@@ -1,0 +1,18 @@
+fastapi>=0.95.0,<2.0.0
+uvicorn[standard]>=0.22.0,<1.0.0
+pydantic>=2.0.0,<3.0.0
+requests>=2.28.0,<3.0.0
+google-cloud-firestore>=2.11.0,<3.0.0
+redis>=4.5.0,<5.0.0
+# Add temporalio only if your orchestration actually requires it
+# temporalio>=1.0.0,<2.0.0
+python-dotenv>=1.0.0,<2.0.0
+httpx>=0.24.0,<1.0.0
+
+# Development dependencies (consider moving to separate dev-requirements.txt)
+pytest>=7.0.0,<8.0.0
+black>=23.0.0,<24.0.0
+flake8>=6.0.0,<7.0.0
+mypy>=1.0.0,<2.0.0
+isort>=5.12.0,<6.0.0
+pytest-cov>=4.0.0,<5.0.0

@@ -1,0 +1,51 @@
+{
+  "name": "Orchestra Python Environment",
+  "dockerFile": "Dockerfile",
+  "remoteUser": "vscode",
+  
+  // Docker-specific settings to help avoid recovery mode issues
+  "runArgs": [
+    "--init",
+    "--security-opt", "seccomp=unconfined"
+  ],
+  
+  // Simplify environment variables
+  "containerEnv": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONPATH": "/workspaces/orchestra-main"
+  },
+  
+  // Cache-busting for build
+  "build": {
+    "args": {
+      "CACHE_BUST": "20250420"
+    }
+  },
+  
+  // Minimal workspace customization
+  "customizations": {
+    "vscode": {
+      "settings": {
+        // Python settings
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.linting.enabled": true,
+        
+        // General settings for better stability
+        "files.watcherExclude": {
+          "**/.git/objects/**": true,
+          "**/.git/subtree-cache/**": true,
+          "**/node_modules/*/**": true
+        }
+      },
+      "extensions": [
+        "ms-python.python"
+      ]
+    }
+  },
+  
+  // Simple initialization command for better startup stability
+  "onCreateCommand": "echo 'Container created: $(date)' > /tmp/container-init.log",
+  
+  // Keep settings minimal - avoid postCreateCommand until container is stable
+  "waitFor": "onCreateCommand"
+}
