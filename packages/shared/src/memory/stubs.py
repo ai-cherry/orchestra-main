@@ -14,41 +14,36 @@ from packages.shared.src.memory.memory_manager import MemoryManager
 from packages.shared.src.models.base_models import AgentData, MemoryItem, PersonaConfig
 
 
-class PatrickMemoryManager(MemoryManager):
+class InMemoryMemoryManagerStub(MemoryManager):
     """
-    Single-user memory manager specifically designed for Patrick.
+    Simple in-memory implementation of the MemoryManager interface for testing.
     
-    This implementation is a simplified version of InMemoryMemoryManager,
-    hardcoded for a single user (patrick) to reduce complexity. It's
-    suitable for the initial development phase where multi-user
-    functionality is not needed.
+    This implementation stores memory items and agent data in memory,
+    making it suitable for development and testing purposes where
+    persistence is not required.
     """
     
     def __init__(self):
-        """Initialize the Patrick-specific memory manager."""
-        self._items = []
-        self._agent_data = []
+        """Initialize the in-memory memory manager stub."""
+        self.memory_items = []
+        self.agent_data = []
+        self.hashes = set()
         self._is_initialized = False
-        self._patrick_user_id = "patrick"  # Hardcoded user ID
     
     def initialize(self) -> None:
         """Initialize the memory manager."""
-        self._items = []
-        self._agent_data = []
         self._is_initialized = True
     
     def close(self) -> None:
         """Close the memory manager and release resources."""
-        self._items = []
-        self._agent_data = []
+        self.memory_items = []
+        self.agent_data = []
+        self.hashes = set()
         self._is_initialized = False
     
     def add_memory_item(self, item: MemoryItem) -> str:
         """
         Add a memory item to storage.
-        
-        This implementation always sets the user_id to "patrick" regardless
-        of what was provided in the item.
         
         Args:
             item: The memory item to store
@@ -65,7 +60,7 @@ class PatrickMemoryManager(MemoryManager):
             item_id = f"memory_{uuid.uuid4().hex}"
             item = MemoryItem(
                 id=item_id,
-                user_id=self._patrick_user_id,  # Always use patrick's user ID
+                user_id=item.user_id,
                 session_id=item.session_id,
                 timestamp=item.timestamp or datetime.utcnow(),
                 item_type=item.item_type,
@@ -75,23 +70,14 @@ class PatrickMemoryManager(MemoryManager):
                 metadata=item.metadata,
                 expiration=item.expiration
             )
-        else:
-            # If ID is provided, ensure the user_id is patrick's
-            item = MemoryItem(
-                id=item.id,
-                user_id=self._patrick_user_id,  # Override with patrick's user ID
-                session_id=item.session_id,
-                timestamp=item.timestamp,
-                item_type=item.item_type,
-                persona_active=item.persona_active,
-                text_content=item.text_content,
-                embedding=item.embedding,
-                metadata=item.metadata,
-                expiration=item.expiration
-            )
         
         # Store the item
-        self._items.append(item)
+        self.memory_items.append(item)
+        
+        # Add content hash to set if it exists
+        content_hash = item.metadata.get('content_hash')
+        if content_hash:
+            self.hashes.add(content_hash)
         
         return item.id
     
@@ -110,7 +96,7 @@ class PatrickMemoryManager(MemoryManager):
             raise RuntimeError("Memory manager is not initialized")
         
         # Find the item
-        for item in self._items:
+        for item in self.memory_items:
             if item.id == item_id:
                 return item
         
@@ -118,19 +104,16 @@ class PatrickMemoryManager(MemoryManager):
     
     def get_conversation_history(
         self,
-        user_id: str = None,  # Made optional since we always use patrick's ID
+        user_id: str,
         session_id: Optional[str] = None,
         limit: int = 20,
         filters: Optional[Dict[str, Any]] = None
     ) -> List[MemoryItem]:
         """
-        Retrieve conversation history for Patrick.
-        
-        This implementation ignores the user_id parameter and always returns
-        items for the hardcoded "patrick" user ID.
+        Retrieve conversation history for a user.
         
         Args:
-            user_id: Ignored (always uses patrick's ID)
+            user_id: The user ID to get history for
             session_id: Optional session ID to filter by
             limit: Maximum number of items to retrieve
             filters: Optional filters to apply
@@ -142,22 +125,12 @@ class PatrickMemoryManager(MemoryManager):
         if not self._is_initialized:
             raise RuntimeError("Memory manager is not initialized")
         
-        # We already know the user is patrick, so no need to filter by user ID
-        items = self._items
+        # Filter by user ID
+        items = [item for item in self.memory_items if item.user_id == user_id]
         
         # Filter by session ID if provided
         if session_id:
             items = [item for item in items if item.session_id == session_id]
-        
-        # Apply additional filters if provided
-        if filters:
-            # Filter by persona
-            if "persona_active" in filters:
-                items = [item for item in items if item.persona_active == filters["persona_active"]]
-            
-            # Filter by item type
-            if "item_type" in filters:
-                items = [item for item in items if item.item_type == filters["item_type"]]
         
         # Sort by timestamp (newest first)
         items.sort(key=lambda x: x.timestamp, reverse=True)
@@ -167,42 +140,26 @@ class PatrickMemoryManager(MemoryManager):
     
     def semantic_search(
         self,
-        user_id: str = None,  # Made optional since we always use patrick's ID
-        query_embedding: List[float] = None,
+        user_id: str,
+        query_embedding: List[float],
         persona_context: Optional[PersonaConfig] = None,
         top_k: int = 5
     ) -> List[MemoryItem]:
         """
-        Simplified semantic search implementation.
+        Perform semantic search using vector embeddings.
         
-        This stub implementation returns the most recent items that match
-        the persona, ignoring the vector embedding search for simplicity.
+        This stub implementation returns an empty list.
         
         Args:
-            user_id: Ignored (always uses patrick's ID)
-            query_embedding: Ignored in this simplified implementation
-            persona_context: Optional persona to filter by
+            user_id: The user ID to search memories for
+            query_embedding: The vector embedding of the query
+            persona_context: Optional persona context for personalized results
             top_k: Maximum number of results to return
             
         Returns:
-            List of recent memory items, optionally filtered by persona
+            Empty list (stub implementation)
         """
-        # Ensure the manager is initialized
-        if not self._is_initialized:
-            raise RuntimeError("Memory manager is not initialized")
-        
-        # We already know the user is patrick, so no need to filter by user ID
-        items = self._items
-        
-        # Filter by persona if provided
-        if persona_context:
-            items = [item for item in items if item.persona_active == persona_context.name]
-        
-        # Sort by timestamp (newest first)
-        items.sort(key=lambda x: x.timestamp, reverse=True)
-        
-        # Return top-k items
-        return items[:top_k]
+        return []
     
     def add_raw_agent_data(self, data: AgentData) -> str:
         """
@@ -227,13 +184,31 @@ class PatrickMemoryManager(MemoryManager):
                 timestamp=data.timestamp or datetime.utcnow(),
                 data_type=data.data_type,
                 content=data.content,
-                metadata=data.metadata
+                metadata=data.metadata,
+                expiration=data.expiration
             )
         
         # Store the data
-        self._agent_data.append(data)
+        self.agent_data.append(data)
         
         return data.id
+    
+    def check_duplicate(self, item: MemoryItem) -> bool:
+        """
+        Check if a memory item already exists in storage.
+        
+        Args:
+            item: The memory item to check for duplicates
+            
+        Returns:
+            True if a duplicate exists, False otherwise
+        """
+        # Check if content hash exists in hashes set
+        content_hash = item.metadata.get('content_hash')
+        if not content_hash:
+            return False
+        
+        return content_hash in self.hashes
     
     def cleanup_expired_items(self) -> int:
         """
@@ -249,10 +224,10 @@ class PatrickMemoryManager(MemoryManager):
         now = datetime.utcnow()
         
         # Count expired items
-        expired_count = sum(1 for item in self._items if item.expiration and item.expiration <= now)
+        expired_count = sum(1 for item in self.memory_items if item.expiration and item.expiration <= now)
         
         # Remove expired items
-        self._items = [item for item in self._items if not item.expiration or item.expiration > now]
-        self._agent_data = [data for data in self._agent_data if not data.expiration or data.expiration > now]
+        self.memory_items = [item for item in self.memory_items if not item.expiration or item.expiration > now]
+        self.agent_data = [data for data in self.agent_data if not data.expiration or data.expiration > now]
         
         return expired_count
