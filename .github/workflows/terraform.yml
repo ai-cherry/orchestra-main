@@ -1,0 +1,150 @@
+name: "Terraform Infrastructure"
+
+on:
+  push:
+    branches: [main]
+    paths: ['infra/**']
+  pull_request:
+    branches: [main]
+    paths: ['infra/**']
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  terraform-dev:
+    name: "Terraform Dev Environment"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./infra/dev
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: agi-baby-cherry
+          
+      - name: Terraform Init
+        id: init
+        run: terraform init
+      
+      - name: Terraform Workspace
+        id: workspace
+        run: |
+          terraform workspace select dev || terraform workspace new dev
+      
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
+        
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate
+      
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -var="env=dev" -no-color
+        continue-on-error: true
+      
+      - name: Update PR
+        uses: actions/github-script@v6
+        if: github.event_name == 'pull_request'
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome == 'success' && '✅' || '❌' }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome == 'success' && '✅' || '❌' }}\`
+            #### Terraform Plan 📖\`${{ steps.plan.outcome == 'success' && '✅' || '❌' }}\`
+
+            <details><summary>Show Plan</summary>
+
+            \`\`\`terraform
+            ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
+            \`\`\`
+
+            </details>`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+      
+      - name: Terraform Apply
+        id: apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -var="env=dev"
+
+  terraform-prod:
+    name: "Terraform Prod Environment"
+    runs-on: ubuntu-latest
+    needs: terraform-dev  # Only run after dev deployment succeeds
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    defaults:
+      run:
+        working-directory: ./infra/prod
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: agi-baby-cherry
+          
+      - name: Terraform Init
+        id: init
+        run: terraform init
+      
+      - name: Terraform Workspace
+        id: workspace
+        run: |
+          terraform workspace select prod || terraform workspace new prod
+      
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -var="env=prod" -no-color
+        
+      # Approve before applying to production
+      - name: Manual approval for production
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ secrets.GITHUB_TOKEN }}
+          approvers: ${{ github.actor }}
+          minimum-approvals: 1
+          issue-title: "Deploy to production"
+          issue-body: "Please approve or deny the deployment to production"
+          exclude-workflow-initiator-as-approver: false
+          timeout-minutes: 60
+      
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -auto-approve -var="env=prod"

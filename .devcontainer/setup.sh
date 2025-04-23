@@ -30,8 +30,8 @@ check_resources() {
 install_dependencies() {
     echo "Installing Python dependencies..."
     # Use python3 -m pip for clarity
-    python3 -m pip install --no-cache-dir -r /workspaces/orchestra-main/orchestrator/requirements.txt
-    python3 -m pip install --no-cache-dir -r /workspaces/orchestra-main/shared/requirements.txt
+    python3 -m pip install --no-cache-dir -r /workspaces/orchestra-main/core/orchestrator/requirements.txt
+    python3 -m pip install --no-cache-dir -r /workspaces/orchestra-main/packages/shared/requirements.txt
     # Add other requirements files if they exist and are needed now
     echo "Python dependencies installation attempted."
 }

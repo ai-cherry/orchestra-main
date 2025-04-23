@@ -1,0 +1,144 @@
+name: Python CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: Test and Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install pytest pytest-cov flake8
+      
+      - name: Lint with flake8
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          
+      - name: Test with pytest
+        run: |
+          pytest tests/ --cov=./ --cov-report=xml
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+  
+  build-and-push:
+    name: Build and Push Docker Image
+    needs: test
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Extract branch name
+        shell: bash
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+      
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/orchestra:${{ env.BRANCH_NAME }}
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/orchestra:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/orchestra:buildcache,mode=max
+  
+  deploy:
+    name: Deploy to Environment
+    needs: build-and-push
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+    steps:
+      - name: Checkout for deployment scripts
+        uses: actions/checkout@v3
+      
+      - name: Set up Google Cloud Auth
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+      
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
+      
+      - name: Configure kubectl for GKE
+        uses: google-github-actions/get-gke-credentials@v1
+        with:
+          cluster_name: ${{ github.ref == 'refs/heads/main' && secrets.GKE_CLUSTER_NAME_PROD || secrets.GKE_CLUSTER_NAME_STAGING }}
+          location: ${{ secrets.GCP_REGION }}
+      
+      - name: Deploy to cluster
+        run: |
+          BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})
+          ENV_NAME=$([[ "$BRANCH_NAME" == "main" ]] && echo "production" || echo "staging")
+          echo "Deploying to $ENV_NAME environment"
+          
+          # Set Firestore credentials for memory manager
+          kubectl create secret generic firestore-creds \
+            --from-literal=project-id=${{ secrets.GOOGLE_CLOUD_PROJECT }} \
+            --from-literal=credentials-path="/app/credentials.json" \
+            --dry-run=client -o yaml | kubectl apply -f -
+            
+          # Create or update the GCP service account credentials secret
+          kubectl create secret generic gcp-credentials \
+            --from-file=credentials.json=${{ secrets.GCP_SERVICE_ACCOUNT_KEY_FILE_PATH }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+          
+          # Deploy with updated image tag
+          kubectl set image deployment/orchestra-app orchestra-app=${{ secrets.DOCKERHUB_USERNAME }}/orchestra:$BRANCH_NAME
+          
+          # Verify deployment
+          kubectl rollout status deployment/orchestra-app
+
+  notify:
+    name: Send Deployment Notification
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "Deployment Completed! :rocket:",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Orchestra Deployment Completed* :rocket:\n\nBranch: ${{ github.ref_name }}\nCommit: ${{ github.sha }}\nEnvironment: ${{ github.ref == 'refs/heads/main' && 'Production' || 'Staging' }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

@@ -1,6 +1,11 @@
 """
 Base model definitions for the AI Orchestration System.
 
+# AI-CONTEXT: This file defines the core data models used throughout the system.
+# AI-CONTEXT: These models are referenced in the memory system and by AI tools.
+# AI-CONTEXT: There are multiple versions of some models (legacy vs core) in the codebase.
+# AI-CONTEXT: MemoryItem is the foundation of the memory and context system.
+
 This module contains the core data models used throughout the application.
 """
 
@@ -13,8 +18,9 @@ try:
 except ImportError:
     # Fallback to dataclasses if pydantic is not available
     from dataclasses import dataclass, field
+
     BaseModel = object
-    
+
     def Field(*args, **kwargs):
         return field(default=None)
 
@@ -22,10 +28,10 @@ except ImportError:
 class PersonaConfig(BaseModel):
     """
     Configuration for a persona in the system.
-    
+
     Personas shape how the orchestrator interacts with the user.
     """
-    
+
     name: str
     description: str
     traits: Dict[str, float] = {}
@@ -36,11 +42,11 @@ class PersonaConfig(BaseModel):
 class MemoryItem(BaseModel):
     """
     Represents a single memory item stored in the system.
-    
+
     Memory items are the core storage unit for conversation history,
     user preferences, and other contextual information.
     """
-    
+
     id: Optional[str] = None
     user_id: str
     session_id: Optional[str] = None
@@ -56,11 +62,11 @@ class MemoryItem(BaseModel):
 class AgentData(BaseModel):
     """
     Represents data produced or consumed by an agent.
-    
+
     Agent data can include intermediate processing results,
     state information, or other agent-specific data.
     """
-    
+
     id: Optional[str] = None
     agent_id: str
     timestamp: datetime = datetime.utcnow()

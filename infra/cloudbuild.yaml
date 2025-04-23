@@ -1,0 +1,212 @@
+# Enhanced Cloud Build configuration for Orchestra
+# Supports:
+# - Multiple environments (dev, stage, prod)
+# - Secret handling
+# - Terraform integration
+# - Docker build and push
+
+steps:
+  # Step 1: Prepare environment variables
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    id: 'set-env'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Determine environment from branch or tag
+        if [[ "$BRANCH_NAME" == "main" ]]; then
+          echo "ENV=prod" > /workspace/env.txt
+        elif [[ "$BRANCH_NAME" == "staging" ]]; then
+          echo "ENV=stage" > /workspace/env.txt
+        else
+          echo "ENV=dev" > /workspace/env.txt
+        fi
+        
+        # Extract env
+        export ENV=$(cat /workspace/env.txt | grep ENV | cut -d '=' -f2)
+        echo "Building for environment: $ENV"
+        
+        # Set version info
+        echo "VERSION=$SHORT_SHA" >> /workspace/env.txt
+        echo "BUILD_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> /workspace/env.txt
+    
+  # Step 2: Access secrets and store them securely for the build
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'access-secrets'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Access OpenRouter API key secret
+        gcloud secrets versions access latest --secret=openrouter --format='get(payload.data)' | tr '_-' '/+' | base64 -d > /workspace/.secrets/openrouter
+        
+        # Create a directory for Terraform service account credentials
+        mkdir -p /workspace/.secrets
+        echo "$$OPENROUTER_API_KEY" > /workspace/.secrets/openrouter_key.txt
+        
+        # Create GSA key for Terraform
+        echo "$$GSA_KEY" > /workspace/.secrets/gsa-key.json
+    secretEnv: ['OPENROUTER_API_KEY', 'GSA_KEY']
+
+  # Step 3: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-image'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Load environment variables
+        source /workspace/env.txt
+        
+        # Build the Docker image with environment-specific arguments
+        docker build \
+          --build-arg ENV=$ENV \
+          --build-arg VERSION=$VERSION \
+          --build-arg BUILD_TIME=$BUILD_TIME \
+          -t us-west2-docker.pkg.dev/$PROJECT_ID/orchestra/orchestrator:$ENV-$SHORT_SHA \
+          -t us-west2-docker.pkg.dev/$PROJECT_ID/orchestra/orchestrator:$ENV-latest \
+          .
+  
+  # Step 4: Push the Docker image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-image'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Load environment variables
+        source /workspace/env.txt
+        
+        # Push the image with environment-specific tags
+        docker push us-west2-docker.pkg.dev/$PROJECT_ID/orchestra/orchestrator:$ENV-$SHORT_SHA
+        docker push us-west2-docker.pkg.dev/$PROJECT_ID/orchestra/orchestrator:$ENV-latest
+
+  # Step 5: Initialize Terraform (using the Terraform cloud builder)
+  - name: 'hashicorp/terraform:1.5'
+    id: 'terraform-init'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Load environment variables
+        source /workspace/env.txt
+        
+        # Copy service account key for Terraform
+        cp /workspace/.secrets/gsa-key.json /tmp/gsa-key.json
+        
+        # Create the GCS bucket if it doesn't exist (for Terraform state)
+        cd infra
+        
+        # Initialize Terraform workspace
+        terraform init
+        
+        # Create or switch to the appropriate workspace
+        if terraform workspace list | grep -q "$ENV"; then
+          terraform workspace select $ENV
+        else
+          terraform workspace new $ENV
+        fi
+
+  # Step 6: Apply Terraform
+  - name: 'hashicorp/terraform:1.5'
+    id: 'terraform-apply'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Load environment variables
+        source /workspace/env.txt
+        
+        cd infra
+        
+        # Select the appropriate workspace again just to be safe
+        terraform workspace select $ENV
+        
+        # Apply with variables
+        terraform apply -auto-approve \
+          -var="env=$ENV" \
+          -var="project_id=$PROJECT_ID" \
+          -var="region=us-west2"
+          
+  # Step 7: Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    id: 'deploy-cloud-run'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Load environment variables
+        source /workspace/env.txt
+        
+        # Deploy to Cloud Run with appropriate settings
+        gcloud run deploy orchestrator-api-$ENV \
+          --image us-west2-docker.pkg.dev/$PROJECT_ID/orchestra/orchestrator:$ENV-$SHORT_SHA \
+          --region us-west2 \
+          --platform managed \
+          --allow-unauthenticated \
+          --min-instances 0 \
+          --max-instances 20 \
+          --cpu Always \
+          --memory 2Gi
+
+  # Step 8: Run smoke tests for the deployment
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    id: 'run-smoke-tests'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Load environment variables
+        source /workspace/env.txt
+        
+        # Get the Cloud Run URL
+        CLOUD_RUN_URL=$(gcloud run services describe orchestrator-api-$ENV --region us-west2 --format='value(status.url)')
+        
+        # Perform a simple health check
+        echo "Running health check on $CLOUD_RUN_URL"
+        curl -s -o /dev/null -w "%{http_code}" $CLOUD_RUN_URL/health | grep 200
+
+  # Step 9: Notify about deployment status
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    id: 'notify-deployment'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Load environment variables
+        source /workspace/env.txt
+        
+        echo "Deployment to $ENV environment completed successfully!"
+        echo "Image: us-west2-docker.pkg.dev/$PROJECT_ID/orchestra/orchestrator:$ENV-$SHORT_SHA"
+        
+        # Get the Cloud Run URL
+        CLOUD_RUN_URL=$(gcloud run services describe orchestrator-api-$ENV --region us-west2 --format='value(status.url)')
+        echo "Service URL: $CLOUD_RUN_URL"
+
+# Define the images that will be built
+images:
+  - 'us-west2-docker.pkg.dev/${PROJECT_ID}/orchestra/orchestrator:${_ENV}-${SHORT_SHA}'
+  - 'us-west2-docker.pkg.dev/${PROJECT_ID}/orchestra/orchestrator:${_ENV}-latest'
+
+# Define the substitution variables
+substitutions:
+  _ENV: 'dev'  # Default environment
+
+# Configure timeout
+timeout: '1800s'  # 30 minutes
+
+# Configure build options
+options:
+  logging: CLOUD_LOGGING_ONLY
+  dynamic_substitutions: true
+  env:
+    - 'TF_VAR_project_id=${PROJECT_ID}'
+    - 'TF_VAR_region=us-west2'
+
+# Access to secrets
+availableSecrets:
+  secretManager:
+    - versionName: projects/${PROJECT_ID}/secrets/openrouter/versions/latest
+      env: 'OPENROUTER_API_KEY'
+    - versionName: projects/${PROJECT_ID}/secrets/gcp-service-account/versions/latest
+      env: 'GSA_KEY'

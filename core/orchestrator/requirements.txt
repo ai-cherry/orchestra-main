@@ -1,0 +1,8 @@
+# Core orchestrator requirements
+-r ../../requirements-consolidated.txt
+
+# Additional dependencies specific to core/orchestrator package
+# (none at the moment, core is covered by the consolidated requirements)
+
+# Note: For testing in this package, use the development dependencies
+# pip install -r ../../requirements-dev.txt
