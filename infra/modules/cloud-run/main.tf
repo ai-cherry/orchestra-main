@@ -53,7 +53,7 @@ resource "google_service_account" "orchestrator_sa" {
   description  = "Service account for the Orchestra ${var.env} API"
 }
 
-# Grant IAM roles to the service account
+# Grant IAM roles to the service account - least privilege principle
 resource "google_project_iam_member" "firestore_access" {
   project = var.project_id
   role    = "roles/datastore.user"
@@ -78,6 +78,24 @@ resource "google_project_iam_member" "vertex_user" {
   member  = "serviceAccount:${google_service_account.orchestrator_sa.email}"
 }
 
+resource "google_project_iam_member" "secretmanager_accessor" {
+  project = var.project_id
+  role    = "roles/secretmanager.secretAccessor"
+  member  = "serviceAccount:${google_service_account.orchestrator_sa.email}"
+}
+
+resource "google_project_iam_member" "redis_user" {
+  project = var.project_id
+  role    = "roles/redis.editor"
+  member  = "serviceAccount:${google_service_account.orchestrator_sa.email}"
+}
+
+resource "google_project_iam_member" "logs_writer" {
+  project = var.project_id
+  role    = "roles/logging.logWriter"
+  member  = "serviceAccount:${google_service_account.orchestrator_sa.email}"
+}
+
 # Cloud Run service
 resource "google_cloud_run_service" "orchestrator" {
   name     = "orchestrator-api-${var.env}"
@@ -89,6 +107,9 @@ resource "google_cloud_run_service" "orchestrator" {
         "autoscaling.knative.dev/minScale"        = var.min_instances
         "autoscaling.knative.dev/maxScale"        = var.max_instances
         "run.googleapis.com/cpu-throttling"       = var.cpu_always_allocated ? "false" : "true"
+        # Connect to VPC
+        "run.googleapis.com/vpc-access-connector" = "projects/${var.project_id}/locations/${var.region}/connectors/orchestrator-vpc-connector-${var.env}"
+        "run.googleapis.com/vpc-access-egress"    = "private-ranges-only"
       }
       labels = {
         "environment" = var.env
@@ -101,6 +122,7 @@ resource "google_cloud_run_service" "orchestrator" {
       containers {
         image = var.image
 
+        # Required environment variables
         env {
           name  = "ENVIRONMENT"
           value = var.env
@@ -116,11 +138,28 @@ resource "google_cloud_run_service" "orchestrator" {
           value = var.vector_index_name
         }
 
+        # Secret references
         env {
-          name  = "OPENROUTER_KEY"
-          value = "projects/${var.project_id}/secrets/openrouter/versions/latest"
+          name  = "OPENROUTER_API_KEY"
+          value_from {
+            secret_key_ref {
+              name = "openrouter-${var.env}"
+              key  = "latest"
+            }
+          }
+        }
+        
+        env {
+          name  = "PORTKEY_API_KEY"
+          value_from {
+            secret_key_ref {
+              name = "portkey-api-key-${var.env}"
+              key  = "latest"
+            }
+          }
         }
 
+        # Configuration
         env {
           name  = "LOG_LEVEL"
           value = var.env == "prod" ? "INFO" : "DEBUG"
@@ -131,13 +170,53 @@ resource "google_cloud_run_service" "orchestrator" {
           value = "orchestra-bus-${var.env}"
         }
 
+        # Redis configuration
+        env {
+          name  = "REDIS_HOST"
+          value = "orchestrator-cache-${var.env}.redis.cache.windows.net"  # This will be replaced with actual Redis host
+        }
+        
+        env {
+          name  = "REDIS_PORT"
+          value = "6379"
+        }
+        
+        env {
+          name  = "REDIS_AUTH_SECRET"
+          value = "redis-auth-${var.env}"
+        }
+
+        # Container resources
         resources {
           limits = {
-            cpu    = "1000m"
-            memory = "2Gi"
+            cpu    = var.env == "prod" ? "2000m" : "1000m"
+            memory = var.env == "prod" ? "4Gi" : "2Gi"
           }
         }
+        
+        # Health checks
+        liveness_probe {
+          http_get {
+            path = "/api/health"
+          }
+          initial_delay_seconds = 10
+          period_seconds = 30
+        }
+        
+        readiness_probe {
+          http_get {
+            path = "/api/health"
+          }
+          initial_delay_seconds = 5
+          period_seconds = 10
+        }
       }
+      
+      # Container concurrency (how many concurrent requests)
+      container_concurrency = 80
+      
+      # Set reasonable timeouts
+      timeout_seconds = 300
     }
   }
 

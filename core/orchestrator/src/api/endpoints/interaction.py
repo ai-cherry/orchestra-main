@@ -30,7 +30,7 @@ class UserInput(BaseModel):
     """User input model for interaction endpoint."""
     
     text: str = Field(..., min_length=1, description="User's message text")
-    user_id: str = Field("patrick", description="User identifier")
+    user_id: Optional[str] = Field(None, description="User identifier")
 
 
 @router.post("/interact", response_model=Dict[str, str], tags=["interaction"])
@@ -62,6 +62,11 @@ async def interact(
     try:
         # Get settings
         settings = get_settings()
+        
+        # Use default user_id if not provided
+        if user_input.user_id is None:
+            user_input.user_id = "patrick"  # For backward compatibility
+            logger.warning("No user_id provided, using default: 'patrick'")
         
         # Retrieve active persona from request state
         persona_config = request.state.active_persona

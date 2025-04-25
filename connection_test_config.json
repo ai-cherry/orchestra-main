@@ -1,0 +1,33 @@
+{
+  "tests": {
+    "connection_count": 5,
+    "operation_count": 20,
+    "run_firestore": true,
+    "run_redis": true,
+    "simulate_errors": true,
+    "error_probability": 0.2,
+    "network_latency": {
+      "enabled": true,
+      "min_ms": 10,
+      "max_ms": 200
+    }
+  },
+  "firestore": {
+    "project_id": "agi-baby-cherry",
+    "credentials_path": "",
+    "collections": {
+      "test": "connection_test",
+      "memory": "memory_items",
+      "config": "config"
+    }
+  },
+  "redis": {
+    "host": "localhost",
+    "port": 6379,
+    "password": "",
+    "connection_pool": {
+      "max_connections": 10,
+      "timeout": 5
+    }
+  }
+}

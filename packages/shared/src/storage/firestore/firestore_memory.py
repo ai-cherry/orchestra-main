@@ -26,7 +26,7 @@ except ImportError:
         "Firestore library not available. Install with: pip install google-cloud-firestore"
     )
 
-from packages.shared.src.memory.memory_manager import MemoryManager
+from packages.shared.src.memory.memory_manager import MemoryManager, MemoryHealth
 from packages.shared.src.models.base_models import MemoryItem, AgentData, PersonaConfig
 
 # Set up logger
@@ -534,7 +534,7 @@ class FirestoreMemoryManager(MemoryManager):
 
     async def cleanup_expired_items(self) -> int:
         """
-        Remove expired items from Firestore.
+        Remove expired items from storage.
 
         Returns:
             Number of items removed
@@ -583,3 +583,54 @@ class FirestoreMemoryManager(MemoryManager):
             error_msg = f"Unexpected error during cleanup: {e}"
             logger.error(error_msg)
             raise StorageError(error_msg)
+            
+    async def health_check(self) -> MemoryHealth:
+        """
+        Perform a health check on the Firestore connection.
+        
+        Returns:
+            Dictionary with health status information
+        """
+        health: MemoryHealth = {
+            "status": "healthy",
+            "firestore": False,
+            "error_count": 0,
+            "details": {}
+        }
+        
+        if not self._initialized:
+            try:
+                self.initialize()
+                health["details"]["initialization"] = "Initialized during health check"
+            except Exception as e:
+                health["status"] = "error"
+                health["details"]["initialization_error"] = str(e)
+                return health
+                
+        try:
+            # Try to read a test document to verify connection
+            test_id = "health-check-non-existent"
+            try:
+                # Should return None or raise "not found" which is fine
+                await self.get_memory_item(test_id)
+                health["firestore"] = True
+            except Exception as e:
+                # If it's just a "not found" error, that's actually good
+                if "not found" in str(e).lower():
+                    health["firestore"] = True
+                    health["details"]["firestore_check"] = "Successfully verified item not found"
+                else:
+                    health["details"]["firestore_error"] = str(e)
+                    health["status"] = "error"
+            
+            return health
+        except Exception as e:
+            return {
+                "status": "error",
+                "firestore": False,
+                "error_count": 1,
+                "last_error": str(e),
+                "details": {
+                    "message": f"Firestore health check failed: {e}"
+                }
+            }

@@ -1,144 +1,180 @@
-# GCP Deployment Guide for Orchestra Project
+# Orchestra GCP Deployment Guide
 
-This guide explains how to set up and manage the deployment of the Orchestra project to Google Cloud Platform (GCP) using GitHub Actions.
+This guide explains how to deploy the Orchestra AI system to Google Cloud Platform (GCP) using the provided infrastructure as code and CI/CD pipeline.
+
+## Overview
+
+The Orchestra deployment uses the following GCP services:
+
+* **Cloud Run**: For hosting the API service
+* **Firestore**: For persistent memory storage
+* **Memorystore for Redis**: For caching and session management
+* **Vertex AI Vector Search**: For semantic search capabilities
+* **Secret Manager**: For secure credentials storage
+* **Cloud Build**: For CI/CD pipeline
+* **Artifact Registry**: For Docker image storage
+* **VPC Network**: For secure connectivity between services
+* **Cloud Monitoring**: For observability and alerting
 
 ## Prerequisites
 
-- Access to the Orchestra GitHub repository
-- Google Cloud Platform account with admin privileges
-- Google Kubernetes Engine (GKE) clusters for staging and production
-- Google Cloud Firestore database set up
-- Docker Hub account to store container images
+1. A GCP project with billing enabled
+2. Required APIs enabled (automatically done by Terraform)
+3. Service account with appropriate permissions
+4. API keys for external services (Portkey, OpenRouter, etc.)
 
-## Setting Up GitHub Secrets
+## Deployment Architecture
 
-For the CI/CD pipeline to work correctly, you need to set up the following secrets in your GitHub repository:
+![Orchestra GCP Architecture](https://storage.googleapis.com/agi-baby-cherry-bucket/orchestra-architecture.png)
 
-1. Go to your GitHub repository → Settings → Secrets and variables → Actions
-2. Add the following secrets:
+The architecture follows GCP best practices:
+- Cloud Run services connect to Redis, Firestore, and Vertex AI
+- All services operate within a custom VPC network
+- Default-deny firewall rules with explicit allow rules only for required traffic
+- Least-privilege service accounts for each component
+- Monitoring with predefined SLOs and alerts
 
-| Secret Name | Description |
-|-------------|-------------|
-| `DOCKERHUB_USERNAME` | Your Docker Hub username |
-| `DOCKERHUB_TOKEN` | Your Docker Hub access token |
-| `GCP_CREDENTIALS` | JSON credentials for GCP service account (with GKE and Firestore access) |
-| `GOOGLE_CLOUD_PROJECT` | Your GCP project ID |
-| `GCP_REGION` | The region where your GKE clusters are hosted (e.g., `us-central1`) |
-| `GKE_CLUSTER_NAME_PROD` | The name of your production GKE cluster |
-| `GKE_CLUSTER_NAME_STAGING` | The name of your staging GKE cluster |
-| `GCP_SERVICE_ACCOUNT_KEY` | The JSON content of your service account key |
-| `SLACK_WEBHOOK_URL` | (Optional) Webhook URL for Slack notifications |
+## Environment Setup
 
-## Setting Up GCP Resources
+Three environments are supported:
+- **dev**: Development environment (minimal resources)
+- **stage**: Staging/testing environment
+- **prod**: Production environment (optimized for performance and reliability)
 
-### 1. Create a Service Account
+## Creating Service Account for Deployment
 
-1. Go to GCP Console → IAM & Admin → Service Accounts
-2. Create a new service account with:
-   - Kubernetes Engine Admin role
-   - Firestore User role
-   - Storage Object Admin role
-3. Create and download a JSON key for this service account
-4. Store this JSON content in the `GCP_SERVICE_ACCOUNT_KEY` GitHub secret
+1. Go to the IAM & Admin > Service Accounts section in the GCP Console
+2. Create a new service account `cherrybaby-deploy`
+3. Grant the necessary roles:
+   - Cloud Run Admin
+   - Cloud Build Editor
+   - Storage Admin
+   - Secret Manager Admin
+   - Service Account User
+   - Compute Admin
+   - Artifact Registry Admin
+   - Firestore Admin
+   - Redis Admin
+   - Vertex AI Admin
 
-### 2. Set Up Firestore Database
+4. Create and download a JSON key for this service account
+5. Store the key securely in Secret Manager as `gcp-service-account`
 
-1. Go to GCP Console → Firestore
-2. Create a new database in Native mode
-3. Note the project ID for your `GOOGLE_CLOUD_PROJECT` secret
+## Setting Up API Keys
 
-### 3. Set Up GKE Clusters
-
-For both production and staging environments:
-
-1. Go to GCP Console → Kubernetes Engine → Clusters
-2. Create a new cluster:
-   - For production:
-     - Name: `orchestra-prod` (use this for `GKE_CLUSTER_NAME_PROD`)
-     - Region: Your preferred region (use this for `GCP_REGION`)
-     - Node count: 3
-     - Machine type: e2-standard-2 (2 vCPUs, 8GB memory)
-   - For staging:
-     - Name: `orchestra-staging` (use this for `GKE_CLUSTER_NAME_STAGING`)
-     - Region: Same as production
-     - Node count: 1 or 2
-     - Machine type: e2-small (2 vCPUs, 2GB memory)
-
-### 4. Setting up Kubernetes Secrets
-
-Once your clusters are created, set up the GCP credentials secret in each cluster:
+Store your API keys in Secret Manager:
 
 ```bash
-# Authenticate to GKE Production Cluster
-gcloud container clusters get-credentials orchestra-prod --region=YOUR_REGION
+# For Portkey
+gcloud secrets create portkey-api-key --replication-policy="automatic"
+echo "YOUR_PORTKEY_API_KEY" | gcloud secrets versions add portkey-api-key --data-file=-
 
-# Create secret for production
-kubectl create secret generic gcp-credentials \
-  --from-file=gcp-credentials.json=/path/to/your/credentials.json
-
-# Authenticate to GKE Staging Cluster
-gcloud container clusters get-credentials orchestra-staging --region=YOUR_REGION
-
-# Create secret for staging
-kubectl create secret generic gcp-credentials \
-  --from-file=gcp-credentials.json=/path/to/your/credentials.json
+# For OpenRouter
+gcloud secrets create openrouter --replication-policy="automatic"
+echo "YOUR_OPENROUTER_API_KEY" | gcloud secrets versions add openrouter --data-file=-
 ```
-
-## Deployment Process
-
-The deployment process is fully automated through GitHub Actions:
-
-1. Push to `develop` branch: Deploys to staging environment
-2. Push to `main` branch: Deploys to production environment
-
-The workflow:
-1. Runs tests and linting
-2. Builds and pushes a Docker image
-3. Deploys the image to the appropriate GKE cluster
-4. Sends a notification when complete
-
-## Monitoring and Troubleshooting
-
-### Monitoring
-
-1. GCP Console → Kubernetes Engine → Workloads: To see the status of your deployments
-2. GCP Console → Kubernetes Engine → Services: To see the status of your services
-3. GCP Console → Logging: To view application logs
-
-### Troubleshooting Common Issues
-
-1. **Authentication Failures**:
-   - Check if your `GCP_CREDENTIALS` and `GCP_SERVICE_ACCOUNT_KEY` are valid and not expired
-   - Ensure the service account has the necessary permissions
-
-2. **Deployment Fails**:
-   - Check the GitHub Actions workflow logs
-   - Check the pod logs in GKE for application errors
-
-3. **Firestore Connection Issues**:
-   - Ensure your service account has Firestore access
-   - Check that the `GOOGLE_APPLICATION_CREDENTIALS` path in containers matches the mount path
 
 ## Manual Deployment
 
-You can also deploy manually using:
+If you need to deploy manually:
 
-```bash
-# Deploy to staging
-kubectl apply -f kubernetes/staging-deployment.yaml
-kubectl apply -f kubernetes/staging-service.yaml
+1. Clone the repository
 
-# Deploy to production
-kubectl apply -f kubernetes/production-deployment.yaml
-kubectl apply -f kubernetes/production-service.yaml
-```
+2. Navigate to the `infra` directory:
+   ```bash
+   cd infra
+   ```
 
-## Future Enhancements
+3. Initialize Terraform:
+   ```bash
+   export GOOGLE_APPLICATION_CREDENTIALS=/path/to/your/service-account-key.json
+   terraform init
+   ```
 
-Consider these improvements for your GCP infrastructure:
+4. Select workspace (environment):
+   ```bash
+   terraform workspace select dev  # or 'stage', 'prod'
+   ```
 
-1. Set up Cloud Monitoring and alerts for your application
-2. Implement Firestore backup strategy
-3. Configure Cloud CDN for better performance
-4. Implement Cloud Armor for additional security
-5. Use Workload Identity for better security than service account keys
+5. Apply Terraform configuration:
+   ```bash
+   terraform apply -var="env=dev" -var="project_id=agi-baby-cherry" -var="region=us-central1"
+   ```
+
+## CI/CD Pipeline
+
+For automated deployments, the project uses Cloud Build:
+
+1. Create a trigger in Cloud Build:
+   - Name: `cherry-deploy-trigger`
+   - Event: Push to branch
+   - Source: Your repository
+   - Configuration: Repository (`/infra/cloudbuild.yaml`)
+
+2. Configure branch-to-environment mapping:
+   - `main` → prod
+   - `staging` → stage
+   - All others → dev
+
+## Configuring Custom Domain (Optional)
+
+To use a custom domain:
+
+1. Add a domain mapping in Cloud Run
+2. Set up DNS records to point to the Cloud Run service
+3. Configure SSL certificates
+
+## Monitoring and Operations
+
+The deployment includes:
+
+- **Dashboards**: Find dashboard links in deployment outputs
+- **Alerting**: Email notifications for critical events
+- **Logging**: Structured logs in Cloud Logging
+- **SLOs**: Service level objectives for availability and latency
+
+## Troubleshooting
+
+Common issues:
+
+1. **Health check failures**:
+   - Verify the service is running: `gcloud run services describe orchestrator-api-dev`
+   - Check logs: `gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=orchestrator-api-dev"`
+
+2. **Secret access issues**:
+   - Verify the Cloud Run service account has Secret Accessor role
+   - Check secret versions exist: `gcloud secrets versions list openrouter-dev`
+
+3. **Network connectivity issues**:
+   - Verify VPC connector is correctly configured
+   - Check firewall rules allow necessary traffic
+
+## Security Best Practices
+
+The deployment implements:
+- Default-deny firewall rules
+- Least-privilege service accounts
+- Secret Manager for credential storage
+- VPC for network isolation
+- Private Google Access for services
+- Cloud Armor for edge protection (optional)
+
+## Scaling Considerations
+
+- Cloud Run scales automatically based on traffic
+- Configure min/max instances based on your needs
+- Redis cache size may need adjustment for heavy loads
+- Monitor Firestore usage for appropriate scaling
+
+## Cost Optimization
+
+- Cloud Run only charges for actual usage
+- Use minimum instances=0 in dev/staging for cost saving
+- Enable Firestore TTL for older data
+- Set up budget alerts in GCP Billing
+
+## Reference
+
+- [Cloud Run Documentation](https://cloud.google.com/run/docs)
+- [Terraform GCP Provider](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
+- [Cloud Build CI/CD](https://cloud.google.com/build/docs/configuring-builds/create-basic-configuration)

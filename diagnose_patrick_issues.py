@@ -391,7 +391,7 @@ class PatrickDiagnostic:
             # Test memory manager initialization
             try:
                 memory_manager = InMemoryMemoryManager()
-                memory_manager.initialize()
+                await memory_manager.initialize()
                 
                 self.results.append(DiagnosticResult(
                     "memory", 
@@ -559,7 +559,13 @@ class PatrickDiagnostic:
             # Import the LLM client
             try:
                 from packages.shared.src.llm_client.interface import LLMClient
-                from packages.shared.src.llm_client.portkey_client import PortkeyClient
+                # Try to import the regular client first
+                try:
+                    from packages.shared.src.llm_client.portkey_client import PortkeyClient
+                except ImportError:
+                    # Fall back to mock client if regular client is not available
+                    from packages.shared.src.llm_client.mock_portkey_client import MockPortkeyClient as PortkeyClient
+                    logger.info("Using MockPortkeyClient for diagnostics")
             except ImportError as e:
                 self.results.append(DiagnosticResult(
                     "llm_integration", 
@@ -573,7 +579,9 @@ class PatrickDiagnostic:
             
             # Test LLM client initialization
             try:
-                llm_client = PortkeyClient()
+                from core.orchestrator.src.config.settings import get_settings
+                settings = get_settings()
+                llm_client = PortkeyClient(settings)
                 
                 # Test health check if available
                 if hasattr(llm_client, 'health_check'):

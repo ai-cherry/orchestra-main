@@ -1,0 +1,56 @@
+Component Name,Found in JS,Found in Android,JS Matches,Android Matches
+Button (Primary),False,True,None,"Button, button, Button, button, button, Button.Primary, Button.Primary, Button.Primary, Button.Primary, Orchestra.Button.Primary, Orchestra.Button.Base, Orchestra.Button.Base, Orchestra.Button.Primary, Orchestra.Button.Primary, Orchestra.Button.Primary, Orchestra.Button.Primary, Orchestra.Button.Primary, Orchestra.Button.Primary, Orchestra.Button.Primary, Orchestra.Button.Secondary, Orchestra.Button.Secondary, Orchestra.Button.Outline, Orchestra.Button.Outline, Orchestra.Button.Ghost, Orchestra.Button.Ghost, Button.Base, Button.Base, Button.Primary, Button.Primary, Button.Primary, Button.Primary, Button.Primary, Button.Primary, Button.Secondary, Button.Secondary, Button.Outline, Button.Outline, Button.Ghost, Button.Ghost, Orchestra.Button.Base, Orchestra.Button.Base, Orchestra.Button.Primary, Orchestra.Button.Primary, Orchestra.Button.Primary, Orchestra.Button.Primary, Orchestra.Button.Primary, Orchestra.Button.Primary, Orchestra.Button.Primary, Orchestra.Button.Secondary, Orchestra.Button.Secondary, Orchestra.Button.Outline, Orchestra.Button.Outline, Orchestra.Button.Ghost, Orchestra.Button.Ghost"
+Card (Default),False,True,None,"Card, card, Card, card, card, Orchestra.Card, Orchestra.Card, Orchestra.Card.Elevated, Orchestra.Card.Elevated, Orchestra.Card.Title, Orchestra.Card.Title, Orchestra.Card.Subtitle, Orchestra.Card.Subtitle, Orchestra.Card.Body, Orchestra.Card.Body, Card, Card, Card.Elevated, Card.Elevated, Card.Title, Card.Title, Card.Subtitle, Card.Subtitle, Card.Body, Card.Body, Orchestra.Card, Orchestra.Card, cardBackgroundColor, cardBackgroundColor, cardBackgroundColor, cardCornerRadius, cardCornerRadius, cardCornerRadius, cardElevation, cardElevation, cardElevation, Orchestra.Card.Elevated, Orchestra.Card.Elevated, cardElevation, cardElevation, cardElevation, Orchestra.Card.Title, Orchestra.Card.Title, Orchestra.Card.Subtitle, Orchestra.Card.Subtitle, Orchestra.Card.Body, Orchestra.Card.Body"
+Input (Default),False,True,None,"Input, Input, Orchestra.TextInputLayout, Orchestra.TextInputLayout, Orchestra.TextInputEditText, Orchestra.TextInputEditText, TextInputLayout, TextInputLayout, TextInputEditText, TextInputEditText, Orchestra.TextInputLayout, Orchestra.TextInputLayout, Orchestra.TextInputEditText, Orchestra.TextInputEditText"
+Sidebar Item,False,False,None,None
+Top Bar Container,False,True,None,"Top, Top, Orchestra.TopBar, Orchestra.TopBar, Orchestra.TopBar.Title, Orchestra.TopBar.Title, TopBar, TopBar, TopBar.Title, TopBar.Title, boxCornerRadiusTopEnd, boxCornerRadiusTopEnd, boxCornerRadiusTopStart, boxCornerRadiusTopStart, android:paddingTop, android:paddingTop, Orchestra.TopBar, Orchestra.TopBar, Orchestra.TopBar.Title, Orchestra.TopBar.Title"
+
+Summary
+Total Components,5
+Found in JS,0
+Found in Android,4
+Found in Both,0
+Not Found,1
+
+JS Patterns Found
+
+Android Patterns Found
+Button
+Button.Base
+Button.Ghost
+Button.Outline
+Button.Primary
+Button.Secondary
+Card
+Card.Body
+Card.Elevated
+Card.Subtitle
+Card.Title
+Input
+Orchestra.Button.Base
+Orchestra.Button.Ghost
+Orchestra.Button.Outline
+Orchestra.Button.Primary
+Orchestra.Button.Secondary
+Orchestra.Card
+Orchestra.Card.Body
+Orchestra.Card.Elevated
+Orchestra.Card.Subtitle
+Orchestra.Card.Title
+Orchestra.TextInputEditText
+Orchestra.TextInputLayout
+Orchestra.TopBar
+Orchestra.TopBar.Title
+TextInputEditText
+TextInputLayout
+Top
+TopBar
+TopBar.Title
+android:paddingTop
+boxCornerRadiusTopEnd
+boxCornerRadiusTopStart
+button
+card
+cardBackgroundColor
+cardCornerRadius
+cardElevation

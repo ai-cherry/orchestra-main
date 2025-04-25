@@ -11,6 +11,7 @@ from fastapi.testclient import TestClient
 
 from core.orchestrator.src.main import app
 from packages.shared.src.models.base_models import MemoryItem
+from tests.mocks.memory_fixtures import mock_memory_manager, get_memory_manager_stub
 
 
 # Create test client
@@ -75,25 +76,28 @@ def test_interact_with_different_personas(persona):
 @pytest.mark.critical
 def test_memory_integration(mock_memory_manager):
     """Test that interaction properly uses memory manager."""
-    # Need to patch the dependency to use our mock
-    with patch("core.orchestrator.src.api.dependencies.memory.get_memory_manager_stub", 
-               return_value=mock_memory_manager):
+    # Need to patch both LLM and memory manager
+    with patch("core.orchestrator.src.api.dependencies.memory.get_memory_manager", 
+              return_value=mock_memory_manager), \
+         patch("core.orchestrator.src.api.dependencies.llm.get_llm_client", 
+              return_value=AsyncMock(generate_response=AsyncMock(return_value="Test response"))):
+        
         # Send a request
         response = client.post("/api/interact", json={
             "text": "Test memory integration",
             "user_id": "memory_test_user"
         })
-        
-        # Verify request was successful
-        assert response.status_code == 200
-        
-        # Verify memory manager was called correctly
-        mock_memory_manager.get_conversation_history.assert_called_once()
-        mock_memory_manager.add_memory_item.assert_called_once()
-        
-        # Verify the user_id was passed correctly
-        args, kwargs = mock_memory_manager.get_conversation_history.call_args
-        assert kwargs["user_id"] == "memory_test_user"
+    
+    # Verify request was successful
+    assert response.status_code == 200
+    
+    # Verify memory manager was called correctly
+    mock_memory_manager.get_conversation_history.assert_called_once()
+    mock_memory_manager.add_memory_item.assert_called_once()
+    
+    # Verify the user_id was passed correctly
+    args, kwargs = mock_memory_manager.get_conversation_history.call_args
+    assert kwargs["user_id"] == "memory_test_user"
 
 
 def test_error_handling_missing_persona():

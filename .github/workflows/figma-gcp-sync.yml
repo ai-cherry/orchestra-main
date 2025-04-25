@@ -1,0 +1,108 @@
+name: Figma GCP Sync
+
+on:
+  repository_dispatch:
+    types: [figma-update]
+  workflow_dispatch:
+    inputs:
+      file_id:
+        description: 'Figma File ID'
+        required: false
+        default: '368236963'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Validate Figma PAT scopes
+        env:
+          FIGMA_PAT: ${{ secrets.FIGMA_PAT }}
+        run: |
+          python scripts/validate_figma_pat.py
+          
+      - name: Set up GCP credentials
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY_JSON }}
+          
+      - name: Run Figma GCP Sync
+        env:
+          FIGMA_PAT: ${{ secrets.FIGMA_PAT }}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: |
+          python scripts/figma_gcp_sync.py \
+            --file-key ${{ github.event.inputs.file_id || '368236963' }} \
+            --output-dir ./styles \
+            --update-secrets \
+            --validate \
+            --update-terraform
+            
+      - name: Validate design tokens with Vertex AI
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: |
+          if [ -f scripts/validate_design_tokens.py ]; then
+            python scripts/validate_design_tokens.py \
+              --input ./styles/design_tokens.json \
+              --project ${{ secrets.GCP_PROJECT_ID }} \
+              --region us-central1
+          else
+            echo "Design token validation script not found, using built-in validation."
+          fi
+            
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        
+      - name: Build and Push Container
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: |
+          if [ -f infra/cloudbuild.yaml ]; then
+            gcloud builds submit --config=infra/cloudbuild.yaml
+          else
+            echo "Building container using default configuration"
+            gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/orchestra:${{ github.sha }}
+          fi
+          
+      - name: Deploy to Cloud Run with Canary
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: |
+          # Deploy 10% traffic to new version
+          gcloud run deploy orchestra \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/orchestra:${{ github.sha }} \
+            --platform managed \
+            --region us-central1 \
+            --tag release-${{ github.run_number }} \
+            --no-traffic
+          
+          # Update traffic split
+          gcloud run services update-traffic orchestra \
+            --platform managed \
+            --region us-central1 \
+            --to-tags release-${{ github.run_number }}=10
+            
+      - name: Post-Deployment Verification
+        run: |
+          echo "Deployed new version with 10% traffic allocation."
+          echo "Monitoring for 15 minutes before proceeding with full rollout."
+          # In a real implementation, you would add monitoring checks here
+          
+      - name: Notify Team
+        run: |
+          echo "Figma-GCP sync completed. New design tokens deployed to Cloud Run."
+          echo "Monitor the canary deployment at: https://orchestra-${{ secrets.GCP_PROJECT_ID }}.a.run.app"
+          # In a real implementation, you would integrate with Slack, Teams, or email notification

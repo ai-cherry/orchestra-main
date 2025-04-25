@@ -10,7 +10,7 @@ import uuid
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from packages.shared.src.memory.memory_manager import MemoryManager
+from packages.shared.src.memory.memory_manager import MemoryManager, MemoryHealth
 from packages.shared.src.models.base_models import AgentData, MemoryItem, PersonaConfig
 
 
@@ -23,25 +23,31 @@ class InMemoryMemoryManagerStub(MemoryManager):
     persistence is not required.
     """
 
-    def __init__(self):
-        """Initialize the in-memory memory manager stub."""
+    def __init__(self, namespace: str = "default"):
+        """
+        Initialize the in-memory memory manager stub.
+        
+        Args:
+            namespace: Optional namespace to use for memory isolation
+        """
+        self.namespace = namespace
         self.memory_items = []
         self.agent_data = []
         self.hashes = set()
         self._is_initialized = False
 
-    def initialize(self) -> None:
+    async def initialize(self) -> None:
         """Initialize the memory manager."""
         self._is_initialized = True
 
-    def close(self) -> None:
+    async def close(self) -> None:
         """Close the memory manager and release resources."""
         self.memory_items = []
         self.agent_data = []
         self.hashes = set()
         self._is_initialized = False
 
-    def add_memory_item(self, item: MemoryItem) -> str:
+    async def add_memory_item(self, item: MemoryItem) -> str:
         """
         Add a memory item to storage.
 
@@ -81,7 +87,7 @@ class InMemoryMemoryManagerStub(MemoryManager):
 
         return item.id
 
-    def get_memory_item(self, item_id: str) -> Optional[MemoryItem]:
+    async def get_memory_item(self, item_id: str) -> Optional[MemoryItem]:
         """
         Retrieve a specific memory item by ID.
 
@@ -102,7 +108,7 @@ class InMemoryMemoryManagerStub(MemoryManager):
 
         return None
 
-    def get_conversation_history(
+    async def get_conversation_history(
         self,
         user_id: str,
         session_id: Optional[str] = None,
@@ -138,7 +144,7 @@ class InMemoryMemoryManagerStub(MemoryManager):
         # Apply limit
         return items[:limit]
 
-    def semantic_search(
+    async def semantic_search(
         self,
         user_id: str,
         query_embedding: List[float],
@@ -161,7 +167,7 @@ class InMemoryMemoryManagerStub(MemoryManager):
         """
         return []
 
-    def add_raw_agent_data(self, data: AgentData) -> str:
+    async def add_raw_agent_data(self, data: AgentData) -> str:
         """
         Store raw agent data.
 
@@ -193,7 +199,7 @@ class InMemoryMemoryManagerStub(MemoryManager):
 
         return data.id
 
-    def check_duplicate(self, item: MemoryItem) -> bool:
+    async def check_duplicate(self, item: MemoryItem) -> bool:
         """
         Check if a memory item already exists in storage.
 
@@ -210,7 +216,7 @@ class InMemoryMemoryManagerStub(MemoryManager):
 
         return content_hash in self.hashes
 
-    def cleanup_expired_items(self) -> int:
+    async def cleanup_expired_items(self) -> int:
         """
         Remove expired items from storage.
 
@@ -244,7 +250,7 @@ class InMemoryMemoryManagerStub(MemoryManager):
 
         return expired_count
         
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> MemoryHealth:
         """
         Check the health status of the memory manager.
 
@@ -253,7 +259,12 @@ class InMemoryMemoryManagerStub(MemoryManager):
         """
         return {
             "status": "healthy",
-            "provider": "in_memory",
-            "items_count": len(self.memory_items),
-            "agent_data_count": len(self.agent_data)
+            "firestore": False,
+            "redis": False,
+            "error_count": 0,
+            "details": {
+                "provider": "in_memory",
+                "items_count": len(self.memory_items),
+                "agent_data_count": len(self.agent_data)
+            }
         }

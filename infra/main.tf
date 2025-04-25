@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/google-beta"
       version = "~> 5.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.5"
+    }
   }
 
   backend "gcs" {
@@ -45,13 +49,31 @@ variable "env" {
 variable "region" {
   description = "GCP region for resources"
   type        = string
-  default     = "us-west2"
+  default     = "us-central1"  # Changed from us-west2 to us-central1 for better network latency
 }
 
 variable "project_id" {
   description = "GCP Project ID"
   type        = string
   default     = "agi-baby-cherry"
+}
+
+variable "alert_notification_emails" {
+  description = "List of email addresses to notify for alerts"
+  type        = list(string)
+  default     = ["muslilyng@gmail.com"]  # Default notification email
+}
+
+variable "enable_monitoring" {
+  description = "Enable monitoring and alerting"
+  type        = bool
+  default     = true
+}
+
+variable "memory_size_gb" {
+  description = "Memory size in GB for Redis instance"
+  type        = number
+  default     = 1  # 1GB for dev, should be higher for prod
 }
 
 # ------------ Storage Bucket for Terraform State --------------
@@ -75,6 +97,45 @@ resource "google_storage_bucket" "terraform_state" {
   }
 }
 
+# ------------ Networking --------------
+module "networking" {
+  source = "./modules/networking"
+
+  project_id = var.project_id
+  region     = var.region
+  env        = var.env
+}
+
+# ------------ Redis --------------
+module "redis" {
+  source = "./modules/redis"
+
+  project_id        = var.project_id
+  region            = var.region
+  env               = var.env
+  network_id        = module.networking.vpc_id
+  memory_size_gb    = var.memory_size_gb
+  redis_version     = "REDIS_6_X"
+}
+
+# ------------ Secret Manager --------------
+module "secrets" {
+  source = "./modules/secret-manager"
+
+  project_id        = var.project_id
+  env               = var.env
+  portkey_api_key_name = "portkey-api-key"
+  openrouter_api_key_name = "openrouter"
+  
+  secret_accessors = {
+    "${module.orchestrator_run.service_account}" = [
+      "${module.secrets.portkey_api_key_secret}",
+      "${module.secrets.openrouter_api_key_secret}",
+      "${module.redis.redis_auth_secret}"
+    ]
+  }
+}
+
 # ------------ Cloud Run --------------
 module "orchestrator_run" {
   source = "./modules/cloud-run"
@@ -83,11 +144,17 @@ module "orchestrator_run" {
   region             = var.region
   env                = var.env
   image              = "us-west2-docker.pkg.dev/${var.project_id}/orchestra/orchestrator:latest"
-  min_instances      = 0
-  max_instances      = 20
+  min_instances      = var.env == "prod" ? 1 : 0
+  max_instances      = var.env == "prod" ? 20 : 5
   cpu_always_allocated = true
   firestore_namespace = "orchestra-${var.env}"
   vector_index_name  = "orchestra-embeddings-${var.env}"
+  
+  depends_on = [
+    module.networking,
+    module.redis,
+    module.secrets
+  ]
 }
 
 # ------------ Firestore --------------
@@ -107,22 +174,6 @@ module "pubsub" {
   env        = var.env
 }
 
-# ------------ Secret Manager ----------
-resource "google_secret_manager_secret" "openrouter" {
-  secret_id = "openrouter"
-  
-  replication {
-    automatic = true
-  }
-}
-
-# Grant access to the Cloud Run service account
-resource "google_secret_manager_secret_iam_member" "secret_access" {
-  secret_id = google_secret_manager_secret.openrouter.id
-  role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${module.orchestrator_run.service_account}"
-}
-
 # ------------ Vertex Vector Search ----
 module "vertex" {
   source = "./modules/vertex"
@@ -130,8 +181,25 @@ module "vertex" {
   project_id      = var.project_id
   region          = var.region
   env             = var.env
-  index_replicas  = 1
+  index_replicas  = var.env == "prod" ? 2 : 1
   vector_dimension = 1536  # Assuming OpenAI embedding dimension
+}
+
+# ------------ Monitoring ----------------
+module "monitoring" {
+  count  = var.enable_monitoring ? 1 : 0
+  source = "./modules/monitoring"
+  
+  project_id    = var.project_id
+  region        = var.region
+  env           = var.env
+  service_name  = "orchestrator-api-${var.env}"
+  alert_notification_emails = var.alert_notification_emails
+  enable_slo_alerts = var.env == "prod"
+  
+  depends_on = [
+    module.orchestrator_run
+  ]
 }
 
 # ------------ Artifact Repository ----------
@@ -157,6 +225,32 @@ resource "google_project_iam_member" "vertex_agent_run_admin" {
   member  = "serviceAccount:vertex-agent@${var.project_id}.iam.gserviceaccount.com"
 }
 
+# ------------ Enable APIs --------------
+resource "google_project_service" "gcp_services" {
+  for_each = toset([
+    "cloudresourcemanager.googleapis.com",
+    "compute.googleapis.com",
+    "containerregistry.googleapis.com",
+    "artifactregistry.googleapis.com",
+    "run.googleapis.com",
+    "cloudbuild.googleapis.com",
+    "aiplatform.googleapis.com",
+    "firestore.googleapis.com",
+    "redis.googleapis.com",
+    "secretmanager.googleapis.com",
+    "monitoring.googleapis.com",
+    "logging.googleapis.com",
+    "cloudtrace.googleapis.com",
+    "vpcaccess.googleapis.com"
+  ])
+
+  project = var.project_id
+  service = each.key
+
+  disable_dependent_services = false
+  disable_on_destroy         = false
+}
+
 # ------------ Outputs --------------
 output "cloud_run_url" {
   value = module.orchestrator_run.url
@@ -176,4 +270,19 @@ output "pubsub_topic" {
 output "vector_index" {
   value = module.vertex.index_id
   description = "Vertex AI Vector Search Index ID"
+}
+
+output "redis_host" {
+  value = module.redis.redis_host
+  description = "Redis instance hostname"
+}
+
+output "vpc_connector_name" {
+  value = module.networking.vpc_connector_name
+  description = "VPC connector name for Cloud Run"
+}
+
+output "dashboard_url" {
+  value = var.enable_monitoring ? "https://console.cloud.google.com/monitoring/dashboards/custom/${module.monitoring[0].dashboard_name}?project=${var.project_id}" : "Monitoring disabled"
+  description = "URL to the monitoring dashboard"
 }

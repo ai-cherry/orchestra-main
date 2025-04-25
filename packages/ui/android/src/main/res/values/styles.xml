@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+  Orchestra Design System Styles
+  Mapped from Figma component styles
+-->
+<resources>
+    <!-- Base application theme -->
+    <style name="Orchestra.Base" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary colors -->
+        <item name="colorPrimary">@color/accent_primary</item>
+        <item name="colorPrimaryVariant">@color/accent_secondary</item>
+        <item name="colorOnPrimary">@color/accent_text</item>
+        
+        <!-- Secondary colors -->
+        <item name="colorSecondary">@color/info</item>
+        <item name="colorSecondaryVariant">@color/info</item>
+        <item name="colorOnSecondary">@color/accent_text</item>
+        
+        <!-- Error colors -->
+        <item name="colorError">@color/error</item>
+        <item name="colorOnError">@color/accent_text</item>
+        
+        <!-- Background colors -->
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnBackground">@color/text_primary</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        
+        <!-- Status bar and navigation -->
+        <item name="android:statusBarColor">@color/surface</item>
+        <item name="android:navigationBarColor">@color/surface</item>
+        
+        <!-- Type -->
+        <item name="fontFamily">@font/inter</item>
+    </style>
+    
+    <!-- Application theme - Neutral (default) -->
+    <style name="Orchestra.Theme.Neutral" parent="Orchestra.Base">
+        <!-- Theme uses default accent colors -->
+    </style>
+    
+    <!-- Application theme - Cherry -->
+    <style name="Orchestra.Theme.Cherry" parent="Orchestra.Base">
+        <item name="colorPrimary">@color/cherry_accent_primary</item>
+        <item name="colorPrimaryVariant">@color/cherry_accent_secondary</item>
+    </style>
+    
+    <!-- Application theme - Sophia -->
+    <style name="Orchestra.Theme.Sophia" parent="Orchestra.Base">
+        <item name="colorPrimary">@color/sophia_accent_primary</item>
+        <item name="colorPrimaryVariant">@color/sophia_accent_secondary</item>
+    </style>
+    
+    <!-- Application theme - Gordon Gekko -->
+    <style name="Orchestra.Theme.GordonGekko" parent="Orchestra.Base">
+        <item name="colorPrimary">@color/gordon_accent_primary</item>
+        <item name="colorPrimaryVariant">@color/gordon_accent_secondary</item>
+    </style>
+
+    <!-- ======= COMPONENT STYLES ======= -->
+    
+    <!-- Button styles mapped from "Button (Primary)" in Figma -->
+    
+    <!-- Base button style -->
+    <style name="Orchestra.Button.Base" parent="Widget.MaterialComponents.Button">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+    
+    <!-- Primary button style -->
+    <style name="Orchestra.Button.Primary" parent="Orchestra.Button.Base">
+        <item name="backgroundTint">@color/accent_primary</item>
+        <item name="android:textColor">@color/accent_text</item>
+        <item name="iconTint">@color/accent_text</item>
+        <item name="rippleColor">@color/accent_secondary</item>
+    </style>
+    
+    <!-- Secondary button style -->
+    <style name="Orchestra.Button.Secondary" parent="Orchestra.Button.Base">
+        <item name="backgroundTint">@color/surface_alt</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="iconTint">@color/text_primary</item>
+        <item name="rippleColor">@color/surface</item>
+    </style>
+    
+    <!-- Outline button style -->
+    <style name="Orchestra.Button.Outline" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="strokeColor">@color/accent_primary</item>
+        <item name="android:textColor">@color/accent_primary</item>
+        <item name="iconTint">@color/accent_primary</item>
+    </style>
+    
+    <!-- Ghost button style -->
+    <style name="Orchestra.Button.Ghost" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="iconTint">@color/text_secondary</item>
+        <item name="rippleColor">@color/surface_alt</item>
+    </style>
+    
+    <!-- Card styles mapped from "Card (Default)" in Figma -->
+    
+    <style name="Orchestra.Card" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/surface</item>
+        <item name="cardCornerRadius">8dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeColor">@color/border_subtle</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+    
+    <style name="Orchestra.Card.Elevated" parent="Orchestra.Card">
+        <item name="cardElevation">4dp</item>
+    </style>
+    
+    <style name="Orchestra.Card.Title" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontWeight">600</item>
+    </style>
+    
+    <style name="Orchestra.Card.Subtitle" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textColor">@color/text_tertiary</item>
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    
+    <style name="Orchestra.Card.Body" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+    
+    <!-- Input styles mapped from "Input (Default)" in Figma -->
+    
+    <style name="Orchestra.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundColor">@color/surface_alt</item>
+        <item name="boxStrokeColor">@color/border_subtle</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="boxCornerRadiusBottomEnd">6dp</item>
+        <item name="boxCornerRadiusBottomStart">6dp</item>
+        <item name="boxCornerRadiusTopEnd">6dp</item>
+        <item name="boxCornerRadiusTopStart">6dp</item>
+        <item name="hintTextColor">@color/text_tertiary</item>
+        <item name="errorTextColor">@color/error</item>
+        <item name="android:textColorHint">@color/text_tertiary</item>
+    </style>
+    
+    <style name="Orchestra.TextInputEditText" parent="Widget.MaterialComponents.TextInputEditText.OutlinedBox">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+    </style>
+    
+    <!-- TopBar styles mapped from "Top Bar Container" in Figma -->
+    
+    <style name="Orchestra.TopBar" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:background">@color/surface</item>
+        <item name="android:elevation">4dp</item>
+        <item name="titleTextColor">@color/text_primary</item>
+        <item name="subtitleTextColor">@color/text_tertiary</item>
+        <item name="android:minHeight">64dp</item>
+    </style>
+    
+    <style name="Orchestra.TopBar.Title" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontWeight">600</item>
+    </style>
+</resources>

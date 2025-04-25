@@ -45,7 +45,7 @@ class MemoryManager(ABC):
     """
 
     @abstractmethod
-    def initialize(self) -> None:
+    async def initialize(self) -> None:
         """
         Initialize the memory manager.
 
@@ -59,7 +59,7 @@ class MemoryManager(ABC):
         pass
 
     @abstractmethod
-    def close(self) -> None:
+    async def close(self) -> None:
         """
         Close the memory manager and release resources.
 
@@ -69,7 +69,7 @@ class MemoryManager(ABC):
         pass
 
     @abstractmethod
-    def add_memory_item(self, item: MemoryItem) -> str:
+    async def add_memory_item(self, item: MemoryItem) -> str:
         """
         Add a memory item to storage.
 
@@ -86,7 +86,7 @@ class MemoryManager(ABC):
         pass
 
     @abstractmethod
-    def get_memory_item(self, item_id: str) -> Optional[MemoryItem]:
+    async def get_memory_item(self, item_id: str) -> Optional[MemoryItem]:
         """
         Retrieve a specific memory item by ID.
 
@@ -102,7 +102,7 @@ class MemoryManager(ABC):
         pass
 
     @abstractmethod
-    def get_conversation_history(
+    async def get_conversation_history(
         self,
         user_id: str,
         session_id: Optional[str] = None,
@@ -127,7 +127,7 @@ class MemoryManager(ABC):
         pass
 
     @abstractmethod
-    def semantic_search(
+    async def semantic_search(
         self,
         user_id: str,
         query_embedding: List[float],
@@ -153,7 +153,7 @@ class MemoryManager(ABC):
         pass
 
     @abstractmethod
-    def add_raw_agent_data(self, data: AgentData) -> str:
+    async def add_raw_agent_data(self, data: AgentData) -> str:
         """
         Store raw agent data.
 
@@ -170,7 +170,7 @@ class MemoryManager(ABC):
         pass
 
     @abstractmethod
-    def check_duplicate(self, item: MemoryItem) -> bool:
+    async def check_duplicate(self, item: MemoryItem) -> bool:
         """
         Check if a memory item already exists in storage.
 
@@ -186,7 +186,7 @@ class MemoryManager(ABC):
         pass
 
     @abstractmethod
-    def cleanup_expired_items(self) -> int:
+    async def cleanup_expired_items(self) -> int:
         """
         Remove expired items from storage.
 
@@ -213,3 +213,18 @@ class MemoryManager(ABC):
             Exception: If the health check itself fails
         """
         pass
+
+# Import the InMemoryMemoryManagerStub implementation and rename it for compatibility
+from packages.shared.src.memory.stubs import InMemoryMemoryManagerStub as InMemoryMemoryManager
+
+# Also import concrete implementations for convenience
+try:
+    from packages.shared.src.memory.concrete_memory_manager import ConcreteMemoryManager
+except ImportError:
+    logger.debug("ConcreteMemoryManager not available, skipping import.")
+
+# Import Firestore adapter if available
+try:
+    from packages.shared.src.memory.firestore_adapter import FirestoreMemoryAdapter
+except ImportError:
+    logger.debug("FirestoreMemoryAdapter not available, skipping import.")

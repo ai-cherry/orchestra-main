@@ -1,0 +1,39 @@
+Create a dark-themed tech command center aesthetic dashboard for Orchestra-Main at 1440px width. Use Inter as the primary font throughout the design.
+
+Layout:
+- Start with a dark background (#111827) for the main canvas
+- Add a collapsible left sidebar/icon rail (width: 64px expanded, 240px collapsed) with a dark surface background (#1F2937)
+- Include a top navigation bar (height: 64px) with the Orchestra logo, page title, and user profile section
+- Create a main content area with a 12-column grid system with 24px gutters
+- Use 24px padding consistently around containers
+
+Key Interface Elements:
+1. Prompt Hub (Position: Span 8 columns on top row)
+   - Create a prominent card with input field and action buttons
+   - Include placeholder for recent/saved prompts below input area
+
+2. Unified Chat Feed (Position: Span 8 columns below Prompt Hub)
+   - Design a scrollable feed area with message bubbles
+   - Include system vs. user attribution with timestamps
+   - Show different message states (loading, error, complete)
+
+3. Active Agents List (Position: Span 4 columns top-right)
+   - Create status cards for 4-5 agents
+   - Include agent icon, name, status indicator (active/idle), and action menu
+
+4. System Health Card (Position: Below Active Agents, span 4 columns)
+   - Include placeholder for uptime chart (line graph)
+   - Add key metrics display with colored status indicators
+
+5. LLM Token Gauge (Position: Bottom-right corner, span 4 columns)
+   - Create a circular or horizontal progress gauge
+   - Display current usage, limit values and percentage
+
+Visual Style:
+- Use #8B5CF6 (purple) as the primary accent color
+- Apply subtle card shadows (drop shadow with 20% opacity)
+- Include subtle grid background or dots on the main canvas for depth
+- Use container radius of 8px consistently across cards
+- Create clear visual hierarchy with consistent spacing between sections
+
+Add realistic dummy data and placeholder charts where appropriate. Focus on creating a cohesive, professional interface that feels like a powerful AI command center.

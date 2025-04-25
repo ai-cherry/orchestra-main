@@ -1,88 +1,84 @@
-# GitHub Organization Secrets for GCP Storage Integration
+# GitHub Organization Secrets Configuration
 
-This document provides instructions for setting up the organization-level GitHub secrets required for the Orchestra project to connect to Google Cloud Platform (GCP) Firestore and Redis services.
+This document provides information about the GitHub organization secrets required for CI/CD deployment of the Orchestra application.
 
-## Why Organization-Level Secrets?
+## Required Secrets
 
-Organization-level secrets offer several advantages:
+These secrets are used by GitHub Actions workflows to deploy the application to Google Cloud Platform.
 
-1. **Centralized Management**: Manage secrets in one place for all repositories in your organization.
-2. **Consistent Access**: Ensure all repositories have access to the same production credentials.
-3. **Reduced Duplication**: Avoid duplicating sensitive credentials across multiple repositories.
-4. **Simplified Rotation**: Update credentials in a single location when they need to be rotated.
+| Secret Name | Description | Example Value |
+|-------------|-------------|---------------|
+| `ORG_GCP_PROJECT_ID` | Google Cloud Platform Project ID | `agi-baby-cherry` |
+| `ORG_GCP_CREDENTIALS` | GCP Service Account Key JSON | `{"type":"service_account","project_id":"agi-baby-cherry",...}` |
+| `ORG_GCP_REGION` | GCP Region for deployment | `us-central1` |
+| `ORG_GKE_CLUSTER_PROD` | GKE Cluster name for production | `autopilot-cluster-1` |
+| `ORG_GKE_CLUSTER_STAGING` | GKE Cluster name for staging | `autopilot-cluster-1` |
+| `ORG_REDIS_HOST` | Redis instance hostname | `redis-12345.c12345.us-central1-1.gcp.cloud.redislabs.com` |
+| `ORG_REDIS_PORT` | Redis instance port | `6379` |
+| `ORG_REDIS_PASSWORD` | Redis instance password | `your-redis-password` |
+| `DOCKERHUB_USERNAME` | Docker Hub username for storing images | `your-dockerhub-username` |
+| `DOCKERHUB_TOKEN` | Docker Hub access token | `your-dockerhub-token` |
+| `SLACK_WEBHOOK_URL` | Slack webhook URL for notifications | `https://hooks.slack.com/services/...` |
 
-## Required Organization Secrets
+## Setting Up Secrets
 
-Set up the following secrets in your GitHub organization:
+You can set up these secrets using one of the following methods:
 
-### GCP Authentication
+### Method 1: Using GitHub Web Interface
 
-| Secret Name | Description |
-|-------------|-------------|
-| `ORG_GCP_CREDENTIALS` | JSON service account key with permissions for Firestore and GKE |
-| `ORG_GCP_PROJECT_ID` | Your Google Cloud project ID |
-| `ORG_GCP_SERVICE_ACCOUNT_KEY` | JSON service account key for application-level access |
-| `ORG_GCP_REGION` | GCP region where your resources are deployed |
+1. Navigate to your GitHub repository
+2. Go to Settings → Secrets and variables → Actions
+3. Click on "New repository secret"
+4. Enter the name and value of the secret
+5. Click "Add secret"
 
-### GKE Clusters
+### Method 2: Using GitHub CLI
 
-| Secret Name | Description |
-|-------------|-------------|
-| `ORG_GKE_CLUSTER_PROD` | Name of production GKE cluster |
-| `ORG_GKE_CLUSTER_STAGING` | Name of staging GKE cluster |
+```bash
+gh secret set ORG_GCP_CREDENTIALS --repo your-org/your-repo --body "$(cat /path/to/service-account-key.json)"
+```
 
-### Redis Configuration
+### Method 3: Using the Provided Script
 
-| Secret Name | Description |
-|-------------|-------------|
-| `ORG_REDIS_HOST` | Hostname of Redis instance (e.g., `10.0.0.1` or `redis-primary.redis.svc.cluster.local`) |
-| `ORG_REDIS_PORT` | Port of Redis instance (typically `6379`) |
-| `ORG_REDIS_PASSWORD` | Password for authenticating with Redis |
+We've created a script to help you set up these secrets:
 
-## Setting Up Organization Secrets
+```bash
+./update_github_secrets.sh
+```
 
-1. Navigate to your GitHub organization settings
-2. Select "Secrets and variables" from the left sidebar
-3. Click on "Actions" to manage GitHub Actions secrets
-4. Click "New organization secret"
-5. Enter the name and value for each secret listed above
-6. For repository access:
-   - Select "All repositories" to make the secret available to all repositories in the organization
-   - Or select "Selected repositories" and choose specific repositories
+The script will guide you through setting up all required secrets.
 
-## Service Account Permissions
+## Service Account Requirements
 
-The GCP service account used for the `ORG_GCP_CREDENTIALS` and `ORG_GCP_SERVICE_ACCOUNT_KEY` secrets should have the following permissions:
+The GCP service account used for deployment (specified in `ORG_GCP_CREDENTIALS`) should have the following roles:
 
-### For CI/CD and Deployment
-- `roles/container.developer` - For deploying to GKE
-- `roles/storage.admin` - For accessing GCS buckets
+- Cloud Run Admin (`roles/run.admin`)
+- Service Account User (`roles/iam.serviceAccountUser`)
+- Storage Admin (`roles/storage.admin`)
+- Artifact Registry Admin (`roles/artifactregistry.admin`)
+- Kubernetes Engine Admin (`roles/container.admin`) - If using GKE
+- Secret Manager Admin (`roles/secretmanager.admin`)
 
-### For Application Data Access
-- `roles/datastore.user` - For Firestore access
-- `roles/redis.editor` - For Redis (Cloud Memorystore) access
+## Secret Rotation
 
-## Redis Setup
+It's recommended to rotate sensitive secrets periodically:
 
-If you're using Google Cloud Memorystore for Redis:
+1. GCP Service Account Keys: Rotate every 90 days
+2. Docker Hub Tokens: Rotate every 180 days
+3. Redis passwords: Rotate every 180 days
 
-1. Create a Redis instance in Google Cloud Console
-2. Make sure it's in the same VPC network as your GKE cluster
-3. Set up VPC peering if needed for connectivity
-4. For production, consider enabling authentication and TLS
-
-## Security Considerations
-
-- Rotate service account keys periodically
-- Use the principle of least privilege when assigning IAM roles
-- Consider using Workload Identity Federation instead of service account keys for production environments
-- For Redis, use authentication and consider using VPC Service Controls for additional security
+After rotating secrets, update the corresponding GitHub secrets with the new values.
 
 ## Troubleshooting
 
-If you encounter issues with the integration:
+If you encounter issues with GitHub Actions deployment related to secrets:
 
-1. Check the GitHub Actions workflow logs for error messages
-2. Verify that all secrets are correctly set and accessible to the repository
-3. Confirm that the service account has the necessary permissions
-4. For Redis connectivity issues, check network connectivity and firewall rules
+1. Verify that all required secrets are set correctly
+2. Check that the GCP service account has the necessary permissions
+3. Ensure the service account key hasn't expired or been revoked
+4. Verify the JSON format of the GCP credentials is valid
+
+## Additional Resources
+
+- [GitHub Actions Documentation](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+- [Google Cloud Service Account Documentation](https://cloud.google.com/iam/docs/creating-managing-service-accounts)

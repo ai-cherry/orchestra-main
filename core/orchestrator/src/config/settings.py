@@ -54,9 +54,29 @@ class Settings(BaseSettings):
     # GCP Settings
     GCP_PROJECT_ID: Optional[str] = None
     GCP_SA_KEY_JSON: Optional[str] = None  # Service account key JSON content
-    GCP_LOCATION: str = "us-west2"  # Default GCP region
+    GCP_LOCATION: str = "us-central1"  # Default GCP region (changed to match deployment)
     GOOGLE_CLOUD_PROJECT: Optional[str] = None  # Alias for GCP_PROJECT_ID (for compatibility)
     GOOGLE_APPLICATION_CREDENTIALS: Optional[str] = None  # Path to credentials file (for compatibility)
+    
+    # Cloud Infrastructure Settings
+    FIRESTORE_NAMESPACE: str = "orchestra-local"  # Namespace for Firestore collections
+    FIRESTORE_TTL_DAYS: int = 30  # TTL for Firestore documents (in days)
+    
+    # Redis Cache Settings
+    REDIS_HOST: Optional[str] = None  # Redis host address
+    REDIS_PORT: int = 6379  # Redis port
+    REDIS_AUTH_SECRET: Optional[str] = None  # Secret name containing Redis auth password
+    REDIS_CACHE_TTL: int = 3600  # Default TTL for Redis cache (in seconds)
+    REDIS_CACHE_ENABLED: bool = False  # Whether Redis caching is enabled
+    
+    # Vertex AI Vector Search Settings
+    VECTOR_INDEX_NAME: Optional[str] = None  # Name of the Vertex AI Vector Search index
+    VECTOR_DIMENSION: int = 1536  # Dimension of embeddings
+    VECTOR_DISTANCE_TYPE: str = "COSINE"  # Distance measure type for vector search
+    
+    # VPC and Networking
+    VPC_CONNECTOR: Optional[str] = None  # VPC connector for Cloud Run
+    VPC_EGRESS: str = "private-ranges-only"  # VPC egress setting
 
     # OpenRouter Pro Configuration
     OPENROUTER_HEADERS: Optional[str] = None  # JSON string of custom headers

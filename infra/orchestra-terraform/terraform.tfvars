@@ -1,0 +1,5 @@
+project_id = "agi-baby-cherry"
+region     = "us-central1"
+zone       = "us-central1-a"
+env        = "dev"
+figma_pat  = "figd_JbqWhdGvNaRvQyLdZdEJslu-8hHoaotLaNKByNRz"
