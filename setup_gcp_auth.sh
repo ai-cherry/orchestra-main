@@ -52,9 +52,15 @@ echo "=== Testing Authentication ==="
 python test_gcp_auth.py
 
 echo "=== Setting up Figma Integration ==="
-# Set up Figma token
-export FIGMA_PAT=figd_JbqWhdGvNaRvQyLdZdEJslu-8hHoaotLaNKByNRz
-echo 'export FIGMA_PAT=figd_JbqWhdGvNaRvQyLdZdEJslu-8hHoaotLaNKByNRz' >> ~/.bashrc
+# Check if FIGMA_PAT is provided as an environment variable
+if [ -z "$FIGMA_PAT" ]; then
+    echo "Error: FIGMA_PAT environment variable is not set."
+    echo "Please set your Figma Personal Access Token by running: export FIGMA_PAT=your-token-here"
+    exit 1
+fi
+
+# Add Figma token to bashrc for persistence
+echo 'export FIGMA_PAT=$FIGMA_PAT' >> ~/.bashrc
 
 echo "=== Setup Complete ==="
 echo "You can now run memory and infrastructure validation tests."

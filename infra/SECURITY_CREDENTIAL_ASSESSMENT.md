@@ -5,35 +5,35 @@
 This document has been created in response to the exposure of multiple sensitive credentials. The following credentials have been identified in plain text and should be considered compromised:
 
 ### 🚨 CRITICAL: OAuth 2.0 Client Credentials
-- **Client ID**: 104944497835-h9l77l0ltmv4h8t9o5a02m51v8g91a9i.apps.googleusercontent.com
-- **Client Secret**: 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
+- **Client ID**: [REMOVED - STORED IN ENVIRONMENT]
+- **Client Secret**: [REMOVED - STORED IN ENVIRONMENT]
 - **Status**: COMPROMISED
 
 ### 🚨 CRITICAL: Google API Key
-- **Key**: AIzaSyDem1_BvE0eeq8PaRvnlsBXMqjI3Z3zB_U
+- **Key**: [REMOVED - STORED IN ENVIRONMENT]
 - **Status**: COMPROMISED
 
 ### 🚨 CRITICAL: Service Account Keys
 - **Service Account**: cherrybaby@agi-baby-cherry.iam.gserviceaccount.com
-  - **Key ID**: 6833bc94f0e3ef8648efc1578caa23ba2b8a8a52
+  - **Key ID**: [REMOVED - STORED IN GCP SECRET MANAGER]
   - **Status**: COMPROMISED (created Apr 11 2025; never expires)
   
 - **Service Account**: vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
-  - **Key ID**: f510256389008a55a6142d2429a185ebf216d685
+  - **Key ID**: [REMOVED - STORED IN GCP SECRET MANAGER]
   - **Status**: COMPROMISED (created Apr 20 2025; never expires)
   - **Roles**: BigQuery Admin, Cloud Storage for Firebase Admin, Compute Admin, Gemini Settings Admin, Owner, Project IAM Admin, Vertex AI Service Agent
   - **Security Concern**: This service account has OWNER permissions, which grants complete control over the project.
 
 ### 🚨 CRITICAL: Figma Personal Access Token
-- **Token**: figd_JbqWhdGvNaRvQyLdZdEJslu-8hHoaotLaNKByNRz
+- **Token**: [REMOVED - STORED IN ENVIRONMENT VARIABLE FIGMA_PAT]
 - **Status**: COMPROMISED
 
 ### 🚨 CRITICAL: SSH Passphrase
-- **Passphrase**: Huskers15
+- **Passphrase**: [REMOVED - STORED IN SSH CONFIG]
 - **Status**: COMPROMISED
 
 ### 🚨 CRITICAL: Vertex API Key
-- **Key**: 0d08481a204c0cdba4095bb94529221e8b8ced5c
+- **Key**: [REMOVED - STORED IN ENVIRONMENT]
 - **Status**: COMPROMISED
 
 ## Immediate Actions Required
@@ -48,8 +48,8 @@ This document has been created in response to the exposure of multiple sensitive
 
 ```bash
 # Delete compromised service account keys
-gcloud iam service-accounts keys delete 6833bc94f0e3ef8648efc1578caa23ba2b8a8a52 --iam-account=cherrybaby@agi-baby-cherry.iam.gserviceaccount.com
-gcloud iam service-accounts keys delete f510256389008a55a6142d2429a185ebf216d685 --iam-account=vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
+gcloud iam service-accounts keys delete [KEY_ID] --iam-account=cherrybaby@agi-baby-cherry.iam.gserviceaccount.com
+gcloud iam service-accounts keys delete [KEY_ID] --iam-account=vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
 
 # Create new keys if needed (consider using workload identity federation instead)
 gcloud iam service-accounts keys create key.json --iam-account=cherrybaby@agi-baby-cherry.iam.gserviceaccount.com

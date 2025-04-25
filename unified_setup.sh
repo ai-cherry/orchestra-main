@@ -52,7 +52,14 @@ confirm() {
 
 # Variables
 PROJECT_ID="agi-baby-cherry"
-FIGMA_PAT="figd_JbqWhdGvNaRvQyLdZdEJslu-8hHoaotLaNKByNRz"
+
+# Check for Figma PAT
+if [ -z "$FIGMA_PAT" ]; then
+    error "FIGMA_PAT environment variable is not set."
+    echo "Please set your Figma Personal Access Token by running: export FIGMA_PAT=your-token-here"
+    exit 1
+fi
+
 FIGMA_FILE_ID="368236963"
 
 section "Orchestra Unified Setup"
@@ -145,7 +152,6 @@ echo "Setting up environment variables..."
 export GOOGLE_APPLICATION_CREDENTIALS=/tmp/vertex-agent-key.json
 export GCP_SA_KEY_PATH=/tmp/vertex-agent-key.json
 export GCP_PROJECT_ID=${PROJECT_ID}
-export FIGMA_PAT=${FIGMA_PAT}
 
 # Add to .bashrc for persistence
 if ! grep -q "export GOOGLE_APPLICATION_CREDENTIALS=/tmp/vertex-agent-key.json" ~/.bashrc; then
@@ -153,7 +159,7 @@ if ! grep -q "export GOOGLE_APPLICATION_CREDENTIALS=/tmp/vertex-agent-key.json" 
     echo 'export GOOGLE_APPLICATION_CREDENTIALS=/tmp/vertex-agent-key.json' >> ~/.bashrc
     echo 'export GCP_SA_KEY_PATH=/tmp/vertex-agent-key.json' >> ~/.bashrc
     echo "export GCP_PROJECT_ID=${PROJECT_ID}" >> ~/.bashrc
-    echo "export FIGMA_PAT=${FIGMA_PAT}" >> ~/.bashrc
+    echo 'export FIGMA_PAT=$FIGMA_PAT' >> ~/.bashrc
     success "Added environment variables to .bashrc"
 fi
 
@@ -184,7 +190,7 @@ project_id = "${PROJECT_ID}"
 region     = "us-central1"
 zone       = "us-central1-a"
 env        = "dev"
-figma_pat  = "${FIGMA_PAT}"
+figma_pat  = "\${FIGMA_PAT}"
 EOF
 success "Updated terraform.tfvars with project ID and Figma PAT"
 
