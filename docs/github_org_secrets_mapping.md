@@ -36,13 +36,18 @@ The following GitHub organization secrets are mapped to local environment variab
 |---------------------------|----------------------|
 | `ORG_GCP_CREDENTIALS` | `GCP_SA_KEY_JSON` |
 | `ORG_GCP_PROJECT_ID` | `GCP_PROJECT_ID` |
+| `ORG_GCP_PROJECT_NUMBER` | `GCP_PROJECT_NUMBER` |
+| `ORG_VERTEX_KEY` | `VERTEX_KEY` |
 | `ORG_GCP_SERVICE_ACCOUNT_KEY` | `GCP_SERVICE_ACCOUNT_KEY` |
 | `ORG_GCP_REGION` | `GCP_LOCATION` |
 | `ORG_GKE_CLUSTER_PROD` | `GKE_CLUSTER_PROD` |
 | `ORG_GKE_CLUSTER_STAGING` | `GKE_CLUSTER_STAGING` |
+| `ORG_PORTKEY_API_KEY` | `PORTKEY_API_KEY` |
 | `ORG_REDIS_HOST` | `REDIS_HOST` |
 | `ORG_REDIS_PORT` | `REDIS_PORT` |
+| `ORG_REDIS_USER` | `REDIS_USER` |
 | `ORG_REDIS_PASSWORD` | `REDIS_PASSWORD` |
+| `ORG_REDIS_DATABASE_NAME` | `REDIS_DATABASE_NAME` |
 
 ## Using the Interactive Script
 
