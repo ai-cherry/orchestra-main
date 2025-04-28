@@ -232,59 +232,157 @@ class LLMAgent(Agent, Service):
 
         return model, temperature, max_tokens
 
+    async def _get_response_with_fallbacks(self, messages, model, temperature, max_tokens):
+        """
+        Try to get a response from multiple providers with cascading fallbacks.
+        
+        The cascade order is:
+        1. OpenRouter (primary gateway)
+        2. Portkey (secondary gateway)
+        3. Direct provider APIs (OpenAI, Anthropic, Deepseek, Grok)
+        """
+        # Track providers tried for logging
+        providers_tried = []
+        last_error = None
+        
+        # Get provider instances - lazy loaded when needed
+        providers = {
+            "openrouter": None,
+            "portkey": None,
+            "openai": None,
+            "anthropic": None,
+            "deepseek": None,
+            "grok": None
+        }
+        
+        # Define the cascade order
+        provider_cascade = ["openrouter", "portkey", "openai", "anthropic", "deepseek", "grok"]
+        
+        # Try each provider in order
+        for provider_name in provider_cascade:
+            try:
+                # Skip if we've reached our retry limit
+                if len(providers_tried) >= 3:
+                    logger.warning(f"Reached maximum provider retry limit ({len(providers_tried)})")
+                    break
+                
+                # Log the attempt
+                providers_tried.append(provider_name)
+                logger.info(f"Attempting request with provider: {provider_name}")
+                
+                # Lazy-load the provider if needed
+                if providers[provider_name] is None:
+                    providers[provider_name] = self._get_provider_instance(provider_name)
+                
+                provider = providers[provider_name]
+                
+                # Set appropriate timeouts based on provider
+                timeout = 8.0 if provider_name == "openrouter" else 15.0
+                
+                # Attempt to get response with timeout
+                result = await asyncio.wait_for(
+                    provider.generate_chat_completion(
+                        messages=messages,
+                        model=self._get_model_for_provider(model, provider_name),
+                        temperature=temperature,
+                        max_tokens=max_tokens
+                    ),
+                    timeout=timeout
+                )
+                
+                # Success! Return the result with provider info
+                result["provider"] = provider_name
+                return result
+                
+            except (LLMProviderError, asyncio.TimeoutError) as e:
+                last_error = e
+                logger.warning(f"Provider {provider_name} failed: {str(e)}")
+                continue
+        
+        # If we've exhausted all options, raise the last error
+        if last_error:
+            logger.error(f"All providers failed. Last error: {str(last_error)}")
+            raise last_error
+        
+        # Safety fallback - should never reach here
+        raise LLMProviderError("All providers failed with unknown errors")
+    
+    def _get_provider_instance(self, provider_name):
+        """Get a provider instance by name"""
+        return get_llm_provider(provider_name)
+    
+    def _get_model_for_provider(self, requested_model, provider_name):
+        """Map the requested model to provider-specific model identifier"""
+        # Default to the requested model
+        if not requested_model:
+            # Use sensible defaults per provider
+            defaults = {
+                "openrouter": "openai/gpt-3.5-turbo",
+                "portkey": "openai/gpt-3.5-turbo",
+                "openai": "gpt-3.5-turbo",
+                "anthropic": "claude-instant-1",
+                "deepseek": "deepseek-chat",
+                "grok": "grok-1"
+            }
+            return defaults.get(provider_name, "gpt-3.5-turbo")
+        
+        # Handle model mapping for different providers
+        if provider_name == "openrouter":
+            # OpenRouter uses provider/model format
+            if "/" not in requested_model:
+                return f"openai/{requested_model}"
+            return requested_model
+        elif provider_name == "portkey":
+            # Similar to OpenRouter but may have different prefixes
+            if "/" not in requested_model:
+                return f"openai/{requested_model}"
+            return requested_model
+        elif provider_name == "openai":
+            # Strip any prefix
+            return requested_model.split("/")[-1]
+        elif provider_name == "anthropic":
+            # Map to Anthropic models if requested model looks like it
+            if "claude" in requested_model.lower():
+                return requested_model.split("/")[-1]
+            return "claude-instant-1"  # Default Anthropic model
+        # Similar handling for other providers
+        
+        # Fallback to a safe default
+        return requested_model
+
     async def process(self, context: AgentContext) -> AgentResponse:
-        """
-        Process a user request using the LLM provider with robust error handling.
-
-        Args:
-            context: Agent context with user input and history
-
-        Returns:
-            Agent response with generated text
-        """
+        """Process a request using our LLM provider cascade"""
         try:
-            # Ensure provider is initialized or get a new instance
-            if self._provider is None:
-                self._provider = get_llm_provider(self._provider_name)
-
-            # Format conversation history
-            history = ConversationFormatter.format_conversation_history(
-                context.conversation_history
+            # Format conversation for the LLM
+            messages = self._formatter.format_conversation(
+                user_input=context.user_input,
+                persona=context.persona,
+                conversation_history=context.conversation_history,
+                metadata=context.metadata,
             )
-
-            # Add system message with persona information
-            system_message = ConversationFormatter.create_system_message(
-                context.persona
-            )
-
-            # Combine messages for chat completion
-            messages = (
-                [system_message]
-                + history
-                + [{"role": "user", "content": context.user_input}]
-            )
-
-            # Extract parameters from context
+            
+            # Extract parameters
             model, temperature, max_tokens = self._extract_llm_parameters(context)
-
-            # Generate completion
-            result = await self._provider.generate_chat_completion(
+            
+            # Use our new cascade method instead of direct provider call
+            result = await self._get_response_with_fallbacks(
                 messages=messages,
                 model=model,
                 temperature=temperature,
-                max_tokens=max_tokens,
+                max_tokens=max_tokens
             )
 
             # Return agent response with high confidence
             return AgentResponse(
                 text=result["content"],
-                confidence=0.9,  # High confidence for successful LLM response
+                confidence=0.9,
                 metadata={
                     "model": result.get("model", "unknown"),
-                    "provider": result.get("provider", self._provider_name),
+                    "provider": result.get("provider", "cascade"),
                     "usage": result.get("usage", {}),
                     "finish_reason": result.get("finish_reason", "unknown"),
                     "response_time_ms": result.get("response_time_ms"),
+                    "providers_tried": result.get("providers_tried", [])
                 },
             )
 

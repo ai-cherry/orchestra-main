@@ -1,0 +1,42 @@
+name: Deploy Dev Environment
+
+on:
+  push:
+    branches:
+      - dev # Trigger deployment when code is pushed to the 'dev' branch
+
+permissions:
+  contents: read
+  id-token: write # Required for Workload Identity Federation
+
+jobs:
+  build-and-deploy-dev:
+    name: Build and Deploy (Dev)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }} # e.g., projects/123456789/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }} # e.g., github-actions-sa@agi-baby-cherry.iam.gserviceaccount.com
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Submit Cloud Build for Dev
+        run: |-
+          gcloud builds submit . \
+            --config cloudbuild.yaml \
+            --region=us-central1 \
+            --substitutions=_ENV=dev,_GCP_REGION=us-central1 \
+            --timeout=20m
+        # Note: Cloud Build automatically gets SHORT_SHA, COMMIT_SHA, etc.
+        # Add any other required substitutions your specific cloudbuild.yaml needs.
+        # Ensure the region matches where you want the build job to run.

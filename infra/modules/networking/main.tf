@@ -178,7 +178,7 @@ resource "google_vpc_access_connector" "connector" {
   name          = "orchestrator-vpc-connector-${var.env}"
   region        = var.region
   network       = google_compute_network.orchestrator_vpc.id
-  ip_cidr_range = "10.8.0.0/28"  # Small CIDR range for the connector
+  ip_cidr_range = "10.9.0.0/28"  # Small CIDR range for the connector, updated to avoid conflicts
   
   # Scale the connector based on environment
   min_instances = var.env == "prod" ? 2 : 1

@@ -1,6 +1,24 @@
 """
 Firestore Memory Manager Implementation for AI Orchestration System.
 
+DEPRECATED: This module is deprecated and will be removed in a future release.
+
+This legacy Firestore memory manager implementation has been replaced by the 
+new V2 implementation with improved architecture and error handling.
+
+Please use packages.shared.src.storage.firestore.v2.adapter.FirestoreMemoryManagerV2 instead,
+which provides:
+- Better separation of concerns between storage and memory management
+- More consistent error handling
+- Async-first API design
+- Improved performance and reliability
+- Centralized configuration management
+
+Example migration:
+from future.firestore_memory_manager import FirestoreMemoryManager  # Old
+# Change to:
+from packages.shared.src.storage.firestore.v2 import FirestoreMemoryManagerV2  # New
+
 This module implements the Firestore-backed memory management system
 for storing and retrieving memory records in Google Cloud Firestore.
 """

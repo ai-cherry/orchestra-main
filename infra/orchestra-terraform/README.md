@@ -36,6 +36,25 @@ Make sure you have:
    terraform apply tfplan
    ```
 
+**Note:** The `pgvector` extension for PostgreSQL needs to be enabled manually after the Cloud SQL instance is created. You can connect to the database using `gcloud sql connect [INSTANCE_NAME] --user=postgres` and run `CREATE EXTENSION IF NOT EXISTS vector;` in the `phidata_memory` database.
+
+### Configuration Values
+
+1. Initialize Terraform:
+   ```bash
+   terraform init
+   ```
+
+2. Plan the deployment:
+   ```bash
+   terraform plan -out=tfplan
+   ```
+
+3. Apply the configuration:
+   ```bash
+   terraform apply tfplan
+   ```
+
 ### Configuration Values
 
 Edit the `terraform.tfvars` file to customize:

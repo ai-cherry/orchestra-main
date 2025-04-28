@@ -1,4 +1,17 @@
 """
+DEPRECATED: This file is deprecated and will be removed in a future release.
+
+This legacy file has been replaced by a newer implementation with improved architecture 
+and error handling. Please consult the project documentation for the recommended 
+replacement module.
+
+Example migration:
+from reviewer_agents import * # Old
+# Change to:
+# Import the appropriate replacement module
+"""
+
+"""
 Design Guild Reviewer Agents.
 
 This module implements the specialized reviewer agents for the AI Design Guild.

@@ -5,7 +5,7 @@ Test script to check if the Portkey API key works.
 
 import os
 import sys
-from portkey import Portkey
+from portkey_ai import Portkey
 
 def main():
     # Get the Portkey API key from environment

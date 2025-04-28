@@ -1,0 +1,147 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "orchestra"
+version = "0.1.0"
+description = "Orchestra AI integration platform"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "Proprietary" }
+
+# Core dependencies
+dependencies = [
+    "phidata>=2.7.0",  # Main phidata package
+    "agno>=2.7.0",  # Alternative name for phidata in some contexts
+    "openai>=1.0.0",
+    "anthropic>=0.5.0",
+    "google-generativeai>=0.3.0", # For Gemini Embedder
+    "psycopg[binary]>=3.1.0",
+    "sqlalchemy>=2.0.0",
+    "pgvector>=0.2.0",
+    "duckduckgo-search>=5.0.0",
+    "newspaper4k>=0.2.0",
+    "slack-sdk>=3.0.0",
+    "fastapi[standard]>=0.115.0",
+    "wikipedia>=1.4.0",
+    "lancedb>=0.3.0",
+    "tantivy>=0.20.0",
+    "pypdf>=3.0.0",
+    "yfinance>=0.2.0",
+    "exa-py>=1.0.0",
+]
+
+[project.optional-dependencies]
+# All required dependencies
+phidata = [
+    "phidata>=2.7.0",
+    "openai>=1.0.0", 
+    "anthropic>=0.5.0",
+    "google-generativeai>=0.3.0",
+    "psycopg[binary]>=3.1.0",
+    "sqlalchemy>=2.0.0",
+    "pgvector>=0.2.0",
+]
+
+# Database integrations
+database = [
+    "lancedb>=0.3.0",
+    "tantivy>=0.20.0",
+]
+
+# Search and tools
+search_tools = [
+    "duckduckgo-search>=5.0.0",
+    "newspaper4k>=0.2.0",
+    "wikipedia>=1.4.0",
+    "exa-py>=1.0.0",
+]
+
+# Document processing
+documents = [
+    "pypdf>=3.0.0",
+]
+
+# Financial data
+finance = [
+    "yfinance>=0.2.0",
+]
+
+# Communication tools
+comms = [
+    "slack-sdk>=3.0.0",
+]
+
+# Development dependencies
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "mypy>=1.0.0",
+]
+
+# Full installation with all extras
+all = [
+    "orchestra[phidata,database,documents,finance,search_tools,comms,dev]",
+]
+
+[tool.setuptools]
+packages = ["packages", "core"]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | google-cloud-sdk
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+skip = [".venv", "google-cloud-sdk"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py38"
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "C",    # flake8-comprehensions
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+    "N",    # pep8-naming
+]
+ignore = [
+    "E203",  # whitespace before ':'
+    "E501",  # line too long (handled by black)
+]
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "google-cloud-sdk",
+    "build",
+    "dist",
+]
+
+[tool.mypy]
+exclude = ["google-cloud-sdk"]

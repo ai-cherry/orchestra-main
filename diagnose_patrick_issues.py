@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 """
+DEPRECATED: This diagnostic script is deprecated and will be removed in a future release.
+
+This script has been replaced by the comprehensive unified_diagnostics.py which 
+provides complete system diagnostics in one tool.
+
+Please use unified_diagnostics.py instead.
+Example: python unified_diagnostics.py
+
 Orchestrator Diagnostic Tool for Patrick's Solo-User Experience
 
 This diagnostic tool specifically focuses on identifying issues in:

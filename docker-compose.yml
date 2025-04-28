@@ -1,0 +1,136 @@
+version: '3.8'
+
+services:
+  # Main Orchestra API service
+  orchestra-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - BUILD_ENV=development
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - PORTKEY_API_KEY=${PORTKEY_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - AGNO_API_KEY=${AGNO_API_KEY}
+      - AGNO_PROJECT_ID=orchestra
+    volumes:
+      - ./core:/app/core
+      - ./packages:/app/packages
+    networks:
+      - orchestra-network
+    depends_on:
+      - redis
+      - postgres
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Agno UI service (Phidata Agent UI)
+  agno-ui:
+    image: phidata/agno-ui:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - API_URL=http://orchestra-api:8000
+      - MCP_ENABLED=true
+      - MEMORY_ENABLED=true
+    networks:
+      - orchestra-network
+    depends_on:
+      - orchestra-api
+
+  # LLM Testing service - for validating different providers
+  llm-test-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.llm-test
+    ports:
+      - "8001:8001"
+    environment:
+      - LOG_LEVEL=INFO
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - PORTKEY_API_KEY=${PORTKEY_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    networks:
+      - orchestra-network
+    depends_on:
+      - redis
+
+  # Redis for caching and pub/sub
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - orchestra-network
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL for medium-term memory storage
+  postgres:
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_USER=orchestra
+      - POSTGRES_PASSWORD=orchestrapass
+      - POSTGRES_DB=orchestradb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - orchestra-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U orchestra"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Monitoring service with Prometheus & Grafana
+  monitoring:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - orchestra-network
+    depends_on:
+      - orchestra-api
+
+  # Grafana for metrics visualization
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./monitoring/grafana-provisioning:/etc/grafana/provisioning
+    networks:
+      - orchestra-network
+    depends_on:
+      - monitoring
+
+volumes:
+  redis-data:
+  postgres-data:
+
+networks:
+  orchestra-network:
+    driver: bridge

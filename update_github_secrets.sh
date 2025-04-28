@@ -78,9 +78,15 @@ add_secret() {
   fi
 }
 
-# Add GCP Project ID
+# Add GCP Project ID, Project Number, and Vertex Key
 echo -e "${YELLOW}Setting GCP Project ID...${NC}"
 add_secret "ORG_GCP_PROJECT_ID" "agi-baby-cherry" "Google Cloud Project ID"
+
+echo -e "${YELLOW}Setting GCP Project Number...${NC}"
+add_secret "ORG_GCP_PROJECT_NUMBER" "104944497835" "Google Cloud Project Number"
+
+echo -e "${YELLOW}Setting Vertex Key...${NC}"
+add_secret "ORG_VERTEX_KEY" "0d08481a204c0cdba4095bb94529221e8b8ced5c" "Vertex AI Key"
 
 # Set up GCP Service Account Credentials
 echo -e "${BLUE}Setting up GCP service account credentials...${NC}"
@@ -119,6 +125,11 @@ fi
 
 # Add service account key
 add_secret "ORG_GCP_CREDENTIALS" "${sa_key}" "GCP Service Account Credentials"
+
+# Add API key configurations
+echo -e "${BLUE}Setting up API keys...${NC}"
+echo -e "${YELLOW}Setting Portkey API Key...${NC}"
+add_secret "ORG_PORTKEY_API_KEY" "l1wHW8yhd/SU32fK4wJIUvAcxAC+" "Portkey API Key"
 
 # Add Redis configuration
 echo -e "${BLUE}Setting up Redis configuration...${NC}"

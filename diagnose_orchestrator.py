@@ -1,9 +1,17 @@
 #!/usr/bin/env python3
 """
-Orchestrator System Diagnostic Utility
+DEPRECATED: This diagnostic script is deprecated and will be removed in a future release.
 
-This script performs comprehensive diagnostics on the Orchestrator system,
-checking for common issues and providing actionable solutions.
+This script has been replaced by the comprehensive unified_diagnostics.py which 
+provides complete system diagnostics in one tool.
+
+Please use unified_diagnostics.py instead.
+Example: python unified_diagnostics.py
+
+Diagnostic script to verify Orchestrator setup and configurations.
+
+This script tests the Orchestrator's connection to LLM providers, memory systems, 
+and other dependencies to identify any configuration issues.
 """
 
 import asyncio

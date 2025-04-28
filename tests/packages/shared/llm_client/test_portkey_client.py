@@ -34,6 +34,23 @@ def mock_settings():
     mock_settings.PORTKEY_VIRTUAL_KEY_OPENAI = "vk_openai_456"
     mock_settings.PORTKEY_VIRTUAL_KEY_ANTHROPIC = "vk_anthropic_789"
     
+    # Add other virtual keys as None to avoid AttributeError
+    mock_settings.PORTKEY_VIRTUAL_KEY_MISTRAL = None
+    mock_settings.PORTKEY_VIRTUAL_KEY_HUGGINGFACE = None
+    mock_settings.PORTKEY_VIRTUAL_KEY_COHERE = None
+    mock_settings.PORTKEY_VIRTUAL_KEY_PERPLEXITY = None
+    mock_settings.PORTKEY_VIRTUAL_KEY_DEEPSEEK = None
+    mock_settings.PORTKEY_VIRTUAL_KEY_CODESTRAL = None
+    mock_settings.PORTKEY_VIRTUAL_KEY_CODY = None
+    mock_settings.PORTKEY_VIRTUAL_KEY_CONTINUE = None
+    mock_settings.PORTKEY_VIRTUAL_KEY_GROK = None
+    mock_settings.PORTKEY_VIRTUAL_KEY_GOOGLE = None
+    mock_settings.PORTKEY_VIRTUAL_KEY_AZURE = None
+    mock_settings.PORTKEY_VIRTUAL_KEY_AWS = None
+    mock_settings.PORTKEY_VIRTUAL_KEY_PINECONE = None
+    mock_settings.PORTKEY_VIRTUAL_KEY_WEAVIATE = None
+    mock_settings.PORTKEY_VIRTUAL_KEY_ELEVENLABS = None
+    
     # Legacy virtual key (should not be used if provider keys exist)
     mock_settings.VIRTUAL_KEY = "legacy_virtual_key"
     
@@ -200,13 +217,14 @@ class TestPortkeyClient:
     
     def test_initialization_with_no_api_key(self, mock_settings, mock_portkey):
         """Test initialization with no API key raises an exception."""
-        # Set API key to None and mock the getter to return None as well
+        # Set API key to None
         mock_settings.PORTKEY_API_KEY = None
-        mock_settings._get_portkey_api_key = mock.Mock(return_value=None)
         
-        # Attempting to initialize should raise an exception
-        with pytest.raises(PortkeyClientException):
-            client = PortkeyClient(mock_settings)
+        # Patch the _get_portkey_api_key method in the PortkeyClient class
+        with mock.patch('packages.shared.src.llm_client.portkey_client.PortkeyClient._get_portkey_api_key', return_value=None):
+            # Attempting to initialize should raise an exception
+            with pytest.raises(PortkeyClientException):
+                client = PortkeyClient(mock_settings)
     
     @pytest.mark.asyncio
     async def test_generate_response(self, mock_settings, mock_portkey):

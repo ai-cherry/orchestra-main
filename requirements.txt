@@ -3,3 +3,6 @@
 
 # Add any project-level specific dependencies below
 # that aren't needed by individual packages
+
+# Secret management
+google-cloud-secret-manager>=2.16.0

@@ -1,5 +1,16 @@
 #!/usr/bin/env python3
 """
+DEPRECATED: This diagnostic script is deprecated and will be removed in a future release.
+
+Please use unified_diagnostics.py instead, which provides:
+- Comprehensive health checks for all Orchestra components
+- Better error reporting and visualization
+- Checks for GCP authentication, Terraform configuration, and Figma integration
+- Memory manager validation
+- GitHub Actions configuration validation
+
+Example: python unified_diagnostics.py
+
 Diagnostic script to verify environment setup and imports.
 
 This script tests importing critical modules and initializing key components

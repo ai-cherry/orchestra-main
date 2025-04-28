@@ -4,6 +4,10 @@
 echo "Activating virtual environment..."
 source .venv/bin/activate || echo "Failed to activate virtual environment. Make sure .venv exists."
 
+# Set PYTHONPATH to include the project root directory
+echo "Setting PYTHONPATH to include the project root..."
+export PYTHONPATH=$(pwd):$PYTHONPATH
+
 echo "Installing pytest-cov if needed..."
 pip install -q pytest-cov==4.1.0
 

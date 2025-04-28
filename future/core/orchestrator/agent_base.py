@@ -1,4 +1,17 @@
 """
+DEPRECATED: This file is deprecated and will be removed in a future release.
+
+This legacy file has been replaced by a newer implementation with improved architecture 
+and error handling. Please consult the project documentation for the recommended 
+replacement module.
+
+Example migration:
+from agent_base import * # Old
+# Change to:
+# Import the appropriate replacement module
+"""
+
+"""
 Base classes for agent implementations.
 """
 from abc import ABC, abstractmethod

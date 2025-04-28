@@ -1,0 +1,97 @@
+# Sample YAML configuration for a HackerNews Team using PhidataAgentWrapper
+# This team consists of specialized agents for analyzing HackerNews content
+
+phidata_hn_team:
+  id: "phidata_hn_team"
+  name: "HackerNews Analysis Team"
+  description: "Team of specialized agents for analyzing HackerNews content"
+  type: "phidata"
+  
+  # Phidata-specific configuration
+  phidata_agent_class: "agno.team.Team"
+  llm_ref: "gpt-4-turbo"  # Default LLM for team members
+  team_model_ref: "gpt-4-turbo"  # LLM for team coordinator
+  markdown: true
+  show_tool_calls: true
+  
+  # Team settings
+  team_mode: "coordinate"  # Options: coordinate, collaborate, delegate
+  team_success_criteria: "The task is considered complete when the team has gathered comprehensive information about the requested HackerNews topic, analyzed it, and presented a structured summary with relevant insights."
+  team_instructions:
+    - "You are a specialized team that analyzes HackerNews content to provide insights and summaries."
+    - "Work together to research, extract, and analyze relevant information from HackerNews and related sources."
+    - "Present findings in a clear, structured format with proper attribution to sources."
+  
+  # PostgreSQL storage configuration for the team
+  storage:
+    table_name: "phidata_hn_team_storage"
+    schema_name: "llm"
+  
+  # PGVector memory configuration for the team
+  memory:
+    table_name: "phidata_hn_team_memory"
+    schema_name: "llm"
+    vector_dimension: 768  # For VertexAI embeddings
+  
+  # CloudSQL configuration (optional, can be provided at runtime)
+  cloudsql_config:
+    project_id: "${GCP_PROJECT_ID}"
+    region: "${GCP_REGION}"
+    instance_connection_name: "${CLOUD_SQL_INSTANCE_CONNECTION_NAME}"
+    database: "${CLOUD_SQL_DATABASE}"
+    user: "${CLOUD_SQL_USER}"
+    use_iam_auth: false
+    password_secret_name: "${CLOUD_SQL_PASSWORD_SECRET_NAME}"
+  
+  # Team members configuration
+  members:
+    # HN Researcher member
+    - name: "hn_researcher"
+      role: "Finds and analyzes relevant HackerNews posts and comments"
+      llm_ref: "gpt-4-turbo"
+      instructions:
+        - "You are a HackerNews specialist who finds and analyzes relevant content."
+        - "Search for posts and comments related to the query topic."
+        - "Extract key information, discussions, and trends from HackerNews."
+      # Member-specific storage
+      storage:
+        table_name: "phidata_hn_researcher_storage"
+      # Member-specific tools
+      tools:
+        - type: "agno.tools.hackernews.HackerNews"
+          params:
+            max_results: 5
+    
+    # Web Searcher member
+    - name: "web_searcher"
+      role: "Conducts web searches to supplement HackerNews information"
+      llm_ref: "gpt-4-turbo"
+      instructions:
+        - "You are a web search specialist who finds information to complement HackerNews content."
+        - "Search for additional context, references, and resources mentioned in HN discussions."
+        - "Verify facts and claims made in HackerNews posts through authoritative sources."
+      # Member-specific storage
+      storage:
+        table_name: "phidata_web_searcher_storage"
+      # Member-specific tools
+      tools:
+        - type: "agno.tools.search.DuckDuckGo"
+          params:
+            max_results: 5
+    
+    # Article Reader member
+    - name: "article_reader"
+      role: "Reads and summarizes articles linked from HackerNews"
+      llm_ref: "gpt-4-turbo"
+      instructions:
+        - "You are a content specialist who reads and summarizes articles linked from HackerNews."
+        - "Extract key points, insights, and relevant information from linked content."
+        - "Provide concise summaries that capture the essence of the articles."
+      # Member-specific storage
+      storage:
+        table_name: "phidata_article_reader_storage"
+      # Member-specific tools
+      tools:
+        - type: "agno.tools.web.Newspaper4k"
+          params:
+            use_tls: true

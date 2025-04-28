@@ -1,31 +1,51 @@
 #!/bin/bash
-# make_scripts_executable.sh - Make deployment scripts executable
-#
-# This script simply makes all deployment-related scripts executable.
+# This script sets appropriate execute permissions for all key scripts in the repository
 
-# Color codes for output
-GREEN='\033[0;32m'
-NC='\033[0m' # No Color
+echo "Setting execute permissions on key scripts..."
 
-echo "Making deployment scripts executable..."
+# Shell scripts
+find . -name "*.sh" -not -path "*/\.*" -not -path "*/google-cloud-sdk/*" -type f -exec chmod +x {} \;
+echo "✓ Set permissions on shell scripts"
 
-# Make the deployment scripts executable
-chmod +x prepare_for_deployment.sh
-chmod +x update_github_secrets.sh
-chmod +x verify_deployment_readiness.sh
-chmod +x deploy_to_cloud_run.sh
-chmod +x setup_gcp_auth.sh
-chmod +x setup_vertex_key.sh
-chmod +x setup_redis_for_deployment.sh
+# Python scripts that should be executable
+KEY_PYTHON_SCRIPTS=(
+  "unified_diagnostics.py"
+  "scripts/setup_postgres_pgvector.py"
+  "verify_deployment_readiness.py"
+  "diagnose_environment.py"
+  "diagnose_orchestrator.py"
+)
 
-if [ -f "infra/run_terraform.sh" ]; then
-  chmod +x infra/run_terraform.sh
-fi
+# Set permissions for each key Python script
+for script in "${KEY_PYTHON_SCRIPTS[@]}"; do
+  if [ -f "$script" ]; then
+    chmod +x "$script"
+    echo "✓ Set execute permission on $script"
+  else
+    echo "⚠ Warning: $script not found"
+  fi
+done
 
-echo -e "${GREEN}All deployment scripts are now executable.${NC}"
-echo "You can run the following commands to prepare for deployment:"
-echo "  1. ./verify_deployment_readiness.sh  (to check readiness)"
-echo "  2. ./setup_vertex_key.sh             (to set up GCP authentication)"
-echo "  3. ./setup_redis_for_deployment.sh   (to configure Redis for production)"
-echo "  4. ./prepare_for_deployment.sh       (to install requirements)"
-echo "  5. ./update_github_secrets.sh        (to configure CI/CD)"
+# Main deployment and setup scripts that must be executable
+KEY_SCRIPTS=(
+  "setup_credentials.sh"
+  "unified_setup.sh"
+  "run_pre_deployment_automated.sh"
+  "deploy_to_production.sh"
+  "run_connection_tests.sh"
+)
+
+# Set permissions for each key script
+for script in "${KEY_SCRIPTS[@]}"; do
+  if [ -f "$script" ]; then
+    chmod +x "$script"
+    echo "✓ Verified execute permission on $script"
+  else
+    echo "⚠ Warning: $script not found"
+  fi
+done
+
+echo ""
+echo "Completed setting execute permissions."
+echo "To make all shell scripts and key Python files executable in the future, run:"
+echo "  ./make_scripts_executable.sh"

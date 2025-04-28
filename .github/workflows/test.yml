@@ -31,8 +31,10 @@ jobs:
         
     - name: Run tests
       run: |
-        pytest tests/ --verbose --cov=core.orchestrator --cov=packages.shared --cov-report=term-missing
+        export PYTHONPATH=$(pwd)
+        python -m pytest tests/ --verbose --cov=core.orchestrator --cov=packages.shared --cov-report=term-missing
         
     - name: Run critical tests only
       run: |
-        pytest -m critical
+        export PYTHONPATH=$(pwd)
+        python -m pytest tests/ -m critical -v

@@ -50,6 +50,53 @@ python test_personas_api_manually.py
 - **Architecture**: See `AI_CONTEXT.md` for a comprehensive system overview
 - **Memory System**: Detailed in `packages/shared/src/memory/MEMORY_CONTEXT.md`
 - **LLM Providers**: Explained in `core/orchestrator/src/services/llm/LLM_PROVIDER_CONTEXT.md`
+- **Deployment**: Production deployment guidance in `docs/PRODUCTION_DEPLOYMENT_GUIDE.md`
+
+## Deployment
+
+Orchestra provides a streamlined deployment process for both development and production environments:
+
+### Development Deployment
+
+Verify your development setup before proceeding to production:
+
+```bash
+./run_pre_deployment_automated.sh
+```
+
+This runs comprehensive checks including environment validation, integrated services connectivity, and test validations.
+
+### Production Deployment
+
+Orchestra uses a two-service architecture:
+1. **Orchestra API**: The main backend service
+2. **Phidata Agent UI**: A placeholder frontend UI that connects to the API
+
+For production deployment, follow these steps:
+
+1. Setup production secrets:
+   ```bash
+   ./scripts/setup_prod_secrets.sh
+   ```
+
+2. Run the production deployment script:
+   ```bash
+   ./deploy_to_production.sh
+   ```
+
+The production deployment script guides you through:
+- Prerequisite verification
+- Secret configuration
+- Infrastructure deployment via Terraform (deploying both API and UI services)
+- Application deployment
+- Post-deployment validation of both services
+- Monitoring setup
+
+After deployment, you'll have two Cloud Run services:
+- `orchestrator-api-prod`: The Orchestra backend API
+- `phidata-agent-ui-prod`: The Phidata Agent UI frontend
+
+For detailed deployment documentation, refer to the [Production Deployment Guide](./docs/PRODUCTION_DEPLOYMENT_GUIDE.md).
 
 ## Development
 

@@ -1,49 +1,7 @@
 # Terraform configuration for Vertex AI Workbench, Firestore, Redis, and Secret Manager
-
-terraform {
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = "~> 5.0"
-    }
-    google-beta = {
-      source  = "hashicorp/google-beta"
-      version = "~> 5.0"
-    }
-  }
-}
-
-# ------------ Provider Configuration --------------
-provider "google" {
-  project     = var.project_id
-  region      = var.region
-  zone        = "${var.region}-a"
-}
-
-provider "google-beta" {
-  project     = var.project_id
-  region      = var.region
-  zone        = "${var.region}-a"
-}
+# Original file has been backed up to vertex_workbench_config.tf.bak
 
 # ------------ Variables --------------
-variable "project_id" {
-  description = "GCP Project ID"
-  type        = string
-}
-
-variable "region" {
-  description = "GCP region for resources"
-  type        = string
-  default     = "us-central1"
-}
-
-variable "env" {
-  description = "Environment (dev, stage, prod)"
-  type        = string
-  default     = "dev"
-}
-
 variable "notebook_name" {
   description = "Name for the Vertex AI Workbench notebook instance"
   type        = string
@@ -374,7 +332,9 @@ output "connection_details" {
   })
 }
 
-# Output JSON connection details to a local file
+# Commenting out local_file resource as it might not be needed right now
+# and could cause issues if the path is incorrect
+/*
 resource "local_file" "connection_details" {
   content  = jsonencode({
     "vertex_workbench" = {
@@ -414,3 +374,4 @@ resource "local_file" "connection_details" {
   })
   filename = "infra/connection_details.json"
 }
+*/

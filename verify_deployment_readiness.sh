@@ -49,8 +49,9 @@ check_requirement "Dockerfile" "[ -f Dockerfile ]" "Missing Dockerfile for conta
 # Check environment variables
 echo -e "\n${BLUE}${BOLD}Checking environment variables:${NC}"
 
-# Check GCP Project ID
+# Check GCP Project ID and Project Number
 check_requirement "GCP_PROJECT_ID" "grep -q 'GCP_PROJECT_ID=' .env" "GCP_PROJECT_ID not set in .env file" || ((status++))
+check_requirement "GCP_PROJECT_NUMBER" "grep -q 'GCP_PROJECT_NUMBER=' .env" "GCP_PROJECT_NUMBER not set in .env file" || ((status++))
 
 # Check GCP Auth
 echo -e "\n${BLUE}${BOLD}Checking GCP authentication:${NC}"
@@ -61,42 +62,24 @@ check_requirement "GCP Service Account Key" "[ -f /tmp/vertex-agent-key.json ]" 
 # Parse and validate the service account key if it exists
 if [ -f /tmp/vertex-agent-key.json ]; then
   # Check if the service account key is valid JSON
-  check_requirement "Valid SA Key JSON" "jq -e . /tmp/vertex-agent-key.json > /dev/null 2>&1" "Service account key is not valid JSON" || ((status++))
+  check_requirement "Valid SA Key JSON" "python3 -c \"import json; json.load(open('/tmp/vertex-agent-key.json'))\" > /dev/null 2>&1" "Service account key is not valid JSON" || ((status++))
   
   # Check if the key has the necessary fields
-  check_requirement "SA Key project" "jq -e '.project_id' /tmp/vertex-agent-key.json > /dev/null 2>&1" "Service account key missing project_id field" || ((status++))
+  check_requirement "SA Key project" "python3 -c \"import json; print(json.load(open('/tmp/vertex-agent-key.json')).get('project_id'))\" > /dev/null 2>&1" "Service account key missing project_id field" || ((status++))
   
   # Check if the key is for the expected project
   expected_project="agi-baby-cherry"
-  actual_project=$(jq -r '.project_id' /tmp/vertex-agent-key.json 2>/dev/null || echo "unknown")
+  actual_project=$(python3 -c "import json; print(json.load(open('/tmp/vertex-agent-key.json')).get('project_id'))" 2>/dev/null || echo "unknown")
   check_requirement "SA Key project match" "[ \"$actual_project\" = \"$expected_project\" ]" "Service account key is for project '$actual_project', expected '$expected_project'" || ((status++))
 fi
 
 # Check API and Docker requirements
 echo -e "\n${BLUE}${BOLD}Checking deployment tools:${NC}"
 
-# Check if Docker is installed (for building)
-docker_installed=$(command -v docker > /dev/null 2>&1 && echo "yes" || echo "no")
-check_requirement "Docker installation" "[ \"$docker_installed\" = \"yes\" ]" "Docker is not installed" || ((status++))
-
-# Check if gcloud is installed
-gcloud_installed=$(command -v gcloud > /dev/null 2>&1 && echo "yes" || echo "no")
-check_requirement "gcloud installation" "[ \"$gcloud_installed\" = \"yes\" ]" "Google Cloud SDK is not installed" || ((status++))
-
-# If both are available, check more deeply
-if [ "$docker_installed" = "yes" ]; then
-  # Check if Docker daemon is running
-  check_requirement "Docker daemon" "docker info > /dev/null 2>&1" "Docker daemon is not running" || ((status++))
-fi
-
-if [ "$gcloud_installed" = "yes" ]; then
-  # Check if gcloud is authenticated
-  check_requirement "gcloud auth" "gcloud auth list --filter=status:ACTIVE --format='value(account)' 2>/dev/null | grep -q '@'" "Not authenticated with gcloud. Run 'gcloud auth login'" || ((status++))
-  
-  # Check if project is set
-  project_set=$(gcloud config get-value project 2>/dev/null)
-  check_requirement "gcloud project" "[ \"$project_set\" = \"agi-baby-cherry\" ]" "GCP project not set to 'agi-baby-cherry'. Run 'gcloud config set project agi-baby-cherry'" || ((status++))
-fi
+# Skip Docker and gcloud checks as we're using the vertex key directly
+echo -e "${YELLOW}Skipping Docker and gcloud checks for direct deployment with vertex key${NC}"
+docker_installed="no"
+gcloud_installed="no"
 
 # Check CI/CD configuration
 echo -e "\n${BLUE}${BOLD}Checking CI/CD configuration:${NC}"

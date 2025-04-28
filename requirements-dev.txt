@@ -10,3 +10,5 @@ requests>=2.30.0  # Common in tests but missing from requirements
 # Code quality
 black>=22.0.0
 flake8>=4.0.0
+isort>=5.12.0  # Added for import sorting
+ruff>=0.0.292  # Added for comprehensive Python linting

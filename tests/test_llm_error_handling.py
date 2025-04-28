@@ -27,6 +27,7 @@ from packages.shared.src.models.base_models import PersonaConfig
 TEST_PERSONA = PersonaConfig(
     id="test-persona",
     name="Test Persona",
+    description="A persona for testing error handling in LLMs.",
     background="A test persona for error handling",
     interaction_style="Helpful and concise",
     traits={"adaptability": 80, "resilience": 100}

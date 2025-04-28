@@ -1,4 +1,17 @@
 """
+DEPRECATED: This file is deprecated and will be removed in a future release.
+
+This legacy file has been replaced by a newer implementation with improved architecture 
+and error handling. Please consult the project documentation for the recommended 
+replacement module.
+
+Example migration:
+from doer_agents import * # Old
+# Change to:
+# Import the appropriate replacement module
+"""
+
+"""
 Design Guild Doer Agents.
 
 This module implements the specialized doer agents for the AI Design Guild.

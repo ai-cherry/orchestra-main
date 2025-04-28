@@ -26,7 +26,8 @@ try:
         RateLimitError,
         APIStatusError,
     )
-    from portkey import Portkey, PortkeyException
+    from portkey_ai import Portkey
+    from portkey_ai.api_resources.exceptions import APIError as PortkeyAPIError
 except ImportError:
     logging.error(
         "Required packages not found. Please install with: pip install openai portkey tenacity"
@@ -381,7 +382,7 @@ class PortkeyClient(LLMClient):
             logger.warning(f"Retryable error occurred: {type(e).__name__}: {e}")
             raise
 
-        except PortkeyException as e:
+        except PortkeyAPIError as e:
             # Portkey-specific exceptions
             logger.error(f"Portkey API error: {e}")
             return self._user_friendly_error(

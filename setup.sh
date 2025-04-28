@@ -1,4 +1,18 @@
 #!/bin/bash
+# DEPRECATED: This script is deprecated and will be removed in a future release.
+#
+# Please use unified_setup.sh instead, which provides:
+# - Complete environment setup in one script
+# - Better error handling and validation
+# - GCP authentication setup
+# - Infrastructure provisioning
+# - Figma-GCP integration
+# - GitHub Actions setup
+#
+# Example: ./unified_setup.sh
+#
+# See unified_setup.sh for more options and documentation.
+
 set -e
 
 echo "Running setup script for Orchestra development environment..."

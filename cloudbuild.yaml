@@ -1,0 +1,167 @@
+steps:
+# Step 1: Initialize Terraform and select/create workspace
+- name: 'hashicorp/terraform:latest'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      set -e
+      cd infra/orchestra-terraform
+      terraform init -upgrade
+      terraform workspace select $_ENV || terraform workspace new $_ENV
+  dir: '.' # Run from the root, then cd into terraform dir
+  id: 'terraform-init-workspace'
+
+# Step 2: Apply Terraform configuration
+- name: 'hashicorp/terraform:latest'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      set -e
+      cd infra/orchestra-terraform
+      terraform apply -auto-approve -var="env=$_ENV"
+  dir: '.' # Run from the root, then cd into terraform dir
+  id: 'terraform-apply'
+
+# Step 3: Build and Push Orchestra API Docker Image
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'build'
+    - '-t'
+    - '$_ARTIFACT_REGISTRY_REPO/orchestrator:$_ENV-$SHORT_SHA'
+    - '.' # Build context is the root of the repository
+  id: 'docker-build'
+
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'push'
+    - '$_ARTIFACT_REGISTRY_REPO/orchestrator:$_ENV-$SHORT_SHA'
+  id: 'docker-push'
+
+# Step 4: Setup PostgreSQL Schema (Conditional)
+# This step assumes the setup script is idempotent and can be run safely.
+# Database credentials should be configured as Cloud Build secrets.
+- name: 'python:3.9' # Use a Python builder
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      set -e
+      # Install dependencies if needed, e.g., pip install -r requirements.txt
+      # Ensure necessary environment variables for DB connection are set via Cloud Build secrets
+      python scripts/setup_postgres_pgvector.py
+  dir: '.'
+  id: 'postgres-setup'
+  # Access database credentials securely via Cloud Build secrets
+  # You need to configure these secrets in the Cloud Build settings
+  # and grant the Cloud Build service account access to them in Secret Manager.
+  secretEnv: ['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASSWORD'] # Example environment variables
+secrets:
+- secretManager:
+  - versionName: projects/$_PROJECT_ID/secrets/postgres-host-${_ENV}/versions/latest
+    env: 'DB_HOST'
+  - versionName: projects/$_PROJECT_ID/secrets/postgres-db-name-${_ENV}/versions/latest
+    env: 'DB_NAME'
+  - versionName: projects/$_PROJECT_ID/secrets/postgres-user-${_ENV}/versions/latest
+    env: 'DB_USER'
+  - versionName: projects/$_PROJECT_ID/secrets/postgres-password-${_ENV}/versions/latest
+    env: 'DB_PASSWORD'
+
+# Step 5: Deploy Orchestra API to Cloud Run
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      set -e
+      # Retrieve necessary values from Terraform outputs dynamically
+      TERRAFORM_DIR="infra/orchestra-terraform"
+      API_SERVICE_NAME=$(terraform -chdir="$TERRAFORM_DIR" output -raw orchestra_api_service_name)
+      GCP_REGION=$(terraform -chdir="$TERRAFORM_DIR" output -raw gcp_region)
+      RUN_SA_EMAIL=$(terraform -chdir="$TERRAFORM_DIR" output -raw cloud_run_sa_email)
+      VPC_CONNECTOR_ID=$(terraform -chdir="$TERRAFORM_DIR" output -raw vpc_connector_id 2>/dev/null || echo "")
+
+      IMAGE_TAG="$_ARTIFACT_REGISTRY_REPO/orchestrator:$_ENV-$SHORT_SHA"
+
+      # Determine Log Level and Authentication Flag
+      LOG_LEVEL="DEBUG"
+      ALLOW_UNAUTH_FLAG="--allow-unauthenticated"
+      if [[ "$_ENV" == "prod" ]]; then
+        LOG_LEVEL="INFO"
+        ALLOW_UNAUTH_FLAG="" # Consider --no-allow-unauthenticated for prod API
+      fi
+
+      # Construct Env Vars string (sensitive vars should use secretKeyRef in TF)
+      ENV_VARS="ENVIRONMENT=$_ENV,LOG_LEVEL=$LOG_LEVEL,GCP_PROJECT_ID=$_PROJECT_ID,MEMORY_ENVIRONMENT=$_ENV"
+
+      VPC_CONNECTOR_ARG=""
+      if [ -n "$VPC_CONNECTOR_ID" ]; then
+          VPC_CONNECTOR_ARG="--vpc-connector=$VPC_CONNECTOR_ID --vpc-egress=private-ranges-only"
+      fi
+
+      gcloud run deploy "$API_SERVICE_NAME" \
+          --image="$IMAGE_TAG" \
+          --region="$GCP_REGION" \
+          --platform=managed \
+          --service-account="$RUN_SA_EMAIL" \
+          --set-env-vars="$ENV_VARS" \
+          $VPC_CONNECTOR_ARG \
+          $ALLOW_UNAUTH_FLAG \
+          --quiet
+
+  dir: '.'
+  id: 'deploy-api'
+  waitFor: ['docker-push', 'postgres-setup'] # Wait for image and schema setup
+
+# Step 6: Deploy Phidata UI Placeholder to Cloud Run (Conditional)
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      set -e
+      # Retrieve necessary values from Terraform outputs dynamically
+      TERRAFORM_DIR="infra/orchestra-terraform"
+      UI_SERVICE_NAME=$(terraform -chdir="$TERRAFORM_DIR" output -raw phidata_ui_service_name 2>/dev/null || echo "")
+      GCP_REGION=$(terraform -chdir="$TERRAFORM_DIR" output -raw gcp_region)
+      API_SERVICE_NAME=$(terraform -chdir="$TERRAFORM_DIR" output -raw orchestra_api_service_name)
+
+      if [ -z "$UI_SERVICE_NAME" ]; then
+          echo "Phidata UI service name not found in Terraform output. Skipping UI deployment."
+          exit 0 # Exit successfully if UI service is not defined
+      fi
+
+      # Get API Service URL from gcloud after deployment
+      API_SERVICE_URL=$(gcloud run services describe "$API_SERVICE_NAME" --platform=managed --region="$GCP_REGION" --format='value(status.url)')
+      if [ -z "$API_SERVICE_URL" ]; then
+          echo "Failed to get URL for deployed API service: $API_SERVICE_NAME. Skipping UI deployment."
+          exit 1 # Exit with error if API URL is not found
+      fi
+
+      # Assume the official image name (Verify this!)
+      PHIDATA_UI_IMAGE="phidata/agent_ui:1.0.0"
+      # Get the correct ENV var name required by the Phidata UI image
+      PHIDATA_API_URL_VAR="PHIDATA_API_URL" # VERIFY THIS!
+
+      UI_ENV_VARS="ENVIRONMENT=$_ENV,${PHIDATA_API_URL_VAR}=${API_SERVICE_URL},PHIDATA_APP_NAME=Orchestra,PHIDATA_APP_DESCRIPTION=Orchestra AI,PHIDATA_TELEMETRY=false,PHIDATA_DEBUG=$_ENV != 'prod'"
+
+      gcloud run deploy "$UI_SERVICE_NAME" \
+          --image="$PHIDATA_UI_IMAGE" \
+          --region="$GCP_REGION" \
+          --platform=managed \
+          --set-env-vars="$UI_ENV_VARS" \
+          --allow-unauthenticated \ # UI is typically public
+          --quiet
+
+  dir: '.'
+  id: 'deploy-ui'
+  waitFor: ['deploy-api'] # Wait for API deployment
+
+# Note: Final verification steps (URLs) are typically done outside of Cloud Build,
+# e.g., in the GitHub Actions workflow or manually.
+
+substitutions:
+  _ENV: 'dev' # Default environment, can be overridden by trigger
+  _ARTIFACT_REGISTRY_REPO: 'us-central1-docker.pkg.dev/$_PROJECT_ID/orchestra' # Default repo, adjust if needed
+  # _PROJECT_ID: 'your-gcp-project-id' # Define this or ensure it's set by the trigger

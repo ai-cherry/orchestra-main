@@ -1,14 +1,16 @@
 {
   "name": "Orchestra Environment",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "context": ".."
-  },
+  "image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
   "containerEnv": {
     "PYTHONPATH": "/workspaces/orchestra-main",
     "USE_RECOVERY_MODE": "false",
     "STANDARD_MODE": "true",
     "ENVIRONMENT": "development"
+  },
+  "features": {
+    // "ghcr.io/devcontainers/features/google-cloud-cli:1": {},
+    "ghcr.io/devcontainers/features/terraform:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
   "customizations": {
     "vscode": {
@@ -34,7 +36,6 @@
       }
     }
   },
-  "postCreateCommand": "chmod +x .devcontainer/setup.sh && .devcontainer/setup.sh && chmod +x ./fix_dependencies.sh && ./fix_dependencies.sh",
-  "postStartCommand": "bash run_api.sh",
+  "postCreateCommand": "bash ./.devcontainer/postCreate.sh",
   "remoteUser": "vscode"
 }

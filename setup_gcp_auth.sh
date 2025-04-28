@@ -1,4 +1,14 @@
 #!/bin/bash
+# DEPRECATED: This script is deprecated and will be removed in a future release.
+#
+# Please use unified_setup.sh instead, which provides comprehensive setup including
+# GCP authentication with improved error handling and better integration with other
+# components.
+#
+# Example: ./unified_setup.sh
+#
+# See unified_setup.sh for more options and documentation.
+
 # Script to set up GCP authentication and generate new service account keys
 
 set -e  # Exit on any error

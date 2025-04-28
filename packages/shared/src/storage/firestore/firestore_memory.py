@@ -1,4 +1,18 @@
 """
+DEPRECATED: This implementation is deprecated and will be removed in a future release.
+
+Please use the FirestoreMemoryManagerV2 implementation at v2/adapter.py instead, which provides:
+- Improved error handling and recovery
+- Better type safety and validation
+- Enhanced performance with optimized queries
+- More robust health checks
+- Better integration with monitoring systems
+
+Example migration:
+from packages.shared.src.storage.firestore.firestore_memory import FirestoreMemoryManager
+# Change to:
+from packages.shared.src.storage.firestore.v2.adapter import FirestoreMemoryManagerV2
+
 Firestore Memory Manager Implementation for AI Orchestration System.
 
 This module provides a Firestore-backed implementation of the MemoryManager

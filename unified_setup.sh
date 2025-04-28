@@ -558,6 +558,51 @@ else
     warning "test_memory_inmemory.py not found, skipping memory tests"
 fi
 
+# Install dependencies from pyproject.toml
+install_dependencies() {
+    section "Installing Dependencies"
+    
+    # Check if pyproject.toml exists
+    if [ ! -f "pyproject.toml" ]; then
+        error "pyproject.toml not found. Please run the script from the project root directory."
+        return 1
+    fi
+    
+    # Parse installation profile (default to development mode)
+    PROFILE=${1:-"dev"}
+    
+    case $PROFILE in
+        "minimal")
+            echo "Installing minimal dependencies..."
+            pip install .
+            ;;
+        "full")
+            echo "Installing full dependencies with all extras..."
+            pip install ".[all]"
+            ;;
+        "phidata")
+            echo "Installing Phidata-specific dependencies..."
+            pip install -e ".[phidata]"
+            ;;
+        "dev")
+            echo "Installing development dependencies..."
+            pip install -e ".[dev]"
+            ;;
+        *)
+            warning "Unknown profile: $PROFILE. Defaulting to development installation."
+            pip install -e ".[dev]"
+            ;;
+    esac
+    
+    # Verify installation
+    if python -c "import phi" &> /dev/null; then
+        success "Phi/Agno dependencies installed successfully."
+    else
+        error "Failed to install dependencies. Please check the output for errors."
+        return 1
+    fi
+}
+
 section "Setup Complete"
 echo ""
 echo -e "${GREEN}Orchestra setup has been completed successfully!${NC}"
@@ -574,5 +619,9 @@ echo ""
 echo "For integration tests (requires real GCP infrastructure):"
 echo "  export RUN_INTEGRATION_TESTS=true"
 echo "  ./run_integration_tests.sh"
+echo ""
+echo "To install dependencies from pyproject.toml, run:"
+echo "  source ./unified_setup.sh && install_dependencies [profile]"
+echo "  Profiles: minimal, full, phidata, dev (default)"
 echo ""
 echo "Thank you for using Orchestra!"

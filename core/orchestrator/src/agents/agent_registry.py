@@ -6,6 +6,7 @@ selection of agents based on context.
 """
 
 import logging
+import os
 from typing import Dict, List, Optional, Any, Callable, Type
 import random
 
@@ -28,8 +29,9 @@ class AgentRegistry:
         self._agents: Dict[str, Agent] = {}
         self._agent_types: Dict[str, Type[Agent]] = {}
         self._default_agent_type = "simple_text"
+        self._environment = os.environ.get("DEPLOYMENT_ENVIRONMENT", "development")
 
-        logger.info("AgentRegistry initialized")
+        logger.info(f"AgentRegistry initialized for environment: {self._environment}")
 
     def register_agent(self, agent: Agent) -> None:
         """
@@ -140,6 +142,15 @@ class AgentRegistry:
 
             raise RuntimeError("No agent types registered")
 
+    def get_environment(self) -> str:
+        """
+        Get the current deployment environment.
+        
+        Returns:
+            The current deployment environment (e.g., 'development', 'staging', 'production')
+        """
+        return self._environment
+
 
 # Global agent registry instance
 _agent_registry = None
@@ -171,18 +182,75 @@ def register_default_agents():
     should be available by default.
     """
     from core.orchestrator.src.agents.agent_base import Agent
-    from core.orchestrator.src.agents.persona_agent import PersonaAgent
+    from core.orchestrator.src.agents.persona_agent import PersonaAwareAgent
     from core.orchestrator.src.agents.llm_agent import LLMAgent
 
     registry = get_agent_registry()
 
     # Register agent types
-    registry.register_agent_type("simple_text", PersonaAgent)
+    registry.register_agent_type("simple_text", PersonaAwareAgent)
     registry.register_agent_type("llm_agent", LLMAgent)
+    
+    # Try to register PhidataAgentWrapper if available
+    try:
+        from packages.agents.src.phidata_agent import PhidataAgentWrapper, PHIDATA_AVAILABLE
+        
+        if PHIDATA_AVAILABLE:
+            registry.register_agent_type("phidata", PhidataAgentWrapper)
+            logger.info("Registered PhidataAgentWrapper type")
+        else:
+            logger.warning("Phidata dependencies available but PHIDATA_AVAILABLE flag is False")
+            
+    except ImportError as e:
+        logger.warning(f"PhidataAgentWrapper not available - skipping registration: {str(e)}")
 
     # Create and register default instances
-    registry.register_agent(PersonaAgent())
+    registry.register_agent(PersonaAwareAgent())
     registry.register_agent(LLMAgent())
+    
+    # Try to create and register a PhidataAgentWrapper instance if available
+    try:
+        from packages.agents.src.phidata_agent import PhidataAgentWrapper, PHIDATA_AVAILABLE
+        
+        if PHIDATA_AVAILABLE:
+            # Get settings to determine memory configuration
+            from core.orchestrator.src.config.config import get_settings
+            settings = get_settings()
+            
+            # Configure based on environment 
+            environment = os.environ.get("DEPLOYMENT_ENVIRONMENT", "development")
+            
+            # This would normally use proper initialization with dependencies
+            phidata_agent_config = {
+                "name": f"PhidataAgent-{environment}",
+                "markdown": True,
+                "show_tool_calls": True,
+                "temperature": 0.7,
+                # Set lower temperature for production
+                "temperature": 0.5 if environment == "production" else 0.7,
+            }
+
+            # Get memory manager if available through dependency injection
+            memory_manager = None
+            llm_client = None
+            tool_registry = None
+            
+            try:
+                from core.orchestrator.src.services.memory_service import get_memory_manager
+                memory_manager = get_memory_manager()
+                logger.info("Successfully loaded memory manager for PhidataAgentWrapper")
+            except (ImportError, Exception) as memory_err:
+                logger.warning(f"Failed to load memory manager for PhidataAgentWrapper: {memory_err}")
+                
+            registry.register_agent(PhidataAgentWrapper(
+                agent_config=phidata_agent_config,
+                memory_manager=memory_manager,
+                llm_client=llm_client,
+                tool_registry=tool_registry
+            ))
+            logger.info(f"Registered PhidataAgentWrapper instance for environment: {environment}")
+    except (ImportError, Exception) as e:
+        logger.warning(f"Failed to register PhidataAgentWrapper instance: {e}")
 
     # Set default agent type
     from core.orchestrator.src.config.config import get_settings

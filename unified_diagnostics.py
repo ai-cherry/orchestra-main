@@ -272,6 +272,75 @@ def check_github_actions():
     else:
         print_warning(f"GitHub secrets setup script not found at {secrets_script}")
 
+def check_phidata_dependencies():
+    """Check for Phidata/Agno dependencies and related libraries."""
+    print_header("Phidata/Agno Integration Check")
+    
+    # Check core imports
+    core_imports = {
+        "phi": "Core Phidata package",
+        "agno": "Alternative name for Phidata in some contexts",
+        "phi.agent": "Agent class for creating AI agents",
+        "phi.model.openai": "OpenAI model integration",
+        "phi.model.anthropic": "Anthropic model integration",
+        "phi.playground": "Phidata UI dashboard",
+        "phi.tools": "Phidata tools package"
+    }
+    
+    missing_core = []
+    for module, description in core_imports.items():
+        try:
+            __import__(module)
+            print_success(f"{module}: {description}")
+        except ImportError as e:
+            print_warning(f"{module}: Not found - {description}")
+            missing_core.append(module)
+    
+    # Check database dependencies
+    db_imports = {
+        "psycopg": "PostgreSQL adapter",
+        "sqlalchemy": "SQL toolkit and ORM",
+        "pgvector": "PostgreSQL vector extension"
+    }
+    
+    missing_db = []
+    for module, description in db_imports.items():
+        try:
+            __import__(module)
+            print_success(f"{module}: {description}")
+        except ImportError as e:
+            print_warning(f"{module}: Not found - {description}")
+            missing_db.append(module)
+    
+    # Check tool dependencies
+    tool_imports = {
+        "duckduckgo_search": "DuckDuckGo search tool",
+        "newspaper": "News article extraction tool",
+        "wikipedia": "Wikipedia search and retrieval",
+        "slack_sdk": "Slack integration"
+    }
+    
+    missing_tools = []
+    for module, description in tool_imports.items():
+        try:
+            __import__(module)
+            print_success(f"{module}: {description}")
+        except ImportError as e:
+            print_warning(f"{module}: Not found - {description}")
+            missing_tools.append(module)
+    
+    # Provide guidance based on missing dependencies
+    if missing_core or missing_db or missing_tools:
+        print_warning("Some Phidata/Agno dependencies are missing.")
+        print("\nTo install all required dependencies, run:")
+        print("  source ./unified_setup.sh && install_dependencies")
+        
+        if missing_core:
+            print("\nTo install core Phidata dependencies only:")
+            print("  source ./unified_setup.sh && install_dependencies phidata")
+    else:
+        print_success("All Phidata/Agno dependencies are properly installed.")
+
 def check_memory_manager():
     """Check Memory Manager implementation."""
     print_header("Memory Manager")
@@ -312,6 +381,7 @@ def main():
     check_terraform()
     check_figma()
     check_github_actions()
+    check_phidata_dependencies()
     check_memory_manager()
     
     print("\n" + "="*80)
@@ -321,8 +391,9 @@ def main():
     print("Next steps:")
     print("  1. Fix any issues highlighted in red")
     print("  2. Run ./unified_setup.sh to set up missing components")
-    print("  3. Run ./test_memory_inmemory.py to verify memory management")
-    print("  4. Run the memory validation script with GCP authentication")
+    print("  3. Install Phidata dependencies: source ./unified_setup.sh && install_dependencies")
+    print("  4. Run ./test_memory_inmemory.py to verify memory management")
+    print("  5. Run the memory validation script with GCP authentication")
     print("\n")
 
 if __name__ == "__main__":

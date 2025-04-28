@@ -1,4 +1,17 @@
 """
+DEPRECATED: This file is deprecated and will be removed in a future release.
+
+This legacy file has been replaced by a newer implementation with improved architecture 
+and error handling. Please consult the project documentation for the recommended 
+replacement module.
+
+Example migration:
+from onepassword_agent import * # Old
+# Change to:
+# Import the appropriate replacement module
+"""
+
+"""
 1Password Agent for Orchestra.
 
 This module implements an agent that interacts with 1Password for secure credential management.

@@ -36,7 +36,7 @@ from openai import (
 import httpx
 
 try:
-    from portkey import Portkey, PortkeyException, PortkeyAPIError
+    from portkey_ai import Portkey, PortkeyException, PortkeyAPIError
 except ImportError:
     PortkeyException = Exception
     PortkeyAPIError = Exception

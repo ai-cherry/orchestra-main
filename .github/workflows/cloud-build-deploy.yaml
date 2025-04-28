@@ -1,0 +1,53 @@
+name: Cloud Build Deployment
+
+on:
+  push:
+    branches:
+      - main # Trigger on pushes to the main branch
+  # Alternatively, trigger on tags for production releases:
+  # push:
+  #   tags:
+  #     - 'v*'
+
+env:
+  PROJECT_ID: 104944497835 # Replace with your GCP Project ID
+  CLOUD_BUILD_REGION: us-central1 # Replace with your desired Cloud Build region
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write' # Required for Workload Identity Federation
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          # Configure Workload Identity Federation
+          workload_identity_provider: 'projects/104944497835/locations/global/workloadIdentityPools/github-pool/providers/github-pool'
+          service_account: 'github-actions-deployer@agi-baby-cherry.iam.gserviceaccount.com'
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Submit Cloud Build Job
+        run: |
+          # Determine environment based on branch or tag
+          ENV="dev"
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            ENV="dev"
+          elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            ENV="prod"
+          fi
+
+          gcloud builds submit . \
+            --project=$PROJECT_ID \
+            --region=$CLOUD_BUILD_REGION \
+            --config=cloudbuild.yaml \
+            --substitutions=_ENV=$ENV,_PROJECT_ID=$PROJECT_ID \
+            --timeout=1200s # Adjust timeout as needed

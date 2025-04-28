@@ -23,4 +23,3 @@ def test_interact():
     response = client.post("/interact", json={"text": "Hello"})
     assert response.status_code == 200
     assert response.json() == {"response": "Orchestrator is listening..."}
-```
