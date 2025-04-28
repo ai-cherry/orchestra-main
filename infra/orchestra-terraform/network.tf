@@ -8,7 +8,7 @@ resource "google_vpc_access_connector" "orchestra_connector" {
   min_instances = var.env == "prod" ? 2 : 2
   max_instances = var.env == "prod" ? 5 : 3
   machine_type  = "e2-micro" // Adding explicit machine type for clarity
-  
+
   lifecycle {
     prevent_destroy = true
     ignore_changes = [

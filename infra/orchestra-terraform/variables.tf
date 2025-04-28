@@ -33,7 +33,7 @@ variable "vpc_connector_cidr" {
   default = {
     dev   = "10.8.0.0/28"
     stage = "10.8.0.16/28"
-    prod  = "10.9.0.0/28"  # Changed to a different subnet to avoid conflicts
+    prod  = "10.9.0.0/28" # Changed to a different subnet to avoid conflicts
   }
 }
 

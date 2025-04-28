@@ -151,7 +151,7 @@ secrets:
           --region="$GCP_REGION" \
           --platform=managed \
           --set-env-vars="$UI_ENV_VARS" \
-          --allow-unauthenticated \ # UI is typically public
+          --allow-unauthenticated \
           --quiet
 
   dir: '.'

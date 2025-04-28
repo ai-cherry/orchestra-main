@@ -34,15 +34,15 @@ terraform {
 }
 
 provider "google" {
-  project     = var.project_id
-  region      = var.region
-  zone        = "${var.region}-a"
+  project = var.project_id
+  region  = var.region
+  zone    = "${var.region}-a"
 }
 
 provider "google-beta" {
-  project     = var.project_id
-  region      = var.region
-  zone        = "${var.region}-a"
+  project = var.project_id
+  region  = var.region
+  zone    = "${var.region}-a"
 }
 
 # Enable required APIs
@@ -56,8 +56,8 @@ resource "google_project_service" "required_apis" {
     "artifactregistry.googleapis.com",
     "run.googleapis.com",
     "cloudbuild.googleapis.com",
-    "sqladmin.googleapis.com",  # For Cloud SQL operations
-    "vpcaccess.googleapis.com"  # For VPC Access Connector
+    "sqladmin.googleapis.com", # For Cloud SQL operations
+    "vpcaccess.googleapis.com" # For VPC Access Connector
   ])
 
   project = var.project_id
@@ -73,8 +73,8 @@ resource "google_redis_instance" "cache" {
   tier           = "BASIC"
   memory_size_gb = 3
 
-  region                  = var.region
-  location_id             = var.zone
+  region      = var.region
+  location_id = var.zone
   # Removed alternative_location_id as it's not supported for BASIC tier
 
   redis_version     = "REDIS_6_X"
@@ -82,7 +82,7 @@ resource "google_redis_instance" "cache" {
   reserved_ip_range = "10.0.0.0/29"
 
   depends_on = [google_project_service.required_apis]
-  
+
   lifecycle {
     ignore_changes = [
       memory_size_gb,
@@ -122,8 +122,8 @@ resource "random_password" "redis_password" {
 output "connection_details" {
   value = jsonencode({
     redis = {
-      host     = google_redis_instance.cache.host
-      port     = google_redis_instance.cache.port
+      host            = google_redis_instance.cache.host
+      port            = google_redis_instance.cache.port
       password_secret = google_secret_manager_secret.redis_auth.name
     }
   })

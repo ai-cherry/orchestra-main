@@ -22,7 +22,7 @@ resource "google_sql_database_instance" "phidata_postgres" {
     backup_configuration {
       enabled                        = true
       point_in_time_recovery_enabled = true
-      start_time                     = "02:00"  # 2 AM in UTC
+      start_time                     = "02:00" # 2 AM in UTC
       transaction_log_retention_days = 7
       backup_retention_settings {
         retained_backups = 7
@@ -36,11 +36,25 @@ resource "google_sql_database_instance" "phidata_postgres" {
       record_client_address   = true
     }
 
-    # Removed the problematic database flag
+    # PostgreSQL specific database flags
+    database_flags {
+      name  = "shared_preload_libraries"
+      value = "pg_stat_statements,vector"
+    }
+
+    database_flags {
+      name  = "max_connections"
+      value = "100"
+    }
+
+    database_flags {
+      name  = "log_min_duration_statement"
+      value = "1000" # Log queries taking longer than 1 second
+    }
   }
 
   deletion_protection = var.env == "prod" ? true : false
-  depends_on = [google_project_service.required_apis]
+  depends_on          = [google_project_service.required_apis]
 }
 
 # Create phidata_memory database
