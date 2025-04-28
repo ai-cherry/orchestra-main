@@ -46,15 +46,28 @@ venv.bak/
 ehthumbs.db
 Thumbs.db
 
-# Terraform
+# Terraform - more comprehensive patterns
 .terraform/
+**/.terraform/*
 *.tfstate
 *.tfstate.*
 *.tfvars
 .terragrunt-cache/
+**/.terragrunt-cache/*
+terraform.tfvars
+terraform.tfvars.json
+*.auto.tfvars
+*.auto.tfvars.json
+.terraform.lock.hcl
+**/.terraform.lock.hcl
+# Specifically exclude large provider files
+**/.terraform/providers/**
+**/terraform-provider-*
 
 # Google Cloud SDK
 google-cloud-sdk/
+**/anthoscli
+**/gcloud.json
 
 # Large files
 *.log
