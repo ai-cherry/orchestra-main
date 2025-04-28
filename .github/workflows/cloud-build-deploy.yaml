@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main # Trigger on pushes to the main branch
+      - dev  # Also trigger on pushes to the dev branch
   # Alternatively, trigger on tags for production releases:
   # push:
   #   tags:
