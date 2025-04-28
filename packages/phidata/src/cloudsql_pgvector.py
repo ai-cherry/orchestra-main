@@ -15,6 +15,27 @@ Usage:
     agent_storage = get_pg_agent_storage(agent_id="my-agent-id")
 """
 
+"""
+Phidata Cloud SQL Configuration with PGVector for Agent Storage and Memory.
+
+This module provides configuration for Phidata to use Cloud SQL (PostgreSQL)
+with PGVector for agent storage and memory, utilizing the google-cloud-sql-connector
+for IAM authentication (or password auth via Secret Manager) and VertexAiEmbedder for embeddings.
+
+Usage:
+    from packages.phidata.src.cloudsql_pgvector import get_pgvector_memory, get_pg_agent_storage
+
+    # Assuming you have a StorageConfig instance available
+    # from packages.shared.src.storage.config import StorageConfig
+    # storage_config = StorageConfig(...)
+
+    # Get vector memory store with Vertex AI embeddings
+    # vector_memory = get_pgvector_memory(storage_config=storage_config, user_id="user-123")
+
+    # Get agent storage partitioned by agent_id
+    # agent_storage = get_pg_agent_storage(storage_config=storage_config, agent_id="my-agent-id")
+"""
+
 import os
 import logging
 import sqlalchemy
@@ -33,81 +54,68 @@ except ImportError as e:
         "Try: pip install 'phi-postgres>=0.2.0' 'phi-vectordb>=0.1.0'"
     )
 
+# Import StorageConfig
+from packages.shared.src.storage.config import StorageConfig, PrivacyLevel
+
 logger = logging.getLogger(__name__)
 
-# Default configuration - override with environment variables
-DEFAULT_CONFIG = {
-    "project_id": os.environ.get("GCP_PROJECT_ID", ""),
-    "region": os.environ.get("GCP_REGION", "us-central1"),
-    "instance_connection_name": os.environ.get("CLOUD_SQL_INSTANCE_CONNECTION_NAME", ""),
-    "database": os.environ.get("CLOUD_SQL_DATABASE", "phidata"),
-    "user": os.environ.get("CLOUD_SQL_USER", "postgres"),
-    "password_secret_name": os.environ.get("CLOUD_SQL_PASSWORD_SECRET_NAME", "cloudsql-postgres-password"),
-    "use_iam_auth": os.environ.get("CLOUD_SQL_USE_IAM_AUTH", "false").lower() == "true",
-    "schema_name": os.environ.get("PG_SCHEMA_NAME", "llm"),
-    "vector_dimension": int(os.environ.get("EMBEDDING_VECTOR_SIZE", "768")),  # gecko-003 dimension
-    "embedding_model": os.environ.get("VERTEX_EMBEDDING_MODEL", "textembedding-gecko@003"),
-    "environment": os.environ.get("APP_ENV", "development")
-}
 
-
-def get_cloud_sql_connection(config: Optional[Dict[str, Any]] = None) -> sqlalchemy.engine.Engine:
+def get_cloud_sql_connection(storage_config: StorageConfig) -> sqlalchemy.engine.Engine:
     """
     Create a connection to Cloud SQL using either IAM or password authentication.
-    
+
     Args:
-        config: Configuration dictionary (falls back to environment variables)
-    
+        storage_config: The StorageConfig instance containing connection details.
+
     Returns:
         SQLAlchemy engine connected to Cloud SQL
     """
-    # Use provided config or defaults
-    cfg = {**DEFAULT_CONFIG, **(config or {})}
-    
-    # Validate required configuration
-    if not cfg["instance_connection_name"]:
-        raise ValueError("Missing Cloud SQL instance connection name")
-    if not cfg["project_id"]:
-        raise ValueError("Missing GCP project ID")
-    
+    # Get configuration from StorageConfig (which reads from env vars/defaults)
+    project_id = storage_config.get_config_value("GCP_PROJECT_ID", required=True)
+    instance_connection_name = storage_config.get_config_value("CLOUD_SQL_INSTANCE_CONNECTION_NAME", required=True)
+    database = storage_config.get_config_value("CLOUD_SQL_DATABASE", default="phidata")
+    user = storage_config.get_config_value("CLOUD_SQL_USER", default="postgres")
+    password_secret_name = storage_config.get_config_value("CLOUD_SQL_PASSWORD_SECRET_NAME", default="cloudsql-postgres-password")
+    use_iam_auth = storage_config.get_config_value("CLOUD_SQL_USE_IAM_AUTH", default="false").lower() == "true"
+
     # Create SQL connection using google-cloud-sql-connector
     connector = Connector()
-    
+
     # Use IAM authentication if enabled
-    if cfg["use_iam_auth"]:
+    if use_iam_auth:
         def getconn():
             try:
-                logger.info(f"Connecting to Cloud SQL with IAM auth: {cfg['instance_connection_name']}")
+                logger.info(f"Connecting to Cloud SQL with IAM auth: {instance_connection_name}")
                 conn = connector.connect(
-                    instance_connection_string=cfg["instance_connection_name"],
+                    instance_connection_string=instance_connection_name,
                     driver="pg8000",
-                    user=cfg["user"],
-                    db=cfg["database"],
+                    user=user,
+                    db=database,
                     enable_iam_auth=True
                 )
                 return conn
             except Exception as e:
                 logger.error(f"Error connecting to Cloud SQL with IAM auth: {e}")
                 raise
-    
+
     # Otherwise use password auth via Secret Manager
     else:
         try:
             # Get the database password from Secret Manager
             client = secretmanager.SecretManagerServiceClient()
-            name = f"projects/{cfg['project_id']}/secrets/{cfg['password_secret_name']}/versions/latest"
+            name = f"projects/{project_id}/secrets/{password_secret_name}/versions/latest"
             response = client.access_secret_version(name=name)
             db_password = response.payload.data.decode("UTF-8")
-            
+
             def getconn():
                 try:
-                    logger.info(f"Connecting to Cloud SQL with password auth: {cfg['instance_connection_name']}")
+                    logger.info(f"Connecting to Cloud SQL with password auth: {instance_connection_name}")
                     conn = connector.connect(
-                        instance_connection_string=cfg["instance_connection_name"],
+                        instance_connection_string=instance_connection_name,
                         driver="pg8000",
-                        user=cfg["user"],
+                        user=user,
                         password=db_password,
-                        db=cfg["database"]
+                        db=database
                     )
                     return conn
                 except Exception as e:
@@ -116,7 +124,7 @@ def get_cloud_sql_connection(config: Optional[Dict[str, Any]] = None) -> sqlalch
         except Exception as e:
             logger.error(f"Error retrieving database password from Secret Manager: {e}")
             raise
-    
+
     # Create SQLAlchemy engine using the Cloud SQL connection
     try:
         engine = sqlalchemy.create_engine(
@@ -134,27 +142,29 @@ def get_cloud_sql_connection(config: Optional[Dict[str, Any]] = None) -> sqlalch
         raise
 
 
-def get_vertexai_embedder(config: Optional[Dict[str, Any]] = None) -> VertexAiEmbedder:
+def get_vertexai_embedder(storage_config: StorageConfig) -> VertexAiEmbedder:
     """
     Create a VertexAiEmbedder for vector embeddings.
-    
+
     Args:
-        config: Configuration dictionary (falls back to environment variables)
-    
+        storage_config: The StorageConfig instance containing embedding details.
+
     Returns:
         Configured VertexAiEmbedder
     """
-    # Use provided config or defaults
-    cfg = {**DEFAULT_CONFIG, **(config or {})}
-    
+    # Get configuration from StorageConfig
+    project_id = storage_config.get_config_value("GCP_PROJECT_ID", required=True)
+    region = storage_config.get_config_value("GCP_REGION", default="us-central1")
+    embedding_model = storage_config.get_config_value("VERTEX_EMBEDDING_MODEL", default="textembedding-gecko@003")
+
     try:
         # Create the embedder using Vertex AI
         embedder = VertexAiEmbedder(
-            model=cfg["embedding_model"],
-            project_id=cfg["project_id"],
-            location=cfg["region"]
+            model=embedding_model,
+            project_id=project_id,
+            location=region
         )
-        logger.info(f"Created VertexAiEmbedder with model: {cfg['embedding_model']}")
+        logger.info(f"Created VertexAiEmbedder with model: {embedding_model}")
         return embedder
     except Exception as e:
         logger.error(f"Error creating VertexAiEmbedder: {e}")
@@ -162,48 +172,53 @@ def get_vertexai_embedder(config: Optional[Dict[str, Any]] = None) -> VertexAiEm
 
 
 def get_pgvector_memory(
+    storage_config: StorageConfig,
     user_id: Optional[str] = None,
-    config: Optional[Dict[str, Any]] = None,
-    table_name: Optional[str] = None
+    table_base_name: str = "pgvector_memory",
+    privacy_level: Optional[PrivacyLevel] = None
 ) -> PgVector2:
     """
     Get a configured PgVector2 for memory with VertexAI embeddings.
-    
+
     Args:
-        user_id: Optional user ID for table naming/partitioning
-        config: Configuration dictionary (falls back to environment variables)
-        table_name: Optional custom table name
-    
+        storage_config: The StorageConfig instance.
+        user_id: Optional user ID for potential table naming/partitioning.
+        table_base_name: The base name for the memory table.
+        privacy_level: Optional privacy classification level for the table name.
+
     Returns:
         Configured PgVector2 instance
     """
-    # Use provided config or defaults
-    cfg = {**DEFAULT_CONFIG, **(config or {})}
-    
+    # Get configuration from StorageConfig
+    schema_name = storage_config.get_config_value("PG_SCHEMA_NAME", default="llm")
+    vector_dimension = int(storage_config.get_config_value("EMBEDDING_VECTOR_SIZE", default="768"))
+
     # Create the database connection
     try:
-        engine = get_cloud_sql_connection(cfg)
-        
+        engine = get_cloud_sql_connection(storage_config)
+
         # Create the embedder
-        embedder = get_vertexai_embedder(cfg)
-        
-        # Configure the table name
-        if not table_name:
-            user_part = f"_{user_id}" if user_id else ""
-            env_part = f"_{cfg['environment']}"
-            table_name = f"pgvector{user_part}{env_part}"
-        
+        embedder = get_vertexai_embedder(storage_config)
+
+        # Configure the table name using StorageConfig's method
+        table_name = storage_config.get_collection_name(
+            table_base_name,
+            privacy_level=privacy_level
+            # Note: user_id is not directly used in get_collection_name,
+            # but could be incorporated into the base_name or handled by partitioning
+        )
+
         # Create and initialize PgVector2
         vector_store = PgVector2(
             db_engine=engine,
             table_name=table_name,
-            schema_name=cfg["schema_name"],
+            schema_name=schema_name,
             embedder=embedder,
-            vector_dimension=cfg["vector_dimension"],
+            vector_dimension=vector_dimension,
             create_tables=True  # Auto-create tables if they don't exist
         )
-        
-        logger.info(f"Created PgVector2 memory with table: {cfg['schema_name']}.{table_name}")
+
+        logger.info(f"Created PgVector2 memory with table: {schema_name}.{table_name}")
         return vector_store
     except Exception as e:
         logger.error(f"Error creating PgVector2 memory: {e}")
@@ -211,45 +226,49 @@ def get_pgvector_memory(
 
 
 def get_pg_agent_storage(
+    storage_config: StorageConfig,
     agent_id: Optional[str] = None,
-    config: Optional[Dict[str, Any]] = None,
-    table_name: Optional[str] = None
+    table_base_name: str = "agent_storage",
+    privacy_level: Optional[PrivacyLevel] = None
 ) -> PgAssistantStorage:
     """
     Get a configured PgAssistantStorage for agent data with partitioning.
-    
+
     Args:
-        agent_id: Optional agent ID for partitioning
-        config: Configuration dictionary (falls back to environment variables)
-        table_name: Optional custom table name
-    
+        storage_config: The StorageConfig instance.
+        agent_id: Optional agent ID for partitioning.
+        table_base_name: The base name for the agent storage table.
+        privacy_level: Optional privacy classification level for the table name.
+
     Returns:
         Configured PgAssistantStorage instance
     """
-    # Use provided config or defaults
-    cfg = {**DEFAULT_CONFIG, **(config or {})}
-    
+    # Get configuration from StorageConfig
+    schema_name = storage_config.get_config_value("PG_SCHEMA_NAME", default="llm")
+
     # Create the database connection
     try:
-        engine = get_cloud_sql_connection(cfg)
-        
-        # Configure the table name
-        if not table_name:
-            agent_part = f"_{agent_id}" if agent_id else ""
-            env_part = f"_{cfg['environment']}"
-            table_name = f"agent_storage{agent_part}{env_part}"
-        
+        engine = get_cloud_sql_connection(storage_config)
+
+        # Configure the table name using StorageConfig's method
+        table_name = storage_config.get_collection_name(
+            table_base_name,
+            privacy_level=privacy_level
+            # Note: agent_id is not directly used in get_collection_name,
+            # but is used by the PgAssistantStorage for partitioning
+        )
+
         # Create and initialize PgAssistantStorage
         agent_storage = PgAssistantStorage(
             db_engine=engine,
             table_name=table_name,
-            schema_name=cfg["schema_name"],
+            schema_name=schema_name,
             create_tables=True,
             # Enable partitioning by agent_id if supported
             partitioning_field="agent_id" if agent_id else None
         )
-        
-        logger.info(f"Created PgAssistantStorage with table: {cfg['schema_name']}.{table_name}")
+
+        logger.info(f"Created PgAssistantStorage with table: {schema_name}.{table_name}")
         return agent_storage
     except Exception as e:
         logger.error(f"Error creating PgAssistantStorage: {e}")

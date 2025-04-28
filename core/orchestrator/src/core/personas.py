@@ -297,9 +297,10 @@ def get_persona_manager(config_path: Optional[str] = None) -> PersonaManager:
     global _persona_manager
 
     if _persona_manager is None:
-        # Use default config path if not provided
+        # Use provided config path or get from central settings
         if config_path is None:
-            config_path = os.getenv("PERSONA_CONFIG_PATH", "config/personas.yaml")
+            from core.orchestrator.src.config.config import get_settings
+            config_path = get_settings().PERSONA_CONFIG_PATH
 
         _persona_manager = PersonaManager(config_path)
 
