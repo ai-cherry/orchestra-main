@@ -11,7 +11,6 @@ on:
   #     - 'v*'
 
 env:
-  PROJECT_ID: 104944497835 # Replace with your GCP Project ID
   CLOUD_BUILD_REGION: us-central1 # Replace with your desired Cloud Build region
 
 jobs:
@@ -29,9 +28,9 @@ jobs:
         id: auth
         uses: google-github-actions/auth@v2
         with:
-          # Using organization-level secrets for Workload Identity Federation
-          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+          # Using standardized GCP_ prefixed secrets for Workload Identity Federation
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - name: Set up gcloud CLI
         uses: google-github-actions/setup-gcloud@v2
@@ -47,8 +46,8 @@ jobs:
           fi
 
           gcloud builds submit . \
-            --project=$PROJECT_ID \
+            --project=${{ secrets.GCP_PROJECT_ID }} \
             --region=$CLOUD_BUILD_REGION \
             --config=cloudbuild.yaml \
-            --substitutions=_ENV=$ENV,_PROJECT_ID=$PROJECT_ID \
+            --substitutions=_ENV=$ENV,_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }} \
             --timeout=1200s # Adjust timeout as needed
