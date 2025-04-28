@@ -25,6 +25,13 @@ wheels/
 .installed.cfg
 *.egg
 
+# Virtual environment - be more specific
+.venv/
+.venv/**
+venv/
+env/
+ENV/
+
 # IDE files
 .idea/
 .vscode/
@@ -33,11 +40,17 @@ wheels/
 
 # Environment files
 .env
-.venv
-env/
-venv/
-ENV/
+.env.*
+!.env.example
 
 # Logs and databases
 *.log
 *.sqlite3
+agents.db
+
+# Terraform files
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+terraform-provider-*
+.terragrunt-cache/
