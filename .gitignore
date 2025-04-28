@@ -17,14 +17,21 @@ infra/orchestra-terraform/terraform.tfvars
 
 # Ignore Google Cloud SDK archives and large binaries
 google-cloud-sdk-*.tar.gz
+google-cloud-sdk/
 google-cloud-sdk/bin/anthoscli
 google-cloud-sdk/data/cli/gcloud.json
 
-# Ignore large Terraform provider files
-infra/orchestra-terraform/.terraform/providers/registry.terraform.io/hashicorp/google-beta/6.32.0/linux_amd64/terraform-provider-google-beta_v6.32.0_x5
-infra/orchestra-terraform/.terraform/providers/registry.terraform.io/hashicorp/google/6.32.0/linux_amd64/terraform-provider-google_v6.32.0_x5
-infra/.terraform/providers/registry.terraform.io/hashicorp/google-beta/5.45.2/linux_amd64/terraform-provider-google-beta_v5.45.2_x5
-infra/.terraform/providers/registry.terraform.io/hashicorp/google/5.45.2/linux_amd64/terraform-provider-google_v5.45.2_x5
+# Ignore all Terraform provider files
+.terraform/
+**/.terraform/providers/
+**/.terraform/providers/**
+infra/orchestra-terraform/.terraform/
+infra/orchestra-terraform/.terraform/providers/
+infra/.terraform/providers/
+*.tfstate
+*.tfstate.*
+.terragrunt-cache/
+.terraform.lock.hcl
 
 # Ignore logs
 *.log
@@ -98,13 +105,6 @@ yarn-error.log*
 package-lock.json
 .pnpm-store/
 .npm/
-
-# Terraform
-.terraform/
-*.tfstate
-*.tfstate.*
-.terragrunt-cache/
-.terraform.lock.hcl
 
 # Docker
 .docker/
