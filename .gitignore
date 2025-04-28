@@ -1,9 +1,4 @@
-# Exclude Google Cloud SDK binaries and other large files
-google-cloud-sdk/
-.terraform/
-*.tar.gz
-
-# Python artifacts
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -25,32 +20,47 @@ wheels/
 .installed.cfg
 *.egg
 
-# Virtual environment - be more specific
-.venv/
-.venv/**
-venv/
+# Virtual Environment
+.env
+.venv
 env/
+venv/
 ENV/
+env.bak/
+venv.bak/
+.env.backup
+*.env.backup
 
-# IDE files
+# IDE
 .idea/
 .vscode/
 *.swp
 *.swo
 
-# Environment files
-.env
-.env.*
-!.env.example
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Logs and databases
-*.log
-*.sqlite3
-agents.db
-
-# Terraform files
-**/.terraform/*
+# Terraform
+.terraform/
 *.tfstate
 *.tfstate.*
-terraform-provider-*
+*.tfvars
 .terragrunt-cache/
+
+# Google Cloud SDK
+google-cloud-sdk/
+
+# Large files
+*.log
+*.gz
+*.zip
+
+# Specific large files
+infra/.terraform/providers/**
+infra/orchestra-terraform/.terraform/providers/**
