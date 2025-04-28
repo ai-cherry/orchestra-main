@@ -1,43 +1,9 @@
-# Ignore environment files with secrets
-.env
-.env.*
-!.env.example
-
-# Ignore credentials and keys
-*_key.json
-*_credentials.json
-credentials/
-secrets/
-
-# Ignore specific files with credentials
-infra/SECURITY_CREDENTIAL_ASSESSMENT.md
-CREDENTIAL_SECURITY_CHECKLIST.md
-setup_gcp_auth.sh
-infra/orchestra-terraform/terraform.tfvars
-
-# Ignore Google Cloud SDK archives and large binaries
-google-cloud-sdk-*.tar.gz
+# Exclude Google Cloud SDK binaries and other large files
 google-cloud-sdk/
-google-cloud-sdk/bin/anthoscli
-google-cloud-sdk/data/cli/gcloud.json
-
-# Ignore all Terraform provider files
 .terraform/
-**/.terraform/providers/
-**/.terraform/providers/**
-infra/orchestra-terraform/.terraform/
-infra/orchestra-terraform/.terraform/providers/
-infra/.terraform/providers/
-*.tfstate
-*.tfstate.*
-.terragrunt-cache/
-.terraform.lock.hcl
+*.tar.gz
 
-# Ignore logs
-*.log
-logs/
-
-# Python
+# Python artifacts
 __pycache__/
 *.py[cod]
 *$py.class
@@ -58,98 +24,20 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-.nox/
-.ipynb_checkpoints
 
-# Virtual environments
-venv/
-env/
-ENV/
-.venv/
-.env/
-.virtualenv/
-
-# IDEs and editors
+# IDE files
 .idea/
 .vscode/
 *.swp
 *.swo
-*~
-.history/
-*.sublime-workspace
-.project
-.classpath
-.c9/
-*.launch
-*.iml
-*.ipr
-*.iws
 
-# OS specific
-.DS_Store
-Thumbs.db
-*.tmp
-*.bak
-Desktop.ini
-$RECYCLE.BIN/
+# Environment files
+.env
+.venv
+env/
+venv/
+ENV/
 
-# Node.js
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-package-lock.json
-.pnpm-store/
-.npm/
-
-# Docker
-.docker/
-
-# Large media and data files
-*.mp4
-*.mov
-*.avi
-*.wmv
-*.flv
-*.mp3
-*.wav
-*.zip
-*.tar.gz
-*.rar
-*.7z
-*.iso
-*.dmg
-*.bin
-*.exe
-*.dll
-*.apk
-*.jar
-*.dat
-*.db
-*.sqlite
+# Logs and databases
+*.log
 *.sqlite3
-*.h5
-*.hdf5
-*.model
-*.onnx
-*.pt
-*.pth
-*.pkl
-*.joblib
-*.csv
-*.xlsx
-*.xls
-*.db
-*.parquet
-*.arrow
-*.gif
-**/dataset/
-**/datasets/
-**/model/
-**/models/
-**/data/large/
-**/assets/videos/
