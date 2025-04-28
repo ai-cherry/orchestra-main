@@ -1,41 +1,28 @@
 {
-  "name": "Orchestra Environment",
-  "image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
-  "containerEnv": {
-    "PYTHONPATH": "/workspaces/orchestra-main",
-    "USE_RECOVERY_MODE": "false",
-    "STANDARD_MODE": "true",
-    "ENVIRONMENT": "development"
-  },
-  "features": {
-    // "ghcr.io/devcontainers/features/google-cloud-cli:1": {},
-    "ghcr.io/devcontainers/features/terraform:1": {},
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
-  },
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "ms-python.python",
-        "ms-python.vscode-pylance",
-        "streetsidesoftware.code-spell-checker",
-        "matangover.mypy"
-      ],
-      "settings": {
-        "python.defaultInterpreterPath": "/workspaces/orchestra-main/.venv/bin/python",
-        "python.linting.enabled": true,
-        "python.linting.pylintEnabled": true,
-        "python.formatting.provider": "black",
-        "editor.formatOnSave": true,
-        "terminal.integrated.defaultProfile.linux": "bash",
-        "terminal.integrated.env.linux": {
-          "PYTHONPATH": "/workspaces/orchestra-main",
-          "USE_RECOVERY_MODE": "false",
-          "STANDARD_MODE": "true",
-          "ENVIRONMENT": "development"
+    "name": "Terraform Development",
+    "build": {
+        "dockerfile": "../Dockerfile.terraform",
+        "context": ".."
+    },
+    "features": {},
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "hashicorp.terraform",
+                "ms-azuretools.vscode-docker",
+                "eamodio.gitlens",
+                "redhat.vscode-yaml",
+                "4ops.terraform"
+            ],
+            "settings": {
+                "terraform.languageServer": {
+                    "enabled": true,
+                    "args": []
+                }
+            }
         }
-      }
-    }
-  },
-  "postCreateCommand": "bash ./.devcontainer/postCreate.sh",
-  "remoteUser": "vscode"
+    },
+    "remoteUser": "root",
+    "forwardPorts": [],
+    "postCreateCommand": "terraform --version && tflint --version && terragrunt --version"
 }

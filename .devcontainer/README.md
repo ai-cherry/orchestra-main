@@ -1,31 +1,46 @@
-# Dev Container Configuration
+# Terraform Development Environment
 
-This document describes the current development container configuration that ensures stable startup in GitHub Codespaces.
+This dev container is set up for Terraform development with the following tools pre-installed:
 
-## Core Components
+- **Terraform CLI**: Version 1.5.0
+- **TFLint**: Version v0.48.0 for linting Terraform code
+- **Terragrunt**: Version v0.51.0 for managing Terraform configurations at scale (optional)
+- **Google Cloud CLI**: For working with GCP resources
 
-- **Base Image**: `python:3.11-slim-bullseye` - Chosen for stability over the more complex devcontainers image
-- **Minimal Dependencies**: Only essential system packages are installed
-- **Simple Setup Script**: Handles only environment variable setup, not complex installations
-- **No Docker-in-Docker**: Avoids common causes of startup failures
+## Getting Started
 
-## Modification Guidelines
+1. Open this workspace in VS Code with the Remote - Containers extension installed
+2. VS Code will prompt you to reopen the workspace in a container - select "Reopen in Container"
+3. The container will build and start, providing a full Terraform development environment
 
-When modifying the dev container configuration:
+## Extensions Included
 
-1. **Make incremental changes**: Test one change at a time
-2. **Keep dependencies minimal**: Only add what you absolutely need
-3. **Avoid Docker extensions/features**: These often cause issues in Codespaces
-4. **Test locally first**: When possible, test with VS Code Remote Containers locally before pushing
-5. **Be cautious with postCreateCommand**: Complex commands here often cause startup failures
+- HashiCorp Terraform - Syntax highlighting, IntelliSense, and validation for Terraform
+- Docker - For managing Docker containers
+- GitLens - Enhanced Git integration
+- YAML - Support for YAML files (commonly used with Terraform)
+- 4ops.terraform - Additional Terraform features and snippets
 
-## Troubleshooting
+## Usage
 
-If startup issues return:
-- Compare against this working version
-- Check GitHub Codespaces logs for specific errors
-- Consider rebuilding without cache using the VS Code command "Codespaces: Rebuild Container"
+- Create your Terraform files in the workspace
+- Use the integrated terminal to run Terraform commands
+- TFLint is available for checking your Terraform code for possible errors and best practices
 
-## Last Known Good Configuration
+## Example Commands
 
-Date: April 20, 2025
+```bash
+# Initialize Terraform in the current directory
+terraform init
+
+# Validate your Terraform configuration
+terraform validate
+
+# Check for lint errors
+tflint
+
+# If using Terragrunt, initialize with
+terragrunt init
+```
+
+You can create Terraform files anywhere in the workspace and manage them using this environment.

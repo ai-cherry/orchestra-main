@@ -1,10 +1,25 @@
 FROM hashicorp/terraform:1.5.0
 
-RUN apk add --no-cache bash curl jq python3
+# Install essential tools
+RUN apk add --no-cache bash curl jq python3 git openssh-client gnupg
 
 # Install Google Cloud SDK
-RUN curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz &&     tar -xf google-cloud-cli-linux-x86_64.tar.gz &&     ./google-cloud-sdk/install.sh --quiet &&     rm google-cloud-cli-linux-x86_64.tar.gz
+RUN curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz && \
+    tar -xf google-cloud-cli-linux-x86_64.tar.gz && \
+    ./google-cloud-sdk/install.sh --quiet && \
+    rm google-cloud-cli-linux-x86_64.tar.gz
 
+# Install TFLint
+ARG TFLINT_VERSION=v0.48.0
+RUN curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+
+# Install Terragrunt
+ARG TERRAGRUNT_VERSION=v0.51.0
+RUN wget -O /usr/local/bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/${TERRAGRUNT_VERSION}/terragrunt_linux_amd64" && \
+    chmod +x /usr/local/bin/terragrunt
+
+# Update PATH to include all tools
 ENV PATH=$PATH:/google-cloud-sdk/bin
 
+# Set the workspace directory
 WORKDIR /workspace

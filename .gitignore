@@ -43,11 +43,20 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.ipynb_checkpoints
 
 # Virtual environments
 venv/
 env/
 ENV/
+.venv/
+.env/
+.virtualenv/
 
 # IDEs and editors
 .idea/
@@ -55,7 +64,84 @@ ENV/
 *.swp
 *.swo
 *~
+.history/
+*.sublime-workspace
+.project
+.classpath
+.c9/
+*.launch
+*.iml
+*.ipr
+*.iws
 
 # OS specific
 .DS_Store
 Thumbs.db
+*.tmp
+*.bak
+Desktop.ini
+$RECYCLE.BIN/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.pnpm-store/
+.npm/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terragrunt-cache/
+.terraform.lock.hcl
+
+# Docker
+.docker/
+
+# Large media and data files
+*.mp4
+*.mov
+*.avi
+*.wmv
+*.flv
+*.mp3
+*.wav
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.iso
+*.dmg
+*.bin
+*.exe
+*.dll
+*.apk
+*.jar
+*.dat
+*.db
+*.sqlite
+*.sqlite3
+*.h5
+*.hdf5
+*.model
+*.onnx
+*.pt
+*.pth
+*.pkl
+*.joblib
+*.csv
+*.xlsx
+*.xls
+*.db
+*.parquet
+*.arrow
+*.gif
+**/dataset/
+**/datasets/
+**/model/
+**/models/
+**/data/large/
+**/assets/videos/
