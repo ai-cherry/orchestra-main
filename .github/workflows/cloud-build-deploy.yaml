@@ -28,9 +28,9 @@ jobs:
         id: auth
         uses: google-github-actions/auth@v2
         with:
-          # Configure Workload Identity Federation
-          workload_identity_provider: 'projects/104944497835/locations/global/workloadIdentityPools/github-pool/providers/github-pool'
-          service_account: 'github-actions-deployer@agi-baby-cherry.iam.gserviceaccount.com'
+          # Using organization-level secrets for Workload Identity Federation
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
 
       - name: Set up gcloud CLI
         uses: google-github-actions/setup-gcloud@v2
