@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Optional, Union, TypedDict
 
 from packages.shared.src.models.base_models import AgentData, MemoryItem, PersonaConfig
 from packages.shared.src.memory.memory_interface import MemoryInterface
-from packages.shared.src.memory.memory_types import MemoryHealth
+from .memory_types import MemoryHealth
 from packages.shared.src.memory.base_memory_manager import BaseMemoryManager
 from packages.shared.src.memory.concrete_memory_manager import FirestoreV1MemoryManager # Assuming this is the refactored name
 from packages.shared.src.storage.firestore.firestore_memory import FirestoreMemoryManager # Need to import the V1 storage class to instantiate it

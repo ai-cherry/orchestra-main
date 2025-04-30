@@ -25,10 +25,13 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 ENV PATH="/root/.local/bin:$PATH"
 
 # Copy Poetry configuration files
-COPY pyproject.toml poetry.lock* ./
+COPY pyproject.toml ./
 
 # Configure Poetry to not create a virtual environment
 RUN poetry config virtualenvs.create false
+
+# Modify dependencies before installation - remove agno dependency
+RUN grep -v "agno" pyproject.toml > pyproject.toml.new && mv pyproject.toml.new pyproject.toml
 
 # Install dependencies
 RUN poetry install --no-interaction --no-root --without dev

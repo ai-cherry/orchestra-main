@@ -14,7 +14,7 @@ import asyncio
 
 from packages.shared.src.memory.base_memory_manager import BaseMemoryManager # New import
 from packages.shared.src.memory.memory_interface import MemoryInterface # New import
-from packages.shared.src.memory.memory_types import MemoryHealth # Updated import
+from .memory_types import MemoryHealth # Updated import
 from packages.shared.src.models.base_models import MemoryItem, AgentData, PersonaConfig
 from packages.shared.src.storage.firestore.firestore_memory import (
     FirestoreMemoryManager,
