@@ -19,6 +19,9 @@ jobs:
           python-version: '3.10'
           cache: 'pip'
       
+      - name: Display file contents for debugging
+        run: cat pyproject.toml
+      
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip

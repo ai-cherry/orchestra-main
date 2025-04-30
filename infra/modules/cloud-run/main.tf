@@ -110,6 +110,11 @@ resource "google_cloud_run_service" "orchestrator" {
         # Connect to VPC
         "run.googleapis.com/vpc-access-connector" = "projects/${var.project_id}/locations/${var.region}/connectors/orchestrator-vpc-connector-${var.env}"
         "run.googleapis.com/vpc-access-egress"    = "private-ranges-only"
+        # Adding health check configurations as annotations instead of blocks
+        "run.googleapis.com/startup-probe-path"   = "/api/health"
+        "run.googleapis.com/startup-probe-period-seconds" = "5"
+        "run.googleapis.com/liveness-probe-path"  = "/api/health" 
+        "run.googleapis.com/liveness-probe-period-seconds" = "30"
       }
       labels = {
         "environment" = var.env
@@ -192,23 +197,6 @@ resource "google_cloud_run_service" "orchestrator" {
             cpu    = var.env == "prod" ? "2000m" : "1000m"
             memory = var.env == "prod" ? "4Gi" : "2Gi"
           }
-        }
-        
-        # Health checks
-        liveness_probe {
-          http_get {
-            path = "/api/health"
-          }
-          initial_delay_seconds = 10
-          period_seconds = 30
-        }
-        
-        readiness_probe {
-          http_get {
-            path = "/api/health"
-          }
-          initial_delay_seconds = 5
-          period_seconds = 10
         }
       }
       

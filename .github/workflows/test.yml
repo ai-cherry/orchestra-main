@@ -18,28 +18,22 @@ jobs:
       with:
         python-version: '3.11'
         
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-      with:
-        version: 1.7.1
-        virtualenvs-create: true
-        virtualenvs-in-project: true
+    - name: Display file contents for debugging
+      run: cat pyproject.toml
         
     - name: Install dependencies
       run: |
-        poetry install --no-interaction --no-root --with dev
-        
-    - name: Check for pytest-cov
-      run: |
-        poetry add pytest-cov==4.1.0
-        poetry run pip freeze | grep pytest-cov
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+        pip install pytest-cov==4.1.0
         
     - name: Run tests
       run: |
         export PYTHONPATH=$(pwd)
-        poetry run python -m pytest tests/ --verbose --cov=core.orchestrator --cov=packages.shared --cov-report=term-missing
+        python -m pytest tests/ --verbose --cov=core.orchestrator --cov=packages.shared --cov-report=term-missing
         
     - name: Run critical tests only
       run: |
         export PYTHONPATH=$(pwd)
-        poetry run python -m pytest tests/ -m critical -v
+        python -m pytest tests/ -m critical -v
