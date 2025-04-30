@@ -22,6 +22,7 @@ from core.orchestrator.src.api.endpoints import (
     llm_interaction,
     personas,
     agents,
+    conversations,  # Add import for conversations endpoints
 )
 from core.orchestrator.src.config.loader import get_settings, load_persona_configs
 from packages.shared.src.models.base_models import PersonaConfig
@@ -160,6 +161,7 @@ app.include_router(interaction.router, prefix="/api")
 app.include_router(llm_interaction.router, prefix="/api")
 app.include_router(personas.router, prefix="/api/personas")
 app.include_router(agents.router, prefix="/api/agents")
+app.include_router(conversations.router, prefix="/api/conversations")  # Add conversations router
 
 
 if __name__ == "__main__":

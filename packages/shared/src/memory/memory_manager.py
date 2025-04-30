@@ -1,33 +1,27 @@
 """
-Memory Manager Interface for AI Orchestration System.
+Memory Manager for AI Orchestration System.
 
-# AI-CONTEXT: This file defines the core memory manager interface used throughout the system.
-# AI-CONTEXT: See MEMORY_CONTEXT.md in this directory for architectural details.
-# AI-CONTEXT: The memory system stores conversation history, user preferences, and other contextual information.
-# AI-CONTEXT: Implementations include InMemoryMemoryManagerStub and PatrickMemoryManager.
-
-This module provides the abstract base class for memory managers,
-defining the interface that all concrete implementations must follow.
-Memory managers are responsible for storing and retrieving conversation
-history, user preferences, and other contextual information.
+This module provides the main MemoryManager class which acts as a factory
+and orchestrator for different concrete memory implementations.
+It selects and delegates operations to the appropriate backend
+(e.g., Firestore V1, Firestore V2, etc.) based on configuration.
 """
 
-from abc import ABC, abstractmethod
-from datetime import datetime
 import logging
 from typing import Any, Dict, List, Optional, Union, TypedDict
 
 from packages.shared.src.models.base_models import AgentData, MemoryItem, PersonaConfig
-
+from packages.shared.src.memory.memory_interface import MemoryInterface
+from packages.shared.src.memory.base_memory_manager import BaseMemoryManager
+from packages.shared.src.memory.concrete_memory_manager import FirestoreV1MemoryManager # Assuming this is the refactored name
+from packages.shared.src.storage.firestore.firestore_memory import FirestoreMemoryManager # Need to import the V1 storage class to instantiate it
 
 # Set up logger
 logger = logging.getLogger(__name__)
 
-
-# Type definition for memory health status
+# Type definition for memory health status (Keep this)
 class MemoryHealth(TypedDict, total=False):
     """Type definition for memory system health status."""
-
     status: str  # 'healthy', 'degraded', or 'unhealthy'
     firestore: bool  # Firestore connection status
     redis: bool  # Redis connection status
@@ -36,72 +30,78 @@ class MemoryHealth(TypedDict, total=False):
     details: Dict[str, Any]  # Additional details about the health status
 
 
-class MemoryManager(ABC):
+class MemoryManager(MemoryInterface): # The main MemoryManager should implement the interface
     """
-    Abstract base class for memory management implementations.
+    Main Memory Manager class.
 
-    This class defines the contract that all memory manager implementations
-    must adhere to, ensuring consistent behavior across different storage backends.
+    This class acts as a factory and orchestrator for different concrete
+    memory implementations, delegating operations based on configuration.
     """
+    def __init__(
+        self,
+        memory_backend_type: str = "firestore_v1", # Configuration parameter
+        project_id: Optional[str] = None,
+        credentials_json: Optional[str] = None,
+        credentials_path: Optional[str] = None,
+        redis_host: Optional[str] = None,
+        redis_port: Optional[int] = None,
+        redis_password: Optional[str] = None,
+        cache_ttl: int = 3600,  # 1 hour default
+        # Add parameters for other backends as needed
+    ):
+        """
+        Initialize the main memory manager.
 
-    @abstractmethod
+        Args:
+            memory_backend_type: The type of memory backend to use (e.g., "firestore_v1").
+            project_id: Optional Google Cloud project ID for Firestore.
+            credentials_json: Optional JSON string for Firestore credentials.
+            credentials_path: Optional path for Firestore credentials file.
+            redis_host: Optional Redis host.
+            redis_port: Optional Redis port.
+            redis_password: Optional Redis password.
+            cache_ttl: Cache TTL in seconds for Redis.
+        """
+        self._backend: BaseMemoryManager # The chosen concrete backend
+
+        if memory_backend_type == "firestore_v1":
+            # Need to instantiate FirestoreMemoryManager first, then pass it to FirestoreV1MemoryManager
+            firestore_v1_storage = FirestoreMemoryManager(
+                 project_id=project_id,
+                 credentials_json=credentials_json,
+                 credentials_path=credentials_path,
+            )
+            self._backend = FirestoreV1MemoryManager(
+                firestore_memory=firestore_v1_storage,
+                redis_host=redis_host,
+                redis_port=redis_port,
+                redis_password=redis_password,
+                cache_ttl=cache_ttl,
+            )
+        # Add logic for other backend types here (e.g., "firestore_v2")
+        # elif memory_backend_type == "firestore_v2":
+        #     self._backend = FirestoreV2MemoryManager(...)
+        else:
+            raise ValueError(f"Unknown memory backend type: {memory_backend_type}")
+
+        logger.info(f"MemoryManager initialized with backend: {memory_backend_type}")
+
     async def initialize(self) -> None:
-        """
-        Initialize the memory manager.
+        """Initialize the selected memory backend."""
+        await self._backend.initialize()
 
-        This method should set up any necessary connections, create
-        resources, or perform other initialization tasks.
-
-        Raises:
-            ConnectionError: If connection to the storage backend fails
-            PermissionError: If the required permissions are not available
-        """
-        pass
-
-    @abstractmethod
     async def close(self) -> None:
-        """
-        Close the memory manager and release resources.
+        """Close the selected memory backend."""
+        await self._backend.close()
 
-        This method should clean up any resources used by the memory manager,
-        such as database connections, file handles, etc.
-        """
-        pass
-
-    @abstractmethod
     async def add_memory_item(self, item: MemoryItem) -> str:
-        """
-        Add a memory item to storage.
+        """Add a memory item to storage via the selected backend."""
+        return await self._backend.add_memory_item(item)
 
-        Args:
-            item: The memory item to store
-
-        Returns:
-            The ID of the created memory item
-
-        Raises:
-            ValidationError: If the item fails validation
-            StorageError: If the storage operation fails
-        """
-        pass
-
-    @abstractmethod
     async def get_memory_item(self, item_id: str) -> Optional[MemoryItem]:
-        """
-        Retrieve a specific memory item by ID.
+        """Retrieve a specific memory item by ID via the selected backend."""
+        return await self._backend.get_memory_item(item_id)
 
-        Args:
-            item_id: The ID of the item to retrieve
-
-        Returns:
-            The memory item if found, None otherwise
-
-        Raises:
-            StorageError: If the retrieval operation fails
-        """
-        pass
-
-    @abstractmethod
     async def get_conversation_history(
         self,
         user_id: str,
@@ -109,24 +109,14 @@ class MemoryManager(ABC):
         limit: int = 20,
         filters: Optional[Dict[str, Any]] = None,
     ) -> List[MemoryItem]:
-        """
-        Retrieve conversation history for a user.
+        """Retrieve conversation history for a user via the selected backend."""
+        return await self._backend.get_conversation_history(
+            user_id=user_id,
+            session_id=session_id,
+            limit=limit,
+            filters=filters,
+        )
 
-        Args:
-            user_id: The user ID to get history for
-            session_id: Optional session ID to filter by
-            limit: Maximum number of items to retrieve
-            filters: Optional filters to apply
-
-        Returns:
-            List of memory items representing the conversation history
-
-        Raises:
-            StorageError: If the retrieval operation fails
-        """
-        pass
-
-    @abstractmethod
     async def semantic_search(
         self,
         user_id: str,
@@ -134,97 +124,30 @@ class MemoryManager(ABC):
         persona_context: Optional[PersonaConfig] = None,
         top_k: int = 5,
     ) -> List[MemoryItem]:
-        """
-        Perform semantic search using vector embeddings.
+        """Perform semantic search via the selected backend."""
+        return await self._backend.semantic_search(
+            user_id=user_id,
+            query_embedding=query_embedding,
+            persona_context=persona_context,
+            top_k=top_k,
+        )
 
-        Args:
-            user_id: The user ID to search memories for
-            query_embedding: The vector embedding of the query
-            persona_context: Optional persona context for personalized results
-            top_k: Maximum number of results to return
-
-        Returns:
-            List of memory items ordered by relevance
-
-        Raises:
-            ValidationError: If the query embedding has invalid dimensions
-            StorageError: If the search operation fails
-        """
-        pass
-
-    @abstractmethod
     async def add_raw_agent_data(self, data: AgentData) -> str:
-        """
-        Store raw agent data.
+        """Store raw agent data via the selected backend."""
+        return await self._backend.add_raw_agent_data(data)
 
-        Args:
-            data: The agent data to store
-
-        Returns:
-            The ID of the stored data
-
-        Raises:
-            ValidationError: If the data fails validation
-            StorageError: If the storage operation fails
-        """
-        pass
-
-    @abstractmethod
     async def check_duplicate(self, item: MemoryItem) -> bool:
-        """
-        Check if a memory item already exists in storage.
+        """Check if a memory item already exists via the selected backend."""
+        return await self._backend.check_duplicate(item)
 
-        Args:
-            item: The memory item to check for duplicates
-
-        Returns:
-            True if a duplicate exists, False otherwise
-
-        Raises:
-            StorageError: If the check operation fails
-        """
-        pass
-
-    @abstractmethod
     async def cleanup_expired_items(self) -> int:
-        """
-        Remove expired items from storage.
+        """Remove expired items via the selected backend."""
+        return await self._backend.cleanup_expired_items()
 
-        Returns:
-            Number of items removed
-
-        Raises:
-            StorageError: If the cleanup operation fails
-        """
-        pass
-
-    @abstractmethod
     async def health_check(self) -> MemoryHealth:
-        """
-        Check the health of the memory system.
+        """Check the health of the selected memory backend."""
+        return await self._backend.health_check()
 
-        This method should perform checks on the underlying storage systems
-        and return a detailed health status report.
-
-        Returns:
-            MemoryHealth: A dictionary with health status information
-
-        Raises:
-            Exception: If the health check itself fails
-        """
-        pass
-
-# Import the InMemoryMemoryManagerStub implementation and rename it for compatibility
-from packages.shared.src.memory.stubs import InMemoryMemoryManagerStub as InMemoryMemoryManager
-
-# Also import concrete implementations for convenience
-try:
-    from packages.shared.src.memory.concrete_memory_manager import ConcreteMemoryManager
-except ImportError:
-    logger.debug("ConcreteMemoryManager not available, skipping import.")
-
-# Import Firestore adapter if available
-try:
-    from packages.shared.src.memory.firestore_adapter import FirestoreMemoryAdapter
-except ImportError:
-    logger.debug("FirestoreMemoryAdapter not available, skipping import.")
+    # Add other methods from MemoryInterface here, delegating to self._backend
+    # async def add_message_to_conversation(self, conversation_id: str, message: dict):
+    #     await self._backend.add_message_to_conversation(conversation_id, message)

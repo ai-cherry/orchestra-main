@@ -8,6 +8,12 @@ variable "env" {
   type        = string
 }
 
+variable "region" {
+  description = "GCP Region for secret replication"
+  type        = string
+  default     = "us-central1"
+}
+
 variable "portkey_api_key_name" {
   description = "Name for the Portkey API key secret"
   type        = string
@@ -17,13 +23,22 @@ variable "portkey_api_key_name" {
 variable "openrouter_api_key_name" {
   description = "Name for the OpenRouter API key secret"
   type        = string
-  default     = "openrouter"
+  default     = "openrouter-api-key"
 }
 
 variable "secret_accessors" {
   description = "Map of service account emails to secrets they need access to"
   type        = map(list(string))
   default     = {}
+}
+
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 4.63.0"
+    }
+  }
 }
 
 # Enable Secret Manager API
@@ -35,18 +50,37 @@ resource "google_project_service" "secretmanager_api" {
   disable_on_destroy         = false
 }
 
-# Create Portkey API Key Secret
-resource "google_secret_manager_secret" "portkey_api_key" {
+# LLM Provider Secrets
+# Using for_each to create multiple similar secrets efficiently
+resource "google_secret_manager_secret" "llm_api_keys" {
+  for_each = {
+    "anthropic-api-key"     = "Anthropic API key for Claude models"
+    "openai-api-key"        = "OpenAI API key for GPT models"
+    "google-api-key"        = "Google API key for Gemini models"
+    "openrouter-api-key"    = "OpenRouter API key for multi-model access"
+    "mistral-api-key"       = "Mistral AI API key"
+    "together-ai-api-key"   = "Together.ai API key"
+    "deepseek-api-key"      = "DeepSeek AI API key"
+    "perplexity-api-key"    = "Perplexity AI API key"
+    "cohere-api-key"        = "Cohere API key"
+    "huggingface-api-token" = "HuggingFace API token"
+  }
+
   project   = var.project_id
-  secret_id = "${var.portkey_api_key_name}-${var.env}"
+  secret_id = "${each.key}-${var.env}"
   
   replication {
-    automatic = true
+    user_managed {
+      replicas {
+        location = var.region
+      }
+    }
   }
   
   labels = {
     environment = var.env
     purpose     = "llm-integration"
+    category    = "llm-api-keys"
   }
   
   depends_on = [
@@ -54,18 +88,34 @@ resource "google_secret_manager_secret" "portkey_api_key" {
   ]
 }
 
-# Create OpenRouter API Key Secret
-resource "google_secret_manager_secret" "openrouter_api_key" {
+# Tool API Keys
+resource "google_secret_manager_secret" "tool_api_keys" {
+  for_each = {
+    "portkey-api-key"        = "Portkey API key for LLM routing"
+    "vertex-api-key"         = "Vertex AI API key"
+    "apify-api-token"        = "Apify API token for web scraping"
+    "apollo-io-api-key"      = "Apollo.io API key"
+    "brave-api-key"          = "Brave Search API key"
+    "exa-api-key"            = "Exa API key" 
+    "tavily-api-key"         = "Tavily API key for search"
+    "eleven-labs-api-key"    = "ElevenLabs API key for voice synthesis"
+  }
+
   project   = var.project_id
-  secret_id = "${var.openrouter_api_key_name}-${var.env}"
+  secret_id = "${each.key}-${var.env}"
   
   replication {
-    automatic = true
+    user_managed {
+      replicas {
+        location = var.region
+      }
+    }
   }
   
   labels = {
     environment = var.env
-    purpose     = "llm-integration"
+    purpose     = "tool-integration"
+    category    = "tool-api-keys"
   }
   
   depends_on = [
@@ -73,18 +123,29 @@ resource "google_secret_manager_secret" "openrouter_api_key" {
   ]
 }
 
-# Create a secret for storing Vertex AI API key
-resource "google_secret_manager_secret" "vertex_api_key" {
+# Infrastructure Secrets
+resource "google_secret_manager_secret" "infrastructure_secrets" {
+  for_each = {
+    "redis-auth"           = "Redis authentication credentials"
+    "db-credentials"       = "Database credentials"
+    "external-apis"        = "External API configuration"
+  }
+
   project   = var.project_id
-  secret_id = "vertex-api-key-${var.env}"
+  secret_id = "${each.key}-${var.env}"
   
   replication {
-    automatic = true
+    user_managed {
+      replicas {
+        location = var.region
+      }
+    }
   }
   
   labels = {
     environment = var.env
-    purpose     = "vertex-integration"
+    purpose     = "infrastructure"
+    category    = "infrastructure-secrets"
   }
   
   depends_on = [
@@ -92,39 +153,33 @@ resource "google_secret_manager_secret" "vertex_api_key" {
   ]
 }
 
-# Create a secret for storing external API keys (e.g. for agents)
-resource "google_secret_manager_secret" "external_apis" {
+# GCP Secrets
+resource "google_secret_manager_secret" "gcp_secrets" {
+  for_each = var.env != "prod" ? {
+    "service-account-keys" = "Service account keys (non-prod only)"
+    "gcp-client-secret"    = "GCP OAuth client secret"
+    "gcp-service-account-key" = "GCP service account key"
+  } : {
+    "gcp-client-secret"    = "GCP OAuth client secret"
+    "gcp-service-account-key" = "GCP service account key"
+  }
+
   project   = var.project_id
-  secret_id = "external-apis-${var.env}"
+  secret_id = "${each.key}-${var.env}"
   
   replication {
-    automatic = true
+    user_managed {
+      replicas {
+        location = var.region
+      }
+    }
   }
   
   labels = {
     environment = var.env
-    purpose     = "external-integrations"
-  }
-  
-  depends_on = [
-    google_project_service.secretmanager_api
-  ]
-}
-
-# Create a secret for storing service account keys (temporary, for dev/test only)
-resource "google_secret_manager_secret" "service_account_keys" {
-  count      = var.env == "prod" ? 0 : 1
-  project    = var.project_id
-  secret_id  = "service-account-keys-${var.env}"
-  
-  replication {
-    automatic = true
-  }
-  
-  labels = {
-    environment = var.env
-    purpose     = "development"
-    temporary   = "true"
+    purpose     = "gcp-configuration"
+    category    = "gcp-secrets"
+    temporary   = each.key == "service-account-keys" ? "true" : "false"
   }
   
   depends_on = [
@@ -151,22 +206,35 @@ resource "google_secret_manager_secret_iam_member" "secret_access" {
   member       = "serviceAccount:${each.value.sa_email}"
 }
 
-output "portkey_api_key_secret" {
-  value       = google_secret_manager_secret.portkey_api_key.id
-  description = "The ID of the Portkey API key secret"
+# Output organized by category for easier consumption
+output "llm_api_key_secrets" {
+  value       = {
+    for key, secret in google_secret_manager_secret.llm_api_keys :
+    key => secret.id
+  }
+  description = "The IDs of LLM API key secrets"
 }
 
-output "openrouter_api_key_secret" {
-  value       = google_secret_manager_secret.openrouter_api_key.id
-  description = "The ID of the OpenRouter API key secret"
+output "tool_api_key_secrets" {
+  value       = {
+    for key, secret in google_secret_manager_secret.tool_api_keys :
+    key => secret.id
+  }
+  description = "The IDs of tool integration API key secrets"
 }
 
-output "vertex_api_key_secret" {
-  value       = google_secret_manager_secret.vertex_api_key.id
-  description = "The ID of the Vertex AI API key secret"
+output "infrastructure_secrets" {
+  value       = {
+    for key, secret in google_secret_manager_secret.infrastructure_secrets :
+    key => secret.id
+  }
+  description = "The IDs of infrastructure secrets"
 }
 
-output "external_apis_secret" {
-  value       = google_secret_manager_secret.external_apis.id
-  description = "The ID of the external APIs secret"
+output "gcp_secrets" {
+  value       = {
+    for key, secret in google_secret_manager_secret.gcp_secrets :
+    key => secret.id
+  }
+  description = "The IDs of GCP configuration secrets"
 }

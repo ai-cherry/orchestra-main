@@ -91,7 +91,7 @@ pip install cloud-sql-python-connector || {
 
 # Additional utilities
 print_header "Installing additional utilities"
-pip install python-dotenv
+pip install python-dotenv pytest pytest-asyncio
 
 # Print summary
 print_header "Installation Summary"

@@ -1,0 +1,64 @@
+name: Validate Secret Manager Configuration
+
+on:
+  workflow_dispatch:  # Manual trigger
+  push:
+    branches: [main]
+    paths:
+      - 'infra/modules/secret-manager/**'
+      - 'infra/orchestra-terraform/secrets.tf'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'infra/modules/secret-manager/**'
+      - 'infra/orchestra-terraform/secrets.tf'
+
+jobs:
+  validate-secrets:
+    name: Validate Secret Manager Configuration
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        environment: [dev, prod]
+        service: [orchestra-api]
+      fail-fast: false  # Continue with other environments if one fails
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install google-cloud-secretmanager
+      
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+      
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Validate Secret Manager Configuration
+        run: |
+          cd infra/modules/secret-manager/validation
+          chmod +x run_validation.sh
+          ./run_validation.sh ${{ secrets.GCP_PROJECT_ID }} ${{ matrix.environment }} ${{ matrix.service }}
+      
+      - name: Notify on Failure
+        if: failure()
+        # Add your preferred notification method here (Slack, email, etc.)
+        run: |
+          echo "Secret Manager validation failed for ${{ matrix.environment }} environment!"
+          # Example: Send a Slack notification
+          # curl -X POST -H 'Content-type: application/json' \
+          #   --data '{"text":"❌ Secret Manager validation failed for ${{ matrix.environment }} environment!"}' \
+          #   ${{ secrets.SLACK_WEBHOOK_URL }}

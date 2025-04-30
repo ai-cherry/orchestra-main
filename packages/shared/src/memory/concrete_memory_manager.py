@@ -1,4 +1,4 @@
-"""
+r"""
 Concrete Memory Manager Implementation for AI Orchestration System.
 
 This module provides a concrete implementation of the MemoryManager interface
@@ -12,7 +12,16 @@ from datetime import datetime
 from typing import Dict, List, Optional, Any, Union
 import asyncio
 
-from packages.shared.src.memory.memory_manager import MemoryManager, MemoryHealth
+import os
+import logging
+import uuid
+from datetime import datetime
+from typing import Dict, List, Optional, Any, Union
+import asyncio
+
+from packages.shared.src.memory.base_memory_manager import BaseMemoryManager # New import
+from packages.shared.src.memory.memory_interface import MemoryInterface # New import
+from packages.shared.src.memory.memory_manager import MemoryHealth # Keep MemoryHealth if used
 from packages.shared.src.models.base_models import MemoryItem, AgentData, PersonaConfig
 from packages.shared.src.storage.firestore.firestore_memory import (
     FirestoreMemoryManager,
@@ -25,42 +34,34 @@ from packages.shared.src.storage.redis.redis_client import RedisClient
 logger = logging.getLogger(__name__)
 
 
-class ConcreteMemoryManager(MemoryManager):
+class FirestoreV1MemoryManager(BaseMemoryManager): # Renamed class and changed base
     """
-    Concrete memory manager implementation using Firestore and Redis.
+    Firestore V1 memory manager implementation using Firestore and Redis.
 
-    This class provides an implementation of the MemoryManager interface that uses
-    Firestore for persistent storage and Redis for caching to improve performance.
+    This class provides a concrete implementation of the BaseMemoryManager interface
+    that uses Firestore V1 for persistent storage and Redis for caching.
     """
 
     def __init__(
         self,
-        project_id: Optional[str] = None,
-        credentials_json: Optional[str] = None,
-        credentials_path: Optional[str] = None,
+        firestore_memory: FirestoreMemoryManager, # Injected instance
         redis_host: Optional[str] = None,
         redis_port: Optional[int] = None,
         redis_password: Optional[str] = None,
         cache_ttl: int = 3600,  # 1 hour default
     ):
         """
-        Initialize the concrete memory manager.
+        Initialize the Firestore V1 memory manager.
 
         Args:
-            project_id: Optional Google Cloud project ID.
-            credentials_json: Optional JSON string containing service account credentials.
-            credentials_path: Optional path to service account credentials file.
+            firestore_memory: An initialized FirestoreMemoryManager instance.
             redis_host: Optional Redis host.
             redis_port: Optional Redis port.
             redis_password: Optional Redis password.
             cache_ttl: Cache TTL in seconds. Defaults to 1 hour.
         """
-        # Initialize storage backends
-        self._firestore = FirestoreMemoryManager(
-            project_id=project_id,
-            credentials_json=credentials_json,
-            credentials_path=credentials_path,
-        )
+        # Use injected Firestore instance
+        self._firestore = firestore_memory
 
         self._redis = RedisClient(
             host=redis_host,
@@ -70,7 +71,7 @@ class ConcreteMemoryManager(MemoryManager):
         )
 
         self._cache_ttl = cache_ttl
-        self._initialized = False
+        self._initialized = False # Keep for Redis initialization status
         self._redis_available = False
 
         # Track errors for health monitoring
@@ -80,31 +81,24 @@ class ConcreteMemoryManager(MemoryManager):
 
     def initialize(self) -> None:
         """
-        Initialize the memory manager.
+        Initialize the Firestore V1 memory manager.
 
-        This method initializes both the Firestore and Redis backends.
-        If Redis initialization fails, the manager will operate without caching.
-
-        Raises:
-            ConnectionError: If connection to Firestore fails
-            PermissionError: If the required permissions are not available
+        This method initializes the Redis backend. Firestore is assumed to be
+        initialized before being injected. If Redis initialization fails,
+        the manager will operate without caching.
         """
         if self._initialized:
             return
-
-        # Initialize Firestore (required)
-        self._firestore.initialize()
-        logger.info("Firestore storage initialized")
 
         # Try to initialize Redis (optional)
         try:
             self._redis.initialize()
             self._redis_available = True
-            logger.info("Redis cache initialized")
+            logger.info("Redis cache initialized for FirestoreV1MemoryManager")
         except Exception as e:
             self._redis_available = False
             logger.warning(
-                f"Redis cache initialization failed: {e}. Operating without caching."
+                f"Redis cache initialization failed for FirestoreV1MemoryManager: {e}. Operating without caching."
             )
 
         self._initialized = True
