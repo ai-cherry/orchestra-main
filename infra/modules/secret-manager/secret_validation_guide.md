@@ -6,14 +6,28 @@ This guide explains how to use the Secret Manager validation system we've implem
 
 The validation system consists of:
 
-1. **Environment-Specific Configuration**: Terraform code in `environments.tf` that properly separates secrets by environment
+1. **Consolidated Secret Configuration**: Terraform code in `environments.tf` that defines all secrets and properly separates them by environment
 2. **Validation Scripts**: Python scripts to check your Secret Manager configuration
 3. **CI/CD Integration**: GitHub Actions workflow for automated validation
+
+## Secret Structure
+
+Our secret management follows a structured approach:
+
+### Common Secrets (All Environments)
+- **LLM API Keys**: Authentication for language models (OpenAI, Anthropic, etc.)
+- **Tool API Keys**: Authentication for integrated tools (Portkey, Tavily, etc.) 
+- **Infrastructure Secrets**: Critical system credentials (Redis, Database, etc.)
+
+### Environment-Specific Secrets
+- **Development-Only Secrets**: Testing keys, mock services, development accounts
+- **Production-Only Secrets**: Security certificates, monitoring systems, production auth
+
+All secrets follow the naming convention: `{secret-name}-{environment}`, e.g., `openai-api-key-dev` or `redis-auth-prod`.
 
 ## Before You Begin
 
 Before you start, make sure you have the following:
-Ensure you have:
 - Google Cloud SDK installed and configured
 - Python 3.7 or higher
 - Access to the GCP project where Secret Manager is deployed
@@ -54,6 +68,23 @@ This will check:
 - Cloud Run service can access the secrets
 - Secrets have proper IAM permissions
 
+## Adding New Secrets
+
+To add new secrets to your infrastructure:
+
+1. **Add to environments.tf**: 
+   - For common secrets, add to the appropriate category under `common_secrets`
+   - For development-only secrets, add to `dev_only_secrets`
+   - For production-only secrets, add to `prod_only_secrets`
+
+2. **Update Service Account Access**:
+   - Add the new secret to the appropriate service account's list in `dev_service_accounts` or `prod_service_accounts`
+   
+3. **Update Validation Requirements**:
+   - Add the secret to `REQUIRED_SECRETS` in `validate_secrets.py` if required in all environments
+   - Add to `PROD_ONLY_SECRETS` or `NON_PROD_SECRETS` if environment-specific
+   - Add to `ENV_CONFIG` in `test_env_config.py` to validate Terraform configuration
+
 ## CI/CD Integration
 
 We've provided a GitHub Actions workflow in `validate-secrets.yml`. To use it:
@@ -64,13 +95,6 @@ We've provided a GitHub Actions workflow in `validate-secrets.yml`. To use it:
    - `GCP_PROJECT_ID`: Your Google Cloud project ID
 
 The workflow will run whenever changes are made to Secret Manager configuration files. It validates both the Terraform configuration (using `test_env_config.py`) and can optionally validate the live Secret Manager configuration (using `run_validation.sh`).
-
-### Required GitHub Repository Secrets
-
-| Secret Name | Description |
-|------------|-------------|
-| `GCP_SA_KEY` | JSON content of a service account key with Secret Manager access |
-| `GCP_PROJECT_ID` | Your Google Cloud project ID |
 
 ## Customizing Validation Rules
 
@@ -95,6 +119,20 @@ ENV_CONFIG = {
 }
 ```
 
+### Customizing Required Secrets
+
+Edit the constants in `validate_secrets.py` to customize validation of deployed secrets:
+
+```python
+REQUIRED_SECRETS = {
+    "llm_api_keys": {
+        "openai-api-key",
+        # Add required LLM API keys
+    },
+    # Other categories...
+}
+```
+
 ## Deployment Readiness Checkpoint
 
 The secret validation system satisfies the following key requirements for deployment readiness:
@@ -103,12 +141,6 @@ The secret validation system satisfies the following key requirements for deploy
 2. **Access Control**: Validates service account permissions for accessing secrets.
 3. **Configuration Validation**: Verifies all required secrets exist in each environment
 4. **CI/CD Integration**: Automatically validates secrets during deployment
-
-The system also addresses the core conversation handling requirements you mentioned:
-
-- **Async Correctness**: The validation scripts properly handle async operations
-- **API Surface**: The validation provides a clean interface for checking secret configuration
-- **Test Coverage**: The system includes comprehensive tests for the secret management layer
 
 ## Troubleshooting
 
@@ -123,7 +155,6 @@ Error: Not authenticated with gcloud
 
 Make sure the `GCP_SA_KEY` secret is correctly configured in your GitHub repository.
 
-
 ### Missing Secrets
 
 If validation fails due to missing secrets:
@@ -132,7 +163,6 @@ Required secret openai-api-key-prod not found
 ```
 
 Make sure you've created all necessary secrets in Secret Manager using the Terraform configuration.
-
 
 ### Permission Issues
 
@@ -143,7 +173,6 @@ Cannot access required secret redis-auth-prod
 
 Check that your account and the service being validated both have proper IAM permissions.
 
-
 ### Terraform Validation Errors
 
 If you encounter errors during the Terraform validation step, such as:
@@ -152,7 +181,6 @@ Error: Invalid block definition
 ```
 
 This indicates a syntax error in your Terraform files. Review the error message for details on the specific issue and correct the syntax in your `environments.tf` or other related Terraform files.
-
 
 ### Python Dependency Errors
 

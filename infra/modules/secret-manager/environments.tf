@@ -9,15 +9,26 @@ locals {
       "openrouter-api-key"    = "OpenRouter API key for multi-model access"
       "mistral-api-key"       = "Mistral AI API key"
       "google-api-key"        = "Google API key for Gemini models"
+      "together-ai-api-key"   = "Together.ai API key"
+      "deepseek-api-key"      = "DeepSeek AI API key"
+      "perplexity-api-key"    = "Perplexity AI API key"
+      "cohere-api-key"        = "Cohere API key"
+      "huggingface-api-token" = "HuggingFace API token"
     }
     "tool_api_keys" = {
       "portkey-api-key"      = "Portkey API key for LLM routing"
       "tavily-api-key"       = "Tavily API key for search"
       "brave-api-key"        = "Brave Search API key"
+      "vertex-api-key"       = "Vertex AI API key"
+      "apify-api-token"      = "Apify API token for web scraping"
+      "apollo-io-api-key"    = "Apollo.io API key"
+      "exa-api-key"          = "Exa API key"
+      "eleven-labs-api-key"  = "ElevenLabs API key for voice synthesis"
     }
     "infrastructure" = {
       "redis-auth"           = "Redis authentication credentials"
       "db-credentials"       = "Database credentials"
+      "external-apis"        = "External API configuration"
     }
   }
 
@@ -25,6 +36,8 @@ locals {
   dev_only_secrets = {
     "gcp_secrets" = {
       "service-account-keys" = "Service account keys (dev only)"
+      "gcp-client-secret"    = "GCP OAuth client secret"
+      "gcp-service-account-key" = "GCP service account key"
     }
     "testing" = {
       "test-data-key"        = "Test data encryption key (dev only)"
@@ -41,6 +54,10 @@ locals {
     "monitoring" = {
       "alert-webhook-key"       = "Alert notification webhook authentication"
       "monitoring-service-key"  = "Monitoring service authentication"
+    }
+    "gcp_secrets" = {
+      "gcp-client-secret"    = "GCP OAuth client secret"
+      "gcp-service-account-key" = "GCP service account key"
     }
   }
 

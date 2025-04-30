@@ -38,14 +38,18 @@ REQUIRED_SECRETS = {
         "openai-api-key",
         "anthropic-api-key",
         "openrouter-api-key",
+        "mistral-api-key",
+        "google-api-key",
     },
     "tool_api_keys": {
         "portkey-api-key",
         "tavily-api-key",
+        "brave-api-key",
     },
     "infrastructure": {
         "redis-auth",
         "db-credentials",
+        "external-apis",
     },
     "gcp_secrets": {
         "gcp-client-secret",
@@ -56,12 +60,16 @@ REQUIRED_SECRETS = {
 # Production-only secrets that should only exist in prod environment
 PROD_ONLY_SECRETS = {
     "oauth-client-secret-prod",
-    "vertex-agent-key-prod",
+    "certificate-key-prod",
+    "alert-webhook-key-prod",
+    "monitoring-service-key-prod",
 }
 
 # Secrets that should NOT exist in production (development/test only)
 NON_PROD_SECRETS = {
     "service-account-keys",
+    "test-data-key",
+    "mock-service-key",
 }
 
 def get_project_id() -> Optional[str]:

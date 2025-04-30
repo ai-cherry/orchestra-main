@@ -20,14 +20,23 @@ ENV_CONFIG = {
         "required_secrets": [
             "openai-api-key-dev",
             "anthropic-api-key-dev",
+            "mistral-api-key-dev", 
+            "google-api-key-dev",
             "redis-auth-dev",
             "db-credentials-dev",
-            "test-data-key-dev"
+            "portkey-api-key-dev",
+            "tavily-api-key-dev",
+            "brave-api-key-dev",
+            "test-data-key-dev",
+            "mock-service-key-dev",
+            "gcp-client-secret-dev",
+            "gcp-service-account-key-dev"
         ],
         "forbidden_secrets": [
-            "oauth-client-secret-dev",  # Production-only secret should not be in dev
-            "certificate-key-dev",      # Production-only secret should not be in dev
-            "alert-webhook-key-dev"     # Production-only secret should not be in dev
+            "oauth-client-secret-dev",      # Production-only secret should not be in dev
+            "certificate-key-dev",          # Production-only secret should not be in dev
+            "alert-webhook-key-dev",        # Production-only secret should not be in dev
+            "monitoring-service-key-dev"    # Production-only secret should not be in dev
         ],
         "service_accounts": [
             "orchestra-dev-sa",
@@ -38,15 +47,24 @@ ENV_CONFIG = {
         "required_secrets": [
             "openai-api-key-prod",
             "anthropic-api-key-prod",
+            "mistral-api-key-prod",
+            "google-api-key-prod",
             "redis-auth-prod",
             "db-credentials-prod",
+            "portkey-api-key-prod",
+            "tavily-api-key-prod",
+            "brave-api-key-prod",
             "oauth-client-secret-prod", 
-            "alert-webhook-key-prod"
+            "certificate-key-prod",
+            "alert-webhook-key-prod",
+            "monitoring-service-key-prod",
+            "gcp-client-secret-prod",
+            "gcp-service-account-key-prod"
         ],
         "forbidden_secrets": [
-            "test-data-key-prod",       # Dev-only secret should not be in prod
-            "mock-service-key-prod",    # Dev-only secret should not be in prod
-            "service-account-keys-prod" # Dev-only secret should not be in prod
+            "test-data-key-prod",           # Dev-only secret should not be in prod
+            "mock-service-key-prod",        # Dev-only secret should not be in prod
+            "service-account-keys-prod"     # Dev-only secret should not be in prod
         ],
         "service_accounts": [
             "orchestra-prod-sa",
@@ -74,52 +92,60 @@ def extract_terraform_resources(tf_file: str) -> Dict[str, Any]:
         content = f.read()
 
     # Extract common secrets (apply to both environments)
-    common_categories = ["llm_api_keys", "tool_api_keys", "infrastructure"]
+    common_patterns = [
+        r'"common_secrets"\s*=\s*\{(.*?)\}',
+        r'"llm_api_keys"\s*=\s*\{(.*?)\}',
+        r'"tool_api_keys"\s*=\s*\{(.*?)\}',
+        r'"infrastructure"\s*=\s*\{(.*?)\}'
+    ]
     
-    for category in common_categories:
-        regex = f'"{category}"\\s*=\\s*{{([^}}]*)}}' 
-        matches = re.findall(regex, content, re.DOTALL)
-        
-        for match in matches:
-            key_matches = re.findall(r'"([^"]+)"\s*=', match)
+    for pattern in common_patterns:
+        for match in re.finditer(pattern, content, re.DOTALL):
+            section = match.group(1)
+            key_matches = re.findall(r'"([^"]+)"\s*=', section)
             resources["dev"]["secrets"].extend([f"{key}-dev" for key in key_matches])
             resources["prod"]["secrets"].extend([f"{key}-prod" for key in key_matches])
     
     # Extract dev-only secrets
-    dev_categories = ["testing", "gcp_secrets"]
+    dev_patterns = [
+        r'"dev_only_secrets"\s*=\s*\{(.*?)\}',
+        r'"testing"\s*=\s*\{(.*?)\}'
+    ]
     
-    for category in dev_categories:
-        regex = f'"{category}"\\s*=\\s*{{([^}}]*)}}' 
-        matches = re.findall(regex, content, re.DOTALL)
-        
-        for match in matches:
-            key_matches = re.findall(r'"([^"]+)"\s*=', match)
+    for pattern in dev_patterns:
+        for match in re.finditer(pattern, content, re.DOTALL):
+            section = match.group(1)
+            key_matches = re.findall(r'"([^"]+)"\s*=', section)
             resources["dev"]["secrets"].extend([f"{key}-dev" for key in key_matches])
-            # These should NOT be in prod
     
     # Extract prod-only secrets
-    prod_categories = ["security", "monitoring"]
+    prod_patterns = [
+        r'"prod_only_secrets"\s*=\s*\{(.*?)\}',
+        r'"security"\s*=\s*\{(.*?)\}',
+        r'"monitoring"\s*=\s*\{(.*?)\}'
+    ]
     
-    for category in prod_categories:
-        regex = f'"{category}"\\s*=\\s*{{([^}}]*)}}' 
-        matches = re.findall(regex, content, re.DOTALL)
-        
-        for match in matches:
-            key_matches = re.findall(r'"([^"]+)"\s*=', match)
+    for pattern in prod_patterns:
+        for match in re.finditer(pattern, content, re.DOTALL):
+            section = match.group(1)
+            key_matches = re.findall(r'"([^"]+)"\s*=', section)
             resources["prod"]["secrets"].extend([f"{key}-prod" for key in key_matches])
-            # These should NOT be in dev
 
     # Find service accounts by environment
-    dev_sa_pattern = r'"orchestra-dev-sa@[^"]+"'
-    prod_sa_pattern = r'"orchestra-prod-sa@[^"]+"'
+    dev_sa_regex = r'dev_service_accounts\s*=\s*\{(.*?)\}'
+    prod_sa_regex = r'prod_service_accounts\s*=\s*\{(.*?)\}'
     
-    # Extract service accounts
-    for match in re.finditer(r'"([^"]+@[^"]+\.iam\.gserviceaccount\.com)"', content):
-        account = match.group(1)
-        if "dev" in account:
-            resources["dev"]["service_accounts"].add(account)
-        if "prod" in account or "monitoring" in account:
-            resources["prod"]["service_accounts"].add(account)
+    # Extract dev service accounts
+    for match in re.finditer(dev_sa_regex, content, re.DOTALL):
+        section = match.group(1)
+        sa_matches = re.findall(r'"([^"]+@[^"]+\.iam\.gserviceaccount\.com)"', section)
+        resources["dev"]["service_accounts"].update(sa_matches)
+    
+    # Extract prod service accounts
+    for match in re.finditer(prod_sa_regex, content, re.DOTALL):
+        section = match.group(1)
+        sa_matches = re.findall(r'"([^"]+@[^"]+\.iam\.gserviceaccount\.com)"', section)
+        resources["prod"]["service_accounts"].update(sa_matches)
 
     return resources
 

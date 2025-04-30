@@ -12,16 +12,9 @@ from datetime import datetime
 from typing import Dict, List, Optional, Any, Union
 import asyncio
 
-import os
-import logging
-import uuid
-from datetime import datetime
-from typing import Dict, List, Optional, Any, Union
-import asyncio
-
 from packages.shared.src.memory.base_memory_manager import BaseMemoryManager # New import
 from packages.shared.src.memory.memory_interface import MemoryInterface # New import
-from packages.shared.src.memory.memory_manager import MemoryHealth # Keep MemoryHealth if used
+from packages.shared.src.memory.memory_types import MemoryHealth # Updated import
 from packages.shared.src.models.base_models import MemoryItem, AgentData, PersonaConfig
 from packages.shared.src.storage.firestore.firestore_memory import (
     FirestoreMemoryManager,

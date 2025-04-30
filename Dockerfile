@@ -20,17 +20,18 @@ RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy requirements files
-COPY requirements*.txt .
-COPY core/orchestrator/requirements.txt ./core/orchestrator/
-COPY packages/shared/requirements.txt ./packages/shared/
+# Install Poetry
+RUN curl -sSL https://install.python-poetry.org | python3 -
+ENV PATH="/root/.local/bin:$PATH"
 
-# Install Python dependencies
-# First install the consolidated requirements which is referenced by other requirement files
-RUN pip3 install --no-cache-dir -r requirements-consolidated.txt \
-    && pip3 install --no-cache-dir -r requirements.txt \
-    && pip3 install --no-cache-dir -r core/orchestrator/requirements.txt \
-    && pip3 install --no-cache-dir -r packages/shared/requirements.txt
+# Copy Poetry configuration files
+COPY pyproject.toml poetry.lock* ./
+
+# Configure Poetry to not create a virtual environment
+RUN poetry config virtualenvs.create false
+
+# Install dependencies
+RUN poetry install --no-interaction --no-root --without dev
 
 # Copy application code
 COPY . .
@@ -43,7 +44,6 @@ ENV ENVIRONMENT=staging
 ENV PORT=8000
 
 # Set Google Cloud credentials environment variable
-# Using /tmp/vertex-agent-key.json for consistency with local development
 ENV GOOGLE_APPLICATION_CREDENTIALS=/tmp/vertex-agent-key.json
 
 # Expose port for the application
