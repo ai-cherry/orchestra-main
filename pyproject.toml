@@ -21,7 +21,7 @@ psycopg = {extras = ["binary"], version = ">=3.1.0"}
 sqlalchemy = ">=2.0.0"
 pgvector = ">=0.2.0"
 duckduckgo-search = ">=5.0.0"
-newspaper4k = ">=0.2.0"
+newspaper4k = { version = ">=0.9.3", python = ">=3.9,<4.0" }  # Explicitly set Python version constraint
 slack-sdk = ">=3.0.0"
 fastapi = {extras = ["standard"], version = ">=0.115.0"}
 wikipedia = ">=1.4.0"
@@ -37,7 +37,7 @@ tantivy = ">=0.20.0"
 
 [tool.poetry.group.search_tools.dependencies]
 duckduckgo-search = ">=5.0.0"
-newspaper4k = ">=0.2.0"
+newspaper4k = { version = ">=0.9.3", python = ">=3.9,<4.0" }  # Using consistent configuration with main dependency
 wikipedia = ">=1.4.0"
 exa-py = ">=1.0.0"
 
