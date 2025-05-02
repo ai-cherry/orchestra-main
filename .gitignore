@@ -77,3 +77,5 @@ google-cloud-sdk/
 # Specific large files
 infra/.terraform/providers/**
 infra/orchestra-terraform/.terraform/providers/**
+# Temporary assessment output files
+codespaces_*.txt
