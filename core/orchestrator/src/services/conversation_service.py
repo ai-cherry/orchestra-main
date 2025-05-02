@@ -155,7 +155,8 @@ class ConversationService:
                 "session_id": conversation.session_id,
                 "timestamp": datetime.utcnow().isoformat(),
                 "duration_seconds": (datetime.utcnow() - conversation.start_time).total_seconds(),
-                "turn_count": conversation.turn_count
+                "turn_count": conversation.turn_count,
+                "success_status": True  # Added field to indicate normal conversation end
             }
         )
         
@@ -163,7 +164,7 @@ class ConversationService:
             # Directly await the async method
             await self._memory_manager.add_memory_item(conversation_end)
         except Exception as e:
-            logger.error(f"Failed to store conversation end: {e}")
+            logger.error(f"Failed to store conversation end for user {user_id}, session {conversation.session_id}: {str(e)}", exc_info=True)
         
         # Remove from active conversations
         del self._active_conversations[user_id]

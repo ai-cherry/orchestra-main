@@ -17,8 +17,12 @@ services:
       - PORTKEY_API_KEY=${PORTKEY_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
-      - AGNO_API_KEY=${AGNO_API_KEY}
-      - AGNO_PROJECT_ID=orchestra
+      # Force standard mode and disable recovery mode
+      - USE_RECOVERY_MODE=false
+      - STANDARD_MODE=true
+      # Optional Agno configuration - will be used only if Agno is installed
+      - AGNO_API_KEY=${AGNO_API_KEY:-}
+      - AGNO_PROJECT_ID=${AGNO_PROJECT_ID:-orchestra}
     volumes:
       - ./core:/app/core
       - ./packages:/app/packages
@@ -33,8 +37,8 @@ services:
       timeout: 10s
       retries: 5
 
-  # Agno UI service (Phidata Agent UI)
-  agno-ui:
+  # Phidata Agent UI service (formerly Agno UI)
+  phidata-ui:
     image: phidata/agno-ui:latest
     ports:
       - "3000:3000"
@@ -42,6 +46,8 @@ services:
       - API_URL=http://orchestra-api:8000
       - MCP_ENABLED=true
       - MEMORY_ENABLED=true
+      - STANDARD_MODE=true
+      - USE_RECOVERY_MODE=false
     networks:
       - orchestra-network
     depends_on:

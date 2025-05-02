@@ -133,6 +133,24 @@ steps:
           terraform workspace new $ENV
         fi
 
+  # Step 5.1: Validate Terraform
+  - name: 'hashicorp/terraform:1.5'
+    id: 'terraform-validate'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Load environment variables
+        source /workspace/env.txt
+
+        cd infra
+
+        # Select the appropriate workspace again just to be safe
+        terraform workspace select $ENV
+
+        # Validate Terraform configuration
+        terraform validate
+
   # Step 6: Apply Terraform
   - name: 'hashicorp/terraform:1.5'
     id: 'terraform-apply'
@@ -264,7 +282,6 @@ timeout: '1800s'  # 30 minutes
 # Configure build options
 options:
   logging: CLOUD_LOGGING_ONLY
-  dynamic_substitutions: true
   env:
     - 'TF_VAR_project_id=${PROJECT_ID}'
     - 'TF_VAR_region=${_REGION}'

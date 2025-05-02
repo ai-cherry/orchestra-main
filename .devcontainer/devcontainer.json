@@ -1,28 +1,23 @@
 {
-    "name": "Terraform Development",
-    "build": {
-        "dockerfile": "../Dockerfile.terraform",
-        "context": ".."
-    },
-    "features": {},
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "hashicorp.terraform",
-                "ms-azuretools.vscode-docker",
-                "eamodio.gitlens",
-                "redhat.vscode-yaml",
-                "4ops.terraform"
-            ],
-            "settings": {
-                "terraform.languageServer": {
-                    "enabled": true,
-                    "args": []
-                }
-            }
-        }
-    },
-    "remoteUser": "root",
-    "forwardPorts": [],
-    "postCreateCommand": "terraform --version && tflint --version && terragrunt --version"
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GoogleCloudTools.cloudcode",
+        "GoogleCloudTools.cloudcode-gemini",
+        "Rooservices.roo-ai",
+        "Cline.cline-vscode",
+        "HashiCorp.terraform"
+      ],
+      "settings": {
+        "geminiCodeAssist.projectId": "agi-baby-cherry",
+        "geminiCodeAssist.contextAware": true,
+        "geminiCodeAssist.codeReview.enabled": true,
+        "cloudcode.duetAI.project": "agi-baby-cherry",
+        "cloudcode.project": "agi-baby-cherry",
+        "roo.mode": "turbo",
+        "cline.apiSource": "gcp-secret-manager"
+      }
+    }
+  },
+  "postCreateCommand": "gcloud auth activate-service-account --key-file=/workspace/gsa-key.json && gcloud config set project agi-baby-cherry && poetry install"
 }

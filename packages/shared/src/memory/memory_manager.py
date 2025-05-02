@@ -12,23 +12,13 @@ from typing import Any, Dict, List, Optional, Union, TypedDict
 
 from packages.shared.src.models.base_models import AgentData, MemoryItem, PersonaConfig
 from packages.shared.src.memory.memory_interface import MemoryInterface
+from .memory_types import MemoryHealth
 from packages.shared.src.memory.base_memory_manager import BaseMemoryManager
 from packages.shared.src.memory.concrete_memory_manager import FirestoreV1MemoryManager # Assuming this is the refactored name
 from packages.shared.src.storage.firestore.firestore_memory import FirestoreMemoryManager # Need to import the V1 storage class to instantiate it
 
 # Set up logger
 logger = logging.getLogger(__name__)
-
-# Type definition for memory health status (Keep this)
-class MemoryHealth(TypedDict, total=False):
-    """Type definition for memory system health status."""
-    status: str  # 'healthy', 'degraded', or 'unhealthy'
-    firestore: bool  # Firestore connection status
-    redis: bool  # Redis connection status
-    error_count: int  # Number of recent errors
-    last_error: Optional[str]  # Last error message or timestamp
-    details: Dict[str, Any]  # Additional details about the health status
-
 
 class MemoryManager(MemoryInterface): # The main MemoryManager should implement the interface
     """

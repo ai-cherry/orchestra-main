@@ -274,33 +274,37 @@ class OpenRouterProvider(LLMProvider):
 
         This creates the OpenAI client and validates the configuration.
         """
-        # Set up httpx client with timeout
-        client_timeout = httpx.Timeout(
-            timeout=self.config.request_timeout,
-            connect=min(5.0, self.config.request_timeout / 2),
-        )
+        try:
+            # Set up httpx client with timeout
+            client_timeout = httpx.Timeout(
+                timeout=self.config.request_timeout,
+                connect=min(5.0, self.config.request_timeout / 2),
+            )
 
-        # Initialize OpenAI client for OpenRouter
-        self._client = AsyncOpenAI(
-            api_key=self.config.api_key,
-            base_url=self.config.base_url,
-            timeout=client_timeout,
-            max_retries=0,  # We handle retries ourselves with more control
-        )
+            # Initialize OpenAI client for OpenRouter
+            self._client = AsyncOpenAI(
+                api_key=self.config.api_key,
+                base_url=self.config.base_url,
+                timeout=client_timeout,
+                max_retries=0,  # We handle retries ourselves with more control
+            )
 
-        # Access the global settings instance directly
-        # settings = get_settings() # Removed this line
+            # Access the global settings instance directly
+            # settings = get_settings() # Removed this line
 
-        # Load agent-to-model mapping if available
-        # Assuming settings instance has get_agent_model_map method
-        self.agent_model_map = settings.get_agent_model_map()
+            # Load agent-to-model mapping if available
+            # Assuming settings instance has get_agent_model_map method
+            self.agent_model_map = settings.get_agent_model_map()
 
-        logger.info(
-            f"Initialized {self.provider_name} provider with model {self.config.default_model}"
-        )
-        logger.info(
-            f"OpenRouter Pro Tier configuration active with {len(self.custom_headers)} custom headers"
-        )
+            logger.info(
+                f"Initialized {self.provider_name} provider with model {self.config.default_model}"
+            )
+            logger.info(
+                f"OpenRouter Pro Tier configuration active with {len(self.custom_headers)} custom headers"
+            )
+        except Exception as e:
+            logger.error(f"Failed to initialize {self.provider_name} provider: {e}", exc_info=True)
+            logger.warning(f"{self.provider_name} provider initialization failed; AI functionalities may be limited or unavailable.")
 
     def close(self) -> None:
         """

@@ -1,0 +1,134 @@
+# LiteLLM Configuration for Orchestra
+# This configuration sets up model providers, routing, caching, and logging
+
+# General settings
+general_settings:
+  # Toggle for verbose logging (overridable via environment variable)
+  verbose: false  # Set to true for detailed logs
+  # Maximum number of retries for failed API calls
+  num_retries: 3
+  # Context window management
+  context_window_fallbacks: true
+  # Set to false in production to prevent exposing full error messages
+  debug: false
+
+# Model provider configurations
+model_list:
+  - model_name: gpt-3.5-turbo
+    litellm_params:
+      model: azure/gpt-35-turbo
+      api_base: ${AZURE_API_BASE}
+      api_key: ${AZURE_API_KEY}
+      api_version: "2023-07-01-preview"
+  
+  - model_name: gpt-4
+    litellm_params:
+      model: azure/gpt-4
+      api_base: ${AZURE_API_BASE}
+      api_key: ${AZURE_API_KEY}
+      api_version: "2023-07-01-preview"
+  
+  - model_name: claude-3-opus
+    litellm_params:
+      model: anthropic/claude-3-opus-20240229
+      api_key: ${ANTHROPIC_API_KEY}
+  
+  - model_name: claude-3-sonnet
+    litellm_params:
+      model: anthropic/claude-3-sonnet-20240229
+      api_key: ${ANTHROPIC_API_KEY}
+      
+  # Portkey integration with proper headers
+  - model_name: portkey/gpt-4o
+    litellm_params:
+      model: openai/portkey/gpt-4o
+      api_base: "https://api.portkey.ai/v1"
+      api_key: ${PORTKEY_API_KEY}
+      extra_headers:
+        x-portkey-provider: "openai"
+        x-portkey-config: "${PORTKEY_CONFIG}"
+  
+  - model_name: portkey/claude-3-opus
+    litellm_params:
+      model: anthropic/portkey/claude-3-opus
+      api_base: "https://api.portkey.ai/v1"
+      api_key: ${PORTKEY_API_KEY}
+      extra_headers:
+        x-portkey-provider: "anthropic"
+        x-portkey-config: "${PORTKEY_CONFIG}"
+  
+  # OpenRouter integration with full model paths
+  - model_name: openrouter/mixtral
+    litellm_params:
+      model: openrouter/mistralai/mixtral-8x7b-instruct
+      api_base: "https://openrouter.ai/api/v1"
+      api_key: ${OPENROUTER_API_KEY}
+      # OpenRouter requires HTTP-Referer - set via environment variables
+      # OR_SITE_URL and OR_APP_NAME
+
+# Model routing configuration based on parameters
+router_settings:
+  # Set to "simple" for round-robin, "shortest-queue" for load-based, "latency-based" for performance
+  routing_strategy: "simple"
+  
+  # Timeout settings in seconds
+  timeout: 30
+  
+  # Fallback models if primary fails
+  fallbacks: [
+    {
+      "model": "gpt-4",
+      "fallback_model": "claude-3-opus"
+    },
+    {
+      "model": "claude-3-opus",
+      "fallback_model": "gpt-4"
+    }
+  ]
+
+# Cache configuration
+cache_settings:
+  # Cache type: "redis" or "in-memory"
+  cache_type: "redis"
+  # Cache parameters for Redis
+  redis_host: ${REDIS_HOST}
+  redis_port: ${REDIS_PORT}
+  redis_password: ${REDIS_PASSWORD}
+  # Time to live for cached responses (seconds)
+  ttl: 3600
+  # Semantic caching (requires embedding model)
+  semantic_cache: false
+
+# Logging configuration
+logging:
+  # Log to Cloud Logging in GCP environments
+  cloud_logging: true
+  # Log level
+  level: "DEBUG"  # DEBUG, INFO, WARNING, ERROR
+  # Request & response logging for analytics
+  log_prompts: true
+  log_responses: true
+
+# Cost tracking & budget controls
+budget_manager:
+  # Enable budget tracking
+  is_enabled: true
+  # Project identifiers
+  project_id: "orchestra"
+  # Budget in USD
+  max_budget: 100.0
+  # Budget reached callback
+  budget_alerts: ["80%", "90%", "100%"]
+
+# Security settings
+security:
+  # API key hashing for logs
+  hash_keys: true
+  # Access controls
+  use_key_management: true
+  master_key: ${LITELLM_MASTER_KEY}
+
+# Custom headers for provider API requests
+extra_headers:
+  user_id: "${USER_ID}"
+  session_id: "${SESSION_ID}"

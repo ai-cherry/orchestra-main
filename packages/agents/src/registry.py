@@ -10,6 +10,9 @@ import logging
 import importlib
 from typing import Dict, Type, Any, Optional
 
+# Import routing logic for advanced agent selection
+from packages.agents.src.routing import AgentRouting
+
 # Import the base class
 from packages.agents.src._base import OrchestraAgentBase
 
@@ -29,10 +32,13 @@ class AgentRegistry:
     3. Providing discovery mechanisms for available wrapper types
     """
     
-    def __init__(self):
-        """Initialize the agent registry."""
+    def __init__(self, project_id: str = "agi-baby-cherry", spanner_instance_id: str = "orchestra-instance", spanner_database_id: str = "orchestra-db"):
+        """Initialize the agent registry with Google Cloud project details for routing."""
         # Dictionary mapping wrapper types to their implementing classes
         self._wrapper_classes: Dict[str, Type[OrchestraAgentBase]] = {}
+        
+        # Initialize routing logic for agent selection
+        self.routing = AgentRouting(project_id, spanner_instance_id, spanner_database_id)
         
         # Register built-in wrapper types
         self._register_builtin_wrappers()
@@ -70,6 +76,7 @@ class AgentRegistry:
     ) -> Optional[OrchestraAgentBase]:
         """
         Create an agent instance based on configuration.
+        Registers the agent in the routing system with initial capability and cost data if provided.
         
         Args:
             agent_id: Unique identifier for this agent instance
@@ -105,6 +112,11 @@ class AgentRegistry:
                 llm_client=llm_client,
                 tool_registry=tool_registry
             )
+            
+            # Register the agent in the routing system with initial values if provided
+            initial_score = agent_config.get("initial_capability_score", 0.0)
+            initial_cost = agent_config.get("initial_cost_per_request", 0.0)
+            self.routing.register_agent(agent_id, initial_score, initial_cost)
             
             logger.info(f"Successfully created agent: {agent_id} with wrapper: {wrapper_type}")
             return agent
@@ -158,13 +170,18 @@ class AgentRegistry:
             logger.error(f"Failed to load wrapper class from path: {class_path}: {e}")
             return False
 
-# Create a singleton instance
-agent_registry = AgentRegistry()
+# Create a singleton instance with default project settings
+agent_registry = AgentRegistry(project_id="agi-baby-cherry", spanner_instance_id="orchestra-instance", spanner_database_id="orchestra-db")
 
 
-def get_registry() -> AgentRegistry:
+def get_registry(project_id: str = "agi-baby-cherry", spanner_instance_id: str = "orchestra-instance", spanner_database_id: str = "orchestra-db") -> AgentRegistry:
     """
-    Get the global agent registry instance.
+    Get the global agent registry instance, initialized with specific project settings if needed.
+    
+    Args:
+        project_id: Google Cloud project ID
+        spanner_instance_id: Cloud Spanner instance ID
+        spanner_database_id: Cloud Spanner database ID
     
     Returns:
         The global AgentRegistry instance

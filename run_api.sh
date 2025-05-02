@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to run the FastAPI app - STANDARD MODE ONLY
+# Script to run the FastAPI app - Can run in STANDARD or RECOVERY mode
 
 # Color output for better visibility
 GREEN='\033[0;32m'
@@ -7,7 +7,17 @@ RED='\033[0;31m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-echo -e "${YELLOW}Starting Orchestra API with FORCE STANDARD MODE${NC}"
+# Parse command line arguments
+MODE="standard"  # Default to standard mode
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --recovery) MODE="recovery"; shift ;;
+        --standard) MODE="standard"; shift ;;
+        *) echo "Unknown parameter: $1"; exit 1 ;;
+    esac
+done
+
+echo -e "${YELLOW}Starting Orchestra API in ${MODE^^} MODE${NC}"
 
 # Source environment variables from set_env.sh if it exists
 if [ -f "/workspaces/orchestra-main/set_env.sh" ]; then
@@ -17,8 +27,17 @@ fi
 
 # Setting PYTHONPATH
 export PYTHONPATH=/workspaces/orchestra-main
-export USE_RECOVERY_MODE=false
-export STANDARD_MODE=true
+
+# Set mode based on parameter
+if [ "$MODE" == "recovery" ]; then
+    export USE_RECOVERY_MODE=true
+    export STANDARD_MODE=false
+    echo -e "${YELLOW}Running in RECOVERY MODE${NC}"
+else
+    export USE_RECOVERY_MODE=false
+    export STANDARD_MODE=true
+    echo -e "${GREEN}Running in STANDARD MODE${NC}"
+fi
 
 echo -e "${GREEN}Critical environment variables:${NC}"
 echo -e "PYTHONPATH=$PYTHONPATH"
@@ -114,22 +133,26 @@ if [ $IMPORT_FAILED -eq 1 ]; then
     fi
 fi
 
-# ----- FORCE STANDARD MODE -----
-# Run our force_standard_mode.py script to patch the application before starting
-echo -e "${YELLOW}Applying forced standard mode patch...${NC}"
-if [ -f "/workspaces/orchestra-main/force_standard_mode.py" ]; then
-    python /workspaces/orchestra-main/force_standard_mode.py
-    if [ $? -eq 0 ]; then
-        echo -e "${GREEN}Standard mode patch applied successfully.${NC}"
+# ----- MODE SELECTION -----
+# Only apply force_standard_mode patch if we're in standard mode
+if [ "$MODE" == "standard" ]; then
+    echo -e "${YELLOW}Applying standard mode patch...${NC}"
+    if [ -f "/workspaces/orchestra-main/force_standard_mode.py" ]; then
+        python /workspaces/orchestra-main/force_standard_mode.py
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}Standard mode patch applied successfully.${NC}"
+        else
+            echo -e "${RED}Failed to apply standard mode patch.${NC}"
+        fi
     else
-        echo -e "${RED}Failed to apply standard mode patch.${NC}"
+        echo -e "${RED}force_standard_mode.py not found.${NC}"
     fi
 else
-    echo -e "${RED}force_standard_mode.py not found.${NC}"
+    echo -e "${YELLOW}Skipping standard mode patch for recovery mode.${NC}"
 fi
 
-# Run the FastAPI app with the clean structure
-echo -e "${GREEN}Starting FastAPI app - Orchestrator API (FORCED STANDARD MODE)${NC}"
+# Run the FastAPI app with the appropriate structure
+echo -e "${GREEN}Starting FastAPI app - Orchestrator API (${MODE^^} MODE)${NC}"
 echo -e "${GREEN}Using Python: $(which python)${NC}"
 echo -e "${GREEN}PYTHONPATH: $PYTHONPATH${NC}"
 echo -e "${GREEN}USE_RECOVERY_MODE: $USE_RECOVERY_MODE${NC}"
@@ -137,4 +160,9 @@ echo -e "${GREEN}STANDARD_MODE: $STANDARD_MODE${NC}"
 
 # Run with PYTHONPATH using the -m flag for better module resolution
 PYTHONPATH=$PYTHONPATH python -c "import os; print('Python sees USE_RECOVERY_MODE=', os.environ.get('USE_RECOVERY_MODE', 'not set'))"
-PYTHONPATH=$PYTHONPATH python -m uvicorn core.orchestrator.src.main:app --reload --host 0.0.0.0 --port 8000
+
+if [ "$MODE" == "recovery" ]; then
+    PYTHONPATH=$PYTHONPATH python -m uvicorn core.orchestrator.src.main_simple:app --reload --host 0.0.0.0 --port 8000
+else
+    PYTHONPATH=$PYTHONPATH python -m uvicorn core.orchestrator.src.main:app --reload --host 0.0.0.0 --port 8000
+fi

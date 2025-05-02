@@ -70,6 +70,19 @@ python -c "import fastapi, uvicorn, pydantic, loguru, google.cloud.storage" || e
 echo "Installed dependency versions:"
 python -m pip list | grep -E 'fastapi|uvicorn|pydantic|redis|openai|google-cloud'
 
+# Automate dependency updates and vulnerability audits
+echo "Updating dependencies and auditing for vulnerabilities..."
+pip install --upgrade pip
+pip list --outdated --format=freeze | cut -d'=' -f1 | xargs -n1 pip install -U
+
+if command -v safety &> /dev/null; then
+    safety check
+else
+    echo "Safety not installed. Skipping vulnerability audit."
+fi
+
+echo "Dependencies updated successfully."
+
 # Set critical environment variables
 export PYTHONPATH=/workspaces/orchestra-main
 export USE_RECOVERY_MODE=false

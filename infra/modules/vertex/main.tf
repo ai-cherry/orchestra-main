@@ -81,22 +81,9 @@ resource "google_vertex_ai_index" "vector_index" {
   
   index_update_method = "BATCH_UPDATE"
   
-  # Optimize deployment config based on environment
-  # Dev/Stage: 1 replica, minimal resources
-  # Prod: Configured replicas, higher resources
-  deployment_resource_pool_spec {
-    replica_count = var.env == "prod" ? var.index_replicas : 1
-    machine_spec {
-      machine_type = var.env == "prod" ? "e2-standard-2" : "e2-standard-1"
-    }
-  }
-  
-  # Define index endpoints
-  # For private connectivity - useful for prod
-  private_service_connect_config {
-    enable_private_service_connect = var.env == "prod"
-    project_allowlist              = [var.project_id]
-  }
+  # Remove the unsupported blocks and convert to supported format or annotations
+  # The replica count and machine type can be set through other supported parameters
+  # or may need to be configured through a different resource
   
   depends_on = [google_project_service.vertex_ai]
 }

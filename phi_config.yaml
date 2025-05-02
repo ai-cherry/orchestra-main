@@ -1,0 +1,9 @@
+storage:
+  type: gcp-firestore
+  project: agi-baby-cherry
+  collection: agent_sessions
+
+secrets:
+  source: gcp-secret-manager
+  project: agi-baby-cherry
+  auto_load: true

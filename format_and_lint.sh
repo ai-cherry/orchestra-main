@@ -2,6 +2,8 @@
 # format_and_lint.sh - Script to run formatting and linting across the codebase
 # Usage: ./format_and_lint.sh [--check] [--fix]
 
+set -e
+
 # Set default behavior
 CHECK_ONLY=false
 FIX=false
@@ -28,9 +30,13 @@ if ! command -v pre-commit &> /dev/null; then
     pip install pre-commit
 fi
 
-# Set up pre-commit hooks if not already installed
-echo "Ensuring pre-commit hooks are installed..."
-pre-commit install
+# Add pre-commit hooks
+if [ -f .pre-commit-config.yaml ]; then
+    pre-commit install
+    echo "Pre-commit hooks installed."
+else
+    echo "No pre-commit configuration found. Skipping."
+fi
 
 # Check or fix the formatting
 if [ "$CHECK_ONLY" = true ]; then
@@ -40,11 +46,11 @@ if [ "$CHECK_ONLY" = true ]; then
     echo "\n> Running black (check only)..."
     python -m black --check .
     
-    echo "\n> Running isort (check only)..."
-    python -m isort --check-only --profile black .
+    echo "\n> Running flake8 (check only)..."
+    flake8 .
     
-    echo "\n> Running ruff linter (check only)..."
-    python -m ruff check .
+    echo "\n> Running pylint (check only)..."
+    pylint $(find . -name "*.py")
     
     echo "\n===== If any issues were found, run with --fix to correct them ====="
 elif [ "$FIX" = true ]; then
@@ -54,11 +60,11 @@ elif [ "$FIX" = true ]; then
     echo "\n> Running black..."
     python -m black .
     
-    echo "\n> Running isort..."
-    python -m isort --profile black .
+    echo "\n> Running flake8..."
+    flake8 .
     
-    echo "\n> Running ruff linter with auto-fix..."
-    python -m ruff check --fix .
+    echo "\n> Running pylint..."
+    pylint $(find . -name "*.py")
     
     echo "\n===== Formatting fixes applied. Some issues may require manual fixes. ====="
 else

@@ -16,27 +16,30 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: '3.11'
           cache: 'pip'
+      
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.7.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
       
       - name: Install dependencies
         run: |
-          python3 -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip3 install -r requirements.txt; fi
-          if [ -f core/orchestrator/requirements.txt ]; then pip3 install -r core/orchestrator/requirements.txt; fi
-          if [ -f packages/shared/requirements.txt ]; then pip3 install -r packages/shared/requirements.txt; fi
-          pip3 install pytest pytest-cov flake8
+          poetry install --no-interaction --no-root --with dev
       
       - name: Lint with flake8
         run: |
           # Stop the build if there are Python syntax errors or undefined names
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          poetry run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # Exit-zero treats all errors as warnings
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          poetry run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
           
       - name: Test with pytest
         run: |
-          pytest tests/ --cov=./ --cov-report=xml
+          poetry run pytest tests/ --cov=./ --cov-report=xml
       
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -65,33 +68,6 @@ jobs:
         shell: bash
         run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
       
-      - name: Create Dockerfile if it doesn't exist
-        run: |
-          if [ ! -f Dockerfile ]; then
-            cat > Dockerfile << EOL
-            FROM python:3.12-slim
-            
-            WORKDIR /app
-            
-            COPY requirements.txt .
-            COPY core/orchestrator/requirements.txt ./core/orchestrator/
-            COPY packages/shared/requirements.txt ./packages/shared/
-            
-            RUN pip3 install --no-cache-dir -r requirements.txt \\
-                && pip3 install --no-cache-dir -r core/orchestrator/requirements.txt \\
-                && pip3 install --no-cache-dir -r packages/shared/requirements.txt
-            
-            COPY . .
-            
-            ENV PYTHONPATH=/app
-            
-            CMD ["python3", "orchestrator/main.py"]
-            EOL
-            echo "Created Dockerfile for the project"
-          else
-            echo "Using existing Dockerfile"
-          fi
-      
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
@@ -115,7 +91,7 @@ jobs:
       - name: Set up Google Cloud Auth
         uses: google-github-actions/auth@v1
         with:
-          credentials_json: ${{ secrets.ORG_GCP_CREDENTIALS }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
       
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1

@@ -11,14 +11,15 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  id-token: write # Required for requesting the JWT for Workload Identity Federation
 
 jobs:
-  terraform-dev:
-    name: "Terraform Dev Environment"
+  terraform-dev-plan:
+    name: "Terraform Dev Plan"
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./infra/dev
+        working-directory: ./infra/orchestra-terraform
     
     steps:
       - name: Checkout
@@ -27,21 +28,29 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.5.0
+          terraform_version: 1.11.3
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v1
+      - name: Authenticate to Google Cloud with Workload Identity Federation
+        uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/github-pool-dev/providers/github-provider-dev'
+          service_account: 'github-actions-dev@agi-baby-cherry.iam.gserviceaccount.com'
+          token_format: 'access_token'
+          create_credentials_file: true
           
       - name: Setup Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
+        uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: agi-baby-cherry
+          install_components: 'beta'
           
-      - name: Terraform Init
+      - name: Terraform Init with GCS Backend and State Locking
         id: init
-        run: terraform init
+        run: |
+          terraform init \
+            -backend-config="bucket=orchestra-terraform-state" \
+            -backend-config="prefix=terraform/state/dev" \
+            -upgrade
       
       - name: Terraform Workspace
         id: workspace
@@ -59,15 +68,53 @@ jobs:
       
       - name: Terraform Plan
         id: plan
-        run: terraform plan -var="env=dev" -no-color
+        run: |
+          terraform plan \
+            -var="env=dev" \
+            -input=false \
+            -no-color | tee terraform-plan.txt
         continue-on-error: true
       
-      - name: Update PR
-        uses: actions/github-script@v6
+      - name: Cache Plan
+        uses: actions/cache@v3
+        with:
+          path: terraform-plan.txt
+          key: terraform-plan-dev-${{ github.sha }}
+      
+      - name: Run Backward Compatibility Check
+        run: |
+          # Check for sensitive changes that could cause issues
+          ! grep -q "forces replacement" terraform-plan.txt || echo "::warning::Plan includes resource replacement - review carefully!"
+          ! grep -q "will be destroyed" terraform-plan.txt || echo "::warning::Plan includes resource destruction - review carefully!"
+
+  terraform-dev-review:
+    name: "Terraform Dev Review"
+    needs: terraform-dev-plan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+    defaults:
+      run:
+        working-directory: ./infra/orchestra-terraform
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Restore Plan
+        uses: actions/cache@v3
+        with:
+          path: terraform-plan.txt
+          key: terraform-plan-dev-${{ github.sha }}
+      
+      - name: Update PR with Plan
         if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const fs = require('fs');
+            const planOutput = fs.readFileSync('terraform-plan.txt', 'utf8');
+            
             const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome == 'success' && '✅' || '❌' }}\`
             #### Terraform Validation 🤖\`${{ steps.validate.outcome == 'success' && '✅' || '❌' }}\`
             #### Terraform Plan 📖\`${{ steps.plan.outcome == 'success' && '✅' || '❌' }}\`
@@ -75,7 +122,7 @@ jobs:
             <details><summary>Show Plan</summary>
 
             \`\`\`terraform
-            ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
+            ${planOutput.length > 65000 ? planOutput.substring(0, 65000) + "\n... (output truncated)" : planOutput}
             \`\`\`
 
             </details>`;
@@ -87,19 +134,26 @@ jobs:
               body: output
             })
       
-      - name: Terraform Apply
-        id: apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve -var="env=dev"
+      - name: Manual Approval for Main
+        if: github.ref == 'refs/heads/main'
+        uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ secrets.GITHUB_TOKEN }}
+          approvers: ${{ github.actor }}
+          minimum-approvals: 1
+          issue-title: "Deploy Terraform to Dev"
+          issue-body: "Please approve or deny the Terraform deployment to dev environment."
+          exclude-workflow-initiator-as-approver: false
+          timeout-minutes: 60
 
-  terraform-prod:
-    name: "Terraform Prod Environment"
+  terraform-dev-apply:
+    name: "Terraform Dev Apply"
+    needs: terraform-dev-review
     runs-on: ubuntu-latest
-    needs: terraform-dev  # Only run after dev deployment succeeds
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     defaults:
       run:
-        working-directory: ./infra/prod
+        working-directory: ./infra/orchestra-terraform
     
     steps:
       - name: Checkout
@@ -108,21 +162,82 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.5.0
+          terraform_version: 1.11.3
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v1
+      - name: Authenticate to Google Cloud with Workload Identity Federation
+        uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/github-pool-dev/providers/github-provider-dev'
+          service_account: 'github-actions-dev@agi-baby-cherry.iam.gserviceaccount.com'
+          token_format: 'access_token'
+          create_credentials_file: true
           
       - name: Setup Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
+        uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: agi-baby-cherry
+          install_components: 'beta'
           
-      - name: Terraform Init
+      - name: Terraform Init with GCS Backend and State Locking
         id: init
-        run: terraform init
+        run: |
+          terraform init \
+            -backend-config="bucket=orchestra-terraform-state" \
+            -backend-config="prefix=terraform/state/dev" \
+            -upgrade
+      
+      - name: Terraform Workspace
+        id: workspace
+        run: |
+          terraform workspace select dev || terraform workspace new dev
+      
+      - name: Terraform Apply
+        id: apply
+        run: |
+          terraform apply \
+            -auto-approve \
+            -var="env=dev" \
+            -input=false
+
+  terraform-prod:
+    name: "Terraform Prod Environment"
+    runs-on: ubuntu-latest
+    needs: terraform-dev-apply  # Only run after dev deployment succeeds
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    defaults:
+      run:
+        working-directory: ./infra/orchestra-terraform
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.11.3 # Updated to 1.11.3
+
+      - name: Authenticate to Google Cloud with Workload Identity Federation
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/github-pool-prod/providers/github-provider-prod'
+          service_account: 'github-actions-prod@agi-baby-cherry.iam.gserviceaccount.com'
+          token_format: 'access_token'
+          create_credentials_file: true
+          
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: agi-baby-cherry
+          install_components: 'beta'
+          
+      - name: Terraform Init with GCS Backend and State Locking
+        id: init
+        run: |
+          terraform init \
+            -backend-config="bucket=orchestra-terraform-state" \
+            -backend-config="prefix=terraform/state/prod" \
+            -upgrade
       
       - name: Terraform Workspace
         id: workspace
@@ -131,7 +246,26 @@ jobs:
       
       - name: Terraform Plan
         id: plan
-        run: terraform plan -var="env=prod" -no-color
+        run: |
+          terraform plan \
+            -var="env=prod" \
+            -input=false \
+            -no-color | tee terraform-plan.txt
+        
+      - name: Run Backward Compatibility Check
+        run: |
+          # Check for sensitive changes that could cause issues
+          if grep -q "forces replacement" terraform-plan.txt; then
+            echo "::warning::Plan includes resource replacement - review carefully!"
+            cat terraform-plan.txt | grep -A 3 -B 3 "forces replacement"
+            exit 1
+          fi
+          
+          if grep -q "will be destroyed" terraform-plan.txt; then
+            echo "::warning::Plan includes resource destruction - review carefully!"
+            cat terraform-plan.txt | grep -A 3 -B 3 "will be destroyed"
+            exit 1
+          fi
         
       # Approve before applying to production
       - name: Manual approval for production
@@ -147,4 +281,70 @@ jobs:
       
       - name: Terraform Apply
         id: apply
-        run: terraform apply -auto-approve -var="env=prod"
+        run: |
+          terraform apply \
+            -auto-approve \
+            -var="env=prod" \
+            -input=false
+
+  rollback:
+    name: "Terraform Rollback Plan"
+    runs-on: ubuntu-latest
+    if: failure()
+    needs: [terraform-dev-apply, terraform-prod]
+    defaults:
+      run:
+        working-directory: ./infra/orchestra-terraform
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0 # Use old version for rollback
+
+      - name: Create Rollback Issue
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 Terraform Deployment Failed - Rollback Required',
+              body: `## Terraform Deployment Failed
+
+              A Terraform deployment has failed. Follow these steps to rollback:
+
+              ### Immediate Rollback Steps:
+
+              1. **Restore the previous state file**:
+                 \`\`\`bash
+                 gsutil cp gs://orchestra-terraform-state/terraform/state/backup/* gs://orchestra-terraform-state/terraform/state/
+                 \`\`\`
+
+              2. **Downgrade Terraform version**:
+                 \`\`\`bash
+                 tfenv install 1.5.0
+                 tfenv use 1.5.0
+                 \`\`\`
+
+              3. **Re-run Terraform with the old version**:
+                 \`\`\`bash
+                 cd infra/orchestra-terraform
+                 terraform init -reconfigure
+                 terraform plan
+                 terraform apply
+                 \`\`\`
+
+              ### Detailed Failure Information:
+              
+              - Workflow: ${context.workflow}
+              - Run ID: ${context.runId}
+              - Triggered by: ${context.actor}
+              - SHA: ${context.sha}
+              
+              Please investigate the workflow logs for more details.`
+            })

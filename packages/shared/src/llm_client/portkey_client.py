@@ -36,6 +36,7 @@ except ImportError:
 
 from core.orchestrator.src.config.settings import Settings, get_settings
 from .interface import LLMClient
+from infra.modules.advanced-monitoring.auto_instrumentation import llm_call
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -70,7 +71,7 @@ class PortkeyClient(LLMClient):
             PortkeyClientException: If the Portkey API key is not found in settings.
         """
         self.settings = settings  # Store settings object
-        
+
         # Try to get the Portkey API key from various sources
         self.api_key = self._get_portkey_api_key(settings)
 
@@ -84,21 +85,22 @@ class PortkeyClient(LLMClient):
                 "variables, .env file, or GitHub organization secrets. "
                 "You can get a key from https://portkey.ai."
             )
-            
+
         # Base configuration with API key and trace ID
         portkey_config = {
             "api_key": self.api_key,
             "trace_id": settings.TRACE_ID,
         }
-        
+
         # First approach: Use CONFIG_ID if available
         if settings.PORTKEY_CONFIG_ID:
             portkey_config["config"] = settings.PORTKEY_CONFIG_ID
-            logger.info(f"Initializing Portkey client with Config ID: {settings.PORTKEY_CONFIG_ID}")
+            logger.info(
+                f"Initializing Portkey client with Config ID: {settings.PORTKEY_CONFIG_ID}")
         else:
             # Second approach: Build dynamic config with targets, fallbacks, caching
             targets = []
-            
+
             # Add OpenRouter as primary target if virtual key exists
             if settings.PORTKEY_VIRTUAL_KEY_OPENROUTER:
                 targets.append({
@@ -106,7 +108,7 @@ class PortkeyClient(LLMClient):
                     "virtual_key": settings.PORTKEY_VIRTUAL_KEY_OPENROUTER
                     # Model will come from the API call
                 })
-            
+
             # Add fallbacks conditionally if their virtual keys exist
             if settings.PORTKEY_VIRTUAL_KEY_OPENAI:
                 targets.append({
@@ -114,25 +116,25 @@ class PortkeyClient(LLMClient):
                     "virtual_key": settings.PORTKEY_VIRTUAL_KEY_OPENAI,
                     "override_params": {"model": settings.DEFAULT_LLM_MODEL_FALLBACK_OPENAI}
                 })
-            
+
             if settings.PORTKEY_VIRTUAL_KEY_ANTHROPIC:
                 targets.append({
                     "provider": "anthropic",
                     "virtual_key": settings.PORTKEY_VIRTUAL_KEY_ANTHROPIC,
                     "override_params": {"model": settings.DEFAULT_LLM_MODEL_FALLBACK_ANTHROPIC}
                 })
-            
+
             # Only configure strategy if we have multiple targets
             if len(targets) > 1:
                 strategy_config = {
                     "mode": "fallback",
                     "on_status_codes": [429, 500, 503]
                 }
-                
+
                 portkey_config["strategy"] = strategy_config
                 portkey_config["targets"] = targets
                 portkey_config["retry"] = {"attempts": 3}
-                
+
                 # Add caching if enabled
                 if settings.PORTKEY_CACHE_ENABLED or settings.LLM_SEMANTIC_CACHE_ENABLED:
                     portkey_config["cache"] = {
@@ -141,24 +143,28 @@ class PortkeyClient(LLMClient):
                         "threshold": settings.LLM_SEMANTIC_CACHE_THRESHOLD,
                         "ttl": settings.LLM_SEMANTIC_CACHE_TTL
                     }
-                
-                logger.info(f"Initialized Portkey client with fallback strategy and {len(targets)} targets")
+
+                logger.info(
+                    f"Initialized Portkey client with fallback strategy and {len(targets)} targets")
             elif len(targets) == 1:
-                logger.warning("Only one target provider configured. Fallback strategy disabled.")
+                logger.warning(
+                    "Only one target provider configured. Fallback strategy disabled.")
                 # Still set the single target to use the virtual key
                 portkey_config["provider"] = targets[0]["provider"]
                 portkey_config["virtual_key"] = targets[0]["virtual_key"]
             else:
                 # No targets configured
-                logger.warning("No provider targets configured. Using default Portkey behavior.")
+                logger.warning(
+                    "No provider targets configured. Using default Portkey behavior.")
                 # Use legacy VIRTUAL_KEY if available
                 if settings.VIRTUAL_KEY:
                     portkey_config["virtual_key"] = settings.VIRTUAL_KEY
-                    logger.warning("Using deprecated VIRTUAL_KEY setting. Please update to provider-specific virtual keys.")
+                    logger.warning(
+                        "Using deprecated VIRTUAL_KEY setting. Please update to provider-specific virtual keys.")
 
         # Initialize Portkey client with configured settings
         self._portkey_client = Portkey(**portkey_config)
-        
+
         # Store provider-to-virtual-key mapping for dynamic selection
         self._provider_virtual_keys = {
             "openai": settings.PORTKEY_VIRTUAL_KEY_OPENAI,
@@ -180,10 +186,11 @@ class PortkeyClient(LLMClient):
             "weaviate": settings.PORTKEY_VIRTUAL_KEY_WEAVIATE,
             "elevenlabs": settings.PORTKEY_VIRTUAL_KEY_ELEVENLABS,
         }
-        
+
         # For backward compatibility
         if settings.VIRTUAL_KEY and not any(self._provider_virtual_keys.values()):
-            logger.warning("Using deprecated VIRTUAL_KEY setting. Please update to provider-specific virtual keys.")
+            logger.warning(
+                "Using deprecated VIRTUAL_KEY setting. Please update to provider-specific virtual keys.")
             self._default_virtual_key = settings.VIRTUAL_KEY
         else:
             self._default_virtual_key = None
@@ -195,13 +202,13 @@ class PortkeyClient(LLMClient):
             f"Config ID: {self.settings.PORTKEY_CONFIG_ID}, "
             f"Available virtual keys: {[k for k, v in self._provider_virtual_keys.items() if v]}"
         )
-    
+
     def _get_portkey_api_key(self, settings: Settings) -> Optional[str]:
         """Get Portkey API key from settings, environment, or organization secrets."""
         # First try from settings
         if settings.PORTKEY_API_KEY:
             return settings.PORTKEY_API_KEY
-        
+
         # Then try environment variables with common naming patterns
         for key_name in [
             "PORTKEY_API_KEY",
@@ -213,9 +220,10 @@ class PortkeyClient(LLMClient):
         ]:
             value = os.environ.get(key_name)
             if value:
-                logger.info(f"Using Portkey API key from environment variable: {key_name}")
+                logger.info(
+                    f"Using Portkey API key from environment variable: {key_name}")
                 return value
-                
+
         # Check for GitHub Actions secret format: ${{ secrets.KEY_NAME }}
         for env_key, env_value in os.environ.items():
             if isinstance(env_value, str) and env_value.startswith("${{") and "secrets.PORTKEY" in env_value:
@@ -225,28 +233,29 @@ class PortkeyClient(LLMClient):
                     secret_name = match.group(1)
                     secret_value = os.environ.get(secret_name)
                     if secret_value:
-                        logger.info(f"Using Portkey API key from GitHub secret: {secret_name}")
+                        logger.info(
+                            f"Using Portkey API key from GitHub secret: {secret_name}")
                         return secret_value
-        
+
         return None
 
     def _get_provider_from_model(self, model: str) -> str:
         """
         Determine the provider based on the model name.
-        
+
         Args:
             model: Model identifier (e.g., 'gpt-4', 'claude-3-opus', 'mistral-large')
-            
+
         Returns:
             The provider name (e.g., 'openai', 'anthropic', 'mistral')
         """
         model_lower = model.lower()
-        
+
         # Check for provider prefixes in format "provider/model"
         if "/" in model_lower:
             provider, _ = model_lower.split("/", 1)
             return provider
-        
+
         # Match based on model name patterns
         if any(name in model_lower for name in ["gpt-", "ft:gpt-", "text-davinci", "text-embedding"]):
             return "openai"
@@ -268,7 +277,7 @@ class PortkeyClient(LLMClient):
             return "perplexity"
         elif any(name in model_lower for name in ["codestral"]):
             return "codestral"
-        
+
         # Default to openrouter if we can't determine
         return "openrouter"
 
@@ -281,6 +290,7 @@ class PortkeyClient(LLMClient):
         before_sleep=before_sleep_log(logger, logging.WARNING),
         reraise=True,
     )
+    @llm_call(provider="portkey", track_prompt=True, track_response=False, error_threshold_ms=5000)
     async def generate_response(
         self,
         model: str,
@@ -325,30 +335,35 @@ class PortkeyClient(LLMClient):
         try:
             # Determine provider and virtual key
             provider = self._get_provider_from_model(model)
-            virtual_key = self._provider_virtual_keys.get(provider) or self._default_virtual_key
-            
+            virtual_key = self._provider_virtual_keys.get(
+                provider) or self._default_virtual_key
+
             # Set up client options with model
             client_options = {
                 "default_headers": {"model": model}
             }
-            
+
             # Set up Portkey client with appropriate configuration
             client = self._portkey_client
-            
+
             # Add config ID if available
             if self.settings.PORTKEY_CONFIG_ID:
-                client = client.with_options(config=self.settings.PORTKEY_CONFIG_ID)
-                
+                client = client.with_options(
+                    config=self.settings.PORTKEY_CONFIG_ID)
+
             # Add virtual key and provider if available
             if virtual_key:
-                logger.debug(f"Using virtual key for provider {provider}: {virtual_key}")
-                client = client.with_options(virtual_key=virtual_key, provider=provider)
+                logger.debug(
+                    f"Using virtual key for provider {provider}: {virtual_key}")
+                client = client.with_options(
+                    virtual_key=virtual_key, provider=provider)
             elif provider == "openrouter" and self.settings.OPENROUTER_API_KEY:
                 # Special case for OpenRouter - use direct API key if virtual key not available
-                logger.debug("Using direct OpenRouter API key (no virtual key found)")
+                logger.debug(
+                    "Using direct OpenRouter API key (no virtual key found)")
                 # This ensures backward compatibility with existing OpenRouter integration
                 client = client.with_options(provider="openrouter")
-            
+
             # Create the completion
             completion = await client.chat.completions.create(
                 model=model,
@@ -379,7 +394,8 @@ class PortkeyClient(LLMClient):
 
         except (APITimeoutError, APIConnectionError, APIStatusError) as e:
             # These exceptions will be caught and retried by the decorator
-            logger.warning(f"Retryable error occurred: {type(e).__name__}: {e}")
+            logger.warning(
+                f"Retryable error occurred: {type(e).__name__}: {e}")
             raise
 
         except PortkeyAPIError as e:

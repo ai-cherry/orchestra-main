@@ -3,6 +3,8 @@ Interaction Endpoints for AI Orchestration System.
 
 This module provides API endpoints for user interactions with the system,
 allowing conversations with AI personas while storing conversation history.
+This implementation follows the hexagonal architecture pattern by
+separating API concerns from business logic.
 """
 
 import logging
@@ -13,11 +15,16 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from core.orchestrator.src.api.dependencies.llm import get_llm_client
-from core.orchestrator.src.api.dependencies.memory import get_memory_manager
+from core.orchestrator.src.api.dependencies.memory import get_memory_manager, get_memory_service
+from core.orchestrator.src.services.interaction_service import InteractionService
 from core.orchestrator.src.config.settings import get_settings
 from packages.shared.src.llm_client.interface import LLMClient
 from packages.shared.src.memory.memory_manager import MemoryManager
+from packages.shared.src.memory.services.memory_service import MemoryService
+from packages.shared.src.memory.services.memory_service_factory import MemoryServiceFactory
 from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
+# Commented out due to Pylance error - verify module path or availability
+# from infra.modules.advanced-monitoring.auto_instrumentation import api_endpoint, llm_call
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -28,133 +35,103 @@ router = APIRouter()
 
 class UserInput(BaseModel):
     """User input model for interaction endpoint."""
-    
+
     text: str = Field(..., min_length=1, description="User's message text")
     user_id: Optional[str] = Field(None, description="User identifier")
 
 
+# Dependency for getting the interaction service
+async def get_interaction_service(
+    memory: MemoryManager = Depends(get_memory_manager),
+    llm_client: LLMClient = Depends(get_llm_client),
+) -> InteractionService:
+    """
+    Get the interaction service for processing user interactions.
+
+    This function serves as a FastAPI dependency that creates an instance of
+    the InteractionService using the necessary dependencies.
+
+    Args:
+        memory: The memory manager from the dependency injection system
+        llm_client: The LLM client from the dependency injection system
+
+    Returns:
+        An initialized interaction service
+    """
+    settings = get_settings()
+
+    # Use the memory service directly from the factory via dependency injection
+    memory_service = await get_memory_service()
+
+    # Use the primary model if available, otherwise fall back to the legacy model setting
+    model_to_use = getattr(
+        settings, "DEFAULT_LLM_MODEL_PRIMARY", settings.DEFAULT_LLM_MODEL)
+
+    # Create and return the interaction service
+    return InteractionService(
+        memory_service=memory_service,
+        llm_client=llm_client,
+        default_model=model_to_use,
+    )
+
+
 @router.post("/interact", response_model=Dict[str, str], tags=["interaction"])
+@api_endpoint(name="interact_endpoint", error_threshold_ms=2000, track_request_body=True)
 async def interact(
     user_input: UserInput,
     request: Request,
-    memory: MemoryManager = Depends(get_memory_manager),
-    llm_client: LLMClient = Depends(get_llm_client),
+    interaction_service: InteractionService = Depends(get_interaction_service),
 ) -> Dict[str, str]:
     """
     Process a user interaction.
-    
-    This endpoint receives user input, processes it through the LLM with
-    the active persona, and returns the system's response while storing
-    the conversation in memory.
-    
+
+    This endpoint receives user input, delegates processing to the interaction service,
+    and returns the system's response. The business logic is handled by the service,
+    keeping the API layer focused on HTTP concerns.
+
     Args:
         user_input: The user's input message
         request: The HTTP request object
-        memory: Memory manager for conversation history
-        llm_client: LLM client for generating responses
-        
+        interaction_service: Service for handling user interactions
+
     Returns:
         A dictionary containing the response text and persona information
-        
+
     Raises:
         HTTPException: If processing fails
     """
     try:
-        # Get settings
-        settings = get_settings()
-        
         # Use default user_id if not provided
         if user_input.user_id is None:
             user_input.user_id = "patrick"  # For backward compatibility
             logger.warning("No user_id provided, using default: 'patrick'")
-        
+
         # Retrieve active persona from request state
         persona_config = request.state.active_persona
-        
-        # Log the interaction
-        logger.info(
-            f"Processing interaction with persona: {persona_config.name} for user: {user_input.user_id}"
-        )
-        
-        # Get conversation history
-        history_items = await memory.get_conversation_history(user_id=user_input.user_id, limit=10)
-        
-        # Format history for LLM
-        formatted_history = []
-        for item in history_items:
-            if item.persona_active == persona_config.name:
-                formatted_history.append({
-                    "role": "assistant",
-                    "content": item.text_content
-                })
-            else:
-                formatted_history.append({
-                    "role": "user",
-                    "content": item.text_content
-                })
-        
-        # Construct system prompt using persona_config
-        system_message = {
-            "role": "system",
-            "content": f"You are {persona_config.name}. {persona_config.description}"
-        }
-        
-        # Add current user message
-        user_message = {
-            "role": "user",
-            "content": user_input.text
-        }
-        
-        # Combine messages
-        messages = [system_message] + formatted_history + [user_message]
-        
-        # Call LLM
-        try:
-            # Use the primary model if available, otherwise fall back to the legacy model setting
-            model_to_use = getattr(settings, "DEFAULT_LLM_MODEL_PRIMARY", settings.DEFAULT_LLM_MODEL)
-            
-            logger.info(f"Calling LLM with model: {model_to_use}")
-            llm_response_text = await llm_client.generate_response(
-                model=model_to_use,
-                messages=messages,
-                temperature=0.7,
-                max_tokens=1000,
-                user_id=user_input.user_id,
-                active_persona_name=persona_config.name
-            )
-        except Exception as e:
-            logger.error(f"LLM call failed: {e}")
-            raise HTTPException(
-                status_code=500,
-                detail=f"Failed to generate response: {str(e)}"
-            )
-        
-        # Create memory item for the response
-        memory_item = MemoryItem(
+
+        # Extract session ID and request ID from request state if available
+        session_id = str(request.state.session_id) if hasattr(
+            request.state, "session_id") else None
+        request_id = getattr(request.state, "request_id", None)
+
+        # Delegate to the interaction service
+        response_text, persona_name = await interaction_service.process_interaction(
             user_id=user_input.user_id,
-            session_id=str(request.state.session_id) if hasattr(request.state, "session_id") else None,
-            item_type="message",
-            persona_active=persona_config.name,
-            text_content=llm_response_text,
-            timestamp=datetime.utcnow(),
-            metadata={
-                "source": "llm",
-                "model": model_to_use,  # Store the actual model used
-                "request_id": getattr(request.state, "request_id", None)
-            }
+            user_message=user_input.text,
+            persona_config=persona_config,
+            session_id=session_id,
+            request_id=request_id,
         )
-        
-        # Save to memory
-        await memory.add_memory_item(memory_item)
-        
+
         # Return response
         return {
-            "response": llm_response_text,
-            "persona": persona_config.name
+            "response": response_text,
+            "persona": persona_name
         }
-    
+
     except Exception as e:
         logger.error(f"Interaction processing failed: {e}", exc_info=True)
+        logger.warning("Interaction processing failure may impact user experience or conversation continuity.")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to process interaction: {str(e)}"

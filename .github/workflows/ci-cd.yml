@@ -16,22 +16,36 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
-          cache: 'pip'
+          python-version: '3.11'
+      
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.6.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-python-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+      
+      - name: Display file contents for debugging
+        run: cat pyproject.toml
       
       - name: Install dependencies
         run: |
-          python3 -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          pip install pytest pytest-cov flake8
+          poetry install --with dev
       
       - name: Lint with flake8
         run: |
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          poetry run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           
       - name: Test with pytest
         run: |
-          pytest tests/ --cov=./ --cov-report=xml
+          poetry run pytest tests/ --cov=./ --cov-report=xml
       
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -67,6 +81,8 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/orchestra:${{ env.BRANCH_NAME }}
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/orchestra:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/orchestra:buildcache,mode=max
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
   
   deploy:
     name: Deploy to Environment
@@ -79,10 +95,21 @@ jobs:
       - name: Checkout for deployment scripts
         uses: actions/checkout@v3
       
-      - name: Set up Google Cloud Auth
-        uses: google-github-actions/auth@v1
+      - name: Determine Environment
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "ENV_TYPE=prod" >> $GITHUB_ENV
+          else
+            echo "ENV_TYPE=staging" >> $GITHUB_ENV
+          fi
+      
+      - name: Authenticate to Google Cloud with OIDC
+        uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+          workload_identity_provider: projects/${{ secrets.GCP_PROJECT_ID }}/locations/global/workloadIdentityPools/github-pool-${{ env.ENV_TYPE }}/providers/github-provider-${{ env.ENV_TYPE }}
+          service_account: github-actions-${{ env.ENV_TYPE }}@${{ secrets.GOOGLE_CLOUD_PROJECT }}.iam.gserviceaccount.com
+          token_format: access_token
+          create_credentials_file: true
       
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
@@ -101,16 +128,8 @@ jobs:
           ENV_NAME=$([[ "$BRANCH_NAME" == "main" ]] && echo "production" || echo "staging")
           echo "Deploying to $ENV_NAME environment"
           
-          # Set Firestore credentials for memory manager
-          kubectl create secret generic firestore-creds \
-            --from-literal=project-id=${{ secrets.GOOGLE_CLOUD_PROJECT }} \
-            --from-literal=credentials-path="/app/credentials.json" \
-            --dry-run=client -o yaml | kubectl apply -f -
-            
           # Create or update the GCP service account credentials secret
-          kubectl create secret generic gcp-credentials \
-            --from-file=credentials.json=${{ secrets.GCP_SERVICE_ACCOUNT_KEY_FILE_PATH }} \
-            --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create secret generic gcp-credentials --from-file=credentials.json=${{ secrets.GCP_SERVICE_ACCOUNT_KEY_FILE_PATH }} --dry-run=client -o yaml | kubectl apply -f -
           
           # Deploy with updated image tag
           kubectl set image deployment/orchestra-app orchestra-app=${{ secrets.DOCKERHUB_USERNAME }}/orchestra:$BRANCH_NAME

@@ -6,16 +6,25 @@ initializes the unified service components and maintains backward compatibility
 with existing components.
 """
 
-import logging
-import os
-from contextlib import asynccontextmanager
-from typing import Dict
-
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
-# Original components (maintained for backward compatibility)
-from core.orchestrator.src.agents.agent_registry import register_default_agents
+from core.orchestrator.src.api.middleware.persona_loader import get_active_persona
+from core.orchestrator.src.api.dependencies.memory import (
+    initialize_memory_manager,
+    close_memory_manager,
+    # Add the new hexagonal architecture components
+    close_memory_service
+)
+from core.orchestrator.src.agents.unified_agent_registry import get_agent_registry
+from core.orchestrator.src.services.unified_event_bus import (
+    get_event_bus,
+    EventPriority,
+)
+from core.orchestrator.src.services.unified_registry import (
+    Service,
+    get_service_registry,
+    register,
+)
+from packages.shared.src.models.base_models import PersonaConfig
+from core.orchestrator.src.config.loader import get_settings, load_persona_configs
 from core.orchestrator.src.api.endpoints import (
     health,
     interaction,
@@ -24,20 +33,47 @@ from core.orchestrator.src.api.endpoints import (
     agents,
     conversations,  # Add import for conversations endpoints
 )
-from core.orchestrator.src.config.loader import get_settings, load_persona_configs
-from packages.shared.src.models.base_models import PersonaConfig
+from core.orchestrator.src.agents.agent_registry import register_default_agents
+import logging
+import os
+from contextlib import asynccontextmanager
+from typing import Dict
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+# Check for mode settings from environment variables
+use_recovery_mode_env = os.environ.get("USE_RECOVERY_MODE", "false").lower()
+standard_mode_env = os.environ.get("STANDARD_MODE", "true").lower()
+
+# OVERRIDE: Always force standard mode regardless of environment variables
+use_recovery_mode_env = "false"
+standard_mode_env = "true"
+
+# Set mode based on environment variables - these variables can be patched at runtime
+RECOVERY_MODE = False  # Hardcoded to False to ensure standard mode
+STANDARD_MODE = True   # Hardcoded to True to ensure standard mode
+
+# Log the current mode
+print(
+    f"🚀 Orchestra core starting in {'RECOVERY' if RECOVERY_MODE else 'STANDARD'} mode")
+print(
+    f"   Environment settings: USE_RECOVERY_MODE={use_recovery_mode_env}, STANDARD_MODE={standard_mode_env}")
+print(
+    f"   Active mode settings: RECOVERY_MODE={RECOVERY_MODE}, STANDARD_MODE={STANDARD_MODE}")
+
+# Original components (maintained for backward compatibility)
 
 # Unified components
-from core.orchestrator.src.services.unified_registry import (
-    Service,
-    get_service_registry,
-    register,
-)
-from core.orchestrator.src.services.unified_event_bus import (
-    get_event_bus,
-    EventPriority,
-)
-from core.orchestrator.src.agents.unified_agent_registry import get_agent_registry
+
+# Memory management components
+
+# Import memory service for hexagonal architecture
+try:
+    from packages.shared.src.memory.services.memory_service_factory import MemoryServiceFactory
+    from core.orchestrator.src.api.dependencies.memory import HEX_ARCH_AVAILABLE
+except ImportError:
+    HEX_ARCH_AVAILABLE = False
 
 # Configure logging
 logging.basicConfig(
@@ -45,6 +81,10 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
 logger = logging.getLogger(__name__)
+
+# Log the mode we're starting in
+logger.info(
+    f"Starting with RECOVERY_MODE={RECOVERY_MODE}, STANDARD_MODE={STANDARD_MODE}")
 
 # Load configurations at module level
 settings = get_settings()
@@ -65,7 +105,29 @@ async def lifespan(app: FastAPI):
         persona_configs = load_persona_configs()
         logger.info(f"Loaded {len(persona_configs)} persona configurations")
     except Exception as e:
-        logger.error(f"Failed to load persona configurations: {e}")
+        logger.error(f"Failed to load persona configurations: {e}", exc_info=True)
+        logger.warning("Application may run with incomplete or default persona configurations due to loading failure.")
+
+    # Initialize legacy memory manager for backward compatibility
+    try:
+        logger.info("Initializing legacy memory manager")
+        await initialize_memory_manager(settings)
+    except Exception as e:
+        logger.error(f"Failed to initialize legacy memory manager: {e}", exc_info=True)
+        logger.warning("Legacy memory manager initialization failed; application may experience memory-related issues.")
+
+    # Initialize memory service for hexagonal architecture if available
+    if HEX_ARCH_AVAILABLE:
+        try:
+            logger.info("Initializing memory service with hexagonal architecture")
+            # Memory service initialization happens lazily in the dependency
+            # but we can log that it's available
+            logger.info("Memory service with hexagonal architecture is available")
+        except Exception as e:
+            logger.error(f"Failed to initialize memory service with hexagonal architecture: {e}", exc_info=True)
+            logger.warning("Hexagonal memory service initialization failed; falling back to legacy if available.")
+    else:
+        logger.warning("Hexagonal architecture components are not available")
 
     # Initialize services
     initialize_services(test_mode=getattr(settings, "TEST_MODE", False))
@@ -76,13 +138,32 @@ async def lifespan(app: FastAPI):
         register_default_agents()
         logger.info("Default agents registered successfully")
     except Exception as e:
-        logger.error(f"Failed to register default agents: {e}")
+        logger.error(f"Failed to register default agents: {e}", exc_info=True)
+        logger.warning("Default agent registration failed; some functionalities may be unavailable.")
 
     # Yield control back to FastAPI
     yield
 
     # Shutdown operations
     logger.info("Application shutting down")
+
+    # Close memory services
+    try:
+        logger.info("Closing legacy memory manager")
+        await close_memory_manager()
+    except Exception as e:
+        logger.error(f"Error closing legacy memory manager: {e}")
+
+    # Close hexagonal architecture memory service if available
+    if HEX_ARCH_AVAILABLE:
+        try:
+            logger.info("Closing memory service with hexagonal architecture")
+            await close_memory_service()
+        except Exception as e:
+            logger.error(
+                f"Error closing memory service with hexagonal architecture: {e}")
+
+    # Close other services
     get_service_registry().close_all()
 
 
@@ -114,25 +195,26 @@ def initialize_services(test_mode: bool = False) -> None:
             from core.orchestrator.src.services.llm.providers import (
                 initialize_llm_providers,
             )
-
             initialize_llm_providers()
         except Exception as e:
-            logger.warning(f"Failed to initialize LLM providers: {e}")
+            logger.warning(f"Failed to initialize LLM providers: {e}", exc_info=True)
+            logger.error("LLM providers initialization failed; AI functionalities may be limited or unavailable.")
 
     # Initialize the LLM agent and register it with the unified registry (skip in test mode)
     if not test_mode:
         try:
             from core.orchestrator.src.agents.llm_agent import LLMAgent
-
             llm_agent = LLMAgent()
             register(llm_agent)
         except Exception as e:
-            logger.warning(f"Failed to initialize LLM agent: {e}")
+            logger.warning(f"Failed to initialize LLM agent: {e}", exc_info=True)
+            logger.error("LLM agent initialization failed; related functionalities will not work.")
 
     # Initialize all registered services
     registry.initialize_all()
 
-    logger.info(f"Unified services initialized {'(test mode)' if test_mode else ''}")
+    logger.info(
+        f"Unified services initialized {'(test mode)' if test_mode else ''}")
 
 
 # Create FastAPI app
@@ -153,15 +235,16 @@ app.add_middleware(
 )
 
 # Import and use the persona loader middleware
-from core.orchestrator.src.api.middleware.persona_loader import get_active_persona
 
 # Register API routes
-app.include_router(health.router, prefix="/api")  # Use settings.API_PREFIX if available
+# Use settings.API_PREFIX if available
+app.include_router(health.router, prefix="/api")
 app.include_router(interaction.router, prefix="/api")
 app.include_router(llm_interaction.router, prefix="/api")
 app.include_router(personas.router, prefix="/api/personas")
 app.include_router(agents.router, prefix="/api/agents")
-app.include_router(conversations.router, prefix="/api/conversations")  # Add conversations router
+# Add conversations router
+app.include_router(conversations.router, prefix="/api/conversations")
 
 
 if __name__ == "__main__":

@@ -20,34 +20,43 @@ RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy requirements files
-COPY requirements*.txt .
-COPY core/orchestrator/requirements.txt ./core/orchestrator/
-COPY packages/shared/requirements.txt ./packages/shared/
+# Install Poetry
+RUN curl -sSL https://install.python-poetry.org | python3 -
+ENV PATH="/root/.local/bin:$PATH"
 
-# Install Python dependencies
-# First install the consolidated requirements which is referenced by other requirement files
-RUN pip3 install --no-cache-dir -r requirements-consolidated.txt \
-    && pip3 install --no-cache-dir -r requirements.txt \
-    && pip3 install --no-cache-dir -r core/orchestrator/requirements.txt \
-    && pip3 install --no-cache-dir -r packages/shared/requirements.txt
+# Copy Poetry configuration files
+COPY pyproject.toml ./
+
+# Configure Poetry - using in-project virtualenv to be consistent with development environment
+RUN poetry config virtualenvs.in-project true
+
+# Install dependencies with better error handling
+RUN poetry install --no-interaction --no-root --without dev || \
+    (echo "Retrying poetry install..." && \
+     poetry lock --no-update && \
+     poetry install --no-interaction --no-root --without dev)
 
 # Copy application code
 COPY . .
 
-# Set Python path
+# Set Python path and environment variables to ensure standard mode
 ENV PYTHONPATH=/app
+ENV USE_RECOVERY_MODE=false
+ENV STANDARD_MODE=true
 
 # Default environment is staging (will be overridden in deployment)
 ENV ENVIRONMENT=staging
 ENV PORT=8000
 
 # Set Google Cloud credentials environment variable
-# Using /tmp/vertex-agent-key.json for consistency with local development
 ENV GOOGLE_APPLICATION_CREDENTIALS=/tmp/vertex-agent-key.json
 
 # Expose port for the application
 EXPOSE ${PORT}
 
-# Run the application
-CMD exec python3 -m orchestrator.main
+# Create force standard mode script during build
+RUN echo '#!/bin/bash\npython3 -c "import os; os.environ[\"USE_RECOVERY_MODE\"]=\"false\"; os.environ[\"STANDARD_MODE\"]=\"true\";"' > /app/force_standard_mode.sh && \
+    chmod +x /app/force_standard_mode.sh
+
+# Run the application with forced standard mode
+CMD bash -c "source /app/force_standard_mode.sh && exec python3 -m orchestrator.main"

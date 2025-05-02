@@ -54,7 +54,7 @@ python test_personas_api_manually.py
 
 ## Deployment
 
-Orchestra provides a streamlined deployment process for both development and production environments:
+Orchestra provides a streamlined deployment process for both development and production environments using **Google Cloud Run** as the primary deployment target. For detailed information on our deployment approach and rationale, see the [Deployment Strategy](./DEPLOYMENT_STRATEGY.md) document.
 
 ### Development Deployment
 
@@ -65,6 +65,22 @@ Verify your development setup before proceeding to production:
 ```
 
 This runs comprehensive checks including environment validation, integrated services connectivity, and test validations.
+
+### Secret Management in CI/CD
+
+We've implemented secure secret management in our CI/CD pipeline. Key features:
+
+- Secrets stored in GitHub Secrets and GCP Secret Manager
+- Automated secret handling during deployments
+- Pre-commit hooks to prevent accidental secret commits
+- IAM-based access control
+
+See [Secret Management CI/CD Documentation](docs/SECRET_MANAGEMENT_CICD.md) for details.
+
+To set up the pre-commit hook for local development:
+```bash
+./scripts/install-pre-commit-hook.sh
+```
 
 ### Production Deployment
 
@@ -96,7 +112,7 @@ After deployment, you'll have two Cloud Run services:
 - `orchestrator-api-prod`: The Orchestra backend API
 - `phidata-agent-ui-prod`: The Phidata Agent UI frontend
 
-For detailed deployment documentation, refer to the [Production Deployment Guide](./docs/PRODUCTION_DEPLOYMENT_GUIDE.md).
+For detailed deployment documentation, refer to the [Production Deployment Guide](./docs/PRODUCTION_DEPLOYMENT_GUIDE.md) and the [Deployment Strategy](./DEPLOYMENT_STRATEGY.md).
 
 ## Development
 

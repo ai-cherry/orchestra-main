@@ -1,0 +1,34 @@
+name: Turbo Deployment
+on: [push]
+
+jobs:
+  deploy:
+    runs-on: vertex-ai
+    strategy:
+      matrix:
+        python: ["3.11"]
+        region: ["us-central1"]
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Auth GCP
+      uses: google-github-actions/auth@v2
+      with:
+        workload_identity_provider: projects/104944497835/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+        service_account: vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
+
+    - name: AI Code Review
+      run: |
+        gcloud alpha ai code-assist review \
+          --source=. \
+          --category=security,performance \
+          --project=agi-baby-cherry
+
+    - name: Turbo Deploy
+      run: |
+        gcloud run deploy orchestra-prod \
+          --image=us-docker.pkg.dev/agi-baby-cherry/orchestra/app:latest \
+          --set-env-vars=PORTKEY_API_KEY=${{ secrets.PORTKEY_API_KEY }} \
+          --args=--ai-mode=turbo
