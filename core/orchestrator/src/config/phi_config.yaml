@@ -1,0 +1,13 @@
+storage:
+  type: gcp-firestore
+  project: agi-baby-cherry
+  collection: agent_sessions
+
+monitoring:
+  enabled: true
+  provider: vertex-ai
+  service_account: vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
+
+tools:
+  - type: portkey
+    api_key_secret: projects/agi-baby-cherry/secrets/portkey-api-key

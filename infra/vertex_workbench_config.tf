@@ -219,7 +219,7 @@ resource "google_redis_instance" "cache" {
 resource "google_secret_manager_secret" "vertex_api_key" {
   secret_id = "vertex-api-key"
   replication {
-    auto {}
+    automatic = true
   }
   
   depends_on = [
@@ -235,7 +235,7 @@ resource "google_secret_manager_secret_version" "vertex_api_key_version" {
 resource "google_secret_manager_secret" "redis_auth" {
   secret_id = "redis-auth"
   replication {
-    auto {}
+    automatic = true
   }
 }
 
@@ -247,7 +247,7 @@ resource "google_secret_manager_secret_version" "redis_auth_version" {
 resource "google_secret_manager_secret" "firestore_backup_credentials" {
   secret_id = "firestore-backup-credentials"
   replication {
-    auto {}
+    automatic = true
   }
 }
 

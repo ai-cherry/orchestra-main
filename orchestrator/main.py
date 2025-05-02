@@ -12,10 +12,17 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
-# HARD OVERRIDE: Force standard mode and disable recovery mode unconditionally
-print("⚠️ APPLYING HARD OVERRIDE: Forcing standard mode and disabling recovery mode!")
-RECOVERY_MODE = False
-STANDARD_MODE = True
+# Read mode from environment variables
+use_recovery_mode_env = os.environ.get("USE_RECOVERY_MODE", "false").lower()
+standard_mode_env = os.environ.get("STANDARD_MODE", "true").lower()
+
+# Set mode based on environment variables
+RECOVERY_MODE = use_recovery_mode_env == "true"
+STANDARD_MODE = standard_mode_env == "true"
+
+# Log the selected mode
+print(f"🔧 Starting Orchestra in {'RECOVERY' if RECOVERY_MODE else 'STANDARD'} mode")
+print(f"   Environment settings: USE_RECOVERY_MODE={use_recovery_mode_env}, STANDARD_MODE={standard_mode_env}")
 
 # Debug: Print all environment variables to help diagnose issues
 print("===== DEBUG: Environment Variables at Startup =====")
@@ -31,22 +38,9 @@ print("===== DEBUG: End Environment Info =====")
 from config.gcp_config import get_gcp_config, get_memory_manager_config
 from packages.shared.src.memory.memory_manager import MemoryManagerFactory
 
-# These values are ignored due to the hard override above, but we keep them for informational purposes
-use_recovery_mode_env = os.environ.get("USE_RECOVERY_MODE", "false").lower()
-standard_mode_env = os.environ.get("STANDARD_MODE", "true").lower()
-
-# These values are ignored due to the hard override above, but we keep them for logging
-env_recovery_mode = use_recovery_mode_env == "true"
-env_standard_mode = standard_mode_env == "true"
-
-# Debug: Print parsed values
-print(f"DEBUG: Environment would set RECOVERY_MODE={env_recovery_mode}")
-print(f"DEBUG: Environment would set STANDARD_MODE={env_standard_mode}")
-print(f"DEBUG: HARD OVERRIDE ACTIVE: RECOVERY_MODE={RECOVERY_MODE}, STANDARD_MODE={STANDARD_MODE}")
-
 # Log the mode we're starting in
-logger.info(f"Starting with RECOVERY_MODE={RECOVERY_MODE}, STANDARD_MODE={STANDARD_MODE} (HARD OVERRIDE)")
-print(f"Starting with RECOVERY_MODE={RECOVERY_MODE}, STANDARD_MODE={STANDARD_MODE} (HARD OVERRIDE)")
+logger.info(f"Starting with RECOVERY_MODE={RECOVERY_MODE}, STANDARD_MODE={STANDARD_MODE}")
+print(f"Starting with RECOVERY_MODE={RECOVERY_MODE}, STANDARD_MODE={STANDARD_MODE}")
 
 # Configure logging
 logging.basicConfig(
@@ -109,7 +103,7 @@ async def startup_event():
     register_default_agents()
 
     logger.info("System initialization complete")
-    logger.info(f"Starting API in STANDARD MODE in {environment} environment")
+    logger.info(f"Starting API in {'STANDARD' if STANDARD_MODE else 'RECOVERY'} MODE in {environment} environment")
 
 # Shutdown cleanup
 
@@ -128,7 +122,7 @@ async def health_check():
     environment = os.environ.get("ENVIRONMENT", "development")
     return {
         "status": "Service is healthy",
-        "mode": "standard",
+        "mode": "standard" if STANDARD_MODE else "recovery",
         "environment": environment,
         "recovery_mode": RECOVERY_MODE
     }

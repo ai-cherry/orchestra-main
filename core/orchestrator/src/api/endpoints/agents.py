@@ -124,6 +124,7 @@ async def _execute_agent_task(agent, context: Dict[str, Any], task_id: str) -> N
         
     except Exception as e:
         logger.error(f"Agent task {task_id} failed with error: {str(e)}", exc_info=True)
+        logger.warning(f"Failure of agent task {task_id} may affect dependent processes or results.")
         
     finally:
         # Ensure agent is properly shut down
@@ -131,4 +132,5 @@ async def _execute_agent_task(agent, context: Dict[str, Any], task_id: str) -> N
             agent.shutdown()
             logger.debug(f"Agent {agent.name} shut down after task {task_id}")
         except Exception as e:
-            logger.warning(f"Error shutting down agent: {str(e)}")
+            logger.warning(f"Error shutting down agent: {str(e)}", exc_info=True)
+            logger.warning(f"Agent shutdown failure for {agent.name} may lead to resource leaks.")

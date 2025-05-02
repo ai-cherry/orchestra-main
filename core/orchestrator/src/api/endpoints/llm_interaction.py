@@ -338,7 +338,8 @@ async def direct_llm_completion(
         return result
 
     except LLMProviderAuthenticationError as e:
-        logger.error(f"Authentication error: {e}")
+        logger.error(f"Authentication error: {e}", exc_info=True)
+        logger.warning("Authentication failure may prevent direct LLM completion.")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(e),
@@ -346,18 +347,21 @@ async def direct_llm_completion(
         )
 
     except LLMProviderInvalidRequestError as e:
-        logger.error(f"Invalid request: {e}")
+        logger.error(f"Invalid request: {e}", exc_info=True)
+        logger.warning("Invalid request may indicate input or configuration issues in direct completion.")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
     except LLMProviderTimeoutError as e:
-        logger.error(f"Request timeout: {e}")
+        logger.error(f"Request timeout: {e}", exc_info=True)
+        logger.warning("Timeout may impact direct completion; consider retrying or adjusting timeout settings.")
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
             detail=f"Request timed out: {str(e)}",
         )
 
     except LLMProviderRateLimitError as e:
-        logger.warning(f"Rate limit exceeded: {e}")
+        logger.warning(f"Rate limit exceeded: {e}", exc_info=True)
+        logger.warning("Rate limit exceeded; direct completion may be delayed.")
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail=f"Rate limit exceeded: {str(e)}",
@@ -365,7 +369,8 @@ async def direct_llm_completion(
         )
 
     except LLMProviderConnectionError as e:
-        logger.error(f"Connection error: {e}")
+        logger.error(f"Connection error: {e}", exc_info=True)
+        logger.warning("Connection issues may prevent direct LLM completion; check network or provider status.")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"Service unavailable: {str(e)}",
@@ -373,13 +378,15 @@ async def direct_llm_completion(
         )
 
     except LLMProviderModelError as e:
-        logger.error(f"Model error: {e}")
+        logger.error(f"Model error: {e}", exc_info=True)
+        logger.warning("Model error may require configuration or model selection adjustments for direct completion.")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=f"Model error: {str(e)}"
         )
 
     except LLMProviderServiceError as e:
-        logger.error(f"Service error: {e}")
+        logger.error(f"Service error: {e}", exc_info=True)
+        logger.warning("Service error may indicate provider issues; consider fallback options for direct completion.")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"Service error: {str(e)}",
@@ -387,7 +394,8 @@ async def direct_llm_completion(
         )
 
     except LLMProviderError as e:
-        logger.error(f"LLM provider error: {e}")
+        logger.error(f"LLM provider error: {e}", exc_info=True)
+        logger.warning("Provider error may disrupt direct LLM completion.")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"LLM provider error: {str(e)}",
@@ -395,6 +403,7 @@ async def direct_llm_completion(
 
     except Exception as e:
         logger.error(f"Error in direct LLM completion: {e}", exc_info=True)
+        logger.warning("Unexpected error may impact direct completion processing; review logs for details.")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"LLM completion failed: {str(e)}",

@@ -1,167 +1,204 @@
 steps:
-# Step 1: Initialize Terraform and select/create workspace
-- name: 'hashicorp/terraform:latest'
+# Setup Python and dependencies
+- name: 'python:3.11-slim'
+  id: 'install-dependencies'
   entrypoint: 'bash'
   args:
     - '-c'
     - |
-      set -e
-      cd infra/orchestra-terraform
-      terraform init -upgrade
-      terraform workspace select $_ENV || terraform workspace new $_ENV
-  dir: '.' # Run from the root, then cd into terraform dir
-  id: 'terraform-init-workspace'
-
-# Step 2: Apply Terraform configuration
-- name: 'hashicorp/terraform:latest'
+      pip install poetry
+      poetry install
+      
+# Run linting and formatting checks
+- name: 'python:3.11-slim'
+  id: 'linting'
   entrypoint: 'bash'
   args:
     - '-c'
     - |
-      set -e
-      cd infra/orchestra-terraform
-      terraform apply -auto-approve -var="env=$_ENV"
-  dir: '.' # Run from the root, then cd into terraform dir
-  id: 'terraform-apply'
+      pip install poetry
+      poetry install
+      poetry add black isort flake8
+      echo "Running code formatting check with black..."
+      poetry run black --check . || echo "Warning: Formatting check with black failed. Please format your code."
+      echo "Running import sorting check with isort..."
+      poetry run isort --check-only --diff . || echo "Warning: Import sorting check with isort failed. Please sort your imports."
+      echo "Running linting check with flake8..."
+      poetry run flake8 . || echo "Warning: Linting check with flake8 failed. Please fix the issues reported by flake8."
+      # We're making these non-blocking for debugging purposes, similar to the GitHub workflow
 
-# Step 3: Build and Push Orchestra API Docker Image
+# Run critical tests
+- name: 'python:3.11-slim'
+  id: 'critical-tests'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      pip install poetry
+      poetry install
+      export PYTHONPATH=$(pwd)
+      poetry run pytest tests/ -m critical -v
+  # This will fail the build if tests fail because we don't specify allowFailure: true
+
+# Pre-deployment Gemini code analysis using Vertex AI
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+  id: 'gemini-code-analysis'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      echo "Running pre-deployment Gemini code analysis..."
+      gcloud auth configure-docker
+      
+      # Set up Python
+      apt-get update && apt-get install -y python3-pip
+      pip3 install google-cloud-aiplatform pyyaml
+      
+      # Create a Python script to run Gemini analysis
+      cat > gemini_analyzer.py << 'EOF'
+      import os
+      import sys
+      import yaml
+      import glob
+      from google.cloud import aiplatform
+      
+      # Initialize Vertex AI with the project and region
+      aiplatform.init(project='agi-baby-cherry', location='us-central1')
+      
+      # Load prompt templates
+      with open('templates/gemini_prompts.yaml', 'r') as f:
+          prompts = yaml.safe_load(f)['prompts']
+      
+      # Function to analyze code with Gemini
+      def analyze_code(file_pattern, prompt_key='fix_code'):
+          prompt_template = prompts[prompt_key]['context']
+          
+          # Find files matching the pattern
+          files = glob.glob(file_pattern, recursive=True)
+          if not files:
+              print(f"No files found matching pattern: {file_pattern}")
+              return
+          
+          # Process each file
+          for file_path in files:
+              try:
+                  with open(file_path, 'r') as f:
+                      code_content = f.read()
+                  
+                  if not code_content.strip():
+                      print(f"File {file_path} is empty, skipping.")
+                      continue
+                  
+                  print(f"Analyzing {file_path}...")
+                  
+                  # Create the prompt
+                  prompt = f"{prompt_template}\n\nFile: {file_path}\n\n```\n{code_content}\n```\n\nAnalysis:"
+                  
+                  # Call Gemini model
+                  model = aiplatform.VertexAI(
+                      model_name="gemini-pro",
+                      max_output_tokens=1024,
+                      temperature=0,
+                  )
+                  
+                  response = model.predict(prompt)
+                  
+                  print(f"\n--- Analysis for {file_path} ---")
+                  print(response.text)
+                  print(f"--- End of analysis for {file_path} ---\n")
+                  
+              except Exception as e:
+                  print(f"Error analyzing {file_path}: {str(e)}")
+      
+      # Analyze key files
+      analyze_code("core/orchestrator/src/**/*.py")
+      analyze_code("agent/**/*.py")
+      analyze_code("packages/**/*.py")
+      analyze_code("Dockerfile")
+      EOF
+      
+      # Run the analysis
+      python3 gemini_analyzer.py
+
+# Build and push Docker image
 - name: 'gcr.io/cloud-builders/docker'
+  id: 'build-docker-image'
   args:
     - 'build'
     - '-t'
-    - '$_ARTIFACT_REGISTRY_REPO/orchestrator:$_ENV-$SHORT_SHA'
-    - '.' # Build context is the root of the repository
-  id: 'docker-build'
+    - 'us-docker.pkg.dev/agi-baby-cherry/orchestra/app:latest'
+    - '.'
 
 - name: 'gcr.io/cloud-builders/docker'
+  id: 'push-docker-image'
   args:
     - 'push'
-    - '$_ARTIFACT_REGISTRY_REPO/orchestrator:$_ENV-$SHORT_SHA'
-  id: 'docker-push'
+    - 'us-docker.pkg.dev/agi-baby-cherry/orchestra/app:latest'
 
-# Step 4: Setup PostgreSQL Schema (Conditional)
-# This step assumes the setup script is idempotent and can be run safely.
-# Database credentials should be configured as Cloud Build secrets.
-- name: 'python:3.9' # Use a Python builder
-  entrypoint: 'bash'
-  args:
-    - '-c'
-    - |
-      set -e
-      # Install dependencies if needed, e.g., pip install -r requirements.txt
-      # Ensure necessary environment variables for DB connection are set via Cloud Build secrets
-      python scripts/setup_postgres_pgvector.py
-  dir: '.'
-  id: 'postgres-setup'
-  # Access database credentials securely via Cloud Build secrets
-  # You need to configure these secrets in the Cloud Build settings
-  # and grant the Cloud Build service account access to them in Secret Manager.
-  secretEnv: ['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASSWORD'] # Example environment variables
-secrets:
-- secretManager:
-  - versionName: projects/$_PROJECT_ID/secrets/postgres-host-${_ENV}/versions/latest
-    env: 'DB_HOST'
-  - versionName: projects/$_PROJECT_ID/secrets/postgres-db-name-${_ENV}/versions/latest
-    env: 'DB_NAME'
-  - versionName: projects/$_PROJECT_ID/secrets/postgres-user-${_ENV}/versions/latest
-    env: 'DB_USER'
-  - versionName: projects/$_PROJECT_ID/secrets/postgres-password-${_ENV}/versions/latest
-    env: 'DB_PASSWORD'
-
-# Step 5: Deploy Orchestra API to Cloud Run
+# Scan Docker image for vulnerabilities
 - name: 'gcr.io/cloud-builders/gcloud'
+  id: 'vulnerability-scan'
   entrypoint: 'bash'
   args:
     - '-c'
     - |
-      set -e
-      # Retrieve necessary values from Terraform outputs dynamically
-      TERRAFORM_DIR="infra/orchestra-terraform"
-      API_SERVICE_NAME=$(terraform -chdir="$TERRAFORM_DIR" output -raw orchestra_api_service_name)
-      GCP_REGION=$(terraform -chdir="$TERRAFORM_DIR" output -raw gcp_region)
-      RUN_SA_EMAIL=$(terraform -chdir="$TERRAFORM_DIR" output -raw cloud_run_sa_email)
-      VPC_CONNECTOR_ID=$(terraform -chdir="$TERRAFORM_DIR" output -raw vpc_connector_id 2>/dev/null || echo "")
-
-      IMAGE_TAG="$_ARTIFACT_REGISTRY_REPO/orchestrator:$_ENV-$SHORT_SHA"
-
-      # Determine Log Level and Authentication Flag
-      LOG_LEVEL="DEBUG"
-      ALLOW_UNAUTH_FLAG="--allow-unauthenticated"
-      if [[ "$_ENV" == "prod" ]]; then
-        LOG_LEVEL="INFO"
-        ALLOW_UNAUTH_FLAG="" # Consider --no-allow-unauthenticated for prod API
+      echo "Scanning Docker image for vulnerabilities..."
+      gcloud artifacts docker images scan \
+        us-docker.pkg.dev/agi-baby-cherry/orchestra/app:latest \
+        --format=json | tee scan-results.json
+      
+      # Check for critical/high vulnerabilities and fail the build if found
+      CRITICAL_COUNT=$(grep -c '"severity": "CRITICAL"' scan-results.json || true)
+      HIGH_COUNT=$(grep -c '"severity": "HIGH"' scan-results.json || true)
+      
+      echo "Found $CRITICAL_COUNT critical and $HIGH_COUNT high severity vulnerabilities"
+      
+      if [ "$CRITICAL_COUNT" -gt 0 ] || [ "$HIGH_COUNT" -gt 3 ]; then
+        echo "Security scan failed due to too many critical/high vulnerabilities"
+        exit 1
       fi
 
-      # Construct Env Vars string (sensitive vars should use secretKeyRef in TF)
-      ENV_VARS="ENVIRONMENT=$_ENV,LOG_LEVEL=$LOG_LEVEL,GCP_PROJECT_ID=$_PROJECT_ID,MEMORY_ENVIRONMENT=$_ENV"
-
-      VPC_CONNECTOR_ARG=""
-      if [ -n "$VPC_CONNECTOR_ID" ]; then
-          VPC_CONNECTOR_ARG="--vpc-connector=$VPC_CONNECTOR_ID --vpc-egress=private-ranges-only"
-      fi
-
-      gcloud run deploy "$API_SERVICE_NAME" \
-          --image="$IMAGE_TAG" \
-          --region="$GCP_REGION" \
-          --platform=managed \
-          --service-account="$RUN_SA_EMAIL" \
-          --set-env-vars="$ENV_VARS" \
-          $VPC_CONNECTOR_ARG \
-          $ALLOW_UNAUTH_FLAG \
-          --quiet
-
-  dir: '.'
-  id: 'deploy-api'
-  waitFor: ['docker-push', 'postgres-setup'] # Wait for image and schema setup
-
-# Step 6: Deploy Phidata UI Placeholder to Cloud Run (Conditional)
-- name: 'gcr.io/cloud-builders/gcloud'
+# Deploy to Cloud Run with secrets from Secret Manager
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+  id: 'deploy-cloud-run'
   entrypoint: 'bash'
   args:
     - '-c'
     - |
-      set -e
-      # Retrieve necessary values from Terraform outputs dynamically
-      TERRAFORM_DIR="infra/orchestra-terraform"
-      UI_SERVICE_NAME=$(terraform -chdir="$TERRAFORM_DIR" output -raw phidata_ui_service_name 2>/dev/null || echo "")
-      GCP_REGION=$(terraform -chdir="$TERRAFORM_DIR" output -raw gcp_region)
-      API_SERVICE_NAME=$(terraform -chdir="$TERRAFORM_DIR" output -raw orchestra_api_service_name)
+      # Get the secrets
+      OPENAI_API_KEY=$(gcloud secrets versions access latest --secret=OPENAI_API_KEY)
+      PORTKEY_API_KEY=$(gcloud secrets versions access latest --secret=PORTKEY_API_KEY)
+      
+      # Deploy to Cloud Run with secrets
+      gcloud run deploy orchestra-prod \
+        --image=us-docker.pkg.dev/agi-baby-cherry/orchestra/app:latest \
+        --set-secrets=OPENAI_API_KEY=OPENAI_API_KEY:latest,PORTKEY_API_KEY=PORTKEY_API_KEY:latest \
+        --region=us-central1 \
+        --project=agi-baby-cherry \
+        --service-account=vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
 
-      if [ -z "$UI_SERVICE_NAME" ]; then
-          echo "Phidata UI service name not found in Terraform output. Skipping UI deployment."
-          exit 0 # Exit successfully if UI service is not defined
-      fi
+# Available substitution variables:
+# $_PROJECT_ID: the Google Cloud project ID
+# $COMMIT_SHA: the commit SHA being built
+# $REVISION_ID: a unique ID for the build
+# $REPO_NAME: the repository name
+# $BRANCH_NAME: the branch or tag name
 
-      # Get API Service URL from gcloud after deployment
-      API_SERVICE_URL=$(gcloud run services describe "$API_SERVICE_NAME" --platform=managed --region="$GCP_REGION" --format='value(status.url)')
-      if [ -z "$API_SERVICE_URL" ]; then
-          echo "Failed to get URL for deployed API service: $API_SERVICE_NAME. Skipping UI deployment."
-          exit 1 # Exit with error if API URL is not found
-      fi
+# Default timeout is 10 minutes
+timeout: 1800s
 
-      # Assume the official image name (Verify this!)
-      PHIDATA_UI_IMAGE="phidata/agent_ui:1.0.0"
-      # Get the correct ENV var name required by the Phidata UI image
-      PHIDATA_API_URL_VAR="PHIDATA_API_URL" # VERIFY THIS!
+# Use the 'agi-baby-cherry' project
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'
+  env:
+    - 'PYTHONUNBUFFERED=1'
 
-      UI_ENV_VARS="ENVIRONMENT=$_ENV,${PHIDATA_API_URL_VAR}=${API_SERVICE_URL},PHIDATA_APP_NAME=Orchestra,PHIDATA_APP_DESCRIPTION=Orchestra AI,PHIDATA_TELEMETRY=false,PHIDATA_DEBUG=$_ENV != 'prod'"
+# Use a service account with the necessary permissions
+serviceAccount: 'projects/agi-baby-cherry/serviceAccounts/vertex-agent@agi-baby-cherry.iam.gserviceaccount.com'
 
-      gcloud run deploy "$UI_SERVICE_NAME" \
-          --image="$PHIDATA_UI_IMAGE" \
-          --region="$GCP_REGION" \
-          --platform=managed \
-          --set-env-vars="$UI_ENV_VARS" \
-          --allow-unauthenticated \
-          --quiet
-
-  dir: '.'
-  id: 'deploy-ui'
-  waitFor: ['deploy-api'] # Wait for API deployment
-
-# Note: Final verification steps (URLs) are typically done outside of Cloud Build,
-# e.g., in the GitHub Actions workflow or manually.
-
-substitutions:
-  _ENV: 'dev' # Default environment, can be overridden by trigger
-  _ARTIFACT_REGISTRY_REPO: 'us-central1-docker.pkg.dev/$_PROJECT_ID/orchestra' # Default repo, adjust if needed
-  # _PROJECT_ID: 'your-gcp-project-id' # Define this or ensure it's set by the trigger
+# Artifacts configuration for storing build outputs
+artifacts:
+  objects:
+    location: 'gs://agi-baby-cherry-cloudbuild-artifacts/'
+    paths: ['scan-results.json']

@@ -27,20 +27,22 @@ ENV PATH="/root/.local/bin:$PATH"
 # Copy Poetry configuration files
 COPY pyproject.toml ./
 
-# Configure Poetry to not create a virtual environment
-RUN poetry config virtualenvs.create false
+# Configure Poetry - using in-project virtualenv to be consistent with development environment
+RUN poetry config virtualenvs.in-project true
 
-# Modify dependencies before installation - remove agno dependency
-RUN grep -v "agno" pyproject.toml > pyproject.toml.new && mv pyproject.toml.new pyproject.toml
-
-# Install dependencies
-RUN poetry install --no-interaction --no-root --without dev
+# Install dependencies with better error handling
+RUN poetry install --no-interaction --no-root --without dev || \
+    (echo "Retrying poetry install..." && \
+     poetry lock --no-update && \
+     poetry install --no-interaction --no-root --without dev)
 
 # Copy application code
 COPY . .
 
-# Set Python path
+# Set Python path and environment variables to ensure standard mode
 ENV PYTHONPATH=/app
+ENV USE_RECOVERY_MODE=false
+ENV STANDARD_MODE=true
 
 # Default environment is staging (will be overridden in deployment)
 ENV ENVIRONMENT=staging
@@ -52,5 +54,9 @@ ENV GOOGLE_APPLICATION_CREDENTIALS=/tmp/vertex-agent-key.json
 # Expose port for the application
 EXPOSE ${PORT}
 
-# Run the application
-CMD exec python3 -m orchestrator.main
+# Create force standard mode script during build
+RUN echo '#!/bin/bash\npython3 -c "import os; os.environ[\"USE_RECOVERY_MODE\"]=\"false\"; os.environ[\"STANDARD_MODE\"]=\"true\";"' > /app/force_standard_mode.sh && \
+    chmod +x /app/force_standard_mode.sh
+
+# Run the application with forced standard mode
+CMD bash -c "source /app/force_standard_mode.sh && exec python3 -m orchestrator.main"

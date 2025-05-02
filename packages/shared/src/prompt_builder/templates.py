@@ -6,7 +6,8 @@ persona types and use cases.
 """
 
 import logging
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Callable
+from functools import lru_cache
 
 from packages.shared.src.models.base_models import PersonaConfig
 
@@ -64,18 +65,22 @@ class TemplateLibrary:
     def __init__(self):
         """Initialize the template library."""
         self._templates: Dict[str, PromptTemplate] = {}
-        self._initialize_default_templates()
+        self._template_definitions: Dict[str, Callable[[], PromptTemplate]] = {}
+        self._initialize_template_definitions()
 
+    @lru_cache(maxsize=32)
     def get_template(self, template_id: str) -> Optional[PromptTemplate]:
         """
-        Get a template by ID.
-
+        Get a template by ID, lazily loading it if not already instantiated.
+        
         Args:
             template_id: The template identifier
-
+            
         Returns:
             The template, or None if not found
         """
+        if template_id in self._template_definitions and template_id not in self._templates:
+            self._templates[template_id] = self._template_definitions[template_id]()
         return self._templates.get(template_id)
 
     def add_template(self, template: PromptTemplate) -> None:
@@ -140,65 +145,49 @@ class TemplateLibrary:
             "fallback", "You are {name}, {description}."
         )
 
-    def _initialize_default_templates(self) -> None:
-        """Initialize the library with default templates."""
+    def _initialize_template_definitions(self) -> None:
+        """Initialize the library with template definitions for lazy loading."""
         # Generic template
-        self.add_template(
-            PromptTemplate(
-                "generic",
-                "You are {name}, {description}. Respond to user queries in a helpful and informative manner.",
-            )
+        self._template_definitions['generic'] = lambda: PromptTemplate(
+            "generic",
+            "You are {name}, {description}. Respond to user queries in a helpful and informative manner."
         )
-
+        
         # Persona-specific templates
-        self.add_template(
-            PromptTemplate(
-                "cherry",
-                "You are Cherry, a cheerful and energetic assistant. Your responses should be upbeat, positive, and enthusiastic. Use exclamation marks and show excitement about helping the user!",
-            )
+        self._template_definitions['cherry'] = lambda: PromptTemplate(
+            "cherry",
+            "You are Cherry, a cheerful and energetic assistant. Your responses should be upbeat, positive, and enthusiastic. Use exclamation marks and show excitement about helping the user!"
         )
-
-        self.add_template(
-            PromptTemplate(
-                "sophia",
-                "You are Sophia, a wise and thoughtful assistant. Your responses should be considered, insightful, and show depth of thought. Take time to reflect on questions and provide nuanced perspectives.",
-            )
+        
+        self._template_definitions['sophia'] = lambda: PromptTemplate(
+            "sophia",
+            "You are Sophia, a wise and thoughtful assistant. Your responses should be considered, insightful, and show depth of thought. Take time to reflect on questions and provide nuanced perspectives."
         )
-
-        self.add_template(
-            PromptTemplate(
-                "gordon_gekko",
-                "You are Gordon Gekko, a ruthless efficiency expert who is blunt and results-obsessed. Be direct, skip pleasantries, and focus relentlessly on effectiveness and performance. Your goal is to push the user to succeed with tough love and brutal honesty.",
-            )
+        
+        self._template_definitions['gordon_gekko'] = lambda: PromptTemplate(
+            "gordon_gekko",
+            "You are Gordon Gekko, a ruthless efficiency expert who is blunt and results-obsessed. Be direct, skip pleasantries, and focus relentlessly on effectiveness and performance. Your goal is to push the user to succeed with tough love and brutal honesty."
         )
-
+        
         # Trait-based templates
-        self.add_template(
-            PromptTemplate(
-                "efficient",
-                "You are {name}, {description}. Your communication style is highly efficient. Keep responses concise and direct, avoiding unnecessary elaboration. Focus on delivering value quickly and clearly.",
-            )
+        self._template_definitions['efficient'] = lambda: PromptTemplate(
+            "efficient",
+            "You are {name}, {description}. Your communication style is highly efficient. Keep responses concise and direct, avoiding unnecessary elaboration. Focus on delivering value quickly and clearly."
         )
-
-        self.add_template(
-            PromptTemplate(
-                "assertive",
-                "You are {name}, {description}. Your communication style is confident and assertive. Make strong statements, give clear guidance, and don't hedge your advice. Be direct and authoritative when answering questions.",
-            )
+        
+        self._template_definitions['assertive'] = lambda: PromptTemplate(
+            "assertive",
+            "You are {name}, {description}. Your communication style is confident and assertive. Make strong statements, give clear guidance, and don't hedge your advice. Be direct and authoritative when answering questions."
         )
-
-        self.add_template(
-            PromptTemplate(
-                "cheerful",
-                "You are {name}, {description}. Your communication style is cheerful and upbeat. Use positive language, express enthusiasm, and maintain an energetic tone throughout your responses.",
-            )
+        
+        self._template_definitions['cheerful'] = lambda: PromptTemplate(
+            "cheerful",
+            "You are {name}, {description}. Your communication style is cheerful and upbeat. Use positive language, express enthusiasm, and maintain an energetic tone throughout your responses."
         )
-
-        self.add_template(
-            PromptTemplate(
-                "wise",
-                "You are {name}, {description}. Your communication style reflects wisdom and thoughtfulness. Consider different perspectives, show depth in your analysis, and provide insights that demonstrate careful consideration.",
-            )
+        
+        self._template_definitions['wise'] = lambda: PromptTemplate(
+            "wise",
+            "You are {name}, {description}. Your communication style reflects wisdom and thoughtfulness. Consider different perspectives, show depth in your analysis, and provide insights that demonstrate careful consideration."
         )
 
 

@@ -14,6 +14,7 @@ import time
 import random
 import asyncio
 import logging
+import requests
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 from contextlib import asynccontextmanager
@@ -43,6 +44,15 @@ except ImportError as e:
     logger.error(f"Failed to import required modules: {e}")
     logger.error("Make sure you're running this from the project root directory")
     sys.exit(1)
+
+def test_connection(url: str):
+    """Test connection to a given URL."""
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        logger.info(f"Connection to {url} successful: {response.status_code}")
+    except requests.RequestException as e:
+        logger.error(f"Connection to {url} failed: {e}")
 
 class ConnectionTester:
     """Base class for connection testing."""
@@ -473,4 +483,5 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
+    test_connection("https://example.com")
     asyncio.run(main())

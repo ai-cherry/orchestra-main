@@ -10,6 +10,8 @@ import logging
 from functools import lru_cache, wraps
 from pathlib import Path
 from typing import Dict, Optional, Callable, TypeVar, Any
+from google.cloud import secretmanager
+import portkey
 
 from packages.shared.src.models.base_models import PersonaConfig
 from .settings import Settings
@@ -262,3 +264,42 @@ def get_settings() -> Settings:
         Settings: Application settings instance.
     """
     return Settings()
+
+
+def initialize_portkey():
+    """
+    Initialize Portkey for observability with API key from GCP Secret Manager.
+    
+    Returns:
+        bool: True if initialization is successful, False otherwise.
+    """
+    try:
+        # Retrieve Portkey API key from Secret Manager
+        client = secretmanager.SecretManagerServiceClient()
+        project_id = os.environ.get("GCP_PROJECT_ID", "agi-baby-cherry")
+        secret_name = f"projects/{project_id}/secrets/portkey-api-key/versions/latest"
+        response = client.access_secret_version(name=secret_name)
+        PORTKEY_API_KEY = response.payload.data.decode('UTF-8')
+        
+        # Initialize Portkey
+        portkey.init(
+            api_key=PORTKEY_API_KEY,
+            base_url="https://api.portkey.ai/v1",
+            virtual_key="vertex-agent-special"
+        )
+        
+        # Set budget limits for cost control
+        portkey.set_limits(
+            max_requests=1000,
+            budget=500  # USD
+        )
+        
+        logger.info("Portkey initialized successfully for observability.")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to initialize Portkey: {str(e)}")
+        return False
+
+
+# Initialize Portkey when module is loaded
+initialize_portkey()

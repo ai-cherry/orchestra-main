@@ -7,10 +7,13 @@ where members are referenced by name/ID from other agent definitions.
 
 import logging
 import sys
+import importlib
 from typing import Dict, List, Any
+from packages.phidata.src.cloudsql_pgvector import get_pg_agent_storage, get_pgvector_memory
 
 # Import the base PhidataAgentWrapper implementation
 from packages.agents.src.phidata.wrapper import PhidataAgentWrapper
+from packages.agents.src.protocols import AgentProtocol
 
 # Import registry to resolve agent references
 from packages.agents.src.registry import get_registry
@@ -18,7 +21,7 @@ from packages.agents.src.registry import get_registry
 logger = logging.getLogger(__name__)
 
 
-class PhidataTeamAgentWrapper(PhidataAgentWrapper):
+class PhidataTeamAgentWrapper(PhidataAgentWrapper, AgentProtocol):
     """
     Enhanced PhidataAgentWrapper that supports resolving team member references.
     

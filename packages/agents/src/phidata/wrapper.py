@@ -16,7 +16,8 @@ from typing import Any, Dict, List, Optional, Union, AsyncGenerator, cast, Gener
 
 from packages.agents.src._base import OrchestraAgentBase
 from packages.core.src.models import AgentInput, AgentOutput
-from packages.memory.src.base import MemoryManager
+from packages.shared.src.memory.protocols import MemoryManagerProtocol
+from packages.agents.src.protocols import AgentProtocol
 from packages.llm.src.portkey_client import PortkeyClient
 from packages.tools.src.base import ToolRegistry
 # Import our CloudSQL PGVector configuration
@@ -24,7 +25,7 @@ from packages.phidata.src.cloudsql_pgvector import get_pg_agent_storage, get_pgv
 
 logger = logging.getLogger(__name__)
 
-class PhidataAgentWrapper(OrchestraAgentBase):
+class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
     """
     Updated wrapper for Phidata/Agno agents with native Postgres storage.
     
@@ -44,7 +45,7 @@ class PhidataAgentWrapper(OrchestraAgentBase):
     def __init__(
         self,
         agent_config: Dict[str, Any],
-        memory_manager: MemoryManager,
+        memory_manager: MemoryManagerProtocol,
         llm_client: PortkeyClient,
         tool_registry: ToolRegistry,
     ):

@@ -92,6 +92,4 @@ phidata_hn_team:
         table_name: "phidata_article_reader_storage"
       # Member-specific tools
       tools:
-        - type: "agno.tools.web.Newspaper4k"
-          params:
-            use_tls: true
+        # Removed Newspaper4k tool to avoid Python 3.11 dependency

@@ -1,22 +1,66 @@
 FROM hashicorp/terraform:1.5.0
 
-# Install essential tools
-RUN apk add --no-cache bash curl jq python3 git openssh-client gnupg
+# Initially use sh instead of bash
+# Install bash first before setting it as the shell
+RUN set -e && \
+    echo "Installing base packages..." && \
+    apk add --no-cache bash curl jq python3 python3-dev py3-pip git openssh-client gnupg build-base && \
+    echo "Base packages installed successfully"
 
-# Install Google Cloud SDK
-RUN curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz && \
+# Now that bash is installed, we can use it
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Install Google Cloud SDK with better error handling
+RUN set -e && \
+    echo "Downloading Google Cloud SDK..." && \
+    curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz && \
+    echo "Extracting Google Cloud SDK..." && \
     tar -xf google-cloud-cli-linux-x86_64.tar.gz && \
+    echo "Installing Google Cloud SDK..." && \
     ./google-cloud-sdk/install.sh --quiet && \
-    rm google-cloud-cli-linux-x86_64.tar.gz
+    rm google-cloud-cli-linux-x86_64.tar.gz && \
+    echo "Google Cloud SDK installed successfully"
 
-# Install TFLint
+# Install TFLint with fallback mechanism
 ARG TFLINT_VERSION=v0.48.0
-RUN curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+RUN set -e && \
+    echo "Installing TFLint ${TFLINT_VERSION}..." && \
+    (curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash || \
+    (echo "Fallback: Installing TFLint manually" && \
+     curl -L -o /tmp/tflint.zip https://github.com/terraform-linters/tflint/releases/download/${TFLINT_VERSION}/tflint_linux_amd64.zip && \
+     unzip /tmp/tflint.zip -d /usr/local/bin && \
+     rm /tmp/tflint.zip && \
+     chmod +x /usr/local/bin/tflint)) && \
+    echo "TFLint installed successfully"
 
-# Install Terragrunt
+# Install Terragrunt with better error handling
 ARG TERRAGRUNT_VERSION=v0.51.0
-RUN wget -O /usr/local/bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/${TERRAGRUNT_VERSION}/terragrunt_linux_amd64" && \
-    chmod +x /usr/local/bin/terragrunt
+RUN set -e && \
+    echo "Installing Terragrunt ${TERRAGRUNT_VERSION}..." && \
+    wget -O /usr/local/bin/terragrunt "https://github.com/gruntwork-io/terragrunt/releases/download/${TERRAGRUNT_VERSION}/terragrunt_linux_amd64" && \
+    chmod +x /usr/local/bin/terragrunt && \
+    echo "Terragrunt installed successfully"
+
+# Set up Python environment - Install Poetry using the official installer
+ENV POETRY_HOME=/opt/poetry
+ENV POETRY_VIRTUALENVS_IN_PROJECT=true
+ENV POETRY_NO_INTERACTION=1
+ENV PATH="$POETRY_HOME/bin:$PATH"
+
+RUN set -e && \
+    echo "Setting up Python environment..." && \
+    python3 -m pip install --upgrade pip && \
+    curl -sSL https://install.python-poetry.org | python3 - && \
+    echo "Python environment set up successfully"
+
+# Copy dependency files first for caching
+COPY pyproject.toml poetry.lock ./
+
+# Install dependencies
+RUN set -e && \
+    echo "Installing Poetry dependencies..." && \
+    poetry install --no-dev --no-root && \
+    echo "Poetry dependencies installed successfully"
 
 # Update PATH to include all tools
 ENV PATH=$PATH:/google-cloud-sdk/bin

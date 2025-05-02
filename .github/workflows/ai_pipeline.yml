@@ -1,0 +1,78 @@
+name: AI Development Pipeline
+on: [push]
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Dependencies
+      run: |
+        pip install poetry
+        poetry install
+
+    - name: Run Critical Tests
+      run: |
+        export PYTHONPATH=$(pwd)
+        poetry run pytest tests/ -m critical -v
+        if [ $? -ne 0 ]; then
+          echo "Critical tests failed. Halting pipeline."
+          exit 1
+        fi
+    
+    - name: Auth GCP
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: projects/104944497835/locations/global/workloadIdentityPools/gitlab-pool/providers/gitlab-provider
+        service_account: vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
+        
+    - name: AI Code Review
+      run: |
+        # Use Gemini for security analysis
+        gcloud alpha ai code-assist review \
+          --source=. \
+          --category=security \
+          --project=agi-baby-cherry
+        
+  train:
+    needs: analyze
+    runs-on: ubuntu-latest
+    container: 
+      image: us-docker.pkg.dev/vertex-ai/training/tf-gpu.2-12:latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Train Vertex Model
+      run: |
+        python -m agent.core.vertex_operations \
+          --command=auto_train \
+          --dataset=${{ secrets.DATASET_ID }}
+          
+  deploy:
+    needs: train
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to Vertex
+      run: |
+        MODEL_ID=$(gcloud ai models list --filter=display_name:"auto-train" --format="value(MODEL_ID)")
+        ENDPOINT_ID=$(gcloud ai endpoints list --filter=display_name:"orchestra-prod" --format="value(ENDPOINT_ID)")
+        if [ -z "$ENDPOINT_ID" ]; then
+          echo "Creating new endpoint..."
+          ENDPOINT_ID=$(gcloud ai endpoints create --display-name="orchestra-prod" --format="value(ENDPOINT_ID)")
+        fi
+        if ! gcloud ai endpoints deploy-model $ENDPOINT_ID \
+          --model=$MODEL_ID \
+          --machine-type=n1-standard-4 \
+          --accelerator=type=nvidia-tesla-t4,count=1; then
+          echo "Deployment failed. Notifying team for manual intervention."
+          # Add notification step here (e.g., Slack, email)
+          exit 1
+        fi

@@ -21,23 +21,74 @@ def patch_module():
     os.environ["STANDARD_MODE"] = "true"
     os.environ["PYTHONPATH"] = script_dir
     
-    # Reload the main module to ensure it picks up these changes
-    if "core.orchestrator.src.main" in sys.modules:
-        # Force reload the module if it's already loaded
-        importlib.reload(sys.modules["core.orchestrator.src.main"])
-    else:
-        # Import it for the first time
-        importlib.import_module("core.orchestrator.src.main")
+    print("=== DEBUG: Environment Variables at Startup ===")
+    for key, value in sorted(os.environ.items()):
+        if key in ["ENVIRONMENT", "PYTHONPATH", "STANDARD_MODE", "USE_RECOVERY_MODE"]:
+            print(f"{key}={value}")
     
-    # Directly patch the module variables
-    import core.orchestrator.src.main
-    core.orchestrator.src.main.RECOVERY_MODE = False
-    core.orchestrator.src.main.STANDARD_MODE = True
+    print("=== DEBUG: Python Path ===")
+    for path in sys.path:
+        print(path)
+    print("=== DEBUG: End Environment Info ===")
     
-    print("=== FORCE STANDARD MODE ACTIVE ===")
-    print("Patched core.orchestrator.src.main: RECOVERY_MODE=False, STANDARD_MODE=True")
-    print("Environment variables set: USE_RECOVERY_MODE=false, STANDARD_MODE=true")
-    print("=================================")
+    # Try to load the module
+    try:
+        # Reload the main module to ensure it picks up these changes
+        if "core.orchestrator.src.main" in sys.modules:
+            # Force reload the module if it's already loaded
+            importlib.reload(sys.modules["core.orchestrator.src.main"])
+        else:
+            # Import it for the first time
+            importlib.import_module("core.orchestrator.src.main")
+        
+        # Directly patch the module variables
+        import core.orchestrator.src.main
+        
+        # Print debug info
+        print(f"DEBUG: Environment would set RECOVERY_MODE={core.orchestrator.src.main.RECOVERY_MODE}")
+        print(f"DEBUG: Environment would set STANDARD_MODE={core.orchestrator.src.main.STANDARD_MODE}")
+        
+        # Force override the mode
+        core.orchestrator.src.main.RECOVERY_MODE = False
+        core.orchestrator.src.main.STANDARD_MODE = True
+        
+        print(f"DEBUG: HARD OVERRIDE ACTIVE: RECOVERY_MODE=False, STANDARD_MODE=True")
+        print(f"Starting with RECOVERY_MODE=False, STANDARD_MODE=True (HARD OVERRIDE)")
+    except ImportError as e:
+        print(f"Warning: Could not import core.orchestrator.src.main module: {e}")
+        print("Will continue with environment variables only.")
+    
+    print("тЪая╕П APPLYING HARD OVERRIDE: Forcing standard mode and disabling recovery mode!")
+
+# Always run when imported
+patch_module()
+
+# Always run when imported
+patch_module()
+
+# Always run when imported
+patch_module()
+
+# Always run when imported
+patch_module()
+
+# Always run when imported
+patch_module()
+
+# Always run when imported
+patch_module()
+
+# Always run when imported
+patch_module()
+
+# Always run when imported
+patch_module()
+
+# Always run when imported
+patch_module()
+
+# Always run when imported
+patch_module()
 
 if __name__ == "__main__":
     patch_module()

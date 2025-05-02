@@ -1,0 +1,53 @@
+name: AI-Enhanced Deployment
+on: [push]
+
+jobs:
+  deploy:
+    runs-on: vertex-ai
+    strategy:
+      matrix:
+        python: ["3.11"]
+        region: ["us-central1"]
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Dependencies
+      run: |
+        pip install poetry
+        poetry install
+
+    - name: Run Critical Tests
+      run: |
+        export PYTHONPATH=$(pwd)
+        poetry run pytest tests/ -m critical -v
+        if [ $? -ne 0 ]; then
+          echo "Critical tests failed. Halting deployment."
+          exit 1
+        fi
+    
+    - name: Auth GCP
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: projects/104944497835/locations/global/workloadIdentityPools/gitlab-pool/providers/gitlab-provider
+        service_account: vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
+        
+    - name: Gemini Code Review
+      run: |
+        # Use Gemini for security analysis
+        gcloud alpha ai code-assist review \
+          --source=. \
+          --category=security \
+          --project=agi-baby-cherry
+
+    - name: Deploy with Vertex AI
+      run: |
+        gcloud ai endpoints deploy-model orchestra-prod \
+          --project=agi-baby-cherry \
+          --model=gemini-pro \
+          --machine-type=a2-highgpu-1g \
+          --accelerator=type=nvidia-tesla-a100,count=1

@@ -47,11 +47,6 @@ agent_definitions:
       - type: "agno.tools.search.DuckDuckGo"
         params:
           max_results: 5
-      
-      # Newspaper4k for article extraction
-      - type: "agno.tools.web.Newspaper4k"
-        params:
-          use_tls: true
   
   # Slack Agent
   phidata_slack_agent:

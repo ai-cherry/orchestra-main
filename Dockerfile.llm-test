@@ -1,27 +1,111 @@
-FROM python:3.11-slim
+# Dedicated cache stage
+FROM python:3.11-slim as cache
 
-WORKDIR /app
+# Set up cache directory
+RUN mkdir -p /cache/poetry /cache/apt
+ENV POETRY_CACHE_DIR=/cache/poetry
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# Install Poetry
+ENV POETRY_HOME=/opt/poetry
+ENV POETRY_VIRTUALENVS_IN_PROJECT=true
+ENV POETRY_NO_INTERACTION=1
+ENV PATH="$POETRY_HOME/bin:$PATH"
+
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
+# Base image for all build stages
+FROM python:3.11-slim as base
+
+# Install common system dependencies with cache mount
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update && apt-get install -y \
     curl \
     gcc \
     build-essential \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
-COPY requirements-llm-test.txt .
-RUN pip install --no-cache-dir -r requirements-llm-test.txt
+# Install Poetry
+ENV POETRY_HOME=/opt/poetry
+ENV POETRY_VIRTUALENVS_IN_PROJECT=true
+ENV POETRY_NO_INTERACTION=1
+ENV PATH="$POETRY_HOME/bin:$PATH"
 
-# Copy the application code
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
+# Set up working directory
+WORKDIR /app
+
+# Stage 1: LiteLLM dependencies
+FROM base as litellm
+
+# Copy only dependency definition files for caching
+COPY pyproject.toml poetry.lock* ./
+
+# Install just LiteLLM dependencies with cache mount
+RUN --mount=type=cache,target=/root/.cache/pypoetry/cache \
+    --mount=type=cache,target=/root/.cache/pip \
+    poetry install --only litellm --no-root
+
+# Stage 2: Portkey dependencies (if needed)
+FROM base as portkey
+
+# Copy only dependency definition files for caching
+COPY pyproject.toml poetry.lock* ./
+
+# Install Portkey dependencies with cache mount
+RUN --mount=type=cache,target=/root/.cache/pypoetry/cache \
+    --mount=type=cache,target=/root/.cache/pip \
+    poetry install --only portkey --no-root
+
+# Stage 3: OpenRouter dependencies (if needed)
+FROM base as openrouter
+
+# Copy only dependency definition files for caching
+COPY pyproject.toml poetry.lock* ./
+
+# Install OpenRouter dependencies with cache mount
+RUN --mount=type=cache,target=/root/.cache/pypoetry/cache \
+    --mount=type=cache,target=/root/.cache/pip \
+    poetry install --only openrouter --no-root
+
+# Stage 4: Final runtime image
+FROM python:3.11-slim
+
+# Install minimal runtime dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy virtual environments from builder stages
+COPY --from=litellm /app/.venv /app/litellm_venv
+COPY --from=portkey /app/.venv /app/portkey_venv
+COPY --from=openrouter /app/.venv /app/openrouter_venv
+
+# Set up PATH to include all virtual environments
+ENV PATH="/app/litellm_venv/bin:/app/portkey_venv/bin:/app/openrouter_venv/bin:$PATH"
+ENV PYTHONPATH=/app
+
+# Configure LiteLLM
+ENV LITELLM_VERBOSE=False
+ENV LITELLM_LOG="DEBUG"
+
+# OpenRouter environment variables
+ENV OR_SITE_URL="https://orchestra.example.com"
+ENV OR_APP_NAME="OrchestraLLM"
+
+# Copy application code
 COPY core/orchestrator/src/services/llm /app/services/llm
 COPY tools/llm_test_server /app/llm_test_server
+COPY examples /app/examples
 
 # Create monitoring directory
 RUN mkdir -p /app/monitoring/metrics
 
-# Set environment variables
-ENV PYTHONPATH=/app
+# Set up litellm config
+COPY config/litellm_config.yaml /app/config/litellm_config.yaml
 
 # Expose the port
 EXPOSE 8001

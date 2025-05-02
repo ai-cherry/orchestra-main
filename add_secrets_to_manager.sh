@@ -121,6 +121,11 @@ create_or_update_secret "neo4j-client-secret" "$NEO4J_CLIENT_SECRET" "Neo4j clie
 echo -e "\n${YELLOW}=== Adding Docker Configuration Secrets to Secret Manager ===${NC}"
 create_or_update_secret "docker-pat" "$DOCKER_PERSONAL_ACCESS_TOKEN" "Docker Personal Access Token"
 
+# Validate exclusion from version control
+if git ls-files | grep -q ".env"; then
+    echo -e "${RED}Warning: .env file is tracked by git. Ensure sensitive information is excluded.${NC}"
+fi
+
 echo -e "\n${GREEN}=== Secret Migration Complete! ===${NC}"
 echo -e "All API keys and sensitive values have been copied to Secret Manager."
 echo -e "${YELLOW}Note: All original values remain in your .env file as requested.${NC}"
