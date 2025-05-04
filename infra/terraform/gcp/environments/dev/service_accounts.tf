@@ -1,11 +1,6 @@
 /**
- * Service accounts for the dev environment
+* Service accounts for the dev environment
  */
-
-provider "google" {
-  project = var.project_id
-  region  = var.region
-}
 
 # Test service account for CI/CD pipelines
 resource "google_service_account" "orchestrator_test_sa" {

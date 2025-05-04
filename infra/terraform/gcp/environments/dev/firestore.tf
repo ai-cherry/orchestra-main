@@ -1,13 +1,17 @@
 /**
- * Firestore configuration for dev environment
+* Firestore configuration for dev environment
  */
 
 # Use the Firestore module for Native mode database
 module "firestore" {
-  source     = "../../../modules/firestore"
+  source     = "../../modules/firestore"
   project_id = var.project_id
-  region     = var.region
-  env        = var.env
+  database_name = "(default)"
+  location = var.region
+  database_type = "FIRESTORE_NATIVE"
+  delete_protection_state = "PROTECTION_DISABLED"
+  deletion_policy = "DELETE"
+  app_engine_integration_mode = "DISABLED"
 }
 
 # Output the database ID for reference
