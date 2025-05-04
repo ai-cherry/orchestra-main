@@ -33,8 +33,8 @@ jobs:
     - name: Auth GCP
       uses: google-github-actions/auth@v1
       with:
-        workload_identity_provider: projects/104944497835/locations/global/workloadIdentityPools/gitlab-pool/providers/gitlab-provider
-        service_account: vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
+        workload_identity_provider: projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+        service_account: github-actions-deployer@cherry-ai-project.iam.gserviceaccount.com
         
     - name: Gemini Code Review
       run: |
@@ -42,12 +42,12 @@ jobs:
         gcloud alpha ai code-assist review \
           --source=. \
           --category=security \
-          --project=agi-baby-cherry
+          --project=cherry-ai-project
 
     - name: Deploy with Vertex AI
       run: |
         gcloud ai endpoints deploy-model orchestra-prod \
-          --project=agi-baby-cherry \
+          --project=cherry-ai-project \
           --model=gemini-pro \
           --machine-type=a2-highgpu-1g \
           --accelerator=type=nvidia-tesla-a100,count=1

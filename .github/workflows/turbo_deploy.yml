@@ -16,19 +16,19 @@ jobs:
     - name: Auth GCP
       uses: google-github-actions/auth@v2
       with:
-        workload_identity_provider: projects/104944497835/locations/global/workloadIdentityPools/github-pool/providers/github-provider
-        service_account: vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
+        workload_identity_provider: projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+        service_account: github-actions-deployer@cherry-ai-project.iam.gserviceaccount.com
 
     - name: AI Code Review
       run: |
         gcloud alpha ai code-assist review \
           --source=. \
           --category=security,performance \
-          --project=agi-baby-cherry
+          --project=cherry-ai-project
 
     - name: Turbo Deploy
       run: |
         gcloud run deploy orchestra-prod \
-          --image=us-docker.pkg.dev/agi-baby-cherry/orchestra/app:latest \
+          --image=us-docker.pkg.dev/cherry-ai-project/orchestra/app:latest \
           --set-env-vars=PORTKEY_API_KEY=${{ secrets.PORTKEY_API_KEY }} \
           --args=--ai-mode=turbo

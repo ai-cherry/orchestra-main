@@ -106,8 +106,8 @@ jobs:
       - name: Authenticate to Google Cloud with OIDC
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: projects/${{ secrets.GCP_PROJECT_ID }}/locations/global/workloadIdentityPools/github-pool-${{ env.ENV_TYPE }}/providers/github-provider-${{ env.ENV_TYPE }}
-          service_account: github-actions-${{ env.ENV_TYPE }}@${{ secrets.GOOGLE_CLOUD_PROJECT }}.iam.gserviceaccount.com
+          workload_identity_provider: projects/525398941159/locations/global/workloadIdentityPools/github-pool-${{ env.ENV_TYPE }}/providers/github-provider-${{ env.ENV_TYPE }}
+          service_account: github-actions-${{ env.ENV_TYPE }}@cherry-ai-project.iam.gserviceaccount.com
           token_format: access_token
           create_credentials_file: true
       

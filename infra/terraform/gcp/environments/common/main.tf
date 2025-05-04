@@ -1,21 +1,8 @@
 /**
- * Main configuration for cherry-ai-project common resources
+ * Common IAM resources for the Orchestra project
  */
 
-terraform {
-  required_version = ">= 1.0"
-  
-  backend "gcs" {
-    bucket  = "tfstate-cherry-ai-project"
-    prefix  = "terraform/state/common"
-  }
-  
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = ">= 4.0"
-    }
-  }
+provider "google" {
+  project = var.project_id
+  region  = var.region
 }
-
-# Provider configurations are in iam.tf to avoid circular dependencies

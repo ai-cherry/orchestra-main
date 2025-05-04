@@ -1,11 +1,11 @@
 /**
- * Storage resources for cherry-ai-project
- * Includes GCS bucket for Terraform backend and Artifact Registry
+ * Storage resources for orchestra project
+ * Includes GCS buckets for Terraform state, embeddings, and Artifact Registry
  */
 
 # 1. GCS bucket for Terraform state storage
 resource "google_storage_bucket" "terraform_state" {
-  name          = "tfstate-cherry-ai-project"
+  name          = "tfstate-cherry-ai-orchestra"
   location      = var.region
   force_destroy = false
   
@@ -28,15 +28,30 @@ resource "google_storage_bucket" "terraform_state" {
     managed-by  = "terraform"
     environment = "common"
     purpose     = "terraform-state"
-    project     = "cherry-ai-project"
+    project     = "cherry-ai-orchestra"
   }
 }
 
-# 2. Artifact Registry Docker repository
+# 2. GCS bucket for embeddings storage
+resource "google_storage_bucket" "embeddings_bucket" {
+  name          = "${var.project_id}-embeddings"
+  location      = "us-west4"
+  force_destroy = false
+  
+  uniform_bucket_level_access = true
+  
+  labels = {
+    managed-by  = "terraform"
+    environment = "common"
+    purpose     = "vector-embeddings"
+  }
+}
+
+# 3. Artifact Registry Docker repository
 resource "google_artifact_registry_repository" "orchestra_images" {
   provider = google-beta
-  
-  location      = var.region
+  project  = var.project_id
+  location = var.region
   repository_id = "orchestra-images"
   description   = "Docker repository for Orchestra application images"
   format        = "DOCKER"
@@ -52,6 +67,11 @@ resource "google_artifact_registry_repository" "orchestra_images" {
 output "terraform_state_bucket" {
   value       = google_storage_bucket.terraform_state.name
   description = "Name of the GCS bucket for Terraform state"
+}
+
+output "embeddings_bucket" {
+  value       = google_storage_bucket.embeddings_bucket.name
+  description = "Name of the GCS bucket for embeddings storage"
 }
 
 output "artifact_registry_repository" {

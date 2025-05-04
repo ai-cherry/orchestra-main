@@ -29,8 +29,8 @@ jobs:
     - name: Auth GCP
       uses: google-github-actions/auth@v1
       with:
-        workload_identity_provider: projects/104944497835/locations/global/workloadIdentityPools/gitlab-pool/providers/gitlab-provider
-        service_account: vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
+        workload_identity_provider: projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+        service_account: github-actions-deployer@cherry-ai-project.iam.gserviceaccount.com
         
     - name: AI Code Review
       run: |
@@ -38,13 +38,13 @@ jobs:
         gcloud alpha ai code-assist review \
           --source=. \
           --category=security \
-          --project=agi-baby-cherry
+          --project=cherry-ai-project
         
   train:
     needs: analyze
     runs-on: ubuntu-latest
     container: 
-      image: us-docker.pkg.dev/vertex-ai/training/tf-gpu.2-12:latest
+      image: us-docker.pkg.dev/cherry-ai-project/training/tf-gpu.2-12:latest
     steps:
     - uses: actions/checkout@v4
     

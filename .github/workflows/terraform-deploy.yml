@@ -15,7 +15,7 @@ on:
 env:
   TF_IN_AUTOMATION: true
   TF_LOG: INFO
-  TF_VAR_project_id: ${{ vars.GCP_PROJECT_ID }}
+  TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
   TF_PARALLELISM: 10  # Optimize Terraform performance
 
 permissions:
@@ -132,13 +132,13 @@ jobs:
         id: auth
         uses: google-github-actions/auth@v1
         with:
-          workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ vars.TERRAFORM_SERVICE_ACCOUNT }}
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER_ID }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
 
       - name: Setup gcloud CLI
         uses: google-github-actions/setup-gcloud@v1
         with:
-          project_id: ${{ vars.GCP_PROJECT_ID }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Cache Terraform plugins
         uses: actions/cache@v3
@@ -251,13 +251,13 @@ jobs:
         id: auth
         uses: google-github-actions/auth@v1
         with:
-          workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ vars.TERRAFORM_SERVICE_ACCOUNT }}
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER_ID }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
 
       - name: Setup gcloud CLI
         uses: google-github-actions/setup-gcloud@v1
         with:
-          project_id: ${{ vars.GCP_PROJECT_ID }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       - name: Cache Terraform plugins
         uses: actions/cache@v3

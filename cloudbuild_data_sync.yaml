@@ -1,0 +1,159 @@
+# Cloud Build configuration for Vertex Workbench data synchronization
+# This configuration automates the data synchronization process between
+# different environments during CI/CD pipeline.
+
+timeout: 1800s  # 30 minutes
+
+substitutions:
+  _BUCKET: "agi-baby-cherry-migration"
+  _ENVIRONMENT: "dev"
+  _DIRECTION: "push"
+  _NOTIFICATION_EMAIL: ""
+  _SLACK_WEBHOOK: ""
+
+options:
+  machineType: "E2_HIGHCPU_8"
+  logging: CLOUD_LOGGING_ONLY
+
+steps:
+  # Step 1: Verify GCP authentication
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "verify-auth"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        echo "Verifying GCP authentication..."
+        gcloud auth list --filter=status:ACTIVE --format="value(account)"
+
+  # Step 2: Check if bucket exists
+  - name: "gcr.io/cloud-builders/gsutil"
+    id: "check-bucket"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        echo "Checking bucket gs://${_BUCKET}..."
+        gsutil ls -b gs://${_BUCKET} || (echo "Bucket gs://${_BUCKET} does not exist or is not accessible" && exit 1)
+
+  # Step 3: Generate Cloud Build-specific setup
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "setup-environment"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        echo "Setting up environment..."
+        mkdir -p /workspace/.checksums
+        cat > /workspace/cloudbuild_data_sync_env.sh << 'EOF'
+        #!/bin/bash
+        export BUCKET="${_BUCKET}"
+        export ENVIRONMENT="${_ENVIRONMENT}"
+        export DIRECTION="${_DIRECTION}"
+        export LOCAL_DIR="/workspace"
+        export NOTIFICATION_EMAIL="${_NOTIFICATION_EMAIL}"
+        export SLACK_WEBHOOK="${_SLACK_WEBHOOK}"
+        EOF
+        chmod +x /workspace/cloudbuild_data_sync_env.sh
+        cat /workspace/cloudbuild_data_sync_env.sh
+
+  # Step 4: Clone or update data sync scripts
+  - name: "gcr.io/cloud-builders/git"
+    id: "get-scripts"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        echo "Retrieving data sync scripts..."
+        
+        # Check if scripts already exist in bucket
+        if gsutil -q stat gs://${_BUCKET}/scripts/data_sync_ci_cd.sh; then
+          echo "Scripts found in bucket, copying to workspace..."
+          gsutil cp gs://${_BUCKET}/scripts/data_sync_ci_cd.sh /workspace/
+          chmod +x /workspace/data_sync_ci_cd.sh
+        else
+          echo "Scripts not found in bucket, will use from workspace..."
+          
+          # Ensure script is present and executable
+          if [ ! -f /workspace/data_sync_ci_cd.sh ]; then
+            echo "ERROR: data_sync_ci_cd.sh not found in workspace or bucket!"
+            exit 1
+          fi
+          
+          # Upload script to bucket for future use
+          echo "Uploading script to bucket for future builds..."
+          mkdir -p /workspace/scripts
+          cp /workspace/data_sync_ci_cd.sh /workspace/scripts/
+          gsutil -m cp -r /workspace/scripts gs://${_BUCKET}/
+        fi
+        
+        ls -la /workspace
+
+  # Step 5: Run data sync operation
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "run-data-sync"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        echo "Running data sync operation..."
+        source /workspace/cloudbuild_data_sync_env.sh
+        bash /workspace/data_sync_ci_cd.sh \
+          --environment ${ENVIRONMENT} \
+          --direction ${DIRECTION} \
+          --bucket ${BUCKET} \
+          $([[ -n "${NOTIFICATION_EMAIL}" ]] && echo "--notification-email ${NOTIFICATION_EMAIL}") \
+          $([[ -n "${SLACK_WEBHOOK}" ]] && echo "--slack-webhook ${SLACK_WEBHOOK}")
+        
+        # Check exit code
+        SYNC_RESULT=$?
+        if [ $SYNC_RESULT -eq 0 ]; then
+          echo "Data sync completed successfully!"
+        else
+          echo "Data sync completed with issues. Check logs for details."
+          exit $SYNC_RESULT
+        fi
+
+  # Step 6: Upload results and logs to bucket
+  - name: "gcr.io/cloud-builders/gsutil"
+    id: "upload-results"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        echo "Uploading results and logs..."
+        
+        # Create results directory
+        TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+        mkdir -p /workspace/sync_results_${TIMESTAMP}
+        
+        # Collect logs and status files
+        cp /tmp/data_sync_status.json /workspace/sync_results_${TIMESTAMP}/ || true
+        cp /workspace/.checksums/*.md5 /workspace/sync_results_${TIMESTAMP}/ || true
+        cp /workspace/.checksums/*.txt /workspace/sync_results_${TIMESTAMP}/ || true
+        
+        # Generate result summary
+        cat > /workspace/sync_results_${TIMESTAMP}/summary.json << EOF
+        {
+          "buildId": "$BUILD_ID",
+          "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+          "environment": "${_ENVIRONMENT}",
+          "direction": "${_DIRECTION}",
+          "bucket": "${_BUCKET}",
+          "result": $([ -f /tmp/data_sync_status.json ] && grep -o '"status":"[^"]*"' /tmp/data_sync_status.json || echo '"unknown"')
+        }
+        EOF
+        
+        # Upload to results directory in bucket
+        gsutil -m cp -r /workspace/sync_results_${TIMESTAMP} gs://${_BUCKET}/sync_results/
+        
+        # Upload latest summary for quick access
+        gsutil cp /workspace/sync_results_${TIMESTAMP}/summary.json gs://${_BUCKET}/sync_results/latest_${_ENVIRONMENT}.json
+        
+        echo "Results uploaded to gs://${_BUCKET}/sync_results/sync_results_${TIMESTAMP}/"
+
+# Artifacts configuration
+artifacts:
+  objects:
+    location: "gs://${_BUCKET}/sync_results/"
+    paths: ["sync_results_*/**"]

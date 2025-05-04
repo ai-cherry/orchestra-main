@@ -1,0 +1,66 @@
+# Gemini Code Assist Configuration for AGI Baby Cherry Project
+# This configuration enables AI-assisted development with Gemini 2.5 model
+
+# Project context configuration, defining which paths should be indexed
+# and their relative priority (higher numbers = higher priority)
+project_context:
+  - path: /workspaces/orchestra-main
+    priority: 100
+  - path: /home/agent/mounted_bucket
+    priority: 50
+  - path: /mnt/repos
+    priority: 25
+
+# Tool integrations for external APIs and services
+tool_integrations:
+  # Vertex AI integration for model inference
+  vertex_ai:
+    endpoint: projects/104944497835/locations/us-central1/endpoints/agent-core
+    api_version: v1
+    
+  # Redis integration for semantic cache
+  redis:
+    connection_string: redis://vertex-agent@agi-baby-cherry
+    
+  # AlloyDB for vector search
+  database:
+    connection_string: postgresql://alloydb-user@alloydb-instance:5432/agi_baby_cherry
+
+# Model configuration
+model:
+  name: gemini-2.5
+  temperature: 0.3
+  max_output_tokens: 8192
+  top_p: 0.95
+
+# Custom code assist commands (for IntelliJ/VS Code)
+commands:
+  - name: optimize-query
+    description: "Optimize AlloyDB vector search query for 10M+ dimensions"
+    prompt_template: |
+      Optimize this AlloyDB vector search query for 10M+ dimensions with 95% recall@10:
+      {{selection}}
+      
+  - name: generate-cloud-run
+    description: "Generate Cloud Run deployment code"
+    prompt_template: |
+      Generate Cloud Run deployment code using service account orchestra-cloud-run-prod:
+      {{selection}}
+      
+  - name: document-function
+    description: "Add comprehensive documentation to function"
+    prompt_template: |
+      Add detailed documentation to the following function, including:
+      - Parameter descriptions
+      - Return value documentation
+      - Usage examples
+      - Edge cases
+      
+      {{selection}}
+
+# Editor settings
+editor:
+  auto_apply_suggestions: false
+  inline_suggestions: true
+  suggestion_delay_ms: 500
+  max_inline_suggestions: 3
