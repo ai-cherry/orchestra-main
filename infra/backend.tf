@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket  = "agi-baby-cherry-tfstate"
+    bucket  = "tfstate-cherry-ai-project"
     prefix  = "orchestra/env/dev"
     credentials = "gsa-key.json"
   }
