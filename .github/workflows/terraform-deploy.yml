@@ -1,0 +1,326 @@
+name: Terraform Infrastructure Deployment
+
+on:
+  push:
+    branches: [main, fix-circular-imports-and-ci]
+    paths:
+      - 'infra/terraform/**'
+      - '.github/workflows/terraform-deploy.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'infra/terraform/**'
+  workflow_dispatch:  # Allow manual trigger
+
+env:
+  TF_IN_AUTOMATION: true
+  TF_LOG: INFO
+  TF_VAR_project_id: ${{ vars.GCP_PROJECT_ID }}
+  TF_PARALLELISM: 10  # Optimize Terraform performance
+
+permissions:
+  contents: 'read'
+  id-token: 'write'  # Required for Workload Identity Federation
+  pull-requests: 'write'  # Required for commenting on PRs
+
+jobs:
+  # Security scanning job
+  terraform-security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: tfsec
+        uses: aquasecurity/tfsec-action@v1.0.0
+        with:
+          working_directory: infra/terraform
+          format: sarif
+          soft_fail: true
+          
+      - name: Checkov scan
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: infra/terraform
+          framework: terraform
+          soft_fail: true
+
+  # Static validation job
+  terraform-validate:
+    name: Validate Terraform
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+          terraform_wrapper: false
+
+      - name: Terraform Format Check
+        id: fmt
+        run: terraform fmt -check -recursive
+        working-directory: infra/terraform
+        continue-on-error: true
+
+      - name: Cache Terraform plugins
+        uses: actions/cache@v3
+        with:
+          path: ~/.terraform.d/plugin-cache
+          key: ${{ runner.os }}-terraform-${{ hashFiles('infra/terraform/**/.terraform.lock.hcl') }}
+          restore-keys: |
+            ${{ runner.os }}-terraform-
+
+      # Validate common environment
+      - name: Terraform Init - Common
+        id: init-common
+        run: terraform init -backend=false
+        working-directory: infra/terraform/gcp/environments/common
+
+      - name: Terraform Validate - Common
+        id: validate-common
+        run: terraform validate
+        working-directory: infra/terraform/gcp/environments/common
+
+      # Validate dev environment
+      - name: Terraform Init - Dev
+        id: init-dev
+        run: terraform init -backend=false
+        working-directory: infra/terraform/gcp/environments/dev
+
+      - name: Terraform Validate - Dev
+        id: validate-dev
+        run: terraform validate
+        working-directory: infra/terraform/gcp/environments/dev
+
+      # Validate prod environment
+      - name: Terraform Init - Prod
+        id: init-prod
+        run: terraform init -backend=false
+        working-directory: infra/terraform/gcp/environments/prod
+
+      - name: Terraform Validate - Prod
+        id: validate-prod
+        run: terraform validate
+        working-directory: infra/terraform/gcp/environments/prod
+
+  # Plan job for PRs
+  terraform-plan:
+    name: Plan Terraform Changes
+    needs: [terraform-validate, terraform-security-scan]
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [common, dev, prod]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+          terraform_wrapper: false
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.TERRAFORM_SERVICE_ACCOUNT }}
+
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+
+      - name: Cache Terraform plugins
+        uses: actions/cache@v3
+        with:
+          path: ~/.terraform.d/plugin-cache
+          key: ${{ runner.os }}-terraform-${{ hashFiles('infra/terraform/**/.terraform.lock.hcl') }}
+          restore-keys: |
+            ${{ runner.os }}-terraform-
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+        working-directory: infra/terraform/gcp/environments/${{ matrix.environment }}
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          terraform plan -no-color -input=false -out=tfplan -var="project_id=${{ env.TF_VAR_project_id }}" \
+            -parallelism=${{ env.TF_PARALLELISM }}
+        working-directory: infra/terraform/gcp/environments/${{ matrix.environment }}
+        continue-on-error: true
+
+      - name: Create Plan Summary
+        id: plan-summary
+        if: always()
+        run: |
+          echo "### Terraform Plan for ${{ matrix.environment }} environment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ steps.plan.outcome }}" == "success" ]]; then
+            echo "✅ Plan succeeded" >> $GITHUB_STEP_SUMMARY
+            echo '```terraform' >> $GITHUB_STEP_SUMMARY
+            terraform show -no-color tfplan >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Plan failed" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "${{ steps.plan.outputs.stderr || steps.plan.outputs.stdout }}" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+        working-directory: infra/terraform/gcp/environments/${{ matrix.environment }}
+
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-plan-${{ matrix.environment }}
+          path: infra/terraform/gcp/environments/${{ matrix.environment }}/tfplan
+          retention-days: 5
+
+  # PR Comment with plan results
+  terraform-plan-summary:
+    name: Summarize Plans
+    needs: terraform-plan
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Plan Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: plans
+          
+      - name: Comment on PR
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const jobsUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            
+            let comment = `## Terraform Plan Summary\n\n`;
+            comment += `[View all job details](${jobsUrl})\n\n`;
+            
+            const environments = ['common', 'dev', 'prod'];
+            
+            for (const env of environments) {
+              comment += `### ${env.toUpperCase()} Environment\n\n`;
+              comment += `<details><summary>Show Plan</summary>\n\n`;
+              comment += `See [workflow summary](${jobsUrl}) for detailed plan output.\n\n`;
+              comment += `</details>\n\n`;
+            }
+            
+            comment += `\n\nPlan generated at: ${new Date().toISOString()}`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  # Apply job for main branch
+  terraform-apply:
+    name: Apply Terraform Changes
+    needs: [terraform-validate, terraform-security-scan]
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment: production  # Requires approval for production environment
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+          terraform_wrapper: false
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.TERRAFORM_SERVICE_ACCOUNT }}
+
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+
+      - name: Cache Terraform plugins
+        uses: actions/cache@v3
+        with:
+          path: ~/.terraform.d/plugin-cache
+          key: ${{ runner.os }}-terraform-${{ hashFiles('infra/terraform/**/.terraform.lock.hcl') }}
+          restore-keys: |
+            ${{ runner.os }}-terraform-
+
+      # Apply to common environment
+      - name: Apply Common Environment
+        id: apply-common
+        run: |
+          terraform init
+          terraform apply -auto-approve -input=false -var="project_id=${{ env.TF_VAR_project_id }}" -parallelism=${{ env.TF_PARALLELISM }}
+        working-directory: infra/terraform/gcp/environments/common
+
+      # Apply to dev environment
+      - name: Apply Dev Environment
+        id: apply-dev
+        run: |
+          terraform init
+          terraform apply -auto-approve -input=false -var="project_id=${{ env.TF_VAR_project_id }}" -parallelism=${{ env.TF_PARALLELISM }}
+        working-directory: infra/terraform/gcp/environments/dev
+
+      # Apply to prod environment
+      - name: Apply Prod Environment
+        id: apply-prod
+        run: |
+          terraform init
+          terraform apply -auto-approve -input=false -var="project_id=${{ env.TF_VAR_project_id }}" -parallelism=${{ env.TF_PARALLELISM }}
+        working-directory: infra/terraform/gcp/environments/prod
+
+  # Notification job
+  notify:
+    name: Notify Deployment Status
+    needs: [terraform-apply]
+    runs-on: ubuntu-latest
+    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    steps:
+      - name: Publish Deployment Result
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const result = '${{ needs.terraform-apply.result }}';
+            const emoji = result === 'success' ? '✅' : '❌';
+            const color = result === 'success' ? '#00FF00' : '#FF0000';
+            const status = result === 'success' ? 'succeeded' : 'failed';
+            
+            const issue = context.payload.issue || (context.payload.pull_request ? { number: context.payload.pull_request.number } : null);
+            
+            if (issue) {
+              github.rest.issues.createComment({
+                issue_number: issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `## Deployment Status: ${emoji} ${status.toUpperCase()} ${emoji}
+
+                The Terraform deployment for commit \`${{ github.sha }}\` has ${status}.
+
+                [View workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+                *Deployment completed at: ${new Date().toISOString()}*`
+              });
+            }
