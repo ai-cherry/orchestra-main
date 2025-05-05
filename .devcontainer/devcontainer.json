@@ -18,7 +18,9 @@
         "GoogleCloudTools.cloudcode",
         "GoogleCloudTools.cloudcode-gemini",
         "Rooservices.roo-ai",
-        "Cline.cline-vscode"
+        "Cline.cline-vscode",
+        "cursor.cursor-ai",
+        "kodu-ai.claude-coder"
       ],
       "settings": {
         "geminiCodeAssist.projectId": "agi-baby-cherry",

@@ -187,3 +187,15 @@ fi
 
 echo -e "${GREEN}=== VS Code extensions and configuration setup complete ===${NC}"
 echo -e "${BLUE}💡 Tip: If any extensions aren't working correctly, try reloading the window (Ctrl+Shift+P > Developer: Reload Window)${NC}"
+
+# Configure Cursor API key if available
+if [ -n "$CURSOR_API_KEY" ]; then
+  echo -e "${YELLOW}Configuring Cursor API key...${NC}"
+  update_settings "cursor.apiKey" "$CURSOR_API_KEY"
+fi
+
+# Configure Claude Coder API key if available
+if [ -n "$CLAUDE_CODER_API_KEY" ]; then
+  echo -e "${YELLOW}Configuring Claude Coder API key...${NC}"
+  update_settings "claudeCoder.apiKey" "$CLAUDE_CODER_API_KEY"
+fi
