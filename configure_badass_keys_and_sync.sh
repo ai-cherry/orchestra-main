@@ -15,7 +15,7 @@ BOLD='\033[1m'
 NC='\033[0m' # No Color
 
 # Configuration variables
-GCP_PROJECT_ID="cherry-ai-project"
+GCP_PROJECT_ID="agi-baby-cherry"
 GITHUB_ORG="ai-cherry"
 GITHUB_PAT="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"
 
@@ -230,72 +230,78 @@ enable_apis() {
   echo -e "${GREEN}All required APIs enabled.${NC}"
 }
 
-# Create a service account with extensive permissions
-create_badass_service_account() {
-  local sa_name=$1
-  local sa_display_name=$2
-  local sa_email="${sa_name}@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
-  
-  echo -e "${YELLOW}Creating badass service account: ${sa_name}...${NC}"
-  
-  # Check if service account exists
-  if gcloud iam service-accounts describe "$sa_email" &> /dev/null; then
-    echo -e "${BLUE}Service account ${sa_email} already exists.${NC}"
-  else
-    # Create service account
-    gcloud iam service-accounts create "$sa_name" \
-      --display-name="$sa_display_name"
-    
-    echo -e "${GREEN}Service account ${sa_email} created.${NC}"
-  fi
-  
-  # Assign extensive permissions (badass access) - these are powerful permissions!
-  local roles=(
-    "roles/aiplatform.admin"                 # Full access to Vertex AI resources
-    "roles/aiplatform.user"                  # Use Vertex AI models and resources
-    "roles/serviceusage.serviceUsageConsumer" # Use Google Cloud services
-    "roles/storage.admin"                    # Full access to storage buckets
-    "roles/artifactregistry.admin"           # Full access to Artifact Registry
-    "roles/compute.admin"                    # Full access to Compute Engine resources
-    "roles/iam.serviceAccountUser"           # Use service accounts
-    "roles/logging.admin"                    # Full access to logging
-    "roles/monitoring.admin"                 # Full access to monitoring
-    "roles/secretmanager.admin"              # Full access to Secret Manager
-  )
-  
-  for role in "${roles[@]}"; do
-    echo -e "${BLUE}Assigning role ${role} to ${sa_email}...${NC}"
-    gcloud projects add-iam-policy-binding "$GCP_PROJECT_ID" \
-      --member="serviceAccount:$sa_email" \
-      --role="$role"
-  done
-  
-  echo -e "${GREEN}Service account ${sa_email} now has badass permissions.${NC}"
-}
+# Use create_vertex_gemini_keys.sh to create service account keys
+echo -e "${YELLOW}Calling create_vertex_gemini_keys.sh to create service account keys...${NC}"
+./create_vertex_gemini_keys.sh
+echo -e "${GREEN}create_vertex_gemini_keys.sh completed.${NC}"
 
-# Create a service account key
-create_service_account_key() {
-  local sa_name=$1
-  local sa_email="${sa_name}@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
-  local key_file="$TEMP_DIR/${sa_name}_key.json"
-  
-  echo -e "${YELLOW}Creating key for service account: ${sa_email}...${NC}"
-  
-  # Create key
-  gcloud iam service-accounts keys create "$key_file" \
-    --iam-account="$sa_email"
-  
-  # Read key content
-  local key_content=$(cat "$key_file")
-  
-  # Clean up
-  rm "$key_file"
-  
-  echo -e "${GREEN}Key created for service account ${sa_email}.${NC}"
-  
-  # Return key content
-  echo "$key_content"
-}
+# The following functions are no longer used
+# # Create a service account with extensive permissions
+# create_badass_service_account() {
+#   local sa_name=$1
+#   local sa_display_name=$2
+#   local sa_email="${sa_name}@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
+#
+#   echo -e "${YELLOW}Creating badass service account: ${sa_name}...${NC}"
+#
+#   # Check if service account exists
+#   if gcloud iam service-accounts describe "$sa_email" &> /dev/null; then
+#     echo -e "${BLUE}Service account ${sa_email} already exists.${NC}"
+#   else
+#     # Create service account
+#     gcloud iam service-accounts create "$sa_name" \
+#       --display-name="$sa_display_name"
+#
+#     echo -e "${GREEN}Service account ${sa_email} created.${NC}"
+#   fi
+#
+#   # Assign extensive permissions (badass access) - these are powerful permissions!
+#   local roles=(
+#     "roles/aiplatform.admin"                 # Full access to Vertex AI resources
+#     "roles/aiplatform.user"                  # Use Vertex AI models and resources
+#     "roles/serviceusage.serviceUsageConsumer" # Use Google Cloud services
+#     "roles/storage.admin"                    # Full access to storage buckets
+#     "roles/artifactregistry.admin"           # Full access to Artifact Registry
+#     "roles/compute.admin"                    # Full access to Compute Engine resources
+#     "roles/iam.serviceAccountUser"           # Use service accounts
+#     "roles/logging.admin"                    # Full access to logging
+#     "roles/monitoring.admin"                 # Full access to monitoring
+#     "roles/secretmanager.admin"              # Full access to Secret Manager
+#   )
+#
+#   for role in "${roles[@]}"; do
+#     echo -e "${BLUE}Assigning role ${role} to ${sa_email}...${NC}"
+#     gcloud projects add-iam-policy-binding "$GCP_PROJECT_ID" \
+#       --member="serviceAccount:$sa_email" \
+#       --role="$role"
+#   done
+#
+#   echo -e "${GREEN}Service account ${sa_email} now has badass permissions.${NC}"
+# }
+#
+# # Create a service account key
+# create_service_account_key() {
+#   local sa_name=$1
+#   local sa_email="${sa_name}@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
+#   local key_file="$TEMP_DIR/${sa_name}_key.json"
+#
+#   echo -e "${YELLOW}Creating key for service account: ${sa_email}...${NC}"
+#
+#   # Create key
+#   gcloud iam service-accounts keys create "$key_file" \
+#     --iam-account="$sa_email"
+#
+#   # Read key content
+#   local key_content=$(cat "$key_file")
+#
+#   # Clean up
+#   rm "$key_file"
+#
+#   echo -e "${GREEN}Key created for service account ${sa_email}.${NC}"
+#
+#   # Return key content
+#   echo "$key_content"
+# }
 
 # Set a GitHub organization secret
 set_github_org_secret() {

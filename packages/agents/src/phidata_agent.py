@@ -43,50 +43,66 @@ class PhidataAgentWrapper(OrchestraAgentBase):
     def _initialize_phidata_agent(self):
         """
         Initialize the Phidata agent based on configuration.
-        
+
         This creates a new Phidata agent instance using the
         configuration provided and the dependencies from Orchestra.
         """
         try:
-            # Implementation details for initializing Phidata agent
-            # would go here, typically importing Phidata and 
-            # creating an instance of their agent framework
-            pass
+            # Get the agent class from the configuration
+            agent_class_name = self.agent_config.get("phidata_agent_class")
+            if not agent_class_name:
+                raise ValueError("phidata_agent_class not defined in agent config")
+
+            # Dynamically import the agent class
+            components = agent_class_name.split(".")
+            module_name = ".".join(components[:-1])
+            class_name = components[-1]
+            module = __import__(module_name, fromlist=[class_name])
+            agent_class = getattr(module, class_name)
+
+            # Create an instance of the agent class
+            self.phidata_agent = agent_class()  # Pass any required arguments here
+
+            logger.info(f"Initialized Phidata agent: {agent_class_name}")
+
         except Exception as e:
             logger.error(f"Failed to initialize Phidata agent: {str(e)}")
     
     async def run(self, input_data: AgentInput) -> AgentOutput:
         """
-        Execute the Phidata agent with the given input.
-        
+        Execute the Phidata agent with the given input, including short-term memory.
+
         Args:
             input_data: The user input to process
-            
+
         Returns:
             AgentOutput containing the agent's response
         """
         try:
-            # Process the input through the Phidata agent
-            # This would typically involve:
-            # 1. Translating Orchestra's input format to Phidata's
-            # 2. Calling the Phidata agent's processing method
-            # 3. Translating the results back to Orchestra's format
-            
-            # Placeholder for actual implementation
+            # 1. Retrieve recent messages from short-term memory
+            from core.orchestrator.src.main import short_term_memory
+            recent_messages = short_term_memory
+
+            # 2. Include recent messages in the context passed to the Phidata agent
+            context = {
+                "user_input": input_data.content,
+                "recent_messages": recent_messages
+            }
+
+            # 3. Call the Phidata agent's processing method
             logger.info(f"Processing input with Phidata agent: {self.name}")
-            
-            # Simulate processing
-            await asyncio.sleep(0.5)
-            
-            # Return a mock response
+            # Assuming the Phidata agent has a 'process' method that takes a context
+            agent_response = await self.phidata_agent.process(context)
+
+            # 4. Translate the results back to Orchestra's format
             return AgentOutput(
-                response_id="mock-response",
+                response_id="phidata-response",  # Replace with actual response ID if available
                 request_id=input_data.request_id,
                 agent_id=self.id,
-                content="This is a placeholder response from the Phidata agent.",
+                content=agent_response,  # Assuming the Phidata agent returns a string
                 status="completed"
             )
-            
+
         except Exception as e:
             logger.error(f"Error running Phidata agent: {str(e)}")
             return AgentOutput(
