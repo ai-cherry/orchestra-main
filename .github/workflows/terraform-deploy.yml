@@ -201,7 +201,7 @@ jobs:
           path: plans
           
       - name: Comment on PR
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -299,7 +299,7 @@ jobs:
     if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     steps:
       - name: Publish Deployment Result
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
