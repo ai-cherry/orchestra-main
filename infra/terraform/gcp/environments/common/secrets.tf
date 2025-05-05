@@ -15,12 +15,16 @@ resource "google_secret_manager_secret" "openai_api_key" {
     }
   }
   
-  labels = {
-    environment = "common"
-    managed-by  = "terraform"
+  labels = local.common_labels
+  
+  # Add rotation period recommendation
+  rotation {
+    next_rotation_time = timeadd(timestamp(), "8760h") # 1 year from now
+    rotation_period    = "31536000s" # 1 year in seconds
   }
 }
 
+# Anthropic API Key
 # Anthropic API Key
 resource "google_secret_manager_secret" "anthropic_api_key" {
   secret_id = "anthropic-api-key"
@@ -34,12 +38,15 @@ resource "google_secret_manager_secret" "anthropic_api_key" {
     }
   }
   
-  labels = {
-    environment = "common"
-    managed-by  = "terraform"
+  labels = local.common_labels
+  
+  # Add rotation period recommendation
+  rotation {
+    next_rotation_time = timeadd(timestamp(), "8760h") # 1 year from now
+    rotation_period    = "31536000s" # 1 year in seconds
   }
 }
-
+# Redis Auth String
 # Redis Auth String
 resource "google_secret_manager_secret" "redis_auth" {
   secret_id = "redis-auth"
@@ -53,16 +60,18 @@ resource "google_secret_manager_secret" "redis_auth" {
     }
   }
   
-  labels = {
-    environment = "common"
-    managed-by  = "terraform"
+  labels = local.common_labels
+  
+  # Add rotation period recommendation
+  rotation {
+    next_rotation_time = timeadd(timestamp(), "8760h") # 1 year from now
+    rotation_period    = "31536000s" # 1 year in seconds
   }
 }
 
-# Environment-specific versions of secrets
-# Dev environment
-resource "google_secret_manager_secret" "openai_api_key_dev" {
-  secret_id = "openai-api-key-dev"
+# Vertex AI API Key
+resource "google_secret_manager_secret" "vertex_api_key" {
+  secret_id = "vertex-api-key"
   project   = var.project_id
   
   replication {
@@ -73,14 +82,37 @@ resource "google_secret_manager_secret" "openai_api_key_dev" {
     }
   }
   
-  labels = {
-    environment = "dev"
-    managed-by  = "terraform"
+  labels = local.common_labels
+  
+  # Add rotation period recommendation
+  rotation {
+    next_rotation_time = timeadd(timestamp(), "8760h") # 1 year from now
+    rotation_period    = "31536000s" # 1 year in seconds
+  }
+}
+# Function to create environment-specific secrets
+locals {
+  environments = ["dev", "prod"]
+  secret_types = {
+    "openai-api-key"    = "OpenAI API Key",
+    "anthropic-api-key" = "Anthropic API Key",
+    "redis-auth"        = "Redis Authentication",
+    "vertex-api-key"    = "Vertex AI API Key"
   }
 }
 
-resource "google_secret_manager_secret" "anthropic_api_key_dev" {
-  secret_id = "anthropic-api-key-dev"
+# Create environment-specific secrets dynamically
+resource "google_secret_manager_secret" "env_secrets" {
+  for_each = {
+    for pair in setproduct(local.environments, keys(local.secret_types)) :
+    "${pair[1]}-${pair[0]}" => {
+      env         = pair[0]
+      secret_type = pair[1]
+      description = local.secret_types[pair[1]]
+    }
+  }
+  
+  secret_id = each.key
   project   = var.project_id
   
   replication {
@@ -91,85 +123,34 @@ resource "google_secret_manager_secret" "anthropic_api_key_dev" {
     }
   }
   
-  labels = {
-    environment = "dev"
-    managed-by  = "terraform"
+  labels = merge(local.common_labels, {
+    environment = each.value.env
+  })
+  
+  # Add rotation period recommendation
+  rotation {
+    next_rotation_time = timeadd(timestamp(), "8760h") # 1 year from now
+    rotation_period    = "31536000s" # 1 year in seconds
   }
 }
 
-resource "google_secret_manager_secret" "redis_auth_dev" {
-  secret_id = "redis-auth-dev"
-  project   = var.project_id
+# Create IAM bindings for the secrets
+resource "google_secret_manager_secret_iam_binding" "secret_accessor" {
+  for_each  = toset([
+    google_secret_manager_secret.openai_api_key.id,
+    google_secret_manager_secret.anthropic_api_key.id,
+    google_secret_manager_secret.redis_auth.id,
+    google_secret_manager_secret.vertex_api_key.id
+  ])
   
-  replication {
-    auto {
-      customer_managed {
-        kms_key_name = null
-      }
-    }
-  }
-  
-  labels = {
-    environment = "dev"
-    managed-by  = "terraform"
-  }
+  secret_id = each.key
+  role      = "roles/secretmanager.secretAccessor"
+  members   = [
+    "serviceAccount:${google_service_account.orchestra_runner_sa.email}"
+  ]
 }
 
-# Prod environment
-resource "google_secret_manager_secret" "openai_api_key_prod" {
-  secret_id = "openai-api-key-prod"
-  project   = var.project_id
-  
-  replication {
-    auto {
-      customer_managed {
-        kms_key_name = null
-      }
-    }
-  }
-  
-  labels = {
-    environment = "prod"
-    managed-by  = "terraform"
-  }
-}
-
-resource "google_secret_manager_secret" "anthropic_api_key_prod" {
-  secret_id = "anthropic-api-key-prod"
-  project   = var.project_id
-  
-  replication {
-    auto {
-      customer_managed {
-        kms_key_name = null
-      }
-    }
-  }
-  
-  labels = {
-    environment = "prod"
-    managed-by  = "terraform"
-  }
-}
-
-resource "google_secret_manager_secret" "redis_auth_prod" {
-  secret_id = "redis-auth-prod"
-  project   = var.project_id
-  
-  replication {
-    auto {
-      customer_managed {
-        kms_key_name = null
-      }
-    }
-  }
-  
-  labels = {
-    environment = "prod"
-    managed-by  = "terraform"
-  }
-}
-
+# Output secret references
 # Output secret references
 output "openai_secret_id" {
   value       = google_secret_manager_secret.openai_api_key.id
@@ -184,4 +165,16 @@ output "anthropic_secret_id" {
 output "redis_auth_secret_id" {
   value       = google_secret_manager_secret.redis_auth.id
   description = "ID of the Redis authentication string secret"
+}
+
+output "vertex_api_key_secret_id" {
+  value       = google_secret_manager_secret.vertex_api_key.id
+  description = "ID of the Vertex AI API key secret"
+}
+
+output "env_secrets" {
+  value = {
+    for k, v in google_secret_manager_secret.env_secrets : k => v.id
+  }
+  description = "Map of environment-specific secret IDs"
 }

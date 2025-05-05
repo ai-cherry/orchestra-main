@@ -1,0 +1,328 @@
+name: Optimized Deployment Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+env:
+  PROJECT_ID: cherry-ai-project
+  PROJECT_NUMBER: 525398941159
+  REGION: us-central1
+  SERVICE_NAME: ai-orchestra
+  PYTHON_VERSION: "3.11"
+  ARTIFACT_REGISTRY: us-central1-docker.pkg.dev
+
+jobs:
+  lint:
+    name: Lint and Format Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.4.0
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+      
+      - name: Install dependencies
+        run: |
+          poetry install --with dev
+      
+      - name: Run linters
+        run: |
+          poetry run flake8 core/ packages/
+          poetry run black --check core/ packages/
+          poetry run isort --check core/ packages/
+  
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: [lint]
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.4.0
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+      
+      - name: Install dependencies
+        run: |
+          poetry install --with dev
+      
+      - name: Run security checks
+        run: |
+          poetry run bandit -r core/ packages/ -c pyproject.toml
+      
+      - name: Run tests
+        run: |
+          poetry run pytest tests/ --cov=core --cov=packages --cov-report=xml
+      
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage.xml
+  
+  build:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    needs: [test]
+    permissions:
+      contents: read
+      id-token: write # Required for Workload Identity Federation
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      # Authenticate using Workload Identity Federation
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          workload_identity_provider: 'projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'github-actions@cherry-ai-project.iam.gserviceaccount.com'
+      
+      # Setup gcloud CLI
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+      
+      # Configure Docker to use gcloud as a credential helper
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+      
+      # Determine environment
+      - name: Set environment
+        id: set-env
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "ENVIRONMENT=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+          elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "ENVIRONMENT=prod" >> $GITHUB_ENV
+          else
+            echo "ENVIRONMENT=dev" >> $GITHUB_ENV
+          fi
+      
+      # Build and push Docker image
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile.optimized
+          push: true
+          tags: |
+            ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+            ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ env.ENVIRONMENT }}-latest
+          build-args: |
+            BUILD_ENV=${{ env.ENVIRONMENT }}
+      
+      # Save image info for deployment
+      - name: Save image info
+        id: image-info
+        run: |
+          echo "IMAGE=${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}" >> $GITHUB_OUTPUT
+  
+  deploy-dev:
+    name: Deploy to Development
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.ref == 'refs/heads/develop' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'dev')
+    permissions:
+      contents: read
+      id-token: write # Required for Workload Identity Federation
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      # Authenticate using Workload Identity Federation
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          workload_identity_provider: 'projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'github-actions@cherry-ai-project.iam.gserviceaccount.com'
+      
+      # Setup gcloud CLI
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+      
+      # Access secrets securely using Secret Manager
+      - name: Access secrets
+        id: secrets
+        run: |
+          echo "::set-output name=REDIS_HOST::$(gcloud secrets versions access latest --secret=redis-host-dev)"
+          echo "::set-output name=REDIS_PASSWORD::$(gcloud secrets versions access latest --secret=redis-password-dev)"
+          echo "::set-output name=VERTEX_API_KEY::$(gcloud secrets versions access latest --secret=vertex-api-key-dev)"
+      
+      # Deploy to Cloud Run
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v1
+        with:
+          service: ${{ env.SERVICE_NAME }}-dev
+          region: ${{ env.REGION }}
+          image: ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          env_vars: |
+            ENVIRONMENT=development
+            LOG_LEVEL=DEBUG
+            STANDARD_MODE=true
+            USE_RECOVERY_MODE=false
+            VSCODE_DISABLE_WORKSPACE_TRUST=true
+            DISABLE_WORKSPACE_TRUST=true
+          secrets: |
+            REDIS_HOST=REDIS_HOST:latest
+            REDIS_PASSWORD=REDIS_PASSWORD:latest
+            VERTEX_API_KEY=VERTEX_API_KEY:latest
+          cpu: 1
+          memory: 512Mi
+          min-instances: 1
+          max-instances: 5
+          concurrency: 80
+          timeout: 300
+      
+      # Verify deployment
+      - name: Verify deployment
+        run: |
+          # Wait for service to be ready
+          sleep 30
+          # Check if service is responding
+          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.deploy.outputs.url }}/health || echo "failed")
+          if [ "$STATUS_CODE" != "200" ]; then
+            echo "Deployment verification failed with status code: $STATUS_CODE"
+            exit 1
+          fi
+          echo "Deployment verified successfully!"
+  
+  deploy-prod:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'prod')
+    permissions:
+      contents: read
+      id-token: write # Required for Workload Identity Federation
+    environment: production # Requires approval
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      # Authenticate using Workload Identity Federation
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          workload_identity_provider: 'projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'github-actions@cherry-ai-project.iam.gserviceaccount.com'
+      
+      # Setup gcloud CLI
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+      
+      # Access secrets securely using Secret Manager
+      - name: Access secrets
+        id: secrets
+        run: |
+          echo "::set-output name=REDIS_HOST::$(gcloud secrets versions access latest --secret=redis-host-prod)"
+          echo "::set-output name=REDIS_PASSWORD::$(gcloud secrets versions access latest --secret=redis-password-prod)"
+          echo "::set-output name=VERTEX_API_KEY::$(gcloud secrets versions access latest --secret=vertex-api-key-prod)"
+      
+      # Deploy to Cloud Run
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v1
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          region: ${{ env.REGION }}
+          image: ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          env_vars: |
+            ENVIRONMENT=production
+            LOG_LEVEL=INFO
+            STANDARD_MODE=true
+            USE_RECOVERY_MODE=false
+            VSCODE_DISABLE_WORKSPACE_TRUST=true
+            DISABLE_WORKSPACE_TRUST=true
+          secrets: |
+            REDIS_HOST=REDIS_HOST:latest
+            REDIS_PASSWORD=REDIS_PASSWORD:latest
+            VERTEX_API_KEY=VERTEX_API_KEY:latest
+          cpu: 2
+          memory: 1Gi
+          min-instances: 2
+          max-instances: 10
+          concurrency: 80
+          timeout: 300
+      
+      # Verify deployment
+      - name: Verify deployment
+        run: |
+          # Wait for service to be ready
+          sleep 30
+          # Check if service is responding
+          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.deploy.outputs.url }}/health || echo "failed")
+          if [ "$STATUS_CODE" != "200" ]; then
+            echo "Deployment verification failed with status code: $STATUS_CODE"
+            exit 1
+          fi
+          echo "Deployment verified successfully!"
+      
+      # Notify team of successful deployment
+      - name: Notify team
+        run: |
+          echo "Production deployment successful! Service URL: ${{ steps.deploy.outputs.url }}"

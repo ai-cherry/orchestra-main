@@ -55,7 +55,11 @@
         "cloudcode.project": "cherry-ai-project",
         "roo.mode": "turbo",
         "cline.apiSource": "gcp-secret-manager",
-        "terminal.integrated.defaultProfile.linux": "bash"
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "security.workspace.trust.enabled": false,
+        "security.workspace.trust.startupPrompt": "never",
+        "security.workspace.trust.banner": "never",
+        "security.workspace.trust.emptyWindow": false
       }
     }
   },
@@ -68,7 +72,8 @@
     "POETRY_VIRTUALENVS_IN_PROJECT": "true",
     "POETRY_NO_INTERACTION": "1"
   },
-  "postCreateCommand": "bash .devcontainer/setup.sh",
-  "postStartCommand": "bash .devcontainer/verify-environment.sh",
-  "waitFor": "postCreateCommand"
+  "postCreateCommand": "bash .devcontainer/setup.sh && bash ./fix_restricted_mode.sh",
+  "postStartCommand": "bash .devcontainer/verify-environment.sh && bash ./fix_restricted_mode.sh",
+  "waitFor": "postCreateCommand",
+  "initializeCommand": "chmod +x ./fix_restricted_mode.sh || true"
 }

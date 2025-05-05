@@ -43,4 +43,46 @@ python -c "import fastapi; print(f'FastAPI version: {fastapi.__version__}')" || 
 python -c "import pydantic; print(f'Pydantic version: {pydantic.__version__}')" || echo "Pydantic not installed"
 python -c "import google.cloud; print('Google Cloud SDK available')" || echo "Google Cloud SDK not installed"
 
+# Verify restricted mode is disabled
+echo "Checking restricted mode status..."
+if [ "$STANDARD_MODE" = "true" ] && [ "$USE_RECOVERY_MODE" = "false" ] && [ "$VSCODE_DISABLE_WORKSPACE_TRUST" = "true" ] && [ "$DISABLE_WORKSPACE_TRUST" = "true" ]; then
+  echo "✅ Standard mode is active, restricted mode is disabled"
+else
+  echo "⚠️ Warning: Environment variables may not be set correctly for standard mode"
+  echo "   STANDARD_MODE=$STANDARD_MODE"
+  echo "   USE_RECOVERY_MODE=$USE_RECOVERY_MODE"
+  echo "   VSCODE_DISABLE_WORKSPACE_TRUST=$VSCODE_DISABLE_WORKSPACE_TRUST"
+  echo "   DISABLE_WORKSPACE_TRUST=$DISABLE_WORKSPACE_TRUST"
+  
+  # Apply fix if needed
+  export STANDARD_MODE=true
+  export USE_RECOVERY_MODE=false
+  export VSCODE_DISABLE_WORKSPACE_TRUST=true
+  export DISABLE_WORKSPACE_TRUST=true
+  echo "✅ Environment variables corrected for this session"
+  
+  # Run the comprehensive fix script if it exists
+  if [ -f "./fix_restricted_mode.sh" ]; then
+    echo "Running comprehensive restricted mode fix script..."
+    bash ./fix_restricted_mode.sh
+  else
+    echo "Comprehensive fix script not found, using basic prevention..."
+  fi
+fi
+
+# Check for .vscode/settings.json with correct workspace trust settings
+if [ -f ".vscode/settings.json" ]; then
+  if grep -q "security.workspace.trust.enabled.*false" .vscode/settings.json; then
+    echo "✅ VS Code workspace trust is disabled"
+  else
+    echo "⚠️ Warning: VS Code workspace trust settings may not be correctly configured"
+    echo "   Running fix_restricted_mode.sh to correct the issue..."
+    if [ -f "./fix_restricted_mode.sh" ]; then
+      bash ./fix_restricted_mode.sh
+    else
+      echo "   fix_restricted_mode.sh not found, consider running ./prevent_restricted_mode.sh instead"
+    fi
+  fi
+fi
+
 echo "Environment verification complete!"

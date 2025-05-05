@@ -4,7 +4,7 @@
 
 # Cloud Tasks Queue for Orchestra background tasks
 resource "google_cloud_tasks_queue" "orchestra_tasks_queue" {
-  name     = "orchestra-tasks-queue"
+  name     = "${local.env_prefix}-tasks-queue"
   project  = var.project_id
   location = var.region
   
@@ -20,10 +20,70 @@ resource "google_cloud_tasks_queue" "orchestra_tasks_queue" {
     max_retry_duration = "4h"
     max_doublings = 3
   }
+  
+  # Add stackdriver logging
+  stackdriver_logging_config {
+    sampling_ratio = 1.0  # Log all tasks
+  }
 }
 
-# Output the queue ID for reference
+# Cloud Tasks Queue for Orchestra scheduled tasks
+resource "google_cloud_tasks_queue" "orchestra_scheduled_tasks_queue" {
+  name     = "${local.env_prefix}-scheduled-tasks-queue"
+  project  = var.project_id
+  location = var.region
+  
+  rate_limits {
+    max_concurrent_dispatches = 5
+    max_dispatches_per_second = 10
+  }
+  
+  retry_config {
+    max_attempts = 3
+    min_backoff  = "5s"
+    max_backoff  = "300s"
+    max_retry_duration = "12h"
+    max_doublings = 4
+  }
+  
+  # Add stackdriver logging
+  stackdriver_logging_config {
+    sampling_ratio = 1.0  # Log all tasks
+  }
+}
+
+# Cloud Scheduler job for regular maintenance tasks
+resource "google_cloud_scheduler_job" "daily_maintenance" {
+  name             = "${local.env_prefix}-daily-maintenance"
+  project          = var.project_id
+  region           = var.region
+  description      = "Daily maintenance job for Orchestra"
+  schedule         = "0 3 * * *"  # 3 AM every day
+  time_zone        = "UTC"
+  attempt_deadline = "320s"
+  
+  http_target {
+    http_method = "POST"
+    uri         = "https://${var.region}-${var.project_id}.cloudfunctions.net/maintenance-function"
+    
+    oidc_token {
+      service_account_email = google_service_account.orchestra_runner_sa.email
+    }
+  }
+}
+
+# Output the queue IDs for reference
 output "tasks_queue_id" {
   value       = google_cloud_tasks_queue.orchestra_tasks_queue.id
   description = "ID of the Orchestra Cloud Tasks queue"
+}
+
+output "scheduled_tasks_queue_id" {
+  value       = google_cloud_tasks_queue.orchestra_scheduled_tasks_queue.id
+  description = "ID of the Orchestra scheduled tasks queue"
+}
+
+output "scheduler_job_id" {
+  value       = google_cloud_scheduler_job.daily_maintenance.id
+  description = "ID of the Orchestra daily maintenance scheduler job"
 }

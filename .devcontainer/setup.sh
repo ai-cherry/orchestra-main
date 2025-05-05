@@ -51,3 +51,38 @@ echo "Poetry version: $(poetry --version)"
 
 # Create GCP credentials directory if it doesn't exist
 mkdir -p ~/.config/gcloud
+
+# Prevent VS Code restricted mode
+echo "Preventing VS Code restricted mode..."
+# Set critical environment variables
+export USE_RECOVERY_MODE=false
+export STANDARD_MODE=true
+export VSCODE_DISABLE_WORKSPACE_TRUST=true
+export DISABLE_WORKSPACE_TRUST=true
+
+# Make all scripts executable
+find . -name "*.sh" -type f -exec chmod +x {} \; 2>/dev/null
+
+# Run the comprehensive fix script if it exists
+if [ -f "./fix_restricted_mode.sh" ]; then
+  echo "Running comprehensive restricted mode fix script..."
+  bash ./fix_restricted_mode.sh
+else
+  echo "Comprehensive fix script not found, using basic prevention..."
+  
+  # Update VS Code settings
+  mkdir -p .vscode
+  if [ -f .vscode/settings.json ]; then
+    # Ensure workspace trust settings are correct
+    sed -i 's/"security.workspace.trust.enabled": *true/"security.workspace.trust.enabled": false/g' .vscode/settings.json 2>/dev/null
+    sed -i 's/"security.workspace.trust.startupPrompt": *".*"/"security.workspace.trust.startupPrompt": "never"/g' .vscode/settings.json 2>/dev/null
+    sed -i 's/"security.workspace.trust.banner": *".*"/"security.workspace.trust.banner": "never"/g' .vscode/settings.json 2>/dev/null
+    sed -i 's/"security.workspace.trust.emptyWindow": *true/"security.workspace.trust.emptyWindow": false/g' .vscode/settings.json 2>/dev/null
+    echo "VS Code settings updated to prevent restricted mode"
+  fi
+fi
+
+echo "Restricted mode prevention complete"
+
+# Create a marker file to indicate setup has completed
+touch .setup_complete

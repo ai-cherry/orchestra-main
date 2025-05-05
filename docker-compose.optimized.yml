@@ -1,0 +1,200 @@
+version: '3.8'
+
+services:
+  # Main Orchestra API service
+  orchestra-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.optimized
+      args:
+        - BUILD_ENV=development
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      - LOCAL_DEVELOPMENT=true
+      # Force standard mode and disable recovery mode
+      - USE_RECOVERY_MODE=false
+      - STANDARD_MODE=true
+      - VSCODE_DISABLE_WORKSPACE_TRUST=true
+      - DISABLE_WORKSPACE_TRUST=true
+      # Optional Agno configuration - will be used only if Agno is installed
+      - AGNO_PROJECT_ID=orchestra
+    volumes:
+      - ./core:/app/core
+      - ./packages:/app/packages
+      # Mount credentials from local .env file
+      - ./.env:/app/.env:ro
+    networks:
+      - orchestra-network
+    depends_on:
+      - redis
+      - postgres
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # Phidata Agent UI service (formerly Agno UI)
+  phidata-ui:
+    image: phidata/agno-ui:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - API_URL=http://orchestra-api:8000
+      - MCP_ENABLED=true
+      - MEMORY_ENABLED=true
+      - STANDARD_MODE=true
+      - USE_RECOVERY_MODE=false
+      - VSCODE_DISABLE_WORKSPACE_TRUST=true
+      - DISABLE_WORKSPACE_TRUST=true
+    networks:
+      - orchestra-network
+    depends_on:
+      - orchestra-api
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  # LLM Testing service - for validating different providers
+  llm-test-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.llm-test
+    ports:
+      - "8001:8001"
+    environment:
+      - LOG_LEVEL=INFO
+      - LOCAL_DEVELOPMENT=true
+    volumes:
+      # Mount credentials from local .env file
+      - ./.env:/app/.env:ro
+    networks:
+      - orchestra-network
+    depends_on:
+      - redis
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  # Redis for caching and pub/sub
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - orchestra-network
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-orchestrapass}
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-orchestrapass}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+
+  # PostgreSQL for medium-term memory storage
+  postgres:
+    image: postgres:14-alpine
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-orchestra}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-orchestrapass}
+      - POSTGRES_DB=${POSTGRES_DB:-orchestradb}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - orchestra-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-orchestra}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # Monitoring service with Prometheus & Grafana
+  monitoring:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - orchestra-network
+    depends_on:
+      - orchestra-api
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+
+  # Grafana for metrics visualization
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./monitoring/grafana-provisioning:/etc/grafana/provisioning
+    networks:
+      - orchestra-network
+    depends_on:
+      - monitoring
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+
+volumes:
+  redis-data:
+  postgres-data:
+
+networks:
+  orchestra-network:
+    driver: bridge
