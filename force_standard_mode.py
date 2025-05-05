@@ -60,38 +60,5 @@ def patch_module():
     
     print("тЪая╕П APPLYING HARD OVERRIDE: Forcing standard mode and disabling recovery mode!")
 
-# Always run when imported
-patch_module()
-
-# Always run when imported
-patch_module()
-
-# Always run when imported
-patch_module()
-
-# Always run when imported
-patch_module()
-
-# Always run when imported
-patch_module()
-
-# Always run when imported
-patch_module()
-
-# Always run when imported
-patch_module()
-
-# Always run when imported
-patch_module()
-
-# Always run when imported
-patch_module()
-
-# Always run when imported
-patch_module()
-
-# Always run when imported
-patch_module()
-
 if __name__ == "__main__":
     patch_module()

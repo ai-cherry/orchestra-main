@@ -1,3 +1,26 @@
+[tool.poetry]
+name = "orchestra"
+version = "0.1.0"
+
+[tool.poetry.dependencies]
+python = "~3.11 || ^3.12"
+fastapi = "^0.100.0"
+pydantic = "^2.0.0"
+google-cloud-secret-manager = "^2.0.0"
+google-cloud-firestore = "^2.0.0"
+google-cloud-storage = "^2.0.0"
+google-cloud-redis = "^2.0.0"
+google-cloud-tasks = "^2.0.0"
+google-cloud-pubsub = "^2.0.0"
+google-cloud-aiplatform = "*"
+litellm = "^1.0.0"
+opentelemetry-exporter-gcp-trace = "^1.0.0"
+opentelemetry-instrumentation-fastapi = "^0.42b0"
+
+[tool.poetry.dev-dependencies]
+pytest-asyncio = "^0.21.0"
+bandit = "^1.7.5"
+
 [tool.black]
 line-length = 100
 target-version = ['py311']
@@ -19,3 +42,6 @@ exclude = '''
 [tool.isort]
 profile = "black"
 line_length = 100
+
+[[tool.poetry.packages]]
+include = "orchestra"

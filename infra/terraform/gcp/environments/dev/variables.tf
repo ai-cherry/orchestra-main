@@ -6,7 +6,13 @@ variable "project_id" {
 variable "region" {
   description = "The GCP region where resources will be created"
   type        = string
-  default     = "us-central1"
+  default     = "us-west4"
+}
+
+variable "image_tag" {
+  description = "Image tag to deploy for container images"
+  type        = string
+  default     = "dev"
 }
 
 variable "env" {

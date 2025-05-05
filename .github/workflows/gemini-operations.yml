@@ -1,0 +1,69 @@
+name: Gemini Operations
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: 'Gemini operation to perform'
+        required: true
+        default: 'deploy'
+        type: choice
+        options:
+          - deploy
+          - update
+          - test
+
+jobs:
+  gemini-ops:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: '1.4.0'
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          
+      - name: Install dependencies
+        run: poetry install --with dev
+        
+      - name: Run Bandit security scan
+        uses: mdegis/bandit-action@v1
+        with:
+          path: '.'
+          level: medium
+          confidence: medium
+      
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GEMINI_API_BADASS_KEY }}
+          
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        
+      - name: Run Gemini operation
+        run: |
+          OPERATION=${{ github.event.inputs.operation }}
+          echo "Running Gemini operation: $OPERATION"
+          
+          if [ "$OPERATION" == "deploy" ]; then
+            poetry run python gemini_deploy.py
+          elif [ "$OPERATION" == "update" ]; then
+            poetry run python gemini_update.py
+          elif [ "$OPERATION" == "test" ]; then
+            poetry run pytest tests/gemini/ -v
+          else
+            echo "Unknown operation: $OPERATION"
+            exit 1
+          fi
+        env:
+          GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+          GCP_REGION: ${{ vars.GCP_REGION }}

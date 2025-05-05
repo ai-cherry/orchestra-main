@@ -1,100 +1,48 @@
-name: Ultra-Fast GCP Deployment
-on: [push]
+name: Deploy to GCP
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-
-    - name: Install Dependencies
-      run: |
-        pip install poetry
-        poetry install
-
-    - name: Run Linting and Formatting Checks (Non-Blocking for Debugging)
-      run: |
-        poetry add black isort flake8
-        poetry run black --check .
-        if [ $? -ne 0 ]; then
-          echo "Formatting check with black failed. Please run 'black .' to format the code."
-          echo "Note: This check is non-blocking temporarily for debugging purposes."
-        fi
-        poetry run isort --check-only --diff .
-        if [ $? -ne 0 ]; then
-          echo "Import sorting check with isort failed. Please run 'isort .' to sort imports."
-          echo "Note: This check is non-blocking temporarily for debugging purposes."
-        fi
-        poetry run flake8 .
-        if [ $? -ne 0 ]; then
-          echo "Linting check with flake8 failed. Please fix the issues reported by flake8."
-          echo "Note: This check is non-blocking temporarily for debugging purposes."
-        fi
-      continue-on-error: true
-
-    - name: Run Critical Tests
-      run: |
-        export PYTHONPATH=$(pwd)
-        poetry run pytest tests/ -m critical -v
-        if [ $? -ne 0 ]; then
-          echo "Critical tests failed. Halting deployment."
-          exit 1
-        fi
-
-    - name: Auth GCP
-      uses: google-github-actions/auth@v1
-      with:
-        workload_identity_provider: projects/104944497835/locations/global/workloadIdentityPools/gitlab-pool/providers/gitlab-provider
-        service_account: vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-
-    - name: Build and Push Docker Image
-      run: |
-        docker build -t us-docker.pkg.dev/agi-baby-cherry/orchestra/app:latest .
-        docker push us-docker.pkg.dev/agi-baby-cherry/orchestra/app:latest
-
-    - name: Scan Docker Image for Vulnerabilities
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: us-docker.pkg.dev/agi-baby-cherry/orchestra/app:latest
-        format: 'table'
-        exit-code: '1'
-        ignore-unfixed: true
-        vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH'
-      env:
-        TRIVY_USERNAME: ${{ github.actor }}
-        TRIVY_PASSWORD: ${{ github.token }}
-
-    - name: Get Secrets
-      id: secrets
-      uses: google-github-actions/get-secretmanager-secrets@v1
-      with:
-        secrets: |
-          OPENAI_API_KEY:projects/104944497835/secrets/OPENAI_API_KEY
-          PORTKEY_API_KEY:projects/104944497835/secrets/PORTKEY_API_KEY
-
-    - name: Deploy to Cloud Run
-      run: |
-        if ! gcloud run deploy orchestra-prod \
-          --image=us-docker.pkg.dev/agi-baby-cherry/orchestra/app:latest \
-          --set-env-vars "OPENAI_API_KEY=${{ steps.secrets.outputs.OPENAI_API_KEY }}" \
-          --set-env-vars "PORTKEY_API_KEY=${{ steps.secrets.outputs.PORTKEY_API_KEY }}" \
-          --region=us-central1; then
-          echo "Deployment failed. Notifying team for manual intervention."
-          # Add notification step here (e.g., Slack, email)
-          exit 1
-        fi
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: '1.4.0'
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          
+      - name: Install dependencies
+        run: poetry install --with dev
+        
+      - name: Run Bandit security scan
+        uses: mdegis/bandit-action@v1
+        with:
+          path: '.'
+          level: medium
+          confidence: medium
+      
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.VERTEX_AI_BADASS_KEY }}
+          
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        
+      - name: Deploy application
+        run: poetry run python deploy.py
+        env:
+          GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+          GCP_REGION: ${{ vars.GCP_REGION }}

@@ -89,11 +89,7 @@ resource "google_secret_manager_secret" "openrouter" {
   secret_id = "orchestrator-${local.env}-openrouter"
   
   replication {
-    auto {
-      customer_managed_encryption {
-        kms_key_name = "projects/${var.project_id}/locations/global/keyRings/orchestrator-${local.env}-kr/cryptoKeys/orchestrator-${local.env}-key"
-      }
-    }
+    automatic = true
   }
   
   labels = merge(local.labels, {

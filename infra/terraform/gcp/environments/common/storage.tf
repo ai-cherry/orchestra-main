@@ -47,21 +47,6 @@ resource "google_storage_bucket" "embeddings_bucket" {
   }
 }
 
-# 3. Artifact Registry Docker repository
-resource "google_artifact_registry_repository" "orchestra_images" {
-  provider = google-beta
-  project  = var.project_id
-  location = var.region
-  repository_id = "orchestra-images"
-  description   = "Docker repository for Orchestra application images"
-  format        = "DOCKER"
-  
-  labels = {
-    managed-by  = "terraform"
-    environment = "common"
-    purpose     = "docker-images"
-  }
-}
 
 # Outputs
 output "terraform_state_bucket" {
@@ -72,9 +57,4 @@ output "terraform_state_bucket" {
 output "embeddings_bucket" {
   value       = google_storage_bucket.embeddings_bucket.name
   description = "Name of the GCS bucket for embeddings storage"
-}
-
-output "artifact_registry_repository" {
-  value       = google_artifact_registry_repository.orchestra_images.name
-  description = "Name of the Artifact Registry Docker repository"
 }

@@ -100,8 +100,10 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
-          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ env.SERVICE_ACCOUNT }}
+          # WIF configuration temporarily commented out for initial Terraform apply
+          # workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          # service_account: ${{ env.SERVICE_ACCOUNT }}
+          credentials_json: ${{ secrets.GCP_ADMIN_SA_KEY_JSON }}
           create_credentials_file: true
 
       - name: Run pre-migration checks
@@ -187,8 +189,10 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
-          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ env.SERVICE_ACCOUNT }}
+          # WIF configuration temporarily commented out for initial Terraform apply
+          # workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          # service_account: ${{ env.SERVICE_ACCOUNT }}
+          credentials_json: ${{ secrets.GCP_ADMIN_SA_KEY_JSON }}
           create_credentials_file: true
 
       - name: Wait for IAM propagation
@@ -257,8 +261,10 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
-          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ env.SERVICE_ACCOUNT }}
+          # WIF configuration temporarily commented out for initial Terraform apply
+          # workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          # service_account: ${{ env.SERVICE_ACCOUNT }}
+          credentials_json: ${{ secrets.GCP_ADMIN_SA_KEY_JSON }}
           create_credentials_file: true
 
       - name: Enable required APIs
@@ -304,8 +310,10 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
-          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ env.SERVICE_ACCOUNT }}
+          # WIF configuration temporarily commented out for initial Terraform apply
+          # workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          # service_account: ${{ env.SERVICE_ACCOUNT }}
+          credentials_json: ${{ secrets.GCP_ADMIN_SA_KEY_JSON }}
           create_credentials_file: true
 
       - name: Run validation script
