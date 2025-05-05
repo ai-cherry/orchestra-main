@@ -1,37 +1,74 @@
 {
-  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+  "name": "AI Orchestra Development",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
   "features": {
-    "ghcr.io/devcontainers-contrib/features/poetry:2": {},
     "ghcr.io/devcontainers/features/terraform:1": {
-      "version": "1.5.7"
+      "version": "1.11.3",
+      "tflint": true
     },
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/google-cloud-cli:1": {
+      "version": "444.0.0",
+      "install_components": "gke-gcloud-auth-plugin,beta"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "version": "2.32.1"
+    },
+    "ghcr.io/devcontainers-contrib/features/poetry:2": {
+      "version": "1.7.1"
+    }
   },
   "customizations": {
     "vscode": {
       "extensions": [
         "ms-python.python",
+        "ms-python.vscode-pylance",
         "hashicorp.terraform",
-        "charliermarsh.ruff",
+        "ms-azuretools.vscode-docker",
+        "googlecloudtools.cloudcode",
+        "googlecloudtools.cloudcode-gemini",
         "github.copilot",
         "github.copilot-chat",
-        "GoogleCloudTools.cloudcode",
-        "GoogleCloudTools.cloudcode-gemini",
-        "Rooservices.roo-ai",
-        "Cline.cline-vscode",
-        "cursor.cursor-ai",
-        "kodu-ai.claude-coder"
+        "ms-python.black-formatter",
+        "charliermarsh.ruff",
+        "redhat.vscode-yaml",
+        "eamodio.gitlens",
+        "ms-python.pytest-intellisense",
+        "cline.cline-vscode",
+        "rooservices.roo-ai"
       ],
       "settings": {
-        "geminiCodeAssist.projectId": "agi-baby-cherry",
+        "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+        "python.formatting.provider": "black",
+        "python.linting.enabled": true,
+        "python.linting.ruffEnabled": true,
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": true
+        },
+        "geminiCodeAssist.projectId": "cherry-ai-project",
         "geminiCodeAssist.contextAware": true,
         "geminiCodeAssist.codeReview.enabled": true,
-        "cloudcode.duetAI.project": "agi-baby-cherry",
-        "cloudcode.project": "agi-baby-cherry",
+        "cloudcode.duetAI.project": "cherry-ai-project",
+        "cloudcode.project": "cherry-ai-project",
         "roo.mode": "turbo",
-        "cline.apiSource": "gcp-secret-manager"
+        "cline.apiSource": "gcp-secret-manager",
+        "terminal.integrated.defaultProfile.linux": "bash"
       }
     }
   },
-  "postCreateCommand": "poetry install --with dev"
+  "remoteEnv": {
+    "PYTHONPATH": "${containerWorkspaceFolder}",
+    "GCP_PROJECT_ID": "cherry-ai-project",
+    "GCP_REGION": "us-west4",
+    "STANDARD_MODE": "true",
+    "ENVIRONMENT": "development",
+    "POETRY_VIRTUALENVS_IN_PROJECT": "true",
+    "POETRY_NO_INTERACTION": "1"
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "postStartCommand": "bash .devcontainer/verify-environment.sh",
+  "waitFor": "postCreateCommand"
 }

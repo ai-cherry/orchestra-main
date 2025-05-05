@@ -1,68 +1,53 @@
 #!/bin/bash
 set -e
 
-echo "Running setup script for Orchestra development environment..."
+echo "Setting up AI Orchestra development environment..."
 
-# Function to check if system has sufficient resources
-check_resources() {
-    echo "Checking system resources..."
-    
-    # Check available memory (in MB)
-    local available_memory=$(free -m | awk '/^Mem:/{print $7}')
-    local required_memory=500 # Minimum 500MB required
-    
-    # Check available CPU cores
-    local available_cores=$(nproc)
-    local required_cores=1 # Minimum 1 core required
-    
-    echo "Available memory: ${available_memory}MB (minimum required: ${required_memory}MB)"
-    echo "Available CPU cores: ${available_cores} (minimum required: ${required_cores})"
-    
-    # Return success if we have enough resources, failure otherwise
-    if [ "${available_memory}" -ge "${required_memory}" ] && [ "${available_cores}" -ge "${required_cores}" ]; then
-        return 0 # Success
-    else
-        return 1 # Failure
+# Ensure Poetry is properly configured
+poetry config virtualenvs.in-project true
+
+# Check if poetry.lock exists and is up-to-date
+if [ ! -f "poetry.lock" ] || [ "pyproject.toml" -nt "poetry.lock" ]; then
+  echo "Generating poetry.lock file..."
+  poetry lock --no-update
+fi
+
+# Install dependencies with retry mechanism
+MAX_RETRIES=3
+RETRY_COUNT=0
+SUCCESS=false
+
+while [ $RETRY_COUNT -lt $MAX_RETRIES ] && [ "$SUCCESS" = false ]; do
+  echo "Installing dependencies (attempt $((RETRY_COUNT+1))/$MAX_RETRIES)..."
+  if poetry install --with dev; then
+    SUCCESS=true
+  else
+    RETRY_COUNT=$((RETRY_COUNT+1))
+    if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+      echo "Retrying in 5 seconds..."
+      sleep 5
     fi
-}
+  fi
+done
 
-# Function to install Python dependencies
-install_dependencies() {
-    echo "Installing Python dependencies..."
-    # Use python3 -m pip for clarity
-    python3 -m pip install --no-cache-dir -r /workspaces/orchestra-main/core/orchestrator/requirements.txt
-    python3 -m pip install --no-cache-dir -r /workspaces/orchestra-main/packages/shared/requirements.txt
-    # Add other requirements files if they exist and are needed now
-    echo "Python dependencies installation attempted."
-}
-
-# Verify Python installation
-python3 --version
-echo "Python is installed and working"
-
-# Check resources before installing dependencies
-if check_resources; then
-    install_dependencies
-else
-    echo "Skipping dependency installation due to resource constraints. Install manually if needed."
+if [ "$SUCCESS" = false ]; then
+  echo "Failed to install dependencies after $MAX_RETRIES attempts."
+  exit 1
 fi
 
-# Set up pre-commit hooks if .pre-commit-config.yaml exists
-# Note: pre-commit install is deferred as per comments in the task
+# Create standard mode marker file
+touch .standard_mode
+
+# Install pre-commit hooks if config exists
 if [ -f ".pre-commit-config.yaml" ]; then
-    echo "Installing pre-commit hooks..."
-    pre-commit install
+  echo "Installing pre-commit hooks..."
+  pre-commit install
 fi
 
-# Set up .env file from example if it exists
-if [ -f ".env.example" ] && [ ! -f ".env" ]; then
-    echo "Creating .env file from example..."
-    cp .env.example .env
-fi
+# Display environment information
+echo "Environment setup complete!"
+echo "Python version: $(python --version)"
+echo "Poetry version: $(poetry --version)"
 
-echo "Attempting to install core Python dependencies..."
-python3 -m pip install --no-cache-dir -r /workspaces/orchestra-main/core/orchestrator/requirements.txt
-python3 -m pip install --no-cache-dir -r /workspaces/orchestra-main/packages/shared/requirements.txt
-echo "Core Python dependency installation attempt finished."
-
-echo "Post-creation setup completed successfully!"
+# Create GCP credentials directory if it doesn't exist
+mkdir -p ~/.config/gcloud
