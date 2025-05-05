@@ -4,8 +4,8 @@ version = "0.1.0"
 
 [tool.poetry.dependencies]
 python = "~3.11 || ^3.12"
-fastapi = "^0.100.0"
-pydantic = "^2.0.0"
+fastapi = "^0.110.0"  # Suggest update to latest major version
+pydantic = "^2.7.0"  # Suggest update to latest major version
 google-cloud-secret-manager = "^2.0.0"
 google-cloud-firestore = "^2.0.0"
 google-cloud-storage = "^2.0.0"
@@ -13,9 +13,9 @@ google-cloud-redis = "^2.0.0"
 google-cloud-tasks = "^2.0.0"
 google-cloud-pubsub = "^2.0.0"
 google-cloud-aiplatform = "*"
-litellm = "^1.0.0"
-opentelemetry-exporter-gcp-trace = "^1.0.0"
-opentelemetry-instrumentation-fastapi = "^0.42b0"
+litellm = "^1.20.0"  # Suggest update to latest version
+opentelemetry-exporter-gcp-trace = "^1.20.0"  # Suggest update to latest version
+opentelemetry-instrumentation-fastapi = "^1.20.0" # Suggest update to latest version
 
 [tool.poetry.dev-dependencies]
 pytest-asyncio = "^0.21.0"

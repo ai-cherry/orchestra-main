@@ -8,10 +8,36 @@ resource "google_secret_manager_secret" "prod_secrets" {
   for_each = toset([
     "openai-api-key-prod",
     "anthropic-api-key-prod",
-    "gemini-api-key-prod", 
+    "gemini-api-key-prod",
     "redis-auth-prod",
     "database-password-prod",
-    "storage-access-key-prod"
+    "storage-access-key-prod",
+    "openrouter-api-key-prod",
+    "mistral-api-key-prod",
+    "google-api-key-prod",
+    "together-ai-api-key-prod",
+    "deepseek-api-key-prod",
+    "perplexity-api-key-prod",
+    "cohere-api-key-prod",
+    "huggingface-api-token-prod",
+    "portkey-api-key-prod",
+    "tavily-api-key-prod",
+    "brave-api-key-prod",
+    "vertex-api-key-prod",
+    "apify-api-token-prod",
+    "apollo-io-api-key-prod",
+    "exa-api-key-prod",
+    "eleven-labs-api-key-prod",
+    "external-apis-prod",
+    "gcp-client-secret-prod",
+    "gcp-service-account-key-prod",
+    "oauth-client-secret-prod",
+    "certificate-key-prod",
+    "alert-webhook-key-prod",
+    "monitoring-service-key-prod",
+    "service-account-keys-prod",
+    "test-data-key-prod",
+    "mock-service-key-prod"
   ])
   
   project   = var.project_id

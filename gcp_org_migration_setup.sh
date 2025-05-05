@@ -70,11 +70,57 @@ verify_command() {
   fi
 }
 
+# Create a service account with specific roles
+create_focused_service_account() {
+  local sa_name=$1
+  local sa_display_name=$2
+  local sa_email="${sa_name}@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
+  local roles=("${@:3}")
+
+  echo -e "${YELLOW}Creating focused service account: ${sa_name}...${NC}"
+
+  # Check if service account exists
+  if gcloud iam service-accounts describe "${sa_email}" &> /dev/null; then
+    echo -e "${BLUE}Service account ${sa_email} already exists.${NC}"
+  else
+    # Create service account
+    gcloud iam service-accounts create "${sa_name}" \
+      --display-name="${sa_display_name}"
+
+    echo -e "${GREEN}Service account ${sa_email} created.${NC}"
+  fi
+
+  # Assign roles
+  for role in "${roles[@]}"; do
+    echo -e "${YELLOW}Assigning role ${role} to ${sa_email}...${NC}"
+
+    gcloud projects add-iam-policy-binding "${GCP_PROJECT_ID}" \
+      --member="serviceAccount:${sa_email}" \
+      --role="${role}"
+
+    echo -e "${GREEN}Role ${role} assigned to ${sa_email}.${NC}"
+  done
+
+  return 0
+}
+
+
 # Check required commands
 log_message "${BLUE}" "Checking required commands..."
 verify_command "gcloud"
 verify_command "terraform"
 verify_command "jq"
+
+# Create Vertex AI and Gemini service accounts with roles/owner
+log_message "${BLUE}" "Creating Vertex AI and Gemini service accounts with roles/owner..."
+
+VERTEX_SA_NAME="vertex-ai-full-access"
+GEMINI_SA_NAME="gemini-api-full-access"
+
+create_focused_service_account "${VERTEX_SA_NAME}" "Vertex AI Full Access" "roles/owner"
+create_focused_service_account "${GEMINI_SA_NAME}" "Gemini API Full Access" "roles/owner"
+
+log_message "${GREEN}" "Vertex AI and Gemini service accounts created successfully."
 
 # Display header
 echo -e "${BLUE}========================================================"

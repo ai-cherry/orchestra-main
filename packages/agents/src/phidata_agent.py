@@ -60,8 +60,8 @@ class PhidataAgentWrapper(OrchestraAgentBase):
             module = __import__(module_name, fromlist=[class_name])
             agent_class = getattr(module, class_name)
 
-            # Create an instance of the agent class
-            self.phidata_agent = agent_class()  # Pass any required arguments here
+            # Create an instance of the agent class, passing the agent config
+            self.phidata_agent = agent_class(agent_config=self.agent_config)
 
             logger.info(f"Initialized Phidata agent: {agent_class_name}")
 
@@ -91,7 +91,6 @@ class PhidataAgentWrapper(OrchestraAgentBase):
 
             # 3. Call the Phidata agent's processing method
             logger.info(f"Processing input with Phidata agent: {self.name}")
-            # Assuming the Phidata agent has a 'process' method that takes a context
             agent_response = await self.phidata_agent.process(context)
 
             # 4. Translate the results back to Orchestra's format
@@ -99,7 +98,7 @@ class PhidataAgentWrapper(OrchestraAgentBase):
                 response_id="phidata-response",  # Replace with actual response ID if available
                 request_id=input_data.request_id,
                 agent_id=self.id,
-                content=agent_response,  # Assuming the Phidata agent returns a string
+                content=str(agent_response),  # Ensure the content is a string
                 status="completed"
             )
 
