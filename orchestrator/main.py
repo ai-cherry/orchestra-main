@@ -70,6 +70,10 @@ memory_manager = None
 
 # Initialize system components
 
+# Short-term memory store (in-memory)
+SHORT_TERM_MEMORY_SIZE = 5  # Maximum number of recent messages to store
+short_term_memory = []
+
 
 @app.on_event("startup")
 async def startup_event():
@@ -165,6 +169,19 @@ async def interact(user_input: dict):
                 await memory_manager.store(memory_item)
             except Exception as e:
                 logger.error(f"Failed to store memory: {e}")
+
+        # Store interaction in short-term memory
+        try:
+            memory_item = MemoryItem(
+                content=text,
+                response=response,
+                metadata={"source": "user_interaction"}
+            )
+            short_term_memory.insert(0, memory_item)  # Add to the beginning
+            if len(short_term_memory) > SHORT_TERM_MEMORY_SIZE:
+                short_term_memory.pop()  # Remove the oldest item
+        except Exception as e:
+            logger.error(f"Failed to store short-term memory: {e}")
 
         return {"response": response}
 
