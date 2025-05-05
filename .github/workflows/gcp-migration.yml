@@ -317,7 +317,7 @@ jobs:
 
       - name: Send Slack notification on failure
         if: steps.migration.outputs.success != 'true'
-        uses: slackapi/slack-github-action@v1.24.0
+        uses: slackapi/slack-github-action@v2.0.0
         with:
           payload: |
             {
@@ -497,7 +497,7 @@ jobs:
           path: migration_artifacts/
 
       - name: Send success notification
-        uses: slackapi/slack-github-action@v1.24.0
+        uses: slackapi/slack-github-action@v2.0.0
         with:
           payload: |
             {
