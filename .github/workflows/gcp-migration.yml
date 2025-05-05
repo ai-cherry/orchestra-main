@@ -491,7 +491,7 @@ jobs:
           cp migration_report.md migration_artifacts/
 
       - name: Upload report artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: migration-report
           path: migration_artifacts/

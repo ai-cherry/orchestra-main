@@ -182,7 +182,7 @@ jobs:
         working-directory: infra/terraform/gcp/environments/${{ matrix.environment }}
 
       - name: Upload Terraform Plan
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: terraform-plan-${{ matrix.environment }}
           path: infra/terraform/gcp/environments/${{ matrix.environment }}/tfplan
