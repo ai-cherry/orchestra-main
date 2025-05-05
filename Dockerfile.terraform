@@ -1,4 +1,4 @@
-FROM hashicorp/terraform:1.5.0
+FROM hashicorp/terraform:1.11.4
 
 # Initially use sh instead of bash
 # Install bash first before setting it as the shell
