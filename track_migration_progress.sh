@@ -95,19 +95,15 @@ get_credentials_from_secret_manager() {
     secret_name="$secret_name-$env"
   fi
   
-  # Check if secret exists
-  # Note: This is not a credential, just a check for secret existence
-  # github-actions: allow
-  if ! gcloud secrets describe "$secret_name" --project="$GCP_PROJECT_ID" &>/dev/null; then
+  # Use the secure credential manager to check if the secret exists
+  if ! ./secure_credential_manager.sh check-secret "$secret_name" &>/dev/null; then
     print_status "Secret Manager" "FAIL" "Secret $secret_name does not exist in project $GCP_PROJECT_ID"
     return 1
   fi
   
-  # Get the secret
-  # Note: This is retrieving a secret securely, not exposing credentials
-  # github-actions: allow
+  # Use the secure credential manager to get the secret
   local secret_value
-  secret_value=$(gcloud secrets versions access latest --secret="$secret_name" --project="$GCP_PROJECT_ID" 2>/dev/null)
+  secret_value=$(./secure_credential_manager.sh get-secret "$secret_name" 2>/dev/null)
   
   if [ -z "$secret_value" ]; then
     print_status "Secret retrieval" "FAIL" "Failed to retrieve secret $secret_name"
@@ -128,21 +124,15 @@ get_secret() {
   # Add environment suffix if not already present
   if [[ "$secret_name" != *"-$env" ]]; then
     secret_name="$secret_name-$env"
-  # Check if secret exists
-  # Note: This is not a credential, just a check for secret existence
-  # github-actions: allow
-  if ! gcloud secrets describe "$secret_name" --project="$GCP_PROJECT_ID" &>/dev/null; then
+  # Use the secure credential manager to check if the secret exists
+  if ! ./secure_credential_manager.sh check-secret "$secret_name" &>/dev/null; then
     echo "Secret $secret_name does not exist in project $GCP_PROJECT_ID" >&2
     return 1
   fi
-    return 1
-  fi
   
-  # Get the secret
-  # Note: This is retrieving a secret securely, not exposing credentials
-  # github-actions: allow
+  # Use the secure credential manager to get the secret
   local secret_value
-  secret_value=$(gcloud secrets versions access latest --secret="$secret_name" --project="$GCP_PROJECT_ID" 2>/dev/null)
+  secret_value=$(./secure_credential_manager.sh get-secret "$secret_name" 2>/dev/null)
   
   if [ -z "$secret_value" ]; then
     echo "Failed to retrieve secret $secret_name" >&2
