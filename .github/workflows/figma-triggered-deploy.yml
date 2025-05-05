@@ -166,7 +166,7 @@ jobs:
           ref: main # Ensure we're deploying from main
       
       - name: Set up Google Cloud Auth
-        uses: google-github-actions/auth@v1
+        uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.ORG_GCP_CREDENTIALS }}
       

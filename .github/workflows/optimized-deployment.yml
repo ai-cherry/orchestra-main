@@ -132,7 +132,7 @@ jobs:
       # Authenticate using Workload Identity Federation
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v1'
+        uses: 'google-github-actions/auth@v2'
         with:
           workload_identity_provider: 'projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
           service_account: 'github-actions@cherry-ai-project.iam.gserviceaccount.com'
@@ -193,7 +193,7 @@ jobs:
       # Authenticate using Workload Identity Federation
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v1'
+        uses: 'google-github-actions/auth@v2'
         with:
           workload_identity_provider: 'projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
           service_account: 'github-actions@cherry-ai-project.iam.gserviceaccount.com'
@@ -266,7 +266,7 @@ jobs:
       # Authenticate using Workload Identity Federation
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v1'
+        uses: 'google-github-actions/auth@v2'
         with:
           workload_identity_provider: 'projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
           service_account: 'github-actions@cherry-ai-project.iam.gserviceaccount.com'

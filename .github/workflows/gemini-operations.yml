@@ -42,7 +42,7 @@ jobs:
           confidence: medium
       
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v1
+        uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GEMINI_API_BADASS_KEY }}
           
