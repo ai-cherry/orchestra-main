@@ -1,5 +1,5 @@
 # Dedicated cache stage
-FROM python:3.11-slim as cache
+FROM python:3.13-slim as cache
 
 # Set up cache directory
 RUN mkdir -p /cache/poetry /cache/apt
@@ -14,7 +14,7 @@ ENV PATH="$POETRY_HOME/bin:$PATH"
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 # Base image for all build stages
-FROM python:3.11-slim as base
+FROM python:3.13-slim as base
 
 # Install common system dependencies with cache mount
 RUN --mount=type=cache,target=/var/cache/apt \
@@ -70,7 +70,7 @@ RUN --mount=type=cache,target=/root/.cache/pypoetry/cache \
     poetry install --only openrouter --no-root
 
 # Stage 4: Final runtime image
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 # Install minimal runtime dependencies
 RUN apt-get update && apt-get install -y \

@@ -1,6 +1,6 @@
 # Multi-stage build for AI Orchestra
 # Stage 1: Build dependencies
-FROM python:3.11-slim-bullseye AS builder
+FROM python:3.13-slim-bullseye AS builder
 
 WORKDIR /app
 
@@ -25,7 +25,7 @@ RUN poetry config virtualenvs.create false
 RUN poetry export -f requirements.txt --without dev > requirements.txt
 
 # Stage 2: Runtime environment
-FROM python:3.11-slim-bullseye
+FROM python:3.13-slim-bullseye
 
 WORKDIR /app
 
