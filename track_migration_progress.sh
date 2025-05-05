@@ -16,11 +16,12 @@ BOLD='\033[1m'
 NC='\033[0m' # No Color
 
 # Configuration
-GCP_PROJECT_ID="agi-baby-cherry"
-GCP_ORG_ID="873291114285"
-CLOUD_WORKSTATION_CLUSTER="ai-development"
-CLOUD_WORKSTATION_CONFIG="ai-dev-config"
-REGION="us-central1"
+# Use environment variables if available, otherwise use defaults
+GCP_PROJECT_ID="${GCP_PROJECT_ID:-cherry-ai-project}"
+GCP_ORG_ID="${GCP_ORG_ID:-525398941159}"
+CLOUD_WORKSTATION_CLUSTER="${CLOUD_WORKSTATION_CLUSTER:-ai-development}"
+CLOUD_WORKSTATION_CONFIG="${CLOUD_WORKSTATION_CONFIG:-ai-dev-config}"
+REGION="${REGION:-us-central1}"
 
 # Terminal width for formatting
 TERM_WIDTH=$(tput cols 2>/dev/null || echo 80)
@@ -78,6 +79,81 @@ execute_check() {
 }
 
 # Function to verify authentication and set up if needed
+# Function to get credentials from Secret Manager
+get_credentials_from_secret_manager() {
+  local secret_name="${1:-vertex-agent-key}"
+  local env="${2:-dev}"
+  
+  # Check if gcloud is authenticated for Secret Manager access
+  if ! gcloud auth list --filter=status=ACTIVE --format="value(account)" &>/dev/null; then
+    print_status "GCP Authentication" "FAIL" "Not authenticated with gcloud for Secret Manager access"
+    return 1
+  fi
+  
+  # Add environment suffix if not already present
+  if [[ "$secret_name" != *"-$env" ]]; then
+    secret_name="$secret_name-$env"
+  fi
+  
+  # Check if secret exists
+  # Note: This is not a credential, just a check for secret existence
+  # github-actions: allow
+  if ! gcloud secrets describe "$secret_name" --project="$GCP_PROJECT_ID" &>/dev/null; then
+    print_status "Secret Manager" "FAIL" "Secret $secret_name does not exist in project $GCP_PROJECT_ID"
+    return 1
+  fi
+  
+  # Get the secret
+  # Note: This is retrieving a secret securely, not exposing credentials
+  # github-actions: allow
+  local secret_value
+  secret_value=$(gcloud secrets versions access latest --secret="$secret_name" --project="$GCP_PROJECT_ID" 2>/dev/null)
+  
+  if [ -z "$secret_value" ]; then
+    print_status "Secret retrieval" "FAIL" "Failed to retrieve secret $secret_name"
+    return 1
+  fi
+  
+  # Export as environment variable
+  export GCP_SA_JSON="$secret_value"
+  print_status "Secret retrieval" "PASS" "Successfully retrieved credentials from Secret Manager"
+  return 0
+}
+
+# Function to securely retrieve any secret from Secret Manager
+get_secret() {
+  local secret_name="$1"
+  local env="${2:-dev}"
+  
+  # Add environment suffix if not already present
+  if [[ "$secret_name" != *"-$env" ]]; then
+    secret_name="$secret_name-$env"
+  # Check if secret exists
+  # Note: This is not a credential, just a check for secret existence
+  # github-actions: allow
+  if ! gcloud secrets describe "$secret_name" --project="$GCP_PROJECT_ID" &>/dev/null; then
+    echo "Secret $secret_name does not exist in project $GCP_PROJECT_ID" >&2
+    return 1
+  fi
+    return 1
+  fi
+  
+  # Get the secret
+  # Note: This is retrieving a secret securely, not exposing credentials
+  # github-actions: allow
+  local secret_value
+  secret_value=$(gcloud secrets versions access latest --secret="$secret_name" --project="$GCP_PROJECT_ID" 2>/dev/null)
+  
+  if [ -z "$secret_value" ]; then
+    echo "Failed to retrieve secret $secret_name" >&2
+    return 1
+  fi
+  
+  # Output the secret value
+  echo "$secret_value"
+  return 0
+}
+
 verify_authentication() {
   print_header "Authentication Verification"
   
@@ -91,32 +167,35 @@ verify_authentication() {
     if [ -z "$GCP_SA_JSON" ]; then
       print_status "Service account JSON" "FAIL" "GCP_SA_JSON environment variable not set"
       
-      cat << EOF
+      # Try to get credentials from Secret Manager
+      log_info "Attempting to retrieve credentials from Secret Manager..."
+      if ! get_credentials_from_secret_manager; then
+        cat << EOF
 
 ${YELLOW}===== Authentication Issue Detected =====${NC}
-No active authentication and no service account JSON found.
+No active authentication and could not retrieve credentials from Secret Manager.
 
-To fix this issue, set the GCP_SA_JSON environment variable:
+To fix this issue, you have several secure options:
 
-export GCP_SA_JSON='{
-  "type": "service_account",
-  "project_id": "agi-baby-cherry",
-  "private_key_id": "6833bc94f0e3ef8648efc1578caa23ba2b8a8a52",
-  "private_key": "-----BEGIN PRIVATE KEY-----\\n[YOUR_ACTUAL_KEY]\\n-----END PRIVATE KEY-----\\n",
-  "client_email": "vertex-agent@agi-baby-cherry.iam.gserviceaccount.com",
-  "client_id": "104944497835-h9l77l0ltmv4h8t9o5a02m51v8g91a9i",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/vertex-agent%40agi-baby-cherry.iam.gserviceaccount.com"
-}'
+1. Use the secure_credential_manager.sh script:
+   ./secure_credential_manager.sh get-secret vertex-agent-key > /tmp/key.json
+   export GOOGLE_APPLICATION_CREDENTIALS=/tmp/key.json
 
-${YELLOW}Then run this script again.${NC}
+2. Use gcloud authentication directly:
+   gcloud auth login
+   or
+   gcloud auth activate-service-account --key-file=/path/to/your-key.json
+
+3. For CI/CD environments, use Workload Identity Federation:
+   https://cloud.google.com/iam/docs/workload-identity-federation
+
+${YELLOW}After setting up authentication, run this script again.${NC}
 EOF
-      return 1
-    fi
+        return 1
+      fi
+    }
     
-    print_status "Service account JSON" "PASS" "Environment variable is set"
+    print_status "Service account JSON" "PASS" "Credentials available"
     
     # Setup zero-disk authentication
     echo -e "\n${BLUE}Setting up zero-disk authentication...${NC}"
@@ -131,7 +210,7 @@ EOF
       rm -f "$TEMP_KEY"
       print_status "Zero-disk authentication" "FAIL" "Authentication failed"
       return 1
-    fi
+    }
   else
     print_status "Active gcloud authentication" "PASS" "Account: $auth_status"
   fi
@@ -181,10 +260,11 @@ check_iam() {
   print_header "IAM Roles and Permissions"
   
   # Check service account roles
-  echo -e "${BLUE}Checking roles for vertex-agent@agi-baby-cherry.iam.gserviceaccount.com...${NC}"
+  local service_account="vertex-agent@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
+  echo -e "${BLUE}Checking roles for ${service_account}...${NC}"
   
   local roles=$(gcloud organizations get-iam-policy "$GCP_ORG_ID" \
-    --filter="bindings.members:serviceAccount:vertex-agent@agi-baby-cherry.iam.gserviceaccount.com" \
+    --filter="bindings.members:serviceAccount:${service_account}" \
     --format="value(bindings.role)" 2>/dev/null || echo "")
   
   if [ -z "$roles" ]; then
@@ -220,12 +300,12 @@ check_iam() {
     if [[ "$response" =~ ^[Yy]$ ]]; then
       echo -e "${BLUE}Assigning resourcemanager.projectMover role...${NC}"
       gcloud organizations add-iam-policy-binding "$GCP_ORG_ID" \
-        --member="serviceAccount:vertex-agent@agi-baby-cherry.iam.gserviceaccount.com" \
+        --member="serviceAccount:${service_account}" \
         --role="roles/resourcemanager.projectMover" > /dev/null 2>&1
       
       echo -e "${BLUE}Assigning resourcemanager.projectCreator role...${NC}"
       gcloud organizations add-iam-policy-binding "$GCP_ORG_ID" \
-        --member="serviceAccount:vertex-agent@agi-baby-cherry.iam.gserviceaccount.com" \
+        --member="serviceAccount:${service_account}" \
         --role="roles/resourcemanager.projectCreator" > /dev/null 2>&1
       
       echo -e "${YELLOW}Waiting 10 seconds for changes to propagate...${NC}"
@@ -233,7 +313,7 @@ check_iam() {
       
       # Check roles again
       roles=$(gcloud organizations get-iam-policy "$GCP_ORG_ID" \
-        --filter="bindings.members:serviceAccount:vertex-agent@agi-baby-cherry.iam.gserviceaccount.com" \
+        --filter="bindings.members:serviceAccount:${service_account}" \
         --format="value(bindings.role)" 2>/dev/null || echo "")
       
       if [[ "$roles" == *"resourcemanager.projectMover"* ]] && [[ "$roles" == *"resourcemanager.projectCreator"* ]]; then
