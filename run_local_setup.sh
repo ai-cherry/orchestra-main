@@ -1,5 +1,5 @@
 #!/bin/bash
-# run_local_setup.sh - Run the infrastructure setup locally using GitHub secrets
+# run_local_setup.sh - Run the local setup process for the AI Orchestra project
 
 set -e
 
@@ -11,12 +11,12 @@ BLUE='\033[0;34m'
 BOLD='\033[1m'
 NC='\033[0m' # No Color
 
-# Configuration - Set defaults but allow override through environment variables
-: "${GCP_PROJECT_ID:=cherry-ai-project}"
-: "${GITHUB_ORG:=ai-cherry}"
-: "${GITHUB_REPO:=orchestra-main}"
-: "${REGION:=us-central1}"
-: "${ENV:=dev}"
+# Configuration
+PROJECT_ID="cherry-ai-project"
+REGION="us-central1"
+SECRET_MANAGER_KEY="secret-management-key.json"
+PROJECT_ADMIN_KEY="project-admin-key.json"
+GITHUB_TOKEN="${GITHUB_TOKEN:-}"
 
 # Log function with timestamps
 log() {
@@ -37,6 +37,9 @@ log() {
     "SUCCESS")
       echo -e "${GREEN}[${timestamp}] [SUCCESS] ${message}${NC}"
       ;;
+    "STEP")
+      echo -e "\n${BLUE}[${timestamp}] [STEP] ${message}${NC}"
+      ;;
     *)
       echo -e "[${timestamp}] ${message}"
       ;;
@@ -45,178 +48,144 @@ log() {
 
 # Check requirements
 check_requirements() {
-  log "INFO" "Checking requirements..."
+  log "STEP" "Checking requirements..."
   
-  # Check for GitHub CLI
-  if ! command -v gh &> /dev/null; then
-    log "ERROR" "GitHub CLI (gh) is required but not found"
-    log "INFO" "Please install it: https://cli.github.com/manual/installation"
+  # Check for gcloud
+  if ! command -v gcloud &> /dev/null; then
+    log "ERROR" "gcloud CLI is required but not found"
+    log "INFO" "Please install it: https://cloud.google.com/sdk/docs/install"
     exit 1
   fi
   
-  # Check for GitHub PAT
-  if [[ -z "${GITHUB_TOKEN}" ]]; then
-    log "ERROR" "GITHUB_TOKEN environment variable is required"
-    log "INFO" "Please set it: export GITHUB_TOKEN=your_github_token"
+  # Check for service account key files
+  if [ ! -f "${SECRET_MANAGER_KEY}" ]; then
+    log "ERROR" "Secret Manager key file not found: ${SECRET_MANAGER_KEY}"
     exit 1
   fi
   
-  log "INFO" "All requirements satisfied"
-}
-
-# Authenticate with GitHub
-authenticate_github() {
-  log "INFO" "Authenticating with GitHub using GITHUB_TOKEN..."
-  echo "${GITHUB_TOKEN}" | gh auth login --with-token
-  
-  # Verify GitHub authentication
-  if ! gh auth status &>/dev/null; then
-    log "ERROR" "Failed to authenticate with GitHub"
+  if [ ! -f "${PROJECT_ADMIN_KEY}" ]; then
+    log "ERROR" "Project Admin key file not found: ${PROJECT_ADMIN_KEY}"
     exit 1
   fi
   
-  log "SUCCESS" "Successfully authenticated with GitHub"
-}
-
-# Fetch GCP_MASTER_SERVICE_JSON from GitHub secrets
-fetch_gcp_master_service_json() {
-  log "INFO" "Fetching GCP_MASTER_SERVICE_JSON from GitHub secrets..."
-  
-  # Create a temporary file to store the secret
-  local temp_file=$(mktemp)
-  
-  # Fetch the secret
-  if gh secret get GCP_MASTER_SERVICE_JSON --org "${GITHUB_ORG}" > "${temp_file}" 2>/dev/null; then
-    log "SUCCESS" "Successfully fetched GCP_MASTER_SERVICE_JSON from GitHub secrets"
+  # Check for GitHub CLI if GITHUB_TOKEN is set
+  if [ -n "${GITHUB_TOKEN}" ]; then
+    if ! command -v gh &> /dev/null; then
+      log "WARN" "GitHub CLI not found, GitHub organization secrets will not be updated"
+      log "INFO" "Please install it: https://cli.github.com/manual/installation"
+    fi
   else
-    log "ERROR" "Failed to fetch GCP_MASTER_SERVICE_JSON from GitHub secrets"
-    rm -f "${temp_file}"
-    exit 1
+    log "WARN" "GITHUB_TOKEN not set, GitHub organization secrets will not be updated"
+    log "INFO" "Set the GITHUB_TOKEN environment variable to update GitHub organization secrets"
   fi
   
-  # Return the path to the temporary file
-  echo "${temp_file}"
+  log "SUCCESS" "All requirements satisfied"
 }
 
-# Run setup_gcp_infrastructure.sh
-run_setup_gcp_infrastructure() {
-  log "INFO" "Running setup_gcp_infrastructure.sh..."
+# Run the create_badass_service_keys.sh script
+run_create_badass_service_keys() {
+  log "STEP" "Creating powerful service account keys..."
   
-  # Check if the script exists
-  if [ ! -f "setup_gcp_infrastructure.sh" ]; then
-    log "ERROR" "setup_gcp_infrastructure.sh not found"
-    exit 1
-  fi
-  
-  # Make the script executable
-  chmod +x setup_gcp_infrastructure.sh
+  # Make sure the script is executable
+  chmod +x create_badass_service_keys.sh
   
   # Run the script
-  GCP_MASTER_SERVICE_JSON=$(cat "$1") \
-  GITHUB_TOKEN="${GITHUB_TOKEN}" \
-  GCP_PROJECT_ID="${GCP_PROJECT_ID}" \
-  GITHUB_ORG="${GITHUB_ORG}" \
-  GITHUB_REPO="${GITHUB_REPO}" \
-  REGION="${REGION}" \
-  ENV="${ENV}" \
-  ./setup_gcp_infrastructure.sh
+  ./create_badass_service_keys.sh
   
-  log "SUCCESS" "setup_gcp_infrastructure.sh completed successfully"
+  log "SUCCESS" "Powerful service account keys created successfully"
 }
 
-# Run update_gcp_infrastructure.sh
-run_update_gcp_infrastructure() {
-  log "INFO" "Running update_gcp_infrastructure.sh..."
-  
-  # Check if the script exists
-  if [ ! -f "update_gcp_infrastructure.sh" ]; then
-    log "ERROR" "update_gcp_infrastructure.sh not found"
-    exit 1
-  fi
-  
-  # Make the script executable
-  chmod +x update_gcp_infrastructure.sh
-  
-  # Run the script
-  GCP_MASTER_SERVICE_JSON=$(cat "$1") \
-  GITHUB_TOKEN="${GITHUB_TOKEN}" \
-  GCP_PROJECT_ID="${GCP_PROJECT_ID}" \
-  GITHUB_ORG="${GITHUB_ORG}" \
-  GITHUB_REPO="${GITHUB_REPO}" \
-  REGION="${REGION}" \
-  ENV="${ENV}" \
-  ./update_gcp_infrastructure.sh
-  
-  log "SUCCESS" "update_gcp_infrastructure.sh completed successfully"
-}
-
-# Run verify_gcp_setup.sh
+# Run the verify_gcp_setup.sh script
 run_verify_gcp_setup() {
-  log "INFO" "Running verify_gcp_setup.sh..."
+  log "STEP" "Verifying GCP setup..."
   
-  # Check if the script exists
-  if [ ! -f "scripts/verify_gcp_setup.sh" ]; then
-    log "ERROR" "scripts/verify_gcp_setup.sh not found"
-    exit 1
-  fi
-  
-  # Make the script executable
+  # Make sure the script is executable
   chmod +x scripts/verify_gcp_setup.sh
   
-  # Run the script
-  GCP_MASTER_SERVICE_JSON=$(cat "$1") \
-  GCP_PROJECT_ID="${GCP_PROJECT_ID}" \
-  REGION="${REGION}" \
-  ./scripts/verify_gcp_setup.sh
+  # Set the environment variables
+  export GCP_PROJECT_ID="${PROJECT_ID}"
+  export REGION="${REGION}"
+  export GCP_MASTER_SERVICE_JSON="$(cat ${PROJECT_ADMIN_KEY})"
   
-  log "SUCCESS" "verify_gcp_setup.sh completed successfully"
+  # Run the script
+  scripts/verify_gcp_setup.sh
+  
+  log "SUCCESS" "GCP setup verified successfully"
 }
 
-# Clean up temporary files
-cleanup() {
-  log "INFO" "Cleaning up temporary files..."
+# Run the secure_exposed_credentials.sh script
+run_secure_exposed_credentials() {
+  log "STEP" "Securing exposed credentials..."
   
-  # Remove the temporary file
-  rm -f "$1"
+  # Make sure the script is executable
+  chmod +x secure_exposed_credentials.sh
   
-  log "SUCCESS" "Temporary files cleaned up"
+  # Run the script
+  ./secure_exposed_credentials.sh
+  
+  log "SUCCESS" "Exposed credentials secured successfully"
+}
+
+# Commit changes
+commit_changes() {
+  log "STEP" "Committing changes..."
+  
+  # Check if git is available
+  if ! command -v git &> /dev/null; then
+    log "WARN" "git not found, changes will not be committed"
+    return
+  fi
+  
+  # Add the changes
+  git add .
+  
+  # Commit the changes
+  git commit -m "Set up GCP infrastructure for AI Orchestra project"
+  
+  log "SUCCESS" "Changes committed successfully"
+}
+
+# Push changes
+push_changes() {
+  log "STEP" "Pushing changes..."
+  
+  # Check if git is available
+  if ! command -v git &> /dev/null; then
+    log "WARN" "git not found, changes will not be pushed"
+    return
+  fi
+  
+  # Push the changes
+  git push origin main
+  
+  log "SUCCESS" "Changes pushed successfully"
 }
 
 # Main function
 main() {
-  log "INFO" "Starting local infrastructure setup..."
+  log "INFO" "Starting local setup process for the AI Orchestra project..."
   
   # Check requirements
   check_requirements
   
-  # Authenticate with GitHub
-  authenticate_github
+  # Run the create_badass_service_keys.sh script
+  run_create_badass_service_keys
   
-  # Fetch GCP_MASTER_SERVICE_JSON from GitHub secrets
-  local master_key_file=$(fetch_gcp_master_service_json)
+  # Run the verify_gcp_setup.sh script
+  run_verify_gcp_setup
   
-  # Run setup_gcp_infrastructure.sh
-  run_setup_gcp_infrastructure "${master_key_file}"
+  # Run the secure_exposed_credentials.sh script
+  run_secure_exposed_credentials
   
-  # Run update_gcp_infrastructure.sh
-  run_update_gcp_infrastructure "${master_key_file}"
+  # Commit changes
+  commit_changes
   
-  # Run verify_gcp_setup.sh
-  run_verify_gcp_setup "${master_key_file}"
+  # Push changes
+  push_changes
   
-  # Clean up temporary files
-  cleanup "${master_key_file}"
-  
-  log "SUCCESS" "Local infrastructure setup completed successfully!"
-  log "INFO" "The following tasks have been completed:"
-  log "INFO" "1. Fetched GCP_MASTER_SERVICE_JSON from GitHub secrets"
-  log "INFO" "2. Ran setup_gcp_infrastructure.sh to set up the GCP infrastructure"
-  log "INFO" "3. Ran update_gcp_infrastructure.sh to update GitHub secrets"
-  log "INFO" "4. Ran verify_gcp_setup.sh to verify the GCP setup"
-  
-  log "INFO" "Next steps:"
-  log "INFO" "1. Create a new Codespace or rebuild an existing one"
-  log "INFO" "2. Verify that the Codespace has access to GCP resources"
+  log "SUCCESS" "Local setup process completed successfully!"
+  log "INFO" "The AI Orchestra project is now set up with GCP infrastructure"
+  log "INFO" "You can now use the GitHub Actions workflow to deploy the project"
 }
 
 # Execute main function

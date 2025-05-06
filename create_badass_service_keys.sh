@@ -1,6 +1,5 @@
 #!/bin/bash
-# Script to create comprehensive service account keys for Vertex AI and Gemini services
-# and update GitHub organization-level secrets with the new keys and project information
+# create_badass_service_keys.sh - Create powerful service account keys for Vertex AI and Gemini
 
 set -e
 
@@ -12,11 +11,14 @@ BLUE='\033[0;34m'
 BOLD='\033[1m'
 NC='\033[0m' # No Color
 
-# Configuration - Set defaults but allow override through environment variables
-: "${GCP_PROJECT_ID:=cherry-ai-project}"
-: "${GITHUB_ORG:=ai-cherry}"
-: "${GITHUB_REPO:=orchestra-main}"
-: "${REGION:=us-central1}"
+# Configuration
+PROJECT_ID="cherry-ai-project"
+PROJECT_NUMBER="525398941159"
+REGION="us-central1"
+VERTEX_SA_NAME="vertex-power-user"
+GEMINI_SA_NAME="gemini-power-user"
+SECRET_MANAGER_KEY="secret-management-key.json"
+PROJECT_ADMIN_KEY="project-admin-key.json"
 
 # Log function with timestamps
 log() {
@@ -50,407 +52,256 @@ check_requirements() {
   # Check for gcloud
   if ! command -v gcloud &> /dev/null; then
     log "ERROR" "gcloud CLI is required but not found"
-    log "INFO" "Please ensure the Google Cloud SDK is installed and in your PATH"
+    log "INFO" "Please install it: https://cloud.google.com/sdk/docs/install"
     exit 1
   fi
   
-  # Check for GitHub CLI
-  GITHUB_CLI_AVAILABLE=false
-  if command -v gh &> /dev/null; then
-    GITHUB_CLI_AVAILABLE=true
-    log "INFO" "GitHub CLI found. Will attempt to update GitHub secrets automatically."
-    
-    # Authenticate with GitHub CLI - only if GITHUB_TOKEN is provided
-    if [ -n "${GITHUB_TOKEN:-}" ]; then
-      log "INFO" "Authenticating with GitHub CLI..."
-      echo "${GITHUB_TOKEN}" | gh auth login --with-token
-      
-      # Verify GitHub authentication
-      if ! gh auth status &>/dev/null; then
-        log "WARN" "Failed to authenticate with GitHub. GitHub secrets will not be updated automatically."
-        GITHUB_CLI_AVAILABLE=false
-      else
-        log "SUCCESS" "Successfully authenticated with GitHub"
-      fi
-    else
-      log "WARN" "No GITHUB_TOKEN provided. GitHub secrets will not be updated automatically."
-      GITHUB_CLI_AVAILABLE=false
-    fi
-  else
-    log "WARN" "GitHub CLI not found. GitHub secrets will not be updated automatically."
-    log "WARN" "You will need to manually set the GitHub secrets."
+  # Check for service account key files
+  if [ ! -f "${SECRET_MANAGER_KEY}" ]; then
+    log "ERROR" "Secret Manager key file not found: ${SECRET_MANAGER_KEY}"
+    exit 1
+  fi
+  
+  if [ ! -f "${PROJECT_ADMIN_KEY}" ]; then
+    log "ERROR" "Project Admin key file not found: ${PROJECT_ADMIN_KEY}"
+    exit 1
   fi
   
   log "INFO" "All requirements satisfied"
 }
 
-# Run requirements check
-check_requirements
-
-# Check for required environment variables
-if [[ -z "${GCP_MASTER_SERVICE_JSON}" && -z "${GCP_PROJECT_ADMIN_KEY}" && -z "${GCP_SECRET_MANAGEMENT_KEY}" ]]; then
-  log "ERROR" "One of GCP_MASTER_SERVICE_JSON, GCP_PROJECT_ADMIN_KEY, or GCP_SECRET_MANAGEMENT_KEY environment variable is required"
+# Authenticate with GCP using Secret Manager key
+authenticate_with_secret_manager() {
+  log "INFO" "Authenticating with GCP using Secret Manager key..."
   
-  # Try to fetch secrets from GitHub if GitHub CLI is available
-  if command -v gh &> /dev/null; then
-    log "INFO" "Attempting to fetch secrets from GitHub..."
-    
-    GCP_PROJECT_ADMIN_KEY=$(gh secret get GCP_PROJECT_ADMIN_KEY --org "$GITHUB_ORG" 2>/dev/null)
-    if [ -n "$GCP_PROJECT_ADMIN_KEY" ]; then
-      log "SUCCESS" "Successfully fetched GCP_PROJECT_ADMIN_KEY from GitHub"
-    fi
-    
-    GCP_SECRET_MANAGEMENT_KEY=$(gh secret get GCP_SECRET_MANAGEMENT_KEY --org "$GITHUB_ORG" 2>/dev/null)
-    if [ -n "$GCP_SECRET_MANAGEMENT_KEY" ]; then
-      log "SUCCESS" "Successfully fetched GCP_SECRET_MANAGEMENT_KEY from GitHub"
-    fi
-    
-    # If still no keys, prompt for manual input
-    if [[ -z "${GCP_MASTER_SERVICE_JSON}" && -z "${GCP_PROJECT_ADMIN_KEY}" && -z "${GCP_SECRET_MANAGEMENT_KEY}" ]]; then
-      log "WARN" "No keys found in GitHub secrets"
-      log "INFO" "Please provide a key file path manually"
-      read -p "Path to service account key file: " KEY_FILE_PATH
-      
-      if [ -f "$KEY_FILE_PATH" ]; then
-        GCP_MASTER_SERVICE_JSON=$(cat "$KEY_FILE_PATH")
-        log "SUCCESS" "Successfully loaded key from $KEY_FILE_PATH"
-      else
-        log "ERROR" "File not found: $KEY_FILE_PATH"
-        exit 1
-      fi
-    fi
-  else
-    log "ERROR" "GitHub CLI not available and no service account keys provided"
-    log "INFO" "Please provide a key file path manually"
-    read -p "Path to service account key file: " KEY_FILE_PATH
-    
-    if [ -f "$KEY_FILE_PATH" ]; then
-      GCP_MASTER_SERVICE_JSON=$(cat "$KEY_FILE_PATH")
-      log "SUCCESS" "Successfully loaded key from $KEY_FILE_PATH"
-    else
-      log "ERROR" "File not found: $KEY_FILE_PATH"
-      exit 1
-    fi
-  fi
-fi
-
-# Service account names
-VERTEX_SA_NAME="vertex-ai-admin"
-GEMINI_API_SA_NAME="gemini-api-admin"
-GEMINI_CODE_ASSIST_SA_NAME="gemini-code-assist-admin"
-GEMINI_CLOUD_ASSIST_SA_NAME="gemini-cloud-assist-admin"
-SECRET_MGMT_SA_NAME="secret-management-admin"
-
-# Print header
-log "INFO" "========================================================================="
-log "INFO" "   COMPREHENSIVE VERTEX AI AND GEMINI SERVICE KEY CREATOR   "
-log "INFO" "========================================================================="
-
-# Function to check if gcloud is installed and authenticated
-check_gcloud() {
-  log "INFO" "Checking gcloud installation and authentication..."
+  # Authenticate with the service account key
+  gcloud auth activate-service-account --key-file="${SECRET_MANAGER_KEY}"
   
-  if ! command -v gcloud &> /dev/null; then
-    log "ERROR" "gcloud CLI is not installed. Please install it first."
-    exit 1
-  fi
+  # Set the project
+  gcloud config set project "${PROJECT_ID}"
   
-  # Authenticate with GCP using the provided key
-  log "INFO" "Authenticating with GCP..."
-  
-  # Create a temporary file to store the service account key
-  TEMP_KEY_FILE=$(mktemp)
-  
-  # Use the first available key
-  if [ -n "${GCP_MASTER_SERVICE_JSON}" ]; then
-    log "INFO" "Using GCP_MASTER_SERVICE_JSON for authentication"
-    echo "$GCP_MASTER_SERVICE_JSON" > "$TEMP_KEY_FILE"
-  elif [ -n "${GCP_PROJECT_ADMIN_KEY}" ]; then
-    log "INFO" "Using GCP_PROJECT_ADMIN_KEY for authentication"
-    echo "$GCP_PROJECT_ADMIN_KEY" > "$TEMP_KEY_FILE"
-  elif [ -n "${GCP_SECRET_MANAGEMENT_KEY}" ]; then
-    log "INFO" "Using GCP_SECRET_MANAGEMENT_KEY for authentication"
-    echo "$GCP_SECRET_MANAGEMENT_KEY" > "$TEMP_KEY_FILE"
-  else
-    log "ERROR" "No service account key available for authentication"
-    exit 1
-  fi
-  
-  chmod 600 "$TEMP_KEY_FILE"
-  gcloud auth activate-service-account --key-file="$TEMP_KEY_FILE"
-  
-  # Securely remove the temporary file
-  shred -u "$TEMP_KEY_FILE"
-  
-  # Verify authentication
-  if ! gcloud auth list --filter=status:ACTIVE --format="value(account)" &> /dev/null; then
-    log "ERROR" "Failed to authenticate with gcloud using the provided key."
-    exit 1
-  fi
-  
-  # Check if project exists and is accessible
-  if ! gcloud projects describe "${GCP_PROJECT_ID}" &> /dev/null; then
-    log "ERROR" "Project ${GCP_PROJECT_ID} does not exist or is not accessible."
-    exit 1
-  fi
-  
-  log "SUCCESS" "gcloud is properly configured."
+  log "SUCCESS" "Successfully authenticated with GCP using Secret Manager key"
 }
 
-# Function to create a service account if it doesn't exist
+# Authenticate with GCP using Project Admin key
+authenticate_with_project_admin() {
+  log "INFO" "Authenticating with GCP using Project Admin key..."
+  
+  # Authenticate with the service account key
+  gcloud auth activate-service-account --key-file="${PROJECT_ADMIN_KEY}"
+  
+  # Set the project
+  gcloud config set project "${PROJECT_ID}"
+  
+  log "SUCCESS" "Successfully authenticated with GCP using Project Admin key"
+}
+
+# Create service account
 create_service_account() {
   local sa_name=$1
-  local description=$2
+  local sa_display_name=$2
+  local sa_description=$3
   
-  log "INFO" "Creating service account: ${sa_name}@${GCP_PROJECT_ID}.iam.gserviceaccount.com..."
+  log "INFO" "Creating service account: ${sa_name}..."
   
-  if gcloud iam service-accounts describe "${sa_name}@${GCP_PROJECT_ID}.iam.gserviceaccount.com" &> /dev/null; then
-    log "INFO" "Service account already exists. Skipping creation."
+  # Check if the service account already exists
+  if gcloud iam service-accounts describe "${sa_name}@${PROJECT_ID}.iam.gserviceaccount.com" --project="${PROJECT_ID}" &>/dev/null; then
+    log "INFO" "Service account ${sa_name} already exists"
   else
+    # Create the service account
     gcloud iam service-accounts create "${sa_name}" \
-      --display-name="${description}" \
-      --project="${GCP_PROJECT_ID}"
-    log "SUCCESS" "Service account created successfully."
+      --display-name="${sa_display_name}" \
+      --description="${sa_description}" \
+      --project="${PROJECT_ID}"
+    
+    log "SUCCESS" "Service account ${sa_name} created successfully"
   fi
 }
 
-# Function to assign roles to a service account
-assign_roles() {
+# Grant role to service account
+grant_role() {
   local sa_name=$1
-  local roles=("${@:2}")
+  local role=$2
   
-  log "INFO" "Assigning roles to ${sa_name}@${GCP_PROJECT_ID}.iam.gserviceaccount.com..."
+  log "INFO" "Granting role ${role} to service account ${sa_name}..."
   
-  for role in "${roles[@]}"; do
-    log "INFO" "  - Assigning role: ${role}"
-    gcloud projects add-iam-policy-binding "${GCP_PROJECT_ID}" \
-      --member="serviceAccount:${sa_name}@${GCP_PROJECT_ID}.iam.gserviceaccount.com" \
-      --role="${role}" \
-      --quiet
-  done
+  # Grant the role
+  gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+    --member="serviceAccount:${sa_name}@${PROJECT_ID}.iam.gserviceaccount.com" \
+    --role="${role}" \
+    --condition=None
   
-  log "SUCCESS" "Roles assigned successfully."
+  log "SUCCESS" "Role ${role} granted to service account ${sa_name}"
 }
 
-# Function to create and download service account key
-create_key() {
+# Create service account key
+create_service_account_key() {
   local sa_name=$1
-  local key_file=$(mktemp)
-
-  log "INFO" "Creating and downloading key for ${sa_name}@${GCP_PROJECT_ID}.iam.gserviceaccount.com..."
-
+  local key_file=$2
+  
+  log "INFO" "Creating service account key for ${sa_name}..."
+  
+  # Create the key
   gcloud iam service-accounts keys create "${key_file}" \
-    --iam-account="${sa_name}@${GCP_PROJECT_ID}.iam.gserviceaccount.com" \
-    --project="${GCP_PROJECT_ID}"
-
-  log "SUCCESS" "Key created and downloaded to temporary file"
-
-  # Read the key file content
-  SA_KEY=$(cat "${key_file}")
-
-  # Base64 encode for GitHub secrets
-  SA_KEY_BASE64=$(echo "${SA_KEY}" | base64 -w 0)
-
-  # Save to a more secure temporary location
-  SECURE_TEMP_DIR=$(mktemp -d)
-  echo "${SA_KEY}" > "${SECURE_TEMP_DIR}/${sa_name}-key.json"
-  echo "${SA_KEY_BASE64}" > "${SECURE_TEMP_DIR}/${sa_name}-key-base64.txt"
+    --iam-account="${sa_name}@${PROJECT_ID}.iam.gserviceaccount.com" \
+    --project="${PROJECT_ID}"
   
-  log "INFO" "Key saved to ${SECURE_TEMP_DIR}/${sa_name}-key.json"
-  log "INFO" "Base64 encoded key saved to ${SECURE_TEMP_DIR}/${sa_name}-key-base64.txt"
-
-  # Store key in Secret Manager
-  log "INFO" "Storing ${sa_name} key in Secret Manager"
-  if gcloud secrets describe "${sa_name}-key" --project="${GCP_PROJECT_ID}" &>/dev/null; then
-    gcloud secrets versions add "${sa_name}-key" \
-      --data-file="${SECURE_TEMP_DIR}/${sa_name}-key.json" \
-      --project="${GCP_PROJECT_ID}"
-  else
-    gcloud secrets create "${sa_name}-key" \
-      --data-file="${SECURE_TEMP_DIR}/${sa_name}-key.json" \
-      --project="${GCP_PROJECT_ID}"
-  fi
-
-  # Securely remove the original temporary file
-  shred -u "${key_file}"
-
-  # Return the base64 encoded key
-  echo "${SA_KEY_BASE64}"
+  log "SUCCESS" "Service account key created successfully: ${key_file}"
 }
 
-# Function to update GitHub secrets
-update_github_secret() {
+# Store key in Secret Manager
+store_key_in_secret_manager() {
   local secret_name=$1
-  local secret_value=$2
+  local key_file=$2
   
-  log "INFO" "Updating GitHub secret: ${secret_name}..."
+  log "INFO" "Storing key in Secret Manager: ${secret_name}..."
   
-  if [ "$GITHUB_CLI_AVAILABLE" = true ] && [ -n "${GITHUB_TOKEN:-}" ]; then
-    # Use GitHub CLI to set the secret
-    if echo "${secret_value}" | gh secret set "${secret_name}" --org "${GITHUB_ORG}"; then
-      log "SUCCESS" "Secret ${secret_name} updated successfully."
-    else
-      log "ERROR" "Failed to update secret ${secret_name}."
-      log "INFO" "Please update it manually."
-      manual_update_instructions "${secret_name}"
-    fi
+  # Check if the secret already exists
+  if gcloud secrets describe "${secret_name}" --project="${PROJECT_ID}" &>/dev/null; then
+    # Add a new version to the existing secret
+    gcloud secrets versions add "${secret_name}" \
+      --data-file="${key_file}" \
+      --project="${PROJECT_ID}"
   else
-    # Output instructions for manual update
-    manual_update_instructions "${secret_name}"
+    # Create a new secret
+    gcloud secrets create "${secret_name}" \
+      --data-file="${key_file}" \
+      --project="${PROJECT_ID}"
   fi
-}
-
-# Function to display manual update instructions
-manual_update_instructions() {
-  local secret_name=$1
   
-  log "INFO" "To update this secret manually:"
-  log "INFO" "1. Go to ${GITHUB_ORG} organization settings"
-  log "INFO" "2. Navigate to Secrets and variables -> Actions"
-  log "INFO" "3. Add or update a secret with name: ${secret_name}"
-  log "INFO" "4. Use the value from the secure temporary directory shown above"
+  log "SUCCESS" "Key stored in Secret Manager: ${secret_name}"
 }
 
-# Enable required GCP APIs
-enable_apis() {
-  log "INFO" "Enabling required APIs..."
-  gcloud services enable iamcredentials.googleapis.com \
-    iam.googleapis.com \
-    cloudresourcemanager.googleapis.com \
-    secretmanager.googleapis.com \
-    aiplatform.googleapis.com \
-    artifactregistry.googleapis.com \
-    --project "${GCP_PROJECT_ID}"
+# Create Vertex AI service account
+create_vertex_service_account() {
+  log "INFO" "Creating Vertex AI service account..."
   
-  log "SUCCESS" "APIs enabled successfully"
+  # Create the service account
+  create_service_account "${VERTEX_SA_NAME}" "Vertex AI Power User" "Service account with powerful permissions for Vertex AI"
+  
+  # Grant roles
+  grant_role "${VERTEX_SA_NAME}" "roles/aiplatform.admin"
+  grant_role "${VERTEX_SA_NAME}" "roles/aiplatform.user"
+  grant_role "${VERTEX_SA_NAME}" "roles/storage.admin"
+  grant_role "${VERTEX_SA_NAME}" "roles/bigquery.admin"
+  grant_role "${VERTEX_SA_NAME}" "roles/logging.admin"
+  grant_role "${VERTEX_SA_NAME}" "roles/monitoring.admin"
+  
+  # Create a temporary directory for the key
+  local temp_dir=$(mktemp -d)
+  local key_file="${temp_dir}/vertex-key.json"
+  
+  # Create the key
+  create_service_account_key "${VERTEX_SA_NAME}" "${key_file}"
+  
+  # Store the key in Secret Manager
+  store_key_in_secret_manager "vertex-power-key" "${key_file}"
+  
+  # Clean up
+  rm -f "${key_file}"
+  rmdir "${temp_dir}"
+  
+  log "SUCCESS" "Vertex AI service account created successfully"
 }
 
-# Main execution
+# Create Gemini service account
+create_gemini_service_account() {
+  log "INFO" "Creating Gemini service account..."
+  
+  # Create the service account
+  create_service_account "${GEMINI_SA_NAME}" "Gemini Power User" "Service account with powerful permissions for Gemini"
+  
+  # Grant roles
+  grant_role "${GEMINI_SA_NAME}" "roles/aiplatform.admin"
+  grant_role "${GEMINI_SA_NAME}" "roles/aiplatform.user"
+  grant_role "${GEMINI_SA_NAME}" "roles/storage.admin"
+  grant_role "${GEMINI_SA_NAME}" "roles/logging.admin"
+  grant_role "${GEMINI_SA_NAME}" "roles/monitoring.admin"
+  
+  # Create a temporary directory for the key
+  local temp_dir=$(mktemp -d)
+  local key_file="${temp_dir}/gemini-key.json"
+  
+  # Create the key
+  create_service_account_key "${GEMINI_SA_NAME}" "${key_file}"
+  
+  # Store the key in Secret Manager
+  store_key_in_secret_manager "gemini-power-key" "${key_file}"
+  
+  # Clean up
+  rm -f "${key_file}"
+  rmdir "${temp_dir}"
+  
+  log "SUCCESS" "Gemini service account created successfully"
+}
 
-# 1. Check requirements
-check_requirements
+# Update GitHub organization secrets
+update_github_org_secrets() {
+  log "INFO" "Updating GitHub organization secrets..."
+  
+  # Check if GitHub CLI is installed
+  if ! command -v gh &> /dev/null; then
+    log "WARN" "GitHub CLI not found, skipping GitHub secrets update"
+    return
+  fi
+  
+  # Check if GITHUB_TOKEN is set
+  if [ -z "${GITHUB_TOKEN}" ]; then
+    log "WARN" "GITHUB_TOKEN not set, skipping GitHub secrets update"
+    return
+  fi
+  
+  # Authenticate with GitHub
+  echo "${GITHUB_TOKEN}" | gh auth login --with-token
+  
+  # Update GitHub organization secrets
+  log "INFO" "Updating GCP_PROJECT_ID secret..."
+  echo "${PROJECT_ID}" | gh secret set GCP_PROJECT_ID --org "ai-cherry"
+  
+  log "INFO" "Updating GCP_PROJECT_NUMBER secret..."
+  echo "${PROJECT_NUMBER}" | gh secret set GCP_PROJECT_NUMBER --org "ai-cherry"
+  
+  log "INFO" "Updating GCP_REGION secret..."
+  echo "${REGION}" | gh secret set GCP_REGION --org "ai-cherry"
+  
+  # Get the Vertex AI key from Secret Manager
+  local vertex_key=$(gcloud secrets versions access latest --secret="vertex-power-key" --project="${PROJECT_ID}")
+  log "INFO" "Updating GCP_VERTEX_POWER_KEY secret..."
+  echo "${vertex_key}" | gh secret set GCP_VERTEX_POWER_KEY --org "ai-cherry"
+  
+  # Get the Gemini key from Secret Manager
+  local gemini_key=$(gcloud secrets versions access latest --secret="gemini-power-key" --project="${PROJECT_ID}")
+  log "INFO" "Updating GCP_GEMINI_POWER_KEY secret..."
+  echo "${gemini_key}" | gh secret set GCP_GEMINI_POWER_KEY --org "ai-cherry"
+  
+  log "SUCCESS" "GitHub organization secrets updated successfully"
+}
 
-# 2. Check gcloud setup
-check_gcloud
+# Main function
+main() {
+  log "INFO" "Starting creation of powerful service account keys..."
+  
+  # Check requirements
+  check_requirements
+  
+  # Authenticate with GCP using Project Admin key (has more permissions)
+  authenticate_with_project_admin
+  
+  # Create Vertex AI service account
+  create_vertex_service_account
+  
+  # Create Gemini service account
+  create_gemini_service_account
+  
+  # Update GitHub organization secrets
+  update_github_org_secrets
+  
+  log "SUCCESS" "Powerful service account keys created successfully!"
+  log "INFO" "The keys have been stored in Secret Manager with the following names:"
+  log "INFO" "- vertex-power-key"
+  log "INFO" "- gemini-power-key"
+  log "INFO" "The keys have also been added to GitHub organization secrets"
+}
 
-# 3. Enable required APIs
-enable_apis
-
-# 4. Create and configure Vertex AI service account
-create_service_account "${VERTEX_SA_NAME}" "Vertex AI Administrator Service Account"
-
-# Assign comprehensive roles for Vertex AI
-VERTEX_ROLES=(
-  "roles/aiplatform.admin"
-  "roles/aiplatform.user"
-  "roles/artifactregistry.admin"
-  "roles/compute.admin"
-  "roles/iam.serviceAccountUser"
-  "roles/logging.admin"
-  "roles/storage.admin"
-  "roles/monitoring.admin"
-  "roles/serviceusage.serviceUsageConsumer"
-)
-assign_roles "${VERTEX_SA_NAME}" "${VERTEX_ROLES[@]}"
-
-# 5. Create and configure Gemini API service account
-create_service_account "${GEMINI_API_SA_NAME}" "Gemini API Administrator Service Account"
-
-# Assign comprehensive roles for Gemini API
-GEMINI_API_ROLES=(
-  "roles/aiplatform.admin"
-  "roles/aiplatform.user"
-  "roles/serviceusage.serviceUsageConsumer"
-  "roles/logging.admin"
-  "roles/monitoring.admin"
-)
-assign_roles "${GEMINI_API_SA_NAME}" "${GEMINI_API_ROLES[@]}"
-
-# 6. Create and configure Gemini Code Assist service account
-create_service_account "${GEMINI_CODE_ASSIST_SA_NAME}" "Gemini Code Assist Administrator Service Account"
-
-# Assign comprehensive roles for Gemini Code Assist
-GEMINI_CODE_ASSIST_ROLES=(
-  "roles/aiplatform.admin"
-  "roles/aiplatform.user"
-  "roles/serviceusage.serviceUsageConsumer"
-  "roles/logging.admin"
-  "roles/monitoring.admin"
-)
-assign_roles "${GEMINI_CODE_ASSIST_SA_NAME}" "${GEMINI_CODE_ASSIST_ROLES[@]}"
-
-# 7. Create and configure Gemini Cloud Assist service account
-create_service_account "${GEMINI_CLOUD_ASSIST_SA_NAME}" "Gemini Cloud Assist Administrator Service Account"
-
-# Assign comprehensive roles for Gemini Cloud Assist
-GEMINI_CLOUD_ASSIST_ROLES=(
-  "roles/aiplatform.admin"
-  "roles/aiplatform.user"
-  "roles/serviceusage.serviceUsageConsumer"
-  "roles/logging.admin"
-  "roles/monitoring.admin"
-)
-assign_roles "${GEMINI_CLOUD_ASSIST_SA_NAME}" "${GEMINI_CLOUD_ASSIST_ROLES[@]}"
-
-# 8. Create and configure Secret Management service account
-create_service_account "${SECRET_MGMT_SA_NAME}" "Secret Management Service Account"
-
-# Assign comprehensive roles for Secret Management
-SECRET_MGMT_ROLES=(
-  "roles/secretmanager.admin"
-  "roles/secretmanager.secretAccessor"
-  "roles/iam.serviceAccountUser"
-  "roles/iam.serviceAccountKeyAdmin"
-  "roles/iam.serviceAccountTokenCreator"
-)
-assign_roles "${SECRET_MGMT_SA_NAME}" "${SECRET_MGMT_ROLES[@]}"
-
-# 9. Create service account keys
-log "INFO" "Creating service account keys..."
-VERTEX_SA_KEY=$(create_key "${VERTEX_SA_NAME}")
-GEMINI_API_SA_KEY=$(create_key "${GEMINI_API_SA_NAME}")
-GEMINI_CODE_ASSIST_SA_KEY=$(create_key "${GEMINI_CODE_ASSIST_SA_NAME}")
-GEMINI_CLOUD_ASSIST_SA_KEY=$(create_key "${GEMINI_CLOUD_ASSIST_SA_NAME}")
-SECRET_MGMT_SA_KEY=$(create_key "${SECRET_MGMT_SA_NAME}")
-
-# 10. Save project ID for GitHub secrets
-SECURE_TEMP_DIR=$(mktemp -d)
-echo "${GCP_PROJECT_ID}" > "${SECURE_TEMP_DIR}/GCP_PROJECT_ID.txt"
-
-# 11. Update GitHub secrets or output instructions
-log "INFO" "========================================================================="
-log "INFO" "   GITHUB SECRET UPDATE INSTRUCTIONS   "
-log "INFO" "========================================================================="
-
-update_github_secret "VERTEX_AI_FULL_ACCESS_KEY" "${VERTEX_SA_KEY}"
-update_github_secret "GEMINI_API_FULL_ACCESS_KEY" "${GEMINI_API_SA_KEY}"
-update_github_secret "GEMINI_CODE_ASSIST_FULL_ACCESS_KEY" "${GEMINI_CODE_ASSIST_SA_KEY}"
-update_github_secret "GEMINI_CLOUD_ASSIST_FULL_ACCESS_KEY" "${GEMINI_CLOUD_ASSIST_SA_KEY}"
-update_github_secret "GCP_SECRET_MANAGEMENT_KEY" "${SECRET_MGMT_SA_KEY}"
-update_github_secret "GCP_PROJECT_ID" "${GCP_PROJECT_ID}"
-update_github_secret "GCP_REGION" "${REGION}"
-
-log "SUCCESS" "Service account keys created successfully!"
-log "INFO" "Check the secure temporary directories for all generated keys and values."
-log "WARN" "IMPORTANT: Secure these keys and remove them from the filesystem after use!"
-
-# 12. Security reminder
-log "WARN" "SECURITY WARNING:"
-log "WARN" "1. The service account keys created are highly privileged and should be protected."
-log "WARN" "2. Consider setting up key rotation policies."
-log "WARN" "3. Transition to Workload Identity Federation after initial setup."
-log "WARN" "4. Delete keys from filesystem after use with: find /tmp -name '*-key*' -exec shred -u {} \;"
-log "WARN" "5. For maximum security, consider rotating these keys regularly and transitioning to Workload Identity Federation."
-
-# 13. Update GitHub Codespaces environment variables
-log "INFO" "To update GitHub Codespaces environment variables:"
-log "INFO" "1. Go to ${GITHUB_ORG} organization settings"
-log "INFO" "2. Navigate to Codespaces"
-log "INFO" "3. Add or update the following environment variables:"
-log "INFO" "   - GCP_PROJECT_ID: ${GCP_PROJECT_ID}"
-log "INFO" "   - GOOGLE_CLOUD_PROJECT: ${GCP_PROJECT_ID}"
-log "INFO" "   - VERTEX_AI_KEY: Use the VERTEX_AI_FULL_ACCESS_KEY value"
-log "INFO" "   - GEMINI_API_KEY: Use the GEMINI_API_FULL_ACCESS_KEY value"
-log "INFO" "   - GEMINI_CODE_ASSIST_KEY: Use the GEMINI_CODE_ASSIST_FULL_ACCESS_KEY value"
-log "INFO" "   - GEMINI_CLOUD_ASSIST_KEY: Use the GEMINI_CLOUD_ASSIST_FULL_ACCESS_KEY value"
-log "INFO" "   - SECRET_MANAGER_KEY: Use the GCP_SECRET_MANAGEMENT_KEY value"
+# Execute main function
+main

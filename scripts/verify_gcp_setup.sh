@@ -1,6 +1,5 @@
 #!/bin/bash
-# verify_gcp_setup.sh - Verify GCP infrastructure setup
-# This script verifies that the GCP infrastructure has been correctly set up
+# verify_gcp_setup.sh - Verify the GCP infrastructure setup
 
 set -e
 
@@ -15,9 +14,6 @@ NC='\033[0m' # No Color
 # Configuration - Set defaults but allow override through environment variables
 : "${GCP_PROJECT_ID:=cherry-ai-project}"
 : "${REGION:=us-central1}"
-: "${MASTER_SA_NAME:=gcp-master-admin}"
-: "${VERTEX_SA_NAME:=vertex-power-user}"
-: "${GEMINI_SA_NAME:=gemini-power-user}"
 
 # Log function with timestamps
 log() {
@@ -38,6 +34,12 @@ log() {
     "SUCCESS")
       echo -e "${GREEN}[${timestamp}] [SUCCESS] ${message}${NC}"
       ;;
+    "TEST")
+      echo -e "${BLUE}[${timestamp}] [TEST] ${message}${NC}"
+      ;;
+    "PASS")
+      echo -e "${GREEN}[${timestamp}] [PASS] ${message}${NC}"
+      ;;
     "FAIL")
       echo -e "${RED}[${timestamp}] [FAIL] ${message}${NC}"
       ;;
@@ -47,232 +49,235 @@ log() {
   esac
 }
 
-# Check if a command exists
-command_exists() {
-  command -v "$1" &> /dev/null
-}
-
-# Check if a command succeeds
-command_succeeds() {
-  "$@" &> /dev/null
-  return $?
-}
-
-# Verify GCP project
-verify_gcp_project() {
-  log "INFO" "Verifying GCP project..."
+# Check requirements
+check_requirements() {
+  log "INFO" "Checking requirements..."
   
-  if command_succeeds gcloud projects describe "${GCP_PROJECT_ID}"; then
-    log "SUCCESS" "GCP project ${GCP_PROJECT_ID} exists and is accessible"
+  # Check for gcloud
+  if ! command -v gcloud &> /dev/null; then
+    log "ERROR" "gcloud CLI is required but not found"
+    log "INFO" "Please install it: https://cloud.google.com/sdk/docs/install"
+    exit 1
+  fi
+  
+  log "INFO" "All requirements satisfied"
+}
+
+# Authenticate with GCP
+authenticate_gcp() {
+  log "INFO" "Authenticating with GCP..."
+  
+  # Check if GCP_MASTER_SERVICE_JSON is set
+  if [[ -n "${GCP_MASTER_SERVICE_JSON}" ]]; then
+    # Create a temporary file for the service account key
+    local temp_file=$(mktemp)
+    echo "${GCP_MASTER_SERVICE_JSON}" > "${temp_file}"
+    
+    # Authenticate with the service account key
+    gcloud auth activate-service-account --key-file="${temp_file}"
+    
+    # Clean up
+    rm -f "${temp_file}"
+  else
+    log "WARN" "GCP_MASTER_SERVICE_JSON not set, using default authentication"
+    # Use default authentication (Application Default Credentials)
+    gcloud auth application-default login --no-launch-browser
+  fi
+  
+  # Set the project
+  gcloud config set project "${GCP_PROJECT_ID}"
+  
+  log "SUCCESS" "Successfully authenticated with GCP"
+}
+
+# Test GCP project access
+test_gcp_project_access() {
+  log "TEST" "Testing GCP project access..."
+  
+  if gcloud projects describe "${GCP_PROJECT_ID}" &>/dev/null; then
+    log "PASS" "GCP project access test passed"
     return 0
   else
-    log "FAIL" "GCP project ${GCP_PROJECT_ID} does not exist or is not accessible"
+    log "FAIL" "GCP project access test failed"
     return 1
   fi
 }
 
-# Verify required APIs are enabled
-verify_apis() {
-  log "INFO" "Verifying required APIs are enabled..."
+# Test APIs enabled
+test_apis_enabled() {
+  log "TEST" "Testing APIs enabled..."
   
   local apis=(
-    "iamcredentials.googleapis.com"
-    "iam.googleapis.com"
-    "cloudresourcemanager.googleapis.com"
     "secretmanager.googleapis.com"
+    "iam.googleapis.com"
     "aiplatform.googleapis.com"
-    "artifactregistry.googleapis.com"
-    "run.googleapis.com"
-    "compute.googleapis.com"
     "storage.googleapis.com"
+    "cloudbuild.googleapis.com"
+    "iamcredentials.googleapis.com"
+    "workloadidentity.googleapis.com"
   )
   
-  local all_enabled=true
+  local failed=0
   
   for api in "${apis[@]}"; do
-    if command_succeeds gcloud services list --project="${GCP_PROJECT_ID}" --filter="config.name:${api}" --format="value(config.name)"; then
-      log "SUCCESS" "API ${api} is enabled"
+    if gcloud services list --enabled --filter="name:${api}" --format="value(name)" | grep -q "${api}"; then
+      log "PASS" "API ${api} is enabled"
     else
       log "FAIL" "API ${api} is not enabled"
-      all_enabled=false
+      failed=1
     fi
   done
   
-  if [ "${all_enabled}" = true ]; then
+  if [ ${failed} -eq 0 ]; then
+    log "PASS" "APIs enabled test passed"
     return 0
   else
+    log "FAIL" "APIs enabled test failed"
     return 1
   fi
 }
 
-# Verify service accounts
-verify_service_accounts() {
-  log "INFO" "Verifying service accounts..."
+# Test service accounts
+test_service_accounts() {
+  log "TEST" "Testing service accounts..."
   
   local service_accounts=(
-    "${MASTER_SA_NAME}"
-    "${VERTEX_SA_NAME}"
-    "${GEMINI_SA_NAME}"
+    "vertex-power-user@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
+    "gemini-power-user@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
+    "github-actions@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
   )
   
-  local all_exist=true
+  local failed=0
   
   for sa in "${service_accounts[@]}"; do
-    if command_succeeds gcloud iam service-accounts describe "${sa}@${GCP_PROJECT_ID}.iam.gserviceaccount.com" --project="${GCP_PROJECT_ID}"; then
-      log "SUCCESS" "Service account ${sa}@${GCP_PROJECT_ID}.iam.gserviceaccount.com exists"
+    if gcloud iam service-accounts describe "${sa}" &>/dev/null; then
+      log "PASS" "Service account ${sa} exists"
     else
-      log "FAIL" "Service account ${sa}@${GCP_PROJECT_ID}.iam.gserviceaccount.com does not exist"
-      all_exist=false
+      log "FAIL" "Service account ${sa} does not exist"
+      failed=1
     fi
   done
   
-  if [ "${all_exist}" = true ]; then
+  if [ ${failed} -eq 0 ]; then
+    log "PASS" "Service accounts test passed"
     return 0
   else
+    log "FAIL" "Service accounts test failed"
     return 1
   fi
 }
 
-# Verify Secret Manager secrets
-verify_secrets() {
-  log "INFO" "Verifying Secret Manager secrets..."
+# Test Secret Manager secrets
+test_secret_manager_secrets() {
+  log "TEST" "Testing Secret Manager secrets..."
   
   local secrets=(
-    "master-service-account-key"
     "vertex-power-key"
     "gemini-power-key"
   )
   
-  local all_exist=true
+  local failed=0
   
   for secret in "${secrets[@]}"; do
-    if command_succeeds gcloud secrets describe "${secret}" --project="${GCP_PROJECT_ID}"; then
-      log "SUCCESS" "Secret ${secret} exists"
+    if gcloud secrets describe "${secret}" &>/dev/null; then
+      log "PASS" "Secret ${secret} exists"
     else
       log "FAIL" "Secret ${secret} does not exist"
-      all_exist=false
+      failed=1
     fi
   done
   
-  if [ "${all_exist}" = true ]; then
+  if [ ${failed} -eq 0 ]; then
+    log "PASS" "Secret Manager secrets test passed"
     return 0
   else
+    log "FAIL" "Secret Manager secrets test failed"
     return 1
   fi
 }
 
-# Verify Terraform state bucket
-verify_terraform_state_bucket() {
-  log "INFO" "Verifying Terraform state bucket..."
+# Test Workload Identity Federation
+test_workload_identity_federation() {
+  log "TEST" "Testing Workload Identity Federation..."
   
-  local bucket="${GCP_PROJECT_ID}-terraform-state"
+  # Check if Workload Identity Pool exists
+  if gcloud iam workload-identity-pools describe github-actions-pool --location=global &>/dev/null; then
+    log "PASS" "Workload Identity Pool exists"
+  else
+    log "FAIL" "Workload Identity Pool does not exist"
+    return 1
+  fi
   
-  if command_succeeds gcloud storage buckets describe "gs://${bucket}"; then
-    log "SUCCESS" "Terraform state bucket gs://${bucket} exists"
+  # Check if Workload Identity Provider exists
+  if gcloud iam workload-identity-pools providers describe github-actions-provider \
+    --workload-identity-pool=github-actions-pool \
+    --location=global &>/dev/null; then
+    log "PASS" "Workload Identity Provider exists"
+  else
+    log "FAIL" "Workload Identity Provider does not exist"
+    return 1
+  fi
+  
+  log "PASS" "Workload Identity Federation test passed"
+  return 0
+}
+
+# Test Vertex AI access
+test_vertex_ai_access() {
+  log "TEST" "Testing Vertex AI access..."
+  
+  if gcloud ai models list --region="${REGION}" &>/dev/null; then
+    log "PASS" "Vertex AI access test passed"
     return 0
   else
-    log "FAIL" "Terraform state bucket gs://${bucket} does not exist"
+    log "FAIL" "Vertex AI access test failed"
     return 1
   fi
 }
 
-# Verify Vertex AI access
-verify_vertex_ai_access() {
-  log "INFO" "Verifying Vertex AI access..."
+# Run all tests
+run_all_tests() {
+  log "INFO" "Running all tests..."
   
-  if command_succeeds gcloud ai models list --project="${GCP_PROJECT_ID}" --region="${REGION}" --limit=1; then
-    log "SUCCESS" "Access to Vertex AI models"
-    return 0
-  else
-    log "FAIL" "Cannot access Vertex AI models"
-    return 1
-  fi
-}
-
-# Verify GitHub secrets
-verify_github_secrets() {
-  log "INFO" "Verifying GitHub secrets..."
+  local total_tests=0
+  local passed_tests=0
+  local failed_tests=0
+  local test_results=()
   
-  if ! command_exists gh; then
-    log "WARN" "GitHub CLI not found, skipping GitHub secrets verification"
-    return 0
-  fi
-  
-  if ! command_succeeds gh auth status; then
-    log "WARN" "Not authenticated with GitHub, skipping GitHub secrets verification"
-    return 0
-  fi
-  
-  local secrets=(
-    "GCP_MASTER_SERVICE_JSON"
-    "GCP_VERTEX_POWER_KEY"
-    "GCP_GEMINI_POWER_KEY"
-    "GCP_PROJECT_ID"
-    "GCP_REGION"
-  )
-  
-  local all_exist=true
-  local org_repo="${GITHUB_ORG}/${GITHUB_REPO}"
-  
-  for secret in "${secrets[@]}"; do
-    if command_succeeds gh secret list --repo "${org_repo}" | grep -q "${secret}"; then
-      log "SUCCESS" "GitHub secret ${secret} exists"
-    else
-      log "FAIL" "GitHub secret ${secret} does not exist"
-      all_exist=false
-    fi
-  done
-  
-  if [ "${all_exist}" = true ]; then
-    return 0
-  else
-    return 1
-  fi
-}
-
-# Run all verification checks
-run_all_checks() {
-  log "INFO" "Running all verification checks..."
-  
-  local total_checks=0
-  local passed_checks=0
-  local failed_checks=0
-  local check_results=()
-  
-  # Run each check and collect results
-  for check_func in verify_gcp_project verify_apis verify_service_accounts verify_secrets verify_terraform_state_bucket verify_vertex_ai_access verify_github_secrets; do
-    total_checks=$((total_checks + 1))
+  # Run each test and collect results
+  for test_func in test_gcp_project_access test_apis_enabled test_service_accounts test_secret_manager_secrets test_workload_identity_federation test_vertex_ai_access; do
+    total_tests=$((total_tests + 1))
     
-    if ${check_func}; then
-      passed_checks=$((passed_checks + 1))
-      check_results+=("${GREEN}✓${NC} ${check_func}")
+    if ${test_func}; then
+      passed_tests=$((passed_tests + 1))
+      test_results+=("${GREEN}✓${NC} ${test_func}")
     else
-      failed_checks=$((failed_checks + 1))
-      check_results+=("${RED}✗${NC} ${check_func}")
+      failed_tests=$((failed_tests + 1))
+      test_results+=("${RED}✗${NC} ${test_func}")
     fi
     
-    # Add a separator between checks
+    # Add a separator between tests
     echo ""
   done
   
   # Print summary
-  echo -e "\n${BOLD}Verification Summary:${NC}"
-  echo -e "Total checks: ${total_checks}"
-  echo -e "Passed: ${GREEN}${passed_checks}${NC}"
-  echo -e "Failed: ${RED}${failed_checks}${NC}"
+  echo -e "\n${BOLD}Test Summary:${NC}"
+  echo -e "Total tests: ${total_tests}"
+  echo -e "Passed: ${GREEN}${passed_tests}${NC}"
+  echo -e "Failed: ${RED}${failed_tests}${NC}"
   
   # Print detailed results
-  echo -e "\n${BOLD}Verification Results:${NC}"
-  for result in "${check_results[@]}"; do
+  echo -e "\n${BOLD}Test Results:${NC}"
+  for result in "${test_results[@]}"; do
     echo -e "  ${result}"
   done
   
-  # Return success if all checks passed
-  if [ ${failed_checks} -eq 0 ]; then
-    log "SUCCESS" "All verification checks passed!"
+  # Return success if all tests passed
+  if [ ${failed_tests} -eq 0 ]; then
+    log "SUCCESS" "All tests passed!"
     return 0
   else
-    log "FAIL" "${failed_checks} verification checks failed"
+    log "ERROR" "${failed_tests} tests failed"
     return 1
   fi
 }
@@ -281,15 +286,14 @@ run_all_checks() {
 main() {
   log "INFO" "Starting GCP infrastructure verification..."
   
-  # Check for gcloud
-  if ! command_exists gcloud; then
-    log "ERROR" "gcloud CLI is required but not found"
-    log "INFO" "Please install it: https://cloud.google.com/sdk/docs/install"
-    exit 1
-  fi
+  # Check requirements
+  check_requirements
   
-  # Run all verification checks
-  run_all_checks
+  # Authenticate with GCP
+  authenticate_gcp
+  
+  # Run all tests
+  run_all_tests
   
   log "INFO" "GCP infrastructure verification completed"
 }
