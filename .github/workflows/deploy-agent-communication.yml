@@ -1,0 +1,221 @@
+name: Deploy Agent Communication Infrastructure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/modules/pubsub/**'
+      - 'terraform/modules/redis/**'
+      - 'terraform/environments/*/pubsub.tf'
+      - 'terraform/environments/*/redis.tf'
+      - '.github/workflows/deploy-agent-communication.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+env:
+  PROJECT_ID: cherry-ai-project
+  TF_STATE_BUCKET: cherry-ai-project-terraform-state
+  TF_STATE_PREFIX: agent-communication
+  REGION: us-west4
+
+jobs:
+  validate:
+    name: Validate Terraform
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+      
+      - name: Terraform Format Check
+        run: |
+          cd terraform
+          terraform fmt -check -recursive
+      
+      - name: Terraform Init
+        run: |
+          cd terraform
+          terraform init -backend-config="bucket=${{ env.TF_STATE_BUCKET }}" -backend-config="prefix=${{ env.TF_STATE_PREFIX }}"
+      
+      - name: Terraform Validate
+        run: |
+          cd terraform
+          terraform validate
+  
+  plan:
+    name: Plan Terraform Changes
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+      
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+      
+      - name: Terraform Init
+        run: |
+          cd terraform
+          terraform init -backend-config="bucket=${{ env.TF_STATE_BUCKET }}" -backend-config="prefix=${{ env.TF_STATE_PREFIX }}"
+      
+      - name: Determine Environment
+        id: env
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "ENVIRONMENT=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+          else
+            echo "ENVIRONMENT=dev" >> $GITHUB_ENV
+          fi
+      
+      - name: Terraform Plan
+        run: |
+          cd terraform
+          terraform plan \
+            -var="project_id=${{ env.PROJECT_ID }}" \
+            -var="region=${{ env.REGION }}" \
+            -var="environment=${{ env.ENVIRONMENT }}" \
+            -target=module.redis \
+            -target=module.pubsub \
+            -out=tfplan
+      
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-plan
+          path: terraform/tfplan
+          retention-days: 1
+  
+  apply:
+    name: Apply Terraform Changes
+    needs: plan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    environment: ${{ github.event.inputs.environment || 'dev' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+      
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+      
+      - name: Terraform Init
+        run: |
+          cd terraform
+          terraform init -backend-config="bucket=${{ env.TF_STATE_BUCKET }}" -backend-config="prefix=${{ env.TF_STATE_PREFIX }}"
+      
+      - name: Download Terraform Plan
+        uses: actions/download-artifact@v3
+        with:
+          name: terraform-plan
+          path: terraform
+      
+      - name: Terraform Apply
+        run: |
+          cd terraform
+          terraform apply -auto-approve tfplan
+      
+      - name: Extract Outputs
+        id: outputs
+        run: |
+          cd terraform
+          echo "REDIS_HOST=$(terraform output -raw redis_host)" >> $GITHUB_ENV
+          echo "REDIS_PORT=$(terraform output -raw redis_port)" >> $GITHUB_ENV
+      
+      - name: Update Secret Manager
+        run: |
+          echo '{
+            "REDIS_HOST": "${{ env.REDIS_HOST }}",
+            "REDIS_PORT": "${{ env.REDIS_PORT }}"
+          }' > redis_config.json
+          
+          gcloud secrets versions add "redis-config-${{ env.ENVIRONMENT }}" \
+            --project="${{ env.PROJECT_ID }}" \
+            --data-file="redis_config.json"
+      
+      - name: Cleanup
+        run: |
+          rm -f redis_config.json
+          rm -f terraform/tfplan
+  
+  update-docs:
+    name: Update Documentation
+    needs: apply
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Update README
+        run: |
+          echo "# Agent Communication Infrastructure" > AGENT_COMMUNICATION.md
+          echo "" >> AGENT_COMMUNICATION.md
+          echo "This infrastructure was last deployed on $(date)" >> AGENT_COMMUNICATION.md
+          echo "" >> AGENT_COMMUNICATION.md
+          echo "## Components" >> AGENT_COMMUNICATION.md
+          echo "" >> AGENT_COMMUNICATION.md
+          echo "- Redis for distributed task queue and short-term memory" >> AGENT_COMMUNICATION.md
+          echo "- PubSub for agent communication" >> AGENT_COMMUNICATION.md
+          echo "- Secret Manager for configuration" >> AGENT_COMMUNICATION.md
+          echo "" >> AGENT_COMMUNICATION.md
+          echo "## Usage" >> AGENT_COMMUNICATION.md
+          echo "" >> AGENT_COMMUNICATION.md
+          echo "See [Agent Communication Guide](docs/agent_communication_guide.md) for details." >> AGENT_COMMUNICATION.md
+      
+      - name: Commit and Push
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Update agent communication infrastructure documentation"
+          file_pattern: AGENT_COMMUNICATION.md

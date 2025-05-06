@@ -1,0 +1,87 @@
+# Example configuration for Phidata agents in Orchestra
+# This file demonstrates how to configure both individual Phidata agents
+# and Phidata teams in the Orchestra configuration system.
+
+agent_definitions:
+  # Example of a single Phidata agent that does web searches
+  phidata_web_search:
+    wrapper_type: phidata  # This tells the registry to use PhidataAgentWrapper
+    description: "Web search agent powered by Phidata/Agno"
+    config:
+      # Specify the Phidata agent class to use
+      phidata_agent_class: "agno.agent.Agent"
+      
+      # Reference to a Portkey-configured LLM (provided by dependency injection)
+      llm_ref: "llm_openai_gpt4o_via_portkey"
+      
+      # List of tools for the agent
+      tools:
+        - type: "agno.tools.duckduckgo.DuckDuckGoTools"
+          params: {}  # Parameters for the DuckDuckGoTools constructor
+        
+        - type: "agno.tools.calculator.CalculatorTools"
+          params: {}
+      
+      # Agent instructions
+      instructions:
+        - "You are a helpful web search assistant."
+        - "Always include sources for your information."
+        - "Use DuckDuckGo to find information, then verify it with additional searches."
+      
+      # Formatting options
+      markdown: true
+      show_tool_calls: true
+
+  # Example of a Phidata team for financial analysis
+  phidata_finance_team:
+    wrapper_type: phidata
+    description: "Financial analysis team powered by Phidata/Agno"
+    config:
+      # Specify the Team class for multi-agent coordination
+      phidata_agent_class: "agno.team.Team"
+      
+      # Team-specific configuration
+      team_mode: "coordinate"  # Options: coordinate, route, collaborate
+      team_model_ref: "llm_anthropic_claude_via_portkey"  # Model for team coordination
+      team_success_criteria: "A comprehensive financial analysis with accurate data and clear recommendations."
+      team_instructions:
+        - "Coordinate analysis of financial data and markets."
+        - "Ensure all information is accurate and up to date."
+        - "Present findings in clearly formatted tables and bullet points."
+      team_markdown: true
+      
+      # Team members configuration
+      members:
+        - name: "Market Research Agent"
+          role: "Searches the web for market trends and news"
+          model_ref: "llm_openai_gpt4o_via_portkey"
+          tools:
+            - type: "agno.tools.duckduckgo.DuckDuckGoTools"
+              params: {}
+          instructions:
+            - "Focus on recent market news and trends"
+            - "Look for information about market sentiment"
+        
+        - name: "Stock Data Agent"
+          role: "Retrieves stock prices and financial data"
+          model_ref: "llm_openai_gpt4o_via_portkey"
+          tools:
+            - type: "agno.tools.yfinance.YFinanceTools"
+              params:
+                stock_price: true
+                historical_data: true
+                analyst_recommendations: true
+          instructions:
+            - "Provide accurate stock data"
+            - "Format financial data in clear tables"
+        
+        - name: "Financial Analyst"
+          role: "Analyzes data and provides recommendations"
+          model_ref: "llm_anthropic_claude_via_portkey"
+          tools:
+            - type: "agno.tools.calculator.CalculatorTools"
+              params: {}
+          instructions:
+            - "Analyze financial data and market trends"
+            - "Provide clear investment recommendations based on data"
+            - "Consider both short-term and long-term outlook"

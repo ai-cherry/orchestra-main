@@ -1,0 +1,113 @@
+# Multi-stage build for AI Orchestra
+# Stage 1: Build dependencies
+FROM python:3.11-slim-bullseye AS builder
+
+WORKDIR /app
+
+# Install system dependencies required for building Python packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Poetry
+RUN curl -sSL https://install.python-poetry.org | python3 -
+ENV PATH="/root/.local/bin:$PATH"
+
+# Copy Poetry configuration files
+COPY pyproject.toml poetry.lock* ./
+
+# Configure Poetry - using system Python to avoid virtualenv
+RUN poetry config virtualenvs.create false
+
+# Export dependencies to requirements.txt for a smaller final image
+RUN poetry export -f requirements.txt --without dev > requirements.txt
+
+# Stage 2: Runtime environment
+FROM python:3.11-slim-bullseye
+
+WORKDIR /app
+
+# Install system dependencies for runtime only
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    apt-transport-https \
+    ca-certificates \
+    gnupg \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Google Cloud CLI (minimal installation)
+RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - && \
+    apt-get update && apt-get install -y google-cloud-cli-gke-gcloud-auth-plugin && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy requirements from builder stage
+COPY --from=builder /app/requirements.txt .
+
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY . .
+
+# Set Python path and environment variables to ensure standard mode
+ENV PYTHONPATH=/app
+ENV USE_RECOVERY_MODE=false
+ENV STANDARD_MODE=true
+ENV VSCODE_DISABLE_WORKSPACE_TRUST=true
+ENV DISABLE_WORKSPACE_TRUST=true
+
+# Default environment is staging (will be overridden in deployment)
+ENV ENVIRONMENT=staging
+ENV PORT=8000
+
+# Set Google Cloud credentials environment variable to use Secret Manager
+ENV GOOGLE_APPLICATION_CREDENTIALS=/tmp/service-account-key.json
+
+# Create directories for credentials
+RUN mkdir -p /tmp
+
+# Add a startup script to fetch credentials from Secret Manager
+RUN echo '#!/bin/bash\n\
+# Fetch credentials from Secret Manager if running in GCP\n\
+if [ -z "$LOCAL_DEVELOPMENT" ]; then\n\
+  echo "Fetching credentials from Secret Manager..."\n\
+  gcloud secrets versions access latest --secret=secret-management-key > $GOOGLE_APPLICATION_CREDENTIALS\n\
+  chmod 600 $GOOGLE_APPLICATION_CREDENTIALS\n\
+fi\n\
+\n\
+# Force standard mode with all required environment variables\n\
+export USE_RECOVERY_MODE=false\n\
+export STANDARD_MODE=true\n\
+export VSCODE_DISABLE_WORKSPACE_TRUST=true\n\
+export DISABLE_WORKSPACE_TRUST=true\n\
+\n\
+# Create standard mode marker file\n\
+touch /app/.standard_mode\n\
+\n\
+# Start the application\n\
+exec python3 -m orchestrator.main\n\
+' > /app/startup.sh
+
+# Make the startup script executable
+RUN chmod +x /app/startup.sh
+
+# Expose port for the application
+EXPOSE ${PORT}
+
+# Set resource constraints for the container
+# These will be overridden by Kubernetes/Cloud Run settings
+ENV MEMORY_LIMIT=512M
+ENV CPU_LIMIT=1
+
+# Use a non-root user for better security
+RUN groupadd -r orchestra && useradd -r -g orchestra orchestra
+RUN chown -R orchestra:orchestra /app /tmp
+USER orchestra
+
+# Run the application with the startup script
+CMD ["/app/startup.sh"]

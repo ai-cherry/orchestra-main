@@ -1,0 +1,8 @@
+# Rule checking if new agents inherit from the Base Agent (Hypothetical Name)
+FLAG {
+    pattern: "class (.*)Agent\((?!BaseAgent).*\):"
+    file_pattern: "**/core/orchestrator/agents/**/*.py"
+    exclude_pattern: "**/core/orchestrator/agents/base.py" # Exclude base class def
+    description: "STRUCTURE: New agents should ideally inherit from the BaseAgent class defined in core/orchestrator/agents/base.py."
+    severity: WARNING
+}

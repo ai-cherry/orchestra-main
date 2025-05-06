@@ -1,0 +1,18 @@
+name: Setup gcloud CLI
+
+on:
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  setup-gcloud:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          service_account_key: "${{ secrets.GCP_PROJECT_ADMIN_KEY }}"
+          project_id: cherry-ai-project

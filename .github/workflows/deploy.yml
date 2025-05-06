@@ -1,0 +1,213 @@
+name: AI-Generated Artifact Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - production
+  push:
+    branches: [ main ]
+    paths:
+      - 'terraform/**'
+      - 'src/**'
+      - '.github/workflows/deploy.yml'
+      - 'Dockerfile'
+
+jobs:
+  validate-terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.3.0
+
+      - name: Terraform Format
+        run: terraform fmt -check -recursive
+        working-directory: terraform
+        continue-on-error: true
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: terraform
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: terraform
+
+  plan-terraform:
+    needs: validate-terraform
+    runs-on: ubuntu-latest
+    outputs:
+      terraform_plan: ${{ steps.tf-plan.outputs.stdout }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.3.0
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.VERTEX_AI_FULL_ACCESS_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: terraform
+
+      - name: Terraform Plan
+        id: tf-plan
+        run: terraform plan -input=false -no-color
+        working-directory: terraform
+
+      - name: Save Terraform Plan
+        run: terraform plan -input=false -out=tfplan
+        working-directory: terraform
+
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-plan
+          path: terraform/tfplan
+          retention-days: 5
+
+  build-and-push:
+    runs-on: ubuntu-latest
+    needs: plan-terraform
+    outputs:
+      image: ${{ steps.build-image.outputs.image }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.VERTEX_AI_FULL_ACCESS_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Configure Docker for GCP Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Set environment variables
+        id: env-vars
+        run: |
+          echo "PROJECT_ID=$(gcloud config get-value project)" >> $GITHUB_ENV
+          echo "REGION=us-central1" >> $GITHUB_ENV
+          echo "IMAGE_NAME=orchestra-api" >> $GITHUB_ENV
+          echo "IMAGE_TAG=${GITHUB_SHA::8}" >> $GITHUB_ENV
+
+      - name: Build and push Docker image
+        id: build-image
+        run: |
+          FULL_IMAGE_NAME=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/orchestra/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          docker build -t ${FULL_IMAGE_NAME} .
+          docker push ${FULL_IMAGE_NAME}
+          echo "image=${FULL_IMAGE_NAME}" >> $GITHUB_OUTPUT
+
+  deploy-to-gcp:
+    needs: [build-and-push, plan-terraform]
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'dev' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.3.0
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.VERTEX_AI_FULL_ACCESS_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Download Terraform Plan
+        uses: actions/download-artifact@v3
+        with:
+          name: terraform-plan
+          path: terraform
+
+      - name: Apply Terraform changes
+        run: terraform apply -input=false -auto-approve tfplan
+        working-directory: terraform
+
+      - name: Update Cloud Run service with new image
+        run: |
+          gcloud run services update orchestra-api \
+            --image=${{ needs.build-and-push.outputs.image }} \
+            --region=us-central1 \
+            --platform=managed
+
+      - name: Output service URL
+        run: |
+          SERVICE_URL=$(gcloud run services describe orchestra-api --region=us-central1 --format='value(status.url)')
+          echo "Service deployed to: $SERVICE_URL"
+
+  run-tests:
+    needs: deploy-to-gcp
+    runs-on: ubuntu-latest
+    if: github.event.inputs.environment != 'production'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest requests
+
+      - name: Run integration tests
+        run: |
+          SERVICE_URL=$(gcloud run services describe orchestra-api --region=us-central1 --format='value(status.url)')
+          python -m pytest tests/integration/ --url=$SERVICE_URL
+
+  notify-roo-code:
+    needs: [deploy-to-gcp, run-tests]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Notify Roo Code of deployment status
+        run: |
+          python orchestrator.py task --mode creative --prompt "Create a deployment summary for the AI-generated project. Deployment to ${{ github.event.inputs.environment || 'dev' }} environment ${{ needs.deploy-to-gcp.result == 'success' && 'succeeded' || 'failed' }}. Tests ${{ needs.run-tests.result == 'success' && 'passed' || 'failed or were skipped' }}."

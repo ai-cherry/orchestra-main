@@ -1,0 +1,98 @@
+{
+  "version": "1.0.0",
+  "description": "MCP (Model Context Protocol) configuration for AI Orchestra",
+  "default_config": {
+    "storage_approach": "tiered_memory",
+    "persistence_level": "cross_session",
+    "security_requirements": "standard",
+    "token_budget": 1536,
+    "default_ttl_seconds": 86400,
+    "integration_points": ["co-pilot", "gemini", "agno"]
+  },
+  "environments": {
+    "dev": {
+      "storage_approach": "simple",
+      "token_budget": 1024,
+      "default_ttl_seconds": 3600
+    },
+    "test": {
+      "token_budget": 1536,
+      "default_ttl_seconds": 7200
+    },
+    "prod": {
+      "persistence_level": "cross_session",
+      "security_requirements": "high",
+      "token_budget": 2048,
+      "default_ttl_seconds": 86400
+    }
+  },
+  "tool_specific_settings": {
+    "co-pilot": {
+      "adapter_class": "CopilotMCPAdapter",
+      "memory_format": "json",
+      "max_memory_items": 100,
+      "context_window": 8000
+    },
+    "gemini": {
+      "adapter_class": "GeminiMCPAdapter",
+      "memory_format": "json",
+      "max_context_window_tokens": 2000000,
+      "default_model": "gemini-pro"
+    },
+    "agno": {
+      "adapter_class": "AgnoMCPAdapter",
+      "memory_format": "json",
+      "key_prefix": "agno:",
+      "workflow_integration": true
+    },
+    "roo": {
+      "adapter_class": "RooMCPAdapter",
+      "memory_format": "json",
+      "mode_integration": true
+    }
+  },
+  "template_settings": {
+    "memory_system_review": {
+      "recommended_tools": ["gemini", "co-pilot"],
+      "security_level": "standard"
+    },
+    "mcp_integration": {
+      "recommended_tools": ["co-pilot", "roo"],
+      "security_level": "standard"
+    },
+    "mcp_performance_optimization": {
+      "recommended_tools": ["gemini", "co-pilot"],
+      "security_level": "standard"
+    },
+    "mcp_security_assessment": {
+      "recommended_tools": ["co-pilot"],
+      "security_level": "high"
+    },
+    "cross_tool_mcp_integration": {
+      "recommended_tools": ["co-pilot", "gemini", "agno", "roo"],
+      "security_level": "standard"
+    }
+  },
+  "memory_mapping": {
+    "shared_keys": [
+      "user_preferences",
+      "conversation_history",
+      "project_context",
+      "system_config"
+    ],
+    "key_prefixes": {
+      "co-pilot": "cp:",
+      "gemini": "gm:",
+      "agno": "ag:",
+      "roo": "roo:"
+    }
+  },
+  "natural_language_triggers": {
+    "review memory system": "memory_system_review",
+    "analyze memory": "memory_system_review",
+    "optimize memory performance": "mcp_performance_optimization",
+    "add mcp support": "mcp_integration",
+    "secure memory system": "mcp_security_assessment",
+    "connect tools together": "cross_tool_mcp_integration"
+  }
+}

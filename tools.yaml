@@ -1,0 +1,14 @@
+# /workspaces/orchestra-main/tools.yaml
+tools:
+  - name: gcloud
+    description: Google Cloud CLI
+    # path: /usr/bin/gcloud # Optional: Include path if needed for validation
+  - name: terraform
+    description: Infrastructure-as-Code CLI
+    # path: /usr/local/bin/terraform # Optional
+  - name: gh
+    description: GitHub CLI
+    # path: /usr/bin/gh # Optional
+  - name: poetry
+    description: Python dependency manager
+    # path: /usr/local/bin/poetry # Optional

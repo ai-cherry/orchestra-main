@@ -1,0 +1,66 @@
+{
+  "name": "Orchestra GCP Terraform Environment",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+  "features": {
+    "ghcr.io/devcontainers/features/terraform:1": {
+      "version": "1.5.0",
+      "tflint": true,
+      "terragrunt": true
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.10"
+    },
+    "ghcr.io/devcontainers/features/gcloud:1": {
+      "version": "latest"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "hashicorp.terraform",
+        "GitHub.vscode-github-actions",
+        "GoogleCloudTools.cloudcode",
+        "redhat.vscode-yaml",
+        "GitHub.copilot"
+      ],
+      "settings": {
+        "terraform.languageServer.enable": true,
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "security.workspace.trust.enabled": false,
+        "security.workspace.trust.startupPrompt": "never",
+        "security.workspace.trust.banner": "never",
+        "security.workspace.trust.emptyWindow": false
+      }
+    }
+  },
+  "containerEnv": {
+    "GITHUB_TOKEN": "${localEnv:GH_PAT_TOKEN}",
+    "CLOUDSDK_CORE_PROJECT": "cherry-ai-project"
+  },
+  "remoteEnv": {
+    "TF_VAR_github_token": "${localEnv:GH_PAT_TOKEN}",
+    "GOOGLE_APPLICATION_CREDENTIALS": "/tmp/gcp-credentials.json"
+  },
+  "postCreateCommand": "bash -c 'source /workspaces/orchestra-main/setup_codespace_env.sh'",
+  "postStartCommand": "bash -c 'echo \"Running post-start initialization...\" && cd /workspaces/orchestra-main/terraform && terraform init'",
+  "mounts": [
+    {
+      "source": "gcp-config-${localEnv:USER}",
+      "target": "/home/vscode/.config/gcloud",
+      "type": "volume"
+    }
+  ],
+  "secrets": {
+    "GCP_MASTER_SERVICE_JSON": {
+      "description": "GCP Master Service Account key from organization secrets"
+    },
+    "GCP_PROJECT_ADMIN_KEY": {
+      "description": "GCP Project Admin service account key from organization secrets"
+    },
+    "GCP_SECRET_MANAGEMENT_KEY": {
+      "description": "GCP Secret Management service account key from organization secrets"
+    }
+  }
+}

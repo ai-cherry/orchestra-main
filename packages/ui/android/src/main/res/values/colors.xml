@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+  Orchestra Design System Colors
+  Mapped from Figma Orchestra-Color-Semantic variables
+-->
+<resources>
+    <!-- Theme Colors -->
+    <color name="accent_primary">#8B5CF6</color> <!-- Purple default -->
+    <color name="accent_secondary">#6D28D9</color>
+    <color name="accent_text">#FFFFFF</color>
+    
+    <!-- Background colors -->
+    <color name="background">#111827</color> <!-- Dark background -->
+    <color name="surface">#1F2937</color> <!-- Gray 800/900 -->
+    <color name="surface_alt">#374151</color> <!-- Gray 700 -->
+    
+    <!-- Text colors -->
+    <color name="text_primary">#FFFFFF</color> <!-- White -->
+    <color name="text_secondary">#D1D5DB</color> <!-- Gray 300 -->
+    <color name="text_tertiary">#9CA3AF</color> <!-- Gray 400 -->
+    
+    <!-- Border colors -->
+    <color name="border_subtle">#4B5563</color> <!-- Gray 600 -->
+    <color name="border_default">#6B7280</color> <!-- Gray 500 -->
+    
+    <!-- Status colors -->
+    <color name="success">#10B981</color>
+    <color name="warning">#F59E0B</color>
+    <color name="error">#EF4444</color>
+    <color name="info">#3B82F6</color>
+    
+    <!-- Additional colors needed by Android system -->
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    
+    <!-- Theme-specific colors for personas -->
+    <!-- Cherry theme -->
+    <color name="cherry_accent_primary">#EC4899</color> <!-- Pink -->
+    <color name="cherry_accent_secondary">#DB2777</color>
+    
+    <!-- Sophia theme -->
+    <color name="sophia_accent_primary">#3B82F6</color> <!-- Blue -->
+    <color name="sophia_accent_secondary">#2563EB</color>
+    
+    <!-- Gordon Gekko theme -->
+    <color name="gordon_accent_primary">#F59E0B</color> <!-- Orange -->
+    <color name="gordon_accent_secondary">#D97706</color>
+</resources>

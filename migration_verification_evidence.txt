@@ -1,0 +1,45 @@
+Starting verification at Sun May  4 01:35:32 UTC 2025
+[0;34mStep 1: Verify gcloud CLI[0m
+[0;32m✅ gcloud CLI verified: Google Cloud SDK 454.0.0[0m
+
+[0;34mStep 2: Service Account Authentication[0m
+[0;32m✅ Authentication successful with vertex-agent@agi-baby-cherry.iam.gserviceaccount.com[0m
+[0;32m✅ Project set to agi-baby-cherry[0m
+
+[0;34mStep 3: ORGANIZATION MEMBERSHIP (CRITICAL PROOF)[0m
+Project: [1magi-baby-cherry[0m
+Expected Organization ID: [1m873291114285[0m
+Actual Organization ID: [1m873291114285[0m
+Organization Name: [1mAGI Development Corporation[0m
+[0;32m[1m✅ MIGRATION CONFIRMED: Project is correctly in organization 873291114285[0m
+[0;32m[1m   This is definitive proof the migration succeeded[0m
+
+[0;34mStep 4: INFRASTRUCTURE (VERTEX WORKSTATIONS, CLOUD IDE)[0m
+[0;32m✅ Workstation clusters found: 1[0m
+Cluster names: [1mprojects/agi-baby-cherry/locations/us-central1/clusters/ai-development[0m
+[0;32m✅ Found 1 configurations in cluster ai-development[0m
+Configuration names: [1mprojects/agi-baby-cherry/locations/us-central1/clusters/ai-development/configs/ai-dev-config[0m
+[0;32m✅ GPU configuration detected![0m
+GPU details: [1m"type": "nvidia-tesla-t4"
+"count": 2[0m
+[0;32m[1m✅ WORKSTATIONS CONFIRMED: 1 configurations found across all clusters[0m
+
+[0;34mStep 5: ADDITIONAL SERVICES[0m
+[0;32m✅ Vertex AI API is enabled[0m
+[0;32m✅ AlloyDB clusters found: projects/agi-baby-cherry/locations/us-central1/clusters/agent-storage[0m
+[0;32m✅ Redis instances found: projects/agi-baby-cherry/locations/us-central1/instances/agent-memory[0m
+
+[0;34m[1m===== MIGRATION VERIFICATION SUMMARY =====[0m
+[0;32m[1m✅ COMPLETE MIGRATION VERIFIED SUCCESSFULLY[0m
+[0;32mProject is in the correct organization with working infrastructure.[0m
+
+[0;34m[1mCOLLECTED EVIDENCE:[0m
+1. Organization Status: Project agi-baby-cherry is in organization 873291114285 (Expected: 873291114285)
+2. Workstation Clusters: 1 found
+3. Workstation Configurations: 1 found
+4. Vertex AI API Status: ENABLED
+5. AlloyDB Status: FOUND
+6. Redis Status: FOUND
+
+Final Verification Status: [1mSUCCESS[0m
+Verification completed at Sun May  4 01:35:32 UTC 2025

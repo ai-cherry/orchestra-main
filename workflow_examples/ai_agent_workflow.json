@@ -1,0 +1,87 @@
+[
+  {
+    "type": "comment",
+    "content": "IMPORTANT: This workflow is designed for the roo_workflow_manager.py utility, which is completely separate from the main Project Orchestra implementation."
+  },
+  {
+    "type": "mode",
+    "mode": "strategy",
+    "task": "Develop a strategy for deploying a new AI agent that integrates with our existing multi-agent system. The agent should use Vertex AI for model hosting, with Cloud Run for the API layer and proper authentication using Workload Identity Federation."
+  },
+  {
+    "type": "mode",
+    "mode": "architect",
+    "task": "Design the architecture for this new AI agent, specifying the components, data flows, authentication mechanisms, and integration points with our existing system."
+  },
+  {
+    "type": "mode",
+    "mode": "code",
+    "task": "Implement the Vertex AI model deployment and Cloud Run integration code. Include proper authentication, error handling, and scalability measures."
+  },
+  {
+    "type": "terraform",
+    "operation": "init",
+    "working_dir": "terraform-modules/vertex-ai-vector-search",
+    "parameters": {}
+  },
+  {
+    "type": "terraform",
+    "operation": "plan",
+    "working_dir": "terraform-modules/vertex-ai-vector-search",
+    "parameters": {
+      "out_file": "ai_agent_plan"
+    }
+  },
+  {
+    "type": "mode",
+    "mode": "reviewer",
+    "task": "Review the implemented AI agent code and Terraform configurations for security best practices, cost optimization, and adherence to our architectural patterns."
+  },
+  {
+    "type": "vs_code_task",
+    "task_id": "github_gcp_init",
+    "inputs": {}
+  },
+  {
+    "type": "github",
+    "operation": "create_branch",
+    "parameters": {
+      "branch_name": "feature/vertex-ai-agent",
+      "base_branch": "main"
+    }
+  },
+  {
+    "type": "github",
+    "operation": "commit_changes",
+    "parameters": {
+      "message": "Add Vertex AI agent with Cloud Run integration",
+      "files": [
+        "src/vertex_ai_agent.py",
+        "infra/ai_resources.tf",
+        "terraform-modules/vertex-ai-vector-search/examples/agent-deployment/main.tf"
+      ]
+    }
+  },
+  {
+    "type": "vs_code_task",
+    "task_id": "github_gcp_pr",
+    "inputs": {}
+  },
+  {
+    "type": "gcp",
+    "operation": "cloud_build",
+    "parameters": {
+      "config_path": "cloudbuild_ai_deployment.yaml"
+    }
+  },
+  {
+    "type": "mode",
+    "mode": "creative",
+    "task": "Create comprehensive documentation for the new AI agent, including setup instructions, API documentation, performance considerations, and integration examples."
+  },
+  {
+    "type": "vs_code_task",
+    "task_id": "run_cloud_build",
+    "inputs": {}
+  }
+]
