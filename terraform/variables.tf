@@ -165,3 +165,27 @@ variable "region" {
   type        = string
   default     = "us-west4"
 }
+
+variable "domain_names" {
+  description = "Map of domain names for services"
+  type        = map(string)
+  default     = {
+    api = ""
+    ui  = ""
+  }
+}
+
+variable "api_keys" {
+  description = "Map of API keys"
+  type        = map(string)
+  default     = {
+    main = ""
+  }
+  sensitive   = true
+}
+
+variable "notification_channels" {
+  description = "List of notification channel IDs for alerting"
+  type        = list(string)
+  default     = []
+}
