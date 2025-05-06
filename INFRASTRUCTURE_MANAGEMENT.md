@@ -1,162 +1,222 @@
-# AI Orchestra Infrastructure Management
+# Infrastructure Management System
 
-This document provides a comprehensive guide to the infrastructure management system for the AI Orchestra project. It explains how to use the scripts and workflows to manage the GCP infrastructure, GitHub secrets, and Codespaces configuration.
+This document provides an overview of the infrastructure management system for the AI Orchestra project. The system is designed to automate the setup and management of the GCP infrastructure, GitHub secrets, and Codespaces configuration.
 
 ## Overview
 
-The AI Orchestra project uses a combination of service account keys and Workload Identity Federation (WIF) for authentication with GCP. The infrastructure management system consists of several scripts and workflows that work together to:
+The infrastructure management system consists of several components:
 
-1. Create service account keys for Vertex AI and Gemini services
-2. Update GitHub organization secrets with the new keys
-3. Update GitHub Codespaces secrets with the new keys
-4. Set up Workload Identity Federation for GitHub Actions
-5. Test the integration between GitHub, Codespaces, and GCP
-6. Update Terraform state
-
-## Prerequisites
-
-Before using the infrastructure management system, you need to have the following:
-
-1. A GCP project with the necessary APIs enabled
-2. A GitHub organization with the necessary repositories
-3. A GitHub Personal Access Token (PAT) with the necessary permissions
-4. A GCP service account key with the necessary permissions (GCP_MASTER_SERVICE_JSON)
+1. **Scripts**: A collection of shell scripts that automate various tasks related to infrastructure management.
+2. **GitHub Actions Workflows**: Workflows that run the scripts automatically when triggered.
+3. **Terraform Modules**: Modules that define the infrastructure as code.
 
 ## Scripts
 
-The infrastructure management system consists of the following scripts:
+### `scripts/verify_gcp_setup.sh`
 
-### update_gcp_infrastructure.sh
+This script verifies that the GCP infrastructure is correctly set up. It checks:
 
-This is the main script that orchestrates the entire infrastructure management process. It:
-
-1. Authenticates with GCP using the GCP_MASTER_SERVICE_JSON
-2. Creates service account keys for Vertex AI and Gemini services
-3. Updates GitHub organization secrets with the new keys
-4. Updates GitHub Codespaces secrets with the new keys
-5. Sets up Workload Identity Federation for GitHub Actions
-6. Tests the integration between GitHub, Codespaces, and GCP
-7. Updates Terraform state
+- GCP project exists and is accessible
+- Required APIs are enabled
+- Service accounts exist
+- Secret Manager secrets exist
+- Terraform state bucket exists
+- Vertex AI is accessible
+- GitHub secrets are set
 
 Usage:
 
 ```bash
-export GCP_MASTER_SERVICE_JSON="<your-gcp-master-service-json>"
-export GITHUB_TOKEN="<your-github-token>"
-export GCP_PROJECT_ID="cherry-ai-project"
-export GITHUB_ORG="ai-cherry"
-export GITHUB_REPO="orchestra-main"
-export REGION="us-central1"
-export ENV="dev"
-./update_gcp_infrastructure.sh
+./scripts/verify_gcp_setup.sh
 ```
 
-### create_badass_service_keys.sh
+### `scripts/update_github_org_secrets.sh`
 
-This script creates service account keys for Vertex AI and Gemini services, and updates GitHub organization secrets with the new keys.
+This script updates GitHub organization secrets with GCP service account keys. It:
+
+- Authenticates with GitHub using a personal access token
+- Authenticates with GCP using the master service account key
+- Gets service account keys from Secret Manager
+- Updates GitHub organization secrets
 
 Usage:
 
 ```bash
-export GCP_MASTER_SERVICE_JSON="<your-gcp-master-service-json>"
-export GITHUB_TOKEN="<your-github-token>"
-export GCP_PROJECT_ID="cherry-ai-project"
-export GITHUB_ORG="ai-cherry"
-export GITHUB_REPO="orchestra-main"
-export REGION="us-central1"
-./create_badass_service_keys.sh
+export GITHUB_TOKEN="your_github_token"
+export GCP_MASTER_SERVICE_JSON="$(cat /path/to/master-key.json)"
+./scripts/update_github_org_secrets.sh
 ```
 
-### scripts/update_codespaces_secrets.sh
+### `scripts/update_codespaces_secrets.sh`
 
-This script updates GitHub Codespaces secrets with GCP credentials.
+This script updates GitHub Codespaces secrets with GCP service account keys. It:
+
+- Authenticates with GitHub using a personal access token
+- Authenticates with GCP using the master service account key
+- Gets service account keys from Secret Manager
+- Updates GitHub Codespaces secrets
 
 Usage:
 
 ```bash
-export GITHUB_TOKEN="<your-github-token>"
-export GCP_PROJECT_ID="cherry-ai-project"
-export GITHUB_ORG="ai-cherry"
-export GITHUB_REPO="orchestra-main"
-export REGION="us-central1"
-export GCP_VERTEX_POWER_KEY="<your-vertex-power-key>"
-export GCP_GEMINI_POWER_KEY="<your-gemini-power-key>"
+export GITHUB_TOKEN="your_github_token"
+export GCP_MASTER_SERVICE_JSON="$(cat /path/to/master-key.json)"
 ./scripts/update_codespaces_secrets.sh
 ```
 
-### orchestra_wif_master.sh
+### `scripts/create_powerful_service_keys.sh`
 
-This script sets up Workload Identity Federation for GitHub Actions.
+This script creates powerful service account keys for Vertex AI and Gemini. It:
+
+- Authenticates with GCP using the master service account key
+- Creates service accounts with powerful permissions
+- Creates service account keys
+- Stores the keys in Secret Manager
 
 Usage:
 
 ```bash
-export GCP_MASTER_SERVICE_JSON="<your-gcp-master-service-json>"
-export GITHUB_TOKEN="<your-github-token>"
-export GCP_PROJECT_ID="cherry-ai-project"
-export GITHUB_ORG="ai-cherry"
-export GITHUB_REPO="orchestra-main"
-export REGION="us-central1"
-export POOL_ID="github-actions-pool"
-export PROVIDER_ID="github-actions-provider"
-./orchestra_wif_master.sh
+export GCP_MASTER_SERVICE_JSON="$(cat /path/to/master-key.json)"
+./scripts/create_powerful_service_keys.sh
 ```
 
-### scripts/test_gcp_integration.sh
+### `scripts/test_gcp_integration.sh`
 
-This script tests the integration between GitHub, Codespaces, and GCP.
+This script tests the integration between GitHub, Codespaces, and GCP. It:
+
+- Authenticates with GCP using the master service account key
+- Tests GCP project access
+- Tests Secret Manager access
+- Tests Vertex AI access
+- Tests Cloud Storage access
+- Tests IAM access
+- Tests Vertex AI service account key
+- Tests Gemini service account key
 
 Usage:
 
 ```bash
-export GCP_PROJECT_ID="cherry-ai-project"
-export REGION="us-central1"
+export GCP_MASTER_SERVICE_JSON="$(cat /path/to/master-key.json)"
 ./scripts/test_gcp_integration.sh
 ```
 
 ## GitHub Actions Workflows
 
-The infrastructure management system includes the following GitHub Actions workflows:
+### `.github/workflows/infrastructure-sync.yml`
 
-### .github/workflows/update-gcp-infrastructure.yml
+This workflow runs the infrastructure setup scripts automatically when triggered. It:
 
-This workflow runs the update_gcp_infrastructure.sh script to update the GCP infrastructure. It can be triggered manually from the GitHub Actions tab.
+- Authenticates with GCP using Workload Identity Federation
+- Runs the infrastructure setup scripts
+- Verifies the setup
+- Updates GitHub secrets
+- Updates Codespaces secrets
 
-### .github/workflows/infrastructure-sync.yml
+Usage:
 
-This workflow uses Workload Identity Federation for authentication with GCP and runs the scripts to create service account keys and update GitHub secrets. It can be triggered manually from the GitHub Actions tab or automatically when changes are pushed to the main branch.
+1. Go to the GitHub Actions tab in your repository
+2. Select the "Infrastructure Sync" workflow
+3. Click "Run workflow"
+4. Select the environment (dev, staging, or prod)
+5. Click "Run workflow" again
+
+## Terraform Modules
+
+### `terraform/modules/ai-service-accounts`
+
+This module defines the service accounts for AI services. It:
+
+- Creates service accounts for Vertex AI and Gemini
+- Grants the necessary permissions
+- Outputs the service account emails
+
+Usage:
+
+```hcl
+module "ai_service_accounts" {
+  source     = "./modules/ai-service-accounts"
+  project_id = var.project_id
+  env        = var.env
+}
+```
+
+## Setup Process
+
+The setup process consists of the following steps:
+
+1. **Initial Setup**:
+   - Create a GCP project
+   - Enable required APIs
+   - Create a master service account with owner permissions
+   - Create a master service account key
+   - Store the key in Secret Manager and GitHub secrets
+   - Create a Terraform state bucket
+   - Set up Workload Identity Federation
+
+2. **Service Account Setup**:
+   - Create service accounts for Vertex AI and Gemini
+   - Grant the necessary permissions
+   - Create service account keys
+   - Store the keys in Secret Manager
+
+3. **GitHub Secrets Setup**:
+   - Update GitHub organization secrets with GCP service account keys
+   - Update GitHub Codespaces secrets with GCP service account keys
+
+4. **Verification**:
+   - Verify that the GCP infrastructure is correctly set up
+   - Verify that the GitHub secrets are correctly set
+   - Verify that the Codespaces configuration is correctly set
 
 ## Security Considerations
 
-The infrastructure management system uses service account keys and Workload Identity Federation for authentication with GCP. Here are some security considerations:
+1. **Service Account Keys**:
+   - Service account keys are highly privileged and should be protected
+   - Service account keys are stored in GitHub secrets and Secret Manager
+   - Service account keys should be rotated regularly
+   - Service account keys should be deleted from the filesystem after use
 
-1. Service account keys are highly privileged and should be protected
-2. Service account keys are stored in GitHub secrets and Secret Manager
-3. Workload Identity Federation is more secure than service account keys
-4. Service account keys should be rotated regularly
-5. Service account keys should be deleted from the filesystem after use
+2. **Workload Identity Federation**:
+   - Workload Identity Federation is more secure than service account keys
+   - Workload Identity Federation should be used for GitHub Actions workflows
+   - Workload Identity Federation should be configured with the principle of least privilege
+
+3. **Secret Management**:
+   - Secrets should be stored in Secret Manager
+   - Secrets should be accessed using the principle of least privilege
+   - Secrets should be rotated regularly
 
 ## Troubleshooting
 
-If you encounter issues with the infrastructure management system, here are some troubleshooting steps:
+### Common Issues
 
-1. Check the logs for error messages
-2. Verify that the required environment variables are set
-3. Verify that the required APIs are enabled
-4. Verify that the service accounts have the necessary permissions
-5. Verify that the GitHub secrets are set correctly
-6. Verify that the Workload Identity Federation is set up correctly
+1. **Authentication Issues**:
+   - Check that the service account key is correct
+   - Check that the service account has the necessary permissions
+   - Check that the Workload Identity Federation is correctly configured
 
-## Next Steps
+2. **API Issues**:
+   - Check that the required APIs are enabled
+   - Check that the service account has the necessary permissions
+   - Check that the API quotas are not exceeded
 
-After setting up the infrastructure management system, you can:
+3. **GitHub Secrets Issues**:
+   - Check that the GitHub token has the necessary permissions
+   - Check that the GitHub organization exists
+   - Check that the GitHub repository exists
 
-1. Create a new Codespace or rebuild an existing one
-2. Verify that the Codespace has access to GCP resources
-3. Run the test_gcp_integration.sh script to verify the integration
-4. Update the Terraform state if needed
-5. Commit and push the changes to your repository
+### Debugging
+
+1. **Verbose Logging**:
+   - All scripts support verbose logging
+   - Set the `DEBUG` environment variable to `true` to enable verbose logging
+   - Example: `DEBUG=true ./scripts/verify_gcp_setup.sh`
+
+2. **Manual Verification**:
+   - Use the `gcloud` CLI to manually verify the setup
+   - Use the GitHub CLI to manually verify the secrets
+   - Use the Codespaces CLI to manually verify the secrets
 
 ## Conclusion
 
-The infrastructure management system provides a comprehensive solution for managing the GCP infrastructure, GitHub secrets, and Codespaces configuration for the AI Orchestra project. By following the instructions in this document, you can ensure that your infrastructure is properly set up and maintained.
+The infrastructure management system provides a comprehensive solution for managing the GCP infrastructure, GitHub secrets, and Codespaces configuration. It automates the setup and management of the infrastructure, making it easy to maintain and update.
