@@ -1,0 +1,94 @@
+[
+  {
+    "type": "comment",
+    "content": "IMPORTANT: This workflow is designed for the roo_workflow_manager.py utility, which is completely separate from the main Project Orchestra implementation."
+  },
+  {
+    "type": "mode",
+    "mode": "architect",
+    "task": "Design a data synchronization system for our multi-agent AI system that securely transfers data between GCP services and our application using Cloud Run as the orchestration layer. Consider our existing infrastructure using Terraform modules and the current GitHub-GCP integration workflow."
+  },
+  {
+    "type": "mode",
+    "mode": "code",
+    "task": "Implement a Python module that handles the data synchronization logic. Include error handling, logging, and authentication against GCP services."
+  },
+  {
+    "type": "vs_code_task",
+    "task_id": "github_gcp_init",
+    "inputs": {}
+  },
+  {
+    "type": "mode",
+    "mode": "reviewer",
+    "task": "Review the implemented data synchronization code for security vulnerabilities, focusing on authentication handling, data encryption, and secure GCP access patterns."
+  },
+  {
+    "type": "mode",
+    "mode": "code",
+    "task": "Fix any security issues identified in the review and implement proper unit tests for the data synchronization module."
+  },
+  {
+    "type": "terraform",
+    "operation": "init",
+    "working_dir": "infra",
+    "parameters": {}
+  },
+  {
+    "type": "terraform",
+    "operation": "plan",
+    "working_dir": "infra",
+    "parameters": {
+      "out_file": "data_sync_plan"
+    }
+  },
+  {
+    "type": "terraform",
+    "operation": "apply",
+    "working_dir": "infra",
+    "parameters": {
+      "plan_file": "data_sync_plan"
+    }
+  },
+  {
+    "type": "github",
+    "operation": "create_branch",
+    "parameters": {
+      "branch_name": "feature/data-sync-service",
+      "base_branch": "main"
+    }
+  },
+  {
+    "type": "github",
+    "operation": "commit_changes",
+    "parameters": {
+      "message": "Add data synchronization service with secure GCP integration",
+      "files": [
+        "src/data_sync_service.py",
+        "tests/test_data_sync_service.py",
+        "infra/data_sync_resources.tf"
+      ]
+    }
+  },
+  {
+    "type": "gcp",
+    "operation": "cloud_build",
+    "parameters": {
+      "config_path": "cloudbuild_data_sync.yaml"
+    }
+  },
+  {
+    "type": "mode",
+    "mode": "creative",
+    "task": "Create comprehensive documentation for the data synchronization service, including architecture diagrams, setup instructions, security considerations, and usage examples."
+  },
+  {
+    "type": "github",
+    "operation": "create_pr",
+    "parameters": {
+      "title": "Data Synchronization Service Implementation",
+      "body": "This PR adds a secure data synchronization service that transfers data between GCP services and our application using Cloud Run. Includes Terraform configuration, Python implementation, tests, and documentation.",
+      "base_branch": "main"
+    }
+  }
+]

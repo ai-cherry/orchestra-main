@@ -1,0 +1,101 @@
+name: Validate Secret Manager Configuration
+
+on:
+  workflow_dispatch:  # Manual trigger
+  push:
+    branches: [main]
+    paths:
+      - 'infra/modules/secret-manager/**'
+      - 'infra/orchestra-terraform/secrets.tf'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'infra/modules/secret-manager/**'
+      - 'infra/orchestra-terraform/secrets.tf'
+
+# Add permissions required for the google-github-actions/auth
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  validate-secrets:
+    name: Validate Secret Manager Configuration
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        environment: [dev, prod]
+        service: [orchestra-api]
+      fail-fast: false  # Continue with other environments if one fails
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install google-cloud-secretmanager
+      
+      # Validate the format of the GCP service account key
+      - name: Validate GCP Service Account Key Format
+        id: validate_key
+        run: |
+          echo "${{ secrets.GCP_SA_KEY }}" | grep -q "private_key" && \
+          echo "${{ secrets.GCP_SA_KEY }}" | grep -q "client_email" && \
+          echo "Service account key appears to be in the correct JSON format" || \
+          (echo "::error::GCP_SA_KEY does not appear to be a valid JSON service account key" && exit 1)
+        continue-on-error: true
+      
+      - name: Authenticate to Google Cloud
+        id: auth
+        if: steps.validate_key.outcome == 'success'
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+        continue-on-error: true
+      
+      - name: Debug Authentication Status
+        run: |
+          if [ "${{ steps.validate_key.outcome }}" != "success" ]; then
+            echo "::error::Service account key validation failed. Please check that GCP_SA_KEY contains a valid JSON key."
+          elif [ "${{ steps.auth.outcome }}" == "success" ]; then
+            echo "✅ GCP Authentication successful"
+          else
+            echo "::error::GCP Authentication failed. Please check that the service account has the required permissions."
+            echo "::warning::The service account needs Secret Manager Admin, Secret Manager Viewer roles for this workflow."
+          fi
+      
+      - name: Set up gcloud CLI
+        if: steps.auth.outcome == 'success'
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Validate Secret Manager Configuration
+        if: steps.auth.outcome == 'success'
+        run: |
+          cd infra/modules/secret-manager/validation
+          chmod +x run_validation.sh
+          ./run_validation.sh ${{ secrets.GCP_PROJECT_ID }} ${{ matrix.environment }} ${{ matrix.service }}
+      
+      - name: Skip Secret Manager validation
+        if: steps.auth.outcome != 'success'
+        run: |
+          echo "::warning::Skipping live Secret Manager validation because GCP authentication failed or was skipped"
+          echo "To enable live validation, add GCP_SA_KEY and GCP_PROJECT_ID secrets to your GitHub repository"
+      
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          echo "::error::Secret Manager validation failed for ${{ matrix.environment }} environment!"
+          # Example: Send a Slack notification
+          # curl -X POST -H 'Content-type: application/json' \
+          #   --data '{"text":"❌ Secret Manager validation failed for ${{ matrix.environment }} environment!"}' \
+          #   ${{ secrets.SLACK_WEBHOOK_URL }}

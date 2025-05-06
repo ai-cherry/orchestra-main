@@ -1,0 +1,116 @@
+name: GCP Terraform Deployment
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'terraform/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'terraform/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # For Workload Identity Federation
+
+jobs:
+  terraform:
+    name: 'Terraform Plan & Apply'
+    runs-on: ubuntu-latest
+    environment: production
+
+    # Add GitHub Codespaces integration - allows reviewing plans in Codespaces
+    outputs:
+      codespace_name: ${{ steps.create_codespace.outputs.codespace_name }}
+      tf_plan_output: ${{ steps.tf_plan.outputs.stdout }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Authenticate to GCP using organization secrets - prioritize master service key
+      - id: 'auth-master'
+        name: 'Authenticate to Google Cloud with Master Service Account'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GCP_MASTER_SERVICE_JSON }}'
+      
+      # Fallback to admin key if master key is not available
+      - id: 'auth-admin'
+        if: ${{ failure() }}
+        name: 'Fallback to Project Admin Key'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GCP_PROJECT_ADMIN_KEY }}'
+      
+      # Final fallback to secret management key
+      - id: 'auth-secret'
+        if: ${{ failure() }}
+        name: 'Fallback to Secret Management Key'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GCP_SECRET_MANAGEMENT_KEY }}'
+
+      - name: 'Set up Terraform'
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: 'Terraform Init'
+        run: |
+          cd terraform
+          terraform init
+
+      - name: 'Terraform Format'
+        run: |
+          cd terraform
+          terraform fmt -check
+
+      - id: 'tf_plan'
+        name: 'Terraform Plan'
+        run: |
+          cd terraform
+          terraform plan -no-color
+        # Save the output for Codespaces review
+
+      # Only apply on main branch
+      - name: 'Terraform Apply'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          cd terraform
+          terraform apply -auto-approve
+        
+      # Create a comment with the plan output on pull requests
+      - name: 'Comment on PR'
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        env:
+          PLAN: "${{ steps.tf_plan.outputs.stdout }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform Plan 📝
+            \`\`\`terraform
+            ${process.env.PLAN}
+            \`\`\`
+            `;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+      
+      # Create a Codespace for PRs that need manual review
+      - id: create_codespace
+        name: Create Review Codespace
+        if: github.event_name == 'pull_request' && contains(steps.tf_plan.outputs.stdout, '! Plan')
+        uses: github/codespaces-actions@v1
+        with:
+          command: |
+            # Create a review file with the plan
+            echo "${{ steps.tf_plan.outputs.stdout }}" > terraform_plan_review.txt
+            # Open the file in editor
+            code terraform_plan_review.txt

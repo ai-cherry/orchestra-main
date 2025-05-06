@@ -1,0 +1,14 @@
+# Rule encouraging Type Hinting (Example - adjust as needed)
+FLAG {
+    pattern: "def (.*)\((.*)\)(?!\s*->):" # Simple check for missing return type hint
+    file_pattern: "**/src/**/*.py"
+    description: "STYLE: Consider adding a return type hint to this function definition."
+    severity: INFO
+}
+
+# Rule checking for TODO comments without assigned user/ticket
+FLAG {
+    pattern: "TODO(?![:(])" # Matches TODO not followed by : or (
+    description: "INFO: Consider adding owner/ticket to TODO comments (e.g., TODO(user): details or TODO(#123): details)."
+    severity: INFO
+}

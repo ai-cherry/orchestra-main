@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # Main Orchestra API service
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.optimized
+    image: us-central1-docker.pkg.dev/cherry-ai.me/orchestra/api:optimized
+    environment:
+      - GCP_PROJECT_ID=cherry-ai.me
+      - GOOGLE_CLOUD_PROJECT=cherry-ai.me
+      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/vertex-agent-key.json
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PORT=8000
+      - ENVIRONMENT=production
+      - USE_MEMORY_CACHE=true
+      - ENABLE_MONITORING=true
+      - USE_RECOVERY_MODE=false
+      - STANDARD_MODE=true
+      - VSCODE_DISABLE_WORKSPACE_TRUST=true
+      - DISABLE_WORKSPACE_TRUST=true
+    volumes:
+      - ${GOOGLE_APPLICATION_CREDENTIALS:-~/.config/gcloud/application_default_credentials.json}:/tmp/vertex-agent-key.json:ro
+    ports:
+      - "8000:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Redis for caching and pub/sub
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes --maxmemory 2gb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 3G
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  redis_data:

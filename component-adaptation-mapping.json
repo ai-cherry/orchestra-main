@@ -1,0 +1,39 @@
+{
+  "Button (Primary)": [
+    {"layer": "Background", "apply": {"Variable": "Orchestra-Color-Semantic/accent-primary"}},
+    {"layer": "Text", "apply": {"Variable": "Orchestra-Color-Semantic/accent-text"}},
+    {"layer": "Icon (Optional)", "apply": {"Variable": "Orchestra-Color-Semantic/accent-text"}},
+    {"layer": "Border", "apply": {"Style": "No Border (Hidden)"}}
+  ],
+  
+  "Card (Default)": [
+    {"layer": "Container Background", "apply": {"Style": "Base Surface Color Style (Gray 800/900)"}},
+    {"layer": "Border (Optional)", "apply": {"Style": "Subtle Border Color Style (Gray 700)"}},
+    {"layer": "Header Text", "apply": {"Style": "Semibold Heading Text Style (text-lg, White)"}},
+    {"layer": "Body Text", "apply": {"Style": "Regular Body Text Style (text-base, Gray 300)"}}
+  ],
+  
+  "Input (Default)": [
+    {"layer": "Container", "apply": {"Style": "Input Background Style (Gray 700)"}},
+    {"layer": "Border", "apply": {"Style": "Input Border Style (Gray 600)"}},
+    {"layer": "Text", "apply": {"Style": "Input Text Style (White)"}},
+    {"layer": "Label", "apply": {"Style": "Input Label Style (Gray 400)"}},
+    {"layer": "Focus State", "apply": {"Variable": "Orchestra-Color-Semantic/accent-primary"}}
+  ],
+  
+  "Sidebar Item": [
+    {"layer": "Container", "apply": {"Style": "Transparent Background"}},
+    {"layer": "Icon", "apply": {"Style": "Navigation Icon Style (Gray 400)"}},
+    {"layer": "Text", "apply": {"Style": "Navigation Text Style (Gray 300)"}},
+    {"layer": "Active State Container", "apply": {"Variable": "Orchestra-Color-Semantic/accent-primary"}},
+    {"layer": "Active State Text/Icon", "apply": {"Variable": "Orchestra-Color-Semantic/accent-text"}}
+  ],
+  
+  "Top Bar Container": [
+    {"layer": "Background", "apply": {"Style": "Header Background Style (Gray 900)"}},
+    {"layer": "Border Bottom", "apply": {"Style": "Subtle Separator Style (Gray 800)"}},
+    {"layer": "Title", "apply": {"Style": "Page Title Style (White, text-xl)"}},
+    {"layer": "Action Icons", "apply": {"Style": "Action Icon Style (Gray 400)"}},
+    {"layer": "User Avatar Border", "apply": {"Variable": "Orchestra-Color-Semantic/accent-primary"}}
+  ]
+}

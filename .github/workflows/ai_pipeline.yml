@@ -1,0 +1,55 @@
+name: AI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'pipelines/**'
+      - 'training/**'
+      - 'evaluation/**'
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: cherry-ai.me
+  PROJECT_NUMBER: 525398941159
+  REGION: us-central1
+  PIPELINE_ROOT: gs://cherry-ai-me-pipeline-root
+  SERVICE_ACCOUNT: vertex-agent@cherry-ai.me.iam.gserviceaccount.com
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Google Auth
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+        service_account: ${{ env.SERVICE_ACCOUNT }}
+        project_id: ${{ env.PROJECT_ID }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        project_id: ${{ env.PROJECT_ID }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install kfp google-cloud-aiplatform
+
+    - name: Compile and run pipeline
+      run: |
+        python pipelines/compile.py
+        python pipelines/run_pipeline.py \
+          --project_id=${{ env.PROJECT_ID }} \
+          --pipeline_root=${{ env.PIPELINE_ROOT }} \
+          --region=${{ env.REGION }}

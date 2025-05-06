@@ -1,0 +1,50 @@
+[tool.poetry]
+name = "orchestra"
+version = "0.1.0"
+
+[tool.poetry.dependencies]
+python = "~3.11 || ^3.12"
+fastapi = "^0.110.0"  # Suggest update to latest major version
+pydantic = "^2.7.0"  # Suggest update to latest major version
+google-cloud-secret-manager = "^2.0.0"
+google-cloud-firestore = "^2.0.0"
+google-cloud-storage = "^2.0.0"
+google-cloud-redis = "^2.0.0"
+google-cloud-tasks = "^2.0.0"
+google-cloud-pubsub = "^2.0.0"
+google-cloud-aiplatform = "*"
+google-cloud-iam = "^2.12.1"  # For service account key management
+redis = "^5.0.0"  # For Redis operations
+cryptography = "^41.0.0"  # For additional security operations
+litellm = "^1.20.0"  # Suggest update to latest version
+opentelemetry-exporter-gcp-trace = "^1.20.0"  # Suggest update to latest version
+opentelemetry-instrumentation-fastapi = "^1.20.0" # Suggest update to latest version
+
+[tool.poetry.dev-dependencies]
+pytest-asyncio = "^0.21.0"
+bandit = "^1.7.5"
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[[tool.poetry.packages]]
+include = "orchestra"

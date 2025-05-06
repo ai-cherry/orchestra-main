@@ -1,0 +1,83 @@
+[1;33mStarting Orchestra API with FORCE STANDARD MODE[0m
+[0;32mLoading environment variables from set_env.sh...[0m
+[0;32mCritical environment variables:[0m
+PYTHONPATH=/workspaces/orchestra-main
+USE_RECOVERY_MODE=false
+STANDARD_MODE=true
+[0;32mFound virtual environment at /workspaces/orchestra-main/.venv[0m
+[1;33mActivating virtual environment...[0m
+[0;32mUsing Python: /workspaces/orchestra-main/.venv/bin/python[0m
+[1;33mChecking for processes running on port 8000...[0m
+[1;33mChecking critical imports before starting...[0m
+Testing import of fastapi... [0;32mOK[0m
+Testing import of pydantic... [0;32mOK[0m
+Testing import of openai... [0;32mOK[0m
+Testing import of uvicorn... [0;32mOK[0m
+[1;33mApplying forced standard mode patch...[0m
+2025-04-21 17:04:39.429 | INFO     | orchestrator.main:<module>:48 - Starting with RECOVERY_MODE=False, STANDARD_MODE=True (HARD OVERRIDE)
+⚠️ APPLYING HARD OVERRIDE: Forcing standard mode and disabling recovery mode!
+===== DEBUG: Environment Variables at Startup =====
+ENVIRONMENT=development
+PYTHONPATH=/workspaces/orchestra-main
+STANDARD_MODE=true
+USE_RECOVERY_MODE=false
+===== DEBUG: Python Path =====
+/workspaces/orchestra-main
+/workspaces/orchestra-main
+/usr/lib/python312.zip
+/usr/lib/python3.12
+/usr/lib/python3.12/lib-dynload
+/workspaces/orchestra-main/.venv/lib/python3.12/site-packages
+===== DEBUG: End Environment Info =====
+DEBUG: Environment would set RECOVERY_MODE=False
+DEBUG: Environment would set STANDARD_MODE=True
+DEBUG: HARD OVERRIDE ACTIVE: RECOVERY_MODE=False, STANDARD_MODE=True
+Starting with RECOVERY_MODE=False, STANDARD_MODE=True (HARD OVERRIDE)
+=== FORCE STANDARD MODE ACTIVE ===
+Patched orchestrator.main: RECOVERY_MODE=False, STANDARD_MODE=True
+Environment variables set: USE_RECOVERY_MODE=false, STANDARD_MODE=true
+=================================
+[0;32mStandard mode patch applied successfully.[0m
+[0;32mStarting FastAPI app - Orchestrator API (FORCED STANDARD MODE)[0m
+[0;32mUsing Python: /workspaces/orchestra-main/.venv/bin/python[0m
+[0;32mPYTHONPATH: /workspaces/orchestra-main[0m
+[0;32mUSE_RECOVERY_MODE: false[0m
+[0;32mSTANDARD_MODE: true[0m
+Python sees USE_RECOVERY_MODE= false
+INFO:     Will watch for changes in these directories: ['/workspaces/orchestra-main']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [2245] using StatReload
+2025-04-21 17:04:41.593 | INFO     | orchestrator.main:<module>:48 - Starting with RECOVERY_MODE=False, STANDARD_MODE=True (HARD OVERRIDE)
+INFO:     Started server process [2247]
+INFO:     Waiting for application startup.
+2025-04-21 17:04:41,597 [INFO] orchestrator.main: Initializing system components...
+2025-04-21 17:04:41.598 | INFO     | config.gcp_config:get_gcp_config:60 - Active GCP configuration (development): {'project_id': '', 'region': 'us-central1', 'memory_type': 'in-memory', 'memory_collection': 'dev_memories', 'credentials_path': '***REDACTED***'}
+2025-04-21 17:04:41,602 [INFO] orchestrator.main: Starting in development environment
+2025-04-21 17:04:41.603 | INFO     | config.gcp_config:get_gcp_config:60 - Active GCP configuration (development): {'project_id': '', 'region': 'us-central1', 'memory_type': 'in-memory', 'memory_collection': 'dev_memories', 'credentials_path': '***REDACTED***'}
+2025-04-21 17:04:41,603 [INFO] orchestrator.main: Memory manager initialized: in-memory
+2025-04-21 17:04:41,609 [INFO] orchestrator.agents.agent_registry: Registered agent: Echo Agent (ID: echo-default)
+2025-04-21 17:04:41,609 [INFO] orchestrator.agents.agent_registry: Registered agent class: EchoAgent as echo
+2025-04-21 17:04:41,609 [INFO] orchestrator.agents.agent_registry: Default agents registered
+2025-04-21 17:04:41,609 [INFO] orchestrator.main: System initialization complete
+2025-04-21 17:04:41,609 [INFO] orchestrator.main: Starting API in STANDARD MODE in development environment
+INFO:     Application startup complete.
+⚠️ APPLYING HARD OVERRIDE: Forcing standard mode and disabling recovery mode!
+===== DEBUG: Environment Variables at Startup =====
+ENVIRONMENT=development
+PYTHONPATH=/workspaces/orchestra-main
+STANDARD_MODE=true
+USE_RECOVERY_MODE=false
+===== DEBUG: Python Path =====
+/workspaces/orchestra-main
+/workspaces/orchestra-main
+/workspaces/orchestra-main
+/usr/lib/python312.zip
+/usr/lib/python3.12
+/usr/lib/python3.12/lib-dynload
+/workspaces/orchestra-main/.venv/lib/python3.12/site-packages
+===== DEBUG: End Environment Info =====
+DEBUG: Environment would set RECOVERY_MODE=False
+DEBUG: Environment would set STANDARD_MODE=True
+DEBUG: HARD OVERRIDE ACTIVE: RECOVERY_MODE=False, STANDARD_MODE=True
+Starting with RECOVERY_MODE=False, STANDARD_MODE=True (HARD OVERRIDE)
+INFO:     127.0.0.1:41612 - "GET /health HTTP/1.1" 200 OK

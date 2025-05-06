@@ -1,0 +1,143 @@
+agent_definitions:
+
+  # Gong Agent: Analyzes call recordings and transcripts
+  phidata_gong_analyst:
+    agent_name: Gong Analyst
+    description: "Analyzes Gong call recordings, transcripts, and sentiment to extract insights"
+    wrapper_type: phidata
+    phidata_agent_class: agno.agent.Agent
+    llm_ref: llm_gpt4_turbo_via_portkey
+    tools:
+      - name: GongTool
+        path: packages.tools.src.gong.GongTool
+    role: "Analyze Gong call recordings and provide insights"
+    instructions:
+      - "Extract key discussion topics from call transcripts"
+      - "Identify and summarize competitor mentions"
+      - "Analyze call sentiment and flag potential deal risks"
+      - "Provide actionable insights based on conversation analysis"
+    memory:
+      memory_type: pgvector
+
+  # Looker Agent: Runs analytics queries and generates insights
+  phidata_looker_strategist:
+    agent_name: Looker Strategist
+    description: "Analyzes business data through Looker to provide strategic insights"
+    wrapper_type: phidata
+    phidata_agent_class: agno.agent.Agent
+    llm_ref: llm_gpt4_turbo_via_portkey
+    tools:
+      - name: LookerTool
+        path: packages.tools.src.looker.LookerTool
+    role: "Run Looker analytics queries and generate business intelligence"
+    instructions:
+      - "Execute specific Looker looks and dashboards based on context"
+      - "Generate analysis of business metrics and trends"
+      - "Compare forecasts against actual performance"
+      - "Provide data-driven recommendations for business optimization"
+    memory:
+      memory_type: pgvector
+
+  # Salesforce Agent: Manages Salesforce CRM operations
+  phidata_salesforce_operator:
+    agent_name: Salesforce Operator
+    description: "Manages Salesforce CRM operations and data retrieval"
+    wrapper_type: phidata
+    phidata_agent_class: agno.agent.Agent
+    llm_ref: llm_gpt4_turbo_via_portkey
+    tools:
+      - name: SalesforceTool
+        path: packages.tools.src.salesforce.SalesforceTool
+    role: "Manage Salesforce CRM operations and data retrieval"
+    instructions:
+      - "Query opportunity and account data from Salesforce"
+      - "Update CRM records based on relevant insights"
+      - "Track pipeline changes and forecast updates"
+      - "Generate reports on sales performance metrics"
+    memory:
+      memory_type: pgvector
+
+  # HubSpot Agent: Manages HubSpot CRM operations
+  phidata_hubspot_manager:
+    agent_name: HubSpot Manager
+    description: "Manages HubSpot CRM contacts, deals, and data enrichment"
+    wrapper_type: phidata
+    phidata_agent_class: agno.agent.Agent
+    llm_ref: llm_gpt4_turbo_via_portkey
+    tools:
+      - name: HubSpotTool
+        path: packages.tools.src.hubspot.HubSpotTool
+    role: "Automate HubSpot CRM operations and data enrichment"
+    instructions:
+      - "Enrich contacts using web search"
+      - "Update deal stages based on context"
+      - "Generate pipeline reports"
+      - "Retrieve customer information for analysis"
+    memory:
+      memory_type: pgvector
+
+  # NetSuite Agent: Manages NetSuite inventory operations
+  phidata_netsuite_agent:
+    agent_name: NetSuite Agent
+    description: "Retrieves and updates NetSuite inventory data"
+    wrapper_type: phidata
+    phidata_agent_class: agno.agent.Agent
+    llm_ref: llm_gpt4_turbo_via_portkey
+    tools:
+      - name: NetSuiteTool
+        path: packages.tools.src.netsuite.NetSuiteTool
+    role: "Retrieve and update NetSuite data"
+    instructions:
+      - "Get inventory levels for specific SKUs"
+      - "Update inventory records accurately"
+      - "Monitor inventory changes and trends"
+      - "Provide inventory insights for business planning"
+    memory:
+      memory_type: pgvector
+
+  # Slack Messenger: Sends messages and reports to Slack
+  phidata_slack_messenger:
+    agent_name: Slack Messenger
+    description: "Formats and sends messages and reports to Slack channels"
+    wrapper_type: phidata
+    phidata_agent_class: agno.agent.Agent
+    llm_ref: llm_gpt4_turbo_via_portkey
+    tools:
+      - name: SlackMessenger
+        path: packages.tools.src.slack.SlackMessenger
+    role: "Sends messages and reports to Slack"
+    instructions:
+      - "Send messages to specified channels"
+      - "Format messages clearly"
+      - "Share data visualizations with context"
+      - "Create well-structured reports for team communication"
+    memory:
+      memory_type: pgvector
+
+  # Insight Engine Team: Coordinates all business intelligence agents
+  insight_engine:
+    agent_name: Insight Engine
+    description: "Team of agents that work together to provide business intelligence insights"
+    wrapper_type: phidata
+    phidata_agent_class: agno.team.Team
+    team_mode: coordinate
+    members:
+      - phidata_gong_analyst
+      - phidata_looker_strategist
+      - phidata_salesforce_operator
+      - phidata_hubspot_manager
+      - phidata_netsuite_agent
+      - phidata_slack_messenger
+    controller:
+      name: Insight Synthesizer
+      llm_ref: llm_gpt4_turbo_via_portkey
+      role: "Coordinate team members to synthesize cross-platform business intelligence"
+      instructions:
+        - "Cross-reference data from multiple platforms to identify patterns"
+        - "Generate comprehensive insights combining call data, CRM info, and analytics"
+        - "Identify discrepancies between sales forecasts and actual performance"
+        - "Create actionable recommendations based on synthesized information"
+        - "Delegate specific tasks to appropriate team members"
+        - "Use Slack integration to share insights with stakeholders"
+    memory:
+      memory_type: pgvector

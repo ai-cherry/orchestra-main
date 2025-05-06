@@ -1,0 +1,100 @@
+name: Python Tests with Poetry
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: '1.4.0'
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          
+      - name: Install dependencies
+        run: poetry install --with dev
+        
+      - name: Run linters
+        run: poetry run flake8 .
+        
+      - name: Run Bandit security scan
+        uses: mdegis/bandit-action@v1
+        with:
+          path: '.'
+          level: medium
+          confidence: medium
+
+  test:
+    runs-on: ubuntu-latest
+    services:
+      firestore-emulator:
+        image: mtlynch/firestore-emulator:latest
+        ports:
+          - 8080:8080
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: '1.4.0'
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          
+      - name: Install dependencies
+        run: poetry install --with dev
+        
+      - name: Run tests with pytest
+        run: poetry run pytest
+        env:
+          FIRESTORE_EMULATOR_HOST: localhost:8080
+          
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: '1.4.0'
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          
+      - name: Install dependencies
+        run: poetry install
+        
+      - name: Build package
+        run: poetry build
+        
+      - name: Store build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/

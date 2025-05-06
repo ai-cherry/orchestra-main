@@ -1,0 +1,8 @@
+# Rule to flag usage of Standard/Enhanced Registries
+FLAG {
+    pattern: "StandardAgentRegistry|EnhancedAgentRegistry"
+    exclude_pattern: "**/core/orchestrator/registry/*|**/core/orchestrator/src/agents/standard_agent_registry.py|**/core/orchestrator/src/agents/enhanced_agent_registry.py|**/archived_files/**" # Exclude definitions and archived files
+    description: "REFACTOR: Usage of Standard/Enhanced Agent Registry detected. Plan migration to UnifiedAgentRegistry."
+    severity: WARNING
+}
+# Add similar rules for other unified components (Event Bus etc.) as identified

@@ -1,0 +1,244 @@
+name: Terraform Validation and Deployment
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'infra/terraform/**'
+      - '.github/workflows/terraform-validation.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'infra/terraform/**'
+      - '.github/workflows/terraform-validation.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy (dev, prod, or all)'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
+          - all
+      auto_apply:
+        description: 'Automatically apply Terraform changes'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  TERRAFORM_VERSION: '1.5.7'
+  WORKING_DIR: 'infra/terraform/gcp'
+
+jobs:
+  validate:
+    name: Validate Terraform
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Format Terraform code
+        id: fmt
+        run: terraform fmt -check -recursive -diff ${{ env.WORKING_DIR }}
+        continue-on-error: true
+
+      - name: Validate common environment
+        id: validate_common
+        run: |
+          cd ${{ env.WORKING_DIR }}/environments/common
+          terraform init -backend=false
+          terraform validate
+        continue-on-error: true
+
+      - name: Validate dev environment
+        id: validate_dev
+        run: |
+          cd ${{ env.WORKING_DIR }}/environments/dev
+          terraform init -backend=false
+          terraform validate
+        continue-on-error: true
+
+      - name: Validate prod environment
+        id: validate_prod
+        run: |
+          cd ${{ env.WORKING_DIR }}/environments/prod
+          terraform init -backend=false
+          terraform validate
+        continue-on-error: true
+
+      - name: Report validation results
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fmtResult = '${{ steps.fmt.outcome }}' === 'success' ? '✅' : '❌';
+            const commonResult = '${{ steps.validate_common.outcome }}' === 'success' ? '✅' : '❌';
+            const devResult = '${{ steps.validate_dev.outcome }}' === 'success' ? '✅' : '❌';
+            const prodResult = '${{ steps.validate_prod.outcome }}' === 'success' ? '✅' : '❌';
+            
+            const comment = `## Terraform Validation Results
+            
+            | Check | Result |
+            | ----- | ------ |
+            | Format | ${fmtResult} |
+            | Common Environment | ${commonResult} |
+            | Dev Environment | ${devResult} |
+            | Prod Environment | ${prodResult} |
+            
+            ${fmtResult === '❌' ? '⚠️ **Formatting issues detected.** Please run `terraform fmt -recursive infra/terraform`.' : ''}
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+      - name: Check validation results
+        if: |
+          steps.fmt.outcome != 'success' ||
+          steps.validate_common.outcome != 'success' ||
+          steps.validate_dev.outcome != 'success' ||
+          steps.validate_prod.outcome != 'success'
+        run: |
+          echo "Terraform validation failed. Please check the logs for details."
+          exit 1
+
+  plan:
+    name: Plan Terraform Changes
+    needs: validate
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'pull_request' || 
+      github.event_name == 'workflow_dispatch'
+    
+    strategy:
+      matrix:
+        environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'all' && fromJSON('["dev", "prod"]') || github.event_name == 'workflow_dispatch' && fromJSON('["' + github.event.inputs.environment + '"]') || fromJSON('["dev"]') }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Terraform Init
+        id: init
+        run: |
+          cd ${{ env.WORKING_DIR }}/environments/${{ matrix.environment }}
+          terraform init
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          cd ${{ env.WORKING_DIR }}/environments/${{ matrix.environment }}
+          terraform plan -var="project_id=${{ env.PROJECT_ID }}" -no-color -out=tfplan
+        continue-on-error: true
+
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-plan-${{ matrix.environment }}
+          path: ${{ env.WORKING_DIR }}/environments/${{ matrix.environment }}/tfplan
+          retention-days: 5
+
+      - name: Post Plan to PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const planOutput = `${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}`;
+            const truncatedPlan = planOutput.length > 65000 
+              ? planOutput.substring(0, 65000) + "\n\n... (truncated, see workflow logs for full plan)"
+              : planOutput;
+            
+            const comment = `## Terraform Plan for ${{ matrix.environment }} Environment
+            
+            \`\`\`terraform
+            ${truncatedPlan}
+            \`\`\`
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  apply:
+    name: Apply Terraform Changes
+    needs: plan
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' && 
+      github.event.inputs.auto_apply == 'true'
+    
+    strategy:
+      matrix:
+        environment: ${{ github.event.inputs.environment == 'all' && fromJSON('["dev", "prod"]') || fromJSON('["' + github.event.inputs.environment + '"]') }}
+    
+    environment:
+      name: ${{ matrix.environment }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Download Terraform Plan
+        uses: actions/download-artifact@v3
+        with:
+          name: terraform-plan-${{ matrix.environment }}
+          path: ${{ env.WORKING_DIR }}/environments/${{ matrix.environment }}
+
+      - name: Terraform Init
+        run: |
+          cd ${{ env.WORKING_DIR }}/environments/${{ matrix.environment }}
+          terraform init
+
+      - name: Terraform Apply
+        run: |
+          cd ${{ env.WORKING_DIR }}/environments/${{ matrix.environment }}
+          terraform apply -auto-approve tfplan

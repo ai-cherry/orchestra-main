@@ -1,0 +1,133 @@
+name: Infrastructure Sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+      force_update:
+        description: 'Force update of all resources'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  sync-infrastructure:
+    name: Sync Infrastructure
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install google-cloud-aiplatform google-cloud-secret-manager google-cloud-storage
+      
+      - name: Set up GitHub CLI
+        run: |
+          type -p curl >/dev/null || (apt update && apt install curl -y)
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          sudo apt update
+          sudo apt install gh -y
+      
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER_ID }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+      
+      - name: Authenticate GitHub CLI
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+      
+      - name: Create service account keys
+        id: create-keys
+        run: |
+          # Export required environment variables
+          export GCP_MASTER_SERVICE_JSON='${{ secrets.GCP_MASTER_SERVICE_JSON }}'
+          export GCP_PROJECT_ADMIN_KEY='${{ secrets.GCP_PROJECT_ADMIN_KEY }}'
+          export GCP_SECRET_MANAGEMENT_KEY='${{ secrets.GCP_SECRET_MANAGEMENT_KEY }}'
+          export GITHUB_TOKEN='${{ secrets.GITHUB_TOKEN }}'
+          export GCP_PROJECT_ID='${{ secrets.GCP_PROJECT_ID }}'
+          export GITHUB_ORG='ai-cherry'
+          export GITHUB_REPO='orchestra-main'
+          export REGION='${{ secrets.GCP_REGION }}'
+          export ENV='${{ inputs.environment }}'
+          
+          # Make script executable
+          chmod +x create_badass_service_keys.sh
+          
+          # Run script
+          ./create_badass_service_keys.sh
+          
+          echo "Service account keys created successfully"
+      
+      - name: Update GitHub secrets
+        id: update-secrets
+        run: |
+          # Export required environment variables
+          export GITHUB_TOKEN='${{ secrets.GITHUB_TOKEN }}'
+          export GCP_PROJECT_ID='${{ secrets.GCP_PROJECT_ID }}'
+          export GITHUB_ORG='ai-cherry'
+          export GITHUB_REPO='orchestra-main'
+          export REGION='${{ secrets.GCP_REGION }}'
+          export GCP_VERTEX_POWER_KEY='${{ secrets.GCP_VERTEX_POWER_KEY }}'
+          export GCP_GEMINI_POWER_KEY='${{ secrets.GCP_GEMINI_POWER_KEY }}'
+          
+          # Make script executable
+          chmod +x scripts/update_codespaces_secrets.sh
+          
+          # Run script
+          ./scripts/update_codespaces_secrets.sh
+          
+          echo "GitHub secrets updated successfully"
+      
+      - name: Test GCP integration
+        id: test-integration
+        run: |
+          # Export required environment variables
+          export GCP_PROJECT_ID='${{ secrets.GCP_PROJECT_ID }}'
+          export REGION='${{ secrets.GCP_REGION }}'
+          
+          # Make script executable
+          chmod +x scripts/test_gcp_integration.sh
+          
+          # Run script
+          ./scripts/test_gcp_integration.sh
+          
+          echo "GCP integration tests completed"
+      
+      - name: Update Terraform state
+        if: ${{ inputs.force_update == true }}
+        run: |
+          # Initialize Terraform
+          cd terraform
+          terraform init
+          
+          # Apply Terraform changes
+          terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT_ID }}" -var="region=${{ secrets.GCP_REGION }}" -var="env=${{ inputs.environment }}"
+          
+          echo "Terraform state updated successfully"
