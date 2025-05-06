@@ -3,18 +3,8 @@ name: Setup GCP Infrastructure
 on:
   workflow_dispatch:
     inputs:
-      project_id:
-        description: 'GCP Project ID'
-        required: true
-        default: 'cherry-ai-project'
-        type: string
-      region:
-        description: 'GCP Region'
-        required: true
-        default: 'us-central1'
-        type: string
       environment:
-        description: 'Environment'
+        description: 'Environment to deploy to'
         required: true
         default: 'dev'
         type: choice
@@ -25,70 +15,356 @@ on:
 
 jobs:
   setup-infrastructure:
-    name: Setup GCP Infrastructure
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
-    
+
+    env:
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      GCP_PROJECT_NUMBER: ${{ secrets.GCP_PROJECT_NUMBER }}
+      REGION: ${{ secrets.GCP_REGION || 'us-central1' }}
+      ENV: ${{ github.event.inputs.environment }}
+      
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-      
+        uses: actions/checkout@v4
+
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
-      
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install google-cloud-aiplatform google-cloud-secret-manager google-cloud-storage
-      
-      - name: Set up GitHub CLI
+          pip install google-auth google-cloud-secret-manager google-cloud-storage google-api-python-client
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          install_components: 'gke-gcloud-auth-plugin'
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Create Vertex AI Service Account
         run: |
-          type -p curl >/dev/null || (apt update && apt install curl -y)
-          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-          sudo apt update
-          sudo apt install gh -y
-      
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-      
-      - name: Authenticate GitHub CLI
+          # Check if service account exists
+          if ! gcloud iam service-accounts describe vertex-power-user@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com &>/dev/null; then
+            echo "Creating Vertex AI service account..."
+            gcloud iam service-accounts create vertex-power-user \
+              --display-name="Vertex AI Power User" \
+              --description="Service account with powerful permissions for Vertex AI"
+          else
+            echo "Vertex AI service account already exists"
+          fi
+          
+          # Grant roles
+          echo "Granting roles to Vertex AI service account..."
+          gcloud projects add-iam-policy-binding ${{ env.GCP_PROJECT_ID }} \
+            --member="serviceAccount:vertex-power-user@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
+            --role="roles/aiplatform.admin" \
+            --condition=None
+            
+          gcloud projects add-iam-policy-binding ${{ env.GCP_PROJECT_ID }} \
+            --member="serviceAccount:vertex-power-user@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
+            --role="roles/aiplatform.user" \
+            --condition=None
+            
+          gcloud projects add-iam-policy-binding ${{ env.GCP_PROJECT_ID }} \
+            --member="serviceAccount:vertex-power-user@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
+            --role="roles/storage.admin" \
+            --condition=None
+            
+          gcloud projects add-iam-policy-binding ${{ env.GCP_PROJECT_ID }} \
+            --member="serviceAccount:vertex-power-user@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
+            --role="roles/bigquery.admin" \
+            --condition=None
+            
+          gcloud projects add-iam-policy-binding ${{ env.GCP_PROJECT_ID }} \
+            --member="serviceAccount:vertex-power-user@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
+            --role="roles/logging.admin" \
+            --condition=None
+            
+          gcloud projects add-iam-policy-binding ${{ env.GCP_PROJECT_ID }} \
+            --member="serviceAccount:vertex-power-user@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
+            --role="roles/monitoring.admin" \
+            --condition=None
+          
+          # Create service account key
+          echo "Creating Vertex AI service account key..."
+          mkdir -p /tmp/keys
+          gcloud iam service-accounts keys create /tmp/keys/vertex-key.json \
+            --iam-account="vertex-power-user@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com"
+          
+          # Store key in Secret Manager
+          echo "Storing Vertex AI key in Secret Manager..."
+          if ! gcloud secrets describe vertex-power-key &>/dev/null; then
+            gcloud secrets create vertex-power-key \
+              --data-file=/tmp/keys/vertex-key.json
+          else
+            gcloud secrets versions add vertex-power-key \
+              --data-file=/tmp/keys/vertex-key.json
+          fi
+          
+          # Clean up
+          rm -f /tmp/keys/vertex-key.json
+
+      - name: Create Gemini Service Account
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
-      
-      - name: Run setup_gcp_infrastructure.sh
+          # Check if service account exists
+          if ! gcloud iam service-accounts describe gemini-power-user@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com &>/dev/null; then
+            echo "Creating Gemini service account..."
+            gcloud iam service-accounts create gemini-power-user \
+              --display-name="Gemini Power User" \
+              --description="Service account with powerful permissions for Gemini"
+          else
+            echo "Gemini service account already exists"
+          fi
+          
+          # Grant roles
+          echo "Granting roles to Gemini service account..."
+          gcloud projects add-iam-policy-binding ${{ env.GCP_PROJECT_ID }} \
+            --member="serviceAccount:gemini-power-user@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
+            --role="roles/aiplatform.admin" \
+            --condition=None
+            
+          gcloud projects add-iam-policy-binding ${{ env.GCP_PROJECT_ID }} \
+            --member="serviceAccount:gemini-power-user@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
+            --role="roles/aiplatform.user" \
+            --condition=None
+            
+          gcloud projects add-iam-policy-binding ${{ env.GCP_PROJECT_ID }} \
+            --member="serviceAccount:gemini-power-user@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
+            --role="roles/storage.admin" \
+            --condition=None
+            
+          gcloud projects add-iam-policy-binding ${{ env.GCP_PROJECT_ID }} \
+            --member="serviceAccount:gemini-power-user@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
+            --role="roles/logging.admin" \
+            --condition=None
+            
+          gcloud projects add-iam-policy-binding ${{ env.GCP_PROJECT_ID }} \
+            --member="serviceAccount:gemini-power-user@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
+            --role="roles/monitoring.admin" \
+            --condition=None
+          
+          # Create service account key
+          echo "Creating Gemini service account key..."
+          mkdir -p /tmp/keys
+          gcloud iam service-accounts keys create /tmp/keys/gemini-key.json \
+            --iam-account="gemini-power-user@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com"
+          
+          # Store key in Secret Manager
+          echo "Storing Gemini key in Secret Manager..."
+          if ! gcloud secrets describe gemini-power-key &>/dev/null; then
+            gcloud secrets create gemini-power-key \
+              --data-file=/tmp/keys/gemini-key.json
+          else
+            gcloud secrets versions add gemini-power-key \
+              --data-file=/tmp/keys/gemini-key.json
+          fi
+          
+          # Clean up
+          rm -f /tmp/keys/gemini-key.json
+
+      - name: Set up Workload Identity Federation
+        run: |
+          # Check if Workload Identity Pool exists
+          if ! gcloud iam workload-identity-pools describe github-actions-pool --location=global &>/dev/null; then
+            echo "Creating Workload Identity Pool..."
+            gcloud iam workload-identity-pools create github-actions-pool \
+              --location=global \
+              --display-name="GitHub Actions Pool" \
+              --description="Pool for GitHub Actions"
+          else
+            echo "Workload Identity Pool already exists"
+          fi
+          
+          # Get the Workload Identity Pool ID
+          POOL_ID=$(gcloud iam workload-identity-pools describe github-actions-pool --location=global --format="value(name)")
+          
+          # Check if Workload Identity Provider exists
+          if ! gcloud iam workload-identity-pools providers describe github-actions-provider \
+            --workload-identity-pool=github-actions-pool \
+            --location=global &>/dev/null; then
+            echo "Creating Workload Identity Provider..."
+            gcloud iam workload-identity-pools providers create-oidc github-actions-provider \
+              --workload-identity-pool=github-actions-pool \
+              --location=global \
+              --display-name="GitHub Actions Provider" \
+              --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository,attribute.repository_owner=assertion.repository_owner" \
+              --issuer-uri="https://token.actions.githubusercontent.com"
+          else
+            echo "Workload Identity Provider already exists"
+          fi
+          
+          # Create GitHub Actions service account if it doesn't exist
+          if ! gcloud iam service-accounts describe github-actions@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com &>/dev/null; then
+            echo "Creating GitHub Actions service account..."
+            gcloud iam service-accounts create github-actions \
+              --display-name="GitHub Actions" \
+              --description="Service account for GitHub Actions"
+          else
+            echo "GitHub Actions service account already exists"
+          fi
+          
+          # Grant roles to GitHub Actions service account
+          echo "Granting roles to GitHub Actions service account..."
+          gcloud projects add-iam-policy-binding ${{ env.GCP_PROJECT_ID }} \
+            --member="serviceAccount:github-actions@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
+            --role="roles/secretmanager.admin" \
+            --condition=None
+            
+          gcloud projects add-iam-policy-binding ${{ env.GCP_PROJECT_ID }} \
+            --member="serviceAccount:github-actions@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
+            --role="roles/storage.admin" \
+            --condition=None
+            
+          gcloud projects add-iam-policy-binding ${{ env.GCP_PROJECT_ID }} \
+            --member="serviceAccount:github-actions@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
+            --role="roles/iam.serviceAccountAdmin" \
+            --condition=None
+            
+          gcloud projects add-iam-policy-binding ${{ env.GCP_PROJECT_ID }} \
+            --member="serviceAccount:github-actions@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com" \
+            --role="roles/iam.serviceAccountKeyAdmin" \
+            --condition=None
+          
+          # Allow GitHub Actions to impersonate the service account
+          echo "Allowing GitHub Actions to impersonate the service account..."
+          gcloud iam service-accounts add-iam-policy-binding github-actions@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com \
+            --member="principalSet://iam.googleapis.com/${POOL_ID}/attribute.repository_owner/ai-cherry" \
+            --role="roles/iam.workloadIdentityUser"
+          
+          # Store Workload Identity Provider in GitHub secrets
+          echo "Storing Workload Identity Provider in GitHub secrets..."
+          WORKLOAD_IDENTITY_PROVIDER="projects/${{ env.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider"
+          echo "GCP_WORKLOAD_IDENTITY_PROVIDER=${WORKLOAD_IDENTITY_PROVIDER}" >> $GITHUB_ENV
+          
+          # Store Service Account in GitHub secrets
+          echo "Storing Service Account in GitHub secrets..."
+          SERVICE_ACCOUNT="github-actions@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com"
+          echo "GCP_SERVICE_ACCOUNT=${SERVICE_ACCOUNT}" >> $GITHUB_ENV
+
+      - name: Update GitHub Organization Secrets
+        if: github.actor == 'ai-cherry'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GCP_PROJECT_ID: ${{ inputs.project_id }}
-          GITHUB_ORG: 'ai-cherry'
-          GITHUB_REPO: 'orchestra-main'
-          REGION: ${{ inputs.region }}
-          ENV: ${{ inputs.environment }}
+          GH_TOKEN: ${{ secrets.GH_PAT_TOKEN }}
         run: |
-          chmod +x setup_gcp_infrastructure.sh
-          ./setup_gcp_infrastructure.sh
-      
-      - name: Run update_gcp_infrastructure.sh
+          # Update GitHub organization secrets
+          echo "Updating GitHub organization secrets..."
+          
+          # Update GCP_PROJECT_ID
+          echo "${{ env.GCP_PROJECT_ID }}" | gh secret set GCP_PROJECT_ID --org ai-cherry
+          
+          # Update GCP_PROJECT_NUMBER
+          echo "${{ env.GCP_PROJECT_NUMBER }}" | gh secret set GCP_PROJECT_NUMBER --org ai-cherry
+          
+          # Update GCP_REGION
+          echo "${{ env.REGION }}" | gh secret set GCP_REGION --org ai-cherry
+          
+          # Update GCP_WORKLOAD_IDENTITY_PROVIDER
+          echo "${{ env.GCP_WORKLOAD_IDENTITY_PROVIDER }}" | gh secret set GCP_WORKLOAD_IDENTITY_PROVIDER --org ai-cherry
+          
+          # Update GCP_SERVICE_ACCOUNT
+          echo "${{ env.GCP_SERVICE_ACCOUNT }}" | gh secret set GCP_SERVICE_ACCOUNT --org ai-cherry
+          
+          # Get Vertex AI key from Secret Manager
+          echo "Getting Vertex AI key from Secret Manager..."
+          gcloud secrets versions access latest --secret=vertex-power-key > /tmp/vertex-key.json
+          
+          # Update GCP_VERTEX_POWER_KEY
+          echo "Updating GCP_VERTEX_POWER_KEY..."
+          cat /tmp/vertex-key.json | gh secret set GCP_VERTEX_POWER_KEY --org ai-cherry
+          
+          # Get Gemini key from Secret Manager
+          echo "Getting Gemini key from Secret Manager..."
+          gcloud secrets versions access latest --secret=gemini-power-key > /tmp/gemini-key.json
+          
+          # Update GCP_GEMINI_POWER_KEY
+          echo "Updating GCP_GEMINI_POWER_KEY..."
+          cat /tmp/gemini-key.json | gh secret set GCP_GEMINI_POWER_KEY --org ai-cherry
+          
+          # Clean up
+          rm -f /tmp/vertex-key.json /tmp/gemini-key.json
+
+      - name: Update GitHub Codespaces Secrets
+        if: github.actor == 'ai-cherry'
         env:
-          GCP_MASTER_SERVICE_JSON: ${{ secrets.GCP_MASTER_SERVICE_JSON }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GCP_PROJECT_ID: ${{ inputs.project_id }}
-          GITHUB_ORG: 'ai-cherry'
-          GITHUB_REPO: 'orchestra-main'
-          REGION: ${{ inputs.region }}
-          ENV: ${{ inputs.environment }}
+          GH_TOKEN: ${{ secrets.GH_PAT_TOKEN }}
         run: |
-          chmod +x update_gcp_infrastructure.sh
-          ./update_gcp_infrastructure.sh
-      
-      - name: Verify infrastructure setup
+          # Update GitHub Codespaces secrets
+          echo "Updating GitHub Codespaces secrets..."
+          
+          # Update GCP_PROJECT_ID
+          echo "${{ env.GCP_PROJECT_ID }}" | gh codespace secret set GCP_PROJECT_ID --org ai-cherry
+          
+          # Update GCP_PROJECT_NUMBER
+          echo "${{ env.GCP_PROJECT_NUMBER }}" | gh codespace secret set GCP_PROJECT_NUMBER --org ai-cherry
+          
+          # Update GCP_REGION
+          echo "${{ env.REGION }}" | gh codespace secret set GCP_REGION --org ai-cherry
+          
+          # Get Vertex AI key from Secret Manager
+          echo "Getting Vertex AI key from Secret Manager..."
+          gcloud secrets versions access latest --secret=vertex-power-key > /tmp/vertex-key.json
+          
+          # Update GCP_VERTEX_POWER_KEY
+          echo "Updating GCP_VERTEX_POWER_KEY..."
+          cat /tmp/vertex-key.json | gh codespace secret set GCP_VERTEX_POWER_KEY --org ai-cherry
+          
+          # Get Gemini key from Secret Manager
+          echo "Getting Gemini key from Secret Manager..."
+          gcloud secrets versions access latest --secret=gemini-power-key > /tmp/gemini-key.json
+          
+          # Update GCP_GEMINI_POWER_KEY
+          echo "Updating GCP_GEMINI_POWER_KEY..."
+          cat /tmp/gemini-key.json | gh codespace secret set GCP_GEMINI_POWER_KEY --org ai-cherry
+          
+          # Update GOOGLE_APPLICATION_CREDENTIALS
+          echo "Updating GOOGLE_APPLICATION_CREDENTIALS..."
+          echo "/workspaces/orchestra-main/service-account-key.json" | gh codespace secret set GOOGLE_APPLICATION_CREDENTIALS --org ai-cherry
+          
+          # Clean up
+          rm -f /tmp/vertex-key.json /tmp/gemini-key.json
+
+      - name: Verify Setup
         run: |
-          echo "Infrastructure setup completed successfully!"
-          echo "Project ID: ${{ inputs.project_id }}"
-          echo "Region: ${{ inputs.region }}"
-          echo "Environment: ${{ inputs.environment }}"
+          echo "Verifying setup..."
+          
+          # Verify Vertex AI service account
+          echo "Verifying Vertex AI service account..."
+          gcloud iam service-accounts describe vertex-power-user@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com
+          
+          # Verify Gemini service account
+          echo "Verifying Gemini service account..."
+          gcloud iam service-accounts describe gemini-power-user@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com
+          
+          # Verify GitHub Actions service account
+          echo "Verifying GitHub Actions service account..."
+          gcloud iam service-accounts describe github-actions@${{ env.GCP_PROJECT_ID }}.iam.gserviceaccount.com
+          
+          # Verify Workload Identity Pool
+          echo "Verifying Workload Identity Pool..."
+          gcloud iam workload-identity-pools describe github-actions-pool --location=global
+          
+          # Verify Workload Identity Provider
+          echo "Verifying Workload Identity Provider..."
+          gcloud iam workload-identity-pools providers describe github-actions-provider \
+            --workload-identity-pool=github-actions-pool \
+            --location=global
+          
+          # Verify Secret Manager secrets
+          echo "Verifying Secret Manager secrets..."
+          gcloud secrets describe vertex-power-key
+          gcloud secrets describe gemini-power-key
+          
+          echo "Setup verification completed successfully!"
