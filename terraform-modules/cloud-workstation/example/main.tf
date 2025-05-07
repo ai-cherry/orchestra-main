@@ -1,21 +1,21 @@
 # Example usage of the Cloud Workstation Module
 
 provider "google" {
-  project = "agi-baby-cherry"
-  region  = "us-central1"
+  project = "cherry-ai-project"
+  region  = "us-west4"
 }
 
 provider "google-beta" {
-  project = "agi-baby-cherry"
-  region  = "us-central1"
+  project = "cherry-ai-project"
+  region  = "us-west4"
 }
 
 module "ai_workstation" {
   source = "../"  # Path to the cloud-workstation module
 
   # Project configuration
-  project_id = "agi-baby-cherry"
-  region     = "us-central1"
+  project_id = "cherry-ai-project"
+  region     = "us-west4"
   
   # Workstation naming
   cluster_name     = "ai-development"
@@ -36,8 +36,8 @@ module "ai_workstation" {
   # Environment variables
   environment_variables = {
     "JUPYTER_PORT"     = "8888",
-    "VERTEX_PROJECT"   = "agi-baby-cherry",
-    "VERTEX_LOCATION"  = "us-central1",
+    "VERTEX_PROJECT"   = "cherry-ai-project",
+    "VERTEX_LOCATION"  = "us-west4",
     "NOTEBOOK_DIR"     = "/home/user/persistent-data/notebooks"
   }
   
@@ -45,7 +45,7 @@ module "ai_workstation" {
   tags = {
     "environment" = "development",
     "purpose"     = "ai-development",
-    "project"     = "agi-baby-cherry"
+    "project"     = "cherry-ai-project"
   }
 }
 

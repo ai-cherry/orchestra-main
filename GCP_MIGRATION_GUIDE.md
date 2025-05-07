@@ -38,7 +38,7 @@ chmod +x gcp_archive_migrate.sh
 
 - Creates a timestamped `.tar.gz` archive of your workspace
 - Excludes unnecessary files (`.git`, `__pycache__`, `.env`, etc.)
-- Uploads the archive to `gs://agi-baby-cherry-migration/` bucket
+- Uploads the archive to `gs://cherry-ai-project-migration/` bucket
 - Creates and uploads a metadata JSON file with archive information
 - Verifies the upload was successful
 - Displays detailed restoration instructions
@@ -46,7 +46,7 @@ chmod +x gcp_archive_migrate.sh
 ### Configuration
 
 By default, the script uses:
-- Bucket: `gs://agi-baby-cherry-migration/`
+- Bucket: `gs://cherry-ai-project-migration/`
 - Archive name: `orchestra_migration_[TIMESTAMP].tar.gz`
 
 To customize these settings, modify the variables at the top of the script:
@@ -54,7 +54,7 @@ To customize these settings, modify the variables at the top of the script:
 ```bash
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 ARCHIVE_NAME="orchestra_migration_${TIMESTAMP}.tar.gz"
-GCS_BUCKET="gs://agi-baby-cherry-migration"
+GCS_BUCKET="gs://cherry-ai-project-migration"
 ```
 
 ## Step 2: Restore in New Environment
@@ -66,27 +66,27 @@ In your new Vertex AI Workbench instance or Google Cloud Workstation:
 1. Download both scripts:
 
 ```bash
-gsutil cp gs://agi-baby-cherry-migration/gcp_archive_migrate.sh .
-gsutil cp gs://agi-baby-cherry-migration/gcp_archive_restore.sh .
+gsutil cp gs://cherry-ai-project-migration/gcp_archive_migrate.sh .
+gsutil cp gs://cherry-ai-project-migration/gcp_archive_restore.sh .
 chmod +x gcp_archive_restore.sh
 ```
 
 2. Run the restore script with required parameters:
 
 ```bash
-./gcp_archive_restore.sh --bucket gs://agi-baby-cherry-migration --archive orchestra_migration_20250501_123456.tar.gz
+./gcp_archive_restore.sh --bucket gs://cherry-ai-project-migration --archive orchestra_migration_20250501_123456.tar.gz
 ```
 
 Or use the short options:
 
 ```bash
-./gcp_archive_restore.sh -b gs://agi-baby-cherry-migration -a orchestra_migration_20250501_123456.tar.gz
+./gcp_archive_restore.sh -b gs://cherry-ai-project-migration -a orchestra_migration_20250501_123456.tar.gz
 ```
 
 3. Optionally specify a destination directory:
 
 ```bash
-./gcp_archive_restore.sh -b gs://agi-baby-cherry-migration -a orchestra_migration_20250501_123456.tar.gz -d /path/to/destination
+./gcp_archive_restore.sh -b gs://cherry-ai-project-migration -a orchestra_migration_20250501_123456.tar.gz -d /path/to/destination
 ```
 
 ### Command-Line Options
@@ -95,7 +95,7 @@ Or use the short options:
 Usage: ./gcp_archive_restore.sh [options]
 
 Options:
-  -b, --bucket       GCS bucket URL (required, e.g. gs://agi-baby-cherry-migration)
+  -b, --bucket       GCS bucket URL (required, e.g. gs://cherry-ai-project-migration)
   -a, --archive      Archive filename (required, e.g. orchestra_migration_20250501_123456.tar.gz)
   -d, --directory    Destination directory (optional, defaults to current directory)
   -h, --help         Show this help message
@@ -121,25 +121,25 @@ Options:
 
 # On new instance
 gcloud auth login
-gsutil cp gs://agi-baby-cherry-migration/gcp_archive_restore.sh .
+gsutil cp gs://cherry-ai-project-migration/gcp_archive_restore.sh .
 chmod +x gcp_archive_restore.sh
-./gcp_archive_restore.sh -b gs://agi-baby-cherry-migration -a orchestra_migration_20250501_123456.tar.gz
+./gcp_archive_restore.sh -b gs://cherry-ai-project-migration -a orchestra_migration_20250501_123456.tar.gz
 ```
 
 ### 2. Migrating to a Google Cloud Workstation
 
 ```bash
 # Upload both scripts to the GCS bucket from your original environment
-gsutil cp gcp_archive_migrate.sh gs://agi-baby-cherry-migration/
-gsutil cp gcp_archive_restore.sh gs://agi-baby-cherry-migration/
+gsutil cp gcp_archive_migrate.sh gs://cherry-ai-project-migration/
+gsutil cp gcp_archive_restore.sh gs://cherry-ai-project-migration/
 
 # On original environment
 ./gcp_archive_migrate.sh
 
 # On Cloud Workstation
-gsutil cp gs://agi-baby-cherry-migration/gcp_archive_restore.sh .
+gsutil cp gs://cherry-ai-project-migration/gcp_archive_restore.sh .
 chmod +x gcp_archive_restore.sh
-./gcp_archive_restore.sh -b gs://agi-baby-cherry-migration -a orchestra_migration_20250501_123456.tar.gz
+./gcp_archive_restore.sh -b gs://cherry-ai-project-migration -a orchestra_migration_20250501_123456.tar.gz
 ```
 
 ### 3. Finding Available Archives
@@ -147,13 +147,13 @@ chmod +x gcp_archive_restore.sh
 To list available archives in the bucket:
 
 ```bash
-gsutil ls gs://agi-baby-cherry-migration/orchestra_migration_*.tar.gz
+gsutil ls gs://cherry-ai-project-migration/orchestra_migration_*.tar.gz
 ```
 
 To list available metadata files:
 
 ```bash
-gsutil ls gs://agi-baby-cherry-migration/migration_metadata_*.json
+gsutil ls gs://cherry-ai-project-migration/migration_metadata_*.json
 ```
 
 ## Troubleshooting
@@ -176,7 +176,7 @@ If you don't have permission to access the bucket:
 
 ```bash
 # Check if you have the required permissions
-gsutil iam get gs://agi-baby-cherry-migration
+gsutil iam get gs://cherry-ai-project-migration
 
 # Request access from your administrator or create a new bucket where you have permissions
 ```

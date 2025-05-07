@@ -9,19 +9,19 @@
 variable "project_id" {
   description = "GCP Project ID"
   type        = string
-  default     = "agi-baby-cherry"
+  default     = "cherry-ai-project"
 }
 
 variable "region" {
   description = "GCP Region"
   type        = string
-  default     = "us-central1"
+  default     = "us-west4"
 }
 
 variable "service_account_email" {
   description = "Service account email for fallback agent"
   type        = string
-  default     = "vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"
+  default     = "vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
 }
 
 variable "task_queue_name" {

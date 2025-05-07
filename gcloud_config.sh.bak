@@ -1,0 +1,87 @@
+#!/bin/bash
+# gcloud_config.sh
+# Script to set up gcloud configuration with hardcoded values for Codespaces
+
+# Color codes for output
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Log function
+log() {
+  local level=$1
+  local message=$2
+  local timestamp=$(date "+%Y-%m-%d %H:%M:%S")
+  
+  case $level in
+    "INFO")
+      echo -e "${BLUE}[${timestamp}] [INFO] ${message}${NC}"
+      ;;
+    "WARN")
+      echo -e "${YELLOW}[${timestamp}] [WARN] ${message}${NC}"
+      ;;
+    "ERROR")
+      echo -e "${RED}[${timestamp}] [ERROR] ${message}${NC}"
+      ;;
+    "SUCCESS")
+      echo -e "${GREEN}[${timestamp}] [SUCCESS] ${message}${NC}"
+      ;;
+    *)
+      echo -e "[${timestamp}] ${message}"
+      ;;
+  esac
+}
+
+# Check if gcloud is installed
+if ! command -v gcloud &> /dev/null; then
+  log "WARN" "gcloud is not installed. Setting environment variables only."
+  
+  # Set environment variables
+  log "INFO" "Setting environment variables..."
+  export CLOUDSDK_CORE_PROJECT="cherry-ai-project"
+  export CLOUDSDK_CORE_ACCOUNT="scoobyjava@cherry-ai.me"
+  export CLOUDSDK_COMPUTE_REGION="us-central1"
+  export CLOUDSDK_COMPUTE_ZONE="us-central1-a"
+  
+  log "INFO" "Environment variables set:"
+  log "INFO" "CLOUDSDK_CORE_PROJECT=cherry-ai-project"
+  log "INFO" "CLOUDSDK_CORE_ACCOUNT=scoobyjava@cherry-ai.me"
+  log "INFO" "CLOUDSDK_COMPUTE_REGION=us-central1"
+  log "INFO" "CLOUDSDK_COMPUTE_ZONE=us-central1-a"
+  
+  log "INFO" "To install gcloud, follow these steps:"
+  log "INFO" "1. Download the Google Cloud SDK: curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-latest-linux-x86_64.tar.gz"
+  log "INFO" "2. Extract the archive: tar -xf google-cloud-cli-latest-linux-x86_64.tar.gz"
+  log "INFO" "3. Run the install script: ./google-cloud-sdk/install.sh --quiet"
+  log "INFO" "4. Initialize gcloud: gcloud init"
+  
+  log "SUCCESS" "Environment variables set successfully!"
+  exit 0
+fi
+
+# Set your project ID
+log "INFO" "Setting project ID to cherry-ai-project..."
+gcloud config set project cherry-ai-project
+
+# Set your account
+log "INFO" "Setting account to scoobyjava@cherry-ai.me..."
+gcloud config set account scoobyjava@cherry-ai.me
+
+# Set your default region and zone
+log "INFO" "Setting default region to us-central1..."
+gcloud config set compute/region us-central1
+
+log "INFO" "Setting default zone to us-central1-a..."
+gcloud config set compute/zone us-central1-a
+
+# Configure git to use gcloud credentials
+log "INFO" "Configuring git to use gcloud credentials..."
+git config --global credential.helper gcloud
+
+# Verify configuration
+log "INFO" "Verifying gcloud configuration..."
+gcloud config list
+
+log "SUCCESS" "GCP configuration set successfully!"

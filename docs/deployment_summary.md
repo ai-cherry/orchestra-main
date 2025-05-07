@@ -5,13 +5,13 @@ This document summarizes the deployment requirements and options for the Orchest
 ## Deployment Prerequisites
 
 ### Required Accounts and Access
-- **Google Cloud Platform Account** with access to `agi-baby-cherry` project
+- **Google Cloud Platform Account** with access to `cherry-ai-project` project
 - **GitHub Account** with access to the repository (for CI/CD deployment)
 - **Docker Hub Account** (if using Docker Hub for image storage)
 
 ### Required API Keys and Credentials
 - **GCP Service Account Key** with appropriate permissions
-  - Current service account: `vertex-agent@agi-baby-cherry.iam.gserviceaccount.com`
+  - Current service account: `vertex-agent@cherry-ai-project.iam.gserviceaccount.com`
   - Key must be stored at `/tmp/vertex-agent-key.json`
 - **Portkey API Key**: Present in `.env` file
 - **OpenRouter API Key**: Present in `.env` file

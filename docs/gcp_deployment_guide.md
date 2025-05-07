@@ -25,7 +25,7 @@ The Orchestra deployment uses the following GCP services:
 
 ## Deployment Architecture
 
-![Orchestra GCP Architecture](https://storage.googleapis.com/agi-baby-cherry-bucket/orchestra-architecture.png)
+![Orchestra GCP Architecture](https://storage.googleapis.com/cherry-ai-project-bucket/orchestra-architecture.png)
 
 The architecture follows GCP best practices:
 - Cloud Run services connect to Redis, Firestore, and Vertex AI
@@ -98,7 +98,7 @@ If you need to deploy manually:
 
 5. Apply Terraform configuration:
    ```bash
-   terraform apply -var="env=dev" -var="project_id=agi-baby-cherry" -var="region=us-central1"
+   terraform apply -var="env=dev" -var="project_id=cherry-ai-project" -var="region=us-west4"
    ```
 
 ## CI/CD Pipeline

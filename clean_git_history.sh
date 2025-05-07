@@ -1,4 +1,4 @@
-thought#!/bin/bash
+#!/bin/bash
 # clean_git_history.sh - Clean the git history to remove any sensitive credentials
 
 set -e

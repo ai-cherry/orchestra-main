@@ -6,9 +6,9 @@ This document summarizes the changes made to update GitHub Actions workflows wit
 
 | Item | Old Value | New Value |
 |------|-----------|-----------|
-| Project ID | agi-baby-cherry | cherry-ai-project |
+| Project ID | cherry-ai-project | cherry-ai-project |
 | Project Number | 104944497835 | 525398941159 |
-| Service Account | vertex-agent@agi-baby-cherry.iam.gserviceaccount.com | github-actions-deployer@cherry-ai-project.iam.gserviceaccount.com |
+| Service Account | vertex-agent@cherry-ai-project.iam.gserviceaccount.com | github-actions-deployer@cherry-ai-project.iam.gserviceaccount.com |
 | Workload Identity Pool/Provider | gitlab-pool/gitlab-provider | github-pool/github-provider |
 
 ## Files Updated

@@ -4,8 +4,8 @@
 echo "=== Setting up Gemini Code Assist in VS Code ==="
 
 # Configuration
-PROJECT_ID="agi-baby-cherry"  # Default project from cloudbuild.yaml
-LOCATION="us-central1"        # Default region from cloudbuild.yaml
+PROJECT_ID="cherry-ai-project"  # Default project from cloudbuild.yaml
+LOCATION="us-west4"        # Default region from cloudbuild.yaml
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -22,8 +22,8 @@ while [[ $# -gt 0 ]]; do
       echo "Usage: $0 [--project PROJECT_ID] [--location LOCATION]"
       echo ""
       echo "Options:"
-      echo "  --project   GCP Project ID (default: agi-baby-cherry)"
-      echo "  --location  GCP Location (default: us-central1)"
+      echo "  --project   GCP Project ID (default: cherry-ai-project)"
+      echo "  --location  GCP Location (default: us-west4)"
       echo "  --help      Show this help message"
       exit 0
       ;;

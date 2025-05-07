@@ -32,7 +32,7 @@ class AgentRegistry:
     3. Providing discovery mechanisms for available wrapper types
     """
     
-    def __init__(self, project_id: str = "agi-baby-cherry", spanner_instance_id: str = "orchestra-instance", spanner_database_id: str = "orchestra-db"):
+    def __init__(self, project_id: str = "cherry-ai-project", spanner_instance_id: str = "orchestra-instance", spanner_database_id: str = "orchestra-db"):
         """Initialize the agent registry with Google Cloud project details for routing."""
         # Dictionary mapping wrapper types to their implementing classes
         self._wrapper_classes: Dict[str, Type[OrchestraAgentBase]] = {}
@@ -171,10 +171,10 @@ class AgentRegistry:
             return False
 
 # Create a singleton instance with default project settings
-agent_registry = AgentRegistry(project_id="agi-baby-cherry", spanner_instance_id="orchestra-instance", spanner_database_id="orchestra-db")
+agent_registry = AgentRegistry(project_id="cherry-ai-project", spanner_instance_id="orchestra-instance", spanner_database_id="orchestra-db")
 
 
-def get_registry(project_id: str = "agi-baby-cherry", spanner_instance_id: str = "orchestra-instance", spanner_database_id: str = "orchestra-db") -> AgentRegistry:
+def get_registry(project_id: str = "cherry-ai-project", spanner_instance_id: str = "orchestra-instance", spanner_database_id: str = "orchestra-db") -> AgentRegistry:
     """
     Get the global agent registry instance, initialized with specific project settings if needed.
     

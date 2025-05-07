@@ -1,6 +1,6 @@
 # GCP Migration Dashboard & Progress Tracking
 
-This dashboard provides comprehensive monitoring and progress tracking for the GCP project migration from `agi-baby-cherry` to organization `873291114285` and the subsequent hybrid IDE deployment.
+This dashboard provides comprehensive monitoring and progress tracking for the GCP project migration from `cherry-ai-project` to organization `873291114285` and the subsequent hybrid IDE deployment.
 
 ## Components
 
@@ -141,14 +141,14 @@ This dashboard complements the existing migration tools:
 
 ```
 ===== GCP Migration Progress Tracker =====
-Project: agi-baby-cherry
+Project: cherry-ai-project
 Target Organization: 873291114285
-Region: us-central1
+Region: us-west4
 Date: Sat May 4 00:13:45 UTC 2025
 
 ===== Authentication Verification =====
-Active gcloud authentication...........................[✓] PASS Account: vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
-Project configuration.................................[✓] PASS Project set to agi-baby-cherry
+Active gcloud authentication...........................[✓] PASS Account: vertex-agent@cherry-ai-project.iam.gserviceaccount.com
+Project configuration.................................[✓] PASS Project set to cherry-ai-project
 
 ===== Organization Membership =====
 Organization membership...............................[✓] PASS Project is in organization 873291114285

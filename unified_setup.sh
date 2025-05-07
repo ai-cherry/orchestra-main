@@ -52,7 +52,7 @@ confirm() {
 }
 
 # Variables
-PROJECT_ID="agi-baby-cherry"
+PROJECT_ID="cherry-ai-project"
 
 # Check for Figma PAT
 if [ -z "$FIGMA_PAT" ]; then
@@ -189,8 +189,8 @@ fi
 echo "Updating Terraform variables..."
 cat > ${TERRAFORM_DIR}/terraform.tfvars << EOF
 project_id = "${PROJECT_ID}"
-region     = "us-central1"
-zone       = "us-central1-a"
+region     = "us-west4"
+zone       = "us-west4-a"
 env        = "dev"
 figma_pat  = "\${FIGMA_PAT}"
 EOF
@@ -535,11 +535,11 @@ fi
 # Set up secrets
 if [ "$ORG_MODE" == "true" ]; then
     create_org_secret "GCP_SA_KEY_JSON" "$GCP_SA_KEY_CONTENT"
-    create_org_secret "GCP_PROJECT_ID" "${GCP_PROJECT_ID:-agi-baby-cherry}"
+    create_org_secret "GCP_PROJECT_ID" "${GCP_PROJECT_ID:-cherry-ai-project}"
     create_org_secret "FIGMA_PAT" "$FIGMA_PAT"
 else
     create_repo_secret "GCP_SA_KEY_JSON" "$GCP_SA_KEY_CONTENT"
-    create_repo_secret "GCP_PROJECT_ID" "${GCP_PROJECT_ID:-agi-baby-cherry}"
+    create_repo_secret "GCP_PROJECT_ID" "${GCP_PROJECT_ID:-cherry-ai-project}"
     create_repo_secret "FIGMA_PAT" "$FIGMA_PAT"
 fi
 

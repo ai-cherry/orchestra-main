@@ -15,20 +15,20 @@ terraform {
   }
 
   backend "gcs" {
-    bucket  = "agi-baby-cherry-terraform-state"
+    bucket  = "cherry-ai-project-terraform-state"
     prefix  = "orchestra"
   }
 }
 
 provider "google" {
-  project     = "agi-baby-cherry"
+  project     = "cherry-ai-project"
   region      = var.region
   zone        = "${var.region}-a"
   credentials = file("/tmp/gsa-key.json")
 }
 
 provider "google-beta" {
-  project     = "agi-baby-cherry"
+  project     = "cherry-ai-project"
   region      = var.region
   zone        = "${var.region}-a"
   credentials = file("/tmp/gsa-key.json")
@@ -49,13 +49,13 @@ variable "env" {
 variable "region" {
   description = "GCP region for resources"
   type        = string
-  default     = "us-central1"  # Changed from us-west2 to us-central1 for better network latency
+  default     = "us-west4"  # Changed from us-west2 to us-west4 for better network latency
 }
 
 variable "project_id" {
   description = "GCP Project ID"
   type        = string
-  default     = "agi-baby-cherry"
+  default     = "cherry-ai-project"
 }
 
 variable "alert_notification_emails" {
@@ -78,7 +78,7 @@ variable "memory_size_gb" {
 
 # ------------ Storage Bucket for Terraform State --------------
 resource "google_storage_bucket" "terraform_state" {
-  name          = "agi-baby-cherry-terraform-state"
+  name          = "cherry-ai-project-terraform-state"
   location      = var.region
   force_destroy = false
   storage_class = "STANDARD"

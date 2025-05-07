@@ -35,7 +35,7 @@ class VertexAgentManager:
     
     def __init__(
         self,
-        project_id: str = "agi-baby-cherry",
+        project_id: str = "cherry-ai-project",
         location: str = "us-west2",
         agent_id: Optional[str] = None,
         pubsub_topic: str = "orchestra-bus-dev"

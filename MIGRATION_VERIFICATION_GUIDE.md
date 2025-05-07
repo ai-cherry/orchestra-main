@@ -2,7 +2,7 @@
 
 ## Nuclear Verification Suite
 
-This guide explains how to use the verification scripts to definitively prove the migration of `agi-baby-cherry` project to organization `873291114285`, including verification of workstations, GPUs, and database connections.
+This guide explains how to use the verification scripts to definitively prove the migration of `cherry-ai-project` project to organization `873291114285`, including verification of workstations, GPUs, and database connections.
 
 ## Quick Reference
 
@@ -61,16 +61,16 @@ This script:
 All scripts check for these critical success indicators:
 
 1. **Organization Membership** (PRIMARY indicator)
-   - Command: `gcloud projects describe agi-baby-cherry --format="value(parent.id)"`
+   - Command: `gcloud projects describe cherry-ai-project --format="value(parent.id)"`
    - Success: `organizations/873291114285`
 
 2. **GPU Configuration**
-   - Command: `gcloud workstations configs describe ai-dev-config --cluster=ai-development --region=us-central1 --format="json(container.guestAccelerators)"`
+   - Command: `gcloud workstations configs describe ai-dev-config --cluster=ai-development --region=us-west4 --format="json(container.guestAccelerators)"`
    - Success: 2x NVIDIA T4 GPUs 
 
 3. **Database Connections**
-   - Redis: `gcloud redis instances describe agent-memory --region=us-central1 --format="value(state)"`
-   - AlloyDB: `gcloud alloydb clusters describe agent-storage --region=us-central1 --format="value(state)"`
+   - Redis: `gcloud redis instances describe agent-memory --region=us-west4 --format="value(state)"`
+   - AlloyDB: `gcloud alloydb clusters describe agent-storage --region=us-west4 --format="value(state)"`
    - Success: Redis "READY" and AlloyDB "RUNNING"
 
 ## Troubleshooting & Critical Fixes
@@ -80,13 +80,13 @@ If verification fails, the scripts offer these remedies:
 1. **Service Account Key Recreation**
    ```bash
    gcloud iam service-accounts keys create new-key.json \
-     --iam-account=vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
+     --iam-account=vertex-agent@cherry-ai-project.iam.gserviceaccount.com
    ```
 
 2. **Billing Project Linkage**
    ```bash
-   gcloud beta billing projects link agi-baby-cherry \
-     --billing-project=agi-baby-cherry
+   gcloud beta billing projects link cherry-ai-project \
+     --billing-project=cherry-ai-project
    ```
 
 3. **Organization Policy Exceptions**
@@ -97,9 +97,9 @@ If verification fails, the scripts offer these remedies:
 
 4. **Force Migration Retry**
    ```bash
-   gcloud beta projects move agi-baby-cherry \
+   gcloud beta projects move cherry-ai-project \
      --organization=873291114285 \
-     --billing-project=agi-baby-cherry \
+     --billing-project=cherry-ai-project \
      --quiet
    ```
 
@@ -117,9 +117,9 @@ All scripts include these security features:
 For a simple command that provides atomic proof of migration:
 
 ```bash
-gcloud projects describe agi-baby-cherry --format="value(name,parent.id)"
+gcloud projects describe cherry-ai-project --format="value(name,parent.id)"
 ```
 
-Expected output: `agi-baby-cherry organizations/873291114285`
+Expected output: `cherry-ai-project organizations/873291114285`
 
 This single command provides the most direct evidence that migration succeeded.

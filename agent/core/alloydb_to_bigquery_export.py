@@ -27,42 +27,45 @@ class AlloyDBToBigQueryExporter:
     """
     def __init__(
         self,
-        alloydb_host: str = "localhost",
-        alloydb_port: int = 5432,
-        alloydb_dbname: str = "agi_baby_cherry",
-        alloydb_user: str = "postgres",
-        alloydb_password: str = "",
-        gcp_project_id: str = "agi-baby-cherry",
-        gcs_bucket: str = "agi-baby-cherry-bucket",
-        gcs_path: str = "backups",
-        bq_dataset: str = "agent_truth",
-        bq_table: str = "memories"
+        alloydb_connection_name: str,
+        alloydb_db_name: str,
+        alloydb_user: str,
+        alloydb_password: str,
+        alloydb_table: str,
+        gcs_bucket_name: str,
+        bq_dataset: str,
+        bq_table: str,
+        gcp_project_id: str = "cherry-ai-project",
+        region: str = "us-central1",
+        temporary_gcs_directory: str = "temp_export",
     ):
         """
         Initialize the exporter with connection and configuration parameters.
         
         Args:
-            alloydb_host: Hostname of the AlloyDB server.
-            alloydb_port: Port of the AlloyDB server.
-            alloydb_dbname: Database name in AlloyDB.
+            alloydb_connection_name: Connection name for AlloyDB.
+            alloydb_db_name: Database name in AlloyDB.
             alloydb_user: Username for AlloyDB connection.
             alloydb_password: Password for AlloyDB connection.
-            gcp_project_id: Google Cloud Project ID.
-            gcs_bucket: Google Cloud Storage bucket for temporary storage.
-            gcs_path: Path in GCS bucket to store Parquet files.
+            alloydb_table: Table name in AlloyDB.
+            gcs_bucket_name: Google Cloud Storage bucket for temporary storage.
             bq_dataset: BigQuery dataset for SSOT.
             bq_table: BigQuery table for SSOT data.
+            gcp_project_id: Google Cloud Project ID.
+            region: Region for the GCP resources.
+            temporary_gcs_directory: Directory in GCS bucket to store Parquet files.
         """
-        self.alloydb_host = alloydb_host
-        self.alloydb_port = alloydb_port
-        self.alloydb_dbname = alloydb_dbname
+        self.alloydb_connection_name = alloydb_connection_name
+        self.alloydb_db_name = alloydb_db_name
         self.alloydb_user = alloydb_user
         self.alloydb_password = alloydb_password
-        self.gcp_project_id = gcp_project_id
-        self.gcs_bucket = gcs_bucket
-        self.gcs_path = gcs_path
+        self.alloydb_table = alloydb_table
+        self.gcs_bucket_name = gcs_bucket_name
         self.bq_dataset = bq_dataset
         self.bq_table = bq_table
+        self.gcp_project_id = gcp_project_id
+        self.region = region
+        self.temporary_gcs_directory = temporary_gcs_directory
         self.alloydb_conn = None
         self.storage_client = None
         self.bq_client = None
@@ -222,16 +225,17 @@ class AlloyDBToBigQueryExporter:
 if __name__ == "__main__":
     # Load configuration from environment variables or defaults
     exporter = AlloyDBToBigQueryExporter(
-        alloydb_host=os.getenv("ALLOYDB_HOST", "localhost"),
-        alloydb_port=int(os.getenv("ALLOYDB_PORT", "5432")),
-        alloydb_dbname=os.getenv("ALLOYDB_DBNAME", "agi_baby_cherry"),
+        alloydb_connection_name=os.getenv("ALLOYDB_CONNECTION_NAME", "cherry-ai-project:us-central1:orchestra-db"),
+        alloydb_db_name=os.getenv("ALLOYDB_DB_NAME", "cherry_ai_db"),
         alloydb_user=os.getenv("ALLOYDB_USER", "postgres"),
         alloydb_password=os.getenv("ALLOYDB_PASSWORD", ""),
-        gcp_project_id=os.getenv("GCP_PROJECT_ID", "agi-baby-cherry"),
-        gcs_bucket=os.getenv("GCS_BUCKET", "agi-baby-cherry-bucket"),
-        gcs_path=os.getenv("GCS_PATH", "backups"),
+        alloydb_table=os.getenv("ALLOYDB_TABLE", "memories"),
+        gcs_bucket_name=os.getenv("GCS_BUCKET_NAME", "cherry-ai-project-bucket"),
         bq_dataset=os.getenv("BQ_DATASET", "agent_truth"),
-        bq_table=os.getenv("BQ_TABLE", "memories")
+        bq_table=os.getenv("BQ_TABLE", "memories"),
+        gcp_project_id=os.getenv("GCP_PROJECT_ID", "cherry-ai-project"),
+        region=os.getenv("REGION", "us-central1"),
+        temporary_gcs_directory=os.getenv("TEMPORARY_GCS_DIRECTORY", "temp_export")
     )
     
     # Run the export cycle

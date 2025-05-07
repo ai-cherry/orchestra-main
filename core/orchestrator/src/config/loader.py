@@ -276,7 +276,7 @@ def initialize_portkey():
     try:
         # Retrieve Portkey API key from Secret Manager
         client = secretmanager.SecretManagerServiceClient()
-        project_id = os.environ.get("GCP_PROJECT_ID", "agi-baby-cherry")
+        project_id = os.environ.get("GCP_PROJECT_ID", "cherry-ai-project")
         secret_name = f"projects/{project_id}/secrets/portkey-api-key/versions/latest"
         response = client.access_secret_version(name=secret_name)
         PORTKEY_API_KEY = response.payload.data.decode('UTF-8')

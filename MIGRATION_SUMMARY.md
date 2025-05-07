@@ -1,6 +1,6 @@
 # GCP Project Migration and Hybrid IDE Setup - Final Solution
 
-This repository contains a complete solution for migrating the "agi-baby-cherry" project to the "cherry-ai" organization and setting up a hybrid IDE environment with Redis/AlloyDB memory layer and Gemini Code Assist integration.
+This repository contains a complete solution for migrating the "cherry-ai-project" project to the "cherry-ai" organization and setting up a hybrid IDE environment with Redis/AlloyDB memory layer and Gemini Code Assist integration.
 
 ## Available Migration Approaches
 

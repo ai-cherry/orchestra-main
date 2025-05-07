@@ -9,7 +9,7 @@ set -e
 # Configuration variables
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 ARCHIVE_NAME="orchestra_migration_${TIMESTAMP}.tar.gz"
-GCS_BUCKET="gs://agi-baby-cherry-migration"
+GCS_BUCKET="gs://cherry-ai-project-migration"
 WORKSPACE_DIR="$(pwd)"
 LOG_FILE="${WORKSPACE_DIR}/migration_${TIMESTAMP}.log"
 

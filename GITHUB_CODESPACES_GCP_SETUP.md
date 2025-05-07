@@ -21,10 +21,12 @@ The devcontainer.json configuration in this repository:
 1. Uses the `mcr.microsoft.com/devcontainers/universal:2` base image
 2. Installs the Google Cloud SDK
 3. Sets up persistent authentication by:
-   - Creating a `~/.gcp` directory
+   - Creating a `$HOME/.gcp` directory
    - Storing your service account credentials securely
    - Configuring gcloud CLI to use these credentials
    - Setting environment variables for consistent authentication
+   - Adding the Google Cloud SDK to PATH
+   - Disabling interactive prompts for gcloud commands
 
 ## Usage
 
@@ -44,18 +46,59 @@ The devcontainer.json configuration in this repository:
 
 ## Verifying Setup
 
-You can verify the setup by running:
+We've provided a verification script to ensure your GCP authentication is set up correctly:
 
 ```bash
-gcloud auth list
+./verify_gcp_codespace_setup.sh
 ```
 
-You should see `orchestra-project-admin-sa@cherry-ai-project.iam.gserviceaccount.com` listed as the active account.
+This script will:
+- Check if the Google Cloud SDK is in your PATH
+- Verify the service account key file exists
+- Confirm you're authenticated with the correct service account
+- Ensure the project is set to cherry-ai-project
+- Validate the GOOGLE_APPLICATION_CREDENTIALS environment variable is set properly
+- Make any necessary corrections if issues are found
+
+You can also manually verify the core setup elements by running:
+
+```bash
+# Check authenticated account
+gcloud auth list
+
+# Check current project
+gcloud config get-value project
+
+# Check credentials path
+echo $GOOGLE_APPLICATION_CREDENTIALS
+```
+
+You should see `orchestra-project-admin-sa@cherry-ai-project.iam.gserviceaccount.com` as the active account, `cherry-ai-project` as the project, and the path to your service account JSON file.
 
 ## Troubleshooting
 
 If you encounter authentication issues:
 
-1. Check if the `GCP_MASTER_SERVICE_JSON` secret is correctly set in your GitHub repository
-2. Verify the service account has the necessary permissions in your GCP project
-3. Review the Codespace creation logs for any errors
+1. Run the verification script to diagnose and fix common issues:
+   ```bash
+   ./verify_gcp_codespace_setup.sh
+   ```
+
+2. Check if the `GCP_MASTER_SERVICE_JSON` secret is correctly set in your GitHub repository
+
+3. Verify the service account has the necessary permissions in your GCP project
+
+4. Ensure the Google Cloud SDK is in your PATH:
+   ```bash
+   export PATH=$PATH:/workspaces/orchestra-main/google-cloud-sdk/bin
+   ```
+
+5. If changes were made to your .bashrc file, apply them to your current session:
+   ```bash
+   source ~/.bashrc
+   ```
+
+6. If you're still having issues, you may need to rebuild your Codespace container by:
+   - Closing the Codespace
+   - Reopening it
+   - Click the "Rebuild Container" option

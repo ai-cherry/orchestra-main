@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 echo -e "${BLUE}Connecting repository and enabling code customization...${NC}"
 
 # Set project ID
-PROJECT_ID="agi-baby-cherry"
+PROJECT_ID="cherry-ai-project"
 echo -e "${YELLOW}Using project ID: ${PROJECT_ID}${NC}"
 
 # Check if gcloud is authenticated
@@ -29,7 +29,7 @@ echo -e "${YELLOW}Connecting repository to Developer Connect...${NC}"
 gcloud alpha developer-connect repos register github_${PROJECT_ID} \
   --gitlab-host-uri="https://github.com" \
   --project=${PROJECT_ID} \
-  --region=us-central1
+  --region=us-west4
 echo -e "${GREEN}Repository connected successfully${NC}"
 
 # Enable code customization

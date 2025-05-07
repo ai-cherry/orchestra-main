@@ -16,7 +16,11 @@
         "python.defaultInterpreterPath": "/usr/local/bin/python",
         "python.linting.enabled": true,
         "python.linting.pylintEnabled": true,
-        "editor.formatOnSave": true
+        "editor.formatOnSave": true,
+        "security.workspace.trust.enabled": false,
+        "security.workspace.trust.startupPrompt": "never",
+        "security.workspace.trust.banner": "never",
+        "security.workspace.trust.emptyWindow": false
       }
     }
   },
@@ -26,6 +30,6 @@
     "CLOUDSDK_CORE_REGION": "us-central1",
     "CLOUDSDK_CORE_ZONE": "us-central1-a"
   },
-  "postCreateCommand": "mkdir -p ~/.gcp && echo $GCP_MASTER_SERVICE_JSON > ~/.gcp/service-account.json && gcloud auth activate-service-account orchestra-project-admin-sa@cherry-ai-project.iam.gserviceaccount.com --key-file=~/.gcp/service-account.json && gcloud config set project cherry-ai-project && echo 'export GOOGLE_APPLICATION_CREDENTIALS=~/.gcp/service-account.json' >> ~/.bashrc",
+  "postCreateCommand": "chmod +x /workspaces/orchestra-main/.devcontainer/setup_and_verify.sh && /workspaces/orchestra-main/.devcontainer/setup_and_verify.sh && echo 'export PATH=$PATH:$HOME/google-cloud-sdk/bin:/workspaces/orchestra-main/google-cloud-sdk/bin' >> $HOME/.bashrc && echo 'export CLOUDSDK_CORE_DISABLE_PROMPTS=1' >> $HOME/.bashrc && echo 'export VSCODE_DISABLE_WORKSPACE_TRUST=true' >> $HOME/.bashrc && echo 'export STANDARD_MODE=true' >> $HOME/.bashrc && echo 'export DISABLE_WORKSPACE_TRUST=true' >> $HOME/.bashrc && echo 'export USE_RECOVERY_MODE=false' >> $HOME/.bashrc",
   "remoteUser": "vscode"
 }

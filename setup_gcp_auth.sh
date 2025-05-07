@@ -14,14 +14,14 @@
 set -e  # Exit on any error
 
 echo "=== GCP Authentication Setup Script ==="
-echo "Setting up authentication for project: agi-baby-cherry"
+echo "Setting up authentication for project: cherry-ai-project"
 
 # Create a directory for credentials if it doesn't exist
 mkdir -p /tmp/credentials
 
 # Create a new service account key for the vertex-agent account
 echo "Generating new service account key for vertex-agent..."
-gcloud config set project agi-baby-cherry
+gcloud config set project cherry-ai-project
 
 # Check if gcloud is authenticated
 if ! gcloud auth list --filter=status:ACTIVE --format="value(account)" | grep -q "@"; then
@@ -30,9 +30,9 @@ if ! gcloud auth list --filter=status:ACTIVE --format="value(account)" | grep -q
 fi
 
 # Generate a new key for the vertex-agent service account
-echo "Creating new key for vertex-agent@agi-baby-cherry.iam.gserviceaccount.com..."
+echo "Creating new key for vertex-agent@cherry-ai-project.iam.gserviceaccount.com..."
 gcloud iam service-accounts keys create /tmp/credentials/vertex-agent-new-key.json \
-    --iam-account=vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
+    --iam-account=vertex-agent@cherry-ai-project.iam.gserviceaccount.com
 
 # Backup existing key 
 if [ -f /tmp/vertex-agent-key.json ]; then
@@ -49,13 +49,13 @@ chmod 600 /tmp/vertex-agent-key.json
 echo "Setting up environment variables..."
 export GOOGLE_APPLICATION_CREDENTIALS=/tmp/vertex-agent-key.json
 export GCP_SA_KEY_PATH=/tmp/vertex-agent-key.json
-export GCP_PROJECT_ID=agi-baby-cherry
+export GCP_PROJECT_ID=cherry-ai-project
 
 # Add these to .bashrc for persistence
 echo '# GCP Authentication' >> ~/.bashrc
 echo 'export GOOGLE_APPLICATION_CREDENTIALS=/tmp/vertex-agent-key.json' >> ~/.bashrc
 echo 'export GCP_SA_KEY_PATH=/tmp/vertex-agent-key.json' >> ~/.bashrc
-echo 'export GCP_PROJECT_ID=agi-baby-cherry' >> ~/.bashrc
+echo 'export GCP_PROJECT_ID=cherry-ai-project' >> ~/.bashrc
 
 echo "=== Testing Authentication ==="
 # Test authentication with new key

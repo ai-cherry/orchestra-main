@@ -48,8 +48,8 @@ confirm() {
 }
 
 # Project and Service Account variables
-PROJECT_ID="agi-baby-cherry"
-SERVICE_ACCOUNT="vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"
+PROJECT_ID="cherry-ai-project"
+SERVICE_ACCOUNT="vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
 
 section "Starting Setup for Google Cloud Workstations / Vertex AI Workbench"
 echo "This script will configure your environment with:"

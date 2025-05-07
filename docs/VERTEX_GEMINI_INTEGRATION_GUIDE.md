@@ -10,7 +10,7 @@ This guide provides detailed instructions for integrating Vertex AI and Gemini i
 
 ## Authentication Setup
 
-To ensure all AI agent and model calls are authenticated using the service account `vertex-agent@agi-baby-cherry.iam.gserviceaccount.com`, follow these steps:
+To ensure all AI agent and model calls are authenticated using the service account `vertex-agent@cherry-ai-project.iam.gserviceaccount.com`, follow these steps:
 
 1. **Run the Setup Script**:
    Execute the provided setup script to configure authentication and environment variables.
@@ -94,7 +94,7 @@ A sample script has been provided to demonstrate how to define, deploy, and moni
    ```python
    def create_and_deploy_agent():
        print("Initializing Vertex AI Agent Builder...")
-       ai_agent_builder.init(project="agi-baby-cherry", location="us-central1")
+       ai_agent_builder.init(project="cherry-ai-project", location="us-west4")
        
        agent_config = {
            "display_name": "Sample-Orchestra-Agent",
@@ -102,8 +102,8 @@ A sample script has been provided to demonstrate how to define, deploy, and moni
            "description": "A sample agent for orchestra-main project automation.",
            "tools": ["google-maps", "supply-chain-db"],
            "memory_config": {
-               "short_term": "redis://agi-baby-cherry-redis",
-               "long_term": "firestore://projects/agi-baby-cherry/databases/agent-memories"
+               "short_term": "redis://cherry-ai-project-redis",
+               "long_term": "firestore://projects/cherry-ai-project/databases/agent-memories"
            },
            "context_window": 1000000
        }

@@ -14,7 +14,7 @@ This document summarizes the implementation of Orchestra's GCP authentication sy
 
 - Script supports the Vertex service account:
   ```bash
-  export GCP_PROJECT_ID=agi-baby-cherry
+  export GCP_PROJECT_ID=cherry-ai-project
   export GCP_SA_KEY_PATH=/tmp/vertex-agent-key.json
   export GOOGLE_APPLICATION_CREDENTIALS=/tmp/vertex-agent-key.json
   ```
@@ -33,7 +33,7 @@ This document summarizes the implementation of Orchestra's GCP authentication sy
   variable "project_id" {
     description = "GCP Project ID"
     type        = string
-    default     = "agi-baby-cherry"
+    default     = "cherry-ai-project"
   }
   ```
 
@@ -50,7 +50,7 @@ This document summarizes the implementation of Orchestra's GCP authentication sy
   python scripts/figma_gcp_sync.py \
     --file-key YOUR_FILE_KEY \
     --output-dir ./styles \
-    --project-id agi-baby-cherry \
+    --project-id cherry-ai-project \
     --update-secrets \
     --validate
   ```

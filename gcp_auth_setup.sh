@@ -32,15 +32,15 @@ create_sample_key() {
   cat > /tmp/vertex-agent-key.json << 'EOF'
 {
   "type": "service_account",
-  "project_id": "agi-baby-cherry",
+  "project_id": "cherry-ai-project",
   "private_key_id": "sample-private-key-id-for-testing",
   "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCxhKMLd6fDYZBj\nA0ud4ZoOR88FyCMJQxKLiUWWqzwY4XsnEXp4Fx9/aT4j9xhW/J1HAAUHYu7sP7ma\nWWFQ0ZJrKn37skGmV/Q3JMpN5qSQ9MCX2hfI9i8JvQdYnlJFdG9bQPcoDl5P5WSA\nwraYh6NnBB/OrkFxCFlQnZ0qKD+5sYGygqYxGI0e31dyEnNbaOU/TJ+ZTHIAcbbA\nK9b1zv3jOYnBwfO5frQs4J8yGbj6d9O3kACeeT3Cbz8cTXLWjmiLYElSFJyFqYoc\nkIdw7zaJ80gwEXFcHIuZjIPVuvOzfVhUYKMwA1NeIUW1IiYoBvoJIB112QFWkv/n\nq+5v+zD/AgMBAAECggEAQpJYKkKzPBB2RALQWMxJ/QjLzEUubDIBoiXdAb80QzfI\nkcLDe5CYdYBEvUK3MF53UtRgJPQQZM+cwG71HJpc6HOvSXUb5wfQJeHOwZZhfqRA\nVPRVzMR1m1sBjBGsTWcdFJQyLCjR54KmD+tE44j9L2YVQMbnGiEKGbZGSNgFIQYs\n5AiDI1Ptv5hNtWgWLdFuG4Enx9hXuHNfFysXQPA4rvCcNCrgzLRNsyuPRyMgVWNl\nPPkzs3ATPKTjJHj18pQVCGgClIDrb6aEXWVSwgo+8t5jMk4ioJGLEg1nis3lSWhR\n5YkWLSwBJLCeGAUYu9UvKoH5LJlFUo8YCG4Y7jZ2YQKBgQDYdRafcwbZk1Dt+Fab\nzVdF0NSCTAMi05Hg/G5KQgy4XS7in2dUEF8lyXv9xEG0q+jlABjiEYciAq44Hz7z\nH72y2D6ophu4+XsFU1AcRQV1sYShOaQ466ZBwOYH7Ye2sQpulX/c7vkgKWD+sSX5\nqD5J9SErvc9DOVNRrJs4EYKsIQKBgQDSABiXvYtcLbJBJUPRYpgkEOggWbH7VuRK\nbRtZvAPHrFUK+FzigOHZivK0lnJkhX4kEYYGGKWrW+Jy2qbpXYOl9TiYFTJYPpEE\nSzT0KSBU+RwQa5lIZVD+byHqHoRTZhQAEu/JKj1AKxEF44XQJzwpGBlYswBLbXRo\ns8JmcgSrHwKBgQCRyaDcHDZZXhkDmXJqXXAoX3uk8q3sE+VL6U8NtUcG7jME9s8n\n6R94TAZpzEf3X2KdjYQBsvMBgbrjEBQmnfJaO2VfTXQWQBajYyqsAi+RcGdpKW1J\nzcNNuGGxPBxTNDeuNuj0h10AXQKVsmQyxPFJbKIbB1mLHo7YbE26yYcSQQKBgDIh\nFIyTldpTH0ymsIJ5nFb/QqB7/LGLEqPQYj1Uslk+D8GwLzO3Lvvb6CoqLS3mPsur\nCWbXiJOXd8FVnJyU5HOAdQgvvxeZWBPIjBKZCRS1R8LnlVEBbOTMCtdkXYRiNPvw\nKXwBs1KrqE9kMfbAiHYjDXn752Yb5F9ENxClPl7jAoGARNCM4Pv+1IVNtZY0CkGP\njXEFDa9lSxIYfmwXUztSjCCDhBpkUHuPmZsIQLEfUjqG7k89+prdxPGxP7ieTb0m\nNWVC1S0V6HHAXVbWKHiTVZIrQqP3PcYCIcFGYRS8F3QSiAyXbTKGnEjG3vQF9sXA\noDMUVUPHkqLMTU9b4hYQSD0=\n-----END PRIVATE KEY-----\n",
-  "client_email": "vertex-agent@agi-baby-cherry.iam.gserviceaccount.com",
+  "client_email": "vertex-agent@cherry-ai-project.iam.gserviceaccount.com",
   "client_id": "vertex-agent-client-id",
   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
   "token_uri": "https://oauth2.googleapis.com/token",
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/vertex-agent%40agi-baby-cherry.iam.gserviceaccount.com",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/vertex-agent%40cherry-ai-project.iam.gserviceaccount.com",
   "universe_domain": "googleapis.com"
 }
 EOF
@@ -69,7 +69,7 @@ case $auth_option in
       echo -e "${YELLOW}Running Google Cloud SDK in Docker to generate key...${NC}"
       
       # Check if GCP_PROJECT_ID is set in environment, if not set to default
-      GCP_PROJECT_ID=${GCP_PROJECT_ID:-"agi-baby-cherry"}
+      GCP_PROJECT_ID=${GCP_PROJECT_ID:-"cherry-ai-project"}
       
       # Create a temporary script for Docker to execute
       cat > /tmp/create_key.sh << EOF
@@ -159,7 +159,7 @@ cat << EOF >> .env
 # GCP Authentication (added by gcp_auth_setup.sh)
 GOOGLE_APPLICATION_CREDENTIALS=/tmp/vertex-agent-key.json
 GCP_SA_KEY_PATH=/tmp/vertex-agent-key.json
-GCP_PROJECT_ID=agi-baby-cherry
+GCP_PROJECT_ID=cherry-ai-project
 EOF
 
 # Create a script to be sourced in the current shell
@@ -167,7 +167,7 @@ cat << 'EOF' > /tmp/gcp_env.sh
 #!/bin/bash
 export GOOGLE_APPLICATION_CREDENTIALS=/tmp/vertex-agent-key.json
 export GCP_SA_KEY_PATH=/tmp/vertex-agent-key.json
-export GCP_PROJECT_ID=agi-baby-cherry
+export GCP_PROJECT_ID=cherry-ai-project
 
 echo "GCP environment variables set:"
 echo "GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS"

@@ -7,9 +7,9 @@
 set -e
 
 # Configuration
-PROJECT_ID="agi-baby-cherry"
+PROJECT_ID="cherry-ai-project"
 ORG_ID="873291114285"
-SERVICE_ACCOUNT="vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"
+SERVICE_ACCOUNT="vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
 KEY_FILE="vertex-key.json"
 DEBUG_LOG="migration_debug.log"
 EVIDENCE_FILE="definitive_migration_evidence.txt"
@@ -113,12 +113,12 @@ if [ -n "$CLUSTERS" ]; then
         echo -e "${GREEN}✅ ai-development cluster found${NC}" | tee -a "$EVIDENCE_FILE"
         
         # Check for GPU configuration
-        GPU_INFO=$(gcloud workstations configs describe ai-dev-config --cluster=ai-development --region=us-central1 --project="$PROJECT_ID" --format="json(container.guestAccelerators)" 2>/dev/null || echo "{}")
+        GPU_INFO=$(gcloud workstations configs describe ai-dev-config --cluster=ai-development --region=us-west4 --project="$PROJECT_ID" --format="json(container.guestAccelerators)" 2>/dev/null || echo "{}")
         echo -e "GPU configuration:" | tee -a "$EVIDENCE_FILE"
         echo "$GPU_INFO" | tee -a "$EVIDENCE_FILE"
         
         if [[ "$GPU_INFO" == *"nvidia-tesla-t4"* ]] && [[ "$GPU_INFO" == *"count\": 2"* ]]; then
-            echo -e "${GREEN}${BOLD}✅ 2x NVIDIA T4 GPUs active in us-central1${NC}" | tee -a "$EVIDENCE_FILE"
+            echo -e "${GREEN}${BOLD}✅ 2x NVIDIA T4 GPUs active in us-west4${NC}" | tee -a "$EVIDENCE_FILE"
             GPU_SUCCESS=true
         else
             echo -e "${YELLOW}⚠️ 2x NVIDIA T4 GPUs not verified${NC}" | tee -a "$EVIDENCE_FILE"
@@ -149,7 +149,7 @@ if [ -n "$REDIS_INSTANCES" ]; then
     
     # Check Redis status
     if [[ "$REDIS_INSTANCES" == *"agent-memory"* ]]; then
-        REDIS_STATUS=$(gcloud redis instances describe agent-memory --region=us-central1 --project="$PROJECT_ID" --format="value(state)" 2>/dev/null || echo "UNKNOWN")
+        REDIS_STATUS=$(gcloud redis instances describe agent-memory --region=us-west4 --project="$PROJECT_ID" --format="value(state)" 2>/dev/null || echo "UNKNOWN")
         echo -e "Redis agent-memory status: $REDIS_STATUS" | tee -a "$EVIDENCE_FILE"
         
         if [ "$REDIS_STATUS" = "READY" ]; then
@@ -180,7 +180,7 @@ if [ -n "$ALLOYDB_CLUSTERS" ]; then
     
     # Check AlloyDB status
     if [[ "$ALLOYDB_CLUSTERS" == *"agent-storage"* ]]; then
-        ALLOYDB_STATUS=$(gcloud alloydb clusters describe agent-storage --region=us-central1 --project="$PROJECT_ID" --format="value(state)" 2>/dev/null || echo "UNKNOWN")
+        ALLOYDB_STATUS=$(gcloud alloydb clusters describe agent-storage --region=us-west4 --project="$PROJECT_ID" --format="value(state)" 2>/dev/null || echo "UNKNOWN")
         echo -e "AlloyDB agent-storage status: $ALLOYDB_STATUS" | tee -a "$EVIDENCE_FILE"
         
         if [ "$ALLOYDB_STATUS" = "RUNNING" ]; then
@@ -311,7 +311,7 @@ fi
 echo -e "\n${BOLD}===== DEFINITIVE MIGRATION VERIFICATION SUMMARY =====${NC}" | tee -a "$EVIDENCE_FILE"
 echo -e "${BOLD}CRITICAL VERIFICATION OUTPUTS:${NC}" | tee -a "$EVIDENCE_FILE"
 echo -e "$([ "$ORG_SUCCESS" = "true" ] && echo "${GREEN}✅ Project $PROJECT_ID in organization $ORG_ID${NC}" || echo "${RED}❌ Project NOT in correct organization${NC}")" | tee -a "$EVIDENCE_FILE"
-echo -e "$([ "$GPU_SUCCESS" = "true" ] && echo "${GREEN}✅ 2x NVIDIA T4 GPUs active in us-central1${NC}" || echo "${RED}❌ 2x NVIDIA T4 GPUs NOT verified${NC}")" | tee -a "$EVIDENCE_FILE"
+echo -e "$([ "$GPU_SUCCESS" = "true" ] && echo "${GREEN}✅ 2x NVIDIA T4 GPUs active in us-west4${NC}" || echo "${RED}❌ 2x NVIDIA T4 GPUs NOT verified${NC}")" | tee -a "$EVIDENCE_FILE"
 echo -e "$([ "$REDIS_SUCCESS" = "true" ] && [ "$ALLOYDB_SUCCESS" = "true" ] && echo "${GREEN}✅ Redis/AlloyDB connections established${NC}" || echo "${RED}❌ Redis/AlloyDB connections NOT established${NC}")" | tee -a "$EVIDENCE_FILE"
 
 # Final status

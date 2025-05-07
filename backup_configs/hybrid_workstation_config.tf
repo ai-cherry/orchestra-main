@@ -11,7 +11,7 @@
 variable "project_id" {
   description = "The Google Cloud project ID"
   type        = string
-  default     = "agi-baby-cherry"
+  default     = "cherry-ai-project"
 }
 
 variable "project_number" {
@@ -23,19 +23,19 @@ variable "project_number" {
 variable "region" {
   description = "The Google Cloud region to deploy resources"
   type        = string
-  default     = "us-central1"
+  default     = "us-west4"
 }
 
 variable "zone" {
   description = "The Google Cloud zone within the region"
   type        = string
-  default     = "us-central1-a"
+  default     = "us-west4-a"
 }
 
 variable "service_account_email" {
   description = "Service account email for the Cloud Workstation"
   type        = string
-  default     = "vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"
+  default     = "vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
 }
 
 variable "admin_email" {
@@ -59,7 +59,7 @@ variable "env" {
 variable "gcs_bucket" {
   description = "GCS bucket to auto-mount for repository access"
   type        = string
-  default     = "gs://agi-baby-cherry-bucket/repos"
+  default     = "gs://cherry-ai-project-bucket/repos"
 }
 
 # ------------ Provider Configuration --------------
@@ -115,7 +115,7 @@ resource "google_workstations_workstation_cluster" "hybrid_cluster" {
   labels = {
     env        = var.env
     managed_by = "terraform"
-    project    = "agi-baby-cherry"
+    project    = "cherry-ai-project"
     org        = "cherry-ai"
   }
 
@@ -352,7 +352,7 @@ CHECKENV
   labels = {
     env        = var.env
     managed_by = "terraform"
-    project    = "agi-baby-cherry"
+    project    = "cherry-ai-project"
     org        = "cherry-ai"
   }
 
@@ -375,7 +375,7 @@ resource "google_workstations_workstation" "hybrid_workstations" {
   labels = {
     env        = var.env
     managed_by = "terraform"
-    project    = "agi-baby-cherry"
+    project    = "cherry-ai-project"
     org        = "cherry-ai"
     instance   = "workstation-${count.index + 1}"
   }

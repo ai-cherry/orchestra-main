@@ -15,10 +15,10 @@ BOLD='\033[1m'
 NC='\033[0m'
 
 # Configuration
-PROJECT_ID="agi-baby-cherry"
+PROJECT_ID="cherry-ai-project"
 ORG_ID="873291114285"
 KEY_FILE="vertex-key.json"
-SERVICE_ACCOUNT="vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"
+SERVICE_ACCOUNT="vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
 
 echo -e "${BOLD}===== FINAL EXECUTION PLAN - ZERO BULLSHIT VERSION =====${NC}"
 echo -e "Starting execution at $(date)"
@@ -36,15 +36,15 @@ if [ ! -f "$KEY_FILE" ]; then
     cat > "$KEY_FILE" <<EOF
 {
   "type": "service_account",
-  "project_id": "agi-baby-cherry",
+  "project_id": "cherry-ai-project",
   "private_key_id": "6833bc94f0e3ef8648efc1578caa23ba2b8a8a52",
   "private_key": "-----BEGIN PRIVATE KEY-----\n${PRIVATE_KEY}\n-----END PRIVATE KEY-----\n",
-  "client_email": "vertex-agent@agi-baby-cherry.iam.gserviceaccount.com",
+  "client_email": "vertex-agent@cherry-ai-project.iam.gserviceaccount.com",
   "client_id": "104944497835-h9l77l0ltmv4h8t9o5a02m51v8g91a9i",
   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
   "token_uri": "https://oauth2.googleapis.com/token",
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/vertex-agent%40agi-baby-cherry.iam.gserviceaccount.com"
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/vertex-agent%40cherry-ai-project.iam.gserviceaccount.com"
 }
 EOF
     chmod 600 "$KEY_FILE"

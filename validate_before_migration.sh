@@ -43,13 +43,13 @@ if [ -f "vertex-agent-service-account.json" ]; then
   fi
   
   # Verify key contents
-  if grep -q '"project_id": "agi-baby-cherry"' vertex-agent-service-account.json; then
+  if grep -q '"project_id": "cherry-ai-project"' vertex-agent-service-account.json; then
     log_success "Key contains correct project ID"
   else
     log_error "Key does not contain expected project ID!"
   fi
   
-  if grep -q '"client_email": "vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"' vertex-agent-service-account.json; then
+  if grep -q '"client_email": "vertex-agent@cherry-ai-project.iam.gserviceaccount.com"' vertex-agent-service-account.json; then
     log_success "Key contains correct service account email"
   else
     log_error "Key does not contain expected service account email!"

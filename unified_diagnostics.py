@@ -128,7 +128,7 @@ def check_gcp_auth():
     exit_code, stdout, stderr = run_command("gcloud config get-value project", check=False)
     if exit_code == 0 and stdout.strip():
         project = stdout.strip()
-        expected_project = os.environ.get("GCP_PROJECT_ID", "agi-baby-cherry")
+        expected_project = os.environ.get("GCP_PROJECT_ID", "cherry-ai-project")
         
         if project == expected_project:
             print_success(f"gcloud configured with correct project: {project}")

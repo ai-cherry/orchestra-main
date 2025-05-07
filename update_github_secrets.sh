@@ -80,7 +80,7 @@ add_secret() {
 
 # Add GCP Project ID, Project Number, and Vertex Key
 echo -e "${YELLOW}Setting GCP Project ID...${NC}"
-add_secret "ORG_GCP_PROJECT_ID" "agi-baby-cherry" "Google Cloud Project ID"
+add_secret "ORG_GCP_PROJECT_ID" "cherry-ai-project" "Google Cloud Project ID"
 
 echo -e "${YELLOW}Setting GCP Project Number...${NC}"
 add_secret "ORG_GCP_PROJECT_NUMBER" "104944497835" "Google Cloud Project Number"
@@ -113,7 +113,7 @@ else
     echo -e "${YELLOW}Creating a new service account key...${NC}"
     mkdir -p /tmp/credentials
     gcloud iam service-accounts keys create /tmp/credentials/deploy-key.json \
-      --iam-account=cherrybaby@agi-baby-cherry.iam.gserviceaccount.com
+      --iam-account=cherrybaby@cherry-ai-project.iam.gserviceaccount.com
     
     sa_key=$(cat /tmp/credentials/deploy-key.json)
   else
@@ -160,8 +160,8 @@ if [ "$setup_k8s" == "y" ]; then
   stage_cluster=${stage_cluster:-$prod_cluster}
   add_secret "ORG_GKE_CLUSTER_STAGING" "${stage_cluster}" "Staging GKE Cluster Name"
   
-  read -p "GCP Region (default: us-central1): " gcp_region
-  gcp_region=${gcp_region:-"us-central1"}
+  read -p "GCP Region (default: us-west4): " gcp_region
+  gcp_region=${gcp_region:-"us-west4"}
   add_secret "ORG_GCP_REGION" "${gcp_region}" "GCP Region"
 fi
 

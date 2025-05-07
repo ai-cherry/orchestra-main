@@ -1,6 +1,6 @@
 # GCP Project Migration Summary
 
-This document summarizes the changes made to migrate from the old GCP project ID (`agi-baby-cherry`) to the new GCP project ID (`cherry-ai-project`).
+This document summarizes the changes made to migrate from the old GCP project ID (`cherry-ai-project`) to the new GCP project ID (`cherry-ai-project`).
 
 ## Changes Completed
 
@@ -14,8 +14,8 @@ This document summarizes the changes made to migrate from the old GCP project ID
 3. **Created Migration Automation**
    - Developed `update-project-references.sh` to systematically update references across the codebase
    - The script handles various reference patterns:
-     - Service account emails (`@agi-baby-cherry.iam.gserviceaccount.com`)
-     - GCS bucket references (`gs://agi-baby-cherry-bucket/`)
+     - Service account emails (`@cherry-ai-project.iam.gserviceaccount.com`)
+     - GCS bucket references (`gs://cherry-ai-project-bucket/`)
      - Artifact Registry references
      - General project ID references
 

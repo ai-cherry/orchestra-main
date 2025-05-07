@@ -59,7 +59,7 @@ To manually trigger a build from a GitHub event:
 
 2. **Start a build with gcloud CLI**:
    ```bash
-   gcloud builds submit --config=cloudbuild.yaml --project=agi-baby-cherry
+   gcloud builds submit --config=cloudbuild.yaml --project=cherry-ai-project
    ```
 
 ### Schedule Regular Builds
@@ -69,14 +69,14 @@ To manually trigger a build from a GitHub event:
    - Click "Create Job"
    - Set a schedule (cron format)
    - Target: HTTP
-   - URL: `https://cloudbuild.googleapis.com/v1/projects/agi-baby-cherry/builds`
+   - URL: `https://cloudbuild.googleapis.com/v1/projects/cherry-ai-project/builds`
    - HTTP method: POST
    - Body:
      ```json
      {
        "source": {
          "repoSource": {
-           "projectId": "agi-baby-cherry",
+           "projectId": "cherry-ai-project",
            "repoName": "YOUR_REPO_NAME",
            "branchName": "main"
          }
@@ -96,11 +96,11 @@ To manually trigger a build from a GitHub event:
 
 - **View build logs**: Go to [Cloud Build History](https://console.cloud.google.com/cloud-build/builds)
 - **Set up notifications**: Configure Cloud Build notifications on the Settings page
-- **View artifacts**: Access build artifacts in the configured GCS bucket (`gs://agi-baby-cherry-cloudbuild-artifacts/`)
+- **View artifacts**: Access build artifacts in the configured GCS bucket (`gs://cherry-ai-project-cloudbuild-artifacts/`)
 
 ## Required Permissions
 
-Ensure your service account (`vertex-agent@agi-baby-cherry.iam.gserviceaccount.com`) has the following roles:
+Ensure your service account (`vertex-agent@cherry-ai-project.iam.gserviceaccount.com`) has the following roles:
 - Cloud Build Service Account
 - Secret Manager Secret Accessor
 - Artifact Registry Writer

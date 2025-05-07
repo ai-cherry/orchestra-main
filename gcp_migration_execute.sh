@@ -11,9 +11,9 @@
 set -e
 
 # -----[ Configuration ]-----
-export GCP_PROJECT_ID="agi-baby-cherry"
+export GCP_PROJECT_ID="cherry-ai-project"
 export GCP_ORG_ID="873291114285"  # Numeric ID without hyphens
-export SERVICE_ACCOUNT_EMAIL="vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"
+export SERVICE_ACCOUNT_EMAIL="vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
 
 # -----[ Helper Functions ]-----
 log_step() {

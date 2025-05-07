@@ -14,11 +14,11 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-GCP_PROJECT_ID="agi-baby-cherry"
+GCP_PROJECT_ID="cherry-ai-project"
 GCP_ORG_ID="873291114285"
 CLOUD_WORKSTATION_CLUSTER="ai-development"
 CLOUD_WORKSTATION_CONFIG="ai-dev-config"
-REGION="us-central1"
+REGION="us-west4"
 
 echo -e "${BLUE}===== GCP Migration and Claude Code Validation =====${NC}"
 

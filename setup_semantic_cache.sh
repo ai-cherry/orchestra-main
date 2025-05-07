@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 
 # Default values
 ENV=${1:-dev}
-REDIS_URL="redis://vertex-agent@agi-baby-cherry"
+REDIS_URL="redis://vertex-agent@cherry-ai-project"
 
 # Print header
 echo -e "${BLUE}======================================================${NC}"

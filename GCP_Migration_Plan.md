@@ -30,7 +30,7 @@ graph TD
 **Steps**:
 - **Update Debounce Interval**: Modify the `debounce_interval` parameter in `agent/core/redis_alloydb_sync.py` from 0.3 seconds (300ms) to 0.5 seconds (500ms) as requested. This will be done by changing the default value in the constructor and updating the environment variable setting in the `if __name__ == "__main__":` block.
 - **Verify Existing Features**: Confirm that version-based conflict resolution and CRC32 checksum validation are already implemented as seen in the code (lines 172-176 for version conflict resolution and line 155 for checksum computation). No changes are needed for these features.
-- **Authentication**: The environment variable approach for the service account `vertex-agent@agi-baby-cherry.iam.gserviceaccount.com` is sufficient, as confirmed by the user. No explicit reference will be added to the sync worker script. The authentication is managed at a higher level through environment configurations and scripts.
+- **Authentication**: The environment variable approach for the service account `vertex-agent@cherry-ai-project.iam.gserviceaccount.com` is sufficient, as confirmed by the user. No explicit reference will be added to the sync worker script. The authentication is managed at a higher level through environment configurations and scripts.
 
 ## 2. Hybrid IDE Configuration (Cloud Workstation Setup)
 
@@ -39,11 +39,11 @@ graph TD
 **Steps**:
 - **Create New Terraform File**: Develop a new Terraform configuration file named `cloud_workstation_config.tf` in the `infra` directory. This file will define a Cloud Workstation resource with the following specifications:
   - **Preinstalled Software**: Include JetBrains IDE and JupyterLab by specifying a custom image or startup script for installation.
-  - **Auto-Mount GCS Bucket**: Configure the workstation to auto-mount `gs://agi-baby-cherry-bucket/repos` for repository access, using appropriate IAM permissions and mount configurations.
+  - **Auto-Mount GCS Bucket**: Configure the workstation to auto-mount `gs://cherry-ai-project-bucket/repos` for repository access, using appropriate IAM permissions and mount configurations.
   - **GPU Quota Management**: Set up GPU resources with quota management to support AI workloads, specifying an accelerator type like NVIDIA Tesla T4 or V100 based on availability and project quotas.
   - **Persistent Storage**: Allocate a 500GB SSD for agent memory persistence, ensuring data durability across sessions.
   - **Network Policies**: Incorporate network policies as an additional requirement specified by the user, ensuring secure connectivity and isolation by configuring VPC and subnet settings, and potentially firewall rules to restrict access.
-- **Service Account Integration**: Use the existing service account `vertex-agent@agi-baby-cherry.iam.gserviceaccount.com` for the workstation, granting necessary permissions for AI Platform, Storage, and Compute services as seen in other configurations.
+- **Service Account Integration**: Use the existing service account `vertex-agent@cherry-ai-project.iam.gserviceaccount.com` for the workstation, granting necessary permissions for AI Platform, Storage, and Compute services as seen in other configurations.
 - **Labels and Metadata**: Add appropriate labels for environment tracking (e.g., `env=prod`) and metadata for Terraform management.
 
 ## 3. Validation and Testing

@@ -5,10 +5,10 @@
 set -eo pipefail
 
 # Configuration variables (adjust as needed or pass as arguments)
-PROJECT_ID="agi-baby-cherry"
-SECRET_NAME="agi-baby-cherry-gsa-key"
-SERVICE_ACCOUNT="vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"
-KEY_FILE_PATH="/workspaces/orchestra-main/credentials/agi-baby-cherry-gsa.json"
+PROJECT_ID="cherry-ai-project"
+SECRET_NAME="cherry-ai-project-gsa-key"
+SERVICE_ACCOUNT="vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
+KEY_FILE_PATH="/workspaces/orchestra-main/credentials/cherry-ai-project-gsa.json"
 
 # Logging function to avoid exposing sensitive data
 log() {

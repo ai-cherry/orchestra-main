@@ -4,8 +4,8 @@
 set -eo pipefail
 
 # Default values
-PROJECT_ID="agi-baby-cherry"
-BUCKET_NAME="agi-baby-cherry-code-analysis"
+PROJECT_ID="cherry-ai-project"
+BUCKET_NAME="cherry-ai-project-code-analysis"
 INPUT_PREFIX="input/"
 FUNCTION_NAME="code_analysis"
 

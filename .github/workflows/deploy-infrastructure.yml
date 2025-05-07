@@ -1,0 +1,133 @@
+name: Deploy GCP Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+      region:
+        description: 'GCP region to deploy to'
+        required: true
+        default: 'us-west4'
+        type: string
+      confirm:
+        description: 'Type "yes" to confirm deployment'
+        required: true
+        type: string
+
+jobs:
+  validate-input:
+    name: Validate Input
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check confirmation
+        if: ${{ inputs.confirm != 'yes' }}
+        run: |
+          echo "You must type 'yes' to confirm deployment"
+          exit 1
+
+  deploy-infrastructure:
+    name: Deploy Infrastructure
+    needs: validate-input
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    
+    env:
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      REGION: ${{ inputs.region }}
+      ENV: ${{ inputs.environment }}
+      GITHUB_ORG: ai-cherry
+      GITHUB_REPO: orchestra-main
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install google-cloud-aiplatform google-cloud-secret-manager google-cloud-storage
+      
+      - name: Set up GitHub CLI
+        run: |
+          type -p curl >/dev/null || (apt update && apt install curl -y)
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          sudo apt update
+          sudo apt install gh -y
+      
+      - name: Authenticate GitHub CLI
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+      
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.6.6
+      
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          token_format: access_token
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER_ID }}
+          service_account: ${{ secrets.GITHUB_ACTIONS_SERVICE_ACCOUNT }}
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+      
+      - name: Fix Terraform configuration
+        run: |
+          chmod +x fix_terraform_config.sh
+          ./fix_terraform_config.sh
+      
+      - name: Initialize Terraform
+        working-directory: terraform
+        run: |
+          terraform init
+      
+      - name: Plan Terraform changes
+        working-directory: terraform
+        run: |
+          terraform plan -var="project_id=${GCP_PROJECT_ID}" -var="region=${REGION}" -var="env=${ENV}" -out=tfplan
+      
+      - name: Apply Terraform changes
+        working-directory: terraform
+        run: |
+          terraform apply -auto-approve tfplan
+      
+      - name: Create service account keys
+        run: |
+          chmod +x create_badass_service_keys.sh
+          ./create_badass_service_keys.sh
+      
+      - name: Update GitHub secrets
+        run: |
+          chmod +x update_github_org_secrets.sh
+          ./update_github_org_secrets.sh
+      
+      - name: Set up Workload Identity Federation
+        run: |
+          chmod +x orchestra_wif_master.sh
+          ./orchestra_wif_master.sh
+      
+      - name: Verify deployment
+        run: |
+          echo "Infrastructure deployment completed successfully!"
+          echo "Environment: ${{ inputs.environment }}"
+          echo "Region: ${{ inputs.region }}"

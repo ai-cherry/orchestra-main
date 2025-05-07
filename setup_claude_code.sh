@@ -69,9 +69,9 @@ if [ ! -f "CLAUDE.md" ]; then
 
 ## GCP Project Configuration
 
-- Project ID: agi-baby-cherry
+- Project ID: cherry-ai-project
 - Organization ID: 873291114285
-- Service Account: vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
+- Service Account: vertex-agent@cherry-ai-project.iam.gserviceaccount.com
 
 ## Critical Migration Information
 
@@ -84,29 +84,29 @@ if [ ! -f "CLAUDE.md" ]; then
 - Machine type: n2d-standard-32
 - GPU: 2x NVIDIA Tesla T4
 - Persistent storage: 1TB SSD
-- Location: us-central1
+- Location: us-west4
 
 ## Connected Services
 
-- Vertex AI endpoint: projects/agi-baby-cherry/locations/us-central1/endpoints/agent-core
-- Redis instance: agent-memory.redis.us-central1.cherry-ai.cloud.goog:6379
+- Vertex AI endpoint: projects/cherry-ai-project/locations/us-west4/endpoints/agent-core
+- Redis instance: agent-memory.redis.us-west4.cherry-ai.cloud.goog:6379
 - AlloyDB cluster: postgresql://alloydb-user@agent-storage:5432/agi_baby_cherry
 
 ## Common Tasks
 
 - Verify project migration:
   ```bash
-  gcloud projects describe agi-baby-cherry --format="value(parent.id)"
+  gcloud projects describe cherry-ai-project --format="value(parent.id)"
   ```
 
 - Check workstation status:
   ```bash
-  gcloud workstations list --project=agi-baby-cherry
+  gcloud workstations list --project=cherry-ai-project
   ```
 
 - Connect to Redis:
   ```bash
-  redis-cli -h agent-memory.redis.us-central1.cherry-ai.cloud.goog
+  redis-cli -h agent-memory.redis.us-west4.cherry-ai.cloud.goog
   ```
 
 - Optimize Terraform:

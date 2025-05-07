@@ -15,9 +15,9 @@ BOLD='\033[1m'
 NC='\033[0m' # No Color
 
 # Default Configuration
-GCP_PROJECT_ID="agi-baby-cherry"
+GCP_PROJECT_ID="cherry-ai-project"
 GCP_ORG_ID="873291114285"  # Numeric ID without hyphens
-SERVICE_ACCOUNT="vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"
+SERVICE_ACCOUNT="vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
 KEY_FILE="vertex-key.json"
 RESULTS_FILE="migration_verification_evidence.txt"
 

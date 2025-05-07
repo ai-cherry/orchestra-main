@@ -244,7 +244,7 @@ def get_incident_reporter() -> IncidentReporter:
         
         project_id = os.environ.get(
             "GCP_PROJECT_ID", 
-            getattr(settings, "GCP_PROJECT_ID", "agi-baby-cherry")
+            getattr(settings, "GCP_PROJECT_ID", "cherry-ai-project")
         )
         
         log_name = os.environ.get(

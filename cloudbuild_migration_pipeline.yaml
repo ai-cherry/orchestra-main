@@ -29,7 +29,7 @@ options:
   machineType: 'E2_HIGHCPU_8'
 
 # Use custom worker pool with Workload Identity Federation
-serviceAccount: 'projects/525398941159/serviceAccounts/vertex-agent@cherry-ai.me.iam.gserviceaccount.com'
+serviceAccount: 'projects/525398941159/serviceAccounts/vertex-agent@cherry-ai-project.iam.gserviceaccount.com'
 
 steps:
   # Step 1: Validate repository structure
@@ -306,7 +306,7 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'us-central1-docker.pkg.dev/cherry-ai.me/orchestra/migration:$_ENV'
+      - 'us-central1-docker.pkg.dev/cherry-ai-project/orchestra/migration:$_ENV'
       - '-f'
       - 'Dockerfile.migration'
       - '.'
@@ -314,7 +314,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'us-central1-docker.pkg.dev/cherry-ai.me/orchestra/migration:$_ENV'
+      - 'us-central1-docker.pkg.dev/cherry-ai-project/orchestra/migration:$_ENV'
 
   # Step 12: Deploy to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -325,13 +325,13 @@ steps:
       - 'create'
       - 'orchestra-migration-$_ENV'
       - '--image'
-      - 'us-central1-docker.pkg.dev/cherry-ai.me/orchestra/migration:$_ENV'
+      - 'us-central1-docker.pkg.dev/cherry-ai-project/orchestra/migration:$_ENV'
       - '--region'
       - '$_REGION'
       - '--service-account'
-      - 'vertex-agent@cherry-ai.me.iam.gserviceaccount.com'
+      - 'vertex-agent@cherry-ai-project.iam.gserviceaccount.com'
       - '--project'
-      - 'cherry-ai.me'
+      - 'cherry-ai-project'
 
 # Slack notification when the build fails
 onError:
@@ -360,4 +360,4 @@ artifacts:
       - 'migration-results.json'
 
 images:
-- 'us-central1-docker.pkg.dev/cherry-ai.me/orchestra/migration:$_ENV'
+- 'us-central1-docker.pkg.dev/cherry-ai-project/orchestra/migration:$_ENV'

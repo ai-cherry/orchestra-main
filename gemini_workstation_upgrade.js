@@ -22,12 +22,12 @@ const upgradeScript = `#!/bin/bash
 # upgrade_workstation.sh
 # 
 # Upgrades GCP workstation from e2-standard-4 to n2d-standard-32 with 2x NVIDIA T4 GPUs
-# For agi-baby-cherry project workstations
+# For cherry-ai-project project workstations
 
 set -e
 
 # Configuration
-PROJECT_ID="agi-baby-cherry"
+PROJECT_ID="cherry-ai-project"
 REGION="us-central1"
 CLUSTER_NAME="ai-development"
 CONFIG_NAME="ai-dev-config"

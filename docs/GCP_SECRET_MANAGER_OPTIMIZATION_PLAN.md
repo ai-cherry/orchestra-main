@@ -54,12 +54,12 @@ This document outlines the detailed plan for optimizing secret management and de
   ```yaml
   storage:
     type: gcp-firestore
-    project: agi-baby-cherry
+    project: cherry-ai-project
     collection: agent_sessions
 
   secrets:
     source: gcp-secret-manager
-    project: agi-baby-cherry
+    project: cherry-ai-project
     auto_load: true
   ```
 - Verify the configuration integrates correctly with Phidata UI components.
@@ -99,7 +99,7 @@ This document outlines the detailed plan for optimizing secret management and de
           
       def _get_secret(self, name):
           return self.secret_client.access_secret_version(
-              name=f"projects/agi-baby-cherry/secrets/{name}/versions/latest"
+              name=f"projects/cherry-ai-project/secrets/{name}/versions/latest"
           ).payload.data.decode('UTF-8')
   ```
 - Ensure the orchestrator integrates with other components using these secrets.

@@ -16,7 +16,7 @@ echo -e "${BLUE}./deploy.sh prod terraform${NC}"
 echo -e ""
 
 # Get project ID if provided
-PROJECT_ID=${1:-"agi-baby-cherry"}
+PROJECT_ID=${1:-"cherry-ai-project"}
 
 echo -e "${YELLOW}Redirecting to: ./deploy.sh prod terraform${NC}"
 echo -e "${YELLOW}Using project ID: $PROJECT_ID${NC}"

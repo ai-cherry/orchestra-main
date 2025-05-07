@@ -41,7 +41,7 @@ async def main():
     logger.info("Starting Redis semantic caching example")
 
     # Check for environment variables
-    redis_url = os.environ.get("REDIS_URL", "redis://vertex-agent@agi-baby-cherry")
+    redis_url = os.environ.get("REDIS_URL", "redis://vertex-agent@cherry-ai-project")
     gemini_api_key = os.environ.get("GEMINI_API_KEY")
     
     if not gemini_api_key:

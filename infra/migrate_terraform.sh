@@ -5,8 +5,8 @@
 set -e
 
 # Set environment variables
-PROJECT_ID="agi-baby-cherry"
-REGION="us-central1"
+PROJECT_ID="cherry-ai-project"
+REGION="us-west4"
 ENV=${1:-dev}  # Default to dev if not specified
 TERRAFORM_DIR="./infra/orchestra-terraform"
 STATE_BUCKET="orchestra-terraform-state"

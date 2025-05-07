@@ -49,7 +49,7 @@ confirm() {
 
 # Default values
 ENV=${1:-"dev"}  # Default to dev environment if not specified
-PROJECT_ID=${GCP_PROJECT_ID:-"agi-baby-cherry"}
+PROJECT_ID=${GCP_PROJECT_ID:-"cherry-ai-project"}
 TENANT_ID=""
 
 section "Memory System Configuration"
@@ -232,7 +232,7 @@ async def verify_memory_separation():
 
     # Create firestore adapter
     firestore_adapter = FirestoreMemoryAdapter(
-        project_id=os.environ.get("GCP_PROJECT_ID", "agi-baby-cherry"),
+        project_id=os.environ.get("GCP_PROJECT_ID", "cherry-ai-project"),
         namespace=namespace or "default",
     )
 

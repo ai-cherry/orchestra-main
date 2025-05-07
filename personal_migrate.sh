@@ -7,7 +7,7 @@
 set -e
 
 # Configuration
-PROJECT_ID="agi-baby-cherry"
+PROJECT_ID="cherry-ai-project"
 ORG_ID="873291114285"
 USER_EMAIL="scoobyjava@cherry-ai.me"
 MASTER_SA_NAME="org-master-sa"
