@@ -93,7 +93,7 @@ echo -e "${BLUE}GCP Authentication${NC}"
 echo -e "Setting up GCP authentication for Firestore, Redis, and other GCP services"
 
 # Get existing values from the .env file if it exists
-EXISTING_GCP_PROJECT_ID=$(grep "^GCP_PROJECT_ID=" .env.backup* 2>/dev/null | head -n1 | cut -d= -f2 || echo "agi-baby-cherry")
+EXISTING_GCP_PROJECT_ID=$(grep "^GCP_PROJECT_ID=" .env.backup* 2>/dev/null | head -n1 | cut -d= -f2 || echo "cherry-ai-project")
 EXISTING_GCP_SA_PATH=$(grep "^GCP_SA_KEY_PATH=" .env.backup* 2>/dev/null | head -n1 | cut -d= -f2 || echo "/tmp/vertex-agent-key.json")
 
 prompt_value "GCP Project ID" "GCP_PROJECT_ID" "$EXISTING_GCP_PROJECT_ID"

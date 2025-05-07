@@ -13,8 +13,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Default values
-PROJECT_ID="agi-baby-cherry"
-REGION="us-central1"
+PROJECT_ID="cherry-ai-project"
+REGION="us-west4"
 ENV=${1:-prod}
 REDIS_NAME="orchestra-redis-${ENV}"
 REDIS_TIER="basic"

@@ -64,7 +64,7 @@ def test_auth_with_key_path(key_path):
     """Test authentication directly using the key file path."""
     try:
         # Create a Firestore client with the key file
-        project_id = os.environ.get('GCP_PROJECT_ID', 'agi-baby-cherry')
+        project_id = os.environ.get('GCP_PROJECT_ID', 'cherry-ai-project')
         os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = key_path
         
         db = firestore.Client(project=project_id)
@@ -85,7 +85,7 @@ def main():
     """Main entry point."""
     # Check for environment variables
     key_path = os.environ.get('GCP_SA_KEY_PATH', '/tmp/vertex-agent-key.json')
-    project_id = os.environ.get('GCP_PROJECT_ID', 'agi-baby-cherry')
+    project_id = os.environ.get('GCP_PROJECT_ID', 'cherry-ai-project')
     
     logger.info(f"Testing GCP authentication with key path: {key_path}")
     logger.info(f"Project ID: {project_id}")

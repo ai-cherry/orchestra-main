@@ -18,7 +18,7 @@ The following steps have been completed to prepare for the migration:
 The migration process using `execute_migration.sh` will:
 
 1. Set environment variables including:
-   - `GCP_PROJECT_ID="agi-baby-cherry"`
+   - `GCP_PROJECT_ID="cherry-ai-project"`
    - `GCP_ORG_ID="873291114285"`
    - `GCP_SA_JSON` (from vertex-agent-service-account.json file)
 

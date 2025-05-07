@@ -8,13 +8,13 @@
 set -e
 
 # Configuration - MODIFY THESE VALUES AS NEEDED
-GCP_PROJECT_ID="agi-baby-cherry"
+GCP_PROJECT_ID="cherry-ai-project"
 GCP_PROJECT_NUMBER="104944497835"
 GCP_ORG_ID="8732-9111-4285"
 GOOGLE_API_KEY="AIzaSyA0rewcfUHo87WMEz4a8Og1eAWTslxlgEE"
-SERVICE_ACCOUNT_EMAIL="vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"
+SERVICE_ACCOUNT_EMAIL="vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
 ADMIN_EMAIL="scoobyjava@cherry-ai.me"
-REGION="us-central1"
+REGION="us-west4"
 
 echo "###############################################"
 echo "# STEP 1: PREREQUISITES CHECK"

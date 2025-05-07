@@ -32,7 +32,7 @@
 
 1. **Fix GCP Authentication**
    - Ensure the service account key has the proper format and permissions
-   - Verify the key has access to Firestore in the agi-baby-cherry project
+   - Verify the key has access to Firestore in the cherry-ai-project project
    - Consider generating a new service account key if needed
 
 2. **Provision Infrastructure**

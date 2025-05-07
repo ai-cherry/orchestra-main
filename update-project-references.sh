@@ -13,7 +13,7 @@ BOLD='\033[1m'
 NC='\033[0m' # No Color
 
 # Configuration
-OLD_PROJECT="agi-baby-cherry"
+OLD_PROJECT="cherry-ai-project"
 NEW_PROJECT="cherry-ai-project"
 BACKUP_DIR="project_id_updates_backup_$(date '+%Y%m%d_%H%M%S')"
 LOG_FILE="project_id_update_$(date '+%Y%m%d_%H%M%S').log"

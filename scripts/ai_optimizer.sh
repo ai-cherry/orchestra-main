@@ -1,6 +1,6 @@
 #!/bin/bash
 # Auto-optimize AI model usage
-PROJECT="agi-baby-cherry"
+PROJECT="cherry-ai-project"
 MODEL="gemini-1.5-pro"
 
 # Dynamic batch sizing based on load

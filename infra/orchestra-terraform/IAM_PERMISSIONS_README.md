@@ -7,7 +7,7 @@ This document explains how to manage Google Cloud Platform IAM permissions, spec
 Instead of manually running `gcloud` commands to grant IAM permissions like:
 
 ```bash
-gcloud projects add-iam-policy-binding agi-baby-cherry \
+gcloud projects add-iam-policy-binding cherry-ai-project \
   --member=user:YOUR_EMAIL@gmail.com \
   --role=roles/secretmanager.admin
 ```
@@ -24,7 +24,7 @@ We manage these permissions through Terraform, providing several benefits:
 
 - Terraform CLI installed (included in this dev container)
 - Google Cloud SDK authentication configured
-- Access to the `agi-baby-cherry` project
+- Access to the `cherry-ai-project` project
 
 ### Configuration Files
 

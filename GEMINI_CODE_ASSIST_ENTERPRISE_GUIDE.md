@@ -59,14 +59,14 @@ gcloud auth activate-service-account --key-file=service-account.json
 The setup connects your GitHub repository to Google Cloud via Developer Connect:
 
 ```bash
-gcloud alpha developer-connect repos register github_agi-baby-cherry \
+gcloud alpha developer-connect repos register github_cherry-ai-project \
   --gitlab-host-uri="https://github.com" \
-  --project=agi-baby-cherry \
-  --region=us-central1
+  --project=cherry-ai-project \
+  --region=us-west4
 
 gcloud alpha genai code customize enable \
-  --project=agi-baby-cherry \
-  --repos=github_agi-baby-cherry
+  --project=cherry-ai-project \
+  --repos=github_cherry-ai-project
 ```
 
 ## Usage Guide
@@ -101,11 +101,11 @@ Gemini Code Assist Enterprise has access to your repository's code through Devel
 Verify that your repositories are properly connected and in a supported region:
 
 ```bash
-gcloud alpha genai code customize list --project=agi-baby-cherry
+gcloud alpha genai code customize list --project=cherry-ai-project
 ```
 
 Supported regions include:
-- us-central1
+- us-west4
 - europe-west1
 - asia-southeast1
 
@@ -160,7 +160,7 @@ Below are specific prompts you can use with Gemini Code Assist Enterprise to aut
 
 ```
 /generate Terraform module for GCP Cloud Workstations with:
-- Project: agi-baby-cherry
+- Project: cherry-ai-project
 - Machine: n2d-standard-32
 - 2x NVIDIA T4 GPUs
 - 1TB SSD

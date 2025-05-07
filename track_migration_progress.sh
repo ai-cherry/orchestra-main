@@ -21,7 +21,7 @@ GCP_PROJECT_ID="${GCP_PROJECT_ID:-cherry-ai-project}"
 GCP_ORG_ID="${GCP_ORG_ID:-525398941159}"
 CLOUD_WORKSTATION_CLUSTER="${CLOUD_WORKSTATION_CLUSTER:-ai-development}"
 CLOUD_WORKSTATION_CONFIG="${CLOUD_WORKSTATION_CONFIG:-ai-dev-config}"
-REGION="${REGION:-us-central1}"
+REGION="${REGION:-us-west4}"
 
 # Terminal width for formatting
 TERM_WIDTH=$(tput cols 2>/dev/null || echo 80)
@@ -576,7 +576,7 @@ print_migration_progress() {
   # Determine status of each phase
   local org_id=$(gcloud projects describe "$GCP_PROJECT_ID" --format="value(parent.id)" 2>/dev/null || echo "")
   local iam_roles=$(gcloud organizations get-iam-policy "$GCP_ORG_ID" \
-    --filter="bindings.members:serviceAccount:vertex-agent@agi-baby-cherry.iam.gserviceaccount.com" \
+    --filter="bindings.members:serviceAccount:vertex-agent@cherry-ai-project.iam.gserviceaccount.com" \
     --format="value(bindings.role)" 2>/dev/null || echo "")
   local workstations=$(gcloud workstations list --format="value(name)" 2>/dev/null | grep -i "ai-dev" || echo "")
   
@@ -643,7 +643,7 @@ ${BOLD}Common Migration Issues:${NC}
 1. ${RED}PERMISSION_DENIED${NC}
    - Cause: Insufficient permissions or IAM propagation delay
    - Solution: Re-run IAM role assignment and wait 5 minutes
-   - Command: ${BLUE}gcloud organizations add-iam-policy-binding $GCP_ORG_ID --member="serviceAccount:vertex-agent@agi-baby-cherry.iam.gserviceaccount.com" --role="roles/resourcemanager.projectMover"${NC}
+   - Command: ${BLUE}gcloud organizations add-iam-policy-binding $GCP_ORG_ID --member="serviceAccount:vertex-agent@cherry-ai-project.iam.gserviceaccount.com" --role="roles/resourcemanager.projectMover"${NC}
 
 2. ${RED}PROJECT_NOT_FOUND${NC}
    - Cause: Incorrect project ID
@@ -687,7 +687,7 @@ suggest_next_steps() {
   
   local org_id=$(gcloud projects describe "$GCP_PROJECT_ID" --format="value(parent.id)" 2>/dev/null || echo "")
   local iam_roles=$(gcloud organizations get-iam-policy "$GCP_ORG_ID" \
-    --filter="bindings.members:serviceAccount:vertex-agent@agi-baby-cherry.iam.gserviceaccount.com" \
+    --filter="bindings.members:serviceAccount:vertex-agent@cherry-ai-project.iam.gserviceaccount.com" \
     --format="value(bindings.role)" 2>/dev/null || echo "")
   local workstations=$(gcloud workstations list --format="value(name)" 2>/dev/null | grep -i "ai-dev" || echo "")
   
@@ -729,7 +729,7 @@ suggest_next_steps() {
      command -v claude &> /dev/null; then
     echo -e "${GREEN}All migration steps are complete!${NC}"
     echo -e "You can now use the following commands to interact with your environment:"
-    echo -e "  - ${BLUE}gcloud workstations start ai-dev-workstation --cluster=ai-development --region=us-central1${NC}"
+    echo -e "  - ${BLUE}gcloud workstations start ai-dev-workstation --cluster=ai-development --region=us-west4${NC}"
     echo -e "  - ${BLUE}claude \"analyze our GCP migration\"${NC}"
     echo -e "  - ${BLUE}./validate_migration_and_claude.sh${NC}"
   fi

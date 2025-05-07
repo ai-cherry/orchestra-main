@@ -47,7 +47,7 @@ For comprehensive documentation on the infrastructure setup and operations, see 
 
 - Terraform 1.5+
 - Google Cloud SDK
-- Access to the `agi-baby-cherry` GCP project
+- Access to the `cherry-ai-project` GCP project
 - Authentication via service account (see documentation)
 
 ## Notes for RC-Arena Non-Profit Project

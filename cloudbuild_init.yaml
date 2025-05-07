@@ -4,7 +4,7 @@ steps:
   - 'config'
   - 'set'
   - 'project'
-  - 'cherry-ai.me'
+  - 'cherry-ai-project'
 
 - name: 'gcr.io/cloud-builders/gcloud'
   args:
@@ -16,7 +16,7 @@ steps:
   - 'aiplatform.googleapis.com'
   - 'secretmanager.googleapis.com'
   - '--project'
-  - 'cherry-ai.me'
+  - 'cherry-ai-project'
 
 - name: 'gcr.io/cloud-builders/gcloud'
   args:
@@ -26,21 +26,21 @@ steps:
   - 'orchestra'
   - '--repository-format=docker'
   - '--location=us-central1'
-  - '--project=cherry-ai.me'
+  - '--project=cherry-ai-project'
 
 - name: 'gcr.io/cloud-builders/gsutil'
   args:
   - 'mb'
   - '-l'
   - 'us-central1'
-  - 'gs://cherry-ai-me-model-artifacts'
+  - 'gs://cherry-ai-project-model-artifacts'
 
 - name: 'gcr.io/cloud-builders/gsutil'
   args:
   - 'mb'
   - '-l'
   - 'us-central1'
-  - 'gs://cherry-ai-me-cloudbuild-artifacts'
+  - 'gs://cherry-ai-project-cloudbuild-artifacts'
 
 - name: 'gcr.io/cloud-builders/gcloud'
   args:
@@ -49,13 +49,13 @@ steps:
   - 'create'
   - 'vertex-agent'
   - '--display-name=Vertex AI Agent Service Account'
-  - '--project=cherry-ai.me'
+  - '--project=cherry-ai-project'
 
-serviceAccount: 'projects/525398941159/serviceAccounts/vertex-agent@cherry-ai.me.iam.gserviceaccount.com'
-logsBucket: 'gs://cherry-ai-me-cloudbuild-artifacts'
+serviceAccount: 'projects/525398941159/serviceAccounts/vertex-agent@cherry-ai-project.iam.gserviceaccount.com'
+logsBucket: 'gs://cherry-ai-project-cloudbuild-artifacts'
 
 substitutions:
-  _PROJECT_ID: 'cherry-ai.me'
+  _PROJECT_ID: 'cherry-ai-project'
   _PROJECT_NUMBER: '525398941159'
   _REGION: 'us-central1'
 

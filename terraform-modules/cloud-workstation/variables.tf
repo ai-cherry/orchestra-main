@@ -1,9 +1,9 @@
 # Variables for Cloud Workstation Module
 
 variable "project_id" {
-  description = "The GCP project ID where resources will be created"
+  description = "GCP Project ID"
   type        = string
-  default     = "agi-baby-cherry"
+  default     = "cherry-ai-project"
 }
 
 variable "region" {
@@ -59,7 +59,7 @@ variable "environment_variables" {
   type        = map(string)
   default     = {
     "JUPYTER_PORT" = "8888",
-    "VERTEX_PROJECT" = "agi-baby-cherry",
+    "VERTEX_PROJECT" = "cherry-ai-project",
     "VERTEX_LOCATION" = "us-central1"
   }
 }

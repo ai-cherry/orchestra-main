@@ -24,32 +24,32 @@ else
 fi
 
 # Set GCP project
-echo "Setting GCP project to agi-baby-cherry..."
-gcloud config set project agi-baby-cherry
+echo "Setting GCP project to cherry-ai-project..."
+gcloud config set project cherry-ai-project
 
 # Configure VS Code settings
 echo "Configuring VS Code settings..."
 mkdir -p .vscode
 cat << EOF > .vscode/settings.json
 {
-  "geminiCodeAssist.projectId": "agi-baby-cherry",
+  "geminiCodeAssist.projectId": "cherry-ai-project",
   "geminiCodeAssist.contextAware": true,
   "geminiCodeAssist.codeReview.enabled": true,
-  "cloudcode.duetAI.project": "agi-baby-cherry",
-  "cloudcode.project": "agi-baby-cherry"
+  "cloudcode.duetAI.project": "cherry-ai-project",
+  "cloudcode.project": "cherry-ai-project"
 }
 EOF
 
 # Enable required APIs
 echo "Enabling required GCP APIs..."
-gcloud services enable aiplatform.googleapis.com --project=agi-baby-cherry
+gcloud services enable aiplatform.googleapis.com --project=cherry-ai-project
 
 echo ""
 echo "=== Cloud Code and Gemini Code Assist Setup Complete ==="
 echo ""
 echo "The following configurations have been applied:"
 echo "1. Cloud Code and Gemini Code Assist extensions installed"
-echo "2. GCP project set to 'agi-baby-cherry'"
+echo "2. GCP project set to 'cherry-ai-project'"
 echo "3. Context-aware code completion enabled"
 echo "4. Gemini-powered code review enabled"
 echo ""

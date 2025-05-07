@@ -1,6 +1,6 @@
 # AGI Baby Cherry Project - GCP Organization Migration and Hybrid IDE Setup Guide
 
-This guide explains how to use the provided scripts to migrate the "agi-baby-cherry" project to the "cherry-ai" organization and set up the hybrid IDE environment with Redis/AlloyDB memory layer and Gemini Code Assist integration.
+This guide explains how to use the provided scripts to migrate the "cherry-ai-project" project to the "cherry-ai" organization and set up the hybrid IDE environment with Redis/AlloyDB memory layer and Gemini Code Assist integration.
 
 ## Table of Contents
 
@@ -41,7 +41,7 @@ Before running the scripts, ensure you have:
 
 2. **Required Permissions**:
    - Organization Admin role in the target organization (`cherry-ai`)
-   - Owner or Editor role in the source project (`agi-baby-cherry`)
+   - Owner or Editor role in the source project (`cherry-ai-project`)
    - Service Account Admin permissions to create and manage service accounts
 
 3. **Network Requirements**:
@@ -126,14 +126,14 @@ For development or testing environments, you can use the all-at-once approach:
 2. Review and update the GCP configuration variables in `gcp_org_migration_setup.sh` if needed:
    ```bash
    # GCP Configuration
-   GCP_PROJECT_ID="agi-baby-cherry"
+   GCP_PROJECT_ID="cherry-ai-project"
    GCP_PROJECT_NUMBER="104944497835"
    GCP_ORG_ID="8732-9111-4285"
    GOOGLE_API_KEY="AIzaSyA0rewcfUHo87WMEz4a8Og1eAWTslxlgEE"
    VERTEX_AGENT_KEY="0d08481a204c0cdba4095bb94529221e8b8ced5c"
-   GCP_RUNTIME_SA_EMAIL="cherrybaby@agi-baby-cherry.iam.gserviceaccount.com"
+   GCP_RUNTIME_SA_EMAIL="cherrybaby@cherry-ai-project.iam.gserviceaccount.com"
    ADMIN_EMAIL="scoobyjava@cherry-ai.me"
-   SERVICE_ACCOUNT_EMAIL="vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"
+   SERVICE_ACCOUNT_EMAIL="vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
    ```
 
 3. Run the migration script:
@@ -187,21 +187,21 @@ When migrating in a real production environment, consider these additional steps
    ```bash
    # Backup important data
    mkdir -p migration_backup
-   gcloud projects get-iam-policy agi-baby-cherry --format=json > migration_backup/iam_policy_before_migration.json
-   gcloud services list --project=agi-baby-cherry --format=json > migration_backup/enabled_apis_before_migration.json
+   gcloud projects get-iam-policy cherry-ai-project --format=json > migration_backup/iam_policy_before_migration.json
+   gcloud services list --project=cherry-ai-project --format=json > migration_backup/enabled_apis_before_migration.json
    ```
 
 2. **Verify network connectivity**:
    The scripts assume private network connectivity for AlloyDB and Redis. Test this with:
    ```bash
    # Test private service access
-   gcloud compute networks describe default --format="value(name)" --project=agi-baby-cherry
+   gcloud compute networks describe default --format="value(name)" --project=cherry-ai-project
    ```
 
 3. **Monitor resource quotas**:
    ```bash
    # Check current quotas
-   gcloud compute project-info describe --project=agi-baby-cherry
+   gcloud compute project-info describe --project=cherry-ai-project
    ```
 
 4. **Test in a staging environment first**:
@@ -237,7 +237,7 @@ The hybrid IDE environment consists of:
 
 ```mermaid
 graph TD
-    A[cherry-ai Organization] --> B[agi-baby-cherry Project]
+    A[cherry-ai Organization] --> B[cherry-ai-project Project]
     B --> C[Cloud Workstations]
     B --> D[Memory Layer]
     B --> E[Vertex AI Resources]
@@ -287,9 +287,9 @@ graph TD
 - Terraform logs can be found in `./migration_logs/terraform_*.log`
 - For advanced debugging, use `gcloud` commands directly:
   ```bash
-  gcloud projects describe "agi-baby-cherry"
-  gcloud workstations clusters list --project="agi-baby-cherry"
-  gcloud redis instances describe agent-memory --region=us-central1
+  gcloud projects describe "cherry-ai-project"
+  gcloud workstations clusters list --project="cherry-ai-project"
+  gcloud redis instances describe agent-memory --region=us-west4
   ```
 
 ## Additional Resources

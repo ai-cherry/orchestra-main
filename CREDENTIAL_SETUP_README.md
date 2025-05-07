@@ -23,7 +23,7 @@ Orchestra requires several sets of credentials to function properly:
 
 These credentials allow Orchestra to connect to Google Cloud Platform services like Firestore and Redis:
 
-- `GCP_PROJECT_ID`: The Google Cloud project ID (e.g., "agi-baby-cherry")
+- `GCP_PROJECT_ID`: The Google Cloud project ID (e.g., "cherry-ai-project")
 - `GOOGLE_APPLICATION_CREDENTIALS`: Path to your GCP service account key JSON file
 - `GCP_SA_KEY_PATH`: Alternative reference to the same key file
 
@@ -117,7 +117,7 @@ Here's a complete reference of all environment variables used by Orchestra:
 | Variable | Required | Purpose | Example |
 |----------|----------|---------|---------|
 | **GCP Authentication** |
-| `GCP_PROJECT_ID` | Yes | GCP project identifier | "agi-baby-cherry" |
+| `GCP_PROJECT_ID` | Yes | GCP project identifier | "cherry-ai-project" |
 | `GOOGLE_APPLICATION_CREDENTIALS` | Yes | Path to service account key | "/tmp/vertex-agent-key.json" |
 | `GCP_SA_KEY_PATH` | Yes | Path to service account key | "/tmp/vertex-agent-key.json" |
 | **Redis Configuration** |

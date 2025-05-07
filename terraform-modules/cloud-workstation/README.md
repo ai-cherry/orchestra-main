@@ -15,8 +15,8 @@ This Terraform module provisions a Google Cloud Workstation configured for AI/ML
 module "ai_workstation" {
   source = "path/to/cloud-workstation"
 
-  project_id = "agi-baby-cherry"
-  region     = "us-central1"
+  project_id = "cherry-ai-project"
+  region     = "us-west4"
 }
 ```
 
@@ -40,8 +40,8 @@ See the [example](./example) directory for a complete usage example.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|----------|
-| project_id | GCP project ID | string | "agi-baby-cherry" | yes |
-| region | GCP region | string | "us-central1" | no |
+| project_id | GCP project ID | string | "cherry-ai-project" | yes |
+| region | GCP region | string | "us-west4" | no |
 | cluster_name | Workstation cluster name | string | "ai-development" | no |
 | config_name | Workstation configuration name | string | "ai-dev-config" | no |
 | workstation_name | Workstation instance name | string | "ai-workstation" | no |

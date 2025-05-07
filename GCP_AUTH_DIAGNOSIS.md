@@ -22,7 +22,7 @@ The service account key file at `/tmp/vertex-agent-key.json` appears to have an 
 ## Required Information to Fix the Issue
 
 1. **New Service Account Key**:
-   - A new service account key file needs to be generated for the `vertex-agent@agi-baby-cherry.iam.gserviceaccount.com` account
+   - A new service account key file needs to be generated for the `vertex-agent@cherry-ai-project.iam.gserviceaccount.com` account
    - The key should be in JSON format with proper RSA key values
 
 2. **Proper IAM Permissions**:
@@ -31,7 +31,7 @@ The service account key file at `/tmp/vertex-agent-key.json` appears to have an 
      - `roles/datastore.owner` for full access
 
 3. **Project Configuration**:
-   - Verify Firestore API is enabled in the GCP project `agi-baby-cherry`
+   - Verify Firestore API is enabled in the GCP project `cherry-ai-project`
 
 ## Recommended Steps
 
@@ -45,7 +45,7 @@ The service account key file at `/tmp/vertex-agent-key.json` appears to have an 
 
    # Or via gcloud CLI (if available):
    gcloud iam service-accounts keys create new-key.json \
-     --iam-account=vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
+     --iam-account=vertex-agent@cherry-ai-project.iam.gserviceaccount.com
    ```
 
 2. **Install the New Key**:
@@ -61,7 +61,7 @@ The service account key file at `/tmp/vertex-agent-key.json` appears to have an 
    ```bash
    # Test authentication with the new key
    export GOOGLE_APPLICATION_CREDENTIALS=/tmp/vertex-agent-key.json
-   export GCP_PROJECT_ID=agi-baby-cherry
+   export GCP_PROJECT_ID=cherry-ai-project
    python test_gcp_auth.py
    ```
 

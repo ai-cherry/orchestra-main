@@ -6,12 +6,12 @@
  */
 
 provider "google" {
-  project = "agi-baby-cherry"  # Parent/billing project
+  project = "cherry-ai-project"  # Parent/billing project
   region  = "us-west2"
 }
 
 provider "google-beta" {
-  project = "agi-baby-cherry"  # Parent/billing project
+  project = "cherry-ai-project"  # Parent/billing project
   region  = "us-west2"
 }
 

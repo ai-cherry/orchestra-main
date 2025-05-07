@@ -1,6 +1,6 @@
 # GCP Migration Verification Suite
 
-This suite provides tools to verify that the migration of the `agi-baby-cherry` project to organization `873291114285` happened successfully and that all required infrastructure components (Vertex workstations, Google Cloud IDE, etc.) are properly set up.
+This suite provides tools to verify that the migration of the `cherry-ai-project` project to organization `873291114285` happened successfully and that all required infrastructure components (Vertex workstations, Google Cloud IDE, etc.) are properly set up.
 
 ## Available Verification Scripts
 

@@ -19,6 +19,7 @@ NC='\033[0m' # No Color
 : "${REGION:=us-west4}"
 : "${POOL_ID:=github-actions-pool}"
 : "${PROVIDER_ID:=github-actions-provider}"
+: "${GCP_USER_EMAIL:=sccobyjava@cherry-ai.me}"
 
 # Service accounts to configure with specific roles
 declare -A SERVICE_ACCOUNTS=(
@@ -84,13 +85,12 @@ check_requirements() {
   
   log "INFO" "All requirements satisfied"
 }
-
 # Authenticate with GCP using the master service account key
 authenticate_gcp() {
   log "INFO" "Authenticating with GCP using GCP_MASTER_SERVICE_JSON..."
   echo "$GCP_MASTER_SERVICE_JSON" > /tmp/master-key.json
   chmod 600 /tmp/master-key.json
-  gcloud auth activate-service-account --key-file=/tmp/master-key.json
+  gcloud auth activate-service-account --key-file=/tmp/master-key.json --impersonate-service-account="${GCP_USER_EMAIL}"
 
   # Verify authentication worked
   if ! gcloud projects describe "${GCP_PROJECT_ID}" &>/dev/null; then
@@ -99,7 +99,7 @@ authenticate_gcp() {
     exit 1
   fi
 
-  log "INFO" "Successfully authenticated with GCP"
+  log "INFO" "Successfully authenticated with GCP (impersonating ${GCP_USER_EMAIL})"
 }
 
 # Authenticate with GitHub

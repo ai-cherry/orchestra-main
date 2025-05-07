@@ -32,10 +32,10 @@ Features:
 
 - `SECRET_NAME` (required): Name of the secret
 - `SECRET_VALUE` (required): Value to store in the secret
-- `PROJECT_ID` (optional): GCP project ID (defaults to "agi-baby-cherry" or value in .env file)
+- `PROJECT_ID` (optional): GCP project ID (defaults to "cherry-ai-project" or value in .env file)
 - `REPLICATION_POLICY` (optional): "automatic" or "user-managed" (default: "automatic")
 - `ENVIRONMENT` (optional): Environment suffix (default: "production")
-- `LOCATION` (optional): Region(s) for user-managed replication (default: "us-central1")
+- `LOCATION` (optional): Region(s) for user-managed replication (default: "us-west4")
 
 #### Examples
 
@@ -51,7 +51,7 @@ Custom project and environment:
 
 Multi-region replication:
 ```bash
-./create_secret.sh SERVICE_ACCOUNT_KEY "$(cat key.json)" "my-project" "user-managed" "prod" "us-central1,us-west1"
+./create_secret.sh SERVICE_ACCOUNT_KEY "$(cat key.json)" "my-project" "user-managed" "prod" "us-west4,us-west1"
 ```
 
 ### 2. `secret_examples.sh`

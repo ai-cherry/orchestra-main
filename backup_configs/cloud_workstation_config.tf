@@ -30,7 +30,7 @@ variable "network_name" {
 variable "gcs_bucket" {
   description = "GCS bucket to auto-mount for repository access"
   type        = string
-  default     = "gs://agi-baby-cherry-bucket/repos"
+  default     = "gs://cherry-ai-project-bucket/repos"
 }
 
 # ------------ Enable Required APIs --------------
@@ -107,8 +107,8 @@ resource "google_workstations_workstation_config" "hybrid_config" {
     
     env = {
       "GEMINI_API_KEY"       = "AIzaSyA0rewcfUHo87WMEz4a8Og1eAWTslxlgEE"
-      "VERTEX_ENDPOINT"      = "projects/104944497835/locations/us-central1/endpoints/agent-core"
-      "REDIS_CONNECTION"     = "redis://vertex-agent@agi-baby-cherry"
+      "VERTEX_ENDPOINT"      = "projects/104944497835/locations/us-west4/endpoints/agent-core"
+      "REDIS_CONNECTION"     = "redis://vertex-agent@cherry-ai-project"
     }
     
     # Custom startup script to install additional tools
@@ -132,10 +132,10 @@ project_context:
 
 tool_integrations:
   vertex_ai:
-    endpoint: projects/104944497835/locations/us-central1/endpoints/agent-core
+    endpoint: projects/104944497835/locations/us-west4/endpoints/agent-core
     api_version: v1
   redis:
-    connection_string: redis://vertex-agent@agi-baby-cherry
+    connection_string: redis://vertex-agent@cherry-ai-project
 GEMINICONFIG
       EOF
     }
@@ -203,7 +203,7 @@ resource "google_project_iam_member" "workstation_sa_permissions" {
 
   project = var.project_id
   role    = each.key
-  member  = "serviceAccount:vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"
+  member  = "serviceAccount:vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
 }
 
 # ------------ Outputs --------------

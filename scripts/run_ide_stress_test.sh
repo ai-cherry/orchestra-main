@@ -83,7 +83,7 @@ except Exception as e:
   echo "1. Review the detailed metrics in 'ide_stress_metrics.json'"
   echo "2. Examine the visual report in 'ide_stress_metrics.png'"
   echo "3. Upload results to Cloud Storage for sharing:"
-  echo "   gsutil -m cp -r ${TEST_OUTPUT_DIR} gs://agi-baby-cherry-bucket/stress-test-results/"
+  echo "   gsutil -m cp -r ${TEST_OUTPUT_DIR} gs://cherry-ai-project-bucket/stress-test-results/"
   echo
   echo "To send metrics to Cloud Monitoring, run:"
   echo "python3 /workspaces/orchestra-main/scripts/upload_stress_test_metrics.py --input=${TEST_OUTPUT_DIR}/ide_stress_metrics.json"

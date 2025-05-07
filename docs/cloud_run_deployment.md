@@ -8,7 +8,7 @@ Before you begin, ensure you have:
 
 - [Google Cloud SDK](https://cloud.google.com/sdk/docs/install) installed and configured
 - [Docker](https://docs.docker.com/get-docker/) installed
-- Access to the `agi-baby-cherry` GCP project
+- Access to the `cherry-ai-project` GCP project
 - Proper authentication set up with GCP
 
 ## Step 1: Authenticate with Google Cloud
@@ -23,7 +23,7 @@ gcloud auth login
 gcloud auth configure-docker us-west2-docker.pkg.dev
 
 # Set the default project
-gcloud config set project agi-baby-cherry
+gcloud config set project cherry-ai-project
 
 # Set the default region
 gcloud config set run/region us-west2
@@ -38,7 +38,7 @@ Navigate to the root directory of your project and build the Docker image:
 cd /workspaces/orchestra-main
 
 # Build the Docker image with a tag for Artifact Registry
-docker build -t us-west2-docker.pkg.dev/agi-baby-cherry/orchestra/orchestrator:dev-latest .
+docker build -t us-west2-docker.pkg.dev/cherry-ai-project/orchestra/orchestrator:dev-latest .
 ```
 
 This command builds a Docker image using the `Dockerfile` in your project root and tags it for Google Artifact Registry.
@@ -55,7 +55,7 @@ gcloud artifacts repositories create orchestra \
     --description="Orchestra Docker images"
 
 # Push the image
-docker push us-west2-docker.pkg.dev/agi-baby-cherry/orchestra/orchestrator:dev-latest
+docker push us-west2-docker.pkg.dev/cherry-ai-project/orchestra/orchestrator:dev-latest
 ```
 
 ## Step 4: Deploy to Cloud Run using Terraform

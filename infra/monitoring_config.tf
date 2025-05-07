@@ -12,7 +12,7 @@ module "monitoring" {
       display_name = "AGI-Baby-Cherry-Alerts"
       type         = "email"
       labels = {
-        email_address = "alerts@agi-baby-cherry.example.com"
+        email_address = "alerts@cherry-ai-project.example.com"
       }
     }
   ]

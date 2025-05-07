@@ -91,7 +91,7 @@ config = StorageConfig(
 
 # Create base adapter
 adapter = FirestoreMemoryAdapter(
-    project_id=os.environ.get("GCP_PROJECT_ID", "agi-baby-cherry")
+    project_id=os.environ.get("GCP_PROJECT_ID", "cherry-ai-project")
 )
 
 # Initialize manager
@@ -135,7 +135,7 @@ pii_config.ENABLE_PII_REDACTION = os.environ.get("MEMORY_ENVIRONMENT", "dev") !=
 
 # Create manager
 adapter = FirestoreMemoryAdapter(
-    project_id=os.environ.get("GCP_PROJECT_ID", "agi-baby-cherry")
+    project_id=os.environ.get("GCP_PROJECT_ID", "cherry-ai-project")
 )
 privacy_manager = PrivacyEnhancedMemoryManager(
     underlying_manager=adapter,

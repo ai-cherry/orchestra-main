@@ -68,7 +68,7 @@ verify_step
 
 # Step 2: Execute GCP migration
 display_step "2" "Executing GCP migration"
-echo -e "${BLUE}This will migrate the agi-baby-cherry project to organization 873291114285${NC}"
+echo -e "${BLUE}This will migrate the cherry-ai-project project to organization 873291114285${NC}"
 echo -e "${BLUE}and deploy hybrid IDE with n2d-standard-32 and 2x T4 GPUs${NC}"
 
 read -p "Execute GCP migration? (y/n): " -n 1 -r
