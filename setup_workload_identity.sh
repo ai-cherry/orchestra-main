@@ -1,608 +1,292 @@
-#!/bin/bash
-# AI Orchestra - Complete Environment Setup Script
-# This script sets up the entire environment for AI Orchestra, including:
-# - GCP project configuration
-# - Terraform backend
-# - Workload Identity Federation
-# - GitHub Actions secrets
-# - Poetry environment
+you #!/bin/bash
+# setup_workload_identity.sh
+# Script to set up Workload Identity Federation for more secure authentication with GCP
 
-set -e  # Exit on any error
+set -e
 
-# Text styling
-BOLD="\033[1m"
-GREEN="\033[0;32m"
-BLUE="\033[0;34m"
-YELLOW="\033[0;33m"
-RED="\033[0;31m"
-NC="\033[0m"  # No Color
+# Color codes for output
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
-# Print section header
-section() {
-    echo ""
-    echo -e "${BOLD}${BLUE}==== $1 ====${NC}"
-    echo ""
-}
-
-# Print success message
-success() {
-    echo -e "${GREEN}✓ $1${NC}"
-}
-
-# Print warning message
-warning() {
-    echo -e "${YELLOW}⚠️ $1${NC}"
-}
-
-# Print error message
-error() {
-    echo -e "${RED}❌ $1${NC}"
-}
-
-# Ask for confirmation
-confirm() {
-    read -p "$1 (y/n) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        return 1
-    fi
-    return 0
-}
-
-# Variables
+# Configuration
 PROJECT_ID="cherry-ai-project"
-REGION="us-west4"
-REPO_OWNER=${REPO_OWNER:-""}
-REPO_NAME=${REPO_NAME:-"orchestra-main"}
-SERVICE_ACCOUNT_NAME="github-actions-wif"
-POOL_NAME="github-actions-pool"
+REGION="us-central1"
+GITHUB_REPO_OWNER="your-github-username"
+GITHUB_REPO_NAME="orchestra-main"
+SERVICE_ACCOUNT_NAME="orchestra-wif-sa"
+POOL_NAME="github-pool"
 PROVIDER_NAME="github-provider"
-BUCKET_NAME="orchestra-terraform-state"
 
-section "AI Orchestra Environment Setup"
-echo "This script will set up the complete AI Orchestra environment:"
-echo "  - GCP project configuration"
-echo "  - Terraform backend"
-echo "  - Workload Identity Federation"
-echo "  - GitHub Actions secrets"
-echo "  - Poetry environment"
-echo ""
-echo "Project ID: $PROJECT_ID"
-echo "Region: $REGION"
-echo ""
-
-if ! confirm "Do you want to proceed with the setup?"; then
-    exit 0
-fi
-
-# Check for gcloud CLI
-if ! command -v gcloud &> /dev/null; then
-    error "gcloud CLI not found. Please install it first."
-    exit 1
-fi
-
-# Check if logged in
-ACCOUNT=$(gcloud auth list --filter=status:ACTIVE --format="value(account)" 2>/dev/null || echo "")
-if [[ -z "$ACCOUNT" ]]; then
-    error "You are not logged in to gcloud. Please run 'gcloud auth login' first."
-    exit 1
-fi
-
-echo "Currently authenticated as: $ACCOUNT"
-
-# Set the project
-echo "Setting project to $PROJECT_ID..."
-gcloud config set project $PROJECT_ID
-
-# Enable required APIs
-section "Enabling required APIs"
-echo "Enabling essential GCP APIs..."
-gcloud services enable iamcredentials.googleapis.com
-gcloud services enable sts.googleapis.com
-gcloud services enable cloudresourcemanager.googleapis.com
-gcloud services enable storage.googleapis.com
-gcloud services enable secretmanager.googleapis.com
-gcloud services enable artifactregistry.googleapis.com
-gcloud services enable run.googleapis.com
-gcloud services enable aiplatform.googleapis.com
-gcloud services enable firestore.googleapis.com
-gcloud services enable redis.googleapis.com
-success "Enabled required GCP APIs"
-
-# Create Terraform state bucket
-section "Setting up Terraform Backend"
-echo "Creating bucket $BUCKET_NAME in $REGION..."
-
-# Check if bucket already exists
-BUCKET_EXISTS=$(gcloud storage ls --project=$PROJECT_ID gs://$BUCKET_NAME 2>/dev/null || echo "")
-
-if [[ -n "$BUCKET_EXISTS" ]]; then
-    warning "Bucket $BUCKET_NAME already exists. Skipping creation."
-    
-    # Check if versioning is enabled
-    VERSIONING=$(gcloud storage buckets describe gs://$BUCKET_NAME --format="value(versioning.enabled)")
-    if [[ "$VERSIONING" != "True" ]]; then
-        echo "Enabling versioning on existing bucket..."
-        gcloud storage buckets update gs://$BUCKET_NAME --versioning
-        success "Versioning enabled on existing bucket"
-    else
-        success "Versioning already enabled on bucket"
-    fi
-else
-    # Create the bucket
-    gcloud storage buckets create gs://$BUCKET_NAME \
-        --project=$PROJECT_ID \
-        --location=$REGION \
-        --uniform-bucket-level-access
-    
-    # Enable versioning
-    echo "Enabling versioning on bucket..."
-    gcloud storage buckets update gs://$BUCKET_NAME --versioning
-    
-    success "Terraform state bucket created and configured"
-fi
-
-# Create backend.tf file if it doesn't exist
-echo "Creating Terraform backend configuration..."
-
-for DIR in terraform terraform-example; do
-    if [ -d "$DIR" ]; then
-        BACKEND_FILE="$DIR/backend.tf"
-        
-        if [ -f "$BACKEND_FILE" ]; then
-            warning "Backend configuration already exists at $BACKEND_FILE"
-            echo "Backing up existing file to ${BACKEND_FILE}.bak"
-            cp "$BACKEND_FILE" "${BACKEND_FILE}.bak"
-        fi
-        
-        echo "Creating backend configuration at $BACKEND_FILE..."
-        cat > "$BACKEND_FILE" << EOF
-# Terraform backend configuration
-# Generated by setup_workload_identity.sh
-
-terraform {
-  backend "gcs" {
-    bucket = "$BUCKET_NAME"
-    prefix = "terraform/state"
-  }
+# Log function
+log() {
+  local level=$1
+  local message=$2
+  local timestamp=$(date "+%Y-%m-%d %H:%M:%S")
+  
+  case $level in
+    "INFO")
+      echo -e "${BLUE}[${timestamp}] [INFO] ${message}${NC}"
+      ;;
+    "WARN")
+      echo -e "${YELLOW}[${timestamp}] [WARN] ${message}${NC}"
+      ;;
+    "ERROR")
+      echo -e "${RED}[${timestamp}] [ERROR] ${message}${NC}"
+      ;;
+    "SUCCESS")
+      echo -e "${GREEN}[${timestamp}] [SUCCESS] ${message}${NC}"
+      ;;
+    *)
+      echo -e "[${timestamp}] ${message}"
+      ;;
+  esac
 }
-EOF
-        
-        success "Backend configuration created at $BACKEND_FILE"
-    fi
-done
 
-# Create Workload Identity Pool
-section "Creating Workload Identity Pool"
+# Function to check if a command exists
+command_exists() {
+  command -v "$1" &> /dev/null
+}
 
-if [[ -z "$REPO_OWNER" ]]; then
-    read -p "Enter your GitHub organization or username: " REPO_OWNER
-fi
+# Function to create a service account
+create_service_account() {
+  log "INFO" "Creating service account ${SERVICE_ACCOUNT_NAME}..."
+  
+  # Check if gcloud is installed
+  if ! command_exists gcloud; then
+    log "ERROR" "gcloud CLI is not installed. Please install it first."
+    exit 1
+  fi
+  
+  # Check if service account already exists
+  if gcloud iam service-accounts describe ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com &> /dev/null; then
+    log "INFO" "Service account ${SERVICE_ACCOUNT_NAME} already exists."
+  else
+    # Create service account
+    gcloud iam service-accounts create ${SERVICE_ACCOUNT_NAME} \
+      --display-name="Workload Identity Federation Service Account for GitHub Actions"
+    
+    log "SUCCESS" "Service account ${SERVICE_ACCOUNT_NAME} created successfully."
+  fi
+  
+  # Grant necessary roles to the service account
+  log "INFO" "Granting necessary roles to the service account..."
+  
+  # Cloud Run Admin role
+  gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+    --member="serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" \
+    --role="roles/run.admin"
+  
+  # Storage Admin role
+  gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+    --member="serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" \
+    --role="roles/storage.admin"
+  
+  # Service Account User role
+  gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+    --member="serviceAccount:${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" \
+    --role="roles/iam.serviceAccountUser"
+  
+  log "SUCCESS" "Roles granted to service account successfully."
+}
 
-echo "Creating pool $POOL_NAME..."
-gcloud iam workload-identity-pools create $POOL_NAME \
-    --location="global" \
-    --description="Pool for GitHub Actions" \
-    --display-name="GitHub Actions Pool" \
-    --project=$PROJECT_ID 2>/dev/null || echo "Pool already exists"
+# Function to create a Workload Identity Pool
+create_workload_identity_pool() {
+  log "INFO" "Creating Workload Identity Pool ${POOL_NAME}..."
+  
+  # Check if pool already exists
+  if gcloud iam workload-identity-pools describe ${POOL_NAME} --location=global &> /dev/null; then
+    log "INFO" "Workload Identity Pool ${POOL_NAME} already exists."
+  else
+    # Create pool
+    gcloud iam workload-identity-pools create ${POOL_NAME} \
+      --location=global \
+      --display-name="GitHub Actions Pool" \
+      --description="Identity pool for GitHub Actions"
+    
+    log "SUCCESS" "Workload Identity Pool ${POOL_NAME} created successfully."
+  fi
+  
+  # Get the full resource name of the pool
+  POOL_ID=$(gcloud iam workload-identity-pools describe ${POOL_NAME} \
+    --location=global \
+    --format="value(name)")
+  
+  log "INFO" "Workload Identity Pool ID: ${POOL_ID}"
+}
 
-# Get the Workload Identity Pool ID
-POOL_ID=$(gcloud iam workload-identity-pools describe $POOL_NAME \
-    --location="global" \
-    --format="value(name)" \
-    --project=$PROJECT_ID)
+# Function to create a Workload Identity Provider
+create_workload_identity_provider() {
+  log "INFO" "Creating Workload Identity Provider ${PROVIDER_NAME}..."
+  
+  # Check if provider already exists
+  if gcloud iam workload-identity-pools providers describe ${PROVIDER_NAME} \
+    --workload-identity-pool=${POOL_NAME} \
+    --location=global &> /dev/null; then
+    log "INFO" "Workload Identity Provider ${PROVIDER_NAME} already exists."
+  else
+    # Create provider
+    gcloud iam workload-identity-pools providers create-oidc ${PROVIDER_NAME} \
+      --workload-identity-pool=${POOL_NAME} \
+      --location=global \
+      --display-name="GitHub Actions Provider" \
+      --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository" \
+      --issuer-uri="https://token.actions.githubusercontent.com"
+    
+    log "SUCCESS" "Workload Identity Provider ${PROVIDER_NAME} created successfully."
+  fi
+}
 
-success "Using Workload Identity Pool: $POOL_ID"
-
-# Create Workload Identity Provider
-section "Creating Workload Identity Provider"
-echo "Creating provider $PROVIDER_NAME..."
-gcloud iam workload-identity-pools providers create-oidc $PROVIDER_NAME \
-    --location="global" \
-    --workload-identity-pool=$POOL_NAME \
-    --display-name="GitHub Actions Provider" \
-    --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository" \
-    --issuer-uri="https://token.actions.githubusercontent.com" \
-    --project=$PROJECT_ID 2>/dev/null || echo "Provider already exists"
-
-# Get the Workload Identity Provider ID
-PROVIDER_ID=$(gcloud iam workload-identity-pools providers describe $PROVIDER_NAME \
-    --location="global" \
-    --workload-identity-pool=$POOL_NAME \
-    --format="value(name)" \
-    --project=$PROJECT_ID)
-
-success "Using Workload Identity Provider: $PROVIDER_ID"
-
-# Create Service Account
-section "Creating Service Account"
-echo "Creating service account $SERVICE_ACCOUNT_NAME..."
-gcloud iam service-accounts create $SERVICE_ACCOUNT_NAME \
-    --display-name="GitHub Actions WIF Service Account" \
-    --project=$PROJECT_ID 2>/dev/null || echo "Service account already exists"
-
-# Grant necessary roles to the service account
-section "Granting roles to Service Account"
-echo "Granting roles to $SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com..."
-
-# Cloud Run Admin role
-gcloud projects add-iam-policy-binding $PROJECT_ID \
-    --member="serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com" \
-    --role="roles/run.admin" --quiet
-
-# Artifact Registry Admin role
-gcloud projects add-iam-policy-binding $PROJECT_ID \
-    --member="serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com" \
-    --role="roles/artifactregistry.admin" --quiet
-
-# Storage Admin role (for Terraform state)
-gcloud projects add-iam-policy-binding $PROJECT_ID \
-    --member="serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com" \
-    --role="roles/storage.admin" --quiet
-
-# Secret Manager Admin role
-gcloud projects add-iam-policy-binding $PROJECT_ID \
-    --member="serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com" \
-    --role="roles/secretmanager.admin" --quiet
-
-# Service Account User role
-gcloud projects add-iam-policy-binding $PROJECT_ID \
-    --member="serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com" \
-    --role="roles/iam.serviceAccountUser" --quiet
-
-# Allow GitHub Actions to impersonate the service account
-section "Allowing GitHub Actions to impersonate Service Account"
-echo "Setting up impersonation for GitHub repository: $REPO_OWNER/$REPO_NAME..."
-
-gcloud iam service-accounts add-iam-policy-binding \
-    $SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com \
+# Function to configure IAM policy binding
+configure_iam_policy_binding() {
+  log "INFO" "Configuring IAM policy binding..."
+  
+  # Get the full resource name of the pool
+  POOL_ID=$(gcloud iam workload-identity-pools describe ${POOL_NAME} \
+    --location=global \
+    --format="value(name)")
+  
+  # Configure IAM policy binding
+  gcloud iam service-accounts add-iam-policy-binding ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
     --role="roles/iam.workloadIdentityUser" \
-    --member="principalSet://iam.googleapis.com/${POOL_ID}/attribute.repository/${REPO_OWNER}/${REPO_NAME}" --quiet
+    --member="principalSet://iam.googleapis.com/${POOL_ID}/attribute.repository/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}"
+  
+  log "SUCCESS" "IAM policy binding configured successfully."
+}
 
-success "Service account impersonation configured"
-
-# Create GitHub directory structure if it doesn't exist
-section "Setting up GitHub Actions"
-mkdir -p .github/workflows
-
-# Create GitHub Actions workflow for CI/CD
-if [ ! -f ".github/workflows/ci-cd.yml" ] || confirm "Overwrite existing CI/CD workflow?"; then
-    echo "Creating GitHub Actions workflow for CI/CD..."
-    cat > .github/workflows/ci-cd.yml << EOF
-name: Python CI/CD Pipeline
+# Function to create GitHub Actions workflow file
+create_github_actions_workflow() {
+  log "INFO" "Creating GitHub Actions workflow file..."
+  
+  # Create GitHub Actions directory
+  mkdir -p .github/workflows
+  
+  # Get the full resource name of the pool
+  POOL_ID=$(gcloud iam workload-identity-pools describe ${POOL_NAME} \
+    --location=global \
+    --format="value(name)")
+  
+  # Get the full resource name of the provider
+  PROVIDER_ID=$(gcloud iam workload-identity-pools providers describe ${PROVIDER_NAME} \
+    --workload-identity-pool=${POOL_NAME} \
+    --location=global \
+    --format="value(name)")
+  
+  # Create GitHub Actions workflow file
+  cat > .github/workflows/deploy-to-cloud-run-wif.yml << EOL
+name: Deploy to Cloud Run with Workload Identity Federation
 
 on:
   push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop ]
+    branches:
+      - main
 
 jobs:
-  test:
-    name: Test and Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: 1.7.1  # Match version with devcontainer
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-      
-      - name: Load cached venv
-        id: cached-poetry-dependencies
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: venv-\${{ runner.os }}-python-\${{ matrix.python-version }}-\${{ hashFiles('**/poetry.lock') }}
-      
-      - name: Install dependencies
-        run: |
-          poetry install --with dev
-      
-      - name: Lint with ruff
-        run: |
-          poetry run ruff check . --select=E,F,B,I --ignore=E203,W503
-          
-      - name: Test with pytest
-        run: |
-          poetry run pytest tests/ --cov=./ --cov-report=xml
-      
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          token: \${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
-  
-  build-and-push:
-    name: Build and Push Docker Image
-    needs: test
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: \${{ secrets.WIF_PROVIDER_ID }}
-          service_account: \${{ secrets.WIF_SERVICE_ACCOUNT }}
-          token_format: access_token
-      
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-        with:
-          project_id: $PROJECT_ID
-      
-      - name: Configure Docker for Artifact Registry
-        run: |
-          gcloud auth configure-docker $REGION-docker.pkg.dev
-      
-      - name: Extract branch name
-        shell: bash
-        run: echo "BRANCH_NAME=\$(echo \${GITHUB_REF#refs/heads/})" >> \$GITHUB_ENV
-      
-      - name: Build and push
-        uses: docker/build-push-action@v4
-        with:
-          push: true
-          tags: $REGION-docker.pkg.dev/$PROJECT_ID/orchestra/api:\${{ env.BRANCH_NAME }}
-          cache-from: type=registry,ref=$REGION-docker.pkg.dev/$PROJECT_ID/orchestra/api:buildcache
-          cache-to: type=registry,ref=$REGION-docker.pkg.dev/$PROJECT_ID/orchestra/api:buildcache,mode=max
-          build-args: |
-            BUILDKIT_INLINE_CACHE=1
-  
   deploy:
-    name: Deploy to Cloud Run
-    needs: build-and-push
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     runs-on: ubuntu-latest
-    environment:
-      name: \${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
-    steps:
-      - name: Checkout for deployment scripts
-        uses: actions/checkout@v3
-      
-      - name: Determine Environment
-        run: |
-          if [ "\${{ github.ref }}" == "refs/heads/main" ]; then
-            echo "ENV_TYPE=prod" >> \$GITHUB_ENV
-            echo "SERVICE_NAME=orchestra-prod" >> \$GITHUB_ENV
-          else
-            echo "ENV_TYPE=staging" >> \$GITHUB_ENV
-            echo "SERVICE_NAME=orchestra-staging" >> \$GITHUB_ENV
-          fi
-      
-      - name: Authenticate to Google Cloud with OIDC
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: \${{ secrets.WIF_PROVIDER_ID }}
-          service_account: \${{ secrets.WIF_SERVICE_ACCOUNT }}
-          token_format: access_token
-          create_credentials_file: true
-      
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-        with:
-          project_id: $PROJECT_ID
-      
-      - name: Deploy to Cloud Run
-        id: deploy
-        uses: google-github-actions/deploy-cloudrun@v1
-        with:
-          service: \${{ env.SERVICE_NAME }}
-          region: $REGION
-          image: $REGION-docker.pkg.dev/$PROJECT_ID/orchestra/api:\${{ github.ref == 'refs/heads/main' && 'main' || 'develop' }}
-          env_vars: |
-            ENVIRONMENT=\${{ env.ENV_TYPE }}
-            STANDARD_MODE=true
-            USE_RECOVERY_MODE=false
-          secrets: |
-            GOOGLE_APPLICATION_CREDENTIALS=orchestra-sa-key:latest
-          flags: |
-            --allow-unauthenticated
-            --memory=2Gi
-            --cpu=2
-            --concurrency=80
-            --timeout=300
-            --min-instances=1
-            --max-instances=10
-      
-      - name: Show Output URL
-        run: echo \${{ steps.deploy.outputs.url }}
-EOF
-    success "Created GitHub Actions workflow for CI/CD"
-fi
-
-# Create GitHub Actions workflow for Terraform
-if [ ! -f ".github/workflows/terraform.yml" ] || confirm "Overwrite existing Terraform workflow?"; then
-    echo "Creating GitHub Actions workflow for Terraform..."
-    cat > .github/workflows/terraform.yml << EOF
-name: "Terraform Infrastructure"
-
-on:
-  push:
-    branches: [main]
-    paths: ['infra/**']
-  pull_request:
-    branches: [main]
-    paths: ['infra/**']
-
-permissions:
-  contents: read
-  pull-requests: write
-  id-token: write # Required for requesting the JWT for Workload Identity Federation
-
-jobs:
-  terraform-dev-plan:
-    name: "Terraform Dev Plan"
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./infra/orchestra-terraform
+    
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.11.3
-
-      - name: Authenticate to Google Cloud with Workload Identity Federation
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: \${{ secrets.WIF_PROVIDER_ID }}
-          service_account: \${{ secrets.WIF_SERVICE_ACCOUNT }}
-          token_format: 'access_token'
-          create_credentials_file: true
-          
-      - name: Setup Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: $PROJECT_ID
-          install_components: 'beta'
-          
-      - name: Terraform Init with GCS Backend and State Locking
-        id: init
-        run: |
-          terraform init \\
-            -backend-config="bucket=$BUCKET_NAME" \\
-            -backend-config="prefix=terraform/state/dev" \\
-            -upgrade
-      
-      - name: Terraform Workspace
-        id: workspace
-        run: |
-          terraform workspace select dev || terraform workspace new dev
-      
-      - name: Terraform Format
-        id: fmt
-        run: terraform fmt -check
-        continue-on-error: true
-        
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate
-      
-      - name: Terraform Plan
-        id: plan
-        run: |
-          terraform plan \\
-            -var="env=dev" \\
-            -var="project_id=$PROJECT_ID" \\
-            -var="region=$REGION" \\
-            -input=false \\
-            -no-color | tee terraform-plan.txt
-        continue-on-error: true
-      
-      - name: Cache Plan
-        uses: actions/cache@v3
-        with:
-          path: terraform-plan.txt
-          key: terraform-plan-dev-\${{ github.sha }}
-      
-      - name: Run Backward Compatibility Check
-        run: |
-          # Check for sensitive changes that could cause issues
-          ! grep -q "forces replacement" terraform-plan.txt || echo "::warning::Plan includes resource replacement - review carefully!"
-          ! grep -q "will be destroyed" terraform-plan.txt || echo "::warning::Plan includes resource destruction - review carefully!"
-
-  terraform-dev-apply:
-    name: "Terraform Dev Apply"
-    needs: terraform-dev-plan
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    defaults:
-      run:
-        working-directory: ./infra/orchestra-terraform
+    - name: Checkout code
+      uses: actions/checkout@v3
     
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - name: Google Auth
+      id: auth
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: '${PROVIDER_ID}'
+        service_account: '${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com'
+    
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+    
+    - name: Build and Deploy to Cloud Run
+      run: |
+        gcloud builds submit --tag gcr.io/${PROJECT_ID}/orchestra-api
+        gcloud run deploy orchestra-api \\
+          --image gcr.io/${PROJECT_ID}/orchestra-api \\
+          --platform managed \\
+          --region ${REGION} \\
+          --allow-unauthenticated
+EOL
+  
+  log "SUCCESS" "GitHub Actions workflow file created successfully."
+  log "INFO" "Workflow file: .github/workflows/deploy-to-cloud-run-wif.yml"
+}
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.11.3
+# Function to print setup information
+print_setup_info() {
+  log "INFO" "Workload Identity Federation setup information:"
+  log "INFO" "Project ID: ${PROJECT_ID}"
+  log "INFO" "Region: ${REGION}"
+  log "INFO" "Service Account: ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+  
+  # Get the full resource name of the pool
+  POOL_ID=$(gcloud iam workload-identity-pools describe ${POOL_NAME} \
+    --location=global \
+    --format="value(name)")
+  
+  # Get the full resource name of the provider
+  PROVIDER_ID=$(gcloud iam workload-identity-pools providers describe ${PROVIDER_NAME} \
+    --workload-identity-pool=${POOL_NAME} \
+    --location=global \
+    --format="value(name)")
+  
+  log "INFO" "Workload Identity Pool ID: ${POOL_ID}"
+  log "INFO" "Workload Identity Provider ID: ${PROVIDER_ID}"
+  
+  log "INFO" "To use Workload Identity Federation in GitHub Actions, add the following to your workflow file:"
+  echo -e "${BLUE}
+    - name: Google Auth
+      id: auth
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: '${PROVIDER_ID}'
+        service_account: '${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com'
+  ${NC}"
+}
 
-      - name: Authenticate to Google Cloud with Workload Identity Federation
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: \${{ secrets.WIF_PROVIDER_ID }}
-          service_account: \${{ secrets.WIF_SERVICE_ACCOUNT }}
-          token_format: 'access_token'
-          create_credentials_file: true
-          
-      - name: Setup Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: $PROJECT_ID
-          install_components: 'beta'
-          
-      - name: Terraform Init with GCS Backend and State Locking
-        id: init
-        run: |
-          terraform init \\
-            -backend-config="bucket=$BUCKET_NAME" \\
-            -backend-config="prefix=terraform/state/dev" \\
-            -upgrade
-      
-      - name: Terraform Workspace
-        id: workspace
-        run: |
-          terraform workspace select dev || terraform workspace new dev
-      
-      - name: Terraform Apply
-        id: apply
-        run: |
-          terraform apply \\
-            -auto-approve \\
-            -var="env=dev" \\
-            -var="project_id=$PROJECT_ID" \\
-            -var="region=$REGION" \\
-            -input=false
-EOF
-    success "Created GitHub Actions workflow for Terraform"
-fi
+# Main function
+main() {
+  log "INFO" "Starting Workload Identity Federation setup..."
+  
+  # Check if gcloud is installed
+  if ! command_exists gcloud; then
+    log "ERROR" "gcloud CLI is not installed. Please install it first."
+    exit 1
+  fi
+  
+  # Check if user is authenticated
+  if ! gcloud auth list --filter=status:ACTIVE --format="value(account)" &> /dev/null; then
+    log "ERROR" "You are not authenticated with gcloud. Please run 'gcloud auth login' first."
+    exit 1
+  fi
+  
+  # Create service account
+  create_service_account
+  
+  # Create Workload Identity Pool
+  create_workload_identity_pool
+  
+  # Create Workload Identity Provider
+  create_workload_identity_provider
+  
+  # Configure IAM policy binding
+  configure_iam_policy_binding
+  
+  # Create GitHub Actions workflow file
+  create_github_actions_workflow
+  
+  # Print setup information
+  print_setup_info
+  
+  log "SUCCESS" "Workload Identity Federation setup completed successfully!"
+}
 
-# Create Artifact Registry repository
-section "Creating Artifact Registry Repository"
-echo "Creating Docker repository in Artifact Registry..."
-gcloud artifacts repositories create orchestra \
-    --repository-format=docker \
-    --location=$REGION \
-    --description="AI Orchestra Docker images" \
-    --project=$PROJECT_ID 2>/dev/null || echo "Repository already exists"
-
-success "Artifact Registry repository created or already exists"
-
-# Output the configuration values for GitHub Actions
-section "GitHub Actions Configuration"
-echo "Add the following secrets to your GitHub repository:"
-echo ""
-echo "WIF_PROVIDER_ID: projects/${PROJECT_ID}/locations/global/workloadIdentityPools/${POOL_NAME}/providers/${PROVIDER_NAME}"
-echo "WIF_SERVICE_ACCOUNT: ${SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
-echo ""
-
-section "Setup Complete"
-success "AI Orchestra environment setup completed successfully!"
-echo ""
-echo "Next steps:"
-echo "1. Add the GitHub secrets mentioned above to your repository"
-echo "2. Run 'terraform init' in the terraform directory to initialize Terraform"
-echo "3. Run 'terraform plan' to verify your Terraform configuration"
-echo "4. Run 'terraform apply' to deploy your infrastructure"
-echo ""
-echo "Your development environment is now ready to use!"
+# Run the main function
+main
