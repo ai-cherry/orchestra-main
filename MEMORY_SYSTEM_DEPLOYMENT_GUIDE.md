@@ -221,11 +221,11 @@ If you encounter permission issues with collections:
 
 ```bash
 # Check Firestore permissions
-gcloud projects get-iam-policy agi-baby-cherry
+gcloud projects get-iam-policy cherry-ai-project
 
 # Grant appropriate permissions if needed
-gcloud projects add-iam-policy-binding agi-baby-cherry \
-  --member="serviceAccount:vertex-agent@agi-baby-cherry.iam.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding cherry-ai-project \
+  --member="serviceAccount:vertex-agent@cherry-ai-project.iam.gserviceaccount.com" \
   --role="roles/datastore.user"
 ```
 

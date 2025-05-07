@@ -37,7 +37,7 @@ Before you begin, ensure you have:
 
 1. [Google Cloud SDK](https://cloud.google.com/sdk/docs/install) installed
 2. [Terraform](https://www.terraform.io/downloads.html) (version 1.5+ recommended) installed
-3. Access to the `agi-baby-cherry` GCP project
+3. Access to the `cherry-ai-project` GCP project
 4. A service account key with appropriate permissions
 
 ## Authentication
@@ -50,7 +50,7 @@ echo "$GCP_API_KEY" | base64 -d > /tmp/gsa-key.json
 gcloud auth activate-service-account --key-file=/tmp/gsa-key.json
 
 # Set default project and region
-gcloud config set project agi-baby-cherry
+gcloud config set project cherry-ai-project
 gcloud config set run/region us-west2
 ```
 
@@ -179,8 +179,8 @@ For team environments, consider using a remote state backend. To enable this:
 2. Create a GCS bucket for Terraform state:
 
 ```bash
-gsutil mb -l us-west2 gs://agi-baby-cherry-terraform-state
-gsutil versioning set on gs://agi-baby-cherry-terraform-state
+gsutil mb -l us-west2 gs://cherry-ai-project-terraform-state
+gsutil versioning set on gs://cherry-ai-project-terraform-state
 ```
 
 3. Re-initialize Terraform to migrate state:

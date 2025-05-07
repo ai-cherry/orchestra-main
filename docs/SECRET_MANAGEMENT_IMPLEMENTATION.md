@@ -38,11 +38,11 @@ This document provides a summary of the implementation of secret management in o
 
 ### 4. Service Accounts and Permissions
 
-- **vertex-agent@agi-baby-cherry.iam.gserviceaccount.com**:
+- **vertex-agent@cherry-ai-project.iam.gserviceaccount.com**:
   - Used for managing secrets with Secret Manager
   - Requires `roles/secretmanager.secretAccessor` and `roles/aiplatform.reasoningEngineServiceAgent`
 
-- **orchestra-cloud-run-prod@agi-baby-cherry.iam.gserviceaccount.com**:
+- **orchestra-cloud-run-prod@cherry-ai-project.iam.gserviceaccount.com**:
   - Runtime service account for Cloud Run
   - Needs access to the secrets during runtime
 

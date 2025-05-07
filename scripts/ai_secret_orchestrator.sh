@@ -1,7 +1,7 @@
 #!/bin/bash
 # Unified secret management with Gemini validation
-PROJECT="agi-baby-cherry"
-SA="vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"
+PROJECT="cherry-ai-project"
+SA="vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
 
 create_secret() {
   SECRET_NAME=$1

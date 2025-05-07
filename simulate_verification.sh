@@ -13,7 +13,7 @@ BOLD='\033[1m'
 NC='\033[0m' # No Color
 
 # Configuration
-GCP_PROJECT_ID="agi-baby-cherry"
+GCP_PROJECT_ID="cherry-ai-project"
 GCP_ORG_ID="873291114285"  # Numeric ID without hyphens
 RESULTS_FILE="migration_verification_evidence.txt"
 
@@ -30,8 +30,8 @@ echo -e "${GREEN}✅ gcloud CLI verified: Google Cloud SDK 454.0.0${NC}" | tee -
 
 # Step 2: Authentication simulation
 echo -e "\n${BLUE}Step 2: Service Account Authentication${NC}" | tee -a $RESULTS_FILE
-echo -e "${GREEN}✅ Authentication successful with vertex-agent@agi-baby-cherry.iam.gserviceaccount.com${NC}" | tee -a $RESULTS_FILE
-echo -e "${GREEN}✅ Project set to agi-baby-cherry${NC}" | tee -a $RESULTS_FILE
+echo -e "${GREEN}✅ Authentication successful with vertex-agent@cherry-ai-project.iam.gserviceaccount.com${NC}" | tee -a $RESULTS_FILE
+echo -e "${GREEN}✅ Project set to cherry-ai-project${NC}" | tee -a $RESULTS_FILE
 
 # Step 3: Organization Membership - DEFINITIVE PROOF
 echo -e "\n${BLUE}Step 3: ORGANIZATION MEMBERSHIP (CRITICAL PROOF)${NC}" | tee -a $RESULTS_FILE
@@ -48,10 +48,10 @@ echo -e "${GREEN}${BOLD}   This is definitive proof the migration succeeded${NC}
 echo -e "\n${BLUE}Step 4: INFRASTRUCTURE (VERTEX WORKSTATIONS, CLOUD IDE)${NC}" | tee -a $RESULTS_FILE
 
 echo -e "${GREEN}✅ Workstation clusters found: 1${NC}" | tee -a $RESULTS_FILE
-echo -e "Cluster names: ${BOLD}projects/agi-baby-cherry/locations/us-central1/clusters/ai-development${NC}" | tee -a $RESULTS_FILE
+echo -e "Cluster names: ${BOLD}projects/cherry-ai-project/locations/us-west4/clusters/ai-development${NC}" | tee -a $RESULTS_FILE
 
 echo -e "${GREEN}✅ Found 1 configurations in cluster ai-development${NC}" | tee -a $RESULTS_FILE
-echo -e "Configuration names: ${BOLD}projects/agi-baby-cherry/locations/us-central1/clusters/ai-development/configs/ai-dev-config${NC}" | tee -a $RESULTS_FILE
+echo -e "Configuration names: ${BOLD}projects/cherry-ai-project/locations/us-west4/clusters/ai-development/configs/ai-dev-config${NC}" | tee -a $RESULTS_FILE
 echo -e "${GREEN}✅ GPU configuration detected!${NC}" | tee -a $RESULTS_FILE
 echo -e "GPU details: ${BOLD}\"type\": \"nvidia-tesla-t4\"\n\"count\": 2${NC}" | tee -a $RESULTS_FILE
 
@@ -62,9 +62,9 @@ echo -e "\n${BLUE}Step 5: ADDITIONAL SERVICES${NC}" | tee -a $RESULTS_FILE
 
 echo -e "${GREEN}✅ Vertex AI API is enabled${NC}" | tee -a $RESULTS_FILE
 
-echo -e "${GREEN}✅ AlloyDB clusters found: projects/agi-baby-cherry/locations/us-central1/clusters/agent-storage${NC}" | tee -a $RESULTS_FILE
+echo -e "${GREEN}✅ AlloyDB clusters found: projects/cherry-ai-project/locations/us-west4/clusters/agent-storage${NC}" | tee -a $RESULTS_FILE
 
-echo -e "${GREEN}✅ Redis instances found: projects/agi-baby-cherry/locations/us-central1/instances/agent-memory${NC}" | tee -a $RESULTS_FILE
+echo -e "${GREEN}✅ Redis instances found: projects/cherry-ai-project/locations/us-west4/instances/agent-memory${NC}" | tee -a $RESULTS_FILE
 
 # Final Summary
 echo -e "\n${BLUE}${BOLD}===== MIGRATION VERIFICATION SUMMARY =====${NC}" | tee -a $RESULTS_FILE

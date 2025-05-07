@@ -14,11 +14,11 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # GCP Configuration from our setup script
-GCP_PROJECT_ID="agi-baby-cherry"
+GCP_PROJECT_ID="cherry-ai-project"
 GCP_PROJECT_NUMBER="104944497835"
 GCP_ORG_ID="873291114285"  # Corrected numeric ID without hyphens
 GOOGLE_API_KEY="AIzaSyA0rewcfUHo87WMEz4a8Og1eAWTslxlgEE"
-SERVICE_ACCOUNT_EMAIL="vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"
+SERVICE_ACCOUNT_EMAIL="vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
 
 # Validation results storage
 VALIDATION_LOG="./validation_results_$(date +%Y%m%d_%H%M%S).log"
@@ -219,7 +219,7 @@ fi
 log_message "${BLUE}" "STEP 5: Verifying Redis/AlloyDB Setup"
 
 echo -e "${YELLOW}Checking Redis instance...${NC}"
-REDIS_LIST=$(gcloud redis instances list --region=us-central1 --project=${GCP_PROJECT_ID} --format="value(name)" 2>/dev/null || echo "Failed to list Redis instances")
+REDIS_LIST=$(gcloud redis instances list --region=us-west4 --project=${GCP_PROJECT_ID} --format="value(name)" 2>/dev/null || echo "Failed to list Redis instances")
 
 if [[ "$REDIS_LIST" == "Failed to list Redis instances" ]]; then
   record_test "Redis Listing" "FAIL" "Could not list Redis instances"
@@ -228,7 +228,7 @@ else
     record_test "Redis Instance" "PASS" "Redis instance 'agent-memory' exists"
     
     # Get details about the Redis instance
-    REDIS_INFO=$(gcloud redis instances describe agent-memory --region=us-central1 --project=${GCP_PROJECT_ID} --format=json 2>/dev/null || echo '{"error":"Failed to get Redis info"}')
+    REDIS_INFO=$(gcloud redis instances describe agent-memory --region=us-west4 --project=${GCP_PROJECT_ID} --format=json 2>/dev/null || echo '{"error":"Failed to get Redis info"}')
     
     if [[ "$REDIS_INFO" != *"error"* ]]; then
       REDIS_SIZE=$(echo "${REDIS_INFO}" | jq -r '.memorySizeGb')

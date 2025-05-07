@@ -4,7 +4,7 @@
 set -e
 
 echo "Setting up environment variables..."
-export GCP_PROJECT_ID="agi-baby-cherry"
+export GCP_PROJECT_ID="cherry-ai-project"
 export GCP_ORG_ID="873291114285"
 
 # Load service account JSON from file

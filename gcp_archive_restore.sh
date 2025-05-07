@@ -25,13 +25,13 @@ show_usage() {
 Usage: $0 [options]
 
 Options:
-  -b, --bucket       GCS bucket URL (required, e.g. gs://agi-baby-cherry-migration)
+  -b, --bucket       GCS bucket URL (required, e.g. gs://cherry-ai-project-migration)
   -a, --archive      Archive filename (required, e.g. orchestra_migration_20250501_123456.tar.gz)
   -d, --directory    Destination directory (optional, defaults to current directory)
   -h, --help         Show this help message
 
 Example:
-  $0 --bucket gs://agi-baby-cherry-migration --archive orchestra_migration_20250501_123456.tar.gz
+  $0 --bucket gs://cherry-ai-project-migration --archive orchestra_migration_20250501_123456.tar.gz
 EOF
 }
 

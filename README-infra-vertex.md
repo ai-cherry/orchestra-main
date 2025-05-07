@@ -51,7 +51,7 @@ The Vertex AI Agent Manager provides automation for:
 - Google Cloud SDK (gcloud)
 - Terraform 1.5+
 - Python 3.8+
-- Access to the `agi-baby-cherry` GCP project
+- Access to the `cherry-ai-project` GCP project
 
 ### Setup
 
@@ -65,7 +65,7 @@ The Vertex AI Agent Manager provides automation for:
    ```bash
    echo "$GCP_API_KEY" | base64 -d > /tmp/gsa-key.json
    gcloud auth activate-service-account --key-file=/tmp/gsa-key.json
-   gcloud config set project agi-baby-cherry
+   gcloud config set project cherry-ai-project
    gcloud config set run/region us-west2
    ```
 

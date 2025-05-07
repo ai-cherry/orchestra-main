@@ -1,6 +1,6 @@
 # GCP Organization Migration Suite
 
-This repository contains a comprehensive set of scripts and configuration files for migrating the `agi-baby-cherry` GCP project to organization `873291114285` and configuring it with Vertex AI and hybrid IDE environments.
+This repository contains a comprehensive set of scripts and configuration files for migrating the `cherry-ai-project` GCP project to organization `873291114285` and configuring it with Vertex AI and hybrid IDE environments.
 
 ## Files Overview
 
@@ -82,7 +82,7 @@ chmod +x validate_migration_minimal.sh
 
 3. **"Invalid Key"**: Re-download the key from the GCP Console.
 
-4. **"Billing Not Linked"**: Run `gcloud beta billing projects link agi-baby-cherry --billing-account=$(gcloud beta billing accounts list --format="value(name)")`.
+4. **"Billing Not Linked"**: Run `gcloud beta billing projects link cherry-ai-project --billing-account=$(gcloud beta billing accounts list --format="value(name)")`.
 
 ## Expected Final Results
 

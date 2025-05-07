@@ -1,21 +1,16 @@
-# AI Orchestra GCP Infrastructure
-# This Terraform configuration sets up the core GCP infrastructure for AI Orchestra
+# Terraform configuration for AI Orchestra project
+# This file sets up the complete GCP environment for the project
 
 terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 4.80.0"
+      version = "~> 5.0"
     }
     google-beta = {
       source  = "hashicorp/google-beta"
-      version = "~> 4.80.0"
+      version = "~> 5.0"
     }
-  }
-
-  backend "gcs" {
-    bucket = "cherry-ai-project-terraform-state"
-    prefix = "terraform/state"
   }
 }
 
@@ -26,99 +21,178 @@ variable "project_id" {
   default     = "cherry-ai-project"
 }
 
-variable "region" {
-  description = "The GCP region to deploy resources"
+variable "project_number" {
+  description = "The GCP project number"
   type        = string
-  default     = "us-west4"
+  default     = "525398941159"
+}
+
+variable "region" {
+  description = "The GCP region"
+  type        = string
+  default     = "us-central1"
 }
 
 variable "env" {
-  description = "Environment (staging or production)"
+  description = "The environment (dev, staging, prod)"
   type        = string
-  default     = "staging"
-  validation {
-    condition     = contains(["staging", "production"], var.env)
-    error_message = "Environment must be either 'staging' or 'production'."
+  default     = "dev"
+}
+
+variable "credentials_path" {
+  description = "Path to the GCP credentials file"
+  type        = string
+  default     = "/tmp/gcp-credentials.json"
+}
+
+variable "orchestrator_service_account" {
+  description = "The email of the orchestrator service account"
+  type        = string
+  default     = "orchestrator-api@cherry-ai-project.iam.gserviceaccount.com"
+}
+
+variable "github_actions_sa" {
+  description = "The email of the GitHub Actions service account"
+  type        = string
+  default     = "github-actions@cherry-ai-project.iam.gserviceaccount.com"
+}
+
+variable "regions" {
+  description = "Map of region configurations"
+  type        = map(string)
+  default     = {
+    default    = "us-central1"
+    workstation = "us-central1"
+    pubsub     = "us-central1"
   }
 }
 
 # Provider configuration
 provider "google" {
-  project = var.project_id
-  region  = var.region
+  credentials = file(var.credentials_path)
+  project     = var.project_id
+  region      = var.region
 }
 
 provider "google-beta" {
+  credentials = file(var.credentials_path)
+  project     = var.project_id
+  region      = var.region
+}
+
+# Enable required APIs
+resource "google_project_service" "required_apis" {
+  for_each = toset([
+    "aiplatform.googleapis.com",
+    "run.googleapis.com",
+    "storage.googleapis.com",
+    "secretmanager.googleapis.com",
+    "iam.googleapis.com",
+    "cloudresourcemanager.googleapis.com",
+    "workstations.googleapis.com",
+    "compute.googleapis.com",
+    "artifactregistry.googleapis.com",
+    "cloudbuild.googleapis.com"
+  ])
+
   project = var.project_id
-  region  = var.region
+  service = each.key
+
+  disable_dependent_services = false
+  disable_on_destroy         = false
 }
 
-# Local variables
-locals {
-  service_name = "ai-orchestra"
-  service_account_name = "ai-orchestra-sa"
-  labels = {
-    environment = var.env
-    managed-by  = "terraform"
-    project     = "ai-orchestra"
-  }
+# Service accounts
+resource "google_service_account" "vertex_ai_sa" {
+  account_id   = "vertex-ai-badass"
+  display_name = "Vertex AI Badass Service Account"
+  description  = "Service account with extensive permissions for all Vertex AI operations"
+  project      = var.project_id
+
+  depends_on = [google_project_service.required_apis]
 }
 
-# Service Account for AI Orchestra
-resource "google_service_account" "ai_orchestra" {
-  account_id   = local.service_account_name
-  display_name = "AI Orchestra Service Account"
-  description  = "Service account for AI Orchestra application"
+resource "google_service_account" "gemini_sa" {
+  account_id   = "gemini-badass"
+  display_name = "Gemini Badass Service Account"
+  description  = "Service account with extensive permissions for all Gemini API operations"
+  project      = var.project_id
+
+  depends_on = [google_project_service.required_apis]
 }
 
-# Grant necessary roles to the service account
-resource "google_project_iam_member" "firestore_user" {
+resource "google_service_account" "cloud_run_sa" {
+  account_id   = "orchestra-api-sa"
+  display_name = "Orchestra API Service Account"
+  description  = "Service account for the Orchestra API Cloud Run service"
+  project      = var.project_id
+
+  depends_on = [google_project_service.required_apis]
+}
+
+# IAM permissions for Vertex AI service account
+resource "google_project_iam_member" "vertex_ai_permissions" {
+  for_each = toset([
+    "roles/aiplatform.admin",
+    "roles/aiplatform.user",
+    "roles/storage.admin",
+    "roles/logging.admin",
+    "roles/iam.serviceAccountUser",
+    "roles/iam.serviceAccountTokenCreator"
+  ])
+
   project = var.project_id
-  role    = "roles/datastore.user"
-  member  = "serviceAccount:${google_service_account.ai_orchestra.email}"
+  role    = each.key
+  member  = "serviceAccount:${google_service_account.vertex_ai_sa.email}"
+
+  depends_on = [google_service_account.vertex_ai_sa]
 }
 
-resource "google_project_iam_member" "secretmanager_accessor" {
+# IAM permissions for Gemini service account
+resource "google_project_iam_member" "gemini_permissions" {
+  for_each = toset([
+    "roles/aiplatform.user",
+    "roles/serviceusage.serviceUsageConsumer",
+    "roles/iam.serviceAccountUser",
+    "roles/iam.serviceAccountTokenCreator"
+  ])
+
   project = var.project_id
-  role    = "roles/secretmanager.secretAccessor"
-  member  = "serviceAccount:${google_service_account.ai_orchestra.email}"
+  role    = each.key
+  member  = "serviceAccount:${google_service_account.gemini_sa.email}"
+
+  depends_on = [google_service_account.gemini_sa]
 }
 
-resource "google_project_iam_member" "aiplatform_user" {
+# IAM permissions for Cloud Run service account
+resource "google_project_iam_member" "cloud_run_permissions" {
+  for_each = toset([
+    "roles/aiplatform.user",
+    "roles/storage.objectViewer",
+    "roles/secretmanager.secretAccessor",
+    "roles/logging.logWriter"
+  ])
+
   project = var.project_id
-  role    = "roles/aiplatform.user"
-  member  = "serviceAccount:${google_service_account.ai_orchestra.email}"
+  role    = each.key
+  member  = "serviceAccount:${google_service_account.cloud_run_sa.email}"
+
+  depends_on = [google_service_account.cloud_run_sa]
 }
 
-resource "google_project_iam_member" "storage_object_viewer" {
-  project = var.project_id
-  role    = "roles/storage.objectViewer"
-  member  = "serviceAccount:${google_service_account.ai_orchestra.email}"
-}
+# Storage buckets
+resource "google_storage_bucket" "model_artifacts" {
+  name     = "${var.project_id}-model-artifacts-${var.env}"
+  location = var.region
+  project  = var.project_id
 
-# Firestore database
-resource "google_firestore_database" "database" {
-  name        = "(default)"
-  location_id = var.region
-  type        = "FIRESTORE_NATIVE"
-
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-# Cloud Storage buckets
-resource "google_storage_bucket" "assets" {
-  name          = "${var.project_id}-assets-${var.env}"
-  location      = var.region
-  storage_class = "STANDARD"
-  
   uniform_bucket_level_access = true
-  
+  force_destroy               = true
+
   versioning {
     enabled = true
   }
-  
+
   lifecycle_rule {
     condition {
       age = 30
@@ -127,269 +201,343 @@ resource "google_storage_bucket" "assets" {
       type = "Delete"
     }
   }
-  
-  labels = local.labels
+
+  depends_on = [google_project_service.required_apis]
 }
 
-resource "google_storage_bucket" "backups" {
-  name          = "${var.project_id}-backups-${var.env}"
-  location      = var.region
-  storage_class = "NEARLINE"
-  
+resource "google_storage_bucket" "data_sync" {
+  name     = "${var.project_id}-data-sync-${var.env}"
+  location = var.region
+  project  = var.project_id
+
   uniform_bucket_level_access = true
-  
+  force_destroy               = true
+
   versioning {
     enabled = true
   }
-  
+
   lifecycle_rule {
     condition {
-      age = 90
+      age = 30
     }
     action {
       type = "Delete"
     }
   }
-  
-  labels = local.labels
+
+  depends_on = [google_project_service.required_apis]
 }
 
 # Secret Manager secrets
-resource "google_secret_manager_secret" "openai_api_key" {
-  secret_id = "openai-api-key"
-  
+resource "google_secret_manager_secret" "vertex_ai_key" {
+  secret_id = "vertex-ai-key"
+  project   = var.project_id
+
   replication {
-    user_managed {
-      replicas {
-        location = var.region
-      }
-    }
+    auto {}
   }
-  
-  labels = local.labels
+
+  depends_on = [google_project_service.required_apis]
 }
 
-resource "google_secret_manager_secret" "anthropic_api_key" {
-  secret_id = "anthropic-api-key"
-  
+resource "google_secret_manager_secret" "gemini_key" {
+  secret_id = "gemini-key"
+  project   = var.project_id
+
   replication {
-    user_managed {
-      replicas {
-        location = var.region
-      }
-    }
+    auto {}
   }
-  
-  labels = local.labels
+
+  depends_on = [google_project_service.required_apis]
 }
 
-resource "google_secret_manager_secret" "portkey_api_key" {
-  secret_id = "portkey-api-key"
-  
-  replication {
-    user_managed {
-      replicas {
-        location = var.region
-      }
-    }
-  }
-  
-  labels = local.labels
+# Allow the orchestrator service account to access the secrets
+resource "google_secret_manager_secret_iam_member" "vertex_ai_key_access" {
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.vertex_ai_key.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${var.orchestrator_service_account}"
 }
 
-# Note: Secret versions would typically be managed outside of Terraform
-# or using sensitive variables with appropriate safeguards
-
-# Vertex AI Vector Search index for semantic memory
-resource "google_vertex_ai_index" "semantic_memory" {
-  provider = google-beta
-  
-  display_name = "semantic-memory-${var.env}"
-  description  = "Vector index for semantic memory in ${var.env} environment"
-  
-  metadata {
-    contents_delta_uri = "gs://${google_storage_bucket.assets.name}/vector-index"
-    config {
-      dimensions = 768
-      approximate_neighbors_count = 150
-      distance_measure_type = "DOT_PRODUCT_DISTANCE"
-      algorithm_config {
-        tree_ah_config {
-          leaf_node_embedding_count    = 1000
-          leaf_nodes_to_search_percent = 10
-        }
-      }
-    }
-  }
-  
-  index_update_method = "BATCH_UPDATE"
-  
-  labels = local.labels
+resource "google_secret_manager_secret_iam_member" "gemini_key_access" {
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.gemini_key.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${var.orchestrator_service_account}"
 }
 
-# Cloud Run service
-resource "google_cloud_run_service" "ai_orchestra" {
-  name     = "${local.service_name}-${var.env}"
-  location = var.region
-  
-  template {
-    spec {
-      service_account_name = google_service_account.ai_orchestra.email
-      
-      containers {
-        image = "gcr.io/${var.project_id}/${local.service_name}:latest"
-        
-        resources {
-          limits = {
-            cpu    = var.env == "production" ? "2" : "1"
-            memory = var.env == "production" ? "4Gi" : "2Gi"
-          }
-        }
-        
-        env {
-          name  = "ENVIRONMENT"
-          value = var.env
-        }
-        
-        env {
-          name  = "PROJECT_ID"
-          value = var.project_id
-        }
-        
-        env {
-          name  = "REGION"
-          value = var.region
-        }
-        
-        # Secret environment variables
-        env {
-          name = "OPENAI_API_KEY"
-          value_from {
-            secret_key_ref {
-              name = google_secret_manager_secret.openai_api_key.secret_id
-              key  = "latest"
-            }
-          }
-        }
-        
-        env {
-          name = "ANTHROPIC_API_KEY"
-          value_from {
-            secret_key_ref {
-              name = google_secret_manager_secret.anthropic_api_key.secret_id
-              key  = "latest"
-            }
-          }
-        }
-        
-        env {
-          name = "PORTKEY_API_KEY"
-          value_from {
-            secret_key_ref {
-              name = google_secret_manager_secret.portkey_api_key.secret_id
-              key  = "latest"
-            }
-          }
-        }
-      }
-      
-      # Container concurrency
-      container_concurrency = var.env == "production" ? 100 : 80
-      
-      # Timeout
-      timeout_seconds = 300
-    }
-    
-    metadata {
-      annotations = {
-        "autoscaling.knative.dev/minScale" = var.env == "production" ? "2" : "1"
-        "autoscaling.knative.dev/maxScale" = var.env == "production" ? "20" : "10"
-      }
-      
-      labels = local.labels
-    }
+# Workload Identity Federation for GitHub Actions
+resource "google_iam_workload_identity_pool" "github_pool" {
+  workload_identity_pool_id = "github-pool"
+  display_name              = "GitHub Actions Pool"
+  description               = "Identity pool for GitHub Actions"
+  project                   = var.project_id
+
+  depends_on = [google_project_service.required_apis]
+}
+
+resource "google_iam_workload_identity_pool_provider" "github_provider" {
+  workload_identity_pool_id          = google_iam_workload_identity_pool.github_pool.workload_identity_pool_id
+  workload_identity_pool_provider_id = "github-provider"
+  display_name                       = "GitHub Provider"
+  attribute_mapping = {
+    "google.subject"       = "assertion.sub"
+    "attribute.actor"      = "assertion.actor"
+    "attribute.repository" = "assertion.repository"
   }
-  
-  traffic {
-    percent         = 100
-    latest_revision = true
+  oidc {
+    issuer_uri = "https://token.actions.githubusercontent.com"
   }
-  
+  project = var.project_id
+
+  depends_on = [google_iam_workload_identity_pool.github_pool]
+}
+
+# Allow GitHub Actions to impersonate the service accounts
+resource "google_service_account_iam_binding" "vertex_ai_workload_identity" {
+  service_account_id = google_service_account.vertex_ai_sa.name
+  role               = "roles/iam.workloadIdentityUser"
+  members = [
+    "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/attribute.repository/ai-cherry/orchestra-main"
+  ]
+
   depends_on = [
-    google_project_iam_member.firestore_user,
-    google_project_iam_member.secretmanager_accessor,
-    google_project_iam_member.aiplatform_user,
-    google_project_iam_member.storage_object_viewer
+    google_service_account.vertex_ai_sa,
+    google_iam_workload_identity_pool.github_pool,
+    google_iam_workload_identity_pool_provider.github_provider
   ]
 }
 
-# IAM policy for Cloud Run service
-resource "google_cloud_run_service_iam_policy" "noauth" {
-  location    = google_cloud_run_service.ai_orchestra.location
-  project     = google_cloud_run_service.ai_orchestra.project
-  service     = google_cloud_run_service.ai_orchestra.name
-  
-  policy_data = data.google_iam_policy.noauth.policy_data
+resource "google_service_account_iam_binding" "gemini_workload_identity" {
+  service_account_id = google_service_account.gemini_sa.name
+  role               = "roles/iam.workloadIdentityUser"
+  members = [
+    "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/attribute.repository/ai-cherry/orchestra-main"
+  ]
+
+  depends_on = [
+    google_service_account.gemini_sa,
+    google_iam_workload_identity_pool.github_pool,
+    google_iam_workload_identity_pool_provider.github_provider
+  ]
 }
 
-data "google_iam_policy" "noauth" {
-  binding {
-    role = "roles/run.invoker"
-    members = [
-      "allUsers",
-    ]
+# Allow the GitHub Actions service account to access the service accounts
+resource "google_service_account_iam_member" "vertex_ai_github_access" {
+  service_account_id = google_service_account.vertex_ai_sa.name
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:${var.github_actions_sa}"
+}
+
+resource "google_service_account_iam_member" "gemini_github_access" {
+  service_account_id = google_service_account.gemini_sa.name
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:${var.github_actions_sa}"
+}
+
+# Cloud Run service
+resource "google_cloud_run_v2_service" "orchestra_api" {
+  name     = "orchestra-api-${var.env}"
+  location = var.region
+  project  = var.project_id
+
+  template {
+    containers {
+      image = "us-docker.pkg.dev/${var.project_id}/orchestra/api:latest"
+      
+      env {
+        name  = "PROJECT_ID"
+        value = var.project_id
+      }
+      
+      env {
+        name  = "ENVIRONMENT"
+        value = var.env
+      }
+      
+      env {
+        name  = "REGION"
+        value = var.region
+      }
+      
+      resources {
+        limits = {
+          cpu    = "1000m"
+          memory = "512Mi"
+        }
+      }
+    }
+
+    service_account = google_service_account.cloud_run_sa.email
   }
+
+  traffic {
+    percent = 100
+    type    = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
+  }
+
+  depends_on = [
+    google_project_service.required_apis,
+    google_service_account.cloud_run_sa
+  ]
 }
 
-# Pub/Sub topic for event-driven communication
-resource "google_pubsub_topic" "ai_orchestra_events" {
-  name = "ai-orchestra-events-${var.env}"
-  
-  labels = local.labels
-  
-  message_retention_duration = "86600s"  # 24 hours + 100 seconds
+# Allow unauthenticated access to the Cloud Run service
+resource "google_cloud_run_service_iam_member" "public_access" {
+  location = google_cloud_run_v2_service.orchestra_api.location
+  project  = google_cloud_run_v2_service.orchestra_api.project
+  service  = google_cloud_run_v2_service.orchestra_api.name
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+
+  depends_on = [google_cloud_run_v2_service.orchestra_api]
 }
 
-# Cloud Scheduler job for periodic tasks
-resource "google_cloud_scheduler_job" "cleanup_job" {
-  name             = "ai-orchestra-cleanup-${var.env}"
-  description      = "Periodic cleanup job for AI Orchestra"
-  schedule         = "0 */6 * * *"  # Every 6 hours
-  time_zone        = "Etc/UTC"
-  attempt_deadline = "320s"
-  
-  http_target {
-    http_method = "POST"
-    uri         = "${google_cloud_run_service.ai_orchestra.status[0].url}/api/maintenance/cleanup"
-    
-    oidc_token {
-      service_account_email = google_service_account.ai_orchestra.email
+# Artifact Registry repository for Docker images
+resource "google_artifact_registry_repository" "orchestra_repo" {
+  location      = var.region
+  repository_id = "orchestra"
+  description   = "Docker repository for Orchestra API images"
+  format        = "DOCKER"
+  project       = var.project_id
+
+  depends_on = [google_project_service.required_apis]
+}
+
+# Cloud Workstation cluster
+resource "google_workstations_workstation_cluster" "ai_orchestra_cluster" {
+  provider               = google-beta
+  workstation_cluster_id = "ai-orchestra-cluster-${var.env}"
+  network                = "default"
+  subnetwork             = "default"
+  location               = var.region
+  project                = var.project_id
+
+  # Labels for resource management
+  labels = {
+    environment = var.env
+    managed_by  = "terraform"
+    project     = "ai-orchestra"
+  }
+
+  # Private cluster configuration for security
+  private_cluster_config {
+    enable_private_endpoint = true
+  }
+
+  depends_on = [google_project_service.required_apis]
+}
+
+# Cloud Workstation configuration
+resource "google_workstations_workstation_config" "ai_orchestra_config" {
+  provider               = google-beta
+  workstation_config_id  = "ai-orchestra-config-${var.env}"
+  workstation_cluster_id = google_workstations_workstation_cluster.ai_orchestra_cluster.workstation_cluster_id
+  location               = var.region
+  project                = var.project_id
+
+  # Host configuration with GCE instance
+  host {
+    gce_instance {
+      machine_type = "n2d-standard-8"
+      boot_disk_size_gb = 100
+      
+      accelerators {
+        type  = "nvidia-tesla-t4"
+        count = 1
+      }
+      
+      disable_public_ip_addresses = true
+      
+      shielded_instance_config {
+        enable_secure_boot          = true
+        enable_vtpm                 = true
+        enable_integrity_monitoring = true
+      }
+      
+      service_account = google_service_account.vertex_ai_sa.email
     }
   }
+
+  # Container configuration for preinstalled software
+  container {
+    image = "us-docker.pkg.dev/cloud-workstations-images/predefined/code-oss:latest"
+    
+    env = {
+      "VERTEX_ENDPOINT" = "projects/${var.project_id}/locations/${var.region}/endpoints/agent-core"
+      "GCP_PROJECT_ID"  = var.project_id
+      "JUPYTER_PORT"    = "8888"
+    }
+  }
+
+  labels = {
+    environment = var.env
+    managed_by  = "terraform"
+    project     = "ai-orchestra"
+  }
+
+  depends_on = [
+    google_workstations_workstation_cluster.ai_orchestra_cluster,
+    google_service_account.vertex_ai_sa
+  ]
+}
+
+# Cloud Workstation instances
+resource "google_workstations_workstation" "ai_orchestra_workstations" {
+  provider               = google-beta
+  count                  = 1
+  workstation_id         = "ai-orchestra-workstation-${var.env}-${count.index + 1}"
+  workstation_config_id  = google_workstations_workstation_config.ai_orchestra_config.workstation_config_id
+  workstation_cluster_id = google_workstations_workstation_cluster.ai_orchestra_cluster.workstation_cluster_id
+  location               = var.region
+  project                = var.project_id
+
+  # Labels for resource management
+  labels = {
+    environment = var.env
+    managed_by  = "terraform"
+    project     = "ai-orchestra"
+    instance    = "workstation-${count.index + 1}"
+  }
+
+  depends_on = [
+    google_workstations_workstation_config.ai_orchestra_config
+  ]
 }
 
 # Outputs
 output "cloud_run_url" {
-  value       = google_cloud_run_service.ai_orchestra.status[0].url
   description = "The URL of the deployed Cloud Run service"
+  value       = google_cloud_run_v2_service.orchestra_api.uri
 }
 
-output "firestore_database" {
-  value       = google_firestore_database.database.name
-  description = "The name of the Firestore database"
+output "workload_identity_provider" {
+  description = "The Workload Identity Provider for GitHub Actions"
+  value       = "projects/${var.project_id}/locations/global/workloadIdentityPools/${google_iam_workload_identity_pool.github_pool.workload_identity_pool_id}/providers/${google_iam_workload_identity_pool_provider.github_provider.workload_identity_pool_provider_id}"
 }
 
-output "assets_bucket" {
-  value       = google_storage_bucket.assets.name
-  description = "The name of the assets bucket"
+output "vertex_ai_service_account" {
+  description = "The email of the Vertex AI service account"
+  value       = google_service_account.vertex_ai_sa.email
 }
 
-output "backups_bucket" {
-  value       = google_storage_bucket.backups.name
-  description = "The name of the backups bucket"
+output "gemini_service_account" {
+  description = "The email of the Gemini service account"
+  value       = google_service_account.gemini_sa.email
 }
 
-output "pubsub_topic" {
-  value       = google_pubsub_topic.ai_orchestra_events.name
-  description = "The name of the Pub/Sub topic"
+output "model_artifacts_bucket" {
+  description = "The name of the model artifacts bucket"
+  value       = google_storage_bucket.model_artifacts.name
+}
+
+output "data_sync_bucket" {
+  description = "The name of the data sync bucket"
+  value       = google_storage_bucket.data_sync.name
+}
+
+output "workstation_url" {
+  description = "The URL of the Cloud Workstation"
+  value       = "https://${var.region}.workstations.cloud.google.com/${var.project_id}/${var.region}/${google_workstations_workstation_cluster.ai_orchestra_cluster.workstation_cluster_id}/${google_workstations_workstation_config.ai_orchestra_config.workstation_config_id}/${google_workstations_workstation.ai_orchestra_workstations[0].workstation_id}"
 }

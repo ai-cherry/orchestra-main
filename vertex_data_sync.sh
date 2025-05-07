@@ -16,7 +16,7 @@
 set -e
 
 # Default configuration
-BUCKET="${BUCKET:-agi-baby-cherry-migration}"
+BUCKET="${BUCKET:-cherry-ai-project-migration}"
 LOCAL_DIR="/home/jupyter"
 REMOTE_DIR="migrations/$(date +%Y%m%d)"
 LATEST_SYMLINK="migrations/latest"

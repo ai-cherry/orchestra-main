@@ -14,13 +14,13 @@ variable "project_id" {
 variable "region" {
   description = "GCP Region"
   type        = string
-  default     = "us-central1"
+  default     = "us-west4"
 }
 
 variable "zone" {
   description = "GCP Zone"
   type        = string
-  default     = "us-central1-a"
+  default     = "us-west4-a"
 }
 
 variable "workbench_name" {
@@ -38,7 +38,7 @@ variable "machine_type" {
 variable "bucket_name" {
   description = "GCS bucket name for migrations"
   type        = string
-  default     = "agi-baby-cherry-migration"
+  default     = "cherry-ai-project-migration"
 }
 
 # Vertex AI Workbench instance

@@ -2,7 +2,7 @@
 
 # Migration Script: Codespaces to Google Cloud Workstations and Vertex AI Workbench
 # Project: orchestra-main
-# Target Project ID: agi-baby-cherry
+# Target Project ID: cherry-ai-project
 
 echo "Starting migration process for orchestra-main to Google Cloud Workstations and Vertex AI Workbench..."
 
@@ -13,26 +13,26 @@ bash scripts/setup_gcloud_sdk.sh
 # Step 1: Preparation and Authentication
 echo "Step 1: Authenticating with Google Cloud SDK..."
 gcloud auth login
-gcloud config set project agi-baby-cherry
+gcloud config set project cherry-ai-project
 # Replace /path/to/service-account-key.json with the actual path to your key file
-gcloud auth activate-service-account vertex-agent@agi-baby-cherry.iam.gserviceaccount.com --key-file=/path/to/service-account-key.json
+gcloud auth activate-service-account vertex-agent@cherry-ai-project.iam.gserviceaccount.com --key-file=/path/to/service-account-key.json
 export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account-key.json
 
 # Step 2: Copy Source Code and Config Files to GCS Bucket
 echo "Step 2: Creating GCS Bucket and syncing project files..."
-gsutil mb -p agi-baby-cherry gs://agi-baby-cherry-codespaces-migration || echo "Bucket already exists"
-gsutil -m cp -r /workspaces/orchestra-main/* gs://agi-baby-cherry-codespaces-migration/
-gsutil ls -r gs://agi-baby-cherry-codespaces-migration/ | head -n 20 && echo "... (output truncated, check full list if needed)"
+gsutil mb -p cherry-ai-project gs://cherry-ai-project-codespaces-migration || echo "Bucket already exists"
+gsutil -m cp -r /workspaces/orchestra-main/* gs://cherry-ai-project-codespaces-migration/
+gsutil ls -r gs://cherry-ai-project-codespaces-migration/ | head -n 20 && echo "... (output truncated, check full list if needed)"
 
 # Step 3: Set Up Google Cloud Workstations
 echo "Step 3: Setting up Google Cloud Workstations..."
-gcloud workstations clusters create orchestra-cluster --region=us-central1 --project=agi-baby-cherry || echo "Cluster already exists or setup failed, proceeding..."
-gcloud workstations configs create orchestra-config --cluster=orchestra-cluster --region=us-central1 --machine-type=e2-standard-4 --project=agi-baby-cherry || echo "Config already exists or setup failed, proceeding..."
-gcloud workstations start orchestra-workstation --config=orchestra-config --cluster=orchestra-cluster --region=us-central1 --project=agi-baby-cherry || echo "Workstation start failed, check status manually"
+gcloud workstations clusters create orchestra-cluster --region=us-west4 --project=cherry-ai-project || echo "Cluster already exists or setup failed, proceeding..."
+gcloud workstations configs create orchestra-config --cluster=orchestra-cluster --region=us-west4 --machine-type=e2-standard-4 --project=cherry-ai-project || echo "Config already exists or setup failed, proceeding..."
+gcloud workstations start orchestra-workstation --config=orchestra-config --cluster=orchestra-cluster --region=us-west4 --project=cherry-ai-project || echo "Workstation start failed, check status manually"
 
 # Step 4: Set Up Vertex AI Workbench
 echo "Step 4: Setting up Vertex AI Workbench..."
-gcloud notebooks instances create orchestra-notebook --vm-image-project=deeplearning-platform-release --vm-image-family=tf-2-11-cu113-notebooks --machine-type=n1-standard-4 --location=us-central1-a --project=agi-baby-cherry || echo "Notebook creation failed, check status manually"
+gcloud notebooks instances create orchestra-notebook --vm-image-project=deeplearning-platform-release --vm-image-family=tf-2-11-cu113-notebooks --machine-type=n1-standard-4 --location=us-west4-a --project=cherry-ai-project || echo "Notebook creation failed, check status manually"
 
 # Step 5: Instructions for Manual Setup of Tools and Extensions
 echo "Step 5: Manual setup required for tools and extensions in Workstations and Workbench."
@@ -49,7 +49,7 @@ echo "    Open VS Code, go to Extensions view, install 'Cloud Code', 'Gemini Cod
 # Step 6: Clone Project Files from GCS to New Environments
 echo "Step 6: Instructions for downloading project files from GCS to new environments."
 echo "  - In both Workstation and Workbench, run:"
-echo "    gsutil -m cp -r gs://agi-baby-cherry-codespaces-migration/* /workspaces/orchestra-main/"
+echo "    gsutil -m cp -r gs://cherry-ai-project-codespaces-migration/* /workspaces/orchestra-main/"
 echo "  - Verify project structure:"
 echo "    ls -laR /workspaces/orchestra-main/ | head -n 20 && echo '... (output truncated)'"
 

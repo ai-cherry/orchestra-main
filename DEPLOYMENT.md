@@ -9,7 +9,7 @@ Before deploying, ensure you have the following:
 1. Google Cloud SDK installed and configured
 2. Docker installed for building container images
 3. Terraform installed (if using the Terraform deployment method)
-4. Access to the Google Cloud project: `agi-baby-cherry`
+4. Access to the Google Cloud project: `cherry-ai-project`
 5. Proper authentication set up for GCP
 6. All required API keys and credentials in your `.env` file
 
@@ -112,7 +112,7 @@ If you encounter issues during deployment:
 
 1. **Authentication Issues**:
    - Run `gcloud auth login` to authenticate
-   - Check project access with `gcloud projects describe agi-baby-cherry`
+   - Check project access with `gcloud projects describe cherry-ai-project`
 
 2. **API Issues**:
    - Manually enable APIs in the GCP Console

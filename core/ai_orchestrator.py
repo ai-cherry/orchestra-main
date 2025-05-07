@@ -16,17 +16,17 @@ class AIOrchestrator:
         try:
             # First try Gemini with full codebase context
             return self.gemini.generate_content(
-                f"Consider current GCP project agi-baby-cherry: {prompt}"
+                f"Consider current GCP project cherry-ai-project: {prompt}"
             ).text
         except Exception:
             # Fallback to Vertex AI
             return self.vertex_llm.predict(
-                endpoint="projects/agi-baby-cherry/locations/us-central1/endpoints/gemini-pro",
+                endpoint="projects/cherry-ai-project/locations/us-west4/endpoints/gemini-pro",
                 instances=[{"content": prompt}]
             ).predictions[0]
     
     def _get_gcp_secret(self, name):
         client = secretmanager.SecretManagerServiceClient()
         return client.access_secret_version(
-            name=f"projects/agi-baby-cherry/secrets/{name}/versions/latest"
+            name=f"projects/cherry-ai-project/secrets/{name}/versions/latest"
         ).payload.data.decode('UTF-8')

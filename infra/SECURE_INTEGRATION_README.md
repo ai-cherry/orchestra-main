@@ -36,7 +36,7 @@ Three Terraform configurations are provided:
 2. Run the secret initialization script to securely store new credentials:
 
 ```bash
-./infra/initialize_secure_secrets.sh agi-baby-cherry
+./infra/initialize_secure_secrets.sh cherry-ai-project
 ```
 
 This script will:
@@ -124,10 +124,10 @@ If the notebook can't access secrets:
 
 ```bash
 # Check service account has secretAccessor role
-gcloud projects get-iam-policy agi-baby-cherry \
+gcloud projects get-iam-policy cherry-ai-project \
   --flatten="bindings[].members" \
   --format="table(bindings.role)" \
-  --filter="bindings.members:figma-vertex-integration@agi-baby-cherry.iam.gserviceaccount.com"
+  --filter="bindings.members:figma-vertex-integration@cherry-ai-project.iam.gserviceaccount.com"
 ```
 
 ### Figma API Issues
@@ -145,13 +145,13 @@ If you encounter Figma API errors:
 ```bash
 # Create a new secret
 echo -n "NEW_SECRET_VALUE" | gcloud secrets create new-secret-name \
-  --data-file=- --project=agi-baby-cherry
+  --data-file=- --project=cherry-ai-project
 
 # Grant the service account access
 gcloud secrets add-iam-policy-binding new-secret-name \
-  --member="serviceAccount:figma-vertex-integration@agi-baby-cherry.iam.gserviceaccount.com" \
+  --member="serviceAccount:figma-vertex-integration@cherry-ai-project.iam.gserviceaccount.com" \
   --role="roles/secretmanager.secretAccessor" \
-  --project=agi-baby-cherry
+  --project=cherry-ai-project
 ```
 
 ### Updating the Integration Code

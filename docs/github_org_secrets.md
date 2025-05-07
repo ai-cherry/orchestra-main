@@ -8,12 +8,12 @@ These secrets are used by GitHub Actions workflows to deploy the application to 
 
 | Secret Name | Description | Example Value |
 |-------------|-------------|---------------|
-| `ORG_GCP_PROJECT_ID` | Google Cloud Platform Project ID | `agi-baby-cherry` |
-| `ORG_GCP_CREDENTIALS` | GCP Service Account Key JSON | `{"type":"service_account","project_id":"agi-baby-cherry",...}` |
-| `ORG_GCP_REGION` | GCP Region for deployment | `us-central1` |
+| `ORG_GCP_PROJECT_ID` | Google Cloud Platform Project ID | `cherry-ai-project` |
+| `ORG_GCP_CREDENTIALS` | GCP Service Account Key JSON | `{"type":"service_account","project_id":"cherry-ai-project",...}` |
+| `ORG_GCP_REGION` | GCP Region for deployment | `us-west4` |
 | `ORG_GKE_CLUSTER_PROD` | GKE Cluster name for production | `autopilot-cluster-1` |
 | `ORG_GKE_CLUSTER_STAGING` | GKE Cluster name for staging | `autopilot-cluster-1` |
-| `ORG_REDIS_HOST` | Redis instance hostname | `redis-12345.c12345.us-central1-1.gcp.cloud.redislabs.com` |
+| `ORG_REDIS_HOST` | Redis instance hostname | `redis-12345.c12345.us-west4-1.gcp.cloud.redislabs.com` |
 | `ORG_REDIS_PORT` | Redis instance port | `6379` |
 | `ORG_REDIS_PASSWORD` | Redis instance password | `your-redis-password` |
 | `DOCKERHUB_USERNAME` | Docker Hub username for storing images | `your-dockerhub-username` |

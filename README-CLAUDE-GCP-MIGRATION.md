@@ -1,6 +1,6 @@
 # GCP Migration & Claude Code Integration Suite
 
-This suite provides a comprehensive solution for migrating the `agi-baby-cherry` GCP project to organization `873291114285` and setting up a hybrid IDE environment, with full Claude Code integration for AI-assisted management.
+This suite provides a comprehensive solution for migrating the `cherry-ai-project` GCP project to organization `873291114285` and setting up a hybrid IDE environment, with full Claude Code integration for AI-assisted management.
 
 ## Components
 
@@ -54,16 +54,16 @@ After running the migration script, verify success with:
 
 ```bash
 # Check organization membership
-gcloud projects describe agi-baby-cherry --format="value(parent.id)"
+gcloud projects describe cherry-ai-project --format="value(parent.id)"
 # Expected: 873291114285
 
 # Check workstation deployment
-gcloud workstations list --project=agi-baby-cherry
+gcloud workstations list --project=cherry-ai-project
 
 # Verify GPU configuration
 gcloud workstations configs describe ai-dev-config \
   --cluster=ai-development \
-  --region=us-central1 \
+  --region=us-west4 \
   --format="json" | jq '.host.gceInstance.accelerators'
 ```
 

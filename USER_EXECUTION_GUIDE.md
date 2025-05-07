@@ -14,7 +14,7 @@ For user `scoobyjava@cherry-ai.me`:
 
 ```bash
 # Grant owner permission on the project
-gcloud projects add-iam-policy-binding agi-baby-cherry \
+gcloud projects add-iam-policy-binding cherry-ai-project \
   --member="user:scoobyjava@cherry-ai.me" \
   --role="roles/owner"
 
@@ -27,7 +27,7 @@ gcloud organizations add-iam-policy-binding 873291114285 \
 ### 2. Configure Default Project
 
 ```bash
-gcloud config set project agi-baby-cherry
+gcloud config set project cherry-ai-project
 ```
 
 ## Migration Execution
@@ -36,7 +36,7 @@ gcloud config set project agi-baby-cherry
 
 ```bash
 # Execute the simple migration command
-gcloud beta projects move agi-baby-cherry --organization 873291114285
+gcloud beta projects move cherry-ai-project --organization 873291114285
 ```
 
 ### Option 2: Use Our Zero-Bullshit Force Migration Script
@@ -55,7 +55,7 @@ After migration, verify success:
 
 ```bash
 # Verify project is in the correct organization
-gcloud projects describe agi-baby-cherry
+gcloud projects describe cherry-ai-project
 
 # The output should show: parent: organizations/873291114285
 ```
@@ -66,7 +66,7 @@ gcloud projects describe agi-baby-cherry
 
 ```bash
 # Link to appropriate billing account
-gcloud beta billing projects link agi-baby-cherry \
+gcloud beta billing projects link cherry-ai-project \
   --billing-account=$(gcloud beta billing accounts list --format="value(name)")
 ```
 
@@ -86,21 +86,21 @@ gcloud iam service-accounts create org-master-sa \
 
 # 2. Grant it organization-level permissions
 gcloud organizations add-iam-policy-binding 873291114285 \
-  --member="serviceAccount:org-master-sa@agi-baby-cherry.iam.gserviceaccount.com" \
+  --member="serviceAccount:org-master-sa@cherry-ai-project.iam.gserviceaccount.com" \
   --role="roles/resourcemanager.organizationAdmin"
 
 # 3. Grant additional needed roles (examples)
 gcloud organizations add-iam-policy-binding 873291114285 \
-  --member="serviceAccount:org-master-sa@agi-baby-cherry.iam.gserviceaccount.com" \
+  --member="serviceAccount:org-master-sa@cherry-ai-project.iam.gserviceaccount.com" \
   --role="roles/billing.admin"
 
 gcloud organizations add-iam-policy-binding 873291114285 \
-  --member="serviceAccount:org-master-sa@agi-baby-cherry.iam.gserviceaccount.com" \
+  --member="serviceAccount:org-master-sa@cherry-ai-project.iam.gserviceaccount.com" \
   --role="roles/iam.securityAdmin"
 
 # 4. Create a key for this service account
 gcloud iam service-accounts keys create org-master-key.json \
-  --iam-account=org-master-sa@agi-baby-cherry.iam.gserviceaccount.com
+  --iam-account=org-master-sa@cherry-ai-project.iam.gserviceaccount.com
 ```
 
 ### Using the Master Service Account
@@ -122,9 +122,9 @@ If the migration fails with permission errors:
 echo "Waiting for IAM propagation..." && sleep 300
 
 # Retry with force option
-gcloud beta projects move agi-baby-cherry \
+gcloud beta projects move cherry-ai-project \
   --organization=873291114285 \
-  --billing-project=agi-baby-cherry \
+  --billing-project=cherry-ai-project \
   --quiet
 ```
 
@@ -132,7 +132,7 @@ If billing errors occur:
 
 ```bash
 # Fix billing project linkage
-gcloud beta billing projects link agi-baby-cherry \
+gcloud beta billing projects link cherry-ai-project \
   --billing-account=$(gcloud beta billing accounts list --format="value(name)")
 ```
 

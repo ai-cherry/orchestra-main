@@ -1,6 +1,6 @@
 # GCP Migration Nuclear Verification Suite
 
-This repository contains a "Zero Bullshit" approach to verifying the successful migration of the `agi-baby-cherry` project to organization `873291114285`, with specific focus on confirming Vertex workstations with NVIDIA T4 GPUs and Redis/AlloyDB connections are established.
+This repository contains a "Zero Bullshit" approach to verifying the successful migration of the `cherry-ai-project` project to organization `873291114285`, with specific focus on confirming Vertex workstations with NVIDIA T4 GPUs and Redis/AlloyDB connections are established.
 
 ## Verification Scripts
 
@@ -71,16 +71,16 @@ chmod +x prove_migration.sh
 
 The verification suite validates three critical components:
 
-1. **Organization Migration**: Confirms `agi-baby-cherry` is in organization `873291114285`
-2. **GPU Configuration**: Verifies 2x NVIDIA T4 GPUs are active in us-central1
+1. **Organization Migration**: Confirms `cherry-ai-project` is in organization `873291114285`
+2. **GPU Configuration**: Verifies 2x NVIDIA T4 GPUs are active in us-west4
 3. **Database Connections**: Validates Redis and AlloyDB are properly connected
 
 A successful verification shows:
 
 ```
 ===== CRITICAL VERIFICATION RESULTS: =====
-✅ Project agi-baby-cherry in organization 873291114285
-✅ 2x NVIDIA T4 GPUs active in us-central1
+✅ Project cherry-ai-project in organization 873291114285
+✅ 2x NVIDIA T4 GPUs active in us-west4
 ✅ Redis/AlloyDB connections established
 ```
 

@@ -5,7 +5,7 @@
 timeout: 3600s  # 1 hour
 
 substitutions:
-  _BUCKET: "agi-baby-cherry-migration"
+  _BUCKET: "cherry-ai-project-migration"
   _ENVIRONMENT: "dev"
   _DIRECTION: "push"
   _NOTIFICATION_EMAIL: ""
@@ -159,7 +159,7 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'us-central1-docker.pkg.dev/cherry-ai.me/orchestra/data-sync:$_ENV'
+      - 'us-central1-docker.pkg.dev/cherry-ai-project/orchestra/data-sync:$_ENV'
       - '-f'
       - 'Dockerfile.data-sync'
       - '.'
@@ -167,7 +167,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'us-central1-docker.pkg.dev/cherry-ai.me/orchestra/data-sync:$_ENV'
+      - 'us-central1-docker.pkg.dev/cherry-ai-project/orchestra/data-sync:$_ENV'
 
   # Step 8: Deploy to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -176,7 +176,7 @@ steps:
       - '-c'
       - |
         gcloud run deploy data-sync \
-          --image=us-docker.pkg.dev/cherry-ai-project/orchestra/data-sync:latest \
+          --image=us-central1-docker.pkg.dev/cherry-ai-project/orchestra/data-sync:latest \
           --region=us-central1 \
           --platform=managed \
           --service-account=vertex-agent@cherry-ai-project.iam.gserviceaccount.com
@@ -187,8 +187,8 @@ steps:
       - '-m'
       - 'rsync'
       - '-r'
-      - 'gs://cherry-ai-me-model-artifacts/data/'
-      - 'gs://cherry-ai-me-model-artifacts-$_ENV/data/'
+      - 'gs://cherry-ai-project-model-artifacts/data/'
+      - 'gs://cherry-ai-project-model-artifacts-$_ENV/data/'
 
   # Step 10: Deploy updated data sync service
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -199,19 +199,19 @@ steps:
       - 'create'
       - 'orchestra-data-sync-$_ENV'
       - '--image'
-      - 'us-central1-docker.pkg.dev/cherry-ai.me/orchestra/data-sync:$_ENV'
+      - 'us-central1-docker.pkg.dev/cherry-ai-project/orchestra/data-sync:$_ENV'
       - '--region'
       - '$_REGION'
       - '--service-account'
-      - 'vertex-agent@cherry-ai.me.iam.gserviceaccount.com'
+      - 'vertex-agent@cherry-ai-project.iam.gserviceaccount.com'
       - '--project'
-      - 'cherry-ai.me'
+      - 'cherry-ai-project'
 
 options:
   logging: CLOUD_LOGGING_ONLY
   machineType: 'E2_HIGHCPU_8'
 
-serviceAccount: 'projects/525398941159/serviceAccounts/vertex-agent@cherry-ai.me.iam.gserviceaccount.com'
+serviceAccount: 'projects/525398941159/serviceAccounts/vertex-agent@cherry-ai-project.iam.gserviceaccount.com'
 
 artifacts:
   objects:
@@ -219,4 +219,4 @@ artifacts:
     paths: ['data-sync-results.json']
 
 images:
-- 'us-central1-docker.pkg.dev/cherry-ai.me/orchestra/data-sync:$_ENV'
+- 'us-central1-docker.pkg.dev/cherry-ai-project/orchestra/data-sync:$_ENV'

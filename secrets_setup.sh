@@ -12,7 +12,7 @@ NC='\033[0m' # No Color
 BOLD='\033[1m'
 
 # Default values
-PROJECT_ID="agi-baby-cherry"
+PROJECT_ID="cherry-ai-project"
 SECRET_NAME="PORTKEY_API_KEY"
 SECRET_FILE="portkey.key"
 SERVICE_ACCOUNT="vertex-agent@${PROJECT_ID}.iam.gserviceaccount.com"

@@ -39,7 +39,7 @@ resource "google_redis_instance" "cache" {
 **Resource:** google_storage_bucket.terraform_state
 ```terraform
 resource "google_storage_bucket" "terraform_state" {
-  name          = "agi-baby-cherry-terraform-state"
+  name          = "cherry-ai-project-terraform-state"
   location      = var.region
   force_destroy = false
   storage_class = "STANDARD"

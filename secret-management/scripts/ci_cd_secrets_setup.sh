@@ -22,7 +22,7 @@ check_tool jq
 
 # Parse arguments
 ENVIRONMENT=${1:-production}
-GCP_PROJECT_ID=${2:-"agi-baby-cherry"}
+GCP_PROJECT_ID=${2:-"cherry-ai-project"}
 
 echo "Setting up secrets for $ENVIRONMENT environment in project $GCP_PROJECT_ID"
 
@@ -75,7 +75,7 @@ EOF
 # Example: Save service account key if available in CI/CD environment variables
 if [ -n "$SERVICE_ACCOUNT_KEY" ]; then
     echo "Setting up service account key secret..."
-    "$SCRIPT_DIR/create_secret.sh" "SERVICE_ACCOUNT_KEY" "$SERVICE_ACCOUNT_KEY" "$GCP_PROJECT_ID" "user-managed" "$ENVIRONMENT" "us-central1,us-west1"
+    "$SCRIPT_DIR/create_secret.sh" "SERVICE_ACCOUNT_KEY" "$SERVICE_ACCOUNT_KEY" "$GCP_PROJECT_ID" "user-managed" "$ENVIRONMENT" "us-west4,us-west1"
 fi
 
 # Example: Save other CI/CD secrets from environment variables

@@ -36,7 +36,7 @@ except ImportError:
     from google.protobuf import timestamp_pb2
 
 # Constants
-DEFAULT_PROJECT_ID = "agi-baby-cherry"
+DEFAULT_PROJECT_ID = "cherry-ai-project"
 METRIC_DOMAIN = "custom.googleapis.com"
 METRIC_TYPES = {
     "cpu_percent": "ide_stress/cpu_usage",

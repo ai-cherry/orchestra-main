@@ -28,7 +28,7 @@ Before beginning the migration, ensure you have:
   - Installation: Use your system's package manager (apt, yum, homebrew, etc.)
 
 ### Required Files
-- **Service account key file** for `vertex-agent@agi-baby-cherry.iam.gserviceaccount.com`
+- **Service account key file** for `vertex-agent@cherry-ai-project.iam.gserviceaccount.com`
 - **Terraform configuration files**:
   - `hybrid_workstation_config.tf` - Main Terraform configuration for Cloud Workstations
   - `terraform.tfvars` - Variables file with project-specific values
@@ -36,7 +36,7 @@ Before beginning the migration, ensure you have:
 ## Required Permissions & Quota
 
 ### IAM Permissions
-- **Source Project (agi-baby-cherry):**
+- **Source Project (cherry-ai-project):**
   - Project Owner or Editor role
   - Service Account Admin role
   - Security Admin role
@@ -47,7 +47,7 @@ Before beginning the migration, ensure you have:
   - Folder Admin role (if using folders)
 
 ### Resource Quota Requirements
-- **GPU Quota** in us-central1 region:
+- **GPU Quota** in us-west4 region:
   - 2x NVIDIA Tesla T4 GPUs per workstation (total: 6 GPUs for 3 workstations)
   
 - **Compute Engine Quota:**
@@ -72,10 +72,10 @@ Before beginning the migration, ensure you have:
 gcloud auth login
 
 # OR service account authentication
-gcloud auth activate-service-account vertex-agent@agi-baby-cherry.iam.gserviceaccount.com --key-file=/path/to/key.json
+gcloud auth activate-service-account vertex-agent@cherry-ai-project.iam.gserviceaccount.com --key-file=/path/to/key.json
 
 # Set current project
-gcloud config set project agi-baby-cherry
+gcloud config set project cherry-ai-project
 ```
 
 ### 2. Enable Required APIs
@@ -97,10 +97,10 @@ gcloud services enable \
 ### 3. Project Migration
 ```bash
 # Verify current project details
-gcloud projects describe agi-baby-cherry --format=json
+gcloud projects describe cherry-ai-project --format=json
 
 # Perform the migration
-gcloud projects move agi-baby-cherry --organization=8732-9111-4285
+gcloud projects move cherry-ai-project --organization=8732-9111-4285
 ```
 
 ### 4. Memory Layer Setup
@@ -108,7 +108,7 @@ gcloud projects move agi-baby-cherry --organization=8732-9111-4285
 # Create Redis instance
 gcloud redis instances create agent-memory \
   --size=10 \
-  --region=us-central1 \
+  --region=us-west4 \
   --tier=standard \
   --redis-version=redis_6_x \
   --connect-mode=private-service-access \
@@ -117,14 +117,14 @@ gcloud redis instances create agent-memory \
 # Create AlloyDB cluster
 gcloud alloydb clusters create agi-baby-cluster \
   --password=SECURE_PASSWORD_HERE \
-  --region=us-central1 \
+  --region=us-west4 \
   --network=default
 
 # Create AlloyDB instance
 gcloud alloydb instances create alloydb-instance \
   --instance-type=PRIMARY \
   --cpu-count=8 \
-  --region=us-central1 \
+  --region=us-west4 \
   --cluster=agi-baby-cluster \
   --machine-config=n2-standard-8 \
   --database=agi_baby_cherry \
@@ -135,15 +135,15 @@ gcloud alloydb instances create alloydb-instance \
 ```bash
 # Create terraform.tfvars file
 cat > terraform.tfvars << EOF
-project_id = "agi-baby-cherry"
+project_id = "cherry-ai-project"
 project_number = "104944497835"
-region = "us-central1"
-zone = "us-central1-a"
+region = "us-west4"
+zone = "us-west4-a"
 env = "prod"
-service_account_email = "vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"
+service_account_email = "vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
 admin_email = "scoobyjava@cherry-ai.me"
 gemini_api_key = "AIzaSyA0rewcfUHo87WMEz4a8Og1eAWTslxlgEE"
-gcs_bucket = "gs://agi-baby-cherry-bucket/repos"
+gcs_bucket = "gs://cherry-ai-project-bucket/repos"
 EOF
 
 # Initialize and apply Terraform configuration
@@ -158,19 +158,19 @@ After each major step, verify success before moving forward:
 
 ### 1. Project Organization Verification
 ```bash
-gcloud projects describe agi-baby-cherry --format=json | grep -A 2 parent
+gcloud projects describe cherry-ai-project --format=json | grep -A 2 parent
 ```
 Expected output should show: `"parent": { "type": "organization", "id": "8732-9111-4285" }`
 
 ### 2. Redis Instance Verification
 ```bash
-gcloud redis instances describe agent-memory --region=us-central1 --format=json
+gcloud redis instances describe agent-memory --region=us-west4 --format=json
 ```
 Verify status is "READY" and the configured size is 10GB
 
 ### 3. AlloyDB Verification
 ```bash
-gcloud alloydb instances list --cluster=agi-baby-cluster --region=us-central1 --format=json
+gcloud alloydb instances list --cluster=agi-baby-cluster --region=us-west4 --format=json
 ```
 Verify instance type is "PRIMARY" and state is "READY"
 
@@ -227,7 +227,7 @@ Complete this checklist before attempting the migration:
 
 - [ ] **Access Verification**
   - [ ] Confirmed Organization Admin access to cherry-ai (ID: 8732-9111-4285)
-  - [ ] Confirmed Project Owner access to agi-baby-cherry (ID: 104944497835)
+  - [ ] Confirmed Project Owner access to cherry-ai-project (ID: 104944497835)
   - [ ] Verified service account permissions
   
 - [ ] **Resource Verification**

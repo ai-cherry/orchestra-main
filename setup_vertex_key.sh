@@ -61,8 +61,8 @@ else
 fi
 
 # Set project
-echo -e "${YELLOW}Setting GCP project to agi-baby-cherry...${NC}"
-gcloud config set project agi-baby-cherry
+echo -e "${YELLOW}Setting GCP project to cherry-ai-project...${NC}"
+gcloud config set project cherry-ai-project
 
 # Create service account key
 echo -e "${YELLOW}Setting up Vertex Agent service account key...${NC}"
@@ -76,7 +76,7 @@ if [ "$key_option" == "1" ]; then
   echo -e "${YELLOW}Creating new service account key for vertex-agent...${NC}"
   
   # Check if service account exists
-  sa_exists=$(gcloud iam service-accounts list --filter="email:vertex-agent@agi-baby-cherry.iam.gserviceaccount.com" --format="value(email)" 2>/dev/null || echo "")
+  sa_exists=$(gcloud iam service-accounts list --filter="email:vertex-agent@cherry-ai-project.iam.gserviceaccount.com" --format="value(email)" 2>/dev/null || echo "")
   
   if [ -z "$sa_exists" ]; then
     echo -e "${YELLOW}Service account does not exist. Creating it now...${NC}"
@@ -97,8 +97,8 @@ if [ "$key_option" == "1" ]; then
     )
     
     for role in "${roles[@]}"; do
-      gcloud projects add-iam-policy-binding agi-baby-cherry \
-        --member="serviceAccount:vertex-agent@agi-baby-cherry.iam.gserviceaccount.com" \
+      gcloud projects add-iam-policy-binding cherry-ai-project \
+        --member="serviceAccount:vertex-agent@cherry-ai-project.iam.gserviceaccount.com" \
         --role="$role"
     done
   else
@@ -107,7 +107,7 @@ if [ "$key_option" == "1" ]; then
   
   # Create key
   gcloud iam service-accounts keys create /tmp/credentials/vertex-agent-key.json \
-    --iam-account=vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
+    --iam-account=vertex-agent@cherry-ai-project.iam.gserviceaccount.com
   echo -e "${GREEN}New key created at /tmp/credentials/vertex-agent-key.json${NC}"
 else
   echo -e "${YELLOW}Please provide the path to your existing vertex-agent key file:${NC}"
@@ -140,7 +140,7 @@ cat << EOF >> ~/.bashrc
 # GCP Authentication for Orchestra
 export GOOGLE_APPLICATION_CREDENTIALS=/tmp/vertex-agent-key.json
 export GCP_SA_KEY_PATH=/tmp/vertex-agent-key.json
-export GCP_PROJECT_ID=agi-baby-cherry
+export GCP_PROJECT_ID=cherry-ai-project
 EOF
 
 # Test authentication

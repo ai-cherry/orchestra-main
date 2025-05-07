@@ -90,7 +90,7 @@ class VertexAgentManager:
             
         # Fall back to hardcoded project ID if all else fails
         if not self.project_id:
-            self.project_id = "agi-baby-cherry"
+            self.project_id = "cherry-ai-project"
             logger.warning(f"No project ID provided, falling back to default: {self.project_id}")
 
         # Set up authentication

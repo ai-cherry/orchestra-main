@@ -59,8 +59,8 @@ cd validation
 ./run_validation.sh [project-id] [environment] [service-name]
 
 # Examples:
-./run_validation.sh agi-baby-cherry dev orchestra-api
-./run_validation.sh agi-baby-cherry prod orchestra-api
+./run_validation.sh cherry-ai-project dev orchestra-api
+./run_validation.sh cherry-ai-project prod orchestra-api
 ```
 
 This will check:

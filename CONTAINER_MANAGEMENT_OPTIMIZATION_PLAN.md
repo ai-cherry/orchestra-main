@@ -4,7 +4,7 @@ This document outlines a comprehensive plan to stabilize and optimize container 
 
 ## 1. Project ID Standardization
 
-**Issue:** The codebase contains 277+ references to `agi-baby-cherry` which should be `cherry-ai-project`.
+**Issue:** The codebase contains 277+ references to `cherry-ai-project` which should be `cherry-ai-project`.
 
 **Solution:**
 1. Use the `update-project-id.sh` script to automatically update all references:

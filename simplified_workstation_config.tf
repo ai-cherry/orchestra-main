@@ -1,11 +1,11 @@
 # Simplified Terraform configuration for Cloud Workstations
-# Based on the verified implementation for the agi-baby-cherry project
+# Based on the verified implementation for the cherry-ai-project project
 
 # Variables
 variable "project_id" {
   description = "GCP project ID"
   type        = string
-  default     = "agi-baby-cherry"
+  default     = "cherry-ai-project"
 }
 
 variable "org_id" {
@@ -28,20 +28,20 @@ variable "gpu_count" {
 
 provider "google" {
   project = var.project_id
-  region  = "us-central1"
+  region  = "us-west4"
 }
 
 resource "google_workstations_workstation_cluster" "ai_cluster" {
   workstation_cluster_id = "ai-development"
   network                = "default"
   subnetwork             = "default"
-  location               = "us-central1"
+  location               = "us-west4"
 }
 
 resource "google_workstations_workstation_config" "ai_config" {
   workstation_config_id  = "ai-dev-config"
   workstation_cluster_id = google_workstations_workstation_cluster.ai_cluster.id
-  location               = "us-central1"
+  location               = "us-west4"
 
   host {
     gce_instance {
@@ -71,14 +71,14 @@ resource "google_workstations_workstation" "ai_workstations" {
   workstation_id         = "ai-workstation-${count.index + 1}"
   workstation_config_id  = google_workstations_workstation_config.ai_config.workstation_config_id
   workstation_cluster_id = google_workstations_workstation_cluster.ai_cluster.workstation_cluster_id
-  location               = "us-central1"
+  location               = "us-west4"
 }
 
 # Output workstation URLs
 output "workstation_urls" {
   value = [
     for ws in google_workstations_workstation.ai_workstations :
-    "https://us-central1.workstations.cloud.goog/${var.project_id}/us-central1/${ws.workstation_cluster_id}/${ws.workstation_config_id}/${ws.workstation_id}"
+    "https://us-west4.workstations.cloud.goog/${var.project_id}/us-west4/${ws.workstation_cluster_id}/${ws.workstation_config_id}/${ws.workstation_id}"
   ]
 }
 

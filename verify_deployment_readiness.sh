@@ -68,7 +68,7 @@ if [ -f /tmp/vertex-agent-key.json ]; then
   check_requirement "SA Key project" "python3 -c \"import json; print(json.load(open('/tmp/vertex-agent-key.json')).get('project_id'))\" > /dev/null 2>&1" "Service account key missing project_id field" || ((status++))
   
   # Check if the key is for the expected project
-  expected_project="agi-baby-cherry"
+  expected_project="cherry-ai-project"
   actual_project=$(python3 -c "import json; print(json.load(open('/tmp/vertex-agent-key.json')).get('project_id'))" 2>/dev/null || echo "unknown")
   check_requirement "SA Key project match" "[ \"$actual_project\" = \"$expected_project\" ]" "Service account key is for project '$actual_project', expected '$expected_project'" || ((status++))
 fi

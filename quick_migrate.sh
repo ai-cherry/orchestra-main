@@ -36,7 +36,7 @@ if [ ! -f "vertex-agent-key.json" ]; then
 fi
 
 echo -e "${BLUE}Authenticating with service account...${NC}"
-gcloud auth activate-service-account vertex-agent@agi-baby-cherry.iam.gserviceaccount.com \
+gcloud auth activate-service-account vertex-agent@cherry-ai-project.iam.gserviceaccount.com \
   --key-file=vertex-agent-key.json
 
 echo -e "${GREEN}Authentication successful!${NC}"
@@ -45,17 +45,17 @@ echo -e "${GREEN}Authentication successful!${NC}"
 echo -e "\n${YELLOW}Step 2: Essential Role Assignment${NC}"
 echo -e "${BLUE}Granting project migration capabilities...${NC}"
 gcloud organizations add-iam-policy-binding 873291114285 \
-  --member="serviceAccount:vertex-agent@agi-baby-cherry.iam.gserviceaccount.com" \
+  --member="serviceAccount:vertex-agent@cherry-ai-project.iam.gserviceaccount.com" \
   --role="roles/resourcemanager.projectMover"
 
 echo -e "${BLUE}Adding Vertex AI service agent permissions...${NC}"
-gcloud projects add-iam-policy-binding agi-baby-cherry \
-  --member="serviceAccount:vertex-agent@agi-baby-cherry.iam.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding cherry-ai-project \
+  --member="serviceAccount:vertex-agent@cherry-ai-project.iam.gserviceaccount.com" \
   --role="roles/aiplatform.serviceAgent"
 
 echo -e "${BLUE}Adding storage permissions for model artifacts...${NC}"
-gcloud projects add-iam-policy-binding agi-baby-cherry \
-  --member="serviceAccount:vertex-agent@agi-baby-cherry.iam.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding cherry-ai-project \
+  --member="serviceAccount:vertex-agent@cherry-ai-project.iam.gserviceaccount.com" \
   --role="roles/storage.admin"
 
 echo -e "${GREEN}Roles assigned successfully!${NC}"
@@ -65,12 +65,12 @@ sleep 30
 # Step 3: Project Migration
 echo -e "\n${YELLOW}Step 3: Project Migration${NC}"
 echo -e "${BLUE}Executing migration with numeric org ID...${NC}"
-gcloud beta projects move agi-baby-cherry \
+gcloud beta projects move cherry-ai-project \
   --organization=873291114285 \
-  --billing-project=agi-baby-cherry
+  --billing-project=cherry-ai-project
 
 echo -e "${BLUE}Verifying organization membership...${NC}"
-CURRENT_ORG=$(gcloud projects describe agi-baby-cherry --format="value(parent.id)")
+CURRENT_ORG=$(gcloud projects describe cherry-ai-project --format="value(parent.id)")
 if [ "$CURRENT_ORG" = "873291114285" ]; then
   echo -e "${GREEN}Migration Success! Project is now in organization 873291114285${NC}"
 else
@@ -92,7 +92,7 @@ else
   terraform init
   
   echo -e "${BLUE}Applying Terraform configuration...${NC}"
-  terraform apply -auto-approve -var="project_id=agi-baby-cherry" -var="org_id=873291114285"
+  terraform apply -auto-approve -var="project_id=cherry-ai-project" -var="org_id=873291114285"
   
   echo -e "${GREEN}Infrastructure deployed successfully!${NC}"
 fi
@@ -106,7 +106,7 @@ if [ -f "validate_migration_minimal.sh" ]; then
 else
   echo -e "${BLUE}Running basic validation checks...${NC}"
   # Verify organization membership
-  ORG_CHECK=$(gcloud projects describe agi-baby-cherry --format="value(parent.id)")
+  ORG_CHECK=$(gcloud projects describe cherry-ai-project --format="value(parent.id)")
   if [ "$ORG_CHECK" = "873291114285" ]; then
     echo -e "${GREEN}✅ Organization validation passed${NC}"
   else 
@@ -114,7 +114,7 @@ else
   fi
   
   # Check Vertex AI service agent
-  SVC_AGENT_CHECK=$(gcloud projects get-iam-policy agi-baby-cherry \
+  SVC_AGENT_CHECK=$(gcloud projects get-iam-policy cherry-ai-project \
     --flatten="bindings[].members" \
     --format="table(bindings.role)" | grep -i "aiplatform.serviceAgent" || echo "")
   if [ -n "$SVC_AGENT_CHECK" ]; then

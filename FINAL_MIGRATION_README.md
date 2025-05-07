@@ -1,16 +1,16 @@
 # GCP Migration Toolkit
 
-This repository contains everything needed to move the `agi-baby-cherry` project to organization `873291114285` and configure workstations with n2d-standard-32 machines and 2x NVIDIA T4 GPUs.
+This repository contains everything needed to move the `cherry-ai-project` project to organization `873291114285` and configure workstations with n2d-standard-32 machines and 2x NVIDIA T4 GPUs.
 
 ## Quick Decision Tree
 
 1. **Direct Command Approach**
    ```bash
    # Execute single command migration
-   gcloud beta projects move agi-baby-cherry --organization=873291114285
+   gcloud beta projects move cherry-ai-project --organization=873291114285
    
    # Verify success
-   gcloud projects describe agi-baby-cherry --format="value(parent.id)"
+   gcloud projects describe cherry-ai-project --format="value(parent.id)"
    # Expected output: organizations/873291114285
    ```
 
@@ -39,7 +39,7 @@ Install Gemini Code Assist extension in VS Code/Codespaces, then use these files
 
 1. **Generate Migration Script**
    - Open `gemini_migration_script.js`
-   - Use prompt: `/generate migration script that moves agi-baby-cherry to organization 873291114285`
+   - Use prompt: `/generate migration script that moves cherry-ai-project to organization 873291114285`
 
 2. **Fix Workstation Configuration**
    - Open `gemini_workstation_upgrade.js`
@@ -47,7 +47,7 @@ Install Gemini Code Assist extension in VS Code/Codespaces, then use these files
 
 3. **Generate Terraform for Infrastructure**
    - Open `gemini_terraform_workstation.js`
-   - Use prompt: `/generate terraform to deploy n2d-standard-32 with T4 GPUs for project agi-baby-cherry`
+   - Use prompt: `/generate terraform to deploy n2d-standard-32 with T4 GPUs for project cherry-ai-project`
 
 ## Documentation
 
@@ -65,7 +65,7 @@ If all automated approaches fail, follow these minimal manual steps:
 
 ```bash
 # Set correct permissions
-gcloud projects add-iam-policy-binding agi-baby-cherry \
+gcloud projects add-iam-policy-binding cherry-ai-project \
   --member="user:YOUR_EMAIL" \
   --role="roles/owner"
 
@@ -77,10 +77,10 @@ gcloud organizations add-iam-policy-binding 873291114285 \
 sleep 300  # 5 minutes
 
 # Execute migration
-gcloud beta projects move agi-baby-cherry --organization=873291114285
+gcloud beta projects move cherry-ai-project --organization=873291114285
 
 # Verify migration success
-gcloud projects describe agi-baby-cherry --format="value(parent.id)"
+gcloud projects describe cherry-ai-project --format="value(parent.id)"
 # Expected output: organizations/873291114285
 ```
 
@@ -90,12 +90,12 @@ All scripts verify these critical indicators:
 
 1. **PRIMARY INDICATOR**: Project parent organization ID
    ```
-   ✅ Project agi-baby-cherry in organization 873291114285
+   ✅ Project cherry-ai-project in organization 873291114285
    ```
 
 2. **INFRASTRUCTURE INDICATOR**: GPU configuration
    ```
-   ✅ 2x NVIDIA T4 GPUs active in us-central1
+   ✅ 2x NVIDIA T4 GPUs active in us-west4
    ```
 
 3. **SERVICE INDICATOR**: Database connections

@@ -73,8 +73,8 @@ echo -e "${YELLOW}IMPORTANT: You will be prompted to log in with your GCP accoun
 gcloud auth login
 
 # Set project
-echo -e "${YELLOW}Setting GCP project to agi-baby-cherry...${NC}"
-gcloud config set project agi-baby-cherry
+echo -e "${YELLOW}Setting GCP project to cherry-ai-project...${NC}"
+gcloud config set project cherry-ai-project
 
 # Create service account key
 echo -e "${YELLOW}Setting up service account key...${NC}"
@@ -86,7 +86,7 @@ read -p "Choose an option (1/2): " key_option
 if [ "$key_option" == "1" ]; then
   echo -e "${YELLOW}Creating new service account key for vertex-agent...${NC}"
   gcloud iam service-accounts keys create /tmp/credentials/vertex-agent-key.json \
-    --iam-account=vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
+    --iam-account=vertex-agent@cherry-ai-project.iam.gserviceaccount.com
   echo -e "${GREEN}Key created at /tmp/credentials/vertex-agent-key.json${NC}"
 else
   echo -e "${YELLOW}Please paste the contents of your service account key JSON below.${NC}"
@@ -114,7 +114,7 @@ if grep -q "REDIS_HOST=localhost" .env; then
   read -p "Update Redis config? " update_redis
   
   if [ "$update_redis" == "y" ]; then
-    read -p "Enter Redis host (e.g., redis-12345.c12345.us-central1-1.gcp.cloud.redislabs.com): " redis_host
+    read -p "Enter Redis host (e.g., redis-12345.c12345.us-west4-1.gcp.cloud.redislabs.com): " redis_host
     read -p "Enter Redis port (default: 6379): " redis_port
     redis_port=${redis_port:-6379}
     

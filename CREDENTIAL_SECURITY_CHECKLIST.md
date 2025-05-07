@@ -48,7 +48,7 @@ gcloud secrets versions access latest --secret=api-key
 
 ```bash
 # Enable Data Access audit logs
-gcloud projects update agi-baby-cherry \
+gcloud projects update cherry-ai-project \
     --update-labels=enable-audit-logs=true
 
 # View access logs

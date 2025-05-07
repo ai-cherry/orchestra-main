@@ -10,11 +10,11 @@ NC='\033[0m' # No Color
 BOLD='\033[1m'
 
 # Default values
-PROJECT_ID="agi-baby-cherry"
+PROJECT_ID="cherry-ai-project"
 SECRET_NAME="GEMINI_API_KEY"
 ANALYSIS_TYPE="security"
 OUTPUT_FILE="analysis-results.json"
-ENDPOINT="https://us-central1-agi-baby-cherry.cloudfunctions.net/code-analysis"
+ENDPOINT="https://us-west4-cherry-ai-project.cloudfunctions.net/code-analysis"
 
 # Function to display usage information
 usage() {

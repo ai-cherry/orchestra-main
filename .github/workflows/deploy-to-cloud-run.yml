@@ -1,0 +1,88 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: cherry-ai-project
+  SERVICE_NAME: orchestra-api
+  REGION: us-central1
+
+jobs:
+  deploy:
+    name: Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.7.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Install dependencies
+        run: |
+          poetry install --no-interaction --no-ansi --no-root --no-dev
+
+      - name: Run tests
+        run: |
+          poetry run pytest
+
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+          service_account: github-actions@cherry-ai-project.iam.gserviceaccount.com
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Authorize Docker push
+        run: gcloud auth configure-docker
+
+      - name: Build and push container
+        uses: google-github-actions/docker-build-push@v1
+        with:
+          registry: gcr.io
+          project_id: ${{ env.PROJECT_ID }}
+          image_name: ${{ env.SERVICE_NAME }}
+          tag: ${{ github.sha }}
+          dockerfile: Dockerfile
+          context: .
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          region: ${{ env.REGION }}
+          image: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          env_vars: |
+            PROJECT_ID=${{ env.PROJECT_ID }}
+            REGION=${{ env.REGION }}
+            ENVIRONMENT=prod
+          memory: 512Mi
+          cpu: 1
+          service_account: orchestra-api-sa@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+          allow_unauthenticated: true
+
+      - name: Show Output
+        run: echo ${{ steps.deploy.outputs.url }}

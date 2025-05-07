@@ -6,7 +6,7 @@ This document provides a step-by-step guide for deploying the Orchestra applicat
 
 Before starting the deployment process, ensure you have:
 
-- Access to the `agi-baby-cherry` GCP project
+- Access to the `cherry-ai-project` GCP project
 - Permissions to create service accounts and resources in GCP
 - GitHub repository access (if using CI/CD deployment)
 
@@ -134,7 +134,7 @@ After deployment is complete:
 
    ```bash
    # For Cloud Run deployment
-   curl $(gcloud run services describe orchestrator-api-prod --region=us-central1 --format="value(status.url)")/health
+   curl $(gcloud run services describe orchestrator-api-prod --region=us-west4 --format="value(status.url)")/health
    ```
 
 2. **Monitor Logs**
@@ -146,7 +146,7 @@ After deployment is complete:
 3. **Check Metrics Dashboard**
 
    Visit the GCP console to view metrics for your deployed service:
-   https://console.cloud.google.com/monitoring/dashboards?project=agi-baby-cherry
+   https://console.cloud.google.com/monitoring/dashboards?project=cherry-ai-project
 
 ## Troubleshooting
 
@@ -169,7 +169,7 @@ If you encounter issues during deployment:
 3. **Check Cloud Run Service**
 
    ```bash
-   gcloud run services describe orchestrator-api-prod --region=us-central1
+   gcloud run services describe orchestrator-api-prod --region=us-west4
    ```
 
 4. **View Build Logs**

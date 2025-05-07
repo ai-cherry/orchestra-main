@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to update all references from agi-baby-cherry to cherry-ai-project
+# Script to update all references from cherry-ai-project to cherry-ai-project
 # This script will update files in-place
 
 set -e  # Exit on any error
@@ -13,9 +13,9 @@ RED="\033[0;31m"
 NC="\033[0m"  # No Color
 
 # Configuration
-OLD_PROJECT="agi-baby-cherry"
+OLD_PROJECT="cherry-ai-project"
 NEW_PROJECT="cherry-ai-project"
-OLD_REGION="us-central1"
+OLD_REGION="us-west4"
 NEW_REGION="us-west4"
 
 # Print section header

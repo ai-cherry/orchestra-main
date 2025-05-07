@@ -63,7 +63,7 @@ steps:
       from google.cloud import aiplatform
       
       # Initialize Vertex AI with the project and region
-      aiplatform.init(project='agi-baby-cherry', location='us-central1')
+      aiplatform.init(project='cherry-ai-project', location='us-west4')
       
       # Load prompt templates
       with open('templates/gemini_prompts.yaml', 'r') as f:
@@ -122,10 +122,10 @@ steps:
 
 # Build and push Docker image
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'us-central1-docker.pkg.dev/cherry-ai.me/orchestra/api:$_ENV', '.']
+  args: ['build', '-t', 'us-west4-docker.pkg.dev/cherry-ai.me/orchestra/api:$_ENV', '.']
 
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'us-central1-docker.pkg.dev/cherry-ai.me/orchestra/api:$_ENV']
+  args: ['push', 'us-west4-docker.pkg.dev/cherry-ai.me/orchestra/api:$_ENV']
 
 # Scan Docker image for vulnerabilities
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -158,7 +158,7 @@ steps:
   - 'deploy'
   - 'orchestra-$_ENV'
   - '--image'
-  - 'us-central1-docker.pkg.dev/cherry-ai.me/orchestra/api:$_ENV'
+  - 'us-west4-docker.pkg.dev/cherry-ai.me/orchestra/api:$_ENV'
   - '--region'
   - '$_REGION'
   - '--platform'
@@ -197,7 +197,7 @@ artifacts:
 
 substitutions:
   _ENV: 'prod'
-  _REGION: 'us-central1'
+  _REGION: 'us-west4'
 
 images:
-- 'us-central1-docker.pkg.dev/cherry-ai.me/orchestra/api:$_ENV'
+- 'us-west4-docker.pkg.dev/cherry-ai.me/orchestra/api:$_ENV'

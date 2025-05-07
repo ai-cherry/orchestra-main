@@ -3,7 +3,7 @@
 -- between BigQuery dataset (agent_truth.memories) and Cloud Storage backups.
 
 -- Create or replace the stored procedure for SSOT validation
-CREATE OR REPLACE PROCEDURE `agi-baby-cherry.agent_truth.validate_ssot`(
+CREATE OR REPLACE PROCEDURE `cherry-ai-project.agent_truth.validate_ssot`(
   gcs_uri STRING,
   bq_table STRING
 )
@@ -34,7 +34,7 @@ BEGIN
     SELECT COUNT(*)
     FROM (
       SELECT id, checksum
-      FROM `agi-baby-cherry.agent_truth.memories`
+      FROM `cherry-ai-project.agent_truth.memories`
     ) bq
     FULL OUTER JOIN (
       SELECT id, checksum
@@ -55,7 +55,7 @@ BEGIN
   END IF;
 
   -- Log the validation result to a monitoring table
-  INSERT INTO `agi-baby-cherry.agent_truth.validation_log` (
+  INSERT INTO `cherry-ai-project.agent_truth.validation_log` (
     validation_time,
     result,
     bq_row_count,
@@ -75,7 +75,7 @@ BEGIN
 END;
 
 -- Create a table to store validation logs if it doesn't exist
-CREATE TABLE IF NOT EXISTS `agi-baby-cherry.agent_truth.validation_log` (
+CREATE TABLE IF NOT EXISTS `cherry-ai-project.agent_truth.validation_log` (
   validation_time TIMESTAMP,
   result STRING,
   bq_row_count INT64,
@@ -85,11 +85,11 @@ CREATE TABLE IF NOT EXISTS `agi-baby-cherry.agent_truth.validation_log` (
 PARTITION BY DATE(validation_time);
 
 -- Example call to the stored procedure (can be scheduled or run via CLI)
--- CALL `agi-baby-cherry.agent_truth.validate_ssot`(
---   'gs://agi-baby-cherry-bucket/backups/*.parquet',
---   'agi-baby-cherry.agent_truth.memories'
+-- CALL `cherry-ai-project.agent_truth.validate_ssot`(
+--   'gs://cherry-ai-project-bucket/backups/*.parquet',
+--   'cherry-ai-project.agent_truth.memories'
 -- );
 
 -- Comment for documentation
-COMMENT ON PROCEDURE `agi-baby-cherry.agent_truth.validate_ssot` IS
+COMMENT ON PROCEDURE `cherry-ai-project.agent_truth.validate_ssot` IS
 'Stored procedure to validate data consistency between BigQuery SSOT table and GCS backups, logging results for monitoring.';

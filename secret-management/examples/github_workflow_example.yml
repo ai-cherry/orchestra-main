@@ -36,10 +36,10 @@ jobs:
         id: setup-env
         run: |
           if [[ "${{ github.event.inputs.environment }}" == "production" ]]; then
-            echo "project_id=agi-baby-cherry-prod" >> $GITHUB_OUTPUT
+            echo "project_id=cherry-ai-project-prod" >> $GITHUB_OUTPUT
             echo "environment=production" >> $GITHUB_OUTPUT
           else
-            echo "project_id=agi-baby-cherry-staging" >> $GITHUB_OUTPUT
+            echo "project_id=cherry-ai-project-staging" >> $GITHUB_OUTPUT
             echo "environment=staging" >> $GITHUB_OUTPUT
           fi
       
@@ -125,7 +125,7 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v1
         with:
           service: myapp
-          region: us-central1
+          region: us-west4
           source: .
           env_vars: |
             API_KEY=${{ steps.secrets.outputs.api_key }}

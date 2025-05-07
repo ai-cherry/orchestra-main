@@ -23,7 +23,7 @@ echo -e "${BLUE}${BOLD}   Orchestra Production Secrets Setup   ${NC}"
 echo -e "${BLUE}======================================================${NC}"
 
 # Default values
-PROJECT_ID=${1:-"agi-baby-cherry"}  # Default project ID, can be overridden by first argument
+PROJECT_ID=${1:-"cherry-ai-project"}  # Default project ID, can be overridden by first argument
 
 # Check if gcloud is installed
 if ! command -v gcloud &> /dev/null; then

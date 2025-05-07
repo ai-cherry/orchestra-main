@@ -15,7 +15,7 @@ BOLD='\033[1m'
 NC='\033[0m' # No Color
 
 # Configuration variables
-GCP_PROJECT_ID="agi-baby-cherry"
+GCP_PROJECT_ID="cherry-ai-project"
 GITHUB_ORG="ai-cherry"
 GITHUB_PAT="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"
 
@@ -331,8 +331,8 @@ set_github_org_variables() {
   local variables=(
     "GCP_PROJECT_ID:$GCP_PROJECT_ID"
     "GCP_PROJECT_NAME:Cherry AI Project"
-    "GCP_REGION:us-central1"
-    "GCP_ZONE:us-central1-a"
+    "GCP_REGION:us-west4"
+    "GCP_ZONE:us-west4-a"
     "DEPLOYMENT_ENVIRONMENT:production"
   )
   
@@ -441,7 +441,7 @@ EOF
   gcloud functions deploy github-gcp-secret-sync \
     --gen2 \
     --runtime=nodejs18 \
-    --region=us-central1 \
+    --region=us-west4 \
     --source="$function_dir" \
     --entry-point=syncGitHubToGCPSecrets \
     --trigger-http \
@@ -460,7 +460,7 @@ create_secret_sync_scheduler() {
   # Get the function URL
   local function_url=$(gcloud functions describe github-gcp-secret-sync \
     --gen2 \
-    --region=us-central1 \
+    --region=us-west4 \
     --format="value(serviceConfig.uri)" \
     --project="$GCP_PROJECT_ID")
   
@@ -474,7 +474,7 @@ create_secret_sync_scheduler() {
     --http-method=POST \
     --oidc-service-account-email="$service_account" \
     --oidc-token-audience="$function_url" \
-    --location=us-central1 \
+    --location=us-west4 \
     --project="$GCP_PROJECT_ID"
   
   echo -e "${GREEN}Secret sync scheduler job created.${NC}"
@@ -517,7 +517,7 @@ jobs:
           # Get the function URL
           FUNCTION_URL=\$(gcloud functions describe github-gcp-secret-sync \\
             --gen2 \\
-            --region=us-central1 \\
+            --region=us-west4 \\
             --format="value(serviceConfig.uri)" \\
             --project="${GCP_PROJECT_ID}")
           

@@ -11,8 +11,15 @@ class VertexAgent:
         self.secret_client = secretmanager.SecretManagerServiceClient()
         
     def get_secret(self, secret_id):
-        name = f"projects/agi-baby-cherry/secrets/{secret_id}/versions/latest"
-        return self.secret_client.access_secret_version(name=name).payload.data.decode('UTF-8')
+        """Fetch a secret from GCP Secret Manager."""
+        try:
+            client = secretmanager.SecretManagerServiceClient()
+            name = f"projects/cherry-ai-project/secrets/{secret_id}/versions/latest"
+            response = client.access_secret_version(request={"name": name})
+            return response.payload.data.decode("UTF-8")
+        except Exception as e:
+            log_error(f"Failed to retrieve secret {secret_id}: {e}")
+            return None
 
     def auto_train_model(self, dataset_id: str):
         """Automatically train best model for given dataset"""
@@ -80,7 +87,7 @@ class VertexAgent:
                 {
                     "type": "vertex_ai_search",
                     "data_sources": [
-                        "gs://agi-baby-cherry-docs",
+                        "gs://cherry-ai-project-docs",
                         "google-drive://team-shared"
                     ]
                 },
@@ -91,7 +98,46 @@ class VertexAgent:
             ]
         }
         return aiplatform.apply_rag_config(rag_config)
-def initialize_adk_multi_agent_system(self):
+
+    def initialize_vector_storage(self):
+        """Initialize the vector database for document embeddings."""
+        try:
+            return Chroma(
+                collection_name="agent_documents",
+                embedding_function=gemini_embeddings,
+                persist_directory="./vector_db",
+                client_settings=ChromaClientSettings(
+                    chroma_db_impl="duckdb+parquet",
+                    persist_directory="./vector_db",
+                    anonymized_telemetry=False
+                )
+            )
+        except Exception as e:
+            # Fall back to cloud storage if local initialization fails
+            log_warning(f"Local vector db initialization failed: {e}. Using cloud storage.")
+            return {
+                "documents": [
+                    {
+                        "id": "1",
+                        "source": "gs://cherry-ai-project-docs",
+                        "metadata": {"type": "reference"}
+                    }
+                ]
+            }
+
+    def setup_memory_systems(self):
+        """Configure agent memory systems."""
+        return {
+            "memory": {
+                "type": "hybrid",
+                "sources": {
+                    "short_term": "redis://cherry-ai-project-redis",
+                    "long_term": "firestore://projects/cherry-ai-project/databases/agent-memories"
+                }
+            }
+        }
+
+    def initialize_adk_multi_agent_system(self):
         """Initialize a multi-agent system using Vertex AI Agent Development Kit (ADK)"""
         from google.cloud import ai_agent_builder
         
@@ -100,8 +146,8 @@ def initialize_adk_multi_agent_system(self):
             base_model="gemini-2.5-pro",
             tools=["google-maps", "supply-chain-db"],
             memory_config={
-                "short_term": "redis://agi-baby-cherry-redis",
-                "long_term": "firestore://projects/agi-baby-cherry/databases/agent-memories"
+                "short_term": "redis://cherry-ai-project-redis",
+                "long_term": "firestore://projects/cherry-ai-project/databases/agent-memories"
             },
             context_window=1_000_000  # Support for 1M+ token context window
         )

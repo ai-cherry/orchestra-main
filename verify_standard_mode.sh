@@ -1,106 +1,100 @@
 #!/bin/bash
-# Verify that standard mode is active and restricted mode is disabled
 
-echo "Verifying standard mode status..."
+# Color output for better visibility
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+BOLD='\033[1m'
+NC='\033[0m' # No Color
+
+echo -e "${BOLD}${BLUE}=====================================================${NC}"
+echo -e "${BOLD}${BLUE}  VERIFYING STANDARD MODE AND WORKSPACE TRUST SETTINGS${NC}"
+echo -e "${BOLD}${BLUE}=====================================================${NC}"
 
 # Check environment variables
-if [ "$STANDARD_MODE" = "true" ] && [ "$USE_RECOVERY_MODE" = "false" ]; then
-  echo "✅ Environment variables are correctly set"
+echo -e "\n${BLUE}Checking environment variables:${NC}"
+
+if [ "$VSCODE_DISABLE_WORKSPACE_TRUST" = "true" ]; then
+    echo -e "${GREEN}✓ VSCODE_DISABLE_WORKSPACE_TRUST is set to true${NC}"
 else
-  echo "❌ Environment variables are not correctly set:"
-  echo "   STANDARD_MODE=$STANDARD_MODE"
-  echo "   USE_RECOVERY_MODE=$USE_RECOVERY_MODE"
+    echo -e "${RED}✗ VSCODE_DISABLE_WORKSPACE_TRUST is not set to true (current value: $VSCODE_DISABLE_WORKSPACE_TRUST)${NC}"
 fi
 
-# Check additional environment variables
-if [ "$VSCODE_DISABLE_WORKSPACE_TRUST" = "true" ] && [ "$DISABLE_WORKSPACE_TRUST" = "true" ]; then
-  echo "✅ Additional workspace trust variables are correctly set"
+if [ "$STANDARD_MODE" = "true" ]; then
+    echo -e "${GREEN}✓ STANDARD_MODE is set to true${NC}"
 else
-  echo "❌ Additional workspace trust variables are not correctly set:"
-  echo "   VSCODE_DISABLE_WORKSPACE_TRUST=$VSCODE_DISABLE_WORKSPACE_TRUST"
-  echo "   DISABLE_WORKSPACE_TRUST=$DISABLE_WORKSPACE_TRUST"
+    echo -e "${RED}✗ STANDARD_MODE is not set to true (current value: $STANDARD_MODE)${NC}"
 fi
 
-# Check VS Code settings
+if [ "$DISABLE_WORKSPACE_TRUST" = "true" ]; then
+    echo -e "${GREEN}✓ DISABLE_WORKSPACE_TRUST is set to true${NC}"
+else
+    echo -e "${RED}✗ DISABLE_WORKSPACE_TRUST is not set to true (current value: $DISABLE_WORKSPACE_TRUST)${NC}"
+fi
+
+if [ "$USE_RECOVERY_MODE" = "false" ]; then
+    echo -e "${GREEN}✓ USE_RECOVERY_MODE is set to false${NC}"
+elif [ -z "$USE_RECOVERY_MODE" ]; then
+    echo -e "${YELLOW}! USE_RECOVERY_MODE is not set${NC}"
+else
+    echo -e "${RED}✗ USE_RECOVERY_MODE is not set to false (current value: $USE_RECOVERY_MODE)${NC}"
+fi
+
+# Check for VS Code settings
+echo -e "\n${BLUE}Checking VS Code settings:${NC}"
+
+# Check .vscode/settings.json
 if [ -f .vscode/settings.json ]; then
-  if grep -q '"security.workspace.trust.enabled": false' .vscode/settings.json; then
-    echo "✅ VS Code workspace trust is disabled in settings.json"
-  else
-    echo "❌ VS Code workspace trust is not properly configured in settings.json"
-  fi
-  
-  # Check for other required settings
-  MISSING_SETTINGS=0
-  if ! grep -q '"security.workspace.trust.startupPrompt": "never"' .vscode/settings.json; then
-    echo "❌ Missing setting: security.workspace.trust.startupPrompt"
-    MISSING_SETTINGS=1
-  fi
-  if ! grep -q '"security.workspace.trust.banner": "never"' .vscode/settings.json; then
-    echo "❌ Missing setting: security.workspace.trust.banner"
-    MISSING_SETTINGS=1
-  fi
-  if ! grep -q '"security.workspace.trust.emptyWindow": false' .vscode/settings.json; then
-    echo "❌ Missing setting: security.workspace.trust.emptyWindow"
-    MISSING_SETTINGS=1
-  fi
-  
-  if [ $MISSING_SETTINGS -eq 0 ]; then
-    echo "✅ All required VS Code settings are present"
-  fi
-else
-  echo "❌ .vscode/settings.json file not found"
-fi
-
-# Check marker files
-if [ -f .standard_mode ]; then
-  echo "✅ Standard mode marker file exists"
-else
-  echo "❌ Standard mode marker file missing"
-fi
-
-# Check global VS Code settings if in Codespace
-if [ -d "/home/codespace/.vscode-remote/data/Machine" ]; then
-  GLOBAL_SETTINGS="/home/codespace/.vscode-remote/data/Machine/settings.json"
-  if [ -f "$GLOBAL_SETTINGS" ] && grep -q '"security.workspace.trust.enabled": false' "$GLOBAL_SETTINGS"; then
-    echo "✅ Global VS Code settings have workspace trust disabled"
-  else
-    echo "❌ Global VS Code settings do not have workspace trust disabled"
-  fi
-fi
-
-# Check shell configuration files
-SHELL_CONFIG_FIXED=true
-for config_file in ~/.bashrc ~/.profile ~/.bash_profile ~/.zshrc; do
-  if [ -f "$config_file" ]; then
-    if ! grep -q "STANDARD_MODE=true" "$config_file"; then
-      echo "❌ $config_file does not have STANDARD_MODE set"
-      SHELL_CONFIG_FIXED=false
+    echo -e "${GREEN}✓ .vscode/settings.json exists${NC}"
+    
+    # Check for workspace trust settings
+    if grep -q "\"security.workspace.trust.enabled\": false" .vscode/settings.json; then
+        echo -e "${GREEN}✓ Workspace trust is disabled in settings.json${NC}"
+    else
+        echo -e "${RED}✗ Workspace trust is not properly disabled in settings.json${NC}"
     fi
-  fi
-done
-
-if [ "$SHELL_CONFIG_FIXED" = true ]; then
-  echo "✅ Shell configuration files have environment variables set"
-fi
-
-# Check if startup hook is installed
-STARTUP_HOOK_INSTALLED=false
-for config_file in ~/.bashrc ~/.profile ~/.bash_profile ~/.zshrc; do
-  if [ -f "$config_file" ] && grep -q ".devcontainer/startup/prevent_restricted.sh" "$config_file"; then
-    STARTUP_HOOK_INSTALLED=true
-    break
-  fi
-done
-
-if [ "$STARTUP_HOOK_INSTALLED" = true ]; then
-  echo "✅ Startup hook is installed"
 else
-  echo "❌ Startup hook is not installed in any shell configuration file"
+    echo -e "${RED}✗ .vscode/settings.json does not exist${NC}"
 fi
 
-# Overall status
-echo ""
-echo "If any ❌ errors were shown above, run ./fix_restricted_mode.sh to fix them"
-echo "If problems persist, try rebuilding the container with:"
-echo "  - VS Code Command Palette (Ctrl+Shift+P or Cmd+Shift+P)"
-echo "  - Type and select 'Codespaces: Rebuild Container'"
+# Check devcontainer.json
+if [ -f .devcontainer/devcontainer.json ]; then
+    echo -e "${GREEN}✓ .devcontainer/devcontainer.json exists${NC}"
+    
+    # Check for workspace trust settings
+    if grep -q "\"security.workspace.trust.enabled\": false" .devcontainer/devcontainer.json; then
+        echo -e "${GREEN}✓ Workspace trust is disabled in devcontainer.json${NC}"
+    else
+        echo -e "${RED}✗ Workspace trust is not properly disabled in devcontainer.json${NC}"
+    fi
+else
+    echo -e "${RED}✗ .devcontainer/devcontainer.json does not exist${NC}"
+fi
+
+# Check for recovery container
+echo -e "\n${BLUE}Checking for recovery container:${NC}"
+if grep -q "recovery container" ../.codespaces/.persistedshare/creation.log 2>/dev/null; then
+    echo -e "${YELLOW}! Codespace was created using a recovery container${NC}"
+    echo -e "${YELLOW}! This may indicate that your original container configuration failed to build${NC}"
+else
+    echo -e "${GREEN}✓ No recovery container detected${NC}"
+fi
+
+# Check for restricted mode references
+echo -e "\n${BLUE}Checking for restricted mode references:${NC}"
+if grep -q -i "restricted mode" ../.codespaces/.persistedshare/creation.log 2>/dev/null; then
+    echo -e "${YELLOW}! References to restricted mode found in creation log${NC}"
+    grep -i "restricted mode" ../.codespaces/.persistedshare/creation.log | head -3 2>/dev/null
+else
+    echo -e "${GREEN}✓ No explicit restricted mode references in creation log${NC}"
+fi
+
+echo -e "\n${BOLD}${BLUE}=====================================================${NC}"
+echo -e "${BOLD}${GREEN}  STANDARD MODE VERIFICATION COMPLETE${NC}"
+echo -e "${BOLD}${BLUE}=====================================================${NC}"
+
+echo -e "\n${YELLOW}If VS Code still shows restricted mode after these checks, try:${NC}"
+echo -e "${BLUE}1. Run 'source ~/.bashrc' to ensure environment variables are set${NC}"
+echo -e "${BLUE}2. Reload VS Code window (Command Palette > Developer: Reload Window)${NC}"
+echo -e "${BLUE}3. If issues persist, try rebuilding the Codespace${NC}"

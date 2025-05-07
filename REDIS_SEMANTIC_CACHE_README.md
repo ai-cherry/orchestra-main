@@ -129,7 +129,7 @@ index:
 
 ```
 # Required
-REDIS_URL=redis://vertex-agent@agi-baby-cherry
+REDIS_URL=redis://vertex-agent@cherry-ai-project
 GEMINI_API_KEY=your_api_key_here
 ```
 
@@ -140,7 +140,7 @@ cacher = SemanticCacher(
     threshold=0.85,  # Similarity threshold
     ttl=3600,        # TTL in seconds (1 hour)
     index_schema="agent_memory.yaml",
-    redis_url="redis://vertex-agent@agi-baby-cherry"
+    redis_url="redis://vertex-agent@cherry-ai-project"
 )
 ```
 
@@ -149,7 +149,7 @@ cacher = SemanticCacher(
 ```python
 langchain_cache = RedisSemanticCache(
     embeddings=GeminiEmbeddings(api_key="your_api_key_here"),
-    redis_url="redis://vertex-agent@agi-baby-cherry",
+    redis_url="redis://vertex-agent@cherry-ai-project",
     name="agent_semantic_cache"
 )
 ```
@@ -167,7 +167,7 @@ provider_config = {
     "threshold": 0.85,
     "ttl": 3600,
     "index_schema": "agent_memory.yaml",
-    "redis_url": "redis://vertex-agent@agi-baby-cherry"
+    "redis_url": "redis://vertex-agent@cherry-ai-project"
 }
 
 provider = RedisSemanticCacheProvider(config=provider_config)
@@ -202,7 +202,7 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings as GeminiEmbeddi
 # Initialize the cache
 cache = RedisSemanticCache(
     embeddings=GeminiEmbeddings(api_key="your_api_key_here"),
-    redis_url="redis://vertex-agent@agi-baby-cherry",
+    redis_url="redis://vertex-agent@cherry-ai-project",
     name="agent_semantic_cache"
 )
 
@@ -226,7 +226,7 @@ cacher = SemanticCacher(
     threshold=0.85,
     ttl=3600,
     index_schema="agent_memory.yaml",
-    redis_url="redis://vertex-agent@agi-baby-cherry"
+    redis_url="redis://vertex-agent@cherry-ai-project"
 )
 
 # Add an item

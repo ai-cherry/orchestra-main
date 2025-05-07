@@ -22,12 +22,12 @@ The Gemini API key is securely stored in Google Cloud Secret Manager:
 ```bash
 # The key is stored with automatic replication
 gcloud secrets create GEMINI_API_KEY --data-file="gemini.key" \
-  --project=agi-baby-cherry \
+  --project=cherry-ai-project \
   --replication-policy=automatic
 
 # The vertex-agent service account has access to the key
 gcloud secrets add-iam-policy-binding GEMINI_API_KEY \
-  --member=serviceAccount:vertex-agent@agi-baby-cherry.iam.gserviceaccount.com \
+  --member=serviceAccount:vertex-agent@cherry-ai-project.iam.gserviceaccount.com \
   --role=roles/secretmanager.secretAccessor
 ```
 
@@ -42,7 +42,7 @@ The `analyze_code.sh` script handles code analysis requests:
 ```
 
 Options:
-- `--project=ID`: GCP Project ID (default: agi-baby-cherry)
+- `--project=ID`: GCP Project ID (default: cherry-ai-project)
 - `--secret=NAME`: API key secret name (default: GEMINI_API_KEY)
 - `--type=TYPE`: Analysis type: security|performance|style (default: security)
 - `--output=PATH`: Path to output file (default: analysis-results.json)
@@ -79,7 +79,7 @@ git commit --no-verify
 
 The code analysis uses a Cloud Function endpoint:
 
-- URL: `https://us-central1-agi-baby-cherry.cloudfunctions.net/code-analysis`
+- URL: `https://us-west4-cherry-ai-project.cloudfunctions.net/code-analysis`
 - API Key: Located in `gemini.key` file or in Secret Manager
 - Method: `POST`
 - Payload Structure:

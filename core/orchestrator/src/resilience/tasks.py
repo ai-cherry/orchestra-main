@@ -39,7 +39,7 @@ class TaskQueueManager:
         
         Args:
             project_id: GCP project ID
-            location_id: GCP location ID (e.g., us-central1)
+            location_id: GCP location ID (e.g., us-west4)
             queue_name: Name of the Cloud Tasks queue
             service_url: URL of the service to receive the task
             service_account_email: Service account for authenticating to service (optional)
@@ -199,10 +199,10 @@ class VertexAiFallbackHandler:
     Handler for falling back to Vertex AI when Phidata agents fail.
     
     This class provides methods for executing operations using the 
-    vertex-agent@agi-baby-cherry service account as a fallback.
+    vertex-agent@cherry-ai-project service account as a fallback.
     """
     
-    def __init__(self, service_account: str = "vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"):
+    def __init__(self, service_account: str = "vertex-agent@cherry-ai-project.iam.gserviceaccount.com"):
         """
         Initialize fallback handler.
         
@@ -313,12 +313,12 @@ def get_task_queue_manager() -> TaskQueueManager:
             
             project_id = os.environ.get(
                 "GCP_PROJECT_ID", 
-                getattr(settings, "GCP_PROJECT_ID", "agi-baby-cherry")
+                getattr(settings, "GCP_PROJECT_ID", "cherry-ai-project")
             )
             
             location_id = os.environ.get(
                 "TASK_QUEUE_LOCATION", 
-                getattr(settings, "TASK_QUEUE_LOCATION", "us-central1")
+                getattr(settings, "TASK_QUEUE_LOCATION", "us-west4")
             )
             
             queue_name = os.environ.get(
@@ -335,7 +335,7 @@ def get_task_queue_manager() -> TaskQueueManager:
             # Service account for authentication
             service_account = os.environ.get(
                 "TASK_QUEUE_SERVICE_ACCOUNT", 
-                getattr(settings, "TASK_QUEUE_SERVICE_ACCOUNT", "vertex-agent@agi-baby-cherry.iam.gserviceaccount.com")
+                getattr(settings, "TASK_QUEUE_SERVICE_ACCOUNT", "vertex-agent@cherry-ai-project.iam.gserviceaccount.com")
             )
             
             _task_queue_manager = TaskQueueManager(
@@ -369,7 +369,7 @@ def get_fallback_handler() -> VertexAiFallbackHandler:
             
             service_account = os.environ.get(
                 "VERTEX_FALLBACK_SERVICE_ACCOUNT", 
-                getattr(settings, "VERTEX_FALLBACK_SERVICE_ACCOUNT", "vertex-agent@agi-baby-cherry.iam.gserviceaccount.com")
+                getattr(settings, "VERTEX_FALLBACK_SERVICE_ACCOUNT", "vertex-agent@cherry-ai-project.iam.gserviceaccount.com")
             )
             
             _fallback_handler = VertexAiFallbackHandler(service_account=service_account)

@@ -2,8 +2,8 @@
 Example script demonstrating how to deploy and monitor a Vertex AI Agent using Vertex AI Agent Builder.
 
 This script assumes:
-1. The Google Cloud SDK is configured with the correct project (agi-baby-cherry).
-2. Authentication is set up with the service account vertex-agent@agi-baby-cherry.iam.gserviceaccount.com.
+1. The Google Cloud SDK is configured with the correct project (cherry-ai-project).
+2. Authentication is set up with the service account vertex-agent@cherry-ai-project.iam.gserviceaccount.com.
 3. Necessary permissions are granted for agent creation and deployment.
 
 Instructions:
@@ -24,7 +24,7 @@ def create_and_deploy_agent():
     """
     print("Initializing Vertex AI Agent Builder...")
     # Initialize with project and location
-    ai_agent_builder.init(project="agi-baby-cherry", location="us-central1")
+    ai_agent_builder.init(project="cherry-ai-project", location="us-west4")
     
     # Define a sample agent
     agent_config = {
@@ -33,8 +33,8 @@ def create_and_deploy_agent():
         "description": "A sample agent for orchestra-main project automation.",
         "tools": ["google-maps", "supply-chain-db"],
         "memory_config": {
-            "short_term": "redis://agi-baby-cherry-redis",
-            "long_term": "firestore://projects/agi-baby-cherry/databases/agent-memories"
+            "short_term": "redis://cherry-ai-project-redis",
+            "long_term": "firestore://projects/cherry-ai-project/databases/agent-memories"
         },
         "context_window": 1000000  # 1M token context window
     }

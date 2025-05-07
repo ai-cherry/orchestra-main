@@ -13,5 +13,5 @@ class TurboOrchestrator:
         
     def _get_secret(self, name):
         return self.secret_client.access_secret_version(
-            name=f"projects/agi-baby-cherry/secrets/{name}/versions/latest"
+            name=f"projects/cherry-ai-project/secrets/{name}/versions/latest"
         ).payload.data.decode('UTF-8')

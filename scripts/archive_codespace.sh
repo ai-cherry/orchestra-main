@@ -5,7 +5,7 @@ i#!/bin/bash
 set -e
 
 # Define variables
-GCS_BUCKET="gs://agi-baby-cherry-bucket"
+GCS_BUCKET="gs://cherry-ai-project-bucket"
 WORKSPACE_DIR="/workspaces/orchestra-main"
 EXCLUDE_DIRS=(".tmp" "dist" ".git" "node_modules" ".cache")
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)

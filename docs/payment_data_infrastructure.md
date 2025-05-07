@@ -13,7 +13,7 @@ The architecture establishes a clear separation between general-purpose workload
 
 ```mermaid
 graph TB
-    A[GCP Organization] --> B[Main Project<br/>agi-baby-cherry]
+    A[GCP Organization] --> B[Main Project<br/>cherry-ai-project]
     A --> C[Payment Project<br/>payment-processing-{env}]
     
     B --> D[General Purpose Resources]
@@ -127,7 +127,7 @@ module "payment_processing" {
   source = "./modules/payment"
   
   project_id     = "payment-processing-dev"
-  region         = "us-central1"
+  region         = "us-west4"
   env            = "dev"
   create_project = true
   billing_account = "BILLING-ACCOUNT-ID"
@@ -148,7 +148,7 @@ from packages.agents.runtime.security.payment_vertex_agent import PaymentVertexA
 
 # Initialize with separate project for payment data
 payment_agent = PaymentVertexAgentManager(
-    project_id="agi-baby-cherry",  # Main project
+    project_id="cherry-ai-project",  # Main project
     payment_data_project_id="payment-processing-dev",  # Payment-specific project
     pubsub_topic="payment-events-dev"
 )

@@ -7,7 +7,7 @@
 set -e
 
 # Default Configuration 
-PROJECT_ID="agi-baby-cherry"
+PROJECT_ID="cherry-ai-project"
 ORG_ID="873291114285"
 KEY_FILE="vertex-key.json"
 FORCE_MODE=false

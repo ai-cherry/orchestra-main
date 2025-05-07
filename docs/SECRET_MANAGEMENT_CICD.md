@@ -41,10 +41,10 @@ The GitHub Actions workflow (`.github/workflows/deploy.yml`) handles the complet
   run: |
     chmod +x secrets_setup.sh
     ./secrets_setup.sh \
-      --project=agi-baby-cherry \
+      --project=cherry-ai-project \
       --file=portkey.key \
       --secret=PORTKEY_API_KEY \
-      --service-account=vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
+      --service-account=vertex-agent@cherry-ai-project.iam.gserviceaccount.com
 
 - name: Cleanup sensitive files
   run: rm -f portkey.key
@@ -59,8 +59,8 @@ Secrets are injected into the Cloud Run service as environment variables:
 - name: Deploy to Cloud Run
   run: |-
     gcloud run deploy orchestra-prod \
-      --image=us-docker.pkg.dev/agi-baby-cherry/orchestra/app:latest \
-      --service-account=orchestra-cloud-run-prod@agi-baby-cherry.iam.gserviceaccount.com \
+      --image=us-docker.pkg.dev/cherry-ai-project/orchestra/app:latest \
+      --service-account=orchestra-cloud-run-prod@cherry-ai-project.iam.gserviceaccount.com \
       --set-env-vars=PORTKEY_API_KEY=$(gcloud secrets versions access latest --secret=PORTKEY_API_KEY)
 ```
 
@@ -79,11 +79,11 @@ To protect against accidentally committing secrets:
 
 The service accounts need specific permissions:
 
-1. **vertex-agent@agi-baby-cherry.iam.gserviceaccount.com**:
+1. **vertex-agent@cherry-ai-project.iam.gserviceaccount.com**:
    - `roles/secretmanager.secretAccessor` - To read secrets
    - `roles/aiplatform.reasoningEngineServiceAgent` - For AI platform operations
 
-2. **orchestra-cloud-run-prod@agi-baby-cherry.iam.gserviceaccount.com**:
+2. **orchestra-cloud-run-prod@cherry-ai-project.iam.gserviceaccount.com**:
    - Used as the runtime service account for Cloud Run
 
 ## Security Considerations

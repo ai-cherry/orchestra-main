@@ -17,7 +17,7 @@ source set_environment_variables.sh --persistent
 ```
 
 This script sets:
-- `GCP_PROJECT_ID="agi-baby-cherry"`
+- `GCP_PROJECT_ID="cherry-ai-project"`
 - `GCP_ORG_ID="873291114285"`
 - `GCP_SA_JSON` with the service account credentials
 - `FULL_SERVICE_ACCOUNT_JSON` for compatibility with the setup scripts
@@ -46,7 +46,7 @@ This script:
 - Creates a service account key file at `/tmp/sa.json`
 - Activates the service account with gcloud
 - Enables the Cloud AI Companion API
-- Sets the project to "agi-baby-cherry"
+- Sets the project to "cherry-ai-project"
 
 ### 3. Repository Connection
 

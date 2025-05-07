@@ -26,7 +26,7 @@ class LLMGateway:
         except Exception as e:
             logger.warning(f"Portkey failed, falling back to Vertex AI. Error: {str(e)}")
             response = self.vertex.predict(
-                endpoint=f"projects/agi-baby-cherry/locations/us-central1/endpoints/gemini-pro",
+                endpoint=f"projects/cherry-ai-project/locations/us-west4/endpoints/gemini-pro",
                 instances=[{"content": prompt}]
             ).predictions[0]
             logger.info("Successfully used Vertex AI as fallback")

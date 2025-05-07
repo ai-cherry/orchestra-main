@@ -19,63 +19,61 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
-# Virtual Environment
+# Poetry
+.venv/
+poetry.lock
+
+# Environment variables
 .env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-.env.backup
-*.env.backup
+.env.local
+.env.*.local
+
+# GCP
+*.json
+!terraform.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!.vscode/*.json
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars
+!example.tfvars
 
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
-
-# OS
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
 
-# Terraform - more comprehensive patterns
-.terraform/
-**/.terraform/*
-*.tfstate
-*.tfstate.*
-*.tfvars
-.terragrunt-cache/
-**/.terragrunt-cache/*
-terraform.tfvars
-terraform.tfvars.json
-*.auto.tfvars
-*.auto.tfvars.json
-.terraform.lock.hcl
-**/.terraform.lock.hcl
-# Specifically exclude large provider files
-**/.terraform/providers/**
-**/terraform-provider-*
-
-# Google Cloud SDK
-google-cloud-sdk/
-**/anthoscli
-**/gcloud.json
-
-# Large files
+# Logs
+logs/
 *.log
-*.gz
-*.zip
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Specific large files
-infra/.terraform/providers/**
-infra/orchestra-terraform/.terraform/providers/**
-# Temporary assessment output files
-codespaces_*.txtservice-account-key.json
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+.hypothesis/
+.pytest_cache/
+
+# Docker
+.docker/
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Local development
+.local/

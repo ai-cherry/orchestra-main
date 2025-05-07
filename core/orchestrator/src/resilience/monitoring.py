@@ -232,7 +232,7 @@ def get_monitoring_client() -> GCPMonitoringClient:
             settings = get_settings()
             project_id = os.environ.get(
                 "GCP_PROJECT_ID", 
-                getattr(settings, "GCP_PROJECT_ID", "agi-baby-cherry")
+                getattr(settings, "GCP_PROJECT_ID", "cherry-ai-project")
             )
             
             _monitoring_client = GCPMonitoringClient(project_id)

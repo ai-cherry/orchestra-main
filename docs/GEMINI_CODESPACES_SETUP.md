@@ -11,13 +11,13 @@ The `.devcontainer/devcontainer.json` file has been configured to automatically:
    - Gemini Code Assist (`GoogleCloudTools.cloudcode-gemini`)
 
 2. Configure Gemini Code Assist:
-   - Set project ID to `agi-baby-cherry`
+   - Set project ID to `cherry-ai-project`
    - Enable context-aware code completion
    - Enable Gemini-powered code review
 
 3. Set up Google Cloud authentication:
    - Authenticate using the service account key
-   - Set the active project to `agi-baby-cherry`
+   - Set the active project to `cherry-ai-project`
 
 When you open the project in Codespaces, these configurations are automatically applied.
 
@@ -32,7 +32,7 @@ If you need to manually set up or refresh the configuration, you can run the pro
 This script will:
 - Install the required VS Code extensions
 - Check for Google Cloud authentication
-- Set the active project to `agi-baby-cherry`
+- Set the active project to `cherry-ai-project`
 - Configure VS Code settings for Gemini Code Assist
 - Enable required GCP APIs
 
@@ -67,4 +67,4 @@ If you encounter issues with the extensions:
 
 3. **API Access Issues**:
    - Ensure APIs are enabled: `gcloud services list --enabled --filter=aiplatform`
-   - Enable if needed: `gcloud services enable aiplatform.googleapis.com --project=agi-baby-cherry`
+   - Enable if needed: `gcloud services enable aiplatform.googleapis.com --project=cherry-ai-project`

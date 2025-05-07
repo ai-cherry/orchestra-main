@@ -44,8 +44,8 @@ echo -e "${GREEN}Service account activated${NC}"
 # Extract project ID from service account file
 PROJECT_ID=$(jq -r '.project_id' service-account.json)
 if [ -z "$PROJECT_ID" ]; then
-  echo -e "${YELLOW}Could not extract project_id from service account, using agi-baby-cherry as default${NC}"
-  PROJECT_ID="agi-baby-cherry"
+  echo -e "${YELLOW}Could not extract project_id from service account, using cherry-ai-project as default${NC}"
+  PROJECT_ID="cherry-ai-project"
 fi
 
 # Set default project
@@ -65,7 +65,7 @@ echo -e "${YELLOW}Registering repository with Developer Connect...${NC}"
 gcloud alpha developer-connect repos register github_${PROJECT_ID} \
   --gitlab-host-uri="https://github.com" \
   --project=$PROJECT_ID \
-  --region=us-central1
+  --region=us-west4
 
 # Enable code customization
 echo -e "${YELLOW}Enabling code customization...${NC}"

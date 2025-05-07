@@ -2,7 +2,7 @@
 # real_migration_steps.sh
 
 # -----[ Configuration ]-----
-export GCP_PROJECT_ID="agi-baby-cherry"
+export GCP_PROJECT_ID="cherry-ai-project"
 export GCP_ORG_ID="873291114285"  # Combined numeric ID from your info
 export SERVICE_ACCOUNT_KEY="$(echo $VERTEX_AGENT_KEY | base64 -d)"
 export ADMIN_EMAIL="scoobyjava@cherry-ai.me"
@@ -21,7 +21,7 @@ check_prerequisites() {
 # -----[ Authentication ]-----
 authenticate_gcp() {
   echo "${SERVICE_ACCOUNT_KEY}" > service-account.json
-  gcloud auth activate-service-account vertex-agent@agi-baby-cherry.iam.gserviceaccount.com \
+  gcloud auth activate-service-account vertex-agent@cherry-ai-project.iam.gserviceaccount.com \
     --key-file=service-account.json
   gcloud config set project $GCP_PROJECT_ID
 }
@@ -47,15 +47,15 @@ setup_infrastructure() {
 
   # Create Redis instance
   gcloud redis instances create agent-memory \
-    --region=us-central1 \
-    --zone=us-central1-a \
+    --region=us-west4 \
+    --zone=us-west4-a \
     --tier=basic \
     --size=5 \
     --redis-version=redis_6_x
 
   # Create AlloyDB cluster
   gcloud alloydb clusters create agent-storage \
-    --region=us-central1 \
+    --region=us-west4 \
     --password=$WORKSTATION_PASSWORD \
     --network=default
 }
@@ -77,15 +77,15 @@ resource "google_workstations_workstation_cluster" "ai_cluster" {
   project                = "$GCP_PROJECT_ID"
   workstation_cluster_id = "ai-development"
   network                = "projects/$GCP_PROJECT_ID/global/networks/default"
-  subnetwork             = "projects/$GCP_PROJECT_ID/regions/us-central1/subnetworks/default"
-  location               = "us-central1"
+  subnetwork             = "projects/$GCP_PROJECT_ID/regions/us-west4/subnetworks/default"
+  location               = "us-west4"
 }
 
 resource "google_workstations_workstation_config" "ai_config" {
   provider               = google-beta
   workstation_config_id  = "ai-dev-config"
   workstation_cluster_id = google_workstations_workstation_cluster.ai_cluster.workstation_cluster_id
-  location               = "us-central1"
+  location               = "us-west4"
 
   host {
     gce_instance {

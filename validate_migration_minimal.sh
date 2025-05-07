@@ -7,10 +7,10 @@
 set -e
 
 # Configuration
-GCP_PROJECT_ID="agi-baby-cherry"
+GCP_PROJECT_ID="cherry-ai-project"
 GCP_ORG_ID="873291114285"  # Numeric ID without hyphens
-SERVICE_ACCOUNT_EMAIL="vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"
-BUCKET_NAME="agi-baby-cherry-bucket"
+SERVICE_ACCOUNT_EMAIL="vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
+BUCKET_NAME="cherry-ai-project-bucket"
 
 # Colors for output
 GREEN='\033[0;32m'

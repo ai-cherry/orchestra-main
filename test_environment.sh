@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Set environment variables
-export GCP_PROJECT_ID=agi-baby-cherry
-export GOOGLE_CLOUD_PROJECT=agi-baby-cherry
+export GCP_PROJECT_ID=cherry-ai-project
+export GOOGLE_CLOUD_PROJECT=cherry-ai-project
 export GCP_SA_KEY_PATH=/tmp/vertex-agent-key.json
 export GOOGLE_APPLICATION_CREDENTIALS=/tmp/vertex-agent-key.json
 export RUN_INTEGRATION_TESTS=true

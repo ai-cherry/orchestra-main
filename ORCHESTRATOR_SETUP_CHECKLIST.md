@@ -136,7 +136,7 @@ terraform apply -var="env=dev"
 # Set GCP credentials
 export GOOGLE_APPLICATION_CREDENTIALS=/tmp/vertex-agent-key.json
 export GCP_SA_KEY_PATH=/tmp/vertex-agent-key.json
-export GCP_PROJECT_ID=agi-baby-cherry
+export GCP_PROJECT_ID=cherry-ai-project
 
 # Set Redis configuration (use values from Terraform output)
 export REDIS_HOST=[from terraform output]

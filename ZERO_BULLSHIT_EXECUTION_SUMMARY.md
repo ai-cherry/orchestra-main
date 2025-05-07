@@ -8,9 +8,9 @@ This repository contains a suite of tools to definitively prove the GCP project 
 
 ```bash
 # Most direct proof possible
-gcloud projects describe agi-baby-cherry --format="value(name,parent.id)"
+gcloud projects describe cherry-ai-project --format="value(name,parent.id)"
 
-# Expected output: agi-baby-cherry organizations/873291114285
+# Expected output: cherry-ai-project organizations/873291114285
 ```
 
 If this shows the correct organization, the migration succeeded. Continue to verify infrastructure:
@@ -19,12 +19,12 @@ If this shows the correct organization, the migration succeeded. Continue to ver
 # Verify GPU workstations
 gcloud workstations configs describe ai-dev-config \
   --cluster=ai-development \
-  --region=us-central1 \
+  --region=us-west4 \
   --format="json(container.guestAccelerators)"
 
 # Verify database connections
-gcloud redis instances describe agent-memory --region=us-central1 --format="value(state)"
-gcloud alloydb clusters describe agent-storage --region=us-central1 --format="value(state)"
+gcloud redis instances describe agent-memory --region=us-west4 --format="value(state)"
+gcloud alloydb clusters describe agent-storage --region=us-west4 --format="value(state)"
 ```
 
 ### 2. Nuclear Verification (Takes 30-60 seconds)
@@ -60,15 +60,15 @@ This script:
 
 Look for these critical indicators:
 
-1. **Primary Success Indicator**: `Project agi-baby-cherry in organization 873291114285`
-2. **GPU Verification**: `2x NVIDIA T4 GPUs active in us-central1`
+1. **Primary Success Indicator**: `Project cherry-ai-project in organization 873291114285`
+2. **GPU Verification**: `2x NVIDIA T4 GPUs active in us-west4`
 3. **Database Verification**: `Redis/AlloyDB connections established`
 
 Example successful output:
 ```
 ===== CRITICAL VERIFICATION RESULTS =====
-✅ Project agi-baby-cherry in organization 873291114285
-✅ 2x NVIDIA T4 GPUs active in us-central1
+✅ Project cherry-ai-project in organization 873291114285
+✅ 2x NVIDIA T4 GPUs active in us-west4
 ✅ Redis/AlloyDB connections established
 ```
 
@@ -91,18 +91,18 @@ All verification has been reduced to these critical commands:
 
 ```bash
 # Organization verification (PRIMARY)
-gcloud projects describe agi-baby-cherry --format="value(parent.id)"
+gcloud projects describe cherry-ai-project --format="value(parent.id)"
 
 # Force migration
-gcloud beta projects move agi-baby-cherry \
+gcloud beta projects move cherry-ai-project \
   --organization=873291114285 \
-  --billing-project=agi-baby-cherry \
+  --billing-project=cherry-ai-project \
   --verbosity=debug \
   --log-http
 
 # Service account roles
 gcloud organizations get-iam-policy 873291114285 \
-  --filter="bindings.members:vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"
+  --filter="bindings.members:vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
 ```
 
 ## Security

@@ -19,7 +19,7 @@ terraform {
 
   # Uncomment to use a GCS backend for state
   # backend "gcs" {
-  #   bucket = "agi-baby-cherry-terraform-state"
+  #   bucket = "cherry-ai-project-terraform-state"
   #   prefix = "orchestra/prod"
   # }
 }
@@ -42,7 +42,7 @@ provider "google-beta" {
 variable "project_id" {
   description = "GCP Project ID"
   type        = string
-  default     = "agi-baby-cherry"
+  default     = "cherry-ai-project"
 }
 
 variable "region" {

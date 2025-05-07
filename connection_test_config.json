@@ -13,7 +13,7 @@
     }
   },
   "firestore": {
-    "project_id": "agi-baby-cherry",
+    "project_id": "cherry-ai-project",
     "credentials_path": "",
     "collections": {
       "test": "connection_test",

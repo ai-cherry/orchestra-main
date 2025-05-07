@@ -10,7 +10,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 # Default values
-PROJECT_ID="agi-baby-cherry"
+PROJECT_ID="cherry-ai-project"
 BUCKET_NAME="${PROJECT_ID}-terraform-state"
 REGION="us-west2"
 
@@ -60,13 +60,13 @@ echo -e "${GREEN}Lifecycle policy set.${NC}"
 # Update terraform files
 echo -e "${GREEN}Updating Terraform backend configuration in dev environment...${NC}"
 sed -i.bak 's/# backend "gcs" {/backend "gcs" {/' infra/dev/main.tf
-sed -i.bak 's/#   bucket = "agi-baby-cherry-terraform-state"/  bucket = "agi-baby-cherry-terraform-state"/' infra/dev/main.tf
+sed -i.bak 's/#   bucket = "cherry-ai-project-terraform-state"/  bucket = "cherry-ai-project-terraform-state"/' infra/dev/main.tf
 sed -i.bak 's/#   prefix = "orchestra\/dev"/  prefix = "orchestra\/dev"/' infra/dev/main.tf
 sed -i.bak 's/# }/}/' infra/dev/main.tf
 
 echo -e "${GREEN}Updating Terraform backend configuration in prod environment...${NC}"
 sed -i.bak 's/# backend "gcs" {/backend "gcs" {/' infra/prod/main.tf
-sed -i.bak 's/#   bucket = "agi-baby-cherry-terraform-state"/  bucket = "agi-baby-cherry-terraform-state"/' infra/prod/main.tf
+sed -i.bak 's/#   bucket = "cherry-ai-project-terraform-state"/  bucket = "cherry-ai-project-terraform-state"/' infra/prod/main.tf
 sed -i.bak 's/#   prefix = "orchestra\/prod"/  prefix = "orchestra\/prod"/' infra/prod/main.tf
 sed -i.bak 's/# }/}/' infra/prod/main.tf
 

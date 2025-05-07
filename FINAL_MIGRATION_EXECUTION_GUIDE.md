@@ -73,7 +73,7 @@ For users who prefer direct gcloud commands:
 
 ```bash
 # Step 1: Set correct permissions
-gcloud projects add-iam-policy-binding agi-baby-cherry \
+gcloud projects add-iam-policy-binding cherry-ai-project \
   --member="user:YOUR_EMAIL" \
   --role="roles/owner"
 
@@ -85,10 +85,10 @@ gcloud organizations add-iam-policy-binding 873291114285 \
 sleep 300  # Wait 5 minutes
 
 # Step 3: Execute migration
-gcloud beta projects move agi-baby-cherry --organization 873291114285
+gcloud beta projects move cherry-ai-project --organization 873291114285
 
 # Step 4: Verify migration
-gcloud projects describe agi-baby-cherry --format="value(parent.id)"
+gcloud projects describe cherry-ai-project --format="value(parent.id)"
 # Should return: organizations/873291114285
 ```
 
@@ -98,12 +98,12 @@ All methods verify these critical indicators:
 
 1. **PRIMARY INDICATOR**: Project parent organization ID
    ```
-   ✅ Project agi-baby-cherry in organization 873291114285
+   ✅ Project cherry-ai-project in organization 873291114285
    ```
 
 2. **INFRASTRUCTURE INDICATOR**: GPU configuration
    ```
-   ✅ 2x NVIDIA T4 GPUs active in us-central1
+   ✅ 2x NVIDIA T4 GPUs active in us-west4
    ```
 
 3. **SERVICE INDICATOR**: Database connections
@@ -122,7 +122,7 @@ If migration fails, common issues and solutions include:
 2. **Billing Project Error**
    - Solution: 
      ```bash
-     gcloud beta billing projects link agi-baby-cherry \
+     gcloud beta billing projects link cherry-ai-project \
        --billing-account=$(gcloud beta billing accounts list --format="value(name)")
      ```
 

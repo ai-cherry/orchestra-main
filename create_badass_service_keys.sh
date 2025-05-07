@@ -15,6 +15,7 @@ NC='\033[0m' # No Color
 PROJECT_ID="cherry-ai-project"
 PROJECT_NUMBER="525398941159"
 REGION="us-central1"
+GCP_USER_EMAIL="sccobyjava@cherry-ai.me"
 VERTEX_SA_NAME="vertex-power-user"
 GEMINI_SA_NAME="gemini-power-user"
 SECRET_MANAGER_KEY="secret-management-key.json"
@@ -75,25 +76,24 @@ authenticate_with_secret_manager() {
   log "INFO" "Authenticating with GCP using Secret Manager key..."
   
   # Authenticate with the service account key
-  gcloud auth activate-service-account --key-file="${SECRET_MANAGER_KEY}"
+  gcloud auth activate-service-account --key-file="${SECRET_MANAGER_KEY}" --impersonate-service-account="${GCP_USER_EMAIL}"
   
   # Set the project
   gcloud config set project "${PROJECT_ID}"
   
-  log "SUCCESS" "Successfully authenticated with GCP using Secret Manager key"
+  log "SUCCESS" "Successfully authenticated with GCP using Secret Manager key (impersonating ${GCP_USER_EMAIL})"
 }
-
 # Authenticate with GCP using Project Admin key
 authenticate_with_project_admin() {
   log "INFO" "Authenticating with GCP using Project Admin key..."
   
   # Authenticate with the service account key
-  gcloud auth activate-service-account --key-file="${PROJECT_ADMIN_KEY}"
+  gcloud auth activate-service-account --key-file="${PROJECT_ADMIN_KEY}" --impersonate-service-account="${GCP_USER_EMAIL}"
   
   # Set the project
   gcloud config set project "${PROJECT_ID}"
   
-  log "SUCCESS" "Successfully authenticated with GCP using Project Admin key"
+  log "SUCCESS" "Successfully authenticated with GCP using Project Admin key (impersonating ${GCP_USER_EMAIL})"
 }
 
 # Create service account

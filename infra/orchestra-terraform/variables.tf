@@ -1,19 +1,19 @@
 variable "project_id" {
   description = "GCP Project ID"
   type        = string
-  default     = "agi-baby-cherry"
+  default     = "cherry-ai-project"
 }
 
 variable "region" {
   description = "GCP Region"
   type        = string
-  default     = "us-central1"
+  default     = "us-west4"
 }
 
 variable "zone" {
   description = "GCP Zone"
   type        = string
-  default     = "us-central1-a"
+  default     = "us-west4-a"
 }
 
 variable "env" {

@@ -12,7 +12,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 # Default values
-DEFAULT_PROJECT_ID="agi-baby-cherry"
+DEFAULT_PROJECT_ID="cherry-ai-project"
 DEFAULT_REPLICATION_POLICY="automatic"
 DEFAULT_ENVIRONMENT="production"
 
@@ -22,7 +22,7 @@ SECRET_VALUE=$2
 PROJECT_ID=${3:-$DEFAULT_PROJECT_ID}
 REPLICATION_POLICY=${4:-$DEFAULT_REPLICATION_POLICY}
 ENVIRONMENT=${5:-$DEFAULT_ENVIRONMENT}
-LOCATION=${6:-"us-central1"}  # Only used if replication is user-managed
+LOCATION=${6:-"us-west4"}  # Only used if replication is user-managed
 
 # Display usage information
 usage() {
@@ -34,11 +34,11 @@ usage() {
     echo "  PROJECT_ID         GCP Project ID (default: $DEFAULT_PROJECT_ID)"
     echo "  REPLICATION_POLICY 'automatic' or 'user-managed' (default: $DEFAULT_REPLICATION_POLICY)"
     echo "  ENVIRONMENT        Environment suffix, e.g. 'production', 'dev' (default: $DEFAULT_ENVIRONMENT)"
-    echo "  LOCATION           Region for user-managed replication (default: us-central1)"
+    echo "  LOCATION           Region for user-managed replication (default: us-west4)"
     echo ""
     echo "Example:"
     echo "  ./create_secret.sh API_KEY \"my-secret-api-key\""
-    echo "  ./create_secret.sh DATABASE_PASSWORD \"db-password-123\" agi-baby-cherry user-managed staging us-west1"
+    echo "  ./create_secret.sh DATABASE_PASSWORD \"db-password-123\" cherry-ai-project user-managed staging us-west1"
 }
 
 # Validate required arguments

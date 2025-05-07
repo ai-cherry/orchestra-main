@@ -27,7 +27,7 @@ for arg in "$@"; do
 done
 
 # -----[ Configuration ]-----
-export GCP_PROJECT_ID="agi-baby-cherry"
+export GCP_PROJECT_ID="cherry-ai-project"
 export GCP_ORG_ID="873291114285"  # Verified numeric ID without hyphens
 export ADMIN_EMAIL="scoobyjava@cherry-ai.me"
 export WORKSTATION_PASSWORD="Huskers15"
@@ -211,7 +211,7 @@ grant_migration_permissions() {
 grant_vertex_agent_permissions() {
   log_step "Granting essential roles to vertex-agent service account"
   
-  VERTEX_AGENT_EMAIL="vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"
+  VERTEX_AGENT_EMAIL="vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
   
   log_info "Granting Project Mover and Project Creator roles to $VERTEX_AGENT_EMAIL..."
   # Grant roles in a single command
@@ -405,8 +405,8 @@ setup_infrastructure() {
   # Create Redis instance
   log_info "Creating Redis instance..."
   gcloud redis instances create agent-memory \
-    --region=us-central1 \
-    --zone=us-central1-a \
+    --region=us-west4 \
+    --zone=us-west4-a \
     --tier=basic \
     --size=5 \
     --redis-version=redis_6_x || {
@@ -416,7 +416,7 @@ setup_infrastructure() {
   # Create AlloyDB cluster
   log_info "Creating AlloyDB cluster..."
   gcloud alloydb clusters create agent-storage \
-    --region=us-central1 \
+    --region=us-west4 \
     --password="$WORKSTATION_PASSWORD" \
     --network=default || {
     log_warning "Failed to create AlloyDB cluster. It might already exist."
@@ -444,29 +444,29 @@ terraform {
 }
 
 provider "google" {
-  project = "agi-baby-cherry"
-  region  = "us-central1"
+  project = "cherry-ai-project"
+  region  = "us-west4"
 }
 
 provider "google-beta" {
-  project = "agi-baby-cherry"
-  region  = "us-central1"
+  project = "cherry-ai-project"
+  region  = "us-west4"
 }
 
 resource "google_workstations_workstation_cluster" "ai_cluster" {
   provider               = google-beta
-  project                = "agi-baby-cherry"
+  project                = "cherry-ai-project"
   workstation_cluster_id = "ai-development"
-  network                = "projects/agi-baby-cherry/global/networks/default"
-  subnetwork             = "projects/agi-baby-cherry/regions/us-central1/subnetworks/default"
-  location               = "us-central1"
+  network                = "projects/cherry-ai-project/global/networks/default"
+  subnetwork             = "projects/cherry-ai-project/regions/us-west4/subnetworks/default"
+  location               = "us-west4"
 }
 
 resource "google_workstations_workstation_config" "ai_config" {
   provider               = google-beta
   workstation_config_id  = "ai-dev-config"
   workstation_cluster_id = google_workstations_workstation_cluster.ai_cluster.workstation_cluster_id
-  location               = "us-central1"
+  location               = "us-west4"
 
   host {
     gce_instance {
@@ -501,8 +501,8 @@ resource "google_workstations_workstation_config" "ai_config" {
     # Environment variables for Gemini, Vertex AI, and Redis
     env = {
       "GEMINI_API_KEY"     = "AIzaSyA0rewcfUHo87WMEz4a8Og1eAWTslxlgEE"
-      "VERTEX_ENDPOINT"    = "projects/agi-baby-cherry/locations/us-central1/endpoints/agent-core"
-      "REDIS_CONNECTION"   = "redis://agent-memory.redis.us-central1.cherry-ai.cloud.goog:6379"
+      "VERTEX_ENDPOINT"    = "projects/cherry-ai-project/locations/us-west4/endpoints/agent-core"
+      "REDIS_CONNECTION"   = "redis://agent-memory.redis.us-west4.cherry-ai.cloud.goog:6379"
       "ALLOYDB_CONNECTION" = "postgresql://alloydb-user@agent-storage:5432/agi_baby_cherry"
     }
     
@@ -536,10 +536,10 @@ project_context:
 
 tool_integrations:
   vertex_ai:
-    endpoint: projects/agi-baby-cherry/locations/us-central1/endpoints/agent-core
+    endpoint: projects/cherry-ai-project/locations/us-west4/endpoints/agent-core
     api_version: v1
   redis:
-    connection_string: redis://agent-memory.redis.us-central1.cherry-ai.cloud.goog:6379
+    connection_string: redis://agent-memory.redis.us-west4.cherry-ai.cloud.goog:6379
   database:
     connection_string: postgresql://alloydb-user@agent-storage:5432/agi_baby_cherry
 
@@ -560,19 +560,19 @@ resource "google_workstations_workstation" "ai_workstations" {
   workstation_id         = "ai-dev-workstation-${count.index + 1}"
   workstation_config_id  = google_workstations_workstation_config.ai_config.workstation_config_id
   workstation_cluster_id = google_workstations_workstation_cluster.ai_cluster.workstation_cluster_id
-  location               = "us-central1"
+  location               = "us-west4"
 }
 
 output "workstation_urls" {
   value = [
     for ws in google_workstations_workstation.ai_workstations : 
-    "https://us-central1.workstations.cloud.goog/agi-baby-cherry/us-central1/${ws.workstation_cluster_id}/${ws.workstation_config_id}/${ws.workstation_id}"
+    "https://us-west4.workstations.cloud.goog/cherry-ai-project/us-west4/${ws.workstation_cluster_id}/${ws.workstation_config_id}/${ws.workstation_id}"
   ]
 }
 EOF
 
   # Replace placeholders with actual values
-  sed -i "s/agi-baby-cherry/$GCP_PROJECT_ID/g" hybrid_workstation_config.tf
+  sed -i "s/cherry-ai-project/$GCP_PROJECT_ID/g" hybrid_workstation_config.tf
 }
 
 # -----[ Hybrid IDE Deployment ]-----
@@ -607,7 +607,7 @@ final_validation() {
   
   # Check Redis instance
   log_info "Checking Redis instance..."
-  gcloud redis instances describe agent-memory --region=us-central1 --format="json" > redis-info.json 2>/dev/null
+  gcloud redis instances describe agent-memory --region=us-west4 --format="json" > redis-info.json 2>/dev/null
   if [ $? -eq 0 ]; then
     REDIS_STATE=$(jq -r '.state' redis-info.json)
     log_info "Redis instance state: $REDIS_STATE"
@@ -617,7 +617,7 @@ final_validation() {
   
   # Check AlloyDB cluster
   log_info "Checking AlloyDB cluster..."
-  gcloud alloydb clusters describe agent-storage --region=us-central1 --format="json" > alloydb-info.json 2>/dev/null
+  gcloud alloydb clusters describe agent-storage --region=us-west4 --format="json" > alloydb-info.json 2>/dev/null
   if [ $? -eq 0 ]; then
     ALLOYDB_STATE=$(jq -r '.state' alloydb-info.json)
     log_info "AlloyDB cluster state: $ALLOYDB_STATE"

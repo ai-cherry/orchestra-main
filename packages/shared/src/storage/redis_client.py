@@ -102,7 +102,7 @@ class RedisClient:
         self._ssl = ssl or os.environ.get("REDIS_SSL", "false").lower() == "true"
         self._db = db
         self._redis = None
-        self._project_id = project_id or os.environ.get("GCP_PROJECT_ID") or "agi-baby-cherry"
+        self._project_id = project_id or os.environ.get("GCP_PROJECT_ID") or "cherry-ai-project"
 
         # Portkey settings
         self._use_portkey = use_portkey

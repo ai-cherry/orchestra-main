@@ -13,11 +13,11 @@ echo "Example 1: Creating a basic API key secret"
 
 # Example 2: Create a secret with user-managed replication in multiple regions
 echo -e "\nExample 2: Creating a secret with user-managed replication"
-./create_secret.sh DATABASE_PASSWORD "secure-db-password-789" "agi-baby-cherry" "user-managed" "production" "us-central1,us-west1"
+./create_secret.sh DATABASE_PASSWORD "secure-db-password-789" "cherry-ai-project" "user-managed" "production" "us-west4,us-west1"
 
 # Example 3: Create a secret for a development environment
 echo -e "\nExample 3: Creating a secret for development environment"
-./create_secret.sh TEST_SECRET "test-value-for-development" "agi-baby-cherry" "automatic" "dev"
+./create_secret.sh TEST_SECRET "test-value-for-development" "cherry-ai-project" "automatic" "dev"
 
 # Example 4: Create a JSON-structured secret
 echo -e "\nExample 4: Creating a JSON-structured secret"

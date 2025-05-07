@@ -5,8 +5,8 @@ echo -e "\033[1;32m=== Phidata PostgreSQL Setup Script ===\033[0m\n"
 
 # 1. Set environment variables
 echo -e "\033[1;34mSetting up environment variables...\033[0m"
-export GCP_REGION=us-central1
-export CLOUD_SQL_INSTANCE_CONNECTION_NAME=agi-baby-cherry:us-central1:phidata-postgres-dev
+export GCP_REGION=us-west4
+export CLOUD_SQL_INSTANCE_CONNECTION_NAME=cherry-ai-project:us-west4:phidata-postgres-dev
 export CLOUD_SQL_DATABASE=phidata_memory
 export CLOUD_SQL_USER=phidata_user
 export CLOUD_SQL_USE_IAM_AUTH=false

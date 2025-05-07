@@ -14,11 +14,11 @@ This document has been created in response to the exposure of multiple sensitive
 - **Status**: COMPROMISED
 
 ### 🚨 CRITICAL: Service Account Keys
-- **Service Account**: cherrybaby@agi-baby-cherry.iam.gserviceaccount.com
+- **Service Account**: cherrybaby@cherry-ai-project.iam.gserviceaccount.com
   - **Key ID**: [REMOVED - STORED IN GCP SECRET MANAGER]
   - **Status**: COMPROMISED (created Apr 11 2025; never expires)
   
-- **Service Account**: vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
+- **Service Account**: vertex-agent@cherry-ai-project.iam.gserviceaccount.com
   - **Key ID**: [REMOVED - STORED IN GCP SECRET MANAGER]
   - **Status**: COMPROMISED (created Apr 20 2025; never expires)
   - **Roles**: BigQuery Admin, Cloud Storage for Firebase Admin, Compute Admin, Gemini Settings Admin, Owner, Project IAM Admin, Vertex AI Service Agent
@@ -48,11 +48,11 @@ This document has been created in response to the exposure of multiple sensitive
 
 ```bash
 # Delete compromised service account keys
-gcloud iam service-accounts keys delete [KEY_ID] --iam-account=cherrybaby@agi-baby-cherry.iam.gserviceaccount.com
-gcloud iam service-accounts keys delete [KEY_ID] --iam-account=vertex-agent@agi-baby-cherry.iam.gserviceaccount.com
+gcloud iam service-accounts keys delete [KEY_ID] --iam-account=cherrybaby@cherry-ai-project.iam.gserviceaccount.com
+gcloud iam service-accounts keys delete [KEY_ID] --iam-account=vertex-agent@cherry-ai-project.iam.gserviceaccount.com
 
 # Create new keys if needed (consider using workload identity federation instead)
-gcloud iam service-accounts keys create key.json --iam-account=cherrybaby@agi-baby-cherry.iam.gserviceaccount.com
+gcloud iam service-accounts keys create key.json --iam-account=cherrybaby@cherry-ai-project.iam.gserviceaccount.com
 ```
 
 #### Figma
@@ -72,7 +72,7 @@ gcloud iam service-accounts keys create key.json --iam-account=cherrybaby@agi-ba
 
 ```bash
 # Example: Check for activities using the compromised service account
-gcloud logging read "protoPayload.authenticationInfo.principalEmail=vertex-agent@agi-baby-cherry.iam.gserviceaccount.com AND timestamp>=\"2025-04-20T00:00:00Z\"" --project=agi-baby-cherry
+gcloud logging read "protoPayload.authenticationInfo.principalEmail=vertex-agent@cherry-ai-project.iam.gserviceaccount.com AND timestamp>=\"2025-04-20T00:00:00Z\"" --project=cherry-ai-project
 ```
 
 ### 3. Implement Secure Credential Management
@@ -83,7 +83,7 @@ gcloud logging read "protoPayload.authenticationInfo.principalEmail=vertex-agent
 
 ```bash
 # Example: Store new credentials in Secret Manager
-echo -n "NEW_CLIENT_SECRET_HERE" | gcloud secrets create oauth-client-secret --data-file=- --project=agi-baby-cherry
+echo -n "NEW_CLIENT_SECRET_HERE" | gcloud secrets create oauth-client-secret --data-file=- --project=cherry-ai-project
 ```
 
 ### 4. Update IAM Roles
@@ -94,13 +94,13 @@ echo -n "NEW_CLIENT_SECRET_HERE" | gcloud secrets create oauth-client-secret --d
 
 ```bash
 # Remove overly permissive Owner role
-gcloud projects remove-iam-policy-binding agi-baby-cherry \
-  --member=serviceAccount:vertex-agent@agi-baby-cherry.iam.gserviceaccount.com \
+gcloud projects remove-iam-policy-binding cherry-ai-project \
+  --member=serviceAccount:vertex-agent@cherry-ai-project.iam.gserviceaccount.com \
   --role=roles/owner
 
 # Add more specific role
-gcloud projects add-iam-policy-binding agi-baby-cherry \
-  --member=serviceAccount:vertex-agent@agi-baby-cherry.iam.gserviceaccount.com \
+gcloud projects add-iam-policy-binding cherry-ai-project \
+  --member=serviceAccount:vertex-agent@cherry-ai-project.iam.gserviceaccount.com \
   --role=roles/aiplatform.user
 ```
 

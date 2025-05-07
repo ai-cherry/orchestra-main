@@ -37,7 +37,7 @@ resource "google_project_service" "vertex_ai" {
 
 # Create a Cloud Storage bucket for vector search index data
 resource "google_storage_bucket" "vector_index_bucket" {
-  name     = "agi-baby-cherry-vector-${var.env}"
+  name     = "cherry-ai-project-vector-${var.env}"
   location = var.region
   force_destroy = var.env != "prod"  # Allow force destroy for non-prod environments
   

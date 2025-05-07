@@ -27,14 +27,14 @@ if [[ "$1" == "--dry-run" ]]; then
   echo -e "${YELLOW}Running in DRY RUN mode. No actual changes will be made.${NC}"
 fi
 # GCP Configuration
-GCP_PROJECT_ID="agi-baby-cherry"
+GCP_PROJECT_ID="cherry-ai-project"
 GCP_PROJECT_NUMBER="104944497835"
 GCP_ORG_ID="8732-9111-4285"
 GOOGLE_API_KEY="AIzaSyA0rewcfUHo87WMEz4a8Og1eAWTslxlgEE"
 VERTEX_AGENT_KEY="0d08481a204c0cdba4095bb94529221e8b8ced5c"
-GCP_RUNTIME_SA_EMAIL="cherrybaby@agi-baby-cherry.iam.gserviceaccount.com"
+GCP_RUNTIME_SA_EMAIL="cherrybaby@cherry-ai-project.iam.gserviceaccount.com"
 ADMIN_EMAIL="scoobyjava@cherry-ai.me"
-SERVICE_ACCOUNT_EMAIL="vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"
+SERVICE_ACCOUNT_EMAIL="vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
 
 # Configuration variables
 TERRAFORM_DIR="./infra"
@@ -300,8 +300,8 @@ cat > "${TERRAFORM_ENV_FILE}" << EOF
 # Terraform configuration for AGI Baby Cherry project
 project_id = "${GCP_PROJECT_ID}"
 project_number = "${GCP_PROJECT_NUMBER}"
-region = "us-central1"
-zone = "us-central1-a"
+region = "us-west4"
+zone = "us-west4-a"
 env = "prod"
 service_account_email = "${SERVICE_ACCOUNT_EMAIL}"
 admin_email = "${ADMIN_EMAIL}"
@@ -322,7 +322,7 @@ echo -e "${YELLOW}Creating Redis/AlloyDB hybrid memory layer configuration...${N
 log_message "${YELLOW}" "Creating Redis Memorystore instance..."
 gcloud redis instances create agent-memory \
   --size=10 \
-  --region=us-central1 \
+  --region=us-west4 \
   --tier=standard \
   --redis-version=redis_6_x \
   --connect-mode=private-service-access \
@@ -334,7 +334,7 @@ log_message "${YELLOW}" "Creating AlloyDB instance..."
 gcloud alloydb instances create alloydb-instance \
   --instance-type=PRIMARY \
   --cpu-count=8 \
-  --region=us-central1 \
+  --region=us-west4 \
   --cluster=agi-baby-cluster \
   --machine-config=n2-standard-8 \
   --database=agi_baby_cherry \
@@ -419,7 +419,7 @@ project_context:
 tool_integrations:
   # Vertex AI integration for model inference
   vertex_ai:
-    endpoint: projects/${GCP_PROJECT_NUMBER}/locations/us-central1/endpoints/agent-core
+    endpoint: projects/${GCP_PROJECT_NUMBER}/locations/us-west4/endpoints/agent-core
     api_version: v1
     
   # Redis integration for semantic cache

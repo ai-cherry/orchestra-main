@@ -39,13 +39,13 @@ terraform {
 # variable "project_id" {
 #   description = "GCP Project ID"
 #   type        = string
-#   default     = "agi-baby-cherry"
+#   default     = "cherry-ai-project"
 # }
 # 
 # variable "region" {
 #   description = "GCP region for resources"
 #   type        = string
-#   default     = "us-central1"
+#   default     = "us-west4"
 # }
 # 
 # variable "env" {

@@ -21,11 +21,11 @@
         "Cline.cline-vscode"
       ],
       "settings": {
-        "geminiCodeAssist.projectId": "agi-baby-cherry",
+        "geminiCodeAssist.projectId": "cherry-ai-project",
         "geminiCodeAssist.contextAware": true,
         "geminiCodeAssist.codeReview.enabled": true,
-        "cloudcode.duetAI.project": "agi-baby-cherry",
-        "cloudcode.project": "agi-baby-cherry",
+        "cloudcode.duetAI.project": "cherry-ai-project",
+        "cloudcode.project": "cherry-ai-project",
         "roo.mode": "turbo",
         "cline.apiSource": "gcp-secret-manager"
       }

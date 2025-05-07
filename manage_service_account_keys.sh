@@ -1,14 +1,14 @@
 #!/bin/bash
 # manage_service_account_keys.sh
 #
-# Secure service account key management script for agi-baby-cherry project
+# Secure service account key management script for cherry-ai-project
 # Handles key creation, rotation, secure storage, and authentication
 
 set -e
 
 # Configuration
-SERVICE_ACCOUNT="vertex-agent@agi-baby-cherry.iam.gserviceaccount.com"
-PROJECT_ID="agi-baby-cherry"
+SERVICE_ACCOUNT="vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
+PROJECT_ID="cherry-ai-project"
 KEY_FILE="vertex-agent-key.json"
 KEY_TEMPLATE="vertex-agent-key-template.json"
 

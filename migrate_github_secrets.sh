@@ -20,7 +20,7 @@ echo -e "${BLUE}======================================================${NC}"
 echo -e "${YELLOW}This tool migrates GitHub organization/repository secrets to GCP Secret Manager${NC}"
 
 # Default values
-PROJECT_ID=${GCP_PROJECT_ID:-"agi-baby-cherry"}
+PROJECT_ID=${GCP_PROJECT_ID:-"cherry-ai-project"}
 ENVIRONMENT="prod"
 INTERACTIVE=true
 DRY_RUN=false
@@ -41,7 +41,7 @@ usage() {
     echo -e "\n${BOLD}Usage:${NC}"
     echo -e "  $0 [options]"
     echo -e "\n${BOLD}Options:${NC}"
-    echo -e "  --project-id <id>       GCP Project ID (default: from GCP_PROJECT_ID env var or 'agi-baby-cherry')"
+    echo -e "  --project-id <id>       GCP Project ID (default: from GCP_PROJECT_ID env var or 'cherry-ai-project')"
     echo -e "  --github-token <token>  GitHub Personal Access Token (default: from GITHUB_TOKEN env var)"
     echo -e "  --github-org <org>      GitHub organization name (for org-level secrets)"
     echo -e "  --github-repo <repo>    GitHub repository name (for repo-level secrets)"
