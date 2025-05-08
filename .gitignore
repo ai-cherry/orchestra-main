@@ -43,6 +43,9 @@ google-cloud-sdk*/
 google-cloud-cli*.tar.gz
 google-cloud-sdk.staging/
 *.tar.gz
+google-cloud-sdk.staging/bin/anthoscli
+google-cloud-cli-*.tar.gz
+google-cloud-sdk-*.tar.gz
 
 # Terraform
 .terraform/
