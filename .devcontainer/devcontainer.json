@@ -1,13 +1,38 @@
 {
-  "name": "AI Orchestra Environment",
-  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "name": "AI Orchestra Dev Container",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
-    "ghcr.io/googlecloudplatform/devcontainers-features/gcloud:latest": {}
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    },
+    "ghcr.io/devcontainers/features/poetry:1": {
+      "version": "1.7.1"
+    },
+    "ghcr.io/devcontainers/features/google-cloud-cli:1": {
+      "version": "latest"
+    }
+  },
+  "postCreateCommand": "mkdir -p /home/vscode/.gcp && echo $GCP_SERVICE_ACCOUNT_KEY > /home/vscode/.gcp/service-account.json && gcloud auth activate-service-account --key-file=/home/vscode/.gcp/service-account.json && gcloud config set project cherry-ai-project && poetry install",
+  "containerEnv": {
+    "GOOGLE_APPLICATION_CREDENTIALS": "/home/vscode/.gcp/service-account.json",
+    "CLOUDSDK_CORE_PROJECT": "cherry-ai-project",
+    "CLOUDSDK_CORE_REGION": "us-central1",
+    "CLOUDSDK_CORE_ZONE": "us-central1-a",
+    "CLOUDSDK_CORE_DISABLE_PROMPTS": "1"
   },
   "customizations": {
+    "codespaces": {
+      "secrets": {
+        "GCP_SERVICE_ACCOUNT_KEY": {
+          "description": "GCP Service Account Key for authentication"
+        }
+      }
+    },
     "vscode": {
       "extensions": [
         "ms-python.python",
+        "ms-toolsai.jupyter",
+        "googlecloudtools.cloudcode",
         "ms-azuretools.vscode-docker",
         "hashicorp.terraform"
       ],
@@ -24,12 +49,6 @@
       }
     }
   },
-  "containerEnv": {
-    "CLOUDSDK_CORE_PROJECT": "cherry-ai-project",
-    "CLOUDSDK_CORE_ACCOUNT": "scoobyjava@cherry-ai.me",
-    "CLOUDSDK_CORE_REGION": "us-central1",
-    "CLOUDSDK_CORE_ZONE": "us-central1-a"
-  },
-  "postCreateCommand": "chmod +x /workspaces/orchestra-main/.devcontainer/setup_and_verify.sh && /workspaces/orchestra-main/.devcontainer/setup_and_verify.sh && echo 'export PATH=$PATH:$HOME/google-cloud-sdk/bin:/workspaces/orchestra-main/google-cloud-sdk/bin' >> $HOME/.bashrc && echo 'export CLOUDSDK_CORE_DISABLE_PROMPTS=1' >> $HOME/.bashrc && echo 'export VSCODE_DISABLE_WORKSPACE_TRUST=true' >> $HOME/.bashrc && echo 'export STANDARD_MODE=true' >> $HOME/.bashrc && echo 'export DISABLE_WORKSPACE_TRUST=true' >> $HOME/.bashrc && echo 'export USE_RECOVERY_MODE=false' >> $HOME/.bashrc",
+  "postStartCommand": "chmod +x /workspaces/orchestra-main/.devcontainer/setup_and_verify.sh && /workspaces/orchestra-main/.devcontainer/setup_and_verify.sh --rebuild",
   "remoteUser": "vscode"
 }
