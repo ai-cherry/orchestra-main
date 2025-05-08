@@ -1,0 +1,51 @@
+# Version control
+.git
+.github
+.gitignore
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+.coverage.*
+coverage.xml
+
+# Environment and local config
+.env
+.venv
+env/
+venv/
+ENV/
+.env.*
+.python-version
+.pyenv/
+.tox/
+
+# Development tools
+.vscode/
+.idea/
+
+# Documentation
+docs/
+
+# Terraform
+terraform/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+
+# Build artifacts
+*.egg-info/
+dist/
+build/

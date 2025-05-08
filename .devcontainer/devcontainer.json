@@ -1,54 +1,49 @@
 {
-  "name": "AI Orchestra Dev Container",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "name": "AI Orchestra Development",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
   "features": {
-    "ghcr.io/devcontainers/features/python:1": {
-      "version": "3.11"
-    },
-    "ghcr.io/devcontainers/features/poetry:1": {
-      "version": "1.7.1"
-    },
-    "ghcr.io/devcontainers/features/google-cloud-cli:1": {
-      "version": "latest"
-    }
-  },
-  "postCreateCommand": "mkdir -p /home/vscode/.gcp && echo $GCP_SERVICE_ACCOUNT_KEY > /home/vscode/.gcp/service-account.json && gcloud auth activate-service-account --key-file=/home/vscode/.gcp/service-account.json && gcloud config set project cherry-ai-project && poetry install",
-  "containerEnv": {
-    "GOOGLE_APPLICATION_CREDENTIALS": "/home/vscode/.gcp/service-account.json",
-    "CLOUDSDK_CORE_PROJECT": "cherry-ai-project",
-    "CLOUDSDK_CORE_REGION": "us-central1",
-    "CLOUDSDK_CORE_ZONE": "us-central1-a",
-    "CLOUDSDK_CORE_DISABLE_PROMPTS": "1"
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/terraform:1": {},
+    "ghcr.io/dhoeric/features/google-cloud-cli:1": {}
   },
   "customizations": {
-    "codespaces": {
-      "secrets": {
-        "GCP_SERVICE_ACCOUNT_KEY": {
-          "description": "GCP Service Account Key for authentication"
-        }
-      }
-    },
     "vscode": {
       "extensions": [
         "ms-python.python",
-        "ms-toolsai.jupyter",
-        "googlecloudtools.cloudcode",
+        "ms-python.vscode-pylance",
         "ms-azuretools.vscode-docker",
-        "hashicorp.terraform"
+        "hashicorp.terraform",
+        "googlecloudtools.cloudcode",
+        "redhat.vscode-yaml",
+        "eamodio.gitlens",
+        "github.copilot",
+        "github.vscode-github-actions"
       ],
       "settings": {
-        "terminal.integrated.defaultProfile.linux": "bash",
         "python.defaultInterpreterPath": "/usr/local/bin/python",
         "python.linting.enabled": true,
         "python.linting.pylintEnabled": true,
+        "python.formatting.provider": "black",
         "editor.formatOnSave": true,
-        "security.workspace.trust.enabled": false,
-        "security.workspace.trust.startupPrompt": "never",
-        "security.workspace.trust.banner": "never",
-        "security.workspace.trust.emptyWindow": false
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": true
+        },
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "/bin/bash"
+          }
+        }
       }
     }
   },
-  "postStartCommand": "chmod +x /workspaces/orchestra-main/.devcontainer/setup_and_verify.sh && /workspaces/orchestra-main/.devcontainer/setup_and_verify.sh --rebuild",
-  "remoteUser": "vscode"
+  "postCreateCommand": "bash ./.devcontainer/setup.sh",
+  "remoteEnv": {
+    "PROJECT_ID": "cherry-ai-project",
+    "REGION": "us-west4"
+  },
+  "mounts": [
+    "source=${localEnv:HOME}/.config/gcloud,target=/home/vscode/.config/gcloud,type=bind,consistency=cached"
+  ]
 }

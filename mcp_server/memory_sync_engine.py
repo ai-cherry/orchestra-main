@@ -37,11 +37,9 @@ class MemoryType(str, Enum):
     TOOL_SPECIFIC = "tool_specific"
 
 class MemoryScope(str, Enum):
-    """Memory scope classification."""
-    SESSION = "session"
-    USER = "user"
-    GLOBAL = "global"
-    PROJECT = "project"
+    """Memory scope classification - simplified for single-user project."""
+    SESSION = "session"  # Keep session scope for basic functionality
+    GLOBAL = "global"    # Keep global scope for shared data
 
 class ToolType(str, Enum):
     """Supported AI tools."""
@@ -466,66 +464,43 @@ class MemorySyncEngine:
         self.tool_adapters[tool] = adapter
     
     def create_memory(self, key: str, entry: MemoryEntry, source_tool: ToolType) -> bool:
-        """Create a new memory entry."""
+        """Create a new memory entry - simplified for single-user project."""
         # Update entry metadata
         entry.metadata.source_tool = source_tool
         entry.metadata.last_modified = time.time()
-        entry.update_hash()
+        
+        # Skip hash computation for performance in single-user context
+        # entry.update_hash()
         
         # Save to storage
         success = self.storage.save(key, entry)
         
         if success:
-            # Create a sync operation
-            operation = SyncOperation(
-                event_type=SyncEvent.CREATED,
-                key=key,
-                entry=entry,
-                source_tool=source_tool,
-                target_tools=[t for t in self.tools if t != source_tool]
-            )
-            self.pending_operations.append(operation)
+            # Simplified logging without complex sync operations
             logger.info(f"Created memory: {key} from {source_tool}")
         
         return success
     
     def update_memory(self, key: str, entry: MemoryEntry, source_tool: ToolType) -> bool:
-        """Update an existing memory entry."""
+        """Update an existing memory entry - simplified for single-user project."""
         # Get the existing entry
         existing = self.storage.get(key)
         
         if not existing:
             return self.create_memory(key, entry, source_tool)
         
-        # Check for conflicts
-        if (existing.metadata.source_tool != source_tool and 
-            existing.metadata.last_modified > entry.metadata.last_modified):
-            # Conflict: existing entry is newer from a different tool
-            return self._resolve_conflict(key, existing, entry, source_tool)
-        
-        # Update entry metadata
+        # Update entry metadata - simplified without conflict resolution
         entry.metadata.source_tool = source_tool
         entry.metadata.last_modified = time.time()
         entry.metadata.version = existing.metadata.version + 1
-        entry.update_hash()
         
         # Save to storage
         success = self.storage.save(key, entry)
         
         if success:
-            # Create a sync operation
-            operation = SyncOperation(
-                event_type=SyncEvent.UPDATED,
-                key=key,
-                entry=entry,
-                source_tool=source_tool,
-                target_tools=[t for t in self.tools if t != source_tool]
-            )
-            self.pending_operations.append(operation)
             logger.info(f"Updated memory: {key} from {source_tool}")
         
         return success
-    
     def get_memory(self, key: str, tool: ToolType) -> Optional[MemoryEntry]:
         """Retrieve a memory entry for a specific tool."""
         entry = self.storage.get(key)
@@ -575,26 +550,17 @@ class MemorySyncEngine:
         return entry
     
     def delete_memory(self, key: str, source_tool: ToolType) -> bool:
-        """Delete a memory entry."""
+        """Delete a memory entry - simplified for single-user project."""
         # Get the existing entry before deletion
         existing = self.storage.get(key)
         
         if not existing:
             return False
         
-        # Delete from storage
+        # Delete from storage - simplified without sync operations
         success = self.storage.delete(key)
         
-        if success and existing:
-            # Create a sync operation
-            operation = SyncOperation(
-                event_type=SyncEvent.DELETED,
-                key=key,
-                entry=existing,
-                source_tool=source_tool,
-                target_tools=[t for t in self.tools if t != source_tool]
-            )
-            self.pending_operations.append(operation)
+        if success:
             logger.info(f"Deleted memory: {key} from {source_tool}")
         
         return success

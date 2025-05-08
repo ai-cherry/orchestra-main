@@ -7,7 +7,7 @@ This guide provides comprehensive instructions for deploying the AI Orchestra pr
 1. [Setup Overview](#setup-overview)
 2. [GitHub Actions Workflow](#github-actions-workflow)
 3. [Dev Container Configuration](#dev-container-configuration)
-4. [Deployment Steps](#deployment-steps)
+4. [Manual Deployment](#manual-deployment)
 5. [Monitoring and Verification](#monitoring-and-verification)
 6. [Customization Options](#customization-options)
 7. [Troubleshooting](#troubleshooting)
@@ -18,128 +18,150 @@ The AI Orchestra project uses two main components for GCP deployment:
 
 1. **GitHub Actions Workflow**: Automates the build, test, and deployment process to GCP Cloud Run
 2. **Dev Container Configuration**: Sets up a consistent development environment with GCP authentication
+3. **Deployment Script**: Provides a standardized approach for manual deployments
 
-Both components use Workload Identity Federation for secure authentication to GCP without storing service account keys in GitHub.
+All components use Workload Identity Federation for secure authentication to GCP without storing service account keys in GitHub.
 
 ## GitHub Actions Workflow
 
-The workflow file (`.github/workflows/deploy-to-gcp.yml`) handles the CI/CD pipeline:
+The workflow file (`.github/workflows/deploy-cloud-run.yml`) handles the CI/CD pipeline:
 
-- Triggers on any push to the repository
+- Triggers on pushes to the main branch
+- Can be manually triggered with environment selection (staging/production)
 - Uses Workload Identity Federation for secure GCP authentication
-- Sets up Python 3.11 and Poetry 1.7.1
 - Runs tests before deployment
-- Builds and pushes a Docker container to Google Container Registry (GCR)
+- Builds and pushes a Docker container to Artifact Registry
 - Deploys to Cloud Run with appropriate configuration
+- Verifies the deployment with health checks
+
+### Workflow Stages
+
+1. **Build and Test**: Validates the application before deployment
+2. **Deploy to Staging**: Automatically deploys to staging on pushes to main
+3. **Deploy to Production**: Manual trigger with production environment selection
 
 ## Dev Container Configuration
 
 The Dev Container configuration (`.devcontainer/devcontainer.json`) provides a consistent development environment:
 
 - Installs Python 3.11, Poetry 1.7.1, and Google Cloud CLI
-- Configures GCP authentication using the `GCP_SERVICE_ACCOUNT_KEY` secret
+- Configures GCP authentication using Workload Identity Federation
 - Sets environment variables for GCP tools
 - Installs necessary VS Code extensions
 
-## Deployment Steps
+## Manual Deployment
 
-### 1. Trigger the GitHub Actions Workflow
-
-The `deploy-to-gcp.yml` workflow is configured to trigger on any push to the repository. To initiate the deployment:
-
-#### Option 1: Automatic Trigger
-Make a small change to your codebase (e.g., update a comment or configuration file) and push it:
+For manual deployments, use the consolidated `deploy.sh` script:
 
 ```bash
-git add .
-git commit -m "Trigger deployment to GCP"
-git push
+# Make the script executable
+chmod +x deploy.sh
+
+# Basic deployment with defaults
+./deploy.sh
+
+# Deployment with custom settings
+./deploy.sh \
+  --project my-project-id \
+  --region us-central1 \
+  --service my-service \
+  --env production \
+  --min-instances 1 \
+  --max-instances 10 \
+  --memory 1Gi \
+  --cpu 2
 ```
 
-#### Option 2: Manual Trigger
-You can also manually trigger the workflow from the GitHub Actions tab in your repository.
+### Script Features
 
-### 2. Monitor the Deployment
+- Comprehensive command-line parameters
+- Environment-specific configuration from `.env.{environment}` files
+- Secret management from `secrets.{environment}.txt` files
+- Colorized output with clear progress indicators
+- Automatic dependency checking
+- Built-in deployment verification
 
-Once the workflow is triggered:
+## Monitoring and Verification
+
+### Monitor the Deployment
+
+For GitHub Actions deployments:
 
 1. Go to the **Actions** tab in your GitHub repository
-2. Select the running instance of the **Deploy to GCP** workflow
-3. Expand the logs for each step to monitor progress:
-   - Checkout code
-   - Set up Python and Poetry
-   - Install dependencies
-   - Run tests
-   - Authenticate to Google Cloud
-   - Build and push container
-   - Deploy to Cloud Run
+2. Select the running instance of the **Deploy to Cloud Run** workflow
+3. Expand the logs for each step to monitor progress
 
-Look for any errors, especially in the authentication or deployment stages.
+For manual deployments, the script provides detailed output.
 
-### 3. Verify the Deployed Service
+### Verify the Deployed Service
 
-After the workflow completes successfully:
+After deployment completes successfully:
 
 #### Get the Service URL
-The workflow deploys your application to Cloud Run, and the output includes a URL (e.g., `https://orchestra-api-XXXXX-uc.a.run.app`).
-
-Check the workflow logs for the exact URL in the "Deploy to Cloud Run" step or the "Show Output" step.
+The deployment outputs a URL (e.g., `https://orchestra-api-XXXXX-uc.a.run.app`).
 
 #### Test the Service
-Open the URL in a browser or use a tool like curl to test the endpoints:
+Test with the provided health endpoint:
 
 ```bash
-curl https://orchestra-api-XXXXX-uc.a.run.app
+# For authenticated services
+curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://your-service-url/health
+
+# For public services
+curl https://your-service-url/health
 ```
 
 #### Check Cloud Run Console
 1. Log in to the Google Cloud Console
-2. Navigate to Cloud Run and select your service (e.g., `orchestra-api`)
+2. Navigate to Cloud Run and select your service
 3. Confirm the service is running and check its status
 
 #### CLI Verification
 From your Codespace or local machine with gcloud installed, run:
 
 ```bash
-gcloud run services describe orchestra-api --region us-central1
+gcloud run services describe YOUR_SERVICE_NAME --region YOUR_REGION
 ```
-
-This will display details about your deployed service, including its status and URL.
 
 ## Customization Options
 
-### Modify the Service Name
-Edit the `SERVICE_NAME` variable in `.github/workflows/deploy-to-gcp.yml` if you want a different service name on Cloud Run.
+### Environment-Specific Configuration
 
-### Adjust Resources
-Update the memory and CPU settings in the workflow's "Deploy to Cloud Run" step:
+Create environment files for different deployment environments:
 
-```yaml
-memory: 1Gi  # Increase from 512Mi if needed
-cpu: 2       # Increase from 1 if needed
-```
+1. **Environment Variables**: Store in `.env.{environment}` files
+   ```
+   # .env.staging example
+   DEBUG=true
+   LOG_LEVEL=info
+   DATABASE_URL=postgresql://user:pass@localhost:5432/mydb
+   ```
 
-### Add Environment Variables
-In the workflow file, add environment variables under the env_vars section of the "Deploy to Cloud Run" step:
+2. **Secrets Configuration**: Define in `secrets.{environment}.txt` files
+   ```
+   # secrets.staging.txt example
+   API_KEY=projects/123456/secrets/api-key/versions/1
+   DB_PASSWORD=projects/123456/secrets/db-password/versions/latest
+   ```
 
-```yaml
-env_vars: |
-  PROJECT_ID=${{ env.PROJECT_ID }}
-  REGION=${{ env.REGION }}
-  ENVIRONMENT=prod
-  KEY1=value1
-  KEY2=value2
-```
+### Command-Line Parameters
 
-Replace `KEY1=value1,KEY2=value2` with your application-specific variables.
+The `deploy.sh` script supports many parameters:
 
-### Configure Scaling
-Add scaling parameters to the "Deploy to Cloud Run" step:
-
-```yaml
-min_instances: 1
-max_instances: 10
-```
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `--project` | GCP project ID | cherry-ai-project |
+| `--region` | GCP region | us-central1 |
+| `--service` | Cloud Run service name | orchestra-api |
+| `--env` | Deployment environment | staging |
+| `--repo` | Artifact Registry repository name | orchestra-repo |
+| `--min-instances` | Minimum instances | 0 |
+| `--max-instances` | Maximum instances | 10 |
+| `--memory` | Memory allocation | 512Mi |
+| `--cpu` | CPU allocation | 1 |
+| `--concurrency` | Request concurrency | 80 |
+| `--timeout` | Request timeout | 300s |
+| `--public` | Allow unauthenticated access | false |
 
 ## Troubleshooting
 
@@ -147,25 +169,26 @@ max_instances: 10
 - Ensure your Workload Identity Federation is correctly set up
 - Verify the service account has the necessary permissions:
   - `roles/run.admin`
-  - `roles/storage.admin`
+  - `roles/artifactregistry.admin`
   - `roles/iam.serviceAccountUser`
 
 ### Build Failures
-- Check the Docker build logs in the workflow for errors in your Dockerfile or dependencies
+- Check the Docker build logs for errors in your Dockerfile or dependencies
 - Verify that Poetry is correctly configured in your project
 
 ### Deployment Failures
 - Verify the Cloud Run region and service configuration match your GCP setup
 - Check if the service account has the necessary permissions to deploy to Cloud Run
+- Ensure Artifact Registry repository exists or can be created
 
 ### Dev Container Issues
-- If the Dev Container fails to authenticate with GCP, check the `GCP_SERVICE_ACCOUNT_KEY` secret
+- If the Dev Container fails to authenticate with GCP, check the Workload Identity Federation setup
 - Run the verification script manually: `.devcontainer/setup_and_verify.sh`
 
 ### Logs
 - Detailed logs are available in the GitHub Actions output
 - Cloud Run logs can be viewed in the Cloud Run console under the "Logs" tab
-- Dev Container logs are stored in `/workspaces/orchestra-main/codespace_setup.log`
+- For manual deployments, check the logs output by the `deploy.sh` script
 
 ## GitHub Codespaces Setup
 
@@ -190,4 +213,12 @@ gcloud auth list
 gcloud config get-value project
 ```
 
-If the service account is listed and active (marked with *), and the project ID matches `cherry-ai-project`, the setup is complete.
+If the service account is listed and active (marked with *), and the project ID matches your GCP project, the setup is complete.
+
+## Additional Documentation
+
+For more detailed information about the deployment process, refer to:
+- `CLOUD_RUN_DEPLOYMENT_GUIDE.md` - Comprehensive guide for the deployment script
+- `SIMPLE_DEPLOYMENT.md` - Simplified deployment options
+- `docs/DOCKER_DEPLOYMENT_GUIDE.md` - Docker-specific deployment information
+- `DEPLOYMENT_CHANGES.md` - Overview of recent deployment infrastructure changes

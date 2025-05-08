@@ -49,12 +49,8 @@
   },
   "defaultMode": "code",
   "fileRestrictions": {
-    "architect": [".*\\.md$", ".*\\.tf$", ".*\\.hcl$", ".*\\.yaml$", ".*\\.yml$"],
-    "code": [".*\\.py$", ".*\\.js$", ".*\\.jsx$", ".*\\.ts$", ".*\\.tsx$", ".*\\.html$", ".*\\.css$", ".*\\.json$", ".*Dockerfile.*", ".*\\.sh$"],
     "reviewer": [".*"],
     "ask": [".*"],
-    "strategy": [".*\\.md$"],
-    "creative": [".*\\.md$", ".*\\.txt$"],
     "debug": [".*"]
   },
   "customModes": [

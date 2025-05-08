@@ -1,88 +1,63 @@
 #!/bin/bash
+# Setup script for AI Orchestra development environment
+
 set -e
 
 echo "Setting up AI Orchestra development environment..."
 
-# Ensure Poetry is properly configured
+# Install dependencies
+echo "Installing Poetry..."
+curl -sSL https://install.python-poetry.org | python3 -
+poetry --version
+
+# Configure Poetry
+echo "Configuring Poetry..."
 poetry config virtualenvs.in-project true
 
-# Check if poetry.lock exists and is up-to-date
-if [ ! -f "poetry.lock" ] || [ "pyproject.toml" -nt "poetry.lock" ]; then
-  echo "Generating poetry.lock file..."
-  poetry lock --no-update
-fi
+# Install project dependencies
+echo "Installing project dependencies..."
+poetry install
 
-# Install dependencies with retry mechanism
-MAX_RETRIES=3
-RETRY_COUNT=0
-SUCCESS=false
-
-while [ $RETRY_COUNT -lt $MAX_RETRIES ] && [ "$SUCCESS" = false ]; do
-  echo "Installing dependencies (attempt $((RETRY_COUNT+1))/$MAX_RETRIES)..."
-  if poetry install --with dev; then
-    SUCCESS=true
-  else
-    RETRY_COUNT=$((RETRY_COUNT+1))
-    if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
-      echo "Retrying in 5 seconds..."
-      sleep 5
-    fi
-  fi
-done
-
-if [ "$SUCCESS" = false ]; then
-  echo "Failed to install dependencies after $MAX_RETRIES attempts."
-  exit 1
-fi
-
-# Create standard mode marker file
-touch .standard_mode
-
-# Install pre-commit hooks if config exists
-if [ -f ".pre-commit-config.yaml" ]; then
-  echo "Installing pre-commit hooks..."
-  pre-commit install
-fi
-
-# Display environment information
-echo "Environment setup complete!"
-echo "Python version: $(python --version)"
-echo "Poetry version: $(poetry --version)"
-
-# Create GCP credentials directory if it doesn't exist
-mkdir -p ~/.config/gcloud
-
-# Prevent VS Code restricted mode
-echo "Preventing VS Code restricted mode..."
-# Set critical environment variables
-export USE_RECOVERY_MODE=false
-export STANDARD_MODE=true
-export VSCODE_DISABLE_WORKSPACE_TRUST=true
-export DISABLE_WORKSPACE_TRUST=true
-
-# Make all scripts executable
-find . -name "*.sh" -type f -exec chmod +x {} \; 2>/dev/null
-
-# Run the comprehensive fix script if it exists
-if [ -f "./fix_restricted_mode.sh" ]; then
-  echo "Running comprehensive restricted mode fix script..."
-  bash ./fix_restricted_mode.sh
+# Configure gcloud if credentials are available
+if [ -n "$GCP_MASTER_SERVICE_JSON" ]; then
+  echo "Configuring gcloud..."
+  echo $GCP_MASTER_SERVICE_JSON > /tmp/gcp-credentials.json
+  gcloud auth activate-service-account --key-file=/tmp/gcp-credentials.json
+  gcloud config set project cherry-ai-project
+  gcloud config set run/region us-west4
+  gcloud auth configure-docker us-docker.pkg.dev
+  rm /tmp/gcp-credentials.json
 else
-  echo "Comprehensive fix script not found, using basic prevention..."
-  
-  # Update VS Code settings
-  mkdir -p .vscode
-  if [ -f .vscode/settings.json ]; then
-    # Ensure workspace trust settings are correct
-    sed -i 's/"security.workspace.trust.enabled": *true/"security.workspace.trust.enabled": false/g' .vscode/settings.json 2>/dev/null
-    sed -i 's/"security.workspace.trust.startupPrompt": *".*"/"security.workspace.trust.startupPrompt": "never"/g' .vscode/settings.json 2>/dev/null
-    sed -i 's/"security.workspace.trust.banner": *".*"/"security.workspace.trust.banner": "never"/g' .vscode/settings.json 2>/dev/null
-    sed -i 's/"security.workspace.trust.emptyWindow": *true/"security.workspace.trust.emptyWindow": false/g' .vscode/settings.json 2>/dev/null
-    echo "VS Code settings updated to prevent restricted mode"
-  fi
+  echo "GCP credentials not found. Skipping gcloud configuration."
 fi
 
-echo "Restricted mode prevention complete"
+# Configure GitHub CLI if token is available
+if [ -n "$GH_CLASSIC_PAT_TOKEN" ]; then
+  echo "Configuring GitHub CLI..."
+  echo $GH_CLASSIC_PAT_TOKEN | gh auth login --with-token
+  gh config set editor vim
+else
+  echo "GitHub token not found. Skipping GitHub CLI configuration."
+fi
 
-# Create a marker file to indicate setup has completed
-touch .setup_complete
+# Set up pre-commit hooks
+echo "Setting up pre-commit hooks..."
+poetry run pre-commit install
+
+# Make scripts executable
+echo "Making scripts executable..."
+find ./scripts -type f -name "*.sh" -exec chmod +x {} \;
+find ./scripts -type f -name "*.py" -exec chmod +x {} \;
+
+# Create local environment file if it doesn't exist
+if [ ! -f .env.local ]; then
+  echo "Creating local environment file..."
+  cat > .env.local << EOF
+# Local environment variables
+PROJECT_ID=cherry-ai-project
+REGION=us-west4
+ENVIRONMENT=dev
+EOF
+fi
+
+echo "Setup complete! Your AI Orchestra development environment is ready."

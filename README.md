@@ -26,7 +26,7 @@ This project provides a complete setup for deploying AI services on GCP, includi
 ├── .env                     # Environment variables
 ├── Dockerfile               # Docker configuration
 ├── pyproject.toml           # Poetry configuration
-└── setup_gcp_environment.sh # GCP environment setup script
+└── deploy.sh                # Consolidated deployment script
 ```
 
 ## Prerequisites
@@ -34,7 +34,6 @@ This project provides a complete setup for deploying AI services on GCP, includi
 - Python 3.11+
 - Poetry
 - Google Cloud SDK
-- Terraform
 - Docker
 
 ## Setup
@@ -62,26 +61,41 @@ poetry run uvicorn packages.api.main:app --reload
 
 ### GCP Environment Setup
 
-1. Make the setup script executable:
+1. Set up non-interactive authentication (optional but recommended):
 
 ```bash
-chmod +x setup_gcp_environment.sh
+# Make the script executable
+chmod +x setup_service_account.sh
+
+# Run the service account setup script
+./setup_service_account.sh
 ```
 
-2. Run the setup script:
+This eliminates browser-based authentication prompts during deployment.
+
+2. Make the deployment script executable:
 
 ```bash
-./setup_gcp_environment.sh
+chmod +x deploy.sh
+```
+
+3. Run the deployment script:
+
+```bash
+./deploy.sh
 ```
 
 This script will:
-- Initialize the GCP workspace
-- Deploy basic infrastructure
-- Configure Vertex AI resources
+- Configure your GCP environment
+- Build and push a Docker image to Artifact Registry
 - Deploy the application to Cloud Run
-- Configure the data sync pipeline
+- Verify the deployment
 
-For more detailed instructions, see [GCP_ENVIRONMENT_SETUP_GUIDE.md](GCP_ENVIRONMENT_SETUP_GUIDE.md).
+For more detailed instructions, see:
+- [CLOUD_RUN_DEPLOYMENT_GUIDE.md](CLOUD_RUN_DEPLOYMENT_GUIDE.md) - Detailed deployment guide
+- [NON_INTERACTIVE_AUTH_GUIDE.md](NON_INTERACTIVE_AUTH_GUIDE.md) - Non-interactive authentication guide
+- [SIMPLE_DEPLOYMENT.md](SIMPLE_DEPLOYMENT.md) - Quick-start deployment guide
+- [docs/GCP_DEPLOYMENT_GUIDE.md](docs/GCP_DEPLOYMENT_GUIDE.md) - GCP-specific deployment guide
 
 ## API Endpoints
 
@@ -96,21 +110,45 @@ The API provides the following endpoints:
 
 ## Deployment
 
-### Manual Deployment
+AI Orchestra offers multiple deployment options:
 
-Deploy to Cloud Run:
+### Script-Based Deployment
+
+Use the consolidated deployment script with sensible defaults:
 
 ```bash
-gcloud run deploy orchestra-api \
-  --source . \
+./deploy.sh
+```
+
+Or customize your deployment:
+
+```bash
+./deploy.sh \
+  --project my-project-id \
   --region us-central1 \
-  --platform managed \
-  --allow-unauthenticated
+  --service my-service \
+  --env production \
+  --min-instances 1 \
+  --max-instances 10
 ```
 
 ### CI/CD Deployment
 
-Push to the main branch to trigger automatic deployment via GitHub Actions.
+The project includes a GitHub Actions workflow for automated deployment:
+
+1. **Automatic Staging Deployment**: Push to the main branch
+2. **Manual Production Deployment**: Use the workflow dispatch with production environment
+
+The workflow is defined in `.github/workflows/deploy-cloud-run.yml`.
+
+### Environment-Specific Configuration
+
+Create environment files for different deployment environments:
+
+1. **Environment Variables**: Store in `.env.{environment}` files
+   - Example: `.env.staging`, `.env.production`
+
+2. **Secrets Configuration**: Define in `secrets.{environment}.txt` files
 
 ## Vertex AI Integration
 

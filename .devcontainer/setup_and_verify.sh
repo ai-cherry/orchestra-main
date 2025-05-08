@@ -187,6 +187,31 @@ else
   echo "WARNING: gcloud not found in PATH"
 fi
 
+# Start the MCP memory system
+echo "Starting MCP memory system..."
+if [ -d "/workspaces/orchestra-main/mcp_server" ]; then
+  # Check if the MCP server is already running
+  if pgrep -f "python.*mcp_server.main" > /dev/null; then
+    echo "MCP server is already running."
+  else
+    # Copy config if it doesn't exist
+    if [ ! -f "/workspaces/orchestra-main/mcp_server/config.json" ]; then
+      if [ -f "/workspaces/orchestra-main/mcp_server/config.json.example" ]; then
+        cp /workspaces/orchestra-main/mcp_server/config.json.example /workspaces/orchestra-main/mcp_server/config.json
+        echo "Created MCP configuration from example"
+      fi
+    fi
+    
+    # Start the MCP server in the background
+    cd /workspaces/orchestra-main
+    nohup python -m mcp_server.main > /tmp/mcp-server.log 2>&1 &
+    echo "MCP server started with PID $!"
+    echo "Log file: /tmp/mcp-server.log"
+  fi
+else
+  echo "MCP server directory not found, skipping startup"
+fi
+
 echo "======================================================"
 echo "  SETUP COMPLETE"
 echo "======================================================"
