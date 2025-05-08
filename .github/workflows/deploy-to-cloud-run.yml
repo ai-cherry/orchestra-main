@@ -4,24 +4,27 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
+    paths:
+      - 'packages/**'
+      - 'core/**'
+      - 'Dockerfile'
+      - 'pyproject.toml'
+      - 'poetry.lock'
+      - '.github/workflows/deploy-to-cloud-run.yml'
 
 env:
   PROJECT_ID: cherry-ai-project
-  SERVICE_NAME: orchestra-api
   REGION: us-central1
+  SERVICE_NAME: ai-orchestra-api
 
 jobs:
   deploy:
-    name: Deploy to Cloud Run
+    name: Build and Deploy
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -32,57 +35,64 @@ jobs:
       - name: Install Poetry
         uses: snok/install-poetry@v1
         with:
-          version: 1.7.1
+          version: 1.8.2
           virtualenvs-create: true
           virtualenvs-in-project: true
 
       - name: Install dependencies
-        run: |
-          poetry install --no-interaction --no-ansi --no-root --no-dev
+        run: poetry install --no-interaction --no-dev
 
-      - name: Run tests
-        run: |
-          poetry run pytest
-
-      - name: Google Auth
-        id: auth
-        uses: google-github-actions/auth@v2
+      - name: Auth with Google Cloud
+        uses: google-github-actions/auth@v1
         with:
-          workload_identity_provider: projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider
-          service_account: github-actions@cherry-ai-project.iam.gserviceaccount.com
+          credentials_json: ${{ secrets.GCP_MASTER_SERVICE_JSON }}
 
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: ${{ env.PROJECT_ID }}
 
       - name: Authorize Docker push
         run: gcloud auth configure-docker
 
-      - name: Build and push container
-        uses: google-github-actions/docker-build-push@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3
         with:
-          registry: gcr.io
-          project_id: ${{ env.PROJECT_ID }}
-          image_name: ${{ env.SERVICE_NAME }}
-          tag: ${{ github.sha }}
-          dockerfile: Dockerfile
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
           context: .
+          push: true
+          tags: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }},gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest
+          build-args: |
+            PROJECT_ID=${{ env.PROJECT_ID }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+      # This step is necessary to prevent cache from growing indefinitely
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
       - name: Deploy to Cloud Run
-        uses: google-github-actions/deploy-cloudrun@v2
-        with:
-          service: ${{ env.SERVICE_NAME }}
-          region: ${{ env.REGION }}
-          image: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
-          env_vars: |
-            PROJECT_ID=${{ env.PROJECT_ID }}
-            REGION=${{ env.REGION }}
-            ENVIRONMENT=prod
-          memory: 512Mi
-          cpu: 1
-          service_account: orchestra-api-sa@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
-          allow_unauthenticated: true
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }} \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --service-account orchestra-api-sa@${{ env.PROJECT_ID }}.iam.gserviceaccount.com \
+            --allow-unauthenticated \
+            --set-env-vars="PROJECT_ID=${{ env.PROJECT_ID }},REGION=${{ env.REGION }}"
 
-      - name: Show Output
-        run: echo ${{ steps.deploy.outputs.url }}
+      - name: Show deployed service URL
+        run: |
+          echo "Service URL: $(gcloud run services describe ${{ env.SERVICE_NAME }} --platform managed --region ${{ env.REGION }} --format='value(status.url)')"

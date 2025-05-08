@@ -135,11 +135,13 @@ steps:
     - '-c'
     - |
       echo "Scanning Docker image for vulnerabilities..."
+      # Fix the image path to match the one used in the build/push steps
       gcloud artifacts docker images scan \
-        us-docker.pkg.dev/cherry-ai.me/orchestra/app:latest \
+        us-west4-docker.pkg.dev/cherry-ai.me/orchestra/api:$_ENV \
         --format=json | tee scan-results.json
       
       # Check for critical/high vulnerabilities and fail the build if found
+      # Using local variables, not substitution variables
       CRITICAL_COUNT=$(grep -c '"severity": "CRITICAL"' scan-results.json || true)
       HIGH_COUNT=$(grep -c '"severity": "HIGH"' scan-results.json || true)
       
@@ -184,7 +186,7 @@ options:
   machineType: 'E2_HIGHCPU_8'
   env:
     - 'PYTHONUNBUFFERED=1'
-  substitution_option: 'ALLOW_LOOSE'
+  # Removed invalid substitution_option
 
 # Use a service account with the necessary permissions
 serviceAccount: 'projects/525398941159/serviceAccounts/vertex-agent@cherry-ai.me.iam.gserviceaccount.com'

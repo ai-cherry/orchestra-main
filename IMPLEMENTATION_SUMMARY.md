@@ -1,144 +1,146 @@
-# Orchestra Implementation Summary
+# Non-Interactive GCP Authentication Implementation Summary
 
-This document summarizes the implementation of Orchestra's GCP authentication system, Terraform infrastructure provisioning, and Figma-GCP integration components.
+This document summarizes the implementation of non-interactive Google Cloud Platform (GCP) authentication across the AI Orchestra codebase. This implementation eliminates browser-based authentication prompts, making deployments more streamlined.
 
-## Components Implemented
+## Files Modified/Created
 
-### 1. GCP Authentication and Service Account Setup
+| File | Status | Description |
+|------|--------|-------------|
+| `deploy.sh` | Modified | Added multi-tiered authentication flow |
+| `deploy_anywhere.sh` | Modified | Added service account authentication |
+| `Dockerfile` | Modified | Replaced hardcoded credentials with mount point |
+| `test_docker_build.sh` | Modified | Added credential volume mounting |
+| `.github/workflows/deploy-cloud-run.yml` | Modified | Added service account directory setup |
+| `setup_service_account.sh` | Created | New utility for setting up authentication |
+| `service-account-key-example.json` | Created | Example key format for reference |
+| `README.md` | Modified | Added service account setup instructions |
+| `CLOUD_RUN_DEPLOYMENT_GUIDE.md` | Modified | Added non-interactive auth section |
+| `NON_INTERACTIVE_AUTH_GUIDE.md` | Created | Comprehensive guide for all auth methods |
+| `GCP_GITHUB_DEPENDENCIES.md` | Created | Dependencies and further options |
 
-- Created `setup_gcp_auth.sh` script to:
-  - Configure GCP authentication 
-  - Create and manage service account keys
-  - Set up environment variables
-  - Validate authentication
+## Authentication Flow
 
-- Script supports the Vertex service account:
-  ```bash
-  export GCP_PROJECT_ID=cherry-ai-project
-  export GCP_SA_KEY_PATH=/tmp/vertex-agent-key.json
-  export GOOGLE_APPLICATION_CREDENTIALS=/tmp/vertex-agent-key.json
-  ```
+The implementation uses a multi-tiered authentication approach:
 
-### 2. Terraform Infrastructure Configuration
+1. **Service Account Key** - Check for file at `$HOME/.gcp/service-account.json`
+2. **Environment Variable** - Fall back to `GCP_MASTER_SERVICE_JSON` environment variable
+3. **Browser Auth** - Only prompt for browser-based auth if neither above is available
 
-- Created complete configuration in `infra/orchestra-terraform/`:
-  - Vertex AI Workbench (4 vCPUs, 16GB RAM)
-  - Firestore in NATIVE mode with redundancy
-  - Memorystore Redis instance (3GB)
-  - Secret Manager for secure storage of credentials
-  - Required API enablement
+## Required GCP Components
 
-- Configuration uses variables for flexibility and environment-specific values:
-  ```hcl
-  variable "project_id" {
-    description = "GCP Project ID"
-    type        = string
-    default     = "cherry-ai-project"
-  }
-  ```
+The minimal dependencies required are:
 
-### 3. Figma-GCP Integration Components
+- **GCP APIs**: `artifactregistry.googleapis.com`, `run.googleapis.com`
+- **Service Account Roles**:
+  - Cloud Run Admin (`roles/run.admin`)
+  - Artifact Registry Administrator (`roles/artifactregistry.admin`) 
+  - Service Account User (`roles/iam.serviceAccountUser`)
+- **GCP SDK**: Standard `gcloud` installation
 
-- Developed `scripts/figma_gcp_sync.py` to:
-  - Extract design tokens from Figma
-  - Generate platform-specific style files (CSS, JS, Android, iOS)
-  - Update GCP Secret Manager with design tokens
-  - Validate using Vertex AI (optional)
+## GitHub Actions Integration
 
-- Supports automation through command-line parameters:
-  ```bash
-  python scripts/figma_gcp_sync.py \
-    --file-key YOUR_FILE_KEY \
-    --output-dir ./styles \
-    --project-id cherry-ai-project \
-    --update-secrets \
-    --validate
-  ```
+For CI/CD with GitHub Actions:
 
-### 4. GitHub Integration
+- **GitHub Actions Runner**: Standard runner with Docker support
+- **Actions**: Standard checkout, auth, and setup-gcloud actions
+- **Authentication**: Uses Workload Identity Federation (recommended) or can use key-based auth
 
-- Implemented `scripts/setup_github_org_secrets.sh` to:
-  - Set up organization or repository secrets
-  - Store GCP credentials securely
-  - Configure Figma PAT for automated workflows
+## User Experience
 
-- Created GitHub Actions workflow templates for CI/CD:
-  - Test execution
-  - Figma synchronization
-  - Deployment to Cloud Run
+1. **One-time Setup**:
+   ```bash
+   # Set up service account key
+   ./setup_service_account.sh
+   ```
 
-### 5. Memory Management Integration
+2. **Everyday Usage**:
+   ```bash
+   # No browser prompts, works immediately
+   ./deploy.sh
+   ```
 
-- Created test scripts for memory management validation:
-  - Local in-memory implementation testing
-  - Firestore-based implementation testing
-  - Error handling and recovery testing
+## Technical Implementation Details
 
-## Unified Management Tools
-
-### 1. Unified Setup Script
-
-- Created comprehensive `unified_setup.sh` that:
-  - Configures GCP authentication
-  - Provisions infrastructure with Terraform
-  - Sets up Figma-GCP integration
-  - Configures GitHub Actions
-  - Runs memory management tests
-
-### 2. Unified Diagnostics
-
-- Created `unified_diagnostics.py` that:
-  - Checks environment variables
-  - Validates GCP authentication
-  - Verifies Terraform configuration
-  - Tests Figma API connectivity
-  - Validates GitHub Actions setup
-  - Checks memory management functionality
-
-## Usage Instructions
-
-### Initial Setup
-
-Run the unified setup script to configure all components:
+### 1. deploy.sh Authentication Logic
 
 ```bash
-./unified_setup.sh
+# Try to authenticate with service account if available
+if [[ -f "$HOME/.gcp/service-account.json" ]]; then
+  log "INFO" "Authenticating with service account key"
+  gcloud auth activate-service-account --quiet --key-file=$HOME/.gcp/service-account.json
+  export GOOGLE_APPLICATION_CREDENTIALS=$HOME/.gcp/service-account.json
+  log "SUCCESS" "Authenticated with service account key"
+elif [[ -n "$GCP_MASTER_SERVICE_JSON" ]]; then
+  log "INFO" "Creating service account key file from environment variable"
+  mkdir -p $HOME/.gcp
+  echo "$GCP_MASTER_SERVICE_JSON" > $HOME/.gcp/service-account.json
+  gcloud auth activate-service-account --quiet --key-file=$HOME/.gcp/service-account.json
+  export GOOGLE_APPLICATION_CREDENTIALS=$HOME/.gcp/service-account.json
+  log "SUCCESS" "Authenticated with service account key from environment variable"
+else
+  log "WARN" "No service account credentials found, using default auth method"
+  log "INFO" "To avoid interactive prompts, set up a service account key at $HOME/.gcp/service-account.json"
+fi
 ```
 
-This script will guide you through the entire setup process, with prompts for confirmation at critical steps.
+### 2. Docker Integration
 
-### Diagnostics
+The Dockerfile creates a credential mount point:
+```dockerfile
+# Create a directory for GCP credentials (will be mounted or populated at runtime)
+RUN mkdir -p /app/.gcp
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/.gcp/service-account.json
+```
 
-Run the diagnostics script to check system health:
-
+And the test script passes credentials when available:
 ```bash
-python unified_diagnostics.py
+# Prepare for authentication if available
+if [[ -f "$HOME/.gcp/service-account.json" ]]; then
+  echo "Using local service account key for authentication..."
+  GCP_AUTH_MOUNT="-v $HOME/.gcp:/app/.gcp:ro"
+else
+  echo "No service account key found at $HOME/.gcp/service-account.json"
+  echo "Container will use application default credentials if available"
+  GCP_AUTH_MOUNT=""
+fi
+
+# Run the container
+docker run -d --name ${CONTAINER_NAME} -p ${PORT}:${PORT} ${GCP_AUTH_MOUNT} ${IMAGE_NAME}
 ```
 
-This will verify all components and provide a summary of the system status.
+### 3. GitHub Actions Workflow
 
-### Figma Synchronization
-
-Sync design tokens from Figma:
-
-```bash
-python scripts/figma_gcp_sync.py --file-key YOUR_FILE_KEY
+```yaml
+- name: Setup service account credentials directory
+  run: |
+    mkdir -p $HOME/.gcp
+    
+- name: Run deployment script
+  run: |
+    # Make the script executable
+    chmod +x ./deploy.sh
+    
+    # Run the deployment script with staging settings
+    ./deploy.sh \
+      --project ${{ env.PROJECT_ID }} \
+      --region ${{ env.REGION }} \
+      --service orchestra-api \
+      --env staging
 ```
 
-### GitHub Secrets Setup
+## Benefits
 
-Configure GitHub secrets for CI/CD:
+1. **No Browser Prompts** - Eliminates need to open browser for auth
+2. **Consistent Authentication** - Works the same way across all scripts
+3. **CI/CD Friendly** - Compatible with GitHub Actions
+4. **Docker Integration** - Credentials automatically mounted into containers
+5. **Flexible Options** - Supports both file-based and environment variable approaches
+6. **Minimal Dependencies** - Only requires standard GCP components
 
-```bash
-export GITHUB_TOKEN=your_token
-./scripts/setup_github_org_secrets.sh --repo your_org your_repo
-```
+## Security Considerations
 
-## Next Steps
+The implementation keeps security considerations in mind while maintaining ease of use:
 
-1. **Run the Setup Script**: Execute `./unified_setup.sh` to set up the entire system
-2. **Configure GitHub Webhooks**: Follow instructions in docs/github_webhook_setup.md
-3. **Test Memory Management**: Run tests with GCP infrastructure
-4. **Enable CI/CD Pipeline**: Configure GitHub repository for automated deployments
-
-All components have been implemented according to the specified requirements and are ready for deployment.
+- Service account keys are stored locally, not in the repository
+- Credentials can be mounted as read-only in Docker containers
+- GitHub Actions uses Workload Identity Federation by default

@@ -30,6 +30,18 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+@router.get("/health", tags=["System"])
+async def health_check() -> Dict[str, str]:
+    """
+    Health check endpoint for monitoring and container health checks.
+    
+    Returns:
+        Dict[str, str]: Status information
+    """
+    return {"status": "ok", "service": "orchestra-api"}
+
+
+
 @router.get("/models", response_model=ModelListResponse, tags=["Models"])
 async def list_models(
     model_type: Optional[str] = Query(None, description="Filter by model type"),

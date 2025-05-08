@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  mcp-server:
+    build:
+      context: ../..
+      dockerfile: mcp_server/scripts/Dockerfile
+    image: ai-orchestra/mcp-server:latest
+    container_name: mcp-server
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    volumes:
+      # Mount a volume for persistent storage
+      - mcp-data:/app/data
+      # Mount custom configuration if needed
+      - ${MCP_CONFIG_PATH:-./config.json}:/app/mcp_server/config.json:ro
+    environment:
+      # Set any environment variables here
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      # Uncomment to set Gemini API key
+      # - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - mcp-network
+
+networks:
+  mcp-network:
+    driver: bridge
+
+volumes:
+  mcp-data:
+    # This volume persists data between container restarts
+    name: mcp-server-data

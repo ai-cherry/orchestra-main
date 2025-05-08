@@ -1,99 +1,80 @@
 """
-Main FastAPI application for AI Orchestra project.
-
-This module initializes the FastAPI application and includes all routes.
+AI Orchestra API - Main Application Entry Point
 """
-
-import logging
-import os
-from typing import Dict, List, Optional
-
-from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-
-from .config import Settings, get_settings
-from .dependencies import get_vertex_client
-from .models import HealthResponse, VertexModel, VertexPredictionRequest, VertexPredictionResponse
-from .routes import router as api_router
+import logging
+import time
+from typing import Callable, Dict, Any, Optional
 
 # Configure logging
 logging.basicConfig(
-    level=os.environ.get("LOG_LEVEL", "INFO"),
+    level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("ai-orchestra")
 
-# Initialize FastAPI app
+# Create FastAPI application
 app = FastAPI(
     title="AI Orchestra API",
-    description="API for AI Orchestra project using Vertex AI",
+    description="API for orchestrating AI models and workflows",
     version="0.1.0",
 )
+
+# Add GZip compression for responses
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with specific origins
+    allow_origins=["*"],  # Update with specific origins in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include routers
-app.include_router(api_router, prefix="/api")
+# Request timing middleware
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next: Callable) -> JSONResponse:
+    """Middleware to track request processing time."""
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
 
-@app.get("/", tags=["Root"])
+# Health check endpoint
+@app.get("/health")
+async def health_check() -> Dict[str, str]:
+    """Health check endpoint for monitoring."""
+    return {"status": "healthy"}
+
+# Root endpoint
+@app.get("/")
 async def root() -> Dict[str, str]:
-    """
-    Root endpoint that returns basic API information.
-    
-    Returns:
-        Dict[str, str]: Basic API information
-    """
+    """Root endpoint with API information."""
     return {
         "name": "AI Orchestra API",
         "version": "0.1.0",
-        "status": "active",
+        "description": "API for orchestrating AI models and workflows",
     }
 
-@app.get("/health", response_model=HealthResponse, tags=["Health"])
-async def health_check(settings: Settings = Depends(get_settings)) -> HealthResponse:
-    """
-    Health check endpoint to verify API is running correctly.
-    
-    Args:
-        settings: Application settings
-        
-    Returns:
-        HealthResponse: Health status information
-    """
-    return HealthResponse(
-        status="ok",
-        version="0.1.0",
-        environment=settings.environment,
-        gcp_project=settings.project_id,
-    )
+# Include routers from other modules
+# from .routers import models, agents, workflows
+# app.include_router(models.router, prefix="/models", tags=["models"])
+# app.include_router(agents.router, prefix="/agents", tags=["agents"])
+# app.include_router(workflows.router, prefix="/workflows", tags=["workflows"])
 
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    """
-    Global exception handler for unhandled exceptions.
-    
-    Args:
-        request: The request that caused the exception
-        exc: The unhandled exception
-        
-    Returns:
-        JSONResponse: Error response
-    """
-    logger.error(f"Unhandled exception: {exc}", exc_info=True)
-    return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"detail": "An unexpected error occurred."},
-    )
+# Add graceful shutdown handler
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Handle graceful shutdown."""
+    logger.info("Application shutdown initiated")
+    # Add cleanup code here (e.g., close DB connections)
+    logger.info("Application shutdown complete")
 
 if __name__ == "__main__":
     import uvicorn
-    
-    uvicorn.run("packages.api.main:app", host="0.0.0.0", port=8080, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)

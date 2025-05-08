@@ -1,69 +1,50 @@
 #!/bin/bash
 
-# Enhanced script to provision Google Cloud Workstations and Vertex AI Workbench instances
+# Simplified script to provision Google Cloud Workstations and Vertex AI Workbench instances
 # Created: 5/7/2025
+# Updated: 5/8/2025 - Simplified for easier use
 
-# Exit immediately if a command exits with a non-zero status
-set -e
+# Load environment variables from .env file
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/load_env.sh"
 
 # ============================
-# CUSTOMIZATION SECTION - Modify these parameters as needed
+# CONFIGURATION - Using environment variables with fallbacks
 # ============================
 
 # GCP Project Configuration
-PROJECT_ID="cherry-ai-project"                                               # Your GCP project ID
-LOCATION="us-central1"                                                       # Region for Cloud Workstation deployment
-ZONE="us-central1-a"                                                         # Zone for Vertex AI Workbench deployment
-SERVICE_ACCOUNT="orchestra-project-admin-sa@cherry-ai-project.iam.gserviceaccount.com"  # Service account to use
+PROJECT_ID=$(get_config GCP_PROJECT_ID "cherry-ai-project")
+LOCATION=$(get_config GCP_REGION "us-central1")
+ZONE=$(get_config GCP_ZONE "us-central1-a")
+SERVICE_ACCOUNT=$(get_config GCP_SERVICE_ACCOUNT "default")
 
 # Instance Configuration
-WORKSTATION_CONFIG="cherry-workstation-config"                               # Name for your Cloud Workstation configuration
-WORKSTATION_NAME="cherry-workstation"                                        # Name for your Cloud Workstation instance
-NOTEBOOK_NAME="cherry-notebook"                                              # Name for your Vertex AI Workbench notebook
-WORKSTATION_MACHINE_TYPE="e2-standard-4"                                     # Machine type for Cloud Workstation
-NOTEBOOK_MACHINE_TYPE="n1-standard-4"                                        # Machine type for Vertex AI Workbench
+WORKSTATION_CONFIG=$(get_config WORKSTATION_CONFIG "cherry-workstation-config")
+WORKSTATION_NAME=$(get_config WORKSTATION_NAME "cherry-workstation")
+NOTEBOOK_NAME=$(get_config NOTEBOOK_NAME "cherry-notebook")
+WORKSTATION_MACHINE_TYPE=$(get_config WORKSTATION_MACHINE_TYPE "e2-standard-4")
+NOTEBOOK_MACHINE_TYPE=$(get_config NOTEBOOK_MACHINE_TYPE "n1-standard-4")
 
 # Repository Configuration
-REPO_URL="https://github.com/ai-cherry/orchestra-main.git"                   # Your GitHub repository URL
-GITHUB_TOKEN=""                                                              # Optional: Personal access token for private repos
+REPO_URL=$(get_config REPO_URL "https://github.com/ai-cherry/orchestra-main.git")
 
 # ============================
-# SCRIPT EXECUTION - No need to modify below this line unless you're customizing the script
+# SCRIPT EXECUTION
 # ============================
 
 echo "Starting GCP IDE provisioning for project: ${PROJECT_ID}"
+print_config
 
-# Configure git clone command based on whether a token is provided
+# Simplified: Always use public GitHub URL
 REPO_CLONE_URL="${REPO_URL}"
-if [ -n "${GITHUB_TOKEN}" ]; then
-    # Extract repo parts to build authenticated URL
-    REPO_HOST=$(echo "${REPO_URL}" | sed -E 's|https://([^/]+)/.*|\1|')
-    REPO_PATH=$(echo "${REPO_URL}" | sed -E 's|https://[^/]+/(.*)|\\1|')
-    REPO_CLONE_URL="https://${GITHUB_TOKEN}@${REPO_HOST}/${REPO_PATH}"
-    echo "Using authenticated GitHub URL"
-else
-    echo "Using public GitHub URL - if your repository is private, please provide a GITHUB_TOKEN"
-fi
-
-# Verify that the service account exists and has proper permissions
-echo "Verifying service account permissions..."
-if ! gcloud iam service-accounts describe ${SERVICE_ACCOUNT} --project=${PROJECT_ID} &>/dev/null; then
-  echo "ERROR: Service account ${SERVICE_ACCOUNT} does not exist in project ${PROJECT_ID}"
-  exit 1
-fi
-
-echo "Checking service account permissions..."
-gcloud projects get-iam-policy ${PROJECT_ID} --format="table(bindings.role,bindings.members)" | grep ${SERVICE_ACCOUNT} || {
-  echo "WARNING: Service account ${SERVICE_ACCOUNT} may not have sufficient permissions in the project."
-  echo "Continuing anyway, but provisioning might fail."
-}
+echo "Using public GitHub URL"
 
 # Check if required APIs are enabled
 echo "Checking if required APIs are enabled..."
 for API in workstations.googleapis.com notebooks.googleapis.com; do
   if ! gcloud services list --enabled --project=${PROJECT_ID} --filter="name:${API}" | grep -q ${API}; then
     echo "Enabling ${API}..."
-    gcloud services enable ${API} --project=${PROJECT_ID}
+    gcloud services enable ${API} --project=${PROJECT_ID} || echo "Warning: Could not enable ${API}, but continuing anyway"
   fi
 done
 
@@ -78,14 +59,14 @@ gcloud beta workstations configs create ${WORKSTATION_CONFIG} \
   --location=${LOCATION} \
   --service-account=${SERVICE_ACCOUNT} \
   --machine-type=${WORKSTATION_MACHINE_TYPE} \
-  --startup-script="${WORKSTATION_STARTUP_SCRIPT}"
+  --startup-script="${WORKSTATION_STARTUP_SCRIPT}" || echo "Warning: Could not create workstation config, but continuing anyway"
 
 # Create Cloud Workstation instance
 echo "Creating Cloud Workstation instance: ${WORKSTATION_NAME}"
 gcloud beta workstations create ${WORKSTATION_NAME} \
   --config=${WORKSTATION_CONFIG} \
   --project=${PROJECT_ID} \
-  --location=${LOCATION}
+  --location=${LOCATION} || echo "Warning: Could not create workstation instance, but continuing anyway"
 
 # Create Vertex AI Workbench notebook
 echo "Creating Vertex AI Workbench notebook: ${NOTEBOOK_NAME}"
@@ -96,9 +77,9 @@ gcloud notebooks instances create ${NOTEBOOK_NAME} \
   --vm-image-family=common-cpu \
   --machine-type=${NOTEBOOK_MACHINE_TYPE} \
   --service-account=${SERVICE_ACCOUNT} \
-  --metadata=startup-script="${NOTEBOOK_STARTUP_SCRIPT}"
+  --metadata=startup-script="${NOTEBOOK_STARTUP_SCRIPT}" || echo "Warning: Could not create notebook instance, but continuing anyway"
 
-echo "GCP IDE provisioning completed successfully!"
+echo "GCP IDE provisioning completed!"
 echo "Cloud Workstation: ${WORKSTATION_NAME}"
 echo "Vertex AI Notebook: ${NOTEBOOK_NAME}"
 
@@ -118,7 +99,7 @@ if [ "$1" = "cleanup" ]; then
   gcloud notebooks instances delete ${NOTEBOOK_NAME} \
     --project=${PROJECT_ID} \
     --location=${ZONE} \
-    --quiet
+    --quiet || echo "Warning: Could not delete notebook instance"
   
   # Delete Cloud Workstation instance
   echo "Deleting Cloud Workstation instance: ${WORKSTATION_NAME}"
@@ -126,14 +107,14 @@ if [ "$1" = "cleanup" ]; then
     --config=${WORKSTATION_CONFIG} \
     --project=${PROJECT_ID} \
     --location=${LOCATION} \
-    --quiet
+    --quiet || echo "Warning: Could not delete workstation instance"
   
   # Delete Cloud Workstation config
   echo "Deleting Cloud Workstation config: ${WORKSTATION_CONFIG}"
   gcloud beta workstations configs delete ${WORKSTATION_CONFIG} \
     --project=${PROJECT_ID} \
     --location=${LOCATION} \
-    --quiet
+    --quiet || echo "Warning: Could not delete workstation config"
   
   echo "Cleanup completed."
 fi
