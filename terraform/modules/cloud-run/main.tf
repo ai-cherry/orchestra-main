@@ -1,94 +1,86 @@
 # Cloud Run Terraform Module for AI Orchestra
 
-# Cloud Run service
-resource "google_cloud_run_service" "service" {
+# Cloud Run service using v2 API
+resource "google_cloud_run_v2_service" "service" {
   name     = "${var.service_name}-${var.env}"
   location = var.region
   project  = var.project_id
 
   template {
-    spec {
-      containers {
-        image = var.container_image
+    containers {
+      image = var.container_image
 
-        # Set resource limits
-        resources {
-          limits = {
-            cpu    = var.cpu
-            memory = var.memory
-          }
-        }
-
-        # Set environment variables
-        dynamic "env" {
-          for_each = var.environment_variables
-          content {
-            name  = env.key
-            value = env.value
-          }
-        }
-
-        # Set secrets as environment variables
-        dynamic "env" {
-          for_each = var.secret_environment_variables
-          content {
-            name = env.key
-            value_from {
-              secret_key_ref {
-                name = env.value.secret_name
-                key  = env.value.secret_key
-              }
-            }
-          }
-        }
-
-        # Set ports
-        ports {
-          container_port = var.container_port
+      # Set resource limits
+      resources {
+        limits = {
+          cpu    = var.cpu
+          memory = var.memory
         }
       }
 
-      # Set service account
-      service_account_name = var.service_account_email
+      # Set environment variables
+      dynamic "env" {
+        for_each = var.environment_variables
+        content {
+          name  = env.key
+          value = env.value
+        }
+      }
 
-      # Set container concurrency
-      container_concurrency = var.container_concurrency
+      # Set secrets as environment variables
+      dynamic "secrets" {
+        for_each = var.secret_environment_variables
+        content {
+          name    = secrets.key
+          secret  = secrets.value.secret_name
+          version = "latest"
+        }
+      }
 
-      # Set timeout
-      timeout_seconds = var.timeout_seconds
+      # Set ports
+      ports {
+        container_port = var.container_port
+      }
     }
 
-    # Set metadata
-    metadata {
-      annotations = {
-        "autoscaling.knative.dev/minScale" = var.min_instances
-        "autoscaling.knative.dev/maxScale" = var.max_instances
-      }
+    # Set service account
+    service_account = var.service_account_email
+    
+    # Set container concurrency
+    execution_environment = "EXECUTION_ENVIRONMENT_GEN2"
+    max_instance_request_concurrency = var.container_concurrency
+    
+    # Set timeout
+    timeout = "${var.timeout_seconds}s"
+    
+    # Set scaling with optimized settings
+    scaling {
+      min_instance_count = var.min_instances
+      max_instance_count = var.max_instances
     }
   }
 
   # Set traffic
   traffic {
-    percent         = 100
-    latest_revision = true
+    percent = 100
+    type    = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
   }
 
   # Ignore changes to image and other fields that are updated outside of Terraform
   lifecycle {
     ignore_changes = [
-      template[0].spec[0].containers[0].image,
-      template[0].metadata[0].annotations["client.knative.dev/user-image"],
-      template[0].metadata[0].annotations["run.googleapis.com/client-name"],
-      template[0].metadata[0].annotations["run.googleapis.com/client-version"],
+      template[0].containers[0].image,
+      client,
+      client_version,
     ]
   }
 }
 
 # IAM policy for Cloud Run service
-resource "google_cloud_run_service_iam_policy" "noauth" {
-  location    = google_cloud_run_service.service.location
-  project     = google_cloud_run_service.service.project
-  service     = google_cloud_run_service.service.name
+resource "google_cloud_run_v2_service_iam_policy" "noauth" {
+  location    = google_cloud_run_v2_service.service.location
+  project     = google_cloud_run_v2_service.service.project
+  name        = google_cloud_run_v2_service.service.name
   policy_data = data.google_iam_policy.noauth.policy_data
 }
 
@@ -103,20 +95,13 @@ data "google_iam_policy" "noauth" {
 }
 
 # Cloud Run domain mapping
-resource "google_cloud_run_domain_mapping" "domain_mapping" {
+resource "google_cloud_run_v2_domain_mapping" "domain_mapping" {
   count = var.domain_name != "" ? 1 : 0
 
   location = var.region
   project  = var.project_id
   name     = var.domain_name
-
-  metadata {
-    namespace = var.project_id
-  }
-
-  spec {
-    route_name = google_cloud_run_service.service.name
-  }
+  service  = google_cloud_run_v2_service.service.name
 }
 
 # Secret Manager secrets for Cloud Run
@@ -161,11 +146,11 @@ resource "google_cloud_scheduler_job" "scheduler_job" {
 
   http_target {
     http_method = var.scheduler_config.http_method
-    uri         = google_cloud_run_service.service.status[0].url
+    uri         = google_cloud_run_v2_service.service.uri
     
     oidc_token {
       service_account_email = var.scheduler_config.service_account_email
-      audience              = google_cloud_run_service.service.status[0].url
+      audience              = google_cloud_run_v2_service.service.uri
     }
   }
 }
@@ -182,7 +167,7 @@ resource "google_monitoring_alert_policy" "alert_policy" {
     display_name = "Error rate for ${var.service_name}"
     
     condition_threshold {
-      filter          = "resource.type = \"cloud_run_revision\" AND resource.labels.service_name = \"${google_cloud_run_service.service.name}\" AND metric.type = \"run.googleapis.com/request_count\" AND metric.labels.response_code_class = \"4xx\""
+      filter          = "resource.type = \"cloud_run_revision\" AND resource.labels.service_name = \"${google_cloud_run_v2_service.service.name}\" AND metric.type = \"run.googleapis.com/request_count\" AND metric.labels.response_code_class = \"4xx\""
       duration        = "60s"
       comparison      = "COMPARISON_GT"
       threshold_value = var.error_rate_threshold
@@ -199,4 +184,20 @@ resource "google_monitoring_alert_policy" "alert_policy" {
   }
 
   notification_channels = var.notification_channels
+}
+
+# Outputs
+output "service_url" {
+  description = "The URL of the deployed Cloud Run service"
+  value       = google_cloud_run_v2_service.service.uri
+}
+
+output "service_name" {
+  description = "The name of the Cloud Run service"
+  value       = google_cloud_run_v2_service.service.name
+}
+
+output "domain_mapping_status" {
+  description = "The status of the domain mapping"
+  value       = var.domain_name != "" ? google_cloud_run_v2_domain_mapping.domain_mapping[0].status : null
 }

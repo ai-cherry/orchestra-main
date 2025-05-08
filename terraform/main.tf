@@ -2,6 +2,11 @@
 # This file sets up the complete GCP environment for the project
 
 terraform {
+  backend "gcs" {
+    bucket = "cherry-ai-project-terraform-state"
+    prefix = "terraform/state"
+  }
+
   required_providers {
     google = {
       source  = "hashicorp/google"

@@ -1,213 +1,126 @@
-name: AI-Generated Artifact Deployment
+name: Build and Deploy
 
 on:
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Deployment environment'
-        required: true
-        default: 'dev'
-        type: choice
-        options:
-          - dev
-          - staging
-          - production
   push:
-    branches: [ main ]
-    paths:
-      - 'terraform/**'
-      - 'src/**'
-      - '.github/workflows/deploy.yml'
-      - 'Dockerfile'
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  validate-terraform:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.3.0
-
-      - name: Terraform Format
-        run: terraform fmt -check -recursive
-        working-directory: terraform
-        continue-on-error: true
-
-      - name: Terraform Init
-        run: terraform init
-        working-directory: terraform
-
-      - name: Terraform Validate
-        run: terraform validate
-        working-directory: terraform
-
-  plan-terraform:
-    needs: validate-terraform
-    runs-on: ubuntu-latest
-    outputs:
-      terraform_plan: ${{ steps.tf-plan.outputs.stdout }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.3.0
-
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v1
-        with:
-          credentials_json: ${{ secrets.VERTEX_AI_FULL_ACCESS_KEY }}
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-
-      - name: Terraform Init
-        run: terraform init
-        working-directory: terraform
-
-      - name: Terraform Plan
-        id: tf-plan
-        run: terraform plan -input=false -no-color
-        working-directory: terraform
-
-      - name: Save Terraform Plan
-        run: terraform plan -input=false -out=tfplan
-        working-directory: terraform
-
-      - name: Upload Terraform Plan
-        uses: actions/upload-artifact@v3
-        with:
-          name: terraform-plan
-          path: terraform/tfplan
-          retention-days: 5
-
-  build-and-push:
-    runs-on: ubuntu-latest
-    needs: plan-terraform
-    outputs:
-      image: ${{ steps.build-image.outputs.image }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v1
-        with:
-          credentials_json: ${{ secrets.VERTEX_AI_FULL_ACCESS_KEY }}
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-
-      - name: Configure Docker for GCP Artifact Registry
-        run: |
-          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
-
-      - name: Set environment variables
-        id: env-vars
-        run: |
-          echo "PROJECT_ID=$(gcloud config get-value project)" >> $GITHUB_ENV
-          echo "REGION=us-central1" >> $GITHUB_ENV
-          echo "IMAGE_NAME=orchestra-api" >> $GITHUB_ENV
-          echo "IMAGE_TAG=${GITHUB_SHA::8}" >> $GITHUB_ENV
-
-      - name: Build and push Docker image
-        id: build-image
-        run: |
-          FULL_IMAGE_NAME=${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/orchestra/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-          docker build -t ${FULL_IMAGE_NAME} .
-          docker push ${FULL_IMAGE_NAME}
-          echo "image=${FULL_IMAGE_NAME}" >> $GITHUB_OUTPUT
-
-  deploy-to-gcp:
-    needs: [build-and-push, plan-terraform]
-    runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment || 'dev' }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.3.0
-
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v1
-        with:
-          credentials_json: ${{ secrets.VERTEX_AI_FULL_ACCESS_KEY }}
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-
-      - name: Download Terraform Plan
-        uses: actions/download-artifact@v3
-        with:
-          name: terraform-plan
-          path: terraform
-
-      - name: Apply Terraform changes
-        run: terraform apply -input=false -auto-approve tfplan
-        working-directory: terraform
-
-      - name: Update Cloud Run service with new image
-        run: |
-          gcloud run services update orchestra-api \
-            --image=${{ needs.build-and-push.outputs.image }} \
-            --region=us-central1 \
-            --platform=managed
-
-      - name: Output service URL
-        run: |
-          SERVICE_URL=$(gcloud run services describe orchestra-api --region=us-central1 --format='value(status.url)')
-          echo "Service deployed to: $SERVICE_URL"
-
-  run-tests:
-    needs: deploy-to-gcp
-    runs-on: ubuntu-latest
-    if: github.event.inputs.environment != 'production'
-    steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
+          cache: 'poetry'
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          poetry --version
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install pytest requests
+          poetry config virtualenvs.in-project true
+          poetry install --no-interaction
+
+      - name: Run tests
+        run: |
+          poetry run pytest
+
+      - name: Run linting
+        run: |
+          poetry run flake8
+          poetry run mypy .
+
+  build-container:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: 'projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'github-actions@cherry-ai-project.iam.gserviceaccount.com'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker us-docker.pkg.dev
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t us-docker.pkg.dev/cherry-ai-project/orchestra/api:${{ github.sha }} .
+          docker push us-docker.pkg.dev/cherry-ai-project/orchestra/api:${{ github.sha }}
+
+  deploy-cloud-run:
+    needs: build-container
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    
+    steps:
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: 'projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'github-actions@cherry-ai-project.iam.gserviceaccount.com'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy mcp-server \
+            --image us-docker.pkg.dev/cherry-ai-project/orchestra/api:${{ github.sha }} \
+            --region us-west4 \
+            --platform managed \
+            --memory 16Gi \
+            --cpu 4 \
+            --min-instances 2 \
+            --max-instances 20 \
+            --concurrency 80 \
+            --execution-environment gen2 \
+            --service-account orchestra-api-sa@cherry-ai-project.iam.gserviceaccount.com \
+            --set-env-vars="PROJECT_ID=cherry-ai-project,ENVIRONMENT=${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }},REGION=us-west4" \
+            --set-secrets="GCP_MASTER_SERVICE_JSON=gcp-master-service-json:latest,GH_CLASSIC_PAT_TOKEN=gh-classic-pat-token:latest,GH_FINE_GRAINED_PAT_TOKEN=gh-fine-grained-pat-token:latest"
 
       - name: Run integration tests
         run: |
-          SERVICE_URL=$(gcloud run services describe orchestra-api --region=us-central1 --format='value(status.url)')
-          python -m pytest tests/integration/ --url=$SERVICE_URL
+          SERVICE_URL=$(gcloud run services describe mcp-server --region us-west4 --format='value(status.url)')
+          curl -s -o /dev/null -w "%{http_code}" $SERVICE_URL/health | grep 200
 
-  notify-roo-code:
-    needs: [deploy-to-gcp, run-tests]
-    if: always()
+  notify:
+    needs: deploy-cloud-run
     runs-on: ubuntu-latest
+    if: always()
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests
-
-      - name: Notify Roo Code of deployment status
-        run: |
-          python orchestrator.py task --mode creative --prompt "Create a deployment summary for the AI-generated project. Deployment to ${{ github.event.inputs.environment || 'dev' }} environment ${{ needs.deploy-to-gcp.result == 'success' && 'succeeded' || 'failed' }}. Tests ${{ needs.run-tests.result == 'success' && 'passed' || 'failed or were skipped' }}."
+      - name: Notify deployment status
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_CHANNEL: deployments
+          SLACK_COLOR: ${{ needs.deploy-cloud-run.result == 'success' && 'good' || 'danger' }}
+          SLACK_TITLE: Deployment Status
+          SLACK_MESSAGE: |
+            Deployment of MCP Server to Cloud Run ${{ needs.deploy-cloud-run.result == 'success' && 'succeeded' || 'failed' }}
+            Environment: ${{ github.ref == 'refs/heads/main' && 'Production' || 'Development' }}
+            Commit: ${{ github.sha }}
+            Author: ${{ github.actor }}
