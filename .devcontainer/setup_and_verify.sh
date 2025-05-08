@@ -2,18 +2,42 @@
 # Enhanced setup and verification script for GCP integration in GitHub Codespaces
 # This script balances robustness with simplicity and integrates with existing scripts
 
-# Redirect output to a log file for debugging
-exec > >(tee -i /workspaces/orchestra-main/codespace_setup.log) 2>&1
+# Parse command line arguments
+IS_REBUILD=false
+for arg in "$@"; do
+  case $arg in
+    --rebuild)
+      IS_REBUILD=true
+      shift
+      ;;
+  esac
+done
+
+# Set log file based on whether this is a rebuild
+if [ "$IS_REBUILD" = true ]; then
+  LOG_FILE="/workspaces/orchestra-main/codespace_rebuild.log"
+  echo "This is a rebuild operation" > "$LOG_FILE"
+else
+  LOG_FILE="/workspaces/orchestra-main/codespace_setup.log"
+fi
+
+# Redirect output to the log file for debugging
+exec > >(tee -i "$LOG_FILE") 2>&1
 
 echo "======================================================"
-echo "  ENHANCED CODESPACE SETUP AND VERIFICATION"
+if [ "$IS_REBUILD" = true ]; then
+  echo "  CODESPACE REBUILD VERIFICATION"
+else
+  echo "  ENHANCED CODESPACE SETUP AND VERIFICATION"
+fi
 echo "======================================================"
 echo "Starting setup at $(date)"
+echo "Is rebuild: $IS_REBUILD"
 
 # Function for error handling
 handle_error() {
   echo "ERROR: $1"
-  echo "See codespace_setup.log for details"
+  echo "See $LOG_FILE for details"
 }
 
 # Create necessary directories
@@ -35,34 +59,24 @@ if grep -q "recovery container" /workspaces/.codespaces/.persistedshare/creation
   echo "This may indicate issues with the original container configuration"
 fi
 
-# Handle GCP service account key with retry
-echo "Setting up GCP authentication..."
-if [ -n "$GCP_MASTER_SERVICE_JSON" ]; then
-  # Use retry mechanism for key setup
-  for i in {1..3}; do
-    echo $GCP_MASTER_SERVICE_JSON > $HOME/.gcp/service-account.json && break || {
-      echo "Attempt $i to write service account key failed"
-      sleep 2
-    }
-  done
+# Verify GCP service account key
+echo "Verifying GCP authentication..."
+if [ -f "$HOME/.gcp/service-account.json" ]; then
+  echo "Service account key file exists"
   
-  if [ -f "$HOME/.gcp/service-account.json" ]; then
-    echo "Service account key file created successfully"
-    
-    # Set credentials environment variable
+  # Set credentials environment variable if not already set
+  if [ -z "$GOOGLE_APPLICATION_CREDENTIALS" ]; then
     export GOOGLE_APPLICATION_CREDENTIALS=$HOME/.gcp/service-account.json
     echo "Set GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS"
-    
-    # Add to .bashrc if not already there (idempotent)
-    if ! grep -q "GOOGLE_APPLICATION_CREDENTIALS=$HOME/.gcp/service-account.json" $HOME/.bashrc; then
-      echo 'export GOOGLE_APPLICATION_CREDENTIALS=$HOME/.gcp/service-account.json' >> $HOME/.bashrc
-      echo "Added GOOGLE_APPLICATION_CREDENTIALS to .bashrc"
-    fi
-  else
-    handle_error "Failed to create service account key file"
+  fi
+  
+  # Add to .bashrc if not already there (idempotent)
+  if ! grep -q "GOOGLE_APPLICATION_CREDENTIALS=$HOME/.gcp/service-account.json" $HOME/.bashrc; then
+    echo 'export GOOGLE_APPLICATION_CREDENTIALS=$HOME/.gcp/service-account.json' >> $HOME/.bashrc
+    echo "Added GOOGLE_APPLICATION_CREDENTIALS to .bashrc"
   fi
 else
-  handle_error "GCP_MASTER_SERVICE_JSON environment variable not set"
+  handle_error "Service account key file not found at $HOME/.gcp/service-account.json"
 fi
 
 # Update VS Code settings for standard mode (idempotent)
@@ -107,75 +121,45 @@ EOF
   echo "Created new settings.json with workspace trust disabled"
 fi
 
-# Add environment variables to .bashrc (idempotent)
-echo "Updating .bashrc with environment variables..."
-if ! grep -q "VSCODE_DISABLE_WORKSPACE_TRUST=true" $HOME/.bashrc; then
-  cat << 'EOF' >> $HOME/.bashrc
-
-# Standard mode environment variables
-export VSCODE_DISABLE_WORKSPACE_TRUST=true
-export STANDARD_MODE=true
-export DISABLE_WORKSPACE_TRUST=true
-export USE_RECOVERY_MODE=false
-EOF
-  echo "Added standard mode environment variables to .bashrc"
+# Verify Poetry installation
+echo "Verifying Poetry installation..."
+if command -v poetry &> /dev/null; then
+  echo "Poetry is installed"
+  poetry --version
+else
+  echo "WARNING: Poetry not found in PATH"
 fi
 
-# Check for gcloud
-echo "Checking for gcloud installation..."
-if ! command -v gcloud &> /dev/null; then
-  echo "gcloud not found in PATH"
-  echo "Setting up PATH variables in case gcloud is installed but not in PATH..."
-  
-  # Add potential gcloud paths to PATH
-  for gcloud_path in \
-    "/workspaces/orchestra-main/google-cloud-sdk/bin" \
-    "$HOME/google-cloud-sdk/bin" \
-    "/usr/local/google-cloud-sdk/bin" \
-    "/usr/share/google-cloud-sdk/bin"; do
-    
-    if [ -d "$gcloud_path" ]; then
-      echo "Found potential gcloud at $gcloud_path, adding to PATH"
-      export PATH=$PATH:$gcloud_path
-      echo "export PATH=\$PATH:$gcloud_path" >> $HOME/.bashrc
-    fi
-  done
-  
-  # Check again after path updates
-  if ! command -v gcloud &> /dev/null; then
-    echo "gcloud still not found after PATH updates"
-    echo ""
-    echo "Google Cloud SDK should be installed manually:"
-    echo "1. Run: curl https://sdk.cloud.google.com | bash"
-    echo "2. Run: exec -l \$SHELL"
-    echo "3. Run: gcloud init"
-    echo ""
-    echo "Standard mode settings have been configured successfully."
-    echo "Once gcloud is installed, run './enhanced_verify_gcp_setup.sh' to complete GCP setup."
-  fi
+# Verify Python installation
+echo "Verifying Python installation..."
+if command -v python &> /dev/null; then
+  echo "Python is installed"
+  python --version
+else
+  echo "WARNING: Python not found in PATH"
 fi
 
-# Only attempt GCP operations if gcloud is available
+# Verify gcloud installation
+echo "Verifying gcloud installation..."
 if command -v gcloud &> /dev/null; then
-  # Authenticate with GCP (with retry)
-  echo "Authenticating with GCP..."
-  if [ -f "$HOME/.gcp/service-account.json" ]; then
-    for i in {1..3}; do
-      gcloud auth activate-service-account --key-file=$HOME/.gcp/service-account.json && {
-        echo "Successfully authenticated with GCP"
-        break
-      } || {
-        echo "Attempt $i to authenticate with GCP failed"
-        sleep 3
-        if [ $i -eq 3 ]; then
-          handle_error "Failed to authenticate with GCP after 3 attempts"
-        fi
-      }
-    done
+  echo "gcloud is installed"
+  gcloud --version
+  
+  # Test GCP authentication
+  echo "Testing GCP authentication..."
+  if gcloud auth list 2>&1 | grep -q "Credentialed Accounts"; then
+    echo "GCP authentication is configured"
     
-    # Set project
-    echo "Setting GCP project..."
-    gcloud config set project cherry-ai-project
+    # Verify project configuration
+    echo "Verifying GCP project configuration..."
+    PROJECT=$(gcloud config get-value project 2>/dev/null)
+    if [ "$PROJECT" = "cherry-ai-project" ]; then
+      echo "GCP project is correctly set to cherry-ai-project"
+    else
+      echo "WARNING: GCP project is set to $PROJECT, expected cherry-ai-project"
+      echo "Setting project to cherry-ai-project..."
+      gcloud config set project cherry-ai-project
+    fi
     
     # Simple GCP test
     echo "Testing GCP connectivity..."
@@ -185,26 +169,28 @@ if command -v gcloud &> /dev/null; then
       handle_error "Failed to list GCP projects"
     fi
   else
-    handle_error "Service account key file not found"
+    echo "WARNING: GCP authentication not configured or failed"
+    echo "Attempting to authenticate with service account key..."
+    if [ -f "$HOME/.gcp/service-account.json" ]; then
+      gcloud auth activate-service-account --key-file=$HOME/.gcp/service-account.json
+      if [ $? -eq 0 ]; then
+        echo "Successfully authenticated with GCP"
+        gcloud config set project cherry-ai-project
+      else
+        handle_error "Failed to authenticate with GCP"
+      fi
+    else
+      handle_error "Service account key file not found"
+    fi
   fi
 else
-  echo ""
-  echo "===== GCP SETUP POSTPONED ====="
-  echo "GCP authentication will be completed when gcloud is available"
-  echo "The service account key has been created at $HOME/.gcp/service-account.json"
-  echo "Environment variables have been configured correctly"
-  echo "Standard mode has been successfully enforced"
-  echo ""
+  echo "WARNING: gcloud not found in PATH"
 fi
 
 echo "======================================================"
 echo "  SETUP COMPLETE"
 echo "======================================================"
 echo "Finished at $(date)"
-echo ""
-echo "To verify configurations anytime:"
-echo "  ./verify_standard_mode.sh"
-echo "  ./enhanced_verify_gcp_setup.sh"
 echo ""
 echo "To apply environment variables to current session:"
 echo "  source ~/.bashrc"
