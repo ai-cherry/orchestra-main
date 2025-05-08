@@ -38,6 +38,12 @@ poetry.lock
 !tsconfig.json
 !.vscode/*.json
 
+# Google Cloud SDK
+google-cloud-sdk*/
+google-cloud-cli*.tar.gz
+google-cloud-sdk.staging/
+*.tar.gz
+
 # Terraform
 .terraform/
 .terraform.lock.hcl
