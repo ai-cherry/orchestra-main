@@ -23,8 +23,8 @@ on:
           - production
 
 env:
-  PROJECT_ID: cherry-ai-project
-  REGION: us-central1
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: ${{ secrets.GCP_REGION }}
   REPO_NAME: orchestra-repo
 
 jobs:
@@ -64,18 +64,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Simplified authentication
-      - name: Set up gcloud CLI
-        uses: google-github-actions/setup-gcloud@v2
+      # Authentication using Workload Identity Federation
+      - name: Google Auth via Workload Identity Federation
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          token_format: 'access_token'
+
+      # Set up Cloud SDK
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: ${{ env.PROJECT_ID }}
-
-      # Authenticate with service account key from secrets
-      - name: Authenticate to Google Cloud
-        run: |
-          echo "${{ secrets.GCP_SA_KEY }}" > service-account.json
-          gcloud auth activate-service-account --key-file=service-account.json
-          export GOOGLE_APPLICATION_CREDENTIALS=service-account.json
 
       - name: Create .env file
         run: |
@@ -118,18 +120,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Simplified authentication
-      - name: Set up gcloud CLI
-        uses: google-github-actions/setup-gcloud@v2
+      # Authentication using Workload Identity Federation
+      - name: Google Auth via Workload Identity Federation
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          token_format: 'access_token'
+
+      # Set up Cloud SDK
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: ${{ env.PROJECT_ID }}
-
-      # Authenticate with service account key from secrets
-      - name: Authenticate to Google Cloud
-        run: |
-          echo "${{ secrets.GCP_SA_KEY }}" > service-account.json
-          gcloud auth activate-service-account --key-file=service-account.json
-          export GOOGLE_APPLICATION_CREDENTIALS=service-account.json
 
       - name: Create .env file
         run: |
