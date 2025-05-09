@@ -13,8 +13,8 @@ on:
       - '.github/workflows/deploy-to-cloud-run.yml'
 
 env:
-  PROJECT_ID: cherry-ai-project
-  REGION: us-central1
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: ${{ secrets.GCP_REGION }}
   SERVICE_NAME: ai-orchestra-api
 
 jobs:
@@ -42,10 +42,13 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction --no-dev
 
-      - name: Auth with Google Cloud
+      - name: Google Auth via Workload Identity Federation
+        id: auth
         uses: google-github-actions/auth@v1
         with:
-          credentials_json: ${{ secrets.GCP_MASTER_SERVICE_JSON }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          token_format: 'access_token'
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1

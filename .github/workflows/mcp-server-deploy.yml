@@ -25,8 +25,8 @@ on:
           - prod
 
 env:
-  PROJECT_ID: cherry-ai-project
-  REGION: us-central1
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: ${{ secrets.GCP_REGION }}
   SERVICE_NAME: mcp-server
 
 jobs:
@@ -75,8 +75,9 @@ jobs:
         id: auth
         uses: google-github-actions/auth@v1
         with:
-          workload_identity_provider: 'projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
-          service_account: 'github-actions@${{ env.PROJECT_ID }}.iam.gserviceaccount.com'
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          token_format: 'access_token'
       
       - name: Configure Docker for GCR
         run: |
@@ -107,8 +108,9 @@ jobs:
         id: auth
         uses: google-github-actions/auth@v1
         with:
-          workload_identity_provider: 'projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
-          service_account: 'github-actions@${{ env.PROJECT_ID }}.iam.gserviceaccount.com'
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          token_format: 'access_token'
       
       - name: Deploy to Cloud Run
         id: deploy
@@ -135,8 +137,9 @@ jobs:
         id: auth
         uses: google-github-actions/auth@v1
         with:
-          workload_identity_provider: 'projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
-          service_account: 'github-actions@${{ env.PROJECT_ID }}.iam.gserviceaccount.com'
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          token_format: 'access_token'
       
       - name: Deploy to Cloud Run
         id: deploy
