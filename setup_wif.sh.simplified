@@ -1,0 +1,319 @@
+#!/bin/bash
+# setup_wif.sh.simplified - Streamlined setup script for GCP authentication
+# This script provides simplified options for single-developer workflows
+
+set -e
+
+# Color codes for output
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+BOLD='\033[1m'
+NC='\033[0m' # No Color
+
+# Create credentials directory if it doesn't exist
+mkdir -p ~/.orchestra/credentials
+
+# Function to print section header
+section() {
+    echo ""
+    echo -e "${BOLD}${BLUE}==== $1 ====${NC}"
+    echo ""
+}
+
+# Load the centralized GitHub authentication utility
+if [ -f "github_auth.sh.simplified" ]; then
+    source github_auth.sh.simplified
+elif [ -f "github_auth.sh" ]; then
+    source github_auth.sh
+else
+    echo -e "${RED}Error: No GitHub authentication script found. Please ensure github_auth.sh or github_auth.sh.simplified exists.${NC}"
+    exit 1
+fi
+
+# Default values with fallbacks to environment variables
+PROJECT_ID="${GCP_PROJECT_ID:-cherry-ai-project}"
+REGION="${GCP_REGION:-us-west4}"
+GITHUB_TOKEN=$(get_github_token)
+REPO_NAME="${REPO_NAME:-$(basename $(git rev-parse --show-toplevel 2>/dev/null || echo "orchestra-main"))}"
+SERVICE_ACCOUNT_NAME="${SERVICE_ACCOUNT_NAME:-github-actions-sa}"
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --project)
+            PROJECT_ID="$2"
+            shift 2
+            ;;
+        --region)
+            REGION="$2"
+            shift 2
+            ;;
+        --repo-name)
+            REPO_NAME="$2"
+            shift 2
+            ;;
+        --service-account)
+            SERVICE_ACCOUNT_NAME="$2"
+            shift 2
+            ;;
+        --help)
+            echo "Usage: $0 [options]"
+            echo ""
+            echo "Options:"
+            echo "  --project PROJECT_ID      GCP project ID (default: $PROJECT_ID)"
+            echo "  --region REGION           GCP region (default: $REGION)"
+            echo "  --repo-name REPO          GitHub repository name (default: $REPO_NAME)"
+            echo "  --service-account NAME    Service account name (default: $SERVICE_ACCOUNT_NAME)"
+            echo "  --help                    Show this help message"
+            exit 0
+            ;;
+        *)
+            echo -e "${RED}Unknown option: $1${NC}"
+            exit 1
+            ;;
+    esac
+done
+
+section "GCP Authentication Setup"
+
+# Check for gcloud CLI
+if ! command -v gcloud &> /dev/null; then
+    echo -e "${RED}Error: gcloud CLI not found. Please install it first.${NC}"
+    exit 1
+fi
+
+# Check if logged in to gcloud
+ACCOUNT=$(gcloud auth list --filter=status:ACTIVE --format="value(account)" 2>/dev/null || echo "")
+if [[ -z "$ACCOUNT" ]]; then
+    echo -e "${YELLOW}You are not logged in to gcloud. Let's log in now.${NC}"
+    gcloud auth login
+    ACCOUNT=$(gcloud auth list --filter=status:ACTIVE --format="value(account)" 2>/dev/null || echo "")
+fi
+
+echo -e "${GREEN}Currently authenticated as: $ACCOUNT${NC}"
+
+# Ask for project ID if not provided
+if [[ "$PROJECT_ID" == "cherry-ai-project" ]]; then
+    echo -e "${YELLOW}Please enter your GCP project ID:${NC}"
+    read PROJECT_ID
+fi
+
+echo -e "${GREEN}Project ID: $PROJECT_ID${NC}"
+
+# Set the project
+echo -e "${BLUE}Setting project to $PROJECT_ID...${NC}"
+gcloud config set project $PROJECT_ID
+
+# Get project number
+PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format="value(projectNumber)")
+if [[ -z "$PROJECT_NUMBER" ]]; then
+    echo -e "${RED}Failed to get project number for $PROJECT_ID${NC}"
+    exit 1
+fi
+echo -e "${GREEN}Project number: $PROJECT_NUMBER${NC}"
+
+section "Choose Authentication Method"
+
+echo "Select the authentication method you want to use for GitHub Actions:"
+echo ""
+echo "1) Workload Identity Federation (more secure, more complex setup)"
+echo "2) Service Account Key (simpler setup, less secure)"
+echo ""
+echo -e "${YELLOW}Enter your choice (1 or 2):${NC}"
+read AUTH_METHOD
+
+if [[ "$AUTH_METHOD" == "1" ]]; then
+    section "Setting up Workload Identity Federation"
+    
+    # Enable required APIs
+    echo "Enabling required APIs..."
+    gcloud services enable iam.googleapis.com iamcredentials.googleapis.com cloudresourcemanager.googleapis.com \
+        run.googleapis.com artifactregistry.googleapis.com --quiet
+    
+    # Create a simpler pool and provider name
+    POOL_NAME="github-pool"
+    PROVIDER_NAME="github-provider"
+    
+    # Create Workload Identity Pool if it doesn't exist
+    echo "Creating Workload Identity Pool..."
+    if ! gcloud iam workload-identity-pools describe $POOL_NAME \
+        --location="global" --format="value(name)" --project=$PROJECT_ID &>/dev/null; then
+        
+        gcloud iam workload-identity-pools create $POOL_NAME \
+            --location="global" \
+            --display-name="GitHub Actions Pool" \
+            --description="Identity pool for GitHub Actions" \
+            --project=$PROJECT_ID
+        
+        echo -e "${GREEN}Created Workload Identity Pool: $POOL_NAME${NC}"
+    else
+        echo -e "${GREEN}Workload Identity Pool already exists: $POOL_NAME${NC}"
+    fi
+    
+    # Create Workload Identity Provider if it doesn't exist
+    echo "Creating Workload Identity Provider..."
+    if ! gcloud iam workload-identity-pools providers describe $PROVIDER_NAME \
+        --location="global" \
+        --workload-identity-pool=$POOL_NAME \
+        --format="value(name)" \
+        --project=$PROJECT_ID &>/dev/null; then
+        
+        gcloud iam workload-identity-pools providers create-oidc $PROVIDER_NAME \
+            --location="global" \
+            --workload-identity-pool=$POOL_NAME \
+            --display-name="GitHub Provider" \
+            --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository" \
+            --issuer-uri="https://token.actions.githubusercontent.com" \
+            --project=$PROJECT_ID
+        
+        echo -e "${GREEN}Created Workload Identity Provider: $PROVIDER_NAME${NC}"
+    else
+        echo -e "${GREEN}Workload Identity Provider already exists: $PROVIDER_NAME${NC}"
+    fi
+    
+    # Create service account if it doesn't exist
+    echo "Creating service account..."
+    if ! gcloud iam service-accounts describe $SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com \
+        --project=$PROJECT_ID &>/dev/null; then
+        
+        gcloud iam service-accounts create $SERVICE_ACCOUNT_NAME \
+            --display-name="GitHub Actions Service Account" \
+            --description="Service account for GitHub Actions deployments" \
+            --project=$PROJECT_ID
+        
+        echo -e "${GREEN}Created service account: $SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com${NC}"
+    else
+        echo -e "${GREEN}Service account already exists: $SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com${NC}"
+    fi
+    
+    # Grant necessary roles to the service account
+    echo "Granting roles to service account..."
+    for role in "roles/run.admin" "roles/storage.admin" "roles/artifactregistry.admin" "roles/iam.serviceAccountUser"; do
+        gcloud projects add-iam-policy-binding $PROJECT_ID \
+            --member="serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com" \
+            --role="$role" \
+            --quiet
+        
+        echo -e "${GREEN}Granted $role to service account${NC}"
+    done
+    
+    # Get GitHub repository owner
+    echo -e "${YELLOW}What is your GitHub username or organization?${NC}"
+    read REPO_OWNER
+    
+    # Allow GitHub Actions to impersonate the service account
+    echo "Setting up service account impersonation..."
+    FULL_REPO="$REPO_OWNER/$REPO_NAME"
+    PRINCIPAL="principalSet://iam.googleapis.com/projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/$POOL_NAME/attribute.repository/$FULL_REPO"
+    
+    gcloud iam service-accounts add-iam-policy-binding $SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com \
+        --member="$PRINCIPAL" \
+        --role="roles/iam.workloadIdentityUser" \
+        --project=$PROJECT_ID
+    
+    echo -e "${GREEN}Allowed GitHub Actions to impersonate the service account${NC}"
+    
+    # Construct the Workload Identity Provider resource name
+    WIF_PROVIDER="projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/$POOL_NAME/providers/$PROVIDER_NAME"
+    WIF_SERVICE_ACCOUNT="$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com"
+    
+    # Set up GitHub repository secrets
+    echo "Setting up GitHub repository secrets..."
+    gh secret set GCP_PROJECT_ID --body "$PROJECT_ID" --repo "$FULL_REPO"
+    gh secret set GCP_REGION --body "$REGION" --repo "$FULL_REPO"
+    gh secret set GCP_WORKLOAD_IDENTITY_PROVIDER --body "$WIF_PROVIDER" --repo "$FULL_REPO"
+    gh secret set GCP_SERVICE_ACCOUNT --body "$WIF_SERVICE_ACCOUNT" --repo "$FULL_REPO"
+    
+    echo -e "${GREEN}Set up GitHub repository secrets for Workload Identity Federation${NC}"
+    
+    # Prepare instructions
+    AUTH_INSTRUCTIONS="Workload Identity Federation"
+    AUTH_CONFIG="workload_identity_provider: \${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}\n      service_account: \${{ secrets.GCP_SERVICE_ACCOUNT }}"
+    
+else
+    section "Setting up Service Account Key"
+    
+    # Create service account if it doesn't exist
+    echo "Creating service account..."
+    if ! gcloud iam service-accounts describe $SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com \
+        --project=$PROJECT_ID &>/dev/null; then
+        
+        gcloud iam service-accounts create $SERVICE_ACCOUNT_NAME \
+            --display-name="GitHub Actions Service Account" \
+            --description="Service account for GitHub Actions deployments" \
+            --project=$PROJECT_ID
+        
+        echo -e "${GREEN}Created service account: $SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com${NC}"
+    else
+        echo -e "${GREEN}Service account already exists: $SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com${NC}"
+    fi
+    
+    # Grant necessary roles to the service account
+    echo "Granting roles to service account..."
+    for role in "roles/run.admin" "roles/storage.admin" "roles/artifactregistry.admin" "roles/iam.serviceAccountUser"; do
+        gcloud projects add-iam-policy-binding $PROJECT_ID \
+            --member="serviceAccount:$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com" \
+            --role="$role" \
+            --quiet
+        
+        echo -e "${GREEN}Granted $role to service account${NC}"
+    done
+    
+    # Create a service account key
+    echo "Creating service account key..."
+    KEY_FILE="$HOME/.orchestra/credentials/$SERVICE_ACCOUNT_NAME-key.json"
+    gcloud iam service-accounts keys create "$KEY_FILE" \
+        --iam-account="$SERVICE_ACCOUNT_NAME@$PROJECT_ID.iam.gserviceaccount.com"
+    chmod 600 "$KEY_FILE"
+    
+    echo -e "${GREEN}Created service account key: $KEY_FILE${NC}"
+    
+    # Get GitHub repository owner
+    echo -e "${YELLOW}What is your GitHub username or organization?${NC}"
+    read REPO_OWNER
+    
+    # Set up GitHub repository secrets
+    echo "Setting up GitHub repository secrets..."
+    FULL_REPO="$REPO_OWNER/$REPO_NAME"
+    gh secret set GCP_PROJECT_ID --body "$PROJECT_ID" --repo "$FULL_REPO"
+    gh secret set GCP_REGION --body "$REGION" --repo "$FULL_REPO"
+    gh secret set GCP_SA_KEY --body "$(cat $KEY_FILE)" --repo "$FULL_REPO"
+    
+    echo -e "${GREEN}Set up GitHub repository secrets for Service Account Key${NC}"
+    
+    # Prepare instructions
+    AUTH_INSTRUCTIONS="Service Account Key"
+    AUTH_CONFIG="credentials_json: \${{ secrets.GCP_SA_KEY }}"
+fi
+
+section "Setup Complete"
+
+echo -e "${GREEN}GCP Authentication setup has been completed successfully!${NC}"
+echo ""
+echo "The following GitHub secrets have been set for repository $FULL_REPO:"
+echo "- GCP_PROJECT_ID: $PROJECT_ID"
+echo "- GCP_REGION: $REGION"
+if [[ "$AUTH_METHOD" == "1" ]]; then
+    echo "- GCP_WORKLOAD_IDENTITY_PROVIDER: $WIF_PROVIDER"
+    echo "- GCP_SERVICE_ACCOUNT: $WIF_SERVICE_ACCOUNT"
+else
+    echo "- GCP_SA_KEY: [Service account key JSON]"
+fi
+echo ""
+echo "To use $AUTH_INSTRUCTIONS in your GitHub Actions workflows:"
+echo ""
+echo "1. Add the following authentication step to your workflow:"
+echo "   - name: Google Auth"
+echo "     uses: google-github-actions/auth@v2"
+echo "     with:"
+echo -e "       $AUTH_CONFIG"
+echo ""
+echo "2. Use the simplified-deploy-template.yml as a starting point for your workflow."
+echo ""
+echo "For development on your local machine, you can authenticate using:"
+echo "gcloud auth login"
+echo "gcloud config set project $PROJECT_ID"
+echo ""
+echo -e "${BLUE}Happy coding!${NC}"
