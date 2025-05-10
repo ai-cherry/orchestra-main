@@ -338,8 +338,19 @@ class WIFReferenceScanner:
             for pattern, reference_type in self.REFERENCE_PATTERNS:
                 matches = re.finditer(pattern, line)
                 for match in matches:
-                    # The second group in the pattern is the actual reference
-                    old_reference = match.group(2)
+                    # Get the reference from the appropriate group
+                    # Most patterns have the reference in group 2, but some might have it in group 1
+                    try:
+                        old_reference = match.group(2)
+                    except IndexError:
+                        # If group 2 doesn't exist, try group 1
+                        try:
+                            old_reference = match.group(1)
+                        except IndexError:
+                            # If neither group exists, skip this match
+                            logger.warning(f"No capture group found in match: {match.group(0)}")
+                            continue
+                    
                     new_reference = self.map_old_to_new_reference(old_reference)
                     
                     if old_reference != new_reference:
