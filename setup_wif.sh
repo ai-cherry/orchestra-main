@@ -4,6 +4,24 @@
 
 set -e  # Exit on any error
 
+# Temporary files and cleanup
+TEMP_DIR=""
+CLEANUP_NEEDED=false
+
+# Cleanup function
+cleanup() {
+    if [ "$CLEANUP_NEEDED" = true ]; then
+        echo -e "${YELLOW}Cleaning up temporary files...${NC}"
+        if [ -n "$TEMP_DIR" ] && [ -d "$TEMP_DIR" ]; then
+            rm -rf "$TEMP_DIR"
+        fi
+    fi
+}
+
+# Set up trap for cleanup on exit
+trap cleanup EXIT
+trap 'echo -e "${RED}Error occurred. Exiting...${NC}"; exit 1' ERR INT TERM
+
 # Text styling
 BOLD="\033[1m"
 GREEN="\033[0;32m"

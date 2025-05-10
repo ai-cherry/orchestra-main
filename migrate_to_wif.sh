@@ -4,6 +4,39 @@
 
 set -e  # Exit on any error
 
+# Temporary files and backup tracking
+BACKUP_FILES=()
+TEMP_FILES=()
+
+# Cleanup function
+cleanup() {
+    if [ ${#TEMP_FILES[@]} -gt 0 ]; then
+        echo -e "${YELLOW}Cleaning up temporary files...${NC}"
+        for file in "${TEMP_FILES[@]}"; do
+            if [ -f "$file" ]; then
+                rm -f "$file"
+            fi
+        done
+    fi
+}
+
+# Error handling function
+handle_error() {
+    echo -e "${RED}Error occurred during migration. Exiting...${NC}"
+    echo -e "${YELLOW}Backup files are available with .bak extension if needed.${NC}"
+    if [ ${#BACKUP_FILES[@]} -gt 0 ]; then
+        echo -e "${YELLOW}Backups created:${NC}"
+        for file in "${BACKUP_FILES[@]}"; do
+            echo "  - $file"
+        done
+    fi
+    exit 1
+}
+
+# Set up trap for cleanup on exit and error handling
+trap cleanup EXIT
+trap handle_error ERR INT TERM
+
 # Color codes for output
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
