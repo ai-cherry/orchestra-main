@@ -35,12 +35,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        continue-on-error: false  # Fail workflow if checkout fails
       
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
+        continue-on-error: false  # Fail workflow if Python setup fails
       
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -48,6 +50,7 @@ jobs:
           version: 1.8.2
           virtualenvs-create: true
           virtualenvs-in-project: true
+        continue-on-error: false  # Fail workflow if Poetry installation fails
       
       - name: Cache Poetry dependencies
         uses: actions/cache@v4
@@ -56,16 +59,19 @@ jobs:
           key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
           restore-keys: |
             ${{ runner.os }}-poetry-
+        continue-on-error: true  # Continue workflow if cache fails
       
       - name: Install dependencies
         run: |
           cd your-service  # Customize this path for your service
           poetry install --no-interaction
+        continue-on-error: false  # Fail workflow if dependency installation fails
       
       - name: Run tests
         run: |
           cd your-service  # Customize this path for your service
           poetry run pytest tests/ --cov=your-service
+        continue-on-error: false  # Fail workflow if tests fail
   
   deploy:
     name: Deploy Service
@@ -79,12 +85,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        continue-on-error: false  # Fail workflow if checkout fails
       
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
+        continue-on-error: false  # Fail workflow if Python setup fails
       
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -100,11 +108,13 @@ jobs:
           key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
           restore-keys: |
             ${{ runner.os }}-poetry-
+        continue-on-error: true  # Continue workflow if cache fails
       
       - name: Install dependencies
         run: |
           cd your-service  # Customize this path for your service
           poetry install --no-interaction --no-dev
+        continue-on-error: false  # Fail workflow if dependency installation fails
       
       - name: Determine environment
         id: env
@@ -139,20 +149,24 @@ jobs:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
           token_format: 'access_token'
+        continue-on-error: false  # Fail workflow if authentication fails
       
       # Setup gcloud CLI
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ env.PROJECT_ID }}
+        continue-on-error: false  # Fail workflow if gcloud setup fails
       
       # Configure Docker to use gcloud credentials
       - name: Authorize Docker push
         run: gcloud auth configure-docker gcr.io
+        continue-on-error: false  # Fail workflow if Docker authorization fails
       
       # Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        continue-on-error: false  # Fail workflow if Buildx setup fails
       
       # Build and push the Docker image
       - name: Build and push Docker image
@@ -168,6 +182,7 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             ENV=${{ env.ENVIRONMENT }}
+        continue-on-error: false  # Fail workflow if build/push fails
       
       # Deploy to Cloud Run
       - name: Deploy to Cloud Run
@@ -201,6 +216,16 @@ jobs:
           # Simple health check
           if curl -s "${{ steps.deploy.outputs.url }}/health"; then
             echo "Health check passed!"
+            exit 0
           else
-            echo "Health check failed, but continuing deployment"
+            echo "Health check failed!"
+            # Fail the workflow if health check fails in production
+            if [ "${{ env.ENVIRONMENT }}" == "prod" ]; then
+              echo "Production deployment failed health check - failing workflow"
+              exit 1
+            else
+              echo "Non-production deployment - continuing despite failed health check"
+              exit 0
+            fi
           fi
+        continue-on-error: false  # Fail workflow if verification fails (based on the script logic)
