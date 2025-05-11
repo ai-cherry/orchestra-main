@@ -1,365 +1,236 @@
 #!/bin/bash
-# deploy.sh - Simplified deployment script for AI Orchestra to Google Cloud Run
-# This script provides a streamlined approach for deploying to Cloud Run
-# Updated: 5/8/2025 - Simplified for easier use
+# deploy.sh - Simplified deployment script for AI Orchestra project
+# 
+# This script automates the deployment of the entire AI Orchestra project to Google Cloud Platform
+# It handles dependency resolution, authentication, and deployment of all components
 
-# Load environment variables from .env file
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "${SCRIPT_DIR}/load_env.sh"
+set -e
 
-# Color codes for better readability
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
+# Color codes for output
 RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
-BOLD='\033[1m'
 NC='\033[0m' # No Color
 
-# Log function for standardized output
-log() {
-  local level=$1
-  local message=$2
-  local timestamp=$(date "+%Y-%m-%d %H:%M:%S")
-  
-  case $level in
-    "INFO")
-      echo -e "${BLUE}[${timestamp}] [INFO] ${message}${NC}"
-      ;;
-    "WARN")
-      echo -e "${YELLOW}[${timestamp}] [WARN] ${message}${NC}"
-      ;;
-    "ERROR")
-      echo -e "${RED}[${timestamp}] [ERROR] ${message}${NC}"
-      ;;
-    "SUCCESS")
-      echo -e "${GREEN}[${timestamp}] [SUCCESS] ${message}${NC}"
-      ;;
-    "STEP")
-      echo -e "\n${BOLD}${message}${NC}"
-      ;;
-    *)
-      echo -e "[${timestamp}] ${message}"
-      ;;
-  esac
-}
+# Default values
+PROJECT_ID="cherry-ai-project"
+REGION="us-central1"
+ENV="dev"
 
-# Default configuration values from environment variables with fallbacks
-PROJECT_ID=$(get_config GCP_PROJECT_ID "cherry-ai-project")
-REGION=$(get_config GCP_REGION "us-central1")
-SERVICE_NAME=$(get_config CLOUD_RUN_SERVICE_NAME "orchestra-api")
-ENVIRONMENT=$(get_config DEPLOYMENT_ENVIRONMENT "staging")
-REPO_NAME=$(get_config ARTIFACT_REGISTRY_REPO "orchestra-repo")
-MIN_INSTANCES=$(get_config CLOUD_RUN_MIN_INSTANCES 0)
-MAX_INSTANCES=$(get_config CLOUD_RUN_MAX_INSTANCES 10)
-MEMORY=$(get_config CLOUD_RUN_MEMORY "512Mi")
-CPU=$(get_config CLOUD_RUN_CPU 1)
-CONCURRENCY=$(get_config CLOUD_RUN_CONCURRENCY 80)
-TIMEOUT=$(get_config CLOUD_RUN_TIMEOUT "300s")
-ALLOW_UNAUTHENTICATED=$(get_config CLOUD_RUN_ALLOW_UNAUTHENTICATED true)  # Default to public access
-
-# Display script banner
-display_banner() {
-  echo -e "${BLUE}"
-  echo "==============================================================="
-  echo "               AI Orchestra Cloud Run Deployment               "
-  echo "==============================================================="
-  echo -e "${NC}"
-}
-
-# Display usage information
-display_usage() {
-  echo "Usage: $0 [options]"
-  echo "Options:"
-  echo "  --project ID          GCP project ID (default: ${PROJECT_ID})"
-  echo "  --region REGION       GCP region (default: ${REGION})"
-  echo "  --service NAME        Cloud Run service name (default: ${SERVICE_NAME})"
-  echo "  --env ENVIRONMENT     Deployment environment (default: ${ENVIRONMENT})"
-  echo "  --repo NAME           Artifact Registry repository name (default: ${REPO_NAME})"
-  echo "  --min-instances N     Minimum instances (default: ${MIN_INSTANCES})"
-  echo "  --max-instances N     Maximum instances (default: ${MAX_INSTANCES})"
-  echo "  --memory SIZE         Memory allocation (default: ${MEMORY})"
-  echo "  --cpu N               CPU allocation (default: ${CPU})"
-  echo "  --concurrency N       Request concurrency (default: ${CONCURRENCY})"
-  echo "  --timeout DURATION    Request timeout (default: ${TIMEOUT})"
-  echo "  --private             Require authentication (default is public)"
-  echo "  --help                Show this help message"
-}
+# Display banner
+echo -e "${BLUE}"
+echo "╔═══════════════════════════════════════════════════════════════╗"
+echo "║                 AI Orchestra Deployment Script                 ║"
+echo "╚═══════════════════════════════════════════════════════════════╝"
+echo -e "${NC}"
 
 # Parse command line arguments
-parse_arguments() {
-  while [[ $# -gt 0 ]]; do
-    key="$1"
-    case $key in
-      --project)
-        PROJECT_ID="$2"
-        shift 2
-        ;;
-      --region)
-        REGION="$2"
-        shift 2
-        ;;
-      --service)
-        SERVICE_NAME="$2"
-        shift 2
-        ;;
-      --env)
-        ENVIRONMENT="$2"
-        shift 2
-        ;;
-      --repo)
-        REPO_NAME="$2"
-        shift 2
-        ;;
-      --min-instances)
-        MIN_INSTANCES="$2"
-        shift 2
-        ;;
-      --max-instances)
-        MAX_INSTANCES="$2"
-        shift 2
-        ;;
-      --memory)
-        MEMORY="$2"
-        shift 2
-        ;;
-      --cpu)
-        CPU="$2"
-        shift 2
-        ;;
-      --concurrency)
-        CONCURRENCY="$2"
-        shift 2
-        ;;
-      --timeout)
-        TIMEOUT="$2"
-        shift 2
-        ;;
-      --private)
-        ALLOW_UNAUTHENTICATED=false
-        shift
-        ;;
-      --help)
-        display_banner
-        display_usage
-        exit 0
-        ;;
-      *)
-        log "ERROR" "Unknown option: $1"
-        display_usage
-        exit 1
-        ;;
-    esac
-  done
+while [[ $# -gt 0 ]]; do
+  key="$1"
+  case $key in
+    --project)
+      PROJECT_ID="$2"
+      shift 2
+      ;;
+    --region)
+      REGION="$2"
+      shift 2
+      ;;
+    --env)
+      ENV="$2"
+      shift 2
+      ;;
+    --help)
+      echo "Usage: $0 [options]"
+      echo "Options:"
+      echo "  --project PROJECT_ID       GCP project ID (default: cherry-ai-project)"
+      echo "  --region REGION            GCP region (default: us-central1)"
+      echo "  --env ENV                  Environment (dev, staging, prod) (default: dev)"
+      echo "  --help                     Display this help message"
+      exit 0
+      ;;
+    *)
+      echo -e "${RED}Unknown option: $key${NC}"
+      exit 1
+      ;;
+  esac
+done
+
+# Function to display step information
+step() {
+  echo -e "${GREEN}➤ $1${NC}"
 }
 
-# Check for required dependencies
-check_dependencies() {
-  log "STEP" "Checking dependencies"
-  
-  # Check for gcloud
-  if ! command -v gcloud &> /dev/null; then
-    log "ERROR" "gcloud CLI is required but not installed"
-    log "INFO" "Install from: https://cloud.google.com/sdk/docs/install"
-    exit 1
-  fi
-  
-  # Check for docker
-  if ! command -v docker &> /dev/null; then
-    log "ERROR" "docker is required but not installed"
-    exit 1
-  fi
-  
-  log "SUCCESS" "All dependencies are installed"
+# Function to display information
+info() {
+  echo -e "${BLUE}ℹ $1${NC}"
 }
 
-# Set up GCP environment - Simplified
-setup_environment() {
-  log "STEP" "Setting up GCP environment"
-  
-  # Simplified authentication - just use current credentials
-  log "INFO" "Using current gcloud authentication"
-  
-  # Set project and region configuration
-  log "INFO" "Setting project to: ${PROJECT_ID}"
-  gcloud config set project ${PROJECT_ID} || log "WARN" "Failed to set project, continuing anyway"
-
-  # Set region configuration 
-  log "INFO" "Setting region to: ${REGION}"
-  gcloud config set run/region ${REGION} || log "WARN" "Failed to set region, continuing anyway"
-  
-  # Image name for Artifact Registry
-  IMAGE_NAME="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO_NAME}/${SERVICE_NAME}:${ENVIRONMENT}"
-  log "INFO" "Using image name: ${IMAGE_NAME}"
+# Function to display warnings
+warn() {
+  echo -e "${YELLOW}⚠ $1${NC}"
 }
 
-# Enable required GCP APIs
-enable_apis() {
-  log "STEP" "Enabling required GCP APIs"
-  
-  log "INFO" "Enabling Artifact Registry and Cloud Run APIs"
-  gcloud services enable artifactregistry.googleapis.com run.googleapis.com \
-    --project=${PROJECT_ID} || log "WARN" "Failed to enable APIs, continuing anyway"
-  
-  log "SUCCESS" "GCP APIs enabled successfully"
+# Function to display errors and exit
+error() {
+  echo -e "${RED}✖ $1${NC}"
+  exit 1
 }
 
-# Set up Artifact Registry
-setup_artifact_registry() {
-  log "STEP" "Setting up Artifact Registry"
+# Function to prompt for confirmation
+confirm() {
+  local message=$1
+  local response
   
-  log "INFO" "Checking if repository exists: ${REPO_NAME}"
-  if ! gcloud artifacts repositories describe ${REPO_NAME} \
-    --location=${REGION} \
-    --project=${PROJECT_ID} > /dev/null 2>&1; then
-    
-    log "INFO" "Creating new repository: ${REPO_NAME}"
-    gcloud artifacts repositories create ${REPO_NAME} \
-      --repository-format=docker \
-      --location=${REGION} \
-      --project=${PROJECT_ID} || log "WARN" "Failed to create repository, continuing anyway"
+  echo -e "${YELLOW}${message} (y/n)${NC}"
+  read -r response
+  
+  if [[ "$response" =~ ^[Yy]$ ]]; then
+    return 0  # true
   else
-    log "INFO" "Repository already exists: ${REPO_NAME}"
+    return 1  # false
   fi
-  
-  # Configure Docker to use Artifact Registry
-  log "INFO" "Configuring Docker authentication for Artifact Registry"
-  gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet || log "WARN" "Failed to configure Docker auth, continuing anyway"
-  
-  log "SUCCESS" "Artifact Registry setup complete"
 }
 
-# Build the Docker image
-build_image() {
-  log "STEP" "Building Docker image"
-  
-  log "INFO" "Building ${SERVICE_NAME} image for ${ENVIRONMENT} environment"
-  docker build -t ${IMAGE_NAME} . || {
-    log "ERROR" "Docker build failed"
-    exit 1
-  }
-  
-  log "SUCCESS" "Docker image built successfully"
-}
+# Check for required environment variables
+if [[ -z "${GCP_MASTER_SERVICE_JSON}" ]]; then
+  echo -e "${RED}Error: GCP_MASTER_SERVICE_JSON environment variable is not set.${NC}"
+  echo "Please set it to the content of your GCP service account key JSON."
+  exit 1
+fi
 
-# Push the Docker image to Artifact Registry
-push_image() {
-  log "STEP" "Pushing image to Artifact Registry"
-  
-  log "INFO" "Pushing image: ${IMAGE_NAME}"
-  docker push ${IMAGE_NAME} || {
-    log "ERROR" "Docker push failed"
-    exit 1
-  }
-  
-  log "SUCCESS" "Image pushed to Artifact Registry"
-}
+# Step 1: Fix dependencies and update Poetry
+step "Fixing dependencies and updating Poetry"
 
-# Prepare environment variables - Simplified
-prepare_config() {
-  log "STEP" "Preparing configuration"
-  
-  # Base environment variables
-  ENV_VARS="ENVIRONMENT=${ENVIRONMENT}"
-  
-  # Load environment variables from file if it exists
-  ENV_FILE=".env.${ENVIRONMENT}"
-  if [ -f "${ENV_FILE}" ]; then
-    log "INFO" "Loading environment variables from ${ENV_FILE}"
-    ENV_VARS="${ENV_VARS},$(grep -v '^#' ${ENV_FILE} | xargs | sed 's/ /,/g')"
-  else
-    log "WARN" "Environment file ${ENV_FILE} not found, using default configuration"
-  fi
-  
-  log "SUCCESS" "Configuration prepared successfully"
-}
+cd mcp_server
+info "Updating Poetry dependencies"
+poetry update || error "Failed to update Poetry dependencies"
+cd ..
 
-# Deploy to Cloud Run - Simplified
-deploy_to_cloud_run() {
-  log "STEP" "Deploying to Cloud Run"
-  
-  # Prepare base deploy command
-  DEPLOY_CMD="gcloud run deploy ${SERVICE_NAME} \
-    --image=${IMAGE_NAME} \
-    --region=${REGION} \
-    --platform=managed \
-    --memory=${MEMORY} \
-    --cpu=${CPU} \
-    --concurrency=${CONCURRENCY} \
-    --timeout=${TIMEOUT} \
-    --min-instances=${MIN_INSTANCES} \
-    --max-instances=${MAX_INSTANCES} \
-    --set-env-vars=${ENV_VARS}"
-  
-  # Set authentication options
-  if [ "$ALLOW_UNAUTHENTICATED" = true ]; then
-    DEPLOY_CMD="${DEPLOY_CMD} --allow-unauthenticated"
-    log "INFO" "Service will be publicly accessible"
-  else
-    DEPLOY_CMD="${DEPLOY_CMD} --no-allow-unauthenticated"
-    log "INFO" "Service will require authentication"
-  fi
-  
-  # Execute deployment
-  log "INFO" "Executing deployment command"
-  eval "${DEPLOY_CMD}" || {
-    log "ERROR" "Deployment failed"
-    exit 1
-  }
-  
-  log "SUCCESS" "Deployment to Cloud Run completed"
-}
+# Step 2: Authenticate with GCP
+step "Authenticating with Google Cloud Platform"
+echo "$GCP_MASTER_SERVICE_JSON" > /tmp/gcp-key.json
+gcloud auth activate-service-account --key-file=/tmp/gcp-key.json || error "Failed to authenticate with GCP"
+gcloud config set project "$PROJECT_ID" || error "Failed to set GCP project"
+info "Successfully authenticated with GCP"
 
-# Verify the deployment - Simplified
-verify_deployment() {
-  log "STEP" "Verifying deployment"
+# Step 3: Enable required APIs
+step "Enabling required APIs"
+gcloud services enable \
+  artifactregistry.googleapis.com \
+  run.googleapis.com \
+  cloudbuild.googleapis.com \
+  aiplatform.googleapis.com \
+  secretmanager.googleapis.com \
+  iam.googleapis.com \
+  cloudresourcemanager.googleapis.com \
+  workstations.googleapis.com \
+  compute.googleapis.com \
+  --project="$PROJECT_ID" || warn "Failed to enable some APIs, deployment may not be complete"
+
+# Step 4: Apply Terraform
+step "Applying Terraform configuration"
+
+if confirm "Do you want to apply Terraform configuration?"; then
+  cd terraform
+  
+  # Initialize Terraform
+  info "Initializing Terraform"
+  terraform init || error "Failed to initialize Terraform"
+  
+  # Plan Terraform changes
+  info "Planning Terraform changes"
+  terraform plan -var="project_id=$PROJECT_ID" -var="region=$REGION" -var="env=$ENV" -out=tfplan || error "Failed to plan Terraform changes"
+  
+  # Apply Terraform changes
+  info "Applying Terraform changes"
+  terraform apply tfplan || error "Failed to apply Terraform changes"
+  
+  cd ..
+else
+  warn "Skipping Terraform apply"
+fi
+
+# Step 5: Build and deploy MCP Server
+step "Building and deploying MCP Server"
+
+if confirm "Do you want to build and deploy the MCP Server?"; then
+  cd mcp_server
+  
+  # Make the deployment script executable
+  chmod +x deploy/deploy_optimized.sh
+  
+  # Run the deployment script
+  ./deploy/deploy_optimized.sh \
+    --project "$PROJECT_ID" \
+    --region "$REGION" \
+    --service-name "mcp-server-$ENV" || error "Failed to deploy MCP Server"
+  
+  cd ..
+else
+  warn "Skipping MCP Server deployment"
+fi
+
+# Step 6: Build and deploy main application
+step "Building and deploying main application"
+
+if confirm "Do you want to build and deploy the main application?"; then
+  # Set up Docker configuration
+  info "Setting up Docker configuration"
+  gcloud auth configure-docker --quiet || warn "Docker configuration might not be complete"
+  
+  # Generate a unique build ID
+  BUILD_ID=$(date +%Y%m%d%H%M%S)
+  IMAGE_NAME="gcr.io/$PROJECT_ID/orchestra-api:$BUILD_ID"
+  
+  # Build the Docker image
+  info "Building Docker image: $IMAGE_NAME"
+  docker build -t "$IMAGE_NAME" . || error "Docker build failed"
+  info "Docker image built successfully"
+  
+  # Push the Docker image to Google Container Registry
+  info "Pushing Docker image to Google Container Registry"
+  docker push "$IMAGE_NAME" || error "Failed to push Docker image"
+  info "Docker image pushed successfully"
+  
+  # Deploy to Cloud Run
+  info "Deploying to Cloud Run"
+  gcloud run deploy "orchestra-api-$ENV" \
+    --image="$IMAGE_NAME" \
+    --region="$REGION" \
+    --platform="managed" \
+    --memory="2Gi" \
+    --cpu=2 \
+    --min-instances=1 \
+    --max-instances=10 \
+    --concurrency=80 \
+    --timeout=300s \
+    --service-account="orchestra-api-sa@$PROJECT_ID.iam.gserviceaccount.com" \
+    --set-env-vars="PROJECT_ID=$PROJECT_ID,ENVIRONMENT=$ENV,REGION=$REGION" \
+    --allow-unauthenticated || error "Failed to deploy to Cloud Run"
   
   # Get the service URL
-  SERVICE_URL=$(gcloud run services describe ${SERVICE_NAME} \
-    --region=${REGION} \
-    --project=${PROJECT_ID} \
-    --format='value(status.url)') || {
-    log "WARN" "Could not get service URL"
-    return
-  }
-  
-  log "INFO" "Service URL: ${SERVICE_URL}"
-  
-  # Simplified health check - just display the URL
-  if [ "$ALLOW_UNAUTHENTICATED" = true ]; then
-    log "INFO" "To test the service:"
-    echo "curl ${SERVICE_URL}/health"
-  else
-    log "INFO" "To test with authentication:"
-    echo "curl -H \"Authorization: Bearer \$(gcloud auth print-identity-token)\" ${SERVICE_URL}/health"
-  fi
-  
-  log "SUCCESS" "Deployment verification complete"
-}
+  SERVICE_URL=$(gcloud run services describe "orchestra-api-$ENV" --region="$REGION" --format="value(status.url)")
+  info "Service URL: $SERVICE_URL"
+else
+  warn "Skipping main application deployment"
+fi
 
-# Main execution
-main() {
-  display_banner
-  parse_arguments "$@"
-  
-  log "INFO" "Deployment configuration:"
-  log "INFO" "- Project ID: ${PROJECT_ID}"
-  log "INFO" "- Region: ${REGION}"
-  log "INFO" "- Service Name: ${SERVICE_NAME}"
-  log "INFO" "- Environment: ${ENVIRONMENT}"
-  log "INFO" "- Public Access: ${ALLOW_UNAUTHENTICATED}"
-  
-  check_dependencies
-  setup_environment
-  enable_apis
-  setup_artifact_registry
-  build_image
-  push_image
-  prepare_config
-  deploy_to_cloud_run
-  verify_deployment
-  
-  log "SUCCESS" "AI Orchestra deployment process completed successfully"
-}
+# Clean up temporary files
+rm -f /tmp/gcp-key.json
 
-# Execute main function with all arguments
-main "$@"
+# Completion message
+echo -e "${GREEN}╔═══════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${GREEN}║                   Deployment Successful!                      ║${NC}"
+echo -e "${GREEN}╚═══════════════════════════════════════════════════════════════╝${NC}"
+echo -e "${BLUE}Project ID: ${NC}$PROJECT_ID"
+echo -e "${BLUE}Region: ${NC}$REGION"
+echo -e "${BLUE}Environment: ${NC}$ENV"
+echo ""
+echo -e "${YELLOW}Next steps:${NC}"
+echo -e "1. Verify the deployed infrastructure is working as expected"
+echo -e "2. Set up Workload Identity Federation for improved security"
+echo -e "3. Delete any local copies of service account keys for security"
+echo ""
+echo -e "${GREEN}Thank you for using the AI Orchestra deployment script!${NC}"

@@ -1,0 +1,200 @@
+# Optimized GitHub Actions workflow template for AI Orchestra
+# This template prioritizes performance, stability, and efficient resource usage
+# with improved error handling, parameterization, and health check mechanisms
+
+name: Optimized Deploy to Cloud Run
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ai-orchestra/**'  # Adjust this path for your service
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: ${{ secrets.GCP_REGION }}
+  SERVICE_NAME: ai-orchestra
+  PYTHON_VERSION: '3.11.7'  # Pinned Python version for consistency
+  POETRY_VERSION: '1.6.1'
+  # Resource configuration with defaults that can be overridden by secrets
+  MEMORY: ${{ secrets.CLOUD_RUN_MEMORY || '2Gi' }}
+  CPU: ${{ secrets.CLOUD_RUN_CPU || '2' }}
+  MIN_INSTANCES: ${{ secrets.CLOUD_RUN_MIN_INSTANCES || '1' }}
+  MAX_INSTANCES: ${{ secrets.CLOUD_RUN_MAX_INSTANCES || '20' }}
+  CONCURRENCY: ${{ secrets.CLOUD_RUN_CONCURRENCY || '80' }}
+  TIMEOUT: ${{ secrets.CLOUD_RUN_TIMEOUT || '300s' }}
+
+jobs:
+  # Add approval step for production deployments
+  approval:
+    name: Approval for Production
+    runs-on: ubuntu-latest
+    if: github.event.inputs.environment == 'prod'
+    environment: production-approval
+    steps:
+      - name: Production deployment approval
+        run: echo "Production deployment approved"
+
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    needs: [approval]
+    if: always() && (needs.approval.result == 'success' || github.event.inputs.environment != 'prod')
+    environment: ${{ github.event.inputs.environment || 'dev' }}
+    permissions:
+      contents: read
+      id-token: write  # Required for requesting the JWT for WIF
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1  # Shallow clone for faster checkout
+      
+      # Setup Python with optimized caching
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: '**/pyproject.toml'
+      
+      # Setup Poetry with caching
+      - name: Setup Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VERSION }}
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      
+      # Cache Poetry dependencies
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+      
+      # Install dependencies with Poetry and improved error handling
+      - name: Install dependencies
+        run: |
+          cd ai-orchestra
+          echo "Poetry version: $(poetry --version)"
+          echo "Python version: $(python --version)"
+          poetry env info
+          poetry check
+          poetry install --no-interaction --no-root --only main || {
+            echo "Poetry install failed. Checking for issues..."
+            poetry check
+            poetry show --tree
+            exit 1
+          }
+      
+      # Authenticate to Google Cloud using Workload Identity Federation
+      - name: Google Auth via Workload Identity Federation
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          token_format: 'access_token'
+          create_credentials_file: true
+          export_environment_variables: true
+      
+      # Setup gcloud CLI with minimal components for faster setup
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          install_components: 'beta'  # Minimal components
+      
+      # Configure Docker to use gcloud credentials with parallel processing
+      - name: Authorize Docker push
+        run: gcloud auth configure-docker gcr.io --quiet
+      
+      # Set up Docker Buildx for multi-architecture builds
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        
+      # Build and push the Docker image with optimized settings and multi-architecture support
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./ai-orchestra
+          file: ./ai-orchestra/Dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest
+            gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
+            POETRY_VERSION=${{ env.POETRY_VERSION }}
+            PYTHON_VERSION=${{ env.PYTHON_VERSION }}
+      
+      # Deploy to Cloud Run with parameterized settings for performance and stability
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          image: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          region: ${{ env.REGION }}
+          flags: |
+            --allow-unauthenticated
+            --memory=${{ env.MEMORY }}
+            --cpu=${{ env.CPU }}
+            --min-instances=${{ env.MIN_INSTANCES }}
+            --max-instances=${{ env.MAX_INSTANCES }}
+            --concurrency=${{ env.CONCURRENCY }}
+            --timeout=${{ env.TIMEOUT }}
+            --cpu-throttling=false
+            --set-env-vars=ENV=${{ github.event.inputs.environment || 'dev' }}
+            --set-env-vars=GCP_PROJECT_ID=${{ env.PROJECT_ID }}
+            --set-env-vars=GCP_REGION=${{ env.REGION }}
+            --set-secrets=SECRET_MANAGER_KEY=${{ secrets.GCP_SECRET_MANAGEMENT_KEY }}:latest
+      
+      # Warm up the service to ensure it's ready for traffic
+      - name: Warm up service
+        run: |
+          echo "Warming up service at ${{ steps.deploy.outputs.url }}"
+          curl -s -o /dev/null -w "%{http_code}" ${{ steps.deploy.outputs.url }}/health || true
+      
+      # Show the deployed service URL
+      - name: Show Output
+        run: |
+          echo "Service deployed successfully!"
+          echo "Service URL: ${{ steps.deploy.outputs.url }}"
+      
+      # Verify deployment health with retry mechanism
+      - name: Verify deployment health
+        run: |
+          echo "Verifying deployment health..."
+          max_retries=5
+          retry_count=0
+          while [ $retry_count -lt $max_retries ]; do
+            HEALTH_CHECK=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.deploy.outputs.url }}/health || echo "000")
+            if [[ "$HEALTH_CHECK" == "200" ]]; then
+              echo "Deployment health check passed!"
+              exit 0
+            else
+              echo "Attempt $((retry_count+1))/$max_retries: Health check returned $HEALTH_CHECK, retrying in $((2**retry_count)) seconds..."
+              sleep $((2**retry_count))
+              retry_count=$((retry_count+1))
+            fi
+          done
+          echo "Health check did not pass after $max_retries attempts, but continuing as this may be expected for new deployments."

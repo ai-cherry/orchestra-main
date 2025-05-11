@@ -41,7 +41,11 @@
   "postCreateCommand": "bash ./.devcontainer/setup.sh",
   "remoteEnv": {
     "PROJECT_ID": "cherry-ai-project",
-    "REGION": "us-west4"
+    "REGION": "us-west4",
+    "GOOGLE_APPLICATION_CREDENTIALS": "/workspaces/orchestra-main/credentials.json"
+  },
+  "containerEnv": {
+    "GOOGLE_APPLICATION_CREDENTIALS": "/workspaces/orchestra-main/credentials.json"
   },
   "mounts": [
     "source=${localEnv:HOME}/.config/gcloud,target=/home/vscode/.config/gcloud,type=bind,consistency=cached"

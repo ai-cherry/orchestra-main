@@ -7,7 +7,7 @@ ensuring efficient connection management and resource utilization.
 
 import logging
 import threading
-from typing import Dict, Optional, Any, Tuple
+from typing import Dict, List, Optional, Any, Tuple
 
 import redis
 
@@ -159,8 +159,14 @@ class RedisConnectionPool:
         with cls._lock:
             # Add current connection counts
             for key, pool in cls._pools.items():
-                cls._metrics[key]["in_use"] = pool.connection_kwargs.get("_in_use_connections", 0)
-                cls._metrics[key]["available"] = pool.connection_kwargs.get("_available_connections", 0)
+                # Safely access connection stats with proper fallbacks
+                if hasattr(pool, 'connection_kwargs') and isinstance(pool.connection_kwargs, dict):
+                    cls._metrics[key]["in_use"] = pool.connection_kwargs.get("_in_use_connections", 0)
+                    cls._metrics[key]["available"] = pool.connection_kwargs.get("_available_connections", 0)
+                else:
+                    # Fallback for newer Redis client versions with different attribute names
+                    cls._metrics[key]["in_use"] = getattr(pool, "_in_use_connections", 0)
+                    cls._metrics[key]["available"] = getattr(pool, "_available_connections", 0)
             
             # Return a copy of the metrics
             return {k: v.copy() for k, v in cls._metrics.items()}
