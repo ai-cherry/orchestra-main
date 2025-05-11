@@ -29,12 +29,33 @@ class TokenBudgetManager:
         self.current_usage = {tool: 0 for tool in tool_budgets}
     
     def estimate_tokens(self, entry: MemoryEntry) -> int:
-        """Estimate the number of tokens for a memory entry."""
-        # Simple estimation based on string length
-        # In a real implementation, this would use a tokenizer
-        content_str = json.dumps(entry.content)
-        # Rough approximation: 4 characters per token
-        return len(content_str) // 4
+        """Estimate the number of tokens for a memory entry using a more accurate approach."""
+        # Convert content to string if needed
+        if isinstance(entry.content, dict):
+            content_str = json.dumps(entry.content)
+        elif isinstance(entry.content, str):
+            content_str = entry.content
+        else:
+            content_str = str(entry.content)
+            
+        # More accurate token estimation based on GPT tokenization patterns
+        # Whitespace: ~0.25 tokens, punctuation: ~0.5 tokens, avg word: ~1.3 tokens
+        
+        # Count words, whitespace, and punctuation
+        import re
+        words = re.findall(r'\w+', content_str)
+        whitespace_count = len(re.findall(r'\s', content_str))
+        punctuation_count = len(re.findall(r'[^\w\s]', content_str))
+        
+        # Calculate estimated tokens
+        word_tokens = len(words) * 1.3
+        whitespace_tokens = whitespace_count * 0.25
+        punctuation_tokens = punctuation_count * 0.5
+        
+        # Add base overhead for JSON structure if content is a dict
+        overhead = 4 if isinstance(entry.content, dict) else 0
+        
+        return int(word_tokens + whitespace_tokens + punctuation_tokens + overhead)
     
     def can_fit_entry(self, entry: MemoryEntry, tool: str) -> bool:
         """Check if an entry can fit in a tool's token budget."""

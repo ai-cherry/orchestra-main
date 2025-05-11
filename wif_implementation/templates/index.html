@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WIF Implementation Plan</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .phase {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+        }
+        .phase-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .phase-title {
+            margin: 0;
+        }
+        .task-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .task {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .task-title {
+            margin: 0;
+            font-weight: bold;
+        }
+        .task-description {
+            margin: 5px 0;
+        }
+        .task-status {
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .status-pending {
+            background-color: #f1c40f;
+            color: #fff;
+        }
+        .status-in_progress {
+            background-color: #3498db;
+            color: #fff;
+        }
+        .status-completed {
+            background-color: #2ecc71;
+            color: #fff;
+        }
+        .status-failed {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+        .status-skipped {
+            background-color: #95a5a6;
+            color: #fff;
+        }
+        .button {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .button:hover {
+            background-color: #2980b9;
+        }
+        .button-green {
+            background-color: #2ecc71;
+        }
+        .button-green:hover {
+            background-color: #27ae60;
+        }
+        .button-red {
+            background-color: #e74c3c;
+        }
+        .button-red:hover {
+            background-color: #c0392b;
+        }
+        .button-disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        .button-disabled:hover {
+            background-color: #7f8c8d;
+        }
+        .vulnerabilities {
+            margin-top: 30px;
+        }
+        .vulnerability {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .vulnerability-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .vulnerability-title {
+            margin: 0;
+            font-weight: bold;
+        }
+        .vulnerability-severity {
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .severity-critical {
+            background-color: #800000;
+            color: #fff;
+        }
+        .severity-high {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+        .severity-moderate {
+            background-color: #f39c12;
+            color: #fff;
+        }
+        .severity-low {
+            background-color: #3498db;
+            color: #fff;
+        }
+        .fixed {
+            text-decoration: line-through;
+        }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+        .alert-success {
+            color: #3c763d;
+            background-color: #dff0d8;
+            border-color: #d6e9c6;
+        }
+        .alert-info {
+            color: #31708f;
+            background-color: #d9edf7;
+            border-color: #bce8f1;
+        }
+        .alert-warning {
+            color: #8a6d3b;
+            background-color: #fcf8e3;
+            border-color: #faebcc;
+        }
+        .alert-danger {
+            color: #a94442;
+            background-color: #f2dede;
+            border-color: #ebccd1;
+        }
+        .csrf-token {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WIF Implementation Plan</h1>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.type }}">
+                    {{ message.text }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="phase-navigation">
+            {% for phase_name in ["vulnerabilities", "migration", "cicd", "training"] %}
+                <a href="#{{ phase_name }}" class="button">{{ phase_name|capitalize }}</a>
+            {% endfor %}
+        </div>
+        
+        <form method="post" action="{{ csrf_token_url }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" class="csrf-token">
+        </form>
+        
+        {% for phase_name in ["vulnerabilities", "migration", "cicd", "training"] %}
+            {% set phase_tasks = tasks|selectattr("phase", "equalto", phase_name)|list %}
+            <div id="{{ phase_name }}" class="phase">
+                <div class="phase-header">
+                    <h2 class="phase-title">{{ phase_name|capitalize }}</h2>
+                    <a href="/execute-phase/{{ phase_name }}?csrf_token={{ csrf_token }}" class="button">Execute Phase</a>
+                </div>
+                
+                <ul class="task-list">
+                    {% for task in phase_tasks %}
+                        <li class="task">
+                            <div class="task-header">
+                                <h3 class="task-title">{{ task.name }}</h3>
+                                <span class="task-status status-{{ task.status }}">{{ task.status|capitalize }}</span>
+                            </div>
+                            <p class="task-description">{{ task.description }}</p>
+                            {% if task.dependencies %}
+                                <p><strong>Dependencies:</strong> {{ task.dependencies|join(", ") }}</p>
+                            {% endif %}
+                            {% if task.start_time %}
+                                <p><strong>Start Time:</strong> {{ task.start_time }}</p>
+                            {% endif %}
+                            {% if task.end_time %}
+                                <p><strong>End Time:</strong> {{ task.end_time }}</p>
+                            {% endif %}
+                            {% if task.notes %}
+                                <p><strong>Notes:</strong> {{ task.notes }}</p>
+                            {% endif %}
+                            
+                            <div class="task-actions">
+                                {% if task.status == "pending" %}
+                                    <a href="/execute-task/{{ task.name }}?csrf_token={{ csrf_token }}" class="button">Execute Task</a>
+                                {% elif task.status == "in_progress" %}
+                                    <a href="/complete-task/{{ task.name }}?csrf_token={{ csrf_token }}" class="button button-green">Complete Task</a>
+                                    <a href="/fail-task/{{ task.name }}?csrf_token={{ csrf_token }}" class="button button-red">Fail Task</a>
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            {% if phase_name == "vulnerabilities" %}
+                <div class="vulnerabilities">
+                    <h2>Vulnerabilities</h2>
+                    <a href="/scan-vulnerabilities?csrf_token={{ csrf_token }}" class="button">Scan for Vulnerabilities</a>
+                    
+                    <h3>High Severity</h3>
+                    <ul class="vulnerability-list">
+                        {% for vuln in vulnerabilities|selectattr("severity", "equalto", "high")|list %}
+                            <li class="vulnerability {% if vuln.is_fixed %}fixed{% endif %}">
+                                <div class="vulnerability-header">
+                                    <h4 class="vulnerability-title">{{ vuln.package }} ({{ vuln.current_version }})</h4>
+                                    <span class="vulnerability-severity severity-{{ vuln.severity }}">{{ vuln.severity|capitalize }}</span>
+                                </div>
+                                <p>{{ vuln.description }}</p>
+                                <p><strong>ID:</strong> {{ vuln.id }}</p>
+                                <p><strong>Fixed Version:</strong> {{ vuln.fixed_version or "Unknown" }}</p>
+                                <p><strong>Direct Dependency:</strong> {{ "Yes" if vuln.is_direct else "No" }}</p>
+                                <p><strong>Fixed:</strong> {{ "Yes" if vuln.is_fixed else "No" }}</p>
+                                {% if vuln.fix_command %}
+                                    <p><strong>Fix Command:</strong> <code>{{ vuln.fix_command }}</code></p>
+                                {% endif %}
+                                
+                                <div class="vulnerability-actions">
+                                    {% if not vuln.is_fixed %}
+                                        <a href="/fix-vulnerability/{{ vuln.id }}?csrf_token={{ csrf_token }}" class="button button-green">Fix Vulnerability</a>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    
+                    <h3>Moderate Severity</h3>
+                    <ul class="vulnerability-list">
+                        {% for vuln in vulnerabilities|selectattr("severity", "equalto", "moderate")|list %}
+                            <li class="vulnerability {% if vuln.is_fixed %}fixed{% endif %}">
+                                <div class="vulnerability-header">
+                                    <h4 class="vulnerability-title">{{ vuln.package }} ({{ vuln.current_version }})</h4>
+                                    <span class="vulnerability-severity severity-{{ vuln.severity }}">{{ vuln.severity|capitalize }}</span>
+                                </div>
+                                <p>{{ vuln.description }}</p>
+                                <p><strong>ID:</strong> {{ vuln.id }}</p>
+                                <p><strong>Fixed Version:</strong> {{ vuln.fixed_version or "Unknown" }}</p>
+                                <p><strong>Direct Dependency:</strong> {{ "Yes" if vuln.is_direct else "No" }}</p>
+                                <p><strong>Fixed:</strong> {{ "Yes" if vuln.is_fixed else "No" }}</p>
+                                {% if vuln.fix_command %}
+                                    <p><strong>Fix Command:</strong> <code>{{ vuln.fix_command }}</code></p>
+                                {% endif %}
+                                
+                                <div class="vulnerability-actions">
+                                    {% if not vuln.is_fixed %}
+                                        <a href="/fix-vulnerability/{{ vuln.id }}?csrf_token={{ csrf_token }}" class="button button-green">Fix Vulnerability</a>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    
+    <script>
+        // Add CSRF token to all links with query parameters
+        document.addEventListener('DOMContentLoaded', function() {
+            const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+            const links = document.querySelectorAll('a[href^="/"]');
+            
+            links.forEach(function(link) {
+                const href = link.getAttribute('href');
+                if (href.includes('?')) {
+                    if (!href.includes('csrf_token=')) {
+                        link.setAttribute('href', href + '&csrf_token=' + csrfToken);
+                    }
+                } else {
+                    link.setAttribute('href', href + '?csrf_token=' + csrfToken);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

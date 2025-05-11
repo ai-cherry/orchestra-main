@@ -10,6 +10,7 @@ set -e
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 REPO_ROOT=$(realpath "$SCRIPT_DIR/../..")
 CONFIG_FILE="$REPO_ROOT/mcp_server/config.json"
+USE_OPTIMIZED=true  # Set to false to disable optimized components
 
 # Create config file if it doesn't exist
 if [ ! -f "$CONFIG_FILE" ]; then
@@ -117,6 +118,13 @@ case "$METHOD" in
     # Start the server in the background
     echo "Starting MCP server in the background..."
     cd "$REPO_ROOT"
+    
+    # Set environment variable for optimized components if enabled
+    if [ "$USE_OPTIMIZED" = true ]; then
+      echo "Using optimized storage and memory components"
+      export MCP_USE_OPTIMIZED=true
+    fi
+    
     nohup poetry run mcp-server --config "$CONFIG_FILE" > /tmp/mcp-server.log 2>&1 &
     
     echo "MCP server started. Process ID: $!"

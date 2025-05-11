@@ -1,0 +1,323 @@
+# Cloud Monitoring configuration for MCP Server
+# This file defines custom metrics, dashboards, and alerts for the MCP server
+
+# Custom metrics
+metrics:
+  - name: custom.googleapis.com/mcp/token_usage
+    description: "Token usage by tool"
+    type: GAUGE
+    labels:
+      - key: tool
+        description: "Tool name"
+      - key: environment
+        description: "Deployment environment"
+    metricKind: GAUGE
+    valueType: DOUBLE
+    unit: "1"
+    
+  - name: custom.googleapis.com/mcp/memory_entries
+    description: "Number of memory entries"
+    type: GAUGE
+    labels:
+      - key: memory_type
+        description: "Memory type"
+      - key: scope
+        description: "Memory scope"
+      - key: environment
+        description: "Deployment environment"
+    metricKind: GAUGE
+    valueType: INT64
+    unit: "1"
+    
+  - name: custom.googleapis.com/mcp/vector_search_latency
+    description: "Vector search latency"
+    type: GAUGE
+    labels:
+      - key: environment
+        description: "Deployment environment"
+    metricKind: GAUGE
+    valueType: DOUBLE
+    unit: "ms"
+    
+  - name: custom.googleapis.com/mcp/api_requests
+    description: "API request count"
+    type: CUMULATIVE
+    labels:
+      - key: endpoint
+        description: "API endpoint"
+      - key: status
+        description: "HTTP status code"
+      - key: environment
+        description: "Deployment environment"
+    metricKind: CUMULATIVE
+    valueType: INT64
+    unit: "1"
+
+# Alerting policies
+alertPolicies:
+  - displayName: "MCP Server - High CPU Usage"
+    conditions:
+      - displayName: "CPU usage above 80%"
+        condition:
+          filter: >
+            resource.type = "cloud_run_revision" AND
+            resource.labels.service_name = "mcp-server" AND
+            metric.type = "run.googleapis.com/container/cpu/utilization"
+          aggregations:
+            - alignmentPeriod: 60s
+              perSeriesAligner: ALIGN_MEAN
+              crossSeriesReducer: REDUCE_MEAN
+          comparison: COMPARISON_GT
+          thresholdValue: 0.8
+          duration: 300s
+    combiner: OR
+    alertStrategy:
+      autoClose: 86400s
+    notificationChannels:
+      - channel: projects/${PROJECT_ID}/notificationChannels/${NOTIFICATION_CHANNEL_ID}
+    
+  - displayName: "MCP Server - High Memory Usage"
+    conditions:
+      - displayName: "Memory usage above 80%"
+        condition:
+          filter: >
+            resource.type = "cloud_run_revision" AND
+            resource.labels.service_name = "mcp-server" AND
+            metric.type = "run.googleapis.com/container/memory/utilization"
+          aggregations:
+            - alignmentPeriod: 60s
+              perSeriesAligner: ALIGN_MEAN
+              crossSeriesReducer: REDUCE_MEAN
+          comparison: COMPARISON_GT
+          thresholdValue: 0.8
+          duration: 300s
+    combiner: OR
+    alertStrategy:
+      autoClose: 86400s
+    notificationChannels:
+      - channel: projects/${PROJECT_ID}/notificationChannels/${NOTIFICATION_CHANNEL_ID}
+    
+  - displayName: "MCP Server - High Error Rate"
+    conditions:
+      - displayName: "Error rate above 5%"
+        condition:
+          filter: >
+            resource.type = "cloud_run_revision" AND
+            resource.labels.service_name = "mcp-server" AND
+            metric.type = "run.googleapis.com/request_count" AND
+            metric.labels.response_code_class = "4xx" OR
+            metric.labels.response_code_class = "5xx"
+          aggregations:
+            - alignmentPeriod: 60s
+              perSeriesAligner: ALIGN_RATE
+              crossSeriesReducer: REDUCE_SUM
+          denominatorFilter: >
+            resource.type = "cloud_run_revision" AND
+            resource.labels.service_name = "mcp-server" AND
+            metric.type = "run.googleapis.com/request_count"
+          denominatorAggregations:
+            - alignmentPeriod: 60s
+              perSeriesAligner: ALIGN_RATE
+              crossSeriesReducer: REDUCE_SUM
+          comparison: COMPARISON_GT
+          thresholdValue: 0.05
+          duration: 300s
+    combiner: OR
+    alertStrategy:
+      autoClose: 86400s
+    notificationChannels:
+      - channel: projects/${PROJECT_ID}/notificationChannels/${NOTIFICATION_CHANNEL_ID}
+    
+  - displayName: "MCP Server - Redis High Memory Usage"
+    conditions:
+      - displayName: "Redis memory usage above 80%"
+        condition:
+          filter: >
+            resource.type = "redis_instance" AND
+            resource.labels.instance_id = "mcp-redis" AND
+            metric.type = "redis.googleapis.com/stats/memory/usage_ratio"
+          aggregations:
+            - alignmentPeriod: 60s
+              perSeriesAligner: ALIGN_MEAN
+              crossSeriesReducer: REDUCE_MEAN
+          comparison: COMPARISON_GT
+          thresholdValue: 0.8
+          duration: 300s
+    combiner: OR
+    alertStrategy:
+      autoClose: 86400s
+    notificationChannels:
+      - channel: projects/${PROJECT_ID}/notificationChannels/${NOTIFICATION_CHANNEL_ID}
+
+# Uptime checks
+uptimeChecks:
+  - displayName: "MCP Server Health Check"
+    httpCheck:
+      path: "/health"
+      port: 443
+      useSsl: true
+      validateSsl: true
+    monitoredResource:
+      type: "uptime_url"
+      labels:
+        host: "${SERVICE_URL}"
+        project_id: "${PROJECT_ID}"
+    period: 60s
+    timeout: 10s
+    contentMatchers:
+      - content: '{"status":"healthy"}'
+        matcher: CONTAINS_STRING
+
+# Log-based metrics
+logMetrics:
+  - name: "mcp-server-errors"
+    description: "Count of error logs from MCP Server"
+    filter: >
+      resource.type="cloud_run_revision"
+      resource.labels.service_name="mcp-server"
+      severity>=ERROR
+    metricDescriptor:
+      metricKind: DELTA
+      valueType: INT64
+      unit: "1"
+      labels:
+        - key: severity
+          description: "Error severity"
+          valueType: STRING
+    labelExtractors:
+      severity: "EXTRACT(severity)"
+    
+  - name: "mcp-server-token-usage-logs"
+    description: "Token usage reported in logs"
+    filter: >
+      resource.type="cloud_run_revision"
+      resource.labels.service_name="mcp-server"
+      jsonPayload.token_count:*
+    metricDescriptor:
+      metricKind: GAUGE
+      valueType: DOUBLE
+      unit: "1"
+      labels:
+        - key: tool
+          description: "Tool name"
+          valueType: STRING
+    valueExtractor: "EXTRACT(jsonPayload.token_count.total)"
+    labelExtractors:
+      tool: "EXTRACT(jsonPayload.token_count.tool)"
+
+# Dashboard configuration
+dashboards:
+  - displayName: "MCP Server Performance Dashboard"
+    gridLayout:
+      columns: 2
+      widgets:
+        - title: "CPU Utilization"
+          xyChart:
+            dataSets:
+              - timeSeriesQuery:
+                  timeSeriesFilter:
+                    filter: >
+                      resource.type="cloud_run_revision"
+                      resource.labels.service_name="mcp-server"
+                      metric.type="run.googleapis.com/container/cpu/utilization"
+                    aggregation:
+                      alignmentPeriod: 60s
+                      perSeriesAligner: ALIGN_MEAN
+        
+        - title: "Memory Utilization"
+          xyChart:
+            dataSets:
+              - timeSeriesQuery:
+                  timeSeriesFilter:
+                    filter: >
+                      resource.type="cloud_run_revision"
+                      resource.labels.service_name="mcp-server"
+                      metric.type="run.googleapis.com/container/memory/utilization"
+                    aggregation:
+                      alignmentPeriod: 60s
+                      perSeriesAligner: ALIGN_MEAN
+        
+        - title: "Request Count"
+          xyChart:
+            dataSets:
+              - timeSeriesQuery:
+                  timeSeriesFilter:
+                    filter: >
+                      resource.type="cloud_run_revision"
+                      resource.labels.service_name="mcp-server"
+                      metric.type="run.googleapis.com/request_count"
+                    aggregation:
+                      alignmentPeriod: 60s
+                      perSeriesAligner: ALIGN_RATE
+                      crossSeriesReducer: REDUCE_SUM
+                      groupByFields:
+                        - "metric.labels.response_code_class"
+        
+        - title: "Response Latency (p99)"
+          xyChart:
+            dataSets:
+              - timeSeriesQuery:
+                  timeSeriesFilter:
+                    filter: >
+                      resource.type="cloud_run_revision"
+                      resource.labels.service_name="mcp-server"
+                      metric.type="run.googleapis.com/request_latencies"
+                    aggregation:
+                      alignmentPeriod: 60s
+                      perSeriesAligner: ALIGN_PERCENTILE_99
+        
+        - title: "Token Usage by Tool"
+          xyChart:
+            dataSets:
+              - timeSeriesQuery:
+                  timeSeriesFilter:
+                    filter: >
+                      resource.type="cloud_run_revision"
+                      resource.labels.service_name="mcp-server"
+                      metric.type="custom.googleapis.com/mcp/token_usage"
+                    aggregation:
+                      alignmentPeriod: 60s
+                      perSeriesAligner: ALIGN_MEAN
+                      groupByFields:
+                        - "metric.labels.tool"
+        
+        - title: "Memory Entries by Type"
+          xyChart:
+            dataSets:
+              - timeSeriesQuery:
+                  timeSeriesFilter:
+                    filter: >
+                      resource.type="cloud_run_revision"
+                      resource.labels.service_name="mcp-server"
+                      metric.type="custom.googleapis.com/mcp/memory_entries"
+                    aggregation:
+                      alignmentPeriod: 60s
+                      perSeriesAligner: ALIGN_MEAN
+                      groupByFields:
+                        - "metric.labels.memory_type"
+        
+        - title: "Vector Search Latency"
+          xyChart:
+            dataSets:
+              - timeSeriesQuery:
+                  timeSeriesFilter:
+                    filter: >
+                      resource.type="cloud_run_revision"
+                      resource.labels.service_name="mcp-server"
+                      metric.type="custom.googleapis.com/mcp/vector_search_latency"
+                    aggregation:
+                      alignmentPeriod: 60s
+                      perSeriesAligner: ALIGN_MEAN
+        
+        - title: "Redis Memory Usage"
+          xyChart:
+            dataSets:
+              - timeSeriesQuery:
+                  timeSeriesFilter:
+                    filter: >
+                      resource.type="redis_instance"
+                      resource.labels.instance_id="mcp-redis"
+                      metric.type="redis.googleapis.com/stats/memory/usage_ratio"
+                    aggregation:
+                      alignmentPeriod: 60s
+                      perSeriesAligner: ALIGN_MEAN

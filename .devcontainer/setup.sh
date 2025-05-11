@@ -21,12 +21,24 @@ poetry install
 # Configure gcloud if credentials are available
 if [ -n "$GCP_MASTER_SERVICE_JSON" ]; then
   echo "Configuring gcloud..."
-  echo $GCP_MASTER_SERVICE_JSON > /tmp/gcp-credentials.json
-  gcloud auth activate-service-account --key-file=/tmp/gcp-credentials.json
+  # Create credentials directory if it doesn't exist
+  mkdir -p /workspaces/orchestra-main
+  
+  # Save credentials to a persistent file
+  echo $GCP_MASTER_SERVICE_JSON > /workspaces/orchestra-main/credentials.json
+  chmod 600 /workspaces/orchestra-main/credentials.json
+  
+  # Set environment variable for current session
+  export GOOGLE_APPLICATION_CREDENTIALS="/workspaces/orchestra-main/credentials.json"
+  
+  # Authenticate with gcloud
+  gcloud auth activate-service-account --key-file=/workspaces/orchestra-main/credentials.json
   gcloud config set project cherry-ai-project
   gcloud config set run/region us-west4
   gcloud auth configure-docker us-docker.pkg.dev
-  rm /tmp/gcp-credentials.json
+  
+  echo "GCP credentials saved to /workspaces/orchestra-main/credentials.json"
+  echo "GOOGLE_APPLICATION_CREDENTIALS environment variable set"
 else
   echo "GCP credentials not found. Skipping gcloud configuration."
 fi

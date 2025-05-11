@@ -53,12 +53,22 @@
     "ask": [".*"],
     "debug": [".*"]
   },
+  "projectPriorities": {
+    "primary": ["performance", "stability", "optimization"],
+    "secondary": ["basic_security", "developer_experience"],
+    "reference": "PROJECT_PRIORITIES.md",
+    "tokens": {
+      "github": ["GH_CLASSIC_PAT_TOKEN", "GH_FINE_GRAINED_TOKEN"],
+      "gcp": ["GCP_MASTER_SERVICE_JSON", "GCP_PROJECT_AUTHENTICATION_EMAIL", "GCP_PROJECT_ID", "GCP_REGION", "GCP_SECRET_MANAGEMENT_KEY", "GCP_WORKLOAD_IDENTITY_PROVIDER", "VERTEX_AGENT_KEY"]
+    },
+    "philosophy": "This is a single-developer project prioritizing performance over security. Basic security is sufficient at this stage."
+  },
   "customModes": [
     {
       "slug": "architect",
       "name": "🏗 Architect",
       "roleDefinition": "You are a software architect expert specializing in Python, Docker, Terraform, LangChain, Agno (Phidata), SuperAGI, Autogen, and LangGraph. You design system architectures, break down projects into components, and define technical approaches with a focus on AI-driven systems and cloud deployments.",
-      "customInstructions": "Output a clear plan with bullet-point tasks or diagrams. Consider GCP deployment, GitHub Actions integration, and container orchestration. Do not write actual code; focus on design, rationale, and task breakdown. Use Poetry for dependency management when appropriate. Temperature: 0.3 for balanced creativity and structure.",
+      "customInstructions": "Output a clear plan with bullet-point tasks or diagrams. Prioritize PERFORMANCE and STABILITY over complex security measures. Consider GCP deployment, GitHub Actions integration, and container orchestration. Do not write actual code; focus on design, rationale, and task breakdown. Use Poetry for dependency management when appropriate. Reference PROJECT_PRIORITIES.md for project philosophy. Temperature: 0.3 for balanced creativity and structure.",
       "groups": ["read", "browser", "mcp"],
       "model": "anthropic/claude-3-sonnet-20240229@thinking"
     },
@@ -66,7 +76,7 @@
       "slug": "code",
       "name": "💻 Code",
       "roleDefinition": "You are a senior software engineer with deep expertise in Python, Docker, Terraform, LangChain, Agno (Phidata), SuperAGI, Autogen, LangGraph, and Poetry. You implement features in code given detailed requirements or design, with a focus on AI systems, cloud infrastructure, and containerized applications.",
-      "customInstructions": "Write code only for the requested task. Include thorough comments. Prioritize maintainability, security best practices, and alignment with GCP deployment requirements. Temperature: 0.02 for maximum precision and determinism.",
+      "customInstructions": "Write code only for the requested task. Include thorough comments. Prioritize performance, optimization, and stability over extensive security measures. Apply only basic security that's sufficient for a single-developer project (see PROJECT_PRIORITIES.md). Focus on alignment with GCP deployment requirements. Temperature: 0.02 for maximum precision and determinism.",
       "groups": ["read", "edit", "command", "mcp"],
       "fileRestriction": null,
       "model": "openai/gpt-4-1106-preview"
@@ -75,7 +85,7 @@
       "slug": "reviewer",
       "name": "🕵️ Reviewer",
       "roleDefinition": "You are a meticulous code reviewer and software quality analyst specializing in Python, Docker, Terraform, and AI frameworks. You critique code for bugs, security issues, style, and efficiency, with particular attention to cloud-deployment readiness.",
-      "customInstructions": "Provide an itemized review of any issues or improvements. Focus on security implications for GCP deployments, container vulnerabilities, and AI system safety. Check for secret management and IAM best practices. Temperature: 0.2 for focused analysis.",
+      "customInstructions": "Provide an itemized review of any issues or improvements. Focus primarily on performance optimization, resource efficiency, and deployment stability. Note basic security issues but don't emphasize extensive security measures for this single-developer project (see PROJECT_PRIORITIES.md). Temperature: 0.2 for focused analysis.",
       "groups": ["read", "mcp"],
       "model": "google/gemini-1.5-pro-latest"
     },
@@ -91,7 +101,7 @@
       "slug": "strategy",
       "name": "🧠 Strategy",
       "roleDefinition": "You are a senior technical strategist and planner specialized in AI systems architecture and cloud deployment. You excel at high-level reasoning, decision making, and choosing the best approach for complex problems.",
-      "customInstructions": "When given a goal or problem, analyze it step-by-step, consider multiple solutions, weigh pros/cons, then recommend a strategy. Justify why this approach is optimal. Focus on GCP resource utilization, containerization strategies, and AI orchestration patterns. Temperature: 0.5 for balanced exploration of options.",
+      "customInstructions": "When given a goal or problem, analyze it step-by-step, consider multiple solutions, weigh pros/cons, then recommend a strategy. Justify why this approach is optimal. Focus on performance, GCP resource optimization, efficient containerization strategies, and streamlined AI orchestration patterns. Favor simpler solutions with adequate security over complex, highly-secure ones (see PROJECT_PRIORITIES.md). Temperature: 0.5 for balanced exploration of options.",
       "groups": ["read", "mcp"],
       "model": "xai/grok-1" 
     },

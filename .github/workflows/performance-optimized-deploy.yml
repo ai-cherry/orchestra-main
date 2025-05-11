@@ -1,0 +1,169 @@
+name: Performance-Optimized Deployment
+
+on:
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options: [dev, staging, prod]
+
+env:
+  PROJECT_ID: cherry-ai-project
+  REGION: us-central1
+  SERVICE_NAME: ai-orchestra
+  PYTHON_VERSION: "3.11"
+  ARTIFACT_REGISTRY: us-central1-docker.pkg.dev
+
+jobs:
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      # Set up credentials from repository secrets
+      - name: Set up credentials
+        run: |
+          echo "${{ secrets.GCP_MASTER_SERVICE_JSON }}" > /tmp/gcp-credentials.json
+          chmod 600 /tmp/gcp-credentials.json
+          echo "GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp-credentials.json" >> $GITHUB_ENV
+      
+      # Authenticate to Google Cloud
+      - name: Authenticate to Google Cloud
+        run: |
+          gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+          gcloud config set project ${{ env.PROJECT_ID }}
+      
+      # Determine environment
+      - name: Set environment
+        id: set-env
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "ENVIRONMENT=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+          elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "ENVIRONMENT=prod" >> $GITHUB_ENV
+          else
+            echo "ENVIRONMENT=dev" >> $GITHUB_ENV
+          fi
+      
+      # Configure Docker for Artifact Registry
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+      
+      # Set up Python and Poetry
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.4.0
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      
+      # Cache Poetry dependencies
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+      
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          poetry install --no-dev
+      
+      # Build and push Docker image
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile.optimized
+          push: true
+          tags: |
+            ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+            ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ env.ENVIRONMENT }}-latest
+          build-args: |
+            BUILD_ENV=${{ env.ENVIRONMENT }}
+      
+      # Ensure Secret Manager secret exists
+      - name: Ensure Secret Manager secret exists
+        run: |
+          if ! gcloud secrets describe secret-management-key &>/dev/null; then
+            echo "Creating secret-management-key..."
+            echo "${{ secrets.GCP_MASTER_SERVICE_JSON }}" | gcloud secrets create secret-management-key \
+                --data-file=- \
+                --replication-policy="automatic"
+          else
+            echo "Updating secret-management-key..."
+            echo "${{ secrets.GCP_MASTER_SERVICE_JSON }}" | gcloud secrets versions add secret-management-key \
+                --data-file=-
+          fi
+      
+      # Deploy to Cloud Run with optimized settings
+      - name: Deploy to Cloud Run
+        id: deploy
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }}-${{ env.ENVIRONMENT }} \
+              --image ${{ env.ARTIFACT_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }} \
+              --region ${{ env.REGION }} \
+              --platform managed \
+              --allow-unauthenticated \
+              --cpu 2 \
+              --memory 1Gi \
+              --min-instances 1 \
+              --max-instances 10 \
+              --concurrency 80 \
+              --timeout 300s \
+              --set-env-vars="ENVIRONMENT=${{ env.ENVIRONMENT }},OPTIMIZE_PERFORMANCE=true,STANDARD_MODE=true,VSCODE_DISABLE_WORKSPACE_TRUST=true,DISABLE_WORKSPACE_TRUST=true" \
+              --set-secrets="GCP_SECRET_MANAGEMENT_KEY=secret-management-key:latest" \
+              --service-account="orchestra-api-sa@${{ env.PROJECT_ID }}.iam.gserviceaccount.com" \
+              --quiet
+          
+          # Get the service URL
+          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }}-${{ env.ENVIRONMENT }} --region ${{ env.REGION }} --format='value(status.url)')
+          echo "SERVICE_URL=$SERVICE_URL" >> $GITHUB_OUTPUT
+      
+      # Verify deployment
+      - name: Verify deployment
+        run: |
+          # Wait for service to be ready
+          sleep 15
+          
+          # Check if service is responding
+          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.deploy.outputs.SERVICE_URL }}/health || echo "failed")
+          if [ "$STATUS_CODE" != "200" ]; then
+            echo "Deployment verification failed with status code: $STATUS_CODE"
+            echo "Please check the logs for more information:"
+            echo "gcloud logging read 'resource.type=cloud_run_revision AND resource.labels.service_name=${{ env.SERVICE_NAME }}-${{ env.ENVIRONMENT }}' --limit 10"
+            exit 1
+          fi
+          echo "Deployment verified successfully!"
+      
+      # Clean up credentials
+      - name: Clean up credentials
+        if: always()
+        run: |
+          rm -f /tmp/gcp-credentials.json
+      
+      # Notify on success
+      - name: Notify on success
+        run: |
+          echo "Deployment completed successfully!"
+          echo "Service URL: ${{ steps.deploy.outputs.SERVICE_URL }}"
