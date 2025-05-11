@@ -1,438 +1,335 @@
 #!/usr/bin/env python3
 """
-Performance tuning utilities for the MCP memory system.
+performance_tuner.py - Performance optimization utilities for MCP Server
 
-This module provides utilities for optimizing the performance of the memory system,
-including token budget management, compression, and context window optimization.
+This module provides utilities for optimizing the performance of the MCP server,
+including memory management, caching strategies, and resource utilization.
 """
 
-import time
-import json
+import os
 import logging
-import copy
-from typing import Dict, List, Optional, Any, Tuple, Set
-
-from ..models.memory import MemoryEntry, MemoryType, MemoryScope, CompressionLevel, StorageTier
-from ..config.memory_config import (
-    COMPRESSION_CONFIG,
-    TOKEN_BUDGET_CONFIG,
-    PERFORMANCE_CONFIG,
-    MEMORY_TIER_CONFIG,
-)
+import time
+import asyncio
+import gc
+import psutil
+import threading
+from typing import Dict, Any, Optional, Callable, List, Tuple
+from functools import lru_cache, wraps
 
 logger = logging.getLogger(__name__)
 
-
-class TokenBudgetManager:
-    """Manages token budgets for different tools."""
+class PerformanceTuner:
+    """Performance optimization manager for MCP Server."""
     
-    def __init__(self, tool_budgets: Optional[Dict[str, int]] = None):
-        """
-        Initialize the token budget manager.
+    def __init__(self, 
+                 enable_optimizations: bool = True,
+                 memory_limit_mb: int = 512,
+                 cpu_limit: int = 1,
+                 cache_ttl_seconds: int = 300,
+                 max_concurrent_requests: int = 10):
+        """Initialize the performance tuner.
         
         Args:
-            tool_budgets: Optional dictionary mapping tool names to token budgets.
-                          If not provided, defaults from config will be used.
+            enable_optimizations: Whether to enable performance optimizations
+            memory_limit_mb: Memory limit in MB
+            cpu_limit: CPU limit (number of cores)
+            cache_ttl_seconds: Time-to-live for cache entries in seconds
+            max_concurrent_requests: Maximum number of concurrent requests
         """
-        self.tool_budgets = tool_budgets or TOKEN_BUDGET_CONFIG
-        self.current_usage: Dict[str, int] = {tool: 0 for tool in self.tool_budgets}
+        self.enable_optimizations = enable_optimizations
+        self.memory_limit_mb = memory_limit_mb
+        self.cpu_limit = cpu_limit
+        self.cache_ttl_seconds = cache_ttl_seconds
+        self.max_concurrent_requests = max_concurrent_requests
+        self.request_semaphore = asyncio.Semaphore(max_concurrent_requests)
+        self.metrics: Dict[str, Any] = {
+            "memory_usage": 0,
+            "cpu_usage": 0,
+            "request_count": 0,
+            "cache_hits": 0,
+            "cache_misses": 0,
+            "average_response_time": 0,
+        }
+        self._start_time = time.time()
+        self._total_response_time = 0
+        
+        # Apply environment-based settings
+        self._apply_environment_settings()
+        
+        # Start monitoring thread if optimizations are enabled
+        if self.enable_optimizations:
+            self._start_monitoring()
     
-    def estimate_tokens(self, entry: MemoryEntry) -> int:
-        """
-        Estimate the number of tokens for a memory entry.
+    def _apply_environment_settings(self) -> None:
+        """Apply settings from environment variables."""
+        if os.environ.get("OPTIMIZE_PERFORMANCE", "").lower() == "true":
+            self.enable_optimizations = True
         
-        Args:
-            entry: The memory entry to estimate tokens for
-            
-        Returns:
-            The estimated number of tokens
-        """
-        # Simple estimation based on string length
-        # In a real implementation, this would use a tokenizer
-        if isinstance(entry.content, str):
-            content_str = entry.content
-        else:
-            content_str = json.dumps(entry.content)
-        
-        # Rough approximation: 4 characters per token
-        return len(content_str) // 4
-    
-    def can_fit_entry(self, entry: MemoryEntry, tool: str) -> bool:
-        """
-        Check if an entry can fit in a tool's token budget.
-        
-        Args:
-            entry: The memory entry to check
-            tool: The tool to check against
-            
-        Returns:
-            True if the entry can fit, False otherwise
-        """
-        if tool not in self.tool_budgets:
-            tool = "default"
-        
-        tokens = self.estimate_tokens(entry)
-        return (self.current_usage[tool] + tokens) <= self.tool_budgets[tool]
-    
-    def add_entry(self, entry: MemoryEntry, tool: str) -> bool:
-        """
-        Add an entry to a tool's token usage.
-        
-        Args:
-            entry: The memory entry to add
-            tool: The tool to add the entry to
-            
-        Returns:
-            True if the entry was added, False otherwise
-        """
-        if tool not in self.tool_budgets:
-            tool = "default"
-            
-        if not self.can_fit_entry(entry, tool):
-            return False
-        
-        tokens = self.estimate_tokens(entry)
-        self.current_usage[tool] += tokens
-        return True
-    
-    def remove_entry(self, entry: MemoryEntry, tool: str) -> None:
-        """
-        Remove an entry from a tool's token usage.
-        
-        Args:
-            entry: The memory entry to remove
-            tool: The tool to remove the entry from
-        """
-        if tool not in self.tool_budgets:
-            tool = "default"
-            
-        tokens = self.estimate_tokens(entry)
-        self.current_usage[tool] = max(0, self.current_usage[tool] - tokens)
-    
-    def get_available_budget(self, tool: str) -> int:
-        """
-        Get the available token budget for a tool.
-        
-        Args:
-            tool: The tool to get the budget for
-            
-        Returns:
-            The available token budget
-        """
-        if tool not in self.tool_budgets:
-            tool = "default"
-            
-        return self.tool_budgets[tool] - self.current_usage[tool]
-
-
-class MemoryCompressionEngine:
-    """Handles memory compression and decompression."""
-    
-    @staticmethod
-    def compress(entry: MemoryEntry) -> MemoryEntry:
-        """
-        Compress a memory entry based on its compression level.
-        
-        Args:
-            entry: The memory entry to compress
-            
-        Returns:
-            The compressed memory entry
-        """
-        if entry.compression_level == CompressionLevel.NONE:
-            return entry
-        
-        # Create a copy to avoid modifying the original
-        compressed_entry = copy.deepcopy(entry)
-        
-        # Get compression config for this level
-        level_name = entry.compression_level.name
-        level_config = COMPRESSION_CONFIG["levels"].get(level_name, {})
-        
-        if isinstance(entry.content, str):
-            text_ratio = level_config.get("text_ratio", 1.0)
-            text_threshold = COMPRESSION_CONFIG.get("text_threshold", 1000)
-            
-            if len(entry.content) > text_threshold:
-                # Compress text based on the ratio
-                keep_chars = int(len(entry.content) * text_ratio)
-                if keep_chars < len(entry.content):
-                    if entry.compression_level == CompressionLevel.REFERENCE_ONLY:
-                        compressed_entry.content = f"[Reference: memory with hash {entry.metadata.content_hash}]"
-                    else:
-                        half_keep = keep_chars // 2
-                        compressed_entry.content = (
-                            entry.content[:half_keep] + 
-                            f" ... [{level_name.lower()} compression: {len(entry.content) - keep_chars} chars removed] ... " + 
-                            entry.content[-half_keep:]
-                        )
-        
-        elif isinstance(entry.content, dict):
-            json_ratio = level_config.get("json_fields_keep", 1.0)
-            json_threshold = COMPRESSION_CONFIG.get("json_threshold", 500)
-            
-            if len(json.dumps(entry.content)) > json_threshold:
-                # Compress JSON based on the ratio
-                if entry.compression_level == CompressionLevel.REFERENCE_ONLY:
-                    compressed_entry.content = {
-                        "_compressed": True,
-                        "_reference": entry.metadata.content_hash,
-                        "_fields": list(entry.content.keys())
-                    }
+        if "MEMORY_LIMIT" in os.environ:
+            try:
+                # Parse memory limit (e.g., "512M" or "1G")
+                memory_limit = os.environ["MEMORY_LIMIT"]
+                if memory_limit.endswith("G"):
+                    self.memory_limit_mb = int(float(memory_limit[:-1]) * 1024)
+                elif memory_limit.endswith("M"):
+                    self.memory_limit_mb = int(memory_limit[:-1])
                 else:
-                    # Keep the most important fields based on the ratio
-                    fields_to_keep = int(len(entry.content) * json_ratio)
-                    if fields_to_keep < len(entry.content):
-                        important_keys = list(entry.content.keys())[:fields_to_keep]
-                        compressed_entry.content = {
-                            k: v for k, v in entry.content.items() if k in important_keys
-                        }
-                        compressed_entry.content["_compressed"] = True
-                        compressed_entry.content["_removed_fields"] = [
-                            k for k in entry.content.keys() if k not in important_keys
-                        ]
+                    self.memory_limit_mb = int(memory_limit)
+            except (ValueError, TypeError):
+                logger.warning(f"Invalid MEMORY_LIMIT: {os.environ['MEMORY_LIMIT']}")
         
-        return compressed_entry
+        if "CPU_LIMIT" in os.environ:
+            try:
+                self.cpu_limit = int(os.environ["CPU_LIMIT"])
+            except (ValueError, TypeError):
+                logger.warning(f"Invalid CPU_LIMIT: {os.environ['CPU_LIMIT']}")
+        
+        if "CACHE_TTL" in os.environ:
+            try:
+                self.cache_ttl_seconds = int(os.environ["CACHE_TTL"])
+            except (ValueError, TypeError):
+                logger.warning(f"Invalid CACHE_TTL: {os.environ['CACHE_TTL']}")
+        
+        if "MAX_CONCURRENT_REQUESTS" in os.environ:
+            try:
+                self.max_concurrent_requests = int(os.environ["MAX_CONCURRENT_REQUESTS"])
+                self.request_semaphore = asyncio.Semaphore(self.max_concurrent_requests)
+            except (ValueError, TypeError):
+                logger.warning(f"Invalid MAX_CONCURRENT_REQUESTS: {os.environ['MAX_CONCURRENT_REQUESTS']}")
     
-    @staticmethod
-    def decompress(entry: MemoryEntry, original_entry: Optional[MemoryEntry] = None) -> MemoryEntry:
-        """
-        Decompress a memory entry.
-        
-        Args:
-            entry: The memory entry to decompress
-            original_entry: The original entry if available
-            
-        Returns:
-            The decompressed memory entry
-        """
-        if entry.compression_level == CompressionLevel.NONE:
-            return entry
-        
-        # If we have the original entry, use it
-        if original_entry is not None:
-            return original_entry
-        
-        # Otherwise, we can only provide a partial decompression
-        decompressed_entry = copy.deepcopy(entry)
-        
-        if isinstance(entry.content, dict) and entry.content.get("_compressed"):
-            # For reference-only compression, we can't decompress without the original
-            if "_reference" in entry.content:
-                decompressed_entry.content = {
-                    "warning": "This entry was compressed with REFERENCE_ONLY level and cannot be fully decompressed",
-                    "hash": entry.content.get("_reference"),
-                    "fields": entry.content.get("_fields", [])
-                }
-            # For other compression levels, we can at least remove the compression markers
-            elif "_removed_fields" in entry.content:
-                cleaned_content = {k: v for k, v in entry.content.items() 
-                                 if k not in ["_compressed", "_removed_fields"]}
-                decompressed_entry.content = cleaned_content
-        
-        # Set compression level to NONE to indicate it's been decompressed
-        decompressed_entry.compression_level = CompressionLevel.NONE
-        
-        return decompressed_entry
-
-
-class ContextWindowOptimizer:
-    """Optimizes the context window for different tools."""
-    
-    def __init__(self, token_budget_manager: TokenBudgetManager):
-        """
-        Initialize the context window optimizer.
-        
-        Args:
-            token_budget_manager: The token budget manager to use
-        """
-        self.token_budget_manager = token_budget_manager
-        self.compression_engine = MemoryCompressionEngine()
-    
-    async def optimize_entries(
-        self, 
-        entries: List[Tuple[str, MemoryEntry]], 
-        tool: str,
-        required_keys: Optional[Set[str]] = None
-    ) -> List[Tuple[str, MemoryEntry]]:
-        """
-        Optimize a list of memory entries to fit in a tool's context window.
-        
-        Args:
-            entries: List of (key, entry) tuples to optimize
-            tool: The tool to optimize for
-            required_keys: Set of keys that must be included
-            
-        Returns:
-            Optimized list of (key, entry) tuples
-        """
-        # Sort entries by priority and relevance
-        entries.sort(
-            key=lambda x: (x[1].priority, x[1].metadata.context_relevance), 
-            reverse=True
-        )
-        
-        # Separate required entries
-        required_entries = []
-        optional_entries = []
-        
-        if required_keys:
-            for key, entry in entries:
-                if key in required_keys:
-                    required_entries.append((key, entry))
-                else:
-                    optional_entries.append((key, entry))
-        else:
-            optional_entries = entries
-        
-        # Add required entries first
-        optimized_entries = []
-        for key, entry in required_entries:
-            # Try to add the entry as-is
-            if self.token_budget_manager.add_entry(entry, tool):
-                optimized_entries.append((key, entry))
-                continue
-                
-            # If it doesn't fit, try to compress it
-            for level in CompressionLevel:
-                if level == CompressionLevel.NONE:
-                    continue
+    def _start_monitoring(self) -> None:
+        """Start a background thread to monitor resource usage."""
+        def monitor_resources():
+            while True:
+                try:
+                    # Update metrics
+                    process = psutil.Process(os.getpid())
+                    self.metrics["memory_usage"] = process.memory_info().rss / (1024 * 1024)  # MB
+                    self.metrics["cpu_usage"] = process.cpu_percent() / psutil.cpu_count()
                     
-                compressed_entry = copy.deepcopy(entry)
-                compressed_entry.compression_level = level
-                compressed_entry = self.compression_engine.compress(compressed_entry)
-                
-                if self.token_budget_manager.add_entry(compressed_entry, tool):
-                    optimized_entries.append((key, compressed_entry))
-                    break
-        
-        # Add optional entries until budget is exhausted
-        for key, entry in optional_entries:
-            # Try to add the entry as-is
-            if self.token_budget_manager.add_entry(entry, tool):
-                optimized_entries.append((key, entry))
-                continue
-                
-            # If it doesn't fit, try to compress it
-            for level in CompressionLevel:
-                if level == CompressionLevel.NONE:
-                    continue
+                    # Check if memory usage exceeds limit
+                    if self.metrics["memory_usage"] > self.memory_limit_mb * 0.9:
+                        logger.warning(f"Memory usage ({self.metrics['memory_usage']:.2f} MB) approaching limit ({self.memory_limit_mb} MB)")
+                        self._reduce_memory_usage()
                     
-                compressed_entry = copy.deepcopy(entry)
-                compressed_entry.compression_level = level
-                compressed_entry = self.compression_engine.compress(compressed_entry)
+                    time.sleep(5)  # Check every 5 seconds
+                except Exception as e:
+                    logger.error(f"Error in resource monitoring: {e}")
+                    time.sleep(10)  # Wait longer on error
+        
+        threading.Thread(target=monitor_resources, daemon=True).start()
+    
+    def _reduce_memory_usage(self) -> None:
+        """Attempt to reduce memory usage."""
+        # Force garbage collection
+        gc.collect()
+        
+        # Clear caches
+        if hasattr(self, "_cache"):
+            self._cache.clear()
+        
+        # Log memory usage after reduction attempts
+        process = psutil.Process(os.getpid())
+        memory_usage = process.memory_info().rss / (1024 * 1024)  # MB
+        logger.info(f"Memory usage after reduction: {memory_usage:.2f} MB")
+    
+    async def limit_concurrency(self, func: Callable) -> Callable:
+        """Decorator to limit concurrency of async functions."""
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            async with self.request_semaphore:
+                return await func(*args, **kwargs)
+        return wrapper
+    
+    def cache_result(self, ttl: Optional[int] = None) -> Callable:
+        """Decorator to cache function results with TTL."""
+        if ttl is None:
+            ttl = self.cache_ttl_seconds
+        
+        def decorator(func: Callable) -> Callable:
+            cache = {}
+            
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                # Create a cache key from the function name and arguments
+                key = str(func.__name__) + str(args) + str(sorted(kwargs.items()))
                 
-                if self.token_budget_manager.add_entry(compressed_entry, tool):
-                    optimized_entries.append((key, compressed_entry))
-                    break
+                # Check if the result is in the cache and not expired
+                if key in cache:
+                    timestamp, result = cache[key]
+                    if time.time() - timestamp < ttl:
+                        self.metrics["cache_hits"] += 1
+                        return result
+                
+                # Call the function and cache the result
+                self.metrics["cache_misses"] += 1
+                result = func(*args, **kwargs)
+                cache[key] = (time.time(), result)
+                
+                # Clean up expired cache entries
+                for k in list(cache.keys()):
+                    if time.time() - cache[k][0] > ttl:
+                        del cache[k]
+                
+                return result
+            
+            return wrapper
         
-        return optimized_entries
+        return decorator
+    
+    async def async_cache_result(self, ttl: Optional[int] = None) -> Callable:
+        """Decorator to cache async function results with TTL."""
+        if ttl is None:
+            ttl = self.cache_ttl_seconds
+        
+        def decorator(func: Callable) -> Callable:
+            cache = {}
+            
+            @wraps(func)
+            async def wrapper(*args, **kwargs):
+                # Create a cache key from the function name and arguments
+                key = str(func.__name__) + str(args) + str(sorted(kwargs.items()))
+                
+                # Check if the result is in the cache and not expired
+                if key in cache:
+                    timestamp, result = cache[key]
+                    if time.time() - timestamp < ttl:
+                        self.metrics["cache_hits"] += 1
+                        return result
+                
+                # Call the function and cache the result
+                self.metrics["cache_misses"] += 1
+                result = await func(*args, **kwargs)
+                cache[key] = (time.time(), result)
+                
+                # Clean up expired cache entries
+                for k in list(cache.keys()):
+                    if time.time() - cache[k][0] > ttl:
+                        del cache[k]
+                
+                return result
+            
+            return wrapper
+        
+        return decorator
+    
+    def track_performance(self, func: Callable) -> Callable:
+        """Decorator to track function performance."""
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            start_time = time.time()
+            result = func(*args, **kwargs)
+            elapsed_time = time.time() - start_time
+            
+            # Update metrics
+            self.metrics["request_count"] += 1
+            self._total_response_time += elapsed_time
+            self.metrics["average_response_time"] = self._total_response_time / self.metrics["request_count"]
+            
+            # Log slow operations
+            if elapsed_time > 1.0:
+                logger.warning(f"Slow operation: {func.__name__} took {elapsed_time:.2f} seconds")
+            
+            return result
+        
+        return wrapper
+    
+    async def async_track_performance(self, func: Callable) -> Callable:
+        """Decorator to track async function performance."""
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            start_time = time.time()
+            result = await func(*args, **kwargs)
+            elapsed_time = time.time() - start_time
+            
+            # Update metrics
+            self.metrics["request_count"] += 1
+            self._total_response_time += elapsed_time
+            self.metrics["average_response_time"] = self._total_response_time / self.metrics["request_count"]
+            
+            # Log slow operations
+            if elapsed_time > 1.0:
+                logger.warning(f"Slow operation: {func.__name__} took {elapsed_time:.2f} seconds")
+            
+            return result
+        
+        return wrapper
+    
+    def get_metrics(self) -> Dict[str, Any]:
+        """Get current performance metrics."""
+        # Update memory and CPU usage
+        process = psutil.Process(os.getpid())
+        self.metrics["memory_usage"] = process.memory_info().rss / (1024 * 1024)  # MB
+        self.metrics["cpu_usage"] = process.cpu_percent() / psutil.cpu_count()
+        
+        # Add uptime
+        self.metrics["uptime_seconds"] = time.time() - self._start_time
+        
+        return self.metrics
+    
+    def optimize_batch_size(self, data_size: int, max_batch_size: int = 100) -> int:
+        """Calculate optimal batch size based on current resource usage.
+        
+        Args:
+            data_size: Total size of data to process
+            max_batch_size: Maximum allowed batch size
+            
+        Returns:
+            Optimal batch size
+        """
+        # Start with max batch size
+        batch_size = max_batch_size
+        
+        # Reduce batch size if memory usage is high
+        memory_usage_percent = self.metrics["memory_usage"] / self.memory_limit_mb
+        if memory_usage_percent > 0.8:
+            # Reduce batch size proportionally to memory pressure
+            reduction_factor = 1 - (memory_usage_percent - 0.8) * 5  # Scale from 1.0 to 0.0
+            batch_size = max(1, int(batch_size * reduction_factor))
+        
+        # Reduce batch size if CPU usage is high
+        if self.metrics["cpu_usage"] > 80:
+            # Reduce batch size proportionally to CPU pressure
+            reduction_factor = 1 - (self.metrics["cpu_usage"] - 80) / 20  # Scale from 1.0 to 0.0
+            batch_size = max(1, int(batch_size * reduction_factor))
+        
+        # Ensure batch size is not larger than data size
+        batch_size = min(batch_size, data_size)
+        
+        return batch_size
 
 
-class MemoryTierManager:
-    """Manages memory tiers for optimal performance."""
-    
-    def __init__(self):
-        """Initialize the memory tier manager."""
-        self.tier_config = MEMORY_TIER_CONFIG
-    
-    def determine_tier(self, entry: MemoryEntry) -> StorageTier:
-        """
-        Determine the appropriate storage tier for a memory entry.
-        
-        Args:
-            entry: The memory entry to determine the tier for
-            
-        Returns:
-            The appropriate storage tier
-        """
-        # Check priority thresholds
-        if entry.priority >= self.tier_config["hot"]["priority_threshold"]:
-            return StorageTier.HOT
-        elif entry.priority >= self.tier_config["warm"]["priority_threshold"]:
-            return StorageTier.WARM
-        else:
-            return StorageTier.COLD
-    
-    def should_promote(self, entry: MemoryEntry) -> bool:
-        """
-        Determine if a memory entry should be promoted to a higher tier.
-        
-        Args:
-            entry: The memory entry to check
-            
-        Returns:
-            True if the entry should be promoted, False otherwise
-        """
-        # Check access count and context relevance
-        if entry.storage_tier == StorageTier.COLD:
-            if (entry.metadata.access_count > 5 or 
-                entry.metadata.context_relevance > 0.7):
-                return True
-        elif entry.storage_tier == StorageTier.WARM:
-            if (entry.metadata.access_count > 10 or 
-                entry.metadata.context_relevance > 0.9):
-                return True
-        
-        return False
-    
-    def should_demote(self, entry: MemoryEntry) -> bool:
-        """
-        Determine if a memory entry should be demoted to a lower tier.
-        
-        Args:
-            entry: The memory entry to check
-            
-        Returns:
-            True if the entry should be demoted, False otherwise
-        """
-        # Check last accessed time
-        current_time = time.time()
-        if entry.storage_tier == StorageTier.HOT:
-            if (current_time - entry.metadata.last_accessed > 
-                self.tier_config["hot"]["ttl_seconds"]):
-                return True
-        elif entry.storage_tier == StorageTier.WARM:
-            if (current_time - entry.metadata.last_accessed > 
-                self.tier_config["warm"]["ttl_seconds"]):
-                return True
-        
-        return False
-    
-    def promote_tier(self, entry: MemoryEntry) -> MemoryEntry:
-        """
-        Promote a memory entry to a higher tier.
-        
-        Args:
-            entry: The memory entry to promote
-            
-        Returns:
-            The promoted memory entry
-        """
-        promoted_entry = copy.deepcopy(entry)
-        
-        if entry.storage_tier == StorageTier.COLD:
-            promoted_entry.storage_tier = StorageTier.WARM
-        elif entry.storage_tier == StorageTier.WARM:
-            promoted_entry.storage_tier = StorageTier.HOT
-        
-        return promoted_entry
-    
-    def demote_tier(self, entry: MemoryEntry) -> MemoryEntry:
-        """
-        Demote a memory entry to a lower tier.
-        
-        Args:
-            entry: The memory entry to demote
-            
-        Returns:
-            The demoted memory entry
-        """
-        demoted_entry = copy.deepcopy(entry)
-        
-        if entry.storage_tier == StorageTier.HOT:
-            demoted_entry.storage_tier = StorageTier.WARM
-        elif entry.storage_tier == StorageTier.WARM:
-            demoted_entry.storage_tier = StorageTier.COLD
-        
-        return demoted_entry
+# Singleton instance for global use
+_default_instance: Optional[PerformanceTuner] = None
+
+def get_performance_tuner() -> PerformanceTuner:
+    """Get the default PerformanceTuner instance."""
+    global _default_instance
+    if _default_instance is None:
+        _default_instance = PerformanceTuner()
+    return _default_instance
+
+# Convenience decorators
+def cache_result(ttl: Optional[int] = None) -> Callable:
+    """Decorator to cache function results with TTL."""
+    return get_performance_tuner().cache_result(ttl)
+
+async def async_cache_result(ttl: Optional[int] = None) -> Callable:
+    """Decorator to cache async function results with TTL."""
+    return await get_performance_tuner().async_cache_result(ttl)
+
+def track_performance(func: Callable) -> Callable:
+    """Decorator to track function performance."""
+    return get_performance_tuner().track_performance(func)
+
+async def async_track_performance(func: Callable) -> Callable:
+    """Decorator to track async function performance."""
+    return await get_performance_tuner().async_track_performance(func)
+
+def limit_concurrency(func: Callable) -> Callable:
+    """Decorator to limit concurrency of async functions."""
+    return get_performance_tuner().limit_concurrency(func)
+
+def get_metrics() -> Dict[str, Any]:
+    """Get current performance metrics."""
+    return get_performance_tuner().get_metrics()

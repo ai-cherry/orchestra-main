@@ -1,0 +1,65 @@
+# Fixed Attribute Condition for GitHub Actions OIDC Provider
+
+## Error Analysis
+
+You're getting this error:
+```
+Failed to add the identity provider.
+Error code: 400. Invalid attribute condition. [ERROR 'ERROR: :1:23: token recognition error at: '"ai-cherry/orchestra-main' | attribute.repository=="ai-cherry/orchestra-main | ......................^' at 22, ERROR 'ERROR: :1:48: mismatched input '' expecting {'[', '{', '(', '.', '-', '!', 'true', 'false', 'null', NUM_FLOAT, NUM_INT, NUM_UINT, STRING, BYTES, IDENTIFIER} | attribute.repository=="ai-cherry/orchestra-main | ...............................................^' at 47]
+```
+
+The issue is with the quotation marks in the attribute condition. When entering the condition in the Google Cloud console, you need to use single quotes instead of double quotes for string literals.
+
+## Correct Attribute Condition
+
+Use this exact attribute condition:
+
+```
+attribute.repository=='ai-cherry/orchestra-main'
+```
+
+Note the use of single quotes (') around the repository name instead of double quotes (").
+
+Replace `ai-cherry/orchestra-main` with your actual GitHub organization/username and repository name, but keep the single quotes.
+
+## Complete Provider Configuration
+
+1. **Provider Details:**
+   - Provider name: github-provider
+   - Provider ID: github-actions
+   - Issuer (URL): https://token.actions.githubusercontent.com
+   - JWK file: Leave empty
+   - Allowed audiences: Leave empty to use the default audience
+
+2. **Attribute Mapping:**
+   - google.subject = assertion.sub
+   - attribute.actor = assertion.actor
+   - attribute.repository = assertion.repository
+
+3. **Attribute Condition:**
+   - attribute.repository=='ai-cherry/orchestra-main'
+
+## Service Account Binding Command
+
+After creating the provider, use this command to allow GitHub Actions to impersonate your service account:
+
+```bash
+gcloud iam service-accounts add-iam-policy-binding \
+  github-actions-sa@cherry-ai-project.iam.gserviceaccount.com \
+  --project=cherry-ai-project \
+  --role="roles/iam.workloadIdentityUser" \
+  --member="principalSet://iam.googleapis.com/projects/525398941159/locations/global/workloadIdentityPools/github-wif-pool/attribute.repository/ai-cherry/orchestra-main"
+```
+
+## GitHub Actions Workflow Configuration
+
+In your GitHub Actions workflow, use this configuration:
+
+```yaml
+- id: auth
+  name: Authenticate to Google Cloud
+  uses: google-github-actions/auth@v1
+  with:
+    token_format: 'access_token'
+    workload_identity_provider: 'projects/525398941159/locations/global/workloadIdentityPools/github-wif-pool/providers/github-actions'
+    service_account: 'github-actions-sa@cherry-ai-project.iam.gserviceaccount.com'

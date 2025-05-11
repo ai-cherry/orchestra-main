@@ -1,211 +1,253 @@
-# Performance-optimized Cloud Run configuration for AI Orchestra
+# Optimized Cloud Run configuration for AI Orchestra
+# Features:
+# - Resource optimization
+# - Autoscaling configuration
+# - CPU throttling
+# - Secret management integration
+# - Health check configuration
 
-# MCP Server Cloud Run Service
-resource "google_cloud_run_v2_service" "mcp_server" {
-  name     = "mcp-server-${var.env}"
+# Cloud Run service for AI Orchestra API
+resource "google_cloud_run_service" "ai_orchestra_api" {
+  name     = "ai-orchestra-api-${var.env}"
   location = var.region
-  
+  project  = var.project_id
+
   template {
-    scaling {
-      min_instance_count = 2
-      max_instance_count = 20
+    spec {
+      containers {
+        image = "gcr.io/${var.project_id}/ai-orchestra-api:latest"
+        
+        # Resource limits - optimized for cost and performance
+        resources {
+          limits = {
+            cpu    = "1"
+            memory = "512Mi"
+          }
+          # Request less than limits to allow for efficient resource allocation
+          requests = {
+            cpu    = "500m"
+            memory = "256Mi"
+          }
+        }
+
+        # Environment variables
+        env {
+          name  = "ENV"
+          value = var.env
+        }
+        
+        env {
+          name  = "PROJECT_ID"
+          value = var.project_id
+        }
+        
+        env {
+          name  = "REGION"
+          value = var.region
+        }
+        
+        # Secret environment variables
+        dynamic "env" {
+          for_each = var.secrets
+          content {
+            name = env.key
+            value_from {
+              secret_key_ref {
+                name = env.value.secret_name
+                key  = env.value.secret_key
+              }
+            }
+          }
+        }
+        
+        # Port configuration
+        ports {
+          container_port = 8000
+          name           = "http1"
+        }
+        
+        # Startup probe - wait for service to be ready
+        startup_probe {
+          http_get {
+            path = "/health"
+            port = 8000
+          }
+          initial_delay_seconds = 5
+          period_seconds        = 3
+          timeout_seconds       = 3
+          failure_threshold     = 5
+          success_threshold     = 1
+        }
+        
+        # Liveness probe - check if service is alive
+        liveness_probe {
+          http_get {
+            path = "/health"
+            port = 8000
+          }
+          period_seconds    = 30
+          timeout_seconds   = 5
+          failure_threshold = 3
+          success_threshold = 1
+        }
+      }
+      
+      # Service account
+      service_account_name = google_service_account.ai_orchestra_sa.email
+      
+      # Container concurrency - number of requests per container instance
+      container_concurrency = 80
+      
+      # Request timeout
+      timeout_seconds = 300
     }
     
-    containers {
-      image = "us-docker.pkg.dev/${var.project_id}/orchestra/mcp-server:latest"
-      
-      resources {
-        limits = {
-          cpu    = "4"
-          memory = "16Gi"
-        }
-        cpu_idle = false  # CPU always allocated
+    metadata {
+      annotations = {
+        # Autoscaling configuration
+        "autoscaling.knative.dev/minScale"      = var.env == "prod" ? "1" : "0"
+        "autoscaling.knative.dev/maxScale"      = var.env == "prod" ? "20" : "10"
+        
+        # CPU throttling - scale down CPU when idle to reduce costs
+        "run.googleapis.com/cpu-throttling"     = "true"
+        
+        # VPC connector - if using VPC
+        "run.googleapis.com/vpc-access-connector" = var.vpc_connector_name != "" ? var.vpc_connector_name : null
+        
+        # Cloud SQL instances - if using Cloud SQL
+        "run.googleapis.com/cloudsql-instances"   = var.cloudsql_instance != "" ? var.cloudsql_instance : null
+        
+        # Client-side throttling - for better performance
+        "run.googleapis.com/client-name"          = "ai-orchestra"
+        "run.googleapis.com/client-protocol"      = "http1"
+        
+        # Execution environment
+        "run.googleapis.com/execution-environment" = "gen2"
       }
       
-      # Environment variables
-      env {
-        name  = "PROJECT_ID"
-        value = var.project_id
-      }
-      
-      env {
-        name  = "ENVIRONMENT"
-        value = var.env
-      }
-      
-      env {
-        name  = "REGION"
-        value = var.region
-      }
-      
-      # Secret environment variables
-      env {
-        name = "GCP_MASTER_SERVICE_JSON"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.gcp_master_service_json.secret_id
-            version = "latest"
-          }
-        }
-      }
-      
-      env {
-        name = "GH_CLASSIC_PAT_TOKEN"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.gh_classic_pat_token.secret_id
-            version = "latest"
-          }
-        }
-      }
-      
-      env {
-        name = "GH_FINE_GRAINED_PAT_TOKEN"
-        value_source {
-          secret_key_ref {
-            secret  = google_secret_manager_secret.gh_fine_grained_pat_token.secret_id
-            version = "latest"
-          }
-        }
-      }
-      
-      # Container concurrency and timeout
-      startup_probe {
-        http_get {
-          path = "/health"
-        }
-        initial_delay_seconds = 5
-        timeout_seconds = 3
-        period_seconds = 5
-        failure_threshold = 3
-      }
-      
-      liveness_probe {
-        http_get {
-          path = "/health"
-        }
-        initial_delay_seconds = 10
-        period_seconds = 15
-        timeout_seconds = 5
-        failure_threshold = 3
+      # Labels for better organization and filtering
+      labels = {
+        "app"         = "ai-orchestra"
+        "environment" = var.env
+        "managed-by"  = "terraform"
       }
     }
-    
-    # Container settings
-    max_instance_request_concurrency = 80
-    service_account = google_service_account.cloud_run_sa.email
-    
-    # Execution environment
-    execution_environment = "EXECUTION_ENVIRONMENT_GEN2"
-    
-    # Request timeout
-    timeout = "300s"
   }
-  
-  # Traffic configuration
+
+  # Traffic configuration - 100% to latest revision
   traffic {
-    percent = 100
-    type    = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
+    percent         = 100
+    latest_revision = true
   }
-  
-  # IAM policy
+
+  # Auto-generate revision name
+  autogenerate_revision_name = true
+
+  # Depends on service account
   depends_on = [
-    google_secret_manager_secret.gcp_master_service_json,
-    google_secret_manager_secret.gh_classic_pat_token,
-    google_secret_manager_secret.gh_fine_grained_pat_token,
-    google_service_account.cloud_run_sa
+    google_service_account.ai_orchestra_sa,
+    google_secret_manager_secret_iam_member.secret_access
   ]
 }
 
-# AI Orchestra UI Cloud Run Service
-resource "google_cloud_run_v2_service" "orchestra_ui" {
-  name     = "orchestra-ui-${var.env}"
-  location = var.region
+# Service account for Cloud Run
+resource "google_service_account" "ai_orchestra_sa" {
+  account_id   = "ai-orchestra-sa-${var.env}"
+  display_name = "AI Orchestra Service Account (${var.env})"
+  project      = var.project_id
+}
+
+# IAM binding for service account
+resource "google_project_iam_member" "ai_orchestra_sa_roles" {
+  for_each = toset([
+    "roles/firestore.user",
+    "roles/secretmanager.secretAccessor",
+    "roles/aiplatform.user",
+    "roles/logging.logWriter",
+    "roles/monitoring.metricWriter"
+  ])
   
-  template {
-    scaling {
-      min_instance_count = 1
-      max_instance_count = 5
-    }
-    
-    containers {
-      image = "us-docker.pkg.dev/${var.project_id}/orchestra/ui:latest"
-      
-      resources {
-        limits = {
-          cpu    = "1"
-          memory = "1Gi"
-        }
-      }
-      
-      # Environment variables
-      env {
-        name  = "PROJECT_ID"
-        value = var.project_id
-      }
-      
-      env {
-        name  = "ENVIRONMENT"
-        value = var.env
-      }
-      
-      env {
-        name  = "API_URL"
-        value = google_cloud_run_v2_service.mcp_server.uri
-      }
-      
-      # Container concurrency and timeout
-      startup_probe {
-        http_get {
-          path = "/health"
-        }
-        initial_delay_seconds = 3
-        timeout_seconds = 2
-        period_seconds = 5
-        failure_threshold = 3
-      }
-    }
-    
-    # Request timeout
-    timeout = "60s"
-    max_instance_request_concurrency = 80
-    service_account = google_service_account.cloud_run_sa.email
+  project = var.project_id
+  role    = each.key
+  member  = "serviceAccount:${google_service_account.ai_orchestra_sa.email}"
+}
+
+# IAM binding for secrets
+resource "google_secret_manager_secret_iam_member" "secret_access" {
+  for_each = var.secrets
+
+  project   = var.project_id
+  secret_id = each.value.secret_name
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.ai_orchestra_sa.email}"
+}
+
+# IAM policy for Cloud Run service
+data "google_iam_policy" "noauth" {
+  binding {
+    role = "roles/run.invoker"
+    members = [
+      "allUsers",
+    ]
   }
+}
+
+# IAM policy binding for Cloud Run service
+resource "google_cloud_run_service_iam_policy" "noauth" {
+  location    = google_cloud_run_service.ai_orchestra_api.location
+  project     = google_cloud_run_service.ai_orchestra_api.project
+  service     = google_cloud_run_service.ai_orchestra_api.name
+  policy_data = data.google_iam_policy.noauth.policy_data
+}
+
+# Output the service URL
+output "ai_orchestra_api_url" {
+  value = google_cloud_run_service.ai_orchestra_api.status[0].url
+}
+
+# Variables
+variable "env" {
+  description = "Environment (dev, staging, prod)"
+  type        = string
+  default     = "dev"
+}
+
+variable "project_id" {
+  description = "GCP project ID"
+  type        = string
+}
+
+variable "region" {
+  description = "GCP region"
+  type        = string
+  default     = "us-west4"
+}
+
+variable "secrets" {
+  description = "Map of environment variable names to secret references"
+  type = map(object({
+    secret_name = string
+    secret_key  = string
+  }))
+  default = {}
   
-  # Traffic configuration
-  traffic {
-    percent = 100
-    type    = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
-  }
-  
-  depends_on = [
-    google_cloud_run_v2_service.mcp_server
-  ]
+  # Example:
+  # secrets = {
+  #   "API_KEY" = {
+  #     secret_name = "api-key"
+  #     secret_key  = "latest"
+  #   }
+  # }
 }
 
-# Allow unauthenticated access to the MCP Server
-resource "google_cloud_run_service_iam_member" "mcp_server_public_access" {
-  location = google_cloud_run_v2_service.mcp_server.location
-  service  = google_cloud_run_v2_service.mcp_server.name
-  role     = "roles/run.invoker"
-  member   = "allUsers"
+variable "vpc_connector_name" {
+  description = "Name of the VPC connector to use"
+  type        = string
+  default     = ""
 }
 
-# Allow unauthenticated access to the Orchestra UI
-resource "google_cloud_run_service_iam_member" "orchestra_ui_public_access" {
-  location = google_cloud_run_v2_service.orchestra_ui.location
-  service  = google_cloud_run_v2_service.orchestra_ui.name
-  role     = "roles/run.invoker"
-  member   = "allUsers"
-}
-
-# Outputs
-output "mcp_server_url" {
-  description = "The URL of the MCP Server"
-  value       = google_cloud_run_v2_service.mcp_server.uri
-}
-
-output "orchestra_ui_url" {
-  description = "The URL of the Orchestra UI"
-  value       = google_cloud_run_v2_service.orchestra_ui.uri
+variable "cloudsql_instance" {
+  description = "Cloud SQL instance connection name"
+  type        = string
+  default     = ""
 }

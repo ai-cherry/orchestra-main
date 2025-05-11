@@ -1,0 +1,72 @@
+name: Deploy Admin Interface
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'admin-interface/**'
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: ${{ vars.PROJECT_ID }}
+  REGION: ${{ vars.REGION }}
+  SERVICE_NAME: ai-orchestra-admin
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'admin-interface/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: ./admin-interface
+        run: npm ci
+
+      - name: Build
+        working-directory: ./admin-interface
+        run: npm run build
+
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Build and Push Docker image
+        working-directory: ./admin-interface
+        run: |
+          gcloud builds submit \
+            --tag gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA \
+            --project $PROJECT_ID
+
+      - name: Deploy to Cloud Run
+        working-directory: ./admin-interface
+        run: |
+          gcloud run deploy $SERVICE_NAME \
+            --image gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA \
+            --platform managed \
+            --region $REGION \
+            --allow-unauthenticated \
+            --set-env-vars "API_URL=${{ secrets.API_URL }}" \
+            --project $PROJECT_ID
+
+      - name: Show Output URL
+        run: |
+          echo "Deployed to: $(gcloud run services describe $SERVICE_NAME --platform managed --region $REGION --format 'value(status.url)')"

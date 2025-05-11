@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
 """
-WIF Implementation Plan Executor
+Workload Identity Federation (WIF) Implementation Plan
 
-This script guides users through the implementation of the Workload Identity Federation
-enhancement plan, including addressing vulnerabilities, running the migration script,
-updating CI/CD pipelines, and training team members.
+This script guides you through the implementation of Workload Identity Federation
+for the AI Orchestra project. It includes four critical phases:
+
+1. Address Dependabot Vulnerabilities: Remediate 38 vulnerabilities (16 high, 22 moderate)
+2. Execute Migration Script: Transition from legacy authentication to WIF
+3. Modernize CI/CD Pipelines: Update all pipelines to leverage WIF authentication
+4. Enable Team Adoption: Develop comprehensive training and documentation
 
 Usage:
-    python wif_implementation_plan.py [options]
+    ./wif_implementation_plan.py [options]
 
 Options:
-    --phase PHASE       Phase to execute (vulnerabilities, migration, cicd, training, all)
-    --verbose           Show detailed output during processing
-    --dry-run           Show what would be done without making changes
-    --help              Show this help message and exit
+    --phase PHASE         Specify which phase to execute (vulnerabilities, migration, cicd, training, all)
+    --verbose             Show detailed output during processing
+    --dry-run             Show what would be done without making changes
+    --report PATH         Path to write the implementation report to
+    --help                Show this help message and exit
 """
 
 import argparse
@@ -24,89 +29,42 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple, Union, Any
 
+# Import implementation modules
+from wif_implementation import (
+    ImplementationPhase,
+    TaskStatus,
+    Task,
+    ImplementationPlan,
+    VulnerabilityManager,
+    MigrationManager,
+    CICDManager,
+    TrainingManager,
+)
 
 # Configure logging
-def setup_logging(log_level: str = "INFO") -> logging.Logger:
-    """
-    Set up logging configuration.
-    
-    Args:
-        log_level: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-        
-    Returns:
-        Configured logger
-    """
-    level = getattr(logging, log_level.upper(), logging.INFO)
-    
-    # Create formatter
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
-    
-    # Create console handler
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(formatter)
-    
-    # Create logger
-    logger = logging.getLogger("wif_implementation_plan")
-    logger.setLevel(level)
-    logger.addHandler(console_handler)
-    
-    return logger
-
-
-# Initialize logger with default settings
-logger = setup_logging()
-
-
-class ImplementationPhase(Enum):
-    """Phases of the WIF implementation plan."""
-    VULNERABILITIES = "vulnerabilities"
-    MIGRATION = "migration"
-    CICD = "cicd"
-    TRAINING = "training"
-    ALL = "all"
-
-
-@dataclass
-class Task:
-    """Represents a task in the implementation plan."""
-    name: str
-    description: str
-    command: Optional[str] = None
-    manual_steps: List[str] = field(default_factory=list)
-    dependencies: List[str] = field(default_factory=list)
-    estimated_time: timedelta = field(default_factory=lambda: timedelta(hours=1))
-    completed: bool = False
-
-
-@dataclass
-class Phase:
-    """Represents a phase in the implementation plan."""
-    name: str
-    description: str
-    tasks: List[Task] = field(default_factory=list)
-    start_date: Optional[datetime] = None
-    end_date: Optional[datetime] = None
-    completed: bool = False
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logger = logging.getLogger("wif_implementation")
 
 
 class WIFImplementationPlan:
     """
-    Implementation plan for the Workload Identity Federation enhancement.
-    
-    This class provides functionality to guide users through the implementation
-    of the WIF enhancement plan, including addressing vulnerabilities, running
-    the migration script, updating CI/CD pipelines, and training team members.
+    Implementation plan for Workload Identity Federation.
+
+    This class provides functionality to execute the WIF implementation plan
+    for the AI Orchestra project.
     """
-    
+
     def __init__(
         self,
         base_path: Union[str, Path] = ".",
@@ -115,7 +73,7 @@ class WIFImplementationPlan:
     ):
         """
         Initialize the WIF implementation plan.
-        
+
         Args:
             base_path: The base path for the project
             verbose: Whether to show detailed output during processing
@@ -124,363 +82,205 @@ class WIFImplementationPlan:
         self.base_path = Path(base_path).resolve()
         self.verbose = verbose
         self.dry_run = dry_run
-        
+        self.plan = ImplementationPlan()
+
+        # Initialize managers for each phase
+        self.vulnerability_manager = VulnerabilityManager(self.base_path, verbose, dry_run)
+        self.migration_manager = MigrationManager(self.base_path, verbose, dry_run)
+        self.cicd_manager = CICDManager(self.base_path, verbose, dry_run)
+        self.training_manager = TrainingManager(self.base_path, verbose, dry_run)
+
         if verbose:
             logger.setLevel(logging.DEBUG)
-        
+
         logger.debug(f"Initialized WIF implementation plan with base path: {self.base_path}")
-        
-        # Initialize phases
-        self.phases = self._create_phases()
-    
-    def _create_phases(self) -> Dict[ImplementationPhase, Phase]:
-        """
-        Create the phases of the implementation plan.
-        
-        Returns:
-            A dictionary of phases
-        """
-        phases = {}
-        
+        logger.debug(f"Verbose mode: {verbose}")
+        logger.debug(f"Dry run mode: {dry_run}")
+
+        # Initialize the implementation plan with tasks
+        self._initialize_plan()
+
+    def _initialize_plan(self) -> None:
+        """Initialize the implementation plan with tasks for each phase."""
         # Phase 1: Address Dependabot Vulnerabilities
-        vulnerabilities_phase = Phase(
-            name="Address Dependabot Vulnerabilities",
-            description="Address the 38 vulnerabilities identified by GitHub Dependabot (16 high, 22 moderate).",
-        )
-        
-        vulnerabilities_phase.tasks = [
-            Task(
-                name="Create Vulnerability Inventory",
-                description="Create an inventory of all vulnerabilities identified by Dependabot.",
-                command="npm audit --json > npm_vulnerabilities.json || true; poetry export -f requirements.txt | pip-audit --format json > pip_vulnerabilities.json || true",
-                manual_steps=[
-                    "Review the npm_vulnerabilities.json and pip_vulnerabilities.json files",
-                    "Create a spreadsheet to track all vulnerabilities",
-                    "Categorize vulnerabilities by severity and impact",
-                ],
-                estimated_time=timedelta(hours=4),
-            ),
-            Task(
-                name="Prioritize Vulnerabilities",
-                description="Prioritize vulnerabilities based on severity, impact, and remediation complexity.",
-                manual_steps=[
-                    "Assess impact on production systems",
-                    "Identify dependencies used in runtime vs. development",
-                    "Create remediation priority matrix",
-                ],
-                dependencies=["Create Vulnerability Inventory"],
-                estimated_time=timedelta(hours=2),
-            ),
-            Task(
-                name="Update Direct Dependencies",
-                description="Update direct dependencies to resolve vulnerabilities.",
-                command="poetry update --lock; npm update",
-                manual_steps=[
-                    "Update Poetry dependencies in pyproject.toml",
-                    "Update npm dependencies in package.json files",
-                    "Focus on high-severity vulnerabilities first",
-                    "Document any breaking changes and required code modifications",
-                ],
-                dependencies=["Prioritize Vulnerabilities"],
-                estimated_time=timedelta(hours=8),
-            ),
-            Task(
-                name="Address Transitive Dependencies",
-                description="Address transitive dependencies that have vulnerabilities.",
-                manual_steps=[
-                    "Identify problematic transitive dependencies",
-                    "Pin specific versions or find alternative packages",
-                    "Use dependency resolution tools",
-                    "Update lockfiles to reflect resolved dependencies",
-                ],
-                dependencies=["Update Direct Dependencies"],
-                estimated_time=timedelta(hours=6),
-            ),
-            Task(
-                name="Run Security Scans",
-                description="Run security scans to verify that vulnerabilities have been addressed.",
-                command="npm audit; poetry export -f requirements.txt | pip-audit",
-                dependencies=["Address Transitive Dependencies"],
-                estimated_time=timedelta(hours=2),
-            ),
-            Task(
-                name="Verify Application Functionality",
-                description="Verify that the application functions correctly with the updated dependencies.",
-                manual_steps=[
-                    "Run comprehensive test suite",
-                    "Deploy to development environment",
-                    "Verify all AI Orchestra components function correctly",
-                    "Conduct performance testing to ensure no degradation",
-                ],
-                dependencies=["Run Security Scans"],
-                estimated_time=timedelta(hours=4),
-            ),
-        ]
-        
-        phases[ImplementationPhase.VULNERABILITIES] = vulnerabilities_phase
-        
-        # Phase 2: Run Migration Script
-        migration_phase = Phase(
-            name="Run Migration Script",
-            description="Run the migration script to transition from the old scripts to the new WIF implementation.",
-        )
-        
-        migration_phase.tasks = [
-            Task(
-                name="Prepare Environment",
-                description="Prepare the environment for migration.",
-                manual_steps=[
-                    "Ensure all prerequisites are installed",
-                    "Verify access permissions to all required resources",
-                    "Create a migration checklist document",
-                ],
-                estimated_time=timedelta(hours=2),
-            ),
-            Task(
-                name="Backup Current State",
-                description="Create a backup of the current state before migration.",
-                command="mkdir -p wif_backup_$(date +%Y%m%d); cp -r setup_github_secrets.sh* update_wif_secrets.sh* verify_github_secrets.sh* github_auth.sh* github-workflow-wif-template.yml* docs/workload_identity_federation.md* wif_backup_$(date +%Y%m%d)/",
-                manual_steps=[
-                    "Document current WIF setup state",
-                    "Capture current GitHub Actions workflow configurations",
-                    "Verify backups are complete and accessible",
-                ],
-                dependencies=["Prepare Environment"],
-                estimated_time=timedelta(hours=1),
-            ),
-            Task(
-                name="Run Migration in Development",
-                description="Run the migration script in the development environment.",
-                command="./migrate_to_wif.sh --environment=dev",
-                manual_steps=[
-                    "Address any issues encountered",
-                    "Document migration process and any manual interventions",
-                ],
-                dependencies=["Backup Current State"],
-                estimated_time=timedelta(hours=2),
-            ),
-            Task(
-                name="Run Migration in Production",
-                description="Run the migration script in the production environment.",
-                command="./migrate_to_wif.sh --environment=prod",
-                manual_steps=[
-                    "Schedule maintenance window if needed",
-                    "Monitor logs and system behavior during migration",
-                ],
-                dependencies=["Run Migration in Development"],
-                estimated_time=timedelta(hours=2),
-            ),
-            Task(
-                name="Verify Migration Success",
-                description="Verify that the migration was successful.",
-                command="./verify_wif_setup.sh",
-                manual_steps=[
-                    "Verify GitHub secrets are correctly configured",
-                    "Test authentication flow end-to-end",
-                    "Verify CI/CD pipeline execution with new WIF setup",
-                ],
-                dependencies=["Run Migration in Production"],
-                estimated_time=timedelta(hours=2),
-            ),
-            Task(
-                name="Cleanup and Documentation",
-                description="Clean up after migration and update documentation.",
-                manual_steps=[
-                    "Remove backup files after successful verification",
-                    "Update documentation to reflect new implementation",
-                    "Archive old scripts and configurations",
-                ],
-                dependencies=["Verify Migration Success"],
-                estimated_time=timedelta(hours=2),
-            ),
-        ]
-        
-        phases[ImplementationPhase.MIGRATION] = migration_phase
-        
-        # Phase 3: Update CI/CD Pipelines
-        cicd_phase = Phase(
-            name="Update CI/CD Pipelines",
-            description="Update CI/CD pipelines to use the new WIF implementation.",
-        )
-        
-        cicd_phase.tasks = [
-            Task(
-                name="Identify All CI/CD Pipelines",
-                description="Identify all CI/CD pipelines that need to be updated.",
-                command="find .github/workflows -name '*.yml' -o -name '*.yaml' | xargs grep -l 'google-github-actions/auth' > pipelines_to_update.txt || true",
-                manual_steps=[
-                    "Document all GitHub Actions workflows",
-                    "Identify any external CI/CD systems",
-                    "Create pipeline inventory spreadsheet",
-                ],
-                estimated_time=timedelta(hours=4),
-            ),
-            Task(
-                name="Analyze Authentication Methods",
-                description="Analyze the authentication methods used in the pipelines.",
-                command="grep -r 'service_account_key' .github/workflows/ > service_account_key_pipelines.txt || true",
-                manual_steps=[
-                    "Identify pipelines using service account keys",
-                    "Identify pipelines already using WIF",
-                    "Document authentication-related environment variables and secrets",
-                    "Create migration priority based on security risk",
-                ],
-                dependencies=["Identify All CI/CD Pipelines"],
-                estimated_time=timedelta(hours=4),
-            ),
-            Task(
-                name="Create Template Pipelines",
-                description="Create standardized WIF authentication blocks for pipelines.",
-                manual_steps=[
-                    "Create standardized WIF authentication blocks",
-                    "Develop pipeline migration guide for developers",
-                    "Create pipeline validation checklist",
-                ],
-                dependencies=["Analyze Authentication Methods"],
-                estimated_time=timedelta(hours=6),
-            ),
-            Task(
-                name="Update Service Pipelines",
-                description="Update service-specific pipelines to use the new WIF template.",
-                manual_steps=[
-                    "Prioritize pipelines by security risk, deployment frequency, and business criticality",
-                    "Update each pipeline to use the new WIF template",
-                    "Add proper error handling to each pipeline",
-                    "Document changes and special considerations",
-                ],
-                dependencies=["Create Template Pipelines"],
-                estimated_time=timedelta(hours=16),
-            ),
-            Task(
-                name="Test Pipeline Execution",
-                description="Test the execution of the updated pipelines.",
-                manual_steps=[
-                    "Trigger test runs of each updated pipeline",
-                    "Verify successful authentication",
-                    "Validate deployment process",
-                    "Document any issues and resolutions",
-                ],
-                dependencies=["Update Service Pipelines"],
-                estimated_time=timedelta(hours=8),
-            ),
-            Task(
-                name="Monitor Production Deployments",
-                description="Monitor production deployments using the updated pipelines.",
-                manual_steps=[
-                    "Closely monitor first production deployment for each pipeline",
-                    "Set up alerts for authentication failures",
-                    "Create dashboard for deployment success rates",
-                    "Document performance metrics before and after migration",
-                ],
-                dependencies=["Test Pipeline Execution"],
-                estimated_time=timedelta(hours=8),
-            ),
-        ]
-        
-        phases[ImplementationPhase.CICD] = cicd_phase
-        
-        # Phase 4: Train Team Members
-        training_phase = Phase(
-            name="Train Team Members",
-            description="Train team members on the new WIF implementation.",
-        )
-        
-        training_phase.tasks = [
-            Task(
-                name="Develop Training Materials",
-                description="Develop training materials for the new WIF implementation.",
-                manual_steps=[
-                    "Create comprehensive WIF documentation",
-                    "Develop presentation slides",
-                    "Prepare hands-on exercises",
-                    "Create quick reference guides",
-                ],
-                estimated_time=timedelta(hours=8),
-            ),
-            Task(
-                name="Set Up Knowledge Base",
-                description="Set up a knowledge base for the new WIF implementation.",
-                manual_steps=[
-                    "Create dedicated section in internal documentation",
-                    "Set up FAQ document based on anticipated questions",
-                    "Create troubleshooting guide",
-                    "Document common error messages and resolutions",
-                ],
-                dependencies=["Develop Training Materials"],
-                estimated_time=timedelta(hours=4),
-            ),
-            Task(
-                name="Conduct Technical Sessions",
-                description="Conduct technical sessions on the new WIF implementation.",
-                manual_steps=[
-                    "Conduct overview session for all team members",
-                    "Hold specialized sessions for DevOps, Development, and Security teams",
-                    "Record sessions for future reference",
-                ],
-                dependencies=["Set Up Knowledge Base"],
-                estimated_time=timedelta(hours=6),
-            ),
-            Task(
-                name="Conduct Hands-on Workshops",
-                description="Conduct hands-on workshops on the new WIF implementation.",
-                manual_steps=[
-                    "Conduct practical workshops with real-world scenarios",
-                    "Guide teams through setting up WIF for a new service",
-                    "Guide teams through troubleshooting common issues",
-                    "Guide teams through monitoring and auditing WIF usage",
-                    "Provide direct assistance during exercises",
-                ],
-                dependencies=["Conduct Technical Sessions"],
-                estimated_time=timedelta(hours=8),
-            ),
-            Task(
-                name="Establish Support Period",
-                description="Establish a support period for the new WIF implementation.",
-                manual_steps=[
-                    "Establish 'office hours' for WIF-related questions",
-                    "Create dedicated Slack channel for support",
-                    "Assign WIF champions in each team",
-                    "Provide direct assistance for first implementations",
-                ],
-                dependencies=["Conduct Hands-on Workshops"],
-                estimated_time=timedelta(hours=4),
-            ),
-            Task(
-                name="Collect Feedback and Improve",
-                description="Collect feedback on the new WIF implementation and improve it.",
-                manual_steps=[
-                    "Gather feedback on documentation and training",
-                    "Identify common pain points",
-                    "Update documentation based on feedback",
-                    "Create additional resources as needed",
-                ],
-                dependencies=["Establish Support Period"],
-                estimated_time=timedelta(hours=4),
-            ),
-        ]
-        
-        phases[ImplementationPhase.TRAINING] = training_phase
-        
-        # All phases
-        phases[ImplementationPhase.ALL] = Phase(
-            name="All Phases",
-            description="Execute all phases of the WIF implementation plan.",
-        )
-        
-        return phases
-    
+        phase1 = ImplementationPhase.VULNERABILITIES
+        self.plan.add_task(Task(
+            name="inventory_vulnerabilities",
+            description="Create an inventory of all vulnerabilities",
+            phase=phase1,
+        ))
+        self.plan.add_task(Task(
+            name="prioritize_vulnerabilities",
+            description="Prioritize vulnerabilities based on severity and impact",
+            phase=phase1,
+            dependencies=["inventory_vulnerabilities"],
+        ))
+        self.plan.add_task(Task(
+            name="update_direct_dependencies",
+            description="Update direct dependencies",
+            phase=phase1,
+            dependencies=["prioritize_vulnerabilities"],
+        ))
+        self.plan.add_task(Task(
+            name="address_transitive_dependencies",
+            description="Address transitive dependencies",
+            phase=phase1,
+            dependencies=["update_direct_dependencies"],
+        ))
+        self.plan.add_task(Task(
+            name="run_security_scans",
+            description="Run security scans",
+            phase=phase1,
+            dependencies=["address_transitive_dependencies"],
+        ))
+        self.plan.add_task(Task(
+            name="verify_functionality",
+            description="Verify application functionality",
+            phase=phase1,
+            dependencies=["run_security_scans"],
+        ))
+
+        # Phase 2: Execute Migration Script
+        phase2 = ImplementationPhase.MIGRATION
+        self.plan.add_task(Task(
+            name="prepare_environment",
+            description="Prepare the environment for migration",
+            phase=phase2,
+        ))
+        self.plan.add_task(Task(
+            name="create_backups",
+            description="Create backups of the current state",
+            phase=phase2,
+            dependencies=["prepare_environment"],
+        ))
+        self.plan.add_task(Task(
+            name="run_migration_dev",
+            description="Run the migration script in development",
+            phase=phase2,
+            dependencies=["create_backups"],
+        ))
+        self.plan.add_task(Task(
+            name="verify_migration_dev",
+            description="Verify migration success in development",
+            phase=phase2,
+            dependencies=["run_migration_dev"],
+        ))
+        self.plan.add_task(Task(
+            name="run_migration_prod",
+            description="Run the migration script in production",
+            phase=phase2,
+            dependencies=["verify_migration_dev"],
+        ))
+        self.plan.add_task(Task(
+            name="verify_migration_prod",
+            description="Verify migration success in production",
+            phase=phase2,
+            dependencies=["run_migration_prod"],
+        ))
+        self.plan.add_task(Task(
+            name="update_documentation",
+            description="Update documentation",
+            phase=phase2,
+            dependencies=["verify_migration_prod"],
+        ))
+        self.plan.add_task(Task(
+            name="cleanup",
+            description="Clean up legacy components",
+            phase=phase2,
+            dependencies=["update_documentation"],
+        ))
+
+        # Phase 3: Modernize CI/CD Pipelines
+        phase3 = ImplementationPhase.CICD
+        self.plan.add_task(Task(
+            name="identify_pipelines",
+            description="Identify all CI/CD pipelines",
+            phase=phase3,
+        ))
+        self.plan.add_task(Task(
+            name="analyze_authentication",
+            description="Analyze authentication methods",
+            phase=phase3,
+            dependencies=["identify_pipelines"],
+        ))
+        self.plan.add_task(Task(
+            name="create_templates",
+            description="Create template pipelines",
+            phase=phase3,
+            dependencies=["analyze_authentication"],
+        ))
+        self.plan.add_task(Task(
+            name="update_pipelines",
+            description="Update service-specific pipelines",
+            phase=phase3,
+            dependencies=["create_templates"],
+        ))
+        self.plan.add_task(Task(
+            name="test_pipelines",
+            description="Test pipeline execution",
+            phase=phase3,
+            dependencies=["update_pipelines"],
+        ))
+        self.plan.add_task(Task(
+            name="monitor_deployments",
+            description="Monitor production deployments",
+            phase=phase3,
+            dependencies=["test_pipelines"],
+        ))
+
+        # Phase 4: Enable Team Adoption
+        phase4 = ImplementationPhase.TRAINING
+        self.plan.add_task(Task(
+            name="develop_materials",
+            description="Develop training materials",
+            phase=phase4,
+        ))
+        self.plan.add_task(Task(
+            name="setup_knowledge_base",
+            description="Set up a knowledge base",
+            phase=phase4,
+            dependencies=["develop_materials"],
+        ))
+        self.plan.add_task(Task(
+            name="conduct_technical_sessions",
+            description="Conduct technical sessions",
+            phase=phase4,
+            dependencies=["setup_knowledge_base"],
+        ))
+        self.plan.add_task(Task(
+            name="conduct_workshops",
+            description="Conduct hands-on workshops",
+            phase=phase4,
+            dependencies=["conduct_technical_sessions"],
+        ))
+        self.plan.add_task(Task(
+            name="establish_support",
+            description="Establish a support period",
+            phase=phase4,
+            dependencies=["conduct_workshops"],
+        ))
+        self.plan.add_task(Task(
+            name="collect_feedback",
+            description="Collect feedback and improve",
+            phase=phase4,
+            dependencies=["establish_support"],
+        ))
+
     def execute_phase(self, phase: ImplementationPhase) -> bool:
         """
-        Execute a phase of the implementation plan.
-        
+        Execute a specific phase of the implementation plan.
+
         Args:
             phase: The phase to execute
-            
+
         Returns:
             True if the phase was executed successfully, False otherwise
         """
+        logger.info(f"Executing phase: {phase.value}")
+        self.plan.current_phase = phase
+
         if phase == ImplementationPhase.ALL:
-            success = True
+            # Execute all phases in order
             for p in [
                 ImplementationPhase.VULNERABILITIES,
                 ImplementationPhase.MIGRATION,
@@ -488,94 +288,211 @@ class WIFImplementationPlan:
                 ImplementationPhase.TRAINING,
             ]:
                 if not self.execute_phase(p):
-                    success = False
-            return success
-        
-        phase_obj = self.phases[phase]
-        logger.info(f"Executing phase: {phase_obj.name}")
-        logger.info(f"Description: {phase_obj.description}")
-        
-        phase_obj.start_date = datetime.now()
-        
-        for task in phase_obj.tasks:
-            if not self.execute_task(task):
-                logger.error(f"Failed to execute task: {task.name}")
-                phase_obj.end_date = datetime.now()
+                    return False
+            return True
+
+        # Get all tasks for this phase
+        tasks = self.plan.get_tasks_by_phase(phase)
+        if not tasks:
+            logger.error(f"No tasks found for phase: {phase.value}")
+            return False
+
+        # Sort tasks by dependencies
+        sorted_tasks = self._sort_tasks_by_dependencies(tasks)
+
+        # Execute each task
+        for task in sorted_tasks:
+            if not self._execute_task(task):
                 return False
-        
-        phase_obj.end_date = datetime.now()
-        phase_obj.completed = True
-        
-        logger.info(f"Phase {phase_obj.name} completed successfully")
+
+        logger.info(f"Phase {phase.value} completed successfully")
         return True
-    
-    def execute_task(self, task: Task) -> bool:
+
+    def _sort_tasks_by_dependencies(self, tasks: List[Task]) -> List[Task]:
         """
-        Execute a task in the implementation plan.
-        
+        Sort tasks by dependencies to ensure they are executed in the correct order.
+
+        Args:
+            tasks: The tasks to sort
+
+        Returns:
+            A list of tasks sorted by dependencies
+        """
+        # Create a dictionary of task names to tasks
+        task_dict = {task.name: task for task in tasks}
+
+        # Create a dictionary of task names to dependencies
+        dependencies = {task.name: set(task.dependencies) for task in tasks}
+
+        # Sort tasks by dependencies
+        sorted_tasks = []
+        visited = set()
+
+        def visit(task_name: str) -> None:
+            """Visit a task and its dependencies recursively."""
+            if task_name in visited:
+                return
+            visited.add(task_name)
+            for dep in dependencies.get(task_name, set()):
+                if dep in task_dict:
+                    visit(dep)
+            sorted_tasks.append(task_dict[task_name])
+
+        # Visit all tasks
+        for task_name in task_dict:
+            visit(task_name)
+
+        return sorted_tasks
+
+    def _execute_task(self, task: Task) -> bool:
+        """
+        Execute a specific task.
+
         Args:
             task: The task to execute
-            
+
         Returns:
             True if the task was executed successfully, False otherwise
         """
         logger.info(f"Executing task: {task.name}")
-        logger.info(f"Description: {task.description}")
-        
-        # Check dependencies
-        for dependency in task.dependencies:
-            dependency_task = next((t for phase in self.phases.values() for t in phase.tasks if t.name == dependency), None)
-            if dependency_task and not dependency_task.completed:
-                logger.error(f"Dependency {dependency} not completed")
+        task.start()
+
+        # Check if all dependencies are completed
+        for dep_name in task.dependencies:
+            dep_task = self.plan.get_task_by_name(dep_name)
+            if not dep_task or dep_task.status != TaskStatus.COMPLETED:
+                error_msg = f"Dependency {dep_name} not completed"
+                logger.error(error_msg)
+                task.fail(error_msg)
                 return False
-        
-        # Execute command if available
-        if task.command:
-            logger.info(f"Executing command: {task.command}")
-            
+
+        # Execute the task based on its name
+        try:
             if self.dry_run:
-                logger.info(f"Dry run: would execute {task.command}")
+                logger.info(f"Dry run: Would execute task {task.name}")
+                task.complete()
+                return True
+
+            # Delegate task execution to the appropriate manager
+            if task.phase == ImplementationPhase.VULNERABILITIES:
+                result = self.vulnerability_manager.execute_task(task.name, self.plan)
+            elif task.phase == ImplementationPhase.MIGRATION:
+                result = self.migration_manager.execute_task(task.name, self.plan)
+            elif task.phase == ImplementationPhase.CICD:
+                result = self.cicd_manager.execute_task(task.name, self.plan)
+            elif task.phase == ImplementationPhase.TRAINING:
+                result = self.training_manager.execute_task(task.name, self.plan)
             else:
-                try:
-                    subprocess.run(task.command, shell=True, check=True)
-                except subprocess.CalledProcessError as e:
-                    logger.error(f"Command failed: {e}")
-                    return False
-        
-        # Display manual steps
-        if task.manual_steps:
-            logger.info("Manual steps:")
-            for i, step in enumerate(task.manual_steps, 1):
-                logger.info(f"  {i}. {step}")
-            
-            if not self.dry_run:
-                # Prompt user to confirm completion of manual steps
-                while True:
-                    response = input("Have you completed all manual steps? (yes/no): ").lower()
-                    if response in ["yes", "y"]:
-                        break
-                    elif response in ["no", "n"]:
-                        logger.error("Manual steps not completed")
-                        return False
-                    else:
-                        logger.warning("Please enter 'yes' or 'no'")
-        
-        task.completed = True
-        logger.info(f"Task {task.name} completed successfully")
-        return True
-    
+                error_msg = f"Unknown phase: {task.phase}"
+                logger.error(error_msg)
+                task.fail(error_msg)
+                return False
+
+            if result:
+                task.complete()
+                logger.info(f"Task {task.name} completed successfully")
+                return True
+            else:
+                error_msg = f"Task {task.name} failed"
+                logger.error(error_msg)
+                task.fail(error_msg)
+                return False
+
+        except Exception as e:
+            error_msg = f"Error executing task {task.name}: {str(e)}"
+            logger.error(error_msg)
+            task.fail(error_msg)
+            return False
+
     def generate_report(self, output_path: Optional[str] = None) -> str:
         """
-        Generate a report of the implementation plan.
-        
+        Generate a detailed report of the implementation progress.
+
         Args:
             output_path: Optional path to write the report to
-            
+
         Returns:
             The report as a string
         """
-        logger.info("Generating report...")
-        
+        logger.info("Generating implementation report")
+
+        # Create the report
+        report = {
+            "timestamp": datetime.now().isoformat(),
+            "phases": {},
+            "vulnerabilities": {
+                "total": len(self.vulnerability_manager.vulnerabilities),
+                "fixed": len(self.vulnerability_manager.get_fixed_vulnerabilities()),
+                "unfixed": len(self.vulnerability_manager.get_unfixed_vulnerabilities()),
+                "by_severity": {
+                    "critical": len(self.vulnerability_manager.get_vulnerabilities_by_severity("critical")),
+                    "high": len(self.vulnerability_manager.get_vulnerabilities_by_severity("high")),
+                    "moderate": len(self.vulnerability_manager.get_vulnerabilities_by_severity("moderate")),
+                    "low": len(self.vulnerability_manager.get_vulnerabilities_by_severity("low")),
+                },
+            },
+        }
+
+        # Add phase information
+        for phase in ImplementationPhase:
+            if phase == ImplementationPhase.ALL:
+                continue
+
+            tasks = self.plan.get_tasks_by_phase(phase)
+            completed = [t for t in tasks if t.status == TaskStatus.COMPLETED]
+            failed = [t for t in tasks if t.status == TaskStatus.FAILED]
+            in_progress = [t for t in tasks if t.status == TaskStatus.IN_PROGRESS]
+            pending = [t for t in tasks if t.status == TaskStatus.PENDING]
+            skipped = [t for t in tasks if t.status == TaskStatus.SKIPPED]
+
+            report["phases"][phase.value] = {
+                "total_tasks": len(tasks),
+                "completed_tasks": len(completed),
+                "failed_tasks": len(failed),
+                "in_progress_tasks": len(in_progress),
+                "pending_tasks": len(pending),
+                "skipped_tasks": len(skipped),
+                "status": (
+                    "completed" if len(completed) == len(tasks) else
+                    "failed" if len(failed) > 0 else
+                    "in_progress" if len(in_progress) > 0 else
+                    "pending"
+                ),
+                "tasks": {},
+            }
+
+            # Add task information
+            for task in tasks:
+                report["phases"][phase.value]["tasks"][task.name] = {
+                    "status": task.status.value,
+                    "start_time": task.start_time.isoformat() if task.start_time else None,
+                    "end_time": task.end_time.isoformat() if task.end_time else None,
+                    "duration": task.get_duration(),
+                    "notes": task.notes,
+                }
+
+        # Write the report to a file if requested
+        if output_path:
+            with open(output_path, "w") as f:
+                json.dump(report, f, indent=2)
+            logger.info(f"Report written to {output_path}")
+
+        # Return the report as a string
+        return json.dumps(report, indent=2)
+
+    def generate_markdown_report(self, output_path: Optional[str] = None) -> str:
+        """
+        Generate a detailed markdown report of the implementation progress.
+
+        Args:
+            output_path: Optional path to write the report to
+
+        Returns:
+            The report as a markdown string
+        """
+        logger.info("Generating markdown implementation report")
+
+        # Create the report
         report = [
             "# WIF Implementation Plan Report",
             "",
@@ -584,116 +501,145 @@ class WIFImplementationPlan:
             "## Summary",
             "",
         ]
-        
-        # Add summary
-        completed_phases = sum(1 for phase in self.phases.values() if phase.completed)
-        total_phases = len(self.phases) - 1  # Exclude ALL phase
-        
-        report.append(f"- Phases: {completed_phases}/{total_phases} completed")
-        
-        completed_tasks = sum(1 for phase in self.phases.values() for task in phase.tasks if task.completed)
-        total_tasks = sum(1 for phase in self.phases.values() for task in phase.tasks)
-        
-        report.append(f"- Tasks: {completed_tasks}/{total_tasks} completed")
-        
-        # Add phases
-        for phase_enum, phase in self.phases.items():
-            if phase_enum == ImplementationPhase.ALL:
+
+        # Add vulnerability summary
+        vuln_total = len(self.vulnerability_manager.vulnerabilities)
+        vuln_fixed = len(self.vulnerability_manager.get_fixed_vulnerabilities())
+        vuln_unfixed = len(self.vulnerability_manager.get_unfixed_vulnerabilities())
+
+        report.extend([
+            "### Vulnerabilities",
+            "",
+            f"- **Total**: {vuln_total}",
+            f"- **Fixed**: {vuln_fixed}",
+            f"- **Unfixed**: {vuln_unfixed}",
+            "",
+            "#### By Severity",
+            "",
+            f"- **Critical**: {len(self.vulnerability_manager.get_vulnerabilities_by_severity('critical'))}",
+            f"- **High**: {len(self.vulnerability_manager.get_vulnerabilities_by_severity('high'))}",
+            f"- **Moderate**: {len(self.vulnerability_manager.get_vulnerabilities_by_severity('moderate'))}",
+            f"- **Low**: {len(self.vulnerability_manager.get_vulnerabilities_by_severity('low'))}",
+            "",
+        ])
+
+        # Add phase information
+        report.append("## Phases")
+        report.append("")
+
+        for phase in ImplementationPhase:
+            if phase == ImplementationPhase.ALL:
                 continue
-            
+
+            tasks = self.plan.get_tasks_by_phase(phase)
+            completed = [t for t in tasks if t.status == TaskStatus.COMPLETED]
+            failed = [t for t in tasks if t.status == TaskStatus.FAILED]
+            in_progress = [t for t in tasks if t.status == TaskStatus.IN_PROGRESS]
+            pending = [t for t in tasks if t.status == TaskStatus.PENDING]
+            skipped = [t for t in tasks if t.status == TaskStatus.SKIPPED]
+
+            status = (
+                "✅ Completed" if len(completed) == len(tasks) else
+                "❌ Failed" if len(failed) > 0 else
+                "🔄 In Progress" if len(in_progress) > 0 else
+                "⏳ Pending"
+            )
+
+            report.extend([
+                f"### {phase.value.capitalize()}",
+                "",
+                f"**Status**: {status}",
+                f"**Progress**: {len(completed)}/{len(tasks)} tasks completed",
+                "",
+                "| Task | Status | Duration | Notes |",
+                "|------|--------|----------|-------|",
+            ])
+
+            # Add task information
+            for task in tasks:
+                status_emoji = (
+                    "✅" if task.status == TaskStatus.COMPLETED else
+                    "❌" if task.status == TaskStatus.FAILED else
+                    "🔄" if task.status == TaskStatus.IN_PROGRESS else
+                    "⏳" if task.status == TaskStatus.PENDING else
+                    "⏭️"
+                )
+
+                duration = task.get_duration()
+                duration_str = f"{duration:.2f}s" if duration is not None else "N/A"
+
+                report.append(
+                    f"| {task.name} | {status_emoji} {task.status.value} | {duration_str} | {task.notes} |")
+
             report.append("")
-            report.append(f"## {phase.name}")
-            report.append("")
-            report.append(f"Status: {'Completed' if phase.completed else 'In Progress'}")
-            
-            if phase.start_date:
-                report.append(f"Start Date: {phase.start_date.strftime('%Y-%m-%d %H:%M:%S')}")
-            
-            if phase.end_date:
-                report.append(f"End Date: {phase.end_date.strftime('%Y-%m-%d %H:%M:%S')}")
-            
-            report.append("")
-            report.append("### Tasks")
-            report.append("")
-            
-            for task in phase.tasks:
-                status = "✅" if task.completed else "❌"
-                report.append(f"- {status} **{task.name}**: {task.description}")
-        
-        # Join the report lines
-        report_str = "\n".join(report)
-        
-        # Write to file if output path is provided
+
+        # Write the report to a file if requested
         if output_path:
-            try:
-                with open(output_path, "w", encoding="utf-8") as f:
-                    f.write(report_str)
-                logger.info(f"Report written to: {output_path}")
-            except Exception as e:
-                logger.error(f"Error writing report to {output_path}: {e}")
-        
-        return report_str
+            with open(output_path, "w") as f:
+                f.write("\n".join(report))
+            logger.info(f"Markdown report written to {output_path}")
+
+        # Return the report as a string
+        return "\n".join(report)
 
 
 def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
-    parser = argparse.ArgumentParser(
-        description="Execute the WIF implementation plan."
-    )
-    
+    parser = argparse.ArgumentParser(description="WIF Implementation Plan")
     parser.add_argument(
         "--phase",
-        type=str,
         choices=[p.value for p in ImplementationPhase],
-        default="all",
-        help="Phase to execute",
+        default=ImplementationPhase.ALL.value,
+        help="Specify which phase to execute",
     )
-    
     parser.add_argument(
         "--verbose",
         action="store_true",
         help="Show detailed output during processing",
     )
-    
     parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Show what would be done without making changes",
     )
-    
     parser.add_argument(
         "--report",
-        type=str,
-        help="Path to write the report to",
+        metavar="PATH",
+        help="Path to write the implementation report to",
     )
-    
     return parser.parse_args()
 
 
 def main() -> int:
-    """Main entry point for the script."""
+    """Main entry point."""
     args = parse_args()
-    
-    # Create implementation plan
-    plan = WIFImplementationPlan(
-        verbose=args.verbose,
-        dry_run=args.dry_run,
-    )
-    
-    # Execute phase
-    phase = ImplementationPhase(args.phase)
-    success = plan.execute_phase(phase)
-    
-    # Generate report
-    if args.report or not success:
-        output_path = args.report
-        if not output_path:
-            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-            output_path = f"wif_implementation_report_{timestamp}.md"
-        
-        plan.generate_report(output_path)
-    
-    return 0 if success else 1
+
+    try:
+        # Initialize the implementation plan
+        plan = WIFImplementationPlan(
+            verbose=args.verbose,
+            dry_run=args.dry_run,
+        )
+
+        # Execute the specified phase
+        phase = ImplementationPhase(args.phase)
+        success = plan.execute_phase(phase)
+
+        # Generate a report if requested
+        if args.report:
+            if args.report.endswith(".md"):
+                plan.generate_markdown_report(args.report)
+            else:
+                plan.generate_report(args.report)
+
+        return 0 if success else 1
+
+    except Exception as e:
+        logger.error(f"Error: {str(e)}")
+        if args.verbose:
+            import traceback
+            traceback.print_exc()
+        return 1
 
 
 if __name__ == "__main__":

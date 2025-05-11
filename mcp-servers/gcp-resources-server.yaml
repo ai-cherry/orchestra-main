@@ -1,0 +1,164 @@
+name: gcp-resources
+display_name: GCP Resources
+description: Access and compare Google Cloud resources with your code
+version: 1.0.0
+base_url: http://localhost:8085
+healthcheck_path: /health
+
+tools:
+  - name: create_gcp_snapshot
+    path: /mcp/tools/create_gcp_snapshot
+    display_name: Create GCP Snapshot
+    description: |
+      Capture a comprehensive snapshot of your GCP project resources.
+      This tool runs the snapshot_gcp_resources.sh script to generate JSON files with resource details.
+      Use this when you need to analyze your current GCP resources or compare them with your code.
+    parameters:
+      project_id:
+        type: string
+        required: true
+        description: The GCP project ID to snapshot
+      comprehensive:
+        type: boolean
+        required: false
+        default: false
+        description: Whether to capture comprehensive details (slower but more detailed)
+      compare_with_code:
+        type: boolean
+        required: false
+        default: false
+        description: Whether to compare resources with codebase
+      code_dir:
+        type: string
+        required: false
+        default: "."
+        description: Directory containing code to compare (if comparing)
+    examples:
+      - description: Create a basic snapshot of a GCP project
+        parameters:
+          project_id: cherry-ai-project
+      - description: Create a comprehensive snapshot with code comparison
+        parameters:
+          project_id: cherry-ai-project
+          comprehensive: true
+          compare_with_code: true
+          code_dir: /workspaces/orchestra-main
+
+  - name: list_gcp_resources
+    path: /mcp/tools/list_gcp_resources
+    display_name: List GCP Resources
+    description: |
+      List resources of a specific type from a GCP snapshot.
+      This tool retrieves structured information about resources such as compute instances,
+      Cloud Run services, storage buckets, etc. from a previously captured snapshot.
+    parameters:
+      snapshot_id:
+        type: string
+        required: true
+        description: Snapshot ID (directory name)
+      resource_type:
+        type: string
+        required: true
+        description: "Resource type (compute, storage, databases, networking, ai, iam)"
+        enum:
+          - compute
+          - storage
+          - databases
+          - networking
+          - ai
+          - iam
+    examples:
+      - description: List all Cloud Run services
+        parameters:
+          snapshot_id: cherry-ai-project_2025-05-11-123456
+          resource_type: compute
+      - description: List all storage buckets
+        parameters:
+          snapshot_id: cherry-ai-project_2025-05-11-123456
+          resource_type: storage
+
+  - name: compare_gcp_with_code
+    path: /mcp/tools/compare_gcp_with_code
+    display_name: Compare GCP with Code
+    description: |
+      Compare GCP resources with code to identify gaps or inconsistencies.
+      This tool analyzes resources in a snapshot and compares them with your codebase
+      to find resources that might not be properly tracked in infrastructure-as-code.
+    parameters:
+      snapshot_id:
+        type: string
+        required: true
+        description: Snapshot ID (directory name)
+      resource_types:
+        type: array
+        items:
+          type: string
+          enum:
+            - compute
+            - storage
+            - databases
+            - networking
+            - ai
+            - iam
+        required: false
+        default: ["compute", "storage", "databases", "ai"]
+        description: Resource types to compare
+      code_dir:
+        type: string
+        required: false
+        default: "."
+        description: Directory to compare with
+    examples:
+      - description: Compare Cloud Run services with Terraform code
+        parameters:
+          snapshot_id: cherry-ai-project_2025-05-11-123456
+          resource_types: ["compute"]
+          code_dir: /workspaces/orchestra-main/terraform
+
+resources:
+  - name: available_snapshots
+    path: /mcp/resources/available_snapshots
+    display_name: Available GCP Snapshots
+    description: List all available GCP resource snapshots
+
+  - name: snapshot
+    path: /mcp/resources/snapshot/{snapshot_id}
+    display_name: GCP Snapshot
+    description: Get information about a specific GCP snapshot
+    parameters:
+      snapshot_id:
+        type: string
+        required: true
+        description: The snapshot ID to retrieve
+
+  - name: snapshot_summary
+    path: /mcp/resources/snapshot/{snapshot_id}/summary
+    display_name: GCP Snapshot Summary
+    description: Get a human-readable summary of a GCP snapshot
+    parameters:
+      snapshot_id:
+        type: string
+        required: true
+        description: The snapshot ID to retrieve the summary for
+
+  - name: resource_file
+    path: /mcp/resources/snapshot/{snapshot_id}/resources/{resource_type}/{resource_file}
+    display_name: GCP Resource File
+    description: Get a specific resource file from a GCP snapshot
+    parameters:
+      snapshot_id:
+        type: string
+        required: true
+        description: The snapshot ID
+      resource_type:
+        type: string
+        required: true
+        description: "Resource type (compute, storage, databases, networking, ai, iam)"
+      resource_file:
+        type: string
+        required: true
+        description: The resource file to retrieve
+
+startup:
+  command: python3 gcp_resources_mcp_server.py
+  working_directory: /workspaces/orchestra-main

@@ -1,0 +1,7 @@
+# Project configuration
+project_id = "cherry-ai-project"
+region     = "us-central1"
+env        = "dev"
+
+# API configuration
+api_url    = "https://api.ai-orchestra.example.com"

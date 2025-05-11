@@ -1,0 +1,74 @@
+# GCP Authentication Troubleshooting Commands
+
+## Fix Service Account Key Issues
+
+```bash
+# Make the key fix script executable
+chmod +x key_fix_script.py
+
+# Run the key fix script
+python key_fix_script.py --input credentials.json --output fixed_credentials.json
+
+# Try authenticating with the fixed key
+gcloud auth activate-service-account --key-file=fixed_credentials.json
+```
+
+## Check Service Account Status
+
+```bash
+# Check if the service account exists and is enabled
+gcloud iam service-accounts describe codespaces-powerful-sa@cherry-ai-project.iam.gserviceaccount.com --project=cherry-ai-project
+
+# List service account keys
+gcloud iam service-accounts keys list --iam-account=codespaces-powerful-sa@cherry-ai-project.iam.gserviceaccount.com --project=cherry-ai-project
+```
+
+## Create a New Service Account Key (if needed)
+
+```bash
+# Create a new key for the service account
+gcloud iam service-accounts keys create new-credentials.json --iam-account=codespaces-powerful-sa@cherry-ai-project.iam.gserviceaccount.com --project=cherry-ai-project
+
+# Authenticate with the new key
+gcloud auth activate-service-account --key-file=new-credentials.json
+```
+
+## Check Required APIs
+
+```bash
+# Check if Cloud Run API is enabled
+gcloud services list --enabled --filter="name:run.googleapis.com" --project=cherry-ai-project
+
+# Enable Cloud Run API if needed
+gcloud services enable run.googleapis.com --project=cherry-ai-project
+
+# Check if Container Registry API is enabled
+gcloud services list --enabled --filter="name:containerregistry.googleapis.com" --project=cherry-ai-project
+
+# Enable Container Registry API if needed
+gcloud services enable containerregistry.googleapis.com --project=cherry-ai-project
+```
+
+## Check IAM Permissions
+
+```bash
+# Check IAM policy for the project
+gcloud projects get-iam-policy cherry-ai-project --format=json > iam_policy.json
+
+# Grant required roles if needed
+gcloud projects add-iam-policy-binding cherry-ai-project --member=serviceAccount:codespaces-powerful-sa@cherry-ai-project.iam.gserviceaccount.com --role=roles/run.admin
+gcloud projects add-iam-policy-binding cherry-ai-project --member=serviceAccount:codespaces-powerful-sa@cherry-ai-project.iam.gserviceaccount.com --role=roles/storage.admin
+gcloud projects add-iam-policy-binding cherry-ai-project --member=serviceAccount:codespaces-powerful-sa@cherry-ai-project.iam.gserviceaccount.com --role=roles/iam.serviceAccountUser
+```
+
+## Deploy to Cloud Run (after fixing authentication)
+
+```bash
+# Build and deploy to Cloud Run
+gcloud builds submit --tag gcr.io/cherry-ai-project/mcp-server
+
+gcloud run deploy mcp-server \
+  --image gcr.io/cherry-ai-project/mcp-server \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated

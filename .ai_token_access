@@ -1,0 +1,22 @@
+# AI Assistant Token Access
+# This file documents which tokens AI assistants can use for real-world changes
+
+GITHUB_TOKENS:
+- GH_CLASSIC_PAT_TOKEN: Full repository access
+- GH_FINE_GRAINED_TOKEN: Scoped repository access
+
+GCP_CREDENTIALS:
+- GCP_MASTER_SERVICE_JSON: Full service account access
+- GCP_PROJECT_AUTHENTICATION_EMAIL: Authentication identity
+- GCP_PROJECT_ID: Target project
+- GCP_REGION: Default region
+- GCP_SECRET_MANAGEMENT_KEY: Secret management
+- GCP_WORKLOAD_IDENTITY_PROVIDER: Identity federation
+- VERTEX_AGENT_KEY: Vertex AI access
+
+INSTRUCTIONS:
+AI assistants working on this project have authorization to use these tokens
+to make real-world changes to resources. Security considerations should be
+basic but sufficient, with focus on performance and stability.
+
+See PROJECT_PRIORITIES.md for detailed guidance.

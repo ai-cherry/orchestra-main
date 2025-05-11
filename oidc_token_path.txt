@@ -1,0 +1,43 @@
+# OIDC ID Token Path for GitHub Actions
+
+## Token Path Value
+
+For the "OIDC ID token path" field, enter:
+
+```
+/.github/workflows/oidc-token
+```
+
+This is the standard path where GitHub Actions stores the OIDC token that will be used for authentication with Google Cloud.
+
+## Complete Configuration
+
+1. **Service Account**: codespaces-powerful-sa@cherry-ai-project.iam.gserviceaccount.com
+
+2. **Provider**: github-provider
+
+3. **OIDC ID token path**: `/.github/workflows/oidc-token`
+
+4. **Format type**: text
+
+## Explanation
+
+The OIDC ID token path is the location where the identity provider (GitHub Actions) will make the OIDC token available. For GitHub Actions, this token is available at the path `/.github/workflows/oidc-token`.
+
+When you use the `google-github-actions/auth@v1` action in your GitHub Actions workflow, it will automatically retrieve the token from this path and use it to authenticate with Google Cloud.
+
+## GitHub Actions Workflow Configuration
+
+This is how the auth step in your GitHub Actions workflow will use this configuration:
+
+```yaml
+- id: auth
+  name: Authenticate to Google Cloud
+  uses: google-github-actions/auth@v1
+  with:
+    token_format: 'access_token'
+    workload_identity_provider: 'projects/525398941159/locations/global/workloadIdentityPools/github-wif-pool/providers/github-actions'
+    service_account: 'codespaces-powerful-sa@cherry-ai-project.iam.gserviceaccount.com'
+```
+
+The `google-github-actions/auth@v1` action handles the token retrieval and exchange automatically, so you don't need to manually specify the token path in your workflow.

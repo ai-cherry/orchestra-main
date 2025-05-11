@@ -10,8 +10,9 @@ import asyncio
 import functools
 import inspect
 import logging
+import time
 import traceback
-from typing import Callable, TypeVar, Any, Dict, Optional, Type, Union, cast, overload, ParamSpec
+from typing import Callable, TypeVar, Any, Dict, Optional, Type, Union, cast, overload, ParamSpec, Tuple
 
 from .errors import AIServiceError
 
@@ -417,7 +418,6 @@ def retry(
         if asyncio.iscoroutinefunction(func):
             return cast(F, async_wrapper)
         else:
-            import time  # Import here to avoid importing in async context
             return cast(F, sync_wrapper)
     
     return decorator

@@ -1,0 +1,33 @@
+# Provider ID for GitHub Actions OIDC Provider
+
+For the "Provider ID" field in the Google Cloud console, use:
+
+```
+github-actions
+```
+
+This is a valid Provider ID that:
+- Contains only lowercase letters, numbers, and hyphens
+- Starts with a letter
+- Ends with a letter or number
+- Is between 4-32 characters
+
+You can also use other valid IDs like:
+- `github-provider`
+- `github-oidc-provider`
+- `github-actions-provider`
+
+Just make sure to use the same Provider ID consistently in your GitHub Actions workflow configuration.
+
+## Complete Provider Configuration
+
+- **Provider name**: github-provider
+- **Provider ID**: github-actions
+- **Issuer (URL)**: https://token.actions.githubusercontent.com
+- **Allowed audiences**: Leave empty to use the default audience
+
+## Attribute Mapping (Next Screen)
+
+- google.subject = assertion.sub
+- attribute.actor = assertion.actor
+- attribute.repository = assertion.repository

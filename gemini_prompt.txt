@@ -1,0 +1,43 @@
+# Troubleshooting GCP Service Account Key Authentication Error
+
+I'm trying to authenticate with a GCP service account key but getting an "Invalid JWT Signature" error. Please help me diagnose and fix this issue.
+
+## Service Account Details
+- Service Account Email: codespaces-powerful-sa@cherry-ai-project.iam.gserviceaccount.com
+- Service Account ID: 117958005088425650597
+- Project ID: cherry-ai-project
+
+## Error Message
+When running `gcloud auth activate-service-account --key-file=credentials.json`, I get:
+```
+ERROR: (gcloud.auth.activate-service-account) There was a problem refreshing auth tokens for account codespaces-powerful-sa@cherry-ai-project.iam.gserviceaccount.com: ('invalid_grant: Invalid JWT Signature.', {'error': 'invalid_grant', 'error_description': 'Invalid JWT Signature.'})
+```
+
+## Key File Format
+The key file is in JSON format and contains all the required fields:
+- type
+- project_id
+- private_key_id
+- private_key
+- client_email
+- client_id
+- auth_uri
+- token_uri
+- auth_provider_x509_cert_url
+- client_x509_cert_url
+
+## What I've Tried
+1. Verified the key file is valid JSON
+2. Checked that the private key appears to be properly formatted
+3. Confirmed the service account exists in the project
+
+## Questions
+1. What are the most common causes of "Invalid JWT Signature" errors?
+2. How can I check if the private key in my credentials file is properly formatted?
+3. Could this be related to the service account being disabled or the key being revoked?
+4. Are there any organization policies that might be restricting service account key usage?
+5. What's the best way to fix this issue - should I create a new key or is there a way to fix the existing one?
+6. Is there a way to test the key directly with the Google OAuth API to bypass gcloud?
+
+## Goal
+I'm trying to deploy an MCP server to Cloud Run using this service account. Any help diagnosing and fixing this authentication issue would be greatly appreciated.

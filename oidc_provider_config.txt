@@ -1,0 +1,50 @@
+# OIDC Provider Configuration for GitHub Actions
+
+## Provider Details
+
+- **Provider Name**: github-provider
+- **Issuer (URL)**: https://token.actions.githubusercontent.com
+- **Allowed audiences**: https://iam.googleapis.com/projects/525398941159/locations/global/workloadIdentityPools/github-wif-pool
+
+## Attribute Mapping
+
+Enter these exact attribute mappings:
+
+- google.subject = assertion.sub
+- attribute.actor = assertion.actor
+- attribute.repository = assertion.repository
+
+## Service Account Access Command
+
+After creating the provider, run this command to allow GitHub Actions to impersonate your service account:
+
+```bash
+gcloud iam service-accounts add-iam-policy-binding \
+  github-actions-sa@cherry-ai-project.iam.gserviceaccount.com \
+  --project=cherry-ai-project \
+  --role="roles/iam.workloadIdentityUser" \
+  --member="principalSet://iam.googleapis.com/projects/525398941159/locations/global/workloadIdentityPools/github-wif-pool/attribute.repository/ai-cherry/orchestra-main"
+```
+
+Replace `ai-cherry/orchestra-main` with your actual GitHub organization/username and repository name.
+
+## GitHub Actions Workflow Configuration
+
+In your GitHub Actions workflow, use this configuration:
+
+```yaml
+- id: auth
+  name: Authenticate to Google Cloud
+  uses: google-github-actions/auth@v1
+  with:
+    token_format: 'access_token'
+    workload_identity_provider: 'projects/525398941159/locations/global/workloadIdentityPools/github-wif-pool/providers/github-provider'
+    service_account: 'github-actions-sa@cherry-ai-project.iam.gserviceaccount.com'
+```
+
+## GitHub Secrets to Set
+
+- GCP_PROJECT_ID: cherry-ai-project
+- GCP_REGION: us-central1 (or your preferred region)
+- GCP_WORKLOAD_IDENTITY_PROVIDER: projects/525398941159/locations/global/workloadIdentityPools/github-wif-pool/providers/github-provider
+- GCP_SERVICE_ACCOUNT: github-actions-sa@cherry-ai-project.iam.gserviceaccount.com
