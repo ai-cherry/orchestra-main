@@ -3,7 +3,7 @@ AlloyDB to BigQuery Export Script
 
 This script performs hourly incremental exports of data from AlloyDB to BigQuery
 for the AGI Baby Cherry project. It extracts data updated in the last hour from
-the AlloyDB 'memories' table, saves it as Parquet files in Cloud Storage, and
+the AlloyDB 'memories' table, saves it as Parquet files in Google Cloud Storage (GCS), and
 loads it into BigQuery for analytical purposes, establishing a Single Source of Truth (SSOT).
 """
 
@@ -38,6 +38,8 @@ class AlloyDBToBigQueryExporter:
         gcp_project_id: str = "cherry-ai-project",
         region: str = "us-central1",
         temporary_gcs_directory: str = "temp_export",
+        alloydb_host: str = "localhost",
+        alloydb_port: int = 5432,
     ):
         """
         Initialize the exporter with connection and configuration parameters.
@@ -48,8 +50,8 @@ class AlloyDBToBigQueryExporter:
             alloydb_user: Username for AlloyDB connection.
             alloydb_password: Password for AlloyDB connection.
             alloydb_table: Table name in AlloyDB.
-            gcs_bucket_name: Google Cloud Storage bucket for temporary storage.
-            bq_dataset: BigQuery dataset for SSOT.
+            gcs_bucket_name: Google Cloud Storage (GCS) bucket for temporary storage.
+            bq_dataset: BigQuery dataset for Single Source of Truth (SSOT).
             bq_table: BigQuery table for SSOT data.
             gcp_project_id: Google Cloud Project ID.
             region: Region for the GCP resources.
@@ -66,6 +68,8 @@ class AlloyDBToBigQueryExporter:
         self.gcp_project_id = gcp_project_id
         self.region = region
         self.temporary_gcs_directory = temporary_gcs_directory
+        self.alloydb_host = alloydb_host
+        self.alloydb_port = alloydb_port
         self.alloydb_conn = None
         self.storage_client = None
         self.bq_client = None
@@ -78,7 +82,7 @@ class AlloyDBToBigQueryExporter:
             self.alloydb_conn = psycopg2.connect(
                 host=self.alloydb_host,
                 port=self.alloydb_port,
-                dbname=self.alloydb_dbname,
+                dbname=self.alloydb_db_name,
                 user=self.alloydb_user,
                 password=self.alloydb_password,
                 cursor_factory=RealDictCursor
@@ -158,14 +162,14 @@ class AlloyDBToBigQueryExporter:
         if not local_file:
             return ""
             
-        bucket = self.storage_client.bucket(self.gcs_bucket)
+        bucket = self.storage_client.bucket(self.gcs_bucket_name)
         filename = os.path.basename(local_file)
-        gcs_uri = f"{self.gcs_path}/{filename}"
+        gcs_uri = f"{self.temporary_gcs_directory}/{filename}"
         blob = bucket.blob(gcs_uri)
         
         try:
             blob.upload_from_filename(local_file)
-            full_gcs_uri = f"gs://{self.gcs_bucket}/{gcs_uri}"
+            full_gcs_uri = f"gs://{self.gcs_bucket_name}/{gcs_uri}"
             logger.info(f"Uploaded {local_file} to {full_gcs_uri}.")
             return full_gcs_uri
         except Exception as e:
@@ -209,7 +213,7 @@ class AlloyDBToBigQueryExporter:
         """
         Run a complete export cycle: extract from AlloyDB, upload to GCS, load to BigQuery.
         """
-        logger.info("Starting AlloyDB to BigQuery export cycle.")
+        logger.info("Starting AlloyDB to BigQuery export cycle for SSOT maintenance.")
         self.connect()
         try:
             local_file = self.export_incremental_data(hours=1)
