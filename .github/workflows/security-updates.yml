@@ -1,0 +1,115 @@
+name: Security Updates
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sundays
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  security-updates:
+    name: Dependency Security Updates
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      security-events: read
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.4.2
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      
+      - name: Configure workload identity federation for GitHub
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.SERVICE_ACCOUNT }}
+      
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v1
+      
+      - name: Install dependencies
+        run: |
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
+          poetry install --no-interaction
+      
+      - name: Update dependencies for security only
+        id: update-deps
+        run: |
+          echo "Checking for vulnerable dependencies..."
+          
+          # Install safety to scan for vulnerable dependencies
+          pip install safety
+          
+          # Scan dependencies and capture output
+          SAFETY_OUTPUT=$(poetry run safety check --json)
+          
+          # Check if vulnerabilities were found
+          if [ "$SAFETY_OUTPUT" != "[]" ]; then
+            echo "Vulnerabilities found, updating dependencies..."
+            echo "$SAFETY_OUTPUT" > vulnerabilities.json
+            
+            # Update dependencies with vulnerable packages
+            poetry update --only security
+
+            # Check if any files were changed
+            if git diff --name-only | grep -q "poetry.lock\|pyproject.toml"; then
+              echo "Dependencies updated successfully"
+              echo "dependencies_updated=true" >> $GITHUB_OUTPUT
+            else
+              echo "No dependencies were updated"
+              echo "dependencies_updated=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "No vulnerabilities found"
+            echo "dependencies_updated=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Create Pull Request
+        if: steps.update-deps.outputs.dependencies_updated == 'true'
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "fix: Update dependencies for security vulnerabilities"
+          branch: security-updates-${{ github.run_id }}
+          delete-branch: true
+          title: "Security Dependency Updates"
+          body: |
+            This PR addresses security vulnerabilities in dependencies.
+            
+            Automated security update via GitHub Actions workflow.
+            
+            ## Changes
+            - Updated dependencies with known security vulnerabilities
+            - See security scan results for details
+            
+            Please review and merge these changes as soon as possible.
+          labels: security,dependencies,automated-pr
+      
+      - name: Run Vulnerability Scan for Repository
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          trivy-config: trivy.yaml
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+      
+      - name: Upload Vulnerability Report
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+          category: 'trivy'
