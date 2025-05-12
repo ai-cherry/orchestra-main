@@ -1,8 +1,9 @@
 """
-MCP Server package for AI tool memory synchronization.
+MCP Server - Model Context Protocol Server Package
 
-This package provides a unified memory system for AI tools, enabling
-synchronization between different AI assistants like Gemini, Copilot, Roo, and Cline.
+This package provides a memory synchronization system for AI tools.
+It allows different AI tools to share and synchronize memory between them.
 """
 
 __version__ = "0.1.0"
+__author__ = "AI Orchestra Team"

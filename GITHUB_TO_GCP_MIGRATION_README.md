@@ -1,77 +1,210 @@
-# GitHub to GCP Secret Manager Migration
+# GitHub Codespaces to Google Cloud Workstations Migration
 
-This guide explains how to migrate GitHub organization secrets to Google Cloud Secret Manager.
+This guide provides a comprehensive approach to migrating from GitHub Codespaces to Google Cloud Workstations, with special focus on maintaining AI coding assistance and optimizing for performance.
+
+## Table of Contents
+
+- [Migration Overview](#migration-overview)
+- [Prerequisites](#prerequisites)
+- [Step-by-Step Migration Process](#step-by-step-migration-process)
+- [AI Coding Assistance Post-Migration](#ai-coding-assistance-post-migration)
+- [Pros and Cons After Migration](#pros-and-cons-after-migration)
+- [Common Issues and Troubleshooting](#common-issues-and-troubleshooting)
+- [GitHub's Role Post-Migration](#githubs-role-post-migration)
+
+## Migration Overview
+
+The migration involves four main phases:
+
+1. **Infrastructure Setup**: Create GCP resources using Terraform
+2. **Secret Migration**: Transfer GitHub and GCP secrets to Google Secret Manager
+3. **Development Environment Configuration**: Set up Cloud Workstations with VSCode and AI assistants
+4. **CI/CD Pipeline Migration**: Convert GitHub Actions to Cloud Build pipelines
 
 ## Prerequisites
 
-- Google Cloud CLI (`gcloud`) installed and configured
-- GitHub CLI (`gh`) installed (the script will attempt to install it if not found)
-- Python 3 with `google-cloud-secretmanager` package
-- Appropriate permissions:
-  - GitHub: Personal access token with `admin:org` scope
-  - GCP: Service account with Secret Manager Admin role
+- Google Cloud Platform account with billing enabled
+- Google Cloud SDK (gcloud CLI) installed
+- Terraform installed (v1.0.0+)
+- GitHub repository access
+- Current GitHub secrets and environment variables
 
-## Migration Script
+## Step-by-Step Migration Process
 
-We've created a wrapper script `migrate_github_to_gcp_secrets.sh` that handles:
+### 1. Run the Automated Migration Script
 
-1. Authentication to both GitHub and GCP
-2. Creation of temporary credential files
-3. Running the underlying migration tool
-4. Secure cleanup after completion
+We've created a migration script that will set up the necessary infrastructure and configuration files:
 
-## Usage
+```bash
+# Make the script executable
+chmod +x gcp_workstation_migrate.sh
 
-1. Make the script executable (already done):
-   ```
-   chmod +x migrate_github_to_gcp_secrets.sh
-   ```
-
-2. Run the script:
-   ```
-   ./migrate_github_to_gcp_secrets.sh
-   ```
-
-3. When prompted, enter your GitHub organization name.
-
-4. For each GitHub secret, you will be prompted to provide the value (since GitHub doesn't allow retrieving the encrypted values).
-
-## Configuration
-
-The script is pre-configured with:
-
-- Project ID: `cherry-ai-project`
-- Service account: `secret-management@cherry-ai-project.iam.gserviceaccount.com`
-- GitHub token: Provided in the script
-- Environment: `prod` (secrets will be created with `-prod` suffix)
-
-## Security Notes
-
-- The service account key is created in a temporary directory and deleted after use
-- The GitHub token should be revoked or rotated after migration
-- All secrets in GCP Secret Manager should be verified after migration
-
-## Using Secrets in GitHub Actions
-
-After migration, you can access the secrets from GCP Secret Manager in your GitHub Actions workflows:
-
-```yaml
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Authenticate to Google Cloud"
-        uses: "google-github-actions/auth@v1" 
-        with:
-          credentials_json: "${{ secrets.GCP_SA_KEY }}"
-          
-      - name: "Set up Cloud SDK"
-        uses: "google-github-actions/setup-gcloud@v1"
-        
-      - name: "Access secret from Secret Manager" 
-        run: |
-          SECRET_VALUE=$(gcloud secrets versions access latest --secret=SECRET_NAME-prod)
-          echo "SECRET_VALUE=$SECRET_VALUE" >> $GITHUB_ENV
+# Run the script
+./gcp_workstation_migrate.sh
 ```
 
-Replace `SECRET_NAME` with the name of your secret.
+The script will create:
+- Terraform configuration for Cloud Workstations
+- Secret migration scripts
+- AI coding assistance configuration files
+
+### 2. Set Up Infrastructure with Terraform
+
+```bash
+# Navigate to the Terraform directory
+cd terraform/gcp_workstation
+
+# Create your terraform.tfvars file from the example
+cp terraform.tfvars.example terraform.tfvars
+
+# Edit the terraform.tfvars file with your GCP project details
+nano terraform.tfvars
+
+# Initialize Terraform
+terraform init
+
+# Apply the Terraform configuration
+terraform apply
+```
+
+This will create:
+- Cloud Workstation cluster and configurations
+- Network infrastructure
+- Service accounts with necessary permissions
+- Secret Manager secrets
+
+### 3. Migrate Secrets
+
+```bash
+# Run the secret migration script
+./migrate_secrets.sh
+```
+
+This will transfer all GitHub and GCP secrets to Google Secret Manager.
+
+### 4. Set Up Cloud Workstation
+
+1. Open the Google Cloud Console
+2. Navigate to Cloud Workstations
+3. Launch your Cloud Workstation
+4. Clone your GitHub repository:
+   ```bash
+   git clone https://github.com/yourusername/your-repo.git
+   cd your-repo
+   ```
+5. Run the AI assistance setup script:
+   ```bash
+   ./setup_ai_assistance.sh
+   ```
+
+## AI Coding Assistance Post-Migration
+
+The following AI coding assistants are configured post-migration:
+
+### Gemini Code Assist
+
+- Configured with enhanced GCP integration
+- Directly connected to Vertex AI services
+- Enhanced with GCP-specific commands and capabilities
+- Path adjusted for Cloud Workstations environment
+
+### Roo and Cline Integration
+
+- Both assistants remain fully functional
+- Enhanced with MCP memory integration
+- Connected to Firestore for persistent memory storage
+- Configured for Cloud Workstations environment
+
+### MCP Memory System
+
+- Memory storage migrated to Firestore
+- Enhanced context awareness for GCP environment
+- Performance-first configuration
+- Shared memory across all AI assistants
+
+### Advantages Over GitHub Codespaces
+
+- Lower latency to GCP resources
+- Direct API access without network hops
+- Higher quotas and priority access to AI services
+- Support for larger context windows
+- Better integration with Vertex AI for experiments
+
+## Pros and Cons After Migration
+
+### Pros
+
+1. **Scalability**: No more repository size or GPU limits
+2. **Performance**: Direct access to GCP resources without latency
+3. **Integration**: Native access to Vertex AI, BigQuery, etc.
+4. **Security**: Secrets managed properly in Secret Manager
+5. **Resources**: More compute power, memory, and storage
+6. **Cost control**: Better visibility into resource usage
+7. **Development speed**: Faster builds, deployments, and testing
+
+### Cons
+
+1. **Cost**: $200-600/month vs. GitHub's included hours
+2. **Learning curve**: New Cloud Build syntax to master
+3. **Lock-in**: Deeper integration with GCP ecosystem
+4. **Setup time**: Initial migration requires effort
+5. **GitHub sync**: Need to maintain GitHub repo in sync with GCP
+
+## Common Issues and Troubleshooting
+
+### Authentication Issues
+
+If you encounter authentication problems:
+
+```bash
+# Re-authenticate with GCP
+gcloud auth login
+
+# Configure application default credentials
+gcloud auth application-default login
+```
+
+### Network Connectivity
+
+If your Cloud Workstation can't connect to the internet:
+
+1. Check if the Cloud NAT gateway is properly configured
+2. Ensure firewall rules allow egress traffic
+3. Verify VPC configuration
+
+### Missing Extensions
+
+If VS Code extensions aren't working:
+
+```bash
+# Install extensions manually
+code --install-extension googlecloudtools.cloudcode
+code --install-extension ms-python.python
+code --install-extension anthropic.claude
+```
+
+### AI Assistance Not Working
+
+If AI coding assistance isn't working:
+
+1. Check Secret Manager for required API keys
+2. Verify service account permissions
+3. Rebuild the AI memory system:
+   ```bash
+   python3 $HOME/.ai-memory/initialize.py
+   ```
+
+## GitHub's Role Post-Migration
+
+GitHub remains involved in the following ways:
+- Primary code repository (source of truth)
+- Pull request reviews and collaboration
+- Issue tracking
+
+However, all execution now happens in GCP:
+- Cloud Build handles CI/CD (not GitHub Actions)
+- Deployment happens directly to Cloud Run
+- Development occurs in Cloud Workstations
+- Secrets are managed in Secret Manager
+
+For more detailed information, refer to the full documentation in `GCP_WORKSTATION_MIGRATION_PLAN.md`.

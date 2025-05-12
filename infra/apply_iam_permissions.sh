@@ -6,7 +6,7 @@ set -e
 
 # Default to dev environment if not specified
 ENV=${1:-dev}
-EMAIL=${2:-musillynn@gmail.com}
+EMAIL=${2:-scoobyjava@cherry-ai.me}
 
 # Validate environment
 if [[ "$ENV" != "dev" && "$ENV" != "prod" ]]; then
@@ -36,13 +36,13 @@ if [ ! -d ".terraform" ]; then
 fi
 
 # Checking if we need to update the tfvars file with a new email
-if [ "$EMAIL" != "musillynn@gmail.com" ]; then
+if [ "$EMAIL" != "scoobyjava@cherry-ai.me" ]; then
   echo "Updating $ENV.tfvars with new email: $EMAIL"
   # Create backup
   cp "$ENV.tfvars" "$ENV.tfvars.bak"
   
   # Update the email in the tfvars file
-  sed -i "s/musillynn@gmail.com/$EMAIL/g" "$ENV.tfvars"
+  sed -i "s/scoobyjava@cherry-ai.me/$EMAIL/g" "$ENV.tfvars"
 fi
 
 # Select workspace

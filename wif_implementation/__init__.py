@@ -1,60 +1,57 @@
 """
 Workload Identity Federation (WIF) Implementation
 
-This package provides a comprehensive implementation of the Workload Identity Federation (WIF)
-enhancement plan for the AI Orchestra project.
-
-The package is organized into the following modules:
-- client: Main entry point for WIF operations
-- config: Configuration for WIF implementation
-- error_handler: Error handling utilities
-- types: Type definitions and data models
-- managers: Implementation managers for different phases
-- utils: Utility functions for WIF implementation
+This package provides a comprehensive solution for implementing
+Workload Identity Federation between GitHub Actions and Google Cloud Platform.
+It eliminates the need for storing service account keys in GitHub Secrets
+and improves security by using short-lived credentials.
 """
 
-__version__ = "1.0.0"
+__version__ = "0.1.0"
 
-# Export public API
-from .client import WIFClient
-from .config import WIFConfig, get_config
-from .error_handler import WIFError, ErrorSeverity, handle_exception, safe_execute
-from .types import (
-    ImplementationPhase,
-    TaskStatus,
-    Task,
-    ImplementationPlan,
-    Vulnerability,
+from . import config_models
+from . import error_handler
+from . import template_manager
+from . import enhanced_template_manager
+from . import cicd_manager
+from . import setup_wif_cli
+
+# Expose key classes and functions for easy import
+from .config_models import (
+    AuthMethod,
+    GCPProjectConfig,
+    GitHubConfig,
+    RepositoryConfig, 
+    WIFImplementationConfig,
+    WorkloadIdentityConfig,
 )
-
-# For backward compatibility
-from .managers.vulnerability_manager import VulnerabilityManager
-from .managers.migration_manager import MigrationManager
-from .managers.cicd_manager import CICDManager
+from .enhanced_template_manager import EnhancedTemplateManager, create_template_manager
+from .error_handler import ErrorSeverity, WIFError, handle_exception, safe_execute
+from .setup_wif_cli import main as setup_wif
 
 __all__ = [
-    # Main client
-    "WIFClient",
+    # Modules
+    "config_models",
+    "error_handler",
+    "template_manager",
+    "enhanced_template_manager",
+    "cicd_manager",
+    "setup_wif_cli",
     
-    # Configuration
-    "WIFConfig",
-    "get_config",
-    
-    # Error handling
-    "WIFError",
+    # Classes
+    "AuthMethod",
+    "EnhancedTemplateManager",
     "ErrorSeverity",
+    "GCPProjectConfig",
+    "GitHubConfig",
+    "RepositoryConfig",
+    "WIFError",
+    "WIFImplementationConfig",
+    "WorkloadIdentityConfig",
+    
+    # Functions
+    "create_template_manager",
     "handle_exception",
     "safe_execute",
-    
-    # Types
-    "ImplementationPhase",
-    "TaskStatus",
-    "Task",
-    "ImplementationPlan",
-    "Vulnerability",
-    
-    # Managers
-    "VulnerabilityManager",
-    "MigrationManager",
-    "CICDManager",
+    "setup_wif",
 ]

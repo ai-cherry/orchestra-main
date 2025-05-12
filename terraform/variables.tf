@@ -1,118 +1,122 @@
-# Variables for AI Orchestra performance-optimized deployment
-# This file centralizes all variables for better organization and reusability
+# Variables for the GCP Workstations Terraform configuration
+# Performance-optimized for GitHub Codespaces to GCP Workstations migration
 
-# Project variables
 variable "project_id" {
   description = "The GCP project ID"
   type        = string
 }
 
-variable "project_number" {
-  description = "The GCP project number"
-  type        = string
-  default     = ""
-}
-
 variable "region" {
-  description = "The GCP region for deployment"
+  description = "The GCP region for deployments"
   type        = string
   default     = "us-central1"
 }
 
-variable "env" {
-  description = "The environment (dev, staging, prod)"
+variable "zone" {
+  description = "The GCP zone for zonal resources"
   type        = string
-  default     = "dev"
-  validation {
-    condition     = contains(["dev", "staging", "prod"], var.env)
-    error_message = "The environment must be one of: dev, staging, prod."
-  }
+  default     = "us-central1-a"
 }
 
-# Service account variables
-variable "service_account_name" {
-  description = "The name of the service account for Cloud Run"
+variable "project_prefix" {
+  description = "Prefix for naming resources"
   type        = string
-  default     = "ai-orchestra-sa"
+  default     = "ai-orchestra"
 }
 
-variable "orchestrator_service_account" {
-  description = "Service account for the Orchestrator API"
+variable "enable_gpu" {
+  description = "Enable GPU for workstations"
+  type        = bool
+  default     = true
+}
+
+variable "gpu_type" {
+  description = "GPU type to use when enable_gpu is true"
   type        = string
-  default     = ""
+  default     = "nvidia-tesla-t4"
 }
 
-variable "github_actions_sa" {
-  description = "Service account for GitHub Actions"
-  type        = string
-  default     = ""
-}
-
-# Secret Manager variables
-variable "secret_name_prefix" {
-  description = "Prefix for Secret Manager secrets"
-  type        = string
-  default     = "secret-management-key"
-}
-
-# Cloud Run variables
-variable "cloud_run_cpu" {
-  description = "CPU allocation for Cloud Run service"
-  type        = string
-  default     = "1000m"  # 1 vCPU
-}
-
-variable "cloud_run_memory" {
-  description = "Memory allocation for Cloud Run service"
-  type        = string
-  default     = "2Gi"    # 2 GB
-}
-
-variable "cloud_run_concurrency" {
-  description = "Maximum number of concurrent requests per container"
-  type        = number
-  default     = 80
-}
-
-variable "cloud_run_timeout" {
-  description = "Maximum request timeout in seconds"
-  type        = number
-  default     = 300  # 5 minutes
-}
-
-variable "cloud_run_min_instances" {
-  description = "Minimum number of instances"
+variable "gpu_count" {
+  description = "Number of GPUs to attach when enable_gpu is true"
   type        = number
   default     = 1
 }
 
-variable "cloud_run_max_instances" {
-  description = "Maximum number of instances"
-  type        = number
-  default     = 10
-}
-
-# Monitoring variables
-variable "latency_threshold_ms" {
-  description = "Threshold for latency alerts in milliseconds"
-  type        = number
-  default     = 1000  # 1 second
-}
-
-# Scheduler variables
-variable "scheduler_interval" {
-  description = "Interval for the keep-warm scheduler job"
+variable "standard_machine_type" {
+  description = "Machine type for standard development workstations"
   type        = string
-  default     = "*/5 * * * *"  # Every 5 minutes
+  default     = "e2-standard-8"
 }
 
-# Region configuration
-variable "regions" {
-  description = "Map of region configurations"
+variable "ml_machine_type" {
+  description = "Machine type for ML-optimized workstations"
+  type        = string
+  default     = "n1-standard-16"
+}
+
+variable "boot_disk_size_gb" {
+  description = "Size of the boot disk in GB"
+  type        = number
+  default     = 100
+}
+
+variable "persistent_disk_size_gb" {
+  description = "Size of the persistent disk in GB"
+  type        = number
+  default     = 200
+}
+
+variable "disable_public_ip" {
+  description = "Disable public IP address for workstations"
+  type        = bool
+  default     = false  # Set to false for better performance, easier access
+}
+
+variable "auto_shutdown_minutes" {
+  description = "Automatically shut down workstations after this many minutes of inactivity"
+  type        = number
+  default     = 20
+}
+
+variable "performance_optimized" {
+  description = "Enable performance optimizations"
+  type        = bool
+  default     = true
+}
+
+variable "ip_cidr_range" {
+  description = "CIDR range for the subnet"
+  type        = string
+  default     = "10.2.0.0/16"
+}
+
+variable "container_image" {
+  description = "Container image for workstations"
+  type        = string
+  default     = "us-docker.pkg.dev/cloud-workstations-images/predefined/code-oss:latest"
+}
+
+variable "environment_variables" {
+  description = "Environment variables to set in the workstation"
   type        = map(string)
-  default     = {
-    default    = "us-central1"
-    workstation = "us-central1"
-    pubsub     = "us-central1"
-  }
+  default     = {}
+}
+
+variable "enable_monitoring" {
+  description = "Enable Cloud Monitoring for workstations"
+  type        = bool
+  default     = true
+}
+
+variable "service_account_roles" {
+  description = "Roles to assign to the workstation service account"
+  type        = list(string)
+  default     = [
+    "roles/editor",                   # For performance over security in single-dev project
+    "roles/aiplatform.user",          # For Vertex AI integration
+    "roles/secretmanager.secretAccessor", # For accessing secrets
+    "roles/storage.objectAdmin",      # For accessing GCS
+    "roles/logging.logWriter",        # For writing logs
+    "roles/monitoring.metricWriter",  # For writing metrics
+  ]
 }

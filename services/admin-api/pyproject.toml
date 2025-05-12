@@ -3,7 +3,7 @@ name = "admin-api"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "Lynn Musil",email = "musillynn@gmail.com"}
+    {name = "Lynn Musil",email = "scoobyjava@cherry-ai.me"}
 ]
 readme = "README.md"
 requires-python = ">=3.11"

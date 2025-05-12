@@ -1,10 +1,25 @@
 # GCP Cloud Workstation Module
 # 
 # This module provisions a Cloud Workstation environment for AI development with:
-#  - n2d-standard-32 machine type
-#  - 2x NVIDIA T4 GPUs
-#  - 1TB persistent SSD
+#  - Configurable machine type (default: n2d-standard-32)
+#  - Configurable GPU type and count (default: 2x NVIDIA T4 GPUs)
+#  - Configurable persistent SSD (default: 1TB)
 #  - Preinstalled JupyterLab and IntelliJ
+#
+# Usage:
+# ```terraform
+# module "ai_workstation" {
+#   source = "./modules/cloud-workstation"
+#   
+#   project_id        = "your-project-id"
+#   region            = "us-central1"
+#   workstation_name  = "ai-workstation"
+#   
+#   # Optional customizations
+#   machine_type      = "n2d-standard-16"  # For lighter workloads
+#   gpu_count         = 1                  # Reduce GPU count
+# }
+# ```
 
 # Enable required APIs
 resource "google_project_service" "workstation_apis" {
@@ -48,16 +63,16 @@ resource "google_workstations_workstation_config" "ai_config" {
   # Host configuration
   host {
     gce_instance {
-      machine_type = "n2d-standard-32"
+      machine_type = var.machine_type
       
-      # NVIDIA T4 GPUs
+      # GPU configuration
       accelerator {
-        type  = "nvidia-tesla-t4"
-        count = 2
+        type  = var.gpu_type
+        count = var.gpu_count
       }
       
       # Boot disk configuration
-      boot_disk_size_gb = 100
+      boot_disk_size_gb = var.boot_disk_size_gb
       
       # Enhanced security options
       shielded_instance_config {
@@ -71,11 +86,11 @@ resource "google_workstations_workstation_config" "ai_config" {
     }
   }
 
-  # 1TB Persistent SSD storage
+  # Persistent storage configuration
   persistent_directories {
     mount_path = "/home/user/persistent-data"
     gce_pd {
-      size_gb        = 1024  # 1TB
+      size_gb        = var.persistent_disk_size_gb
       disk_type      = "pd-ssd"
       reclaim_policy = "DELETE"
     }

@@ -66,7 +66,7 @@ USER mcp
 ENTRYPOINT ["/usr/bin/tini", "--"]
 
 # Command to run the application
-CMD ["python", "-m", "mcp_server.main"]
+CMD ["python", "-m", "mcp_server.run_mcp_server"]
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \

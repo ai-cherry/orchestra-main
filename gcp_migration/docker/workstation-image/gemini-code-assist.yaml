@@ -1,0 +1,106 @@
+# Optimized Gemini Code Assist configuration for GCP Cloud Workstations
+# This configuration sets up Gemini for direct integration with GCP services
+
+# General configuration
+general:
+  telemetry:
+    enabled: false
+  contexts:
+    # Increase maxContexts for better memory management in large repositories
+    maxContexts: 10
+    # Increase contextSize for better handling of complex codebases
+    contextSize: 3000
+
+# Authentication and API settings
+api:
+  # Direct GCP backend integration - faster response and better performance
+  endpoint: "https://us-central1-aiplatform.googleapis.com/v1/projects/${GCP_PROJECT_ID}/locations/us-central1/publishers/google/models/gemini-1.5-pro:streamGenerateContent"
+  # Use ADC authentication for seamless integration with GCP services
+  authentication: "ADC"
+  # Disable rate limiting by default, control through service quotas instead
+  rateLimit:
+    enabled: false
+  # Higher quota limits when running in GCP
+  quotas:
+    dailyLimit: 100000
+    monthlyLimit: 3000000
+    securityScanLimit: 5000
+
+# Enhanced model configuration
+model:
+  # Set to Gemini 1.5 Pro by default
+  name: "gemini-1.5-pro"
+  # Higher temperature for more creative responses
+  temperature: 0.3
+  # Enhanced token limits when running in GCP
+  tokenLimit:
+    input: 150000
+    output: 50000
+  # Specialized capabilities specifically for GCP environment
+  capabilities:
+    # Enable enhanced GCP service integration features
+    gcpServiceIntegration: true
+    # Specialized knowledge about GCP services
+    gcpServiceKnowledge: true
+    # Additional context awareness for GCP resources
+    gcpResourceAwareness: true
+
+# Vertex AI integration for better performance
+vertexAi:
+  enabled: true
+  region: "us-central1"
+  # Reference project ID from environment
+  projectId: "${GCP_PROJECT_ID}"
+
+# Features configuration
+features:
+  # Code editing features
+  code:
+    completion:
+      enabled: true
+      # Enable automatic imports for GCP libraries
+      autoImports: true
+    # Enhanced chat with more context awareness
+    chat:
+      enabled: true
+      contextSize: 100000
+    # Specialized code explanation for GCP services
+    explanation:
+      enabled: true
+      depth: "detailed"
+  # Repository scanning features
+  repository:
+    # Enable deeper repo scanning
+    scanning:
+      enabled: true
+      # Include more files in scan for better context
+      includePaths: ["**/*.py", "**/*.js", "**/*.java", "**/*.go", "**/*.tf", "**/Dockerfile*", "**/*.yaml", "**/*.yml"]
+      # Maximum files to scan
+      maxFiles: 5000
+      # Maximum file size to scan
+      maxFileSize: 5000000
+    # Enable caching for faster performance
+    cache:
+      enabled: true
+      # Larger cache size for better performance
+      maxSizeInMb: 1000
+
+# Security settings
+security:
+  # Local MCP memory integration
+  mcpMemory:
+    enabled: true
+    path: "/home/user/.ai-memory"
+  # Skip credential scanning in GCP environment (already secured)
+  credentialScanning:
+    enabled: false
+  # Additional security scanner features
+  securityScanner:
+    enabled: true
+    severityThreshold: "medium"
+  # Data privacy options
+  dataPrivacy:
+    # Keep data within GCP
+    dataResidency: "in-region"
+    # Don't use response data for training
+    allowResponsesForTraining: false

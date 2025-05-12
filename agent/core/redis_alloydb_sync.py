@@ -4,7 +4,8 @@ Redis to AlloyDB Synchronization Worker
 This module implements an asynchronous worker for real-time synchronization of data
 between Redis (hot tier) and AlloyDB (persistent storage) in the AGI Baby Cherry project.
 It ensures data consistency for agent memory and vector embeddings, with version-based
-conflict resolution to handle concurrent updates.
+conflict resolution to handle concurrent updates. This synchronization is part of the
+Single Source of Truth (SSOT) architecture.
 """
 
 import asyncio
@@ -126,7 +127,7 @@ class RedisAlloyDBSyncWorker:
         if not self.redis_client or not self.alloydb_conn:
             raise RuntimeError("Connections to Redis or AlloyDB not established.")
             
-        logger.info("Starting Redis to AlloyDB sync worker.")
+        logger.info("Starting Redis to AlloyDB synchronization worker.")
         self.is_running = True
         last_id = "$"  # Start reading from the latest messages
         sync_count = 0

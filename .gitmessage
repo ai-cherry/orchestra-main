@@ -1,0 +1,23 @@
+# <type>: <subject>
+# |<---- Using a maximum of 50 characters --->|
+
+# Explain the problem that this commit is solving. Focus on why you
+# are making this change as opposed to how.
+# |<---- Try to limit each line to a maximum of 72 characters --->|
+
+# Allowed <type> values:
+# feat (new feature)
+# fix (bug fix)
+# docs (changes to documentation)
+# style (formatting, etc; no code change)
+# refactor (refactoring code)
+# perf (performance improvements)
+# test (adding missing tests)
+# chore (maintenance tasks)
+
+# Include relevant issue numbers if applicable:
+# Resolves: #123
+# See also: #456, #789
+
+# Include any breaking changes with a BREAKING CHANGE: prefix
+# BREAKING CHANGE: <explanation of the breaking change>
