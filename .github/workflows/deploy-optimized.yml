@@ -101,7 +101,7 @@ jobs:
         run: gcloud auth configure-docker gcr.io
       
       - name: Build and push API image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
@@ -113,7 +113,7 @@ jobs:
             ENV=${{ env.ENVIRONMENT }}
       
       - name: Build and push MCP image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
@@ -125,7 +125,7 @@ jobs:
             ENV=${{ env.ENVIRONMENT }}
       
       - name: Build and push Phidata image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./packages/agents/phidata-agent.Dockerfile
