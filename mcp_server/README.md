@@ -63,9 +63,9 @@ The MCP server uses the following environment variables:
 
 ## Troubleshooting
 
-### Poetry Dependency Issues
+### Poetry Dependency and Startup Issues
 
-If you encounter dependency resolution issues with Poetry, try the following:
+If you encounter dependency resolution or MCP server startup issues, try the following:
 
 1. Update Poetry to the latest version:
    ```bash
@@ -77,10 +77,41 @@ If you encounter dependency resolution issues with Poetry, try the following:
    poetry cache clear --all pypi
    ```
 
-3. Update dependencies:
+3. Rebuild the lock file:
+   ```bash
+   poetry lock --no-update
+   ```
+
+4. Update dependencies:
    ```bash
    poetry update
    ```
+
+5. If you're encountering import problems, check that the package structure is correct:
+   - The `mcp_server` package should use absolute imports (e.g., `from mcp_server.config import load_config`)
+   - Run the server using the provided helper script: `./start_mcp_server.sh`
+
+### Running the MCP Server Locally
+
+For development purposes, we've added a simple helper script to run the MCP server:
+
+```bash
+# From the project root
+./start_mcp_server.sh
+```
+
+Alternatively, you can run it manually:
+
+```bash
+# Navigate to the mcp_server directory
+cd mcp_server
+
+# Install dependencies
+poetry install
+
+# Run the server
+poetry run python -m mcp_server.run_mcp_server --config ./config.json
+```
 
 ### Authentication Issues
 

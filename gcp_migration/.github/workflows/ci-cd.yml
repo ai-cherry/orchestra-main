@@ -1,0 +1,119 @@
+name: GCP Migration CI/CD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "gcp_migration/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "gcp_migration/**"
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGISTRY: gcr.io
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.6.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      
+      - name: Install dependencies
+        run: |
+          cd gcp_migration
+          poetry install
+      
+      - name: Run tests
+        run: |
+          cd gcp_migration
+          poetry run pytest -xvs
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.6.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      
+      - name: Install dependencies
+        run: |
+          cd gcp_migration
+          poetry install
+      
+      - name: Run linting
+        run: |
+          cd gcp_migration
+          poetry run black . --check
+          poetry run isort . --check
+          poetry run flake8 .
+
+  build-and-push:
+    name: Build and Push Container
+    needs: [test, lint]
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+      
+      - name: Docker auth
+        run: gcloud auth configure-docker $REGISTRY
+      
+      - name: Build and Push Container
+        run: |
+          cd gcp_migration
+          docker build -t "$REGISTRY/$PROJECT_ID/gcp-migration:${{ github.sha }}" .
+          docker push "$REGISTRY/$PROJECT_ID/gcp-migration:${{ github.sha }}"
+          docker tag "$REGISTRY/$PROJECT_ID/gcp-migration:${{ github.sha }}" "$REGISTRY/$PROJECT_ID/gcp-migration:latest"
+          docker push "$REGISTRY/$PROJECT_ID/gcp-migration:latest"
+      
+      - name: Update Cloud Run service
+        run: |
+          gcloud run deploy gcp-migration \
+            --image="$REGISTRY/$PROJECT_ID/gcp-migration:${{ github.sha }}" \
+            --platform=managed \
+            --region=${{ secrets.GCP_REGION }} \
+            --project=$PROJECT_ID \
+            --allow-unauthenticated

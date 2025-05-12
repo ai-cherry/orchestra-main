@@ -1,0 +1,308 @@
+name: GitHub PAT Rotation Automation
+
+on:
+  # Run monthly for automated rotation
+  schedule:
+    - cron: '0 0 1 * *'  # At midnight on the first day of each month
+  
+  # Allow manual triggering
+  workflow_dispatch:
+    inputs:
+      pat_type:
+        description: 'Type of PAT to rotate'
+        required: true
+        default: 'workflow'
+        type: choice
+        options:
+          - read
+          - write_packages
+          - workflow
+          - deployment
+      force_rotation:
+        description: 'Force rotation even if not expired'
+        required: false
+        default: false
+        type: boolean
+
+# Limit permissions
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  check-rotation:
+    name: Check Token Rotation Needs
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      needs_rotation: ${{ steps.check.outputs.needs_rotation }}
+      pat_types: ${{ steps.check.outputs.pat_types }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+      
+      - name: Check PAT rotation needs
+        id: check
+        env:
+          MANUAL_PAT_TYPE: ${{ github.event.inputs.pat_type }}
+          FORCE_ROTATION: ${{ github.event.inputs.force_rotation }}
+        run: |
+          # If this is a manual run with force_rotation, set needs_rotation=true
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "$FORCE_ROTATION" == "true" ]]; then
+            echo "needs_rotation=true" >> $GITHUB_OUTPUT
+            echo "pat_types=${MANUAL_PAT_TYPE}" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Otherwise check token expiration
+          cd secret-management
+          python -c "
+          import sys
+          import os
+          sys.path.append('.')
+          from pat_manager import PATManager
+          
+          manager = PATManager()
+          tokens_to_rotate = manager.check_rotation_needed()
+          
+          if tokens_to_rotate:
+              print('Tokens needing rotation:')
+              for token in tokens_to_rotate:
+                  print(f'- {token[\"token_id\"]} (scope: {token[\"scope\"]})')
+              
+              # Get unique scopes of tokens needing rotation
+              scopes = list(set([t['scope'] for t in tokens_to_rotate]))
+              
+              # For manual run, filter to just the requested type
+              if os.environ.get('MANUAL_PAT_TYPE'):
+                  manual_type = os.environ.get('MANUAL_PAT_TYPE')
+                  if manual_type in scopes:
+                      scopes = [manual_type]
+                  else:
+                      scopes = []
+              
+              with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+                  f.write(f'needs_rotation=true\n')
+                  f.write(f'pat_types={\",\".join(scopes)}\n')
+          else:
+              print('No tokens need rotation')
+              with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+                  f.write('needs_rotation=false\n')
+          "
+
+  generate-read-pat:
+    name: Generate Read-Only PAT
+    needs: check-rotation
+    if: needs.check-rotation.outputs.needs_rotation == 'true' && contains(needs.check-rotation.outputs.pat_types, 'read')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: pat-rotation
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pynacl requests
+
+      - name: Generate and distribute new PAT
+        env:
+          CURRENT_PAT: ${{ secrets.GITHUB_ADMIN_PAT }}
+          GITHUB_USERNAME: ${{ github.repository_owner }}
+        run: |
+          cd secret-management
+          python rotate_github_pat.py \
+            --username "$GITHUB_USERNAME" \
+            --current-pat "$CURRENT_PAT" \
+            --token-name "AI-Orchestra-Read-PAT" \
+            --scopes "repo:status,public_repo,read:packages" \
+            --repos "ai-orchestra,ai-orchestra-api,ai-orchestra-docs" \
+            --secret-name "GITHUB_READ_PAT"
+          
+          # Register the new token in PAT manager
+          NEW_PAT=$(grep -oP 'Successfully created new PAT: \K.*' rotation_log.txt || echo "")
+          if [ -n "$NEW_PAT" ]; then
+            python -c "
+            import sys
+            sys.path.append('.')
+            from pat_manager import PATManager
+            
+            manager = PATManager()
+            manager.register_token('read', 'read', '$NEW_PAT')
+            print('Registered new read PAT in manager')
+            "
+          else
+            echo "Failed to extract new PAT from log"
+            exit 1
+          fi
+
+  generate-workflow-pat:
+    name: Generate Workflow PAT
+    needs: check-rotation
+    if: needs.check-rotation.outputs.needs_rotation == 'true' && contains(needs.check-rotation.outputs.pat_types, 'workflow')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: pat-rotation
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pynacl requests
+
+      - name: Generate and distribute new PAT
+        env:
+          CURRENT_PAT: ${{ secrets.GITHUB_ADMIN_PAT }}
+          GITHUB_USERNAME: ${{ github.repository_owner }}
+        run: |
+          cd secret-management
+          python rotate_github_pat.py \
+            --username "$GITHUB_USERNAME" \
+            --current-pat "$CURRENT_PAT" \
+            --token-name "AI-Orchestra-Workflow-PAT" \
+            --scopes "repo,workflow,read:packages,write:packages" \
+            --repos "ai-orchestra,ai-orchestra-api,ai-orchestra-docs" \
+            --secret-name "GITHUB_WORKFLOW_PAT"
+          
+          # Register the new token in PAT manager
+          NEW_PAT=$(grep -oP 'Successfully created new PAT: \K.*' rotation_log.txt || echo "")
+          if [ -n "$NEW_PAT" ]; then
+            python -c "
+            import sys
+            sys.path.append('.')
+            from pat_manager import PATManager
+            
+            manager = PATManager()
+            manager.register_token('workflow', 'workflow', '$NEW_PAT')
+            print('Registered new workflow PAT in manager')
+            "
+          else
+            echo "Failed to extract new PAT from log"
+            exit 1
+          fi
+
+  generate-deployment-pat:
+    name: Generate Deployment PAT
+    needs: check-rotation
+    if: needs.check-rotation.outputs.needs_rotation == 'true' && contains(needs.check-rotation.outputs.pat_types, 'deployment')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: pat-rotation
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pynacl requests
+
+      - name: Generate and distribute new PAT
+        env:
+          CURRENT_PAT: ${{ secrets.GITHUB_ADMIN_PAT }}
+          GITHUB_USERNAME: ${{ github.repository_owner }}
+        run: |
+          cd secret-management
+          python rotate_github_pat.py \
+            --username "$GITHUB_USERNAME" \
+            --current-pat "$CURRENT_PAT" \
+            --token-name "AI-Orchestra-Deployment-PAT" \
+            --scopes "repo,workflow,write:packages,delete:packages,admin:org_hook" \
+            --repos "ai-orchestra,ai-orchestra-api,ai-orchestra-docs" \
+            --secret-name "GITHUB_DEPLOYMENT_PAT"
+          
+          # Register the new token in PAT manager
+          NEW_PAT=$(grep -oP 'Successfully created new PAT: \K.*' rotation_log.txt || echo "")
+          if [ -n "$NEW_PAT" ]; then
+            python -c "
+            import sys
+            sys.path.append('.')
+            from pat_manager import PATManager
+            
+            manager = PATManager()
+            manager.register_token('deployment', 'deployment', '$NEW_PAT')
+            print('Registered new deployment PAT in manager')
+            "
+          else
+            echo "Failed to extract new PAT from log"
+            exit 1
+          fi
+
+  verify-rotation:
+    name: Verify PAT Rotation
+    needs: [check-rotation, generate-read-pat, generate-workflow-pat, generate-deployment-pat]
+    if: |
+      always() && 
+      needs.check-rotation.outputs.needs_rotation == 'true' && 
+      (needs.generate-read-pat.result == 'success' || needs.generate-workflow-pat.result == 'success' || needs.generate-deployment-pat.result == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Check results
+        run: |
+          echo "PAT rotation verification:"
+          
+          if [[ "${{ contains(needs.check-rotation.outputs.pat_types, 'read') }}" == "true" ]]; then
+            if [[ "${{ needs.generate-read-pat.result }}" == "success" ]]; then
+              echo "✅ Read PAT rotated successfully"
+            else
+              echo "❌ Read PAT rotation failed"
+            fi
+          fi
+          
+          if [[ "${{ contains(needs.check-rotation.outputs.pat_types, 'workflow') }}" == "true" ]]; then
+            if [[ "${{ needs.generate-workflow-pat.result }}" == "success" ]]; then
+              echo "✅ Workflow PAT rotated successfully"
+            else
+              echo "❌ Workflow PAT rotation failed"
+            fi
+          fi
+          
+          if [[ "${{ contains(needs.check-rotation.outputs.pat_types, 'deployment') }}" == "true" ]]; then
+            if [[ "${{ needs.generate-deployment-pat.result }}" == "success" ]]; then
+              echo "✅ Deployment PAT rotated successfully"
+            else
+              echo "❌ Deployment PAT rotation failed"
+            fi
+          fi
+          
+          echo "PAT rotation complete. Check PAT Manager for updated token information."
+      
+      - name: Notify on rotation completion
+        if: ${{ github.event_name == 'schedule' }}
+        run: |
+          echo "Automatic PAT rotation completed on $(date)"
+          # Add notification logic here if needed (Slack, email, etc.)

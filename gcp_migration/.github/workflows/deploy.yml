@@ -1,0 +1,289 @@
+name: Deploy GCP Migration Toolkit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'gcp_migration/**'
+      - '.github/workflows/deploy.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'gcp_migration/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+env:
+  PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  REGION: ${{ vars.GCP_REGION }}
+  ARTIFACTS_REGISTRY: ${{ vars.GCP_REGISTRY_URL }}
+  SERVICE_NAME: gcp-migration-toolkit
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Setup Poetry cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Install dependencies
+        run: |
+          cd gcp_migration
+          poetry install
+
+      - name: Lint code
+        run: |
+          cd gcp_migration
+          poetry run ruff .
+          poetry run black --check .
+
+      - name: Type check
+        run: |
+          cd gcp_migration
+          poetry run mypy .
+
+      - name: Run tests
+        run: |
+          cd gcp_migration
+          poetry run pytest -xvs
+
+  build:
+    name: Build and Push
+    needs: validate
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.image-tag.outputs.tag }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Generate unique image tag
+        id: image-tag
+        run: |
+          echo "tag=sha-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Authenticate to Google Cloud using Workload Identity Federation
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          install_components: "beta"
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and push Docker image
+        run: |
+          cd gcp_migration
+          docker build -t ${{ env.ARTIFACTS_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ steps.image-tag.outputs.tag }} -f docker/migration-image/Dockerfile .
+          docker push ${{ env.ARTIFACTS_REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ steps.image-tag.outputs.tag }}
+
+  deploy-dev:
+    name: Deploy to Dev
+    needs: build
+    if: ${{ github.event_name != 'pull_request' && (github.event.inputs.environment == 'dev' || github.event.inputs.environment == null) }}
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      IMAGE_TAG: ${{ needs.build.outputs.image-tag }}
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Authenticate to Google Cloud using Workload Identity Federation
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        run: |
+          cd gcp_migration/terraform/workstations
+          terraform init -backend-config="bucket=${{ env.PROJECT_ID }}-terraform-state" \
+                        -backend-config="prefix=terraform/state/dev"
+
+      - name: Terraform Validate
+        run: |
+          cd gcp_migration/terraform/workstations
+          terraform validate
+
+      - name: Terraform Plan
+        run: |
+          cd gcp_migration/terraform/workstations
+          terraform plan -var="project_id=${{ env.PROJECT_ID }}" \
+                        -var="location=${{ env.REGION }}" \
+                        -out=tfplan
+
+      - name: Terraform Apply
+        run: |
+          cd gcp_migration/terraform/workstations
+          terraform apply -auto-approve tfplan
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: build
+    if: ${{ github.event_name != 'pull_request' && github.event.inputs.environment == 'staging' }}
+    runs-on: ubuntu-latest
+    environment: staging
+    env:
+      IMAGE_TAG: ${{ needs.build.outputs.image-tag }}
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Authenticate to Google Cloud using Workload Identity Federation
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        run: |
+          cd gcp_migration/terraform/workstations
+          terraform init -backend-config="bucket=${{ env.PROJECT_ID }}-terraform-state" \
+                        -backend-config="prefix=terraform/state/staging"
+
+      - name: Terraform Validate
+        run: |
+          cd gcp_migration/terraform/workstations
+          terraform validate
+
+      - name: Terraform Plan
+        run: |
+          cd gcp_migration/terraform/workstations
+          terraform plan -var="project_id=${{ env.PROJECT_ID }}" \
+                        -var="location=${{ env.REGION }}" \
+                        -var="workstation_cluster_id=orchestra-staging-cluster" \
+                        -var="standard_config_id=orchestra-staging-standard-config" \
+                        -var="ml_config_id=orchestra-staging-ml-config" \
+                        -out=tfplan
+
+      - name: Terraform Apply
+        run: |
+          cd gcp_migration/terraform/workstations
+          terraform apply -auto-approve tfplan
+
+  deploy-prod:
+    name: Deploy to Production
+    needs: build
+    if: ${{ github.event_name != 'pull_request' && github.event.inputs.environment == 'prod' }}
+    runs-on: ubuntu-latest
+    environment: prod
+    env:
+      IMAGE_TAG: ${{ needs.build.outputs.image-tag }}
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Authenticate to Google Cloud using Workload Identity Federation
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        run: |
+          cd gcp_migration/terraform/workstations
+          terraform init -backend-config="bucket=${{ env.PROJECT_ID }}-terraform-state" \
+                        -backend-config="prefix=terraform/state/prod"
+
+      - name: Terraform Validate
+        run: |
+          cd gcp_migration/terraform/workstations
+          terraform validate
+
+      - name: Terraform Plan
+        run: |
+          cd gcp_migration/terraform/workstations
+          terraform plan -var="project_id=${{ env.PROJECT_ID }}" \
+                        -var="location=${{ env.REGION }}" \
+                        -var="workstation_cluster_id=orchestra-prod-cluster" \
+                        -var="standard_config_id=orchestra-prod-standard-config" \
+                        -var="ml_config_id=orchestra-prod-ml-config" \
+                        -var="persistent_disk_size_gb=500" \
+                        -var="boot_disk_size_gb=150" \
+                        -out=tfplan
+
+      - name: Terraform Apply
+        run: |
+          cd gcp_migration/terraform/workstations
+          terraform apply -auto-approve tfplan
+          
+  notify:
+    name: Notify Deployment Status
+    needs: [deploy-dev, deploy-staging, deploy-prod]
+    if: ${{ always() && github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check deployment status
+        run: |
+          if [ "${{ needs.deploy-dev.result }}" == "success" ] || [ "${{ needs.deploy-staging.result }}" == "success" ] || [ "${{ needs.deploy-prod.result }}" == "success" ]; then
+            echo "✅ Deployment successful"
+            exit 0
+          else
+            echo "❌ Deployment failed"
+            exit 1
+          fi

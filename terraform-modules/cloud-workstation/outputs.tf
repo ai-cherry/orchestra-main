@@ -1,27 +1,28 @@
 # Outputs for Cloud Workstation Module
 
+# Resource identifiers for reference or further automation
 output "workstation_cluster_id" {
-  description = "The ID of the created workstation cluster"
+  description = "The ID of the created workstation cluster - use this ID in other configurations"
   value       = google_workstations_workstation_cluster.ai_cluster.workstation_cluster_id
 }
 
 output "workstation_config_id" {
-  description = "The ID of the created workstation configuration"
+  description = "The ID of the created workstation configuration - reference for workstation administration"
   value       = google_workstations_workstation_config.ai_config.workstation_config_id
 }
 
 output "workstation_id" {
-  description = "The ID of the created workstation instance"
+  description = "The ID of the created workstation instance - use this for direct API operations"
   value       = google_workstations_workstation.ai_workstation.workstation_id
 }
 
 output "workstation_url" {
-  description = "The URL to access the workstation"
+  description = "The URL to access the workstation through the web interface - copy and paste this into your browser"
   value       = "https://${var.region}.workstations.cloud.google.com/${var.project_id}/${var.region}/${var.cluster_name}/${var.config_name}/${var.workstation_name}"
 }
 
 output "workstation_ip" {
-  description = "The external IP address of the workstation (if public IP is enabled)"
+  description = "The external IP address of the workstation (if public IP is enabled) - use for firewall configurations"
   value       = var.disable_public_ip ? "Private endpoint only" : data.google_compute_instance.workstation_vm[0].network_interface[0].access_config[0].nat_ip
 }
 
@@ -37,13 +38,29 @@ data "google_compute_instance" "workstation_vm" {
 }
 
 output "jupyter_connection_command" {
-  description = "Command to connect to JupyterLab running on the workstation"
-  value       = var.disable_public_ip ? "JupyterLab requires a direct connection to the workstation" : "gcloud compute ssh workstation-${var.cluster_name}-${var.config_name}-${var.workstation_name} --project=${var.project_id} --zone=${var.region}-a -- -L 8888:localhost:8888"
+  description = "Command to establish an SSH tunnel to JupyterLab - use this to securely access JupyterLab in your local browser"
+  value       = var.disable_public_ip ? "JupyterLab requires a direct connection to the workstation" : <<-EOT
+# To connect to JupyterLab, run the following command and then open http://localhost:8888 in your browser:
+gcloud compute ssh workstation-${var.cluster_name}-${var.config_name}-${var.workstation_name} \
+  --project=${var.project_id} \
+  --zone=${var.region}-a \
+  -- -L 8888:localhost:8888
+EOT
 }
 
 output "workstation_connection_command" {
-  description = "Command to start and connect to the workstation"
-  value       = "gcloud workstations start ${var.workstation_name} --cluster=${var.cluster_name} --config=${var.config_name} --region=${var.region} --project=${var.project_id}"
+  description = "Commands to start and connect to the workstation - run these in sequence"
+  value       = <<-EOT
+# Start your workstation:
+gcloud workstations start ${var.workstation_name} \
+  --cluster=${var.cluster_name} \
+  --config=${var.config_name} \
+  --region=${var.region} \
+  --project=${var.project_id}
+
+# After starting, access through the web UI:
+${google_workstations_workstation.ai_workstation.host}
+EOT
 }
 
 output "iam_bindings" {
