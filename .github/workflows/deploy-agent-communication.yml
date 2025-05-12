@@ -215,7 +215,7 @@ jobs:
           echo "See [Agent Communication Guide](docs/agent_communication_guide.md) for details." >> AGENT_COMMUNICATION.md
       
       - name: Commit and Push
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Update agent communication infrastructure documentation"
           file_pattern: AGENT_COMMUNICATION.md
