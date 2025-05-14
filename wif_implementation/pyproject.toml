@@ -2,7 +2,7 @@
 name = "wif-implementation"
 version = "0.1.0"
 description = "Workload Identity Federation implementation for GitHub and GCP"
-authors = ["AI Orchestra Team <team@cherry-ai-project.com>"]
+authors = ["Lynn Musil <scoobyjava@cherry-ai.me>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]

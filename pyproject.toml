@@ -2,7 +2,7 @@
 name        = "ai-orchestra"
 version     = "0.0.0"
 description = "Mono-repo shared environment for all services"
-authors     = ["AI Orchestra Team <dev@ai-orchestra.local>"]
+authors     = ["Lynn Musil <scoobyjava@cherry-ai.me>"]
 
 [tool.poetry.dependencies]
 python = ">=3.11,<4.0"

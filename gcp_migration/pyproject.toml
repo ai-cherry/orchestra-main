@@ -2,7 +2,7 @@
 name = "ai-orchestra-migration"
 version = "1.0.0"
 description = "AI Orchestra migration toolkit for GCP"
-authors = ["Roo <roo@ai-orchestra.example.com>"]
+authors = ["Lynn Musil <scoobyjava@cherry-ai.me>"]
 readme = "README.md"
 # packages = [{include = "."}]
 

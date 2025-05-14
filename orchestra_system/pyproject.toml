@@ -2,7 +2,7 @@
 name = "orchestra-system"
 version = "0.1.0"
 description = "System for AI assistants to maintain real-time awareness of development resources"
-authors = ["AI Orchestra Team <team@cherry-ai.me>"]
+authors = ["Lynn Musil <scoobyjava@cherry-ai.me>"]
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/cherry-ai/ai-orchestra"
