@@ -139,7 +139,7 @@ jobs:
       
       # Setup gcloud CLI
       - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v1'
+        uses: 'google-github-actions/setup-gcloud@v2'
       
       # Configure Docker to use gcloud as a credential helper
       - name: Configure Docker for Artifact Registry
@@ -200,7 +200,7 @@ jobs:
       
       # Setup gcloud CLI
       - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v1'
+        uses: 'google-github-actions/setup-gcloud@v2'
       
       # Access secrets securely using Secret Manager
       - name: Access secrets
@@ -273,7 +273,7 @@ jobs:
       
       # Setup gcloud CLI
       - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v1'
+        uses: 'google-github-actions/setup-gcloud@v2'
       
       # Access secrets securely using Secret Manager
       - name: Access secrets

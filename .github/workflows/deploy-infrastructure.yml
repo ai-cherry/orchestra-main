@@ -89,7 +89,7 @@ jobs:
           service_account: ${{ secrets.GITHUB_ACTIONS_SERVICE_ACCOUNT }}
       
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
+        uses: google-github-actions/setup-gcloud@v2
       
       - name: Fix Terraform configuration
         run: |
