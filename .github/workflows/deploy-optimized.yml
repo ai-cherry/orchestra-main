@@ -1,4 +1,4 @@
-tname: Deploy Optimized AI Orchestra
+name: Deploy Optimized AI Orchestra
 
 on:
   push:
