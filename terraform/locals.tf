@@ -26,7 +26,7 @@ locals {
   # Common labels to apply to all resources
   common_labels = {
     managed_by = "terraform"
-    project    = "ai-orchestra"
-    org        = "cherry-ai"
+    project    = var.project_id
+    org        = var.org
   }
 }

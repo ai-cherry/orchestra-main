@@ -1,122 +1,211 @@
-# Variables for the GCP Workstations Terraform configuration
-# Performance-optimized for GitHub Codespaces to GCP Workstations migration
+# AI Orchestra Terraform variables
+# Comprehensive variable definitions for GCP infrastructure
 
+# Project Configuration
 variable "project_id" {
   description = "The GCP project ID"
   type        = string
+  default     = "cherry-ai-project"
+}
+
+variable "project_prefix" {
+  description = "Prefix used for naming resources"
+  type        = string
+  default     = "ai-orchestra"
+}
+
+variable "env" {
+  description = "Environment (dev, staging, prod)"
+  type        = string
+  default     = "dev"
 }
 
 variable "region" {
-  description = "The GCP region for deployments"
+  description = "The GCP region to deploy resources"
   type        = string
   default     = "us-central1"
 }
 
 variable "zone" {
-  description = "The GCP zone for zonal resources"
+  description = "The GCP zone within the region"
   type        = string
   default     = "us-central1-a"
 }
 
-variable "project_prefix" {
-  description = "Prefix for naming resources"
+variable "service_prefix" {
+  description = "Prefix used for service naming"
   type        = string
-  default     = "ai-orchestra"
+  default     = "orchestra"
 }
 
-variable "enable_gpu" {
-  description = "Enable GPU for workstations"
-  type        = bool
-  default     = true
-}
-
-variable "gpu_type" {
-  description = "GPU type to use when enable_gpu is true"
+# Container and Repository Configuration
+variable "image_repository" {
+  description = "Container image repository path"
   type        = string
-  default     = "nvidia-tesla-t4"
+  default     = "gcr.io/cherry-ai-project"
 }
 
-variable "gpu_count" {
-  description = "Number of GPUs to attach when enable_gpu is true"
-  type        = number
-  default     = 1
-}
-
-variable "standard_machine_type" {
-  description = "Machine type for standard development workstations"
+variable "image_tag" {
+  description = "Container image tag to deploy"
   type        = string
-  default     = "e2-standard-8"
+  default     = "latest"
 }
 
-variable "ml_machine_type" {
-  description = "Machine type for ML-optimized workstations"
-  type        = string
-  default     = "n1-standard-16"
-}
-
-variable "boot_disk_size_gb" {
-  description = "Size of the boot disk in GB"
-  type        = number
-  default     = 100
-}
-
-variable "persistent_disk_size_gb" {
-  description = "Size of the persistent disk in GB"
-  type        = number
-  default     = 200
-}
-
-variable "disable_public_ip" {
-  description = "Disable public IP address for workstations"
-  type        = bool
-  default     = false  # Set to false for better performance, easier access
-}
-
-variable "auto_shutdown_minutes" {
-  description = "Automatically shut down workstations after this many minutes of inactivity"
-  type        = number
-  default     = 20
-}
-
-variable "performance_optimized" {
-  description = "Enable performance optimizations"
-  type        = bool
-  default     = true
-}
-
-variable "ip_cidr_range" {
-  description = "CIDR range for the subnet"
-  type        = string
-  default     = "10.2.0.0/16"
-}
-
-variable "container_image" {
-  description = "Container image for workstations"
-  type        = string
-  default     = "us-docker.pkg.dev/cloud-workstations-images/predefined/code-oss:latest"
-}
-
-variable "environment_variables" {
-  description = "Environment variables to set in the workstation"
+# Service Configuration: Admin API
+variable "admin_api_env_vars" {
+  description = "Environment variables for Admin API"
   type        = map(string)
+  default     = {
+    PORT                       = "8080"
+    LOG_LEVEL                  = "info"
+    CONTEXT_OPTIMIZATION_LEVEL = "maximum"
+  }
+}
+
+variable "admin_api_secret_env_vars" {
+  description = "Secret environment variables for Admin API"
+  type        = map(object({
+    secret_name = string
+    secret_key  = string
+  }))
   default     = {}
 }
 
-variable "enable_monitoring" {
-  description = "Enable Cloud Monitoring for workstations"
+variable "container_concurrency_settings" {
+  description = "Container concurrency for each service"
+  type        = map(number)
+  default     = {
+    admin_api = 80
+  }
+}
+
+variable "cpu_limits" {
+  description = "CPU limits for each service"
+  type        = map(string)
+  default     = {
+    admin_api = "4"
+  }
+}
+
+variable "memory_limits" {
+  description = "Memory limits for each service"
+  type        = map(string)
+  default     = {
+    admin_api = "2Gi"
+  }
+}
+
+variable "min_instances" {
+  description = "Minimum instances for each service"
+  type        = map(number)
+  default     = {
+    admin_api = 1
+  }
+}
+
+variable "max_instances" {
+  description = "Maximum instances for each service"
+  type        = map(number)
+  default     = {
+    admin_api = 10
+  }
+}
+
+# Service Accounts
+variable "service_accounts" {
+  description = "Service accounts for each service"
+  type        = map(string)
+  default     = {
+    admin_api = "admin-api-sa@cherry-ai-project.iam.gserviceaccount.com"
+  }
+}
+
+variable "service_account_roles" {
+  description = "IAM roles to assign to service accounts"
+  type        = list(string)
+  default     = [
+    "roles/logging.logWriter",
+    "roles/monitoring.metricWriter",
+    "roles/secretmanager.secretAccessor"
+  ]
+}
+
+# Network Configuration
+variable "vpc_connector_name" {
+  description = "Name of the VPC connector for Cloud Run"
+  type        = string
+  default     = "orchestra-vpc-connector"
+}
+
+variable "ip_cidr_range" {
+  description = "IP CIDR range for the subnet"
+  type        = string
+  default     = "10.0.0.0/28"
+}
+
+# Database Configuration
+variable "cloudsql_connections" {
+  description = "CloudSQL connections for each service"
+  type        = map(string)
+  default     = {
+    admin_api = ""
+  }
+}
+
+# Domain Configuration
+variable "enable_custom_domains" {
+  description = "Whether to enable custom domains"
+  type        = bool
+  default     = false
+}
+
+variable "domain_mappings" {
+  description = "Custom domain mappings for services"
+  type        = map(string)
+  default     = {
+    admin_api = "api.orchestra.example.com"
+  }
+}
+
+# Security Configuration
+variable "make_admin_api_public" {
+  description = "Whether to make the Admin API publicly accessible"
   type        = bool
   default     = true
 }
 
-variable "service_account_roles" {
-  description = "Roles to assign to the workstation service account"
-  type        = list(string)
-  default     = [
-    "roles/editor",                   # For performance over security in single-dev project
-    "roles/aiplatform.user",          # For Vertex AI integration
-    "roles/secretmanager.secretAccessor", # For accessing secrets
-    "roles/storage.objectAdmin",      # For accessing GCS
-    "roles/logging.logWriter",        # For writing logs
-    "roles/monitoring.metricWriter",  # For writing metrics
-  ]
+# Monitoring Configuration
+variable "enable_monitoring" {
+  description = "Whether to enable Cloud Monitoring"
+  type        = bool
+  default     = true
+}
+
+variable "notification_channels" {
+  description = "Notification channels for alerts"
+  type        = map(string)
+  default     = {
+    email = "projects/cherry-ai-project/notificationChannels/email-channel"
+  }
+}
+
+# Workstation Configuration
+variable "enable_gpu" {
+  description = "Whether to enable GPU for workstations"
+  type        = bool
+  default     = true
+}
+
+variable "secret_name_prefix" {
+  description = "Prefix for secret names"
+  type        = string
+  default     = "ai-orchestra"
+}
+variable "org" {
+  description = "The organization name for the project."
+  type        = string
+}
+variable "env" {
+  description = "The deployment environment (e.g., dev, staging, prod)."
+  type        = string
 }
