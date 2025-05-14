@@ -19,7 +19,7 @@ provider "google-beta" {
 
 # Local variables
 locals {
-  env = "dev"
+  env = var.env
 }
 
 # Secure credentials module

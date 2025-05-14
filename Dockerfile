@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
-RUN pip install --no-cache-dir poetry==1.8.2
+RUN pip install --upgrade pip && pip install --no-cache-dir poetry==1.8.2
 
 # Copy Poetry configuration files for dependency caching
 COPY pyproject.toml poetry.lock* ./
@@ -32,6 +32,7 @@ RUN mkdir -p /app/.gcp
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
+RUN pip install --upgrade pip
 
 # Copy requirements from builder stage
 COPY --from=builder /app/requirements.txt .

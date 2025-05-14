@@ -1,0 +1,230 @@
+name: Deploy Admin API to Cloud Run
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'services/admin-api/**'
+      - '.github/workflows/deploy-admin-api.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment (dev, staging, prod)'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+# Explicitly define concurrency to prevent race conditions
+concurrency:
+  group: "deploy-${{ github.ref }}-${{ inputs.environment || 'dev' }}"
+  cancel-in-progress: true
+
+env:
+  PROJECT_ID: cherry-ai-project
+  SERVICE_NAME: admin-api
+  REGION: us-central1
+  SERVICE_DIR: services/admin-api
+  CPU_LIMIT: 4
+  MEMORY_LIMIT: 2Gi
+  MIN_INSTANCES: 1
+  CONCURRENCY: 80
+  POETRY_VERSION: 1.8.2
+  
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.set-env.outputs.environment }}
+    steps:
+      - id: set-env
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          else
+            echo "environment=dev" >> $GITHUB_OUTPUT
+          fi
+          echo "Selected environment: ${{ steps.set-env.outputs.environment }}"
+
+  test:
+    needs: setup
+    runs-on: ubuntu-latest
+    environment: ${{ needs.setup.outputs.environment }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install Poetry
+        run: |
+          pip install poetry==${{ env.POETRY_VERSION }}
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ${{ env.SERVICE_DIR }}/.venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('${{ env.SERVICE_DIR }}/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+      
+      - name: Install dependencies
+        working-directory: ${{ env.SERVICE_DIR }}
+        run: poetry install
+      
+      - name: Lint with ruff
+        working-directory: ${{ env.SERVICE_DIR }}
+        run: poetry run ruff check .
+      
+      - name: Type check with mypy
+        working-directory: ${{ env.SERVICE_DIR }}
+        run: poetry run mypy .
+      
+      - name: Test with pytest
+        working-directory: ${{ env.SERVICE_DIR }}
+        run: poetry run pytest
+      
+  build-and-deploy:
+    needs: [setup, test]
+    runs-on: ubuntu-latest
+    environment: ${{ needs.setup.outputs.environment }}
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'orchestra-wif-sa@${{ env.PROJECT_ID }}.iam.gserviceaccount.com'
+          token_format: 'access_token'
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      
+      - name: Verify authentication
+        run: gcloud auth list
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      
+      - name: Login to Google Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: gcr.io
+          username: _json_key
+          password: ${{ steps.auth.outputs.access_token }}
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        id: build-push
+        with:
+          context: ${{ env.SERVICE_DIR }}
+          push: true
+          tags: |
+            gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+            gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+          build-args: |
+            POETRY_VERSION=${{ env.POETRY_VERSION }}
+      
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+      
+      - name: Deploy to Cloud Run with progressive rollout
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          image: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          region: ${{ env.REGION }}
+          tag: revision-${{ github.sha }}
+          flags: |
+            --allow-unauthenticated
+            --min-instances=${{ env.MIN_INSTANCES }}
+            --cpu=${{ env.CPU_LIMIT }}
+            --memory=${{ env.MEMORY_LIMIT }}
+            --concurrency=${{ env.CONCURRENCY }}
+            --timeout=300s
+      
+      - name: Traffic migrating (progressive rollout)
+        if: ${{ needs.setup.outputs.environment == 'prod' }}
+        run: |
+          echo "Starting progressive traffic migration"
+          # Initial traffic split: 10% to new revision, 90% to previous
+          gcloud run services update-traffic ${{ env.SERVICE_NAME }} \
+            --region=${{ env.REGION }} \
+            --to-revisions="revision-${{ github.sha }}=10,LATEST=90"
+          
+          # Wait 2 minutes to check monitoring
+          echo "Waiting for 2 minutes to monitor the new revision..."
+          sleep 120
+          
+          # If successful, migrate to 50% traffic
+          gcloud run services update-traffic ${{ env.SERVICE_NAME }} \
+            --region=${{ env.REGION }} \
+            --to-revisions="revision-${{ github.sha }}=50,LATEST=50"
+          
+          # Wait 3 minutes more
+          echo "Waiting for 3 more minutes before full migration..."
+          sleep 180
+          
+          # If no errors, migrate to 100% traffic
+          gcloud run services update-traffic ${{ env.SERVICE_NAME }} \
+            --region=${{ env.REGION }} \
+            --to-latest
+          
+          echo "✅ Traffic migration complete - new revision serving 100% traffic"
+      
+      # For dev/staging, migrate directly to 100%
+      - name: Traffic migrating (direct)
+        if: ${{ needs.setup.outputs.environment != 'prod' }}
+        run: |
+          echo "Non-production deployment - migrating traffic directly"
+          gcloud run services update-traffic ${{ env.SERVICE_NAME }} \
+            --region=${{ env.REGION }} \
+            --to-latest
+      
+      - name: Verify deployment
+        run: |
+          echo "✅ Service deployed successfully: ${{ steps.deploy.outputs.url }}"
+          SERVICE_URL="${{ steps.deploy.outputs.url }}"
+          curl -s "$SERVICE_URL/health" || echo "❌ Health check failed"
+      
+      - name: Notify on deployment completion
+        if: always()
+        run: |
+          STATUS="${{ job.status }}"
+          ENV="${{ needs.setup.outputs.environment }}"
+          if [ "$STATUS" == "success" ]; then
+            echo "✅ Deployment to $ENV successful"
+          else
+            echo "❌ Deployment to $ENV failed"
+          fi

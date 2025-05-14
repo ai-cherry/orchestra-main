@@ -87,6 +87,31 @@ class Settings(BaseSettings):
     )
     PREFERRED_LLM_PROVIDER: str = "openrouter"  # Default provider to use
 
+    # Mode-specific model mapping
+    MODE_MODEL_MAP: Optional[str] = None  # JSON string mapping Roo modes to models and providers
+    MODE_MODEL_MAP_DEFAULT: Dict[str, Dict[str, str]] = {
+        "orchestrator": {
+            "model": "google/gemini-pro-2.5-preview",
+            "provider": "vertex"
+        },
+        "reviewer": {
+            "model": "google/gemini-pro-2.5-preview",
+            "provider": "vertex"
+        },
+        "strategy": {
+            "model": "google/gemini-pro-2.5-preview",
+            "provider": "vertex"
+        },
+        "code": {
+            "model": "openai/gpt-4-1106-preview",
+            "provider": "openai"
+        },
+        "debug": {
+            "model": "openai/gpt-4-1106-preview",
+            "provider": "openai"
+        }
+    }
+    
     # Agent-specific model mapping
     AGENT_MODEL_MAP: Optional[str] = None  # JSON string mapping agent roles to models
 
@@ -210,6 +235,22 @@ class Settings(BaseSettings):
         except json.JSONDecodeError as e:
             logging.error(f"Failed to parse AGENT_MODEL_MAP: {e}")
             return {}
+            
+    def get_mode_model_map(self) -> Dict[str, Dict[str, str]]:
+        """
+        Parse and return the mode-to-model mapping.
+        
+        Returns:
+            Dict[str, Dict[str, str]]: Dictionary mapping Roo modes to specific models and providers
+        """
+        if not self.MODE_MODEL_MAP:
+            return self.MODE_MODEL_MAP_DEFAULT
+        
+        try:
+            return json.loads(self.MODE_MODEL_MAP)
+        except json.JSONDecodeError as e:
+            logging.error(f"Failed to parse MODE_MODEL_MAP: {e}")
+            return self.MODE_MODEL_MAP_DEFAULT
 
     def get_portkey_strategy_config(self) -> Dict[str, Any]:
         """

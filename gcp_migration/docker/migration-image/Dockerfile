@@ -8,7 +8,7 @@ FROM python:3.11-slim as builder
 WORKDIR /app
 
 # Install Poetry
-RUN pip install --no-cache-dir poetry==1.8.2 \
+RUN pip install --upgrade pip && pip install --no-cache-dir poetry==1.8.2 \
     && poetry config virtualenvs.create false
 
 # Copy Poetry configuration files
@@ -25,6 +25,9 @@ RUN poetry build
 
 # Final stage
 FROM python:3.11-slim
+
+# Upgrade pip in runtime image
+RUN pip install --upgrade pip
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \

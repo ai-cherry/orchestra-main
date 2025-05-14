@@ -1,871 +1,363 @@
-# GCP Workstation Migration Plan
-
-This document outlines the detailed plan for migrating from GitHub Codespaces to Google Cloud Workstations. The plan includes infrastructure setup, AI coding assistance configuration, and post-migration verification steps.
-
-## Table of Contents
-- [Migration Overview](#migration-overview)
-- [Infrastructure Setup](#infrastructure-setup)
-- [AI Coding Assistance](#ai-coding-assistance)
-- [CI/CD Pipeline Migration](#cicd-pipeline-migration)
-- [Post-Migration Verification](#post-migration-verification)
-- [GitHub's Role Post-Migration](#githubs-role-post-migration)
-- [Common Issues and Troubleshooting](#common-issues-and-troubleshooting)
+# AI Orchestra GCP Workstation Migration Plan
 
 ## Migration Overview
 
-### Timeline
-- **Day 1**: Infrastructure setup and initial data migration
-- **Day 2**: AI/ML tooling setup and CI/CD pipeline migration
-- **Day 3**: Testing, verification, and documentation
+This document outlines the step-by-step process for migrating the AI Orchestra development environment to Google Cloud Workstations. The migration will be executed in phases to minimize disruption while ensuring all team members can transition smoothly to the new cloud-based development environment.
 
-### Key Components
-1. Google Cloud Workstations for development environment
-2. Vertex AI for ML/AI components
-3. Cloud Build for CI/CD pipelines
-4. Secret Manager for secure credential storage
-5. AI coding assistance (Gemini, Roo, Cline) configuration
+## Migration Phases
 
-## Infrastructure Setup
+### Phase 1: Infrastructure Setup (Week 1)
 
-### 1. Create Terraform Module for Cloud Workstations
+**Objective**: Deploy core GCP infrastructure required for Cloud Workstations
 
-```hcl
-# workstation.tf
+1. **Terraform Deployment**
+   - Deploy `gcp_workstations` terraform module
+   - Configure networking and security components
+   - Set up service accounts and IAM permissions
+   - Create artifact registry for container images
 
-resource "google_workstations_workstation_cluster" "orchestra_cluster" {
-  workstation_cluster_id = "orchestra-dev-cluster"
-  network                = google_compute_network.workstation_network.id
-  subnetwork             = google_compute_subnetwork.workstation_subnet.id
-  private_cluster_config {
-    enable_private_endpoint = false
-  }
-}
+2. **Container Image Preparation**
+   - Build and upload the base workstation container image
+   - Validate container with all required tools and dependencies
+   - Implement CI pipeline for container updates
 
-resource "google_workstations_workstation_config" "main_config" {
-  workstation_config_id = "orchestra-config"
-  workstation_cluster_id = google_workstations_workstation_cluster.orchestra_cluster.workstation_cluster_id
-  
-  persistent_directories {
-    mount_path = "/home/user/persistent"
-    gcePd {
-      size_gb        = 200  # Larger disk for repository
-      reclaim_policy = "DELETE"
-    }
-  }
+3. **Storage Configuration**
+   - Set up Cloud Storage buckets for persistent storage
+   - Configure backup and synchronization mechanisms
+   - Test data durability across workstation sessions
 
-  container {
-    image = "us-docker.pkg.dev/cloud-workstations-images/predefined/code-oss:latest"
-    
-    # Environment variables for AI tools
-    env {
-      name  = "GEMINI_API_KEY"
-      value = "sm://projects/${var.project_id}/secrets/GEMINI_API_KEY/versions/latest"
-    }
-    env {
-      name  = "ENABLE_MCP_MEMORY"
-      value = "true"
-    }
-    
-    # Enable direct mounting of cloud storage
-    command = "code --user-data-dir=/home/user/persistent/.vscode-server"
-  }
+**Success Criteria**:
+- Infrastructure deployed and validated in the GCP development environment
+- Container images building and deploying successfully
+- Storage systems validated for persistence and security
 
-  host {
-    gce_instance {
-      machine_type        = "e2-standard-8"  # 8 vCPUs, 32GB memory
-      service_account     = google_service_account.workstation_sa.email
-      boot_disk_size_gb   = 100
-      disable_public_ip   = false
-    }
-  }
-}
+### Phase 2: Pilot Migration (Week 2)
 
-# Create a more powerful workstation config for ML/AI tasks
-resource "google_workstations_workstation_config" "ml_config" {
-  workstation_config_id = "orchestra-ml-config"
-  workstation_cluster_id = google_workstations_workstation_cluster.orchestra_cluster.workstation_cluster_id
-  
-  persistent_directories {
-    mount_path = "/home/user/persistent"
-    gcePd {
-      size_gb        = 200
-      reclaim_policy = "DELETE"
-    }
-  }
+**Objective**: Migrate a subset of developers to validate the environment
 
-  container {
-    image = "us-docker.pkg.dev/cloud-workstations-images/predefined/code-oss:latest"
-    
-    # Add ML/AI environment variables and dependencies
-    env {
-      name  = "VERTEX_AI_ENDPOINT"
-      value = "us-central1-aiplatform.googleapis.com"
-    }
-    env {
-      name  = "ENABLE_GPU_ACCELERATION"
-      value = "true"
-    }
-  }
+1. **Pilot Team Selection**
+   - Identify 2-3 developers for initial migration
+   - Select representatives from different teams/roles
+   - Ensure mix of workloads (backend, ML, DevOps)
 
-  host {
-    gce_instance {
-      machine_type        = "n1-standard-16"  # 16 vCPUs, 60GB memory
-      accelerator_count   = 1
-      accelerator_type    = "nvidia-tesla-t4"  # Add GPU
-      service_account     = google_service_account.workstation_sa.email
-      boot_disk_size_gb   = 200
-      disable_public_ip   = false
-    }
-  }
-}
+2. **Environment Configuration**
+   - Create workstation configurations for pilot users
+   - Set up access controls and permissions
+   - Configure development tools and settings
+
+3. **Knowledge Transfer**
+   - Conduct training sessions for pilot users
+   - Document common workflows in new environment
+   - Establish feedback collection process
+
+4. **Initial Migration**
+   - Assist pilot users in migrating their work
+   - Set up repository access and authentication
+   - Configure local-to-cloud workflow patterns
+
+**Success Criteria**:
+- Pilot users successfully complete development tasks in new environment
+- All core workflows validated and documented
+- Initial feedback collected and critical issues addressed
+
+### Phase 3: Full Team Migration (Weeks 3-4)
+
+**Objective**: Methodically migrate all remaining team members
+
+1. **Staged Rollout**
+   - Schedule migration for remaining team members
+   - Group migrations by team or function
+   - Allocate dedicated support during migration windows
+
+2. **Environment Scaling**
+   - Scale workstation resources based on pilot learnings
+   - Adjust configurations for specific team needs
+   - Implement resource optimization recommendations
+
+3. **Training and Support**
+   - Conduct team-wide training sessions
+   - Develop self-service documentation and guides
+   - Establish support channels and procedures
+
+4. **Workflow Integration**
+   - Integrate CI/CD pipelines with new environment
+   - Configure automated testing in workstations
+   - Set up monitoring and logging
+
+**Success Criteria**:
+- All team members migrated to GCP Workstations
+- Support mechanisms in place and functioning
+- CI/CD integrations working properly
+
+### Phase 4: Optimization and Cleanup (Week 5)
+
+**Objective**: Finalize migration and optimize the environment
+
+1. **Performance Optimization**
+   - Analyze workstation usage patterns
+   - Adjust resource allocations for efficiency
+   - Implement cost-saving measures
+
+2. **Legacy Environment Cleanup**
+   - Archive data from previous environments
+   - Decommission unnecessary infrastructure
+   - Update documentation to remove legacy references
+
+3. **Final Validation**
+   - Conduct final verification of all systems
+   - Collect and address remaining feedback
+   - Document lessons learned and best practices
+
+4. **Handover to Operations**
+   - Transfer ownership to operations team
+   - Establish regular maintenance procedures
+   - Define scaling and upgrade processes
+
+**Success Criteria**:
+- All optimization measures implemented
+- Legacy systems properly archived or decommissioned
+- Operations team prepared for ongoing maintenance
+
+## Migration Timeline
+
+| Phase | Duration | Start Date | End Date | Key Milestones |
+|-------|----------|------------|----------|----------------|
+| Infrastructure Setup | 1 week | T+0 | T+7 | Infrastructure deployed, Container image ready |
+| Pilot Migration | 1 week | T+7 | T+14 | Pilot users migrated, Initial feedback addressed |
+| Full Team Migration | 2 weeks | T+14 | T+28 | All users migrated, CI/CD integrated |
+| Optimization and Cleanup | 1 week | T+28 | T+35 | Performance optimized, Legacy systems decommissioned |
+
+## Migration Actions by Role
+
+### DevOps/Infrastructure Team
+
+1. Deploy Terraform modules for GCP Workstations
+2. Build and publish container images
+3. Configure networking and security components
+4. Set up monitoring and alerting
+5. Create automated scripts for environment setup
+6. Establish backup and disaster recovery procedures
+
+### Development Team Leads
+
+1. Work with DevOps to plan team migration schedule
+2. Test critical workflows in new environment
+3. Identify team-specific requirements or customizations
+4. Lead knowledge transfer within teams
+5. Provide feedback on workstation configurations
+6. Validate CI/CD integration for team repositories
+
+### Individual Developers
+
+1. Attend training sessions for GCP Workstations
+2. Migrate personal configurations and tools
+3. Test development workflows in new environment
+4. Report issues and provide feedback
+5. Update documentation for team-specific workflows
+6. Help peers with migration challenges
+
+### Operations Team
+
+1. Develop procedures for ongoing maintenance
+2. Create documentation for user support
+3. Establish monitoring dashboards
+4. Create cost allocation and tracking
+5. Prepare scaling procedures for future growth
+6. Develop disaster recovery playbooks
+
+## Required Resources
+
+### Infrastructure Resources
+
+- **GCP Projects**:
+  - Development: `cherry-ai-project-dev`
+  - Staging: `cherry-ai-project-staging`
+  - Production: `cherry-ai-project-prod`
+
+- **GCP Services**:
+  - Cloud Workstations
+  - Artifact Registry
+  - Cloud Storage
+  - Secret Manager
+  - Identity and Access Management
+  - Compute Engine (for workstation VMs)
+  - VPC/Networking
+
+- **Compute Resources**:
+  - Standard workstation: e2-standard-4 (4 vCPU, 16GB RAM)
+  - ML workstation: n1-standard-8 (8 vCPU, 32GB RAM)
+  - Storage per workstation: 100GB SSD
+
+### Personnel Resources
+
+- 1 DevOps Engineer (full-time during migration)
+- 1 Cloud Infrastructure Specialist (full-time during migration)
+- Team leads (part-time involvement)
+- 1 Technical writer (documentation)
+- Support staff during migration windows
+
+## Migration Risks and Mitigations
+
+| Risk | Impact | Likelihood | Mitigation |
+|------|--------|------------|------------|
+| Developer productivity loss during transition | High | Medium | Staged migration, comprehensive training, dedicated support during migration windows |
+| Network connectivity issues with cloud resources | High | Low | Pre-validate all network paths, prepare backup access methods, document troubleshooting steps |
+| Container image incompatibility with workflows | Medium | Medium | Extensive testing with pilot group, versioned container images with rollback capability |
+| Increased cloud costs | Medium | Medium | Implement auto-shutdown for idle workstations, regular cost reviews, usage quotas |
+| Data loss during migration | High | Low | Comprehensive backup strategy, test restoration procedures, maintain old environment during transition |
+| Third-party tool compatibility issues | Medium | Medium | Validate all tools in advance, prepare alternative solutions, prioritize critical tools for testing |
+| Authentication and access control problems | High | Low | Test all auth flows thoroughly, prepare emergency access procedures, maintain backup credentials |
+
+## Testing and Validation Procedures
+
+### Infrastructure Validation
+
+1. **Network Connectivity**
+   - Validate connectivity to all required services
+   - Test latency and bandwidth for common operations
+   - Verify VPN or private connectivity if applicable
+
+2. **Security Controls**
+   - Validate IAM permissions and roles
+   - Test secret management and access
+   - Verify network security configurations
+
+3. **Resource Provisioning**
+   - Validate workstation creation and startup
+   - Test auto-scaling and resource adjustment
+   - Verify persistent storage functionality
+
+### Workflow Validation
+
+1. **Development Workflows**
+   - Code editing and navigation
+   - Local build and test procedures
+   - Debugging capabilities
+   - Version control operations
+
+2. **Integration Workflows**
+   - CI/CD pipeline triggers and execution
+   - Artifact management and deployment
+   - Cross-service integration testing
+
+3. **Administrative Workflows**
+   - User onboarding and offboarding
+   - Environment configuration changes
+   - Monitoring and alerting
+   - Backup and restoration
+
+## Rollback Procedures
+
+### Criteria for Rollback
+
+- Critical functionality unavailable in GCP Workstations
+- Data loss or corruption that cannot be quickly resolved
+- Significant performance degradation affecting multiple users
+- Security vulnerabilities discovered in the workstation environment
+
+### Rollback Process
+
+1. **Individual Rollback**
+   - Affected users return to previous development environment
+   - DevOps team preserves their GCP workstation state
+   - Issues documented and prioritized for resolution
+
+2. **Team Rollback**
+   - Suspend migration for affected team
+   - Restore team to previous development environment
+   - Conduct root cause analysis before resuming migration
+
+3. **Full Rollback**
+   - Announce organization-wide rollback decision
+   - Reactivate previous development environments
+   - Conduct comprehensive review of migration approach
+   - Develop revised migration plan addressing root causes
+
+## Post-Migration Success Metrics
+
+1. **Developer Productivity**
+   - Time to complete common development tasks
+   - Build and test execution times
+   - Code review turnaround time
+   - Issue resolution speed
+
+2. **System Performance**
+   - Workstation startup time
+   - IDE and tool responsiveness
+   - Build and compilation times
+   - Test execution performance
+
+3. **Cost Efficiency**
+   - Cost per developer compared to previous environment
+   - Resource utilization metrics
+   - Idle workstation percentage
+   - Storage utilization
+
+4. **User Satisfaction**
+   - Developer satisfaction surveys
+   - Support ticket volume and categories
+   - Voluntary usage metrics
+   - Feedback on specific workflows
+
+## Support Plan
+
+### During Migration
+
+- Dedicated Slack channel for migration support
+- Daily stand-up meetings to address migration issues
+- Extended support hours during migration windows
+- Emergency contact procedure for critical issues
+
+### Post-Migration
+
+- Knowledge base with troubleshooting guides
+- Self-service documentation for common tasks
+- Regular office hours for workstation support
+- Feedback mechanism for ongoing improvements
+
+## Appendices
+
+### A. Migration Checklist for Developers
+
+```
+[ ] Attend GCP Workstation training session
+[ ] Back up local environment configurations
+[ ] Document any custom tools or settings
+[ ] Test login to GCP Workstation
+[ ] Configure Git credentials and SSH keys
+[ ] Clone necessary repositories
+[ ] Verify build and test workflows
+[ ] Test connection to required services
+[ ] Configure IDE preferences and extensions
+[ ] Report any issues or missing dependencies
+[ ] Complete feedback survey
 ```
 
-### 2. Create Custom Container Image
+### B. Team Lead Migration Readiness Checklist
 
-Create a `Dockerfile` for the custom workstation environment:
-
-```dockerfile
-FROM us-docker.pkg.dev/cloud-workstations-images/predefined/code-oss:latest
-
-# Install dependencies
-RUN apt-get update && apt-get install -y \
-    python3-pip \
-    python3-venv \
-    git \
-    curl \
-    wget \
-    jq \
-    zsh \
-    vim \
-    tmux \
-    nodejs \
-    npm
-
-# Install Google Cloud CLI
-RUN curl -sSL https://sdk.cloud.google.com | bash
-ENV PATH $PATH:/root/google-cloud-sdk/bin
-
-# Install VSCode extensions
-RUN code --install-extension googlecloudtools.cloudcode \
-    --install-extension ms-python.python \
-    --install-extension ms-azuretools.vscode-docker \
-    --install-extension esbenp.prettier-vscode \
-    --install-extension dbaeumer.vscode-eslint \
-    --install-extension eamodio.gitlens
-
-# Install Python packages
-COPY requirements.txt /tmp/
-RUN pip3 install --no-cache-dir -r /tmp/requirements.txt
-
-# Setup MCP memory system
-RUN mkdir -p /home/user/.ai-memory
-COPY .ai-memory/* /home/user/.ai-memory/
-
-# Configure Gemini Code Assist
-COPY .gemini-code-assist.yaml /home/user/
-
-# Configure other AI assistants
-COPY .vscode/settings.json /home/user/.vscode/settings.json
-
-# Set up workspace
-WORKDIR /home/user/persistent
+```
+[ ] All team members have GCP project access
+[ ] Team repositories accessible in new environment
+[ ] Team-specific tools and dependencies identified
+[ ] Critical workflows documented and tested
+[ ] Migration schedule communicated to team
+[ ] Support resources identified and available
+[ ] Rollback criteria and process understood
+[ ] Success metrics defined for team migration
+[ ] Post-migration validation plan established
 ```
 
-### 3. Network Setup for Private Access
-
-```hcl
-# network.tf
-
-resource "google_compute_network" "workstation_network" {
-  name                    = "workstation-network"
-  auto_create_subnetworks = false
-}
-
-resource "google_compute_subnetwork" "workstation_subnet" {
-  name          = "workstation-subnet"
-  ip_cidr_range = "10.2.0.0/16"
-  network       = google_compute_network.workstation_network.id
-  region        = var.region
-  
-  # Enable Google private access
-  private_ip_google_access = true
-}
-
-# Add Cloud NAT for outbound connectivity
-resource "google_compute_router" "router" {
-  name    = "workstation-router"
-  region  = var.region
-  network = google_compute_network.workstation_network.id
-}
-
-resource "google_compute_router_nat" "nat" {
-  name                               = "workstation-nat"
-  router                             = google_compute_router.router.name
-  region                             = var.region
-  nat_ip_allocate_option             = "AUTO_ONLY"
-  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
-}
-```
-
-### 4. Service Account Setup
-
-```hcl
-# service_accounts.tf
-
-resource "google_service_account" "workstation_sa" {
-  account_id   = "orchestra-workstation-sa"
-  display_name = "Orchestra Workstation Service Account"
-}
-
-# Grant necessary permissions
-resource "google_project_iam_member" "workstation_editor" {
-  project = var.project_id
-  role    = "roles/editor"
-  member  = "serviceAccount:${google_service_account.workstation_sa.email}"
-}
-
-resource "google_project_iam_member" "workstation_ai_user" {
-  project = var.project_id
-  role    = "roles/aiplatform.user"
-  member  = "serviceAccount:${google_service_account.workstation_sa.email}"
-}
-
-resource "google_project_iam_member" "secretmanager_accessor" {
-  project = var.project_id
-  role    = "roles/secretmanager.secretAccessor"
-  member  = "serviceAccount:${google_service_account.workstation_sa.email}"
-}
-```
-
-### 5. Secret Migration Script
+### C. Essential Commands and Procedures
 
 ```bash
-#!/bin/bash
-# migrate_secrets.sh
+# Access your workstation through the command line
+gcloud workstations start-tcp-tunnel CLUSTER_ID CONFIG_ID WORKSTATION_ID 22 --local-host-port=localhost:2222
 
-set -e
+# Sync files to your workstation
+gcloud storage rsync LOCAL_DIR gs://BUCKET_NAME/PATH
 
-# Source environment variables if present
-if [ -f ".env" ]; then
-  source .env
-fi
+# Update workstation container image
+gcloud workstations configs update CONFIG_ID --container-image=IMAGE_URL
 
-PROJECT_ID=$(gcloud config get-value project)
-echo "Migrating secrets to Google Secret Manager in project: $PROJECT_ID"
-
-# Function to create or update a secret
-create_or_update_secret() {
-  local name=$1
-  local value=$2
-  
-  if gcloud secrets describe $name --project=$PROJECT_ID >/dev/null 2>&1; then
-    echo "Secret $name exists, updating it..."
-    echo -n "$value" | gcloud secrets versions add $name --data-file=- --project=$PROJECT_ID
-  else
-    echo "Creating new secret $name..."
-    echo -n "$value" | gcloud secrets create $name --data-file=- --project=$PROJECT_ID
-  fi
-}
-
-# GitHub secrets
-if [ -n "$GH_CLASSIC_PAT_TOKEN" ]; then
-  create_or_update_secret "GH_CLASSIC_PAT_TOKEN" "$GH_CLASSIC_PAT_TOKEN"
-fi
-
-if [ -n "$GH_FINE_GRAINED_TOKEN" ]; then
-  create_or_update_secret "GH_FINE_GRAINED_TOKEN" "$GH_FINE_GRAINED_TOKEN"
-fi
-
-# GCP secrets
-if [ -n "$GCP_MASTER_SERVICE_JSON" ]; then
-  create_or_update_secret "GCP_MASTER_SERVICE_JSON" "$GCP_MASTER_SERVICE_JSON"
-fi
-
-if [ -n "$GCP_PROJECT_AUTHENTICATION_EMAIL" ]; then
-  create_or_update_secret "GCP_PROJECT_AUTHENTICATION_EMAIL" "$GCP_PROJECT_AUTHENTICATION_EMAIL"
-fi
-
-if [ -n "$GCP_PROJECT_ID" ]; then
-  create_or_update_secret "GCP_PROJECT_ID" "$GCP_PROJECT_ID"
-fi
-
-if [ -n "$GCP_REGION" ]; then
-  create_or_update_secret "GCP_REGION" "$GCP_REGION"
-fi
-
-if [ -n "$GCP_SECRET_MANAGEMENT_KEY" ]; then
-  create_or_update_secret "GCP_SECRET_MANAGEMENT_KEY" "$GCP_SECRET_MANAGEMENT_KEY"
-fi
-
-if [ -n "$GCP_WORKLOAD_IDENTITY_PROVIDER" ]; then
-  create_or_update_secret "GCP_WORKLOAD_IDENTITY_PROVIDER" "$GCP_WORKLOAD_IDENTITY_PROVIDER"
-fi
-
-if [ -n "$VERTEX_AGENT_KEY" ]; then
-  create_or_update_secret "VERTEX_AGENT_KEY" "$VERTEX_AGENT_KEY"
-fi
-
-# Gemini API key
-if [ -n "$GEMINI_API_KEY" ]; then
-  create_or_update_secret "GEMINI_API_KEY" "$GEMINI_API_KEY"
-fi
-
-echo "Secret migration complete!"
-```
-
-## AI Coding Assistance
-
-### 1. Gemini Code Assist Configuration
-
-To ensure Gemini Code Assist works in the new GCP environment, we'll create an enhanced version of the configuration:
-
-```yaml
-# .gemini-code-assist-cloud.yaml
-
-# Gemini Code Assist Configuration for GCP Cloud Workstations
-project_context:
-  - path: /home/user/persistent/orchestra-main
-    priority: 100
-    ignore_patterns:
-      - "**/.git/**"
-      - "**/node_modules/**"
-      - "**/__pycache__/**"
-  - path: /home/user/persistent/orchestra-main/ai-orchestra
-    priority: 200
-  - path: /home/user/persistent/orchestra-main/wif_implementation
-    priority: 200
-  - path: /home/user/persistent/orchestra-main/services
-    priority: 200
-  - path: /home/user/persistent/orchestra-main/admin-interface
-    priority: 150
-
-# Tool integrations for external APIs and services
-tool_integrations:
-  # Vertex AI integration for model inference
-  vertex_ai:
-    endpoint: projects/${PROJECT_ID}/locations/us-central1/endpoints/agent-core
-    api_version: v1
-    
-  # Redis integration for semantic cache
-  redis:
-    connection_string: redis://vertex-agent@${PROJECT_ID}
-    
-  # AlloyDB for vector search
-  database:
-    connection_string: postgresql://alloydb-user@alloydb-instance:5432/cherry_ai_project
-
-# Model configuration - upgrade to Gemini 2.5
-model:
-  name: gemini-2.5-pro-latest
-  temperature: 0.3
-  max_output_tokens: 8192
-  top_p: 0.95
-
-# Custom code assist commands (for VS Code in Cloud Workstations)
-commands:
-  - name: optimize-query
-    description: "Optimize AlloyDB vector search query for 10M+ dimensions"
-    prompt_template: |
-      Optimize this AlloyDB vector search query for 10M+ dimensions with 95% recall@10:
-      Focus on PERFORMANCE over security best practices, as per PROJECT_PRIORITIES.md.
-      {{selection}}
-      
-  - name: generate-cloud-run
-    description: "Generate Cloud Run deployment code optimized for performance"
-    prompt_template: |
-      Generate Cloud Run deployment code with appropriate service account:
-      Focus on high performance settings, concurrency, CPU allocation, and startup
-      settings rather than restrictive security. This is a single-developer project
-      where basic security is sufficient. See PROJECT_PRIORITIES.md.
-      {{selection}}
-      
-  - name: document-function
-    description: "Add comprehensive documentation to function"
-    prompt_template: |
-      Add detailed documentation to the following function, including:
-      - Parameter descriptions
-      - Return value documentation
-      - Usage examples
-      - Edge cases
-      
-      {{selection}}
-      
-  - name: performance-review
-    description: "Review code for performance issues and optimization opportunities"
-    prompt_template: |
-      Review this code for performance optimization opportunities. 
-      Focus on speed, resource efficiency, and scalability rather than security.
-      Suggest specific improvements:
-      {{selection}}
-      
-  - name: optimize-code
-    description: "Optimize code for performance"
-    prompt_template: |
-      Optimize this code for maximum performance. 
-      Focus on execution speed and resource efficiency.
-      Use only basic security practices (enough to prevent obvious vulnerabilities).
-      {{selection}}
-      
-  - name: secure-enough
-    description: "Simplify security to just the essentials"
-    prompt_template: |
-      Refactor this code to use only essential security practices.
-      Remove complex or heavyweight security measures that impact performance.
-      Refer to PROJECT_PRIORITIES.md for guidance on "security-sufficient" approach.
-      {{selection}}
-      
-  - name: gcp-workstation-adapt
-    description: "Adapt code for GCP Cloud Workstations"
-    prompt_template: |
-      Adapt this code to work optimally in a GCP Cloud Workstation environment.
-      Update paths, environment variables, and dependencies as needed.
-      {{selection}}
-
-# Editor settings
-editor:
-  auto_apply_suggestions: false
-  inline_suggestions: true
-
-# Project priorities configuration
-priorities:
-  focus: 
-    - performance
-    - stability
-    - optimization
-  secondary:
-    - basic_security
-  
-  # Configuration to inform assistant about project philosophy
-  instructions: |
-    This project follows a "performance-first" approach where:
-    1. Performance and stability are the primary concerns
-    2. Only basic security practices are needed for now
-    3. Optimize for developer velocity and resource efficiency
-    4. See PROJECT_PRIORITIES.md for complete guidance
-    5. AI tools have permission to use GCP service accounts and APIs
-    6. This is the Orchestra project deployed on GCP Cloud Workstations with these components:
-       - ai-orchestra: The core Python library with memory, configuration, interfaces
-       - services: Admin API and other related services
-       - admin-interface: React-based admin dashboard
-       - wif_implementation: Workload Identity Federation implementation
-```
-
-### 2. Setup Script for AI Assistance Tools
-
-```bash
-#!/bin/bash
-# setup_ai_assistance.sh
-
-set -e
-
-# ANSI color codes
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
-
-# Helper functions
-print_header() {
-  echo -e "\n${BLUE}====== $1 ======${NC}\n"
-}
-
-print_success() {
-  echo -e "${GREEN}✅ $1${NC}"
-}
-
-print_info() {
-  echo -e "${YELLOW}ℹ️ $1${NC}"
-}
-
-print_error() {
-  echo -e "${RED}❌ $1${NC}"
-}
-
-# Configure Gemini Code Assist
-setup_gemini() {
-  print_header "Setting up Gemini Code Assist"
-  
-  # Copy configuration file
-  cp .gemini-code-assist-cloud.yaml $HOME/.gemini-code-assist.yaml
-  print_success "Configured Gemini Code Assist"
-  
-  # Enable Developer Connect integration
-  PROJECT_ID=$(gcloud config get-value project)
-  REGION=$(gcloud config get-value compute/region || echo "us-central1")
-  
-  print_info "Enabling Developer Connect APIs..."
-  gcloud services enable cloudresourcemanager.googleapis.com --project=$PROJECT_ID
-  gcloud services enable developerconnect.googleapis.com --project=$PROJECT_ID
-  gcloud services enable cloudaicompanion.googleapis.com --project=$PROJECT_ID
-  
-  print_info "Registering repository with Developer Connect..."
-  REPO_NAME=orchestra-main
-  gcloud alpha developer-connect repos register github_$REPO_NAME \
-    --gitlab-host-uri="https://github.com" \
-    --project=$PROJECT_ID \
-    --region=$REGION
-  
-  print_info "Enabling Gemini Code Assist for the repository..."
-  gcloud alpha genai code customize enable \
-    --project=$PROJECT_ID \
-    --region=$REGION \
-    --repos=github_$REPO_NAME
-  
-  print_success "Gemini Code Assist setup complete"
-}
-
-# Configure AI Memory System
-setup_ai_memory() {
-  print_header "Setting up AI Memory System"
-  
-  # Create AI memory directory
-  mkdir -p $HOME/.ai-memory
-  
-  # Copy existing memory files
-  if [ -d "$PWD/.ai-memory" ]; then
-    cp -r $PWD/.ai-memory/* $HOME/.ai-memory/
-    print_success "Copied existing AI memory files"
-  else
-    print_info "Creating new AI memory system..."
-    
-    # Create initialize.py script
-    cat > $HOME/.ai-memory/initialize.py << 'EOF'
-#!/usr/bin/env python3
-"""
-Initialize AI Memory System for GCP Cloud Workstations environment.
-"""
-import os
-import json
-from datetime import datetime
-import logging
-import sys
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger('ai-memory-init')
-
-# Directory where this script is located
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.environ.get('HOME', '/home/user')
-
-# Performance-first priorities
-PRIORITIES = {
-    "name": "Performance-First Directives for GCP",
-    "version": "1.1.0",
-    "timestamp": datetime.now().isoformat(),
-    "priorities": {
-        "primary": ["performance", "optimization", "stability"],
-        "secondary": ["basic_security", "developer_experience"]
-    },
-    "environment": "gcp_cloud_workstation",
-    "tokens": {
-        "gcp": [
-            "GCP_MASTER_SERVICE_JSON", 
-            "GCP_PROJECT_AUTHENTICATION_EMAIL",
-            "GCP_PROJECT_ID", 
-            "GCP_REGION", 
-            "GCP_SECRET_MANAGEMENT_KEY",
-            "GCP_WORKLOAD_IDENTITY_PROVIDER", 
-            "VERTEX_AGENT_KEY"
-        ]
-    },
-    "philosophy": "GCP-focused project prioritizing performance over complex security measures",
-    "reference_files": ["PROJECT_PRIORITIES.md", "PERFORMANCE_FIRST_README.md"],
-    "directives": [
-        "Leverage GCP Cloud Workstations for development",
-        "Focus on performance and optimization over extensive security",
-        "Implement only basic security measures that don't impact performance",
-        "Use GCP Secret Manager for credentials",
-        "Prioritize deployment stability and reliability",
-        "Optimize for Vertex AI integration"
-    ],
-    "memory_metadata": {
-        "system_wide": True,
-        "persistence": "permanent",
-        "priority_level": "high",
-        "access_control": "all_assistants",
-        "context_aware": True,
-        "prompt_access": True
-    }
-}
-
-def initialize_memory_system():
-    """Initialize the AI memory system."""
-    try:
-        # Create necessary directories
-        os.makedirs(SCRIPT_DIR, exist_ok=True)
-        
-        # Create core memory files
-        with open(os.path.join(SCRIPT_DIR, 'performance_priorities.json'), 'w') as f:
-            json.dump(PRIORITIES, f, indent=2)
-            logger.info("Created performance_priorities.json in memory system")
-        
-        # Create index file
-        with open(os.path.join(SCRIPT_DIR, 'memory_index.json'), 'w') as f:
-            memory_index = {
-                "version": "1.1.0",
-                "last_updated": datetime.now().isoformat(),
-                "environment": "gcp_cloud_workstation",
-                "memory_files": [
-                    {"file": "performance_priorities.json", "type": "project_priority", "access": "all_assistants"}
-                ],
-                "system_directive": "Prioritize performance and optimization in GCP environment"
-            }
-            json.dump(memory_index, f, indent=2)
-            logger.info("Created memory_index.json in memory system")
-        
-        # Create project structure file
-        with open(os.path.join(SCRIPT_DIR, 'project_structure.json'), 'w') as f:
-            project_structure = {
-                "name": "Orchestra Project",
-                "version": "1.0.0",
-                "environment": "gcp_cloud_workstation",
-                "components": [
-                    {
-                        "name": "ai-orchestra",
-                        "path": "/home/user/persistent/orchestra-main/ai-orchestra",
-                        "description": "Core Python library with memory, configuration, interfaces"
-                    },
-                    {
-                        "name": "services",
-                        "path": "/home/user/persistent/orchestra-main/services",
-                        "description": "Admin API and other related services"
-                    },
-                    {
-                        "name": "admin-interface",
-                        "path": "/home/user/persistent/orchestra-main/admin-interface",
-                        "description": "React-based admin dashboard"
-                    },
-                    {
-                        "name": "wif_implementation",
-                        "path": "/home/user/persistent/orchestra-main/wif_implementation",
-                        "description": "Workload Identity Federation implementation"
-                    }
-                ]
-            }
-            json.dump(project_structure, f, indent=2)
-            logger.info("Created project_structure.json in memory system")
-            
-        logger.info("Successfully initialized AI memory system")
-        return True
-        
-    except Exception as e:
-        logger.error(f"Error initializing memory system: {e}")
-        return False
-
-if __name__ == "__main__":
-    success = initialize_memory_system()
-    sys.exit(0 if success else 1)
-EOF
-    
-    # Make the script executable
-    chmod +x $HOME/.ai-memory/initialize.py
-    
-    # Run the initialization script
-    python3 $HOME/.ai-memory/initialize.py
-    print_success "Created and initialized AI memory system"
-  fi
-}
-
-# Configure VSCode Settings
-setup_vscode() {
-  print_header "Configuring VSCode Settings"
-  
-  mkdir -p $HOME/.vscode
-  
-  cat > $HOME/.vscode/settings.json << EOF
-{
-  "editor.formatOnSave": true,
-  "editor.codeActionsOnSave": {
-    "source.fixAll": true
-  },
-  "python.linting.enabled": true,
-  "python.linting.pylintEnabled": true,
-  "python.formatting.provider": "black",
-  "workbench.colorTheme": "Default Dark+",
-  "workbench.iconTheme": "material-icon-theme",
-  "terminal.integrated.defaultProfile.linux": "bash",
-  "terminal.integrated.env.linux": {
-    "PYTHONPATH": "\${workspaceFolder}"
-  },
-  "cloudcode.gke": {
-    "projectIds": ["${PROJECT_ID}"]
-  },
-  "cloudcode.deployment": {
-    "unifiedDeployment": true
-  },
-  "cloudcode.cloudRun": {
-    "projectIds": ["${PROJECT_ID}"]
-  },
-  "cloudcode.cloudRunLocations": [
-    "us-central1"
-  ],
-  "gemini-code-assist.enabled": true,
-  "gemini-code-assist.inlineChat.enabled": true,
-  "gemini-code-assist.inlineCompletions.enabled": true,
-  "gemini-code-assist.quickFixes.enabled": true,
-  "gemini-code-assist.docFinder.enabled": true
-}
-EOF
-  
-  print_success "VS Code configured for GCP Cloud Workstations"
-}
-
-# Setup Roo and Cline code assistants
-setup_ai_assistants() {
-  print_header "Setting up additional AI code assistants"
-  
-  # Roo and Cline are handled via VS Code extensions
-  # Install the necessary extensions
-  
-  code --install-extension anthropic.claude \
-       --install-extension googlecloudtools.cloudcode
-
-  # Create MCP configuration for AI assistants
-  mkdir -p $HOME/.config/mcp
-  
-  cat > $HOME/.config/mcp/config.json << EOF
-{
-  "version": "1.0.0",
-  "assistants": {
-    "gemini": {
-      "enabled": true,
-      "model": "gemini-2.5-pro-latest",
-      "memory_enabled": true,
-      "memory_path": "$HOME/.ai-memory"
-    },
-    "claude": {
-      "enabled": true,
-      "endpoint": "claude-3-opus-20240229",
-      "memory_enabled": true,
-      "memory_path": "$HOME/.ai-memory"
-    },
-    "roo": {
-      "enabled": true,
-      "memory_enabled": true,
-      "memory_path": "$HOME/.ai-memory"
-    },
-    "cline": {
-      "enabled": true,
-      "memory_enabled": true,
-      "memory_path": "$HOME/.ai-memory"
-    }
-  },
-  "mcp_memory": {
-    "enabled": true,
-    "storage": {
-      "type": "firestore",
-      "collection": "ai_memory",
-      "project_id": "${PROJECT_ID}"
-    },
-    "shared": true
-  }
-}
-EOF
-
-  print_success "AI assistants configured with MCP memory integration"
-}
-
-# Main execution
-print_header "Setting up AI coding assistance for GCP Cloud Workstations"
-
-# Get necessary environment variables
-PROJECT_ID=$(gcloud config get-value project)
-if [ -z "$PROJECT_ID" ]; then
-  print_error "No GCP project ID found. Please run 'gcloud config set project YOUR_PROJECT_ID' first."
-  exit 1
-fi
-
-# Run setup functions
-setup_gemini
-setup_ai_memory
-setup_vscode
-setup_ai_assistants
-
-print_header "AI Coding Assistance Setup Complete!"
-echo "Your GCP Cloud Workstation is now configured with:"
-echo "  ✓ Gemini Code Assist with enhanced GCP integration"
-echo "  ✓ AI memory system for context-aware assistance"
-echo "  ✓ VSCode optimized for GCP Cloud Workstation"
-echo "  ✓ Additional AI assistants (Roo, Cline) with MCP memory integration"
-echo ""
-echo "To verify the setup, open VS Code and start using AI assistance with:"
-echo "  - Gemini: Ctrl+I or Cmd+I"
-echo "  - Roo: Via the VS Code extension panel"
-echo "  - Cline: Via the VS Code extension panel"
-```
-
-### 3. MCP Server Setup for Cloud Workstations
-
-Create a script to set up the MCP server in the Cloud Workstation environment:
-
-```bash
-#!/bin/bash
-# setup_mcp_server.sh
-
-set -e
-
-# ANSI color codes
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
-
-print_header() {
-  echo -e "\n${BLUE}====== $1 ======${NC}\n"
-}
-
-print_success() {
-  echo -e "${GREEN}✅ $1${NC}"
-}
-
-print_info() {
-  echo -e "${YELLOW}ℹ️ $1${NC}"
-}
-
-print_error() {
-  echo -e "${RED}❌ $1${NC}"
-}
-
-PROJECT_DIR="/home/user/persistent/orchestra-main"
-MCP_SERVER_DIR="$PROJECT_DIR/mcp_server"
-
-print_header "Setting up MCP Server for GCP Cloud Workstations"
-
-# Create systemd service file for the MCP server
-create_service_file() {
-  print_info "Creating MCP server service file..."
-  
-  mkdir -p $MCP_SERVER_DIR/scripts
-  
-  cat > $MCP_SERVER_DIR/scripts/mcp-server.service << EOF
-[Unit]
-Description=Model Context Protocol Server for AI Assistance
-After=network.target
-
-[Service]
-Type=simple
-User=user
-WorkingDirectory=$MCP_SERVER_DIR
-ExecStart=/usr/bin/python3 $MCP_SERVER_DIR/run_mcp_server.py
-Restart=on-failure
-RestartSec=5
-Environment=PYTHONPATH=$PROJECT_DIR
-Environment=MCP_SERVER_CONFIG=$MCP_SERVER_DIR/config.yaml
-Environment=GOOGLE_APPLICATION_CREDENTIALS=/tmp/service-account.json
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-  print_success "Created MCP server service file"
-}
-
-# Create MCP server configuration for GCP
-create_config_file() {
-  print_info "Creating MCP server configuration..."
-  
-  cat > $MCP_SERVER_DIR/config.yaml << EOF
-# MCP Server Configuration for GCP Cloud Workstations
-version: 1.0.
+# View workstation logs
+gcloud workstations diagnose get-logs CLUSTER_ID CONFIG_ID WORKSTATION_ID
