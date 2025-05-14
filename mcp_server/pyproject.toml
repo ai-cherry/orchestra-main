@@ -2,7 +2,7 @@
 name = "mcp-server"
 version = "0.1.0"
 description = "Model Context Protocol (MCP) Memory System"
-authors = ["AI Orchestra Team <info@example.com>"]
+authors = ["Lynn Musil <scoobyjava@cherry-ai.me>"]
 readme = "README.md"
 packages = [{include = "mcp_server"}]
 
