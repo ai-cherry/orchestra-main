@@ -8,11 +8,11 @@ FROM python:3.11-slim as builder
 WORKDIR /app
 
 # Install Poetry
-RUN pip install --no-cache-dir poetry==1.6.1 \
+RUN pip install --no-cache-dir poetry==1.8.2 \
     && poetry config virtualenvs.create false
 
 # Copy Poetry configuration files
-COPY pyproject.toml poetry.lock* ./
+COPY ../pyproject.toml ../poetry.lock* ./
 
 # Install dependencies only (without development dependencies)
 RUN poetry install --no-interaction --no-ansi --without dev
