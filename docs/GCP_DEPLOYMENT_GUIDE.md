@@ -51,17 +51,17 @@ The Dev Container configuration (`.devcontainer/devcontainer.json`) provides a c
 
 ## Manual Deployment
 
-For manual deployments, use the consolidated `deploy.sh` script:
+For manual deployments, use the consolidated `deploy_gcp_infra.sh` script:
 
 ```bash
 # Make the script executable
-chmod +x deploy.sh
+chmod +x deploy_gcp_infra.sh
 
 # Basic deployment with defaults
-./deploy.sh
+./deploy_gcp_infra.sh
 
 # Deployment with custom settings
-./deploy.sh \
+./deploy_gcp_infra.sh \
   --project my-project-id \
   --region us-central1 \
   --service my-service \
@@ -146,7 +146,7 @@ Create environment files for different deployment environments:
 
 ### Command-Line Parameters
 
-The `deploy.sh` script supports many parameters:
+The `deploy_gcp_infra.sh` script supports many parameters:
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
@@ -188,7 +188,7 @@ The `deploy.sh` script supports many parameters:
 ### Logs
 - Detailed logs are available in the GitHub Actions output
 - Cloud Run logs can be viewed in the Cloud Run console under the "Logs" tab
-- For manual deployments, check the logs output by the `deploy.sh` script
+- For manual deployments, check the logs output by the `deploy_gcp_infra.sh` script
 
 ## GitHub Codespaces Setup
 
