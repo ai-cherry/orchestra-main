@@ -1,241 +1,175 @@
-# GCP Workspace Migration Guide
+# AI Orchestra GCP Migration Guide
 
-This guide provides instructions for archiving your workspace and migrating it to a new Google Cloud environment.
+This guide provides detailed instructions for completing the migration to Google Cloud Platform. It addresses all critical issues blocking the deployment process and provides step-by-step procedures for a successful migration.
 
-## Overview
+## Critical Issues Fixed
 
-The provided scripts facilitate:
+This migration addresses the following critical issues that were blocking deployment:
 
-1. **Archiving** all source code, notebooks, and configuration files into a tarball
-2. **Uploading** the archive to a Google Cloud Storage bucket
-3. **Restoring** the workspace in a new Vertex AI Workbench instance or Google Cloud Workstation
+1. **Poetry Configuration Format Mismatch**: Fixed the incompatibility between `pyproject.toml` format and Poetry expectations
+2. **Service Account Permissions**: Added necessary IAM roles to the build service account
+3. **Deployment Process Standardization**: Consolidated multiple approaches into a single, reliable deployment pipeline
 
 ## Prerequisites
 
-- Google Cloud SDK (`gcloud` command-line tool) installed and configured
-- Authenticated access to GCP and permissions to write to the target bucket
-- Sufficient storage space for the archive creation
+Before beginning the migration, ensure you have:
 
-## Migration Scripts
+- Google Cloud SDK (`gcloud`) installed and configured
+- Docker installed and configured
+- Access to the GCP project (`cherry-ai-project`)
+- GitHub repository access with admin permissions
+- Poetry 1.7.0 or higher installed
 
-Two scripts are provided for the migration process:
+## Migration Steps
 
-1. `gcp_archive_migrate.sh` - Creates an archive of your current workspace and uploads it to GCS
-2. `gcp_archive_restore.sh` - Downloads and extracts the archive in a new environment
+### 1. Fix Poetry Configuration
 
-## Step 1: Archive and Upload
+The `services/admin-api/pyproject.toml` file has been updated to use the correct Poetry format. This resolves the build failure where Poetry was unable to find the `[tool.poetry]` section.
 
-### Usage
+**Verification:**
+```bash
+grep "\[tool.poetry\]" services/admin-api/pyproject.toml
+```
 
-Make the script executable and run it:
+If this returns the section header, the fix has been successfully applied.
+
+### 2. Fix Service Account Permissions
+
+The service account used for Cloud Build was missing necessary permissions, particularly `roles/logging.logWriter`. Run the provided script to add all required permissions:
 
 ```bash
-chmod +x gcp_archive_migrate.sh
-./gcp_archive_migrate.sh
+# Make the script executable if needed
+chmod +x fix_service_account_permissions.sh
+
+# Run the script
+./fix_service_account_permissions.sh
 ```
 
-### What This Script Does
+**Verification:**
+After running the script, you should see confirmation that all roles were successfully granted to the service account.
 
-- Creates a timestamped `.tar.gz` archive of your workspace
-- Excludes unnecessary files (`.git`, `__pycache__`, `.env`, etc.)
-- Uploads the archive to `gs://cherry-ai-project-migration/` bucket
-- Creates and uploads a metadata JSON file with archive information
-- Verifies the upload was successful
-- Displays detailed restoration instructions
+### 3. Deploy Using the Standardized Process
 
-### Configuration
-
-By default, the script uses:
-- Bucket: `gs://cherry-ai-project-migration/`
-- Archive name: `orchestra_migration_[TIMESTAMP].tar.gz`
-
-To customize these settings, modify the variables at the top of the script:
+A new standardized deployment script has been created that consolidates the various approaches and includes robust validation and error handling:
 
 ```bash
-TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-ARCHIVE_NAME="orchestra_migration_${TIMESTAMP}.tar.gz"
-GCS_BUCKET="gs://cherry-ai-project-migration"
+# Make the script executable if needed
+chmod +x deploy_to_gcp.sh
+
+# For a basic deployment with defaults
+./deploy_to_gcp.sh
+
+# For a customized deployment
+./deploy_to_gcp.sh \
+  --project-id=cherry-ai-project \
+  --region=us-central1 \
+  --service=admin-api \
+  --source-dir=services/admin-api \
+  --min-instances=1 \
+  --max-instances=5 \
+  --env-vars="DEBUG=false,LOG_LEVEL=info"
 ```
 
-## Step 2: Restore in New Environment
+**Available Parameters:**
+- `--project-id`: GCP project ID (default: cherry-ai-project)
+- `--region`: GCP region (default: us-central1)
+- `--service`: Service name (default: admin-api)
+- `--dockerfile`: Path to Dockerfile (default: services/admin-api/Dockerfile)
+- `--source-dir`: Source directory (default: services/admin-api)
+- `--min-instances`: Minimum instances (default: 0)
+- `--max-instances`: Maximum instances (default: 10)
+- `--memory`: Memory allocation (default: 1Gi)
+- `--cpu`: CPU allocation (default: 1)
+- `--env-vars`: Environment variables (comma-separated key=value pairs)
 
-### Usage
+### 4. Set Up GitHub Actions Workflow
 
-In your new Vertex AI Workbench instance or Google Cloud Workstation:
+A GitHub Actions workflow has been created that uses Workload Identity Federation for secure GCP authentication. This eliminates the need for storing service account keys in GitHub.
 
-1. Download both scripts:
+1. Ensure the repository has the following secrets configured:
+   - `GCP_PROJECT_ID`: Your GCP project ID
+   - `GCP_REGION`: Your preferred GCP region
+   - `GCP_ARTIFACT_REGISTRY`: The name of your Artifact Registry
+   - `GCP_WORKLOAD_IDENTITY_PROVIDER`: The full resource name of your Workload Identity Provider
+   - `GCP_SERVICE_ACCOUNT`: The email of your GCP service account
 
-```bash
-gsutil cp gs://cherry-ai-project-migration/gcp_archive_migrate.sh .
-gsutil cp gs://cherry-ai-project-migration/gcp_archive_restore.sh .
-chmod +x gcp_archive_restore.sh
-```
+2. The workflow will automatically deploy the admin-api service when:
+   - Code is pushed to main or develop branches
+   - Pull requests are opened against main or develop
+   - The workflow is manually triggered
 
-2. Run the restore script with required parameters:
+## Continuous Integration/Deployment
 
-```bash
-./gcp_archive_restore.sh --bucket gs://cherry-ai-project-migration --archive orchestra_migration_20250501_123456.tar.gz
-```
+The GitHub Actions workflow provides a robust CI/CD pipeline:
 
-Or use the short options:
+1. **Validation**: Checks that the Poetry configuration and Dockerfile are valid
+2. **Build**: Builds and pushes the Docker image to Artifact Registry
+3. **Deploy**: Deploys the image to Cloud Run
+4. **Verify**: Confirms the deployment is successful and healthy
+5. **Notify**: Posts status comments on pull requests
 
-```bash
-./gcp_archive_restore.sh -b gs://cherry-ai-project-migration -a orchestra_migration_20250501_123456.tar.gz
-```
+## Testing Your Migration
 
-3. Optionally specify a destination directory:
+To verify the migration was successful:
 
-```bash
-./gcp_archive_restore.sh -b gs://cherry-ai-project-migration -a orchestra_migration_20250501_123456.tar.gz -d /path/to/destination
-```
+1. Run the deployment script:
+   ```bash
+   ./deploy_to_gcp.sh
+   ```
 
-### Command-Line Options
+2. Visit the deployed service URL (provided at the end of deployment)
 
-```
-Usage: ./gcp_archive_restore.sh [options]
-
-Options:
-  -b, --bucket       GCS bucket URL (required, e.g. gs://cherry-ai-project-migration)
-  -a, --archive      Archive filename (required, e.g. orchestra_migration_20250501_123456.tar.gz)
-  -d, --directory    Destination directory (optional, defaults to current directory)
-  -h, --help         Show this help message
-```
-
-### What This Script Does
-
-- Downloads the specified archive from GCS
-- Downloads the associated metadata file (if available)
-- Extracts the archive
-- Sets correct permissions on shell scripts
-- Verifies the restoration was successful
-
-## Common Use Cases
-
-### 1. Migrating to a New Vertex AI Workbench Instance
-
-```bash
-# On original instance
-./gcp_archive_migrate.sh
-
-# Note the archive name from the output, e.g. orchestra_migration_20250501_123456.tar.gz
-
-# On new instance
-gcloud auth login
-gsutil cp gs://cherry-ai-project-migration/gcp_archive_restore.sh .
-chmod +x gcp_archive_restore.sh
-./gcp_archive_restore.sh -b gs://cherry-ai-project-migration -a orchestra_migration_20250501_123456.tar.gz
-```
-
-### 2. Migrating to a Google Cloud Workstation
-
-```bash
-# Upload both scripts to the GCS bucket from your original environment
-gsutil cp gcp_archive_migrate.sh gs://cherry-ai-project-migration/
-gsutil cp gcp_archive_restore.sh gs://cherry-ai-project-migration/
-
-# On original environment
-./gcp_archive_migrate.sh
-
-# On Cloud Workstation
-gsutil cp gs://cherry-ai-project-migration/gcp_archive_restore.sh .
-chmod +x gcp_archive_restore.sh
-./gcp_archive_restore.sh -b gs://cherry-ai-project-migration -a orchestra_migration_20250501_123456.tar.gz
-```
-
-### 3. Finding Available Archives
-
-To list available archives in the bucket:
-
-```bash
-gsutil ls gs://cherry-ai-project-migration/orchestra_migration_*.tar.gz
-```
-
-To list available metadata files:
-
-```bash
-gsutil ls gs://cherry-ai-project-migration/migration_metadata_*.json
-```
+3. Check the logs:
+   ```bash
+   gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=admin-api" --limit=10
+   ```
 
 ## Troubleshooting
 
-### Authentication Issues
+### Common Issues
 
-If you encounter authentication errors:
+1. **Docker Build Fails**:
+   - Verify that `pyproject.toml` has the `[tool.poetry]` section
+   - Check that `poetry.lock` is present and up-to-date
+   - Ensure Dockerfile has the correct `COPY` commands for Python files
 
-```bash
-# Login with your Google account
-gcloud auth login
+2. **Deployment Fails**:
+   - Check service account permissions
+   - Verify that all required APIs are enabled
+   - Look for quota issues or resource constraints
 
-# Or set up application default credentials
-gcloud auth application-default login
-```
+3. **Service Unhealthy**:
+   - Check the application logs for errors
+   - Verify that all environment variables are set correctly
+   - Confirm that the service has proper permissions to access other resources
 
-### Permission Issues
+### Getting Help
 
-If you don't have permission to access the bucket:
+If you encounter issues not covered in this guide:
 
-```bash
-# Check if you have the required permissions
-gsutil iam get gs://cherry-ai-project-migration
+1. Check the detailed logs:
+   ```bash
+   gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=admin-api" --limit=50
+   ```
 
-# Request access from your administrator or create a new bucket where you have permissions
-```
+2. Review the build logs:
+   ```bash
+   gcloud builds list --filter="source.repo_source.repo_name=github_ai-cherry_orchestra-main"
+   gcloud builds log [BUILD_ID]
+   ```
 
-### Disk Space Issues
+## Next Steps
 
-If you run out of disk space during archive creation:
+After completing the migration:
 
-1. Free up space by removing unnecessary files
-2. Modify the exclude patterns in `gcp_archive_migrate.sh` to exclude more directories
+1. Remove any deprecated deployment scripts
+2. Update documentation to reflect the new deployment process
+3. Train team members on using the new deployment workflow
+4. Consider setting up monitoring and alerting for the deployed services
 
-### Extraction Issues
+## References
 
-If archive extraction fails:
-
-1. Check if the archive was downloaded completely
-2. Verify you have write permissions in the destination directory
-3. Ensure you have sufficient disk space
-
-## Customization
-
-### Excluding Additional Files
-
-To exclude additional files/directories from the archive, modify the `EXCLUDE_PATTERNS` array in `gcp_archive_migrate.sh`:
-
-```bash
-EXCLUDE_PATTERNS=(
-  "--exclude=.git"
-  "--exclude=__pycache__"
-  "--exclude=*.pyc"
-  "--exclude=venv"
-  "--exclude=.venv"
-  "--exclude=node_modules"
-  "--exclude=.env"
-  "--exclude=*.log"
-  "--exclude=*.tar.gz"
-  "--exclude=your_additional_pattern"
-)
-```
-
-### Using a Different Bucket
-
-To use a different GCS bucket, modify the `GCS_BUCKET` variable in both scripts.
-
-## Security Considerations
-
-- The scripts don't handle sensitive data by default but be careful if your codebase contains credentials or tokens
-- Consider excluding sensitive files from the archive
-- Ensure the GCS bucket has appropriate access controls
-- Both scripts check for proper authentication before attempting operations
-
-## Next Steps After Migration
-
-After restoring your workspace:
-
-1. Install any required dependencies
-2. Reconfigure environment variables (especially those excluded in `.env` files)
-3. Verify that everything works as expected in the new environment
-
----
-
-For additional assistance or to report issues, please contact your system administrator or cloud support team.
+- [Google Cloud Run Documentation](https://cloud.google.com/run/docs)
+- [Workload Identity Federation](https://cloud.google.com/iam/docs/workload-identity-federation)
+- [Poetry Documentation](https://python-poetry.org/docs/)
+- [GitHub Actions Documentation](https://docs.github.com/en/actions)

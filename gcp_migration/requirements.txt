@@ -1,0 +1,18 @@
+# GCP-GitHub Integration Requirements
+
+# Google Cloud Libraries
+google-cloud-secretmanager>=2.18.0
+google-cloud-storage>=2.12.0
+google-api-python-client>=2.108.0
+google-auth>=2.22.0
+
+# GitHub Secret Encryption
+pynacl>=1.5.0
+cryptography>=41.0.0
+requests>=2.31.0
+
+# CLI and Utility Tools
+click>=8.1.7
+pydantic>=2.4.0
+python-dotenv>=1.0.0
+colorlog>=6.7.0

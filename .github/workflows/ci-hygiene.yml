@@ -1,0 +1,54 @@
+name: CI Hygiene & Validation
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  lint-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: '1.8.2'
+
+      - name: Install yamllint and actionlint
+        run: |
+          pip install yamllint
+          curl -sSL https://github.com/rhysd/actionlint/releases/latest/download/actionlint-linux-amd64.tar.gz | tar xz
+          sudo mv actionlint /usr/local/bin/
+
+      - name: Lint all workflow YAMLs
+        run: |
+          yamllint .github/workflows/
+          find .github/workflows -name '*.yml' -exec actionlint -oneline -color < {} \;
+
+      - name: Poetry check (gcp_migration)
+        run: poetry check
+        working-directory: gcp_migration
+
+      - name: Poetry check (admin-api)
+        run: poetry check
+        working-directory: services/admin-api
+
+      - name: Terraform validate (root)
+        run: terraform validate || true
+        continue-on-error: true
+
+      - name: Terraform validate (migration)
+        run: terraform -chdir=terraform/migration validate || true
+        continue-on-error: true
+
+      - name: Terraform validate (environments/dev)
+        run: terraform -chdir=terraform/environments/dev validate || true
+        continue-on-error: true

@@ -1,116 +1,200 @@
-# Google Cloud Platform Migration Toolkit
+# AI Orchestra GCP Migration Toolkit
 
-This toolkit provides sanitized scripts and templates for migrating a GCP project between organizations and setting up a hybrid IDE environment with Vertex AI. All sensitive information has been replaced with placeholders.
+This toolkit provides a collection of scripts and tools for migrating the AI Orchestra project to Google Cloud Platform.
 
-## Security Notice
+## Overview
 
-⚠️ **IMPORTANT**: These scripts handle sensitive GCP credentials and permissions. Before using:
+The AI Orchestra GCP Migration Toolkit includes:
 
-1. Replace all placeholders with your actual values
-2. Store credential files securely with `chmod 600` permissions
-3. Never commit credential files to version control
-4. Use the principle of least privilege when assigning service account roles
-5. Consider setting up key rotation practices
+1. Fixed migration scripts that address the issues found in the original implementation
+2. Permission-fixing utilities for Cloud Run and Vertex AI
+3. Simplified Cloud Run deployment tools
+4. Vertex AI connectivity testing utilities
+5. Local development configurations
 
-## Toolkit Components
+## Components
 
-### 1. Migration Script
-`sanitized_migration_script.sh` - Main script for migrating a GCP project to a different organization
+### Migration Scripts
 
-```bash
-# Make executable
-chmod +x sanitized_migration_script.sh
+- `execute_migration_fixed.sh` - Fixed version of the migration script that addresses authentication, building, and deployment issues
+- `execute_non_interactive.sh` - Non-interactive version that uses service account authentication instead of interactive login
+- `deploy_minimal_service.py` - Python script to deploy a minimal FastAPI service for testing Cloud Run
+- `test_vertex_ai.py` - Python script to test connectivity to Vertex AI
 
-# Review and replace placeholders
-nano sanitized_migration_script.sh
+### Permission Fixing Utilities
 
-# Run
-./sanitized_migration_script.sh
-```
+- `fix_cloud_run_access.sh` - Script to diagnose and fix Cloud Run access issues, generating Cloud Shell commands if needed
+- `fix_vertex_ai_auth.py` - Python script to set up Vertex AI authentication and permissions
 
-### 2. Service Account Key Management
-`sanitized_manage_keys.sh` - Script for managing service account keys
+### Terraform Configurations
 
-```bash
-# Make executable
-chmod +x sanitized_manage_keys.sh
+- `/terraform/migration/` - Directory containing clean Terraform configurations for migration
 
-# Get help
-./sanitized_manage_keys.sh help
+## Usage
 
-# Create a key template
-./sanitized_manage_keys.sh template
-```
+### Complete Migration
 
-### 3. Service Account Key Template
-`sanitized-service-account-key-template.json` - Template for service account credentials
-
-### 4. Validation Script
-`sanitized_validate_migration.sh` - Validates the migration was successful
+To execute the complete migration process:
 
 ```bash
-# Make executable
-chmod +x sanitized_validate_migration.sh
-
-# Run after migration
-./sanitized_validate_migration.sh
+./gcp_migration/execute_non_interactive.sh
 ```
 
-### 5. Workstation Configuration
-`sanitized_workstation_config.tf` - Terraform configuration for cloud workstations
+This script will:
+1. Install required dependencies
+2. Set up proper authentication using the service account
+3. Configure local infrastructure
+4. Plan Terraform deployment
+5. Deploy a minimal test service
+6. Test Vertex AI connectivity
+7. Generate a final migration report
+
+### Fix Cloud Run Access Issues
+
+If you encounter permission issues with Cloud Run services:
 
 ```bash
-# Initialize Terraform
-terraform init
-
-# Apply configuration
-terraform apply -var="project_id=YOUR_PROJECT_ID" -var="org_id=YOUR_ORGANIZATION_ID"
+./gcp_migration/fix_cloud_run_access.sh
 ```
 
-## Migration Process
+This script will:
+1. Check current Cloud Run service configuration
+2. Try different approaches to fix the permissions
+3. Redeploy the service with correct settings if needed
+4. Generate Cloud Shell commands for manual execution if automatic fixes fail
 
-1. **Service Account Setup**
-   - Replace placeholders in the key template
-   - Set secure permissions: `chmod 600 service-account-key.json`
+### Fix Vertex AI Authentication
 
-2. **IAM Preparation**
-   - Grant required roles to the service account
-   - Wait 5 minutes for IAM propagation (critical step)
+To set up proper Vertex AI permissions:
 
-3. **Project Migration**
-   - Run the migration script
-   - Verify organization membership immediately
+```bash
+./gcp_migration/fix_vertex_ai_auth.py [--project-id PROJECT_ID] [--service-account SERVICE_ACCOUNT] [--key-path KEY_PATH]
+```
 
-4. **Enable Required Services**
-   - Enable Vertex AI, Workstations, Redis, and AlloyDB APIs
+This script will:
+1. Set up necessary IAM roles for Vertex AI access
+2. Create a service account key if needed
+3. Test Vertex AI connectivity to verify the configuration
 
-5. **Infrastructure Deployment**
-   - Apply Terraform configuration for workstations
-   - Provision with required GPU and disk resources
+### Deploy Test Service
 
-6. **Validation**
-   - Verify project organization membership
-   - Check service account roles
-   - Test resource access
+To deploy only the minimal test service:
 
-## Critical Success Factors
+```bash
+python3 ./gcp_migration/deploy_minimal_service.py
+```
 
-1. **IAM Propagation**: Always wait 5 minutes after granting roles
-2. **Key Security**: Maintain strict 600 permissions on key files
-3. **Validation**: Always verify project organization membership immediately
-4. **Roles**: Ensure service account has project mover and creator roles at organization level
+### Test Vertex AI Connectivity
+
+To test connectivity to Vertex AI:
+
+```bash
+python3 ./gcp_migration/test_vertex_ai.py
+```
+
+## Fixed Issues
+
+This toolkit addresses the following issues found in the original migration implementation:
+
+1. **Authentication Issues**
+   - Now using service account authentication instead of interactive login
+   - Added Docker authentication configuration
+   - Provides tools to diagnose and fix permissions problems
+
+2. **Docker Build Issues**
+   - Fixed Dockerfile to handle missing poetry.lock file
+   - Added fallback for Docker builds
+   - Implemented robust error handling
+
+3. **Terraform Configuration Issues**
+   - Using local backend for initial testing
+   - Created clean Terraform files without conflicts
+   - Simplified resource declarations
+
+4. **Vertex AI Integration Issues**
+   - Created simpler test script using the correct Google Cloud libraries
+   - Fixed permission issues with IAM role assignments
+   - Added detailed error reporting
+
+## Google Cloud Shell Commands
+
+For some operations, it may be necessary to use Google Cloud Shell. The `fix_cloud_run_access.sh` script generates a file with Cloud Shell commands that can be run to fix permission issues:
+
+```bash
+# Run the fix script to generate Cloud Shell commands
+./gcp_migration/fix_cloud_run_access.sh
+
+# Copy the generated commands and run them in Cloud Shell
+cat gcp_migration/cloud_shell_commands.sh
+```
+
+## Directory Structure
+
+```
+gcp_migration/
+├── execute_migration_fixed.sh      # Main migration script (fixed version)
+├── execute_non_interactive.sh      # Non-interactive migration script
+├── deploy_minimal_service.py       # Minimal service deployment
+├── test_vertex_ai.py               # Vertex AI connectivity test
+├── fix_cloud_run_access.sh         # Cloud Run permission fixing utility
+├── fix_vertex_ai_auth.py           # Vertex AI authentication utility
+├── migration_logs/                 # Migration logs and reports
+└── model_configs/                  # Model configuration files
+
+terraform/migration/
+├── main.tf                         # Main Terraform configuration
+├── variables.tf                    # Variable definitions
+├── outputs.tf                      # Output definitions
+├── backend.tf                      # Backend configuration
+└── monitoring.tf                   # Monitoring configuration
+```
 
 ## Troubleshooting
 
-1. **Permission Denied**: Ensure IAM roles have propagated (wait 5 minutes)
-2. **Organization Not Found**: Verify organization ID format
-3. **Service Account Issues**: Verify key is valid and has required permissions
-4. **Terraform Errors**: Ensure Google provider is properly configured
+### Authentication Issues
 
-## Customization
+If you encounter authentication issues:
 
-Modify these scripts based on your requirements:
-- GPU type and count in the workstation configuration
-- Disk sizes for persistent storage
-- Number of workstation instances
-- Additional services to enable
+```bash
+# Check current authentication
+gcloud auth list
+
+# Create a service account key for local testing
+./gcp_migration/fix_vertex_ai_auth.py --key-path=/path/to/key.json
+```
+
+### Cloud Run Access Issues
+
+If Cloud Run services return 403 Forbidden:
+
+```bash
+# Run the fix script
+./gcp_migration/fix_cloud_run_access.sh
+
+# Or manually update the service to allow unauthenticated access
+gcloud run services update SERVICE_NAME --region=REGION --allow-unauthenticated
+```
+
+### Terraform State Issues
+
+If Terraform state management fails:
+
+```bash
+# Use local backend
+cd terraform/migration
+terraform init -reconfigure
+```
+
+## Logs and Reports
+
+Migration logs and reports are stored in:
+
+```
+gcp_migration/migration_logs/
+```
+
+Key files include:
+- `migration_execution_YYYYMMDD_HHMMSS.log` - Detailed execution log
+- `migration_final_report.md` - Final migration report
+- `vertex_ai_test_report.json` - Vertex AI test results
+- `fix_permissions_YYYYMMDD_HHMMSS.log` - Permission fix log

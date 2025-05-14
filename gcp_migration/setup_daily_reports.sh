@@ -1,0 +1,192 @@
+#!/bin/bash
+# Setup script for AI Orchestra GCP Migration daily status reports
+# This script configures automated daily status reports using cron
+
+set -e  # Exit on any error
+
+# Default values
+OUTPUT_TYPE="file"
+OUTPUT_PATH="reports"
+EMAIL_RECIPIENTS=""
+SMTP_SERVER="localhost"
+SMTP_PORT=25
+SMTP_USER=""
+SMTP_PASSWORD=""
+GCS_BUCKET=""
+METRICS=false
+REPORT_TIME="07:00"  # Default time for daily reports (7 AM)
+
+print_usage() {
+  echo "Usage: $0 [options]"
+  echo "Options:"
+  echo "  --output TYPE          Output type (file, email, gcs) [default: file]"
+  echo "  --path DIR             Output directory for file reports [default: reports]"
+  echo "  --email-recipients LIST Comma-separated list of email recipients"
+  echo "  --smtp-server SERVER   SMTP server for sending emails [default: localhost]"
+  echo "  --smtp-port PORT       SMTP port [default: 25]"
+  echo "  --smtp-user USER       SMTP username for authentication"
+  echo "  --smtp-password PASS   SMTP password for authentication"
+  echo "  --gcs-bucket BUCKET    GCS bucket name for GCS output"
+  echo "  --metrics              Include performance metrics in reports [default: false]"
+  echo "  --time HH:MM           Time to send daily reports [default: 07:00]"
+  echo "  --help                 Show this help message"
+}
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --output)
+      OUTPUT_TYPE="$2"
+      shift 2
+      ;;
+    --path)
+      OUTPUT_PATH="$2"
+      shift 2
+      ;;
+    --email-recipients)
+      EMAIL_RECIPIENTS="$2"
+      shift 2
+      ;;
+    --smtp-server)
+      SMTP_SERVER="$2"
+      shift 2
+      ;;
+    --smtp-port)
+      SMTP_PORT="$2"
+      shift 2
+      ;;
+    --smtp-user)
+      SMTP_USER="$2"
+      shift 2
+      ;;
+    --smtp-password)
+      SMTP_PASSWORD="$2"
+      shift 2
+      ;;
+    --gcs-bucket)
+      GCS_BUCKET="$2"
+      shift 2
+      ;;
+    --metrics)
+      METRICS=true
+      shift
+      ;;
+    --time)
+      REPORT_TIME="$2"
+      shift 2
+      ;;
+    --help)
+      print_usage
+      exit 0
+      ;;
+    *)
+      echo "Error: Unknown option $1"
+      print_usage
+      exit 1
+      ;;
+  esac
+done
+
+# Validate arguments
+if [ "$OUTPUT_TYPE" == "email" ] && [ -z "$EMAIL_RECIPIENTS" ]; then
+  echo "Error: Email recipients are required for email output"
+  print_usage
+  exit 1
+fi
+
+if [ "$OUTPUT_TYPE" == "gcs" ] && [ -z "$GCS_BUCKET" ]; then
+  echo "Error: GCS bucket is required for GCS output"
+  print_usage
+  exit 1
+fi
+
+# Extract hours and minutes from report time
+REPORT_HOUR=$(echo "$REPORT_TIME" | cut -d ':' -f 1)
+REPORT_MINUTE=$(echo "$REPORT_TIME" | cut -d ':' -f 2)
+
+# Construct the command to run
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+REPORT_SCRIPT="${SCRIPT_DIR}/generate_status_report.py"
+COMMAND="$REPORT_SCRIPT --output=$OUTPUT_TYPE"
+
+if [ "$OUTPUT_TYPE" == "file" ]; then
+  COMMAND="$COMMAND --path=$OUTPUT_PATH"
+elif [ "$OUTPUT_TYPE" == "email" ]; then
+  COMMAND="$COMMAND --recipients=$EMAIL_RECIPIENTS --smtp-server=$SMTP_SERVER --smtp-port=$SMTP_PORT"
+  if [ -n "$SMTP_USER" ]; then
+    COMMAND="$COMMAND --smtp-user=$SMTP_USER --smtp-password=$SMTP_PASSWORD"
+  fi
+elif [ "$OUTPUT_TYPE" == "gcs" ]; then
+  COMMAND="$COMMAND --bucket=$GCS_BUCKET"
+fi
+
+if [ "$METRICS" = true ]; then
+  COMMAND="$COMMAND --metrics"
+fi
+
+# Create a log directory
+LOG_DIR="${SCRIPT_DIR}/logs"
+mkdir -p "$LOG_DIR"
+
+# Add logging to the command
+COMMAND="$COMMAND >> $LOG_DIR/status_report_\$(date +\%Y\%m\%d).log 2>&1"
+
+# Create the cron job
+CRON_JOB="$REPORT_MINUTE $REPORT_HOUR * * * $COMMAND"
+
+# Backup existing crontab
+crontab -l > /tmp/crontab.backup 2>/dev/null || echo "No existing crontab"
+
+# Check if the cron job already exists
+if grep -q "$REPORT_SCRIPT" /tmp/crontab.backup; then
+  echo "Updating existing cron job..."
+  # Remove existing cron job
+  grep -v "$REPORT_SCRIPT" /tmp/crontab.backup > /tmp/crontab.new
+  # Add the new cron job
+  echo "$CRON_JOB" >> /tmp/crontab.new
+else
+  echo "Adding new cron job..."
+  # Add the new cron job to the existing crontab
+  cp /tmp/crontab.backup /tmp/crontab.new
+  echo "$CRON_JOB" >> /tmp/crontab.new
+fi
+
+# Install the new crontab
+crontab /tmp/crontab.new
+rm /tmp/crontab.new
+
+echo "Daily status reports have been scheduled to run at $REPORT_TIME"
+echo "Report configuration:"
+echo "  Output type: $OUTPUT_TYPE"
+
+if [ "$OUTPUT_TYPE" == "file" ]; then
+  echo "  Output directory: $OUTPUT_PATH"
+elif [ "$OUTPUT_TYPE" == "email" ]; then
+  echo "  Email recipients: $EMAIL_RECIPIENTS"
+  echo "  SMTP server: $SMTP_SERVER:$SMTP_PORT"
+elif [ "$OUTPUT_TYPE" == "gcs" ]; then
+  echo "  GCS bucket: $GCS_BUCKET"
+fi
+
+echo "  Include metrics: $METRICS"
+echo "  Logs will be written to: $LOG_DIR"
+
+# Create a convenient script to generate an on-demand report
+ON_DEMAND_SCRIPT="${SCRIPT_DIR}/generate_report_now.sh"
+echo "#!/bin/bash" > "$ON_DEMAND_SCRIPT"
+echo "# Script to generate an on-demand status report" >> "$ON_DEMAND_SCRIPT"
+echo "# Generated by setup_daily_reports.sh" >> "$ON_DEMAND_SCRIPT"
+echo "" >> "$ON_DEMAND_SCRIPT"
+echo "$(echo "$COMMAND" | sed 's/>>.*//') \"\$@\"" >> "$ON_DEMAND_SCRIPT"
+chmod +x "$ON_DEMAND_SCRIPT"
+
+echo ""
+echo "A script for generating on-demand reports has been created: $ON_DEMAND_SCRIPT"
+echo "You can run it with:"
+echo "  $ON_DEMAND_SCRIPT"
+echo ""
+echo "To view the current cron jobs:"
+echo "  crontab -l"
+echo ""
+echo "To test the report generation immediately:"
+echo "  $ON_DEMAND_SCRIPT"

@@ -1,240 +1,163 @@
-# GCP Migration Toolkit
+# AI Orchestra GCP Migration Framework
 
-## Overview
+This directory contains the unified framework for migrating AI Orchestra to Google Cloud Platform. The framework provides a structured, phased approach to migration with built-in checkpointing, validation, and reporting.
 
-A comprehensive toolkit for migrating from GitHub Codespaces to Google Cloud Workstations, providing seamless transition with minimal disruption to development workflows.
+## Key Components
 
-This toolkit simplifies the migration process by automating resource inventories, handling repository transfers, managing secrets, and configuring GCP Workstation environments that replicate your existing GitHub Codespaces setup.
+### 1. Unified Client Libraries
 
-## Key Features
+| Component | Description |
+|-----------|-------------|
+| [`mcp_client_unified.py`](./mcp_client_unified.py) | Unified MCP client with comprehensive error handling, connection pooling, and async support |
+| [`circuit_breaker_unified.py`](./circuit_breaker_unified.py) | Thread-safe circuit breaker implementation for resilient service communication |
 
-- **Comprehensive Pre-Migration Assessment**: Automatically inventory repositories, extensions, dependencies, and configurations
-- **Secure Resource Migration**: Safely transfer repositories, secrets, and configurations with validation at each step
-- **Infrastructure as Code**: Generate Terraform configurations for GCP Workstations environments
-- **AI Coding Tool Integration**: Seamlessly configure Gemini Code Assist and other AI tools in your new environment
-- **Resilient Operations**: Built-in circuit breakers, retry mechanisms, and validation ensure robust migration
-- **Multiple Interfaces**: Use the toolkit via CLI, REST API, or programmatic Python interface
+### 2. Migration Execution Framework
 
-## Installation
+| Component | Description |
+|-----------|-------------|
+| [`execute_unified_migration.py`](./execute_unified_migration.py) | Core migration executor with phased approach and checkpointing |
+| [`run_unified_migration.sh`](./run_unified_migration.sh) | User-friendly script for running migrations with various options |
 
-### Using Poetry (Recommended)
+### 3. Validation Tools
 
-```bash
-# Clone this repository
-git clone https://github.com/your-org/gcp-migration.git
-cd gcp-migration
+| Component | Description |
+|-----------|-------------|
+| [`validate_migration.py`](./validate_migration.py) | Toolset for validating migration success with specific test cases |
+| [`MIGRATION_MONITORING_README.md`](./MIGRATION_MONITORING_README.md) | Documentation for ongoing monitoring of migrated infrastructure |
 
-# Install dependencies using Poetry
-poetry install
+## Migration Phases
 
-# Activate the virtual environment
-poetry shell
-```
+The migration process is broken down into these phases:
 
-### Using pip
+1. **Initialization**: Environment detection, authentication validation, and dependency checking
+2. **Infrastructure**: Setting up core GCP infrastructure, workstations, and security configuration
+3. **Database**: Setting up AlloyDB instances, schema migration, and data migration
+4. **Vector Search**: Creating and optimizing vector indices with circuit breaker patterns
+5. **APIs**: Deploying and configuring API services
+6. **Validation**: Comprehensive testing of connectivity, performance, and security
+7. **Finalization**: Cleanup, documentation updates, and report generation
 
-```bash
-# Install from PyPI
-pip install gcp-migration
+## How to Use
 
-# Or install directly from GitHub
-pip install git+https://github.com/your-org/gcp-migration.git
-```
+### Basic Usage
 
-## Prerequisites
-
-- Python 3.11+
-- Google Cloud SDK installed and configured
-- Access to your GitHub organization/repositories
-- Appropriate GCP permissions to create resources
-
-## Quick Start
-
-### Basic Migration
+To run a full migration:
 
 ```bash
-# Initialize a migration configuration template
-gcp-migrate init --github-repo your-org/your-repo --gcp-project your-gcp-project-id
-
-# Edit the generated configuration file with your specific details
-# Then run the migration
-gcp-migrate migrate --config migration_config.yaml
+./run_unified_migration.sh --full
 ```
 
-### Validate Without Execution
+To run a specific component:
 
 ```bash
-gcp-migrate validate --config migration_config.yaml
+./run_unified_migration.sh --component vector-index-creation
 ```
 
-### Generate Cloud Workstation Configuration
+To run validation only:
 
 ```bash
-gcp-migrate generate-workstation-config --project your-gcp-project-id --name dev-workstation-cluster
+./run_unified_migration.sh --validate
 ```
 
-## Migration Configuration
-
-The migration configuration file controls all aspects of the migration process. Here's an example:
-
-```yaml
-migration_type: github-to-gcp
-source:
-  type: github
-  repository: your-org/your-repo
-  branch: main
-  use_oauth: false
-  auth_method: personal_access_token
-destination:
-  type: gcp
-  project_id: your-gcp-project-id
-  location: us-central1
-  use_application_default: true
-options:
-  parallel_resources: true
-  validate_only: false
-  dry_run: false
-  skip_validation: false
-resources:
-  - id: secret1
-    name: github-token
-    type: SECRET
-    source_path: GITHUB_TOKEN
-  - id: config1
-    name: app-config
-    type: CONFIGURATION
-    source_path: .devcontainer/devcontainer.json
-    destination_path: gs://bucket-name/configs/devcontainer.json
-```
-
-## API Usage
-
-The toolkit also provides a FastAPI-based REST API for integration with other tools:
+To resume from a checkpoint:
 
 ```bash
-# Start the API server
-python -m gcp_migration.application.api
+./run_unified_migration.sh --resume
 ```
 
-Then make requests like:
+### Advanced Options
 
-```bash
-curl -X POST http://localhost:8000/migrations/github-to-gcp \
-  -H "Content-Type: application/json" \
-  -d '{
-    "github_repository": "your-org/your-repo",
-    "github_branch": "main",
-    "gcp_project_id": "your-gcp-project-id",
-    "resources": [
-      {
-        "id": "secret1",
-        "name": "github-token",
-        "type": "SECRET",
-        "source_path": "GITHUB_TOKEN"
-      }
-    ]
-  }'
-```
+| Option | Description |
+|--------|-------------|
+| `--dry-run` | Simulate migration without making changes |
+| `--env ENV` | Set environment (`development`, `staging`, `production`) |
+| `--force` | Skip prerequisite checks |
+| `--debug` | Enable verbose debug logging |
+| `--checkpoint PATH` | Specify custom checkpoint file path |
 
-## Programmatic Usage
+## Improvements Over Previous Implementations
 
-You can also use the toolkit programmatically in your Python code:
+This unified migration framework addresses several issues found in previous migration attempts:
 
-```python
-import asyncio
-from gcp_migration.application.migration_service import MigrationService
-from gcp_migration.domain.models import GithubConfig, GCPConfig, MigrationResource, ResourceType
+1. **Code Consistency**: Standardized error handling, logging, and naming conventions across components
+2. **Checkpointing**: Ability to resume interrupted migrations from last successful step
+3. **Thread Safety**: Properly synchronized access to shared resources
+4. **Exception Context Preservation**: Original exceptions are preserved for better debugging
+5. **Environment Detection**: Automatic detection of execution environment
+6. **Connection Pooling**: Optimized connection management for better performance
+7. **Comprehensive Validation**: Detailed validation with clear pass/fail criteria
+8. **Detailed Reporting**: Comprehensive reports with metrics and recommendations
 
-async def run_migration():
-    # Create service
-    service = MigrationService(default_project_id="your-gcp-project-id")
-    await service.initialize()
-    
-    # Configure source and destination
-    github_config = GithubConfig(repository="your-org/your-repo", branch="main")
-    gcp_config = GCPConfig(project_id="your-gcp-project-id", location="us-central1")
-    
-    # Define resources to migrate
-    resources = [
-        MigrationResource(
-            id="secret1",
-            name="github-token",
-            type=ResourceType.SECRET,
-            source_path="GITHUB_TOKEN"
-        )
-    ]
-    
-    # Create and execute migration plan
-    plan = await service.create_github_to_gcp_plan(
-        github_config=github_config,
-        gcp_config=gcp_config,
-        resources=resources
-    )
-    
-    result = await service.execute_plan(plan)
-    print(f"Migration succeeded: {result.success}")
+## Validation Criteria
 
-if __name__ == "__main__":
-    asyncio.run(run_migration())
-```
+A successful migration must meet these criteria:
+
+1. Project correctly assigned to organization `873291114285`
+2. Workstation cluster "ai-development" exists with GPU support
+3. AlloyDB cluster "agent-storage" exists and is accessible
+4. Redis instance "agent-memory" exists and is accessible 
+5. Vector search latency < 30ms
+6. API response time < 100ms
+7. Workstation startup time < 3 minutes
 
 ## Architecture
 
-The toolkit is designed using clean architecture principles with three main layers:
-
-1. **Domain Layer**: Core business logic and domain models
-   - Models represent migration resources, contexts, and results
-   - Business rules and validation logic
-
-2. **Application Layer**: Orchestration and workflow
-   - Migration service coordinates the migration process
-   - Workflows define the step-by-step migration execution
-   - API and CLI interfaces expose functionality
-
-3. **Infrastructure Layer**: External integrations
-   - GCP service clients for storage, secrets, etc.
-   - GitHub API integration
-   - Connection and resilience mechanisms
-
-## Development
-
-### Project Structure
+The migration framework follows a modular design:
 
 ```
-gcp_migration/
-├── domain/                  # Domain models and interfaces
-│   ├── models.py            # Core domain entities
-│   └── exceptions_fixed.py  # Exception hierarchy
-├── infrastructure/          # Infrastructure implementations
-│   ├── connection.py        # Connection pooling
-│   ├── resilience.py        # Circuit breakers and retry logic
-│   └── gcp_service.py       # GCP service clients
-├── application/             # Application services
-│   ├── migration_service.py # Main migration service
-│   ├── workflow.py          # Workflow orchestration
-│   ├── api.py               # FastAPI interface
-│   └── cli.py               # CLI interface
-└── __main__.py              # Entry point
+┌─────────────────────┐
+│                     │
+│  Migration Executor │
+│                     │
+└───────────┬─────────┘
+            │
+            ▼
+┌─────────────────────┐     ┌─────────────────────┐
+│                     │     │                     │
+│   Phase Execution   │◄───►│  Component Registry │
+│                     │     │                     │
+└───────────┬─────────┘     └─────────────────────┘
+            │
+            ▼
+┌─────────────────────┐     ┌─────────────────────┐
+│                     │     │                     │
+│ Component Execution │◄───►│ Checkpointing System│
+│                     │     │                     │
+└───────────┬─────────┘     └─────────────────────┘
+            │
+            ▼
+┌─────────────────────┐     ┌─────────────────────┐
+│                     │     │                     │
+│  Unified Libraries  │◄───►│  Validation System  │
+│                     │     │                     │
+└─────────────────────┘     └─────────────────────┘
 ```
 
-### Running Tests
+## Troubleshooting
+
+### Common Issues
+
+1. **Import Errors**: Make sure your `PYTHONPATH` includes the project root directory
+2. **Authentication Failures**: Ensure you have valid GCP credentials
+3. **Dependency Errors**: Run the dependency check or install required packages
+4. **Permission Issues**: Verify the service account has required permissions
+5. **Network Issues**: Check firewall settings and network connectivity
+
+### Debugging
+
+For detailed debugging, run with the `--debug` flag:
 
 ```bash
-# Run all tests
-poetry run pytest
-
-# Run with coverage
-poetry run pytest --cov=gcp_migration
+./run_unified_migration.sh --debug --full
 ```
 
-### Contributing
+Logs are written to both standard output and `migration_execution.log`.
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/my-feature`
-3. Make your changes
-4. Run tests: `poetry run pytest`
-5. Submit a pull request
+## Contributing
 
-## License
+When adding new components or modifying existing ones:
 
-MIT License
+1. Follow the established naming and error handling patterns
+2. Add appropriate validation steps
+3. Update the documentation
+4. Ensure backward compatibility with checkpoints

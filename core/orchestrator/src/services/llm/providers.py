@@ -338,18 +338,29 @@ class OpenRouterProvider(LLMProvider):
         """Check if provider is initialized."""
         return self._client is not None
 
-    def get_model_for_agent(self, agent_type: Optional[str] = None) -> str:
+    def get_model_for_agent(self, agent_type: Optional[str] = None, mode: Optional[str] = None) -> str:
         """
-        Get the appropriate model for a specific agent type.
+        Get the appropriate model for a specific agent type or mode.
 
         Args:
             agent_type: The type of agent making the request
+            mode: The current Roo mode (orchestrator, reviewer, etc.)
 
         Returns:
             The model identifier to use
         """
+        # Check settings for mode-specific model mapping
+        mode_model_map = settings.get_mode_model_map()
+        
+        # Mode-specific model takes highest priority
+        if mode and mode in mode_model_map:
+            return mode_model_map[mode]["model"]
+            
+        # Agent-specific model takes second priority
         if agent_type and agent_type in self.agent_model_map:
             return self.agent_model_map[agent_type]
+            
+        # Default to provider's default model
         return self.default_model
 
     def _should_retry(self, exception: Exception) -> bool:
@@ -412,6 +423,7 @@ class OpenRouterProvider(LLMProvider):
         temperature: float = 0.7,
         max_tokens: Optional[int] = None,
         agent_type: Optional[str] = None,
+        mode: Optional[str] = None,
         **kwargs,
     ) -> Dict[str, Any]:
         """
@@ -423,6 +435,7 @@ class OpenRouterProvider(LLMProvider):
             temperature: Temperature for generation
             max_tokens: Maximum tokens to generate
             agent_type: Type of agent making the request (for model routing)
+            mode: Current Roo mode (orchestrator, reviewer, etc.) for model selection
             **kwargs: Additional parameters to pass to the API
 
         Returns:
@@ -435,9 +448,9 @@ class OpenRouterProvider(LLMProvider):
         if not self.is_initialized:
             self.initialize()
 
-        # If no model specified, but agent_type is provided, use agent-specific model
-        if not model and agent_type:
-            model = self.get_model_for_agent(agent_type)
+        # If no model specified, check mode first, then agent_type
+        if not model:
+            model = self.get_model_for_agent(agent_type, mode)
 
         # For OpenRouter, we'll adapt the prompt to chat format
         messages = [{"role": "user", "content": prompt}]
@@ -457,6 +470,7 @@ class OpenRouterProvider(LLMProvider):
         temperature: float = 0.7,
         max_tokens: Optional[int] = None,
         agent_type: Optional[str] = None,
+        mode: Optional[str] = None,
         **kwargs,
     ) -> Dict[str, Any]:
         """
@@ -464,10 +478,11 @@ class OpenRouterProvider(LLMProvider):
 
         Args:
             messages: List of message objects with role and content
-            model: Model to use (overrides agent_type if provided)
+            model: Model to use (overrides other selectors if provided)
             temperature: Temperature for generation
             max_tokens: Maximum tokens to generate
             agent_type: Type of agent making the request (for model routing)
+            mode: Current Roo mode (orchestrator, reviewer, etc.) for model selection
             **kwargs: Additional parameters to pass to the API
 
         Returns:
@@ -482,11 +497,19 @@ class OpenRouterProvider(LLMProvider):
             LLMProviderTimeoutError: If the request times out
             LLMProviderError: For other unexpected errors
         """
-        # If no model specified, but agent_type is provided, use agent-specific model
-        if not model and agent_type:
-            model = self.get_model_for_agent(agent_type)
+        # If model not explicitly specified, use mode/agent-based selection
+        if not model:
+            model = self.get_model_for_agent(agent_type, mode)
         else:
+            # Use provided model or fallback to default
             model = model or self.config.default_model
+            
+        # Check if mode requires a different provider
+        if mode:
+            mode_model_map = settings.get_mode_model_map()
+            if mode in mode_model_map and mode_model_map[mode]["provider"] != self.provider_name:
+                logger.info(f"Mode '{mode}' requires provider '{mode_model_map[mode]['provider']}' instead of '{self.provider_name}'")
+                # We continue with the current provider but log the mismatch
 
         # Validate messages
         if not messages or not isinstance(messages, list):
@@ -695,20 +718,56 @@ class PortkeyProvider(LLMProvider):
         """Check if provider is initialized."""
         return self._client is not None
 
+    def get_model_for_mode(self, agent_type: Optional[str] = None, mode: Optional[str] = None) -> str:
+        """
+        Get the appropriate model based on Roo mode and agent type.
+        
+        Args:
+            agent_type: The type of agent making the request
+            mode: The current Roo mode (orchestrator, reviewer, etc.)
+            
+        Returns:
+            The model identifier to use
+        """
+        # Check settings for mode-specific model mapping
+        mode_model_map = settings.get_mode_model_map()
+        
+        # Mode-specific model takes highest priority
+        if mode and mode in mode_model_map:
+            return mode_model_map[mode]["model"]
+            
+        # Default to provider's default model
+        return self.default_model
+    
     async def generate_completion(
         self,
         prompt: str,
         model: Optional[str] = None,
         temperature: float = 0.7,
         max_tokens: Optional[int] = None,
+        agent_type: Optional[str] = None,
+        mode: Optional[str] = None,
         **kwargs,
     ) -> Dict[str, Any]:
         """
         Generate text completion.
+        
+        Args:
+            prompt: Prompt text
+            model: Model to use
+            temperature: Temperature for generation
+            max_tokens: Maximum tokens to generate
+            agent_type: Type of agent making the request
+            mode: Current Roo mode (orchestrator, reviewer, etc.)
+            **kwargs: Additional parameters
         """
         # Ensure provider is initialized
         if not self.is_initialized:
             self.initialize()
+
+        # If no model specified, check mode first
+        if not model:
+            model = self.get_model_for_mode(agent_type, mode)
 
         # Adapt the prompt to chat format
         messages = [{"role": "user", "content": prompt}]
@@ -717,6 +776,8 @@ class PortkeyProvider(LLMProvider):
             model=model,
             temperature=temperature,
             max_tokens=max_tokens,
+            agent_type=agent_type,
+            mode=mode,
             **kwargs,
         )
 
@@ -726,12 +787,34 @@ class PortkeyProvider(LLMProvider):
         model: Optional[str] = None,
         temperature: float = 0.7,
         max_tokens: Optional[int] = None,
+        agent_type: Optional[str] = None,
+        mode: Optional[str] = None,
         **kwargs,
     ) -> Dict[str, Any]:
         """
         Generate chat completion with basic error handling.
+        
+        Args:
+            messages: List of message objects with role and content
+            model: Model to use (overrides other selectors if provided)
+            temperature: Temperature for generation
+            max_tokens: Maximum tokens to generate
+            agent_type: Type of agent making the request
+            mode: Current Roo mode (orchestrator, reviewer, etc.)
+            **kwargs: Additional parameters
         """
-        model = model or self.config.default_model
+        # If no model specified, use mode-based selection
+        if not model:
+            model = self.get_model_for_mode(agent_type, mode)
+        else:
+            model = model or self.config.default_model
+            
+        # Check if mode requires a different provider
+        if mode:
+            mode_model_map = settings.get_mode_model_map()
+            if mode in mode_model_map and mode_model_map[mode]["provider"] != self.provider_name:
+                logger.info(f"Mode '{mode}' requires provider '{mode_model_map[mode]['provider']}' instead of '{self.provider_name}'")
+                # We continue with the current provider but log the mismatch
 
         # Validate messages
         if not messages or not isinstance(messages, list):
@@ -793,6 +876,32 @@ class PortkeyProvider(LLMProvider):
         except Exception as exc:
             logger.error(f"Error with {self.provider_name}: {str(exc)}", exc_info=True)
             raise LLMProviderError(f"API error: {str(exc)}")
+
+
+def get_provider_for_mode(mode: Optional[str] = None) -> str:
+    """
+    Determine the appropriate provider based on the Roo mode.
+    
+    Args:
+        mode: The current Roo mode (orchestrator, reviewer, etc.)
+        
+    Returns:
+        The provider name to use
+    """
+    if not mode:
+        return getattr(settings, "PREFERRED_LLM_PROVIDER", "openrouter")
+        
+    # Get the mode-to-model mapping
+    mode_model_map = settings.get_mode_model_map()
+    
+    # Check if the mode exists in the mapping
+    if mode in mode_model_map and "provider" in mode_model_map[mode]:
+        provider = mode_model_map[mode]["provider"]
+        logger.info(f"Using provider '{provider}' for mode '{mode}'")
+        return provider
+        
+    # Default to preferred provider
+    return getattr(settings, "PREFERRED_LLM_PROVIDER", "openrouter")
 
 
 def _validate_openrouter_environment(settings_instance) -> None:

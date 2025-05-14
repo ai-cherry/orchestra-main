@@ -91,7 +91,7 @@ resource "google_workstations_workstation_cluster" "ai_orchestra_cluster" {
   labels = {
     environment = var.env
     managed_by  = "terraform"
-    project     = "ai-orchestra"
+    project     = var.project_id
   }
 
   # Private cluster configuration for security
@@ -182,7 +182,7 @@ EOT
   labels = {
     environment = var.env
     managed_by  = "terraform"
-    project     = "ai-orchestra"
+    project     = var.project_id
   }
 
   depends_on = [
@@ -204,7 +204,7 @@ resource "google_workstations_workstation" "ai_orchestra_workstations" {
   labels = {
     environment = var.env
     managed_by  = "terraform"
-    project     = "ai-orchestra"
+    project     = var.project_id
     instance    = "workstation-${count.index + 1}"
   }
 

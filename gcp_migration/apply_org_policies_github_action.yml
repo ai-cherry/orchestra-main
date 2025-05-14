@@ -1,0 +1,170 @@
+name: Apply Organization Policies for GCP Migration
+
+on:
+  workflow_dispatch:
+    inputs:
+      service_name:
+        description: 'Cloud Run service name to update'
+        required: true
+        default: 'ai-orchestra-minimal'
+      region:
+        description: 'GCP Region'
+        required: true
+        default: 'us-central1'
+
+jobs:
+  apply-org-policies:
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install google-cloud-storage google-auth
+        
+    - name: Create service account key file
+      env:
+        GCP_ORGANIZATION_POLICY_JSON: ${{ secrets.GCP_ORGANIZATION_POLICY_JSON }}
+      run: |
+        echo "$GCP_ORGANIZATION_POLICY_JSON" > org-policy-key.json
+        echo "Service account key file created"
+        
+    - name: Set up gcloud CLI
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        install_components: 'gcloud'
+        
+    - name: Authenticate with service account
+      run: |
+        gcloud auth activate-service-account --key-file=org-policy-key.json
+        gcloud config set project cherry-ai-project
+        
+    - name: Apply organization policies
+      run: |
+        # Create policies directory
+        mkdir -p gcp_migration/policies
+        
+        # Create Cloud Run policy
+        cat > gcp_migration/policies/run_invoker_policy.yaml << EOF
+        name: projects/cherry-ai-project/policies/run.requireInvokerIam
+        spec:
+          rules:
+          - enforce: false
+        EOF
+        
+        # Create Vertex AI models policy
+        cat > gcp_migration/policies/vertex_models_policy.yaml << EOF
+        name: projects/cherry-ai-project/policies/vertexai.allowedModels
+        spec:
+          rules:
+          - values:
+              allowedValues:
+              - resource://aiplatform.googleapis.com/projects/cherry-ai-project/locations/*
+        EOF
+        
+        # Create Vertex AI GenAI policy
+        cat > gcp_migration/policies/vertex_genai_policy.yaml << EOF
+        name: projects/cherry-ai-project/policies/vertexai.allowedGenAIModels
+        spec:
+          rules:
+          - values:
+              allowedValues:
+              - "*"
+        EOF
+        
+        # Create allowed domains policy
+        cat > gcp_migration/policies/allowed_domains_policy.yaml << EOF
+        name: projects/cherry-ai-project/policies/iam.allowedPolicyMemberDomains
+        spec:
+          rules:
+          - values:
+              allowedValues:
+              - "domain:cherry-ai.me"
+              - "allUsers"
+              - "allAuthenticatedUsers"
+        EOF
+        
+        # Apply policies
+        echo "Applying Cloud Run policy..."
+        gcloud org-policies set-policy gcp_migration/policies/run_invoker_policy.yaml
+        
+        echo "Applying Vertex AI models policy..."
+        gcloud org-policies set-policy gcp_migration/policies/vertex_models_policy.yaml
+        
+        echo "Applying Vertex AI GenAI policy..."
+        gcloud org-policies set-policy gcp_migration/policies/vertex_genai_policy.yaml
+        
+        echo "Applying allowed domains policy..."
+        gcloud org-policies set-policy gcp_migration/policies/allowed_domains_policy.yaml
+        
+    - name: Update Cloud Run service
+      run: |
+        echo "Updating Cloud Run service ${{ github.event.inputs.service_name }} in ${{ github.event.inputs.region }} to allow unauthenticated access..."
+        gcloud run services update ${{ github.event.inputs.service_name }} --region=${{ github.event.inputs.region }} --allow-unauthenticated
+        
+        # Get service URL
+        SERVICE_URL=$(gcloud run services describe ${{ github.event.inputs.service_name }} --region=${{ github.event.inputs.region }} --format='value(status.url)')
+        echo "Service URL: $SERVICE_URL"
+        
+        # Test the service
+        echo "Testing service health endpoint..."
+        curl -s -i "${SERVICE_URL}/health"
+        
+    - name: Check policy status
+      run: |
+        echo "Checking updated organization policies..."
+        gcloud org-policies list --project=cherry-ai-project
+        
+        echo "==== POLICY DETAILS ===="
+        gcloud org-policies describe run.requireInvokerIam --project=cherry-ai-project
+        gcloud org-policies describe vertexai.allowedModels --project=cherry-ai-project
+        gcloud org-policies describe iam.allowedPolicyMemberDomains --project=cherry-ai-project
+        
+    - name: Generate report
+      run: |
+        cat > org_policies_report.md << EOF
+        # Organization Policy Update Report
+        
+        Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        
+        ## Updated Policies
+        
+        - run.requireInvokerIam (allow unauthenticated Cloud Run access)
+        - vertexai.allowedModels (allow all models in the project)
+        - vertexai.allowedGenAIModels (allow all GenAI models)
+        - iam.allowedPolicyMemberDomains (allow allUsers and allAuthenticatedUsers)
+        
+        ## Updated Cloud Run Service
+        
+        - Service Name: ${{ github.event.inputs.service_name }}
+        - Region: ${{ github.event.inputs.region }}
+        - URL: $(gcloud run services describe ${{ github.event.inputs.service_name }} --region=${{ github.event.inputs.region }} --format='value(status.url)')
+        - Access: Public (allow unauthenticated)
+        
+        ## Next Steps
+        
+        1. Verify that Cloud Run services are now publicly accessible
+        2. Verify that Vertex AI models can be accessed
+        3. Complete the remaining migration steps
+        EOF
+        
+        cat org_policies_report.md
+        
+    - name: Upload report
+      uses: actions/upload-artifact@v4
+      with:
+        name: org-policies-report
+        path: org_policies_report.md
+        
+    - name: Clean up
+      run: |
+        rm -f org-policy-key.json

@@ -1,63 +1,63 @@
-# Stage 1: Builder
-FROM python:3.11-slim-bullseye AS builder
+# Multi-stage build for AI Orchestra admin-api service
+# Optimized for performance and security with proper Poetry integration
+
+# --- Build stage ---
+FROM python:3.11-slim AS builder
+
+# Set environment variables for Poetry
+ENV POETRY_VERSION=1.8.2 \
+    POETRY_VIRTUALENVS_IN_PROJECT=true \
+    POETRY_NO_INTERACTION=1 \
+    POETRY_CACHE_DIR=/tmp/poetry_cache
 
 WORKDIR /app
 
-# Install Poetry and build dependencies
-RUN pip install --no-cache-dir poetry==1.8.2 \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends gcc g++ libffi-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Install Poetry with exact version
+RUN pip install --upgrade pip && pip install "poetry==$POETRY_VERSION"
 
-# Copy dependency files only (for better caching)
-COPY pyproject.toml poetry.lock ./
+# Copy pyproject.toml and create an empty poetry.lock if it doesn't exist
+COPY pyproject.toml ./
+RUN if [ ! -f poetry.lock ]; then touch poetry.lock; fi
 
-# Configure poetry to not use a virtual environment
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-root --without dev
+# Install dependencies without development dependencies
+RUN poetry install --without dev --no-root
 
 # Copy application code
-COPY ./main.py ./
-COPY ./app ./app
+COPY . .
 
-# Stage 2: Production
-FROM python:3.11-slim-bullseye AS production
+# Install project
+RUN poetry install --without dev
 
-WORKDIR /app
+# --- Runtime stage ---
+FROM python:3.11-slim
 
-# Set environment variables with improved performance settings
-ENV PYTHONPATH="/app" \
+# Upgrade pip in runtime image
+RUN pip install --upgrade pip
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PORT=8080 \
-    WEB_CONCURRENCY=4 \
-    WORKERS_PER_CORE=2 \
-    MAX_KEEPALIVE=120 \
-    LIMIT_MAX_REQUESTS=10000
+    VIRTUAL_ENV=/app/.venv \
+    PATH="/app/.venv/bin:$PATH" \
+    PORT=8080
 
-# Install runtime dependencies only
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
-    && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
 
-# Copy dependencies from builder
-COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
+# Copy virtual environment from builder
+COPY --from=builder /app/.venv /app/.venv
 
-# Copy application code
-COPY --from=builder /app/main.py ./
-COPY --from=builder /app/app ./app
+# Copy application files
+COPY --from=builder /app/app /app/app
+COPY --from=builder /app/main.py /app/main.py
 
-# Create cache directories with full permissions
-RUN mkdir -p /app/logs /app/data /app/cache
+# Add health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:${PORT}/health || exit 1
 
-# Add healthcheck
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:${PORT}/ || exit 1
+# Run as non-root user for security
+RUN groupadd -r appuser && useradd -r -g appuser appuser && \
+    chown -R appuser:appuser /app
+USER appuser
 
-# Command to run the application with performance settings
-CMD uvicorn app.application:app --host 0.0.0.0 --port $PORT \
-    --workers $WEB_CONCURRENCY \
-    --limit-max-requests $LIMIT_MAX_REQUESTS \
-    --timeout-keep-alive $MAX_KEEPALIVE \
-    --log-level warning
+# Run the service
+CMD exec uvicorn main:app --host 0.0.0.0 --port ${PORT}

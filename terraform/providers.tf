@@ -9,13 +9,13 @@ provider "google" {
 provider "google" {
   alias   = "us-central1"
   project = var.project_id
-  region  = "us-central1"
+  region  = var.region
 }
 
 provider "google" {
   alias   = "us-west4"
   project = var.project_id
-  region  = "us-west4"
+  region  = var.region
 }
 
 provider "google-beta" {
@@ -27,13 +27,13 @@ provider "google-beta" {
 provider "google-beta" {
   alias   = "us-central1"
   project = var.project_id
-  region  = "us-central1"
+  region  = var.region
 }
 
 provider "google-beta" {
   alias   = "us-west4"
   project = var.project_id
-  region  = "us-west4"
+  region  = var.region
 }
 
 # Default providers (for backward compatibility during migration)

@@ -5,47 +5,6 @@
  * cost analysis, as well as budget alerts when costs exceed thresholds.
  */
 
-# Variables
-variable "project_id" {
-  description = "GCP Project ID"
-  type        = string
-}
-
-variable "location" {
-  description = "BigQuery dataset location"
-  type        = string
-  default     = "US"
-}
-
-variable "billing_account_id" {
-  description = "Billing account ID for budget configuration"
-  type        = string
-}
-
-variable "monthly_budget" {
-  description = "Monthly budget amount in USD"
-  type        = number
-  default     = 1000
-}
-
-variable "budget_alert_thresholds" {
-  description = "List of budget alert thresholds (0.0 to 1.0)"
-  type        = list(number)
-  default     = [0.5, 0.8, 0.9, 1.0]
-}
-
-variable "alert_pubsub_topic" {
-  description = "Optional existing Pub/Sub topic for budget alerts"
-  type        = string
-  default     = ""
-}
-
-variable "notification_emails" {
-  description = "Email addresses to notify for budget alerts"
-  type        = list(string)
-  default     = []
-}
-
 # BigQuery Dataset for Cost Analysis
 resource "google_bigquery_dataset" "cost_metrics" {
   dataset_id    = "cost_metrics"
@@ -261,6 +220,13 @@ resource "google_pubsub_topic" "budget_alerts" {
 # Local variable for pubsub topic
 locals {
   pubsub_topic = var.alert_pubsub_topic != "" ? var.alert_pubsub_topic : google_pubsub_topic.budget_alerts[0].id
+  
+  # Create monitoring notification channels for emails if provided
+  monitoring_notification_channels = length(var.notification_emails) > 0 ? [
+    for email in var.notification_emails : {
+      email = email
+    }
+  ] : []
 }
 
 # Budget configuration
@@ -292,13 +258,21 @@ resource "google_billing_budget" "budget" {
   all_updates_rule {
     pubsub_topic = local.pubsub_topic
     
-    # Add email notifications if provided
-    dynamic "monitoring_notification_channels" {
-      for_each = length(var.notification_emails) > 0 ? [1] : []
-      content {
-        email = var.notification_emails
-      }
-    }
+    # Add monitoring channels if needed
+    # Note: The monitoring_notification_channels field expects a list of strings, not objects
+    # We'll create the monitoring channels separately and reference them here
+  }
+}
+
+# Create monitoring notification channels for email alerts
+resource "google_monitoring_notification_channel" "email_channels" {
+  count        = length(var.notification_emails)
+  project      = var.project_id
+  display_name = "Budget Alert Email - ${var.notification_emails[count.index]}"
+  type         = "email"
+  
+  labels = {
+    email_address = var.notification_emails[count.index]
   }
 }
 
