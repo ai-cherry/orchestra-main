@@ -11,7 +11,7 @@ We've implemented a standardized approach to configuration management:
 - Created `.env.template` with all configuration options and default values
 - Created `load_env.sh` utility script for loading environment variables from `.env` files
 - Updated `setup-gcp-ides.sh` to use environment variables instead of hardcoded values
-- Updated `deploy.sh` to use environment variables instead of hardcoded values
+- Updated `deploy_gcp_infra.sh` to use environment variables instead of hardcoded values
 - Created comprehensive documentation in `docs/CONFIGURATION_MANAGEMENT.md`
 
 ### 2. GitHub Workflow Standardization
@@ -49,7 +49,7 @@ We've created tools to help with the ongoing cleanup process:
 
 ### 3. Deployment Script Consolidation
 
-- Standardize on `deploy.sh` as the primary deployment script
+- Standardize on `deploy_gcp_infra.sh` as the primary deployment script
 - Remove redundant deployment scripts
 - Update documentation to reflect the new deployment approach
 

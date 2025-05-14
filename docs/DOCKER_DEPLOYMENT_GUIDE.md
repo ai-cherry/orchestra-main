@@ -88,7 +88,7 @@ You can now proceed with deployment to Cloud Run.
 
 ## Manual Deployment
 
-The `deploy.sh` script provides a comprehensive, consistent approach for deploying to GCP Cloud Run.
+The `deploy_gcp_infra.sh` script provides a comprehensive, consistent approach for deploying to GCP Cloud Run.
 
 ### Prerequisites
 
@@ -103,13 +103,13 @@ The `deploy.sh` script provides a comprehensive, consistent approach for deployi
 
 ```bash
 # Make the script executable
-chmod +x deploy.sh
+chmod +x deploy_gcp_infra.sh
 
 # Basic deployment with defaults
-./deploy.sh
+./deploy_gcp_infra.sh
 
 # Deployment with custom settings
-./deploy.sh \
+./deploy_gcp_infra.sh \
   --project my-project \
   --region us-central1 \
   --service my-service \
