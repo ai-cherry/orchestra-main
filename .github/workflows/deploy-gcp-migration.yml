@@ -34,6 +34,10 @@ jobs:
         with:
           poetry-version: '1.8.2'
 
+      - name: Install Python dependencies (gcp_migration)
+        run: poetry install --no-interaction
+        working-directory: gcp_migration
+
       - name: Authenticate to Google Cloud (WIF)
         uses: google-github-actions/auth@v2
         with:
