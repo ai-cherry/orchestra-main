@@ -41,3 +41,4 @@ ENV DEBIAN_FRONTEND=dialog
 
 # Set the default user - this ensures we don't run as root
 USER $USERNAME
+ENV PATH="/usr/local/py-utils/bin:${PATH}"
