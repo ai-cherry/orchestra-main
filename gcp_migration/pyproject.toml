@@ -1,65 +1,60 @@
 [tool.poetry]
-name = "gcp-migration"
+name = "ai-orchestra-migration"
 version = "1.0.0"
-description = "Comprehensive toolkit for migrating from GitHub Codespaces to Google Cloud Workstations"
-authors = ["AI Orchestra Team <team@example.com>"]
+description = "AI Orchestra migration toolkit for GCP"
+authors = ["Roo <roo@ai-orchestra.example.com>"]
 readme = "README.md"
-packages = [{include = "gcp_migration"}]
-license = "MIT"
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-]
+# packages = [{include = "."}]
 
 [tool.poetry.dependencies]
-python = ">=3.11,<3.13"
-pydantic = "^2.5.2"
-fastapi = "^0.104.1"
-uvicorn = {extras = ["standard"], version = "^0.24.0"}
-click = "^8.1.7"
-rich = "^13.6.0"
-aiohttp = "^3.9.1"
-google-api-python-client = "^2.108.0"
-google-auth = "^2.23.4"
-google-cloud-storage = "^2.13.0"
-google-cloud-secret-manager = "^2.17.0"
-google-cloud-firestore = "^2.13.1"
-gitpython = "^3.1.40"
+python = "^3.11"
+google-cloud-aiplatform = "^1.36.0"
+google-cloud-storage = "^2.10.0"
+google-cloud-alloydb = "^0.3.1"
+google-cloud-firestore = "^2.13.0"
+google-cloud-run = "^0.5.0"
+google-cloud-monitoring = "^2.14.2"
+google-cloud-resource-manager = "^1.10.0"
+google-cloud-secret-manager = "^2.16.1"
+aiohttp = "^3.8.5"
+asyncio = "^3.4.3"
+pydantic = "^2.4.2"
+rich = "^13.5.2"
 python-dotenv = "^1.0.0"
-pyyaml = "^6.0.1"
-jinja2 = "^3.1.2"
-types-pyyaml = "^6.0.12.12"
+tenacity = "^8.2.3"
+typer = "^0.9.0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.4.3"
+pytest = "^7.3.1"
+pytest-asyncio = "^0.21.0"
 pytest-cov = "^4.1.0"
-pytest-asyncio = "^0.21.1"
-black = "^23.11.0"
+black = "^23.3.0"
 isort = "^5.12.0"
-flake8 = "^6.1.0"
-mypy = "^1.7.0"
-pre-commit = "^3.5.0"
-types-requests = "^2.31.0.10"
+mypy = "^1.3.0"
+ruff = "^0.0.270"
+types-protobuf = "^4.23.0.2"
 
 [tool.poetry.scripts]
-gcp-migrate = "gcp_migration.__main__:main"
+migrate = "gcp_migration.cli:main"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.black]
-line-length = 88
-target-version = ["py311", "py312"]
+line-length = 100
+target-version = ["py311"]
 include = '\.pyi?$'
 
 [tool.isort]
 profile = "black"
-line_length = 88
+line_length = 100
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+select = ["E", "F", "I", "N", "W"]
+ignore = ["E203"]
 
 [tool.mypy]
 python_version = "3.11"
@@ -67,16 +62,14 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
-
-[[tool.mypy.overrides]]
-module = "google.*"
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = "git.*"
-ignore_missing_imports = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+strict_optional = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
 asyncio_mode = "auto"
