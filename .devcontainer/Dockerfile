@@ -15,6 +15,13 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 # Install mypy for static type checking
 RUN pip install --no-cache-dir mypy
 
+# Install Node.js and pnpm (using ARG for version)
+ARG NODE_VERSION=22.15.0
+RUN curl -fsSL https://unpkg.com/@pnpm/self-installer | node \
+    && corepack enable pnpm \
+    && npm config set update-notifier false \
+    && npm install -g npm@latest
+
 # Create a non-root user - this is required for DevContainer to work properly
 ARG USERNAME=vscode
 ARG USER_UID=1000
