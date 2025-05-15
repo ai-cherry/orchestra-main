@@ -1,53 +1,56 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-added-large-files
-        args: ['--maxkb=500']  # Match with LFS threshold in automation config
+        args: ["--maxkb=500"] # Match with LFS threshold in automation config
       - id: check-json
       - id: check-merge-conflict
       - id: detect-private-key
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.262
+    rev: v0.11.9
     hooks:
       - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]
 
   - repo: https://github.com/psf/black
-    rev: 23.3.0
+    rev: 25.1.0
     hooks:
       - id: black
         language_version: python3.11
         args: [--config=pyproject.toml]
 
   - repo: https://github.com/pycqa/isort
-    rev: 5.12.0
+    rev: 6.0.1
     hooks:
       - id: isort
         args: ["--settings-path=pyproject.toml"]
 
   - repo: local
     hooks:
+      - id: tool-versions-check
+        name: asdf Tool Versions Drift Check
+        entry: bash scripts/pre-commit-tool-versions-check.sh
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+        verbose: true
       - id: gemini-code-analysis
         name: Gemini Code Analysis
         entry: python analyze_code_wrapper.py
         language: system
         pass_filenames: false
-        stages: [commit]
+        stages: [pre-commit]
         verbose: true
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.3.0
+    rev: v1.15.0
     hooks:
       - id: mypy
-        additional_dependencies: [
-          'types-requests',
-          'types-PyYAML'
-        ]
+        additional_dependencies: ["types-requests", "types-PyYAML"]
         # Specify files to avoid running on entire codebase
         files: >
           (?x)(
@@ -57,3 +60,14 @@ repos:
             automation_decision_helper\.py|
             analyze_code_wrapper\.py
           )
+
+  #  - repo: https://github.com/antonbabenko/pre-commit-terraform
+  #    rev: v1.84.4
+  #    hooks:
+  #      - id: terraform_fmt
+  # Removed: pre-commit-terraform repo entirely due to missing tag and hooks. Use standalone tflint/terraform_fmt in Makefile or CI instead.
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier

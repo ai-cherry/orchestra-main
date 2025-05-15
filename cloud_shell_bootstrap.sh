@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Setup script for Orchestra monorepo (local, Codespaces, CI)
+# Bootstrap script for GCP Cloud Shell hybrid IDE setup
 
-# 1. Ensure asdf is installed
+# 1. Install asdf if not present
 if ! command -v asdf &>/dev/null; then
-  echo "asdf not found. Please install asdf (https://asdf-vm.com) and re-run this script."
-  exit 1
+  git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0
+  echo '. "$HOME/.asdf/asdf.sh"' >> ~/.bashrc
+  . "$HOME/.asdf/asdf.sh"
 fi
 
 # 2. Install required asdf plugins and tools
@@ -36,4 +37,4 @@ if [ ! -f .envrc ]; then
   echo ".envrc created from example. Edit as needed."
 fi
 
-echo "Setup complete. Run 'direnv allow' if using direnv."
+echo "Cloud Shell hybrid IDE environment is ready. Run 'direnv allow' if using direnv."

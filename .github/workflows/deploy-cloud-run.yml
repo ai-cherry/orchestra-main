@@ -1,0 +1,86 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      REGION: us-central1
+      SERVICE: orchestra-system
+      IMAGE: gcr.io/${{ secrets.GCP_PROJECT_ID }}/orchestra-system:${{ github.sha }}
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_MASTER_SERVICE_JSON }}
+      VERTEX_AGENT_KEY: ${{ secrets.VERTEX_AGENT_KEY }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up asdf
+        uses: asdf-vm/actions/setup@v3
+
+      - name: Install tools with asdf
+        run: |
+          asdf plugin add python || true
+          asdf plugin add poetry || true
+          asdf plugin add terraform || true
+          asdf plugin add nodejs || true
+          asdf install --all
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        run: pip install poetry==1.8.2
+
+      - name: Install dependencies
+        run: poetry install --no-root
+
+      - name: Run pre-commit checks
+        run: |
+          pip install pre-commit
+          pre-commit run --all-files
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_MASTER_SERVICE_JSON }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          install_components: "beta"
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker
+
+      - name: Build Docker image
+        run: |
+          docker build -f docker/Dockerfile.app -t $IMAGE .
+
+      - name: Push Docker image
+        run: |
+          docker push $IMAGE
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy $SERVICE \
+            --image $IMAGE \
+            --region $REGION \
+            --platform managed \
+            --allow-unauthenticated \
+            --set-env-vars GOOGLE_APPLICATION_CREDENTIALS=$GOOGLE_APPLICATION_CREDENTIALS,VERTEX_AGENT_KEY=$VERTEX_AGENT_KEY
+
+      - name: (Optional) Run Terraform
+        run: |
+          terraform -chdir=terraform init
+          terraform -chdir=terraform apply -auto-approve
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_MASTER_SERVICE_JSON }}
+        if: ${{ always() }}
