@@ -15,18 +15,42 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install Poetry
         uses: abatilo/actions-poetry@v3
         with:
-          poetry-version: '1.8.2'
+          poetry-version: "1.8.2"
 
       - name: Install yamllint and actionlint
         run: |
           pip install yamllint
           curl -sSL https://github.com/rhysd/actionlint/releases/latest/download/actionlint-linux-amd64.tar.gz | tar xz
           sudo mv actionlint /usr/local/bin/
+
+      - name: Install asdf
+        run: |
+          git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0
+          echo '. "$HOME/.asdf/asdf.sh"' >> $GITHUB_ENV
+          . "$HOME/.asdf/asdf.sh"
+
+      - name: Install asdf plugins and tools
+        run: |
+          . "$HOME/.asdf/asdf.sh"
+          asdf plugin add python || true
+          asdf plugin add poetry || true
+          asdf plugin add terraform || true
+          asdf plugin add nodejs || true
+          asdf install
+
+      - name: Check asdf tool versions
+        run: |
+          . "$HOME/.asdf/asdf.sh"
+          asdf current
+          python --version
+          poetry --version
+          terraform version
+          node --version
 
       - name: Lint all workflow YAMLs
         run: |
