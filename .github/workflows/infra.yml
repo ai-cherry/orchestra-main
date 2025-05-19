@@ -1,0 +1,113 @@
+name: CI/CD for Infrastructure
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write # Required for Workload Identity Federation with google-github-actions/auth
+
+jobs:
+  lint_and_test:
+    name: Lint & Test Code
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11"] # Matches dev container
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+      
+      - name: Lint with Flake8
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Add more specific paths if needed, e.g., flake8 infra/ scripts/ tests/
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Format with Black
+        run: |
+          black --check . --diff
+          # Add more specific paths if needed, e.g., black --check infra/ scripts/ tests/
+
+      - name: Run Python Unit Tests
+        run: |
+          python -m unittest discover -s tests -p 'test_*.py'
+          # Or if using pytest: pytest tests/
+
+  deploy_infrastructure:
+    name: Deploy Infrastructure to Dev (Main Branch)
+    needs: lint_and_test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    # environment: # You can configure this in GitHub repository settings under Environments
+    #   name: development 
+    env:
+      PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+      GOOGLE_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }} # Should be cherry-ai-project
+      # GOOGLE_APPLICATION_CREDENTIALS will be set by google-github-actions/auth or via SA key
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: '${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}' # e.g., projects/525398941159/locations/global/workloadIdentityPools/github-wif-pool/providers/github-actions
+          service_account: '${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}' # Using the org-level secret
+          # Option 2: Service Account Key JSON (Less Secure)
+          # credentials_json: '${{ secrets.GCP_SA_KEY_JSON }}'
+
+      - name: Set up Pulumi CLI
+        uses: pulumi/actions@v5 # Use latest version
+        # with:
+        #   pulumi-version: 'latest' # Optional: specify Pulumi version
+
+      - name: Pulumi Up (Dev Stack)
+        working-directory: ./infra
+        run: pulumi up --yes --stack dev
+        # The Pulumi Action automatically handles login via PULUMI_ACCESS_TOKEN
+
+  preview_infrastructure:
+    name: Preview Infrastructure Changes (Pull Request)
+    needs: lint_and_test
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    env:
+      PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+      GOOGLE_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: '${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}' # e.g., projects/525398941159/locations/global/workloadIdentityPools/github-wif-pool/providers/github-actions
+          service_account: '${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}' # Using the org-level secret
+          # credentials_json: '${{ secrets.GCP_SA_KEY_JSON }}'
+
+      - name: Set up Pulumi CLI
+        uses: pulumi/actions@v5
+
+      - name: Pulumi Preview (Dev Stack)
+        working-directory: ./infra
+        run: pulumi preview --stack dev 

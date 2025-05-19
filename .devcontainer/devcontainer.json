@@ -1,11 +1,10 @@
 {
-  "name": "AI Orchestra Development",
+  "name": "AI Orchestra Dev",
   "image": "mcr.microsoft.com/devcontainers/python:3.11",
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-    "ghcr.io/devcontainers/features/terraform:1": {},
-    "ghcr.io/dhoeric/features/google-cloud-cli:1": {}
+    "ghcr.io/devcontainers/features/pulumi:latest": {}
   },
   "customizations": {
     "vscode": {
@@ -13,17 +12,14 @@
         "ms-python.python",
         "ms-python.vscode-pylance",
         "ms-azuretools.vscode-docker",
-        "hashicorp.terraform",
-        "googlecloudtools.cloudcode",
-        "redhat.vscode-yaml",
         "eamodio.gitlens",
         "github.copilot",
-        "github.vscode-github-actions"
+        "github.vscode-github-actions",
+        "redhat.vscode-yaml",
+        "pulumi.pulumi"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/usr/local/bin/python",
-        "python.linting.enabled": true,
-        "python.linting.pylintEnabled": true,
         "python.formatting.provider": "black",
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
@@ -38,16 +34,14 @@
       }
     }
   },
-  "postCreateCommand": "bash ./.devcontainer/setup.sh",
-  "remoteEnv": {
-    "PROJECT_ID": "cherry-ai-project",
-    "REGION": "us-west4",
-    "GOOGLE_APPLICATION_CREDENTIALS": "/workspaces/orchestra-main/credentials.json"
-  },
+  "postCreateCommand": "echo 'Dev container ready!'",
+  "postStartCommand": "KEY_TMP=$(mktemp) && gcloud secrets versions access latest --secret=platform-admin-key >\\"$KEY_TMP\\" && export GOOGLE_APPLICATION_CREDENTIALS=\\"$KEY_TMP\\" && for S in OPENROUTER_API_KEY PORTKEY_API_KEY PULUMI_ACCESS_TOKEN GH_FINE_PAT GH_CLASSIC_PAT; do export $S=\\"$(gcloud secrets versions access latest --secret=$S --project cherry-ai-project 2>/dev/null || echo \\"Secret $S not found or no permission\\")\\"; done && echo \\"Secrets sourced. GOOGLE_APPLICATION_CREDENTIALS set to $KEY_TMP\\" ",
   "containerEnv": {
-    "GOOGLE_APPLICATION_CREDENTIALS": "/workspaces/orchestra-main/credentials.json"
+    "HTTP_PROXY": "http://http.docker.internal:3128",
+    "HTTPS_PROXY": "http://http.docker.internal:3128",
+    "NO_PROXY": "localhost,127.0.0.1,.internal"
   },
   "mounts": [
-    "source=${localEnv:HOME}/.config/gcloud,target=/home/vscode/.config/gcloud,type=bind,consistency=cached"
+    "source=${localWorkspaceFolder}/.pulumi,target=/workspace/.pulumi,type=bind,consistency=cached"
   ]
 }
