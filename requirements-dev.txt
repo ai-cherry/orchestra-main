@@ -2,13 +2,15 @@
 -r requirements.txt
 
 # Testing
-pytest>=7.0.0
-pytest-asyncio>=0.18.0
-pytest-cov==4.1.0
-requests>=2.30.0  # Common in tests but missing from requirements
+pytest>=7.0.0,<8.0.0
+
+# Linting
+black>=23.0.0,<24.0.0
+flake8>=6.0.0,<7.0.0
+
+# Pulumi (if tests need to interact with Pulumi project structure, though not typical for unit tests)
+# pulumi>=3.0.0,<4.0.0
 
 # Code quality
-black>=22.0.0
-flake8>=4.0.0
 isort>=5.12.0  # Added for import sorting
 ruff>=0.0.292  # Added for comprehensive Python linting
