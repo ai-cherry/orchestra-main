@@ -155,3 +155,15 @@ Optimization & stability > cost & perfect security.  One developer (me).
 *   **Pulumi Project Structure in `infra/`:** The organization within `infra/` (e.g., use of Pulumi components, how shared vs. stack-specific logic is handled) can be further detailed.
 *   **Agent/Dashboard Specific Environment Variables:** Beyond secrets, are there non-sensitive environment variables needed for the agent or dashboard (e.g., `API_BASE_URL` for the dashboard to call the agent)? How are these configured for Cloud Run (likely via Pulumi)?
 *   **Initial Pulumi Setup:** How the Pulumi project and stacks are initially created and configured with GCP backend. 
+
+### 5. AI-Assisted Code Review Process
+
+After each major PR, use the following prompt with an AI assistant (like Cursor) to review changes:
+
+```plaintext
+You are my senior reviewer. Review the diff in this PR:
+1. Highlight any architecture drift vs docs/ARCHITECTURE.md
+2. Point out missing tests or error handling
+3. Suggest performance improvements
+Return a markdown checklist I can act on.
+``` 

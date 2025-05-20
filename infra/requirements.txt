@@ -1,3 +1,4 @@
 pulumi
 pulumi-gcp
+structlog
 # Add other Python dependencies for Pulumi here 

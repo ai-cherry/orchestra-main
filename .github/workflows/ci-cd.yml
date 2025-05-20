@@ -1,0 +1,158 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+  id-token: write # Required for Workload Identity Federation
+
+env:
+  PROJECT_ID: "YOUR_GCP_PROJECT_ID" # TODO: Replace with your GCP Project ID
+  GCP_REGION: "us-central1" # TODO: Choose your preferred GCP region
+  GAR_LOCATION: "us-central1" # Artifact Registry location (e.g., us-central1, europe-west1)
+  # These are for Workload Identity Federation
+  WORKLOAD_IDENTITY_PROVIDER: "projects/YOUR_GCP_PROJECT_NUMBER/locations/global/workloadIdentityPools/YOUR_POOL_ID/providers/YOUR_PROVIDER_ID" # TODO: Replace
+  SERVICE_ACCOUNT: "your-service-account-email@${PROJECT_ID}.iam.gserviceaccount.com" # TODO: Replace with your CI/CD Service Account email
+  PULUMI_STACK_DEV: "dev"
+  PULUMI_STACK_PROD: "prod"
+  AGENT_DOCKER_REPO: "agent-docker" # As defined in Pulumi
+  DASHBOARD_DOCKER_REPO: "dashboard-docker" # TODO: Ensure this Artifact Registry repo exists or create it via Pulumi/manual
+  AGENT_IMAGE_NAME: "agent"
+  DASHBOARD_IMAGE_NAME: "dashboard"
+
+jobs:
+  build-and-test:
+    name: Build, Test, and Push Images
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ github.sha }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker
+        run: |
+          gcloud auth configure-docker ${{ env.GAR_LOCATION }}-docker.pkg.dev
+
+      - name: Set up Python for Agent tests
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' # Match agent Dockerfile
+
+      - name: Install Agent test dependencies and run tests
+        working-directory: ./agent
+        run: |
+          pip install -r requirements.txt
+          # pip install pytest # If not in requirements.txt
+          # TODO: Create actual tests in agent/tests/
+          # pytest tests/ # Or your specific test command
+          echo "Skipping agent tests - no tests found or configured yet"
+
+      - name: Build and Push Agent Docker image
+        run: |
+          docker build -t ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AGENT_DOCKER_REPO }}/${{ env.AGENT_IMAGE_NAME }}:${{ github.sha }} \
+                       -t ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AGENT_DOCKER_REPO }}/${{ env.AGENT_IMAGE_NAME }}:latest \
+                       ./agent
+          docker push ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AGENT_DOCKER_REPO }}/${{ env.AGENT_IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AGENT_DOCKER_REPO }}/${{ env.AGENT_IMAGE_NAME }}:latest
+
+      - name: Set up Node.js for Dashboard build
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Match dashboard Dockerfile
+
+      - name: Build and Push Dashboard Docker image
+        run: |
+          docker build -t ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DASHBOARD_DOCKER_REPO }}/${{ env.DASHBOARD_IMAGE_NAME }}:${{ github.sha }} \
+                       -t ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DASHBOARD_DOCKER_REPO }}/${{ env.DASHBOARD_IMAGE_NAME }}:latest \
+                       ./dashboard
+          docker push ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DASHBOARD_DOCKER_REPO }}/${{ env.DASHBOARD_IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DASHBOARD_DOCKER_REPO }}/${{ env.DASHBOARD_IMAGE_NAME }}:latest
+
+  deploy-dev:
+    name: Deploy to Development
+    needs: build-and-test
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    environment:
+      name: development
+      url: ${{ steps.pulumi_up.outputs.endpoint_url }} # Optional: To show service URL in GitHub Deployments
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud (for Pulumi)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.SERVICE_ACCOUNT }}
+
+      - name: Set up Pulumi
+        uses: pulumi/actions@v5 # Changed from v3 to v5 (latest stable)
+        # Pulumi Cloud login is handled by default by the action if PULUMI_ACCESS_TOKEN is set.
+        # For GCP backend, it uses ADC from the auth step.
+
+      - name: Deploy to Dev Stack
+        id: pulumi_up
+        working-directory: ./infra
+        run: |
+          pulumi login # Logs into Pulumi Cloud or GCP backend based on Pulumi.yaml
+          pulumi select ${{ env.PULUMI_STACK_DEV }}
+          pulumi config set agentImageUrl ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AGENT_DOCKER_REPO }}/${{ env.AGENT_IMAGE_NAME }}:${{ needs.build-and-test.outputs.image_tag }}
+          pulumi config set dashboardImageUrl ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DASHBOARD_DOCKER_REPO }}/${{ env.DASHBOARD_IMAGE_NAME }}:${{ needs.build-and-test.outputs.image_tag }}
+          pulumi up --yes
+          # Capture an output, e.g., agent service URL for environment URL
+          # Adjust the output name based on your Pulumi program's exports
+          echo "endpoint_url=$(pulumi stack output ai_agent_service_url)" >> $GITHUB_OUTPUT
+
+  deploy-prod:
+    name: Deploy to Production
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.pulumi_up.outputs.endpoint_url }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud (for Pulumi)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.SERVICE_ACCOUNT }}
+
+      - name: Set up Pulumi
+        uses: pulumi/actions@v5
+
+      - name: Deploy to Prod Stack
+        id: pulumi_up
+        working-directory: ./infra
+        run: |
+          pulumi login
+          pulumi select ${{ env.PULUMI_STACK_PROD }}
+          pulumi config set agentImageUrl ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AGENT_DOCKER_REPO }}/${{ env.AGENT_IMAGE_NAME }}:${{ needs.build-and-test.outputs.image_tag }}
+          pulumi config set dashboardImageUrl ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DASHBOARD_DOCKER_REPO }}/${{ env.DASHBOARD_IMAGE_NAME }}:${{ needs.build-and-test.outputs.image_tag }}
+          pulumi up --yes
+          echo "endpoint_url=$(pulumi stack output ai_agent_service_url)" >> $GITHUB_OUTPUT 
