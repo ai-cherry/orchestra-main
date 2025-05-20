@@ -1,6 +1,8 @@
 config:
-  gcp:project: cherry-ai-project # Your Google Cloud project ID
-  gcp:region: us-central1 # Your preferred GCP region (e.g., us-central1)
+  gcp:project: your-gcp-project-id-dev
+  gcp:region: us-central1
+  # Add dev-specific configurations here
+
   # Required: Full path to your Cloud Run Docker image
   # Example: us-central1-docker.pkg.dev/cherry-ai-project/ai-orchestra/my-app-image:latest
   cloudRunImage: us-central1-docker.pkg.dev/cherry-ai-project/ai-orchestra/ai-orchestra:latest # Assuming image name is also ai-orchestra
@@ -43,3 +45,6 @@ config:
 #    }
 # This Pulumi.dev.yaml primarily handles configuration for the Pulumi program itself.
 # Secrets needed by the *application* should be provisioned into Secret Manager and accessed by Cloud Run as shown above.
+
+# Example: agentImage: "gcr.io/your-gcp-project-id-dev/agent:latest"
+# Example: dashboardImage: "gcr.io/your-gcp-project-id-dev/dashboard:latest"

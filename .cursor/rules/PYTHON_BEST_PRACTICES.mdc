@@ -1,0 +1,13 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+**Python Development Standards:**
+- **Version:** Target Python 3.11+.
+- **Formatting:** Strictly adhere to Black. Use isort for imports.
+- **Type Hints:** Mandatory for all function signatures and important variable declarations.
+- **Docstrings:** Google-style for all public modules, classes, functions.
+- **Dependencies:** Managed with Poetry (`pyproject.toml`).
+- **Linting:** Aim for Pylint and Flake8 clean code.
+- **Error Handling:** Use specific exceptions. Implement `try-except` blocks appropriately.

@@ -4,7 +4,7 @@
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-    "ghcr.io/devcontainers/features/pulumi:latest": {}
+    "ghcr.io/devcontainers-contrib/features/pulumi:1": {}
   },
   "customizations": {
     "vscode": {
@@ -23,7 +23,7 @@
         "python.formatting.provider": "black",
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
-          "source.organizeImports": "true"
+          "source.organizeImports": true
         },
         "terminal.integrated.defaultProfile.linux": "bash",
         "terminal.integrated.profiles.linux": {
@@ -34,14 +34,18 @@
       }
     }
   },
-  "postCreateCommand": "echo 'Dev container ready!'",
-  "postStartCommand": "KEY_TMP=$(mktemp) && gcloud secrets versions access latest --secret=platform-admin-key >\\"$KEY_TMP\\" && export GOOGLE_APPLICATION_CREDENTIALS=\\"$KEY_TMP\\" && for S in OPENROUTER_API_KEY PORTKEY_API_KEY PULUMI_ACCESS_TOKEN GH_FINE_PAT GH_CLASSIC_PAT; do export $S=\\"$(gcloud secrets versions access latest --secret=$S --project cherry-ai-project 2>/dev/null || echo \\"Secret $S not found or no permission\\")\\"; done && echo \\"Secrets sourced. GOOGLE_APPLICATION_CREDENTIALS set to $KEY_TMP\\" ",
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y curl && curl -sSL https://install.python-poetry.org | python3 - && chmod +x ./.devcontainer/setup_env.sh && echo 'Dev container creation complete. Poetry installed and setup script made executable.'",
+  "postStartCommand": "bash ./.devcontainer/setup_env.sh && source /tmp/devcontainer_exports.sh && echo '\n# Load Devcontainer Environment Variables\nsource /tmp/devcontainer_exports.sh' >> ~/.bashrc && echo '\n# Load Devcontainer Environment Variables\nsource /tmp/devcontainer_exports.sh' >> ~/.bash_profile && echo 'Secrets sourced and environment configured. Check /tmp/devcontainer_exports.sh for details.'",
+  "remoteEnv": {
+    "PATH": "${containerEnv:PATH}:${containerEnv:HOME}/.local/bin"
+  },
   "containerEnv": {
     "HTTP_PROXY": "http://http.docker.internal:3128",
     "HTTPS_PROXY": "http://http.docker.internal:3128",
     "NO_PROXY": "localhost,127.0.0.1,.internal"
   },
   "mounts": [
+    "source=${localEnv:HOME}/.config/gcloud,target=/home/vscode/.config/gcloud,type=bind,consistency=cached",
     "source=${localWorkspaceFolder}/.pulumi,target=/workspace/.pulumi,type=bind,consistency=cached"
   ]
 }

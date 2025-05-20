@@ -1,0 +1,20 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+\
+---
+description: Standards for Pulumi Python IaC on GCP.
+globs: ["infra/**/*.py", "Pulumi.yaml", "Pulumi.*.yaml"]
+autoAttach: true
+---
+
+**Pulumi GCP Standards:**
+- **Language:** Use Pulumi with Python SDK (`pulumi_gcp` or `pulumi_gcp_native`).
+- **Idempotency:** All stacks must be idempotent.
+- **State Backend:** GCS bucket `gs://cherry-ai-project-pulumi-state`.
+- **Config:** Use Pulumi stack configuration for environment-specific values. Fetch sensitive values from GCP Secret Manager at runtime if possible, or use Pulumi secrets.
+- **Components:** Structure resources into reusable Pulumi Components where appropriate.
+- **Naming:** Follow consistent naming conventions for resources.
+- **Secrets in Pulumi:** For secrets managed *by* Pulumi (e.g., a generated DB password), use `pulumi.Output.secret()` and `pulumi config set --secret`.
