@@ -1,11 +1,15 @@
 # Placeholder Dockerfile for agent service
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY requirements.txt requirements.txt
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ./app /app/app
+COPY ./app ./agent/app
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"] 
+EXPOSE 8080
+
+ENV PORT 8080
+
+CMD ["uvicorn", "agent.app.main:app", "--host", "0.0.0.0", "--port", "8080"] 
