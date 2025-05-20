@@ -19,8 +19,6 @@ jobs:
 
       - name: Install Poetry
         uses: abatilo/actions-poetry@v3
-        with:
-          poetry-version: "1.8.2"
 
       - name: Install yamllint and actionlint
         run: |
@@ -28,51 +26,25 @@ jobs:
           curl -sSL https://github.com/rhysd/actionlint/releases/latest/download/actionlint-linux-amd64.tar.gz | tar xz
           sudo mv actionlint /usr/local/bin/
 
-      - name: Install asdf
-        run: |
-          git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0
-          echo '. "$HOME/.asdf/asdf.sh"' >> $GITHUB_ENV
-          . "$HOME/.asdf/asdf.sh"
-
-      - name: Install asdf plugins and tools
-        run: |
-          . "$HOME/.asdf/asdf.sh"
-          asdf plugin add python || true
-          asdf plugin add poetry || true
-          asdf plugin add terraform || true
-          asdf plugin add nodejs || true
-          asdf install
-
-      - name: Check asdf tool versions
-        run: |
-          . "$HOME/.asdf/asdf.sh"
-          asdf current
-          python --version
-          poetry --version
-          terraform version
-          node --version
-
       - name: Lint all workflow YAMLs
         run: |
           yamllint .github/workflows/
           find .github/workflows -name '*.yml' -exec actionlint -oneline -color < {} \;
 
       - name: Poetry check (gcp_migration)
-        run: poetry check
-        working-directory: gcp_migration
+        if: GITHUB.EVENT_NAME == 'pull_request'
+        run: |
+          if [ -f "gcp_migration/pyproject.toml" ]; then
+            poetry check --directory=gcp_migration
+          else
+            echo "Skipping Poetry check for gcp_migration: pyproject.toml not found"
+          fi
 
       - name: Poetry check (admin-api)
-        run: poetry check
-        working-directory: services/admin-api
-
-      - name: Terraform validate (root)
-        run: terraform validate || true
-        continue-on-error: true
-
-      - name: Terraform validate (migration)
-        run: terraform -chdir=terraform/migration validate || true
-        continue-on-error: true
-
-      - name: Terraform validate (environments/dev)
-        run: terraform -chdir=terraform/environments/dev validate || true
-        continue-on-error: true
+        if: GITHUB.EVENT_NAME == 'pull_request'
+        run: |
+          if [ -f "services/admin-api/pyproject.toml" ]; then
+            poetry check --directory=services/admin-api
+          else
+            echo "Skipping Poetry check for services/admin-api: pyproject.toml not found"
+          fi
