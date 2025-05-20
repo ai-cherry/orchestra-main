@@ -127,3 +127,9 @@ crash.log
 *.log
 .env.*.local
 .env.local
+# local SDK / venv / archives – never commit
+google-cloud-sdk*
+google-cloud-sdk.staging/
+venv/
+*.tar.gz
+*.zip
