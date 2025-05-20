@@ -58,7 +58,7 @@ def tool_config():
         },
         "copilot": {
             "enabled": False,
-        }
+        },
     }
 
 
@@ -101,9 +101,9 @@ def test_workflow():
             {
                 "type": "mode",
                 "mode": "code",
-                "task": "Write a function to add two numbers"
+                "task": "Write a function to add two numbers",
             }
-        ]
+        ],
     }
 
 
@@ -118,12 +118,8 @@ def test_workflow_with_params():
             {
                 "type": "mode",
                 "mode": "code",
-                "task": "Write a function to {action} {count} {items}"
+                "task": "Write a function to {action} {count} {items}",
             },
-            {
-                "type": "mode",
-                "mode": "ask",
-                "task": "Explain the function"
-            }
-        ]
+            {"type": "mode", "mode": "ask", "task": "Explain the function"},
+        ],
     }

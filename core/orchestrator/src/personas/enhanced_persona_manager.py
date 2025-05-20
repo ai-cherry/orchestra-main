@@ -368,9 +368,9 @@ class EnhancedPersonaManager(PersonaManager):
 
                                 # Check for agent type mapping
                                 if persona.preferred_agent_type:
-                                    self._agent_type_mappings[persona_id] = (
-                                        persona.preferred_agent_type
-                                    )
+                                    self._agent_type_mappings[
+                                        persona_id
+                                    ] = persona.preferred_agent_type
 
                                 logger.debug(f"Loaded enhanced persona: {persona.name}")
                         except Exception as e:

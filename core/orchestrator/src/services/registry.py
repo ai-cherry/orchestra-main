@@ -27,9 +27,9 @@ class ServiceRegistry:
     def __init__(self):
         """Initialize the service registry."""
         self._services: List[Any] = []
-        self._service_ids: Set[int] = (
-            set()
-        )  # Track service object IDs to prevent duplicates
+        self._service_ids: Set[
+            int
+        ] = set()  # Track service object IDs to prevent duplicates
         logger.debug("ServiceRegistry initialized")
 
     def register(self, service: Any) -> Any:

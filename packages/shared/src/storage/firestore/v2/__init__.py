@@ -8,7 +8,9 @@ of concerns, better error handling, and more consistent interfaces.
 
 from packages.shared.src.storage.firestore.v2.adapter import FirestoreMemoryManagerV2
 from packages.shared.src.storage.firestore.v2.core import FirestoreStorageManager
-from packages.shared.src.storage.firestore.v2.async_core import AsyncFirestoreStorageManager
+from packages.shared.src.storage.firestore.v2.async_core import (
+    AsyncFirestoreStorageManager,
+)
 from packages.shared.src.storage.firestore.v2.models import (
     memory_item_to_document,
     document_to_memory_item,

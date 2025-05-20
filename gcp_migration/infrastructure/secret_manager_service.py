@@ -43,8 +43,16 @@ class SecretManagerService(ISecretService):
         self.github_secret_prefix = "github_"
         # Set of sensitive keywords to identify when sanitizing secret names
         self.sensitive_keywords = {
-            "password", "token", "key", "secret", "credential", "auth",
-            "private", "certificate", "access", "api"
+            "password",
+            "token",
+            "key",
+            "secret",
+            "credential",
+            "auth",
+            "private",
+            "certificate",
+            "access",
+            "api",
         }
 
     async def list_github_secrets(self, repository_name: str) -> List[str]:
@@ -142,10 +150,7 @@ class SecretManagerService(ISecretService):
         except Exception as e:
             error_message = f"Failed to create GCP secret '{secret.name}': {str(e)}"
             logger.error(error_message, exc_info=True)
-            raise SecretError(
-                message=error_message,
-                cause=e
-            )
+            raise SecretError(message=error_message, cause=e)
 
     async def migrate_secret(
         self, repository_name: str, secret_name: str, project_id: str
@@ -181,7 +186,7 @@ class SecretManagerService(ISecretService):
                     name=secret_name,
                     source="github",
                     source_repository=repository_name,
-                    migrated=False
+                    migrated=False,
                 )
 
             # Create GCP secret
@@ -190,13 +195,11 @@ class SecretManagerService(ISecretService):
             return secret
         except Exception as e:
             raise SecretError(
-                message=f"Failed to migrate secret {secret_name}: {str(e)}",
-                cause=e
+                message=f"Failed to migrate secret {secret_name}: {str(e)}", cause=e
             )
 
     async def batch_migrate_secrets(
-        self, github_secrets: Dict[str, str], project_id: str,
-        add_prefix: bool = True
+        self, github_secrets: Dict[str, str], project_id: str, add_prefix: bool = True
     ) -> List[Secret]:
         """
         Migrate multiple GitHub secrets to GCP Secret Manager in a batch.
@@ -217,13 +220,17 @@ class SecretManagerService(ISecretService):
         for secret_name, secret_value in github_secrets.items():
             try:
                 # Prepare secret
-                gcp_secret_name = f"{self.github_secret_prefix}{secret_name}" if add_prefix else secret_name
+                gcp_secret_name = (
+                    f"{self.github_secret_prefix}{secret_name}"
+                    if add_prefix
+                    else secret_name
+                )
                 secret = Secret(
                     name=gcp_secret_name,
                     value=secret_value,
                     source="github",
                     target="gcp",
-                    target_project=project_id
+                    target_project=project_id,
                 )
 
                 # Create GCP secret
@@ -256,7 +263,7 @@ class SecretManagerService(ISecretService):
             "total": len(migrated_secrets),
             "success": 0,
             "failed": 0,
-            "failures": []
+            "failures": [],
         }
 
         for secret in migrated_secrets:
@@ -267,18 +274,14 @@ class SecretManagerService(ISecretService):
                 # Compare with original value if available
                 if secret.value and gcp_value != secret.value:
                     results["failed"] += 1
-                    results["failures"].append({
-                        "name": secret.name,
-                        "reason": "Value mismatch"
-                    })
+                    results["failures"].append(
+                        {"name": secret.name, "reason": "Value mismatch"}
+                    )
                 else:
                     results["success"] += 1
             except Exception as e:
                 results["failed"] += 1
-                results["failures"].append({
-                    "name": secret.name,
-                    "reason": str(e)
-                })
+                results["failures"].append({"name": secret.name, "reason": str(e)})
 
         return results
 
@@ -295,13 +298,13 @@ class SecretManagerService(ISecretService):
         # Replace invalid characters with underscores
         sanitized = ""
         for char in name:
-            if char.isalnum() or char == '_' or char == '-':
+            if char.isalnum() or char == "_" or char == "-":
                 sanitized += char
             else:
-                sanitized += '_'
+                sanitized += "_"
 
         # Ensure name starts with a letter or underscore
-        if sanitized and not (sanitized[0].isalpha() or sanitized[0] == '_'):
+        if sanitized and not (sanitized[0].isalpha() or sanitized[0] == "_"):
             sanitized = f"s_{sanitized}"
 
         # Ensure name is not empty
@@ -322,11 +325,7 @@ class SecretManagerService(ISecretService):
         Returns:
             Dictionary mapping sensitivity level to list of secrets
         """
-        organized = {
-            "high": [],
-            "medium": [],
-            "low": []
-        }
+        organized = {"high": [], "medium": [], "low": []}
 
         for secret in secrets:
             name_lower = secret.name.lower()
@@ -357,11 +356,11 @@ class SecretManagerService(ISecretService):
 
         # Secret names must consist of only lowercase letters, numbers, dashes, and underscores
         for char in name:
-            if not (char.isalnum() or char == '_' or char == '-'):
+            if not (char.isalnum() or char == "_" or char == "-"):
                 return False
 
         # Secret names must start with a letter or underscore
-        if not (name[0].isalpha() or name[0] == '_'):
+        if not (name[0].isalpha() or name[0] == "_"):
             return False
 
         return True

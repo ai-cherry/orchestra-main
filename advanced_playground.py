@@ -14,7 +14,7 @@ web_agent = Agent(
     instructions=[
         "You are a helpful web search assistant.",
         "Always include sources in your responses.",
-        "Respond in a concise and informative manner."
+        "Respond in a concise and informative manner.",
     ],
     storage=SqlAgentStorage(table_name="web_agent", db_file="agents.db"),
     add_history_to_messages=True,
@@ -30,7 +30,7 @@ research_agent = Agent(
         "You are a knowledgeable research assistant.",
         "Use Wikipedia to provide detailed information on topics.",
         "Always cite your sources properly.",
-        "Format your responses in a scholarly style."
+        "Format your responses in a scholarly style.",
     ],
     storage=SqlAgentStorage(table_name="research_agent", db_file="agents.db"),
     add_history_to_messages=True,
@@ -45,7 +45,7 @@ math_agent = Agent(
     instructions=[
         "You are a math assistant who helps with calculations.",
         "Show your work step by step.",
-        "Explain mathematical concepts clearly."
+        "Explain mathematical concepts clearly.",
     ],
     storage=SqlAgentStorage(table_name="math_agent", db_file="agents.db"),
     add_history_to_messages=True,
@@ -56,15 +56,22 @@ math_agent = Agent(
 app = Playground(
     agents=[web_agent, research_agent, math_agent],
     title="Advanced Agent Dashboard",
-    description="A dashboard with multiple specialized agents for different tasks."
+    description="A dashboard with multiple specialized agents for different tasks.",
 ).get_app()
+
 
 class DynamicAgentScaler:
     """
     Handles dynamic scaling of agents based on load and performance metrics.
     """
 
-    def __init__(self, min_agents=1, max_agents=10, scale_up_threshold=75, scale_down_threshold=30):
+    def __init__(
+        self,
+        min_agents=1,
+        max_agents=10,
+        scale_up_threshold=75,
+        scale_down_threshold=30,
+    ):
         self.min_agents = min_agents
         self.max_agents = max_agents
         self.scale_up_threshold = scale_up_threshold
@@ -75,6 +82,7 @@ class DynamicAgentScaler:
         """Simulate fetching the current load percentage."""
         # Replace with actual logic to fetch load metrics
         import random
+
         return random.randint(10, 100)
 
     def scale_up(self):
@@ -103,6 +111,7 @@ class DynamicAgentScaler:
         elif current_load < self.scale_down_threshold:
             self.scale_down()
 
+
 class PredictiveRouter:
     """
     Implements predictive routing using a machine learning model.
@@ -115,6 +124,7 @@ class PredictiveRouter:
     def load_model(self):
         """Load the predictive model from a file."""
         import pickle
+
         try:
             with open(self.model_path, "rb") as f:
                 model = pickle.load(f)
@@ -137,6 +147,7 @@ class PredictiveRouter:
         except Exception as e:
             print(f"Error during prediction: {e}")
             return None
+
 
 class MultiRegionRouter:
     """
@@ -165,10 +176,12 @@ class MultiRegionRouter:
         import geopy.distance
 
         nearest_region = None
-        shortest_distance = float('inf')
+        shortest_distance = float("inf")
 
         for region, region_location in self.regions.items():
-            distance = geopy.distance.distance(user_location, region_location['location']).km
+            distance = geopy.distance.distance(
+                user_location, region_location["location"]
+            ).km
             if distance < shortest_distance:
                 shortest_distance = distance
                 nearest_region = region
@@ -187,13 +200,16 @@ class MultiRegionRouter:
             str: The name of the selected agent.
         """
         nearest_region = self.get_nearest_region(user_location)
-        if nearest_region and self.regions[nearest_region]['agents']:
-            selected_agent = self.regions[nearest_region]['agents'][0]  # Simplified selection logic
+        if nearest_region and self.regions[nearest_region]["agents"]:
+            selected_agent = self.regions[nearest_region]["agents"][
+                0
+            ]  # Simplified selection logic
             print(f"Routed to agent: {selected_agent} in region: {nearest_region}")
             return selected_agent
         else:
             print("No agents available in the nearest region.")
             return None
+
 
 class CostPerformanceOptimizer:
     """
@@ -221,7 +237,9 @@ class CostPerformanceOptimizer:
         """
         performance_weight = 0.7
         cost_weight = 0.3
-        return (agent['performance'] * performance_weight) - (agent['cost'] * cost_weight)
+        return (agent["performance"] * performance_weight) - (
+            agent["cost"] * cost_weight
+        )
 
     def select_best_agent(self):
         """
@@ -231,8 +249,11 @@ class CostPerformanceOptimizer:
             dict: The best agent.
         """
         best_agent = max(self.agents, key=self.calculate_score)
-        print(f"Selected best agent: {best_agent['name']} with score: {self.calculate_score(best_agent):.2f}")
+        print(
+            f"Selected best agent: {best_agent['name']} with score: {self.calculate_score(best_agent):.2f}"
+        )
         return best_agent
+
 
 class AgentHealthChecker:
     """
@@ -259,6 +280,7 @@ class AgentHealthChecker:
             bool: True if the agent is healthy, False otherwise.
         """
         import random
+
         return random.choice([True, False])  # Simulate health check with random outcome
 
     def perform_health_checks(self):
@@ -273,6 +295,7 @@ class AgentHealthChecker:
                 del self.agents[agent]
             else:
                 print(f"Agent {agent} is healthy.")
+
 
 class DebuggingTools:
     """
@@ -306,6 +329,7 @@ class DebuggingTools:
         except Exception as e:
             print(f"Error during scenario '{scenario_name}': {e}")
 
+
 # Run the app when this file is executed
 if __name__ == "__main__":
     print("Starting Advanced Phidata Dashboard on http://localhost:7777")
@@ -316,6 +340,7 @@ if __name__ == "__main__":
 
     # Simulate periodic scaling adjustments
     import time
+
     for _ in range(10):
         scaler.adjust_agents()
         time.sleep(2)

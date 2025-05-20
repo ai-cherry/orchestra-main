@@ -25,11 +25,15 @@ if DEV_MODE:
     try:
         from .csrf_protection_dev import csrf_protection_dev as csrf_protection
         from .csrf_protection_dev import csrf_protect_dev as csrf_protect
+
         logger.debug("Successfully loaded development CSRF protection")
     except ImportError as e:
-        logger.warning(f"Development CSRF protection not found: {str(e)}, falling back to production version")
+        logger.warning(
+            f"Development CSRF protection not found: {str(e)}, falling back to production version"
+        )
         try:
             from .csrf_protection import csrf_protection, csrf_protect
+
             logger.debug("Successfully loaded production CSRF protection as fallback")
         except ImportError as e2:
             logger.error(f"Failed to import CSRF protection: {str(e2)}")
@@ -38,6 +42,7 @@ else:
     logger.info("Loading production CSRF protection")
     try:
         from .csrf_protection import csrf_protection, csrf_protect
+
         logger.debug("Successfully loaded production CSRF protection")
     except ImportError as e:
         logger.error(f"Failed to import production CSRF protection: {str(e)}")

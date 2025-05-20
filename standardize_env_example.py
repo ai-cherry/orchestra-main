@@ -45,7 +45,7 @@ def write_env_file(path: Path, lines: List[str]) -> None:
 def categorize_env_lines(lines: List[str]) -> Dict[str, List[str]]:
     """
     Categorize environment variables by section.
-    
+
     Returns a dictionary mapping section names to lists of lines.
     """
     sections = {
@@ -61,30 +61,33 @@ def categorize_env_lines(lines: List[str]) -> Dict[str, List[str]]:
         "neo4j": [],
         "docker": [],
         "llm_config": [],
-        "other": []
+        "other": [],
     }
-    
+
     # First pass - filter lines with actual content
     filtered_lines = []
-    
+
     for line in lines:
         # Skip empty lines
         if not line.strip():
             continue
-            
+
         # Skip lines with just "#" (empty comments)
         if line.strip() == "#":
             continue
-            
+
         # Skip duplicated instructions
-        if "copy this file to .env" in line.lower() and any("copy this file to .env" in prev_line.lower() for prev_line in filtered_lines):
+        if "copy this file to .env" in line.lower() and any(
+            "copy this file to .env" in prev_line.lower()
+            for prev_line in filtered_lines
+        ):
             continue
-            
+
         filtered_lines.append(line)
-        
+
     # Process filtered lines
     current_section = "header"
-    
+
     # Regular expressions for identifying sections and variables
     section_patterns = {
         "environment": r"# .*[Ee]nvironment|APP_ENV|ENVIRONMENT|SITE_URL|SITE_TITLE",
@@ -99,7 +102,7 @@ def categorize_env_lines(lines: List[str]) -> Dict[str, List[str]]:
         "docker": r"# .*Docker|DOCKER_",
         "llm_config": r"# .*LLM|DEFAULT_LLM_|LLM_REQUEST|LLM_MAX|LLM_RETRY|LLM_SEMANTIC|PREFERRED_LLM|PORTKEY_CONFIG|PORTKEY_STRATEGY|PORTKEY_VIRTUAL|MASTER_PORTKEY",
     }
-    
+
     # Process each filtered line
     for line in filtered_lines:
         # Only process non-empty lines
@@ -111,29 +114,33 @@ def categorize_env_lines(lines: List[str]) -> Dict[str, List[str]]:
                     current_section = section
                     section_found = True
                     break
-                    
+
             # If no specific section was matched, add to "other" only if it's a variable
             if not section_found and "=" in line and not line.strip().startswith("#"):
                 current_section = "other"
-                
+
             # Add the line to the current section
             sections[current_section].append(line)
-    
+
     return sections
 
 
-def standardize_comments_and_spacing(sections: Dict[str, List[str]]) -> Dict[str, List[str]]:
+def standardize_comments_and_spacing(
+    sections: Dict[str, List[str]]
+) -> Dict[str, List[str]]:
     """Standardize comments and spacing in each section."""
     for section, lines in sections.items():
         # Skip empty sections
         if not lines:
             continue
-        
+
         # Ensure each section has a header comment
-        if section != "header" and not any(line.strip().startswith("#") and len(line.strip()) > 2 for line in lines[:3]):
+        if section != "header" and not any(
+            line.strip().startswith("#") and len(line.strip()) > 2 for line in lines[:3]
+        ):
             section_title = section.replace("_", " ").title()
             sections[section] = [f"# {section_title} Configuration\n"] + lines
-        
+
         # Ensure a blank line after comments at the start
         if any(line.strip().startswith("#") for line in lines):
             # Find the last comment line
@@ -143,11 +150,14 @@ def standardize_comments_and_spacing(sections: Dict[str, List[str]]) -> Dict[str
                     last_comment_idx = i
                 elif line.strip():  # If we hit a non-comment, non-blank line, stop
                     break
-            
+
             # If the line after the last comment is not blank, add a blank line
-            if last_comment_idx + 1 < len(lines) and lines[last_comment_idx + 1].strip():
+            if (
+                last_comment_idx + 1 < len(lines)
+                and lines[last_comment_idx + 1].strip()
+            ):
                 lines.insert(last_comment_idx + 1, "\n")
-    
+
     return sections
 
 
@@ -162,22 +172,24 @@ def remove_redundant_comments(sections: Dict[str, List[str]]) -> Dict[str, List[
         "authentication": r"authentication.*choose one method",
         "empty_comment": r"^#\s*$",
     }
-    
+
     for section_name, lines in sections.items():
         if section_name == "header":
             continue
-            
+
         # Extract actual variable assignments
-        var_lines = [line for line in lines if "=" in line and not line.strip().startswith("#")]
+        var_lines = [
+            line for line in lines if "=" in line and not line.strip().startswith("#")
+        ]
         var_names = set(line.split("=")[0].strip() for line in var_lines)
-        
+
         # Filter comments
         filtered_lines = []
         seen_patterns = set()
-        
+
         for line in lines:
             keep_line = True
-            
+
             # Check if it's a comment
             if line.strip().startswith("#"):
                 # Check for redundant patterns
@@ -188,67 +200,68 @@ def remove_redundant_comments(sections: Dict[str, List[str]]) -> Dict[str, List[
                             keep_line = False
                             break
                         seen_patterns.add(pattern_name)
-            
+
             if keep_line:
                 filtered_lines.append(line)
-        
+
         sections[section_name] = filtered_lines
-    
+
     return sections
+
 
 def reassemble_env_file(sections: Dict[str, List[str]]) -> List[str]:
     """Reassemble the sections into a single list of lines."""
     result = []
-    
+
     # Create a standard header
     result = [
         "# Orchestra Environment Configuration\n",
         "# Copy this file to .env and fill in your actual values\n",
-        "\n"
+        "\n",
     ]
-    
+
     # Define the order of sections
     section_order = [
-        "environment", 
+        "environment",
         "llm_api_keys",
-        "tools_api_keys", 
-        "gcp", 
+        "tools_api_keys",
+        "gcp",
         "github",
-        "terraform", 
-        "redis", 
-        "postgres", 
-        "neo4j", 
+        "terraform",
+        "redis",
+        "postgres",
+        "neo4j",
         "docker",
         "llm_config",
-        "other"
+        "other",
     ]
-    
+
     # Add each section with proper spacing
     for section in section_order:
         if sections[section]:
             if result and not result[-1].strip() == "":
                 result.append("\n")
             result.extend(sections[section])
-    
+
     return result
 
 
 def main():
     """Main function."""
     print(f"Standardizing {ENV_EXAMPLE_PATH}...")
-    
+
     # Read the existing file
     lines = read_env_file(ENV_EXAMPLE_PATH)
-    
+
     # Process the file
     sections = categorize_env_lines(lines)
     sections = standardize_comments_and_spacing(sections)
     sections = remove_redundant_comments(sections)
     updated_lines = reassemble_env_file(sections)
-    
+
     # Write the updated file
     write_env_file(OUTPUT_PATH, updated_lines)
-    
+
     print("Done! The .env.example file has been standardized.")
 
 

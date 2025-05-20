@@ -22,6 +22,7 @@ except ImportError:
     class RedisError(Exception):
         pass
 
+
 # Import Portkey manager
 try:
     from ..portkey.manager import PortkeyManager
@@ -61,8 +62,8 @@ class RedisClient:
     """
 
     def __init__(
-        self, 
-        host: Optional[str] = None, 
+        self,
+        host: Optional[str] = None,
         port: Optional[int] = None,
         password: Optional[str] = None,
         ssl: bool = False,
@@ -71,7 +72,7 @@ class RedisClient:
         portkey_api_key: Optional[str] = None,
         portkey_cache_ttl: int = 3600,
         secret_id: Optional[str] = None,
-        project_id: Optional[str] = None
+        project_id: Optional[str] = None,
     ):
         """
         Initialize a new RedisClient.
@@ -98,11 +99,15 @@ class RedisClient:
         self._port = port or int(os.environ.get("REDIS_PORT", "6379"))
         self._password = password  # Will be set during initialization
         self._password_env = os.environ.get("REDIS_PASSWORD")
-        self._password_secret_id = secret_id or os.environ.get("REDIS_PASSWORD_SECRET_ID")
+        self._password_secret_id = secret_id or os.environ.get(
+            "REDIS_PASSWORD_SECRET_ID"
+        )
         self._ssl = ssl or os.environ.get("REDIS_SSL", "false").lower() == "true"
         self._db = db
         self._redis = None
-        self._project_id = project_id or os.environ.get("GCP_PROJECT_ID") or "cherry-ai-project"
+        self._project_id = (
+            project_id or os.environ.get("GCP_PROJECT_ID") or "cherry-ai-project"
+        )
 
         # Portkey settings
         self._use_portkey = use_portkey
@@ -116,7 +121,9 @@ class RedisClient:
             raise ImportError("Redis library not available")
 
         if self._use_portkey and PortkeyManager is None:
-            logger.error("PortkeyManager not available. Ensure the module is properly installed.")
+            logger.error(
+                "PortkeyManager not available. Ensure the module is properly installed."
+            )
             raise ImportError("PortkeyManager not available")
 
         # Initialize clients
@@ -126,7 +133,7 @@ class RedisClient:
     def _setup_redis_password(self) -> None:
         """
         Set up the Redis password, with Secret Manager support if available.
-        
+
         This method attempts to get the Redis password from:
         1. The provided password parameter
         2. Secret Manager (if secret_id is provided)
@@ -136,31 +143,43 @@ class RedisClient:
         if self._password:
             logger.debug("Using provided Redis password")
             return
-            
+
         # Try to get password from Secret Manager if secret_id is provided
-        if self._password_secret_id and secretmanager is not None and get_gcp_credentials is not None:
-            logger.debug(f"Attempting to get Redis password from Secret Manager: {self._password_secret_id}")
+        if (
+            self._password_secret_id
+            and secretmanager is not None
+            and get_gcp_credentials is not None
+        ):
+            logger.debug(
+                f"Attempting to get Redis password from Secret Manager: {self._password_secret_id}"
+            )
             try:
                 # Initialize GCP auth for Secret Manager
-                credentials, project_id = get_gcp_credentials(project_id=self._project_id)
-                
+                credentials, project_id = get_gcp_credentials(
+                    project_id=self._project_id
+                )
+
                 # Create Secret Manager client
-                client = secretmanager.SecretManagerServiceClient(credentials=credentials)
-                
+                client = secretmanager.SecretManagerServiceClient(
+                    credentials=credentials
+                )
+
                 # Build the resource name of the secret version
                 name = f"projects/{project_id}/secrets/{self._password_secret_id}/versions/latest"
-                
+
                 # Access the secret version
                 response = client.access_secret_version(request={"name": name})
-                
+
                 # Get the password from the secret
                 self._password = response.payload.data.decode("UTF-8")
-                logger.info(f"Retrieved Redis password from Secret Manager: {self._password_secret_id}")
+                logger.info(
+                    f"Retrieved Redis password from Secret Manager: {self._password_secret_id}"
+                )
                 return
             except Exception as e:
                 logger.warning(f"Failed to get Redis password from Secret Manager: {e}")
                 # Continue to try environment variable
-        
+
         # Fall back to environment variable
         self._password = self._password_env
         if self._password:
@@ -178,7 +197,7 @@ class RedisClient:
                 password=self._password,
                 ssl=self._ssl,
                 db=self._db,
-                decode_responses=True  # Auto-decode to strings
+                decode_responses=True,  # Auto-decode to strings
             )
             logger.info(f"Redis client initialized for {self._host}:{self._port}")
         except Exception as e:
@@ -189,8 +208,7 @@ class RedisClient:
         if self._use_portkey:
             try:
                 self._portkey_manager = PortkeyManager(
-                    api_key=self._portkey_api_key,
-                    cache_ttl=self._portkey_cache_ttl
+                    api_key=self._portkey_api_key, cache_ttl=self._portkey_cache_ttl
                 )
                 logger.info("Portkey manager initialized")
             except Exception as e:
@@ -210,7 +228,7 @@ class RedisClient:
         """
         if not self._redis:
             raise RuntimeError("Redis client not initialized")
-        
+
         try:
             await self._redis.set(key, value, ex=ttl)
             logger.debug(f"Set cache key {key} with TTL {ttl}")
@@ -230,10 +248,12 @@ class RedisClient:
         """
         if not self._redis:
             raise RuntimeError("Redis client not initialized")
-        
+
         try:
             value = await self._redis.get(key)
-            logger.debug(f"Retrieved cache key {key}: {'found' if value else 'not found'}")
+            logger.debug(
+                f"Retrieved cache key {key}: {'found' if value else 'not found'}"
+            )
             return value
         except RedisError as e:
             logger.error(f"Error getting Redis cache: {e}")
@@ -248,7 +268,7 @@ class RedisClient:
         """
         if not self._redis:
             raise RuntimeError("Redis client not initialized")
-        
+
         try:
             await self._redis.delete(key)
             logger.debug(f"Deleted cache key {key}")
@@ -267,7 +287,7 @@ class RedisClient:
         """
         if not self._redis:
             raise RuntimeError("Redis client not initialized")
-        
+
         try:
             await self._redis.hset(key, field, value)
             logger.debug(f"Set hash field {key}.{field}")
@@ -288,10 +308,12 @@ class RedisClient:
         """
         if not self._redis:
             raise RuntimeError("Redis client not initialized")
-        
+
         try:
             value = await self._redis.hget(key, field)
-            logger.debug(f"Retrieved hash field {key}.{field}: {'found' if value else 'not found'}")
+            logger.debug(
+                f"Retrieved hash field {key}.{field}: {'found' if value else 'not found'}"
+            )
             return value
         except RedisError as e:
             logger.error(f"Error getting Redis hash field: {e}")
@@ -309,7 +331,7 @@ class RedisClient:
         """
         if not self._redis:
             raise RuntimeError("Redis client not initialized")
-        
+
         try:
             result = await self._redis.hgetall(key)
             logger.debug(f"Retrieved all hash fields for {key}: {len(result)} fields")
@@ -317,11 +339,11 @@ class RedisClient:
         except RedisError as e:
             logger.error(f"Error getting all Redis hash fields: {e}")
             raise
-            
+
     async def set_json(self, key: str, value: Dict[str, Any], ttl: int = 3600) -> None:
         """
         Store a JSON object in Redis.
-        
+
         Args:
             key: The cache key
             value: The dictionary to store as JSON
@@ -329,7 +351,7 @@ class RedisClient:
         """
         if not self._redis:
             raise RuntimeError("Redis client not initialized")
-            
+
         try:
             json_data = json.dumps(value)
             await self._redis.set(key, json_data, ex=ttl)
@@ -337,37 +359,37 @@ class RedisClient:
         except (RedisError, TypeError) as e:
             logger.error(f"Error setting Redis JSON data: {e}")
             raise
-            
+
     async def get_json(self, key: str) -> Optional[Dict[str, Any]]:
         """
         Retrieve a JSON object from Redis.
-        
+
         Args:
             key: The cache key
-            
+
         Returns:
             Deserialized JSON object or None if not found
         """
         if not self._redis:
             raise RuntimeError("Redis client not initialized")
-            
+
         try:
             data = await self._redis.get(key)
             if data is None:
                 return None
-                
+
             return json.loads(data)
         except (RedisError, json.JSONDecodeError) as e:
             logger.error(f"Error retrieving JSON from Redis: {e}")
             raise
-    
+
     # Portkey delegation methods
-    
+
     async def setup_portkey_config(
-        self, 
-        strategy: str = "fallback", 
+        self,
+        strategy: str = "fallback",
         fallbacks: Optional[List[Dict[str, Any]]] = None,
-        cache_enabled: bool = True
+        cache_enabled: bool = True,
     ) -> None:
         """
         Configure Portkey settings for the client.
@@ -379,19 +401,15 @@ class RedisClient:
         """
         if not self._use_portkey or not self._portkey_manager:
             raise RuntimeError("Portkey is not enabled or not initialized")
-        
+
         # Delegate to PortkeyManager
         await self._portkey_manager.setup_config(
-            strategy=strategy,
-            fallbacks=fallbacks,
-            cache_enabled=cache_enabled
+            strategy=strategy, fallbacks=fallbacks, cache_enabled=cache_enabled
         )
         logger.info("Portkey configuration completed successfully")
 
     async def portkey_semantic_cache(
-        self, 
-        query: str,
-        cache_key: Optional[str] = None
+        self, query: str, cache_key: Optional[str] = None
     ) -> Optional[Dict[str, Any]]:
         """
         Try to retrieve a semantically similar result from Portkey's cache.
@@ -405,11 +423,10 @@ class RedisClient:
         """
         if not self._use_portkey or not self._portkey_manager:
             raise RuntimeError("Portkey is not enabled or not initialized")
-            
+
         # Delegate to PortkeyManager
         return await self._portkey_manager.semantic_cache_get(
-            query=query,
-            cache_key=cache_key
+            query=query, cache_key=cache_key
         )
 
     async def portkey_store_semantic_cache(
@@ -417,7 +434,7 @@ class RedisClient:
         query: str,
         response: Dict[str, Any],
         cache_key: Optional[str] = None,
-        ttl: Optional[int] = None
+        ttl: Optional[int] = None,
     ) -> bool:
         """
         Store a response in Portkey's semantic cache.
@@ -433,13 +450,10 @@ class RedisClient:
         """
         if not self._use_portkey or not self._portkey_manager:
             raise RuntimeError("Portkey is not enabled or not initialized")
-            
+
         # Delegate to PortkeyManager
         return await self._portkey_manager.semantic_cache_store(
-            query=query,
-            response=response,
-            cache_key=cache_key,
-            ttl=ttl
+            query=query, response=response, cache_key=cache_key, ttl=ttl
         )
 
     async def clear_portkey_cache(self) -> bool:
@@ -451,7 +465,7 @@ class RedisClient:
         """
         if not self._use_portkey or not self._portkey_manager:
             raise RuntimeError("Portkey is not enabled or not initialized")
-            
+
         # Delegate to PortkeyManager
         return await self._portkey_manager.clear_cache()
 
@@ -462,14 +476,18 @@ class RedisClient:
         Returns:
             True if Portkey is enabled and initialized, False otherwise
         """
-        return self._use_portkey and self._portkey_manager is not None and self._portkey_manager.is_initialized()
-            
+        return (
+            self._use_portkey
+            and self._portkey_manager is not None
+            and self._portkey_manager.is_initialized()
+        )
+
     async def close(self) -> None:
         """Close the Redis connection and any other resources."""
         if self._redis:
             await self._redis.close()
             logger.debug("Redis connection closed")
-            
+
         # Close PortkeyManager if initialized
         if self._portkey_manager:
             await self._portkey_manager.close()

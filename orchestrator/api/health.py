@@ -10,22 +10,18 @@ router = APIRouter(tags=["health"])
 async def health_check():
     """
     Simple health check endpoint.
-    
+
     Returns:
         A dictionary with status information
     """
-    return {
-        "status": "healthy",
-        "service": "orchestrator",
-        "mode": "standard" 
-    }
+    return {"status": "healthy", "service": "orchestrator", "mode": "standard"}
 
 
 @router.get("/status")
 async def system_status():
     """
     Get detailed system status information.
-    
+
     Returns:
         A dictionary with system status details
     """
@@ -33,10 +29,6 @@ async def system_status():
     # such as connected services, available agents, etc.
     return {
         "status": "operational",
-        "components": {
-            "api": "online",
-            "agents": "online",
-            "memory": "online"
-        },
-        "version": "1.0.0"
+        "components": {"api": "online", "agents": "online", "memory": "online"},
+        "version": "1.0.0",
     }

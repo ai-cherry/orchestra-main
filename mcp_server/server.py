@@ -29,12 +29,20 @@ try:
     from flask_cors import CORS
     from flask_socketio import SocketIO
 except ImportError:
-    print("Flask dependencies not found. Install with: pip install flask flask-cors flask-socketio")
+    print(
+        "Flask dependencies not found. Install with: pip install flask flask-cors flask-socketio"
+    )
     print("Continuing with limited functionality...")
 
 # Import configuration loader
 # Import configuration loader
-from .config.loader import load_config_from_file, load_config_from_env, merge_configs, load_config
+from .config.loader import (
+    load_config_from_file,
+    load_config_from_env,
+    merge_configs,
+    load_config,
+)
+
 # Import enhanced storage and server components
 from .storage.memory_store import MemoryStore
 from .storage.optimized_memory_storage import OptimizedMemoryStorage
@@ -46,11 +54,12 @@ from .managers.performance_memory_manager import PerformanceMemoryManager
 from .utils.performance_tuner import PerformanceTuner
 from .utils.performance_monitor import get_performance_monitor
 from .health_check import register_health_endpoints
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)]
+    handlers=[logging.StreamHandler(sys.stdout)],
 )
 logger = logging.getLogger("mcp-server")
 
@@ -91,16 +100,21 @@ DEFAULT_CONFIG = {
         "copilot": {
             "enabled": False,
             "memory_sync": False,
-        }
-    }
+        },
+    },
 }
 
 
 class MCPServer:
     """Model Context Protocol (MCP) Server with performance optimizations."""
 
-    def __init__(self, config_path: Optional[str] = None,
-                 memory_manager=None, tool_manager=None, workflow_manager=None):
+    def __init__(
+        self,
+        config_path: Optional[str] = None,
+        memory_manager=None,
+        tool_manager=None,
+        workflow_manager=None,
+    ):
         """Initialize the MCP server with optional dependency injection and performance optimizations.
 
         Args:
@@ -112,6 +126,7 @@ class MCPServer:
         # Load configuration using enhanced loader
         try:
             from .config.loader import load_config as config_loader
+
             self.config = config_loader(config_path)
         except ImportError:
             logger.warning("Config loader not found. Using default configuration.")
@@ -120,19 +135,31 @@ class MCPServer:
         # Initialize performance tuner
         try:
             from .utils.performance_tuner import PerformanceTuner
+
             self.perf_tuner = PerformanceTuner()
         except ImportError:
-            logger.warning("Performance tuner not available. Performance optimizations disabled.")
-            self.perf_tuner = None        # Use injected dependencies or create optimized instances
-        memory_config = self.config.get("memory", {}) if isinstance(
-            self.config, dict) else self.config.memory.dict()
+            logger.warning(
+                "Performance tuner not available. Performance optimizations disabled."
+            )
+            self.perf_tuner = (
+                None  # Use injected dependencies or create optimized instances
+            )
+        memory_config = (
+            self.config.get("memory", {})
+            if isinstance(self.config, dict)
+            else self.config.memory.dict()
+        )
         self.memory_store = memory_store = MemoryStore(memory_config)
 
         # Initialize performance monitor
         self.perf_monitor = get_performance_monitor()
 
         # Check if optimized components should be used
-        use_optimized = os.environ.get("MCP_USE_OPTIMIZED", "false").lower() in ["true", "1", "yes"]
+        use_optimized = os.environ.get("MCP_USE_OPTIMIZED", "false").lower() in [
+            "true",
+            "1",
+            "yes",
+        ]
 
         # Use performance memory manager by default for better performance
         try:
@@ -148,14 +175,13 @@ class MCPServer:
                 self.memory_manager = memory_manager or PerformanceMemoryManager(
                     config=memory_config,
                     storage=storage_adapter,
-                    performance_monitor=self.perf_monitor
+                    performance_monitor=self.perf_monitor,
                 )
             else:
                 logger.info("Using standard memory components")
                 # Use regular performance memory manager
                 self.memory_manager = memory_manager or PerformanceMemoryManager(
-                    config=memory_config,
-                    performance_monitor=self.perf_monitor
+                    config=memory_config, performance_monitor=self.perf_monitor
                 )
         except Exception as e:
             logger.error(f"Failed to initialize memory components: {e}")
@@ -169,14 +195,12 @@ class MCPServer:
             self.config.tools.dict(),
             self.memory_store,
             memory_manager=self.memory_manager,
-            perf_tuner=self.perf_tuner
+            perf_tuner=self.perf_tuner,
         )
 
         # Initialize workflow manager with performance instrumentation
         self.workflow_manager = workflow_manager or WorkflowManager(
-            self.tool_manager,
-            self.memory_store,
-            perf_tuner=self.perf_tuner
+            self.tool_manager, self.memory_store, perf_tuner=self.perf_tuner
         )
 
         # Initialize Flask application with performance-optimized settings
@@ -191,8 +215,10 @@ class MCPServer:
         # Initialize SocketIO with appropriate settings
         self.socketio = SocketIO(
             self.app,
-            cors_allowed_origins="*" if not self.config.security.allowed_origins else self.config.security.allowed_origins,
-            async_mode='gevent'  # Use gevent for better performance
+            cors_allowed_origins="*"
+            if not self.config.security.allowed_origins
+            else self.config.security.allowed_origins,
+            async_mode="gevent",  # Use gevent for better performance
         )
 
         # Configure routes with performance monitoring
@@ -240,14 +266,17 @@ class MCPServer:
 
     def _configure_routes(self):
         """Configure Flask routes."""
+
         # Define API routes
         @self.app.route("/api/status", methods=["GET"])
         def status():
-            return jsonify({
-                "status": "running",
-                "tools": self.tool_manager.get_enabled_tools(),
-                "workflows": len(self.workflow_manager.get_available_workflows()),
-            })
+            return jsonify(
+                {
+                    "status": "running",
+                    "tools": self.tool_manager.get_enabled_tools(),
+                    "workflows": len(self.workflow_manager.get_available_workflows()),
+                }
+            )
 
         @self.app.route("/api/memory", methods=["GET"])
         def get_memory():
@@ -302,7 +331,12 @@ class MCPServer:
         def sync_memory():
             data = request.json
 
-            if not data or "key" not in data or "source_tool" not in data or "target_tool" not in data:
+            if (
+                not data
+                or "key" not in data
+                or "source_tool" not in data
+                or "target_tool" not in data
+            ):
                 return jsonify({"error": "Missing required parameters"}), 400
 
             key = data["key"]
@@ -320,7 +354,12 @@ class MCPServer:
         def execute():
             data = request.json
 
-            if not data or "tool" not in data or "mode" not in data or "prompt" not in data:
+            if (
+                not data
+                or "tool" not in data
+                or "mode" not in data
+                or "prompt" not in data
+            ):
                 return jsonify({"error": "Missing required parameters"}), 400
 
             tool = data["tool"]
@@ -350,9 +389,14 @@ class MCPServer:
             parameters = data.get("parameters")
             tool = data.get("tool")
 
-            result = self.workflow_manager.execute_workflow(workflow_id, parameters, tool)
+            result = self.workflow_manager.execute_workflow(
+                workflow_id, parameters, tool
+            )
             if result is None:
-                return jsonify({"error": f"Failed to execute workflow {workflow_id}"}), 500
+                return (
+                    jsonify({"error": f"Failed to execute workflow {workflow_id}"}),
+                    500,
+                )
 
             return jsonify({"result": result})
 
@@ -366,9 +410,18 @@ class MCPServer:
             workflow_id = data["workflow_id"]
             tools = data.get("tools")
 
-            result = self.workflow_manager.execute_cross_tool_workflow(workflow_id, tools)
+            result = self.workflow_manager.execute_cross_tool_workflow(
+                workflow_id, tools
+            )
             if result is None:
-                return jsonify({"error": f"Failed to execute cross-tool workflow {workflow_id}"}), 500
+                return (
+                    jsonify(
+                        {
+                            "error": f"Failed to execute cross-tool workflow {workflow_id}"
+                        }
+                    ),
+                    500,
+                )
 
             return jsonify({"result": result})
 
@@ -385,11 +438,15 @@ class MCPServer:
                     "uptime": time.time() - self.start_time,
                     "memory_usage": self._get_memory_usage(),
                 },
-                "memory_manager": self.memory_manager.get_performance_metrics() if hasattr(self.memory_manager, "get_performance_metrics") else {},
-                "tuner": self.perf_tuner.get_metrics()
+                "memory_manager": self.memory_manager.get_performance_metrics()
+                if hasattr(self.memory_manager, "get_performance_metrics")
+                else {},
+                "tuner": self.perf_tuner.get_metrics(),
             }
 
-            self.perf_tuner.record_operation("get_performance_metrics", time.time() - start_time)
+            self.perf_tuner.record_operation(
+                "get_performance_metrics", time.time() - start_time
+            )
             return jsonify(metrics)
 
         @self.app.route("/api/performance/slow-operations", methods=["GET"])
@@ -399,7 +456,9 @@ class MCPServer:
 
             slow_ops = self.perf_tuner.get_slow_operations()
 
-            self.perf_tuner.record_operation("get_slow_operations", time.time() - start_time)
+            self.perf_tuner.record_operation(
+                "get_slow_operations", time.time() - start_time
+            )
             return jsonify({"slow_operations": slow_ops})
 
         @self.app.route("/api/performance/reset", methods=["POST"])
@@ -420,7 +479,7 @@ class MCPServer:
             return {
                 "rss_mb": memory_info.rss / (1024 * 1024),
                 "vms_mb": memory_info.vms / (1024 * 1024),
-                "percent": process.memory_percent()
+                "percent": process.memory_percent(),
             }
         except:
             return {"error": "Failed to get memory usage"}

@@ -12,7 +12,16 @@ import tempfile
 import datetime
 from typing import Dict, List, Optional, Any
 
-from fastapi import FastAPI, Depends, HTTPException, Request, status, File, UploadFile, Form
+from fastapi import (
+    FastAPI,
+    Depends,
+    HTTPException,
+    Request,
+    status,
+    File,
+    UploadFile,
+    Form,
+)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
@@ -20,13 +29,26 @@ from pydantic import BaseModel, Field
 from ai_orchestra.core.config import settings, get_settings
 from ai_orchestra.core.errors import AIServiceError
 from ai_orchestra.infrastructure.gcp.vertex_ai_service import VertexAIService
-from ai_orchestra.infrastructure.persistence.firestore_memory import FirestoreMemoryProvider
-from ai_orchestra.infrastructure.persistence.failover_memory import FailoverMemoryProvider
+from ai_orchestra.infrastructure.persistence.firestore_memory import (
+    FirestoreMemoryProvider,
+)
+from ai_orchestra.infrastructure.persistence.failover_memory import (
+    FailoverMemoryProvider,
+)
 from ai_orchestra.infrastructure.persistence.memory_provider import MemoryProvider
-from ai_orchestra.infrastructure.vector.pgvector_service import PGVectorService, DocumentChunk
-from ai_orchestra.services.document.document_processor import DocumentProcessor, ChunkingStrategy, TextExtractionError
+from ai_orchestra.infrastructure.vector.pgvector_service import (
+    PGVectorService,
+    DocumentChunk,
+)
+from ai_orchestra.services.document.document_processor import (
+    DocumentProcessor,
+    ChunkingStrategy,
+    TextExtractionError,
+)
 from ai_orchestra.core.services.checkpointing import StateCheckpointManager
-from ai_orchestra.infrastructure.versioning.model_version_manager import ModelVersionManager
+from ai_orchestra.infrastructure.versioning.model_version_manager import (
+    ModelVersionManager,
+)
 from ai_orchestra.utils.logging import configure_logging, log_event
 
 # Configure logging
@@ -76,10 +98,12 @@ def get_memory_provider() -> MemoryProvider:
     secondary = FirestoreMemoryProvider(collection_name="memory_backup")
 
     # Create failover provider
-    return FailoverMemoryProvider([
-        (primary, "primary"),
-        (secondary, "secondary"),
-    ])
+    return FailoverMemoryProvider(
+        [
+            (primary, "primary"),
+            (secondary, "secondary"),
+        ]
+    )
 
 
 def get_checkpoint_manager() -> StateCheckpointManager:
@@ -305,7 +329,9 @@ class DocumentListResponse(BaseModel):
 
 # Exception handlers
 @app.exception_handler(AIServiceError)
-async def ai_service_error_handler(request: Request, exc: AIServiceError) -> JSONResponse:
+async def ai_service_error_handler(
+    request: Request, exc: AIServiceError
+) -> JSONResponse:
     """
     Handle AI service errors.
 
@@ -316,11 +342,16 @@ async def ai_service_error_handler(request: Request, exc: AIServiceError) -> JSO
     Returns:
         JSON response with error details
     """
-    log_event(logger, "error", "handled", {
-        "code": exc.code,
-        "message": exc.message,
-        "path": request.url.path,
-    })
+    log_event(
+        logger,
+        "error",
+        "handled",
+        {
+            "code": exc.code,
+            "message": exc.message,
+            "path": request.url.path,
+        },
+    )
 
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
@@ -344,11 +375,16 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
     Returns:
         JSON response with error details
     """
-    log_event(logger, "error", "unhandled", {
-        "type": type(exc).__name__,
-        "message": str(exc),
-        "path": request.url.path,
-    })
+    log_event(
+        logger,
+        "error",
+        "unhandled",
+        {
+            "type": type(exc).__name__,
+            "message": str(exc),
+            "path": request.url.path,
+        },
+    )
 
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -979,7 +1015,7 @@ async def process_document(
             file_path=request.file_path,
             document_id=request.document_id,
             metadata=request.metadata,
-            chunking_strategy=request.chunking_strategy
+            chunking_strategy=request.chunking_strategy,
         )
 
         # Store document metadata
@@ -987,19 +1023,21 @@ async def process_document(
             document_id=document_id,
             title=document_metadata["title"],
             source=document_metadata["source"],
-            metadata=document_metadata.get("metadata", {})
+            metadata=document_metadata.get("metadata", {}),
         )
 
         # Prepare chunks for storage
         document_chunks = []
         for chunk in chunks:
-            document_chunks.append(DocumentChunk(
-                chunk_id=chunk["id"],
-                document_id=document_id,
-                content=chunk["content"],
-                metadata=chunk.get("metadata", {}),
-                embedding=None  # We'll get embeddings from the AI service
-            ))
+            document_chunks.append(
+                DocumentChunk(
+                    chunk_id=chunk["id"],
+                    document_id=document_id,
+                    content=chunk["content"],
+                    metadata=chunk.get("metadata", {}),
+                    embedding=None,  # We'll get embeddings from the AI service
+                )
+            )
 
         # Get embeddings for chunks
         for chunk in document_chunks:
@@ -1018,25 +1056,22 @@ async def process_document(
                 title=document_metadata["title"],
                 source=document_metadata["source"],
                 created_at=datetime.datetime.now().isoformat(),
-                metadata=document_metadata.get("metadata", {})
-            )
+                metadata=document_metadata.get("metadata", {}),
+            ),
         )
 
     except TextExtractionError as e:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Failed to extract text from document: {str(e)}"
+            detail=f"Failed to extract text from document: {str(e)}",
         )
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         logger.error(f"Error processing document: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error processing document: {str(e)}"
+            detail=f"Error processing document: {str(e)}",
         )
 
 
@@ -1070,7 +1105,9 @@ async def upload_document(
         metadata = json.loads(metadata_json) if metadata_json else {}
 
         # Create a temporary file to store the uploaded content
-        with tempfile.NamedTemporaryFile(delete=False, suffix=f"_{file.filename}") as temp_file:
+        with tempfile.NamedTemporaryFile(
+            delete=False, suffix=f"_{file.filename}"
+        ) as temp_file:
             # Write uploaded file content to the temporary file
             content = await file.read()
             temp_file.write(content)
@@ -1078,11 +1115,15 @@ async def upload_document(
 
         try:
             # Process the document using the temporary file
-            document_id, chunks, document_metadata = await document_processor.process_file(
+            (
+                document_id,
+                chunks,
+                document_metadata,
+            ) = await document_processor.process_file(
                 file_path=temp_file_path,
                 document_id=document_id,
                 metadata=metadata,
-                chunking_strategy=chunking_strategy
+                chunking_strategy=chunking_strategy,
             )
 
             # Store document metadata
@@ -1090,19 +1131,21 @@ async def upload_document(
                 document_id=document_id,
                 title=document_metadata["title"],
                 source=file.filename,  # Use original filename as source
-                metadata=document_metadata.get("metadata", {})
+                metadata=document_metadata.get("metadata", {}),
             )
 
             # Prepare chunks for storage
             document_chunks = []
             for chunk in chunks:
-                document_chunks.append(DocumentChunk(
-                    chunk_id=chunk["id"],
-                    document_id=document_id,
-                    content=chunk["content"],
-                    metadata=chunk.get("metadata", {}),
-                    embedding=None  # We'll get embeddings from the AI service
-                ))
+                document_chunks.append(
+                    DocumentChunk(
+                        chunk_id=chunk["id"],
+                        document_id=document_id,
+                        content=chunk["content"],
+                        metadata=chunk.get("metadata", {}),
+                        embedding=None,  # We'll get embeddings from the AI service
+                    )
+                )
 
             # Get embeddings for chunks
             for chunk in document_chunks:
@@ -1121,8 +1164,8 @@ async def upload_document(
                     title=document_metadata["title"],
                     source=file.filename,
                     created_at=datetime.datetime.now().isoformat(),
-                    metadata=document_metadata.get("metadata", {})
-                )
+                    metadata=document_metadata.get("metadata", {}),
+                ),
             )
 
         finally:
@@ -1133,21 +1176,18 @@ async def upload_document(
     except TextExtractionError as e:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Failed to extract text from document: {str(e)}"
+            detail=f"Failed to extract text from document: {str(e)}",
         )
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except json.JSONDecodeError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid metadata JSON format"
+            detail="Invalid metadata JSON format",
         )
     except Exception as e:
         logger.error(f"Error processing uploaded document: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error processing uploaded document: {str(e)}"
+            detail=f"Error processing uploaded document: {str(e)}",
         )

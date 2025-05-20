@@ -3,6 +3,7 @@ from typing import Dict, List, Optional, Any
 
 from packages.shared.src.models.base_models import MemoryItem, AgentData, PersonaConfig
 
+
 class MemoryInterface(abc.ABC):
     @abc.abstractmethod
     async def add_memory_item(self, item: MemoryItem) -> str:

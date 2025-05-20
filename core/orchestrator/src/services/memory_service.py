@@ -12,10 +12,15 @@ from functools import lru_cache
 from typing import Dict, List, Optional, Any
 
 from core.orchestrator.src.services.event_bus import get_event_bus
+
 # Import the settings instance directly
 from core.orchestrator.src.config.config import settings
-from packages.shared.src.memory.memory_manager import MemoryManager, MemoryHealth # Import MemoryHealth if needed by MemoryService, otherwise remove
+from packages.shared.src.memory.memory_manager import (
+    MemoryManager,
+    MemoryHealth,
+)  # Import MemoryHealth if needed by MemoryService, otherwise remove
 from packages.shared.src.models.base_models import AgentData, MemoryItem, PersonaConfig
+
 # Removed legacy import: from future.firestore_memory_manager import FirestoreMemoryManager
 # Removed incorrect import: from packages.shared.src.storage.enhanced_firestore_stub import EnhancedFirestoreManager
 
@@ -73,15 +78,17 @@ class MemoryService:
         try:
             # Use asyncio to run the async method in a synchronous context
             import asyncio
-            
+
             try:
                 loop = asyncio.get_event_loop()
             except RuntimeError:
                 # Create a new event loop if one doesn't exist
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
-                
-            item_id = loop.run_until_complete(self._memory_manager.add_memory_item(item))
+
+            item_id = loop.run_until_complete(
+                self._memory_manager.add_memory_item(item)
+            )
         except Exception as e:
             logger.error(f"Failed to add memory item: {e}")
             # Re-raise to notify caller
@@ -130,14 +137,14 @@ class MemoryService:
         # Get conversation history
         # Use asyncio to run the async method in a synchronous context
         import asyncio
-        
+
         try:
             loop = asyncio.get_event_loop()
         except RuntimeError:
             # Create a new event loop if one doesn't exist
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            
+
         items = loop.run_until_complete(
             self._memory_manager.get_conversation_history(
                 user_id=user_id, session_id=session_id, limit=limit, filters=filters
@@ -215,14 +222,14 @@ class MemoryService:
         try:
             # Use asyncio to run the async method in a synchronous context
             import asyncio
-            
+
             try:
                 loop = asyncio.get_event_loop()
             except RuntimeError:
                 # Create a new event loop if one doesn't exist
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
-                
+
             results = loop.run_until_complete(
                 self._memory_manager.semantic_search(
                     user_id=user_id,
@@ -267,14 +274,14 @@ class MemoryService:
         """
         # Use asyncio to run the async method in a synchronous context
         import asyncio
-        
+
         try:
             loop = asyncio.get_event_loop()
         except RuntimeError:
             # Create a new event loop if one doesn't exist
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            
+
         return loop.run_until_complete(self._memory_manager.add_raw_agent_data(data))
 
     def cleanup_expired_items(self) -> int:
@@ -290,15 +297,17 @@ class MemoryService:
         try:
             # Use asyncio to run the async method in a synchronous context
             import asyncio
-            
+
             try:
                 loop = asyncio.get_event_loop()
             except RuntimeError:
                 # Create a new event loop if one doesn't exist
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
-                
-            count = loop.run_until_complete(self._memory_manager.cleanup_expired_items())
+
+            count = loop.run_until_complete(
+                self._memory_manager.cleanup_expired_items()
+            )
         except Exception as e:
             logger.error(f"Failed to cleanup expired items: {e}")
             # Re-raise since this is the primary operation
@@ -371,7 +380,7 @@ def get_memory_manager() -> MemoryManager:
         cache_ttl=settings.MEMORY_CACHE_TTL,
         # Add other configuration parameters for MemoryManager if needed
         # e.g., memory_backend_type="firestore_v1" or "firestore_v2" if settings controls this
-        memory_backend_type=settings.MEMORY_BACKEND_TYPE # Assuming settings controls backend type
+        memory_backend_type=settings.MEMORY_BACKEND_TYPE,  # Assuming settings controls backend type
     )
 
     # Initialize the manager (this initializes the selected backend)

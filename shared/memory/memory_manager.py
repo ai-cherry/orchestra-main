@@ -80,7 +80,9 @@ class InMemoryMemoryManager(MemoryManager):
 class FirestoreMemoryManager(MemoryManager):
     """Firestore implementation of MemoryManager for GCP integration."""
 
-    def __init__(self, collection_name: str = "memories", credentials_path: Optional[str] = None):
+    def __init__(
+        self, collection_name: str = "memories", credentials_path: Optional[str] = None
+    ):
         """
         Initialize the FirestoreMemoryManager.
 
@@ -93,15 +95,16 @@ class FirestoreMemoryManager(MemoryManager):
             # If credentials path is provided, use it to authenticate
             if credentials_path and os.path.exists(credentials_path):
                 credentials = service_account.Credentials.from_service_account_file(
-                    credentials_path)
+                    credentials_path
+                )
                 self.db = firestore.Client(credentials=credentials)
                 logger.info(
-                    f"Initialized Firestore client with credentials from {credentials_path}")
+                    f"Initialized Firestore client with credentials from {credentials_path}"
+                )
             else:
                 # Otherwise, rely on default authentication (GOOGLE_APPLICATION_CREDENTIALS env var)
                 self.db = firestore.Client()
-                logger.info(
-                    "Initialized Firestore client with default credentials")
+                logger.info("Initialized Firestore client with default credentials")
 
             self.collection = self.db.collection(collection_name)
             logger.info(f"Using Firestore collection: {collection_name}")
@@ -140,8 +143,7 @@ class FirestoreMemoryManager(MemoryManager):
                 logger.debug(f"Memory item not found with ID: {memory_id}")
                 return None
         except Exception as e:
-            logger.error(
-                f"Error retrieving memory item from Firestore: {str(e)}")
+            logger.error(f"Error retrieving memory item from Firestore: {str(e)}")
             raise
 
     async def search(self, query: str, limit: int = 10) -> List[MemoryItem]:
@@ -168,8 +170,7 @@ class FirestoreMemoryManager(MemoryManager):
 
             return results
         except Exception as e:
-            logger.error(
-                f"Error searching memory items in Firestore: {str(e)}")
+            logger.error(f"Error searching memory items in Firestore: {str(e)}")
             raise
 
     async def delete(self, memory_id: str) -> bool:
@@ -186,8 +187,7 @@ class FirestoreMemoryManager(MemoryManager):
                 logger.debug(f"Memory item not found with ID: {memory_id}")
                 return False
         except Exception as e:
-            logger.error(
-                f"Error deleting memory item from Firestore: {str(e)}")
+            logger.error(f"Error deleting memory item from Firestore: {str(e)}")
             raise
 
 
@@ -213,8 +213,11 @@ class MemoryManagerFactory:
             return InMemoryMemoryManager()
         elif memory_type.lower() == "firestore":
             collection = kwargs.get("collection_name", "memories")
-            creds_path = kwargs.get("credentials_path", os.environ.get(
-                "GOOGLE_APPLICATION_CREDENTIALS"))
-            return FirestoreMemoryManager(collection_name=collection, credentials_path=creds_path)
+            creds_path = kwargs.get(
+                "credentials_path", os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+            )
+            return FirestoreMemoryManager(
+                collection_name=collection, credentials_path=creds_path
+            )
         else:
             raise ValueError(f"Unknown memory manager type: {memory_type}")

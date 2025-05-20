@@ -24,6 +24,7 @@ from ai_orchestra.core.config import settings
 from ai_orchestra.utils.logging import log_event, log_start, log_end, log_error
 
 import logging
+
 logger = logging.getLogger("ai_orchestra.infrastructure.gcp.vertex_ai_service")
 
 
@@ -56,10 +57,15 @@ class VertexAIService:
             "text-bison": "text-bison@latest",
         }
 
-        log_event(logger, "vertex_ai_service", "initialized", {
-            "project_id": self.project_id,
-            "location": self.location,
-        })
+        log_event(
+            logger,
+            "vertex_ai_service",
+            "initialized",
+            {
+                "project_id": self.project_id,
+                "location": self.location,
+            },
+        )
 
     async def generate_text(
         self,
@@ -90,11 +96,15 @@ class VertexAIService:
             InvalidInputError: If the input is invalid
             AIServiceError: For other errors
         """
-        start_time = log_start(logger, "generate_text", {
-            "model_id": model_id,
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-        })
+        start_time = log_start(
+            logger,
+            "generate_text",
+            {
+                "model_id": model_id,
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+            },
+        )
 
         try:
             # Map model ID to Vertex AI model
@@ -185,10 +195,15 @@ class VertexAIService:
             # Extract text from response
             generated_text = response.text
 
-            log_end(logger, "generate_text", start_time, {
-                "model_id": model_id,
-                "output_length": len(generated_text),
-            })
+            log_end(
+                logger,
+                "generate_text",
+                start_time,
+                {
+                    "model_id": model_id,
+                    "output_length": len(generated_text),
+                },
+            )
 
             return generated_text
 
@@ -222,7 +237,8 @@ class VertexAIService:
         try:
             # Get the model endpoint
             endpoint = aiplatform.Endpoint(
-                f"projects/{self.project_id}/locations/{self.location}/publishers/google/models/{model_id}")
+                f"projects/{self.project_id}/locations/{self.location}/publishers/google/models/{model_id}"
+            )
 
             # Prepare the request
             instances = [{"prompt": prompt}]
@@ -249,10 +265,15 @@ class VertexAIService:
 
             generated_text = predictions[0].get("content", "")
 
-            log_end(logger, "generate_text", start_time, {
-                "model_id": model_id,
-                "output_length": len(generated_text),
-            })
+            log_end(
+                logger,
+                "generate_text",
+                start_time,
+                {
+                    "model_id": model_id,
+                    "output_length": len(generated_text),
+                },
+            )
 
             return generated_text
 
@@ -281,10 +302,14 @@ class VertexAIService:
             InvalidInputError: If the input is invalid
             AIServiceError: For other errors
         """
-        start_time = log_start(logger, "generate_embeddings", {
-            "model_id": model_id,
-            "text_count": len(texts),
-        })
+        start_time = log_start(
+            logger,
+            "generate_embeddings",
+            {
+                "model_id": model_id,
+                "text_count": len(texts),
+            },
+        )
 
         try:
             # Map model ID to Vertex AI model
@@ -294,7 +319,8 @@ class VertexAIService:
 
             # Get the model endpoint
             endpoint = aiplatform.Endpoint(
-                f"projects/{self.project_id}/locations/{self.location}/publishers/google/models/{vertex_model_id}")
+                f"projects/{self.project_id}/locations/{self.location}/publishers/google/models/{vertex_model_id}"
+            )
 
             # Prepare the request
             instances = [{"content": text} for text in texts]
@@ -314,10 +340,15 @@ class VertexAIService:
                 else:
                     embeddings.append([])
 
-            log_end(logger, "generate_embeddings", start_time, {
-                "model_id": model_id,
-                "embedding_count": len(embeddings),
-            })
+            log_end(
+                logger,
+                "generate_embeddings",
+                start_time,
+                {
+                    "model_id": model_id,
+                    "embedding_count": len(embeddings),
+                },
+            )
 
             return embeddings
 
@@ -387,10 +418,14 @@ class VertexAIService:
             InvalidInputError: If the input is invalid
             AIServiceError: For other errors
         """
-        start_time = log_start(logger, "classify_text", {
-            "model_id": model_id,
-            "category_count": len(categories),
-        })
+        start_time = log_start(
+            logger,
+            "classify_text",
+            {
+                "model_id": model_id,
+                "category_count": len(categories),
+            },
+        )
 
         try:
             # For classification, we'll use a prompt-based approach with Gemini
@@ -422,7 +457,9 @@ class VertexAIService:
                     classification = json.loads(json_str)
                 else:
                     # Fallback: create a uniform distribution
-                    classification = {category: 1.0 / len(categories) for category in categories}
+                    classification = {
+                        category: 1.0 / len(categories) for category in categories
+                    }
 
                 # Ensure all categories are present
                 for category in categories:
@@ -434,22 +471,34 @@ class VertexAIService:
                 if total > 0:
                     classification = {k: v / total for k, v in classification.items()}
 
-                log_end(logger, "classify_text", start_time, {
-                    "model_id": model_id,
-                    "categories": list(classification.keys()),
-                })
+                log_end(
+                    logger,
+                    "classify_text",
+                    start_time,
+                    {
+                        "model_id": model_id,
+                        "categories": list(classification.keys()),
+                    },
+                )
 
                 return classification
 
             except json.JSONDecodeError:
                 # Fallback: create a uniform distribution
-                classification = {category: 1.0 / len(categories) for category in categories}
+                classification = {
+                    category: 1.0 / len(categories) for category in categories
+                }
 
-                log_end(logger, "classify_text", start_time, {
-                    "model_id": model_id,
-                    "categories": list(classification.keys()),
-                    "fallback": True,
-                })
+                log_end(
+                    logger,
+                    "classify_text",
+                    start_time,
+                    {
+                        "model_id": model_id,
+                        "categories": list(classification.keys()),
+                        "fallback": True,
+                    },
+                )
 
                 return classification
 
@@ -484,11 +533,15 @@ class VertexAIService:
             InvalidInputError: If the input is invalid
             AIServiceError: For other errors
         """
-        start_time = log_start(logger, "answer_question", {
-            "model_id": model_id,
-            "question_length": len(question),
-            "context_length": len(context),
-        })
+        start_time = log_start(
+            logger,
+            "answer_question",
+            {
+                "model_id": model_id,
+                "question_length": len(question),
+                "context_length": len(context),
+            },
+        )
 
         try:
             # Create a prompt for question answering
@@ -507,10 +560,15 @@ class VertexAIService:
                 temperature=0.3,  # Lower temperature for more factual responses
             )
 
-            log_end(logger, "answer_question", start_time, {
-                "model_id": model_id,
-                "answer_length": len(answer),
-            })
+            log_end(
+                logger,
+                "answer_question",
+                start_time,
+                {
+                    "model_id": model_id,
+                    "answer_length": len(answer),
+                },
+            )
 
             return answer
 
@@ -545,11 +603,15 @@ class VertexAIService:
             InvalidInputError: If the input is invalid
             AIServiceError: For other errors
         """
-        start_time = log_start(logger, "summarize_text", {
-            "model_id": model_id,
-            "text_length": len(text),
-            "max_length": max_length,
-        })
+        start_time = log_start(
+            logger,
+            "summarize_text",
+            {
+                "model_id": model_id,
+                "text_length": len(text),
+                "max_length": max_length,
+            },
+        )
 
         try:
             # Create a prompt for summarization
@@ -567,13 +629,20 @@ class VertexAIService:
                 prompt=prompt,
                 model_id=model_id,
                 temperature=0.3,  # Lower temperature for more factual responses
-                max_tokens=max_length // 4 if max_length else None,  # Rough estimate of tokens from characters
+                max_tokens=max_length // 4
+                if max_length
+                else None,  # Rough estimate of tokens from characters
             )
 
-            log_end(logger, "summarize_text", start_time, {
-                "model_id": model_id,
-                "summary_length": len(summary),
-            })
+            log_end(
+                logger,
+                "summarize_text",
+                start_time,
+                {
+                    "model_id": model_id,
+                    "summary_length": len(summary),
+                },
+            )
 
             return summary
 
@@ -609,9 +678,14 @@ class VertexAIService:
                 for model_id in self.model_mapping.keys()
             ]
 
-            log_end(logger, "get_available_models", start_time, {
-                "model_count": len(models),
-            })
+            log_end(
+                logger,
+                "get_available_models",
+                start_time,
+                {
+                    "model_count": len(models),
+                },
+            )
 
             return models
 
@@ -635,10 +709,20 @@ class VertexAIService:
         """
         # Define capabilities for each model
         capabilities_map = {
-            "gemini-pro": ["text_generation", "classification", "question_answering", "summarization"],
+            "gemini-pro": [
+                "text_generation",
+                "classification",
+                "question_answering",
+                "summarization",
+            ],
             "gemini-pro-vision": ["text_generation", "image_understanding"],
             "text-embedding": ["embeddings"],
-            "text-bison": ["text_generation", "classification", "question_answering", "summarization"],
+            "text-bison": [
+                "text_generation",
+                "classification",
+                "question_answering",
+                "summarization",
+            ],
         }
 
         return capabilities_map.get(model_id, [])

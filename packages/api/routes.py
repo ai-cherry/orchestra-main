@@ -34,12 +34,11 @@ router = APIRouter()
 async def health_check() -> Dict[str, str]:
     """
     Health check endpoint for monitoring and container health checks.
-    
+
     Returns:
         Dict[str, str]: Status information
     """
     return {"status": "ok", "service": "orchestra-api"}
-
 
 
 @router.get("/models", response_model=ModelListResponse, tags=["Models"])
@@ -49,21 +48,21 @@ async def list_models(
 ) -> ModelListResponse:
     """
     List available AI models.
-    
+
     Args:
         model_type: Optional filter by model type
         settings: Application settings
-        
+
     Returns:
         ModelListResponse: List of available models
     """
     try:
         # Initialize Vertex AI
         aiplatform.init(project=settings.project_id, location=settings.vertex_location)
-        
+
         # Get list of models
         models = []
-        
+
         # Example models - in a real implementation, these would be fetched from Vertex AI
         example_models = [
             VertexModel(
@@ -88,13 +87,15 @@ async def list_models(
                 description="Image generation model",
             ),
         ]
-        
+
         # Filter by model type if specified
         if model_type:
-            models = [model for model in example_models if model.model_type == model_type]
+            models = [
+                model for model in example_models if model.model_type == model_type
+            ]
         else:
             models = example_models
-        
+
         return ModelListResponse(models=models, total_count=len(models))
     except Exception as e:
         logger.error(f"Error listing models: {e}", exc_info=True)
@@ -112,32 +113,32 @@ async def predict(
 ) -> VertexPredictionResponse:
     """
     Make a prediction using Vertex AI.
-    
+
     Args:
         request: Prediction request
         settings: Application settings
         client: Vertex AI prediction client
-        
+
     Returns:
         VertexPredictionResponse: Prediction response
     """
     try:
         # Get endpoint
         endpoint = get_vertex_endpoint(request.model_id, settings)
-        
+
         # Prepare instances
         instances = request.instances
-        
+
         # Prepare parameters
         parameters = request.parameters or {}
-        
+
         # Make prediction
         response = client.predict(
             endpoint=endpoint,
             instances=instances,
             parameters=parameters,
         )
-        
+
         # Process response
         predictions = []
         for prediction in response.predictions:
@@ -145,7 +146,7 @@ async def predict(
                 predictions.append(prediction.to_dict())
             else:
                 predictions.append(prediction)
-        
+
         return VertexPredictionResponse(
             model_id=request.model_id,
             predictions=predictions,
@@ -167,21 +168,21 @@ async def generate_text(
 ) -> GeminiResponse:
     """
     Generate text using Gemini API.
-    
+
     Args:
         request: Gemini request
         settings: Application settings
-        
+
     Returns:
         GeminiResponse: Gemini response
     """
     try:
         # Initialize Vertex AI
         aiplatform.init(project=settings.project_id, location=settings.vertex_location)
-        
+
         # Initialize Gemini model
         model = aiplatform.GenerativeModel("gemini-pro")
-        
+
         # Set generation config
         generation_config = {
             "max_output_tokens": request.max_tokens,
@@ -189,16 +190,16 @@ async def generate_text(
             "top_p": request.top_p,
             "top_k": request.top_k,
         }
-        
+
         # Generate content
         response = model.generate_content(
             request.prompt,
             generation_config=generation_config,
         )
-        
+
         # Process response
         text = response.text
-        
+
         # In a real implementation, you would get usage from the response
         # For now, we'll use placeholder values
         usage = {
@@ -206,7 +207,7 @@ async def generate_text(
             "completion_tokens": len(text) // 4,  # Rough estimate
             "total_tokens": (len(request.prompt) + len(text)) // 4,  # Rough estimate
         }
-        
+
         return GeminiResponse(
             text=text,
             usage=usage,
@@ -221,7 +222,9 @@ async def generate_text(
         )
 
 
-@router.post("/orchestrate", response_model=OrchestrationResponse, tags=["Orchestration"])
+@router.post(
+    "/orchestrate", response_model=OrchestrationResponse, tags=["Orchestration"]
+)
 async def orchestrate_workflow(
     request: OrchestrationRequest,
     settings: Settings = Depends(get_settings),
@@ -229,38 +232,41 @@ async def orchestrate_workflow(
 ) -> OrchestrationResponse:
     """
     Orchestrate an AI workflow.
-    
+
     Args:
         request: Orchestration request
         settings: Application settings
         db: Firestore client
-        
+
     Returns:
         OrchestrationResponse: Orchestration response
     """
     try:
         # In a real implementation, this would start a workflow in Vertex AI Pipelines
         # For now, we'll just create a record in Firestore
-        
+
         # Generate a unique execution ID
         import uuid
+
         execution_id = str(uuid.uuid4())
-        
+
         # Create a document in Firestore
         workflow_ref = db.collection("workflows").document(execution_id)
-        workflow_ref.set({
-            "workflow_id": request.workflow_id,
-            "execution_id": execution_id,
-            "status": "pending",
-            "input_data": request.input_data,
-            "config": request.config,
-            "created_at": firestore.SERVER_TIMESTAMP,
-            "updated_at": firestore.SERVER_TIMESTAMP,
-        })
-        
+        workflow_ref.set(
+            {
+                "workflow_id": request.workflow_id,
+                "execution_id": execution_id,
+                "status": "pending",
+                "input_data": request.input_data,
+                "config": request.config,
+                "created_at": firestore.SERVER_TIMESTAMP,
+                "updated_at": firestore.SERVER_TIMESTAMP,
+            }
+        )
+
         # In a real implementation, this would trigger the workflow
         # For now, we'll just return the execution ID
-        
+
         return OrchestrationResponse(
             workflow_id=request.workflow_id,
             execution_id=execution_id,
@@ -285,11 +291,11 @@ async def get_workflow_status(
 ) -> WorkflowStatusResponse:
     """
     Get the status of a workflow.
-    
+
     Args:
         execution_id: The execution ID of the workflow
         db: Firestore client
-        
+
     Returns:
         WorkflowStatusResponse: Workflow status
     """
@@ -297,25 +303,25 @@ async def get_workflow_status(
         # Get the workflow document from Firestore
         workflow_ref = db.collection("workflows").document(execution_id)
         workflow_doc = workflow_ref.get()
-        
+
         if not workflow_doc.exists:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Workflow with execution ID {execution_id} not found",
             )
-        
+
         # Get the workflow data
         workflow_data = workflow_doc.to_dict()
-        
+
         # Convert Firestore timestamps to strings
         start_time = None
         if "start_time" in workflow_data and workflow_data["start_time"]:
             start_time = workflow_data["start_time"].isoformat()
-            
+
         end_time = None
         if "end_time" in workflow_data and workflow_data["end_time"]:
             end_time = workflow_data["end_time"].isoformat()
-        
+
         return WorkflowStatusResponse(
             workflow_id=workflow_data["workflow_id"],
             execution_id=execution_id,

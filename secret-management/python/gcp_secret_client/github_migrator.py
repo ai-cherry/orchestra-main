@@ -19,8 +19,7 @@ from .exceptions import SecretAccessError, SecretNotFoundError, SecretOperationE
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger("github_migration")
 
@@ -91,8 +90,7 @@ class GitHubSecretMigrator:
         self.github_repo = github_repo
 
         if not github_org and not github_repo:
-            raise ValueError(
-                "Either github_org or github_repo must be provided")
+            raise ValueError("Either github_org or github_repo must be provided")
 
         # Set up Secret Manager client
         self.secret_client = secret_client or SecretClient(
@@ -127,11 +125,12 @@ class GitHubSecretMigrator:
                 ["gh", "--version"],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                text=True
+                text=True,
             )
             if result.returncode != 0:
                 logger.error(
-                    "GitHub CLI (gh) is not installed. Please install it first.")
+                    "GitHub CLI (gh) is not installed. Please install it first."
+                )
                 return False
 
             # Check authentication status
@@ -139,12 +138,13 @@ class GitHubSecretMigrator:
                 ["gh", "auth", "status"],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                text=True
+                text=True,
             )
 
             if result.returncode != 0 or "Logged in to" not in result.stdout:
                 logger.error(
-                    "Not authenticated with GitHub CLI. Please run 'gh auth login' first.")
+                    "Not authenticated with GitHub CLI. Please run 'gh auth login' first."
+                )
                 return False
 
             logger.info("GitHub CLI is installed and authenticated.")
@@ -168,14 +168,13 @@ class GitHubSecretMigrator:
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                text=True
+                text=True,
             )
 
             stdout, stderr = process.communicate(input=self.github_token)
 
             if process.returncode != 0:
-                logger.error(
-                    f"Failed to authenticate with GitHub token: {stderr}")
+                logger.error(f"Failed to authenticate with GitHub token: {stderr}")
                 return False
 
             logger.info("Successfully authenticated with GitHub token.")
@@ -199,26 +198,22 @@ class GitHubSecretMigrator:
                 target = f"organization '{self.github_org}'"
             else:
                 # List repository secrets
-                cmd = ["gh", "api",
-                       f"repos/{self.github_repo}/actions/secrets"]
+                cmd = ["gh", "api", f"repos/{self.github_repo}/actions/secrets"]
                 target = f"repository '{self.github_repo}'"
 
             result = subprocess.run(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
+                cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
             )
 
             if result.returncode != 0:
-                logger.error(
-                    f"Failed to list secrets for {target}: {result.stderr}")
+                logger.error(f"Failed to list secrets for {target}: {result.stderr}")
                 return []
 
             # Parse JSON response
             secrets_data = json.loads(result.stdout)
-            secret_names = [secret["name"]
-                            for secret in secrets_data.get("secrets", [])]
+            secret_names = [
+                secret["name"] for secret in secrets_data.get("secrets", [])
+            ]
 
             logger.info(f"Found {len(secret_names)} secrets in {target}")
             return secret_names
@@ -244,8 +239,7 @@ class GitHubSecretMigrator:
         # Option 1: Check if the secret is available in environment variables
         env_value = os.environ.get(secret_name)
         if env_value:
-            logger.info(
-                f"Found value for '{secret_name}' in environment variables")
+            logger.info(f"Found value for '{secret_name}' in environment variables")
             return env_value
 
         # Option 2: Inform user that direct access is not possible
@@ -255,7 +249,9 @@ class GitHubSecretMigrator:
         )
         return None
 
-    def _prompt_for_secret_value(self, secret_name: str, gcp_secret_name: str) -> Optional[str]:
+    def _prompt_for_secret_value(
+        self, secret_name: str, gcp_secret_name: str
+    ) -> Optional[str]:
         """
         Prompt the user to enter a secret value manually.
 
@@ -267,11 +263,14 @@ class GitHubSecretMigrator:
             Optional[str]: User-provided secret value or None if skipped
         """
         print(
-            f"\nGitHub secret '{secret_name}' will be migrated to '{gcp_secret_name}-{self.environment}'")
+            f"\nGitHub secret '{secret_name}' will be migrated to '{gcp_secret_name}-{self.environment}'"
+        )
         print(
-            "Enter the secret value (input will not be displayed) or press Enter to skip:")
+            "Enter the secret value (input will not be displayed) or press Enter to skip:"
+        )
         try:
             import getpass
+
             value = getpass.getpass("> ")
             if not value.strip():
                 logger.info(f"Skipping empty value for '{secret_name}'")
@@ -313,7 +312,8 @@ class GitHubSecretMigrator:
             try:
                 self.secret_client.client.get_secret(name=secret_path)
                 logger.info(
-                    f"Secret '{full_secret_id}' already exists, adding new version")
+                    f"Secret '{full_secret_id}' already exists, adding new version"
+                )
             except Exception:
                 secret_exists = False
                 logger.info(f"Creating new secret '{full_secret_id}'")
@@ -323,23 +323,22 @@ class GitHubSecretMigrator:
                 self.secret_client.client.create_secret(
                     parent=parent,
                     secret_id=full_secret_id,
-                    secret={"replication": {"automatic": {}}}
+                    secret={"replication": {"automatic": {}}},
                 )
 
             # Add the secret version
             secret_data = secret_value.encode("UTF-8")
             response = self.secret_client.client.add_secret_version(
-                parent=secret_path,
-                payload={"data": secret_data}
+                parent=secret_path, payload={"data": secret_data}
             )
 
             logger.info(
-                f"Successfully stored '{full_secret_id}' (version: {response.name})")
+                f"Successfully stored '{full_secret_id}' (version: {response.name})"
+            )
             return True
 
         except Exception as e:
-            logger.error(
-                f"Failed to store secret '{full_secret_id}': {str(e)}")
+            logger.error(f"Failed to store secret '{full_secret_id}': {str(e)}")
             return False
 
     def _validate_secret_migration(self, gcp_secret_name: str) -> bool:
@@ -357,19 +356,19 @@ class GitHubSecretMigrator:
         try:
             # Try to access the secret
             secret_path = f"projects/{self.gcp_project_id}/secrets/{full_secret_id}/versions/latest"
-            response = self.secret_client.client.access_secret_version(
-                name=secret_path)
+            response = self.secret_client.client.access_secret_version(name=secret_path)
 
             # If we get here, the secret exists and is accessible
             logger.info(f"Validated access to secret '{full_secret_id}'")
             return True
 
         except Exception as e:
-            logger.error(
-                f"Failed to validate secret '{full_secret_id}': {str(e)}")
+            logger.error(f"Failed to validate secret '{full_secret_id}': {str(e)}")
             return False
 
-    def migrate_secrets(self, interactive: bool = True, dry_run: bool = False) -> Dict[str, Any]:
+    def migrate_secrets(
+        self, interactive: bool = True, dry_run: bool = False
+    ) -> Dict[str, Any]:
         """
         Perform the migration from GitHub Actions secrets to GCP Secret Manager.
 
@@ -383,20 +382,21 @@ class GitHubSecretMigrator:
         # Check GitHub CLI availability and authentication
         if not self._check_github_cli():
             if not self._authenticate_with_token():
-                logger.error(
-                    "Failed to authenticate with GitHub. Migration aborted.")
+                logger.error("Failed to authenticate with GitHub. Migration aborted.")
                 return self.results
 
         # Get list of GitHub secrets
         secret_names = self._list_github_secrets()
         if not secret_names:
             logger.error(
-                "No GitHub secrets found or unable to access them. Migration aborted.")
+                "No GitHub secrets found or unable to access them. Migration aborted."
+            )
             return self.results
 
         self.results["total"] = len(secret_names)
         logger.info(
-            f"Starting migration of {len(secret_names)} secrets to GCP Secret Manager")
+            f"Starting migration of {len(secret_names)} secrets to GCP Secret Manager"
+        )
 
         # Process each secret
         for secret_name in secret_names:
@@ -405,13 +405,12 @@ class GitHubSecretMigrator:
 
             if not gcp_secret_name:
                 logger.warning(
-                    f"No mapping defined for GitHub secret '{secret_name}', skipping")
+                    f"No mapping defined for GitHub secret '{secret_name}', skipping"
+                )
                 self.results["skipped"] += 1
-                self.results["secrets"].append({
-                    "name": secret_name,
-                    "status": "skipped",
-                    "reason": "no_mapping"
-                })
+                self.results["secrets"].append(
+                    {"name": secret_name, "status": "skipped", "reason": "no_mapping"}
+                )
                 continue
 
             # Try to get secret value or prompt user
@@ -419,54 +418,61 @@ class GitHubSecretMigrator:
 
             if secret_value is None and interactive:
                 secret_value = self._prompt_for_secret_value(
-                    secret_name, gcp_secret_name)
+                    secret_name, gcp_secret_name
+                )
 
             if not secret_value:
-                logger.warning(
-                    f"No value available for '{secret_name}', skipping")
+                logger.warning(f"No value available for '{secret_name}', skipping")
                 self.results["skipped"] += 1
-                self.results["secrets"].append({
-                    "name": secret_name,
-                    "status": "skipped",
-                    "reason": "no_value"
-                })
+                self.results["secrets"].append(
+                    {"name": secret_name, "status": "skipped", "reason": "no_value"}
+                )
                 continue
 
             # Create or update the secret in GCP Secret Manager
             if dry_run:
                 logger.info(
-                    f"[DRY RUN] Would migrate '{secret_name}' to '{gcp_secret_name}-{self.environment}'")
+                    f"[DRY RUN] Would migrate '{secret_name}' to '{gcp_secret_name}-{self.environment}'"
+                )
                 self.results["migrated"] += 1
-                self.results["secrets"].append({
-                    "name": secret_name,
-                    "gcp_name": f"{gcp_secret_name}-{self.environment}",
-                    "status": "simulated",
-                })
+                self.results["secrets"].append(
+                    {
+                        "name": secret_name,
+                        "gcp_name": f"{gcp_secret_name}-{self.environment}",
+                        "status": "simulated",
+                    }
+                )
                 continue
 
             if self._create_or_update_gcp_secret(gcp_secret_name, secret_value):
                 # Validate the migration
                 if self._validate_secret_migration(gcp_secret_name):
                     self.results["migrated"] += 1
-                    self.results["secrets"].append({
-                        "name": secret_name,
-                        "gcp_name": f"{gcp_secret_name}-{self.environment}",
-                        "status": "success",
-                    })
+                    self.results["secrets"].append(
+                        {
+                            "name": secret_name,
+                            "gcp_name": f"{gcp_secret_name}-{self.environment}",
+                            "status": "success",
+                        }
+                    )
                 else:
                     self.results["failed"] += 1
-                    self.results["secrets"].append({
-                        "name": secret_name,
-                        "gcp_name": f"{gcp_secret_name}-{self.environment}",
-                        "status": "validation_failed",
-                    })
+                    self.results["secrets"].append(
+                        {
+                            "name": secret_name,
+                            "gcp_name": f"{gcp_secret_name}-{self.environment}",
+                            "status": "validation_failed",
+                        }
+                    )
             else:
                 self.results["failed"] += 1
-                self.results["secrets"].append({
-                    "name": secret_name,
-                    "gcp_name": f"{gcp_secret_name}-{self.environment}",
-                    "status": "failed",
-                })
+                self.results["secrets"].append(
+                    {
+                        "name": secret_name,
+                        "gcp_name": f"{gcp_secret_name}-{self.environment}",
+                        "status": "failed",
+                    }
+                )
 
         return self.results
 
@@ -481,8 +487,7 @@ class GitHubSecretMigrator:
             str: Formatted report
         """
         report = []
-        report.append(
-            "\n=== GitHub to GCP Secret Manager Migration Report ===\n")
+        report.append("\n=== GitHub to GCP Secret Manager Migration Report ===\n")
         report.append(f"Environment: {self.environment}")
 
         if self.github_org:
@@ -500,25 +505,25 @@ class GitHubSecretMigrator:
             report.append("\nSecret details:")
             for secret in self.results["secrets"]:
                 if secret["status"] == "success":
-                    report.append(
-                        f"✅ {secret['name']} -> {secret['gcp_name']}")
+                    report.append(f"✅ {secret['name']} -> {secret['gcp_name']}")
                 elif secret["status"] == "simulated":
                     report.append(
-                        f"🔄 {secret['name']} -> {secret['gcp_name']} (dry run)")
+                        f"🔄 {secret['name']} -> {secret['gcp_name']} (dry run)"
+                    )
                 elif secret["status"] == "skipped":
                     reason = secret.get("reason", "unknown")
                     report.append(f"⏭️ {secret['name']} (reason: {reason})")
                 else:
                     report.append(
-                        f"❌ {secret['name']} -> {secret.get('gcp_name', 'N/A')}")
+                        f"❌ {secret['name']} -> {secret.get('gcp_name', 'N/A')}"
+                    )
 
         report.append("\nNext steps:")
+        report.append("1. Update your CI/CD workflows to use GCP Secret Manager")
         report.append(
-            "1. Update your CI/CD workflows to use GCP Secret Manager")
-        report.append(
-            "2. Consider removing the GitHub secrets once migration is complete")
-        report.append(
-            "3. Ensure proper IAM permissions are set for accessing secrets")
+            "2. Consider removing the GitHub secrets once migration is complete"
+        )
+        report.append("3. Ensure proper IAM permissions are set for accessing secrets")
 
         return "\n".join(report)
 
@@ -529,61 +534,51 @@ def main():
         description="Migrate secrets from GitHub Actions to GCP Secret Manager"
     )
 
-    parser.add_argument(
-        "--github-token",
-        help="GitHub Personal Access Token"
-    )
+    parser.add_argument("--github-token", help="GitHub Personal Access Token")
 
     parser.add_argument(
-        "--gcp-project-id",
-        required=True,
-        help="GCP Project ID for Secret Manager"
+        "--gcp-project-id", required=True, help="GCP Project ID for Secret Manager"
     )
 
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
-        "--github-org",
-        help="GitHub organization name (for org-level secrets)"
+        "--github-org", help="GitHub organization name (for org-level secrets)"
     )
     group.add_argument(
-        "--github-repo",
-        help="GitHub repository name (for repo-level secrets)"
+        "--github-repo", help="GitHub repository name (for repo-level secrets)"
     )
 
     parser.add_argument(
         "--environment",
         default="prod",
-        help="Environment suffix for secrets (e.g., 'dev', 'prod')"
+        help="Environment suffix for secrets (e.g., 'dev', 'prod')",
     )
 
     parser.add_argument(
         "--mapping-file",
-        help="Path to JSON file with custom mapping of GitHub secret names to GCP secret names"
+        help="Path to JSON file with custom mapping of GitHub secret names to GCP secret names",
     )
 
     parser.add_argument(
         "--interactive",
         action="store_true",
         default=True,
-        help="Prompt for secret values when not available"
+        help="Prompt for secret values when not available",
     )
 
     parser.add_argument(
         "--non-interactive",
         action="store_true",
-        help="Skip secrets when values are not available (don't prompt)"
+        help="Skip secrets when values are not available (don't prompt)",
     )
 
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Simulate the migration without making changes"
+        help="Simulate the migration without making changes",
     )
 
-    parser.add_argument(
-        "--output",
-        help="Output report to file"
-    )
+    parser.add_argument("--output", help="Output report to file")
 
     args = parser.parse_args()
 
@@ -591,13 +586,14 @@ def main():
     github_token = args.github_token or os.environ.get("GITHUB_TOKEN")
     if not github_token:
         parser.error(
-            "GitHub token must be provided via --github-token or GITHUB_TOKEN environment variable")
+            "GitHub token must be provided via --github-token or GITHUB_TOKEN environment variable"
+        )
 
     # Load custom mapping if provided
     custom_mapping = None
     if args.mapping_file:
         try:
-            with open(args.mapping_file, 'r') as f:
+            with open(args.mapping_file, "r") as f:
                 custom_mapping = json.load(f)
         except Exception as e:
             parser.error(f"Failed to load mapping file: {str(e)}")
@@ -613,17 +609,14 @@ def main():
     )
 
     # Run the migration
-    migrator.migrate_secrets(
-        interactive=not args.non_interactive,
-        dry_run=args.dry_run
-    )
+    migrator.migrate_secrets(interactive=not args.non_interactive, dry_run=args.dry_run)
 
     # Generate and output the report
     report = migrator.generate_report(include_secrets=True)
 
     if args.output:
         try:
-            with open(args.output, 'w') as f:
+            with open(args.output, "w") as f:
                 f.write(report)
             print(f"Report written to {args.output}")
         except Exception as e:

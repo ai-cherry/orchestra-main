@@ -30,13 +30,17 @@ Example usage:
 """
 
 from .client import SecretClient
-from .exceptions import SecretAccessError, SecretNotFoundError, SecretVersionNotFoundError
+from .exceptions import (
+    SecretAccessError,
+    SecretNotFoundError,
+    SecretVersionNotFoundError,
+)
 
 __all__ = [
     "SecretClient",
     "SecretAccessError",
     "SecretNotFoundError",
-    "SecretVersionNotFoundError"
+    "SecretVersionNotFoundError",
 ]
 
 __version__ = "0.1.0"

@@ -15,6 +15,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 from core.orchestrator.src.agents.agent_base import AgentContext, AgentResponse
 from core.orchestrator.src.agents.agent_registry import get_agent_registry
+
 # Import the settings instance directly
 from core.orchestrator.src.config.config import settings
 from core.orchestrator.src.services.event_bus import get_event_bus

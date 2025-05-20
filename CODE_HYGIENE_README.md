@@ -134,3 +134,23 @@ Consider integrating these checks into your CI pipeline by adding steps to:
 4. Ensure no critical linting issues are present
 
 This will help maintain code quality across the entire development team.
+
+---
+
+## 6. Documentation Formatting Prompts
+
+To ensure consistency and clarity in new documentation (e.g., new .md files or significant additions to existing ones), consider using prompts like the following with an AI assistant:
+
+```plaintext
+You are reviewing a new documentation file: `[Path to NEW_DOC_FILE.md]` (or a new section in an existing document).
+
+1.  **Purpose & Clarity:** Does the document (or section) have a clear title and an introductory sentence/paragraph explaining its purpose and scope?
+2.  **Structure & Readability:** Is the content logically organized using appropriate markdown headers (H2, H3, etc.)? Are paragraphs concise and easy to read? Is there good use of lists or bullet points for itemized information?
+3.  **Markdown Correctness:** Are all markdown elements (code blocks, links, tables, bold/italics) used correctly and rendered as expected? Ensure code blocks specify the language for syntax highlighting.
+4.  **Internal Linking:** Are all internal links to other project documents or sections relative and correct? Check for any broken links.
+5.  **Technical Accuracy:** (If applicable) Is the technical information presented accurate and up-to-date with the current state of the project?
+6.  **Conciseness & Grammar:** Is the language clear, concise, and free of jargon where possible (or is jargon clearly explained)? Check for grammatical errors, typos, and awkward phrasing.
+7.  **Alignment with Existing Docs:** Does the new documentation align with the style and tone of existing key documents like `README.md` and `@docs/ARCHITECTURE.md`?
+
+Return a list of specific, actionable suggestions for improvement, referencing line numbers or specific text where appropriate.
+```

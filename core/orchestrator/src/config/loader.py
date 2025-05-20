@@ -269,7 +269,7 @@ def get_settings() -> Settings:
 def initialize_portkey():
     """
     Initialize Portkey for observability with API key from GCP Secret Manager.
-    
+
     Returns:
         bool: True if initialization is successful, False otherwise.
     """
@@ -279,21 +279,18 @@ def initialize_portkey():
         project_id = os.environ.get("GCP_PROJECT_ID", "cherry-ai-project")
         secret_name = f"projects/{project_id}/secrets/portkey-api-key/versions/latest"
         response = client.access_secret_version(name=secret_name)
-        PORTKEY_API_KEY = response.payload.data.decode('UTF-8')
-        
+        PORTKEY_API_KEY = response.payload.data.decode("UTF-8")
+
         # Initialize Portkey
         portkey.init(
             api_key=PORTKEY_API_KEY,
             base_url="https://api.portkey.ai/v1",
-            virtual_key="vertex-agent-special"
+            virtual_key="vertex-agent-special",
         )
-        
+
         # Set budget limits for cost control
-        portkey.set_limits(
-            max_requests=1000,
-            budget=500  # USD
-        )
-        
+        portkey.set_limits(max_requests=1000, budget=500)  # USD
+
         logger.info("Portkey initialized successfully for observability.")
         return True
     except Exception as e:

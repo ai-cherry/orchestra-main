@@ -13,6 +13,7 @@ from typing import Dict, List, Optional, Set, Tuple, Union, Any
 
 class ImplementationPhase(Enum):
     """Phases of the WIF implementation plan."""
+
     VULNERABILITIES = "vulnerabilities"
     MIGRATION = "migration"
     CICD = "cicd"
@@ -22,6 +23,7 @@ class ImplementationPhase(Enum):
 
 class TaskStatus(Enum):
     """Status of a task in the implementation plan."""
+
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
@@ -32,6 +34,7 @@ class TaskStatus(Enum):
 @dataclass
 class Vulnerability:
     """Representation of a security vulnerability."""
+
     id: str
     package: str
     severity: str
@@ -47,6 +50,7 @@ class Vulnerability:
 @dataclass
 class Task:
     """A task in the implementation plan."""
+
     name: str
     description: str
     phase: ImplementationPhase
@@ -93,6 +97,7 @@ class Task:
 @dataclass
 class ImplementationPlan:
     """The overall WIF implementation plan."""
+
     tasks: Dict[str, Task] = field(default_factory=dict)
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None

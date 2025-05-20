@@ -31,7 +31,7 @@ router = APIRouter()
 
 class ComponentHealth(BaseModel):
     """Schema for a system component's health status."""
-    
+
     status: str  # "healthy", "degraded", "unavailable"
     message: Optional[str] = None
     details: Dict[str, Any] = {}
@@ -53,8 +53,8 @@ class HealthStatus(BaseModel):
 async def check_health(
     request: Request,
     settings: Settings = Depends(get_settings),
-    memory_manager = Depends(get_memory_manager),
-    redis_cache = Depends(get_redis_cache)
+    memory_manager=Depends(get_memory_manager),
+    redis_cache=Depends(get_redis_cache),
 ) -> HealthStatus:
     """
     Check the health of the system components.
@@ -71,19 +71,16 @@ async def check_health(
     # Initialize health status
     overall_status = "healthy"
     components = {
-        "api": ComponentHealth(
-            status="healthy",
-            message="API is responding normally"
-        ),
+        "api": ComponentHealth(status="healthy", message="API is responding normally"),
     }
-    
+
     # Runtime information
     runtime_info = {
         "python_version": sys.version.split()[0],
         "platform": platform.platform(),
         "hostname": platform.node(),
     }
-    
+
     # Cloud information
     cloud_info = {}
     if settings.get_gcp_project_id():
@@ -95,19 +92,19 @@ async def check_health(
     try:
         if hasattr(memory_manager, "health_check"):
             memory_health = await memory_manager.health_check()
-            
+
             # Process memory health info
             if memory_health.get("status") == "healthy":
                 components["memory"] = ComponentHealth(
                     status="healthy",
                     message="Memory system is working correctly",
-                    details=memory_health
+                    details=memory_health,
                 )
             else:
                 components["memory"] = ComponentHealth(
                     status="degraded",
                     message=memory_health.get("message", "Memory system degraded"),
-                    details=memory_health
+                    details=memory_health,
                 )
                 overall_status = "degraded"
         else:
@@ -115,14 +112,14 @@ async def check_health(
             components["memory"] = ComponentHealth(
                 status="healthy",
                 message="Memory system is available (basic check)",
-                details={"type": memory_manager.__class__.__name__}
+                details={"type": memory_manager.__class__.__name__},
             )
     except Exception as e:
         logger.error(f"Error checking memory system health: {e}")
         components["memory"] = ComponentHealth(
             status="unavailable",
             message=f"Memory system error: {str(e)}",
-            details={"error": str(e), "type": "exception"}
+            details={"error": str(e), "type": "exception"},
         )
         overall_status = "degraded"
 
@@ -130,26 +127,26 @@ async def check_health(
     try:
         if hasattr(redis_cache, "health_check"):
             cache_health = await redis_cache.health_check()
-            
+
             # Process cache health info
             if cache_health.get("status") == "healthy":
                 components["cache"] = ComponentHealth(
                     status="healthy",
                     message="Cache system is working correctly",
-                    details=cache_health
+                    details=cache_health,
                 )
             elif cache_health.get("status") in ["disabled", "not_configured"]:
                 components["cache"] = ComponentHealth(
                     status="unavailable",
                     message="Cache system is not enabled",
-                    details=cache_health
+                    details=cache_health,
                 )
                 # Don't mark system as degraded if caching is intentionally disabled
             else:
                 components["cache"] = ComponentHealth(
                     status="degraded",
                     message=cache_health.get("message", "Cache system degraded"),
-                    details=cache_health
+                    details=cache_health,
                 )
                 # Only mark system as degraded if cache was supposed to be enabled
                 if cache_health.get("enabled", False):
@@ -159,24 +156,24 @@ async def check_health(
             components["cache"] = ComponentHealth(
                 status="unavailable",
                 message="Cache system health check unavailable",
-                details={"type": redis_cache.__class__.__name__}
+                details={"type": redis_cache.__class__.__name__},
             )
     except Exception as e:
         logger.error(f"Error checking cache health: {e}")
         components["cache"] = ComponentHealth(
             status="unavailable",
             message=f"Cache system error: {str(e)}",
-            details={"error": str(e), "type": "exception"}
+            details={"error": str(e), "type": "exception"},
         )
         # Don't mark system as degraded just for cache failure
 
     # Return health status
     return HealthStatus(
-        status=overall_status, 
+        status=overall_status,
         environment=settings.ENVIRONMENT,
-        components=components, 
+        components=components,
         runtime_info=runtime_info,
-        cloud_info=cloud_info
+        cloud_info=cloud_info,
     )
 
 
