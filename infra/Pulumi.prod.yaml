@@ -1,0 +1,6 @@
+config:
+  gcp:project: your-gcp-project-id-prod
+  gcp:region: us-central1
+  # Add prod-specific configurations here
+  # Example: agentImage: "gcr.io/your-gcp-project-id-prod/agent:stable"
+  # Example: dashboardImage: "gcr.io/your-gcp-project-id-prod/dashboard:stable"

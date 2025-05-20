@@ -88,3 +88,42 @@ htmlcov/
 
 # Local development
 .local/
+
+# Environments
+.env
+.venv
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Pulumi
+.pulumi/
+Pulumi.landmark
+Pulumi.lock.yaml
+
+# Node
+node_modules/
+dist/
+.next/
+out/
+coverage/
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# IDE / OS
+.vscode/
+.idea/
+*.DS_Store
+
+# Terraform (if ever used)
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+
+# Other
+*.log
+.env.*.local
+.env.local
