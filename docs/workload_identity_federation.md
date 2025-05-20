@@ -1,136 +1,138 @@
-# Workload Identity Federation for GitHub Actions
+# Workload Identity Federation for AI Orchestra
 
-This document explains how to set up and use Workload Identity Federation (WIF) for secure authentication between GitHub Actions and Google Cloud Platform in the AI Orchestra project.
+This document serves as the definitive guide for implementing and using Workload Identity Federation (WIF) in the AI Orchestra project. It provides comprehensive instructions for setup, usage, verification, and troubleshooting.
 
-## What is Workload Identity Federation?
+## Table of Contents
 
-Workload Identity Federation allows external identities (like GitHub Actions) to act as Google Cloud service accounts without using service account keys. This provides several benefits:
+1. [Overview](#overview)
+2. [Benefits](#benefits)
+3. [Setup Process](#setup-process)
+4. [Verification](#verification)
+5. [Using WIF in GitHub Actions](#using-wif-in-github-actions)
+6. [Troubleshooting](#troubleshooting)
+7. [Best Practices](#best-practices)
+8. [References](#references)
+
+## Overview
+
+Workload Identity Federation (WIF) allows external identities (like GitHub Actions) to act as Google Cloud service accounts without using service account keys. This enables secure authentication between GitHub Actions and Google Cloud Platform for CI/CD pipelines.
+
+The AI Orchestra project uses WIF for all deployments to Google Cloud Platform, eliminating the need for storing service account keys in GitHub secrets.
+
+## Benefits
+
+Using Workload Identity Federation provides several advantages over traditional service account keys:
 
 - **Improved Security**: No long-lived service account keys to manage or rotate
 - **Reduced Risk**: No secrets to accidentally expose in logs or code
 - **Simplified Management**: No need to create, download, and manage service account keys
 - **Audit Trail**: Clear audit logs showing which external identity accessed which resources
+- **Principle of Least Privilege**: Fine-grained control over which repositories can access which resources
 
 ## Setup Process
 
-The AI Orchestra project provides several tools to set up Workload Identity Federation:
+The AI Orchestra project provides a unified script for setting up Workload Identity Federation:
 
-1. **Terraform Module**: `terraform/modules/wif/main.tf`
-2. **Setup Script**: `deploy_wif.sh`
-3. **GitHub Secrets Setup Script**: `setup_github_wif_secrets.sh`
-4. **GitHub Actions Workflow**: `.github/workflows/wif-deploy.yml`
+### Prerequisites
 
-### Option 1: Using Terraform (Recommended)
+Before setting up WIF, ensure you have:
 
-1. Navigate to the terraform directory:
-   ```bash
-   cd terraform
-   ```
+1. A Google Cloud Platform project with billing enabled
+2. Owner or Editor permissions on the GCP project
+3. GitHub repository where you want to deploy from
+4. GitHub Personal Access Token with `repo` scope
 
-2. Create a new file `wif.tf` with the following content:
-   ```hcl
-   module "wif" {
-     source = "./modules/wif"
-     
-     project_id     = var.project_id
-     project_number = "525398941159"  # Replace with your project number
-     repository     = "ai-cherry/orchestra-main"  # Replace with your GitHub repository
-   }
-   
-   output "workload_identity_provider" {
-     value = module.wif.workload_identity_provider
-   }
-   
-   output "service_account_email" {
-     value = module.wif.service_account_email
-   }
-   ```
+### Using the Setup Script
 
-3. Initialize and apply the Terraform configuration:
-   ```bash
-   terraform init
-   terraform apply
-   ```
-
-4. Note the outputs for `workload_identity_provider` and `service_account_email`, which you'll need for GitHub secrets.
-
-### Option 2: Using the Setup Script
-
-1. Make the script executable:
-   ```bash
-   chmod +x deploy_wif.sh
-   ```
-
-2. Run the script:
-   ```bash
-   ./deploy_wif.sh
-   ```
-
-3. The script will set up Workload Identity Federation and output the values needed for GitHub secrets.
-
-## Setting Up GitHub Secrets
-
-After setting up Workload Identity Federation, you need to add the following secrets to your GitHub repository:
-
-- `GCP_PROJECT_ID`: Your Google Cloud project ID (e.g., "cherry-ai-project")
-- `GCP_REGION`: Your Google Cloud region (e.g., "us-central1")
-- `GCP_WORKLOAD_IDENTITY_PROVIDER`: The full resource name of your Workload Identity Provider
-- `GCP_SERVICE_ACCOUNT`: The email of your service account
-
-You can set these secrets manually in the GitHub repository settings, or use the provided script:
+The `setup_wif.sh` script handles the complete WIF setup process:
 
 ```bash
-chmod +x setup_github_wif_secrets.sh
-./setup_github_wif_secrets.sh
+# Make the script executable
+chmod +x setup_wif.sh
+
+# Run with default settings
+./setup_wif.sh
+
+# Run with custom settings
+./setup_wif.sh \
+  --project your-project-id \
+  --region us-central1 \
+  --repo-owner your-github-org \
+  --repo-name your-repo-name \
+  --service-account your-sa-name \
+  --pool your-pool-name \
+  --provider your-provider-name
 ```
 
-## Using Workload Identity Federation in GitHub Actions
+The script performs the following actions:
 
-The AI Orchestra project includes a GitHub Actions workflow that uses Workload Identity Federation for authentication:
+1. Enables required GCP APIs
+2. Creates a Workload Identity Pool
+3. Creates a Workload Identity Provider for GitHub
+4. Creates a service account with necessary permissions
+5. Sets up the binding between GitHub Actions and the service account
+6. Sets up GitHub repository secrets
 
-```yaml
-# .github/workflows/wif-deploy.yml
-```
+### Manual Setup
 
-This workflow:
+If you prefer to set up WIF manually, follow these steps:
 
-1. Checks out the code
-2. Sets up Python and Poetry
-3. Authenticates to Google Cloud using Workload Identity Federation
-4. Builds and pushes a Docker image
-5. Deploys the service to Cloud Run
+1. **Enable required APIs**:
 
-To use this workflow, simply push to the main branch or manually trigger the workflow from the GitHub Actions tab.
+   ```bash
+   gcloud services enable iam.googleapis.com \
+     iamcredentials.googleapis.com \
+     cloudresourcemanager.googleapis.com
+   ```
 
-## Troubleshooting
+2. **Create Workload Identity Pool**:
 
-### Authentication Issues
+   ```bash
+   gcloud iam workload-identity-pools create github-pool \
+     --location="global" \
+     --display-name="GitHub Actions Pool" \
+     --description="Identity pool for GitHub Actions"
+   ```
 
-If you encounter authentication issues, check the following:
+3. **Create Workload Identity Provider**:
 
-1. Verify that the GitHub secrets are set correctly
-2. Ensure that the service account has the necessary permissions
-3. Check that the Workload Identity Pool and Provider are set up correctly
-4. Verify that the repository attribute mapping is correct
+   ```bash
+   gcloud iam workload-identity-pools providers create-oidc github-provider \
+     --location="global" \
+     --workload-identity-pool=github-pool \
+     --display-name="GitHub Provider" \
+     --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository" \
+     --issuer-uri="https://token.actions.githubusercontent.com"
+   ```
 
-### Permission Issues
+4. **Create service account**:
 
-If you encounter permission issues, check the following:
+   ```bash
+   gcloud iam service-accounts create github-actions-sa \
+     --display-name="GitHub Actions Service Account" \
+     --description="Service account for GitHub Actions deployments"
+   ```
 
-1. Ensure that the service account has the necessary roles (e.g., `roles/run.admin`, `roles/storage.admin`)
-2. Verify that the service account binding is set up correctly
-3. Check the audit logs for more details on the permission issue
+5. **Grant necessary roles to the service account**:
 
-## Best Practices
+   ```bash
+   for role in "roles/run.admin" "roles/storage.admin" "roles/artifactregistry.admin" "roles/iam.serviceAccountUser"; do
+     gcloud projects add-iam-policy-binding your-project-id \
+       --member="serviceAccount:github-actions-sa@your-project-id.iam.gserviceaccount.com" \
+       --role="$role"
+   done
+   ```
 
-1. **Use Terraform**: Manage your Workload Identity Federation setup with Terraform for reproducibility
-2. **Limit Permissions**: Grant only the necessary permissions to the service account
-3. **Use Repository Conditions**: Restrict which repositories can use the service account
-4. **Monitor Usage**: Regularly review audit logs for unexpected access patterns
-5. **Keep Dependencies Updated**: Regularly update the GitHub Actions workflows and dependencies
+6. **Allow GitHub Actions to impersonate the service account**:
 
-## References
+   ```bash
+   gcloud iam service-accounts add-iam-policy-binding github-actions-sa@your-project-id.iam.gserviceaccount.com \
+     --member="principalSet://iam.googleapis.com/projects/your-project-number/locations/global/workloadIdentityPools/github-pool/attribute.repository/your-github-org/your-repo-name" \
+     --role="roles/iam.workloadIdentityUser"
+   ```
 
-- [Google Cloud Documentation: Workload Identity Federation](https://cloud.google.com/iam/docs/workload-identity-federation)
-- [GitHub Actions: Google Auth Action](https://github.com/google-github-actions/auth)
-- [GitHub Actions: Deploy Cloud Run Action](https://github.com/google-github-actions/deploy-cloudrun)
+7. **Set up GitHub secrets**:
+   ```bash
+   gh secret set GCP_PROJECT_ID --body "your-project-id" --repo "your-github-org/your-repo-name"
+   gh secret set GCP_REGION --body "your-region" --repo "your-github-org/your-re
+   ```

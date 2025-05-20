@@ -1,180 +1,179 @@
-# Orchestra GCP Deployment Guide
+# AI Orchestra GCP Deployment Guide
 
-This guide explains how to deploy the Orchestra AI system to Google Cloud Platform (GCP) using the provided infrastructure as code and CI/CD pipeline.
+This guide provides comprehensive instructions for deploying the AI Orchestra project to Google Cloud Platform (GCP) using GitHub Actions and GitHub Codespaces.
 
-## Overview
+## Table of Contents
 
-The Orchestra deployment uses the following GCP services:
+1. [Setup Overview](#setup-overview)
+2. [GitHub Actions Workflow](#github-actions-workflow)
+3. [Dev Container Configuration](#dev-container-configuration)
+4. [Manual Deployment](#manual-deployment)
+5. [Monitoring and Verification](#monitoring-and-verification)
+6. [Customization Options](#customization-options)
+7. [Troubleshooting](#troubleshooting)
 
-* **Cloud Run**: For hosting the API service
-* **Firestore**: For persistent memory storage
-* **Memorystore for Redis**: For caching and session management
-* **Vertex AI Vector Search**: For semantic search capabilities
-* **Secret Manager**: For secure credentials storage
-* **Cloud Build**: For CI/CD pipeline
-* **Artifact Registry**: For Docker image storage
-* **VPC Network**: For secure connectivity between services
-* **Cloud Monitoring**: For observability and alerting
+## Setup Overview
 
-## Prerequisites
+The AI Orchestra project uses two main components for GCP deployment:
 
-1. A GCP project with billing enabled
-2. Required APIs enabled (automatically done by Terraform)
-3. Service account with appropriate permissions
-4. API keys for external services (Portkey, OpenRouter, etc.)
+1. **GitHub Actions Workflow**: Automates the build, test, and deployment process to GCP Cloud Run
+2. **Dev Container Configuration**: Sets up a consistent development environment with GCP authentication
+3. **Deployment Script**: Provides a standardized approach for manual deployments
 
-## Deployment Architecture
+All components use Workload Identity Federation for secure authentication to GCP without storing service account keys in GitHub.
 
-![Orchestra GCP Architecture](https://storage.googleapis.com/cherry-ai-project-bucket/orchestra-architecture.png)
+## GitHub Actions Workflow
 
-The architecture follows GCP best practices:
-- Cloud Run services connect to Redis, Firestore, and Vertex AI
-- All services operate within a custom VPC network
-- Default-deny firewall rules with explicit allow rules only for required traffic
-- Least-privilege service accounts for each component
-- Monitoring with predefined SLOs and alerts
+The workflow file (`.github/workflows/deploy-cloud-run.yml`) handles the CI/CD pipeline:
 
-## Environment Setup
+- Triggers on pushes to the main branch
+- Can be manually triggered with environment selection (staging/production)
+- Uses Workload Identity Federation for secure GCP authentication
+- Runs tests before deployment
+- Builds and pushes a Docker container to Artifact Registry
+- Deploys to Cloud Run with appropriate configuration
+- Verifies the deployment with health checks
 
-Three environments are supported:
-- **dev**: Development environment (minimal resources)
-- **stage**: Staging/testing environment
-- **prod**: Production environment (optimized for performance and reliability)
+### Workflow Stages
 
-## Creating Service Account for Deployment
+1. **Build and Test**: Validates the application before deployment
+2. **Deploy to Staging**: Automatically deploys to staging on pushes to main
+3. **Deploy to Production**: Manual trigger with production environment selection
 
-1. Go to the IAM & Admin > Service Accounts section in the GCP Console
-2. Create a new service account `cherrybaby-deploy`
-3. Grant the necessary roles:
-   - Cloud Run Admin
-   - Cloud Build Editor
-   - Storage Admin
-   - Secret Manager Admin
-   - Service Account User
-   - Compute Admin
-   - Artifact Registry Admin
-   - Firestore Admin
-   - Redis Admin
-   - Vertex AI Admin
+## Dev Container Configuration
 
-4. Create and download a JSON key for this service account
-5. Store the key securely in Secret Manager as `gcp-service-account`
+The Dev Container configuration (`.devcontainer/devcontainer.json`) provides a consistent development environment:
 
-## Setting Up API Keys
-
-Store your API keys in Secret Manager:
-
-```bash
-# For Portkey
-gcloud secrets create portkey-api-key --replication-policy="automatic"
-echo "YOUR_PORTKEY_API_KEY" | gcloud secrets versions add portkey-api-key --data-file=-
-
-# For OpenRouter
-gcloud secrets create openrouter --replication-policy="automatic"
-echo "YOUR_OPENROUTER_API_KEY" | gcloud secrets versions add openrouter --data-file=-
-```
+- Installs Python 3.11, Poetry 1.7.1, and Google Cloud CLI
+- Configures GCP authentication using Workload Identity Federation
+- Sets environment variables for GCP tools
+- Installs necessary VS Code extensions
 
 ## Manual Deployment
 
-If you need to deploy manually:
+For manual deployments, use the consolidated `deploy_gcp_infra.sh` script:
 
-1. Clone the repository
+```bash
+# Make the script executable
+chmod +x deploy_gcp_infra.sh
 
-2. Navigate to the `infra` directory:
-   ```bash
-   cd infra
+# Basic deployment with defaults
+./deploy_gcp_infra.sh
+
+# Deployment with custom settings
+./deploy_gcp_infra.sh \
+  --project my-project-id \
+  --region us-central1 \
+  --service my-service \
+  --env production \
+  --min-instances 1 \
+  --max-instances 10 \
+  --memory 1Gi \
+  --cpu 2
+```
+
+### Script Features
+
+- Comprehensive command-line parameters
+- Environment-specific configuration from `.env.{environment}` files
+- Secret management from `secrets.{environment}.txt` files
+- Colorized output with clear progress indicators
+- Automatic dependency checking
+- Built-in deployment verification
+
+## Monitoring and Verification
+
+### Monitor the Deployment
+
+For GitHub Actions deployments:
+
+1. Go to the **Actions** tab in your GitHub repository
+2. Select the running instance of the **Deploy to Cloud Run** workflow
+3. Expand the logs for each step to monitor progress
+
+For manual deployments, the script provides detailed output.
+
+### Verify the Deployed Service
+
+After deployment completes successfully:
+
+#### Get the Service URL
+
+The deployment outputs a URL (e.g., `https://orchestra-api-XXXXX-uc.a.run.app`).
+
+#### Test the Service
+
+Test with the provided health endpoint:
+
+```bash
+# For authenticated services
+curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" https://your-service-url/health
+
+# For public services
+curl https://your-service-url/health
+```
+
+#### Check Cloud Run Console
+
+1. Log in to the Google Cloud Console
+2. Navigate to Cloud Run and select your service
+3. Confirm the service is running and check its status
+
+#### CLI Verification
+
+From your Codespace or local machine with gcloud installed, run:
+
+```bash
+gcloud run services describe YOUR_SERVICE_NAME --region YOUR_REGION
+```
+
+## Customization Options
+
+### Environment-Specific Configuration
+
+Create environment files for different deployment environments:
+
+1. **Environment Variables**: Store in `.env.{environment}` files
+
+   ```
+   # .env.staging example
+   DEBUG=true
+   LOG_LEVEL=info
+   DATABASE_URL=postgresql://user:pass@localhost:5432/mydb
    ```
 
-3. Initialize Terraform:
-   ```bash
-   export GOOGLE_APPLICATION_CREDENTIALS=/path/to/your/service-account-key.json
-   terraform init
+2. **Secrets Configuration**: Define in `secrets.{environment}.txt` files
+   ```
+   # secrets.staging.txt example
+   API_KEY=projects/123456/secrets/api-key/versions/1
+   DB_PASSWORD=projects/123456/secrets/db-password/versions/latest
    ```
 
-4. Select workspace (environment):
-   ```bash
-   terraform workspace select dev  # or 'stage', 'prod'
-   ```
+### Command-Line Parameters
 
-5. Apply Terraform configuration:
-   ```bash
-   terraform apply -var="env=dev" -var="project_id=cherry-ai-project" -var="region=us-west4"
-   ```
+The `deploy_gcp_infra.sh` script supports many parameters:
 
-## CI/CD Pipeline
-
-For automated deployments, the project uses Cloud Build:
-
-1. Create a trigger in Cloud Build:
-   - Name: `cherry-deploy-trigger`
-   - Event: Push to branch
-   - Source: Your repository
-   - Configuration: Repository (`/infra/cloudbuild.yaml`)
-
-2. Configure branch-to-environment mapping:
-   - `main` → prod
-   - `staging` → stage
-   - All others → dev
-
-## Configuring Custom Domain (Optional)
-
-To use a custom domain:
-
-1. Add a domain mapping in Cloud Run
-2. Set up DNS records to point to the Cloud Run service
-3. Configure SSL certificates
-
-## Monitoring and Operations
-
-The deployment includes:
-
-- **Dashboards**: Find dashboard links in deployment outputs
-- **Alerting**: Email notifications for critical events
-- **Logging**: Structured logs in Cloud Logging
-- **SLOs**: Service level objectives for availability and latency
+| Parameter         | Description                       | Default           |
+| ----------------- | --------------------------------- | ----------------- |
+| `--project`       | GCP project ID                    | cherry-ai-project |
+| `--region`        | GCP region                        | us-central1       |
+| `--service`       | Cloud Run service name            | orchestra-api     |
+| `--env`           | Deployment environment            | staging           |
+| `--repo`          | Artifact Registry repository name | orchestra-repo    |
+| `--min-instances` | Minimum instances                 | 0                 |
+| `--max-instances` | Maximum instances                 | 10                |
+| `--memory`        | Memory allocation                 | 512Mi             |
+| `--cpu`           | CPU allocation                    | 1                 |
+| `--concurrency`   | Request concurrency               | 80                |
+| `--timeout`       | Request timeout                   | 300s              |
+| `--public`        | Allow unauthenticated access      | false             |
 
 ## Troubleshooting
 
-Common issues:
+### Authentication Errors
 
-1. **Health check failures**:
-   - Verify the service is running: `gcloud run services describe orchestrator-api-dev`
-   - Check logs: `gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=orchestrator-api-dev"`
-
-2. **Secret access issues**:
-   - Verify the Cloud Run service account has Secret Accessor role
-   - Check secret versions exist: `gcloud secrets versions list openrouter-dev`
-
-3. **Network connectivity issues**:
-   - Verify VPC connector is correctly configured
-   - Check firewall rules allow necessary traffic
-
-## Security Best Practices
-
-The deployment implements:
-- Default-deny firewall rules
-- Least-privilege service accounts
-- Secret Manager for credential storage
-- VPC for network isolation
-- Private Google Access for services
-- Cloud Armor for edge protection (optional)
-
-## Scaling Considerations
-
-- Cloud Run scales automatically based on traffic
-- Configure min/max instances based on your needs
-- Redis cache size may need adjustment for heavy loads
-- Monitor Firestore usage for appropriate scaling
-
-## Cost Optimization
-
-- Cloud Run only charges for actual usage
-- Use minimum instances=0 in dev/staging for cost saving
-- Enable Firestore TTL for older data
-- Set up budget alerts in GCP Billing
-
-## Reference
-
-- [Cloud Run Documentation](https://cloud.google.com/run/docs)
-- [Terraform GCP Provider](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
-- [Cloud Build CI/CD](https://cloud.google.com/build/docs/configuring-builds/create-basic-configuration)
+- Ensure your Workload Identity Federation is correctly set up
+- Verify the service account has the necessary permissions:
+  - `roles/run.admin`
+  - `roles/artifactregistry.admin`
+  - `roles/iam.serviceAccou
