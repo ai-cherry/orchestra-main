@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 # Default persona for fallback
 DEFAULT_PERSONA = PersonaConfig(
     name="Default",
-    description="A standard default persona.", # Added missing description
+    description="A standard default persona.",  # Added missing description
     background="Default persona for when no specific persona is selected or available.",
     interaction_style="Helpful and informative",
     traits={"sarcasm": 10, "creativity": 50, "strategy": 50},
@@ -32,21 +32,21 @@ FALLBACK_PERSONAS = {
     "default": DEFAULT_PERSONA,
     "cherry": PersonaConfig(
         name="Cherry",
-        description="A cheerful and optimistic persona.", # Added missing description
+        description="A cheerful and optimistic persona.",  # Added missing description
         background="Cheerful and optimistic persona with a focus on positive thinking.",
         interaction_style="Upbeat and encouraging",
         traits={"sarcasm": 5, "creativity": 80, "strategy": 40},
     ),
     "sage": PersonaConfig(
         name="Sage",
-        description="A wise and thoughtful persona.", # Added missing description
+        description="A wise and thoughtful persona.",  # Added missing description
         background="Wise and thoughtful persona with a focus on careful analysis.",
         interaction_style="Deliberate and measured",
         traits={"sarcasm": 5, "creativity": 40, "strategy": 90},
     ),
     "wit": PersonaConfig(
         name="Wit",
-        description="A clever and quick-witted persona.", # Added missing description
+        description="A clever and quick-witted persona.",  # Added missing description
         background="Clever and quick-witted persona with a sharp sense of humor.",
         interaction_style="Clever and playful",
         traits={"sarcasm": 70, "creativity": 85, "strategy": 60},

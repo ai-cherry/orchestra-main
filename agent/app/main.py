@@ -37,7 +37,7 @@ async def log_requests(request: Request, call_next):
         method=request.method,
         path=request.url.path,
         status_code=response.status_code,
-        latency_ms=f"{process_time:.2f}"
+        latency_ms=f"{process_time:.2f}",
     )
     return response
 
@@ -85,7 +85,10 @@ async def process_query(query_request: QueryRequest):
     #     raise HTTPException(status_code=500, detail=f"Error communicating with OpenAI: {str(e)}")
 
     logger.info("openai_call_mocked")
-    return {"response": f"Mock response to prompt: '{query_request.prompt}' using API key ending with ...{api_key[-4:] if api_key else 'N/A'}"}
+    return {
+        "response": f"Mock response to prompt: '{query_request.prompt}' using API key ending with ...{api_key[-4:] if api_key else 'N/A'}"
+    }
+
 
 # Initialize an __init__.py file in the app directory if it doesn't exist,
 # to ensure the module can be found by Uvicorn.
@@ -95,5 +98,6 @@ if __name__ == "__main__":
     # This part is for local development and debugging,
     # Uvicorn will run the app directly in production.
     import uvicorn
+
     logger.info("starting_uvicorn_dev_server", host="0.0.0.0", port=8080)
     uvicorn.run(app, host="0.0.0.0", port=8080)

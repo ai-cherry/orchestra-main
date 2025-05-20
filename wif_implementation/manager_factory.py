@@ -21,17 +21,17 @@ from .managers.migration_manager import MigrationManager
 logger = logging.getLogger(__name__)
 
 # Type variable for manager types
-T = TypeVar('T', bound=BaseManager)
+T = TypeVar("T", bound=BaseManager)
 
 
 class ManagerFactory:
     """
     Factory for creating managers for the WIF implementation.
-    
+
     This class provides a factory for creating managers with proper
     dependency injection and consistent configuration.
     """
-    
+
     def __init__(
         self,
         config: Optional[WIFConfig] = None,
@@ -41,7 +41,7 @@ class ManagerFactory:
     ):
         """
         Initialize the manager factory.
-        
+
         Args:
             config: The WIF configuration
             base_path: The base path for the WIF implementation
@@ -53,33 +53,33 @@ class ManagerFactory:
         self.verbose = verbose
         self.dry_run = dry_run
         self._managers: Dict[str, BaseManager] = {}
-        
+
         if self.verbose:
             logger.setLevel(logging.DEBUG)
-    
+
     @handle_exception(logger=logger)
     def get_manager(self, manager_class: Type[T]) -> T:
         """
         Get a manager instance.
-        
+
         This method returns a cached manager instance if available,
         or creates a new one if not.
-        
+
         Args:
             manager_class: The manager class to get
-            
+
         Returns:
             A manager instance
-            
+
         Raises:
             WIFError: If the manager class is not supported
         """
         manager_name = manager_class.__name__
-        
+
         # Return cached manager if available
         if manager_name in self._managers:
             return cast(T, self._managers[manager_name])
-        
+
         # Create a new manager instance
         try:
             manager = manager_class(
@@ -98,34 +98,34 @@ class ManagerFactory:
                 details={"manager_class": manager_name, "error": str(e)},
                 cause=e,
             )
-    
+
     def get_vulnerability_manager(self) -> VulnerabilityManager:
         """
         Get a vulnerability manager instance.
-        
+
         Returns:
             A vulnerability manager instance
         """
         return self.get_manager(VulnerabilityManager)
-    
+
     def get_cicd_manager(self) -> CICDManager:
         """
         Get a CICD manager instance.
-        
+
         Returns:
             A CICD manager instance
         """
         return self.get_manager(CICDManager)
-    
+
     def get_migration_manager(self) -> MigrationManager:
         """
         Get a migration manager instance.
-        
+
         Returns:
             A migration manager instance
         """
         return self.get_manager(MigrationManager)
-    
+
     def clear_cache(self) -> None:
         """Clear the manager cache."""
         self._managers.clear()
@@ -144,21 +144,21 @@ def get_manager_factory(
 ) -> ManagerFactory:
     """
     Get the global manager factory instance.
-    
+
     This function returns the global manager factory instance,
     creating it if necessary.
-    
+
     Args:
         config: The WIF configuration
         base_path: The base path for the WIF implementation
         verbose: Whether to enable verbose logging
         dry_run: Whether to run in dry-run mode
-        
+
     Returns:
         The global manager factory instance
     """
     global _factory
-    
+
     if _factory is None:
         _factory = ManagerFactory(
             config=config,
@@ -166,7 +166,7 @@ def get_manager_factory(
             verbose=verbose,
             dry_run=dry_run,
         )
-    
+
     return _factory
 
 

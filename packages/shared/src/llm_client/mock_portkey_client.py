@@ -61,15 +61,15 @@ class MockPortkeyClient(LLMClient):
         """
         self.settings = settings
         self.api_key = settings.PORTKEY_API_KEY or "mock_api_key"
-        
+
         # Set up model fallbacks
         self.model_fallbacks = {
             "gpt-4-turbo": ["gpt-4", "gpt-3.5-turbo"],
             "gpt-4": ["gpt-3.5-turbo"],
             "claude-3-opus": ["claude-3-sonnet", "claude-2"],
-            "claude-3-sonnet": ["claude-2", "gpt-3.5-turbo"]
+            "claude-3-sonnet": ["claude-2", "gpt-3.5-turbo"],
         }
-        
+
         logger.info(
             "Mock Portkey client initialized - This is a test implementation only!"
         )
@@ -97,25 +97,25 @@ class MockPortkeyClient(LLMClient):
             A mock generated text response
         """
         logger.debug(f"Mock generate_response called with model: {model}")
-        
+
         # Extract user message for context
         user_message = "No user message provided"
         for message in messages:
             if message.get("role") == "user":
                 user_message = message.get("content", "No user message provided")
                 break
-        
+
         # Determine which persona is active
         persona = active_persona_name or "Assistant"
-        
+
         # Generate a simple mock response
         await asyncio.sleep(1)  # Simulate API latency
-        
+
         mock_responses = {
             "cherry": f"[Cherry] 💫 As your creative muse, I found your message about '{user_message[:20]}...' quite inspiring! Let me share a playful thought with you...",
             "sophia": f"[Sophia] 📊 Analyzing your message about '{user_message[:20]}...'. Here's my data-backed assessment...",
             "gordon_gekko": f"[Gordon Gekko] 💼 Listen up. Your message about '{user_message[:20]}...' shows potential, but here's what you need to do to win...",
-            "default": f"[Assistant] I'm responding to your message about '{user_message[:20]}...' in test mode. This is a mock response from the development environment."
+            "default": f"[Assistant] I'm responding to your message about '{user_message[:20]}...' in test mode. This is a mock response from the development environment.",
         }
 
         # For the mock response, return either a specific persona response or the default
@@ -123,13 +123,13 @@ class MockPortkeyClient(LLMClient):
             response_key = active_persona_name.lower()
         else:
             response_key = "default"
-            
+
         # Get the response for the selected persona or default
         mock_response = mock_responses.get(response_key, mock_responses["default"])
 
         logger.info(f"Generated mock response for persona: {persona}")
         return mock_response
-    
+
     async def health_check(self) -> Dict[str, Any]:
         """
         Check the health status of the mock Portkey client.
@@ -141,5 +141,5 @@ class MockPortkeyClient(LLMClient):
             "status": "healthy",
             "api_key_configured": bool(self.api_key),
             "mode": "mock",
-            "warning": "This is a mock client for testing only!"
+            "warning": "This is a mock client for testing only!",
         }

@@ -16,7 +16,7 @@ router = APIRouter()
 async def get_system_stats() -> Dict[str, Any]:
     """
     Get system statistics including CPU, memory, and disk usage.
-    
+
     Returns:
         Dict[str, Any]: System statistics
     """
@@ -33,13 +33,13 @@ async def get_system_stats() -> Dict[str, Any]:
 
 
 @router.get("/gcp")
-async def get_gcp_info(gcp_service = Depends(get_gcp_service)) -> Dict[str, Any]:
+async def get_gcp_info(gcp_service=Depends(get_gcp_service)) -> Dict[str, Any]:
     """
     Get GCP project information.
-    
+
     Args:
         gcp_service: GCP service client
-        
+
     Returns:
         Dict[str, Any]: GCP project information
     """

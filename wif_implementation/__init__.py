@@ -21,7 +21,7 @@ from .config_models import (
     AuthMethod,
     GCPProjectConfig,
     GitHubConfig,
-    RepositoryConfig, 
+    RepositoryConfig,
     WIFImplementationConfig,
     WorkloadIdentityConfig,
 )
@@ -37,7 +37,6 @@ __all__ = [
     "enhanced_template_manager",
     "cicd_manager",
     "setup_wif_cli",
-    
     # Classes
     "AuthMethod",
     "EnhancedTemplateManager",
@@ -48,7 +47,6 @@ __all__ = [
     "WIFError",
     "WIFImplementationConfig",
     "WorkloadIdentityConfig",
-    
     # Functions
     "create_template_manager",
     "handle_exception",

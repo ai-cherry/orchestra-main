@@ -43,13 +43,13 @@ service_metadata_cache = {}
 last_cache_refresh = datetime.min
 
 
-@app.route('/health', methods=['GET'])
+@app.route("/health", methods=["GET"])
 def health_check():
     """Health check endpoint."""
     return jsonify({"status": "healthy", "timestamp": datetime.now().isoformat()})
 
 
-@app.route('/predict', methods=['POST'])
+@app.route("/predict", methods=["POST"])
 def predict_scaling():
     """
     Predict and apply optimal scaling for Cloud Run services.
@@ -67,11 +67,12 @@ def predict_scaling():
             # Skip critical services for scale-to-zero
             if service["criticality"] == "critical":
                 logger.info(
-                    f"Skipping scale-to-zero for critical service: {service['name']}")
+                    f"Skipping scale-to-zero for critical service: {service['name']}"
+                )
                 service_result = {
                     "service": service["name"],
                     "action": "skipped",
-                    "reason": "Critical service not eligible for scale-to-zero"
+                    "reason": "Critical service not eligible for scale-to-zero",
                 }
             else:
                 # Get historical metrics
@@ -81,23 +82,21 @@ def predict_scaling():
                 prediction = predict_traffic(service["name"], metrics)
 
                 # Apply scaling recommendation
-                service_result = apply_scaling_recommendation(
-                    service, prediction)
+                service_result = apply_scaling_recommendation(service, prediction)
 
             results.append(service_result)
 
-        return jsonify({
-            "timestamp": datetime.now().isoformat(),
-            "environment": ENVIRONMENT,
-            "results": results
-        })
+        return jsonify(
+            {
+                "timestamp": datetime.now().isoformat(),
+                "environment": ENVIRONMENT,
+                "results": results,
+            }
+        )
 
     except Exception as e:
         logger.error(f"Error in predict_scaling: {str(e)}", exc_info=True)
-        return jsonify({
-            "error": str(e),
-            "timestamp": datetime.now().isoformat()
-        }), 500
+        return jsonify({"error": str(e), "timestamp": datetime.now().isoformat()}), 500
 
 
 def get_services_with_metadata() -> List[Dict[str, Any]]:
@@ -110,7 +109,10 @@ def get_services_with_metadata() -> List[Dict[str, Any]]:
     global service_metadata_cache, last_cache_refresh
 
     # Check if cache is still valid (less than 1 hour old)
-    if datetime.now() - last_cache_refresh < timedelta(hours=1) and service_metadata_cache:
+    if (
+        datetime.now() - last_cache_refresh < timedelta(hours=1)
+        and service_metadata_cache
+    ):
         return service_metadata_cache
 
     try:
@@ -134,13 +136,15 @@ def get_services_with_metadata() -> List[Dict[str, Any]]:
                     if key == "criticality" and value == "critical":
                         criticality = "critical"
 
-                services.append({
-                    "name": service_name,
-                    "region": region,
-                    "criticality": criticality,
-                    "min_instances": service.template.scaling.min_instance_count,
-                    "max_instances": service.template.scaling.max_instance_count
-                })
+                services.append(
+                    {
+                        "name": service_name,
+                        "region": region,
+                        "criticality": criticality,
+                        "min_instances": service.template.scaling.min_instance_count,
+                        "max_instances": service.template.scaling.max_instance_count,
+                    }
+                )
 
         # Update cache
         service_metadata_cache = services
@@ -211,15 +215,13 @@ def get_service_metrics(service_name: str) -> pd.DataFrame:
         for time_series in results:
             for point in time_series.points:
                 # Convert to datetime and append to list
-                point_time = datetime.fromtimestamp(
-                    point.interval.start_time.seconds)
+                point_time = datetime.fromtimestamp(point.interval.start_time.seconds)
                 timestamps.append(point_time)
                 values.append(point.value.double_value)
 
         # Create DataFrame
         if timestamps and values:
-            df = pd.DataFrame(
-                {"timestamp": timestamps, "request_count": values})
+            df = pd.DataFrame({"timestamp": timestamps, "request_count": values})
             df = df.sort_values("timestamp")
             return df
         else:
@@ -228,7 +230,8 @@ def get_service_metrics(service_name: str) -> pd.DataFrame:
 
     except Exception as e:
         logger.error(
-            f"Error getting metrics for {service_name}: {str(e)}", exc_info=True)
+            f"Error getting metrics for {service_name}: {str(e)}", exc_info=True
+        )
         # Return empty DataFrame with correct columns
         return pd.DataFrame({"timestamp": [], "request_count": []})
 
@@ -248,23 +251,20 @@ def predict_traffic(service_name: str, historical_data: pd.DataFrame) -> Dict[st
     default_result = {
         "service": service_name,
         "has_sufficient_data": False,
-        "prediction": {
-            "next_24h_max": 0,
-            "next_24h_min": 0,
-            "next_hour": 0
-        },
+        "prediction": {"next_24h_max": 0, "next_24h_min": 0, "next_hour": 0},
         "recommendation": {
             "scale_to_zero": True,
             "min_instances": 0,
-            "max_instances": 1
-        }
+            "max_instances": 1,
+        },
     }
 
     try:
         # Check if we have enough data for prediction
         if historical_data.empty or len(historical_data) < 24:
             logger.info(
-                f"Insufficient data for {service_name}, recommending default settings")
+                f"Insufficient data for {service_name}, recommending default settings"
+            )
             return default_result
 
         # Set has_sufficient_data to True since we have data
@@ -274,7 +274,8 @@ def predict_traffic(service_name: str, historical_data: pd.DataFrame) -> Dict[st
         # Less than 36 requests per hour
         if historical_data["request_count"].max() < 0.01:
             logger.info(
-                f"Very low traffic for {service_name}, recommending scale-to-zero")
+                f"Very low traffic for {service_name}, recommending scale-to-zero"
+            )
             return default_result
 
         # Prepare data for time series forecasting
@@ -284,7 +285,8 @@ def predict_traffic(service_name: str, historical_data: pd.DataFrame) -> Dict[st
         # Calculate simple statistics for next 24 hours
         current_hour = datetime.now().hour
         hourly_avg = historical_data.groupby(historical_data["timestamp"].dt.hour)[
-            "request_count"].mean()
+            "request_count"
+        ].mean()
 
         # Get predictions for the next 24 hours
         next_24h = [(current_hour + i) % 24 for i in range(24)]
@@ -310,24 +312,27 @@ def predict_traffic(service_name: str, historical_data: pd.DataFrame) -> Dict[st
             "prediction": {
                 "next_24h_max": next_24h_max,
                 "next_24h_min": next_24h_min,
-                "next_hour": next_hour
+                "next_hour": next_hour,
             },
             "recommendation": {
                 "scale_to_zero": scale_to_zero,
                 "min_instances": min_instances,
-                "max_instances": max_instances
-            }
+                "max_instances": max_instances,
+            },
         }
 
         return result
 
     except Exception as e:
         logger.error(
-            f"Error predicting traffic for {service_name}: {str(e)}", exc_info=True)
+            f"Error predicting traffic for {service_name}: {str(e)}", exc_info=True
+        )
         return default_result
 
 
-def apply_scaling_recommendation(service: Dict[str, Any], prediction: Dict[str, Any]) -> Dict[str, Any]:
+def apply_scaling_recommendation(
+    service: Dict[str, Any], prediction: Dict[str, Any]
+) -> Dict[str, Any]:
     """
     Apply scaling recommendations to Cloud Run service.
 
@@ -342,7 +347,7 @@ def apply_scaling_recommendation(service: Dict[str, Any], prediction: Dict[str, 
         "service": service["name"],
         "action": "none",
         "reason": "No changes needed",
-        "prediction": prediction["prediction"]
+        "prediction": prediction["prediction"],
     }
 
     try:
@@ -357,7 +362,10 @@ def apply_scaling_recommendation(service: Dict[str, Any], prediction: Dict[str, 
         current_min = service.get("min_instances", 1)
         current_max = service.get("max_instances", 10)
 
-        if current_min == recommendation["min_instances"] and current_max == recommendation["max_instances"]:
+        if (
+            current_min == recommendation["min_instances"]
+            and current_max == recommendation["max_instances"]
+        ):
             result["reason"] = "Service already configured with recommended settings"
             return result
 
@@ -369,8 +377,12 @@ def apply_scaling_recommendation(service: Dict[str, Any], prediction: Dict[str, 
         current_service = run_client.get_service(request=request)
 
         # Update scaling settings
-        current_service.template.scaling.min_instance_count = recommendation["min_instances"]
-        current_service.template.scaling.max_instance_count = recommendation["max_instances"]
+        current_service.template.scaling.min_instance_count = recommendation[
+            "min_instances"
+        ]
+        current_service.template.scaling.max_instance_count = recommendation[
+            "max_instances"
+        ]
 
         # Update the service
         update_request = run_v2.UpdateServiceRequest(service=current_service)
@@ -387,14 +399,14 @@ def apply_scaling_recommendation(service: Dict[str, Any], prediction: Dict[str, 
         )
 
         # Log the change
-        logger.info(
-            f"Updated scaling for {service['name']}: {result['reason']}")
+        logger.info(f"Updated scaling for {service['name']}: {result['reason']}")
 
         return result
 
     except Exception as e:
         logger.error(
-            f"Error applying scaling for {service['name']}: {str(e)}", exc_info=True)
+            f"Error applying scaling for {service['name']}: {str(e)}", exc_info=True
+        )
         result["action"] = "error"
         result["reason"] = f"Error applying scaling recommendation: {str(e)}"
         return result

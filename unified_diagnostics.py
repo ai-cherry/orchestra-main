@@ -18,7 +18,7 @@ from typing import Dict, Any, List, Tuple, Optional
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    handlers=[logging.StreamHandler(), logging.FileHandler("diagnostics.log")]
+    handlers=[logging.StreamHandler(), logging.FileHandler("diagnostics.log")],
 )
 logger = logging.getLogger("orchestra-diagnostics")
 
@@ -26,14 +26,14 @@ logger = logging.getLogger("orchestra-diagnostics")
 
 
 class Colors:
-    HEADER = '\033[95m'
-    BLUE = '\033[94m'
-    CYAN = '\033[96m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    RED = '\033[91m'
-    BOLD = '\033[1m'
-    END = '\033[0m'
+    HEADER = "\033[95m"
+    BLUE = "\033[94m"
+    CYAN = "\033[96m"
+    GREEN = "\033[92m"
+    YELLOW = "\033[93m"
+    RED = "\033[91m"
+    BOLD = "\033[1m"
+    END = "\033[0m"
 
 
 def print_header(text: str) -> None:
@@ -64,7 +64,7 @@ def run_command(command: str, check: bool = True) -> Tuple[int, str, str]:
             shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True
+            text=True,
         )
         stdout, stderr = process.communicate()
         exit_code = process.returncode
@@ -95,8 +95,10 @@ def check_environment():
     env_vars = {
         "GCP_PROJECT_ID": os.environ.get("GCP_PROJECT_ID"),
         "GCP_SA_KEY_PATH": os.environ.get("GCP_SA_KEY_PATH"),
-        "GOOGLE_APPLICATION_CREDENTIALS": os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"),
-        "FIGMA_PAT": os.environ.get("FIGMA_PAT")
+        "GOOGLE_APPLICATION_CREDENTIALS": os.environ.get(
+            "GOOGLE_APPLICATION_CREDENTIALS"
+        ),
+        "FIGMA_PAT": os.environ.get("FIGMA_PAT"),
     }
 
     missing_vars = []
@@ -127,17 +129,22 @@ def check_gcp_auth():
 
         # Try to verify key content
         exit_code, stdout, stderr = run_command(
-            f"cat {key_path} | grep -q 'private_key'", check=False)
+            f"cat {key_path} | grep -q 'private_key'", check=False
+        )
         if exit_code == 0:
             print_success("Service account key appears to be valid")
         else:
-            print_warning("Service account key may be invalid (couldn't find private_key)")
+            print_warning(
+                "Service account key may be invalid (couldn't find private_key)"
+            )
     else:
         print_error(f"Service account key file not found at {key_path}")
         print("Run ./setup_gcp_auth.sh to create a new service account key.")
 
     # Check gcloud CLI configuration
-    exit_code, stdout, stderr = run_command("gcloud config get-value project", check=False)
+    exit_code, stdout, stderr = run_command(
+        "gcloud config get-value project", check=False
+    )
     if exit_code == 0 and stdout.strip():
         project = stdout.strip()
         expected_project = os.environ.get("GCP_PROJECT_ID", "cherry-ai-project")
@@ -145,14 +152,16 @@ def check_gcp_auth():
         if project == expected_project:
             print_success(f"gcloud configured with correct project: {project}")
         else:
-            print_warning(f"gcloud configured with project {project}, expected {expected_project}")
+            print_warning(
+                f"gcloud configured with project {project}, expected {expected_project}"
+            )
     else:
         print_error("Failed to get gcloud project configuration")
 
     # Try a simple API call
     exit_code, stdout, stderr = run_command(
         "python -c \"from google.cloud import storage; print('Connected to GCP:', storage.Client().project)\"",
-        check=False
+        check=False,
     )
 
     if exit_code == 0:
@@ -161,7 +170,9 @@ def check_gcp_auth():
     else:
         print_error("Failed to connect to GCP Storage API")
         print(f"  Error: {stderr.strip()}")
-        print("This may indicate an issue with your service account key or permissions.")
+        print(
+            "This may indicate an issue with your service account key or permissions."
+        )
 
 
 def check_terraform():
@@ -186,14 +197,16 @@ def check_terraform():
     # Check if terraform is installed
     exit_code, stdout, stderr = run_command("terraform --version", check=False)
     if exit_code == 0:
-        first_line_of_stdout = stdout.split('\n')[0]
+        first_line_of_stdout = stdout.split("\n")[0]
         print_success(f"Terraform installed: {first_line_of_stdout}")
     else:
         print_error("Terraform not installed")
         return
 
     # Check terraform initialization
-    exit_code, stdout, stderr = run_command(f"cd {terraform_dir} && terraform show", check=False)
+    exit_code, stdout, stderr = run_command(
+        f"cd {terraform_dir} && terraform show", check=False
+    )
     if exit_code == 0:
         print_success("Terraform is initialized")
     else:
@@ -227,15 +240,18 @@ def check_figma():
 
     for package in packages:
         exit_code, stdout, stderr = run_command(
-            f"python -c 'import {package.split('.')[0]}'", check=False)
+            f"python -c 'import {package.split('.')[0]}'", check=False
+        )
         if exit_code == 0:
             print_success(f"Python package '{package.split('.')[0]}' is installed")
         else:
             print_warning(f"Python package '{package.split('.')[0]}' is not installed")
-            missing_packages.append(package.split('.')[0])
+            missing_packages.append(package.split(".")[0])
 
     if missing_packages:
-        print_warning(f"Install required packages: pip install {' '.join(missing_packages)}")
+        print_warning(
+            f"Install required packages: pip install {' '.join(missing_packages)}"
+        )
 
     # Test Figma API connectivity
     if "requests" not in missing_packages:
@@ -258,7 +274,9 @@ else:
         else:
             print_error("Failed to connect to Figma API")
             print(f"  {stdout.strip()}")
-            print("Check your Figma PAT and make sure it has the necessary permissions.")
+            print(
+                "Check your Figma PAT and make sure it has the necessary permissions."
+            )
 
 
 def check_github_actions():
@@ -302,7 +320,7 @@ def check_phidata_dependencies():
         "phi.model.openai": "OpenAI model integration",
         "phi.model.anthropic": "Anthropic model integration",
         "phi.playground": "Phidata UI dashboard",
-        "phi.tools": "Phidata tools package"
+        "phi.tools": "Phidata tools package",
     }
 
     missing_core = []
@@ -318,7 +336,7 @@ def check_phidata_dependencies():
     db_imports = {
         "psycopg": "PostgreSQL adapter",
         "sqlalchemy": "SQL toolkit and ORM",
-        "pgvector": "PostgreSQL vector extension"
+        "pgvector": "PostgreSQL vector extension",
     }
 
     missing_db = []
@@ -335,7 +353,7 @@ def check_phidata_dependencies():
         "duckduckgo_search": "DuckDuckGo search tool",
         "newspaper": "News article extraction tool",
         "wikipedia": "Wikipedia search and retrieval",
-        "slack_sdk": "Slack integration"
+        "slack_sdk": "Slack integration",
     }
 
     missing_tools = []
@@ -411,7 +429,9 @@ def main():
     print("Next steps:")
     print("  1. Fix any issues highlighted in red")
     print("  2. Run ./unified_setup.sh to set up missing components")
-    print("  3. Install Phidata dependencies: source ./unified_setup.sh && install_dependencies")
+    print(
+        "  3. Install Phidata dependencies: source ./unified_setup.sh && install_dependencies"
+    )
     print("  4. Run ./test_memory_inmemory.py to verify memory management")
     print("  5. Run the memory validation script with GCP authentication")
     print("\n")

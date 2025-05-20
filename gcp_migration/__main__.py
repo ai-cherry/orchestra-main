@@ -20,18 +20,16 @@ from gcp_migration.application.cli import cli
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(sys.stdout)
-    ]
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)],
 )
 
 # Set more specific log levels for noisy libraries
-logging.getLogger('google').setLevel(logging.WARNING)
-logging.getLogger('google.auth').setLevel(logging.WARNING)
-logging.getLogger('google.auth.transport').setLevel(logging.WARNING)
-logging.getLogger('urllib3').setLevel(logging.WARNING)
-logging.getLogger('requests').setLevel(logging.WARNING)
+logging.getLogger("google").setLevel(logging.WARNING)
+logging.getLogger("google.auth").setLevel(logging.WARNING)
+logging.getLogger("google.auth.transport").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger("requests").setLevel(logging.WARNING)
 
 
 def main():

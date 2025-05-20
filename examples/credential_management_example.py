@@ -40,10 +40,10 @@ from core.security.credential_manager import (
 async def example_basic_usage():
     """Example of basic credential manager usage."""
     print("\n=== Basic Usage Example ===")
-    
+
     # Get the credential manager
     credential_manager = get_credential_manager()
-    
+
     # Get a secret
     try:
         # Note: This will fail if the secret doesn't exist
@@ -53,7 +53,7 @@ async def example_basic_usage():
         print(f"Error getting secret: {str(e)}")
         print("Creating a mock secret for demonstration purposes...")
         api_key = "mock-api-key-12345"
-    
+
     # Get a JSON secret
     try:
         # Note: This will fail if the secret doesn't exist
@@ -65,29 +65,33 @@ async def example_basic_usage():
         config = {
             "endpoint": "https://api.example.com",
             "timeout": 30,
-            "retry_count": 3
+            "retry_count": 3,
         }
-    
+
     # Use the credentials
-    print(f"\nUsing API key to make a request to {config.get('endpoint', 'https://api.example.com')}")
+    print(
+        f"\nUsing API key to make a request to {config.get('endpoint', 'https://api.example.com')}"
+    )
     print(f"Request headers: Authorization: Bearer {api_key[:3]}...")
     print(f"Request timeout: {config.get('timeout', 30)} seconds")
     print(f"Request retry count: {config.get('retry_count', 3)}")
-    
+
     return api_key, config
 
 
 async def example_gcp_services():
     """Example of using credentials with GCP services."""
     print("\n=== GCP Services Example ===")
-    
+
     # Get the credential manager
     credential_manager = get_credential_manager()
-    
+
     # Get service account credentials
     try:
         # Note: This will fail if the service account key doesn't exist
-        vertex_credentials = credential_manager.get_service_account_key("vertex-ai-agent")
+        vertex_credentials = credential_manager.get_service_account_key(
+            "vertex-ai-agent"
+        )
         print(f"Vertex AI Credentials: {vertex_credentials['client_email']}")
     except Exception as e:
         print(f"Error getting service account key: {str(e)}")
@@ -95,14 +99,16 @@ async def example_gcp_services():
         vertex_credentials = {
             "type": "service_account",
             "project_id": "cherry-ai-project",
-            "client_email": "vertex-ai-agent@cherry-ai-project.iam.gserviceaccount.com"
+            "client_email": "vertex-ai-agent@cherry-ai-project.iam.gserviceaccount.com",
         }
-    
+
     # Use the credentials with Vertex AI
     print("\nInitializing Vertex AI with credentials...")
     print(f"Project ID: {vertex_credentials.get('project_id', 'cherry-ai-project')}")
-    print(f"Service Account: {vertex_credentials.get('client_email', 'vertex-ai-agent@cherry-ai-project.iam.gserviceaccount.com')}")
-    
+    print(
+        f"Service Account: {vertex_credentials.get('client_email', 'vertex-ai-agent@cherry-ai-project.iam.gserviceaccount.com')}"
+    )
+
     # This is just a demonstration - in a real application, you would do:
     # from google.cloud import aiplatform
     # aiplatform.init(
@@ -110,38 +116,42 @@ async def example_gcp_services():
     #     location="us-central1",
     #     credentials=vertex_credentials
     # )
-    
+
     return vertex_credentials
 
 
 async def example_memory_system():
     """Example of using credentials with the memory system."""
     print("\n=== Memory System Example ===")
-    
+
     # Get the credential manager
     credential_manager = get_credential_manager()
-    
+
     # Get Redis credentials
     try:
         # Note: These will fail if the secrets don't exist
         redis_host = credential_manager.get_secret("redis-host")
         redis_port = credential_manager.get_secret("redis-port")
         redis_password = credential_manager.get_secret("redis-password")
-        
+
         print(f"Redis Host: {redis_host}")
         print(f"Redis Port: {redis_port}")
-        print(f"Redis Password: {'*' * len(redis_password)}")  # Don't print actual password
+        print(
+            f"Redis Password: {'*' * len(redis_password)}"
+        )  # Don't print actual password
     except Exception as e:
         print(f"Error getting Redis credentials: {str(e)}")
         print("Creating mock Redis credentials for demonstration purposes...")
         redis_host = "redis-12345.c123.us-central1-1.gce.cloud.redislabs.com"
         redis_port = "12345"
         redis_password = "mock-password"
-    
+
     # Get Firestore credentials
     try:
         # Note: This will fail if the service account key doesn't exist
-        firestore_credentials = credential_manager.get_service_account_key("memory-system")
+        firestore_credentials = credential_manager.get_service_account_key(
+            "memory-system"
+        )
         print(f"\nFirestore Credentials: {firestore_credentials['client_email']}")
     except Exception as e:
         print(f"\nError getting Firestore credentials: {str(e)}")
@@ -149,13 +159,13 @@ async def example_memory_system():
         firestore_credentials = {
             "type": "service_account",
             "project_id": "cherry-ai-project",
-            "client_email": "memory-system@cherry-ai-project.iam.gserviceaccount.com"
+            "client_email": "memory-system@cherry-ai-project.iam.gserviceaccount.com",
         }
-    
+
     # Use the credentials with Redis
     print("\nConnecting to Redis...")
     print(f"Redis URI: redis://:{redis_password[:3]}...@{redis_host}:{redis_port}")
-    
+
     # This is just a demonstration - in a real application, you would do:
     # import redis
     # r = redis.Redis(
@@ -165,12 +175,14 @@ async def example_memory_system():
     #     ssl=True
     # )
     # r.set("test_key", "test_value")
-    
+
     # Use the credentials with Firestore
     print("\nConnecting to Firestore...")
     print(f"Project ID: {firestore_credentials.get('project_id', 'cherry-ai-project')}")
-    print(f"Service Account: {firestore_credentials.get('client_email', 'memory-system@cherry-ai-project.iam.gserviceaccount.com')}")
-    
+    print(
+        f"Service Account: {firestore_credentials.get('client_email', 'memory-system@cherry-ai-project.iam.gserviceaccount.com')}"
+    )
+
     # This is just a demonstration - in a real application, you would do:
     # from google.cloud import firestore
     # db = firestore.Client(
@@ -179,21 +191,17 @@ async def example_memory_system():
     # )
     # doc_ref = db.collection("test").document("test_doc")
     # doc_ref.set({"test_field": "test_value"})
-    
+
     return {
-        "redis": {
-            "host": redis_host,
-            "port": redis_port,
-            "password": redis_password
-        },
-        "firestore": firestore_credentials
+        "redis": {"host": redis_host, "port": redis_port, "password": redis_password},
+        "firestore": firestore_credentials,
     }
 
 
 async def example_fastapi_integration():
     """Example of integrating with FastAPI."""
     print("\n=== FastAPI Integration Example ===")
-    
+
     # This is just a demonstration of how the FastAPI integration would work
     print("In a FastAPI application, you would use the dependencies like this:")
     print("\nfrom fastapi import Depends, FastAPI")
@@ -221,19 +229,21 @@ async def example_fastapi_integration():
 async def example_credential_rotation():
     """Example of handling credential rotation."""
     print("\n=== Credential Rotation Example ===")
-    
+
     # Get the credential manager
     credential_manager = get_credential_manager()
-    
-    print("When credentials are rotated, the credential manager automatically picks up the new credentials.")
+
+    print(
+        "When credentials are rotated, the credential manager automatically picks up the new credentials."
+    )
     print("This is because it always fetches the latest version from Secret Manager.")
-    
+
     print("\nSimulating credential rotation...")
     print("1. First access (original credential):")
-    
+
     # Clear the cache to simulate a fresh access
     credential_manager._cache.clear()
-    
+
     # Get a secret (this will be cached)
     try:
         # Note: This will fail if the secret doesn't exist
@@ -243,7 +253,7 @@ async def example_credential_rotation():
         print(f"   Error getting secret: {str(e)}")
         print("   Creating a mock secret for demonstration purposes...")
         api_key = "mock-api-key-12345"
-    
+
     print("\n2. Second access (cached credential):")
     try:
         # This should use the cached value
@@ -252,11 +262,11 @@ async def example_credential_rotation():
     except Exception as e:
         print(f"   Error getting secret: {str(e)}")
         api_key = "mock-api-key-12345"
-    
+
     print("\n3. After rotation (new credential):")
     # Clear the cache to simulate credential rotation
     credential_manager._cache.clear()
-    
+
     # In a real scenario, the credential would have been rotated in Secret Manager
     # Here we're just simulating by clearing the cache
     try:
@@ -267,8 +277,10 @@ async def example_credential_rotation():
         print(f"   Error getting secret: {str(e)}")
         api_key = "mock-api-key-67890"  # Simulate a new key
         print(f"   API Key: {api_key[:5]}...")
-    
-    print("\nIn a production environment, credentials are automatically rotated using Cloud Scheduler and Cloud Functions.")
+
+    print(
+        "\nIn a production environment, credentials are automatically rotated using Cloud Scheduler and Cloud Functions."
+    )
     print("The rotation schedule is defined in the Terraform configuration.")
 
 
@@ -276,14 +288,14 @@ async def main():
     """Main function to run all examples."""
     print("AI Orchestra Credential Management System Examples")
     print("================================================")
-    
+
     # Run the examples
     await example_basic_usage()
     await example_gcp_services()
     await example_memory_system()
     await example_fastapi_integration()
     await example_credential_rotation()
-    
+
     print("\nAll examples completed successfully!")
 
 

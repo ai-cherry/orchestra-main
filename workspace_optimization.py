@@ -25,7 +25,7 @@ from typing import Dict, List, Optional, Set, Tuple, Any, Union, TypedDict
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S"
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
 
@@ -63,6 +63,7 @@ CONFIG_KEY_LFS_THRESHOLD_KB = "lfs_threshold_kb"
 
 class OptimizationCategory(str, Enum):
     """Categories of workspace optimizations."""
+
     WORKSPACE_SEGMENTATION = "workspace_segmentation"
     FILE_EXCLUSIONS = "file_exclusions"
     GIT_OPTIMIZATION = "git_optimization"
@@ -75,6 +76,7 @@ class OptimizationCategory(str, Enum):
 
 class WorkspaceSegment(str, Enum):
     """Workspace segments for targeted optimization."""
+
     FRONTEND = "frontend"
     BACKEND = "backend"
     INFRASTRUCTURE = "infrastructure"
@@ -165,13 +167,30 @@ class OptimizationProfile:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'OptimizationProfile':
+    def from_dict(cls, data: Dict[str, Any]) -> "OptimizationProfile":
         """Create profile from dictionary."""
         return cls(
-            file_stats=data.get("file_stats", FileAnalysisStats(total_count=0, total_size_bytes=0, by_extension={
-            }, largest_files=[], binary_files=BinaryFileStats(count=0, total_size_bytes=0, extensions=[]))),
-            directory_stats=data.get("directory_stats", DirectoryAnalysisStats(
-                total_count=0, deepest_nesting=0, deepest_path=".", largest_directories=[])),
+            file_stats=data.get(
+                "file_stats",
+                FileAnalysisStats(
+                    total_count=0,
+                    total_size_bytes=0,
+                    by_extension={},
+                    largest_files=[],
+                    binary_files=BinaryFileStats(
+                        count=0, total_size_bytes=0, extensions=[]
+                    ),
+                ),
+            ),
+            directory_stats=data.get(
+                "directory_stats",
+                DirectoryAnalysisStats(
+                    total_count=0,
+                    deepest_nesting=0,
+                    deepest_path=".",
+                    largest_directories=[],
+                ),
+            ),
             exclusion_patterns=data.get("exclusion_patterns", []),
             git_stats=data.get("git_stats", {}),
             env_files=data.get("env_files", []),
@@ -188,6 +207,7 @@ class ConfigLoader:
         self.yaml_module = None
         try:
             import yaml  # type: ignore
+
             self._yaml_available = True
             self.yaml_module = yaml
             logger.debug("PyYAML is available for YAML config file parsing.")
@@ -227,9 +247,12 @@ class ConfigLoader:
                 "language_server_memory_limit": 4096,
                 CONFIG_KEY_EXTENSIONS: {
                     CONFIG_KEY_RECOMMENDED: [
-                        "ms-python.python", "ms-python.vscode-pylance",
-                        "ms-azuretools.vscode-docker", "hashicorp.terraform",
-                        "redhat.vscode-yaml", "streetsidesoftware.code-spell-checker",
+                        "ms-python.python",
+                        "ms-python.vscode-pylance",
+                        "ms-azuretools.vscode-docker",
+                        "hashicorp.terraform",
+                        "redhat.vscode-yaml",
+                        "streetsidesoftware.code-spell-checker",
                     ],
                     CONFIG_KEY_UNWANTED: [],
                 },
@@ -238,10 +261,14 @@ class ConfigLoader:
                 CONFIG_KEY_STANDARDIZE_ENV_FILES: True,
                 CONFIG_KEY_ENV_FILE_SCHEMA: {
                     CONFIG_KEY_REQUIRED_VARIABLES: [
-                        "ENVIRONMENT", "GCP_PROJECT_ID", "GCP_REGION",
+                        "ENVIRONMENT",
+                        "GCP_PROJECT_ID",
+                        "GCP_REGION",
                     ],
                     CONFIG_KEY_OPTIONAL_VARIABLES: [
-                        "DEBUG", "LOG_LEVEL", "API_PORT",
+                        "DEBUG",
+                        "LOG_LEVEL",
+                        "API_PORT",
                     ],
                 },
                 "visual_indicators": {  # Example: Nested keys not yet constants
@@ -313,15 +340,16 @@ class ConfigLoader:
             return default_config
 
         try:
-            with open(config_file_path, 'r', encoding='utf-8') as f:  # Added encoding
+            with open(config_file_path, "r", encoding="utf-8") as f:  # Added encoding
                 content = f.read()
                 if not content.strip():
                     logger.warning(
-                        f"Config file {config_file_path} is empty. Using default configuration.")
+                        f"Config file {config_file_path} is empty. Using default configuration."
+                    )
                     return default_config
                 f.seek(0)  # Reset cursor for parsing
 
-                if config_file_path.suffix.lower() in ['.yaml', '.yml']:
+                if config_file_path.suffix.lower() in [".yaml", ".yml"]:
                     if not self._yaml_available or self.yaml_module is None:
                         logger.error(
                             f"Cannot load YAML config file {config_file_path} because PyYAML is not available. "
@@ -330,13 +358,15 @@ class ConfigLoader:
                         return default_config
                     try:
                         loaded_config_data = self.yaml_module.safe_load(f)
-                    except self.yaml_module.YAMLError as yaml_err:  # Specific YAML error
+                    except (
+                        self.yaml_module.YAMLError
+                    ) as yaml_err:  # Specific YAML error
                         logger.error(
                             f"Failed to parse YAML from {config_file_path}: {str(yaml_err)}. "
                             "Falling back to default configuration."
                         )
                         return default_config
-                elif config_file_path.suffix.lower() == '.json':
+                elif config_file_path.suffix.lower() == ".json":
                     try:
                         loaded_config_data = json.load(f)
                     except json.JSONDecodeError as json_err:  # Specific JSON error
@@ -370,7 +400,9 @@ class ConfigLoader:
                 "Falling back to default configuration."
             )
             return default_config
-        except Exception as e:  # Catch-all for other unexpected errors during the loading logic
+        except (
+            Exception
+        ) as e:  # Catch-all for other unexpected errors during the loading logic
             logger.error(
                 f"An unexpected error occurred while loading config from {config_file_path}: {str(e)}. "
                 "Falling back to default configuration."
@@ -383,8 +415,16 @@ class FileSystemAnalyzer:
 
     def __init__(self, base_dir: Path):
         self.base_dir = base_dir
-        self.default_skip_dirs = {".git", ".venv", "venv", "node_modules",
-                                  "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
+        self.default_skip_dirs = {
+            ".git",
+            ".venv",
+            "venv",
+            "node_modules",
+            "__pycache__",
+            ".pytest_cache",
+            ".mypy_cache",
+            ".ruff_cache",
+        }
 
     def discover_env_files(self) -> List[EnvFileInfo]:
         """
@@ -406,35 +446,46 @@ class FileSystemAnalyzer:
                         var_count = 0
                         file_size = file_path.stat().st_size
 
-                        with open(file_path, 'r', encoding='utf-8') as f:
+                        with open(file_path, "r", encoding="utf-8") as f:
                             for line in f:
                                 line_count += 1
-                                if re.match(r'^\s*[A-Za-z0-9_]+=', line):
+                                if re.match(r"^\s*[A-Za-z0-9_]+=", line):
                                     var_count += 1
 
-                        env_files_data.append({
-                            "path": rel_path_str,
-                            "size": file_size,
-                            "line_count": line_count,
-                            "var_count": var_count,
-                        })
+                        env_files_data.append(
+                            {
+                                "path": rel_path_str,
+                                "size": file_size,
+                                "line_count": line_count,
+                                "var_count": var_count,
+                            }
+                        )
                     except (FileNotFoundError, PermissionError) as fs_err:
                         logger.warning(
-                            f"Skipping env file {file_path} due to file system error: {str(fs_err)}")
+                            f"Skipping env file {file_path} due to file system error: {str(fs_err)}"
+                        )
                     except ValueError:  # from relative_to
                         logger.warning(
-                            f"Skipping env file {file_path} not under base directory {self.base_dir}")
+                            f"Skipping env file {file_path} not under base directory {self.base_dir}"
+                        )
                     except IOError as io_err:
-                        logger.warning(f"IOError reading env file {file_path}: {str(io_err)}")
+                        logger.warning(
+                            f"IOError reading env file {file_path}: {str(io_err)}"
+                        )
                     except Exception as e:
                         logger.warning(
-                            f"Unexpected error processing env file {file_path}: {str(e)}")
+                            f"Unexpected error processing env file {file_path}: {str(e)}"
+                        )
         return env_files_data
 
-    def _do_analyze_files_sync(self, skip_dirs_override: Optional[Set[str]] = None) -> FileAnalysisStats:
+    def _do_analyze_files_sync(
+        self, skip_dirs_override: Optional[Set[str]] = None
+    ) -> FileAnalysisStats:
         """Synchronous core logic for analyzing files."""
         stats: FileAnalysisStats = {
-            "total_count": 0, "total_size_bytes": 0, "by_extension": {},
+            "total_count": 0,
+            "total_size_bytes": 0,
+            "by_extension": {},
             "largest_files": [],
             "binary_files": {"count": 0, "total_size_bytes": 0, "extensions": []},
         }
@@ -444,7 +495,13 @@ class FileSystemAnalyzer:
         largest_files_tracking: List[Tuple[str, int]] = []
         binary_file_extensions_set: Set[str] = set()
 
-        for root_str, dirs, files in os.walk(self.base_dir, topdown=True, onerror=lambda err: logger.warning(f"Error walking directory {err.filename}: {err.strerror}")):
+        for root_str, dirs, files in os.walk(
+            self.base_dir,
+            topdown=True,
+            onerror=lambda err: logger.warning(
+                f"Error walking directory {err.filename}: {err.strerror}"
+            ),
+        ):
             root_path = Path(root_str)
             dirs[:] = [d for d in dirs if d not in skip_dirs and not d.startswith(".")]
             for file_name in files:
@@ -463,12 +520,15 @@ class FileSystemAnalyzer:
                     ext = file_path.suffix.lower()
                     if ext:
                         if ext not in stats["by_extension"]:
-                            stats["by_extension"][ext] = {"count": 0, "total_size_bytes": 0}
+                            stats["by_extension"][ext] = {
+                                "count": 0,
+                                "total_size_bytes": 0,
+                            }
                         stats["by_extension"][ext]["count"] += 1
                         stats["by_extension"][ext]["total_size_bytes"] += size
                     is_binary = False
                     try:
-                        with open(file_path, 'r', encoding='utf-8') as f_text:
+                        with open(file_path, "r", encoding="utf-8") as f_text:
                             f_text.read(1024)
                     except UnicodeDecodeError:
                         is_binary = True
@@ -481,23 +541,37 @@ class FileSystemAnalyzer:
                         stats["binary_files"]["total_size_bytes"] += size
                         if ext:
                             binary_file_extensions_set.add(ext)
-                    if not largest_files_tracking or size > largest_files_tracking[-1][1] or len(largest_files_tracking) < 10:
+                    if (
+                        not largest_files_tracking
+                        or size > largest_files_tracking[-1][1]
+                        or len(largest_files_tracking) < 10
+                    ):
                         largest_files_tracking.append((rel_path_str, size))
                         largest_files_tracking.sort(key=lambda x: x[1], reverse=True)
                         if len(largest_files_tracking) > 10:
                             largest_files_tracking.pop()
                 except (FileNotFoundError, PermissionError) as fs_err:
                     # Debug for less noise
-                    logger.debug(f"Skipping file {file_path} during analysis: {str(fs_err)}")
+                    logger.debug(
+                        f"Skipping file {file_path} during analysis: {str(fs_err)}"
+                    )
                 except ValueError:
-                    logger.warning(f"Skipping file {file_path} not under base dir {self.base_dir}")
+                    logger.warning(
+                        f"Skipping file {file_path} not under base dir {self.base_dir}"
+                    )
                 except Exception as e:
-                    logger.warning(f"Unexpected error analyzing file {file_path}: {str(e)}")
+                    logger.warning(
+                        f"Unexpected error analyzing file {file_path}: {str(e)}"
+                    )
         stats["binary_files"]["extensions"] = sorted(list(binary_file_extensions_set))
-        stats["largest_files"] = [{"path": p, "size_bytes": s} for p, s in largest_files_tracking]
+        stats["largest_files"] = [
+            {"path": p, "size_bytes": s} for p, s in largest_files_tracking
+        ]
         return stats
 
-    async def analyze_files(self, skip_dirs_override: Optional[Set[str]] = None) -> Dict[str, Any]:
+    async def analyze_files(
+        self, skip_dirs_override: Optional[Set[str]] = None
+    ) -> Dict[str, Any]:
         """
         Analyze files in the workspace.
 
@@ -510,10 +584,15 @@ class FileSystemAnalyzer:
         stats = self._do_analyze_files_sync(skip_dirs_override)
         return stats
 
-    def _do_analyze_directories_sync(self, skip_dirs_override: Optional[Set[str]] = None) -> DirectoryAnalysisStats:
+    def _do_analyze_directories_sync(
+        self, skip_dirs_override: Optional[Set[str]] = None
+    ) -> DirectoryAnalysisStats:
         """Synchronous core logic for analyzing directories."""
         stats: DirectoryAnalysisStats = {
-            "total_count": 0, "deepest_nesting": 0, "deepest_path": "", "largest_directories": [],
+            "total_count": 0,
+            "deepest_nesting": 0,
+            "deepest_path": "",
+            "largest_directories": [],
         }
         skip_dirs = self.default_skip_dirs.copy()
         if skip_dirs_override:
@@ -522,7 +601,13 @@ class FileSystemAnalyzer:
         max_depth = 0
         deepest_path_candidate = "."
 
-        for root_str, dirs, _ in os.walk(self.base_dir, topdown=True, onerror=lambda err: logger.warning(f"Error walking directory {err.filename}: {err.strerror}")):
+        for root_str, dirs, _ in os.walk(
+            self.base_dir,
+            topdown=True,
+            onerror=lambda err: logger.warning(
+                f"Error walking directory {err.filename}: {err.strerror}"
+            ),
+        ):
             root_path = Path(root_str)
             dirs[:] = [d for d in dirs if d not in skip_dirs and not d.startswith(".")]
             try:
@@ -530,8 +615,11 @@ class FileSystemAnalyzer:
             except ValueError:
                 continue
             stats["total_count"] += 1
-            current_depth = len(rel_path_str.split(os.sep)) if rel_path_str != "." else (
-                1 if str(self.base_dir) == str(root_path) else 0)
+            current_depth = (
+                len(rel_path_str.split(os.sep))
+                if rel_path_str != "."
+                else (1 if str(self.base_dir) == str(root_path) else 0)
+            )
             if current_depth > max_depth:
                 max_depth = current_depth
                 deepest_path_candidate = rel_path_str
@@ -545,26 +633,40 @@ class FileSystemAnalyzer:
                                 current_dir_size += item.stat().st_size
                         except (FileNotFoundError, PermissionError) as item_err:
                             logger.debug(
-                                f"Skipping item {item} in dir {root_path} for size calc: {item_err}")
+                                f"Skipping item {item} in dir {root_path} for size calc: {item_err}"
+                            )
                         except Exception as e_stat:  # Catch other potential stat errors
-                            logger.debug(f"Error stating item {item} in dir {root_path}: {e_stat}")
+                            logger.debug(
+                                f"Error stating item {item} in dir {root_path}: {e_stat}"
+                            )
             except (FileNotFoundError, PermissionError) as fs_err:
-                logger.warning(f"Cannot iterate directory {root_path} for size calc: {str(fs_err)}")
+                logger.warning(
+                    f"Cannot iterate directory {root_path} for size calc: {str(fs_err)}"
+                )
                 continue
             except Exception as e_iter:  # Catch other potential iterdir errors
                 logger.warning(
-                    f"Error iterating directory {root_path} for size calc: {str(e_iter)}")
+                    f"Error iterating directory {root_path} for size calc: {str(e_iter)}"
+                )
                 continue
             dir_sizes[rel_path_str] = current_dir_size
         stats["deepest_nesting"] = max_depth
-        stats["deepest_path"] = deepest_path_candidate if deepest_path_candidate else str(
-            self.base_dir.name)
-        largest_dirs_sorted = sorted(dir_sizes.items(), key=lambda item: item[1], reverse=True)[:10]
-        stats["largest_directories"] = [{"path": p, "size_bytes": s}
-                                        for p, s in largest_dirs_sorted]
+        stats["deepest_path"] = (
+            deepest_path_candidate
+            if deepest_path_candidate
+            else str(self.base_dir.name)
+        )
+        largest_dirs_sorted = sorted(
+            dir_sizes.items(), key=lambda item: item[1], reverse=True
+        )[:10]
+        stats["largest_directories"] = [
+            {"path": p, "size_bytes": s} for p, s in largest_dirs_sorted
+        ]
         return stats
 
-    async def analyze_directories(self, skip_dirs_override: Optional[Set[str]] = None) -> Dict[str, Any]:
+    async def analyze_directories(
+        self, skip_dirs_override: Optional[Set[str]] = None
+    ) -> Dict[str, Any]:
         """
         Analyze directories in the workspace.
 
@@ -586,13 +688,35 @@ class GitOptimizerHelper:
         self.git_dir = self.base_dir / ".git"
         self.config = config
         self.git_attributes_defaults = [
-            "*.png binary", "*.jpg binary", "*.jpeg binary", "*.gif binary",
-            "*.ico binary", "*.mov binary", "*.mp4 binary", "*.mp3 binary",
-            "*.flv binary", "*.fla binary", "*.swf binary", "*.gz binary",
-            "*.zip binary", "*.7z binary", "*.ttf binary", "*.eot binary",
-            "*.woff binary", "*.woff2 binary", "*.pyc binary", "*.pdf binary",
-            "*.ez binary", "*.bz2 binary", "*.swp binary", "*.webp binary",
-            "*.jar binary", "*.jks binary", "*.tar binary", "*.tgz binary", "*.war binary",
+            "*.png binary",
+            "*.jpg binary",
+            "*.jpeg binary",
+            "*.gif binary",
+            "*.ico binary",
+            "*.mov binary",
+            "*.mp4 binary",
+            "*.mp3 binary",
+            "*.flv binary",
+            "*.fla binary",
+            "*.swf binary",
+            "*.gz binary",
+            "*.zip binary",
+            "*.7z binary",
+            "*.ttf binary",
+            "*.eot binary",
+            "*.woff binary",
+            "*.woff2 binary",
+            "*.pyc binary",
+            "*.pdf binary",
+            "*.ez binary",
+            "*.bz2 binary",
+            "*.swp binary",
+            "*.webp binary",
+            "*.jar binary",
+            "*.jks binary",
+            "*.tar binary",
+            "*.tgz binary",
+            "*.war binary",
         ]
 
     async def analyze_git_repo(self) -> Dict[str, Any]:
@@ -606,7 +730,7 @@ class GitOptimizerHelper:
             "repo_size_bytes": 0,
             "objects_count": 0,
             "largest_objects": [],
-            "error_messages": []
+            "error_messages": [],
         }
 
         if not self.git_dir.exists() or not self.git_dir.is_dir():
@@ -617,7 +741,12 @@ class GitOptimizerHelper:
 
         # Check if git command is available early
         try:
-            git_version_proc = await asyncio.create_subprocess_exec("git", "--version", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+            git_version_proc = await asyncio.create_subprocess_exec(
+                "git",
+                "--version",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
             _, stderr_git_version = await git_version_proc.communicate()
             if git_version_proc.returncode != 0:
                 err_msg = f"Git command seems unavailable or failing: {stderr_git_version.decode().strip() if stderr_git_version else 'Unknown error'}"
@@ -625,7 +754,9 @@ class GitOptimizerHelper:
                 stats["error_messages"].append(err_msg)
                 return stats  # Cannot proceed if git is not working
         except FileNotFoundError:
-            err_msg = "Git command not found. Please ensure Git is installed and in PATH."
+            err_msg = (
+                "Git command not found. Please ensure Git is installed and in PATH."
+            )
             logger.error(err_msg)
             stats["error_messages"].append(err_msg)
             return stats
@@ -644,7 +775,12 @@ class GitOptimizerHelper:
                 # For now, wrapping in a to_thread call as it's blocking I/O
                 try:
                     total_size = await asyncio.to_thread(
-                        sum, (f.stat().st_size for f in objects_dir.rglob("*") if f.is_file())
+                        sum,
+                        (
+                            f.stat().st_size
+                            for f in objects_dir.rglob("*")
+                            if f.is_file()
+                        ),
                     )
                     stats["repo_size_bytes"] = total_size
                 except Exception as e_size_calc:
@@ -653,11 +789,18 @@ class GitOptimizerHelper:
                     stats["error_messages"].append(err_msg)
             else:
                 logger.warning(f"Git objects directory not found at {objects_dir}")
-                stats["error_messages"].append(f"Git objects directory not found at {objects_dir}")
+                stats["error_messages"].append(
+                    f"Git objects directory not found at {objects_dir}"
+                )
 
             count_proc = await asyncio.create_subprocess_exec(
-                "git", "count-objects", "-v", cwd=self.base_dir,
-                stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+                "git",
+                "count-objects",
+                "-v",
+                cwd=self.base_dir,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
             stdout_count, stderr_count = await count_proc.communicate()
             if count_proc.returncode == 0 and stdout_count:
                 for line in stdout_count.decode().splitlines():
@@ -666,7 +809,9 @@ class GitOptimizerHelper:
                             stats["objects_count"] = int(line.split(":")[1].strip())
                             break
                         except (IndexError, ValueError) as e:
-                            err_msg = f"Could not parse objects_count from line '{line}': {e}"
+                            err_msg = (
+                                f"Could not parse objects_count from line '{line}': {e}"
+                            )
                             logger.warning(err_msg)
                             stats["error_messages"].append(err_msg)
             elif stderr_count or count_proc.returncode != 0:
@@ -675,20 +820,36 @@ class GitOptimizerHelper:
                 stats["error_messages"].append(err_msg)
 
             rev_list_proc = await asyncio.create_subprocess_exec(
-                "git", "rev-list", "--objects", "--all", cwd=self.base_dir,
-                stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+                "git",
+                "rev-list",
+                "--objects",
+                "--all",
+                cwd=self.base_dir,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
             stdout_rev_list, stderr_rev_list = await rev_list_proc.communicate()
             if rev_list_proc.returncode == 0 and stdout_rev_list:
-                object_hashes = [line.strip().split()[0]
-                                 for line in stdout_rev_list.decode().splitlines() if line.strip()]
+                object_hashes = [
+                    line.strip().split()[0]
+                    for line in stdout_rev_list.decode().splitlines()
+                    if line.strip()
+                ]
                 if object_hashes:
                     batch_check_input = "\n".join(object_hashes)
                     cat_file_proc = await asyncio.create_subprocess_exec(
                         # objectsize:disk for actual size
-                        "git", "cat-file", "--batch-check=%(objectname) %(objecttype) %(objectsize:disk)",
-                        cwd=self.base_dir, stdin=asyncio.subprocess.PIPE,
-                        stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
-                    stdout_cat_file, stderr_cat_file = await cat_file_proc.communicate(input=batch_check_input.encode())
+                        "git",
+                        "cat-file",
+                        "--batch-check=%(objectname) %(objecttype) %(objectsize:disk)",
+                        cwd=self.base_dir,
+                        stdin=asyncio.subprocess.PIPE,
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.PIPE,
+                    )
+                    stdout_cat_file, stderr_cat_file = await cat_file_proc.communicate(
+                        input=batch_check_input.encode()
+                    )
                     if cat_file_proc.returncode == 0 and stdout_cat_file:
                         object_details = []
                         for line in stdout_cat_file.decode().splitlines():
@@ -696,9 +857,12 @@ class GitOptimizerHelper:
                             if len(parts) == 3 and parts[1] == "blob":
                                 try:
                                     object_details.append(
-                                        {"hash": parts[0], "size_bytes": int(parts[2])})
+                                        {"hash": parts[0], "size_bytes": int(parts[2])}
+                                    )
                                 except ValueError:
-                                    logger.warning(f"Could not parse object size from: {line}")
+                                    logger.warning(
+                                        f"Could not parse object size from: {line}"
+                                    )
                         object_details.sort(key=lambda x: x["size_bytes"], reverse=True)
                         stats["largest_objects"] = object_details[:10]
                     elif stderr_cat_file or cat_file_proc.returncode != 0:
@@ -718,28 +882,38 @@ class GitOptimizerHelper:
     async def implement_git_attributes(self) -> bool:
         """Writes or updates the .gitattributes file."""
         if not self.git_dir.exists():
-            logger.warning("Not a Git repository (or .git directory missing), skipping .gitattributes generation.")
+            logger.warning(
+                "Not a Git repository (or .git directory missing), skipping .gitattributes generation."
+            )
             return False
 
         attributes_path = self.base_dir / ".gitattributes"
         # Use constants for config access
         git_optimization_config = self.config.get(CONFIG_GIT_OPTIMIZATION, {})
-        custom_attributes = git_optimization_config.get(CONFIG_KEY_CUSTOM_GIT_ATTRIBUTES, [])
+        custom_attributes = git_optimization_config.get(
+            CONFIG_KEY_CUSTOM_GIT_ATTRIBUTES, []
+        )
         all_attributes = self.git_attributes_defaults + custom_attributes
-        
+
         try:
-            with open(attributes_path, 'w', encoding='utf-8') as f:
+            with open(attributes_path, "w", encoding="utf-8") as f:
                 f.write("# Auto-generated by WorkspaceOptimizer for AI Orchestra\n")
                 f.write("# Managed by GitOptimizerHelper\n\n")
                 for attribute_line in all_attributes:
                     f.write(f"{attribute_line}\n")
-            logger.info(f"Successfully wrote/updated .gitattributes file: {attributes_path}")
+            logger.info(
+                f"Successfully wrote/updated .gitattributes file: {attributes_path}"
+            )
             return True
         except IOError as e_io:
-            logger.error(f"IOError writing .gitattributes file {attributes_path}: {str(e_io)}")
+            logger.error(
+                f"IOError writing .gitattributes file {attributes_path}: {str(e_io)}"
+            )
             return False
         except Exception as e_general:
-            logger.error(f"Unexpected error writing .gitattributes file {attributes_path}: {str(e_general)}")
+            logger.error(
+                f"Unexpected error writing .gitattributes file {attributes_path}: {str(e_general)}"
+            )
             return False
 
     async def configure_git_lfs(self) -> bool:
@@ -749,3 +923,4 @@ class GitOptimizerHelper:
         # lfs_threshold_kb = lfs_management_config.get(CONFIG_KEY_LFS_THRESHOLD_KB, 500)
         # logger.info(f"LFS threshold from config: {lfs_threshold_kb}KB (currently used for logging, not direct LFS command filtering here)")
         # ... (rest of configure_git_lfs method body)
+        pass

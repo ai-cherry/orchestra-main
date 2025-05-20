@@ -26,6 +26,7 @@ from typing import Dict, List, Optional, Pattern, Set, Tuple
 @dataclass
 class HardcodedPattern:
     """Pattern for detecting hardcoded values."""
+
     name: str
     pattern: Pattern
     env_var: str
@@ -59,7 +60,9 @@ PATTERNS = [
     ),
     HardcodedPattern(
         name="Service Account",
-        pattern=re.compile(r'["\'][a-z-]+@cherry-ai-project\.iam\.gserviceaccount\.com["\']'),
+        pattern=re.compile(
+            r'["\'][a-z-]+@cherry-ai-project\.iam\.gserviceaccount\.com["\']'
+        ),
         env_var="GCP_SERVICE_ACCOUNT",
         description="Service account email",
         file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.tf$", r"\.py$"],
@@ -100,9 +103,7 @@ def should_scan_file(file_path: Path, pattern: HardcodedPattern) -> bool:
     return True
 
 
-def scan_file(
-    file_path: Path, pattern: HardcodedPattern
-) -> List[Tuple[int, str, str]]:
+def scan_file(file_path: Path, pattern: HardcodedPattern) -> List[Tuple[int, str, str]]:
     """
     Scan a file for hardcoded values.
 
@@ -189,7 +190,9 @@ def scan_directory(
                                 line_num,
                                 line,
                                 match,
-                                generate_fix(file_path, pattern, line, match) if fix else None,
+                                generate_fix(file_path, pattern, line, match)
+                                if fix
+                                else None,
                             )
                             for line_num, line, match in matches
                         ]
@@ -211,7 +214,9 @@ def print_results(
     """
     total_files = len(results)
     total_matches = sum(
-        len(match) for file_results in results.values() for match in file_results.values()
+        len(match)
+        for file_results in results.values()
+        for match in file_results.values()
     )
 
     print(f"Found {total_matches} hardcoded values in {total_files} files:\n")
@@ -233,11 +238,12 @@ def main() -> None:
         description="Scan for hardcoded values in AI Orchestra codebase"
     )
     parser.add_argument(
-        "--path", type=str, default=".", help="Path to scan (default: current directory)"
+        "--path",
+        type=str,
+        default=".",
+        help="Path to scan (default: current directory)",
     )
-    parser.add_argument(
-        "--fix", action="store_true", help="Generate suggested fixes"
-    )
+    parser.add_argument("--fix", action="store_true", help="Generate suggested fixes")
     args = parser.parse_args()
 
     directory = Path(args.path)

@@ -57,12 +57,14 @@ class Settings(BaseSettings):
     GCP_CREDENTIALS_JSON: Optional[str] = None
     GCP_CREDENTIALS_PATH: Optional[str] = None
     REDIS_PASSWORD: Optional[str] = None
-    
+
     # Enhanced memory settings
     USE_RESILIENT_ADAPTER: bool = True  # Whether to use circuit breaker pattern
     USE_VERTEX_VECTOR_SEARCH: bool = False  # Whether to use Vertex Vector Search
     VERTEX_LOCATION: str = "us-central1"  # GCP region for Vertex AI
-    VERTEX_INDEX_ENDPOINT_ID: Optional[str] = None  # Vertex Vector Search index endpoint ID
+    VERTEX_INDEX_ENDPOINT_ID: Optional[
+        str
+    ] = None  # Vertex Vector Search index endpoint ID
     VERTEX_INDEX_ID: Optional[str] = None  # Vertex Vector Search index ID
     EMBEDDING_DIMENSION: int = 768  # Dimension of embedding vectors
     ENABLE_MEMORY_MONITORING: bool = True  # Whether to enable memory monitoring

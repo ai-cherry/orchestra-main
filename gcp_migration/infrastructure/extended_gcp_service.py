@@ -88,16 +88,16 @@ class ExtendedGCPService(IExtendedGCPService):
             AuthenticationError: If authentication with GCP fails
             ValueError: If project ID cannot be determined
         """
-        self._project_id = project_id or os.environ.get('GCP_PROJECT_ID')
+        self._project_id = project_id or os.environ.get("GCP_PROJECT_ID")
 
         if not self._project_id:
             try:
                 # Try to get project ID from gcloud config
                 result = subprocess.run(
-                    ['gcloud', 'config', 'get-value', 'project'],
+                    ["gcloud", "config", "get-value", "project"],
                     capture_output=True,
                     text=True,
-                    check=True
+                    check=True,
                 )
                 self._project_id = result.stdout.strip()
             except (subprocess.SubprocessError, FileNotFoundError):
@@ -110,7 +110,8 @@ class ExtendedGCPService(IExtendedGCPService):
         # Check for GCP libraries
         if not HAS_GCP_LIBS:
             logger.error(
-                "GCP libraries not installed. Run: pip install google-cloud-storage google-cloud-secretmanager google-cloud-firestore google-cloud-aiplatform")
+                "GCP libraries not installed. Run: pip install google-cloud-storage google-cloud-secretmanager google-cloud-firestore google-cloud-aiplatform"
+            )
             raise ImportError("Required GCP libraries not installed")
 
         # Initialize clients
@@ -135,7 +136,9 @@ class ExtendedGCPService(IExtendedGCPService):
             self._credentials, _ = default()
             logger.info(f"Authenticated with GCP project: {self._project_id}")
         except DefaultCredentialsError as e:
-            error_msg = f"Failed to authenticate with GCP using default credentials: {str(e)}"
+            error_msg = (
+                f"Failed to authenticate with GCP using default credentials: {str(e)}"
+            )
             logger.error(error_msg)
             raise AuthenticationError(message=error_msg, cause=e)
 
@@ -151,7 +154,8 @@ class ExtendedGCPService(IExtendedGCPService):
         """Get or create Secret Manager client."""
         if self._secret_client is None:
             self._secret_client = secretmanager.SecretManagerServiceClient(
-                credentials=self._credentials)
+                credentials=self._credentials
+            )
         return self._secret_client
 
     @property
@@ -159,7 +163,8 @@ class ExtendedGCPService(IExtendedGCPService):
         """Get or create Storage client."""
         if self._storage_client is None:
             self._storage_client = storage.Client(
-                credentials=self._credentials, project=self._project_id)
+                credentials=self._credentials, project=self._project_id
+            )
         return self._storage_client
 
     @property
@@ -167,7 +172,8 @@ class ExtendedGCPService(IExtendedGCPService):
         """Get or create Firestore client."""
         if self._firestore_client is None:
             self._firestore_client = firestore.Client(
-                credentials=self._credentials, project=self._project_id)
+                credentials=self._credentials, project=self._project_id
+            )
         return self._firestore_client
 
     def check_gcp_apis_enabled(self) -> Dict[str, bool]:
@@ -181,7 +187,7 @@ class ExtendedGCPService(IExtendedGCPService):
             "secretmanager.googleapis.com",
             "firestore.googleapis.com",
             "storage.googleapis.com",
-            "aiplatform.googleapis.com"
+            "aiplatform.googleapis.com",
         ]
 
         results = {}
@@ -189,10 +195,10 @@ class ExtendedGCPService(IExtendedGCPService):
         for api in apis:
             try:
                 result = subprocess.run(
-                    ['gcloud', 'services', 'list', '--enabled', f'--filter={api}'],
+                    ["gcloud", "services", "list", "--enabled", f"--filter={api}"],
                     capture_output=True,
                     text=True,
-                    check=True
+                    check=True,
                 )
                 results[api] = api in result.stdout
             except subprocess.SubprocessError:
@@ -216,7 +222,7 @@ class ExtendedGCPService(IExtendedGCPService):
                 "secretmanager.googleapis.com",
                 "firestore.googleapis.com",
                 "storage.googleapis.com",
-                "aiplatform.googleapis.com"
+                "aiplatform.googleapis.com",
             ]
 
         results = {}
@@ -224,10 +230,16 @@ class ExtendedGCPService(IExtendedGCPService):
         for api in apis:
             try:
                 subprocess.run(
-                    ['gcloud', 'services', 'enable', api, f'--project={self._project_id}'],
+                    [
+                        "gcloud",
+                        "services",
+                        "enable",
+                        api,
+                        f"--project={self._project_id}",
+                    ],
                     capture_output=True,
                     text=True,
-                    check=True
+                    check=True,
                 )
                 results[api] = True
                 logger.info(f"Enabled API: {api}")
@@ -254,16 +266,24 @@ class ExtendedGCPService(IExtendedGCPService):
         results = {
             "mcp_memory": {
                 "exists": ai_memory_dir.exists(),
-                "memory_index": (ai_memory_dir / "memory_index.json").exists() if ai_memory_dir.exists() else False
+                "memory_index": (ai_memory_dir / "memory_index.json").exists()
+                if ai_memory_dir.exists()
+                else False,
             },
             "gemini": {
-                "config_exists": (gemini_config_dir / "gemini-code-assist.yaml").exists() if gemini_config_dir.exists() else False
+                "config_exists": (
+                    gemini_config_dir / "gemini-code-assist.yaml"
+                ).exists()
+                if gemini_config_dir.exists()
+                else False
             },
             "claude": {
-                "config_exists": (claude_config_dir / "config.json").exists() if claude_config_dir.exists() else False
+                "config_exists": (claude_config_dir / "config.json").exists()
+                if claude_config_dir.exists()
+                else False
             },
             "gcp_apis": self.check_gcp_apis_enabled(),
-            "gcp_project": self._project_id
+            "gcp_project": self._project_id,
         }
 
         return results
@@ -328,7 +348,7 @@ class ExtendedGCPService(IExtendedGCPService):
                     self.secret_client.create_secret(
                         parent=parent,
                         secret_id=secret_id,
-                        secret={"replication": {"automatic": {}}}
+                        secret={"replication": {"automatic": {}}},
                     )
                     logger.info(f"Created new secret: {secret_id}")
                 except Exception as create_err:
@@ -336,7 +356,9 @@ class ExtendedGCPService(IExtendedGCPService):
                     if "Permission" in str(create_err):
                         error_msg = f"Permission denied when creating secret {secret_id}. Verify IAM permissions include secretmanager.secrets.create"
                     else:
-                        error_msg = f"Failed to create secret {secret_id}: {str(create_err)}"
+                        error_msg = (
+                            f"Failed to create secret {secret_id}: {str(create_err)}"
+                        )
 
                     logger.error(error_msg, exc_info=True)
                     raise SecretError(message=error_msg, cause=create_err)
@@ -352,8 +374,7 @@ class ExtendedGCPService(IExtendedGCPService):
 
         try:
             response = self.secret_client.add_secret_version(
-                parent=parent,
-                payload={"data": payload}
+                parent=parent, payload={"data": payload}
             )
             logger.info(f"Added secret version {response.name}")
             return response.name
@@ -392,7 +413,7 @@ class ExtendedGCPService(IExtendedGCPService):
             secret_ids = []
             for secret in response:
                 # Extract secret ID from name (format: projects/{project}/secrets/{secret})
-                secret_id = secret.name.split('/')[-1]
+                secret_id = secret.name.split("/")[-1]
 
                 # Apply filter if provided
                 if filter_prefix is None or secret_id.startswith(filter_prefix):
@@ -468,8 +489,12 @@ class ExtendedGCPService(IExtendedGCPService):
         return migrated_secrets
 
     # Storage implementation
-    def upload_file(self, bucket_name: str, source_file_path: Path,
-                    destination_blob_name: Optional[str] = None) -> str:
+    def upload_file(
+        self,
+        bucket_name: str,
+        source_file_path: Path,
+        destination_blob_name: Optional[str] = None,
+    ) -> str:
         """
         Upload a file to a GCS bucket.
 
@@ -520,8 +545,9 @@ class ExtendedGCPService(IExtendedGCPService):
             logger.error(error_msg)
             raise StorageError(message=error_msg, cause=e)
 
-    def download_file(self, bucket_name: str, source_blob_name: str,
-                      destination_file_path: Path) -> Path:
+    def download_file(
+        self, bucket_name: str, source_blob_name: str, destination_file_path: Path
+    ) -> Path:
         """
         Download a file from a GCS bucket.
 
@@ -608,7 +634,9 @@ class ExtendedGCPService(IExtendedGCPService):
             logger.error(error_msg)
             raise StorageError(message=error_msg, cause=e)
 
-    def ensure_bucket_exists(self, bucket_name: str, region: Optional[str] = None) -> bool:
+    def ensure_bucket_exists(
+        self, bucket_name: str, region: Optional[str] = None
+    ) -> bool:
         """
         Ensure a GCS bucket exists, creating it if necessary.
 
@@ -631,8 +659,7 @@ class ExtendedGCPService(IExtendedGCPService):
 
             # Create bucket
             bucket = self.storage_client.create_bucket(
-                bucket_name,
-                location=region or "us-central1"
+                bucket_name, location=region or "us-central1"
             )
             logger.info(f"Created bucket: {bucket_name}")
             return True
@@ -642,7 +669,9 @@ class ExtendedGCPService(IExtendedGCPService):
             raise StorageError(message=error_msg, cause=e)
 
     # Firestore implementation
-    def store_document(self, collection: str, document_id: str, data: Dict[str, Any]) -> str:
+    def store_document(
+        self, collection: str, document_id: str, data: Dict[str, Any]
+    ) -> str:
         """
         Store a document in Firestore.
 
@@ -713,8 +742,13 @@ class ExtendedGCPService(IExtendedGCPService):
             logger.error(error_msg)
             raise FirestoreError(message=error_msg, cause=e)
 
-    def update_document(self, collection: str, document_id: str, data: Dict[str, Any],
-                        merge: bool = True) -> bool:
+    def update_document(
+        self,
+        collection: str,
+        document_id: str,
+        data: Dict[str, Any],
+        merge: bool = True,
+    ) -> bool:
         """
         Update a document in Firestore.
 
@@ -793,13 +827,21 @@ class ExtendedGCPService(IExtendedGCPService):
             # Convert to dictionaries
             model_info = []
             for model in models:
-                model_info.append({
-                    "name": model.display_name,
-                    "id": model.name,
-                    "version": model.version_id if hasattr(model, "version_id") else None,
-                    "create_time": model.create_time if hasattr(model, "create_time") else None,
-                    "update_time": model.update_time if hasattr(model, "update_time") else None,
-                })
+                model_info.append(
+                    {
+                        "name": model.display_name,
+                        "id": model.name,
+                        "version": model.version_id
+                        if hasattr(model, "version_id")
+                        else None,
+                        "create_time": model.create_time
+                        if hasattr(model, "create_time")
+                        else None,
+                        "update_time": model.update_time
+                        if hasattr(model, "update_time")
+                        else None,
+                    }
+                )
 
             return model_info
         except Exception as e:
@@ -829,11 +871,15 @@ class ExtendedGCPService(IExtendedGCPService):
                 config_path = str(config_dir / "gemini-code-assist.yaml")
 
             # Get template configuration
-            template_path = Path(__file__).parent.parent / "docker" / \
-                "workstation-image" / "gemini-code-assist.yaml"
+            template_path = (
+                Path(__file__).parent.parent
+                / "docker"
+                / "workstation-image"
+                / "gemini-code-assist.yaml"
+            )
 
             if template_path.exists():
-                with open(template_path, 'r') as f:
+                with open(template_path, "r") as f:
                     config_content = f.read()
 
                 # Replace variables
@@ -841,7 +887,7 @@ class ExtendedGCPService(IExtendedGCPService):
                 config_content = config_content.replace("${GCP_PROJECT_ID}", project_id)
 
                 # Write to target path
-                with open(config_path, 'w') as f:
+                with open(config_path, "w") as f:
                     f.write(config_content)
 
                 logger.info(f"Set up Gemini Code Assist configuration at {config_path}")
@@ -888,32 +934,32 @@ class ExtendedGCPService(IExtendedGCPService):
                 "storage_options": {
                     "persistent": True,
                     "encrypted": True,
-                    "geo_redundant": True
+                    "geo_redundant": True,
                 },
                 "assistants": [
                     {
                         "name": "gemini",
                         "type": "code-assist",
                         "provider": "google",
-                        "enabled": True
+                        "enabled": True,
                     },
                     {
                         "name": "roo",
                         "type": "chat",
                         "provider": "anthropic",
-                        "enabled": True
+                        "enabled": True,
                     },
                     {
                         "name": "cline",
                         "type": "chat",
                         "provider": "anthropic",
-                        "enabled": True
-                    }
-                ]
+                        "enabled": True,
+                    },
+                ],
             }
 
             # Write memory index
-            with open(memory_dir / "memory_index.json", 'w') as f:
+            with open(memory_dir / "memory_index.json", "w") as f:
                 json.dump(memory_index, f, indent=2)
 
             logger.info(f"Set up MCP memory system at {memory_path}")
@@ -960,7 +1006,7 @@ class ExtendedGCPService(IExtendedGCPService):
                 "config_exists": gemini_config_file.exists(),
                 "extension_installed": gemini_extension_installed,
                 "vertex_api_enabled": vertex_api_enabled,
-                "project_configured": self._project_id is not None
+                "project_configured": self._project_id is not None,
             }
         except Exception as e:
             error_msg = f"Error verifying Gemini installation: {str(e)}"

@@ -8,4 +8,4 @@ and mode transitions.
 
 from .gemini_adapter import GeminiRooAdapter
 
-__all__ = ['GeminiRooAdapter']
+__all__ = ["GeminiRooAdapter"]

@@ -111,7 +111,8 @@ class MemoryService:
 
         if not item.text_content and item.item_type == "conversation":
             raise MemoryValidationError(
-                "Conversation memory items must have text content")
+                "Conversation memory items must have text content"
+            )
 
         # Save to storage
         return await self._storage.save_item(item)
@@ -175,13 +176,12 @@ class MemoryService:
         MAX_LIMIT = 100
         if limit > MAX_LIMIT:
             logger.warning(
-                f"Limiting conversation history request to {MAX_LIMIT} items (requested {limit})")
+                f"Limiting conversation history request to {MAX_LIMIT} items (requested {limit})"
+            )
             limit = MAX_LIMIT
 
         # Prepare filters
-        filters = {
-            "item_type": "conversation"
-        }
+        filters = {"item_type": "conversation"}
 
         if session_id:
             filters["session_id"] = session_id
@@ -248,7 +248,8 @@ class MemoryService:
         # For now, we'll throw a NotImplementedError to indicate that this higher-level
         # business logic is not fully implemented
         raise NotImplementedError(
-            "Semantic search not implemented in this version of MemoryService")
+            "Semantic search not implemented in this version of MemoryService"
+        )
 
     async def add_agent_data(self, data: AgentData) -> str:
         """
@@ -314,15 +315,17 @@ class MemoryService:
         filters = {
             "item_type": item.item_type,
             # Recent items only (conceptual filter, implementation depends on storage)
-            "timestamp": {"start": datetime.utcnow() - timedelta(minutes=5)}
+            "timestamp": {"start": datetime.utcnow() - timedelta(minutes=5)},
         }
 
         recent_items = await self._storage.query_items(item.user_id, filters, 20)
 
         # Check for content similarity
         for existing_item in recent_items:
-            if (existing_item.text_content == item.text_content and
-                    existing_item.persona_active == item.persona_active):
+            if (
+                existing_item.text_content == item.text_content
+                and existing_item.persona_active == item.persona_active
+            ):
                 return True
 
         return False
@@ -359,9 +362,7 @@ class MemoryService:
         if not self._initialized:
             return {
                 "status": "not_initialized",
-                "details": {
-                    "message": "MemoryService is not initialized"
-                }
+                "details": {"message": "MemoryService is not initialized"},
             }
 
         # Get health from storage

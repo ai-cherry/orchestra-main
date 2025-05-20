@@ -14,20 +14,21 @@ from packages.shared.src.models.domain_models import AgentResponse as AgentOutpu
 
 logger = logging.getLogger(__name__)
 
+
 class PhidataAgentWrapper(OrchestraAgentBase):
     """
     Wrapper for integrating Phidata-based agents with Orchestra.
-    
+
     This wrapper adapts Phidata's agent framework to work with the
     Orchestra orchestration system.
     """
-    
+
     agent_type = "phidata"
-    
+
     def __init__(self, **kwargs):
         """
         Initialize the Phidata agent wrapper.
-        
+
         Args:
             agent_config: Configuration for the Phidata agent
             memory_manager: Orchestra's memory management system
@@ -35,11 +36,11 @@ class PhidataAgentWrapper(OrchestraAgentBase):
             tool_registry: Tool registry for the agent
         """
         super().__init__(**kwargs)
-        
+
         # Initialize Phidata agent
         self.phidata_agent = None
         self._initialize_phidata_agent()
-    
+
     def _initialize_phidata_agent(self):
         """
         Initialize the Phidata agent based on configuration.
@@ -67,7 +68,7 @@ class PhidataAgentWrapper(OrchestraAgentBase):
 
         except Exception as e:
             logger.error(f"Failed to initialize Phidata agent: {str(e)}")
-    
+
     async def run(self, input_data: AgentInput) -> AgentOutput:
         """
         Execute the Phidata agent with the given input, including short-term memory.
@@ -81,12 +82,13 @@ class PhidataAgentWrapper(OrchestraAgentBase):
         try:
             # 1. Retrieve recent messages from short-term memory
             from core.orchestrator.src.main import short_term_memory
+
             recent_messages = short_term_memory
 
             # 2. Include recent messages in the context passed to the Phidata agent
             context = {
                 "user_input": input_data.content,
-                "recent_messages": recent_messages
+                "recent_messages": recent_messages,
             }
 
             # 3. Call the Phidata agent's processing method
@@ -99,7 +101,7 @@ class PhidataAgentWrapper(OrchestraAgentBase):
                 request_id=input_data.request_id,
                 agent_id=self.id,
                 content=str(agent_response),  # Ensure the content is a string
-                status="completed"
+                status="completed",
             )
 
         except Exception as e:
@@ -109,5 +111,5 @@ class PhidataAgentWrapper(OrchestraAgentBase):
                 request_id=input_data.request_id,
                 agent_id=self.id,
                 content=f"Error executing Phidata agent: {str(e)}",
-                status="error"
+                status="error",
             )

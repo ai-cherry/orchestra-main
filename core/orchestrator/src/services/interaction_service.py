@@ -90,25 +90,23 @@ class InteractionService:
             user_id=user_id,
             session_id=session_id,
             limit=history_limit,
-            persona_name=persona_config.name
+            persona_name=persona_config.name,
         )
 
         # Format history for LLM
         # This is a business rule: how to format conversation history for the LLM
         formatted_history = self._format_history_for_llm(
-            history_items, persona_config.name)
+            history_items, persona_config.name
+        )
 
         # Construct system prompt using persona_config
         system_message = {
             "role": "system",
-            "content": f"You are {persona_config.name}. {persona_config.description}"
+            "content": f"You are {persona_config.name}. {persona_config.description}",
         }
 
         # Add current user message
-        user_message_dict = {
-            "role": "user",
-            "content": user_message
-        }
+        user_message_dict = {"role": "user", "content": user_message}
 
         # Combine messages
         messages = [system_message] + formatted_history + [user_message_dict]
@@ -120,7 +118,7 @@ class InteractionService:
             temperature=temperature,
             max_tokens=max_tokens,
             user_id=user_id,
-            active_persona_name=persona_config.name
+            active_persona_name=persona_config.name,
         )
 
         # Create memory item for the response
@@ -134,8 +132,8 @@ class InteractionService:
             metadata={
                 "source": "llm",
                 "model": self._default_model,  # Store the actual model used
-                "request_id": request_id
-            }
+                "request_id": request_id,
+            },
         )
 
         # Also create a memory item for the user message to maintain complete history
@@ -146,10 +144,7 @@ class InteractionService:
             persona_active="user",  # Distinguishing user messages
             text_content=user_message,
             timestamp=datetime.utcnow(),
-            metadata={
-                "source": "user",
-                "request_id": request_id
-            }
+            metadata={"source": "user", "request_id": request_id},
         )
 
         # Save to memory
@@ -160,9 +155,7 @@ class InteractionService:
         return llm_response_text, persona_config.name
 
     def _format_history_for_llm(
-        self,
-        history_items: List[MemoryItem],
-        persona_name: str
+        self, history_items: List[MemoryItem], persona_name: str
     ) -> List[Dict[str, str]]:
         """
         Format conversation history for the LLM.
@@ -179,14 +172,10 @@ class InteractionService:
         # Process items in order (oldest to newest)
         for item in reversed(history_items):
             if item.persona_active == persona_name:
-                formatted_history.append({
-                    "role": "assistant",
-                    "content": item.text_content
-                })
+                formatted_history.append(
+                    {"role": "assistant", "content": item.text_content}
+                )
             else:
-                formatted_history.append({
-                    "role": "user",
-                    "content": item.text_content
-                })
+                formatted_history.append({"role": "user", "content": item.text_content})
 
         return formatted_history

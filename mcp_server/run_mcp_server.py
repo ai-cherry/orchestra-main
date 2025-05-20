@@ -19,7 +19,14 @@ from mcp_server.adapters.gemini_adapter import GeminiAdapter
 from mcp_server.adapters.copilot_adapter import CopilotAdapter
 from mcp_server.managers.standard_memory_manager import StandardMemoryManager
 from mcp_server.storage.in_memory_storage import InMemoryStorage
-from mcp_server.models.memory import MemoryEntry, MemoryType, MemoryScope, CompressionLevel, StorageTier, MemoryMetadata
+from mcp_server.models.memory import (
+    MemoryEntry,
+    MemoryType,
+    MemoryScope,
+    CompressionLevel,
+    StorageTier,
+    MemoryMetadata,
+)
 from mcp_server.config import load_config, MCPConfig
 
 # Now we can import modules with proper package structure
@@ -100,7 +107,7 @@ class MCPApplication:
         return {
             "status": "initialized",
             "memory": memory_status,
-            "tools": tool_statuses
+            "tools": tool_statuses,
         }
 
 

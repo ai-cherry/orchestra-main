@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field, validator, root_validator
 
 class MemoryBackendType(str, Enum):
     """Enum for memory backend types."""
+
     FIRESTORE = "firestore"
     REDIS = "redis"
     IN_MEMORY = "in_memory"
@@ -22,6 +23,7 @@ class MemoryBackendType(str, Enum):
 
 class VectorSearchType(str, Enum):
     """Enum for vector search types."""
+
     IN_MEMORY = "in_memory"
     VERTEX = "vertex"
     NONE = "none"
@@ -29,35 +31,29 @@ class VectorSearchType(str, Enum):
 
 class FirestoreConfig(BaseModel):
     """Configuration for Firestore backend."""
+
     project_id: Optional[str] = Field(
-        default=None,
-        description="Google Cloud project ID"
+        default=None, description="Google Cloud project ID"
     )
     credentials_json: Optional[str] = Field(
-        default=None,
-        description="JSON string containing service account credentials"
+        default=None, description="JSON string containing service account credentials"
     )
     credentials_path: Optional[str] = Field(
-        default=None,
-        description="Path to service account credentials file"
+        default=None, description="Path to service account credentials file"
     )
     namespace: str = Field(
-        default="default",
-        description="Namespace for memory isolation"
+        default="default", description="Namespace for memory isolation"
     )
     connection_pool_size: int = Field(
-        default=10,
-        description="Size of the connection pool for Firestore",
-        ge=1
+        default=10, description="Size of the connection pool for Firestore", ge=1
     )
     batch_size: Optional[int] = Field(
-        default=None,
-        description="Batch size for Firestore operations"
+        default=None, description="Batch size for Firestore operations"
     )
     max_errors_before_unhealthy: int = Field(
         default=10,
         description="Threshold for number of errors before health status is degraded",
-        ge=1
+        ge=1,
     )
 
     @validator("project_id", pre=True, always=True)
@@ -77,46 +73,27 @@ class FirestoreConfig(BaseModel):
 
 class RedisConfig(BaseModel):
     """Configuration for Redis backend."""
-    host: str = Field(
-        default="localhost",
-        description="Redis host"
-    )
-    port: int = Field(
-        default=6379,
-        description="Redis port",
-        ge=1,
-        le=65535
-    )
-    db: int = Field(
-        default=0,
-        description="Redis database number",
-        ge=0
-    )
-    password: Optional[str] = Field(
-        default=None,
-        description="Redis password"
-    )
+
+    host: str = Field(default="localhost", description="Redis host")
+    port: int = Field(default=6379, description="Redis port", ge=1, le=65535)
+    db: int = Field(default=0, description="Redis database number", ge=0)
+    password: Optional[str] = Field(default=None, description="Redis password")
     ssl: bool = Field(
-        default=False,
-        description="Whether to use SSL for Redis connection"
+        default=False, description="Whether to use SSL for Redis connection"
     )
     namespace: str = Field(
-        default="default",
-        description="Namespace for memory isolation"
+        default="default", description="Namespace for memory isolation"
     )
     ttl: Optional[int] = Field(
-        default=None,
-        description="Default TTL for Redis keys in seconds"
+        default=None, description="Default TTL for Redis keys in seconds"
     )
     connection_pool_size: int = Field(
-        default=10,
-        description="Size of the connection pool for Redis",
-        ge=1
+        default=10, description="Size of the connection pool for Redis", ge=1
     )
     max_errors_before_unhealthy: int = Field(
         default=10,
         description="Threshold for number of errors before health status is degraded",
-        ge=1
+        ge=1,
     )
 
     @validator("host", pre=True, always=True)
@@ -145,39 +122,27 @@ class RedisConfig(BaseModel):
 
 class InMemoryConfig(BaseModel):
     """Configuration for in-memory backend."""
+
     namespace: str = Field(
-        default="default",
-        description="Namespace for memory isolation"
+        default="default", description="Namespace for memory isolation"
     )
     max_items: int = Field(
-        default=10000,
-        description="Maximum number of items to store in memory",
-        ge=1
+        default=10000, description="Maximum number of items to store in memory", ge=1
     )
     ttl: Optional[int] = Field(
-        default=None,
-        description="Default TTL for memory items in seconds"
+        default=None, description="Default TTL for memory items in seconds"
     )
 
 
 class VertexVectorSearchConfig(BaseModel):
     """Configuration for Vertex AI Vector Search."""
+
     project_id: Optional[str] = Field(
-        default=None,
-        description="Google Cloud project ID"
+        default=None, description="Google Cloud project ID"
     )
-    location: str = Field(
-        default="us-west4",
-        description="Google Cloud region"
-    )
-    index_endpoint_id: str = Field(
-        ...,
-        description="Vector Search index endpoint ID"
-    )
-    index_id: str = Field(
-        ...,
-        description="Vector Search index ID"
-    )
+    location: str = Field(default="us-west4", description="Google Cloud region")
+    index_endpoint_id: str = Field(..., description="Vector Search index endpoint ID")
+    index_id: str = Field(..., description="Vector Search index ID")
 
     @validator("project_id", pre=True, always=True)
     def set_project_id_from_env(cls, v):
@@ -189,26 +154,23 @@ class VertexVectorSearchConfig(BaseModel):
 
 class InMemoryVectorSearchConfig(BaseModel):
     """Configuration for in-memory vector search."""
+
     dimensions: int = Field(
-        default=768,
-        description="Dimensionality of the vectors",
-        ge=1
+        default=768, description="Dimensionality of the vectors", ge=1
     )
 
 
 class VectorSearchConfig(BaseModel):
     """Configuration for vector search."""
+
     provider: VectorSearchType = Field(
-        default=VectorSearchType.IN_MEMORY,
-        description="Vector search provider to use"
+        default=VectorSearchType.IN_MEMORY, description="Vector search provider to use"
     )
     in_memory: Optional[InMemoryVectorSearchConfig] = Field(
-        default=None,
-        description="Configuration for in-memory vector search"
+        default=None, description="Configuration for in-memory vector search"
     )
     vertex: Optional[VertexVectorSearchConfig] = Field(
-        default=None,
-        description="Configuration for Vertex AI Vector Search"
+        default=None, description="Configuration for Vertex AI Vector Search"
     )
 
     @root_validator
@@ -218,58 +180,45 @@ class VectorSearchConfig(BaseModel):
         if provider == VectorSearchType.IN_MEMORY and values.get("in_memory") is None:
             values["in_memory"] = InMemoryVectorSearchConfig()
         elif provider == VectorSearchType.VERTEX and values.get("vertex") is None:
-            raise ValueError("Vertex AI Vector Search configuration is required when provider is 'vertex'")
+            raise ValueError(
+                "Vertex AI Vector Search configuration is required when provider is 'vertex'"
+            )
         return values
 
 
 class TelemetryConfig(BaseModel):
     """Configuration for telemetry."""
-    enabled: bool = Field(
-        default=True,
-        description="Whether telemetry is enabled"
-    )
-    log_level: str = Field(
-        default="INFO",
-        description="Log level for telemetry"
-    )
+
+    enabled: bool = Field(default=True, description="Whether telemetry is enabled")
+    log_level: str = Field(default="INFO", description="Log level for telemetry")
     trace_sampling_rate: float = Field(
-        default=0.1,
-        description="Sampling rate for distributed tracing",
-        ge=0.0,
-        le=1.0
+        default=0.1, description="Sampling rate for distributed tracing", ge=0.0, le=1.0
     )
     metrics_export_interval_seconds: int = Field(
-        default=60,
-        description="Interval for exporting metrics in seconds",
-        ge=1
+        default=60, description="Interval for exporting metrics in seconds", ge=1
     )
 
 
 class MemoryConfig(BaseModel):
     """Root configuration for memory system."""
+
     backend: MemoryBackendType = Field(
-        default=MemoryBackendType.FIRESTORE,
-        description="Memory backend to use"
+        default=MemoryBackendType.FIRESTORE, description="Memory backend to use"
     )
     firestore: Optional[FirestoreConfig] = Field(
-        default=None,
-        description="Configuration for Firestore backend"
+        default=None, description="Configuration for Firestore backend"
     )
     redis: Optional[RedisConfig] = Field(
-        default=None,
-        description="Configuration for Redis backend"
+        default=None, description="Configuration for Redis backend"
     )
     in_memory: Optional[InMemoryConfig] = Field(
-        default=None,
-        description="Configuration for in-memory backend"
+        default=None, description="Configuration for in-memory backend"
     )
     vector_search: Optional[VectorSearchConfig] = Field(
-        default=None,
-        description="Configuration for vector search"
+        default=None, description="Configuration for vector search"
     )
     telemetry: Optional[TelemetryConfig] = Field(
-        default=None,
-        description="Configuration for telemetry"
+        default=None, description="Configuration for telemetry"
     )
 
     @root_validator
@@ -302,7 +251,9 @@ class MemoryConfig(BaseModel):
         except ValueError:
             backend = MemoryBackendType.FIRESTORE
 
-        vector_search_str = os.environ.get("VECTOR_SEARCH_PROVIDER", "in_memory").lower()
+        vector_search_str = os.environ.get(
+            "VECTOR_SEARCH_PROVIDER", "in_memory"
+        ).lower()
         try:
             vector_search_provider = VectorSearchType(vector_search_str)
         except ValueError:
@@ -316,7 +267,9 @@ class MemoryConfig(BaseModel):
         if vector_search_provider == VectorSearchType.VERTEX:
             vertex_config = {}
             if os.environ.get("VECTOR_SEARCH_INDEX_ENDPOINT_ID"):
-                vertex_config["index_endpoint_id"] = os.environ["VECTOR_SEARCH_INDEX_ENDPOINT_ID"]
+                vertex_config["index_endpoint_id"] = os.environ[
+                    "VECTOR_SEARCH_INDEX_ENDPOINT_ID"
+                ]
             if os.environ.get("VECTOR_SEARCH_INDEX_ID"):
                 vertex_config["index_id"] = os.environ["VECTOR_SEARCH_INDEX_ID"]
             if vertex_config:

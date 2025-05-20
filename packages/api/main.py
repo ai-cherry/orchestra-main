@@ -35,9 +35,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Request timing middleware
 @app.middleware("http")
-async def add_process_time_header(request: Request, call_next: Callable) -> JSONResponse:
+async def add_process_time_header(
+    request: Request, call_next: Callable
+) -> JSONResponse:
     """Middleware to track request processing time."""
     start_time = time.time()
     response = await call_next(request)
@@ -45,11 +48,13 @@ async def add_process_time_header(request: Request, call_next: Callable) -> JSON
     response.headers["X-Process-Time"] = str(process_time)
     return response
 
+
 # Health check endpoint
 @app.get("/health")
 async def health_check() -> Dict[str, str]:
     """Health check endpoint for monitoring."""
     return {"status": "healthy"}
+
 
 # Root endpoint
 @app.get("/")
@@ -61,11 +66,13 @@ async def root() -> Dict[str, str]:
         "description": "API for orchestrating AI models and workflows",
     }
 
+
 # Include routers from other modules
 # from .routers import models, agents, workflows
 # app.include_router(models.router, prefix="/models", tags=["models"])
 # app.include_router(agents.router, prefix="/agents", tags=["agents"])
 # app.include_router(workflows.router, prefix="/workflows", tags=["workflows"])
+
 
 # Add graceful shutdown handler
 @app.on_event("shutdown")
@@ -75,6 +82,8 @@ async def shutdown_event():
     # Add cleanup code here (e.g., close DB connections)
     logger.info("Application shutdown complete")
 
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)

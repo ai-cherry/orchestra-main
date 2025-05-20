@@ -232,10 +232,12 @@ class LLMAgent(Agent, Service):
 
         return model, temperature, max_tokens
 
-    async def _get_response_with_fallbacks(self, messages, model, temperature, max_tokens):
+    async def _get_response_with_fallbacks(
+        self, messages, model, temperature, max_tokens
+    ):
         """
         Try to get a response from multiple providers with cascading fallbacks.
-        
+
         The cascade order is:
         1. OpenRouter (primary gateway)
         2. Portkey (secondary gateway)
@@ -244,7 +246,7 @@ class LLMAgent(Agent, Service):
         # Track providers tried for logging
         providers_tried = []
         last_error = None
-        
+
         # Get provider instances - lazy loaded when needed
         providers = {
             "openrouter": None,
@@ -252,65 +254,76 @@ class LLMAgent(Agent, Service):
             "openai": None,
             "anthropic": None,
             "deepseek": None,
-            "grok": None
+            "grok": None,
         }
-        
+
         # Define the cascade order
-        provider_cascade = ["openrouter", "portkey", "openai", "anthropic", "deepseek", "grok"]
-        
+        provider_cascade = [
+            "openrouter",
+            "portkey",
+            "openai",
+            "anthropic",
+            "deepseek",
+            "grok",
+        ]
+
         # Try each provider in order
         for provider_name in provider_cascade:
             try:
                 # Skip if we've reached our retry limit
                 if len(providers_tried) >= 3:
-                    logger.warning(f"Reached maximum provider retry limit ({len(providers_tried)})")
+                    logger.warning(
+                        f"Reached maximum provider retry limit ({len(providers_tried)})"
+                    )
                     break
-                
+
                 # Log the attempt
                 providers_tried.append(provider_name)
                 logger.info(f"Attempting request with provider: {provider_name}")
-                
+
                 # Lazy-load the provider if needed
                 if providers[provider_name] is None:
-                    providers[provider_name] = self._get_provider_instance(provider_name)
-                
+                    providers[provider_name] = self._get_provider_instance(
+                        provider_name
+                    )
+
                 provider = providers[provider_name]
-                
+
                 # Set appropriate timeouts based on provider
                 timeout = 8.0 if provider_name == "openrouter" else 15.0
-                
+
                 # Attempt to get response with timeout
                 result = await asyncio.wait_for(
                     provider.generate_chat_completion(
                         messages=messages,
                         model=self._get_model_for_provider(model, provider_name),
                         temperature=temperature,
-                        max_tokens=max_tokens
+                        max_tokens=max_tokens,
                     ),
-                    timeout=timeout
+                    timeout=timeout,
                 )
-                
+
                 # Success! Return the result with provider info
                 result["provider"] = provider_name
                 return result
-                
+
             except (LLMProviderError, asyncio.TimeoutError) as e:
                 last_error = e
                 logger.warning(f"Provider {provider_name} failed: {str(e)}")
                 continue
-        
+
         # If we've exhausted all options, raise the last error
         if last_error:
             logger.error(f"All providers failed. Last error: {str(last_error)}")
             raise last_error
-        
+
         # Safety fallback - should never reach here
         raise LLMProviderError("All providers failed with unknown errors")
-    
+
     def _get_provider_instance(self, provider_name):
         """Get a provider instance by name"""
         return get_llm_provider(provider_name)
-    
+
     def _get_model_for_provider(self, requested_model, provider_name):
         """Map the requested model to provider-specific model identifier"""
         # Default to the requested model
@@ -322,10 +335,10 @@ class LLMAgent(Agent, Service):
                 "openai": "gpt-3.5-turbo",
                 "anthropic": "claude-instant-1",
                 "deepseek": "deepseek-chat",
-                "grok": "grok-1"
+                "grok": "grok-1",
             }
             return defaults.get(provider_name, "gpt-3.5-turbo")
-        
+
         # Handle model mapping for different providers
         if provider_name == "openrouter":
             # OpenRouter uses provider/model format
@@ -346,7 +359,7 @@ class LLMAgent(Agent, Service):
                 return requested_model.split("/")[-1]
             return "claude-instant-1"  # Default Anthropic model
         # Similar handling for other providers
-        
+
         # Fallback to a safe default
         return requested_model
 
@@ -360,16 +373,16 @@ class LLMAgent(Agent, Service):
                 conversation_history=context.conversation_history,
                 metadata=context.metadata,
             )
-            
+
             # Extract parameters
             model, temperature, max_tokens = self._extract_llm_parameters(context)
-            
+
             # Use our new cascade method instead of direct provider call
             result = await self._get_response_with_fallbacks(
                 messages=messages,
                 model=model,
                 temperature=temperature,
-                max_tokens=max_tokens
+                max_tokens=max_tokens,
             )
 
             # Return agent response with high confidence
@@ -382,7 +395,7 @@ class LLMAgent(Agent, Service):
                     "usage": result.get("usage", {}),
                     "finish_reason": result.get("finish_reason", "unknown"),
                     "response_time_ms": result.get("response_time_ms"),
-                    "providers_tried": result.get("providers_tried", [])
+                    "providers_tried": result.get("providers_tried", []),
                 },
             )
 

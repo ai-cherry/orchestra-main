@@ -16,13 +16,12 @@ from core.orchestrator.src.memory.lifecycle import (
     ProgressiveSummarizer,
     SummaryLevel,
     MemoryChunker,
-    ChunkingStrategy
+    ChunkingStrategy,
 )
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -37,13 +36,13 @@ async def importance_scorer_example():
             content_weight=0.2,
             metadata_weight=0.1,
             relationship_weight=0.1,
-            semantic_weight=0.1
+            semantic_weight=0.1,
         )
     )
-    
+
     # Create a sample memory item
     from datetime import datetime, timedelta
-    
+
     item = {
         "id": "mem123",
         "content": "This is an important memory about AI Orchestra architecture.",
@@ -52,14 +51,12 @@ async def importance_scorer_example():
         "access_count": 5,
         "reference_count": 2,
         "entities": ["AI Orchestra", "architecture"],
-        "metadata": {
-            "important": True
-        }
+        "metadata": {"important": True},
     }
-    
+
     # Score the item
     score = scorer.score_item(item)
-    
+
     # Print the results
     logger.info(f"Item ID: {score.item_id}")
     logger.info(f"Overall score: {score.score:.2f}")
@@ -70,7 +67,7 @@ async def importance_scorer_example():
     logger.info(f"  Metadata: {score.metadata_score:.2f}")
     logger.info(f"  Relationship: {score.relationship_score:.2f}")
     logger.info(f"  Semantic: {score.semantic_score:.2f}")
-    
+
     return score
 
 
@@ -78,7 +75,7 @@ async def progressive_summarizer_example():
     """Example of using the ProgressiveSummarizer."""
     # Create a progressive summarizer
     summarizer = ProgressiveSummarizer()
-    
+
     # Sample content to summarize
     content = """
     # AI Orchestra Memory System
@@ -114,18 +111,18 @@ async def progressive_summarizer_example():
     These enhancements significantly improve the performance, scalability, and intelligence
     of the memory system while maintaining its clean architectural design.
     """
-    
+
     # Create summaries at different levels
     item_id = "doc123"
     summaries = await summarizer.create_progressive_summaries(content, item_id)
-    
+
     # Print the results
     for level, result in summaries.items():
         logger.info(f"\nSummary Level: {level}")
         logger.info(f"Length: {len(result.summary_text)} chars")
         logger.info(f"Compression ratio: {result.compression_ratio:.2f}x")
         logger.info(f"Summary: {result.summary_text[:100]}...")
-    
+
     return summaries
 
 
@@ -133,7 +130,7 @@ async def memory_chunker_example():
     """Example of using the MemoryChunker."""
     # Create a memory chunker
     chunker = MemoryChunker()
-    
+
     # Sample content to chunk
     content = """
     # AI Orchestra Memory System
@@ -169,42 +166,44 @@ async def memory_chunker_example():
     These enhancements significantly improve the performance, scalability, and intelligence
     of the memory system while maintaining its clean architectural design.
     """
-    
+
     # Chunk the content using different strategies
     item_id = "doc123"
-    
+
     # Paragraph chunking
     paragraph_chunks = await chunker.chunk_item(
         item_id, content, ChunkingStrategy.PARAGRAPH
     )
-    
+
     # Sentence chunking
     sentence_chunks = await chunker.chunk_item(
         item_id, content, ChunkingStrategy.SENTENCE
     )
-    
+
     # Fixed size chunking
     fixed_chunks = await chunker.chunk_item(
         item_id, content, ChunkingStrategy.FIXED_SIZE
     )
-    
+
     # Print the results
     logger.info(f"\nParagraph chunking: {len(paragraph_chunks)} chunks")
     for i, chunk in enumerate(paragraph_chunks):
-        logger.info(f"  Chunk {i+1}: {len(chunk.content)} chars, Heading: {chunk.metadata.heading}")
-    
+        logger.info(
+            f"  Chunk {i+1}: {len(chunk.content)} chars, Heading: {chunk.metadata.heading}"
+        )
+
     logger.info(f"\nSentence chunking: {len(sentence_chunks)} chunks")
     for i, chunk in enumerate(sentence_chunks[:3]):  # Show first 3 chunks
         logger.info(f"  Chunk {i+1}: {len(chunk.content)} chars")
-    
+
     logger.info(f"\nFixed size chunking: {len(fixed_chunks)} chunks")
     for i, chunk in enumerate(fixed_chunks[:3]):  # Show first 3 chunks
         logger.info(f"  Chunk {i+1}: {len(chunk.content)} chars")
-    
+
     return {
         "paragraph": paragraph_chunks,
         "sentence": sentence_chunks,
-        "fixed": fixed_chunks
+        "fixed": fixed_chunks,
     }
 
 
@@ -214,7 +213,7 @@ async def integrated_example():
     scorer = ImportanceScorer()
     summarizer = ProgressiveSummarizer()
     chunker = MemoryChunker()
-    
+
     # Sample content
     content = """
     # AI Orchestra Memory System Architecture
@@ -246,24 +245,26 @@ async def integrated_example():
     These improvements significantly enhance the system's capabilities while
     maintaining its clean architectural design.
     """
-    
+
     # Process the content
     item_id = "doc456"
-    
+
     # Step 1: Chunk the content
     logger.info("Step 1: Chunking content")
     chunks = await chunker.chunk_item(item_id, content, ChunkingStrategy.PARAGRAPH)
     logger.info(f"Created {len(chunks)} chunks")
-    
+
     # Step 2: Create summaries for each chunk
     logger.info("\nStep 2: Creating summaries")
     all_summaries = []
     for i, chunk in enumerate(chunks):
         chunk_id = f"{item_id}_chunk_{i}"
-        summaries = await summarizer.create_progressive_summaries(chunk.content, chunk_id)
+        summaries = await summarizer.create_progressive_summaries(
+            chunk.content, chunk_id
+        )
         all_summaries.append(summaries)
         logger.info(f"Created summaries for chunk {i+1}")
-    
+
     # Step 3: Score the importance of each chunk
     logger.info("\nStep 3: Scoring importance")
     scores = []
@@ -276,14 +277,14 @@ async def integrated_example():
             "access_count": 0,
             "reference_count": 0,
             "entities": [],
-            "metadata": chunk.metadata.custom_metadata
+            "metadata": chunk.metadata.custom_metadata,
         }
-        
+
         # Score the item
         score = scorer.score_item(item)
         scores.append(score)
         logger.info(f"Chunk {i+1} importance score: {score.score:.2f}")
-    
+
     # Step 4: Determine storage strategy based on importance
     logger.info("\nStep 4: Determining storage strategy")
     storage_decisions = []
@@ -297,15 +298,15 @@ async def integrated_example():
         else:
             # Low importance: store key points only
             decision = "key_points"
-        
+
         storage_decisions.append(decision)
         logger.info(f"Chunk {i+1} storage decision: {decision}")
-    
+
     return {
         "chunks": chunks,
         "summaries": all_summaries,
         "scores": scores,
-        "decisions": storage_decisions
+        "decisions": storage_decisions,
     }
 
 
@@ -315,18 +316,19 @@ from datetime import datetime
 
 # Run examples if module is executed directly
 if __name__ == "__main__":
+
     async def run_examples():
         logger.info("Running importance scorer example...")
         await importance_scorer_example()
-        
+
         logger.info("\nRunning progressive summarizer example...")
         await progressive_summarizer_example()
-        
+
         logger.info("\nRunning memory chunker example...")
         await memory_chunker_example()
-        
+
         logger.info("\nRunning integrated example...")
         await integrated_example()
-    
+
     # Run the examples
     asyncio.run(run_examples())

@@ -9,10 +9,16 @@
     – Cloud Run (standard) for dashboard (Next.js)  
     – Secret Manager (OPENAI_API_KEY, PORTKEY_API_KEY, etc.)
 
+Optimization & stability > cost & perfect security.  One developer (me).
+
+### Memory Architecture (v2)
+Short-Term ➜ Redis (async, LRU eviction)
+Mid-Term   ➜ Firestore V2 (async, Resilient Adapter, connection pool)
+Long-Term  ➜ Vertex AI Vector Search (optional, fallback to backend)
+All components are instantiated via `MemoryManagerFactory` with capability detection; Firestore V1 path is deprecated.
+
 CI/CD = GitHub Actions ▶︎ build Docker ▶︎ push ▶︎ `pulumi up` (via WIF)  
 Secrets live **only** in Secret Manager; Cloud Run mounts them as env vars.  
-Optimization & stability > cost & perfect security.  One developer (me).
-(Save the file → open it in a tab; Cursor will index it for every later prompt.) 
 
 ---
 

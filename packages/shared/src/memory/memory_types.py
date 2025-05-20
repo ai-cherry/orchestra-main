@@ -6,8 +6,10 @@ This module contains shared type definitions used across memory management compo
 
 from typing import Any, Dict, Optional, TypedDict
 
+
 class MemoryHealth(TypedDict, total=False):
     """Type definition for memory system health status."""
+
     status: str  # 'healthy', 'degraded', or 'unhealthy'
     firestore: bool  # Firestore connection status
     redis: bool  # Redis connection status

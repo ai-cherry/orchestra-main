@@ -52,11 +52,13 @@ class PerformanceMonitor:
 
             # Trim history if needed
             if len(self.operations[name]) > self.max_history:
-                self.operations[name] = self.operations[name][-self.max_history:]
+                self.operations[name] = self.operations[name][-self.max_history :]
 
             # Log slow operations
             if duration_ms > self.slow_threshold:
-                logger.warning(f"Slow operation detected: {name} took {duration_ms:.2f}ms")
+                logger.warning(
+                    f"Slow operation detected: {name} took {duration_ms:.2f}ms"
+                )
 
     def monitor(self, name: Optional[str] = None):
         """Decorator to monitor function execution time.
@@ -64,6 +66,7 @@ class PerformanceMonitor:
         Args:
             name: Optional custom name for the operation
         """
+
         def decorator(func):
             @wraps(func)
             def wrapper(*args, **kwargs):
@@ -76,7 +79,9 @@ class PerformanceMonitor:
                 finally:
                     op_name = name or f"{func.__module__}.{func.__name__}"
                     self.record_operation(op_name, time.time() - start_time)
+
             return wrapper
+
         return decorator
 
     def get_metrics(self) -> Dict[str, Any]:
@@ -85,10 +90,7 @@ class PerformanceMonitor:
         Returns:
             Dictionary of performance metrics
         """
-        metrics = {
-            "uptime_seconds": time.time() - self.start_time,
-            "operations": {}
-        }
+        metrics = {"uptime_seconds": time.time() - self.start_time, "operations": {}}
 
         with self.lock:
             for op_name, durations in self.operations.items():
@@ -100,12 +102,14 @@ class PerformanceMonitor:
                     "avg_ms": sum(durations) / len(durations),
                     "min_ms": min(durations),
                     "max_ms": max(durations),
-                    "latest_ms": durations[-1]
+                    "latest_ms": durations[-1],
                 }
 
         return metrics
 
-    def get_slow_operations(self, threshold_ms: Optional[float] = None) -> Dict[str, Any]:
+    def get_slow_operations(
+        self, threshold_ms: Optional[float] = None
+    ) -> Dict[str, Any]:
         """Get operations exceeding the slow threshold.
 
         Args:
@@ -134,15 +138,16 @@ class PerformanceMonitor:
                     "slow_count": slow_count,
                     "slow_percentage": slow_percentage,
                     "avg_ms": sum(durations) / len(durations),
-                    "max_ms": max(durations)
+                    "max_ms": max(durations),
                 }
 
         # Sort by slow percentage (highest first)
-        return {k: v for k, v in sorted(
-            result.items(),
-            key=lambda x: x[1]["slow_percentage"],
-            reverse=True
-        )}
+        return {
+            k: v
+            for k, v in sorted(
+                result.items(), key=lambda x: x[1]["slow_percentage"], reverse=True
+            )
+        }
 
     def reset(self) -> None:
         """Reset all performance metrics."""
@@ -164,12 +169,16 @@ class PerformanceMonitor:
 
         # Check for slow operations
         if slow_ops:
-            recommendations.append({
-                "type": "performance",
-                "severity": "high" if any(op["slow_percentage"] > 50 for op in slow_ops.values()) else "medium",
-                "message": f"Found {len(slow_ops)} slow operations that exceed {self.slow_threshold}ms threshold",
-                "operations": list(slow_ops.keys())
-            })
+            recommendations.append(
+                {
+                    "type": "performance",
+                    "severity": "high"
+                    if any(op["slow_percentage"] > 50 for op in slow_ops.values())
+                    else "medium",
+                    "message": f"Found {len(slow_ops)} slow operations that exceed {self.slow_threshold}ms threshold",
+                    "operations": list(slow_ops.keys()),
+                }
+            )
 
         # TODO: Add more recommendations based on patterns
 
@@ -180,7 +189,9 @@ class PerformanceMonitor:
 _performance_monitor = None
 
 
-def get_performance_monitor(config: Optional[Dict[str, Any]] = None) -> PerformanceMonitor:
+def get_performance_monitor(
+    config: Optional[Dict[str, Any]] = None
+) -> PerformanceMonitor:
     """Get or create the global performance monitor instance.
 
     Args:

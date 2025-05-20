@@ -23,11 +23,13 @@ logger = logging.getLogger("ai_orchestra.services.document.document_processor")
 
 class TextExtractionError(Exception):
     """Exception for text extraction-related errors."""
+
     pass
 
 
 class ChunkingStrategy:
     """Chunking strategies for text documents."""
+
     PARAGRAPH = "paragraph"
     SENTENCE = "sentence"
     FIXED_SIZE = "fixed_size"
@@ -60,7 +62,7 @@ class DocumentProcessor:
         file_path: str,
         document_id: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
-        chunking_strategy: str = ChunkingStrategy.PARAGRAPH
+        chunking_strategy: str = ChunkingStrategy.PARAGRAPH,
     ) -> Tuple[str, List[Dict[str, Any]], Dict[str, Any]]:
         """
         Process a file to extract text and create chunks.
@@ -82,7 +84,8 @@ class DocumentProcessor:
         file_size = os.path.getsize(file_path)
         if file_size > self.max_file_size:
             raise ValueError(
-                f"File size ({file_size} bytes) exceeds maximum allowed size ({self.max_file_size} bytes)")
+                f"File size ({file_size} bytes) exceeds maximum allowed size ({self.max_file_size} bytes)"
+            )
 
         # Generate document ID if not provided
         if not document_id:
@@ -105,7 +108,7 @@ class DocumentProcessor:
             "source": file_path,
             "file_type": file_type,
             "file_size": file_size,
-            "metadata": file_metadata
+            "metadata": file_metadata,
         }
 
         # Chunk the text
@@ -170,6 +173,7 @@ class DocumentProcessor:
         try:
             # Try PyMuPDF (fitz) first
             import fitz
+
             doc = fitz.open(file_path)
             text = ""
 
@@ -185,6 +189,7 @@ class DocumentProcessor:
             try:
                 # Fall back to pypdf
                 from pypdf import PdfReader
+
                 reader = PdfReader(file_path)
                 text = ""
 
@@ -223,6 +228,7 @@ class DocumentProcessor:
         """Extract text from a DOCX file."""
         try:
             import docx
+
             doc = docx.Document(file_path)
 
             # Extract text from paragraphs
@@ -321,7 +327,7 @@ class DocumentProcessor:
             List of chunks with metadata
         """
         # Split by double newlines (paragraphs)
-        paragraphs = re.split(r'\n\s*\n', text)
+        paragraphs = re.split(r"\n\s*\n", text)
 
         # Filter out empty paragraphs
         paragraphs = [p.strip() for p in paragraphs if p.strip()]
@@ -339,17 +345,19 @@ class DocumentProcessor:
                 chunk_text = "\n\n".join(current_chunk)
                 chunk_id = f"{document_id}_chunk_{len(chunks)}"
 
-                chunks.append({
-                    "id": chunk_id,
-                    "document_id": document_id,
-                    "content": chunk_text,
-                    "metadata": {
-                        "seq_num": len(chunks),
-                        "chunk_type": "paragraph",
-                        "start_idx": i - len(current_chunk),
-                        "end_idx": i - 1
+                chunks.append(
+                    {
+                        "id": chunk_id,
+                        "document_id": document_id,
+                        "content": chunk_text,
+                        "metadata": {
+                            "seq_num": len(chunks),
+                            "chunk_type": "paragraph",
+                            "start_idx": i - len(current_chunk),
+                            "end_idx": i - 1,
+                        },
                     }
-                })
+                )
 
                 # Start new chunk, possibly with overlap
                 if self.chunk_overlap > 0 and len(current_chunk) > 1:
@@ -369,17 +377,19 @@ class DocumentProcessor:
             chunk_text = "\n\n".join(current_chunk)
             chunk_id = f"{document_id}_chunk_{len(chunks)}"
 
-            chunks.append({
-                "id": chunk_id,
-                "document_id": document_id,
-                "content": chunk_text,
-                "metadata": {
-                    "seq_num": len(chunks),
-                    "chunk_type": "paragraph",
-                    "start_idx": len(paragraphs) - len(current_chunk),
-                    "end_idx": len(paragraphs) - 1
+            chunks.append(
+                {
+                    "id": chunk_id,
+                    "document_id": document_id,
+                    "content": chunk_text,
+                    "metadata": {
+                        "seq_num": len(chunks),
+                        "chunk_type": "paragraph",
+                        "start_idx": len(paragraphs) - len(current_chunk),
+                        "end_idx": len(paragraphs) - 1,
+                    },
                 }
-            })
+            )
 
         return chunks
 
@@ -395,7 +405,7 @@ class DocumentProcessor:
             List of chunks with metadata
         """
         # Split by sentences
-        sentences = re.split(r'(?<=[.!?])\s+', text)
+        sentences = re.split(r"(?<=[.!?])\s+", text)
 
         # Filter out empty sentences
         sentences = [s.strip() for s in sentences if s.strip()]
@@ -413,24 +423,26 @@ class DocumentProcessor:
                 chunk_text = " ".join(current_chunk)
                 chunk_id = f"{document_id}_chunk_{len(chunks)}"
 
-                chunks.append({
-                    "id": chunk_id,
-                    "document_id": document_id,
-                    "content": chunk_text,
-                    "metadata": {
-                        "seq_num": len(chunks),
-                        "chunk_type": "sentence",
-                        "start_idx": i - len(current_chunk),
-                        "end_idx": i - 1
+                chunks.append(
+                    {
+                        "id": chunk_id,
+                        "document_id": document_id,
+                        "content": chunk_text,
+                        "metadata": {
+                            "seq_num": len(chunks),
+                            "chunk_type": "sentence",
+                            "start_idx": i - len(current_chunk),
+                            "end_idx": i - 1,
+                        },
                     }
-                })
+                )
 
                 # Start new chunk, possibly with overlap
                 if self.chunk_overlap > 0 and len(current_chunk) > 1:
                     # Keep the last few sentences for overlap
                     overlap_sentences = min(
                         int(self.chunk_overlap / 100 * len(current_chunk)),
-                        len(current_chunk)
+                        len(current_chunk),
                     )
                     current_chunk = current_chunk[-overlap_sentences:]
                     current_length = sum(len(s) for s in current_chunk)
@@ -447,17 +459,19 @@ class DocumentProcessor:
             chunk_text = " ".join(current_chunk)
             chunk_id = f"{document_id}_chunk_{len(chunks)}"
 
-            chunks.append({
-                "id": chunk_id,
-                "document_id": document_id,
-                "content": chunk_text,
-                "metadata": {
-                    "seq_num": len(chunks),
-                    "chunk_type": "sentence",
-                    "start_idx": len(sentences) - len(current_chunk),
-                    "end_idx": len(sentences) - 1
+            chunks.append(
+                {
+                    "id": chunk_id,
+                    "document_id": document_id,
+                    "content": chunk_text,
+                    "metadata": {
+                        "seq_num": len(chunks),
+                        "chunk_type": "sentence",
+                        "start_idx": len(sentences) - len(current_chunk),
+                        "end_idx": len(sentences) - 1,
+                    },
                 }
-            })
+            )
 
         return chunks
 
@@ -486,21 +500,25 @@ class DocumentProcessor:
 
             # Create chunk
             chunk_id = f"{document_id}_chunk_{len(chunks)}"
-            chunks.append({
-                "id": chunk_id,
-                "document_id": document_id,
-                "content": chunk_text,
-                "metadata": {
-                    "seq_num": len(chunks),
-                    "chunk_type": "fixed_size",
-                    "start_char": i,
-                    "end_char": chunk_end
+            chunks.append(
+                {
+                    "id": chunk_id,
+                    "document_id": document_id,
+                    "content": chunk_text,
+                    "metadata": {
+                        "seq_num": len(chunks),
+                        "chunk_type": "fixed_size",
+                        "start_char": i,
+                        "end_char": chunk_end,
+                    },
                 }
-            })
+            )
 
         return chunks
 
-    async def _chunk_by_semantic(self, text: str, document_id: str) -> List[Dict[str, Any]]:
+    async def _chunk_by_semantic(
+        self, text: str, document_id: str
+    ) -> List[Dict[str, Any]]:
         """
         Split content by semantic boundaries using AI.
 
@@ -514,7 +532,8 @@ class DocumentProcessor:
         # Check if AI service is available
         if not self.ai_service:
             logger.warning(
-                "AI service not available for semantic chunking, falling back to paragraph chunking")
+                "AI service not available for semantic chunking, falling back to paragraph chunking"
+            )
             return self._chunk_by_paragraph(text, document_id)
 
         try:
@@ -539,15 +558,13 @@ class DocumentProcessor:
 
             # Generate chunks using AI
             semantic_chunks_text = await self.ai_service.generate_text(
-                prompt=prompt,
-                max_tokens=4096,
-                temperature=0.2
+                prompt=prompt, max_tokens=4096, temperature=0.2
             )
 
             # Parse JSON response
             try:
                 # Extract JSON array from response
-                json_match = re.search(r'\[.*\]', semantic_chunks_text, re.DOTALL)
+                json_match = re.search(r"\[.*\]", semantic_chunks_text, re.DOTALL)
                 if json_match:
                     semantic_chunks = json.loads(json_match.group(0))
                 else:
@@ -557,15 +574,14 @@ class DocumentProcessor:
                 chunks = []
                 for i, chunk_text in enumerate(semantic_chunks):
                     chunk_id = f"{document_id}_chunk_{i}"
-                    chunks.append({
-                        "id": chunk_id,
-                        "document_id": document_id,
-                        "content": chunk_text.strip(),
-                        "metadata": {
-                            "seq_num": i,
-                            "chunk_type": "semantic"
+                    chunks.append(
+                        {
+                            "id": chunk_id,
+                            "document_id": document_id,
+                            "content": chunk_text.strip(),
+                            "metadata": {"seq_num": i, "chunk_type": "semantic"},
                         }
-                    })
+                    )
 
                 return chunks
             except (json.JSONDecodeError, ValueError) as e:
@@ -576,7 +592,9 @@ class DocumentProcessor:
             logger.error(f"Semantic chunking failed: {e}")
             return self._chunk_by_paragraph(text, document_id)
 
-    async def _chunk_by_hybrid(self, text: str, document_id: str) -> List[Dict[str, Any]]:
+    async def _chunk_by_hybrid(
+        self, text: str, document_id: str
+    ) -> List[Dict[str, Any]]:
         """
         Split content using a hybrid of multiple strategies.
 
@@ -603,17 +621,19 @@ class DocumentProcessor:
                 # Add refined chunks with updated metadata
                 for j, sub_chunk in enumerate(sub_chunks):
                     sub_chunk_id = f"{document_id}_chunk_{len(refined_chunks)}"
-                    refined_chunks.append({
-                        "id": sub_chunk_id,
-                        "document_id": document_id,
-                        "content": sub_chunk["content"],
-                        "metadata": {
-                            "seq_num": len(refined_chunks),
-                            "chunk_type": "hybrid",
-                            "parent_chunk": i,
-                            "sub_chunk": j
+                    refined_chunks.append(
+                        {
+                            "id": sub_chunk_id,
+                            "document_id": document_id,
+                            "content": sub_chunk["content"],
+                            "metadata": {
+                                "seq_num": len(refined_chunks),
+                                "chunk_type": "hybrid",
+                                "parent_chunk": i,
+                                "sub_chunk": j,
+                            },
                         }
-                    })
+                    )
             else:
                 # Keep chunk as is, just update the ID
                 chunk["id"] = f"{document_id}_chunk_{len(refined_chunks)}"

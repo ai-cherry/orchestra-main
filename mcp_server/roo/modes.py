@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 
 class RooModeCapability(str, Enum):
     """Capabilities that can be assigned to Roo modes."""
+
     READ_FILES = "read_files"
     WRITE_FILES = "write_files"
     EXECUTE_COMMANDS = "execute_commands"
@@ -27,59 +28,56 @@ class RooModeCapability(str, Enum):
 
 class RooMode(BaseModel):
     """Definition of a Roo mode with its capabilities and settings."""
+
     slug: str = Field(..., description="Unique identifier for the mode")
     name: str = Field(..., description="Display name for the mode")
-    description: str = Field(..., description="Detailed description of the mode's purpose")
+    description: str = Field(
+        ..., description="Detailed description of the mode's purpose"
+    )
     role: str = Field(..., description="Role description provided to the LLM")
     capabilities: List[RooModeCapability] = Field(
-        default_factory=list,
-        description="List of capabilities this mode has"
+        default_factory=list, description="List of capabilities this mode has"
     )
     memory_access_level: str = Field(
         default="read",
-        description="Level of memory access: 'read', 'write', or 'admin'"
+        description="Level of memory access: 'read', 'write', or 'admin'",
     )
     can_transition_to: List[str] = Field(
         default_factory=list,
-        description="List of mode slugs this mode can transition to"
+        description="List of mode slugs this mode can transition to",
     )
     default_rules: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="Default rules applied to this mode"
+        default_factory=dict, description="Default rules applied to this mode"
     )
     file_patterns: List[str] = Field(
-        default_factory=list,
-        description="File patterns this mode can access or modify"
+        default_factory=list, description="File patterns this mode can access or modify"
     )
-    model: str = Field(
-        default="",
-        description="The LLM model to use for this mode"
-    )
+    model: str = Field(default="", description="The LLM model to use for this mode")
     temperature: float = Field(
-        default=0.7,
-        description="Temperature setting for the LLM"
+        default=0.7, description="Temperature setting for the LLM"
     )
-    
+
     def can_access_memory(self) -> bool:
         """Check if this mode can access memory."""
         return self.memory_access_level in ["read", "write", "admin"]
-    
+
     def can_modify_memory(self) -> bool:
         """Check if this mode can modify memory."""
         return self.memory_access_level in ["write", "admin"]
-    
+
     def can_access_file(self, file_path: str) -> bool:
         """Check if this mode can access a specific file."""
         if not self.file_patterns:
             return True
-            
+
         import re
+
         return any(re.match(pattern, file_path) for pattern in self.file_patterns)
-    
+
     def can_transition_to_mode(self, target_mode_slug: str) -> bool:
         """Check if this mode can transition to a specific target mode."""
         return target_mode_slug in self.can_transition_to
-    
+
     def has_capability(self, capability: RooModeCapability) -> bool:
         """Check if this mode has a specific capability."""
         return capability in self.capabilities
@@ -96,13 +94,22 @@ CODE_MODE = RooMode(
         RooModeCapability.WRITE_FILES,
         RooModeCapability.EXECUTE_COMMANDS,
         RooModeCapability.MODIFY_MEMORY,
-        RooModeCapability.REFACTOR_CODE
+        RooModeCapability.REFACTOR_CODE,
     ],
     memory_access_level="write",
     can_transition_to=["architect", "debug", "reviewer", "orchestrator"],
-    file_patterns=[".*\\.py$", ".*\\.js$", ".*\\.ts$", ".*\\.html$", ".*\\.css$", ".*\\.json$", ".*\\.yaml$", ".*\\.yml$"],
+    file_patterns=[
+        ".*\\.py$",
+        ".*\\.js$",
+        ".*\\.ts$",
+        ".*\\.html$",
+        ".*\\.css$",
+        ".*\\.json$",
+        ".*\\.yaml$",
+        ".*\\.yml$",
+    ],
     model="anthropic/claude-3.7-sonnet",
-    temperature=0.7
+    temperature=0.7,
 )
 
 ARCHITECT_MODE = RooMode(
@@ -113,13 +120,13 @@ ARCHITECT_MODE = RooMode(
     capabilities=[
         RooModeCapability.READ_FILES,
         RooModeCapability.ACCESS_INTERNET,
-        RooModeCapability.DESIGN_ARCHITECTURE
+        RooModeCapability.DESIGN_ARCHITECTURE,
     ],
     memory_access_level="read",
     can_transition_to=["code", "strategy"],
     file_patterns=[".*\\.md$", ".*\\.tf$", ".*\\.hcl$", ".*\\.yaml$", ".*\\.yml$"],
     model="anthropic/claude-3.7-sonnet",
-    temperature=0.7
+    temperature=0.7,
 )
 
 DEBUG_MODE = RooMode(
@@ -131,13 +138,13 @@ DEBUG_MODE = RooMode(
         RooModeCapability.READ_FILES,
         RooModeCapability.WRITE_FILES,
         RooModeCapability.EXECUTE_COMMANDS,
-        RooModeCapability.DEBUG_CODE
+        RooModeCapability.DEBUG_CODE,
     ],
     memory_access_level="write",
     can_transition_to=["code", "reviewer"],
     file_patterns=[".*\\.py$", ".*\\.js$", ".*\\.ts$", ".*\\.log$", ".*\\.json$"],
     model="anthropic/claude-3.7-sonnet",
-    temperature=0.2
+    temperature=0.2,
 )
 
 REVIEWER_MODE = RooMode(
@@ -145,15 +152,19 @@ REVIEWER_MODE = RooMode(
     name="🕵️ Reviewer",
     description="Meticulous code reviewer and software quality analyst",
     role="You are a meticulous code reviewer and software quality analyst specializing in Python, Docker, Terraform, and AI frameworks.",
-    capabilities=[
-        RooModeCapability.READ_FILES,
-        RooModeCapability.REVIEW_CODE
-    ],
+    capabilities=[RooModeCapability.READ_FILES, RooModeCapability.REVIEW_CODE],
     memory_access_level="read",
     can_transition_to=["code", "debug"],
-    file_patterns=[".*\\.py$", ".*\\.js$", ".*\\.ts$", ".*\\.tf$", ".*\\.dockerfile$", ".*Dockerfile.*"],
+    file_patterns=[
+        ".*\\.py$",
+        ".*\\.js$",
+        ".*\\.ts$",
+        ".*\\.tf$",
+        ".*\\.dockerfile$",
+        ".*Dockerfile.*",
+    ],
     model="anthropic/claude-3.7-sonnet",
-    temperature=0.2
+    temperature=0.2,
 )
 
 ORCHESTRATOR_MODE = RooMode(
@@ -161,15 +172,12 @@ ORCHESTRATOR_MODE = RooMode(
     name="🪃 Orchestrator",
     description="Meticulous code reviewer and static analysis expert",
     role="You are Roo, a meticulous code reviewer and static analysis expert for the AI Orchestra project",
-    capabilities=[
-        RooModeCapability.READ_FILES,
-        RooModeCapability.ANALYZE_CODE
-    ],
+    capabilities=[RooModeCapability.READ_FILES, RooModeCapability.ANALYZE_CODE],
     memory_access_level="read",
     can_transition_to=["code", "debug", "reviewer"],
     file_patterns=[".*\\.py$", ".*\\.js$", ".*\\.ts$"],
     model="anthropic/claude-3.7-sonnet",
-    temperature=0.2
+    temperature=0.2,
 )
 
 STRATEGY_MODE = RooMode(
@@ -180,13 +188,13 @@ STRATEGY_MODE = RooMode(
     capabilities=[
         RooModeCapability.READ_FILES,
         RooModeCapability.ACCESS_INTERNET,
-        RooModeCapability.DESIGN_ARCHITECTURE
+        RooModeCapability.DESIGN_ARCHITECTURE,
     ],
     memory_access_level="read",
     can_transition_to=["architect", "code"],
     file_patterns=[".*\\.md$", ".*\\.tf$", ".*\\.hcl$", ".*\\.yaml$", ".*\\.yml$"],
     model="anthropic/claude-3.7-sonnet",
-    temperature=0.7
+    temperature=0.7,
 )
 
 CREATIVE_MODE = RooMode(
@@ -197,13 +205,13 @@ CREATIVE_MODE = RooMode(
     capabilities=[
         RooModeCapability.READ_FILES,
         RooModeCapability.WRITE_FILES,
-        RooModeCapability.ACCESS_INTERNET
+        RooModeCapability.ACCESS_INTERNET,
     ],
     memory_access_level="read",
     can_transition_to=["code", "architect"],
     file_patterns=[".*\\.md$", ".*\\.txt$", ".*\\.html$", ".*\\.css$"],
     model="anthropic/claude-3.7-sonnet",
-    temperature=0.9
+    temperature=0.9,
 )
 
 ASK_MODE = RooMode(
@@ -211,15 +219,12 @@ ASK_MODE = RooMode(
     name="❓ Ask",
     description="Research assistant with access to documentation and the internet",
     role="You are a research assistant with access to documentation and the internet",
-    capabilities=[
-        RooModeCapability.READ_FILES,
-        RooModeCapability.ACCESS_INTERNET
-    ],
+    capabilities=[RooModeCapability.READ_FILES, RooModeCapability.ACCESS_INTERNET],
     memory_access_level="read",
     can_transition_to=["code", "creative"],
     file_patterns=[".*\\.md$", ".*\\.txt$", ".*\\.pdf$"],
     model="anthropic/claude-3.7-sonnet",
-    temperature=0.7
+    temperature=0.7,
 )
 
 # Mode registry
@@ -231,7 +236,7 @@ MODES: Dict[str, RooMode] = {
     "orchestrator": ORCHESTRATOR_MODE,
     "strategy": STRATEGY_MODE,
     "creative": CREATIVE_MODE,
-    "ask": ASK_MODE
+    "ask": ASK_MODE,
 }
 
 
@@ -245,7 +250,7 @@ def get_available_transitions(current_mode_slug: str) -> List[RooMode]:
     current_mode = get_mode(current_mode_slug)
     if not current_mode:
         return []
-        
+
     return [MODES[slug] for slug in current_mode.can_transition_to if slug in MODES]
 
 

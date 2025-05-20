@@ -16,7 +16,14 @@ import argparse
 from typing import Dict, Any, Optional, List
 
 from mcp_server.config import load_config, MCPConfig
-from mcp_server.models.memory import MemoryEntry, MemoryType, MemoryScope, CompressionLevel, StorageTier, MemoryMetadata
+from mcp_server.models.memory import (
+    MemoryEntry,
+    MemoryType,
+    MemoryScope,
+    CompressionLevel,
+    StorageTier,
+    MemoryMetadata,
+)
 from mcp_server.storage.in_memory_storage import InMemoryStorage
 from mcp_server.managers.standard_memory_manager import StandardMemoryManager
 from mcp_server.adapters.copilot_adapter import CopilotAdapter
@@ -77,9 +84,16 @@ class MCPApplication:
             logger.error("Failed to initialize MCP application")
             return False
 
-    async def create_memory(self, key: str, content: Any, source_tool: str,
-                            memory_type: str = "shared", scope: str = "session",
-                            priority: int = 5, ttl_seconds: int = 3600) -> bool:
+    async def create_memory(
+        self,
+        key: str,
+        content: Any,
+        source_tool: str,
+        memory_type: str = "shared",
+        scope: str = "session",
+        priority: int = 5,
+        ttl_seconds: int = 3600,
+    ) -> bool:
         """Create a new memory entry."""
         if not self.initialized:
             logger.error("MCP application not initialized")
@@ -96,8 +110,8 @@ class MCPApplication:
             metadata=MemoryMetadata(
                 source_tool=source_tool,
                 last_modified=0.0,  # Will be set by manager
-                context_relevance=0.8  # Default high relevance
-            )
+                context_relevance=0.8,  # Default high relevance
+            ),
         )
 
         # Create memory
@@ -111,8 +125,9 @@ class MCPApplication:
 
         return await self.memory_manager.get_memory(key, tool)
 
-    async def execute_prompt(self, prompt: str, mode: str = "chat",
-                             tool: Optional[str] = None) -> Dict[str, Any]:
+    async def execute_prompt(
+        self, prompt: str, mode: str = "chat", tool: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Execute a prompt with a specific tool or all tools."""
         if not self.initialized:
             logger.error("MCP application not initialized")
@@ -165,7 +180,7 @@ class MCPApplication:
         return {
             "status": "initialized",
             "memory": memory_status,
-            "tools": tool_statuses
+            "tools": tool_statuses,
         }
 
     async def demo(self):
@@ -192,7 +207,7 @@ class MCPApplication:
             source_tool="copilot",
             memory_type="shared",
             scope="global",
-            priority=10
+            priority=10,
         )
         print("Created 'project_overview' memory from Copilot")
 
@@ -202,12 +217,12 @@ class MCPApplication:
             content={
                 "components": ["memory_manager", "storage", "adapters"],
                 "patterns": ["factory", "adapter", "repository"],
-                "complexity": "medium"
+                "complexity": "medium",
             },
             source_tool="gemini",
             memory_type="knowledge",
             scope="project",
-            priority=8
+            priority=8,
         )
         print("Created 'architecture_analysis' memory from Gemini")
 
@@ -221,7 +236,8 @@ class MCPApplication:
         # Get architecture analysis from Copilot
         architecture_copilot = await self.get_memory("architecture_analysis", "copilot")
         print(
-            f"'architecture_analysis' from Copilot: {json.dumps(architecture_copilot.content, indent=2)}")
+            f"'architecture_analysis' from Copilot: {json.dumps(architecture_copilot.content, indent=2)}"
+        )
 
         # Step 4: Execute prompts with different tools
         print("\nExecuting prompts with different tools...")
@@ -230,7 +246,7 @@ class MCPApplication:
         copilot_result = await self.execute_prompt(
             prompt="Generate a function to calculate fibonacci numbers",
             mode="code",
-            tool="copilot"
+            tool="copilot",
         )
         print(f"Copilot result: {copilot_result['copilot']}")
 
@@ -238,7 +254,7 @@ class MCPApplication:
         gemini_result = await self.execute_prompt(
             prompt="Explain the advantages of memory synchronization between AI tools",
             mode="chat",
-            tool="gemini"
+            tool="gemini",
         )
         print(f"Gemini result: {gemini_result['gemini']}")
 
@@ -262,7 +278,9 @@ async def main_async(config_path: Optional[str] = None):
         logging.getLogger().setLevel(config.log_level)
 
         # Check for API keys
-        has_copilot_key = bool(config.copilot.api_key) if config.copilot.enabled else False
+        has_copilot_key = (
+            bool(config.copilot.api_key) if config.copilot.enabled else False
+        )
         has_gemini_key = bool(config.gemini.api_key) if config.gemini.enabled else False
 
         if config.debug:

@@ -16,11 +16,14 @@ import logging
 from typing import List, Dict, Any
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger("portkey-demo")
 
 # Add parent directory to path
 import sys
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.orchestrator.src.config.settings import Settings, get_settings
@@ -30,20 +33,17 @@ from packages.shared.src.llm_client.portkey_client import PortkeyClient
 async def run_model(client: PortkeyClient, model: str, prompt: str) -> None:
     """Run a query against a specified model using Portkey."""
     logger.info(f"Running query with model: {model}")
-    
+
     messages = [
         {"role": "system", "content": "You are a helpful AI assistant."},
-        {"role": "user", "content": prompt}
+        {"role": "user", "content": prompt},
     ]
-    
+
     try:
         response = await client.generate_response(
-            model=model,
-            messages=messages,
-            temperature=0.7,
-            max_tokens=150
+            model=model, messages=messages, temperature=0.7, max_tokens=150
         )
-        
+
         logger.info(f"Response from {model}:")
         logger.info(f"{response}\n")
     except Exception as e:
@@ -53,7 +53,7 @@ async def run_model(client: PortkeyClient, model: str, prompt: str) -> None:
 async def main() -> None:
     """Main function demonstrating Portkey virtual keys with multiple providers."""
     settings = get_settings()
-    
+
     # Print available virtual keys
     logger.info("Checking for configured virtual keys...")
     available_keys = []
@@ -67,14 +67,16 @@ async def main() -> None:
         available_keys.append(("Cohere", "command-r"))
     if settings.PORTKEY_VIRTUAL_KEY_OPENROUTER:
         available_keys.append(("OpenRouter", "openai/gpt-3.5-turbo"))
-    
+
     if not available_keys:
-        logger.error("No virtual keys configured. Please set up at least one virtual key in your .env file.")
+        logger.error(
+            "No virtual keys configured. Please set up at least one virtual key in your .env file."
+        )
         logger.info("Example: PORTKEY_VIRTUAL_KEY_OPENAI=vk_openai_...")
         return
-    
+
     logger.info(f"Found {len(available_keys)} configured virtual keys")
-    
+
     # Initialize Portkey client
     try:
         client = PortkeyClient(settings)
@@ -82,15 +84,17 @@ async def main() -> None:
     except Exception as e:
         logger.error(f"Failed to initialize Portkey client: {e}")
         return
-    
+
     # Test prompt
-    prompt = "Explain the concept of virtual keys in API management in a single paragraph."
-    
+    prompt = (
+        "Explain the concept of virtual keys in API management in a single paragraph."
+    )
+
     # Run queries against all available models
     for provider, model in available_keys:
         logger.info(f"Testing {provider} with model: {model}")
         await run_model(client, model, prompt)
-    
+
     logger.info("Demo completed successfully")
 
 

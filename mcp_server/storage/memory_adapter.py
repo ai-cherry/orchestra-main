@@ -56,7 +56,7 @@ class StorageBridgeAdapter(IMemoryStorage):
         """
         # Determine scope from entry if available
         scope = "default"
-        if hasattr(entry, 'scope') and entry.scope:
+        if hasattr(entry, "scope") and entry.scope:
             scope = entry.scope
 
         # Store using the optimized storage
@@ -125,7 +125,9 @@ class StorageBridgeAdapter(IMemoryStorage):
                     return await self.get(result_key)
         return None
 
-    async def search(self, query: str, limit: int = 10) -> List[Tuple[str, MemoryEntry, float]]:
+    async def search(
+        self, query: str, limit: int = 10
+    ) -> List[Tuple[str, MemoryEntry, float]]:
         """Search for memory entries matching the query.
 
         Args:
@@ -162,17 +164,16 @@ class StorageBridgeAdapter(IMemoryStorage):
                         last_accessed=time.time(),
                         version=1,
                         sync_status={},
-                        content_hash=None
+                        content_hash=None,
                     )
-                    memory_entry = MemoryEntry(
-                        content=entry,
-                        metadata=metadata
-                    )
+                    memory_entry = MemoryEntry(content=entry, metadata=metadata)
                 except:
                     # Fall back to raw entry
                     memory_entry = entry
 
-            converted_results.append((key, memory_entry, 1.0))  # Score is hardcoded for now
+            converted_results.append(
+                (key, memory_entry, 1.0)
+            )  # Score is hardcoded for now
 
         return converted_results
 

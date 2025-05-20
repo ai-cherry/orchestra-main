@@ -9,20 +9,20 @@ from core.orchestrator.src.memory.lifecycle.importance_scorer import (
     ImportanceScorer,
     ImportanceScore,
     ImportanceFactors,
-    ImportanceScoringConfig
+    ImportanceScoringConfig,
 )
 from core.orchestrator.src.memory.lifecycle.progressive_summarizer import (
     ProgressiveSummarizer,
     SummaryLevel,
     SummaryResult,
-    ProgressiveSummarizerConfig
+    ProgressiveSummarizerConfig,
 )
 from core.orchestrator.src.memory.lifecycle.memory_chunker import (
     MemoryChunker,
     Chunk,
     ChunkMetadata,
     ChunkingStrategy,
-    ChunkerConfig
+    ChunkerConfig,
 )
 
 __all__ = [
@@ -31,17 +31,15 @@ __all__ = [
     "ImportanceScore",
     "ImportanceFactors",
     "ImportanceScoringConfig",
-    
     # Progressive Summarizer
     "ProgressiveSummarizer",
     "SummaryLevel",
     "SummaryResult",
     "ProgressiveSummarizerConfig",
-    
     # Memory Chunker
     "MemoryChunker",
     "Chunk",
     "ChunkMetadata",
     "ChunkingStrategy",
-    "ChunkerConfig"
+    "ChunkerConfig",
 ]
