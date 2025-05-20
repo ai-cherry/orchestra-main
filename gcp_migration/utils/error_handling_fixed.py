@@ -41,24 +41,25 @@ def with_error_mapping(
 ) -> Callable[[F], F]:
     """
     Decorator that maps external exceptions to domain-specific exceptions.
-    
+
     This decorator helps standardize error handling by converting external
     library exceptions into our domain-specific exception hierarchy.
-    
+
     Args:
         target_error: The domain-specific exception to raise
         source_errors: The external exception(s) to catch
         error_message: Optional message to include in the raised exception
-        
+
     Returns:
         A decorator function
-        
+
     Example:
         @with_error_mapping(StorageError, (IOError, ValueError), "Failed to read file")
         def read_file(path: str) -> str:
             with open(path, "r") as f:
                 return f.read()
     """
+
     def decorator(func: F) -> F:
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
@@ -68,8 +69,9 @@ def with_error_mapping(
                 msg = error_message or f"Error in {func.__name__}: {str(e)}"
                 logger.error(msg, exc_info=True)
                 raise target_error(message=msg, cause=e)
-            
+
         return cast(F, wrapper)
+
     return decorator
 
 
@@ -80,21 +82,22 @@ def with_async_error_mapping(
 ) -> Callable[[AsyncF], AsyncF]:
     """
     Async version of the error mapping decorator.
-    
+
     Args:
         target_error: The domain-specific exception to raise
         source_errors: The external exception(s) to catch
         error_message: Optional message to include in the raised exception
-        
+
     Returns:
         An async decorator function
-        
+
     Example:
         @with_async_error_mapping(StorageError, (IOError, ValueError), "Failed to read file")
         async def read_file_async(path: str) -> str:
             async with aiofiles.open(path, "r") as f:
                 return await f.read()
     """
+
     def decorator(func: AsyncF) -> AsyncF:
         @functools.wraps(func)
         async def wrapper(*args: Any, **kwargs: Any) -> Any:
@@ -104,8 +107,9 @@ def with_async_error_mapping(
                 msg = error_message or f"Error in {func.__name__}: {str(e)}"
                 logger.error(msg, exc_info=True)
                 raise target_error(message=msg, cause=e)
-            
+
         return cast(AsyncF, wrapper)
+
     return decorator
 
 
@@ -119,10 +123,10 @@ def with_retry(
 ) -> Callable[[F], F]:
     """
     Decorator that adds retry logic with exponential backoff and jitter.
-    
+
     This decorator automatically retries functions that fail with specified
     exceptions, using exponential backoff with jitter for better resilience.
-    
+
     Args:
         max_attempts: Maximum number of retry attempts
         initial_backoff: Initial backoff time in seconds
@@ -130,57 +134,60 @@ def with_retry(
         backoff_multiplier: Multiplier for exponential backoff
         jitter: Random jitter factor to add to backoff
         retryable_errors: Tuple of exception types that should trigger retry
-        
+
     Returns:
         A decorator function
-        
+
     Example:
         @with_retry(max_attempts=5, retryable_errors=(ConnectionError, TimeoutError))
         def fetch_data(url: str) -> dict:
             return requests.get(url).json()
     """
+
     def decorator(func: F) -> F:
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             last_exception = None
-            
+
             for attempt in range(1, max_attempts + 1):
                 try:
                     return func(*args, **kwargs)
                 except retryable_errors as e:
                     last_exception = e
-                    
+
                     if attempt == max_attempts:
                         # Last attempt failed, re-raise the exception
                         logger.error(
                             f"All {max_attempts} attempts failed for {func.__name__}",
-                            exc_info=True
+                            exc_info=True,
                         )
                         raise
-                    
+
                     # Calculate backoff with jitter
                     backoff = min(
                         initial_backoff * (backoff_multiplier ** (attempt - 1)),
-                        max_backoff
+                        max_backoff,
                     )
                     # Add jitter
                     import random
+
                     actual_backoff = backoff * (1 + random.uniform(-jitter, jitter))
-                    
+
                     logger.warning(
                         f"Attempt {attempt} failed for {func.__name__}, "
                         f"retrying in {actual_backoff:.2f}s: {str(e)}"
                     )
-                    
+
                     # Wait before retrying
                     time.sleep(actual_backoff)
-            
+
             # This should never be reached, but for type safety
             if last_exception:
                 raise last_exception
             return None
-            
+
         return cast(F, wrapper)
+
     return decorator
 
 
@@ -194,7 +201,7 @@ def with_async_retry(
 ) -> Callable[[AsyncF], AsyncF]:
     """
     Async version of the retry decorator.
-    
+
     Args:
         max_attempts: Maximum number of retry attempts
         initial_backoff: Initial backoff time in seconds
@@ -202,10 +209,10 @@ def with_async_retry(
         backoff_multiplier: Multiplier for exponential backoff
         jitter: Random jitter factor to add to backoff
         retryable_errors: Tuple of exception types that should trigger retry
-        
+
     Returns:
         An async decorator function
-        
+
     Example:
         @with_async_retry(max_attempts=5, retryable_errors=(aiohttp.ClientError,))
         async def fetch_data_async(url: str) -> dict:
@@ -213,127 +220,133 @@ def with_async_retry(
                 async with session.get(url) as response:
                     return await response.json()
     """
+
     def decorator(func: AsyncF) -> AsyncF:
         @functools.wraps(func)
         async def wrapper(*args: Any, **kwargs: Any) -> Any:
             last_exception = None
-            
+
             for attempt in range(1, max_attempts + 1):
                 try:
                     return await func(*args, **kwargs)
                 except retryable_errors as e:
                     last_exception = e
-                    
+
                     if attempt == max_attempts:
                         # Last attempt failed, re-raise the exception
                         logger.error(
                             f"All {max_attempts} attempts failed for {func.__name__}",
-                            exc_info=True
+                            exc_info=True,
                         )
                         raise
-                    
+
                     # Calculate backoff with jitter
                     backoff = min(
                         initial_backoff * (backoff_multiplier ** (attempt - 1)),
-                        max_backoff
+                        max_backoff,
                     )
                     # Add jitter
                     import random
+
                     actual_backoff = backoff * (1 + random.uniform(-jitter, jitter))
-                    
+
                     logger.warning(
                         f"Attempt {attempt} failed for {func.__name__}, "
                         f"retrying in {actual_backoff:.2f}s: {str(e)}"
                     )
-                    
+
                     # Wait before retrying
                     await asyncio.sleep(actual_backoff)
-            
+
             # This should never be reached, but for type safety
             if last_exception:
                 raise last_exception
             return None
-            
+
         return cast(AsyncF, wrapper)
+
     return decorator
 
 
 # Fix type annotations with proper overloads for map_exception function
 @overload
 def map_exception(
-    exception: Exception,
-    target_error: Type[GCPError],
-    message: Optional[str] = None
+    exception: Exception, target_error: Type[GCPError], message: Optional[str] = None
 ) -> GCPError:
     ...
 
+
 @overload
 def map_exception(
-    exception: Exception,
-    target_error: Type[SecretError],
-    message: Optional[str] = None
+    exception: Exception, target_error: Type[SecretError], message: Optional[str] = None
 ) -> SecretError:
     ...
+
 
 @overload
 def map_exception(
     exception: Exception,
     target_error: Type[StorageError],
-    message: Optional[str] = None
+    message: Optional[str] = None,
 ) -> StorageError:
     ...
+
 
 @overload
 def map_exception(
     exception: Exception,
     target_error: Type[FirestoreError],
-    message: Optional[str] = None
+    message: Optional[str] = None,
 ) -> FirestoreError:
     ...
+
 
 @overload
 def map_exception(
     exception: Exception,
     target_error: Type[AuthenticationError],
-    message: Optional[str] = None
+    message: Optional[str] = None,
 ) -> AuthenticationError:
     ...
+
 
 @overload
 def map_exception(
     exception: Exception,
     target_error: Type[VertexAIError],
-    message: Optional[str] = None
+    message: Optional[str] = None,
 ) -> VertexAIError:
     ...
+
 
 @overload
 def map_exception(
     exception: Exception,
     target_error: Type[MigrationError],
-    message: Optional[str] = None
+    message: Optional[str] = None,
 ) -> MigrationError:
     ...
+
 
 def map_exception(
     exception: Exception,
     target_error: Type[MigrationError],
-    message: Optional[str] = None
+    message: Optional[str] = None,
 ) -> MigrationError:
     """
     Map an exception to a domain-specific exception.
-    
+
     This utility function helps convert external exceptions to domain
     exceptions in places where decorators cannot be used.
-    
+
     Args:
         exception: The original exception
         target_error: The domain-specific exception class to use
         message: Optional message for the new exception
-        
+
     Returns:
         A new domain-specific exception
-        
+
     Example:
         try:
             result = api_client.fetch_data()
@@ -345,26 +358,38 @@ def map_exception(
 
 
 # Common error mapping functions with proper typing
-def map_google_api_error(exception: Exception, message: Optional[str] = None) -> GCPError:
+def map_google_api_error(
+    exception: Exception, message: Optional[str] = None
+) -> GCPError:
     """Map a Google API exception to a GCPError."""
     return cast(GCPError, map_exception(exception, GCPError, message))
 
 
-def map_secret_error(exception: Exception, message: Optional[str] = None) -> SecretError:
+def map_secret_error(
+    exception: Exception, message: Optional[str] = None
+) -> SecretError:
     """Map an exception to a SecretError."""
     return cast(SecretError, map_exception(exception, SecretError, message))
 
 
-def map_storage_error(exception: Exception, message: Optional[str] = None) -> StorageError:
+def map_storage_error(
+    exception: Exception, message: Optional[str] = None
+) -> StorageError:
     """Map an exception to a StorageError."""
     return cast(StorageError, map_exception(exception, StorageError, message))
 
 
-def map_firestore_error(exception: Exception, message: Optional[str] = None) -> FirestoreError:
+def map_firestore_error(
+    exception: Exception, message: Optional[str] = None
+) -> FirestoreError:
     """Map an exception to a FirestoreError."""
     return cast(FirestoreError, map_exception(exception, FirestoreError, message))
 
 
-def map_authentication_error(exception: Exception, message: Optional[str] = None) -> AuthenticationError:
+def map_authentication_error(
+    exception: Exception, message: Optional[str] = None
+) -> AuthenticationError:
     """Map an exception to an AuthenticationError."""
-    return cast(AuthenticationError, map_exception(exception, AuthenticationError, message))
+    return cast(
+        AuthenticationError, map_exception(exception, AuthenticationError, message)
+    )

@@ -13,7 +13,7 @@ setup(
         "flask-socketio>=5.0.0",
         "requests>=2.25.0",
         "aiohttp>=3.7.0",
-        "pydantic>=1.8.0"
+        "pydantic>=1.8.0",
     ],
     python_requires=">=3.8",
     classifiers=[

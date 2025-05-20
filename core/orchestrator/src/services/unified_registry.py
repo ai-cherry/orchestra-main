@@ -142,9 +142,9 @@ class ServiceRegistry:
         self._services: List[Any] = []
         self._service_by_type: Dict[Type[Any], Any] = {}
         self._service_factories: Dict[Type[Any], ServiceFactory[Any]] = {}
-        self._service_ids: Set[int] = (
-            set()
-        )  # Track service object IDs to prevent duplicates
+        self._service_ids: Set[
+            int
+        ] = set()  # Track service object IDs to prevent duplicates
 
         logger.debug("ServiceRegistry initialized")
 
@@ -212,10 +212,12 @@ class ServiceRegistry:
         return factory
 
     @overload
-    def get_service(self, service_type: Type[T]) -> Optional[T]: ...
+    def get_service(self, service_type: Type[T]) -> Optional[T]:
+        ...
 
     @overload
-    def get_service(self, service_type: Type[T], default: S) -> Union[T, S]: ...
+    def get_service(self, service_type: Type[T], default: S) -> Union[T, S]:
+        ...
 
     def get_service(self, service_type: Type[T], default: Any = None) -> Any:
         """
@@ -597,11 +599,13 @@ def register(service: T) -> T:
 
 
 @overload
-def get(service_type: Type[T]) -> Optional[T]: ...
+def get(service_type: Type[T]) -> Optional[T]:
+    ...
 
 
 @overload
-def get(service_type: Type[T], default: S) -> Union[T, S]: ...
+def get(service_type: Type[T], default: S) -> Union[T, S]:
+    ...
 
 
 def get(service_type: Type[T], default: Any = None) -> Any:

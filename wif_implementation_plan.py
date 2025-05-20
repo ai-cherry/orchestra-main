@@ -85,7 +85,9 @@ class WIFImplementationPlan:
         self.plan = ImplementationPlan()
 
         # Initialize managers for each phase
-        self.vulnerability_manager = VulnerabilityManager(self.base_path, verbose, dry_run)
+        self.vulnerability_manager = VulnerabilityManager(
+            self.base_path, verbose, dry_run
+        )
         self.migration_manager = MigrationManager(self.base_path, verbose, dry_run)
         self.cicd_manager = CICDManager(self.base_path, verbose, dry_run)
         self.training_manager = TrainingManager(self.base_path, verbose, dry_run)
@@ -93,7 +95,9 @@ class WIFImplementationPlan:
         if verbose:
             logger.setLevel(logging.DEBUG)
 
-        logger.debug(f"Initialized WIF implementation plan with base path: {self.base_path}")
+        logger.debug(
+            f"Initialized WIF implementation plan with base path: {self.base_path}"
+        )
         logger.debug(f"Verbose mode: {verbose}")
         logger.debug(f"Dry run mode: {dry_run}")
 
@@ -104,167 +108,219 @@ class WIFImplementationPlan:
         """Initialize the implementation plan with tasks for each phase."""
         # Phase 1: Address Dependabot Vulnerabilities
         phase1 = ImplementationPhase.VULNERABILITIES
-        self.plan.add_task(Task(
-            name="inventory_vulnerabilities",
-            description="Create an inventory of all vulnerabilities",
-            phase=phase1,
-        ))
-        self.plan.add_task(Task(
-            name="prioritize_vulnerabilities",
-            description="Prioritize vulnerabilities based on severity and impact",
-            phase=phase1,
-            dependencies=["inventory_vulnerabilities"],
-        ))
-        self.plan.add_task(Task(
-            name="update_direct_dependencies",
-            description="Update direct dependencies",
-            phase=phase1,
-            dependencies=["prioritize_vulnerabilities"],
-        ))
-        self.plan.add_task(Task(
-            name="address_transitive_dependencies",
-            description="Address transitive dependencies",
-            phase=phase1,
-            dependencies=["update_direct_dependencies"],
-        ))
-        self.plan.add_task(Task(
-            name="run_security_scans",
-            description="Run security scans",
-            phase=phase1,
-            dependencies=["address_transitive_dependencies"],
-        ))
-        self.plan.add_task(Task(
-            name="verify_functionality",
-            description="Verify application functionality",
-            phase=phase1,
-            dependencies=["run_security_scans"],
-        ))
+        self.plan.add_task(
+            Task(
+                name="inventory_vulnerabilities",
+                description="Create an inventory of all vulnerabilities",
+                phase=phase1,
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="prioritize_vulnerabilities",
+                description="Prioritize vulnerabilities based on severity and impact",
+                phase=phase1,
+                dependencies=["inventory_vulnerabilities"],
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="update_direct_dependencies",
+                description="Update direct dependencies",
+                phase=phase1,
+                dependencies=["prioritize_vulnerabilities"],
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="address_transitive_dependencies",
+                description="Address transitive dependencies",
+                phase=phase1,
+                dependencies=["update_direct_dependencies"],
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="run_security_scans",
+                description="Run security scans",
+                phase=phase1,
+                dependencies=["address_transitive_dependencies"],
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="verify_functionality",
+                description="Verify application functionality",
+                phase=phase1,
+                dependencies=["run_security_scans"],
+            )
+        )
 
         # Phase 2: Execute Migration Script
         phase2 = ImplementationPhase.MIGRATION
-        self.plan.add_task(Task(
-            name="prepare_environment",
-            description="Prepare the environment for migration",
-            phase=phase2,
-        ))
-        self.plan.add_task(Task(
-            name="create_backups",
-            description="Create backups of the current state",
-            phase=phase2,
-            dependencies=["prepare_environment"],
-        ))
-        self.plan.add_task(Task(
-            name="run_migration_dev",
-            description="Run the migration script in development",
-            phase=phase2,
-            dependencies=["create_backups"],
-        ))
-        self.plan.add_task(Task(
-            name="verify_migration_dev",
-            description="Verify migration success in development",
-            phase=phase2,
-            dependencies=["run_migration_dev"],
-        ))
-        self.plan.add_task(Task(
-            name="run_migration_prod",
-            description="Run the migration script in production",
-            phase=phase2,
-            dependencies=["verify_migration_dev"],
-        ))
-        self.plan.add_task(Task(
-            name="verify_migration_prod",
-            description="Verify migration success in production",
-            phase=phase2,
-            dependencies=["run_migration_prod"],
-        ))
-        self.plan.add_task(Task(
-            name="update_documentation",
-            description="Update documentation",
-            phase=phase2,
-            dependencies=["verify_migration_prod"],
-        ))
-        self.plan.add_task(Task(
-            name="cleanup",
-            description="Clean up legacy components",
-            phase=phase2,
-            dependencies=["update_documentation"],
-        ))
+        self.plan.add_task(
+            Task(
+                name="prepare_environment",
+                description="Prepare the environment for migration",
+                phase=phase2,
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="create_backups",
+                description="Create backups of the current state",
+                phase=phase2,
+                dependencies=["prepare_environment"],
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="run_migration_dev",
+                description="Run the migration script in development",
+                phase=phase2,
+                dependencies=["create_backups"],
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="verify_migration_dev",
+                description="Verify migration success in development",
+                phase=phase2,
+                dependencies=["run_migration_dev"],
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="run_migration_prod",
+                description="Run the migration script in production",
+                phase=phase2,
+                dependencies=["verify_migration_dev"],
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="verify_migration_prod",
+                description="Verify migration success in production",
+                phase=phase2,
+                dependencies=["run_migration_prod"],
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="update_documentation",
+                description="Update documentation",
+                phase=phase2,
+                dependencies=["verify_migration_prod"],
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="cleanup",
+                description="Clean up legacy components",
+                phase=phase2,
+                dependencies=["update_documentation"],
+            )
+        )
 
         # Phase 3: Modernize CI/CD Pipelines
         phase3 = ImplementationPhase.CICD
-        self.plan.add_task(Task(
-            name="identify_pipelines",
-            description="Identify all CI/CD pipelines",
-            phase=phase3,
-        ))
-        self.plan.add_task(Task(
-            name="analyze_authentication",
-            description="Analyze authentication methods",
-            phase=phase3,
-            dependencies=["identify_pipelines"],
-        ))
-        self.plan.add_task(Task(
-            name="create_templates",
-            description="Create template pipelines",
-            phase=phase3,
-            dependencies=["analyze_authentication"],
-        ))
-        self.plan.add_task(Task(
-            name="update_pipelines",
-            description="Update service-specific pipelines",
-            phase=phase3,
-            dependencies=["create_templates"],
-        ))
-        self.plan.add_task(Task(
-            name="test_pipelines",
-            description="Test pipeline execution",
-            phase=phase3,
-            dependencies=["update_pipelines"],
-        ))
-        self.plan.add_task(Task(
-            name="monitor_deployments",
-            description="Monitor production deployments",
-            phase=phase3,
-            dependencies=["test_pipelines"],
-        ))
+        self.plan.add_task(
+            Task(
+                name="identify_pipelines",
+                description="Identify all CI/CD pipelines",
+                phase=phase3,
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="analyze_authentication",
+                description="Analyze authentication methods",
+                phase=phase3,
+                dependencies=["identify_pipelines"],
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="create_templates",
+                description="Create template pipelines",
+                phase=phase3,
+                dependencies=["analyze_authentication"],
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="update_pipelines",
+                description="Update service-specific pipelines",
+                phase=phase3,
+                dependencies=["create_templates"],
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="test_pipelines",
+                description="Test pipeline execution",
+                phase=phase3,
+                dependencies=["update_pipelines"],
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="monitor_deployments",
+                description="Monitor production deployments",
+                phase=phase3,
+                dependencies=["test_pipelines"],
+            )
+        )
 
         # Phase 4: Enable Team Adoption
         phase4 = ImplementationPhase.TRAINING
-        self.plan.add_task(Task(
-            name="develop_materials",
-            description="Develop training materials",
-            phase=phase4,
-        ))
-        self.plan.add_task(Task(
-            name="setup_knowledge_base",
-            description="Set up a knowledge base",
-            phase=phase4,
-            dependencies=["develop_materials"],
-        ))
-        self.plan.add_task(Task(
-            name="conduct_technical_sessions",
-            description="Conduct technical sessions",
-            phase=phase4,
-            dependencies=["setup_knowledge_base"],
-        ))
-        self.plan.add_task(Task(
-            name="conduct_workshops",
-            description="Conduct hands-on workshops",
-            phase=phase4,
-            dependencies=["conduct_technical_sessions"],
-        ))
-        self.plan.add_task(Task(
-            name="establish_support",
-            description="Establish a support period",
-            phase=phase4,
-            dependencies=["conduct_workshops"],
-        ))
-        self.plan.add_task(Task(
-            name="collect_feedback",
-            description="Collect feedback and improve",
-            phase=phase4,
-            dependencies=["establish_support"],
-        ))
+        self.plan.add_task(
+            Task(
+                name="develop_materials",
+                description="Develop training materials",
+                phase=phase4,
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="setup_knowledge_base",
+                description="Set up a knowledge base",
+                phase=phase4,
+                dependencies=["develop_materials"],
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="conduct_technical_sessions",
+                description="Conduct technical sessions",
+                phase=phase4,
+                dependencies=["setup_knowledge_base"],
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="conduct_workshops",
+                description="Conduct hands-on workshops",
+                phase=phase4,
+                dependencies=["conduct_technical_sessions"],
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="establish_support",
+                description="Establish a support period",
+                phase=phase4,
+                dependencies=["conduct_workshops"],
+            )
+        )
+        self.plan.add_task(
+            Task(
+                name="collect_feedback",
+                description="Collect feedback and improve",
+                phase=phase4,
+                dependencies=["establish_support"],
+            )
+        )
 
     def execute_phase(self, phase: ImplementationPhase) -> bool:
         """
@@ -423,12 +479,30 @@ class WIFImplementationPlan:
             "vulnerabilities": {
                 "total": len(self.vulnerability_manager.vulnerabilities),
                 "fixed": len(self.vulnerability_manager.get_fixed_vulnerabilities()),
-                "unfixed": len(self.vulnerability_manager.get_unfixed_vulnerabilities()),
+                "unfixed": len(
+                    self.vulnerability_manager.get_unfixed_vulnerabilities()
+                ),
                 "by_severity": {
-                    "critical": len(self.vulnerability_manager.get_vulnerabilities_by_severity("critical")),
-                    "high": len(self.vulnerability_manager.get_vulnerabilities_by_severity("high")),
-                    "moderate": len(self.vulnerability_manager.get_vulnerabilities_by_severity("moderate")),
-                    "low": len(self.vulnerability_manager.get_vulnerabilities_by_severity("low")),
+                    "critical": len(
+                        self.vulnerability_manager.get_vulnerabilities_by_severity(
+                            "critical"
+                        )
+                    ),
+                    "high": len(
+                        self.vulnerability_manager.get_vulnerabilities_by_severity(
+                            "high"
+                        )
+                    ),
+                    "moderate": len(
+                        self.vulnerability_manager.get_vulnerabilities_by_severity(
+                            "moderate"
+                        )
+                    ),
+                    "low": len(
+                        self.vulnerability_manager.get_vulnerabilities_by_severity(
+                            "low"
+                        )
+                    ),
                 },
             },
         }
@@ -453,10 +527,13 @@ class WIFImplementationPlan:
                 "pending_tasks": len(pending),
                 "skipped_tasks": len(skipped),
                 "status": (
-                    "completed" if len(completed) == len(tasks) else
-                    "failed" if len(failed) > 0 else
-                    "in_progress" if len(in_progress) > 0 else
-                    "pending"
+                    "completed"
+                    if len(completed) == len(tasks)
+                    else "failed"
+                    if len(failed) > 0
+                    else "in_progress"
+                    if len(in_progress) > 0
+                    else "pending"
                 ),
                 "tasks": {},
             }
@@ -465,7 +542,9 @@ class WIFImplementationPlan:
             for task in tasks:
                 report["phases"][phase.value]["tasks"][task.name] = {
                     "status": task.status.value,
-                    "start_time": task.start_time.isoformat() if task.start_time else None,
+                    "start_time": task.start_time.isoformat()
+                    if task.start_time
+                    else None,
                     "end_time": task.end_time.isoformat() if task.end_time else None,
                     "duration": task.get_duration(),
                     "notes": task.notes,
@@ -507,21 +586,23 @@ class WIFImplementationPlan:
         vuln_fixed = len(self.vulnerability_manager.get_fixed_vulnerabilities())
         vuln_unfixed = len(self.vulnerability_manager.get_unfixed_vulnerabilities())
 
-        report.extend([
-            "### Vulnerabilities",
-            "",
-            f"- **Total**: {vuln_total}",
-            f"- **Fixed**: {vuln_fixed}",
-            f"- **Unfixed**: {vuln_unfixed}",
-            "",
-            "#### By Severity",
-            "",
-            f"- **Critical**: {len(self.vulnerability_manager.get_vulnerabilities_by_severity('critical'))}",
-            f"- **High**: {len(self.vulnerability_manager.get_vulnerabilities_by_severity('high'))}",
-            f"- **Moderate**: {len(self.vulnerability_manager.get_vulnerabilities_by_severity('moderate'))}",
-            f"- **Low**: {len(self.vulnerability_manager.get_vulnerabilities_by_severity('low'))}",
-            "",
-        ])
+        report.extend(
+            [
+                "### Vulnerabilities",
+                "",
+                f"- **Total**: {vuln_total}",
+                f"- **Fixed**: {vuln_fixed}",
+                f"- **Unfixed**: {vuln_unfixed}",
+                "",
+                "#### By Severity",
+                "",
+                f"- **Critical**: {len(self.vulnerability_manager.get_vulnerabilities_by_severity('critical'))}",
+                f"- **High**: {len(self.vulnerability_manager.get_vulnerabilities_by_severity('high'))}",
+                f"- **Moderate**: {len(self.vulnerability_manager.get_vulnerabilities_by_severity('moderate'))}",
+                f"- **Low**: {len(self.vulnerability_manager.get_vulnerabilities_by_severity('low'))}",
+                "",
+            ]
+        )
 
         # Add phase information
         report.append("## Phases")
@@ -539,37 +620,47 @@ class WIFImplementationPlan:
             skipped = [t for t in tasks if t.status == TaskStatus.SKIPPED]
 
             status = (
-                "✅ Completed" if len(completed) == len(tasks) else
-                "❌ Failed" if len(failed) > 0 else
-                "🔄 In Progress" if len(in_progress) > 0 else
-                "⏳ Pending"
+                "✅ Completed"
+                if len(completed) == len(tasks)
+                else "❌ Failed"
+                if len(failed) > 0
+                else "🔄 In Progress"
+                if len(in_progress) > 0
+                else "⏳ Pending"
             )
 
-            report.extend([
-                f"### {phase.value.capitalize()}",
-                "",
-                f"**Status**: {status}",
-                f"**Progress**: {len(completed)}/{len(tasks)} tasks completed",
-                "",
-                "| Task | Status | Duration | Notes |",
-                "|------|--------|----------|-------|",
-            ])
+            report.extend(
+                [
+                    f"### {phase.value.capitalize()}",
+                    "",
+                    f"**Status**: {status}",
+                    f"**Progress**: {len(completed)}/{len(tasks)} tasks completed",
+                    "",
+                    "| Task | Status | Duration | Notes |",
+                    "|------|--------|----------|-------|",
+                ]
+            )
 
             # Add task information
             for task in tasks:
                 status_emoji = (
-                    "✅" if task.status == TaskStatus.COMPLETED else
-                    "❌" if task.status == TaskStatus.FAILED else
-                    "🔄" if task.status == TaskStatus.IN_PROGRESS else
-                    "⏳" if task.status == TaskStatus.PENDING else
-                    "⏭️"
+                    "✅"
+                    if task.status == TaskStatus.COMPLETED
+                    else "❌"
+                    if task.status == TaskStatus.FAILED
+                    else "🔄"
+                    if task.status == TaskStatus.IN_PROGRESS
+                    else "⏳"
+                    if task.status == TaskStatus.PENDING
+                    else "⏭️"
                 )
 
                 duration = task.get_duration()
                 duration_str = f"{duration:.2f}s" if duration is not None else "N/A"
 
                 report.append(
-                    f"| {task.name} | {status_emoji} {task.status.value} | {duration_str} | {task.notes} |")
+                    f"| {task.name} | {status_emoji} {task.status.value} | {duration_str} | {task.notes} |"
+                )
 
             report.append("")
 
@@ -638,6 +729,7 @@ def main() -> int:
         logger.error(f"Error: {str(e)}")
         if args.verbose:
             import traceback
+
             traceback.print_exc()
         return 1
 

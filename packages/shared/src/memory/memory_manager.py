@@ -16,22 +16,30 @@ from packages.shared.src.memory.memory_interface import MemoryInterface
 from .memory_types import MemoryHealth
 from packages.shared.src.memory.base_memory_manager import BaseMemoryManager
 from packages.shared.src.memory.concrete_memory_manager import FirestoreV1MemoryManager
-from packages.shared.src.storage.firestore.firestore_memory import FirestoreMemoryManager
+from packages.shared.src.storage.firestore.firestore_memory import (
+    FirestoreMemoryManager,
+)
 from packages.shared.src.storage.firestore.v2.adapter import FirestoreMemoryManagerV2
-from packages.shared.src.storage.firestore.v2.resilient_adapter import ResilientFirestoreAdapter
+from packages.shared.src.storage.firestore.v2.resilient_adapter import (
+    ResilientFirestoreAdapter,
+)
 from packages.shared.src.memory.monitoring import MemoryMonitoring
 from packages.shared.src.memory.vertex_vector_search import VertexVectorSearch
 
 # Set up logger
 logger = logging.getLogger(__name__)
 
-class MemoryManager(MemoryInterface): # The main MemoryManager should implement the interface
+
+class MemoryManager(
+    MemoryInterface
+):  # The main MemoryManager should implement the interface
     """
     Main Memory Manager class.
 
     This class acts as a factory and orchestrator for different concrete
     memory implementations, delegating operations based on configuration.
     """
+
     def __init__(
         self,
         memory_backend_type: str = "firestore_v1",  # Configuration parameter
@@ -48,7 +56,9 @@ class MemoryManager(MemoryInterface): # The main MemoryManager should implement 
         use_resilient_adapter: bool = True,  # Whether to use the resilient adapter
         use_vertex_vector_search: bool = False,  # Whether to use Vertex Vector Search
         vertex_location: str = "us-central1",  # GCP region for Vertex AI
-        vertex_index_endpoint_id: Optional[str] = None,  # Vertex Vector Search index endpoint ID
+        vertex_index_endpoint_id: Optional[
+            str
+        ] = None,  # Vertex Vector Search index endpoint ID
         vertex_index_id: Optional[str] = None,  # Vertex Vector Search index ID
         embedding_dimension: int = 768,  # Dimension of embedding vectors
         enable_monitoring: bool = True,  # Whether to enable monitoring
@@ -95,7 +105,7 @@ class MemoryManager(MemoryInterface): # The main MemoryManager should implement 
                     metric_prefix="custom.googleapis.com/ai_orchestra/memory",
                 )
                 logger.info("Memory monitoring enabled")
-                
+
             # Initialize Vertex Vector Search if enabled
             vector_search = None
             if use_vertex_vector_search and project_id:
@@ -109,7 +119,7 @@ class MemoryManager(MemoryInterface): # The main MemoryManager should implement 
                     enabled=use_vertex_vector_search,
                 )
                 logger.info("Vertex Vector Search integration enabled")
-                
+
             # Create the base V2 implementation
             firestore_v2 = FirestoreMemoryManagerV2(
                 project_id=project_id,
@@ -118,7 +128,7 @@ class MemoryManager(MemoryInterface): # The main MemoryManager should implement 
                 namespace=namespace,
                 log_level=log_level,
             )
-            
+
             # Wrap with resilient adapter if enabled
             if use_resilient_adapter:
                 self._backend = ResilientFirestoreAdapter(
@@ -127,11 +137,15 @@ class MemoryManager(MemoryInterface): # The main MemoryManager should implement 
                     circuit_breaker_recovery_timeout=30.0,
                     circuit_breaker_reset_timeout=60.0,
                 )
-                logger.info("Using ResilientFirestoreAdapter with circuit breaker protection")
+                logger.info(
+                    "Using ResilientFirestoreAdapter with circuit breaker protection"
+                )
             else:
                 self._backend = firestore_v2
-                logger.info("Using FirestoreMemoryManagerV2 with improved async support")
-                
+                logger.info(
+                    "Using FirestoreMemoryManagerV2 with improved async support"
+                )
+
             # Store references to components for initialization
             self._monitoring = monitoring
             self._vector_search = vector_search
@@ -144,22 +158,22 @@ class MemoryManager(MemoryInterface): # The main MemoryManager should implement 
         """Initialize the selected memory backend and related components."""
         # Initialize the backend first
         await self._backend.initialize()
-        
+
         # Initialize monitoring if available
-        if hasattr(self, '_monitoring') and self._monitoring:
+        if hasattr(self, "_monitoring") and self._monitoring:
             logger.info("Initializing memory monitoring")
             # Monitoring doesn't require async initialization
-            
+
         # Initialize vector search if available
-        if hasattr(self, '_vector_search') and self._vector_search:
+        if hasattr(self, "_vector_search") and self._vector_search:
             logger.info("Initializing Vertex Vector Search")
             await self._vector_search.initialize()
-        
+
     # Synchronous wrapper for initialize to handle sync/async mismatch
     def initialize_sync(self) -> None:
         """
         Initialize the selected memory backend synchronously.
-        
+
         This is a wrapper around the async initialize method for use in synchronous contexts.
         """
         try:
@@ -168,24 +182,24 @@ class MemoryManager(MemoryInterface): # The main MemoryManager should implement 
             # Create a new event loop if one doesn't exist
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            
+
         loop.run_until_complete(self.initialize())
 
     async def close(self) -> None:
         """Close the selected memory backend and related components."""
         # Close the backend first
         await self._backend.close()
-        
+
         # Close vector search if available
-        if hasattr(self, '_vector_search') and self._vector_search:
+        if hasattr(self, "_vector_search") and self._vector_search:
             logger.info("Closing Vertex Vector Search")
             await self._vector_search.close()
-        
+
     # Synchronous wrapper for close to handle sync/async mismatch
     def close_sync(self) -> None:
         """
         Close the selected memory backend synchronously.
-        
+
         This is a wrapper around the async close method for use in synchronous contexts.
         """
         try:
@@ -194,29 +208,33 @@ class MemoryManager(MemoryInterface): # The main MemoryManager should implement 
             # Create a new event loop if one doesn't exist
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-            
+
         loop.run_until_complete(self.close())
 
     async def add_memory_item(self, item: MemoryItem) -> str:
         """
         Add a memory item to storage via the selected backend.
-        
+
         If Vertex Vector Search is enabled, the item will also be indexed there.
         """
         # Add to backend first
         item_id = await self._backend.add_memory_item(item)
-        
+
         # Index in Vertex Vector Search if available and item has embedding
-        if (hasattr(self, '_vector_search') and
-            self._vector_search and
-            self._vector_search.enabled and
-            item.embedding):
+        if (
+            hasattr(self, "_vector_search")
+            and self._vector_search
+            and self._vector_search.enabled
+            and item.embedding
+        ):
             try:
                 await self._vector_search.index_memory_item(item)
             except Exception as e:
-                logger.error(f"Failed to index memory item in Vertex Vector Search: {e}")
+                logger.error(
+                    f"Failed to index memory item in Vertex Vector Search: {e}"
+                )
                 # Don't re-raise, as the primary operation (storing in backend) succeeded
-                
+
         return item_id
 
     async def get_memory_item(self, item_id: str) -> Optional[MemoryItem]:
@@ -247,12 +265,16 @@ class MemoryManager(MemoryInterface): # The main MemoryManager should implement 
     ) -> List[MemoryItem]:
         """
         Perform semantic search via the selected backend or Vertex Vector Search.
-        
+
         If Vertex Vector Search is enabled and initialized, it will be used for
         semantic search. Otherwise, the backend's semantic search will be used.
         """
         # Use Vertex Vector Search if available
-        if hasattr(self, '_vector_search') and self._vector_search and self._vector_search.enabled:
+        if (
+            hasattr(self, "_vector_search")
+            and self._vector_search
+            and self._vector_search.enabled
+        ):
             try:
                 # Perform search using Vertex Vector Search
                 results_with_scores = await self._vector_search.search(
@@ -261,16 +283,20 @@ class MemoryManager(MemoryInterface): # The main MemoryManager should implement 
                     persona_context=persona_context,
                     top_k=top_k,
                 )
-                
+
                 # Extract just the items (without scores)
                 if results_with_scores:
                     return [item for item, _ in results_with_scores]
-                    
+
                 # Fall back to backend if no results
-                logger.debug("No results from Vertex Vector Search, falling back to backend")
+                logger.debug(
+                    "No results from Vertex Vector Search, falling back to backend"
+                )
             except Exception as e:
-                logger.error(f"Error using Vertex Vector Search, falling back to backend: {e}")
-                
+                logger.error(
+                    f"Error using Vertex Vector Search, falling back to backend: {e}"
+                )
+
         # Use the backend's semantic search
         return await self._backend.semantic_search(
             user_id=user_id,
@@ -294,22 +320,22 @@ class MemoryManager(MemoryInterface): # The main MemoryManager should implement 
     async def health_check(self) -> MemoryHealth:
         """
         Check the health of the memory system.
-        
+
         This includes the backend, Vertex Vector Search, and monitoring components.
         """
         # Get backend health
         health = await self._backend.health_check()
-        
+
         # Add Vertex Vector Search health if available
-        if hasattr(self, '_vector_search') and self._vector_search:
+        if hasattr(self, "_vector_search") and self._vector_search:
             health["vector_search_enabled"] = self._vector_search.enabled
             health["vector_search_initialized"] = self._vector_search._initialized
             health["vector_search_fallback"] = self._vector_search._fallback_to_custom
-            
+
         # Add monitoring health if available
-        if hasattr(self, '_monitoring') and self._monitoring:
+        if hasattr(self, "_monitoring") and self._monitoring:
             health["monitoring_enabled"] = self._monitoring.enabled
-            
+
         return health
 
     # Add other methods from MemoryInterface here, delegating to self._backend

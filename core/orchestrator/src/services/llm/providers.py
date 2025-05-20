@@ -303,8 +303,13 @@ class OpenRouterProvider(LLMProvider):
                 f"OpenRouter Pro Tier configuration active with {len(self.custom_headers)} custom headers"
             )
         except Exception as e:
-            logger.error(f"Failed to initialize {self.provider_name} provider: {e}", exc_info=True)
-            logger.warning(f"{self.provider_name} provider initialization failed; AI functionalities may be limited or unavailable.")
+            logger.error(
+                f"Failed to initialize {self.provider_name} provider: {e}",
+                exc_info=True,
+            )
+            logger.warning(
+                f"{self.provider_name} provider initialization failed; AI functionalities may be limited or unavailable."
+            )
 
     def close(self) -> None:
         """
@@ -338,7 +343,9 @@ class OpenRouterProvider(LLMProvider):
         """Check if provider is initialized."""
         return self._client is not None
 
-    def get_model_for_agent(self, agent_type: Optional[str] = None, mode: Optional[str] = None) -> str:
+    def get_model_for_agent(
+        self, agent_type: Optional[str] = None, mode: Optional[str] = None
+    ) -> str:
         """
         Get the appropriate model for a specific agent type or mode.
 
@@ -351,15 +358,15 @@ class OpenRouterProvider(LLMProvider):
         """
         # Check settings for mode-specific model mapping
         mode_model_map = settings.get_mode_model_map()
-        
+
         # Mode-specific model takes highest priority
         if mode and mode in mode_model_map:
             return mode_model_map[mode]["model"]
-            
+
         # Agent-specific model takes second priority
         if agent_type and agent_type in self.agent_model_map:
             return self.agent_model_map[agent_type]
-            
+
         # Default to provider's default model
         return self.default_model
 
@@ -503,12 +510,17 @@ class OpenRouterProvider(LLMProvider):
         else:
             # Use provided model or fallback to default
             model = model or self.config.default_model
-            
+
         # Check if mode requires a different provider
         if mode:
             mode_model_map = settings.get_mode_model_map()
-            if mode in mode_model_map and mode_model_map[mode]["provider"] != self.provider_name:
-                logger.info(f"Mode '{mode}' requires provider '{mode_model_map[mode]['provider']}' instead of '{self.provider_name}'")
+            if (
+                mode in mode_model_map
+                and mode_model_map[mode]["provider"] != self.provider_name
+            ):
+                logger.info(
+                    f"Mode '{mode}' requires provider '{mode_model_map[mode]['provider']}' instead of '{self.provider_name}'"
+                )
                 # We continue with the current provider but log the mismatch
 
         # Validate messages
@@ -679,8 +691,12 @@ class PortkeyProvider(LLMProvider):
             "retry": {
                 "attempts": self.config.max_retries,
             },
-            "trace_id": self.settings_instance.TRACE_ID if hasattr(self.settings_instance, "TRACE_ID") else None,
-            "virtual_key": self.settings_instance.PORTKEY_VIRTUAL_KEY_OPENROUTER if hasattr(self.settings_instance, "PORTKEY_VIRTUAL_KEY_OPENROUTER") else None,
+            "trace_id": self.settings_instance.TRACE_ID
+            if hasattr(self.settings_instance, "TRACE_ID")
+            else None,
+            "virtual_key": self.settings_instance.PORTKEY_VIRTUAL_KEY_OPENROUTER
+            if hasattr(self.settings_instance, "PORTKEY_VIRTUAL_KEY_OPENROUTER")
+            else None,
             "provider": "openrouter",  # Set default provider
         }
 
@@ -718,27 +734,29 @@ class PortkeyProvider(LLMProvider):
         """Check if provider is initialized."""
         return self._client is not None
 
-    def get_model_for_mode(self, agent_type: Optional[str] = None, mode: Optional[str] = None) -> str:
+    def get_model_for_mode(
+        self, agent_type: Optional[str] = None, mode: Optional[str] = None
+    ) -> str:
         """
         Get the appropriate model based on Roo mode and agent type.
-        
+
         Args:
             agent_type: The type of agent making the request
             mode: The current Roo mode (orchestrator, reviewer, etc.)
-            
+
         Returns:
             The model identifier to use
         """
         # Check settings for mode-specific model mapping
         mode_model_map = settings.get_mode_model_map()
-        
+
         # Mode-specific model takes highest priority
         if mode and mode in mode_model_map:
             return mode_model_map[mode]["model"]
-            
+
         # Default to provider's default model
         return self.default_model
-    
+
     async def generate_completion(
         self,
         prompt: str,
@@ -751,7 +769,7 @@ class PortkeyProvider(LLMProvider):
     ) -> Dict[str, Any]:
         """
         Generate text completion.
-        
+
         Args:
             prompt: Prompt text
             model: Model to use
@@ -793,7 +811,7 @@ class PortkeyProvider(LLMProvider):
     ) -> Dict[str, Any]:
         """
         Generate chat completion with basic error handling.
-        
+
         Args:
             messages: List of message objects with role and content
             model: Model to use (overrides other selectors if provided)
@@ -808,12 +826,17 @@ class PortkeyProvider(LLMProvider):
             model = self.get_model_for_mode(agent_type, mode)
         else:
             model = model or self.config.default_model
-            
+
         # Check if mode requires a different provider
         if mode:
             mode_model_map = settings.get_mode_model_map()
-            if mode in mode_model_map and mode_model_map[mode]["provider"] != self.provider_name:
-                logger.info(f"Mode '{mode}' requires provider '{mode_model_map[mode]['provider']}' instead of '{self.provider_name}'")
+            if (
+                mode in mode_model_map
+                and mode_model_map[mode]["provider"] != self.provider_name
+            ):
+                logger.info(
+                    f"Mode '{mode}' requires provider '{mode_model_map[mode]['provider']}' instead of '{self.provider_name}'"
+                )
                 # We continue with the current provider but log the mismatch
 
         # Validate messages
@@ -842,11 +865,16 @@ class PortkeyProvider(LLMProvider):
 
             # Make the API call with config ID applied per-request
             client = self._client.with_options(default_headers={"model": model})
-            
+
             # Apply the config ID if available
-            if hasattr(self.settings_instance, "PORTKEY_CONFIG_ID") and self.settings_instance.PORTKEY_CONFIG_ID:
-                client = client.with_options(config=self.settings_instance.PORTKEY_CONFIG_ID)
-                
+            if (
+                hasattr(self.settings_instance, "PORTKEY_CONFIG_ID")
+                and self.settings_instance.PORTKEY_CONFIG_ID
+            ):
+                client = client.with_options(
+                    config=self.settings_instance.PORTKEY_CONFIG_ID
+                )
+
             response = await client.chat.completions.create(**params)
 
             # Calculate request duration
@@ -881,25 +909,25 @@ class PortkeyProvider(LLMProvider):
 def get_provider_for_mode(mode: Optional[str] = None) -> str:
     """
     Determine the appropriate provider based on the Roo mode.
-    
+
     Args:
         mode: The current Roo mode (orchestrator, reviewer, etc.)
-        
+
     Returns:
         The provider name to use
     """
     if not mode:
         return getattr(settings, "PREFERRED_LLM_PROVIDER", "openrouter")
-        
+
     # Get the mode-to-model mapping
     mode_model_map = settings.get_mode_model_map()
-    
+
     # Check if the mode exists in the mapping
     if mode in mode_model_map and "provider" in mode_model_map[mode]:
         provider = mode_model_map[mode]["provider"]
         logger.info(f"Using provider '{provider}' for mode '{mode}'")
         return provider
-        
+
     # Default to preferred provider
     return getattr(settings, "PREFERRED_LLM_PROVIDER", "openrouter")
 
@@ -915,7 +943,10 @@ def _validate_openrouter_environment(settings_instance) -> None:
         ValueError: If required settings are missing
     """
     # Use the settings_instance directly
-    if not hasattr(settings_instance, "OPENROUTER_API_KEY") or not settings_instance.OPENROUTER_API_KEY:
+    if (
+        not hasattr(settings_instance, "OPENROUTER_API_KEY")
+        or not settings_instance.OPENROUTER_API_KEY
+    ):
         raise ValueError(
             "OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment."
         )
@@ -932,7 +963,10 @@ def _validate_portkey_environment(settings_instance) -> None:
         ValueError: If required settings are missing
     """
     # Use the settings_instance directly
-    if not hasattr(settings_instance, "PORTKEY_API_KEY") or not settings_instance.PORTKEY_API_KEY:
+    if (
+        not hasattr(settings_instance, "PORTKEY_API_KEY")
+        or not settings_instance.PORTKEY_API_KEY
+    ):
         raise ValueError(
             "Portkey API key not configured. Please set PORTKEY_API_KEY in your environment."
         )

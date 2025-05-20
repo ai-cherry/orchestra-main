@@ -57,14 +57,20 @@ logger = logging.getLogger("migration-executor")
 try:
     from gcp_migration.circuit_breaker_unified import CircuitBreaker, circuit_break
     from gcp_migration.mcp_client_unified import MCPClient, get_client as get_mcp_client
-    from gcp_migration.validate_migration import validate_circuit_breaker, validate_environment_detection
+    from gcp_migration.validate_migration import (
+        validate_circuit_breaker,
+        validate_environment_detection,
+    )
 except ImportError:
-    logger.critical("Failed to import required modules. Make sure you're in the correct directory.")
+    logger.critical(
+        "Failed to import required modules. Make sure you're in the correct directory."
+    )
     sys.exit(1)
 
 
 class MigrationPhase(Enum):
     """Migration phases in execution order."""
+
     INITIALIZE = "initialize"
     INFRASTRUCTURE = "infrastructure"
     DATABASE = "database"
@@ -93,6 +99,7 @@ class MigrationPhase(Enum):
 
 class MigrationStatus(Enum):
     """Status of a migration phase or component."""
+
     PENDING = "pending"
     IN_PROGRESS = "in-progress"
     COMPLETED = "completed"
@@ -102,6 +109,7 @@ class MigrationStatus(Enum):
 
 class MigrationMode(Enum):
     """Mode of migration execution."""
+
     FULL = "full"
     COMPONENT = "component"
     VALIDATE = "validate"
@@ -110,6 +118,7 @@ class MigrationMode(Enum):
 
 class MigrationError(Exception):
     """Base exception for migration errors."""
+
     pass
 
 
@@ -123,17 +132,20 @@ class PhaseError(MigrationError):
 
 class ValidationError(MigrationError):
     """Error during validation."""
+
     pass
 
 
 class ConfigurationError(MigrationError):
     """Error in migration configuration."""
+
     pass
 
 
 @dataclass
 class MigrationComponent:
     """A component within a migration phase."""
+
     name: str
     description: str
     status: MigrationStatus = MigrationStatus.PENDING
@@ -185,6 +197,7 @@ class MigrationComponent:
 @dataclass
 class MigrationPhaseStatus:
     """Status of a migration phase."""
+
     phase: MigrationPhase
     status: MigrationStatus = MigrationStatus.PENDING
     start_time: Optional[datetime] = None
@@ -257,6 +270,7 @@ class MigrationPhaseStatus:
 @dataclass
 class MigrationState:
     """Current state of the migration process."""
+
     mode: MigrationMode
     current_phase: MigrationPhase
     phases: Dict[MigrationPhase, MigrationPhaseStatus] = field(default_factory=dict)
@@ -275,19 +289,27 @@ class MigrationState:
             "phases": {
                 phase.value: {
                     "status": status.status.value,
-                    "start_time": status.start_time.isoformat() if status.start_time else None,
-                    "end_time": status.end_time.isoformat() if status.end_time else None,
+                    "start_time": status.start_time.isoformat()
+                    if status.start_time
+                    else None,
+                    "end_time": status.end_time.isoformat()
+                    if status.end_time
+                    else None,
                     "components": {
                         name: {
                             "description": component.description,
                             "status": component.status.value,
-                            "start_time": component.start_time.isoformat() if component.start_time else None,
-                            "end_time": component.end_time.isoformat() if component.end_time else None,
+                            "start_time": component.start_time.isoformat()
+                            if component.start_time
+                            else None,
+                            "end_time": component.end_time.isoformat()
+                            if component.end_time
+                            else None,
                             "error": component.error,
                             "details": component.details,
                         }
                         for name, component in status.components.items()
-                    }
+                    },
                 }
                 for phase, status in self.phases.items()
             },
@@ -309,7 +331,9 @@ class MigrationState:
             mode=MigrationMode(data["mode"]),
             current_phase=MigrationPhase(data["current_phase"]),
             start_time=datetime.fromisoformat(data["start_time"]),
-            end_time=datetime.fromisoformat(data["end_time"]) if data.get("end_time") else None,
+            end_time=datetime.fromisoformat(data["end_time"])
+            if data.get("end_time")
+            else None,
         )
 
         for phase_value, phase_data in data["phases"].items():
@@ -317,10 +341,12 @@ class MigrationState:
             phase_status = MigrationPhaseStatus(
                 phase=phase,
                 status=MigrationStatus(phase_data["status"]),
-                start_time=datetime.fromisoformat(
-                    phase_data["start_time"]) if phase_data.get("start_time") else None,
-                end_time=datetime.fromisoformat(
-                    phase_data["end_time"]) if phase_data.get("end_time") else None,
+                start_time=datetime.fromisoformat(phase_data["start_time"])
+                if phase_data.get("start_time")
+                else None,
+                end_time=datetime.fromisoformat(phase_data["end_time"])
+                if phase_data.get("end_time")
+                else None,
             )
 
             for component_name, component_data in phase_data["components"].items():
@@ -328,10 +354,12 @@ class MigrationState:
                     name=component_name,
                     description=component_data["description"],
                     status=MigrationStatus(component_data["status"]),
-                    start_time=datetime.fromisoformat(
-                        component_data["start_time"]) if component_data.get("start_time") else None,
-                    end_time=datetime.fromisoformat(
-                        component_data["end_time"]) if component_data.get("end_time") else None,
+                    start_time=datetime.fromisoformat(component_data["start_time"])
+                    if component_data.get("start_time")
+                    else None,
+                    end_time=datetime.fromisoformat(component_data["end_time"])
+                    if component_data.get("end_time")
+                    else None,
                     error=component_data.get("error"),
                     details=component_data.get("details", {}),
                 )
@@ -351,7 +379,9 @@ class MigrationState:
             json.dump(self.to_dict(), f, indent=2)
 
     @classmethod
-    def load_checkpoint(cls, path: str = "migration_state.json") -> Optional["MigrationState"]:
+    def load_checkpoint(
+        cls, path: str = "migration_state.json"
+    ) -> Optional["MigrationState"]:
         """Load migration state from a checkpoint file.
 
         Args:
@@ -418,108 +448,133 @@ class MigrationExecutor:
         """Set up components for each phase."""
         # Initialize phase
         init_phase = self.state.phases[MigrationPhase.INITIALIZE]
-        init_phase.add_component(MigrationComponent(
-            name="environment-detection",
-            description="Detect the current environment (development, staging, production)"
-        ))
-        init_phase.add_component(MigrationComponent(
-            name="auth-validation",
-            description="Validate authentication credentials"
-        ))
-        init_phase.add_component(MigrationComponent(
-            name="dependency-check",
-            description="Check for required dependencies"
-        ))
+        init_phase.add_component(
+            MigrationComponent(
+                name="environment-detection",
+                description="Detect the current environment (development, staging, production)",
+            )
+        )
+        init_phase.add_component(
+            MigrationComponent(
+                name="auth-validation",
+                description="Validate authentication credentials",
+            )
+        )
+        init_phase.add_component(
+            MigrationComponent(
+                name="dependency-check", description="Check for required dependencies"
+            )
+        )
 
         # Infrastructure phase
         infra_phase = self.state.phases[MigrationPhase.INFRASTRUCTURE]
-        infra_phase.add_component(MigrationComponent(
-            name="core-infrastructure",
-            description="Set up core GCP infrastructure (VPC, subnets, etc.)"
-        ))
-        infra_phase.add_component(MigrationComponent(
-            name="workstation-setup",
-            description="Set up Cloud Workstations"
-        ))
-        infra_phase.add_component(MigrationComponent(
-            name="security-configuration",
-            description="Configure security settings"
-        ))
+        infra_phase.add_component(
+            MigrationComponent(
+                name="core-infrastructure",
+                description="Set up core GCP infrastructure (VPC, subnets, etc.)",
+            )
+        )
+        infra_phase.add_component(
+            MigrationComponent(
+                name="workstation-setup", description="Set up Cloud Workstations"
+            )
+        )
+        infra_phase.add_component(
+            MigrationComponent(
+                name="security-configuration", description="Configure security settings"
+            )
+        )
 
         # Database phase
         db_phase = self.state.phases[MigrationPhase.DATABASE]
-        db_phase.add_component(MigrationComponent(
-            name="alloydb-setup",
-            description="Set up AlloyDB instances"
-        ))
-        db_phase.add_component(MigrationComponent(
-            name="schema-migration",
-            description="Migrate database schema"
-        ))
-        db_phase.add_component(MigrationComponent(
-            name="data-migration",
-            description="Migrate data to new database"
-        ))
+        db_phase.add_component(
+            MigrationComponent(
+                name="alloydb-setup", description="Set up AlloyDB instances"
+            )
+        )
+        db_phase.add_component(
+            MigrationComponent(
+                name="schema-migration", description="Migrate database schema"
+            )
+        )
+        db_phase.add_component(
+            MigrationComponent(
+                name="data-migration", description="Migrate data to new database"
+            )
+        )
 
         # Vector search phase
         vector_phase = self.state.phases[MigrationPhase.VECTOR_SEARCH]
-        vector_phase.add_component(MigrationComponent(
-            name="vector-index-creation",
-            description="Create vector indices"
-        ))
-        vector_phase.add_component(MigrationComponent(
-            name="vector-optimization",
-            description="Optimize vector search parameters"
-        ))
-        vector_phase.add_component(MigrationComponent(
-            name="circuit-breaker-setup",
-            description="Set up circuit breaker for vector search"
-        ))
+        vector_phase.add_component(
+            MigrationComponent(
+                name="vector-index-creation", description="Create vector indices"
+            )
+        )
+        vector_phase.add_component(
+            MigrationComponent(
+                name="vector-optimization",
+                description="Optimize vector search parameters",
+            )
+        )
+        vector_phase.add_component(
+            MigrationComponent(
+                name="circuit-breaker-setup",
+                description="Set up circuit breaker for vector search",
+            )
+        )
 
         # APIs phase
         apis_phase = self.state.phases[MigrationPhase.APIS]
-        apis_phase.add_component(MigrationComponent(
-            name="api-deployment",
-            description="Deploy API services"
-        ))
-        apis_phase.add_component(MigrationComponent(
-            name="api-configuration",
-            description="Configure API services"
-        ))
-        apis_phase.add_component(MigrationComponent(
-            name="api-testing",
-            description="Test API endpoints"
-        ))
+        apis_phase.add_component(
+            MigrationComponent(name="api-deployment", description="Deploy API services")
+        )
+        apis_phase.add_component(
+            MigrationComponent(
+                name="api-configuration", description="Configure API services"
+            )
+        )
+        apis_phase.add_component(
+            MigrationComponent(name="api-testing", description="Test API endpoints")
+        )
 
         # Validation phase
         validation_phase = self.state.phases[MigrationPhase.VALIDATION]
-        validation_phase.add_component(MigrationComponent(
-            name="connectivity-check",
-            description="Check connectivity between services"
-        ))
-        validation_phase.add_component(MigrationComponent(
-            name="performance-validation",
-            description="Validate performance against targets"
-        ))
-        validation_phase.add_component(MigrationComponent(
-            name="security-validation",
-            description="Validate security configuration"
-        ))
+        validation_phase.add_component(
+            MigrationComponent(
+                name="connectivity-check",
+                description="Check connectivity between services",
+            )
+        )
+        validation_phase.add_component(
+            MigrationComponent(
+                name="performance-validation",
+                description="Validate performance against targets",
+            )
+        )
+        validation_phase.add_component(
+            MigrationComponent(
+                name="security-validation",
+                description="Validate security configuration",
+            )
+        )
 
         # Finalize phase
         finalize_phase = self.state.phases[MigrationPhase.FINALIZE]
-        finalize_phase.add_component(MigrationComponent(
-            name="cleanup",
-            description="Clean up temporary resources"
-        ))
-        finalize_phase.add_component(MigrationComponent(
-            name="documentation-update",
-            description="Update documentation"
-        ))
-        finalize_phase.add_component(MigrationComponent(
-            name="report-generation",
-            description="Generate migration report"
-        ))
+        finalize_phase.add_component(
+            MigrationComponent(
+                name="cleanup", description="Clean up temporary resources"
+            )
+        )
+        finalize_phase.add_component(
+            MigrationComponent(
+                name="documentation-update", description="Update documentation"
+            )
+        )
+        finalize_phase.add_component(
+            MigrationComponent(
+                name="report-generation", description="Generate migration report"
+            )
+        )
 
     def resume_from_checkpoint(self) -> bool:
         """Resume migration from a checkpoint.
@@ -531,7 +586,8 @@ class MigrationExecutor:
         if loaded_state:
             self.state = loaded_state
             logger.info(
-                f"Resumed migration from checkpoint at phase {self.state.current_phase.value}")
+                f"Resumed migration from checkpoint at phase {self.state.current_phase.value}"
+            )
             return True
         return False
 
@@ -553,7 +609,9 @@ class MigrationExecutor:
             return False
 
         if component.status in (MigrationStatus.COMPLETED, MigrationStatus.SKIPPED):
-            logger.info(f"Component {component_name} already {component.status.value}, skipping")
+            logger.info(
+                f"Component {component_name} already {component.status.value}, skipping"
+            )
             return True
 
         logger.info(f"Executing component {component_name} in phase {phase.value}")
@@ -567,18 +625,23 @@ class MigrationExecutor:
                     validate_result = validate_environment_detection()
                     if not validate_result.success:
                         raise ValidationError(
-                            f"Environment detection failed: {validate_result.error}")
+                            f"Environment detection failed: {validate_result.error}"
+                        )
                     component.complete(success=True, **validate_result.details)
                 elif component_name == "auth-validation":
                     # Validate authentication
                     # In a dry run, we'll skip actual validation
                     if self.mode == MigrationMode.DRY_RUN:
-                        component.complete(success=True, details={
-                                           "message": "Dry run, skipping auth validation"})
+                        component.complete(
+                            success=True,
+                            details={"message": "Dry run, skipping auth validation"},
+                        )
                     else:
                         # Implement actual auth validation
-                        component.complete(success=True, details={
-                                           "message": "Authentication validated"})
+                        component.complete(
+                            success=True,
+                            details={"message": "Authentication validated"},
+                        )
                 elif component_name == "dependency-check":
                     # Check dependencies
                     dependencies_ok = self._check_dependencies()
@@ -590,27 +653,36 @@ class MigrationExecutor:
                     validate_result = validate_circuit_breaker()
                     if not validate_result.success:
                         raise ValidationError(
-                            f"Circuit breaker validation failed: {validate_result.error}")
+                            f"Circuit breaker validation failed: {validate_result.error}"
+                        )
                     component.complete(success=True, **validate_result.details)
                 else:
                     # For other components, just mark as completed in dry run mode
                     if self.mode == MigrationMode.DRY_RUN:
-                        component.complete(success=True, details={
-                                           "message": "Dry run, skipping actual execution"})
+                        component.complete(
+                            success=True,
+                            details={"message": "Dry run, skipping actual execution"},
+                        )
                     else:
                         # Implement actual component logic
-                        component.complete(success=True, details={
-                                           "message": "Component executed successfully"})
+                        component.complete(
+                            success=True,
+                            details={"message": "Component executed successfully"},
+                        )
 
             else:
                 # For all other phases/components, just mark as completed in dry run mode
                 if self.mode == MigrationMode.DRY_RUN:
-                    component.complete(success=True, details={
-                                       "message": "Dry run, skipping actual execution"})
+                    component.complete(
+                        success=True,
+                        details={"message": "Dry run, skipping actual execution"},
+                    )
                 else:
                     # Implement actual component logic
-                    component.complete(success=True, details={
-                                       "message": "Component executed successfully"})
+                    component.complete(
+                        success=True,
+                        details={"message": "Component executed successfully"},
+                    )
 
             return True
 
@@ -636,7 +708,9 @@ class MigrationExecutor:
         phase_status = self.state.phases[phase]
 
         if phase_status.status in (MigrationStatus.COMPLETED, MigrationStatus.SKIPPED):
-            logger.info(f"Phase {phase.value} already {phase_status.status.value}, skipping")
+            logger.info(
+                f"Phase {phase.value} already {phase_status.status.value}, skipping"
+            )
             return True
 
         logger.info(f"Executing phase {phase.value}")
@@ -647,7 +721,9 @@ class MigrationExecutor:
         for component_name, component in phase_status.components.items():
             if not self.execute_component(phase, component_name):
                 all_success = False
-                if phase != MigrationPhase.VALIDATION:  # Continue validation phase even if some components fail
+                if (
+                    phase != MigrationPhase.VALIDATION
+                ):  # Continue validation phase even if some components fail
                     break
 
         # Mark phase as completed
@@ -686,9 +762,12 @@ class MigrationExecutor:
             all_success = True
             for phase in MigrationPhase.get_ordered_phases():
                 # Skip phases before the current phase (for resuming from checkpoint)
-                if MigrationPhase.get_ordered_phases().index(phase) < MigrationPhase.get_ordered_phases().index(self.state.current_phase):
+                if MigrationPhase.get_ordered_phases().index(
+                    phase
+                ) < MigrationPhase.get_ordered_phases().index(self.state.current_phase):
                     logger.info(
-                        f"Skipping phase {phase.value} (before current phase {self.state.current_phase.value})")
+                        f"Skipping phase {phase.value} (before current phase {self.state.current_phase.value})"
+                    )
                     continue
 
                 self.state.current_phase = phase
@@ -768,10 +847,13 @@ class MigrationExecutor:
             # Summary
             f.write("## Summary\n\n")
             f.write(f"**Mode:** {self.mode.value}\n\n")
-            f.write(f"**Status:** {'✅ Success' if failed_components == 0 else '❌ Failed'}\n\n")
+            f.write(
+                f"**Status:** {'✅ Success' if failed_components == 0 else '❌ Failed'}\n\n"
+            )
             f.write(f"**Duration:** {self.state.duration_seconds:.2f} seconds\n\n")
             f.write(
-                f"**Components:** {total_components} total, {completed_components} completed, {failed_components} failed, {skipped_components} skipped\n\n")
+                f"**Components:** {total_components} total, {completed_components} completed, {failed_components} failed, {skipped_components} skipped\n\n"
+            )
 
             # Phase details
             f.write("## Phase Details\n\n")
@@ -789,16 +871,34 @@ class MigrationExecutor:
                 f.write("|-----------|--------|----------|--------|\n")
 
                 for component_name, component in phase_status.components.items():
-                    status_emoji = "✅" if component.status == MigrationStatus.COMPLETED else "❌" if component.status == MigrationStatus.FAILED else "⏭️" if component.status == MigrationStatus.SKIPPED else "⏳"
-                    duration = f"{component.duration_seconds:.2f}s" if component.duration_seconds else "N/A"
+                    status_emoji = (
+                        "✅"
+                        if component.status == MigrationStatus.COMPLETED
+                        else "❌"
+                        if component.status == MigrationStatus.FAILED
+                        else "⏭️"
+                        if component.status == MigrationStatus.SKIPPED
+                        else "⏳"
+                    )
+                    duration = (
+                        f"{component.duration_seconds:.2f}s"
+                        if component.duration_seconds
+                        else "N/A"
+                    )
 
-                    details = component.error if component.error else ", ".join(
-                        f"{k}: {v}" for k, v in component.details.items())
+                    details = (
+                        component.error
+                        if component.error
+                        else ", ".join(
+                            f"{k}: {v}" for k, v in component.details.items()
+                        )
+                    )
                     if len(details) > 50:
                         details = details[:47] + "..."
 
                     f.write(
-                        f"| {component.description} | {status_emoji} {component.status.value} | {duration} | {details} |\n")
+                        f"| {component.description} | {status_emoji} {component.status.value} | {duration} | {details} |\n"
+                    )
 
                 f.write("\n")
 
@@ -807,8 +907,11 @@ class MigrationExecutor:
                 f.write("## Failed Components\n\n")
 
                 for phase, phase_status in self.state.phases.items():
-                    failed_in_phase = [c for c in phase_status.components.values(
-                    ) if c.status == MigrationStatus.FAILED]
+                    failed_in_phase = [
+                        c
+                        for c in phase_status.components.values()
+                        if c.status == MigrationStatus.FAILED
+                    ]
                     if failed_in_phase:
                         f.write(f"### {phase.value.title()}\n\n")
 
@@ -848,14 +951,23 @@ def parse_args():
 
     mode_group = parser.add_mutually_exclusive_group()
     mode_group.add_argument(
-        "--mode", choices=[m.value for m in MigrationMode], help="Migration mode")
-    mode_group.add_argument("--resume", action="store_true", help="Resume from checkpoint")
+        "--mode", choices=[m.value for m in MigrationMode], help="Migration mode"
+    )
+    mode_group.add_argument(
+        "--resume", action="store_true", help="Resume from checkpoint"
+    )
 
-    parser.add_argument("--component", help="Specific component to migrate (for component mode)")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="Perform a dry run without making actual changes")
-    parser.add_argument("--checkpoint", default="migration_state.json",
-                        help="Path to checkpoint file")
+    parser.add_argument(
+        "--component", help="Specific component to migrate (for component mode)"
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Perform a dry run without making actual changes",
+    )
+    parser.add_argument(
+        "--checkpoint", default="migration_state.json", help="Path to checkpoint file"
+    )
 
     return parser.parse_args()
 

@@ -18,15 +18,16 @@ from core.orchestrator.src.memory.layered_memory import LayeredMemory
 # Configure logging
 logger = logging.getLogger(__name__)
 
+
 class ObservableAgent(Agent):
     """
     Agent with built-in observability features.
-    
+
     This agent wraps any other agent implementation and adds observability
     features like logging, metrics, and tracing to help with monitoring
     and debugging agent operations.
     """
-    
+
     def __init__(
         self,
         wrapped_agent: Agent,
@@ -35,11 +36,11 @@ class ObservableAgent(Agent):
         log_level: str = "INFO",
         enable_metrics: bool = True,
         enable_tracing: bool = True,
-        config: Optional[Dict[str, Any]] = None
+        config: Optional[Dict[str, Any]] = None,
     ):
         """
         Initialize an observable agent.
-        
+
         Args:
             wrapped_agent: The agent to wrap with observability features
             agent_id: Unique identifier for this agent
@@ -57,61 +58,69 @@ class ObservableAgent(Agent):
         self.enable_metrics = enable_metrics
         self.enable_tracing = enable_tracing
         self.config = config or {}
-        
+
         # Configure logging level
         numeric_level = getattr(logging, log_level.upper(), None)
         if isinstance(numeric_level, int):
             logger.setLevel(numeric_level)
-        
+
         logger.info(f"ObservableAgent initialized for agent_id: {agent_id}")
-    
+
     async def process(self, context: AgentContext) -> AgentResponse:
         """
         Process user input with observability features.
-        
+
         This method wraps the underlying agent's process method with
         logging, metrics, and tracing to provide observability.
-        
+
         Args:
             context: The context for this interaction
-            
+
         Returns:
             The agent's response
         """
         # Generate a unique operation ID for tracing
         operation_id = str(uuid.uuid4())
         start_time = time.time()
-        
+
         # Add operation ID to context metadata
         if context.metadata is None:
             context.metadata = {}
         context.metadata["operation_id"] = operation_id
         context.metadata["agent_id"] = self.agent_id
-        
+
         # Log the start of processing
-        logger.info(f"Agent {self.agent_id} processing started", extra={
-            "agent_id": self.agent_id,
-            "operation_id": operation_id,
-            "context_type": type(context).__name__,
-            "user_input_length": len(context.user_input) if context.user_input else 0
-        })
-        
+        logger.info(
+            f"Agent {self.agent_id} processing started",
+            extra={
+                "agent_id": self.agent_id,
+                "operation_id": operation_id,
+                "context_type": type(context).__name__,
+                "user_input_length": len(context.user_input)
+                if context.user_input
+                else 0,
+            },
+        )
+
         try:
             # Process with the wrapped agent
             response = await self.wrapped_agent.process(context)
-            
+
             # Calculate processing time
             processing_time = time.time() - start_time
-            
+
             # Log the successful completion
-            logger.info(f"Agent {self.agent_id} processing completed", extra={
-                "agent_id": self.agent_id,
-                "operation_id": operation_id,
-                "processing_time_ms": int(processing_time * 1000),
-                "response_length": len(response.text) if response.text else 0,
-                "confidence": response.confidence
-            })
-            
+            logger.info(
+                f"Agent {self.agent_id} processing completed",
+                extra={
+                    "agent_id": self.agent_id,
+                    "operation_id": operation_id,
+                    "processing_time_ms": int(processing_time * 1000),
+                    "response_length": len(response.text) if response.text else 0,
+                    "confidence": response.confidence,
+                },
+            )
+
             # Store in memory if available
             if self.memory:
                 memory_key = f"interaction:{operation_id}"
@@ -120,9 +129,9 @@ class ObservableAgent(Agent):
                     "agent_response": response.text,
                     "confidence": response.confidence,
                     "processing_time": processing_time,
-                    "timestamp": time.time()
+                    "timestamp": time.time(),
                 }
-                
+
                 try:
                     await self.memory.store(
                         key=memory_key,
@@ -131,12 +140,12 @@ class ObservableAgent(Agent):
                         metadata={
                             "agent_id": self.agent_id,
                             "operation_id": operation_id,
-                            "interaction_type": "user_query"
-                        }
+                            "interaction_type": "user_query",
+                        },
                     )
                 except Exception as e:
                     logger.warning(f"Failed to store in memory: {e}")
-            
+
             # Record metrics if enabled
             if self.enable_metrics:
                 self._record_metrics(
@@ -144,33 +153,38 @@ class ObservableAgent(Agent):
                     processing_time=processing_time,
                     response_length=len(response.text) if response.text else 0,
                     confidence=response.confidence,
-                    success=True
+                    success=True,
                 )
-            
+
             # Add observability metadata to response
             if response.metadata is None:
                 response.metadata = {}
-            response.metadata.update({
-                "operation_id": operation_id,
-                "processing_time_ms": int(processing_time * 1000),
-                "agent_id": self.agent_id
-            })
-            
+            response.metadata.update(
+                {
+                    "operation_id": operation_id,
+                    "processing_time_ms": int(processing_time * 1000),
+                    "agent_id": self.agent_id,
+                }
+            )
+
             return response
-            
+
         except Exception as e:
             # Calculate processing time
             processing_time = time.time() - start_time
-            
+
             # Log the error
-            logger.error(f"Agent {self.agent_id} processing failed: {e}", extra={
-                "agent_id": self.agent_id,
-                "operation_id": operation_id,
-                "processing_time_ms": int(processing_time * 1000),
-                "error": str(e),
-                "traceback": traceback.format_exc()
-            })
-            
+            logger.error(
+                f"Agent {self.agent_id} processing failed: {e}",
+                extra={
+                    "agent_id": self.agent_id,
+                    "operation_id": operation_id,
+                    "processing_time_ms": int(processing_time * 1000),
+                    "error": str(e),
+                    "traceback": traceback.format_exc(),
+                },
+            )
+
             # Record metrics if enabled
             if self.enable_metrics:
                 self._record_metrics(
@@ -179,9 +193,9 @@ class ObservableAgent(Agent):
                     response_length=0,
                     confidence=0.0,
                     success=False,
-                    error=str(e)
+                    error=str(e),
                 )
-            
+
             # Create error response
             error_response = AgentResponse(
                 text=f"An error occurred while processing your request: {e}",
@@ -190,50 +204,50 @@ class ObservableAgent(Agent):
                     "operation_id": operation_id,
                     "processing_time_ms": int(processing_time * 1000),
                     "agent_id": self.agent_id,
-                    "error": str(e)
-                }
+                    "error": str(e),
+                },
             )
-            
+
             return error_response
-    
+
     def can_handle(self, context: AgentContext) -> float:
         """
         Determine if this agent can handle the given context.
-        
+
         This method delegates to the wrapped agent's can_handle method.
-        
+
         Args:
             context: The context for this interaction
-            
+
         Returns:
             A score between 0 and 1
         """
         return self.wrapped_agent.can_handle(context)
-    
+
     async def initialize_async(self) -> None:
         """Initialize the agent asynchronously."""
         logger.info(f"Initializing agent {self.agent_id}")
-        
+
         # Initialize wrapped agent if it has an initialize_async method
         if hasattr(self.wrapped_agent, "initialize_async") and callable(
             self.wrapped_agent.initialize_async
         ):
             await self.wrapped_agent.initialize_async()
-        
+
         logger.info(f"Agent {self.agent_id} initialized")
-    
+
     async def close_async(self) -> None:
         """Close the agent and release resources asynchronously."""
         logger.info(f"Closing agent {self.agent_id}")
-        
+
         # Close wrapped agent if it has a close_async method
         if hasattr(self.wrapped_agent, "close_async") and callable(
             self.wrapped_agent.close_async
         ):
             await self.wrapped_agent.close_async()
-        
+
         logger.info(f"Agent {self.agent_id} closed")
-    
+
     def _record_metrics(
         self,
         operation_id: str,
@@ -241,14 +255,14 @@ class ObservableAgent(Agent):
         response_length: int,
         confidence: float,
         success: bool,
-        error: Optional[str] = None
+        error: Optional[str] = None,
     ) -> None:
         """
         Record metrics for monitoring.
-        
+
         In a production environment, this would send metrics to a monitoring system
         like Cloud Monitoring. For now, we just log them.
-        
+
         Args:
             operation_id: Unique identifier for this operation
             processing_time: Time taken to process the request in seconds
@@ -263,12 +277,12 @@ class ObservableAgent(Agent):
             "processing_time_ms": int(processing_time * 1000),
             "response_length": response_length,
             "confidence": confidence,
-            "success": success
+            "success": success,
         }
-        
+
         if error:
             metrics["error"] = error
-        
+
         # In a production environment, send to Cloud Monitoring
         # For now, just log as JSON
         logger.debug(f"METRICS: {json.dumps(metrics)}")
@@ -277,20 +291,20 @@ class ObservableAgent(Agent):
 class ObservableAgentFactory:
     """
     Factory for creating observable agents.
-    
+
     This factory creates observable agents that wrap other agent implementations
     and add observability features.
     """
-    
+
     def __init__(self, memory_factory=None):
         """
         Initialize the factory.
-        
+
         Args:
             memory_factory: Factory for creating memory systems
         """
         self.memory_factory = memory_factory
-    
+
     def create_observable_agent(
         self,
         wrapped_agent: Agent,
@@ -299,11 +313,11 @@ class ObservableAgentFactory:
         log_level: str = "INFO",
         enable_metrics: bool = True,
         enable_tracing: bool = True,
-        config: Optional[Dict[str, Any]] = None
+        config: Optional[Dict[str, Any]] = None,
     ) -> ObservableAgent:
         """
         Create an observable agent.
-        
+
         Args:
             wrapped_agent: The agent to wrap with observability features
             agent_id: Unique identifier for this agent
@@ -312,7 +326,7 @@ class ObservableAgentFactory:
             enable_metrics: Whether to collect metrics
             enable_tracing: Whether to enable distributed tracing
             config: Additional configuration options
-            
+
         Returns:
             An observable agent instance
         """
@@ -320,7 +334,7 @@ class ObservableAgentFactory:
         memory = None
         if self.memory_factory and memory_config:
             memory = self.memory_factory.create_layered_memory(memory_config)
-        
+
         # Create observable agent
         return ObservableAgent(
             wrapped_agent=wrapped_agent,
@@ -329,5 +343,5 @@ class ObservableAgentFactory:
             log_level=log_level,
             enable_metrics=enable_metrics,
             enable_tracing=enable_tracing,
-            config=config
+            config=config,
         )

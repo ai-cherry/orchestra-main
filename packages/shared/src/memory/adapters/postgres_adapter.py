@@ -90,7 +90,8 @@ class PostgresStorageAdapter(MemoryStoragePort):
         self._last_error = None
 
         logger.debug(
-            f"PostgresStorageAdapter initialized with host: {host}, database: {database}")
+            f"PostgresStorageAdapter initialized with host: {host}, database: {database}"
+        )
 
     async def initialize(self) -> None:
         """
@@ -123,7 +124,8 @@ class PostgresStorageAdapter(MemoryStoragePort):
 
             self._initialized = True
             logger.info(
-                f"PostgresStorageAdapter successfully connected to {self._host}:{self._port}/{self._database}")
+                f"PostgresStorageAdapter successfully connected to {self._host}:{self._port}/{self._database}"
+            )
 
         except Exception as e:
             error_msg = f"Failed to connect to PostgreSQL: {e}"
@@ -140,7 +142,8 @@ class PostgresStorageAdapter(MemoryStoragePort):
         try:
             async with self._pool.acquire() as conn:
                 # Create memory items table if it doesn't exist
-                await conn.execute(f'''
+                await conn.execute(
+                    f"""
                     CREATE TABLE IF NOT EXISTS {self._schema}.{MEMORY_ITEMS_TABLE} (
                         id TEXT PRIMARY KEY,
                         user_id TEXT NOT NULL,
@@ -153,26 +156,34 @@ class PostgresStorageAdapter(MemoryStoragePort):
                         embedding FLOAT[] DEFAULT NULL,
                         ttl TIMESTAMPTZ DEFAULT NULL
                     )
-                ''')
+                """
+                )
 
                 # Create indexes for efficient queries
-                await conn.execute(f'''
+                await conn.execute(
+                    f"""
                     CREATE INDEX IF NOT EXISTS idx_{MEMORY_ITEMS_TABLE}_user_id 
                     ON {self._schema}.{MEMORY_ITEMS_TABLE} (user_id)
-                ''')
+                """
+                )
 
-                await conn.execute(f'''
+                await conn.execute(
+                    f"""
                     CREATE INDEX IF NOT EXISTS idx_{MEMORY_ITEMS_TABLE}_session_id 
                     ON {self._schema}.{MEMORY_ITEMS_TABLE} (session_id)
-                ''')
+                """
+                )
 
-                await conn.execute(f'''
+                await conn.execute(
+                    f"""
                     CREATE INDEX IF NOT EXISTS idx_{MEMORY_ITEMS_TABLE}_timestamp 
                     ON {self._schema}.{MEMORY_ITEMS_TABLE} (timestamp DESC)
-                ''')
+                """
+                )
 
                 # Create agent data table if it doesn't exist
-                await conn.execute(f'''
+                await conn.execute(
+                    f"""
                     CREATE TABLE IF NOT EXISTS {self._schema}.{AGENT_DATA_TABLE} (
                         id TEXT PRIMARY KEY,
                         agent_id TEXT NOT NULL,
@@ -181,16 +192,18 @@ class PostgresStorageAdapter(MemoryStoragePort):
                         timestamp TIMESTAMPTZ DEFAULT NOW(),
                         metadata JSONB DEFAULT '{{}}'::jsonb
                     )
-                ''')
+                """
+                )
 
                 # Create index for agent queries
-                await conn.execute(f'''
+                await conn.execute(
+                    f"""
                     CREATE INDEX IF NOT EXISTS idx_{AGENT_DATA_TABLE}_agent_id 
                     ON {self._schema}.{AGENT_DATA_TABLE} (agent_id)
-                ''')
+                """
+                )
 
-                logger.debug(
-                    "PostgreSQL tables and indexes created or verified")
+                logger.debug("PostgreSQL tables and indexes created or verified")
 
         except Exception as e:
             error_msg = f"Failed to create tables in PostgreSQL: {e}"
@@ -212,8 +225,7 @@ class PostgresStorageAdapter(MemoryStoragePort):
             MemoryConnectionError: If the adapter is not initialized
         """
         if not self._initialized or not self._pool:
-            raise MemoryConnectionError(
-                "PostgresStorageAdapter is not initialized")
+            raise MemoryConnectionError("PostgresStorageAdapter is not initialized")
 
     async def save_item(self, item: MemoryItem) -> str:
         """
@@ -246,11 +258,15 @@ class PostgresStorageAdapter(MemoryStoragePort):
 
             # Calculate TTL if configured
             ttl = None
-            if hasattr(self._config, "item_ttl_days") and self._config.item_ttl_days > 0:
+            if (
+                hasattr(self._config, "item_ttl_days")
+                and self._config.item_ttl_days > 0
+            ):
                 ttl = datetime.now() + timedelta(days=self._config.item_ttl_days)
 
             async with self._pool.acquire() as conn:
-                await conn.execute(f'''
+                await conn.execute(
+                    f"""
                     INSERT INTO {self._schema}.{MEMORY_ITEMS_TABLE}
                     (id, user_id, session_id, item_type, text_content, persona_active, timestamp, metadata, embedding, ttl)
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
@@ -265,18 +281,18 @@ class PostgresStorageAdapter(MemoryStoragePort):
                         metadata = $8,
                         embedding = $9,
                         ttl = $10
-                ''',
-                                   item.id,
-                                   item.user_id,
-                                   item.session_id,
-                                   item.item_type,
-                                   item.text_content,
-                                   item.persona_active,
-                                   item.timestamp or datetime.now(),
-                                   metadata,
-                                   embedding,
-                                   ttl
-                                   )
+                """,
+                    item.id,
+                    item.user_id,
+                    item.session_id,
+                    item.item_type,
+                    item.text_content,
+                    item.persona_active,
+                    item.timestamp or datetime.now(),
+                    metadata,
+                    embedding,
+                    ttl,
+                )
 
             logger.debug(f"Saved memory item {item.id} to PostgreSQL")
             return item.id
@@ -304,35 +320,36 @@ class PostgresStorageAdapter(MemoryStoragePort):
 
         try:
             async with self._pool.acquire() as conn:
-                row = await conn.fetchrow(f'''
+                row = await conn.fetchrow(
+                    f"""
                     SELECT id, user_id, session_id, item_type, text_content, persona_active, 
                            timestamp, metadata, embedding
                     FROM {self._schema}.{MEMORY_ITEMS_TABLE}
                     WHERE id = $1
-                ''', item_id)
+                """,
+                    item_id,
+                )
 
                 if not row:
                     return None
 
                 # Convert PostgreSQL row to MemoryItem
                 # Note: This keeps infrastructure concerns in the adapter
-                metadata = json.loads(
-                    row['metadata']) if row['metadata'] else {}
+                metadata = json.loads(row["metadata"]) if row["metadata"] else {}
 
                 # Convert embedding from database format to list if present
-                embedding = list(
-                    row['embedding']) if row['embedding'] else None
+                embedding = list(row["embedding"]) if row["embedding"] else None
 
                 return MemoryItem(
-                    id=row['id'],
-                    user_id=row['user_id'],
-                    session_id=row['session_id'],
-                    item_type=row['item_type'],
-                    text_content=row['text_content'],
-                    persona_active=row['persona_active'],
-                    timestamp=row['timestamp'],
+                    id=row["id"],
+                    user_id=row["user_id"],
+                    session_id=row["session_id"],
+                    item_type=row["item_type"],
+                    text_content=row["text_content"],
+                    persona_active=row["persona_active"],
+                    timestamp=row["timestamp"],
                     metadata=metadata,
-                    embedding=embedding
+                    embedding=embedding,
                 )
 
         except Exception as e:
@@ -365,12 +382,12 @@ class PostgresStorageAdapter(MemoryStoragePort):
 
         try:
             # Build the SQL query with parameters
-            query = f'''
+            query = f"""
                 SELECT id, user_id, session_id, item_type, text_content, persona_active, 
                        timestamp, metadata, embedding
                 FROM {self._schema}.{MEMORY_ITEMS_TABLE}
                 WHERE user_id = $1
-            '''
+            """
 
             params = [user_id]
             param_index = 2
@@ -379,26 +396,26 @@ class PostgresStorageAdapter(MemoryStoragePort):
             where_clauses = []
 
             for key, value in filters.items():
-                if key == 'session_id' and value:
+                if key == "session_id" and value:
                     where_clauses.append(f"session_id = ${param_index}")
                     params.append(value)
                     param_index += 1
-                elif key == 'item_type' and value:
+                elif key == "item_type" and value:
                     where_clauses.append(f"item_type = ${param_index}")
                     params.append(value)
                     param_index += 1
-                elif key == 'persona_active' and value:
+                elif key == "persona_active" and value:
                     where_clauses.append(f"persona_active = ${param_index}")
                     params.append(value)
                     param_index += 1
-                elif key == 'timestamp' and isinstance(value, dict):
-                    if 'start' in value:
+                elif key == "timestamp" and isinstance(value, dict):
+                    if "start" in value:
                         where_clauses.append(f"timestamp >= ${param_index}")
-                        params.append(value['start'])
+                        params.append(value["start"])
                         param_index += 1
-                    if 'end' in value:
+                    if "end" in value:
                         where_clauses.append(f"timestamp <= ${param_index}")
-                        params.append(value['end'])
+                        params.append(value["end"])
                         param_index += 1
                 # Add more filter types as needed
 
@@ -418,30 +435,28 @@ class PostgresStorageAdapter(MemoryStoragePort):
             result = []
             for row in rows:
                 try:
-                    metadata = json.loads(
-                        row['metadata']) if row['metadata'] else {}
-                    embedding = list(
-                        row['embedding']) if row['embedding'] else None
+                    metadata = json.loads(row["metadata"]) if row["metadata"] else {}
+                    embedding = list(row["embedding"]) if row["embedding"] else None
 
                     memory_item = MemoryItem(
-                        id=row['id'],
-                        user_id=row['user_id'],
-                        session_id=row['session_id'],
-                        item_type=row['item_type'],
-                        text_content=row['text_content'],
-                        persona_active=row['persona_active'],
-                        timestamp=row['timestamp'],
+                        id=row["id"],
+                        user_id=row["user_id"],
+                        session_id=row["session_id"],
+                        item_type=row["item_type"],
+                        text_content=row["text_content"],
+                        persona_active=row["persona_active"],
+                        timestamp=row["timestamp"],
                         metadata=metadata,
-                        embedding=embedding
+                        embedding=embedding,
                     )
                     result.append(memory_item)
                 except Exception as e:
                     logger.warning(
-                        f"Error parsing row for id {row['id'] if 'id' in row else 'unknown'}: {e}")
+                        f"Error parsing row for id {row['id'] if 'id' in row else 'unknown'}: {e}"
+                    )
                     continue
 
-            logger.debug(
-                f"Retrieved {len(result)} memory items for user {user_id}")
+            logger.debug(f"Retrieved {len(result)} memory items for user {user_id}")
             return result
 
         except Exception as e:
@@ -478,7 +493,8 @@ class PostgresStorageAdapter(MemoryStoragePort):
             metadata = json.dumps(data.metadata or {})
 
             async with self._pool.acquire() as conn:
-                await conn.execute(f'''
+                await conn.execute(
+                    f"""
                     INSERT INTO {self._schema}.{AGENT_DATA_TABLE}
                     (id, agent_id, data_type, content, timestamp, metadata)
                     VALUES ($1, $2, $3, $4, $5, $6)
@@ -489,17 +505,18 @@ class PostgresStorageAdapter(MemoryStoragePort):
                         content = $4,
                         timestamp = $5,
                         metadata = $6
-                ''',
-                                   data.id,
-                                   data.agent_id,
-                                   data.data_type,
-                                   data.content,
-                                   data.timestamp or datetime.now(),
-                                   metadata
-                                   )
+                """,
+                    data.id,
+                    data.agent_id,
+                    data.data_type,
+                    data.content,
+                    data.timestamp or datetime.now(),
+                    metadata,
+                )
 
             logger.debug(
-                f"Saved agent data {data.id} for agent {data.agent_id} to PostgreSQL")
+                f"Saved agent data {data.id} for agent {data.agent_id} to PostgreSQL"
+            )
             return data.id
 
         except Exception as e:
@@ -538,7 +555,8 @@ class PostgresStorageAdapter(MemoryStoragePort):
 
             if not where_clauses:
                 raise MemoryValidationError(
-                    "At least one filter criterion is required for deletion")
+                    "At least one filter criterion is required for deletion"
+                )
 
             query += " AND ".join(where_clauses)
 
@@ -574,7 +592,7 @@ class PostgresStorageAdapter(MemoryStoragePort):
                 "host": self._host,
                 "database": self._database,
                 "schema": self._schema,
-            }
+            },
         }
 
         if self._last_error:

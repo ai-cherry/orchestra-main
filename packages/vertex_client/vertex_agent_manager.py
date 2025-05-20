@@ -37,12 +37,20 @@ except ImportError:
     try:
         import sys
         import os.path
-        sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-        from packages.shared.src.gcp.auth import get_gcp_credentials, initialize_gcp_auth
+
+        sys.path.append(
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+        )
+        from packages.shared.src.gcp.auth import (
+            get_gcp_credentials,
+            initialize_gcp_auth,
+        )
     except ImportError:
         get_gcp_credentials = None
         initialize_gcp_auth = None
-        logging.warning("GCP auth utilities not found. Falling back to default credentials.")
+        logging.warning(
+            "GCP auth utilities not found. Falling back to default credentials."
+        )
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -62,7 +70,7 @@ class VertexAgentManager:
         location: str = "us-west2",
         agent_id: Optional[str] = None,
         pubsub_topic: str = "orchestra-bus-dev",
-        service_account_json: Optional[str] = None
+        service_account_json: Optional[str] = None,
     ):
         """
         Initialize the Vertex Agent Manager.
@@ -75,30 +83,38 @@ class VertexAgentManager:
             service_account_json: Optional service account JSON key content
         """
         # Get project ID from parameters, environment, or GCP auth utilities
-        self.project_id = project_id or os.environ.get("GCP_PROJECT_ID") or os.environ.get("GOOGLE_CLOUD_PROJECT")
+        self.project_id = (
+            project_id
+            or os.environ.get("GCP_PROJECT_ID")
+            or os.environ.get("GOOGLE_CLOUD_PROJECT")
+        )
         self.location = location
         self.agent_id = agent_id
         self.pubsub_topic = pubsub_topic
-        self.service_account_json = service_account_json or os.environ.get("GCP_SA_KEY_JSON")
-        
+        self.service_account_json = service_account_json or os.environ.get(
+            "GCP_SA_KEY_JSON"
+        )
+
         # If we still don't have a project_id, try to get it from credentials
         if not self.project_id and get_gcp_credentials is not None:
             _, detected_project_id = get_gcp_credentials(
                 service_account_json=self.service_account_json
             )
             self.project_id = detected_project_id
-            
+
         # Fall back to hardcoded project ID if all else fails
         if not self.project_id:
             self.project_id = "cherry-ai-project"
-            logger.warning(f"No project ID provided, falling back to default: {self.project_id}")
+            logger.warning(
+                f"No project ID provided, falling back to default: {self.project_id}"
+            )
 
         # Set up authentication
         self._setup_auth()
-        
+
         # Initialize clients
         self._initialize_clients()
-        
+
         # Get OpenRouter API key
         self.api_key = self._get_secret("openrouter")
 
@@ -109,23 +125,25 @@ class VertexAgentManager:
             try:
                 # Initialize GCP auth
                 auth_result = initialize_gcp_auth()
-                if auth_result['success']:
+                if auth_result["success"]:
                     logger.info(
                         f"GCP authentication initialized using {auth_result['method']} "
                         f"for project {auth_result['project_id']}"
                     )
-                    
+
                     # Update project_id if it wasn't explicitly set
-                    if not self.project_id and auth_result['project_id']:
-                        self.project_id = auth_result['project_id']
+                    if not self.project_id and auth_result["project_id"]:
+                        self.project_id = auth_result["project_id"]
                 else:
-                    logger.warning("GCP authentication initialization was not successful")
+                    logger.warning(
+                        "GCP authentication initialization was not successful"
+                    )
             except Exception as e:
                 logger.error(f"Error setting up GCP authentication: {e}")
                 # Continue and try default initialization
         else:
             logger.info("Using default GCP authentication mechanisms")
-    
+
     def _initialize_clients(self) -> None:
         """Initialize all GCP clients with proper authentication."""
         try:
@@ -135,29 +153,43 @@ class VertexAgentManager:
                 try:
                     credentials, _ = get_gcp_credentials(
                         service_account_json=self.service_account_json,
-                        project_id=self.project_id
+                        project_id=self.project_id,
                     )
-                    logger.info("Using explicit service account credentials for GCP clients")
+                    logger.info(
+                        "Using explicit service account credentials for GCP clients"
+                    )
                 except Exception as e:
-                    logger.warning(f"Could not get credentials using auth utilities: {e}")
-            
+                    logger.warning(
+                        f"Could not get credentials using auth utilities: {e}"
+                    )
+
             # Initialize Vertex AI
             if vertexai is not None:
-                vertexai.init(project=self.project_id, location=self.location, credentials=credentials)
-                logger.info(f"Vertex AI initialized for project {self.project_id} in {self.location}")
+                vertexai.init(
+                    project=self.project_id,
+                    location=self.location,
+                    credentials=credentials,
+                )
+                logger.info(
+                    f"Vertex AI initialized for project {self.project_id} in {self.location}"
+                )
             else:
                 logger.warning("Vertex AI library not available")
-            
+
             # Initialize Pub/Sub publisher
             if pubsub_v1 is not None:
                 self.publisher = pubsub_v1.PublisherClient(credentials=credentials)
-                self.topic_path = self.publisher.topic_path(self.project_id, self.pubsub_topic)
-                logger.info(f"Pub/Sub publisher initialized for topic: {self.pubsub_topic}")
+                self.topic_path = self.publisher.topic_path(
+                    self.project_id, self.pubsub_topic
+                )
+                logger.info(
+                    f"Pub/Sub publisher initialized for topic: {self.pubsub_topic}"
+                )
             else:
                 logger.warning("Pub/Sub library not available")
                 self.publisher = None
                 self.topic_path = None
-            
+
             # Initialize Cloud Run client
             if run_v2 is not None:
                 self.run_client = run_v2.ServicesClient(credentials=credentials)
@@ -165,10 +197,12 @@ class VertexAgentManager:
             else:
                 logger.warning("Cloud Run library not available")
                 self.run_client = None
-            
+
             # Initialize Secret Manager client
             if secretmanager is not None:
-                self.secret_client = secretmanager.SecretManagerServiceClient(credentials=credentials)
+                self.secret_client = secretmanager.SecretManagerServiceClient(
+                    credentials=credentials
+                )
                 logger.info("Secret Manager client initialized")
             else:
                 logger.warning("Secret Manager library not available")
@@ -188,9 +222,11 @@ class VertexAgentManager:
             Secret value as a string
         """
         if not self.secret_client:
-            logger.warning(f"Secret Manager client not initialized, cannot retrieve secret: {secret_id}")
+            logger.warning(
+                f"Secret Manager client not initialized, cannot retrieve secret: {secret_id}"
+            )
             return ""
-            
+
         name = f"projects/{self.project_id}/secrets/{secret_id}/versions/latest"
         try:
             response = self.secret_client.access_secret_version(request={"name": name})
@@ -217,7 +253,7 @@ class VertexAgentManager:
         if agent_builder is None:
             logger.error("Vertex AI Agent Builder library not available")
             raise ImportError("Vertex AI Agent Builder library not available")
-            
+
         try:
             # Try to get existing agent by ID if provided
             if self.agent_id:
@@ -691,20 +727,20 @@ if __name__ == "__main__":
                     is_correct = player_action == "answer_a"
                     if is_correct:
                         game_state["scores"]["player1"] += 10
-                        game_state["response"] = (
-                            "Cherry says: That's correct! You earned 10 points!"
-                        )
+                        game_state[
+                            "response"
+                        ] = "Cherry says: That's correct! You earned 10 points!"
                     else:
-                        game_state["response"] = (
-                            "Cherry says: Sorry, that's incorrect. The correct answer was A."
-                        )
+                        game_state[
+                            "response"
+                        ] = "Cherry says: Sorry, that's incorrect. The correct answer was A."
             elif game_type == "word_game":
                 # Simple word game logic
                 word_length = len(player_action)
                 game_state["scores"]["player1"] += word_length
-                game_state["response"] = (
-                    f"Cherry says: Nice word worth {word_length} points!"
-                )
+                game_state[
+                    "response"
+                ] = f"Cherry says: Nice word worth {word_length} points!"
 
             # Increment the round
             game_state["current_round"] += 1

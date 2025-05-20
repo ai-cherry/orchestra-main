@@ -12,14 +12,18 @@ from datetime import datetime
 from typing import Dict, List, Optional, Any, Union
 import asyncio
 
-from packages.shared.src.memory.base_memory_manager import BaseMemoryManager # New import
-from packages.shared.src.memory.memory_interface import MemoryInterface # New import
-from .memory_types import MemoryHealth # Correct relative import
+from packages.shared.src.memory.base_memory_manager import (
+    BaseMemoryManager,
+)  # New import
+from packages.shared.src.memory.memory_interface import MemoryInterface  # New import
+from .memory_types import MemoryHealth  # Correct relative import
 from packages.shared.src.models.base_models import MemoryItem, AgentData, PersonaConfig
+
 # Fix the import to use the v2 module instead
 from packages.shared.src.storage.firestore.v2 import (
     FirestoreMemoryManagerV2 as FirestoreMemoryManager,
 )
+
 # Import common exceptions
 from packages.shared.src.storage.exceptions import StorageError, ValidationError
 from packages.shared.src.storage.redis.redis_client import RedisClient
@@ -28,7 +32,7 @@ from packages.shared.src.storage.redis.redis_client import RedisClient
 logger = logging.getLogger(__name__)
 
 
-class FirestoreV1MemoryManager(BaseMemoryManager): # Renamed class and changed base
+class FirestoreV1MemoryManager(BaseMemoryManager):  # Renamed class and changed base
     """
     Firestore V1 memory manager implementation using Firestore and Redis.
 
@@ -38,7 +42,7 @@ class FirestoreV1MemoryManager(BaseMemoryManager): # Renamed class and changed b
 
     def __init__(
         self,
-        firestore_memory: FirestoreMemoryManager, # Injected instance
+        firestore_memory: FirestoreMemoryManager,  # Injected instance
         redis_host: Optional[str] = None,
         redis_port: Optional[int] = None,
         redis_password: Optional[str] = None,
@@ -65,7 +69,7 @@ class FirestoreV1MemoryManager(BaseMemoryManager): # Renamed class and changed b
         )
 
         self._cache_ttl = cache_ttl
-        self._initialized = False # Keep for Redis initialization status
+        self._initialized = False  # Keep for Redis initialization status
         self._redis_available = False
 
         # Track errors for health monitoring

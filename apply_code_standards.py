@@ -53,8 +53,7 @@ from typing import List, Optional, Tuple
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger("apply_code_standards")
 
@@ -79,7 +78,7 @@ def run_command(command: List[str], cwd: Optional[str] = None) -> Tuple[bool, st
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
-            check=False
+            check=False,
         )
         success = result.returncode == 0
         output = result.stdout
@@ -207,8 +206,10 @@ def format_terraform(directories: List[str]) -> bool:
         True if successful, False otherwise
     """
     if not is_tool_installed("terraform"):
-        logger.error("Terraform is not installed. Install it following the instructions at: "
-                     "https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli")
+        logger.error(
+            "Terraform is not installed. Install it following the instructions at: "
+            "https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli"
+        )
         return False
 
     logger.info("Formatting Terraform files...")
@@ -262,8 +263,10 @@ def validate_terraform(directories: List[str]) -> bool:
         True if successful, False otherwise
     """
     if not is_tool_installed("terraform"):
-        logger.error("Terraform is not installed. Install it following the instructions at: "
-                     "https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli")
+        logger.error(
+            "Terraform is not installed. Install it following the instructions at: "
+            "https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli"
+        )
         return False
 
     logger.info("Validating Terraform configurations...")
@@ -293,7 +296,9 @@ def validate_terraform(directories: List[str]) -> bool:
             init_success, init_output = run_command(init_command, cwd=tf_dir)
 
             if not init_success:
-                logger.warning(f"Terraform initialization failed in {tf_dir}, skipping validation")
+                logger.warning(
+                    f"Terraform initialization failed in {tf_dir}, skipping validation"
+                )
                 logger.warning(f"Output: {init_output}")
                 results.append(False)
                 continue
@@ -328,8 +333,10 @@ def run_tflint(directories: List[str]) -> bool:
         True if successful, False otherwise
     """
     if not is_tool_installed("tflint"):
-        logger.error("tflint is not installed. Install it following the instructions at: "
-                     "https://github.com/terraform-linters/tflint#installation")
+        logger.error(
+            "tflint is not installed. Install it following the instructions at: "
+            "https://github.com/terraform-linters/tflint#installation"
+        )
         return False
 
     logger.info("Running tflint to check for Terraform linting issues...")
@@ -378,7 +385,9 @@ def setup_pre_commit() -> bool:
         True if successful, False otherwise
     """
     if not is_tool_installed("pre-commit"):
-        logger.error("pre-commit is not installed. Install it with: pip install pre-commit")
+        logger.error(
+            "pre-commit is not installed. Install it with: pip install pre-commit"
+        )
         return False
 
     logger.info("Setting up pre-commit hooks...")
@@ -403,47 +412,23 @@ def main() -> int:
     parser.add_argument(
         "directories",
         nargs="*",
-        help="Directories to process (default: the entire project)"
+        help="Directories to process (default: the entire project)",
+    )
+    parser.add_argument("--no-black", action="store_true", help="Skip Black formatting")
+    parser.add_argument("--no-isort", action="store_true", help="Skip isort formatting")
+    parser.add_argument("--no-flake8", action="store_true", help="Skip flake8 linting")
+    parser.add_argument(
+        "--no-pre-commit", action="store_true", help="Skip pre-commit setup"
     )
     parser.add_argument(
-        "--no-black",
-        action="store_true",
-        help="Skip Black formatting"
+        "--no-terraform", action="store_true", help="Skip Terraform formatting"
     )
     parser.add_argument(
-        "--no-isort",
-        action="store_true",
-        help="Skip isort formatting"
+        "--no-terraform-validate", action="store_true", help="Skip Terraform validation"
     )
+    parser.add_argument("--no-tflint", action="store_true", help="Skip tflint linting")
     parser.add_argument(
-        "--no-flake8",
-        action="store_true",
-        help="Skip flake8 linting"
-    )
-    parser.add_argument(
-        "--no-pre-commit",
-        action="store_true",
-        help="Skip pre-commit setup"
-    )
-    parser.add_argument(
-        "--no-terraform",
-        action="store_true",
-        help="Skip Terraform formatting"
-    )
-    parser.add_argument(
-        "--no-terraform-validate",
-        action="store_true",
-        help="Skip Terraform validation"
-    )
-    parser.add_argument(
-        "--no-tflint",
-        action="store_true",
-        help="Skip tflint linting"
-    )
-    parser.add_argument(
-        "--verbose", "-v",
-        action="store_true",
-        help="Enable verbose logging"
+        "--verbose", "-v", action="store_true", help="Enable verbose logging"
     )
 
     args = parser.parse_args()

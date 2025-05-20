@@ -6,5 +6,5 @@ class TestExample(unittest.TestCase):
         self.assertEqual(1 + 1, 2, "Simple addition should work")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

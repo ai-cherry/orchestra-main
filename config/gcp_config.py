@@ -17,7 +17,9 @@ BASE_CONFIG = {
     "region": os.environ.get("GCP_REGION", "us-central1"),
     "memory_type": "firestore",  # Use Firestore for memory management in GCP
     "memory_collection": "memories",
-    "credentials_path": os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "/app/gcp-credentials.json"),
+    "credentials_path": os.environ.get(
+        "GOOGLE_APPLICATION_CREDENTIALS", "/app/gcp-credentials.json"
+    ),
 }
 
 # Environment-specific configurations
@@ -32,7 +34,7 @@ ENV_CONFIGS = {
     },
     "production": {
         "memory_collection": "prod_memories",
-    }
+    },
 }
 
 
@@ -51,7 +53,8 @@ def get_gcp_config() -> Dict[str, Any]:
         config.update(ENV_CONFIGS[ENVIRONMENT])
     else:
         logger.warning(
-            f"Unknown environment: {ENVIRONMENT}, using default configuration")
+            f"Unknown environment: {ENVIRONMENT}, using default configuration"
+        )
 
     # Log the active configuration (excluding sensitive info)
     safe_config = config.copy()
@@ -73,5 +76,5 @@ def get_memory_manager_config() -> Dict[str, Any]:
     return {
         "memory_type": config.get("memory_type", "in-memory"),
         "collection_name": config.get("memory_collection", "memories"),
-        "credentials_path": config.get("credentials_path")
+        "credentials_path": config.get("credentials_path"),
     }

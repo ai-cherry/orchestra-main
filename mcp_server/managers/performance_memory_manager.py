@@ -14,7 +14,14 @@ import logging
 import asyncio
 import threading
 from ..interfaces.memory_manager import IMemoryManager
-from ..models.memory import MemoryEntry, MemoryMetadata, MemoryType, MemoryScope, CompressionLevel, StorageTier
+from ..models.memory import (
+    MemoryEntry,
+    MemoryMetadata,
+    MemoryType,
+    MemoryScope,
+    CompressionLevel,
+    StorageTier,
+)
 from ..storage.optimized_memory_storage import OptimizedMemoryStorage
 from ..storage.sync_storage_adapter import SyncStorageAdapter
 from ..utils.performance_monitor import get_performance_monitor
@@ -45,7 +52,9 @@ class PerformanceMemoryManager(IMemoryManager):
         stats: Statistics dictionary for tracking operations
     """
 
-    def __init__(self, config: Dict[str, Any] = None, storage=None, performance_monitor=None):
+    def __init__(
+        self, config: Dict[str, Any] = None, storage=None, performance_monitor=None
+    ):
         """Initialize with performance-focused configuration.
 
         Args:
@@ -67,8 +76,12 @@ class PerformanceMemoryManager(IMemoryManager):
         self.storage_adapter = SyncStorageAdapter(self.storage)
 
         # Initialize cache
-        self.cache: Dict[str, Dict[str, Any]] = {}  # Local in-process cache for ultra-fast access
-        self.max_cache_items = self.config.get("max_cache_items", 1000)  # Limit cache size
+        self.cache: Dict[
+            str, Dict[str, Any]
+        ] = {}  # Local in-process cache for ultra-fast access
+        self.max_cache_items = self.config.get(
+            "max_cache_items", 1000
+        )  # Limit cache size
         self.cache_ttl = self.config.get("cache_ttl", 300)  # 5 minutes default
         self.cache_last_cleanup = time.time()
         self.cache_cleanup_interval = 60  # Clean expired items every minute
@@ -89,11 +102,14 @@ class PerformanceMemoryManager(IMemoryManager):
             "store_count": 0,
             "retrieve_count": 0,
             "delete_count": 0,
-            "search_count": 0
+            "search_count": 0,
         }
 
-        logger.info("Initialized PerformanceMemoryManager with cache_ttl=%s seconds, max_items=%s",
-                    self.cache_ttl, self.max_cache_items)
+        logger.info(
+            "Initialized PerformanceMemoryManager with cache_ttl=%s seconds, max_items=%s",
+            self.cache_ttl,
+            self.max_cache_items,
+        )
 
     async def initialize(self) -> bool:
         """Initialize the memory manager.
@@ -139,8 +155,9 @@ class PerformanceMemoryManager(IMemoryManager):
                 return False
         return True
 
-    async def store(self, key: str, content: Any, tool_name: str,
-                    ttl_seconds: int = 3600) -> bool:
+    async def store(
+        self, key: str, content: Any, tool_name: str, ttl_seconds: int = 3600
+    ) -> bool:
         """Store content with optimized parameters.
 
         Args:
@@ -173,7 +190,7 @@ class PerformanceMemoryManager(IMemoryManager):
                 last_accessed=time.time(),
                 version=1,
                 sync_status={},
-                content_hash=None  # Will be computed during save
+                content_hash=None,  # Will be computed during save
             )
 
             # Create memory entry with performance-optimized defaults
@@ -185,7 +202,7 @@ class PerformanceMemoryManager(IMemoryManager):
                 ttl_seconds=ttl_seconds,
                 content=content,
                 metadata=metadata,
-                storage_tier=StorageTier.HOT
+                storage_tier=StorageTier.HOT,
             )
 
             # Update local cache with thread safety
@@ -197,7 +214,7 @@ class PerformanceMemoryManager(IMemoryManager):
                 # Add to cache
                 self.cache[key] = {
                     "content": content,
-                    "expires_at": time.time() + min(ttl_seconds, self.cache_ttl)
+                    "expires_at": time.time() + min(ttl_seconds, self.cache_ttl),
                 }
 
                 # Clean cache if needed
@@ -275,9 +292,9 @@ class PerformanceMemoryManager(IMemoryManager):
                 # Update cache
                 with self._lock:
                     # Check if entry has content field (it should be a MemoryEntry)
-                    if hasattr(entry, 'content'):
+                    if hasattr(entry, "content"):
                         content = entry.content
-                        ttl = getattr(entry, 'ttl_seconds', self.cache_ttl)
+                        ttl = getattr(entry, "ttl_seconds", self.cache_ttl)
                     else:
                         # If it's not a MemoryEntry, use it directly
                         content = entry
@@ -285,7 +302,7 @@ class PerformanceMemoryManager(IMemoryManager):
 
                     self.cache[key] = {
                         "content": content,
-                        "expires_at": time.time() + min(ttl, self.cache_ttl)
+                        "expires_at": time.time() + min(ttl, self.cache_ttl),
                     }
 
                 duration = time.time() - start_time
@@ -395,15 +412,19 @@ class PerformanceMemoryManager(IMemoryManager):
                     else:
                         content = item
 
-                    formatted_results.append({
-                        "key": key,
-                        "content": content,
-                        "score": 1.0  # Simple relevance score for now
-                    })
+                    formatted_results.append(
+                        {
+                            "key": key,
+                            "content": content,
+                            "score": 1.0,  # Simple relevance score for now
+                        }
+                    )
 
                 duration = time.time() - start_time
                 self.perf.record_operation("memory_manager.search", duration)
-                logger.debug("Found %d results for query '%s'", len(formatted_results), query)
+                logger.debug(
+                    "Found %d results for query '%s'", len(formatted_results), query
+                )
                 return formatted_results
 
             except Exception as e:
@@ -435,7 +456,7 @@ class PerformanceMemoryManager(IMemoryManager):
                     "status": "not_initialized",
                     "cache_items": len(self.cache),
                     "storage": {"status": "unknown"},
-                    "stats": self.stats
+                    "stats": self.stats,
                 }
 
             try:
@@ -446,12 +467,16 @@ class PerformanceMemoryManager(IMemoryManager):
                 storage_health = {"status": "error", "error": str(e)}
 
             result = {
-                "status": "healthy" if storage_health.get("status") == "healthy" else "degraded",
+                "status": "healthy"
+                if storage_health.get("status") == "healthy"
+                else "degraded",
                 "cache_items": len(self.cache),
                 "cache_max_items": self.max_cache_items,
-                "cache_usage_percent": (len(self.cache) / self.max_cache_items) * 100 if self.max_cache_items > 0 else 0,
+                "cache_usage_percent": (len(self.cache) / self.max_cache_items) * 100
+                if self.max_cache_items > 0
+                else 0,
                 "storage": storage_health,
-                "stats": self.stats
+                "stats": self.stats,
             }
 
             duration = time.time() - start_time
@@ -462,11 +487,7 @@ class PerformanceMemoryManager(IMemoryManager):
             logger.error("Error performing health check: %s", str(e))
             duration = time.time() - start_time
             self.perf.record_operation("memory_manager.health_check.error", duration)
-            return {
-                "status": "error",
-                "error": str(e),
-                "stats": self.stats
-            }
+            return {"status": "error", "error": str(e), "stats": self.stats}
 
     def _evict_cache_items(self) -> None:
         """Evict items from cache when it reaches the size limit.
@@ -487,8 +508,7 @@ class PerformanceMemoryManager(IMemoryManager):
 
         # Sort keys by expiration time (oldest first)
         sorted_keys = sorted(
-            self.cache.keys(),
-            key=lambda k: self.cache[k].get("expires_at", 0)
+            self.cache.keys(), key=lambda k: self.cache[k].get("expires_at", 0)
         )
 
         # Remove oldest items

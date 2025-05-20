@@ -27,9 +27,9 @@ def mock_env_vars():
     os.environ["GCP_PROJECT_ID"] = "mock-project-id"
     os.environ["GCP_REGION"] = "us-central1"
     os.environ["MACHINE_TYPE"] = "n1-standard-4"
-    
+
     yield
-    
+
     # Restore original environment
     os.environ.clear()
     os.environ.update(original_environ)
@@ -43,14 +43,16 @@ def mock_vertex_model():
         # Mock the upload method
         mock_model.upload = MagicMock()
         mock_model.upload.return_value = mock_model
-        
+
         # Mock the deploy method
         mock_model.deploy = AsyncMock()
         mock_model.deploy.return_value = mock_model
-        
+
         # Add name attribute
-        mock_model.name = "projects/mock-project-id/locations/us-central1/models/mock-model-id"
-        
+        mock_model.name = (
+            "projects/mock-project-id/locations/us-central1/models/mock-model-id"
+        )
+
         yield mock_model
 
 
@@ -62,16 +64,18 @@ def mock_vertex_endpoint():
         # Mock the create method
         mock_endpoint.create = MagicMock()
         mock_endpoint.create.return_value = mock_endpoint
-        
+
         # Mock the predict method
         mock_endpoint.predict = AsyncMock()
-        mock_endpoint.predict.return_value = MagicMock(predictions=[
-            {"confidence": 0.95, "class": "test_class"}
-        ])
-        
+        mock_endpoint.predict.return_value = MagicMock(
+            predictions=[{"confidence": 0.95, "class": "test_class"}]
+        )
+
         # Add name attribute
-        mock_endpoint.name = "projects/mock-project-id/locations/us-central1/endpoints/mock-endpoint-id"
-        
+        mock_endpoint.name = (
+            "projects/mock-project-id/locations/us-central1/endpoints/mock-endpoint-id"
+        )
+
         yield mock_endpoint
 
 
@@ -96,12 +100,9 @@ def test_model_config():
         "max_replicas": 3,
         "metadata": {
             "framework": "tensorflow",
-            "description": "Test model for unit tests"
+            "description": "Test model for unit tests",
         },
-        "labels": {
-            "environment": "test",
-            "team": "ai-orchestra"
-        }
+        "labels": {"environment": "test", "team": "ai-orchestra"},
     }
 
 
@@ -110,16 +111,16 @@ def test_model_config():
 def test_model_config_file(test_model_config, tmp_path):
     """Create a temporary model configuration file."""
     import json
-    
+
     # Create a temporary config file
     config_dir = tmp_path / "model_configs"
     config_dir.mkdir()
     config_file = config_dir / "test-model.json"
-    
+
     # Write the config to the file
     with open(config_file, "w") as f:
         json.dump(test_model_config, f)
-    
+
     yield str(config_file)
 
 

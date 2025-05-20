@@ -33,8 +33,9 @@ T = TypeVar("T")
 
 class CircuitState(enum.Enum):
     """Circuit breaker states."""
+
     CLOSED = "closed"  # Normal operation
-    OPEN = "open"      # Circuit is open, operations are blocked
+    OPEN = "open"  # Circuit is open, operations are blocked
     HALF_OPEN = "half_open"  # Testing if service is back online
 
 
@@ -84,7 +85,7 @@ class RedisClient:
         self._async_client = None
         self._initialized = False
         self._pool = None
-        
+
         # Circuit breaker settings
         self.circuit_state = CircuitState.CLOSED
         self.circuit_failure_threshold = circuit_failure_threshold
@@ -114,7 +115,7 @@ class RedisClient:
                 ssl=self._ssl,
                 decode_responses=False,  # We'll handle decoding ourselves
             )
-            
+
             # Create Redis client using the pool
             self._client = redis.Redis(connection_pool=self._pool)
 
@@ -154,19 +155,19 @@ class RedisClient:
                 logger.warning(f"Error disconnecting Redis pool: {e}")
             finally:
                 self._pool = None
-                
+
         if self._client:
             try:
                 self._client.close()
             except Exception as e:
                 logger.warning(f"Error closing Redis client: {e}")
-                
+
         if self._async_client:
             try:
                 await self._async_client.close()
             except Exception as e:
                 logger.warning(f"Error closing async Redis client: {e}")
-            
+
         self._client = None
         self._async_client = None
         self._initialized = False
@@ -231,44 +232,49 @@ class RedisClient:
         except Exception as e:
             logger.error(f"Error deserializing data: {e}")
             raise ValueError(f"Failed to deserialize data from Redis: {e}")
-            
+
     async def _get_client(self) -> AsyncRedis:
         """
         Get the Redis client, checking circuit breaker state.
-        
+
         Returns:
             Redis async client
-            
+
         Raises:
             ConnectionError: If circuit breaker is open
         """
         self._check_initialized()
-        
+
         # Check circuit state
         if self.circuit_state == CircuitState.OPEN:
             # Check if recovery timeout has elapsed
-            if (self.last_failure_time and 
-                (datetime.utcnow() - self.last_failure_time).total_seconds() > self.circuit_recovery_timeout):
+            if (
+                self.last_failure_time
+                and (datetime.utcnow() - self.last_failure_time).total_seconds()
+                > self.circuit_recovery_timeout
+            ):
                 # Try recovery
                 logger.info("Circuit half-open, testing Redis connection")
                 self.circuit_state = CircuitState.HALF_OPEN
             else:
                 # Circuit still open
                 logger.warning("Circuit breaker open, Redis operations suspended")
-                raise ConnectionError("Circuit breaker open, Redis operations suspended")
-                
+                raise ConnectionError(
+                    "Circuit breaker open, Redis operations suspended"
+                )
+
         return self._async_client
-            
+
     async def _execute_with_circuit_breaker(self, operation: Callable) -> Any:
         """
         Execute an operation with circuit breaker pattern.
-        
+
         Args:
             operation: Async callable operation to execute
-            
+
         Returns:
             Result of the operation
-            
+
         Raises:
             Various exceptions depending on the operation
         """
@@ -276,26 +282,30 @@ class RedisClient:
             # Get client and execute operation
             client = await self._get_client()
             result = await operation(client)
-            
+
             # If we get here in HALF_OPEN state, close the circuit
             if self.circuit_state == CircuitState.HALF_OPEN:
                 self.circuit_state = CircuitState.CLOSED
                 self.failure_count = 0
                 logger.info("Circuit closed, Redis operations resumed")
-                
+
             return result
-            
+
         except Exception as e:
             # Track failure
             self.failure_count += 1
             self.last_failure_time = datetime.utcnow()
-            
+
             # Check if we should open the circuit
-            if (self.circuit_state == CircuitState.CLOSED or self.circuit_state == CircuitState.HALF_OPEN) and \
-               self.failure_count >= self.circuit_failure_threshold:
+            if (
+                self.circuit_state == CircuitState.CLOSED
+                or self.circuit_state == CircuitState.HALF_OPEN
+            ) and self.failure_count >= self.circuit_failure_threshold:
                 self.circuit_state = CircuitState.OPEN
-                logger.warning(f"Circuit breaker opened after {self.failure_count} failures")
-                
+                logger.warning(
+                    f"Circuit breaker opened after {self.failure_count} failures"
+                )
+
             # Map exceptions
             if isinstance(e, redis.ConnectionError):
                 raise ConnectionError(f"Redis connection error: {e}")
@@ -667,7 +677,11 @@ class RedisClient:
     # Session data caching methods
 
     async def cache_session_data(
-        self, user_id: str, session_id: str, data: Dict[str, Any], ttl: Optional[int] = None
+        self,
+        user_id: str,
+        session_id: str,
+        data: Dict[str, Any],
+        ttl: Optional[int] = None,
     ) -> bool:
         """
         Cache session data for a user.
@@ -713,35 +727,38 @@ class RedisClient:
         """
         key = f"session:{user_id}:{session_id}"
         return await self.delete(key)
-        
+
     async def ping(self) -> bool:
         """
         Ping the Redis server to check connectivity.
-        
+
         Returns:
             True if connected, False otherwise
         """
         try:
+
             async def _operation(client: AsyncRedis) -> bool:
                 await client.ping()
                 return True
-                
+
             return await self._execute_with_circuit_breaker(_operation)
         except Exception as e:
             logger.warning(f"Redis ping failed: {e}")
             return False
-            
+
     def get_circuit_state(self) -> Dict[str, Any]:
         """
         Get the current circuit breaker state.
-        
+
         Returns:
             Dictionary with circuit breaker state information
         """
         return {
             "state": self.circuit_state.value,
             "failure_count": self.failure_count,
-            "last_failure": self.last_failure_time.isoformat() if self.last_failure_time else None,
+            "last_failure": self.last_failure_time.isoformat()
+            if self.last_failure_time
+            else None,
             "threshold": self.circuit_failure_threshold,
-            "recovery_timeout": self.circuit_recovery_timeout
+            "recovery_timeout": self.circuit_recovery_timeout,
         }

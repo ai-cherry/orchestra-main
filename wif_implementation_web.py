@@ -36,7 +36,10 @@ from wif_implementation.db_schema import DatabaseManager
 from wif_implementation.template_manager import template_manager
 from wif_implementation.csrf_loader import csrf_protection, csrf_protect
 from wif_implementation.error_handler import (
-    WIFError, ErrorSeverity, handle_exception, safe_execute
+    WIFError,
+    ErrorSeverity,
+    handle_exception,
+    safe_execute,
 )
 
 # Configure logging
@@ -70,6 +73,7 @@ db_manager = DatabaseManager(db_path="wif_implementation.db")
 plan = db_manager.get_implementation_plan()
 if not plan:
     from wif_implementation_cli import create_implementation_plan
+
     plan = create_implementation_plan(Path("."))
     db_manager.save_implementation_plan(plan)
 
@@ -77,6 +81,7 @@ if not plan:
 # Models
 class TaskModel(BaseModel):
     """Task model for the API."""
+
     name: str
     description: str
     phase: str
@@ -89,6 +94,7 @@ class TaskModel(BaseModel):
 
 class VulnerabilityModel(BaseModel):
     """Vulnerability model for the API."""
+
     id: str
     package: str
     severity: str
@@ -103,6 +109,7 @@ class VulnerabilityModel(BaseModel):
 
 class MessageModel(BaseModel):
     """Message model for the API."""
+
     type: str
     text: str
 
@@ -114,29 +121,30 @@ async def index(request: Request):
     """Render the index page."""
     # Get tasks from the database
     tasks = db_manager.get_tasks()
-    
+
     # Get vulnerabilities from the database
     vulnerabilities = db_manager.get_vulnerabilities()
-    
+
     # If no vulnerabilities, scan for real ones
     if not vulnerabilities:
         manager = VulnerabilityManager(verbose=True, dry_run=False)
         plan = db_manager.get_implementation_plan()
         if not plan:
             from wif_implementation_cli import create_implementation_plan
+
             plan = create_implementation_plan(Path("."))
-        
+
         # Try to scan for real vulnerabilities
         manager._inventory_vulnerabilities(plan)
-        
+
         # Save found vulnerabilities to the database
         for vuln in manager.vulnerabilities:
             db_manager.save_vulnerability(vuln)
         vulnerabilities = db_manager.get_vulnerabilities()
-    
+
     # Generate a CSRF token
     csrf_token = csrf_protection.generate_token()
-    
+
     # Render the template
     return template_manager.render_template(
         "index.html",
@@ -157,25 +165,28 @@ async def csrf_token():
     """Generate a new CSRF token."""
     # Generate a new CSRF token
     csrf_token = csrf_protection.generate_token()
-    
+
     # Return the token
     return {"csrf_token": csrf_token}
 
 
 @app.get("/execute-phase/{phase_name}")
 @handle_exception
-async def execute_phase(phase_name: str, request: Request, _: None = Depends(csrf_protect)):
+async def execute_phase(
+    phase_name: str, request: Request, _: None = Depends(csrf_protect)
+):
     """Execute a phase of the implementation plan."""
     try:
         # Get the phase
         phase = ImplementationPhase(phase_name)
-        
+
         # Get the implementation plan
         plan = db_manager.get_implementation_plan()
         if not plan:
             from wif_implementation_cli import create_implementation_plan
+
             plan = create_implementation_plan(Path("."))
-        
+
         # Create the appropriate manager
         if phase == ImplementationPhase.VULNERABILITIES:
             manager = VulnerabilityManager(verbose=True, dry_run=True)
@@ -187,12 +198,14 @@ async def execute_phase(phase_name: str, request: Request, _: None = Depends(csr
             manager = TrainingManager(verbose=True, dry_run=True)
         else:
             raise HTTPException(status_code=400, detail=f"Unknown phase: {phase_name}")
-        
+
         # Get tasks for this phase
         tasks = plan.get_tasks_by_phase(phase)
         if not tasks:
-            raise HTTPException(status_code=404, detail=f"No tasks found for phase {phase_name}")
-        
+            raise HTTPException(
+                status_code=404, detail=f"No tasks found for phase {phase_name}"
+            )
+
         # Execute tasks in order
         for task in tasks:
             # Check dependencies
@@ -200,34 +213,34 @@ async def execute_phase(phase_name: str, request: Request, _: None = Depends(csr
                 dependency_task = plan.get_task_by_name(dependency)
                 if dependency_task and dependency_task.status != TaskStatus.COMPLETED:
                     continue
-            
+
             # Start the task
             task.start()
-            
+
             # Execute the task
             success = manager.execute_task(task.name, plan)
-            
+
             # Update task status
             if success:
                 task.complete()
             else:
                 task.fail(f"Task {task.name} failed")
-            
+
             # Save the task
             db_manager.save_task(task)
-        
+
         # Save the implementation plan
         db_manager.save_implementation_plan(plan)
-        
+
         # Generate a new CSRF token
         csrf_token = csrf_protection.generate_token()
-        
+
         # Redirect to the phase section
         return RedirectResponse(
             url=f"/?csrf_token={csrf_token}#{phase_name}",
             status_code=303,
         )
-    
+
     except HTTPException:
         # Re-raise HTTP exceptions
         raise
@@ -238,20 +251,23 @@ async def execute_phase(phase_name: str, request: Request, _: None = Depends(csr
 
 @app.get("/execute-task/{task_name}")
 @handle_exception
-async def execute_task(task_name: str, request: Request, _: None = Depends(csrf_protect)):
+async def execute_task(
+    task_name: str, request: Request, _: None = Depends(csrf_protect)
+):
     """Execute a task in the implementation plan."""
     try:
         # Get the implementation plan
         plan = db_manager.get_implementation_plan()
         if not plan:
             from wif_implementation_cli import create_implementation_plan
+
             plan = create_implementation_plan(Path("."))
-        
+
         # Get the task
         task = plan.get_task_by_name(task_name)
         if not task:
             raise HTTPException(status_code=404, detail=f"Task {task_name} not found")
-        
+
         # Check dependencies
         for dependency in task.dependencies:
             dependency_task = plan.get_task_by_name(dependency)
@@ -260,13 +276,13 @@ async def execute_task(task_name: str, request: Request, _: None = Depends(csrf_
                     status_code=400,
                     detail=f"Dependency {dependency} not completed",
                 )
-        
+
         # Start the task
         task.start()
-        
+
         # Save the task
         db_manager.save_task(task)
-        
+
         # Create the appropriate manager
         if task.phase == ImplementationPhase.VULNERABILITIES:
             manager = VulnerabilityManager(verbose=True, dry_run=True)
@@ -278,31 +294,31 @@ async def execute_task(task_name: str, request: Request, _: None = Depends(csrf_
             manager = TrainingManager(verbose=True, dry_run=True)
         else:
             raise HTTPException(status_code=400, detail=f"Unknown phase: {task.phase}")
-        
+
         # Execute the task
         success = manager.execute_task(task.name, plan)
-        
+
         # Update task status
         if success:
             task.complete()
         else:
             task.fail(f"Task {task.name} failed")
-        
+
         # Save the task
         db_manager.save_task(task)
-        
+
         # Save the implementation plan
         db_manager.save_implementation_plan(plan)
-        
+
         # Generate a new CSRF token
         csrf_token = csrf_protection.generate_token()
-        
+
         # Redirect to the phase section
         return RedirectResponse(
             url=f"/?csrf_token={csrf_token}#{task.phase.value}",
             status_code=303,
         )
-    
+
     except HTTPException:
         # Re-raise HTTP exceptions
         raise
@@ -313,38 +329,41 @@ async def execute_task(task_name: str, request: Request, _: None = Depends(csrf_
 
 @app.get("/complete-task/{task_name}")
 @handle_exception
-async def complete_task(task_name: str, request: Request, _: None = Depends(csrf_protect)):
+async def complete_task(
+    task_name: str, request: Request, _: None = Depends(csrf_protect)
+):
     """Mark a task as completed."""
     try:
         # Get the implementation plan
         plan = db_manager.get_implementation_plan()
         if not plan:
             from wif_implementation_cli import create_implementation_plan
+
             plan = create_implementation_plan(Path("."))
-        
+
         # Get the task
         task = plan.get_task_by_name(task_name)
         if not task:
             raise HTTPException(status_code=404, detail=f"Task {task_name} not found")
-        
+
         # Complete the task
         task.complete()
-        
+
         # Save the task
         db_manager.save_task(task)
-        
+
         # Save the implementation plan
         db_manager.save_implementation_plan(plan)
-        
+
         # Generate a new CSRF token
         csrf_token = csrf_protection.generate_token()
-        
+
         # Redirect to the phase section
         return RedirectResponse(
             url=f"/?csrf_token={csrf_token}#{task.phase.value}",
             status_code=303,
         )
-    
+
     except HTTPException:
         # Re-raise HTTP exceptions
         raise
@@ -362,31 +381,32 @@ async def fail_task(task_name: str, request: Request, _: None = Depends(csrf_pro
         plan = db_manager.get_implementation_plan()
         if not plan:
             from wif_implementation_cli import create_implementation_plan
+
             plan = create_implementation_plan(Path("."))
-        
+
         # Get the task
         task = plan.get_task_by_name(task_name)
         if not task:
             raise HTTPException(status_code=404, detail=f"Task {task_name} not found")
-        
+
         # Fail the task
         task.fail("Task failed manually")
-        
+
         # Save the task
         db_manager.save_task(task)
-        
+
         # Save the implementation plan
         db_manager.save_implementation_plan(plan)
-        
+
         # Generate a new CSRF token
         csrf_token = csrf_protection.generate_token()
-        
+
         # Redirect to the phase section
         return RedirectResponse(
             url=f"/?csrf_token={csrf_token}#{task.phase.value}",
             status_code=303,
         )
-    
+
     except HTTPException:
         # Re-raise HTTP exceptions
         raise
@@ -402,35 +422,36 @@ async def scan_vulnerabilities(request: Request, _: None = Depends(csrf_protect)
     try:
         # Create a vulnerability manager
         manager = VulnerabilityManager(verbose=True, dry_run=False)
-        
+
         # Get the implementation plan
         plan = db_manager.get_implementation_plan()
         if not plan:
             from wif_implementation_cli import create_implementation_plan
+
             plan = create_implementation_plan(Path("."))
-        
+
         # Clear existing vulnerabilities
         db_manager.clear_vulnerabilities()
-        
+
         # Scan for real vulnerabilities
         manager._inventory_vulnerabilities(plan)
-        
+
         # Save vulnerabilities to the database
         for vuln in manager.vulnerabilities:
             db_manager.save_vulnerability(vuln)
-            
+
         # Log the number of vulnerabilities found
         logger.info(f"Found {len(manager.vulnerabilities)} vulnerabilities")
-        
+
         # Generate a new CSRF token
         csrf_token = csrf_protection.generate_token()
-        
+
         # Redirect to the vulnerabilities section
         return RedirectResponse(
             url=f"/?csrf_token={csrf_token}#vulnerabilities",
             status_code=303,
         )
-    
+
     except Exception as e:
         logger.error(f"Error scanning for vulnerabilities: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -438,30 +459,39 @@ async def scan_vulnerabilities(request: Request, _: None = Depends(csrf_protect)
 
 @app.get("/fix-vulnerability/{vulnerability_id}")
 @handle_exception
-async def fix_vulnerability(vulnerability_id: str, request: Request, _: None = Depends(csrf_protect)):
+async def fix_vulnerability(
+    vulnerability_id: str, request: Request, _: None = Depends(csrf_protect)
+):
     """Fix a vulnerability."""
     try:
         # Get the vulnerability
         vulnerability = db_manager.get_vulnerability(vulnerability_id)
         if not vulnerability:
-            raise HTTPException(status_code=404, detail=f"Vulnerability {vulnerability_id} not found")
-        
+            raise HTTPException(
+                status_code=404, detail=f"Vulnerability {vulnerability_id} not found"
+            )
+
         # Fix the vulnerability
         vulnerability.is_fixed = True
-        vulnerability.fix_command = f"npm update {vulnerability.package}" if vulnerability.package in ["lodash", "axios", "react", "express", "minimist"] else f"pip install {vulnerability.package}=={vulnerability.fixed_version}"
-        
+        vulnerability.fix_command = (
+            f"npm update {vulnerability.package}"
+            if vulnerability.package
+            in ["lodash", "axios", "react", "express", "minimist"]
+            else f"pip install {vulnerability.package}=={vulnerability.fixed_version}"
+        )
+
         # Save the vulnerability
         db_manager.save_vulnerability(vulnerability)
-        
+
         # Generate a new CSRF token
         csrf_token = csrf_protection.generate_token()
-        
+
         # Redirect to the vulnerabilities section
         return RedirectResponse(
             url=f"/?csrf_token={csrf_token}#vulnerabilities",
             status_code=303,
         )
-    
+
     except HTTPException:
         # Re-raise HTTP exceptions
         raise
@@ -498,7 +528,7 @@ async def api_get_task(task_name: str):
     task = db_manager.get_task(task_name)
     if not task:
         raise HTTPException(status_code=404, detail=f"Task {task_name} not found")
-    
+
     return TaskModel(
         name=task.name,
         description=task.description,
@@ -539,8 +569,10 @@ async def api_get_vulnerability(vulnerability_id: str):
     """Get a vulnerability by ID."""
     vulnerability = db_manager.get_vulnerability(vulnerability_id)
     if not vulnerability:
-        raise HTTPException(status_code=404, detail=f"Vulnerability {vulnerability_id} not found")
-    
+        raise HTTPException(
+            status_code=404, detail=f"Vulnerability {vulnerability_id} not found"
+        )
+
     return VulnerabilityModel(
         id=vulnerability.id,
         package=vulnerability.package,
@@ -561,14 +593,14 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     """Handle HTTP exceptions."""
     # Generate a new CSRF token
     csrf_token = csrf_protection.generate_token()
-    
+
     # If the request accepts JSON, return a JSON response
     if "application/json" in request.headers.get("accept", ""):
         return JSONResponse(
             status_code=exc.status_code,
             content={"detail": exc.detail},
         )
-    
+
     # Otherwise, redirect to the index page with an error message
     return RedirectResponse(
         url=f"/?csrf_token={csrf_token}&error={exc.detail}",
@@ -581,17 +613,17 @@ async def exception_handler(request: Request, exc: Exception):
     """Handle generic exceptions."""
     # Log the exception
     logger.error(f"Unhandled exception: {str(exc)}")
-    
+
     # Generate a new CSRF token
     csrf_token = csrf_protection.generate_token()
-    
+
     # If the request accepts JSON, return a JSON response
     if "application/json" in request.headers.get("accept", ""):
         return JSONResponse(
             status_code=500,
             content={"detail": "Internal server error"},
         )
-    
+
     # Otherwise, redirect to the index page with an error message
     return RedirectResponse(
         url=f"/?csrf_token={csrf_token}&error=Internal+server+error",
@@ -604,34 +636,34 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Start the WIF implementation web interface."
     )
-    
+
     parser.add_argument(
         "--host",
         type=str,
         default="127.0.0.1",
         help="Host to bind to",
     )
-    
+
     parser.add_argument(
         "--port",
         type=int,
         default=8000,
         help="Port to bind to",
     )
-    
+
     parser.add_argument(
         "--reload",
         action="store_true",
         help="Enable auto-reload",
     )
-    
+
     return parser.parse_args()
 
 
 def main() -> int:
     """Main entry point for the script."""
     args = parse_args()
-    
+
     # Start the server
     uvicorn.run(
         "wif_implementation_web:app",
@@ -639,7 +671,7 @@ def main() -> int:
         port=args.port,
         reload=args.reload,
     )
-    
+
     return 0
 
 

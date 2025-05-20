@@ -348,12 +348,16 @@ async def direct_llm_completion(
 
     except LLMProviderInvalidRequestError as e:
         logger.error(f"Invalid request: {e}", exc_info=True)
-        logger.warning("Invalid request may indicate input or configuration issues in direct completion.")
+        logger.warning(
+            "Invalid request may indicate input or configuration issues in direct completion."
+        )
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
     except LLMProviderTimeoutError as e:
         logger.error(f"Request timeout: {e}", exc_info=True)
-        logger.warning("Timeout may impact direct completion; consider retrying or adjusting timeout settings.")
+        logger.warning(
+            "Timeout may impact direct completion; consider retrying or adjusting timeout settings."
+        )
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
             detail=f"Request timed out: {str(e)}",
@@ -370,7 +374,9 @@ async def direct_llm_completion(
 
     except LLMProviderConnectionError as e:
         logger.error(f"Connection error: {e}", exc_info=True)
-        logger.warning("Connection issues may prevent direct LLM completion; check network or provider status.")
+        logger.warning(
+            "Connection issues may prevent direct LLM completion; check network or provider status."
+        )
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"Service unavailable: {str(e)}",
@@ -379,14 +385,18 @@ async def direct_llm_completion(
 
     except LLMProviderModelError as e:
         logger.error(f"Model error: {e}", exc_info=True)
-        logger.warning("Model error may require configuration or model selection adjustments for direct completion.")
+        logger.warning(
+            "Model error may require configuration or model selection adjustments for direct completion."
+        )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=f"Model error: {str(e)}"
         )
 
     except LLMProviderServiceError as e:
         logger.error(f"Service error: {e}", exc_info=True)
-        logger.warning("Service error may indicate provider issues; consider fallback options for direct completion.")
+        logger.warning(
+            "Service error may indicate provider issues; consider fallback options for direct completion."
+        )
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"Service error: {str(e)}",
@@ -403,7 +413,9 @@ async def direct_llm_completion(
 
     except Exception as e:
         logger.error(f"Error in direct LLM completion: {e}", exc_info=True)
-        logger.warning("Unexpected error may impact direct completion processing; review logs for details.")
+        logger.warning(
+            "Unexpected error may impact direct completion processing; review logs for details."
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"LLM completion failed: {str(e)}",

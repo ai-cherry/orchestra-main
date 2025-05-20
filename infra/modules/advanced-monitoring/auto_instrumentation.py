@@ -23,7 +23,7 @@ from google.cloud.monitoring_v3.types import (
     Point,
     TimeInterval,
     TimeSeries,
-    TypedValue
+    TypedValue,
 )
 
 # Configure logging
@@ -31,7 +31,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Type variable for decorator return types
-F = TypeVar('F', bound=Callable[..., Any])
+F = TypeVar("F", bound=Callable[..., Any])
 
 # Get project ID from environment variable
 PROJECT_ID = os.environ.get("PROJECT_ID")
@@ -56,6 +56,7 @@ class MonitoredError(Exception):
     This can be used to track specific business-logic errors separately
     from general exceptions.
     """
+
     pass
 
 
@@ -64,7 +65,7 @@ def instrument(
     track_args: bool = False,
     track_return_value: bool = False,
     error_threshold_ms: Optional[int] = None,
-    labels: Optional[Dict[str, str]] = None
+    labels: Optional[Dict[str, str]] = None,
 ) -> Callable[[F], F]:
     """
     Decorator to instrument a function or method with metrics and tracing.
@@ -79,6 +80,7 @@ def instrument(
     Returns:
         Decorated function
     """
+
     def decorator(func: F) -> F:
         # Get function metadata
         func_name = name or func.__name__
@@ -94,7 +96,7 @@ def instrument(
             metric_labels = {
                 "function": func_name,
                 "module": module_name,
-                "environment": ENVIRONMENT
+                "environment": ENVIRONMENT,
             }
             if labels:
                 metric_labels.update(labels)
@@ -112,7 +114,10 @@ def instrument(
                 execution_time_ms = (time.time() - start_time) * 1000
 
                 # Determine if execution time exceeds threshold
-                is_slow = error_threshold_ms is not None and execution_time_ms > error_threshold_ms
+                is_slow = (
+                    error_threshold_ms is not None
+                    and execution_time_ms > error_threshold_ms
+                )
 
                 # Report metrics
                 try:
@@ -122,26 +127,27 @@ def instrument(
                         execution_time_ms=execution_time_ms,
                         error=error is not None,
                         is_slow=is_slow,
-                        labels=metric_labels
+                        labels=metric_labels,
                     )
 
                     # Log additional details if enabled
                     if track_args and (error is not None or is_slow):
                         # Safely serialize args and kwargs
                         args_str = safely_serialize_args(args, kwargs)
-                        logger.warning(
-                            f"Function {func_name} issues: args={args_str}")
+                        logger.warning(f"Function {func_name} issues: args={args_str}")
 
                     if track_return_value and error is None and is_slow:
                         # Safely serialize return value
                         result_str = safely_serialize_value(result)
                         logger.warning(
-                            f"Slow function {func_name} returned: {result_str}")
+                            f"Slow function {func_name} returned: {result_str}"
+                        )
 
                 except Exception as metric_error:
                     # Don't let metrics reporting break functionality
                     logger.error(
-                        f"Error reporting metrics for {func_name}: {metric_error}")
+                        f"Error reporting metrics for {func_name}: {metric_error}"
+                    )
 
         return cast(F, wrapper)
 
@@ -151,7 +157,7 @@ def instrument(
 def api_endpoint(
     name: Optional[str] = None,
     error_threshold_ms: int = 1000,  # 1 second
-    track_request_body: bool = False
+    track_request_body: bool = False,
 ) -> Callable[[F], F]:
     """
     Specialized decorator for API endpoints that reports additional metrics.
@@ -164,6 +170,7 @@ def api_endpoint(
     Returns:
         Decorated function
     """
+
     def decorator(func: F) -> F:
         endpoint_name = name or func.__name__
 
@@ -180,15 +187,20 @@ def api_endpoint(
 
             # Look for request in args and kwargs
             for arg in args:
-                if str(type(arg)).find("fastapi") >= 0 and str(type(arg)).find("Request") >= 0:
+                if (
+                    str(type(arg)).find("fastapi") >= 0
+                    and str(type(arg)).find("Request") >= 0
+                ):
                     request = arg
                     break
 
             if request is None:
                 for key, value in kwargs.items():
-                    if key == "request" or (isinstance(value, object) and
-                                            str(type(value)).find("fastapi") >= 0 and
-                                            str(type(value)).find("Request") >= 0):
+                    if key == "request" or (
+                        isinstance(value, object)
+                        and str(type(value)).find("fastapi") >= 0
+                        and str(type(value)).find("Request") >= 0
+                    ):
                         request = value
                         break
 
@@ -199,16 +211,23 @@ def api_endpoint(
                         "method": getattr(request, "method", "UNKNOWN"),
                         "url": str(getattr(request, "url", "UNKNOWN")),
                         "client": getattr(request, "client", "UNKNOWN"),
-                        "headers": dict(getattr(request, "headers", {}))
+                        "headers": dict(getattr(request, "headers", {})),
                     }
 
                     # Extract request body if needed
                     if track_request_body:
                         try:
-                            body = await request.json() if hasattr(request, "json") else {}
+                            body = (
+                                await request.json() if hasattr(request, "json") else {}
+                            )
                             # Sanitize sensitive information
                             if isinstance(body, dict):
-                                for sensitive_key in ["password", "token", "key", "secret"]:
+                                for sensitive_key in [
+                                    "password",
+                                    "token",
+                                    "key",
+                                    "secret",
+                                ]:
                                     if sensitive_key in body:
                                         body[sensitive_key] = "REDACTED"
                             request_info["body"] = body
@@ -222,7 +241,7 @@ def api_endpoint(
             metric_labels = {
                 "endpoint": endpoint_name,
                 "method": request_info.get("method", "UNKNOWN"),
-                "environment": ENVIRONMENT
+                "environment": ENVIRONMENT,
             }
 
             try:
@@ -233,8 +252,13 @@ def api_endpoint(
                 if inspect.isawaitable(response):
                     # We need to handle this differently since we can't use finally with await
                     return handle_async_response(
-                        response, endpoint_name, start_time, error_threshold_ms,
-                        metric_labels, request_info, track_request_body
+                        response,
+                        endpoint_name,
+                        start_time,
+                        error_threshold_ms,
+                        metric_labels,
+                        request_info,
+                        track_request_body,
                     )
 
                 # Extract status code if response has it
@@ -269,7 +293,7 @@ def api_endpoint(
                             error=error is not None,
                             is_slow=is_slow,
                             status_code=status_code,
-                            labels=metric_labels
+                            labels=metric_labels,
                         )
 
                         # Log details for errors or slow requests
@@ -280,15 +304,15 @@ def api_endpoint(
                                 "status_code": status_code,
                                 "request_info": request_info,
                                 "error": str(error) if error else None,
-                                "is_slow": is_slow
+                                "is_slow": is_slow,
                             }
-                            logger.warning(
-                                f"API issue detected: {log_payload}")
+                            logger.warning(f"API issue detected: {log_payload}")
 
                     except Exception as metric_error:
                         # Don't let metrics reporting break functionality
                         logger.error(
-                            f"Error reporting API metrics for {endpoint_name}: {metric_error}")
+                            f"Error reporting API metrics for {endpoint_name}: {metric_error}"
+                        )
 
         return cast(F, wrapper)
 
@@ -302,7 +326,7 @@ async def handle_async_response(
     error_threshold_ms: int,
     metric_labels: Dict[str, str],
     request_info: Dict[str, Any],
-    track_request_body: bool
+    track_request_body: bool,
 ):
     """
     Helper function to handle awaitable responses from async endpoints.
@@ -344,7 +368,7 @@ async def handle_async_response(
                 error=error is not None,
                 is_slow=is_slow,
                 status_code=status_code,
-                labels=metric_labels
+                labels=metric_labels,
             )
 
             # Log details for errors or slow requests
@@ -355,21 +379,22 @@ async def handle_async_response(
                     "status_code": status_code,
                     "request_info": request_info,
                     "error": str(error) if error else None,
-                    "is_slow": is_slow
+                    "is_slow": is_slow,
                 }
                 logger.warning(f"API issue detected: {log_payload}")
 
         except Exception as metric_error:
             # Don't let metrics reporting break functionality
             logger.error(
-                f"Error reporting API metrics for {endpoint_name}: {metric_error}")
+                f"Error reporting API metrics for {endpoint_name}: {metric_error}"
+            )
 
 
 def llm_call(
     provider: str = "generic",
     track_prompt: bool = False,
     track_response: bool = False,
-    error_threshold_ms: int = 5000  # 5 seconds
+    error_threshold_ms: int = 5000,  # 5 seconds
 ) -> Callable[[F], F]:
     """
     Specialized decorator for LLM API calls that reports additional metrics.
@@ -383,6 +408,7 @@ def llm_call(
     Returns:
         Decorated function
     """
+
     def decorator(func: F) -> F:
         func_name = func.__name__
 
@@ -395,7 +421,9 @@ def llm_call(
 
             # Try to extract model information
             for key, value in kwargs.items():
-                if key in ["model", "model_name", "model_id"] and isinstance(value, str):
+                if key in ["model", "model_name", "model_id"] and isinstance(
+                    value, str
+                ):
                     model = value
                     break
 
@@ -404,7 +432,7 @@ def llm_call(
                 "function": func_name,
                 "provider": provider,
                 "model": model,
-                "environment": ENVIRONMENT
+                "environment": ENVIRONMENT,
             }
 
             # Extract prompt for potential logging
@@ -426,8 +454,16 @@ def llm_call(
                 # Handle async LLM calls
                 if inspect.isawaitable(result):
                     return handle_async_llm_call(
-                        result, func_name, provider, model, start_time,
-                        error_threshold_ms, metric_labels, prompt, track_prompt, track_response
+                        result,
+                        func_name,
+                        provider,
+                        model,
+                        start_time,
+                        error_threshold_ms,
+                        metric_labels,
+                        prompt,
+                        track_prompt,
+                        track_response,
                     )
 
                 # Try to extract token count if available
@@ -458,7 +494,7 @@ def llm_call(
                             execution_time_ms=execution_time_ms,
                             error=error is not None,
                             token_count=token_count,
-                            labels=metric_labels
+                            labels=metric_labels,
                         )
 
                         # Log details for errors or slow requests
@@ -471,25 +507,28 @@ def llm_call(
                                 "execution_time_ms": execution_time_ms,
                                 "error": str(error) if error else None,
                                 "is_slow": is_slow,
-                                "token_count": token_count
+                                "token_count": token_count,
                             }
 
                             # Add prompt if tracking
                             if track_prompt and prompt is not None:
-                                log_data["prompt"] = safely_serialize_value(
-                                    prompt)
+                                log_data["prompt"] = safely_serialize_value(prompt)
 
                             # Add response if tracking and available
-                            if track_response and not error and hasattr(result, "__dict__"):
-                                log_data["response"] = safely_serialize_value(
-                                    result)
+                            if (
+                                track_response
+                                and not error
+                                and hasattr(result, "__dict__")
+                            ):
+                                log_data["response"] = safely_serialize_value(result)
 
                             logger.warning(f"LLM call issue: {log_data}")
 
                     except Exception as metric_error:
                         # Don't let metrics reporting break functionality
                         logger.error(
-                            f"Error reporting LLM metrics for {func_name}: {metric_error}")
+                            f"Error reporting LLM metrics for {func_name}: {metric_error}"
+                        )
 
         return cast(F, wrapper)
 
@@ -506,7 +545,7 @@ async def handle_async_llm_call(
     metric_labels: Dict[str, str],
     prompt: Any,
     track_prompt: bool,
-    track_response: bool
+    track_response: bool,
 ):
     """
     Helper function to handle awaitable results from async LLM calls.
@@ -544,7 +583,7 @@ async def handle_async_llm_call(
                 execution_time_ms=execution_time_ms,
                 error=error is not None,
                 token_count=token_count,
-                labels=metric_labels
+                labels=metric_labels,
             )
 
             # Log details for errors or slow requests
@@ -557,7 +596,7 @@ async def handle_async_llm_call(
                     "execution_time_ms": execution_time_ms,
                     "error": str(error) if error else None,
                     "is_slow": is_slow,
-                    "token_count": token_count
+                    "token_count": token_count,
                 }
 
                 # Add prompt if tracking
@@ -573,14 +612,15 @@ async def handle_async_llm_call(
         except Exception as metric_error:
             # Don't let metrics reporting break functionality
             logger.error(
-                f"Error reporting LLM metrics for {function_name}: {metric_error}")
+                f"Error reporting LLM metrics for {function_name}: {metric_error}"
+            )
 
 
 def database_operation(
     database_type: str = "generic",
     operation_type: Optional[str] = None,
     error_threshold_ms: int = 1000,  # 1 second
-    collection: Optional[str] = None
+    collection: Optional[str] = None,
 ) -> Callable[[F], F]:
     """
     Specialized decorator for database operations.
@@ -594,15 +634,22 @@ def database_operation(
     Returns:
         Decorated function
     """
+
     def decorator(func: F) -> F:
         func_name = func.__name__
 
         # Infer operation type from function name if not provided
         inferred_operation = operation_type
         if not inferred_operation:
-            if any(op in func_name.lower() for op in ["get", "find", "select", "query", "fetch"]):
+            if any(
+                op in func_name.lower()
+                for op in ["get", "find", "select", "query", "fetch"]
+            ):
                 inferred_operation = "read"
-            elif any(op in func_name.lower() for op in ["save", "insert", "update", "create", "set"]):
+            elif any(
+                op in func_name.lower()
+                for op in ["save", "insert", "update", "create", "set"]
+            ):
                 inferred_operation = "write"
             elif any(op in func_name.lower() for op in ["delete", "remove", "drop"]):
                 inferred_operation = "delete"
@@ -619,7 +666,7 @@ def database_operation(
                 "function": func_name,
                 "database_type": database_type,
                 "operation_type": inferred_operation,
-                "environment": ENVIRONMENT
+                "environment": ENVIRONMENT,
             }
 
             # Add collection if provided
@@ -633,8 +680,13 @@ def database_operation(
                 # Handle async database operations
                 if inspect.isawaitable(result):
                     return handle_async_db_operation(
-                        result, func_name, database_type, inferred_operation,
-                        start_time, error_threshold_ms, metric_labels
+                        result,
+                        func_name,
+                        database_type,
+                        inferred_operation,
+                        start_time,
+                        error_threshold_ms,
+                        metric_labels,
                     )
 
                 return result
@@ -661,7 +713,7 @@ def database_operation(
                             execution_time_ms=execution_time_ms,
                             error=error is not None,
                             is_slow=is_slow,
-                            labels=metric_labels
+                            labels=metric_labels,
                         )
 
                         # Log details for errors or slow operations
@@ -672,18 +724,18 @@ def database_operation(
                                 "operation_type": inferred_operation,
                                 "execution_time_ms": execution_time_ms,
                                 "error": str(error) if error else None,
-                                "is_slow": is_slow
+                                "is_slow": is_slow,
                             }
                             if collection:
                                 log_data["collection"] = collection
 
-                            logger.warning(
-                                f"Database operation issue: {log_data}")
+                            logger.warning(f"Database operation issue: {log_data}")
 
                     except Exception as metric_error:
                         # Don't let metrics reporting break functionality
                         logger.error(
-                            f"Error reporting database metrics for {func_name}: {metric_error}")
+                            f"Error reporting database metrics for {func_name}: {metric_error}"
+                        )
 
         return cast(F, wrapper)
 
@@ -697,7 +749,7 @@ async def handle_async_db_operation(
     operation_type: str,
     start_time: float,
     error_threshold_ms: int,
-    metric_labels: Dict[str, str]
+    metric_labels: Dict[str, str],
 ):
     """
     Helper function to handle awaitable results from async database operations.
@@ -729,7 +781,7 @@ async def handle_async_db_operation(
                 execution_time_ms=execution_time_ms,
                 error=error is not None,
                 is_slow=is_slow,
-                labels=metric_labels
+                labels=metric_labels,
             )
 
             # Log details for errors or slow operations
@@ -740,7 +792,7 @@ async def handle_async_db_operation(
                     "operation_type": operation_type,
                     "execution_time_ms": execution_time_ms,
                     "error": str(error) if error else None,
-                    "is_slow": is_slow
+                    "is_slow": is_slow,
                 }
 
                 if "collection" in metric_labels:
@@ -751,10 +803,12 @@ async def handle_async_db_operation(
         except Exception as metric_error:
             # Don't let metrics reporting break functionality
             logger.error(
-                f"Error reporting database metrics for {function_name}: {metric_error}")
+                f"Error reporting database metrics for {function_name}: {metric_error}"
+            )
 
 
 # Helper functions for metric reporting
+
 
 def report_function_metrics(
     func_name: str,
@@ -762,12 +816,11 @@ def report_function_metrics(
     execution_time_ms: float,
     error: bool,
     is_slow: bool,
-    labels: Dict[str, str]
+    labels: Dict[str, str],
 ) -> None:
     """Report metrics for a function call."""
     if not PROJECT_ID:
-        logger.warning(
-            "PROJECT_ID environment variable not set, skipping metrics")
+        logger.warning("PROJECT_ID environment variable not set, skipping metrics")
         return
 
     try:
@@ -780,7 +833,7 @@ def report_function_metrics(
             metric_kind=MetricDescriptor.MetricKind.GAUGE,
             value_type=MetricDescriptor.ValueType.DOUBLE,
             value=execution_time_ms,
-            labels=labels
+            labels=labels,
         )
 
         # Create time series for errors (as a count)
@@ -791,7 +844,7 @@ def report_function_metrics(
                 metric_kind=MetricDescriptor.MetricKind.CUMULATIVE,
                 value_type=MetricDescriptor.ValueType.INT64,
                 value=1,
-                labels=labels
+                labels=labels,
             )
 
         # Create time series for slow executions (as a count)
@@ -802,7 +855,7 @@ def report_function_metrics(
                 metric_kind=MetricDescriptor.MetricKind.CUMULATIVE,
                 value_type=MetricDescriptor.ValueType.INT64,
                 value=1,
-                labels=labels
+                labels=labels,
             )
 
     except Exception as e:
@@ -815,12 +868,11 @@ def report_api_metrics(
     error: bool,
     is_slow: bool,
     status_code: int,
-    labels: Dict[str, str]
+    labels: Dict[str, str],
 ) -> None:
     """Report metrics for an API endpoint call."""
     if not PROJECT_ID:
-        logger.warning(
-            "PROJECT_ID environment variable not set, skipping metrics")
+        logger.warning("PROJECT_ID environment variable not set, skipping metrics")
         return
 
     try:
@@ -833,7 +885,7 @@ def report_api_metrics(
             metric_kind=MetricDescriptor.MetricKind.GAUGE,
             value_type=MetricDescriptor.ValueType.DOUBLE,
             value=execution_time_ms,
-            labels=labels
+            labels=labels,
         )
 
         # Create time series for request count
@@ -843,7 +895,7 @@ def report_api_metrics(
             metric_kind=MetricDescriptor.MetricKind.CUMULATIVE,
             value_type=MetricDescriptor.ValueType.INT64,
             value=1,
-            labels=labels
+            labels=labels,
         )
 
         # Create time series for errors (if applicable)
@@ -857,7 +909,7 @@ def report_api_metrics(
                 metric_kind=MetricDescriptor.MetricKind.CUMULATIVE,
                 value_type=MetricDescriptor.ValueType.INT64,
                 value=1,
-                labels=error_labels
+                labels=error_labels,
             )
 
     except Exception as e:
@@ -871,12 +923,11 @@ def report_llm_metrics(
     execution_time_ms: float,
     error: bool,
     token_count: int,
-    labels: Dict[str, str]
+    labels: Dict[str, str],
 ) -> None:
     """Report metrics for an LLM API call."""
     if not PROJECT_ID:
-        logger.warning(
-            "PROJECT_ID environment variable not set, skipping metrics")
+        logger.warning("PROJECT_ID environment variable not set, skipping metrics")
         return
 
     try:
@@ -889,7 +940,7 @@ def report_llm_metrics(
             metric_kind=MetricDescriptor.MetricKind.GAUGE,
             value_type=MetricDescriptor.ValueType.DOUBLE,
             value=execution_time_ms,
-            labels=labels
+            labels=labels,
         )
 
         # Create time series for token count
@@ -900,7 +951,7 @@ def report_llm_metrics(
                 metric_kind=MetricDescriptor.MetricKind.GAUGE,
                 value_type=MetricDescriptor.ValueType.INT64,
                 value=token_count,
-                labels=labels
+                labels=labels,
             )
 
         # Create time series for request count
@@ -910,7 +961,7 @@ def report_llm_metrics(
             metric_kind=MetricDescriptor.MetricKind.CUMULATIVE,
             value_type=MetricDescriptor.ValueType.INT64,
             value=1,
-            labels=labels
+            labels=labels,
         )
 
         # Create time series for errors (if applicable)
@@ -921,7 +972,7 @@ def report_llm_metrics(
                 metric_kind=MetricDescriptor.MetricKind.CUMULATIVE,
                 value_type=MetricDescriptor.ValueType.INT64,
                 value=1,
-                labels=labels
+                labels=labels,
             )
 
     except Exception as e:
@@ -935,12 +986,11 @@ def report_database_metrics(
     execution_time_ms: float,
     error: bool,
     is_slow: bool,
-    labels: Dict[str, str]
+    labels: Dict[str, str],
 ) -> None:
     """Report metrics for a database operation."""
     if not PROJECT_ID:
-        logger.warning(
-            "PROJECT_ID environment variable not set, skipping metrics")
+        logger.warning("PROJECT_ID environment variable not set, skipping metrics")
         return
 
     try:
@@ -953,7 +1003,7 @@ def report_database_metrics(
             metric_kind=MetricDescriptor.MetricKind.GAUGE,
             value_type=MetricDescriptor.ValueType.DOUBLE,
             value=execution_time_ms,
-            labels=labels
+            labels=labels,
         )
 
         # Create time series for operation count
@@ -963,7 +1013,7 @@ def report_database_metrics(
             metric_kind=MetricDescriptor.MetricKind.CUMULATIVE,
             value_type=MetricDescriptor.ValueType.INT64,
             value=1,
-            labels=labels
+            labels=labels,
         )
 
         # Create time series for errors (if applicable)
@@ -974,7 +1024,7 @@ def report_database_metrics(
                 metric_kind=MetricDescriptor.MetricKind.CUMULATIVE,
                 value_type=MetricDescriptor.ValueType.INT64,
                 value=1,
-                labels=labels
+                labels=labels,
             )
 
         # Create time series for slow operations (if applicable)
@@ -985,7 +1035,7 @@ def report_database_metrics(
                 metric_kind=MetricDescriptor.MetricKind.CUMULATIVE,
                 value_type=MetricDescriptor.ValueType.INT64,
                 value=1,
-                labels=labels
+                labels=labels,
             )
 
     except Exception as e:
@@ -998,7 +1048,7 @@ def create_time_series(
     metric_kind: MetricDescriptor.MetricKind,
     value_type: MetricDescriptor.ValueType,
     value: float,
-    labels: Dict[str, str]
+    labels: Dict[str, str],
 ) -> None:
     """
     Create and write a time series for a metric.
@@ -1014,18 +1064,10 @@ def create_time_series(
     project_name = f"projects/{PROJECT_ID}"
 
     # Create the specific metric object
-    metric = {
-        "type": metric_type,
-        "labels": labels
-    }
+    metric = {"type": metric_type, "labels": labels}
 
     # Create the resource object
-    resource = {
-        "type": "global",
-        "labels": {
-            "project_id": PROJECT_ID
-        }
-    }
+    resource = {"type": "global", "labels": {"project_id": PROJECT_ID}}
 
     # Create the time series
     now = time.time()
@@ -1061,13 +1103,11 @@ def create_time_series(
     series.points = [point]
 
     # Write the time series
-    client.create_time_series(
-        name=project_name,
-        time_series=[series]
-    )
+    client.create_time_series(name=project_name, time_series=[series])
 
 
 # Utility functions
+
 
 def safely_serialize_args(args: tuple, kwargs: dict) -> str:
     """
@@ -1123,7 +1163,13 @@ def safely_serialize_value(value: Any) -> Any:
                         result["..."] = "..."
                         break
                     # Skip or redact sensitive keys
-                    if isinstance(k, str) and k.lower() in ["password", "token", "key", "secret", "credential"]:
+                    if isinstance(k, str) and k.lower() in [
+                        "password",
+                        "token",
+                        "key",
+                        "secret",
+                        "credential",
+                    ]:
                         result[k] = "REDACTED"
                     else:
                         result[k] = safely_serialize_value(v)
@@ -1132,7 +1178,13 @@ def safely_serialize_value(value: Any) -> Any:
             result = {}
             for k, v in value.items():
                 # Skip or redact sensitive keys
-                if isinstance(k, str) and k.lower() in ["password", "token", "key", "secret", "credential"]:
+                if isinstance(k, str) and k.lower() in [
+                    "password",
+                    "token",
+                    "key",
+                    "secret",
+                    "credential",
+                ]:
                     result[k] = "REDACTED"
                 else:
                     result[k] = safely_serialize_value(v)

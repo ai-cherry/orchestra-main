@@ -24,7 +24,10 @@ from packages.shared.src.memory.ports import MemoryStoragePort
 from packages.shared.src.memory.services import MemoryService, MemoryServiceFactory
 
 # Adapters (infrastructure)
-from packages.shared.src.memory.adapters import FirestoreStorageAdapter, PostgresStorageAdapter
+from packages.shared.src.memory.adapters import (
+    FirestoreStorageAdapter,
+    PostgresStorageAdapter,
+)
 
 # Legacy backward-compatible imports
 from packages.shared.src.memory.memory_types import MemoryHealth
@@ -40,18 +43,14 @@ __all__ = [
     "MemoryQueryError",
     "MemoryWriteError",
     "MemoryValidationError",
-
     # Ports
     "MemoryStoragePort",
-
     # Services
     "MemoryService",
     "MemoryServiceFactory",
-
     # Adapters
     "FirestoreStorageAdapter",
     "PostgresStorageAdapter",
-
     # Legacy
     "MemoryHealth",
     "MemoryInterface",

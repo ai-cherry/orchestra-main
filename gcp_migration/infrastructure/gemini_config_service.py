@@ -89,17 +89,22 @@ class GeminiConfigService(IGeminiConfigService):
             config_dir.mkdir(parents=True, exist_ok=True)
 
             # Get template configuration
-            template_path = Path(__file__).parent.parent / "docker" / \
-                "workstation-image" / "gemini-code-assist.yaml"
+            template_path = (
+                Path(__file__).parent.parent
+                / "docker"
+                / "workstation-image"
+                / "gemini-code-assist.yaml"
+            )
 
             if not template_path.exists():
                 # If template doesn't exist, create a minimal default configuration
                 logger.warning(
-                    f"Template not found at {template_path}, creating default configuration")
+                    f"Template not found at {template_path}, creating default configuration"
+                )
                 config_content = self._create_default_config()
             else:
                 # Read template configuration
-                with open(template_path, 'r') as f:
+                with open(template_path, "r") as f:
                     config_content = f.read()
 
             # Replace variables
@@ -107,7 +112,7 @@ class GeminiConfigService(IGeminiConfigService):
             config_content = config_content.replace("${GCP_PROJECT_ID}", project_id)
 
             # Write to target path
-            with open(config_file, 'w') as f:
+            with open(config_file, "w") as f:
                 f.write(config_content)
 
             logger.info(f"Set up Gemini Code Assist configuration at {config_file}")
@@ -150,7 +155,7 @@ class GeminiConfigService(IGeminiConfigService):
                 "storage_options": {
                     "persistent": True,
                     "encrypted": True,
-                    "geo_redundant": True
+                    "geo_redundant": True,
                 },
                 "assistants": [
                     {
@@ -158,27 +163,27 @@ class GeminiConfigService(IGeminiConfigService):
                         "type": "code-assist",
                         "provider": "google",
                         "enabled": True,
-                        "model": "gemini-1.5-pro"
+                        "model": "gemini-1.5-pro",
                     },
                     {
                         "name": "roo",
                         "type": "chat",
                         "provider": "anthropic",
                         "enabled": True,
-                        "model": "claude-3-sonnet"
+                        "model": "claude-3-sonnet",
                     },
                     {
                         "name": "cline",
                         "type": "chat",
                         "provider": "anthropic",
                         "enabled": True,
-                        "model": "claude-3-opus"
-                    }
-                ]
+                        "model": "claude-3-opus",
+                    },
+                ],
             }
 
             # Write memory index
-            with open(memory_dir / "memory_index.json", 'w') as f:
+            with open(memory_dir / "memory_index.json", "w") as f:
                 json.dump(memory_index, f, indent=2)
 
             logger.info(f"Set up MCP memory system at {memory_dir}")
@@ -186,17 +191,11 @@ class GeminiConfigService(IGeminiConfigService):
         except IOError as io_error:
             error_msg = f"I/O error during MCP memory setup: {str(io_error)}"
             logger.error(error_msg, exc_info=True)
-            raise ConfigurationError(
-                message=error_msg,
-                cause=io_error
-            )
+            raise ConfigurationError(message=error_msg, cause=io_error)
         except PermissionError as perm_error:
             error_msg = f"Permission denied when creating MCP memory directory: {str(perm_error)}"
             logger.error(error_msg, exc_info=True)
-            raise ConfigurationError(
-                message=error_msg,
-                cause=perm_error
-            )
+            raise ConfigurationError(message=error_msg, cause=perm_error)
         except Exception as e:
             error_msg = f"Failed to setup MCP memory: {str(e)}"
             logger.error(error_msg, exc_info=True)
@@ -220,7 +219,9 @@ class GeminiConfigService(IGeminiConfigService):
             extension_installed = self._check_extension_installed()
 
             # Check memory system
-            memory_exists = self._memory_dir.exists() and self._memory_index_file.exists()
+            memory_exists = (
+                self._memory_dir.exists() and self._memory_index_file.exists()
+            )
 
             # Check Vertex AI API
             vertex_api_enabled = False
@@ -233,7 +234,7 @@ class GeminiConfigService(IGeminiConfigService):
                 "config_exists": config_exists,
                 "extension_installed": extension_installed,
                 "memory_exists": memory_exists,
-                "vertex_api_enabled": vertex_api_enabled
+                "vertex_api_enabled": vertex_api_enabled,
             }
         except Exception as e:
             error_msg = f"Failed to verify Gemini installation: {str(e)}"
@@ -262,7 +263,7 @@ class GeminiConfigService(IGeminiConfigService):
                 ["code", "--install-extension", "Google.cloud-code", "--force"],
                 capture_output=True,
                 text=True,
-                check=False
+                check=False,
             )
 
             if result.returncode != 0:
@@ -298,6 +299,7 @@ class GeminiConfigService(IGeminiConfigService):
 
             # Create timestamped backup filename
             from datetime import datetime
+
             timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
             backup_file = backup_dir / f"gemini-code-assist.{timestamp}.yaml"
 
@@ -324,7 +326,7 @@ class GeminiConfigService(IGeminiConfigService):
                 ["code", "--list-extensions"],
                 capture_output=True,
                 text=True,
-                check=True
+                check=True,
             )
 
             if self._extension_id in result.stdout:

@@ -18,7 +18,7 @@ from datetime import datetime
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)]
+    handlers=[logging.StreamHandler(sys.stdout)],
 )
 logger = logging.getLogger(__name__)
 
@@ -27,12 +27,17 @@ try:
     from redisvl import SemanticCacher
     from langchain_redis.cache import RedisSemanticCache
     from langchain_google_genai import GoogleGenerativeAIEmbeddings as GeminiEmbeddings
-    from packages.shared.src.memory.redis_semantic_cacher import RedisSemanticCacheProvider
+    from packages.shared.src.memory.redis_semantic_cacher import (
+        RedisSemanticCacheProvider,
+    )
     from packages.shared.src.models.base_models import MemoryItem
 except ImportError as e:
     logger.error(f"Failed to import required libraries: {e}")
-    logger.error("Please install required packages: pip install redisvl langchain-redis langchain-google-genai")
+    logger.error(
+        "Please install required packages: pip install redisvl langchain-redis langchain-google-genai"
+    )
     sys.exit(1)
+
 
 async def main():
     """
@@ -43,13 +48,15 @@ async def main():
     # Check for environment variables
     redis_url = os.environ.get("REDIS_URL", "redis://vertex-agent@cherry-ai-project")
     gemini_api_key = os.environ.get("GEMINI_API_KEY")
-    
+
     if not gemini_api_key:
         try:
             with open("gemini.key", "r") as f:
                 gemini_api_key = f.read().strip()
         except:
-            logger.error("Gemini API key not found. Set GEMINI_API_KEY environment variable or create a gemini.key file.")
+            logger.error(
+                "Gemini API key not found. Set GEMINI_API_KEY environment variable or create a gemini.key file."
+            )
             sys.exit(1)
 
     # 1. Set up redisvl SemanticCacher for direct use
@@ -57,9 +64,9 @@ async def main():
     try:
         cacher = SemanticCacher(
             threshold=0.85,  # Similarity threshold
-            ttl=3600,        # TTL in seconds (1 hour)
+            ttl=3600,  # TTL in seconds (1 hour)
             index_schema="agent_memory.yaml",
-            redis_url=redis_url
+            redis_url=redis_url,
         )
         logger.info("Successfully initialized SemanticCacher")
     except Exception as e:
@@ -72,7 +79,7 @@ async def main():
         langchain_cache = RedisSemanticCache(
             embeddings=GeminiEmbeddings(api_key=gemini_api_key),
             redis_url=redis_url,
-            name="agent_semantic_cache"
+            name="agent_semantic_cache",
         )
         logger.info("Successfully initialized LangChain RedisSemanticCache")
     except Exception as e:
@@ -88,9 +95,9 @@ async def main():
             "ttl": 3600,
             "index_schema": "agent_memory.yaml",
             "redis_url": redis_url,
-            "enable_vector_index": True
+            "enable_vector_index": True,
         }
-        
+
         provider = RedisSemanticCacheProvider(config=provider_config)
         await provider.initialize()
         logger.info("Successfully initialized RedisSemanticCacheProvider")
@@ -100,16 +107,16 @@ async def main():
 
     # 4. Demonstrate adding memory items
     logger.info("Demonstrating memory operations")
-    
+
     # Create a test memory item
     memory_item = MemoryItem(
         user_id="test_user",
         session_id="test_session",
         item_type="conversation",
         text_content="This is a test memory about AI orchestration and semantic caching",
-        metadata={"source": "user", "importance": "high"}
+        metadata={"source": "user", "importance": "high"},
     )
-    
+
     # Add to Orchestra's provider
     try:
         memory_id = await provider.add_memory(memory_item)
@@ -124,9 +131,9 @@ async def main():
             user_id="test_user",
             session_id="test_session",
             query="Tell me about orchestration",
-            limit=5
+            limit=5,
         )
-        
+
         logger.info(f"Retrieved {len(memories)} memories through semantic search")
         for i, mem in enumerate(memories):
             logger.info(f"Memory {i+1}: {mem.text_content[:50]}...")
@@ -136,23 +143,23 @@ async def main():
     # 6. Demonstrate LangChain caching
     try:
         logger.info("Testing LangChain caching integration")
-        
+
         # Example query that would be cached
         test_query = "How does semantic caching improve agent memory?"
-        
+
         # The first time would compute embeddings and store in cache
         result1 = langchain_cache.lookup(test_query)
-        
+
         if result1:
             logger.info("Got cached result (unexpected for first query)")
         else:
             logger.info("No cache hit for first query (expected)")
-            
+
             # Simulate storing a result
             test_result = "Semantic caching improves agent memory by efficiently retrieving similar contexts."
             langchain_cache.update(test_query, test_result)
             logger.info("Added result to cache")
-            
+
             # Try lookup again
             result2 = langchain_cache.lookup(test_query)
             if result2:
@@ -165,6 +172,7 @@ async def main():
     # Close connections
     await provider.close()
     logger.info("Redis semantic caching example completed")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

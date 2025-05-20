@@ -22,11 +22,11 @@ logger = logging.getLogger(__name__)
 def get_credential_manager() -> CredentialManager:
     """
     Get a cached instance of the CredentialManager.
-    
+
     This function is cached to ensure that only one instance of the
     CredentialManager is created, which helps with performance and
     resource management.
-    
+
     Returns:
         CredentialManager: An instance of the credential manager
     """
@@ -39,16 +39,16 @@ def get_service_account_info(
 ) -> ServiceAccountInfo:
     """
     Get the service account information.
-    
+
     This dependency provides the service account information to FastAPI routes.
     If the service account information is not available, it raises an HTTP 500 error.
-    
+
     Args:
         credential_manager: The credential manager instance
-        
+
     Returns:
         ServiceAccountInfo: The service account information
-        
+
     Raises:
         HTTPException: If the service account information is not available
     """
@@ -67,17 +67,17 @@ def get_service_account_path(
 ) -> str:
     """
     Get the path to the service account key file.
-    
+
     This dependency provides the path to a temporary file containing the
     service account key to FastAPI routes. If the service account key is
     not available, it raises an HTTP 500 error.
-    
+
     Args:
         credential_manager: The credential manager instance
-        
+
     Returns:
         str: The path to the service account key file
-        
+
     Raises:
         HTTPException: If the service account key is not available
     """
@@ -96,16 +96,16 @@ def get_project_id(
 ) -> str:
     """
     Get the GCP project ID.
-    
+
     This dependency provides the GCP project ID to FastAPI routes.
     If the project ID is not available, it raises an HTTP 500 error.
-    
+
     Args:
         credential_manager: The credential manager instance
-        
+
     Returns:
         str: The GCP project ID
-        
+
     Raises:
         HTTPException: If the project ID is not available
     """
@@ -122,10 +122,10 @@ def get_project_id(
 def get_environment() -> str:
     """
     Get the current environment.
-    
+
     This dependency provides the current environment (e.g., development,
     staging, production) to FastAPI routes.
-    
+
     Returns:
         str: The current environment
     """

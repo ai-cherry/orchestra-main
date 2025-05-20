@@ -77,9 +77,13 @@ def info():
     config_table.add_row("GPU Enabled", str(settings.workstation_use_gpu))
 
     # Compute resources
-    config_table.add_row("Standard Machine Type",
-                         settings.workstation_machine_types.get("standard", "N/A"))
-    config_table.add_row("ML Machine Type", settings.workstation_machine_types.get("ml", "N/A"))
+    config_table.add_row(
+        "Standard Machine Type",
+        settings.workstation_machine_types.get("standard", "N/A"),
+    )
+    config_table.add_row(
+        "ML Machine Type", settings.workstation_machine_types.get("ml", "N/A")
+    )
 
     console.print(config_table)
 
@@ -111,16 +115,16 @@ def benchmark(
     environment: str = typer.Option(
         "github",
         help="Environment to benchmark (github, gcp, or both)",
-        case_sensitive=False
+        case_sensitive=False,
     ),
     workstation_name: Optional[str] = typer.Option(
         None,
-        help="Name of the GCP Workstation to benchmark (required for gcp environment)"
+        help="Name of the GCP Workstation to benchmark (required for gcp environment)",
     ),
     output_dir: Path = typer.Option(
         Path("benchmark_results"),
         help="Directory to save benchmark results",
-        file_okay=False
+        file_okay=False,
     ),
 ):
     """
@@ -129,7 +133,8 @@ def benchmark(
     # Validate arguments
     if environment.lower() in ["gcp", "both"] and not workstation_name:
         console.print(
-            "[bold red]Error:[/bold red] Workstation name is required for GCP benchmarking")
+            "[bold red]Error:[/bold red] Workstation name is required for GCP benchmarking"
+        )
         raise typer.Exit(1)
 
     # Create output directory
@@ -147,67 +152,84 @@ def benchmark(
             with Progress(
                 SpinnerColumn(),
                 TextColumn("[progress.description]{task.description}"),
-                console=console
+                console=console,
             ) as progress:
                 # Start a benchmarking task
                 task = progress.add_task("Running benchmarks...", total=None)
 
                 # Run the benchmark
-                github_results = asyncio.run(benchmark_service.benchmark_github_codespaces())
+                github_results = asyncio.run(
+                    benchmark_service.benchmark_github_codespaces()
+                )
 
                 # Mark the task as completed
                 progress.update(task, completed=True)
 
             # Save results
-            github_output = output_dir / \
-                f"github_benchmark_{github_results.timestamp.strftime('%Y%m%d_%H%M%S')}.json"
+            github_output = (
+                output_dir
+                / f"github_benchmark_{github_results.timestamp.strftime('%Y%m%d_%H%M%S')}.json"
+            )
             benchmark_service.save_results(github_results, github_output)
 
             # Display results summary
             console.print(
-                f"[green]GitHub benchmarks completed and saved to {github_output}[/green]")
+                f"[green]GitHub benchmarks completed and saved to {github_output}[/green]"
+            )
             _display_benchmark_summary(github_results)
 
         if environment.lower() in ["gcp", "both"]:
             # We know workstation_name is not None here due to the validation check above
-            assert workstation_name is not None, "Workstation name is required for GCP benchmarking"
-            console.print(f"[bold]Benchmarking GCP Workstation: {workstation_name}...[/bold]")
+            assert (
+                workstation_name is not None
+            ), "Workstation name is required for GCP benchmarking"
+            console.print(
+                f"[bold]Benchmarking GCP Workstation: {workstation_name}...[/bold]"
+            )
 
             # Run in a progress spinner context
             with Progress(
                 SpinnerColumn(),
                 TextColumn("[progress.description]{task.description}"),
-                console=console
+                console=console,
             ) as progress:
                 # Start a benchmarking task
                 task = progress.add_task("Running benchmarks...", total=None)
 
                 # Run the benchmark with the validated workstation name
                 gcp_results = asyncio.run(
-                    benchmark_service.benchmark_gcp_workstation(workstation_name))
+                    benchmark_service.benchmark_gcp_workstation(workstation_name)
+                )
 
                 # Mark the task as completed
                 progress.update(task, completed=True)
 
             # Save results
-            gcp_output = output_dir / \
-                f"gcp_benchmark_{gcp_results.timestamp.strftime('%Y%m%d_%H%M%S')}.json"
+            gcp_output = (
+                output_dir
+                / f"gcp_benchmark_{gcp_results.timestamp.strftime('%Y%m%d_%H%M%S')}.json"
+            )
             benchmark_service.save_results(gcp_results, gcp_output)
 
             # Display results summary
-            console.print(f"[green]GCP benchmarks completed and saved to {gcp_output}[/green]")
+            console.print(
+                f"[green]GCP benchmarks completed and saved to {gcp_output}[/green]"
+            )
             _display_benchmark_summary(gcp_results)
 
         # If both environments were benchmarked, show comparison
         if environment.lower() == "both":
             comparison = asyncio.run(
-                benchmark_service.compare_environments(github_results, gcp_results))
+                benchmark_service.compare_environments(github_results, gcp_results)
+            )
             _display_comparison(comparison)
 
             # Save comparison
-            comparison_output = output_dir / \
-                f"benchmark_comparison_{github_results.timestamp.strftime('%Y%m%d_%H%M%S')}.json"
-            with open(comparison_output, 'w') as f:
+            comparison_output = (
+                output_dir
+                / f"benchmark_comparison_{github_results.timestamp.strftime('%Y%m%d_%H%M%S')}.json"
+            )
+            with open(comparison_output, "w") as f:
                 json.dump(comparison, f, indent=2)
 
             console.print(f"[green]Comparison saved to {comparison_output}[/green]")
@@ -222,7 +244,7 @@ def benchmark(
             f"[yellow]Root Cause:[/yellow] {error_details.get('root_cause', 'Unknown')}\n"
             f"[yellow]Suggestion:[/yellow] {error_details.get('suggestion', 'Try again or check logs for more details.')}",
             title="Benchmark Failed",
-            border_style="red"
+            border_style="red",
         )
         console.print(error_panel)
 
@@ -237,7 +259,7 @@ def benchmark(
             f"[yellow]Suggestion:[/yellow] This is an unhandled error. Please report this issue "
             f"with the complete error message and steps to reproduce.",
             title="Unexpected Error",
-            border_style="red"
+            border_style="red",
         )
         console.print(error_panel)
 
@@ -249,33 +271,19 @@ def benchmark(
 @app.command()
 def migrate(
     project_id: str = typer.Option(
-        None,
-        help="GCP Project ID (uses configured value if not provided)"
+        None, help="GCP Project ID (uses configured value if not provided)"
     ),
     repositories: Optional[List[str]] = typer.Option(
         None,
-        help="GitHub repositories to migrate (uses configured values if not provided)"
+        help="GitHub repositories to migrate (uses configured values if not provided)",
     ),
-    skip_benchmark: bool = typer.Option(
-        False,
-        help="Skip benchmarking"
-    ),
+    skip_benchmark: bool = typer.Option(False, help="Skip benchmarking"),
     skip_terraform: bool = typer.Option(
-        False,
-        help="Skip Terraform infrastructure deployment"
+        False, help="Skip Terraform infrastructure deployment"
     ),
-    skip_container: bool = typer.Option(
-        False,
-        help="Skip container image building"
-    ),
-    skip_secrets: bool = typer.Option(
-        False,
-        help="Skip secret migration"
-    ),
-    auto_approve: bool = typer.Option(
-        False,
-        help="Skip confirmation prompts"
-    ),
+    skip_container: bool = typer.Option(False, help="Skip container image building"),
+    skip_secrets: bool = typer.Option(False, help="Skip secret migration"),
+    auto_approve: bool = typer.Option(False, help="Skip confirmation prompts"),
 ):
     """
     Execute the complete migration process.
@@ -303,8 +311,7 @@ def migrate(
 @app.command()
 def validate(
     workstation_name: str = typer.Argument(
-        ...,
-        help="Name of the GCP Workstation to validate"
+        ..., help="Name of the GCP Workstation to validate"
     ),
 ):
     """

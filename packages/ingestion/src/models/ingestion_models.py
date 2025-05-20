@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field, HttpUrl, validator
 
 class IngestionStatus(str, Enum):
     """Status of an ingestion task."""
+
     PENDING = "pending"
     DOWNLOADING = "downloading"
     DOWNLOADED = "downloaded"
@@ -25,6 +26,7 @@ class IngestionStatus(str, Enum):
 
 class FileType(str, Enum):
     """Supported file types for ingestion."""
+
     PDF = "pdf"
     DOCX = "docx"
     XLSX = "xlsx"
@@ -44,10 +46,11 @@ class FileType(str, Enum):
 class IngestionTask(BaseModel):
     """
     Model for tracking ingestion tasks.
-    
+
     This represents a top-level ingestion request, potentially
     involving multiple files (e.g., if the source is an archive).
     """
+
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
     session_id: Optional[str] = None
@@ -57,7 +60,7 @@ class IngestionTask(BaseModel):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     error: Optional[str] = None
     metadata: Dict[str, Any] = Field(default_factory=dict)
-    
+
     class Config:
         populate_by_name = True
         arbitrary_types_allowed = True
@@ -69,10 +72,11 @@ class IngestionTask(BaseModel):
 class ProcessedFile(BaseModel):
     """
     Model for tracking processed files.
-    
+
     This represents an individual file that has been processed,
     which may be part of a larger ingestion task.
     """
+
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     task_id: str
     user_id: str
@@ -86,7 +90,7 @@ class ProcessedFile(BaseModel):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     error: Optional[str] = None
     metadata: Dict[str, Any] = Field(default_factory=dict)
-    
+
     class Config:
         populate_by_name = True
         arbitrary_types_allowed = True
@@ -98,10 +102,11 @@ class ProcessedFile(BaseModel):
 class TextChunk(BaseModel):
     """
     Model for text chunks extracted from a file.
-    
+
     This represents a segment of text extracted from a processed file,
     which will be embedded and stored in the vector database.
     """
+
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     file_id: str
     task_id: str
@@ -111,7 +116,7 @@ class TextChunk(BaseModel):
     embedding: Optional[List[float]] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
     metadata: Dict[str, Any] = Field(default_factory=dict)
-    
+
     class Config:
         populate_by_name = True
         arbitrary_types_allowed = True
@@ -123,17 +128,18 @@ class TextChunk(BaseModel):
 class IngestionResult(BaseModel):
     """
     Model for returning ingestion task results.
-    
+
     This is used for API responses to provide information
     about an ingestion task's status and details.
     """
+
     task_id: str
     status: IngestionStatus
     message: str
     details: Dict[str, Any] = Field(default_factory=dict)
     created_at: datetime
     updated_at: datetime
-    
+
     class Config:
         populate_by_name = True
         arbitrary_types_allowed = True
@@ -145,16 +151,17 @@ class IngestionResult(BaseModel):
 class PubSubMessage(BaseModel):
     """
     Model for PubSub message data.
-    
+
     This represents the structure of messages sent through Pub/Sub
     for asynchronous processing of ingestion tasks.
     """
+
     task_id: str
     user_id: str
     session_id: Optional[str] = None
     source_url: HttpUrl
     metadata: Dict[str, Any] = Field(default_factory=dict)
-    
+
     class Config:
         populate_by_name = True
         arbitrary_types_allowed = True

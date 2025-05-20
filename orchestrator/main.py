@@ -22,7 +22,9 @@ STANDARD_MODE = standard_mode_env == "true"
 
 # Log the selected mode
 print(f"🔧 Starting Orchestra in {'RECOVERY' if RECOVERY_MODE else 'STANDARD'} mode")
-print(f"   Environment settings: USE_RECOVERY_MODE={use_recovery_mode_env}, STANDARD_MODE={standard_mode_env}")
+print(
+    f"   Environment settings: USE_RECOVERY_MODE={use_recovery_mode_env}, STANDARD_MODE={standard_mode_env}"
+)
 
 # Debug: Print all environment variables to help diagnose issues
 print("===== DEBUG: Environment Variables at Startup =====")
@@ -39,7 +41,9 @@ from config.gcp_config import get_gcp_config, get_memory_manager_config
 from packages.shared.src.memory.memory_manager import MemoryManagerFactory
 
 # Log the mode we're starting in
-logger.info(f"Starting with RECOVERY_MODE={RECOVERY_MODE}, STANDARD_MODE={STANDARD_MODE}")
+logger.info(
+    f"Starting with RECOVERY_MODE={RECOVERY_MODE}, STANDARD_MODE={STANDARD_MODE}"
+)
 print(f"Starting with RECOVERY_MODE={RECOVERY_MODE}, STANDARD_MODE={STANDARD_MODE}")
 
 # Configure logging
@@ -90,8 +94,7 @@ async def startup_event():
     try:
         memory_config = get_memory_manager_config()
         memory_manager = MemoryManagerFactory.create(**memory_config)
-        logger.info(
-            f"Memory manager initialized: {memory_config['memory_type']}")
+        logger.info(f"Memory manager initialized: {memory_config['memory_type']}")
     except Exception as e:
         logger.error(f"Failed to initialize memory manager: {e}")
         if environment in ["production", "staging"]:
@@ -104,10 +107,14 @@ async def startup_event():
 
     # Register default agents
     from core.orchestrator.src.agents.agent_registry import register_default_agents
+
     register_default_agents()
 
     logger.info("System initialization complete")
-    logger.info(f"Starting API in {'STANDARD' if STANDARD_MODE else 'RECOVERY'} MODE in {environment} environment")
+    logger.info(
+        f"Starting API in {'STANDARD' if STANDARD_MODE else 'RECOVERY'} MODE in {environment} environment"
+    )
+
 
 # Shutdown cleanup
 
@@ -128,7 +135,7 @@ async def health_check():
         "status": "Service is healthy",
         "mode": "standard" if STANDARD_MODE else "recovery",
         "environment": environment,
-        "recovery_mode": RECOVERY_MODE
+        "recovery_mode": RECOVERY_MODE,
     }
 
 
@@ -152,7 +159,9 @@ async def interact(user_input: dict):
 
         agents = get_all_agents()
         if not agents:
-            return {"response": "No agents are currently available. Please try again later."}
+            return {
+                "response": "No agents are currently available. Please try again later."
+            }
 
         agent = agents[0]  # Use the first registered agent
         response = await agent.process(text)
@@ -160,11 +169,12 @@ async def interact(user_input: dict):
         # Store interaction in memory if memory manager is available
         if memory_manager:
             from packages.shared.src.models.base_models import MemoryItem
+
             try:
                 memory_item = MemoryItem(
                     content=text,
                     response=response,
-                    metadata={"source": "user_interaction"}
+                    metadata={"source": "user_interaction"},
                 )
                 await memory_manager.store(memory_item)
             except Exception as e:
@@ -173,9 +183,7 @@ async def interact(user_input: dict):
         # Store interaction in short-term memory
         try:
             memory_item = MemoryItem(
-                content=text,
-                response=response,
-                metadata={"source": "user_interaction"}
+                content=text, response=response, metadata={"source": "user_interaction"}
             )
             short_term_memory.insert(0, memory_item)  # Add to the beginning
             if len(short_term_memory) > SHORT_TERM_MEMORY_SIZE:
@@ -189,6 +197,7 @@ async def interact(user_input: dict):
         logger.error(f"Interaction failed: {e}")
         return {"response": f"Error processing request: {str(e)}"}
 
+
 if __name__ == "__main__":
     import uvicorn
 
@@ -197,8 +206,5 @@ if __name__ == "__main__":
 
     # Start server
     uvicorn.run(
-        "core.orchestrator.src.main:app",
-        host="0.0.0.0",
-        port=port,
-        reload=True
+        "core.orchestrator.src.main:app", host="0.0.0.0", port=port, reload=True
     )

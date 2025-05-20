@@ -66,7 +66,7 @@ class OptimizedMemoryStorage(IMemoryStorage):
             "misses": 0,
             "expirations": 0,
             "deletes": 0,
-            "searches": 0
+            "searches": 0,
         }
 
     async def initialize(self) -> bool:
@@ -322,7 +322,9 @@ class OptimizedMemoryStorage(IMemoryStorage):
             self.perf.record_operation("storage.list_keys.error", duration)
             return []
 
-    async def search(self, query: str, scope: str = "default", limit: int = 10) -> List[Dict[str, Any]]:
+    async def search(
+        self, query: str, scope: str = "default", limit: int = 10
+    ) -> List[Dict[str, Any]]:
         """Search for entries matching a query.
 
         Args:
@@ -445,11 +447,7 @@ class OptimizedMemoryStorage(IMemoryStorage):
             logger.error(f"Failed to get health information: {e}")
             duration = time.time() - start_time
             self.perf.record_operation("storage.get_health.error", duration)
-            return {
-                "status": "unhealthy",
-                "error": str(e),
-                "type": "in-memory"
-            }
+            return {"status": "unhealthy", "error": str(e), "type": "in-memory"}
 
     async def save(self, key: str, entry: MemoryEntry) -> bool:
         """Save a memory entry to storage.
@@ -462,7 +460,7 @@ class OptimizedMemoryStorage(IMemoryStorage):
             True if successful, False otherwise
         """
         # Map to the store method
-        return await self.store(key, entry, getattr(entry, 'scope', 'default'))
+        return await self.store(key, entry, getattr(entry, "scope", "default"))
 
     async def get(self, key: str) -> Optional[MemoryEntry]:
         """Retrieve a memory entry from storage.
@@ -491,7 +489,11 @@ class OptimizedMemoryStorage(IMemoryStorage):
                 for scope_data in self.data.values():
                     for key, value in scope_data.items():
                         # Check if it's a MemoryEntry with matching hash
-                        if isinstance(value, dict) and value.get('metadata', {}).get('content_hash') == content_hash:
+                        if (
+                            isinstance(value, dict)
+                            and value.get("metadata", {}).get("content_hash")
+                            == content_hash
+                        ):
                             entry = await self.retrieve(key)
                             if entry:
                                 return entry
@@ -623,12 +625,31 @@ class OptimizedMemoryStorage(IMemoryStorage):
         # Remove punctuation, convert to lowercase, and split by whitespace
         terms = set()
         import re
+
         # Remove non-alphanumeric characters and split by whitespace
-        words = re.sub(r'[^\w\s]', ' ', text.lower()).split()
+        words = re.sub(r"[^\w\s]", " ", text.lower()).split()
 
         # Filter out very short words and common stop words
-        stop_words = {'a', 'an', 'the', 'and', 'or', 'but', 'is', 'are', 'was', 'were',
-                      'in', 'on', 'at', 'to', 'for', 'with', 'by', 'of'}
+        stop_words = {
+            "a",
+            "an",
+            "the",
+            "and",
+            "or",
+            "but",
+            "is",
+            "are",
+            "was",
+            "were",
+            "in",
+            "on",
+            "at",
+            "to",
+            "for",
+            "with",
+            "by",
+            "of",
+        }
 
         for word in words:
             if len(word) > 2 and word not in stop_words:
@@ -665,16 +686,17 @@ class OptimizedMemoryStorage(IMemoryStorage):
 
                     data_to_persist[scope][key] = {
                         "value": value,
-                        "ttl_remaining": ttl_remaining
+                        "ttl_remaining": ttl_remaining,
                     }
 
             # Write to temporary file first
             temp_path = f"{self.persistence_path}.tmp"
-            with open(temp_path, 'w') as f:
+            with open(temp_path, "w") as f:
                 json.dump(data_to_persist, f)
 
             # Rename to actual file (atomic operation)
             import os
+
             os.replace(temp_path, self.persistence_path)
 
             return True
@@ -694,7 +716,7 @@ class OptimizedMemoryStorage(IMemoryStorage):
         try:
             import json
 
-            with open(self.persistence_path, 'r') as f:
+            with open(self.persistence_path, "r") as f:
                 persisted_data = json.load(f)
 
             # Load data

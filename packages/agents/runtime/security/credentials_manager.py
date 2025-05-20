@@ -48,12 +48,8 @@ class CredentialsManager(BaseAgent):
         """
         # Create config dictionary if not provided
         if config is None:
-            config = {
-                "id": agent_id,
-                "name": name,
-                "description": description
-            }
-        
+            config = {"id": agent_id, "name": name, "description": description}
+
         super().__init__(config=config, persona=persona)
         self.providers = {}
         self.default_provider = None
@@ -121,14 +117,14 @@ class CredentialsManager(BaseAgent):
         if not self.providers:
             return {
                 "status": "error",
-                "message": "No credential providers are configured."
+                "message": "No credential providers are configured.",
             }
 
         if provider not in self.providers:
             available_providers = ", ".join(self.providers.keys())
             return {
                 "status": "error",
-                "message": f"Unknown credential provider '{provider}'. Available providers: {available_providers}"
+                "message": f"Unknown credential provider '{provider}'. Available providers: {available_providers}",
             }
 
         # Delegate to the appropriate provider
@@ -137,26 +133,20 @@ class CredentialsManager(BaseAgent):
             credential_name = context.get("credential_name")
 
             if not credential_name:
-                return {
-                    "status": "error",
-                    "message": "No credential name provided."
-                }
+                return {"status": "error", "message": "No credential name provided."}
 
             # Instead of returning credential, confirm access and store
             # in a secure context that only authorized agents can access
             return {
                 "status": "success",
-                "message": f"Credential '{credential_name}' would be securely accessed through {provider}."
+                "message": f"Credential '{credential_name}' would be securely accessed through {provider}.",
             }
 
         elif request_type == "check_exists":
             credential_name = context.get("credential_name")
 
             if not credential_name:
-                return {
-                    "status": "error",
-                    "message": "No credential name provided."
-                }
+                return {"status": "error", "message": "No credential name provided."}
 
             result = await self.check_credential_exists(
                 credential_name, provider=provider, vault=context.get("vault")
@@ -165,7 +155,7 @@ class CredentialsManager(BaseAgent):
             return {
                 "status": "success",
                 "exists": result,
-                "message": f"Credential '{credential_name}' {'exists' if result else 'does not exist'} in provider '{provider}'."
+                "message": f"Credential '{credential_name}' {'exists' if result else 'does not exist'} in provider '{provider}'.",
             }
 
         elif request_type == "list_available":
@@ -180,20 +170,20 @@ class CredentialsManager(BaseAgent):
                     "status": "success",
                     "count": 0,
                     "credentials": [],
-                    "message": f"No credentials found in provider '{provider}'."
+                    "message": f"No credentials found in provider '{provider}'.",
                 }
 
             return {
                 "status": "success",
                 "count": len(result),
                 "credentials": result,
-                "message": f"Found {len(result)} credentials in provider '{provider}'."
+                "message": f"Found {len(result)} credentials in provider '{provider}'.",
             }
 
         else:
             return {
                 "status": "error",
-                "message": f"Unknown request type '{request_type}'. Valid types are: get_credential, check_exists, list_available."
+                "message": f"Unknown request type '{request_type}'. Valid types are: get_credential, check_exists, list_available.",
             }
 
     async def get_credential(
@@ -401,7 +391,7 @@ class CredentialsManager(BaseAgent):
         """Process feedback about the agent's performance."""
         logger.info(f"Credentials Manager received feedback: {feedback}")
         super().process_feedback(feedback)
-    
+
     def shutdown(self) -> None:
         """Perform any necessary cleanup when shutting down the agent."""
         logger.info(f"Shutting down Credentials Manager")

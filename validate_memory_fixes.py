@@ -31,12 +31,15 @@ async def test_memory_adapter(use_firestore=False):
         # Import the necessary modules
         from packages.shared.src.memory.memory_manager import InMemoryMemoryManager
         from packages.shared.src.models.base_models import MemoryItem
-        
+
         # Try to import the FirestoreMemoryAdapter
         firestore_adapter = None
         if use_firestore:
             try:
-                from packages.shared.src.memory.firestore_adapter import FirestoreMemoryAdapter
+                from packages.shared.src.memory.firestore_adapter import (
+                    FirestoreMemoryAdapter,
+                )
+
                 firestore_adapter = FirestoreMemoryAdapter
                 logger.info("Successfully imported FirestoreMemoryAdapter")
             except ImportError as e:
@@ -48,21 +51,23 @@ async def test_memory_adapter(use_firestore=False):
 
         # Determine which adapter to use
         if use_firestore and firestore_adapter:
-            # Get GCP Project ID from environment 
+            # Get GCP Project ID from environment
             project_id = os.environ.get("GCP_PROJECT_ID")
             credentials_path = os.environ.get("GCP_SA_KEY_PATH")
             credentials_json = os.environ.get("GCP_SA_KEY_JSON")
-            
+
             if not project_id:
                 logger.error("GCP_PROJECT_ID environment variable not set")
                 return False
-                
-            logger.info(f"Testing with FirestoreMemoryAdapter using project ID: {project_id}")
+
+            logger.info(
+                f"Testing with FirestoreMemoryAdapter using project ID: {project_id}"
+            )
             adapter = firestore_adapter(
                 project_id=project_id,
                 credentials_path=credentials_path,
                 credentials_json=credentials_json,
-                namespace=namespace
+                namespace=namespace,
             )
         else:
             # Use in-memory manager for validation
@@ -88,10 +93,7 @@ async def test_memory_adapter(use_firestore=False):
             persona_active="test_persona",
             text_content="This is a test message from validate_memory_fixes.py",
             timestamp=datetime.utcnow(),
-            metadata={
-                "source": "validation_script",
-                "test": True
-            }
+            metadata={"source": "validation_script", "test": True},
         )
 
         # Test adding a memory item
@@ -102,14 +104,16 @@ async def test_memory_adapter(use_firestore=False):
         # Test retrieving conversation history
         logger.info("Retrieving conversation history...")
         history = await adapter.get_conversation_history(
-            user_id="patrick_test",
-            limit=10
+            user_id="patrick_test", limit=10
         )
         logger.info(f"Retrieved {len(history)} memory items")
 
         # Verify the test item was retrieved
         for item in history:
-            if item.text_content == "This is a test message from validate_memory_fixes.py":
+            if (
+                item.text_content
+                == "This is a test message from validate_memory_fixes.py"
+            ):
                 logger.info("Successfully retrieved test memory item!")
                 logger.info(f"Item metadata: {item.metadata}")
                 break
@@ -135,9 +139,15 @@ async def test_memory_adapter(use_firestore=False):
 def parse_args():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(description="Validate memory system fixes")
-    parser.add_argument("--project-id", help="Google Cloud project ID for Firestore testing")
-    parser.add_argument("--firestore", action="store_true", help="Use FirestoreMemoryAdapter")
-    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose output")
+    parser.add_argument(
+        "--project-id", help="Google Cloud project ID for Firestore testing"
+    )
+    parser.add_argument(
+        "--firestore", action="store_true", help="Use FirestoreMemoryAdapter"
+    )
+    parser.add_argument(
+        "--verbose", "-v", action="store_true", help="Enable verbose output"
+    )
     return parser.parse_args()
 
 
@@ -158,7 +168,7 @@ async def main():
     use_firestore = args.firestore or os.environ.get("GCP_PROJECT_ID") is not None
     if use_firestore:
         logger.info("Will attempt to use FirestoreMemoryAdapter")
-    
+
     # Run the test
     logger.info("Starting memory system validation...")
     success = await test_memory_adapter(use_firestore=use_firestore)
@@ -174,8 +184,10 @@ async def main():
 if __name__ == "__main__":
     # Make script executable
     import os
+
     if os.name != "nt":  # Not Windows
         import stat
+
         script_path = os.path.abspath(__file__)
         st = os.stat(script_path)
         os.chmod(script_path, st.st_mode | stat.S_IEXEC)

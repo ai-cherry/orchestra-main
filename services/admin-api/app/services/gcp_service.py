@@ -16,25 +16,25 @@ class GcpService:
     """
     Service for interacting with Google Cloud Platform services.
     """
-    
+
     def __init__(self, project_id: str):
         """
         Initialize the GCP service.
-        
+
         Args:
             project_id: GCP project ID
         """
         self.project_id = project_id
         self.resource_client = resourcemanager_v3.ProjectsClient()
         self.firestore_client = FirestoreAsyncClient(project=project_id)
-        
+
         # Initialize Vertex AI
         aiplatform.init(project=project_id, location=settings.REGION)
-    
+
     async def get_project_info(self) -> Dict[str, Any]:
         """
         Get GCP project information.
-        
+
         Returns:
             Dict[str, Any]: Project information
         """
@@ -42,25 +42,26 @@ class GcpService:
         project_name = f"projects/{self.project_id}"
         loop = asyncio.get_event_loop()
         project = await loop.run_in_executor(
-            None, 
-            lambda: self.resource_client.get_project(name=project_name)
+            None, lambda: self.resource_client.get_project(name=project_name)
         )
-        
+
         # Get Firestore stats
-        memory_collection = self.firestore_client.collection(settings.FIRESTORE_COLLECTION)
+        memory_collection = self.firestore_client.collection(
+            settings.FIRESTORE_COLLECTION
+        )
         memory_docs = await memory_collection.count().get()
         memory_count = memory_docs[0][0].value
-        
+
         # Get Vertex AI models
         vertex_models = await loop.run_in_executor(
             None,
             lambda: aiplatform.Model.list(
                 filter=f"display_name=*",
                 project=self.project_id,
-                location=settings.GEMINI_LOCATION
-            )
+                location=settings.GEMINI_LOCATION,
+            ),
         )
-        
+
         return {
             "project_id": self.project_id,
             "project_name": project.display_name,
@@ -72,7 +73,7 @@ class GcpService:
                 "models_count": len(vertex_models),
                 "gemini_model": settings.GEMINI_MODEL_ID,
                 "location": settings.GEMINI_LOCATION,
-            }
+            },
         }
 
 
@@ -81,7 +82,7 @@ def get_gcp_service() -> GcpService:
     """
     Factory function for GcpService instances.
     Used as a FastAPI dependency.
-    
+
     Returns:
         GcpService: The GCP service instance
     """

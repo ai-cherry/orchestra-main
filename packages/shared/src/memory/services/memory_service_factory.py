@@ -9,7 +9,9 @@ import logging
 from typing import Dict, Optional, Any
 
 from packages.shared.src.memory.ports import MemoryStoragePort
-from packages.shared.src.memory.adapters.firestore_adapter import FirestoreStorageAdapter
+from packages.shared.src.memory.adapters.firestore_adapter import (
+    FirestoreStorageAdapter,
+)
 from packages.shared.src.memory.adapters.postgres_adapter import PostgresStorageAdapter
 from packages.shared.src.memory.services.memory_service import MemoryService
 from packages.shared.src.storage.config import StorageConfig
@@ -58,8 +60,7 @@ class MemoryServiceFactory:
         service = MemoryService(storage_adapter)
         await service.initialize()
 
-        logger.info(
-            f"Created memory service with {storage_type} storage adapter")
+        logger.info(f"Created memory service with {storage_type} storage adapter")
         return service
 
     @staticmethod

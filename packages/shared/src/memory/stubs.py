@@ -17,28 +17,28 @@ from packages.shared.src.models.base_models import AgentData, MemoryItem, Person
 class PatrickMemoryManager(MemoryManager):
     """
     Simple in-memory implementation of the MemoryManager specifically for Patrick.
-    
+
     This class was previously used in tests and is maintained for backward compatibility.
     It stores memory items and agent data in memory with all user_ids overridden to 'patrick'.
     """
-    
+
     def __init__(self):
         """Initialize the Patrick memory manager."""
         self._is_initialized = False
         self._items = []
         self._agent_data = []
         self._patrick_user_id = "patrick"
-    
+
     def initialize(self):
         """Initialize the memory manager."""
         self._is_initialized = True
-    
+
     def close(self):
         """Close the memory manager and release resources."""
         self._items = []
         self._agent_data = []
         self._is_initialized = False
-    
+
     def add_memory_item(self, item: MemoryItem) -> str:
         """
         Add a memory item to storage, overriding user_id with 'patrick'.
@@ -55,7 +55,7 @@ class PatrickMemoryManager(MemoryManager):
 
         # Create a copy with a generated ID if one isn't provided
         item_id = item.id if item.id else str(uuid.uuid4())
-        
+
         # Always override user_id with patrick
         new_item = MemoryItem(
             id=item_id,
@@ -111,19 +111,19 @@ class PatrickMemoryManager(MemoryManager):
         """
         # Start with all items (always filtered to patrick)
         items = self._items.copy()
-        
+
         # Filter by session ID if provided
         if session_id:
             items = [item for item in items if item.session_id == session_id]
-        
+
         # Apply additional filters if provided
         if filters:
             for key, value in filters.items():
                 items = [item for item in items if getattr(item, key, None) == value]
-        
+
         # Sort by timestamp (newest first)
         items.sort(key=lambda x: x.timestamp or datetime.min, reverse=True)
-        
+
         # Apply limit
         return items[:limit]
 
@@ -137,7 +137,7 @@ class PatrickMemoryManager(MemoryManager):
     ) -> List[MemoryItem]:
         """
         Mock implementation of semantic search for Patrick.
-        
+
         This implementation simply filters by persona and returns items in reverse chronological order.
 
         Args:
@@ -151,19 +151,23 @@ class PatrickMemoryManager(MemoryManager):
             List of filtered memory items
         """
         items = self._items.copy()
-        
+
         # Filter by persona if provided
         if persona_context:
-            items = [item for item in items if item.persona_active == persona_context.name.lower()]
-        
+            items = [
+                item
+                for item in items
+                if item.persona_active == persona_context.name.lower()
+            ]
+
         # Apply additional filters if provided
         if filters:
             for key, value in filters.items():
                 items = [item for item in items if getattr(item, key, None) == value]
-        
+
         # Sort by timestamp (newest first)
         items.sort(key=lambda x: x.timestamp or datetime.min, reverse=True)
-        
+
         # Apply limit
         return items[:top_k]
 
@@ -183,7 +187,7 @@ class PatrickMemoryManager(MemoryManager):
 
         # Create a copy with a generated ID if one isn't provided
         data_id = data.id if data.id else str(uuid.uuid4())
-        
+
         new_data = AgentData(
             id=data_id,
             agent_id=data.agent_id,
@@ -209,7 +213,9 @@ class PatrickMemoryManager(MemoryManager):
             True if a duplicate exists, False otherwise
         """
         # Simple implementation - just check if text content already exists
-        return any(existing.text_content == item.text_content for existing in self._items)
+        return any(
+            existing.text_content == item.text_content for existing in self._items
+        )
 
     def cleanup_expired_items(self) -> int:
         """
@@ -220,7 +226,7 @@ class PatrickMemoryManager(MemoryManager):
         """
         now = datetime.utcnow()
         expired_count = 0
-        
+
         # Count and remove expired items
         new_items = []
         for item in self._items:
@@ -228,17 +234,18 @@ class PatrickMemoryManager(MemoryManager):
                 expired_count += 1
             else:
                 new_items.append(item)
-        
+
         self._items = new_items
-        
+
         # Also clean up agent data
         self._agent_data = [
-            data for data in self._agent_data
+            data
+            for data in self._agent_data
             if not data.expiration or data.expiration > now
         ]
-        
+
         return expired_count
-    
+
     def health_check(self) -> MemoryHealth:
         """
         Check the health status of the memory manager.
@@ -254,8 +261,8 @@ class PatrickMemoryManager(MemoryManager):
             "details": {
                 "provider": "patrick_memory",
                 "items_count": len(self._items),
-                "agent_data_count": len(self._agent_data)
-            }
+                "agent_data_count": len(self._agent_data),
+            },
         }
 
 
@@ -271,7 +278,7 @@ class InMemoryMemoryManagerStub(MemoryManager):
     def __init__(self, namespace: str = "default"):
         """
         Initialize the in-memory memory manager stub.
-        
+
         Args:
             namespace: Optional namespace to use for memory isolation
         """
@@ -494,7 +501,7 @@ class InMemoryMemoryManagerStub(MemoryManager):
         ]
 
         return expired_count
-    
+
     async def health_check(self) -> MemoryHealth:
         """
         Check the health status of the memory manager.
@@ -510,6 +517,6 @@ class InMemoryMemoryManagerStub(MemoryManager):
             "details": {
                 "provider": "in_memory",
                 "items_count": len(self.memory_items),
-                "agent_data_count": len(self.agent_data)
-            }
+                "agent_data_count": len(self.agent_data),
+            },
         }

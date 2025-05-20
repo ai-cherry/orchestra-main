@@ -4,12 +4,14 @@ from typing import Dict, List, Optional, Any
 from packages.shared.src.models.base_models import MemoryItem, AgentData, PersonaConfig
 from packages.shared.src.memory.memory_interface import MemoryInterface
 
+
 class BaseMemoryManager(MemoryInterface):
     """
     Abstract base class for memory managers.
 
     This class defines the interface for interacting with memory systems.
     """
+
     @abc.abstractmethod
     async def add_memory_item(self, item: MemoryItem) -> str:
         """Add a memory item to storage."""

@@ -41,14 +41,14 @@ logger = logging.getLogger("memory_deployment")
 
 class DeploymentConfig:
     """Deployment configuration for memory system"""
-    
+
     # GCP project IDs
     PROJECT_IDS = {
         "dev": "orchestra-dev-project",
         "staging": "orchestra-staging-project",
         "prod": "orchestra-prod-project",
     }
-    
+
     # Environment-specific configuration
     ENV_CONFIGS = {
         "dev": {
@@ -87,9 +87,9 @@ def get_credentials_path(env: str) -> str:
 def create_storage_config(env: str, tenant_id: Optional[str] = None) -> StorageConfig:
     """Create a StorageConfig for the specified environment and tenant"""
     env_config = DeploymentConfig.ENV_CONFIGS[env]
-    
+
     namespace = f"tenant_{tenant_id}" if tenant_id else None
-    
+
     return StorageConfig(
         namespace=namespace,
         environment=env,
@@ -102,12 +102,12 @@ def create_storage_config(env: str, tenant_id: Optional[str] = None) -> StorageC
 def create_pii_config(env: str) -> PIIDetectionConfig:
     """Create a PIIDetectionConfig for the specified environment"""
     env_config = DeploymentConfig.ENV_CONFIGS[env]
-    
+
     config = PIIDetectionConfig()
     config.ENABLE_PII_DETECTION = True
     config.ENABLE_PII_REDACTION = env_config["pii_redaction"]
     config.DEFAULT_RETENTION_DAYS = env_config["retention_days"]
-    
+
     return config
 
 
@@ -117,17 +117,17 @@ async def setup_memory_managers(env: str, tenant_id: Optional[str] = None):
     credentials_path = get_credentials_path(env)
     storage_config = create_storage_config(env, tenant_id)
     pii_config = create_pii_config(env)
-    
+
     # Create base Firestore adapter
     firestore_adapter = FirestoreMemoryAdapter(
         project_id=project_id,
         credentials_path=credentials_path,
         namespace=storage_config.namespace or "default",
     )
-    
+
     # Initialize the adapter
     await firestore_adapter.initialize()
-    
+
     # Create development notes manager if enabled
     dev_notes_manager = None
     if storage_config.enable_dev_notes:
@@ -138,17 +138,17 @@ async def setup_memory_managers(env: str, tenant_id: Optional[str] = None):
         )
         await dev_notes_manager.initialize()
         logger.info(f"Development notes manager initialized for {env} environment")
-    
+
     # Create privacy-enhanced memory manager
     privacy_manager = PrivacyEnhancedMemoryManager(
         underlying_manager=firestore_adapter,
         config=storage_config,
         pii_config=pii_config,
     )
-    
+
     await privacy_manager.initialize()
     logger.info(f"Privacy-enhanced memory manager initialized for {env} environment")
-    
+
     return {
         "base_adapter": firestore_adapter,
         "dev_notes_manager": dev_notes_manager,
@@ -165,20 +165,21 @@ async def record_deployment_info(
 ):
     """Record deployment information as a development note"""
     if not dev_notes_manager:
-        logger.warning("Development notes manager not available, skipping deployment record")
+        logger.warning(
+            "Development notes manager not available, skipping deployment record"
+        )
         return
-    
+
     # Format changes list
     changes_formatted = "\n".join([f"- {change}" for change in changes])
-    
+
     # Create implementation note for each affected component
     for component in components:
         await dev_notes_manager.add_implementation_note(
             component=component,
             overview=f"Deployment {version} - {component}",
             implementation_details=(
-                f"Deployment ID: {deployment_id}\n\n"
-                f"Changes:\n{changes_formatted}"
+                f"Deployment ID: {deployment_id}\n\n" f"Changes:\n{changes_formatted}"
             ),
             affected_files=[],  # Would be populated with actual affected files
             testing_status="verified",
@@ -187,33 +188,34 @@ async def record_deployment_info(
                 "version": version,
                 "note_type": DevNoteType.DEPLOYMENT.value,
                 "priority": "normal",
-                "expiration": datetime.utcnow() + timedelta(days=365),  # 1 year retention
+                "expiration": datetime.utcnow()
+                + timedelta(days=365),  # 1 year retention
             },
         )
-        
+
         logger.info(f"Recorded deployment information for component: {component}")
 
 
 async def verify_memory_health(managers: Dict):
     """Verify the health of memory managers"""
     results = {}
-    
+
     # Check base adapter health
     base_health = await managers["base_adapter"].health_check()
     results["base_adapter"] = base_health["status"]
-    
+
     # Check dev notes manager health if available
     if managers["dev_notes_manager"]:
         dev_notes_health = await managers["dev_notes_manager"].health_check()
         results["dev_notes_manager"] = dev_notes_health["status"]
-    
+
     # Check privacy manager health
     privacy_health = await managers["privacy_manager"].health_check()
     results["privacy_manager"] = privacy_health["status"]
-    
+
     # Log health status
     logger.info(f"Memory system health: {json.dumps(results, indent=2)}")
-    
+
     # Return overall status
     overall_status = all(status == "healthy" for status in results.values())
     return "healthy" if overall_status else "unhealthy"
@@ -223,17 +225,19 @@ async def close_managers(managers: Dict):
     """Close all memory managers"""
     if managers["base_adapter"]:
         await managers["base_adapter"].close()
-    
+
     if managers["dev_notes_manager"]:
         await managers["dev_notes_manager"].close()
-    
+
     if managers["privacy_manager"]:
         await managers["privacy_manager"].close()
 
 
 async def main():
     """Main entry point"""
-    parser = argparse.ArgumentParser(description="Configure memory system for deployment")
+    parser = argparse.ArgumentParser(
+        description="Configure memory system for deployment"
+    )
     parser.add_argument(
         "--env",
         choices=["dev", "staging", "prod"],
@@ -254,15 +258,15 @@ async def main():
         default="1.0.0",
         help="Version being deployed",
     )
-    
+
     args = parser.parse_args()
-    
+
     logger.info(f"Configuring memory system for {args.env} environment")
-    
+
     try:
         # Setup memory managers
         managers = await setup_memory_managers(args.env, args.tenant)
-        
+
         # Record deployment information if dev notes are enabled
         if managers["dev_notes_manager"]:
             await record_deployment_info(
@@ -280,16 +284,16 @@ async def main():
                     "privacy_controls",
                 ],
             )
-        
+
         # Verify memory system health
         health_status = await verify_memory_health(managers)
         logger.info(f"Memory system configuration complete. Status: {health_status}")
-        
+
         # Close all managers
         await close_managers(managers)
-        
+
         return 0 if health_status == "healthy" else 1
-    
+
     except Exception as e:
         logger.error(f"Error configuring memory system: {e}", exc_info=True)
         return 1

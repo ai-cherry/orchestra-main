@@ -71,7 +71,8 @@ class PGVectorService:
             await conn.execute("CREATE EXTENSION IF NOT EXISTS vector")
 
             # Create documents table
-            await conn.execute("""
+            await conn.execute(
+                """
                 CREATE TABLE IF NOT EXISTS documents (
                     id TEXT PRIMARY KEY,
                     title TEXT,
@@ -79,10 +80,12 @@ class PGVectorService:
                     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                     metadata JSONB
                 )
-            """)
+            """
+            )
 
             # Create chunks table
-            await conn.execute("""
+            await conn.execute(
+                """
                 CREATE TABLE IF NOT EXISTS document_chunks (
                     id TEXT PRIMARY KEY,
                     document_id TEXT REFERENCES documents(id) ON DELETE CASCADE,
@@ -92,38 +95,47 @@ class PGVectorService:
                     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                     seq_num INTEGER
                 )
-            """)
+            """
+            )
 
             # Create index on document_id
-            await conn.execute("""
+            await conn.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_document_chunks_document_id
                 ON document_chunks(document_id)
-            """)
+            """
+            )
 
             # Create vector index for similarity search
             try:
-                await conn.execute("""
+                await conn.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_document_chunks_embedding
                     ON document_chunks
                     USING hnsw (embedding vector_cosine_ops)
                     WITH (ef_construction = 128, m = 16)
-                """)
+                """
+                )
             except Exception as e:
-                logger.warning(f"Could not create HNSW index, falling back to IVFFlat: {e}")
+                logger.warning(
+                    f"Could not create HNSW index, falling back to IVFFlat: {e}"
+                )
                 # Fall back to IVFFlat index which is more widely supported
-                await conn.execute("""
+                await conn.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_document_chunks_embedding
                     ON document_chunks
                     USING ivfflat (embedding vector_cosine_ops)
                     WITH (lists = 100)
-                """)
+                """
+                )
 
     async def store_document(
         self,
         document_id: str,
         title: str,
         source: str,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[Dict[str, Any]] = None,
     ) -> bool:
         """
         Store document metadata.
@@ -147,7 +159,10 @@ class PGVectorService:
                     ON CONFLICT (id) DO UPDATE
                     SET title = $2, source = $3, metadata = $4
                     """,
-                    document_id, title, source, metadata or {}
+                    document_id,
+                    title,
+                    source,
+                    metadata or {},
                 )
                 return True
             except Exception as e:
@@ -186,7 +201,7 @@ class PGVectorService:
                             chunk.content,
                             chunk.embedding,
                             chunk.metadata or {},
-                            i
+                            i,
                         )
                 return True
             except Exception as e:
@@ -198,7 +213,7 @@ class PGVectorService:
         query_embedding: List[float],
         limit: int = 5,
         score_threshold: float = 0.7,
-        document_id: Optional[str] = None
+        document_id: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         """
         Search for similar chunks based on embedding.
@@ -253,7 +268,7 @@ class PGVectorService:
                         "metadata": row["metadata"],
                         "document_title": row["document_title"],
                         "document_source": row["document_source"],
-                        "similarity": row["similarity"]
+                        "similarity": row["similarity"],
                     }
                     for row in rows
                 ]
@@ -278,8 +293,7 @@ class PGVectorService:
                 async with conn.transaction():
                     # Delete document (cascade will delete chunks)
                     await conn.execute(
-                        "DELETE FROM documents WHERE id = $1",
-                        document_id
+                        "DELETE FROM documents WHERE id = $1", document_id
                     )
                 return True
             except Exception as e:
@@ -305,7 +319,7 @@ class PGVectorService:
                     FROM documents
                     WHERE id = $1
                     """,
-                    document_id
+                    document_id,
                 )
 
                 if not row:
@@ -322,7 +336,9 @@ class PGVectorService:
                 logger.error(f"Error getting document: {e}")
                 return None
 
-    async def list_documents(self, limit: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
+    async def list_documents(
+        self, limit: int = 100, offset: int = 0
+    ) -> List[Dict[str, Any]]:
         """
         List all documents.
 
@@ -343,7 +359,8 @@ class PGVectorService:
                     ORDER BY created_at DESC
                     LIMIT $1 OFFSET $2
                     """,
-                    limit, offset
+                    limit,
+                    offset,
                 )
 
                 return [
@@ -396,7 +413,7 @@ class PGVectorService:
                     WHERE document_id = $1
                     ORDER BY seq_num ASC NULLS LAST, created_at ASC
                     """,
-                    document_id
+                    document_id,
                 )
 
                 return [
@@ -443,7 +460,7 @@ class PGVectorService:
                     WHERE 
                         c.id = $1
                     """,
-                    chunk_id
+                    chunk_id,
                 )
 
                 if not row:

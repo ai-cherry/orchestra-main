@@ -15,14 +15,20 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from core.orchestrator.src.api.dependencies.llm import get_llm_client
-from core.orchestrator.src.api.dependencies.memory import get_memory_manager, get_memory_service
+from core.orchestrator.src.api.dependencies.memory import (
+    get_memory_manager,
+    get_memory_service,
+)
 from core.orchestrator.src.services.interaction_service import InteractionService
 from core.orchestrator.src.config.settings import get_settings
 from packages.shared.src.llm_client.interface import LLMClient
 from packages.shared.src.memory.memory_manager import MemoryManager
 from packages.shared.src.memory.services.memory_service import MemoryService
-from packages.shared.src.memory.services.memory_service_factory import MemoryServiceFactory
+from packages.shared.src.memory.services.memory_service_factory import (
+    MemoryServiceFactory,
+)
 from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
+
 # Commented out due to Pylance error - verify module path or availability
 # from infra.modules.advanced-monitoring.auto_instrumentation import api_endpoint, llm_call
 
@@ -65,7 +71,8 @@ async def get_interaction_service(
 
     # Use the primary model if available, otherwise fall back to the legacy model setting
     model_to_use = getattr(
-        settings, "DEFAULT_LLM_MODEL_PRIMARY", settings.DEFAULT_LLM_MODEL)
+        settings, "DEFAULT_LLM_MODEL_PRIMARY", settings.DEFAULT_LLM_MODEL
+    )
 
     # Create and return the interaction service
     return InteractionService(
@@ -76,7 +83,9 @@ async def get_interaction_service(
 
 
 @router.post("/interact", response_model=Dict[str, str], tags=["interaction"])
-@api_endpoint(name="interact_endpoint", error_threshold_ms=2000, track_request_body=True)
+@api_endpoint(
+    name="interact_endpoint", error_threshold_ms=2000, track_request_body=True
+)
 async def interact(
     user_input: UserInput,
     request: Request,
@@ -110,8 +119,11 @@ async def interact(
         persona_config = request.state.active_persona
 
         # Extract session ID and request ID from request state if available
-        session_id = str(request.state.session_id) if hasattr(
-            request.state, "session_id") else None
+        session_id = (
+            str(request.state.session_id)
+            if hasattr(request.state, "session_id")
+            else None
+        )
         request_id = getattr(request.state, "request_id", None)
 
         # Delegate to the interaction service
@@ -124,15 +136,13 @@ async def interact(
         )
 
         # Return response
-        return {
-            "response": response_text,
-            "persona": persona_name
-        }
+        return {"response": response_text, "persona": persona_name}
 
     except Exception as e:
         logger.error(f"Interaction processing failed: {e}", exc_info=True)
-        logger.warning("Interaction processing failure may impact user experience or conversation continuity.")
+        logger.warning(
+            "Interaction processing failure may impact user experience or conversation continuity."
+        )
         raise HTTPException(
-            status_code=500,
-            detail=f"Failed to process interaction: {str(e)}"
+            status_code=500, detail=f"Failed to process interaction: {str(e)}"
         )

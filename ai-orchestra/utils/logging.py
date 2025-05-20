@@ -19,7 +19,7 @@ def configure_logging(
 ) -> None:
     """
     Configure logging for the application.
-    
+
     Args:
         level: Logging level
         log_format: Log format string
@@ -27,43 +27,43 @@ def configure_logging(
     """
     if isinstance(level, str):
         level = getattr(logging, level.upper())
-    
+
     if not log_format:
         if json_logs:
             log_format = "%(message)s"
         else:
             log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    
+
     # Configure root logger
     root_logger = logging.getLogger()
     root_logger.setLevel(level)
-    
+
     # Remove existing handlers
     for handler in root_logger.handlers[:]:
         root_logger.removeHandler(handler)
-    
+
     # Create console handler
     handler = logging.StreamHandler(sys.stdout)
     handler.setLevel(level)
-    
+
     if json_logs:
         handler.setFormatter(JsonFormatter())
     else:
         handler.setFormatter(logging.Formatter(log_format))
-    
+
     root_logger.addHandler(handler)
 
 
 class JsonFormatter(logging.Formatter):
     """JSON log formatter."""
-    
+
     def format(self, record: logging.LogRecord) -> str:
         """
         Format the log record as JSON.
-        
+
         Args:
             record: The log record
-            
+
         Returns:
             JSON formatted log
         """
@@ -73,15 +73,15 @@ class JsonFormatter(logging.Formatter):
             "name": record.name,
             "message": record.getMessage(),
         }
-        
+
         # Add exception info if available
         if record.exc_info:
             log_data["exception"] = self.formatException(record.exc_info)
-        
+
         # Add extra fields from record
         if hasattr(record, "props"):
             log_data.update(record.props)
-        
+
         return json.dumps(log_data)
 
 
@@ -94,7 +94,7 @@ def log_event(
 ) -> None:
     """
     Log a structured event.
-    
+
     Args:
         logger: The logger to use
         event: The event name
@@ -103,17 +103,17 @@ def log_event(
         level: Logging level
     """
     message = f"{event}:{status}"
-    
+
     # Add details to the log record
     extra = {}
     if details:
         # For JSON formatter
         extra["props"] = details
-        
+
         # For string formatter, append details to message
         details_str = json.dumps(details)
         message += f":{details_str}"
-    
+
     logger.log(level, message, extra=extra)
 
 
@@ -124,12 +124,12 @@ def log_start(
 ) -> float:
     """
     Log the start of an operation and return the start time.
-    
+
     Args:
         logger: The logger to use
         operation: The operation name
         details: Optional operation details
-        
+
     Returns:
         Start time in seconds
     """
@@ -146,7 +146,7 @@ def log_end(
 ) -> None:
     """
     Log the end of an operation with duration.
-    
+
     Args:
         logger: The logger to use
         operation: The operation name
@@ -154,10 +154,10 @@ def log_end(
         details: Optional operation details
     """
     duration = time.time() - start_time
-    
+
     if details is None:
         details = {}
-    
+
     details["duration_ms"] = int(duration * 1000)
     log_event(logger, operation, "complete", details)
 
@@ -170,7 +170,7 @@ def log_error(
 ) -> None:
     """
     Log an error.
-    
+
     Args:
         logger: The logger to use
         operation: The operation name
@@ -179,9 +179,9 @@ def log_error(
     """
     if details is None:
         details = {}
-    
+
     details["error_type"] = type(error).__name__
     details["error_message"] = str(error)
-    
+
     log_event(logger, operation, "error", details, level=logging.ERROR)
     logger.exception(f"{operation}:exception", exc_info=error)

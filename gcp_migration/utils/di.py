@@ -9,15 +9,25 @@ service dependencies and their lifecycle. This makes it easier to:
 """
 
 import inspect
-from typing import Any, Callable, Dict, Generic, Optional, Type, TypeVar, cast, get_type_hints
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    Optional,
+    Type,
+    TypeVar,
+    cast,
+    get_type_hints,
+)
 
 from gcp_migration.utils.logging import get_logger
 
 
 logger = get_logger(__name__)
 
-T = TypeVar('T')
-TImpl = TypeVar('TImpl')
+T = TypeVar("T")
+TImpl = TypeVar("TImpl")
 
 
 class DIContainer:
@@ -46,7 +56,7 @@ class DIContainer:
 
         # Register a factory for database
         container.register_factory(
-            IDatabase, 
+            IDatabase,
             lambda: PostgreSQLDatabase("postgresql://user:pass@localhost/db")
         )
 
@@ -70,7 +80,8 @@ class DIContainer:
             implementation: The concrete implementation class
         """
         logger.debug(
-            f"Registering implementation for {interface.__name__}: {implementation.__name__}")
+            f"Registering implementation for {interface.__name__}: {implementation.__name__}"
+        )
         self._registry[interface] = implementation
 
     def register_instance(self, interface: Type[T], instance: T) -> None:
@@ -153,7 +164,7 @@ class DIContainer:
             return implementation()
 
         # Skip 'self' parameter
-        parameters = {k: v for k, v in parameters.items() if k != 'self'}
+        parameters = {k: v for k, v in parameters.items() if k != "self"}
 
         # If no parameters, just instantiate
         if not parameters:

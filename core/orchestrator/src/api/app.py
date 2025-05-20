@@ -45,17 +45,19 @@ async def lifespan(app: FastAPI):
         logger.info(f"Loaded {len(personas)} persona configurations")
     except Exception as e:
         logger.error(f"Failed to load persona configurations: {e}")
-        
+
     # Initialize memory system
     from core.orchestrator.src.api.dependencies.memory import initialize_memory_manager
+
     try:
         await initialize_memory_manager()
         logger.info("Memory manager initialized")
     except Exception as e:
         logger.error(f"Failed to initialize memory manager: {e}")
-    
+
     # Initialize Redis cache if available
     from core.orchestrator.src.api.dependencies.cache import initialize_redis_cache
+
     try:
         await initialize_redis_cache()
         logger.info("Redis cache initialized")
@@ -66,31 +68,33 @@ async def lifespan(app: FastAPI):
     logger.info(f"Running in environment: {settings.ENVIRONMENT}")
     if settings.get_gcp_project_id():
         logger.info(f"Connected to GCP project: {settings.get_gcp_project_id()}")
-    
+
     logger.info("Application startup complete")
-    
+
     # Yield control back to FastAPI
     yield
 
     # Shutdown operations
     logger.info("Application shutting down")
-    
+
     # Close Redis cache
     from core.orchestrator.src.api.dependencies.cache import close_redis_cache
+
     try:
         await close_redis_cache()
         logger.info("Redis cache closed")
     except Exception as e:
         logger.error(f"Failed to close Redis cache: {e}")
-    
+
     # Close memory system
     from core.orchestrator.src.api.dependencies.memory import close_memory_manager
+
     try:
         await close_memory_manager()
         logger.info("Memory manager closed")
     except Exception as e:
         logger.error(f"Failed to close memory manager: {e}")
-    
+
     logger.info("Application shutdown complete")
 
 
@@ -128,7 +132,7 @@ if __name__ == "__main__":
 
     # Get port from environment or use default
     port = int(os.environ.get("PORT", 8000))
-    
+
     # Start server
     uvicorn.run(
         "core.orchestrator.src.api.app:app",

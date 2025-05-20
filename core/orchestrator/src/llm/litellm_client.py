@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 class ModelProvider(str, Enum):
     """Supported model providers."""
+
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
     GOOGLE = "google"
@@ -29,6 +30,7 @@ class ModelProvider(str, Enum):
 
 class ModelType(str, Enum):
     """Types of models."""
+
     CHAT = "chat"
     COMPLETION = "completion"
     EMBEDDING = "embedding"
@@ -36,6 +38,7 @@ class ModelType(str, Enum):
 
 class LLMMessage(BaseModel):
     """A message for LLM interaction."""
+
     role: str
     content: str
     name: Optional[str] = None
@@ -43,6 +46,7 @@ class LLMMessage(BaseModel):
 
 class LLMResponse(BaseModel):
     """Response from an LLM."""
+
     model: str
     content: str
     usage: Dict[str, int] = Field(default_factory=dict)
@@ -52,6 +56,7 @@ class LLMResponse(BaseModel):
 
 class LLMEmbeddingResponse(BaseModel):
     """Response from an embedding model."""
+
     model: str
     embedding: List[float]
     usage: Dict[str, int] = Field(default_factory=dict)
@@ -61,15 +66,15 @@ class LLMEmbeddingResponse(BaseModel):
 class LiteLLMClient:
     """
     Client for interacting with various LLM providers through LiteLLM.
-    
+
     This client provides a unified interface for:
     - Chat completions
     - Text completions
     - Embeddings
-    
+
     It supports multiple providers including OpenAI, Anthropic, Google, and Azure.
     """
-    
+
     def __init__(
         self,
         default_model: Optional[str] = None,
@@ -85,29 +90,33 @@ class LiteLLMClient:
         """Initialize the LiteLLM client."""
         # Load settings
         settings = get_settings()
-        
+
         # Set API keys from parameters or environment variables
         self.api_keys = {
             ModelProvider.OPENAI: api_key_openai or os.environ.get("OPENAI_API_KEY"),
-            ModelProvider.ANTHROPIC: api_key_anthropic or os.environ.get("ANTHROPIC_API_KEY"),
+            ModelProvider.ANTHROPIC: api_key_anthropic
+            or os.environ.get("ANTHROPIC_API_KEY"),
             ModelProvider.GOOGLE: api_key_google or os.environ.get("GEMINI_API_KEY"),
-            ModelProvider.AZURE_OPENAI: api_key_azure or os.environ.get("AZURE_OPENAI_API_KEY"),
+            ModelProvider.AZURE_OPENAI: api_key_azure
+            or os.environ.get("AZURE_OPENAI_API_KEY"),
         }
-        
+
         # Set Azure API base
         self.api_base_azure = api_base_azure or os.environ.get("AZURE_OPENAI_API_BASE")
-        
+
         # Set Vertex AI project and location
         self.vertex_project = vertex_project or settings.gcp_project_id
         self.vertex_location = vertex_location or settings.gcp_region
-        
+
         # Set default models
         self.default_model = default_model or "gpt-3.5-turbo"
-        self.default_embedding_model = default_embedding_model or "text-embedding-ada-002"
-        
+        self.default_embedding_model = (
+            default_embedding_model or "text-embedding-ada-002"
+        )
+
         # Configure LiteLLM
         self._configure_litellm()
-    
+
     def _configure_litellm(self):
         """Configure LiteLLM with API keys and settings."""
         # Set API keys
@@ -123,15 +132,15 @@ class LiteLLMClient:
                     litellm.azure_api_key = api_key
                     if self.api_base_azure:
                         litellm.azure_api_base = self.api_base_azure
-        
+
         # Configure Vertex AI if project and location are provided
         if self.vertex_project and self.vertex_location:
             os.environ["VERTEX_PROJECT"] = self.vertex_project
             os.environ["VERTEX_LOCATION"] = self.vertex_location
-        
+
         # Set up logging
         litellm.set_verbose = True
-    
+
     async def chat_completion(
         self,
         messages: List[LLMMessage],
@@ -147,7 +156,7 @@ class LiteLLMClient:
     ) -> LLMResponse:
         """
         Generate a chat completion using the specified model.
-        
+
         Args:
             messages: List of messages in the conversation
             model: Model to use (defaults to self.default_model)
@@ -159,18 +168,22 @@ class LiteLLMClient:
             stop: Stop sequences
             user: User identifier
             timeout: Request timeout in seconds
-            
+
         Returns:
             LLMResponse object containing the model's response
         """
         model = model or self.default_model
-        
+
         # Convert messages to LiteLLM format
         litellm_messages = [
-            {"role": msg.role, "content": msg.content, **({"name": msg.name} if msg.name else {})}
+            {
+                "role": msg.role,
+                "content": msg.content,
+                **({"name": msg.name} if msg.name else {}),
+            }
             for msg in messages
         ]
-        
+
         try:
             response = await litellm.acompletion(
                 model=model,
@@ -184,29 +197,31 @@ class LiteLLMClient:
                 user=user,
                 timeout=timeout,
             )
-            
+
             # Extract content from response
             content = response.choices[0].message.content
-            
+
             # Extract usage information
             usage = {
                 "prompt_tokens": response.usage.prompt_tokens,
                 "completion_tokens": response.usage.completion_tokens,
                 "total_tokens": response.usage.total_tokens,
             }
-            
+
             return LLMResponse(
                 model=model,
                 content=content,
                 usage=usage,
                 finish_reason=response.choices[0].finish_reason,
-                raw_response=response.model_dump() if hasattr(response, "model_dump") else response.dict(),
+                raw_response=response.model_dump()
+                if hasattr(response, "model_dump")
+                else response.dict(),
             )
-        
+
         except Exception as e:
             logger.error(f"Error in chat completion: {str(e)}")
             raise
-    
+
     async def text_completion(
         self,
         prompt: str,
@@ -222,7 +237,7 @@ class LiteLLMClient:
     ) -> LLMResponse:
         """
         Generate a text completion using the specified model.
-        
+
         Args:
             prompt: Text prompt
             model: Model to use (defaults to self.default_model)
@@ -234,7 +249,7 @@ class LiteLLMClient:
             stop: Stop sequences
             user: User identifier
             timeout: Request timeout in seconds
-            
+
         Returns:
             LLMResponse object containing the model's response
         """
@@ -252,7 +267,7 @@ class LiteLLMClient:
             user=user,
             timeout=timeout,
         )
-    
+
     async def get_embedding(
         self,
         text: str,
@@ -262,18 +277,18 @@ class LiteLLMClient:
     ) -> LLMEmbeddingResponse:
         """
         Generate an embedding for the given text.
-        
+
         Args:
             text: Text to embed
             model: Model to use (defaults to self.default_embedding_model)
             user: User identifier
             timeout: Request timeout in seconds
-            
+
         Returns:
             LLMEmbeddingResponse object containing the embedding
         """
         model = model or self.default_embedding_model
-        
+
         try:
             response = await litellm.aembedding(
                 model=model,
@@ -281,31 +296,33 @@ class LiteLLMClient:
                 user=user,
                 timeout=timeout,
             )
-            
+
             # Extract embedding from response
             embedding = response.data[0].embedding
-            
+
             # Extract usage information
             usage = {
                 "prompt_tokens": response.usage.prompt_tokens,
                 "total_tokens": response.usage.total_tokens,
             }
-            
+
             return LLMEmbeddingResponse(
                 model=model,
                 embedding=embedding,
                 usage=usage,
-                raw_response=response.model_dump() if hasattr(response, "model_dump") else response.dict(),
+                raw_response=response.model_dump()
+                if hasattr(response, "model_dump")
+                else response.dict(),
             )
-        
+
         except Exception as e:
             logger.error(f"Error in embedding: {str(e)}")
             raise
-    
+
     def get_available_models(self) -> Dict[ModelType, List[str]]:
         """
         Get a list of available models grouped by type.
-        
+
         Returns:
             Dictionary mapping model types to lists of model names
         """
@@ -335,14 +352,14 @@ class LiteLLMClient:
                 "vertex-ai/textembedding-gecko",
             ],
         }
-    
+
     def get_token_limit(self, model: str) -> int:
         """
         Get the token limit for a specific model.
-        
+
         Args:
             model: Model name
-            
+
         Returns:
             Token limit as an integer
         """
@@ -365,5 +382,5 @@ class LiteLLMClient:
             "text-embedding-3-small": 8191,
             "text-embedding-3-large": 8191,
         }
-        
+
         return token_limits.get(model, 4096)  # Default to 4096 if model not found

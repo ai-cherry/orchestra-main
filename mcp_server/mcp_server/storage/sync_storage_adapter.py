@@ -116,7 +116,9 @@ class SyncStorageAdapter:
         """
         return self._run_coroutine(self.storage.list_keys(scope))
 
-    def search(self, query: str, scope: str = "default", limit: int = 10) -> List[Dict[str, Any]]:
+    def search(
+        self, query: str, scope: str = "default", limit: int = 10
+    ) -> List[Dict[str, Any]]:
         """Search for entries matching a query.
 
         Args:

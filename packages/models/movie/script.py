@@ -12,25 +12,26 @@ from pydantic import BaseModel, Field
 class Scene(BaseModel):
     """
     Model representing a scene in a movie script.
-    
+
     Attributes:
         description: Brief description of the scene
         setting: Location or setting where the scene takes place
         script_content: The actual script content including dialogue and action
     """
+
     description: str = Field(
         ...,
-        description="Brief description of the scene (e.g., 'The protagonist discovers the hidden treasure')"
+        description="Brief description of the scene (e.g., 'The protagonist discovers the hidden treasure')",
     )
     setting: str = Field(
         ...,
-        description="Location or setting of the scene (e.g., 'INT. ABANDONED WAREHOUSE - NIGHT')"
+        description="Location or setting of the scene (e.g., 'INT. ABANDONED WAREHOUSE - NIGHT')",
     )
     script_content: str = Field(
         ...,
-        description="The actual script content including dialogue and action directions"
+        description="The actual script content including dialogue and action directions",
     )
-    
+
     class Config:
         schema_extra = {
             "example": {
@@ -46,7 +47,7 @@ class Scene(BaseModel):
                     "Detective Johnson slams his fist on the table.\n\n"
                     "DETECTIVE JOHNSON\n"
                     "We have witnesses!"
-                )
+                ),
             }
         }
 
@@ -54,41 +55,31 @@ class Scene(BaseModel):
 class MovieScript(BaseModel):
     """
     Model representing a complete movie script.
-    
+
     Attributes:
         title: The title of the movie
         genre: The genre(s) of the movie
         logline: A one-sentence summary of the plot
         scenes: List of scenes in the movie
     """
-    title: str = Field(
-        ...,
-        description="The title of the movie"
-    )
+
+    title: str = Field(..., description="The title of the movie")
     genre: str = Field(
-        ...,
-        description="The genre(s) of the movie (e.g., 'Action/Thriller')"
+        ..., description="The genre(s) of the movie (e.g., 'Action/Thriller')"
     )
-    logline: str = Field(
-        ...,
-        description="A one-sentence summary of the plot"
-    )
+    logline: str = Field(..., description="A one-sentence summary of the plot")
     scenes: List[Scene] = Field(
-        ...,
-        description="List of scenes in the movie",
-        min_items=1
+        ..., description="List of scenes in the movie", min_items=1
     )
-    
+
     # Optional fields
     target_audience: Optional[str] = Field(
-        None,
-        description="Target audience for the movie (e.g., 'PG-13', 'Adult')"
+        None, description="Target audience for the movie (e.g., 'PG-13', 'Adult')"
     )
     screenplay_author: Optional[str] = Field(
-        None,
-        description="Name of the screenplay author"
+        None, description="Name of the screenplay author"
     )
-    
+
     class Config:
         schema_extra = {
             "example": {
@@ -105,10 +96,10 @@ class MovieScript(BaseModel):
                             "JOHNSON\n"
                             "(whispers)\n"
                             "He's back."
-                        )
+                        ),
                     }
                 ],
                 "target_audience": "PG-13",
-                "screenplay_author": "A. Writer"
+                "screenplay_author": "A. Writer",
             }
         }

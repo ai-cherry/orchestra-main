@@ -112,9 +112,9 @@ class EnhancedServiceRegistry:
         self._services: List[Any] = []
         self._service_by_type: Dict[Type[Any], Any] = {}
         self._service_factories: Dict[Type[Any], ServiceFactory[Any]] = {}
-        self._service_ids: Set[int] = (
-            set()
-        )  # Track service object IDs to prevent duplicates
+        self._service_ids: Set[
+            int
+        ] = set()  # Track service object IDs to prevent duplicates
 
         logger.debug("EnhancedServiceRegistry initialized")
 

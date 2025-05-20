@@ -12,7 +12,7 @@ import traceback
 
 class AIServiceError(Exception):
     """Base class for AI service errors."""
-    
+
     def __init__(
         self,
         code: str,
@@ -22,7 +22,7 @@ class AIServiceError(Exception):
     ):
         """
         Initialize the error.
-        
+
         Args:
             code: Error code
             message: Error message
@@ -34,11 +34,11 @@ class AIServiceError(Exception):
         self.details = details or {}
         self.cause = cause
         super().__init__(f"{code}: {message}")
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """
         Convert the error to a dictionary.
-        
+
         Returns:
             Dictionary representation of the error
         """
@@ -47,16 +47,16 @@ class AIServiceError(Exception):
             "message": self.message,
             "details": self.details,
         }
-        
+
         if self.cause:
             result["cause"] = str(self.cause)
-        
+
         return result
-    
+
     def to_json(self) -> str:
         """
         Convert the error to JSON.
-        
+
         Returns:
             JSON representation of the error
         """
@@ -65,7 +65,7 @@ class AIServiceError(Exception):
 
 class ModelNotFoundError(AIServiceError):
     """Raised when a requested AI model is not found."""
-    
+
     def __init__(
         self,
         model_id: str,
@@ -74,7 +74,7 @@ class ModelNotFoundError(AIServiceError):
     ):
         """
         Initialize the error.
-        
+
         Args:
             model_id: The ID of the model that was not found
             details: Additional error details
@@ -91,7 +91,7 @@ class ModelNotFoundError(AIServiceError):
 
 class ModelUnavailableError(AIServiceError):
     """Raised when an AI model is temporarily unavailable."""
-    
+
     def __init__(
         self,
         model_id: str,
@@ -100,7 +100,7 @@ class ModelUnavailableError(AIServiceError):
     ):
         """
         Initialize the error.
-        
+
         Args:
             model_id: The ID of the model that is unavailable
             details: Additional error details
@@ -117,7 +117,7 @@ class ModelUnavailableError(AIServiceError):
 
 class InvalidInputError(AIServiceError):
     """Raised when input to an AI model is invalid."""
-    
+
     def __init__(
         self,
         message: str,
@@ -126,7 +126,7 @@ class InvalidInputError(AIServiceError):
     ):
         """
         Initialize the error.
-        
+
         Args:
             message: Error message
             details: Additional error details
@@ -142,7 +142,7 @@ class InvalidInputError(AIServiceError):
 
 class AuthenticationError(AIServiceError):
     """Raised when authentication fails."""
-    
+
     def __init__(
         self,
         message: str = "Authentication failed",
@@ -151,7 +151,7 @@ class AuthenticationError(AIServiceError):
     ):
         """
         Initialize the error.
-        
+
         Args:
             message: Error message
             details: Additional error details
@@ -167,7 +167,7 @@ class AuthenticationError(AIServiceError):
 
 class MemoryError(AIServiceError):
     """Raised when there is an error with memory operations."""
-    
+
     def __init__(
         self,
         message: str,
@@ -176,7 +176,7 @@ class MemoryError(AIServiceError):
     ):
         """
         Initialize the error.
-        
+
         Args:
             message: Error message
             details: Additional error details
@@ -193,13 +193,14 @@ class MemoryError(AIServiceError):
 def handle_exception(func):
     """
     Decorator to handle exceptions in a consistent way.
-    
+
     Args:
         func: The function to decorate
-        
+
     Returns:
         The decorated function
     """
+
     async def wrapper(*args, **kwargs):
         try:
             return await func(*args, **kwargs)
@@ -210,14 +211,14 @@ def handle_exception(func):
                 logging.error(f"Details: {json.dumps(e.details)}")
             if e.cause:
                 logging.error(f"Cause: {str(e.cause)}")
-            
+
             # Re-raise the error
             raise
         except Exception as e:
             # Log the unexpected error
             logging.error(f"Unexpected error: {str(e)}")
             logging.error(traceback.format_exc())
-            
+
             # Wrap the error in an AIServiceError
             raise AIServiceError(
                 code="UNEXPECTED_ERROR",
@@ -225,5 +226,5 @@ def handle_exception(func):
                 details={"original_error": str(e)},
                 cause=e,
             )
-    
+
     return wrapper
