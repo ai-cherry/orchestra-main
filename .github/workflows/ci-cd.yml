@@ -107,7 +107,7 @@ jobs:
           service_account: ${{ env.SERVICE_ACCOUNT }}
 
       - name: Set up Pulumi
-        uses: pulumi/actions@v5 # Changed from v3 to v5 (latest stable)
+        uses: pulumi/actions@v6 # Changed from v3 to v5 (latest stable)
         # Pulumi Cloud login is handled by default by the action if PULUMI_ACCESS_TOKEN is set.
         # For GCP backend, it uses ADC from the auth step.
 
@@ -144,7 +144,7 @@ jobs:
           service_account: ${{ env.SERVICE_ACCOUNT }}
 
       - name: Set up Pulumi
-        uses: pulumi/actions@v5
+        uses: pulumi/actions@v6
 
       - name: Deploy to Prod Stack
         id: pulumi_up

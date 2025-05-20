@@ -190,7 +190,7 @@ jobs:
           service_account: ${{ env.SERVICE_ACCOUNT }}
 
       - name: Set up Pulumi
-        uses: pulumi/actions@v5
+        uses: pulumi/actions@v6
 
       - name: Deploy to Dev Stack
         id: pulumi_up
@@ -225,7 +225,7 @@ jobs:
           service_account: ${{ env.SERVICE_ACCOUNT }}
 
       - name: Set up Pulumi
-        uses: pulumi/actions@v5
+        uses: pulumi/actions@v6
 
       - name: Deploy to Prod Stack
         id: pulumi_up
