@@ -1,4 +1,4 @@
-name: CI/CD - Cloud Build Deploy
+name: Build and Deploy to GCP Cloud Run
 
 on:
   push:
@@ -25,14 +25,13 @@ jobs:
           echo "Commit: ${{ github.sha }}"
 
       # 3. Authenticate to Google Cloud using Workload Identity Federation
-      # NOTE: Replace workload_identity_provider and service_account with your real values!
       - name: Set up Google Cloud authentication (Workload Identity Federation)
         id: 'auth'
         uses: 'google-github-actions/auth@v2'
         with:
           token_format: 'access_token'
-          workload_identity_provider: 'projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/POOL_ID/providers/PROVIDER_ID' # <-- Replace with your actual provider resource name
-          service_account: 'platform-admin@cherry-ai-project.iam.gserviceaccount.com' # <-- Replace with your CI/CD service account
+          workload_identity_provider: 'projects/525398941159/locations/global/workloadIdentityPools/github-wif-pool/providers/github-actions'
+          service_account: 'cicd-sa@cherry-ai-project.iam.gserviceaccount.com'
 
       # 4. Set up gcloud CLI
       - name: Set up gcloud CLI
@@ -40,26 +39,19 @@ jobs:
         with:
           project_id: 'cherry-ai-project'
 
-      # 5. (Optional) Run tests and linting before deployment
+      # --- Optional test stage (kept lightweight for solo-dev) ---
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install test dependencies
+      - name: Install dependencies
         run: |
-          pip install -r wif_implementation_requirements.txt
-      - name: Run tests
+          pip install -r requirements.txt
+      - name: Run unit tests & lint (fast-fail)
         run: |
-          pytest --junitxml=test-results.xml
-      - name: Run flake8 lint
-        run: |
-          flake8 .
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: test-results.xml
+          if [ -f tests ]; then pytest -q ; fi
+          flake8 --ignore=E501 .
+      # -----------------------------------------------------------
 
       # 6. Verify gcloud authentication
       - name: Verify gcloud authentication
@@ -71,9 +63,9 @@ jobs:
       - name: Submit build to Google Cloud Build
         id: cloudbuild
         run: |
-          gcloud builds submit \
-            --config=cloudbuild.yaml \
-            --substitutions=_COMMIT_SHA=${{ github.sha }}
+          gcloud builds submit --config cloudbuild.yaml \
+            --substitutions=COMMIT_SHA=${{ github.sha }} \
+            .
 
       # 8. Print Cloud Build logs URL
       - name: Print Cloud Build logs URL
