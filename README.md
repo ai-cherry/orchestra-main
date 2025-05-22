@@ -64,7 +64,9 @@ A modern, cloud-native Python application for rapid solo development and deploym
 
 - No complex local Docker or Compose setup required.
 - All infrastructure-as-code (Terraform, Pulumi) is archived in `infra_legacy/` for reference.
-- Focus on writing code, testing, and pushing to deploy!
+- For detailed architecture & workflow see **docs/PROJECT_BLUEPRINT.md**.
+
+Any legacy Terraform snippets have been removed to keep the repo clean; future IaC will be added with Pulumi if required.
 
 ---
 
