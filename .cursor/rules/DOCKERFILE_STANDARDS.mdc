@@ -3,17 +3,3 @@ description:
 globs:
 alwaysApply: false
 ---
-\
----
-description: Best practices for Dockerfiles.
-globs: ["Dockerfile*", "**/Dockerfile"]
-autoAttach: true
----
-
-**Dockerfile Standards:**
-- **Base Images:** Prefer official `python:3.11-slim-bookworm` or `python:3.12-slim-bookworm`. For others, use official slim/alpine variants.
-- **Security:** Always run containers as non-root users. `USER <username>` should be one of the last steps.
-- **Layers:** Minimize layers. Chain `RUN` commands using `&& \`.
-- **Cache:** Optimize layer caching (e.g., copy `requirements.txt`/`pyproject.toml` and install deps before copying application code).
-- **Cloud Run/GKE:** Services must listen on the `$PORT` environment variable. Implement `HEALTHCHECK`s.
-- **Credentials:** DO NOT embed `GOOGLE_APPLICATION_CREDENTIALS` or any keys directly in the image. Fetch at runtime or use Workload Identity.
