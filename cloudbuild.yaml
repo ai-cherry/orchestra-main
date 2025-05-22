@@ -12,19 +12,14 @@ steps:
           . "/root/.asdf/asdf.sh"
         fi
         asdf plugin add python || true
-        asdf plugin add poetry || true
         asdf plugin add terraform || true
         asdf plugin add nodejs || true
         asdf install --all
 
-  # 2. Install Python dependencies with Poetry
+  # 2. Install Python application dependencies
   - name: "python:3.11"
-    entrypoint: "bash"
-    args:
-      - "-c"
-      - |
-        pip install poetry==1.8.2
-        poetry install --no-root
+    entrypoint: "pip"
+    args: ["install", "-r", "requirements.txt"]
 
   # 3. Run pre-commit checks
   - name: "python:3.11"
@@ -32,7 +27,10 @@ steps:
     args:
       - "-c"
       - |
+        # Install pre-commit and development dependencies that hooks might need
         pip install pre-commit
+        # Install any Python-based tools that pre-commit hooks might require
+        pip install black isort ruff mypy types-requests types-PyYAML
         pre-commit run --all-files
 
   # 4. Build Docker image for Cloud Run
