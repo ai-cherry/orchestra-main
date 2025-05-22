@@ -36,39 +36,38 @@ steps:
         pre-commit run --all-files
 
   # 4. Build Docker image for Cloud Run
-  - name: "gcr.io/cloud-builders/docker"
-    args:
-      - build
-      - "-f"
-      - docker/Dockerfile.app
-      - "-t"
-      - "gcr.io/$PROJECT_ID/orchestra-system:$COMMIT_SHA"
-      - .
+  - name: 'gcr.io/cloud-builders/docker'
+    id: Build
+    args: [
+      'build',
+      '-t', 'us-central1-docker.pkg.dev/cherry-ai-project/orchestra-images/orchestra-main:$COMMIT_SHA',
+      '.'
+    ]
 
-  # 5. Deploy to Cloud Run
-  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
-    entrypoint: "gcloud"
-    args:
-      - run
-      - deploy
-      - orchestra-system
-      - --image=gcr.io/$PROJECT_ID/orchestra-system:$COMMIT_SHA
-      - --region=us-central1
-      - --platform=managed
-      - --allow-unauthenticated
-      - --set-env-vars=GOOGLE_APPLICATION_CREDENTIALS=.gcp/wif.json
+  # 5. Push Docker image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: Push
+    args: [
+      'push',
+      'us-central1-docker.pkg.dev/cherry-ai-project/orchestra-images/orchestra-main:$COMMIT_SHA'
+    ]
 
-  # 6. (Optional) Sync IDE environment or run additional setup scripts
-  - name: "gcr.io/cloud-builders/gcloud"
-    entrypoint: "bash"
+  # 6. Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: Deploy
+    entrypoint: 'gcloud'
     args:
-      - "-c"
-      - |
-        echo "Syncing hybrid IDE environment..."
-        # Add any additional sync or setup steps here
+      - 'run'
+      - 'deploy'
+      - 'orchestra-main-service'
+      - '--image=us-central1-docker.pkg.dev/cherry-ai-project/orchestra-images/orchestra-main:$COMMIT_SHA'
+      - '--region=us-central1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--set-secrets=OPENAI_API_KEY=projects/cherry-ai-project/secrets/OPENAI_API_KEY:latest,PORTKEY_API_KEY=projects/cherry-ai-project/secrets/PORTKEY_API_KEY:latest,PERPLEXITY_API_KEY=projects/cherry-ai-project/secrets/PERPLEXITY_API_KEY:latest,ANTHROPIC_API_KEY=projects/cherry-ai-project/secrets/ANTHROPIC_API_KEY:latest,GOOGLE_API_KEY=projects/cherry-ai-project/secrets/GOOGLE_API_KEY:latest,VERTEX_API_KEY=projects/cherry-ai-project/secrets/VERTEX_API_KEY:latest,GITHUB_TOKEN=projects/cherry-ai-project/secrets/GITHUB_TOKEN:latest,SLACK_BOT_TOKEN=projects/cherry-ai-project/secrets/SLACK_BOT_TOKEN:latest,REDIS_PASSWORD=projects/cherry-ai-project/secrets/REDIS_PASSWORD:latest,DATABASE_URL=projects/cherry-ai-project/secrets/DATABASE_URL:latest'
 
 images:
-  - "gcr.io/$PROJECT_ID/orchestra-system:$COMMIT_SHA"
+  - 'us-central1-docker.pkg.dev/cherry-ai-project/orchestra-images/orchestra-main:$COMMIT_SHA'
 
 timeout: 1800s
 

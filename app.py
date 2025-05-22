@@ -1,5 +1,18 @@
-from flask import Flask, jsonify
+import logging
+from pythonjsonlogger import jsonlogger
+
+# Set up structured JSON logging
+logger = logging.getLogger()
+logHandler = logging.StreamHandler()
+formatter = jsonlogger.JsonFormatter()
+logHandler.setFormatter(formatter)
+logger.handlers = [logHandler]
+logger.setLevel(logging.INFO)
+
+from flask import Flask, jsonify, request
 import os
+from utils import retry
+import requests
 
 app = Flask(__name__)
 
@@ -32,6 +45,65 @@ def info():
             "ide_sync": "configured",
         }
     )
+
+
+@app.route("/query", methods=["POST"])
+def handle_query():
+    data = request.json
+    user_id = data.get("user_id")
+    query = data.get("query", "")
+    logger.info("User query received", extra={'user_id': user_id, 'query_length': len(query)})
+    return {"status": "ok"}
+
+
+@app.route("/call-llm", methods=["POST"])
+def call_llm():
+    try:
+        # ... code that calls the LLM API ...
+        pass
+    except Exception as e:
+        logger.error(
+            "LLM API call failed",
+            exc_info=True,
+            extra={'api_endpoint': 'openai_v1'}
+        )
+        return {"error": "LLM API call failed"}, 500
+
+
+@retry(max_attempts=3, delay=2, exponential_backoff=2)
+def fetch_external_data():
+    response = requests.get('https://api.example.com/data', timeout=10)
+    response.raise_for_status()
+    return response.json()
+
+
+@app.route('/fetch-data')
+def fetch_data_sync():
+    try:
+        logger.info("Fetching external data", extra={"endpoint": "/fetch-data"})
+        data = fetch_external_data()
+        return jsonify(data)
+    except requests.RequestException as e:
+        logger.error(
+            "External API call failed",
+            exc_info=True,
+            extra={"endpoint": "/fetch-data", "error_type": type(e).__name__}
+        )
+        return jsonify({"error": "Failed to fetch data"}), 502
+
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    logger.error(
+        "Unhandled exception",
+        exc_info=True,
+        extra={
+            "path": request.path,
+            "method": request.method,
+            "remote_addr": request.remote_addr
+        }
+    )
+    return jsonify({"error": "Internal server error"}), 500
 
 
 if __name__ == "__main__":

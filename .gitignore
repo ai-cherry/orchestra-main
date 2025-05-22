@@ -1,135 +1,60 @@
-# Python
+# Python bytecode and cache
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
 
-# Poetry
+# Virtual environments
+venv/
+.env/
 .venv/
-poetry.lock
 
-# Environment variables
-.env
-.env.local
-.env.*.local
-
-# GCP
-*.json
-!terraform.json
-!package.json
-!package-lock.json
-!tsconfig.json
-!.vscode/*.json
-
-# Google Cloud SDK
-google-cloud-sdk*/
-google-cloud-cli*.tar.gz
-google-cloud-sdk.staging/
-*.tar.gz
-google-cloud-sdk.staging/bin/anthoscli
-google-cloud-cli-*.tar.gz
-google-cloud-sdk-*.tar.gz
-
-# Terraform
-.terraform/
-.terraform.lock.hcl
-terraform.tfstate
-terraform.tfstate.backup
-*.tfvars
-!example.tfvars
-
-# IDE
-.idea/
+# Editor/IDE settings
 .vscode/
+.idea/
 *.swp
-*.swo
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Test and coverage outputs
+*.cover
+.coverage
+coverage.*
+htmlcov/
+.tox/
+.pytest_cache/
+test-results.xml
 
 # Logs
-logs/
 *.log
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Docker
+*.tar
+docker-compose.override.yml
+
+# GCP/Cloud
+.gcp/
+.gcloud/
+.gcloud_env/
+.gcp_env_setup.sh
+
+# Secrets (never commit!)
+*.key
+*.pem
+*.env
+.env.*
+
+# Node (if any frontend)
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Testing
-.coverage
-htmlcov/
-.pytest_cache/
-.tox/
-.nox/
-.hypothesis/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-
-# Docker
-.docker/
-
-# Jupyter Notebooks
-.ipynb_checkpoints
-
-# Local development
-.local/
-
-# Environments
-.env
-.venv
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Pulumi
-.pulumi/
-Pulumi.landmark
-Pulumi.lock.yaml
-
-# Node
-node_modules/
-dist/
-.next/
-out/
-coverage/
-npm-debug.log
-yarn-error.log
-pnpm-debug.log
-
-# IDE / OS
-.vscode/
-.idea/
-*.DS_Store
-
-# Terraform (if ever used)
-.terraform/
-*.tfstate
-*.tfstate.*
-crash.log
-
-# Other
-*.log
-.env.*.local
-.env.local
-# local SDK / venv / archives – never commit
-google-cloud-sdk*
-google-cloud-sdk.staging/
-venv/
-*.tar.gz
-*.zip
+# Infra legacy
+infra_legacy/
