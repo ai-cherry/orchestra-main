@@ -1,12 +1,13 @@
 ---
-description:
-globs:
-alwaysApply: false
+description: 
+globs: 
+alwaysApply: true
 ---
 \
+\\
 ---
-description: Standards for Pulumi Python IaC on GCP.
-globs: ["infra/**/*.py", "Pulumi.yaml", "Pulumi.*.yaml"]
+description: Standards for Pulumi Python IaC on GCP for Project Symphony, focusing on Cloud Run deployments and GCS state backend.
+globs: ["infra/**/*.py", "**/Pulumi.yaml", "**/Pulumi.*.yaml"]
 autoAttach: true
 ---
 
@@ -18,3 +19,5 @@ autoAttach: true
 - **Components:** Structure resources into reusable Pulumi Components where appropriate.
 - **Naming:** Follow consistent naming conventions for resources.
 - **Secrets in Pulumi:** For secrets managed *by* Pulumi (e.g., a generated DB password), use `pulumi.Output.secret()` and `pulumi config set --secret`.
+- **Cloud Run Specifics**: When defining `gcp.cloudrun.Service` resources, ensure appropriate settings for concurrency, min/max instances, and CPU allocation based on expected workload. Always include health check configurations (`livenessProbe`, `startupProbe`).
+- **IAM Best Practices**: Follow the principle of least privilege for IAM bindings. Define roles at the most granular level possible (e.g., per-service service accounts) rather than broad project-level roles.
