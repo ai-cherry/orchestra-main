@@ -1,4 +1,4 @@
-ot  #!/usr/bin/env python3
+import os  # Changed 'ot' to 'os'
 """
 token_budget_manager.py - Optimized Token Budget Manager
 

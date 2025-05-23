@@ -16,6 +16,7 @@ from typing import Dict, List, Any, Optional, Union
 import uvicorn
 from fastapi import FastAPI, Depends, HTTPException, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 # Import components

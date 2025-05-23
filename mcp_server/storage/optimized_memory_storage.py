@@ -12,6 +12,7 @@ import json
 import asyncio
 import threading
 from typing import Dict, List, Optional, Any, Union, Set
+import os
 
 from ..interfaces.storage import IMemoryStorage
 from ..models.memory import MemoryEntry
@@ -667,7 +668,6 @@ class OptimizedMemoryStorage(IMemoryStorage):
             return False
 
         try:
-            import os
             import json
             from pathlib import Path
 
@@ -695,8 +695,6 @@ class OptimizedMemoryStorage(IMemoryStorage):
                 json.dump(data_to_persist, f)
 
             # Rename to actual file (atomic operation)
-            import os
-
             os.replace(temp_path, self.persistence_path)
 
             return True
