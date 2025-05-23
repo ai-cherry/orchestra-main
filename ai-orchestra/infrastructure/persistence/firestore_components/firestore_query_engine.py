@@ -4,38 +4,20 @@ for memory items. Supports filtering, tagging, and pagination.
 """
 import logging
 from typing import Dict, Any, Optional, List, AsyncGenerator
-from datetime import datetime # Ensure datetime is imported if used for expiry checks here
+from datetime import datetime, timezone # Ensure datetime is imported if used for expiry checks here
 
 from google.cloud import firestore
 from google.cloud.firestore_v1.async_client import AsyncClient as FirestoreAsyncClient
-from google.cloud.firestore_v1.base_query import AsyncBaseQuery, FieldFilter, Or, And
+from google.cloud.firestore_v1.base_query import AsyncBaseQuery, FieldFilter
 from google.cloud.firestore_v1.async_document import AsyncDocumentSnapshot
 
 # TODO: Replace these with actual imports from your project
-# from packages.shared.src.models.base_models import MemoryItem
+from packages.shared.src.models.base_models import MemoryItem
 # from ai_orchestra.core.interfaces.enhanced_memory import QueryResult, QueryFilter
 from .memory_item_serializer import MemoryItemSerializer # Assuming it's in the same directory
 
 # Placeholder for actual models - replace these with your actual imports and definitions
-from pydantic import BaseModel, Field # Assuming Pydantic is used
-
-class PlaceholderQueryFilter(BaseModel):
-    field: str
-    operator: str # e.g., "==", "<", ">", "array_contains", etc.
-    value: Any
-
-class PlaceholderMemoryItem(BaseModel): # Replace with actual MemoryItem
-    key: str
-    value: Any
-    # ... other fields from your MemoryItem model
-    expiry: Optional[datetime] = None # Important for filtering expired items
-
-class PlaceholderQueryResult(BaseModel): # Replace with actual QueryResult
-    items: List[PlaceholderMemoryItem]
-    total_count: int
-    page: int
-    page_size: int
-    has_more: bool
+# from pydantic import BaseModel, Field # Assuming Pydantic is used
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +51,7 @@ class FirestoreQueryEngine:
     def _apply_filters_and_ordering(
         self,
         base_query: AsyncBaseQuery,
-        filters: Optional[List[PlaceholderQueryFilter]] = None,
+        filters: Optional[List[Dict[str, Any]]] = None,
         tags: Optional[List[str]] = None,
         order_by: Optional[str] = None,
         order_direction: str = "ASCENDING",
@@ -78,7 +60,7 @@ class FirestoreQueryEngine:
         query = base_query
         if filters:
             for f in filters:
-                query = query.where(filter=FieldFilter(f.field, f.operator, f.value))
+                query = query.where(filter=FieldFilter(f["field"], f["operator"], f["value"]))
         if tags:
             for tag in tags:
                 query = query.where(filter=FieldFilter("tags", "array_contains", tag))
@@ -89,13 +71,13 @@ class FirestoreQueryEngine:
 
     async def execute_query(
         self,
-        filters: Optional[List[PlaceholderQueryFilter]] = None,
+        filters: Optional[List[Dict[str, Any]]] = None,
         tags: Optional[List[str]] = None,
         order_by: Optional[str] = None,
         order_direction: str = "ASCENDING",
         page: int = 1,
         page_size: int = 100,
-    ) -> PlaceholderQueryResult:
+    ) -> List[MemoryItem]:
         if page < 1:
             raise ValueError("Page number must be 1 or greater.")
         if page_size < 1 or page_size > 1000: # Firestore limit for array_contains_any, good general limit
@@ -140,7 +122,7 @@ class FirestoreQueryEngine:
             paginated_query = paginated_query.limit(page_size)
             
             docs_stream = paginated_query.stream()
-            items: List[PlaceholderMemoryItem] = []
+            items: List[MemoryItem] = []
             current_time_utc = datetime.now(timezone.utc)
 
             async for doc_snapshot in docs_stream:
@@ -148,27 +130,18 @@ class FirestoreQueryEngine:
                     firestore_data = doc_snapshot.to_dict()
                     try:
                         item = self.serializer.to_memory_item(doc_snapshot.id, firestore_data)
-                        # Filter out expired items after deserialization if expiry is part of MemoryItem
-                        if item.expiry and item.expiry < current_time_utc:
-                            logger.debug(f"Item '{item.key}' expired, filtering out from query results.")
-                            # Optionally, you could trigger a delete here or mark for deletion
+                        if getattr(item, "expiry", None) and item.expiry < current_time_utc:
+                            logger.debug(
+                                f"Item '{item.id}' expired, filtering out from query results."
+                            )
                             continue 
                         items.append(item)
                     except ValueError as ve:
                         logger.warning(f"Skipping item due to deserialization/validation error: {doc_snapshot.id}, error: {ve}")
                         continue
-            
-            has_more = (page * page_size) < total_count
-            
             logger.info(f"Query returned {len(items)} items for page {page} (total potential: {total_count}).")
-
-            return PlaceholderQueryResult(
-                items=items,
-                total_count=total_count,
-                page=page,
-                page_size=page_size,
-                has_more=has_more,
-            )
+            # Return just the list of items, not a QueryResult
+            return items
 
         except Exception as e:
             logger.error(f"Error executing query on '{self.collection_name}': {e}", exc_info=True)
@@ -176,11 +149,11 @@ class FirestoreQueryEngine:
 
     async def stream_query_results(
         self,
-        filters: Optional[List[PlaceholderQueryFilter]] = None,
+        filters: Optional[List[Dict[str, Any]]] = None,
         tags: Optional[List[str]] = None,
         order_by: Optional[str] = None,
         order_direction: str = "ASCENDING",
-    ) -> AsyncGenerator[PlaceholderMemoryItem, None]:
+    ) -> AsyncGenerator[MemoryItem, None]:
         logger.debug(
             f"Streaming query results from '{self.collection_name}' with filters: {filters}, "
             f"tags: {tags}, order_by: {order_by} {order_direction}"
@@ -200,8 +173,10 @@ class FirestoreQueryEngine:
                     firestore_data = doc_snapshot.to_dict()
                     try:
                         item = self.serializer.to_memory_item(doc_snapshot.id, firestore_data)
-                        if item.expiry and item.expiry < current_time_utc:
-                            logger.debug(f"Streaming: Item '{item.key}' expired, skipping.")
+                        if getattr(item, "expiry", None) and item.expiry < current_time_utc:
+                            logger.debug(
+                                f"Streaming: Item '{item.id}' expired, skipping."
+                            )
                             continue
                         yield item
                     except ValueError as ve:

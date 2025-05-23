@@ -9,19 +9,18 @@ This class acts as a facade, delegating operations to specialized
 firestore_components for CRUD, querying, serialization, expiry, and batch processing.
 """
 import logging
-import asyncio
 from typing import Any, Dict, List, Optional, AsyncGenerator
 from datetime import datetime, timezone
 
-# TODO: Replace these with actual imports from your project structure
-# from ai_orchestra.core.interfaces.enhanced_memory import (
-#     EnhancedMemoryProvider,
-#     MemoryItem as ActualMemoryItem,
-#     QueryFilter as ActualQueryFilter,
-#     QueryResult as ActualQueryResult,
-# )
-# from ai_orchestra.core.config import Settings as ActualAppSettings
-# from ai_orchestra.core.events.memory_events import get_event_bus, MemoryEvent as ActualMemoryEvent, EventType as ActualEventType
+from core.orchestrator.src.config.settings import Settings
+from packages.shared.src.models.base_models import MemoryItem
+from ai_orchestra.core.events.memory_events import (
+    MemoryItemCreatedEvent,
+    MemoryItemAccessedEvent,
+    MemoryItemDeletedEvent,
+    MemoryEventBus,
+)
+from ai_orchestra.core.interfaces.enhanced_memory import EnhancedMemoryProvider
 
 from .firestore_components.firestore_client_manager import FirestoreClientManager
 from .firestore_components.firestore_crud_operations import FirestoreCrudOperations
@@ -102,17 +101,17 @@ class EnhancedFirestoreMemoryProvider(EnhancedMemoryProvider):
         else:
             firestore_data.pop("expiry", None)
 
-        success = await self._crud_ops.create_or_update_item(item.key, firestore_data)
+        success = await self._crud_ops.create_or_update_item(item.id, firestore_data)
         if success:
-            await self._event_bus.publish(MemoryItemCreatedEvent(key=item.key))
+            await self._event_bus.publish(MemoryItemCreatedEvent(item_id=item.id))
         return success
 
-    async def retrieve_item(self, key: str) -> Optional[MemoryItem]:
+    async def retrieve_item(self, id: str) -> Optional[MemoryItem]:
         self._ensure_initialized()
         assert self._crud_ops and self._serializer and self._expiry_manager and self._event_bus, \
             "CRUD ops, serializer, expiry_manager, or event_bus not initialized"
 
-        firestore_data = await self._crud_ops.get_item(key)
+        firestore_data = await self._crud_ops.get_item(id)
         if not firestore_data:
             return None
 
@@ -120,29 +119,29 @@ class EnhancedFirestoreMemoryProvider(EnhancedMemoryProvider):
         if expiry_timestamp_from_db:
             expiry_dt = self._serializer._to_datetime(expiry_timestamp_from_db)
             if expiry_dt and expiry_dt < datetime.now(timezone.utc):
-                logger.info(f"Item '{key}' found but is expired. Auto-deleting.")
-                await self._crud_ops.delete_item(key)
-                await self._event_bus.publish(MemoryEvent(event_type="MEMORY_ITEM_EXPIRED", key=key, reason="retrieval_check"))
+                logger.info(f"Item '{id}' found but is expired. Auto-deleting.")
+                await self._crud_ops.delete_item(id)
+                await self._event_bus.publish(MemoryItemDeletedEvent(item_id=id))
                 return None
 
-        item = self._serializer.to_memory_item(key, firestore_data)
-        await self._event_bus.publish(MemoryItemAccessedEvent(key=key))
+        item = self._serializer.to_memory_item(id, firestore_data)
+        await self._event_bus.publish(MemoryItemAccessedEvent(item_id=id))
         return item
 
-    async def delete_item(self, key: str) -> bool:
+    async def delete_item(self, id: str) -> bool:
         self._ensure_initialized()
         assert self._crud_ops and self._event_bus, "CRUD ops or event_bus not initialized"
-        success = await self._crud_ops.delete_item(key)
+        success = await self._crud_ops.delete_item(id)
         if success:
-            await self._event_bus.publish(MemoryItemDeletedEvent(key=key))
+            await self._event_bus.publish(MemoryItemDeletedEvent(item_id=id))
         return success
 
-    async def item_exists(self, key: str) -> bool:
+    async def item_exists(self, id: str) -> bool:
         self._ensure_initialized()
         assert self._crud_ops and self._serializer and self._expiry_manager, \
             "CRUD ops, serializer or expiry_manager not initialized"
         
-        firestore_data = await self._crud_ops.get_item(key)
+        firestore_data = await self._crud_ops.get_item(id)
         if not firestore_data:
             return False
 
@@ -160,38 +159,21 @@ class EnhancedFirestoreMemoryProvider(EnhancedMemoryProvider):
         filters: Optional[Dict[str, Any]] = None,
         tags: Optional[List[str]] = None,
         order_by: Optional[str] = None,
-        order_direction: str = "ASCENDING",
-        page: int = 1,
-        page_size: int = 100
+        page_size: int = 100,
+        order_direction: str = "ASCENDING"
     ) -> List[MemoryItem]:
         self._ensure_initialized()
         assert self._query_engine is not None, "Query engine not initialized"
-        return await self._query_engine.execute_query(
-            filters=filters,
-            tags=tags,
-            order_by=order_by,
-            order_direction=order_direction,
-            page=page,
-            page_size=page_size
-        )
-
-    async def stream_items(
-        self,
-        filters: Optional[Dict[str, Any]] = None,
-        tags: Optional[List[str]] = None,
-        order_by: Optional[str] = None,
-        order_direction: str = "ASCENDING"
-    ) -> AsyncGenerator[MemoryItem, None]:
-        self._ensure_initialized()
-        assert self._query_engine is not None, "Query engine not initialized"
+        items = []
         async for item in self._query_engine.stream_query_results(
             filters=filters,
             tags=tags,
             order_by=order_by,
             order_direction=order_direction
         ):
-            yield item
-    
+            items.append(item)
+        return items
+
     async def batch_store_items(self, items: List[MemoryItem], merge: bool = False) -> Dict[str, int]:
         self._ensure_initialized()
         assert self._batch_processor is not None and self._serializer is not None and self._expiry_manager is not None, \
@@ -205,19 +187,20 @@ class EnhancedFirestoreMemoryProvider(EnhancedMemoryProvider):
                 firestore_data["expiry"] = self._serializer._ensure_utc(calculated_expiry)
             elif "expiry" in firestore_data:
                 del firestore_data["expiry"]
-            items_data[item.key] = firestore_data
+            items_data[item.id] = firestore_data
 
         return await self._batch_processor.batch_set_items(items_data, merge=merge)
 
-    async def batch_delete_items(self, item_keys: List[str]) -> Dict[str, int]:
+    async def batch_delete_items(self, item_ids: List[str]) -> Dict[str, int]:
         self._ensure_initialized()
         assert self._batch_processor is not None and self._event_bus is not None, \
             "Batch processor or event_bus not initialized"
-        result = await self._batch_processor.batch_delete_items(item_keys)
+        result = await self._batch_processor.batch_delete_items(item_ids)
         if result.get("successful", 0) > 0:
-            # TODO: Consider if individual delete events are needed or if a single batch event is sufficient
-            await self._event_bus.publish(MemoryItemDeletedEvent(key="batch_delete_operation"))
-            return result
+            # Emit individual delete events for each id for auditability
+            for item_id in item_ids:
+                await self._event_bus.publish(MemoryItemDeletedEvent(item_id=item_id))
+        return result
             
     async def prune_all_expired_items(self) -> Dict[str, Any]:
         self._ensure_initialized()
@@ -225,12 +208,22 @@ class EnhancedFirestoreMemoryProvider(EnhancedMemoryProvider):
         # The expiry manager handles its own event publishing internally during prune
         return await self._expiry_manager.prune_expired_items()
 
-    # TODO: Implement other methods from your EnhancedMemoryProvider interface
-    # by delegating to the appropriate specialized components.
-    # Example:
-    # async def add_tag_to_item(self, key: str, tag: str) -> bool:
-    #     self._ensure_initialized()
-    #     item_data = await self._crud_ops.get_item(key)
-    #     if not item_data: return False
-    #     # ... (logic to add tag, then use self._crud_ops.update_item) ...
-    #     return True
+    # Implementation of EnhancedMemoryProvider interface methods
+
+    async def store(self, item: MemoryItem) -> str:
+        await self.store_item(item)
+        return item.id
+
+    async def retrieve(self, id: str) -> Optional[MemoryItem]:
+        return await self.retrieve_item(id)
+
+    async def delete(self, id: str) -> bool:
+        return await self.delete_item(id)
+
+    async def update(self, id: str, updates: Dict[str, Any]) -> bool:
+        self._ensure_initialized()
+        assert self._crud_ops is not None
+        return await self._crud_ops.update_item(id, updates)
+
+    async def query(self, filters: Dict[str, Any], limit: Optional[int] = None) -> List[MemoryItem]:
+        return await self.query_items(filters=filters, page_size=limit or 100)
