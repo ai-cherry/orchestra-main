@@ -5,22 +5,7 @@ Firestore-compatible dictionaries.
 import logging
 from typing import Dict, Any, Optional, List
 from datetime import datetime, timezone
-
-# Assuming MemoryItem is defined in a shared models location
-# from packages.shared.src.models.base_models import MemoryItem # TODO: Replace with actual import
-# For now, let's define a placeholder MemoryItem for structure
-from pydantic import BaseModel, Field # Assuming Pydantic is used for MemoryItem
-
-class PlaceholderMemoryItem(BaseModel): # TODO: Replace with actual MemoryItem class name and fields
-    key: str
-    value: Any
-    metadata: Dict[str, Any] = Field(default_factory=dict)
-    tags: List[str] = Field(default_factory=list)
-    relationships: Dict[str, List[str]] = Field(default_factory=dict)
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
-    expiry: Optional[datetime] = None
-    # user_id: Optional[str] = None # Example of another common field
+from packages.shared.src.models.base_models import MemoryItem
 
 # Using a standard logger for now
 logger = logging.getLogger(__name__)
@@ -33,7 +18,7 @@ class MemoryItemSerializer:
     def __init__(self):
         logger.info("MemoryItemSerializer initialized.")
 
-    def to_firestore(self, memory_item: PlaceholderMemoryItem) -> Dict[str, Any]:
+    def to_firestore(self, memory_item: MemoryItem) -> Dict[str, Any]:
         """
         Converts a MemoryItem object into a dictionary suitable for Firestore storage.
 
@@ -47,33 +32,28 @@ class MemoryItemSerializer:
             TypeError: If the memory_item is not of the expected type.
             ValueError: If essential fields are missing or invalid.
         """
-        # TODO: Replace PlaceholderMemoryItem with your actual MemoryItem class
-        if not isinstance(memory_item, PlaceholderMemoryItem): 
-            raise TypeError(f"Expected PlaceholderMemoryItem, got {type(memory_item)}")
+        if not isinstance(memory_item, MemoryItem):
+            raise TypeError(f"Expected MemoryItem, got {type(memory_item)}")
 
         data: Dict[str, Any] = {
-            "key": memory_item.key,
-            "value": self._serialize_value(memory_item.value),
+            "id": memory_item.id,
+            "content": self._serialize_value(memory_item.content),
+            "source": memory_item.source,
+            "timestamp": memory_item.timestamp,
             "metadata": memory_item.metadata if memory_item.metadata is not None else {},
             "tags": memory_item.tags if memory_item.tags is not None else [],
             "relationships": memory_item.relationships if memory_item.relationships is not None else {},
+            "created_at": self._ensure_utc(memory_item.created_at) if memory_item.created_at else None,
+            "updated_at": self._ensure_utc(memory_item.updated_at) if memory_item.updated_at else None,
+            "expiry": self._ensure_utc(memory_item.expiry) if memory_item.expiry else None,
+            "priority": memory_item.priority,
+            "embedding": memory_item.embedding,
         }
 
-        if memory_item.created_at:
-            data["created_at"] = self._ensure_utc(memory_item.created_at)
-        if memory_item.updated_at:
-            data["updated_at"] = self._ensure_utc(memory_item.updated_at)
-        if memory_item.expiry:
-            data["expiry"] = self._ensure_utc(memory_item.expiry)
-        
-        # TODO: Add serialization for any other fields from your MemoryItem model
-        # Example: if hasattr(memory_item, 'user_id') and memory_item.user_id is not None:
-        #     data["user_id"] = memory_item.user_id
-
-        logger.debug(f"Serialized MemoryItem '{memory_item.key}' to Firestore dict.")
+        logger.debug(f"Serialized MemoryItem '{memory_item.id}' to Firestore dict.")
         return data
 
-    def to_memory_item(self, item_id: str, firestore_data: Dict[str, Any]) -> PlaceholderMemoryItem:
+    def to_memory_item(self, item_id: str, firestore_data: Dict[str, Any]) -> MemoryItem:
         """
         Converts a dictionary from Firestore into a MemoryItem object.
 
@@ -92,7 +72,7 @@ class MemoryItemSerializer:
             raise TypeError(f"Expected dict for firestore_data, got {type(firestore_data)}")
         
         # Ensure item_id is present, either passed in or from the data itself
-        actual_item_id = item_id or firestore_data.get("key")
+        actual_item_id = item_id or firestore_data.get("id")
         if not actual_item_id:
             raise ValueError("Item ID (key) is missing or not provided.")
 
@@ -101,23 +81,22 @@ class MemoryItemSerializer:
         expiry = firestore_data.get("expiry")
 
         memory_item_data = {
-            "key": actual_item_id,
-            "value": self._deserialize_value(firestore_data.get("value")),
+            "id": actual_item_id,
+            "content": self._deserialize_value(firestore_data.get("content")),
+            "source": firestore_data.get("source", "unknown"),
+            "timestamp": firestore_data.get("timestamp"),
             "metadata": firestore_data.get("metadata", {}),
             "tags": firestore_data.get("tags", []),
             "relationships": firestore_data.get("relationships", {}),
             "created_at": self._to_datetime(created_at) if created_at else None,
             "updated_at": self._to_datetime(updated_at) if updated_at else None,
             "expiry": self._to_datetime(expiry) if expiry else None,
+            "priority": firestore_data.get("priority", 0.5),
+            "embedding": firestore_data.get("embedding"),
         }
         
-        # TODO: Add deserialization for any other fields from your MemoryItem model
-        # Example: if "user_id" in firestore_data:
-        #     memory_item_data["user_id"] = firestore_data.get("user_id")
-
         try:
-            # TODO: Replace PlaceholderMemoryItem with your actual MemoryItem class
-            item = PlaceholderMemoryItem(**memory_item_data) 
+            item = MemoryItem(**memory_item_data)
             logger.debug(f"Deserialized Firestore dict to MemoryItem '{actual_item_id}'.")
             return item
         except Exception as e: # Catch Pydantic validation errors or others
