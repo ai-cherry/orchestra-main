@@ -57,7 +57,7 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'orchestra-main-service'
+      - 'ai-orchestra-minimal'
       - '--image=us-central1-docker.pkg.dev/cherry-ai-project/orchestra-images/orchestra-main:$COMMIT_SHA'
       - '--region=us-central1'
       - '--platform=managed'
