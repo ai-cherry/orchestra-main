@@ -62,7 +62,7 @@ steps:
       - '--region=us-central1'
       - '--platform=managed'
       - '--allow-unauthenticated'
-      - '--set-secrets=OPENAI_API_KEY=projects/cherry-ai-project/secrets/OPENAI_API_KEY:latest,PORTKEY_API_KEY=projects/cherry-ai-project/secrets/PORTKEY_API_KEY:latest,PERPLEXITY_API_KEY=projects/cherry-ai-project/secrets/PERPLEXITY_API_KEY:latest,ANTHROPIC_API_KEY=projects/cherry-ai-project/secrets/ANTHROPIC_API_KEY:latest,GOOGLE_API_KEY=projects/cherry-ai-project/secrets/GOOGLE_API_KEY:latest,VERTEX_API_KEY=projects/cherry-ai-project/secrets/VERTEX_API_KEY:latest,GITHUB_TOKEN=projects/cherry-ai-project/secrets/GITHUB_TOKEN:latest,SLACK_BOT_TOKEN=projects/cherry-ai-project/secrets/SLACK_BOT_TOKEN:latest,REDIS_PASSWORD=projects/cherry-ai-project/secrets/REDIS_PASSWORD:latest,DATABASE_URL=projects/cherry-ai-project/secrets/DATABASE_URL:latest'
+      - '--set-secrets=OPENAI_API_KEY=projects/cherry-ai-project/secrets/OPENAI_API_KEY:latest,PORTKEY_API_KEY=projects/cherry-ai-project/secrets/PORTKEY_API_KEY:latest,PERPLEXITY_API_KEY=projects/cherry-ai-project/secrets/PERPLEXITY_API_KEY:latest,ANTHROPIC_API_KEY=projects/cherry-ai-project/secrets/ANTHROPIC_API_KEY:latest,GOOGLE_API_KEY=projects/cherry-ai-project/secrets/GOOGLE_API_KEY:latest,VERTEX_API_KEY=projects/cherry-ai-project/secrets/VERTEX_API_KEY:latest,GITHUB_TOKEN=projects/cherry-ai-project/secrets/GITHUB_TOKEN:latest,SLACK_BOT_TOKEN=projects/cherry-ai-project/secrets/SLACK_BOT_TOKEN:latest,REDIS_PASSWORD=projects/cherry-ai-project/secrets/REDIS_PASSWORD:latest,DATABASE_URL=projects/cherry-ai-project/secrets/DATABASE_URL:latest,DRAGONFLY_PASSWORD=projects/cherry-ai-project/secrets/DRAGONFLY_PASSWORD:latest,DRAGONFLY_HOST=projects/cherry-ai-project/secrets/DRAGONFLY_HOST:latest,DRAGONFLY_PORT=projects/cherry-ai-project/secrets/DRAGONFLY_PORT:latest,DRAGONFLY_CONNECTION_URI=projects/cherry-ai-project/secrets/DRAGONFLY_CONNECTION_URI:latest'
 
 images:
   - 'us-central1-docker.pkg.dev/cherry-ai-project/orchestra-images/orchestra-main:$COMMIT_SHA'
@@ -75,7 +75,7 @@ options:
   env:
     - "PYTHONUNBUFFERED=1"
 
-serviceAccount: "projects/525398941159/serviceAccounts/vertex-agent@cherry-ai.me.iam.gserviceaccount.com"
+serviceAccount: "projects/cherry-ai-project/serviceAccounts/vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
 
 artifacts:
   objects:
