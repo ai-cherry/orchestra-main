@@ -49,8 +49,8 @@ jobs:
           pip install -r requirements.txt
       - name: Run unit tests & lint (fast-fail)
         run: |
-          if [ -f tests ]; then pytest -q ; fi
-          flake8 --ignore=E501 .
+          if [ -d tests ]; then pytest -q ; fi
+          flake8 .
       # -----------------------------------------------------------
 
       # 6. Verify gcloud authentication
