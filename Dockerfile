@@ -19,10 +19,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN pip install --upgrade pip wheel
 
 # Copy only requirements to leverage Docker cache
-COPY requirements.txt ./
+COPY requirements-app.txt ./
 
 # Install Python dependencies (build wheels if necessary)
-RUN pip wheel --no-cache-dir --wheel-dir=/wheels -r requirements.txt
+RUN pip wheel --no-cache-dir --wheel-dir=/wheels -r requirements-app.txt
 
 # Stage 2: Final runtime stage - minimal image
 FROM python:3.11-slim-bullseye AS final
@@ -43,8 +43,8 @@ COPY --from=builder /wheels /wheels
 
 # Install Python dependencies from wheels (faster and doesn't need build tools)
 # Also copy requirements.txt for completeness or if some packages don't produce wheels easily
-COPY requirements.txt ./
-RUN pip install --no-cache-dir --no-index --find-links=/wheels -r requirements.txt
+COPY requirements-app.txt ./
+RUN pip install --no-cache-dir --no-index --find-links=/wheels -r requirements-app.txt
 
 # Copy application code
 # Ensure correct ownership if files are created/copied as root before switching user

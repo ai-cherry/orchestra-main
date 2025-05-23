@@ -1,4 +1,4 @@
-ot  #!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 token_budget_manager.py - Optimized Token Budget Manager
 

@@ -352,31 +352,34 @@ async def prune_memory(agent_id: str, older_than_days: int) -> Dict[str, Any]:
         operation_start_time = time.time()
 
         # Process in batches using pagination
+        # Initialize batch before the loop if it's used inside the loop
+        batch = firestore_client.batch()
         async for mem_doc in paginate_query(query, page_size=batch_size):
             # Create a new batch if needed
-            if deleted_count % batch_size == 0:
+            if deleted_count > 0 and deleted_count % batch_size == 0: # check deleted_count > 0 to avoid committing an empty initial batch
                 # Commit previous batch if it exists
-                if deleted_count > 0:
-                    try:
-                        await batch.commit()
-                        batch_time = time.time() - batch_start_time
-                        logger.info(
-                            f"Committed batch of {batch_size}, total deleted: {deleted_count} ({batch_time:.2f}s)"
-                        )
-                        batch_start_time = time.time()
-                    except (
-                        DeadlineExceeded,
-                        ServiceUnavailable,
-                        ResourceExhausted,
-                    ) as e:
-                        # On transient errors, reduce batch size and retry
-                        logger.warning(
-                            f"Transient error, reducing batch size: {str(e)}"
-                        )
-                        batch_size = max(50, batch_size // 2)
-                        continue
-
-                # Create a new batch
+                try:
+                    await batch.commit()
+                    batch_time = time.time() - batch_start_time
+                    logger.info(
+                        f"Committed batch of {batch_size}, total deleted: {deleted_count} ({batch_time:.2f}s)"
+                    )
+                    batch_start_time = time.time()
+                except (
+                    DeadlineExceeded,
+                    ServiceUnavailable,
+                    ResourceExhausted,
+                ) as e:
+                    # On transient errors, reduce batch size and retry
+                    logger.warning(
+                        f"Transient error, reducing batch size: {str(e)}"
+                    )
+                    batch_size = max(50, batch_size // 2)
+                    # Re-initialize batch for the next set of operations
+                    batch = firestore_client.batch() 
+                    continue
+                
+                # Create a new batch for the next set of operations after successful commit
                 batch = firestore_client.batch()
 
             # Add delete operation to batch
@@ -384,7 +387,7 @@ async def prune_memory(agent_id: str, older_than_days: int) -> Dict[str, Any]:
             deleted_count += 1
 
         # Commit any remaining operations in the final batch
-        if deleted_count % batch_size != 0:
+        if deleted_count > 0 and deleted_count % batch_size != 0: # check deleted_count > 0
             await batch.commit()
             logger.info(f"Committed final batch, total deleted: {deleted_count}")
 

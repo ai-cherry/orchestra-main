@@ -139,7 +139,11 @@ async def interact(
         return {"response": response_text, "persona": persona_name}
 
     except Exception as e:
-        logger.error(f"Interaction processing failed: {e}", exc_info=True)
+        logger.error(
+            "Error processing interaction",
+            exc_info=True,
+            extra={"error_message": str(e), "endpoint_path": "interaction_endpoint_placeholder"}
+        )
         logger.warning(
             "Interaction processing failure may impact user experience or conversation continuity."
         )

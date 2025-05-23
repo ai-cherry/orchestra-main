@@ -4,13 +4,16 @@ Main FastAPI application for AI Orchestra.
 This module provides the main FastAPI application.
 """
 
-import logging
 import os
-import uuid
+# Use the new centralized logging setup
+from core.logging_config import setup_logging, get_logger
+
+# Standard library imports
 import json
 import tempfile
 import datetime
-from typing import Dict, List, Optional, Any
+import uuid
+from typing import Dict, List, Optional, Any, Union
 
 from fastapi import (
     FastAPI,
@@ -49,12 +52,12 @@ from ai_orchestra.core.services.checkpointing import StateCheckpointManager
 from ai_orchestra.infrastructure.versioning.model_version_manager import (
     ModelVersionManager,
 )
-from ai_orchestra.utils.logging import configure_logging, log_event
 
-# Configure logging
-configure_logging(level=settings.log_level, json_logs=True)
-logger = logging.getLogger("ai_orchestra.api.main")
+# Determine if running in production (Cloud Run) or development
+is_production = os.environ.get("K_SERVICE") is not None
+setup_logging(level=settings.log_level, json_format=is_production)
 
+logger = get_logger(__name__) # Use the centralized get_logger
 
 # Create FastAPI app
 app = FastAPI(
@@ -342,15 +345,14 @@ async def ai_service_error_handler(
     Returns:
         JSON response with error details
     """
-    log_event(
-        logger,
-        "error",
-        "handled",
-        {
+    logger.error(
+        "Handled AI service error",
+        extra={
             "code": exc.code,
             "message": exc.message,
             "path": request.url.path,
-        },
+            "error_type": "AIServiceError"
+        }
     )
 
     return JSONResponse(
@@ -375,15 +377,14 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
     Returns:
         JSON response with error details
     """
-    log_event(
-        logger,
-        "error",
-        "unhandled",
-        {
-            "type": type(exc).__name__,
+    logger.error(
+        "Unhandled exception",
+        exc_info=True, # Include stack trace for unhandled exceptions
+        extra={
+            "error_type": type(exc).__name__,
             "message": str(exc),
             "path": request.url.path,
-        },
+        }
     )
 
     return JSONResponse(
@@ -1068,7 +1069,7 @@ async def process_document(
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
-        logger.error(f"Error processing document: {e}")
+        logger.error("Error processing document", exc_info=True, extra={"file_path": request.file_path, "error_message": str(e)})
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error processing document: {str(e)}",
@@ -1186,7 +1187,7 @@ async def upload_document(
             detail="Invalid metadata JSON format",
         )
     except Exception as e:
-        logger.error(f"Error processing uploaded document: {e}")
+        logger.error("Error processing uploaded document", exc_info=True, extra={"filename": file.filename, "error_message": str(e)})
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error processing uploaded document: {str(e)}",

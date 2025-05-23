@@ -7,6 +7,7 @@ This module provides a Vertex AI-based implementation of the AI service.
 import asyncio
 import json
 from typing import Any, Dict, List, Optional, Union
+import time
 
 from google.cloud import aiplatform
 from google.cloud.aiplatform.gapic.schema import predict
@@ -384,6 +385,7 @@ class VertexAIService:
             InvalidInputError: If the input is invalid
             AIServiceError: For other errors
         """
+        start_time = time.time()
         embeddings = await self.generate_embeddings(
             texts=[text],
             model_id=model_id,
@@ -726,3 +728,10 @@ class VertexAIService:
         }
 
         return capabilities_map.get(model_id, [])
+
+    async def batch_get_embeddings(self, texts: List[str], model_id: str = "text-embedding-preview-0409") -> List[List[float]]:
+        """Get embeddings for a list of texts in batches."""
+        start_time = time.time()
+        embeddings = await self.generate_embeddings(texts, model_id)
+        log_end(logger, "batch_get_embeddings", start_time, {"embedding_count": len(embeddings)})
+        return embeddings

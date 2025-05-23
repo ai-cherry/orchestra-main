@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Dict, Optional, Callable, TypeVar, Any
 from google.cloud import secretmanager
 import portkey
+import os
 
 from packages.shared.src.models.base_models import PersonaConfig
 from .settings import Settings
