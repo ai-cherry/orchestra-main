@@ -1,4 +1,4 @@
-#!/workspaces/orchestra-main/venv/bin/python3
+#!/home/paperspace/orchestra-main/venv/bin/python3
 # -*- coding: utf-8 -*-
 # Copyright 2025 Google LLC
 #

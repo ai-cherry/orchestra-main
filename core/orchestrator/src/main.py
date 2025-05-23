@@ -6,6 +6,18 @@ initializes the unified service components and maintains backward compatibility
 with existing components.
 """
 
+# Use the new centralized logging setup
+from core.logging_config import setup_logging, get_logger
+import os
+
+# Determine if running in production (Cloud Run) or development
+is_production = os.environ.get("K_SERVICE") is not None 
+# Assuming settings.log_level is available, otherwise use a default
+# from core.orchestrator.src.config.loader import get_settings # This will be loaded later
+setup_logging(level=os.environ.get("LOG_LEVEL", "INFO"), json_format=is_production)
+
+logger = get_logger(__name__) # Use the centralized get_logger
+
 from core.orchestrator.src.api.middleware.persona_loader import get_active_persona
 from core.orchestrator.src.api.dependencies.memory import (
     initialize_memory_manager,
@@ -34,8 +46,6 @@ from core.orchestrator.src.api.endpoints import (
     conversations,  # Add import for conversations endpoints
 )
 from core.orchestrator.src.agents.agent_registry import register_default_agents
-import logging
-import os
 from contextlib import asynccontextmanager
 from typing import Dict
 
@@ -79,18 +89,6 @@ try:
     from core.orchestrator.src.api.dependencies.memory import HEX_ARCH_AVAILABLE
 except ImportError:
     HEX_ARCH_AVAILABLE = False
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-)
-logger = logging.getLogger(__name__)
-
-# Log the mode we're starting in
-logger.info(
-    f"Starting with RECOVERY_MODE={RECOVERY_MODE}, STANDARD_MODE={STANDARD_MODE}"
-)
 
 # Load configurations at module level
 settings = get_settings()

@@ -90,7 +90,7 @@ node_modules/
 # Other common ignores
 *~
 *.swp
-*.swo
+*.swo 
 
 # Project-specific additions
 /.git/

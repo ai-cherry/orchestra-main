@@ -36,6 +36,7 @@ import tempfile
 import time
 import uuid
 import sys
+import subprocess
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum

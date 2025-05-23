@@ -139,6 +139,30 @@ class BaseAgent:
             logger.error(f"Chat completion generation failed: {str(e)}")
             return f"Error generating chat completion: {str(e)}"
 
+    def log_info(self, message_text: str) -> None:
+        # Changed message to logger.info
+        logger.info(f"[Agent: {self.agent_id}] {message_text}")
+
+    def log_warning(self, message_text: str) -> None:
+        # Changed message to logger.warning
+        logger.warning(f"[Agent: {self.agent_id}] {message_text}")
+
+    def log_error(self, message_text: str, exc_info: bool = False) -> None:
+        # Changed message to logger.error
+        logger.error(f"[Agent: {self.agent_id}] {message_text}", exc_info=exc_info)
+
+    def log_debug(self, message_text: str) -> None:
+        # Changed message to logger.debug
+        logger.debug(f"[Agent: {self.agent_id}] {message_text}")
+
+    def log_critical(self, message_text: str) -> None:
+        # Changed message to logger.critical
+        logger.critical(f"[Agent: {self.agent_id}] {message_text}")
+
+    def log_exception(self, message_text: str) -> None:
+        # Changed message to logger.exception
+        logger.exception(f"[Agent: {self.agent_id}] {message_text}")
+
 
 class DomainExpertAgent(BaseAgent):
     """

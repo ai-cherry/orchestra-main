@@ -1,13 +1,12 @@
-import logging
-from pythonjsonlogger import jsonlogger
+from core.logging_config import setup_logging, get_logger
+import os
 
 # Set up structured JSON logging
-logger = logging.getLogger()
-logHandler = logging.StreamHandler()
-formatter = jsonlogger.JsonFormatter()
-logHandler.setFormatter(formatter)
-logger.handlers = [logHandler]
-logger.setLevel(logging.INFO)
+# Determine if running in production (Cloud Run) or development
+is_production = os.environ.get("K_SERVICE") is not None
+setup_logging(json_format=is_production)
+
+logger = get_logger(__name__)
 
 from flask import Flask, jsonify, request
 import os
