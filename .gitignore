@@ -49,6 +49,8 @@ docker-compose.override.yml
 *.pem
 *.env
 .env.*
+project-admin-key.json
+secret-management-key.json
 
 # Node (if any frontend)
 node_modules/
