@@ -44,6 +44,18 @@ All legacy admin UI code (Flask backend and HTML/Alpine frontend in `apps/admin/
    ```
    - The app will listen on the port specified by the `PORT` environment variable (default: 8080).
 
+6. **Run tests (optional):**
+   ```bash
+   # Install development dependencies
+   pip install -r requirements-dev.txt
+   
+   # Run all tests
+   pytest
+   
+   # Run tests with verbose output
+   pytest -v
+   ```
+
 ---
 
 ## 🚑 Troubleshooting
@@ -64,11 +76,13 @@ All legacy admin UI code (Flask backend and HTML/Alpine frontend in `apps/admin/
 - **CI/CD (Recommended):**
   - Pushing to the `main` branch triggers the GitHub Actions workflow (`.github/workflows/main.yml`).
   - The workflow:
-    1. Runs tests and linting.
-    2. Submits a build to Google Cloud Build using `cloudbuild.yaml`.
-    3. Builds and pushes a Docker image (see `Dockerfile`).
-    4. Deploys the image to Cloud Run (`orchestra-main-service`) in `us-central1`.
-    5. Injects secrets from GCP Secret Manager as environment variables.
+    1. Authenticates with GCP using Workload Identity Federation.
+    2. Installs dependencies (including testing tools).
+    3. Runs tests with pytest (if tests directory exists).
+    4. Submits a build to Google Cloud Build using `cloudbuild.yaml`.
+    5. Builds and pushes a Docker image (see `Dockerfile`).
+    6. Deploys the image to Cloud Run (`ai-orchestra-minimal`) in `us-central1`.
+    7. Injects secrets from GCP Secret Manager as environment variables.
 
 - **Manual Deployment (Option A):**
   - From your Paperspace VM, you can deploy directly:

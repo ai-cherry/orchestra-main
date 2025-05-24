@@ -61,6 +61,29 @@ python mvp_orchestra_ai.py init
 # ✓ Initialize the Enhanced Natural Language Interface
 ```
 
+## 🚀 Deployment
+
+The MVP automatically deploys to Google Cloud Run when changes are pushed to the main branch:
+
+- **Service Name**: `ai-orchestra-minimal`
+- **Region**: `us-central1`
+- **Platform**: Google Cloud Run (managed)
+- **Authentication**: Workload Identity Federation via GitHub Actions
+
+### Local Development vs. Cloud Deployment
+
+- **Local Development**: Use `python mvp_orchestra_ai.py` commands for testing
+- **Production**: Automatically deployed via GitHub Actions → Cloud Build → Cloud Run
+
+### Accessing the Deployed Service
+
+Once deployed, the MVP is available at:
+```
+https://ai-orchestra-minimal-<hash>-uc.a.run.app
+```
+
+You can find the exact URL in the Google Cloud Console under Cloud Run services.
+
 ## 🎯 MVP Features Overview
 
 ### Enhanced Vector Memory System

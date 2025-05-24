@@ -1,0 +1,11 @@
+name: orchestra-gcp-infra
+description: Orchestra AI GCP Infrastructure Stack
+runtime:
+  name: python
+  options:
+    toolchain: pip
+    virtualenv: venv
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: python

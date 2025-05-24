@@ -7,7 +7,7 @@ The following context should be provided to the AI assistant for every session.
 See `docs/PROJECT_BLUEPRINT.md` for details.
 • Dev on Paperspace VM via SSH (Cursor)
 • Secrets via Secret Manager – exported at login by `~/.gcp_env_setup.sh`
-• Deployment: GitHub Actions ➜ Cloud Build ➜ Cloud Run (`orchestra-main-service` in `us-central1`).
+• Deployment: GitHub Actions ➜ Cloud Build ➜ Cloud Run (`ai-orchestra-minimal` in `us-central1`).
 
 ## Key directories (keep short)
 ```

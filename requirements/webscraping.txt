@@ -1,0 +1,62 @@
+# Web Scraping AI Agent Team Requirements
+# Builds on base.txt with scraping-specific dependencies
+
+-r base.txt
+
+# Web Scraping Frameworks and Tools
+playwright==1.40.0
+beautifulsoup4==4.12.2
+lxml==4.9.3
+selectolax==0.3.17
+scrapy==2.11.0
+selenium==4.15.2
+
+# Anti-detection and Proxy Services
+zenrows==1.2.0
+requests-html==0.10.0
+undetected-chromedriver==3.5.4
+fake-useragent==1.4.0
+
+# Additional ML for Content Analysis
+torch==2.1.2
+
+# Data Processing for Scraping
+pandas==2.1.4
+pymongo==4.6.1
+
+# Task Coordination and Queuing
+celery==5.3.4
+kombu==5.3.4
+billiard==4.2.0
+
+# HTTP and Parsing for Scraping
+parsel==1.8.1
+w3lib==2.1.2
+
+# Rate Limiting and Throttling
+ratelimit==2.2.1
+asyncio-throttle==1.0.2
+
+# Monitoring and Metrics
+prometheus-client==0.19.0
+psutil==5.9.6
+
+# Text Processing and NLP
+spacy==3.7.2
+nltk==3.8.1
+textstat==0.7.3
+
+# Image Processing (for screenshot analysis)
+Pillow==10.1.0
+opencv-python==4.8.1.78
+
+# API Integration Libraries
+apify-client==1.7.0
+phantombuster==0.1.4
+
+# Enhanced Logging
+loguru==0.7.2
+
+# Additional File Processing
+aiofiles==23.2.0
+configparser==6.0.0 

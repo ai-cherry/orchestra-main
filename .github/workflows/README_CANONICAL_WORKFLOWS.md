@@ -1,20 +1,41 @@
-# Canonical Workflows for AI Orchestra
+# Canonical Workflows for Orchestra AI
 
 ## Active Workflows
 
-- **deploy-gcp-migration.yml**: The only supported workflow for GCP migration, deployment, and verification.
-- **python-tests.yml**: The only supported workflow for Python code linting and tests.
+### Primary Workflow
+- **main.yml**: The primary CI/CD workflow for deployment to GCP Cloud Run. Triggers on pushes to main branch and handles:
+  - Authentication via Workload Identity Federation
+  - Python testing and linting
+  - Cloud Build submission using `cloudbuild.yaml`
+  - Deployment to Cloud Run service `ai-orchestra-minimal`
 
-## All other workflows in `.github/workflows/` are deprecated and should be archived, deleted, or disabled to prevent CI/CD conflicts and instability.
+### Component-Specific Workflows
+- **admin-interface/.github/workflows/deploy.yml**: Deployment workflow for the React/TypeScript admin interface
+- **gcp-ide-sync/.github/workflows/deploy.yml**: Deployment workflow for GCP IDE synchronization components
+- **mcp_server/.github/workflows/deploy.yml**: Deployment workflow for MCP (Model Context Protocol) servers
 
 ## Best Practices
 
 - Validate all workflow YAMLs with `yamllint` and `actionlint` before pushing.
-- Use only the canonical workflows for deployment and testing.
+- Use the appropriate workflow for your component:
+  - Main application changes: Triggers `main.yml` automatically
+  - Admin interface changes: Use `admin-interface/` workflow
+  - MCP server changes: Use `mcp_server/` workflow
+  - GCP IDE sync changes: Use `gcp-ide-sync/` workflow
 - All GCP secrets must be referenced directly in workflow steps.
 - Docker build context and COPY paths must be explicit and correct.
 - Run `terraform validate` and `poetry check` in CI to catch errors early.
 
-## To Archive/Disable
+## Service Deployment Targets
 
-Move all non-canonical workflow files to `.github/workflows/archived/` or delete them from the repo.
+- **Main Application**: Deploys to `ai-orchestra-minimal` Cloud Run service in `us-central1`
+- **Admin Interface**: Deploys to dedicated admin interface service
+- **MCP Servers**: Deploy to individual MCP service endpoints
+
+## Workflow Coordination
+
+All workflows use Workload Identity Federation for secure GCP authentication and follow the same general pattern:
+1. Checkout code
+2. Authenticate to GCP
+3. Build and test (if applicable)
+4. Deploy to appropriate Cloud Run service
