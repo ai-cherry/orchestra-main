@@ -21,9 +21,7 @@ from ai_orchestra.utils.logging import log_event, log_start, log_end, log_error
 
 import logging
 
-logger = logging.getLogger(
-    "ai_orchestra.infrastructure.persistence.firestore_optimized"
-)
+logger = logging.getLogger("ai_orchestra.infrastructure.persistence.firestore_optimized")
 
 # Type variable for generic function return type
 T = TypeVar("T")
@@ -57,15 +55,10 @@ class FirestoreClientPool:
         with cls._lock:
             if project_id not in cls._instances:
                 # Use emulator if configured
-                if (
-                    settings.database.use_firestore_emulator
-                    and settings.database.firestore_emulator_host
-                ):
+                if settings.database.use_firestore_emulator and settings.database.firestore_emulator_host:
                     import os
 
-                    os.environ[
-                        "FIRESTORE_EMULATOR_HOST"
-                    ] = settings.database.firestore_emulator_host
+                    os.environ["FIRESTORE_EMULATOR_HOST"] = settings.database.firestore_emulator_host
 
                 # Create new client
                 cls._instances[project_id] = firestore.Client(project=project_id)
@@ -259,11 +252,7 @@ class OptimizedFirestoreMemoryProvider(MemoryProvider):
                 doc_data["expiry"] = expiry
 
             # Store the document
-            await self._run_async(
-                lambda: self.client.collection(self.collection_name)
-                .document(key)
-                .set(doc_data)
-            )
+            await self._run_async(lambda: self.client.collection(self.collection_name).document(key).set(doc_data))
 
             # Clear cache for this key to ensure fresh data
             # This is a bit of a hack since we can't directly access the cache from the decorator
@@ -296,11 +285,7 @@ class OptimizedFirestoreMemoryProvider(MemoryProvider):
 
         try:
             # Delete the document
-            await self._run_async(
-                lambda: self.client.collection(self.collection_name)
-                .document(key)
-                .delete()
-            )
+            await self._run_async(lambda: self.client.collection(self.collection_name).document(key).delete())
 
             # Clear cache for this key
             retrieve_method = type(self).retrieve
@@ -338,11 +323,7 @@ class OptimizedFirestoreMemoryProvider(MemoryProvider):
             exists = doc.exists
 
             # If document exists, check if it has expired
-            if (
-                exists
-                and "expiry" in doc.to_dict()
-                and doc.to_dict()["expiry"] < time.time()
-            ):
+            if exists and "expiry" in doc.to_dict() and doc.to_dict()["expiry"] < time.time():
                 # Document has expired, delete it
                 await self._run_async(doc_ref.delete)
                 exists = False
@@ -411,13 +392,9 @@ class OptimizedFirestoreMemoryProvider(MemoryProvider):
 
         except Exception as e:
             log_error(logger, "list_keys", e, {"pattern": pattern})
-            raise MemoryError(
-                f"Failed to list keys matching pattern '{pattern}'", cause=e
-            )
+            raise MemoryError(f"Failed to list keys matching pattern '{pattern}'", cause=e)
 
-    async def store_batch(
-        self, items: List[Tuple[str, Any, Optional[int]]]
-    ) -> Dict[str, bool]:
+    async def store_batch(self, items: List[Tuple[str, Any, Optional[int]]]) -> Dict[str, bool]:
         """
         Store multiple items in a batch operation.
 
@@ -441,9 +418,7 @@ class OptimizedFirestoreMemoryProvider(MemoryProvider):
             # Add each item to the batch
             for key, value, ttl in items:
                 # Serialize the value to JSON if needed
-                if not isinstance(
-                    value, (str, int, float, bool, dict, list, type(None))
-                ):
+                if not isinstance(value, (str, int, float, bool, dict, list, type(None))):
                     value = json.dumps({"serialized": str(value)})
 
                 # Calculate expiry time if TTL is provided
@@ -460,9 +435,7 @@ class OptimizedFirestoreMemoryProvider(MemoryProvider):
                     doc_data["expiry"] = expiry
 
                 # Add to batch
-                batch.set(
-                    self.client.collection(self.collection_name).document(key), doc_data
-                )
+                batch.set(self.client.collection(self.collection_name).document(key), doc_data)
                 results[key] = True
 
             # Commit the batch

@@ -1,6 +1,7 @@
 """
 Schema models for Gemini LLM interactions.
 """
+
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, Field
 
@@ -11,9 +12,7 @@ class FunctionCall(BaseModel):
     """
 
     name: str = Field(..., description="Name of the function called")
-    arguments: Dict[str, Any] = Field(
-        ..., description="Arguments passed to the function"
-    )
+    arguments: Dict[str, Any] = Field(..., description="Arguments passed to the function")
     result: Optional[Any] = Field(None, description="Result of the function call")
 
 
@@ -28,9 +27,7 @@ class CommandRequest(BaseModel):
         max_length=32768,
         description="Natural language command to execute",
     )
-    context: Optional[Dict[str, Any]] = Field(
-        None, description="Additional context for the command"
-    )
+    context: Optional[Dict[str, Any]] = Field(None, description="Additional context for the command")
 
 
 class CommandResponse(BaseModel):
@@ -43,9 +40,7 @@ class CommandResponse(BaseModel):
         default_factory=list,
         description="List of function calls made during command execution",
     )
-    successful: bool = Field(
-        ..., description="Whether the command was executed successfully"
-    )
+    successful: bool = Field(..., description="Whether the command was executed successfully")
 
 
 class AnalysisRequest(BaseModel):
@@ -59,9 +54,7 @@ class AnalysisRequest(BaseModel):
         max_length=1000000,  # Generous limit for large log files
         description="Content to analyze",
     )
-    context: Optional[Dict[str, Any]] = Field(
-        None, description="Additional context for the analysis"
-    )
+    context: Optional[Dict[str, Any]] = Field(None, description="Additional context for the analysis")
     analysis_type: str = Field(
         "general",
         description="Type of analysis to perform (e.g., 'general', 'logs', 'metrics', 'memory')",

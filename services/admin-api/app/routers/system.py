@@ -1,6 +1,7 @@
 """
 Router for system-level API endpoints.
 """
+
 from typing import Dict, Any
 import platform
 import psutil

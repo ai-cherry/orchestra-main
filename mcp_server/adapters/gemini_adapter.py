@@ -43,17 +43,11 @@ class GeminiAdapter(IToolAdapter):
     def __init__(self, config: Dict[str, Any] = None):
         """Initialize the Gemini adapter with optimized configuration."""
         self.config = config or {}
-        self.project_id = self.config.get("project_id") or os.environ.get(
-            "GOOGLE_CLOUD_PROJECT", "cherry-ai-project"
-        )
-        self.location = self.config.get("location") or os.environ.get(
-            "VERTEX_LOCATION", "us-central1"
-        )
+        self.project_id = self.config.get("project_id") or os.environ.get("GOOGLE_CLOUD_PROJECT", "cherry-ai-project")
+        self.location = self.config.get("location") or os.environ.get("VERTEX_LOCATION", "us-central1")
         self.api_key = self.config.get("api_key") or os.environ.get("GEMINI_API_KEY")
         self.model = self.config.get("model", "gemini-pro")
-        self.embeddings_model = self.config.get(
-            "embeddings_model", "textembedding-gecko"
-        )
+        self.embeddings_model = self.config.get("embeddings_model", "textembedding-gecko")
 
         # Performance optimizations
         self.initialized = False
@@ -64,9 +58,7 @@ class GeminiAdapter(IToolAdapter):
         self.batch_size = self.config.get("batch_size", 5)  # For batch processing
 
         # Request throttling
-        self.request_semaphore = asyncio.Semaphore(
-            self.config.get("max_concurrent_requests", 10)
-        )
+        self.request_semaphore = asyncio.Semaphore(self.config.get("max_concurrent_requests", 10))
         self.request_history: Deque[float] = deque(maxlen=100)  # Track recent requests
         self.rate_limit = self.config.get("rate_limit", 60)  # Requests per minute
 
@@ -102,15 +94,11 @@ class GeminiAdapter(IToolAdapter):
                 self.generative_model = GenerativeModel(self.model)
 
                 # Initialize embedding model
-                self.embedding_model = TextEmbeddingModel.from_pretrained(
-                    self.embeddings_model
-                )
+                self.embedding_model = TextEmbeddingModel.from_pretrained(self.embeddings_model)
 
                 logger.info(f"Initialized Gemini adapter with Vertex AI: {self.model}")
             else:
-                logger.warning(
-                    "Using simulated Gemini adapter (Vertex AI not available)"
-                )
+                logger.warning("Using simulated Gemini adapter (Vertex AI not available)")
 
             self.initialized = True
             return True
@@ -198,9 +186,7 @@ class GeminiAdapter(IToolAdapter):
             logger.error(f"Error syncing deletion to Gemini: {e}")
             return False
 
-    async def execute(
-        self, mode: str, prompt: str, context: Optional[Dict[str, Any]] = None
-    ) -> Optional[str]:
+    async def execute(self, mode: str, prompt: str, context: Optional[Dict[str, Any]] = None) -> Optional[str]:
         """Execute a prompt with Gemini using Vertex AI with optimized context handling."""
         if not self.initialized:
             logger.error("Gemini adapter not initialized")
@@ -230,9 +216,7 @@ class GeminiAdapter(IToolAdapter):
                     generation_config = self._get_generation_config(mode)
 
                     # Execute the request with Vertex AI
-                    response = await asyncio.to_thread(
-                        self._execute_vertex_request, full_prompt, generation_config
-                    )
+                    response = await asyncio.to_thread(self._execute_vertex_request, full_prompt, generation_config)
                     return response
                 else:
                     # Simulate a response with a slight delay
@@ -274,9 +258,7 @@ class GeminiAdapter(IToolAdapter):
 
                 if VERTEX_AI_AVAILABLE and self.embedding_model:
                     # Get embeddings from Vertex AI
-                    embeddings = await asyncio.to_thread(
-                        self._get_vertex_embeddings, text
-                    )
+                    embeddings = await asyncio.to_thread(self._get_vertex_embeddings, text)
 
                     # Cache the result
                     self.embedding_cache[cache_key] = embeddings
@@ -338,14 +320,10 @@ class GeminiAdapter(IToolAdapter):
 
     # Helper methods for optimized implementation
 
-    def _execute_vertex_request(
-        self, prompt: str, generation_config: GenerationConfig
-    ) -> str:
+    def _execute_vertex_request(self, prompt: str, generation_config: GenerationConfig) -> str:
         """Execute a request to Vertex AI (runs in a thread pool)."""
         try:
-            response = self.generative_model.generate_content(
-                prompt, generation_config=generation_config
-            )
+            response = self.generative_model.generate_content(prompt, generation_config=generation_config)
             return response.text
         except Exception as e:
             logger.error(f"Error in Vertex AI request: {e}")
@@ -364,17 +342,11 @@ class GeminiAdapter(IToolAdapter):
     def _get_generation_config(self, mode: str) -> GenerationConfig:
         """Get generation configuration based on the mode."""
         if mode == "code":
-            return GenerationConfig(
-                temperature=0.2, top_p=0.95, top_k=40, max_output_tokens=2048
-            )
+            return GenerationConfig(temperature=0.2, top_p=0.95, top_k=40, max_output_tokens=2048)
         elif mode == "chat":
-            return GenerationConfig(
-                temperature=0.7, top_p=0.95, top_k=40, max_output_tokens=1024
-            )
+            return GenerationConfig(temperature=0.7, top_p=0.95, top_k=40, max_output_tokens=1024)
         else:
-            return GenerationConfig(
-                temperature=0.4, top_p=0.95, top_k=40, max_output_tokens=1024
-            )
+            return GenerationConfig(temperature=0.4, top_p=0.95, top_k=40, max_output_tokens=1024)
 
     async def _optimize_context(self, context: Dict[str, Any]) -> Dict[str, Any]:
         """Optimize context by prioritizing most relevant information."""
@@ -447,9 +419,7 @@ class GeminiAdapter(IToolAdapter):
         # If still too large, remove oldest entries
         if len(self.context_cache) > self.max_cache_size:
             # Sort by expiration time and keep only max_cache_size entries
-            sorted_entries = sorted(
-                self.context_cache.items(), key=lambda x: x[1].get("expires_at", 0)
-            )
+            sorted_entries = sorted(self.context_cache.items(), key=lambda x: x[1].get("expires_at", 0))
 
             # Keep only the newest entries
             self.context_cache = dict(sorted_entries[-self.max_cache_size :])

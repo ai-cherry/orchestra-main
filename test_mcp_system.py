@@ -21,9 +21,11 @@ TESTS = []
 
 def test(name: str):
     """Decorator to register tests"""
+
     def decorator(func):
         TESTS.append((name, func))
         return func
+
     return decorator
 
 
@@ -45,11 +47,11 @@ async def test_server_status():
         response = await client.get(f"{GATEWAY_URL}/status")
         assert response.status_code == 200
         data = response.json()
-        
+
         results = []
         for server_id, health in data["servers"].items():
             results.append(f"{server_id}: {health['healthy']}")
-        
+
         return "\n".join(results)
 
 
@@ -60,7 +62,7 @@ async def test_list_tools():
         response = await client.get(f"{GATEWAY_URL}/mcp/tools")
         assert response.status_code == 200
         data = response.json()
-        
+
         tool_count = sum(len(server["tools"]) for server in data.values())
         return f"Found {tool_count} tools across {len(data)} servers"
 
@@ -75,22 +77,16 @@ async def test_store_memory():
             "params": {
                 "content": f"Test memory created at {datetime.now().isoformat()}",
                 "importance": 0.7,
-                "metadata": {
-                    "type": "test",
-                    "source": "mcp_test"
-                },
-                "memory_type": "test"
-            }
+                "metadata": {"type": "test", "source": "mcp_test"},
+                "memory_type": "test",
+            },
         }
-        
-        response = await client.post(
-            f"{GATEWAY_URL}/mcp/execute",
-            json=memory_data
-        )
+
+        response = await client.post(f"{GATEWAY_URL}/mcp/execute", json=memory_data)
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "success"
-        
+
         return f"Memory stored in {len(data['layers_stored'])} layers"
 
 
@@ -101,19 +97,13 @@ async def test_query_memory():
         query_data = {
             "server": "memory",
             "action": "query_memory",
-            "params": {
-                "query": "test memory",
-                "max_results": 5
-            }
+            "params": {"query": "test memory", "max_results": 5},
         }
-        
-        response = await client.post(
-            f"{GATEWAY_URL}/mcp/execute",
-            json=query_data
-        )
+
+        response = await client.post(f"{GATEWAY_URL}/mcp/execute", json=query_data)
         assert response.status_code == 200
         data = response.json()
-        
+
         return f"Found {len(data)} memories"
 
 
@@ -127,18 +117,12 @@ async def test_create_secret():
             "params": {
                 "secret_id": "mcp-test-secret",
                 "value": "test-value-123",
-                "labels": {
-                    "created_by": "mcp_test",
-                    "environment": "test"
-                }
-            }
+                "labels": {"created_by": "mcp_test", "environment": "test"},
+            },
         }
-        
-        response = await client.post(
-            f"{GATEWAY_URL}/mcp/execute",
-            json=secret_data
-        )
-        
+
+        response = await client.post(f"{GATEWAY_URL}/mcp/execute", json=secret_data)
+
         # It's okay if it already exists
         if response.status_code == 200:
             return "Secret created successfully"
@@ -157,21 +141,13 @@ async def test_switch_mode():
         mode_data = {
             "server": "orchestrator",
             "action": "switch_mode",
-            "params": {
-                "mode": "performance",
-                "context": {
-                    "test": True
-                }
-            }
+            "params": {"mode": "performance", "context": {"test": True}},
         }
-        
-        response = await client.post(
-            f"{GATEWAY_URL}/mcp/execute",
-            json=mode_data
-        )
+
+        response = await client.post(f"{GATEWAY_URL}/mcp/execute", json=mode_data)
         assert response.status_code == 200
         data = response.json()
-        
+
         return f"Switched from {data['previous_mode']} to {data['current_mode']}"
 
 
@@ -182,21 +158,13 @@ async def test_run_workflow():
         workflow_data = {
             "server": "orchestrator",
             "action": "run_workflow",
-            "params": {
-                "name": "code_review",
-                "params": {
-                    "test": True
-                }
-            }
+            "params": {"name": "code_review", "params": {"test": True}},
         }
-        
-        response = await client.post(
-            f"{GATEWAY_URL}/mcp/execute",
-            json=workflow_data
-        )
+
+        response = await client.post(f"{GATEWAY_URL}/mcp/execute", json=workflow_data)
         assert response.status_code == 200
         data = response.json()
-        
+
         return f"Started workflow: {data['workflow_id']}"
 
 
@@ -207,19 +175,13 @@ async def test_orchestrator_status():
         status_data = {
             "server": "orchestrator",
             "action": "get_status",
-            "params": {
-                "include_workflows": True,
-                "include_tasks": True
-            }
+            "params": {"include_workflows": True, "include_tasks": True},
         }
-        
-        response = await client.post(
-            f"{GATEWAY_URL}/mcp/execute",
-            json=status_data
-        )
+
+        response = await client.post(f"{GATEWAY_URL}/mcp/execute", json=status_data)
         assert response.status_code == 200
         data = response.json()
-        
+
         return f"Mode: {data['current_mode']}, Active workflows: {data['workflows']['active']}"
 
 
@@ -230,60 +192,49 @@ async def test_metrics():
         response = await client.get(f"{GATEWAY_URL}/metrics")
         assert response.status_code == 200
         assert "mcp_gateway_requests_total" in response.text
-        
+
         # Count metric lines
-        metric_lines = [l for l in response.text.split('\n') if l and not l.startswith('#')]
+        metric_lines = [l for l in response.text.split("\n") if l and not l.startswith("#")]
         return f"Found {len(metric_lines)} metrics"
 
 
 async def run_tests():
     """Run all tests"""
-    console.print(Panel.fit(
-        "[bold blue]MCP System Integration Tests[/bold blue]\n"
-        f"Testing {len(TESTS)} components...",
-        border_style="blue"
-    ))
-    
+    console.print(
+        Panel.fit(
+            "[bold blue]MCP System Integration Tests[/bold blue]\n" f"Testing {len(TESTS)} components...",
+            border_style="blue",
+        )
+    )
+
     # Create results table
     table = Table(show_header=True, header_style="bold magenta")
     table.add_column("Test", style="cyan", width=30)
     table.add_column("Status", width=10)
     table.add_column("Result", width=50)
-    
+
     passed = 0
     failed = 0
-    
-    with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        console=console
-    ) as progress:
-        
+
+    with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"), console=console) as progress:
+
         for test_name, test_func in TESTS:
             task = progress.add_task(f"Running {test_name}...", total=None)
-            
+
             try:
                 result = await test_func()
-                table.add_row(
-                    test_name,
-                    "[green]✓ PASS[/green]",
-                    result
-                )
+                table.add_row(test_name, "[green]✓ PASS[/green]", result)
                 passed += 1
             except Exception as e:
-                table.add_row(
-                    test_name,
-                    "[red]✗ FAIL[/red]",
-                    f"[red]{str(e)}[/red]"
-                )
+                table.add_row(test_name, "[red]✗ FAIL[/red]", f"[red]{str(e)}[/red]")
                 failed += 1
-            
+
             progress.remove_task(task)
-    
+
     console.print("\n")
     console.print(table)
     console.print("\n")
-    
+
     # Summary
     total = passed + failed
     if failed == 0:
@@ -292,7 +243,7 @@ async def run_tests():
         console.print(f"[bold yellow]Tests completed: {passed}/{total} passed[/bold yellow]")
         if failed > 0:
             console.print(f"[bold red]{failed} tests failed[/bold red]")
-    
+
     return failed == 0
 
 
@@ -301,7 +252,7 @@ async def main():
     # Wait a bit for servers to be ready
     console.print("[yellow]Waiting for servers to be ready...[/yellow]")
     await asyncio.sleep(2)
-    
+
     try:
         success = await run_tests()
         exit(0 if success else 1)

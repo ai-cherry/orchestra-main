@@ -43,9 +43,7 @@ def _initialize_imports():
 
     # Import the memory manager interface and implementations
     try:
-        logger.info(
-            "Attempting to import memory managers from packages.shared.src.memory"
-        )
+        logger.info("Attempting to import memory managers from packages.shared.src.memory")
         # Importing here to avoid module-level imports that could cause circular dependencies
         global MemoryManager, InMemoryMemoryManager
         from packages.shared.src.memory.memory_manager import MemoryManager
@@ -91,16 +89,12 @@ def _initialize_imports():
             USE_STUBS = True
             logger.info("Using stub memory manager implementation")
         except ImportError as stub_error:
-            logger.error(
-                f"Failed to import even stub memory managers: {str(stub_error)}"
-            )
+            logger.error(f"Failed to import even stub memory managers: {str(stub_error)}")
             MEMORY_MANAGER_AVAILABLE = False
 
     # Import hexagonal architecture components
     try:
-        logger.info(
-            "Attempting to import hexagonal architecture components for memory service"
-        )
+        logger.info("Attempting to import hexagonal architecture components for memory service")
         global MemoryService, MemoryServiceFactory, FirestoreStorageAdapter, PostgresStorageAdapter
         from packages.shared.src.memory.services.memory_service import MemoryService
         from packages.shared.src.memory.services.memory_service_factory import (
@@ -130,9 +124,7 @@ _memory_manager: Optional["MemoryManager"] = None
 _memory_service: Optional["MemoryService"] = None
 
 
-@error_boundary(
-    fallback_value=None, propagate_types=[MemoryError], log_to_monitoring=True
-)
+@error_boundary(fallback_value=None, propagate_types=[MemoryError], log_to_monitoring=True)
 def create_memory_manager(settings: Settings) -> "MemoryManager":
     """
     Create a memory manager instance based on settings.
@@ -164,22 +156,17 @@ def create_memory_manager(settings: Settings) -> "MemoryManager":
     # Use Firestore if available and configured
     if use_firestore:
         try:
-            logger.info(
-                f"Creating Firestore memory adapter for environment: {settings.ENVIRONMENT}"
-            )
+            logger.info(f"Creating Firestore memory adapter for environment: {settings.ENVIRONMENT}")
             return FirestoreMemoryAdapter(
                 project_id=settings.get_gcp_project_id(),
                 credentials_path=settings.get_gcp_credentials_path(),
-                namespace=settings.FIRESTORE_NAMESPACE
-                or f"orchestra-{settings.ENVIRONMENT}",
+                namespace=settings.FIRESTORE_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}",
             )
         except Exception as e:
             logger.error(f"Failed to create Firestore memory adapter: {str(e)}")
             logger.warning("Falling back to in-memory implementation")
             # Convert general exception to a specific memory error
-            raise MemoryConnectionError(
-                f"Failed to connect to Firestore: {str(e)}", original_error=e
-            )
+            raise MemoryConnectionError(f"Failed to connect to Firestore: {str(e)}", original_error=e)
 
     # Use in-memory implementation
     namespace = settings.FIRESTORE_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
@@ -187,9 +174,7 @@ def create_memory_manager(settings: Settings) -> "MemoryManager":
     return InMemoryMemoryManager(namespace=namespace)
 
 
-@error_boundary(
-    fallback_value=None, propagate_types=[MemoryError], log_to_monitoring=True
-)
+@error_boundary(fallback_value=None, propagate_types=[MemoryError], log_to_monitoring=True)
 async def get_memory_manager(
     settings: Settings = Depends(get_settings),
 ) -> "MemoryManager":
@@ -221,9 +206,7 @@ async def get_memory_manager(
         except MemoryError as e:
             # If we can't create the Firestore adapter, fall back to in-memory
             logger.warning(f"Creating in-memory manager due to error: {str(e)}")
-            namespace = (
-                settings.FIRESTORE_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
-            )
+            namespace = settings.FIRESTORE_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
             _memory_manager = InMemoryMemoryManager(namespace=namespace)
 
         try:
@@ -236,10 +219,7 @@ async def get_memory_manager(
             if not isinstance(_memory_manager, InMemoryMemoryManager):
                 logger.warning("Falling back to in-memory implementation")
                 try:
-                    namespace = (
-                        settings.FIRESTORE_NAMESPACE
-                        or f"orchestra-{settings.ENVIRONMENT}"
-                    )
+                    namespace = settings.FIRESTORE_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
                     _memory_manager = InMemoryMemoryManager(namespace=namespace)
                     await _memory_manager.initialize()
                 except Exception as fallback_error:
@@ -280,9 +260,7 @@ async def initialize_memory_manager(settings: Settings = None) -> None:
         except MemoryError as e:
             # If we can't create the preferred adapter, fall back to in-memory
             logger.warning(f"Creating in-memory manager due to error: {str(e)}")
-            namespace = (
-                settings.FIRESTORE_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
-            )
+            namespace = settings.FIRESTORE_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
             _memory_manager = InMemoryMemoryManager(namespace=namespace)
 
     # Initialize the memory manager
@@ -293,19 +271,13 @@ async def initialize_memory_manager(settings: Settings = None) -> None:
     except Exception as e:
         # If initialization fails with a specific type, fall back to in-memory
         if not isinstance(_memory_manager, InMemoryMemoryManager):
-            logger.warning(
-                f"Falling back to in-memory implementation after error: {str(e)}"
-            )
-            namespace = (
-                settings.FIRESTORE_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
-            )
+            logger.warning(f"Falling back to in-memory implementation after error: {str(e)}")
+            namespace = settings.FIRESTORE_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
             _memory_manager = InMemoryMemoryManager(namespace=namespace)
             await _memory_manager.initialize()
         else:
             # If even the in-memory manager fails, re-raise
-            raise MemoryOperationError(
-                f"Failed to initialize memory manager: {str(e)}", original_error=e
-            )
+            raise MemoryOperationError(f"Failed to initialize memory manager: {str(e)}", original_error=e)
 
     # Perform a health check
     if hasattr(_memory_manager, "health_check"):
@@ -334,9 +306,7 @@ async def close_memory_manager() -> None:
             _memory_manager = None
 
 
-@error_boundary(
-    fallback_value=None, propagate_types=[MemoryError], log_to_monitoring=True
-)
+@error_boundary(fallback_value=None, propagate_types=[MemoryError], log_to_monitoring=True)
 async def get_memory_service(
     settings: Settings = Depends(get_settings),
 ) -> "MemoryService":
@@ -364,9 +334,7 @@ async def get_memory_service(
         try:
             # Check if hexagonal architecture components are available
             if not HEX_ARCH_AVAILABLE:
-                raise DependencyError(
-                    "Hexagonal architecture components are not available"
-                )
+                raise DependencyError("Hexagonal architecture components are not available")
 
             # Determine storage type and configuration based on settings
             if (
@@ -377,8 +345,7 @@ async def get_memory_service(
                 storage_config = {
                     "project_id": settings.get_gcp_project_id(),
                     "credentials_path": settings.get_gcp_credentials_path(),
-                    "namespace": settings.FIRESTORE_NAMESPACE
-                    or f"orchestra-{settings.ENVIRONMENT}",
+                    "namespace": settings.FIRESTORE_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}",
                 }
             else:
                 # Use in-memory implementation for development
@@ -392,22 +359,16 @@ async def get_memory_service(
                 _memory_service = await MemoryServiceFactory.create_memory_service(
                     storage_type=storage_type, config=storage_config
                 )
-                logger.info(
-                    f"Memory service initialized with {storage_type} storage adapter"
-                )
+                logger.info(f"Memory service initialized with {storage_type} storage adapter")
             except Exception as adapter_error:
                 # If specific adapter fails, try with memory adapter
                 if storage_type != "memory":
-                    logger.warning(
-                        f"Failed to initialize {storage_type} adapter, falling back to memory adapter"
-                    )
+                    logger.warning(f"Failed to initialize {storage_type} adapter, falling back to memory adapter")
                     _memory_service = await MemoryServiceFactory.create_memory_service(
                         storage_type="memory",
                         config={"namespace": f"orchestra-{settings.ENVIRONMENT}"},
                     )
-                    logger.info(
-                        "Memory service initialized with memory adapter as fallback"
-                    )
+                    logger.info("Memory service initialized with memory adapter as fallback")
                 else:
                     # Re-raise if even memory adapter fails
                     raise MemoryOperationError(
@@ -416,20 +377,14 @@ async def get_memory_service(
                     )
 
         except Exception as e:
-            logger.error(
-                f"Failed to create memory service with hexagonal architecture: {str(e)}"
-            )
-            logger.warning(
-                "Creating simple wrapper service around legacy memory manager"
-            )
+            logger.error(f"Failed to create memory service with hexagonal architecture: {str(e)}")
+            logger.warning("Creating simple wrapper service around legacy memory manager")
 
             # Fall back to using the legacy memory manager with a wrapper
             try:
                 memory_manager = await get_memory_manager(settings)
                 if memory_manager is None:
-                    raise MemoryError(
-                        "Failed to get memory manager for wrapper service"
-                    )
+                    raise MemoryError("Failed to get memory manager for wrapper service")
 
                 # Create a simple MemoryService that uses the legacy memory manager
                 _memory_service = MemoryService(memory_manager)

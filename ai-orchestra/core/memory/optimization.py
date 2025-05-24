@@ -110,9 +110,7 @@ class ResourceManager:
 
 
 @contextmanager
-def managed_resource(
-    resource: T, cleanup_func: Callable[[T], None]
-) -> Generator[T, None, None]:
+def managed_resource(resource: T, cleanup_func: Callable[[T], None]) -> Generator[T, None, None]:
     """
     Context manager for automatically cleaning up resources.
 

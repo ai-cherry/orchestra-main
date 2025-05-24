@@ -88,9 +88,7 @@ class RotationStrategy:
 
             # Fill the rest with lowercase
             remaining = length - (uppercase + numbers + special)
-            result.extend(
-                secrets.choice(string.ascii_lowercase) for _ in range(remaining)
-            )
+            result.extend(secrets.choice(string.ascii_lowercase) for _ in range(remaining))
 
             # Shuffle the result
             random.shuffle(result)
@@ -117,11 +115,7 @@ def get_secret_info(secret_id: str) -> Tuple[str, Dict]:
         strategy = labels.get("rotation_strategy", "random")
 
         # Get additional parameters from labels
-        params = {
-            k.replace("rotation_param_", ""): v
-            for k, v in labels.items()
-            if k.startswith("rotation_param_")
-        }
+        params = {k.replace("rotation_param_", ""): v for k, v in labels.items() if k.startswith("rotation_param_")}
 
         return strategy, params
     except Exception as e:
@@ -141,9 +135,7 @@ def rotate_secret(secret_id: str) -> bool:
         if hasattr(RotationStrategy, strategy_name):
             strategy_func = getattr(RotationStrategy, strategy_name)
         else:
-            logger.warning(
-                f"Unknown strategy '{strategy_name}' for {secret_id}, using 'random'"
-            )
+            logger.warning(f"Unknown strategy '{strategy_name}' for {secret_id}, using 'random'")
             strategy_func = RotationStrategy.random
 
         # Generate the new secret value

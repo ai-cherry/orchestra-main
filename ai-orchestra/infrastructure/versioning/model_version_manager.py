@@ -256,17 +256,13 @@ class ModelVersionManager:
         # Validate total traffic percentage
         total_percentage = sum(s.traffic_percentage for s in strategies)
         if total_percentage != 100:
-            raise ValueError(
-                f"Total traffic percentage must be 100, got {total_percentage}"
-            )
+            raise ValueError(f"Total traffic percentage must be 100, got {total_percentage}")
 
         # Validate versions exist
         for strategy in strategies:
             version = await self.get_model_version(model_id, strategy.version)
             if not version:
-                raise ValueError(
-                    f"Version {strategy.version} not found for model {model_id}"
-                )
+                raise ValueError(f"Version {strategy.version} not found for model {model_id}")
 
         # Store deployment strategy
         deployment_key = self._get_deployment_key(model_id)
@@ -370,21 +366,15 @@ class ModelVersionManager:
         # Validate versions exist
         blue_model = await self.get_model_version(model_id, blue_version)
         if not blue_model:
-            raise ValueError(
-                f"Blue version {blue_version} not found for model {model_id}"
-            )
+            raise ValueError(f"Blue version {blue_version} not found for model {model_id}")
 
         green_model = await self.get_model_version(model_id, green_version)
         if not green_model:
-            raise ValueError(
-                f"Green version {green_version} not found for model {model_id}"
-            )
+            raise ValueError(f"Green version {green_version} not found for model {model_id}")
 
         # Validate traffic percentage
         if not 0 <= green_traffic_percentage <= 100:
-            raise ValueError(
-                f"Green traffic percentage must be between 0 and 100, got {green_traffic_percentage}"
-            )
+            raise ValueError(f"Green traffic percentage must be between 0 and 100, got {green_traffic_percentage}")
 
         # Create deployment strategies
         strategies = [
@@ -422,9 +412,7 @@ class ModelVersionManager:
         strategies = await self.get_deployment_strategy(model_id)
 
         if len(strategies) != 2:
-            raise ValueError(
-                f"Expected 2 deployment strategies for blue/green deployment, got {len(strategies)}"
-            )
+            raise ValueError(f"Expected 2 deployment strategies for blue/green deployment, got {len(strategies)}")
 
         # Sort strategies by traffic percentage (blue has more traffic initially)
         strategies.sort(key=lambda s: s.traffic_percentage, reverse=True)
@@ -436,9 +424,7 @@ class ModelVersionManager:
         green_strategy.traffic_percentage = green_traffic_percentage
 
         # Update deployment strategy
-        return await self.update_deployment_strategy(
-            model_id, [blue_strategy, green_strategy]
-        )
+        return await self.update_deployment_strategy(model_id, [blue_strategy, green_strategy])
 
     async def promote_green_to_blue(
         self,
@@ -457,9 +443,7 @@ class ModelVersionManager:
         strategies = await self.get_deployment_strategy(model_id)
 
         if len(strategies) != 2:
-            raise ValueError(
-                f"Expected 2 deployment strategies for blue/green deployment, got {len(strategies)}"
-            )
+            raise ValueError(f"Expected 2 deployment strategies for blue/green deployment, got {len(strategies)}")
 
         # Sort strategies by traffic percentage (blue has more traffic initially)
         strategies.sort(key=lambda s: s.traffic_percentage, reverse=True)
@@ -488,9 +472,7 @@ class ModelVersionManager:
         strategies = await self.get_deployment_strategy(model_id)
 
         if len(strategies) != 2:
-            raise ValueError(
-                f"Expected 2 deployment strategies for blue/green deployment, got {len(strategies)}"
-            )
+            raise ValueError(f"Expected 2 deployment strategies for blue/green deployment, got {len(strategies)}")
 
         # Sort strategies by traffic percentage (blue has more traffic initially)
         strategies.sort(key=lambda s: s.traffic_percentage, reverse=True)

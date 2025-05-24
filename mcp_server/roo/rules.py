@@ -59,14 +59,7 @@ class RuleCondition(BaseModel):
     @validator("pattern", pre=True)
     def compile_pattern(cls, v):
         """Compile string patterns into regex patterns if they look like regex."""
-        if (
-            isinstance(v, str)
-            and v.startswith("^")
-            or v.endswith("$")
-            or "*" in v
-            or "+" in v
-            or "?" in v
-        ):
+        if isinstance(v, str) and v.startswith("^") or v.endswith("$") or "*" in v or "+" in v or "?" in v:
             try:
                 return re.compile(v)
             except re.error:
@@ -103,22 +96,14 @@ class Rule(BaseModel):
 
     id: str = Field(..., description="Unique identifier for the rule")
     name: str = Field(..., description="Display name for the rule")
-    description: str = Field(
-        ..., description="Detailed description of the rule's purpose"
-    )
+    description: str = Field(..., description="Detailed description of the rule's purpose")
     type: RuleType = Field(..., description="Type of rule")
     intent: RuleIntent = Field(..., description="Developer intent captured by the rule")
-    conditions: List[RuleCondition] = Field(
-        ..., description="Conditions that must be met for the rule to apply"
-    )
+    conditions: List[RuleCondition] = Field(..., description="Conditions that must be met for the rule to apply")
     action: str = Field(..., description="Action to take when the rule matches")
     enabled: bool = Field(default=True, description="Whether the rule is enabled")
-    severity: RuleSeverity = Field(
-        default=RuleSeverity.WARNING, description="Severity of rule violations"
-    )
-    metadata: Dict[str, Any] = Field(
-        default_factory=dict, description="Additional metadata for the rule"
-    )
+    severity: RuleSeverity = Field(default=RuleSeverity.WARNING, description="Severity of rule violations")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata for the rule")
 
     def matches(self, context: Dict[str, Any]) -> bool:
         """
@@ -214,11 +199,7 @@ class RuleEngine:
         Returns:
             List of rules with the specified intent
         """
-        return [
-            rule
-            for rule in self.rules.values()
-            if rule.intent == intent and rule.enabled
-        ]
+        return [rule for rule in self.rules.values() if rule.intent == intent and rule.enabled]
 
     def get_rules_by_type(self, rule_type: RuleType) -> List[Rule]:
         """
@@ -230,11 +211,7 @@ class RuleEngine:
         Returns:
             List of rules of the specified type
         """
-        return [
-            rule
-            for rule in self.rules.values()
-            if rule.type == rule_type and rule.enabled
-        ]
+        return [rule for rule in self.rules.values() if rule.type == rule_type and rule.enabled]
 
 
 # Example rule definitions
@@ -247,9 +224,7 @@ FILE_PATTERN_RULES = [
         intent=RuleIntent.ENFORCE_CONVENTIONS,
         conditions=[
             RuleCondition(type="file_path", pattern=r".*\.py$"),
-            RuleCondition(
-                type="file_name", pattern=r"^[a-z][a-z0-9_]*\.py$", negated=True
-            ),
+            RuleCondition(type="file_name", pattern=r"^[a-z][a-z0-9_]*\.py$", negated=True),
         ],
         action="rename_file",
         severity=RuleSeverity.WARNING,
@@ -279,9 +254,7 @@ CODE_STYLE_RULES = [
         intent=RuleIntent.ENFORCE_STYLE,
         conditions=[
             RuleCondition(type="file_path", pattern=r".*\.py$"),
-            RuleCondition(
-                type="code_content", pattern=r"(def|class)\s+\w+[^#\n]*:[^\"\']*$"
-            ),
+            RuleCondition(type="code_content", pattern=r"(def|class)\s+\w+[^#\n]*:[^\"\']*$"),
         ],
         action="add_docstring",
         severity=RuleSeverity.WARNING,
@@ -294,9 +267,7 @@ CODE_STYLE_RULES = [
         intent=RuleIntent.PREVENT_BUGS,
         conditions=[
             RuleCondition(type="file_path", pattern=r".*\.py$"),
-            RuleCondition(
-                type="code_content", pattern=r"def\s+\w+\s*\([^:]*\)\s*:[^\"\']*$"
-            ),
+            RuleCondition(type="code_content", pattern=r"def\s+\w+\s*\([^:]*\)\s*:[^\"\']*$"),
         ],
         action="add_type_hints",
         severity=RuleSeverity.WARNING,
@@ -325,11 +296,7 @@ SECURITY_RULES = [
         description="SQL queries should use parameterized statements to prevent SQL injection",
         type=RuleType.SECURITY,
         intent=RuleIntent.ENSURE_SECURITY,
-        conditions=[
-            RuleCondition(
-                type="code_content", pattern=r"execute\s*\(\s*f['\"].*\{.*\}.*['\"]"
-            )
-        ],
+        conditions=[RuleCondition(type="code_content", pattern=r"execute\s*\(\s*f['\"].*\{.*\}.*['\"]")],
         action="use_parameterized_query",
         severity=RuleSeverity.ERROR,
     ),
@@ -355,9 +322,7 @@ MEMORY_ACCESS_RULES = [
         description="All memory access should be logged",
         type=RuleType.MEMORY_ACCESS,
         intent=RuleIntent.ENSURE_SECURITY,
-        conditions=[
-            RuleCondition(type="memory_operation", pattern=r"^(read|write|delete)$")
-        ],
+        conditions=[RuleCondition(type="memory_operation", pattern=r"^(read|write|delete)$")],
         action="log_access",
         severity=RuleSeverity.INFO,
     ),
@@ -387,13 +352,7 @@ MODE_TRANSITION_RULES = [
 ]
 
 # Combine all rules
-DEFAULT_RULES = (
-    FILE_PATTERN_RULES
-    + CODE_STYLE_RULES
-    + SECURITY_RULES
-    + MEMORY_ACCESS_RULES
-    + MODE_TRANSITION_RULES
-)
+DEFAULT_RULES = FILE_PATTERN_RULES + CODE_STYLE_RULES + SECURITY_RULES + MEMORY_ACCESS_RULES + MODE_TRANSITION_RULES
 
 
 def create_rule_engine() -> RuleEngine:

@@ -16,11 +16,13 @@ import abc
 import hashlib
 from typing import Any, AsyncGenerator, Callable, Dict, List, Optional
 
+
 class StorageAdapter(abc.ABC):
     """
     Abstract interface for storage backends (cache, vector DB, persistent storage, etc.).
     Implementations must be async and support upsert, batch, and deduplication queries.
     """
+
     @abc.abstractmethod
     async def exists(self, fingerprint: str) -> bool:
         """Check if a record with the given fingerprint already exists."""
@@ -35,6 +37,7 @@ class StorageAdapter(abc.ABC):
     async def close(self) -> None:
         """Clean up resources (connections, etc.)."""
         pass
+
 
 class BaseProcessor(abc.ABC):
     """

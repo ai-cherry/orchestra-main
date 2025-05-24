@@ -104,9 +104,7 @@ def handle_push_event(payload):
     branch = payload.get("ref", "").replace("refs/heads/", "")
     commits = payload.get("commits", [])
 
-    app.logger.info(
-        f"Push to {repo_name} on branch {branch} with {len(commits)} commits"
-    )
+    app.logger.info(f"Push to {repo_name} on branch {branch} with {len(commits)} commits")
 
     # Check if this is a push to main/master
     if branch in ("main", "master"):
@@ -255,9 +253,7 @@ def trigger_cloud_build(repo_name, branch, pr_number=None):
         event_type="build_trigger",
     )
 
-    app.logger.info(
-        f"Triggered Cloud Build for {repo_name}/{branch}: {future.result()}"
-    )
+    app.logger.info(f"Triggered Cloud Build for {repo_name}/{branch}: {future.result()}")
     return jsonify({"status": "success", "message": "Build triggered"})
 
 

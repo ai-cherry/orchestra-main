@@ -384,9 +384,7 @@ class PortkeyAdminClient:
         response = self.session.post(url, json=payload)
         data = self._handle_response(response)
 
-        logger.info(
-            f"Created new gateway config: {name} with strategy: {routing_strategy}"
-        )
+        logger.info(f"Created new gateway config: {name} with strategy: {routing_strategy}")
         return GatewayConfig(
             id=data["id"],
             name=data["name"],

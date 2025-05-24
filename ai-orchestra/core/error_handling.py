@@ -71,13 +71,11 @@ def _handle_error(func_name: str, e: Exception, logger: logging.Logger) -> None:
 
 
 @overload
-def handle_exception(func: F) -> F:
-    ...
+def handle_exception(func: F) -> F: ...
 
 
 @overload
-def handle_exception(*, logger: Optional[logging.Logger] = None) -> Callable[[F], F]:
-    ...
+def handle_exception(*, logger: Optional[logging.Logger] = None) -> Callable[[F], F]: ...
 
 
 def handle_exception(
@@ -251,9 +249,7 @@ class ErrorContext:
         if exc_val is not None:
             if isinstance(exc_val, AIServiceError):
                 # Log the error
-                self.logger.error(
-                    f"AIServiceError in {self.operation_name}: {exc_val.code}:{exc_val.message}"
-                )
+                self.logger.error(f"AIServiceError in {self.operation_name}: {exc_val.code}:{exc_val.message}")
                 if exc_val.details:
                     self.logger.debug(f"Error details: {exc_val.details}")
                 if exc_val.cause:
@@ -263,9 +259,7 @@ class ErrorContext:
                 return False
             else:
                 # Log the unexpected error
-                self.logger.error(
-                    f"Unexpected error in {self.operation_name}: {str(exc_val)}"
-                )
+                self.logger.error(f"Unexpected error in {self.operation_name}: {str(exc_val)}")
                 self.logger.debug(traceback.format_exc())
 
                 # Wrap the error in an AIServiceError
@@ -326,9 +320,7 @@ class AsyncErrorContext:
         if exc_val is not None:
             if isinstance(exc_val, AIServiceError):
                 # Log the error
-                self.logger.error(
-                    f"AIServiceError in {self.operation_name}: {exc_val.code}:{exc_val.message}"
-                )
+                self.logger.error(f"AIServiceError in {self.operation_name}: {exc_val.code}:{exc_val.message}")
                 if exc_val.details:
                     self.logger.debug(f"Error details: {exc_val.details}")
                 if exc_val.cause:
@@ -338,9 +330,7 @@ class AsyncErrorContext:
                 return False
             else:
                 # Log the unexpected error
-                self.logger.error(
-                    f"Unexpected error in {self.operation_name}: {str(exc_val)}"
-                )
+                self.logger.error(f"Unexpected error in {self.operation_name}: {str(exc_val)}")
                 self.logger.debug(traceback.format_exc())
 
                 # Wrap the error in an AIServiceError
@@ -361,9 +351,7 @@ def retry(
     max_attempts: int = 3,
     retry_delay: float = 1.0,
     backoff_factor: float = 2.0,
-    retry_exceptions: Optional[
-        Union[Type[Exception], Tuple[Type[Exception], ...]]
-    ] = None,
+    retry_exceptions: Optional[Union[Type[Exception], Tuple[Type[Exception], ...]]] = None,
     logger: Optional[logging.Logger] = None,
 ) -> Callable[[F], F]:
     """
@@ -412,9 +400,7 @@ def retry(
                         await asyncio.sleep(current_delay)
                         current_delay *= backoff_factor
                     else:
-                        logger.error(
-                            f"All {max_attempts} attempts failed for {func.__name__}: {str(e)}"
-                        )
+                        logger.error(f"All {max_attempts} attempts failed for {func.__name__}: {str(e)}")
 
             if last_exception:
                 raise last_exception
@@ -440,9 +426,7 @@ def retry(
                         time.sleep(current_delay)
                         current_delay *= backoff_factor
                     else:
-                        logger.error(
-                            f"All {max_attempts} attempts failed for {func.__name__}: {str(e)}"
-                        )
+                        logger.error(f"All {max_attempts} attempts failed for {func.__name__}: {str(e)}")
 
             if last_exception:
                 raise last_exception

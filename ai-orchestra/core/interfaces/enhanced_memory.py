@@ -89,9 +89,7 @@ class EnhancedMemoryProvider(ABC):
         pass
 
     @abstractmethod
-    async def query(
-        self, filters: Dict[str, Any], limit: Optional[int] = None
-    ) -> List[MemoryItem]:
+    async def query(self, filters: Dict[str, Any], limit: Optional[int] = None) -> List[MemoryItem]:
         """
         Query memory items based on filters.
 

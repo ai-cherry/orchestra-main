@@ -38,9 +38,7 @@ except ImportError:
 
 def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
-    parser = argparse.ArgumentParser(
-        description="Deploy monitoring configuration to Cloud Monitoring"
-    )
+    parser = argparse.ArgumentParser(description="Deploy monitoring configuration to Cloud Monitoring")
     parser.add_argument(
         "--config",
         default="monitoring/monitoring.yaml",
@@ -98,9 +96,7 @@ def replace_variables(text: str, variables: Dict[str, str]) -> str:
     return result
 
 
-def create_custom_metrics(
-    project_id: str, metrics: List[Dict[str, Any]], dry_run: bool = False
-) -> None:
+def create_custom_metrics(project_id: str, metrics: List[Dict[str, Any]], dry_run: bool = False) -> None:
     """Create custom metrics in Cloud Monitoring."""
     if not HAS_GCP or dry_run:
         for metric in metrics:
@@ -114,12 +110,8 @@ def create_custom_metrics(
         descriptor = monitoring_v3.MetricDescriptor()
         descriptor.type = metric_def["name"]
         descriptor.description = metric_def["description"]
-        descriptor.metric_kind = monitoring_v3.MetricDescriptor.MetricKind[
-            metric_def["metricKind"]
-        ]
-        descriptor.value_type = monitoring_v3.MetricDescriptor.ValueType[
-            metric_def["valueType"]
-        ]
+        descriptor.metric_kind = monitoring_v3.MetricDescriptor.MetricKind[metric_def["metricKind"]]
+        descriptor.value_type = monitoring_v3.MetricDescriptor.ValueType[metric_def["valueType"]]
         descriptor.unit = metric_def["unit"]
 
         # Add labels
@@ -131,9 +123,7 @@ def create_custom_metrics(
             descriptor.labels.append(label_descriptor)
 
         try:
-            client.create_metric_descriptor(
-                name=project_path, metric_descriptor=descriptor
-            )
+            client.create_metric_descriptor(name=project_path, metric_descriptor=descriptor)
             logger.info(f"Created metric: {metric_def['name']}")
         except AlreadyExists:
             logger.info(f"Metric already exists: {metric_def['name']}")
@@ -163,34 +153,24 @@ def create_alert_policies(
         # Create alert policy
         policy = monitoring_v3.AlertPolicy()
         policy.display_name = display_name
-        policy.combiner = monitoring_v3.AlertPolicy.ConditionCombinerType[
-            policy_def["combiner"]
-        ]
+        policy.combiner = monitoring_v3.AlertPolicy.ConditionCombinerType[policy_def["combiner"]]
 
         # Add conditions
         for condition_def in policy_def["conditions"]:
             condition = monitoring_v3.AlertPolicy.Condition()
-            condition.display_name = replace_variables(
-                condition_def["displayName"], variables
-            )
+            condition.display_name = replace_variables(condition_def["displayName"], variables)
 
             # Create condition
-            condition_filter = replace_variables(
-                condition_def["condition"]["filter"], variables
-            )
+            condition_filter = replace_variables(condition_def["condition"]["filter"], variables)
 
             if "aggregations" in condition_def["condition"]:
                 aggregations = []
                 for agg in condition_def["condition"]["aggregations"]:
                     aggregation = monitoring_v3.Aggregation()
                     aggregation.alignment_period = agg["alignmentPeriod"]
-                    aggregation.per_series_aligner = monitoring_v3.Aggregation.Aligner[
-                        agg["perSeriesAligner"]
-                    ]
+                    aggregation.per_series_aligner = monitoring_v3.Aggregation.Aligner[agg["perSeriesAligner"]]
                     if "crossSeriesReducer" in agg:
-                        aggregation.cross_series_reducer = (
-                            monitoring_v3.Aggregation.Reducer[agg["crossSeriesReducer"]]
-                        )
+                        aggregation.cross_series_reducer = monitoring_v3.Aggregation.Reducer[agg["crossSeriesReducer"]]
                     if "groupByFields" in agg:
                         aggregation.group_by_fields.extend(agg["groupByFields"])
                     aggregations.append(aggregation)
@@ -199,11 +179,9 @@ def create_alert_policies(
                 threshold = monitoring_v3.AlertPolicy.Condition.MetricThreshold()
                 threshold.filter = condition_filter
                 threshold.aggregations.extend(aggregations)
-                threshold.comparison = (
-                    monitoring_v3.AlertPolicy.Condition.ComparisonType[
-                        condition_def["condition"]["comparison"]
-                    ]
-                )
+                threshold.comparison = monitoring_v3.AlertPolicy.Condition.ComparisonType[
+                    condition_def["condition"]["comparison"]
+                ]
                 threshold.threshold_value = condition_def["condition"]["thresholdValue"]
                 threshold.duration = condition_def["condition"]["duration"]
 
@@ -214,37 +192,25 @@ def create_alert_policies(
                     )
                     if "denominatorAggregations" in condition_def["condition"]:
                         denominator_aggregations = []
-                        for agg in condition_def["condition"][
-                            "denominatorAggregations"
-                        ]:
+                        for agg in condition_def["condition"]["denominatorAggregations"]:
                             aggregation = monitoring_v3.Aggregation()
                             aggregation.alignment_period = agg["alignmentPeriod"]
-                            aggregation.per_series_aligner = (
-                                monitoring_v3.Aggregation.Aligner[
-                                    agg["perSeriesAligner"]
-                                ]
-                            )
+                            aggregation.per_series_aligner = monitoring_v3.Aggregation.Aligner[agg["perSeriesAligner"]]
                             if "crossSeriesReducer" in agg:
-                                aggregation.cross_series_reducer = (
-                                    monitoring_v3.Aggregation.Reducer[
-                                        agg["crossSeriesReducer"]
-                                    ]
-                                )
+                                aggregation.cross_series_reducer = monitoring_v3.Aggregation.Reducer[
+                                    agg["crossSeriesReducer"]
+                                ]
                             if "groupByFields" in agg:
                                 aggregation.group_by_fields.extend(agg["groupByFields"])
                             denominator_aggregations.append(aggregation)
-                        threshold.denominator_aggregations.extend(
-                            denominator_aggregations
-                        )
+                        threshold.denominator_aggregations.extend(denominator_aggregations)
 
                 condition.condition_threshold = threshold
 
             policy.conditions.append(condition)
 
         # Add notification channels if specified
-        if "notificationChannels" in policy_def and variables.get(
-            "NOTIFICATION_CHANNEL_ID"
-        ):
+        if "notificationChannels" in policy_def and variables.get("NOTIFICATION_CHANNEL_ID"):
             for channel in policy_def["notificationChannels"]:
                 channel_name = replace_variables(channel["channel"], variables)
                 policy.notification_channels.append(channel_name)
@@ -314,9 +280,7 @@ def create_dashboards(
 
                             # Add time series filter
                             if "timeSeriesFilter" in dataset_def["timeSeriesQuery"]:
-                                filter_def = dataset_def["timeSeriesQuery"][
-                                    "timeSeriesFilter"
-                                ]
+                                filter_def = dataset_def["timeSeriesQuery"]["timeSeriesFilter"]
                                 ts_filter = dashboard.TimeSeriesFilter()
                                 ts_filter.filter = filter_def["filter"]
 
@@ -327,13 +291,9 @@ def create_dashboards(
                                     agg.alignment_period = agg_def["alignmentPeriod"]
                                     agg.per_series_aligner = agg_def["perSeriesAligner"]
                                     if "crossSeriesReducer" in agg_def:
-                                        agg.cross_series_reducer = agg_def[
-                                            "crossSeriesReducer"
-                                        ]
+                                        agg.cross_series_reducer = agg_def["crossSeriesReducer"]
                                     if "groupByFields" in agg_def:
-                                        agg.group_by_fields.extend(
-                                            agg_def["groupByFields"]
-                                        )
+                                        agg.group_by_fields.extend(agg_def["groupByFields"])
                                     ts_filter.aggregation = agg
 
                                 query.time_series_filter = ts_filter
@@ -354,9 +314,7 @@ def create_dashboards(
         except AlreadyExists:
             logger.info(f"Dashboard already exists: {dashboard_dict['displayName']}")
         except Exception as e:
-            logger.error(
-                f"Error creating dashboard {dashboard_dict['displayName']}: {e}"
-            )
+            logger.error(f"Error creating dashboard {dashboard_dict['displayName']}: {e}")
 
 
 def create_uptime_checks(
@@ -411,17 +369,13 @@ def create_uptime_checks(
             for matcher_def in check_def["contentMatchers"]:
                 matcher = monitoring_v3.UptimeCheckConfig.ContentMatcher()
                 matcher.content = matcher_def["content"]
-                matcher.matcher = (
-                    monitoring_v3.UptimeCheckConfig.ContentMatcher.ContentMatcherOption[
-                        matcher_def["matcher"]
-                    ]
-                )
+                matcher.matcher = monitoring_v3.UptimeCheckConfig.ContentMatcher.ContentMatcherOption[
+                    matcher_def["matcher"]
+                ]
                 check.content_matchers.append(matcher)
 
         try:
-            client.create_uptime_check_config(
-                parent=project_path, uptime_check_config=check
-            )
+            client.create_uptime_check_config(parent=project_path, uptime_check_config=check)
             logger.info(f"Created uptime check: {display_name}")
         except AlreadyExists:
             logger.info(f"Uptime check already exists: {display_name}")
@@ -452,12 +406,8 @@ def create_log_metrics(
         descriptor = monitoring_v3.MetricDescriptor()
         descriptor.type = f"logging.googleapis.com/user/{metric_def['name']}"
         descriptor.description = metric_def["description"]
-        descriptor.metric_kind = monitoring_v3.MetricDescriptor.MetricKind[
-            metric_def["metricDescriptor"]["metricKind"]
-        ]
-        descriptor.value_type = monitoring_v3.MetricDescriptor.ValueType[
-            metric_def["metricDescriptor"]["valueType"]
-        ]
+        descriptor.metric_kind = monitoring_v3.MetricDescriptor.MetricKind[metric_def["metricDescriptor"]["metricKind"]]
+        descriptor.value_type = monitoring_v3.MetricDescriptor.ValueType[metric_def["metricDescriptor"]["valueType"]]
         descriptor.unit = metric_def["metricDescriptor"]["unit"]
 
         # Add labels
@@ -465,15 +415,11 @@ def create_log_metrics(
             label_descriptor = monitoring_v3.LabelDescriptor()
             label_descriptor.key = label["key"]
             label_descriptor.description = label["description"]
-            label_descriptor.value_type = monitoring_v3.LabelDescriptor.ValueType[
-                label["valueType"]
-            ]
+            label_descriptor.value_type = monitoring_v3.LabelDescriptor.ValueType[label["valueType"]]
             descriptor.labels.append(label_descriptor)
 
         try:
-            client.create_metric_descriptor(
-                name=project_path, metric_descriptor=descriptor
-            )
+            client.create_metric_descriptor(name=project_path, metric_descriptor=descriptor)
             logger.info(f"Created log metric: {metric_def['name']}")
         except AlreadyExists:
             logger.info(f"Log metric already exists: {metric_def['name']}")
@@ -505,30 +451,22 @@ def main() -> None:
     # Create alert policies
     if "alertPolicies" in config:
         logger.info("Creating alert policies...")
-        create_alert_policies(
-            args.project_id, config["alertPolicies"], variables, args.dry_run
-        )
+        create_alert_policies(args.project_id, config["alertPolicies"], variables, args.dry_run)
 
     # Create dashboards
     if "dashboards" in config:
         logger.info("Creating dashboards...")
-        create_dashboards(
-            args.project_id, config["dashboards"], variables, args.dry_run
-        )
+        create_dashboards(args.project_id, config["dashboards"], variables, args.dry_run)
 
     # Create uptime checks
     if "uptimeChecks" in config:
         logger.info("Creating uptime checks...")
-        create_uptime_checks(
-            args.project_id, config["uptimeChecks"], variables, args.dry_run
-        )
+        create_uptime_checks(args.project_id, config["uptimeChecks"], variables, args.dry_run)
 
     # Create log-based metrics
     if "logMetrics" in config:
         logger.info("Creating log-based metrics...")
-        create_log_metrics(
-            args.project_id, config["logMetrics"], variables, args.dry_run
-        )
+        create_log_metrics(args.project_id, config["logMetrics"], variables, args.dry_run)
 
     logger.info("Monitoring configuration deployment complete!")
 

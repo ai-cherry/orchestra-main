@@ -21,27 +21,27 @@ logger = get_logger(__name__)
 class QdrantSemanticMemory(BaseMemory):
     """
     Qdrant-based implementation for cold tier semantic memory.
-    
+
     Optimized for:
     - Long-term semantic storage
     - Vector similarity search
     - Low-frequency, high-value queries
     - Complex semantic relationships
-    
+
     TODO: Implement full Qdrant integration
     """
-    
+
     def __init__(self, config: Optional[Dict[str, Any]] = None):
         """Initialize Qdrant semantic memory."""
         super().__init__(MemoryTier.COLD, config)
-        
+
         # Qdrant settings (to be implemented)
         self.qdrant_url = self.config.get("qdrant_url", "http://localhost:6333")
         self.collection_name = self.config.get("collection_name", "mcp_semantic_memory")
         self.vector_size = self.config.get("vector_size", 768)
-        
+
         logger.warning("QdrantSemanticMemory is a stub implementation")
-    
+
     async def initialize(self) -> bool:
         """Initialize Qdrant client and collection."""
         logger.info("QdrantSemanticMemory initialization (stub)")
@@ -50,7 +50,7 @@ class QdrantSemanticMemory(BaseMemory):
         # - Create or verify collection exists
         # - Set up vector indexes
         return True
-    
+
     async def save(self, entry: MemoryEntry) -> bool:
         """Save entry to Qdrant."""
         logger.debug(f"QdrantSemanticMemory.save (stub): {entry.key}")
@@ -59,7 +59,7 @@ class QdrantSemanticMemory(BaseMemory):
         # - Include vector embedding
         # - Save with metadata
         return True
-    
+
     async def get(self, key: str) -> Optional[MemoryEntry]:
         """Retrieve entry from Qdrant."""
         logger.debug(f"QdrantSemanticMemory.get (stub): {key}")
@@ -67,13 +67,13 @@ class QdrantSemanticMemory(BaseMemory):
         # - Query by ID
         # - Convert back to MemoryEntry
         return None
-    
+
     async def delete(self, key: str) -> bool:
         """Delete entry from Qdrant."""
         logger.debug(f"QdrantSemanticMemory.delete (stub): {key}")
         # TODO: Implement deletion from Qdrant
         return True
-    
+
     async def search(
         self,
         query: Union[str, List[float]],
@@ -88,7 +88,7 @@ class QdrantSemanticMemory(BaseMemory):
         # - Apply filters
         # - Return ranked results
         return []
-    
+
     async def list_keys(self, prefix: Optional[str] = None) -> List[str]:
         """List all keys with optional prefix."""
         logger.debug(f"QdrantSemanticMemory.list_keys (stub): prefix={prefix}")
@@ -96,7 +96,7 @@ class QdrantSemanticMemory(BaseMemory):
         # - Query Qdrant with scroll
         # - Filter by prefix if provided
         return []
-    
+
     async def batch_save(self, entries: List[MemoryEntry]) -> Dict[str, bool]:
         """Save multiple entries in batch."""
         logger.debug(f"QdrantSemanticMemory.batch_save (stub): {len(entries)} entries")
@@ -104,7 +104,7 @@ class QdrantSemanticMemory(BaseMemory):
         # - Convert entries to points
         # - Use Qdrant batch upsert
         return {entry.key: True for entry in entries}
-    
+
     async def batch_get(self, keys: List[str]) -> Dict[str, Optional[MemoryEntry]]:
         """Retrieve multiple entries in batch."""
         logger.debug(f"QdrantSemanticMemory.batch_get (stub): {len(keys)} keys")
@@ -112,7 +112,7 @@ class QdrantSemanticMemory(BaseMemory):
         # - Query multiple points by ID
         # - Convert back to MemoryEntry objects
         return {key: None for key in keys}
-    
+
     async def clear(self, prefix: Optional[str] = None) -> int:
         """Clear entries matching prefix."""
         logger.debug(f"QdrantSemanticMemory.clear (stub): prefix={prefix}")
@@ -120,7 +120,7 @@ class QdrantSemanticMemory(BaseMemory):
         # - Delete points matching filter
         # - Return count of deleted items
         return 0
-    
+
     async def stats(self) -> Dict[str, Any]:
         """Get Qdrant statistics."""
         # TODO: Implement stats collection
@@ -135,7 +135,7 @@ class QdrantSemanticMemory(BaseMemory):
             "collection": self.collection_name,
             "vector_size": self.vector_size,
         }
-    
+
     async def health_check(self) -> Dict[str, Any]:
         """Check Qdrant health."""
         # TODO: Implement health check
@@ -146,7 +146,7 @@ class QdrantSemanticMemory(BaseMemory):
             "tier": self.tier.value,
             "message": "QdrantSemanticMemory is not yet implemented",
         }
-    
+
     async def close(self) -> None:
         """Close Qdrant connections."""
         logger.info("QdrantSemanticMemory.close (stub)")

@@ -123,10 +123,7 @@ class MemoryBenchmark:
         operations_per_worker = self.operation_count // self.concurrency
 
         # Create and run workers
-        workers = [
-            self._worker(i, operations_per_worker, operation, results)
-            for i in range(self.concurrency)
-        ]
+        workers = [self._worker(i, operations_per_worker, operation, results) for i in range(self.concurrency)]
 
         start_time = time.time()
         await asyncio.gather(*workers)
@@ -150,12 +147,8 @@ class MemoryBenchmark:
                 "max": max(latencies) if latencies else None,
                 "mean": statistics.mean(latencies) if latencies else None,
                 "median": statistics.median(latencies) if latencies else None,
-                "p95": statistics.quantiles(latencies, n=20)[18]
-                if len(latencies) >= 20
-                else None,
-                "p99": statistics.quantiles(latencies, n=100)[98]
-                if len(latencies) >= 100
-                else None,
+                "p95": statistics.quantiles(latencies, n=20)[18] if len(latencies) >= 20 else None,
+                "p99": statistics.quantiles(latencies, n=100)[98] if len(latencies) >= 100 else None,
             },
         }
 
@@ -182,9 +175,7 @@ class MemoryBenchmark:
             "concurrency": self.concurrency,
             "total_operations": total_operations,
             "total_time": total_time,
-            "operations_per_second": total_operations / total_time
-            if total_time > 0
-            else 0,
+            "operations_per_second": total_operations / total_time if total_time > 0 else 0,
             "operations": results,
         }
 

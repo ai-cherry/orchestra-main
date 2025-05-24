@@ -27,17 +27,17 @@ from mcp_server.config.dragonfly_config import validate_dragonfly_config, log_dr
 
 class DragonflyConnectionTest:
     """Test suite for DragonflyDB connection and operations."""
-    
+
     def __init__(self):
         self.cache = DragonflyCache()
         self.test_results: Dict[str, Any] = {}
-        
+
     async def run_all_tests(self) -> Dict[str, Any]:
         """Run all tests and return results."""
         print("=" * 60)
         print("DragonflyDB Connection Test Suite")
         print("=" * 60)
-        
+
         # Validate configuration
         print("\n1. Validating configuration...")
         if not validate_dragonfly_config():

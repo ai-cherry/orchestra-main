@@ -2,7 +2,7 @@
 GCP Secret Manager Client Library
 =================================
 
-A robust and efficient client library for accessing secrets from Google Cloud Secret Manager 
+A robust and efficient client library for accessing secrets from Google Cloud Secret Manager
 with advanced features like caching, error handling, and fallback mechanisms.
 
 Example usage:
@@ -17,14 +17,14 @@ Example usage:
 
     # Access a secret
     api_key = client.get_secret("API_KEY")
-    
+
     # Access with version control
     db_password = client.get_secret("DB_PASSWORD", version="latest")
-    
+
     # Access with fallback value
     debug_mode = client.get_secret(
-        "DEBUG_MODE", 
-        fallback="false", 
+        "DEBUG_MODE",
+        fallback="false",
         transform=lambda x: x.lower() == "true"
     )
 """

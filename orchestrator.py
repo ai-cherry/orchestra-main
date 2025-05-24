@@ -122,9 +122,7 @@ class VSCodeTaskRunner:
     """Handles running VS Code tasks from the orchestrator."""
 
     @staticmethod
-    def run_task(
-        task_id: str, inputs: Optional[Dict[str, str]] = None
-    ) -> Optional[str]:
+    def run_task(task_id: str, inputs: Optional[Dict[str, str]] = None) -> Optional[str]:
         """Run a VS Code task by ID."""
         if task_id not in VSCODE_TASKS:
             logger.error(f"Unknown VS Code task ID: {task_id}")
@@ -166,9 +164,7 @@ class RooModeManager:
             return False
 
     @staticmethod
-    def execute_in_mode(
-        mode: str, prompt: str, context: Optional[str] = None
-    ) -> Optional[str]:
+    def execute_in_mode(mode: str, prompt: str, context: Optional[str] = None) -> Optional[str]:
         """Execute a prompt in the specified mode with optional context."""
         try:
             full_prompt = prompt
@@ -208,18 +204,14 @@ class GithubIntegration:
         try:
             # Check if branch already exists
             check_cmd = ["git", "show-ref", "--verify", f"refs/heads/{branch_name}"]
-            branch_exists = (
-                subprocess.run(check_cmd, capture_output=True).returncode == 0
-            )
+            branch_exists = subprocess.run(check_cmd, capture_output=True).returncode == 0
 
             if branch_exists:
                 logger.info(f"Branch {branch_name} already exists")
                 return True
 
             # Create and checkout new branch
-            subprocess.run(
-                ["git", "checkout", "-b", branch_name, base_branch], check=True
-            )
+            subprocess.run(["git", "checkout", "-b", branch_name, base_branch], check=True)
             logger.info(f"Created and checked out branch: {branch_name}")
             return True
         except subprocess.CalledProcessError as e:
@@ -251,9 +243,7 @@ class GithubIntegration:
         try:
             # Get current branch
             branch_cmd = ["git", "branch", "--show-current"]
-            result = subprocess.run(
-                branch_cmd, check=True, capture_output=True, text=True
-            )
+            result = subprocess.run(branch_cmd, check=True, capture_output=True, text=True)
             current_branch = result.stdout.strip()
 
             # Create PR
@@ -306,9 +296,7 @@ class GCPIntegration:
             return None
 
     @staticmethod
-    def deploy_to_cloud_run(
-        service_name: str, image: str, region: str = "us-central1"
-    ) -> Optional[str]:
+    def deploy_to_cloud_run(service_name: str, image: str, region: str = "us-central1") -> Optional[str]:
         """Deploy an image to Cloud Run."""
         try:
             cmd = [
@@ -335,15 +323,11 @@ class TerraformManager:
     """Handles Terraform operations."""
 
     @staticmethod
-    def run_terraform_command(
-        command: str, working_dir: str = "terraform"
-    ) -> Optional[str]:
+    def run_terraform_command(command: str, working_dir: str = "terraform") -> Optional[str]:
         """Run a Terraform command in the specified directory."""
         try:
             cmd = ["terraform", command]
-            result = subprocess.run(
-                cmd, check=True, capture_output=True, text=True, cwd=working_dir
-            )
+            result = subprocess.run(cmd, check=True, capture_output=True, text=True, cwd=working_dir)
             logger.info(f"Ran Terraform command '{command}' in {working_dir}")
             return result.stdout.strip()
         except subprocess.CalledProcessError as e:
@@ -355,9 +339,7 @@ class TerraformManager:
         """Run Terraform plan and save the plan to a file."""
         try:
             cmd = ["terraform", "plan", "-out", out_file]
-            result = subprocess.run(
-                cmd, check=True, capture_output=True, text=True, cwd=working_dir
-            )
+            result = subprocess.run(cmd, check=True, capture_output=True, text=True, cwd=working_dir)
             logger.info(f"Created Terraform plan in {working_dir}/{out_file}")
             return result.stdout.strip()
         except subprocess.CalledProcessError as e:
@@ -365,9 +347,7 @@ class TerraformManager:
             return None
 
     @staticmethod
-    def apply(
-        working_dir: str = "terraform", plan_file: Optional[str] = None
-    ) -> Optional[str]:
+    def apply(working_dir: str = "terraform", plan_file: Optional[str] = None) -> Optional[str]:
         """Apply Terraform changes."""
         try:
             if plan_file:
@@ -375,9 +355,7 @@ class TerraformManager:
             else:
                 cmd = ["terraform", "apply", "-auto-approve"]
 
-            result = subprocess.run(
-                cmd, check=True, capture_output=True, text=True, cwd=working_dir
-            )
+            result = subprocess.run(cmd, check=True, capture_output=True, text=True, cwd=working_dir)
             logger.info(f"Applied Terraform changes in {working_dir}")
             return result.stdout.strip()
         except subprocess.CalledProcessError as e:
@@ -392,16 +370,12 @@ class TerraformManager:
         try:
             if output_name:
                 cmd = ["terraform", "output", "-raw", output_name]
-                result = subprocess.run(
-                    cmd, check=True, capture_output=True, text=True, cwd=working_dir
-                )
+                result = subprocess.run(cmd, check=True, capture_output=True, text=True, cwd=working_dir)
                 logger.info(f"Got Terraform output '{output_name}'")
                 return result.stdout.strip()
             else:
                 cmd = ["terraform", "output", "-json"]
-                result = subprocess.run(
-                    cmd, check=True, capture_output=True, text=True, cwd=working_dir
-                )
+                result = subprocess.run(cmd, check=True, capture_output=True, text=True, cwd=working_dir)
                 logger.info(f"Got all Terraform outputs")
                 return json.loads(result.stdout)
         except subprocess.CalledProcessError as e:
@@ -428,9 +402,7 @@ class SubtaskManager:
         """Generate a unique ID for the next subtask."""
         return f"subtask_{len(self.execution_history) + 1}"
 
-    def _save_subtask_result(
-        self, subtask_id: str, mode: str, task: str, result: str
-    ) -> None:
+    def _save_subtask_result(self, subtask_id: str, mode: str, task: str, result: str) -> None:
         """Save subtask result to memory and update execution history."""
         # Save to memory bank
         self.memory.save(f"{subtask_id}_result", result)
@@ -448,9 +420,7 @@ class SubtaskManager:
         # Save updated execution history
         self.memory.update("execution_history", json.dumps(self.execution_history))
 
-    def execute_subtask(
-        self, mode: str, task: str, context: Optional[str] = None
-    ) -> Optional[str]:
+    def execute_subtask(self, mode: str, task: str, context: Optional[str] = None) -> Optional[str]:
         """Execute a single subtask in the specified mode."""
         subtask_id = self._get_next_subtask_id()
         logger.info(f"Executing subtask {subtask_id} in mode '{mode}': {task[:50]}...")
@@ -468,9 +438,7 @@ class SubtaskManager:
 
         return None
 
-    def execute_vs_code_task(
-        self, task_id: str, inputs: Optional[Dict[str, str]] = None
-    ) -> Optional[str]:
+    def execute_vs_code_task(self, task_id: str, inputs: Optional[Dict[str, str]] = None) -> Optional[str]:
         """Execute a VS Code task as part of a workflow."""
         subtask_id = self._get_next_subtask_id()
         task_name = VSCODE_TASKS.get(task_id, task_id)
@@ -489,9 +457,7 @@ class SubtaskManager:
                     "id": subtask_id,
                     "type": "vs_code_task",
                     "task": task_name,
-                    "result_summary": result[:100] + "..."
-                    if len(result) > 100
-                    else result,
+                    "result_summary": result[:100] + "..." if len(result) > 100 else result,
                 }
             )
 
@@ -502,14 +468,10 @@ class SubtaskManager:
 
         return None
 
-    def run_terraform_operation(
-        self, operation: str, working_dir: str = "terraform", **kwargs
-    ) -> Optional[str]:
+    def run_terraform_operation(self, operation: str, working_dir: str = "terraform", **kwargs) -> Optional[str]:
         """Run a Terraform operation as part of a workflow."""
         subtask_id = self._get_next_subtask_id()
-        logger.info(
-            f"Running Terraform operation {subtask_id}: {operation} in {working_dir}"
-        )
+        logger.info(f"Running Terraform operation {subtask_id}: {operation} in {working_dir}")
 
         # Map operation to method
         result = None
@@ -538,9 +500,7 @@ class SubtaskManager:
                     "type": "terraform",
                     "operation": operation,
                     "working_dir": working_dir,
-                    "result_summary": result[:100] + "..."
-                    if len(result) > 100
-                    else result,
+                    "result_summary": result[:100] + "..." if len(result) > 100 else result,
                 }
             )
 
@@ -579,9 +539,7 @@ class SubtaskManager:
                     "id": subtask_id,
                     "type": "gcp",
                     "operation": operation,
-                    "result_summary": result[:100] + "..."
-                    if len(result) > 100
-                    else result,
+                    "result_summary": result[:100] + "..." if len(result) > 100 else result,
                 }
             )
 
@@ -592,9 +550,7 @@ class SubtaskManager:
 
         return None
 
-    def orchestrate_workflow(
-        self, main_task: str, subtasks: Optional[List[Dict[str, Any]]] = None
-    ) -> str:
+    def orchestrate_workflow(self, main_task: str, subtasks: Optional[List[Dict[str, Any]]] = None) -> str:
         """
         Orchestrate a complete workflow with multiple subtasks.
 
@@ -615,9 +571,7 @@ class SubtaskManager:
 
         # If no subtasks provided, generate them using Strategy mode
         if not subtasks:
-            logger.info(
-                "No subtasks provided, asking Strategy mode to break down the task"
-            )
+            logger.info("No subtasks provided, asking Strategy mode to break down the task")
 
             strategy_prompt = (
                 f"Break down this task into subtasks that can be executed by specialized modes or operations:\n\n{main_task}\n\n"
@@ -691,9 +645,7 @@ class SubtaskManager:
                 working_dir = subtask.get("working_dir", "terraform")
                 kwargs = subtask.get("parameters", {})
                 if operation:
-                    result = self.run_terraform_operation(
-                        operation, working_dir, **kwargs
-                    )
+                    result = self.run_terraform_operation(operation, working_dir, **kwargs)
             elif subtask_type == "gcp":
                 operation = subtask.get("operation")
                 kwargs = subtask.get("parameters", {})
@@ -701,17 +653,13 @@ class SubtaskManager:
                     result = self.run_gcp_operation(operation, **kwargs)
 
             if result:
-                results.append(
-                    {"type": subtask_type, "details": subtask, "result": result}
-                )
+                results.append({"type": subtask_type, "details": subtask, "result": result})
                 logger.info(f"Completed subtask {idx+1}/{len(subtasks)}")
             else:
                 logger.error(f"Failed to complete subtask {idx+1}/{len(subtasks)}")
 
         # Generate final summary using Creative mode
-        summary_prompt = (
-            f"Summarize the results of this multi-step workflow: {main_task}\n\n"
-        )
+        summary_prompt = f"Summarize the results of this multi-step workflow: {main_task}\n\n"
         for idx, result in enumerate(results):
             subtask_type = result["type"]
             details = result["details"]
@@ -723,9 +671,7 @@ class SubtaskManager:
                 summary_prompt += f"Step {idx+1} ({subtask_type} - {details.get('operation', details.get('task_id', ''))}): {result_text[:200]}...\n\n"
 
         final_summary = self.execute_subtask("creative", summary_prompt)
-        self.memory.save(
-            "workflow_summary", final_summary or "Failed to generate summary"
-        )
+        self.memory.save("workflow_summary", final_summary or "Failed to generate summary")
 
         logger.info("Workflow orchestration completed successfully")
         return final_summary or "Workflow completed but failed to generate summary."
@@ -733,16 +679,12 @@ class SubtaskManager:
 
 def main():
     """Command line interface for the orchestrator."""
-    parser = argparse.ArgumentParser(
-        description="Project Orchestra - Roo Code Orchestrator"
-    )
+    parser = argparse.ArgumentParser(description="Project Orchestra - Roo Code Orchestrator")
 
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")
 
     # Task command
-    task_parser = subparsers.add_parser(
-        "task", help="Execute a single task in a specific mode"
-    )
+    task_parser = subparsers.add_parser("task", help="Execute a single task in a specific mode")
     task_parser.add_argument(
         "--mode",
         required=True,
@@ -760,14 +702,10 @@ def main():
         choices=VSCODE_TASKS.keys(),
         help="VS Code task to run",
     )
-    vscode_task_parser.add_argument(
-        "--inputs", help="JSON string of inputs for the task"
-    )
+    vscode_task_parser.add_argument("--inputs", help="JSON string of inputs for the task")
 
     # Terraform command
-    terraform_parser = subparsers.add_parser(
-        "terraform", help="Run a Terraform operation"
-    )
+    terraform_parser = subparsers.add_parser("terraform", help="Run a Terraform operation")
     terraform_parser.add_argument(
         "--operation",
         required=True,
@@ -778,9 +716,7 @@ def main():
         default="terraform",
         help="Directory containing Terraform configuration",
     )
-    terraform_parser.add_argument(
-        "--parameters", help="JSON string of additional parameters"
-    )
+    terraform_parser.add_argument("--parameters", help="JSON string of additional parameters")
 
     # GCP command
     gcp_parser = subparsers.add_parser("gcp", help="Run a GCP operation")
@@ -799,18 +735,12 @@ def main():
         choices=["create_branch", "commit_changes", "create_pr"],
         help="GitHub operation to run",
     )
-    github_parser.add_argument(
-        "--parameters", help="JSON string of operation parameters"
-    )
+    github_parser.add_argument("--parameters", help="JSON string of operation parameters")
 
     # Workflow command
-    workflow_parser = subparsers.add_parser(
-        "workflow", help="Execute a complete workflow"
-    )
+    workflow_parser = subparsers.add_parser("workflow", help="Execute a complete workflow")
     workflow_parser.add_argument("--task", required=True, help="Main task description")
-    workflow_parser.add_argument(
-        "--subtasks", help="JSON file with subtask definitions"
-    )
+    workflow_parser.add_argument("--subtasks", help="JSON file with subtask definitions")
 
     args = parser.parse_args()
 
@@ -851,23 +781,15 @@ def main():
                 sys.exit(1)
 
         if args.operation == "plan":
-            result = terraform_manager.plan(
-                args.working_dir, parameters.get("out_file", "tfplan")
-            )
+            result = terraform_manager.plan(args.working_dir, parameters.get("out_file", "tfplan"))
         elif args.operation == "apply":
-            result = terraform_manager.apply(
-                args.working_dir, parameters.get("plan_file")
-            )
+            result = terraform_manager.apply(args.working_dir, parameters.get("plan_file"))
         elif args.operation == "get_outputs":
-            result = terraform_manager.get_outputs(
-                args.working_dir, parameters.get("output_name")
-            )
+            result = terraform_manager.get_outputs(args.working_dir, parameters.get("output_name"))
             if isinstance(result, dict):
                 result = json.dumps(result, indent=2)
         else:
-            result = terraform_manager.run_terraform_command(
-                args.operation, args.working_dir
-            )
+            result = terraform_manager.run_terraform_command(args.operation, args.working_dir)
 
         if result:
             print(result)
@@ -886,9 +808,7 @@ def main():
                 sys.exit(1)
 
         if args.operation == "cloud_build":
-            result = gcp_integration.run_cloud_build(
-                parameters.get("config_path", "cloudbuild.yaml")
-            )
+            result = gcp_integration.run_cloud_build(parameters.get("config_path", "cloudbuild.yaml"))
         elif args.operation == "deploy_cloud_run":
             result = gcp_integration.deploy_to_cloud_run(
                 parameters.get("service_name"),

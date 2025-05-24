@@ -168,9 +168,7 @@ class ResponseCompressionMiddleware(BaseHTTPMiddleware):
 
         return new_response
 
-    def _select_compression_algorithm(
-        self, accept_encoding: str
-    ) -> CompressionAlgorithm:
+    def _select_compression_algorithm(self, accept_encoding: str) -> CompressionAlgorithm:
         """
         Select the best compression algorithm based on client support.
 
@@ -458,8 +456,7 @@ class PayloadOptimizationMiddleware(BaseHTTPMiddleware):
             return {
                 k: self._filter_json(v, fields) if k in fields else v
                 for k, v in data.items()
-                if k in fields
-                or "." in next((f for f in fields if f.startswith(f"{k}.")), "")
+                if k in fields or "." in next((f for f in fields if f.startswith(f"{k}.")), "")
             }
         elif isinstance(data, list):
             return [self._filter_json(item, fields) for item in data]

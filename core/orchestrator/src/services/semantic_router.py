@@ -80,9 +80,7 @@ class SemanticRouter:
             agent_types = self._agent_registry.get_agent_types()
             for agent_type in agent_types:
                 agent_info = self._agent_registry.get_agent_info(agent_type)
-                if all(
-                    agent_info.supports_capability(cap) for cap in required_capabilities
-                ):
+                if all(agent_info.supports_capability(cap) for cap in required_capabilities):
                     candidate_agents.append(agent_type)
         else:
             # All agents are candidates
@@ -90,9 +88,7 @@ class SemanticRouter:
 
         if not candidate_agents:
             # No agents match the required capabilities
-            logger.warning(
-                f"No agents found with required capabilities: {required_capabilities}"
-            )
+            logger.warning(f"No agents found with required capabilities: {required_capabilities}")
             return None, 0.0
 
         # Calculate semantic similarity with each agent's embedding

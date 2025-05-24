@@ -15,6 +15,7 @@ from packages.shared.src.models.domain_models import AgentResponse as AgentOutpu
 
 logger = logging.getLogger(__name__)
 
+
 class LangChainAgentWrapper(OrchestraAgentBase):
     """
     Wrapper for integrating LangChain-based agents with Orchestra.
@@ -83,6 +84,7 @@ class LangChainAgentWrapper(OrchestraAgentBase):
             # NOTE: Replace with actual memory retrieval logic as needed
             try:
                 from core.orchestrator.src.main import short_term_memory
+
                 recent_messages = short_term_memory
             except ImportError:
                 recent_messages = []

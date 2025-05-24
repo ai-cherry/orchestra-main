@@ -51,7 +51,7 @@ def handle_query():
     data = request.json
     user_id = data.get("user_id")
     query = data.get("query", "")
-    logger.info("User query received", extra={'user_id': user_id, 'query_length': len(query)})
+    logger.info("User query received", extra={"user_id": user_id, "query_length": len(query)})
     return {"status": "ok"}
 
 
@@ -61,22 +61,18 @@ def call_llm():
         # ... code that calls the LLM API ...
         pass
     except Exception as e:
-        logger.error(
-            "LLM API call failed",
-            exc_info=True,
-            extra={'api_endpoint': 'openai_v1'}
-        )
+        logger.error("LLM API call failed", exc_info=True, extra={"api_endpoint": "openai_v1"})
         return {"error": "LLM API call failed"}, 500
 
 
 @retry(max_attempts=3, delay=2, exponential_backoff=2)
 def fetch_external_data():
-    response = requests.get('https://api.example.com/data', timeout=10)
+    response = requests.get("https://api.example.com/data", timeout=10)
     response.raise_for_status()
     return response.json()
 
 
-@app.route('/fetch-data')
+@app.route("/fetch-data")
 def fetch_data_sync():
     try:
         logger.info("Fetching external data", extra={"endpoint": "/fetch-data"})
@@ -84,9 +80,7 @@ def fetch_data_sync():
         return jsonify(data)
     except requests.RequestException as e:
         logger.error(
-            "External API call failed",
-            exc_info=True,
-            extra={"endpoint": "/fetch-data", "error_type": type(e).__name__}
+            "External API call failed", exc_info=True, extra={"endpoint": "/fetch-data", "error_type": type(e).__name__}
         )
         return jsonify({"error": "Failed to fetch data"}), 502
 
@@ -96,11 +90,7 @@ def handle_exception(e):
     logger.error(
         "Unhandled exception",
         exc_info=True,
-        extra={
-            "path": request.path,
-            "method": request.method,
-            "remote_addr": request.remote_addr
-        }
+        extra={"path": request.path, "method": request.method, "remote_addr": request.remote_addr},
     )
     return jsonify({"error": "Internal server error"}), 500
 

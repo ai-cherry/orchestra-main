@@ -39,9 +39,7 @@ try:
         get_client as get_mcp_client,
     )
 except ImportError:
-    logger.warning(
-        "Could not import enhanced MCP client, attempting to import basic client"
-    )
+    logger.warning("Could not import enhanced MCP client, attempting to import basic client")
     try:
         from gcp_migration.mcp_client import MCPClient, get_client as get_mcp_client
 
@@ -57,9 +55,7 @@ except ImportError:
                 return self.success
 
     except ImportError:
-        logger.error(
-            "Failed to import MCP client. Resource Registry will operate in offline mode."
-        )
+        logger.error("Failed to import MCP client. Resource Registry will operate in offline mode.")
         MCPClient = object
         MCPResponse = object
 
@@ -214,9 +210,7 @@ class Resource:
             version=data.get("version"),
             dependencies=data.get("dependencies", []),
             tags=data.get("tags", []),
-            priority=ResourcePriority(
-                data.get("priority", ResourcePriority.MEDIUM.value)
-            ),
+            priority=ResourcePriority(data.get("priority", ResourcePriority.MEDIUM.value)),
             metadata=data.get("metadata", {}),
         )
 
@@ -265,20 +259,14 @@ class ResourceRegistry:
                 # Fetch existing registry from MCP memory
                 registry_response = self.mcp_client.get(self.REGISTRY_KEY)
 
-                if (
-                    registry_response
-                    and registry_response.success
-                    and registry_response.value
-                ):
+                if registry_response and registry_response.success and registry_response.value:
                     # Registry exists, load it
                     registry_data = registry_response.value
                     for resource_data in registry_data.get("resources", []):
                         resource = Resource.from_dict(resource_data)
                         self.resources[resource.id] = resource
 
-                    logger.info(
-                        f"Loaded {len(self.resources)} resources from MCP memory"
-                    )
+                    logger.info(f"Loaded {len(self.resources)} resources from MCP memory")
 
                 else:
                     # Registry doesn't exist, create it
@@ -286,9 +274,7 @@ class ResourceRegistry:
 
             else:
                 # No MCP client, create an empty registry
-                logger.warning(
-                    "No MCP client available. Creating in-memory registry only."
-                )
+                logger.warning("No MCP client available. Creating in-memory registry only.")
                 self.resources = {}
 
             self.initialized = True
@@ -339,11 +325,7 @@ class ResourceRegistry:
             if self.mcp_client:
                 registry_response = self.mcp_client.get(self.REGISTRY_KEY)
 
-                if (
-                    registry_response
-                    and registry_response.success
-                    and registry_response.value
-                ):
+                if registry_response and registry_response.success and registry_response.value:
                     registry_data = registry_response.value
 
                     # Convert all resources to dictionaries
@@ -389,11 +371,7 @@ class ResourceRegistry:
             if self.mcp_client:
                 registry_response = self.mcp_client.get(self.REGISTRY_KEY)
 
-                if (
-                    registry_response
-                    and registry_response.success
-                    and registry_response.value
-                ):
+                if registry_response and registry_response.success and registry_response.value:
                     registry_data = registry_response.value
 
                     # Convert all resources to dictionaries
@@ -457,11 +435,7 @@ class ResourceRegistry:
         try:
             registry_response = self.mcp_client.get(self.REGISTRY_KEY)
 
-            if (
-                registry_response
-                and registry_response.success
-                and registry_response.value
-            ):
+            if registry_response and registry_response.success and registry_response.value:
                 registry_data = registry_response.value
 
                 # Clear local registry
@@ -508,26 +482,18 @@ class ResourceRegistry:
                 resources = [r for r in resources if r.resource_type == resource_type]
 
             if environment:
-                resources = [
-                    r
-                    for r in resources
-                    if r.environment == environment or r.environment == Environment.ALL
-                ]
+                resources = [r for r in resources if r.environment == environment or r.environment == Environment.ALL]
 
             if tags:
                 tags_set = set(tags)
-                resources = [
-                    r for r in resources if all(tag in r.tags for tag in tags_set)
-                ]
+                resources = [r for r in resources if all(tag in r.tags for tag in tags_set)]
 
             if status:
                 resources = [r for r in resources if r.status == status]
 
             if min_priority:
                 # Lower numerical value means higher priority
-                resources = [
-                    r for r in resources if r.priority.value <= min_priority.value
-                ]
+                resources = [r for r in resources if r.priority.value <= min_priority.value]
 
             return resources
 
@@ -557,16 +523,9 @@ class ResourceRegistry:
                 # Check if CLI tool exists in PATH
                 import shutil
 
-                status = (
-                    ResourceStatus.AVAILABLE
-                    if shutil.which(resource.name)
-                    else ResourceStatus.MISSING
-                )
+                status = ResourceStatus.AVAILABLE if shutil.which(resource.name) else ResourceStatus.MISSING
 
-            elif (
-                resource.resource_type == ResourceType.GCP_SERVICE
-                or resource.resource_type == ResourceType.GCP_API
-            ):
+            elif resource.resource_type == ResourceType.GCP_SERVICE or resource.resource_type == ResourceType.GCP_API:
                 # Check GCP service/API status
                 # In a real implementation, this would use the Cloud APIs to check service status
                 # For now, just assume it's available
@@ -586,10 +545,7 @@ class ResourceRegistry:
                         # Check if credential is expired
                         if "expiration" in resource.metadata:
                             expiration = resource.metadata["expiration"]
-                            if (
-                                expiration
-                                and datetime.fromisoformat(expiration) < datetime.now()
-                            ):
+                            if expiration and datetime.fromisoformat(expiration) < datetime.now():
                                 status = ResourceStatus.DEGRADED
                             else:
                                 status = ResourceStatus.AVAILABLE
@@ -709,9 +665,7 @@ class ResourceRegistry:
         # Default to local
         return Environment.LOCAL
 
-    async def _discover_cli_tools(
-        self, environment: Environment, new_resources: List[Resource]
-    ) -> None:
+    async def _discover_cli_tools(self, environment: Environment, new_resources: List[Resource]) -> None:
         """Discover CLI tools in the current environment.
 
         Args:
@@ -815,9 +769,7 @@ class ResourceRegistry:
         except Exception:
             return None
 
-    async def _discover_gcp_resources(
-        self, environment: Environment, new_resources: List[Resource]
-    ) -> None:
+    async def _discover_gcp_resources(self, environment: Environment, new_resources: List[Resource]) -> None:
         """Discover GCP resources.
 
         Args:
@@ -867,9 +819,7 @@ class ResourceRegistry:
                         new_resources.append(project_resource)
 
                     # Discover enabled APIs
-                    await self._discover_gcp_apis(
-                        environment, new_resources, project_id
-                    )
+                    await self._discover_gcp_apis(environment, new_resources, project_id)
 
         except Exception as e:
             logger.error(f"Failed to discover GCP project: {e}")
@@ -930,9 +880,7 @@ class ResourceRegistry:
         except Exception as e:
             logger.error(f"Failed to discover GCP APIs: {e}")
 
-    async def _discover_github_resources(
-        self, environment: Environment, new_resources: List[Resource]
-    ) -> None:
+    async def _discover_github_resources(self, environment: Environment, new_resources: List[Resource]) -> None:
         """Discover GitHub resources.
 
         Args:
@@ -989,9 +937,7 @@ class ResourceRegistry:
                             new_resources.append(repo_resource)
 
                         # Check for GitHub Actions
-                        await self._discover_github_actions(
-                            environment, new_resources, owner, repo
-                        )
+                        await self._discover_github_actions(environment, new_resources, owner, repo)
 
         except Exception as e:
             logger.error(f"Failed to discover GitHub resources: {e}")
@@ -1027,11 +973,7 @@ class ResourceRegistry:
                     import re
 
                     name_match = re.search(r"name:\s*(.+)", workflow)
-                    workflow_name = (
-                        name_match.group(1).strip()
-                        if name_match
-                        else workflow_file.stem
-                    )
+                    workflow_name = name_match.group(1).strip() if name_match else workflow_file.stem
 
                     # Register GitHub Action as a resource
                     action_resource = Resource(
@@ -1061,9 +1003,7 @@ class ResourceRegistry:
         except Exception as e:
             logger.error(f"Failed to discover GitHub Actions: {e}")
 
-    async def _discover_local_services(
-        self, environment: Environment, new_resources: List[Resource]
-    ) -> None:
+    async def _discover_local_services(self, environment: Environment, new_resources: List[Resource]) -> None:
         """Discover local services.
 
         Args:
@@ -1130,9 +1070,7 @@ class ResourceRegistry:
         except:
             return False
 
-    async def _discover_config_files(
-        self, environment: Environment, new_resources: List[Resource]
-    ) -> None:
+    async def _discover_config_files(self, environment: Environment, new_resources: List[Resource]) -> None:
         """Discover configuration files.
 
         Args:
@@ -1172,9 +1110,7 @@ class ResourceRegistry:
                 if self.register_resource(config_resource):
                     new_resources.append(config_resource)
 
-    async def _discover_credentials(
-        self, environment: Environment, new_resources: List[Resource]
-    ) -> None:
+    async def _discover_credentials(self, environment: Environment, new_resources: List[Resource]) -> None:
         """Discover credential files.
 
         Args:
@@ -1243,9 +1179,7 @@ class ResourceRegistry:
 _default_registry: Optional[ResourceRegistry] = None
 
 
-def get_registry(
-    mcp_client: Optional[MCPClient] = None, force_new: bool = False
-) -> ResourceRegistry:
+def get_registry(mcp_client: Optional[MCPClient] = None, force_new: bool = False) -> ResourceRegistry:
     """Get the default resource registry.
 
     Args:
@@ -1325,9 +1259,7 @@ if __name__ == "__main__":
             resources = registry.list_resources()
 
             for resource in resources:
-                print(
-                    f"  - {resource.name} ({resource.resource_type}): {resource.status}"
-                )
+                print(f"  - {resource.name} ({resource.resource_type}): {resource.status}")
                 print(f"    Access: {resource.access_pattern}")
                 print(f"    Description: {resource.description}")
                 print()

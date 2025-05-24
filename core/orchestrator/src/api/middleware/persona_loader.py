@@ -109,9 +109,7 @@ async def get_active_persona(
 
     # Log persona selection result
     if persona_name != active_persona.name.lower():
-        logger.info(
-            f"Using '{active_persona.name}' instead of requested '{persona_name}'"
-        )
+        logger.info(f"Using '{active_persona.name}' instead of requested '{persona_name}'")
     else:
         logger.debug(f"Using requested persona '{persona_name}'")
 

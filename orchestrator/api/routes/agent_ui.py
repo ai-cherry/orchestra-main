@@ -176,9 +176,7 @@ async def get_agent(agent_id: str):
             detail=f"Agent with ID {agent_id} not found",
         )
 
-    return AgentResponse(
-        id=agent.id, name=agent.name, description=agent.description, status="active"
-    )
+    return AgentResponse(id=agent.id, name=agent.name, description=agent.description, status="active")
 
 
 @router.post("/", response_model=AgentResponse, status_code=status.HTTP_201_CREATED)
@@ -218,21 +216,9 @@ async def create_agent(config: AgentConfig):
         if config.memory_config:
             memory_config = {
                 "memory_type": config.memory_config.memory_type,
-                **(
-                    {"ttl": config.memory_config.ttl}
-                    if config.memory_config.ttl
-                    else {}
-                ),
-                **(
-                    {"namespace": config.memory_config.namespace}
-                    if config.memory_config.namespace
-                    else {}
-                ),
-                **(
-                    {"config": config.memory_config.config}
-                    if config.memory_config.config
-                    else {}
-                ),
+                **({"ttl": config.memory_config.ttl} if config.memory_config.ttl else {}),
+                **({"namespace": config.memory_config.namespace} if config.memory_config.namespace else {}),
+                **({"config": config.memory_config.config} if config.memory_config.config else {}),
             }
 
         # Register the agent
@@ -308,21 +294,9 @@ async def update_agent_config(agent_id: str, config: AgentConfig):
         if config.memory_config:
             memory_config = {
                 "memory_type": config.memory_config.memory_type,
-                **(
-                    {"ttl": config.memory_config.ttl}
-                    if config.memory_config.ttl
-                    else {}
-                ),
-                **(
-                    {"namespace": config.memory_config.namespace}
-                    if config.memory_config.namespace
-                    else {}
-                ),
-                **(
-                    {"config": config.memory_config.config}
-                    if config.memory_config.config
-                    else {}
-                ),
+                **({"ttl": config.memory_config.ttl} if config.memory_config.ttl else {}),
+                **({"namespace": config.memory_config.namespace} if config.memory_config.namespace else {}),
+                **({"config": config.memory_config.config} if config.memory_config.config else {}),
             }
 
         # Update the agent
@@ -447,20 +421,13 @@ async def get_agent_conversations(
             )
 
             # Update conversation timestamp
-            if (
-                item.created_at.isoformat()
-                > conversations_map[conversation_id]["updated_at"]
-            ):
-                conversations_map[conversation_id][
-                    "updated_at"
-                ] = item.created_at.isoformat()
+            if item.created_at.isoformat() > conversations_map[conversation_id]["updated_at"]:
+                conversations_map[conversation_id]["updated_at"] = item.created_at.isoformat()
 
         # Convert to list
         conversations = list(conversations_map.values())
 
-        return ConversationListResponse(
-            conversations=conversations, total=len(memory_items)
-        )
+        return ConversationListResponse(conversations=conversations, total=len(memory_items))
     except Exception as e:
         logger.error(f"Failed to get agent conversations: {e}")
         raise HTTPException(
@@ -496,9 +463,7 @@ async def test_agent(agent_id: str, input_data: Dict[str, Any]):
         # Get input text
         input_text = input_data.get("text", "")
         if not input_text:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Input text is required"
-            )
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Input text is required")
 
         # Process input
         response = await agent.process(input_text)

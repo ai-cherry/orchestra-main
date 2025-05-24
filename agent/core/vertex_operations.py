@@ -17,8 +17,9 @@ from google.cloud.aiplatform_v1beta1.types import (
     FunctionResponse,
     PredictRequest,
     PredictResponse,
-    gemini_embeddings
+    gemini_embeddings,
 )
+
 
 # Placeholder for gemini_embeddings function
 # Replace this with your actual Gemini embedding function implementation
@@ -31,7 +32,8 @@ def gemini_embeddings(texts: list[str]) -> list[list[float]]:
     # embeddings = model.get_embeddings(texts)
     # return [embedding.values for embedding in embeddings]
     # This is a simplified placeholder. You'll need error handling, batching, etc.
-    return [[0.0] * 768 for _ in texts] # Placeholder: 768-dim zero vectors
+    return [[0.0] * 768 for _ in texts]  # Placeholder: 768-dim zero vectors
+
 
 class VertexAgent:
     def __init__(self):
@@ -60,9 +62,7 @@ class VertexAgent:
             optimization_prediction_type="classification",
             optimization_objective="maximize-au-prc",
         )
-        return job.run(
-            dataset=dataset, target_column="target", budget_milli_node_hours=1000
-        )
+        return job.run(dataset=dataset, target_column="target", budget_milli_node_hours=1000)
 
     def generate_gemini_docs(self, code_path: str):
         """Use Gemini Enterprise to generate documentation with extended context window"""
@@ -89,9 +89,7 @@ class VertexAgent:
 
         # Use Vertex AI model for response generation
         model = aiplatform.GenerativeModel("gemini-pro")
-        response = model.generate_content(
-            contents=[{"role": "user", "parts": [{"text": prompt}]}]
-        )
+        response = model.generate_content(contents=[{"role": "user", "parts": [{"text": prompt}]}])
         return response.text
 
     def configure_auto_scaling(self):
@@ -146,9 +144,7 @@ class VertexAgent:
             )
         except Exception as e:
             # Fall back to cloud storage if local initialization fails
-            log_warning(
-                f"Local vector db initialization failed: {e}. Using cloud storage."
-            )
+            log_warning(f"Local vector db initialization failed: {e}. Using cloud storage.")
             return {
                 "documents": [
                     {

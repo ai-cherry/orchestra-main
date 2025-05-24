@@ -1,6 +1,7 @@
 """
 Service for system-level operations and GCP resource management.
 """
+
 from typing import Dict, Any, Optional
 import logging
 import platform
@@ -74,9 +75,7 @@ class SystemService:
                 "memory_usage_mb": process.memory_info().rss / (1024 * 1024),
                 "cpu_percent": process.cpu_percent(interval=0.1),
                 "threads": process.num_threads(),
-                "created_time": time.strftime(
-                    "%Y-%m-%d %H:%M:%S", time.localtime(process.create_time())
-                ),
+                "created_time": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(process.create_time())),
             }
 
             return {

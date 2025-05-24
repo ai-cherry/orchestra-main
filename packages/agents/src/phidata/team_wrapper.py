@@ -74,9 +74,7 @@ class PhidataTeamAgentWrapper(PhidataAgentWrapper, AgentProtocol):
                     member_config = get_agent_config(member_id)
 
                     if not member_config:
-                        logger.error(
-                            f"Failed to resolve team member reference: {member_id}"
-                        )
+                        logger.error(f"Failed to resolve team member reference: {member_id}")
                         continue
 
                     # Create agent instance with resolved config
@@ -89,22 +87,16 @@ class PhidataTeamAgentWrapper(PhidataAgentWrapper, AgentProtocol):
                     )
 
                     if not member_agent:
-                        logger.error(
-                            f"Failed to instantiate agent for member reference: {member_id}"
-                        )
+                        logger.error(f"Failed to instantiate agent for member reference: {member_id}")
                         continue
 
                     # Extract the underlying Phidata agent from the wrapper
                     if hasattr(member_agent, "phidata_agent"):
                         phidata_agent = member_agent.phidata_agent
                         members.append(phidata_agent)
-                        logger.info(
-                            f"Successfully initialized referenced team member: {member_id}"
-                        )
+                        logger.info(f"Successfully initialized referenced team member: {member_id}")
                     else:
-                        logger.error(
-                            f"Referenced agent doesn't have a phidata_agent attribute: {member_id}"
-                        )
+                        logger.error(f"Referenced agent doesn't have a phidata_agent attribute: {member_id}")
 
                 else:
                     # This is a direct configuration (existing behavior)
@@ -133,12 +125,8 @@ class PhidataTeamAgentWrapper(PhidataAgentWrapper, AgentProtocol):
                             if tool_type.startswith("registry:"):
                                 tool_id = tool_type.replace("registry:", "").strip()
                                 orchestra_tool = self.tools.get_tool(tool_id)
-                                if orchestra_tool and hasattr(
-                                    orchestra_tool, "to_phidata_tool"
-                                ):
-                                    phidata_tool = orchestra_tool.to_phidata_tool(
-                                        **tool_params
-                                    )
+                                if orchestra_tool and hasattr(orchestra_tool, "to_phidata_tool"):
+                                    phidata_tool = orchestra_tool.to_phidata_tool(**tool_params)
                                     if phidata_tool:
                                         member_tools.append(phidata_tool)
                                 continue
@@ -152,9 +140,7 @@ class PhidataTeamAgentWrapper(PhidataAgentWrapper, AgentProtocol):
                             member_tools.append(tool_instance)
 
                         except Exception as e:
-                            logger.error(
-                                f"Failed to initialize tool for member {name}: {e}"
-                            )
+                            logger.error(f"Failed to initialize tool for member {name}: {e}")
 
                     # Initialize member-specific storage if needed
                     member_storage = None
@@ -163,9 +149,7 @@ class PhidataTeamAgentWrapper(PhidataAgentWrapper, AgentProtocol):
                     # Check if member has specific storage config
                     if "storage" in member_config:
                         # Get table name for member storage
-                        storage_table = member_config["storage"].get(
-                            "table_name", f"{name.lower()}_storage"
-                        )
+                        storage_table = member_config["storage"].get("table_name", f"{name.lower()}_storage")
 
                         # Use CloudSQL for member storage with partitioning
                         member_storage = get_pg_agent_storage(
@@ -173,9 +157,7 @@ class PhidataTeamAgentWrapper(PhidataAgentWrapper, AgentProtocol):
                             config=cloudsql_config,
                             table_name=storage_table,
                         )
-                        logger.info(
-                            f"Created CloudSQL storage for member {name}: {storage_table}"
-                        )
+                        logger.info(f"Created CloudSQL storage for member {name}: {storage_table}")
                     else:
                         # Share the team's storage
                         member_storage = self.agent_storage
@@ -183,9 +165,7 @@ class PhidataTeamAgentWrapper(PhidataAgentWrapper, AgentProtocol):
                     # Check if member has specific memory config
                     if "memory" in member_config:
                         # Get table name for member memory
-                        memory_table = member_config["memory"].get(
-                            "table_name", f"{name.lower()}_memory"
-                        )
+                        memory_table = member_config["memory"].get("table_name", f"{name.lower()}_memory")
 
                         # Use CloudSQL for member memory
                         member_memory = get_pgvector_memory(
@@ -193,9 +173,7 @@ class PhidataTeamAgentWrapper(PhidataAgentWrapper, AgentProtocol):
                             config=cloudsql_config,
                             table_name=memory_table,
                         )
-                        logger.info(
-                            f"Created CloudSQL memory for member {name}: {memory_table}"
-                        )
+                        logger.info(f"Created CloudSQL memory for member {name}: {memory_table}")
                     else:
                         # Share the team's memory
                         member_memory = self.agent_memory
@@ -208,9 +186,7 @@ class PhidataTeamAgentWrapper(PhidataAgentWrapper, AgentProtocol):
                         name=name,
                         role=role,
                         markdown=member_config.get("markdown", self.markdown),
-                        show_tool_calls=member_config.get(
-                            "show_tool_calls", self.show_tool_calls
-                        ),
+                        show_tool_calls=member_config.get("show_tool_calls", self.show_tool_calls),
                         storage=member_storage,
                         memory=member_memory,
                     )

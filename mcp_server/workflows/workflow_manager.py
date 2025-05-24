@@ -142,9 +142,7 @@ class WorkflowManager:
                 if result:
                     results.append(result)
                 else:
-                    logger.error(
-                        f"Failed to execute step {i+1} of workflow {workflow_id}"
-                    )
+                    logger.error(f"Failed to execute step {i+1} of workflow {workflow_id}")
             else:
                 logger.error(f"Unsupported step type: {step_type}")
 
@@ -152,15 +150,11 @@ class WorkflowManager:
         final_result = "\n\n".join(results)
 
         # Store workflow result in memory
-        self.memory_store.set(
-            f"workflow_{workflow_id}_result", final_result, scope="session", tool=tool
-        )
+        self.memory_store.set(f"workflow_{workflow_id}_result", final_result, scope="session", tool=tool)
 
         return final_result
 
-    def execute_cross_tool_workflow(
-        self, workflow_id: str, tools: List[str] = None
-    ) -> Optional[str]:
+    def execute_cross_tool_workflow(self, workflow_id: str, tools: List[str] = None) -> Optional[str]:
         """Execute a workflow across multiple tools.
 
         Args:
@@ -195,8 +189,6 @@ class WorkflowManager:
         final_result = "\n\n".join(results)
 
         # Store workflow result in memory
-        self.memory_store.set(
-            f"cross_tool_workflow_{workflow_id}_result", final_result, scope="global"
-        )
+        self.memory_store.set(f"cross_tool_workflow_{workflow_id}_result", final_result, scope="global")
 
         return final_result

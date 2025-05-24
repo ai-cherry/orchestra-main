@@ -242,9 +242,7 @@ class AsyncMCPServer:
 
         # Memory endpoints
         @self.app.get("/api/memory", response_model=MemoryResponse)
-        async def get_memory(
-            key: str, scope: str = "session", tool: Optional[str] = None
-        ):
+        async def get_memory(key: str, scope: str = "session", tool: Optional[str] = None):
             content = await self.memory_store.get(key, scope, tool)
             if content is None:
                 raise MemoryNotFoundError(key, scope, tool)
@@ -262,9 +260,7 @@ class AsyncMCPServer:
             return {"success": True}
 
         @self.app.delete("/api/memory", response_model=SuccessResponse)
-        async def delete_memory(
-            key: str, scope: str = "session", tool: Optional[str] = None
-        ):
+        async def delete_memory(key: str, scope: str = "session", tool: Optional[str] = None):
             success = await self.memory_store.delete(key, scope, tool)
             if not success:
                 raise MemoryDeleteError(key, scope, tool)
@@ -273,13 +269,9 @@ class AsyncMCPServer:
 
         @self.app.post("/api/memory/sync", response_model=SuccessResponse)
         async def sync_memory(request: MemorySyncRequest):
-            success = await self.memory_store.sync(
-                request.key, request.source_tool, request.target_tool, request.scope
-            )
+            success = await self.memory_store.sync(request.key, request.source_tool, request.target_tool, request.scope)
             if not success:
-                raise MemorySyncError(
-                    request.key, request.source_tool, request.target_tool, request.scope
-                )
+                raise MemorySyncError(request.key, request.source_tool, request.target_tool, request.scope)
 
             return {"success": True}
 
@@ -291,9 +283,7 @@ class AsyncMCPServer:
                 raise ToolNotEnabledError(request.tool)
 
             # Execute the tool
-            result = self.tool_manager.execute(
-                request.tool, request.mode, request.prompt, request.context
-            )
+            result = self.tool_manager.execute(request.tool, request.mode, request.prompt, request.context)
             if result is None:
                 raise ToolExecutionError(request.tool, request.mode)
 
@@ -307,16 +297,11 @@ class AsyncMCPServer:
         @self.app.post("/api/workflows/execute", response_model=WorkflowResponse)
         async def execute_workflow(request: WorkflowRequest):
             # Check if the workflow exists
-            if (
-                request.workflow_id
-                not in self.workflow_manager.get_available_workflows()
-            ):
+            if request.workflow_id not in self.workflow_manager.get_available_workflows():
                 raise WorkflowNotFoundError(request.workflow_id)
 
             # Execute the workflow
-            result = self.workflow_manager.execute_workflow(
-                request.workflow_id, request.parameters, request.tool
-            )
+            result = self.workflow_manager.execute_workflow(request.workflow_id, request.parameters, request.tool)
             if result is None:
                 raise WorkflowExecutionError(request.workflow_id)
 
@@ -325,16 +310,11 @@ class AsyncMCPServer:
         @self.app.post("/api/workflows/cross-tool", response_model=WorkflowResponse)
         async def execute_cross_tool_workflow(request: CrossToolWorkflowRequest):
             # Check if the workflow exists
-            if (
-                request.workflow_id
-                not in self.workflow_manager.get_available_workflows()
-            ):
+            if request.workflow_id not in self.workflow_manager.get_available_workflows():
                 raise WorkflowNotFoundError(request.workflow_id)
 
             # Execute the workflow
-            result = self.workflow_manager.execute_cross_tool_workflow(
-                request.workflow_id, request.tools
-            )
+            result = self.workflow_manager.execute_cross_tool_workflow(request.workflow_id, request.tools)
             if result is None:
                 raise WorkflowExecutionError(request.workflow_id)
 

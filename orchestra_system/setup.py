@@ -227,17 +227,13 @@ async def setup_gcp_integration() -> bool:
             logger.info("GCP client libraries found")
         except ImportError:
             logger.error("GCP client libraries not found")
-            logger.error(
-                "Install them with: pip install google-cloud-storage google-cloud-aiplatform"
-            )
+            logger.error("Install them with: pip install google-cloud-storage google-cloud-aiplatform")
             return False
 
         # Check GCP authentication
         import subprocess
 
-        result = subprocess.run(
-            ["gcloud", "auth", "list"], capture_output=True, text=True
-        )
+        result = subprocess.run(["gcloud", "auth", "list"], capture_output=True, text=True)
 
         if result.returncode != 0:
             logger.error("Failed to check GCP authentication")
@@ -272,9 +268,7 @@ async def main():
     parser.add_argument("--config", action="store_true", help="Discover configuration")
     parser.add_argument("--cleanup", action="store_true", help="Clean up artifacts")
     parser.add_argument("--apply", action="store_true", help="Apply cleanup")
-    parser.add_argument(
-        "--integration", action="store_true", help="Set up MCP integration"
-    )
+    parser.add_argument("--integration", action="store_true", help="Set up MCP integration")
     parser.add_argument("--gcp", action="store_true", help="Set up GCP integration")
     parser.add_argument("--all", action="store_true", help="Run all operations")
     parser.add_argument("--output", help="Output file for results")

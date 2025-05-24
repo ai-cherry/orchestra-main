@@ -183,17 +183,11 @@ class QueryClassifier:
                 logger.info(f"Vertex AI endpoint initialized: {endpoint_name}")
             else:
                 # Use foundation model for classification
-                self.vertex_ai_client = aiplatform.TextEmbeddingModel.from_pretrained(
-                    "textembedding-gecko@latest"
-                )
-                logger.info(
-                    "Vertex AI foundation model initialized for query classification"
-                )
+                self.vertex_ai_client = aiplatform.TextEmbeddingModel.from_pretrained("textembedding-gecko@latest")
+                logger.info("Vertex AI foundation model initialized for query classification")
 
         except ImportError:
-            logger.warning(
-                "google-cloud-aiplatform package not installed. Falling back to rule-based classification."
-            )
+            logger.warning("google-cloud-aiplatform package not installed. Falling back to rule-based classification.")
             self.use_vertex_ai = False
         except Exception as e:
             logger.error(f"Failed to initialize Vertex AI: {e}")
@@ -265,23 +259,15 @@ class QueryClassifier:
             # Call Vertex AI endpoint
             if hasattr(self.vertex_ai_client, "predict"):
                 # Using custom endpoint
-                response = await self.vertex_ai_client.predict_async(
-                    instances=[{"prompt": prompt}]
-                )
+                response = await self.vertex_ai_client.predict_async(instances=[{"prompt": prompt}])
 
                 # Parse response based on expected format
                 # Note: This would need to be adjusted based on the actual model output format
                 prediction = response[0]
                 scores = {
-                    QueryType.FACTUAL.value: prediction.get("scores", {}).get(
-                        "FACTUAL", 0.0
-                    ),
-                    QueryType.CONCEPTUAL.value: prediction.get("scores", {}).get(
-                        "CONCEPTUAL", 0.0
-                    ),
-                    QueryType.CONVERSATIONAL.value: prediction.get("scores", {}).get(
-                        "CONVERSATIONAL", 0.0
-                    ),
+                    QueryType.FACTUAL.value: prediction.get("scores", {}).get("FACTUAL", 0.0),
+                    QueryType.CONCEPTUAL.value: prediction.get("scores", {}).get("CONCEPTUAL", 0.0),
+                    QueryType.CONVERSATIONAL.value: prediction.get("scores", {}).get("CONVERSATIONAL", 0.0),
                     QueryType.UNKNOWN.value: 0.0,
                 }
 
@@ -325,10 +311,8 @@ class QueryClassifier:
 
         # Calculate scores for each type
         scores = {
-            QueryType.FACTUAL.value: features.factual_indicators * 0.2
-            + features.question_words * 0.1,
-            QueryType.CONCEPTUAL.value: features.conceptual_indicators * 0.2
-            + (features.has_technical_terms * 0.2),
+            QueryType.FACTUAL.value: features.factual_indicators * 0.2 + features.question_words * 0.1,
+            QueryType.CONCEPTUAL.value: features.conceptual_indicators * 0.2 + (features.has_technical_terms * 0.2),
             QueryType.CONVERSATIONAL.value: features.conversational_indicators * 0.2
             + features.greeting_terms * 0.2
             + (features.has_personal_pronouns * 0.1),
@@ -371,28 +355,18 @@ class QueryClassifier:
         query_lower = query.lower()
 
         # Basic features
-        features = QueryFeatures(
-            query_length=len(query), contains_question_mark="?" in query
-        )
+        features = QueryFeatures(query_length=len(query), contains_question_mark="?" in query)
 
         # Count indicator terms
-        features.factual_indicators = sum(
-            1 for indicator in self.factual_indicators if indicator in query_lower
-        )
-        features.conceptual_indicators = sum(
-            1 for indicator in self.conceptual_indicators if indicator in query_lower
-        )
+        features.factual_indicators = sum(1 for indicator in self.factual_indicators if indicator in query_lower)
+        features.conceptual_indicators = sum(1 for indicator in self.conceptual_indicators if indicator in query_lower)
         features.conversational_indicators = sum(
-            1
-            for indicator in self.conversational_indicators
-            if indicator in query_lower
+            1 for indicator in self.conversational_indicators if indicator in query_lower
         )
 
         # Count question words
         question_words = ["what", "who", "when", "where", "why", "how"]
-        features.question_words = sum(
-            1 for word in question_words if word in query_lower.split()
-        )
+        features.question_words = sum(1 for word in question_words if word in query_lower.split())
 
         # Count greeting terms
         greeting_terms = [
@@ -403,9 +377,7 @@ class QueryClassifier:
             "good afternoon",
             "good evening",
         ]
-        features.greeting_terms = sum(
-            1 for term in greeting_terms if term in query_lower
-        )
+        features.greeting_terms = sum(1 for term in greeting_terms if term in query_lower)
 
         # Check for personal pronouns
         personal_pronouns = [
@@ -420,9 +392,7 @@ class QueryClassifier:
             "us",
             "our",
         ]
-        features.has_personal_pronouns = any(
-            pronoun in query_lower.split() for pronoun in personal_pronouns
-        )
+        features.has_personal_pronouns = any(pronoun in query_lower.split() for pronoun in personal_pronouns)
 
         # Simple check for technical terms (could be enhanced with a domain-specific vocabulary)
         technical_indicators = [
@@ -435,8 +405,6 @@ class QueryClassifier:
             "protocol",
             "architecture",
         ]
-        features.has_technical_terms = any(
-            term in query_lower for term in technical_indicators
-        )
+        features.has_technical_terms = any(term in query_lower for term in technical_indicators)
 
         return features

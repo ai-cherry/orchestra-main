@@ -33,16 +33,12 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 try:
     from python.gcp_secret_client import SecretClient, SecretAccessError
 except ImportError:
-    print(
-        "Cannot import SecretClient. Make sure the library is installed or in the path."
-    )
+    print("Cannot import SecretClient. Make sure the library is installed or in the path.")
     print("You can install it with: pip install -e ../../python")
     sys.exit(1)
 
 
-def get_secrets(
-    client: SecretClient, secret_ids: List[str], project_id: Optional[str] = None
-) -> Dict[str, str]:
+def get_secrets(client: SecretClient, secret_ids: List[str], project_id: Optional[str] = None) -> Dict[str, str]:
     """
     Retrieve multiple secrets from Secret Manager.
 
@@ -156,18 +152,11 @@ def update_devcontainer_json(
     if "settings" not in devcontainer["customizations"]["vscode"]:
         devcontainer["customizations"]["vscode"]["settings"] = {}
 
-    if (
-        "terminal.integrated.env.linux"
-        not in devcontainer["customizations"]["vscode"]["settings"]
-    ):
-        devcontainer["customizations"]["vscode"]["settings"][
-            "terminal.integrated.env.linux"
-        ] = {}
+    if "terminal.integrated.env.linux" not in devcontainer["customizations"]["vscode"]["settings"]:
+        devcontainer["customizations"]["vscode"]["settings"]["terminal.integrated.env.linux"] = {}
 
     # Add the secrets to the terminal environment
-    terminal_env = devcontainer["customizations"]["vscode"]["settings"][
-        "terminal.integrated.env.linux"
-    ]
+    terminal_env = devcontainer["customizations"]["vscode"]["settings"]["terminal.integrated.env.linux"]
     for secret_id, value in secrets.items():
         terminal_env[secret_id] = value
 
@@ -182,14 +171,10 @@ def update_devcontainer_json(
     with open(devcontainer_path, "w") as f:
         json.dump(devcontainer, f, indent=4)
 
-    print(
-        f"Updated {devcontainer_path} with {len(secrets)} secret environment variables"
-    )
+    print(f"Updated {devcontainer_path} with {len(secrets)} secret environment variables")
     print("WARNING: The devcontainer.json now contains sensitive values.")
     print("Ensure this file is not committed to version control.")
-    print(
-        "Consider using a template and generating the final version only for local use."
-    )
+    print("Consider using a template and generating the final version only for local use.")
 
 
 def docker_build_with_secrets(
@@ -231,9 +216,7 @@ def docker_build_with_secrets(
     result = subprocess.run(cmd, shell=True)
 
     if result.returncode != 0:
-        print(
-            f"Docker build failed with exit code {result.returncode}", file=sys.stderr
-        )
+        print(f"Docker build failed with exit code {result.returncode}", file=sys.stderr)
         sys.exit(result.returncode)
     else:
         print(f"Docker build completed successfully with tag {tag}")
@@ -241,43 +224,27 @@ def docker_build_with_secrets(
 
 def parse_args():
     """Parse command line arguments."""
-    parser = argparse.ArgumentParser(
-        description="Integrate GCP Secret Manager with Docker builds and devcontainers"
-    )
+    parser = argparse.ArgumentParser(description="Integrate GCP Secret Manager with Docker builds and devcontainers")
 
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
 
     # Command: build-args
-    build_args_parser = subparsers.add_parser(
-        "build-args", help="Generate Docker build arguments"
-    )
+    build_args_parser = subparsers.add_parser("build-args", help="Generate Docker build arguments")
     build_args_parser.add_argument("--project-id", required=True, help="GCP Project ID")
-    build_args_parser.add_argument(
-        "--secrets", required=True, help="Comma-separated list of secret IDs"
-    )
+    build_args_parser.add_argument("--secrets", required=True, help="Comma-separated list of secret IDs")
 
     # Command: env-file
-    env_file_parser = subparsers.add_parser(
-        "env-file", help="Generate environment file for Docker Compose"
-    )
+    env_file_parser = subparsers.add_parser("env-file", help="Generate environment file for Docker Compose")
     env_file_parser.add_argument("--project-id", required=True, help="GCP Project ID")
-    env_file_parser.add_argument(
-        "--secrets", required=True, help="Comma-separated list of secret IDs"
-    )
-    env_file_parser.add_argument(
-        "--output", default=".env.build", help="Output file path"
-    )
+    env_file_parser.add_argument("--secrets", required=True, help="Comma-separated list of secret IDs")
+    env_file_parser.add_argument("--output", default=".env.build", help="Output file path")
 
     # Command: update-devcontainer
     devcontainer_parser = subparsers.add_parser(
         "update-devcontainer", help="Update devcontainer.json with secret values"
     )
-    devcontainer_parser.add_argument(
-        "--project-id", required=True, help="GCP Project ID"
-    )
-    devcontainer_parser.add_argument(
-        "--secrets", required=True, help="Comma-separated list of secret IDs"
-    )
+    devcontainer_parser.add_argument("--project-id", required=True, help="GCP Project ID")
+    devcontainer_parser.add_argument("--secrets", required=True, help="Comma-separated list of secret IDs")
     devcontainer_parser.add_argument(
         "--devcontainer-path",
         default=".devcontainer/devcontainer.json",
@@ -285,24 +252,12 @@ def parse_args():
     )
 
     # Command: docker-build
-    docker_build_parser = subparsers.add_parser(
-        "docker-build", help="Run docker build with secrets as build args"
-    )
-    docker_build_parser.add_argument(
-        "--project-id", required=True, help="GCP Project ID"
-    )
-    docker_build_parser.add_argument(
-        "--secrets", required=True, help="Comma-separated list of secret IDs"
-    )
-    docker_build_parser.add_argument(
-        "--dockerfile", default="Dockerfile", help="Path to Dockerfile"
-    )
-    docker_build_parser.add_argument(
-        "--tag", required=True, help="Tag for the built image"
-    )
-    docker_build_parser.add_argument(
-        "--extra-args", help="Additional arguments for docker build"
-    )
+    docker_build_parser = subparsers.add_parser("docker-build", help="Run docker build with secrets as build args")
+    docker_build_parser.add_argument("--project-id", required=True, help="GCP Project ID")
+    docker_build_parser.add_argument("--secrets", required=True, help="Comma-separated list of secret IDs")
+    docker_build_parser.add_argument("--dockerfile", default="Dockerfile", help="Path to Dockerfile")
+    docker_build_parser.add_argument("--tag", required=True, help="Tag for the built image")
+    docker_build_parser.add_argument("--extra-args", help="Additional arguments for docker build")
 
     return parser.parse_args()
 

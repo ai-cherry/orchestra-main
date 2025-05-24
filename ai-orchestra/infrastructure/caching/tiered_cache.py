@@ -269,9 +269,7 @@ class RedisCache(Generic[T]):
             )
 
             # Get a Redis client optimized for caching
-            self._redis_client = await get_optimized_redis_client(
-                pool_type=PoolType.CACHE
-            )
+            self._redis_client = await get_optimized_redis_client(pool_type=PoolType.CACHE)
 
         return self._redis_client
 
@@ -582,9 +580,7 @@ class TieredCache(Generic[T]):
 
         # Calculate overall stats
         total_requests = self.l1_hits + self.l2_hits + self.misses
-        hit_rate = (
-            (self.l1_hits + self.l2_hits) / total_requests if total_requests > 0 else 0
-        )
+        hit_rate = (self.l1_hits + self.l2_hits) / total_requests if total_requests > 0 else 0
         l1_hit_rate = self.l1_hits / total_requests if total_requests > 0 else 0
         l2_hit_rate = self.l2_hits / total_requests if total_requests > 0 else 0
 
@@ -605,9 +601,7 @@ class TieredCache(Generic[T]):
 # Utility functions for caching
 
 
-def generate_cache_key(
-    prefix: str, args: tuple, kwargs: Dict[str, Any], namespace: Optional[str] = None
-) -> str:
+def generate_cache_key(prefix: str, args: tuple, kwargs: Dict[str, Any], namespace: Optional[str] = None) -> str:
     """
     Generate a cache key from function arguments.
 
@@ -799,9 +793,7 @@ class ModelCache(Generic[T]):
             l1_ttl_seconds: L1 cache TTL in seconds
             l2_ttl_seconds: L2 cache TTL in seconds
         """
-        await self.cache.set(
-            key, value, l1_ttl_seconds=l1_ttl_seconds, l2_ttl_seconds=l2_ttl_seconds
-        )
+        await self.cache.set(key, value, l1_ttl_seconds=l1_ttl_seconds, l2_ttl_seconds=l2_ttl_seconds)
 
     async def delete(self, key: str) -> bool:
         """

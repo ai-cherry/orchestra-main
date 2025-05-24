@@ -97,22 +97,16 @@ def load_persona_configs(force_refresh: bool = False) -> Dict[str, PersonaConfig
         with open(config_path, "r") as file:
             yaml_data = yaml.safe_load(file)
     except FileNotFoundError:
-        logger.warning(
-            f"Personas configuration file not found at: {config_path}. Using default configuration."
-        )
+        logger.warning(f"Personas configuration file not found at: {config_path}. Using default configuration.")
         return create_default_persona_configs()
     except yaml.YAMLError as e:
-        logger.warning(
-            f"Error parsing personas YAML file: {str(e)}. Using default configuration."
-        )
+        logger.warning(f"Error parsing personas YAML file: {str(e)}. Using default configuration.")
         return create_default_persona_configs()
 
     # Process the persona configurations
     persona_configs = {}
     if not yaml_data:
-        logger.warning(
-            "Invalid personas.yaml: file is empty or malformed. Using default configuration."
-        )
+        logger.warning("Invalid personas.yaml: file is empty or malformed. Using default configuration.")
         return create_default_persona_configs()
 
     # Validate all personas at once to catch any issues
@@ -126,10 +120,7 @@ def load_persona_configs(force_refresh: bool = False) -> Dict[str, PersonaConfig
                 config_data["traits"] = {}
 
             # Map base_prompt_template to prompt_template if needed
-            if (
-                "base_prompt_template" in config_data
-                and "prompt_template" not in config_data
-            ):
+            if "base_prompt_template" in config_data and "prompt_template" not in config_data:
                 config_data["prompt_template"] = config_data.pop("base_prompt_template")
 
             # Validate without creating the object yet
@@ -147,9 +138,7 @@ def load_persona_configs(force_refresh: bool = False) -> Dict[str, PersonaConfig
 
         # If all personas are invalid, use defaults
         if len(validation_errors) == len(yaml_data):
-            logger.error(
-                "All persona configurations are invalid. Using default configurations."
-            )
+            logger.error("All persona configurations are invalid. Using default configurations.")
             return create_default_persona_configs()
 
     # Second pass: Create valid persona configs
@@ -160,10 +149,7 @@ def load_persona_configs(force_refresh: bool = False) -> Dict[str, PersonaConfig
                 config_data["traits"] = {}
 
             # Map base_prompt_template to prompt_template if needed
-            if (
-                "base_prompt_template" in config_data
-                and "prompt_template" not in config_data
-            ):
+            if "base_prompt_template" in config_data and "prompt_template" not in config_data:
                 config_data["prompt_template"] = config_data.pop("base_prompt_template")
 
             # Create PersonaConfig object
@@ -175,16 +161,12 @@ def load_persona_configs(force_refresh: bool = False) -> Dict[str, PersonaConfig
 
     # Ensure we have at least one valid persona, otherwise use defaults
     if not persona_configs:
-        logger.warning(
-            "No valid persona configurations found. Using default configurations."
-        )
+        logger.warning("No valid persona configurations found. Using default configurations.")
         return create_default_persona_configs()
 
     # Ensure that "cherry" exists as a fallback option
     if "cherry" not in persona_configs:
-        logger.warning(
-            "Default 'cherry' persona not found in configuration. Adding fallback cherry persona."
-        )
+        logger.warning("Default 'cherry' persona not found in configuration. Adding fallback cherry persona.")
         # Extract just the cherry persona from defaults
         default_personas = create_default_persona_configs()
         persona_configs["cherry"] = default_personas["cherry"]

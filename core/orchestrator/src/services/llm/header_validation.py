@@ -9,9 +9,9 @@ It helps prevent hard-to-diagnose errors when calling provider APIs.
 Usage:
     from fastapi import FastAPI, Request
     from core.orchestrator.src.services.llm.header_validation import validate_provider_headers
-    
+
     app = FastAPI()
-    
+
     @app.middleware("http")
     async def validate_headers_middleware(request: Request, call_next):
         # Validate headers based on provider in the URL or path parameters
@@ -44,9 +44,7 @@ MODEL_PROVIDER_MAP = {
 }
 
 
-def validate_provider_headers(
-    headers: Mapping[str, str], provider: str, strict: bool = False
-) -> bool:
+def validate_provider_headers(headers: Mapping[str, str], provider: str, strict: bool = False) -> bool:
     """
     Validate that all required headers for a given provider are present.
 
@@ -74,9 +72,7 @@ def validate_provider_headers(
     normalized_headers = {k.lower(): v for k, v in headers.items()}
 
     # Check if all required headers are present
-    missing_headers = [
-        h for h in required_headers if h.lower() not in normalized_headers
-    ]
+    missing_headers = [h for h in required_headers if h.lower() not in normalized_headers]
 
     if missing_headers:
         missing_str = ", ".join(missing_headers)

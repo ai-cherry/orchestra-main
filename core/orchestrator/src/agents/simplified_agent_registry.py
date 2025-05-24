@@ -91,9 +91,7 @@ class SimplifiedAgentRegistry:
             self._default_agent_type = agent_type
             logger.info(f"Set default agent type: {agent_type}")
         else:
-            logger.warning(
-                f"Unknown agent type '{agent_type}' cannot be set as default"
-            )
+            logger.warning(f"Unknown agent type '{agent_type}' cannot be set as default")
 
     def get_agent(self, agent_type: Optional[str] = None) -> Agent:
         """
@@ -160,9 +158,7 @@ class SimplifiedAgentRegistry:
             try:
                 return self.get_agent(requested_agent)
             except KeyError:
-                logger.warning(
-                    f"Requested agent '{requested_agent}' not found, using selection logic"
-                )
+                logger.warning(f"Requested agent '{requested_agent}' not found, using selection logic")
 
         # Simple keyword-based selection
         user_input = context.user_input.lower()
@@ -175,9 +171,7 @@ class SimplifiedAgentRegistry:
                     return self.get_agent(agent_type)
 
         # Check for question answering
-        if "?" in user_input or any(
-            kw in user_input for kw in ["what", "how", "why", "when", "where"]
-        ):
+        if "?" in user_input or any(kw in user_input for kw in ["what", "how", "why", "when", "where"]):
             for agent_type, capabilities in self._capabilities.items():
                 if AgentCapability.QUESTION_ANSWERING in capabilities:
                     logger.info(f"Selected agent {agent_type} for question answering")

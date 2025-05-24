@@ -62,9 +62,7 @@ class MessageQueue:
 
         # Publish to event bus for monitoring/logging
         try:
-            await self._event_bus.publish_async(
-                "agent_message_sent", {"message": message.dict()}
-            )
+            await self._event_bus.publish_async("agent_message_sent", {"message": message.dict()})
         except Exception as e:
             logger.warning(f"Failed to publish agent_message_sent event: {e}")
 
@@ -73,9 +71,7 @@ class MessageQueue:
             if message.recipient_id not in self._queues:
                 self._queues[message.recipient_id] = asyncio.Queue()
             await self._queues[message.recipient_id].put(message)
-            logger.debug(
-                f"Message {message.message_id} queued for {message.recipient_id}"
-            )
+            logger.debug(f"Message {message.message_id} queued for {message.recipient_id}")
         else:
             # Broadcast to all registered handlers
             broadcast_count = 0
@@ -85,22 +81,16 @@ class MessageQueue:
                         await handler(message)
                         broadcast_count += 1
                     except Exception as e:
-                        logger.error(
-                            f"Error in broadcast handler for agent {agent_id}: {e}"
-                        )
+                        logger.error(f"Error in broadcast handler for agent {agent_id}: {e}")
                         await self._event_bus.publish_async(
                             "agent_message_error",
                             {"message_id": message.message_id, "error": str(e)},
                         )
-            logger.debug(
-                f"Message {message.message_id} broadcast to {broadcast_count} handlers"
-            )
+            logger.debug(f"Message {message.message_id} broadcast to {broadcast_count} handlers")
 
         return message.message_id
 
-    async def receive_message(
-        self, agent_id: str, timeout: Optional[float] = None
-    ) -> Optional[AgentMessage]:
+    async def receive_message(self, agent_id: str, timeout: Optional[float] = None) -> Optional[AgentMessage]:
         """
         Receive a message for a specific agent.
 
@@ -130,9 +120,7 @@ class MessageQueue:
         except asyncio.TimeoutError:
             return None
 
-    def register_handler(
-        self, agent_id: str, handler: Callable[[AgentMessage], Awaitable[None]]
-    ):
+    def register_handler(self, agent_id: str, handler: Callable[[AgentMessage], Awaitable[None]]):
         """
         Register a message handler for an agent.
 
@@ -145,9 +133,7 @@ class MessageQueue:
         self._handlers[agent_id].append(handler)
         logger.debug(f"Handler registered for agent {agent_id}")
 
-    def unregister_handler(
-        self, agent_id: str, handler: Callable[[AgentMessage], Awaitable[None]]
-    ) -> bool:
+    def unregister_handler(self, agent_id: str, handler: Callable[[AgentMessage], Awaitable[None]]) -> bool:
         """
         Unregister a message handler.
 
@@ -167,9 +153,7 @@ class MessageQueue:
                 return False
         return False
 
-    async def request_response(
-        self, request: AgentMessage, timeout: float = 30.0
-    ) -> Optional[AgentMessage]:
+    async def request_response(self, request: AgentMessage, timeout: float = 30.0) -> Optional[AgentMessage]:
         """
         Send a request and wait for a response.
 
@@ -194,10 +178,7 @@ class MessageQueue:
 
         # Define a handler for the response
         async def response_handler(message: AgentMessage):
-            if (
-                message.correlation_id == request.message_id
-                or message.correlation_id == request.correlation_id
-            ):
+            if message.correlation_id == request.message_id or message.correlation_id == request.correlation_id:
                 response_future.set_result(message)
 
         # Register temporary handler

@@ -83,9 +83,7 @@ class DocumentProcessor:
         # Check file size
         file_size = os.path.getsize(file_path)
         if file_size > self.max_file_size:
-            raise ValueError(
-                f"File size ({file_size} bytes) exceeds maximum allowed size ({self.max_file_size} bytes)"
-            )
+            raise ValueError(f"File size ({file_size} bytes) exceeds maximum allowed size ({self.max_file_size} bytes)")
 
         # Generate document ID if not provided
         if not document_id:
@@ -245,10 +243,7 @@ class DocumentProcessor:
 
             return text.strip()
         except ImportError:
-            raise TextExtractionError(
-                "DOCX extraction requires python-docx. "
-                "Install with: pip install python-docx"
-            )
+            raise TextExtractionError("DOCX extraction requires python-docx. " "Install with: pip install python-docx")
 
     async def _extract_from_json(self, file_path: str) -> str:
         """Extract text from a JSON file."""
@@ -289,8 +284,7 @@ class DocumentProcessor:
                 return soup.get_text(separator="\n", strip=True)
         except ImportError:
             raise TextExtractionError(
-                "HTML extraction requires beautifulsoup4. "
-                "Install with: pip install beautifulsoup4"
+                "HTML extraction requires beautifulsoup4. " "Install with: pip install beautifulsoup4"
             )
 
     def _get_file_metadata(self, file_path: str, file_type: str) -> Dict[str, Any]:
@@ -516,9 +510,7 @@ class DocumentProcessor:
 
         return chunks
 
-    async def _chunk_by_semantic(
-        self, text: str, document_id: str
-    ) -> List[Dict[str, Any]]:
+    async def _chunk_by_semantic(self, text: str, document_id: str) -> List[Dict[str, Any]]:
         """
         Split content by semantic boundaries using AI.
 
@@ -531,9 +523,7 @@ class DocumentProcessor:
         """
         # Check if AI service is available
         if not self.ai_service:
-            logger.warning(
-                "AI service not available for semantic chunking, falling back to paragraph chunking"
-            )
+            logger.warning("AI service not available for semantic chunking, falling back to paragraph chunking")
             return self._chunk_by_paragraph(text, document_id)
 
         try:
@@ -557,9 +547,7 @@ class DocumentProcessor:
             """
 
             # Generate chunks using AI
-            semantic_chunks_text = await self.ai_service.generate_text(
-                prompt=prompt, max_tokens=4096, temperature=0.2
-            )
+            semantic_chunks_text = await self.ai_service.generate_text(prompt=prompt, max_tokens=4096, temperature=0.2)
 
             # Parse JSON response
             try:
@@ -592,9 +580,7 @@ class DocumentProcessor:
             logger.error(f"Semantic chunking failed: {e}")
             return self._chunk_by_paragraph(text, document_id)
 
-    async def _chunk_by_hybrid(
-        self, text: str, document_id: str
-    ) -> List[Dict[str, Any]]:
+    async def _chunk_by_hybrid(self, text: str, document_id: str) -> List[Dict[str, Any]]:
         """
         Split content using a hybrid of multiple strategies.
 

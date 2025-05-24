@@ -168,9 +168,7 @@ class ToolNotEnabledError(ToolError):
     """Exception raised when a tool is not enabled."""
 
     def __init__(self, tool: str):
-        super().__init__(
-            f"Tool not enabled: {tool}", "TOOL_NOT_ENABLED", {"tool": tool}
-        )
+        super().__init__(f"Tool not enabled: {tool}", "TOOL_NOT_ENABLED", {"tool": tool})
 
 
 class ToolExecutionError(ToolError):
@@ -195,9 +193,7 @@ class ToolNotImplementedError(ToolError):
     """Exception raised when a tool is not implemented."""
 
     def __init__(self, tool: str):
-        super().__init__(
-            f"Tool not implemented: {tool}", "TOOL_NOT_IMPLEMENTED", {"tool": tool}
-        )
+        super().__init__(f"Tool not implemented: {tool}", "TOOL_NOT_IMPLEMENTED", {"tool": tool})
 
 
 # Workflow Manager Exceptions
@@ -227,9 +223,7 @@ class WorkflowNotFoundError(WorkflowError):
 class WorkflowExecutionError(WorkflowError):
     """Exception raised when a workflow execution fails."""
 
-    def __init__(
-        self, workflow_id: str, step: Optional[int] = None, reason: Optional[str] = None
-    ):
+    def __init__(self, workflow_id: str, step: Optional[int] = None, reason: Optional[str] = None):
         details = {
             "workflow_id": workflow_id,
         }
@@ -305,9 +299,7 @@ class ConfigFileError(ConfigError):
         if reason:
             details["reason"] = reason
 
-        super().__init__(
-            f"Failed to load configuration file: {path}", "CONFIG_FILE_ERROR", details
-        )
+        super().__init__(f"Failed to load configuration file: {path}", "CONFIG_FILE_ERROR", details)
 
 
 class ConfigValidationError(ConfigError):

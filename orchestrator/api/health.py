@@ -1,6 +1,7 @@
 """
 Health check and system status endpoints.
 """
+
 from fastapi import APIRouter, Depends
 
 router = APIRouter(tags=["health"])

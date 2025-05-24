@@ -30,26 +30,27 @@ def get_llm_client() -> Any:  # Return type could be LLMClient or an Agno model
         An initialized LLM client or model
     """
     settings = get_settings()
-    
+
     # Check if we should use monitored LiteLLM client
     use_monitored_litellm = os.environ.get("USE_MONITORED_LITELLM", "").lower() in ("true", "1", "yes")
-    
+
     if use_monitored_litellm:
         logger.info("Using MonitoredLiteLLMClient for Claude API monitoring")
         try:
             from core.monitoring.monitored_litellm_client import MonitoredLiteLLMClient
+
             return MonitoredLiteLLMClient(
                 monitor_all_models=False,  # Only monitor Claude models
                 api_key_anthropic=os.environ.get("ANTHROPIC_API_KEY"),
                 api_key_openai=os.environ.get("OPENAI_API_KEY"),
                 api_key_google=os.environ.get("GEMINI_API_KEY"),
                 vertex_project=settings.gcp_project_id,
-                vertex_location=settings.gcp_region
+                vertex_location=settings.gcp_region,
             )
         except Exception as e:
             logger.error(f"Failed to initialize MonitoredLiteLLMClient: {e}")
             # Fall through to other options
-    
+
     use_phidata_models = use_phidata_implementation(settings)
 
     if use_phidata_models:

@@ -460,8 +460,7 @@ def with_retry(
                     actual_backoff = backoff * (1 + random.uniform(-jitter, jitter))
 
                     logger.warning(
-                        f"Attempt {attempt} failed for {func.__name__}, "
-                        f"retrying in {actual_backoff:.2f}s: {str(e)}"
+                        f"Attempt {attempt} failed for {func.__name__}, " f"retrying in {actual_backoff:.2f}s: {str(e)}"
                     )
 
                     # Wait before retrying
@@ -538,8 +537,7 @@ async def with_async_retry(
                     actual_backoff = backoff * (1 + random.uniform(-jitter, jitter))
 
                     logger.warning(
-                        f"Attempt {attempt} failed for {func.__name__}, "
-                        f"retrying in {actual_backoff:.2f}s: {str(e)}"
+                        f"Attempt {attempt} failed for {func.__name__}, " f"retrying in {actual_backoff:.2f}s: {str(e)}"
                     )
 
                     # Wait before retrying
@@ -662,9 +660,7 @@ def example_with_context_manager() -> None:
             raise KeyError("Item must have an ID")
 
     try:
-        with error_context(
-            DataProcessingError, "Error processing item", details={"item_id": 123}
-        ):
+        with error_context(DataProcessingError, "Error processing item", details={"item_id": 123}):
             process_item({})  # This will raise DataProcessingError
     except DataProcessingError as e:
         print(f"Caught error: {e}")

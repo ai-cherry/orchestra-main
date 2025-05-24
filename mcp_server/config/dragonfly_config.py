@@ -33,7 +33,7 @@ except ImportError:
     DRAGONFLY_PASSWORD = os.getenv("DRAGONFLY_PASSWORD")
     DRAGONFLY_DB_INDEX = int(os.getenv("DRAGONFLY_DB_INDEX", "0"))
     DRAGONFLY_CONNECTION_URI = os.getenv("DRAGONFLY_CONNECTION_URI")
-    
+
     def log_dragonfly_config():
         print("[DragonflyDB config loaded from: env]")
         print(f"  HOST: {'set' if DRAGONFLY_HOST else 'MISSING'}")
@@ -46,7 +46,7 @@ except ImportError:
 def get_dragonfly_config() -> Dict[str, Any]:
     """
     Get DragonflyDB configuration for Redis client.
-    
+
     Returns:
         Dict containing Redis client configuration optimized for DragonflyDB
     """
@@ -57,7 +57,7 @@ def get_dragonfly_config() -> Dict[str, Any]:
         # Build connection URL
         auth_part = f":{DRAGONFLY_PASSWORD}@" if DRAGONFLY_PASSWORD else ""
         redis_url = f"redis://{auth_part}{DRAGONFLY_HOST}:{DRAGONFLY_PORT}/{DRAGONFLY_DB_INDEX}"
-    
+
     config = {
         # Connection settings
         "redis_url": redis_url,
@@ -65,10 +65,9 @@ def get_dragonfly_config() -> Dict[str, Any]:
         "port": DRAGONFLY_PORT,
         "password": DRAGONFLY_PASSWORD,
         "db": DRAGONFLY_DB_INDEX,
-        
         # Connection pool settings optimized for DragonflyDB
         "max_connections": 200,  # High connection pool for performance
-        "min_connections": 10,   # Maintain minimum connections
+        "min_connections": 10,  # Maintain minimum connections
         "connection_pool_kwargs": {
             "max_connections": 200,
             "socket_timeout": 5.0,
@@ -79,34 +78,29 @@ def get_dragonfly_config() -> Dict[str, Any]:
             "retry_on_error": [ConnectionError, TimeoutError],
             "health_check_interval": 30,
         },
-        
         # DragonflyDB specific settings
         "decode_responses": True,
         "encoding": "utf-8",
         "encoding_errors": "strict",
-        
         # Performance settings
         "single_connection_client": False,  # Use connection pooling
         "connection_pool_class": "redis.asyncio.BlockingConnectionPool",
-        
         # Memory settings for DragonflyDB
         "maxmemory_policy": "allkeys-lru",
         "maxmemory_samples": 10,  # Higher sampling for better LRU accuracy
-        
         # Persistence settings (DragonflyDB handles this internally)
         "save": "",  # Disable Redis save, DragonflyDB has its own persistence
-        
         # Development mode support
         "is_dev_mode": DRAGONFLY_DB_INDEX == 1,
     }
-    
+
     return config
 
 
 def get_dragonfly_pool_config() -> Dict[str, Any]:
     """
     Get optimized connection pool configuration for DragonflyDB.
-    
+
     Returns:
         Dict containing connection pool settings
     """
@@ -125,25 +119,25 @@ def get_dragonfly_pool_config() -> Dict[str, Any]:
 def validate_dragonfly_config() -> bool:
     """
     Validate that required DragonflyDB configuration is present.
-    
+
     Returns:
         bool: True if configuration is valid
     """
     if not DRAGONFLY_HOST:
         print("ERROR: DRAGONFLY_HOST is not configured")
         return False
-    
+
     if DRAGONFLY_PORT <= 0 or DRAGONFLY_PORT > 65535:
         print(f"ERROR: Invalid DRAGONFLY_PORT: {DRAGONFLY_PORT}")
         return False
-    
+
     # Password is optional but recommended
     if not DRAGONFLY_PASSWORD:
         print("WARNING: DRAGONFLY_PASSWORD is not set - connection is unprotected")
-    
+
     # Log configuration (without exposing secrets)
     log_dragonfly_config()
-    
+
     return True
 
 

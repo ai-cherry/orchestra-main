@@ -29,6 +29,7 @@ except ImportError:
 
 from pydantic import BaseModel, Field
 
+
 # --- Canonical Memory Item Model ---
 class MemoryItem(BaseModel):
     id: str = Field(..., description="Unique identifier for this memory item")
@@ -38,6 +39,7 @@ class MemoryItem(BaseModel):
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     priority: float = Field(default=0.5, description="Priority of the memory (0.0-1.0)")
     embedding: Optional[List[float]] = Field(default=None, description="Vector embedding of the memory content")
+
 
 # --- Unified Memory Abstraction ---
 class UnifiedMemory:
@@ -62,7 +64,9 @@ class UnifiedMemory:
         # --- DragonflyDB (Redis-compatible) ---
         self.dragonfly = None
         if use_dragonfly and redis:
-            self.dragonfly = redis.Redis.from_url(dragonfly_url or os.getenv("DRAGONFLY_URL", "redis://localhost:6379/0"))
+            self.dragonfly = redis.Redis.from_url(
+                dragonfly_url or os.getenv("DRAGONFLY_URL", "redis://localhost:6379/0")
+            )
 
         # --- Qdrant (Vector DB) ---
         self.qdrant = None
@@ -215,6 +219,7 @@ class UnifiedMemory:
             except Exception:
                 status["firestore"] = False
         return status
+
 
 # --- Example Usage ---
 if __name__ == "__main__":

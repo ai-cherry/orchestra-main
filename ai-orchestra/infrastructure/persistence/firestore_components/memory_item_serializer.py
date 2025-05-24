@@ -2,6 +2,7 @@
 Handles serialization and deserialization of MemoryItem objects to and from
 Firestore-compatible dictionaries.
 """
+
 import logging
 from typing import Dict, Any, Optional, List
 from datetime import datetime, timezone
@@ -9,6 +10,7 @@ from packages.shared.src.models.base_models import MemoryItem
 
 # Using a standard logger for now
 logger = logging.getLogger(__name__)
+
 
 class MemoryItemSerializer:
     """
@@ -27,7 +29,7 @@ class MemoryItemSerializer:
 
         Returns:
             A dictionary representation of the MemoryItem.
-        
+
         Raises:
             TypeError: If the memory_item is not of the expected type.
             ValueError: If essential fields are missing or invalid.
@@ -70,7 +72,7 @@ class MemoryItemSerializer:
         """
         if not isinstance(firestore_data, dict):
             raise TypeError(f"Expected dict for firestore_data, got {type(firestore_data)}")
-        
+
         # Ensure item_id is present, either passed in or from the data itself
         actual_item_id = item_id or firestore_data.get("id")
         if not actual_item_id:
@@ -94,12 +96,12 @@ class MemoryItemSerializer:
             "priority": firestore_data.get("priority", 0.5),
             "embedding": firestore_data.get("embedding"),
         }
-        
+
         try:
             item = MemoryItem(**memory_item_data)
             logger.debug(f"Deserialized Firestore dict to MemoryItem '{actual_item_id}'.")
             return item
-        except Exception as e: # Catch Pydantic validation errors or others
+        except Exception as e:  # Catch Pydantic validation errors or others
             logger.error(f"Error deserializing MemoryItem '{actual_item_id}': {e}", exc_info=True)
             raise ValueError(f"Malformed data for MemoryItem '{actual_item_id}': {e}") from e
 
@@ -125,7 +127,7 @@ class MemoryItemSerializer:
         """Ensures a datetime object is timezone-aware and in UTC."""
         if not isinstance(dt, datetime):
             logger.warning(f"_ensure_utc expected datetime, got {type(dt)}. Returning as is.")
-            return dt # Or raise TypeError
+            return dt  # Or raise TypeError
         if dt.tzinfo is None:
             return dt.replace(tzinfo=timezone.utc)
         return dt.astimezone(timezone.utc)
@@ -146,13 +148,13 @@ class MemoryItemSerializer:
             except ValueError:
                 logger.warning(f"Could not parse date string '{value}' to datetime.")
                 return None
-        
+
         # Handle direct google.cloud.firestore.SERVER_TIMESTAMP (though client usually converts)
         # This check is a bit indirect as SERVER_TIMESTAMP is a sentinel object.
-        if hasattr(value, '__class__') and 'SERVER_TIMESTAMP' in str(value.__class__):
-             logger.debug("Encountered Firestore SERVER_TIMESTAMP. Will be set by server.")
-             return None # Or a placeholder indicating server will set it
-        
+        if hasattr(value, "__class__") and "SERVER_TIMESTAMP" in str(value.__class__):
+            logger.debug("Encountered Firestore SERVER_TIMESTAMP. Will be set by server.")
+            return None  # Or a placeholder indicating server will set it
+
         if value is not None:
             logger.warning(f"Unsupported type for datetime conversion: {type(value)}. Value: {value}")
         return None

@@ -2,7 +2,7 @@
 Circuit Breaker Implementation for LLM Providers
 ------------------------------------------------
 
-This module implements the circuit breaker pattern to prevent cascading failures 
+This module implements the circuit breaker pattern to prevent cascading failures
 when using multiple LLM providers. It tracks failures per provider and temporarily
 disables providers that exceed a certain failure threshold, allowing the system
 to gracefully degrade and recover.
@@ -16,10 +16,10 @@ Key features:
 
 Usage:
     from core.orchestrator.src.services.llm.circuit_breaker import CircuitBreaker, ProviderCircuitOpenError
-    
+
     # Create a circuit breaker
     breaker = CircuitBreaker(max_failures=3, reset_timeout=60)
-    
+
     # Use with a provider
     try:
         result = await breaker.call_provider("openai", some_async_function, arg1, arg2)
@@ -152,17 +152,13 @@ class CircuitBreaker:
                 and provider in self.last_failure_time
                 and time.time() - self.last_failure_time[provider] > self.reset_timeout
             ):
-                logger.info(
-                    f"Circuit for {provider} transitioning from OPEN to HALF_OPEN"
-                )
+                logger.info(f"Circuit for {provider} transitioning from OPEN to HALF_OPEN")
                 self.circuit_state[provider] = CircuitState.HALF_OPEN
                 self.half_open_calls[provider] = 0
 
                 # Update prometheus metric if available
                 if PROMETHEUS_AVAILABLE:
-                    self.circuit_state_gauge.labels(provider=provider).set(
-                        1
-                    )  # 1 = half-open
+                    self.circuit_state_gauge.labels(provider=provider).set(1)  # 1 = half-open
 
             return self.circuit_state[provider]
 
@@ -175,16 +171,12 @@ class CircuitBreaker:
 
             # If we're in HALF_OPEN and succeeded, close the circuit
             if self._get_circuit_state(provider) == CircuitState.HALF_OPEN:
-                logger.info(
-                    f"Circuit for {provider} transitioning from HALF_OPEN to CLOSED after success"
-                )
+                logger.info(f"Circuit for {provider} transitioning from HALF_OPEN to CLOSED after success")
                 self.circuit_state[provider] = CircuitState.CLOSED
 
                 # Update prometheus metric if available
                 if PROMETHEUS_AVAILABLE:
-                    self.circuit_state_gauge.labels(provider=provider).set(
-                        0
-                    )  # 0 = closed
+                    self.circuit_state_gauge.labels(provider=provider).set(0)  # 0 = closed
 
     def record_failure(self, provider: str) -> None:
         """Record a failed call to a provider."""
@@ -197,37 +189,27 @@ class CircuitBreaker:
             self.failures[provider] = self.failures.get(provider, 0) + 1
             self.last_failure_time[provider] = time.time()
 
-            logger.warning(
-                f"Recorded failure for {provider} (count: {self.failures[provider]})"
-            )
+            logger.warning(f"Recorded failure for {provider} (count: {self.failures[provider]})")
 
             # Check if we need to open the circuit
             if self.failures[provider] >= self.max_failures:
                 current_state = self._get_circuit_state(provider)
 
                 if current_state == CircuitState.CLOSED:
-                    logger.warning(
-                        f"Circuit for {provider} transitioning from CLOSED to OPEN"
-                    )
+                    logger.warning(f"Circuit for {provider} transitioning from CLOSED to OPEN")
                     self.circuit_state[provider] = CircuitState.OPEN
 
                     # Update prometheus metric if available
                     if PROMETHEUS_AVAILABLE:
-                        self.circuit_state_gauge.labels(provider=provider).set(
-                            2
-                        )  # 2 = open
+                        self.circuit_state_gauge.labels(provider=provider).set(2)  # 2 = open
 
                 elif current_state == CircuitState.HALF_OPEN:
-                    logger.warning(
-                        f"Circuit for {provider} transitioning from HALF_OPEN back to OPEN after failure"
-                    )
+                    logger.warning(f"Circuit for {provider} transitioning from HALF_OPEN back to OPEN after failure")
                     self.circuit_state[provider] = CircuitState.OPEN
 
                     # Update prometheus metric if available
                     if PROMETHEUS_AVAILABLE:
-                        self.circuit_state_gauge.labels(provider=provider).set(
-                            2
-                        )  # 2 = open
+                        self.circuit_state_gauge.labels(provider=provider).set(2)  # 2 = open
 
     def _can_make_request(self, provider: str) -> bool:
         """Check if a request can be made to the provider."""
@@ -240,9 +222,7 @@ class CircuitBreaker:
             with self._lock:
                 # Only allow a limited number of test calls in half-open state
                 if self.half_open_calls.get(provider, 0) < self.half_open_max_calls:
-                    self.half_open_calls[provider] = (
-                        self.half_open_calls.get(provider, 0) + 1
-                    )
+                    self.half_open_calls[provider] = self.half_open_calls.get(provider, 0) + 1
                     return True
             return False
 
@@ -340,9 +320,7 @@ class CircuitBreaker:
                 self.record_failure(provider)
                 raise
 
-    def call_provider_sync(
-        self, provider: str, func: Callable[..., T], *args: Any, **kwargs: Any
-    ) -> T:
+    def call_provider_sync(self, provider: str, func: Callable[..., T], *args: Any, **kwargs: Any) -> T:
         """
         Call a synchronous provider function with circuit breaker protection.
 
@@ -427,9 +405,7 @@ class CircuitBreaker:
                 self.record_failure(provider)
                 raise
 
-    async def call_provider(
-        self, provider: str, func: SyncOrAsyncCallable[T], *args: Any, **kwargs: Any
-    ) -> T:
+    async def call_provider(self, provider: str, func: SyncOrAsyncCallable[T], *args: Any, **kwargs: Any) -> T:
         """
         Call a provider function (sync or async) with circuit breaker protection.
 
@@ -473,9 +449,7 @@ class CircuitBreaker:
                     self.circuit_state[provider] = CircuitState.CLOSED
                     # Update prometheus metric if available
                     if PROMETHEUS_AVAILABLE:
-                        self.circuit_state_gauge.labels(provider=provider).set(
-                            0
-                        )  # 0 = closed
+                        self.circuit_state_gauge.labels(provider=provider).set(0)  # 0 = closed
                 if provider in self.last_failure_time:
                     del self.last_failure_time[provider]
                 if provider in self.half_open_calls:
@@ -487,9 +461,7 @@ class CircuitBreaker:
                     self.circuit_state[provider] = CircuitState.CLOSED
                     # Update prometheus metric if available
                     if PROMETHEUS_AVAILABLE:
-                        self.circuit_state_gauge.labels(provider=provider).set(
-                            0
-                        )  # 0 = closed
+                        self.circuit_state_gauge.labels(provider=provider).set(0)  # 0 = closed
                 self.last_failure_time = {}
                 self.half_open_calls = {}
 
@@ -498,9 +470,7 @@ class CircuitBreaker:
 _default_circuit_breaker = None
 
 
-def get_circuit_breaker(
-    max_failures: int = 5, reset_timeout: int = 60
-) -> CircuitBreaker:
+def get_circuit_breaker(max_failures: int = 5, reset_timeout: int = 60) -> CircuitBreaker:
     """
     Get or create the default CircuitBreaker instance.
 
@@ -513,7 +483,5 @@ def get_circuit_breaker(
     """
     global _default_circuit_breaker
     if _default_circuit_breaker is None:
-        _default_circuit_breaker = CircuitBreaker(
-            max_failures=max_failures, reset_timeout=reset_timeout
-        )
+        _default_circuit_breaker = CircuitBreaker(max_failures=max_failures, reset_timeout=reset_timeout)
     return _default_circuit_breaker

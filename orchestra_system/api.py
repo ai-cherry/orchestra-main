@@ -132,9 +132,7 @@ try:
         get_client as get_mcp_client,
     )
 except ImportError:
-    logger.warning(
-        "Could not import enhanced MCP client, attempting to import basic client"
-    )
+    logger.warning("Could not import enhanced MCP client, attempting to import basic client")
     try:
         from gcp_migration.mcp_client import MCPClient, get_client as get_mcp_client
     except ImportError:
@@ -262,14 +260,10 @@ class OrchestraSystemAPI:
                 component_status["resource_registry"] = {
                     "discovered_resources": len(resources),
                     "available_resources": sum(
-                        1
-                        for status in resource_status.values()
-                        if status == ResourceStatus.AVAILABLE
+                        1 for status in resource_status.values() if status == ResourceStatus.AVAILABLE
                     ),
                     "unavailable_resources": sum(
-                        1
-                        for status in resource_status.values()
-                        if status != ResourceStatus.AVAILABLE
+                        1 for status in resource_status.values() if status != ResourceStatus.AVAILABLE
                     ),
                 }
 
@@ -278,9 +272,7 @@ class OrchestraSystemAPI:
                 logger.error(f"Failed to initialize resource registry: {e}")
                 component_status["resource_registry"] = {"error": str(e)}
         else:
-            component_status["resource_registry"] = {
-                "error": "Resource registry not available"
-            }
+            component_status["resource_registry"] = {"error": "Resource registry not available"}
 
         # Initialize configuration manager
         if self.config_manager:
@@ -299,9 +291,7 @@ class OrchestraSystemAPI:
                 logger.error(f"Failed to initialize configuration manager: {e}")
                 component_status["config_manager"] = {"error": str(e)}
         else:
-            component_status["config_manager"] = {
-                "error": "Configuration manager not available"
-            }
+            component_status["config_manager"] = {"error": "Configuration manager not available"}
 
         # Initialize conflict resolver
         if self.conflict_resolver:
@@ -310,16 +300,8 @@ class OrchestraSystemAPI:
 
                 component_status["conflict_resolver"] = {
                     "detected_conflicts": len(conflicts),
-                    "pending_conflicts": sum(
-                        1
-                        for c in conflicts
-                        if c.resolution_status == ResolutionStatus.PENDING
-                    ),
-                    "resolved_conflicts": sum(
-                        1
-                        for c in conflicts
-                        if c.resolution_status == ResolutionStatus.RESOLVED
-                    ),
+                    "pending_conflicts": sum(1 for c in conflicts if c.resolution_status == ResolutionStatus.PENDING),
+                    "resolved_conflicts": sum(1 for c in conflicts if c.resolution_status == ResolutionStatus.RESOLVED),
                 }
 
                 self.system_state["conflicts_count"] = len(conflicts)
@@ -327,9 +309,7 @@ class OrchestraSystemAPI:
                 logger.error(f"Failed to initialize conflict resolver: {e}")
                 component_status["conflict_resolver"] = {"error": str(e)}
         else:
-            component_status["conflict_resolver"] = {
-                "error": "Conflict resolver not available"
-            }
+            component_status["conflict_resolver"] = {"error": "Conflict resolver not available"}
 
         # Update system state
         self.system_state["initialization_status"] = component_status
@@ -391,9 +371,7 @@ class OrchestraSystemAPI:
             result = [r.to_dict() for r in resources]
 
             # Update system state
-            self.system_state["resources_count"] = len(
-                getattr(self.registry, "resources", {})
-            )
+            self.system_state["resources_count"] = len(getattr(self.registry, "resources", {}))
             self._save_system_state()
 
             return result
@@ -483,9 +461,7 @@ class OrchestraSystemAPI:
 
         try:
             statuses = await verify_resources()
-            return {
-                resource_id: status.value for resource_id, status in statuses.items()
-            }
+            return {resource_id: status.value for resource_id, status in statuses.items()}
         except Exception as e:
             logger.error(f"Failed to verify resources: {e}")
             return {}
@@ -569,9 +545,7 @@ class OrchestraSystemAPI:
                 source_enum = getattr(ConfigSource, source.upper())
 
             # Set configuration
-            self.config_manager.set(
-                key=key, value=value, environment=env_enum, source=source_enum
-            )
+            self.config_manager.set(key=key, value=value, environment=env_enum, source=source_enum)
 
             return True
         except Exception as e:
@@ -849,10 +823,7 @@ class OrchestraSystemAPI:
                         file_path = os.path.join(root, file)
 
                         # Match file patterns
-                        if not any(
-                            self._match_pattern(file, pattern)
-                            for pattern in file_patterns
-                        ):
+                        if not any(self._match_pattern(file, pattern) for pattern in file_patterns):
                             continue
 
                         # Check file age
@@ -896,11 +867,7 @@ class OrchestraSystemAPI:
                 history_response = self.mcp_client.get(self.CLEANUP_HISTORY_KEY)
                 history = []
 
-                if (
-                    history_response
-                    and history_response.success
-                    and history_response.value
-                ):
+                if history_response and history_response.success and history_response.value:
                     history = history_response.value
 
                 # Add current report to history
@@ -972,12 +939,8 @@ class OrchestraSystemAPI:
                 context["resources"] = {
                     "total": len(resources),
                     "by_type": {rtype: len(items) for rtype, items in by_type.items()},
-                    "available": sum(
-                        1 for r in resources if r.get("status") == "available"
-                    ),
-                    "high_priority": sum(
-                        1 for r in resources if r.get("priority", 2) <= 1
-                    ),
+                    "available": sum(1 for r in resources if r.get("status") == "available"),
+                    "high_priority": sum(1 for r in resources if r.get("priority", 2) <= 1),
                 }
             except:
                 pass
@@ -995,9 +958,7 @@ class OrchestraSystemAPI:
                     "environments": list(
                         set(
                             getattr(entry, "environment", "unknown")
-                            for entry in getattr(
-                                self.config_manager, "config_entries", {}
-                            ).values()
+                            for entry in getattr(self.config_manager, "config_entries", {}).values()
                         )
                     ),
                 }
@@ -1012,12 +973,8 @@ class OrchestraSystemAPI:
                 context["conflicts"] = {
                     "total": len(conflicts),
                     "by_type": {},
-                    "pending": sum(
-                        1 for c in conflicts if c.get("resolution_status") == "pending"
-                    ),
-                    "resolved": sum(
-                        1 for c in conflicts if c.get("resolution_status") == "resolved"
-                    ),
+                    "pending": sum(1 for c in conflicts if c.get("resolution_status") == "pending"),
+                    "resolved": sum(1 for c in conflicts if c.get("resolution_status") == "resolved"),
                 }
 
                 # Group by conflict type
@@ -1036,9 +993,7 @@ class OrchestraSystemAPI:
 _default_api: Optional[OrchestraSystemAPI] = None
 
 
-def get_api(
-    mcp_client: Optional[MCPClient] = None, force_new: bool = False
-) -> OrchestraSystemAPI:
+def get_api(mcp_client: Optional[MCPClient] = None, force_new: bool = False) -> OrchestraSystemAPI:
     """Get the default system API.
 
     Args:

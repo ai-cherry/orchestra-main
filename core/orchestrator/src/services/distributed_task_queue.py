@@ -64,9 +64,7 @@ class DistributedTaskQueue:
         """Initialize the distributed task queue."""
         self._redis = None
         self._event_bus = get_event_bus()
-        self._task_handlers: Dict[
-            str, Callable[[TaskInstance], Awaitable[Dict[str, Any]]]
-        ] = {}
+        self._task_handlers: Dict[str, Callable[[TaskInstance], Awaitable[Dict[str, Any]]]] = {}
         self._running = False
         self._worker_tasks: List[asyncio.Task] = []
         self._processing_instances: Set[str] = set()
@@ -81,9 +79,7 @@ class DistributedTaskQueue:
                     password=settings.REDIS_PASSWORD,
                     encoding="utf-8",
                 )
-                logger.info(
-                    f"Connected to Redis at {settings.REDIS_HOST}:{settings.REDIS_PORT}"
-                )
+                logger.info(f"Connected to Redis at {settings.REDIS_HOST}:{settings.REDIS_PORT}")
             except Exception as e:
                 logger.error(f"Failed to connect to Redis: {e}")
                 raise
@@ -136,19 +132,13 @@ class DistributedTaskQueue:
         )
 
         # Store task definition
-        await self._redis.set(
-            f"task:def:{task_def.task_id}", json.dumps(task_def.dict())
-        )
+        await self._redis.set(f"task:def:{task_def.task_id}", json.dumps(task_def.dict()))
 
         # Store task instance
-        await self._redis.set(
-            f"task:instance:{instance_id}", json.dumps(task_instance.dict())
-        )
+        await self._redis.set(f"task:instance:{instance_id}", json.dumps(task_instance.dict()))
 
         # Add to pending queue with priority
-        await self._redis.zadd(
-            f"task:queue:{task_def.task_type}", task_def.priority, instance_id
-        )
+        await self._redis.zadd(f"task:queue:{task_def.task_type}", task_def.priority, instance_id)
 
         # Publish event
         try:
@@ -229,13 +219,9 @@ class DistributedTaskQueue:
 
                         try:
                             # Get task instance
-                            instance_data = await self._redis.get(
-                                f"task:instance:{instance_id}"
-                            )
+                            instance_data = await self._redis.get(f"task:instance:{instance_id}")
                             if not instance_data:
-                                logger.warning(
-                                    f"Task instance not found: {instance_id}"
-                                )
+                                logger.warning(f"Task instance not found: {instance_id}")
                                 self._processing_instances.remove(instance_id)
                                 continue
 
@@ -243,13 +229,9 @@ class DistributedTaskQueue:
                             instance = TaskInstance.parse_raw(instance_data)
 
                             # Get task definition
-                            task_def_data = await self._redis.get(
-                                f"task:def:{instance.task_id}"
-                            )
+                            task_def_data = await self._redis.get(f"task:def:{instance.task_id}")
                             if not task_def_data:
-                                logger.warning(
-                                    f"Task definition not found: {instance.task_id}"
-                                )
+                                logger.warning(f"Task definition not found: {instance.task_id}")
                                 self._processing_instances.remove(instance_id)
                                 continue
 
@@ -276,9 +258,7 @@ class DistributedTaskQueue:
                                     },
                                 )
                             except Exception as e:
-                                logger.warning(
-                                    f"Failed to publish task_started event: {e}"
-                                )
+                                logger.warning(f"Failed to publish task_started event: {e}")
 
                             # Execute handler
                             try:
@@ -302,9 +282,7 @@ class DistributedTaskQueue:
                                         },
                                     )
                                 except Exception as e:
-                                    logger.warning(
-                                        f"Failed to publish task_completed event: {e}"
-                                    )
+                                    logger.warning(f"Failed to publish task_completed event: {e}")
 
                             except Exception as e:
                                 # Update with failure
@@ -337,8 +315,7 @@ class DistributedTaskQueue:
                                 else:
                                     # Max retries reached
                                     logger.error(
-                                        f"Task {instance_id} failed after {task_def.max_retries} "
-                                        f"retries: {e}"
+                                        f"Task {instance_id} failed after {task_def.max_retries} " f"retries: {e}"
                                     )
 
                                     # Publish failure event
@@ -354,9 +331,7 @@ class DistributedTaskQueue:
                                             },
                                         )
                                     except Exception as event_error:
-                                        logger.warning(
-                                            f"Failed to publish task_failed event: {event_error}"
-                                        )
+                                        logger.warning(f"Failed to publish task_failed event: {event_error}")
 
                             # Save updated instance
                             await self._redis.set(
@@ -439,9 +414,7 @@ class DistributedTaskQueue:
         instance.updated_at = time.time()
 
         # Save updated instance
-        await self._redis.set(
-            f"task:instance:{instance_id}", json.dumps(instance.dict())
-        )
+        await self._redis.set(f"task:instance:{instance_id}", json.dumps(instance.dict()))
 
         # Publish event
         try:

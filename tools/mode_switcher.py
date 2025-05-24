@@ -42,13 +42,9 @@ colorama.init()
 
 def print_header():
     """Print a colorized header for the CLI."""
-    print(
-        f"\n{Fore.CYAN}============================================={Style.RESET_ALL}"
-    )
+    print(f"\n{Fore.CYAN}============================================={Style.RESET_ALL}")
     print(f"{Fore.CYAN}{Style.BRIGHT}  AI Orchestra Mode Switcher{Style.RESET_ALL}")
-    print(
-        f"{Fore.CYAN}============================================={Style.RESET_ALL}\n"
-    )
+    print(f"{Fore.CYAN}============================================={Style.RESET_ALL}\n")
 
 
 def print_modes(manager: ModeManager, current_slug: Optional[str] = None):
@@ -78,9 +74,7 @@ def print_modes(manager: ModeManager, current_slug: Optional[str] = None):
         write_access = f"{Fore.GREEN}✓" if mode.write_access else f"{Fore.RED}✗"
 
         # Print mode details
-        print(
-            f"{prefix}{Style.BRIGHT}{mode.name}{Style.RESET_ALL} ({Fore.WHITE}{slug}{Style.RESET_ALL})"
-        )
+        print(f"{prefix}{Style.BRIGHT}{mode.name}{Style.RESET_ALL} ({Fore.WHITE}{slug}{Style.RESET_ALL})")
         print(f"   Model: {model_color}{mode.model}{Style.RESET_ALL}")
         print(f"   Write Access: {write_access}{Style.RESET_ALL}")
         print(f"   Description: {mode.description}")
@@ -185,12 +179,8 @@ def interactive_mode_switcher(manager: ModeManager):
         choice = input(f"\n{Fore.YELLOW}Enter choice (1-7):{Style.RESET_ALL} ")
 
         if choice == "1":
-            print_modes(
-                manager, manager.current_mode.slug if manager.current_mode else None
-            )
-            mode_slug = input(
-                f"\n{Fore.YELLOW}Enter mode slug to switch to:{Style.RESET_ALL} "
-            )
+            print_modes(manager, manager.current_mode.slug if manager.current_mode else None)
+            mode_slug = input(f"\n{Fore.YELLOW}Enter mode slug to switch to:{Style.RESET_ALL} ")
 
             if mode_slug in manager.modes:
                 success, message = manager.switch_mode(mode_slug)
@@ -203,9 +193,7 @@ def interactive_mode_switcher(manager: ModeManager):
 
         elif choice == "2":
             print_workflows(manager)
-            workflow_slug = input(
-                f"\n{Fore.YELLOW}Enter workflow slug to start:{Style.RESET_ALL} "
-            )
+            workflow_slug = input(f"\n{Fore.YELLOW}Enter workflow slug to start:{Style.RESET_ALL} ")
 
             if workflow_slug in manager.workflows:
                 success, message = manager.start_workflow(workflow_slug)
@@ -227,9 +215,7 @@ def interactive_mode_switcher(manager: ModeManager):
                     print(f"{Fore.RED}✗ {message}{Style.RESET_ALL}")
 
         elif choice == "4":
-            print_modes(
-                manager, manager.current_mode.slug if manager.current_mode else None
-            )
+            print_modes(manager, manager.current_mode.slug if manager.current_mode else None)
 
         elif choice == "5":
             print_workflows(manager)
@@ -238,9 +224,7 @@ def interactive_mode_switcher(manager: ModeManager):
             suggestions = manager.suggest_next_modes()
 
             if suggestions:
-                print(
-                    f"\n{Fore.GREEN}{Style.BRIGHT}Suggested next steps:{Style.RESET_ALL}"
-                )
+                print(f"\n{Fore.GREEN}{Style.BRIGHT}Suggested next steps:{Style.RESET_ALL}")
                 for i, suggestion in enumerate(suggestions):
                     mode = manager.modes.get(suggestion["slug"])
 
@@ -271,9 +255,7 @@ def interactive_mode_switcher(manager: ModeManager):
             break
 
         else:
-            print(
-                f"{Fore.RED}Invalid choice. Please enter a number from 1-7.{Style.RESET_ALL}"
-            )
+            print(f"{Fore.RED}Invalid choice. Please enter a number from 1-7.{Style.RESET_ALL}")
 
         print("\n" + ("-" * 50))
 
@@ -284,13 +266,9 @@ def main():
         description="AI Orchestra Mode Switcher - Manage Roo's operation modes and workflows"
     )
 
-    parser.add_argument(
-        "--switch", "-s", help="Switch to the specified mode", metavar="MODE"
-    )
+    parser.add_argument("--switch", "-s", help="Switch to the specified mode", metavar="MODE")
 
-    parser.add_argument(
-        "--workflow", "-w", help="Start the specified workflow", metavar="WORKFLOW"
-    )
+    parser.add_argument("--workflow", "-w", help="Start the specified workflow", metavar="WORKFLOW")
 
     parser.add_argument(
         "--advance",
@@ -306,9 +284,7 @@ def main():
         help="List all available modes and workflows",
     )
 
-    parser.add_argument(
-        "--interactive", "-i", action="store_true", help="Run in interactive mode"
-    )
+    parser.add_argument("--interactive", "-i", action="store_true", help="Run in interactive mode")
 
     parser.add_argument(
         "--suggestions",
@@ -335,9 +311,7 @@ def main():
     # Process commands
     if args.list:
         print_header()
-        print_modes(
-            manager, manager.current_mode.slug if manager.current_mode else None
-        )
+        print_modes(manager, manager.current_mode.slug if manager.current_mode else None)
         print_workflows(manager)
         return
 

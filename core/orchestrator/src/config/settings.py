@@ -44,15 +44,9 @@ class Settings(BaseSettings):
     # General settings
     ENVIRONMENT: str = "development"
     DEFAULT_LLM_MODEL: str = "gpt-4"  # Default model to use for LLM interactions
-    DEFAULT_LLM_MODEL_PRIMARY: str = (
-        "openai/gpt-4o"  # Default model for OpenRouter (primary route)
-    )
-    DEFAULT_LLM_MODEL_FALLBACK_OPENAI: Optional[
-        str
-    ] = "gpt-4o"  # Fallback model for OpenAI
-    DEFAULT_LLM_MODEL_FALLBACK_ANTHROPIC: Optional[
-        str
-    ] = "claude-3-5-sonnet-20240620"  # Fallback model for Anthropic
+    DEFAULT_LLM_MODEL_PRIMARY: str = "openai/gpt-4o"  # Default model for OpenRouter (primary route)
+    DEFAULT_LLM_MODEL_FALLBACK_OPENAI: Optional[str] = "gpt-4o"  # Fallback model for OpenAI
+    DEFAULT_LLM_MODEL_FALLBACK_ANTHROPIC: Optional[str] = "claude-3-5-sonnet-20240620"  # Fallback model for Anthropic
 
     # API keys
     OPENROUTER_API_KEY: Optional[str] = None
@@ -61,15 +55,9 @@ class Settings(BaseSettings):
     # GCP Settings
     GCP_PROJECT_ID: Optional[str] = None
     GCP_SA_KEY_JSON: Optional[str] = None  # Service account key JSON content
-    GCP_LOCATION: str = (
-        "us-central1"  # Default GCP region (changed to match deployment)
-    )
-    GOOGLE_CLOUD_PROJECT: Optional[
-        str
-    ] = None  # Alias for GCP_PROJECT_ID (for compatibility)
-    GOOGLE_APPLICATION_CREDENTIALS: Optional[
-        str
-    ] = None  # Path to credentials file (for compatibility)
+    GCP_LOCATION: str = "us-central1"  # Default GCP region (changed to match deployment)
+    GOOGLE_CLOUD_PROJECT: Optional[str] = None  # Alias for GCP_PROJECT_ID (for compatibility)
+    GOOGLE_APPLICATION_CREDENTIALS: Optional[str] = None  # Path to credentials file (for compatibility)
 
     # Cloud Infrastructure Settings
     FIRESTORE_NAMESPACE: str = "orchestra-local"  # Namespace for Firestore collections
@@ -78,9 +66,7 @@ class Settings(BaseSettings):
     # Redis Cache Settings
     REDIS_HOST: Optional[str] = None  # Redis host address
     REDIS_PORT: int = 6379  # Redis port
-    REDIS_AUTH_SECRET: Optional[
-        str
-    ] = None  # Secret name containing Redis auth password
+    REDIS_AUTH_SECRET: Optional[str] = None  # Secret name containing Redis auth password
     REDIS_CACHE_TTL: int = 3600  # Default TTL for Redis cache (in seconds)
     REDIS_CACHE_ENABLED: bool = False  # Whether Redis caching is enabled
 
@@ -96,15 +82,11 @@ class Settings(BaseSettings):
     # OpenRouter Pro Configuration
     OPENROUTER_HEADERS: Optional[str] = None  # JSON string of custom headers
     OPENROUTER_DEFAULT_MODEL: str = "openai/gpt-3.5-turbo"
-    OPENROUTER_FREE_FALLBACKS: Optional[
-        str
-    ] = None  # Comma-separated list of free models to use as fallbacks
+    OPENROUTER_FREE_FALLBACKS: Optional[str] = None  # Comma-separated list of free models to use as fallbacks
     PREFERRED_LLM_PROVIDER: str = "openrouter"  # Default provider to use
 
     # Mode-specific model mapping
-    MODE_MODEL_MAP: Optional[
-        str
-    ] = None  # JSON string mapping Roo modes to models and providers
+    MODE_MODEL_MAP: Optional[str] = None  # JSON string mapping Roo modes to models and providers
     MODE_MODEL_MAP_DEFAULT: Dict[str, Dict[str, str]] = {
         "orchestrator": {
             "model": "google/gemini-pro-2.5-preview",
@@ -124,9 +106,7 @@ class Settings(BaseSettings):
     LLM_MAX_RETRIES: int = 3
     LLM_RETRY_DELAY: float = 1.0
     LLM_RETRY_MAX_DELAY: float = 60.0  # Increased for Pro Tier
-    LLM_RETRYABLE_ERRORS: str = (
-        "connection_error,timeout_error,rate_limit_error,service_error"
-    )
+    LLM_RETRYABLE_ERRORS: str = "connection_error,timeout_error,rate_limit_error,service_error"
 
     # Enable semantic caching to reduce API calls and avoid rate limits
     LLM_SEMANTIC_CACHE_ENABLED: bool = False
@@ -137,50 +117,34 @@ class Settings(BaseSettings):
     TRACE_ID: Optional[str] = None
 
     # Main Portkey configuration
-    MASTER_PORTKEY_ADMIN_KEY: Optional[
-        str
-    ] = None  # Admin API key for managing virtual keys
+    MASTER_PORTKEY_ADMIN_KEY: Optional[str] = None  # Admin API key for managing virtual keys
     PORTKEY_CONFIG_ID: Optional[str] = None  # Gateway Config ID for retries/fallbacks
-    PORTKEY_STRATEGY: str = (
-        "fallback"  # Strategy for Portkey: fallback, loadbalance, or cost_aware
-    )
+    PORTKEY_STRATEGY: str = "fallback"  # Strategy for Portkey: fallback, loadbalance, or cost_aware
     PORTKEY_CACHE_ENABLED: bool = False  # Enable Portkey's built-in caching
 
     # Virtual Keys for different providers
     PORTKEY_VIRTUAL_KEY_OPENAI: Optional[str] = None  # Virtual Key ID for OpenAI
     PORTKEY_VIRTUAL_KEY_ANTHROPIC: Optional[str] = None  # Virtual Key ID for Anthropic
     PORTKEY_VIRTUAL_KEY_MISTRAL: Optional[str] = None  # Virtual Key ID for Mistral
-    PORTKEY_VIRTUAL_KEY_HUGGINGFACE: Optional[
-        str
-    ] = None  # Virtual Key ID for HuggingFace
+    PORTKEY_VIRTUAL_KEY_HUGGINGFACE: Optional[str] = None  # Virtual Key ID for HuggingFace
     PORTKEY_VIRTUAL_KEY_COHERE: Optional[str] = None  # Virtual Key ID for Cohere
-    PORTKEY_VIRTUAL_KEY_OPENROUTER: Optional[
-        str
-    ] = None  # Virtual Key ID for OpenRouter
-    PORTKEY_VIRTUAL_KEY_PERPLEXITY: Optional[
-        str
-    ] = None  # Virtual Key ID for Perplexity
+    PORTKEY_VIRTUAL_KEY_OPENROUTER: Optional[str] = None  # Virtual Key ID for OpenRouter
+    PORTKEY_VIRTUAL_KEY_PERPLEXITY: Optional[str] = None  # Virtual Key ID for Perplexity
     PORTKEY_VIRTUAL_KEY_DEEPSEEK: Optional[str] = None  # Virtual Key ID for DeepSeek
     PORTKEY_VIRTUAL_KEY_CODESTRAL: Optional[str] = None  # Virtual Key ID for Codestral
     PORTKEY_VIRTUAL_KEY_CODY: Optional[str] = None  # Virtual Key ID for Cody
     PORTKEY_VIRTUAL_KEY_CONTINUE: Optional[str] = None  # Virtual Key ID for Continue
     PORTKEY_VIRTUAL_KEY_GROK: Optional[str] = None  # Virtual Key ID for Grok
-    PORTKEY_VIRTUAL_KEY_GOOGLE: Optional[
-        str
-    ] = None  # Virtual Key ID for Google (Vertex AI)
+    PORTKEY_VIRTUAL_KEY_GOOGLE: Optional[str] = None  # Virtual Key ID for Google (Vertex AI)
     PORTKEY_VIRTUAL_KEY_AZURE: Optional[str] = None  # Virtual Key ID for Azure
     PORTKEY_VIRTUAL_KEY_AWS: Optional[str] = None  # Virtual Key ID for AWS (Bedrock)
     PORTKEY_VIRTUAL_KEY_PINECONE: Optional[str] = None  # Virtual Key ID for Pinecone
     PORTKEY_VIRTUAL_KEY_WEAVIATE: Optional[str] = None  # Virtual Key ID for Weaviate
-    PORTKEY_VIRTUAL_KEY_ELEVENLABS: Optional[
-        str
-    ] = None  # Virtual Key ID for ElevenLabs
+    PORTKEY_VIRTUAL_KEY_ELEVENLABS: Optional[str] = None  # Virtual Key ID for ElevenLabs
 
     # Legacy fields (keeping for backward compatibility)
     VIRTUAL_KEY: Optional[str] = None  # Existing virtual key field, keeping for now
-    PORTKEY_FALLBACKS: Optional[
-        str
-    ] = None  # JSON string of fallback config, keeping for now
+    PORTKEY_FALLBACKS: Optional[str] = None  # JSON string of fallback config, keeping for now
 
     # Site information (used for API request headers)
     SITE_URL: str = "http://localhost"

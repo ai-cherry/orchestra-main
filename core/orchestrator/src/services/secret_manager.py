@@ -30,9 +30,7 @@ class SecretManagerService:
             project_id: The GCP project ID. If not provided, it will be read from
                        the GCP_PROJECT_ID environment variable.
         """
-        self.project_id = project_id or os.environ.get(
-            "GCP_PROJECT_ID", "cherry-ai-project"
-        )
+        self.project_id = project_id or os.environ.get("GCP_PROJECT_ID", "cherry-ai-project")
         self.client = secretmanager.SecretManagerServiceClient()
         self._cache: Dict[str, str] = {}
 

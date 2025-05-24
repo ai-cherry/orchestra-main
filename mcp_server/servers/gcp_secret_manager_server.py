@@ -1,18 +1,27 @@
 #!/usr/bin/env python3
 """
-MCP Server for Google Secret Manager
+MCP Server for Google Secret Manager Management
 
-This server enables Claude 4 to manage secrets in Google Secret Manager
+This server enables API-driven management of GCP Secret Manager resources
 through the Model Context Protocol (MCP).
 """
 
-import os
 import logging
 from typing import Dict, Any, List, Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
-from google.cloud import secretmanager_v1
-import google.auth
+from google.cloud import secretmanager
+from google.api_core.exceptions import NotFound
+
+# --- Shared GCP Client Utility ---
+from mcp_server.utils.gcp_client import init_gcp_client
+
+# --- MCP CONFIG IMPORTS ---
+from mcp_server.config.loader import load_config
+from mcp_server.config.models import MCPConfig
+
+gcp_config: MCPConfig = load_config()
+PROJECT_ID = getattr(gcp_config, "gcp_project_id", None) or "your-gcp-project"
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -21,252 +30,148 @@ logger = logging.getLogger(__name__)
 # Initialize FastAPI app for MCP server
 app = FastAPI(
     title="GCP Secret Manager MCP Server",
-    description="MCP server for managing Google Secret Manager secrets",
-    version="1.0.0"
+    description="MCP server for managing Google Secret Manager resources",
+    version="1.0.0",
 )
 
-# Get configuration from environment
-PROJECT_ID = os.getenv("GCP_PROJECT_ID")
-
-# Initialize Secret Manager client
-try:
-    credentials, project = google.auth.default()
-    secret_client = secretmanager_v1.SecretManagerServiceClient()
-except Exception as e:
-    logger.error(f"Failed to initialize Secret Manager client: {e}")
-    secret_client = None
-
-
-class GetSecretRequest(BaseModel):
-    """Request model for retrieving a secret"""
-    secret_name: str = Field(..., description="Name of the secret")
-    version: str = Field(default="latest", description="Version of the secret")
+# Initialize Secret Manager client using shared utility
+secret_client = init_gcp_client(secretmanager.SecretManagerServiceClient, PROJECT_ID)
 
 
 class CreateSecretRequest(BaseModel):
-    """Request model for creating a secret"""
-    secret_name: str = Field(..., description="Name of the secret")
-    secret_value: str = Field(..., description="Value of the secret")
-    labels: Optional[Dict[str, str]] = Field(default={}, description="Labels for the secret")
+    secret_id: str = Field(..., description="Secret ID")
+    value: str = Field(..., description="Secret value")
+    labels: Optional[Dict[str, str]] = Field(default=None, description="Labels for the secret")
 
 
 class UpdateSecretRequest(BaseModel):
-    """Request model for updating a secret (adding new version)"""
-    secret_name: str = Field(..., description="Name of the secret")
-    secret_value: str = Field(..., description="New value of the secret")
+    secret_id: str = Field(..., description="Secret ID")
+    value: str = Field(..., description="New secret value")
 
-
-class SecretInfo(BaseModel):
-    """Response model for secret information"""
-    name: str
-    create_time: Optional[str]
-    labels: Dict[str, str]
-    latest_version: Optional[str]
-    
 
 class MCPToolDefinition(BaseModel):
-    """MCP tool definition for Claude"""
     name: str
     description: str
     parameters: Dict[str, Any]
 
 
-@app.get("/mcp/secrets/tools")
+@app.get("/mcp/secret-manager/tools")
 async def get_tools() -> List[MCPToolDefinition]:
-    """Return available tools for Claude to use"""
+    """Return available Secret Manager tools for MCP."""
     return [
         MCPToolDefinition(
-            name="get_secret",
-            description="Retrieve a secret value from Secret Manager",
+            name="create_secret",
+            description="Create a new secret",
             parameters={
                 "type": "object",
                 "properties": {
-                    "secret_name": {"type": "string", "description": "Name of the secret"},
-                    "version": {"type": "string", "description": "Version (default: latest)"}
+                    "secret_id": {"type": "string", "description": "Secret ID"},
+                    "value": {"type": "string", "description": "Secret value"},
+                    "labels": {"type": "object", "description": "Labels for the secret"},
                 },
-                "required": ["secret_name"]
-            }
+                "required": ["secret_id", "value"],
+            },
         ),
         MCPToolDefinition(
-            name="create_secret",
-            description="Create a new secret in Secret Manager",
+            name="get_secret",
+            description="Retrieve the latest value of a secret",
             parameters={
                 "type": "object",
-                "properties": {
-                    "secret_name": {"type": "string", "description": "Name of the secret"},
-                    "secret_value": {"type": "string", "description": "Value of the secret"},
-                    "labels": {"type": "object", "description": "Labels for the secret"}
-                },
-                "required": ["secret_name", "secret_value"]
-            }
+                "properties": {"secret_id": {"type": "string", "description": "Secret ID"}},
+                "required": ["secret_id"],
+            },
         ),
         MCPToolDefinition(
             name="update_secret",
-            description="Add a new version to an existing secret",
+            description="Update an existing secret with a new value",
             parameters={
                 "type": "object",
                 "properties": {
-                    "secret_name": {"type": "string", "description": "Name of the secret"},
-                    "secret_value": {"type": "string", "description": "New value"}
+                    "secret_id": {"type": "string", "description": "Secret ID"},
+                    "value": {"type": "string", "description": "New secret value"},
                 },
-                "required": ["secret_name", "secret_value"]
-            }
+                "required": ["secret_id", "value"],
+            },
         ),
         MCPToolDefinition(
             name="list_secrets",
             description="List all secrets in the project",
-            parameters={
-                "type": "object",
-                "properties": {
-                    "filter": {"type": "string", "description": "Optional filter"}
-                }
-            }
-        )
+            parameters={"type": "object", "properties": {}},
+        ),
     ]
 
 
-@app.post("/mcp/secrets/get")
-async def get_secret(request: GetSecretRequest) -> Dict[str, Any]:
-    """Retrieve a secret value"""
+@app.post("/mcp/secret-manager/create")
+async def create_secret(request: CreateSecretRequest):
+    """Create a new secret and add an initial version."""
     if not secret_client:
         raise HTTPException(status_code=500, detail="Secret Manager client not initialized")
-    
+    parent = f"projects/{PROJECT_ID}"
     try:
-        # Build the resource name
-        if request.version == "latest":
-            name = f"projects/{PROJECT_ID}/secrets/{request.secret_name}/versions/latest"
-        else:
-            name = f"projects/{PROJECT_ID}/secrets/{request.secret_name}/versions/{request.version}"
-        
-        # Access the secret version
-        response = secret_client.access_secret_version(request={"name": name})
-        
-        # Decode the secret payload
-        secret_value = response.payload.data.decode("UTF-8")
-        
-        logger.info(f"Successfully retrieved secret: {request.secret_name}")
-        
-        return {
-            "status": "success",
-            "secret_name": request.secret_name,
-            "version": request.version,
-            "value": secret_value,
-            "message": f"Secret {request.secret_name} retrieved successfully"
-        }
-        
-    except Exception as e:
-        logger.error(f"Failed to retrieve secret: {e}")
-        raise HTTPException(status_code=404, detail=f"Secret {request.secret_name} not found")
-
-
-@app.post("/mcp/secrets/create")
-async def create_secret(request: CreateSecretRequest) -> Dict[str, Any]:
-    """Create a new secret"""
-    if not secret_client:
-        raise HTTPException(status_code=500, detail="Secret Manager client not initialized")
-    
-    try:
-        # Build the parent name
-        parent = f"projects/{PROJECT_ID}"
-        
         # Create the secret
-        secret = {
-            "replication": {
-                "automatic": {}
-            },
-            "labels": request.labels
-        }
-        
-        response = secret_client.create_secret(
+        secret = secret_client.create_secret(
             request={
                 "parent": parent,
-                "secret_id": request.secret_name,
-                "secret": secret
+                "secret_id": request.secret_id,
+                "secret": {"replication": {"automatic": {}}, "labels": request.labels or {}},
             }
         )
-        
         # Add the initial version
-        secret_name = response.name
-        version_request = {
-            "parent": secret_name,
-            "payload": {"data": request.secret_value.encode("UTF-8")}
-        }
-        version_response = secret_client.add_secret_version(request=version_request)
-        
-        logger.info(f"Successfully created secret: {request.secret_name}")
-        
-        return {
-            "status": "success",
-            "secret_name": request.secret_name,
-            "version": version_response.name.split('/')[-1],
-            "message": f"Secret {request.secret_name} created successfully"
-        }
-        
+        secret_client.add_secret_version(
+            request={"parent": secret.name, "payload": {"data": request.value.encode("UTF-8")}}
+        )
+        return {"status": "success", "secret_id": request.secret_id}
     except Exception as e:
-        logger.error(f"Failed to create secret: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        from mcp_server.utils.gcp_client import handle_gcp_error
+        raise HTTPException(status_code=500, detail=handle_gcp_error(e, "Failed to create secret"))
 
 
-@app.post("/mcp/secrets/update")
-async def update_secret(request: UpdateSecretRequest) -> Dict[str, Any]:
-    """Add a new version to an existing secret"""
+@app.get("/mcp/secret-manager/get/{secret_id}")
+async def get_secret(secret_id: str):
+    """Retrieve the latest value of a secret."""
     if not secret_client:
         raise HTTPException(status_code=500, detail="Secret Manager client not initialized")
-    
+    name = f"projects/{PROJECT_ID}/secrets/{secret_id}/versions/latest"
     try:
-        # Build the secret name
-        secret_name = f"projects/{PROJECT_ID}/secrets/{request.secret_name}"
-        
-        # Add the new version
-        version_request = {
-            "parent": secret_name,
-            "payload": {"data": request.secret_value.encode("UTF-8")}
-        }
-        response = secret_client.add_secret_version(request=version_request)
-        
-        logger.info(f"Successfully updated secret: {request.secret_name}")
-        
-        return {
-            "status": "success",
-            "secret_name": request.secret_name,
-            "version": response.name.split('/')[-1],
-            "message": f"Secret {request.secret_name} updated with new version"
-        }
-        
+        response = secret_client.access_secret_version(request={"name": name})
+        value = response.payload.data.decode("UTF-8")
+        return {"secret_id": secret_id, "value": value}
+    except NotFound:
+        raise HTTPException(status_code=404, detail=f"Secret {secret_id} not found")
     except Exception as e:
-        logger.error(f"Failed to update secret: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        from mcp_server.utils.gcp_client import handle_gcp_error
+        raise HTTPException(status_code=500, detail=handle_gcp_error(e, "Failed to get secret"))
 
 
-@app.get("/mcp/secrets/list")
-async def list_secrets(filter: Optional[str] = None) -> List[Dict[str, Any]]:
-    """List all secrets"""
+@app.post("/mcp/secret-manager/update")
+async def update_secret(request: UpdateSecretRequest):
+    """Update an existing secret by adding a new version."""
     if not secret_client:
         raise HTTPException(status_code=500, detail="Secret Manager client not initialized")
-    
+    name = f"projects/{PROJECT_ID}/secrets/{request.secret_id}"
     try:
-        parent = f"projects/{PROJECT_ID}"
-        
-        # List secrets with optional filter
-        request = {"parent": parent}
-        if filter:
-            request["filter"] = filter
-            
-        secrets = secret_client.list_secrets(request=request)
-        
-        return [
-            {
-                "name": secret.name.split("/")[-1],
-                "created": secret.create_time.isoformat() if secret.create_time else None,
-                "labels": dict(secret.labels),
-                "replication": secret.replication.WhichOneof("replication")
-            }
-            for secret in secrets
-        ]
-        
+        # Add a new version
+        secret_client.add_secret_version(request={"parent": name, "payload": {"data": request.value.encode("UTF-8")}})
+        return {"status": "success", "secret_id": request.secret_id}
+    except NotFound:
+        raise HTTPException(status_code=404, detail=f"Secret {request.secret_id} not found")
     except Exception as e:
-        logger.error(f"Failed to list secrets: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        from mcp_server.utils.gcp_client import handle_gcp_error
+        raise HTTPException(status_code=500, detail=handle_gcp_error(e, "Failed to update secret"))
+
+
+@app.get("/mcp/secret-manager/list")
+async def list_secrets():
+    """List all secrets in the project."""
+    if not secret_client:
+        raise HTTPException(status_code=500, detail="Secret Manager client not initialized")
+    parent = f"projects/{PROJECT_ID}"
+    try:
+        secrets = secret_client.list_secrets(request={"parent": parent})
+        return {"secrets": [{"name": secret.name, "labels": dict(secret.labels)} for secret in secrets]}
+    except Exception as e:
+        from mcp_server.utils.gcp_client import handle_gcp_error
+        raise HTTPException(status_code=500, detail=handle_gcp_error(e, "Failed to list secrets"))
 
 
 @app.get("/health")
@@ -277,4 +182,5 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8002)

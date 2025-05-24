@@ -19,9 +19,7 @@ import logging
 from typing import Dict, Any, List, Optional, Tuple
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -36,14 +34,10 @@ def is_phidata_agent_config(config: Dict[str, Any]) -> bool:
         True if it's a Phidata agent config, False otherwise
     """
     # Check for wrapper_type = phidata or phidata_agent_class
-    return isinstance(config, dict) and (
-        config.get("wrapper_type") == "phidata" or "phidata_agent_class" in config
-    )
+    return isinstance(config, dict) and (config.get("wrapper_type") == "phidata" or "phidata_agent_class" in config)
 
 
-def update_agent_config(
-    config: Dict[str, Any], agent_key: str
-) -> Tuple[Dict[str, Any], bool]:
+def update_agent_config(config: Dict[str, Any], agent_key: str) -> Tuple[Dict[str, Any], bool]:
     """
     Update a Phidata agent configuration with optimal UI display settings.
 
@@ -112,9 +106,7 @@ def update_agent_config(
             if "show_tool_calls" not in member:
                 member["show_tool_calls"] = not is_prod
                 changes_made = True
-                logger.info(
-                    f"Added show_tool_calls: {not is_prod} to member {i+1} in {agent_key}"
-                )
+                logger.info(f"Added show_tool_calls: {not is_prod} to member {i+1} in {agent_key}")
 
     config[agent_key] = agent_config
     return config, changes_made
@@ -189,9 +181,7 @@ def process_directory(directory: str, dry_run: bool = False) -> Tuple[int, int]:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Update Phidata agent configs with UI optimization settings"
-    )
+    parser = argparse.ArgumentParser(description="Update Phidata agent configs with UI optimization settings")
     parser.add_argument(
         "--config-dir",
         required=True,
@@ -209,16 +199,11 @@ def main():
         logger.error(f"Config directory {args.config_dir} does not exist")
         sys.exit(1)
 
-    logger.info(
-        f"Processing YAML files in {args.config_dir}"
-        + (" (dry run)" if args.dry_run else "")
-    )
+    logger.info(f"Processing YAML files in {args.config_dir}" + (" (dry run)" if args.dry_run else ""))
 
     files_processed, files_changed = process_directory(args.config_dir, args.dry_run)
 
-    logger.info(
-        f"Processed {files_processed} YAML files, updated {files_changed} files"
-    )
+    logger.info(f"Processed {files_processed} YAML files, updated {files_changed} files")
 
     if files_changed > 0:
         logger.info("Changes made to Phidata agent configurations:")

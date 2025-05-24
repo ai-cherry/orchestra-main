@@ -2,9 +2,10 @@
 Handles the construction and execution of queries against Firestore
 for memory items. Supports filtering, tagging, and pagination.
 """
+
 import logging
 from typing import Dict, Any, Optional, List, AsyncGenerator
-from datetime import datetime, timezone # Ensure datetime is imported if used for expiry checks here
+from datetime import datetime, timezone  # Ensure datetime is imported if used for expiry checks here
 
 from google.cloud import firestore
 from google.cloud.firestore_v1.async_client import AsyncClient as FirestoreAsyncClient
@@ -13,13 +14,15 @@ from google.cloud.firestore_v1.async_document import AsyncDocumentSnapshot
 
 # TODO: Replace these with actual imports from your project
 from packages.shared.src.models.base_models import MemoryItem
+
 # from ai_orchestra.core.interfaces.enhanced_memory import QueryResult, QueryFilter
-from .memory_item_serializer import MemoryItemSerializer # Assuming it's in the same directory
+from .memory_item_serializer import MemoryItemSerializer  # Assuming it's in the same directory
 
 # Placeholder for actual models - replace these with your actual imports and definitions
 # from pydantic import BaseModel, Field # Assuming Pydantic is used
 
 logger = logging.getLogger(__name__)
+
 
 class FirestoreQueryEngine:
     """
@@ -65,7 +68,11 @@ class FirestoreQueryEngine:
             for tag in tags:
                 query = query.where(filter=FieldFilter("tags", "array_contains", tag))
         if order_by:
-            direction = firestore.AsyncQuery.DESCENDING if order_direction.upper() == "DESCENDING" else firestore.AsyncQuery.ASCENDING
+            direction = (
+                firestore.AsyncQuery.DESCENDING
+                if order_direction.upper() == "DESCENDING"
+                else firestore.AsyncQuery.ASCENDING
+            )
             query = query.order_by(order_by, direction=direction)
         return query
 
@@ -80,7 +87,7 @@ class FirestoreQueryEngine:
     ) -> List[MemoryItem]:
         if page < 1:
             raise ValueError("Page number must be 1 or greater.")
-        if page_size < 1 or page_size > 1000: # Firestore limit for array_contains_any, good general limit
+        if page_size < 1 or page_size > 1000:  # Firestore limit for array_contains_any, good general limit
             raise ValueError("Page size must be between 1 and 1000.")
 
         logger.debug(
@@ -90,18 +97,12 @@ class FirestoreQueryEngine:
         )
 
         try:
-            query = self._apply_filters_and_ordering(
-                self._collection_ref,
-                filters,
-                tags,
-                order_by,
-                order_direction
-            )
+            query = self._apply_filters_and_ordering(self._collection_ref, filters, tags, order_by, order_direction)
 
             # For total count, it's often more performant to do a separate count query if possible,
             # or accept that total_count might be for the non-paginated set.
             # Firestore's .count() aggregator is generally efficient.
-            count_query = query # The query before pagination is applied
+            count_query = query  # The query before pagination is applied
             count_snapshot = await count_query.count().get()
             total_count = count_snapshot[0][0].value if count_snapshot else 0
 
@@ -113,14 +114,14 @@ class FirestoreQueryEngine:
                 offset_docs_query = query.limit((page - 1) * page_size)
                 # We only need the last document of this query to act as a cursor
                 last_doc_of_prev_page: Optional[AsyncDocumentSnapshot] = None
-                async for doc_snap in offset_docs_query.stream(): # Iterate to get to the last one
+                async for doc_snap in offset_docs_query.stream():  # Iterate to get to the last one
                     last_doc_of_prev_page = doc_snap
-                
+
                 if last_doc_of_prev_page:
                     paginated_query = paginated_query.start_after(last_doc_of_prev_page)
-            
+
             paginated_query = paginated_query.limit(page_size)
-            
+
             docs_stream = paginated_query.stream()
             items: List[MemoryItem] = []
             current_time_utc = datetime.now(timezone.utc)
@@ -131,13 +132,13 @@ class FirestoreQueryEngine:
                     try:
                         item = self.serializer.to_memory_item(doc_snapshot.id, firestore_data)
                         if getattr(item, "expiry", None) and item.expiry < current_time_utc:
-                            logger.debug(
-                                f"Item '{item.id}' expired, filtering out from query results."
-                            )
-                            continue 
+                            logger.debug(f"Item '{item.id}' expired, filtering out from query results.")
+                            continue
                         items.append(item)
                     except ValueError as ve:
-                        logger.warning(f"Skipping item due to deserialization/validation error: {doc_snapshot.id}, error: {ve}")
+                        logger.warning(
+                            f"Skipping item due to deserialization/validation error: {doc_snapshot.id}, error: {ve}"
+                        )
                         continue
             logger.info(f"Query returned {len(items)} items for page {page} (total potential: {total_count}).")
             # Return just the list of items, not a QueryResult
@@ -145,7 +146,7 @@ class FirestoreQueryEngine:
 
         except Exception as e:
             logger.error(f"Error executing query on '{self.collection_name}': {e}", exc_info=True)
-            raise # Re-raise the original exception or a custom domain error
+            raise  # Re-raise the original exception or a custom domain error
 
     async def stream_query_results(
         self,
@@ -159,13 +160,7 @@ class FirestoreQueryEngine:
             f"tags: {tags}, order_by: {order_by} {order_direction}"
         )
         try:
-            query = self._apply_filters_and_ordering(
-                self._collection_ref,
-                filters,
-                tags,
-                order_by,
-                order_direction
-            )
+            query = self._apply_filters_and_ordering(self._collection_ref, filters, tags, order_by, order_direction)
             current_time_utc = datetime.now(timezone.utc)
 
             async for doc_snapshot in query.stream():
@@ -174,14 +169,14 @@ class FirestoreQueryEngine:
                     try:
                         item = self.serializer.to_memory_item(doc_snapshot.id, firestore_data)
                         if getattr(item, "expiry", None) and item.expiry < current_time_utc:
-                            logger.debug(
-                                f"Streaming: Item '{item.id}' expired, skipping."
-                            )
+                            logger.debug(f"Streaming: Item '{item.id}' expired, skipping.")
                             continue
                         yield item
                     except ValueError as ve:
-                        logger.warning(f"Streaming: Skipping item due to deserialization error: {doc_snapshot.id}, error: {ve}")
-                        continue 
+                        logger.warning(
+                            f"Streaming: Skipping item due to deserialization error: {doc_snapshot.id}, error: {ve}"
+                        )
+                        continue
         except Exception as e:
             logger.error(f"Error streaming query results from '{self.collection_name}': {e}", exc_info=True)
-            raise 
+            raise

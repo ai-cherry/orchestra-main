@@ -60,25 +60,17 @@ class GcpSnapshotRequest(BaseModel):
     """Request to create a new GCP snapshot."""
 
     project_id: str = Field(..., description="The GCP project ID to snapshot")
-    comprehensive: bool = Field(
-        False, description="Whether to capture comprehensive details"
-    )
-    compare_with_code: bool = Field(
-        False, description="Whether to compare with codebase"
-    )
+    comprehensive: bool = Field(False, description="Whether to capture comprehensive details")
+    compare_with_code: bool = Field(False, description="Whether to compare with codebase")
     code_dir: str = Field(".", description="Directory to compare with (if comparing)")
-    output_subdir: Optional[str] = Field(
-        None, description="Optional subdirectory for output"
-    )
+    output_subdir: Optional[str] = Field(None, description="Optional subdirectory for output")
 
 
 class GcpResourceListRequest(BaseModel):
     """Request to list GCP resources of a specific type."""
 
     snapshot_id: str = Field(..., description="Snapshot ID (directory name)")
-    resource_type: str = Field(
-        ..., description="Resource type (compute, storage, etc.)"
-    )
+    resource_type: str = Field(..., description="Resource type (compute, storage, etc.)")
 
 
 class GcpResourceCompareRequest(BaseModel):
@@ -107,9 +99,7 @@ class GcpSnapshotInfoResponse(BaseModel):
 def get_available_snapshots() -> List[str]:
     """Get list of available snapshot directories."""
     snapshot_pattern = os.path.join(config["snapshot_dir"], "*")
-    return [
-        os.path.basename(d) for d in glob.glob(snapshot_pattern) if os.path.isdir(d)
-    ]
+    return [os.path.basename(d) for d in glob.glob(snapshot_pattern) if os.path.isdir(d)]
 
 
 def get_snapshot_info(snapshot_id: str) -> Optional[GcpSnapshotInfoResponse]:
@@ -234,9 +224,7 @@ async def compare_gcp_with_code(request: GcpResourceCompareRequest) -> Dict[str,
     """
     snapshot_dir = os.path.join(config["snapshot_dir"], request.snapshot_id)
     if not os.path.isdir(snapshot_dir):
-        raise HTTPException(
-            status_code=404, detail=f"Snapshot {request.snapshot_id} not found"
-        )
+        raise HTTPException(status_code=404, detail=f"Snapshot {request.snapshot_id} not found")
 
     # Get metadata
     metadata_file = os.path.join(snapshot_dir, "metadata.json")
@@ -286,9 +274,7 @@ async def list_gcp_resources(request: GcpResourceListRequest) -> Dict[str, Any]:
     """
     snapshot_dir = os.path.join(config["snapshot_dir"], request.snapshot_id)
     if not os.path.isdir(snapshot_dir):
-        raise HTTPException(
-            status_code=404, detail=f"Snapshot {request.snapshot_id} not found"
-        )
+        raise HTTPException(status_code=404, detail=f"Snapshot {request.snapshot_id} not found")
 
     resource_dir = os.path.join(snapshot_dir, request.resource_type)
     if not os.path.isdir(resource_dir):
@@ -350,9 +336,7 @@ async def get_snapshot_summary(snapshot_id: str) -> Dict[str, Any]:
 
     summary_file = os.path.join(snapshot_dir, "resource_summary.md")
     if not os.path.exists(summary_file):
-        raise HTTPException(
-            status_code=404, detail=f"Summary for snapshot {snapshot_id} not found"
-        )
+        raise HTTPException(status_code=404, detail=f"Summary for snapshot {snapshot_id} not found")
 
     with open(summary_file, "r") as f:
         summary_content = f.read()
@@ -364,12 +348,8 @@ async def get_snapshot_summary(snapshot_id: str) -> Dict[str, Any]:
     }
 
 
-@app.get(
-    "/mcp/resources/snapshot/{snapshot_id}/resources/{resource_type}/{resource_file}"
-)
-async def get_resource_file(
-    snapshot_id: str, resource_type: str, resource_file: str
-) -> Dict[str, Any]:
+@app.get("/mcp/resources/snapshot/{snapshot_id}/resources/{resource_type}/{resource_file}")
+async def get_resource_file(snapshot_id: str, resource_type: str, resource_file: str) -> Dict[str, Any]:
     """Get a specific resource file from a GCP snapshot."""
     snapshot_dir = os.path.join(config["snapshot_dir"], snapshot_id)
     if not os.path.isdir(snapshot_dir):
@@ -377,9 +357,7 @@ async def get_resource_file(
 
     resource_path = os.path.join(snapshot_dir, resource_type, resource_file)
     if not os.path.exists(resource_path):
-        raise HTTPException(
-            status_code=404, detail=f"Resource file {resource_file} not found"
-        )
+        raise HTTPException(status_code=404, detail=f"Resource file {resource_file} not found")
 
     with open(resource_path, "r") as f:
         content = f.read()

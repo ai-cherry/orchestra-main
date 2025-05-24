@@ -142,9 +142,7 @@ class ServiceRegistry:
         self._services: List[Any] = []
         self._service_by_type: Dict[Type[Any], Any] = {}
         self._service_factories: Dict[Type[Any], ServiceFactory[Any]] = {}
-        self._service_ids: Set[
-            int
-        ] = set()  # Track service object IDs to prevent duplicates
+        self._service_ids: Set[int] = set()  # Track service object IDs to prevent duplicates
 
         logger.debug("ServiceRegistry initialized")
 
@@ -176,10 +174,7 @@ class ServiceRegistry:
         # Register by each interface that it implements
         for base_class in service_type.__mro__[1:]:  # Skip the class itself
             # Only register for actual classes, not builtins like object
-            if (
-                base_class not in (object, ABC)
-                and base_class not in self._service_by_type
-            ):
+            if base_class not in (object, ABC) and base_class not in self._service_by_type:
                 self._service_by_type[base_class] = service
 
         logger.debug(f"Registered service: {service_type.__name__}")
@@ -212,12 +207,10 @@ class ServiceRegistry:
         return factory
 
     @overload
-    def get_service(self, service_type: Type[T]) -> Optional[T]:
-        ...
+    def get_service(self, service_type: Type[T]) -> Optional[T]: ...
 
     @overload
-    def get_service(self, service_type: Type[T], default: S) -> Union[T, S]:
-        ...
+    def get_service(self, service_type: Type[T], default: S) -> Union[T, S]: ...
 
     def get_service(self, service_type: Type[T], default: Any = None) -> Any:
         """
@@ -269,9 +262,7 @@ class ServiceRegistry:
         """
         service = self.get_service(service_type)
         if service is None:
-            raise ValueError(
-                f"Required service of type {service_type.__name__} not found"
-            )
+            raise ValueError(f"Required service of type {service_type.__name__} not found")
         return service
 
     def unregister(self, service: Any) -> bool:
@@ -313,10 +304,7 @@ class ServiceRegistry:
         Returns:
             True if the service is available, False otherwise
         """
-        return (
-            service_type in self._service_by_type
-            or service_type in self._service_factories
-        )
+        return service_type in self._service_by_type or service_type in self._service_factories
 
     async def initialize_all_async(self) -> Dict[str, str]:
         """
@@ -338,9 +326,7 @@ class ServiceRegistry:
             service_name = service.__class__.__name__
 
             # Create task for async initialization
-            task = asyncio.create_task(
-                self._safe_initialize_service_async(service, service_name)
-            )
+            task = asyncio.create_task(self._safe_initialize_service_async(service, service_name))
             initialization_tasks.append(task)
 
         # Wait for all initialization tasks to complete
@@ -354,17 +340,13 @@ class ServiceRegistry:
                     errors[service_name] = error
 
         if errors:
-            logger.warning(
-                f"Service initialization completed with {len(errors)} errors"
-            )
+            logger.warning(f"Service initialization completed with {len(errors)} errors")
         else:
             logger.info("All services initialized successfully")
 
         return errors
 
-    async def _safe_initialize_service_async(
-        self, service: Any, service_name: str
-    ) -> tuple[str, Optional[str]]:
+    async def _safe_initialize_service_async(self, service: Any, service_name: str) -> tuple[str, Optional[str]]:
         """
         Initialize a service safely with full async/sync fallback support.
 
@@ -377,9 +359,7 @@ class ServiceRegistry:
         """
         try:
             # First try the async initialize if it exists
-            if hasattr(service, "initialize_async") and callable(
-                service.initialize_async
-            ):
+            if hasattr(service, "initialize_async") and callable(service.initialize_async):
                 await service.initialize_async()
                 logger.debug(f"Initialized service asynchronously: {service_name}")
 
@@ -423,9 +403,7 @@ class ServiceRegistry:
                     errors[service_name] = error_msg
 
         if errors:
-            logger.warning(
-                f"Service initialization completed with {len(errors)} errors"
-            )
+            logger.warning(f"Service initialization completed with {len(errors)} errors")
         else:
             logger.info("All services initialized successfully")
 
@@ -449,9 +427,7 @@ class ServiceRegistry:
         # Process in reverse order to handle dependencies correctly
         for service in reversed(self._services):
             service_name = service.__class__.__name__
-            task = asyncio.create_task(
-                self._safe_close_service_async(service, service_name)
-            )
+            task = asyncio.create_task(self._safe_close_service_async(service, service_name))
             closure_tasks.append(task)
 
         # Wait for all closure tasks to complete
@@ -474,9 +450,7 @@ class ServiceRegistry:
 
         return errors
 
-    async def _safe_close_service_async(
-        self, service: Any, service_name: str
-    ) -> tuple[str, Optional[str]]:
+    async def _safe_close_service_async(self, service: Any, service_name: str) -> tuple[str, Optional[str]]:
         """
         Close a service safely with full async/sync fallback support.
 
@@ -599,13 +573,11 @@ def register(service: T) -> T:
 
 
 @overload
-def get(service_type: Type[T]) -> Optional[T]:
-    ...
+def get(service_type: Type[T]) -> Optional[T]: ...
 
 
 @overload
-def get(service_type: Type[T], default: S) -> Union[T, S]:
-    ...
+def get(service_type: Type[T], default: S) -> Union[T, S]: ...
 
 
 def get(service_type: Type[T], default: Any = None) -> Any:

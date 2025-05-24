@@ -88,9 +88,7 @@ class AgentOrchestrator(BaseOrchestrator):
         try:
             # Select persona
             persona = self._persona_manager.get_persona(persona_id)
-            logger.info(
-                f"Using persona {persona.name} for interaction {interaction_id}"
-            )
+            logger.info(f"Using persona {persona.name} for interaction {interaction_id}")
 
             # Store user message in memory
             user_memory_item = MemoryItem(
@@ -234,16 +232,12 @@ class AgentOrchestrator(BaseOrchestrator):
             # For context-based selection using enhanced registry:
             agent = select_agent_for_context(agent_context)
 
-            logger.info(
-                f"Selected agent type: {agent.__class__.__name__} for interaction {interaction_id}"
-            )
+            logger.info(f"Selected agent type: {agent.__class__.__name__} for interaction {interaction_id}")
         except Exception as e:
             logger.error(f"Error selecting agent: {e}")
             # Fall back to SimpleTextAgent
             agent = agent_registry.get_agent("simple_text")
-            logger.warning(
-                f"Falling back to SimpleTextAgent for interaction {interaction_id}"
-            )
+            logger.warning(f"Falling back to SimpleTextAgent for interaction {interaction_id}")
 
         # Execute the agent
         try:
@@ -256,9 +250,7 @@ class AgentOrchestrator(BaseOrchestrator):
                 response.metadata = {}
             response.metadata["processing_time_ms"] = process_time
 
-            logger.info(
-                f"Agent {agent.__class__.__name__} processed interaction {interaction_id} in {process_time}ms"
-            )
+            logger.info(f"Agent {agent.__class__.__name__} processed interaction {interaction_id} in {process_time}ms")
             return response
         except Exception as e:
             logger.error(f"Agent processing failed: {e}", exc_info=True)

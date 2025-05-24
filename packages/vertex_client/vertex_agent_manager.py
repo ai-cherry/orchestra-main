@@ -38,9 +38,7 @@ except ImportError:
         import sys
         import os.path
 
-        sys.path.append(
-            os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-        )
+        sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
         from packages.shared.src.gcp.auth import (
             get_gcp_credentials,
             initialize_gcp_auth,
@@ -48,9 +46,7 @@ except ImportError:
     except ImportError:
         get_gcp_credentials = None
         initialize_gcp_auth = None
-        logging.warning(
-            "GCP auth utilities not found. Falling back to default credentials."
-        )
+        logging.warning("GCP auth utilities not found. Falling back to default credentials.")
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -83,31 +79,21 @@ class VertexAgentManager:
             service_account_json: Optional service account JSON key content
         """
         # Get project ID from parameters, environment, or GCP auth utilities
-        self.project_id = (
-            project_id
-            or os.environ.get("GCP_PROJECT_ID")
-            or os.environ.get("GOOGLE_CLOUD_PROJECT")
-        )
+        self.project_id = project_id or os.environ.get("GCP_PROJECT_ID") or os.environ.get("GOOGLE_CLOUD_PROJECT")
         self.location = location
         self.agent_id = agent_id
         self.pubsub_topic = pubsub_topic
-        self.service_account_json = service_account_json or os.environ.get(
-            "GCP_SA_KEY_JSON"
-        )
+        self.service_account_json = service_account_json or os.environ.get("GCP_SA_KEY_JSON")
 
         # If we still don't have a project_id, try to get it from credentials
         if not self.project_id and get_gcp_credentials is not None:
-            _, detected_project_id = get_gcp_credentials(
-                service_account_json=self.service_account_json
-            )
+            _, detected_project_id = get_gcp_credentials(service_account_json=self.service_account_json)
             self.project_id = detected_project_id
 
         # Fall back to hardcoded project ID if all else fails
         if not self.project_id:
             self.project_id = "cherry-ai-project"
-            logger.warning(
-                f"No project ID provided, falling back to default: {self.project_id}"
-            )
+            logger.warning(f"No project ID provided, falling back to default: {self.project_id}")
 
         # Set up authentication
         self._setup_auth()
@@ -135,9 +121,7 @@ class VertexAgentManager:
                     if not self.project_id and auth_result["project_id"]:
                         self.project_id = auth_result["project_id"]
                 else:
-                    logger.warning(
-                        "GCP authentication initialization was not successful"
-                    )
+                    logger.warning("GCP authentication initialization was not successful")
             except Exception as e:
                 logger.error(f"Error setting up GCP authentication: {e}")
                 # Continue and try default initialization
@@ -155,13 +139,9 @@ class VertexAgentManager:
                         service_account_json=self.service_account_json,
                         project_id=self.project_id,
                     )
-                    logger.info(
-                        "Using explicit service account credentials for GCP clients"
-                    )
+                    logger.info("Using explicit service account credentials for GCP clients")
                 except Exception as e:
-                    logger.warning(
-                        f"Could not get credentials using auth utilities: {e}"
-                    )
+                    logger.warning(f"Could not get credentials using auth utilities: {e}")
 
             # Initialize Vertex AI
             if vertexai is not None:
@@ -170,21 +150,15 @@ class VertexAgentManager:
                     location=self.location,
                     credentials=credentials,
                 )
-                logger.info(
-                    f"Vertex AI initialized for project {self.project_id} in {self.location}"
-                )
+                logger.info(f"Vertex AI initialized for project {self.project_id} in {self.location}")
             else:
                 logger.warning("Vertex AI library not available")
 
             # Initialize Pub/Sub publisher
             if pubsub_v1 is not None:
                 self.publisher = pubsub_v1.PublisherClient(credentials=credentials)
-                self.topic_path = self.publisher.topic_path(
-                    self.project_id, self.pubsub_topic
-                )
-                logger.info(
-                    f"Pub/Sub publisher initialized for topic: {self.pubsub_topic}"
-                )
+                self.topic_path = self.publisher.topic_path(self.project_id, self.pubsub_topic)
+                logger.info(f"Pub/Sub publisher initialized for topic: {self.pubsub_topic}")
             else:
                 logger.warning("Pub/Sub library not available")
                 self.publisher = None
@@ -200,9 +174,7 @@ class VertexAgentManager:
 
             # Initialize Secret Manager client
             if secretmanager is not None:
-                self.secret_client = secretmanager.SecretManagerServiceClient(
-                    credentials=credentials
-                )
+                self.secret_client = secretmanager.SecretManagerServiceClient(credentials=credentials)
                 logger.info("Secret Manager client initialized")
             else:
                 logger.warning("Secret Manager library not available")
@@ -222,9 +194,7 @@ class VertexAgentManager:
             Secret value as a string
         """
         if not self.secret_client:
-            logger.warning(
-                f"Secret Manager client not initialized, cannot retrieve secret: {secret_id}"
-            )
+            logger.warning(f"Secret Manager client not initialized, cannot retrieve secret: {secret_id}")
             return ""
 
         name = f"projects/{self.project_id}/secrets/{secret_id}/versions/latest"
@@ -267,13 +237,9 @@ class VertexAgentManager:
                     return agent
 
             # Create a new agent if not found
-            new_agent = agent_builder.Agent.create(
-                display_name=display_name, description=description
-            )
+            new_agent = agent_builder.Agent.create(display_name=display_name, description=description)
             self.agent_id = new_agent.id
-            logger.info(
-                f"Created new Vertex AI Agent: {display_name} (ID: {self.agent_id})"
-            )
+            logger.info(f"Created new Vertex AI Agent: {display_name} (ID: {self.agent_id})")
             return new_agent
         except Exception as e:
             logger.error(f"Error getting or creating agent: {e}")
@@ -347,9 +313,7 @@ class VertexAgentManager:
             os.system(f"terraform plan -var='env={workspace}' -out=tfplan")
 
             # Apply the plan
-            apply_result = os.system(
-                f"terraform apply -auto-approve -var='env={workspace}'"
-            )
+            apply_result = os.system(f"terraform apply -auto-approve -var='env={workspace}'")
 
             # Change back to the original directory
             os.chdir(original_dir)
@@ -358,9 +322,7 @@ class VertexAgentManager:
                 logger.info(f"Terraform apply completed successfully for {workspace}")
                 return {"status": "success", "workspace": workspace}
             else:
-                logger.error(
-                    f"Terraform apply failed for {workspace} with exit code {apply_result}"
-                )
+                logger.error(f"Terraform apply failed for {workspace} with exit code {apply_result}")
                 return {
                     "status": "failed",
                     "workspace": workspace,
@@ -583,9 +545,7 @@ if __name__ == "__main__":
                 "status": "success",
                 "team": team_name,
                 "roles": roles,
-                "files_created": [
-                    f"{team_path}/{role.lower()}_agent.py" for role in roles
-                ],
+                "files_created": [f"{team_path}/{role.lower()}_agent.py" for role in roles],
                 "message_id": message_id,
             }
         except Exception as e:
@@ -644,16 +604,12 @@ if __name__ == "__main__":
             # Perform a search query
             try:
                 query_embedding = embedding  # Use the same embedding for testing
-                search_results = index_endpoint.find_neighbors(
-                    queries=[query_embedding], num_neighbors=5
-                )
+                search_results = index_endpoint.find_neighbors(queries=[query_embedding], num_neighbors=5)
 
                 result_summary = []
                 for idx, neighbors in enumerate(search_results):
                     for neighbor in neighbors:
-                        result_summary.append(
-                            {"id": neighbor.id, "distance": neighbor.distance}
-                        )
+                        result_summary.append({"id": neighbor.id, "distance": neighbor.distance})
 
                 logger.info(f"Search results: {result_summary}")
             except Exception as e:
@@ -687,9 +643,7 @@ if __name__ == "__main__":
             logger.error(f"Error managing embeddings: {e}")
             return {"status": "failed", "index": index_name, "error": str(e)}
 
-    def manage_game_session(
-        self, game_type: str, session_id: str, player_action: str
-    ) -> Dict[str, Any]:
+    def manage_game_session(self, game_type: str, session_id: str, player_action: str) -> Dict[str, Any]:
         """
         Manage a live game session.
 
@@ -701,9 +655,7 @@ if __name__ == "__main__":
         Returns:
             Dictionary with status and game state
         """
-        logger.info(
-            f"Managing game session: {game_type}/{session_id}, action: {player_action}"
-        )
+        logger.info(f"Managing game session: {game_type}/{session_id}, action: {player_action}")
         try:
             # In a real implementation, you would store and retrieve
             # game state from Firestore or another database
@@ -727,20 +679,14 @@ if __name__ == "__main__":
                     is_correct = player_action == "answer_a"
                     if is_correct:
                         game_state["scores"]["player1"] += 10
-                        game_state[
-                            "response"
-                        ] = "Cherry says: That's correct! You earned 10 points!"
+                        game_state["response"] = "Cherry says: That's correct! You earned 10 points!"
                     else:
-                        game_state[
-                            "response"
-                        ] = "Cherry says: Sorry, that's incorrect. The correct answer was A."
+                        game_state["response"] = "Cherry says: Sorry, that's incorrect. The correct answer was A."
             elif game_type == "word_game":
                 # Simple word game logic
                 word_length = len(player_action)
                 game_state["scores"]["player1"] += word_length
-                game_state[
-                    "response"
-                ] = f"Cherry says: Nice word worth {word_length} points!"
+                game_state["response"] = f"Cherry says: Nice word worth {word_length} points!"
 
             # Increment the round
             game_state["current_round"] += 1
@@ -906,12 +852,7 @@ if __name__ == "__main__":
         task_str = f"create agent team {args.team}"
     elif args.task == "manage embeddings" and args.index_name:
         task_str = f"manage embeddings {args.index_name}"
-    elif (
-        args.task == "manage game session"
-        and args.game_type
-        and args.session_id
-        and args.player_action
-    ):
+    elif args.task == "manage game session" and args.game_type and args.session_id and args.player_action:
         task_str = f"manage game session {args.game_type} {args.session_id} {args.player_action}"
 
     # Prepare kwargs
