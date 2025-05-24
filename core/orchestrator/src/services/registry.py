@@ -6,7 +6,7 @@ ensuring proper initialization and cleanup of resources.
 """
 
 import logging
-from typing import Any, Callable, Dict, List, Optional, TypeVar, Generic, Set
+from typing import Any, List, Set, TypeVar
 
 # Configure logging
 logger = logging.getLogger(__name__)

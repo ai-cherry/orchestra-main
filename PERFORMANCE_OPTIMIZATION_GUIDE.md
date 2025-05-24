@@ -76,6 +76,7 @@ This optimization guide prioritizes performance over certain security best pract
 3. **Public Access**: Configures the Cloud Run service to be publicly accessible
 
 For production environments with sensitive data, consider:
+
 - Using Workload Identity Federation exclusively
 - Implementing more granular IAM permissions
 - Adding authentication requirements to Cloud Run services
@@ -94,6 +95,7 @@ Run the provided script to apply all optimizations:
 ```
 
 This script will:
+
 1. Set up Workload Identity Federation
 2. Configure GitHub secrets
 3. Apply Terraform configurations
@@ -104,11 +106,13 @@ This script will:
 If you prefer to apply optimizations manually:
 
 1. **GitHub Workflow**:
+
    ```bash
    cp .github/workflows/optimized-deploy-template.yml .github/workflows/deploy-{env}.yml
    ```
 
 2. **Dockerfile**:
+
    ```bash
    cp Dockerfile.performance-optimized ai-orchestra/Dockerfile
    ```
@@ -131,6 +135,7 @@ The following GitHub secrets are required:
 - `GCP_SECRET_MANAGEMENT_KEY`: Secret Manager key for authentication
 
 Optional resource configuration secrets:
+
 - `CLOUD_RUN_MEMORY`: Memory allocation for Cloud Run (default: "2Gi")
 - `CLOUD_RUN_CPU`: CPU allocation for Cloud Run (default: "2")
 - `CLOUD_RUN_MIN_INSTANCES`: Minimum instances (default: "1")

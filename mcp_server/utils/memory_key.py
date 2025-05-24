@@ -7,10 +7,9 @@ that support scoping, namespacing, and user-specific memory isolation.
 """
 
 import re
-from typing import Optional, Dict, Any, List, Tuple, Set, Union
-from enum import Enum
-import hashlib
 import uuid
+from enum import Enum
+from typing import Optional, Union
 
 from .structured_logging import get_logger
 

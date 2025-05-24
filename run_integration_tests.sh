@@ -98,7 +98,7 @@ if [ -z "$PROJECT_ID" ]; then
   if command -v gcloud &> /dev/null; then
     DEFAULT_PROJECT=$(gcloud config get-value project 2>/dev/null)
   fi
-  
+
   # Prompt with default if available
   if [ -n "$DEFAULT_PROJECT" ]; then
     read -p "Enter GCP project ID [$DEFAULT_PROJECT]: " INPUT_PROJECT_ID

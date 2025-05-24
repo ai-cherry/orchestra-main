@@ -6,19 +6,19 @@ different memory stores (short-term, long-term, semantic) to create a
 comprehensive memory system for agents.
 """
 
-import logging
 import asyncio
-from typing import Any, Dict, List, Optional, Set, Tuple, Union, cast
+import logging
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
-from core.orchestrator.src.config.models import MemoryType, MemoryConfig
 from core.orchestrator.src.agents.memory.manager import (
-    MemoryStore,
-    MemoryQuery,
-    RedisMemoryStore,
     FirestoreMemoryStore,
+    MemoryQuery,
+    MemoryStore,
+    RedisMemoryStore,
 )
+from core.orchestrator.src.config.models import MemoryType
 from packages.shared.src.models.base_models import MemoryItem
 
 # Configure logging

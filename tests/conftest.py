@@ -4,15 +4,11 @@ Pytest configuration for AI Orchestration System.
 This module provides fixtures and configuration for pytest tests.
 """
 
-import asyncio
-import pytest
 import logging
 from unittest.mock import AsyncMock, patch
 
-from fastapi.testclient import TestClient
+import pytest
 
-from core.orchestrator.src.main import app
-from core.orchestrator.src.config.settings import Settings
 from packages.shared.src.models.base_models import PersonaConfig
 
 # Configure logging

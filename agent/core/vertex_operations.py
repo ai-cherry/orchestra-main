@@ -1,24 +1,14 @@
-from google.cloud import aiplatform
-from google.cloud import secretmanager
 import os
-from core.orchestrator.src.utils.error_handling import log_error, log_warning
-import chromadb
+
 from chromadb import Client as Chroma
 from chromadb.config import Settings as ChromaClientSettings
+from google.cloud import aiplatform, secretmanager
+
+from core.orchestrator.src.utils.error_handling import log_error, log_warning
+
 from ..config.logging_config import get_logger
-from google.cloud.aiplatform_v1beta1.types import (
-    CountTokensResponse,
-    GenerateContentResponse,
-    Content,
-    Part,
-    Tool,
-    FunctionCall,
-    FunctionDeclaration,
-    FunctionResponse,
-    PredictRequest,
-    PredictResponse,
-    gemini_embeddings,
-)
+
+logger = get_logger(__name__)
 
 
 # Placeholder for gemini_embeddings function

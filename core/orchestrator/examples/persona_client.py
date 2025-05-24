@@ -7,12 +7,11 @@ endpoints and processing the responses.
 """
 
 import asyncio
-import json
 import logging
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, Optional
 
 import aiohttp
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

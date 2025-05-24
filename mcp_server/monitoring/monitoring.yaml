@@ -14,7 +14,7 @@ metrics:
     metricKind: GAUGE
     valueType: DOUBLE
     unit: "1"
-    
+
   - name: custom.googleapis.com/mcp/memory_entries
     description: "Number of memory entries"
     type: GAUGE
@@ -28,7 +28,7 @@ metrics:
     metricKind: GAUGE
     valueType: INT64
     unit: "1"
-    
+
   - name: custom.googleapis.com/mcp/vector_search_latency
     description: "Vector search latency"
     type: GAUGE
@@ -38,7 +38,7 @@ metrics:
     metricKind: GAUGE
     valueType: DOUBLE
     unit: "ms"
-    
+
   - name: custom.googleapis.com/mcp/api_requests
     description: "API request count"
     type: CUMULATIVE
@@ -75,7 +75,7 @@ alertPolicies:
       autoClose: 86400s
     notificationChannels:
       - channel: projects/${PROJECT_ID}/notificationChannels/${NOTIFICATION_CHANNEL_ID}
-    
+
   - displayName: "MCP Server - High Memory Usage"
     conditions:
       - displayName: "Memory usage above 80%"
@@ -96,7 +96,7 @@ alertPolicies:
       autoClose: 86400s
     notificationChannels:
       - channel: projects/${PROJECT_ID}/notificationChannels/${NOTIFICATION_CHANNEL_ID}
-    
+
   - displayName: "MCP Server - High Error Rate"
     conditions:
       - displayName: "Error rate above 5%"
@@ -127,7 +127,7 @@ alertPolicies:
       autoClose: 86400s
     notificationChannels:
       - channel: projects/${PROJECT_ID}/notificationChannels/${NOTIFICATION_CHANNEL_ID}
-    
+
   - displayName: "MCP Server - Redis High Memory Usage"
     conditions:
       - displayName: "Redis memory usage above 80%"
@@ -186,7 +186,7 @@ logMetrics:
           valueType: STRING
     labelExtractors:
       severity: "EXTRACT(severity)"
-    
+
   - name: "mcp-server-token-usage-logs"
     description: "Token usage reported in logs"
     filter: >
@@ -223,7 +223,7 @@ dashboards:
                     aggregation:
                       alignmentPeriod: 60s
                       perSeriesAligner: ALIGN_MEAN
-        
+
         - title: "Memory Utilization"
           xyChart:
             dataSets:
@@ -236,7 +236,7 @@ dashboards:
                     aggregation:
                       alignmentPeriod: 60s
                       perSeriesAligner: ALIGN_MEAN
-        
+
         - title: "Request Count"
           xyChart:
             dataSets:
@@ -252,7 +252,7 @@ dashboards:
                       crossSeriesReducer: REDUCE_SUM
                       groupByFields:
                         - "metric.labels.response_code_class"
-        
+
         - title: "Response Latency (p99)"
           xyChart:
             dataSets:
@@ -265,7 +265,7 @@ dashboards:
                     aggregation:
                       alignmentPeriod: 60s
                       perSeriesAligner: ALIGN_PERCENTILE_99
-        
+
         - title: "Token Usage by Tool"
           xyChart:
             dataSets:
@@ -280,7 +280,7 @@ dashboards:
                       perSeriesAligner: ALIGN_MEAN
                       groupByFields:
                         - "metric.labels.tool"
-        
+
         - title: "Memory Entries by Type"
           xyChart:
             dataSets:
@@ -295,7 +295,7 @@ dashboards:
                       perSeriesAligner: ALIGN_MEAN
                       groupByFields:
                         - "metric.labels.memory_type"
-        
+
         - title: "Vector Search Latency"
           xyChart:
             dataSets:
@@ -308,7 +308,7 @@ dashboards:
                     aggregation:
                       alignmentPeriod: 60s
                       perSeriesAligner: ALIGN_MEAN
-        
+
         - title: "Redis Memory Usage"
           xyChart:
             dataSets:

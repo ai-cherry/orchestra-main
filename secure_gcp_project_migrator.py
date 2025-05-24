@@ -21,15 +21,16 @@ Requirements:
 
 import argparse
 import json
+import logging
 import os
 import subprocess
 import sys
 import tempfile
 import time
-from typing import Dict, Tuple, Optional, List
-import backoff
-import logging
 from datetime import datetime
+from typing import List
+
+import backoff
 from google.oauth2 import service_account
 from googleapiclient import discovery, errors
 

@@ -7,9 +7,9 @@ This script provides a CLI for triggering Vertex AI Agent tasks.
 
 import argparse
 import json
-import sys
 import logging
-from typing import Dict, Any, List, Optional
+import sys
+from typing import Any, Dict
 
 from .vertex_agent_manager import trigger_vertex_task
 

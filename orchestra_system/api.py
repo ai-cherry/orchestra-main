@@ -21,9 +21,7 @@ import logging
 import os
 import time
 from datetime import datetime
-from enum import Enum
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple, Union, TypeVar, Generic, cast
+from typing import Any, Dict, List, Optional, Tuple
 
 # Configure logging
 logging.basicConfig(
@@ -35,12 +33,12 @@ logger = logging.getLogger("orchestra-system-api")
 # Import system components
 try:
     from orchestra_system.resource_registry import (
-        ResourceType,
-        ResourceStatus,
         Environment,
         Resource,
-        get_registry,
+        ResourceStatus,
+        ResourceType,
         discover_resources,
+        get_registry,
         verify_resources,
     )
 except ImportError:
@@ -62,14 +60,14 @@ except ImportError:
 
 try:
     from orchestra_system.config_manager import (
+        ConfigConflict,
+        ConfigEntry,
         ConfigEnvironment,
         ConfigSource,
-        ConfigEntry,
-        ConfigConflict,
-        get_manager,
         get,
-        set,
         get_all,
+        get_manager,
+        set,
     )
 except ImportError:
     logger.warning("Could not import config manager, functionality will be limited")
@@ -93,15 +91,15 @@ except ImportError:
 
 try:
     from orchestra_system.conflict_resolver import (
-        ConflictType,
-        ResolutionStrategy,
-        ResolutionStatus,
         Conflict,
+        ConflictType,
         Resolution,
-        get_resolver,
-        detect_conflicts,
-        resolve_conflict,
+        ResolutionStatus,
+        ResolutionStrategy,
         apply_resolution,
+        detect_conflicts,
+        get_resolver,
+        resolve_conflict,
     )
 except ImportError:
     logger.warning("Could not import conflict resolver, functionality will be limited")
@@ -128,13 +126,13 @@ except ImportError:
 try:
     from gcp_migration.mcp_client_enhanced import (
         MCPClient,
-        MCPResponse,
-        get_client as get_mcp_client,
     )
+    from gcp_migration.mcp_client_enhanced import get_client as get_mcp_client
 except ImportError:
     logger.warning("Could not import enhanced MCP client, attempting to import basic client")
     try:
-        from gcp_migration.mcp_client import MCPClient, get_client as get_mcp_client
+        from gcp_migration.mcp_client import MCPClient
+        from gcp_migration.mcp_client import get_client as get_mcp_client
     except ImportError:
         logger.error("Failed to import MCP client. API will operate in offline mode.")
         MCPClient = object

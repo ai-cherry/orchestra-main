@@ -63,7 +63,7 @@ reset_permissions() {
 cleanup_git_conflicts() {
   echo -e "${YELLOW}Checking for git conflict markers...${NC}"
   CONFLICT_FILES=$(grep -l "<<<<<<< HEAD" $(find . -type f -not -path "*/\.*" -not -path "*/venv/*" -not -path "*/.venv/*" | grep -v "node_modules"))
-  
+
   if [ -z "$CONFLICT_FILES" ]; then
     echo -e "${GREEN}No git conflict markers found.${NC}"
   else
@@ -139,7 +139,7 @@ cleanup_gcp_keys() {
   echo -e "${YELLOW}Checking for GCP service account keys...${NC}"
   KEY_FILES=$(find /tmp -name "*-key.json" 2>/dev/null)
   KEY_FILES+=" "$(find . -name "*-key.json" -o -name "*sa*.json" | grep -v node_modules)
-  
+
   if [ -z "$KEY_FILES" ]; then
     echo -e "${GREEN}No GCP service account key files found.${NC}"
   else
@@ -155,7 +155,7 @@ cleanup_gcp_keys() {
       done
     fi
   fi
-  
+
   # Also check for environment variables with credentials
   if [ -n "$GOOGLE_APPLICATION_CREDENTIALS" ]; then
     echo -e "${YELLOW}GOOGLE_APPLICATION_CREDENTIALS environment variable is set to:${NC}"
@@ -281,7 +281,7 @@ for CHOICE in $CHOICES; do
     13) cleanup_workload_identity ;;
     14) cleanup_github_auth ;;
     15) validate_final_cleanup_plan ;;
-    16) 
+    16)
       cleanup_temp_files
       cleanup_cache_dirs
       cleanup_node_modules

@@ -5,10 +5,9 @@ This module provides tools for managing model versions and deployments,
 enabling blue/green deployment and traffic shifting.
 """
 
-import json
 import logging
 import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from ai_orchestra.core.interfaces.ai_service import AIService
 from ai_orchestra.core.interfaces.memory import MemoryProvider

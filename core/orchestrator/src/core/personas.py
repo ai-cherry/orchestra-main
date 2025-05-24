@@ -7,9 +7,10 @@ including loading persona configurations and formatting responses.
 
 import logging
 import os
-import yaml
-from typing import Dict, List, Optional, Any, Union
 from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional
+
+import yaml
 
 # Configure logging
 logger = logging.getLogger(__name__)

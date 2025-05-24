@@ -6,11 +6,10 @@ for template-based persona definitions and response formatting.
 """
 
 import logging
-import string
-from typing import Dict, List, Optional, Any, Union, Callable
+from typing import Any, Dict, List, Optional, Union
 
-from core.orchestrator.src.personas.loader import PersonaManager
 from core.orchestrator.src.config.config import get_settings
+from core.orchestrator.src.personas.loader import PersonaManager
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -316,8 +315,9 @@ class EnhancedPersonaManager(PersonaManager):
         Returns:
             True if load was successful
         """
-        import yaml
         from pathlib import Path
+
+        import yaml
 
         # Skip if not forced and cache is still valid
         if not force and not self._should_reload():

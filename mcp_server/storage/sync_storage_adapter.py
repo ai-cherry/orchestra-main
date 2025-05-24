@@ -9,7 +9,7 @@ making it easier to integrate with both synchronous and asynchronous code.
 import asyncio
 import logging
 import threading
-from typing import Dict, List, Optional, Any, Union
+from typing import Any, Dict, List, Optional
 
 from ..interfaces.storage import IMemoryStorage
 from ..utils.performance_monitor import get_performance_monitor

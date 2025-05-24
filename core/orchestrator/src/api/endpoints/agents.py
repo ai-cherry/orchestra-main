@@ -6,13 +6,13 @@ allowing them to be triggered and monitored through the API.
 """
 
 import logging
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Body
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException
 from pydantic import BaseModel
 
-from core.orchestrator.src.services.agent_service import get_agent_instance
 from core.orchestrator.src.config.config import get_settings
+from core.orchestrator.src.services.agent_service import get_agent_instance
 from packages.shared.src.memory.stubs import InMemoryMemoryManagerStub
 
 # Configure logging

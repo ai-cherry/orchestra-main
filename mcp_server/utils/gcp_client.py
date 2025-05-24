@@ -4,10 +4,11 @@ Ensures DRY, robust, and elegant integration with Google Cloud services.
 """
 
 import logging
-from typing import Optional
+
 from google.api_core.exceptions import GoogleAPIError
 
 logger = logging.getLogger(__name__)
+
 
 def init_gcp_client(client_cls, project_id: str, **kwargs):
     """
@@ -26,6 +27,7 @@ def init_gcp_client(client_cls, project_id: str, **kwargs):
     except Exception as e:
         logger.error(f"Failed to initialize {client_cls.__name__}: {e}")
         return None
+
 
 def handle_gcp_error(e: Exception, context: str = "") -> str:
     """

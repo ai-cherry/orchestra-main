@@ -11,10 +11,12 @@ Orchestrator supports multiple methods for authenticating with GCP services like
 The system supports three primary authentication methods, listed in order of precedence:
 
 1. **Service Account JSON Content** (recommended for Codespaces/Cloud Run)
+
    - Provide the entire service account key JSON as a string via the `GCP_SA_KEY_JSON` environment variable
    - Ideal for containerized environments and CI/CD pipelines
 
 2. **Service Account Key File**
+
    - Provide the path to a service account key file via the `GOOGLE_APPLICATION_CREDENTIALS` environment variable
    - Familiar approach for developers who use the standard Google Cloud SDK
 
@@ -57,6 +59,7 @@ The `core/orchestrator/src/config/settings.py` file includes GCP-specific settin
 - `GOOGLE_APPLICATION_CREDENTIALS`: Path to credentials file
 
 Helper methods include:
+
 - `get_gcp_project_id()`: Get the project ID with fallback
 - `get_gcp_credentials_info()`: Get a dictionary with credentials information
 
@@ -125,7 +128,7 @@ result = manager.apply_terraform("dev")
 To use GCP services, configure your `.env` file with the appropriate values:
 
 ```
-# Project identification 
+# Project identification
 GCP_PROJECT_ID=your-gcp-project-id
 GCP_LOCATION=us-west2  # Default region
 
@@ -145,10 +148,12 @@ GOOGLE_APPLICATION_CREDENTIALS=/path/to/your-key-file.json
 For production deployments, it's recommended to create a dedicated service account with only the necessary permissions:
 
 1. Create a new service account in the GCP Console:
+
    - Name: `orchestrator-runtime`
    - Description: "Least-privilege service account for the Orchestrator application"
 
 2. Assign only the required roles:
+
    - `roles/datastore.user` - For Firestore access
    - `roles/redis.editor` - For Redis access (if using GCP Memorystore)
    - `roles/secretmanager.secretAccessor` - For accessing secrets

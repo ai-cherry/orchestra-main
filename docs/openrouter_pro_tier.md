@@ -75,6 +75,7 @@ PORTKEY_FALLBACKS='[{"provider":"openai","model":"gpt-4o"},{"provider":"anthropi
 With the Pro Tier access to 300+ models, you can optimize your agents by assigning specialized models to different agent roles. This is configured through the `AGENT_MODEL_MAP` environment variable.
 
 For example, you can configure:
+
 - Research-intensive agents to use Claude models with larger context windows
 - Creative tasks to use GPT-4o
 - Cost-efficient tasks to use Llama 3 or Gemini models
@@ -94,6 +95,7 @@ This ensures optimal usage of your increased rate limits (60 RPM) while graceful
 ## Usage and Monitoring
 
 The system logs detailed information about each API call, including:
+
 - Model used
 - Token usage
 - Response time

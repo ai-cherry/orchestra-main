@@ -8,15 +8,16 @@ to integrate with the Orchestra orchestration system.
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
-# Updated imports to use the current module paths
-from packages.shared.src.models.domain_models import UserRequest as AgentInput
-from packages.shared.src.models.domain_models import AgentResponse as AgentOutput
+from packages.shared.src.llm_client.portkey_client import PortkeyClient
 
 # Updated imports for other modules - using correct paths based on project structure
 from packages.shared.src.memory.memory_manager import MemoryManager
-from packages.shared.src.llm_client.portkey_client import PortkeyClient
+
+# Updated imports to use the current module paths
+from packages.shared.src.models.domain_models import AgentResponse as AgentOutput
+from packages.shared.src.models.domain_models import UserRequest as AgentInput
 from packages.shared.src.storage.base import ToolRegistry
 
 logger = logging.getLogger(__name__)
@@ -78,7 +79,6 @@ class OrchestraAgentBase(ABC):
         Returns:
             Standardized agent output with content and metadata
         """
-        pass
 
     async def health_check(self) -> bool:
         """

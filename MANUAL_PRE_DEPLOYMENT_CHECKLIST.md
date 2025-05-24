@@ -1,7 +1,7 @@
 # Manual Pre-Deployment Checklist
 
-> **NEW**: Use the automated verification script to streamline this process: `./run_pre_deployment_automated.sh`  
-> The script will automate many of the steps below while still allowing for necessary manual verification.  
+> **NEW**: Use the automated verification script to streamline this process: `./run_pre_deployment_automated.sh`
+> The script will automate many of the steps below while still allowing for necessary manual verification.
 > See `DEPLOYMENT_AUTOMATION_README.md` for details on the automation and code duplication cleanup.
 
 This checklist covers essential verification steps to perform after successfully running Terraform and before extensive testing.
@@ -40,31 +40,39 @@ This checklist covers essential verification steps to perform after successfully
 ## 4. Key Integration Tests
 
 - [ ] **Run connection tests for Firestore/Redis:**
+
   ```bash
   ./run_connection_tests.sh
   ```
+
   - Tests connectivity to Firestore and Redis
   - Verifies authentication and configuration
 
 - [ ] **Verify PostgreSQL connectivity:**
+
   ```bash
   python test_postgres_connection.py
   ```
+
   - Checks PostgreSQL connection configuration
   - Validates required dependencies
   - Confirms database user and permissions
 
 - [ ] **Run LLM integration test:**
+
   ```bash
   python -m packages.llm.src.test_phidata_integration
   ```
+
   - Tests connectivity with LLM providers
   - Validates response handling
 
 - [ ] **Run tool integration test:**
+
   ```bash
   python -m packages.tools.src.test_phidata_integration
   ```
+
   - Verifies tool functionality
   - Tests tool integration with the system
 

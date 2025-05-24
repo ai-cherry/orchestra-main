@@ -27,40 +27,40 @@ error() {
 # Find VS Code settings file
 find_settings_file() {
   local settings_paths=(".vscode/settings.json" "../.vscode/settings.json" "../../.vscode/settings.json" "$HOME/.config/Code/User/settings.json" "$HOME/Library/Application Support/Code/User/settings.json" "$APPDATA/Code/User/settings.json")
-  
+
   for path in "${settings_paths[@]}"; do
     if [ -f "$path" ]; then
       echo "$path"
       return 0
     fi
   done
-  
+
   return 1
 }
 
 # Disable workspace trust feature
 disable_workspace_trust() {
   log "Disabling VS Code workspace trust feature..."
-  
+
   local settings_file=$(find_settings_file)
-  
+
   if [ -z "$settings_file" ]; then
     warn "VS Code settings file not found. Creating a new one in .vscode/settings.json"
     mkdir -p .vscode
     settings_file=".vscode/settings.json"
     echo "{}" > "$settings_file"
   fi
-  
+
   # Check if file is valid JSON
   if ! jq empty "$settings_file" 2>/dev/null; then
     warn "Settings file is not valid JSON. Creating a backup and starting fresh."
     cp "$settings_file" "${settings_file}.bak"
     echo "{}" > "$settings_file"
   fi
-  
+
   # Add workspace trust settings
   log "Updating settings file: $settings_file"
-  
+
   # Use jq to update settings if available
   if command -v jq &>/dev/null; then
     local temp_file=$(mktemp)
@@ -75,13 +75,13 @@ disable_workspace_trust() {
   else
     # Fallback to simple sed-based approach
     warn "jq not found, using simple text replacement"
-    
+
     # Create backup
     cp "$settings_file" "${settings_file}.bak"
-    
+
     # Remove closing brace if it exists
     sed -i.tmp 's/}$//' "$settings_file"
-    
+
     # Add our settings
     cat >> "$settings_file" <<EOL
   "security.workspace.trust.enabled": false,
@@ -94,20 +94,20 @@ EOL
     # Clean up
     rm -f "${settings_file}.tmp"
   fi
-  
+
   log "Workspace trust feature disabled successfully"
 }
 
 # Disable extension security restrictions
 disable_extension_restrictions() {
   log "Disabling VS Code extension security restrictions..."
-  
+
   local settings_file=$(find_settings_file)
-  
+
   if [ -z "$settings_file" ]; then
     error "VS Code settings file not found"
   fi
-  
+
   # Use jq to update settings if available
   if command -v jq &>/dev/null; then
     local temp_file=$(mktemp)
@@ -121,13 +121,13 @@ disable_extension_restrictions() {
   else
     # Fallback to simple sed-based approach
     warn "jq not found, using simple text replacement"
-    
+
     # Create backup
     cp "$settings_file" "${settings_file}.bak"
-    
+
     # Remove closing brace if it exists
     sed -i.tmp 's/}$//' "$settings_file"
-    
+
     # Add our settings
     cat >> "$settings_file" <<EOL
   "extensions.autoUpdate": false,
@@ -139,20 +139,20 @@ EOL
     # Clean up
     rm -f "${settings_file}.tmp"
   fi
-  
+
   log "Extension security restrictions disabled successfully"
 }
 
 # Disable telemetry
 disable_telemetry() {
   log "Disabling VS Code telemetry..."
-  
+
   local settings_file=$(find_settings_file)
-  
+
   if [ -z "$settings_file" ]; then
     error "VS Code settings file not found"
   fi
-  
+
   # Use jq to update settings if available
   if command -v jq &>/dev/null; then
     local temp_file=$(mktemp)
@@ -166,13 +166,13 @@ disable_telemetry() {
   else
     # Fallback to simple sed-based approach
     warn "jq not found, using simple text replacement"
-    
+
     # Create backup
     cp "$settings_file" "${settings_file}.bak"
-    
+
     # Remove closing brace if it exists
     sed -i.tmp 's/}$//' "$settings_file"
-    
+
     # Add our settings
     cat >> "$settings_file" <<EOL
   "telemetry.enableTelemetry": false,
@@ -184,23 +184,23 @@ EOL
     # Clean up
     rm -f "${settings_file}.tmp"
   fi
-  
+
   log "Telemetry disabled successfully"
 }
 
 # Main function
 main() {
   log "Starting VS Code security restrictions removal..."
-  
+
   # Disable workspace trust
   disable_workspace_trust
-  
+
   # Disable extension restrictions
   disable_extension_restrictions
-  
+
   # Disable telemetry
   disable_telemetry
-  
+
   log "All VS Code security restrictions have been disabled!"
   log "Note: You may need to restart VS Code for changes to take effect."
   log "For a complete development experience, also consider running:"

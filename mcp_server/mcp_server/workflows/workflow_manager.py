@@ -9,7 +9,7 @@ handling workflow loading, parameter substitution, and result aggregation.
 import json
 import logging
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 # Configure logging
 logger = logging.getLogger("mcp-workflow-manager")
@@ -168,7 +168,7 @@ class WorkflowManager:
             logger.error(f"Workflow not found: {workflow_id}")
             return None
 
-        workflow_def = self.workflows[workflow_id]
+        self.workflows[workflow_id]
 
         # Use specified tools or all enabled tools
         if not tools:

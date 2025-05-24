@@ -21,6 +21,7 @@ The AI Orchestra deployment process has been updated to eliminate the need for b
 The new authentication system uses a service account key file stored at `$HOME/.gcp/service-account.json`. All deployment scripts have been updated to check for this file and use it for authentication when available.
 
 This approach provides several benefits:
+
 1. No more browser-based authentication prompts
 2. Consistent authentication across all scripts
 3. Works with CI/CD systems and headless environments
@@ -33,6 +34,7 @@ This approach provides several benefits:
 The `setup_service_account.sh` script walks you through the process:
 
 1. Run the script:
+
    ```bash
    ./setup_service_account.sh
    ```
@@ -45,6 +47,7 @@ The `setup_service_account.sh` script walks you through the process:
 ### Option 2: Manual Setup
 
 1. Create a service account with these roles:
+
    - Cloud Run Admin (`roles/run.admin`)
    - Artifact Registry Administrator (`roles/artifactregistry.admin`)
    - Service Account User (`roles/iam.serviceAccountUser`)
@@ -54,6 +57,7 @@ The `setup_service_account.sh` script walks you through the process:
 3. Place the key file at `$HOME/.gcp/service-account.json`
 
 4. Set the environment variable:
+
    ```bash
    export GOOGLE_APPLICATION_CREDENTIALS=$HOME/.gcp/service-account.json
    ```
@@ -76,6 +80,7 @@ export GCP_MASTER_SERVICE_JSON='{ "type": "service_account", ... }'
 ### 1. Local Deployment Scripts
 
 Both `deploy.sh` and `deploy_anywhere.sh` have been updated to:
+
 1. Check for the service account key file at `$HOME/.gcp/service-account.json`
 2. Fall back to `GCP_MASTER_SERVICE_JSON` environment variable if the file doesn't exist
 3. Only prompt for browser-based auth if neither is available
@@ -83,6 +88,7 @@ Both `deploy.sh` and `deploy_anywhere.sh` have been updated to:
 ### 2. Docker Containers
 
 The Dockerfile has been updated to:
+
 1. Create an empty mount point for credentials at `/app/.gcp`
 2. Accept credentials through volume mounting
 
@@ -91,6 +97,7 @@ When testing with `test_docker_build.sh`, the script will automatically mount yo
 ### 3. GitHub Actions
 
 The GitHub Actions workflow has been updated to:
+
 1. Continue using Workload Identity Federation for production
 2. Create the necessary directory structure to maintain compatibility
 
@@ -106,11 +113,13 @@ The GitHub Actions workflow has been updated to:
 ### Common Issues
 
 1. **Authentication fails despite key file being present**
+
    - Verify the key file is valid JSON: `jq . $HOME/.gcp/service-account.json`
    - Check if the service account has the necessary permissions
    - Ensure the service account is not disabled
 
 2. **Deployment scripts still prompt for browser authentication**
+
    - Verify the environment variable is set: `echo $GOOGLE_APPLICATION_CREDENTIALS`
    - Check the path is correct
    - Ensure the GCP project ID in the deployment script matches the one in the service account
@@ -122,6 +131,7 @@ The GitHub Actions workflow has been updated to:
 ### Logs and Debugging
 
 Both `deploy.sh` and `setup_service_account.sh` maintain logs that can help diagnose issues:
+
 - `$HOME/setup_service_account.log`
 
 ## Reverting to Interactive Authentication
@@ -138,3 +148,4 @@ unset GCP_MASTER_SERVICE_JSON
 
 # Authenticate with browser-based flow
 gcloud auth login
+```

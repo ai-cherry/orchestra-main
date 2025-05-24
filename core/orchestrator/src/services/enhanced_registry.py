@@ -6,19 +6,18 @@ with support for dependency injection, service type lookup, and async operations
 """
 
 import asyncio
-import inspect
 import logging
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import (
     Any,
     Callable,
     Dict,
+    Generic,
     List,
     Optional,
+    Set,
     Type,
     TypeVar,
-    Generic,
-    Set,
     Union,
     cast,
 )
@@ -41,19 +40,15 @@ class Service(ABC):
 
     def initialize(self) -> None:
         """Initialize the service (synchronous)."""
-        pass
 
     async def initialize_async(self) -> None:
         """Initialize the service asynchronously."""
-        pass
 
     def close(self) -> None:
         """Release resources held by the service (synchronous)."""
-        pass
 
     async def close_async(self) -> None:
         """Release resources held by the service asynchronously."""
-        pass
 
 
 class ServiceFactory(Generic[T]):

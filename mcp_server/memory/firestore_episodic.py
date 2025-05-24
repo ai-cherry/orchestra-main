@@ -25,8 +25,8 @@ except ImportError:
     AsyncClient = None
     AsyncTransaction = None
 
-from .base import BaseMemory, MemoryEntry, MemorySearchResult, MemoryTier
 from ..utils.structured_logging import get_logger
+from .base import BaseMemory, MemoryEntry, MemorySearchResult, MemoryTier
 
 logger = get_logger(__name__)
 

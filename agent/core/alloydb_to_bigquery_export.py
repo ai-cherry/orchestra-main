@@ -7,14 +7,13 @@ the AlloyDB 'memories' table, saves it as Parquet files in Google Cloud Storage 
 loads it into BigQuery for analytical purposes, establishing a Single Source of Truth (SSOT).
 """
 
-import os
-import logging
 import datetime
-import subprocess
-import psycopg2
+import logging
+import os
+
 import pandas as pd
-from google.cloud import storage
-from google.cloud import bigquery
+import psycopg2
+from google.cloud import bigquery, storage
 from psycopg2.extras import RealDictCursor
 
 # Configure logging

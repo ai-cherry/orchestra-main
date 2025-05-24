@@ -7,7 +7,7 @@ It defines the common interface and functionality for agents in the system.
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +54,6 @@ class BaseAgent(ABC):
         Returns:
             Dictionary containing the agent's output.
         """
-        pass
 
     def process_feedback(self, feedback: Dict[str, Any]) -> None:
         """

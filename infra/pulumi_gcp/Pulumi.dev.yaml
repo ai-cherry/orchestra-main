@@ -1,18 +1,5 @@
+encryptionsalt: v1:r0v47DLLWQY=:v1:ZTJktSfEVEHWzARb:R3i3EASgv8OI0SQ3QNoutH7md7i+qA==
 config:
-  orchestra-gcp-infra:project: cherry-ai-project
-  orchestra-gcp-infra:region: us-central1
-  gcp:project: cherry-ai-project
+  # gcp:project: cherry-ai-project  # Set via GOOGLE_CLOUD_PROJECT env var
+  # orchestra-gcp-infra:project: cherry-ai-project  # Set via GOOGLE_CLOUD_PROJECT env var
   gcp:region: us-central1
-
-  # === Pinecone Vector DB Integration ===
-  # Store API keys in GCP Secret Manager, reference here by secret name only.
-  pinecone:index_name: orchestra-index
-  pinecone:dimension: 1536
-  pinecone:environment: us-west1-gcp
-  # pinecone:api_key: (DO NOT store API keys here; use Secret Manager)
-
-  # === Weaviate Vector DB Integration ===
-  # Store API keys in GCP Secret Manager, reference here by secret name only.
-  weaviate:endpoint: https://weaviate-instance-url
-  weaviate:api_key_secret: WEAVIATE_API_KEY
-  # weaviate:schema: (define in code or as a separate config file if needed)

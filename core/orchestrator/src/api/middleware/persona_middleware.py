@@ -6,9 +6,9 @@ that the appropriate persona configuration is available for the interaction endp
 """
 
 import logging
+
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from fastapi import Depends
 
 from core.orchestrator.src.api.dependencies.personas import get_persona_config
 

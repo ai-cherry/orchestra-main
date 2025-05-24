@@ -11,14 +11,12 @@ implementation. It serves as a bridge between Roo Code AI modes and the Project 
 infrastructure.
 """
 
-import os
-import sys
+import argparse
 import json
 import logging
-import argparse
 import subprocess
-from typing import List, Dict, Any, Optional, Union
-from pathlib import Path
+import sys
+from typing import Any, Dict, List, Optional, Union
 
 # Configure logging
 logging.basicConfig(
@@ -76,7 +74,7 @@ class MemoryBank:
                 "--content",
                 content,
             ]
-            result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+            subprocess.run(cmd, check=True, capture_output=True, text=True)
             logger.info(f"Saved to memory: {key}")
             return True
         except subprocess.CalledProcessError as e:
@@ -110,7 +108,7 @@ class MemoryBank:
                 "--content",
                 content,
             ]
-            result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+            subprocess.run(cmd, check=True, capture_output=True, text=True)
             logger.info(f"Updated memory: {key}")
             return True
         except subprocess.CalledProcessError as e:
@@ -156,7 +154,7 @@ class RooModeManager:
         """Switch Roo Code to the specified mode."""
         try:
             cmd = ["roo-cli", "mode", mode]
-            result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+            subprocess.run(cmd, check=True, capture_output=True, text=True)
             logger.info(f"Switched to mode: {mode}")
             return True
         except subprocess.CalledProcessError as e:
@@ -191,7 +189,7 @@ class RooModeManager:
             logger.error(f"Failed to execute in mode {mode}: {e.stdout} / {e.stderr}")
             return None
         except json.JSONDecodeError:
-            logger.error(f"Failed to parse response from MCP")
+            logger.error("Failed to parse response from MCP")
             return None
 
 
@@ -376,13 +374,13 @@ class TerraformManager:
             else:
                 cmd = ["terraform", "output", "-json"]
                 result = subprocess.run(cmd, check=True, capture_output=True, text=True, cwd=working_dir)
-                logger.info(f"Got all Terraform outputs")
+                logger.info("Got all Terraform outputs")
                 return json.loads(result.stdout)
         except subprocess.CalledProcessError as e:
             logger.error(f"Failed to get Terraform outputs: {e.stdout} / {e.stderr}")
             return None
         except json.JSONDecodeError:
-            logger.error(f"Failed to parse Terraform outputs JSON")
+            logger.error("Failed to parse Terraform outputs JSON")
             return None
 
 

@@ -5,17 +5,16 @@ Real-time monitoring of all MCP servers
 """
 
 import asyncio
-import httpx
+import json
 from datetime import datetime
+
+import click
+import httpx
 from rich.console import Console
-from rich.table import Table
+from rich.layout import Layout
 from rich.live import Live
 from rich.panel import Panel
-from rich.layout import Layout
-from rich.progress import Progress, SpinnerColumn, TextColumn
-from rich.text import Text
-import click
-import json
+from rich.table import Table
 
 console = Console()
 

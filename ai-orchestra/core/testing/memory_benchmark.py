@@ -6,9 +6,8 @@ under different load conditions.
 """
 
 import asyncio
-import time
-import uuid
 import statistics
+import time
 from typing import Any, Dict, List, Optional, Tuple
 
 from ai_orchestra.core.interfaces.memory import MemoryProvider
@@ -184,10 +183,6 @@ class MemoryBenchmark:
 if __name__ == "__main__":
     import argparse
     import json
-    import sys
-    from ai_orchestra.infrastructure.persistence.firestore_memory import (
-        FirestoreMemoryProvider,
-    )
 
     async def main():
         parser = argparse.ArgumentParser(description="Benchmark memory providers")
@@ -228,7 +223,7 @@ if __name__ == "__main__":
         elif args.provider == "redis":
             from ai_orchestra.core.memory.redis_pool import RedisClient
 
-            redis_client = RedisClient()
+            RedisClient()
             # Would need a Redis memory provider implementation
             raise NotImplementedError("Redis memory provider not implemented")
         elif args.provider == "failover":
@@ -272,7 +267,7 @@ if __name__ == "__main__":
             print(f"\n{operation.upper()}:")
             print(f"  Success rate: {result['success_rate'] * 100:.2f}%")
             print(f"  Throughput: {result['operations_per_second']:.2f} ops/sec")
-            print(f"  Latency (seconds):")
+            print("  Latency (seconds):")
             print(f"    Min: {result['latency']['min']:.6f}")
             print(f"    Max: {result['latency']['max']:.6f}")
             print(f"    Mean: {result['latency']['mean']:.6f}")

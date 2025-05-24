@@ -6,7 +6,7 @@ how to use the workflow state machine for agent coordination.
 """
 
 import logging
-from typing import Dict, Any
+from typing import Any, Dict
 
 from core.orchestrator.src.workflows.state_machine import (
     WorkflowDefinition,

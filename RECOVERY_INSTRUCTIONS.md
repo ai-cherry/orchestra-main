@@ -9,22 +9,26 @@ Yes, if your system rebuilds and ends up in restricted mode, you should run the 
 ### Recovery Process:
 
 1. **Run the enforcement script**:
+
    ```bash
    ./ensure_standard_mode.sh
    ```
 
 2. **Apply environment variables to your current session**:
+
    ```bash
    source ~/.bashrc
    ```
 
 3. **Restart your application to apply changes**:
+
    - For local development:
+
      ```bash
      python force_standard_mode.py
      # Then restart your application
      ```
-   
+
    - For Docker environments:
      ```bash
      # Complete rebuild to apply all changes
@@ -44,14 +48,17 @@ The `ensure_standard_mode.sh` script performs multiple actions to fix restricted
 
 To prevent getting into restricted mode again:
 
-1. **Don't modify the standard mode settings**: 
+1. **Don't modify the standard mode settings**:
+
    - Keep `USE_RECOVERY_MODE=false` and `STANDARD_MODE=true` in your environment
 
 2. **For Docker environments**:
+
    - Always use the updated Dockerfile and docker-compose.yml files
    - The modified Dockerfile enforces standard mode at the container level
 
 3. **For VSCode**:
+
    - The workspace trust settings in .vscode/settings.json disable VSCode's restricted mode
    - These settings should persist across rebuilds
 
@@ -64,12 +71,14 @@ To prevent getting into restricted mode again:
 If all else fails and you still end up in restricted mode:
 
 1. **Hard reset environment variables**:
+
    ```bash
    export USE_RECOVERY_MODE=false
    export STANDARD_MODE=true
    ```
 
 2. **Run force_standard_mode.py directly**:
+
    ```bash
    python force_standard_mode.py
    ```

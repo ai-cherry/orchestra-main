@@ -6,24 +6,17 @@ real-time capability scoring, load balancing, cost-aware routing, shadow testing
 and integration with Cloud Spanner for routing table storage.
 """
 
-import logging
 import asyncio
-import time
-from typing import Dict, List, Any, Optional, Tuple, Set, cast
-from datetime import datetime, timedelta
-import random
+import logging
 import os
-from google.cloud import spanner
-from google.cloud.spanner_v1 import param_types
-from google.cloud import aiplatform
-from google.cloud.aiplatform.matching_engine import MatchingEngineIndexEndpoint
-from google.cloud import billing_v1
-from google.cloud.billing_v1.types import AggregationInfo, QueryFilter, TimeInterval
+import random
+import time
+from typing import Any, Dict, List, Optional, Tuple
+
+from google.cloud import aiplatform, billing_v1, spanner
 
 from core.orchestrator.src.exceptions import (
     OrchestratorError,
-    ConnectionError,
-    OperationError,
 )
 from core.orchestrator.src.utils.error_handling import error_boundary, retry
 
@@ -33,25 +26,17 @@ logger = logging.getLogger(__name__)
 class AgentRoutingError(OrchestratorError):
     """Base exception for agent routing errors."""
 
-    pass
-
 
 class MatchingEngineError(AgentRoutingError):
     """Exception raised when there's an error with the Matching Engine."""
-
-    pass
 
 
 class RouterConnectionError(AgentRoutingError):
     """Exception raised when there's a connection error with the router's dependencies."""
 
-    pass
-
 
 class RouteCalculationError(AgentRoutingError):
     """Exception raised when there's an error calculating a route."""
-
-    pass
 
 
 class AgentRouting:
@@ -99,7 +84,7 @@ class AgentRouting:
                 logger.info(f"Initialized Matching Engine endpoint: {matching_engine_endpoint_name}")
         except Exception as e:
             logger.error(f"Failed to initialize Vertex AI: {str(e)}")
-            raise RouterConnectionError(f"Failed to initialize Vertex AI", e)
+            raise RouterConnectionError("Failed to initialize Vertex AI", e)
 
         # Initialize Cloud Spanner client
         try:
@@ -115,14 +100,14 @@ class AgentRouting:
                 self.async_spanner_client = spanner_v1.services.spanner.SpannerAsyncClient()
         except Exception as e:
             logger.error(f"Failed to initialize Spanner: {str(e)}")
-            raise RouterConnectionError(f"Failed to initialize Spanner", e)
+            raise RouterConnectionError("Failed to initialize Spanner", e)
 
         # Initialize Cloud Billing client for cost-aware routing
         try:
             self.billing_client = billing_v1.CloudBillingClient()
         except Exception as e:
             logger.error(f"Failed to initialize Billing client: {str(e)}")
-            raise RouterConnectionError(f"Failed to initialize Billing client", e)
+            raise RouterConnectionError("Failed to initialize Billing client", e)
 
         # In-memory cache for agent scores and routing data (synced with Spanner)
         self.agent_scores: Dict[str, float] = {}
@@ -180,7 +165,7 @@ class AgentRouting:
 
         except Exception as e:
             logger.error(f"Failed to load routing data from Spanner: {str(e)}", exc_info=True)
-            raise RouterConnectionError(f"Failed to load routing data from Spanner", e)
+            raise RouterConnectionError("Failed to load routing data from Spanner", e)
 
     @error_boundary(propagate_types=[AgentRoutingError])
     async def async_load_routing_data(self) -> None:
@@ -199,7 +184,7 @@ class AgentRouting:
 
         except Exception as e:
             logger.error(f"Failed to load routing data asynchronously: {str(e)}", exc_info=True)
-            raise RouterConnectionError(f"Failed to load routing data asynchronously", e)
+            raise RouterConnectionError("Failed to load routing data asynchronously", e)
 
     @error_boundary(propagate_types=[AgentRoutingError])
     @retry(max_attempts=3, delay_seconds=1.0, backoff_factor=2.0)
@@ -272,7 +257,7 @@ class AgentRouting:
 
         except Exception as e:
             logger.error(f"Failed to update capability scores: {str(e)}", exc_info=True)
-            raise MatchingEngineError(f"Failed to update capability scores", e)
+            raise MatchingEngineError("Failed to update capability scores", e)
 
     async def _async_batch_update_scores(self, updates: List[Tuple[str, float]]) -> None:
         """
@@ -370,8 +355,8 @@ class AgentRouting:
             # In real implementation, this would query the Billing API
 
             # Get date range for the last 7 days
-            end_time = datetime.now()
-            start_time = end_time - timedelta(days=7)
+            # end_time = datetime.now()  # Removed unused assignment
+            # start_time = end_time - timedelta(days=7)  # Removed unused assignment
 
             updates = []
 
@@ -438,7 +423,7 @@ class AgentRouting:
 
         except Exception as e:
             logger.error(f"Failed to update cost data: {str(e)}", exc_info=True)
-            raise AgentRoutingError(f"Failed to update cost data", e)
+            raise AgentRoutingError("Failed to update cost data", e)
 
     async def _async_batch_update_costs(self, updates: List[Tuple[str, float]]) -> None:
         """
@@ -663,7 +648,7 @@ class AgentRouting:
 
         except Exception as e:
             logger.error(f"Failed to register shadow agent: {str(e)}", exc_info=True)
-            raise AgentRoutingError(f"Failed to register shadow agent", e)
+            raise AgentRoutingError("Failed to register shadow agent", e)
 
     def _sync_register_shadow_agent(self, production_agent_id: str, shadow_agent_id: str) -> None:
         """Synchronous shadow agent registration."""
@@ -701,7 +686,7 @@ class AgentRouting:
 
         except Exception as e:
             logger.error(f"Failed to remove shadow agent: {str(e)}", exc_info=True)
-            raise AgentRoutingError(f"Failed to remove shadow agent", e)
+            raise AgentRoutingError("Failed to remove shadow agent", e)
 
     def _sync_remove_shadow_agent(self, production_agent_id: str) -> None:
         """Synchronous shadow agent removal."""
@@ -778,7 +763,7 @@ class AgentRouting:
 
         except Exception as e:
             logger.error(f"Failed to register agent: {str(e)}", exc_info=True)
-            raise AgentRoutingError(f"Failed to register agent", e)
+            raise AgentRoutingError("Failed to register agent", e)
 
     def _sync_register_agent(
         self,

@@ -12,11 +12,10 @@ Usage:
   python key_fix_script.py --input credentials.json --output fixed_credentials.json
 """
 
-import json
 import argparse
+import json
 import re
 import sys
-from typing import Dict, Any
 
 
 def fix_private_key(private_key: str) -> str:

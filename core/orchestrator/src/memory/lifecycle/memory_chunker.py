@@ -8,7 +8,7 @@ for more efficient storage and retrieval.
 import logging
 import re
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple, Union, TypeVar
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -437,19 +437,19 @@ class MemoryChunker:
             # Create prompt for semantic chunking
             prompt = f"""
             Split the following text into coherent semantic chunks. Each chunk should be a self-contained unit of information.
-            
+
             Rules for chunking:
             1. Each chunk should be coherent and self-contained
             2. Preserve paragraph boundaries when possible
             3. Keep related information together
             4. Split at natural semantic boundaries
             5. Aim for chunks of roughly similar length
-            
+
             Format your response as a JSON array of chunks, where each chunk is a string.
-            
+
             Text to chunk:
             {content}
-            
+
             Chunks:
             """
 
@@ -673,4 +673,3 @@ class MemoryChunker:
 
 
 # Import datetime here to avoid circular import
-from datetime import datetime

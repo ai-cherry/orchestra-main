@@ -10,10 +10,9 @@ Example usage:
 python examples/portkey_virtual_keys_demo.py
 """
 
-import os
 import asyncio
 import logging
-from typing import List, Dict, Any
+import os
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -24,7 +23,7 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.orchestrator.src.config.settings import Settings, get_settings
+from core.orchestrator.src.config.settings import get_settings
 from packages.shared.src.llm_client.portkey_client import PortkeyClient
 
 

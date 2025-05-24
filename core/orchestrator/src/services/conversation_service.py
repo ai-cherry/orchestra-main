@@ -9,14 +9,13 @@ import logging
 import uuid
 from datetime import datetime
 from functools import lru_cache
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
-from core.orchestrator.src.config.config import settings
 from core.orchestrator.src.services.event_bus import get_event_bus
 
 # Updated import to use new memory manager
 from core.orchestrator.src.services.memory_service import get_memory_manager
-from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
+from packages.shared.src.models.base_models import MemoryItem
 
 # Handle both pydantic v1 and v2
 try:

@@ -6,11 +6,11 @@ This module provides a simplified client for interacting with the MCP server,
 focusing on the basic operations needed by the Tool Registry.
 """
 
-import json
 import logging
 import os
+from typing import Any, Dict, List, Optional
+
 import requests
-from typing import Any, Dict, List, Optional, Union
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")

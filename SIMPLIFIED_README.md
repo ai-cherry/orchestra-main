@@ -27,22 +27,27 @@ source simplified_auth.sh --auth
 ## Components
 
 ### Authentication
+
 - **simplified_auth.sh**: Shell script for authentication
 - **simplified_gcp_auth.py**: Python module for GCP client authentication
 - **Master Key Location**: `$HOME/.gcp/master-key.json`
 
 ### VS Code Configuration
+
 - **disable_restrictions.sh**: Script to disable all VS Code security features
 
 ### Security Checks
+
 - **simplified_security_check.sh**: Minimal security check script
 - **No Dependency Scanning**: Vulnerability scanning has been disabled
 
 ### Infrastructure
+
 - **simplified_security.tf**: Terraform configuration with minimal security
 - **Broader IAM Permissions**: Using editor role for simplicity
 
 ### Deployment
+
 - **simplified_deploy.sh**: Deployment script with minimal security checks
 
 ## Security Policy
@@ -61,3 +66,4 @@ chmod +x simplified_auth.sh
 chmod +x disable_restrictions.sh
 chmod +x simplified_security_check.sh
 chmod +x simplified_deploy.sh
+```

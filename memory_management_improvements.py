@@ -9,18 +9,19 @@ cloud optimization.
 
 import asyncio
 import concurrent.futures
+import datetime
 import functools
 import logging
 import time
-from typing import Any, Dict, List, Optional, TypeVar, Callable, AsyncGenerator
-import datetime
 import uuid
+from typing import List, Optional, TypeVar
 
 # Imports would normally be from the actual codebase
 # These are placeholders to demonstrate patterns
 from google.api_core.exceptions import GoogleAPIError
-from packages.shared.src.models.base_models import MemoryItem, AgentData, PersonaConfig
-from packages.shared.src.memory.memory_manager import MemoryManager, MemoryHealth
+
+from packages.shared.src.memory.memory_manager import MemoryHealth, MemoryManager
+from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
 
 # Set up logger
 logger = logging.getLogger(__name__)
@@ -101,19 +102,13 @@ class ThreadPoolManager:
 class StorageError(Exception):
     """Base exception for storage-related errors."""
 
-    pass
-
 
 class ValidationError(Exception):
     """Exception for validation errors in storage operations."""
 
-    pass
-
 
 class ConnectionError(Exception):
     """Exception for connection-related errors."""
-
-    pass
 
 
 def handle_storage_errors(func):
@@ -522,7 +517,6 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
     def _initialize_sync(self):
         """Synchronous initialization for running in thread pool."""
         # In a real implementation, would initialize clients and create collections if needed
-        pass
 
     @handle_storage_errors
     async def close(self) -> None:
@@ -542,7 +536,6 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
     def _close_sync(self):
         """Synchronous close method for running in thread pool."""
         # In a real implementation, would close Firestore clients
-        pass
 
     def _check_initialized(self) -> None:
         """Check if initialized and raise appropriate exception if not."""
@@ -572,7 +565,6 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
     def _add_item_sync(self, item: MemoryItem) -> None:
         """Synchronous add item method for running in thread pool."""
         # In a real implementation, would convert item to dict and store in Firestore
-        pass
 
     # Other methods would be implemented similarly using the patterns demonstrated above
     # Each method would use the ThreadPoolManager, error handling, and retry decorators

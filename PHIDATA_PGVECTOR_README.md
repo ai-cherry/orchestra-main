@@ -30,6 +30,7 @@ source .env.postgres
 ```
 
 Variables include:
+
 - `GCP_PROJECT_ID` - Your Google Cloud project ID
 - `GCP_REGION` - Region for deployment (e.g., us-central1)
 - `CLOUD_SQL_INSTANCE_CONNECTION_NAME` - Cloud SQL connection string
@@ -46,6 +47,7 @@ We've provided a script to install all required dependencies:
 ```
 
 This installs:
+
 - Phidata agent framework
 - SQLAlchemy and PostgreSQL drivers
 - Google Cloud libraries
@@ -60,6 +62,7 @@ The infrastructure is defined in Terraform files in `infra/orchestra-terraform/`
 ```
 
 This creates:
+
 - Cloud SQL PostgreSQL instance with pgvector extension
 - Service accounts with proper permissions
 - Secret Manager secrets for secure password management
@@ -74,6 +77,7 @@ python scripts/setup_postgres_pgvector.py --apply --schema llm
 ```
 
 This creates:
+
 - Required database tables
 - PGVector extension
 - Optimized indexes for vector search
@@ -115,6 +119,7 @@ python -m packages.tools.src.test_phidata_integration
 ### PhidataAgentWrapper
 
 The `PhidataAgentWrapper` in `updated_phidata_wrapper.py` provides:
+
 - Native PostgreSQL storage for agent history
 - PGVector integration for embeddings
 - Support for both single agents and teams
@@ -123,6 +128,7 @@ The `PhidataAgentWrapper` in `updated_phidata_wrapper.py` provides:
 ### CloudSQL PGVector Module
 
 The `cloudsql_pgvector.py` module provides:
+
 - Connection handling to Cloud SQL with either IAM or password auth
 - PgVector2 configuration for storing embeddings
 - PgAssistantStorage for storing agent conversation history
@@ -165,6 +171,7 @@ The `cloudsql_pgvector.py` module provides:
 ### Connection Issues
 
 If you encounter connection issues:
+
 - Check that the Cloud SQL instance is running
 - Verify IAM permissions are correct
 - Ensure the Cloud SQL proxy is running if testing locally
@@ -173,6 +180,7 @@ If you encounter connection issues:
 ### Extension Issues
 
 If pgvector extension is not working:
+
 - Verify PostgreSQL version (must be 12+ for pgvector)
 - Run the setup script with `--apply` flag
 - Check for errors in the PostgreSQL logs
@@ -180,6 +188,7 @@ If pgvector extension is not working:
 ### Embedding Issues
 
 If embeddings are not working correctly:
+
 - Verify the VertexAI embedding model is available
 - Check API permissions for the service account
 - Ensure the vector dimension matches the model output (768 for gecko-003)

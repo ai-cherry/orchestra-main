@@ -4,16 +4,16 @@ Comprehensive MCP Implementation Test Script
 Tests all MCP servers, Claude API connectivity, monitoring, and configurations
 """
 
-import subprocess
+import asyncio
 import json
 import os
+import subprocess
 import sys
-import time
-import asyncio
-import requests
-from pathlib import Path
-from typing import Dict, List, Tuple, Optional
 from datetime import datetime
+from pathlib import Path
+from typing import List, Tuple
+
+import requests
 
 
 # Color codes for output

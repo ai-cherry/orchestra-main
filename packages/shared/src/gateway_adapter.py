@@ -8,12 +8,12 @@ communication while abstracting away the specifics of each gateway implementatio
 
 import logging
 import os
-import yaml
-import asyncio
 import time
-from typing import Dict, List, Any, Optional, Union, Callable, Set
 from abc import ABC, abstractmethod
 from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import yaml
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -25,7 +25,6 @@ class GatewayAdapter(ABC):
     @abstractmethod
     async def initialize(self) -> bool:
         """Initialize the gateway connection."""
-        pass
 
     @abstractmethod
     async def generate_completion(
@@ -37,7 +36,6 @@ class GatewayAdapter(ABC):
         max_tokens: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Generate text completion using the gateway."""
-        pass
 
     @abstractmethod
     async def generate_chat_completion(
@@ -49,29 +47,24 @@ class GatewayAdapter(ABC):
         max_tokens: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Generate chat completion using the gateway."""
-        pass
 
     @abstractmethod
     async def close(self) -> None:
         """Close gateway connections and release resources."""
-        pass
 
     @property
     @abstractmethod
     def provider_name(self) -> str:
         """Get the provider name."""
-        pass
 
     @property
     @abstractmethod
     def is_initialized(self) -> bool:
         """Check if gateway is initialized."""
-        pass
 
     @abstractmethod
     async def monitor_credits(self) -> Dict[str, Any]:
         """Monitor credit usage."""
-        pass
 
 
 class PortkeyGatewayAdapter(GatewayAdapter):

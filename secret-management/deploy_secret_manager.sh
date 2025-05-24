@@ -165,7 +165,7 @@ cat > "$TERRAFORM_DIR/main.tf" << EOF
 
 terraform {
   required_version = ">= 1.0.0"
-  
+
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -214,16 +214,16 @@ resource "google_project_service" "required_apis" {
 # Secret Manager Module
 module "secret_manager" {
   source = "../modules/secret-manager"
-  
+
   project_id = var.project_id
-  
+
   secrets = var.secrets
   labels  = var.labels
-  
+
   replication_automatic        = var.replication_automatic
   replication_locations        = var.replication_locations
   customer_managed_encryption_key = var.customer_managed_encryption_key
-  
+
   depends_on = [google_project_service.required_apis]
 }
 
@@ -231,15 +231,15 @@ module "secret_manager" {
 module "secret_rotation" {
   count  = var.enable_rotation ? 1 : 0
   source = "../modules/secret-rotation"
-  
+
   project_id       = var.project_id
   region           = var.region
   environment      = var.environment
-  
+
   rotation_schedule = var.rotation_schedule
   time_zone         = var.time_zone
   secrets_to_rotate = var.secrets_to_rotate
-  
+
   depends_on = [
     google_project_service.required_apis,
     module.secret_manager
@@ -402,13 +402,13 @@ echo -e "${GREEN}Terraform configuration created in ${TERRAFORM_DIR}${NC}"
 if [ "$SKIP_TERRAFORM" = false ]; then
   echo -e "${BLUE}Initializing Terraform...${NC}"
   (cd "$TERRAFORM_DIR" && terraform init)
-  
+
   echo -e "${BLUE}Planning Terraform deployment...${NC}"
   (cd "$TERRAFORM_DIR" && terraform plan -out=tfplan)
-  
+
   echo -e "${YELLOW}Ready to apply Terraform configuration.${NC}"
   read -p "Do you want to continue? (y/n): " confirm
-  
+
   if [[ "$confirm" == "y" || "$confirm" == "Y" ]]; then
     echo -e "${BLUE}Applying Terraform configuration...${NC}"
     (cd "$TERRAFORM_DIR" && terraform apply tfplan)
@@ -423,36 +423,36 @@ fi
 # If migrating GitHub secrets
 if [ "$MIGRATE_GITHUB" = true ]; then
   echo -e "${BLUE}Migrating GitHub secrets to GCP Secret Manager...${NC}"
-  
+
   # Build the migration command
   MIGRATE_CMD="python3 ../migrate_github_to_gcp.py --project-id=${PROJECT_ID}"
-  
+
   if [ ! -z "$GITHUB_REPO" ]; then
     MIGRATE_CMD="$MIGRATE_CMD --repo=${GITHUB_REPO}"
   fi
-  
+
   if [ ! -z "$GITHUB_ORG" ]; then
     MIGRATE_CMD="$MIGRATE_CMD --org=${GITHUB_ORG}"
   fi
-  
+
   if [ ! -z "$SERVICE_ACCOUNTS" ]; then
     MIGRATE_CMD="$MIGRATE_CMD --service-accounts=${SERVICE_ACCOUNTS}"
   fi
-  
+
   if [ ! -z "$LABELS" ]; then
     MIGRATE_CMD="$MIGRATE_CMD --labels=${LABELS}"
   fi
-  
+
   if [ "$TIME_CONDITION" = true ]; then
     MIGRATE_CMD="$MIGRATE_CMD --time-condition"
   fi
-  
+
   # Add output CSV report
   MIGRATE_CMD="$MIGRATE_CMD --output-csv=migration_report_${ENVIRONMENT}.csv"
-  
+
   # Run the migration script
   (cd "$TERRAFORM_DIR" && $MIGRATE_CMD)
-  
+
   echo -e "${GREEN}GitHub secrets migration completed!${NC}"
   echo -e "${YELLOW}Check migration_report_${ENVIRONMENT}.csv for details.${NC}"
 fi

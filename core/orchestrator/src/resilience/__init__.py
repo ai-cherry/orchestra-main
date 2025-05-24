@@ -9,6 +9,10 @@ from core.orchestrator.src.resilience.circuit_breaker import (
     CircuitBreaker,
     get_circuit_breaker,
 )
+from core.orchestrator.src.resilience.incident_reporter import (
+    IncidentReporter,
+    get_incident_reporter,
+)
 from core.orchestrator.src.resilience.monitoring import (
     GCPMonitoringClient,
     get_monitoring_client,
@@ -16,12 +20,8 @@ from core.orchestrator.src.resilience.monitoring import (
 from core.orchestrator.src.resilience.tasks import (
     TaskQueueManager,
     VertexAiFallbackHandler,
-    get_task_queue_manager,
     get_fallback_handler,
-)
-from core.orchestrator.src.resilience.incident_reporter import (
-    IncidentReporter,
-    get_incident_reporter,
+    get_task_queue_manager,
 )
 
 __all__ = [

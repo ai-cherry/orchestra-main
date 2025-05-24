@@ -3,6 +3,7 @@
 ## Active Workflows
 
 ### Primary Workflow
+
 - **main.yml**: The primary CI/CD workflow for deployment to GCP Cloud Run. Triggers on pushes to main branch and handles:
   - Authentication via Workload Identity Federation
   - Python testing and linting
@@ -10,6 +11,7 @@
   - Deployment to Cloud Run service `ai-orchestra-minimal`
 
 ### Component-Specific Workflows
+
 - **admin-interface/.github/workflows/deploy.yml**: Deployment workflow for the React/TypeScript admin interface
 - **gcp-ide-sync/.github/workflows/deploy.yml**: Deployment workflow for GCP IDE synchronization components
 - **mcp_server/.github/workflows/deploy.yml**: Deployment workflow for MCP (Model Context Protocol) servers
@@ -35,6 +37,7 @@
 ## Workflow Coordination
 
 All workflows use Workload Identity Federation for secure GCP authentication and follow the same general pattern:
+
 1. Checkout code
 2. Authenticate to GCP
 3. Build and test (if applicable)

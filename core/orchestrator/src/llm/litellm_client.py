@@ -3,14 +3,12 @@ LiteLLM Client for AI Orchestra
 Provides a unified interface for accessing multiple LLM providers.
 """
 
-import json
 import logging
 import os
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 
 import litellm
-from litellm import completion
 from pydantic import BaseModel, Field
 
 from core.orchestrator.src.config.loader import get_settings

@@ -18,14 +18,14 @@ The `analyze_code_wrapper.py` script was updated to correctly handle file argume
 
 Several vulnerable dependencies were identified and updated to secure versions:
 
-| Package | CVE | Severity | Fixed Version |
-|---------|-----|----------|---------------|
-| pyyaml | CVE-2022-1471 | HIGH | 6.0.1 |
-| django | CVE-2023-41164 | HIGH | 4.2.5 |
-| cryptography | CVE-2023-38325 | HIGH | 41.0.4 |
-| requests | CVE-2023-32681 | MODERATE | 2.31.0 |
-| pytest | CVE-2023-2835 | MODERATE | 7.3.1 |
-| flask | CVE-2023-30861 | MODERATE | 2.3.3 |
+| Package      | CVE            | Severity | Fixed Version |
+| ------------ | -------------- | -------- | ------------- |
+| pyyaml       | CVE-2022-1471  | HIGH     | 6.0.1         |
+| django       | CVE-2023-41164 | HIGH     | 4.2.5         |
+| cryptography | CVE-2023-38325 | HIGH     | 41.0.4        |
+| requests     | CVE-2023-32681 | MODERATE | 2.31.0        |
+| pytest       | CVE-2023-2835  | MODERATE | 7.3.1         |
+| flask        | CVE-2023-30861 | MODERATE | 2.3.3         |
 
 ## Actions Taken
 

@@ -6,16 +6,15 @@ This server enables Claude 4 to manage Firestore documents and collections
 through the Model Context Protocol (MCP).
 """
 
-import os
-import json
 import logging
-from typing import Dict, Any, List, Optional, Union
+import os
 from datetime import datetime
-from fastapi import FastAPI, HTTPException, Query
-from pydantic import BaseModel, Field
-from google.cloud import firestore
-from google.cloud.firestore_v1.base_query import FieldFilter
+from typing import Any, Dict, List, Optional
+
 import google.auth
+from fastapi import FastAPI, HTTPException
+from google.cloud import firestore
+from pydantic import BaseModel, Field
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -249,7 +248,7 @@ async def create_document(request: DocumentRequest) -> Dict[str, Any]:
             "status": "success",
             "collection": request.collection,
             "document_id": document_id,
-            "message": f"Document created successfully",
+            "message": "Document created successfully",
         }
 
     except Exception as e:
@@ -268,7 +267,7 @@ async def get_document(collection: str, document_id: str) -> Dict[str, Any]:
         doc = doc_ref.get()
 
         if not doc.exists:
-            raise HTTPException(status_code=404, detail=f"Document not found")
+            raise HTTPException(status_code=404, detail="Document not found")
 
         doc_data = doc.to_dict()
 
@@ -297,7 +296,7 @@ async def update_document(request: UpdateRequest) -> Dict[str, Any]:
 
         # Check if document exists
         if not doc_ref.get().exists:
-            raise HTTPException(status_code=404, detail=f"Document not found")
+            raise HTTPException(status_code=404, detail="Document not found")
 
         # Add update timestamp
         updates = request.updates.copy()
@@ -311,7 +310,7 @@ async def update_document(request: UpdateRequest) -> Dict[str, Any]:
             "status": "success",
             "collection": request.collection,
             "document_id": request.document_id,
-            "message": f"Document updated successfully",
+            "message": "Document updated successfully",
         }
 
     except HTTPException:
@@ -332,7 +331,7 @@ async def delete_document(collection: str, document_id: str) -> Dict[str, Any]:
 
         # Check if document exists
         if not doc_ref.get().exists:
-            raise HTTPException(status_code=404, detail=f"Document not found")
+            raise HTTPException(status_code=404, detail="Document not found")
 
         doc_ref.delete()
 
@@ -342,7 +341,7 @@ async def delete_document(collection: str, document_id: str) -> Dict[str, Any]:
             "status": "success",
             "collection": collection,
             "document_id": document_id,
-            "message": f"Document deleted successfully",
+            "message": "Document deleted successfully",
         }
 
     except HTTPException:
@@ -484,7 +483,7 @@ async def batch_write(request: BatchWriteRequest) -> Dict[str, Any]:
         return {
             "status": "success",
             "operations_count": operation_count,
-            "message": f"Batch write completed successfully",
+            "message": "Batch write completed successfully",
         }
 
     except Exception as e:

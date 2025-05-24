@@ -1,6 +1,6 @@
 # Vertex Workbench Data Synchronization Guide
 
-This guide provides detailed instructions for automating data transfer between Vertex AI Workbench instances and Google Cloud Storage. 
+This guide provides detailed instructions for automating data transfer between Vertex AI Workbench instances and Google Cloud Storage.
 
 ## Overview
 
@@ -108,8 +108,8 @@ The Terraform configuration will create a Vertex AI Workbench instance with the 
 ```yaml
 substitutions:
   _BUCKET: "your-bucket-name"
-  _ENVIRONMENT: "dev"  # dev, test, prod
-  _DIRECTION: "push"   # push or pull
+  _ENVIRONMENT: "dev" # dev, test, prod
+  _DIRECTION: "push" # push or pull
   _NOTIFICATION_EMAIL: "your-email@example.com"
   _SLACK_WEBHOOK: "https://hooks.slack.com/services/..."
 ```
@@ -177,6 +177,7 @@ ERROR: Not authenticated with gcloud
 ```
 
 Resolution:
+
 ```bash
 gcloud auth login
 ```
@@ -188,6 +189,7 @@ ERROR: Bucket not accessible
 ```
 
 Resolution:
+
 - Verify bucket exists and is correctly named
 - Check permissions for the authenticated account
 - Ensure storage access APIs are enabled
@@ -199,6 +201,7 @@ WARNING: Data integrity issues detected
 ```
 
 Resolution:
+
 - Review the diff file to identify specific files with issues
 - Manually compare files to resolve discrepancies
 - Re-synchronize with the correct direction
@@ -216,11 +219,13 @@ EXCLUDE_PATTERNS=(".git" "__pycache__" "*.pyc" "venv" ".venv" "node_modules" ".e
 ### Notification Setup
 
 For email notifications:
+
 ```bash
 ./data_sync_ci_cd.sh --notification-email your-email@example.com
 ```
 
 For Slack notifications:
+
 ```bash
 ./data_sync_ci_cd.sh --slack-webhook https://hooks.slack.com/services/...
 ```
@@ -240,6 +245,7 @@ The original migration scripts (`gcp_archive_migrate.sh` and `gcp_archive_restor
 ### What if I need to transfer sensitive data?
 
 For sensitive data:
+
 1. Exclude sensitive files using the `EXCLUDE_PATTERNS` configuration
 2. Use service accounts with limited permissions
 3. Consider client-side encryption before transfer
@@ -248,6 +254,7 @@ For sensitive data:
 ### How can I schedule synchronization?
 
 In a Vertex Workbench instance:
+
 ```bash
 # Add to crontab
 (crontab -l 2>/dev/null || echo "") | { cat; echo "0 2 * * * /home/jupyter/vertex_data_sync.sh --push"; } | crontab -
@@ -256,6 +263,7 @@ In a Vertex Workbench instance:
 ## Support
 
 For issues or questions:
+
 1. Check the logs in `/home/jupyter/logs/` directory
 2. Review the status file at `/tmp/data_sync_status.json`
 3. Contact your system administrator or cloud support team

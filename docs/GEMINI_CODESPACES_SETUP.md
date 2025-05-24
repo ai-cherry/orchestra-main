@@ -7,10 +7,12 @@ This document explains how Cloud Code and Gemini Code Assist extensions are conf
 The `.devcontainer/devcontainer.json` file has been configured to automatically:
 
 1. Install required VS Code extensions:
+
    - Cloud Code (`GoogleCloudTools.cloudcode`)
    - Gemini Code Assist (`GoogleCloudTools.cloudcode-gemini`)
 
 2. Configure Gemini Code Assist:
+
    - Set project ID to `cherry-ai-project`
    - Enable context-aware code completion
    - Enable Gemini-powered code review
@@ -30,6 +32,7 @@ If you need to manually set up or refresh the configuration, you can run the pro
 ```
 
 This script will:
+
 - Install the required VS Code extensions
 - Check for Google Cloud authentication
 - Set the active project to `cherry-ai-project`
@@ -41,10 +44,12 @@ This script will:
 Once configured, you can use Gemini Code Assist in your development workflow:
 
 1. **Context-Aware Code Completion**:
+
    - As you type, you'll see AI-powered code suggestions that understand your codebase context
    - Accept suggestions by pressing Tab or Enter
 
 2. **Gemini-Powered Code Review**:
+
    - Right-click on code and select "Review with Gemini"
    - Get AI-powered code reviews with suggestions and improvements
 
@@ -58,10 +63,12 @@ Once configured, you can use Gemini Code Assist in your development workflow:
 If you encounter issues with the extensions:
 
 1. **Authentication Problems**:
+
    - Verify authentication with: `gcloud auth list`
    - Check the project is set correctly: `gcloud config get-value project`
 
 2. **Extension Not Working**:
+
    - Check if extensions are installed in VS Code Extensions panel
    - Reload VS Code window with Ctrl+Shift+P, then "Developer: Reload Window"
 

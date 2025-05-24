@@ -17,17 +17,17 @@ The `.vscode/tasks.json` file includes a task to automatically start the MCP ser
 
 ```json
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "Start MCP Server",
-            "type": "shell",
-            "command": "${workspaceFolder}/mcp_server/scripts/start_mcp_server.sh",
-            "runOptions": {
-                "runOn": "folderOpen"
-            }
-        }
-    ]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start MCP Server",
+      "type": "shell",
+      "command": "${workspaceFolder}/mcp_server/scripts/start_mcp_server.sh",
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    }
+  ]
 }
 ```
 
@@ -46,6 +46,7 @@ sudo ./mcp_server/scripts/install_mcp_service.sh
 ```
 
 This will:
+
 - Install the MCP package
 - Create a systemd service
 - Enable autostart on system boot
@@ -97,6 +98,7 @@ docker-compose logs -f
 ```
 
 The Docker setup includes:
+
 - Automatic restart on container crash
 - Volume for persistent data storage
 - Port exposure (8080)
@@ -119,6 +121,7 @@ For any environment, you can use the universal startup script:
 ```
 
 This script:
+
 - Detects your environment (Docker, Codespace, systemd, or standard)
 - Uses the appropriate method to start the server
 - Installs dependencies if needed
@@ -147,11 +150,13 @@ The startup script automatically detects your environment:
 If the MCP server fails to start:
 
 1. Check the logs:
+
    - Direct run: `/tmp/mcp-server.log`
    - Systemd: `journalctl -u mcp-server.service -f`
    - Docker: `docker-compose logs -f`
 
 2. Common issues:
+
    - Port 8080 already in use
    - Missing dependencies
    - Permission issues in systemd service

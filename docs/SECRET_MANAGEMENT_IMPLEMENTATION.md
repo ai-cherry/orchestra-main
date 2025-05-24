@@ -9,14 +9,17 @@ This document provides a summary of the implementation of secret management in o
 ### 1. Files Created or Modified
 
 - **GitHub Actions Workflow**
+
   - `.github/workflows/deploy.yml`: Configured for secret management integration
 
 - **Scripts**
+
   - `scripts/pre-commit-hook-template`: Template for preventing accidental commits of secret files
   - `scripts/install-pre-commit-hook.sh`: Helper script for developers to install the pre-commit hook
   - `scripts/validate_secret_cicd.sh`: Validation script to check the integration
 
 - **Documentation**
+
   - `docs/SECRET_MANAGEMENT_CICD.md`: Comprehensive documentation for the CI/CD integration
   - `README.md`: Updated with information about the secret management features
 
@@ -39,6 +42,7 @@ This document provides a summary of the implementation of secret management in o
 ### 4. Service Accounts and Permissions
 
 - **vertex-agent@cherry-ai-project.iam.gserviceaccount.com**:
+
   - Used for managing secrets with Secret Manager
   - Requires `roles/secretmanager.secretAccessor` and `roles/aiplatform.reasoningEngineServiceAgent`
 
@@ -49,6 +53,7 @@ This document provides a summary of the implementation of secret management in o
 ## Testing and Validation
 
 The integration includes a validation script (`scripts/validate_secret_cicd.sh`) that checks:
+
 - Presence of all required files
 - Executable permissions
 - Essential content in configuration files
@@ -57,6 +62,7 @@ The integration includes a validation script (`scripts/validate_secret_cicd.sh`)
 ## Developer Workflow
 
 1. **Local Development**:
+
    - Install the pre-commit hook using `./scripts/install-pre-commit-hook.sh`
    - Use the example script for local testing: `examples/local_secret_setup_example.sh`
 

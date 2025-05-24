@@ -16,21 +16,20 @@ from typing import List
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from packages.shared.src.memory.config import (
-    MemoryConfig,
-    MemoryBackendType,
     FirestoreConfig,
+    MemoryBackendType,
+    MemoryConfig,
+    TelemetryConfig,
     VectorSearchConfig,
     VectorSearchType,
-    TelemetryConfig,
 )
 from packages.shared.src.memory.factory import MemoryManagerFactory
 from packages.shared.src.memory.telemetry import (
     configure_telemetry,
-    trace_operation,
     log_operation,
+    trace_operation,
 )
 from packages.shared.src.models.base_models import MemoryItem
-
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -135,7 +134,7 @@ async def example_with_config():
             memory_manager, user_id="user123", query_embedding=query_embedding, top_k=2
         )
 
-        logger.info(f"Search results:")
+        logger.info("Search results:")
         for i, item in enumerate(results):
             logger.info(f"  {i+1}. ID: {item.id}, Content: {item.text_content}")
 

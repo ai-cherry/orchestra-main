@@ -7,11 +7,11 @@ throughout the application.
 """
 
 import logging
-import os
 import time
-import yaml
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Dict, Optional
+
+import yaml
 
 from packages.shared.src.models.base_models import PersonaConfig
 
@@ -130,7 +130,7 @@ class PersonaManager:
 
         # If still not found, use fallback
         if "default" in FALLBACK_PERSONAS:
-            logger.warning(f"No personas available, using fallback: default")
+            logger.warning("No personas available, using fallback: default")
             return FALLBACK_PERSONAS["default"]
 
         # If all else fails, raise an error

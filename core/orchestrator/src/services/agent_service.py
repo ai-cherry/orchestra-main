@@ -6,7 +6,7 @@ including functionality to instantiate and manage agents.
 """
 
 import logging
-from typing import Dict, Optional, Any
+from typing import Any, Dict, Optional
 
 # Import base agent class and concrete implementations
 from packages.agents.base import BaseAgent

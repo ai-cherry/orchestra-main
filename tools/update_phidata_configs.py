@@ -12,11 +12,12 @@ Usage:
 """
 
 import argparse
+import logging
 import os
 import sys
+from typing import Any, Dict, Tuple
+
 import yaml
-import logging
-from typing import Dict, Any, List, Optional, Tuple
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")

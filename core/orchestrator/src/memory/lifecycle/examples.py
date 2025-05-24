@@ -7,16 +7,13 @@ for importance scoring, progressive summarization, and chunking.
 
 import asyncio
 import logging
-from typing import Dict, List, Any, Optional
 
 from core.orchestrator.src.memory.lifecycle import (
+    ChunkingStrategy,
     ImportanceScorer,
     ImportanceScoringConfig,
-    ImportanceFactors,
-    ProgressiveSummarizer,
-    SummaryLevel,
     MemoryChunker,
-    ChunkingStrategy,
+    ProgressiveSummarizer,
 )
 
 # Configure logging
@@ -58,7 +55,7 @@ async def importance_scorer_example():
     # Print the results
     logger.info(f"Item ID: {score.item_id}")
     logger.info(f"Overall score: {score.score:.2f}")
-    logger.info(f"Component scores:")
+    logger.info("Component scores:")
     logger.info(f"  Recency: {score.recency_score:.2f}")
     logger.info(f"  Usage: {score.usage_score:.2f}")
     logger.info(f"  Content: {score.content_score:.2f}")
@@ -77,35 +74,35 @@ async def progressive_summarizer_example():
     # Sample content to summarize
     content = """
     # AI Orchestra Memory System
-    
+
     The AI Orchestra memory system is designed to provide a unified interface for managing
     different types of memory storage (short-term, mid-term, semantic) across various backends
     (Redis, Firestore, Vertex AI Vector Search, etc.).
-    
+
     ## Key Components
-    
+
     1. **Layered Memory**: Manages multiple memory layers with different characteristics
     2. **Memory Store**: Abstract interface for memory storage backends
     3. **Memory Query**: Encapsulates parameters for memory retrieval
-    
+
     ## Memory Types
-    
+
     - **Short-term memory**: Fast, ephemeral storage using Redis
     - **Mid-term memory**: Structured storage using Firestore
     - **Long-term memory**: Persistent storage using Firestore
     - **Semantic memory**: Vector-based storage using Vertex AI Vector Search
-    
+
     ## Recent Enhancements
-    
+
     The memory system has been enhanced with several new capabilities:
-    
+
     1. **Parallel Retrieval**: Execute searches across multiple memory layers concurrently
     2. **Hybrid Search**: Combine keyword-based and semantic search for better results
     3. **Query Classification**: Dynamically adjust retrieval strategies based on query type
     4. **Importance Scoring**: Evaluate the importance of memory items for retention decisions
     5. **Progressive Summarization**: Create multi-level summaries for efficient storage
     6. **Memory Chunking**: Split large documents into semantic chunks for better retrieval
-    
+
     These enhancements significantly improve the performance, scalability, and intelligence
     of the memory system while maintaining its clean architectural design.
     """
@@ -132,35 +129,35 @@ async def memory_chunker_example():
     # Sample content to chunk
     content = """
     # AI Orchestra Memory System
-    
+
     The AI Orchestra memory system is designed to provide a unified interface for managing
     different types of memory storage (short-term, mid-term, semantic) across various backends
     (Redis, Firestore, Vertex AI Vector Search, etc.).
-    
+
     ## Key Components
-    
+
     1. **Layered Memory**: Manages multiple memory layers with different characteristics
     2. **Memory Store**: Abstract interface for memory storage backends
     3. **Memory Query**: Encapsulates parameters for memory retrieval
-    
+
     ## Memory Types
-    
+
     - **Short-term memory**: Fast, ephemeral storage using Redis
     - **Mid-term memory**: Structured storage using Firestore
     - **Long-term memory**: Persistent storage using Firestore
     - **Semantic memory**: Vector-based storage using Vertex AI Vector Search
-    
+
     ## Recent Enhancements
-    
+
     The memory system has been enhanced with several new capabilities:
-    
+
     1. **Parallel Retrieval**: Execute searches across multiple memory layers concurrently
     2. **Hybrid Search**: Combine keyword-based and semantic search for better results
     3. **Query Classification**: Dynamically adjust retrieval strategies based on query type
     4. **Importance Scoring**: Evaluate the importance of memory items for retention decisions
     5. **Progressive Summarization**: Create multi-level summaries for efficient storage
     6. **Memory Chunking**: Split large documents into semantic chunks for better retrieval
-    
+
     These enhancements significantly improve the performance, scalability, and intelligence
     of the memory system while maintaining its clean architectural design.
     """
@@ -207,31 +204,31 @@ async def integrated_example():
     # Sample content
     content = """
     # AI Orchestra Memory System Architecture
-    
+
     The AI Orchestra memory system provides a unified interface for managing different types
     of memory across various storage backends. This document outlines the key architectural
     components and recent enhancements.
-    
+
     ## System Components
-    
+
     The memory system consists of several key components:
-    
+
     1. **Layered Memory Manager**: Coordinates access to different memory layers
     2. **Memory Stores**: Implementations for different storage backends
     3. **Query Engine**: Processes and optimizes memory queries
     4. **Memory Lifecycle**: Manages the lifecycle of memory items
-    
+
     ## Recent Enhancements
-    
+
     Several enhancements have been made to improve performance and functionality:
-    
+
     - Parallel retrieval for faster search across memory layers
     - Hybrid search combining keyword and semantic approaches
     - Query classification for optimized retrieval strategies
     - Importance scoring for intelligent memory management
     - Progressive summarization for efficient storage
     - Memory chunking for better handling of large documents
-    
+
     These improvements significantly enhance the system's capabilities while
     maintaining its clean architectural design.
     """
@@ -300,7 +297,6 @@ async def integrated_example():
 
 # Import datetime here to avoid circular import
 from datetime import datetime
-
 
 # Run examples if module is executed directly
 if __name__ == "__main__":

@@ -6,10 +6,10 @@ This module provides a service for accessing secrets stored in Google Cloud Secr
 
 import logging
 import os
-from typing import Dict, Optional, Any
+from typing import Dict, Optional
 
-from google.cloud import secretmanager
 from google.api_core.exceptions import NotFound, PermissionDenied
+from google.cloud import secretmanager
 
 logger = logging.getLogger(__name__)
 

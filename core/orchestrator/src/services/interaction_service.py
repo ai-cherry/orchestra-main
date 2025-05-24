@@ -10,8 +10,8 @@ import logging
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
-from packages.shared.src.memory.services.memory_service import MemoryService
 from packages.shared.src.llm_client.interface import LLMClient
+from packages.shared.src.memory.services.memory_service import MemoryService
 from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
 
 # Configure logging

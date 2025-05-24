@@ -54,6 +54,7 @@ The integration architecture enhances Orchestra's agent capabilities by connecti
 Leverages Gemini 2.5's 2M token context window for cross-agent memory sharing.
 
 **Key Features:**
+
 - Maintains a shared 2M token context pool
 - Priority-based memory management
 - Intelligent context pruning
@@ -64,6 +65,7 @@ Leverages Gemini 2.5's 2M token context window for cross-agent memory sharing.
 Connects Orchestra to SuperAGI's cloud agent management platform.
 
 **Key Features:**
+
 - Advanced agent lifecycle management
 - Tool discovery and registry mapping
 - Resource optimization
@@ -74,6 +76,7 @@ Connects Orchestra to SuperAGI's cloud agent management platform.
 Implements AutoGen's multi-agent conversation protocols.
 
 **Key Features:**
+
 - Structured multi-agent dialogues
 - Group reasoning capabilities
 - Advanced agent specialization
@@ -84,6 +87,7 @@ Implements AutoGen's multi-agent conversation protocols.
 Enhances Orchestra's memory system with LangChain's specialized memory modules.
 
 **Key Features:**
+
 - Entity extraction and memory
 - Conversation summarization
 - Structured knowledge bases
@@ -94,6 +98,7 @@ Enhances Orchestra's memory system with LangChain's specialized memory modules.
 Provides enterprise-grade agent management via Google's Vertex AI platform.
 
 **Key Features:**
+
 - Enterprise compliance features
 - Advanced analytics and monitoring
 - A/B testing for agent optimization
@@ -117,6 +122,7 @@ Provides enterprise-grade agent management via Google's Vertex AI platform.
 ```
 
 This script will:
+
 - Install required dependencies
 - Set up configuration files
 - Enable Google Cloud APIs
@@ -158,9 +164,9 @@ superagi:
 gemini_context_manager:
   enabled: true
   model: "gemini-2.5-pro"
-  max_tokens: 2000000  # 2M tokens
-  token_estimator: "transformers"  # Use transformers library for token estimation
-  priority_threshold: 0.7  # Threshold for high-priority items preservation
+  max_tokens: 2000000 # 2M tokens
+  token_estimator: "transformers" # Use transformers library for token estimation
+  priority_threshold: 0.7 # Threshold for high-priority items preservation
 ```
 
 ### SuperAGI Integration
@@ -169,7 +175,7 @@ gemini_context_manager:
 superagi:
   enabled: true
   api_url: "https://api.superagi.com/v1"
-  organization_id: "your-org-id"  # Optional
+  organization_id: "your-org-id" # Optional
 ```
 
 ### AutoGen Integration
@@ -177,10 +183,10 @@ superagi:
 ```yaml
 autogen:
   enabled: true
-  default_llm: "gpt-4o"  # Default model
-  max_rounds: 10         # Maximum conversation rounds
-  speaker_selection: "auto"  # auto, round_robin, or random
-  use_manager: true      # Use GroupChatManager
+  default_llm: "gpt-4o" # Default model
+  max_rounds: 10 # Maximum conversation rounds
+  speaker_selection: "auto" # auto, round_robin, or random
+  use_manager: true # Use GroupChatManager
 ```
 
 ### LangChain Memory Adapter
@@ -188,11 +194,11 @@ autogen:
 ```yaml
 langchain:
   enabled: true
-  use_entity_memory: true      # Enable entity extraction
-  use_summary_memory: true     # Enable conversation summarization
-  use_vectorstore: true        # Enable vector storage
-  collection_name: "orchestra_memories"  # Collection name
-  embedding_model: "textembedding-gecko@latest"  # Embedding model
+  use_entity_memory: true # Enable entity extraction
+  use_summary_memory: true # Enable conversation summarization
+  use_vectorstore: true # Enable vector storage
+  collection_name: "orchestra_memories" # Collection name
+  embedding_model: "textembedding-gecko@latest" # Embedding model
 ```
 
 ### Vertex AI Integration
@@ -200,9 +206,9 @@ langchain:
 ```yaml
 vertex_ai:
   enabled: true
-  model: "gemini-2.5-pro"  # Model to use
-  project_id: "your-project-id"  # Optional, uses current project by default
-  region: "us-central1"    # Region
+  model: "gemini-2.5-pro" # Model to use
+  project_id: "your-project-id" # Optional, uses current project by default
+  region: "us-central1" # Region
 ```
 
 ## Usage Examples
@@ -360,6 +366,7 @@ The Gemini Context Manager leverages Gemini 2.5's 2M token context window for ef
 2. **Cross-Agent Knowledge Sharing**: Allow multiple agents to share a unified context pool.
 
 3. **Prioritized Memory Management**: Keep the most important information in context using intelligent prioritization:
+
    - High-priority items are preserved even when context approaches capacity
    - Low-priority items are pruned first when space is needed
    - Recency and access frequency influence priority calculation
@@ -369,6 +376,7 @@ The Gemini Context Manager leverages Gemini 2.5's 2M token context window for ef
 ### Memory Prioritization
 
 The system uses a prioritization algorithm based on:
+
 - Explicit priority assignment (0.0-1.0)
 - Access count and frequency
 - Recency of information
@@ -379,11 +387,13 @@ The system uses a prioritization algorithm based on:
 The integration components are supported by Google Cloud infrastructure:
 
 - **Memory System Infrastructure**
+
   - Redis for real-time caching layer
   - AlloyDB with vector extension for persistent storage
   - BigQuery for analytics
 
 - **Security Infrastructure**
+
   - Secret Manager for API keys
   - Workload Identity Federation for GitHub Actions
   - IAM permissions for secure access
@@ -431,6 +441,7 @@ terraform apply
 **Problem**: "Failed to authenticate with [Service] API"
 
 **Solution**:
+
 - Verify API keys are correctly set in Secret Manager or environment variables
 - Check if API key has necessary permissions
 - Confirm the API is enabled in Google Cloud Console
@@ -440,6 +451,7 @@ terraform apply
 **Problem**: "Failed to initialize [Integration] adapter"
 
 **Solution**:
+
 - Check if all dependencies are installed
 - Verify configuration values in `integrations.yaml`
 - Check logs for specific error messages
@@ -450,6 +462,7 @@ terraform apply
 **Problem**: Terraform deployment fails
 
 **Solution**:
+
 - Check project permissions
 - Verify quota limits for resources
 - Review error messages in Terraform output
@@ -460,6 +473,7 @@ terraform apply
 **Problem**: "Could not add to context: not enough space"
 
 **Solution**:
+
 - Lower the priority threshold to allow more aggressive pruning
 - Reduce the token count of items being added
 - Monitor the context window usage metrics

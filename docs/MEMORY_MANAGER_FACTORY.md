@@ -96,7 +96,7 @@ memory_manager = await MemoryManagerFactory.create_memory_manager(config)
 try:
     # Add memory item
     item_id = await memory_manager.add_memory_item(memory_item)
-    
+
     # Perform semantic search
     results = await memory_manager.semantic_search(
         user_id="user123",

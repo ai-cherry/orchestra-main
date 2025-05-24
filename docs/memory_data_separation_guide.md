@@ -11,13 +11,13 @@ The memory system stores two distinct types of data:
 
 These data types have different characteristics and requirements:
 
-| Characteristic | Development Context | Personal Information |
-|----------------|---------------------|----------------------|
-| Privacy Level  | Generally lower     | Potentially high     |
-| Retention      | Longer term         | Subject to data protection laws |
+| Characteristic | Development Context | Personal Information                     |
+| -------------- | ------------------- | ---------------------------------------- |
+| Privacy Level  | Generally lower     | Potentially high                         |
+| Retention      | Longer term         | Subject to data protection laws          |
 | Access Pattern | Team-wide           | User-specific with strict access control |
-| Classification | By component/system | By user/privacy level |
-| Regulation     | Internal policies   | External regulations (GDPR, CCPA, etc.) |
+| Classification | By component/system | By user/privacy level                    |
+| Regulation     | Internal policies   | External regulations (GDPR, CCPA, etc.)  |
 
 ## Implementation Components
 
@@ -75,6 +75,7 @@ memory_items_critical_prod
 ```
 
 This separation is managed by the `get_collection_name()` function in `StorageConfig`, which applies the appropriate prefixes and suffixes based on:
+
 - Environment (dev, staging, prod)
 - Privacy level (standard, sensitive, critical)
 - Namespace (for multi-tenant deployments)
@@ -84,7 +85,7 @@ This separation is managed by the `get_collection_name()` function in `StorageCo
 ```python
 # Development context manager (used by development tools)
 dev_notes_manager = DevNotesManager(
-    memory_manager=FirestoreMemoryAdapter(), 
+    memory_manager=FirestoreMemoryAdapter(),
     config=dev_config
 )
 
@@ -110,27 +111,27 @@ service cloud.firestore {
       allow read: if request.auth.token.role in ['developer', 'architect', 'admin'];
       allow write: if request.auth.token.role in ['developer', 'architect', 'admin'];
     }
-    
+
     match /agent_data_{environment}/{document=**} {
       allow read: if request.auth.token.role in ['developer', 'architect', 'admin', 'support'];
       allow write: if request.auth.token.role in ['developer', 'architect', 'admin'];
     }
-    
+
     // User data access - restricted by user_id and service roles
     match /memory_items_{privacy_level}_{environment}/{document} {
       // Users can only access their own data
       allow read: if request.auth.uid == resource.data.user_id;
-      
+
       // Services can access data according to their permissions
-      allow read: if request.auth.token.role == 'service' && 
+      allow read: if request.auth.token.role == 'service' &&
                    request.auth.token.service_name in ['orchestrator', 'memory_service'];
-                   
+
       // Write permissions are strictly limited to authorized services
-      allow write: if request.auth.token.role == 'service' && 
+      allow write: if request.auth.token.role == 'service' &&
                    request.auth.token.service_name in ['orchestrator', 'memory_service'] &&
                    request.auth.token.write_access == true;
     }
-    
+
     // Multi-tenant isolation
     match /{tenant_namespace}/{collection}/{document} {
       allow read, write: if request.auth.token.tenant_id == tenant_namespace;
@@ -163,7 +164,8 @@ When deploying the memory system, ensure:
 
 When moving from development to staging/production:
 
-1. **Development Notes**: 
+1. **Development Notes**:
+
    - Document key architecture decisions in permanent repositories
    - Do not migrate dev_notes or agent_data to production
    - If needed, create sanitized versions for production documentation
@@ -193,9 +195,9 @@ async def record_deployment_notes(deployment_id: str, version: str, changes: Lis
         memory_manager=FirestoreMemoryAdapter(),
         config=StorageConfig(environment="prod", enable_dev_notes=True)
     )
-    
+
     await dev_notes_manager.initialize()
-    
+
     # Record the deployment as an implementation note
     await dev_notes_manager.add_implementation_note(
         component="memory_system",
@@ -216,7 +218,7 @@ async def record_deployment_notes(deployment_id: str, version: str, changes: Lis
             "expiration": datetime.utcnow() + timedelta(days=180)  # 6 month retention
         }
     )
-    
+
     await dev_notes_manager.close()
 ```
 
@@ -230,7 +232,7 @@ async def store_user_conversation(user_id: str, session_id: str, message: str):
         project_id="my-project",
         namespace=f"tenant_{get_tenant_for_user(user_id)}"
     )
-    
+
     # Wrap with privacy enhancements
     privacy_manager = PrivacyEnhancedMemoryManager(
         underlying_manager=base_manager,
@@ -239,9 +241,9 @@ async def store_user_conversation(user_id: str, session_id: str, message: str):
             enforce_privacy_classification=True
         )
     )
-    
+
     await privacy_manager.initialize()
-    
+
     # Create memory item
     item = MemoryItem(
         user_id=user_id,
@@ -253,10 +255,10 @@ async def store_user_conversation(user_id: str, session_id: str, message: str):
             "retention_period": 90  # days
         }
     )
-    
+
     # Store with automatic PII detection and classification
     await privacy_manager.add_memory_item(item)
-    
+
     await privacy_manager.close()
 ```
 

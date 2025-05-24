@@ -28,10 +28,9 @@ import argparse
 import asyncio
 import json
 import logging
-import os
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Any
+from typing import Any, Dict, List
 
 # Set up logging
 logging.basicConfig(
@@ -46,7 +45,7 @@ sys.path.insert(0, str(parent_dir))
 
 # Import orchestra_system components
 try:
-    from orchestra_system.api import get_api, initialize_system
+    from orchestra_system.api import get_api
 except ImportError as e:
     logger.error(f"Failed to import orchestra_system: {e}")
     logger.error("Make sure the package is installed or in your PYTHONPATH")
@@ -178,12 +177,12 @@ async def setup_mcp_integration() -> bool:
     try:
         # Check for MCP client
         try:
-            from gcp_migration.mcp_client_enhanced import MCPClient, get_client
+            from gcp_migration.mcp_client_enhanced import get_client
 
             logger.info("Using enhanced MCP client")
         except ImportError:
             try:
-                from gcp_migration.mcp_client import MCPClient, get_client
+                from gcp_migration.mcp_client import get_client
 
                 logger.info("Using basic MCP client")
             except ImportError:
@@ -200,7 +199,7 @@ async def setup_mcp_integration() -> bool:
         api = get_api(mcp_client=mcp_client, force_new=True)
 
         # Initialize system
-        state = await api.initialize_system()
+        await api.initialize_system()
         logger.info("MCP integration set up successfully")
 
         return True
@@ -221,8 +220,7 @@ async def setup_gcp_integration() -> bool:
     try:
         # Check for GCP client libraries
         try:
-            import google.cloud.storage
-            import google.cloud.aiplatform
+            pass
 
             logger.info("GCP client libraries found")
         except ImportError:

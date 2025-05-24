@@ -1,7 +1,7 @@
 # AI Orchestra Mode Definitions
 # This configuration defines all available modes with their optimized model assignments:
 # - Gemini 2.5 Pro: architect, orchestrator, and reviewer modes
-# - GPT-4.1: code and debug modes  
+# - GPT-4.1: code and debug modes
 # - Claude 3.7: strategy, ask, and creative modes
 
 modes:
@@ -137,7 +137,7 @@ modes:
     name: "🎨 Creative"
     model: "claude-4"
     description: "Technical writer and creative communicator"
-    write_access: true  # Enhanced to allow documentation creation
+    write_access: true # Enhanced to allow documentation creation
     file_patterns:
       - ".*\\.md$"
       - "docs/.*"

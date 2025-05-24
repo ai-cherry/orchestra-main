@@ -22,7 +22,7 @@ python3 setup_figma_pages.py
 #### Color Variables
 
 1. Open your Figma file (ID: 368236963)
-2. Navigate to the "_Foundations & Variables" page
+2. Navigate to the "\_Foundations & Variables" page
 3. Open the Variables panel (Menu → Variables)
 4. Create a new collection named "Orchestra-Color-Semantic"
 5. Add 4 modes:
@@ -32,11 +32,11 @@ python3 setup_figma_pages.py
    - Gordon Gekko
 6. Add variables with these exact values:
 
-| Variable Name | Neutral | Cherry | Sophia | Gordon Gekko |
-|---------------|---------|--------|--------|--------------|
-| accent-primary | #8B5CF6 | #E04DDA | #38BDF8 | #F97316 |
-| accent-secondary | #A78BFA | #F0ABFC | #7DD3FC | #FDBA74 |
-| accent-text | #FFFFFF | #FFFFFF | #FFFFFF | #1A1A1A |
+| Variable Name    | Neutral | Cherry  | Sophia  | Gordon Gekko |
+| ---------------- | ------- | ------- | ------- | ------------ |
+| accent-primary   | #8B5CF6 | #E04DDA | #38BDF8 | #F97316      |
+| accent-secondary | #A78BFA | #F0ABFC | #7DD3FC | #FDBA74      |
+| accent-text      | #FFFFFF | #FFFFFF | #FFFFFF | #1A1A1A      |
 
 #### Typography Variables
 
@@ -49,21 +49,24 @@ python3 setup_figma_pages.py
 
 ### 3. Adapt Core Components
 
-Navigate to "_Core Components [Adapted]" page and create these components:
+Navigate to "\_Core Components [Adapted]" page and create these components:
 
 #### Button (Primary)
+
 - Apply "Orchestra-Color-Semantic/accent-primary" to Background
 - Apply "Orchestra-Color-Semantic/accent-text" to Text and Icon
 - Remove border
 - Create hover/active states
 
 #### Card (Default)
+
 - Apply "Base Surface Color Style" (Gray 800/900) to Container Background
 - Add optional subtle border (Gray 700)
 - Style header with Semibold Heading text (White)
 - Style body with Regular Body text (Gray 300)
 
 #### Input (Default)
+
 - Apply "Input Background Style" (Gray 700) to Container
 - Apply "Input Border Style" (Gray 600) to Border
 - Apply "Input Text Style" (White) to Text
@@ -71,6 +74,7 @@ Navigate to "_Core Components [Adapted]" page and create these components:
 - Apply "Orchestra-Color-Semantic/accent-primary" to Focus State
 
 #### Sidebar Item
+
 - Make Container transparent
 - Style Icon with "Navigation Icon Style" (Gray 400)
 - Style Text with "Navigation Text Style" (Gray 300)
@@ -78,6 +82,7 @@ Navigate to "_Core Components [Adapted]" page and create these components:
 - Apply "Orchestra-Color-Semantic/accent-text" to Active State Text/Icon
 
 #### Top Bar Container
+
 - Apply "Header Background Style" (Gray 900) to Background
 - Apply "Subtle Separator Style" (Gray 800) to Border Bottom
 - Apply "Page Title Style" (White, text-xl) to Title
@@ -187,11 +192,13 @@ chmod +x deploy_to_cloud_run.sh
 ### 10. Manual End-to-End Testing
 
 Start the API server:
+
 ```bash
 ./run_api.sh
 ```
 
 Test with curl commands:
+
 ```bash
 # Test persona switching
 curl -X POST "http://localhost:8000/api/interact?persona=cherry" \

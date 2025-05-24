@@ -6,31 +6,25 @@ trips circuits when thresholds are exceeded, and implements retry with exponenti
 """
 
 import logging
-import time
 import random
-import asyncio
+import threading
+from datetime import datetime, timedelta
 from enum import Enum
 from typing import (
-    Dict,
-    List,
-    Optional,
     Any,
-    Callable,
-    TypeVar,
-    Generic,
-    Union,
     Awaitable,
-    cast,
+    Callable,
+    Dict,
+    Generic,
+    Optional,
+    TypeVar,
 )
-from datetime import datetime, timedelta
-import threading
-from core.orchestrator.src.resilience.tasks import get_task_queue_manager
+
 from core.orchestrator.src.exceptions import (
-    ResilienceError,
-    CircuitBreakerOpenError,
     AgentExecutionError,
-    OrchestratorError,
+    CircuitBreakerOpenError,
 )
+from core.orchestrator.src.resilience.tasks import get_task_queue_manager
 from core.orchestrator.src.utils.error_handling import log_error
 
 # Configure logging

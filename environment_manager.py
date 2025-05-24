@@ -23,9 +23,8 @@ import platform
 import shutil
 import subprocess
 import sys
-from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple, Any, Union
+from typing import Any, Dict, Optional
 
 
 # ANSI color codes for terminal output
@@ -431,7 +430,7 @@ class EnvironmentManager:
             settings_str = "{\n" + settings_comment + settings_str[1:]
             f.write(settings_str)
 
-        print(f"Successfully optimized VS Code workspace settings for better performance")
+        print("Successfully optimized VS Code workspace settings for better performance")
 
     def analyze_repository_size(self) -> Dict[str, Any]:
         """
@@ -734,7 +733,7 @@ def main() -> int:
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
 
     # Status command
-    status_parser = subparsers.add_parser("status", help="Show environment status")
+    subparsers.add_parser("status", help="Show environment status")
 
     # Switch command
     switch_parser = subparsers.add_parser("switch", help="Switch environment")
@@ -745,10 +744,10 @@ def main() -> int:
     )
 
     # Optimize workspace command
-    optimize_parser = subparsers.add_parser("optimize-workspace", help="Optimize VS Code workspace settings")
+    subparsers.add_parser("optimize-workspace", help="Optimize VS Code workspace settings")
 
     # Repository size command
-    repo_size_parser = subparsers.add_parser("repo-size", help="Analyze repository size")
+    subparsers.add_parser("repo-size", help="Analyze repository size")
 
     # Cleanup command
     cleanup_parser = subparsers.add_parser("cleanup", help="Clean up repository to reduce size")

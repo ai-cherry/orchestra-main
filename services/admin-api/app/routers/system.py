@@ -2,8 +2,9 @@
 Router for system-level API endpoints.
 """
 
-from typing import Dict, Any
 import platform
+from typing import Any, Dict
+
 import psutil
 from fastapi import APIRouter, Depends
 

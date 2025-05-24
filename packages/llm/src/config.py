@@ -4,11 +4,12 @@ Configuration module for LLM models.
 This module provides helper functions to configure LLM models from application settings.
 """
 
-import os
 import logging
-from typing import Dict, Any, Optional, Union
+from typing import Any, Dict, Optional
+
 from pydantic import BaseModel
-from core.orchestrator.src.config.settings import Settings, get_settings
+
+from core.orchestrator.src.config.settings import Settings
 
 # Configure logging
 logger = logging.getLogger(__name__)

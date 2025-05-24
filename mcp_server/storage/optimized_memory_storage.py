@@ -6,13 +6,12 @@ This module provides a high-performance in-memory storage implementation
 optimized for single-instance, development, and test environments.
 """
 
-import time
-import logging
-import json
 import asyncio
-import threading
-from typing import Dict, List, Optional, Any, Union, Set
+import json
+import logging
 import os
+import time
+from typing import Any, Dict, List, Optional, Set
 
 from ..interfaces.storage import IMemoryStorage
 from ..models.memory import MemoryEntry
@@ -663,7 +662,6 @@ class OptimizedMemoryStorage(IMemoryStorage):
 
         try:
             import json
-            from pathlib import Path
 
             # Create directory if it doesn't exist
             os.makedirs(os.path.dirname(self.persistence_path), exist_ok=True)

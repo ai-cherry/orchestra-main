@@ -5,15 +5,13 @@ This module provides classes for coordinating teams of specialized agents,
 enabling them to work together to solve complex tasks.
 """
 
-import logging
 import asyncio
-from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple, Union, cast
+import logging
+from typing import Any, Dict, List, Optional, Tuple
 
 from pydantic import BaseModel, Field
 
 from core.orchestrator.src.agents.agent_base import Agent, AgentContext, AgentResponse
-from core.orchestrator.src.agents.memory.layered_memory import get_memory_manager
 from core.orchestrator.src.agents.stateful_agent import StatefulAgent
 from core.orchestrator.src.config.models import TeamMode
 

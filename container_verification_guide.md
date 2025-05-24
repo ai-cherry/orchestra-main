@@ -1,6 +1,7 @@
 # Container Verification Guide
 
 ## Project Information
+
 - Project ID: cherry-ai.me
 - Project Number: 525398941159
 - Region: us-central1
@@ -9,17 +10,20 @@
 ## Container Image Verification Steps
 
 1. **Verify Registry Access**
+
    ```bash
    gcloud auth configure-docker us-central1-docker.pkg.dev
    docker pull us-central1-docker.pkg.dev/cherry-ai.me/orchestra/api:latest
    ```
 
 2. **Check Container Scan Results**
+
    ```bash
    gcloud artifacts docker images scan us-central1-docker.pkg.dev/cherry-ai.me/orchestra/api:latest
    ```
 
 3. **Verify Container Signatures**
+
    ```bash
    cosign verify us-central1-docker.pkg.dev/cherry-ai.me/orchestra/api:latest
    ```
@@ -33,6 +37,7 @@
    ```
 
 ## Service Account Verification
+
 - Service Account: vertex-agent@cherry-ai.me.iam.gserviceaccount.com
 - Required Roles:
   - roles/artifactregistry.reader
@@ -40,12 +45,14 @@
   - roles/aiplatform.user
 
 ## Container Health Checks
+
 - API Endpoint: http://localhost:8000/health
 - Expected Response: {"status": "healthy"}
 - Timeout: 5 seconds
 - Period: 30 seconds
 
 ## Security Requirements
+
 1. No privileged containers
 2. Read-only root filesystem
 3. Non-root user execution

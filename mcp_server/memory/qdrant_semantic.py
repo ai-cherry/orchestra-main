@@ -12,8 +12,8 @@ NOTE: This is a stub implementation to be completed later.
 
 from typing import Any, Dict, List, Optional, Union
 
-from .base import BaseMemory, MemoryEntry, MemorySearchResult, MemoryTier
 from ..utils.structured_logging import get_logger
+from .base import BaseMemory, MemoryEntry, MemorySearchResult, MemoryTier
 
 logger = get_logger(__name__)
 

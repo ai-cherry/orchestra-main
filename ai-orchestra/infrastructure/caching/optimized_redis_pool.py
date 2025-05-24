@@ -6,7 +6,6 @@ implementing connection pool partitioning, pipelining operations, and adaptive
 connection limits for improved performance.
 """
 
-import asyncio
 import logging
 import threading
 import time
@@ -17,21 +16,16 @@ from typing import (
     Dict,
     List,
     Optional,
-    Set,
-    Tuple,
     TypeVar,
-    Union,
-    Generic,
-    cast,
 )
 
 import redis.asyncio
-from redis.asyncio import Redis, ConnectionPool
+from redis.asyncio import ConnectionPool, Redis
 from redis.asyncio.client import Pipeline
 
 from ....core.config import get_settings
 from ....core.errors import handle_exception
-from ....utils.logging import log_event, log_start, log_end, log_error
+from ....utils.logging import log_event
 
 logger = logging.getLogger(__name__)
 T = TypeVar("T")

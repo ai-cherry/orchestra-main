@@ -18,6 +18,7 @@ This guide explains how to maximize the utility of the pre-built Phidata Agent U
 The Phidata Agent UI provides a web interface for interacting with your Orchestra backend. By properly configuring your backend and agents, you can ensure that responses are displayed in a readable, well-formatted manner in the UI.
 
 Key components:
+
 - **Backend API Endpoint**: The `/phidata/chat` endpoint processes requests from the UI
 - **Phidata Agent Wrapper**: Handles agent initialization with proper storage/memory
 - **Structured Output Formatting**: Converts structured data to readable markdown
@@ -25,12 +26,14 @@ Key components:
 ## Key Integration Points
 
 1. **`/phidata/chat` Endpoint**: We've enhanced this endpoint to:
+
    - Accept session identifiers for conversation persistence
    - Return properly formatted markdown responses
    - Handle structured outputs by converting them to markdown
    - Control tool call visibility based on agent configuration
 
 2. **`PhidataAgentWrapper`**: This wrapper now:
+
    - Properly initializes agents with CloudSQL PgVector storage
    - Configures markdown output and tool call visibility
    - Handles structured outputs via response_model configuration
@@ -53,13 +56,15 @@ Markdown makes responses significantly more readable in the UI by enabling:
 ### How to Enable Markdown
 
 1. In your YAML agent configurations:
+
    ```yaml
    phidata_agent:
      # Other configuration...
-     markdown: true  # This enables markdown formatting
+     markdown: true # This enables markdown formatting
    ```
 
 2. For teams, enable at both team and member levels:
+
    ```yaml
    phidata_team:
      # Team configuration...
@@ -106,6 +111,7 @@ Tool calls can be displayed or hidden in the UI based on your configuration.
 ### Development vs. Production
 
 - **Development**: Show tool calls for debugging
+
   ```yaml
   phidata_dev_agent:
     # Other configuration...
@@ -135,6 +141,7 @@ Proper session management ensures conversation history is maintained correctly.
 ### Requirements
 
 1. Configure CloudSQL PgVector storage in your agent YAML:
+
    ```yaml
    phidata_agent:
      # Other configuration...
@@ -160,14 +167,17 @@ See [core/orchestrator/examples/phidata_agent_ui_config.yaml](../core/orchestrat
 ## Testing Your Integration
 
 1. **Verify Markdown Rendering**:
+
    - Test with various markdown features (code blocks, lists, tables)
    - Ensure they render correctly in the UI
 
 2. **Test Structured Output**:
+
    - Use an agent with a response_model
    - Verify the output is formatted legibly in the UI
 
 3. **Check Conversation History**:
+
    - Have a multi-turn conversation
    - Refresh the page and verify history is maintained
 
@@ -193,11 +203,11 @@ def format_custom_output(data: Dict[str, Any]) -> str:
 # Then add to the main function:
 def format_structured_output_as_markdown(data: Any, output_type: Optional[str] = None) -> str:
     # Existing code...
-    
+
     # Add your custom type:
     if output_type == "custom_type":
         return format_custom_output(data)
-    
+
     # Existing code...
 ```
 
@@ -207,8 +217,8 @@ The UI can display agent names and roles. Ensure your YAML configs include:
 
 ```yaml
 phidata_agent:
-  name: "Helpful Assistant"  # Displayed in the UI
-  role: "I help answer questions about..."  # Can be displayed in the UI
+  name: "Helpful Assistant" # Displayed in the UI
+  role: "I help answer questions about..." # Can be displayed in the UI
 ```
 
 These fields will be passed to the UI for display.

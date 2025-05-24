@@ -50,8 +50,8 @@ echo -e "${YELLOW}Step 1: Removing deprecated files...${NC}"
 
 # Updated list of files to remove based on current needs (May 2025)
 FILES_TO_REMOVE=(
-    "updated_phidata_wrapper.py" 
-    "setup_gcp_auth.sh" 
+    "updated_phidata_wrapper.py"
+    "setup_gcp_auth.sh"
     "diagnose_environment.py"
     "deprecated_firestore_v1.py"
     "legacy_migration_script.sh"
@@ -77,7 +77,7 @@ BACKUP_DIR="/workspaces/orchestra-main/backups/import_fixes_$(date +%Y%m%d_%H%M%
 mkdir -p "$BACKUP_DIR"
 
 # Find files with deprecated imports and back them up
-grep -r --include="*.py" "from packages.memory.src.base" /workspaces/orchestra-main | awk -F: '{print $1}' | sort -u | xargs -I{} cp {} "$BACKUP_DIR"/ 
+grep -r --include="*.py" "from packages.memory.src.base" /workspaces/orchestra-main | awk -F: '{print $1}' | sort -u | xargs -I{} cp {} "$BACKUP_DIR"/
 
 echo "Updating imports from packages.memory.src.base to packages.shared.src.memory.memory_manager..."
 find /workspaces/orchestra-main -type f -name "*.py" -exec sed -i 's/from packages\.memory\.src\.base import MemoryManager/from packages.shared.src.memory.memory_manager import MemoryManager/g' {} \;
@@ -109,7 +109,7 @@ Memory management components are located in two main areas:
 2. **packages/shared/src/storage/firestore/**
    - `firestore_memory.py`: Original Firestore implementation (DEPRECATED)
    - `v2/adapter.py`: V2 Firestore implementation (RECOMMENDED)
-   - `v2/core.py`: Core functionality for V2 implementation 
+   - `v2/core.py`: Core functionality for V2 implementation
    - `v2/models.py`: Data models for V2 implementation
 
 3. **packages/phidata/src/**
@@ -167,13 +167,13 @@ if [ -f "/workspaces/orchestra-main/add_deprecation_notices.py" ]; then
     echo -e "${GREEN}Deprecation notice added to FirestoreMemoryManager.${NC}"
 else
     echo -e "${YELLOW}Warning: add_deprecation_notices.py not found, adding deprecation notice manually...${NC}"
-    
+
     # Add deprecation notice manually if the Python script doesn't exist
     FIRESTORE_FILE="packages/shared/src/storage/firestore/firestore_memory.py"
     if [ -f "$FIRESTORE_FILE" ]; then
         # Create a temporary file
         TEMP_FILE=$(mktemp)
-        
+
         # Add deprecation notice to the beginning of the file
         cat > "$TEMP_FILE" << 'EOD'
 """
@@ -193,13 +193,13 @@ warnings.warn(
 )
 
 EOD
-        
+
         # Append the original content
         cat "$FIRESTORE_FILE" >> "$TEMP_FILE"
-        
+
         # Replace the original file
         mv "$TEMP_FILE" "$FIRESTORE_FILE"
-        
+
         echo -e "${GREEN}Deprecation notice added manually to FirestoreMemoryManager.${NC}"
     else
         echo -e "${RED}Error: FirestoreMemoryManager file not found at $FIRESTORE_FILE${NC}"
@@ -216,26 +216,26 @@ if [ -n "$HARDCODED_ORG_FILES" ]; then
     echo -e "${YELLOW}Found hardcoded organization references in the following files:${NC}"
     echo "$HARDCODED_ORG_FILES"
     echo -e "${YELLOW}Consider updating these to use environment variables instead.${NC}"
-    
+
     read -p "Would you like to see examples of the hardcoded references? (y/n) " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         grep -n "ai-cherry" --include="*.sh" --include="*.py" --include="*.yml" --include="*.yaml" /workspaces/orchestra-main | head -10
     fi
-    
+
     read -p "Would you like to automatically update these references to use environment variables? (y/n) " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo -e "${YELLOW}Updating hardcoded references...${NC}"
-        
+
         # Create backups
         for file in $HARDCODED_ORG_FILES; do
             cp "$file" "$file.bak"
         done
-        
+
         # Update the files
         find /workspaces/orchestra-main -type f \( -name "*.sh" -o -name "*.py" -o -name "*.yml" -o -name "*.yaml" \) -exec sed -i 's/ai-cherry/${GITHUB_ORG:-ai-cherry}/g' {} \;
-        
+
         echo -e "${GREEN}Updated hardcoded references. Backups created with .bak extension.${NC}"
     fi
 else

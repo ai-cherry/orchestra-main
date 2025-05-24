@@ -156,3 +156,4 @@ gcloud workstations clusters delete ai-orchestra-cluster \
   --project=cherry-ai-project \
   --location=us-west4 \
   --quiet
+```

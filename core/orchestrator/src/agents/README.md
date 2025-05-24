@@ -11,6 +11,7 @@ The agent architecture consists of several core components:
 The `Agent` abstract base class in `agent_base.py` defines the interface that all agents must implement. It provides methods for processing user input, determining if an agent can handle a specific context, and managing agent lifecycle.
 
 Key methods:
+
 - `process(context: AgentContext) -> AgentResponse`: Process user input and generate a response
 - `can_handle(context: AgentContext) -> float`: Determine if this agent can handle the given context
 - `initialize()`: Initialize the agent

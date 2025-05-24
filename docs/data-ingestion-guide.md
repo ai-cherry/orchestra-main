@@ -49,17 +49,17 @@ flowchart TD
 
 ### 2. **API Usage**
 
-- **File Ingestion:**  
+- **File Ingestion:**
   `POST /ingest/file` with file upload and source_type (e.g., csv, jsonl).
-- **Directory Ingestion:**  
+- **Directory Ingestion:**
   `POST /ingest/directory` with directory path and source_type.
-- **API Ingestion:**  
+- **API Ingestion:**
   `POST /ingest/api` with API URL and type (rest, graphql, etc.).
-- **Webhook/Event:**  
+- **Webhook/Event:**
   `POST /ingest/webhook` for event-driven triggers.
-- **Progress Tracking:**  
+- **Progress Tracking:**
   `GET /ingest/progress/{task_id}`
-- **Cancellation:**  
+- **Cancellation:**
   `POST /ingest/cancel/{task_id}`
 
 ### 3. **Extending Processors**
@@ -85,13 +85,13 @@ curl -X POST -H "Content-Type: application/json" \
 
 ## Troubleshooting & FAQ
 
-- **File not ingested?**  
+- **File not ingested?**
   Check file format, processor registration, and logs.
-- **API errors?**  
+- **API errors?**
   Validate endpoint, credentials, and throttling settings.
-- **Performance issues?**  
+- **Performance issues?**
   Tune batch size, enable async processing, and monitor resource usage.
-- **Extending formats?**  
+- **Extending formats?**
   See `shared/data_ingestion/file_processors.py` and `api_connectors.py` for templates.
 
 ---

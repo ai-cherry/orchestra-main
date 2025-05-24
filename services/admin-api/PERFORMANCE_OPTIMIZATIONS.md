@@ -18,6 +18,7 @@ We've implemented a series of performance optimizations across multiple layers o
 **File:** `services/admin-api/Dockerfile`
 
 Changes made:
+
 - Removed non-root user setup to reduce container build time and complexity
 - Removed Tini signal handler to simplify execution chain
 - Increased worker counts (`WEB_CONCURRENCY=4`, `WORKERS_PER_CORE=2`)
@@ -27,6 +28,7 @@ Changes made:
 - Kept CPU active at all times by setting `cpu_idle=false`
 
 Benefits:
+
 - Container startup time reduced by approximately 20%
 - Request throughput increased by approximately 35-40%
 - Simplified container structure with fewer layers
@@ -34,55 +36,67 @@ Benefits:
 ### 2. Application Code Optimization
 
 #### Error Handling Optimization
+
 **File:** `services/admin-api/app/application.py`
 
 Changes made:
+
 - Removed stack trace logging in exception handler
-- Modified error responses to include actual error details 
+- Modified error responses to include actual error details
 - Added more specific error type information for faster debugging
 
 Benefits:
+
 - Reduced CPU overhead during error processing
 - Improved debugging efficiency with specific error details
 - Eliminated unnecessary sanitization overhead
 
 #### Redis Configuration Optimization
+
 **File:** `services/admin-api/app/application.py`
 
 Changes made:
+
 - Reduced connection timeouts from 5s to 2s
 - Added health check interval (15s)
 - Increased connection pool size (20)
 - Disabled automatic pool closing
 
 Benefits:
+
 - Faster Redis connections with less wait time
 - More efficient connection pool management
 - Higher throughput for cached operations
 
 #### Circuit Breaker Optimization
+
 **File:** `services/admin-api/app/services/gemini_service.py`
 
 Changes made:
+
 - Increased failure threshold from 5 to 12
 - Reduced reset timeout from 30s to 15s
 - Added fast path optimizations in the code
 - Simplified logging to reduce overhead
 
 Benefits:
+
 - Higher service availability under intermittent failures
 - Faster recovery from transient errors
 - Reduced CPU overhead in the hot path
 
 #### Firestore Pagination Optimization
+
 **File:** `services/admin-api/app/services/admin_functions.py`
 
 Changes made:
+
 - Increased default page size from 100 to 500
 - Added read consistency setting optimization
 - Simplified query execution path
 
 Benefits:
+
 - Reduced number of Firestore queries by 80%
 - Lower overall latency for paginated operations
 - Improved query efficiency with consistency settings
@@ -92,6 +106,7 @@ Benefits:
 **File:** `services/admin-api/terraform/main.tf`
 
 Changes made:
+
 - Simplified IAM permissions with broader role (`roles/editor`)
 - Removed Secret Manager usage for direct environment variables
 - Optimized startup probe (faster detection, more retries)
@@ -100,8 +115,9 @@ Changes made:
 - Configured VPC connector for all traffic types
 
 Benefits:
+
 - Faster service deployment with simpler permissions
-- Reduced API calls during startup 
+- Reduced API calls during startup
 - Higher availability with optimized probe settings
 - Better network throughput with all-traffic VPC settings
 
@@ -110,11 +126,13 @@ Benefits:
 We've created two new files for performance testing and validation:
 
 **File:** `services/admin-api/performance_test.py`
+
 - Python script for load testing API endpoints
 - Measures response times, throughput, and error rates
 - Generates detailed performance reports and charts
 
 **File:** `services/admin-api/run_performance_test.sh`
+
 - Shell script for easy test execution
 - Supports before/after comparison testing
 - Handles continuous monitoring of performance
@@ -123,17 +141,18 @@ We've created two new files for performance testing and validation:
 
 Based on preliminary testing, these optimizations are expected to deliver:
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Average Response Time | ~150ms | ~90ms | ~40% |
-| Throughput (req/sec) | ~25 | ~40 | ~60% |
-| Container Startup Time | ~8s | ~5s | ~38% |
-| Memory Usage | Medium | Medium | Similar |
-| CPU Utilization | Medium | Higher | Increased |
+| Metric                 | Before | After  | Improvement |
+| ---------------------- | ------ | ------ | ----------- |
+| Average Response Time  | ~150ms | ~90ms  | ~40%        |
+| Throughput (req/sec)   | ~25    | ~40    | ~60%        |
+| Container Startup Time | ~8s    | ~5s    | ~38%        |
+| Memory Usage           | Medium | Medium | Similar     |
+| CPU Utilization        | Medium | Higher | Increased   |
 
 ## How to Verify Performance Improvements
 
 1. Run the performance test script in before/after mode:
+
    ```bash
    cd services/admin-api
    ./run_performance_test.sh --mode before-after

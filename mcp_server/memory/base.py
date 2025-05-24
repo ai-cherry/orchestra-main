@@ -5,14 +5,14 @@ This module defines the core abstractions for memory storage, retrieval,
 and management across different tiers with performance-first design.
 """
 
+import asyncio
+import hashlib
+import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
-import asyncio
-import hashlib
-import json
 from uuid import uuid4
 
 
@@ -151,7 +151,6 @@ class BaseMemory(ABC):
         Returns:
             bool: True if initialization successful
         """
-        pass
 
     @abstractmethod
     async def save(self, entry: MemoryEntry) -> bool:
@@ -164,7 +163,6 @@ class BaseMemory(ABC):
         Returns:
             bool: True if save successful
         """
-        pass
 
     @abstractmethod
     async def get(self, key: str) -> Optional[MemoryEntry]:
@@ -177,7 +175,6 @@ class BaseMemory(ABC):
         Returns:
             MemoryEntry or None if not found
         """
-        pass
 
     @abstractmethod
     async def delete(self, key: str) -> bool:
@@ -190,7 +187,6 @@ class BaseMemory(ABC):
         Returns:
             bool: True if deletion successful
         """
-        pass
 
     @abstractmethod
     async def search(
@@ -210,7 +206,6 @@ class BaseMemory(ABC):
         Returns:
             List of search results sorted by relevance
         """
-        pass
 
     @abstractmethod
     async def list_keys(self, prefix: Optional[str] = None) -> List[str]:
@@ -223,7 +218,6 @@ class BaseMemory(ABC):
         Returns:
             List of keys
         """
-        pass
 
     @abstractmethod
     async def batch_save(self, entries: List[MemoryEntry]) -> Dict[str, bool]:
@@ -236,7 +230,6 @@ class BaseMemory(ABC):
         Returns:
             Dict mapping keys to success status
         """
-        pass
 
     @abstractmethod
     async def batch_get(self, keys: List[str]) -> Dict[str, Optional[MemoryEntry]]:
@@ -249,7 +242,6 @@ class BaseMemory(ABC):
         Returns:
             Dict mapping keys to entries (None if not found)
         """
-        pass
 
     @abstractmethod
     async def clear(self, prefix: Optional[str] = None) -> int:
@@ -262,7 +254,6 @@ class BaseMemory(ABC):
         Returns:
             Number of entries cleared
         """
-        pass
 
     @abstractmethod
     async def stats(self) -> Dict[str, Any]:
@@ -272,7 +263,6 @@ class BaseMemory(ABC):
         Returns:
             Dict with stats (size, count, performance metrics, etc.)
         """
-        pass
 
     @abstractmethod
     async def health_check(self) -> Dict[str, Any]:
@@ -282,7 +272,6 @@ class BaseMemory(ABC):
         Returns:
             Dict with health status and diagnostics
         """
-        pass
 
     async def ensure_initialized(self) -> None:
         """Ensure the backend is initialized before operations."""

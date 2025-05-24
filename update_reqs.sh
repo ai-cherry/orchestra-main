@@ -3,4 +3,4 @@
 set -e
 source ~/orchestra-main/venv/bin/activate
 pip freeze | grep -v "pkg-resources" > requirements.txt
-echo "requirements.txt updated from current environment." 
+echo "requirements.txt updated from current environment."

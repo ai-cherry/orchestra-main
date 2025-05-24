@@ -7,12 +7,12 @@ for single-developer, single-user projects. It prioritizes speed and
 reduced overhead over security measures.
 """
 
+import argparse
+import json
+import logging
 import os
 import sys
-import json
-import argparse
-import logging
-from typing import Dict, Any, Optional
+from typing import Any, Dict
 
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

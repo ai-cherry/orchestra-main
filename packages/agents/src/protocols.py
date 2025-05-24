@@ -5,7 +5,8 @@ This module defines the interfaces for agent interactions, ensuring a clear cont
 for implementations to follow.
 """
 
-from typing import Protocol, Any
+from typing import Protocol
+
 from packages.core.src.models import AgentInput, AgentOutput
 
 

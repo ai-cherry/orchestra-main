@@ -17,10 +17,12 @@ We've implemented a comprehensive set of changes to streamline security and impr
 ### 1. Authentication Simplification
 
 **Files Created:**
+
 - `simplified_auth.sh`: Streamlined shell script for GCP authentication
 - `simplified_gcp_auth.py`: Python module for GCP client authentication
 
 **Key Changes:**
+
 - Uses a single master GCP key for all operations
 - Eliminates complex permission checks and file operations
 - Removes key rotation requirements
@@ -29,9 +31,11 @@ We've implemented a comprehensive set of changes to streamline security and impr
 ### 2. VS Code Restriction Removal
 
 **Files Created:**
+
 - `disable_restrictions.sh`: Script to disable all VS Code security features
 
 **Key Changes:**
+
 - Disables workspace trust features
 - Removes restricted mode permanently
 - Sets environment variables to prevent security prompts
@@ -40,10 +44,12 @@ We've implemented a comprehensive set of changes to streamline security and impr
 ### 3. Security Check Minimization
 
 **Files Created:**
+
 - `simplified_security_check.sh`: Minimal security check script
 - `simplified_security_policy.md`: Simplified security policy document
 
 **Key Changes:**
+
 - Removes dependency vulnerability scanning
 - Eliminates custom security policies
 - Removes strict dependency pinning requirements
@@ -52,9 +58,11 @@ We've implemented a comprehensive set of changes to streamline security and impr
 ### 4. Terraform Configuration Simplification
 
 **Files Created:**
+
 - `simplified_security.tf`: Terraform configuration with minimal security
 
 **Key Changes:**
+
 - Uses broader IAM permissions for efficiency
 - Removes VPC Service Controls
 - Eliminates CMEK encryption requirements
@@ -63,9 +71,11 @@ We've implemented a comprehensive set of changes to streamline security and impr
 ### 5. Deployment Process Streamlining
 
 **Files Created:**
+
 - `simplified_deploy.sh`: Deployment script with minimal security checks
 
 **Key Changes:**
+
 - Uses the master key for authentication
 - Removes security checks from the deployment process
 - Simplifies the deployment configuration
@@ -76,11 +86,13 @@ We've implemented a comprehensive set of changes to streamline security and impr
 To use the simplified security approach:
 
 1. **Authentication Setup**
+
    ```bash
    source simplified_auth.sh --auth
    ```
 
 2. **VS Code Configuration**
+
    ```bash
    ./disable_restrictions.sh
    ```

@@ -21,9 +21,9 @@ echo
 check_api() {
   local api_name=$1
   local display_name=$2
-  
+
   echo -e "${YELLOW}Checking if ${display_name} (${api_name}) is enabled...${NC}"
-  
+
   if gcloud services list --enabled --filter="name:${api_name}" --project="${PROJECT_ID}" | grep -q "${api_name}"; then
     echo -e "${GREEN}✓ ${display_name} is enabled${NC}"
     return 0
@@ -37,9 +37,9 @@ check_api() {
 enable_api() {
   local api_name=$1
   local display_name=$2
-  
+
   echo -e "${YELLOW}Enabling ${display_name} (${api_name})...${NC}"
-  
+
   if gcloud services enable "${api_name}" --project="${PROJECT_ID}"; then
     echo -e "${GREEN}✓ ${display_name} enabled successfully${NC}"
     return 0
@@ -62,18 +62,18 @@ declare -A APIS=(
 # Check and enable each API
 for api_name in "${!APIS[@]}"; do
   display_name="${APIS[$api_name]}"
-  
+
   if ! check_api "$api_name" "$display_name"; then
     echo -e "  Would you like to enable ${display_name}? (y/n)"
     read -r response
-    
+
     if [[ "$response" =~ ^[Yy]$ ]]; then
       enable_api "$api_name" "$display_name"
     else
       echo -e "${YELLOW}⚠ Skipping ${display_name}${NC}"
     fi
   fi
-  
+
   echo
 done
 

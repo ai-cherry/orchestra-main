@@ -122,10 +122,12 @@ After deployment, you can monitor the application using:
 ### Common Issues
 
 1. **Deployment Fails with Authentication Error**:
+
    - Ensure the GCP_MASTER_SERVICE_JSON has the correct permissions
    - Check that the service account has the necessary roles
 
 2. **Container Fails to Start**:
+
    - Check the Cloud Run logs for startup errors
    - Verify that the GCP_SECRET_MANAGEMENT_KEY secret exists in Secret Manager
 

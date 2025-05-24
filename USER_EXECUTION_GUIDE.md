@@ -3,6 +3,7 @@
 ## Where to Run These Commands
 
 All commands in this guide should be run in either:
+
 - **Your Codespaces terminal** (where you're currently working)
 - **Google Cloud Shell** (accessible via the GCP Console)
 

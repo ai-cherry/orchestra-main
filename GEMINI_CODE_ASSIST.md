@@ -42,6 +42,7 @@ The `analyze_code.sh` script handles code analysis requests:
 ```
 
 Options:
+
 - `--project=ID`: GCP Project ID (default: cherry-ai-project)
 - `--secret=NAME`: API key secret name (default: GEMINI_API_KEY)
 - `--type=TYPE`: Analysis type: security|performance|style (default: security)
@@ -106,6 +107,7 @@ If you encounter issues with the code analysis:
 4. Examine the analysis output for error messages
 
 For local development issues:
+
 ```bash
 # To test the hook manually
 .git/hooks/pre-commit
@@ -121,3 +123,4 @@ echo "NEW_API_KEY" > gemini.key
 
 # Update the secret in Secret Manager (automatic in CI/CD)
 ./secrets_setup.sh --secret=GEMINI_API_KEY --file=gemini.key
+```

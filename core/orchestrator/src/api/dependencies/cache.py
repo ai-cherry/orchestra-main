@@ -7,9 +7,9 @@ in cloud environments.
 """
 
 import logging
-import asyncio
 from functools import lru_cache
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
+
 from fastapi import Depends
 
 from core.orchestrator.src.config.settings import Settings, get_settings

@@ -5,12 +5,10 @@ This script demonstrates how to interact with the LLM endpoints
 of the AI Orchestration System.
 """
 
-import os
-import sys
-import json
-import asyncio
 import argparse
-from typing import Dict, List, Optional, Any
+import asyncio
+from typing import Optional
+
 import httpx
 
 

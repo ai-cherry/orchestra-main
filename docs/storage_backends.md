@@ -17,6 +17,7 @@ The storage implementation follows a tiered architecture:
 
 1. **Memory Manager Interface**: Defined in `packages/shared/src/memory/memory_manager.py`
 2. **Concrete Implementations**:
+
    - `FirestoreMemoryManager`: Implements persistent storage using Google Cloud Firestore
    - `RedisClient`: Provides caching functionality using Redis
    - `ConcreteMemoryManager`: Combines Firestore and Redis for optimal performance
@@ -87,9 +88,11 @@ await redis.set("key", data, ttl=3600)
 ### Firestore Collections
 
 - `memory_items`: Stores MemoryItem objects
+
   - Key fields: `user_id`, `session_id`, `item_type`, `timestamp`
-  
+
 - `agent_data`: Stores AgentData objects
+
   - Key fields: `agent_id`, `data_type`, `timestamp`
 
 - `user_sessions`: Stores user session data

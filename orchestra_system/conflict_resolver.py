@@ -14,14 +14,10 @@ Key features:
 - Integration with MCP memory for persistent conflict state
 """
 
-import asyncio
-import difflib
 import hashlib
-import json
 import logging
 import os
 import re
-import time
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
@@ -30,12 +26,7 @@ from typing import (
     Dict,
     List,
     Optional,
-    Set,
-    Tuple,
     Union,
-    TypeVar,
-    Generic,
-    Callable,
 )
 
 # Configure logging
@@ -49,13 +40,13 @@ logger = logging.getLogger("conflict-resolver")
 try:
     from gcp_migration.mcp_client_enhanced import (
         MCPClient,
-        MCPResponse,
-        get_client as get_mcp_client,
     )
+    from gcp_migration.mcp_client_enhanced import get_client as get_mcp_client
 except ImportError:
     logger.warning("Could not import enhanced MCP client, attempting to import basic client")
     try:
-        from gcp_migration.mcp_client import MCPClient, get_client as get_mcp_client
+        from gcp_migration.mcp_client import MCPClient
+        from gcp_migration.mcp_client import get_client as get_mcp_client
     except ImportError:
         logger.error("Failed to import MCP client. Conflict Resolver will operate in offline mode.")
         MCPClient = object
@@ -81,7 +72,7 @@ except ImportError:
 
 
 try:
-    from orchestra_system.config_manager import ConfigEntry, ConfigConflict, get_manager
+    from orchestra_system.config_manager import ConfigConflict, ConfigEntry, get_manager
 except ImportError:
     logger.warning("Could not import config manager, some functionality will be limited")
     ConfigEntry = None
@@ -1360,7 +1351,7 @@ class ConflictResolver:
                     actions=actions,
                     status=ResolutionStatus.MANUAL_REQUIRED,
                     resolved_at=datetime.now().isoformat(),
-                    description=f"Reference inconsistency requires manual resolution",
+                    description="Reference inconsistency requires manual resolution",
                 )
 
                 return resolution
@@ -1726,7 +1717,7 @@ if __name__ == "__main__":
         if resolution:
             print(f"Resolved conflict {args.resolve} using {strategy} strategy")
             print(f"  Status: {resolution.status}")
-            print(f"  Actions:")
+            print("  Actions:")
             for action in resolution.actions:
                 print(f"    - {action.get('description')}")
         else:

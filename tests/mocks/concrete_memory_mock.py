@@ -9,12 +9,9 @@ class ConcreteMemoryManager:
 
     def __init__(self, **kwargs):
         """Initialize with any kwargs."""
-        pass
 
     def initialize(self):
         """Mock initialization."""
-        pass
 
     def close(self):
         """Mock close."""
-        pass

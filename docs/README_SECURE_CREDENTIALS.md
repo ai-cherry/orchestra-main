@@ -17,6 +17,7 @@ This document provides an overview of the secure credential management system im
 The AI Orchestra secure credential management system provides a robust, scalable, and secure way to manage credentials across different environments and components. It addresses the security vulnerability found in `track_migration_progress.sh` and establishes a comprehensive credential management architecture.
 
 Key features:
+
 - Secure storage of credentials in Google Cloud Secret Manager
 - Service account management with least privilege
 - Workload Identity Federation for GitHub Actions
@@ -31,6 +32,7 @@ The system consists of the following components:
 ### 1. Bash Scripts
 
 - `secure_credential_manager.sh`: CLI tool for credential management
+
   - Get secrets from Secret Manager
   - Create and update secrets
   - Rotate service account keys
@@ -47,6 +49,7 @@ The system consists of the following components:
 ### 2. Python Modules
 
 - `core/security/credential_manager.py`: Python interface for credential management
+
   - Access secrets from Secret Manager
   - Cache credentials for performance
   - Handle credential rotation
@@ -282,12 +285,13 @@ Select the appropriate option to update the infrastructure.
 1. **Authentication Failures**
 
    If you encounter authentication failures:
-   
+
    ```
    Error: Request had invalid authentication credentials
    ```
-   
+
    Check:
+
    - Is GOOGLE_APPLICATION_CREDENTIALS set correctly?
    - Does the service account have the necessary permissions?
    - Has the key been rotated recently?
@@ -295,12 +299,13 @@ Select the appropriate option to update the infrastructure.
 2. **Secret Not Found**
 
    If a secret is not found:
-   
+
    ```
    Error: Secret not found: projects/cherry-ai-project/secrets/secret-name
    ```
-   
+
    Check:
+
    - Does the secret exist in Secret Manager?
    - Are you using the correct name and environment suffix?
    - Do you have permission to access the secret?
@@ -308,12 +313,13 @@ Select the appropriate option to update the infrastructure.
 3. **Workload Identity Federation Issues**
 
    If GitHub Actions fails to authenticate:
-   
+
    ```
    Error: Unable to get credential via Workload Identity Federation
    ```
-   
+
    Check:
+
    - Is the Workload Identity Pool configured correctly?
    - Does the GitHub repository have the correct permissions?
    - Is the id-token permission set in the workflow?

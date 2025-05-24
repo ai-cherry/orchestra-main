@@ -3,15 +3,13 @@
 Script to find critical linting issues across the codebase.
 """
 
-import os
-import sys
-import subprocess
 import argparse
-import re
 import json
-from typing import List, Dict, Any
-from pathlib import Path
-from collections import defaultdict, Counter
+import re
+import subprocess
+import sys
+from collections import Counter, defaultdict
+from typing import Any, Dict, List
 
 # Critical lint issues to check for
 CRITICAL_ISSUES = {
@@ -110,7 +108,7 @@ def print_summary(results: Dict[str, List[Dict[str, Any]]]) -> None:
     total_issues = sum(len(issues) for issues in results.values())
     files_with_issues = len(results)
 
-    print(f"\n===== Critical Linting Issues Summary =====")
+    print("\n===== Critical Linting Issues Summary =====")
     print(f"Found {total_issues} issues in {files_with_issues} files\n")
 
     # Count issues by type
@@ -134,7 +132,7 @@ def print_summary(results: Dict[str, List[Dict[str, Any]]]) -> None:
 
 def print_detailed_report(results: Dict[str, List[Dict[str, Any]]]) -> None:
     """Print a detailed report of all linting issues."""
-    print(f"\n===== Detailed Linting Issues Report =====")
+    print("\n===== Detailed Linting Issues Report =====")
 
     for filename, issues in sorted(results.items()):
         print(f"\n{filename}:")

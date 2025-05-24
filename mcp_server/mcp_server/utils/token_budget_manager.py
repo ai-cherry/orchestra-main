@@ -1,4 +1,4 @@
-import os  # Changed 'ot' to 'os'
+# import os  # Removed unused import
 
 """
 token_budget_manager.py - Optimized Token Budget Manager
@@ -9,9 +9,9 @@ token estimation without requiring a full tokenizer.
 """
 
 import json
-import re
 import logging
-from typing import Dict, Any, Optional, Set, List
+import re
+from typing import Any, Dict, Optional
 
 # Import from relative paths
 from ..models.memory import MemoryEntry

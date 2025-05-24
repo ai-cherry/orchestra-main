@@ -47,7 +47,7 @@ DEPLOY_CHOICE=1
 case $DEPLOY_CHOICE in
   1)
     echo "Deploying to Cloud Run..."
-    
+
     # Create a simple Dockerfile
     cat > Dockerfile << 'EOL'
 FROM nginx:alpine
@@ -61,7 +61,7 @@ EOL
 
     # Deploy to Cloud Run using a public Docker Hub image
     echo "Skipping build step due to permission issues. Using public nginx image instead..."
-    
+
     # Deploy to Cloud Run
     $HOME/google-cloud-sdk/bin/gcloud run deploy quick-deploy \
       --image nginx:alpine \
@@ -69,15 +69,15 @@ EOL
       --region us-central1 \
       --allow-unauthenticated \
       --quiet
-    
+
     # Get the deployed URL
     CLOUD_RUN_URL=$($HOME/google-cloud-sdk/bin/gcloud run services describe quick-deploy --platform managed --region us-central1 --format='value(status.url)')
     echo "Your application is deployed at: $CLOUD_RUN_URL"
     ;;
-    
+
   2)
     echo "Deploying to App Engine..."
-    
+
     # Create app.yaml
     cat > app.yaml << 'EOL'
 runtime: python39
@@ -105,15 +105,15 @@ EOL
 
     # Deploy to App Engine
     $HOME/google-cloud-sdk/bin/gcloud app deploy --quiet
-    
+
     # Get the deployed URL
     APP_ENGINE_URL=$($HOME/google-cloud-sdk/bin/gcloud app describe --format='value(defaultHostname)')
     echo "Your application is deployed at: https://$APP_ENGINE_URL"
     ;;
-    
+
   3)
     echo "Deploying to Cloud Functions..."
-    
+
     # Create function directory
     mkdir -p function-deploy
     cd function-deploy
@@ -133,12 +133,12 @@ EOL
       --runtime python39 \
       --trigger-http \
       --allow-unauthenticated
-    
+
     # Get the deployed URL
     FUNCTION_URL=$($HOME/google-cloud-sdk/bin/gcloud functions describe hello-function --format='value(httpsTrigger.url)')
     echo "Your function is deployed at: $FUNCTION_URL"
     ;;
-    
+
   *)
     echo "Invalid choice. Exiting."
     exit 1

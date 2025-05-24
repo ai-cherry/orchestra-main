@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { Bell, Menu, X } from 'lucide-react'
-import { Button } from '../ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { useState } from "react";
+import { Bell, Menu, X } from "lucide-react";
+import { Button } from "../ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,21 +9,21 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu'
+} from "../ui/dropdown-menu";
 
 /**
  * Props for the Header component
  */
 interface HeaderProps {
-  toggleSidebar: () => void
-  sidebarCollapsed: boolean
+  toggleSidebar: () => void;
+  sidebarCollapsed: boolean;
 }
 
 /**
  * Header component that provides navigation controls and user menu
  */
 const Header = ({ toggleSidebar, sidebarCollapsed }: HeaderProps) => {
-  const [notifications, setNotifications] = useState<number>(3)
+  const [notifications, setNotifications] = useState<number>(3);
 
   return (
     <header className="h-16 border-b border-border bg-card flex items-center justify-between px-4">
@@ -32,11 +32,13 @@ const Header = ({ toggleSidebar, sidebarCollapsed }: HeaderProps) => {
           variant="ghost"
           size="icon"
           onClick={toggleSidebar}
-          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {sidebarCollapsed ? <Menu size={20} /> : <X size={20} />}
         </Button>
-        <h1 className="ml-4 text-xl font-semibold hidden md:block">AI Orchestra Admin</h1>
+        <h1 className="ml-4 text-xl font-semibold hidden md:block">
+          AI Orchestra Admin
+        </h1>
       </div>
 
       <div className="flex items-center space-x-4">
@@ -59,21 +61,29 @@ const Header = ({ toggleSidebar, sidebarCollapsed }: HeaderProps) => {
               <DropdownMenuItem className="cursor-pointer">
                 <div className="flex flex-col space-y-1">
                   <p className="font-medium">Memory Pressure Alert</p>
-                  <p className="text-sm text-muted-foreground">Hot tier memory usage at 85%</p>
-                  <p className="text-xs text-muted-foreground">10 minutes ago</p>
+                  <p className="text-sm text-muted-foreground">
+                    Hot tier memory usage at 85%
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    10 minutes ago
+                  </p>
                 </div>
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer">
                 <div className="flex flex-col space-y-1">
                   <p className="font-medium">New Agent Registered</p>
-                  <p className="text-sm text-muted-foreground">Agent "Content Optimizer" has been registered</p>
+                  <p className="text-sm text-muted-foreground">
+                    Agent "Content Optimizer" has been registered
+                  </p>
                   <p className="text-xs text-muted-foreground">1 hour ago</p>
                 </div>
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer">
                 <div className="flex flex-col space-y-1">
                   <p className="font-medium">System Update</p>
-                  <p className="text-sm text-muted-foreground">AI Orchestra core updated to v1.2.0</p>
+                  <p className="text-sm text-muted-foreground">
+                    AI Orchestra core updated to v1.2.0
+                  </p>
                   <p className="text-xs text-muted-foreground">2 hours ago</p>
                 </div>
               </DropdownMenuItem>
@@ -106,7 +116,7 @@ const Header = ({ toggleSidebar, sidebarCollapsed }: HeaderProps) => {
         </DropdownMenu>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

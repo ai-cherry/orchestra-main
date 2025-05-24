@@ -11,18 +11,18 @@ This script verifies:
 
 import asyncio
 import json
+import sys
 import time
 from datetime import datetime
-from typing import Dict, List, Any
-import sys
 from pathlib import Path
+from typing import Any, Dict
 
 # Add parent directories to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from mcp_server.memory.dragonfly_cache import DragonflyCache
+from mcp_server.config.dragonfly_config import log_dragonfly_config, validate_dragonfly_config
 from mcp_server.memory.base import MemoryEntry, MemoryMetadata
-from mcp_server.config.dragonfly_config import validate_dragonfly_config, log_dragonfly_config
+from mcp_server.memory.dragonfly_cache import DragonflyCache
 
 
 class DragonflyConnectionTest:
@@ -114,7 +114,7 @@ class DragonflyConnectionTest:
                 print(f"  ✅ Save: Success ({save_time:.2f}ms)")
                 results["save"] = {"status": "success", "time_ms": save_time}
             else:
-                print(f"  ❌ Save: Failed")
+                print("  ❌ Save: Failed")
                 results["save"] = {"status": "failed"}
 
             # Read test
@@ -126,7 +126,7 @@ class DragonflyConnectionTest:
                 print(f"  ✅ Get: Success ({get_time:.2f}ms)")
                 results["get"] = {"status": "success", "time_ms": get_time}
             else:
-                print(f"  ❌ Get: Failed")
+                print("  ❌ Get: Failed")
                 results["get"] = {"status": "failed"}
 
             # Update test (save with same key)
@@ -139,7 +139,7 @@ class DragonflyConnectionTest:
                 print(f"  ✅ Update: Success ({update_time:.2f}ms)")
                 results["update"] = {"status": "success", "time_ms": update_time}
             else:
-                print(f"  ❌ Update: Failed")
+                print("  ❌ Update: Failed")
                 results["update"] = {"status": "failed"}
 
             # Delete test
@@ -151,15 +151,15 @@ class DragonflyConnectionTest:
                 print(f"  ✅ Delete: Success ({delete_time:.2f}ms)")
                 results["delete"] = {"status": "success", "time_ms": delete_time}
             else:
-                print(f"  ❌ Delete: Failed")
+                print("  ❌ Delete: Failed")
                 results["delete"] = {"status": "failed"}
 
             # Verify deletion
             verify = await self.cache.get("test_key_1")
             if verify is None:
-                print(f"  ✅ Delete verification: Confirmed")
+                print("  ✅ Delete verification: Confirmed")
             else:
-                print(f"  ❌ Delete verification: Failed")
+                print("  ❌ Delete verification: Failed")
 
         except Exception as e:
             print(f"  ❌ CRUD test error: {e}")
@@ -248,7 +248,7 @@ class DragonflyConnectionTest:
             max_latency = max(latencies)
             p99_latency = sorted(latencies)[int(len(latencies) * 0.99)]
 
-            print(f"  📊 Write latency:")
+            print("  📊 Write latency:")
             print(f"     Average: {avg_latency:.2f}ms")
             print(f"     Min: {min_latency:.2f}ms")
             print(f"     Max: {max_latency:.2f}ms")
@@ -274,7 +274,7 @@ class DragonflyConnectionTest:
             max_read_latency = max(read_latencies)
             p99_read_latency = sorted(read_latencies)[int(len(read_latencies) * 0.99)]
 
-            print(f"  📊 Read latency:")
+            print("  📊 Read latency:")
             print(f"     Average: {avg_read_latency:.2f}ms")
             print(f"     Min: {min_read_latency:.2f}ms")
             print(f"     Max: {max_read_latency:.2f}ms")
@@ -340,7 +340,7 @@ class DragonflyConnectionTest:
 
             avg_latency = sum(latencies) / len(latencies)
 
-            print(f"  ✅ Connection pool test:")
+            print("  ✅ Connection pool test:")
             print(f"     200 concurrent operations in {total_time:.2f}ms")
             print(f"     Average latency: {avg_latency:.2f}ms")
             print(f"     Effective parallelism: {(sum(latencies) / total_time):.1f}x")
@@ -366,7 +366,7 @@ class DragonflyConnectionTest:
         try:
             health = await self.cache.health_check()
 
-            print(f"  ✅ Health check:")
+            print("  ✅ Health check:")
             print(f"     Status: {health.get('status', 'unknown')}")
             print(f"     Latency: {health.get('latency_ms', 'N/A')}ms")
             print(f"     Version: {health.get('version', 'unknown')}")

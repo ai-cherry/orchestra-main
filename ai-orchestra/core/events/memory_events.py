@@ -7,7 +7,7 @@ that can be used for monitoring, logging, and triggering actions.
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 
 @dataclass

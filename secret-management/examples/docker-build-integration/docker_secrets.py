@@ -31,7 +31,7 @@ from typing import Dict, List, Optional
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
 
 try:
-    from python.gcp_secret_client import SecretClient, SecretAccessError
+    from python.gcp_secret_client import SecretAccessError, SecretClient
 except ImportError:
     print("Cannot import SecretClient. Make sure the library is installed or in the path.")
     print("You can install it with: pip install -e ../../python")

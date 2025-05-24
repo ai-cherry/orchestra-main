@@ -6,13 +6,12 @@ This module provides an asynchronous version of the MemoryStore class,
 using asyncio for improved performance with I/O operations.
 """
 
-import json
-import time
-import logging
 import asyncio
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Union
+import json
+import logging
 from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 # Configure logging
 logger = logging.getLogger("mcp-async-memory-store")

@@ -4,55 +4,53 @@ Main FastAPI application for AI Orchestra.
 This module provides the main FastAPI application.
 """
 
-import os
-
-# Use the new centralized logging setup
-from core.logging_config import setup_logging, get_logger
+import datetime
 
 # Standard library imports
 import json
+import os
 import tempfile
-import datetime
-import uuid
-from typing import Dict, List, Optional, Any, Union
+from typing import Any, Dict, List, Optional
 
-from fastapi import (
-    FastAPI,
-    Depends,
-    HTTPException,
-    Request,
-    status,
-    File,
-    UploadFile,
-    Form,
-)
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
-
-from ai_orchestra.core.config import settings, get_settings
+from ai_orchestra.core.config import settings
 from ai_orchestra.core.errors import AIServiceError
+from ai_orchestra.core.services.checkpointing import StateCheckpointManager
 from ai_orchestra.infrastructure.gcp.vertex_ai_service import VertexAIService
-from ai_orchestra.infrastructure.persistence.firestore_memory import (
-    FirestoreMemoryProvider,
-)
 from ai_orchestra.infrastructure.persistence.failover_memory import (
     FailoverMemoryProvider,
 )
+from ai_orchestra.infrastructure.persistence.firestore_memory import (
+    FirestoreMemoryProvider,
+)
 from ai_orchestra.infrastructure.persistence.memory_provider import MemoryProvider
 from ai_orchestra.infrastructure.vector.pgvector_service import (
-    PGVectorService,
     DocumentChunk,
+    PGVectorService,
 )
-from ai_orchestra.services.document.document_processor import (
-    DocumentProcessor,
-    ChunkingStrategy,
-    TextExtractionError,
-)
-from ai_orchestra.core.services.checkpointing import StateCheckpointManager
 from ai_orchestra.infrastructure.versioning.model_version_manager import (
     ModelVersionManager,
 )
+from ai_orchestra.services.document.document_processor import (
+    ChunkingStrategy,
+    DocumentProcessor,
+    TextExtractionError,
+)
+from fastapi import (
+    Depends,
+    FastAPI,
+    File,
+    Form,
+    HTTPException,
+    Request,
+    UploadFile,
+    status,
+)
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+
+# Use the new centralized logging setup
+from core.logging_config import get_logger, setup_logging
 
 # Determine if running in production (Cloud Run) or development
 is_production = os.environ.get("K_SERVICE") is not None

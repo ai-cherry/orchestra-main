@@ -6,10 +6,10 @@ Demonstrates various data ingestion capabilities.
 
 import asyncio
 import json
-from pathlib import Path
 
 # Add parent directory to path for imports
 import sys
+from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent))
 

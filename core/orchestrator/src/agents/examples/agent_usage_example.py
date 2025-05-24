@@ -7,25 +7,23 @@ with the new memory and tool systems.
 
 import asyncio
 import logging
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, Optional
 
-from core.orchestrator.src.agents.agent_base import Agent, AgentContext, AgentResponse
-from core.orchestrator.src.agents.stateful_agent import (
-    StatefulAgent,
-    ConversationalAgent,
-)
-from core.orchestrator.src.agents.observable_agent import (
-    ObservableAgent,
-    ResilientAgent,
-)
-from core.orchestrator.src.agents.tools.base import Tool, ToolUsingAgent
+from core.orchestrator.src.agents.agent_base import AgentContext, AgentResponse
 from core.orchestrator.src.agents.memory.layered_memory import (
-    get_memory_manager,
     LayeredMemoryManager,
     MemoryLayer,
 )
+from core.orchestrator.src.agents.observable_agent import (
+    ObservableAgent,
+)
+from core.orchestrator.src.agents.stateful_agent import (
+    ConversationalAgent,
+    StatefulAgent,
+)
 from core.orchestrator.src.agents.teams.coordinator import AgentTeam, TeamCoordinator
-from core.orchestrator.src.config.models import MemoryType, TeamMode, PersonaConfig
+from core.orchestrator.src.agents.tools.base import Tool, ToolUsingAgent
+from core.orchestrator.src.config.models import MemoryType, PersonaConfig, TeamMode
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -182,9 +180,7 @@ class ExampleToolUsingAgent(ToolUsingAgent, StatefulAgent):
 
         # Default response
         else:
-            response_text = (
-                f"I'm a tool-using agent. You can ask me to:\n" f"- calculate [expression]\n" f"- weather [location]"
-            )
+            response_text = "I'm a tool-using agent. You can ask me to:\n- calculate [expression]\n- weather [location]"
 
         # Create response
         response = AgentResponse(

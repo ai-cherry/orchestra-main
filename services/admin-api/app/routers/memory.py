@@ -2,10 +2,11 @@
 Router for memory management API endpoints.
 """
 
-from typing import Dict, Any, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, Path, Body
+from typing import Any, Dict
 
-from app.services.admin_functions import get_memory_stats, prune_memory, promote_memory
+from fastapi import APIRouter, HTTPException, Path, Query
+
+from app.services.admin_functions import get_memory_stats, promote_memory, prune_memory
 
 router = APIRouter()
 

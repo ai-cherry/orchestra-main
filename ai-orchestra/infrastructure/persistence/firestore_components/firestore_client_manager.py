@@ -3,9 +3,9 @@ Manages the Firestore client instance, including initialization,
 emulator configuration, and providing a shared client.
 """
 
+import asyncio  # Retained for asyncio.Lock
 import logging
 import os
-import asyncio  # Retained for asyncio.Lock
 from typing import Optional
 
 # google.cloud.firestore is not directly used, only FirestoreAsyncClient from the specific path

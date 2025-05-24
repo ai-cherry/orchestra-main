@@ -62,6 +62,7 @@ python -m orchestra_system.setup --init
 ```
 
 This will:
+
 - Initialize the resource registry
 - Set up the configuration manager
 - Initialize the conflict resolver
@@ -77,6 +78,7 @@ python -m orchestra_system.setup --discover
 ```
 
 This will scan your environment for:
+
 - GCP services and APIs
 - CLI tools
 - Configuration files
@@ -94,6 +96,7 @@ python -m orchestra_system.setup --config
 ```
 
 This will scan for configuration from:
+
 - Environment variables
 - .env files
 - JSON/YAML configuration files
@@ -109,6 +112,7 @@ python -m orchestra_system.setup --conflicts
 ```
 
 This will detect:
+
 - Duplicate files
 - File conflicts
 - Resource conflicts
@@ -129,6 +133,7 @@ python -m orchestra_system.migrate --analyze --output migration_analysis.json
 ```
 
 This will:
+
 - Identify existing integration points
 - Analyze current configuration
 - Detect potential conflicts
@@ -144,6 +149,7 @@ python -m orchestra_system.migrate --plan --output migration_plan.json
 ```
 
 This will create a plan with:
+
 - Step-by-step instructions
 - Backup procedures
 - Validation checks
@@ -189,13 +195,13 @@ from orchestra_system.api import get_api, initialize_system
 async def init_ai_assistant():
     # Initialize the system
     await initialize_system()
-    
+
     # Get system API
     api = get_api()
-    
+
     # Get current context for AI assistant
     context = await api.get_context()
-    
+
     return context
 
 # Use within your AI assistant
@@ -219,14 +225,14 @@ from orchestra_system.api import get_api, initialize_system
 async def init_ai_assistant_with_mcp():
     # Get MCP client
     mcp_client = get_mcp_client()
-    
+
     # Initialize system with MCP client
     api = get_api(mcp_client=mcp_client)
     await api.initialize_system()
-    
+
     # Get context with MCP persistence
     context = await api.get_context()
-    
+
     return context
 ```
 
@@ -416,13 +422,13 @@ Keep AI assistants updated with the latest context:
 async def update_ai_context():
     """Update AI context periodically."""
     api = get_api()
-    
+
     # Rediscover resources
     await api.discover_resources()
-    
+
     # Get fresh context
     context = await api.get_context()
-    
+
     return context
 ```
 
@@ -433,7 +439,9 @@ async def update_ai_context():
 **Problem**: Resources not being discovered correctly
 
 **Solution**:
+
 1. Check environment detection:
+
    ```python
    from orchestra_system.api import get_api
    api = get_api()
@@ -441,6 +449,7 @@ async def update_ai_context():
    ```
 
 2. Run manual resource discovery:
+
    ```bash
    python -m orchestra_system.setup --discover --output resources_debug.json
    ```
@@ -458,7 +467,9 @@ async def update_ai_context():
 **Problem**: Configuration conflicts between environments
 
 **Solution**:
+
 1. Run configuration validation:
+
    ```python
    from orchestra_system.config_manager import get_manager
    config_manager = get_manager()
@@ -467,11 +478,12 @@ async def update_ai_context():
    ```
 
 2. Resolve conflicts manually:
+
    ```python
    from orchestra_system.api import get_api
    api = get_api()
    conflicts = api.get_conflicts()
-   
+
    for conflict in conflicts:
        if conflict.get("conflict_type") == "config_conflict":
            print(f"Conflict: {conflict.get('description')}")
@@ -483,7 +495,9 @@ async def update_ai_context():
 **Problem**: MCP integration failing
 
 **Solution**:
+
 1. Check MCP client:
+
    ```python
    try:
        from gcp_migration.mcp_client_enhanced import get_client
@@ -503,21 +517,25 @@ async def update_ai_context():
 **Problem**: Migration failing at specific steps
 
 **Solution**:
+
 1. Run migration with detailed analysis:
+
    ```bash
    python -m orchestra_system.migrate --analyze --output migration_debug.json
    ```
 
 2. Create a more cautious plan:
+
    ```bash
    python -m orchestra_system.migrate --plan --output migration_plan_safe.json
    ```
 
 3. Execute steps manually if needed:
+
    ```bash
    # Check plan file for individual steps
    cat migration_plan_safe.json
-   
+
    # Execute specific commands from the plan
    # e.g., python -m orchestra_system.setup --init
    ```
@@ -527,21 +545,25 @@ async def update_ai_context():
 After implementing the AI Orchestra System, consider the following next steps:
 
 1. **Create CI/CD Pipeline Integration**
+
    - Add resource discovery to your CI/CD pipeline
    - Run conflict detection as part of pull request validation
    - Generate system reports after deployments
 
 2. **Extend with Custom Resource Types**
+
    - Define domain-specific resource types
    - Create custom discovery mechanisms
    - Implement specialized validation rules
 
 3. **Build Custom AI Tooling**
+
    - Create specialized tools for AI assistants
    - Build context-aware AI prompts
    - Develop AI resource optimization strategies
 
 4. **Implement Advanced Monitoring**
+
    - Track resource usage and availability
    - Monitor configuration changes
    - Alert on persistent conflicts

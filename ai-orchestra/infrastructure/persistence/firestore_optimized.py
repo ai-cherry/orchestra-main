@@ -5,21 +5,18 @@ This module provides a performance-optimized Firestore-based implementation
 of the memory provider with connection pooling and result caching.
 """
 
-import json
-import time
-import threading
 import functools
-from typing import Any, Dict, List, Optional, Union, Tuple, TypeVar, Callable
-
-from google.cloud import firestore
-from google.cloud.firestore_v1.base_query import FieldFilter
-
-from ai_orchestra.core.interfaces.memory import MemoryProvider
-from ai_orchestra.core.errors import MemoryError
-from ai_orchestra.core.config import settings
-from ai_orchestra.utils.logging import log_event, log_start, log_end, log_error
-
+import json
 import logging
+import threading
+import time
+from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar
+
+from ai_orchestra.core.config import settings
+from ai_orchestra.core.errors import MemoryError
+from ai_orchestra.core.interfaces.memory import MemoryProvider
+from ai_orchestra.utils.logging import log_end, log_error, log_event, log_start
+from google.cloud import firestore
 
 logger = logging.getLogger("ai_orchestra.infrastructure.persistence.firestore_optimized")
 

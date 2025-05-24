@@ -7,16 +7,19 @@ The Model Context Protocol (MCP) servers provide specialized tools and capabilit
 ## Quick Start
 
 ### Setup Claude Code with MCP
+
 ```bash
 ./scripts/setup_claude_code.sh
 ```
 
 ### Launch Cursor with MCP Servers
+
 ```bash
 ./launch_cursor_with_claude.sh
 ```
 
 ### Check Server Status
+
 ```bash
 ./check_mcp_servers.sh
 ```
@@ -50,14 +53,17 @@ The `manage_mcp_servers.sh` script provides comprehensive server control:
 ### Available Servers
 
 1. **gcp-cloud-run** - Deploy and manage Cloud Run services
+
    - Required: `GCP_PROJECT_ID`, `GCP_REGION`
    - Capabilities: deploy, update, status, list, logs, scale
 
 2. **gcp-secrets** - Manage Google Secret Manager
+
    - Required: `GCP_PROJECT_ID`
    - Capabilities: get, create, update, list, versions
 
 3. **dragonfly** - Short-term memory cache (DragonflyDB)
+
    - Optional: `DRAGONFLY_HOST`, `DRAGONFLY_PORT`, `DRAGONFLY_PASSWORD`
    - Capabilities: get, set, delete, list, ttl, pipeline
 
@@ -89,11 +95,13 @@ grep ERROR ~/.claude-code/logs/*.log
 ### Common Issues and Solutions
 
 1. **Server won't start**
+
    - Check if required environment variables are set
    - Verify Python dependencies are installed
    - Check log files for specific errors
 
 2. **Server crashes immediately**
+
    - Run syntax check: `python -m py_compile <server_file>`
    - Check for missing imports or dependencies
    - Verify GCP credentials if using GCP services
@@ -127,6 +135,7 @@ The server registry (`mcp_server/server_registry.json`) defines available server
 Use the template at `mcp_server/servers/example_server.py.template` as a starting point:
 
 1. Copy the template:
+
    ```bash
    cp mcp_server/servers/example_server.py.template mcp_server/servers/my_server.py
    ```
@@ -136,6 +145,7 @@ Use the template at `mcp_server/servers/example_server.py.template` as a startin
 3. Add to server registry
 
 4. Test the server:
+
    ```bash
    python mcp_server/servers/my_server.py
    ```
@@ -192,6 +202,7 @@ The Claude Code configuration is stored at `~/.config/claude/config.json` and is
 ### Server Health
 
 The launch script includes automatic monitoring:
+
 - Checks if servers are still running every 5 seconds
 - Attempts to restart crashed servers
 - Logs all events for debugging
@@ -241,6 +252,7 @@ rm ~/.claude-code/pids/*.pid
 ## Support
 
 For issues:
+
 1. Check the logs first
 2. Verify environment setup
 3. Consult server-specific documentation

@@ -33,14 +33,14 @@ command_exists() {
 # Install Docker if not installed
 if ! command_exists docker; then
   echo -e "${YELLOW}Docker not found. Installing Docker...${NC}"
-  
+
   # Install Docker using the convenience script
   curl -fsSL https://get.docker.com -o get-docker.sh
   sudo sh get-docker.sh
-  
+
   # Add current user to docker group to avoid using sudo
   sudo usermod -aG docker $USER
-  
+
   echo -e "${GREEN}Docker installed successfully.${NC}"
   echo -e "${YELLOW}You may need to log out and log back in for group changes to take effect.${NC}"
 else
@@ -50,18 +50,18 @@ fi
 # Install Google Cloud SDK if not installed
 if ! command_exists gcloud; then
   echo -e "${YELLOW}Google Cloud SDK not found. Installing gcloud...${NC}"
-  
+
   # Install Google Cloud SDK
   curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-latest-linux-x86_64.tar.gz
   tar -xf google-cloud-sdk-latest-linux-x86_64.tar.gz
   ./google-cloud-sdk/install.sh --quiet
-  
+
   # Add to PATH for current session
   export PATH="$PATH:$HOME/google-cloud-sdk/bin"
-  
+
   # Add to shell profile for persistence
   echo 'export PATH="$PATH:$HOME/google-cloud-sdk/bin"' >> ~/.bashrc
-  
+
   echo -e "${GREEN}Google Cloud SDK installed successfully.${NC}"
 else
   echo -e "${GREEN}Google Cloud SDK is already installed.${NC}"
@@ -109,19 +109,19 @@ echo -e "${YELLOW}Checking Redis configuration...${NC}"
 if grep -q "REDIS_HOST=localhost" .env; then
   echo -e "${RED}Warning: Redis is configured to use localhost in .env${NC}"
   echo -e "${YELLOW}For production deployment, you should update this to point to a managed Redis instance.${NC}"
-  
+
   echo -e "${BLUE}Do you want to update the Redis configuration now? (y/n)${NC}"
   read -p "Update Redis config? " update_redis
-  
+
   if [ "$update_redis" == "y" ]; then
     read -p "Enter Redis host (e.g., redis-12345.c12345.us-west4-1.gcp.cloud.redislabs.com): " redis_host
     read -p "Enter Redis port (default: 6379): " redis_port
     redis_port=${redis_port:-6379}
-    
+
     # Update .env file
     sed -i "s/REDIS_HOST=localhost/REDIS_HOST=$redis_host/" .env
     sed -i "s/REDIS_PORT=6379/REDIS_PORT=$redis_port/" .env
-    
+
     echo -e "${GREEN}Redis configuration updated in .env${NC}"
   fi
 fi

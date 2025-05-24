@@ -102,13 +102,13 @@ Service account keys should be handled with care:
 
 ## Comparison with Workload Identity Federation
 
-| Feature | Service Account Key | Workload Identity Federation |
-|---------|--------------------|-----------------------------|
-| Setup Complexity | Simpler | More complex |
-| Security | Less secure (long-lived key) | More secure (short-lived tokens) |
-| Key Management | Manual key rotation required | No keys to manage |
-| Audit Trail | Less detailed | More detailed |
-| Recommended For | Development, testing | Production |
+| Feature          | Service Account Key          | Workload Identity Federation     |
+| ---------------- | ---------------------------- | -------------------------------- |
+| Setup Complexity | Simpler                      | More complex                     |
+| Security         | Less secure (long-lived key) | More secure (short-lived tokens) |
+| Key Management   | Manual key rotation required | No keys to manage                |
+| Audit Trail      | Less detailed                | More detailed                    |
+| Recommended For  | Development, testing         | Production                       |
 
 ## Best Practices
 

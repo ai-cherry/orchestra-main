@@ -86,22 +86,22 @@ check_server() {
 start_server() {
     local server_name=$1
     local server_path=$2
-    
+
     log_info "Starting $server_name server..."
-    
+
     # Check if server exists
     if ! check_server "$server_path"; then
         log_error "Cannot start $server_name - server file issues"
         return 1
     fi
-    
+
     # Start the server with proper error handling
     python "$server_path" >> "$LOG_FILE" 2>&1 &
     local pid=$!
-    
+
     # Give server a moment to start
     sleep 1
-    
+
     # Check if server is still running
     if kill -0 $pid 2>/dev/null; then
         MCP_PIDS+=($pid)
@@ -183,7 +183,7 @@ while true; do
         log_info "Cursor has been closed"
         break
     fi
-    
+
     # Check if servers are still running
     for i in "${!MCP_PIDS[@]}"; do
         local pid="${MCP_PIDS[$i]}"
@@ -199,6 +199,6 @@ while true; do
             fi
         fi
     done
-    
+
     sleep 5
 done

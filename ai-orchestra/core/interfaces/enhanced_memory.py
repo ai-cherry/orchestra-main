@@ -6,8 +6,8 @@ extended capabilities for metadata, tagging, relationships, and querying.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 
 class MemoryItem:
@@ -46,7 +46,6 @@ class EnhancedMemoryProvider(ABC):
         Returns:
             The ID of the stored item
         """
-        pass
 
     @abstractmethod
     async def retrieve(self, id: str) -> Optional[MemoryItem]:
@@ -59,7 +58,6 @@ class EnhancedMemoryProvider(ABC):
         Returns:
             The memory item if found, None otherwise
         """
-        pass
 
     @abstractmethod
     async def delete(self, id: str) -> bool:
@@ -72,7 +70,6 @@ class EnhancedMemoryProvider(ABC):
         Returns:
             True if the item was deleted, False otherwise
         """
-        pass
 
     @abstractmethod
     async def update(self, id: str, updates: Dict[str, Any]) -> bool:
@@ -86,7 +83,6 @@ class EnhancedMemoryProvider(ABC):
         Returns:
             True if the item was updated, False otherwise
         """
-        pass
 
     @abstractmethod
     async def query(self, filters: Dict[str, Any], limit: Optional[int] = None) -> List[MemoryItem]:
@@ -100,4 +96,3 @@ class EnhancedMemoryProvider(ABC):
         Returns:
             List of matching memory items
         """
-        pass

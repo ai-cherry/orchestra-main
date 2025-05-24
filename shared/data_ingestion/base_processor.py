@@ -26,17 +26,14 @@ class StorageAdapter(abc.ABC):
     @abc.abstractmethod
     async def exists(self, fingerprint: str) -> bool:
         """Check if a record with the given fingerprint already exists."""
-        pass
 
     @abc.abstractmethod
     async def upsert_batch(self, records: List[Dict[str, Any]]) -> None:
         """Insert or update a batch of records."""
-        pass
 
     @abc.abstractmethod
     async def close(self) -> None:
         """Clean up resources (connections, etc.)."""
-        pass
 
 
 class BaseProcessor(abc.ABC):
@@ -112,7 +109,6 @@ class BaseProcessor(abc.ABC):
         Yields batches of records from the source.
         Must be implemented by subclasses for specific formats/sources.
         """
-        pass
 
     @staticmethod
     def default_fingerprint(record: Dict[str, Any]) -> str:

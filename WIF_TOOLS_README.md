@@ -32,6 +32,7 @@ This tool scans the codebase for references to old WIF components and updates th
 ```
 
 Key features:
+
 - Identifies references to old script names and paths
 - Updates references to point to new components
 - Creates backups of modified files
@@ -56,6 +57,7 @@ This tool validates dependencies and tests the WIF implementation to ensure ever
 ```
 
 Key features:
+
 - Checks for required dependencies and their versions
 - Validates WIF scripts for common issues
 - Tests GitHub Actions workflow templates
@@ -80,6 +82,7 @@ This tool synchronizes documentation references to WIF components across the pro
 ```
 
 Key features:
+
 - Scans documentation files for references to old WIF components
 - Updates references to point to the new implementation
 - Ensures consistent terminology and naming
@@ -101,6 +104,7 @@ This tool provides enhanced error handling and recovery procedures for WIF opera
 ```
 
 Key features:
+
 - Provides comprehensive error handling for WIF scripts
 - Categorizes errors and determines severity
 - Implements recovery procedures for common errors
@@ -111,21 +115,25 @@ Key features:
 For a smooth transition to the new WIF implementation, follow these steps:
 
 1. **Scan and Update References**:
+
    ```bash
    ./wif_reference_scanner.py --update --report --backup
    ```
 
 2. **Synchronize Documentation**:
+
    ```bash
    ./wif_docs_synchronizer.py --update --report --backup
    ```
 
 3. **Validate Dependencies and Scripts**:
+
    ```bash
    ./wif_dependency_validator.py --all --report
    ```
 
 4. **Use Enhanced Error Handling for WIF Operations**:
+
    ```bash
    ./wif_error_handler.py wrap setup_wif.sh
    ```

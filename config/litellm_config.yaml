@@ -1,7 +1,7 @@
 # LiteLLM Configuration for Orchestra
 # This configuration sets up model providers, routing, caching, monitoring, and logging
 # Last updated: 2025-05-23
-# 
+#
 # Configuration sections:
 # - General settings: Basic operational parameters
 # - Model list: Available models with provider-specific configurations
@@ -15,7 +15,7 @@
 # General settings
 general_settings:
   # Toggle for verbose logging (overridable via environment variable)
-  verbose: false  # Set to true for detailed logs
+  verbose: false # Set to true for detailed logs
   # Maximum number of retries for failed API calls
   num_retries: 3
   # Context window management
@@ -35,14 +35,14 @@ model_list:
       api_base: ${AZURE_API_BASE}
       api_key: ${AZURE_API_KEY}
       api_version: "2023-07-01-preview"
-  
+
   - model_name: gpt-4
     litellm_params:
       model: azure/gpt-4
       api_base: ${AZURE_API_BASE}
       api_key: ${AZURE_API_KEY}
       api_version: "2023-07-01-preview"
-  
+
   # Claude 3 models with MCP support
   - model_name: claude-3-opus
     litellm_params:
@@ -53,7 +53,7 @@ model_list:
         anthropic-beta: "mcp-client-2025-04-04"
       # Cost optimization: Set max tokens to prevent runaway costs
       max_tokens: 4096
-  
+
   - model_name: claude-3-sonnet
     litellm_params:
       model: anthropic/claude-3-sonnet-20240229
@@ -61,15 +61,15 @@ model_list:
       extra_headers:
         anthropic-beta: "mcp-client-2025-04-04"
       max_tokens: 4096
-  
+
   # Claude 4 models (placeholder names - update when Anthropic releases official model identifiers)
   # Expected release: Q1 2025
   # Note: These model names are placeholders and will need to be updated
   # when Anthropic announces the official Claude 4 model identifiers
-  
+
   - model_name: claude-4
     litellm_params:
-      model: anthropic/claude-4-20250522  # PLACEHOLDER - Update when official name is released
+      model: anthropic/claude-4-20250522 # PLACEHOLDER - Update when official name is released
       api_key: ${ANTHROPIC_API_KEY}
       # Enable MCP connector support
       extra_headers:
@@ -79,10 +79,10 @@ model_list:
       temperature: 0.7
       # Enable streaming for better UX
       stream: true
-  
+
   - model_name: claude-4-opus
     litellm_params:
-      model: anthropic/claude-4-opus-20250522  # PLACEHOLDER - Update when official name is released
+      model: anthropic/claude-4-opus-20250522 # PLACEHOLDER - Update when official name is released
       api_key: ${ANTHROPIC_API_KEY}
       extra_headers:
         anthropic-beta: "mcp-client-2025-04-04"
@@ -93,10 +93,10 @@ model_list:
       metadata:
         tier: "premium"
         use_case: "complex_reasoning"
-  
+
   - model_name: claude-4-sonnet
     litellm_params:
-      model: anthropic/claude-4-sonnet-20250522  # PLACEHOLDER - Update when official name is released
+      model: anthropic/claude-4-sonnet-20250522 # PLACEHOLDER - Update when official name is released
       api_key: ${ANTHROPIC_API_KEY}
       extra_headers:
         anthropic-beta: "mcp-client-2025-04-04"
@@ -107,10 +107,10 @@ model_list:
       metadata:
         tier: "standard"
         use_case: "general_purpose"
-  
+
   - model_name: claude-4-haiku
     litellm_params:
-      model: anthropic/claude-4-haiku-20250522  # PLACEHOLDER - Update when official name is released
+      model: anthropic/claude-4-haiku-20250522 # PLACEHOLDER - Update when official name is released
       api_key: ${ANTHROPIC_API_KEY}
       extra_headers:
         anthropic-beta: "mcp-client-2025-04-04"
@@ -121,7 +121,7 @@ model_list:
       metadata:
         tier: "economy"
         use_case: "simple_tasks"
-  
+
   # Portkey integration with proper headers
   - model_name: portkey/gpt-4o
     litellm_params:
@@ -131,7 +131,7 @@ model_list:
       extra_headers:
         x-portkey-provider: "openai"
         x-portkey-config: "${PORTKEY_CONFIG}"
-  
+
   - model_name: portkey/claude-3-opus
     litellm_params:
       model: anthropic/portkey/claude-3-opus
@@ -140,7 +140,7 @@ model_list:
       extra_headers:
         x-portkey-provider: "anthropic"
         x-portkey-config: "${PORTKEY_CONFIG}"
-  
+
   # OpenRouter integration with full model paths
   - model_name: openrouter/mixtral
     litellm_params:
@@ -150,38 +150,49 @@ model_list:
       # OpenRouter requires HTTP-Referer - set via environment variables
       # OR_SITE_URL and OR_APP_NAME
 
+  # Google AI / Gemini Models with Vertex AI compatibility
+  - model_name: llm_gemini_pro
+    litellm_params:
+      model: vertex_ai/gemini-1.5-pro-preview-0514
+      vertex_project: ${GOOGLE_CLOUD_PROJECT}
+      vertex_location: us-central1
+      temperature: 0.7
+      max_tokens: 2048
+
+  - model_name: llm_gemini_flash
+    litellm_params:
+      model: vertex_ai/gemini-1.5-flash-preview-0514
+      vertex_project: ${GOOGLE_CLOUD_PROJECT}
+      vertex_location: us-central1
+      temperature: 0.7
+      max_tokens: 2048
+
+  - model_name: llm_gemini_ultra
+    litellm_params:
+      model: vertex_ai/gemini-ultra
+      vertex_project: ${GOOGLE_CLOUD_PROJECT}
+      vertex_location: us-central1
+      temperature: 0.7
+      max_tokens: 4096
+
 # Model routing configuration based on parameters
 router_settings:
   # Set to "simple" for round-robin, "shortest-queue" for load-based, "latency-based" for performance
-  routing_strategy: "latency-based"  # Optimize for performance
-  
+  routing_strategy: "latency-based" # Optimize for performance
+
   # Timeout settings in seconds
   timeout: 30
-  
+
   # Fallback models if primary fails
-  fallbacks: [
-    {
-      "model": "claude-4-opus",
-      "fallback_model": "gpt-4"
-    },
-    {
-      "model": "claude-4-sonnet",
-      "fallback_model": "claude-3-sonnet"
-    },
-    {
-      "model": "claude-4",
-      "fallback_model": "claude-3-opus"
-    },
-    {
-      "model": "gpt-4",
-      "fallback_model": "claude-3-opus"
-    },
-    {
-      "model": "claude-3-opus",
-      "fallback_model": "gpt-4"
-    }
-  ]
-  
+  fallbacks:
+    [
+      { "model": "claude-4-opus", "fallback_model": "gpt-4" },
+      { "model": "claude-4-sonnet", "fallback_model": "claude-3-sonnet" },
+      { "model": "claude-4", "fallback_model": "claude-3-opus" },
+      { "model": "gpt-4", "fallback_model": "claude-3-opus" },
+      { "model": "claude-3-opus", "fallback_model": "gpt-4" },
+    ]
+
   # Model selection based on task complexity
   model_selection:
     # Use economy models for simple tasks
@@ -214,13 +225,13 @@ monitoring:
   enabled: true
   # Metrics to track
   metrics:
-    - latency          # Response time tracking
-    - token_usage      # Token consumption
+    - latency # Response time tracking
+    - token_usage # Token consumption
     - cost_per_request # Cost tracking
-    - error_rate       # Error tracking
-    - cache_hit_rate   # Cache effectiveness
+    - error_rate # Error tracking
+    - cache_hit_rate # Cache effectiveness
     - model_performance # Model-specific metrics
-  
+
   # Export metrics to monitoring systems
   exporters:
     # Prometheus metrics endpoint
@@ -228,17 +239,17 @@ monitoring:
       enabled: true
       port: 9090
       path: "/metrics"
-    
+
     # Google Cloud Monitoring
     cloud_monitoring:
       enabled: true
       project_id: ${GCP_PROJECT_ID}
-      
+
     # Custom webhooks for alerts
     webhooks:
       - url: ${ALERT_WEBHOOK_URL}
         events: ["error", "budget_alert", "rate_limit"]
-  
+
   # Performance tracking
   performance:
     # Track p50, p90, p99 latencies
@@ -251,20 +262,20 @@ logging:
   # Log to Cloud Logging in GCP environments
   cloud_logging: true
   # Log level
-  level: "INFO"  # DEBUG, INFO, WARNING, ERROR (use INFO in production)
+  level: "INFO" # DEBUG, INFO, WARNING, ERROR (use INFO in production)
   # Request & response logging for analytics
   log_prompts: true
-  log_responses: false  # Disable in production for privacy
+  log_responses: false # Disable in production for privacy
   # Structured logging format
   format: "json"
   # Log sampling for high volume
-  sampling_rate: 0.1  # Log 10% of requests in production
+  sampling_rate: 0.1 # Log 10% of requests in production
 
 # Cost optimization settings
 cost_optimization:
   # Enable cost optimization features
   enabled: true
-  
+
   # Automatic model downgrade based on task
   auto_downgrade:
     enabled: true
@@ -274,7 +285,7 @@ cost_optimization:
         target_tier: "economy"
       - condition: "no_code_generation"
         target_tier: "standard"
-  
+
   # Token optimization
   token_optimization:
     # Compress system prompts
@@ -283,12 +294,12 @@ cost_optimization:
     trim_whitespace: true
     # Truncate verbose responses
     max_response_tokens: 2048
-  
+
   # Request batching for efficiency
   batching:
     enabled: true
     max_batch_size: 10
-    max_wait_time: 100  # ms
+    max_wait_time: 100 # ms
 
 # Cost tracking & budget controls
 budget_manager:
@@ -308,7 +319,7 @@ budget_manager:
   # Budget reached callback
   budget_alerts: ["50%", "80%", "90%", "100%"]
   # Actions when budget exceeded
-  budget_exceeded_action: "fallback_to_cheaper"  # or "block"
+  budget_exceeded_action: "fallback_to_cheaper" # or "block"
 
 # Security settings
 security:
@@ -320,10 +331,10 @@ security:
   # Rate limiting per API key
   rate_limiting:
     enabled: true
-    default_rpm: 60  # Requests per minute
-    default_tpm: 100000  # Tokens per minute
+    default_rpm: 60 # Requests per minute
+    default_tpm: 100000 # Tokens per minute
   # IP allowlist (optional)
-  ip_allowlist: []  # Add allowed IPs if needed
+  ip_allowlist: [] # Add allowed IPs if needed
 
 # Custom headers for provider API requests
 extra_headers:

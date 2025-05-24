@@ -1,14 +1,25 @@
-import React, { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs'
-import { AreaChart, LineChart } from '../../components/ui/charts'
-import { formatBytes, formatNumber } from '../../lib/utils'
+import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../components/ui/tabs";
+import { AreaChart, LineChart } from "../../components/ui/charts";
+import { formatBytes, formatNumber } from "../../lib/utils";
 
 /**
  * Memory Management component that provides detailed visibility into the memory system
  */
 const MemoryManagement = () => {
-  const [timeRange, setTimeRange] = useState<'24h' | '7d' | '30d'>('24h')
+  const [timeRange, setTimeRange] = useState<"24h" | "7d" | "30d">("24h");
 
   return (
     <div className="space-y-6">
@@ -18,7 +29,9 @@ const MemoryManagement = () => {
           <select
             className="rounded-md border border-input bg-background px-3 py-1 text-sm"
             value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value as '24h' | '7d' | '30d')}
+            onChange={(e) =>
+              setTimeRange(e.target.value as "24h" | "7d" | "30d")
+            }
           >
             <option value="24h">Last 24 Hours</option>
             <option value="7d">Last 7 Days</option>
@@ -37,7 +50,8 @@ const MemoryManagement = () => {
           <CardContent>
             <div className="text-2xl font-bold">85%</div>
             <div className="text-sm text-muted-foreground">
-              {formatBytes(850 * 1024 * 1024)} / {formatBytes(1 * 1024 * 1024 * 1024)}
+              {formatBytes(850 * 1024 * 1024)} /{" "}
+              {formatBytes(1 * 1024 * 1024 * 1024)}
             </div>
             <div className="mt-4 h-1 w-full rounded-full bg-secondary">
               <div className="h-1 w-[85%] rounded-full bg-memory-hot"></div>
@@ -57,7 +71,8 @@ const MemoryManagement = () => {
           <CardContent>
             <div className="text-2xl font-bold">42%</div>
             <div className="text-sm text-muted-foreground">
-              {formatBytes(1.26 * 1024 * 1024 * 1024)} / {formatBytes(3 * 1024 * 1024 * 1024)}
+              {formatBytes(1.26 * 1024 * 1024 * 1024)} /{" "}
+              {formatBytes(3 * 1024 * 1024 * 1024)}
             </div>
             <div className="mt-4 h-1 w-full rounded-full bg-secondary">
               <div className="h-1 w-[42%] rounded-full bg-memory-warm"></div>
@@ -77,7 +92,8 @@ const MemoryManagement = () => {
           <CardContent>
             <div className="text-2xl font-bold">28%</div>
             <div className="text-sm text-muted-foreground">
-              {formatBytes(1.12 * 1024 * 1024 * 1024)} / {formatBytes(4 * 1024 * 1024 * 1024)}
+              {formatBytes(1.12 * 1024 * 1024 * 1024)} /{" "}
+              {formatBytes(4 * 1024 * 1024 * 1024)}
             </div>
             <div className="mt-4 h-1 w-full rounded-full bg-secondary">
               <div className="h-1 w-[28%] rounded-full bg-memory-cold"></div>
@@ -221,35 +237,39 @@ const MemoryManagement = () => {
                 title: "Memory Pressure Alert",
                 description: "Hot tier memory usage at 85%",
                 time: "10 minutes ago",
-                type: "warning"
+                type: "warning",
               },
               {
                 title: "Tier Migration",
                 description: "Migrated 250MB from hot to warm tier",
                 time: "30 minutes ago",
-                type: "info"
+                type: "info",
               },
               {
                 title: "Context Pruning",
-                description: "Pruned 120 conversation contexts, saved 24K tokens",
+                description:
+                  "Pruned 120 conversation contexts, saved 24K tokens",
                 time: "1 hour ago",
-                type: "success"
+                type: "success",
               },
               {
                 title: "Cache Eviction",
                 description: "LRU cache evicted 50MB of data",
                 time: "2 hours ago",
-                type: "info"
+                type: "info",
               },
               {
                 title: "Cold Tier Compression",
-                description: "Compressed 100MB of cold tier data, 40% space saved",
+                description:
+                  "Compressed 100MB of cold tier data, 40% space saved",
                 time: "3 hours ago",
-                type: "success"
-              }
+                type: "success",
+              },
             ].map((event, index) => (
               <div key={index} className="flex items-start space-x-4">
-                <div className={`mt-0.5 h-2 w-2 rounded-full bg-status-${event.type === "warning" ? "warning" : event.type === "success" ? "healthy" : "info"}`} />
+                <div
+                  className={`mt-0.5 h-2 w-2 rounded-full bg-status-${event.type === "warning" ? "warning" : event.type === "success" ? "healthy" : "info"}`}
+                />
                 <div className="space-y-1">
                   <p className="text-sm font-medium leading-none">
                     {event.title}
@@ -257,9 +277,7 @@ const MemoryManagement = () => {
                   <p className="text-sm text-muted-foreground">
                     {event.description}
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    {event.time}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{event.time}</p>
                 </div>
               </div>
             ))}
@@ -267,7 +285,7 @@ const MemoryManagement = () => {
         </CardContent>
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default MemoryManagement
+export default MemoryManagement;

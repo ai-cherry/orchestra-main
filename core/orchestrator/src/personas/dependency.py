@@ -7,7 +7,7 @@ centralizing persona access throughout the application.
 
 import logging
 from functools import lru_cache
-from typing import Dict, Optional
+from typing import Optional
 
 # Import the settings instance directly
 from core.orchestrator.src.config.config import settings

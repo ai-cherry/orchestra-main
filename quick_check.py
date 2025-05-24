@@ -10,9 +10,9 @@ without making any actual API calls.
 For a more thorough diagnostic, use diagnose_patrick_issues.py.
 """
 
+import logging
 import os
 import sys
-import logging
 from pathlib import Path
 
 # Configure logging
@@ -200,18 +200,18 @@ def main():
 
     if env_ok and files_ok and api_ok and hardcoded_ok:
         print(f"\n{Colors.GREEN}✓ All basic checks passed!{Colors.ENDC}")
-        print(f"  The system structure looks good for Patrick's experience.")
-        print(f"  For a more thorough analysis, run: ./diagnose_patrick_issues.py")
+        print("  The system structure looks good for Patrick's experience.")
+        print("  For a more thorough analysis, run: ./diagnose_patrick_issues.py")
         return 0
     elif env_ok and files_ok and api_ok:
         print(f"\n{Colors.YELLOW}⚠ Most checks passed with some minor issues{Colors.ENDC}")
-        print(f"  The system structure is present but there are some potential issues.")
-        print(f"  Run ./diagnose_patrick_issues.py for detailed diagnostics.")
+        print("  The system structure is present but there are some potential issues.")
+        print("  Run ./diagnose_patrick_issues.py for detailed diagnostics.")
         return 1
     else:
         print(f"\n{Colors.RED}✗ Basic structure checks failed{Colors.ENDC}")
-        print(f"  The system has critical configuration or file structure issues.")
-        print(f"  Fix these basic issues before running the full diagnostic.")
+        print("  The system has critical configuration or file structure issues.")
+        print("  Fix these basic issues before running the full diagnostic.")
         return 2
 
 

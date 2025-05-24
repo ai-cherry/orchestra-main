@@ -7,11 +7,10 @@ This module provides factory functions for creating memory instances.
 import logging
 from typing import Any, Dict, Optional
 
-from core.orchestrator.src.config.models import MemoryConfig, MemoryType
-from core.orchestrator.src.memory.backends.redis_memory import RedisMemory
+from core.orchestrator.src.config.models import MemoryConfig
 from core.orchestrator.src.memory.backends.firestore_memory import FirestoreMemory
+from core.orchestrator.src.memory.backends.redis_memory import RedisMemory
 from core.orchestrator.src.memory.backends.vertex_memory import VertexMemory
-from core.orchestrator.src.memory.layered_memory import LayeredMemory
 from core.orchestrator.src.memory.layered_memory_manager import LayeredMemoryManager
 
 logger = logging.getLogger(__name__)

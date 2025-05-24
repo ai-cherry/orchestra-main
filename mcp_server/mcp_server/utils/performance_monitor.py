@@ -7,12 +7,12 @@ the MCP server components. It tracks operation timings, memory usage, and
 provides recommendations for optimization.
 """
 
-import time
 import logging
 import threading
-from typing import Dict, List, Any, Optional, Tuple
+import time
+from collections import defaultdict
 from functools import wraps
-from collections import defaultdict, deque
+from typing import Any, Dict, List, Optional
 
 # Configure logging
 logger = logging.getLogger("mcp-performance")
@@ -155,7 +155,7 @@ class PerformanceMonitor:
         recommendations = []
 
         # Get overall metrics
-        metrics = self.get_metrics()
+        self.get_metrics()
         slow_ops = self.get_slow_operations()
 
         # Check for slow operations

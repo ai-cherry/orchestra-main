@@ -6,15 +6,14 @@ specialized worker agents. These domain experts can manage context, delegate tas
 aggregate results while communicating through the unified gateway adapter.
 """
 
-import logging
 import asyncio
-import json
-from typing import Dict, List, Any, Optional, Union, Set, Tuple
-from enum import Enum
+import logging
 from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional, Set
 
-from packages.shared.src.gateway_adapter import get_gateway_adapter, GatewayAdapter
-from packages.shared.src.models.base_models import MemoryItem, AgentMessage
+from packages.shared.src.gateway_adapter import get_gateway_adapter
+from packages.shared.src.models.base_models import AgentMessage, MemoryItem
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -235,7 +234,7 @@ class DomainExpertAgent(BaseAgent):
 
         # Generate system prompt for understanding the task
         system_prompt = f"""
-        You are a {self.specialization} domain expert. 
+        You are a {self.specialization} domain expert.
         You need to analyze this task and determine the best approach.
         Consider which specialized workers would be best suited for this task.
         Available workers: {', '.join(self.workers.keys())}
@@ -292,7 +291,7 @@ class DomainExpertAgent(BaseAgent):
         ]
 
         # Generate assignments
-        assignment_text = await self.generate_chat_completion(messages)
+        await self.generate_chat_completion(messages)
 
         # Parse assignments - this would be more structured in a real implementation
         # For now, just assign all workers to the task
@@ -426,20 +425,20 @@ class WorkerAgent(BaseAgent):
 
         # Select appropriate prompt based on role
         if self.role == AgentRole.ANALYST:
-            return await self._process_analyst_task(content, subtasks)
+            return await self._process_analyst_task(content, subtasks, message)
         elif self.role == AgentRole.CODER:
-            return await self._process_coder_task(content, subtasks)
+            return await self._process_coder_task(content, subtasks, message)
         elif self.role == AgentRole.DATA_PROCESSOR:
-            return await self._process_data_processor_task(content, subtasks)
+            return await self._process_data_processor_task(content, subtasks, message)
         elif self.role == AgentRole.WEB_RESEARCHER:
-            return await self._process_web_researcher_task(content, subtasks)
+            return await self._process_web_researcher_task(content, subtasks, message)
         elif self.role == AgentRole.CRM_INTEGRATOR:
-            return await self._process_crm_task(content, subtasks)
+            return await self._process_crm_task(content, subtasks, message)
         else:
             # Generic processing for other roles
-            return await self._process_generic_task(content, subtasks)
+            return await self._process_generic_task(content, subtasks, message)
 
-    async def _process_analyst_task(self, content: str, subtasks: List[str]) -> AgentMessage:
+    async def _process_analyst_task(self, content: str, subtasks: List[str], message: AgentMessage) -> AgentMessage:
         """Process an analyst task."""
         system_prompt = """
         You are a data analyst specialized in business intelligence.
@@ -464,7 +463,7 @@ class WorkerAgent(BaseAgent):
             context={"role": "analyst", "capabilities": list(self.capabilities)},
         )
 
-    async def _process_coder_task(self, content: str, subtasks: List[str]) -> AgentMessage:
+    async def _process_coder_task(self, content: str, subtasks: List[str], message: AgentMessage) -> AgentMessage:
         """Process a coder task."""
         system_prompt = """
         You are an expert software developer.
@@ -490,7 +489,9 @@ class WorkerAgent(BaseAgent):
             context={"role": "coder", "capabilities": list(self.capabilities)},
         )
 
-    async def _process_data_processor_task(self, content: str, subtasks: List[str]) -> AgentMessage:
+    async def _process_data_processor_task(
+        self, content: str, subtasks: List[str], message: AgentMessage
+    ) -> AgentMessage:
         """Process a data processor task."""
         system_prompt = """
         You are a data processing specialist.
@@ -515,7 +516,9 @@ class WorkerAgent(BaseAgent):
             context={"role": "data_processor", "capabilities": list(self.capabilities)},
         )
 
-    async def _process_web_researcher_task(self, content: str, subtasks: List[str]) -> AgentMessage:
+    async def _process_web_researcher_task(
+        self, content: str, subtasks: List[str], message: AgentMessage
+    ) -> AgentMessage:
         """Process a web researcher task."""
         system_prompt = """
         You are a web research specialist.
@@ -540,7 +543,7 @@ class WorkerAgent(BaseAgent):
             context={"role": "web_researcher", "capabilities": list(self.capabilities)},
         )
 
-    async def _process_crm_task(self, content: str, subtasks: List[str]) -> AgentMessage:
+    async def _process_crm_task(self, content: str, subtasks: List[str], message: AgentMessage) -> AgentMessage:
         """Process a CRM integration task."""
         system_prompt = """
         You are a CRM integration specialist.
@@ -566,7 +569,7 @@ class WorkerAgent(BaseAgent):
             context={"role": "crm_integrator", "capabilities": list(self.capabilities)},
         )
 
-    async def _process_generic_task(self, content: str, subtasks: List[str]) -> AgentMessage:
+    async def _process_generic_task(self, content: str, subtasks: List[str], message: AgentMessage) -> AgentMessage:
         """Process a generic task for other roles."""
         system_prompt = f"""
         You are a specialized worker with the following capabilities: {', '.join(self.capabilities)}.

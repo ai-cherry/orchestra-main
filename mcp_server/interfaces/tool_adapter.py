@@ -8,7 +8,8 @@ MCP memory system, allowing bidirectional memory synchronization.
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional, List, Tuple
+from typing import Any, Dict, List, Optional
+
 from ..models.memory import MemoryEntry
 
 
@@ -19,53 +20,43 @@ class IToolAdapter(ABC):
     @abstractmethod
     def tool_name(self) -> str:
         """Get the name of the tool."""
-        pass
 
     @property
     @abstractmethod
     def context_window_size(self) -> int:
         """Get the context window size for this tool."""
-        pass
 
     @abstractmethod
     async def initialize(self) -> bool:
         """Initialize the tool adapter."""
-        pass
 
     @abstractmethod
     async def sync_create(self, key: str, entry: MemoryEntry) -> bool:
         """Sync a newly created memory entry to the tool."""
-        pass
 
     @abstractmethod
     async def sync_update(self, key: str, entry: MemoryEntry) -> bool:
         """Sync an updated memory entry to the tool."""
-        pass
 
     @abstractmethod
     async def sync_delete(self, key: str) -> bool:
         """Sync a deleted memory entry to the tool."""
-        pass
 
     @abstractmethod
     async def execute(self, mode: str, prompt: str, context: Optional[Dict[str, Any]] = None) -> Optional[str]:
         """Execute a prompt with the tool."""
-        pass
 
     @abstractmethod
     async def get_embeddings(self, text: str) -> List[float]:
         """Get vector embeddings for text using the tool's embedding model."""
-        pass
 
     @abstractmethod
     async def get_context(self) -> Dict[str, Any]:
         """Get current IDE/editor context from the tool."""
-        pass
 
     @abstractmethod
     async def get_status(self) -> Dict[str, Any]:
         """Get the status of the tool adapter."""
-        pass
 
 
 class CopilotAdapter(IToolAdapter):
@@ -234,9 +225,10 @@ class GeminiAdapter(IToolAdapter):
         }
 
 
+import logging
+
 # Import necessary modules
 import os
-import logging
 
 # Configure logging
 logging.basicConfig(

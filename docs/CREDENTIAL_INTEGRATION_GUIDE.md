@@ -60,22 +60,22 @@ async def predict(
 ):
     """
     Make a prediction using Vertex AI.
-    
+
     Uses the Vertex AI credentials injected by the dependency.
     """
     # Initialize Vertex AI with credentials
     from google.cloud import aiplatform
-    
+
     aiplatform.init(
         project=credentials["project_id"],
         location="us-central1",
         credentials=credentials
     )
-    
+
     # Use Vertex AI
     endpoint = aiplatform.Endpoint(request.endpoint_id)
     prediction = endpoint.predict(instances=request.instances)
-    
+
     return {"prediction": prediction}
 
 @app.post("/gemini/generate")
@@ -85,22 +85,22 @@ async def generate(
 ):
     """
     Generate text using Gemini.
-    
+
     Uses the Gemini credentials injected by the dependency.
     """
     # Use Gemini credentials
     from google.cloud import aiplatform
-    
+
     aiplatform.init(
         project=credentials["project_id"],
         location="us-central1",
         credentials=credentials
     )
-    
+
     # Use Gemini
     model = aiplatform.TextGenerationModel.from_pretrained("gemini-pro")
     response = model.predict(request.prompt)
-    
+
     return {"text": response.text}
 
 @app.get("/memory/retrieve")
@@ -110,11 +110,11 @@ async def retrieve_memory(
 ):
     """
     Retrieve a memory item from Redis.
-    
+
     Uses the Redis credentials injected by the dependency.
     """
     import redis
-    
+
     # Connect to Redis
     r = redis.Redis(
         host=redis_config["host"],
@@ -122,10 +122,10 @@ async def retrieve_memory(
         password=redis_config["password"],
         ssl=True
     )
-    
+
     # Retrieve value
     value = r.get(key)
-    
+
     return {"key": key, "value": value}
 ```
 
@@ -138,43 +138,43 @@ from core.security.credential_manager import get_credential_manager
 
 class VertexAgent:
     """Agent that uses Vertex AI for predictions."""
-    
+
     def __init__(self, project_id=None, environment=None):
         """
         Initialize the Vertex Agent.
-        
+
         Args:
             project_id: Google Cloud project ID.
             environment: Environment name (dev, staging, prod).
         """
         self.credential_manager = get_credential_manager(project_id, environment)
         self.credentials = self.credential_manager.get_service_account_key("vertex-ai-agent")
-        
+
         # Initialize Vertex AI
         from google.cloud import aiplatform
-        
+
         aiplatform.init(
             project=self.credentials["project_id"],
             location="us-central1",
             credentials=self.credentials
         )
-    
+
     async def predict(self, endpoint_id, instances):
         """
         Make a prediction using Vertex AI.
-        
+
         Args:
             endpoint_id: The Vertex AI endpoint ID.
             instances: The instances to predict.
-            
+
         Returns:
             The prediction results.
         """
         from google.cloud import aiplatform
-        
+
         endpoint = aiplatform.Endpoint(endpoint_id)
         prediction = endpoint.predict(instances=instances)
-        
+
         return prediction
 ```
 
@@ -189,14 +189,14 @@ from typing import Any, Dict, Optional
 class MemoryManager:
     """
     Memory manager for AI Orchestra.
-    
+
     Manages access to different memory storage backends.
     """
-    
+
     def __init__(self, project_id=None, environment=None):
         """
         Initialize the Memory Manager.
-        
+
         Args:
             project_id: Google Cloud project ID.
             environment: Environment name (dev, staging, prod).
@@ -208,41 +208,41 @@ class MemoryManager:
             "password": self.credential_manager.get_secret("redis-password"),
         }
         self.firestore_credentials = self.credential_manager.get_service_account_key("memory-system")
-    
+
     def get_redis_client(self):
         """
         Get a Redis client.
-        
+
         Returns:
             A Redis client.
         """
         import redis
-        
+
         return redis.Redis(
             host=self.redis_config["host"],
             port=int(self.redis_config["port"]),
             password=self.redis_config["password"],
             ssl=True
         )
-    
+
     def get_firestore_client(self):
         """
         Get a Firestore client.
-        
+
         Returns:
             A Firestore client.
         """
         from google.cloud import firestore
-        
+
         return firestore.Client(
             project=self.firestore_credentials["project_id"],
             credentials=self.firestore_credentials
         )
-    
+
     async def store_short_term(self, key: str, value: Any, ttl: int = 3600):
         """
         Store a value in short-term memory (Redis).
-        
+
         Args:
             key: The key to store.
             value: The value to store.
@@ -250,24 +250,24 @@ class MemoryManager:
         """
         client = self.get_redis_client()
         client.set(key, value, ex=ttl)
-    
+
     async def retrieve_short_term(self, key: str) -> Optional[Any]:
         """
         Retrieve a value from short-term memory (Redis).
-        
+
         Args:
             key: The key to retrieve.
-            
+
         Returns:
             The value, or None if not found.
         """
         client = self.get_redis_client()
         return client.get(key)
-    
+
     async def store_long_term(self, collection: str, document_id: str, data: Dict[str, Any]):
         """
         Store a value in long-term memory (Firestore).
-        
+
         Args:
             collection: The collection to store in.
             document_id: The document ID.
@@ -275,15 +275,15 @@ class MemoryManager:
         """
         client = self.get_firestore_client()
         client.collection(collection).document(document_id).set(data)
-    
+
     async def retrieve_long_term(self, collection: str, document_id: str) -> Optional[Dict[str, Any]]:
         """
         Retrieve a value from long-term memory (Firestore).
-        
+
         Args:
             collection: The collection to retrieve from.
             document_id: The document ID.
-            
+
         Returns:
             The data, or None if not found.
         """
@@ -303,117 +303,117 @@ from typing import List, Dict, Any, Optional
 class LLMManager:
     """
     LLM Manager for AI Orchestra.
-    
+
     Manages access to different LLM providers.
     """
-    
+
     def __init__(self, project_id=None, environment=None):
         """
         Initialize the LLM Manager.
-        
+
         Args:
             project_id: Google Cloud project ID.
             environment: Environment name (dev, staging, prod).
         """
         self.credential_manager = get_credential_manager(project_id, environment)
-        
+
         # Get credentials for different LLM providers
         self.vertex_credentials = self.credential_manager.get_service_account_key("vertex-ai-agent")
         self.gemini_credentials = self.credential_manager.get_service_account_key("gemini-agent")
         self.openai_api_key = self.credential_manager.get_secret("openai-api-key")
         self.anthropic_api_key = self.credential_manager.get_secret("anthropic-api-key")
-    
+
     async def generate_vertex(self, prompt: str, model: str = "text-bison") -> str:
         """
         Generate text using Vertex AI.
-        
+
         Args:
             prompt: The prompt to generate from.
             model: The model to use.
-            
+
         Returns:
             The generated text.
         """
         from google.cloud import aiplatform
-        
+
         aiplatform.init(
             project=self.vertex_credentials["project_id"],
             location="us-central1",
             credentials=self.vertex_credentials
         )
-        
+
         model = aiplatform.TextGenerationModel.from_pretrained(model)
         response = model.predict(prompt)
-        
+
         return response.text
-    
+
     async def generate_gemini(self, prompt: str) -> str:
         """
         Generate text using Gemini.
-        
+
         Args:
             prompt: The prompt to generate from.
-            
+
         Returns:
             The generated text.
         """
         from google.cloud import aiplatform
-        
+
         aiplatform.init(
             project=self.gemini_credentials["project_id"],
             location="us-central1",
             credentials=self.gemini_credentials
         )
-        
+
         model = aiplatform.TextGenerationModel.from_pretrained("gemini-pro")
         response = model.predict(prompt)
-        
+
         return response.text
-    
+
     async def generate_openai(self, prompt: str, model: str = "gpt-4") -> str:
         """
         Generate text using OpenAI.
-        
+
         Args:
             prompt: The prompt to generate from.
             model: The model to use.
-            
+
         Returns:
             The generated text.
         """
         import openai
-        
+
         openai.api_key = self.openai_api_key
-        
+
         response = openai.Completion.create(
             model=model,
             prompt=prompt,
             max_tokens=1000
         )
-        
+
         return response.choices[0].text
-    
+
     async def generate_anthropic(self, prompt: str, model: str = "claude-2") -> str:
         """
         Generate text using Anthropic.
-        
+
         Args:
             prompt: The prompt to generate from.
             model: The model to use.
-            
+
         Returns:
             The generated text.
         """
         import anthropic
-        
+
         client = anthropic.Anthropic(api_key=self.anthropic_api_key)
-        
+
         response = client.completions.create(
             model=model,
             prompt=prompt,
             max_tokens_to_sample=1000
         )
-        
+
         return response.completion
 ```
 
@@ -449,7 +449,7 @@ name: Deploy to Cloud Run
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   deploy:
@@ -463,16 +463,16 @@ jobs:
         uses: actions/checkout@v3
 
       # Authenticate using Workload Identity Federation
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v1'
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v1"
         with:
           workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
 
       # Setup gcloud CLI
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v1'
+      - name: "Set up Cloud SDK"
+        uses: "google-github-actions/setup-gcloud@v1"
 
       # Deploy to Cloud Run
       - name: Deploy to Cloud Run
@@ -554,29 +554,29 @@ class MonitoredCredentialManager:
         self.project_id = project_id or "cherry-ai-project"
         self.environment = environment or "dev"
         self.monitoring_client = monitoring_v3.MetricServiceClient()
-    
+
     def get_secret(self, secret_name, version="latest"):
         # Get the secret
         secret = self.credential_manager.get_secret(secret_name, version)
-        
+
         # Record the access
         self._record_access(secret_name)
-        
+
         return secret
-    
+
     def _record_access(self, credential_name):
         # Create a time series
         series = monitoring_v3.TimeSeries()
         series.metric.type = "custom.googleapis.com/credential_access"
         series.metric.labels["credential_name"] = credential_name
         series.metric.labels["environment"] = self.environment
-        
+
         # Create a data point
         point = series.points.add()
         point.value.int64_value = 1
         now = time.time()
         point.interval.end_time.seconds = int(now)
-        
+
         # Write the time series
         self.monitoring_client.create_time_series(
             name=f"projects/{self.project_id}",
@@ -589,11 +589,13 @@ class MonitoredCredentialManager:
 If you encounter issues with the credential management system:
 
 1. **Authentication Failures**:
+
    - Check if the service account has the necessary permissions
    - Verify that the credentials are correctly stored in Secret Manager
    - Ensure the environment variables are set correctly
 
 2. **Secret Not Found**:
+
    - Check if the secret exists in Secret Manager
    - Verify that you're using the correct name and environment suffix
    - Ensure you have permission to access the secret

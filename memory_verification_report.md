@@ -3,6 +3,7 @@
 ## Verification Tasks Completed
 
 1. **Documentation Review**
+
    - Examined the existing FirestoreMemoryManager implementation
    - Reviewed the memory management refactoring plan
    - Analyzed integration tests for Firestore connectivity
@@ -31,12 +32,15 @@
 ## Next Steps
 
 1. **Fix GCP Authentication**
+
    - Ensure the service account key has the proper format and permissions
    - Verify the key has access to Firestore in the cherry-ai-project project
    - Consider generating a new service account key if needed
 
 2. **Provision Infrastructure**
+
    - Once authentication is working, run Terraform to provision required resources:
+
    ```
    cd /workspaces/orchestra-main/infra
    terraform init
@@ -46,10 +50,12 @@
    ```
 
 3. **Configure Environment**
+
    - Set proper environment variables for GCP and Redis
    - Use values from Terraform output for Redis configuration
 
 4. **Run Integration Tests**
+
    - Enable integration tests with `export RUN_INTEGRATION_TESTS=true`
    - Execute `./run_integration_tests.sh`
 

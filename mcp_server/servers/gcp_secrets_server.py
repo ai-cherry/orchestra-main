@@ -4,14 +4,15 @@ MCP Server for Google Secret Manager
 Enables secure secret management through MCP
 """
 
-import os
-import logging
-from typing import Dict, Any, List, Optional
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
-from google.cloud import secretmanager
-import google.auth
 import json
+import logging
+import os
+from typing import Any, Dict, List, Optional
+
+import google.auth
+from fastapi import FastAPI, HTTPException
+from google.cloud import secretmanager
+from pydantic import BaseModel, Field
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

@@ -5,9 +5,10 @@ Run the Vertex AI Agent Manager API server.
 This script launches the FastAPI server for the Vertex AI Agent Manager.
 """
 
-import uvicorn
-import logging
 import argparse
+import logging
+
+import uvicorn
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -26,7 +27,6 @@ def main():
     logger.info(f"Starting Vertex AI Agent Manager API server on {args.host}:{args.port}")
 
     # Import the API module
-    from packages.vertex_client.api import app
 
     # Run the server
     uvicorn.run(

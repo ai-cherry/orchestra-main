@@ -24,17 +24,14 @@ Usage:
     config = manager.load_mode_definitions()
 """
 
-import os
-import sys
-import json
-import logging
-import tempfile
-import shutil
 import hashlib
-import time
+import logging
+import os
+import shutil
+import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any, Tuple, Union, cast
+from typing import Any, Dict, Optional
 
 import yaml
 
@@ -66,8 +63,6 @@ DEFAULT_COLLECTION = os.environ.get(ENV_COLLECTION, "mode_system_config")
 
 class PersistenceError(Exception):
     """Base exception for persistence errors."""
-
-    pass
 
 
 class PersistenceManager:
@@ -131,12 +126,11 @@ class PersistenceManager:
         """
         try:
             # Try to import Google Cloud libraries
-            import google.cloud.storage
-            import google.cloud.secretmanager
-            import google.cloud.firestore
+            pass
 
             # Check for GCP environment indicators
-            has_gcp_env = (
+            # GCP environment indicator check (was unused variable)
+            (
                 os.environ.get("GOOGLE_CLOUD_PROJECT") is not None
                 or os.environ.get("K_SERVICE") is not None
                 or os.path.exists("/var/run/secrets/kubernetes.io")
@@ -151,8 +145,7 @@ class PersistenceManager:
         """Initialize Google Cloud clients if possible."""
         try:
             # Import GCP libraries
-            from google.cloud import storage, secretmanager, firestore
-            from google.api_core.exceptions import NotFound, PermissionDenied
+            from google.cloud import firestore, secretmanager, storage
 
             # Initialize Secret Manager client
             try:
@@ -311,7 +304,7 @@ class PersistenceManager:
 
             # Validate configuration
             try:
-                config = self._validate_yaml_config(content)
+                self._validate_yaml_config(content)
             except PersistenceError as e:
                 logger.error(f"Invalid mode configuration: {str(e)}")
                 # Restore backup if available
@@ -329,7 +322,6 @@ class PersistenceManager:
             # 2. Save to GCP Secret Manager
             if self.gcp_enabled and self.secret_manager_client:
                 try:
-                    from google.cloud import secretmanager
                     from google.api_core.exceptions import NotFound
 
                     secret_name = f"projects/{self.project_id}/secrets/{self.secret_name}"
@@ -363,7 +355,6 @@ class PersistenceManager:
             # 3. Save to Cloud Storage
             if self.gcp_enabled and self.storage_client:
                 try:
-                    from google.cloud import storage
                     from google.api_core.exceptions import NotFound
 
                     # Check if bucket exists
@@ -472,7 +463,7 @@ class PersistenceManager:
                             "updated_at": firestore.SERVER_TIMESTAMP,
                         }
                     )
-                    logger.info(f"Saved workflow state to Firestore")
+                    logger.info("Saved workflow state to Firestore")
                 except Exception as e:
                     logger.error(f"Failed to save workflow state to Firestore: {str(e)}")
                     success = False
@@ -514,7 +505,7 @@ class PersistenceManager:
                 source = "Secret Manager"
                 logger.info(f"Loaded mode definitions from Secret Manager: {secret_name}")
             except NotFound:
-                logger.warning(f"Mode definitions not found in Secret Manager")
+                logger.warning("Mode definitions not found in Secret Manager")
             except Exception as e:
                 logger.error(f"Failed to load mode definitions from Secret Manager: {str(e)}")
 
@@ -530,7 +521,7 @@ class PersistenceManager:
                 source = "Cloud Storage"
                 logger.info(f"Loaded mode definitions from Cloud Storage: gs://{self.bucket_name}/{blob_path}")
             except NotFound:
-                logger.warning(f"Mode definitions not found in Cloud Storage")
+                logger.warning("Mode definitions not found in Cloud Storage")
             except Exception as e:
                 logger.error(f"Failed to load mode definitions from Cloud Storage: {str(e)}")
 
@@ -542,9 +533,9 @@ class PersistenceManager:
                 if doc.exists:
                     content = doc.to_dict().get("content")
                     source = "Firestore"
-                    logger.info(f"Loaded mode definitions from Firestore")
+                    logger.info("Loaded mode definitions from Firestore")
                 else:
-                    logger.warning(f"Mode definitions not found in Firestore")
+                    logger.warning("Mode definitions not found in Firestore")
             except Exception as e:
                 logger.error(f"Failed to load mode definitions from Firestore: {str(e)}")
 
@@ -604,7 +595,7 @@ class PersistenceManager:
                 source = "Cloud Storage"
                 logger.info(f"Loaded workflow state from Cloud Storage: gs://{self.bucket_name}/{blob_path}")
             except NotFound:
-                logger.warning(f"Workflow state not found in Cloud Storage")
+                logger.warning("Workflow state not found in Cloud Storage")
             except Exception as e:
                 logger.error(f"Failed to load workflow state from Cloud Storage: {str(e)}")
 
@@ -616,9 +607,9 @@ class PersistenceManager:
                 if doc.exists:
                     content = doc.to_dict().get("content")
                     source = "Firestore"
-                    logger.info(f"Loaded workflow state from Firestore")
+                    logger.info("Loaded workflow state from Firestore")
                 else:
-                    logger.warning(f"Workflow state not found in Firestore")
+                    logger.warning("Workflow state not found in Firestore")
             except Exception as e:
                 logger.error(f"Failed to load workflow state from Firestore: {str(e)}")
 
@@ -671,7 +662,6 @@ class PersistenceManager:
                 logger.error(f"Failed to load mode definitions from local file: {str(e)}")
 
         # 2. Secret Manager
-        secret_config = None
         if self.gcp_enabled and self.secret_manager_client:
             try:
                 from google.api_core.exceptions import NotFound
@@ -679,16 +669,15 @@ class PersistenceManager:
                 secret_name = f"projects/{self.project_id}/secrets/{self.secret_name}/versions/latest"
                 response = self.secret_manager_client.access_secret_version(request={"name": secret_name})
                 secret_content = response.payload.data.decode("UTF-8")
-                secret_config = self._validate_yaml_config(secret_content)
+                self._validate_yaml_config(secret_content)
                 secret_hash = hashlib.md5(secret_content.encode()).hexdigest()
                 sources.append(("secret_manager", secret_content, secret_hash))
             except NotFound:
-                logger.warning(f"Mode definitions not found in Secret Manager")
+                logger.warning("Mode definitions not found in Secret Manager")
             except Exception as e:
                 logger.error(f"Failed to load mode definitions from Secret Manager: {str(e)}")
 
         # 3. Cloud Storage
-        storage_config = None
         if self.gcp_enabled and self.storage_client:
             try:
                 from google.api_core.exceptions import NotFound
@@ -697,27 +686,26 @@ class PersistenceManager:
                 blob_path = f"{self.environment}/mode_definitions.yaml"
                 blob = bucket.blob(blob_path)
                 storage_content = blob.download_as_text()
-                storage_config = self._validate_yaml_config(storage_content)
+                self._validate_yaml_config(storage_content)
                 storage_hash = hashlib.md5(storage_content.encode()).hexdigest()
                 sources.append(("cloud_storage", storage_content, storage_hash))
             except NotFound:
-                logger.warning(f"Mode definitions not found in Cloud Storage")
+                logger.warning("Mode definitions not found in Cloud Storage")
             except Exception as e:
                 logger.error(f"Failed to load mode definitions from Cloud Storage: {str(e)}")
 
         # 4. Firestore
-        firestore_config = None
         if self.gcp_enabled and self.firestore_client:
             try:
                 doc_ref = self.firestore_client.collection(self.collection_name).document("mode_definitions")
                 doc = doc_ref.get()
                 if doc.exists:
                     firestore_content = doc.to_dict().get("content")
-                    firestore_config = self._validate_yaml_config(firestore_content)
+                    self._validate_yaml_config(firestore_content)
                     firestore_hash = hashlib.md5(firestore_content.encode()).hexdigest()
                     sources.append(("firestore", firestore_content, firestore_hash))
                 else:
-                    logger.warning(f"Mode definitions not found in Firestore")
+                    logger.warning("Mode definitions not found in Firestore")
             except Exception as e:
                 logger.error(f"Failed to load mode definitions from Firestore: {str(e)}")
 

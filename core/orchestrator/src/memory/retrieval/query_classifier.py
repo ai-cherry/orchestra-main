@@ -8,9 +8,9 @@ This module provides a query classifier that categorizes queries into different 
 import logging
 import time
 from enum import Enum
-from typing import Dict, List, Optional, Union, Any
+from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -250,9 +250,9 @@ class QueryClassifier:
             - FACTUAL: Seeking specific information or facts (e.g., "What is X?", "Who invented Y?")
             - CONCEPTUAL: Seeking understanding of concepts, theories, or relationships (e.g., "Why does X happen?", "How does Y work?")
             - CONVERSATIONAL: General conversation, greetings, or requests (e.g., "Can you help me?", "Hello")
-            
+
             Query: "{query}"
-            
+
             Classification:
             """
 

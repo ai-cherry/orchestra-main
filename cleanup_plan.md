@@ -4,11 +4,13 @@ Based on the code review, this document outlines the safest redundancy eliminati
 
 ## Verified Current Structure
 
-- **Phidata Agent Wrapper**: 
+- **Phidata Agent Wrapper**:
+
   - Current official implementation: `packages/agents/src/phidata/wrapper.py`
   - Deprecated implementation: `updated_phidata_wrapper.py` (root directory)
 
 - **Memory System**:
+
   - Current location: `packages/shared/src/storage/firestore/`
   - Original implementation: `firestore_memory.py`
   - V2 implementation: `v2/adapter.py`

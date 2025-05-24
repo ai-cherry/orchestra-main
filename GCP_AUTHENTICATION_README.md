@@ -22,6 +22,7 @@ source ~/setup-env.sh
 ```
 
 This script sets:
+
 - GCP credentials and project configuration
 - Standard mode environment variables
 - AI Orchestra specific configuration
@@ -29,6 +30,7 @@ This script sets:
 ### 2. GCP Authentication
 
 Authentication is handled through:
+
 - Service account key stored at `$HOME/.gcp/service-account.json`
 - Environment variable `GOOGLE_APPLICATION_CREDENTIALS` pointing to this file
 - Automatic authentication during Codespace creation via `postCreateCommand`
@@ -38,6 +40,7 @@ Authentication is handled through:
 #### Docker
 
 The Dockerfile includes GCP credentials configuration:
+
 ```dockerfile
 ENV GOOGLE_APPLICATION_CREDENTIALS=/app/.gcp/service-account.json
 COPY .gcp/service-account.json /app/.gcp/service-account.json
@@ -46,6 +49,7 @@ COPY .gcp/service-account.json /app/.gcp/service-account.json
 #### Terraform
 
 Use the `terraform-wrapper.sh` script to run Terraform commands with the proper environment:
+
 ```bash
 ./terraform-wrapper.sh apply
 ```
@@ -53,6 +57,7 @@ Use the `terraform-wrapper.sh` script to run Terraform commands with the proper 
 #### Poetry
 
 Poetry inherits environment variables from the shell. Ensure you've sourced the environment:
+
 ```bash
 source ~/setup-env.sh
 poetry shell
@@ -61,15 +66,18 @@ poetry shell
 ### 4. Verification
 
 Run the verification script to validate your setup:
+
 ```bash
 ./verify-setup.sh
 ```
 
 This checks:
+
 - GCP authentication status
 - Environment variables
 - Tool availability and configuration
 - GCP API access
+
 ## Codespace Rebuild Process
 
 The setup includes automatic handling of Codespace rebuilds:
@@ -91,6 +99,7 @@ To test the rebuild process without actually rebuilding the Codespace, use the `
 ```
 
 This script:
+
 - Simulates a Codespace rebuild by running the setup script with the `--rebuild` flag
 - Verifies that GCP authentication is maintained
 - Tests API access after the simulated rebuild
@@ -107,6 +116,7 @@ For quick re-authentication without rebuilding the Codespace, use the `quick-aut
 ```
 
 This script:
+
 - Checks for the service account key file and attempts to recover if missing
 - Authenticates with GCP using the service account
 - Sets the project, region, and zone
@@ -130,6 +140,7 @@ cat /workspaces/orchestra-main/codespace_rebuild.log
 ```
 
 The log files contain detailed information about each step of the authentication process, including:
+
 - Command outputs that aren't shown in the terminal
 - Error messages from GCP commands
 - Environment variable settings
@@ -140,11 +151,13 @@ The log files contain detailed information about each step of the authentication
 After a Codespace rebuild:
 
 1. Source the environment:
+
    ```bash
    source ~/.bashrc
    ```
 
 2. Verify the setup:
+
    ```bash
    ./verify-setup.sh
    ```
@@ -159,10 +172,12 @@ After a Codespace rebuild:
 The setup includes specific configurations for better IDE integration with GCP:
 
 1. **VSCode Extensions**: The verification script checks for recommended GCP-related extensions:
+
    - Cloud Code: For GCP resource management and deployment
    - Google Cloud Spanner: For database operations
 
 2. **Environment Variables**: The setup sets environment variables for IDE integration:
+
    ```bash
    export CLOUDCODE_ENABLE=true
    export CLOUDCODE_PROJECT="cherry-ai-project"
@@ -170,16 +185,21 @@ The setup includes specific configurations for better IDE integration with GCP:
    ```
 
 3. **VSCode-GCP Sync**: Use the `sync-vscode-gcp.sh` script to sync VSCode with GCP:
+
    ```bash
    ./sync-vscode-gcp.sh
    ```
-   
+
    This script:
+
    - Creates or updates VSCode settings for GCP integration
    - Configures Cloud Code settings for the project
    - Checks for recommended extensions
    - Sets up workspace trust settings
    - Creates project-specific settings in the `.vscode` directory
+
+   ```
+
    ```
 
 ## Troubleshooting
@@ -187,10 +207,12 @@ The setup includes specific configurations for better IDE integration with GCP:
 ### Common Issues
 
 1. **Missing GCP credentials**:
+
    - Check if `$HOME/.gcp/service-account.json` exists
    - Ensure the `GCP_MASTER_SERVICE_JSON` secret is set in GitHub
 
 2. **Authentication failures**:
+
    - Run `gcloud auth list` to check active accounts
    - Try `gcloud auth activate-service-account --key-file=$HOME/.gcp/service-account.json`
 

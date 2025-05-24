@@ -4,7 +4,7 @@ agent_definitions:
     agent_name: LangChain Example
     description: "A modular agent powered by LangChain"
     wrapper_type: langchain
-    langchain_agent_class: myproject.langchain.MyLangChainAgent  # Update with actual import path
+    langchain_agent_class: myproject.langchain.MyLangChainAgent # Update with actual import path
     llm_ref: llm_gpt4_turbo_via_portkey
     tools: []
     role: "Perform tasks using LangChain"
@@ -21,9 +21,7 @@ agent_definitions:
     wrapper_type: phidata
     phidata_agent_class: agno.agent.Agent
     llm_ref: llm_gpt4_turbo_via_portkey
-    tools:
-      - name: GongTool
-        path: packages.tools.src.gong.GongTool
+    tools: []
     role: "Analyze Gong call recordings and provide insights"
     instructions:
       - "Extract key discussion topics from call transcripts"
@@ -40,9 +38,7 @@ agent_definitions:
     wrapper_type: phidata
     phidata_agent_class: agno.agent.Agent
     llm_ref: llm_gpt4_turbo_via_portkey
-    tools:
-      - name: LookerTool
-        path: packages.tools.src.looker.LookerTool
+    tools: []
     role: "Run Looker analytics queries and generate business intelligence"
     instructions:
       - "Execute specific Looker looks and dashboards based on context"
@@ -59,9 +55,7 @@ agent_definitions:
     wrapper_type: phidata
     phidata_agent_class: agno.agent.Agent
     llm_ref: llm_gpt4_turbo_via_portkey
-    tools:
-      - name: SalesforceTool
-        path: packages.tools.src.salesforce.SalesforceTool
+    tools: []
     role: "Manage Salesforce CRM operations and data retrieval"
     instructions:
       - "Query opportunity and account data from Salesforce"
@@ -78,9 +72,7 @@ agent_definitions:
     wrapper_type: phidata
     phidata_agent_class: agno.agent.Agent
     llm_ref: llm_gpt4_turbo_via_portkey
-    tools:
-      - name: HubSpotTool
-        path: packages.tools.src.hubspot.HubSpotTool
+    tools: []
     role: "Automate HubSpot CRM operations and data enrichment"
     instructions:
       - "Enrich contacts using web search"
@@ -97,9 +89,7 @@ agent_definitions:
     wrapper_type: phidata
     phidata_agent_class: agno.agent.Agent
     llm_ref: llm_gpt4_turbo_via_portkey
-    tools:
-      - name: NetSuiteTool
-        path: packages.tools.src.netsuite.NetSuiteTool
+    tools: []
     role: "Retrieve and update NetSuite data"
     instructions:
       - "Get inventory levels for specific SKUs"
@@ -116,9 +106,7 @@ agent_definitions:
     wrapper_type: phidata
     phidata_agent_class: agno.agent.Agent
     llm_ref: llm_gpt4_turbo_via_portkey
-    tools:
-      - name: SlackMessenger
-        path: packages.tools.src.slack.SlackMessenger
+    tools: []
     role: "Sends messages and reports to Slack"
     instructions:
       - "Send messages to specified channels"

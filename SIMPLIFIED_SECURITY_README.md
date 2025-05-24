@@ -17,12 +17,14 @@ The AI Orchestra project was originally designed with enterprise-level security 
 
 **Original approach:** Multiple token types (classic and fine-grained), organization-level secrets, and complex authentication utility.
 
-**Simplified approach:** 
+**Simplified approach:**
+
 - Single GitHub token management
 - Repository-level secrets instead of organization-level
 - Simplified authentication script
 
 **Files:**
+
 - `github_auth.sh.simplified` - Streamlined GitHub authentication utility
 
 ### GitHub Secrets Management
@@ -30,11 +32,13 @@ The AI Orchestra project was originally designed with enterprise-level security 
 **Original approach:** Extensive list of required organization secrets with strict verification.
 
 **Simplified approach:**
+
 - Reduced set of essential secrets
 - Repository-level secrets instead of organization-level
 - Interactive creation of missing secrets
 
 **Files:**
+
 - `verify_github_secrets.sh.simplified` - Streamlined verification script
 
 ### GCP Authentication
@@ -42,11 +46,13 @@ The AI Orchestra project was originally designed with enterprise-level security 
 **Original approach:** Workload Identity Federation (WIF) with complex setup and verification.
 
 **Simplified approach:**
+
 - Option to use WIF (more secure) or Service Account Keys (simpler)
 - Interactive setup process
 - Clear instructions for both approaches
 
 **Files:**
+
 - `setup_wif.sh.simplified` - Provides both authentication options
 
 ### GitHub Actions Workflows
@@ -54,11 +60,13 @@ The AI Orchestra project was originally designed with enterprise-level security 
 **Original approach:** Complex workflows with extensive verification steps.
 
 **Simplified approach:**
+
 - Streamlined deployment workflow
 - Fewer verification steps
 - Option to skip tests in development
 
 **Files:**
+
 - `.github/workflows/simplified-deploy-template.yml` - Streamlined workflow template
 
 ### Web Security
@@ -66,11 +74,13 @@ The AI Orchestra project was originally designed with enterprise-level security 
 **Original approach:** Comprehensive CSRF protection, extensive error handling.
 
 **Simplified approach:**
+
 - Development mode with optional CSRF bypass
 - Simplified token validation
 - Environment variable control
 
 **Files:**
+
 - `wif_implementation/csrf_protection_dev.py` - Development-friendly CSRF protection
 
 ## How to Use
@@ -88,6 +98,7 @@ chmod +x github_auth.sh.simplified
 ```
 
 This script will:
+
 - Check for a GitHub token in environment variables or stored credentials
 - Prompt you to enter a token if none is found
 - Save the token for future use
@@ -106,6 +117,7 @@ chmod +x verify_github_secrets.sh.simplified
 ```
 
 This script will:
+
 - Check for essential GitHub repository secrets
 - Offer to create missing secrets interactively
 - Verify that all required secrets are available
@@ -123,6 +135,7 @@ chmod +x setup_wif.sh.simplified
 ```
 
 This script will:
+
 - Check for GCP authentication
 - Prompt you to choose between WIF (more secure) or Service Account Keys (simpler)
 - Configure the selected authentication method
@@ -207,6 +220,7 @@ chmod +x mode_indicator.sh
 ```
 
 After setup, you'll see a colored mode indicator in your shell prompt:
+
 - **[DEV]** - You're in development mode
 - **[DEV-BYPASS]** - You're in development mode with CSRF protection bypassed
 - **[PROD]** - You're in production mode
@@ -265,16 +279,18 @@ git push origin main
 The simplified workflow manages environments through:
 
 1. **Default Environment**: Pushes to the main branch automatically deploy to the 'dev' environment
+
    ```yaml
    environment: ${{ github.event.inputs.environment || 'dev' }}
    ```
 
 2. **Environment Variables**: The environment name is passed to your application
+
    ```yaml
    --set-env-vars=ENV=${{ github.event.inputs.environment || 'dev' }}
    ```
 
-3. **Authentication Method Flexibility**: 
+3. **Authentication Method Flexibility**:
    - Production can use the more secure Workload Identity Federation
    - Development can use the simpler Service Account key approach
 
@@ -290,8 +306,9 @@ For a streamlined experience as a single developer:
 
 The workflow supports different authentication methods based on security needs:
 
-**For Development**: 
-```yaml 
+**For Development**:
+
+```yaml
 # Simpler method using service account key
 - name: Google Auth via Service Account Key
   if: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER == '' }}
@@ -301,6 +318,7 @@ The workflow supports different authentication methods based on security needs:
 ```
 
 **For Production**:
+
 ```yaml
 # More secure method using Workload Identity Federation
 - name: Google Auth via Workload Identity Federation
@@ -335,10 +353,10 @@ If your project grows beyond a single developer or needs enhanced security, you 
 
 ## Files Overview
 
-| Original File | Simplified File | Description |
-|---------------|-----------------|-------------|
-| `github_auth.sh` | `github_auth.sh.simplified` | GitHub authentication utility |
-| `verify_github_secrets.sh` | `verify_github_secrets.sh.simplified` | GitHub secrets verification |
-| `setup_wif.sh` | `setup_wif.sh.simplified` | GCP authentication setup |
+| Original File                               | Simplified File                                    | Description                      |
+| ------------------------------------------- | -------------------------------------------------- | -------------------------------- |
+| `github_auth.sh`                            | `github_auth.sh.simplified`                        | GitHub authentication utility    |
+| `verify_github_secrets.sh`                  | `verify_github_secrets.sh.simplified`              | GitHub secrets verification      |
+| `setup_wif.sh`                              | `setup_wif.sh.simplified`                          | GCP authentication setup         |
 | `.github/workflows/wif-deploy-template.yml` | `.github/workflows/simplified-deploy-template.yml` | GitHub Actions workflow template |
-| `wif_implementation/csrf_protection.py` | `wif_implementation/csrf_protection_dev.py` | CSRF protection implementation |
+| `wif_implementation/csrf_protection.py`     | `wif_implementation/csrf_protection_dev.py`        | CSRF protection implementation   |

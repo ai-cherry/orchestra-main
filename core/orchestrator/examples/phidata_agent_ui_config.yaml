@@ -10,26 +10,26 @@ phidata_dev_agent:
   name: "Development Assistant"
   description: "An AI assistant configured for development with visible tool calls and debug info"
   role: "I help with development tasks and provide detailed debugging information"
-  wrapper_type: "phidata" 
-  
+  wrapper_type: "phidata"
+
   # Phidata-specific configuration
   phidata_agent_class: "agno.agent.Agent"
   llm_ref: "gpt-4-turbo" # or any model name configured in your LLM client
-  
+
   # UI Experience Settings - CRITICAL for good UI display
   markdown: true # Set to true for all agents to enable rich formatting
   show_tool_calls: true # Show tool calls in development for debugging
-  
+
   # Storage configuration for session persistence
   storage:
     table_name: "phidata_dev_agent_storage"
     schema_name: "llm"
-  
+
   # Memory configuration for conversation history
   memory:
     table_name: "phidata_dev_agent_memory"
     schema_name: "llm"
-  
+
   # Tool Configuration
   tools:
     - type: "registry:web_search"
@@ -44,15 +44,15 @@ phidata_prod_agent:
   description: "Production-ready AI assistant with clean user interface"
   role: "I help with various tasks efficiently and with a clean presentation"
   wrapper_type: "phidata"
-  
+
   # Phidata-specific configuration
   phidata_agent_class: "agno.agent.Agent"
   llm_ref: "gpt-4-turbo" # or any model name configured in your LLM client
-  
+
   # UI Experience Settings - CRITICAL for good UI display
   markdown: true # Always enable markdown for better formatting
   show_tool_calls: false # Hide tool calls in production for cleaner UI
-  
+
   # Storage/memory configuration
   storage:
     table_name: "phidata_prod_agent_storage"
@@ -60,7 +60,7 @@ phidata_prod_agent:
   memory:
     table_name: "phidata_prod_agent_memory"
     schema_name: "llm"
-  
+
   # Tool Configuration - same tools, different UI presentation
   tools:
     - type: "registry:web_search"
@@ -75,18 +75,18 @@ phidata_movie_script_agent:
   description: "Creates movie script outlines based on your ideas"
   role: "I create movie script outlines with scenes and dialogue based on your concepts"
   wrapper_type: "phidata"
-  
+
   # Use StructuredAgent for response models
   phidata_agent_class: "agno.structured.StructuredAgent"
   llm_ref: "gpt-4-turbo"
-  
+
   # UI Experience Settings
   markdown: true
   show_tool_calls: false
-  
+
   # Response model for structured output - the model path needs to exist in your codebase
   response_model_path: "packages.models.movie.MovieScript"
-  
+
   # Storage/memory configuration
   storage:
     table_name: "phidata_movie_agent_storage"
@@ -101,14 +101,14 @@ phidata_research_team:
   name: "Research Team"
   description: "A team of specialized agents for comprehensive research"
   wrapper_type: "phidata"
-  
+
   # Team-specific configuration
   phidata_agent_class: "agno.team.Team"
   llm_ref: "gpt-4-turbo"
   team_mode: "coordinate"
   team_instructions: "Work together to research topics and provide comprehensive insights"
   team_markdown: true
-  
+
   # Storage/memory for the team
   storage:
     table_name: "phidata_research_team_storage"
@@ -116,7 +116,7 @@ phidata_research_team:
   memory:
     table_name: "phidata_research_team_memory"
     schema_name: "llm"
-  
+
   # Team members configuration
   members:
     - name: "Web Researcher"
@@ -129,7 +129,7 @@ phidata_research_team:
       # Member-specific storage
       storage:
         table_name: "phidata_web_researcher_storage"
-    
+
     - name: "Data Analyst"
       role: "I analyze and summarize information"
       instructions: "Analyze information and provide structured summaries"
@@ -139,7 +139,7 @@ phidata_research_team:
         - type: "registry:text_analyzer"
       storage:
         table_name: "phidata_data_analyst_storage"
-    
+
     - name: "Report Writer"
       role: "I create well-structured final reports"
       instructions: "Create comprehensive reports based on research findings"

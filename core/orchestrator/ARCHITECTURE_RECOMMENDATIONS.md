@@ -31,11 +31,13 @@ The AI orchestration system follows a layered architecture with clear separation
 ### Core Components
 
 1. **Service Registry** (`unified_registry.py`)
+
    - **Responsibility**: Service discovery and lifecycle management
    - **Interfaces**: Registration, lookup, initialization, cleanup
    - **Dependencies**: None (root component)
 
 2. **Event Bus** (`unified_event_bus.py`)
+
    - **Responsibility**: Decouple components through pub/sub pattern
    - **Interfaces**: Subscribe, publish, event statistics
    - **Dependencies**: Service Registry
@@ -48,16 +50,19 @@ The AI orchestration system follows a layered architecture with clear separation
 ### Domain-Specific Components
 
 4. **Agent Framework** (`agents/`)
+
    - **Responsibility**: Define agent behaviors and processing
    - **Key Classes**: Agent (base), PersonaAgent, LLMAgent
    - **Dependencies**: Service Registry, Provider interfaces
 
 5. **Persona System** (`personas/`)
+
    - **Responsibility**: Manage personality configurations
    - **Key Classes**: PersonaLoader, PersonaManager
    - **Dependencies**: Configuration
 
 6. **Memory Management** (`memory/`)
+
    - **Responsibility**: Track conversation history and context
    - **Key Classes**: MemoryManager
    - **Dependencies**: Storage providers
@@ -71,11 +76,13 @@ The AI orchestration system follows a layered architecture with clear separation
 
 The codebase has established good separation along these dimensions:
 
-1. **Infrastructure vs. Domain Logic**: 
+1. **Infrastructure vs. Domain Logic**:
+
    - Infrastructure (registry, event bus) is separate from domain logic (agents, personas)
    - Clearly defined interfaces between layers
 
 2. **API vs. Implementation**:
+
    - Well-defined interfaces with implementation details hidden
    - Abstract base classes establish clear contracts
 
@@ -88,14 +95,17 @@ The codebase has established good separation along these dimensions:
 The following principles help avoid circular dependencies:
 
 1. **Dependency Injection**:
+
    - Components receive dependencies through constructors or registries
    - Unified registry provides type-based service lookup
 
 2. **Interface Segregation**:
+
    - Components depend on interfaces, not concrete implementations
    - Narrowly defined interfaces for specific responsibilities
 
 3. **Event-Driven Communication**:
+
    - Components publish events rather than calling each other directly
    - Reduces direct coupling between modules
 
@@ -108,9 +118,11 @@ The following principles help avoid circular dependencies:
 The primary stable entry points are:
 
 1. **`main.py`**: Application initialization and server startup
+
    - Should remain stable and handle core initialization
 
 2. **API Endpoints**: Client-facing interfaces in `api/endpoints/`
+
    - Should maintain backward compatibility
 
 3. **Service Registry**: Central access point for component lookup
@@ -121,10 +133,12 @@ The primary stable entry points are:
 The testing strategy follows a layered approach:
 
 1. **Unit Tests**: Test individual components in isolation
+
    - Mock dependencies using `unittest.mock` or test doubles
    - Focus on specific logic without external dependencies
 
 2. **Integration Tests**: Test component interactions
+
    - Use test configurations to replace external services
    - Verify correct interaction between related components
 
@@ -137,21 +151,25 @@ The testing strategy follows a layered approach:
 The following enhancements would improve maintainability and capabilities:
 
 1. **Configuration Management**:
+
    - Consolidate configuration into a unified framework
    - Support hierarchical configuration with overrides
    - Add validation for all configuration parameters
 
 2. **Observability Framework**:
+
    - Implement structured logging with consistent fields
    - Add tracing for request flows across components
    - Create standardized metrics collection interfaces
 
 3. **Error Handling Strategy**:
+
    - Define domain-specific error types with proper hierarchy
    - Implement consistent error propagation patterns
    - Add error recovery mechanisms and circuit breakers
 
 4. **Testing Utilities**:
+
    - Create reusable test fixtures for common test scenarios
    - Implement factory methods for test data generation
    - Add support for test environments with simplified setup

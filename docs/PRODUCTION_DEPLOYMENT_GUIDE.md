@@ -30,7 +30,8 @@ Deploying Orchestra to production involves several steps to ensure a reliable, s
 
 Orchestra uses a two-service deployment architecture:
 
-1. **Orchestra API Service** (`orchestrator-api-{env}`): 
+1. **Orchestra API Service** (`orchestrator-api-{env}`):
+
    - Primary backend service implementing the Orchestra orchestration logic
    - Provides API endpoints for agent interaction, including the `/phidata/chat` endpoint
    - Connects to PostgreSQL and Redis for data persistence and caching
@@ -43,6 +44,7 @@ Orchestra uses a two-service deployment architecture:
    - Runs as a separate Cloud Run service without direct access to databases or LLMs
 
 This separation of concerns allows for:
+
 - Independent scaling of frontend and backend services
 - Use of the standard Phidata UI container without customization
 - Clear API contract between frontend and backend
@@ -55,11 +57,13 @@ Both services are deployed together using Terraform or the Cloud Run deployment 
 We've created several scripts to automate and streamline the deployment process:
 
 1. **`run_pre_deployment_automated.sh`**
+
    - Automates pre-deployment verification
    - Checks environment readiness
    - Runs integration tests and diagnostics
 
 2. **`scripts/setup_prod_secrets.sh`**
+
    - Sets up production secrets in Google Secret Manager
    - Creates or updates required secrets for production
    - Configures IAM permissions for service accounts
@@ -118,6 +122,7 @@ Set up production secrets securely using:
 ```
 
 This script helps you create and manage:
+
 - API keys (OpenRouter, Portkey)
 - Database passwords
 - Redis credentials
@@ -150,24 +155,28 @@ The script implements safeguards to ensure a smooth deployment process and avoid
 After deployment, verify both services:
 
 1. **API Health**: Check if the API is responding correctly
+
    ```bash
    curl $(gcloud run services describe orchestrator-api-prod --region=us-central1 --format="value(status.url)")/api/health
    ```
 
 2. **Phidata UI**: Verify the UI is accessible
+
    ```bash
    # Get the UI service URL
    UI_URL=$(gcloud run services describe phidata-agent-ui-prod --region=us-central1 --format="value(status.url)")
    echo $UI_URL
    ```
+
    - Visit this URL in your web browser to confirm the Phidata Agent UI is working
    - Test sending messages through the UI to verify it connects to the Orchestra API
 
 3. **Logs**: Review recent logs for any errors
+
    ```bash
    # API logs
    gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=orchestrator-api-prod" --limit=10
-   
+
    # UI logs
    gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=phidata-agent-ui-prod" --limit=10
    ```
@@ -193,6 +202,7 @@ For more advanced monitoring:
 After successful production deployment, follow the prioritized cleanup plan:
 
 ### Priority 1 (Safest)
+
 - Remove redundant diagnostic scripts
   - `diagnose_environment.py`
   - `diagnose_orchestrator.py`
@@ -202,12 +212,15 @@ After successful production deployment, follow the prioritized cleanup plan:
   - `setup_gcp_auth.sh`
 
 ### Priority 2 (Requires Care)
+
 - Remove `future/firestore_memory_manager.py` after validating the V2 adapter works correctly
 
 ### Priority 3 (Requires Care)
+
 - Remove redundant agent wrapper files (`updated_phidata_wrapper.py`) after confirming all code uses the official implementation
 
 ### Priority 4 (Ongoing)
+
 - Refactor shared utilities
 - Standardize configurations
 - Update documentation
@@ -217,10 +230,12 @@ After successful production deployment, follow the prioritized cleanup plan:
 ### Common Issues
 
 1. **API Key Errors**
+
    - Check Secret Manager for proper key storage
    - Verify IAM permissions are correctly set
 
 2. **Database Connection Issues**
+
    - Check network connectivity (VPC settings)
    - Verify IP allowlisting is configured correctly
    - Check service account permissions
@@ -242,6 +257,7 @@ If you encounter issues:
 By following this guide and using the provided scripts, you can deploy Orchestra to production with confidence. The automated verification, configuration management, and monitoring setup help ensure a reliable and maintainable production environment.
 
 Remember to:
+
 1. Test thoroughly in development first
 2. Review configuration before applying
 3. Monitor the production deployment closely

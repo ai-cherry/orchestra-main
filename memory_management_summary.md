@@ -40,16 +40,19 @@ The first steps of implementation have been designed in [`memory_management_impl
 To complete the refactoring, the following actions are recommended:
 
 1. **Memory-Specific Implementation**:
+
    - Create memory-specific adapters that work with the new storage core
    - Implement memory model conversion utilities
    - Add semantic search capabilities for vector embeddings
 
 2. **Integration Testing**:
+
    - Develop comprehensive test suite covering both sync and async interfaces
    - Include connection recovery and error handling tests
    - Add performance benchmarks for common operations
 
 3. **Migration Strategy**:
+
    - Implement feature flags for gradually adopting the new implementation
    - Add deprecation warnings to the old implementations
    - Create documentation for migration paths

@@ -5,18 +5,18 @@ This server provides endpoints to test multiple LLM providers and analyze
 their performance and reliability for the cascade setup.
 """
 
-import logging
-import time
-import os
 import asyncio
 import json
-from typing import Dict, List, Any, Optional
+import logging
+import os
+import time
 from datetime import datetime
+from typing import Dict, List, Optional
 
-import uvicorn
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Query
-from pydantic import BaseModel
 import prometheus_client as prom
+import uvicorn
+from fastapi import BackgroundTasks, FastAPI
+from pydantic import BaseModel
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

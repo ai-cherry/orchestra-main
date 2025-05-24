@@ -6,12 +6,11 @@ A streamlined version of the memory synchronization demo that prioritizes
 performance over security for single-developer, single-user projects.
 """
 
+import json
+import logging
 import os
 import sys
-import json
-import time
-import logging
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, Optional
 
 # Import from simple_mcp instead of the complex memory_sync_engine
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -113,10 +112,10 @@ def run_demo():
     manager = OptimizedMemoryManager()
 
     # Register tools with different context windows
-    roo = manager.register_tool("roo", 16000)
-    cline = manager.register_tool("cline", 8000)
-    gemini = manager.register_tool("gemini", 200000)
-    copilot = manager.register_tool("copilot", 5000)
+    manager.register_tool("roo", 16000)
+    manager.register_tool("cline", 8000)
+    manager.register_tool("gemini", 200000)
+    manager.register_tool("copilot", 5000)
 
     print("1. Creating and sharing small memory item...")
     manager.share_memory(

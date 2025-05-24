@@ -5,27 +5,22 @@ This module provides coordination of multiple AI agents, managing their
 interactions, selection, and communication based on personas and context.
 """
 
-import asyncio
 import logging
 import time
 import uuid
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 
-from core.orchestrator.src.agents.agent_base import AgentContext, AgentResponse
+from core.orchestrator.src.agents.agent_base import AgentResponse
 from core.orchestrator.src.agents.enhanced_agent_registry import (
     get_enhanced_agent_registry,
     select_agent_for_context,
-    AgentCapability,
 )
 
 # Import the settings instance directly
-from core.orchestrator.src.config.config import settings
 from core.orchestrator.src.personas.dependency import get_persona_manager
 from core.orchestrator.src.services.base_orchestrator import BaseOrchestrator
-from core.orchestrator.src.services.event_bus import get_event_bus
-from core.orchestrator.src.services.memory_service import get_memory_service
-from packages.shared.src.models.base_models import AgentData, MemoryItem, PersonaConfig
+from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
 
 # Configure logging
 logger = logging.getLogger(__name__)

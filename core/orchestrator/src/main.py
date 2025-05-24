@@ -6,9 +6,10 @@ initializes the unified service components and maintains backward compatibility
 with existing components.
 """
 
-# Use the new centralized logging setup
-from core.logging_config import setup_logging, get_logger
 import os
+
+# Use the new centralized logging setup
+from core.logging_config import get_logger, setup_logging
 
 # Determine if running in production (Cloud Run) or development
 is_production = os.environ.get("K_SERVICE") is not None
@@ -18,39 +19,36 @@ setup_logging(level=os.environ.get("LOG_LEVEL", "INFO"), json_format=is_producti
 
 logger = get_logger(__name__)  # Use the centralized get_logger
 
-from core.orchestrator.src.api.middleware.persona_loader import get_active_persona
-from core.orchestrator.src.api.dependencies.memory import (
-    initialize_memory_manager,
-    close_memory_manager,
-    # Add the new hexagonal architecture components
-    close_memory_service,
-)
-from core.orchestrator.src.agents.unified_agent_registry import get_agent_registry
-from core.orchestrator.src.services.unified_event_bus import (
-    get_event_bus,
-    EventPriority,
-)
-from core.orchestrator.src.services.unified_registry import (
-    Service,
-    get_service_registry,
-    register,
-)
-from packages.shared.src.models.base_models import PersonaConfig
-from core.orchestrator.src.config.loader import get_settings, load_persona_configs
-from core.orchestrator.src.api.endpoints import (
-    health,
-    interaction,
-    llm_interaction,
-    personas,
-    agents,
-    conversations,  # Add import for conversations endpoints
-)
-from core.orchestrator.src.agents.agent_registry import register_default_agents
 from contextlib import asynccontextmanager
 from typing import Dict
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from core.orchestrator.src.agents.agent_registry import register_default_agents
+from core.orchestrator.src.agents.unified_agent_registry import get_agent_registry
+from core.orchestrator.src.api.dependencies.memory import (  # Add the new hexagonal architecture components
+    close_memory_manager,
+    close_memory_service,
+    initialize_memory_manager,
+)
+from core.orchestrator.src.api.endpoints import conversations  # Add import for conversations endpoints
+from core.orchestrator.src.api.endpoints import (
+    agents,
+    health,
+    interaction,
+    llm_interaction,
+    personas,
+)
+from core.orchestrator.src.config.loader import get_settings, load_persona_configs
+from core.orchestrator.src.services.unified_event_bus import (
+    get_event_bus,
+)
+from core.orchestrator.src.services.unified_registry import (
+    get_service_registry,
+    register,
+)
+from packages.shared.src.models.base_models import PersonaConfig
 
 # Check for mode settings from environment variables
 use_recovery_mode_env = os.environ.get("USE_RECOVERY_MODE", "false").lower()
@@ -77,9 +75,6 @@ print(f"   Active mode settings: RECOVERY_MODE={RECOVERY_MODE}, STANDARD_MODE={S
 
 # Import memory service for hexagonal architecture
 try:
-    from packages.shared.src.memory.services.memory_service_factory import (
-        MemoryServiceFactory,
-    )
     from core.orchestrator.src.api.dependencies.memory import HEX_ARCH_AVAILABLE
 except ImportError:
     HEX_ARCH_AVAILABLE = False
@@ -250,7 +245,6 @@ app.include_router(conversations.router, prefix="/api/conversations")
 
 if __name__ == "__main__":
     import uvicorn
-    import asyncio
 
     # Get port from environment or use default
     port = int(os.environ.get("PORT", 8000))

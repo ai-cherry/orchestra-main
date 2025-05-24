@@ -30,7 +30,8 @@ Please maintain this documentation as the configuration evolves.
 
 import json
 import logging
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 

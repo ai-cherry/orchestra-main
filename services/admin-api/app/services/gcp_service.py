@@ -2,13 +2,12 @@
 Service for interacting with Google Cloud Platform services.
 """
 
-from typing import Dict, Any, Optional
 import asyncio
 from functools import lru_cache
+from typing import Any, Dict
 
-from google.cloud import resourcemanager_v3
+from google.cloud import aiplatform, resourcemanager_v3
 from google.cloud.firestore import AsyncClient as FirestoreAsyncClient
-from google.cloud import aiplatform
 
 from app.config import settings
 

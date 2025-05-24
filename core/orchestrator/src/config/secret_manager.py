@@ -9,10 +9,10 @@ It maintains backward compatibility with the existing .env approach
 while enabling more secure secret access via Secret Manager.
 """
 
-import os
 import logging
+import os
 from functools import lru_cache
-from typing import Optional, Dict, Any
+from typing import Optional
 
 from .settings import get_settings
 
@@ -109,7 +109,6 @@ class SecretManager:
 
     def __init__(self):
         """Initialize the secret manager."""
-        pass
 
     def __getitem__(self, key: str) -> Optional[Secret]:
         """Get a secret value."""

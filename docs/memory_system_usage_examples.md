@@ -37,25 +37,25 @@ async def store_development_context():
         environment="dev",
         enable_dev_notes=True
     )
-    
+
     # Create memory adapter
     adapter = FirestoreMemoryAdapter(
         project_id="your-project-id",
         credentials_path="/path/to/credentials.json"
     )
-    
+
     # Initialize adapter
     await adapter.initialize()
-    
+
     # Create dev notes manager
     dev_notes = DevNotesManager(
         memory_manager=adapter,
         config=config,
         agent_id="dev_system"
     )
-    
+
     await dev_notes.initialize()
-    
+
     # Store an architecture decision note
     await dev_notes.add_architecture_note(
         component="memory_system",
@@ -74,7 +74,7 @@ async def store_development_context():
             "visibility": "team"
         }
     )
-    
+
     # Store an implementation note
     await dev_notes.add_implementation_note(
         component="firestore_adapter",
@@ -95,7 +95,7 @@ async def store_development_context():
             "ticket_id": "FEAT-123"
         }
     )
-    
+
     # Store an issue note
     await dev_notes.add_issue_note(
         component="privacy_manager",
@@ -113,7 +113,7 @@ async def store_development_context():
             "ticket_id": "BUG-789"
         }
     )
-    
+
     # Close managers
     await dev_notes.close()
     await adapter.close()
@@ -130,25 +130,25 @@ async def retrieve_development_notes():
     config = StorageConfig(environment="dev", enable_dev_notes=True)
     adapter = FirestoreMemoryAdapter(project_id="your-project-id")
     await adapter.initialize()
-    
+
     dev_notes = DevNotesManager(memory_manager=adapter, config=config)
     await dev_notes.initialize()
-    
+
     # Get notes for a specific component
     memory_system_notes = await dev_notes.get_component_notes(
         component="memory_system"
     )
-    
+
     print(f"Found {len(memory_system_notes)} notes for memory_system component")
-    
+
     # Get notes of a specific type for a component
     architecture_notes = await dev_notes.get_component_notes(
         component="memory_system",
         note_type=DevNoteType.ARCHITECTURE
     )
-    
+
     print(f"Found {len(architecture_notes)} architecture notes")
-    
+
     # Close managers
     await dev_notes.close()
     await adapter.close()
@@ -180,29 +180,29 @@ async def store_personal_information():
         default_privacy_level="sensitive",
         enforce_privacy_classification=True
     )
-    
+
     # Configure PII detection with more strict settings for production
     pii_config = PIIDetectionConfig()
     pii_config.ENABLE_PII_REDACTION = True
     pii_config.DEFAULT_RETENTION_DAYS = 90  # Shorter retention in production
-    
+
     # Create base adapter
     adapter = FirestoreMemoryAdapter(
         project_id="your-production-project",
         credentials_path="/path/to/prod_credentials.json"
     )
-    
+
     await adapter.initialize()
-    
+
     # Create privacy-enhanced manager
     privacy_manager = PrivacyEnhancedMemoryManager(
         underlying_manager=adapter,
         config=config,
         pii_config=pii_config
     )
-    
+
     await privacy_manager.initialize()
-    
+
     # Store a conversation message that might contain PII
     message_with_pii = MemoryItem(
         user_id="user123",
@@ -216,26 +216,26 @@ async def store_personal_information():
             "retention_period": 30  # shorter retention for sensitive data
         }
     )
-    
+
     # The privacy manager will automatically:
     # 1. Detect PII (name, email, phone)
     # 2. Classify the privacy level (sensitive due to PII)
     # 3. Redact PII if configured to do so
     # 4. Add appropriate metadata and set expiration
     item_id = await privacy_manager.add_memory_item(message_with_pii)
-    
+
     print(f"Stored conversation with ID: {item_id}")
-    
+
     # Retrieve the item to see how PII was handled
     stored_item = await privacy_manager.get_memory_item(item_id)
-    
+
     if stored_item:
         print(f"Retrieved item content: {stored_item.text_content}")
         print(f"Privacy classification: {stored_item.metadata.get('data_classification')}")
         print(f"PII detected: {stored_item.metadata.get('pii_detected')}")
         print(f"PII types: {stored_item.metadata.get('pii_types')}")
         print(f"Expiration: {stored_item.expiration}")
-    
+
     # Close managers
     await privacy_manager.close()
     await adapter.close()
@@ -251,29 +251,29 @@ async def retrieve_conversation_history():
     config = StorageConfig(environment="prod")
     adapter = FirestoreMemoryAdapter(project_id="your-production-project")
     await adapter.initialize()
-    
+
     privacy_manager = PrivacyEnhancedMemoryManager(
         underlying_manager=adapter,
         config=config
     )
-    
+
     await privacy_manager.initialize()
-    
+
     # Get conversation history for a specific user
     user_id = "user123"
     session_id = "session456"
-    
+
     history = await privacy_manager.get_conversation_history(
         user_id=user_id,
         session_id=session_id,
         limit=10
     )
-    
+
     print(f"Retrieved {len(history)} conversation items")
-    
+
     # Note: The history items will have any configured PII redactions
     # and will respect privacy classifications
-    
+
     # Close managers
     await privacy_manager.close()
     await adapter.close()
@@ -341,18 +341,22 @@ def create_tenant_config(tenant_id: str, environment: str):
 When working with both development context and personal information:
 
 1. **Always use the right manager for the data type:**
+
    - `DevNotesManager` for technical documentation and development context
    - `PrivacyEnhancedMemoryManager` for user data and personal information
 
 2. **Use appropriate metadata for searchability:**
+
    - Development notes: component, note_type, author, ticket_id
    - Personal data: data_classification, retention_period, consent_reference
 
 3. **Set proper expiration policies:**
+
    - Development notes: Longer retention (6-12 months) with archiving strategy
    - Personal data: Shorter retention based on privacy regulations and data type
 
 4. **Implement access controls:**
+
    - Development notes: Limited to development team and support staff
    - Personal data: Limited to specific services and the user themselves
 

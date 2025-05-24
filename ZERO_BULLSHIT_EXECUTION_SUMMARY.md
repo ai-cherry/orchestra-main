@@ -50,6 +50,7 @@ chmod +x force_migration_nuclear.sh
 ```
 
 This script:
+
 1. Authenticates with your key
 2. Forces migration with full debug logging
 3. Performs immediate post-migration checks
@@ -65,6 +66,7 @@ Look for these critical indicators:
 3. **Database Verification**: `Redis/AlloyDB connections established`
 
 Example successful output:
+
 ```
 ===== CRITICAL VERIFICATION RESULTS =====
 ✅ Project cherry-ai-project in organization 873291114285
@@ -77,9 +79,11 @@ Example successful output:
 Issues are rare but might include:
 
 1. **Permission Denied**
+
    - Fix: `force_migration_nuclear.sh` recreates service account key
 
 2. **Billing Project Error**
+
    - Fix: Script automatically attempts billing project linkage fix
 
 3. **Organization Policy Error**
@@ -116,12 +120,14 @@ All scripts securely handle credentials:
 ## Evidence Collection
 
 Verification evidence is saved to:
+
 - `definitive_migration_evidence.txt` - Comprehensive evidence
 - `migration_debug.log` - Migration command debug output
 
 ## Next Steps
 
 After verification, check GCP Console to visually confirm:
+
 1. Project appears under the correct organization
 2. Workstations show correct GPU configuration
 3. Database services show correct status

@@ -10,17 +10,16 @@ import json
 import logging
 import time
 from datetime import datetime
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
-import pytest
 import numpy as np
+import pytest
 
-from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
-from packages.shared.src.memory.memory_manager import MemoryManager
+from packages.shared.src.memory.concrete_memory_manager import FirestoreV1MemoryManager
+from packages.shared.src.models.base_models import MemoryItem
 from packages.shared.src.storage.firestore.firestore_memory import (
     FirestoreMemoryManager,
 )
-from packages.shared.src.memory.concrete_memory_manager import FirestoreV1MemoryManager
 from packages.shared.src.storage.firestore.v2 import FirestoreMemoryManagerV2
 
 # Configure logging

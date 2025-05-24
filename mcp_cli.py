@@ -32,25 +32,23 @@ Options:
   --help                Show this help message and exit
 """
 
-import sys
 import json
-import subprocess
-from textwrap import dedent
-from typing import Dict, Any, List, Optional
+import sys
+from typing import Any, Dict
 
 # Import unified MCP components
 try:
+    from cline_integration import CLINE_MODE_MAP as CLINE_MODES
+    from roo_workflow_manager import MODE_MAP as ROO_MODES
     from unified_mcp_orchestrator import (
+        UNIFIED_WORKFLOWS,
         AITool,
+        MCPServerManager,
         MemoryScope,
         UnifiedMemoryManager,
         UnifiedModeManager,
         UnifiedWorkflowOrchestrator,
-        MCPServerManager,
-        UNIFIED_WORKFLOWS,
     )
-    from roo_workflow_manager import MODE_MAP as ROO_MODES
-    from cline_integration import CLINE_MODE_MAP as CLINE_MODES
 except ImportError as e:
     print(f"Error importing MCP components: {e}")
     print("Make sure unified_mcp_orchestrator.py, roo_workflow_manager.py, and cline_integration.py are available.")
@@ -295,7 +293,7 @@ def handle_list_command(args: Dict[str, Any]) -> None:
 def main() -> None:
     """Main entry point."""
     try:
-        import docopt
+        pass
     except ImportError:
         print("docopt package is required. Install it with: pip install docopt")
         sys.exit(1)

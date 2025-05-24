@@ -9,17 +9,17 @@ graph TD
         IAM[Identity & Access Management]
         LOG[Cloud Audit Logs]
     end
-    
+
     subgraph GitHub
         ACT[Actions Workflows]
         SEC[Organization Secrets]
     end
-    
+
     subgraph Application
         RUNTIME[Runtime Environment]
         CI/CD[Build Pipeline]
     end
-    
+
     ACT -->|Workload Identity| IAM
     IAM --> SM
     SM --> CI/CD
@@ -30,6 +30,7 @@ graph TD
 ## 2. Implementation Phases
 
 ### Phase 1: Secret Centralization
+
 - Migrate all secrets to GCP Secret Manager
 - Environment-specific naming convention:
   - `dev/{service}-{secret}`
@@ -37,6 +38,7 @@ graph TD
 - Update initialization scripts to use Secret Manager API
 
 ### Phase 2: Least Privilege Access
+
 ```mermaid
 graph LR
     DEV[Developers] -->|secret.viewer| SM
@@ -46,6 +48,7 @@ graph LR
 ```
 
 ### Phase 3: Automated Rotation
+
 - Weekly rotation for sensitive credentials
 - Integration with GCP Scheduler and Cloud Functions
 - Zero-downtime validation process
@@ -53,17 +56,19 @@ graph LR
 ## 3. Security Controls
 
 ### IAM Roles Configuration
+
 ```yaml
 # terraform/iam.tf
 resource "google_secret_manager_secret_iam_member" "ci_access" {
-  project = var.project_id
-  secret_id = google_secret_manager_secret.api_key.id
-  role = "roles/secretmanager.secretAccessor"
-  member = "serviceAccount:${var.ci_service_account}"
+project = var.project_id
+secret_id = google_secret_manager_secret.api_key.id
+role = "roles/secretmanager.secretAccessor"
+member = "serviceAccount:${var.ci_service_account}"
 }
 ```
 
 ### Audit Logging
+
 ```python
 # monitoring/audit_check.py
 def check_secret_access():
@@ -77,10 +82,12 @@ def check_secret_access():
 ## 4. Rollout Plan
 
 1. **Staging Environment**:
+
    - Migrate non-critical secrets first
    - Validate rotation workflow
 
 2. **Production Cutover**:
+
    - Parallel run with old system for 72hrs
    - Automated secret synchronization
 

@@ -133,11 +133,11 @@ create_or_update_secret() {
   local secret_name="$1"
   local env_var_name="$2"
   local prompt_text="$3"
-  
+
   # Check if the secret exists
   if ! gcloud secrets describe "$secret_name" --project="$PROJECT_ID" &> /dev/null; then
     echo -e "${YELLOW}Creating $secret_name secret...${NC}"
-    
+
     # If environment variable doesn't exist, prompt for value
     if [ -z "${!env_var_name}" ]; then
       read -sp "$prompt_text: " secret_value
@@ -145,7 +145,7 @@ create_or_update_secret() {
     else
       secret_value="${!env_var_name}"
     fi
-    
+
     # Create the secret
     echo -n "$secret_value" | gcloud secrets create "$secret_name" \
       --data-file=- \

@@ -4,20 +4,19 @@ Performance wrapper for MCP servers
 Adds caching, connection pooling, and optimization
 """
 
-import os
 import asyncio
 import functools
+import logging
+import os
 import time
-from typing import Any, Dict, Optional, Callable
-from datetime import datetime, timedelta
+from typing import Any, Callable, Optional
+
+import aioredis
 import uvloop
 import yaml
-import aiocache
 from aiocache import Cache
 from aiocache.serializers import PickleSerializer
-import aioredis
-from prometheus_client import Histogram, Counter, Gauge
-import logging
+from prometheus_client import Counter, Gauge, Histogram
 
 # Use uvloop for better async performance
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())

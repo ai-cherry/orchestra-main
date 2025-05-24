@@ -8,25 +8,24 @@ This implementation includes performance optimizations, proper async patterns,
 and integration with Vertex AI.
 """
 
-import os
+import asyncio
+import hashlib
 import json
 import logging
-import asyncio
+import os
 import time
-from typing import Dict, List, Optional, Any, Tuple, Set, Deque
 from collections import deque
-import hashlib
-import aiohttp
 from functools import lru_cache
+from typing import Any, Deque, Dict, List, Optional
 
 from ..interfaces.tool_adapter import IToolAdapter
-from ..models.memory import MemoryEntry, MemoryType
+from ..models.memory import MemoryEntry
 
 # Import Vertex AI libraries conditionally to avoid hard dependency
 try:
     from google.cloud import aiplatform
-    from vertexai.preview.generative_models import GenerativeModel, GenerationConfig
     from vertexai.language_models import TextEmbeddingModel
+    from vertexai.preview.generative_models import GenerationConfig, GenerativeModel
 
     VERTEX_AI_AVAILABLE = True
 except ImportError:

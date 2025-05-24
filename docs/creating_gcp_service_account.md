@@ -78,7 +78,7 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 gcloud projects add-iam-policy-binding $PROJECT_ID \
     --member="serviceAccount:orchestrator-runtime@$PROJECT_ID.iam.gserviceaccount.com" \
     --role="roles/pubsub.publisher"
-    
+
 gcloud projects add-iam-policy-binding $PROJECT_ID \
     --member="serviceAccount:orchestrator-runtime@$PROJECT_ID.iam.gserviceaccount.com" \
     --role="roles/pubsub.subscriber"
@@ -181,3 +181,4 @@ To delete the service account when no longer needed:
 ```bash
 gcloud iam service-accounts delete \
     orchestrator-runtime@$PROJECT_ID.iam.gserviceaccount.com
+```

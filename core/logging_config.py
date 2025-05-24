@@ -3,11 +3,11 @@ Centralized logging configuration for orchestra-main.
 Provides structured JSON logging for Google Cloud Logging compatibility.
 """
 
+import json
 import logging
 import sys
-from typing import Optional, Dict, Any
-import json
 from datetime import datetime, timezone
+from typing import Any, Dict, Optional
 
 
 class JSONFormatter(logging.Formatter):

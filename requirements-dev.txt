@@ -1,4 +1,4 @@
 # Development Requirements for Orchestra AI Project
 # This includes testing, linting, and development tools
 
--r requirements/development.txt 
+-r requirements/development.txt

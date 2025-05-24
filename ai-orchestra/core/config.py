@@ -5,12 +5,11 @@ This module provides configuration management using Pydantic models.
 It includes comprehensive validation and caching for optimal performance.
 """
 
-import os
 import re
 from functools import lru_cache
-from typing import Dict, List, Optional, Set, Union, Any
+from typing import Any, Dict, List, Optional
 
-from pydantic import BaseSettings, Field, validator, root_validator
+from pydantic import BaseSettings, Field, root_validator, validator
 
 
 class GCPSettings(BaseSettings):

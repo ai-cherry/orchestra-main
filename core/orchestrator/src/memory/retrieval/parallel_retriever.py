@@ -8,12 +8,11 @@ enabling concurrent searches across multiple memory layers for improved performa
 import asyncio
 import logging
 import time
-from typing import Any, Dict, List, Optional, Set, Tuple, Union, TypeVar, Generic
+from typing import Any, Dict, Generic, List, Optional, TypeVar
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from core.orchestrator.src.memory.interface import MemoryInterface
-from core.orchestrator.src.agents.memory.models import MemoryItem, MemoryType
 
 # Configure logging
 logger = logging.getLogger(__name__)

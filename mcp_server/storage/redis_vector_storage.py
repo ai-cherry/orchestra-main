@@ -8,24 +8,19 @@ RedisJSON for efficient storage and retrieval of memory entries with vector embe
 """
 
 import json
-import logging
-import asyncio
-import time
+from typing import Any, Dict, List, Optional, Tuple
+
 import numpy as np
-from typing import Dict, List, Optional, Any, Tuple, Union, Set
-import hashlib
-from datetime import datetime
 
 # Import Redis with fallback
 try:
     import redis.asyncio as redis
     from redis.commands.search.field import (
-        TextField,
         NumericField,
         TagField,
+        TextField,
         VectorField,
     )
-    from redis.commands.search.indexDefinition import IndexDefinition, IndexType
 
     HAS_REDIS = True
 except ImportError:
@@ -33,9 +28,8 @@ except ImportError:
 
 # Import from relative paths
 from ..interfaces.storage import IMemoryStorage
-from ..models.memory import MemoryEntry, MemoryType, MemoryScope, StorageTier
+from ..models.memory import MemoryEntry
 from ..utils.structured_logging import get_logger, with_correlation_id
-from ..utils.memory_key import MemoryKey, MemoryKeyPattern
 
 logger = get_logger(__name__)
 

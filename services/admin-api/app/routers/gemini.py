@@ -2,12 +2,12 @@
 Router for Gemini LLM-powered API endpoints.
 """
 
-from typing import Dict, Any, List
+from typing import Any, Dict
+
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.config import settings
+from app.schemas.gemini import CommandRequest, CommandResponse
 from app.services.gemini_service import get_gemini_service
-from app.schemas.gemini import CommandRequest, CommandResponse, FunctionCall
 
 router = APIRouter()
 

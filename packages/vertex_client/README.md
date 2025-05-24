@@ -59,7 +59,7 @@ print(f"Status: {result['status']}")
 
 # Example: Creating an agent team
 result = trigger_vertex_task(
-    "create agent team clinical-trial-followup", 
+    "create agent team clinical-trial-followup",
     roles=["planner", "doer", "reviewer"]
 )
 print(f"Team created: {result['team']}")

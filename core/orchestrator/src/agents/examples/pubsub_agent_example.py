@@ -6,10 +6,9 @@ communication system for inter-agent messaging and task coordination.
 """
 
 import asyncio
-import json
 import logging
 import uuid
-from typing import Dict, Any, Optional, List
+from typing import Any, Dict, Optional
 
 from core.orchestrator.src.agents.agent_base import Agent, AgentContext, AgentResponse
 from core.orchestrator.src.services.agent_communication import get_agent_communication

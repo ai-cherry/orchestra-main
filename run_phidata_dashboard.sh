@@ -14,10 +14,10 @@ echo "Checking dependencies..."
 # Check for requirements file
 if [ -f "phidata_requirements.txt" ]; then
     echo "Found phidata_requirements.txt"
-    
+
     # Check if we need to install dependencies
     INSTALL_DEPS=false
-    
+
     # Check each required package
     if ! check_package "phi"; then
         echo "Phidata not found. Will install dependencies."
@@ -29,7 +29,7 @@ if [ -f "phidata_requirements.txt" ]; then
         echo "Wikipedia tool not found. Will install dependencies."
         INSTALL_DEPS=true
     fi
-    
+
     # Install dependencies if needed
     if [ "$INSTALL_DEPS" = true ]; then
         echo "Installing required dependencies from phidata_requirements.txt..."
@@ -52,7 +52,7 @@ if [[ -z "${OPENAI_API_KEY}" ]]; then
     echo "OPENAI_API_KEY environment variable is not set."
     echo "Please enter your OpenAI API key (or press enter to skip if you'll set it later):"
     read -s api_key  # -s flag hides the input (for security)
-    
+
     if [[ ! -z "$api_key" ]]; then
         export OPENAI_API_KEY=$api_key
         echo "OPENAI_API_KEY has been set for this session."

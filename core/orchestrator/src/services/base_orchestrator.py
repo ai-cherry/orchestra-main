@@ -7,13 +7,10 @@ and standardize core functionality across different orchestrator implementations
 
 import asyncio
 import logging
-import time
-import uuid
 from abc import ABC, abstractmethod
-from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 
-from core.orchestrator.src.agents.agent_base import AgentContext, AgentResponse
+from core.orchestrator.src.agents.agent_base import AgentContext
 from core.orchestrator.src.agents.agent_registry import get_agent_registry
 
 # Import the settings instance directly
@@ -55,7 +52,6 @@ class BaseOrchestrator(ABC):
     def initialize(self) -> None:
         """Initialize the orchestrator resources."""
         # Subclasses can override to add specific initialization
-        pass
 
     def close(self) -> None:
         """Close the orchestrator and release resources."""
@@ -101,7 +97,6 @@ class BaseOrchestrator(ABC):
         Returns:
             Dict containing the response and metadata
         """
-        pass
 
     async def _add_memory_async(self, item: MemoryItem) -> str:
         """

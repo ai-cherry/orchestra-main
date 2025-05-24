@@ -9,7 +9,7 @@ import asyncio
 import logging
 import time
 import uuid
-from typing import Dict, List, Any, Callable, Awaitable, Optional, Union
+from typing import Any, Awaitable, Callable, Dict, List, Optional
 
 # Handle both pydantic v1 and v2
 try:

@@ -6,22 +6,21 @@ including creating, configuring, and monitoring agents.
 """
 
 import logging
-from typing import Dict, List, Optional, Any, Union
+from typing import Any, Dict, List, Optional, Union
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
-from packages.shared.src.memory.factory import MemoryManagerFactory
-from packages.shared.src.memory.memory_interface import MemoryInterface
-from packages.shared.src.models.base_models import MemoryItem, AgentData
 from core.orchestrator.src.agents.agent_registry import (
+    delete_agent,
     get_agent_by_id,
     get_all_agents,
     register_agent,
     update_agent,
-    delete_agent,
 )
+from packages.shared.src.memory.factory import MemoryManagerFactory
+from packages.shared.src.memory.memory_interface import MemoryInterface
 
 # Set up logger
 logger = logging.getLogger(__name__)

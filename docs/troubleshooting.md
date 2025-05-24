@@ -21,12 +21,14 @@ python scripts/diagnose_system.py
 ```
 
 Command line options:
+
 - `--focus COMPONENT`: Run diagnostics only for a specific component (memory, llm, agents, api)
 - `--verbose`: Show detailed diagnostic information
 - `--fix`: Attempt to automatically fix detected issues
 - `--output FILE`: Save diagnostic results to a JSON file
 
 Example for checking only memory systems:
+
 ```bash
 python scripts/diagnose_system.py --focus memory --verbose
 ```
@@ -36,27 +38,31 @@ python scripts/diagnose_system.py --focus memory --verbose
 ### LLM Timeouts
 
 **Symptoms**:
+
 - Long response times
 - Responses cut off mid-generation
 - "Request timed out" errors
 
 **Solutions**:
+
 1. Check your internet connection
 2. Verify your API key has sufficient quota
 3. Try a different LLM model (smaller models usually have better availability)
 4. Increase the timeout setting in `config/settings.yaml`:
    ```yaml
    llm:
-     timeout_seconds: 60  # Increase from default 30
+     timeout_seconds: 60 # Increase from default 30
    ```
 
 ### Authentication Errors
 
 **Symptoms**:
+
 - "API key not valid" error messages
 - "Authentication failed" in logs
 
 **Solutions**:
+
 1. Verify your API key in `.env` file
 2. Check if the API key has expired or been revoked
 3. Ensure the API key has the correct permissions
@@ -68,15 +74,17 @@ python scripts/diagnose_system.py --focus memory --verbose
 ### Rate Limiting
 
 **Symptoms**:
+
 - "Rate limit exceeded" errors
 - Increasing frequency of 429 HTTP status codes
 
 **Solutions**:
+
 1. Implement request throttling in your configuration:
    ```yaml
    llm:
      max_requests_per_minute: 60
-     rate_limit_strategy: "queue"  # Options: queue, fail, fallback_model
+     rate_limit_strategy: "queue" # Options: queue, fail, fallback_model
    ```
 2. Use a token bucket implementation to manage request rates
 3. Consider upgrading your API tier for higher rate limits
@@ -95,11 +103,13 @@ python scripts/diagnose_system.py --focus memory --verbose
 ### Vector Database Connection Failures
 
 **Symptoms**:
+
 - "Failed to connect to vector database" errors
 - Empty semantic search results despite content existing
 - Slow query performance
 
 **Solutions**:
+
 1. Check network connectivity to the vector database
 2. Verify database credentials in `.env`
 3. Ensure the vector database service is running:
@@ -118,11 +128,13 @@ python scripts/diagnose_system.py --focus memory --verbose
 ### Missing or Incomplete Memory Records
 
 **Symptoms**:
+
 - Expected memories not appearing in search results
 - Incorrect or partial recall of stored information
 - "Embedding generation failed" errors
 
 **Solutions**:
+
 1. Verify the memory was properly stored:
    ```bash
    curl -X GET "http://localhost:8000/memory/status?user_id=YOUR_USER_ID"
@@ -146,11 +158,13 @@ python scripts/diagnose_system.py --focus memory --verbose
 ### Redis Cache Issues
 
 **Symptoms**:
+
 - Slow memory retrieval
 - "Redis connection error" in logs
 - System working but with degraded performance
 
 **Solutions**:
+
 1. Verify Redis is running:
    ```bash
    redis-cli ping
@@ -176,11 +190,13 @@ python scripts/diagnose_system.py --focus memory --verbose
 ### Persona Switching Failures
 
 **Symptoms**:
+
 - Agent using wrong persona
 - "Persona not found" errors
 - Unexpected fallback to default persona
 
 **Solutions**:
+
 1. Verify persona configurations:
    ```bash
    python scripts/diagnose_system.py --focus agents --check personas
@@ -195,11 +211,13 @@ python scripts/diagnose_system.py --focus memory --verbose
 ### Graph Execution Failures
 
 **Symptoms**:
+
 - "Graph execution failed" errors
 - Workflows getting stuck at specific nodes
 - Unexpected agent behavior
 
 **Solutions**:
+
 1. Review LangGraph execution logs:
    ```bash
    python scripts/diagnose_system.py --focus agents --check workflows
@@ -219,11 +237,13 @@ python scripts/diagnose_system.py --focus memory --verbose
 ### API Server Won't Start
 
 **Symptoms**:
+
 - "Address already in use" errors
 - Server crashes immediately after starting
 - Permission errors
 
 **Solutions**:
+
 1. Check if another process is using the port:
    ```bash
    lsof -i :8000
@@ -244,11 +264,13 @@ python scripts/diagnose_system.py --focus memory --verbose
 ### Slow API Response
 
 **Symptoms**:
+
 - API requests taking >1 second to respond
 - Timeouts from client applications
 - High server CPU or memory usage
 
 **Solutions**:
+
 1. Check server resource usage:
    ```bash
    python scripts/diagnose_system.py --focus api --check performance
@@ -274,11 +296,13 @@ python scripts/diagnose_system.py --focus memory --verbose
 ### Terraform Deployment Failures
 
 **Symptoms**:
+
 - "Error applying Terraform plan"
 - Resource creation failures
 - Permission issues
 
 **Solutions**:
+
 1. Verify cloud credentials:
    ```bash
    gcloud auth list
@@ -296,11 +320,13 @@ python scripts/diagnose_system.py --focus memory --verbose
 ### Docker Image Build Failures
 
 **Symptoms**:
+
 - "Failed to build Docker image"
 - Dependency installation errors
 - Resource limitations during build
 
 **Solutions**:
+
 1. Update Docker and dependencies:
    ```bash
    docker --version
@@ -328,6 +354,7 @@ Here are solutions for specific error messages you might encounter:
 This usually indicates network or authentication issues with the LLM API.
 
 **Solutions**:
+
 1. Check your internet connection
 2. Verify API key in `.env`
 3. Test direct API connectivity:
@@ -342,6 +369,7 @@ This usually indicates network or authentication issues with the LLM API.
 This can happen when the vector database doesn't contain relevant information or when there are embedding issues.
 
 **Solutions**:
+
 1. Verify content exists in the vector store:
    ```bash
    python scripts/list_vector_entries.py --user_id YOUR_USER_ID
@@ -353,8 +381,8 @@ This can happen when the vector database doesn't contain relevant information or
 3. Adjust search parameters:
    ```yaml
    vector_search:
-     similarity_threshold: 0.7  # Lower for more results
-     top_k: 10  # Increase for more results
+     similarity_threshold: 0.7 # Lower for more results
+     top_k: 10 # Increase for more results
    ```
 
 ### "Memory component in degraded state"
@@ -362,6 +390,7 @@ This can happen when the vector database doesn't contain relevant information or
 This indicates the memory system is operating with reduced functionality.
 
 **Solutions**:
+
 1. Identify which components are degraded:
    ```bash
    python scripts/diagnose_system.py --focus memory --verbose
@@ -381,6 +410,7 @@ This indicates the memory system is operating with reduced functionality.
 This indicates problems with agent configuration files.
 
 **Solutions**:
+
 1. Validate agent configuration formats:
    ```bash
    python scripts/validate_agent_configs.py
@@ -400,6 +430,7 @@ This indicates problems with agent configuration files.
 If you're still experiencing issues:
 
 1. Generate a detailed diagnostic report:
+
    ```bash
    python scripts/diagnose_system.py --verbose --output diagnostic_report.json
    ```

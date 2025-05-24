@@ -33,6 +33,7 @@ All agent communication uses a standardized message protocol defined in `core/or
 - Content models for different message types
 
 Example message types:
+
 - `QUERY`: A question or request from one agent to another
 - `RESPONSE`: A response to a query
 - `NOTIFICATION`: A broadcast notification
@@ -139,13 +140,13 @@ await communication.publish_task(
 ```python
 # Register event handler
 communication.register_event_handler(
-    "agent_message", 
+    "agent_message",
     async_handler_function
 )
 
 # Register task handler
 communication.register_task_handler(
-    "process_query", 
+    "process_query",
     async_task_handler
 )
 ```
@@ -200,13 +201,13 @@ engine.register_workflow(workflow)
 async def process_query(context):
     # Process the query...
     return {"result": "processed"}
-    
+
 # Register the action
 engine.register_action("process_query", process_query)
 
 # Create and start a workflow instance
 instance_id = await engine.create_instance(
-    "query_workflow", 
+    "query_workflow",
     {"query": "What is the weather?"}
 )
 await engine.start_instance(instance_id)
@@ -269,18 +270,18 @@ class MyAgent(Agent, MessageHandlerMixin):
     def __init__(self, config=None):
         Agent.__init__(self, config)
         MessageHandlerMixin.__init__(self)
-        
+
         # Register message handlers
         self.register_message_handler("query", self._handle_query)
-        
+
     async def initialize_async(self):
         # Start message processing
         await self.start_message_processing()
-        
+
     async def close_async(self):
         # Stop message processing
         await self.stop_message_processing()
-        
+
     async def _handle_query(self, message):
         # Handle query messages
         # ...
@@ -307,6 +308,7 @@ terraform apply -target=module.redis -target=module.pubsub
 ## Best Practices
 
 1. **Use the right communication mechanism** for your needs:
+
    - In-memory queue for local, fast communication
    - PubSub for distributed, reliable communication
    - Workflow state machine for complex processes
@@ -327,11 +329,13 @@ terraform apply -target=module.redis -target=module.pubsub
 Common issues and solutions:
 
 1. **Messages not being delivered**:
+
    - Check that the recipient agent exists and is listening
    - Verify that PubSub topics and subscriptions are correctly set up
    - Check for filtering rules that might be blocking messages
 
 2. **Tasks not being processed**:
+
    - Ensure task handlers are registered for the task type
    - Check Redis connection and configuration
    - Verify that workers are running

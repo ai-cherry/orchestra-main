@@ -7,19 +7,23 @@ This document outlines the immediate next steps to implement and test the memory
 The following components have been successfully implemented:
 
 1. **Enhanced Storage Configuration System** (`StorageConfig`)
+
    - Supporting environment, namespace and privacy level parameters
    - Dynamic collection name generation based on configuration
 
 2. **Specialized Memory Managers**
+
    - `DevNotesManager`: For technical documentation and development context
    - `PrivacyEnhancedMemoryManager`: For user data with PII protection
 
 3. **Documentation**
+
    - Memory Data Separation Guide: `docs/memory_data_separation_guide.md`
    - Memory System Usage Examples: `docs/memory_system_usage_examples.md`
    - Memory System Deployment Guide: `MEMORY_SYSTEM_DEPLOYMENT_GUIDE.md`
 
 4. **Setup Scripts**
+
    - Memory configuration script: `scripts/configure_memory_for_deployment.py`
    - Memory system setup: `memory_system_setup.sh`
 
@@ -31,12 +35,14 @@ The following components have been successfully implemented:
 ### Immediate Tasks
 
 1. **Security First - Address Exposed Credentials**
+
    - [ ] Rotate all exposed GCP credentials (API Key, OAuth Client Secret, Service Account Keys)
    - [ ] Rotate exposed Figma PAT
    - [ ] Change SSH passphrase
    - [ ] Implement Secret Manager for credential storage
 
 2. **Configure Memory System For Development**
+
    - [ ] Run `./memory_system_setup.sh dev`
    - [ ] Verify configuration was applied correctly
    - [ ] Test dev notes functionality
@@ -51,6 +57,7 @@ The following components have been successfully implemented:
 ### Figma Setup & Infrastructure Tasks
 
 4. **Complete Figma Setup**
+
    - [ ] Follow steps in `FIGMA_SETUP_QUICK_GUIDE.md`
    - [ ] Set up Figma pages and variables
    - [ ] Create initial components and draft dashboard
@@ -63,6 +70,7 @@ The following components have been successfully implemented:
 ### Testing & Verification
 
 6. **Test Memory System Configuration**
+
    - [ ] Run memory verification test: `python test_memory_separation.py`
    - [ ] Verify dev notes are stored in the correct collection
    - [ ] Verify personal info is stored with proper privacy controls
@@ -158,36 +166,42 @@ await privacy_manager.add_memory_item(MemoryItem(
 ## Environment-Specific Settings
 
 ### Development Environment
+
 ```bash
 MEMORY_ENVIRONMENT=dev
 MEMORY_ENABLE_DEV_NOTES=true
 MEMORY_DEFAULT_PRIVACY_LEVEL=standard
 MEMORY_ENFORCE_PRIVACY=false
 ```
+
 - Development notes enabled
 - PII detection but no redaction
 - Privacy classification not enforced
 - Longer retention periods (365 days)
 
 ### Staging Environment
+
 ```bash
 MEMORY_ENVIRONMENT=staging
 MEMORY_ENABLE_DEV_NOTES=true
 MEMORY_DEFAULT_PRIVACY_LEVEL=sensitive
 MEMORY_ENFORCE_PRIVACY=true
 ```
+
 - Development notes still enabled
 - PII detection with redaction
 - Privacy classification enforced
 - Medium retention periods (180 days)
 
 ### Production Environment
+
 ```bash
 MEMORY_ENVIRONMENT=prod
 MEMORY_ENABLE_DEV_NOTES=false
 MEMORY_DEFAULT_PRIVACY_LEVEL=sensitive
 MEMORY_ENFORCE_PRIVACY=true
 ```
+
 - Development notes disabled
 - Strict PII detection with redaction
 - Strict privacy classification enforcement
@@ -196,10 +210,12 @@ MEMORY_ENFORCE_PRIVACY=true
 ## Known Issues and Considerations
 
 1. **Migration Strategy**
+
    - No automatic migration of existing data to the new schema
    - Consider writing a migration script if needed
 
 2. **Performance Impact**
+
    - PII detection adds processing overhead
    - Consider enabling only in production for performance during development
 
@@ -210,6 +226,7 @@ MEMORY_ENFORCE_PRIVACY=true
 ## Monitoring and Auditing
 
 1. **Firestore Collection Monitoring**
+
    - Periodically check collection sizes and growth rates
    - Monitor for unexpected access patterns
 

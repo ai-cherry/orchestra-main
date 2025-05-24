@@ -20,7 +20,7 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Pattern, Set, Tuple
+from typing import Dict, List, Optional, Pattern, Tuple
 
 
 @dataclass

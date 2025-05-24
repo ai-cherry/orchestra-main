@@ -26,12 +26,12 @@ class RedisConfig(BaseModel):
 
 class RedisShortTermMemory:
     """Short-term memory implementation using Redis"""
-    
+
     def __init__(self, config: RedisConfig):
         self.config = config
         self.redis: Optional[aioredis.Redis] = None
         self.ttl = config.ttl
-    
+
     async def connect(self) -> None:
         """Connect to Redis"""
         self.redis = await aioredis.from_url(
@@ -40,21 +40,21 @@ class RedisShortTermMemory:
             encoding="utf-8",
             decode_responses=True
         )
-    
+
     async def store(self, key: str, value: Any, namespace: str = "conversation") -> None:
         """Store data in Redis with namespace prefix"""
         if not self.redis:
             await self.connect()
-        
+
         full_key = f"{namespace}:{key}"
         serialized = json.dumps(value)
         await self.redis.set(full_key, serialized, ex=self.ttl)
-    
+
     async def retrieve(self, key: str, namespace: str = "conversation") -> Optional[Any]:
         """Retrieve data from Redis with namespace prefix"""
         if not self.redis:
             await self.connect()
-        
+
         full_key = f"{namespace}:{key}"
         data = await self.redis.get(full_key)
         return json.loads(data) if data else None
@@ -74,17 +74,17 @@ class FirestoreConfig(BaseModel):
 
 class FirestoreMidTermMemory:
     """Mid-term memory implementation using Firestore"""
-    
+
     def __init__(self, config: FirestoreConfig):
         self.config = config
         self.db = firestore.AsyncClient(project=config.project_id)
         self.collection_prefix = config.collection_prefix
-    
+
     async def store(self, key: str, value: Any, namespace: str = "conversations") -> None:
         """Store data in Firestore"""
         collection = self.db.collection(f"{self.collection_prefix}_{namespace}")
         await collection.document(key).set(value)
-    
+
     async def retrieve(self, key: str, namespace: str = "conversations") -> Optional[Dict]:
         """Retrieve data from Firestore"""
         collection = self.db.collection(f"{self.collection_prefix}_{namespace}")
@@ -108,48 +108,48 @@ class VectorSearchConfig(BaseModel):
 
 class VectorLongTermMemory:
     """Long-term memory implementation using Vertex AI Vector Search"""
-    
+
     def __init__(self, config: VectorSearchConfig, embedding_service):
         self.config = config
         self.embedding_service = embedding_service
-        
+
         # Initialize Vertex AI
         aiplatform.init(project=config.project_id, location=config.region)
-        
+
         # Get the index endpoint
         self.index_endpoint = aiplatform.MatchingEngineIndexEndpoint(
             index_endpoint_name=config.index_endpoint_id
         )
-    
+
     async def store(self, text: str, metadata: Dict[str, Any]) -> str:
         """Store text and metadata in Vector Search"""
         # Generate embedding
         embedding = await self.embedding_service.embed_text(text)
-        
+
         # Create a unique ID for this item
         item_id = metadata.get("id", f"item_{hash(text)}")
-        
+
         # Upsert the embedding
         self.index_endpoint.upsert_embeddings(
             embeddings=[embedding],
             ids=[item_id],
             deployed_index_id=self.config.deployed_index_id
         )
-        
+
         return item_id
-    
+
     async def search(self, query: str, limit: int = 5) -> List[Dict]:
         """Search for similar items"""
         # Generate embedding for query
         query_embedding = await self.embedding_service.embed_text(query)
-        
+
         # Search for similar embeddings
         response = self.index_endpoint.find_neighbors(
             deployed_index_id=self.config.deployed_index_id,
             queries=[query_embedding],
             num_neighbors=limit
         )
-        
+
         # Process results
         results = []
         for neighbor in response[0]:
@@ -158,7 +158,7 @@ class VectorLongTermMemory:
                 "score": neighbor.distance,
                 "metadata": neighbor.metadata
             })
-        
+
         return results
 ```
 
@@ -183,48 +183,48 @@ class MemoryImportance(str, Enum):
 
 class LayeredMemoryManager:
     """Unified memory manager that orchestrates all memory types"""
-    
+
     def __init__(self, config, embedding_service):
         self.short_term = RedisShortTermMemory(config.short_term)
         self.mid_term = FirestoreMidTermMemory(config.mid_term)
         self.long_term = VectorLongTermMemory(config.long_term, embedding_service)
-    
+
     async def store(self, data: Dict[str, Any], importance: MemoryImportance = MemoryImportance.LOW) -> None:
         """Store data in appropriate memory layers based on importance"""
         # Validate data
         if 'id' not in data or 'content' not in data:
             raise ValueError("Data must contain 'id' and 'content' fields")
-        
+
         # Always store in short-term memory
         await self.short_term.store(data['id'], data)
-        
+
         # Store in mid-term memory if medium or high importance
         if importance in [MemoryImportance.MEDIUM, MemoryImportance.HIGH]:
             await self.mid_term.store(data['id'], data)
-        
+
         # Store in long-term memory if high importance
         if importance == MemoryImportance.HIGH:
             await self.long_term.store(data['content'], data)
-    
+
     async def retrieve_context(self, query: str, conversation_id: str) -> Dict[str, Any]:
         """Retrieve context from all memory layers"""
         # Get context from all memory layers in parallel
         short_term_task = self.short_term.retrieve(conversation_id)
         mid_term_task = self.mid_term.retrieve(conversation_id)
         long_term_task = self.long_term.search(query)
-        
+
         # Await all tasks
         short_term_result = await short_term_task
         mid_term_result = await mid_term_task
         long_term_result = await long_term_task
-        
+
         # Combine results
         context = {
             "recent": short_term_result,
             "related": mid_term_result,
             "semantic": long_term_result
         }
-        
+
         return context
 ```
 
@@ -260,27 +260,27 @@ terraform/
 resource "google_cloud_run_v2_service" "api" {
   name     = var.service_name
   location = var.region
-  
+
   template {
     containers {
       image = var.container_image
-      
+
       resources {
         limits = {
           cpu    = var.cpu
           memory = var.memory
         }
       }
-      
+
       env {
         name  = "GCP_PROJECT_ID"
         value = var.project_id
       }
-      
+
       # Secret environment variables
       dynamic "env" {
         for_each = var.secrets
-        
+
         content {
           name = env.key
           value_source {
@@ -292,14 +292,14 @@ resource "google_cloud_run_v2_service" "api" {
         }
       }
     }
-    
+
     service_account = var.service_account_email
-    
+
     vpc_access {
       connector = var.vpc_connector_id
       egress    = "PRIVATE_RANGES_ONLY"
     }
-    
+
     scaling {
       min_instance_count = var.min_instances
       max_instance_count = var.max_instances
@@ -317,7 +317,7 @@ resource "google_cloud_run_v2_service" "api" {
 resource "google_vertex_ai_index" "vector_index" {
   region       = var.region
   display_name = "${var.prefix}-vector-index"
-  
+
   metadata {
     contents_delta_uri = "gs://${var.bucket_name}/vector-index"
     config {
@@ -338,7 +338,7 @@ resource "google_vertex_ai_index" "vector_index" {
 resource "google_vertex_ai_index_endpoint" "vector_endpoint" {
   region       = var.region
   display_name = "${var.prefix}-vector-endpoint"
-  
+
   network      = var.network_id
   private_service_connect_config {
     enable_private_service_connect = true
@@ -370,25 +370,25 @@ class AgentInfo(BaseModel):
 
 class AgentRegistry:
     """Registry for managing different agent types"""
-    
+
     def __init__(self):
         self.agents: Dict[str, AgentInfo] = {}
-    
+
     def register(self, agent_info: AgentInfo) -> None:
         """Register an agent"""
         self.agents[agent_info.name] = agent_info
-    
+
     def get_agent_class(self, name: str) -> Type[BaseAgent]:
         """Get agent class by name"""
         if name not in self.agents:
             raise ValueError(f"Agent '{name}' not registered")
-        
+
         agent_info = self.agents[name]
         module_name, class_name = agent_info.agent_class.rsplit(".", 1)
-        
+
         module = importlib.import_module(module_name)
         agent_class = getattr(module, class_name)
-        
+
         return agent_class
 ```
 
@@ -420,10 +420,10 @@ class TeamConfig(BaseModel):
 
 class AgentTeam:
     """A team of agents that can collaborate"""
-    
+
     def __init__(
-        self, 
-        config: TeamConfig, 
+        self,
+        config: TeamConfig,
         registry: AgentRegistry,
         memory_manager: LayeredMemoryManager
     ):
@@ -431,7 +431,7 @@ class AgentTeam:
         self.registry = registry
         self.memory_manager = memory_manager
         self.agents: Dict[str, BaseAgent] = {}
-        
+
         # Initialize agents
         for agent_config in config.agents:
             agent_class = registry.get_agent_class(agent_config.agent_type)
@@ -441,13 +441,13 @@ class AgentTeam:
                 memory_manager=memory_manager
             )
             self.agents[agent_config.name] = agent
-        
+
         # Ensure coordinator exists
         if config.coordinator not in self.agents:
             raise ValueError(f"Coordinator '{config.coordinator}' not found in agents")
-        
+
         self.coordinator = self.agents[config.coordinator]
-    
+
     async def process_message(self, message: Dict[str, Any]) -> Dict[str, Any]:
         """Process a message using the team"""
         # Store the message in memory
@@ -457,7 +457,7 @@ class AgentTeam:
             "type": "user_message",
             "timestamp": message.get("timestamp")
         })
-        
+
         # Let the coordinator process the message
         return await self.coordinator.process_message(message, self.agents)
 ```
@@ -465,16 +465,19 @@ class AgentTeam:
 ## Next Steps
 
 1. **Implement Memory Architecture**:
+
    - Start with the short-term memory (Redis) implementation
    - Add mid-term memory (Firestore) for persistent storage
    - Integrate Vertex AI Vector Search for semantic memory
 
 2. **Set Up Infrastructure**:
+
    - Create Terraform modules for each component
    - Define environments (dev, staging, prod)
    - Implement CI/CD pipeline for infrastructure deployment
 
 3. **Develop Agent Framework**:
+
    - Implement base agent classes
    - Create agent registry for dynamic loading
    - Develop coordinator agent for orchestration

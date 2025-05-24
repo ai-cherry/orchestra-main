@@ -7,12 +7,11 @@ for single-developer, single-user projects. Eliminates security overhead and
 complex synchronization mechanisms.
 """
 
+import logging
 import os
 import sys
-import json
 import time
-import logging
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Any, Dict
 
 # Import from simple_mcp instead of the complex memory_sync_engine
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -181,9 +180,9 @@ def simulate_coding_session():
 def process_data(data):
     \"\"\"Process the input data.\"\"\"
     result = {}
-    
+
     # TODO: Implement data processing logic
-    
+
     return result
 
 def main():

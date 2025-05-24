@@ -6,10 +6,8 @@ for intelligent promotion, demotion, and retention decisions.
 """
 
 import logging
-import time
-from datetime import datetime, timedelta
-from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple, Union, TypeVar
+from datetime import datetime
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, Field
 

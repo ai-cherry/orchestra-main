@@ -81,6 +81,7 @@ Added a simple startup script (`start_mcp_server.sh`) in the project root to sim
 ```
 
 This script handles:
+
 - Poetry installation (if needed)
 - Dependencies installation
 - Running the server with proper environment variables

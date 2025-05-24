@@ -17,7 +17,7 @@ Add the following environment variables to your `.env` file:
 
 ```bash
 # Primary configuration
-OPENROUTER_API_KEY="your-openrouter-api-key"  
+OPENROUTER_API_KEY="your-openrouter-api-key"
 PREFERRED_LLM_PROVIDER="openrouter"
 OPENROUTER_DEFAULT_MODEL="anthropic/claude-3-opus-20k"  # Your primary paid model
 
@@ -139,14 +139,17 @@ async def check_credits():
 ## Best Practices
 
 1. **Production Usage**:
+
    - Do not rely solely on free model fallbacks for production systems
    - Use Portkey with paid models and load balancing for reliable production use
 
 2. **Optimizing for Costs**:
+
    - Enable semantic caching to reduce redundant API calls
    - Use load balancing to avoid hitting rate limits on any single model
 
 3. **Monitoring**:
+
    - Regularly check your credit usage and rate limit errors in logs
    - Adjust your strategies if seeing too many fallbacks or rate limit errors
 

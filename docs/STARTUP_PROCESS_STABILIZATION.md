@@ -15,11 +15,13 @@ This document outlines the steps taken and recommendations for stabilizing the A
 ### Additional Recommendations
 
 - **Update Base Image**: Consider using a more specific Python image version in `.devcontainer/devcontainer.json`:
+
   ```json
   "image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
   ```
 
 - **Add Development Tools**: Add development tools to the DevContainer for better debugging:
+
   ```json
   "features": {
     "ghcr.io/devcontainers/features/terraform:1": {
@@ -59,10 +61,12 @@ This document outlines the steps taken and recommendations for stabilizing the A
 ### Completed Changes
 
 - **Added Validation Job**: Added a new job to validate configuration before running tests:
+
   - Checks Poetry lock file consistency
   - Validates Terraform configuration
 
 - **Updated GitHub Actions**: Updated all GitHub Actions to latest versions:
+
   - actions/checkout@v4
   - actions/setup-python@v5
   - actions/cache@v4
@@ -76,6 +80,7 @@ This document outlines the steps taken and recommendations for stabilizing the A
 ### Additional Recommendations
 
 - **Add Terraform Plan Job**: Add a job to run `terraform plan` and comment the plan on PRs:
+
   ```yaml
   terraform-plan:
     name: Terraform Plan
@@ -84,30 +89,30 @@ This document outlines the steps taken and recommendations for stabilizing the A
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.11.3
-      
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER_ID }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
           token_format: access_token
-      
+
       - name: Terraform Init
         run: |
           cd terraform
           terraform init
-      
+
       - name: Terraform Plan
         id: plan
         run: |
           cd terraform
           terraform plan -no-color -out=tfplan
-      
+
       - name: Comment Plan
         uses: actions/github-script@v7
         with:
@@ -127,6 +132,7 @@ This document outlines the steps taken and recommendations for stabilizing the A
   ```
 
 - **Add Security Scanning**: Add security scanning for Docker images and dependencies:
+
   ```yaml
   security-scan:
     name: Security Scan
@@ -134,20 +140,20 @@ This document outlines the steps taken and recommendations for stabilizing the A
     needs: validate
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      
+          python-version: "3.11"
+
       - name: Install dependencies
         run: |
           pip install safety bandit
-      
+
       - name: Run safety check
         run: |
           safety check -r requirements.txt
-      
+
       - name: Run bandit
         run: |
           bandit -r . -x tests/
@@ -162,6 +168,7 @@ This document outlines the steps taken and recommendations for stabilizing the A
 ### Additional Recommendations
 
 - **Use Terraform for API Enablement**: Move API enablement to Terraform:
+
   ```hcl
   # terraform/apis.tf
   resource "google_project_service" "required_apis" {
@@ -183,16 +190,17 @@ This document outlines the steps taken and recommendations for stabilizing the A
       "iamcredentials.googleapis.com",
       "sts.googleapis.com"
     ])
-    
+
     project = var.project_id
     service = each.key
-    
+
     disable_dependent_services = false
     disable_on_destroy         = false
   }
   ```
 
 - **Use Terraform for Workload Identity Federation**: Move Workload Identity Federation setup to Terraform:
+
   ```hcl
   # terraform/github-wif.tf
   resource "google_iam_workload_identity_pool" "github_pool" {
@@ -205,13 +213,13 @@ This document outlines the steps taken and recommendations for stabilizing the A
     workload_identity_pool_id          = google_iam_workload_identity_pool.github_pool.workload_identity_pool_id
     workload_identity_pool_provider_id = "github-provider"
     display_name                       = "GitHub Provider"
-    
+
     attribute_mapping = {
       "google.subject"       = "assertion.sub"
       "attribute.actor"      = "assertion.actor"
       "attribute.repository" = "assertion.repository"
     }
-    
+
     oidc {
       issuer_uri = "https://token.actions.githubusercontent.com"
     }
@@ -226,7 +234,7 @@ This document outlines the steps taken and recommendations for stabilizing the A
   resource "google_service_account_iam_binding" "workload_identity_binding" {
     service_account_id = google_service_account.github_actions.name
     role               = "roles/iam.workloadIdentityUser"
-    
+
     members = [
       "principalSet://iam.googleapis.com/projects/${var.project_number}/locations/global/workloadIdentityPools/${google_iam_workload_identity_pool.github_pool.workload_identity_pool_id}/attribute.repository/${var.github_repo_owner}/${var.github_repo_name}"
     ]
@@ -240,7 +248,7 @@ This document outlines the steps taken and recommendations for stabilizing the A
       "roles/secretmanager.admin",
       "roles/iam.serviceAccountUser"
     ])
-    
+
     project = var.project_id
     role    = each.key
     member  = "serviceAccount:${google_service_account.github_actions.email}"
@@ -263,11 +271,11 @@ class RedisShortTermMemory:
     def __init__(self, redis_client, ttl=3600):
         self.redis = redis_client
         self.ttl = ttl
-        
+
     async def store(self, key, value, namespace="conversation"):
         full_key = f"{namespace}:{key}"
         await self.redis.set(full_key, json.dumps(value), ex=self.ttl)
-        
+
     async def retrieve(self, key, namespace="conversation"):
         full_key = f"{namespace}:{key}"
         data = await self.redis.get(full_key)
@@ -285,11 +293,11 @@ class RedisShortTermMemory:
 class FirestoreMidTermMemory:
     def __init__(self, firestore_client):
         self.db = firestore_client
-        
+
     async def store(self, collection, document_id, data):
         doc_ref = self.db.collection(collection).document(document_id)
         await doc_ref.set(data, merge=True)
-        
+
     async def retrieve(self, collection, document_id):
         doc_ref = self.db.collection(collection).document(document_id)
         doc = await doc_ref.get()
@@ -308,11 +316,11 @@ class VectorLongTermMemory:
     def __init__(self, embedding_service, vector_search_client):
         self.embedding_service = embedding_service
         self.vector_search = vector_search_client
-        
+
     async def store(self, text, metadata=None):
         embedding = await self.embedding_service.embed_text(text)
         await self.vector_search.upsert(embedding, metadata)
-        
+
     async def search(self, query, limit=5):
         query_embedding = await self.embedding_service.embed_text(query)
         results = await self.vector_search.search(query_embedding, limit=limit)
@@ -332,17 +340,17 @@ class LayeredMemoryManager:
         self.short_term = short_term
         self.mid_term = mid_term
         self.long_term = long_term
-        
+
     async def store(self, data, importance="low"):
         # Store in appropriate layers based on importance
         await self.short_term.store(data["id"], data)
-        
+
         if importance in ["medium", "high"]:
             await self.mid_term.store("memories", data["id"], data)
-            
+
         if importance == "high":
             await self.long_term.store(data["content"], metadata=data)
-            
+
     async def retrieve_context(self, query, conversation_id):
         # Get context from all memory layers
         context = {

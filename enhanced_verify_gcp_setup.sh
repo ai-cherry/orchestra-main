@@ -18,7 +18,7 @@ if ! command -v gcloud &> /dev/null; then
     echo -e "${RED}❌ gcloud not found in PATH. Attempting to fix...${NC}"
     export PATH=$PATH:/home/vscode/google-cloud-sdk/bin:/workspaces/orchestra-main/google-cloud-sdk/bin
     echo 'export PATH=$PATH:/home/vscode/google-cloud-sdk/bin:/workspaces/orchestra-main/google-cloud-sdk/bin' >> $HOME/.bashrc
-    
+
     if ! command -v gcloud &> /dev/null; then
         echo -e "${RED}❌ gcloud still not found. Manual installation may be required:${NC}"
         echo -e "${YELLOW}Run these commands:${NC}"
@@ -37,9 +37,9 @@ echo -e "\n${BLUE}Checking service account key file:${NC}"
 if [ ! -f "$HOME/.gcp/service-account.json" ]; then
     echo -e "${RED}❌ Service account key file not found at $HOME/.gcp/service-account.json${NC}"
     echo -e "${YELLOW}Creating directory and attempting to create key file from environment variable...${NC}"
-    
+
     mkdir -p $HOME/.gcp
-    
+
     if [ -n "$GCP_MASTER_SERVICE_JSON" ]; then
         echo $GCP_MASTER_SERVICE_JSON > $HOME/.gcp/service-account.json
         echo -e "${GREEN}✅ Created service account key file from GCP_MASTER_SERVICE_JSON${NC}"
@@ -49,7 +49,7 @@ if [ ! -f "$HOME/.gcp/service-account.json" ]; then
     fi
 else
     echo -e "${GREEN}✅ Service account key file exists at $HOME/.gcp/service-account.json${NC}"
-    
+
     # Verify it's valid JSON
     if jq . $HOME/.gcp/service-account.json >/dev/null 2>&1; then
         echo -e "${GREEN}✅ Service account key file contains valid JSON${NC}"
@@ -63,7 +63,7 @@ echo -e "\n${BLUE}Checking authentication:${NC}"
 ACTIVE_ACCOUNT=$(gcloud auth list --format="value(account)" --filter="status:ACTIVE" 2>/dev/null)
 if [ -z "$ACTIVE_ACCOUNT" ]; then
     echo -e "${RED}❌ No active gcloud account found${NC}"
-    
+
     if [ -f "$HOME/.gcp/service-account.json" ]; then
         echo -e "${YELLOW}Attempting to authenticate with service account key...${NC}"
         gcloud auth activate-service-account --key-file=$HOME/.gcp/service-account.json
@@ -71,7 +71,7 @@ if [ -z "$ACTIVE_ACCOUNT" ]; then
 elif [ "$ACTIVE_ACCOUNT" != "orchestra-project-admin-sa@cherry-ai-project.iam.gserviceaccount.com" ]; then
     echo -e "${YELLOW}⚠️ Active account ($ACTIVE_ACCOUNT) is not the expected service account${NC}"
     echo -e "${YELLOW}Attempting to authenticate with the correct service account...${NC}"
-    
+
     if [ -f "$HOME/.gcp/service-account.json" ]; then
         gcloud auth activate-service-account orchestra-project-admin-sa@cherry-ai-project.iam.gserviceaccount.com --key-file=$HOME/.gcp/service-account.json
     fi
@@ -116,7 +116,7 @@ if grep -q "recovery container" ../.codespaces/.persistedshare/creation.log 2>/d
     echo -e "${YELLOW}⚠️ Codespace was created using a recovery container${NC}"
     echo -e "${YELLOW}⚠️ This indicates that your original container configuration failed to build${NC}"
     echo -e "${YELLOW}⚠️ The GCP feature may not have been installed properly${NC}"
-    
+
     if grep -q "Feature.*gcloud.*could not be processed" ../.codespaces/.persistedshare/creation.log 2>/dev/null; then
         echo -e "${RED}❌ Found error with GCP feature installation in creation log${NC}"
         echo -e "${YELLOW}⚠️ This may require manually installing gcloud SDK${NC}"

@@ -5,11 +5,10 @@ This module provides pytest fixtures for mocking memory manager
 functionality in tests.
 """
 
-import pytest
-from unittest.mock import AsyncMock, MagicMock
-from typing import Dict, List, Optional, Any
+from unittest.mock import AsyncMock
 
-from packages.shared.src.models.domain_models import MemoryRecord
+import pytest
+
 from packages.shared.src.memory.memory_manager import MemoryManager
 
 

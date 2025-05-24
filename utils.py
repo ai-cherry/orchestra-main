@@ -2,11 +2,37 @@
 Utility classes and functions for the Orchestra system.
 """
 
-import os
+import functools
 import logging
-from typing import Optional, Dict, Any
+import os
+import time
+from typing import Any, Callable, Dict, Optional
 
 logger = logging.getLogger(__name__)
+
+
+def retry(max_attempts: int = 3, delay: float = 1.0, exponential_backoff: float = 2.0):
+    """Retry decorator with exponential backoff."""
+
+    def decorator(func: Callable) -> Callable:
+        @functools.wraps(func)
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
+            for attempt in range(max_attempts):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    if attempt == max_attempts - 1:
+                        raise
+                    wait_time = delay * (exponential_backoff**attempt)
+                    logger.warning(
+                        f"Attempt {attempt + 1} failed for {func.__name__}: {e}. " f"Retrying in {wait_time} seconds..."
+                    )
+                    time.sleep(wait_time)
+            return None
+
+        return wrapper
+
+    return decorator
 
 
 class APIKeyManager:

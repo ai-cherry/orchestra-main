@@ -1,10 +1,12 @@
 # Placeholder for FastAPI app definition
-from fastapi import FastAPI, HTTPException, Request
-from pydantic import BaseModel
-import structlog
 import os
 import time
-import openai  # Placeholder for actual OpenAI client usage
+
+import structlog
+from fastapi import FastAPI, HTTPException, Request
+from pydantic import BaseModel
+
+# import openai  # Removed unused import
 
 # Configure structlog for structured logging
 structlog.configure(

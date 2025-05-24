@@ -6,23 +6,23 @@ including importance scoring, progressive summarization, and chunking.
 """
 
 from core.orchestrator.src.memory.lifecycle.importance_scorer import (
-    ImportanceScorer,
-    ImportanceScore,
     ImportanceFactors,
+    ImportanceScore,
+    ImportanceScorer,
     ImportanceScoringConfig,
+)
+from core.orchestrator.src.memory.lifecycle.memory_chunker import (
+    Chunk,
+    ChunkerConfig,
+    ChunkingStrategy,
+    ChunkMetadata,
+    MemoryChunker,
 )
 from core.orchestrator.src.memory.lifecycle.progressive_summarizer import (
     ProgressiveSummarizer,
+    ProgressiveSummarizerConfig,
     SummaryLevel,
     SummaryResult,
-    ProgressiveSummarizerConfig,
-)
-from core.orchestrator.src.memory.lifecycle.memory_chunker import (
-    MemoryChunker,
-    Chunk,
-    ChunkMetadata,
-    ChunkingStrategy,
-    ChunkerConfig,
 )
 
 __all__ = [

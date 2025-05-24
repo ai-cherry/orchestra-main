@@ -22,7 +22,7 @@ import random
 import time
 import traceback
 from contextlib import contextmanager
-from typing import Any, Callable, Dict, List, Optional, Type, TypeVar, Union, cast
+from typing import Any, Callable, Dict, Optional, Type, TypeVar, cast
 
 # Type variables for function signatures
 T = TypeVar("T")
@@ -588,49 +588,33 @@ def map_exception(
 class ConfigError(BaseError):
     """Error related to configuration issues."""
 
-    pass
-
 
 class DataProcessingError(BaseError):
     """Error related to data processing."""
-
-    pass
 
 
 class NetworkError(BaseError):
     """Error related to network operations."""
 
-    pass
-
 
 class DatabaseError(BaseError):
     """Error related to database operations."""
-
-    pass
 
 
 class ValidationError(BaseError):
     """Error related to validation failures."""
 
-    pass
-
 
 class AuthenticationError(BaseError):
     """Error related to authentication failures."""
-
-    pass
 
 
 class AuthorizationError(BaseError):
     """Error related to authorization failures."""
 
-    pass
-
 
 class ResourceNotFoundError(BaseError):
     """Error raised when a resource cannot be found."""
-
-    pass
 
 
 # Usage examples
@@ -647,7 +631,7 @@ def example_with_decorator() -> None:
         return {"key": "value"}
 
     try:
-        config = load_config("config.yaml")  # This will raise ConfigError
+        load_config("config.yaml")  # This will raise ConfigError
     except ConfigError as e:
         print(f"Caught error: {e}")
 
@@ -714,6 +698,6 @@ if __name__ == "__main__":
     example_with_safe_execute()
 
     # Run the async example using asyncio
-    import asyncio
+    # import asyncio  # Removed redundant unused import
 
     asyncio.run(example_with_retry())

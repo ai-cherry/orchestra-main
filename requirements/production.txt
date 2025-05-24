@@ -30,4 +30,4 @@ dynaconf==3.3.2
 sentry-sdk==2.19.2
 
 # Production Health Checks
-health-check==3.4.7 
+health-check==3.4.7

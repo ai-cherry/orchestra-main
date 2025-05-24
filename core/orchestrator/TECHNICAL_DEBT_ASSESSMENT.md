@@ -26,12 +26,14 @@ To address these issues, we've implemented consolidated versions of key componen
 - Many core service interfaces and implementations
 
 **Impact**:
+
 - Introduces cognitive load as developers need to know which version to use
 - Creates confusion about the migration state (which is the "current" version)
 - Produces dependency tangles when some components use one version and others use another
 - Makes code changes more error-prone and harder to test
 
 **Solution**: We've created unified implementations of core components:
+
 - `unified_registry.py`
 - `unified_event_bus.py`
 - `unified_agent_registry.py`
@@ -41,18 +43,21 @@ These implementations combine the best aspects of each version into a single, we
 ### 2. Inconsistent Dependency Management
 
 **Problem**: The codebase uses multiple patterns for dependency management:
+
 - Global singletons with direct imports
 - Explicit dependency injection
 - Service registries with manual lookup
 - Mix of factory functions and direct instantiation
 
 **Impact**:
+
 - Makes testing difficult as dependencies are often tightly coupled
 - Complicates refactoring because dependency relationships are unclear
 - Increases the likelihood of circular imports
 - Creates initialization order issues
 
 **Solution**: The unified components use a consistent dependency management pattern:
+
 - Service interface definitions with proper inheritance
 - Type-based service registration and lookup
 - Simplified factory patterns for deferred initialization
@@ -61,17 +66,20 @@ These implementations combine the best aspects of each version into a single, we
 ### 3. Lifecycle Management Gaps
 
 **Problem**: Many components lack proper lifecycle management:
+
 - Inconsistent initialization methods
 - Missing cleanup routines
 - No standardized approach to startup/shutdown ordering
 - Limited error handling during initialization/shutdown
 
 **Impact**:
+
 - Resource leaks when components aren't properly shut down
 - Initialization errors that can leave the system in an inconsistent state
 - Difficulty implementing proper clean shutdowns
 
 **Solution**: The unified components implement:
+
 - A standardized Service interface with consistent lifecycle methods
 - Comprehensive async/sync support for initialization and shutdown
 - Proper error handling and reporting during all lifecycle phases
@@ -80,16 +88,19 @@ These implementations combine the best aspects of each version into a single, we
 ### 4. Async/Sync Inconsistencies
 
 **Problem**: The codebase has inconsistent approaches to asynchronous programming:
+
 - Some components only support synchronous operations
 - Others support both but in incompatible ways
 - Error handling differs between sync and async paths
 
 **Impact**:
+
 - Forces unnecessary thread pool usage in otherwise async code
 - Complicates error handling and recovery
 - Creates performance bottlenecks
 
 **Solution**: The unified components provide:
+
 - Comprehensive async support with proper fallbacks
 - Consistent error handling across sync and async paths
 - Simplified APIs that hide implementation complexity
@@ -98,17 +109,20 @@ These implementations combine the best aspects of each version into a single, we
 ### 5. Type Safety Issues
 
 **Problem**: The codebase has limited use of Python's type system:
+
 - Few explicit interface definitions
 - Missing generic type parameters
 - Inconsistent use of `Optional` and `Union` types
 - Limited use of overloaded methods for API clarity
 
 **Impact**:
+
 - Makes refactoring riskier due to unclear interface contracts
 - Reduces IDE assistance for developers
 - Increases likelihood of runtime type errors
 
 **Solution**: The unified components leverage modern Python typing:
+
 - Explicit interfaces through abstract base classes
 - Generic type parameters for type-safe containers
 - Overloaded methods to provide clear API signatures
@@ -119,6 +133,7 @@ These implementations combine the best aspects of each version into a single, we
 ### Unified Service Registry
 
 `unified_registry.py` provides:
+
 - A consolidated registry for managing service lifecycles
 - Type-based service lookup for dependency injection
 - Comprehensive async/sync support
@@ -128,6 +143,7 @@ These implementations combine the best aspects of each version into a single, we
 ### Unified Event Bus
 
 `unified_event_bus.py` provides:
+
 - A clean implementation of the publish-subscribe pattern
 - Support for both sync and async event handlers
 - Prioritized event processing
@@ -137,6 +153,7 @@ These implementations combine the best aspects of each version into a single, we
 ### Unified Agent Registry
 
 `unified_agent_registry.py` provides:
+
 - Capability-based agent selection
 - Proper lifecycle management of agents
 - Simplified dependency injection
@@ -146,11 +163,13 @@ These implementations combine the best aspects of each version into a single, we
 ## Migration Path
 
 1. **Gradual Component Migration**:
+
    - Use the unified implementations for new code
    - Gradually migrate existing code to use the unified components
    - Keep compatibility helpers during transition
 
 2. **Dependency Injection Refactoring**:
+
    - Refactor direct imports to use service registry
    - Update initialization code to register services
    - Adjust testing to leverage the improved testability

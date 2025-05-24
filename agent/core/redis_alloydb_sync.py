@@ -11,11 +11,12 @@ Single Source of Truth (SSOT) architecture.
 import asyncio
 import logging
 import os
-from typing import List, Tuple, Dict, Any
-import redis.asyncio as redis
-import psycopg2
-from psycopg2.extras import execute_batch
+from typing import Any, Dict
+
 import crc32c
+import psycopg2
+import redis.asyncio as redis
+from psycopg2.extras import execute_batch
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -220,7 +221,6 @@ class RedisAlloyDBSyncWorker:
         # TODO: Integrate with Google Cloud Monitoring or other alerting system
         # Example: Send alert to Cloud Monitoring or custom alerting endpoint
         # self._send_alert_to_monitoring(alert_type, message)
-        pass
 
     async def start(self) -> None:
         """

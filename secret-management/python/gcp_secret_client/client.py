@@ -2,7 +2,6 @@
 Primary client class for interacting with GCP Secret Manager.
 """
 
-import base64
 import datetime
 import json
 import logging
@@ -12,9 +11,9 @@ from functools import wraps
 from typing import Any, Callable, Dict, List, Optional, TypeVar, Union
 
 try:
-    from google.cloud import secretmanager
     from google.api_core import exceptions as gcp_exceptions
     from google.auth import exceptions as auth_exceptions
+    from google.cloud import secretmanager
 except ImportError:
     raise ImportError(
         "Google Cloud Secret Manager dependencies not installed. "
@@ -23,10 +22,10 @@ except ImportError:
 
 from .exceptions import (
     SecretAccessError,
-    SecretNotFoundError,
-    SecretVersionNotFoundError,
     SecretAccessPermissionError,
+    SecretNotFoundError,
     SecretOperationError,
+    SecretVersionNotFoundError,
 )
 
 # Type variables for generic functions
@@ -297,7 +296,7 @@ class SecretClient:
                     secret_path.split("/projects/")[1].split("/secrets")[0],
                 )
 
-        except gcp_exceptions.PermissionDenied as e:
+        except gcp_exceptions.PermissionDenied:
             secret_id = secret_path.split("/secrets/")[1].split("/versions")[0]
             project_id = secret_path.split("/projects/")[1].split("/secrets")[0]
             raise SecretAccessPermissionError(secret_id, project_id)

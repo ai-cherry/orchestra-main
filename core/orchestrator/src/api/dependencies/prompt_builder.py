@@ -7,12 +7,12 @@ which is responsible for creating dynamic, persona-specific prompts.
 
 import logging
 from functools import lru_cache
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 from fastapi import Depends
 
+from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
 from packages.shared.src.prompt_builder import PromptBuilder, PromptFormat
-from packages.shared.src.models.base_models import PersonaConfig, MemoryItem
 
 # Configure logging
 logger = logging.getLogger(__name__)

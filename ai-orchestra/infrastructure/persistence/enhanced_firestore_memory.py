@@ -10,25 +10,26 @@ firestore_components for CRUD, querying, serialization, expiry, and batch proces
 """
 
 import logging
-from typing import Any, Dict, List, Optional, AsyncGenerator
 from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
 
-from core.orchestrator.src.config.settings import Settings
-from packages.shared.src.models.base_models import MemoryItem
 from ai_orchestra.core.events.memory_events import (
-    MemoryItemCreatedEvent,
-    MemoryItemAccessedEvent,
-    MemoryItemDeletedEvent,
     MemoryEventBus,
+    MemoryItemAccessedEvent,
+    MemoryItemCreatedEvent,
+    MemoryItemDeletedEvent,
 )
 from ai_orchestra.core.interfaces.enhanced_memory import EnhancedMemoryProvider
 
+from core.orchestrator.src.config.settings import Settings
+from packages.shared.src.models.base_models import MemoryItem
+
+from .firestore_components.firestore_batch_processor import FirestoreBatchProcessor
 from .firestore_components.firestore_client_manager import FirestoreClientManager
 from .firestore_components.firestore_crud_operations import FirestoreCrudOperations
-from .firestore_components.memory_item_serializer import MemoryItemSerializer
-from .firestore_components.firestore_query_engine import FirestoreQueryEngine
 from .firestore_components.firestore_expiry_manager import FirestoreExpiryManager
-from .firestore_components.firestore_batch_processor import FirestoreBatchProcessor
+from .firestore_components.firestore_query_engine import FirestoreQueryEngine
+from .firestore_components.memory_item_serializer import MemoryItemSerializer
 
 logger = logging.getLogger(__name__)
 

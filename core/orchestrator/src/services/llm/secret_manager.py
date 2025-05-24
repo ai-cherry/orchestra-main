@@ -22,17 +22,16 @@ Usage:
     llm_credentials = secret_manager.get_llm_credentials()
 """
 
+import logging
 import os
 import time
-import logging
-from typing import Dict, Optional, Any, Union
 from functools import lru_cache
+from typing import Dict, Optional
 
 # Import GCP libraries if available
 try:
-    from google.cloud import secretmanager
-    from google.cloud.secretmanager_v1.types import AccessSecretVersionResponse
     from google.auth import default
+    from google.cloud import secretmanager
 
     GOOGLE_CLOUD_AVAILABLE = True
 except ImportError:

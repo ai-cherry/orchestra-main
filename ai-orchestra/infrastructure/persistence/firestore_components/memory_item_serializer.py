@@ -4,8 +4,9 @@ Firestore-compatible dictionaries.
 """
 
 import logging
-from typing import Dict, Any, Optional, List
 from datetime import datetime, timezone
+from typing import Any, Dict, Optional
+
 from packages.shared.src.models.base_models import MemoryItem
 
 # Using a standard logger for now

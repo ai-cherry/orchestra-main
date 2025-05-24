@@ -6,17 +6,19 @@ for communication with other agents.
 """
 
 import logging
-from typing import Dict, Any, Optional, List
+from typing import Any, Dict, Optional
 
 from core.orchestrator.src.agents.agent_base import Agent, AgentContext, AgentResponse
 from core.orchestrator.src.agents.message_handler_mixin import MessageHandlerMixin
-from core.orchestrator.src.services.message_queue import AgentMessage, get_message_queue
+from core.orchestrator.src.protocols.agent_protocol import (
+    AgentQuery,
+)
+from core.orchestrator.src.protocols.agent_protocol import AgentResponse as ProtocolResponse
 from core.orchestrator.src.protocols.agent_protocol import (
     MessageType,
-    AgentQuery,
-    AgentResponse as ProtocolResponse,
     create_protocol_message,
 )
+from core.orchestrator.src.services.message_queue import AgentMessage, get_message_queue
 
 # Configure logging
 logger = logging.getLogger(__name__)

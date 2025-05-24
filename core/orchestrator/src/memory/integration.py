@@ -5,19 +5,18 @@ This module demonstrates how to integrate the layered memory system with the age
 """
 
 import logging
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
-from core.orchestrator.src.agents.unified_agent_registry import (
-    AgentRegistry,
-    AgentContext,
-)
-from core.orchestrator.src.memory.layered_memory import LayeredMemoryManager
 from core.orchestrator.src.agents.memory.models import (
-    MemoryItem,
     ConversationMemoryItem,
-    VectorMemoryItem,
+    MemoryItem,
     MemoryType,
 )
+from core.orchestrator.src.agents.unified_agent_registry import (
+    AgentContext,
+    AgentRegistry,
+)
+from core.orchestrator.src.memory.layered_memory import LayeredMemoryManager
 
 logger = logging.getLogger(__name__)
 

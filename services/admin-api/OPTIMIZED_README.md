@@ -7,12 +7,14 @@ This document outlines the optimizations and improvements made to the AI Orchest
 ### Performance Improvements
 
 1. **Gemini API Integration**
+
    - Implemented caching with Redis for expensive Gemini calls
    - Added semantic hashing for efficient cache retrieval
    - Shared thread pool for all API calls to prevent exhaustion
    - Added performance metrics logging
 
 2. **Firestore Optimizations**
+
    - Optimized batch operations for memory pruning
    - Implemented efficient pagination for large dataset queries
    - Added parallel queries for memory statistics
@@ -27,12 +29,14 @@ This document outlines the optimizations and improvements made to the AI Orchest
 ### Stability Enhancements
 
 1. **Resilience Patterns**
+
    - Implemented retry logic with exponential backoff
    - Added circuit breaker pattern to prevent cascading failures
    - Proper error categories (retryable vs. non-retryable)
    - Graceful handling of service unavailability
 
 2. **Exception Handling**
+
    - Structured logging of errors with proper context
    - Sanitized error responses to clients
    - Consistent error format throughout the application
@@ -47,6 +51,7 @@ This document outlines the optimizations and improvements made to the AI Orchest
 ### Infrastructure Optimizations
 
 1. **Docker Optimizations**
+
    - Multi-stage build for smaller image size
    - Non-root user for security
    - Proper signal handling
@@ -54,7 +59,8 @@ This document outlines the optimizations and improvements made to the AI Orchest
    - Environment variable configuration
 
 2. **Cloud Run Deployment**
-   - Complete Terraform configuration 
+
+   - Complete Terraform configuration
    - Secret management for sensitive data
    - Proper IAM permissions with least privilege
    - VPC Connector support for private networking

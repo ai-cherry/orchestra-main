@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import {
   Area,
   AreaChart as RechartsAreaChart,
@@ -11,22 +11,22 @@ import {
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis
-} from 'recharts'
-import { cn } from '../../lib/utils'
+  YAxis,
+} from "recharts";
+import { cn } from "../../lib/utils";
 
 /**
  * Props for the LineChart component
  */
 interface LineChartProps {
-  data: any[]
-  xAxisKey: string
-  yAxisKey: string
-  className?: string
-  showGrid?: boolean
-  showLegend?: boolean
-  showTooltip?: boolean
-  lineColor?: string
+  data: any[];
+  xAxisKey: string;
+  yAxisKey: string;
+  className?: string;
+  showGrid?: boolean;
+  showLegend?: boolean;
+  showTooltip?: boolean;
+  lineColor?: string;
 }
 
 /**
@@ -40,40 +40,45 @@ export const LineChart = ({
   showGrid = true,
   showLegend = false,
   showTooltip = true,
-  lineColor = 'var(--primary)'
+  lineColor = "var(--primary)",
 }: LineChartProps) => {
   return (
-    <div className={cn('w-full h-full', className)}>
+    <div className={cn("w-full h-full", className)}>
       <ResponsiveContainer width="100%" height="100%">
-        <RechartsLineChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+        <RechartsLineChart
+          data={data}
+          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+        >
           {showGrid && <CartesianGrid strokeDasharray="3 3" opacity={0.2} />}
-          <XAxis 
-            dataKey={xAxisKey} 
-            stroke="var(--muted-foreground)" 
+          <XAxis
+            dataKey={xAxisKey}
+            stroke="var(--muted-foreground)"
             fontSize={12}
             tickLine={false}
             axisLine={false}
           />
-          <YAxis 
-            stroke="var(--muted-foreground)" 
+          <YAxis
+            stroke="var(--muted-foreground)"
             fontSize={12}
             tickLine={false}
             axisLine={false}
           />
-          {showTooltip && <Tooltip 
-            contentStyle={{ 
-              backgroundColor: 'var(--popover)', 
-              borderColor: 'var(--border)',
-              color: 'var(--popover-foreground)',
-              fontSize: '12px',
-              borderRadius: '6px'
-            }} 
-          />}
+          {showTooltip && (
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "var(--popover)",
+                borderColor: "var(--border)",
+                color: "var(--popover-foreground)",
+                fontSize: "12px",
+                borderRadius: "6px",
+              }}
+            />
+          )}
           {showLegend && <Legend />}
-          <Line 
-            type="monotone" 
-            dataKey={yAxisKey} 
-            stroke={lineColor} 
+          <Line
+            type="monotone"
+            dataKey={yAxisKey}
+            stroke={lineColor}
             strokeWidth={2}
             dot={{ r: 3 }}
             activeDot={{ r: 5 }}
@@ -81,22 +86,22 @@ export const LineChart = ({
         </RechartsLineChart>
       </ResponsiveContainer>
     </div>
-  )
-}
+  );
+};
 
 /**
  * Props for the AreaChart component
  */
 interface AreaChartProps {
-  data: any[]
-  categories: string[]
-  colors?: string[]
-  xAxisKey: string
-  className?: string
-  showGrid?: boolean
-  showLegend?: boolean
-  showTooltip?: boolean
-  stackOffset?: 'none' | 'expand' | 'wiggle' | 'silhouette'
+  data: any[];
+  categories: string[];
+  colors?: string[];
+  xAxisKey: string;
+  className?: string;
+  showGrid?: boolean;
+  showLegend?: boolean;
+  showTooltip?: boolean;
+  stackOffset?: "none" | "expand" | "wiggle" | "silhouette";
 }
 
 /**
@@ -105,41 +110,47 @@ interface AreaChartProps {
 export const AreaChart = ({
   data,
   categories,
-  colors = ['var(--primary)', 'var(--secondary)', 'var(--accent)'],
+  colors = ["var(--primary)", "var(--secondary)", "var(--accent)"],
   xAxisKey,
   className,
   showGrid = true,
   showLegend = true,
   showTooltip = true,
-  stackOffset = 'none'
+  stackOffset = "none",
 }: AreaChartProps) => {
   return (
-    <div className={cn('w-full h-full', className)}>
+    <div className={cn("w-full h-full", className)}>
       <ResponsiveContainer width="100%" height="100%">
-        <RechartsAreaChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }} stackOffset={stackOffset}>
+        <RechartsAreaChart
+          data={data}
+          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+          stackOffset={stackOffset}
+        >
           {showGrid && <CartesianGrid strokeDasharray="3 3" opacity={0.2} />}
-          <XAxis 
-            dataKey={xAxisKey} 
-            stroke="var(--muted-foreground)" 
+          <XAxis
+            dataKey={xAxisKey}
+            stroke="var(--muted-foreground)"
             fontSize={12}
             tickLine={false}
             axisLine={false}
           />
-          <YAxis 
-            stroke="var(--muted-foreground)" 
+          <YAxis
+            stroke="var(--muted-foreground)"
             fontSize={12}
             tickLine={false}
             axisLine={false}
           />
-          {showTooltip && <Tooltip 
-            contentStyle={{ 
-              backgroundColor: 'var(--popover)', 
-              borderColor: 'var(--border)',
-              color: 'var(--popover-foreground)',
-              fontSize: '12px',
-              borderRadius: '6px'
-            }} 
-          />}
+          {showTooltip && (
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "var(--popover)",
+                borderColor: "var(--border)",
+                color: "var(--popover-foreground)",
+                fontSize: "12px",
+                borderRadius: "6px",
+              }}
+            />
+          )}
           {showLegend && <Legend />}
           {categories.map((category, index) => (
             <Area
@@ -155,21 +166,21 @@ export const AreaChart = ({
         </RechartsAreaChart>
       </ResponsiveContainer>
     </div>
-  )
-}
+  );
+};
 
 /**
  * Props for the BarChart component
  */
 interface BarChartProps {
-  data: any[]
-  xAxisKey: string
-  yAxisKey: string
-  className?: string
-  showGrid?: boolean
-  showLegend?: boolean
-  showTooltip?: boolean
-  barColor?: string
+  data: any[];
+  xAxisKey: string;
+  yAxisKey: string;
+  className?: string;
+  showGrid?: boolean;
+  showLegend?: boolean;
+  showTooltip?: boolean;
+  barColor?: string;
 }
 
 /**
@@ -183,43 +194,44 @@ export const BarChart = ({
   showGrid = true,
   showLegend = false,
   showTooltip = true,
-  barColor = 'var(--primary)'
+  barColor = "var(--primary)",
 }: BarChartProps) => {
   return (
-    <div className={cn('w-full h-full', className)}>
+    <div className={cn("w-full h-full", className)}>
       <ResponsiveContainer width="100%" height="100%">
-        <RechartsBarChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+        <RechartsBarChart
+          data={data}
+          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+        >
           {showGrid && <CartesianGrid strokeDasharray="3 3" opacity={0.2} />}
-          <XAxis 
-            dataKey={xAxisKey} 
-            stroke="var(--muted-foreground)" 
+          <XAxis
+            dataKey={xAxisKey}
+            stroke="var(--muted-foreground)"
             fontSize={12}
             tickLine={false}
             axisLine={false}
           />
-          <YAxis 
-            stroke="var(--muted-foreground)" 
+          <YAxis
+            stroke="var(--muted-foreground)"
             fontSize={12}
             tickLine={false}
             axisLine={false}
           />
-          {showTooltip && <Tooltip 
-            contentStyle={{ 
-              backgroundColor: 'var(--popover)', 
-              borderColor: 'var(--border)',
-              color: 'var(--popover-foreground)',
-              fontSize: '12px',
-              borderRadius: '6px'
-            }} 
-          />}
+          {showTooltip && (
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "var(--popover)",
+                borderColor: "var(--border)",
+                color: "var(--popover-foreground)",
+                fontSize: "12px",
+                borderRadius: "6px",
+              }}
+            />
+          )}
           {showLegend && <Legend />}
-          <Bar 
-            dataKey={yAxisKey} 
-            fill={barColor} 
-            radius={[4, 4, 0, 0]}
-          />
+          <Bar dataKey={yAxisKey} fill={barColor} radius={[4, 4, 0, 0]} />
         </RechartsBarChart>
       </ResponsiveContainer>
     </div>
-  )
-}
+  );
+};

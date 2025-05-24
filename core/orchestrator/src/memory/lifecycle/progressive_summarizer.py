@@ -5,11 +5,10 @@ This module provides functionality to create multi-level summaries of memory ite
 for efficient storage while preserving context.
 """
 
-import asyncio
 import logging
 import re
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple, Union, TypeVar
+from typing import Any, Dict, List, Optional, Tuple
 
 from pydantic import BaseModel, Field
 
@@ -308,12 +307,12 @@ class ProgressiveSummarizer:
         # Create prompt for summarization
         prompt = f"""
         {instruction}
-        
+
         Target length: approximately {target_length} characters.
-        
+
         Original content:
         {content}
-        
+
         Summary:
         """
 

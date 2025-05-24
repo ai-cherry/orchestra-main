@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy to'
+        description: "Environment to deploy to"
         required: true
-        default: 'staging'
+        default: "staging"
         type: choice
         options:
           - staging
@@ -19,19 +19,19 @@ jobs:
     name: Setup GCP Secrets
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment || 'staging' }}
-    
+
     permissions:
       contents: read
       id-token: write # Required for GCP Workload Identity Federation
-    
+
     outputs:
       project_id: ${{ steps.setup-env.outputs.project_id }}
       environment: ${{ steps.setup-env.outputs.environment }}
-      
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
+
       - name: Setup environment variables
         id: setup-env
         run: |
@@ -42,44 +42,44 @@ jobs:
             echo "project_id=cherry-ai-project-staging" >> $GITHUB_OUTPUT
             echo "environment=staging" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v1
         with:
-          workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
-          service_account: 'github-actions@${{ steps.setup-env.outputs.project_id }}.iam.gserviceaccount.com'
-      
+          workload_identity_provider: "projects/123456789/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+          service_account: "github-actions@${{ steps.setup-env.outputs.project_id }}.iam.gserviceaccount.com"
+
       - name: Setup gcloud CLI
         uses: google-github-actions/setup-gcloud@v1
         with:
-          version: '>= 390.0.0'
+          version: ">= 390.0.0"
           project_id: ${{ steps.setup-env.outputs.project_id }}
-      
+
       - name: Enable Secret Manager API
         run: gcloud services enable secretmanager.googleapis.com
-      
+
       - name: Make secret scripts executable
         run: |
           chmod +x secret-management/scripts/create_secret.sh
           chmod +x secret-management/scripts/ci_cd_secrets_setup.sh
-      
+
       - name: Create deployment secrets
         run: |
           # Generate random API key for this deployment
           API_KEY=$(openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 24)
           ./secret-management/scripts/create_secret.sh "DEPLOYMENT_API_KEY" "$API_KEY" "${{ steps.setup-env.outputs.project_id }}" "automatic" "${{ steps.setup-env.outputs.environment }}"
-          
+
           # Create a timestamp for this deployment
           DEPLOY_TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           ./secret-management/scripts/create_secret.sh "DEPLOY_TIMESTAMP" "$DEPLOY_TIMESTAMP" "${{ steps.setup-env.outputs.project_id }}" "automatic" "${{ steps.setup-env.outputs.environment }}"
-          
+
           # Store GitHub context as a secret for debugging
           GITHUB_CONTEXT=$(echo '${{ toJson(github) }}' | tr -d '\n')
           ./secret-management/scripts/create_secret.sh "GITHUB_CONTEXT" "$GITHUB_CONTEXT" "${{ steps.setup-env.outputs.project_id }}" "automatic" "${{ steps.setup-env.outputs.environment }}"
-          
+
           # Other secrets can be created here...
-          
+
           echo "Secrets created successfully in ${{ steps.setup-env.outputs.environment }} environment"
 
   deploy-application:
@@ -87,39 +87,39 @@ jobs:
     needs: setup-secrets
     runs-on: ubuntu-latest
     environment: ${{ needs.setup-secrets.outputs.environment }}
-    
+
     permissions:
       contents: read
       id-token: write
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
-          workload_identity_provider: 'projects/123456789/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
-          service_account: 'github-actions@${{ needs.setup-secrets.outputs.project_id }}.iam.gserviceaccount.com'
-      
+          workload_identity_provider: "projects/123456789/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+          service_account: "github-actions@${{ needs.setup-secrets.outputs.project_id }}.iam.gserviceaccount.com"
+
       - name: Setup gcloud CLI
         uses: google-github-actions/setup-gcloud@v1
         with:
-          version: '>= 390.0.0'
+          version: ">= 390.0.0"
           project_id: ${{ needs.setup-secrets.outputs.project_id }}
-      
+
       - name: Access deployment secrets
         id: secrets
         run: |
           # Access secrets using the gcloud CLI
           DEPLOY_TIMESTAMP=$(gcloud secrets versions access latest --secret="DEPLOY_TIMESTAMP-${{ needs.setup-secrets.outputs.environment }}")
           echo "Deploying with timestamp: $DEPLOY_TIMESTAMP"
-          
+
           # Access API key but don't print it (security best practice)
           API_KEY=$(gcloud secrets versions access latest --secret="DEPLOYMENT_API_KEY-${{ needs.setup-secrets.outputs.environment }}")
           echo "::add-mask::$API_KEY"
           echo "api_key=$API_KEY" >> $GITHUB_OUTPUT
-      
+
       - name: Deploy to Cloud Run
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v1
@@ -130,6 +130,6 @@ jobs:
           env_vars: |
             API_KEY=${{ steps.secrets.outputs.api_key }}
             ENVIRONMENT=${{ needs.setup-secrets.outputs.environment }}
-      
+
       - name: Show Output
         run: echo "${{ steps.deploy.outputs.url }}"

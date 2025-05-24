@@ -7,19 +7,18 @@ It includes advanced features like local caching, statistics tracking, and
 optimized access patterns.
 """
 
-from typing import Dict, List, Optional, Any, Union, Tuple
-import time
-import json
 import logging
-import asyncio
 import threading
+import time
+from typing import Any, Dict, List, Optional
+
 from ..interfaces.memory_manager import IMemoryManager
 from ..models.memory import (
+    CompressionLevel,
     MemoryEntry,
     MemoryMetadata,
-    MemoryType,
     MemoryScope,
-    CompressionLevel,
+    MemoryType,
     StorageTier,
 )
 from ..storage.optimized_memory_storage import OptimizedMemoryStorage

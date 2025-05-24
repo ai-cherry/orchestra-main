@@ -6,8 +6,7 @@ This module provides a Redis-based memory implementation for short-term storage.
 
 import json
 import logging
-import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import redis
 

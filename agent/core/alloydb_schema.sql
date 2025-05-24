@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS memories (
 );
 
 -- Create an index for vector similarity search using IVFFlat with L2 distance
-CREATE INDEX IF NOT EXISTS agent_context ON memories 
-USING ivfflat (vector vector_l2_ops) 
+CREATE INDEX IF NOT EXISTS agent_context ON memories
+USING ivfflat (vector vector_l2_ops)
 WITH (lists = 2000, quantizer='SQ8');
 
 -- Create an index on version for faster conflict resolution queries

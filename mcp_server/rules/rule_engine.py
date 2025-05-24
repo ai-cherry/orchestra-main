@@ -7,15 +7,14 @@ content against rules. It supports loading rules from files, dynamic rule activa
 and rule set management.
 """
 
-import os
-import re
-import logging
-import yaml
 import json
-from enum import Enum
-from typing import Dict, List, Any, Optional, Callable, Set, Union, Pattern, Tuple
+import re
 from dataclasses import dataclass, field
+from enum import Enum
 from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional, Pattern, Set, Union
+
+import yaml
 
 from ..utils.structured_logging import get_logger, with_correlation_id
 

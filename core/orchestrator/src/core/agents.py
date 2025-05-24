@@ -6,11 +6,9 @@ which are core components of the AI orchestration system.
 """
 
 import logging
-import asyncio
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Any, Union, Type
-import uuid
 from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Type
 
 from core.orchestrator.src.core.memory import MemoryItem
 from core.orchestrator.src.core.personas import PersonaConfig
@@ -70,7 +68,6 @@ class Agent(ABC):
         Returns:
             The agent's response
         """
-        pass
 
     @property
     @abstractmethod
@@ -81,7 +78,6 @@ class Agent(ABC):
         Returns:
             The agent type string
         """
-        pass
 
     @property
     def capabilities(self) -> List[str]:

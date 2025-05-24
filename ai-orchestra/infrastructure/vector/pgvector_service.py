@@ -5,14 +5,11 @@ This module provides a service for storing and retrieving vectors in pgvector.
 """
 
 import logging
-import asyncio
-import asyncpg
-import numpy as np
-from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
+import asyncpg
 from ai_orchestra.core.config import settings
-from ai_orchestra.utils.logging import log_event
 
 logger = logging.getLogger("ai_orchestra.infrastructure.vector.pgvector_service")
 
@@ -188,7 +185,7 @@ class PGVectorService:
                     for i, chunk in enumerate(chunks):
                         await conn.execute(
                             """
-                            INSERT INTO document_chunks 
+                            INSERT INTO document_chunks
                             (id, document_id, content, embedding, metadata, seq_num)
                             VALUES ($1, $2, $3, $4, $5, $6)
                             ON CONFLICT (id) DO UPDATE
@@ -229,19 +226,19 @@ class PGVectorService:
         async with self.pool.acquire() as conn:
             try:
                 query = """
-                    SELECT 
-                        c.id, 
-                        c.document_id, 
-                        c.content, 
+                    SELECT
+                        c.id,
+                        c.document_id,
+                        c.content,
                         c.metadata,
                         d.title as document_title,
                         d.source as document_source,
                         1 - (c.embedding <=> $1) as similarity
-                    FROM 
+                    FROM
                         document_chunks c
                     JOIN
                         documents d ON c.document_id = d.id
-                    WHERE 
+                    WHERE
                         1 - (c.embedding <=> $1) > $2
                 """
 
@@ -439,19 +436,19 @@ class PGVectorService:
             try:
                 row = await conn.fetchrow(
                     """
-                    SELECT 
-                        c.id, 
-                        c.document_id, 
-                        c.content, 
+                    SELECT
+                        c.id,
+                        c.document_id,
+                        c.content,
                         c.metadata,
                         c.seq_num,
                         d.title as document_title,
                         d.source as document_source
-                    FROM 
+                    FROM
                         document_chunks c
                     JOIN
                         documents d ON c.document_id = d.id
-                    WHERE 
+                    WHERE
                         c.id = $1
                     """,
                     chunk_id,

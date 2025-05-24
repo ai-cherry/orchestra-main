@@ -6,13 +6,8 @@ platform, enabling enterprise-grade agent management, analytics, and deployment.
 """
 
 import logging
-import asyncio
-import json
 import os
-from typing import Dict, List, Any, Optional, Union, Callable
-
-from packages.shared.src.memory.base_memory_manager import MemoryProvider
-from packages.shared.src.models.base_models import MemoryItem
+from typing import Any, Dict, List, Optional
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -52,17 +47,17 @@ class VertexAIAgentBuilder:
                 from google.cloud import aiplatform
                 from google.cloud.aiplatform.preview.language_models import (
                     ChatModel,
-                    TextGenerationModel,
-                    GroundingSource,
                     CodeChatModel,
-                )
-                from vertexai.preview.generative_models import (
-                    GenerativeModel,
-                    Content,
-                    Part,
-                    GenerationConfig,
+                    GroundingSource,
+                    TextGenerationModel,
                 )
                 from vertexai.language_models import ChatMessage
+                from vertexai.preview.generative_models import (
+                    Content,
+                    GenerationConfig,
+                    GenerativeModel,
+                    Part,
+                )
 
                 self.aiplatform = aiplatform
                 self.ChatModel = ChatModel
@@ -95,10 +90,10 @@ class VertexAIAgentBuilder:
             try:
                 from vertexai.agents import (
                     Agent,
-                    Tool,
+                    ExecutionConfig,
                     FunctionDeclaration,
                     Parameter,
-                    ExecutionConfig,
+                    Tool,
                 )
 
                 self.Agent = Agent

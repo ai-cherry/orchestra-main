@@ -18,38 +18,42 @@ The Enhanced Mode System introduces several key improvements:
 
 We've optimized the AI model assignments based on each mode's primary function:
 
-| Mode | Model | Context Window | Specialization |
-|------|-------|----------------|----------------|
-| 💻 Code | GPT-4.1 | 128K tokens | Implementation-focused with strong coding abilities |
-| 🪲 Debug | GPT-4.1 | 128K tokens | Error analysis and runtime diagnostics |
-| 🏗 Architect | Gemini 2.5 Pro | 1M+ tokens | System design with large context awareness |
-| 🪃 Orchestrator | Gemini 2.5 Pro | 1M+ tokens | Comprehensive code review and analysis |
-| 🕵️ Reviewer | Gemini 2.5 Pro | 1M+ tokens | Quality assurance and documentation |
-| 🧠 Strategy | Claude 3.7 | 200K tokens | Planning and roadmapping |
-| ❓ Ask | Claude 3.7 | 100K tokens | Research and information gathering |
-| 🎨 Creative | Claude 3.7 | 100K tokens | Technical writing and documentation |
+| Mode            | Model          | Context Window | Specialization                                      |
+| --------------- | -------------- | -------------- | --------------------------------------------------- |
+| 💻 Code         | GPT-4.1        | 128K tokens    | Implementation-focused with strong coding abilities |
+| 🪲 Debug        | GPT-4.1        | 128K tokens    | Error analysis and runtime diagnostics              |
+| 🏗 Architect    | Gemini 2.5 Pro | 1M+ tokens     | System design with large context awareness          |
+| 🪃 Orchestrator | Gemini 2.5 Pro | 1M+ tokens     | Comprehensive code review and analysis              |
+| 🕵️ Reviewer     | Gemini 2.5 Pro | 1M+ tokens     | Quality assurance and documentation                 |
+| 🧠 Strategy     | Claude 3.7     | 200K tokens    | Planning and roadmapping                            |
+| ❓ Ask          | Claude 3.7     | 100K tokens    | Research and information gathering                  |
+| 🎨 Creative     | Claude 3.7     | 100K tokens    | Technical writing and documentation                 |
 
 ### Enhanced Access Permissions
 
 The following modes now have expanded write access to specific file patterns:
 
 - **🏗 Architect**: Can now create and modify architectural documentation files
+
   - `.md` files
   - `infrastructure/*.yaml` files
   - `config/*.yaml` files
   - `docs/*` files
 
 - **🪃 Orchestrator**: Can now perform automated fixes to code issues
+
   - `.py` files (for automated fixes)
   - `.md` files (for documentation updates)
   - `.json` files (for configuration updates)
 
 - **🕵️ Reviewer**: Can now update documentation files
+
   - `.md` files
   - `docs/*` files
   - `README.*` files
 
 - **🧠 Strategy**: Can now create roadmap and planning documents
+
   - `.md` files
   - `docs/strategy/*` files
   - `roadmap/*` files
@@ -66,6 +70,7 @@ The system now supports predefined workflows - sequences of mode transitions des
 ### Available Workflows
 
 1. **Feature Development Workflow**
+
    - Step 1: Strategy (Planning)
    - Step 2: Architect (Design)
    - Step 3: Code (Implementation)
@@ -74,11 +79,13 @@ The system now supports predefined workflows - sequences of mode transitions des
    - Step 6: Creative (Documentation)
 
 2. **Bug Fix Workflow**
+
    - Step 1: Debug (Analysis)
    - Step 2: Code (Fix Implementation)
    - Step 3: Orchestrator (Review)
 
 3. **Refactoring Workflow**
+
    - Step 1: Orchestrator (Analysis)
    - Step 2: Architect (Design)
    - Step 3: Code (Implementation)
@@ -163,14 +170,17 @@ The mode system configuration is defined in `config/mode_definitions.yaml`. You 
 Based on analysis of the AI Orchestra project, we recommend considering these additional modes:
 
 1. **📊 MLOps Mode**: Specialized in AI model deployment, versioning, and monitoring
+
    - Model: Gemini 2.5 Pro (for large context understanding)
    - Focus: AI pipeline optimization, model performance metrics, dataset management
 
 2. **🔐 Security Mode**: Dedicated to security audits and vulnerability management
+
    - Model: GPT-4.1 (for precise vulnerability detection)
    - Focus: Security scanning, vulnerability remediation, compliance checking
 
 3. **📡 Integration Mode**: Specialized in third-party API integration
+
    - Model: Claude 3.7 (for context understanding of external systems)
    - Focus: API client implementation, authentication flow, data mapping
 

@@ -44,14 +44,14 @@ The following service accounts have been created with appropriate IAM roles:
 
 The following GitHub organization-level secrets have been configured:
 
-| Secret Name | Description | Used For |
-|-------------|-------------|----------|
-| `VERTEX_AI_FULL_ACCESS_KEY` | Vertex AI admin service account key | Vertex AI operations |
-| `GEMINI_API_FULL_ACCESS_KEY` | Gemini API service account key | Gemini API operations |
-| `GEMINI_CODE_ASSIST_FULL_ACCESS_KEY` | Gemini Code Assist service account key | Gemini Code Assist operations |
-| `GEMINI_CLOUD_ASSIST_FULL_ACCESS_KEY` | Gemini Cloud Assist service account key | Gemini Cloud Assist operations |
-| `GCP_SECRET_MANAGEMENT_KEY` | Secret Management service account key | Secret Manager operations |
-| `GCP_PROJECT_ID` | The Google Cloud Project ID | Identifying the project in all GCP operations |
+| Secret Name                           | Description                             | Used For                                      |
+| ------------------------------------- | --------------------------------------- | --------------------------------------------- |
+| `VERTEX_AI_FULL_ACCESS_KEY`           | Vertex AI admin service account key     | Vertex AI operations                          |
+| `GEMINI_API_FULL_ACCESS_KEY`          | Gemini API service account key          | Gemini API operations                         |
+| `GEMINI_CODE_ASSIST_FULL_ACCESS_KEY`  | Gemini Code Assist service account key  | Gemini Code Assist operations                 |
+| `GEMINI_CLOUD_ASSIST_FULL_ACCESS_KEY` | Gemini Cloud Assist service account key | Gemini Cloud Assist operations                |
+| `GCP_SECRET_MANAGEMENT_KEY`           | Secret Management service account key   | Secret Manager operations                     |
+| `GCP_PROJECT_ID`                      | The Google Cloud Project ID             | Identifying the project in all GCP operations |
 
 ## Usage in GitHub Actions
 
@@ -79,7 +79,7 @@ resource "google_service_account" "vertex_ai_admin" {
 resource "google_project_iam_binding" "vertex_ai_admin_bindings" {
   project = var.project_id
   role    = "roles/aiplatform.admin"
-  
+
   members = [
     "serviceAccount:${google_service_account.vertex_ai_admin.email}",
   ]

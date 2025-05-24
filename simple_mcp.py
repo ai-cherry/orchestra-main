@@ -7,15 +7,14 @@ Removes excessive security measures and complex synchronization while maintainin
 essential functionality.
 """
 
-import os
+import argparse
 import json
 import logging
-import argparse
-from pathlib import Path
-from typing import Dict, List, Any, Optional
 from datetime import datetime
-import flask
-from flask import Flask, request, jsonify
+from pathlib import Path
+from typing import Any, Optional
+
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 # Configure logging

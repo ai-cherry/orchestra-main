@@ -5,6 +5,7 @@ This documentation explains how to use Phidata with Cloud SQL PostgreSQL for age
 ## Overview
 
 This implementation provides:
+
 - Cloud SQL PostgreSQL integration for persistent agent storage
 - PGVector integration for vector embeddings using VertexAI
 - Support for both IAM authentication and password auth via Secret Manager
@@ -88,14 +89,14 @@ agent_config = {
     "type": AGENT_TYPE_PHIDATA,
     "phidata_agent_class": "agno.agent.Agent",
     "llm_ref": "gpt-4-turbo",
-    
+
     # CloudSQL configuration
     "cloudsql_config": {
         "project_id": "your-project-id",
         "instance_connection_name": "project:region:instance",
         # Additional config...
     },
-    
+
     # Storage and memory configuration
     "storage": {"table_name": "agent_storage"},
     "memory": {"table_name": "agent_memory"}
@@ -115,11 +116,13 @@ For a complete example of setting up a team of agents with PostgreSQL storage, s
 The implementation consists of:
 
 1. **PostgreSQL Connection Handler**
+
    - Uses google-cloud-sql-connector for secure communication
    - Supports IAM authentication for enhanced security
    - Falls back to Secret Manager for password retrieval
 
 2. **PgAgentStorage**
+
    - Handles conversation history and agent state
    - Uses table partitioning by agent_id for improved performance
    - Automatic table creation with optimized schema
@@ -152,6 +155,7 @@ For optimal performance with PostgreSQL:
 ### Health Checks
 
 The PhidataAgentWrapper includes a `health_check()` method that verifies:
+
 - Connection to Cloud SQL is active
 - PGVector configuration is valid
 - Agent is correctly initialized
@@ -159,6 +163,7 @@ The PhidataAgentWrapper includes a `health_check()` method that verifies:
 ### Connection Management
 
 Connection pooling parameters can be adjusted in the `get_cloud_sql_connection` function:
+
 - `pool_size`: Maximum number of persistent connections (default: 5)
 - `max_overflow`: Maximum number of connections above pool_size (default: 2)
 - `pool_timeout`: Seconds to wait for a connection from pool (default: 30)

@@ -21,11 +21,11 @@ Usage:
         sys.exit(1)
 """
 
+import importlib
+import logging
 import os
 import sys
-import logging
-import importlib
-from typing import Dict, List, Optional, Set, Tuple, Any
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -228,7 +228,7 @@ def init_providers(providers: Optional[List[str]] = None) -> bool:
         # Portkey
         elif provider == "portkey":
             try:
-                import portkey_ai
+                pass
 
                 logger.info("Portkey initialized successfully")
             except ImportError:
@@ -241,7 +241,7 @@ def init_providers(providers: Optional[List[str]] = None) -> bool:
         # OpenRouter
         elif provider == "openrouter":
             try:
-                import openrouter
+                pass
 
                 # Set OpenRouter environment variables if not already set
                 if not os.environ.get("OR_SITE_URL"):
@@ -320,7 +320,7 @@ def init_circuit_breaker() -> bool:
         )
 
         # Initialize the Circuit Breaker with default settings
-        circuit_breaker = get_circuit_breaker(max_failures=5, reset_timeout=60)
+        get_circuit_breaker(max_failures=5, reset_timeout=60)
 
         logger.info("Circuit Breaker initialized successfully")
 

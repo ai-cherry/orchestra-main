@@ -10,17 +10,18 @@ import logging
 import platform
 import sys
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
 
-# Import application settings
-from core.orchestrator.src.config.settings import Settings, get_settings
+from core.orchestrator.src.api.dependencies.cache import get_redis_cache
 
 # Import dependencies
 from core.orchestrator.src.api.dependencies.memory import get_memory_manager
-from core.orchestrator.src.api.dependencies.cache import get_redis_cache
+
+# Import application settings
+from core.orchestrator.src.config.settings import Settings, get_settings
 
 # Configure logging
 logger = logging.getLogger(__name__)

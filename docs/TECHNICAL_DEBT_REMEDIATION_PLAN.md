@@ -5,6 +5,7 @@ This plan outlines specific actions to address the technical debt identified in 
 ## Prioritization Criteria
 
 Issues are prioritized based on:
+
 1. **Impact**: How much the issue affects development velocity, system stability, and scalability
 2. **Effort**: Estimated work required to address the issue
 3. **Risk**: Potential for introducing regressions during remediation
@@ -17,6 +18,7 @@ Issues are prioritized based on:
 **Issue Addressed**: Parallel Implementation Patterns
 
 **Actions**:
+
 - [ ] Add deprecation warnings to all methods in legacy components (`registry.py`, `event_bus.py`, `agent_registry.py`)
 - [ ] Add deprecation warnings to all methods in enhanced components (`enhanced_registry.py`, `enhanced_event_bus.py`, `enhanced_agent_registry.py`)
 - [ ] Create usage reports to identify code still using legacy/enhanced components
@@ -32,6 +34,7 @@ Issues are prioritized based on:
 **Issue Addressed**: Inconsistent Dependency Management
 
 **Actions**:
+
 - [ ] Create a service registration module in application initialization
 - [ ] Update application startup to register all core services with the unified registry
 - [ ] Replace direct imports of singleton instances with registry lookups
@@ -47,6 +50,7 @@ Issues are prioritized based on:
 **Issue Addressed**: Lifecycle Management Gaps
 
 **Actions**:
+
 - [ ] Create a checklist for proper service lifecycle implementation
 - [ ] Audit existing services for proper initialization and cleanup
 - [ ] Implement missing lifecycle methods for all services
@@ -64,6 +68,7 @@ Issues are prioritized based on:
 **Issue Addressed**: Async/Sync Implementation Inconsistencies
 
 **Actions**:
+
 - [ ] Document standard async/sync patterns for the codebase
 - [ ] Audit current async implementations for compliance with standards
 - [ ] Implement proper async fallbacks in synchronous methods
@@ -79,6 +84,7 @@ Issues are prioritized based on:
 **Issue Addressed**: Type Safety and Interface Clarity Issues
 
 **Actions**:
+
 - [ ] Create interface definitions for all major component types
 - [ ] Add generic type parameters to container classes
 - [ ] Apply consistent `Optional` and `Union` type usage
@@ -94,6 +100,7 @@ Issues are prioritized based on:
 **Issue Addressed**: Configuration Management Complexity
 
 **Actions**:
+
 - [ ] Design a unified configuration system
 - [ ] Create schema definitions for all configuration sections
 - [ ] Implement configuration validation on application startup
@@ -111,6 +118,7 @@ Issues are prioritized based on:
 **Issue Addressed**: Potentially Unused or Redundant Modules
 
 **Actions**:
+
 - [ ] Run static analysis to identify unused code
 - [ ] Implement code usage metrics to track component utilization
 - [ ] Consolidate duplicate implementations with similar functionality
@@ -126,6 +134,7 @@ Issues are prioritized based on:
 **Issue Addressed**: Long-term Architectural Improvements
 
 **Actions**:
+
 - [ ] Design distributed event bus implementation
 - [ ] Create cross-instance coordination mechanisms
 - [ ] Implement leader election for cluster coordination
@@ -141,6 +150,7 @@ Issues are prioritized based on:
 **Issue Addressed**: Various operational issues across components
 
 **Actions**:
+
 - [ ] Add structured logging across all components
 - [ ] Implement performance metrics collection
 - [ ] Create health check endpoints for all major services

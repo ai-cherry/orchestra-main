@@ -16,6 +16,7 @@ The workflow (`wif-deploy.yml`) provides a straightforward deployment process:
 ### Test Job
 
 The test job:
+
 - Sets up Python and Poetry
 - Caches Poetry dependencies
 - Installs dependencies
@@ -24,6 +25,7 @@ The test job:
 ### Deploy Job
 
 The deploy job:
+
 - Only runs if tests pass
 - Sets up Python and Poetry
 - Installs dependencies
@@ -55,7 +57,7 @@ The workflow uses Workload Identity Federation for authentication with Google Cl
   with:
     workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
     service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-    token_format: 'access_token'
+    token_format: "access_token"
 ```
 
 This approach eliminates the need for storing service account keys in GitHub secrets, improving security.

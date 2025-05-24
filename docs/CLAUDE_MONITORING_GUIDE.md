@@ -17,17 +17,20 @@ The Claude API Monitoring System provides real-time tracking and analysis of all
 ### Components
 
 1. **ClaudeMonitor** (`core/monitoring/claude_monitor.py`)
+
    - Core monitoring engine
    - Tracks individual API calls
    - Calculates costs based on current pricing
    - Provides aggregated metrics
 
 2. **MonitoredLiteLLMClient** (`core/monitoring/monitored_litellm_client.py`)
+
    - Extended LiteLLM client with automatic monitoring
    - Transparent integration with existing code
    - Supports all Claude models
 
 3. **Monitoring API** (`core/orchestrator/src/api/endpoints/monitoring.py`)
+
    - RESTful API endpoints for accessing metrics
    - Summary statistics and cost breakdowns
    - Data export functionality
@@ -120,16 +123,19 @@ print(f"Average latency: {summary['average_latency_ms']:.0f}ms")
 ### API Endpoints
 
 #### Get Monitoring Summary
+
 ```bash
 curl http://localhost:8000/api/monitoring/summary?hours=24
 ```
 
 #### Get Cost Breakdown
+
 ```bash
 curl http://localhost:8000/api/monitoring/costs?days=7
 ```
 
 #### Export Data
+
 ```bash
 # Export as JSON
 curl http://localhost:8000/api/monitoring/export?format=json&hours=24 > metrics.json
@@ -142,16 +148,16 @@ curl http://localhost:8000/api/monitoring/export?format=csv&hours=24 > metrics.c
 
 The system uses current Claude API pricing (as of 2025):
 
-| Model | Input (per 1M tokens) | Output (per 1M tokens) |
-|-------|----------------------|------------------------|
-| Claude 3 Opus | $15.00 | $75.00 |
-| Claude 3 Sonnet | $3.00 | $15.00 |
-| Claude 3 Haiku | $0.25 | $1.25 |
-| Claude 4* | $20.00 | $100.00 |
-| Claude 4 Opus* | $25.00 | $125.00 |
-| Claude 4 Sonnet* | $5.00 | $25.00 |
+| Model             | Input (per 1M tokens) | Output (per 1M tokens) |
+| ----------------- | --------------------- | ---------------------- |
+| Claude 3 Opus     | $15.00                | $75.00                 |
+| Claude 3 Sonnet   | $3.00                 | $15.00                 |
+| Claude 3 Haiku    | $0.25                 | $1.25                  |
+| Claude 4\*        | $20.00                | $100.00                |
+| Claude 4 Opus\*   | $25.00                | $125.00                |
+| Claude 4 Sonnet\* | $5.00                 | $25.00                 |
 
-*Claude 4 pricing is placeholder - update when official pricing is announced.
+\*Claude 4 pricing is placeholder - update when official pricing is announced.
 
 ## Alerts and Thresholds
 
@@ -178,21 +184,25 @@ monitor = ClaudeMonitor(
 ## Dashboard Features
 
 ### Real-time Metrics
+
 - Total API calls and success rate
 - Current costs and token usage
 - Average latency
 
 ### Interactive Charts
+
 - API calls by model (doughnut chart)
 - Cost over time (line chart)
 - Token usage by model (stacked bar chart)
 
 ### Controls
+
 - Time range selection (1 hour to 1 week)
 - Model filtering
 - Auto-refresh (30 seconds)
 
 ### Export Options
+
 - Download data as JSON or CSV
 - Suitable for further analysis in Excel or data tools
 
@@ -205,6 +215,7 @@ python examples/claude_monitoring_demo.py
 ```
 
 The demo showcases:
+
 - Basic monitoring setup
 - Error handling and alerts
 - Cost tracking across sessions

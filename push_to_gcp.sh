@@ -26,7 +26,7 @@ log() {
   local level=$1
   local message=$2
   local timestamp=$(date "+%Y-%m-%d %H:%M:%S")
-  
+
   case $level in
     "INFO")
       echo -e "${GREEN}[${timestamp}] [INFO] ${message}${NC}"
@@ -54,20 +54,20 @@ log() {
 # Authenticate with GCP using service account key
 authenticate_with_gcp() {
   log "INFO" "Authenticating with GCP using project admin service account key..."
-  
+
   # Authenticate with gcloud using the project admin service account
   gcloud auth activate-service-account orchestra-project-admin-sa@cherry-ai-project.iam.gserviceaccount.com --key-file=project-admin-key.json --project=${PROJECT_ID}
-  
+
   # Set the project
   gcloud config set project ${PROJECT_ID}
-  
+
   log "SUCCESS" "Authenticated with GCP"
 }
 
 # Enable required APIs
 enable_apis() {
   log "INFO" "Enabling required APIs..."
-  
+
   # List of APIs to enable
   apis=(
     "iam.googleapis.com"
@@ -83,23 +83,23 @@ enable_apis() {
     "cloudfunctions.googleapis.com"
     "generativelanguage.googleapis.com"
   )
-  
+
   # Enable each API
   for api in "${apis[@]}"; do
     log "INFO" "Enabling ${api}..."
     gcloud services enable ${api} --project=${PROJECT_ID}
   done
-  
+
   log "SUCCESS" "Required APIs enabled"
 }
 
 # Create GitHub Actions workflow
 create_github_actions_workflow() {
   log "INFO" "Creating GitHub Actions workflow..."
-  
+
   # Create .github/workflows directory if it doesn't exist
   mkdir -p .github/workflows
-  
+
   # Create workflow file
   cat > .github/workflows/deploy-to-gcp.yml << EOF
 name: Deploy to GCP
@@ -167,14 +167,14 @@ jobs:
             --platform managed \\
             --allow-unauthenticated
 EOF
-  
+
   log "SUCCESS" "GitHub Actions workflow created"
 }
 
 # Main function
 main() {
   log "INFO" "Starting GCP infrastructure setup with real keys..."
-  
+
   # Ensure key files are present (User needs to provide them securely)
   if [ ! -f "project-admin-key.json" ] || [ ! -f "secret-management-key.json" ]; then
     log "ERROR" "Service account key files 'project-admin-key.json' and/or 'secret-management-key.json' not found."
@@ -182,23 +182,23 @@ main() {
     log "ERROR" "These files should contain the respective service account keys for project-admin and secret-management."
     exit 1
   fi
-  
+
   # Authenticate with GCP
   authenticate_with_gcp
-  
+
   # Enable required APIs
   enable_apis
-  
+
   # Create GitHub Actions workflow
   create_github_actions_workflow
-  
+
   log "SUCCESS" "GCP infrastructure setup completed successfully!"
   log "INFO" "The following tasks have been completed:"
   log "INFO" "1. Ensured service account key files are present (user-provided)"
   log "INFO" "2. Authenticated with GCP"
   log "INFO" "3. Enabled required APIs"
   log "INFO" "(Terraform steps have been removed from this workflow)"
-  
+
   log "INFO" "Your GCP service accounts are now set up and ready to use!"
 }
 

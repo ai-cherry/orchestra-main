@@ -6,12 +6,9 @@ based on configuration. It serves as a central registry for all agent wrapper ty
 available in the Orchestra system.
 """
 
-import logging
 import importlib
-from typing import Dict, Type, Any, Optional
-
-# Import routing logic for advanced agent selection
-from packages.agents.src.routing import AgentRouting
+import logging
+from typing import Any, Dict, Optional, Type
 
 # Import the base class
 from packages.agents.src._base import OrchestraAgentBase
@@ -19,6 +16,9 @@ from packages.agents.src._base import OrchestraAgentBase
 # Import wrapper implementations
 # Use team_wrapper import for Phidata since it enhances the original wrapper
 from packages.agents.src.phidata.team_wrapper import PhidataTeamAgentWrapper
+
+# Import routing logic for advanced agent selection
+from packages.agents.src.routing import AgentRouting
 
 logger = logging.getLogger(__name__)
 

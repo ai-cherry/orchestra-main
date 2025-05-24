@@ -3,6 +3,7 @@
 This guide provides detailed instructions for integrating Vertex AI and Gemini into your development workflow for the `orchestra-main` project. It covers authentication setup, replacing legacy API key usage with Vertex AI Gemini SDK calls, using Gemini Code Assist for context-aware code generation in VS Code, and deploying and monitoring agents with Vertex AI Agent Builder.
 
 ## Table of Contents
+
 - [Authentication Setup](#authentication-setup)
 - [Vertex AI Gemini SDK Integration](#vertex-ai-gemini-sdk-integration)
 - [Context-Aware Code Generation with Gemini Code Assist](#context-aware-code-generation-with-gemini-code-assist)
@@ -14,9 +15,11 @@ To ensure all AI agent and model calls are authenticated using the service accou
 
 1. **Run the Setup Script**:
    Execute the provided setup script to configure authentication and environment variables.
+
    ```bash
    bash scripts/setup_vertex_auth.sh
    ```
+
    **Note**: Before running the script, update the path to the service account key file in the script (replace `/path/to/service-account-key.json` with the actual path).
 
 2. **Verify Authentication**:
@@ -31,11 +34,12 @@ To ensure all AI agent and model calls are authenticated using the service accou
 Legacy Gemini API key usage has been replaced with Vertex AI Gemini SDK calls in the project. The key file to review is `agent/core/vertex_operations.py`, where the `generate_gemini_docs` method now uses Gemini Enterprise with a 10M-token context window, authenticated via the service account.
 
 **Key Code Snippet** (from `agent/core/vertex_operations.py`):
+
 ```python
 def generate_gemini_docs(self, code_path: str):
     """Use Gemini Enterprise to generate documentation with extended context window"""
     from google.cloud import gemini
-    
+
     # Leverage Gemini Enterprise for larger context processing
     enterprise_agent = gemini.EnterpriseAgent(
         model="gemini-3.0-enterprise",
@@ -67,6 +71,7 @@ Gemini Code Assist in VS Code provides context-aware code generation and review 
    - Review and accept the generated code based on the context of the surrounding code and comments.
 
 **Sample TODO from `gemini_code_assist_example.py`**:
+
 ```python
 def process_data(data_list):
     processed_data = []
@@ -86,16 +91,18 @@ A sample script has been provided to demonstrate how to define, deploy, and moni
 
 1. **Run the Deployment Script**:
    Execute the provided script to create and deploy a sample agent.
+
    ```bash
    python3 examples/deploy_vertex_agent.py
    ```
 
 2. **Key Code Snippet** (from `examples/deploy_vertex_agent.py`):
+
    ```python
    def create_and_deploy_agent():
        print("Initializing Vertex AI Agent Builder...")
        ai_agent_builder.init(project="cherry-ai-project", location="us-west4")
-       
+
        agent_config = {
            "display_name": "Sample-Orchestra-Agent",
            "base_model": "gemini-2.5-pro",
@@ -107,7 +114,7 @@ A sample script has been provided to demonstrate how to define, deploy, and moni
            },
            "context_window": 1000000
        }
-       
+
        agent = ai_agent_builder.Agent(**agent_config)
        agent.register_protocols(["mcp", "a2a"])
        agent_id = agent.deploy()
@@ -120,6 +127,7 @@ A sample script has been provided to demonstrate how to define, deploy, and moni
    - Use Cloud Code in VS Code to interact with deployed resources directly from the IDE.
 
 ## Additional Notes
+
 - Ensure that the Google Cloud SDK and necessary Python libraries (`google-cloud-aiplatform`, `google-cloud-gemini`) are installed in your environment.
 - If you encounter authentication issues, verify that the service account key file path is correctly set in `GOOGLE_APPLICATION_CREDENTIALS`.
 - For advanced agent configurations or monitoring, refer to the Vertex AI documentation or use the Cloud Code extension for a graphical interface within VS Code.

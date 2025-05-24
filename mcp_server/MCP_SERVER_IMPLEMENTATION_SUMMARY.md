@@ -38,11 +38,13 @@ We've implemented a comprehensive set of improvements to the MCP server to enhan
 The MCP server now follows a modern, cloud-native architecture:
 
 1. **Local Development**:
+
    - Poetry for dependency management
    - Docker for containerization
    - Automated scripts for easy setup
 
 2. **CI/CD Pipeline**:
+
    - GitHub Actions for automated builds and deployments
    - Testing and linting in the pipeline
    - Secure GCP authentication with Workload Identity Federation
@@ -80,11 +82,13 @@ The MCP server now follows a modern, cloud-native architecture:
 To work with the improved MCP server:
 
 1. **Local Development**:
+
    ```bash
    ./mcp_server/scripts/start_mcp_server.sh
    ```
 
 2. **Docker Deployment**:
+
    ```bash
    cd mcp_server/scripts
    docker-compose up -d
@@ -102,10 +106,12 @@ To work with the improved MCP server:
 While we've made significant improvements to the MCP server, there are still some areas for future enhancement:
 
 1. **API Standardization**:
+
    - Standardize APIs between MCP server and other components
    - Implement versioning for backward compatibility
 
 2. **Memory System Enhancement**:
+
    - Integrate with Vertex AI for enhanced capabilities
    - Implement caching strategies for better performance
 

@@ -18,7 +18,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Print commit SHA and branch for traceability
+      # 2. Print commit info for traceability
       - name: Print commit info
         run: |
           echo "Branch: ${{ github.ref }}"
@@ -39,34 +39,79 @@ jobs:
         with:
           project_id: 'cherry-ai-project'
 
-      # --- Optional test stage (kept lightweight for solo-dev) ---
+      # 5. Set up Python environment
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
+      # 6. Install dependencies
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
-          pip install -r requirements-dev.txt
-      - name: Run unit tests & lint (fast-fail)
+          pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+          # Install GCP SDK for secret validation
+          pip install google-cloud-secret-manager
+
+      # 7. Validate required secrets exist
+      - name: Validate secrets in GCP Secret Manager
+        run: |
+          echo "Validating required secrets..."
+          python << 'EOF'
+          import os
+          from google.cloud import secretmanager
+
+          client = secretmanager.SecretManagerServiceClient()
+          project_id = "cherry-ai-project"
+
+          # Required secrets to check
+          required_secrets = [
+              "OPENAI_API_KEY",
+              "PORTKEY_API_KEY",
+              "REDIS_HOST",
+              "REDIS_PASSWORD",
+              "ZENROWS_API_KEY",
+              "APIFY_API_KEY",
+          ]
+
+          missing_secrets = []
+          for secret_id in required_secrets:
+              try:
+                  name = f"projects/{project_id}/secrets/{secret_id}/versions/latest"
+                  response = client.access_secret_version(request={"name": name})
+                  print(f"✓ {secret_id} exists")
+              except Exception:
+                  print(f"✗ {secret_id} missing")
+                  missing_secrets.append(secret_id)
+
+          if missing_secrets:
+              print(f"\nERROR: Missing required secrets: {', '.join(missing_secrets)}")
+              exit(1)
+          else:
+              print("\n✓ All required secrets validated")
+          EOF
+
+      # 8. Run unit tests and linting
+      - name: Run tests and code quality checks
         run: |
           echo "Running tests..."
-          if [ -d tests ]; then 
+          if [ -d tests ]; then
             echo "Found tests directory, running pytest..."
-            pytest -v --tb=short
+            pytest -v --tb=short --no-header
           else
             echo "No tests directory found, skipping pytest"
           fi
-          echo "Tests completed successfully"
-      # -----------------------------------------------------------
 
-      # 6. Verify gcloud authentication
-      - name: Verify gcloud authentication
-        run: |
-          gcloud auth list
-          gcloud config list project
+          echo "Running linting..."
+          # Run ruff for fast linting (if available)
+          if command -v ruff &> /dev/null; then
+            ruff check . || true
+          fi
 
-      # 7. Submit build to Google Cloud Build
+          echo "Tests and linting completed"
+
+      # 9. Submit build to Google Cloud Build
       - name: Submit build to Google Cloud Build
         id: cloudbuild
         run: |
@@ -74,7 +119,115 @@ jobs:
             --substitutions=COMMIT_SHA=${{ github.sha }} \
             .
 
-      # 8. Print Cloud Build logs URL
-      - name: Print Cloud Build logs URL
+      # 10. Wait for services to be ready
+      - name: Wait for services to be ready
         run: |
-          echo "View build logs at: https://console.cloud.google.com/cloud-build/builds?project=cherry-ai-project" 
+          echo "Waiting for services to be ready..."
+          sleep 30  # Give services time to start
+
+          # Check main orchestrator service
+          echo "Checking ai-orchestra-minimal..."
+          SERVICE_URL=$(gcloud run services describe ai-orchestra-minimal \
+            --region=us-central1 \
+            --format='value(status.url)')
+
+          for i in {1..10}; do
+            if curl -f -s "$SERVICE_URL/health" > /dev/null; then
+              echo "✓ ai-orchestra-minimal is healthy"
+              break
+            else
+              echo "Waiting for ai-orchestra-minimal to be ready... ($i/10)"
+              sleep 10
+            fi
+          done
+
+          # Check web scraping service
+          echo "Checking web-scraping-agents..."
+          SCRAPING_URL=$(gcloud run services describe web-scraping-agents \
+            --region=us-central1 \
+            --format='value(status.url)' || echo "")
+
+          if [ -n "$SCRAPING_URL" ]; then
+            for i in {1..10}; do
+              if curl -f -s "$SCRAPING_URL/health" > /dev/null; then
+                echo "✓ web-scraping-agents is healthy"
+                break
+              else
+                echo "Waiting for web-scraping-agents to be ready... ($i/10)"
+                sleep 10
+              fi
+            done
+          fi
+
+      # 11. Run post-deployment health checks
+      - name: Run post-deployment health checks
+        run: |
+          echo "Running comprehensive health checks..."
+          python << 'EOF'
+          import requests
+          import subprocess
+          import json
+
+          def get_service_url(service_name):
+              try:
+                  result = subprocess.run([
+                      "gcloud", "run", "services", "describe", service_name,
+                      "--region=us-central1",
+                      "--format=value(status.url)"
+                  ], capture_output=True, text=True, check=True)
+                  return result.stdout.strip()
+              except:
+                  return None
+
+          # Check services
+          services = ["ai-orchestra-minimal", "web-scraping-agents"]
+          all_healthy = True
+
+          for service in services:
+              url = get_service_url(service)
+              if url:
+                  try:
+                      response = requests.get(f"{url}/health", timeout=30)
+                      if response.status_code == 200:
+                          print(f"✓ {service}: Healthy")
+                          health_data = response.json() if response.headers.get('content-type') == 'application/json' else {}
+                          if health_data:
+                              print(f"  Status: {health_data.get('status', 'unknown')}")
+                      else:
+                          print(f"✗ {service}: Unhealthy (status code: {response.status_code})")
+                          all_healthy = False
+                  except Exception as e:
+                      print(f"✗ {service}: Failed to check ({str(e)})")
+                      all_healthy = False
+              else:
+                  print(f"⚠ {service}: Not deployed")
+
+          if not all_healthy:
+              print("\nWARNING: Some services are not healthy")
+              exit(1)
+          else:
+              print("\n✓ All services are healthy")
+          EOF
+
+      # 12. Output deployment summary
+      - name: Deployment summary
+        run: |
+          echo "========================================="
+          echo "Deployment Summary"
+          echo "========================================="
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref }}"
+          echo "Project: cherry-ai-project"
+          echo "Region: us-central1"
+          echo ""
+          echo "Services deployed:"
+          gcloud run services list --platform=managed --region=us-central1 --format="table(metadata.name,status.url)"
+          echo ""
+          echo "View logs at: https://console.cloud.google.com/logs/query;query=resource.type%3D%22cloud_run_revision%22?project=cherry-ai-project"
+          echo "View monitoring at: https://console.cloud.google.com/monitoring?project=cherry-ai-project"
+
+# --- Audit helpers -------------------------------------------------
+audit-code:  ## create audit/inventory.json
+	@python scripts/code_inventory.py > audit/inventory.json
+audit-configs:  ## map all config files
+	@python scripts/config_inventory.py > audit/config_map.json

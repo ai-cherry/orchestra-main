@@ -1,5 +1,6 @@
-from core.logging_config import setup_logging, get_logger
 import os
+
+from core.logging_config import get_logger, setup_logging
 
 # Set up structured JSON logging
 # Determine if running in production (Cloud Run) or development
@@ -8,10 +9,10 @@ setup_logging(json_format=is_production)
 
 logger = get_logger(__name__)
 
-from flask import Flask, jsonify, request
 import os
-from utils import retry
-import requests
+
+import litellm
+from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
@@ -58,41 +59,57 @@ def handle_query():
 @app.route("/call-llm", methods=["POST"])
 def call_llm():
     try:
-        # ... code that calls the LLM API ...
-        pass
+        data = request.json
+        prompt = data.get("prompt", "")
+        model = data.get("model", "gpt-3.5-turbo")
+
+        # Use litellm for LLM API calls
+        response = litellm.completion(model=model, messages=[{"role": "user", "content": prompt}])
+
+        logger.info("LLM API call successful", extra={"model": model})
+        return jsonify({"status": "success", "response": response.choices[0].message.content})
     except Exception as e:
-        logger.error("LLM API call failed", exc_info=True, extra={"api_endpoint": "openai_v1"})
-        return {"error": "LLM API call failed"}, 500
+        logger.error("LLM API call failed", exc_info=False, extra={"api_endpoint": model, "error": str(e)})
+        return jsonify({"error": "LLM API call failed"}), 500
 
 
-@retry(max_attempts=3, delay=2, exponential_backoff=2)
-def fetch_external_data():
-    response = requests.get("https://api.example.com/data", timeout=10)
-    response.raise_for_status()
-    return response.json()
-
-
-@app.route("/fetch-data")
-def fetch_data_sync():
-    try:
-        logger.info("Fetching external data", extra={"endpoint": "/fetch-data"})
-        data = fetch_external_data()
-        return jsonify(data)
-    except requests.RequestException as e:
-        logger.error(
-            "External API call failed", exc_info=True, extra={"endpoint": "/fetch-data", "error_type": type(e).__name__}
-        )
-        return jsonify({"error": "Failed to fetch data"}), 502
+@app.route("/health/detailed")
+def health_detailed():
+    """Detailed health check endpoint"""
+    health_status = {
+        "status": "healthy",
+        "services": {
+            "app": "running",
+            "gcp_project": os.environ.get("GOOGLE_CLOUD_PROJECT", "not_set"),
+            "api_keys_loaded": {
+                "openai": bool(os.environ.get("OPENAI_API_KEY")),
+                "anthropic": bool(os.environ.get("ANTHROPIC_API_KEY")),
+            },
+        },
+    }
+    return jsonify(health_status)
 
 
 @app.errorhandler(Exception)
 def handle_exception(e):
-    logger.error(
-        "Unhandled exception",
-        exc_info=True,
-        extra={"path": request.path, "method": request.method, "remote_addr": request.remote_addr},
-    )
-    return jsonify({"error": "Internal server error"}), 500
+    # Don't expose stack traces in production
+    is_production = os.environ.get("K_SERVICE") is not None
+
+    if is_production:
+        logger.error(
+            "Unhandled exception",
+            exc_info=True,  # Log full details server-side
+            extra={"path": request.path, "method": request.method},
+        )
+        return jsonify({"error": "Internal server error"}), 500
+    else:
+        # In development, return more details
+        logger.error(
+            "Unhandled exception",
+            exc_info=True,
+            extra={"path": request.path, "method": request.method, "remote_addr": request.remote_addr},
+        )
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":

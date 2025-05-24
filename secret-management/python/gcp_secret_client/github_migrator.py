@@ -12,10 +12,9 @@ import logging
 import os
 import subprocess
 import sys
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Any, Dict, List, Optional
 
 from .client import SecretClient
-from .exceptions import SecretAccessError, SecretNotFoundError, SecretOperationError
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -334,7 +333,7 @@ class GitHubSecretMigrator:
         try:
             # Try to access the secret
             secret_path = f"projects/{self.gcp_project_id}/secrets/{full_secret_id}/versions/latest"
-            response = self.secret_client.client.access_secret_version(name=secret_path)
+            self.secret_client.client.access_secret_version(name=secret_path)
 
             # If we get here, the secret exists and is accessible
             logger.info(f"Validated access to secret '{full_secret_id}'")

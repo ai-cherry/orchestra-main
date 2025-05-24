@@ -5,12 +5,11 @@ This module provides integration with Phidata's agent framework.
 """
 
 import logging
-import asyncio
-from typing import Dict, Any, Optional, List
+
+from packages.shared.src.models.domain_models import AgentResponse as AgentOutput
+from packages.shared.src.models.domain_models import UserRequest as AgentInput
 
 from ._base import OrchestraAgentBase
-from packages.shared.src.models.domain_models import UserRequest as AgentInput
-from packages.shared.src.models.domain_models import AgentResponse as AgentOutput
 
 logger = logging.getLogger(__name__)
 

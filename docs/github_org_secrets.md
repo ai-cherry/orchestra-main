@@ -6,19 +6,19 @@ This document provides information about the GitHub organization secrets require
 
 These secrets are used by GitHub Actions workflows to deploy the application to Google Cloud Platform.
 
-| Secret Name | Description | Example Value |
-|-------------|-------------|---------------|
-| `ORG_GCP_PROJECT_ID` | Google Cloud Platform Project ID | `cherry-ai-project` |
-| `ORG_GCP_CREDENTIALS` | GCP Service Account Key JSON | `{"type":"service_account","project_id":"cherry-ai-project",...}` |
-| `ORG_GCP_REGION` | GCP Region for deployment | `us-west4` |
-| `ORG_GKE_CLUSTER_PROD` | GKE Cluster name for production | `autopilot-cluster-1` |
-| `ORG_GKE_CLUSTER_STAGING` | GKE Cluster name for staging | `autopilot-cluster-1` |
-| `ORG_REDIS_HOST` | Redis instance hostname | `redis-12345.c12345.us-west4-1.gcp.cloud.redislabs.com` |
-| `ORG_REDIS_PORT` | Redis instance port | `6379` |
-| `ORG_REDIS_PASSWORD` | Redis instance password | `your-redis-password` |
-| `DOCKERHUB_USERNAME` | Docker Hub username for storing images | `your-dockerhub-username` |
-| `DOCKERHUB_TOKEN` | Docker Hub access token | `your-dockerhub-token` |
-| `SLACK_WEBHOOK_URL` | Slack webhook URL for notifications | `https://hooks.slack.com/services/...` |
+| Secret Name               | Description                            | Example Value                                                     |
+| ------------------------- | -------------------------------------- | ----------------------------------------------------------------- |
+| `ORG_GCP_PROJECT_ID`      | Google Cloud Platform Project ID       | `cherry-ai-project`                                               |
+| `ORG_GCP_CREDENTIALS`     | GCP Service Account Key JSON           | `{"type":"service_account","project_id":"cherry-ai-project",...}` |
+| `ORG_GCP_REGION`          | GCP Region for deployment              | `us-west4`                                                        |
+| `ORG_GKE_CLUSTER_PROD`    | GKE Cluster name for production        | `autopilot-cluster-1`                                             |
+| `ORG_GKE_CLUSTER_STAGING` | GKE Cluster name for staging           | `autopilot-cluster-1`                                             |
+| `ORG_REDIS_HOST`          | Redis instance hostname                | `redis-12345.c12345.us-west4-1.gcp.cloud.redislabs.com`           |
+| `ORG_REDIS_PORT`          | Redis instance port                    | `6379`                                                            |
+| `ORG_REDIS_PASSWORD`      | Redis instance password                | `your-redis-password`                                             |
+| `DOCKERHUB_USERNAME`      | Docker Hub username for storing images | `your-dockerhub-username`                                         |
+| `DOCKERHUB_TOKEN`         | Docker Hub access token                | `your-dockerhub-token`                                            |
+| `SLACK_WEBHOOK_URL`       | Slack webhook URL for notifications    | `https://hooks.slack.com/services/...`                            |
 
 ## Setting Up Secrets
 

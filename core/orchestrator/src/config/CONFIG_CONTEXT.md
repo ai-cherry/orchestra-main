@@ -16,17 +16,17 @@ The core `Settings` class in `settings.py` defines all configurable parameters:
 class Settings(BaseSettings):
     """
     Application settings loaded from environment variables.
-    
+
     Automatically reads from .env file when present.
     """
-    
+
     # General settings
     ENVIRONMENT: str = 'development'
-    
+
     # API keys
     OPENROUTER_API_KEY: Optional[str] = None
     PORTKEY_API_KEY: Optional[str] = None
-    
+
     # Additional settings...
 ```
 
@@ -35,16 +35,19 @@ class Settings(BaseSettings):
 Settings are organized into logical categories:
 
 1. **Environment Configuration**
+
    - `ENVIRONMENT`: Current environment (development, testing, production)
    - `USE_RECOVERY_MODE`: Flag for recovery mode activation
    - `STANDARD_MODE`: Flag for standard operation mode
 
 2. **LLM Provider Settings**
+
    - API keys for different providers (OpenRouter, Portkey)
    - Default models and retry parameters
    - Fallback configuration and strategy settings
 
 3. **Performance and Optimization**
+
    - Request timeouts and retry counts
    - Caching settings and thresholds
    - Rate limit handling configuration
@@ -70,7 +73,7 @@ The `get_settings()` function provides a standard way to access settings through
 def get_settings() -> Settings:
     """
     Get application settings.
-    
+
     Returns:
         Settings: Application settings instance.
     """

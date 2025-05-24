@@ -7,11 +7,11 @@ ensuring that all AI assistants working on the project prioritize performance,
 optimization, and stability over extensive security measures.
 """
 
-import os
 import json
+import logging
+import os
 import sys
 from datetime import datetime
-import logging
 
 # Set up logging
 logging.basicConfig(
@@ -78,9 +78,9 @@ def initialize_memory_system():
         if os.path.exists(priorities_md_path) and not os.path.exists(symlink_path):
             try:
                 os.symlink(priorities_md_path, symlink_path)
-                logger.info(f"Created symbolic link to PROJECT_PRIORITIES.md")
+                logger.info("Created symbolic link to PROJECT_PRIORITIES.md")
             except OSError:
-                logger.warning(f"Could not create symbolic link - copying file instead")
+                logger.warning("Could not create symbolic link - copying file instead")
                 # On systems where symlinks aren't supported (like Windows without admin),
                 # copy the file instead
                 import shutil
@@ -141,7 +141,7 @@ This directory is maintained by:
 - `update_ai_memory_priorities.py` script
 - The `apply_performance_priorities.sh` script with the --update-all flag
 
-Do not modify these files directly unless you specifically want to change the 
+Do not modify these files directly unless you specifically want to change the
 project priorities.
 """
             )

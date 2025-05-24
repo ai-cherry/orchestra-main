@@ -1,5 +1,6 @@
-from google.cloud import workflows
 import json
+
+from google.cloud import workflows
 
 
 class AgentSwarm:
@@ -14,7 +15,7 @@ class AgentSwarm:
     def execute(self, input_data):
         workflow = self.workflows.get(self.agent_type)
         if workflow:
-            execution = workflows.create_execution(
+            workflows.create_execution(
                 workflow=workflow,
                 input_data={"input": json.dumps({"project": "cherry-ai-project"})},
             )

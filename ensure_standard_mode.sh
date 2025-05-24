@@ -24,13 +24,13 @@ ensure_permissions() {
 # Function to set environment variables
 set_environment_variables() {
   echo -e "\n${YELLOW}Setting environment variables...${NC}"
-  
+
   # Add to .bashrc if it exists
   if [ -f ~/.bashrc ]; then
     # Remove any existing Orchestra mode variables
     grep -v "USE_RECOVERY_MODE\|STANDARD_MODE" ~/.bashrc > ~/.bashrc.tmp
     mv ~/.bashrc.tmp ~/.bashrc
-    
+
     # Add environment variables
     cat << 'EOF' >> ~/.bashrc
 
@@ -38,14 +38,14 @@ set_environment_variables() {
 export USE_RECOVERY_MODE=false
 export STANDARD_MODE=true
 EOF
-    
+
     echo -e "${GREEN}Added environment variables to ~/.bashrc${NC}"
   fi
-  
+
   # Set for current session
   export USE_RECOVERY_MODE=false
   export STANDARD_MODE=true
-  
+
   echo -e "${GREEN}Environment variables set for current session:${NC}"
   echo -e "  USE_RECOVERY_MODE=${USE_RECOVERY_MODE}"
   echo -e "  STANDARD_MODE=${STANDARD_MODE}"
@@ -54,7 +54,7 @@ EOF
 # Function to create or update .env file
 update_env_file() {
   echo -e "\n${YELLOW}Updating .env file...${NC}"
-  
+
   if [ -f .env ]; then
     echo -e "${YELLOW}Found existing .env file. Updating...${NC}"
     # Remove any existing mode settings
@@ -64,21 +64,21 @@ update_env_file() {
     echo -e "${YELLOW}Creating new .env file...${NC}"
     touch .env
   fi
-  
+
   # Add standard mode settings
   cat << 'EOF' >> .env
 # Force standard mode and disable recovery mode
 USE_RECOVERY_MODE=false
 STANDARD_MODE=true
 EOF
-  
+
   echo -e "${GREEN}.env file updated successfully.${NC}"
 }
 
 # Function to ensure docker-compose.yml has standard mode settings
 check_docker_compose() {
   echo -e "\n${YELLOW}Checking docker-compose.yml...${NC}"
-  
+
   if [ -f docker-compose.yml ]; then
     if grep -q "USE_RECOVERY_MODE=false" docker-compose.yml && grep -q "STANDARD_MODE=true" docker-compose.yml; then
       echo -e "${GREEN}docker-compose.yml has correct mode settings.${NC}"
@@ -96,13 +96,13 @@ check_docker_compose() {
 # Function to ensure force_standard_mode.py is up to date
 update_force_standard_mode() {
   echo -e "\n${YELLOW}Updating force_standard_mode.py...${NC}"
-  
+
   if [ -f force_standard_mode.py ]; then
     echo -e "${YELLOW}force_standard_mode.py exists. Ensuring it's up to date...${NC}"
   else
     echo -e "${YELLOW}Creating force_standard_mode.py...${NC}"
   fi
-  
+
   # Write the force_standard_mode.py file
   cat << 'EOF' > force_standard_mode.py
 """
@@ -122,22 +122,22 @@ def patch_module():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     if script_dir not in sys.path:
         sys.path.insert(0, script_dir)
-    
+
     # Force environment variables
     os.environ["USE_RECOVERY_MODE"] = "false"
     os.environ["STANDARD_MODE"] = "true"
     os.environ["PYTHONPATH"] = script_dir
-    
+
     print("=== DEBUG: Environment Variables at Startup ===")
     for key, value in sorted(os.environ.items()):
         if key in ["ENVIRONMENT", "PYTHONPATH", "STANDARD_MODE", "USE_RECOVERY_MODE"]:
             print(f"{key}={value}")
-    
+
     print("=== DEBUG: Python Path ===")
     for path in sys.path:
         print(path)
     print("=== DEBUG: End Environment Info ===")
-    
+
     # Try to load the module
     try:
         # Reload the main module to ensure it picks up these changes
@@ -147,37 +147,37 @@ def patch_module():
         else:
             # Import it for the first time
             importlib.import_module("core.orchestrator.src.main")
-        
+
         # Directly patch the module variables
         import core.orchestrator.src.main
-        
+
         # Print debug info
         print(f"DEBUG: Environment would set RECOVERY_MODE={core.orchestrator.src.main.RECOVERY_MODE}")
         print(f"DEBUG: Environment would set STANDARD_MODE={core.orchestrator.src.main.STANDARD_MODE}")
-        
+
         # Force override the mode
         core.orchestrator.src.main.RECOVERY_MODE = False
         core.orchestrator.src.main.STANDARD_MODE = True
-        
+
         print(f"DEBUG: HARD OVERRIDE ACTIVE: RECOVERY_MODE=False, STANDARD_MODE=True")
         print(f"Starting with RECOVERY_MODE=False, STANDARD_MODE=True (HARD OVERRIDE)")
     except ImportError as e:
         print(f"Warning: Could not import core.orchestrator.src.main module: {e}")
         print("Will continue with environment variables only.")
-    
+
     print("тЪая╕П APPLYING HARD OVERRIDE: Forcing standard mode and disabling recovery mode!")
 
 if __name__ == "__main__":
     patch_module()
 EOF
-  
+
   echo -e "${GREEN}force_standard_mode.py updated successfully.${NC}"
 }
 
 # Function to ensure Dockerfile has the correct settings
 check_dockerfile() {
   echo -e "\n${YELLOW}Checking Dockerfile...${NC}"
-  
+
   if [ -f Dockerfile ]; then
     if grep -q "ENV USE_RECOVERY_MODE=false" Dockerfile && grep -q "ENV STANDARD_MODE=true" Dockerfile; then
       echo -e "${GREEN}Dockerfile has correct mode settings.${NC}"
@@ -195,7 +195,7 @@ check_dockerfile() {
 # Function to create a startup hook script
 create_startup_hook() {
   echo -e "\n${YELLOW}Creating startup hook script...${NC}"
-  
+
   cat << 'EOF' > startup_hook.sh
 #!/bin/bash
 # Startup hook script to enforce standard mode at runtime
@@ -215,7 +215,7 @@ print('STARTUP HOOK: Enforced standard mode through environment variables')
 # Execute the original command
 exec "$@"
 EOF
-  
+
   chmod +x startup_hook.sh
   echo -e "${GREEN}Created startup_hook.sh successfully.${NC}"
 }

@@ -13,7 +13,7 @@ from redis import Redis
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import settings
-from app.routers import agents, memory, system, gemini
+from app.routers import agents, gemini, memory, system
 
 # Configure logging
 logger = logging.getLogger(__name__)

@@ -7,18 +7,18 @@ with a primary focus on Google Cloud Secret Manager. It includes fallback mechan
 to environment variables and local files for development environments.
 """
 
-import os
+import asyncio
 import json
 import logging
-from typing import Optional, Dict, Any, Union
-from pathlib import Path
-import asyncio
+import os
 from functools import lru_cache
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 # Import Google Cloud libraries
 try:
+    from google.api_core.exceptions import InvalidArgument, NotFound, PermissionDenied
     from google.cloud import storage
-    from google.api_core.exceptions import NotFound, PermissionDenied, InvalidArgument
 
     HAS_GCP = True
 except ImportError:

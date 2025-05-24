@@ -199,7 +199,7 @@ fi
 # Verify gcloud CLI is installed
 if command -v gcloud &> /dev/null; then
   echo "Google Cloud SDK is installed: $(gcloud --version | head -n 1)"
-  
+
   # Check if authenticated
   if gcloud auth list --filter=status=ACTIVE --format="value(account)" &> /dev/null; then
     echo "Authenticated with Google Cloud as: $(gcloud auth list --filter=status=ACTIVE --format="value(account)")"
@@ -265,7 +265,7 @@ fi
 # Check Google Cloud SDK
 if command -v gcloud &> /dev/null; then
   echo "Google Cloud SDK is installed: $(gcloud --version | head -n 1)"
-  
+
   # Check if authenticated
   if gcloud auth list --filter=status=ACTIVE --format="value(account)" &> /dev/null; then
     echo "Authenticated with Google Cloud as: $(gcloud auth list --filter=status=ACTIVE --format="value(account)")"

@@ -1,5 +1,5 @@
-from vertexai.preview.vision_models import ImageGenerationModel
 from gemini_code_assist import generate_code
+from vertexai.preview.vision_models import ImageGenerationModel
 
 
 class AutoVertex:

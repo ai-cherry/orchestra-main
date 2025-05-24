@@ -6,15 +6,16 @@ integrating all core components.
 """
 
 import logging
-from typing import Dict, List, Optional, Any, Union
-from fastapi import FastAPI, Depends, HTTPException, Request
+from typing import Any, Dict, List, Optional
+
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from core.orchestrator.src.core.memory import get_memory_manager
-from core.orchestrator.src.core.personas import get_persona_manager
 from core.orchestrator.src.core.agents import get_agent_registry
-from core.orchestrator.src.core.orchestrator import get_orchestrator, InteractionResult
+from core.orchestrator.src.core.memory import get_memory_manager
+from core.orchestrator.src.core.orchestrator import get_orchestrator
+from core.orchestrator.src.core.personas import get_persona_manager
 
 # Configure logging
 logging.basicConfig(

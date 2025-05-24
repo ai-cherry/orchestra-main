@@ -3,10 +3,9 @@ Application settings for the Admin API.
 """
 
 import logging
-from typing import Dict, List, Optional, Union
-from functools import lru_cache
+from typing import List, Optional, Union
 
-from pydantic import AnyHttpUrl, computed_field, Field
+from pydantic import AnyHttpUrl, Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 logger = logging.getLogger(__name__)

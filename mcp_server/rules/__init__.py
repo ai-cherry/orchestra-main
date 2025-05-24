@@ -8,13 +8,13 @@ and utilities for rule management.
 """
 
 from .rule_engine import (
-    RuleEngine,
     Rule,
-    RuleViolation,
-    RuleSeverity,
     RuleCategory,
-    get_rule_engine,
+    RuleEngine,
+    RuleSeverity,
+    RuleViolation,
     check_content,
+    get_rule_engine,
     load_rules_from_file,
 )
 

@@ -10,8 +10,6 @@ A simplified validator for the Codespaces environment, checking:
 5. AI Validation Requirements
 """
 
-import os
-import sys
 import json
 import re
 from pathlib import Path

@@ -4,7 +4,7 @@
 /**
  * Workstation configuration upgrade script
  * Upgrades from e2-standard-4 to n2d-standard-32 with 2x T4 GPUs
- * 
+ *
  * To generate with Gemini Code Assist, use:
  * /fix workstation configuration to upgrade from e2-standard-4 to n2d-standard-32 with 2x T4 GPUs
  */
@@ -20,7 +20,7 @@
 // Shell script to be saved as upgrade_workstation.sh
 const upgradeScript = `#!/bin/bash
 # upgrade_workstation.sh
-# 
+#
 # Upgrades GCP workstation from e2-standard-4 to n2d-standard-32 with 2x NVIDIA T4 GPUs
 # For cherry-ai-project project workstations
 
@@ -124,7 +124,7 @@ if [[ "$RESTART_CONFIRM" == "y" ]]; then
     --project="$PROJECT_ID" || {
       echo "Warning: Failed to stop workstation. It might already be stopped."
     }
-    
+
   echo "Starting workstation with new configuration..."
   gcloud workstations start "$CONFIG_NAME" \\
     --cluster="$CLUSTER_NAME" \\
@@ -133,7 +133,7 @@ if [[ "$RESTART_CONFIRM" == "y" ]]; then
       echo "Error: Failed to start workstation with new configuration."
       exit 1
     }
-    
+
   echo "\\n✅ WORKSTATION RESTART COMPLETE"
   echo "The workstation is now running with the new configuration"
 else
@@ -151,15 +151,19 @@ echo "View in GCP Console: https://console.cloud.google.com/workstations/cluster
 // Function to save the upgrade script
 function saveUpgradeScript() {
   // This would be handled by the Gemini Code Assist extension
-  console.log('Workstation upgrade script generated');
+  console.log("Workstation upgrade script generated");
 }
 
 // Function to execute the upgrade script
 function executeUpgradeScript() {
   // This would be executed by the user in the terminal
-  console.log('Execute with: chmod +x upgrade_workstation.sh && ./upgrade_workstation.sh');
+  console.log(
+    "Execute with: chmod +x upgrade_workstation.sh && ./upgrade_workstation.sh",
+  );
 }
 
 // Output
-console.log('Workstation upgrade script generated for upgrading to n2d-standard-32 with 2x NVIDIA T4 GPUs');
-console.log('Save to upgrade_workstation.sh and execute with bash');
+console.log(
+  "Workstation upgrade script generated for upgrading to n2d-standard-32 with 2x NVIDIA T4 GPUs",
+);
+console.log("Save to upgrade_workstation.sh and execute with bash");

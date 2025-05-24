@@ -24,27 +24,27 @@ fi
 # Function to create or update .vscode/settings.json
 update_vscode_settings() {
   echo -e "\n${CYAN}[1/5]${NC} ${BOLD}Updating .vscode/settings.json...${NC}"
-  
+
   # Create .vscode directory if it doesn't exist
   mkdir -p .vscode
-  
+
   # Check if settings.json exists
   if [ -f .vscode/settings.json ]; then
     echo -e "${YELLOW}Existing settings.json found. Updating...${NC}"
-    
+
     # Check if the file already has security.workspace.trust settings
     if grep -q "security.workspace.trust.enabled" .vscode/settings.json; then
       echo -e "${YELLOW}Workspace trust settings already exist in settings.json.${NC}"
       echo -e "${YELLOW}Ensuring they are set correctly...${NC}"
-      
+
       # Use temporary file for in-place editing
       TMP_FILE=$(mktemp)
-      
+
       # Try to use jq if available for proper JSON editing
       if command -v jq >/dev/null 2>&1; then
-        jq '.["security.workspace.trust.enabled"] = false | 
-            .["security.workspace.trust.startupPrompt"] = "never" | 
-            .["security.workspace.trust.banner"] = "never" | 
+        jq '.["security.workspace.trust.enabled"] = false |
+            .["security.workspace.trust.startupPrompt"] = "never" |
+            .["security.workspace.trust.banner"] = "never" |
             .["security.workspace.trust.emptyWindow"] = false' .vscode/settings.json > "$TMP_FILE"
         mv "$TMP_FILE" .vscode/settings.json
       else
@@ -57,10 +57,10 @@ update_vscode_settings() {
     else
       # Settings exist but no workspace trust settings yet
       echo -e "${YELLOW}Adding workspace trust settings to existing settings.json...${NC}"
-      
+
       # Use temporary file for in-place editing
       TMP_FILE=$(mktemp)
-      
+
       # Try to use jq if available for proper JSON editing
       if command -v jq >/dev/null 2>&1; then
         jq '. + {
@@ -96,29 +96,29 @@ EOF
 }
 EOF
   fi
-  
+
   echo -e "${GREEN}✓ .vscode/settings.json updated successfully.${NC}"
 }
 
 # Function to update devcontainer.json
 update_devcontainer() {
   echo -e "\n${CYAN}[2/5]${NC} ${BOLD}Updating devcontainer.json...${NC}"
-  
+
   # Check if devcontainer.json exists
   if [ -f .devcontainer/devcontainer.json ]; then
     echo -e "${YELLOW}Existing devcontainer.json found. Updating...${NC}"
-    
+
     # Check if devcontainer.json already has workspace trust settings
     if grep -q "security.workspace.trust.enabled" .devcontainer/devcontainer.json; then
       echo -e "${YELLOW}Workspace trust settings already exist in devcontainer.json.${NC}"
       echo -e "${GREEN}✓ No changes needed.${NC}"
     else
       echo -e "${YELLOW}Adding workspace trust settings to devcontainer.json...${NC}"
-      
+
       # Try to use jq if available for proper JSON editing
       if command -v jq >/dev/null 2>&1; then
         TMP_FILE=$(mktemp)
-        
+
         # If customizations.vscode.settings exists, add to it
         if jq -e '.customizations.vscode.settings' .devcontainer/devcontainer.json >/dev/null 2>&1; then
           jq '.customizations.vscode.settings += {
@@ -159,7 +159,7 @@ update_devcontainer() {
 # Function to create VS Code CLI command file
 create_vscode_cli_command() {
   echo -e "\n${CYAN}[3/5]${NC} ${BOLD}Creating VS Code CLI command file...${NC}"
-  
+
   # Create a script that uses VS Code CLI to disable workspace trust
   cat << 'EOF' > .vscode/disable_trust.js
 // This script disables VS Code workspace trust using the VS Code API
@@ -170,13 +170,13 @@ create_vscode_cli_command() {
   try {
     // Access the VS Code API
     const vscode = acquireVsCodeApi();
-    
+
     // Send message to extension host to disable workspace trust
     vscode.postMessage({
       command: 'workspaceTrust',
       action: 'disable'
     });
-    
+
     // Try to directly modify the workspace trust settings
     // This is a backup approach and may not work in all VS Code versions
     const settings = {
@@ -185,19 +185,19 @@ create_vscode_cli_command() {
       "security.workspace.trust.banner": "never",
       "security.workspace.trust.emptyWindow": false
     };
-    
+
     // Use localStorage to persist these settings
     for (const [key, value] of Object.entries(settings)) {
       localStorage.setItem(`vscode.${key}`, JSON.stringify(value));
     }
-    
+
     console.log('Workspace trust disabled successfully');
   } catch (error) {
     console.error('Failed to disable workspace trust:', error);
   }
 })();
 EOF
-  
+
   echo -e "${GREEN}✓ Created .vscode/disable_trust.js${NC}"
   echo -e "${YELLOW}Note: You can use this script in VS Code's Developer Console if other methods fail.${NC}"
 }
@@ -205,26 +205,26 @@ EOF
 # Function to add VS Code arguments to workspace file
 update_workspace_file() {
   echo -e "\n${CYAN}[4/5]${NC} ${BOLD}Checking for workspace file...${NC}"
-  
+
   # Look for .code-workspace files
   WORKSPACE_FILES=$(find . -maxdepth 1 -name "*.code-workspace" -type f)
-  
+
   if [ -n "$WORKSPACE_FILES" ]; then
     echo -e "${YELLOW}Found workspace file(s):${NC}"
-    
+
     for file in $WORKSPACE_FILES; do
       echo -e "${YELLOW}  - $file${NC}"
-      
+
       # Check if file already has trust settings
       if grep -q "security.workspace.trust.enabled" "$file"; then
         echo -e "${YELLOW}  Workspace trust settings already exist in $file.${NC}"
       else
         echo -e "${YELLOW}  Adding workspace trust settings to $file...${NC}"
-        
+
         # Try to use jq if available for proper JSON editing
         if command -v jq >/dev/null 2>&1; then
           TMP_FILE=$(mktemp)
-          
+
           # If settings exists, add to it
           if jq -e '.settings' "$file" >/dev/null 2>&1; then
             jq '.settings += {
@@ -262,15 +262,15 @@ update_workspace_file() {
 # Function to set environment variables for VS Code
 set_environment_vars() {
   echo -e "\n${CYAN}[5/5]${NC} ${BOLD}Setting environment variables...${NC}"
-  
+
   # Create or update .bashrc to set environment variables
   if [ -f ~/.bashrc ]; then
     echo -e "${YELLOW}Updating ~/.bashrc with environment variables...${NC}"
-    
+
     # Remove any existing VS Code workspace trust variables
     grep -v "VSCODE_DISABLE_WORKSPACE_TRUST" ~/.bashrc > ~/.bashrc.tmp
     mv ~/.bashrc.tmp ~/.bashrc
-    
+
     # Add the environment variables
     cat << 'EOF' >> ~/.bashrc
 
@@ -278,27 +278,27 @@ set_environment_vars() {
 export VSCODE_DISABLE_WORKSPACE_TRUST=true
 export DISABLE_WORKSPACE_TRUST=true
 EOF
-    
+
     echo -e "${GREEN}✓ Added environment variables to ~/.bashrc${NC}"
     echo -e "${YELLOW}Note: You'll need to restart your shell or run 'source ~/.bashrc' for these to take effect.${NC}"
   else
     echo -e "${YELLOW}No ~/.bashrc found. Creating one...${NC}"
-    
+
     # Create .bashrc with environment variables
     cat << 'EOF' > ~/.bashrc
 # VS Code workspace trust environment variables
 export VSCODE_DISABLE_WORKSPACE_TRUST=true
 export DISABLE_WORKSPACE_TRUST=true
 EOF
-    
+
     echo -e "${GREEN}✓ Created ~/.bashrc with environment variables${NC}"
     echo -e "${YELLOW}Note: You'll need to restart your shell or run 'source ~/.bashrc' for these to take effect.${NC}"
   fi
-  
+
   # Set variables for current session
   export VSCODE_DISABLE_WORKSPACE_TRUST=true
   export DISABLE_WORKSPACE_TRUST=true
-  
+
   echo -e "${GREEN}✓ Set environment variables for current session${NC}"
 }
 

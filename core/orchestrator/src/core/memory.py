@@ -5,12 +5,12 @@ This module provides memory management functionality for storing and retrieving
 conversation history and other relevant information.
 """
 
-from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Any, Union
-from dataclasses import dataclass, field
 import logging
 import uuid
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -43,7 +43,6 @@ class MemoryProvider(ABC):
         Returns:
             The ID of the added item
         """
-        pass
 
     @abstractmethod
     def get_item(self, item_id: str) -> Optional[MemoryItem]:
@@ -56,7 +55,6 @@ class MemoryProvider(ABC):
         Returns:
             The memory item, or None if not found
         """
-        pass
 
     @abstractmethod
     def get_items(
@@ -78,7 +76,6 @@ class MemoryProvider(ABC):
         Returns:
             List of memory items
         """
-        pass
 
 
 class InMemoryProvider(MemoryProvider):

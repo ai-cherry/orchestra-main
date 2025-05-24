@@ -83,12 +83,14 @@ This uses Cloud Build to automatically build and deploy your application in one 
 For automated deployments, a GitHub Actions workflow is included in `.github/workflows/deploy-cloud-run.yml`.
 
 This workflow:
+
 - Builds and tests the application
 - Uses Workload Identity Federation for secure authentication
 - Deploys to staging or production environments
 - Includes verification steps
 
 To use it:
+
 1. Set up Workload Identity Federation for GitHub Actions
 2. Push to the main branch or manually trigger the workflow with environment selection
 
@@ -108,6 +110,7 @@ The deployment script supports environment-specific configuration:
 After deployment, your application will be available at the URL provided in the deployment output.
 
 You can test the application with:
+
 ```bash
 curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" YOUR_SERVICE_URL/health
 ```

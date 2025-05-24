@@ -8,16 +8,14 @@ context window to analyze files of any size.
 """
 
 import argparse
-import json
-import os
 import subprocess
 import sys
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
 
 # Import Google Cloud libraries with proper error handling
 try:
     from google.cloud import aiplatform
-    from vertexai.generative_models import GenerativeModel, GenerationConfig
+    from vertexai.generative_models import GenerationConfig, GenerativeModel
 except ImportError:
     print("Error: Required Google Cloud libraries not found.")
     print("Install with: pip install google-cloud-aiplatform")
@@ -228,7 +226,7 @@ def main():
         print("No matching files to analyze.")
         return 0
 
-    print(f"Running Gemini 2.5 Pro code analysis on files...")
+    print("Running Gemini 2.5 Pro code analysis on files...")
     print(f"Files: {','.join(staged_files)}")
 
     # Read file contents - no line limits with Gemini 2.5 Pro

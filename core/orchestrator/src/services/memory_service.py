@@ -5,10 +5,10 @@ This module provides a central point of access to the memory management system,
 abstracting the underlying implementation and providing dependency injection.
 """
 
+import asyncio
 import logging
 from functools import lru_cache
 from typing import List, Optional
-import asyncio
 
 # Import the settings instance directly
 from core.orchestrator.src.config.config import settings

@@ -4,7 +4,8 @@
 
 ### Problem: pytest command not found in GitHub Actions
 
-**Error Message**: 
+**Error Message**:
+
 ```
 /home/runner/work/_temp/xxx.sh: line 1: pytest: command not found
 Error: Process completed with exit code 127
@@ -17,6 +18,7 @@ Error: Process completed with exit code 127
 ### 1. Created Development Requirements File
 
 **File**: `requirements-dev.txt`
+
 - ✅ Added pytest and testing framework dependencies
 - ✅ Added code quality tools (black, flake8, pylint, mypy)
 - ✅ Added type checking support
@@ -25,6 +27,7 @@ Error: Process completed with exit code 127
 ### 2. Updated GitHub Actions Workflow
 
 **File**: `.github/workflows/main.yml`
+
 - ✅ Modified install step to install both `requirements.txt` and `requirements-dev.txt`
 - ✅ Improved test step with better error handling and feedback
 - ✅ Added verbose output for better debugging
@@ -32,6 +35,7 @@ Error: Process completed with exit code 127
 ### 3. Enhanced Test Infrastructure
 
 **Files Created/Updated**:
+
 - ✅ `tests/test_mvp_imports.py` - Basic import tests for MVP components
 - ✅ `pytest.ini` - Comprehensive pytest configuration
 - ✅ `tests/__init__.py` - Test package initialization
@@ -41,6 +45,7 @@ Error: Process completed with exit code 127
 ### GitHub Actions Workflow (.github/workflows/main.yml)
 
 **Before**:
+
 ```yaml
 - name: Install dependencies
   run: |
@@ -51,6 +56,7 @@ Error: Process completed with exit code 127
 ```
 
 **After**:
+
 ```yaml
 - name: Install dependencies
   run: |
@@ -59,7 +65,7 @@ Error: Process completed with exit code 127
 - name: Run unit tests & lint (fast-fail)
   run: |
     echo "Running tests..."
-    if [ -d tests ]; then 
+    if [ -d tests ]; then
       echo "Found tests directory, running pytest..."
       pytest -v --tb=short
     else
@@ -95,12 +101,14 @@ pre-commit==3.6.0
 ### Test Coverage
 
 **MVP Component Import Tests**:
+
 - ✅ `EnhancedVectorMemorySystem` and `ContextualMemory`
 - ✅ `DataAggregationOrchestrator` and `DataSourceConfig`
 - ✅ `EnhancedNaturalLanguageInterface` and `ConversationMode`
 - ✅ `OrchestraAIMVP` main integration class
 
 **Basic Functionality Tests**:
+
 - ✅ ConversationMode enum validation
 - ✅ DataSourceConfig object creation
 - ✅ Graceful handling of missing dependencies
@@ -170,4 +178,4 @@ Tests completed successfully
 
 ---
 
-*This fix ensures that the Orchestra AI MVP has a robust testing infrastructure that works both locally and in CI/CD pipelines.* 
+_This fix ensures that the Orchestra AI MVP has a robust testing infrastructure that works both locally and in CI/CD pipelines._

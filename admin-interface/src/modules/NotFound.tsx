@@ -1,6 +1,6 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { Button } from '../components/ui/button'
+import React from "react";
+import { Link } from "react-router-dom";
+import { Button } from "../components/ui/button";
 
 /**
  * NotFound component displayed when a route is not found
@@ -19,7 +19,7 @@ const NotFound = () => {
         </Button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default NotFound
+export default NotFound;

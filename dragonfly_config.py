@@ -12,11 +12,11 @@ import os
 # 1. Try to import local secrets (ignored by git)
 try:
     from dragonfly_secrets import (
-        DRAGONFLY_HOST,
-        DRAGONFLY_PORT,
-        DRAGONFLY_PASSWORD,
-        DRAGONFLY_DB_INDEX,
         DRAGONFLY_CONNECTION_URI,
+        DRAGONFLY_DB_INDEX,
+        DRAGONFLY_HOST,
+        DRAGONFLY_PASSWORD,
+        DRAGONFLY_PORT,
     )
 
     _SOURCE = "local"

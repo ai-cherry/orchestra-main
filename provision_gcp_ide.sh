@@ -73,14 +73,14 @@ echo "Vertex AI Workbench: https://console.cloud.google.com/vertex-ai/workbench/
 : '
 cleanup_resources() {
   echo "Cleaning up resources..."
-  
+
   # Delete Vertex AI Workbench notebook
   echo "Deleting Vertex AI Workbench notebook: ${NOTEBOOK_NAME}"
   gcloud notebooks instances delete ${NOTEBOOK_NAME} \
     --project=${PROJECT_ID} \
     --location=${ZONE} \
     --quiet
-  
+
   # Delete Cloud Workstation instance
   echo "Deleting Cloud Workstation instance: ${WORKSTATION_NAME}"
   gcloud beta workstations delete ${WORKSTATION_NAME} \
@@ -88,14 +88,14 @@ cleanup_resources() {
     --project=${PROJECT_ID} \
     --location=${LOCATION} \
     --quiet
-  
+
   # Delete Cloud Workstation config
   echo "Deleting Cloud Workstation config: ${WORKSTATION_CONFIG}"
   gcloud beta workstations configs delete ${WORKSTATION_CONFIG} \
     --project=${PROJECT_ID} \
     --location=${LOCATION} \
     --quiet
-  
+
   echo "Cleanup completed."
 }
 

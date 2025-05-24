@@ -7,14 +7,13 @@ It identifies common issues like unused imports, unused variables, duplicate cod
 and potential security vulnerabilities.
 """
 
-import os
-import sys
-import re
 import ast
-import importlib.util
+import os
+import re
+import sys
+from collections import defaultdict
 from pathlib import Path
-from collections import defaultdict, Counter
-from typing import Dict, List, Set, Tuple, Any, Optional, Union
+from typing import Dict, List, Optional, Set
 
 # ANSI color codes for terminal output
 GREEN = "\033[92m"
@@ -408,7 +407,7 @@ def main() -> int:
     if args.detailed:
         print_detailed_report(issues)
     else:
-        print(f"\nRun with --detailed for a full report of all issues")
+        print("\nRun with --detailed for a full report of all issues")
 
     return 1 if issues else 0
 

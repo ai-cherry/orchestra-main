@@ -13,13 +13,11 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Import endpoints
-from .endpoints import interaction
-from .endpoints import health
-from .endpoints import phidata_chat
-from .endpoints import monitoring
-from core.orchestrator.src.config.settings import get_settings
 from core.orchestrator.src.config.loader import load_persona_configs
+from core.orchestrator.src.config.settings import get_settings
+
+# Import endpoints
+from .endpoints import health, interaction, monitoring, phidata_chat
 
 # Configure logging
 logging.basicConfig(
@@ -108,9 +106,11 @@ app = FastAPI(
 )
 
 # Configure CORS
+allowed_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:8080").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For development - use settings.CORS_ORIGINS in production
+    allow_origins=allowed_origins,  # Use specific origins instead of ["*"]
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

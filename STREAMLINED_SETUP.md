@@ -5,6 +5,7 @@ This document provides instructions for setting up and deploying the Orchestra p
 ## Overview
 
 This implementation prioritizes:
+
 - **Performance**: Optimized for speed and efficiency
 - **Simplicity**: Streamlined setup and deployment
 - **Development Speed**: Reduced complexity for faster iterations
@@ -30,6 +31,7 @@ Run the setup script to prepare your development environment:
 ```
 
 This script:
+
 - Authenticates with GCP using your service account key
 - Installs dependencies using Poetry
 - Sets up environment variables
@@ -45,6 +47,7 @@ For quick GCP authentication:
 ```
 
 This script:
+
 - Authenticates with GCP using your service account key
 - Sets up gcloud configuration
 - Enables required GCP APIs
@@ -58,6 +61,7 @@ For one-command deployment:
 ```
 
 This script:
+
 - Authenticates with GCP
 - Enables required APIs
 - Deploys infrastructure with Terraform

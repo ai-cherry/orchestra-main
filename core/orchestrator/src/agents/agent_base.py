@@ -8,7 +8,7 @@ types of AI agents within the orchestration system.
 import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
 
@@ -159,7 +159,6 @@ class Agent(ABC):
             ValueError: If the input is invalid
             RuntimeError: If processing fails
         """
-        pass
 
     @abstractmethod
     def can_handle(self, context: AgentContext) -> float:
@@ -175,7 +174,6 @@ class Agent(ABC):
         Returns:
             A score between 0 and 1 indicating how well this agent can handle the context
         """
-        pass
 
     def initialize(self) -> None:
         """
@@ -184,7 +182,6 @@ class Agent(ABC):
         This method is called when the agent is first created.
         Override this to perform any necessary setup.
         """
-        pass
 
     def close(self) -> None:
         """
@@ -193,7 +190,6 @@ class Agent(ABC):
         This method is called when the agent is no longer needed.
         Override this to perform any necessary cleanup.
         """
-        pass
 
 
 class SimpleTextAgent(Agent):

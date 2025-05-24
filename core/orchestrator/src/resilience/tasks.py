@@ -5,16 +5,14 @@ This module provides integration with Google Cloud Tasks for scheduling
 retry attempts with exponential backoff for failed agent operations.
 """
 
-import logging
 import json
-import base64
-import time
-from typing import Dict, Any, Optional, Callable
-from datetime import datetime, timedelta
-import os
-from google.cloud import tasks_v2
-from google.protobuf import timestamp_pb2, duration_pb2
+import logging
 import threading
+from datetime import datetime, timedelta
+from typing import Any, Dict, Optional
+
+from google.cloud import tasks_v2
+from google.protobuf import timestamp_pb2
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -305,6 +303,7 @@ def get_task_queue_manager() -> TaskQueueManager:
         if _task_queue_manager is None:
             # Get settings from environment or config
             import os
+
             from core.orchestrator.src.config.config import get_settings
 
             settings = get_settings()
@@ -363,6 +362,7 @@ def get_fallback_handler() -> VertexAiFallbackHandler:
         if _fallback_handler is None:
             # Get service account from environment or config
             import os
+
             from core.orchestrator.src.config.config import get_settings
 
             settings = get_settings()

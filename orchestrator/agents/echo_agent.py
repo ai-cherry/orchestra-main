@@ -3,7 +3,7 @@ A simple echo agent for demonstration purposes.
 """
 
 import logging
-from typing import Dict, Any
+from typing import Any, Dict
 
 from packages.agents.base import BaseAgent
 

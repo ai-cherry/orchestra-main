@@ -8,14 +8,14 @@ agent_definitions:
     name: "Rental Market Research Specialist"
     description: "Agent specialized in rental market research using web search, article extraction, and data analysis tools"
     type: "phidata"
-    
+
     # Phidata-specific configuration
     phidata_agent_class: "agno.agent.Agent"
-    llm_ref: "gpt-4-turbo"  # Reference to Portkey-configured LLM
+    llm_ref: "gpt-4-turbo" # Reference to Portkey-configured LLM
     markdown: true
     show_tool_calls: true
     add_datetime_to_instructions: true
-    
+
     # Instructions focused on rental market data, regulations, pricing
     instructions:
       - "You are a rental market research specialist with expertise in analyzing rental markets, regulations, and pricing trends."
@@ -23,18 +23,18 @@ agent_definitions:
       - "Research local regulations, tenant rights, and landlord obligations."
       - "Provide data-driven recommendations based on location-specific market analysis."
       - "Focus on factual information and cite your sources when providing market data or regulatory information."
-    
+
     # PostgreSQL storage configuration
     storage:
       table_name: "phidata_rental_researcher_storage"
       schema_name: "llm"
-    
+
     # PGVector memory configuration
     memory:
       table_name: "phidata_rental_researcher_memory"
       schema_name: "llm"
-      vector_dimension: 768  # For VertexAI embeddings
-    
+      vector_dimension: 768 # For VertexAI embeddings
+
     # Tools configuration
     tools:
       # ExaTools for data analysis
@@ -42,37 +42,37 @@ agent_definitions:
         params:
           api_key: "${EVATOOLS_API_KEY}"
           max_results: 5
-      
+
       # DuckDuckGo Search
       - type: "agno.tools.search.DuckDuckGo"
         params:
           max_results: 5
-  
+
   # Slack Agent
   phidata_slack_agent:
     id: "phidata_slack_agent"
     name: "Slack Assistant"
     description: "Agent for integrating with Slack workspace and channels"
     type: "phidata"
-    
+
     # Phidata-specific configuration
     phidata_agent_class: "agno.agent.Agent"
-    llm_ref: "gpt-4-turbo"  # Reference to Portkey-configured LLM
+    llm_ref: "gpt-4-turbo" # Reference to Portkey-configured LLM
     markdown: true
     show_tool_calls: true
-    
+
     # Basic instructions
     instructions:
       - "You are a Slack workspace assistant that helps users interact with their Slack channels and workspaces."
       - "Help users post messages, retrieve channel information, and manage Slack workflows."
       - "Be concise and clear in your Slack message formatting, using Markdown appropriately."
       - "Always respect privacy and security when interacting with Slack data."
-    
+
     # PostgreSQL storage configuration (optional but included)
     storage:
       table_name: "phidata_slack_agent_storage"
       schema_name: "llm"
-    
+
     # Tools configuration
     tools:
       # SlackTools
@@ -81,22 +81,22 @@ agent_definitions:
           # Token configured via environment variable
           use_env_token: true
           env_var_name: "SLACK_TOKEN"
-  
+
   # RAG Agent
   phidata_rag_agent:
     id: "phidata_rag_agent"
     name: "Knowledge Base Assistant"
     description: "RAG agent with PDF knowledge base and vector search capabilities"
     type: "phidata"
-    
+
     # Phidata-specific configuration
     phidata_agent_class: "agno.agent.Agent"
-    llm_ref: "gpt-4-turbo"  # Reference to Portkey-configured LLM
+    llm_ref: "gpt-4-turbo" # Reference to Portkey-configured LLM
     markdown: true
     show_tool_calls: true
     search_knowledge: true
     read_chat_history: true
-    
+
     # Instructions to prioritize knowledge base
     instructions:
       - "You are a knowledge base assistant that helps users find and understand information from your knowledge base."
@@ -104,18 +104,18 @@ agent_definitions:
       - "When information is available in your knowledge base, cite the specific document source."
       - "For questions outside your knowledge base, clearly indicate that the information is not in your indexed documents."
       - "Provide factual, accurate responses based on the content of your knowledge base."
-    
+
     # PostgreSQL storage configuration
     storage:
       table_name: "phidata_rag_agent_storage"
       schema_name: "llm"
-    
+
     # PGVector memory configuration
     memory:
       table_name: "phidata_rag_agent_memory"
       schema_name: "llm"
-      vector_dimension: 768  # For VertexAI embeddings
-    
+      vector_dimension: 768 # For VertexAI embeddings
+
     # Knowledge base configuration
     knowledge_base:
       type: "agno.knowledge.PDFUrlKnowledgeBase"
@@ -126,19 +126,19 @@ agent_definitions:
           params:
             table_name: "orchestra_rag_docs"
             schema_name: "llm"
-        
+
         # Configure VertexAI embedder
         embedder:
           type: "agno.embeddings.VertexAiEmbedder"
-  
+
   # Python Agent
   phidata_python_agent:
     id: "phidata_python_agent"
     name: "Python Code Executor"
     description: "Agent that can safely execute Python code"
     type: "phidata"
-    
+
     # Phidata-specific configuration
     phidata_agent_class: "agno.agent.Agent"
-    llm_ref: "gpt-4-turbo"  # Reference to Portkey-configured LLM
+    llm_ref: "gpt-4-turbo" # Reference to Portkey-configured LLM
     markdown: true

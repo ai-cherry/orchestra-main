@@ -243,21 +243,21 @@ echo -e "${YELLOW}Verifying services...${NC}"
 # Check if MCP servers should auto-start
 if [ "${MCP_AUTO_START:-true}" = "true" ]; then
     echo -e "${YELLOW}Starting MCP servers...${NC}"
-    
+
     # Start MCP servers with proper logging
     mkdir -p logs/mcp
-    
+
     echo "Starting Cloud Run MCP server..."
     python ~/orchestra-main/mcp_server/servers/gcp_cloud_run_server.py \
         > logs/mcp/cloud_run.log 2>&1 &
     MCP_PIDS+=($!)
-    
+
     # Add other servers as they're implemented
     # echo "Starting Secret Manager MCP server..."
     # python ~/orchestra-main/mcp_server/servers/gcp_secret_manager_server.py \
     #     > logs/mcp/secrets.log 2>&1 &
     # MCP_PIDS+=($!)
-    
+
     echo -e "${GREEN}✓ MCP servers started${NC}"
 fi
 
@@ -343,4 +343,4 @@ echo ""
 echo -e "${YELLOW}⚠️  Note: Some MCP servers are pending implementation${NC}"
 echo "   Implemented: gcp_cloud_run_server.py"
 echo "   TODO: Secret Manager, DragonflyDB, Firestore, Qdrant, Orchestrator servers"
-echo "" 
+echo ""

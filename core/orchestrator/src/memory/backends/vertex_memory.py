@@ -7,11 +7,9 @@ This module provides a Vertex AI-based memory implementation for long-term seman
 import json
 import logging
 import time
-import uuid
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
-from google.cloud import aiplatform
-from google.cloud import firestore
+from google.cloud import aiplatform, firestore
 
 from core.orchestrator.src.memory.interface import MemoryInterface
 

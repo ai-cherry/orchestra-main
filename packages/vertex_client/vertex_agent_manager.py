@@ -5,19 +5,16 @@ This module provides functionality to interact with Vertex AI Agents for
 automation of infrastructure and operational tasks.
 """
 
-import os
 import json
 import logging
-from typing import Dict, List, Any, Optional, Union, Tuple
+import os
+from typing import Any, Dict, List, Optional
 
 # Google Cloud imports
 try:
     import vertexai
+    from google.cloud import aiplatform, pubsub_v1, run_v2, secretmanager
     from vertexai.preview import agent_builder
-    from google.cloud import aiplatform
-    from google.cloud import pubsub_v1
-    from google.cloud import run_v2
-    from google.cloud import secretmanager
 except ImportError:
     logging.warning(
         "Google Cloud libraries not found. Install with: pip install google-cloud-aiplatform google-cloud-pubsub google-cloud-run"
@@ -35,8 +32,8 @@ try:
 except ImportError:
     # Fallback for direct import
     try:
-        import sys
         import os.path
+        import sys
 
         sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
         from packages.shared.src.gcp.auth import (
@@ -370,28 +367,28 @@ logger = logging.getLogger(__name__)
 class {role.capitalize()}Agent:
     """
     {role.capitalize()} agent for {team_name.capitalize()} team.
-    
+
     This agent is responsible for {role.lower()} tasks in the
     {team_name.capitalize()} domain.
     """
-    
+
     def __init__(self):
         """Initialize the {role.capitalize()} agent."""
         self.domain = "{domain}"
         self.role = "{role}"
-    
+
     async def execute(self, context: AgentContext) -> AgentResponse:
         """
         Execute a task using this agent.
-        
+
         Args:
             context: Context information for the agent
-            
+
         Returns:
             Agent response
         """
         logger.info(f"{{self.role}} agent in {{self.domain}} team executing: {{context.task}}")
-        
+
         # Placeholder implementation
         return AgentResponse(
             success=True,
@@ -462,36 +459,36 @@ class TaskRequest(BaseModel):
 async def execute_task(request: TaskRequest):
     """Execute a task with the agent team."""
     logger.info(f"Received task: {{request.task}}")
-    
+
     # Create instances of the agents
     planner = PlannerAgent()
     doer = DoerAgent()
     reviewer = ReviewerAgent()
-    
+
     # Execute the task with each agent in sequence
     try:
         # First, plan the task
         from core.orchestrator.src.agents.agent_base import AgentContext
         context = AgentContext(task=request.task, data=request.context)
-        
+
         plan_response = await planner.execute(context)
         if not plan_response.success:
             return {{"success": False, "error": "Planning failed", "details": plan_response.message}}
-        
+
         # Update context with planning results
         context.data["plan"] = plan_response.data
-        
+
         # Execute the plan
         do_response = await doer.execute(context)
         if not do_response.success:
             return {{"success": False, "error": "Execution failed", "details": do_response.message}}
-        
+
         # Update context with execution results
         context.data["execution"] = do_response.data
-        
+
         # Review the results
         review_response = await reviewer.execute(context)
-        
+
         return {{
             "success": True,
             "result": {{

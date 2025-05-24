@@ -130,11 +130,11 @@ for server_file in "$PROJECT_ROOT/mcp_server/servers/"*.py; do
     if [ -f "$server_file" ]; then
         server_name=$(basename "$server_file" .py | sed 's/_server$//' | sed 's/_/-/g')
         log_info "Found server: $server_name ($server_file)"
-        
+
         if [ $SERVER_COUNT -gt 0 ]; then
             MCP_CONFIG+=","
         fi
-        
+
         MCP_CONFIG+="
     \"$server_name\": {
       \"command\": \"python\",
@@ -142,7 +142,7 @@ for server_file in "$PROJECT_ROOT/mcp_server/servers/"*.py; do
         \"$server_file\"
       ],
       \"env\": {"
-        
+
         # Add environment variables based on server type
         case "$server_name" in
             "gcp-cloud-run")
@@ -165,11 +165,11 @@ for server_file in "$PROJECT_ROOT/mcp_server/servers/"*.py; do
         \"GCP_PROJECT_ID\": \"\${GCP_PROJECT_ID}\""
                 ;;
         esac
-        
+
         MCP_CONFIG+="
       }
     }"
-        
+
         SERVER_COUNT=$((SERVER_COUNT + 1))
     fi
 done
@@ -334,22 +334,22 @@ check_server() {
 start_server() {
     local server_name=$1
     local server_path=$2
-    
+
     log_info "Starting $server_name server..."
-    
+
     # Check if server exists
     if ! check_server "$server_path"; then
         log_error "Cannot start $server_name - server file issues"
         return 1
     fi
-    
+
     # Start the server with proper error handling
     python "$server_path" >> "$LOG_FILE" 2>&1 &
     local pid=$!
-    
+
     # Give server a moment to start
     sleep 1
-    
+
     # Check if server is still running
     if kill -0 $pid 2>/dev/null; then
         MCP_PIDS+=($pid)
@@ -431,7 +431,7 @@ while true; do
         log_info "Cursor has been closed"
         break
     fi
-    
+
     # Check if servers are still running
     for i in "${!MCP_PIDS[@]}"; do
         local pid="${MCP_PIDS[$i]}"
@@ -447,7 +447,7 @@ while true; do
             fi
         fi
     done
-    
+
     sleep 5
 done
 EOF
@@ -512,4 +512,4 @@ echo '- "Deploy my app to Cloud Run staging"'
 echo '- "Get the database password from Secret Manager"'
 echo '- "Cache this result in DragonflyDB with key user:123"'
 echo ""
-log_info "Setup complete! Check the log file for details: $LOG_FILE" 
+log_info "Setup complete! Check the log file for details: $LOG_FILE"

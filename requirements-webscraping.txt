@@ -1,4 +1,4 @@
 # Web Scraping Requirements for Orchestra AI Project
 # This includes all dependencies for the web scraping AI agent team
 
--r requirements/webscraping.txt 
+-r requirements/webscraping.txt

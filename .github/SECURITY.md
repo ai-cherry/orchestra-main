@@ -17,6 +17,7 @@ This project follows secure practices for credential management:
 2. **Secret Manager**: All credentials are stored in Google Cloud Secret Manager and accessed securely at runtime.
 
 3. **False Positives**: Some files contain code that interacts with Secret Manager but do not contain actual secrets. These include:
+
    - `track_migration_progress.sh` - Contains functions to retrieve secrets from Secret Manager
    - Other utility scripts that check for the existence of secrets
 

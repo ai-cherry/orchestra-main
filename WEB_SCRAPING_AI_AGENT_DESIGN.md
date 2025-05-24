@@ -9,12 +9,14 @@ This document outlines the design of a world-class web scraping AI agent team fo
 ### Core Components
 
 1. **Web Scraping AI Agent Team** (`web_scraping_ai_agents.py`)
+
    - Specialized agent types for different scraping tasks
    - Redis-coordinated task distribution
    - Quality scoring and performance monitoring
    - Advanced scraping strategies (stealth, dynamic, bulk)
 
 2. **MCP Server Integration** (`mcp_server/servers/web_scraping_mcp_server.py`)
+
    - Native integration with Orchestra AI MCP framework
    - Tool-based interface for natural language requests
    - Resource monitoring and task status tracking
@@ -52,6 +54,7 @@ This document outlines the design of a world-class web scraping AI agent team fo
 ### Agent Types & Responsibilities
 
 #### 1. SearchSpecialistAgent
+
 - **Purpose**: Web search across multiple engines
 - **Strategies**: Fast static, dynamic content, stealth mode
 - **Capabilities**:
@@ -60,9 +63,10 @@ This document outlines the design of a world-class web scraping AI agent team fo
   - DuckDuckGo for privacy-focused searches
   - Custom search engine integration
 
-#### 2. ScraperSpecialistAgent  
+#### 2. ScraperSpecialistAgent
+
 - **Purpose**: Website content extraction
-- **Strategies**: 
+- **Strategies**:
   - `FAST_STATIC`: aiohttp + BeautifulSoup (fastest)
   - `DYNAMIC_CONTENT`: Playwright for JS-heavy sites
   - `STEALTH_MODE`: Zenrows for anti-detection
@@ -73,6 +77,7 @@ This document outlines the design of a world-class web scraping AI agent team fo
   - Structured data parsing (JSON-LD, microdata)
 
 #### 3. ContentAnalyzerAgent
+
 - **Purpose**: AI-powered content analysis
 - **Analysis Types**:
   - `summary`: AI-generated content summaries
@@ -84,16 +89,17 @@ This document outlines the design of a world-class web scraping AI agent team fo
 
 ## 🔧 Scraping Strategy Matrix
 
-| Strategy | Speed | Reliability | Detection Risk | Use Case |
-|----------|-------|-------------|----------------|----------|
-| `fast_static` | ⚡⚡⚡ | ⭐⭐⭐ | 🔴 High | Simple HTML pages |
-| `dynamic_content` | ⚡⚡ | ⭐⭐⭐⭐ | 🟡 Medium | JS-rendered content |
-| `stealth_mode` | ⚡ | ⭐⭐⭐⭐⭐ | 🟢 Low | Protected sites |
-| `bulk_extraction` | ⚡ | ⭐⭐⭐⭐ | 🟡 Medium | Large datasets |
+| Strategy          | Speed  | Reliability | Detection Risk | Use Case            |
+| ----------------- | ------ | ----------- | -------------- | ------------------- |
+| `fast_static`     | ⚡⚡⚡ | ⭐⭐⭐      | 🔴 High        | Simple HTML pages   |
+| `dynamic_content` | ⚡⚡   | ⭐⭐⭐⭐    | 🟡 Medium      | JS-rendered content |
+| `stealth_mode`    | ⚡     | ⭐⭐⭐⭐⭐  | 🟢 Low         | Protected sites     |
+| `bulk_extraction` | ⚡     | ⭐⭐⭐⭐    | 🟡 Medium      | Large datasets      |
 
 ## 🛠️ Tool Integration
 
 ### Zenrows Integration
+
 ```python
 # Anti-detection scraping with residential proxies
 proxy_params = {
@@ -105,6 +111,7 @@ proxy_params = {
 ```
 
 ### Apify Integration
+
 ```python
 # Scalable web automation
 actor_input = {
@@ -116,6 +123,7 @@ actor_input = {
 ```
 
 ### Playwright Integration
+
 ```python
 # Dynamic content handling
 await page.goto(url, wait_until='networkidle')
@@ -128,11 +136,13 @@ await page.evaluate(custom_javascript)
 ### MCP Server Capabilities
 
 #### Resources
+
 - `webscraping://agents/status` - Real-time agent performance
-- `webscraping://tasks/active` - Current task queue status  
+- `webscraping://tasks/active` - Current task queue status
 - `webscraping://results/recent` - Latest scraping results
 
 #### Tools
+
 - `web_search` - Multi-engine web search
 - `scrape_website` - Flexible website scraping
 - `analyze_content` - AI content analysis
@@ -178,23 +188,25 @@ contextual_memory = ContextualMemory(
 ## 📊 Quality & Performance Management
 
 ### Quality Scoring Algorithm
+
 ```python
 def calculate_quality_score(content: str, structured_data: Dict) -> float:
     score = 0.0
-    
+
     # Content length score (0-0.3)
     content_score = min(len(content) / 1000, 1.0) * 0.3
-    
-    # Structured data richness (0-0.4)  
+
+    # Structured data richness (0-0.4)
     data_score = min(len(structured_data) / 10, 1.0) * 0.4
-    
+
     # Content quality indicators (0-0.3)
     quality_indicators = check_content_quality(content)
-    
+
     return min(score, 1.0)
 ```
 
 ### Performance Monitoring
+
 - **Agent Success Rates**: Track completion rates per agent
 - **Processing Times**: Monitor scraping speed and optimization
 - **Quality Metrics**: Content richness and extraction accuracy
@@ -212,7 +224,7 @@ REDIS_DB=0
 
 # Agent Scaling
 SEARCH_AGENTS=2
-SCRAPER_AGENTS=3  
+SCRAPER_AGENTS=3
 ANALYZER_AGENTS=2
 
 # Tool API Keys
@@ -227,22 +239,31 @@ The system integrates seamlessly with your existing Cloud Run infrastructure:
 
 ```yaml
 # cloudbuild.yaml addition
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/$PROJECT_ID/web-scraping-agents:$COMMIT_SHA', '.']
-  
-- name: 'gcr.io/cloud-builders/gcloud'
-  args: [
-    'run', 'deploy', 'web-scraping-agents',
-    '--image', 'gcr.io/$PROJECT_ID/web-scraping-agents:$COMMIT_SHA',
-    '--region', 'us-central1',
-    '--platform', 'managed',
-    '--set-env-vars', 'REDIS_HOST=$_REDIS_HOST'
-  ]
+- name: "gcr.io/cloud-builders/docker"
+  args:
+    ["build", "-t", "gcr.io/$PROJECT_ID/web-scraping-agents:$COMMIT_SHA", "."]
+
+- name: "gcr.io/cloud-builders/gcloud"
+  args:
+    [
+      "run",
+      "deploy",
+      "web-scraping-agents",
+      "--image",
+      "gcr.io/$PROJECT_ID/web-scraping-agents:$COMMIT_SHA",
+      "--region",
+      "us-central1",
+      "--platform",
+      "managed",
+      "--set-env-vars",
+      "REDIS_HOST=$_REDIS_HOST",
+    ]
 ```
 
 ## 🎯 Use Cases & Examples
 
 ### 1. Competitive Intelligence
+
 ```python
 # Monitor competitor pricing
 await orchestrator.submit_task(ScrapingTask(
@@ -255,7 +276,8 @@ await orchestrator.submit_task(ScrapingTask(
 ))
 ```
 
-### 2. Content Aggregation  
+### 2. Content Aggregation
+
 ```python
 # Aggregate industry news
 search_task = ScrapingTask(
@@ -269,10 +291,11 @@ search_task = ScrapingTask(
 ```
 
 ### 3. Market Research
+
 ```python
 # Analyze social media sentiment
 analysis_task = ScrapingTask(
-    task_type="analyze", 
+    task_type="analyze",
     parameters={
         "content": scraped_social_posts,
         "analysis_type": "sentiment"
@@ -283,12 +306,14 @@ analysis_task = ScrapingTask(
 ## 🔐 Security & Ethics
 
 ### Anti-Detection Measures
+
 - **Rotating Proxies**: Zenrows residential proxy network
 - **Browser Fingerprinting**: Realistic browser profiles
 - **Rate Limiting**: Respectful request timing
 - **User Agent Rotation**: Diverse browser signatures
 
 ### Ethical Guidelines
+
 - **robots.txt Compliance**: Honor website scraping policies
 - **Rate Limiting**: Prevent server overload
 - **Data Privacy**: Handle personal data responsibly
@@ -297,20 +322,23 @@ analysis_task = ScrapingTask(
 ## 📈 Advanced Features
 
 ### Adaptive Learning
+
 - **Pattern Recognition**: Learn optimal strategies per site
 - **Quality Improvement**: Continuously enhance extraction rules
 - **Error Recovery**: Intelligent retry mechanisms
 - **Performance Optimization**: Self-tuning based on success rates
 
 ### Monitoring & Alerting
+
 - **Real-time Dashboards**: Agent performance visualization
-- **Error Notifications**: Proactive failure alerts  
+- **Error Notifications**: Proactive failure alerts
 - **Capacity Planning**: Automatic scaling recommendations
 - **Quality Reports**: Regular extraction accuracy assessments
 
 ## 🔄 Integration with Your Existing Systems
 
 ### Enhanced Vector Memory System
+
 ```python
 # Automatic memory integration
 async def store_scraping_result(result: ScrapingResult):
@@ -330,6 +358,7 @@ async def store_scraping_result(result: ScrapingResult):
 ```
 
 ### Data Source Integrations
+
 Your existing data source integrations (Gong, Salesforce, HubSpot, etc.) can now be supplemented with real-time web data:
 
 ```python
@@ -345,6 +374,7 @@ await data_aggregator.enrich_contact_data({
 ## 🚀 Getting Started
 
 ### 1. Installation
+
 ```bash
 # Install dependencies
 pip install -r requirements-webscraping.txt
@@ -354,14 +384,16 @@ playwright install chromium
 ```
 
 ### 2. Configuration
+
 ```bash
 # Set up environment variables
 export ZENROWS_API_KEY="your_key"
-export APIFY_API_KEY="your_key" 
+export APIFY_API_KEY="your_key"
 export REDIS_HOST="localhost"
 ```
 
 ### 3. Launch
+
 ```python
 # Initialize and start the system
 from web_scraping_ai_agents import WebScrapingOrchestrator
@@ -380,6 +412,7 @@ await orchestrator.start()
 ```
 
 ### 4. Integration with Orchestra AI
+
 ```bash
 # Start the MCP server
 python mcp_server/servers/web_scraping_mcp_server.py
@@ -388,13 +421,15 @@ python mcp_server/servers/web_scraping_mcp_server.py
 ## 🎯 Communication Architecture
 
 ### Task Flow
+
 ```
 Orchestra AI → MCP Server → Orchestrator → Agent Selection → Task Execution → Result Processing → Vector Memory Storage → Response to User
 ```
 
 ### Agent Communication
+
 - **Redis Pub/Sub**: Real-time coordination
-- **Task Queues**: Distributed work assignment  
+- **Task Queues**: Distributed work assignment
 - **Status Updates**: Performance monitoring
 - **Result Sharing**: Cross-agent collaboration
 
@@ -403,16 +438,19 @@ Orchestra AI → MCP Server → Orchestrator → Agent Selection → Task Execut
 ### Framework Selection Guide
 
 1. **Use Zenrows when**:
+
    - Target sites have anti-bot protection
    - Need residential IP addresses
    - Require JavaScript rendering with stealth
 
 2. **Use Apify when**:
+
    - Scraping large datasets (1000+ pages)
    - Need pre-built scrapers for popular sites
    - Require cloud-based scaling
 
 3. **Use Playwright when**:
+
    - Sites require complex interactions
    - Need screenshots or PDFs
    - Custom JavaScript execution required
@@ -432,17 +470,50 @@ Orchestra AI → MCP Server → Orchestrator → Agent Selection → Task Execut
 ## 🔮 Future Enhancements
 
 ### Planned Features
+
 - **Machine Learning Models**: Custom extraction algorithms
 - **Visual Recognition**: Image and video content analysis
 - **API Simulation**: Reverse-engineer private APIs
 - **Real-time Monitoring**: Live website change detection
 
 ### Advanced Integrations
+
 - **Browser Automation**: Full user journey simulation
 - **CAPTCHA Solving**: Automated challenge resolution
 - **Multi-language Support**: Global content extraction
 - **Mobile Scraping**: App and mobile site handling
 
+## Setup
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone <repo-url>
+   cd orchestra-main
+   ```
+
+2. **Create and activate a Python 3.11+ virtual environment:**
+
+   ```bash
+   python3.11 -m venv .venv
+   source .venv/bin/activate
+   pip install --upgrade pip
+   ```
+
+3. **Install web scraping dependencies:**
+   ```bash
+   pip install -r requirements-webscraping.txt
+   ```
+
+## Requirements Structure
+
+- `requirements/base.txt`: Core dependencies
+- `requirements/webscraping.txt`: Web scraping agent dependencies
+- `requirements/development.txt`: Dev/test/lint tools
+- `requirements/production.txt`: Production-only extras
+
+All environments inherit from `base.txt` for consistency. Poetry is not used.
+
 ---
 
-This web scraping AI agent team provides Orchestra AI with world-class data acquisition capabilities, seamlessly integrated with your existing architecture while maintaining the highest standards of performance, reliability, and ethical operation. 
+This web scraping AI agent team provides Orchestra AI with world-class data acquisition capabilities, seamlessly integrated with your existing architecture while maintaining the highest standards of performance, reliability, and ethical operation.
