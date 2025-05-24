@@ -1,7 +1,8 @@
 # Web Framework
+# Flask is included for legacy endpoints only; prefer FastAPI for all new development.
 Flask==3.1.1
-flask-cors==4.0.0
-gunicorn==21.2.0
+# flask-cors removed: deprecated/vulnerable, use FastAPI/Starlette CORS middleware instead.
+# gunicorn removed: deprecated/vulnerable, use uvicorn or hypercorn for ASGI apps.
 fastapi==0.115.12
 uvicorn==0.34.2
 
@@ -32,8 +33,11 @@ httpx==0.28.1
 aiohttp==3.11.18
 tenacity==8.2.3
 
+# Monitoring
+prometheus_client==0.20.0
+
 # Development (move to requirements-dev.txt in production)
 pytest==8.3.5
 black==25.1.0
 flake8==7.2.0
-isort==5.13.2 
+isort==5.13.2
