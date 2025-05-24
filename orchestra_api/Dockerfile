@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y gcc build-essential && rm -rf /var/lib/
 WORKDIR /app
 
 # Copy only requirements files first for Docker layer caching
-COPY ../requirements/base.txt ./requirements.txt
+COPY requirements.txt ./requirements.txt
 
 # Install Python dependencies using pip
 RUN pip install --no-cache-dir --upgrade pip \

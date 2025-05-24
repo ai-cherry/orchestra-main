@@ -1,16 +1,4 @@
-# Development dependencies
--r requirements.txt
+# Development Requirements for Orchestra AI Project
+# This includes testing, linting, and development tools
 
-# Testing
-pytest>=7.0.0,<8.0.0
-
-# Linting
-black>=23.0.0,<24.0.0
-flake8>=6.0.0,<7.0.0
-
-# Pulumi (if tests need to interact with Pulumi project structure, though not typical for unit tests)
-# pulumi>=3.0.0,<4.0.0
-
-# Code quality
-isort>=5.12.0  # Added for import sorting
-ruff>=0.0.292  # Added for comprehensive Python linting
+-r requirements/development.txt 

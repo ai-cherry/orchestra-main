@@ -98,9 +98,16 @@ class OrchestraAIMVP:
         logger.info("🚀 Orchestra AI MVP fully initialized and ready!")
 
     async def _setup_data_source_configs(self) -> None:
-        """Setup configurations for all data sources."""
-        
-        # Gong.io configuration
+        """
+        Setup configurations for all data sources.
+
+        Each integration requires specific environment variables to be set.
+        If any required variable is missing, the integration will be skipped and a warning will be logged.
+        See .env.template for required variable names.
+        """
+
+        # --- Gong.io ---
+        # Requires: GONG_API_KEY
         if os.getenv("GONG_API_KEY"):
             self.configs["gong"] = DataSourceConfig(
                 name="gong",
@@ -109,8 +116,11 @@ class OrchestraAIMVP:
                 rate_limit=0.5  # 0.5 requests per second
             )
             logger.info("✓ Gong.io configuration loaded")
-        
-        # Salesforce configuration
+        else:
+            logger.warning("Gong.io integration skipped: GONG_API_KEY not set.")
+
+        # --- Salesforce ---
+        # Requires: SALESFORCE_CLIENT_ID, SALESFORCE_CLIENT_SECRET
         if os.getenv("SALESFORCE_CLIENT_ID") and os.getenv("SALESFORCE_CLIENT_SECRET"):
             self.configs["salesforce"] = DataSourceConfig(
                 name="salesforce",
@@ -120,8 +130,11 @@ class OrchestraAIMVP:
                 rate_limit=2.0  # 2 requests per second
             )
             logger.info("✓ Salesforce configuration loaded")
-        
-        # HubSpot configuration
+        else:
+            logger.warning("Salesforce integration skipped: SALESFORCE_CLIENT_ID or SALESFORCE_CLIENT_SECRET not set.")
+
+        # --- HubSpot ---
+        # Requires: HUBSPOT_API_KEY
         if os.getenv("HUBSPOT_API_KEY"):
             self.configs["hubspot"] = DataSourceConfig(
                 name="hubspot",
@@ -130,18 +143,24 @@ class OrchestraAIMVP:
                 rate_limit=10.0  # 10 requests per second
             )
             logger.info("✓ HubSpot configuration loaded")
-        
-        # Slack configuration
-        if os.getenv("SLACK_BOT_TOKEN"):
+        else:
+            logger.warning("HubSpot integration skipped: HUBSPOT_API_KEY not set.")
+
+        # --- Slack ---
+        # Requires: SLACK_API_KEY
+        if os.getenv("SLACK_API_KEY"):
             self.configs["slack"] = DataSourceConfig(
                 name="slack",
-                api_key=os.getenv("SLACK_BOT_TOKEN"),
+                api_key=os.getenv("SLACK_API_KEY"),
                 base_url="https://slack.com/api",
                 rate_limit=1.0  # 1 request per second
             )
             logger.info("✓ Slack configuration loaded")
-        
-        # Looker configuration
+        else:
+            logger.warning("Slack integration skipped: SLACK_API_KEY not set.")
+
+        # --- Looker ---
+        # Requires: LOOKER_CLIENT_ID, LOOKER_CLIENT_SECRET
         if os.getenv("LOOKER_CLIENT_ID") and os.getenv("LOOKER_CLIENT_SECRET"):
             self.configs["looker"] = DataSourceConfig(
                 name="looker",
@@ -151,7 +170,9 @@ class OrchestraAIMVP:
                 rate_limit=5.0  # 5 requests per second
             )
             logger.info("✓ Looker configuration loaded")
-        
+        else:
+            logger.warning("Looker integration skipped: LOOKER_CLIENT_ID or LOOKER_CLIENT_SECRET not set.")
+
         total_sources = len(self.configs)
         logger.info(f"✓ Configured {total_sources} data sources")
 

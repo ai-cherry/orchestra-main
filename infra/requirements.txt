@@ -1,0 +1,10 @@
+# Pulumi core infrastructure dependencies
+pulumi>=3.0.0
+pulumi_gcp>=6.0.0
+
+# Vector database SDKs for dynamic provisioning and integration
+pinecone-client>=3.0.0
+weaviate-client>=4.0.0
+
+# (Optional) If you use dotenv elsewhere in infra scripts, uncomment below
+# python-dotenv>=1.0.0

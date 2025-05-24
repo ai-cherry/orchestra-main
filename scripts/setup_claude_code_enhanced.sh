@@ -293,7 +293,7 @@ cat > "$PROJECT_ROOT/scripts/mcp/deploy_to_cloud_run.sh" << 'EOF'
 #!/bin/bash
 # Helper script to deploy services via MCP
 
-SERVICE_NAME="${1:-orchestra-main-service}"
+SERVICE_NAME="${1:-ai-orchestra-minimal}"
 IMAGE="${2:-gcr.io/${GCP_PROJECT_ID}/${SERVICE_NAME}:latest}"
 MEMORY="${3:-2Gi}"
 

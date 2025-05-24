@@ -34,7 +34,7 @@
       }
     }
   },
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y curl && curl -sSL https://install.python-poetry.org | python3 - && chmod +x ./.devcontainer/setup_env.sh && echo 'Dev container creation complete. Poetry installed and setup script made executable.'",
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y curl && python -m pip install --upgrade pip && pip install -r requirements-dev.txt && chmod +x ./.devcontainer/setup_env.sh && echo 'Dev container creation complete. Dependencies installed and setup script made executable.'",
   "postStartCommand": "bash ./.devcontainer/setup_env.sh && source /tmp/devcontainer_exports.sh && echo '\n# Load Devcontainer Environment Variables\nsource /tmp/devcontainer_exports.sh' >> ~/.bashrc && echo '\n# Load Devcontainer Environment Variables\nsource /tmp/devcontainer_exports.sh' >> ~/.bash_profile && echo 'Secrets sourced and environment configured. Check /tmp/devcontainer_exports.sh for details.'",
   "remoteEnv": {
     "PATH": "${containerEnv:PATH}:${containerEnv:HOME}/.local/bin"

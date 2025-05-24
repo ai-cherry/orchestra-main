@@ -57,6 +57,6 @@ USER appuser
 # Expose the port (for documentation; Cloud Run uses $PORT)
 EXPOSE 8080
 
-# Start the app with Gunicorn
-# exec ensures Gunicorn replaces the shell, correctly handling signals
-CMD exec gunicorn --bind 0.0.0.0:${PORT:-8080} app:app
+# Start the app with uvicorn (FastAPI ASGI server)
+# exec ensures uvicorn replaces the shell, correctly handling signals
+CMD exec uvicorn app:app --host 0.0.0.0 --port ${PORT:-8080}
