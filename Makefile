@@ -114,4 +114,44 @@ dev-start: env-setup config-validate start-and-validate
 deploy-validate: config-validate health-check
 	@echo "✅ Ready for deployment"
 
+# AI Code Review targets
+.PHONY: ai-review ai-review-changes ai-review-scan
+
+# Review AI-generated code changes
+ai-review-changes:
+	@echo "🤖 Reviewing AI code changes..."
+	python scripts/ai_code_reviewer.py --check-changes
+
+# Full project scan for AI anti-patterns  
+ai-review-scan:
+	@echo "🔍 Scanning project for AI anti-patterns..."
+	python scripts/ai_code_reviewer.py --full-scan
+
+# Review specific file
+ai-review:
+	@echo "📄 Reviewing file: $(FILE)"
+	@if [ -z "$(FILE)" ]; then echo "Usage: make ai-review FILE=path/to/file.py"; exit 1; fi
+	python scripts/ai_code_reviewer.py --check-file $(FILE)
+
+# Pre-AI coding preparation
+before-ai-coding:
+	@echo "🎯 Preparing for AI coding session..."
+	@echo "Creating checkpoint..."
+	@git add -A && git commit -m "checkpoint: before AI coding session" || true
+	@echo "Documenting current state..."
+	@python scripts/orchestra.py services status > .ai-session/pre-status.txt || true
+	@pip freeze > .ai-session/pre-requirements.txt || true
+	@echo "Current tool inventory:"
+	@ls -la scripts/*.py | grep -v __pycache__
+	@echo ""
+	@echo "Ready for AI coding! Remember:"
+	@echo "- Python 3.10 (not 3.11+)"
+	@echo "- pip/venv only (no Poetry/Docker)"
+	@echo "- Check scripts/ for existing tools"
+	@echo "- Keep it simple!"
+
+# Post-AI coding validation
+after-ai-coding: ai-review-changes validate
+	@echo "✅ AI coding session validated"
+
 .PHONY: venv-check deps-check outdated install update lint format type-check test pre-commit-run validate

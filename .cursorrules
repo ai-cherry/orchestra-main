@@ -1,0 +1,34 @@
+# Orchestra AI Project Rules for Cursor
+
+## Core Principles
+- Python 3.10 (NOT 3.11+) - system constraint
+- pip/venv ONLY - NO Poetry, Docker, Pipenv
+- Simple > Complex
+- Performance > Security (within reason)
+- Existing patterns > New patterns
+
+## Project Structure
+- Automation tools: scripts/
+- Config validation: scripts/config_validator.py
+- Health monitoring: scripts/health_monitor.py  
+- Unified CLI: scripts/orchestra.py
+- Requirements: requirements/base.txt
+
+## Coding Standards
+- subprocess.run() NOT os.system()
+- Type hints for all functions
+- Google-style docstrings
+- Black formatting
+
+## Before Creating New Code
+1. Check if functionality exists in scripts/
+2. Use existing patterns
+3. Don't add heavy dependencies
+4. Keep it simple
+
+## Forbidden
+- Docker/docker-compose files
+- Poetry/Pipfile
+- Python 3.11+ features (match/case, tomllib)
+- Complex patterns (metaclasses, multiple inheritance)
+- Heavy dependencies for simple tasks 
