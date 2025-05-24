@@ -12,12 +12,16 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 from shared.memory.unified_memory import UnifiedMemory, MemoryItem
+from orchestra_api.routers import data_ingestion
 
 app = FastAPI(
     title="Orchestra API",
     description="Async, high-performance API for AI/data orchestration on GCP",
     version="0.1.0",
 )
+
+# Include routers
+app.include_router(data_ingestion.router)
 
 # Initialize unified memory (env-driven config)
 memory = UnifiedMemory(

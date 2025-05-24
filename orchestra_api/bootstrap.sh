@@ -1,4 +1,4 @@
-#!/bin/bash
+as#!/bin/bash
 # Orchestra API Bootstrap Script
 # One-command setup for local/cloud development using pip, requirements.txt, and pip-tools.
 # Elegantly integrates dependency management, pre-commit, and secret sync with GCP Secret Manager.
