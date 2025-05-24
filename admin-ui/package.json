@@ -12,22 +12,22 @@
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.15.15",
-    "@mui/material": "^5.15.15",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.23.0",
-    "zustand": "^4.4.7",
-    "socket.io-client": "^4.7.5"
+    "@mui/icons-material": "^7.1.0",
+    "@mui/material": "^7.1.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.6.0",
+    "socket.io-client": "^4.7.5",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
-    "@types/node": "^20.11.30",
-    "@types/react": "^18.2.62",
-    "@types/react-dom": "^18.2.19",
+    "@types/node": "^22.15.21",
+    "@types/react": "^19.1.5",
+    "@types/react-dom": "^19.1.5",
     "@types/react-router-dom": "^5.3.3",
+    "eslint": "^9.27.0",
+    "eslint-plugin-react": "^7.34.1",
     "typescript": "^5.4.5",
-    "vite": "^5.2.8",
-    "eslint": "^8.57.0",
-    "eslint-plugin-react": "^7.34.1"
+    "vite": "^6.3.5"
   }
 }
