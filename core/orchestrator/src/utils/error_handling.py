@@ -128,9 +128,7 @@ def handle_error(
         propagate_types = [OrchestratorError]
 
     # Determine if we should propagate this error
-    should_propagate = any(
-        isinstance(error, error_type) for error_type in propagate_types
-    )
+    should_propagate = any(isinstance(error, error_type) for error_type in propagate_types)
 
     # Always log if requested or if we're going to propagate
     if always_log or should_propagate:
@@ -195,9 +193,7 @@ def error_boundary(
                         try:
                             context = context_provider(*args, **kwargs)
                         except Exception as context_error:
-                            logger.warning(
-                                f"Error in context provider: {context_error}"
-                            )
+                            logger.warning(f"Error in context provider: {context_error}")
 
                     # Add function name to context
                     if context is None:
@@ -230,9 +226,7 @@ def error_boundary(
                         try:
                             context = context_provider(*args, **kwargs)
                         except Exception as context_error:
-                            logger.warning(
-                                f"Error in context provider: {context_error}"
-                            )
+                            logger.warning(f"Error in context provider: {context_error}")
 
                     # Add function name to context
                     if context is None:
@@ -319,9 +313,7 @@ def retry(
                         last_exception = e
 
                         # Check if this exception should be retried
-                        should_retry = any(
-                            isinstance(e, exc_type) for exc_type in retry_exceptions
-                        )
+                        should_retry = any(isinstance(e, exc_type) for exc_type in retry_exceptions)
 
                         if not should_retry or attempt >= max_attempts:
                             # Don't retry - either wrong exception type or too many attempts
@@ -378,9 +370,7 @@ def retry(
                         last_exception = e
 
                         # Check if this exception should be retried
-                        should_retry = any(
-                            isinstance(e, exc_type) for exc_type in retry_exceptions
-                        )
+                        should_retry = any(isinstance(e, exc_type) for exc_type in retry_exceptions)
 
                         if not should_retry or attempt >= max_attempts:
                             # Don't retry - either wrong exception type or too many attempts
@@ -451,9 +441,7 @@ def convert_exceptions(
                                 try:
                                     context = context_provider(*args, **kwargs)
                                 except Exception as context_error:
-                                    logger.warning(
-                                        f"Error in context provider: {context_error}"
-                                    )
+                                    logger.warning(f"Error in context provider: {context_error}")
 
                             # Add function name to context
                             if context is None:
@@ -494,9 +482,7 @@ def convert_exceptions(
                                 try:
                                     context = context_provider(*args, **kwargs)
                                 except Exception as context_error:
-                                    logger.warning(
-                                        f"Error in context provider: {context_error}"
-                                    )
+                                    logger.warning(f"Error in context provider: {context_error}")
 
                             # Add function name to context
                             if context is None:

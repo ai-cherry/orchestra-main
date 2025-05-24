@@ -16,9 +16,7 @@ class AIOrchestrator:
         """Smart routing between AI providers"""
         try:
             # First try Gemini with full codebase context
-            return self.gemini.generate_content(
-                f"Consider current GCP project cherry-ai-project: {prompt}"
-            ).text
+            return self.gemini.generate_content(f"Consider current GCP project cherry-ai-project: {prompt}").text
         except Exception:
             # Fallback to Vertex AI
             return self.vertex_llm.predict(

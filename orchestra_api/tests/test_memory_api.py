@@ -1,7 +1,8 @@
-tfrom fastapi.testclient import TestClient
+from fastapi.testclient import TestClient
 from orchestra_api.main import app
 
 client = TestClient(app)
+
 
 def test_health_check():
     resp = client.get("/health")
@@ -9,6 +10,7 @@ def test_health_check():
     assert "dragonfly" in resp.json()
     assert "qdrant" in resp.json()
     assert "firestore" in resp.json()
+
 
 def test_create_and_get_memory():
     payload = {

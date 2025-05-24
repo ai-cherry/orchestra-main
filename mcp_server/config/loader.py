@@ -71,9 +71,7 @@ def load_config_from_env() -> Dict[str, Any]:
         storage_config["type"] = os.environ["MCP_STORAGE_TYPE"]
 
     if "MCP_STORAGE_CONNECTION_STRING" in os.environ:
-        storage_config["connection_string"] = os.environ[
-            "MCP_STORAGE_CONNECTION_STRING"
-        ]
+        storage_config["connection_string"] = os.environ["MCP_STORAGE_CONNECTION_STRING"]
 
     if "MCP_STORAGE_MAX_ENTRIES" in os.environ:
         storage_config["max_entries"] = int(os.environ["MCP_STORAGE_MAX_ENTRIES"])
@@ -98,14 +96,10 @@ def load_config_from_env() -> Dict[str, Any]:
         copilot_config["token_limit"] = int(os.environ["MCP_COPILOT_TOKEN_LIMIT"])
 
     if "MCP_COPILOT_VSCODE_EXTENSION_PATH" in os.environ:
-        copilot_config["vscode_extension_path"] = os.environ[
-            "MCP_COPILOT_VSCODE_EXTENSION_PATH"
-        ]
+        copilot_config["vscode_extension_path"] = os.environ["MCP_COPILOT_VSCODE_EXTENSION_PATH"]
 
     if "MCP_COPILOT_USE_OPENAI_FALLBACK" in os.environ:
-        copilot_config["use_openai_fallback"] = (
-            os.environ["MCP_COPILOT_USE_OPENAI_FALLBACK"].lower() == "true"
-        )
+        copilot_config["use_openai_fallback"] = os.environ["MCP_COPILOT_USE_OPENAI_FALLBACK"].lower() == "true"
 
     if "MCP_COPILOT_OPENAI_MODEL" in os.environ:
         copilot_config["openai_model"] = os.environ["MCP_COPILOT_OPENAI_MODEL"]
@@ -138,9 +132,7 @@ def load_config_from_env() -> Dict[str, Any]:
     return config
 
 
-def merge_configs(
-    base_config: Dict[str, Any], override_config: Dict[str, Any]
-) -> Dict[str, Any]:
+def merge_configs(base_config: Dict[str, Any], override_config: Dict[str, Any]) -> Dict[str, Any]:
     """
     Merge two configurations, with override_config taking precedence.
 
@@ -215,9 +207,7 @@ def load_config(config_path: Optional[str] = None) -> MCPConfig:
     try:
         config = MCPConfig(**config_dict)
         logger.info("Configuration loaded and validated successfully")
-        logger.debug(
-            f"Final config: {config.dict(exclude={'copilot': {'api_key'}, 'gemini': {'api_key'}})}"
-        )
+        logger.debug(f"Final config: {config.dict(exclude={'copilot': {'api_key'}, 'gemini': {'api_key'}})}")
         return config
     except Exception as e:
         logger.error(f"Error validating configuration: {e}")

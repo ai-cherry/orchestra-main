@@ -13,6 +13,7 @@ from typing import Any, Callable, Dict, Optional
 
 from .base_processor import BaseProcessor, StorageAdapter
 
+
 class IngestionPipeline:
     """
     Orchestrates data ingestion from multiple sources and formats.
@@ -44,12 +45,7 @@ class IngestionPipeline:
         self.error_handler = error_handler
         self.progress_cb = progress_cb
 
-    async def ingest(
-        self,
-        source_type: str,
-        source: Any,
-        **kwargs
-    ) -> int:
+    async def ingest(self, source_type: str, source: Any, **kwargs) -> int:
         """
         Ingests data from the specified source using the appropriate processor.
 
@@ -70,7 +66,7 @@ class IngestionPipeline:
                 enrich_fn=self.enrichment_fn,
                 validate_fn=self.validation_fn,
                 progress_cb=self.progress_cb,
-                **kwargs
+                **kwargs,
             )
             return total
         except Exception as e:

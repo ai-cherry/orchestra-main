@@ -125,9 +125,7 @@ class MCPApplication:
 
         return await self.memory_manager.get_memory(key, tool)
 
-    async def execute_prompt(
-        self, prompt: str, mode: str = "chat", tool: Optional[str] = None
-    ) -> Dict[str, Any]:
+    async def execute_prompt(self, prompt: str, mode: str = "chat", tool: Optional[str] = None) -> Dict[str, Any]:
         """Execute a prompt with a specific tool or all tools."""
         if not self.initialized:
             logger.error("MCP application not initialized")
@@ -235,9 +233,7 @@ class MCPApplication:
 
         # Get architecture analysis from Copilot
         architecture_copilot = await self.get_memory("architecture_analysis", "copilot")
-        print(
-            f"'architecture_analysis' from Copilot: {json.dumps(architecture_copilot.content, indent=2)}"
-        )
+        print(f"'architecture_analysis' from Copilot: {json.dumps(architecture_copilot.content, indent=2)}")
 
         # Step 4: Execute prompts with different tools
         print("\nExecuting prompts with different tools...")
@@ -278,9 +274,7 @@ async def main_async(config_path: Optional[str] = None):
         logging.getLogger().setLevel(config.log_level)
 
         # Check for API keys
-        has_copilot_key = (
-            bool(config.copilot.api_key) if config.copilot.enabled else False
-        )
+        has_copilot_key = bool(config.copilot.api_key) if config.copilot.enabled else False
         has_gemini_key = bool(config.gemini.api_key) if config.gemini.enabled else False
 
         if config.debug:

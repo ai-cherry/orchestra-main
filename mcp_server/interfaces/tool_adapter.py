@@ -48,9 +48,7 @@ class IToolAdapter(ABC):
         pass
 
     @abstractmethod
-    async def execute(
-        self, mode: str, prompt: str, context: Optional[Dict[str, Any]] = None
-    ) -> Optional[str]:
+    async def execute(self, mode: str, prompt: str, context: Optional[Dict[str, Any]] = None) -> Optional[str]:
         """Execute a prompt with the tool."""
         pass
 
@@ -105,9 +103,7 @@ class CopilotAdapter(IToolAdapter):
         # This is a placeholder implementation
         return True
 
-    async def execute(
-        self, mode: str, prompt: str, context: Optional[Dict[str, Any]] = None
-    ) -> Optional[str]:
+    async def execute(self, mode: str, prompt: str, context: Optional[Dict[str, Any]] = None) -> Optional[str]:
         """Execute a prompt with Copilot."""
         # Execute using the Copilot API
         # This is a placeholder implementation
@@ -204,9 +200,7 @@ class GeminiAdapter(IToolAdapter):
         # This is a placeholder implementation
         return True
 
-    async def execute(
-        self, mode: str, prompt: str, context: Optional[Dict[str, Any]] = None
-    ) -> Optional[str]:
+    async def execute(self, mode: str, prompt: str, context: Optional[Dict[str, Any]] = None) -> Optional[str]:
         """Execute a prompt with Gemini."""
         if not self.initialized:
             return None

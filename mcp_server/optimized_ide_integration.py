@@ -55,9 +55,7 @@ class LightweightIDEContext:
         if file_path in self.open_files:
             del self.open_files[file_path]
             if self.active_file == file_path:
-                self.active_file = (
-                    next(iter(self.open_files.keys())) if self.open_files else None
-                )
+                self.active_file = next(iter(self.open_files.keys())) if self.open_files else None
             logger.info(f"Closed file: {file_path}")
 
     def update_cursor(self, file_path: str, line: int, column: int) -> None:

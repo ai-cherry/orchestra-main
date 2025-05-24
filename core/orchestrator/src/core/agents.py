@@ -121,9 +121,7 @@ class SimpleTextAgent(Agent):
 
         response_text = f"As {name}, I acknowledge your message: '{context.user_input}'"
 
-        return AgentResponse(
-            text=response_text, confidence=0.8, metadata={"agent_type": self.agent_type}
-        )
+        return AgentResponse(text=response_text, confidence=0.8, metadata={"agent_type": self.agent_type})
 
 
 class PersonaAwareAgent(SimpleTextAgent):
@@ -152,10 +150,7 @@ class PersonaAwareAgent(SimpleTextAgent):
         persona = context.persona
         traits_str = ", ".join(persona.traits[:3]) if persona.traits else "helpful"
 
-        response_text = (
-            f"As {persona.name}, I'm being {traits_str} in my response to: "
-            f"'{context.user_input}'"
-        )
+        response_text = f"As {persona.name}, I'm being {traits_str} in my response to: " f"'{context.user_input}'"
 
         return AgentResponse(
             text=response_text,

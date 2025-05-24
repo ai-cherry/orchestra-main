@@ -63,36 +63,26 @@ class CredentialsManager(BaseAgent):
         op_service_token = os.environ.get("OP_SERVICE_ACCOUNT_TOKEN")
         if op_service_token:
             try:
-                self.onepassword_agent = OnePasswordAgent(
-                    service_account_token=op_service_token
-                )
+                self.onepassword_agent = OnePasswordAgent(service_account_token=op_service_token)
                 await self.onepassword_agent.initialize()
 
                 if self.onepassword_agent.authenticated:
                     self.providers["1password"] = self.onepassword_agent
                     self.default_provider = "1password"
-                    logger.info(
-                        "1Password credential provider initialized successfully"
-                    )
+                    logger.info("1Password credential provider initialized successfully")
                 else:
-                    logger.warning(
-                        "1Password authentication failed, provider not registered"
-                    )
+                    logger.warning("1Password authentication failed, provider not registered")
             except Exception as e:
                 logger.error(f"Failed to initialize 1Password provider: {str(e)}")
         else:
-            logger.info(
-                "1Password service token not found in environment, provider not registered"
-            )
+            logger.info("1Password service token not found in environment, provider not registered")
 
         # Could add other credential providers here (AWS Secrets Manager, HashiCorp Vault, etc.)
 
         if not self.providers:
             logger.warning("No credential providers were initialized")
         else:
-            logger.info(
-                f"Credentials Manager initialized with providers: {', '.join(self.providers.keys())}"
-            )
+            logger.info(f"Credentials Manager initialized with providers: {', '.join(self.providers.keys())}")
 
     async def run(self, context: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -148,9 +138,7 @@ class CredentialsManager(BaseAgent):
             if not credential_name:
                 return {"status": "error", "message": "No credential name provided."}
 
-            result = await self.check_credential_exists(
-                credential_name, provider=provider, vault=context.get("vault")
-            )
+            result = await self.check_credential_exists(credential_name, provider=provider, vault=context.get("vault"))
 
             return {
                 "status": "success",
@@ -219,17 +207,13 @@ class CredentialsManager(BaseAgent):
         provider_agent = self.providers[provider]
 
         if provider == "1password":
-            return await provider_agent.get_credential(
-                credential_name, field=field, vault=vault
-            )
+            return await provider_agent.get_credential(credential_name, field=field, vault=vault)
 
         # Add handlers for other providers as needed
 
         return None
 
-    async def check_credential_exists(
-        self, credential_name: str, provider: str = None, vault: str = None
-    ) -> bool:
+    async def check_credential_exists(self, credential_name: str, provider: str = None, vault: str = None) -> bool:
         """
         Check if a credential exists in the specified provider.
 
@@ -250,9 +234,7 @@ class CredentialsManager(BaseAgent):
         provider_agent = self.providers[provider]
 
         if provider == "1password":
-            return await provider_agent.check_credential_exists(
-                credential_name, vault=vault
-            )
+            return await provider_agent.check_credential_exists(credential_name, vault=vault)
 
         # Add handlers for other providers as needed
 
@@ -281,9 +263,7 @@ class CredentialsManager(BaseAgent):
         provider_agent = self.providers[provider]
 
         if provider == "1password":
-            return await provider_agent.list_available_credentials(
-                vault=vault, category=category
-            )
+            return await provider_agent.list_available_credentials(vault=vault, category=category)
 
         # Add handlers for other providers as needed
 
@@ -317,9 +297,7 @@ class CredentialsManager(BaseAgent):
         provider_agent = self.providers[provider]
 
         if provider == "1password":
-            return await provider_agent.inject_credentials_to_env(
-                credential_names, vault=vault, env_map=env_map
-            )
+            return await provider_agent.inject_credentials_to_env(credential_names, vault=vault, env_map=env_map)
 
         # Add handlers for other providers as needed
 

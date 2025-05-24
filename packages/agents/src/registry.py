@@ -44,9 +44,7 @@ class AgentRegistry:
         self._wrapper_classes: Dict[str, Type[OrchestraAgentBase]] = {}
 
         # Initialize routing logic for agent selection
-        self.routing = AgentRouting(
-            project_id, spanner_instance_id, spanner_database_id
-        )
+        self.routing = AgentRouting(project_id, spanner_instance_id, spanner_database_id)
 
         # Register built-in wrapper types
         self._register_builtin_wrappers()
@@ -58,15 +56,14 @@ class AgentRegistry:
 
         # Register the LangChain wrapper for modular LangChain agent support
         from packages.agents.src.langchain_agent import LangChainAgentWrapper
+
         self.register_wrapper_class("langchain", LangChainAgentWrapper)
 
         # Add other built-in wrappers as they are implemented
         # Example: self.register_wrapper_class("arno", ArnoAgentWrapper)
         # Example: self.register_wrapper_class("adk", ADKAgentWrapper)
 
-    def register_wrapper_class(
-        self, wrapper_type: str, wrapper_class: Type[OrchestraAgentBase]
-    ) -> None:
+    def register_wrapper_class(self, wrapper_type: str, wrapper_class: Type[OrchestraAgentBase]) -> None:
         """
         Register a wrapper class for a specific wrapper type.
 
@@ -75,9 +72,7 @@ class AgentRegistry:
             wrapper_class: The class implementing the wrapper
         """
         if wrapper_type in self._wrapper_classes:
-            logger.warning(
-                f"Overwriting existing wrapper class for type: {wrapper_type}"
-            )
+            logger.warning(f"Overwriting existing wrapper class for type: {wrapper_type}")
 
         self._wrapper_classes[wrapper_type] = wrapper_class
         logger.info(f"Registered wrapper class for type: {wrapper_type}")
@@ -134,9 +129,7 @@ class AgentRegistry:
             initial_cost = agent_config.get("initial_cost_per_request", 0.0)
             self.routing.register_agent(agent_id, initial_score, initial_cost)
 
-            logger.info(
-                f"Successfully created agent: {agent_id} with wrapper: {wrapper_type}"
-            )
+            logger.info(f"Successfully created agent: {agent_id} with wrapper: {wrapper_type}")
             return agent
 
         except Exception as e:
@@ -157,9 +150,7 @@ class AgentRegistry:
         for wrapper_type, wrapper_class in self._wrapper_classes.items():
             doc = wrapper_class.__doc__ or ""
             # Extract the first line of the docstring as a short description
-            description = (
-                doc.strip().split("\n")[0] if doc else f"Wrapper type: {wrapper_type}"
-            )
+            description = doc.strip().split("\n")[0] if doc else f"Wrapper type: {wrapper_type}"
             result[wrapper_type] = description
 
         return result
@@ -182,9 +173,7 @@ class AgentRegistry:
 
             # Ensure it's a subclass of OrchestraAgentBase
             if not issubclass(wrapper_class, OrchestraAgentBase):
-                logger.error(
-                    f"Class {class_path} is not a subclass of OrchestraAgentBase"
-                )
+                logger.error(f"Class {class_path} is not a subclass of OrchestraAgentBase")
                 return False
 
             # Register the wrapper

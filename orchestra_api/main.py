@@ -33,6 +33,7 @@ memory = UnifiedMemory(
     firestore_project=os.getenv("GCP_PROJECT"),
 )
 
+
 class MemoryCreateRequest(BaseModel):
     id: str
     content: str
@@ -42,11 +43,13 @@ class MemoryCreateRequest(BaseModel):
     priority: Optional[float] = 0.5
     embedding: Optional[List[float]] = None
 
+
 @app.post("/memory/", response_model=dict)
 async def create_memory(item: MemoryCreateRequest):
     """Store a memory item in all enabled backends."""
     memory_id = memory.store(MemoryItem(**item.dict()))
     return {"id": memory_id}
+
 
 @app.get("/memory/{memory_id}", response_model=MemoryCreateRequest)
 async def get_memory(memory_id: str):
@@ -55,6 +58,7 @@ async def get_memory(memory_id: str):
     if not item:
         raise HTTPException(status_code=404, detail="Memory item not found")
     return item
+
 
 @app.get("/memory/search/", response_model=List[MemoryCreateRequest])
 async def search_memory(query: str, limit: int = 10):
@@ -70,6 +74,7 @@ async def search_memory(query: str, limit: int = 10):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Search error: {e}")
 
+
 @app.delete("/memory/{memory_id}", response_model=dict)
 async def delete_memory(memory_id: str):
     """Delete a memory item from all backends."""
@@ -77,6 +82,7 @@ async def delete_memory(memory_id: str):
     if not deleted:
         raise HTTPException(status_code=404, detail="Memory item not found")
     return {"deleted": True}
+
 
 @app.get("/health", response_model=dict)
 async def health_check():

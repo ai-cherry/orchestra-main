@@ -43,9 +43,7 @@ try:
     nest_asyncio.apply()
     logger.info("Applied nest_asyncio to handle event loop conflicts")
 except ImportError:
-    logger.warning(
-        "nest_asyncio not found, may encounter event loop issues with mixed async libraries"
-    )
+    logger.warning("nest_asyncio not found, may encounter event loop issues with mixed async libraries")
 
 try:
     import litellm
@@ -92,9 +90,7 @@ def setup_litellm() -> None:
         if os.getenv("LITELLM_VERBOSE"):
             litellm.set_verbose = os.getenv("LITELLM_VERBOSE").lower() == "true"
     else:
-        logger.warning(
-            f"Config file not found at {config_path}, using environment variables"
-        )
+        logger.warning(f"Config file not found at {config_path}, using environment variables")
         # Configure LiteLLM with environment variables
         litellm.set_verbose = os.getenv("LITELLM_VERBOSE", "false").lower() == "true"
 
@@ -170,9 +166,7 @@ def advanced_routing_example(input_length: int = 500) -> None:
     # Generate a prompt of the specified length (roughly)
     words_per_char = 1 / 6  # Approximate words per character
     word_count = int(input_length * words_per_char)
-    prompt = (
-        f"Write {word_count} words about Poetry, the Python dependency management tool."
-    )
+    prompt = f"Write {word_count} words about Poetry, the Python dependency management tool."
 
     try:
         # For shorter prompts, use a smaller model
@@ -299,14 +293,10 @@ def fallback_example() -> None:
 def multi_provider_example() -> None:
     """Demonstrate using all three tools in the same environment"""
     if not (HAS_PORTKEY and HAS_OPENROUTER):
-        logger.warning(
-            "Skipping multi-provider example - required packages not installed"
-        )
+        logger.warning("Skipping multi-provider example - required packages not installed")
         return
 
-    logger.info(
-        "Running multi-provider example with LiteLLM, Portkey, and OpenRouter..."
-    )
+    logger.info("Running multi-provider example with LiteLLM, Portkey, and OpenRouter...")
 
     # Function to route requests based on requirements
     def smart_model_router(prompt: str, requirement: str) -> Dict:
@@ -397,9 +387,7 @@ if __name__ == "__main__":
             os.getenv("PORTKEY_API_KEY"),
         ]
     ):
-        logger.warning(
-            "No API keys detected. Examples will use demo mode where possible."
-        )
+        logger.warning("No API keys detected. Examples will use demo mode where possible.")
 
     # Run examples
     try:

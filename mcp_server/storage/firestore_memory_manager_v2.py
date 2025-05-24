@@ -23,9 +23,7 @@ try:
         ServiceUnavailable,
     )
 except ImportError:
-    logging.warning(
-        "Google Cloud Firestore library not installed. Install with: pip install google-cloud-firestore"
-    )
+    logging.warning("Google Cloud Firestore library not installed. Install with: pip install google-cloud-firestore")
 
 # Import from relative paths
 from ..interfaces.memory_manager import IMemoryManager
@@ -103,9 +101,7 @@ class FirestoreMemoryManagerV2(IMemoryManager):
         # Retry strategy
         self._retry_strategy = None
 
-        logger.info(
-            f"Initialized FirestoreMemoryManagerV2 with collection prefix: {collection_prefix}"
-        )
+        logger.info(f"Initialized FirestoreMemoryManagerV2 with collection prefix: {collection_prefix}")
 
     async def initialize(self) -> bool:
         """Initialize the memory manager.
@@ -143,14 +139,10 @@ class FirestoreMemoryManagerV2(IMemoryManager):
             )
 
             # Start background batch processor
-            self._batch_processor_task = asyncio.create_task(
-                self._process_batch_operations()
-            )
+            self._batch_processor_task = asyncio.create_task(self._process_batch_operations())
 
             self._initialized = True
-            logger.info(
-                f"Firestore memory manager initialized for project: {self.project_id}"
-            )
+            logger.info(f"Firestore memory manager initialized for project: {self.project_id}")
             return True
         except Exception as e:
             logger.error(f"Failed to initialize Firestore memory manager: {e}")
@@ -169,9 +161,7 @@ class FirestoreMemoryManagerV2(IMemoryManager):
             return f"{self.collection_prefix}_{memory_type.value}"
         return self.collection_prefix
 
-    async def create_memory(
-        self, key: str, entry: MemoryEntry, source_tool: str
-    ) -> bool:
+    async def create_memory(self, key: str, entry: MemoryEntry, source_tool: str) -> bool:
         """Create a new memory entry.
 
         Args:
@@ -237,9 +227,7 @@ class FirestoreMemoryManagerV2(IMemoryManager):
                 del self._cache_ttl[key]
 
         # Try all collections if we don't know the memory type
-        collections_to_try = [
-            self._get_collection_name(memory_type) for memory_type in MemoryType
-        ]
+        collections_to_try = [self._get_collection_name(memory_type) for memory_type in MemoryType]
         collections_to_try.append(self.collection_prefix)  # Try default collection too
 
         # Get from Firestore
@@ -270,17 +258,13 @@ class FirestoreMemoryManagerV2(IMemoryManager):
                     logger.debug(f"Retrieved memory entry: {key} for {tool}")
                     return entry
             except Exception as e:
-                logger.warning(
-                    f"Error getting memory {key} from {collection_name}: {e}"
-                )
+                logger.warning(f"Error getting memory {key} from {collection_name}: {e}")
                 continue
 
         logger.debug(f"Memory entry not found: {key}")
         return None
 
-    async def update_memory(
-        self, key: str, entry: MemoryEntry, source_tool: str
-    ) -> bool:
+    async def update_memory(self, key: str, entry: MemoryEntry, source_tool: str) -> bool:
         """Update an existing memory entry.
 
         Args:
@@ -343,9 +327,7 @@ class FirestoreMemoryManagerV2(IMemoryManager):
 
         # Add to batch operations for all possible collections
         # (since we don't know which collection it's in)
-        collections_to_try = [
-            self._get_collection_name(memory_type) for memory_type in MemoryType
-        ]
+        collections_to_try = [self._get_collection_name(memory_type) for memory_type in MemoryType]
         collections_to_try.append(self.collection_prefix)  # Try default collection too
 
         async with self._batch_lock:
@@ -359,9 +341,7 @@ class FirestoreMemoryManagerV2(IMemoryManager):
         logger.debug(f"Deleted memory entry: {key} from {source_tool}")
         return True
 
-    async def search_memory(
-        self, query: str, tool: str, limit: int = 10
-    ) -> List[Tuple[str, MemoryEntry, float]]:
+    async def search_memory(self, query: str, tool: str, limit: int = 10) -> List[Tuple[str, MemoryEntry, float]]:
         """Search for memory entries for a specific tool.
 
         Args:
@@ -378,12 +358,8 @@ class FirestoreMemoryManagerV2(IMemoryManager):
         results: List[Tuple[str, MemoryEntry, float]] = []
 
         # Search in all collections
-        collections_to_search = [
-            self._get_collection_name(memory_type) for memory_type in MemoryType
-        ]
-        collections_to_search.append(
-            self.collection_prefix
-        )  # Search default collection too
+        collections_to_search = [self._get_collection_name(memory_type) for memory_type in MemoryType]
+        collections_to_search.append(self.collection_prefix)  # Search default collection too
 
         # Simple text search for now
         # In a future version, this would use Firestore's text search or Vertex AI Search
@@ -421,17 +397,13 @@ class FirestoreMemoryManagerV2(IMemoryManager):
 
                         if query_lower in content_lower:
                             # Calculate a simple relevance score
-                            score = content_lower.count(query_lower) / len(
-                                content_lower
-                            )
+                            score = content_lower.count(query_lower) / len(content_lower)
 
                             # Boost score based on metadata
                             if entry.metadata.source_tool == tool:
                                 score *= 1.5  # Boost entries from the same tool
 
-                            score *= (
-                                entry.metadata.context_relevance
-                            )  # Use context relevance
+                            score *= entry.metadata.context_relevance  # Use context relevance
 
                             results.append((doc.id, entry, score))
                     except Exception as e:
@@ -445,14 +417,10 @@ class FirestoreMemoryManagerV2(IMemoryManager):
         results.sort(key=lambda x: x[2], reverse=True)
         limited_results = results[:limit]
 
-        logger.debug(
-            f"Search for '{query}' found {len(limited_results)} results for {tool}"
-        )
+        logger.debug(f"Search for '{query}' found {len(limited_results)} results for {tool}")
         return limited_results
 
-    async def optimize_context_window(
-        self, tool: str, required_keys: Optional[List[str]] = None
-    ) -> int:
+    async def optimize_context_window(self, tool: str, required_keys: Optional[List[str]] = None) -> int:
         """Optimize the context window for a specific tool.
 
         Args:
@@ -494,18 +462,16 @@ class FirestoreMemoryManagerV2(IMemoryManager):
                 docs = await query.get()
                 collection_counts[memory_type.value] = len(docs)
             except Exception as e:
-                logger.warning(
-                    f"Error getting count for collection {collection_name}: {e}"
-                )
+                logger.warning(f"Error getting count for collection {collection_name}: {e}")
                 collection_counts[memory_type.value] = -1
 
         # Get cache stats
         cache_stats = {
             "size": len(self._cache),
             "max_size": self.max_cache_size,
-            "usage_percentage": round((len(self._cache) / self.max_cache_size) * 100, 2)
-            if self.max_cache_size > 0
-            else 0,
+            "usage_percentage": (
+                round((len(self._cache) / self.max_cache_size) * 100, 2) if self.max_cache_size > 0 else 0
+            ),
         }
 
         # Get batch stats
@@ -602,18 +568,14 @@ class FirestoreMemoryManagerV2(IMemoryManager):
                     break
                 except Exception as e:
                     if attempt == self.retry_attempts - 1:
-                        logger.error(
-                            f"Failed to commit batch after {self.retry_attempts} attempts: {e}"
-                        )
+                        logger.error(f"Failed to commit batch after {self.retry_attempts} attempts: {e}")
                         success = False
 
                         # Re-add failed operations
                         async with self._batch_lock:
                             self._batch_operations.extend(collection_ops)
                     else:
-                        logger.warning(
-                            f"Batch commit attempt {attempt+1} failed: {e}, retrying..."
-                        )
+                        logger.warning(f"Batch commit attempt {attempt+1} failed: {e}, retrying...")
                         await asyncio.sleep(0.5 * (attempt + 1))  # Exponential backoff
 
         return success
@@ -625,9 +587,7 @@ class FirestoreMemoryManagerV2(IMemoryManager):
 
         # Remove expired entries first
         current_time = time.time()
-        expired_keys = [
-            key for key, ttl in self._cache_ttl.items() if ttl < current_time
-        ]
+        expired_keys = [key for key, ttl in self._cache_ttl.items() if ttl < current_time]
 
         for key in expired_keys:
             if key in self._cache:
@@ -638,9 +598,7 @@ class FirestoreMemoryManagerV2(IMemoryManager):
         # If still over limit, remove oldest entries
         if len(self._cache) > self.max_cache_size:
             # Sort by TTL (oldest first)
-            sorted_keys = sorted(
-                self._cache_ttl.keys(), key=lambda k: self._cache_ttl[k]
-            )
+            sorted_keys = sorted(self._cache_ttl.keys(), key=lambda k: self._cache_ttl[k])
 
             # Remove oldest entries
             keys_to_remove = sorted_keys[: len(self._cache) - self.max_cache_size]

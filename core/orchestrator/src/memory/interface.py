@@ -12,9 +12,7 @@ class MemoryInterface(abc.ABC):
     """Abstract base class for memory implementations."""
 
     @abc.abstractmethod
-    async def store(
-        self, key: str, value: Dict[str, Any], ttl: Optional[int] = None
-    ) -> bool:
+    async def store(self, key: str, value: Dict[str, Any], ttl: Optional[int] = None) -> bool:
         """
         Store an item in memory.
 
@@ -68,9 +66,7 @@ class MemoryInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    async def search(
-        self, field: str, value: Any, operator: str = "==", limit: int = 10
-    ) -> List[Dict[str, Any]]:
+    async def search(self, field: str, value: Any, operator: str = "==", limit: int = 10) -> List[Dict[str, Any]]:
         """
         Search for items in memory.
 
@@ -114,9 +110,7 @@ class MemoryInterface(abc.ABC):
         # Default implementation: not supported
         return False
 
-    async def batch_store(
-        self, items: Dict[str, Dict[str, Any]], ttl: Optional[int] = None
-    ) -> bool:
+    async def batch_store(self, items: Dict[str, Dict[str, Any]], ttl: Optional[int] = None) -> bool:
         """
         Store multiple items in memory.
 
@@ -134,9 +128,7 @@ class MemoryInterface(abc.ABC):
                 success = False
         return success
 
-    async def batch_retrieve(
-        self, keys: List[str]
-    ) -> Dict[str, Optional[Dict[str, Any]]]:
+    async def batch_retrieve(self, keys: List[str]) -> Dict[str, Optional[Dict[str, Any]]]:
         """
         Retrieve multiple items from memory.
 

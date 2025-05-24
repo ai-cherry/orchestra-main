@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="GCP Firestore MCP Server",
     description="MCP server for managing Google Firestore documents and collections",
-    version="1.0.0"
+    version="1.0.0",
 )
 
 # Get configuration from environment
@@ -46,6 +46,7 @@ except Exception as e:
 
 class DocumentRequest(BaseModel):
     """Request model for document operations"""
+
     collection: str = Field(..., description="Collection name")
     document_id: str = Field(..., description="Document ID")
     data: Dict[str, Any] = Field(..., description="Document data")
@@ -54,6 +55,7 @@ class DocumentRequest(BaseModel):
 
 class UpdateRequest(BaseModel):
     """Request model for updating documents"""
+
     collection: str = Field(..., description="Collection name")
     document_id: str = Field(..., description="Document ID")
     updates: Dict[str, Any] = Field(..., description="Fields to update")
@@ -61,6 +63,7 @@ class UpdateRequest(BaseModel):
 
 class QueryRequest(BaseModel):
     """Request model for querying documents"""
+
     collection: str = Field(..., description="Collection name")
     filters: List[Dict[str, Any]] = Field(default=[], description="Query filters")
     order_by: Optional[str] = Field(None, description="Field to order by")
@@ -70,17 +73,20 @@ class QueryRequest(BaseModel):
 
 class BatchWriteRequest(BaseModel):
     """Request model for batch write operations"""
+
     operations: List[Dict[str, Any]] = Field(..., description="List of write operations")
 
 
 class CollectionRequest(BaseModel):
     """Request model for collection operations"""
+
     collection: str = Field(..., description="Collection name")
     parent_document: Optional[Dict[str, str]] = Field(None, description="Parent document path for subcollections")
 
 
 class MCPToolDefinition(BaseModel):
     """MCP tool definition for Claude"""
+
     name: str
     description: str
     parameters: Dict[str, Any]
@@ -97,11 +103,14 @@ async def get_tools() -> List[MCPToolDefinition]:
                 "type": "object",
                 "properties": {
                     "collection": {"type": "string", "description": "Collection name"},
-                    "document_id": {"type": "string", "description": "Document ID (optional, auto-generated if not provided)"},
-                    "data": {"type": "object", "description": "Document data"}
+                    "document_id": {
+                        "type": "string",
+                        "description": "Document ID (optional, auto-generated if not provided)",
+                    },
+                    "data": {"type": "object", "description": "Document data"},
                 },
-                "required": ["collection", "data"]
-            }
+                "required": ["collection", "data"],
+            },
         ),
         MCPToolDefinition(
             name="get_document",
@@ -110,10 +119,10 @@ async def get_tools() -> List[MCPToolDefinition]:
                 "type": "object",
                 "properties": {
                     "collection": {"type": "string", "description": "Collection name"},
-                    "document_id": {"type": "string", "description": "Document ID"}
+                    "document_id": {"type": "string", "description": "Document ID"},
                 },
-                "required": ["collection", "document_id"]
-            }
+                "required": ["collection", "document_id"],
+            },
         ),
         MCPToolDefinition(
             name="update_document",
@@ -123,10 +132,10 @@ async def get_tools() -> List[MCPToolDefinition]:
                 "properties": {
                     "collection": {"type": "string", "description": "Collection name"},
                     "document_id": {"type": "string", "description": "Document ID"},
-                    "updates": {"type": "object", "description": "Fields to update"}
+                    "updates": {"type": "object", "description": "Fields to update"},
                 },
-                "required": ["collection", "document_id", "updates"]
-            }
+                "required": ["collection", "document_id", "updates"],
+            },
         ),
         MCPToolDefinition(
             name="delete_document",
@@ -135,10 +144,10 @@ async def get_tools() -> List[MCPToolDefinition]:
                 "type": "object",
                 "properties": {
                     "collection": {"type": "string", "description": "Collection name"},
-                    "document_id": {"type": "string", "description": "Document ID"}
+                    "document_id": {"type": "string", "description": "Document ID"},
                 },
-                "required": ["collection", "document_id"]
-            }
+                "required": ["collection", "document_id"],
+            },
         ),
         MCPToolDefinition(
             name="query_documents",
@@ -154,24 +163,35 @@ async def get_tools() -> List[MCPToolDefinition]:
                             "type": "object",
                             "properties": {
                                 "field": {"type": "string"},
-                                "operator": {"type": "string", "enum": ["==", "!=", "<", "<=", ">", ">=", "in", "not-in", "array-contains", "array-contains-any"]},
-                                "value": {}
-                            }
-                        }
+                                "operator": {
+                                    "type": "string",
+                                    "enum": [
+                                        "==",
+                                        "!=",
+                                        "<",
+                                        "<=",
+                                        ">",
+                                        ">=",
+                                        "in",
+                                        "not-in",
+                                        "array-contains",
+                                        "array-contains-any",
+                                    ],
+                                },
+                                "value": {},
+                            },
+                        },
                     },
                     "order_by": {"type": "string", "description": "Field to order by"},
-                    "limit": {"type": "integer", "description": "Maximum number of results"}
+                    "limit": {"type": "integer", "description": "Maximum number of results"},
                 },
-                "required": ["collection"]
-            }
+                "required": ["collection"],
+            },
         ),
         MCPToolDefinition(
             name="list_collections",
             description="List all collections in the database",
-            parameters={
-                "type": "object",
-                "properties": {}
-            }
+            parameters={"type": "object", "properties": {}},
         ),
         MCPToolDefinition(
             name="batch_write",
@@ -188,14 +208,14 @@ async def get_tools() -> List[MCPToolDefinition]:
                                 "type": {"type": "string", "enum": ["create", "update", "delete"]},
                                 "collection": {"type": "string"},
                                 "document_id": {"type": "string"},
-                                "data": {"type": "object"}
-                            }
-                        }
+                                "data": {"type": "object"},
+                            },
+                        },
                     }
                 },
-                "required": ["operations"]
-            }
-        )
+                "required": ["operations"],
+            },
+        ),
     ]
 
 
@@ -204,15 +224,15 @@ async def create_document(request: DocumentRequest) -> Dict[str, Any]:
     """Create a new document in Firestore"""
     if not firestore_client:
         raise HTTPException(status_code=500, detail="Firestore client not initialized")
-    
+
     try:
         collection_ref = firestore_client.collection(request.collection)
-        
+
         # Add timestamp
         doc_data = request.data.copy()
         doc_data["_created_at"] = datetime.utcnow()
         doc_data["_updated_at"] = datetime.utcnow()
-        
+
         if request.document_id:
             # Create with specific ID
             doc_ref = collection_ref.document(request.document_id)
@@ -222,16 +242,16 @@ async def create_document(request: DocumentRequest) -> Dict[str, Any]:
             # Auto-generate ID
             doc_ref = collection_ref.add(doc_data)
             document_id = doc_ref[1].id
-        
+
         logger.info(f"Created document {document_id} in collection {request.collection}")
-        
+
         return {
             "status": "success",
             "collection": request.collection,
             "document_id": document_id,
-            "message": f"Document created successfully"
+            "message": f"Document created successfully",
         }
-        
+
     except Exception as e:
         logger.error(f"Failed to create document: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -242,28 +262,23 @@ async def get_document(collection: str, document_id: str) -> Dict[str, Any]:
     """Get a document from Firestore"""
     if not firestore_client:
         raise HTTPException(status_code=500, detail="Firestore client not initialized")
-    
+
     try:
         doc_ref = firestore_client.collection(collection).document(document_id)
         doc = doc_ref.get()
-        
+
         if not doc.exists:
             raise HTTPException(status_code=404, detail=f"Document not found")
-        
+
         doc_data = doc.to_dict()
-        
+
         # Convert timestamps to ISO format
         for field in ["_created_at", "_updated_at"]:
             if field in doc_data and hasattr(doc_data[field], "isoformat"):
                 doc_data[field] = doc_data[field].isoformat()
-        
-        return {
-            "status": "success",
-            "collection": collection,
-            "document_id": document_id,
-            "data": doc_data
-        }
-        
+
+        return {"status": "success", "collection": collection, "document_id": document_id, "data": doc_data}
+
     except HTTPException:
         raise
     except Exception as e:
@@ -276,29 +291,29 @@ async def update_document(request: UpdateRequest) -> Dict[str, Any]:
     """Update an existing document in Firestore"""
     if not firestore_client:
         raise HTTPException(status_code=500, detail="Firestore client not initialized")
-    
+
     try:
         doc_ref = firestore_client.collection(request.collection).document(request.document_id)
-        
+
         # Check if document exists
         if not doc_ref.get().exists:
             raise HTTPException(status_code=404, detail=f"Document not found")
-        
+
         # Add update timestamp
         updates = request.updates.copy()
         updates["_updated_at"] = datetime.utcnow()
-        
+
         doc_ref.update(updates)
-        
+
         logger.info(f"Updated document {request.document_id} in collection {request.collection}")
-        
+
         return {
             "status": "success",
             "collection": request.collection,
             "document_id": request.document_id,
-            "message": f"Document updated successfully"
+            "message": f"Document updated successfully",
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -311,25 +326,25 @@ async def delete_document(collection: str, document_id: str) -> Dict[str, Any]:
     """Delete a document from Firestore"""
     if not firestore_client:
         raise HTTPException(status_code=500, detail="Firestore client not initialized")
-    
+
     try:
         doc_ref = firestore_client.collection(collection).document(document_id)
-        
+
         # Check if document exists
         if not doc_ref.get().exists:
             raise HTTPException(status_code=404, detail=f"Document not found")
-        
+
         doc_ref.delete()
-        
+
         logger.info(f"Deleted document {document_id} from collection {collection}")
-        
+
         return {
             "status": "success",
             "collection": collection,
             "document_id": document_id,
-            "message": f"Document deleted successfully"
+            "message": f"Document deleted successfully",
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -342,16 +357,16 @@ async def query_documents(request: QueryRequest) -> Dict[str, Any]:
     """Query documents in a collection"""
     if not firestore_client:
         raise HTTPException(status_code=500, detail="Firestore client not initialized")
-    
+
     try:
         query = firestore_client.collection(request.collection)
-        
+
         # Apply filters
         for filter_spec in request.filters:
             field = filter_spec.get("field")
             operator = filter_spec.get("operator", "==")
             value = filter_spec.get("value")
-            
+
             if field and value is not None:
                 if operator == "==":
                     query = query.where(field, "==", value)
@@ -373,42 +388,34 @@ async def query_documents(request: QueryRequest) -> Dict[str, Any]:
                     query = query.where(field, "array-contains", value)
                 elif operator == "array-contains-any":
                     query = query.where(field, "array-contains-any", value)
-        
+
         # Apply ordering
         if request.order_by:
             query = query.order_by(request.order_by)
-        
+
         # Apply limit and offset
         if request.offset > 0:
             query = query.offset(request.offset)
         query = query.limit(request.limit)
-        
+
         # Execute query
         docs = query.stream()
-        
+
         results = []
         for doc in docs:
             doc_data = doc.to_dict()
-            
+
             # Convert timestamps to ISO format
             for field in ["_created_at", "_updated_at"]:
                 if field in doc_data and hasattr(doc_data[field], "isoformat"):
                     doc_data[field] = doc_data[field].isoformat()
-            
-            results.append({
-                "document_id": doc.id,
-                "data": doc_data
-            })
-        
+
+            results.append({"document_id": doc.id, "data": doc_data})
+
         logger.info(f"Query returned {len(results)} documents from collection {request.collection}")
-        
-        return {
-            "status": "success",
-            "collection": request.collection,
-            "count": len(results),
-            "documents": results
-        }
-        
+
+        return {"status": "success", "collection": request.collection, "count": len(results), "documents": results}
+
     except Exception as e:
         logger.error(f"Failed to query documents: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -419,19 +426,15 @@ async def list_collections() -> Dict[str, Any]:
     """List all collections in the database"""
     if not firestore_client:
         raise HTTPException(status_code=500, detail="Firestore client not initialized")
-    
+
     try:
         collections = firestore_client.collections()
         collection_names = [collection.id for collection in collections]
-        
+
         logger.info(f"Found {len(collection_names)} collections")
-        
-        return {
-            "status": "success",
-            "count": len(collection_names),
-            "collections": collection_names
-        }
-        
+
+        return {"status": "success", "count": len(collection_names), "collections": collection_names}
+
     except Exception as e:
         logger.error(f"Failed to list collections: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -442,22 +445,22 @@ async def batch_write(request: BatchWriteRequest) -> Dict[str, Any]:
     """Perform batch write operations"""
     if not firestore_client:
         raise HTTPException(status_code=500, detail="Firestore client not initialized")
-    
+
     try:
         batch = firestore_client.batch()
         operation_count = 0
-        
+
         for op in request.operations:
             op_type = op.get("type")
             collection = op.get("collection")
             document_id = op.get("document_id")
             data = op.get("data", {})
-            
+
             if not collection or not document_id:
                 continue
-            
+
             doc_ref = firestore_client.collection(collection).document(document_id)
-            
+
             if op_type == "create":
                 doc_data = data.copy()
                 doc_data["_created_at"] = datetime.utcnow()
@@ -472,18 +475,18 @@ async def batch_write(request: BatchWriteRequest) -> Dict[str, Any]:
             elif op_type == "delete":
                 batch.delete(doc_ref)
                 operation_count += 1
-        
+
         # Commit the batch
         batch.commit()
-        
+
         logger.info(f"Batch write completed with {operation_count} operations")
-        
+
         return {
             "status": "success",
             "operations_count": operation_count,
-            "message": f"Batch write completed successfully"
+            "message": f"Batch write completed successfully",
         }
-        
+
     except Exception as e:
         logger.error(f"Failed to perform batch write: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -494,18 +497,13 @@ async def check_document_exists(collection: str, document_id: str) -> Dict[str, 
     """Check if a document exists"""
     if not firestore_client:
         raise HTTPException(status_code=500, detail="Firestore client not initialized")
-    
+
     try:
         doc_ref = firestore_client.collection(collection).document(document_id)
         exists = doc_ref.get().exists
-        
-        return {
-            "status": "success",
-            "collection": collection,
-            "document_id": document_id,
-            "exists": exists
-        }
-        
+
+        return {"status": "success", "collection": collection, "document_id": document_id, "exists": exists}
+
     except Exception as e:
         logger.error(f"Failed to check document existence: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -519,9 +517,9 @@ async def health_check():
         "service": "gcp-firestore-mcp",
         "project_id": PROJECT_ID,
         "database_id": DATABASE_ID,
-        "client_initialized": firestore_client is not None
+        "client_initialized": firestore_client is not None,
     }
-    
+
     # Test Firestore connection
     if firestore_client:
         try:
@@ -531,11 +529,12 @@ async def health_check():
         except Exception as e:
             health_status["firestore_connected"] = False
             health_status["firestore_error"] = str(e)
-    
+
     return health_status
 
 
 if __name__ == "__main__":
     import uvicorn
+
     port = int(os.getenv("PORT", "8002"))
     uvicorn.run(app, host="0.0.0.0", port=port)

@@ -65,9 +65,7 @@ class GCPMonitoringClient:
 
         logger.info("OpenTelemetry tracing initialized with Cloud Trace exporter")
 
-    def report_metric(
-        self, metric_name: str, value: Any, labels: Optional[Dict[str, str]] = None
-    ) -> bool:
+    def report_metric(self, metric_name: str, value: Any, labels: Optional[Dict[str, str]] = None) -> bool:
         """
         Report a metric to Cloud Monitoring.
 
@@ -164,9 +162,7 @@ class GCPMonitoringClient:
         descriptor.description = f"Agent resilience metric: {metric_name}"
 
         try:
-            created = self.client.create_metric_descriptor(
-                name=self.project_name, metric_descriptor=descriptor
-            )
+            created = self.client.create_metric_descriptor(name=self.project_name, metric_descriptor=descriptor)
 
             with self._metric_descriptors_lock:
                 self._metric_descriptors[metric_name] = created
@@ -176,9 +172,7 @@ class GCPMonitoringClient:
             logger.error(f"Failed to create metric descriptor {metric_name}: {str(e)}")
             raise
 
-    def create_incident_report(
-        self, agent_id: str, incident_data: Dict[str, Any]
-    ) -> None:
+    def create_incident_report(self, agent_id: str, incident_data: Dict[str, Any]) -> None:
         """
         Create an incident report in Cloud Logging.
 
@@ -235,8 +229,6 @@ def get_monitoring_client() -> GCPMonitoringClient:
 
             _monitoring_client = GCPMonitoringClient(project_id)
 
-            logger.info(
-                f"Created global GCP Monitoring client for project {project_id}"
-            )
+            logger.info(f"Created global GCP Monitoring client for project {project_id}")
 
         return _monitoring_client

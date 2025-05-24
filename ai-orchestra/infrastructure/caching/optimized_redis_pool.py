@@ -69,9 +69,7 @@ class EnhancedRedisConnectionPool:
     _lock = threading.RLock()
 
     # Connection usage and performance metrics
-    _metrics: Dict[str, Dict[str, Dict[str, Any]]] = {
-        pool_type.value: {} for pool_type in PoolType
-    }
+    _metrics: Dict[str, Dict[str, Dict[str, Any]]] = {pool_type.value: {} for pool_type in PoolType}
 
     # Circuit breaker state
     _circuit_breakers: Dict[str, Dict[str, Any]] = {}
@@ -126,9 +124,7 @@ class EnhancedRedisConnectionPool:
 
         with cls._lock:
             # Adjust max connections based on pool type
-            adjusted_max_connections = cls._get_adjusted_max_connections(
-                pool_type, max_connections
-            )
+            adjusted_max_connections = cls._get_adjusted_max_connections(pool_type, max_connections)
 
             if key not in pool_dict:
                 pool_dict[key] = ConnectionPool(
@@ -180,16 +176,12 @@ class EnhancedRedisConnectionPool:
                     circuit["last_checked"] = current_time
                 else:
                     logger.warning(f"Circuit open for {key}, using fallback mechanism")
-                    raise redis.exceptions.ConnectionError(
-                        f"Circuit breaker open for {key}"
-                    )
+                    raise redis.exceptions.ConnectionError(f"Circuit breaker open for {key}")
 
             return pool_dict[key]
 
     @classmethod
-    def _get_adjusted_max_connections(
-        cls, pool_type: PoolType, base_max_connections: int
-    ) -> int:
+    def _get_adjusted_max_connections(cls, pool_type: PoolType, base_max_connections: int) -> int:
         """
         Calculate adjusted max connections based on pool type.
 
@@ -219,9 +211,7 @@ class EnhancedRedisConnectionPool:
             return base_max_connections
 
     @classmethod
-    def record_operation(
-        cls, pool_type: PoolType, key: str, success: bool, latency: float
-    ) -> None:
+    def record_operation(cls, pool_type: PoolType, key: str, success: bool, latency: float) -> None:
         """
         Record operation metrics for a connection pool.
 
@@ -285,13 +275,11 @@ class EnhancedRedisConnectionPool:
                         "operations": metrics["operations"],
                         "errors": metrics["errors"],
                         "avg_latency": (
-                            metrics["latency_sum"] / metrics["latency_count"]
-                        )
-                        if metrics["latency_count"] > 0
-                        else 0,
-                        "error_rate": (metrics["errors"] / metrics["operations"] * 100)
-                        if metrics["operations"] > 0
-                        else 0,
+                            (metrics["latency_sum"] / metrics["latency_count"]) if metrics["latency_count"] > 0 else 0
+                        ),
+                        "error_rate": (
+                            (metrics["errors"] / metrics["operations"] * 100) if metrics["operations"] > 0 else 0
+                        ),
                         "age_seconds": time.time() - metrics["created"],
                         "idle_seconds": time.time() - metrics["last_operation"],
                     }
@@ -310,16 +298,10 @@ class EnhancedRedisConnectionPool:
                 }
 
             # Calculate summary
-            result["summary"]["total_pools"] = sum(
-                len(pools) for pools in cls._metrics.values()
-            )
+            result["summary"]["total_pools"] = sum(len(pools) for pools in cls._metrics.values())
             result["summary"]["total_operations"] = total_ops
-            result["summary"]["error_rate"] = (
-                (total_errors / total_ops * 100) if total_ops > 0 else 0
-            )
-            result["summary"]["avg_latency"] = (
-                (latency_sum / latency_count) if latency_count > 0 else 0
-            )
+            result["summary"]["error_rate"] = (total_errors / total_ops * 100) if total_ops > 0 else 0
+            result["summary"]["avg_latency"] = (latency_sum / latency_count) if latency_count > 0 else 0
 
             return result
 
@@ -586,9 +568,7 @@ class OptimizedRedisClient:
             )
 
     @handle_exception(logger=logger)
-    async def pipeline_execute(
-        self, operations: List[Callable[[Pipeline], None]]
-    ) -> List[Any]:
+    async def pipeline_execute(self, operations: List[Callable[[Pipeline], None]]) -> List[Any]:
         """
         Execute multiple operations in a pipeline.
 
@@ -654,16 +634,12 @@ class OptimizedRedisClient:
             return {keys[0]: value}
 
         # Create pipeline operations
-        results = await self.pipeline_execute(
-            [lambda pipe: pipe.get(key) for key in keys]
-        )
+        results = await self.pipeline_execute([lambda pipe: pipe.get(key) for key in keys])
 
         # Map keys to results
         return dict(zip(keys, results))
 
-    async def batch_set(
-        self, key_values: Dict[str, str], ttl_seconds: Optional[int] = None
-    ) -> bool:
+    async def batch_set(self, key_values: Dict[str, str], ttl_seconds: Optional[int] = None) -> bool:
         """
         Set multiple key-value pairs in a single operation.
 
@@ -685,10 +661,7 @@ class OptimizedRedisClient:
         # Create pipeline operations
         if ttl_seconds is not None:
             # Need to use set with ex for each key
-            ops = [
-                lambda pipe, k=k, v=v: pipe.set(k, v, ex=ttl_seconds)
-                for k, v in key_values.items()
-            ]
+            ops = [lambda pipe, k=k, v=v: pipe.set(k, v, ex=ttl_seconds) for k, v in key_values.items()]
         else:
             # Can use mset for better performance when no TTL
             ops = [lambda pipe: pipe.mset(key_values)]
@@ -852,9 +825,7 @@ class OptimizedRedisClient:
             Dictionary with performance metrics
         """
         # Get pool metrics
-        pool_key = EnhancedRedisConnectionPool.get_pool_key(
-            self.host, self.port, self.db
-        )
+        pool_key = EnhancedRedisConnectionPool.get_pool_key(self.host, self.port, self.db)
         all_metrics = EnhancedRedisConnectionPool.get_metrics()
 
         pool_metrics = {}
@@ -937,9 +908,7 @@ async def get_optimized_redis_client(
     Returns:
         An optimized Redis client
     """
-    client = OptimizedRedisClient(
-        host=host, port=port, db=db, password=password, pool_type=pool_type, **kwargs
-    )
+    client = OptimizedRedisClient(host=host, port=port, db=db, password=password, pool_type=pool_type, **kwargs)
 
     # Test connection
     await client.ping()

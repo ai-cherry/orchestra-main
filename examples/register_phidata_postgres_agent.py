@@ -44,17 +44,12 @@ def register_phidata_postgres_agent(
         cloud_sql_config = {
             "project_id": os.environ.get("GCP_PROJECT_ID", "your-project-id"),
             "region": os.environ.get("GCP_REGION", "us-central1"),
-            "instance_connection_name": os.environ.get(
-                "CLOUD_SQL_INSTANCE_CONNECTION_NAME", ""
-            ),
+            "instance_connection_name": os.environ.get("CLOUD_SQL_INSTANCE_CONNECTION_NAME", ""),
             "database": os.environ.get("CLOUD_SQL_DATABASE", "phidata"),
             "user": os.environ.get("CLOUD_SQL_USER", "postgres"),
-            "use_iam_auth": os.environ.get("CLOUD_SQL_USE_IAM_AUTH", "false").lower()
-            == "true",
+            "use_iam_auth": os.environ.get("CLOUD_SQL_USE_IAM_AUTH", "false").lower() == "true",
             # Only needed if use_iam_auth is False
-            "password_secret_name": os.environ.get(
-                "CLOUD_SQL_PASSWORD_SECRET_NAME", "cloudsql-postgres-password"
-            ),
+            "password_secret_name": os.environ.get("CLOUD_SQL_PASSWORD_SECRET_NAME", "cloudsql-postgres-password"),
         }
 
     # Define agent configuration
@@ -102,9 +97,7 @@ def register_phidata_postgres_agent(
 
     # Register the agent with the agent registry
     register_agent(agent_config)
-    logger.info(
-        f"Successfully registered Phidata agent '{agent_name}' with PostgreSQL storage"
-    )
+    logger.info(f"Successfully registered Phidata agent '{agent_name}' with PostgreSQL storage")
 
 
 def register_phidata_team_with_postgres(
@@ -129,17 +122,12 @@ def register_phidata_team_with_postgres(
         cloud_sql_config = {
             "project_id": os.environ.get("GCP_PROJECT_ID", "your-project-id"),
             "region": os.environ.get("GCP_REGION", "us-central1"),
-            "instance_connection_name": os.environ.get(
-                "CLOUD_SQL_INSTANCE_CONNECTION_NAME", ""
-            ),
+            "instance_connection_name": os.environ.get("CLOUD_SQL_INSTANCE_CONNECTION_NAME", ""),
             "database": os.environ.get("CLOUD_SQL_DATABASE", "phidata"),
             "user": os.environ.get("CLOUD_SQL_USER", "postgres"),
-            "use_iam_auth": os.environ.get("CLOUD_SQL_USE_IAM_AUTH", "false").lower()
-            == "true",
+            "use_iam_auth": os.environ.get("CLOUD_SQL_USE_IAM_AUTH", "false").lower() == "true",
             # Only needed if use_iam_auth is False
-            "password_secret_name": os.environ.get(
-                "CLOUD_SQL_PASSWORD_SECRET_NAME", "cloudsql-postgres-password"
-            ),
+            "password_secret_name": os.environ.get("CLOUD_SQL_PASSWORD_SECRET_NAME", "cloudsql-postgres-password"),
         }
 
     # Define team configuration
@@ -219,9 +207,7 @@ def register_phidata_team_with_postgres(
 
     # Register the team with the agent registry
     register_agent(team_config)
-    logger.info(
-        f"Successfully registered Phidata team '{team_name}' with PostgreSQL storage"
-    )
+    logger.info(f"Successfully registered Phidata team '{team_name}' with PostgreSQL storage")
 
 
 def test_postgres_agent(agent_id: str = "phidata-postgres") -> None:

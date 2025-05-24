@@ -1,16 +1,16 @@
 """
 Phidata Cloud SQL Configuration with PGVector for Agent Storage and Memory.
 
-This module provides configuration for Phidata to use Cloud SQL (PostgreSQL) 
+This module provides configuration for Phidata to use Cloud SQL (PostgreSQL)
 with PGVector for agent storage and memory, utilizing the google-cloud-sql-connector
 for IAM authentication (or password auth via Secret Manager) and VertexAiEmbedder for embeddings.
 
 Usage:
     from packages.phidata.src.cloudsql_pgvector import get_pgvector_memory, get_pg_agent_storage
-    
+
     # Get vector memory store with Vertex AI embeddings
     vector_memory = get_pgvector_memory(user_id="user-123")
-    
+
     # Get agent storage partitioned by agent_id
     agent_storage = get_pg_agent_storage(agent_id="my-agent-id")
 """
@@ -72,20 +72,13 @@ def get_cloud_sql_connection(storage_config: StorageConfig) -> sqlalchemy.engine
     """
     # Get configuration from StorageConfig (which reads from env vars/defaults)
     project_id = storage_config.get_config_value("GCP_PROJECT_ID", required=True)
-    instance_connection_name = storage_config.get_config_value(
-        "CLOUD_SQL_INSTANCE_CONNECTION_NAME", required=True
-    )
+    instance_connection_name = storage_config.get_config_value("CLOUD_SQL_INSTANCE_CONNECTION_NAME", required=True)
     database = storage_config.get_config_value("CLOUD_SQL_DATABASE", default="phidata")
     user = storage_config.get_config_value("CLOUD_SQL_USER", default="postgres")
     password_secret_name = storage_config.get_config_value(
         "CLOUD_SQL_PASSWORD_SECRET_NAME", default="cloudsql-postgres-password"
     )
-    use_iam_auth = (
-        storage_config.get_config_value(
-            "CLOUD_SQL_USE_IAM_AUTH", default="false"
-        ).lower()
-        == "true"
-    )
+    use_iam_auth = storage_config.get_config_value("CLOUD_SQL_USE_IAM_AUTH", default="false").lower() == "true"
 
     # Create SQL connection using google-cloud-sql-connector
     connector = Connector()
@@ -95,9 +88,7 @@ def get_cloud_sql_connection(storage_config: StorageConfig) -> sqlalchemy.engine
 
         def getconn():
             try:
-                logger.info(
-                    f"Connecting to Cloud SQL with IAM auth: {instance_connection_name}"
-                )
+                logger.info(f"Connecting to Cloud SQL with IAM auth: {instance_connection_name}")
                 conn = connector.connect(
                     instance_connection_string=instance_connection_name,
                     driver="pg8000",
@@ -115,17 +106,13 @@ def get_cloud_sql_connection(storage_config: StorageConfig) -> sqlalchemy.engine
         try:
             # Get the database password from Secret Manager
             client = secretmanager.SecretManagerServiceClient()
-            name = (
-                f"projects/{project_id}/secrets/{password_secret_name}/versions/latest"
-            )
+            name = f"projects/{project_id}/secrets/{password_secret_name}/versions/latest"
             response = client.access_secret_version(name=name)
             db_password = response.payload.data.decode("UTF-8")
 
             def getconn():
                 try:
-                    logger.info(
-                        f"Connecting to Cloud SQL with password auth: {instance_connection_name}"
-                    )
+                    logger.info(f"Connecting to Cloud SQL with password auth: {instance_connection_name}")
                     conn = connector.connect(
                         instance_connection_string=instance_connection_name,
                         driver="pg8000",
@@ -135,9 +122,7 @@ def get_cloud_sql_connection(storage_config: StorageConfig) -> sqlalchemy.engine
                     )
                     return conn
                 except Exception as e:
-                    logger.error(
-                        f"Error connecting to Cloud SQL with password auth: {e}"
-                    )
+                    logger.error(f"Error connecting to Cloud SQL with password auth: {e}")
                     raise
 
         except Exception as e:
@@ -174,15 +159,11 @@ def get_vertexai_embedder(storage_config: StorageConfig) -> VertexAiEmbedder:
     # Get configuration from StorageConfig
     project_id = storage_config.get_config_value("GCP_PROJECT_ID", required=True)
     region = storage_config.get_config_value("GCP_REGION", default="us-central1")
-    embedding_model = storage_config.get_config_value(
-        "VERTEX_EMBEDDING_MODEL", default="textembedding-gecko@003"
-    )
+    embedding_model = storage_config.get_config_value("VERTEX_EMBEDDING_MODEL", default="textembedding-gecko@003")
 
     try:
         # Create the embedder using Vertex AI
-        embedder = VertexAiEmbedder(
-            model=embedding_model, project_id=project_id, location=region
-        )
+        embedder = VertexAiEmbedder(model=embedding_model, project_id=project_id, location=region)
         logger.info(f"Created VertexAiEmbedder with model: {embedding_model}")
         return embedder
     except Exception as e:
@@ -210,9 +191,7 @@ def get_pgvector_memory(
     """
     # Get configuration from StorageConfig
     schema_name = storage_config.get_config_value("PG_SCHEMA_NAME", default="llm")
-    vector_dimension = int(
-        storage_config.get_config_value("EMBEDDING_VECTOR_SIZE", default="768")
-    )
+    vector_dimension = int(storage_config.get_config_value("EMBEDDING_VECTOR_SIZE", default="768"))
 
     # Create the database connection
     try:
@@ -224,7 +203,7 @@ def get_pgvector_memory(
         # Configure the table name using StorageConfig's method
         table_name = storage_config.get_collection_name(
             table_base_name,
-            privacy_level=privacy_level
+            privacy_level=privacy_level,
             # Note: user_id is not directly used in get_collection_name,
             # but could be incorporated into the base_name or handled by partitioning
         )
@@ -274,7 +253,7 @@ def get_pg_agent_storage(
         # Configure the table name using StorageConfig's method
         table_name = storage_config.get_collection_name(
             table_base_name,
-            privacy_level=privacy_level
+            privacy_level=privacy_level,
             # Note: agent_id is not directly used in get_collection_name,
             # but is used by the PgAssistantStorage for partitioning
         )
@@ -289,9 +268,7 @@ def get_pg_agent_storage(
             partitioning_field="agent_id" if agent_id else None,
         )
 
-        logger.info(
-            f"Created PgAssistantStorage with table: {schema_name}.{table_name}"
-        )
+        logger.info(f"Created PgAssistantStorage with table: {schema_name}.{table_name}")
         return agent_storage
     except Exception as e:
         logger.error(f"Error creating PgAssistantStorage: {e}")

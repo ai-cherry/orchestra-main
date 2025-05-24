@@ -40,9 +40,7 @@ def fix_private_key(private_key: str) -> str:
             private_key = private_key.rstrip() + "\n-----END PRIVATE KEY-----\n"
 
     # Ensure there's a newline after BEGIN and before END
-    private_key = re.sub(
-        r"(-----BEGIN PRIVATE KEY-----)([^\n])", r"\1\n\2", private_key
-    )
+    private_key = re.sub(r"(-----BEGIN PRIVATE KEY-----)([^\n])", r"\1\n\2", private_key)
     private_key = re.sub(r"([^\n])(-----END PRIVATE KEY-----)", r"\1\n\2", private_key)
 
     # Remove any non-printable characters
@@ -52,15 +50,9 @@ def fix_private_key(private_key: str) -> str:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Fix GCP service account key file issues"
-    )
-    parser.add_argument(
-        "--input", default="credentials.json", help="Input key file path"
-    )
-    parser.add_argument(
-        "--output", default="fixed_credentials.json", help="Output key file path"
-    )
+    parser = argparse.ArgumentParser(description="Fix GCP service account key file issues")
+    parser.add_argument("--input", default="credentials.json", help="Input key file path")
+    parser.add_argument("--output", default="fixed_credentials.json", help="Output key file path")
     args = parser.parse_args()
 
     print(f"Reading key file: {args.input}")
@@ -96,9 +88,7 @@ def main():
 
         missing_fields = [field for field in required_fields if field not in key_data]
         if missing_fields:
-            print(
-                f"Error: Key file is missing required fields: {', '.join(missing_fields)}"
-            )
+            print(f"Error: Key file is missing required fields: {', '.join(missing_fields)}")
             sys.exit(1)
 
         # Fix the private key

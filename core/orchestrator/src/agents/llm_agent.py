@@ -80,9 +80,7 @@ class ConversationFormatter:
 
         # Add traits if available
         if persona.traits:
-            traits_desc = ", ".join(
-                f"{trait} ({value}/100)" for trait, value in persona.traits.items()
-            )
+            traits_desc = ", ".join(f"{trait} ({value}/100)" for trait, value in persona.traits.items())
             system_content += f"Your traits are: {traits_desc}."
 
         return {"role": "system", "content": system_content}
@@ -166,10 +164,7 @@ class LLMAgent(Agent, Service):
         confidence = 0.7  # Base confidence level
 
         # Check for specific keywords or patterns that LLMs excel at
-        if (
-            "generate" in context.user_input.lower()
-            or "create" in context.user_input.lower()
-        ):
+        if "generate" in context.user_input.lower() or "create" in context.user_input.lower():
             confidence += 0.1
 
         # Check for code-related queries
@@ -181,9 +176,7 @@ class LLMAgent(Agent, Service):
             "script",
             "implement",
         ]
-        if any(
-            indicator in context.user_input.lower() for indicator in code_indicators
-        ):
+        if any(indicator in context.user_input.lower() for indicator in code_indicators):
             confidence += 0.2
 
         # Check for long or complex requests that benefit from LLM processing
@@ -193,9 +186,7 @@ class LLMAgent(Agent, Service):
         # Cap confidence at 1.0
         return min(confidence, 1.0)
 
-    def _extract_llm_parameters(
-        self, context: AgentContext
-    ) -> Tuple[Optional[str], float, Optional[int]]:
+    def _extract_llm_parameters(self, context: AgentContext) -> Tuple[Optional[str], float, Optional[int]]:
         """
         Extract LLM-specific parameters from context metadata.
 
@@ -232,9 +223,7 @@ class LLMAgent(Agent, Service):
 
         return model, temperature, max_tokens
 
-    async def _get_response_with_fallbacks(
-        self, messages, model, temperature, max_tokens
-    ):
+    async def _get_response_with_fallbacks(self, messages, model, temperature, max_tokens):
         """
         Try to get a response from multiple providers with cascading fallbacks.
 
@@ -272,9 +261,7 @@ class LLMAgent(Agent, Service):
             try:
                 # Skip if we've reached our retry limit
                 if len(providers_tried) >= 3:
-                    logger.warning(
-                        f"Reached maximum provider retry limit ({len(providers_tried)})"
-                    )
+                    logger.warning(f"Reached maximum provider retry limit ({len(providers_tried)})")
                     break
 
                 # Log the attempt
@@ -283,9 +270,7 @@ class LLMAgent(Agent, Service):
 
                 # Lazy-load the provider if needed
                 if providers[provider_name] is None:
-                    providers[provider_name] = self._get_provider_instance(
-                        provider_name
-                    )
+                    providers[provider_name] = self._get_provider_instance(provider_name)
 
                 provider = providers[provider_name]
 
@@ -508,11 +493,7 @@ class LLMAgent(Agent, Service):
                 text=f"I'm sorry, but I encountered an issue while processing your request. As {context.persona.name}, I'd like to help, but I need a moment for my service to recover.",
                 confidence=0.2,
                 metadata={
-                    "error": (
-                        "service_error"
-                        if isinstance(e, LLMProviderServiceError)
-                        else "unexpected_error"
-                    ),
+                    "error": ("service_error" if isinstance(e, LLMProviderServiceError) else "unexpected_error"),
                     "error_message": str(e),
                     "provider": self._provider_name,
                     "fallback": True,

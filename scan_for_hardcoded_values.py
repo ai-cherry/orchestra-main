@@ -60,9 +60,7 @@ PATTERNS = [
     ),
     HardcodedPattern(
         name="Service Account",
-        pattern=re.compile(
-            r'["\'][a-z-]+@cherry-ai-project\.iam\.gserviceaccount\.com["\']'
-        ),
+        pattern=re.compile(r'["\'][a-z-]+@cherry-ai-project\.iam\.gserviceaccount\.com["\']'),
         env_var="GCP_SERVICE_ACCOUNT",
         description="Service account email",
         file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.tf$", r"\.py$"],
@@ -95,9 +93,7 @@ def should_scan_file(file_path: Path, pattern: HardcodedPattern) -> bool:
         return False
 
     # Skip files that match any exclude pattern
-    if pattern.exclude_patterns and any(
-        re.search(p, str(file_path)) for p in pattern.exclude_patterns
-    ):
+    if pattern.exclude_patterns and any(re.search(p, str(file_path)) for p in pattern.exclude_patterns):
         return False
 
     return True
@@ -128,9 +124,7 @@ def scan_file(file_path: Path, pattern: HardcodedPattern) -> List[Tuple[int, str
     return results
 
 
-def generate_fix(
-    file_path: Path, pattern: HardcodedPattern, line: str, match: str
-) -> str:
+def generate_fix(file_path: Path, pattern: HardcodedPattern, line: str, match: str) -> str:
     """
     Generate a suggested fix for a hardcoded value.
 
@@ -190,9 +184,7 @@ def scan_directory(
                                 line_num,
                                 line,
                                 match,
-                                generate_fix(file_path, pattern, line, match)
-                                if fix
-                                else None,
+                                generate_fix(file_path, pattern, line, match) if fix else None,
                             )
                             for line_num, line, match in matches
                         ]
@@ -203,9 +195,7 @@ def scan_directory(
     return results
 
 
-def print_results(
-    results: Dict[Path, Dict[str, List[Tuple[int, str, str, Optional[str]]]]]
-) -> None:
+def print_results(results: Dict[Path, Dict[str, List[Tuple[int, str, str, Optional[str]]]]]) -> None:
     """
     Print scan results.
 
@@ -213,11 +203,7 @@ def print_results(
         results: Scan results
     """
     total_files = len(results)
-    total_matches = sum(
-        len(match)
-        for file_results in results.values()
-        for match in file_results.values()
-    )
+    total_matches = sum(len(match) for file_results in results.values() for match in file_results.values())
 
     print(f"Found {total_matches} hardcoded values in {total_files} files:\n")
 
@@ -234,9 +220,7 @@ def print_results(
 
 def main() -> None:
     """Main function."""
-    parser = argparse.ArgumentParser(
-        description="Scan for hardcoded values in AI Orchestra codebase"
-    )
+    parser = argparse.ArgumentParser(description="Scan for hardcoded values in AI Orchestra codebase")
     parser.add_argument(
         "--path",
         type=str,

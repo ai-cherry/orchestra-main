@@ -74,9 +74,7 @@ class PATManager:
         self.config["tokens"][token_id] = {
             "scope": scope,
             "created_at": datetime.now().isoformat(),
-            "expires_at": (
-                datetime.now() + timedelta(days=self.config["rotation_schedule"][scope])
-            ).isoformat(),
+            "expires_at": (datetime.now() + timedelta(days=self.config["rotation_schedule"][scope])).isoformat(),
             "value": value,
             "last_used": None,
         }
@@ -121,9 +119,7 @@ class PATManager:
         )[0]
 
         # Update last_used timestamp
-        self.config["tokens"][selected_token[0]][
-            "last_used"
-        ] = datetime.now().isoformat()
+        self.config["tokens"][selected_token[0]]["last_used"] = datetime.now().isoformat()
         self._save_config()
 
         return selected_token[1]
@@ -136,9 +132,7 @@ class PATManager:
         """
         tokens_to_rotate = []
         for token_id, token_info in self.config["tokens"].items():
-            if datetime.fromisoformat(
-                token_info["expires_at"]
-            ) < datetime.now() + timedelta(days=7):
+            if datetime.fromisoformat(token_info["expires_at"]) < datetime.now() + timedelta(days=7):
                 tokens_to_rotate.append(
                     {
                         "token_id": token_id,
@@ -157,6 +151,4 @@ if __name__ == "__main__":
     # Check if any tokens need rotation
     tokens_to_rotate = manager.check_rotation_needed()
     for token in tokens_to_rotate:
-        print(
-            f"Token {token['token_id']} (scope: {token['scope']}) expires on {token['expires_at']}"
-        )
+        print(f"Token {token['token_id']} (scope: {token['scope']}) expires on {token['expires_at']}")

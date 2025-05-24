@@ -40,9 +40,7 @@ def check_env_file():
     env_path = Path(".env")
     if not env_path.exists():
         print(f"  {Colors.RED}✗ .env file not found{Colors.ENDC}")
-        print(
-            f"    {Colors.YELLOW}→ Create a .env file based on .env.example{Colors.ENDC}"
-        )
+        print(f"    {Colors.YELLOW}→ Create a .env file based on .env.example{Colors.ENDC}")
         return False
 
     # Check for required API keys
@@ -173,14 +171,9 @@ def check_hardcoded_references():
             for pattern, description in patterns:
                 if pattern in content:
                     line_num = (
-                        content.split("\n").index(
-                            [line for line in content.split("\n") if pattern in line][0]
-                        )
-                        + 1
+                        content.split("\n").index([line for line in content.split("\n") if pattern in line][0]) + 1
                     )
-                    print(
-                        f"  {Colors.YELLOW}⚠ {description} found in {file_path}:{line_num}{Colors.ENDC}"
-                    )
+                    print(f"  {Colors.YELLOW}⚠ {description} found in {file_path}:{line_num}{Colors.ENDC}")
                     issues_found = True
         except Exception as e:
             print(f"  {Colors.YELLOW}⚠ Error checking {file_path}: {e}{Colors.ENDC}")
@@ -194,9 +187,7 @@ def check_hardcoded_references():
 def main():
     """Run all quick checks."""
     print(f"{Colors.BOLD}Orchestrator Quick Check Tool{Colors.ENDC}")
-    print(
-        f"{Colors.BLUE}Running rapid checks for Patrick's experience...{Colors.ENDC}\n"
-    )
+    print(f"{Colors.BLUE}Running rapid checks for Patrick's experience...{Colors.ENDC}\n")
 
     # Run all checks
     env_ok = check_env_file()
@@ -213,9 +204,7 @@ def main():
         print(f"  For a more thorough analysis, run: ./diagnose_patrick_issues.py")
         return 0
     elif env_ok and files_ok and api_ok:
-        print(
-            f"\n{Colors.YELLOW}⚠ Most checks passed with some minor issues{Colors.ENDC}"
-        )
+        print(f"\n{Colors.YELLOW}⚠ Most checks passed with some minor issues{Colors.ENDC}")
         print(f"  The system structure is present but there are some potential issues.")
         print(f"  Run ./diagnose_patrick_issues.py for detailed diagnostics.")
         return 1

@@ -11,9 +11,19 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Prefer system log dir, fall back to user home if not writable
+SYSTEM_LOG_DIR="/var/log/mcp"
+USER_LOG_DIR="$HOME/.mcp/logs"
+
+if mkdir -p "$SYSTEM_LOG_DIR" 2>/dev/null; then
+  LOG_DIR="$SYSTEM_LOG_DIR"
+else
+  echo "WARNING: No permission for /var/log, using $USER_LOG_DIR instead."
+  mkdir -p "$USER_LOG_DIR"
+  LOG_DIR="$USER_LOG_DIR"
+fi
+
 # Log file
-LOG_DIR="/var/log/mcp"
-mkdir -p $LOG_DIR
 LOG_FILE="$LOG_DIR/mcp_system_$(date +%Y%m%d_%H%M%S).log"
 
 # Function to log messages
@@ -109,11 +119,8 @@ start_server "Secrets MCP" \
     8002 \
     "http://localhost:8002/health"
 
-# 3. Start Memory Management MCP Server
-start_server "Memory MCP" \
-    "python -m mcp_server.servers.memory_mcp_server" \
-    8003 \
-    "http://localhost:8003/health"
+# 3. Start Memory Management MCP Server (disabled until dependencies resolved)
+# echo -e "${YELLOW}Skipping Memory MCP (dependencies not ready)${NC}"
 
 # 4. Start Orchestrator MCP Server
 start_server "Orchestrator MCP" \

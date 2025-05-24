@@ -33,9 +33,7 @@ from packages.shared.src.models.base_models import MemoryItem
 
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("memory_example")
 
 
@@ -81,9 +79,7 @@ async def perform_semantic_search(
     Returns:
         List of memory items
     """
-    results = await memory_manager.semantic_search(
-        user_id=user_id, query_embedding=query_embedding, top_k=top_k
-    )
+    results = await memory_manager.semantic_search(user_id=user_id, query_embedding=query_embedding, top_k=top_k)
 
     log_operation(
         logging.INFO,
@@ -163,14 +159,10 @@ async def example_from_env():
     try:
         # Get available backends and vector search providers
         available_backends = MemoryManagerFactory.get_available_backends()
-        available_providers = (
-            MemoryManagerFactory.get_available_vector_search_providers()
-        )
+        available_providers = MemoryManagerFactory.get_available_vector_search_providers()
 
         logger.info(f"Available backends: {[b.value for b in available_backends]}")
-        logger.info(
-            f"Available vector search providers: {[p.value for p in available_providers]}"
-        )
+        logger.info(f"Available vector search providers: {[p.value for p in available_providers]}")
 
         # Check health
         health = await memory_manager.health_check()

@@ -1,7 +1,7 @@
 """
 Tool Registry for AI Orchestra
 
-This module implements a Tool Registry that allows AI agents to discover 
+This module implements a Tool Registry that allows AI agents to discover
 available tools through the MCP (Model Context Protocol) memory system.
 The ToolRegistry class manages tool registration, discovery, and permissions
 across environments, enabling seamless tool access for AI agents like
@@ -11,10 +11,10 @@ Example:
     # Initialize the registry with MCP client
     from tool_registry import ToolRegistry
     from mcp_client import MCPClient
-    
+
     mcp_client = MCPClient()
     registry = ToolRegistry(mcp_client)
-    
+
     # Register a tool
     registry.register_tool(
         name="summarize_text",
@@ -22,7 +22,7 @@ Example:
         provider="gemini",
         parameters={"text": "string", "max_length": "integer"}
     )
-    
+
     # Discover tools
     tools = registry.discover_tools(provider="gemini")
 """
@@ -33,9 +33,7 @@ import time
 import uuid
 from typing import Any, Dict, List, Optional, Set, Union
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("tool_registry")
 
 
@@ -90,9 +88,7 @@ class ToolRegistry:
             usage_stats = self.mcp_client.get(self.USAGE_STATS_KEY)
             if not usage_stats:
                 logger.info("Initializing tool usage stats in MCP memory")
-                self.mcp_client.set(
-                    self.USAGE_STATS_KEY, {"tools": {}, "last_reset": time.time()}
-                )
+                self.mcp_client.set(self.USAGE_STATS_KEY, {"tools": {}, "last_reset": time.time()})
         except Exception as e:
             logger.error(f"Failed to initialize registry: {e}")
             raise
@@ -282,9 +278,7 @@ class ToolRegistry:
 
             # Check permissions if agent_id is provided
             if agent_id and not self._check_permission(agent_id, tool_id):
-                raise PermissionError(
-                    f"Agent {agent_id} not allowed to use tool {tool_id}"
-                )
+                raise PermissionError(f"Agent {agent_id} not allowed to use tool {tool_id}")
 
             # Record usage stats
             invocation_id = str(uuid.uuid4())
@@ -327,9 +321,7 @@ class ToolRegistry:
         except Exception as e:
             logger.error(f"Failed to initialize tool stats for {tool_id}: {e}")
 
-    def _record_usage(
-        self, tool_id: str, agent_id: Optional[str], invocation_id: str
-    ) -> None:
+    def _record_usage(self, tool_id: str, agent_id: Optional[str], invocation_id: str) -> None:
         """Record tool usage statistics.
 
         Args:
@@ -434,9 +426,7 @@ class ToolRegistry:
             logger.error(f"Failed to get tool info for {tool_id}: {e}")
             return None
 
-    def get_usage_stats(
-        self, tool_id: Optional[str] = None, agent_id: Optional[str] = None
-    ) -> Dict[str, Any]:
+    def get_usage_stats(self, tool_id: Optional[str] = None, agent_id: Optional[str] = None) -> Dict[str, Any]:
         """Get usage statistics for tools.
 
         Args:
@@ -461,9 +451,7 @@ class ToolRegistry:
             if agent_id:
                 result = {}
                 for tid, tool_stat in tools_stats.items():
-                    agent_invocations = tool_stat.get("invocations_by_agent", {}).get(
-                        agent_id
-                    )
+                    agent_invocations = tool_stat.get("invocations_by_agent", {}).get(agent_id)
                     if agent_invocations:
                         result[tid] = {
                             "total_invocations": agent_invocations,

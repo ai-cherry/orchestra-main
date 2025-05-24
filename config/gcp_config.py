@@ -4,6 +4,7 @@ Google Cloud Platform configuration settings for the Orchestra project.
 This module contains configurations for connecting to various GCP services
 based on the current environment (development, staging, production).
 """
+
 import os
 from typing import Dict, Any, Optional
 from loguru import logger
@@ -17,9 +18,7 @@ BASE_CONFIG = {
     "region": os.environ.get("GCP_REGION", "us-central1"),
     "memory_type": "firestore",  # Use Firestore for memory management in GCP
     "memory_collection": "memories",
-    "credentials_path": os.environ.get(
-        "GOOGLE_APPLICATION_CREDENTIALS", "/app/gcp-credentials.json"
-    ),
+    "credentials_path": os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "/app/gcp-credentials.json"),
 }
 
 # Environment-specific configurations
@@ -52,9 +51,7 @@ def get_gcp_config() -> Dict[str, Any]:
     if ENVIRONMENT in ENV_CONFIGS:
         config.update(ENV_CONFIGS[ENVIRONMENT])
     else:
-        logger.warning(
-            f"Unknown environment: {ENVIRONMENT}, using default configuration"
-        )
+        logger.warning(f"Unknown environment: {ENVIRONMENT}, using default configuration")
 
     # Log the active configuration (excluding sensitive info)
     safe_config = config.copy()

@@ -91,9 +91,7 @@ class SecureGCPProjectMigrator:
         Returns:
             Path to the temporary key file
         """
-        logger.info(
-            f"Creating temporary service account key for {self.service_account_email}"
-        )
+        logger.info(f"Creating temporary service account key for {self.service_account_email}")
 
         # Create a secure temporary file with restricted permissions
         self.temp_key_file = tempfile.NamedTemporaryFile(delete=False)
@@ -114,9 +112,7 @@ class SecureGCPProjectMigrator:
         ]
 
         try:
-            subprocess.run(
-                cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-            )
+            subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             logger.info("Service account key created successfully (temporary file)")
             return self.temp_key_file.name
         except subprocess.CalledProcessError as e:
@@ -136,9 +132,7 @@ class SecureGCPProjectMigrator:
             self.credentials = service_account.Credentials.from_service_account_file(
                 key_file, scopes=["https://www.googleapis.com/auth/cloud-platform"]
             )
-            self.resource_manager = discovery.build(
-                "cloudresourcemanager", "v3", credentials=self.credentials
-            )
+            self.resource_manager = discovery.build("cloudresourcemanager", "v3", credentials=self.credentials)
             logger.info("Authentication successful")
         except Exception as e:
             logger.error(f"Authentication failed: {str(e)}")
@@ -153,9 +147,7 @@ class SecureGCPProjectMigrator:
             roles: List of roles to grant
         """
         for role in roles:
-            logger.info(
-                f"Granting {role} to {self.service_account_email} in organization {org_id}"
-            )
+            logger.info(f"Granting {role} to {self.service_account_email} in organization {org_id}")
             cmd = [
                 "gcloud",
                 "organizations",
@@ -168,9 +160,7 @@ class SecureGCPProjectMigrator:
             ]
 
             try:
-                subprocess.run(
-                    cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-                )
+                subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 logger.info(f"Successfully granted {role}")
             except subprocess.CalledProcessError as e:
                 logger.error(f"Failed to grant {role}: {e.stderr.decode()}")
@@ -178,9 +168,7 @@ class SecureGCPProjectMigrator:
 
     def wait_for_iam_propagation(self) -> None:
         """Wait for IAM role changes to propagate across the GCP environment."""
-        logger.info(
-            f"Waiting {self.iam_propagation_time} seconds for IAM propagation..."
-        )
+        logger.info(f"Waiting {self.iam_propagation_time} seconds for IAM propagation...")
 
         # Show progress during the wait
         start_time = time.time()
@@ -192,9 +180,7 @@ class SecureGCPProjectMigrator:
             if elapsed % 5 == 0:
                 # Calculate progress percentage
                 progress = int((elapsed / self.iam_propagation_time) * 100)
-                logger.info(
-                    f"IAM propagation: {progress}% complete, {remaining} seconds remaining"
-                )
+                logger.info(f"IAM propagation: {progress}% complete, {remaining} seconds remaining")
 
             time.sleep(1)
 
@@ -213,9 +199,7 @@ class SecureGCPProjectMigrator:
         Returns:
             True if successful, False otherwise
         """
-        logger.info(
-            f"Moving project {self.project_id} to organization {self.target_org_id}"
-        )
+        logger.info(f"Moving project {self.project_id} to organization {self.target_org_id}")
         cmd = [
             "gcloud",
             "beta",
@@ -229,9 +213,7 @@ class SecureGCPProjectMigrator:
         ]
 
         try:
-            subprocess.run(
-                cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-            )
+            subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             logger.info("Project migration command completed successfully")
             return True
         except subprocess.CalledProcessError as e:
@@ -262,17 +244,13 @@ class SecureGCPProjectMigrator:
                 "--format",
                 "json",
             ]
-            result = subprocess.run(
-                cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-            )
+            result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             policy = json.loads(result.stdout.decode())
 
             # Extract roles assigned to our service account
             roles = set()
             for binding in policy.get("bindings", []):
-                if f"serviceAccount:{self.service_account_email}" in binding.get(
-                    "members", []
-                ):
+                if f"serviceAccount:{self.service_account_email}" in binding.get("members", []):
                     roles.add(binding.get("role"))
 
             # Check if critical roles are missing
@@ -294,9 +272,7 @@ class SecureGCPProjectMigrator:
                         logger.error(f"Failed to grant role {role}: {str(e)}")
 
                 # Additional wait for newly granted roles
-                logger.info(
-                    "Waiting additional time for new role grants to propagate..."
-                )
+                logger.info("Waiting additional time for new role grants to propagate...")
                 time.sleep(120)  # 2 minutes additional wait
             else:
                 logger.info("All required roles are correctly assigned")
@@ -314,20 +290,13 @@ class SecureGCPProjectMigrator:
                     "--format",
                     "json",
                 ]
-                result = subprocess.run(
-                    cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-                )
+                result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 policies = json.loads(result.stdout.decode())
 
                 # Check for restrictive policies
                 for policy in policies:
-                    if (
-                        "constraints/resourcemanager.projectsMoveRestriction"
-                        in policy.get("name", "")
-                    ):
-                        logger.warning(
-                            "Organization has project move restrictions in place!"
-                        )
+                    if "constraints/resourcemanager.projectsMoveRestriction" in policy.get("name", ""):
+                        logger.warning("Organization has project move restrictions in place!")
                         break
             except Exception as e:
                 logger.error(f"Error checking organization policies: {str(e)}")
@@ -342,9 +311,7 @@ class SecureGCPProjectMigrator:
         Returns:
             True if successful, False otherwise
         """
-        logger.info(
-            f"Verifying project {self.project_id} migration to organization {self.target_org_id}"
-        )
+        logger.info(f"Verifying project {self.project_id} migration to organization {self.target_org_id}")
         cmd = [
             "gcloud",
             "projects",
@@ -355,15 +322,11 @@ class SecureGCPProjectMigrator:
         ]
 
         try:
-            result = subprocess.run(
-                cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-            )
+            result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             current_org = result.stdout.decode().strip()
 
             if current_org == self.target_org_id:
-                logger.info(
-                    f"✅ Verification successful: Project is now in organization {self.target_org_id}"
-                )
+                logger.info(f"✅ Verification successful: Project is now in organization {self.target_org_id}")
                 return True
             else:
                 logger.error(
@@ -416,13 +379,9 @@ class SecureGCPProjectMigrator:
 
 def main():
     """Parse arguments and run the migration."""
-    parser = argparse.ArgumentParser(
-        description="Securely migrate GCP projects between organizations"
-    )
+    parser = argparse.ArgumentParser(description="Securely migrate GCP projects between organizations")
     parser.add_argument("--project-id", required=True, help="GCP project ID to migrate")
-    parser.add_argument(
-        "--service-account", required=True, help="Service account email address"
-    )
+    parser.add_argument("--service-account", required=True, help="Service account email address")
     parser.add_argument("--target-org", required=True, help="Target organization ID")
     parser.add_argument(
         "--iam-wait",

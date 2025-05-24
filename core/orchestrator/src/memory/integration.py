@@ -52,9 +52,7 @@ class MemoryEnhancedAgentContext(AgentContext):
         self.conversation_id = conversation_id
         self.memory_items: List[MemoryItem] = []
 
-    async def remember(
-        self, content: Any, memory_type: MemoryType = MemoryType.MID_TERM, **kwargs
-    ) -> str:
+    async def remember(self, content: Any, memory_type: MemoryType = MemoryType.MID_TERM, **kwargs) -> str:
         """
         Store information in memory.
 
@@ -115,9 +113,7 @@ class MemoryEnhancedAgentContext(AgentContext):
         # Extract items
         return [result.item for result in results]
 
-    async def recall_conversation(
-        self, limit: int = 10
-    ) -> List[ConversationMemoryItem]:
+    async def recall_conversation(self, limit: int = 10) -> List[ConversationMemoryItem]:
         """
         Retrieve recent conversation history.
 
@@ -201,9 +197,7 @@ class MemoryAwareAgentRegistry(AgentRegistry):
         )
         await self._memory_manager.initialize()
 
-    def create_context(
-        self, text: str, conversation_id: Optional[str] = None, **kwargs
-    ) -> MemoryEnhancedAgentContext:
+    def create_context(self, text: str, conversation_id: Optional[str] = None, **kwargs) -> MemoryEnhancedAgentContext:
         """
         Create a memory-enhanced agent context.
 

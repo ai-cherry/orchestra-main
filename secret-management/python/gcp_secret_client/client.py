@@ -63,14 +63,11 @@ def retry(
                     if attempt < max_retries:
                         sleep_time = backoff_factor * (2**attempt)
                         logger.warning(
-                            f"Attempt {attempt + 1}/{max_retries + 1} failed: {e}. "
-                            f"Retrying in {sleep_time:.2f}s..."
+                            f"Attempt {attempt + 1}/{max_retries + 1} failed: {e}. " f"Retrying in {sleep_time:.2f}s..."
                         )
                         time.sleep(sleep_time)
                     else:
-                        logger.error(
-                            f"All {max_retries + 1} attempts failed. Last error: {e}"
-                        )
+                        logger.error(f"All {max_retries + 1} attempts failed. Last error: {e}")
             raise last_exception
 
         return wrapper
@@ -155,9 +152,7 @@ class SecretClient:
             f"with cache_ttl={cache_ttl}s, max_retries={max_retries}"
         )
 
-    def _format_secret_path(
-        self, secret_id: str, version: str = "latest", project_id: Optional[str] = None
-    ) -> str:
+    def _format_secret_path(self, secret_id: str, version: str = "latest", project_id: Optional[str] = None) -> str:
         """
         Format the full path to a secret.
 
@@ -206,9 +201,7 @@ class SecretClient:
         for var_name in variations:
             value = os.environ.get(var_name)
             if value is not None:
-                logger.debug(
-                    f"Secret '{secret_id}' found in environment as '{var_name}'"
-                )
+                logger.debug(f"Secret '{secret_id}' found in environment as '{var_name}'")
                 return value
 
         return None
@@ -226,9 +219,7 @@ class SecretClient:
 
         expiry = None
         if self.cache_ttl > 0:
-            expiry = datetime.datetime.now() + datetime.timedelta(
-                seconds=self.cache_ttl
-            )
+            expiry = datetime.datetime.now() + datetime.timedelta(seconds=self.cache_ttl)
 
         self.cache[cache_key] = CacheEntry(value, expiry)
         logger.debug(f"Cached secret '{cache_key}' until {expiry}")
@@ -259,9 +250,7 @@ class SecretClient:
         return entry.value
 
     @retry(max_retries=3)
-    def _access_secret_version(
-        self, secret_path: str, allow_missing: bool = False
-    ) -> str:
+    def _access_secret_version(self, secret_path: str, allow_missing: bool = False) -> str:
         """
         Access a secret version with retries.
 
@@ -393,9 +382,7 @@ class SecretClient:
 
             # If we have a fallback value, use it
             if fallback is not None:
-                logger.warning(
-                    f"Couldn't access secret '{secret_id}', using fallback value. Error: {e}"
-                )
+                logger.warning(f"Couldn't access secret '{secret_id}', using fallback value. Error: {e}")
                 return fallback
 
             # Otherwise propagate the exception
@@ -503,9 +490,7 @@ class SecretClient:
 
         return results
 
-    def clear_cache(
-        self, secret_id: Optional[str] = None, project_id: Optional[str] = None
-    ) -> None:
+    def clear_cache(self, secret_id: Optional[str] = None, project_id: Optional[str] = None) -> None:
         """
         Clear cached secrets.
 
@@ -522,9 +507,7 @@ class SecretClient:
             for key in keys_to_remove:
                 del self.cache[key]
 
-            logger.debug(
-                f"Cleared {len(keys_to_remove)} cached entries for secret '{secret_id}'"
-            )
+            logger.debug(f"Cleared {len(keys_to_remove)} cached entries for secret '{secret_id}'")
         else:
             # Clear all cached secrets
             count = len(self.cache)

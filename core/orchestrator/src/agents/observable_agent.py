@@ -96,9 +96,7 @@ class ObservableAgent(Agent):
                 "agent_id": self.agent_id,
                 "operation_id": operation_id,
                 "context_type": type(context).__name__,
-                "user_input_length": len(context.user_input)
-                if context.user_input
-                else 0,
+                "user_input_length": len(context.user_input) if context.user_input else 0,
             },
         )
 
@@ -229,9 +227,7 @@ class ObservableAgent(Agent):
         logger.info(f"Initializing agent {self.agent_id}")
 
         # Initialize wrapped agent if it has an initialize_async method
-        if hasattr(self.wrapped_agent, "initialize_async") and callable(
-            self.wrapped_agent.initialize_async
-        ):
+        if hasattr(self.wrapped_agent, "initialize_async") and callable(self.wrapped_agent.initialize_async):
             await self.wrapped_agent.initialize_async()
 
         logger.info(f"Agent {self.agent_id} initialized")
@@ -241,9 +237,7 @@ class ObservableAgent(Agent):
         logger.info(f"Closing agent {self.agent_id}")
 
         # Close wrapped agent if it has a close_async method
-        if hasattr(self.wrapped_agent, "close_async") and callable(
-            self.wrapped_agent.close_async
-        ):
+        if hasattr(self.wrapped_agent, "close_async") and callable(self.wrapped_agent.close_async):
             await self.wrapped_agent.close_async()
 
         logger.info(f"Agent {self.agent_id} closed")

@@ -1,6 +1,7 @@
 """
 Endpoints for user interactions with the orchestration system.
 """
+
 from typing import Dict, Any, Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
@@ -14,24 +15,16 @@ class InteractionRequest(BaseModel):
     """Model for an interaction request."""
 
     text: str = Field(..., description="The input text from the user")
-    agent_id: Optional[str] = Field(
-        None, description="Specific agent ID to target, or None for default"
-    )
-    context: Dict[str, Any] = Field(
-        default_factory=dict, description="Additional context for the interaction"
-    )
+    agent_id: Optional[str] = Field(None, description="Specific agent ID to target, or None for default")
+    context: Dict[str, Any] = Field(default_factory=dict, description="Additional context for the interaction")
 
 
 class InteractionResponse(BaseModel):
     """Model for an interaction response."""
 
     response: str = Field(..., description="The response text")
-    agent_id: Optional[str] = Field(
-        None, description="ID of the agent that generated the response"
-    )
-    metadata: Dict[str, Any] = Field(
-        default_factory=dict, description="Additional metadata"
-    )
+    agent_id: Optional[str] = Field(None, description="ID of the agent that generated the response")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
 
 
 @router.post("/interact", response_model=InteractionResponse)
@@ -69,9 +62,7 @@ async def interact(request: InteractionRequest):
         # Process the input with the selected agent
         response = await agent.process(request.text, context=request.context)
 
-        return InteractionResponse(
-            response=response, agent_id=agent.id, metadata={"agent_name": agent.name}
-        )
+        return InteractionResponse(response=response, agent_id=agent.id, metadata={"agent_name": agent.name})
 
     except Exception as e:
         # Handle any errors during processing

@@ -199,41 +199,31 @@ class MemoryCompressionEngine:
                     paragraphs = entry.content.split("\n\n")
                     if len(paragraphs) > 2:
                         compressed_entry.content = (
-                            paragraphs[0]
-                            + "\n\n... [highly compressed] ...\n\n"
-                            + paragraphs[-1]
+                            paragraphs[0] + "\n\n... [highly compressed] ...\n\n" + paragraphs[-1]
                         )
 
             elif entry.compression_level == CompressionLevel.EXTREME:
                 # Extreme compression: keep only first paragraph
                 if len(entry.content) > 100:
                     paragraphs = entry.content.split("\n\n")
-                    compressed_entry.content = (
-                        paragraphs[0] + " ... [extremely compressed]"
-                    )
+                    compressed_entry.content = paragraphs[0] + " ... [extremely compressed]"
 
             elif entry.compression_level == CompressionLevel.REFERENCE_ONLY:
                 # Reference only: keep only a reference to the original content
-                compressed_entry.content = (
-                    f"[Reference: memory with hash {entry.metadata.content_hash}]"
-                )
+                compressed_entry.content = f"[Reference: memory with hash {entry.metadata.content_hash}]"
 
         elif isinstance(entry.content, dict):
             if entry.compression_level == CompressionLevel.LIGHT:
                 # For dictionaries, keep only key fields
                 important_keys = set(list(entry.content.keys())[:5])
-                compressed_entry.content = {
-                    k: v for k, v in entry.content.items() if k in important_keys
-                }
+                compressed_entry.content = {k: v for k, v in entry.content.items() if k in important_keys}
                 if len(entry.content) > len(compressed_entry.content):
                     compressed_entry.content["_compressed"] = True
 
             elif entry.compression_level == CompressionLevel.MEDIUM:
                 # Keep only 3 key fields
                 important_keys = set(list(entry.content.keys())[:3])
-                compressed_entry.content = {
-                    k: v for k, v in entry.content.items() if k in important_keys
-                }
+                compressed_entry.content = {k: v for k, v in entry.content.items() if k in important_keys}
                 compressed_entry.content["_compressed"] = True
 
             elif entry.compression_level in [
@@ -256,18 +246,13 @@ class MemoryCompressionEngine:
         return compressed_entry
 
     @staticmethod
-    def decompress(
-        entry: MemoryEntry, original_storage: "MemoryStorage"
-    ) -> MemoryEntry:
+    def decompress(entry: MemoryEntry, original_storage: "MemoryStorage") -> MemoryEntry:
         """Attempt to decompress a memory entry if possible."""
         if entry.compression_level == CompressionLevel.NONE:
             return entry
 
         # For REFERENCE_ONLY, try to retrieve the original
-        if (
-            entry.compression_level == CompressionLevel.REFERENCE_ONLY
-            and entry.metadata.content_hash
-        ):
+        if entry.compression_level == CompressionLevel.REFERENCE_ONLY and entry.metadata.content_hash:
             original = original_storage.get_by_hash(entry.metadata.content_hash)
             if original:
                 # Create a new entry with the original content but keep current metadata
@@ -333,9 +318,7 @@ class TokenBudgetManager:
 
         return self.tool_budgets[tool] - self.current_usage[tool]
 
-    def optimize_for_tool(
-        self, entries: List[MemoryEntry], tool: ToolType
-    ) -> List[MemoryEntry]:
+    def optimize_for_tool(self, entries: List[MemoryEntry], tool: ToolType) -> List[MemoryEntry]:
         """Optimize a list of entries to fit within a tool's budget."""
         if tool not in self.tool_budgets:
             return []
@@ -375,9 +358,7 @@ class TokenBudgetManager:
                         storage_tier=entry.storage_tier,
                     )
 
-                    compressed_entry = MemoryCompressionEngine.compress(
-                        compressed_entry
-                    )
+                    compressed_entry = MemoryCompressionEngine.compress(compressed_entry)
                     compressed_tokens = self.estimate_tokens(compressed_entry)
 
                     if (current_tokens + compressed_tokens) <= budget:
@@ -512,9 +493,7 @@ class MemorySyncEngine:
         """Register a tool-specific adapter."""
         self.tool_adapters[tool] = adapter
 
-    def create_memory(
-        self, key: str, entry: MemoryEntry, source_tool: ToolType
-    ) -> bool:
+    def create_memory(self, key: str, entry: MemoryEntry, source_tool: ToolType) -> bool:
         """Create a new memory entry - simplified for single-user project."""
         # Update entry metadata
         entry.metadata.source_tool = source_tool
@@ -532,9 +511,7 @@ class MemorySyncEngine:
 
         return success
 
-    def update_memory(
-        self, key: str, entry: MemoryEntry, source_tool: ToolType
-    ) -> bool:
+    def update_memory(self, key: str, entry: MemoryEntry, source_tool: ToolType) -> bool:
         """Update an existing memory entry - simplified for single-user project."""
         # Get the existing entry
         existing = self.storage.get(key)
@@ -599,12 +576,8 @@ class MemorySyncEngine:
                         CompressionLevel.REFERENCE_ONLY,
                     ]:
                         compressed_entry.compression_level = level
-                        compressed_entry = self.compression_engine.compress(
-                            compressed_entry
-                        )
-                        if self.token_budget_manager.can_fit_entry(
-                            compressed_entry, tool
-                        ):
+                        compressed_entry = self.compression_engine.compress(compressed_entry)
+                        if self.token_budget_manager.can_fit_entry(compressed_entry, tool):
                             break
 
                 return compressed_entry
@@ -635,10 +608,7 @@ class MemorySyncEngine:
         source_tool: ToolType,
     ) -> bool:
         """Resolve a conflict between two memory entries."""
-        logger.warning(
-            f"Conflict detected for key {key} between "
-            f"{existing.metadata.source_tool} and {source_tool}"
-        )
+        logger.warning(f"Conflict detected for key {key} between " f"{existing.metadata.source_tool} and {source_tool}")
 
         # Simple resolution strategy: most recent wins
         if new_entry.metadata.last_modified > existing.metadata.last_modified:
@@ -694,9 +664,7 @@ class MemorySyncEngine:
                             success = False
                     else:
                         # Couldn't compress enough to fit
-                        logger.warning(
-                            f"Entry {operation.key} too large for {tool} even after compression"
-                        )
+                        logger.warning(f"Entry {operation.key} too large for {tool} even after compression")
                         success = False
                 else:
                     # Sync the entry as-is
@@ -723,9 +691,7 @@ class MemorySyncEngine:
 
         return success
 
-    def _compress_for_tool(
-        self, entry: MemoryEntry, tool: ToolType
-    ) -> Optional[MemoryEntry]:
+    def _compress_for_tool(self, entry: MemoryEntry, tool: ToolType) -> Optional[MemoryEntry]:
         """Compress an entry to fit in a tool's context window."""
         for level in CompressionLevel:
             if level == CompressionLevel.NONE:
@@ -749,9 +715,7 @@ class MemorySyncEngine:
 
         return None
 
-    def optimize_context_window(
-        self, tool: ToolType, required_keys: Optional[List[str]] = None
-    ) -> int:
+    def optimize_context_window(self, tool: ToolType, required_keys: Optional[List[str]] = None) -> int:
         """Optimize the context window for a specific tool."""
         # Get all active memory entries
         all_keys = self.storage.list_keys()
@@ -763,9 +727,7 @@ class MemorySyncEngine:
                 entries.append((key, entry))
 
         # Sort by priority and relevance
-        entries.sort(
-            key=lambda x: (x[1].priority, x[1].metadata.context_relevance), reverse=True
-        )
+        entries.sort(key=lambda x: (x[1].priority, x[1].metadata.context_relevance), reverse=True)
 
         # Ensure required keys are at the top
         if required_keys:
@@ -789,9 +751,7 @@ class MemorySyncEngine:
                 # Try to compress
                 compressed_entry = self._compress_for_tool(entry, tool)
                 if compressed_entry:
-                    compressed_tokens = self.token_budget_manager.estimate_tokens(
-                        compressed_entry
-                    )
+                    compressed_tokens = self.token_budget_manager.estimate_tokens(compressed_entry)
                     if compressed_tokens <= current_budget:
                         optimized_entries.append((key, compressed_entry))
                         current_budget -= compressed_tokens
@@ -827,10 +787,7 @@ class MemorySyncEngine:
             compression_counts[compression] = compression_counts.get(compression, 0) + 1
 
         # Get token usage by tool
-        token_usage = {
-            tool: self.token_budget_manager.current_usage.get(tool, 0)
-            for tool in self.tools
-        }
+        token_usage = {tool: self.token_budget_manager.current_usage.get(tool, 0) for tool in self.tools}
 
         return {
             "entry_count": entry_count,

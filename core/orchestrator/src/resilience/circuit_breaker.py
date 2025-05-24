@@ -94,9 +94,7 @@ class CircuitBreaker(Generic[T]):
         # Task queue manager for retries
         self._task_queue_manager = get_task_queue_manager()
 
-        logger.info(
-            f"Circuit breaker '{name}' initialized with failure threshold: {failure_threshold}"
-        )
+        logger.info(f"Circuit breaker '{name}' initialized with failure threshold: {failure_threshold}")
 
     def set_metrics_client(self, metrics_client: Any) -> None:
         """
@@ -172,18 +170,11 @@ class CircuitBreaker(Generic[T]):
             # If circuit is open, check if we should try recovery
             if state == CircuitState.OPEN:
                 current_time = datetime.now()
-                if (
-                    agent_id in self._next_attempt_time
-                    and current_time >= self._next_attempt_time[agent_id]
-                ):
+                if agent_id in self._next_attempt_time and current_time >= self._next_attempt_time[agent_id]:
                     # Transition to half-open state for a recovery attempt
                     self._circuit_state[agent_id] = CircuitState.HALF_OPEN
-                    logger.info(
-                        f"Circuit for agent '{agent_id}' transitioning to HALF_OPEN for recovery attempt"
-                    )
-                    self._report_metric(
-                        f"{agent_id}.circuit_state_change", 1, {"state": "HALF_OPEN"}
-                    )
+                    logger.info(f"Circuit for agent '{agent_id}' transitioning to HALF_OPEN for recovery attempt")
+                    self._report_metric(f"{agent_id}.circuit_state_change", 1, {"state": "HALF_OPEN"})
                 else:
                     # Circuit is open and not ready for retry - use fallback
                     should_use_fallback = True
@@ -192,9 +183,7 @@ class CircuitBreaker(Generic[T]):
 
         # If circuit is open, use fallback
         if should_use_fallback:
-            logger.info(
-                f"Circuit for agent '{agent_id}' is OPEN - using fallback (next retry: {next_retry_time})"
-            )
+            logger.info(f"Circuit for agent '{agent_id}' is OPEN - using fallback (next retry: {next_retry_time})")
             self._report_metric(f"{agent_id}.fallback_execution", 1)
 
             try:
@@ -228,9 +217,7 @@ class CircuitBreaker(Generic[T]):
                     self._failure_counts[agent_id] = 0
                     self._retry_timeout[agent_id] = self.recovery_timeout
                     logger.info(f"Circuit for agent '{agent_id}' recovered and CLOSED")
-                    self._report_metric(
-                        f"{agent_id}.circuit_state_change", 1, {"state": "CLOSED"}
-                    )
+                    self._report_metric(f"{agent_id}.circuit_state_change", 1, {"state": "CLOSED"})
                     self._report_metric(f"{agent_id}.recovery_success", 1)
                 elif self._failure_counts.get(agent_id, 0) > 0:
                     # Reset any tracked failures during normal operation
@@ -259,9 +246,7 @@ class CircuitBreaker(Generic[T]):
                 # Schedule retry using Cloud Tasks if operation data is provided
                 if operation_data:
                     retry_attempt = self._failure_counts[agent_id]
-                    delay_seconds = self._retry_timeout.get(
-                        agent_id, self.recovery_timeout
-                    )
+                    delay_seconds = self._retry_timeout.get(agent_id, self.recovery_timeout)
 
                     try:
                         task_name = self._task_queue_manager.schedule_retry(
@@ -271,26 +256,18 @@ class CircuitBreaker(Generic[T]):
                             delay_seconds=delay_seconds,
                         )
                         if task_name:
-                            logger.info(
-                                f"Scheduled retry for agent '{agent_id}' with task {task_name}"
-                            )
+                            logger.info(f"Scheduled retry for agent '{agent_id}' with task {task_name}")
                         else:
-                            logger.warning(
-                                f"Failed to schedule retry for agent '{agent_id}'"
-                            )
+                            logger.warning(f"Failed to schedule retry for agent '{agent_id}'")
                     except Exception as task_error:
-                        logger.error(
-                            f"Error scheduling retry for agent '{agent_id}': {task_error}"
-                        )
+                        logger.error(f"Error scheduling retry for agent '{agent_id}': {task_error}")
 
             # Log primary operation failure
             logger.warning(
                 f"Primary operation for agent '{agent_id}' failed, using fallback. "
                 f"Error: {type(e).__name__}: {str(e)}"
             )
-            self._report_metric(
-                f"{agent_id}.fallback_execution", 1, {"reason": "primary_failure"}
-            )
+            self._report_metric(f"{agent_id}.fallback_execution", 1, {"reason": "primary_failure"})
 
             # Execute fallback with error handling
             try:
@@ -353,18 +330,11 @@ class CircuitBreaker(Generic[T]):
             # If circuit is open, check if we should try recovery
             if state == CircuitState.OPEN:
                 current_time = datetime.now()
-                if (
-                    agent_id in self._next_attempt_time
-                    and current_time >= self._next_attempt_time[agent_id]
-                ):
+                if agent_id in self._next_attempt_time and current_time >= self._next_attempt_time[agent_id]:
                     # Transition to half-open state for a recovery attempt
                     self._circuit_state[agent_id] = CircuitState.HALF_OPEN
-                    logger.info(
-                        f"Circuit for agent '{agent_id}' transitioning to HALF_OPEN for recovery attempt"
-                    )
-                    self._report_metric(
-                        f"{agent_id}.circuit_state_change", 1, {"state": "HALF_OPEN"}
-                    )
+                    logger.info(f"Circuit for agent '{agent_id}' transitioning to HALF_OPEN for recovery attempt")
+                    self._report_metric(f"{agent_id}.circuit_state_change", 1, {"state": "HALF_OPEN"})
                 else:
                     # Circuit is open and not ready for retry - use fallback
                     should_use_fallback = True
@@ -373,9 +343,7 @@ class CircuitBreaker(Generic[T]):
 
         # If circuit is open, use fallback
         if should_use_fallback:
-            logger.info(
-                f"Circuit for agent '{agent_id}' is OPEN - using fallback (next retry: {next_retry_time})"
-            )
+            logger.info(f"Circuit for agent '{agent_id}' is OPEN - using fallback (next retry: {next_retry_time})")
             self._report_metric(f"{agent_id}.fallback_execution", 1)
 
             try:
@@ -409,9 +377,7 @@ class CircuitBreaker(Generic[T]):
                     self._failure_counts[agent_id] = 0
                     self._retry_timeout[agent_id] = self.recovery_timeout
                     logger.info(f"Circuit for agent '{agent_id}' recovered and CLOSED")
-                    self._report_metric(
-                        f"{agent_id}.circuit_state_change", 1, {"state": "CLOSED"}
-                    )
+                    self._report_metric(f"{agent_id}.circuit_state_change", 1, {"state": "CLOSED"})
                     self._report_metric(f"{agent_id}.recovery_success", 1)
                 elif self._failure_counts.get(agent_id, 0) > 0:
                     # Reset any tracked failures during normal operation
@@ -440,9 +406,7 @@ class CircuitBreaker(Generic[T]):
                 # Schedule retry using Cloud Tasks if operation data is provided
                 if operation_data:
                     retry_attempt = self._failure_counts[agent_id]
-                    delay_seconds = self._retry_timeout.get(
-                        agent_id, self.recovery_timeout
-                    )
+                    delay_seconds = self._retry_timeout.get(agent_id, self.recovery_timeout)
 
                     try:
                         task_name = self._task_queue_manager.schedule_retry(
@@ -452,26 +416,18 @@ class CircuitBreaker(Generic[T]):
                             delay_seconds=delay_seconds,
                         )
                         if task_name:
-                            logger.info(
-                                f"Scheduled retry for agent '{agent_id}' with task {task_name}"
-                            )
+                            logger.info(f"Scheduled retry for agent '{agent_id}' with task {task_name}")
                         else:
-                            logger.warning(
-                                f"Failed to schedule retry for agent '{agent_id}'"
-                            )
+                            logger.warning(f"Failed to schedule retry for agent '{agent_id}'")
                     except Exception as task_error:
-                        logger.error(
-                            f"Error scheduling retry for agent '{agent_id}': {task_error}"
-                        )
+                        logger.error(f"Error scheduling retry for agent '{agent_id}': {task_error}")
 
             # Log primary operation failure
             logger.warning(
                 f"Primary operation for agent '{agent_id}' failed, using fallback. "
                 f"Error: {type(e).__name__}: {str(e)}"
             )
-            self._report_metric(
-                f"{agent_id}.fallback_execution", 1, {"reason": "primary_failure"}
-            )
+            self._report_metric(f"{agent_id}.fallback_execution", 1, {"reason": "primary_failure"})
 
             # Execute fallback with error handling
             try:
@@ -573,9 +529,7 @@ class CircuitBreaker(Generic[T]):
             f"Next attempt at {next_attempt.isoformat()}"
         )
 
-    def _report_metric(
-        self, metric_name: str, value: Any, labels: Optional[Dict[str, str]] = None
-    ) -> None:
+    def _report_metric(self, metric_name: str, value: Any, labels: Optional[Dict[str, str]] = None) -> None:
         """
         Report metric to Cloud Monitoring if metrics client is configured.
 
@@ -586,9 +540,7 @@ class CircuitBreaker(Generic[T]):
         """
         if self._metrics_client:
             try:
-                self._metrics_client.report_metric(
-                    f"agent_circuit_breaker.{metric_name}", value, labels=labels
-                )
+                self._metrics_client.report_metric(f"agent_circuit_breaker.{metric_name}", value, labels=labels)
             except Exception as e:
                 logger.error(f"Failed to report metric {metric_name}: {str(e)}")
 
@@ -618,9 +570,7 @@ class CircuitBreaker(Generic[T]):
                 "circuit_state": self._circuit_state[agent_id].value,
                 "failure_count": self._failure_counts.get(agent_id, 0),
                 "last_failure_time": self._last_failure_time.get(agent_id, None),
-                "retry_timeout": self._retry_timeout.get(
-                    agent_id, self.recovery_timeout
-                ),
+                "retry_timeout": self._retry_timeout.get(agent_id, self.recovery_timeout),
                 "next_attempt_time": next_attempt.isoformat() if next_attempt else None,
                 "in_operation": True,
             }
@@ -640,9 +590,7 @@ class CircuitBreaker(Generic[T]):
                 if agent_id in self._next_attempt_time:
                     del self._next_attempt_time[agent_id]
 
-                logger.info(
-                    f"Circuit for agent '{agent_id}' was force reset to CLOSED state"
-                )
+                logger.info(f"Circuit for agent '{agent_id}' was force reset to CLOSED state")
                 self._report_metric(f"{agent_id}.circuit_force_reset", 1)
 
 
@@ -666,15 +614,9 @@ def get_circuit_breaker() -> CircuitBreaker:
             # Default values can be overridden by environment variables
             import os
 
-            failure_threshold = int(
-                os.environ.get("CIRCUIT_BREAKER_FAILURE_THRESHOLD", "3")
-            )
-            recovery_timeout = int(
-                os.environ.get("CIRCUIT_BREAKER_RECOVERY_TIMEOUT", "60")
-            )
-            max_retry_timeout = int(
-                os.environ.get("CIRCUIT_BREAKER_MAX_RETRY_TIMEOUT", "3600")
-            )
+            failure_threshold = int(os.environ.get("CIRCUIT_BREAKER_FAILURE_THRESHOLD", "3"))
+            recovery_timeout = int(os.environ.get("CIRCUIT_BREAKER_RECOVERY_TIMEOUT", "60"))
+            max_retry_timeout = int(os.environ.get("CIRCUIT_BREAKER_MAX_RETRY_TIMEOUT", "3600"))
 
             _circuit_breaker = CircuitBreaker(
                 failure_threshold=failure_threshold,

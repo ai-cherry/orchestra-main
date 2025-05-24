@@ -18,6 +18,7 @@ try:
         DRAGONFLY_DB_INDEX,
         DRAGONFLY_CONNECTION_URI,
     )
+
     _SOURCE = "local"
 except ImportError:
     # 2. Fallback to environment variables
@@ -29,9 +30,8 @@ except ImportError:
     _SOURCE = "env"
 
     # 3. Optionally, fetch from GCP Secret Manager if running in GCP and any secret is missing
-    if (
-        (not DRAGONFLY_HOST or not DRAGONFLY_PASSWORD or not DRAGONFLY_CONNECTION_URI)
-        and os.getenv("GOOGLE_CLOUD_PROJECT")
+    if (not DRAGONFLY_HOST or not DRAGONFLY_PASSWORD or not DRAGONFLY_CONNECTION_URI) and os.getenv(
+        "GOOGLE_CLOUD_PROJECT"
     ):
         try:
             from google.cloud import secretmanager
@@ -58,6 +58,7 @@ except ImportError:
         except Exception:
             # If GCP Secret Manager is unavailable, fail gracefully
             pass
+
 
 # For debugging (never print secrets)
 def log_dragonfly_config():

@@ -33,9 +33,7 @@ try:
     from packages.shared.src.models.base_models import MemoryItem
 except ImportError as e:
     logger.error(f"Failed to import required libraries: {e}")
-    logger.error(
-        "Please install required packages: pip install redisvl langchain-redis langchain-google-genai"
-    )
+    logger.error("Please install required packages: pip install redisvl langchain-redis langchain-google-genai")
     sys.exit(1)
 
 

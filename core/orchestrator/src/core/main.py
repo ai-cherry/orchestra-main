@@ -32,15 +32,9 @@ class InteractionRequest(BaseModel):
 
     message: str = Field(..., description="The user's message")
     user_id: str = Field(..., description="User identifier")
-    session_id: Optional[str] = Field(
-        None, description="Session identifier for conversation continuity"
-    )
-    persona_id: Optional[str] = Field(
-        None, description="Persona identifier to use for this interaction"
-    )
-    context: Optional[Dict[str, Any]] = Field(
-        None, description="Additional context for the interaction"
-    )
+    session_id: Optional[str] = Field(None, description="Session identifier for conversation continuity")
+    persona_id: Optional[str] = Field(None, description="Persona identifier to use for this interaction")
+    context: Optional[Dict[str, Any]] = Field(None, description="Additional context for the interaction")
 
 
 class InteractionResponse(BaseModel):
@@ -52,9 +46,7 @@ class InteractionResponse(BaseModel):
     session_id: str = Field(..., description="The session identifier")
     interaction_id: str = Field(..., description="The interaction identifier")
     timestamp: str = Field(..., description="Timestamp of the interaction")
-    metadata: Dict[str, Any] = Field(
-        default_factory=dict, description="Additional metadata"
-    )
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
 
 
 class PersonaInfo(BaseModel):
@@ -69,9 +61,7 @@ class PersonaInfo(BaseModel):
 class PersonaListResponse(BaseModel):
     """Response model for persona listing API."""
 
-    personas: Dict[str, PersonaInfo] = Field(
-        ..., description="Dictionary of available personas"
-    )
+    personas: Dict[str, PersonaInfo] = Field(..., description="Dictionary of available personas")
     default_persona_id: str = Field(..., description="The default persona identifier")
 
 

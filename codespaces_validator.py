@@ -70,13 +70,9 @@ def validate_figma_gcp_sync():
         found_generators = [gen for gen in style_generators if gen in script_content]
 
         if len(found_generators) >= 3:  # At least 3 platforms supported
-            print_success(
-                f"Can generate platform-specific style files ({len(found_generators)} platforms)"
-            )
+            print_success(f"Can generate platform-specific style files ({len(found_generators)} platforms)")
         else:
-            print_failure(
-                f"Limited platform support for style generation (only {len(found_generators)} platforms)"
-            )
+            print_failure(f"Limited platform support for style generation (only {len(found_generators)} platforms)")
     else:
         print_failure("figma_gcp_sync.py does not exist")
 
@@ -90,9 +86,7 @@ def validate_figma_gcp_sync():
                 missing_scopes.append(scope)
 
     if missing_scopes:
-        print_warning(
-            f"Script doesn't explicitly check for these scopes: {', '.join(missing_scopes)}"
-        )
+        print_warning(f"Script doesn't explicitly check for these scopes: {', '.join(missing_scopes)}")
     else:
         print_pending("FIGMA_PAT scope validation requires manual verification")
 
@@ -113,9 +107,7 @@ def validate_component_library():
         return
 
     if not android_styles_path.exists():
-        print_failure(
-            "packages/ui/android/src/main/res/values/styles.xml does not exist"
-        )
+        print_failure("packages/ui/android/src/main/res/values/styles.xml does not exist")
         return
 
     # Load the mapping file
@@ -131,36 +123,22 @@ def validate_component_library():
         android_styles = f.read()
 
     # Check for Button variants (should have 4)
-    button_styles_in_android = re.findall(
-        r'style name="Orchestra\.Button\.([^"]+)"', android_styles
-    )
+    button_styles_in_android = re.findall(r'style name="Orchestra\.Button\.([^"]+)"', android_styles)
 
     if len(button_styles_in_android) >= 4:
         button_styles_str = ", ".join(button_styles_in_android)
-        print_success(
-            f"Found {len(button_styles_in_android)} button styles in Android: {button_styles_str}"
-        )
+        print_success(f"Found {len(button_styles_in_android)} button styles in Android: {button_styles_str}")
     else:
-        print_failure(
-            f"Expected at least 4 button variants, found {len(button_styles_in_android)}"
-        )
+        print_failure(f"Expected at least 4 button variants, found {len(button_styles_in_android)}")
 
     # Check for Card elevation states (should have 2)
-    card_styles_in_android = re.findall(
-        r'style name="Orchestra\.Card([^"]*)"', android_styles
-    )
+    card_styles_in_android = re.findall(r'style name="Orchestra\.Card([^"]*)"', android_styles)
 
     if len(card_styles_in_android) >= 2:
-        card_styles_str = ", ".join(
-            [s if s else "Default" for s in card_styles_in_android]
-        )
-        print_success(
-            f"Found {len(card_styles_in_android)} card styles in Android: {card_styles_str}"
-        )
+        card_styles_str = ", ".join([s if s else "Default" for s in card_styles_in_android])
+        print_success(f"Found {len(card_styles_in_android)} card styles in Android: {card_styles_str}")
     else:
-        print_failure(
-            f"Expected at least 2 card elevation states, found {len(card_styles_in_android)}"
-        )
+        print_failure(f"Expected at least 2 card elevation states, found {len(card_styles_in_android)}")
 
     # Check for Input validation styles (should have 3)
     input_fields_in_android = re.findall(
@@ -170,9 +148,7 @@ def validate_component_library():
 
     input_validation_count = len(set(input_fields_in_android))
     if input_validation_count >= 3:
-        print_success(
-            f"Found sufficient input validation styles: {input_validation_count} relevant properties"
-        )
+        print_success(f"Found sufficient input validation styles: {input_validation_count} relevant properties")
     else:
         print_failure(
             f"Expected at least 3 input validation styles, found {input_validation_count} relevant properties"
@@ -185,24 +161,15 @@ def validate_component_library():
     match_count = 0
     for component in components_in_mapping:
         component_base = component.split(" ")[0].lower()
-        if (
-            component_base in variables_js.lower()
-            and component_base in android_styles.lower()
-        ):
+        if component_base in variables_js.lower() and component_base in android_styles.lower():
             match_count += 1
 
-    match_percentage = (
-        (match_count / len(components_in_mapping)) * 100 if components_in_mapping else 0
-    )
+    match_percentage = (match_count / len(components_in_mapping)) * 100 if components_in_mapping else 0
 
     if match_percentage >= 80:
-        print_success(
-            f"Found {match_percentage:.0f}% of components in implementation files"
-        )
+        print_success(f"Found {match_percentage:.0f}% of components in implementation files")
     else:
-        print_warning(
-            f"Only {match_percentage:.0f}% of components found in implementation files"
-        )
+        print_warning(f"Only {match_percentage:.0f}% of components found in implementation files")
 
 
 def validate_infrastructure():
@@ -226,22 +193,14 @@ def validate_infrastructure():
     if "machine_type" in tf_config and "n1-standard-4" in tf_config:
         print_success("Vertex AI Workbench configured with n1-standard-4 instance type")
     else:
-        print_failure(
-            "Vertex AI Workbench not configured with n1-standard-4 instance type"
-        )
+        print_failure("Vertex AI Workbench not configured with n1-standard-4 instance type")
 
     # Check for Firestore NATIVE with backup policies
-    if (
-        "google_firestore_database" in tf_config
-        and "type" in tf_config
-        and "FIRESTORE_NATIVE" in tf_config
-    ):
+    if "google_firestore_database" in tf_config and "type" in tf_config and "FIRESTORE_NATIVE" in tf_config:
         if "google_storage_bucket" in tf_config and "firestore_backups" in tf_config:
             print_success("Firestore NATIVE configured with backup policies")
         else:
-            print_warning(
-                "Firestore NATIVE configured but without clear backup policies"
-            )
+            print_warning("Firestore NATIVE configured but without clear backup policies")
     else:
         print_failure("Firestore NATIVE not configured properly")
 
@@ -299,10 +258,7 @@ def validate_cicd_pipeline():
 
     missing_mappings = []
     for github_secret, env_var in required_mappings:
-        if (
-            f'["{github_secret}"]' not in secrets_script
-            or env_var not in secrets_script
-        ):
+        if f'["{github_secret}"]' not in secrets_script or env_var not in secrets_script:
             missing_mappings.append(f"{github_secret} → {env_var}")
 
     if not missing_mappings:
@@ -365,15 +321,11 @@ def validate_ai_requirements():
 
 def print_conclusion():
     print_header("CONCLUSION")
-    print(
-        "Based on the validation results above, here's a summary of the environment status:"
-    )
+    print("Based on the validation results above, here's a summary of the environment status:")
 
     # Figma-GCP Sync
     print("\n1. Figma-GCP Sync:")
-    print(
-        "   ✅ The figma_gcp_sync.py script exists and includes all required functionality"
-    )
+    print("   ✅ The figma_gcp_sync.py script exists and includes all required functionality")
     print("   ⚠️ FIGMA_PAT scopes should be manually verified to ensure they include:")
     print("      - files:read")
     print("      - variables:write")
@@ -405,12 +357,8 @@ def print_conclusion():
     print("   ⎔ Cline MCP tools need manual version verification")
     print("   ⎔ Vertex AI validation capabilities need manual verification")
 
-    print(
-        "\nOverall, the environment is well-configured for the Figma-GCP integration."
-    )
-    print(
-        "Manual verification is needed for GitHub Actions configurations and Cline MCP tools."
-    )
+    print("\nOverall, the environment is well-configured for the Figma-GCP integration.")
+    print("Manual verification is needed for GitHub Actions configurations and Cline MCP tools.")
 
 
 def main():

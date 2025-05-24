@@ -69,9 +69,7 @@ async def example_basic_usage():
         }
 
     # Use the credentials
-    print(
-        f"\nUsing API key to make a request to {config.get('endpoint', 'https://api.example.com')}"
-    )
+    print(f"\nUsing API key to make a request to {config.get('endpoint', 'https://api.example.com')}")
     print(f"Request headers: Authorization: Bearer {api_key[:3]}...")
     print(f"Request timeout: {config.get('timeout', 30)} seconds")
     print(f"Request retry count: {config.get('retry_count', 3)}")
@@ -89,9 +87,7 @@ async def example_gcp_services():
     # Get service account credentials
     try:
         # Note: This will fail if the service account key doesn't exist
-        vertex_credentials = credential_manager.get_service_account_key(
-            "vertex-ai-agent"
-        )
+        vertex_credentials = credential_manager.get_service_account_key("vertex-ai-agent")
         print(f"Vertex AI Credentials: {vertex_credentials['client_email']}")
     except Exception as e:
         print(f"Error getting service account key: {str(e)}")
@@ -136,9 +132,7 @@ async def example_memory_system():
 
         print(f"Redis Host: {redis_host}")
         print(f"Redis Port: {redis_port}")
-        print(
-            f"Redis Password: {'*' * len(redis_password)}"
-        )  # Don't print actual password
+        print(f"Redis Password: {'*' * len(redis_password)}")  # Don't print actual password
     except Exception as e:
         print(f"Error getting Redis credentials: {str(e)}")
         print("Creating mock Redis credentials for demonstration purposes...")
@@ -149,9 +143,7 @@ async def example_memory_system():
     # Get Firestore credentials
     try:
         # Note: This will fail if the service account key doesn't exist
-        firestore_credentials = credential_manager.get_service_account_key(
-            "memory-system"
-        )
+        firestore_credentials = credential_manager.get_service_account_key("memory-system")
         print(f"\nFirestore Credentials: {firestore_credentials['client_email']}")
     except Exception as e:
         print(f"\nError getting Firestore credentials: {str(e)}")
@@ -233,9 +225,7 @@ async def example_credential_rotation():
     # Get the credential manager
     credential_manager = get_credential_manager()
 
-    print(
-        "When credentials are rotated, the credential manager automatically picks up the new credentials."
-    )
+    print("When credentials are rotated, the credential manager automatically picks up the new credentials.")
     print("This is because it always fetches the latest version from Secret Manager.")
 
     print("\nSimulating credential rotation...")

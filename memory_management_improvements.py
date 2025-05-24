@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 T = TypeVar("T")
 
 # Define MEMORY_ITEMS_COLLECTION if it's a constant
-MEMORY_ITEMS_COLLECTION = "memory_items_default_collection" # Placeholder value, adjust as needed
+MEMORY_ITEMS_COLLECTION = "memory_items_default_collection"  # Placeholder value, adjust as needed
 
 # ============================
 # Thread Pool Management
@@ -180,9 +180,7 @@ def with_retry(
                 except retryable_exceptions as e:
                     retries += 1
                     if retries > max_retries:
-                        logger.error(
-                            f"Operation {func.__name__} failed after {max_retries} retries: {e}"
-                        )
+                        logger.error(f"Operation {func.__name__} failed after {max_retries} retries: {e}")
                         raise
 
                     delay = base_delay * (2 ** (retries - 1))  # Exponential backoff
@@ -260,9 +258,7 @@ async def optimized_semantic_search(
 
             # Get a batch of memory items using pagination
             query = (
-                self._async_client.collection(MEMORY_ITEMS_COLLECTION)
-                .where("user_id", "==", user_id)
-                .limit(page_size)
+                self._async_client.collection(MEMORY_ITEMS_COLLECTION).where("user_id", "==", user_id).limit(page_size)
             )
 
             # Add persona filter if provided
@@ -296,9 +292,7 @@ async def optimized_semantic_search(
 
                     # Skip items with mismatched embedding dimensions
                     if len(embedding) != len(query_embedding):
-                        logger.warning(
-                            f"Embedding dimension mismatch: {len(embedding)} vs {len(query_embedding)}"
-                        )
+                        logger.warning(f"Embedding dimension mismatch: {len(embedding)} vs {len(query_embedding)}")
                         continue
 
                     # Calculate similarity more efficiently
@@ -306,21 +300,13 @@ async def optimized_semantic_search(
                         item_np = np.array(embedding)
                         mag_item = np.linalg.norm(item_np)
                         if mag_item > 0 and mag_query > 0:
-                            similarity = np.dot(query_np, item_np) / (
-                                mag_item * mag_query
-                            )
+                            similarity = np.dot(query_np, item_np) / (mag_item * mag_query)
                         else:
                             similarity = 0
                     else:
-                        dot_product = sum(
-                            a * b for a, b in zip(query_embedding, embedding)
-                        )
+                        dot_product = sum(a * b for a, b in zip(query_embedding, embedding))
                         mag_item = sum(a * a for a in embedding) ** 0.5
-                        similarity = (
-                            dot_product / (mag_item * mag_query)
-                            if mag_item > 0 and mag_query > 0
-                            else 0
-                        )
+                        similarity = dot_product / (mag_item * mag_query) if mag_item > 0 and mag_query > 0 else 0
 
                     item = MemoryItem(**item_data)
                     batch_items_with_scores.append((item, similarity))
@@ -436,9 +422,7 @@ async def cleanup_expired_items_with_progress(self) -> int:
                     total_batches += 1
 
                     # Log progress
-                    logger.info(
-                        f"Deleted batch of {items_in_batch} expired items (total: {total_deleted})"
-                    )
+                    logger.info(f"Deleted batch of {items_in_batch} expired items (total: {total_deleted})")
 
                     # Start a new batch
                     delete_batch = self._async_client.batch()
@@ -449,9 +433,7 @@ async def cleanup_expired_items_with_progress(self) -> int:
                 await delete_batch.commit()
                 total_deleted += items_in_batch
                 total_batches += 1
-                logger.info(
-                    f"Deleted batch of {items_in_batch} expired items (total: {total_deleted})"
-                )
+                logger.info(f"Deleted batch of {items_in_batch} expired items (total: {total_deleted})")
 
         # Log summary
         duration = time.time() - start_time
@@ -532,9 +514,7 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
             # For demonstration, using ThreadPoolManager to run sync initialization
             await ThreadPoolManager.run_in_thread(self._initialize_sync)
             self._is_initialized = True
-            logger.info(
-                f"ImprovedFirestoreMemoryAdapter initialized with namespace {self.namespace}"
-            )
+            logger.info(f"ImprovedFirestoreMemoryAdapter initialized with namespace {self.namespace}")
         except Exception as e:
             logger.error(f"Failed to initialize Firestore adapter: {e}")
             raise ConnectionError(f"Failed to initialize Firestore connection: {e}")
@@ -567,9 +547,7 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
     def _check_initialized(self) -> None:
         """Check if initialized and raise appropriate exception if not."""
         if not self._is_initialized:
-            raise RuntimeError(
-                "Memory manager is not initialized. Call initialize() first."
-            )
+            raise RuntimeError("Memory manager is not initialized. Call initialize() first.")
 
     @handle_storage_errors
     @with_retry()
@@ -670,9 +648,7 @@ async def usage_example():
     """Example of using the improved FirestoreMemoryAdapter."""
 
     # Initialize the adapter
-    memory_manager = ImprovedFirestoreMemoryAdapter(
-        project_id="your-project-id", namespace="example-namespace"
-    )
+    memory_manager = ImprovedFirestoreMemoryAdapter(project_id="your-project-id", namespace="example-namespace")
 
     try:
         # Initialize

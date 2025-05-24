@@ -31,9 +31,7 @@ class RooMode(BaseModel):
 
     slug: str = Field(..., description="Unique identifier for the mode")
     name: str = Field(..., description="Display name for the mode")
-    description: str = Field(
-        ..., description="Detailed description of the mode's purpose"
-    )
+    description: str = Field(..., description="Detailed description of the mode's purpose")
     role: str = Field(..., description="Role description provided to the LLM")
     capabilities: List[RooModeCapability] = Field(
         default_factory=list, description="List of capabilities this mode has"
@@ -46,16 +44,10 @@ class RooMode(BaseModel):
         default_factory=list,
         description="List of mode slugs this mode can transition to",
     )
-    default_rules: Dict[str, Any] = Field(
-        default_factory=dict, description="Default rules applied to this mode"
-    )
-    file_patterns: List[str] = Field(
-        default_factory=list, description="File patterns this mode can access or modify"
-    )
+    default_rules: Dict[str, Any] = Field(default_factory=dict, description="Default rules applied to this mode")
+    file_patterns: List[str] = Field(default_factory=list, description="File patterns this mode can access or modify")
     model: str = Field(default="", description="The LLM model to use for this mode")
-    temperature: float = Field(
-        default=0.7, description="Temperature setting for the LLM"
-    )
+    temperature: float = Field(default=0.7, description="Temperature setting for the LLM")
 
     def can_access_memory(self) -> bool:
         """Check if this mode can access memory."""

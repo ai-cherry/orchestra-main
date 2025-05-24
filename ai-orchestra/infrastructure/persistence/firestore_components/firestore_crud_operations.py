@@ -3,13 +3,15 @@ Handles basic Create, Read, Update, Delete (CRUD) operations for memory items
 in Firestore. This class directly interacts with the Firestore client for
 document manipulation.
 """
+
 # import asyncio # Not used in current outline
 import logging
-from typing import Dict, Any, Optional # Removed List as it might not be used yet
+from typing import Dict, Any, Optional  # Removed List as it might not be used yet
 
 # from google.cloud import firestore # Potentially unused direct import
 from google.cloud.firestore_v1.async_client import AsyncClient as FirestoreAsyncClient
 from google.cloud.firestore_v1.async_document import AsyncDocumentReference
+
 # from google.cloud.firestore_v1.base_query import AsyncBaseQuery # Not used in this CRUD file
 
 # Assuming a shared logger or get one
@@ -17,6 +19,7 @@ from google.cloud.firestore_v1.async_document import AsyncDocumentReference
 # logger = get_logger(__name__)
 # For now, using a standard logger
 logger = logging.getLogger(__name__)
+
 
 class FirestoreCrudOperations:
     """
@@ -35,7 +38,7 @@ class FirestoreCrudOperations:
             raise TypeError("firestore_client must be an instance of FirestoreAsyncClient.")
         if not collection_name or not isinstance(collection_name, str):
             raise ValueError("collection_name must be a non-empty string.")
-            
+
         self.client: FirestoreAsyncClient = firestore_client
         self.collection_name: str = collection_name
         self._collection_ref = self.client.collection(self.collection_name)
@@ -48,12 +51,12 @@ class FirestoreCrudOperations:
 
         Args:
             item_id: The unique ID for the new memory item (document ID).
-            data: A dictionary containing the data to store. 
+            data: A dictionary containing the data to store.
                   Should be Firestore-compatible (e.g., primitive types, lists, dicts).
 
         Returns:
             True if the item was created successfully, False otherwise (e.g., if item already exists).
-        
+
         Raises:
             ValueError: If item_id or data is invalid.
             Exception: For underlying Firestore errors.
@@ -62,7 +65,7 @@ class FirestoreCrudOperations:
             raise ValueError("item_id must be a non-empty string.")
         if not isinstance(data, dict):
             raise ValueError("data must be a dictionary.")
-        
+
         logger.debug(f"Attempting to create item '{item_id}' in '{self.collection_name}'")
         doc_ref: AsyncDocumentReference = self._collection_ref.document(item_id)
         try:
@@ -70,11 +73,11 @@ class FirestoreCrudOperations:
             await doc_ref.create(document_data=data)
             logger.info(f"Successfully created item '{item_id}' in '{self.collection_name}'.")
             return True
-        except Exception as e: # Replace with more specific google.cloud.exceptions.Conflict if needed
+        except Exception as e:  # Replace with more specific google.cloud.exceptions.Conflict if needed
             logger.error(f"Error creating item '{item_id}' in '{self.collection_name}': {e}", exc_info=True)
             # Could be a google.cloud.exceptions.Conflict if item_id already exists
             # Or other Firestore errors.
-            return False # Or re-raise a custom domain error
+            return False  # Or re-raise a custom domain error
 
     async def create_or_update_item(self, item_id: str, data: Dict[str, Any]) -> bool:
         """
@@ -87,7 +90,7 @@ class FirestoreCrudOperations:
 
         Returns:
             True if the operation was successful.
-            
+
         Raises:
             ValueError: If item_id or data is invalid.
             Exception: For underlying Firestore errors.
@@ -102,12 +105,12 @@ class FirestoreCrudOperations:
         try:
             # Using set() with merge=False will overwrite the document if it exists,
             # or create it if it doesn't.
-            await doc_ref.set(document_data=data, merge=False) 
+            await doc_ref.set(document_data=data, merge=False)
             logger.info(f"Successfully set item '{item_id}' in '{self.collection_name}'.")
             return True
         except Exception as e:
             logger.error(f"Error setting item '{item_id}' in '{self.collection_name}': {e}", exc_info=True)
-            return False # Or re-raise
+            return False  # Or re-raise
 
     async def get_item(self, item_id: str) -> Optional[Dict[str, Any]]:
         """
@@ -118,7 +121,7 @@ class FirestoreCrudOperations:
 
         Returns:
             A dictionary containing the document data if found, otherwise None.
-            
+
         Raises:
             ValueError: If item_id is invalid.
             Exception: For underlying Firestore errors.
@@ -138,7 +141,7 @@ class FirestoreCrudOperations:
                 return None
         except Exception as e:
             logger.error(f"Error getting item '{item_id}': {e}", exc_info=True)
-            return None # Or re-raise
+            return None  # Or re-raise
 
     async def update_item(self, item_id: str, updates: Dict[str, Any]) -> bool:
         """
@@ -153,7 +156,7 @@ class FirestoreCrudOperations:
 
         Returns:
             True if the update was successful, False if the document was not found or an error occurred.
-            
+
         Raises:
             ValueError: If item_id or updates is invalid.
             Exception: For underlying Firestore errors.
@@ -172,13 +175,13 @@ class FirestoreCrudOperations:
             if not doc_snapshot.exists:
                 logger.warning(f"Cannot update item '{item_id}': document not found.")
                 return False
-            
+
             await doc_ref.update(updates)
             logger.info(f"Successfully updated item '{item_id}'.")
             return True
-        except Exception as e: # Replace with more specific google.cloud.exceptions.NotFound if needed for update
+        except Exception as e:  # Replace with more specific google.cloud.exceptions.NotFound if needed for update
             logger.error(f"Error updating item '{item_id}': {e}", exc_info=True)
-            return False # Or re-raise
+            return False  # Or re-raise
 
     async def delete_item(self, item_id: str) -> bool:
         """
@@ -190,7 +193,7 @@ class FirestoreCrudOperations:
         Returns:
             True if the deletion was successful or if the document didn't exist.
             False if an error occurred during deletion.
-            
+
         Raises:
             ValueError: If item_id is invalid.
             Exception: For underlying Firestore errors.
@@ -208,7 +211,7 @@ class FirestoreCrudOperations:
             return True
         except Exception as e:
             logger.error(f"Error deleting item '{item_id}': {e}", exc_info=True)
-            return False # Or re-raise
+            return False  # Or re-raise
 
     async def item_exists(self, item_id: str) -> bool:
         """
@@ -236,4 +239,4 @@ class FirestoreCrudOperations:
             return exists
         except Exception as e:
             logger.error(f"Error checking existence of item '{item_id}': {e}", exc_info=True)
-            return False # Or re-raise, or return False indicating not findable due to error 
+            return False  # Or re-raise, or return False indicating not findable due to error

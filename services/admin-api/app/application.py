@@ -1,6 +1,7 @@
 """
 Main FastAPI application.
 """
+
 import logging
 import time
 from typing import Callable

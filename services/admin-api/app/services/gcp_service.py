@@ -1,6 +1,7 @@
 """
 Service for interacting with Google Cloud Platform services.
 """
+
 from typing import Dict, Any, Optional
 import asyncio
 from functools import lru_cache
@@ -41,14 +42,10 @@ class GcpService:
         # Resource Manager calls are synchronous, so run in a thread pool
         project_name = f"projects/{self.project_id}"
         loop = asyncio.get_event_loop()
-        project = await loop.run_in_executor(
-            None, lambda: self.resource_client.get_project(name=project_name)
-        )
+        project = await loop.run_in_executor(None, lambda: self.resource_client.get_project(name=project_name))
 
         # Get Firestore stats
-        memory_collection = self.firestore_client.collection(
-            settings.FIRESTORE_COLLECTION
-        )
+        memory_collection = self.firestore_client.collection(settings.FIRESTORE_COLLECTION)
         memory_docs = await memory_collection.count().get()
         memory_count = memory_docs[0][0].value
 

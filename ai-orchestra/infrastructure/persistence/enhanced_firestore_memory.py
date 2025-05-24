@@ -8,6 +8,7 @@ Refactored Firestore implementation of the EnhancedMemoryProvider interface.
 This class acts as a facade, delegating operations to specialized
 firestore_components for CRUD, querying, serialization, expiry, and batch processing.
 """
+
 import logging
 from typing import Any, Dict, List, Optional, AsyncGenerator
 from datetime import datetime, timezone
@@ -31,12 +32,13 @@ from .firestore_components.firestore_batch_processor import FirestoreBatchProces
 
 logger = logging.getLogger(__name__)
 
+
 class EnhancedFirestoreMemoryProvider(EnhancedMemoryProvider):
     """
     Facade for Firestore-based enhanced memory, delegating to specialized components.
     """
 
-    DEFAULT_COLLECTION_NAME = "enhanced_memory_items" 
+    DEFAULT_COLLECTION_NAME = "enhanced_memory_items"
 
     def __init__(self, settings: Settings, collection_name: Optional[str] = None):
         self._settings = settings
@@ -51,7 +53,9 @@ class EnhancedFirestoreMemoryProvider(EnhancedMemoryProvider):
         self._event_bus = MemoryEventBus()
 
         self._is_initialized = False
-        logger.info(f"EnhancedFirestoreMemoryProvider configured for collection '{self._collection_name}'. Call initialize() to connect.")
+        logger.info(
+            f"EnhancedFirestoreMemoryProvider configured for collection '{self._collection_name}'. Call initialize() to connect."
+        )
 
     async def initialize(self):
         if self._is_initialized:
@@ -67,7 +71,7 @@ class EnhancedFirestoreMemoryProvider(EnhancedMemoryProvider):
         self._query_engine = FirestoreQueryEngine(firestore_client, self._collection_name, self._serializer)
         self._expiry_manager = FirestoreExpiryManager(firestore_client, self._collection_name, self._event_bus)
         self._batch_processor = FirestoreBatchProcessor(firestore_client, self._collection_name)
-        
+
         self._is_initialized = True
         logger.info("EnhancedFirestoreMemoryProvider components initialized successfully.")
 
@@ -80,11 +84,12 @@ class EnhancedFirestoreMemoryProvider(EnhancedMemoryProvider):
     def _ensure_initialized(self):
         if not self._is_initialized:
             raise RuntimeError("EnhancedFirestoreMemoryProvider is not initialized. Call initialize() first.")
-    
+
     async def store_item(self, item: MemoryItem, ttl: Optional[int] = None) -> bool:
         self._ensure_initialized()
-        assert self._crud_ops and self._serializer and self._expiry_manager and self._event_bus, \
-            "CRUD ops, serializer, expiry_manager, or event_bus not initialized"
+        assert (
+            self._crud_ops and self._serializer and self._expiry_manager and self._event_bus
+        ), "CRUD ops, serializer, expiry_manager, or event_bus not initialized"
 
         firestore_data = self._serializer.to_firestore(item)
 
@@ -108,8 +113,9 @@ class EnhancedFirestoreMemoryProvider(EnhancedMemoryProvider):
 
     async def retrieve_item(self, id: str) -> Optional[MemoryItem]:
         self._ensure_initialized()
-        assert self._crud_ops and self._serializer and self._expiry_manager and self._event_bus, \
-            "CRUD ops, serializer, expiry_manager, or event_bus not initialized"
+        assert (
+            self._crud_ops and self._serializer and self._expiry_manager and self._event_bus
+        ), "CRUD ops, serializer, expiry_manager, or event_bus not initialized"
 
         firestore_data = await self._crud_ops.get_item(id)
         if not firestore_data:
@@ -138,9 +144,10 @@ class EnhancedFirestoreMemoryProvider(EnhancedMemoryProvider):
 
     async def item_exists(self, id: str) -> bool:
         self._ensure_initialized()
-        assert self._crud_ops and self._serializer and self._expiry_manager, \
-            "CRUD ops, serializer or expiry_manager not initialized"
-        
+        assert (
+            self._crud_ops and self._serializer and self._expiry_manager
+        ), "CRUD ops, serializer or expiry_manager not initialized"
+
         firestore_data = await self._crud_ops.get_item(id)
         if not firestore_data:
             return False
@@ -150,8 +157,8 @@ class EnhancedFirestoreMemoryProvider(EnhancedMemoryProvider):
             expiry_dt = self._serializer._to_datetime(expiry_timestamp_from_db)
             if expiry_dt and expiry_dt < datetime.now(timezone.utc):
                 # Optionally log that it exists but is expired, but for item_exists, it effectively doesn't.
-                return False 
-        
+                return False
+
         return True
 
     async def query_items(
@@ -160,24 +167,22 @@ class EnhancedFirestoreMemoryProvider(EnhancedMemoryProvider):
         tags: Optional[List[str]] = None,
         order_by: Optional[str] = None,
         page_size: int = 100,
-        order_direction: str = "ASCENDING"
+        order_direction: str = "ASCENDING",
     ) -> List[MemoryItem]:
         self._ensure_initialized()
         assert self._query_engine is not None, "Query engine not initialized"
         items = []
         async for item in self._query_engine.stream_query_results(
-            filters=filters,
-            tags=tags,
-            order_by=order_by,
-            order_direction=order_direction
+            filters=filters, tags=tags, order_by=order_by, order_direction=order_direction
         ):
             items.append(item)
         return items
 
     async def batch_store_items(self, items: List[MemoryItem], merge: bool = False) -> Dict[str, int]:
         self._ensure_initialized()
-        assert self._batch_processor is not None and self._serializer is not None and self._expiry_manager is not None, \
-            "Batch processor, serializer, or expiry manager not initialized"
+        assert (
+            self._batch_processor is not None and self._serializer is not None and self._expiry_manager is not None
+        ), "Batch processor, serializer, or expiry manager not initialized"
 
         items_data: Dict[str, Dict[str, Any]] = {}
         for item in items:
@@ -193,15 +198,16 @@ class EnhancedFirestoreMemoryProvider(EnhancedMemoryProvider):
 
     async def batch_delete_items(self, item_ids: List[str]) -> Dict[str, int]:
         self._ensure_initialized()
-        assert self._batch_processor is not None and self._event_bus is not None, \
-            "Batch processor or event_bus not initialized"
+        assert (
+            self._batch_processor is not None and self._event_bus is not None
+        ), "Batch processor or event_bus not initialized"
         result = await self._batch_processor.batch_delete_items(item_ids)
         if result.get("successful", 0) > 0:
             # Emit individual delete events for each id for auditability
             for item_id in item_ids:
                 await self._event_bus.publish(MemoryItemDeletedEvent(item_id=item_id))
         return result
-            
+
     async def prune_all_expired_items(self) -> Dict[str, Any]:
         self._ensure_initialized()
         assert self._expiry_manager is not None, "Expiry manager not initialized"

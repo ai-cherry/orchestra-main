@@ -142,9 +142,7 @@ class MemoryManager:
             provider: Memory provider to use (defaults to InMemoryProvider)
         """
         self._provider = provider or InMemoryProvider()
-        logger.info(
-            f"MemoryManager initialized with provider: {self._provider.__class__.__name__}"
-        )
+        logger.info(f"MemoryManager initialized with provider: {self._provider.__class__.__name__}")
 
     def add_memory(
         self,
@@ -235,9 +233,7 @@ class MemoryManager:
         Returns:
             List of memory items
         """
-        return self._provider.get_items(
-            user_id=user_id, session_id=session_id, item_type=item_type, limit=limit
-        )
+        return self._provider.get_items(user_id=user_id, session_id=session_id, item_type=item_type, limit=limit)
 
 
 # Global memory manager instance

@@ -204,9 +204,7 @@ class WebScraperRuntimeAgent(BaseAgent):
         # Return the result
         return result_dict
 
-    async def _store_result_in_memory(
-        self, result_dict: Dict[str, Any], context: Dict[str, Any]
-    ) -> None:
+    async def _store_result_in_memory(self, result_dict: Dict[str, Any], context: Dict[str, Any]) -> None:
         """
         Store the scraping result in memory using the memory manager.
 
@@ -233,18 +231,14 @@ class WebScraperRuntimeAgent(BaseAgent):
                 data_id = await self.memory_manager.add_raw_agent_data(agent_data)
             else:
                 # Run the synchronous method in a thread to avoid blocking
-                data_id = await asyncio.to_thread(
-                    self.memory_manager.add_raw_agent_data, agent_data
-                )
+                data_id = await asyncio.to_thread(self.memory_manager.add_raw_agent_data, agent_data)
 
             logger.info(f"Stored web scraping result in memory with ID: {data_id}")
 
         except Exception as e:
             logger.error(f"Failed to store scraping result in memory: {str(e)}")
 
-    async def _scrape_with_requests(
-        self, url: str, context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _scrape_with_requests(self, url: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """
         Scrape a URL using the requests library.
 

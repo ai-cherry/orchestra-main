@@ -43,9 +43,7 @@ def execute_roo_workflow(workflow_def):
         manager = SubtaskManager()
 
         # Extract workflow details
-        main_task = workflow_def.get(
-            "description", "Execute strategic analysis workflow"
-        )
+        main_task = workflow_def.get("description", "Execute strategic analysis workflow")
         subtasks = workflow_def.get("steps", [])
 
         # Execute the workflow
@@ -64,9 +62,7 @@ def execute_roo_workflow(workflow_def):
         return result
 
     except ImportError:
-        logger.error(
-            "Could not import Roo's workflow manager. Make sure roo_workflow_manager.py is available."
-        )
+        logger.error("Could not import Roo's workflow manager. Make sure roo_workflow_manager.py is available.")
         return None
     except Exception as e:
         logger.error(f"Error executing workflow: {e}")

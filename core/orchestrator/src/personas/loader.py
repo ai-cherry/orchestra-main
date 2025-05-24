@@ -106,11 +106,7 @@ class PersonaManager:
             KeyError: If the persona ID is not found and no default is available
         """
         # Auto-reload if needed
-        if (
-            self._auto_reload
-            and self._config_path
-            and time.time() - self._last_loaded > self._cache_ttl_seconds
-        ):
+        if self._auto_reload and self._config_path and time.time() - self._last_loaded > self._cache_ttl_seconds:
             self._load_personas()
 
         # Use default if no ID provided
@@ -129,9 +125,7 @@ class PersonaManager:
 
         # Fall back to default
         if self._default_id in self._personas:
-            logger.warning(
-                f"Persona '{persona_id}' not found, using default: {self._default_id}"
-            )
+            logger.warning(f"Persona '{persona_id}' not found, using default: {self._default_id}")
             return self._personas[self._default_id]
 
         # If still not found, use fallback
@@ -150,11 +144,7 @@ class PersonaManager:
             Dictionary mapping persona IDs to their configurations
         """
         # Auto-reload if needed
-        if (
-            self._auto_reload
-            and self._config_path
-            and time.time() - self._last_loaded > self._cache_ttl_seconds
-        ):
+        if self._auto_reload and self._config_path and time.time() - self._last_loaded > self._cache_ttl_seconds:
             self._load_personas()
 
         # Return a copy to prevent modification
@@ -189,11 +179,7 @@ class PersonaManager:
             True if load was successful, False otherwise
         """
         # Skip if not forced and cache is still valid
-        if (
-            not force
-            and self._last_loaded > 0
-            and time.time() - self._last_loaded <= self._cache_ttl_seconds
-        ):
+        if not force and self._last_loaded > 0 and time.time() - self._last_loaded <= self._cache_ttl_seconds:
             return True
 
         # Start with fallback personas
@@ -238,9 +224,7 @@ class PersonaManager:
                     if default_id in personas_dict:
                         self._default_id = default_id
 
-                    logger.info(
-                        f"Loaded {len(yaml_personas)} personas from {config_path}"
-                    )
+                    logger.info(f"Loaded {len(yaml_personas)} personas from {config_path}")
             except Exception as e:
                 logger.error(f"Failed to load personas from {self._config_path}: {e}")
                 self._last_loaded = time.time()
@@ -254,8 +238,6 @@ class PersonaManager:
         if self._default_id not in self._personas and self._personas:
             # Pick first persona as default
             self._default_id = next(iter(self._personas))
-            logger.warning(
-                f"Default persona ID not found, using {self._default_id} as default"
-            )
+            logger.warning(f"Default persona ID not found, using {self._default_id} as default")
 
         return True

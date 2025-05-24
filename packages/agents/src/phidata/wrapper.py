@@ -96,9 +96,7 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
 
                 # Store the imported Pydantic model class
                 self.response_model = model_class
-                logger.info(
-                    f"Successfully loaded response model: {class_name} from {module_path}"
-                )
+                logger.info(f"Successfully loaded response model: {class_name} from {module_path}")
             except ImportError as e:
                 logger.error(f"Failed to import response model module: {e}")
                 raise ImportError(f"Response model module not found: {e}")
@@ -121,9 +119,7 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
         Parse the Phidata-specific configuration from the agent_config.
         """
         # Get agent class path (e.g., "agno.agent.Agent" or "agno.team.Team")
-        self.phidata_agent_class = self.agent_config.get(
-            "phidata_agent_class", "agno.agent.Agent"
-        )
+        self.phidata_agent_class = self.agent_config.get("phidata_agent_class", "agno.agent.Agent")
         self._is_team = self.phidata_agent_class.endswith(".Team")
 
         # Get LLM reference (which LLM to use from those configured via Portkey)
@@ -154,18 +150,12 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
         if self._is_team:
             self.team_mode = self.agent_config.get("team_mode", "coordinate")
             self.team_model_ref = self.agent_config.get("team_model_ref", self.llm_ref)
-            self.team_success_criteria = self.agent_config.get(
-                "team_success_criteria", ""
-            )
-            self.team_instructions = self.agent_config.get(
-                "team_instructions", self.instructions
-            )
+            self.team_success_criteria = self.agent_config.get("team_success_criteria", "")
+            self.team_instructions = self.agent_config.get("team_instructions", self.instructions)
             self.team_markdown = self.agent_config.get("team_markdown", self.markdown)
             self.members_config = self.agent_config.get("members", [])
             if not self.members_config:
-                raise ValueError(
-                    "PhidataAgentWrapper with Team requires 'members' in config"
-                )
+                raise ValueError("PhidataAgentWrapper with Team requires 'members' in config")
 
     def _init_knowledge_base(self) -> None:
         """
@@ -182,13 +172,9 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
 
             # 1. EMBEDDER: Configure and instantiate embedder
             embedder_config = knowledge_config.get("embedder", {})
-            embedder_class_path = embedder_config.get(
-                "embedder_class_path", "phi.embeddings.VertexAiEmbedder"
-            )
+            embedder_class_path = embedder_config.get("embedder_class_path", "phi.embeddings.VertexAiEmbedder")
             embedder_model = embedder_config.get("model", "textembedding-gecko@latest")
-            embedder_project = embedder_config.get(
-                "project", os.environ.get("GCP_PROJECT_ID")
-            )
+            embedder_project = embedder_config.get("project", os.environ.get("GCP_PROJECT_ID"))
             embedder_location = embedder_config.get("location", "us-central1")
 
             # Import embedder class
@@ -206,21 +192,15 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
 
             # 2. VECTOR DB: Configure and instantiate vector database
             vector_db_config = knowledge_config.get("vector_db", {})
-            vector_db_class_path = vector_db_config.get(
-                "vector_db_class_path", "phi.vector.PgVector"
-            )
-            vector_db_collection = vector_db_config.get(
-                "collection", f"{self.id}_knowledge"
-            )
+            vector_db_class_path = vector_db_config.get("vector_db_class_path", "phi.vector.PgVector")
+            vector_db_collection = vector_db_config.get("collection", f"{self.id}_knowledge")
             db_conn_env_var = vector_db_config.get("db_conn_env_var", "DATABASE_URL")
             search_type = vector_db_config.get("search_type", "mmr")
 
             # Get DB connection string from environment
             db_connection_url = os.environ.get(db_conn_env_var)
             if not db_connection_url:
-                raise ValueError(
-                    f"Environment variable {db_conn_env_var} not found for vector DB connection"
-                )
+                raise ValueError(f"Environment variable {db_conn_env_var} not found for vector DB connection")
 
             # Import vector DB class
             module_path, class_name = vector_db_class_path.rsplit(".", 1)
@@ -234,9 +214,7 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
                 embedder=embedder,
                 search_type=search_type,
             )
-            logger.info(
-                f"Initialized {class_name} with collection {vector_db_collection}"
-            )
+            logger.info(f"Initialized {class_name} with collection {vector_db_collection}")
 
             # 3. KNOWLEDGE BASE: Configure and instantiate knowledge base
             knowledge_base_class_path = knowledge_config.get(
@@ -252,9 +230,7 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
             # Instantiate knowledge base
             self.knowledge_base = KnowledgeBaseClass(urls=urls, vector_db=vector_db)
 
-            logger.info(
-                f"Successfully initialized {class_name} with {len(urls)} URLs and {vector_db_class_path}"
-            )
+            logger.info(f"Successfully initialized {class_name} with {len(urls)} URLs and {vector_db_class_path}")
 
         except ImportError as e:
             logger.error(f"Failed to import knowledge base component: {e}")
@@ -278,26 +254,18 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
             self.agent_storage = get_pg_agent_storage(
                 agent_id=self.id, config=cloudsql_config, table_name=storage_table
             )
-            logger.info(
-                f"Initialized CloudSQL PgAgentStorage with table: {storage_table}"
-            )
+            logger.info(f"Initialized CloudSQL PgAgentStorage with table: {storage_table}")
 
             # Setup PgVector2 for memory using VertexAI embeddings
             memory_table = self.memory_config.get("table_name", f"{self.id}_memory")
 
             # Initialize PgVector2 with user_id if available
             user_id = self.agent_config.get("default_user_id")
-            self.agent_memory = get_pgvector_memory(
-                user_id=user_id, config=cloudsql_config, table_name=memory_table
-            )
-            logger.info(
-                f"Initialized CloudSQL PgVector2 memory with table: {memory_table}"
-            )
+            self.agent_memory = get_pgvector_memory(user_id=user_id, config=cloudsql_config, table_name=memory_table)
+            logger.info(f"Initialized CloudSQL PgVector2 memory with table: {memory_table}")
 
         except Exception as e:
-            logger.error(
-                f"Failed to initialize CloudSQL storage/memory: {e}", exc_info=True
-            )
+            logger.error(f"Failed to initialize CloudSQL storage/memory: {e}", exc_info=True)
             # Set to None if initialization fails - we'll handle this gracefully
             self.agent_storage = None
             self.agent_memory = None
@@ -331,25 +299,17 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
                     # Get the tool from the registry
                     orchestra_tool = self.tools.get_tool(tool_id)
                     if not orchestra_tool:
-                        logger.warning(
-                            f"Tool '{tool_id}' not found in registry, skipping"
-                        )
+                        logger.warning(f"Tool '{tool_id}' not found in registry, skipping")
                         continue
 
                     # Check if tool has a to_phidata_tool method
-                    if hasattr(orchestra_tool, "to_phidata_tool") and callable(
-                        orchestra_tool.to_phidata_tool
-                    ):
+                    if hasattr(orchestra_tool, "to_phidata_tool") and callable(orchestra_tool.to_phidata_tool):
                         phidata_tool = orchestra_tool.to_phidata_tool(**tool_params)
                         if phidata_tool:
                             phidata_tools.append(phidata_tool)
-                            logger.info(
-                                f"Added registry tool: {tool_id} to Phidata agent"
-                            )
+                            logger.info(f"Added registry tool: {tool_id} to Phidata agent")
                     else:
-                        logger.warning(
-                            f"Tool {tool_id} doesn't support conversion to Phidata format"
-                        )
+                        logger.warning(f"Tool {tool_id} doesn't support conversion to Phidata format")
 
                     continue
 
@@ -423,12 +383,8 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
                         if tool_type.startswith("registry:"):
                             tool_id = tool_type.replace("registry:", "").strip()
                             orchestra_tool = self.tools.get_tool(tool_id)
-                            if orchestra_tool and hasattr(
-                                orchestra_tool, "to_phidata_tool"
-                            ):
-                                phidata_tool = orchestra_tool.to_phidata_tool(
-                                    **tool_params
-                                )
+                            if orchestra_tool and hasattr(orchestra_tool, "to_phidata_tool"):
+                                phidata_tool = orchestra_tool.to_phidata_tool(**tool_params)
                                 if phidata_tool:
                                     member_tools.append(phidata_tool)
                             continue
@@ -442,9 +398,7 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
                         member_tools.append(tool_instance)
 
                     except Exception as e:
-                        logger.error(
-                            f"Failed to initialize tool for member {name}: {e}"
-                        )
+                        logger.error(f"Failed to initialize tool for member {name}: {e}")
 
                 # Initialize member-specific storage if needed
                 member_storage = None
@@ -453,9 +407,7 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
                 # Check if member has specific storage config
                 if "storage" in member_config:
                     # Get table name for member storage
-                    storage_table = member_config["storage"].get(
-                        "table_name", f"{name.lower()}_storage"
-                    )
+                    storage_table = member_config["storage"].get("table_name", f"{name.lower()}_storage")
 
                     # Use CloudSQL for member storage with partitioning
                     member_storage = get_pg_agent_storage(
@@ -463,9 +415,7 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
                         config=cloudsql_config,
                         table_name=storage_table,
                     )
-                    logger.info(
-                        f"Created CloudSQL storage for member {name}: {storage_table}"
-                    )
+                    logger.info(f"Created CloudSQL storage for member {name}: {storage_table}")
                 else:
                     # Share the team's storage
                     member_storage = self.agent_storage
@@ -473,9 +423,7 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
                 # Check if member has specific memory config
                 if "memory" in member_config:
                     # Get table name for member memory
-                    memory_table = member_config["memory"].get(
-                        "table_name", f"{name.lower()}_memory"
-                    )
+                    memory_table = member_config["memory"].get("table_name", f"{name.lower()}_memory")
 
                     # Use CloudSQL for member memory
                     member_memory = get_pgvector_memory(
@@ -483,9 +431,7 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
                         config=cloudsql_config,
                         table_name=memory_table,
                     )
-                    logger.info(
-                        f"Created CloudSQL memory for member {name}: {memory_table}"
-                    )
+                    logger.info(f"Created CloudSQL memory for member {name}: {memory_table}")
                 else:
                     # Share the team's memory
                     member_memory = self.agent_memory
@@ -498,17 +444,13 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
                     name=name,
                     role=role,
                     markdown=member_config.get("markdown", self.markdown),
-                    show_tool_calls=member_config.get(
-                        "show_tool_calls", self.show_tool_calls
-                    ),
+                    show_tool_calls=member_config.get("show_tool_calls", self.show_tool_calls),
                     storage=member_storage,
                     memory=member_memory,
                 )
 
                 members.append(member)
-                logger.info(
-                    f"Initialized team member: {name} with CloudSQL storage/memory"
-                )
+                logger.info(f"Initialized team member: {name} with CloudSQL storage/memory")
 
             except Exception as e:
                 logger.error(f"Failed to initialize team member: {e}")
@@ -568,9 +510,7 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
                     "storage": self.agent_storage,
                     "memory": self.agent_memory,
                     # Add additional configurations from agent_config
-                    "add_history_to_messages": self.agent_config.get(
-                        "add_history_to_messages", True
-                    ),
+                    "add_history_to_messages": self.agent_config.get("add_history_to_messages", True),
                 }
 
                 # Add knowledge_base if configured
@@ -597,9 +537,7 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
 
         except ImportError as e:
             logger.error(f"Failed to import Phidata module: {e}")
-            raise ImportError(
-                f"Phidata module not available. Please ensure Phidata/Agno is installed: {e}"
-            )
+            raise ImportError(f"Phidata module not available. Please ensure Phidata/Agno is installed: {e}")
         except Exception as e:
             logger.error(f"Failed to initialize Phidata agent: {e}")
             raise RuntimeError(f"Failed to initialize Phidata agent: {e}")
@@ -645,30 +583,20 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
         # Check by model name attribute
         if hasattr(llm_model, "model") and isinstance(llm_model.model, str):
             model_name = llm_model.model.lower()
-            if (
-                "openrouter" in model_name
-                or "openai/" in model_name
-                or "anthropic/" in model_name
-            ):
+            if "openrouter" in model_name or "openai/" in model_name or "anthropic/" in model_name:
                 is_openrouter = True
 
         # Check if this is being used via Portkey
         via_portkey = False
         if hasattr(llm_model, "default_headers"):
             headers = llm_model.default_headers
-            if isinstance(headers, dict) and any(
-                key.startswith("x-portkey") for key in headers
-            ):
+            if isinstance(headers, dict) and any(key.startswith("x-portkey") for key in headers):
                 via_portkey = True
 
-        logger.debug(
-            f"Model check: is_openrouter={is_openrouter}, via_portkey={via_portkey}"
-        )
+        logger.debug(f"Model check: is_openrouter={is_openrouter}, via_portkey={via_portkey}")
         return is_openrouter and via_portkey
 
-    async def _process_streaming_response(
-        self, response_gen: Union[AsyncGenerator, Generator]
-    ) -> str:
+    async def _process_streaming_response(self, response_gen: Union[AsyncGenerator, Generator]) -> str:
         """
         Process a streaming response from the Phidata agent.
 
@@ -774,9 +702,7 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
             if input_data.metadata:
                 # Filter out 'system' which was handled specially for OpenRouter
                 metadata_to_add = {
-                    k: v
-                    for k, v in input_data.metadata.items()
-                    if not (k == "system" and using_openrouter_via_portkey)
+                    k: v for k, v in input_data.metadata.items() if not (k == "system" and using_openrouter_via_portkey)
                 }
                 run_params.update(metadata_to_add)
 
@@ -792,9 +718,7 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
                         response_gen = await self.phidata_agent.run(**run_params)
                     else:
                         # Sync streaming response
-                        response_gen = await asyncio.to_thread(
-                            self.phidata_agent.run, **run_params
-                        )
+                        response_gen = await asyncio.to_thread(self.phidata_agent.run, **run_params)
 
                     # Process the streaming response
                     content = await self._process_streaming_response(response_gen)
@@ -814,9 +738,7 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
                         response = await self.phidata_agent.run(**run_params)
                     else:
                         # Run synchronous method in a thread pool to avoid blocking
-                        response = await asyncio.to_thread(
-                            self.phidata_agent.run, **run_params
-                        )
+                        response = await asyncio.to_thread(self.phidata_agent.run, **run_params)
             else:
                 raise NotImplementedError("Phidata agent does not have a 'run' method")
 

@@ -5,6 +5,7 @@ This module provides the main FastAPI application.
 """
 
 import os
+
 # Use the new centralized logging setup
 from core.logging_config import setup_logging, get_logger
 
@@ -57,7 +58,7 @@ from ai_orchestra.infrastructure.versioning.model_version_manager import (
 is_production = os.environ.get("K_SERVICE") is not None
 setup_logging(level=settings.log_level, json_format=is_production)
 
-logger = get_logger(__name__) # Use the centralized get_logger
+logger = get_logger(__name__)  # Use the centralized get_logger
 
 # Create FastAPI app
 app = FastAPI(
@@ -332,9 +333,7 @@ class DocumentListResponse(BaseModel):
 
 # Exception handlers
 @app.exception_handler(AIServiceError)
-async def ai_service_error_handler(
-    request: Request, exc: AIServiceError
-) -> JSONResponse:
+async def ai_service_error_handler(request: Request, exc: AIServiceError) -> JSONResponse:
     """
     Handle AI service errors.
 
@@ -347,12 +346,7 @@ async def ai_service_error_handler(
     """
     logger.error(
         "Handled AI service error",
-        extra={
-            "code": exc.code,
-            "message": exc.message,
-            "path": request.url.path,
-            "error_type": "AIServiceError"
-        }
+        extra={"code": exc.code, "message": exc.message, "path": request.url.path, "error_type": "AIServiceError"},
     )
 
     return JSONResponse(
@@ -379,12 +373,12 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
     """
     logger.error(
         "Unhandled exception",
-        exc_info=True, # Include stack trace for unhandled exceptions
+        exc_info=True,  # Include stack trace for unhandled exceptions
         extra={
             "error_type": type(exc).__name__,
             "message": str(exc),
             "path": request.url.path,
-        }
+        },
     )
 
     return JSONResponse(
@@ -1069,7 +1063,9 @@ async def process_document(
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
-        logger.error("Error processing document", exc_info=True, extra={"file_path": request.file_path, "error_message": str(e)})
+        logger.error(
+            "Error processing document", exc_info=True, extra={"file_path": request.file_path, "error_message": str(e)}
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error processing document: {str(e)}",
@@ -1106,9 +1102,7 @@ async def upload_document(
         metadata = json.loads(metadata_json) if metadata_json else {}
 
         # Create a temporary file to store the uploaded content
-        with tempfile.NamedTemporaryFile(
-            delete=False, suffix=f"_{file.filename}"
-        ) as temp_file:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=f"_{file.filename}") as temp_file:
             # Write uploaded file content to the temporary file
             content = await file.read()
             temp_file.write(content)
@@ -1187,7 +1181,11 @@ async def upload_document(
             detail="Invalid metadata JSON format",
         )
     except Exception as e:
-        logger.error("Error processing uploaded document", exc_info=True, extra={"filename": file.filename, "error_message": str(e)})
+        logger.error(
+            "Error processing uploaded document",
+            exc_info=True,
+            extra={"filename": file.filename, "error_message": str(e)},
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error processing uploaded document: {str(e)}",

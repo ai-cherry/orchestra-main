@@ -1,6 +1,7 @@
 """
 A simple echo agent for demonstration purposes.
 """
+
 import logging
 from typing import Dict, Any
 

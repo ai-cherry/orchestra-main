@@ -46,9 +46,7 @@ class ToolManager:
         """
         return list(self.tools.keys())
 
-    def execute(
-        self, tool: str, mode: str, prompt: str, context: Optional[str] = None
-    ) -> Optional[str]:
+    def execute(self, tool: str, mode: str, prompt: str, context: Optional[str] = None) -> Optional[str]:
         """Execute a prompt with a specific tool and mode.
 
         Args:
@@ -79,9 +77,7 @@ class ToolManager:
         logger.error(f"Unsupported tool: {tool}")
         return None
 
-    def _execute_roo(
-        self, mode: str, prompt: str, context: Optional[str] = None
-    ) -> Optional[str]:
+    def _execute_roo(self, mode: str, prompt: str, context: Optional[str] = None) -> Optional[str]:
         """Execute a prompt with Roo.
 
         Args:
@@ -117,9 +113,7 @@ class ToolManager:
             logger.error(f"Error: {e}")
             return None
 
-    def _execute_cline(
-        self, mode: str, prompt: str, context: Optional[str] = None
-    ) -> Optional[str]:
+    def _execute_cline(self, mode: str, prompt: str, context: Optional[str] = None) -> Optional[str]:
         """Execute a prompt with Cline.bot.
 
         Args:
@@ -146,9 +140,7 @@ class ToolManager:
             logger.error(f"Error executing Cline: {e}")
             return None
 
-    def _execute_gemini(
-        self, mode: str, prompt: str, context: Optional[str] = None
-    ) -> Optional[str]:
+    def _execute_gemini(self, mode: str, prompt: str, context: Optional[str] = None) -> Optional[str]:
         """Execute a prompt with Gemini.
 
         Args:
@@ -163,9 +155,7 @@ class ToolManager:
         logger.error("Gemini integration not yet implemented")
         return None
 
-    def _execute_copilot(
-        self, mode: str, prompt: str, context: Optional[str] = None
-    ) -> Optional[str]:
+    def _execute_copilot(self, mode: str, prompt: str, context: Optional[str] = None) -> Optional[str]:
         """Execute a prompt with Co-pilot.
 
         Args:

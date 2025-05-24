@@ -34,24 +34,12 @@ class OperationContext(BaseModel):
 
     operation_id: str = Field(..., description="Unique identifier for this operation")
     initial_mode: str = Field(..., description="Slug of the initial mode")
-    target_modes: List[str] = Field(
-        ..., description="List of mode slugs to transition through"
-    )
-    current_mode_index: int = Field(
-        default=0, description="Index of the current mode in target_modes"
-    )
-    return_mode: str = Field(
-        ..., description="Slug of the mode to return to after completion"
-    )
-    operation_data: Dict[str, Any] = Field(
-        default_factory=dict, description="Data for the operation"
-    )
-    results: List[Dict[str, Any]] = Field(
-        default_factory=list, description="Results from each mode"
-    )
-    status: OperationStatus = Field(
-        default=OperationStatus.STARTED, description="Status of the operation"
-    )
+    target_modes: List[str] = Field(..., description="List of mode slugs to transition through")
+    current_mode_index: int = Field(default=0, description="Index of the current mode in target_modes")
+    return_mode: str = Field(..., description="Slug of the mode to return to after completion")
+    operation_data: Dict[str, Any] = Field(default_factory=dict, description="Data for the operation")
+    results: List[Dict[str, Any]] = Field(default_factory=list, description="Results from each mode")
+    status: OperationStatus = Field(default=OperationStatus.STARTED, description="Status of the operation")
     created_at: float = Field(
         default_factory=time.time,
         description="Timestamp when this operation was created",
@@ -166,9 +154,7 @@ class BoomerangOperation:
                 first_target = target_modes[0]
 
                 # Store updated context
-                await self.memory_manager.store(
-                    memory_key, context.dict(), "roo_boomerang", ttl_seconds=86400
-                )
+                await self.memory_manager.store(memory_key, context.dict(), "roo_boomerang", ttl_seconds=86400)
 
                 # Prepare transition
                 await self.transition_manager.prepare_transition(
@@ -188,9 +174,7 @@ class BoomerangOperation:
             logger.error(f"Failed to start boomerang operation: {e}")
             return None
 
-    async def advance_operation(
-        self, operation_id: str, result: Dict[str, Any] = None
-    ) -> Optional[Dict[str, Any]]:
+    async def advance_operation(self, operation_id: str, result: Dict[str, Any] = None) -> Optional[Dict[str, Any]]:
         """
         Advance the operation to the next mode or complete it.
 
@@ -235,9 +219,7 @@ class BoomerangOperation:
             # Store updated context
             memory_key = f"boomerang:{operation_id}"
             try:
-                await self.memory_manager.store(
-                    memory_key, context.dict(), "roo_boomerang", ttl_seconds=86400
-                )
+                await self.memory_manager.store(memory_key, context.dict(), "roo_boomerang", ttl_seconds=86400)
 
                 # Store results separately for easier retrieval
                 results_key = f"boomerang_results:{operation_id}"
@@ -265,9 +247,7 @@ class BoomerangOperation:
                 )
 
                 if not transition_context:
-                    logger.error(
-                        f"Failed to prepare final transition for operation {operation_id}"
-                    )
+                    logger.error(f"Failed to prepare final transition for operation {operation_id}")
                     return None
 
                 # Clean up
@@ -291,9 +271,7 @@ class BoomerangOperation:
             # Store updated context
             memory_key = f"boomerang:{operation_id}"
             try:
-                await self.memory_manager.store(
-                    memory_key, context.dict(), "roo_boomerang", ttl_seconds=86400
-                )
+                await self.memory_manager.store(memory_key, context.dict(), "roo_boomerang", ttl_seconds=86400)
 
                 # Prepare transition to next mode
                 current_mode = context.target_modes[current_index]
@@ -313,9 +291,7 @@ class BoomerangOperation:
                 )
 
                 if not transition_context:
-                    logger.error(
-                        f"Failed to prepare transition for operation {operation_id}"
-                    )
+                    logger.error(f"Failed to prepare transition for operation {operation_id}")
                     return None
 
                 return {
@@ -354,9 +330,7 @@ class BoomerangOperation:
             logger.error(f"Failed to retrieve operation {operation_id}: {e}")
             return None
 
-    async def get_operation_results(
-        self, operation_id: str
-    ) -> Optional[List[Dict[str, Any]]]:
+    async def get_operation_results(self, operation_id: str) -> Optional[List[Dict[str, Any]]]:
         """
         Get the results of an operation.
 
@@ -447,9 +421,7 @@ class RooMemoryManager:
             logger.error(f"Failed to store mode context: {e}")
             return None
 
-    async def retrieve_mode_contexts(
-        self, mode_slug: str, limit: int = 10
-    ) -> List[Dict[str, Any]]:
+    async def retrieve_mode_contexts(self, mode_slug: str, limit: int = 10) -> List[Dict[str, Any]]:
         """
         Retrieve recent context data for a specific mode.
 
@@ -463,11 +435,7 @@ class RooMemoryManager:
         try:
             # This would use the search functionality of the base memory manager
             results = await self.memory_manager.search(f"roo:mode:{mode_slug}:", limit)
-            return [
-                r.get("content", {})
-                for r in results
-                if isinstance(r, dict) and "content" in r
-            ]
+            return [r.get("content", {}) for r in results if isinstance(r, dict) and "content" in r]
         except Exception as e:
             logger.error(f"Failed to retrieve mode contexts: {e}")
             return []
@@ -515,9 +483,7 @@ class RooMemoryManager:
             logger.error(f"Failed to store code change: {e}")
             return None
 
-    async def get_recent_changes_for_file(
-        self, file_path: str, limit: int = 5
-    ) -> List[Dict[str, Any]]:
+    async def get_recent_changes_for_file(self, file_path: str, limit: int = 5) -> List[Dict[str, Any]]:
         """
         Get recent changes for a specific file.
 
@@ -529,9 +495,7 @@ class RooMemoryManager:
             List of change dictionaries
         """
         try:
-            results = await self.memory_manager.search(
-                f"roo:code_change:{file_path}:", limit
-            )
+            results = await self.memory_manager.search(f"roo:code_change:{file_path}:", limit)
             return [
                 {"content": r.get("content", {}), "metadata": r.get("metadata", {})}
                 for r in results
@@ -581,9 +545,7 @@ class RooMemoryManager:
             logger.error(f"Failed to store analysis: {e}")
             return None
 
-    async def get_recent_analyses(
-        self, analysis_type: Optional[str] = None, limit: int = 5
-    ) -> List[Dict[str, Any]]:
+    async def get_recent_analyses(self, analysis_type: Optional[str] = None, limit: int = 5) -> List[Dict[str, Any]]:
         """
         Get recent analyses.
 
@@ -640,9 +602,7 @@ class RooMemoryManager:
             logger.error(f"Failed to store user preference: {e}")
             return None
 
-    async def get_user_preference(
-        self, preference_type: str, default_value: Any = None
-    ) -> Any:
+    async def get_user_preference(self, preference_type: str, default_value: Any = None) -> Any:
         """
         Get a user preference.
 

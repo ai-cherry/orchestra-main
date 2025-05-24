@@ -1,6 +1,7 @@
 """
 Stub implementations for testing and development.
 """
+
 import random
 from typing import List, Optional
 
