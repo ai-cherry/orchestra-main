@@ -1,32 +1,46 @@
-# Makefile for Orchestra Monorepo Automation
+# Unified Makefile for Python Project (pip-based)
+# Usage: make <target>
+# Ensures robust, reproducible, and efficient workflows for a single-developer project.
 
-.PHONY: setup check-versions lint test deploy
+# --- Environment Checks ---
+venv-check:
+	@python scripts/check_venv.py
 
-setup:
-	@echo "[SETUP] Installing tools with asdf..."
-	asdf install
-	poetry install
-	@echo "[SETUP] All tools and dependencies installed."
+deps-check:
+	@python scripts/check_dependencies.py
 
-check-versions:
-	@echo "[CHECK] Verifying tool versions from .tool-versions..."
-	asdf current
-	python --version
-	poetry --version
-	terraform version
-	node --version
+outdated:
+	@python scripts/check_dependencies.py --show-outdated
 
+# --- Dependency Management ---
+install:
+	@pip install --upgrade pip
+	@if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+	@if [ -f orchestrator/requirements.txt ]; then pip install -r orchestrator/requirements.txt; fi
+	@if [ -f codespaces_pip_requirements.txt ]; then pip install -r codespaces_pip_requirements.txt; fi
+
+update:
+	@pip install --upgrade pip
+	@pip list --outdated
+	@echo "Update your requirements.txt as needed and re-run 'make install'"
+
+# --- Linting, Formatting, Type-Checking ---
 lint:
-	@echo "[LINT] Running pre-commit, terraform fmt, and backend lint..."
-	pre-commit run --all-files
-	terraform fmt -check -recursive terraform/
-	cd terraform && ./lint-backend.sh
+	@flake8 .
+	@ruff check .
 
-# Add your test command here (example: pytest)
+format:
+	@black .
+	@ruff format .
+
+type-check:
+	@mypy .
+
+# --- Testing ---
 test:
-	@echo "[TEST] Running tests..."
-	pytest || echo "No tests found."
+	@pytest
 
-deploy:
-	@echo "[DEPLOY] Running deployment pipeline..."
-	gcloud builds submit --config=cloudbuild.yaml .
+# --- All-in-One Validation ---
+validate: venv-check deps-check lint type-check test
+
+.PHONY: venv-check deps-check outdated install update lint format type-check test validate

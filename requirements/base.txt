@@ -2,6 +2,7 @@
 # Python 3.11+ required for all modules
 
 # Web Frameworks
+Flask==3.0.3
 fastapi==0.115.12
 uvicorn==0.34.2
 starlette==0.46.2
@@ -63,7 +64,7 @@ anyio==4.9.0
 async-timeout==5.0.1
 
 # Core System Libraries
-attrs==21.2.0
+attrs
 certifi==2020.6.20
 charset-normalizer==3.4.2
 idna==3.3
