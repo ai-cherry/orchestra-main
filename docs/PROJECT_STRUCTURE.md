@@ -12,6 +12,12 @@ orchestra-main/
 │   ├── check_venv.py           # Virtual environment validation
 │   └── check_dependencies.py   # Dependency checking
 │
+├── ai_context_*.py            # AI context files (root level)
+│   ├── ai_context_planner.py  # Planning phase guidance
+│   ├── ai_context_coder.py    # Coding patterns & examples
+│   ├── ai_context_reviewer.py # Review checklist
+│   └── ai_context_debugger.py # Debug workflows
+│
 ├── requirements/               # Dependency management (pip-based)
 │   ├── base.txt               # Core dependencies
 │   ├── development.txt        # Dev dependencies
@@ -35,8 +41,10 @@ orchestra-main/
 ├── docs/                      # Documentation
 │   ├── AI_CODING_STANDARDS.md # AI tool guidelines
 │   ├── PROJECT_STRUCTURE.md   # This file
+│   ├── AI_WORKFLOW_INTEGRATION.md # How AI tools work together
 │   └── AUTOMATION_SUMMARY.md  # Automation overview
 │
+├── AI_CONTEXT_FILES.md       # Quick reference for context files
 ├── Makefile                   # Build automation
 ├── .cursorrules              # Cursor AI rules
 └── .pre-commit-config.yaml   # Pre-commit hooks
@@ -45,30 +53,36 @@ orchestra-main/
 ## 🛠️ Key Components
 
 ### **1. Automation Scripts (scripts/)**
+
 All automation tools MUST go in the `scripts/` directory:
 
-| Script | Purpose | Usage |
-|--------|---------|-------|
-| `config_validator.py` | Validates YAML, env vars, GCP connectivity | `python scripts/config_validator.py` |
-| `health_monitor.py` | Dynamic health checks, replaces sleep | `python scripts/health_monitor.py --monitor` |
-| `orchestra.py` | Unified CLI for all operations | `python scripts/orchestra.py services status` |
-| `ai_code_reviewer.py` | Checks for AI anti-patterns | `python scripts/ai_code_reviewer.py --check-changes` |
+| Script                | Purpose                                    | Usage                                                |
+| --------------------- | ------------------------------------------ | ---------------------------------------------------- |
+| `config_validator.py` | Validates YAML, env vars, GCP connectivity | `python scripts/config_validator.py`                 |
+| `health_monitor.py`   | Dynamic health checks, replaces sleep      | `python scripts/health_monitor.py --monitor`         |
+| `orchestra.py`        | Unified CLI for all operations             | `python scripts/orchestra.py services status`        |
+| `ai_code_reviewer.py` | Checks for AI anti-patterns                | `python scripts/ai_code_reviewer.py --check-changes` |
 
 ### **2. Service Ports**
+
 Fixed port assignments - DO NOT duplicate:
+
 - **8002**: MCP Secret Manager
 - **8080**: Core Orchestrator / Firestore MCP
 - **3000**: Admin UI
 - **6379**: Redis (if running)
 
 ### **3. Configuration Files**
+
 - `requirements/base.txt` - Core Python dependencies
 - `mcp-servers/*.yaml` - MCP server configs
 - `core/orchestrator/src/config/*.yaml` - Service configs
 - NO Docker files, NO Poetry files, NO Pipfile
 
 ### **4. Makefile Targets**
+
 Key automation targets:
+
 ```bash
 # Development
 make dev-start              # Full dev environment setup
@@ -93,6 +107,7 @@ make after-ai-coding       # Validate AI changes
 ## 📋 Before Adding New Code
 
 ### **Check Existing Tools**
+
 ```bash
 # Find existing validators
 grep -r "def.*validat" scripts/
@@ -110,6 +125,7 @@ ls -la scripts/*.py
 ### **Common Patterns to Follow**
 
 #### **1. Script Structure**
+
 ```python
 #!/usr/bin/env python3
 """One-line description.
@@ -128,7 +144,7 @@ logger = logging.getLogger(__name__)
 
 class MyTool:
     """Tool description."""
-    
+
     def __init__(self):
         pass
 
@@ -136,12 +152,13 @@ def main():
     """Main entry point."""
     parser = argparse.ArgumentParser()
     # ... args
-    
+
 if __name__ == "__main__":
     sys.exit(main())
 ```
 
 #### **2. Error Handling**
+
 ```python
 # Good - specific, graceful
 try:
@@ -152,6 +169,7 @@ except subprocess.TimeoutExpired:
 ```
 
 #### **3. Subprocess Usage**
+
 ```python
 # ✅ GOOD - Secure
 subprocess.run(["terraform", "plan", "-out=tfplan"], check=True)
@@ -164,18 +182,21 @@ subprocess.run(cmd, shell=True)  # Avoid shell=True
 ## 🚫 What NOT to Add
 
 ### **Forbidden Files**
+
 - `Dockerfile`, `docker-compose.yml`
 - `Pipfile`, `poetry.lock`, `pyproject.toml`
 - `setup.py`, `setup.cfg`
 - `requirements-*.txt` (use requirements/ directory)
 
 ### **Forbidden Dependencies**
+
 - `docker`, `docker-compose`
 - `poetry`, `pipenv`
 - `pandas` (for simple tasks)
 - Heavy ML libraries (unless absolutely needed)
 
 ### **Forbidden Patterns**
+
 - Multiple inheritance
 - Metaclasses
 - Abstract base classes for simple tasks
@@ -184,6 +205,7 @@ subprocess.run(cmd, shell=True)  # Avoid shell=True
 ## 🔍 Quick Reference
 
 ### **Find Stuff**
+
 ```bash
 # Find API endpoints
 find . -path "*/api/*" -name "*.py"
@@ -199,6 +221,7 @@ grep -r "class.*${PATTERN}" --include="*.py" scripts/
 ```
 
 ### **Validate Changes**
+
 ```bash
 # After making changes
 make ai-review-changes     # Check for anti-patterns
@@ -208,4 +231,4 @@ make health-check         # Verify services still work
 
 ---
 
-**Remember: If you're not sure if something exists, it probably does! Check `scripts/` first!** 
+**Remember: If you're not sure if something exists, it probably does! Check `scripts/` first!**

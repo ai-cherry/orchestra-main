@@ -7,15 +7,18 @@ This guide details the recommended code modifications and best practices for int
 ## 1. Pub/Sub Integration
 
 ### **A. Dependencies**
+
 - Add `google-cloud-pubsub` to your requirements (Poetry or requirements.txt).
 
 ### **B. Configuration**
+
 - Add the following to your MCP server config:
   - `PUBSUB_TOPIC`: Name of the Pub/Sub topic (e.g., `orchestra-events`)
   - `PUBSUB_SUBSCRIPTION`: Name of the subscription (e.g., `orchestra-events-sub`)
   - `GOOGLE_APPLICATION_CREDENTIALS`: Path to service account key (or use Workload Identity)
 
 ### **C. Publishing Events**
+
 ```python
 from google.cloud import pubsub_v1
 import os
@@ -30,6 +33,7 @@ def publish_event(event_type, payload):
 ```
 
 ### **D. Subscribing to Events**
+
 ```python
 from google.cloud import pubsub_v1
 import os
@@ -45,6 +49,7 @@ subscriber.subscribe(subscription_path, callback=callback)
 ```
 
 ### **E. Best Practices**
+
 - Use batch publishing for high-throughput scenarios.
 - Handle message deduplication and retries.
 - Monitor Pub/Sub health and log errors.
@@ -54,9 +59,11 @@ subscriber.subscribe(subscription_path, callback=callback)
 ## 2. Service Directory Integration
 
 ### **A. Dependencies**
+
 - Add `google-cloud-service-directory` to your requirements.
 
 ### **B. Registration at Startup**
+
 ```python
 from google.cloud import servicedirectory_v1
 
@@ -71,9 +78,11 @@ client.create_endpoint(parent=service, endpoint_id="main", endpoint=endpoint)
 ```
 
 ### **C. Health Updates**
+
 - Periodically update endpoint metadata with health status.
 
 ### **D. Resolving Endpoints**
+
 ```python
 from google.cloud import servicedirectory_v1
 
@@ -85,6 +94,7 @@ for endpoint in response.service.endpoints:
 ```
 
 ### **E. Best Practices**
+
 - Use namespaces for environment separation (dev, prod).
 - Store version and health in endpoint metadata.
 - Implement fallback to static config if Service Directory is unavailable.

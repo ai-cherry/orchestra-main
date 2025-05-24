@@ -1,5 +1,12 @@
 # Orchestra AI Project Rules for Cursor
 
+## AI Context Files Available
+For best results, reference these in your prompts:
+- Planning: ai_context_planner.py
+- Coding: ai_context_coder.py
+- Reviewing: ai_context_reviewer.py
+- Debugging: ai_context_debugger.py
+
 ## Core Principles
 - Python 3.10 (NOT 3.11+) - system constraint
 - pip/venv ONLY - NO Poetry, Docker, Pipenv
@@ -10,7 +17,7 @@
 ## Project Structure
 - Automation tools: scripts/
 - Config validation: scripts/config_validator.py
-- Health monitoring: scripts/health_monitor.py  
+- Health monitoring: scripts/health_monitor.py
 - Unified CLI: scripts/orchestra.py
 - Requirements: requirements/base.txt
 
@@ -31,4 +38,4 @@
 - Poetry/Pipfile
 - Python 3.11+ features (match/case, tomllib)
 - Complex patterns (metaclasses, multiple inheritance)
-- Heavy dependencies for simple tasks 
+- Heavy dependencies for simple tasks

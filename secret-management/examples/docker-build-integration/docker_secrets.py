@@ -116,7 +116,7 @@ def generate_env_file(secrets: Dict[str, str], output_path: str) -> None:
     os.chmod(output_path, 0o600)
 
     print(f"Environment file generated at {output_path}")
-    print(f"File permissions set to 0600 (read/write for owner only)")
+    print("File permissions set to 0600 (read/write for owner only)")
 
 
 def update_devcontainer_json(
@@ -203,23 +203,36 @@ def docker_build_with_secrets(
         print("No secrets retrieved, cannot proceed with build", file=sys.stderr)
         sys.exit(1)
 
-    # Generate build args
-    build_args = generate_build_args(secrets)
+    # Build the command as a list for security
+    cmd = ["docker", "build", "-f", docker_file, "-t", tag]
 
-    # Build the command
-    cmd = f"docker build -f {docker_file} -t {tag} {build_args}"
+    # Add build args securely
+    for secret_id, value in secrets.items():
+        cmd.extend(["--build-arg", f"{secret_id}={value}"])
+
+    # Add extra args if provided
     if extra_args:
-        cmd += " " + " ".join(extra_args)
+        cmd.extend(extra_args)
 
-    # Run the command
-    print(f"Running Docker build with secrets as build arguments")
-    result = subprocess.run(cmd, shell=True)
+    # Add context (current directory)
+    cmd.append(".")
 
-    if result.returncode != 0:
-        print(f"Docker build failed with exit code {result.returncode}", file=sys.stderr)
-        sys.exit(result.returncode)
-    else:
-        print(f"Docker build completed successfully with tag {tag}")
+    # Run the command securely
+    print("Running Docker build with secrets as build arguments")
+    try:
+        result = subprocess.run(cmd, timeout=1800)  # 30 minute timeout
+
+        if result.returncode != 0:
+            print(f"Docker build failed with exit code {result.returncode}", file=sys.stderr)
+            sys.exit(result.returncode)
+        else:
+            print(f"Docker build completed successfully with tag {tag}")
+    except subprocess.TimeoutExpired:
+        print("Docker build timed out after 30 minutes", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error running Docker build: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 def parse_args():

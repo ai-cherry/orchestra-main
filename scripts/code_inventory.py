@@ -1,9 +1,7 @@
-import os
 import json
+import os
 
-ROOTS = [
-    "mcp_server", "tools", "scripts", "orchestra_system", "ai-orchestra", "orchestrator", "packages", "core"
-]
+ROOTS = ["mcp_server", "tools", "scripts", "orchestra_system", "ai-orchestra", "orchestrator", "packages", "core"]
 
 inventory = {
     "python_modules": [],
@@ -24,4 +22,4 @@ for root in ROOTS:
             elif fname.endswith(".sh") or fname.endswith(".bash"):
                 inventory["cli_scripts"].append(path)
 
-print(json.dumps(inventory, indent=2)) 
+print(json.dumps(inventory, indent=2))

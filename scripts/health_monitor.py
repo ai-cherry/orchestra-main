@@ -13,47 +13,45 @@ Usage:
 import asyncio
 import json
 import logging
-import time
-from datetime import datetime
-from typing import Dict, Any
-import requests
 import socket
 import sys
+import time
+from datetime import datetime
+from typing import Any, Dict
+
+import requests
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
 class HealthMonitor:
     """Simple health monitoring for Orchestra services."""
-    
+
     def __init__(self, admin_ui_url: str = "http://localhost:3000"):
         self.admin_ui_url = admin_ui_url
         self.services = {
             "mcp_secret_manager": {"port": 8002, "name": "MCP Secret Manager"},
-            "mcp_firestore": {"port": 8080, "name": "MCP Firestore"}, 
+            "mcp_firestore": {"port": 8080, "name": "MCP Firestore"},
             "orchestrator": {"port": 8080, "name": "Core Orchestrator"},
         }
-        
+
     def check_port(self, port: int, timeout: float = 2.0) -> bool:
         """Check if a port is responding."""
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
                 sock.settimeout(timeout)
-                result = sock.connect_ex(('localhost', port))
+                result = sock.connect_ex(("localhost", port))
                 return result == 0
         except Exception:
             return False
-    
+
     def check_service_health(self, service_name: str, config: Dict[str, Any]) -> Dict[str, Any]:
         """Check health of a specific service."""
         port = config["port"]
         name = config["name"]
-        
+
         result = {
             "service": service_name,
             "name": name,
@@ -61,20 +59,20 @@ class HealthMonitor:
             "status": "unknown",
             "response_time": None,
             "timestamp": datetime.now().isoformat(),
-            "details": {}
+            "details": {},
         }
-        
+
         # Check port connectivity
         start_time = time.time()
         port_up = self.check_port(port)
         response_time = time.time() - start_time
-        
+
         result["response_time"] = round(response_time, 3)
-        
+
         if port_up:
             result["status"] = "healthy"
             result["details"]["port_accessible"] = True
-            
+
             # Try HTTP health check if possible
             try:
                 health_url = f"http://localhost:{port}/health"
@@ -89,39 +87,35 @@ class HealthMonitor:
         else:
             result["status"] = "unhealthy"
             result["details"]["port_accessible"] = False
-        
+
         return result
-    
+
     def check_all_services(self) -> Dict[str, Any]:
         """Check health of all configured services."""
         logger.info("Checking health of all services...")
-        
+
         results = {
             "timestamp": datetime.now().isoformat(),
             "overall_status": "healthy",
             "services": {},
-            "summary": {
-                "total": len(self.services),
-                "healthy": 0,
-                "unhealthy": 0
-            }
+            "summary": {"total": len(self.services), "healthy": 0, "unhealthy": 0},
         }
-        
+
         for service_name, config in self.services.items():
             service_result = self.check_service_health(service_name, config)
             results["services"][service_name] = service_result
-            
+
             if service_result["status"] == "healthy":
                 results["summary"]["healthy"] += 1
             else:
                 results["summary"]["unhealthy"] += 1
                 results["overall_status"] = "degraded"
-        
+
         if results["summary"]["unhealthy"] == len(self.services):
             results["overall_status"] = "critical"
-        
+
         return results
-    
+
     def send_notification(self, message: str, level: str = "info", data: Dict = None) -> bool:
         """Send notification to admin UI."""
         try:
@@ -130,29 +124,25 @@ class HealthMonitor:
                 "level": level,
                 "timestamp": datetime.now().isoformat(),
                 "source": "health_monitor",
-                "data": data or {}
+                "data": data or {},
             }
-            
+
             # Try to send to admin UI notification endpoint
-            response = requests.post(
-                f"{self.admin_ui_url}/api/notifications",
-                json=notification_payload,
-                timeout=5
-            )
-            
+            response = requests.post(f"{self.admin_ui_url}/api/notifications", json=notification_payload, timeout=5)
+
             if response.status_code in [200, 201]:
                 logger.info(f"Notification sent successfully: {message}")
                 return True
             else:
                 logger.warning(f"Notification failed with status {response.status_code}")
                 return False
-                
+
         except Exception as e:
             logger.error(f"Failed to send notification: {e}")
             # Fall back to console logging
             logger.warning(f"NOTIFICATION: [{level.upper()}] {message}")
             return False
-    
+
     def wait_for_service(self, service_name: str, max_wait: int = 120, check_interval: int = 5) -> bool:
         """
         Wait for a service to become healthy with dynamic checking.
@@ -161,139 +151,127 @@ class HealthMonitor:
         if service_name not in self.services:
             logger.error(f"Unknown service: {service_name}")
             return False
-        
+
         config = self.services[service_name]
         logger.info(f"Waiting for {config['name']} to become healthy (max {max_wait}s)...")
-        
+
         start_time = time.time()
         while time.time() - start_time < max_wait:
             result = self.check_service_health(service_name, config)
-            
+
             if result["status"] == "healthy":
                 elapsed = round(time.time() - start_time, 1)
                 logger.info(f"{config['name']} is healthy after {elapsed}s")
                 self.send_notification(
                     f"Service {config['name']} is now healthy",
                     level="success",
-                    data={"service": service_name, "wait_time": elapsed}
+                    data={"service": service_name, "wait_time": elapsed},
                 )
                 return True
-            
+
             logger.debug(f"{config['name']} not ready, waiting {check_interval}s...")
             time.sleep(check_interval)
-        
+
         # Service didn't come up in time
         elapsed = round(time.time() - start_time, 1)
         logger.error(f"{config['name']} failed to become healthy after {elapsed}s")
         self.send_notification(
             f"Service {config['name']} failed to start within {max_wait}s",
             level="error",
-            data={"service": service_name, "wait_time": elapsed}
+            data={"service": service_name, "wait_time": elapsed},
         )
         return False
-    
+
     async def monitor_continuously(self, interval: int = 30) -> None:
         """Monitor services continuously and alert on changes."""
         logger.info(f"Starting continuous monitoring (interval: {interval}s)")
-        
+
         previous_status = None
         consecutive_failures = {}
-        
+
         while True:
             try:
                 current_status = self.check_all_services()
-                
+
                 # Check for status changes
                 if previous_status:
                     for service_name, current in current_status["services"].items():
                         previous = previous_status["services"].get(service_name, {})
-                        
+
                         if previous.get("status") != current["status"]:
                             if current["status"] == "healthy":
                                 self.send_notification(
-                                    f"Service {current['name']} recovered",
-                                    level="success",
-                                    data=current
+                                    f"Service {current['name']} recovered", level="success", data=current
                                 )
                                 consecutive_failures.pop(service_name, None)
                             else:
                                 consecutive_failures[service_name] = consecutive_failures.get(service_name, 0) + 1
                                 failure_count = consecutive_failures[service_name]
-                                
+
                                 self.send_notification(
                                     f"Service {current['name']} unhealthy (failure #{failure_count})",
                                     level="warning" if failure_count < 3 else "error",
-                                    data=current
+                                    data=current,
                                 )
-                
+
                 # Log current status
                 healthy_count = current_status["summary"]["healthy"]
                 total_count = current_status["summary"]["total"]
                 logger.info(f"Health check: {healthy_count}/{total_count} services healthy")
-                
+
                 previous_status = current_status
                 await asyncio.sleep(interval)
-                
+
             except KeyboardInterrupt:
                 logger.info("Monitoring stopped by user")
                 break
             except Exception as e:
                 logger.error(f"Error during monitoring: {e}")
                 await asyncio.sleep(interval)
-    
+
     def check_prerequisites(self) -> Dict[str, Any]:
         """Check system prerequisites and dependencies."""
-        results = {
-            "timestamp": datetime.now().isoformat(),
-            "status": "ok",
-            "checks": {}
-        }
-        
+        results = {"timestamp": datetime.now().isoformat(), "status": "ok", "checks": {}}
+
         # Check Python version
         python_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
         python_ok = sys.version_info >= (3, 10)
         results["checks"]["python_version"] = {
             "status": "ok" if python_ok else "error",
             "value": python_version,
-            "required": "3.10+"
+            "required": "3.10+",
         }
         if not python_ok:
             results["status"] = "error"
-        
+
         # Check virtual environment
-        in_venv = hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix)
-        results["checks"]["virtual_environment"] = {
-            "status": "ok" if in_venv else "warning",
-            "active": in_venv
-        }
-        
+        in_venv = hasattr(sys, "real_prefix") or (hasattr(sys, "base_prefix") and sys.base_prefix != sys.prefix)
+        results["checks"]["virtual_environment"] = {"status": "ok" if in_venv else "warning", "active": in_venv}
+
         # Check required files
-        required_files = [
-            "requirements/base.txt",
-            "scripts/check_venv.py",
-            "core/orchestrator/src/api/app.py"
-        ]
-        
+        required_files = ["requirements/base.txt", "scripts/check_venv.py", "core/orchestrator/src/api/app.py"]
+
         missing_files = []
         for file_path in required_files:
             import os
+
             if not os.path.exists(file_path):
                 missing_files.append(file_path)
-        
+
         results["checks"]["required_files"] = {
             "status": "ok" if not missing_files else "error",
-            "missing": missing_files
+            "missing": missing_files,
         }
         if missing_files:
             results["status"] = "error"
-        
+
         return results
 
 
 def main():
     """Main entry point for the health monitor."""
     import argparse
-    
+
     parser = argparse.ArgumentParser(description="AI Orchestra Health Monitor")
     parser.add_argument("--check-services", action="store_true", help="Check all services once")
     parser.add_argument("--monitor", action="store_true", help="Monitor continuously")
@@ -303,39 +281,39 @@ def main():
     parser.add_argument("--admin-ui-url", default="http://localhost:3000", help="Admin UI URL for notifications")
     parser.add_argument("--check-prereqs", action="store_true", help="Check system prerequisites")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
-    
+
     args = parser.parse_args()
-    
+
     if args.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
-    
+
     monitor = HealthMonitor(admin_ui_url=args.admin_ui_url)
-    
+
     if args.check_prereqs:
         results = monitor.check_prerequisites()
         print(json.dumps(results, indent=2))
         return 0 if results["status"] == "ok" else 1
-    
+
     if args.check_services:
         results = monitor.check_all_services()
         print(json.dumps(results, indent=2))
         return 0 if results["overall_status"] == "healthy" else 1
-    
+
     if args.wait_for:
         success = monitor.wait_for_service(args.wait_for, max_wait=args.max_wait)
         return 0 if success else 1
-    
+
     if args.monitor:
         try:
             asyncio.run(monitor.monitor_continuously(interval=args.interval))
         except KeyboardInterrupt:
             logger.info("Monitoring stopped")
         return 0
-    
+
     # Default: show help
     parser.print_help()
     return 1
 
 
 if __name__ == "__main__":
-    sys.exit(main()) 
+    sys.exit(main())

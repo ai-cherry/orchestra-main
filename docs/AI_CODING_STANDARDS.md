@@ -5,18 +5,21 @@
 ### **MUST FOLLOW - Non-Negotiable Rules**
 
 1. **Simplicity Over Complexity**
+
    - ❌ NO Docker unless absolutely necessary
    - ❌ NO Poetry - use pip/venv
    - ✅ Use existing tools and patterns
    - ✅ Prefer Python's built-in libraries
 
 2. **Performance & Stability First**
+
    - Optimize for speed and reliability
    - Simple > Secure (within reason)
    - Fast > Feature-rich
    - Stable > Cutting-edge
 
 3. **Consistent Structure**
+
    - All Python scripts in `scripts/`
    - All configs in appropriate subdirectories
    - Use existing patterns from codebase
@@ -27,9 +30,23 @@
    - Google-style docstrings
    - Black formatting
 
+## 🚀 NEW: AI Context Files System
+
+We now have specialized AI context files for each development phase:
+
+### **Quick Start - Just Copy & Paste**
+
+- **Planning**: `Read ai_context_planner.py`
+- **Coding**: `Read ai_context_coder.py`
+- **Reviewing**: `Read ai_context_reviewer.py`
+- **Debugging**: `Read ai_context_debugger.py`
+
+See `AI_CONTEXT_FILES.md` for detailed usage examples.
+
 ## 🚨 Common AI Tool Mistakes to Avoid
 
 ### **1. Dependency Sprawl**
+
 ```python
 # ❌ AI often suggests:
 import pandas as pd  # Don't add heavy deps for simple tasks
@@ -43,6 +60,7 @@ import json         # For data serialization
 ```
 
 ### **2. Over-Engineering**
+
 ```python
 # ❌ AI loves complex patterns:
 class AbstractFactoryMetaBuilder:  # Too complex!
@@ -54,6 +72,7 @@ def build_thing(config):  # Simple function
 ```
 
 ### **3. Duplicate Functionality**
+
 ```python
 # ❌ AI might create:
 def validate_yaml_file():  # We already have this!
@@ -64,6 +83,7 @@ from scripts.config_validator import ConfigValidator
 ```
 
 ### **4. Wrong Python Version**
+
 ```python
 # ❌ AI assumes latest:
 match value:  # Python 3.10+ only
@@ -76,42 +96,61 @@ if value == "a":  # Works on 3.10
 
 ## 📋 Pre-AI-Coding Checklist
 
-Before using AI tools (Cursor, Copilot, etc.), run:
+Before using AI tools (Cursor, Copilot, etc.):
+
+### **Step 1: Use the Right Context File**
 
 ```bash
-# 1. Check current state
+# For planning new features
+"Read ai_context_planner.py and help me plan..."
+
+# For writing code
+"Read ai_context_coder.py and implement..."
+
+# For reviewing changes
+"Read ai_context_reviewer.py and review..."
+
+# For debugging issues
+"Read ai_context_debugger.py and debug..."
+```
+
+### **Step 2: Check Current State**
+
+```bash
+# Check current state
 python scripts/orchestra.py services status
 python scripts/config_validator.py --verbose
 
-# 2. Document what exists
+# Document what exists
 find . -name "*.py" -path "./scripts/*" | head -20  # Check existing scripts
 grep -r "def validate" --include="*.py"  # Find existing validators
 grep -r "class.*Monitor" --include="*.py"  # Find existing monitors
+```
 
-# 3. Set AI context
-# Tell the AI:
-# - "We use Python 3.10, not 3.11"
-# - "We use pip/venv, not Poetry/Docker"
-# - "Check scripts/ directory for existing tools"
-# - "Prefer subprocess.run() over os.system()"
-# - "Use existing patterns from the codebase"
+### **Step 3: Create Checkpoint**
+
+```bash
+make before-ai-coding  # Creates git checkpoint and documents state
 ```
 
 ## 🛡️ Guardrails for AI Tools
 
 ### **1. MCP Server Guidelines**
+
 - Port 8002: Secret Manager (don't duplicate)
 - Port 8080: Firestore/Orchestrator (shared)
 - Port 3000: Admin UI
 - Check `mcp-servers/` before creating new ones
 
 ### **2. Configuration Files**
+
 - `requirements/base.txt` - Core dependencies only
 - `scripts/` - All automation tools
 - `Makefile` - Build targets (check before adding)
 - NO `poetry.lock`, `Pipfile`, `docker-compose.yml`
 
 ### **3. Import Patterns**
+
 ```python
 # Standard imports first
 import os
@@ -153,30 +192,33 @@ find . -path "*/api/*" -name "*.py" | xargs grep -l "route\|endpoint"
 ## 🤖 AI Tool Configuration
 
 ### **Cursor Settings**
-Add to `.cursor/rules` or mention in every session:
+
+The `.cursorrules` file is already configured. Additionally, use context files:
+
 ```
-Project uses:
-- Python 3.10 (NOT 3.11+)
-- pip/venv (NOT Poetry/Docker)
-- subprocess.run() (NOT os.system)
-- Existing tools in scripts/ directory
-- Simple solutions over complex patterns
+For any task, start with: Read ai_context_[planner|coder|reviewer|debugger].py
 ```
 
 ### **GitHub Copilot**
+
 Create `.github/copilot-instructions.md`:
+
 ```markdown
 This project prioritizes:
+
 1. Simplicity over complexity
 2. Performance over security
 3. Using existing patterns
 4. No Docker/Poetry
 5. Python 3.10 compatibility
+
+Always reference: ai_context_planner.py, ai_context_coder.py, ai_context_reviewer.py, ai_context_debugger.py
 ```
 
 ## 📊 Regular Maintenance Tasks
 
 ### **Weekly Checks**
+
 ```bash
 # 1. Check for duplicates
 make config-validate
@@ -193,6 +235,7 @@ make pre-commit-run
 ```
 
 ### **Before Major AI Sessions**
+
 ```bash
 # Create a checkpoint
 git add -A && git commit -m "checkpoint: before AI coding session"
@@ -206,12 +249,15 @@ make validate
 ```
 
 ### **After AI Changes**
-```bash
-# Check what changed
-git diff --name-only
-git diff --stat
 
-# Validate changes
+```bash
+# Step 1: Run automated review
+make ai-review-changes  # Uses ai_code_reviewer.py
+
+# Step 2: Full validation
+make after-ai-coding    # Runs ai-review + validate
+
+# Step 3: Manual checks
 python scripts/config_validator.py
 python scripts/health_monitor.py --check-services
 
@@ -228,18 +274,22 @@ grep -r "3\.11\|match.*case\|tomllib" --include="*.py"
 Watch for these warning signs:
 
 1. **New dependency management files**
+
    - `Pipfile`, `poetry.lock`, `setup.cfg`, `pyproject.toml`
-   
+
 2. **Container files**
+
    - `Dockerfile`, `docker-compose.yml`, `.dockerignore`
-   
+
 3. **Complex patterns**
+
    - Abstract base classes for simple tasks
    - Metaclasses
    - Multiple inheritance
    - Overly generic solutions
 
 4. **Version assumptions**
+
    - `match/case` statements (3.10+)
    - `tomllib` (3.11+)
    - `:=` walrus operator usage everywhere
@@ -254,21 +304,23 @@ Watch for these warning signs:
 When AI generates documentation:
 
 ### **Good Documentation**
+
 ```python
 def wait_for_service(self, service_name: str, timeout: int = 60) -> bool:
     """
     Wait for a service to become healthy.
-    
+
     Args:
         service_name: Name of the service (e.g., 'mcp_firestore')
         timeout: Maximum seconds to wait
-        
+
     Returns:
         True if service became healthy, False if timeout
     """
 ```
 
 ### **Bad Documentation**
+
 ```python
 def wait_for_service(self, service_name: str, timeout: int = 60) -> bool:
     """Waits for the specified service to become healthy within the given timeout period using advanced monitoring techniques and sophisticated algorithms."""  # Too verbose!
@@ -300,6 +352,7 @@ diff -u <(grep "def " scripts/health_monitor.py | sort) <(grep "def " scripts/ne
 
 Before committing AI-generated code:
 
+- [ ] Used appropriate ai*context*\*.py file for the task
 - [ ] No new dependency management tools (Poetry, Pipenv)
 - [ ] No Docker/container files
 - [ ] No Python 3.11+ only features
@@ -310,7 +363,8 @@ Before committing AI-generated code:
 - [ ] No duplicate functionality
 - [ ] Simple solution, not over-engineered
 - [ ] Uses subprocess.run(), not os.system()
+- [ ] Ran `make ai-review-changes`
 
 ---
 
-**Remember: When in doubt, check what already exists in `scripts/` before creating new tools!** 
+**Remember: Always start with the appropriate ai*context*\*.py file for your task!**

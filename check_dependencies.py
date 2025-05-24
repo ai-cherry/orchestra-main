@@ -10,16 +10,14 @@ Usage:
     python check_dependencies.py [--show-outdated]
 """
 
-import sys
 import os
 import subprocess
+import sys
+
 import pkg_resources
 
-REQUIREMENTS_FILES = [
-    "requirements.txt",
-    "orchestrator/requirements.txt",
-    "codespaces_pip_requirements.txt"
-]
+REQUIREMENTS_FILES = ["requirements.txt", "orchestrator/requirements.txt", "codespaces_pip_requirements.txt"]
+
 
 def find_requirements_file():
     for fname in REQUIREMENTS_FILES:
@@ -28,10 +26,12 @@ def find_requirements_file():
     print("ERROR: No requirements.txt file found.")
     sys.exit(1)
 
+
 def parse_requirements(req_file):
     with open(req_file, "r") as f:
         lines = [line.strip() for line in f if line.strip() and not line.startswith("#")]
     return [pkg_resources.Requirement.parse(line) for line in lines]
+
 
 def check_installed(requirements):
     installed = {pkg.key: pkg for pkg in pkg_resources.working_set}
@@ -45,6 +45,7 @@ def check_installed(requirements):
             mismatched.append(f"{pkg.project_name}=={pkg.version} (required: {req})")
     return missing, mismatched
 
+
 def show_outdated():
     print("\nChecking for outdated packages...")
     try:
@@ -52,8 +53,10 @@ def show_outdated():
     except Exception as e:
         print(f"Failed to check outdated packages: {e}")
 
+
 def main():
     import argparse
+
     parser = argparse.ArgumentParser(description="Validate pip dependencies against requirements.txt")
     parser.add_argument("--show-outdated", action="store_true", help="List outdated packages")
     args = parser.parse_args()
@@ -79,6 +82,7 @@ def main():
 
     if args.show_outdated:
         show_outdated()
+
 
 if __name__ == "__main__":
     main()

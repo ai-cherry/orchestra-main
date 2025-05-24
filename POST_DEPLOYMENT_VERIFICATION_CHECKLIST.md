@@ -130,8 +130,8 @@ Use this checklist to verify that your Badass GCP & GitHub Integration has been 
 
 ---
 
-Completed by: **********\_\_\_\_**********
+Completed by: \***\*\*\*\*\***\_\_\_\_\***\*\*\*\*\***
 
-Date: **********\_\_\_\_**********
+Date: \***\*\*\*\*\***\_\_\_\_\***\*\*\*\*\***
 
 Notes:

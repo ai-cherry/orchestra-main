@@ -39,7 +39,6 @@ from typing import Any, Dict
 # Import unified MCP components
 try:
     from cline_integration import CLINE_MODE_MAP as CLINE_MODES
-    from roo_workflow_manager import MODE_MAP as ROO_MODES
     from unified_mcp_orchestrator import (
         UNIFIED_WORKFLOWS,
         AITool,
@@ -49,6 +48,8 @@ try:
         UnifiedModeManager,
         UnifiedWorkflowOrchestrator,
     )
+
+    from roo_workflow_manager import MODE_MAP as ROO_MODES
 except ImportError as e:
     print(f"Error importing MCP components: {e}")
     print("Make sure unified_mcp_orchestrator.py, roo_workflow_manager.py, and cline_integration.py are available.")

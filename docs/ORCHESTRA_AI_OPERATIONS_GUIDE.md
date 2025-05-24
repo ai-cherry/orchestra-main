@@ -25,11 +25,11 @@ Orchestra AI is a cloud-native, AI-powered orchestration platform built on Googl
 
 ### Key Services
 
-| Service | Purpose | URL Pattern |
-|---------|---------|-------------|
+| Service                | Purpose           | URL Pattern                              |
+| ---------------------- | ----------------- | ---------------------------------------- |
 | `ai-orchestra-minimal` | Main orchestrator | `https://ai-orchestra-minimal-*.run.app` |
-| `web-scraping-agents` | Web scraping team | `https://web-scraping-agents-*.run.app` |
-| `admin-interface` | Admin UI | `https://admin-interface-*.run.app` |
+| `web-scraping-agents`  | Web scraping team | `https://web-scraping-agents-*.run.app`  |
+| `admin-interface`      | Admin UI          | `https://admin-interface-*.run.app`      |
 
 ---
 
@@ -63,6 +63,7 @@ python tools/orchestra_cli.py init
 ```
 
 This will:
+
 1. Sync all secrets from GCP Secret Manager
 2. Validate configuration
 3. Run comprehensive health checks
@@ -76,6 +77,7 @@ The Orchestra CLI (`tools/orchestra_cli.py`) is your primary interface for syste
 ### Secrets Management
 
 #### Sync Secrets from GCP
+
 ```bash
 # Sync all secrets to local .env
 python tools/orchestra_cli.py secrets sync
@@ -88,12 +90,14 @@ python tools/orchestra_cli.py secrets sync --env-file .env.local
 ```
 
 #### Validate Secrets
+
 ```bash
 # Check all required secrets are present
 python tools/orchestra_cli.py secrets validate
 ```
 
 #### Set/Update Secrets in GCP
+
 ```bash
 # Set a new secret (will prompt for value)
 python tools/orchestra_cli.py secrets set MY_API_KEY
@@ -105,12 +109,14 @@ python tools/orchestra_cli.py secrets set OPENAI_API_KEY
 ### Adapter Management
 
 #### List Adapters
+
 ```bash
 # Show all adapters and their status
 python tools/orchestra_cli.py adapters list
 ```
 
 Output:
+
 ```
 ┌─────────────┬─────────────┬──────────────────────┬─────────────────────────────┬─────────────────┐
 │ Adapter     │ Name        │ Description          │ Required Secrets            │ Status          │
@@ -121,6 +127,7 @@ Output:
 ```
 
 #### Check Adapter Configuration
+
 ```bash
 # Validate specific adapter
 python tools/orchestra_cli.py adapters check salesforce
@@ -129,12 +136,14 @@ python tools/orchestra_cli.py adapters check salesforce
 ### System Diagnostics
 
 #### Health Check
+
 ```bash
 # Run comprehensive health checks
 python tools/orchestra_cli.py diagnostics health
 ```
 
 This checks:
+
 - Secret availability
 - GCP connectivity
 - Redis connection
@@ -144,12 +153,14 @@ This checks:
 ### Orchestrator Management
 
 #### Reload Configuration
+
 ```bash
 # Reload after config changes
 python tools/orchestra_cli.py orchestrator reload
 ```
 
 #### Check Status
+
 ```bash
 # Show orchestrator status
 python tools/orchestra_cli.py orchestrator status
@@ -199,6 +210,7 @@ pulumi stack output
 ```
 
 Key infrastructure components:
+
 - **VPC & Subnets**: Isolated network for services
 - **Service Accounts**: Least-privilege IAM per service
 - **Pub/Sub Topics**: Event-driven communication
@@ -212,11 +224,13 @@ Key infrastructure components:
 ### Dashboard
 
 Access the Orchestra AI dashboard:
+
 ```
 https://console.cloud.google.com/monitoring/dashboards/custom/[dashboard-id]?project=cherry-ai-project
 ```
 
 Metrics tracked:
+
 - Request rate per service
 - Error rates
 - Memory usage
@@ -225,21 +239,23 @@ Metrics tracked:
 ### Uptime Checks
 
 Automated health checks run every 60 seconds for:
+
 - Orchestra API (`/health`)
 - Web Scraping Service (`/health`)
 - Admin Interface (`/`)
 
 ### Alert Policies
 
-| Alert | Condition | Threshold |
-|-------|-----------|-----------|
-| High Error Rate | Error rate > 5% | 5 minutes |
-| High Memory Usage | Memory > 90% | 5 minutes |
-| Service Down | Uptime check fails | 2 consecutive |
+| Alert             | Condition          | Threshold     |
+| ----------------- | ------------------ | ------------- |
+| High Error Rate   | Error rate > 5%    | 5 minutes     |
+| High Memory Usage | Memory > 90%       | 5 minutes     |
+| Service Down      | Uptime check fails | 2 consecutive |
 
 ### Log-Based Metrics
 
 Custom metrics track:
+
 - MCP server errors by type
 - Tool call success/failure rates
 - Agent performance metrics
@@ -270,6 +286,7 @@ gcloud logging read 'resource.type="cloud_run_revision" AND severity="ERROR"' \
 **Symptoms**: Health check returns 503, service not responding
 
 **Resolution**:
+
 ```bash
 # Check service logs
 gcloud run services logs read [service-name] --region us-central1 --limit 100
@@ -287,6 +304,7 @@ gcloud run services update [service-name] --region us-central1 --to-latest
 **Symptoms**: Services fail to start, "Missing required secrets" error
 
 **Resolution**:
+
 ```bash
 # List what's missing
 python tools/orchestra_cli.py secrets validate
@@ -303,6 +321,7 @@ python tools/orchestra_cli.py secrets sync
 **Symptoms**: "Connection failed: Connection refused" in health checks
 
 **Resolution**:
+
 ```bash
 # Check Redis instance status
 gcloud redis instances describe orchestra-redis --region us-central1
@@ -321,10 +340,11 @@ python tools/orchestra_cli.py secrets set REDIS_HOST
 **Symptoms**: Alert triggered, service performance degraded
 
 **Resolution**:
+
 ```bash
 # Check current usage
 gcloud monitoring read \
-  'resource.type="cloud_run_revision" AND 
+  'resource.type="cloud_run_revision" AND
    resource.labels.service_name="[service-name]" AND
    metric.type="run.googleapis.com/container/memory/utilizations"' \
   --start-time -1h
@@ -360,11 +380,11 @@ curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
 
 Each service runs with least-privilege IAM:
 
-| Service | Service Account | Key Permissions |
-|---------|----------------|-----------------|
+| Service      | Service Account             | Key Permissions                     |
+| ------------ | --------------------------- | ----------------------------------- |
 | Orchestrator | `orchestra-orchestrator-sa` | Pub/Sub, Service Directory, Secrets |
-| Web Scraping | `orchestra-webscraping-sa` | Redis, Pub/Sub, Secrets |
-| Admin | `orchestra-admin-sa` | Read-only monitoring, logs |
+| Web Scraping | `orchestra-webscraping-sa`  | Redis, Pub/Sub, Secrets             |
+| Admin        | `orchestra-admin-sa`        | Read-only monitoring, logs          |
 
 ### Secret Rotation
 
@@ -440,12 +460,14 @@ gcloud run services update [service-name] --region us-central1 --to-latest
 ### Emergency Response
 
 1. **Service Down**:
+
    - Check health endpoint
    - Review recent deployments
    - Roll back if needed
    - Check secrets and dependencies
 
 2. **Data Loss**:
+
    - Redis has replication enabled
    - Firestore has automatic backups
    - Check audit logs for actions
@@ -493,7 +515,8 @@ APIFY_API_KEY=...
 ### Support
 
 For issues or questions:
+
 1. Check this guide's troubleshooting section
 2. Review service logs in Cloud Logging
 3. Check monitoring dashboards for anomalies
-4. Verify all secrets are properly configured 
+4. Verify all secrets are properly configured
