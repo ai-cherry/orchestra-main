@@ -4,7 +4,7 @@ Stub implementations for testing and development.
 import random
 from typing import List, Optional
 
-from shared.models.base_models import MemoryItem
+from packages.shared.src.models.base_models import MemoryItem
 from shared.memory.memory_manager import MemoryManager
 
 

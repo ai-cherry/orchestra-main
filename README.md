@@ -4,26 +4,58 @@ A modern, cloud-native Python application for rapid solo development and deploym
 
 ---
 
+---
+### 🛠️ Migration Note (May 2025)
+All legacy admin UI code (Flask backend and HTML/Alpine frontend in `apps/admin/`) has been removed. The unified, modern admin interface is now implemented exclusively in [`admin-interface/`](admin-interface/README.md:1) using React and TypeScript. All administrative workflows, dashboards, and agent management are consolidated in this interface. See `admin-interface/README.md` for details.
+---
 ## 🚀 Development Setup
 
 1. **Connect to Paperspace VM using Cursor (SSH):**
    - Open Cursor and connect to your Paperspace VM via SSH for a seamless, cloud-based development experience.
 
-2. **Activate the Python virtual environment:**
-   ```bash
-   source venv/bin/activate
-   ```
+2. **Activate the Python virtual environment (venv):**
+   - If you do not see a `venv/` directory in the project root, run:
+     ```bash
+     ./activate_venv.sh
+     ```
+   - This script will create and activate the venv, and install all dependencies.
+   - If the venv already exists, you can activate it directly:
+     ```bash
+     source venv/bin/activate
+     ```
+   - **Always ensure you are working inside the venv.**
 
-3. **GCP Auth & API Keys:**
+3. **Verify your environment:**
+   - To confirm you are inside the venv, run:
+     ```bash
+     command -v python
+     command -v pip
+     ```
+   - Both commands should output a path inside `./venv/bin/`.
+
+4. **GCP Auth & API Keys:**
    - The `~/.gcp_env_setup.sh` script runs automatically on login, handling Google Cloud authentication and loading all required API keys from GCP Secret Manager into your environment.
 
-4. **Run the application locally for testing:**
+5. **Run the application locally for testing:**
    ```bash
    python app.py
    # or, for production-like testing:
    gunicorn --bind 0.0.0.0:8080 app:app
    ```
    - The app will listen on the port specified by the `PORT` environment variable (default: 8080).
+
+---
+
+## 🚑 Troubleshooting
+
+- **If you see errors with `which python` or `which pip`:**
+  - Use `command -v python` and `command -v pip` instead.
+  - Some shells (especially in Cursor or minimal environments) may not support `which`.
+- **If you are not in the venv:**
+  - Run `./activate_venv.sh` to create and activate it.
+  - If you see a system Python path, you are not in the venv.
+- **If dependencies are missing:**
+  - Ensure you have run `./activate_venv.sh` at least once.
 
 ---
 

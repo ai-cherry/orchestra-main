@@ -5,7 +5,6 @@ This module provides various services used by the orchestration system,
 including event bus, registry, memory service, and LLM providers.
 """
 
-from core.orchestrator.src.services.event_bus import EventBus, get_event_bus
 from core.orchestrator.src.services.registry import (
     ServiceRegistry,
     get_service_registry,
@@ -30,9 +29,6 @@ from core.orchestrator.src.services.llm import (
 )
 
 __all__ = [
-    # Event bus
-    "EventBus",
-    "get_event_bus",
     # Service registry
     "ServiceRegistry",
     "get_service_registry",

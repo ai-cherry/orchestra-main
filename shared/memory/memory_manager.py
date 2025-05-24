@@ -11,7 +11,7 @@ from google.cloud import firestore
 from google.oauth2 import service_account
 from loguru import logger
 
-from shared.models.base_models import MemoryItem
+from packages.shared.src.models.base_models import MemoryItem
 
 
 class MemoryManager(ABC):

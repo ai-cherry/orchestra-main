@@ -20,21 +20,20 @@ import os
 import sys
 import argparse
 import logging
-from typing import List, Dict, Optional, Any, Tuple
-import yaml
+from typing import Optional
 import colorama
 from colorama import Fore, Style
+from core.logging_config import configure_logging
 
 # Add the project root to the Python path for proper imports
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
-sys.path.append(project_root)
 
 # Import the mode manager
 from core.mode_manager import get_mode_manager, ModeManager
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+configure_logging()
 logger = logging.getLogger(__name__)
 
 # Initialize colorama
@@ -113,8 +112,6 @@ def print_workflows(manager: ModeManager, current_workflow: Optional[str] = None
         print(f"   Steps: {len(workflow.steps)}")
 
         for i, step in enumerate(workflow.steps):
-            mode = manager.modes.get(step.mode)
-            mode_name = mode.name if mode else step.mode
             status = f"{Fore.GREEN}✓ " if step.completed else ""
             print(f"     {i+1}. {status}[{step.mode}] {step.task}")
 
@@ -177,13 +174,13 @@ def interactive_mode_switcher(manager: ModeManager):
         print_current_state(manager)
 
         print(f"\n{Fore.CYAN}Choose an action:{Style.RESET_ALL}")
-        print(f"  1. Switch mode")
-        print(f"  2. Start workflow")
-        print(f"  3. Advance workflow")
-        print(f"  4. View all modes")
-        print(f"  5. View all workflows")
-        print(f"  6. Get suggested next steps")
-        print(f"  7. Exit")
+        print("  1. Switch mode")
+        print("  2. Start workflow")
+        print("  3. Advance workflow")
+        print("  4. View all modes")
+        print("  5. View all workflows")
+        print("  6. Get suggested next steps")
+        print("  7. Exit")
 
         choice = input(f"\n{Fore.YELLOW}Enter choice (1-7):{Style.RESET_ALL} ")
 
@@ -278,7 +275,7 @@ def interactive_mode_switcher(manager: ModeManager):
                 f"{Fore.RED}Invalid choice. Please enter a number from 1-7.{Style.RESET_ALL}"
             )
 
-        print("\n" + "-" * 50)
+        print("\n" + ("-" * 50))
 
 
 def main():

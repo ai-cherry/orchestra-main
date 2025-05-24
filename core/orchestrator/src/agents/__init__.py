@@ -6,9 +6,9 @@ by the orchestration system to process user interactions.
 """
 
 from core.orchestrator.src.agents.agent_base import Agent, AgentContext, AgentResponse
-from core.orchestrator.src.agents.agent_registry import (
-    AgentRegistry,
-    get_agent_registry,
+from core.orchestrator.src.agents.simplified_agent_registry import (
+    SimplifiedAgentRegistry,
+    get_simplified_agent_registry,
 )
 from core.orchestrator.src.agents.llm_agent import LLMAgent, ConversationFormatter
 
@@ -19,8 +19,8 @@ __all__ = [
     "Agent",
     "AgentContext",
     "AgentResponse",
-    "AgentRegistry",
-    "get_agent_registry",
+    "SimplifiedAgentRegistry",
+    "get_simplified_agent_registry",
     # Include PersonaAwareAgent in __all__
     "PersonaAwareAgent",
     "LLMAgent",

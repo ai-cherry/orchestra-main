@@ -6,19 +6,13 @@ abstracting the underlying implementation and providing dependency injection.
 """
 
 import logging
-import os
-from datetime import datetime
 from functools import lru_cache
-from typing import Dict, List, Optional, Any
-
-from core.orchestrator.src.services.event_bus import get_event_bus
+from typing import List, Optional
+import asyncio
 
 # Import the settings instance directly
 from core.orchestrator.src.config.config import settings
-from packages.shared.src.memory.memory_manager import (
-    MemoryManager,
-    MemoryHealth,
-)  # Import MemoryHealth if needed by MemoryService, otherwise remove
+from packages.shared.src.memory.memory_manager import MemoryManager
 from packages.shared.src.models.base_models import AgentData, MemoryItem, PersonaConfig
 
 # Removed legacy import: from future.firestore_memory_manager import FirestoreMemoryManager
@@ -45,10 +39,7 @@ class MemoryService:
             memory_manager: The memory manager implementation to use
         """
         self._memory_manager = memory_manager
-        self._event_bus = get_event_bus()
-        logger.info(
-            f"MemoryService initialized with {memory_manager.__class__.__name__}"
-        )
+        logger.info(f"MemoryService initialized with {memory_manager.__class__.__name__}")
 
     def initialize(self):
         """Initialize the underlying memory manager."""
@@ -61,54 +52,8 @@ class MemoryService:
         self._memory_manager.close_sync()
 
     def add_memory_item(self, item: MemoryItem) -> str:
-        """
-        Add a memory item and publish an event.
-
-        Args:
-            item: The memory item to add
-
-        Returns:
-            The ID of the added item
-
-        Raises:
-            ValidationError: If the item fails validation
-            StorageError: If the storage operation fails
-        """
-        # First store the item - this is the critical operation
-        try:
-            # Use asyncio to run the async method in a synchronous context
-            import asyncio
-
-            try:
-                loop = asyncio.get_event_loop()
-            except RuntimeError:
-                # Create a new event loop if one doesn't exist
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-
-            item_id = loop.run_until_complete(
-                self._memory_manager.add_memory_item(item)
-            )
-        except Exception as e:
-            logger.error(f"Failed to add memory item: {e}")
-            # Re-raise to notify caller
-            raise
-
-        # Then try to publish the event, but don't let event failures affect the main flow
-        try:
-            self._event_bus.publish(
-                "memory_item_added",
-                {
-                    "item_id": item_id,
-                    "item_type": item.item_type,
-                    "user_id": item.user_id,
-                },
-            )
-        except Exception as e:
-            logger.warning(f"Failed to publish memory_item_added event: {e}")
-            # We don't re-raise here since the primary operation (storing the item) succeeded
-
-        return item_id
+        """Synchronously add a memory item."""
+        return asyncio.run(self.add_memory_item_async(item))
 
     def get_conversation_history(
         self,
@@ -117,41 +62,31 @@ class MemoryService:
         session_id: Optional[str] = None,
         limit: int = 20,
     ) -> List[MemoryItem]:
-        """
-        Get conversation history, optionally filtered by persona.
-
-        Args:
-            user_id: The user ID to get history for
-            persona_name: Optional persona name to filter by
-            session_id: Optional session ID to filter by
-            limit: Maximum number of items to retrieve
-
-        Returns:
-            List of conversation memory items
-        """
-        # Create filter if needed
-        filters = None
-        if persona_name:
-            filters = {"persona_active": persona_name}
-
-        # Get conversation history
-        # Use asyncio to run the async method in a synchronous context
-        import asyncio
-
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            # Create a new event loop if one doesn't exist
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-
-        items = loop.run_until_complete(
-            self._memory_manager.get_conversation_history(
-                user_id=user_id, session_id=session_id, limit=limit, filters=filters
+        """Synchronously get conversation history."""
+        return asyncio.run(
+            self.get_conversation_history_async(
+                user_id=user_id,
+                persona_name=persona_name,
+                session_id=session_id,
+                limit=limit,
             )
         )
 
-        return items
+    async def get_conversation_history_async(
+        self,
+        user_id: str,
+        persona_name: Optional[str] = None,
+        session_id: Optional[str] = None,
+        limit: int = 20,
+    ) -> List[MemoryItem]:
+        """Asynchronously get conversation history, optionally filtered by persona."""
+        filters = {"persona_active": persona_name} if persona_name else None
+        return await self._memory_manager.get_conversation_history(
+            user_id=user_id,
+            session_id=session_id,
+            limit=limit,
+            filters=filters,
+        )
 
     async def add_memory_item_async(self, item: MemoryItem) -> str:
         """
@@ -178,21 +113,6 @@ class MemoryService:
             # Re-raise to notify caller
             raise
 
-        # Then try to publish the event asynchronously
-        try:
-            await self._event_bus.publish_async(
-                "memory_item_added",
-                {
-                    "item_id": item_id,
-                    "item_type": item.item_type,
-                    "user_id": item.user_id,
-                    "async": True,
-                },
-            )
-        except Exception as e:
-            logger.warning(f"Failed to publish async memory_item_added event: {e}")
-            # We don't re-raise here since the primary operation (storing the item) succeeded
-
         return item_id
 
     def semantic_search(
@@ -202,127 +122,48 @@ class MemoryService:
         persona_context: Optional[PersonaConfig] = None,
         top_k: int = 5,
     ) -> List[MemoryItem]:
-        """
-        Perform semantic search with tracking.
-
-        Args:
-            user_id: The user ID to search memories for
-            query_embedding: The vector embedding of the query
-            persona_context: Optional persona context for personalized results
-            top_k: Maximum number of results to return
-
-        Returns:
-            List of memory items ordered by relevance
-
-        Raises:
-            ValidationError: If the query embedding has invalid dimensions
-            StorageError: If the search operation fails
-        """
-        # Perform search - this is the critical operation
-        try:
-            # Use asyncio to run the async method in a synchronous context
-            import asyncio
-
-            try:
-                loop = asyncio.get_event_loop()
-            except RuntimeError:
-                # Create a new event loop if one doesn't exist
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-
-            results = loop.run_until_complete(
-                self._memory_manager.semantic_search(
-                    user_id=user_id,
-                    query_embedding=query_embedding,
-                    persona_context=persona_context,
-                    top_k=top_k,
-                )
+        """Synchronously perform semantic search."""
+        return asyncio.run(
+            self.semantic_search_async(
+                user_id=user_id,
+                query_embedding=query_embedding,
+                persona_context=persona_context,
+                top_k=top_k,
             )
-        except Exception as e:
-            logger.error(f"Semantic search failed: {e}")
-            # Re-raise since this is the primary operation
-            raise
+        )
 
-        # Publish event, but don't let event failures affect the main flow
-        if results:
-            try:
-                self._event_bus.publish(
-                    "semantic_search_performed",
-                    {
-                        "user_id": user_id,
-                        "results_count": len(results),
-                        "persona_id": persona_context.name if persona_context else None,
-                    },
-                )
-            except Exception as e:
-                logger.warning(
-                    f"Failed to publish semantic_search_performed event: {e}"
-                )
-                # We don't re-raise here since the primary operation (search) succeeded
+    async def semantic_search_async(
+        self,
+        user_id: str,
+        query_embedding: List[float],
+        persona_context: Optional[PersonaConfig] = None,
+        top_k: int = 5,
+    ) -> List[MemoryItem]:
+        """Asynchronously perform semantic search with tracking."""
+        results = await self._memory_manager.semantic_search(
+            user_id=user_id,
+            query_embedding=query_embedding,
+            persona_context=persona_context,
+            top_k=top_k,
+        )
 
         return results
 
     def add_raw_agent_data(self, data: AgentData) -> str:
-        """
-        Process raw agent data.
+        """Synchronously process raw agent data."""
+        return asyncio.run(self.add_raw_agent_data_async(data))
 
-        Args:
-            data: The agent data to process
-
-        Returns:
-            The ID of the processed data
-        """
-        # Use asyncio to run the async method in a synchronous context
-        import asyncio
-
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            # Create a new event loop if one doesn't exist
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-
-        return loop.run_until_complete(self._memory_manager.add_raw_agent_data(data))
+    async def add_raw_agent_data_async(self, data: AgentData) -> str:
+        """Asynchronously process raw agent data."""
+        return await self._memory_manager.add_raw_agent_data(data)
 
     def cleanup_expired_items(self) -> int:
-        """
-        Remove expired items and report count.
+        """Synchronously remove expired items."""
+        return asyncio.run(self.cleanup_expired_items_async())
 
-        Returns:
-            Number of items removed
-
-        Raises:
-            StorageError: If the cleanup operation fails
-        """
-        try:
-            # Use asyncio to run the async method in a synchronous context
-            import asyncio
-
-            try:
-                loop = asyncio.get_event_loop()
-            except RuntimeError:
-                # Create a new event loop if one doesn't exist
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-
-            count = loop.run_until_complete(
-                self._memory_manager.cleanup_expired_items()
-            )
-        except Exception as e:
-            logger.error(f"Failed to cleanup expired items: {e}")
-            # Re-raise since this is the primary operation
-            raise
-
-        # Publish event if items were removed, but don't let event failures affect the main flow
-        if count > 0:
-            try:
-                self._event_bus.publish(
-                    "expired_items_cleaned",
-                    {"count": count, "timestamp": datetime.utcnow().isoformat()},
-                )
-            except Exception as e:
-                logger.warning(f"Failed to publish expired_items_cleaned event: {e}")
-                # We don't re-raise here since the primary operation (cleanup) succeeded
+    async def cleanup_expired_items_async(self) -> int:
+        """Asynchronously remove expired items and publish an event."""
+        count = await self._memory_manager.cleanup_expired_items()
 
         return count
 
