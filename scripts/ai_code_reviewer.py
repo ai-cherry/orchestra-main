@@ -122,7 +122,7 @@ class AICodeReviewer:
             for feature_pattern in self.python311_features:
                 if re.search(feature_pattern, content):
                     results["warnings"].append(
-                        f"Python 3.11+ feature detected: {feature_pattern} - We use Python 3.10!"
+                        f"Python 3.11+ feature detected: {feature_pattern} - Ensure target runtime is 3.11 or newer."
                     )
 
             # Check for os.system usage
@@ -290,7 +290,7 @@ class AICodeReviewer:
                 "1. Replace Docker/Poetry with pip/venv",
                 "2. Use subprocess.run() instead of os.system()",
                 "3. Check existing tools in scripts/ before creating new ones",
-                "4. Remove Python 3.11+ features (match/case, tomllib)",
+                "4. Ensure Python 3.11+ features are supported in deployment environments",
                 "5. Simplify over-engineered patterns",
             ]
         )

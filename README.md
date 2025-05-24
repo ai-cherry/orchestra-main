@@ -2,6 +2,10 @@
 
 A modern, cloud-native Python application for rapid solo development and deployment on Google Cloud Run. Designed for simplicity, security, and developer productivity.
 
+# ⚡ Simplicity First
+
+This project prioritizes performance, stability, and maintainability over security and compliance. No unnecessary security scans, policies, or complex patterns are included. All automation and CI/CD is designed to be fast, simple, and developer-friendly.
+
 ---
 
 ---
@@ -81,6 +85,24 @@ A modern, cloud-native Python application for rapid solo development and deploym
 ---
 
 ## 🚢 Deployment
+
+### Admin UI (React) Deployment
+
+The Admin UI is deployed as a static website to Google Cloud Storage and served via HTTPS Load Balancer with managed SSL and optional Cloud DNS. This is fully automated:
+
+**CI/CD:**
+- Pushing to `main` or changes in `admin-ui/` triggers `.github/workflows/admin-ui.yml`.
+- The workflow builds the React app, updates the Pulumi stack (infra/admin_ui_site), and syncs the built assets to the GCS bucket.
+- The site is served at https://cherry-ai.me/ (or your configured domain).
+
+**Manual one-liner deploy:**
+```bash
+python scripts/deploy_admin_ui.py --stack dev --domain cherry-ai.me
+```
+
+**Requirements:** Python 3.11+ everywhere (venv, CI, Pulumi, app code).
+
+See `infra/admin_ui_site/` and `.github/workflows/admin-ui.yml` for details.
 
 - **CI/CD (Recommended):**
 

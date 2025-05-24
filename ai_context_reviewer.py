@@ -4,17 +4,17 @@ AI CONTEXT: REVIEWER MODE - Orchestra Project
 
 READ THIS ENTIRE FILE BEFORE REVIEWING ANY CODE!
 
-Project: Orchestra AI (Python 3.10, pip/venv, GCP-focused)
+Project: Orchestra AI (Python 3.11+, pip/venv, GCP-focused)
 Role: You are reviewing code changes for compliance and quality
 
 REVIEW CHECKLIST:
 
 1. PYTHON VERSION COMPLIANCE
-   ❌ FAIL: match/case statements (Python 3.10+)
-   ❌ FAIL: tomllib imports (Python 3.11+)
-   ❌ FAIL: ExceptionGroup, TaskGroup (Python 3.11+)
-   ✅ PASS: if/elif/else instead of match/case
-   ✅ PASS: pyyaml instead of tomllib
+   ❌ FAIL: Using syntax/features that require **>3.11** (e.g., Python 3.12-only APIs)
+   ✅ PASS: `match`/`case` statements where they improve clarity
+   ✅ PASS: `tomllib` for TOML parsing where appropriate
+   ✅ PASS: `ExceptionGroup`, `TaskGroup` usage where beneficial
+   ⚠️  WARN: Overly complex `match`/`case` patterns that reduce readability
 
 2. DEPENDENCY MANAGEMENT
    ❌ FAIL: from poetry import ...
@@ -98,8 +98,8 @@ grep -n "match.*:\|case.*:" file.py
 # Check for duplication
 diff -u <(grep "def " existing.py) <(grep "def " new.py)
 
-# Validate Python 3.10 compatibility
-python3.10 -m py_compile file.py
+# Validate Python 3.11 compatibility
+python3.11 -m py_compile file.py
 
 # Run our automated checker
 python scripts/ai_code_reviewer.py --check-file file.py
@@ -126,7 +126,7 @@ PERFORMANCE CONSIDERATIONS:
 QUESTIONS TO ASK:
 1. Does this duplicate existing functionality?
 2. Is this following project patterns?
-3. Will this work on Python 3.10?
+3. Will this work on Python 3.11?
 4. Are all the imports necessary?
 5. Could this be simpler?
 
@@ -134,7 +134,7 @@ APPROVE ONLY IF:
 - No forbidden patterns detected
 - No unnecessary duplication
 - Follows project structure
-- Works with Python 3.10
+- Works with Python 3.11
 - Uses existing tools appropriately
 - Has proper error handling
 - Includes type hints

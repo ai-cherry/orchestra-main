@@ -32,14 +32,11 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
     ],
     keywords="vertex-ai, google-cloud, orchestration, automation",
     packages=find_packages(include=["vertex_client", "vertex_client.*"]),
-    python_requires=">=3.8, <4",
+    python_requires=">=3.11, <4",
     install_requires=requirements,
     entry_points={
         "console_scripts": [

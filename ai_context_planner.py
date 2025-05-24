@@ -4,11 +4,11 @@ AI CONTEXT: PLANNER MODE - Orchestra Project
 
 READ THIS ENTIRE FILE BEFORE PLANNING ANY CHANGES!
 
-Project: Orchestra AI (Python 3.10, pip/venv, GCP-focused)
+Project: Orchestra AI (Python 3.11+, pip/venv, GCP-focused)
 Role: You are planning a change/feature for this project
 
 CRITICAL RULES:
-1. Python 3.10 ONLY (not 3.11+) - system constraint
+1. Python 3.11+ REQUIRED (minimum 3.11)
 2. pip/venv ONLY - NO Docker, Poetry, Pipenv
 3. Check existing tools FIRST before planning new ones
 4. Simple solutions > Complex architectures
@@ -53,8 +53,7 @@ ARCHITECTURAL PRINCIPLES:
 FORBIDDEN IN YOUR PLAN:
 ❌ Docker, docker-compose, containers
 ❌ Poetry, Pipenv, complex dependency management
-❌ Python 3.11+ features (match/case, tomllib)
-❌ Metaclasses, multiple inheritance, over-engineering
+⚠️  Complex Python 3.11+ features (e.g., metaprogramming with `match`/`case`, excessive `tomllib` use) — keep implementations simple and readable
 ❌ Creating new services on ports 8002, 8080
 
 GOOD PLANNING EXAMPLE:

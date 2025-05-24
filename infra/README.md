@@ -18,6 +18,14 @@ All environments inherit from `base.txt` for consistency.
 
 ## Setup
 
+**Python 3.11+ is required for all infrastructure work.**
+
+**Pulumi state backend:**
+- All stacks use the GCS bucket `gs://cherry-ai-project-pulumi-state` for state storage.
+
+**Admin UI stack:**
+- The static admin UI is managed in `infra/admin_ui_site/` and deployed via the `admin-ui` Pulumi stack (see `.github/workflows/admin-ui.yml` and `scripts/deploy_admin_ui.py`).
+
 1. Create a virtual environment:
    ```bash
    python3.11 -m venv .venv

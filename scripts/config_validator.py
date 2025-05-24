@@ -172,8 +172,8 @@ class ConfigValidator:
         python_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
         results["python_version"] = python_version
 
-        if sys.version_info < (3, 10):
-            self.errors.append(f"Python 3.10+ required, found {python_version}")
+        if sys.version_info < (3, 11):
+            self.errors.append(f"Python 3.11+ required, found {python_version}")
             results["success"] = False
 
         return results

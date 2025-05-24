@@ -4,14 +4,20 @@ AI CONTEXT: CODER MODE - Orchestra Project
 
 READ THIS ENTIRE FILE BEFORE WRITING ANY CODE!
 
-Project: Orchestra AI (Python 3.10, pip/venv, GCP-focused)
+Project: Orchestra AI (Python 3.11+, pip/venv, GCP-focused)
 Role: You are implementing code for this project
 
+NOTE: The orchestration environment now standardises on Python 3.11 or later. Where
+possible leverage language enhancements (e.g. `match`/`case`, `tomllib`, `typing`
+improvements) while still favouring simplicity and readability.
+
 ENVIRONMENT CONSTRAINTS:
-- Python 3.10.12 (NOT 3.11+)
+- Python 3.11.4 (preferred; >=3.11 required)
 - Ubuntu Linux 5.15.0
-- pip/venv for dependencies
+- pip/venv for dependencies (no Poetry/Pipenv)
 - GCP project: cherry-ai-project
+
+Backward compatibility with 3.10 is desirable but **not required**.
 
 CODE PATTERNS TO FOLLOW:
 
@@ -128,10 +134,10 @@ FORBIDDEN PATTERNS:
 ❌ class AbstractBaseFactory(ABC, metaclass=Meta)  # Too complex
 ❌ from docker import ...  # No Docker
 ❌ import poetry  # No Poetry
-❌ match/case statements  # Python 3.11+
-❌ := walrus operator everywhere  # Keep it simple
-❌ Multiple inheritance
-❌ Metaclasses
+⚠️  Overusing complex `match`/`case` patterns — favour clarity
+⚠️  := walrus operator **over-use** — employ sparingly to maintain readability
+❌ Multiple inheritance (except for well-defined mixins)
+❌ Metaclasses (avoid unless absolutely necessary)
 
 GOOD CODE EXAMPLE:
 ```python

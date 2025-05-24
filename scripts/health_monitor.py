@@ -235,11 +235,11 @@ class HealthMonitor:
 
         # Check Python version
         python_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-        python_ok = sys.version_info >= (3, 10)
+        python_ok = sys.version_info >= (3, 11)
         results["checks"]["python_version"] = {
             "status": "ok" if python_ok else "error",
             "value": python_version,
-            "required": "3.10+",
+            "required": "3.11+",
         }
         if not python_ok:
             results["status"] = "error"

@@ -4,11 +4,11 @@ AI CONTEXT: DEBUGGER MODE - Orchestra Project
 
 READ THIS ENTIRE FILE BEFORE DEBUGGING!
 
-Project: Orchestra AI (Python 3.10, pip/venv, GCP-focused)
+Project: Orchestra AI (Python 3.11+, pip/venv, GCP-focused)
 Role: You are debugging issues in this project
 
 SYSTEM INFORMATION:
-- Python 3.10.12 (NOT 3.11+)
+- Python 3.11.6 (minimum 3.11)
 - OS: Linux 5.15.0-124-generic
 - Shell: /bin/bash
 - Workspace: /home/paperspace/orchestra-main
@@ -16,12 +16,11 @@ SYSTEM INFORMATION:
 COMMON ISSUES AND SOLUTIONS:
 
 1. PYTHON VERSION ERRORS
-   SYMPTOM: SyntaxError on match/case or tomllib import
-   CAUSE: Code written for Python 3.11+
-   FIX: Replace with Python 3.10 compatible code
+   SYMPTOM: `SyntaxError` on features introduced **after** Python 3.11 (e.g., hypothetical 3.12-only APIs)
+   CAUSE: Code written for a newer Python release than the runtime (3.11)
+   FIX: Either bump the runtime to the required version or replace those constructs with Python 3.11-compatible alternatives.
    ```python
-   # Replace match/case with if/elif
-   # Replace tomllib with pyyaml
+   # Example: replace newer syntax with standard approaches
    ```
 
 2. MODULE NOT FOUND
@@ -184,7 +183,7 @@ QUICK FIXES:
 ```bash
 # Reset environment
 deactivate
-python3.10 -m venv venv
+python3.11 -m venv venv
 source venv/bin/activate
 pip install -r requirements/base.txt
 
