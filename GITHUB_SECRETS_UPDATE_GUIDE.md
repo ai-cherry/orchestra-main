@@ -6,11 +6,11 @@ This guide outlines the steps to update GitHub repository secrets and variables 
 
 Based on the new GCP project information, the following values need to be set in GitHub:
 
-| Name | Value |
-|------|-------|
-| WIF_PROVIDER_ID | projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider |
-| WIF_SERVICE_ACCOUNT | github-actions-deployer@cherry-ai-project.iam.gserviceaccount.com |
-| GCP_PROJECT_ID | cherry-ai-project |
+| Name                | Value                                                                                              |
+| ------------------- | -------------------------------------------------------------------------------------------------- |
+| WIF_PROVIDER_ID     | projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider |
+| WIF_SERVICE_ACCOUNT | github-actions-deployer@cherry-ai-project.iam.gserviceaccount.com                                  |
+| GCP_PROJECT_ID      | cherry-ai-project                                                                                  |
 
 ## Update Instructions
 
@@ -23,9 +23,11 @@ Since these values need to be accessible in both GitHub Secrets and GitHub Varia
 3. In the **Secrets** tab, add or update the following secrets:
 
    - Add/Update **WIF_PROVIDER_ID**:
+
      - Value: `projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider`
 
    - Add/Update **WIF_SERVICE_ACCOUNT**:
+
      - Value: `github-actions-deployer@cherry-ai-project.iam.gserviceaccount.com`
 
    - Add/Update **GCP_PROJECT_ID**:
@@ -40,9 +42,11 @@ Since these values need to be accessible in both GitHub Secrets and GitHub Varia
 3. Add or update the following variables:
 
    - Add/Update **WORKLOAD_IDENTITY_PROVIDER**:
+
      - Value: `projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider`
 
    - Add/Update **TERRAFORM_SERVICE_ACCOUNT**:
+
      - Value: `github-actions-deployer@cherry-ai-project.iam.gserviceaccount.com`
 
    - Add/Update **GCP_PROJECT_ID**:
@@ -60,6 +64,7 @@ If your team is using GitHub Codespaces:
 The following GitHub Actions workflows use these values and will need to be verified:
 
 1. `.github/workflows/terraform-deploy.yml` - Uses GitHub Variables:
+
    ```yaml
    with:
      workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
@@ -68,6 +73,7 @@ The following GitHub Actions workflows use these values and will need to be veri
    ```
 
 2. `.github/workflows/migrate-github-secrets.yml` - Uses GitHub Secrets:
+
    ```yaml
    with:
      workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}

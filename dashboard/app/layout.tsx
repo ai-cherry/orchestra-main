@@ -5,20 +5,20 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: "AI Agent Dashboard",
-    description: "Admin dashboard for the AI Agent service",
+  title: "AI Agent Dashboard",
+  description: "Admin dashboard for the AI Agent service",
 };
 
 export default function RootLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    return (
-        <html lang="en">
-            <body className={`${inter.className} bg-gray-900 text-white`}>
-                {children}
-            </body>
-        </html>
-    );
-} 
+  return (
+    <html lang="en">
+      <body className={`${inter.className} bg-gray-900 text-white`}>
+        {children}
+      </body>
+    </html>
+  );
+}

@@ -93,12 +93,14 @@ The GitHub Actions workflow in `.github/workflows/deploy-admin-interface.yml` au
 ### Setup
 
 1. Install dependencies:
+
    ```bash
    cd services/admin-api
    poetry install
    ```
 
 2. Set up environment variables in `.env`:
+
    ```
    PROJECT_ID=your-gcp-project-id
    REGION=us-central1

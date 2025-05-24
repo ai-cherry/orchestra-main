@@ -27,11 +27,10 @@ Example:
     tools = registry.discover_tools(provider="gemini")
 """
 
-import json
 import logging
 import time
 import uuid
-from typing import Any, Dict, List, Optional, Set, Union
+from typing import Any, Dict, List, Optional
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("tool_registry")

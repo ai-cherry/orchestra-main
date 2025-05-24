@@ -5,7 +5,8 @@ This module defines Pydantic models for configuration settings used by the MCP s
 and its components.
 """
 
-from typing import Dict, Optional, List
+from typing import Dict, List, Optional
+
 from pydantic import BaseModel, Field
 
 

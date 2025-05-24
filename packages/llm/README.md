@@ -24,7 +24,7 @@ packages/llm/
     └── models/                    # Model-specific implementations
         ├── __init__.py
         ├── anthropic.py           # Anthropic Claude implementation
-        ├── openai.py              # OpenAI implementation 
+        ├── openai.py              # OpenAI implementation
         └── openrouter.py          # OpenRouter implementation
 ```
 
@@ -120,5 +120,5 @@ To control which implementation is used:
 To add support for a new provider:
 
 1. Create a new file in `src/models/` for the provider
-2. Implement a factory function that uses `configure_model_from_settings()` 
+2. Implement a factory function that uses `configure_model_from_settings()`
 3. Update `get_phidata_llm_model()` in `dependencies/llm.py` to use the new factory

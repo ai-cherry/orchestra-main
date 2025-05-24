@@ -17,6 +17,7 @@ This document outlines the secure credential management architecture for the AI 
 AI Orchestra requires secure access to various GCP services, including Vertex AI, Gemini, Firestore, and Redis. The secure credential management system provides a robust, scalable, and secure way to manage and access credentials across different environments.
 
 Key features:
+
 - Secret storage in Google Cloud Secret Manager
 - Service account management with least privilege
 - Workload Identity Federation for GitHub Actions
@@ -40,11 +41,13 @@ The secure credential management architecture follows a multi-layered approach:
 ### Components:
 
 1. **Access Layer**: How applications and services authenticate to GCP
+
    - GitHub Actions: Uses Workload Identity Federation
    - FastAPI App: Uses service account keys or Workload Identity
    - CLI Scripts: Uses service account keys or user credentials
 
 2. **Secret Layer**: How credentials are stored and managed
+
    - Secret Manager: Stores all credentials securely
    - IAM: Controls access to credentials
    - Key Rotation: Automatically rotates credentials
@@ -59,18 +62,22 @@ The secure credential management architecture follows a multi-layered approach:
 The AI Orchestra credential management system follows these security best practices:
 
 1. **Least Privilege Principle**
+
    - Each service account has only the permissions it needs
    - Separate service accounts for different components
 
 2. **No Hardcoded Credentials**
+
    - All credentials are stored in Secret Manager
    - No credentials in code, config files, or environment variables
 
 3. **Short-Lived Credentials**
+
    - Service account keys are rotated regularly
    - Workload Identity Federation provides short-lived tokens
 
 4. **Defense in Depth**
+
    - Multiple layers of security controls
    - Audit logging for all credential access
 
@@ -174,11 +181,11 @@ async def predict(
         location="us-central1",
         credentials=credentials
     )
-    
+
     # Use Vertex AI
     endpoint = aiplatform.Endpoint(request.endpoint_id)
     prediction = endpoint.predict(instances=request.instances)
-    
+
     return {"prediction": prediction}
 ```
 
@@ -189,7 +196,7 @@ name: Deploy to Cloud Run
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   deploy:
@@ -203,12 +210,12 @@ jobs:
         uses: actions/checkout@v3
 
       # Authenticate using Workload Identity Federation
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v1'
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v1"
         with:
-          workload_identity_provider: 'projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
-          service_account: 'github-actions@cherry-ai-project.iam.gserviceaccount.com'
+          workload_identity_provider: "projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+          service_account: "github-actions@cherry-ai-project.iam.gserviceaccount.com"
 
       # Deploy to Cloud Run
       - name: Deploy to Cloud Run
@@ -268,12 +275,13 @@ The project uses Cloud Scheduler and Cloud Functions to automatically rotate cre
 1. **Authentication Failures**
 
    If you encounter authentication failures:
-   
+
    ```
    Error: Request had invalid authentication credentials
    ```
-   
+
    Check:
+
    - Is GOOGLE_APPLICATION_CREDENTIALS set correctly?
    - Does the service account have the necessary permissions?
    - Has the key been rotated recently?
@@ -281,12 +289,13 @@ The project uses Cloud Scheduler and Cloud Functions to automatically rotate cre
 2. **Secret Not Found**
 
    If a secret is not found:
-   
+
    ```
    Error: Secret not found: projects/cherry-ai-project/secrets/vertex-api-key
    ```
-   
+
    Check:
+
    - Does the secret exist in Secret Manager?
    - Are you using the correct name and environment suffix?
    - Do you have permission to access the secret?
@@ -294,12 +303,13 @@ The project uses Cloud Scheduler and Cloud Functions to automatically rotate cre
 3. **Workload Identity Federation Issues**
 
    If GitHub Actions fails to authenticate:
-   
+
    ```
    Error: Unable to get credential via Workload Identity Federation
    ```
-   
+
    Check:
+
    - Is the Workload Identity Pool configured correctly?
    - Does the GitHub repository have the correct permissions?
    - Is the id-token permission set in the workflow?

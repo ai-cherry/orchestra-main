@@ -95,9 +95,7 @@
       "issue_severity": "MEDIUM",
       "issue_text": "Possible binding to all interfaces.",
       "line_number": 260,
-      "line_range": [
-        260
-      ],
+      "line_range": [260],
       "more_info": "https://bandit.readthedocs.io/en/1.8.3/plugins/b104_hardcoded_bind_all_interfaces.html",
       "test_id": "B104",
       "test_name": "hardcoded_bind_all_interfaces"
@@ -115,9 +113,7 @@
       "issue_severity": "LOW",
       "issue_text": "Consider possible security implications associated with the subprocess module.",
       "line_number": 13,
-      "line_range": [
-        13
-      ],
+      "line_range": [13],
       "more_info": "https://bandit.readthedocs.io/en/1.8.3/blacklists/blacklist_imports.html#b404-import-subprocess",
       "test_id": "B404",
       "test_name": "blacklist"
@@ -135,14 +131,7 @@
       "issue_severity": "LOW",
       "issue_text": "Starting a process with a partial executable path",
       "line_number": 126,
-      "line_range": [
-        126,
-        127,
-        128,
-        129,
-        130,
-        131
-      ],
+      "line_range": [126, 127, 128, 129, 130, 131],
       "more_info": "https://bandit.readthedocs.io/en/1.8.3/plugins/b607_start_process_with_partial_path.html",
       "test_id": "B607",
       "test_name": "start_process_with_partial_path"
@@ -160,14 +149,7 @@
       "issue_severity": "LOW",
       "issue_text": "subprocess call - check for execution of untrusted input.",
       "line_number": 126,
-      "line_range": [
-        126,
-        127,
-        128,
-        129,
-        130,
-        131
-      ],
+      "line_range": [126, 127, 128, 129, 130, 131],
       "more_info": "https://bandit.readthedocs.io/en/1.8.3/plugins/b603_subprocess_without_shell_equals_true.html",
       "test_id": "B603",
       "test_name": "subprocess_without_shell_equals_true"
@@ -185,14 +167,7 @@
       "issue_severity": "LOW",
       "issue_text": "Starting a process with a partial executable path",
       "line_number": 138,
-      "line_range": [
-        138,
-        139,
-        140,
-        141,
-        142,
-        143
-      ],
+      "line_range": [138, 139, 140, 141, 142, 143],
       "more_info": "https://bandit.readthedocs.io/en/1.8.3/plugins/b607_start_process_with_partial_path.html",
       "test_id": "B607",
       "test_name": "start_process_with_partial_path"
@@ -210,14 +185,7 @@
       "issue_severity": "LOW",
       "issue_text": "subprocess call - check for execution of untrusted input.",
       "line_number": 138,
-      "line_range": [
-        138,
-        139,
-        140,
-        141,
-        142,
-        143
-      ],
+      "line_range": [138, 139, 140, 141, 142, 143],
       "more_info": "https://bandit.readthedocs.io/en/1.8.3/plugins/b603_subprocess_without_shell_equals_true.html",
       "test_id": "B603",
       "test_name": "subprocess_without_shell_equals_true"
@@ -235,15 +203,7 @@
       "issue_severity": "LOW",
       "issue_text": "Starting a process with a partial executable path",
       "line_number": 166,
-      "line_range": [
-        166,
-        167,
-        168,
-        169,
-        170,
-        171,
-        172
-      ],
+      "line_range": [166, 167, 168, 169, 170, 171, 172],
       "more_info": "https://bandit.readthedocs.io/en/1.8.3/plugins/b607_start_process_with_partial_path.html",
       "test_id": "B607",
       "test_name": "start_process_with_partial_path"
@@ -261,15 +221,7 @@
       "issue_severity": "LOW",
       "issue_text": "subprocess call - check for execution of untrusted input.",
       "line_number": 166,
-      "line_range": [
-        166,
-        167,
-        168,
-        169,
-        170,
-        171,
-        172
-      ],
+      "line_range": [166, 167, 168, 169, 170, 171, 172],
       "more_info": "https://bandit.readthedocs.io/en/1.8.3/plugins/b603_subprocess_without_shell_equals_true.html",
       "test_id": "B603",
       "test_name": "subprocess_without_shell_equals_true"
@@ -287,14 +239,7 @@
       "issue_severity": "LOW",
       "issue_text": "subprocess call - check for execution of untrusted input.",
       "line_number": 206,
-      "line_range": [
-        206,
-        207,
-        208,
-        209,
-        210,
-        211
-      ],
+      "line_range": [206, 207, 208, 209, 210, 211],
       "more_info": "https://bandit.readthedocs.io/en/1.8.3/plugins/b603_subprocess_without_shell_equals_true.html",
       "test_id": "B603",
       "test_name": "subprocess_without_shell_equals_true"

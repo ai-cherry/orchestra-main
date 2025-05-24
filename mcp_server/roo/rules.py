@@ -6,10 +6,11 @@ on Roo operations, capturing developer intent and ensuring consistent
 behavior across different modes.
 """
 
-import re
 import logging
+import re
 from enum import Enum
-from typing import Dict, Any, List, Optional, Union, Pattern, Callable
+from typing import Any, Dict, List, Pattern, Union
+
 from pydantic import BaseModel, Field, validator
 
 logger = logging.getLogger(__name__)

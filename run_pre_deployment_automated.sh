@@ -31,17 +31,17 @@ run_step() {
   local step_name=$1
   local command=$2
   local manual_review=$3  # "yes" if manual review is required, "no" otherwise
-  
+
   echo -e "\n${BLUE}${BOLD}Running step: ${step_name}${NC}"
-  
+
   if [ "$manual_review" == "yes" ]; then
     echo -e "${YELLOW}⚠️  This step requires manual review of the output.${NC}"
   fi
-  
+
   # Run the command
   echo -e "${YELLOW}Command: ${command}${NC}"
   echo -e "${YELLOW}Output:${NC}"
-  
+
   if eval $command; then
     if [ "$manual_review" == "yes" ]; then
       echo -e "\n${YELLOW}✓ Step completed, but requires manual review of the output.${NC}"
@@ -204,11 +204,11 @@ if command -v terraform &> /dev/null && [ -d "infra/orchestra-terraform" ]; then
   echo -e "${YELLOW}Attempting to get UI URL from Terraform output...${NC}"
   terraform_output=$(terraform -chdir="infra/orchestra-terraform" output -json service_urls 2>/dev/null || echo '{}')
   ui_url=$(echo $terraform_output | jq -r '.ui // empty' 2>/dev/null)
-  
+
   if [ -n "$ui_url" ] && [ "$ui_url" != "null" ]; then
     echo -e "${GREEN}Found UI URL: $ui_url${NC}"
     echo -e "${YELLOW}Please visit the URL in your browser to verify the UI functionality.${NC}"
-    
+
     # Try to open the URL in the default browser if on a supported platform
     echo -e "${YELLOW}Attempting to open the URL in your browser...${NC}"
     if command -v xdg-open &> /dev/null; then
@@ -246,12 +246,12 @@ if [ -f "./docs/TECHNICAL_DEBT_REMEDIATION_PLAN.md" ]; then
   echo -e "${YELLOW}Found Technical Debt Remediation Plan which includes code duplication cleanup.${NC}"
   echo -e "${YELLOW}Please review the plan at ./docs/TECHNICAL_DEBT_REMEDIATION_PLAN.md${NC}"
   echo -e "${YELLOW}Specifically check section 7: 'Code Cleanup and Consolidation'${NC}"
-  
+
   if [ -f "./docs/CODEBASE_HEALTH_ASSESSMENT.md" ]; then
     echo -e "${YELLOW}Also review ./docs/CODEBASE_HEALTH_ASSESSMENT.md for details on code duplication issues${NC}"
     echo -e "${YELLOW}Specifically check section 1: 'Parallel Implementation Patterns'${NC}"
   fi
-  
+
   echo -e "${YELLOW}⚠️  Code duplication cleanup requires manual developer intervention and cannot be automated.${NC}"
 else
   echo -e "${YELLOW}Technical Debt Remediation Plan not found. Cannot provide code duplication cleanup recommendations.${NC}"

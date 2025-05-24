@@ -4,7 +4,7 @@ AI service interface for AI Orchestra.
 This module defines the protocol for AI model interactions.
 """
 
-from typing import Protocol, Any, Optional, Dict, List, Union
+from typing import Any, Dict, List, Optional, Protocol
 
 
 class AIService(Protocol):

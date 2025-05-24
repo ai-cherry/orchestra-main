@@ -3,6 +3,7 @@
 ## ✅ MCP Servers Running
 
 ### 1. Secret Manager Server
+
 - **Status**: ✅ Running
 - **Port**: 8002
 - **Health Check**: Healthy
@@ -14,6 +15,7 @@
   - `list_secrets` - List all secrets
 
 ### 2. Firestore Server
+
 - **Status**: ✅ Running
 - **Port**: 8080
 - **Health Check**: Healthy (but Firestore not configured in project)
@@ -23,17 +25,20 @@
 ## 🔧 Server Implementations Created
 
 1. **Secret Manager Server** (`mcp_server/servers/gcp_secret_manager_server.py`)
+
    - Full CRUD operations for secrets
    - MCP tool definitions
    - Error handling and logging
 
 2. **Firestore Server** (`mcp_server/servers/firestore_server.py`)
+
    - Document CRUD operations
    - Collection management
    - Query support with filtering
    - Batch operations
 
 3. **DragonflyDB Server** (`mcp_server/servers/dragonfly_server.py`)
+
    - Redis-compatible caching operations
    - Support for strings, lists, sets, hashes
    - Connection pooling
@@ -47,6 +52,7 @@
 ## 📊 Test Results
 
 ### API Endpoints Working:
+
 ```bash
 # Secret Manager Health Check
 curl http://localhost:8002/health
@@ -64,6 +70,7 @@ curl http://localhost:8080/health
 ## 🚀 Quick Start Commands
 
 ### Start Individual Servers:
+
 ```bash
 # Secret Manager Server
 export GCP_PROJECT_ID=cherry-ai-project
@@ -80,6 +87,7 @@ python mcp_server/servers/gcp_cloud_run_server.py
 ```
 
 ### Test Servers:
+
 ```bash
 # Test all health endpoints
 curl http://localhost:8002/health  # Secret Manager
@@ -119,6 +127,7 @@ curl http://localhost:8001/health  # Cloud Run
 ## 🐛 Debug Findings
 
 ### Fixed Issues:
+
 1. ✅ Created missing `utils.py` with APIKeyManager
 2. ✅ Fixed `agents.yaml` YAML structure
 3. ✅ Created `.env.example` template
@@ -130,17 +139,20 @@ curl http://localhost:8001/health  # Cloud Run
 9. ✅ Fixed DragonflyDB server port (8002 → 8004)
 
 ### Currently Running:
+
 - ✅ **Redis**: Running on port 6379
 - ✅ **Secret Manager MCP**: Running on port 8002
 - ✅ **Firestore MCP**: Running on port 8080
 - ✅ **DragonflyDB MCP**: Running on port 8004
 
 ### Remaining Issues:
+
 1. **Firestore Database**: Not enabled in cherry-ai-project (server running but no database)
 2. **API Keys**: Need to add actual API keys to `.env` file
 3. **Cloud Run Server**: Not started yet (can start with management script)
 
 ### Quick Start After Debug:
+
 ```bash
 # 1. Setup environment
 cp .env.example .env

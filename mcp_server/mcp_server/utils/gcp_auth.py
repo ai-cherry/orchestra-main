@@ -7,17 +7,16 @@ services, leveraging the GCP_MASTER_SERVICE_JSON credential for direct authentic
 It implements a singleton pattern to reuse credentials across different services.
 """
 
-import os
 import json
-import tempfile
 import logging
-from typing import Optional, Dict, Any
+import os
+import tempfile
+from typing import Optional
 
 # Import GCP libraries
 try:
+    from google.cloud import aiplatform, firestore, storage
     from google.oauth2 import service_account
-    from google.cloud import firestore, storage, aiplatform
-    from google.api_core.exceptions import GoogleAPIError
 except ImportError:
     logging.warning(
         "Google Cloud libraries not installed. Install with: pip install google-cloud-firestore google-cloud-storage google-cloud-aiplatform"

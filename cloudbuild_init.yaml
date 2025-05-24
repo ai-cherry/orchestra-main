@@ -1,66 +1,66 @@
 steps:
-- name: 'gcr.io/cloud-builders/gcloud'
-  args:
-  - 'config'
-  - 'set'
-  - 'project'
-  - 'cherry-ai-project'
+  - name: "gcr.io/cloud-builders/gcloud"
+    args:
+      - "config"
+      - "set"
+      - "project"
+      - "cherry-ai-project"
 
-- name: 'gcr.io/cloud-builders/gcloud'
-  args:
-  - 'services'
-  - 'enable'
-  - 'artifactregistry.googleapis.com'
-  - 'run.googleapis.com'
-  - 'cloudbuild.googleapis.com'
-  - 'aiplatform.googleapis.com'
-  - 'secretmanager.googleapis.com'
-  - '--project'
-  - 'cherry-ai-project'
+  - name: "gcr.io/cloud-builders/gcloud"
+    args:
+      - "services"
+      - "enable"
+      - "artifactregistry.googleapis.com"
+      - "run.googleapis.com"
+      - "cloudbuild.googleapis.com"
+      - "aiplatform.googleapis.com"
+      - "secretmanager.googleapis.com"
+      - "--project"
+      - "cherry-ai-project"
 
-- name: 'gcr.io/cloud-builders/gcloud'
-  args:
-  - 'artifacts'
-  - 'repositories'
-  - 'create'
-  - 'orchestra'
-  - '--repository-format=docker'
-  - '--location=us-central1'
-  - '--project=cherry-ai-project'
+  - name: "gcr.io/cloud-builders/gcloud"
+    args:
+      - "artifacts"
+      - "repositories"
+      - "create"
+      - "orchestra"
+      - "--repository-format=docker"
+      - "--location=us-central1"
+      - "--project=cherry-ai-project"
 
-- name: 'gcr.io/cloud-builders/gsutil'
-  args:
-  - 'mb'
-  - '-l'
-  - 'us-central1'
-  - 'gs://cherry-ai-project-model-artifacts'
+  - name: "gcr.io/cloud-builders/gsutil"
+    args:
+      - "mb"
+      - "-l"
+      - "us-central1"
+      - "gs://cherry-ai-project-model-artifacts"
 
-- name: 'gcr.io/cloud-builders/gsutil'
-  args:
-  - 'mb'
-  - '-l'
-  - 'us-central1'
-  - 'gs://cherry-ai-project-cloudbuild-artifacts'
+  - name: "gcr.io/cloud-builders/gsutil"
+    args:
+      - "mb"
+      - "-l"
+      - "us-central1"
+      - "gs://cherry-ai-project-cloudbuild-artifacts"
 
-- name: 'gcr.io/cloud-builders/gcloud'
-  args:
-  - 'iam'
-  - 'service-accounts'
-  - 'create'
-  - 'vertex-agent'
-  - '--display-name=Vertex AI Agent Service Account'
-  - '--project=cherry-ai-project'
+  - name: "gcr.io/cloud-builders/gcloud"
+    args:
+      - "iam"
+      - "service-accounts"
+      - "create"
+      - "vertex-agent"
+      - "--display-name=Vertex AI Agent Service Account"
+      - "--project=cherry-ai-project"
 
-serviceAccount: 'projects/525398941159/serviceAccounts/vertex-agent@cherry-ai-project.iam.gserviceaccount.com'
-logsBucket: 'gs://cherry-ai-project-cloudbuild-artifacts'
+serviceAccount: "projects/525398941159/serviceAccounts/vertex-agent@cherry-ai-project.iam.gserviceaccount.com"
+logsBucket: "gs://cherry-ai-project-cloudbuild-artifacts"
 
 substitutions:
-  _PROJECT_ID: 'cherry-ai-project'
-  _PROJECT_NUMBER: '525398941159'
-  _REGION: 'us-central1'
+  _PROJECT_ID: "cherry-ai-project"
+  _PROJECT_NUMBER: "525398941159"
+  _REGION: "us-central1"
 
 options:
   logging: CLOUD_LOGGING_ONLY
-  machineType: 'E2_HIGHCPU_8'
+  machineType: "E2_HIGHCPU_8"
 
-timeout: '3600s'
+timeout: "3600s"

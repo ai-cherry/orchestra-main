@@ -6,9 +6,9 @@ access secrets from both environment variables and Google Secret Manager
 while maintaining backward compatibility.
 """
 
+import logging
 import os
 import sys
-import logging
 from pathlib import Path
 
 # Add parent directory to path for imports

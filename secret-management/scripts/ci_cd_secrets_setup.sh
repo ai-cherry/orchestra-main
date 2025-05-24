@@ -29,7 +29,7 @@ echo "Setting up secrets for $ENVIRONMENT environment in project $GCP_PROJECT_ID
 # Ensure Secret Manager API is enabled
 gcloud services enable secretmanager.googleapis.com --project="$GCP_PROJECT_ID"
 
-# Example: Generate a random API key 
+# Example: Generate a random API key
 RANDOM_API_KEY=$(openssl rand -base64 24 | tr -dc 'a-zA-Z0-9' | head -c 32)
 "$SCRIPT_DIR/create_secret.sh" "EXAMPLE_API_KEY" "$RANDOM_API_KEY" "$GCP_PROJECT_ID" "automatic" "$ENVIRONMENT"
 

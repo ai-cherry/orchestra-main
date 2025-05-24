@@ -6,16 +6,16 @@ working memory system, enabling efficient memory access patterns and
 context preservation across mode transitions.
 """
 
-import uuid
-import time
 import logging
-import asyncio
-from typing import Dict, Any, List, Optional, Union, Tuple
+import time
+import uuid
 from enum import Enum
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel, Field
 
-from .transitions import TransitionContext, ModeTransitionManager
 from .modes import get_mode
+from .transitions import ModeTransitionManager
 
 logger = logging.getLogger(__name__)
 

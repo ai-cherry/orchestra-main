@@ -19,11 +19,10 @@ Requirements:
     - redis
 """
 
+import asyncio
+import json
 import os
 import sys
-import json
-import asyncio
-from typing import Dict, Any, List, Optional
 
 # Add the project root to the Python path
 sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
@@ -31,9 +30,6 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
 # Import the credential manager
 from core.security.credential_manager import (
     get_credential_manager,
-    get_secret,
-    get_json_secret,
-    get_service_account_key,
 )
 
 

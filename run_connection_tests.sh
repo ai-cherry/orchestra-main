@@ -118,7 +118,7 @@ if [ $? -eq 0 ]; then
   if [[ ! $ARGS == *"--firestore-only"* ]]; then
     echo "- redis_test_report.json"
   fi
-  
+
   # Determine output file name
   OUTPUT_FILE="connection_test_report.json"
   if [[ $ARGS == *"--output"* ]]; then

@@ -68,7 +68,7 @@ get_pid_file() {
 is_running() {
     local server_name=$1
     local pid_file=$(get_pid_file "$server_name")
-    
+
     if [ -f "$pid_file" ]; then
         local pid=$(cat "$pid_file")
         if kill -0 "$pid" 2>/dev/null; then
@@ -87,35 +87,35 @@ start_server() {
     local server_path=$(get_server_path "$server_name")
     local pid_file=$(get_pid_file "$server_name")
     local log_file="$LOG_DIR/mcp_${server_name}_$(date +%Y%m%d).log"
-    
+
     if is_running "$server_name"; then
         echo -e "${YELLOW}⚠${NC} $server_name is already running"
         return 1
     fi
-    
+
     if [ ! -f "$server_path" ]; then
         echo -e "${RED}✗${NC} Server file not found: $server_path"
         return 1
     fi
-    
+
     # Check syntax
     if ! python -m py_compile "$server_path" 2>/dev/null; then
         echo -e "${RED}✗${NC} $server_name has syntax errors"
         return 1
     fi
-    
+
     echo -n "Starting $server_name... "
-    
+
     # Load environment if available
     [ -f ~/.gcp_env_setup.sh ] && source ~/.gcp_env_setup.sh
-    
+
     # Start server
     nohup python "$server_path" >> "$log_file" 2>&1 &
     local pid=$!
-    
+
     # Give it a moment to start
     sleep 1
-    
+
     if kill -0 "$pid" 2>/dev/null; then
         echo "$pid" > "$pid_file"
         echo -e "${GREEN}✓${NC} Started (PID: $pid, Log: $log_file)"
@@ -130,29 +130,29 @@ start_server() {
 stop_server() {
     local server_name=$1
     local pid_file=$(get_pid_file "$server_name")
-    
+
     if ! is_running "$server_name"; then
         echo -e "${YELLOW}⚠${NC} $server_name is not running"
         return 1
     fi
-    
+
     local pid=$(cat "$pid_file")
     echo -n "Stopping $server_name (PID: $pid)... "
-    
+
     kill "$pid" 2>/dev/null
-    
+
     # Wait for process to stop
     local count=0
     while kill -0 "$pid" 2>/dev/null && [ $count -lt 10 ]; do
         sleep 1
         count=$((count + 1))
     done
-    
+
     if kill -0 "$pid" 2>/dev/null; then
         # Force kill if still running
         kill -9 "$pid" 2>/dev/null
     fi
-    
+
     rm -f "$pid_file"
     echo -e "${GREEN}✓${NC} Stopped"
     return 0
@@ -163,14 +163,14 @@ show_status() {
     local server_name=$1
     local server_path=$(get_server_path "$server_name")
     local pid_file=$(get_pid_file "$server_name")
-    
+
     echo -n "$server_name: "
-    
+
     if [ ! -f "$server_path" ]; then
         echo -e "${RED}✗${NC} Not installed"
         return
     fi
-    
+
     if is_running "$server_name"; then
         local pid=$(cat "$pid_file")
         local log_file="$LOG_DIR/mcp_${server_name}_$(date +%Y%m%d).log"
@@ -189,7 +189,7 @@ show_status() {
 list_servers() {
     echo "Available MCP Servers:"
     echo ""
-    
+
     local registry="$MCP_SERVER_DIR/server_registry.json"
     if [ -f "$registry" ] && command -v jq &> /dev/null; then
         # Use registry for detailed info
@@ -216,7 +216,7 @@ case "$1" in
             start_server "$2"
         fi
         ;;
-        
+
     stop)
         if [ -z "$2" ]; then
             # Stop all servers
@@ -229,7 +229,7 @@ case "$1" in
             stop_server "$2"
         fi
         ;;
-        
+
     restart)
         if [ -z "$2" ]; then
             # Restart all servers
@@ -244,7 +244,7 @@ case "$1" in
             start_server "$2"
         fi
         ;;
-        
+
     status)
         if [ -z "$2" ]; then
             # Show status of all servers
@@ -259,11 +259,11 @@ case "$1" in
             show_status "$2"
         fi
         ;;
-        
+
     list)
         list_servers
         ;;
-        
+
     *)
         usage
         ;;

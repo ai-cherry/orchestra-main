@@ -13,7 +13,7 @@ try:
     from pydantic import BaseModel, Field
 except ImportError:
     # Fallback to dataclasses if pydantic is not available
-    from dataclasses import dataclass, field
+    from dataclasses import field
 
     BaseModel = object
 

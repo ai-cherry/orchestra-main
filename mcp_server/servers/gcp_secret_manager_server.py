@@ -7,18 +7,19 @@ through the Model Context Protocol (MCP).
 """
 
 import logging
-from typing import Dict, Any, List, Optional
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
-from google.cloud import secretmanager
-from google.api_core.exceptions import NotFound
+from typing import Any, Dict, List, Optional
 
-# --- Shared GCP Client Utility ---
-from mcp_server.utils.gcp_client import init_gcp_client
+from fastapi import FastAPI, HTTPException
+from google.api_core.exceptions import NotFound
+from google.cloud import secretmanager
+from pydantic import BaseModel, Field
 
 # --- MCP CONFIG IMPORTS ---
 from mcp_server.config.loader import load_config
 from mcp_server.config.models import MCPConfig
+
+# --- Shared GCP Client Utility ---
+from mcp_server.utils.gcp_client import init_gcp_client
 
 gcp_config: MCPConfig = load_config()
 PROJECT_ID = getattr(gcp_config, "gcp_project_id", None) or "your-gcp-project"
@@ -123,6 +124,7 @@ async def create_secret(request: CreateSecretRequest):
         return {"status": "success", "secret_id": request.secret_id}
     except Exception as e:
         from mcp_server.utils.gcp_client import handle_gcp_error
+
         raise HTTPException(status_code=500, detail=handle_gcp_error(e, "Failed to create secret"))
 
 
@@ -140,6 +142,7 @@ async def get_secret(secret_id: str):
         raise HTTPException(status_code=404, detail=f"Secret {secret_id} not found")
     except Exception as e:
         from mcp_server.utils.gcp_client import handle_gcp_error
+
         raise HTTPException(status_code=500, detail=handle_gcp_error(e, "Failed to get secret"))
 
 
@@ -157,6 +160,7 @@ async def update_secret(request: UpdateSecretRequest):
         raise HTTPException(status_code=404, detail=f"Secret {request.secret_id} not found")
     except Exception as e:
         from mcp_server.utils.gcp_client import handle_gcp_error
+
         raise HTTPException(status_code=500, detail=handle_gcp_error(e, "Failed to update secret"))
 
 
@@ -171,6 +175,7 @@ async def list_secrets():
         return {"secrets": [{"name": secret.name, "labels": dict(secret.labels)} for secret in secrets]}
     except Exception as e:
         from mcp_server.utils.gcp_client import handle_gcp_error
+
         raise HTTPException(status_code=500, detail=handle_gcp_error(e, "Failed to list secrets"))
 
 

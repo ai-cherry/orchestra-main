@@ -8,14 +8,11 @@ associated with Vertex AI usage in the AI Orchestra project.
 import asyncio
 import datetime
 import logging
-from typing import Dict, List, Optional, Union, Any, Tuple
-
-from google.cloud import monitoring_v3
-from google.cloud.monitoring_v3 import query
-from google.cloud import secretmanager
+from typing import Any, Dict, List, Optional
 
 from ai_orchestra.core.config import settings
-from ai_orchestra.utils.logging import log_event, log_start, log_end, log_error
+from ai_orchestra.utils.logging import log_end, log_error, log_event, log_start
+from google.cloud import monitoring_v3, secretmanager
 
 logger = logging.getLogger("ai_orchestra.infrastructure.gcp.vertex_ai_cost_manager")
 

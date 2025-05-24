@@ -4,13 +4,13 @@ Test script to verify all MCP servers work together
 """
 
 import asyncio
-import httpx
-import json
 from datetime import datetime
+
+import httpx
 from rich.console import Console
-from rich.table import Table
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.table import Table
 
 console = Console()
 

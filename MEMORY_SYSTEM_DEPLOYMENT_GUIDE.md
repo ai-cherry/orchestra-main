@@ -10,6 +10,7 @@ The memory system now supports separation of two distinct data types:
 2. **Personal User Information**: User conversations, preferences, potentially containing PII
 
 This separation is managed through:
+
 - Enhanced `StorageConfig` with environment, namespace, and privacy settings
 - Specialized managers (`DevNotesManager` and `PrivacyEnhancedMemoryManager`)
 - Collection namespacing for proper isolation
@@ -20,6 +21,7 @@ This separation is managed through:
 ### 1. Review Current Memory Documentation
 
 Ensure you've reviewed these documents:
+
 - `docs/memory_data_separation_guide.md`
 - `docs/memory_system_usage_examples.md`
 
@@ -34,6 +36,7 @@ python scripts/configure_memory_for_deployment.py --env dev
 ```
 
 This configures the memory system with dev-appropriate settings:
+
 - Development notes enabled
 - Standard privacy level
 - No PII redaction in development
@@ -140,15 +143,15 @@ After configuring each environment, run these checks:
 # Add to your verification scripts
 async def verify_memory_collections():
     firestore_client = firestore.Client()
-    
+
     # List collections
     collections = list(firestore_client.collections())
     collection_names = [c.id for c in collections]
-    
+
     # Check for proper environment prefixes/suffixes
     dev_collections = [c for c in collection_names if "_dev" in c]
     prod_collections = [c for c in collection_names if "_prod" in c]
-    
+
     print(f"Dev collections: {dev_collections}")
     print(f"Prod collections: {prod_collections}")
 ```
@@ -246,7 +249,7 @@ If you can't find data where expected:
 async def list_collection_documents(collection_name):
     base_adapter = FirestoreMemoryAdapter()
     await base_adapter.initialize()
-    
+
     docs = await base_adapter.list_documents(collection_name)
     for doc in docs:
         print(f"Document ID: {doc.id}, Data: {doc.to_dict()}")

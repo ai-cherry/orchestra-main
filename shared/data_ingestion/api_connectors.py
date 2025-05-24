@@ -10,24 +10,25 @@ Author: Orchestra AI Platform
 """
 
 import abc
-from typing import Any, AsyncGenerator, Dict, List, Optional, Union, AsyncIterator
+import asyncio
 import json
 from datetime import datetime
 from pathlib import Path
-import asyncio
+from typing import Any, AsyncGenerator, AsyncIterator, Dict, List, Optional, Union
 from urllib.parse import urljoin
 
 import aiohttp
 from aiohttp import ClientTimeout
 
+# The following imports are for the previously generated classes that are part of this file
+from shared.data_ingestion.base_processor import (  # This is for the *existing* integrated design
+    BaseProcessor,
+    ProcessedData,
+)
+
 # This BaseProcessor is from the *new* design in base_processor.py
 # from .base_processor import BaseProcessor, ProcessedData # This was for the other design
 
-# The following imports are for the previously generated classes that are part of this file
-from shared.data_ingestion.base_processor import (
-    BaseProcessor,
-    ProcessedData,
-)  # This is for the *existing* integrated design
 
 
 # ---- User-provided/Newer API Connector Structure ----

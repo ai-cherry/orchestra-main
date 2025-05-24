@@ -7,12 +7,12 @@ handling storage, retrieval, and management of memory items with TTL support.
 """
 
 import json
-import time
 import logging
 import threading
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Union
+import time
 from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 # Configure logging
 logger = logging.getLogger("mcp-memory-store")

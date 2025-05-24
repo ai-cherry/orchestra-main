@@ -106,12 +106,14 @@ gcloud logging read "resource.type=cloud_run_revision AND resource.labels.servic
 ### Image Not Found
 
 If Terraform can't find your image, ensure:
+
 - The image was pushed successfully to Artifact Registry
 - The image name in `infra/dev/main.tf` matches exactly what you pushed
 
 ### Service Unavailable
 
 If the service deploys but returns errors:
+
 - Check the Cloud Run logs for specific error messages
 - Verify that all required environment variables are set in your Terraform configuration
 - Ensure the service account has the necessary permissions
@@ -119,6 +121,7 @@ If the service deploys but returns errors:
 ### Terraform State Issues
 
 If you encounter Terraform state issues:
+
 - Consider using remote state as described in `docs/infra.md`
 - Run `terraform state list` to see what resources are currently tracked
 

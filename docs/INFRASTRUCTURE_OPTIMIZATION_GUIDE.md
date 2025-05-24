@@ -163,28 +163,33 @@ We've optimized the Cloud Run configuration for better performance, scalability,
 Follow these steps to implement the infrastructure optimizations:
 
 1. **Secure Exposed Credentials**:
+
    ```bash
    ./secure_exposed_credentials.sh
    ```
 
 2. **Set Up Secure Credential Management**:
+
    ```bash
    ./setup_secure_credentials.sh
    ```
 
 3. **Update Development Environment**:
+
    ```bash
    cp .devcontainer/setup.optimized.sh .devcontainer/setup.sh
    ./.devcontainer/setup.sh
    ```
 
 4. **Update Docker Configuration**:
+
    ```bash
    cp Dockerfile.optimized Dockerfile
    cp docker-compose.optimized.yml docker-compose.yml
    ```
 
 5. **Deploy Terraform Infrastructure**:
+
    ```bash
    cd terraform/environments/dev
    terraform init
@@ -193,6 +198,7 @@ Follow these steps to implement the infrastructure optimizations:
    ```
 
 6. **Update GitHub Actions Workflow**:
+
    ```bash
    cp .github/workflows/optimized-deployment.yml .github/workflows/deployment.yml
    ```

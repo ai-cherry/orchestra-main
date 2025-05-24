@@ -87,6 +87,7 @@ Developers working with this codebase should:
 The Orchestrator codebase is in a transition state, with significant improvements already implemented through the unified components. By completing the migration to these components and standardizing on consistent patterns across the codebase, the system can achieve a more maintainable and extensible architecture.
 
 The priorities should be:
+
 1. Reducing duplication through component consolidation
 2. Establishing clear interface boundaries
 3. Ensuring robust component lifecycle management

@@ -21,8 +21,7 @@ import socket
 import subprocess
 import sys
 import time
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, Dict, List, Optional
 
 # Configure logging
 logging.basicConfig(
@@ -35,13 +34,13 @@ logger = logging.getLogger("mcp-server-management")
 try:
     from gcp_migration.mcp_client_enhanced import (
         MCPClient,
-        MCPResponse,
-        get_client as get_mcp_client,
     )
+    from gcp_migration.mcp_client_enhanced import get_client as get_mcp_client
 except ImportError:
     logger.warning("Could not import enhanced MCP client, attempting to import basic client")
     try:
-        from gcp_migration.mcp_client import MCPClient, get_client as get_mcp_client
+        from gcp_migration.mcp_client import MCPClient
+        from gcp_migration.mcp_client import get_client as get_mcp_client
     except ImportError:
         logger.error("Failed to import MCP client. MCP server management will operate in standalone mode.")
         MCPClient = object
@@ -287,7 +286,7 @@ class MCPServerManager:
         try:
             # Find MCP server module
             try:
-                from mcp_server import run_server
+                # from mcp_server import run_server  # Unused import removed
 
                 # Use imported run_server function
                 logger.info("Using imported MCP server module")
@@ -729,11 +728,10 @@ class MCPIntegrationHelper:
         # Initialize Orchestra System with MCP client
         try:
             from orchestra_system.api import initialize_system
-            from gcp_migration.mcp_client import get_client
 
+            # from gcp_migration.mcp_client import get_client  # Unused import removed
             # Get MCP client
-            mcp_client = get_client()
-
+            # mcp_client = get_client()  # Unused variable removed
             # Initialize system with MCP client
             asyncio.run(initialize_system())
 
@@ -926,7 +924,7 @@ async def main():
         results = await helper.sync_orchestra_data_to_mcp()
 
         if results.get("success", False):
-            print(f"Orchestra data synchronized to MCP memory:")
+            print("Orchestra data synchronized to MCP memory:")
             print(f"  - {results.get('resources_count', 0)} resources")
             print(f"  - {results.get('configs_count', 0)} configurations")
             print(f"  - {results.get('conflicts_count', 0)} conflicts")
@@ -938,7 +936,7 @@ async def main():
     if args.info:
         if manager.check_server_status():
             info = manager.get_server_info()
-            print(f"MCP server info:")
+            print("MCP server info:")
             print(f"  - Host: {info['host']}")
             print(f"  - Port: {info['port']}")
             print(f"  - Running: {info['is_running']}")

@@ -7,6 +7,7 @@ This document describes the Simplified Agent Registry implementation for the AI 
 The Simplified Agent Registry is a lightweight alternative to the more complex agent registry implementations in the codebase. It focuses on core functionality while removing security-related features like circuit breakers, extensive error handling, and complex lifecycle management.
 
 Key benefits:
+
 - **Simplified Code**: Easier to understand and maintain
 - **Improved Performance**: Less overhead from security checks and error handling
 - **Faster Development**: Simpler API for registering and using agents
@@ -14,28 +15,30 @@ Key benefits:
 
 ## Comparison with Other Implementations
 
-| Feature | Original Registry | Enhanced Registry | Simplified Registry |
-|---------|------------------|-------------------|---------------------|
-| Agent Registration | ✅ | ✅ | ✅ |
-| Agent Selection | ✅ | ✅ | ✅ |
-| Capability-based Selection | ❌ | ✅ | ✅ |
-| Circuit Breaker | ✅ | ❌ | ❌ |
-| Fallback Handling | ✅ | ❌ | ❌ |
-| Incident Reporting | ✅ | ❌ | ❌ |
-| Lifecycle Management | ❌ | ✅ | ❌ |
-| Event-based Communication | ❌ | ✅ | ❌ |
-| Dependency Injection | ✅ | ✅ | ✅ |
-| Agent Factory | ❌ | ✅ | ❌ |
+| Feature                    | Original Registry | Enhanced Registry | Simplified Registry |
+| -------------------------- | ----------------- | ----------------- | ------------------- |
+| Agent Registration         | ✅                | ✅                | ✅                  |
+| Agent Selection            | ✅                | ✅                | ✅                  |
+| Capability-based Selection | ❌                | ✅                | ✅                  |
+| Circuit Breaker            | ✅                | ❌                | ❌                  |
+| Fallback Handling          | ✅                | ❌                | ❌                  |
+| Incident Reporting         | ✅                | ❌                | ❌                  |
+| Lifecycle Management       | ❌                | ✅                | ❌                  |
+| Event-based Communication  | ❌                | ✅                | ❌                  |
+| Dependency Injection       | ✅                | ✅                | ✅                  |
+| Agent Factory              | ❌                | ✅                | ❌                  |
 
 ## When to Use
 
 Use the Simplified Agent Registry when:
+
 - You need maximum performance
 - You're working in a trusted environment
 - You don't need advanced features like circuit breakers or event-based communication
 - You want to minimize dependencies and complexity
 
 Use the original or enhanced registries when:
+
 - You need robust error handling and fallbacks
 - You're working in a production environment with strict reliability requirements
 - You need advanced features like lifecycle management or event-based communication
@@ -89,7 +92,7 @@ class CustomAgent:
     def __init__(self):
         self.agent_type = "custom_agent"
         self.capabilities = [AgentCapability.TEXT_GENERATION]
-    
+
     async def process(self, user_input: str) -> str:
         return f"CustomAgent processed: {user_input}"
 
@@ -140,6 +143,7 @@ See `examples/simplified_agent_example.py` for a complete example of using the s
 To migrate from the original or enhanced registry to the simplified registry:
 
 1. Update imports:
+
    ```python
    # From
    from core.orchestrator.src.agents.agent_registry import get_agent_registry
@@ -148,6 +152,7 @@ To migrate from the original or enhanced registry to the simplified registry:
    ```
 
 2. Update agent registration:
+
    ```python
    # From
    registry = get_agent_registry()
@@ -158,6 +163,7 @@ To migrate from the original or enhanced registry to the simplified registry:
    ```
 
 3. Update agent selection:
+
    ```python
    # From
    agent = registry.select_agent_for_context(context)

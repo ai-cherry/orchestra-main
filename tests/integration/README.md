@@ -7,6 +7,7 @@ This directory contains integration tests for the Orchestra Business Intelligenc
 The implementation includes:
 
 1. **Business Intelligence Tools**: Located in `packages/tools/src/`
+
    - `gong.py`: Interface with Gong API for call transcripts and insights
    - `hubspot.py`: Manage HubSpot CRM contacts and deals
    - `netsuite.py`: Access inventory data from NetSuite
@@ -15,10 +16,11 @@ The implementation includes:
    - `looker.py`: Run analytics queries and access Looker dashboards
 
 2. **Agent Configurations**: Located in `config/agents.yaml`
+
    - Individual agent definitions for each tool
    - Team configuration that references individual agents as members
 
-3. **Enhanced Team Support**: 
+3. **Enhanced Team Support**:
    - `packages/agents/src/phidata/team_wrapper.py`: Handles agent references in team member configuration
    - `packages/agents/src/registry.py`: Updated to use the enhanced team wrapper
 
@@ -52,6 +54,7 @@ Integration tests focus on the interaction between components:
 ### Setup
 
 1. Install dependencies:
+
 ```bash
 poetry install
 # or
@@ -59,6 +62,7 @@ pip install -r requirements-dev.txt
 ```
 
 2. Set up environment variables (or run with mocks):
+
 ```bash
 source .env  # Or add to your environment
 ```
@@ -66,11 +70,13 @@ source .env  # Or add to your environment
 ### Execute Tests
 
 Run specific business intelligence agent integration tests:
+
 ```bash
 pytest tests/integration/test_phidata_team_agents.py -v
 ```
 
 Run all integration tests:
+
 ```bash
 pytest tests/integration/ -v
 ```

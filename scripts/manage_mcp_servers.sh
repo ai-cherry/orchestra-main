@@ -31,7 +31,7 @@ SERVERS["cloud_run"]="gcp_cloud_run_server.py:8001"
 is_running() {
     local server_name=$1
     local pid_file="$PID_DIR/$server_name.pid"
-    
+
     if [ -f "$pid_file" ]; then
         local pid=$(cat "$pid_file")
         if ps -p "$pid" > /dev/null 2>&1; then
@@ -49,32 +49,32 @@ start_server() {
     local server_info=${SERVERS[$server_name]}
     local server_file=$(echo $server_info | cut -d: -f1)
     local server_port=$(echo $server_info | cut -d: -f2)
-    
+
     if is_running "$server_name"; then
         echo -e "${YELLOW}⚠️  $server_name is already running${NC}"
         return 0
     fi
-    
+
     if [ ! -f "$MCP_SERVER_DIR/$server_file" ]; then
         echo -e "${RED}❌ Server file not found: $server_file${NC}"
         return 1
     fi
-    
+
     echo -e "${BLUE}🚀 Starting $server_name on port $server_port...${NC}"
-    
+
     # Source environment variables
     if [ -f "$BASE_DIR/.env" ]; then
         export $(cat "$BASE_DIR/.env" | grep -v '^#' | xargs)
     fi
-    
+
     # Start the server
     cd "$BASE_DIR"
     nohup python "$MCP_SERVER_DIR/$server_file" > "$LOG_DIR/$server_name.log" 2>&1 &
     local pid=$!
-    
+
     # Save PID
     echo $pid > "$PID_DIR/$server_name.pid"
-    
+
     # Wait a moment and check if it started
     sleep 2
     if is_running "$server_name"; then
@@ -91,29 +91,29 @@ start_server() {
 stop_server() {
     local server_name=$1
     local pid_file="$PID_DIR/$server_name.pid"
-    
+
     if ! is_running "$server_name"; then
         echo -e "${YELLOW}⚠️  $server_name is not running${NC}"
         return 0
     fi
-    
+
     local pid=$(cat "$pid_file")
     echo -e "${BLUE}🛑 Stopping $server_name (PID: $pid)...${NC}"
-    
+
     kill -TERM "$pid" 2>/dev/null || true
-    
+
     # Wait for graceful shutdown
     local count=0
     while is_running "$server_name" && [ $count -lt 10 ]; do
         sleep 1
         ((count++))
     done
-    
+
     # Force kill if still running
     if is_running "$server_name"; then
         kill -KILL "$pid" 2>/dev/null || true
     fi
-    
+
     rm -f "$pid_file"
     echo -e "${GREEN}✅ $server_name stopped${NC}"
 }
@@ -123,11 +123,11 @@ status_server() {
     local server_name=$1
     local server_info=${SERVERS[$server_name]}
     local server_port=$(echo $server_info | cut -d: -f2)
-    
+
     if is_running "$server_name"; then
         local pid=$(cat "$PID_DIR/$server_name.pid")
         echo -e "${GREEN}✅ $server_name is running (PID: $pid, Port: $server_port)${NC}"
-        
+
         # Try to check health endpoint
         if command -v curl &> /dev/null; then
             local health_url="http://localhost:$server_port/health"
@@ -155,7 +155,7 @@ restart_server() {
 show_logs() {
     local server_name=$1
     local log_file="$LOG_DIR/$server_name.log"
-    
+
     if [ -f "$log_file" ]; then
         echo -e "${BLUE}📜 Logs for $server_name:${NC}"
         tail -f "$log_file"

@@ -9,10 +9,9 @@ with Portkey integration.
 import logging
 import os
 from functools import lru_cache
-from typing import Union, Any, Optional
+from typing import Any
 
-from packages.shared.src.llm_client.interface import LLMClient
-from core.orchestrator.src.config.settings import get_settings, Settings
+from core.orchestrator.src.config.settings import Settings, get_settings
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -102,8 +101,7 @@ def use_phidata_implementation(settings: Settings) -> bool:
 
     # Check if required packages are available
     try:
-        import agno
-        import portkey_ai
+        pass
 
         return True
     except ImportError:

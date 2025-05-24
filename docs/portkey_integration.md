@@ -28,7 +28,7 @@ pip install portkey-ai
 
 ### What Are Virtual Keys?
 
-Virtual Keys are a Portkey feature that provides a secure way to manage LLM provider API keys. Instead of directly using 
+Virtual Keys are a Portkey feature that provides a secure way to manage LLM provider API keys. Instead of directly using
 provider keys (like OpenAI, Anthropic, etc.) in your code, you create virtual keys in Portkey that
 reference these provider keys. Benefits include:
 
@@ -199,13 +199,13 @@ if cached_response:
 else:
     # Generate new response with your LLM
     response = await generate_llm_response(query)
-    
+
     # Store in semantic cache for future use
     await redis_client.portkey_store_semantic_cache(
         query="What is the capital of France?",
         response=response
     )
-    
+
     return response
 ```
 
@@ -261,7 +261,7 @@ except PortkeyError as e:
 
 ## Gateway Configurations
 
-Portkey Gateway Configurations allow you to set up advanced routing and fallback strategies between 
+Portkey Gateway Configurations allow you to set up advanced routing and fallback strategies between
 multiple LLM providers or models. This is especially powerful when combined with virtual keys.
 
 ### Creating Gateway Configurations
@@ -353,19 +353,22 @@ python -m unittest tests/test_portkey_integration.py
 ## Best Practices
 
 1. **Virtual Keys**: Use virtual keys instead of raw API keys for better security and management
+
    - Create separate virtual keys for different environments (dev, staging, prod)
    - Set budget limits to prevent unexpected costs
    - Rotate provider keys regularly without affecting your application
-   
+
 2. **Gateway Configurations**: Create gateway configurations for reliable LLM access
+
    - Use fallback strategies to handle provider outages or rate limits
    - Use load balancing to distribute traffic across providers
    - Use cost-aware routing to optimize for budget constraints
-   
+
 3. **TTL Selection**: Choose appropriate cache TTLs based on your data's freshness needs
+
    - Use shorter TTLs for time-sensitive information
    - Use longer TTLs for stable knowledge
-   
+
 4. **Monitoring**: Set up proper logging and monitoring for Portkey operations
    - Review usage statistics regularly
    - Set up budget alerts to prevent unexpected costs

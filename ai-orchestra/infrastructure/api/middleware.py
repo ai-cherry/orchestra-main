@@ -8,29 +8,23 @@ including compression, caching, and payload optimization.
 import json
 import time
 import zlib
-import brotli
 from enum import Enum
 from typing import (
+    Any,
     Callable,
     Dict,
     List,
     Optional,
     Set,
-    Tuple,
-    Any,
-    Union,
-    Awaitable,
-    cast,
 )
 
+import brotli
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse, StreamingResponse
-from fastapi.routing import APIRoute
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.types import ASGIApp, Receive, Scope, Send
-from starlette.datastructures import Headers, MutableHeaders
+from starlette.types import ASGIApp
 
-from ...utils.logging import log_event, log_start, log_end
+from ...utils.logging import log_end, log_event, log_start
 
 
 class CompressionAlgorithm(str, Enum):

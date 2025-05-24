@@ -8,7 +8,6 @@ including efficient string operations, resource cleanup, and large object handli
 import gc
 import io
 import logging
-import sys
 import weakref
 from contextlib import contextmanager
 from typing import (
@@ -16,14 +15,12 @@ from typing import (
     Callable,
     Dict,
     Generator,
+    Generic,
     Iterator,
     List,
     Optional,
-    Set,
     Tuple,
     TypeVar,
-    Union,
-    Generic,
 )
 
 logger = logging.getLogger(__name__)

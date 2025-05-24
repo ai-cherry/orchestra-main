@@ -8,9 +8,9 @@ token estimation without requiring a full tokenizer.
 """
 
 import json
-import re
 import logging
-from typing import Dict, Any, Optional, Set, List
+import re
+from typing import Any, Dict, Optional
 
 # Import from relative paths
 from ..models.memory import MemoryEntry

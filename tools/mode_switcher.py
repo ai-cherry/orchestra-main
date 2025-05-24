@@ -16,13 +16,15 @@ Each mode is optimized with a specific AI model:
 - Claude 3.7: strategy, ask, and creative modes
 """
 
-import os
-import sys
 import argparse
 import logging
+import os
+import sys
 from typing import Optional
+
 import colorama
 from colorama import Fore, Style
+
 from core.logging_config import configure_logging
 
 # Add the project root to the Python path for proper imports
@@ -30,7 +32,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
 
 # Import the mode manager
-from core.mode_manager import get_mode_manager, ModeManager
+from core.mode_manager import ModeManager, get_mode_manager
 
 # Configure logging
 configure_logging()

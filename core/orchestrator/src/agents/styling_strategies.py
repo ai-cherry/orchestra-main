@@ -21,7 +21,6 @@ class InteractionStylingStrategy(ABC):
         Returns:
             The styled text.
         """
-        pass
 
 
 class FormalStyling(InteractionStylingStrategy):

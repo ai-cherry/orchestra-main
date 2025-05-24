@@ -102,7 +102,16 @@
       "url": "http://localhost:8004",
       "description": "AI agent orchestration and mode management",
       "capabilities": ["switchMode", "runWorkflow", "getStatus", "executeTask"],
-      "modes": ["standard", "code", "debug", "architect", "strategy", "ask", "creative", "performance"],
+      "modes": [
+        "standard",
+        "code",
+        "debug",
+        "architect",
+        "strategy",
+        "ask",
+        "creative",
+        "performance"
+      ],
       "tools": [
         {
           "name": "switch_mode",
@@ -156,15 +165,31 @@
     },
     "test_automation": {
       "description": "Generate and run tests automatically",
-      "steps": ["analyze_code", "generate_tests", "run_tests", "coverage_report"]
+      "steps": [
+        "analyze_code",
+        "generate_tests",
+        "run_tests",
+        "coverage_report"
+      ]
     },
     "performance_optimization": {
       "description": "Optimize code performance",
-      "steps": ["profile_code", "identify_bottlenecks", "optimize_performance", "benchmark"]
+      "steps": [
+        "profile_code",
+        "identify_bottlenecks",
+        "optimize_performance",
+        "benchmark"
+      ]
     },
     "deployment": {
       "description": "Full deployment pipeline",
-      "steps": ["run_tests", "build_image", "deploy_staging", "smoke_test", "deploy_production"]
+      "steps": [
+        "run_tests",
+        "build_image",
+        "deploy_staging",
+        "smoke_test",
+        "deploy_production"
+      ]
     },
     "memory_consolidation": {
       "description": "Consolidate short-term memories to long-term storage",

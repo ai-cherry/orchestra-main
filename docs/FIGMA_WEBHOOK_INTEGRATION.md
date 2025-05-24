@@ -75,6 +75,7 @@ chmod +x scripts/setup_figma_webhook.sh
 ```
 
 The script will:
+
 - Create a webhook in Figma
 - Generate a webhook secret
 - Save webhook details to `figma_webhook_details.json`
@@ -96,6 +97,7 @@ python scripts/improve_component_mapping.py
 ```
 
 This will analyze the mappings between components defined in `component-adaptation-mapping.json` and their implementations in:
+
 - `packages/ui/src/tokens/variables.js`
 - `packages/ui/android/src/main/res/values/styles.xml`
 
@@ -108,6 +110,7 @@ python scripts/verify_cline_tools.py
 ```
 
 This checks for:
+
 - figma-sync (v1.3.0+)
 - terraform-linter (v2.8+)
 - gcp-cost (v0.9+)
@@ -126,6 +129,7 @@ The webhook triggers the `.github/workflows/figma-gcp-sync.yml` workflow which p
 ### Design Token Generation
 
 The `figma_gcp_sync.py` script:
+
 - Fetches design variables from Figma
 - Generates platform-specific implementation files:
   - CSS variables
@@ -138,6 +142,7 @@ The `figma_gcp_sync.py` script:
 ### Error Handling
 
 The workflow includes error handling for:
+
 - Figma API failures
 - Validation errors in design tokens
 - Deployment issues
@@ -188,6 +193,7 @@ It's recommended to rotate the Figma PAT and webhook secret periodically:
 ### Monitoring
 
 Monitor the webhook health:
+
 - Check GitHub Actions workflow runs
 - Review Figma webhook logs in Team settings
 - Monitor GCP logs for sync operations

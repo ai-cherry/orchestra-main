@@ -3,9 +3,9 @@ Force standard mode by patching the core/orchestrator/src/main.py module directl
 This script runs before the application starts and modifies the in-memory module.
 """
 
-import sys
 import importlib
 import os
+import sys
 
 
 def patch_module():
@@ -53,8 +53,8 @@ def patch_module():
         core.orchestrator.src.main.RECOVERY_MODE = False
         core.orchestrator.src.main.STANDARD_MODE = True
 
-        print(f"DEBUG: HARD OVERRIDE ACTIVE: RECOVERY_MODE=False, STANDARD_MODE=True")
-        print(f"Starting with RECOVERY_MODE=False, STANDARD_MODE=True (HARD OVERRIDE)")
+        print("DEBUG: HARD OVERRIDE ACTIVE: RECOVERY_MODE=False, STANDARD_MODE=True")
+        print("Starting with RECOVERY_MODE=False, STANDARD_MODE=True (HARD OVERRIDE)")
     except ImportError as e:
         print(f"Warning: Could not import core.orchestrator.src.main module: {e}")
         print("Will continue with environment variables only.")

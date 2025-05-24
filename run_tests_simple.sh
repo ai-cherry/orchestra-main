@@ -14,7 +14,7 @@ echo -e "Activating virtual environment..."
 source .venv/bin/activate || {
     echo -e "${YELLOW}Failed to activate virtual environment. Creating a new one...${NC}"
     python -m venv .venv
-    source .venv/bin/activate || { 
+    source .venv/bin/activate || {
         echo -e "${YELLOW}Failed to create virtual environment. Proceeding without it.${NC}"
     }
 }

@@ -18,16 +18,15 @@ The system optimizes model usage by assigning:
 - Claude 3.7: strategy, ask, and creative modes
 """
 
-import os
-import sys
 import logging
+import os
 import re
 from dataclasses import dataclass, field
-from enum import Enum
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Set, Tuple, Union, ClassVar
-import yaml
 from datetime import datetime
+from pathlib import Path
+from typing import Any, ClassVar, Dict, List, Optional, Tuple, Union
+
+import yaml
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -43,13 +42,9 @@ WORKFLOW_STATE_PATH = CONFIG_DIR / "workflow_state.yaml"
 class FileAccessError(Exception):
     """Exception raised when a mode attempts to access a restricted file."""
 
-    pass
-
 
 class WorkflowError(Exception):
     """Exception raised for workflow-related errors."""
-
-    pass
 
 
 @dataclass

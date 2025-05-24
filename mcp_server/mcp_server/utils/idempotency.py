@@ -6,14 +6,14 @@ This module provides utilities for implementing idempotent operations in the MCP
 It includes key generation, result caching, and decorators for making functions idempotent.
 """
 
-import json
+import asyncio
+import functools
 import hashlib
+import json
 import time
 import uuid
-import functools
-import asyncio
-from typing import Dict, Any, Optional, Callable, Awaitable, TypeVar, cast, Union, List
-from datetime import datetime, timedelta
+from datetime import datetime
+from typing import Any, Awaitable, Callable, Dict, Optional, TypeVar, Union, cast
 
 # Import Redis with fallback
 try:
@@ -23,7 +23,7 @@ try:
 except ImportError:
     HAS_REDIS = False
 
-from .structured_logging import get_logger, with_correlation_id
+from .structured_logging import get_logger
 
 logger = get_logger(__name__)
 

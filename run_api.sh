@@ -122,7 +122,7 @@ if [ $IMPORT_FAILED -eq 1 ]; then
                 break
             fi
         done
-        
+
         if [ $IMPORT_FAILED -eq 1 ]; then
             echo -e "${RED}Dependencies still missing after fix attempt. Continuing anyway...${NC}"
         else

@@ -15,20 +15,15 @@ Environment variables:
 - SECRETS: Comma-separated list of secrets to rotate
 """
 
-import base64
 import datetime
-import json
 import logging
 import os
 import random
 import secrets
 import string
-import time
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 import functions_framework
-import google.auth
-import google.auth.transport.requests
 from google.cloud import secretmanager
 
 # Configure logging

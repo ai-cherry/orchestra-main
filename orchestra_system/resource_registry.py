@@ -18,11 +18,10 @@ import asyncio
 import json
 import logging
 import os
-import time
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Union, TypeVar, Generic, cast
+from typing import Any, Dict, List, Optional
 
 # Configure logging
 logging.basicConfig(
@@ -36,12 +35,13 @@ try:
     from gcp_migration.mcp_client_enhanced import (
         MCPClient,
         MCPResponse,
-        get_client as get_mcp_client,
     )
+    from gcp_migration.mcp_client_enhanced import get_client as get_mcp_client
 except ImportError:
     logger.warning("Could not import enhanced MCP client, attempting to import basic client")
     try:
-        from gcp_migration.mcp_client import MCPClient, get_client as get_mcp_client
+        from gcp_migration.mcp_client import MCPClient
+        from gcp_migration.mcp_client import get_client as get_mcp_client
 
         # Define a minimal MCPResponse if using the basic client
         class MCPResponse:
@@ -727,7 +727,6 @@ class ResourceRegistry:
         Returns:
             Version string if available, None otherwise
         """
-        import subprocess
 
         # Version command mapping
         version_commands = {
@@ -784,7 +783,7 @@ class ResourceRegistry:
 
         try:
             # Get active GCP project
-            import subprocess
+            pass
 
             process = await asyncio.create_subprocess_exec(
                 "gcloud",
@@ -836,7 +835,7 @@ class ResourceRegistry:
         """
         try:
             # Get enabled APIs
-            import subprocess
+            pass
 
             process = await asyncio.create_subprocess_exec(
                 "gcloud",
@@ -895,7 +894,7 @@ class ResourceRegistry:
 
         try:
             # Get git remote origin URL
-            import subprocess
+            pass
 
             process = await asyncio.create_subprocess_exec(
                 "git",
@@ -1223,7 +1222,6 @@ async def verify_resources() -> Dict[str, ResourceStatus]:
 
 if __name__ == "__main__":
     """Run the resource registry as a script to discover resources."""
-    import asyncio
     import argparse
 
     parser = argparse.ArgumentParser(description="Resource Registry for AI Orchestra")

@@ -2,4 +2,4 @@ fastapi
 uvicorn[standard]
 openai
 structlog
-# Add other dependencies here 
+# Add other dependencies here

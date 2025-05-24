@@ -232,7 +232,8 @@ What might be causing these errors and how can I set up better logging to diagno
 
 Here's an example of how to have an effective conversation with Gemini about GCP and GitHub integration:
 
-**User**: 
+**User**:
+
 ```
 I need to set up a CI/CD pipeline for my AI application that uses Vertex AI. The application is a FastAPI service that calls Vertex AI endpoints for predictions. I want to use GitHub Actions for CI/CD and deploy to Cloud Run. What's the best way to structure this?
 ```
@@ -241,6 +242,7 @@ I need to set up a CI/CD pipeline for my AI application that uses Vertex AI. The
 [Provides initial recommendations]
 
 **User**:
+
 ```
 That's helpful. Now I need to set up authentication between GitHub Actions and GCP. I've heard about Workload Identity Federation but I'm not sure how to implement it. Can you provide specific steps and configurations?
 ```
@@ -249,6 +251,7 @@ That's helpful. Now I need to set up authentication between GitHub Actions and G
 [Provides detailed instructions for Workload Identity Federation]
 
 **User**:
+
 ```
 I'm getting this error when trying to set up Workload Identity Federation: [error message]. What might be causing this?
 ```

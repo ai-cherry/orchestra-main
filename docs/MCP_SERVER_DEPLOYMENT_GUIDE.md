@@ -7,12 +7,14 @@ This guide provides instructions for deploying the MCP (Model Context Protocol) 
 Before deploying the MCP server, ensure you have the following:
 
 1. A GCP project with the following APIs enabled:
+
    - Cloud Run API
    - Container Registry API
    - Secret Manager API
    - IAM API
 
 2. GitHub organization with the following secrets configured:
+
    - `GCP_PROJECT_ID`: The ID of your GCP project
    - `GCP_PROJECT_NUMBER`: The numeric ID of your GCP project
    - `GCP_REGION`: The GCP region to deploy to (e.g., `us-central1`)
@@ -38,6 +40,7 @@ To deploy the MCP server manually, run the following command:
 Where `[environment]` is optional and defaults to `dev`. Valid environments are `dev`, `staging`, and `prod`.
 
 This script will:
+
 1. Set up GCP credentials using the `GCP_PROJECT_ADMIN_KEY` environment variable
 2. Update Poetry dependencies
 3. Build a Docker image
@@ -52,6 +55,7 @@ To set up powerful service accounts for Vertex AI and Gemini, run:
 ```
 
 This script will:
+
 1. Create a Vertex AI service account with extensive permissions
 2. Create a Gemini service account with necessary permissions
 3. Update GitHub organization secrets with the new service account keys
@@ -61,6 +65,7 @@ This script will:
 The repository includes a GitHub Actions workflow that automatically deploys the MCP server when changes are pushed to the `main` branch or when manually triggered.
 
 To manually trigger a deployment:
+
 1. Go to the "Actions" tab in the GitHub repository
 2. Select the "Deploy MCP Server" workflow
 3. Click "Run workflow"
@@ -81,11 +86,13 @@ The MCP server uses the following environment variables:
 If you encounter dependency resolution issues with Poetry, try the following:
 
 1. Update Poetry to the latest version:
+
    ```bash
    pip install --upgrade poetry
    ```
 
 2. Clear Poetry's cache:
+
    ```bash
    poetry cache clear --all pypi
    ```

@@ -9,14 +9,14 @@ DragonflyDB is a Redis-compatible in-memory datastore that provides
 high performance and modern architecture.
 """
 
-import os
-import logging
 import json
-import asyncio
-from typing import Dict, Any, List, Optional, Union
+import logging
+import os
+from typing import Any, Dict, List, Optional
+
+import redis.asyncio as redis
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
-import redis.asyncio as redis
 from redis.asyncio.connection import ConnectionPool
 
 # Configure logging

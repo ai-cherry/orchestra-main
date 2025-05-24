@@ -5,11 +5,11 @@ Pytest configuration for MCP server tests.
 This module provides fixtures for testing the MCP server components.
 """
 
-import os
 import tempfile
-import pytest
 from pathlib import Path
 from unittest.mock import MagicMock
+
+import pytest
 
 from mcp_server.storage.memory_store import MemoryStore
 from mcp_server.tools.tool_manager import ToolManager

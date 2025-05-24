@@ -14,18 +14,16 @@ Key features:
 - Security and authentication layer
 """
 
+import argparse
+import json
+import logging
 import os
 import sys
-import json
 import time
-import logging
-import argparse
-from pathlib import Path
-from typing import Dict, List, Any, Optional, Union
+from typing import Any, Dict, Optional
 
 try:
-    import flask
-    from flask import Flask, request, jsonify
+    from flask import Flask, jsonify, request
     from flask_cors import CORS
     from flask_socketio import SocketIO
 except ImportError:
@@ -34,24 +32,17 @@ except ImportError:
 
 # Import configuration loader
 # Import configuration loader
-from .config.loader import (
-    load_config_from_file,
-    load_config_from_env,
-    merge_configs,
-    load_config,
-)
+
+from .health_check import register_health_endpoints
+from .managers.performance_memory_manager import PerformanceMemoryManager
+from .storage.memory_adapter import StorageBridgeAdapter
 
 # Import enhanced storage and server components
 from .storage.memory_store import MemoryStore
 from .storage.optimized_memory_storage import OptimizedMemoryStorage
-from .storage.sync_storage_adapter import SyncStorageAdapter
-from .storage.memory_adapter import StorageBridgeAdapter
 from .tools.tool_manager import ToolManager
-from .workflows.workflow_manager import WorkflowManager
-from .managers.performance_memory_manager import PerformanceMemoryManager
-from .utils.performance_tuner import PerformanceTuner
 from .utils.performance_monitor import get_performance_monitor
-from .health_check import register_health_endpoints
+from .workflows.workflow_manager import WorkflowManager
 
 # Configure logging
 logging.basicConfig(
@@ -139,7 +130,7 @@ class MCPServer:
             logger.warning("Performance tuner not available. Performance optimizations disabled.")
             self.perf_tuner = None  # Use injected dependencies or create optimized instances
         memory_config = self.config.get("memory", {}) if isinstance(self.config, dict) else self.config.memory.dict()
-        self.memory_store = memory_store = MemoryStore(memory_config)
+        self.memory_store = MemoryStore(memory_config)
 
         # Initialize performance monitor
         self.perf_monitor = get_performance_monitor()
@@ -438,6 +429,7 @@ class MCPServer:
     def _get_memory_usage(self) -> Dict[str, Any]:
         """Get memory usage statistics."""
         import os
+
         import psutil
 
         try:

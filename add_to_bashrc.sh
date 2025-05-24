@@ -14,7 +14,7 @@ log() {
   local level=$1
   local message=$2
   local timestamp=$(date "+%Y-%m-%d %H:%M:%S")
-  
+
   case $level in
     "INFO")
       echo -e "${BLUE}[${timestamp}] [INFO] ${message}${NC}"
@@ -40,7 +40,7 @@ if grep -q "source_env_and_ensure_gcp.sh" ~/.bashrc; then
 else
   # Add the script to .bashrc
   log "INFO" "Adding source_env_and_ensure_gcp.sh to .bashrc..."
-  
+
   # Add a comment to .bashrc
   echo "" >> ~/.bashrc
   echo "# Source environment variables and ensure GCP environment variables are set correctly" >> ~/.bashrc
@@ -49,7 +49,7 @@ else
   echo "elif [ -f /workspaces/orchestra-main/source_env_and_ensure_gcp.sh ]; then" >> ~/.bashrc
   echo "  source /workspaces/orchestra-main/source_env_and_ensure_gcp.sh" >> ~/.bashrc
   echo "fi" >> ~/.bashrc
-  
+
   log "SUCCESS" "source_env_and_ensure_gcp.sh added to .bashrc!"
 fi
 

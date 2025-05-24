@@ -22,11 +22,11 @@ Environment variables:
   REDIS_HOST, REDIS_PORT, REDIS_PASSWORD: Redis connection details (optional)
 """
 
+import logging
 import os
 import sys
-from typing import Dict, List, Optional, Union
-import logging
 from pathlib import Path
+from typing import Dict
 
 # Configure logging
 logging.basicConfig(
@@ -48,7 +48,6 @@ except ImportError:
 try:
     import litellm
     from litellm import completion
-    from litellm.utils import get_secret
 except ImportError:
     logger.error("LiteLLM not installed. Run: poetry install")
     sys.exit(1)
@@ -63,7 +62,7 @@ except ImportError:
     logger.warning("Portkey not installed. Run: poetry install --with llm_gateways")
 
 try:
-    import openrouter
+    pass
 
     HAS_OPENROUTER = True
     # Set OpenRouter environment variables if not already set

@@ -5,11 +5,11 @@ This module provides a standalone manager for Portkey functionality,
 decoupled from other services like Redis.
 """
 
-import os
-import logging
 import asyncio
 import hashlib
-from typing import Dict, List, Any, Optional, Union
+import logging
+import os
+from typing import Any, Dict, List, Optional
 
 # Import Portkey (optional)
 try:

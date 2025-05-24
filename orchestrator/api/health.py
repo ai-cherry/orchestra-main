@@ -2,7 +2,7 @@
 Health check and system status endpoints.
 """
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
 router = APIRouter(tags=["health"])
 

@@ -2,11 +2,10 @@
 Memory management system for the orchestration system.
 """
 
-import time
 import os
-import json
+import time
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Any, Type
+from typing import Dict, List, Optional
 
 from google.cloud import firestore
 from google.oauth2 import service_account
@@ -21,22 +20,18 @@ class MemoryManager(ABC):
     @abstractmethod
     async def store(self, memory_item: MemoryItem) -> str:
         """Store a memory item and return its ID."""
-        pass
 
     @abstractmethod
     async def retrieve(self, memory_id: str) -> Optional[MemoryItem]:
         """Retrieve a memory item by ID."""
-        pass
 
     @abstractmethod
     async def search(self, query: str, limit: int = 10) -> List[MemoryItem]:
         """Search for memory items matching a query."""
-        pass
 
     @abstractmethod
     async def delete(self, memory_id: str) -> bool:
         """Delete a memory item by ID."""
-        pass
 
 
 class InMemoryMemoryManager(MemoryManager):

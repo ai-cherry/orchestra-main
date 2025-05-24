@@ -1,8 +1,8 @@
 from phi.agent import Agent
 from phi.model.openai import OpenAIChat
+from phi.playground import Playground, serve_playground_app
 from phi.storage.agent.sqlite import SqlAgentStorage
 from phi.tools.duckduckgo import DuckDuckGo
-from phi.playground import Playground, serve_playground_app
 
 # Define a web agent with DuckDuckGo search capability
 web_agent = Agent(

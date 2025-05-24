@@ -3,6 +3,7 @@
 This document outlines the standards and best practices for configuration management in the Orchestra project.
 
 ## Table of Contents
+
 - [Environment Variable Management](#environment-variable-management)
 - [Secret Management](#secret-management)
 - [Configuration Files](#configuration-files)
@@ -14,11 +15,13 @@ This document outlines the standards and best practices for configuration manage
 
 ### Key Principles
 
-1. **Dual-mode Support**: 
+1. **Dual-mode Support**:
+
    - Environment variables are supported via both `.env` files and Secret Manager
    - Environment variables take precedence over Secret Manager (for backward compatibility)
 
 2. **Placement Guidelines**:
+
    - `.env` file: Development-only variables, non-sensitive configuration
    - Secret Manager: Production credentials, API keys, sensitive information
 
@@ -28,20 +31,20 @@ This document outlines the standards and best practices for configuration manage
 
 ### Standard Environment Variables
 
-| Category | Environment Variable | Terraform/Secret Manager Name | Description |
-|----------|----------------------|------------------------------|-------------|
-| **Environment** | `ENVIRONMENT` | `env` | Environment name (development, staging, production) |
-| **GCP** | `GCP_PROJECT_ID` | `project_id` | Google Cloud Project ID |
-| | `GCP_LOCATION` | `region` | Primary GCP region |
-| **Database** | `POSTGRES_HOST` | N/A | PostgreSQL host address |
-| | `POSTGRES_DATABASE` | N/A | PostgreSQL database name |
-| | `POSTGRES_USER` | N/A | PostgreSQL username |
-| | `POSTGRES_PASSWORD_SECRET_NAME` | `postgres-password-[env]` | Secret name for PostgreSQL password |
-| **Redis** | `REDIS_HOST` | N/A | Redis host address |
-| | `REDIS_PORT` | N/A | Redis port |
-| | `REDIS_PASSWORD_SECRET_NAME` | `redis-auth-[env]` | Secret name for Redis password |
-| **API Keys** | `[SERVICE]_API_KEY` | `[service]-api-key-[env]` | Direct service API key (dev only) |
-| | `[SERVICE]_API_KEY_SECRET_NAME` | N/A | Secret name reference (production) |
+| Category        | Environment Variable            | Terraform/Secret Manager Name | Description                                         |
+| --------------- | ------------------------------- | ----------------------------- | --------------------------------------------------- |
+| **Environment** | `ENVIRONMENT`                   | `env`                         | Environment name (development, staging, production) |
+| **GCP**         | `GCP_PROJECT_ID`                | `project_id`                  | Google Cloud Project ID                             |
+|                 | `GCP_LOCATION`                  | `region`                      | Primary GCP region                                  |
+| **Database**    | `POSTGRES_HOST`                 | N/A                           | PostgreSQL host address                             |
+|                 | `POSTGRES_DATABASE`             | N/A                           | PostgreSQL database name                            |
+|                 | `POSTGRES_USER`                 | N/A                           | PostgreSQL username                                 |
+|                 | `POSTGRES_PASSWORD_SECRET_NAME` | `postgres-password-[env]`     | Secret name for PostgreSQL password                 |
+| **Redis**       | `REDIS_HOST`                    | N/A                           | Redis host address                                  |
+|                 | `REDIS_PORT`                    | N/A                           | Redis port                                          |
+|                 | `REDIS_PASSWORD_SECRET_NAME`    | `redis-auth-[env]`            | Secret name for Redis password                      |
+| **API Keys**    | `[SERVICE]_API_KEY`             | `[service]-api-key-[env]`     | Direct service API key (dev only)                   |
+|                 | `[SERVICE]_API_KEY_SECRET_NAME` | N/A                           | Secret name reference (production)                  |
 
 ## Secret Management
 
@@ -71,8 +74,9 @@ api_key = secrets.get("openai-api-key", "default-value")
 ### Secret Naming Convention
 
 - **Secret Manager**: `service-name-purpose-env`
+
   - Example: `openai-api-key-production`
-  
+
 - **Environment Variable**: `SERVICE_NAME_PURPOSE`
   - Example: `OPENAI_API_KEY`
 
@@ -94,7 +98,7 @@ api_key = secrets.get("openai-api-key", "default-value")
 ### Resource Organization
 
 - `main.tf`: Core infrastructure setup
-- `cloudrun.tf`: Cloud Run services configuration 
+- `cloudrun.tf`: Cloud Run services configuration
 - `cloudsql.tf`: Database configuration
 - `network.tf`: Networking configuration
 - `secrets.tf`: Secret Manager resources
@@ -104,6 +108,7 @@ api_key = secrets.get("openai-api-key", "default-value")
 Terraform integrates secrets in two ways:
 
 1. **Resource Creation**:
+
    ```terraform
    resource "google_secret_manager_secret" "llm_api_keys" {
      for_each = { ... }

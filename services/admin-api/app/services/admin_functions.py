@@ -3,21 +3,21 @@ Implementation of administrative functions that can be called by Gemini.
 Optimized for performance and stability.
 """
 
-from typing import Dict, Any, List, Optional, Tuple, AsyncGenerator
-import logging
-import json
-import time
 import asyncio
+import logging
+import time
 from datetime import datetime, timedelta
 from functools import wraps
+from typing import Any, AsyncGenerator, Dict, List, Optional, Tuple
 
-from google.cloud.firestore import AsyncClient as FirestoreAsyncClient, AsyncTransaction
-from google.cloud.firestore_v1.base_query import BaseQuery
 from google.api_core.exceptions import (
     DeadlineExceeded,
-    ServiceUnavailable,
     ResourceExhausted,
+    ServiceUnavailable,
 )
+from google.cloud.firestore import AsyncClient as FirestoreAsyncClient
+from google.cloud.firestore import AsyncTransaction
+from google.cloud.firestore_v1.base_query import BaseQuery
 
 from app.config import settings
 

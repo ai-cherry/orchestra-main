@@ -7,7 +7,7 @@ to adapt their responses to match different interaction styles and traits.
 
 import logging
 import random
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from core.orchestrator.src.agents.agent_base import Agent, AgentContext, AgentResponse
 

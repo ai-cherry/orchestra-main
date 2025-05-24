@@ -7,15 +7,15 @@ decompressing memory entries. It supports multiple compression levels and conten
 types, using efficient algorithms for each scenario.
 """
 
-import zlib
-import pickle
+import copy
 import json
 import logging
-import copy
-from typing import Any, Dict, List, Optional, Union, Tuple
+import pickle
+import zlib
+from typing import Any, Dict
 
 # Import from relative paths
-from ..models.memory import MemoryEntry, CompressionLevel
+from ..models.memory import CompressionLevel, MemoryEntry
 
 logger = logging.getLogger(__name__)
 
@@ -308,7 +308,6 @@ class MemoryCompressionEngine:
                 except Exception as e:
                     logger.error(f"Failed to decompress content: {e}")
                     # Keep the compressed content if decompression fails
-                    pass
 
         return decompressed_entry
 

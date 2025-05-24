@@ -104,19 +104,19 @@ Due to GitHub API limitations, the scripts cannot directly retrieve the values o
 Example workflow for Vertex AI:
 
 ```yaml
-- name: 'Authenticate to Google Cloud for Vertex AI'
-  uses: 'google-github-actions/auth@v1'
+- name: "Authenticate to Google Cloud for Vertex AI"
+  uses: "google-github-actions/auth@v1"
   with:
-    credentials_json: '${{ secrets.VERTEX_AI_BADASS_KEY }}'
+    credentials_json: "${{ secrets.VERTEX_AI_BADASS_KEY }}"
 ```
 
 Example workflow for Gemini API:
 
 ```yaml
-- name: 'Authenticate to Google Cloud for Gemini API'
-  uses: 'google-github-actions/auth@v1'
+- name: "Authenticate to Google Cloud for Gemini API"
+  uses: "google-github-actions/auth@v1"
   with:
-    credentials_json: '${{ secrets.GEMINI_API_BADASS_KEY }}'
+    credentials_json: "${{ secrets.GEMINI_API_BADASS_KEY }}"
 ```
 
 ## Security Considerations

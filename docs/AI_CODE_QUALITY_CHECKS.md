@@ -46,6 +46,7 @@ Alternatively, you can create a setup script to automate this process.
 Once installed, the pre-commit hook will run automatically when you attempt to commit changes. It will check staged Python files for AI code quality issues. If issues are found, it will display warnings with line numbers and descriptions, along with suggestions for review. The commit will not be blocked, allowing you to proceed if necessary, but it encourages addressing the flagged issues.
 
 Example output:
+
 ```
 Running AI Code Quality Checks on staged files...
 
@@ -81,6 +82,7 @@ This allows the system to grow with the project's needs, incorporating additiona
 ## Interpreting Output
 
 The output from the checks includes:
+
 - **File Path**: The file where issues were detected.
 - **Line Number**: The specific line of code with the potential issue.
 - **Issue Description**: A brief explanation of the detected issue.

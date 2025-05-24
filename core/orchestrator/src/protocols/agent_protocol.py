@@ -8,7 +8,7 @@ agent communication in the AI Orchestra system.
 import time
 import uuid
 from enum import Enum
-from typing import Dict, Any, Optional, List, Union
+from typing import Any, Dict, Optional, Union
 
 # Handle both pydantic v1 and v2
 try:

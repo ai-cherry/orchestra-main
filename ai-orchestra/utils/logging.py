@@ -4,12 +4,12 @@ Logging utilities for AI Orchestra.
 This module provides structured logging utilities.
 """
 
-import logging
 import json
+import logging
 import sys
 import time
-from typing import Any, Dict, Optional, Union
 from datetime import datetime
+from typing import Any, Dict, Optional, Union
 
 
 def configure_logging(

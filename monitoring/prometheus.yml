@@ -3,16 +3,16 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-  - job_name: 'orchestra-api'
-    metrics_path: '/metrics'
+  - job_name: "orchestra-api"
+    metrics_path: "/metrics"
     static_configs:
-      - targets: ['orchestra-api:8000']
-    
-  - job_name: 'llm-test-service'
-    metrics_path: '/metrics'
-    static_configs:
-      - targets: ['llm-test-service:8001']
+      - targets: ["orchestra-api:8000"]
 
-  - job_name: 'prometheus'
+  - job_name: "llm-test-service"
+    metrics_path: "/metrics"
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ["llm-test-service:8001"]
+
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]

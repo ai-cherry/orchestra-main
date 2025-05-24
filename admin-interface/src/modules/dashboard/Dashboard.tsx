@@ -1,63 +1,88 @@
-import React from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs'
-import { AreaChart, BarChart, LineChart } from '../../components/ui/charts'
-import { formatBytes, formatNumber } from '../../lib/utils'
-import { apiService, SystemStats, ActivityEvent, TimeSeriesDataPoint } from '../../lib/api'
-import { useMultiFetch } from '../../lib/hooks'
+import React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../components/ui/tabs";
+import { AreaChart, BarChart, LineChart } from "../../components/ui/charts";
+import { formatBytes, formatNumber } from "../../lib/utils";
+import {
+  apiService,
+  SystemStats,
+  ActivityEvent,
+  TimeSeriesDataPoint,
+} from "../../lib/api";
+import { useMultiFetch } from "../../lib/hooks";
 
 /**
  * Dashboard component that displays system overview and key metrics
  */
 const Dashboard = () => {
   // Use the custom hook to fetch all dashboard data in parallel
-  const { 
-    data, 
-    loading, 
-    error, 
-    refetch 
-  } = useMultiFetch({
+  const { data, loading, error, refetch } = useMultiFetch({
     stats: apiService.getSystemStats,
     activities: apiService.getRecentActivity,
     performanceData: apiService.getSystemPerformance,
     memoryData: apiService.getMemoryUsage,
-    agentData: apiService.getAgentActivity
-  })
-  
+    agentData: apiService.getAgentActivity,
+  });
+
   // Extract data from the hook result
-  const stats = data.stats as SystemStats | undefined
-  const activities = data.activities as ActivityEvent[] | undefined
-  const performanceData = data.performanceData as TimeSeriesDataPoint[] | undefined
-  const memoryData = data.memoryData as TimeSeriesDataPoint[] | undefined
-  const agentData = data.agentData as TimeSeriesDataPoint[] | undefined
-  
+  const stats = data.stats as SystemStats | undefined;
+  const activities = data.activities as ActivityEvent[] | undefined;
+  const performanceData = data.performanceData as
+    | TimeSeriesDataPoint[]
+    | undefined;
+  const memoryData = data.memoryData as TimeSeriesDataPoint[] | undefined;
+  const agentData = data.agentData as TimeSeriesDataPoint[] | undefined;
+
   // Show loading state
   if (loading) {
     return (
       <div className="flex h-[80vh] items-center justify-center">
         <div className="text-center">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Loading dashboard data...</p>
+          <p className="mt-4 text-muted-foreground">
+            Loading dashboard data...
+          </p>
         </div>
       </div>
-    )
+    );
   }
-  
+
   // Show error state
   if (error) {
     return (
       <div className="flex h-[80vh] items-center justify-center">
         <div className="text-center">
           <div className="rounded-full bg-destructive/10 p-3 text-destructive mx-auto w-fit">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-              <line x1="12" y1="9" x2="12" y2="13"/>
-              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
             </svg>
           </div>
           <h3 className="mt-4 text-lg font-medium">Error Loading Dashboard</h3>
           <p className="mt-2 text-sm text-muted-foreground">{error}</p>
-          <button 
+          <button
             className="mt-4 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
             onClick={() => refetch()}
           >
@@ -65,9 +90,9 @@ const Dashboard = () => {
           </button>
         </div>
       </div>
-    )
+    );
   }
-  
+
   // If no data is available after loading
   if (!stats || !activities || !performanceData || !memoryData || !agentData) {
     return (
@@ -76,7 +101,7 @@ const Dashboard = () => {
           <p className="text-muted-foreground">No dashboard data available.</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -104,13 +129,16 @@ const Dashboard = () => {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.memorySystem.usagePercentage}%</div>
+            <div className="text-2xl font-bold">
+              {stats.memorySystem.usagePercentage}%
+            </div>
             <div className="text-xs text-muted-foreground">
-              {formatBytes(stats.memorySystem.totalUsed)} / {formatBytes(stats.memorySystem.totalCapacity)}
+              {formatBytes(stats.memorySystem.totalUsed)} /{" "}
+              {formatBytes(stats.memorySystem.totalCapacity)}
             </div>
             <div className="mt-4 h-1 w-full rounded-full bg-secondary">
-              <div 
-                className="h-1 rounded-full bg-primary" 
+              <div
+                className="h-1 rounded-full bg-primary"
                 style={{ width: `${stats.memorySystem.usagePercentage}%` }}
               ></div>
             </div>
@@ -137,9 +165,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.activeAgents}</div>
-            <p className="text-xs text-muted-foreground">
-              +12% from last week
-            </p>
+            <p className="text-xs text-muted-foreground">+12% from last week</p>
           </CardContent>
         </Card>
 
@@ -161,7 +187,9 @@ const Dashboard = () => {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatNumber(stats.apiRequests)}</div>
+            <div className="text-2xl font-bold">
+              {formatNumber(stats.apiRequests)}
+            </div>
             <p className="text-xs text-muted-foreground">
               +19% from last month
             </p>
@@ -185,11 +213,21 @@ const Dashboard = () => {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold text-status-${stats.systemHealth === 'healthy' ? 'healthy' : stats.systemHealth === 'degraded' ? 'warning' : 'error'}`}>
-              {stats.systemHealth === 'healthy' ? 'Healthy' : stats.systemHealth === 'degraded' ? 'Degraded' : 'Unhealthy'}
+            <div
+              className={`text-2xl font-bold text-status-${stats.systemHealth === "healthy" ? "healthy" : stats.systemHealth === "degraded" ? "warning" : "error"}`}
+            >
+              {stats.systemHealth === "healthy"
+                ? "Healthy"
+                : stats.systemHealth === "degraded"
+                  ? "Degraded"
+                  : "Unhealthy"}
             </div>
             <p className="text-xs text-muted-foreground">
-              {stats.systemHealth === 'healthy' ? 'All systems operational' : stats.systemHealth === 'degraded' ? 'Some systems degraded' : 'System issues detected'}
+              {stats.systemHealth === "healthy"
+                ? "All systems operational"
+                : stats.systemHealth === "degraded"
+                  ? "Some systems degraded"
+                  : "System issues detected"}
             </p>
           </CardContent>
         </Card>
@@ -211,16 +249,19 @@ const Dashboard = () => {
                   <div className="h-3 w-3 rounded-full bg-memory-hot"></div>
                   <span className="text-sm font-medium">Hot Tier (Redis)</span>
                 </div>
-                <span className="text-sm text-muted-foreground">{stats.memorySystem.hot.percentage}% used</span>
+                <span className="text-sm text-muted-foreground">
+                  {stats.memorySystem.hot.percentage}% used
+                </span>
               </div>
               <div className="h-2 w-full rounded-full bg-secondary">
-                <div 
+                <div
                   className="h-2 rounded-full bg-memory-hot"
                   style={{ width: `${stats.memorySystem.hot.percentage}%` }}
                 ></div>
               </div>
               <div className="text-xs text-muted-foreground">
-                {formatBytes(stats.memorySystem.hot.used)} / {formatBytes(stats.memorySystem.hot.total)}
+                {formatBytes(stats.memorySystem.hot.used)} /{" "}
+                {formatBytes(stats.memorySystem.hot.total)}
               </div>
             </div>
 
@@ -228,18 +269,23 @@ const Dashboard = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full bg-memory-warm"></div>
-                  <span className="text-sm font-medium">Warm Tier (Firestore)</span>
+                  <span className="text-sm font-medium">
+                    Warm Tier (Firestore)
+                  </span>
                 </div>
-                <span className="text-sm text-muted-foreground">{stats.memorySystem.warm.percentage}% used</span>
+                <span className="text-sm text-muted-foreground">
+                  {stats.memorySystem.warm.percentage}% used
+                </span>
               </div>
               <div className="h-2 w-full rounded-full bg-secondary">
-                <div 
+                <div
                   className="h-2 rounded-full bg-memory-warm"
                   style={{ width: `${stats.memorySystem.warm.percentage}%` }}
                 ></div>
               </div>
               <div className="text-xs text-muted-foreground">
-                {formatBytes(stats.memorySystem.warm.used)} / {formatBytes(stats.memorySystem.warm.total)}
+                {formatBytes(stats.memorySystem.warm.used)} /{" "}
+                {formatBytes(stats.memorySystem.warm.total)}
               </div>
             </div>
 
@@ -247,18 +293,23 @@ const Dashboard = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full bg-memory-cold"></div>
-                  <span className="text-sm font-medium">Cold Tier (Compressed)</span>
+                  <span className="text-sm font-medium">
+                    Cold Tier (Compressed)
+                  </span>
                 </div>
-                <span className="text-sm text-muted-foreground">{stats.memorySystem.cold.percentage}% used</span>
+                <span className="text-sm text-muted-foreground">
+                  {stats.memorySystem.cold.percentage}% used
+                </span>
               </div>
               <div className="h-2 w-full rounded-full bg-secondary">
-                <div 
+                <div
                   className="h-2 rounded-full bg-memory-cold"
                   style={{ width: `${stats.memorySystem.cold.percentage}%` }}
                 ></div>
               </div>
               <div className="text-xs text-muted-foreground">
-                {formatBytes(stats.memorySystem.cold.used)} / {formatBytes(stats.memorySystem.cold.total)}
+                {formatBytes(stats.memorySystem.cold.used)} /{" "}
+                {formatBytes(stats.memorySystem.cold.total)}
               </div>
             </div>
           </div>
@@ -341,15 +392,17 @@ const Dashboard = () => {
           <div className="space-y-4">
             {activities.map((activity) => (
               <div key={activity.id} className="flex items-start space-x-4">
-                <div className={`mt-0.5 h-2 w-2 rounded-full bg-status-${
-                  activity.type === "warning" 
-                    ? "warning" 
-                    : activity.type === "success" 
-                      ? "healthy" 
-                      : activity.type === "error"
-                        ? "error"
-                        : "info"
-                }`} />
+                <div
+                  className={`mt-0.5 h-2 w-2 rounded-full bg-status-${
+                    activity.type === "warning"
+                      ? "warning"
+                      : activity.type === "success"
+                        ? "healthy"
+                        : activity.type === "error"
+                          ? "error"
+                          : "info"
+                  }`}
+                />
                 <div className="space-y-1">
                   <p className="text-sm font-medium leading-none">
                     {activity.title}
@@ -367,7 +420,7 @@ const Dashboard = () => {
         </CardContent>
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;

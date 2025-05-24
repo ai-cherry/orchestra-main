@@ -17,18 +17,18 @@ mkdir -p ~/.mode_config
 set_mode() {
     local mode=$1
     local bypass_csrf=$2
-    
+
     # Save the mode settings persistently
     echo "$mode" > ~/.mode_config/current_mode
     echo "$bypass_csrf" > ~/.mode_config/bypass_csrf
-    
+
     # Update .dev_mode file for the toggle script to read
     if [ "$mode" == "DEV" ]; then
         echo "true" > .dev_mode
     else
         echo "false" > .dev_mode
     fi
-    
+
     # Set the environment variables for the current session
     if [ "$mode" == "DEV" ]; then
         export WIF_DEV_MODE=true
@@ -41,7 +41,7 @@ set_mode() {
         export WIF_DEV_MODE=false
         export WIF_BYPASS_CSRF=false
     fi
-    
+
     # Add or update the environment variables in shell config
     update_shell_config
 }
@@ -58,10 +58,10 @@ update_shell_config() {
         echo -e "${YELLOW}Could not find .bashrc or .zshrc. Please manually configure your shell.${NC}"
         return
     fi
-    
+
     # Remove any existing mode settings
     sed -i '/# WIF Mode Settings/,/# End WIF Mode Settings/d' "$SHELL_RC"
-    
+
     # Add new mode settings
     cat >> "$SHELL_RC" << EOF
 # WIF Mode Settings

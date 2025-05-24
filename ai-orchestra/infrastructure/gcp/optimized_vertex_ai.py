@@ -6,27 +6,24 @@ with optimized request batching, semantic caching, and performance improvements.
 """
 
 import asyncio
-import logging
-import time
-from typing import Any, Dict, List, Optional, Tuple, Union, Set, cast
 import hashlib
 import json
+import logging
+import time
+from typing import Any, Dict, List, Optional
 
 from google.cloud import aiplatform
-from google.cloud.aiplatform.gapic.schema import predict
-from vertexai.preview.generative_models import GenerativeModel, GenerationConfig
+from vertexai.preview.generative_models import GenerationConfig, GenerativeModel
 
-from ...core.interfaces.ai_service import AIService
+from ...core.config import get_settings
 from ...core.errors import (
     AIServiceError,
+    InvalidInputError,
     ModelNotFoundError,
     ModelUnavailableError,
-    InvalidInputError,
-    AuthenticationError,
 )
-from ...core.config import get_settings
-from ...utils.logging import log_event, log_start, log_end, log_error
-from ..caching.tiered_cache import get_tiered_cache, cached, ModelCache, SemanticCache
+from ...utils.logging import log_end, log_error, log_event, log_start
+from ..caching.tiered_cache import SemanticCache, cached, get_tiered_cache
 
 logger = logging.getLogger(__name__)
 
@@ -856,9 +853,9 @@ class OptimizedVertexAIService:
             categories_str = ", ".join(categories)
             prompt = f"""
             Classify the following text into one of these categories: {categories_str}
-            
+
             Text: {text}
-            
+
             Respond with a JSON object where the keys are the categories and the values are confidence scores between 0 and 1.
             The confidence scores should sum to 1.
             """
@@ -968,9 +965,9 @@ class OptimizedVertexAIService:
             # Create a prompt for question answering
             prompt = f"""
             Context: {context}
-            
+
             Question: {question}
-            
+
             Answer the question based only on the provided context. If the answer cannot be determined from the context, say "I don't know."
             """
 
@@ -1039,7 +1036,7 @@ class OptimizedVertexAIService:
             # Create a prompt for summarization
             prompt = f"""
             Summarize the following text:
-            
+
             {text}
             """
 

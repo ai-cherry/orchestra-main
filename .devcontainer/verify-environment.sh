@@ -53,14 +53,14 @@ else
   echo "   USE_RECOVERY_MODE=$USE_RECOVERY_MODE"
   echo "   VSCODE_DISABLE_WORKSPACE_TRUST=$VSCODE_DISABLE_WORKSPACE_TRUST"
   echo "   DISABLE_WORKSPACE_TRUST=$DISABLE_WORKSPACE_TRUST"
-  
+
   # Apply fix if needed
   export STANDARD_MODE=true
   export USE_RECOVERY_MODE=false
   export VSCODE_DISABLE_WORKSPACE_TRUST=true
   export DISABLE_WORKSPACE_TRUST=true
   echo "✅ Environment variables corrected for this session"
-  
+
   # Run the comprehensive fix script if it exists
   if [ -f "./fix_restricted_mode.sh" ]; then
     echo "Running comprehensive restricted mode fix script..."

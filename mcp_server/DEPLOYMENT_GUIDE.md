@@ -5,6 +5,7 @@ This guide explains how to deploy the MCP (Model Context Protocol) Server to Goo
 ## Prerequisites
 
 1. A Google Cloud Platform (GCP) project with the following APIs enabled:
+
    - Cloud Run API (run.googleapis.com)
    - Container Registry API (containerregistry.googleapis.com)
    - Cloud Build API (cloudbuild.googleapis.com)
@@ -43,6 +44,7 @@ The repository includes a GitHub Actions workflow that automates the deployment 
    5. Click "Run workflow"
 
    The workflow will:
+
    - Build a Docker image using the optimized Dockerfile
    - Push the image to Google Container Registry
    - Deploy the image to Cloud Run
@@ -56,7 +58,7 @@ If you prefer to deploy manually or need more control over the deployment proces
    ```bash
    # Authenticate with your service account key
    gcloud auth activate-service-account --key-file=credentials.json
-   
+
    # Set the project and region
    gcloud config set project cherry-ai-project
    gcloud config set run/region us-central1
@@ -67,10 +69,10 @@ If you prefer to deploy manually or need more control over the deployment proces
    ```bash
    # Build the Docker image
    docker build -t gcr.io/cherry-ai-project/mcp-server -f mcp_server/Dockerfile.optimized .
-   
+
    # Configure Docker to use gcloud credentials
    gcloud auth configure-docker gcr.io
-   
+
    # Push the image to Container Registry
    docker push gcr.io/cherry-ai-project/mcp-server
    ```

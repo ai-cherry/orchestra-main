@@ -6,15 +6,16 @@ This module provides utilities for optimizing the performance of the MCP server,
 including memory management, caching strategies, and resource utilization.
 """
 
-import os
-import logging
-import time
 import asyncio
 import gc
-import psutil
+import logging
+import os
 import threading
-from typing import Dict, Any, Optional, Callable, List, Tuple
-from functools import lru_cache, wraps
+import time
+from functools import wraps
+from typing import Any, Callable, Dict, Optional
+
+import psutil
 
 logger = logging.getLogger(__name__)
 

@@ -6,14 +6,15 @@ semantic similarity between queries and agent capabilities.
 """
 
 import logging
-import numpy as np
-from typing import List, Dict, Any, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
-from core.orchestrator.src.services.memory_service import get_memory_service
+import numpy as np
+
 from core.orchestrator.src.agents.unified_agent_registry import (
-    get_agent_registry,
     AgentCapability,
+    get_agent_registry,
 )
+from core.orchestrator.src.services.memory_service import get_memory_service
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -43,7 +44,7 @@ class SemanticRouter:
 
         for agent_type in agent_types:
             # Get agent info
-            agent_info = self._agent_registry.get_agent_info(agent_type)
+            self._agent_registry.get_agent_info(agent_type)
 
             # Generate a random embedding for demonstration
             # In a real implementation, this would be based on agent capabilities

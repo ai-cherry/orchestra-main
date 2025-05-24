@@ -1,5 +1,5 @@
-from google.cloud import aiplatform, secretmanager
 import portkey
+from google.cloud import aiplatform, secretmanager
 from vertexai.preview import generative_models
 
 

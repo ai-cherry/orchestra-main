@@ -6,8 +6,6 @@ Custom exceptions for the GCP Secret Manager client.
 class SecretAccessError(Exception):
     """Base exception for all secret access errors."""
 
-    pass
-
 
 class SecretNotFoundError(SecretAccessError):
     """Raised when a requested secret does not exist."""

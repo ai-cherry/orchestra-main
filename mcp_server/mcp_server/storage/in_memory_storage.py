@@ -8,17 +8,16 @@ This implementation includes performance optimizations like background cleanup,
 efficient indexing, and proper async patterns.
 """
 
-import logging
-import json
-import time
 import asyncio
-from typing import Dict, List, Optional, Any, Tuple, Set
-from collections import defaultdict
 import heapq
-from datetime import datetime, timedelta
+import json
+import logging
+import time
+from collections import defaultdict
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from ..interfaces.storage import IMemoryStorage
-from ..models.memory import MemoryEntry, MemoryType, MemoryScope
+from ..models.memory import MemoryEntry, MemoryScope, MemoryType
 
 logger = logging.getLogger(__name__)
 

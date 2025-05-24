@@ -23,12 +23,8 @@
     },
     "portkey-router": {
       "command": "node",
-      "args": [
-        "${workspaceFolder}/.roo/scripts/portkey-router.js"
-      ],
-      "alwaysAllow": [
-        "route_model_request"
-      ]
+      "args": ["${workspaceFolder}/.roo/scripts/portkey-router.js"],
+      "alwaysAllow": ["route_model_request"]
     }
   }
 }

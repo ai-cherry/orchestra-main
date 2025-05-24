@@ -1,5 +1,7 @@
 # Web Scraping AI Agent System - Infrastructure Alignment Summary
 
+**Note:** This project uses pip and requirements files only for dependency management. No Poetry or pipenv is used. See the requirements/ directory for details.
+
 ## 🎯 Overview
 
 This document summarizes the infrastructure alignment changes made to integrate the Web Scraping AI Agent Team with the existing Orchestra AI project infrastructure, ensuring seamless deployment on Google Cloud Platform with Pulumi and Cloud Run.
@@ -7,17 +9,19 @@ This document summarizes the infrastructure alignment changes made to integrate 
 ## 📋 Current Infrastructure Analysis
 
 ### Existing Setup
+
 - **Project**: `cherry-ai-project`
 - **Region**: `us-central1`
 - **Artifact Registry**: `us-central1-docker.pkg.dev/cherry-ai-project/orchestra-images/`
 - **Network**: `orchestra-vpc` with subnet `orchestra-subnet`
 - **Redis**: Standard HA instance with 4GB memory
-- **Cloud Run Services**: 
+- **Cloud Run Services**:
   - `ai-orchestra-minimal` (main Orchestra service)
   - `admin-interface` (admin UI)
 - **Secret Manager**: Comprehensive API key management
 
 ### MCP Architecture
+
 - Multiple specialized MCP servers (Firestore, Dragonfly, GCP resources)
 - FastAPI-based endpoints
 - Redis coordination for cross-service communication
@@ -27,14 +31,16 @@ This document summarizes the infrastructure alignment changes made to integrate 
 ### 1. Pulumi GCP Stack Updates (`infra/pulumi_gcp/__main__.py`)
 
 #### New Secrets Added
+
 ```python
 # Web scraping API keys in Secret Manager
 zenrows_secret = gcp.secretmanager.Secret("zenrows-api-key")
-apify_secret = gcp.secretmanager.Secret("apify-api-key") 
+apify_secret = gcp.secretmanager.Secret("apify-api-key")
 phantombuster_secret = gcp.secretmanager.Secret("phantombuster-api-key")
 ```
 
 #### New Cloud Run Service
+
 ```python
 # Web Scraping Agents Service
 web_scraping_service = gcp.cloudrun.Service(
@@ -75,6 +81,7 @@ web_scraping_service = gcp.cloudrun.Service(
 ```
 
 #### Enhanced Existing Services
+
 - **Updated image paths** to use Artifact Registry
 - **Added health checks** (startup and liveness probes)
 - **Resource optimization** with CPU/memory requests and limits
@@ -83,19 +90,35 @@ web_scraping_service = gcp.cloudrun.Service(
 ### 2. Cloud Build Pipeline Updates (`cloudbuild.yaml`)
 
 #### Multi-Service Build Process
+
 ```yaml
 # Build main Orchestra service
-- name: 'gcr.io/cloud-builders/docker'
+- name: "gcr.io/cloud-builders/docker"
   id: Build-Main
-  args: ['build', '-t', 'us-central1-docker.pkg.dev/cherry-ai-project/orchestra-images/orchestra-main:$COMMIT_SHA', '.']
+  args:
+    [
+      "build",
+      "-t",
+      "us-central1-docker.pkg.dev/cherry-ai-project/orchestra-images/orchestra-main:$COMMIT_SHA",
+      ".",
+    ]
 
-# Build Web Scraping Agents service  
-- name: 'gcr.io/cloud-builders/docker'
+# Build Web Scraping Agents service
+- name: "gcr.io/cloud-builders/docker"
   id: Build-WebScraping
-  args: ['build', '-f', 'Dockerfile.webscraping', '-t', 'us-central1-docker.pkg.dev/cherry-ai-project/orchestra-images/web-scraping-agents:$COMMIT_SHA', '.']
+  args:
+    [
+      "build",
+      "-f",
+      "Dockerfile.webscraping",
+      "-t",
+      "us-central1-docker.pkg.dev/cherry-ai-project/orchestra-images/web-scraping-agents:$COMMIT_SHA",
+      ".",
+    ]
 ```
 
 #### Deployment Configuration
+
 ```yaml
 # Deploy Web Scraping Agents with optimized settings
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -114,6 +137,7 @@ web_scraping_service = gcp.cloudrun.Service(
 ### 3. Containerization (`Dockerfile.webscraping`)
 
 #### Multi-Stage Build for Optimization
+
 ```dockerfile
 # Stage 1: Build dependencies
 FROM python:3.11-slim-bullseye AS builder
@@ -126,6 +150,7 @@ RUN playwright install chromium
 ```
 
 #### Security and Performance Features
+
 - **Non-root user**: `webscraper` user for security
 - **Optimized dependencies**: Wheel-based installation
 - **Browser support**: Chromium for dynamic content
@@ -134,6 +159,7 @@ RUN playwright install chromium
 ### 4. Application Integration (`webscraping_app.py`)
 
 #### FastAPI Service with MCP Integration
+
 ```python
 # Standalone FastAPI application
 app = FastAPI(
@@ -147,18 +173,19 @@ mcp_server = OrchestraWebScrapingMCPServer()
 
 # RESTful endpoints
 @app.post("/search")
-@app.post("/scrape") 
+@app.post("/scrape")
 @app.post("/analyze")
 @app.post("/bulk-scrape")
 ```
 
 #### Health Monitoring
+
 ```python
 @app.get("/health")
 async def health_check():
     return {
         "status": "healthy",
-        "service": "web-scraping-agents", 
+        "service": "web-scraping-agents",
         "agents_initialized": orchestrator is not None,
         "agent_count": len(orchestrator.agents)
     }
@@ -167,15 +194,17 @@ async def health_check():
 ### 5. MCP Server Alignment (`mcp_server/servers/web_scraping_mcp_server.py`)
 
 #### Framework Compatibility
+
 - **Removed MCP framework dependencies** that conflicted with existing setup
 - **Direct tool calling interface** compatible with current MCP architecture
 - **Async/await patterns** matching existing servers
 
 #### Tool Integration
+
 ```python
 async def list_tools(self) -> List[Dict[str, Any]]:
     # Returns tool definitions compatible with Orchestra AI
-    
+
 async def call_tool(self, name: str, arguments: dict) -> str:
     # Handles tool execution with proper error handling
 ```
@@ -183,6 +212,7 @@ async def call_tool(self, name: str, arguments: dict) -> str:
 ## 🚀 Deployment Architecture
 
 ### Service Communication Flow
+
 ```
 Internet → Cloud Run Load Balancer → Web Scraping Agents Service
                                    ↓
@@ -199,13 +229,14 @@ Internet → Cloud Run Load Balancer → Web Scraping Agents Service
 
 ### Resource Allocation Strategy
 
-| Service | CPU | Memory | Instances | Concurrency | Purpose |
-|---------|-----|--------|-----------|-------------|---------|
-| Orchestra Main | 2 | 4Gi | 0-10 | 80 | Core AI orchestration |
-| Web Scraping | 4 | 8Gi | 1-20 | 40 | Intensive scraping |
-| Admin Interface | 2 | 2Gi | 0-5 | 100 | Management UI |
+| Service         | CPU | Memory | Instances | Concurrency | Purpose               |
+| --------------- | --- | ------ | --------- | ----------- | --------------------- |
+| Orchestra Main  | 2   | 4Gi    | 0-10      | 80          | Core AI orchestration |
+| Web Scraping    | 4   | 8Gi    | 1-20      | 40          | Intensive scraping    |
+| Admin Interface | 2   | 2Gi    | 0-5       | 100         | Management UI         |
 
 ### Agent Scaling Configuration
+
 - **Search Specialists**: 3 agents for multi-engine search
 - **Scraper Specialists**: 5 agents for parallel web scraping
 - **Content Analyzers**: 3 agents for AI-powered analysis
@@ -213,14 +244,17 @@ Internet → Cloud Run Load Balancer → Web Scraping Agents Service
 ## 🔐 Security & Compliance
 
 ### Secret Management
+
 All sensitive credentials managed through GCP Secret Manager:
+
 - `ZENROWS_API_KEY`: Anti-detection proxy service
-- `APIFY_API_KEY`: Scalable web automation platform  
+- `APIFY_API_KEY`: Scalable web automation platform
 - `PHANTOMBUSTER_API_KEY`: Social media data extraction
 - `OPENAI_API_KEY`: AI content analysis
 - `REDIS_HOST`: Redis coordination endpoint
 
 ### Network Security
+
 - **VPC isolation**: Services run in `orchestra-vpc`
 - **Private communication**: Redis coordination within VPC
 - **Non-root containers**: Security-hardened images
@@ -229,11 +263,13 @@ All sensitive credentials managed through GCP Secret Manager:
 ## 📊 Monitoring & Observability
 
 ### Health Checks
+
 - **Startup probes**: 60-second initialization timeout
 - **Liveness probes**: 60-second health check intervals
 - **Readiness**: Service-level agent status monitoring
 
 ### Metrics & Logging
+
 - **Cloud Logging**: Structured JSON logging
 - **Agent performance**: Success rates and processing times
 - **Quality scoring**: Content extraction accuracy metrics
@@ -242,11 +278,13 @@ All sensitive credentials managed through GCP Secret Manager:
 ## 🔄 Integration Points
 
 ### Orchestra AI MCP Framework
+
 - **Tool registration**: Native MCP tool definitions
 - **Resource monitoring**: Agent status and task queues
 - **Result formatting**: Consistent response structures
 
 ### Enhanced Vector Memory System
+
 ```python
 # Automatic integration with scraped content
 contextual_memory = ContextualMemory(
@@ -262,6 +300,7 @@ contextual_memory = ContextualMemory(
 ```
 
 ### Data Source Integrations
+
 - **CRM enrichment**: Web data enhancement of existing contacts
 - **Competitive intelligence**: Automated monitoring workflows
 - **Market research**: Real-time data aggregation
@@ -269,18 +308,20 @@ contextual_memory = ContextualMemory(
 ## ✅ Deployment Checklist
 
 ### Pre-Deployment Requirements
+
 - [ ] Set API keys in Secret Manager (Zenrows, Apify, PhantomBuster)
-- [ ] Verify Redis/Dragonfly connectivity  
+- [ ] Verify Redis/Dragonfly connectivity
 - [ ] Configure Pulumi stack with new service definitions
 - [ ] Update Cloud Build trigger with multi-service pipeline
 
 ### Deployment Commands
+
 ```bash
 # 1. Apply Pulumi infrastructure changes
 cd infra/pulumi_gcp
 pulumi up
 
-# 2. Trigger Cloud Build deployment  
+# 2. Trigger Cloud Build deployment
 gcloud builds submit --config cloudbuild.yaml
 
 # 3. Verify service deployment
@@ -288,6 +329,7 @@ gcloud run services describe web-scraping-agents --region=us-central1
 ```
 
 ### Post-Deployment Validation
+
 - [ ] Health check endpoints return 200 OK
 - [ ] MCP tools list correctly
 - [ ] Agent initialization successful
@@ -297,13 +339,15 @@ gcloud run services describe web-scraping-agents --region=us-central1
 ## 🎯 Performance Expectations
 
 ### Throughput Targets
+
 - **Search Operations**: 50-100 queries/minute
-- **Static Scraping**: 200-500 pages/minute  
+- **Static Scraping**: 200-500 pages/minute
 - **Dynamic Scraping**: 50-100 pages/minute
 - **Stealth Scraping**: 10-20 pages/minute
 - **Content Analysis**: 100-200 documents/minute
 
 ### Quality Metrics
+
 - **Content Quality Score**: >0.7 for successful extractions
 - **Agent Success Rate**: >95% for well-formed requests
 - **Processing Time**: <30s for standard scraping, <90s for complex sites
@@ -311,12 +355,14 @@ gcloud run services describe web-scraping-agents --region=us-central1
 ## 🔮 Future Enhancements
 
 ### Planned Infrastructure Improvements
+
 - **Auto-scaling policies**: Based on queue depth and processing time
 - **Multi-region deployment**: Global scraping capabilities
 - **CDN integration**: Cached results for repeated requests
 - **Custom domains**: Branded API endpoints
 
 ### Advanced Features Pipeline
+
 - **ML-powered extraction**: Custom content recognition models
 - **Real-time monitoring**: Live website change detection
 - **API simulation**: Reverse-engineer private APIs
@@ -328,12 +374,12 @@ gcloud run services describe web-scraping-agents --region=us-central1
 
 The Web Scraping AI Agent System has been fully aligned with the existing Orchestra AI infrastructure, providing:
 
-✅ **Seamless integration** with current Pulumi/Cloud Run setup  
-✅ **Scalable architecture** supporting 3-20 Cloud Run instances  
-✅ **Secure credential management** via GCP Secret Manager  
-✅ **Optimized resource allocation** for scraping workloads  
-✅ **Native MCP compatibility** with existing Orchestra AI framework  
-✅ **Comprehensive monitoring** and health checking  
-✅ **Multi-service CI/CD pipeline** with Cloud Build automation  
+✅ **Seamless integration** with current Pulumi/Cloud Run setup
+✅ **Scalable architecture** supporting 3-20 Cloud Run instances
+✅ **Secure credential management** via GCP Secret Manager
+✅ **Optimized resource allocation** for scraping workloads
+✅ **Native MCP compatibility** with existing Orchestra AI framework
+✅ **Comprehensive monitoring** and health checking
+✅ **Multi-service CI/CD pipeline** with Cloud Build automation
 
-The system is production-ready and can be deployed immediately to enhance Orchestra AI with world-class web scraping and content analysis capabilities. 
+The system is production-ready and can be deployed immediately to enhance Orchestra AI with world-class web scraping and content analysis capabilities.

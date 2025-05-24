@@ -42,12 +42,14 @@ The AI Orchestration System provides a modular, extensible framework for managin
 ### Key Components
 
 1. **Memory System**
+
    - `MemoryManager`: Abstract interface for memory operations
    - `InMemoryMemoryManager`: Simple in-memory implementation
    - `FirestoreMemoryManager`: Persistent storage implementation
    - `MemoryService`: High-level service for memory operations
 
 2. **Agent Framework**
+
    - `Agent`: Base abstract class for all agent implementations
    - `AgentContext`: Container for all context provided to agents
    - `AgentResponse`: Standardized response format from agents
@@ -56,11 +58,13 @@ The AI Orchestration System provides a modular, extensible framework for managin
    - `DomainSpecificAgent`: Specializes in specific knowledge domains
 
 3. **Orchestration Layer**
+
    - `AgentRegistry`: Manages agent types and instances
    - `AgentOrchestrator`: Coordinates the overall interaction flow
    - `ServiceRegistry`: Manages service lifecycle
 
 4. **Communication Infrastructure**
+
    - `EventBus`: Decouples components via publish-subscribe pattern
 
 5. **API Layer**
@@ -72,6 +76,7 @@ The AI Orchestration System provides a modular, extensible framework for managin
 ### Memory System
 
 The memory system is responsible for:
+
 - Storing conversation history
 - Retrieving relevant context for interactions
 - Performing semantic search on past conversations
@@ -80,6 +85,7 @@ The memory system is responsible for:
 ### Agent Framework
 
 The agent framework is responsible for:
+
 - Defining the interface for all agent types
 - Providing context and persona-specific responses
 - Managing agent lifecycle (initialization, processing, cleanup)
@@ -88,6 +94,7 @@ The agent framework is responsible for:
 ### Orchestration Layer
 
 The orchestration layer is responsible for:
+
 - Coordinating the flow of information between components
 - Managing agent selection and execution
 - Error handling and recovery
@@ -96,6 +103,7 @@ The orchestration layer is responsible for:
 ### Communication Infrastructure
 
 The event bus is responsible for:
+
 - Enabling loosely coupled communication between components
 - Supporting both synchronous and asynchronous event handling
 - Providing wildcards and pattern-based event subscription
@@ -128,6 +136,7 @@ The system can be extended in the following ways:
 ### Dependency Management
 
 Components access each other through factory functions that implement dependency injection:
+
 - `get_event_bus()`
 - `get_memory_manager()`
 - `get_memory_service()`
@@ -140,6 +149,7 @@ This pattern ensures singleton instances, simplifies testing, and reduces coupli
 ### Error Handling
 
 The system implements multiple layers of error handling:
+
 - API-level exception catching and conversion to HTTP responses
 - Service-level error handling with appropriate fallbacks
 - Event publishing for error tracking and monitoring
@@ -154,6 +164,7 @@ The system implements multiple layers of error handling:
 ## Future Enhancements
 
 Potential future enhancements include:
+
 1. Distributed event bus for scaling
 2. Vector database for more efficient semantic search
 3. More sophisticated agent selection algorithms

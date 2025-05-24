@@ -129,14 +129,17 @@ If Restricted Mode persists after applying these solutions:
 1. **Rebuild the Codespace**: From the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`), select "Codespaces: Rebuild Container"
 
 2. **Check VS Code Logs**: Examine logs for clues about why trust settings aren't being applied
+
    - Open Command Palette
    - Select "Developer: Toggle Developer Tools"
    - Check Console for errors
 
 3. **Extension Issues**: Some extensions may force Restricted Mode regardless of settings
+
    - Try temporarily disabling extensions to identify problematic ones
 
 4. **Storage Problems**: Persistent storage issues might prevent settings from sticking
+
    - Try using the VS Code CLI approach in `.vscode/disable_trust.js`
 
 5. **Direct Configuration**: If all else fails, consider using the VS Code Web Developer Console:

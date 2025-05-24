@@ -39,14 +39,14 @@ async def generate_with_retry(messages, model="gpt-4", max_retries=3):
             # Critical error, cannot recover
             logger.error("Authentication failed for LLM provider")
             return user_friendly_error_response(
-                "I'm having trouble connecting to my knowledge service. " 
+                "I'm having trouble connecting to my knowledge service. "
                 "Please check your API key configuration."
             )
-    
+
     # If we get here, all retries failed
     logger.error(f"All {max_retries} attempts failed")
     return user_friendly_error_response(
-        "I'm currently experiencing technical difficulties. " 
+        "I'm currently experiencing technical difficulties. "
         "Please try again in a few moments."
     )
 ```
@@ -59,10 +59,10 @@ The memory system implements graceful degradation when components fail:
 async def retrieve_memories(query, user_id):
     # Check component health
     health_status = await memory_system.health_check()
-    
+
     results = []
     error_context = {}
-    
+
     # Try vector search first (most relevant)
     if health_status.vector_db_healthy:
         try:
@@ -74,7 +74,7 @@ async def retrieve_memories(query, user_id):
     else:
         logger.warning("Vector DB unavailable, skipping semantic search")
         error_context["vector_db_unavailable"] = True
-    
+
     # Always try to get recent memories from SQL (fallback)
     try:
         recent_memories = await memory_system.get_recent_memories(user_id, limit=5)
@@ -82,11 +82,11 @@ async def retrieve_memories(query, user_id):
     except Exception as e:
         logger.error(f"Recent memory retrieval failed: {e}")
         error_context["recent_memory_error"] = str(e)
-    
+
     # If we have enough results, return them
     if len(results) >= 3:
         return results, error_context
-        
+
     # Last resort: try graph database for related memories
     if health_status.graph_db_healthy and not results:
         try:
@@ -95,7 +95,7 @@ async def retrieve_memories(query, user_id):
         except Exception as e:
             logger.error(f"Graph search failed: {e}")
             error_context["graph_search_error"] = str(e)
-    
+
     return results, error_context
 ```
 
@@ -111,7 +111,7 @@ async def search_memories(request: SearchRequest):
         results, error_context = await retrieve_memories(
             request.query, request.user_id
         )
-        
+
         # Determine response status
         if len(results) == 0 and error_context:
             status = "degraded"
@@ -119,23 +119,23 @@ async def search_memories(request: SearchRequest):
             status = "partial"
         else:
             status = "success"
-        
+
         # Include system health for client awareness
         system_health = {
             "status": status,
             "degraded_components": [k for k, v in error_context.items() if v],
             "timestamp": datetime.utcnow().isoformat()
         }
-        
+
         return {
             "results": results,
             "system_health": system_health,
             "result_count": len(results)
         }
-        
+
     except Exception as e:
         logger.exception(f"Search endpoint error: {e}")
-        
+
         # Return a structured error with remediation steps
         return JSONResponse(
             status_code=500,
@@ -154,6 +154,7 @@ We categorize errors to apply appropriate handling strategies:
 ### 1. Transient Errors
 
 Temporary issues that might resolve on retry:
+
 - Network timeouts
 - Temporary service unavailability
 - Rate limiting
@@ -163,6 +164,7 @@ Temporary issues that might resolve on retry:
 ### 2. Configuration Errors
 
 Issues with system configuration:
+
 - Missing API keys
 - Invalid database credentials
 - Incorrect permissions
@@ -172,6 +174,7 @@ Issues with system configuration:
 ### 3. Data Errors
 
 Issues with data processing:
+
 - Invalid input format
 - Embedding generation failures
 - Schema validation errors
@@ -181,6 +184,7 @@ Issues with data processing:
 ### 4. System Errors
 
 Fundamental issues with system components:
+
 - Database connection failures
 - Out of memory errors
 - Service crashes
@@ -199,22 +203,22 @@ async def health_monitor():
         try:
             # Check all system components
             status = await perform_health_checks()
-            
+
             # Log current health
             logger.info(f"System health status: {status['overall']}")
             for component, health in status['components'].items():
                 if health['status'] != 'healthy':
                     logger.warning(f"Component {component} health: {health['status']}")
-            
+
             # Attempt recovery for unhealthy components
             for component, health in status['components'].items():
                 if health['status'] == 'unhealthy' and health.get('recoverable', False):
                     logger.info(f"Attempting recovery for {component}")
                     await recovery_strategies[component]()
-                    
+
         except Exception as e:
             logger.error(f"Health monitor error: {e}")
-            
+
         # Check every 5 minutes
         await asyncio.sleep(300)
 ```
@@ -265,12 +269,12 @@ def user_friendly_error_response(technical_error):
             "action": "Please try again or contact support if the problem persists."
         }
     }
-    
+
     # Find the appropriate error category
     for error_type, response in error_mapping.items():
         if error_type in str(technical_error):
             return f"{response['message']} {response['action']}"
-    
+
     # If no specific match, use default
     return f"{error_mapping['default']['message']} {error_mapping['default']['action']}"
 ```

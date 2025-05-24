@@ -28,6 +28,7 @@ wif_implementation/
 ## Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/ai-cherry/orchestra-main.git
    cd orchestra-main
@@ -49,6 +50,7 @@ To execute the implementation plan from the command line:
 ```
 
 Available phases:
+
 - `vulnerabilities`: Address Dependabot vulnerabilities
 - `migration`: Run migration script
 - `cicd`: Update CI/CD pipelines
@@ -56,11 +58,13 @@ Available phases:
 - `all`: Execute all phases (default)
 
 Additional options:
+
 - `--verbose`: Show detailed output during processing
 - `--dry-run`: Show what would be done without making changes
 - `--report PATH`: Path to write the report to
 
 Example:
+
 ```bash
 ./wif_implementation_cli.py --phase vulnerabilities --verbose --report vulnerability_report.md
 ```
@@ -76,6 +80,7 @@ To start the web interface:
 Then open your browser and navigate to http://127.0.0.1:8000
 
 Additional options:
+
 - `--host HOST`: Host to bind to (default: 127.0.0.1)
 - `--port PORT`: Port to bind to (default: 8000)
 - `--reload`: Enable auto-reload

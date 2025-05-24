@@ -6,7 +6,7 @@ This module defines the configuration for the memory system, including
 performance-optimized settings for different storage tiers and compression levels.
 """
 
-from typing import Dict, Any
+from typing import Any, Dict
 
 # Redis configuration for hot memory tier
 REDIS_CONFIG: Dict[str, Any] = {

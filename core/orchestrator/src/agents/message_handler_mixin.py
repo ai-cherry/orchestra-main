@@ -7,10 +7,9 @@ to agent implementations.
 
 import asyncio
 import logging
-from typing import Dict, Any, Callable, Awaitable, Optional, List
+from typing import Awaitable, Callable, Dict, List
 
-from core.orchestrator.src.services.message_queue import get_message_queue, AgentMessage
-from core.orchestrator.src.protocols.agent_protocol import MessageType
+from core.orchestrator.src.services.message_queue import AgentMessage, get_message_queue
 
 # Configure logging
 logger = logging.getLogger(__name__)

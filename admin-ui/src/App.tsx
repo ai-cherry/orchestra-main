@@ -27,7 +27,7 @@ const App: React.FC = () => {
         shape: { borderRadius: 12 },
         typography: { fontFamily: "Inter, sans-serif" },
       }),
-    [mode]
+    [mode],
   );
 
   return (
@@ -36,7 +36,9 @@ const App: React.FC = () => {
       <Router>
         <div style={{ display: "flex", minHeight: "100vh" }}>
           <Sidebar />
-          <main style={{ flex: 1, background: theme.palette.background.default }}>
+          <main
+            style={{ flex: 1, background: theme.palette.background.default }}
+          >
             <TopBar toggleMode={toggleMode} />
             <Routes>
               <Route path="/" element={<Dashboard />} />

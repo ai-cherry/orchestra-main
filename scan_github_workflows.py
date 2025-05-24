@@ -19,13 +19,13 @@ Options:
 """
 
 import argparse
-import os
 import re
 import sys
-import yaml
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Pattern, Set, Tuple, Any
+from typing import Any, Dict, List, Optional
+
+import yaml
 
 
 @dataclass

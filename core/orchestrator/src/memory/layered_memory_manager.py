@@ -4,26 +4,19 @@ Provides a unified interface for managing short-term, mid-term, and long-term me
 with semantic search capabilities using Redis, Firestore, and Vertex AI Vector Search.
 """
 
-import json
 import logging
-import time
 import uuid
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 
 import aioredis
-import numpy as np
-from google.cloud import firestore
-from google.cloud import storage
-from google.cloud import aiplatform
-from pydantic import BaseModel, Field
+from google.cloud import aiplatform, firestore
 
 from core.orchestrator.src.config.loader import get_settings
 from core.orchestrator.src.memory.models import (
     MemoryEntry,
-    MemoryType,
     MemorySearchResult,
-    MemoryMetadata,
+    MemoryType,
 )
 
 logger = logging.getLogger(__name__)

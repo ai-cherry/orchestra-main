@@ -28,6 +28,7 @@ Before running the bootstrap script, ensure you have the following:
 
 1. **GCP Project**: Access to the `cherry-ai-project` GCP project
 2. **Command Line Tools**:
+
    - `gcloud` CLI installed and configured
    - `terraform` CLI installed (version 1.0.0+)
    - `jq` installed for JSON processing
@@ -50,11 +51,13 @@ We've created a comprehensive bootstrap script that sets up the entire infrastru
 ### Running the Bootstrap Script
 
 1. Make the script executable:
+
    ```bash
    chmod +x scripts/bootstrap_orchestra_infrastructure.sh
    ```
 
 2. Run the script:
+
    ```bash
    ./scripts/bootstrap_orchestra_infrastructure.sh
    ```
@@ -81,11 +84,13 @@ The infrastructure includes the following components:
 ### Memory Systems
 
 1. **Redis** (Short-term Memory):
+
    - Fast, in-memory storage
    - Used for active conversation context
    - TTL: 1 hour
 
 2. **Firestore** (Mid/Long-term Memory):
+
    - Document database for structured data
    - Used for persistent storage
    - TTL: Configurable (1 day to 30 days)
@@ -106,6 +111,7 @@ All sensitive information is stored in Secret Manager:
 ### Service Accounts
 
 1. **Agent Service Account**:
+
    - Used by agents to access GCP resources
    - Least privilege permissions
 
@@ -138,12 +144,14 @@ The bootstrap script uses a service account key for initial setup, but it's revo
 The infrastructure includes monitoring and observability features:
 
 1. **Cloud Monitoring Dashboard**:
+
    - Redis memory usage
    - Firestore operations
    - Vector search queries
    - Agent errors
 
 2. **Logging**:
+
    - Structured logging for agent operations
    - Error tracking
    - Performance metrics
@@ -158,16 +166,19 @@ After running the bootstrap script, you should:
 
 1. **Update Secrets**: Replace placeholder values in Secret Manager with real values
 2. **Configure GitHub Repository**:
+
    - Enable GitHub Actions
    - Update repository settings for Workload Identity Federation
    - Push changes to trigger the workflow
 
 3. **Test the Infrastructure**:
+
    - Run the example agent configuration
    - Verify memory systems are working
    - Check monitoring dashboards
 
 4. **Implement Memory Backends**:
+
    - Implement Redis memory backend
    - Implement Firestore memory backend
    - Implement Vertex AI Vector Search backend

@@ -5,6 +5,7 @@
 ## Immediate Actions Required
 
 - [ ] **Rotate ALL exposed GCP credentials**:
+
   - Google API Key (`AIzaSyDem1_BvE0eeq8PaRvnlsBXMqjI3Z3zB_U`)
   - OAuth Client Secret (`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`)
   - Service account keys (both `6833bc94f0e3ef8648efc1578caa23ba2b8a8a52` and `f510256389008a55a6142d2429a185ebf216d685`)
@@ -12,6 +13,7 @@
   - Figma PAT (`figd_JbqWhdGvNaRvQyLdZdEJslu-8hHoaotLaNKByNRz`)
 
 - [ ] **Update GCP IAM permissions**:
+
   - Review and restrict overly permissive roles (especially Owner and Admin roles)
   - Apply principle of least privilege to all service accounts and users
 

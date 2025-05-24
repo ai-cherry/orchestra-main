@@ -15,17 +15,14 @@ Key features:
 - Cross-environment configuration synchronization
 """
 
-import asyncio
 import json
 import logging
 import os
-import time
 from collections import defaultdict
-from copy import deepcopy
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 # Configure logging
 logging.basicConfig(
@@ -38,13 +35,13 @@ logger = logging.getLogger("config-manager")
 try:
     from gcp_migration.mcp_client_enhanced import (
         MCPClient,
-        MCPResponse,
-        get_client as get_mcp_client,
     )
+    from gcp_migration.mcp_client_enhanced import get_client as get_mcp_client
 except ImportError:
     logger.warning("Could not import enhanced MCP client, attempting to import basic client")
     try:
-        from gcp_migration.mcp_client import MCPClient, get_client as get_mcp_client
+        from gcp_migration.mcp_client import MCPClient
+        from gcp_migration.mcp_client import get_client as get_mcp_client
     except ImportError:
         logger.error("Failed to import MCP client. Config Manager will operate in offline mode.")
         MCPClient = object

@@ -13,21 +13,19 @@ Usage:
     python figma_gcp_sync.py --file-key YOUR_FILE_KEY [--output-dir ./styles] [--validate]
 """
 
+import argparse
+import json
+import logging
 import os
 import sys
-import json
-import argparse
-import requests
-import time
-import logging
 from pathlib import Path
-from typing import Dict, Any, List, Optional
-import subprocess
+from typing import Any, Dict
+
+import requests
 
 # Import Google Cloud libraries if available
 try:
-    from google.cloud import secretmanager, aiplatform
-    from google.oauth2 import service_account
+    from google.cloud import aiplatform, secretmanager
 
     GOOGLE_CLOUD_AVAILABLE = True
 except ImportError:
@@ -455,15 +453,15 @@ class GCPManager:
             # Create prompt for validation
             prompt = f"""
             Please validate the following design system variables and check for any issues:
-            
+
             {json.dumps(design_data, indent=2)}
-            
+
             Check for the following problems:
             1. Inconsistent naming patterns
             2. Accessibility issues with color contrast
             3. Redundant or duplicate values
             4. Missing essential variables
-            
+
             Format your response as a JSON with these keys:
             - validationResult: "pass" or "fail"
             - issues: [] (array of issues found)
@@ -520,10 +518,10 @@ def sync_figma_variables(args):
         # Generate style files
         output_dir = args.output_dir
 
-        css_file = generator.generate_css(output_dir)
-        js_file = generator.generate_js(output_dir)
-        android_dir = generator.generate_android_xml(output_dir)
-        ios_dir = generator.generate_ios_swift(output_dir)
+        generator.generate_css(output_dir)
+        generator.generate_js(output_dir)
+        generator.generate_android_xml(output_dir)
+        generator.generate_ios_swift(output_dir)
         tf_file = generator.generate_terraform(output_dir)
 
         logger.info("Generated all style files successfully")

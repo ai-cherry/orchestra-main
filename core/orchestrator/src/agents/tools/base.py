@@ -5,10 +5,10 @@ This module provides a standardized framework for defining and using tools
 with agents, enabling consistent tool registration, discovery, and execution.
 """
 
-import logging
 import inspect
+import logging
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Set, Type, TypeVar, Union, get_type_hints
+from typing import Any, Dict, List, Optional, Set, Type, TypeVar, get_type_hints
 
 from pydantic import BaseModel, Field, create_model
 
@@ -84,7 +84,6 @@ class Tool(ABC):
         Raises:
             ValueError: If required parameters are missing or invalid
         """
-        pass
 
     def get_metadata(self) -> ToolMetadata:
         """

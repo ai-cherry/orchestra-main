@@ -6,7 +6,7 @@ document manipulation.
 
 # import asyncio # Not used in current outline
 import logging
-from typing import Dict, Any, Optional  # Removed List as it might not be used yet
+from typing import Any, Dict, Optional  # Removed List as it might not be used yet
 
 # from google.cloud import firestore # Potentially unused direct import
 from google.cloud.firestore_v1.async_client import AsyncClient as FirestoreAsyncClient

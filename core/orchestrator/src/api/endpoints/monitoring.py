@@ -8,9 +8,9 @@ from typing import Any, Dict, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
+from core.logging_config import get_logger
 from core.monitoring.monitored_litellm_client import MonitoredLiteLLMClient
 from core.orchestrator.src.api.dependencies.llm import get_llm_client
-from core.logging_config import get_logger
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/monitoring", tags=["monitoring"])

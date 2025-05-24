@@ -7,13 +7,12 @@ across multiple repositories with minimal disruption to workflows.
 """
 
 import argparse
-import os
 import logging
-import requests
-import json
 import time
-from typing import Dict, Optional, List
-from datetime import datetime, timedelta
+from datetime import datetime
+from typing import Dict, List, Optional
+
+import requests
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("pat_rotation")

@@ -43,7 +43,7 @@ The Secret Manager module (`secret-management/terraform/modules/secret-manager/`
 module "secret_manager" {
   source     = "../modules/secret-manager"
   project_id = "your-project-id"
-  
+
   secrets = {
     "api-key" = {
       labels = { type = "api" }
@@ -142,16 +142,19 @@ The deployment script (`secret-management/deploy_secret_manager.sh`) provides:
 ## Zero-Trust Security Features
 
 1. **Time-Based Conditions**: Limit access to specific time windows
+
    ```
    "request.time.getHours('America/New_York') >= 9 && request.time.getHours('America/New_York') < 17"
    ```
 
 2. **Service-Based Restrictions**: Limit access to specific services
+
    ```
    "resource.service.name == 'cloudrun.googleapis.com'"
    ```
 
 3. **IP-Based Restrictions**: Limit access to specific networks
+
    ```
    "request.ip.matches('10.0.0.0/8')"
    ```

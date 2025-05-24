@@ -6,14 +6,13 @@ enabling memory access and mode transitions for Gemini-based agents.
 """
 
 import logging
-import json
 import time
-from typing import Dict, Any, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
-from ..modes import RooMode, get_mode
-from ..transitions import TransitionContext, ModeTransitionManager
-from ..memory_hooks import RooMemoryManager, BoomerangOperation
+from ..memory_hooks import BoomerangOperation, RooMemoryManager
+from ..modes import get_mode
 from ..rules import RuleEngine, create_rule_engine
+from ..transitions import ModeTransitionManager
 
 logger = logging.getLogger(__name__)
 

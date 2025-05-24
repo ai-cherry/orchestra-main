@@ -4,10 +4,10 @@ Error handling for AI Orchestra.
 This module provides a consistent error handling framework.
 """
 
-from typing import Dict, Optional, Any
-import logging
 import json
+import logging
 import traceback
+from typing import Any, Dict, Optional
 
 
 class AIServiceError(Exception):

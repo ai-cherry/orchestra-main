@@ -15,11 +15,13 @@ The integration is handled through three key components:
 To set up Gemini Code Assist Enterprise in your Codespace:
 
 1. Ensure you have the necessary service account credentials stored in a secure environment variable:
+
    ```bash
    export FULL_SERVICE_ACCOUNT_JSON='{"type": "service_account", ...}'
    ```
 
 2. Run the setup script:
+
    ```bash
    ./setup_gemini_enterprise.sh
    ```
@@ -79,13 +81,13 @@ Gemini Code Assist Enterprise provides powerful code generation capabilities thr
 2. Press `Ctrl+I` (Windows/Linux) or `Cmd+I` (Mac)
 3. Enter prompts using these special commands:
 
-| Command | Description | Example |
-|---------|-------------|---------|
-| `/generate` | Generate new code | `/generate Vertex AI pipeline with BigQuery input` |
-| `/doc` | Add or improve documentation | `/doc this Cloud Function with security warnings` |
-| `/fix` | Fix issues in code | `/fix Redis connection timeout in line 42` |
-| `/refactor` | Refactor code | `/refactor this function to use async/await` |
-| `/test` | Generate tests | `/test create unit tests for this class` |
+| Command     | Description                  | Example                                            |
+| ----------- | ---------------------------- | -------------------------------------------------- |
+| `/generate` | Generate new code            | `/generate Vertex AI pipeline with BigQuery input` |
+| `/doc`      | Add or improve documentation | `/doc this Cloud Function with security warnings`  |
+| `/fix`      | Fix issues in code           | `/fix Redis connection timeout in line 42`         |
+| `/refactor` | Refactor code                | `/refactor this function to use async/await`       |
+| `/test`     | Generate tests               | `/test create unit tests for this class`           |
 
 ### Customized Code Generation
 
@@ -105,6 +107,7 @@ gcloud alpha genai code customize list --project=cherry-ai-project
 ```
 
 Supported regions include:
+
 - us-west4
 - europe-west1
 - asia-southeast1
@@ -112,10 +115,12 @@ Supported regions include:
 ### Security Best Practices
 
 1. Store service account credentials securely:
+
    - Use GitHub Codespaces secrets for the `FULL_SERVICE_ACCOUNT_JSON` variable
    - Never commit credentials to your repository
 
 2. Clean up after each session:
+
    ```bash
    ./cleanup_gemini_credentials.sh
    ```
@@ -139,6 +144,7 @@ Supported regions include:
 ### Logs and Diagnostics
 
 Access VS Code logs for extension troubleshooting:
+
 1. Open Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`)
 2. Type and select "Developer: Open Extension Logs"
 3. Filter for "cloudcode" or "gemini-code-assist"
@@ -182,7 +188,7 @@ Use existing service account key from env
 ### For Error Handling
 
 ```
-/fix [PASTE ERROR MESSAGE HERE] 
+/fix [PASTE ERROR MESSAGE HERE]
 Provide solution with gcloud commands
 ```
 

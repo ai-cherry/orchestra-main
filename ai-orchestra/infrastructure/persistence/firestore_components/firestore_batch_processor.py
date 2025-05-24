@@ -4,13 +4,15 @@ efficiently in Firestore.
 """
 
 import logging
-from typing import Dict, Any, Optional, List, Tuple, Union, Sequence
-import asyncio  # Added for asyncio.Lock in FirestoreClientManager example, ensure it's here if needed for other async ops directly.
+from typing import Any, Dict, List, Optional, Tuple
 
-from google.cloud.firestore_v1.async_client import AsyncClient as FirestoreAsyncClient
-from google.cloud.firestore_v1.async_batch import AsyncWriteBatch
-from google.cloud.firestore_v1.async_document import AsyncDocumentReference
 from google.api_core.exceptions import GoogleAPIError
+from google.cloud.firestore_v1.async_batch import AsyncWriteBatch
+from google.cloud.firestore_v1.async_client import AsyncClient as FirestoreAsyncClient
+from google.cloud.firestore_v1.async_document import AsyncDocumentReference
+
+# import asyncio  # Removed unused import
+
 
 # Assuming MemoryItem is defined. If not, use a placeholder or basic dict.
 # TODO: Replace with actual MemoryItem import if operations become type-specific for data

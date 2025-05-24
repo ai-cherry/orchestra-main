@@ -6,11 +6,10 @@ This module provides adapters for memory storage implementations to make them
 compatible with the MCP server's interfaces.
 """
 
-import json
+import asyncio
 import logging
 import time
-import asyncio
-from typing import Dict, List, Optional, Any, Union, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from ..interfaces.storage import IMemoryStorage
 from ..models.memory import MemoryEntry, MemoryMetadata

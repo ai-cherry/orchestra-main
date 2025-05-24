@@ -11,19 +11,19 @@ This module provides configuration for DragonflyDB connections with support for:
 
 import os
 import sys
-from typing import Dict, Any
 from pathlib import Path
+from typing import Any, Dict
 
 # Add parent directory to path to import dragonfly_config from root
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 try:
     from dragonfly_config import (
-        DRAGONFLY_HOST,
-        DRAGONFLY_PORT,
-        DRAGONFLY_PASSWORD,
-        DRAGONFLY_DB_INDEX,
         DRAGONFLY_CONNECTION_URI,
+        DRAGONFLY_DB_INDEX,
+        DRAGONFLY_HOST,
+        DRAGONFLY_PASSWORD,
+        DRAGONFLY_PORT,
         log_dragonfly_config,
     )
 except ImportError:

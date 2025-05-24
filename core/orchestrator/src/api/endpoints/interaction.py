@@ -8,10 +8,9 @@ separating API concerns from business logic.
 """
 
 import logging
-from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from core.orchestrator.src.api.dependencies.llm import get_llm_client
@@ -19,15 +18,10 @@ from core.orchestrator.src.api.dependencies.memory import (
     get_memory_manager,
     get_memory_service,
 )
-from core.orchestrator.src.services.interaction_service import InteractionService
 from core.orchestrator.src.config.settings import get_settings
+from core.orchestrator.src.services.interaction_service import InteractionService
 from packages.shared.src.llm_client.interface import LLMClient
 from packages.shared.src.memory.memory_manager import MemoryManager
-from packages.shared.src.memory.services.memory_service import MemoryService
-from packages.shared.src.memory.services.memory_service_factory import (
-    MemoryServiceFactory,
-)
-from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
 
 # Commented out due to Pylance error - verify module path or availability
 # from infra.modules.advanced-monitoring.auto_instrumentation import api_endpoint, llm_call
@@ -81,7 +75,6 @@ async def get_interaction_service(
 
 
 @router.post("/interact", response_model=Dict[str, str], tags=["interaction"])
-@api_endpoint(name="interact_endpoint", error_threshold_ms=2000, track_request_body=True)
 async def interact(
     user_input: UserInput,
     request: Request,

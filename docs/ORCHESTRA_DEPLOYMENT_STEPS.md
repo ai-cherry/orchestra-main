@@ -45,6 +45,7 @@ Before starting the deployment process, ensure you have:
    ```
 
    This script:
+
    - Installs Google Cloud SDK if not already installed
    - Sets up authentication with GCP
    - Creates or imports a vertex-agent service account key
@@ -57,6 +58,7 @@ Before starting the deployment process, ensure you have:
    ```
 
    This script:
+
    - Creates a Redis instance in GCP
    - Generates a secure password and stores it in Secret Manager
    - Updates the .env file with Redis connection information
@@ -82,6 +84,7 @@ This is the simplest method for quick deployment:
 ```
 
 This script:
+
 - Builds a Docker image of the application
 - Pushes the image to Google Artifact Registry
 - Deploys the application to Cloud Run
@@ -97,6 +100,7 @@ cd infra
 ```
 
 This creates all the required GCP resources:
+
 - Cloud Run service
 - Firestore database
 - Redis instance
@@ -175,6 +179,7 @@ If you encounter issues during deployment:
 4. **View Build Logs**
 
    If using Cloud Build:
+
    ```bash
    gcloud builds list
    gcloud builds log <build-id>
@@ -183,10 +188,12 @@ If you encounter issues during deployment:
 ## Security Considerations
 
 1. **Service Account Key Security**
+
    - Keep the service account key secure
    - Consider rotating the key periodically
 
 2. **Secret Management**
+
    - Use Secret Manager for all sensitive information
    - Avoid hardcoding secrets in configuration files
 

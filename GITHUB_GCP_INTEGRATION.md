@@ -7,15 +7,18 @@ This document outlines the implementation of the GitHub and GCP integration opti
 The implementation includes several components:
 
 1. **GitHub Token Management**
+
    - Token rotation script
    - Token usage monitoring
    - Secret synchronization between GitHub and GCP
 
 2. **GCP Service Account Management**
+
    - Service account key rotation
    - Least privilege implementation
 
 3. **CI/CD Pipeline Optimization**
+
    - Dependency caching
    - Parallel job execution
    - Performance testing

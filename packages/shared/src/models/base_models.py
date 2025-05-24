@@ -4,9 +4,9 @@ Base models for AI Orchestra agent orchestration system.
 This module defines the base data models used throughout the agent orchestration system.
 """
 
-from typing import Dict, List, Any, Optional, Union
-from enum import Enum
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel, Field
 
 

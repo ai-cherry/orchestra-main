@@ -8,7 +8,7 @@ for agent management and selection without security overhead.
 
 import logging
 import sys
-from typing import Dict, Any
+from typing import Any, Dict
 
 # Configure logging
 logging.basicConfig(
@@ -18,13 +18,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger("simplified-agent-example")
 
+from core.orchestrator.src.agents.agent_base import AgentContext
+
 # Import the simplified agent registry
 from core.orchestrator.src.agents.simplified_agent_registry import (
+    AgentCapability,
     get_simplified_agent_registry,
     register_default_agents,
-    AgentCapability,
 )
-from core.orchestrator.src.agents.agent_base import AgentContext
 
 
 class SimpleAgent:

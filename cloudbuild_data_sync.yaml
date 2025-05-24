@@ -67,7 +67,7 @@ steps:
       - "-c"
       - |
         echo "Retrieving data sync scripts..."
-        
+
         # Check if scripts already exist in bucket
         if gsutil -q stat gs://${_BUCKET}/scripts/data_sync_ci_cd.sh; then
           echo "Scripts found in bucket, copying to workspace..."
@@ -75,20 +75,20 @@ steps:
           chmod +x /workspace/data_sync_ci_cd.sh
         else
           echo "Scripts not found in bucket, will use from workspace..."
-          
+
           # Ensure script is present and executable
           if [ ! -f /workspace/data_sync_ci_cd.sh ]; then
             echo "ERROR: data_sync_ci_cd.sh not found in workspace or bucket!"
             exit 1
           fi
-          
+
           # Upload script to bucket for future use
           echo "Uploading script to bucket for future builds..."
           mkdir -p /workspace/scripts
           cp /workspace/data_sync_ci_cd.sh /workspace/scripts/
           gsutil -m cp -r /workspace/scripts gs://${_BUCKET}/
         fi
-        
+
         ls -la /workspace
 
   # Step 5: Run data sync operation
@@ -106,7 +106,7 @@ steps:
           --bucket ${BUCKET} \
           $([[ -n "${NOTIFICATION_EMAIL}" ]] && echo "--notification-email ${NOTIFICATION_EMAIL}") \
           $([[ -n "${SLACK_WEBHOOK}" ]] && echo "--slack-webhook ${SLACK_WEBHOOK}")
-        
+
         # Check exit code
         SYNC_RESULT=$?
         if [ $SYNC_RESULT -eq 0 ]; then
@@ -124,16 +124,16 @@ steps:
       - "-c"
       - |
         echo "Uploading results and logs..."
-        
+
         # Create results directory
         TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
         mkdir -p /workspace/sync_results_${TIMESTAMP}
-        
+
         # Collect logs and status files
         cp /tmp/data_sync_status.json /workspace/sync_results_${TIMESTAMP}/ || true
         cp /workspace/.checksums/*.md5 /workspace/sync_results_${TIMESTAMP}/ || true
         cp /workspace/.checksums/*.txt /workspace/sync_results_${TIMESTAMP}/ || true
-        
+
         # Generate result summary
         cat > /workspace/sync_results_${TIMESTAMP}/summary.json << EOF
         {
@@ -145,13 +145,13 @@ steps:
           "result": $([ -f /tmp/data_sync_status.json ] && grep -o '"status":"[^"]*"' /tmp/data_sync_status.json || echo '"unknown"')
         }
         EOF
-        
+
         # Upload to results directory in bucket
         gsutil -m cp -r /workspace/sync_results_${TIMESTAMP} gs://${_BUCKET}/sync_results/
-        
+
         # Upload latest summary for quick access
         gsutil cp /workspace/sync_results_${TIMESTAMP}/summary.json gs://${_BUCKET}/sync_results/latest_${_ENVIRONMENT}.json
-        
+
         echo "Results uploaded to gs://${_BUCKET}/sync_results/sync_results_${TIMESTAMP}/"
 
   # Step 7: Build and push Docker image
@@ -206,10 +206,6 @@ steps:
       - 'vertex-agent@cherry-ai-project.iam.gserviceaccount.com'
       - '--project'
       - 'cherry-ai-project'
-
-options:
-  logging: CLOUD_LOGGING_ONLY
-  machineType: 'E2_HIGHCPU_8'
 
 serviceAccount: 'projects/525398941159/serviceAccounts/vertex-agent@cherry-ai-project.iam.gserviceaccount.com'
 

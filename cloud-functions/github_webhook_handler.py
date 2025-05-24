@@ -1,16 +1,14 @@
 # GitHub Webhook Handler for GCP Cloud Functions
 # This script processes GitHub webhooks and triggers actions in GCP
 
-import os
-import json
-import hmac
 import hashlib
-import base64
-from flask import Flask, request, jsonify
+import hmac
+import json
+import os
+
 import google.cloud.logging
-from google.cloud import pubsub_v1
-from google.cloud import secretmanager
-from google.cloud import storage
+from flask import Flask, jsonify, request
+from google.cloud import pubsub_v1, secretmanager, storage
 
 app = Flask(__name__)
 

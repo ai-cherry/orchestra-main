@@ -8,13 +8,12 @@ maintaining security best practices.
 
 import logging
 import os
-from typing import Dict, List, Optional, Any, Union
-import json
-
-from packages.agents.base import BaseAgent
+from typing import Any, Dict, List, Optional
 
 # Import from future directory since OnePasswordAgent has been moved
 from future.packages.agents.runtime.security.onepassword_agent import OnePasswordAgent
+
+from packages.agents.base import BaseAgent
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +101,7 @@ class CredentialsManager(BaseAgent):
         # Extract request details
         request_type = context.get("request_type", "unknown")
         provider = context.get("provider", self.default_provider)
-        input_text = context.get("input_text", "")
+        context.get("input_text", "")
 
         if not self.providers:
             return {
@@ -330,7 +329,6 @@ class CredentialsManager(BaseAgent):
             return False
 
         success = True
-        env_map = {}
 
         # Group credentials by provider for efficiency
         by_provider = {}
@@ -372,7 +370,7 @@ class CredentialsManager(BaseAgent):
 
     def shutdown(self) -> None:
         """Perform any necessary cleanup when shutting down the agent."""
-        logger.info(f"Shutting down Credentials Manager")
+        logger.info("Shutting down Credentials Manager")
         super().shutdown()
 
 

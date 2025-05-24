@@ -15,6 +15,7 @@ The following measures have been implemented to prevent restricted mode:
 The `.devcontainer/devcontainer.json` file includes:
 
 - Workspace trust settings that disable restricted mode:
+
   ```json
   "security.workspace.trust.enabled": false,
   "security.workspace.trust.startupPrompt": "never",
@@ -30,6 +31,7 @@ The `.devcontainer/devcontainer.json` file includes:
 ### 2. Startup Scripts
 
 - `.devcontainer/setup.sh`: Runs during container creation and includes code to:
+
   - Set critical environment variables
   - Make all scripts executable
   - Update VS Code settings to disable workspace trust
@@ -56,21 +58,25 @@ The `fix_restricted_mode.sh` script is now the recommended solution as it implem
 If your Codespace starts in restricted mode despite these preventions:
 
 1. Run the following command in the terminal:
+
    ```bash
    ./fix_restricted_mode.sh
    ```
 
 2. Verify the fix worked by running:
+
    ```bash
    ./verify_standard_mode.sh
    ```
 
 3. If the issue persists, try:
+
    ```bash
    ./prevent_restricted_mode.sh
    ```
 
 4. If still having issues:
+
    ```bash
    ./disable_restricted_mode.sh
    ```
@@ -105,6 +111,7 @@ Our solution addresses all three aspects to ensure a consistent development expe
 The comprehensive fix implemented in `fix_restricted_mode.sh` addresses the following:
 
 1. **Environment Variables**: Sets and persists critical environment variables in multiple locations:
+
    - Current shell session
    - Shell configuration files (`.bashrc`, `.profile`, etc.)
    - VS Code settings
@@ -112,14 +119,17 @@ The comprehensive fix implemented in `fix_restricted_mode.sh` addresses the foll
    - CI/CD pipelines via GitHub Actions
 
 2. **VS Code Settings**: Updates both workspace and global VS Code settings to disable workspace trust:
+
    - `.vscode/settings.json` for workspace settings
    - Global VS Code settings in Codespaces
 
 3. **Filesystem Permissions**: Ensures proper permissions on scripts and creates marker files:
+
    - Makes all scripts executable
    - Creates `.standard_mode` marker files
 
 4. **Startup Hooks**: Adds hooks to ensure settings are applied on each session:
+
    - Creates a startup script that runs on each terminal session
    - Integrates with container startup via `postCreateCommand` and `postStartCommand`
 

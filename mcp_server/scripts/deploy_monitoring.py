@@ -9,11 +9,12 @@ for the MCP server.
 
 import argparse
 import json
+import logging
 import os
 import sys
+from typing import Any, Dict, List
+
 import yaml
-from typing import Dict, Any, List, Optional
-import logging
 
 # Set up logging
 logging.basicConfig(
@@ -24,9 +25,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 try:
+    from google.api_core.exceptions import AlreadyExists
     from google.cloud import monitoring_v3
     from google.cloud.monitoring_dashboard import v1 as dashboard
-    from google.api_core.exceptions import NotFound, AlreadyExists, PermissionDenied
 
     HAS_GCP = True
 except ImportError:
@@ -400,7 +401,7 @@ def create_log_metrics(
 
     for metric_def in log_metrics:
         # Replace variables in filter
-        filter_str = replace_variables(metric_def["filter"], variables)
+        replace_variables(metric_def["filter"], variables)
 
         # Create log metric
         descriptor = monitoring_v3.MetricDescriptor()

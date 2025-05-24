@@ -7,18 +7,16 @@ across asynchronous contexts. It outputs JSON-formatted logs with consistent
 fields and supports context propagation through asyncio tasks.
 """
 
-import logging
-import json
-import uuid
-import time
+import asyncio
 import functools
+import inspect
+import json
+import logging
 import sys
-import traceback
-from typing import Dict, Any, Optional, Callable, TypeVar, cast, Union
+import uuid
 from contextvars import ContextVar
 from datetime import datetime
-import inspect
-import asyncio
+from typing import Any, Callable, Dict, Optional, TypeVar, cast
 
 # Context variable to store correlation ID
 correlation_id: ContextVar[Optional[str]] = ContextVar("correlation_id", default=None)

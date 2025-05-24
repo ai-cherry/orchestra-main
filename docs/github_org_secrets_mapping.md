@@ -32,25 +32,25 @@ Both scripts require:
 
 The following GitHub organization secrets are mapped to local environment variables:
 
-| GitHub Organization Secret | Local `.env` Variable |
-|---------------------------|----------------------|
-| `ORG_GCP_CREDENTIALS` | `GCP_SA_KEY_JSON` |
-| `ORG_GCP_PROJECT_ID` | `GCP_PROJECT_ID` |
-| `ORG_GCP_PROJECT_NUMBER` | `GCP_PROJECT_NUMBER` |
-| `ORG_VERTEX_KEY` | `VERTEX_KEY` |
-| `ORG_GCP_SERVICE_ACCOUNT_KEY` | `GCP_SERVICE_ACCOUNT_KEY` |
-| `ORG_GCP_REGION` | `GCP_LOCATION` |
-| `ORG_GKE_CLUSTER_PROD` | `GKE_CLUSTER_PROD` |
-| `ORG_GKE_CLUSTER_STAGING` | `GKE_CLUSTER_STAGING` |
-| `ORG_PORTKEY_API_KEY` | `PORTKEY_API_KEY` |
-| `ORG_TERRAFORM_API_KEY` | `TERRAFORM_API_KEY` |
+| GitHub Organization Secret         | Local `.env` Variable          |
+| ---------------------------------- | ------------------------------ |
+| `ORG_GCP_CREDENTIALS`              | `GCP_SA_KEY_JSON`              |
+| `ORG_GCP_PROJECT_ID`               | `GCP_PROJECT_ID`               |
+| `ORG_GCP_PROJECT_NUMBER`           | `GCP_PROJECT_NUMBER`           |
+| `ORG_VERTEX_KEY`                   | `VERTEX_KEY`                   |
+| `ORG_GCP_SERVICE_ACCOUNT_KEY`      | `GCP_SERVICE_ACCOUNT_KEY`      |
+| `ORG_GCP_REGION`                   | `GCP_LOCATION`                 |
+| `ORG_GKE_CLUSTER_PROD`             | `GKE_CLUSTER_PROD`             |
+| `ORG_GKE_CLUSTER_STAGING`          | `GKE_CLUSTER_STAGING`          |
+| `ORG_PORTKEY_API_KEY`              | `PORTKEY_API_KEY`              |
+| `ORG_TERRAFORM_API_KEY`            | `TERRAFORM_API_KEY`            |
 | `ORG_TERRAFORM_ORGANIZATION_TOKEN` | `TERRAFORM_ORGANIZATION_TOKEN` |
-| `ORG_REDIS_HOST` | `REDIS_HOST` |
-| `ORG_REDIS_PORT` | `REDIS_PORT` |
-| `ORG_REDIS_USER` | `REDIS_USER` |
-| `ORG_REDIS_PASSWORD` | `REDIS_PASSWORD` |
-| `ORG_REDIS_DATABASE_NAME` | `REDIS_DATABASE_NAME` |
-| `ORG_REDIS_DATABASE_ENDPOINT` | `REDIS_DATABASE_ENDPOINT` |
+| `ORG_REDIS_HOST`                   | `REDIS_HOST`                   |
+| `ORG_REDIS_PORT`                   | `REDIS_PORT`                   |
+| `ORG_REDIS_USER`                   | `REDIS_USER`                   |
+| `ORG_REDIS_PASSWORD`               | `REDIS_PASSWORD`               |
+| `ORG_REDIS_DATABASE_NAME`          | `REDIS_DATABASE_NAME`          |
+| `ORG_REDIS_DATABASE_ENDPOINT`      | `REDIS_DATABASE_ENDPOINT`      |
 
 ## Using the Interactive Script
 
@@ -79,11 +79,13 @@ For automated environments, use the non-interactive script:
 ```
 
 Arguments:
+
 - `--org <name>`: (Required) GitHub organization name
 - `--yes`: (Optional) Skip all confirmations (for CI/CD environments)
 - `--env-file <path>`: (Optional) Custom path to `.env` file
 
 Example for CI/CD pipeline:
+
 ```bash
 ./scripts/update_github_org_secrets_ci.sh --org orchestra-project --yes
 ```
@@ -93,6 +95,7 @@ Example for CI/CD pipeline:
 These scripts do not retrieve the actual secret values from GitHub (as GitHub makes this impossible by design). Instead, they create a structure in your `.env` file that shows what values you need to set.
 
 For production environments, consider using:
+
 - Google Secret Manager for GCP deployments
 - GitHub Actions' built-in secrets handling for CI/CD
 - AWS Secrets Manager for AWS deployments
@@ -102,11 +105,13 @@ For production environments, consider using:
 ### Common Issues
 
 1. **"Not authenticated with GitHub CLI"**
+
    ```bash
    gh auth login
    ```
 
 2. **"Cannot access organization"**
+
    - Verify organization name
    - Ensure you're a member of the organization
    - Check you have sufficient permissions
@@ -118,6 +123,7 @@ For production environments, consider using:
 ### Getting Help
 
 If you encounter issues with these scripts, please:
+
 1. Check the error messages for specific guidance
 2. Review the script code for error handling
 3. Contact your organization's DevOps or Infrastructure team
@@ -152,10 +158,10 @@ For GitHub Actions, you can add the following step to your workflow:
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
     sudo apt update
     sudo apt install gh
-    
+
     # Authenticate (using the GITHUB_TOKEN provided by Actions)
     echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
-    
+
     # Run the script
     ./scripts/update_github_org_secrets_ci.sh --org ${{ github.repository_owner }} --yes
 ```

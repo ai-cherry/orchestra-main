@@ -10,12 +10,12 @@ privileges. Ensure this key is stored securely and access to these functions is
 properly controlled and audited.
 """
 
-import os
 import logging
-import requests
-from typing import Dict, List, Any, Optional, Union
+import os
 from dataclasses import dataclass
-import json
+from typing import Any, Dict, List, Optional
+
+import requests
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -26,8 +26,6 @@ PORTKEY_API_BASE_URL = "https://api.portkey.ai/v1"
 
 class PortkeyAdminException(Exception):
     """Exception raised for errors in the Portkey Admin client."""
-
-    pass
 
 
 @dataclass

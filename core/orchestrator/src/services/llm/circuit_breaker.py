@@ -28,23 +28,21 @@ Usage:
         result = await fallback_provider()
 """
 
-import time
 import asyncio
 import logging
-from typing import Dict, Callable, Any, Optional, List, TypeVar, Awaitable, Union, cast
-from enum import Enum
-from functools import wraps
 import threading
-from datetime import datetime, timedelta
+import time
+from enum import Enum
+from typing import Any, Awaitable, Callable, Dict, Optional, TypeVar, Union
 
 # Import tenacity for retry logic
 try:
     from tenacity import (
+        RetryError,
         retry,
+        retry_if_exception_type,
         stop_after_attempt,
         wait_exponential,
-        retry_if_exception_type,
-        RetryError,
     )
 
     TENACITY_AVAILABLE = True

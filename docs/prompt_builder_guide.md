@@ -44,7 +44,7 @@ builder = PromptBuilder()
 
 # Define a persona
 persona = PersonaConfig(
-    name="Cherry", 
+    name="Cherry",
     description="A cheerful and energetic assistant",
     prompt_template="Respond in a cheerful tone: {input}",
     traits={"efficiency": 0.7, "empathy": 0.9}
@@ -84,16 +84,16 @@ async def interact(
 
 The PromptBuilder processes a wide range of persona traits:
 
-| Trait | High Value (0.7-1.0) | Low Value (0.0-0.3) |
-|-------|----------------------|---------------------|
-| Efficiency | Concise, direct communication | Detailed, thorough explanations |
-| Assertiveness | Confident, authoritative language | Gentle, suggestive language |
-| Pragmatism | Practical, actionable advice | Theoretical, conceptual perspectives |
-| Creativity | Innovative, novel approaches | Conventional, established approaches |
-| Empathy | Emotionally aware, supportive | Factual, logical focus |
-| Humor | Light-hearted, playful tone | Serious, straightforward tone |
-| Formality | Professional, structured language | Casual, conversational language |
-| Detail Orientation | Specific, comprehensive coverage | High-level, big picture focus |
+| Trait              | High Value (0.7-1.0)              | Low Value (0.0-0.3)                  |
+| ------------------ | --------------------------------- | ------------------------------------ |
+| Efficiency         | Concise, direct communication     | Detailed, thorough explanations      |
+| Assertiveness      | Confident, authoritative language | Gentle, suggestive language          |
+| Pragmatism         | Practical, actionable advice      | Theoretical, conceptual perspectives |
+| Creativity         | Innovative, novel approaches      | Conventional, established approaches |
+| Empathy            | Emotionally aware, supportive     | Factual, logical focus               |
+| Humor              | Light-hearted, playful tone       | Serious, straightforward tone        |
+| Formality          | Professional, structured language | Casual, conversational language      |
+| Detail Orientation | Specific, comprehensive coverage  | High-level, big picture focus        |
 
 Traits are defined in the persona configuration and automatically processed to shape the prompt.
 
@@ -102,6 +102,7 @@ Traits are defined in the persona configuration and automatically processed to s
 The PromptBuilder supports multiple output formats:
 
 - **CHAT**: A list of message objects for chat-based LLM APIs
+
   ```python
   [
       {"role": "system", "content": "..."},
@@ -111,10 +112,11 @@ The PromptBuilder supports multiple output formats:
   ```
 
 - **INSTRUCTION**: A single string formatted for instruction-following models
+
   ```
   You are Cherry, a cheerful assistant.
   User: How are you?
-  Assistant: 
+  Assistant:
   ```
 
 - **RAW**: A simple text prompt without special formatting
@@ -129,7 +131,7 @@ To add support for new traits, extend the `TraitsProcessor` class:
 def _process_analytical(self, value: float) -> Tuple[str, Dict[str, Any]]:
     """Process analytical trait."""
     params = {"analytical_level": "moderate"}
-    
+
     if value >= 0.7:
         params["analytical_level"] = "high"
         return (
@@ -144,7 +146,7 @@ def _process_analytical(self, value: float) -> Tuple[str, Dict[str, Any]]:
             "rather than detailed breakdowns.",
             params
         )
-    
+
     return "", params
 ```
 

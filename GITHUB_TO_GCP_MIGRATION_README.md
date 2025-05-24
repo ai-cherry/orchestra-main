@@ -44,6 +44,7 @@ chmod +x gcp_workstation_migrate.sh
 ```
 
 The script will create:
+
 - Terraform configuration for Cloud Workstations
 - Secret migration scripts
 - AI coding assistance configuration files
@@ -68,6 +69,7 @@ terraform apply
 ```
 
 This will create:
+
 - Cloud Workstation cluster and configurations
 - Network infrastructure
 - Service accounts with necessary permissions
@@ -197,11 +199,13 @@ If AI coding assistance isn't working:
 ## GitHub's Role Post-Migration
 
 GitHub remains involved in the following ways:
+
 - Primary code repository (source of truth)
 - Pull request reviews and collaboration
 - Issue tracking
 
 However, all execution now happens in GCP:
+
 - Cloud Build handles CI/CD (not GitHub Actions)
 - Deployment happens directly to Cloud Run
 - Development occurs in Cloud Workstations

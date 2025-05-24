@@ -5,26 +5,20 @@ This module provides functionality for processing large documents,
 extracting text, and chunking them for efficient storage and retrieval.
 """
 
+import json
 import logging
 import os
-import uuid
-import asyncio
-from typing import Dict, List, Optional, Any, Tuple, BinaryIO, Union
-import tempfile
-import mimetypes
-import json
 import re
+import uuid
+from typing import Any, Dict, List, Optional, Tuple
 
 from ai_orchestra.core.config import settings
-from ai_orchestra.utils.logging import log_event
 
 logger = logging.getLogger("ai_orchestra.services.document.document_processor")
 
 
 class TextExtractionError(Exception):
     """Exception for text extraction-related errors."""
-
-    pass
 
 
 class ChunkingStrategy:
@@ -530,19 +524,19 @@ class DocumentProcessor:
             # Create prompt for semantic chunking
             prompt = f"""
             Split the following text into coherent semantic chunks. Each chunk should be a self-contained unit of information.
-            
+
             Rules for chunking:
             1. Each chunk should be coherent and self-contained
             2. Preserve paragraph boundaries when possible
             3. Keep related information together
             4. Split at natural semantic boundaries
             5. Aim for chunks of roughly {self.chunk_size} characters
-            
+
             Format your response as a JSON array of chunks, where each chunk is a string.
-            
+
             Text to chunk:
             {text[:20000]}  # Limit text size for prompt
-            
+
             Chunks:
             """
 

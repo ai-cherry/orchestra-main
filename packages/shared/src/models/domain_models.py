@@ -6,14 +6,14 @@ used throughout the application.
 """
 
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Any, Dict
 
 # Note: Pydantic might need to be installed if not present
 try:
     from pydantic import BaseModel, Field
 except ImportError:
     # Fallback to dataclasses if pydantic is not available
-    from dataclasses import dataclass, field
+    from dataclasses import field
 
     BaseModel = object
 

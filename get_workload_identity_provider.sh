@@ -38,7 +38,7 @@ if gcloud iam workload-identity-pools describe $POOL_NAME \
   --project=$PROJECT_ID \
   --location="global" &>/dev/null; then
   echo -e "${GREEN}✓ Workload Identity Pool exists${NC}"
-  
+
   # Check if the Workload Identity Provider exists
   echo -e "\n${YELLOW}Checking if Workload Identity Provider exists...${NC}"
   if gcloud iam workload-identity-pools providers describe $PROVIDER_NAME \
@@ -46,7 +46,7 @@ if gcloud iam workload-identity-pools describe $POOL_NAME \
     --location="global" \
     --workload-identity-pool=$POOL_NAME &>/dev/null; then
     echo -e "${GREEN}✓ Workload Identity Provider exists${NC}"
-    
+
     # Get the actual Workload Identity Provider string from GCP
     echo -e "\n${YELLOW}Getting actual Workload Identity Provider string from GCP...${NC}"
     ACTUAL_WIF_PROVIDER=$(gcloud iam workload-identity-pools providers describe $PROVIDER_NAME \

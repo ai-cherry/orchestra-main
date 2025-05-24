@@ -5,18 +5,18 @@ This module provides a web scraper agent that can fetch content from URLs using
 various scraping methods and APIs.
 """
 
-import logging
 import asyncio
-import uuid
-from typing import Dict, Any, List, Optional
+import logging
 import urllib.parse
+import uuid
+from typing import Any, Dict, List
+
+# For basic scraping
+import requests
 
 # Import the BaseAgent class
 from packages.agents.base import BaseAgent
 from packages.shared.src.models.base_models import AgentData
-
-# For basic scraping
-import requests
 
 logger = logging.getLogger(__name__)
 

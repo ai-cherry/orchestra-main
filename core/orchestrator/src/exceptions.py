@@ -5,7 +5,7 @@ This module defines custom exceptions for different types of failures in the orc
 system, allowing for more precise error handling and easier troubleshooting.
 """
 
-from typing import Optional, Any, Dict
+from typing import Any, Dict, Optional
 
 
 class OrchestratorError(Exception):
@@ -20,49 +20,33 @@ class OrchestratorError(Exception):
 class ConfigurationError(OrchestratorError):
     """Raised when there's a configuration issue."""
 
-    pass
-
 
 class DependencyError(OrchestratorError):
     """Raised when a required dependency is missing or unavailable."""
-
-    pass
 
 
 class MemoryError(OrchestratorError):
     """Base exception for memory system errors."""
 
-    pass
-
 
 class MemoryConnectionError(MemoryError):
     """Raised when a connection to a memory storage system fails."""
-
-    pass
 
 
 class MemoryOperationError(MemoryError):
     """Raised when a memory operation fails."""
 
-    pass
-
 
 class MemoryItemNotFoundError(MemoryError):
     """Raised when a memory item is not found."""
-
-    pass
 
 
 class AgentError(OrchestratorError):
     """Base exception for agent-related errors."""
 
-    pass
-
 
 class AgentNotFoundError(AgentError):
     """Raised when a requested agent is not found."""
-
-    pass
 
 
 class AgentExecutionError(AgentError):
@@ -83,8 +67,6 @@ class AgentExecutionError(AgentError):
 class ResilienceError(OrchestratorError):
     """Base exception for resilience system errors."""
 
-    pass
-
 
 class CircuitBreakerOpenError(ResilienceError):
     """Raised when a circuit breaker is open."""
@@ -104,40 +86,26 @@ class CircuitBreakerOpenError(ResilienceError):
 class FallbackError(ResilienceError):
     """Raised when a fallback operation fails."""
 
-    pass
-
 
 class LLMError(OrchestratorError):
     """Base exception for LLM-related errors."""
-
-    pass
 
 
 class LLMProviderError(LLMError):
     """Raised when an LLM provider operation fails."""
 
-    pass
-
 
 class LLMRateLimitError(LLMError):
     """Raised when an LLM provider enforces rate limiting."""
-
-    pass
 
 
 class APIError(OrchestratorError):
     """Base exception for API-related errors."""
 
-    pass
-
 
 class ValidationError(APIError):
     """Raised when API request validation fails."""
 
-    pass
-
 
 class ServiceUnavailableError(APIError):
     """Raised when a required service is unavailable."""
-
-    pass

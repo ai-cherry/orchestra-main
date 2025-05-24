@@ -6,15 +6,16 @@ agent failure metrics and setting up alerting, and uses OpenTelemetry for tracin
 """
 
 import logging
-import time
-from typing import Dict, Any, List, Optional
-from datetime import datetime
 import threading
+import time
+from datetime import datetime
+from typing import Any, Dict, Optional
+
 from google.cloud import monitoring_v3
 from opentelemetry import trace
+from opentelemetry.exporter.cloud_trace import CloudTraceSpanExporter
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.exporter.cloud_trace import CloudTraceSpanExporter
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -53,7 +54,7 @@ class GCPMonitoringClient:
 
     def _setup_tracing(self):
         """Set up OpenTelemetry tracing with Cloud Trace exporter."""
-        tracer = trace.get_tracer(
+        trace.get_tracer(
             "agent-orchestrator",
             resource=Resource.create({"service.name": "vertex-agent"}),
         )
@@ -219,6 +220,7 @@ def get_monitoring_client() -> GCPMonitoringClient:
         if _monitoring_client is None:
             # Get GCP project ID from environment or config
             import os
+
             from core.orchestrator.src.config.config import get_settings
 
             settings = get_settings()

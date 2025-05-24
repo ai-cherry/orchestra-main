@@ -85,6 +85,7 @@ chmod +x setup_semantic_cache.sh
 ```
 
 This script will:
+
 - Install required dependencies
 - Configure Redis connection
 - Create needed schema files
@@ -114,7 +115,7 @@ index:
   prefix: "memory:"
   fields:
     - name: "text_content"
-      type: "text" 
+      type: "text"
       weight: 1.0
     - name: "embedding"
       type: "vector"
@@ -267,11 +268,13 @@ The implementation tracks key performance metrics:
 ### Common Issues
 
 1. **Connection Errors**:
+
    - Verify Redis URL is correct
    - Ensure Redis instance is running and accessible
    - Check network connectivity and firewall settings
 
 2. **Schema Errors**:
+
    - Validate the YAML schema is correctly formatted
    - Ensure Redis has vector search capability
    - Check for proper field types in schema
@@ -303,9 +306,9 @@ attrs:
   algorithm: "hnsw"
   distance_metric: "cosine"
   initial_size: 1000
-  m: 16                  # Number of connections per node
-  ef_construction: 200   # Effect on build-time quality
-  ef_runtime: 100        # Effect on search quality
+  m: 16 # Number of connections per node
+  ef_construction: 200 # Effect on build-time quality
+  ef_runtime: 100 # Effect on search quality
 ```
 
 ### Redis Enterprise Features

@@ -8,21 +8,21 @@ formatting and structured output handling.
 
 import logging
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from packages.ingestion.src.api.chat_integration import (
-    get_ingestion_middleware,
-    process_phidata_message,
-    IngestionChatMiddleware,
-)
 from pydantic import BaseModel, Field
 
+from core.orchestrator.src.agents.agent_registry import get_agent_registry
 from core.orchestrator.src.api.dependencies.llm import get_llm_client
 from core.orchestrator.src.api.dependencies.memory import get_memory_manager
-from core.orchestrator.src.agents.agent_registry import get_agent_registry
 from core.orchestrator.src.api.utils.format_structured_output import (
     format_structured_output_as_markdown,
+)
+from packages.ingestion.src.api.chat_integration import (
+    IngestionChatMiddleware,
+    get_ingestion_middleware,
+    process_phidata_message,
 )
 from packages.shared.src.llm_client.interface import LLMClient
 from packages.shared.src.memory.memory_manager import MemoryManager

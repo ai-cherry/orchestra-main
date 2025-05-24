@@ -6,8 +6,7 @@ into well-formatted markdown suitable for display in the Phidata Agent UI.
 """
 
 import json
-from typing import Any, Dict, List, Union, Optional
-from datetime import datetime
+from typing import Any, Dict, Optional
 
 
 def format_dictionary_as_markdown(data: Dict[str, Any], title: Optional[str] = None) -> str:

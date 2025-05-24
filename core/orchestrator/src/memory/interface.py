@@ -5,7 +5,7 @@ This module defines the interface for memory implementations.
 """
 
 import abc
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 
 class MemoryInterface(abc.ABC):
@@ -24,7 +24,6 @@ class MemoryInterface(abc.ABC):
         Returns:
             True if successful, False otherwise
         """
-        pass
 
     @abc.abstractmethod
     async def retrieve(self, key: str) -> Optional[Dict[str, Any]]:
@@ -37,7 +36,6 @@ class MemoryInterface(abc.ABC):
         Returns:
             The stored value, or None if not found
         """
-        pass
 
     @abc.abstractmethod
     async def delete(self, key: str) -> bool:
@@ -50,7 +48,6 @@ class MemoryInterface(abc.ABC):
         Returns:
             True if successful, False otherwise
         """
-        pass
 
     @abc.abstractmethod
     async def exists(self, key: str) -> bool:
@@ -63,7 +60,6 @@ class MemoryInterface(abc.ABC):
         Returns:
             True if the item exists, False otherwise
         """
-        pass
 
     @abc.abstractmethod
     async def search(self, field: str, value: Any, operator: str = "==", limit: int = 10) -> List[Dict[str, Any]]:
@@ -79,7 +75,6 @@ class MemoryInterface(abc.ABC):
         Returns:
             List of matching items
         """
-        pass
 
     async def update(self, key: str, updates: Dict[str, Any]) -> bool:
         """

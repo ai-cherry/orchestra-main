@@ -7,24 +7,24 @@ The agent implements lifecycle methods for proper integration with
 the unified registry and service management system.
 """
 
-import logging
 import asyncio
-from typing import List, Dict, Any, Optional, Set, Tuple
+import logging
+from typing import Dict, List, Optional, Set, Tuple
 
 from core.orchestrator.src.agents.agent_base import Agent, AgentContext, AgentResponse
-from core.orchestrator.src.services.unified_registry import Service
-from core.orchestrator.src.services.llm.providers import get_llm_provider, LLMProvider
 from core.orchestrator.src.services.llm.exceptions import (
-    LLMProviderError,
     LLMProviderAuthenticationError,
     LLMProviderConnectionError,
-    LLMProviderRateLimitError,
+    LLMProviderError,
     LLMProviderInvalidRequestError,
+    LLMProviderModelError,
+    LLMProviderRateLimitError,
+    LLMProviderResourceExhaustedError,
     LLMProviderServiceError,
     LLMProviderTimeoutError,
-    LLMProviderModelError,
-    LLMProviderResourceExhaustedError,
 )
+from core.orchestrator.src.services.llm.providers import get_llm_provider
+from core.orchestrator.src.services.unified_registry import Service
 from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
 
 # Configure logging

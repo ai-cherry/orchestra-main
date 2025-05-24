@@ -66,6 +66,7 @@ Run the webhook setup script to generate a secure webhook secret and register wi
 ```
 
 During this process, you'll need to provide:
+
 - Your Figma team ID
 - Which events to subscribe to (typically FILE_UPDATE)
 - A temporary webhook URL (you'll update this later)
@@ -77,6 +78,7 @@ During this process, you'll need to provide:
 ```
 
 This script will:
+
 - Create a Dockerfile
 - Set up secrets in Google Secret Manager
 - Build and deploy to Cloud Run

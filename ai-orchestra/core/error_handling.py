@@ -8,22 +8,20 @@ context managers, support for both sync and async functions, and better logging.
 
 import asyncio
 import functools
-import inspect
 import logging
 import time
 import traceback
 from typing import (
-    Callable,
-    TypeVar,
     Any,
-    Dict,
+    Callable,
     Optional,
+    ParamSpec,
+    Tuple,
     Type,
+    TypeVar,
     Union,
     cast,
     overload,
-    ParamSpec,
-    Tuple,
 )
 
 from .errors import AIServiceError

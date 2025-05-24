@@ -6,30 +6,27 @@ This module implements a performance-optimized Firestore V2 memory manager with
 async operations, batching, connection pooling, and caching for improved performance.
 """
 
-import time
-import logging
 import asyncio
 import json
-from typing import Dict, List, Optional, Any, Tuple, Set, Union
-from datetime import datetime, timedelta
+import logging
+import time
+from typing import Any, Dict, List, Optional, Tuple
 
 # Import GCP libraries
 try:
-    from google.cloud import firestore
-    from google.api_core.retry import Retry
     from google.api_core.exceptions import (
-        GoogleAPIError,
         DeadlineExceeded,
         ServiceUnavailable,
     )
+    from google.api_core.retry import Retry
+    from google.cloud import firestore
 except ImportError:
     logging.warning("Google Cloud Firestore library not installed. Install with: pip install google-cloud-firestore")
 
 # Import from relative paths
 from ..interfaces.memory_manager import IMemoryManager
-from ..models.memory import MemoryEntry, MemoryType, MemoryScope, StorageTier
+from ..models.memory import MemoryEntry, MemoryType
 from ..utils.gcp_auth import GCPAuth
-from ..utils.memory_compression_engine import MemoryCompressionEngine
 
 logger = logging.getLogger(__name__)
 
@@ -189,7 +186,7 @@ class FirestoreMemoryManagerV2(IMemoryManager):
             self._prune_cache()
 
         # Add to batch operations
-        collection_name = self._get_collection_name(entry.memory_type)
+        self._get_collection_name(entry.memory_type)
         async with self._batch_lock:
             self._batch_operations.append(BatchOperation("set", key, entry.to_dict()))
 
@@ -295,7 +292,7 @@ class FirestoreMemoryManagerV2(IMemoryManager):
         self._cache_ttl[key] = time.time() + self.cache_ttl_seconds
 
         # Add to batch operations
-        collection_name = self._get_collection_name(entry.memory_type)
+        self._get_collection_name(entry.memory_type)
         async with self._batch_lock:
             self._batch_operations.append(BatchOperation("set", key, entry.to_dict()))
 
@@ -540,7 +537,7 @@ class FirestoreMemoryManagerV2(IMemoryManager):
                 operations_by_collection[collection].append(op)
 
             # Clear batch operations
-            operations = self._batch_operations.copy()
+            self._batch_operations.copy()
             self._batch_operations.clear()
             self._last_batch_flush = time.time()
 

@@ -93,11 +93,13 @@ The gateway provides a unified interface to all MCP servers:
 Manages Google Cloud Run deployments:
 
 **Tools:**
+
 - `deploy_service`: Deploy or update Cloud Run services
 - `get_service_status`: Check service status
 - `list_services`: List all deployed services
 
 **Example:**
+
 ```json
 {
   "server": "cloud-run",
@@ -116,6 +118,7 @@ Manages Google Cloud Run deployments:
 Manages Google Secret Manager:
 
 **Tools:**
+
 - `get_secret`: Retrieve secret values
 - `create_secret`: Create new secrets
 - `update_secret`: Update existing secrets
@@ -123,6 +126,7 @@ Manages Google Secret Manager:
 - `list_versions`: List secret versions
 
 **Example:**
+
 ```json
 {
   "server": "secrets",
@@ -130,7 +134,7 @@ Manages Google Secret Manager:
   "params": {
     "secret_id": "api-key",
     "value": "secret-value",
-    "labels": {"env": "prod"}
+    "labels": { "env": "prod" }
   }
 }
 ```
@@ -140,17 +144,20 @@ Manages Google Secret Manager:
 Implements layered memory architecture:
 
 **Memory Layers:**
+
 - **Short-term (Redis)**: TTL 1 hour, for temporary data
 - **Mid-term (Firestore)**: 30-day retention, for episodic memory
 - **Long-term (Qdrant)**: Permanent, for semantic memory
 
 **Tools:**
+
 - `store_memory`: Store memory with importance scoring
 - `query_memory`: Search across memory layers
 - `consolidate_memories`: Move memories between layers
 - `get_agent_memories`: Get all memories for an agent
 
 **Example:**
+
 ```json
 {
   "server": "memory",
@@ -158,7 +165,7 @@ Implements layered memory architecture:
   "params": {
     "content": "Important configuration detail",
     "importance": 0.9,
-    "metadata": {"type": "config"},
+    "metadata": { "type": "config" },
     "agent_id": "main-agent"
   }
 }
@@ -169,6 +176,7 @@ Implements layered memory architecture:
 Manages agent modes and workflows:
 
 **Available Modes:**
+
 - `standard`: Default operational mode
 - `code`: Code generation and analysis
 - `debug`: Debugging and troubleshooting
@@ -179,12 +187,14 @@ Manages agent modes and workflows:
 - `performance`: Performance optimization
 
 **Tools:**
+
 - `switch_mode`: Change operational mode
 - `run_workflow`: Execute predefined workflows
 - `execute_task`: Run specific tasks
 - `get_status`: Get orchestrator status
 
 **Available Workflows:**
+
 - `code_review`: Automated code review
 - `test_automation`: Generate and run tests
 - `performance_optimization`: Optimize performance
@@ -225,11 +235,11 @@ connection_pools:
   redis:
     max_connections: 100
     min_idle: 10
-    
+
 caching:
   health_check:
     ttl: 30
-    
+
 rate_limiting:
   requests_per_minute: 1000
 ```
@@ -261,6 +271,7 @@ tail -f /var/log/mcp/Memory_MCP.log
 Access Prometheus metrics at `http://localhost:8000/metrics`
 
 Key metrics:
+
 - `mcp_gateway_requests_total`: Total requests by endpoint
 - `mcp_gateway_request_duration_seconds`: Request latency
 - `mcp_gateway_active_servers`: Number of healthy servers
@@ -269,20 +280,24 @@ Key metrics:
 ## Performance Optimizations
 
 ### 1. Connection Pooling
+
 - Redis: 100 max connections
 - Firestore: 50 concurrent requests
 - Qdrant: 20 connections with gRPC compression
 
 ### 2. Caching Strategy
+
 - Health checks: 30-second TTL
 - Memory queries: 5-minute TTL
 - Secret values: 10-minute TTL (encrypted)
 
 ### 3. Batch Processing
+
 - Memory consolidation runs in batches
 - Workflow tasks are queued and processed asynchronously
 
 ### 4. Rate Limiting
+
 - Global: 1000 requests/minute
 - Per-endpoint limits for resource-intensive operations
 
@@ -291,31 +306,34 @@ Key metrics:
 ### Common Issues
 
 1. **Server won't start**
+
    ```bash
    # Check if ports are in use
    lsof -i :8000-8004
-   
+
    # Kill existing processes
    ./stop_mcp_system.sh
    ```
 
 2. **Authentication errors**
+
    ```bash
    # Check GCP auth
    gcloud auth application-default print-access-token
-   
+
    # Set project
    export GCP_PROJECT_ID=your-project-id
    ```
 
 3. **Memory backend issues**
+
    ```bash
    # Test Redis
    redis-cli ping
-   
+
    # Test Firestore
    gcloud firestore operations list
-   
+
    # Test Qdrant
    curl http://localhost:6333/health
    ```
@@ -323,6 +341,7 @@ Key metrics:
 ### Debug Mode
 
 Enable debug logging:
+
 ```bash
 export MCP_LOG_LEVEL=DEBUG
 ./start_mcp_system.sh
@@ -338,6 +357,7 @@ export MCP_LOG_LEVEL=DEBUG
 4. Add tests
 
 Example:
+
 ```python
 @app.post("/mcp/my_new_tool")
 async def my_new_tool(param1: str, param2: int):
@@ -348,6 +368,7 @@ async def my_new_tool(param1: str, param2: int):
 ### Testing
 
 Run the test suite:
+
 ```bash
 # All tests
 python test_mcp_system.py
@@ -359,11 +380,13 @@ pytest mcp_server/tests/test_memory_server.py
 ## Security
 
 ### Authentication
+
 - Service account authentication for GCP services
 - API key validation for external services
 - Role-based access control
 
 ### Best Practices
+
 1. Store sensitive data in Secret Manager
 2. Use service accounts with minimal permissions
 3. Enable audit logging
@@ -418,6 +441,7 @@ env:
 ## Support
 
 For issues or questions:
+
 1. Check the health dashboard
 2. Review server logs
 3. Run integration tests
@@ -453,6 +477,7 @@ Before deploying the MCP server using legacy scripts, ensure you have:
 ### Troubleshooting Legacy Issues
 
 For Poetry dependency issues:
+
 1. Update Poetry: `pip install --upgrade poetry`
 2. Clear cache: `poetry cache clear --all pypi`
 3. Rebuild lock: `poetry lock --no-update`

@@ -11,7 +11,7 @@ After a thorough investigation of the current codebase, I've identified the foll
 - **Import Issue**: Several files import from `packages.memory.src.base`, which doesn't exist
 - **Key File Locations**:
   - Memory manager base: `packages/shared/src/memory/memory_manager.py`
-  - Enhanced memory managers: 
+  - Enhanced memory managers:
     - `packages/shared/src/memory/privacy_enhanced_memory_manager.py`
     - `packages/shared/src/memory/dev_notes_manager.py`
   - Firestore implementations:
@@ -77,7 +77,7 @@ find /workspaces/orchestra-main -type f -name "*.py" -exec sed -i 's/from packag
 
 Create a documentation file explaining the current memory system structure:
 
-```bash
+````bash
 # Create the documentation file
 cat > docs/MEMORY_SYSTEM_STRUCTURE.md << 'EOF'
 # Memory System Structure
@@ -96,7 +96,7 @@ Memory management components are located in two main areas:
 2. **packages/shared/src/storage/firestore/**
    - `firestore_memory.py`: Original Firestore implementation (DEPRECATED)
    - `v2/adapter.py`: V2 Firestore implementation (RECOMMENDED)
-   - `v2/core.py`: Core functionality for V2 implementation 
+   - `v2/core.py`: Core functionality for V2 implementation
    - `v2/models.py`: Data models for V2 implementation
 
 3. **packages/phidata/src/**
@@ -119,7 +119,7 @@ from packages.shared.src.storage.firestore.v2.adapter import FirestoreMemoryMana
 
 # Import PG Vector configuration
 from packages.phidata.src.cloudsql_pgvector import get_pgvector_memory, get_pg_agent_storage
-```
+````
 
 **IMPORTANT:** Do not import from `packages.memory.src.base` as this path does not exist.
 
@@ -137,7 +137,8 @@ from packages.shared.src.storage.firestore.v2.adapter import FirestoreMemoryMana
 
 Note that initialization parameters are compatible between versions.
 EOF
-```
+
+````
 
 ### Priority 4: Add Detailed Deprecation Notice to FirestoreMemoryManager
 
@@ -146,18 +147,20 @@ Add a more detailed deprecation notice to the original Firestore memory manager:
 ```bash
 # Use the add_deprecation_notices.py script to add a deprecation notice
 ./add_deprecation_notices.py --file packages/shared/src/storage/firestore/firestore_memory.py
-```
+````
 
 ## Final Verification Steps
 
 These steps should be performed after implementing the changes above:
 
 1. Verify that removing the deprecated files doesn't break any functionality:
+
    ```bash
    ./run_pre_deployment_automated.sh
    ```
 
 2. Verify that all tests pass with the current structure:
+
    ```bash
    ./run_tests.sh
    ```

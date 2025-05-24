@@ -14,4 +14,4 @@ pip-check-reqs --unused .
 
 echo
 echo "Checking for missing requirements (imported but not in requirements.txt)..."
-pip-check-reqs --missing . 
+pip-check-reqs --missing .

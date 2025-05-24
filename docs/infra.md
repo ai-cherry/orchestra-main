@@ -135,40 +135,40 @@ name: Terraform
 on:
   push:
     branches: [main]
-    paths: ['infra/**']
+    paths: ["infra/**"]
   pull_request:
     branches: [main]
-    paths: ['infra/**']
+    paths: ["infra/**"]
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.5.0
-      
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
-      
+
       - name: Initialize Terraform
-        working-directory: infra/dev  # or infra/prod
+        working-directory: infra/dev # or infra/prod
         run: terraform init
-      
+
       - name: Terraform Plan
-        working-directory: infra/dev  # or infra/prod
-        run: terraform plan -var="env=dev"  # or -var="env=prod"
-        
+        working-directory: infra/dev # or infra/prod
+        run: terraform plan -var="env=dev" # or -var="env=prod"
+
       # Only apply on push to main
       - name: Terraform Apply
         if: github.event_name == 'push'
-        working-directory: infra/dev  # or infra/prod
-        run: terraform apply -auto-approve -var="env=dev"  # or -var="env=prod"
+        working-directory: infra/dev # or infra/prod
+        run: terraform apply -auto-approve -var="env=dev" # or -var="env=prod"
 ```
 
 ## Remote State Management
@@ -221,6 +221,7 @@ terraform workspace delete test-feature
 ### Getting Help
 
 For assistance with infrastructure issues:
+
 - Check the [Terraform GCP provider documentation](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
 - Review the module code in `infra/modules/`
 - Consult the Orchestra team Slack channel
@@ -230,6 +231,7 @@ For assistance with infrastructure issues:
 To deploy infrastructure for the RC-Arena Non-Profit project:
 
 1. Create a new workspace for the non-profit project:
+
    ```bash
    cd infra/dev
    terraform workspace new nonprofit

@@ -52,7 +52,7 @@ fi
 if [ -f .env ]; then
     echo -e "${YELLOW}Loading environment variables from .env...${NC}"
     source .env
-    
+
     # Override with .env values if they exist
     PROJECT_ID=${GCP_PROJECT_ID:-$PROJECT_ID}
 fi
@@ -78,7 +78,7 @@ echo -e "\n${YELLOW}Checking GCP authentication...${NC}"
 if ! gcloud auth print-access-token &>/dev/null; then
     echo -e "${RED}Not authenticated to GCP. Running 'gcloud auth login'...${NC}"
     gcloud auth login
-    
+
     # Check if login was successful
     if ! gcloud auth print-access-token &>/dev/null; then
         echo -e "${RED}Authentication failed. Please run 'gcloud auth login' manually.${NC}"
@@ -108,7 +108,7 @@ if gcloud secrets describe "$FULL_SECRET_ID" &>/dev/null; then
     echo -e "${GREEN}✓ Successfully added new version to secret: $FULL_SECRET_ID${NC}"
 else
     echo -e "${YELLOW}Creating new secret $FULL_SECRET_ID...${NC}"
-    
+
     # Create the secret with appropriate replication policy
     if [ "$REPLICATION_POLICY" == "automatic" ]; then
         echo -n "$SECRET_VALUE" | gcloud secrets create "$FULL_SECRET_ID" \
@@ -122,7 +122,7 @@ else
             --data-file=- \
             --quiet
     fi
-    
+
     echo -e "${GREEN}✓ Successfully created secret: $FULL_SECRET_ID${NC}"
 fi
 

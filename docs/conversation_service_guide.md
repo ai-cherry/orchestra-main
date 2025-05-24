@@ -45,7 +45,7 @@ async def start_conversation_endpoint(user_id: str, persona_name: str = None):
 ```python
 @router.post("/messages")
 async def add_message_endpoint(
-    user_id: str, 
+    user_id: str,
     session_id: str,
     message: str,
     is_user: bool = True,
@@ -67,7 +67,7 @@ async def add_message_endpoint(
 ```python
 @router.get("/history")
 async def get_history_endpoint(
-    user_id: str, 
+    user_id: str,
     session_id: str,
     limit: int = 20
 ):

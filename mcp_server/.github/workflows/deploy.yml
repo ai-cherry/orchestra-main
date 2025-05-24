@@ -4,19 +4,19 @@ on:
   push:
     branches: [main]
     paths:
-      - 'mcp_server/**'
-      - '.github/workflows/deploy.yml'
+      - "mcp_server/**"
+      - ".github/workflows/deploy.yml"
   pull_request:
     branches: [main]
     paths:
-      - 'mcp_server/**'
-      - '.github/workflows/deploy.yml'
+      - "mcp_server/**"
+      - ".github/workflows/deploy.yml"
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy to'
+        description: "Environment to deploy to"
         required: true
-        default: 'dev'
+        default: "dev"
         type: choice
         options:
           - dev
@@ -32,7 +32,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    
+
     services:
       redis:
         image: redis/redis-stack:latest
@@ -43,42 +43,42 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
-          cache: 'pip'
-      
+          python-version: "3.11"
+          cache: "pip"
+
       - name: Install Poetry
         uses: snok/install-poetry@v1
         with:
           version: 1.5.1
           virtualenvs-create: true
           virtualenvs-in-project: true
-      
+
       - name: Load cached dependencies
         id: cached-poetry-dependencies
         uses: actions/cache@v3
         with:
           path: mcp_server/.venv
           key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
-      
+
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: |
           cd mcp_server
           poetry install --no-interaction
-      
+
       - name: Run tests
         run: |
           cd mcp_server
           poetry run pytest -v
-      
+
       - name: Run linters
         run: |
           cd mcp_server
@@ -92,14 +92,14 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      
+
       - name: Set environment variables
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
@@ -109,20 +109,20 @@ jobs:
           fi
           echo "IMAGE_NAME=gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}" >> $GITHUB_ENV
           echo "IMAGE_TAG=${GITHUB_SHA::8}" >> $GITHUB_ENV
-      
+
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v1
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
-      
+
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
-      
+
       - name: Configure Docker for GCR
         run: gcloud auth configure-docker --quiet
-      
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
@@ -133,7 +133,7 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             ENVIRONMENT=${{ env.ENVIRONMENT }}
-      
+
       - name: Save image name and tag
         run: |
           echo "IMAGE_NAME=${{ env.IMAGE_NAME }}" >> $GITHUB_ENV
@@ -144,21 +144,21 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment || 'dev' }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
+
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@v1
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
-      
+
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
-      
+
       - name: Set environment variables
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
@@ -166,7 +166,7 @@ jobs:
           else
             echo "ENVIRONMENT=dev" >> $GITHUB_ENV
           fi
-          
+
           # Set environment-specific variables
           if [ "${{ env.ENVIRONMENT }}" == "prod" ]; then
             echo "MIN_INSTANCES=2" >> $GITHUB_ENV
@@ -187,7 +187,7 @@ jobs:
             echo "MEMORY=512Mi" >> $GITHUB_ENV
             echo "CONCURRENCY=20" >> $GITHUB_ENV
           fi
-      
+
       - name: Deploy to Cloud Run
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v1
@@ -205,11 +205,11 @@ jobs:
             --set-secrets=REDIS_CREDENTIALS=redis-credentials:latest
             --vpc-connector=projects/${{ env.PROJECT_ID }}/locations/${{ env.REGION }}/connectors/vpc-connector
             --allow-unauthenticated
-      
+
       - name: Show Output
         run: |
           echo "Service URL: ${{ steps.deploy.outputs.url }}"
-      
+
       - name: Create GitHub Deployment
         uses: chrnorm/deployment-action@v2
         with:
@@ -228,7 +228,7 @@ jobs:
     needs: deploy
     runs-on: ubuntu-latest
     if: always()
-    
+
     steps:
       - name: Set status
         id: status
@@ -240,7 +240,7 @@ jobs:
             echo "STATUS=failure" >> $GITHUB_ENV
             echo "ICON=❌" >> $GITHUB_ENV
           fi
-      
+
       - name: Create GitHub Issue on Failure
         if: env.STATUS == 'failure'
         uses: actions/github-script@v6
@@ -255,7 +255,7 @@ jobs:
               labels: ['deployment', 'bug', 'priority']
             });
             console.log(`Created issue #${issue.data.number}`);
-      
+
       - name: Send Slack notification
         uses: slackapi/slack-github-action@v1.24.0
         with:

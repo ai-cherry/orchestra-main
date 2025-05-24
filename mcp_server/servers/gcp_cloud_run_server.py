@@ -6,14 +6,15 @@ This server enables Claude 4 to deploy and manage Cloud Run services
 through the Model Context Protocol (MCP).
 """
 
-import os
 import logging
-from typing import Dict, Any, List, Optional
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
-from google.cloud import run_v2
-from google.cloud.run_v2 import Service, Container
+import os
+from typing import Any, Dict, List, Optional
+
 import google.auth
+from fastapi import FastAPI, HTTPException
+from google.cloud import run_v2
+from google.cloud.run_v2 import Container, Service
+from pydantic import BaseModel, Field
 
 # --- MCP CONFIG IMPORTS ---
 from mcp_server.config.loader import load_config

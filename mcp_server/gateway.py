@@ -4,19 +4,20 @@ MCP Gateway - Unified interface for all MCP servers
 Provides health monitoring, routing, and error handling
 """
 
-import os
 import asyncio
 import logging
-from typing import Dict, Any, Optional
+import os
+import time
 from datetime import datetime
+from typing import Any, Dict, Optional
+
+import httpx
+import uvicorn
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-import httpx
+from prometheus_client import Counter, Gauge, Histogram, generate_latest
 from pydantic import BaseModel, Field
-import uvicorn
-from prometheus_client import Counter, Histogram, Gauge, generate_latest
-import time
 
 # --- MCP CONFIG IMPORTS ---
 from mcp_server.config.loader import load_config
@@ -281,23 +282,38 @@ async def execute_mcp_action(request: MCPRequest):
     if request.server in health_cache and not health_cache[request.server].get("healthy", False):
         raise HTTPException(status_code=503, detail=f"Server {request.server} is not healthy")
 
-    try:
-        # Route request to appropriate server
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(f"{server_info['url']}/mcp/{request.action}", json=request.params)
+    # Retry logic for transient connection errors
+    max_retries = 3
+    backoff_base = 0.5  # seconds
 
-            if response.status_code >= 400:
-                raise HTTPException(status_code=response.status_code, detail=response.text)
+    for attempt in range(1, max_retries + 1):
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(f"{server_info['url']}/mcp/{request.action}", json=request.params)
 
-            return response.json()
+                if response.status_code >= 400:
+                    raise HTTPException(status_code=response.status_code, detail=response.text)
 
-    except httpx.TimeoutException:
-        error_count.labels(server=request.server, error_type="timeout").inc()
-        raise HTTPException(status_code=504, detail="Request timeout")
-    except Exception as e:
-        error_count.labels(server=request.server, error_type="error").inc()
-        logger.error(f"Error executing action on {request.server}: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+                return response.json()
+
+        except httpx.TimeoutException:
+            error_count.labels(server=request.server, error_type="timeout").inc()
+            if attempt == max_retries:
+                raise HTTPException(status_code=504, detail=f"Request timeout after {max_retries} attempts")
+            await asyncio.sleep(backoff_base * (2 ** (attempt - 1)))
+        except httpx.RequestError as e:
+            error_count.labels(server=request.server, error_type="connection_error").inc()
+            logger.error(f"Connection error on {request.server} (attempt {attempt}): {e}")
+            if attempt == max_retries:
+                raise HTTPException(
+                    status_code=502,
+                    detail=f"Failed to connect to {request.server} after {max_retries} attempts: {str(e)}",
+                )
+            await asyncio.sleep(backoff_base * (2 ** (attempt - 1)))
+        except Exception as e:
+            error_count.labels(server=request.server, error_type="error").inc()
+            logger.error(f"Error executing action on {request.server}: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/mcp/tools")
@@ -330,26 +346,46 @@ async def proxy_request(server: str, path: str, request: Request):
     server_info = MCP_SERVERS[server]
     target_url = f"{server_info['url']}/{path}"
 
-    try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            # Forward the request
-            response = await client.request(
-                method=request.method, url=target_url, content=await request.body(), headers=dict(request.headers)
-            )
+    # Retry logic for transient connection errors
+    max_retries = 3
+    backoff_base = 0.5  # seconds
 
-            return JSONResponse(
-                content=(
-                    response.json()
-                    if response.headers.get("content-type", "").startswith("application/json")
-                    else response.text
-                ),
-                status_code=response.status_code,
-                headers=dict(response.headers),
-            )
+    for attempt in range(1, max_retries + 1):
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.request(
+                    method=request.method, url=target_url, content=await request.body(), headers=dict(request.headers)
+                )
 
-    except Exception as e:
-        logger.error(f"Proxy error for {server}: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+                return JSONResponse(
+                    content=(
+                        response.json()
+                        if response.headers.get("content-type", "").startswith("application/json")
+                        else response.text
+                    ),
+                    status_code=response.status_code,
+                    headers=dict(response.headers),
+                )
+        except httpx.TimeoutException:
+            logger.error(f"Proxy timeout for {server} (attempt {attempt})")
+            if attempt == max_retries:
+                raise HTTPException(
+                    status_code=504, detail=f"Proxy request to {server} timed out after {max_retries} attempts"
+                )
+            await asyncio.sleep(backoff_base * (2 ** (attempt - 1)))
+        except httpx.RequestError as e:
+            logger.error(f"Proxy connection error for {server} (attempt {attempt}): {e}")
+            if attempt == max_retries:
+                raise HTTPException(
+                    status_code=502, detail=f"Failed to connect to {server} after {max_retries} attempts: {str(e)}"
+                )
+            await asyncio.sleep(backoff_base * (2 ** (attempt - 1)))
+        except Exception as e:
+            logger.error(f"Proxy error for {server}: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
+
+    # If we reach here, all retries failed without raising (should not happen)
+    raise HTTPException(status_code=500, detail=f"Proxy request to {server} failed after {max_retries} attempts")
 
 
 @app.exception_handler(Exception)

@@ -7,14 +7,16 @@ updating persona configurations.
 """
 
 import os
+
 import yaml
 from fastapi import APIRouter, Depends, HTTPException, status
-from packages.shared.src.models.base_models import PersonaConfig
+
 from core.orchestrator.src.config.loader import (
-    load_persona_configs,
     force_reload_personas,
+    load_persona_configs,
 )
 from core.orchestrator.src.config.settings import Settings, get_settings
+from packages.shared.src.models.base_models import PersonaConfig
 
 router = APIRouter()
 

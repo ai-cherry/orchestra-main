@@ -11,18 +11,15 @@ import time
 from enum import Enum
 from typing import (
     Any,
+    Callable,
     Dict,
     List,
     Optional,
-    Set,
     Tuple,
-    Union,
     TypeVar,
-    Generic,
-    Callable,
 )
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from core.orchestrator.src.memory.interface import MemoryInterface
 from core.orchestrator.src.memory.retrieval.parallel_retriever import (

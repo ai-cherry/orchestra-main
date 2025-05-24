@@ -37,4 +37,4 @@ memory-profiler==0.62.0
 
 # Security Scanning
 bandit==1.8.0
-safety==3.2.11 
+safety==3.2.11

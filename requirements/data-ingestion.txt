@@ -14,4 +14,4 @@ python-multipart>=0.0.5  # For file uploads in FastAPI
 # lxml>=4.9.0  # For better XML processing performance
 # pdfplumber>=0.9.0  # Alternative PDF processor with better text extraction
 # python-docx>=0.8.11  # For Word document processing
-# python-pptx>=0.6.21  # For PowerPoint processing 
+# python-pptx>=0.6.21  # For PowerPoint processing

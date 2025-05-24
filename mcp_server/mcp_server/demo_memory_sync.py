@@ -7,25 +7,23 @@ with simulated AI tool adapters. It shows how memory is synchronized
 between different AI tools with different context window capacities.
 """
 
-import os
-import sys
-import json
-import time
-import logging
 import argparse
-from typing import Dict, List, Any, Optional
+import json
+import logging
+import sys
+import time
+from typing import Any, Dict
 
 # Import the memory sync engine
 from memory_sync_engine import (
-    MemorySyncEngine,
+    CompressionLevel,
+    InMemoryStorage,
     MemoryEntry,
     MemoryMetadata,
-    MemoryType,
     MemoryScope,
+    MemorySyncEngine,
+    MemoryType,
     ToolType,
-    CompressionLevel,
-    StorageTier,
-    InMemoryStorage,
 )
 
 # Configure logging
@@ -396,7 +394,7 @@ def demonstrate_context_window_optimization(sync_engine: MemorySyncEngine) -> No
     adapter = sync_engine.tool_adapters.get(ToolType.CLINE)
     if adapter:
         stats = adapter.get_memory_stats()
-        print(f"\nCLINE memory after optimization:")
+        print("\nCLINE memory after optimization:")
         print(f"  Entries: {stats['entry_count']}")
         print(f"  Estimated Tokens: {stats['estimated_tokens']}")
 

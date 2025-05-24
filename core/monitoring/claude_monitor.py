@@ -9,16 +9,13 @@ Provides comprehensive monitoring for Claude API usage including:
 - Error tracking
 """
 
-import asyncio
 import json
-import logging
 import time
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Union
-from dataclasses import dataclass, field
 from collections import defaultdict
 from contextlib import asynccontextmanager
-import os
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional, Union
 
 from core.logging_config import get_logger
 

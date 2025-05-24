@@ -90,7 +90,7 @@ node_modules/
 # Other common ignores
 *~
 *.swp
-*.swo 
+*.swo
 
 # Project-specific additions
 /.git/
@@ -99,4 +99,4 @@ gcp_snapshots/
 .dev_mode
 google-cloud-cli-latest-linux-x86_64.tar.gz
 credential_scan_report.json
-security-analysis.json 
+security-analysis.json

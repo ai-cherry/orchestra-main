@@ -9,12 +9,12 @@ Usage:
     python examples/register_phidata_postgres_agent.py
 """
 
-import os
 import logging
-from typing import Dict, Any, List, Optional
+import os
+from typing import Any, Dict, Optional
 
 # Import the agent registry
-from packages.agent_registry import register_agent, get_agent_instance
+from packages.agent_registry import get_agent_instance, register_agent
 from packages.agent_types import AGENT_TYPE_PHIDATA
 
 # Configure logging

@@ -5,12 +5,12 @@ This module provides an agent implementation with built-in observability feature
 like logging, metrics, and tracing to help with monitoring and debugging.
 """
 
+import json
 import logging
 import time
-import uuid
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
-import json
 import traceback
+import uuid
+from typing import Any, Dict, Optional
 
 from core.orchestrator.src.agents.agent_base import Agent, AgentContext, AgentResponse
 from core.orchestrator.src.memory.layered_memory import LayeredMemory

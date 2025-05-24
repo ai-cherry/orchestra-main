@@ -1,6 +1,6 @@
 #!/bin/bash
 # rollback.sh - Rollback script for AI Orchestra project
-# 
+#
 # This script provides rollback capabilities for the AI Orchestra project deployment
 # It can revert changes to previous versions in case of deployment issues
 
@@ -94,10 +94,10 @@ error() {
 confirm() {
   local message=$1
   local response
-  
+
   echo -e "${YELLOW}${message} (y/n)${NC}"
   read -r response
-  
+
   if [[ "$response" =~ ^[Yy]$ ]]; then
     return 0  # true
   else
@@ -122,83 +122,83 @@ info "Successfully authenticated with GCP"
 # Function to roll back MCP Server
 rollback_mcp_server() {
   step "Rolling back MCP Server"
-  
+
   # Get the current version
   CURRENT_VERSION=$(gcloud run services describe "mcp-server-$ENV" --region="$REGION" --format="value(status.latestReadyRevision.name)")
   info "Current version: $CURRENT_VERSION"
-  
+
   # Get the previous version if not specified
   if [[ -z "$VERSION" ]]; then
     # List all revisions and get the second one (previous version)
     REVISIONS=$(gcloud run revisions list --service="mcp-server-$ENV" --region="$REGION" --format="value(name)" | sort -r)
     VERSION=$(echo "$REVISIONS" | sed -n '2p')
-    
+
     if [[ -z "$VERSION" ]]; then
       error "No previous version found for MCP Server"
     fi
   fi
-  
+
   info "Rolling back to version: $VERSION"
-  
+
   # Roll back to the specified version
   gcloud run services update-traffic "mcp-server-$ENV" \
     --region="$REGION" \
     --to-revisions="$VERSION=100" || error "Failed to roll back MCP Server"
-  
+
   info "Successfully rolled back MCP Server to version: $VERSION"
 }
 
 # Function to roll back main application
 rollback_main_app() {
   step "Rolling back main application"
-  
+
   # Get the current version
   CURRENT_VERSION=$(gcloud run services describe "orchestra-api-$ENV" --region="$REGION" --format="value(status.latestReadyRevision.name)")
   info "Current version: $CURRENT_VERSION"
-  
+
   # Get the previous version if not specified
   if [[ -z "$VERSION" ]]; then
     # List all revisions and get the second one (previous version)
     REVISIONS=$(gcloud run revisions list --service="orchestra-api-$ENV" --region="$REGION" --format="value(name)" | sort -r)
     VERSION=$(echo "$REVISIONS" | sed -n '2p')
-    
+
     if [[ -z "$VERSION" ]]; then
       error "No previous version found for main application"
     fi
   fi
-  
+
   info "Rolling back to version: $VERSION"
-  
+
   # Roll back to the specified version
   gcloud run services update-traffic "orchestra-api-$ENV" \
     --region="$REGION" \
     --to-revisions="$VERSION=100" || error "Failed to roll back main application"
-  
+
   info "Successfully rolled back main application to version: $VERSION"
 }
 
 # Function to roll back infrastructure
 rollback_infrastructure() {
   step "Rolling back infrastructure"
-  
+
   if confirm "Rolling back infrastructure can be destructive. Are you sure you want to proceed?"; then
     cd terraform
-    
+
     # Check if there's a backup state file
     if [[ ! -f "terraform.tfstate.backup" ]]; then
       error "No backup state file found for infrastructure"
     fi
-    
+
     # Restore the backup state file
     info "Restoring backup state file"
     cp terraform.tfstate.backup terraform.tfstate
-    
+
     # Apply the restored state
     info "Applying restored state"
     terraform apply -auto-approve || error "Failed to apply restored state"
-    
+
     cd ..
-    
+
     info "Successfully rolled back infrastructure"
   else
     warn "Skipping infrastructure rollback"

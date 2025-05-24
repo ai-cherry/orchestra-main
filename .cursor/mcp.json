@@ -2,9 +2,7 @@
   "mcpServers": {
     "gcp-cloud-run": {
       "command": "python",
-      "args": [
-        "mcp_server/servers/gcp_cloud_run_server.py"
-      ],
+      "args": ["mcp_server/servers/gcp_cloud_run_server.py"],
       "transport": "stdio",
       "env": {
         "GCP_PROJECT_ID": "cherry-ai-project",
@@ -14,9 +12,7 @@
     },
     "gcp-secrets": {
       "command": "python",
-      "args": [
-        "mcp_server/servers/gcp_secret_manager_server.py"
-      ],
+      "args": ["mcp_server/servers/gcp_secret_manager_server.py"],
       "transport": "stdio",
       "env": {
         "GCP_PROJECT_ID": "cherry-ai-project",
@@ -25,9 +21,7 @@
     },
     "dragonfly": {
       "command": "python",
-      "args": [
-        "mcp_server/servers/dragonfly_server.py"
-      ],
+      "args": ["mcp_server/servers/dragonfly_server.py"],
       "transport": "stdio",
       "env": {
         "DRAGONFLY_HOST": "${DRAGONFLY_HOST:-localhost}",
@@ -37,9 +31,7 @@
     },
     "firestore": {
       "command": "python",
-      "args": [
-        "mcp_server/servers/firestore_server.py"
-      ],
+      "args": ["mcp_server/servers/firestore_server.py"],
       "transport": "stdio",
       "env": {
         "GCP_PROJECT_ID": "cherry-ai-project",
@@ -47,4 +39,4 @@
       }
     }
   }
-} 
+}

@@ -83,18 +83,21 @@ python core/orchestrator/examples/llm_client.py --mode direct --message "Tell me
 ### Memory Integration
 
 The LLM agent integrates with the memory system by:
+
 - Retrieving conversation history for context
 - Storing both user inputs and LLM responses
 
 ### Persona Integration
 
 The LLM agent leverages personas by:
+
 - Creating system messages based on persona traits and characteristics
 - Formatting responses according to persona styles
 
 ### Orchestration Integration
 
 The LLM agent works with the orchestration system by:
+
 - Using the event system for interaction events
 - Supporting selection based on context
 - Handling fallbacks for error cases
@@ -116,7 +119,7 @@ class CustomProvider(LLMProvider):
     @property
     def provider_name(self) -> str:
         return "custom_provider"
-    
+
     async def generate_chat_completion(self, messages, model=None, temperature=0.7, max_tokens=None):
         # Implementation here
         pass

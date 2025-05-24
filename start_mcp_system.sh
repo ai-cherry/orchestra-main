@@ -47,9 +47,9 @@ wait_for_health() {
     local health_url=$2
     local max_attempts=30
     local attempt=0
-    
+
     log "${BLUE}Waiting for $service_name to be healthy...${NC}"
-    
+
     while [ $attempt -lt $max_attempts ]; do
         if curl -s $health_url > /dev/null 2>&1; then
             log "${GREEN}✓ $service_name is healthy${NC}"
@@ -58,7 +58,7 @@ wait_for_health() {
         attempt=$((attempt + 1))
         sleep 2
     done
-    
+
     log "${RED}✗ $service_name failed to start${NC}"
     return 1
 }
@@ -69,21 +69,21 @@ start_server() {
     local command=$2
     local port=$3
     local health_endpoint=$4
-    
+
     log "${BLUE}Starting $name on port $port...${NC}"
-    
+
     # Check if port is already in use
     if check_port $port; then
         log "${YELLOW}⚠ Port $port is already in use. Attempting to stop existing process...${NC}"
         lsof -ti:$port | xargs kill -9 2>/dev/null || true
         sleep 2
     fi
-    
+
     # Start the server
     nohup $command > "$LOG_DIR/${name}.log" 2>&1 &
     local pid=$!
     echo $pid > "$LOG_DIR/${name}.pid"
-    
+
     # Wait for health check
     if wait_for_health "$name" "$health_endpoint"; then
         log "${GREEN}✓ $name started successfully (PID: $pid)${NC}"

@@ -7,21 +7,17 @@ that handles memory operations across tools, manages token budgets, and ensures
 consistent memory synchronization.
 """
 
-import time
 import json
 import logging
-import asyncio
-from typing import Dict, List, Optional, Any, Tuple, Set
+import time
+from typing import Any, Dict, List, Optional, Tuple
 
 from ..interfaces.memory_manager import IMemoryManager
 from ..interfaces.storage import IMemoryStorage
 from ..interfaces.tool_adapter import IToolAdapter
 from ..models.memory import (
-    MemoryEntry,
-    MemoryType,
-    MemoryScope,
     CompressionLevel,
-    StorageTier,
+    MemoryEntry,
 )
 
 logger = logging.getLogger(__name__)

@@ -37,18 +37,18 @@ fi
 # Function to fix common filesystem issues
 fix_filesystem_issues() {
   echo -e "${YELLOW}Fixing common filesystem issues...${NC}"
-  
+
   # Make all .sh files executable
   echo -e "${YELLOW}Making scripts executable...${NC}"
   find /workspaces/orchestra-main -name "*.sh" -type f -exec chmod +x {} \; 2>/dev/null || echo -e "${RED}Failed to make scripts executable${NC}"
-  
+
   # Fix ownership issues (common in containerized environments)
   echo -e "${YELLOW}Fixing file ownership...${NC}"
   if [ "$(id -u)" -eq 0 ]; then
     # Only attempt if we're running as root
     chown -R $(stat -c '%u:%g' /workspaces/orchestra-main) /workspaces/orchestra-main 2>/dev/null || echo -e "${RED}Failed to fix ownership${NC}"
   fi
-  
+
   echo -e "${GREEN}Filesystem issues addressed.${NC}"
 }
 

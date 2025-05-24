@@ -7,26 +7,24 @@ with MemoryService and storage adapters.
 """
 
 import logging
-import os
-from typing import Optional, Dict, Any, Union
-import asyncio
-from functools import lru_cache
+from typing import Optional
+
 from fastapi import Depends
 
 # Configure logging first, before it's used
 logger = logging.getLogger(__name__)
 
-# Import error handling utilities and exceptions
-from core.orchestrator.src.utils.error_handling import error_boundary, retry
-from core.orchestrator.src.exceptions import (
-    MemoryError,
-    MemoryConnectionError,
-    MemoryOperationError,
-    DependencyError,
-)
-
 # Import settings
 from core.orchestrator.src.config.settings import Settings, get_settings
+from core.orchestrator.src.exceptions import (
+    DependencyError,
+    MemoryConnectionError,
+    MemoryError,
+    MemoryOperationError,
+)
+
+# Import error handling utilities and exceptions
+from core.orchestrator.src.utils.error_handling import error_boundary
 
 # Import required components - moved to functions to avoid circular imports
 # Use flag variables to track availability
@@ -46,8 +44,7 @@ def _initialize_imports():
         logger.info("Attempting to import memory managers from packages.shared.src.memory")
         # Importing here to avoid module-level imports that could cause circular dependencies
         global MemoryManager, InMemoryMemoryManager
-        from packages.shared.src.memory.memory_manager import MemoryManager
-        from packages.shared.src.memory.memory_manager import InMemoryMemoryManager
+        from packages.shared.src.memory.memory_manager import InMemoryMemoryManager, MemoryManager
 
         MEMORY_MANAGER_AVAILABLE = True
         logger.info("Successfully imported memory managers")
@@ -80,9 +77,7 @@ def _initialize_imports():
         try:
             global MemoryManager, InMemoryMemoryManager
             from packages.shared.src.memory.memory_manager import MemoryManager
-            from packages.shared.src.memory.stubs import (
-                InMemoryMemoryManagerStub as InMemoryMemoryManager,
-            )
+            from packages.shared.src.memory.stubs import InMemoryMemoryManagerStub as InMemoryMemoryManager
 
             MEMORY_MANAGER_AVAILABLE = True
             FIRESTORE_AVAILABLE = False
@@ -96,15 +91,15 @@ def _initialize_imports():
     try:
         logger.info("Attempting to import hexagonal architecture components for memory service")
         global MemoryService, MemoryServiceFactory, FirestoreStorageAdapter, PostgresStorageAdapter
-        from packages.shared.src.memory.services.memory_service import MemoryService
-        from packages.shared.src.memory.services.memory_service_factory import (
-            MemoryServiceFactory,
-        )
         from packages.shared.src.memory.adapters.firestore_adapter import (
             FirestoreStorageAdapter,
         )
         from packages.shared.src.memory.adapters.postgres_adapter import (
             PostgresStorageAdapter,
+        )
+        from packages.shared.src.memory.services.memory_service import MemoryService
+        from packages.shared.src.memory.services.memory_service_factory import (
+            MemoryServiceFactory,
         )
 
         HEX_ARCH_AVAILABLE = True

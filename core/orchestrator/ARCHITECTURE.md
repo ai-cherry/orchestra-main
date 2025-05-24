@@ -19,6 +19,7 @@ The system consists of five main modules:
 The memory module provides a storage mechanism for conversation history and other relevant information.
 
 Components:
+
 - `MemoryItem`: Base class for items stored in memory
 - `MemoryProvider`: Abstract interface for memory storage
 - `InMemoryProvider`: Simple in-memory implementation
@@ -31,6 +32,7 @@ The memory system uses a provider pattern, allowing different storage backends t
 The personas module manages AI agent personas with configurable traits and templates.
 
 Components:
+
 - `PersonaConfig`: Configuration for an AI persona
 - `PersonaProcessor`: Applies persona-specific operations to responses
 - `PersonaLoader`: Loads persona configurations from YAML
@@ -43,6 +45,7 @@ Personas are defined with traits, interaction styles, and templates that shape t
 The agents module defines the core agent interfaces and implementations.
 
 Components:
+
 - `AgentContext`: Context provided to agents for processing
 - `AgentResponse`: Response from an agent's processing
 - `Agent`: Abstract base class for all agents
@@ -57,11 +60,13 @@ Agents use a plugin architecture where different agent types can be registered a
 The orchestrator coordinates the memory, personas, and agents components to process user interactions.
 
 Components:
+
 - `EventEmitter`: Simple event system for orchestrator events
 - `InteractionResult`: Result of an interaction processing
 - `Orchestrator`: Main orchestrator for AI interactions
 
 The orchestrator handles the complete interaction flow:
+
 1. Select persona
 2. Record user input in memory
 3. Retrieve context from memory
@@ -76,12 +81,14 @@ The orchestrator handles the complete interaction flow:
 The API layer exposes the system capabilities through RESTful endpoints.
 
 Components:
+
 - `InteractionRequest`: Request model for interaction API
 - `InteractionResponse`: Response model for interaction API
 - `PersonaInfo`: Persona information model
 - `PersonaListResponse`: Response model for persona listing API
 
 Endpoints:
+
 - `POST /api/interact`: Process a user interaction
 - `GET /api/personas`: List available personas
 - `GET /api/health`: Health check endpoint

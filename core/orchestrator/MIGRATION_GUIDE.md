@@ -14,10 +14,10 @@ The unified components provide:
 
 ## Components Overview
 
-| Original Components | Enhanced Components | Unified Component |
-|---------------------|---------------------|-------------------|
-| `registry.py` | `enhanced_registry.py` | `unified_registry.py` |
-| `event_bus.py` | `enhanced_event_bus.py` | `unified_event_bus.py` |
+| Original Components | Enhanced Components          | Unified Component           |
+| ------------------- | ---------------------------- | --------------------------- |
+| `registry.py`       | `enhanced_registry.py`       | `unified_registry.py`       |
+| `event_bus.py`      | `enhanced_event_bus.py`      | `unified_event_bus.py`      |
 | `agent_registry.py` | `enhanced_agent_registry.py` | `unified_agent_registry.py` |
 
 ## Migration Strategy
@@ -31,6 +31,7 @@ We recommend a gradual migration approach:
 ## Unified Service Registry Migration
 
 ### Before:
+
 ```python
 from core.orchestrator.src.services.registry import get_service_registry
 # or
@@ -41,6 +42,7 @@ registry.register(my_service)
 ```
 
 ### After:
+
 ```python
 from core.orchestrator.src.services.unified_registry import register, get, require
 
@@ -53,6 +55,7 @@ required_service = require(ServiceType)  # Raises if not found
 ```
 
 ### Key Differences:
+
 - More ergonomic helper functions
 - Type-based service lookup
 - Improved error handling
@@ -61,6 +64,7 @@ required_service = require(ServiceType)  # Raises if not found
 ## Unified Event Bus Migration
 
 ### Before:
+
 ```python
 from core.orchestrator.src.services.event_bus import get_event_bus
 # or
@@ -72,6 +76,7 @@ event_bus.publish("event_type", {"data": value})
 ```
 
 ### After:
+
 ```python
 from core.orchestrator.src.services.unified_event_bus import (
     subscribe, publish, publish_async, EventPriority
@@ -88,6 +93,7 @@ count = await publish_async("event_type", {"data": value})
 ```
 
 ### Key Differences:
+
 - Simpler API with helper functions
 - Priority-based event handling
 - Better statistics and monitoring
@@ -96,6 +102,7 @@ count = await publish_async("event_type", {"data": value})
 ## Unified Agent Registry Migration
 
 ### Before:
+
 ```python
 from core.orchestrator.src.agents.agent_registry import get_agent_registry
 # or
@@ -107,6 +114,7 @@ agent = registry.select_agent_for_context(context)
 ```
 
 ### After:
+
 ```python
 from core.orchestrator.src.agents.unified_agent_registry import (
     get_agent, select_agent_for_context, register_agent, AgentCapability
@@ -114,7 +122,7 @@ from core.orchestrator.src.agents.unified_agent_registry import (
 
 # Register agent with capabilities
 register_agent(
-    agent, "agent_type", 
+    agent, "agent_type",
     [AgentCapability.TEXT_GENERATION, AgentCapability.QUESTION_ANSWERING],
     priority=50, is_default=True
 )
@@ -127,6 +135,7 @@ agent = select_agent_for_context(context)
 ```
 
 ### Key Differences:
+
 - Capability-based agent selection
 - Improved selection algorithm
 - Better lifecycle management
@@ -135,6 +144,7 @@ agent = select_agent_for_context(context)
 ## Service Lifecycle Integration
 
 ### Before:
+
 Manual initialization and cleanup, often with inconsistent patterns:
 
 ```python
@@ -147,6 +157,7 @@ service.stop()
 ```
 
 ### After:
+
 Automatic lifecycle management through the service registry:
 
 ```python
@@ -155,10 +166,10 @@ from core.orchestrator.src.services.unified_registry import Service, register, g
 class MyService(Service):
     def initialize(self) -> None:
         # Initialize resources
-        
+
     def close(self) -> None:
         # Release resources
-        
+
 # Register the service
 service = MyService()
 register(service)
@@ -186,14 +197,14 @@ def initialize_services() -> None:
     """Initialize and register unified services."""
     # Get the service registry
     registry = get_service_registry()
-    
+
     # Register core services
     event_bus = get_event_bus()
     register(event_bus)
-    
+
     agent_registry = get_agent_registry()
     register(agent_registry)
-    
+
     # Initialize all registered services
     registry.initialize_all()
 ```
@@ -235,14 +246,14 @@ from core.orchestrator.src.services.unified_registry import Service
 class DataProcessingService(Service):
     def __init__(self):
         self.resources = []
-    
+
     def initialize(self) -> None:
         self.resources = ["database", "cache", "workers"]
         print("DataProcessingService initialized")
-    
+
     def process(self, data):
         return f"Processed: {data}"
-    
+
     def close(self) -> None:
         self.resources = []
         print("DataProcessingService resources released")
@@ -286,7 +297,7 @@ from core.orchestrator.src.agents.unified_agent_registry import (
 
 # Register an agent
 register_agent(
-    my_agent, 
+    my_agent,
     "data_processing_agent",
     [AgentCapability.TEXT_GENERATION, AgentCapability.FACTUAL_RESPONSE],
     priority=50

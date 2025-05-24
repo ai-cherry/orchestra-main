@@ -4,9 +4,9 @@ FastAPI integration for Vertex AI Agent Manager.
 This module provides REST API endpoints for triggering Vertex AI Agent tasks.
 """
 
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
 
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import BackgroundTasks, FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 from .vertex_agent_manager import trigger_vertex_task

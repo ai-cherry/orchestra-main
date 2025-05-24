@@ -7,12 +7,10 @@ using both the redisvl SemanticCacher and LangChain RedisSemanticCache
 for efficient vector similarity search and memory retrieval.
 """
 
+import asyncio
+import logging
 import os
 import sys
-import logging
-import asyncio
-from typing import List, Dict, Any, Optional
-from datetime import datetime
 
 # Configure logging
 logging.basicConfig(
@@ -24,9 +22,10 @@ logger = logging.getLogger(__name__)
 
 # Import necessary libraries
 try:
-    from redisvl import SemanticCacher
-    from langchain_redis.cache import RedisSemanticCache
     from langchain_google_genai import GoogleGenerativeAIEmbeddings as GeminiEmbeddings
+    from langchain_redis.cache import RedisSemanticCache
+    from redisvl import SemanticCacher
+
     from packages.shared.src.memory.redis_semantic_cacher import (
         RedisSemanticCacheProvider,
     )
@@ -60,7 +59,7 @@ async def main():
     # 1. Set up redisvl SemanticCacher for direct use
     logger.info("Setting up redisvl SemanticCacher")
     try:
-        cacher = SemanticCacher(
+        SemanticCacher(
             threshold=0.85,  # Similarity threshold
             ttl=3600,  # TTL in seconds (1 hour)
             index_schema="agent_memory.yaml",

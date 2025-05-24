@@ -78,21 +78,21 @@ The `deploy_optimized.sh` script automates the deployment process:
 
 Available options:
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--project` | GCP project ID | `cherry-ai-project` |
-| `--region` | GCP region | `us-central1` |
-| `--service-name` | Cloud Run service name | `mcp-server` |
-| `--min-instances` | Minimum instances | `1` |
-| `--max-instances` | Maximum instances | `100` |
-| `--cpu` | CPU count | `2` |
-| `--memory` | Memory size | `2Gi` |
-| `--concurrency` | Concurrency per instance | `80` |
-| `--timeout` | Request timeout | `300s` |
-| `--vpc-connector` | VPC connector name | `vpc-connector` |
-| `--redis-instance` | Redis instance name | `mcp-redis` |
-| `--redis-tier` | Redis tier | `STANDARD_HA` |
-| `--redis-size` | Redis size in GB | `10` |
+| Option             | Description              | Default             |
+| ------------------ | ------------------------ | ------------------- |
+| `--project`        | GCP project ID           | `cherry-ai-project` |
+| `--region`         | GCP region               | `us-central1`       |
+| `--service-name`   | Cloud Run service name   | `mcp-server`        |
+| `--min-instances`  | Minimum instances        | `1`                 |
+| `--max-instances`  | Maximum instances        | `100`               |
+| `--cpu`            | CPU count                | `2`                 |
+| `--memory`         | Memory size              | `2Gi`               |
+| `--concurrency`    | Concurrency per instance | `80`                |
+| `--timeout`        | Request timeout          | `300s`              |
+| `--vpc-connector`  | VPC connector name       | `vpc-connector`     |
+| `--redis-instance` | Redis instance name      | `mcp-redis`         |
+| `--redis-tier`     | Redis tier               | `STANDARD_HA`       |
+| `--redis-size`     | Redis size in GB         | `10`                |
 
 ### 2. Terraform Deployment
 
@@ -121,6 +121,7 @@ terraform apply tfplan
 The GitHub Actions workflow in `.github/workflows/deploy.yml` automates the CI/CD process:
 
 1. Set up the following secrets in your GitHub repository:
+
    - `GCP_PROJECT_ID`: Your GCP project ID
    - `WIF_PROVIDER`: Your Workload Identity Federation provider
    - `WIF_SERVICE_ACCOUNT`: Your Workload Identity Federation service account
@@ -137,10 +138,10 @@ The GitHub Actions workflow in `.github/workflows/deploy.yml` automates the CI/C
 The MCP Server uses environment-specific configurations:
 
 | Environment | Min Instances | Max Instances | CPU | Memory | Concurrency |
-|-------------|--------------|--------------|-----|--------|-------------|
-| dev | 0 | 5 | 1 | 512Mi | 20 |
-| staging | 1 | 10 | 1 | 1Gi | 40 |
-| prod | 2 | 100 | 2 | 2Gi | 80 |
+| ----------- | ------------- | ------------- | --- | ------ | ----------- |
+| dev         | 0             | 5             | 1   | 512Mi  | 20          |
+| staging     | 1             | 10            | 1   | 1Gi    | 40          |
+| prod        | 2             | 100           | 2   | 2Gi    | 80          |
 
 To customize the environment configuration:
 
@@ -174,10 +175,12 @@ python scripts/deploy_monitoring.py \
 ### Common Issues
 
 1. **Authentication Errors**:
+
    - Ensure `GCP_MASTER_SERVICE_JSON` is correctly set
    - Verify the service account has the required permissions
 
 2. **Deployment Failures**:
+
    - Check Cloud Build logs for build errors
    - Verify VPC connector exists and is properly configured
 

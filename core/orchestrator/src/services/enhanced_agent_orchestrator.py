@@ -10,22 +10,17 @@ import logging
 import time
 import uuid
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 
-from core.orchestrator.src.agents.agent_base import AgentContext, AgentResponse
+from core.orchestrator.src.agents.agent_base import AgentResponse
 from core.orchestrator.src.agents.enhanced_agent_registry import (
     get_enhanced_agent_registry,
-    select_agent_for_context,
-    AgentCapability,
 )
-from core.orchestrator.src.config.settings import get_settings
 from core.orchestrator.src.personas.enhanced_persona_manager import (
     get_enhanced_persona_manager,
 )
 from core.orchestrator.src.services.base_orchestrator import BaseOrchestrator
-from core.orchestrator.src.services.event_bus import get_event_bus
-from core.orchestrator.src.services.memory_service import get_memory_service
-from packages.shared.src.models.base_models import AgentData, MemoryItem, PersonaConfig
+from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -275,7 +270,7 @@ class EnhancedAgentOrchestrator(BaseOrchestrator):
                 )
                 # Emergency response when no agents are available
                 return AgentResponse(
-                    text=f"I apologize, but our service is experiencing difficulties at the moment. Please try again later.",
+                    text="I apologize, but our service is experiencing difficulties at the moment. Please try again later.",
                     confidence=0.1,
                     metadata={"critical_error": True, "error": str(e2)},
                 )

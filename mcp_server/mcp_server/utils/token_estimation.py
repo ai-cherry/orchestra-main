@@ -7,12 +7,11 @@ the tiktoken library. It includes caching and fallback mechanisms for efficient
 token counting in production environments.
 """
 
+import functools
+import hashlib
 import json
 import re
-import logging
-import functools
-from typing import Dict, Any, Optional, List, Union, Callable, TypeVar
-import hashlib
+from typing import Any, Callable, Dict, TypeVar
 
 # Import tiktoken with fallback
 try:

@@ -7,12 +7,11 @@ Demonstrates how to use the Claude monitoring system.
 
 import asyncio
 import os
-from datetime import datetime, timedelta
 
+from core.logging_config import get_logger, setup_logging
 from core.monitoring.claude_monitor import ClaudeMonitor
 from core.monitoring.monitored_litellm_client import MonitoredLiteLLMClient
 from core.orchestrator.src.llm.litellm_client import LLMMessage
-from core.logging_config import setup_logging, get_logger
 
 # Setup logging
 setup_logging(level="INFO", json_format=False)
@@ -124,7 +123,7 @@ async def demo_cost_tracking():
         messages = [LLMMessage(role="user", content=f"Generate a 50-word story for {session['user_id']}")]
 
         try:
-            response = await client.chat_completion(
+            await client.chat_completion(
                 messages=messages, model="claude-3-haiku", max_tokens=100, **session  # Use cheaper model
             )
             logger.info(f"Generated story for {session['user_id']}")
@@ -188,14 +187,14 @@ async def demo_performance_monitoring():
 
         for i in range(3):
             try:
-                response = await client.chat_completion(
+                await client.chat_completion(
                     messages=messages, model=model, max_tokens=10, metadata={"test": "performance", "iteration": i}
                 )
             except Exception as e:
                 logger.error(f"Error with {model}: {str(e)}")
 
     # Analyze performance by model
-    summary = monitor.get_metrics_summary()
+    monitor.get_metrics_summary()
     logger.info("\nPerformance comparison:")
 
     for model in models:

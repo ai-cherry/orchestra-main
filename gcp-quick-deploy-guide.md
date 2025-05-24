@@ -117,6 +117,7 @@ gcloud functions deploy hello-function \
 ## Step 3: Verify Deployment
 
 ### For Cloud Run:
+
 ```bash
 # Get the deployed URL
 CLOUD_RUN_URL=$(gcloud run services describe quick-deploy --platform managed --region us-central1 --format='value(status.url)')
@@ -127,6 +128,7 @@ curl $CLOUD_RUN_URL
 ```
 
 ### For App Engine:
+
 ```bash
 # Get the deployed URL
 APP_ENGINE_URL=$(gcloud app describe --format='value(defaultHostname)')
@@ -137,6 +139,7 @@ curl https://$APP_ENGINE_URL
 ```
 
 ### For Cloud Function:
+
 ```bash
 # Get the deployed URL
 FUNCTION_URL=$(gcloud functions describe hello-function --format='value(httpsTrigger.url)')
@@ -173,17 +176,20 @@ EOL
 If you encounter any issues:
 
 1. Check service account permissions:
+
 ```bash
 gcloud projects get-iam-policy cherry-ai-project --format=json
 ```
 
 2. Ensure APIs are enabled:
+
 ```bash
 # Enable necessary APIs
 gcloud services enable cloudbuild.googleapis.com run.googleapis.com appengine.googleapis.com cloudfunctions.googleapis.com
 ```
 
 3. Check deployment logs:
+
 ```bash
 # For Cloud Run
 gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=quick-deploy" --limit=10
@@ -193,3 +199,4 @@ gcloud app logs read --limit=10
 
 # For Cloud Functions
 gcloud functions logs read hello-function --limit=10
+```

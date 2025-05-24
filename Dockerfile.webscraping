@@ -109,4 +109,4 @@ USER webscraper
 EXPOSE 8080
 
 # Start the application
-CMD ["python", "webscraping_app.py"] 
+CMD ["python", "webscraping_app.py"]

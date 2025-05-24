@@ -4,14 +4,14 @@ Includes functionality for checking item expiry and pruning expired documents.
 """
 
 import logging
-import asyncio
+import time
 from datetime import datetime, timedelta, timezone
-from typing import Dict, Any, Optional, List, AsyncGenerator
+from typing import Any, Dict, Optional
 
+from google.api_core.exceptions import DeadlineExceeded, ResourceExhausted, ServiceUnavailable
 from google.cloud.firestore_v1.async_client import AsyncClient as FirestoreAsyncClient
+from google.cloud.firestore_v1.async_document import AsyncDocumentSnapshot
 from google.cloud.firestore_v1.base_query import AsyncBaseQuery, FieldFilter
-from google.cloud.firestore_v1.async_document import AsyncDocumentReference, AsyncDocumentSnapshot
-from google.api_core.exceptions import DeadlineExceeded, ServiceUnavailable, ResourceExhausted
 
 # TODO: Replace these with actual imports from your project
 # from packages.shared.src.models.base_models import MemoryItem

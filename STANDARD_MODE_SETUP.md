@@ -5,14 +5,17 @@
 This repository now includes an enhanced setup process that automatically configures standard mode and GCP authentication when a Codespace is created or rebuilt. The improvements include:
 
 1. **Robust Error Handling**:
+
    - Retry mechanisms for GCP authentication and file operations
    - Detailed logging to help diagnose issues
 
 2. **Idempotent Operations**:
+
    - All configuration changes check for existing settings first
    - Prevents duplicate entries in configuration files
 
 3. **Recovery Container Detection**:
+
    - Automatically detects if running in a recovery container
    - Implements appropriate fixes for this scenario
 
@@ -25,16 +28,19 @@ This repository now includes an enhanced setup process that automatically config
 This repository has been configured to force standard mode operation and disable VS Code's restricted mode, which should resolve GCP authentication and workspace trust issues. The following actions have been completed:
 
 1. **Environment Variables Set**:
+
    - `VSCODE_DISABLE_WORKSPACE_TRUST=true`
    - `STANDARD_MODE=true`
    - `DISABLE_WORKSPACE_TRUST=true`
    - `USE_RECOVERY_MODE=false`
 
 2. **VS Code Settings Updated**:
+
    - `.vscode/settings.json` modified to disable workspace trust
    - `.devcontainer/devcontainer.json` updated with workspace trust settings
 
 3. **CLI Command File Created**:
+
    - `.vscode/disable_trust.js` for further customization if needed
 
 4. **GCP Authentication Fixed**:
@@ -58,17 +64,19 @@ Despite this, we've successfully configured GCP authentication and ensured that 
 Three scripts are now available to help maintain and verify your environment:
 
 1. **.devcontainer/setup_and_verify.sh**:
+
    - Comprehensive setup script that runs automatically on container creation
    - Handles GCP authentication with retries and error handling
    - Configures VS Code settings and environment variables
    - Logs all operations to `/workspaces/orchestra-main/codespace_setup.log`
 
 1. **verify_standard_mode.sh**:
+
    - Checks environment variables
    - Verifies VS Code settings
    - Ensures workspace trust is disabled
 
-2. **enhanced_verify_gcp_setup.sh**:
+1. **enhanced_verify_gcp_setup.sh**:
    - Verifies GCP authentication
    - Checks service account key file
    - Tests GCP connectivity
@@ -85,12 +93,14 @@ The enhanced setup script will run automatically when the container is rebuilt, 
 ### Manual Verification
 
 1. Run these scripts at the start of each session:
+
    ```bash
    ./verify_standard_mode.sh
    ./enhanced_verify_gcp_setup.sh
    ```
 
 2. If restricted mode returns, execute:
+
    ```bash
    ./enforce_standard_mode.sh
    ./disable_restricted_mode.sh

@@ -5,11 +5,11 @@ This module provides a tiered caching implementation with in-memory L1 cache
 and Redis L2 cache for improved performance and reduced latency.
 """
 
-import asyncio
 import hashlib
 import json
 import logging
 import time
+from functools import wraps
 from typing import (
     Any,
     Callable,
@@ -19,15 +19,10 @@ from typing import (
     Optional,
     Type,
     TypeVar,
-    Union,
-    cast,
 )
-from functools import wraps
-
-from pydantic import BaseModel
 
 from ...core.config import get_settings
-from ...utils.logging import log_event, log_start, log_end, log_error
+from ...utils.logging import log_error, log_event
 
 # For type hints with generic cache value types
 T = TypeVar("T")
@@ -264,8 +259,8 @@ class RedisCache(Generic[T]):
         if self._redis_client is None:
             # Import here to avoid circular imports
             from ..caching.optimized_redis_pool import (
-                get_optimized_redis_client,
                 PoolType,
+                get_optimized_redis_client,
             )
 
             # Get a Redis client optimized for caching

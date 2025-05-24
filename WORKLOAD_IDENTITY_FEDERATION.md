@@ -16,17 +16,20 @@ Workload Identity Federation allows GitHub Actions workflows and Codespaces to a
 The WIF implementation consists of the following components:
 
 1. **GCP Resources**:
+
    - Workload Identity Pool
    - Workload Identity Provider
    - Service Accounts with appropriate permissions
    - IAM bindings for WIF authentication
 
 2. **GitHub Resources**:
+
    - Organization secrets for WIF configuration
    - Updated GitHub Actions workflows
    - Codespaces configuration
 
 3. **Implementation Scripts**:
+
    - `orchestra_wif_master.sh`: Main setup script
    - `sync_github_gcp_secrets.sh`: Synchronizes GitHub and GCP secrets
    - `migrate_workflow_to_wif.sh`: Updates GitHub Actions workflows
@@ -54,7 +57,7 @@ The WIF implementation consists of the following components:
    # Set environment variables
    export GCP_MASTER_SERVICE_JSON='<your-service-account-key-json>'
    export GITHUB_TOKEN='<your-github-pat>'
-   
+
    # Run the master setup script
    ./orchestra_wif_master.sh
    ```
@@ -95,24 +98,24 @@ name: Deploy with WIF
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   contents: read
-  id-token: write  # Required for requesting the JWT
+  id-token: write # Required for requesting the JWT
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER_ID }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
-      
+
       # Deployment steps
       # ...
 ```
@@ -143,23 +146,25 @@ To manually synchronize secrets:
 
 The following service accounts are configured for WIF:
 
-| Service Account | Purpose | Roles |
-|-----------------|---------|-------|
-| orchestrator-api | Cloud Run API service | roles/run.admin, roles/secretmanager.secretAccessor, roles/firestore.user |
-| phidata-agent-ui | Cloud Run UI service | roles/run.admin, roles/secretmanager.secretAccessor |
-| github-actions | GitHub Actions workflows | roles/artifactregistry.writer, roles/run.admin, roles/secretmanager.secretAccessor, roles/storage.admin |
-| codespaces-dev | Codespaces development | roles/viewer, roles/secretmanager.secretAccessor, roles/logging.viewer |
+| Service Account  | Purpose                  | Roles                                                                                                   |
+| ---------------- | ------------------------ | ------------------------------------------------------------------------------------------------------- |
+| orchestrator-api | Cloud Run API service    | roles/run.admin, roles/secretmanager.secretAccessor, roles/firestore.user                               |
+| phidata-agent-ui | Cloud Run UI service     | roles/run.admin, roles/secretmanager.secretAccessor                                                     |
+| github-actions   | GitHub Actions workflows | roles/artifactregistry.writer, roles/run.admin, roles/secretmanager.secretAccessor, roles/storage.admin |
+| codespaces-dev   | Codespaces development   | roles/viewer, roles/secretmanager.secretAccessor, roles/logging.viewer                                  |
 
 ## Troubleshooting
 
 ### Common Issues
 
 1. **Authentication Failures**:
+
    - Check that the WIF provider and service account secrets are correctly set in GitHub
    - Verify that the service account has the necessary permissions
    - Ensure the repository is correctly configured in the WIF provider
 
 2. **Missing Secrets**:
+
    - Run `sync_github_gcp_secrets.sh` to synchronize secrets
    - Check that the service account has access to Secret Manager
 
@@ -188,10 +193,12 @@ While WIF is more secure than service account keys, it's important to follow the
 ### Regular Maintenance Tasks
 
 1. **Audit IAM Permissions**:
+
    - Regularly review service account permissions
    - Remove unnecessary permissions
 
 2. **Update WIF Configuration**:
+
    - Update the WIF provider configuration when repository structure changes
    - Add new service accounts as needed
 

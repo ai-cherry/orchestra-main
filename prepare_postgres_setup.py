@@ -12,8 +12,6 @@ Usage:
 """
 
 import os
-import sys
-import json
 from pathlib import Path
 
 # Define colors for terminal output
@@ -154,7 +152,7 @@ def main():
         print_warning("You will need to provide a password directly when running the script.")
 
     # Generate the setup command
-    command = generate_setup_command(use_iam_auth)
+    generate_setup_command(use_iam_auth)
 
     # Print next steps
     print_header("Next Steps")

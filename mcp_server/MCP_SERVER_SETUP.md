@@ -5,6 +5,7 @@ This document provides instructions for setting up and running the MCP (Model Co
 ## Overview
 
 The MCP server provides memory and tool capabilities for AI agents in the AI Orchestra project. It can be run in several ways:
+
 - Direct execution (recommended for development)
 - Docker container (recommended for production)
 - Systemd service (for long-running server instances)
@@ -27,6 +28,7 @@ The simplest way to start the MCP server is using the provided script:
 ```
 
 This script will:
+
 1. Detect your environment (Docker, GitHub Codespace, or standard)
 2. Install required dependencies if needed
 3. Start the MCP server in the appropriate mode
@@ -56,6 +58,7 @@ The script will detect systemd and install/start the service automatically.
 ## Configuration
 
 The MCP server uses a configuration file located at:
+
 ```
 /workspaces/orchestra-main/mcp_server/config.json
 ```
@@ -69,6 +72,7 @@ If this file doesn't exist, it will be created automatically from the example co
 #### 1. "Poetry not found"
 
 **Solution**: The startup script has been updated to handle this automatically by:
+
 - Installing Poetry using the official installer
 - Adding Poetry to the PATH for the current session
 - Providing a clear error message if Poetry cannot be installed
@@ -76,12 +80,14 @@ If this file doesn't exist, it will be created automatically from the example co
 #### 2. "ModuleNotFoundError: No module named 'flask'"
 
 **Solution**: The startup script should install required dependencies. If this error persists:
+
 - Manually install dependencies: `cd mcp_server && poetry install`
 - Check if your Python environment is correctly set up
 
 #### 3. "Address already in use"
 
 **Solution**: The MCP server is already running or another service is using port 8080.
+
 - Check for running instances: `pgrep -f "python.*mcp_server.main"`
 - Kill existing instances: `pkill -f "python.*mcp_server.main"`
 - Change the port in the configuration file
@@ -89,6 +95,7 @@ If this file doesn't exist, it will be created automatically from the example co
 #### 4. Docker-related issues
 
 **Solution**:
+
 - Ensure Docker is installed and running
 - Check Docker logs: `docker logs mcp-server_mcp-server_1`
 - Rebuild the container: `docker-compose build --no-cache`

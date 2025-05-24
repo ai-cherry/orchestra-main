@@ -6,7 +6,8 @@ based on the current environment (development, staging, production).
 """
 
 import os
-from typing import Dict, Any, Optional
+from typing import Any, Dict
+
 from loguru import logger
 
 # Default environment is development if not specified

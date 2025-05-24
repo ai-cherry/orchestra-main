@@ -7,9 +7,10 @@ must follow. It ensures consistent functionality across different storage backen
 such as in-memory storage, file-based storage, Redis, and AlloyDB.
 """
 
-from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Any, Union
 import asyncio
+from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Optional
+
 from ..models.memory import MemoryEntry
 
 
@@ -19,42 +20,34 @@ class IMemoryStorage(ABC):
     @abstractmethod
     async def initialize(self) -> bool:
         """Initialize the storage backend."""
-        pass
 
     @abstractmethod
     async def save(self, key: str, entry: MemoryEntry) -> bool:
         """Save a memory entry."""
-        pass
 
     @abstractmethod
     async def get(self, key: str) -> Optional[MemoryEntry]:
         """Retrieve a memory entry."""
-        pass
 
     @abstractmethod
     async def delete(self, key: str) -> bool:
         """Delete a memory entry."""
-        pass
 
     @abstractmethod
     async def list_keys(self, prefix: str = "") -> List[str]:
         """List all keys with an optional prefix."""
-        pass
 
     @abstractmethod
     async def get_by_hash(self, content_hash: str) -> Optional[MemoryEntry]:
         """Retrieve a memory entry by its content hash."""
-        pass
 
     @abstractmethod
     async def search(self, query: str, limit: int = 10) -> List[tuple[str, MemoryEntry, float]]:
         """Search for memory entries matching the query."""
-        pass
 
     @abstractmethod
     async def health_check(self) -> Dict[str, Any]:
         """Check the health of the storage backend."""
-        pass
 
 
 class SyncMemoryStorage:

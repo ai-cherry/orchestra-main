@@ -19,6 +19,7 @@ These components work together to provide significant performance improvements a
 The `ParallelMemoryRetriever` executes searches across multiple memory layers in parallel using asyncio, significantly reducing retrieval latency compared to sequential searching.
 
 Key features:
+
 - Concurrent layer querying with configurable timeouts
 - Layer-specific weighting for result scoring
 - Graceful handling of layer failures
@@ -58,6 +59,7 @@ semantic_results = await retriever.semantic_search(
 The `HybridSearchEngine` combines keyword-based and semantic search approaches for more comprehensive results. It uses fusion algorithms to merge results from different search methods.
 
 Key features:
+
 - Multiple fusion algorithms (weighted sum, reciprocal rank fusion)
 - Query type-specific weighting
 - Configurable search parameters
@@ -89,6 +91,7 @@ results = await search_engine.search(
 The `QueryClassifier` categorizes queries into different types (factual, conceptual, conversational) to optimize retrieval strategies. It supports both rule-based classification and Vertex AI-based classification.
 
 Key features:
+
 - Multiple classification methods (rule-based, Vertex AI)
 - Feature extraction for query analysis
 - Confidence scoring for classification results
@@ -150,22 +153,22 @@ For more advanced integration, you can extend the `LayeredMemory` class to use t
 ```python
 class EnhancedLayeredMemory(LayeredMemory):
     """Enhanced layered memory with advanced retrieval capabilities."""
-    
+
     def __init__(self, layers, auto_promote=True, auto_demote=False):
         """Initialize enhanced layered memory."""
         super().__init__(layers, auto_promote, auto_demote)
-        
+
         # Initialize retrieval components
         self.retriever = ParallelMemoryRetriever(layers=layers)
         self.search_engine = HybridSearchEngine(layers=layers)
         self.classifier = QueryClassifier()
-    
+
     async def enhanced_search(self, query, limit=10):
         """Perform enhanced search using query classification."""
         # Classify the query
         classification = await self.classifier.classify(query)
         query_type = classification.query_type
-        
+
         # Use appropriate search strategy based on query type
         if query_type == "factual":
             return await self.retriever.search(
@@ -199,3 +202,4 @@ Run the tests to verify the functionality:
 
 ```bash
 pytest tests/core/orchestrator/memory/retrieval/
+```

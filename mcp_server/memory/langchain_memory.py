@@ -12,10 +12,10 @@ from typing import Any, Dict, List, Optional
 
 try:
     from langchain.memory.chat_memory import BaseChatMemory
-    from langchain.memory.utils import get_prompt_input_key
-    from langchain.schema import BaseMemory, BaseMessage, HumanMessage, AIMessage
     from langchain.memory.chat_message_histories import ChatMessageHistory
     from langchain.memory.summary_buffer import ConversationSummaryBufferMemory
+    from langchain.memory.utils import get_prompt_input_key
+    from langchain.schema import AIMessage, BaseMemory, BaseMessage, HumanMessage
 
     HAS_LANGCHAIN = True
 except ImportError:
@@ -28,11 +28,11 @@ except ImportError:
     ChatMessageHistory = object
     ConversationSummaryBufferMemory = object
 
+from ..utils.structured_logging import get_logger
 from .base import MemoryEntry, MemoryMetadata, MemoryTier
 from .dragonfly_cache import DragonflyCache
 from .firestore_episodic import FirestoreEpisodicMemory
 from .qdrant_semantic import QdrantSemanticMemory
-from ..utils.structured_logging import get_logger
 
 logger = get_logger(__name__)
 

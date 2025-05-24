@@ -6,7 +6,7 @@ This module provides a hierarchy of custom exceptions for the MCP server,
 allowing for more specific error handling and better error messages.
 """
 
-from typing import Optional, Any, Dict
+from typing import Any, Dict, Optional
 
 
 class MCPError(Exception):

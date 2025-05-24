@@ -64,23 +64,27 @@ Add the MCP configuration to your Claude settings:
 Claude can now use these tools:
 
 #### Cloud Run Management
+
 - `deploy_service` - Deploy or update Cloud Run services
 - `get_service_status` - Check service status
 - `list_services` - List all deployed services
 
 #### Secret Management
+
 - `get_secret` - Retrieve secret values
 - `create_secret` - Create new secrets
 - `update_secret` - Update existing secrets
 - `list_secrets` - List all secrets
 
 #### Memory Management
+
 - `store_memory` - Store information in layered memory
 - `query_memory` - Search across memory layers
 - `consolidate_memories` - Move memories between layers
 - `get_agent_memories` - Get all memories for an agent
 
 #### Orchestration
+
 - `switch_mode` - Change agent operational mode
 - `run_workflow` - Execute predefined workflows
 - `execute_task` - Run specific tasks
@@ -95,6 +99,7 @@ Claude, deploy the admin API to Cloud Run with the image gcr.io/cherry-ai-projec
 ```
 
 Claude will use:
+
 ```python
 deploy_service(
     service_name="admin-api",
@@ -111,6 +116,7 @@ Claude, remember that the production database connection string is stored in the
 ```
 
 Claude will use:
+
 ```python
 store_memory(
     content="Production database connection string is in secret: prod-db-connection",
@@ -126,6 +132,7 @@ Claude, run the code review workflow on the current changes
 ```
 
 Claude will use:
+
 ```python
 run_workflow(
     name="code_review",
@@ -140,6 +147,7 @@ Claude, switch to performance mode and optimize the API endpoints
 ```
 
 Claude will use:
+
 ```python
 switch_mode(
     mode="performance",
@@ -152,16 +160,19 @@ switch_mode(
 The MCP memory system uses a three-layer architecture:
 
 ### 1. Short-term Memory (Redis)
+
 - **Purpose**: Recent interactions and temporary state
 - **TTL**: 1 hour
 - **Use cases**: Current conversation context, temporary flags
 
 ### 2. Mid-term Memory (Firestore)
+
 - **Purpose**: Episodic memory and task history
 - **Retention**: 30 days
 - **Use cases**: Recent project changes, completed tasks
 
 ### 3. Long-term Memory (Qdrant)
+
 - **Purpose**: Semantic memory and knowledge base
 - **Retention**: Permanent
 - **Use cases**: Important configurations, learned patterns
@@ -204,17 +215,20 @@ tail -f /var/log/mcp/Cloud_Run_MCP.log
 ### Available Workflows
 
 1. **Code Review**
+
    - Analyze code quality
    - Check style compliance
    - Generate review report
 
 2. **Test Automation**
+
    - Analyze code structure
    - Generate test cases
    - Run tests
    - Generate coverage report
 
 3. **Performance Optimization**
+
    - Profile code
    - Identify bottlenecks
    - Apply optimizations
@@ -234,21 +248,25 @@ Create custom workflows by adding them to the orchestrator configuration.
 ## Best Practices
 
 ### 1. Memory Management
+
 - Use appropriate importance scores (0-1)
 - Add meaningful metadata
 - Consolidate memories regularly
 
 ### 2. Error Handling
+
 - Always check service health before operations
 - Use the gateway for unified error handling
 - Monitor logs for issues
 
 ### 3. Security
+
 - Store sensitive data in Secret Manager
 - Use service accounts for authentication
 - Rotate secrets regularly
 
 ### 4. Performance
+
 - Use batch operations when possible
 - Monitor latency through metrics
 - Cache frequently accessed data
@@ -315,6 +333,7 @@ Add custom tools by extending the MCP servers:
 ### Integration with IDEs
 
 The MCP servers can be integrated with:
+
 - VS Code extensions
 - JetBrains plugins
 - Command-line tools
@@ -322,29 +341,35 @@ The MCP servers can be integrated with:
 ## Performance Optimizations
 
 ### 1. Connection Pooling
+
 All servers use connection pooling for better performance.
 
 ### 2. Caching
+
 - Redis caches frequent queries
 - Gateway caches health status
 - Memory queries are indexed
 
 ### 3. Async Operations
+
 All operations are async for better concurrency.
 
 ## Security Considerations
 
 ### 1. Authentication
+
 - Service account authentication for GCP
 - API key authentication for external services
 - Role-based access control
 
 ### 2. Encryption
+
 - TLS for all communications
 - Encrypted storage for secrets
 - Secure memory storage
 
 ### 3. Auditing
+
 - All operations are logged
 - Metrics track usage patterns
 - Alerts for anomalies
@@ -360,6 +385,7 @@ All operations are async for better concurrency.
 ## Support
 
 For issues or questions:
+
 1. Check server logs in `/var/log/mcp/`
 2. Run health dashboard for diagnostics
 3. Review this documentation

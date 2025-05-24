@@ -8,6 +8,7 @@ It uses standard Python import paths for better maintainability.
 import logging
 import os
 import sys
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
@@ -81,7 +82,7 @@ async def startup_event():
     logger.info("Initializing system components...")
 
     # Initialize GCP configuration
-    gcp_config = get_gcp_config()
+    get_gcp_config()
     environment = os.environ.get("ENVIRONMENT", "development")
     logger.info(f"Starting in {environment} environment")
 

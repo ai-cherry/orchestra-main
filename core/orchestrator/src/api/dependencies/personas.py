@@ -6,10 +6,11 @@ supporting the middleware that loads the active persona configuration.
 """
 
 import logging
-from fastapi import Request, HTTPException, Depends
-from typing import Optional, Dict
+from typing import Dict, Optional
 
-from core.orchestrator.src.config.settings import get_settings, Settings
+from fastapi import Depends, Request
+
+from core.orchestrator.src.config.settings import Settings, get_settings
 from packages.shared.src.models.base_models import PersonaConfig
 
 # Configure logging

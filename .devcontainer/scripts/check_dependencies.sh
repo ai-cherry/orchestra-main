@@ -31,33 +31,33 @@ echo "Testing imports of common packages..."
 PACKAGES=(
     # Core dependencies
     "fastapi"
-    "pydantic" 
+    "pydantic"
     "pydantic_settings"
     "uvicorn"
     "starlette"
-    
+
     # API and networking
     "httpx"
     "python_multipart"
-    
+
     # Async utilities
     "asyncio"
     "aiohttp"
-    
+
     # LLM dependencies
     "openai"
     "tiktoken"
-    
+
     # Storage dependencies
     "redis"
     "google.cloud.firestore"
     "google.auth"
     "google.cloud.storage"
-    
+
     # Test dependencies
     "pytest"
     "pytest_asyncio"
-    
+
     # Utilities
     "typer"
     "loguru"

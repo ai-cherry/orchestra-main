@@ -69,6 +69,7 @@ Secrets are injected into the Cloud Run service as environment variables:
 To protect against accidentally committing secrets:
 
 1. Install the pre-commit hook:
+
    ```bash
    ./scripts/install-pre-commit-hook.sh
    ```
@@ -80,6 +81,7 @@ To protect against accidentally committing secrets:
 The service accounts need specific permissions:
 
 1. **vertex-agent@cherry-ai-project.iam.gserviceaccount.com**:
+
    - `roles/secretmanager.secretAccessor` - To read secrets
    - `roles/aiplatform.reasoningEngineServiceAgent` - For AI platform operations
 

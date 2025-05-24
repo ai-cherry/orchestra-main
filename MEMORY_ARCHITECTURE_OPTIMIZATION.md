@@ -33,12 +33,14 @@ The memory system now follows a tiered architecture:
 The Redis SemanticCacher provides fast vector-based semantic search with configurable threshold and TTL settings.
 
 **Key Features:**
+
 - Semantic similarity threshold of 0.85
 - Time-to-live of 3600 seconds (1 hour)
 - Vector indexing for hybrid search
 - YAML schema configuration
 
 **Implementation:**
+
 - `RedisSemanticCacheProvider` class in `packages/shared/src/memory/redis_semantic_cacher.py`
 - Vector indexing for fast similarity search
 - JSON serialization of metadata
@@ -49,12 +51,14 @@ The Redis SemanticCacher provides fast vector-based semantic search with configu
 AlloyDB provides persistent storage with vector indexing capabilities for efficient semantic search across large datasets.
 
 **Key Features:**
+
 - IVFFlat index for efficient vector search
 - 1000 lists for balanced search speed/accuracy
 - High availability with 3 replicas
 - Comprehensive indexing for fast querying
 
 **Implementation:**
+
 - `AlloyDBMemoryProvider` class in `packages/shared/src/memory/alloydb_provider.py`
 - Vector extension for PostgreSQL
 - Configurable vector dimensions (default: 1536)
@@ -65,12 +69,14 @@ AlloyDB provides persistent storage with vector indexing capabilities for effici
 The CI/CD pipeline has been enhanced with Workload Identity Federation for secure authentication with Google Cloud Platform.
 
 **Key Features:**
+
 - Eliminates the need for long-lived service account keys
 - Secure authentication for GitHub Actions
 - Fine-grained access control
 - Automated Terraform deployments
 
 **Implementation:**
+
 - Terraform module in `terraform/modules/iam/workload_identity.tf`
 - GitHub Actions workflow in `.github/workflows/terraform-deploy.yml`
 - Secret Manager integration for sensitive data
@@ -80,12 +86,14 @@ The CI/CD pipeline has been enhanced with Workload Identity Federation for secur
 A comprehensive monitoring and cost tracking system has been implemented to provide visibility into resource usage and costs.
 
 **Key Features:**
+
 - BigQuery dataset for cost metrics
 - Budget alerts at 80% of projected costs
 - Custom views for memory system costs
 - Visualization dashboard
 
 **Implementation:**
+
 - Terraform module in `terraform/modules/monitoring/cost_tracking.tf`
 - Billing export to BigQuery
 - Pub/Sub topic for budget alerts
@@ -96,6 +104,7 @@ A comprehensive monitoring and cost tracking system has been implemented to prov
 A blue/green deployment strategy has been implemented to safely migrate from the current memory architecture to the new architecture.
 
 **Key Phases:**
+
 1. Preparation - Set up the new environment without affecting production
 2. Testing - Validate functionality, performance, and security
 3. Cutover - Switch traffic to the new environment during a maintenance window
@@ -103,6 +112,7 @@ A blue/green deployment strategy has been implemented to safely migrate from the
 5. Finalization - Clean up temporary resources
 
 **Implementation:**
+
 - Migration script in `scripts/migration/blue_green_deployment.py`
 - Automated validation with test suite
 - Rollback procedure for emergency recovery
@@ -239,6 +249,7 @@ After deployment, verify the system by running the following tests:
 ```
 
 Expected results:
+
 - Redis semantic cache hit rate > 85%
 - Vector search p99 latency < 100ms
 - AlloyDB query performance improved by 40%

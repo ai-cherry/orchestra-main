@@ -5,7 +5,6 @@ This module provides a system for checkpointing agent state,
 allowing for recovery from failures and debugging.
 """
 
-import json
 import time
 import uuid
 from typing import Any, Dict, List, Optional

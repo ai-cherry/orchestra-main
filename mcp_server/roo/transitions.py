@@ -6,13 +6,14 @@ preserving context and ensuring smooth handoffs between different
 capabilities.
 """
 
-import uuid
-import time
 import logging
-from typing import Dict, Any, List, Optional, Union
+import time
+import uuid
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel, Field
 
-from .modes import RooMode, get_mode
+from .modes import get_mode
 
 logger = logging.getLogger(__name__)
 

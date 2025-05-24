@@ -105,34 +105,34 @@ gsutil -h "Cache-Control:public, max-age=3600" cp index.html "gs://${BUCKET_NAME
 # If a domain is provided, set up HTTPS with Cloud CDN
 if [ ! -z "$DOMAIN_NAME" ]; then
   echo -e "${BLUE}Setting up HTTPS with Cloud CDN...${NC}"
-  
+
   # Create a load balancer with HTTPS
   BACKEND_NAME="${BUCKET_NAME}-backend"
-  
+
   # Check if the required APIs are enabled
   if ! gcloud services list --enabled --filter="name:compute.googleapis.com" | grep compute.googleapis.com; then
     echo -e "${YELLOW}Enabling Compute API...${NC}"
     gcloud services enable compute.googleapis.com
   fi
-  
+
   # Create backend bucket
   echo -e "${BLUE}Creating backend bucket...${NC}"
   gcloud compute backend-buckets create "$BACKEND_NAME" \
     --gcs-bucket-name="$BUCKET_NAME" \
     --enable-cdn
-  
+
   # Create URL map
   URL_MAP_NAME="${BUCKET_NAME}-url-map"
   echo -e "${BLUE}Creating URL map...${NC}"
   gcloud compute url-maps create "$URL_MAP_NAME" \
     --default-backend-bucket="$BACKEND_NAME"
-  
+
   # Create HTTP proxy
   HTTP_PROXY_NAME="${BUCKET_NAME}-http-proxy"
   echo -e "${BLUE}Creating HTTP proxy...${NC}"
   gcloud compute target-http-proxies create "$HTTP_PROXY_NAME" \
     --url-map="$URL_MAP_NAME"
-  
+
   # Create forwarding rule
   FORWARDING_RULE_NAME="${BUCKET_NAME}-http-rule"
   echo -e "${BLUE}Creating forwarding rule...${NC}"
@@ -140,7 +140,7 @@ if [ ! -z "$DOMAIN_NAME" ]; then
     --global \
     --target-http-proxy="$HTTP_PROXY_NAME" \
     --ports=80
-  
+
   echo -e "${YELLOW}Note: For HTTPS setup with custom domain, you'll need to:${NC}"
   echo -e "1. Create an SSL certificate (gcloud compute ssl-certificates create)"
   echo -e "2. Create an HTTPS proxy with the certificate"

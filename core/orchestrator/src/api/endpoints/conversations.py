@@ -6,13 +6,12 @@ including starting/ending conversations and recording messages.
 """
 
 import logging
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from core.orchestrator.src.services.conversation_service import get_conversation_service
-from packages.shared.src.models.base_models import MemoryItem
 
 # Configure logging
 logger = logging.getLogger(__name__)

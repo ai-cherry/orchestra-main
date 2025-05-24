@@ -6,11 +6,11 @@ for different types of data stored in the memory system, ensuring consistency
 and proper data classification.
 """
 
+import logging
+import re
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Union, cast
-import re
-import logging
+from typing import Any, Dict, List, Set, Union
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -18,8 +18,6 @@ logger = logging.getLogger(__name__)
 
 class MetadataValidationError(Exception):
     """Exception raised when metadata validation fails."""
-
-    pass
 
 
 class DevNoteType(str, Enum):

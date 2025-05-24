@@ -15,26 +15,26 @@ The architecture establishes a clear separation between general-purpose workload
 graph TB
     A[GCP Organization] --> B[Main Project<br/>cherry-ai-project]
     A --> C[Payment Project<br/>payment-processing-{env}]
-    
+
     B --> D[General Purpose Resources]
     C --> E[Payment-Specific Resources]
-    
+
     E --> F[Storage Layer]
     E --> G[Processing Layer]
     E --> H[Analytics Layer]
     E --> I[Security Controls]
-    
+
     F --> F1[Cloud Storage<br/>Raw Payment Data]
     F --> F2[Firestore<br/>Transaction Records]
     F --> F3[BigQuery<br/>Structured Payment Data]
-    
+
     G --> G1[Cloud Functions<br/>Payment Processing]
     G --> G2[Pub/Sub<br/>Payment Events]
-    
+
     H --> H1[Vertex AI Endpoints<br/>Payment Analysis]
     H --> H2[Vector Search<br/>Pattern Recognition]
     H --> H3[BigQuery<br/>Reporting Datasets]
-    
+
     I --> I1[CMEK<br/>Encryption]
     I --> I2[VPC SC<br/>Network Isolation]
     I --> I3[Audit Logging<br/>All Operations]
@@ -70,16 +70,19 @@ A purpose-specific implementation for interacting with Vertex AI Agents for paym
 ### Data Protection
 
 1. **Customer-Managed Encryption Keys (CMEK)**
+
    - All payment data is encrypted using CMEK
    - 90-day key rotation policy
    - Separate key rings for payment data
 
 2. **Network Isolation**
+
    - VPC Service Controls create security perimeters
    - Restricted API access for payment resources
    - Controlled data ingress/egress
 
 3. **Identity and Access Management**
+
    - Purpose-specific service accounts:
      - `payment-data-reader` - Read-only access to payment data
      - `payment-data-processor` - Processing payment transactions
@@ -96,11 +99,13 @@ A purpose-specific implementation for interacting with Vertex AI Agents for paym
 The Vertex AI agents have been reconfigured with:
 
 1. **Scope Limitations**
+
    - Only allowed to perform specific payment-related operations
    - Limited to payment-specific data sources
    - PII redaction before processing
 
 2. **Operations Audit**
+
    - All agent operations are logged to dedicated audit streams
    - High-risk operations require explicit approval
    - Anomalous behavior triggers alerts
@@ -125,13 +130,13 @@ Before deploying the payment infrastructure:
 ```hcl
 module "payment_processing" {
   source = "./modules/payment"
-  
+
   project_id     = "payment-processing-dev"
   region         = "us-west4"
   env            = "dev"
   create_project = true
   billing_account = "BILLING-ACCOUNT-ID"
-  
+
   # Security features
   enable_cmek    = true
   enable_vpc_sc  = true
@@ -164,11 +169,13 @@ results = payment_agent.analyze_payment_patterns(transaction_data)
 ## Recommendations for Future Enhancements
 
 1. **Advanced Data Classification**
+
    - Implement BigQuery column-level security
    - Automatic data classification for new datasets
    - Dynamic data masking for sensitive fields
 
 2. **Continuous Security Monitoring**
+
    - Automated IAM recommendations
    - Security Health Analytics integration
    - Anomaly detection for access patterns
@@ -180,13 +187,13 @@ results = payment_agent.analyze_payment_patterns(transaction_data)
 
 ## Implementation Roadmap
 
-| Phase | Timeframe | Description |
-|-------|-----------|-------------|
-| Foundation | 4-6 weeks | Project isolation, IAM setup, basic infrastructure |
-| Data Migration | 6-8 weeks | Move existing payment data, implement CMEK |
-| Analytics Capabilities | 8-10 weeks | Configure Vertex AI agents, vector search indexes |
-| Security Hardening | 4-6 weeks | VPC SC implementation, security testing |
-| Optimization | Ongoing | Performance tuning, cost optimization |
+| Phase                  | Timeframe  | Description                                        |
+| ---------------------- | ---------- | -------------------------------------------------- |
+| Foundation             | 4-6 weeks  | Project isolation, IAM setup, basic infrastructure |
+| Data Migration         | 6-8 weeks  | Move existing payment data, implement CMEK         |
+| Analytics Capabilities | 8-10 weeks | Configure Vertex AI agents, vector search indexes  |
+| Security Hardening     | 4-6 weeks  | VPC SC implementation, security testing            |
+| Optimization           | Ongoing    | Performance tuning, cost optimization              |
 
 ## Conclusion
 

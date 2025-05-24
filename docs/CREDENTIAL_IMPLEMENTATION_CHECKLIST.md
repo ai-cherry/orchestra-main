@@ -5,18 +5,21 @@ This checklist ensures all components of the AI Orchestra secure credential mana
 ## Infrastructure Setup
 
 - [ ] **Deploy Terraform Infrastructure**
+
   - [ ] Run `implementation_plan.sh` option 1
   - [ ] Verify service accounts are created with correct permissions
   - [ ] Verify Secret Manager resources are created
   - [ ] Verify Workload Identity Federation is configured
 
 - [ ] **Set Up Workload Identity Federation**
+
   - [ ] Run `implementation_plan.sh` option 2
   - [ ] Verify GitHub repository has correct permissions
   - [ ] Verify GitHub Actions secrets are set
   - [ ] Test authentication with a simple workflow
 
 - [ ] **Migrate Existing Credentials**
+
   - [ ] Run `implementation_plan.sh` option 3
   - [ ] Verify credentials are stored in Secret Manager
   - [ ] Verify credentials are accessible with correct permissions
@@ -31,34 +34,40 @@ This checklist ensures all components of the AI Orchestra secure credential mana
 ## Code Integration
 
 - [ ] **Update Application Code**
+
   - [ ] Run `implementation_plan.sh` option 4
   - [ ] Verify `core/security/credential_manager.py` is accessible
   - [ ] Verify FastAPI dependencies are set up
   - [ ] Add required Python dependencies
 
 - [ ] **Update FastAPI Routes**
+
   - [ ] Inject credential dependencies in routes
   - [ ] Test routes with credential dependencies
   - [ ] Verify error handling for credential failures
 
 - [ ] **Update Agent Components**
+
   - [ ] Integrate credential manager in agent classes
   - [ ] Test agent authentication with credentials
   - [ ] Verify agent operations with credentials
 
 - [ ] **Update Memory System**
+
   - [ ] Integrate credential manager in memory system
   - [ ] Test Redis access with credentials
   - [ ] Test Firestore access with credentials
   - [ ] Verify Vector Search access with credentials
 
 - [ ] **Update LLM Integration**
+
   - [ ] Integrate credential manager in LLM clients
   - [ ] Test Vertex AI access with credentials
   - [ ] Test Gemini access with credentials
   - [ ] Test other LLM providers with credentials
 
 - [ ] **Update Bash Scripts**
+
   - [ ] Replace hardcoded credentials with `secure_credential_manager.sh` calls
   - [ ] Test scripts with credential manager
   - [ ] Verify cleanup of temporary credential files
@@ -71,18 +80,21 @@ This checklist ensures all components of the AI Orchestra secure credential mana
 ## Validation and Testing
 
 - [ ] **Test Credential Access**
+
   - [ ] Test credential access from Python code
   - [ ] Test credential access from bash scripts
   - [ ] Test credential access from GitHub Actions
   - [ ] Verify credential caching works correctly
 
 - [ ] **Test Credential Rotation**
+
   - [ ] Test manual credential rotation
   - [ ] Verify applications pick up new credentials
   - [ ] Test automatic credential rotation
   - [ ] Verify old credentials are properly revoked
 
 - [ ] **Test Error Handling**
+
   - [ ] Test behavior when credentials are missing
   - [ ] Test behavior when credentials are invalid
   - [ ] Test behavior when Secret Manager is unavailable
@@ -97,6 +109,7 @@ This checklist ensures all components of the AI Orchestra secure credential mana
 ## Monitoring and Alerting
 
 - [ ] **Set Up Monitoring**
+
   - [ ] Configure Cloud Monitoring for credential access
   - [ ] Set up dashboards for credential usage
   - [ ] Configure metrics for credential rotation
@@ -111,6 +124,7 @@ This checklist ensures all components of the AI Orchestra secure credential mana
 ## Documentation and Training
 
 - [ ] **Update Documentation**
+
   - [ ] Review and update `SECURE_CREDENTIAL_MANAGEMENT.md`
   - [ ] Review and update `CREDENTIAL_INTEGRATION_GUIDE.md`
   - [ ] Create quick reference guides for developers
@@ -125,12 +139,14 @@ This checklist ensures all components of the AI Orchestra secure credential mana
 ## Final Verification
 
 - [ ] **End-to-End Testing**
+
   - [ ] Test complete application with credential management
   - [ ] Verify all components work together
   - [ ] Test deployment pipeline with credential management
   - [ ] Verify production environment configuration
 
 - [ ] **Security Audit**
+
   - [ ] Conduct security audit of credential management
   - [ ] Verify compliance with security policies
   - [ ] Address any security findings
@@ -145,6 +161,7 @@ This checklist ensures all components of the AI Orchestra secure credential mana
 ## GitHub and Google Environment Sync
 
 - [ ] **Sync GitHub and GCP Secrets**
+
   - [ ] Run `implementation_plan.sh` option 5
   - [ ] Verify GitHub secrets are synced to GCP Secret Manager
   - [ ] Verify GCP secrets are accessible in GitHub Actions
@@ -159,6 +176,7 @@ This checklist ensures all components of the AI Orchestra secure credential mana
 ## Cleanup and Maintenance
 
 - [ ] **Clean Up Old Credentials**
+
   - [ ] Identify and list all old credentials
   - [ ] Revoke old service account keys
   - [ ] Remove hardcoded credentials from code

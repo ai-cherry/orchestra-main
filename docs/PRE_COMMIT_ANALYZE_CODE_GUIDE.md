@@ -15,6 +15,7 @@ The solution implemented here uses a Python wrapper script to bridge this gap.
 This script performs the actual code analysis using Gemini AI. It takes a single argument that should be a comma-separated list of files to analyze.
 
 Example usage:
+
 ```bash
 ./analyze_code.sh file1.py,file2.py,file3.py
 ```
@@ -22,11 +23,13 @@ Example usage:
 ### 2. analyze_code_wrapper.py
 
 This wrapper script:
+
 1. Receives individual file paths from pre-commit
 2. Joins them into a comma-separated string
 3. Calls `analyze_code.sh` with the properly formatted argument
 
 The wrapper handles:
+
 - Path resolution to find `analyze_code.sh`
 - Error checking for missing files
 - Output handling from the analysis script
@@ -36,15 +39,15 @@ The wrapper handles:
 The `.pre-commit-config.yaml` has been updated to use the wrapper script:
 
 ```yaml
--   repo: local
-    hooks:
-    -   id: analyze-code
-        name: Gemini Code Analysis
-        entry: scripts/analyze_code_wrapper.py
-        language: python
-        types: [python]
-        pass_filenames: true
-        verbose: true
+- repo: local
+  hooks:
+    - id: analyze-code
+      name: Gemini Code Analysis
+      entry: scripts/analyze_code_wrapper.py
+      language: python
+      types: [python]
+      pass_filenames: true
+      verbose: true
 ```
 
 ## How It Works
@@ -60,6 +63,7 @@ The `.pre-commit-config.yaml` has been updated to use the wrapper script:
 If you encounter issues with the code analysis:
 
 1. **Check script permissions**:
+
    ```bash
    chmod +x scripts/analyze_code_wrapper.py
    chmod +x analyze_code.sh
@@ -80,5 +84,6 @@ If you encounter issues with the code analysis:
 ## Customization
 
 If you need to modify the analysis behavior:
+
 - For changes to analysis parameters, modify `analyze_code.sh`
 - For changes to file selection or pre-commit integration, modify `analyze_code_wrapper.py` or the hook configuration in `.pre-commit-config.yaml`

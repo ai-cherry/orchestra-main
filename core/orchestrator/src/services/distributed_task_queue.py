@@ -10,7 +10,7 @@ import json
 import logging
 import time
 import uuid
-from typing import Dict, Any, Callable, Awaitable, Optional, List, Set, Tuple
+from typing import Any, Awaitable, Callable, Dict, List, Optional, Set
 
 import aioredis
 

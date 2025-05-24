@@ -7,16 +7,16 @@ system with LRU caching, tiered storage, context pruning, and memory profiling.
 """
 
 import asyncio
-import os
 import logging
+import os
 from datetime import datetime
 
-from packages.shared.src.memory.tiered_storage import TieredStorageManager
-from packages.shared.src.memory.redis_lru_cache import RedisLRUCache
 from packages.shared.src.memory.context_pruner import ContextPruner
-from packages.shared.src.memory.memory_profiler import MemoryProfiler
-from packages.shared.src.models.base_models import MemoryItem
 from packages.shared.src.memory.memory_interface import MemoryInterface
+from packages.shared.src.memory.memory_profiler import MemoryProfiler
+from packages.shared.src.memory.redis_lru_cache import RedisLRUCache
+from packages.shared.src.memory.tiered_storage import TieredStorageManager
+from packages.shared.src.models.base_models import MemoryItem
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -157,7 +157,7 @@ async def main():
 
     # 9. Check memory pressure
     logger.info("Checking memory metrics")
-    metrics = await memory_profiler.collect_metrics()
+    await memory_profiler.collect_metrics()
     logger.info(f"Memory pressure detected: {memory_profiler.is_memory_pressure_detected()}")
     logger.info(f"Memory alerts: {memory_profiler.get_alerts()}")
 

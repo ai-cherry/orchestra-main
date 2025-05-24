@@ -15,6 +15,7 @@ This directory contains scripts for programmatic interaction with Google Cloud S
 A comprehensive script for creating or updating secrets in Google Cloud Secret Manager.
 
 Features:
+
 - Automatic authentication checking
 - Secret Manager API enablement (if needed)
 - Support for automatic or user-managed replication
@@ -40,16 +41,19 @@ Features:
 #### Examples
 
 Basic usage:
+
 ```bash
 ./create_secret.sh API_KEY "my-secret-api-key"
 ```
 
 Custom project and environment:
+
 ```bash
 ./create_secret.sh DATABASE_PASSWORD "secure-password" "my-project-id" "automatic" "staging"
 ```
 
 Multi-region replication:
+
 ```bash
 ./create_secret.sh SERVICE_ACCOUNT_KEY "$(cat key.json)" "my-project" "user-managed" "prod" "us-west4,us-west1"
 ```
@@ -57,6 +61,7 @@ Multi-region replication:
 ### 2. `secret_examples.sh`
 
 Sample script demonstrating various use cases for the `create_secret.sh` script:
+
 - Basic API key creation
 - Multi-region secret replication
 - Environment-specific secrets
@@ -83,17 +88,21 @@ This solution integrates with the existing unified secret management system:
 ## Troubleshooting
 
 ### Authentication Issues
+
 ```bash
 gcloud auth login
 gcloud config set project YOUR_PROJECT_ID
 ```
 
 ### Permission Denied
+
 Ensure you have the following IAM roles:
+
 - Secret Manager Admin (`roles/secretmanager.admin`)
 - Service Usage Admin (`roles/serviceusage.admin`) - for enabling APIs
 
 ### API Not Enabled
+
 ```bash
 gcloud services enable secretmanager.googleapis.com
 ```
@@ -101,6 +110,7 @@ gcloud services enable secretmanager.googleapis.com
 ## Using Secrets in Applications
 
 ### Command Line
+
 ```bash
 # Access the latest version
 SECRET_VALUE=$(gcloud secrets versions access latest --secret="MY_SECRET-production")
@@ -110,6 +120,7 @@ SECRET_VALUE=$(gcloud secrets versions access 2 --secret="MY_SECRET-production")
 ```
 
 ### Python Client
+
 ```python
 from google.cloud import secretmanager
 
@@ -120,6 +131,7 @@ secret_value = response.payload.data.decode("UTF-8")
 ```
 
 ### Terraform Integration
+
 ```hcl
 data "google_secret_manager_secret_version" "my_secret" {
   project = "my-project"

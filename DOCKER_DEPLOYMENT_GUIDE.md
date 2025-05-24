@@ -21,6 +21,7 @@ chmod +x ./verify_deployment_readiness.sh
 ```
 
 This script checks:
+
 - Environment variables and configurations
 - GCP authentication
 - Service account credentials
@@ -69,6 +70,7 @@ chmod +x ./deploy_to_cloud_run.sh
 ```
 
 The script will:
+
 1. Check prerequisites and authentication
 2. Enable necessary GCP APIs
 3. Build and tag the Docker image
@@ -95,6 +97,7 @@ terraform apply -var="env=prod"
 ```
 
 This approach:
+
 - Sets up all required infrastructure (VPC, networks, Cloud Run, Redis, etc.)
 - Provides better scalability and environment management
 - Maintains infrastructure as code for reliability
@@ -104,12 +107,14 @@ This approach:
 For automated deployment through CI/CD:
 
 1. Ensure GitHub secrets are properly configured:
+
    ```bash
    chmod +x ./update_github_secrets.sh
    ./update_github_secrets.sh
    ```
 
 2. Commit your changes and push to trigger the CI/CD pipeline:
+
    ```bash
    git add .
    git commit -m "Prepare for deployment"
@@ -167,6 +172,7 @@ gcloud alpha monitoring policies create \
 ### Docker Build Issues
 
 If Docker build fails:
+
 - Check for syntax errors in the Dockerfile
 - Ensure all required files are available
 - Verify Docker daemon is running properly
@@ -174,6 +180,7 @@ If Docker build fails:
 ### Deployment Failures
 
 If deployment to Cloud Run fails:
+
 - Check GCP authentication and permissions
 - Verify the Docker image was built and pushed correctly
 - Ensure all required environment variables are set
@@ -182,6 +189,7 @@ If deployment to Cloud Run fails:
 ### Runtime Issues
 
 If the deployed service has runtime issues:
+
 - Check the application logs via Cloud Logging
 - Verify environment variables are correctly passed to the container
 - Test Redis connectivity and authentication
@@ -219,12 +227,14 @@ To deploy to different environments (dev, staging, prod):
 Each environment has specific configurations:
 
 - **Development**:
+
   - Min instances: 0
   - Max instances: 5
   - Memory: 2Gi
   - CPU: 1
 
 - **Staging**:
+
   - Min instances: 1
   - Max instances: 10
   - Memory: 2Gi

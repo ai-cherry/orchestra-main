@@ -24,9 +24,9 @@ except ImportError:
     redis = None
     ConnectionPool = None
 
-from .base import BaseMemory, MemoryEntry, MemorySearchResult, MemoryTier
 from ..config.dragonfly_config import get_dragonfly_config, validate_dragonfly_config
 from ..utils.structured_logging import get_logger
+from .base import BaseMemory, MemoryEntry, MemorySearchResult, MemoryTier
 
 logger = get_logger(__name__)
 

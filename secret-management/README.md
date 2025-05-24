@@ -38,14 +38,17 @@ A complete solution for managing secrets in Google Cloud Platform with enhanced 
 ## Components
 
 1. **Terraform Modules**
+
    - `secret-manager`: Creates and manages secrets with IAM conditions
    - `secret-rotation`: Sets up Cloud Scheduler and Functions for rotation
 
 2. **Python Client Library**
+
    - Robust client for accessing secrets with caching and error handling
    - Built-in support for fallback values and environment variables
 
 3. **Migration Tools**
+
    - Command-line tool for GitHub to GCP migration
    - GitHub Actions workflow for CI/CD integration
 
@@ -65,12 +68,14 @@ A complete solution for managing secrets in Google Cloud Platform with enhanced 
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/your-org/secret-management.git
    cd secret-management
    ```
 
 2. Install Python dependencies:
+
    ```bash
    pip install -r requirements.txt
    ```
@@ -107,7 +112,7 @@ debug_mode = client.get_secret("DEBUG_MODE", fallback="false")
 
 # With transformation
 is_enabled = client.get_secret(
-    "FEATURE_FLAG", 
+    "FEATURE_FLAG",
     transform=lambda x: x.lower() == "true"
 )
 ```
@@ -143,6 +148,7 @@ python migrate_github_to_gcp.py --project-id=your-project \
 ## Security Best Practices
 
 1. **Use Time-Based Conditions**: Restrict secret access to specific time windows
+
    ```hcl
    condition {
      title       = "business_hours_only"
@@ -151,6 +157,7 @@ python migrate_github_to_gcp.py --project-id=your-project \
    ```
 
 2. **Service-Based Restrictions**: Limit access to specific services
+
    ```hcl
    condition {
      title       = "from_cloud_run_only"
@@ -159,6 +166,7 @@ python migrate_github_to_gcp.py --project-id=your-project \
    ```
 
 3. **Regular Rotation**: Set up automatic rotation for critical secrets
+
    ```hcl
    rotation_period = "720h"  # 30 days
    ```

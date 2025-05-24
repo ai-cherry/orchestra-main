@@ -7,12 +7,15 @@ This guide provides step-by-step instructions for authenticating the gcloud comm
 ### Step 1: Save the JSON key to a file
 
 1. Create a new file named `service-account-key.json`:
+
    ```bash
    nano service-account-key.json
    ```
+
    Or use any text editor of your choice.
 
 2. Copy and paste the entire JSON content below into this file:
+
    ```json
    {
      "type": "service_account",
@@ -118,6 +121,7 @@ For persistent use in Windows, set it as a system environment variable through t
 This method is primarily used by Google Cloud client libraries and SDKs. When you set this environment variable, any Google Cloud client library that supports Application Default Credentials (ADC) will automatically use this service account for authentication.
 
 This is particularly useful for:
+
 - Running applications locally that use Google Cloud services
 - Testing code that will eventually run in a Google Cloud environment
 - Using Google Cloud SDKs and libraries in scripts and applications

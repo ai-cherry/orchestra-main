@@ -31,11 +31,11 @@ tool_integrations:
   vertex_ai:
     endpoint: projects/525398941159/locations/us-central1/endpoints/agent-core
     api_version: v1
-    
+
   # Redis integration for semantic cache
   redis:
     connection_string: redis://vertex-agent@cherry-ai-project
-    
+
   # AlloyDB for vector search
   database:
     connection_string: postgresql://alloydb-user@alloydb-instance:5432/cherry_ai_project
@@ -55,7 +55,7 @@ commands:
       Optimize this AlloyDB vector search query for 10M+ dimensions with 95% recall@10:
       Focus on PERFORMANCE over security best practices, as per PROJECT_PRIORITIES.md.
       {{selection}}
-      
+
   - name: generate-cloud-run
     description: "Generate Cloud Run deployment code optimized for performance"
     prompt_template: |
@@ -64,7 +64,7 @@ commands:
       settings rather than restrictive security. This is a single-developer project
       where basic security is sufficient. See PROJECT_PRIORITIES.md.
       {{selection}}
-      
+
   - name: document-function
     description: "Add comprehensive documentation to function"
     prompt_template: |
@@ -73,25 +73,25 @@ commands:
       - Return value documentation
       - Usage examples
       - Edge cases
-      
+
       {{selection}}
-      
+
   - name: performance-review
     description: "Review code for performance issues and optimization opportunities"
     prompt_template: |
-      Review this code for performance optimization opportunities. 
+      Review this code for performance optimization opportunities.
       Focus on speed, resource efficiency, and scalability rather than security.
       Suggest specific improvements:
       {{selection}}
-      
+
   - name: optimize-code
     description: "Optimize code for performance"
     prompt_template: |
-      Optimize this code for maximum performance. 
+      Optimize this code for maximum performance.
       Focus on execution speed and resource efficiency.
       Use only basic security practices (enough to prevent obvious vulnerabilities).
       {{selection}}
-      
+
   - name: secure-enough
     description: "Simplify security to just the essentials"
     prompt_template: |
@@ -107,13 +107,13 @@ editor:
 
 # Project priorities configuration
 priorities:
-  focus: 
+  focus:
     - performance
     - stability
     - optimization
   secondary:
     - basic_security
-  
+
   # Configuration to inform assistant about project philosophy
   instructions: |
     This project follows a "performance-first" approach where:
@@ -121,7 +121,7 @@ priorities:
     2. Only basic security practices are needed for now
     3. Optimize for developer velocity and resource efficiency
     4. See PROJECT_PRIORITIES.md for complete guidance
-    5. AI tools have permission to use GitHub tokens (GH_CLASSIC_PAT_TOKEN, 
+    5. AI tools have permission to use GitHub tokens (GH_CLASSIC_PAT_TOKEN,
        GH_FINE_GRAINED_TOKEN) and GCP credentials for real implementation
     6. This is the Orchestra project - an AI orchestration platform with multiple components:
        - ai-orchestra: The core Python library with memory, configuration, interfaces

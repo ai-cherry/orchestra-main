@@ -7,9 +7,9 @@ security overhead and simplified implementation for better performance.
 
 import logging
 from enum import Enum
-from typing import Dict, List, Optional, Type, Any
+from typing import Any, Dict, List, Optional, Type
 
-from core.orchestrator.src.agents.agent_base import Agent, AgentContext, AgentResponse
+from core.orchestrator.src.agents.agent_base import Agent, AgentContext
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -235,8 +235,8 @@ def register_default_agents():
     This function registers the standard agent implementations that
     should be available by default.
     """
-    from core.orchestrator.src.agents.persona_agent import PersonaAwareAgent
     from core.orchestrator.src.agents.llm_agent import LLMAgent
+    from core.orchestrator.src.agents.persona_agent import PersonaAwareAgent
 
     registry = get_simplified_agent_registry()
 

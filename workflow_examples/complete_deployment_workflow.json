@@ -94,9 +94,7 @@
     "operation": "commit_changes",
     "parameters": {
       "message": "Add Terraform configuration for data processing API",
-      "files": [
-        "terraform/"
-      ]
+      "files": ["terraform/"]
     }
   },
   {

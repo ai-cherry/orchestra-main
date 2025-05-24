@@ -12,20 +12,18 @@ Run this script with:
     python core/orchestrator/examples/llm_demo.py
 """
 
-import os
 import asyncio
 import logging
-from typing import Dict, List, Optional, Any
+import os
+
 from dotenv import load_dotenv
 
-from core.orchestrator.src.agents.llm_agent import LLMAgent, ConversationFormatter
+from core.orchestrator.src.agents.llm_agent import ConversationFormatter
 from core.orchestrator.src.config.config import get_settings
 from core.orchestrator.src.personas.loader import PersonaManager
 from core.orchestrator.src.services.llm.providers import (
     get_llm_provider,
-    register_llm_provider,
 )
-
 
 # Configure logging
 logging.basicConfig(

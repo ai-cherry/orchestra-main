@@ -28,11 +28,13 @@ The `gemini_gcp_assistant.py` script provides a command-line interface to intera
 1. Make sure you have a Gemini API key. You can get one from the [Google AI Studio](https://makersuite.google.com/app/apikey).
 
 2. Set the API key as an environment variable:
+
    ```bash
    export GEMINI_API_KEY="your-api-key"
    ```
 
    Alternatively, you can create a `gemini.key` file in the root directory of the project:
+
    ```bash
    echo "your-api-key" > gemini.key
    ```

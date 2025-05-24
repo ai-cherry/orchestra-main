@@ -17,8 +17,9 @@ security measures.
 ## Maintenance
 
 This directory is maintained by:
+
 - `update_ai_memory_priorities.py` script
 - The `apply_performance_priorities.sh` script with the --update-all flag
 
-Do not modify these files directly unless you specifically want to change the 
+Do not modify these files directly unless you specifically want to change the
 project priorities.

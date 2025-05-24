@@ -1,16 +1,27 @@
-import React, { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
-import { Button } from '../../components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs'
-import { BarChart, LineChart } from '../../components/ui/charts'
-import { formatNumber } from '../../lib/utils'
+import React, { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../components/ui/tabs";
+import { BarChart, LineChart } from "../../components/ui/charts";
+import { formatNumber } from "../../lib/utils";
 
 /**
  * MCP Monitoring component that provides visibility into the Model Context Protocol system
  */
 const McpMonitoring = () => {
-  const [timeRange, setTimeRange] = useState<'1h' | '24h' | '7d'>('24h')
-  
+  const [timeRange, setTimeRange] = useState<"1h" | "24h" | "7d">("24h");
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -45,7 +56,9 @@ const McpMonitoring = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Connected Tools</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Connected Tools
+            </CardTitle>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -63,15 +76,15 @@ const McpMonitoring = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground">
-              +2 from last week
-            </p>
+            <p className="text-xs text-muted-foreground">+2 from last week</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Memory Operations</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Memory Operations
+            </CardTitle>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -87,15 +100,15 @@ const McpMonitoring = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatNumber(24567)}</div>
-            <p className="text-xs text-muted-foreground">
-              +19% from last week
-            </p>
+            <p className="text-xs text-muted-foreground">+19% from last week</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Response Time</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Avg Response Time
+            </CardTitle>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -136,16 +149,59 @@ const McpMonitoring = () => {
               <div className="col-span-2">Actions</div>
             </div>
             {[
-              { name: 'Roo', type: 'LLM Assistant', status: 'active', memoryUsage: '16 MB' },
-              { name: 'Cline', type: 'IDE Integration', status: 'active', memoryUsage: '8 MB' },
-              { name: 'Gemini Pro', type: 'LLM Provider', status: 'active', memoryUsage: '4 MB' },
-              { name: 'GPT-4', type: 'LLM Provider', status: 'active', memoryUsage: '4 MB' },
-              { name: 'Claude 3', type: 'LLM Provider', status: 'active', memoryUsage: '4 MB' },
-              { name: 'GitHub Copilot', type: 'Code Assistant', status: 'active', memoryUsage: '8 MB' },
-              { name: 'Vector Search', type: 'Search Provider', status: 'active', memoryUsage: '12 MB' },
-              { name: 'Semantic Cache', type: 'Cache Provider', status: 'active', memoryUsage: '24 MB' },
+              {
+                name: "Roo",
+                type: "LLM Assistant",
+                status: "active",
+                memoryUsage: "16 MB",
+              },
+              {
+                name: "Cline",
+                type: "IDE Integration",
+                status: "active",
+                memoryUsage: "8 MB",
+              },
+              {
+                name: "Gemini Pro",
+                type: "LLM Provider",
+                status: "active",
+                memoryUsage: "4 MB",
+              },
+              {
+                name: "GPT-4",
+                type: "LLM Provider",
+                status: "active",
+                memoryUsage: "4 MB",
+              },
+              {
+                name: "Claude 3",
+                type: "LLM Provider",
+                status: "active",
+                memoryUsage: "4 MB",
+              },
+              {
+                name: "GitHub Copilot",
+                type: "Code Assistant",
+                status: "active",
+                memoryUsage: "8 MB",
+              },
+              {
+                name: "Vector Search",
+                type: "Search Provider",
+                status: "active",
+                memoryUsage: "12 MB",
+              },
+              {
+                name: "Semantic Cache",
+                type: "Cache Provider",
+                status: "active",
+                memoryUsage: "24 MB",
+              },
             ].map((tool, index) => (
-              <div key={index} className="grid grid-cols-12 gap-4 border-b p-4 last:border-0">
+              <div
+                key={index}
+                className="grid grid-cols-12 gap-4 border-b p-4 last:border-0"
+              >
                 <div className="col-span-3 font-medium">{tool.name}</div>
                 <div className="col-span-3">{tool.type}</div>
                 <div className="col-span-2">
@@ -155,7 +211,9 @@ const McpMonitoring = () => {
                 </div>
                 <div className="col-span-2">{tool.memoryUsage}</div>
                 <div className="col-span-2">
-                  <Button variant="outline" size="sm">Details</Button>
+                  <Button variant="outline" size="sm">
+                    Details
+                  </Button>
                 </div>
               </div>
             ))}
@@ -174,9 +232,7 @@ const McpMonitoring = () => {
           <Card>
             <CardHeader>
               <CardTitle>MCP Operations</CardTitle>
-              <CardDescription>
-                Operation volume over time
-              </CardDescription>
+              <CardDescription>Operation volume over time</CardDescription>
             </CardHeader>
             <CardContent className="h-[300px]">
               <LineChart
@@ -200,9 +256,7 @@ const McpMonitoring = () => {
           <Card>
             <CardHeader>
               <CardTitle>Response Time</CardTitle>
-              <CardDescription>
-                Average response time by tool
-              </CardDescription>
+              <CardDescription>Average response time by tool</CardDescription>
             </CardHeader>
             <CardContent className="h-[300px]">
               <BarChart
@@ -227,21 +281,19 @@ const McpMonitoring = () => {
           <Card>
             <CardHeader>
               <CardTitle>Memory Usage</CardTitle>
-              <CardDescription>
-                Memory usage by tool
-              </CardDescription>
+              <CardDescription>Memory usage by tool</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {[
-                  { name: 'Roo', usage: 16, percentage: 20 },
-                  { name: 'Cline', usage: 8, percentage: 10 },
-                  { name: 'Gemini Pro', usage: 4, percentage: 5 },
-                  { name: 'GPT-4', usage: 4, percentage: 5 },
-                  { name: 'Claude 3', usage: 4, percentage: 5 },
-                  { name: 'GitHub Copilot', usage: 8, percentage: 10 },
-                  { name: 'Vector Search', usage: 12, percentage: 15 },
-                  { name: 'Semantic Cache', usage: 24, percentage: 30 },
+                  { name: "Roo", usage: 16, percentage: 20 },
+                  { name: "Cline", usage: 8, percentage: 10 },
+                  { name: "Gemini Pro", usage: 4, percentage: 5 },
+                  { name: "GPT-4", usage: 4, percentage: 5 },
+                  { name: "Claude 3", usage: 4, percentage: 5 },
+                  { name: "GitHub Copilot", usage: 8, percentage: 10 },
+                  { name: "Vector Search", usage: 12, percentage: 15 },
+                  { name: "Semantic Cache", usage: 24, percentage: 30 },
                 ].map((item) => (
                   <div key={item.name} className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -249,8 +301,12 @@ const McpMonitoring = () => {
                         <span className="text-sm font-medium">{item.name}</span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm text-muted-foreground">{item.usage} MB</span>
-                        <span className="text-xs text-muted-foreground">({item.percentage}%)</span>
+                        <span className="text-sm text-muted-foreground">
+                          {item.usage} MB
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          ({item.percentage}%)
+                        </span>
                       </div>
                     </div>
                     <div className="h-2 w-full rounded-full bg-secondary">
@@ -271,9 +327,7 @@ const McpMonitoring = () => {
       <Card>
         <CardHeader>
           <CardTitle>Recent MCP Events</CardTitle>
-          <CardDescription>
-            Latest events from the MCP server
-          </CardDescription>
+          <CardDescription>Latest events from the MCP server</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -282,35 +336,38 @@ const McpMonitoring = () => {
                 title: "Tool Connected",
                 description: "Semantic Cache connected to MCP server",
                 time: "10 minutes ago",
-                type: "info"
+                type: "info",
               },
               {
                 title: "Memory Sync",
                 description: "Synchronized memory between Roo and Cline",
                 time: "15 minutes ago",
-                type: "info"
+                type: "info",
               },
               {
                 title: "Performance Alert",
                 description: "GPT-4 response time exceeded threshold (150ms)",
                 time: "30 minutes ago",
-                type: "warning"
+                type: "warning",
               },
               {
                 title: "Memory Shared",
                 description: "Shared context between Roo and Vector Search",
                 time: "45 minutes ago",
-                type: "info"
+                type: "info",
               },
               {
                 title: "Tool Reconnected",
-                description: "GitHub Copilot reconnected after temporary disconnect",
+                description:
+                  "GitHub Copilot reconnected after temporary disconnect",
                 time: "1 hour ago",
-                type: "info"
-              }
+                type: "info",
+              },
             ].map((event, index) => (
               <div key={index} className="flex items-start space-x-4">
-                <div className={`mt-0.5 h-2 w-2 rounded-full bg-status-${event.type === "warning" ? "warning" : event.type === "success" ? "healthy" : "info"}`} />
+                <div
+                  className={`mt-0.5 h-2 w-2 rounded-full bg-status-${event.type === "warning" ? "warning" : event.type === "success" ? "healthy" : "info"}`}
+                />
                 <div className="space-y-1">
                   <p className="text-sm font-medium leading-none">
                     {event.title}
@@ -318,9 +375,7 @@ const McpMonitoring = () => {
                   <p className="text-sm text-muted-foreground">
                     {event.description}
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    {event.time}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{event.time}</p>
                 </div>
               </div>
             ))}
@@ -328,7 +383,7 @@ const McpMonitoring = () => {
         </CardContent>
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default McpMonitoring
+export default McpMonitoring;

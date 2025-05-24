@@ -22,7 +22,7 @@ if [ -f ~/.bashrc ]; then
   # Remove any existing mode settings
   grep -v "USE_RECOVERY_MODE\|STANDARD_MODE\|VSCODE_DISABLE_WORKSPACE_TRUST\|DISABLE_WORKSPACE_TRUST" ~/.bashrc > ~/.bashrc.tmp
   mv ~/.bashrc.tmp ~/.bashrc
-  
+
   # Add the environment variables
   cat << 'EOF' >> ~/.bashrc
 
@@ -32,7 +32,7 @@ export STANDARD_MODE=true
 export VSCODE_DISABLE_WORKSPACE_TRUST=true
 export DISABLE_WORKSPACE_TRUST=true
 EOF
-  
+
   echo -e "${GREEN}✓ Environment variables added to ~/.bashrc${NC}"
 fi
 

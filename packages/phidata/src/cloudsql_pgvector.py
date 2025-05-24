@@ -36,18 +36,18 @@ Usage:
     # agent_storage = get_pg_agent_storage(storage_config=storage_config, agent_id="my-agent-id")
 """
 
-import os
 import logging
+from typing import Optional
+
 import sqlalchemy
-from typing import Dict, Any, Optional, Union
-from google.cloud.sql.connector import Connector
 from google.cloud import secretmanager
+from google.cloud.sql.connector import Connector
 
 # Import Phidata classes with error handling
 try:
     from phi.embedder import VertexAiEmbedder
-    from phi.storage.postgres.pgvector import PgVector2
     from phi.storage.assistant.pg import PgAssistantStorage
+    from phi.storage.postgres.pgvector import PgVector2
 except ImportError as e:
     raise ImportError(
         f"Failed to import Phidata modules. Please install required packages: {e}\n"
@@ -55,7 +55,7 @@ except ImportError as e:
     )
 
 # Import StorageConfig
-from packages.shared.src.storage.config import StorageConfig, PrivacyLevel
+from packages.shared.src.storage.config import PrivacyLevel, StorageConfig
 
 logger = logging.getLogger(__name__)
 

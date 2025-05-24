@@ -24,7 +24,7 @@ if gcloud secrets versions access latest \
   echo "  Successfully fetched platform-admin-key to ${KEY_TMP}"
   export GOOGLE_APPLICATION_CREDENTIALS="${KEY_TMP}"
   echo "  Exported GOOGLE_APPLICATION_CREDENTIALS=${KEY_TMP}"
-  
+
   echo "  Activating platform-admin service account..."
   if gcloud auth activate-service-account --key-file="${KEY_TMP}" --project="${PROJECT_ID}" --quiet; then
     echo "  Successfully activated platform-admin service account."
@@ -35,7 +35,7 @@ else
   echo "  ❌ ERROR: Failed to fetch platform-admin-key. This is critical for further secret fetching."
   echo "  Please ensure your local gcloud is authenticated and has permissions for secret 'platform-admin-key' in project '${PROJECT_ID}'."
   # Decide if you want to exit here or try to continue
-  # exit 1 
+  # exit 1
 fi
 
 # --- Environment File for Persistent Env Vars ---
@@ -67,18 +67,18 @@ for SECRET_NAME in "${SECRETS_TO_FETCH[@]}"; do
   echo "  Fetching secret: ${SECRET_NAME}..."
   # Fetch the secret value. If fails, V will be empty.
   SECRET_VALUE=$(gcloud secrets versions access latest --secret="${SECRET_NAME}" --project="${PROJECT_ID}" || echo "")
-  
+
   if [ -z "${SECRET_VALUE}" ]; then
     echo "  ⚠️ WARNING: Failed to fetch secret '${SECRET_NAME}' or it is empty. It will be set as an empty environment variable."
   else
     echo "  Successfully fetched ${SECRET_NAME}."
   fi
-  
+
   # Add to the environment file for .bashrc
   # Escape double quotes within the secret value if any (rare for API keys, but good practice)
   ESCAPED_SECRET_VALUE=$(echo "${SECRET_VALUE}" | sed 's/"/\"/g')
   echo "export ${SECRET_NAME}="${ESCAPED_SECRET_VALUE}"" >> "${BASHRC_ADDITIONS_FILE}"
-  
+
   # Export for the current script's execution context
   export "${SECRET_NAME}=${SECRET_VALUE}"
 done
@@ -118,4 +118,4 @@ gcloud config list project
 
 echo "✅  Dev container initialization script completed."
 echo "   Secrets have been fetched and exported as environment variables."
-echo "   You may need to open a new terminal or source ~/.bashrc for all changes to take effect in existing terminals." 
+echo "   You may need to open a new terminal or source ~/.bashrc for all changes to take effect in existing terminals."

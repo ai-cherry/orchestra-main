@@ -6,25 +6,20 @@ This module provides a Vertex AI-based implementation of the AI service.
 
 import asyncio
 import json
-from typing import Any, Dict, List, Optional, Union
+import logging
 import time
+from typing import Any, Dict, List, Optional
 
-from google.cloud import aiplatform
-from google.cloud.aiplatform.gapic.schema import predict
-from vertexai.preview.generative_models import GenerativeModel, GenerationConfig
-
-from ai_orchestra.core.interfaces.ai_service import AIService
+from ai_orchestra.core.config import settings
 from ai_orchestra.core.errors import (
     AIServiceError,
+    InvalidInputError,
     ModelNotFoundError,
     ModelUnavailableError,
-    InvalidInputError,
-    AuthenticationError,
 )
-from ai_orchestra.core.config import settings
-from ai_orchestra.utils.logging import log_event, log_start, log_end, log_error
-
-import logging
+from ai_orchestra.utils.logging import log_end, log_error, log_event, log_start
+from google.cloud import aiplatform
+from vertexai.preview.generative_models import GenerationConfig, GenerativeModel
 
 logger = logging.getLogger("ai_orchestra.infrastructure.gcp.vertex_ai_service")
 
@@ -97,7 +92,7 @@ class VertexAIService:
             InvalidInputError: If the input is invalid
             AIServiceError: For other errors
         """
-        start_time = log_start(
+        log_start(
             logger,
             "generate_text",
             {
@@ -174,6 +169,15 @@ class VertexAIService:
         Returns:
             The generated text
         """
+        start_time = log_start(
+            logger,
+            "generate_text",
+            {
+                "model_id": model_id,
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+            },
+        )
         try:
             # Create generation config
             generation_config = GenerationConfig(
@@ -235,6 +239,15 @@ class VertexAIService:
         Returns:
             The generated text
         """
+        start_time = log_start(
+            logger,
+            "generate_text",
+            {
+                "model_id": model_id,
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+            },
+        )
         try:
             # Get the model endpoint
             endpoint = aiplatform.Endpoint(
@@ -385,7 +398,7 @@ class VertexAIService:
             InvalidInputError: If the input is invalid
             AIServiceError: For other errors
         """
-        start_time = time.time()
+        time.time()
         embeddings = await self.generate_embeddings(
             texts=[text],
             model_id=model_id,
@@ -434,9 +447,9 @@ class VertexAIService:
             categories_str = ", ".join(categories)
             prompt = f"""
             Classify the following text into one of these categories: {categories_str}
-            
+
             Text: {text}
-            
+
             Respond with a JSON object where the keys are the categories and the values are confidence scores between 0 and 1.
             The confidence scores should sum to 1.
             """
@@ -545,9 +558,9 @@ class VertexAIService:
             # Create a prompt for question answering
             prompt = f"""
             Context: {context}
-            
+
             Question: {question}
-            
+
             Answer the question based only on the provided context. If the answer cannot be determined from the context, say "I don't know."
             """
 
@@ -615,7 +628,7 @@ class VertexAIService:
             # Create a prompt for summarization
             prompt = f"""
             Summarize the following text:
-            
+
             {text}
             """
 

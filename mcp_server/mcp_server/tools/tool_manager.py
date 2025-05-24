@@ -6,10 +6,9 @@ This module provides a manager for integrating with various AI tools like
 Roo, Cline, Gemini, and Copilot, handling execution and context sharing.
 """
 
-import subprocess
 import logging
-from typing import Dict, List, Optional, Any
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 # Configure logging
 logger = logging.getLogger("mcp-tool-manager")
@@ -62,7 +61,7 @@ class ToolManager:
             logger.error(f"Tool not enabled: {tool}")
             return None
 
-        tool_config = self.tools[tool]["config"]
+        self.tools[tool]["config"]
 
         # Execute based on the tool type
         if tool == "roo":

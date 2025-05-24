@@ -6,12 +6,12 @@ This module implements the IToolAdapter interface for GitHub Copilot,
 enabling bidirectional memory synchronization between Copilot and the MCP system.
 """
 
-import os
+import asyncio
 import json
 import logging
-import asyncio
+import os
 import tempfile
-from typing import Dict, List, Optional, Any, Tuple
+from typing import Any, Dict, List, Optional
 
 from ..interfaces.tool_adapter import IToolAdapter
 from ..models.memory import MemoryEntry

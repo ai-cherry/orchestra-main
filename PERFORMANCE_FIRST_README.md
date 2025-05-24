@@ -93,10 +93,12 @@ Even in a performance-first environment, some basic security is still needed:
 AI assistants have permission to use these tokens:
 
 ### GitHub Tokens
+
 - `GH_CLASSIC_PAT_TOKEN`: Full repository access
 - `GH_FINE_GRAINED_TOKEN`: Scoped repository access
 
 ### GCP Credentials
+
 - `GCP_MASTER_SERVICE_JSON`: Full service account access
 - `GCP_PROJECT_AUTHENTICATION_EMAIL`: Authentication identity
 - `GCP_PROJECT_ID`: Target project

@@ -5,6 +5,7 @@ This document outlines the strategy and implementation details for managing the 
 ## Background
 
 The AI Orchestra repository was approaching GitHub size limits (4.3GB), primarily due to:
+
 - Google Cloud SDK files in the repository (~712MB)
 - SDK staging directories (~526MB)
 - Cache directories (.mypy_cache, etc.)
@@ -27,6 +28,7 @@ The Google Cloud SDK has been removed from the repository. Instead, use the prov
 ```
 
 **Benefits:**
+
 - Removes >1GB from the repository
 - Provides consistent SDK installation across environments
 - Allows developers to use their preferred SDK version
@@ -34,6 +36,7 @@ The Google Cloud SDK has been removed from the repository. Instead, use the prov
 ### 2. Cache Cleanup
 
 We've updated the `.gitignore` file to exclude cache directories:
+
 - `.mypy_cache/`
 - `.ruff_cache/`
 - `.pytest_cache/`
@@ -62,6 +65,7 @@ pre-commit install
 ```
 
 The pre-commit configuration includes:
+
 - Checking for large files (>500KB)
 - Preventing commit of ignored files
 - Code formatting with Black and isort
@@ -96,6 +100,7 @@ A standardized development environment has been configured:
 ### VS Code Configuration
 
 VS Code settings have been optimized to:
+
 - Properly configure Python tools (Black, MyPy, Flake8)
 - Hide cache and build directories from the file explorer
 - Configure search exclusions for better performance
@@ -150,6 +155,7 @@ export PATH=$HOME/google-cloud-sdk/bin:$PATH
 ## Future Plans
 
 Phase 1 implementation focuses on immediate size reduction. Future phases will include:
+
 - Environment standardization
 - Repository restructuring
 - Advanced optimization with Git LFS

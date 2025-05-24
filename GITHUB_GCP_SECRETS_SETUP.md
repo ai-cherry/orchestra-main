@@ -7,6 +7,7 @@ This document describes the GitHub secrets setup for GCP authentication in both 
 The authentication method in GitHub Actions workflows has been temporarily changed from Workload Identity Federation (WIF) to service account key-based authentication for initial Terraform apply. This allows for easier initial setup and configuration of the infrastructure.
 
 ### Before: Workload Identity Federation
+
 ```yaml
 - name: Authenticate to Google Cloud
   uses: google-github-actions/auth@v1
@@ -17,6 +18,7 @@ The authentication method in GitHub Actions workflows has been temporarily chang
 ```
 
 ### After: Service Account Key Authentication
+
 ```yaml
 - name: Authenticate to Google Cloud
   uses: google-github-actions/auth@v1
@@ -32,37 +34,39 @@ The authentication method in GitHub Actions workflows has been temporarily chang
 
 The following secrets are set at the GitHub organization level (ai-cherry):
 
-| Secret Name | Description | Used For |
-|------------|-------------|----------|
-| GCP_PROJECT_ID | The Google Cloud Project ID | Identifying the project in all GCP operations |
-| GCP_PROJECT_NAME | The Google Cloud Project Name | Documentation and display purposes |
-| GCP_PROJECT_ADMIN_KEY | Vertex AI admin service account key | Primary authentication for GitHub Actions workflows |
-| GCP_VERTEX_AI_ADMIN_KEY | Same as PROJECT_ADMIN_KEY | Specific Vertex AI operations |
-| GCP_SECRET_MANAGEMENT_KEY | Secret Management service account key | Managing GCP Secret Manager |
-| GCP_GEMINI_API_KEY | Gemini API service account key | Authentication for Gemini API calls |
-| GCP_GEMINI_CODE_ASSIST_KEY | Same as GEMINI_API_KEY | Specific for Gemini Code Assist |
-| GCP_GEMINI_CLOUD_ASSIST_KEY | Same as GEMINI_API_KEY | Specific for Gemini Cloud Assist |
+| Secret Name                 | Description                           | Used For                                            |
+| --------------------------- | ------------------------------------- | --------------------------------------------------- |
+| GCP_PROJECT_ID              | The Google Cloud Project ID           | Identifying the project in all GCP operations       |
+| GCP_PROJECT_NAME            | The Google Cloud Project Name         | Documentation and display purposes                  |
+| GCP_PROJECT_ADMIN_KEY       | Vertex AI admin service account key   | Primary authentication for GitHub Actions workflows |
+| GCP_VERTEX_AI_ADMIN_KEY     | Same as PROJECT_ADMIN_KEY             | Specific Vertex AI operations                       |
+| GCP_SECRET_MANAGEMENT_KEY   | Secret Management service account key | Managing GCP Secret Manager                         |
+| GCP_GEMINI_API_KEY          | Gemini API service account key        | Authentication for Gemini API calls                 |
+| GCP_GEMINI_CODE_ASSIST_KEY  | Same as GEMINI_API_KEY                | Specific for Gemini Code Assist                     |
+| GCP_GEMINI_CLOUD_ASSIST_KEY | Same as GEMINI_API_KEY                | Specific for Gemini Cloud Assist                    |
 
 ## GitHub Codespaces Environment Variables
 
 The following environment variables are automatically set in GitHub Codespaces:
 
-| Environment Variable | Source Secret | Description |
-|---------------------|---------------|-------------|
-| GCP_PROJECT_ID | GCP_PROJECT_ID | Project ID for GCP operations |
-| GOOGLE_CLOUD_PROJECT | GCP_PROJECT_ID | Standard environment variable for GCP SDK |
-| GCP_PROJECT_NAME | GCP_PROJECT_NAME | Project name for display purposes |
-| GOOGLE_APPLICATION_CREDENTIALS | GCP_PROJECT_ADMIN_KEY | Standard GCP authentication credential path |
-| VERTEX_AI_KEY | GCP_VERTEX_AI_ADMIN_KEY | Vertex AI authentication |
-| GEMINI_API_KEY | GCP_GEMINI_API_KEY | Gemini API authentication |
-| GEMINI_CODE_ASSIST_KEY | GCP_GEMINI_CODE_ASSIST_KEY | Gemini Code Assist authentication |
-| GEMINI_CLOUD_ASSIST_KEY | GCP_GEMINI_CLOUD_ASSIST_KEY | Gemini Cloud Assist authentication |
-| SECRET_MANAGER_KEY | GCP_SECRET_MANAGEMENT_KEY | Secret Manager authentication |
+| Environment Variable           | Source Secret               | Description                                 |
+| ------------------------------ | --------------------------- | ------------------------------------------- |
+| GCP_PROJECT_ID                 | GCP_PROJECT_ID              | Project ID for GCP operations               |
+| GOOGLE_CLOUD_PROJECT           | GCP_PROJECT_ID              | Standard environment variable for GCP SDK   |
+| GCP_PROJECT_NAME               | GCP_PROJECT_NAME            | Project name for display purposes           |
+| GOOGLE_APPLICATION_CREDENTIALS | GCP_PROJECT_ADMIN_KEY       | Standard GCP authentication credential path |
+| VERTEX_AI_KEY                  | GCP_VERTEX_AI_ADMIN_KEY     | Vertex AI authentication                    |
+| GEMINI_API_KEY                 | GCP_GEMINI_API_KEY          | Gemini API authentication                   |
+| GEMINI_CODE_ASSIST_KEY         | GCP_GEMINI_CODE_ASSIST_KEY  | Gemini Code Assist authentication           |
+| GEMINI_CLOUD_ASSIST_KEY        | GCP_GEMINI_CLOUD_ASSIST_KEY | Gemini Cloud Assist authentication          |
+| SECRET_MANAGER_KEY             | GCP_SECRET_MANAGEMENT_KEY   | Secret Manager authentication               |
 
 ## Service Account Permissions
 
 ### Vertex AI Admin Service Account
+
 This service account (`vertex-ai-admin@PROJECT_ID.iam.gserviceaccount.com`) has the following permissions:
+
 - `roles/aiplatform.admin` - Full control over Vertex AI resources
 - `roles/aiplatform.user` - Use Vertex AI resources
 - `roles/aiplatform.serviceAgent` - Service agent role
@@ -75,7 +79,9 @@ This service account (`vertex-ai-admin@PROJECT_ID.iam.gserviceaccount.com`) has 
 - `roles/serviceusage.serviceUsageConsumer` - Service usage consumer for API activation
 
 ### Secret Management Service Account
+
 This service account (`secret-management-admin@PROJECT_ID.iam.gserviceaccount.com`) has the following permissions:
+
 - `roles/secretmanager.admin` - Secret Manager admin
 - `roles/secretmanager.secretAccessor` - Access secrets
 - `roles/secretmanager.secretVersionManager` - Manage secret versions
@@ -83,7 +89,9 @@ This service account (`secret-management-admin@PROJECT_ID.iam.gserviceaccount.co
 - `roles/iam.serviceAccountKeyAdmin` - Manage service account keys
 
 ### Gemini API Service Account
+
 This service account (`gemini-api-admin@PROJECT_ID.iam.gserviceaccount.com`) has the following permissions:
+
 - `roles/aiplatform.admin` - Full control over AI Platform resources (includes Gemini)
 - `roles/aiplatform.user` - Use AI Platform resources
 - `roles/serviceusage.serviceUsageConsumer` - Service usage consumer for API activation
@@ -101,6 +109,7 @@ This service account (`gemini-api-admin@PROJECT_ID.iam.gserviceaccount.com`) has
 The following scripts are provided to manage and update these secrets:
 
 ### 1. Create Service Accounts and Update Secrets
+
 This script creates the Vertex AI and Secret Management service accounts, generates keys, and updates the GitHub organization secrets.
 
 ```bash
@@ -108,6 +117,7 @@ This script creates the Vertex AI and Secret Management service accounts, genera
 ```
 
 ### 2. Setup Gemini Access
+
 This script creates the Gemini API service account, generates keys, and updates the GitHub organization secrets for Gemini-specific services.
 
 ```bash
@@ -115,6 +125,7 @@ This script creates the Gemini API service account, generates keys, and updates 
 ```
 
 ### 3. Update Codespaces Secrets
+
 This script synchronizes the GitHub organization secrets with GitHub Codespaces environment variables.
 
 ```bash
@@ -130,6 +141,7 @@ After initial setup and Terraform apply, you should consider reverting to Worklo
 3. Setting up the Workload Identity Federation provider in GCP if not already done
 
 Example:
+
 ```yaml
 - name: Authenticate to Google Cloud
   uses: google-github-actions/auth@v1

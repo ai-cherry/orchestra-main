@@ -18,7 +18,7 @@ echo -e "${BLUE}Stopping MCP System Components...${NC}"
 stop_service() {
     local name=$1
     local pid_file="$LOG_DIR/${name}.pid"
-    
+
     if [ -f "$pid_file" ]; then
         local pid=$(cat "$pid_file")
         if kill -0 $pid 2>/dev/null; then

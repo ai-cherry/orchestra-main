@@ -5,14 +5,15 @@ This module provides middleware or dependency for handling persona context in re
 """
 
 import logging
-from typing import Dict, Optional, Union, Tuple
-from fastapi import Depends, Request, HTTPException
-from packages.shared.src.models.base_models import PersonaConfig
+from typing import Dict
+
+from fastapi import Depends, Request
 
 from core.orchestrator.src.config.loader import (
-    load_persona_configs,
     force_reload_personas,
+    load_persona_configs,
 )
+from packages.shared.src.models.base_models import PersonaConfig
 
 # Configure logging
 logger = logging.getLogger(__name__)

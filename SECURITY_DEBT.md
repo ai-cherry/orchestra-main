@@ -5,11 +5,13 @@ This document outlines security considerations that have been deferred in favor 
 ## Authentication & Authorization
 
 1. **High-Privilege Service Account**: The current implementation uses a single high-privilege service account
+
    - **Current approach**: Using a master service account with broad permissions
    - **Future improvement**: Implement least-privilege service accounts for each component
    - **Future improvement**: Add proper IAM role bindings with minimal permissions
 
 2. **Direct Key Usage**: Service account keys are used directly
+
    - **Current approach**: Using GCP_MASTER_SERVICE_JSON environment variable directly
    - **Future improvement**: Implement Workload Identity Federation for GitHub Actions
    - **Future improvement**: Use Workload Identity for GCP service-to-service authentication
@@ -22,11 +24,13 @@ This document outlines security considerations that have been deferred in favor 
 ## Infrastructure Security
 
 1. **Public Access**: Resources are publicly accessible for ease of development
+
    - **Current approach**: Cloud Run services are publicly accessible
    - **Future improvement**: Implement VPC Service Controls
    - **Future improvement**: Use private IP for database and Redis
 
 2. **Simplified Network**: Network security is minimal
+
    - **Current approach**: Default network configuration
    - **Future improvement**: Implement proper network segmentation
    - **Future improvement**: Add firewall rules and security groups
@@ -39,11 +43,13 @@ This document outlines security considerations that have been deferred in favor 
 ## Application Security
 
 1. **Input Validation**: Minimal input validation for development speed
+
    - **Current approach**: Basic validation through FastAPI
    - **Future improvement**: Implement comprehensive input validation
    - **Future improvement**: Add request rate limiting and abuse prevention
 
 2. **Secrets Management**: Simplified secrets management
+
    - **Current approach**: Using Secret Manager but with simplified access
    - **Future improvement**: Implement proper secret rotation
    - **Future improvement**: Use Secret Manager for all sensitive information
@@ -58,11 +64,13 @@ This document outlines security considerations that have been deferred in favor 
 These security items should be addressed according to the following timeline:
 
 1. **Short-term (1-3 months)**:
+
    - Implement basic input validation
    - Improve secrets management
    - Add basic security logging
 
 2. **Medium-term (3-6 months)**:
+
    - Implement least-privilege service accounts
    - Add proper network security
    - Implement user authentication
@@ -74,12 +82,12 @@ These security items should be addressed according to the following timeline:
 
 ## Risk Assessment
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| Unauthorized access to GCP resources | Medium | High | Restrict IP access to GCP console, rotate service account keys regularly |
-| Data exposure | Low | High | Ensure proper access controls to databases, encrypt sensitive data |
-| Service disruption | Low | Medium | Implement monitoring and alerting, have rollback procedures |
-| Credential leakage | Medium | High | Store credentials securely, use Secret Manager, limit access |
+| Risk                                 | Likelihood | Impact | Mitigation                                                               |
+| ------------------------------------ | ---------- | ------ | ------------------------------------------------------------------------ |
+| Unauthorized access to GCP resources | Medium     | High   | Restrict IP access to GCP console, rotate service account keys regularly |
+| Data exposure                        | Low        | High   | Ensure proper access controls to databases, encrypt sensitive data       |
+| Service disruption                   | Low        | Medium | Implement monitoring and alerting, have rollback procedures              |
+| Credential leakage                   | Medium     | High   | Store credentials securely, use Secret Manager, limit access             |
 
 ## Conclusion
 

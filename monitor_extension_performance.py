@@ -8,13 +8,10 @@ and provide recommendations for optimizing extension usage.
 """
 
 import json
-import os
 import subprocess
-import sys
-import time
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 # Configuration
 WORKSPACE_ROOT = Path("/workspaces/orchestra-main")

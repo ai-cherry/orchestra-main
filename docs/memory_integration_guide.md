@@ -69,11 +69,11 @@ agents:
     memory:
       memory_type: layered
       short_term:
-        ttl: 3600  # 1 hour
+        ttl: 3600 # 1 hour
       mid_term:
-        ttl: 86400  # 1 day
+        ttl: 86400 # 1 day
       long_term:
-        ttl: 2592000  # 30 days
+        ttl: 2592000 # 30 days
       semantic:
         vector_dimension: 768
     capabilities:
@@ -178,7 +178,7 @@ class MyAgent:
     def __init__(self):
         # Create memory factory
         memory_factory = get_memory_factory()
-        
+
         # Create memory config
         memory_config = MemoryConfig(
             memory_type=MemoryType.LAYERED,
@@ -187,30 +187,30 @@ class MyAgent:
             long_term={"ttl": 2592000},
             semantic={"vector_dimension": 768}
         )
-        
+
         # Create memory
         self.memory = memory_factory.create_memory_from_config(memory_config)
-    
+
     async def process(self, context):
         # Store data in memory
         await self.memory.store("conversation:123", {
             "user_input": context.user_input,
             "timestamp": time.time()
         })
-        
+
         # Retrieve data from memory
         previous_conversation = await self.memory.retrieve("conversation:123")
-        
+
         # Perform semantic search
         similar_conversations = await self.memory.semantic_search(
             query_embedding=context.embedding,
             limit=5,
             threshold=0.7
         )
-        
+
         # Process the request
         # ...
-        
+
         return response
 ```
 
@@ -226,7 +226,7 @@ class CustomMemoryAgent:
     def __init__(self):
         # Create memory factory
         memory_factory = get_memory_factory()
-        
+
         # Create layered memory with custom configuration
         self.memory = memory_factory.create_layered_memory({
             "short_term": {
@@ -248,18 +248,18 @@ class CustomMemoryAgent:
                 "vector_dimension": 768
             }
         })
-    
+
     async def store_conversation(self, conversation_id, user_input, response):
         """Store conversation in memory."""
         key = f"conversation:{conversation_id}:{time.time()}"
-        
+
         # Store in short-term memory
         await self.memory.store(key, {
             "user_input": user_input,
             "response": response,
             "timestamp": time.time()
         }, layer="short_term")
-        
+
         # Store important conversations in long-term memory
         if self._is_important(user_input, response):
             await self.memory.store(key, {
@@ -268,7 +268,7 @@ class CustomMemoryAgent:
                 "timestamp": time.time(),
                 "importance": self._calculate_importance(user_input, response)
             }, layer="long_term")
-    
+
     async def retrieve_conversation_history(self, conversation_id, limit=10):
         """Retrieve conversation history from memory."""
         # Search for conversation history
@@ -278,9 +278,9 @@ class CustomMemoryAgent:
             operator="==",
             limit=limit
         )
-        
+
         return results
-    
+
     async def find_similar_conversations(self, query_embedding, limit=5):
         """Find similar conversations using semantic search."""
         results = await self.memory.semantic_search(
@@ -288,7 +288,7 @@ class CustomMemoryAgent:
             limit=limit,
             threshold=0.7
         )
-        
+
         return results
 ```
 
@@ -318,38 +318,38 @@ def mock_memory_factory():
 async def test_observable_agent_with_memory(mock_memory_factory):
     """Test observable agent with memory."""
     mock_factory, mock_memory = mock_memory_factory
-    
+
     # Create mock agent
     mock_agent = MagicMock()
     mock_agent.process.return_value = {"text": "Hello, world!"}
-    
+
     # Create memory config
     memory_config = MemoryConfig(
         memory_type=MemoryType.REDIS,
         ttl=3600
     )
-    
+
     # Create observable agent factory
     observable_factory = ObservableAgentFactory(memory_factory=mock_factory)
-    
+
     # Create observable agent with memory
     observable_agent = observable_factory.create_observable_agent(
         wrapped_agent=mock_agent,
         agent_id="test_agent",
         memory_config=memory_config
     )
-    
+
     # Create mock context
     mock_context = MagicMock()
     mock_context.user_input = "Hello"
     mock_context.conversation_id = "123"
-    
+
     # Process request
     response = await observable_agent.process(mock_context)
-    
+
     # Verify that the agent was called
     mock_agent.process.assert_called_once_with(mock_context)
-    
+
     # Verify that memory was used
     mock_memory.store.assert_called_once()
     assert response == {"text": "Hello, world!"}
@@ -371,7 +371,7 @@ async def test_redis_memory():
     """Test Redis memory."""
     # Create memory factory
     memory_factory = get_memory_factory()
-    
+
     # Create Redis memory
     redis_memory = memory_factory.create_memory_from_config(
         MemoryConfig(
@@ -379,21 +379,21 @@ async def test_redis_memory():
             ttl=3600
         )
     )
-    
+
     # Store data
     key = f"test:{time.time()}"
     value = {"test": "value"}
     result = await redis_memory.store(key, value)
     assert result is True
-    
+
     # Retrieve data
     retrieved = await redis_memory.retrieve(key)
     assert retrieved == value
-    
+
     # Delete data
     result = await redis_memory.delete(key)
     assert result is True
-    
+
     # Verify deletion
     retrieved = await redis_memory.retrieve(key)
     assert retrieved is None
@@ -403,7 +403,7 @@ async def test_layered_memory():
     """Test layered memory."""
     # Create memory factory
     memory_factory = get_memory_factory()
-    
+
     # Create layered memory
     layered_memory = memory_factory.create_layered_memory({
         "short_term": {
@@ -416,23 +416,23 @@ async def test_layered_memory():
             "ttl": 86400
         }
     })
-    
+
     # Store data in short-term memory
     key = f"test:{time.time()}"
     value = {"test": "value"}
     result = await layered_memory.store(key, value, layer="short_term")
     assert result is True
-    
+
     # Retrieve data
     retrieved = await layered_memory.retrieve(key)
     assert retrieved == value
-    
+
     # Store data in mid-term memory
     key = f"test:{time.time()}"
     value = {"test": "value"}
     result = await layered_memory.store(key, value, layer="mid_term")
     assert result is True
-    
+
     # Retrieve data
     retrieved = await layered_memory.retrieve(key)
     assert retrieved == value

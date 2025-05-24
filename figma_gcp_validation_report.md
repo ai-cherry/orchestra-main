@@ -11,7 +11,6 @@ Passed: 3/5 checks
 
 Status: Warning
 
-
 ### Component Library Validation
 
 Status: Success
@@ -57,5 +56,3 @@ Status: Success
 - You can validate it manually: python scripts/validate_figma_pat.py
 
 ### Component Library Validation
-
-

@@ -5,15 +5,16 @@ This module provides a connection pool manager for Redis connections,
 ensuring efficient connection management and resource utilization.
 """
 
+import asyncio
 import logging
-import threading
 import os
-from typing import Dict, List, Optional, Any, Tuple
+import threading
+from typing import Any, Dict, List, Optional
 
 import redis
 
-from ..config import RedisSettings, get_settings
-from ..error_handling import handle_exception, safe_execute
+from ..config import get_settings
+from ..error_handling import handle_exception
 
 logger = logging.getLogger(__name__)
 

@@ -11,6 +11,7 @@ The LLM Provider system creates an abstraction layer between the orchestration s
 ### LLMProvider Interface
 
 Base abstract class that defines the provider interface:
+
 - Initialization and shutdown lifecycle
 - Text completion generation
 - Chat completion generation
@@ -19,6 +20,7 @@ Base abstract class that defines the provider interface:
 ### Provider Implementations
 
 1. **OpenRouterProvider**
+
    - Primary LLM provider
    - Connects to multiple models through OpenRouter's API
    - Sophisticated error handling and retry mechanisms
@@ -33,6 +35,7 @@ Base abstract class that defines the provider interface:
 ### Configuration System
 
 The `LLMProviderConfig` class manages provider-specific settings:
+
 - API keys and base URLs
 - Default models
 - Request timeouts
@@ -42,6 +45,7 @@ The `LLMProviderConfig` class manages provider-specific settings:
 ## Fallback Mechanism
 
 The system includes a sophisticated fallback system:
+
 1. Primary provider is attempted first (usually OpenRouter)
 2. On failure, system falls back to secondary provider (usually Portkey)
 3. Each provider has its own internal retry mechanism for transient errors
@@ -50,6 +54,7 @@ The system includes a sophisticated fallback system:
 ## Error Handling
 
 The system defines a hierarchy of error types:
+
 - `LLMProviderError`: Base exception class
 - `LLMProviderConnectionError`: Network/connection issues
 - `LLMProviderAuthenticationError`: Auth failures
@@ -63,6 +68,7 @@ The system defines a hierarchy of error types:
 ## Registry System
 
 Providers are registered with a unified registry:
+
 - `register_llm_provider(provider)` for registration
 - `get_llm_provider(provider_name)` for retrieval
 - Automatic initialization during application startup
@@ -80,6 +86,7 @@ When requesting completions from LLM providers:
 ## Configuration Options
 
 Key environment variables that affect provider behavior:
+
 - `PREFERRED_LLM_PROVIDER`: Selects the default provider
 - `OPENROUTER_API_KEY`: Authentication for OpenRouter
 - `PORTKEY_API_KEY`: Authentication for Portkey

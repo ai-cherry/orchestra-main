@@ -16,36 +16,36 @@ The following improvements have been implemented:
 
 The following scripts have been updated to use organization-level secrets:
 
-| Original Script | Updated Script | Description |
-|-----------------|----------------|-------------|
-| `setup_github_secrets.sh` | `setup_github_secrets.sh.updated` | Sets up GitHub repository secrets for WIF |
-| `update_wif_secrets.sh` | `update_wif_secrets.sh.updated` | Updates GitHub repository secrets with WIF values |
-| `deploy_with_adc.sh` | `deploy_with_adc.sh.updated` | Deploys to GCP using Application Default Credentials |
-| `configure_badass_keys_and_sync.sh` | `configure_badass_keys_and_sync.sh.updated` | Creates service accounts and syncs secrets |
-| `push_to_gcp.sh` | `push_to_gcp.sh.updated` | Pushes infrastructure to GCP |
+| Original Script                     | Updated Script                              | Description                                          |
+| ----------------------------------- | ------------------------------------------- | ---------------------------------------------------- |
+| `setup_github_secrets.sh`           | `setup_github_secrets.sh.updated`           | Sets up GitHub repository secrets for WIF            |
+| `update_wif_secrets.sh`             | `update_wif_secrets.sh.updated`             | Updates GitHub repository secrets with WIF values    |
+| `deploy_with_adc.sh`                | `deploy_with_adc.sh.updated`                | Deploys to GCP using Application Default Credentials |
+| `configure_badass_keys_and_sync.sh` | `configure_badass_keys_and_sync.sh.updated` | Creates service accounts and syncs secrets           |
+| `push_to_gcp.sh`                    | `push_to_gcp.sh.updated`                    | Pushes infrastructure to GCP                         |
 
 ## New Scripts and Templates
 
 The following new scripts and templates have been created:
 
-| Script/Template | Description |
-|-----------------|-------------|
-| `github_auth.sh.updated` | Centralized utility for GitHub authentication |
-| `github-workflow-wif-template.yml.updated` | GitHub Actions workflow template using WIF |
-| `verify_github_secrets.sh` | Tool to verify GitHub organization secrets |
+| Script/Template                            | Description                                   |
+| ------------------------------------------ | --------------------------------------------- |
+| `github_auth.sh.updated`                   | Centralized utility for GitHub authentication |
+| `github-workflow-wif-template.yml.updated` | GitHub Actions workflow template using WIF    |
+| `verify_github_secrets.sh`                 | Tool to verify GitHub organization secrets    |
 
 ## Required GitHub Organization Secrets
 
 The following secrets should be set at the organization level:
 
-| Secret Name | Description |
-|-------------|-------------|
-| `GH_CLASSIC_PAT_TOKEN` | GitHub classic personal access token |
-| `GH_FINE_GRAINED_TOKEN` | GitHub fine-grained personal access token |
-| `GCP_PROJECT_ID` | GCP project ID (e.g., "cherry-ai-project") |
-| `GCP_REGION` | GCP region (e.g., "us-west4") |
-| `GCP_WORKLOAD_IDENTITY_PROVIDER` | Workload Identity Federation provider ID |
-| `GCP_SERVICE_ACCOUNT` | Service account email for WIF |
+| Secret Name                      | Description                                |
+| -------------------------------- | ------------------------------------------ |
+| `GH_CLASSIC_PAT_TOKEN`           | GitHub classic personal access token       |
+| `GH_FINE_GRAINED_TOKEN`          | GitHub fine-grained personal access token  |
+| `GCP_PROJECT_ID`                 | GCP project ID (e.g., "cherry-ai-project") |
+| `GCP_REGION`                     | GCP region (e.g., "us-west4")              |
+| `GCP_WORKLOAD_IDENTITY_PROVIDER` | Workload Identity Federation provider ID   |
+| `GCP_SERVICE_ACCOUNT`            | Service account email for WIF              |
 
 ## How to Use the Updated Scripts
 

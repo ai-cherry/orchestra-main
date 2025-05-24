@@ -2,14 +2,15 @@
 Router for agent management API endpoints.
 """
 
-from typing import Dict, Any, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
+from typing import Any, Dict, Optional
+
+from fastapi import APIRouter, HTTPException, Query
 
 from app.services.admin_functions import (
     get_agent_status,
+    list_agents,
     start_agent,
     stop_agent,
-    list_agents,
 )
 
 router = APIRouter()

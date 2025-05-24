@@ -19,6 +19,7 @@ chmod +x execute_gcp_migration_plan.sh
 ```
 
 This script:
+
 1. Prepares the key file automatically
 2. Authenticates with GCP
 3. Runs nuclear verification
@@ -43,6 +44,7 @@ chmod +x verify_migration.sh
 ```
 
 This script provides in-depth verification of:
+
 - Organization membership
 - Workstation clusters/configurations
 - GPU availability (specifically 2x NVIDIA T4)
@@ -96,6 +98,7 @@ The verification suite includes robust security measures:
 ## Verification Evidence
 
 Evidence is saved in standardized files:
+
 - `migration_verification_evidence.txt`: Detailed evidence from verify_migration.sh
 - `migration_proof_evidence.txt`: Focused evidence from prove_migration.sh
 
@@ -128,6 +131,7 @@ If you have a key file with a different name:
 ## Troubleshooting
 
 If verification fails:
+
 1. Check organization ID is exactly `873291114285`
 2. Ensure service account has appropriate permissions
 3. Try force mode: `./prove_migration.sh --force`

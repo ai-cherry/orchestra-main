@@ -11,10 +11,7 @@
         "list_services",
         "get_service_status"
       ],
-      "required_env": [
-        "GCP_PROJECT_ID",
-        "GCP_REGION"
-      ]
+      "required_env": ["GCP_PROJECT_ID", "GCP_REGION"]
     },
     "gcp_secret_manager": {
       "name": "GCP Secret Manager",
@@ -27,26 +24,15 @@
         "update_secret",
         "list_secrets"
       ],
-      "required_env": [
-        "GCP_PROJECT_ID"
-      ]
+      "required_env": ["GCP_PROJECT_ID"]
     },
     "dragonfly_db": {
       "name": "DragonflyDB Manager",
       "description": "Interact with DragonflyDB for caching",
       "type": "http",
       "url": "http://localhost:8003/mcp/dragonfly",
-      "capabilities": [
-        "get_cache",
-        "set_cache",
-        "delete_cache",
-        "list_keys"
-      ],
-      "required_env": [
-        "DRAGONFLY_HOST",
-        "DRAGONFLY_PORT",
-        "DRAGONFLY_PASSWORD"
-      ]
+      "capabilities": ["get_cache", "set_cache", "delete_cache", "list_keys"],
+      "required_env": ["DRAGONFLY_HOST", "DRAGONFLY_PORT", "DRAGONFLY_PASSWORD"]
     },
     "firestore": {
       "name": "Firestore Manager",
@@ -59,24 +45,14 @@
         "update_document",
         "query_collection"
       ],
-      "required_env": [
-        "GCP_PROJECT_ID",
-        "FIRESTORE_NAMESPACE"
-      ]
+      "required_env": ["GCP_PROJECT_ID", "FIRESTORE_NAMESPACE"]
     }
   },
   "claude_code_config": {
     "enable_mcp": true,
     "auto_discover": true,
     "require_confirmation": true,
-    "allowed_operations": [
-      "read",
-      "create",
-      "update"
-    ],
-    "restricted_operations": [
-      "delete",
-      "deploy"
-    ]
+    "allowed_operations": ["read", "create", "update"],
+    "restricted_operations": ["delete", "deploy"]
   }
 }

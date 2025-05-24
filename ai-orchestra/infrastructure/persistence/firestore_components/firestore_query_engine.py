@@ -4,13 +4,13 @@ for memory items. Supports filtering, tagging, and pagination.
 """
 
 import logging
-from typing import Dict, Any, Optional, List, AsyncGenerator
 from datetime import datetime, timezone  # Ensure datetime is imported if used for expiry checks here
+from typing import Any, AsyncGenerator, Dict, List, Optional
 
 from google.cloud import firestore
 from google.cloud.firestore_v1.async_client import AsyncClient as FirestoreAsyncClient
-from google.cloud.firestore_v1.base_query import AsyncBaseQuery, FieldFilter
 from google.cloud.firestore_v1.async_document import AsyncDocumentSnapshot
+from google.cloud.firestore_v1.base_query import AsyncBaseQuery, FieldFilter
 
 # TODO: Replace these with actual imports from your project
 from packages.shared.src.models.base_models import MemoryItem

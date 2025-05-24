@@ -8,19 +8,18 @@ more maintainable implementation.
 """
 
 import asyncio
-import inspect
 import logging
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import (
     Any,
     Callable,
     Dict,
+    Generic,
     List,
     Optional,
+    Set,
     Type,
     TypeVar,
-    Generic,
-    Set,
     Union,
     cast,
     overload,
@@ -45,7 +44,6 @@ class Service(ABC):
 
     def initialize(self) -> None:
         """Initialize the service (synchronous)."""
-        pass
 
     async def initialize_async(self) -> None:
         """
@@ -60,7 +58,6 @@ class Service(ABC):
 
     def close(self) -> None:
         """Release resources held by the service (synchronous)."""
-        pass
 
     async def close_async(self) -> None:
         """

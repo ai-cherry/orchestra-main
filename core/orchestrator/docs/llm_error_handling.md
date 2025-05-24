@@ -40,6 +40,7 @@ The `LLMProvider` implementation includes configurable retry logic through the f
 4. **Per-Provider Configuration**: Each provider can have its own retry settings
 
 By default, the system retries:
+
 - Connection errors
 - Timeout errors
 - Rate limit errors

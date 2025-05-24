@@ -3,10 +3,10 @@
 start_mcp.py - Helper script to start the MCP server with proper import paths
 """
 
-from mcp_server.main import main
 import os
 import sys
-import argparse
+
+from mcp_server.main import main
 
 # Add the parent directory to the Python path
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

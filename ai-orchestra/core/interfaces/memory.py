@@ -4,7 +4,7 @@ Memory provider interface for AI Orchestra.
 This module defines the protocol for memory storage providers.
 """
 
-from typing import Protocol, Any, Optional, Dict, List
+from typing import Any, List, Optional, Protocol
 
 
 class MemoryProvider(Protocol):

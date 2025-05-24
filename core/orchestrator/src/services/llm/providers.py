@@ -11,50 +11,47 @@ that can be used by agents in the orchestration system. Providers implement the 
 interface for proper lifecycle management and integrate with the unified registry system.
 """
 
-import logging
 import asyncio
+import logging
 import time
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Any, Union, Callable, Set
+from typing import Any, Dict, List, Optional, Set
+
+import httpx
+from openai import (
+    APIConnectionError,
+    APIError,
+    AsyncOpenAI,
+    AuthenticationError,
+    BadRequestError,
+    InternalServerError,
+    RateLimitError,
+)
 from tenacity import (
     retry,
     stop_after_attempt,
     wait_exponential,
-    retry_if_exception_type,
 )
-
-from openai import AsyncOpenAI
-from openai.types.chat import ChatCompletion
-from openai import (
-    APIError,
-    APIConnectionError,
-    AuthenticationError,
-    RateLimitError,
-    BadRequestError,
-    InternalServerError,
-)
-import httpx
 
 try:
-    from portkey_ai import Portkey, PortkeyException, PortkeyAPIError
+    from portkey_ai import PortkeyAPIError, PortkeyException
 except ImportError:
     PortkeyException = Exception
     PortkeyAPIError = Exception
 
 # Import the settings instance directly
 from core.orchestrator.src.config.config import settings
-from core.orchestrator.src.services.unified_registry import Service, register
 from core.orchestrator.src.services.llm.exceptions import (
-    LLMProviderError,
-    LLMProviderConnectionError,
     LLMProviderAuthenticationError,
-    LLMProviderRateLimitError,
-    LLMProviderResourceExhaustedError,
+    LLMProviderConnectionError,
+    LLMProviderError,
     LLMProviderInvalidRequestError,
+    LLMProviderModelError,
+    LLMProviderRateLimitError,
     LLMProviderServiceError,
     LLMProviderTimeoutError,
-    LLMProviderModelError,
 )
+from core.orchestrator.src.services.unified_registry import Service, register
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -141,7 +138,6 @@ class LLMProvider(Service, ABC):
         This method is called during service initialization.
         Override to perform provider-specific setup.
         """
-        pass
 
     async def initialize_async(self) -> None:
         """
@@ -161,7 +157,6 @@ class LLMProvider(Service, ABC):
         This method is called during service shutdown.
         Override to perform provider-specific cleanup.
         """
-        pass
 
     async def close_async(self) -> None:
         """
@@ -178,7 +173,6 @@ class LLMProvider(Service, ABC):
     @abstractmethod
     def provider_name(self) -> str:
         """Get provider name."""
-        pass
 
     @property
     def default_model(self) -> str:
@@ -210,7 +204,6 @@ class LLMProvider(Service, ABC):
         Raises:
             LLMProviderError: Base class for all LLM provider errors
         """
-        pass
 
     @abstractmethod
     async def generate_chat_completion(
@@ -237,7 +230,6 @@ class LLMProvider(Service, ABC):
         Raises:
             LLMProviderError: Base class for all LLM provider errors
         """
-        pass
 
 
 class OpenRouterProvider(LLMProvider):
@@ -584,7 +576,7 @@ class OpenRouterProvider(LLMProvider):
                 # This will be retried by the decorator if configured
                 raise LLMProviderServiceError(f"Service error: {str(e)}")
 
-            except asyncio.TimeoutError as e:
+            except asyncio.TimeoutError:
                 logger.error(f"Request to {self.provider_name} timed out after {self.config.request_timeout}s")
                 # This will be retried by the decorator if configured
                 raise LLMProviderTimeoutError(f"Request timed out after {self.config.request_timeout} seconds")
@@ -948,8 +940,6 @@ def get_llm_provider(provider_name: str = None) -> LLMProvider:
     Raises:
         LLMProviderError: If the provider is not properly configured or registered
     """
-    global _llm_providers
-
     # Access the global settings instance directly
     # settings = get_settings() # Removed this line
 

@@ -7,17 +7,17 @@ member Agent with its specific tools and model (via llm_ref), and then
 instantiate the Team with these members, team mode, team model, etc.
 """
 
-import logging
 import importlib
+import logging
 from typing import Any, Dict, List
 
-from packages.memory.src.base import MemoryManager
 from packages.llm.src.portkey_client import PortkeyClient
-from packages.tools.src.base import ToolRegistry
+from packages.memory.src.base import MemoryManager
 from packages.phidata.src.cloudsql_pgvector import (
     get_pg_agent_storage,
     get_pgvector_memory,
 )
+from packages.tools.src.base import ToolRegistry
 
 logger = logging.getLogger(__name__)
 

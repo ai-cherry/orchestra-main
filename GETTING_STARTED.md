@@ -23,6 +23,7 @@ chmod +x deploy-chat-interface.sh
 ```
 
 The deployment script will:
+
 - Create a Google Cloud Storage bucket configured for website hosting
 - Upload the HTML/CSS/JS chat interface
 - Configure proper permissions and cache settings
@@ -86,12 +87,12 @@ To have the LLM chat interface receive actual Figma updates:
 
 ## Production Deployment Timeline
 
-| Component | Deployment Time | Dependencies |
-|-----------|----------------|--------------|
-| LLM Chat Interface | ~10 minutes | GCP account |
-| Webhook Handler | ~1-2 hours | GCP account |
-| GitHub Workflow | ~30 minutes | GitHub repository |
-| Complete Integration | ~3 hours | All of the above |
+| Component            | Deployment Time | Dependencies      |
+| -------------------- | --------------- | ----------------- |
+| LLM Chat Interface   | ~10 minutes     | GCP account       |
+| Webhook Handler      | ~1-2 hours      | GCP account       |
+| GitHub Workflow      | ~30 minutes     | GitHub repository |
+| Complete Integration | ~3 hours        | All of the above  |
 
 ## Next Steps
 

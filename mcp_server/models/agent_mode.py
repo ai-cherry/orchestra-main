@@ -7,10 +7,10 @@ These models enable context-aware prompting and specialized behavior for differe
 types of AI assistant tasks.
 """
 
-from enum import Enum
-from typing import Dict, Any, List, Optional, Set, Union
-from dataclasses import dataclass, field
 import json
+from enum import Enum
+from typing import Any, Dict, List
+
 from pydantic import BaseModel, Field, validator
 
 
@@ -137,7 +137,7 @@ DEFAULT_AGENT_MODES = {
     AgentModeType.CODER: AgentModeConfig(
         name="CoderAgent",
         description="Specialized in generating, completing, and explaining code",
-        system_prompt="""You are an expert software engineer with deep knowledge of programming languages, 
+        system_prompt="""You are an expert software engineer with deep knowledge of programming languages,
 frameworks, and best practices. Your task is to write clean, efficient, and well-documented code.""",
         required_context=["language", "requirements"],
         suggested_tools=["code_completion", "code_explanation", "code_generation"],
@@ -154,7 +154,7 @@ frameworks, and best practices. Your task is to write clean, efficient, and well
     AgentModeType.DEBUGGER: AgentModeConfig(
         name="DebuggerAgent",
         description="Specialized in identifying and fixing bugs",
-        system_prompt="""You are an expert debugger with a keen eye for identifying the root cause of errors. 
+        system_prompt="""You are an expert debugger with a keen eye for identifying the root cause of errors.
 Your task is to analyze code, error messages, and logs to diagnose and fix issues.""",
         required_context=["error_message", "code_context"],
         suggested_tools=["error_analysis", "code_fix_suggestion"],
@@ -171,7 +171,7 @@ Your task is to analyze code, error messages, and logs to diagnose and fix issue
     AgentModeType.REFACTOR: AgentModeConfig(
         name="RefactorAgent",
         description="Specialized in improving code structure and quality",
-        system_prompt="""You are an expert in code refactoring and software design. 
+        system_prompt="""You are an expert in code refactoring and software design.
 Your task is to improve code quality, readability, and maintainability without changing its external behavior.""",
         required_context=["code", "refactoring_goals"],
         suggested_tools=["code_analysis", "refactoring_suggestion"],
@@ -188,7 +188,7 @@ Your task is to improve code quality, readability, and maintainability without c
     AgentModeType.TESTER: AgentModeConfig(
         name="TesterAgent",
         description="Specialized in creating tests and test strategies",
-        system_prompt="""You are an expert in software testing and quality assurance. 
+        system_prompt="""You are an expert in software testing and quality assurance.
 Your task is to create comprehensive tests that verify code correctness and catch potential issues.""",
         required_context=["code_to_test", "testing_framework"],
         suggested_tools=["test_generation", "test_analysis"],
@@ -205,7 +205,7 @@ Your task is to create comprehensive tests that verify code correctness and catc
     AgentModeType.SECURITY_ANALYST: AgentModeConfig(
         name="SecurityAnalystAgent",
         description="Specialized in identifying security vulnerabilities",
-        system_prompt="""You are an expert in cybersecurity and secure coding practices. 
+        system_prompt="""You are an expert in cybersecurity and secure coding practices.
 Your task is to identify potential security vulnerabilities and suggest improvements.""",
         required_context=["code", "security_requirements"],
         suggested_tools=["vulnerability_scan", "security_recommendation"],
@@ -222,7 +222,7 @@ Your task is to identify potential security vulnerabilities and suggest improvem
     AgentModeType.DOC_WRITER: AgentModeConfig(
         name="DocWriterAgent",
         description="Specialized in creating documentation",
-        system_prompt="""You are an expert technical writer with a talent for clear, concise documentation. 
+        system_prompt="""You are an expert technical writer with a talent for clear, concise documentation.
 Your task is to create documentation that helps users understand and use the code effectively.""",
         required_context=["code", "audience"],
         suggested_tools=["docstring_generation", "readme_generation"],
@@ -239,7 +239,7 @@ Your task is to create documentation that helps users understand and use the cod
     AgentModeType.ARCHITECT: AgentModeConfig(
         name="ArchitectAgent",
         description="Specialized in system design and architecture",
-        system_prompt="""You are an expert software architect with deep knowledge of system design, 
+        system_prompt="""You are an expert software architect with deep knowledge of system design,
 patterns, and best practices. Your task is to design robust, scalable, and maintainable systems.""",
         required_context=["requirements", "constraints"],
         suggested_tools=["architecture_diagram", "design_recommendation"],
@@ -256,7 +256,7 @@ patterns, and best practices. Your task is to design robust, scalable, and maint
     AgentModeType.PLANNER: AgentModeConfig(
         name="PlannerAgent",
         description="Specialized in breaking down complex tasks",
-        system_prompt="""You are an expert project planner with skills in task decomposition and estimation. 
+        system_prompt="""You are an expert project planner with skills in task decomposition and estimation.
 Your task is to break down complex problems into manageable steps.""",
         required_context=["goal", "constraints"],
         suggested_tools=["task_decomposition", "timeline_generation"],
@@ -273,7 +273,7 @@ Your task is to break down complex problems into manageable steps.""",
     AgentModeType.ORCHESTRATOR: AgentModeConfig(
         name="OrchestratorAgent",
         description="Specialized in coordinating multiple agents",
-        system_prompt="""You are an expert coordinator with skills in managing complex workflows. 
+        system_prompt="""You are an expert coordinator with skills in managing complex workflows.
 Your task is to orchestrate the work of multiple specialized agents to solve complex problems.""",
         required_context=["goal", "available_agents"],
         suggested_tools=["agent_delegation", "workflow_management"],
@@ -291,7 +291,7 @@ Your task is to orchestrate the work of multiple specialized agents to solve com
     AgentModeType.DEFAULT: AgentModeConfig(
         name="DefaultAgent",
         description="General-purpose assistant",
-        system_prompt="""You are a helpful AI assistant. Your task is to provide accurate, 
+        system_prompt="""You are a helpful AI assistant. Your task is to provide accurate,
 helpful responses to user queries.""",
         example_prompts=[
             "Explain how to use this API",

@@ -64,7 +64,7 @@ if ! gsutil ls -b "${PULUMI_LOGIN_TARGET}" >/dev/null 2>&1; then
   fi
 else
   echo "  Found existing Pulumi state bucket: ${PULUMI_GCS_BUCKET_NAME}."
-fi 
+fi
 
 if pulumi login "${PULUMI_LOGIN_TARGET}"; then
   echo "  Successfully logged into Pulumi backend: ${PULUMI_LOGIN_TARGET}."
@@ -109,4 +109,4 @@ pulumi whoami --verbose
 
 echo "✅  Pulumi dev container setup script completed."
 echo "   Pulumi should be logged into GCS backend. SA key at: ${SA_KEY_PATH}."
-echo "   Open a new terminal or source ~/.bashrc for environment variables to be fully available." 
+echo "   Open a new terminal or source ~/.bashrc for environment variables to be fully available."

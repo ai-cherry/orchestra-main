@@ -5,12 +5,12 @@ This module provides functionality for logging and reporting incidents
 when agent failures occur, enabling better visibility and debugging.
 """
 
-import logging
 import json
-from typing import Dict, Any, List, Optional
-from datetime import datetime
-import os
+import logging
 import uuid
+from datetime import datetime
+from typing import Any, Dict, Optional
+
 from google.cloud import logging as cloud_logging
 
 # Configure logging
@@ -229,6 +229,7 @@ def get_incident_reporter() -> IncidentReporter:
     if _incident_reporter is None:
         # Get GCP project ID from environment or config
         import os
+
         from core.orchestrator.src.config.config import get_settings
 
         settings = get_settings()

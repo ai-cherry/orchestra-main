@@ -2,43 +2,40 @@
 Service for interacting with Google Gemini LLM through Vertex AI.
 """
 
-from typing import Dict, Any, List, Optional, Callable, Tuple
-import json
-import logging
 import asyncio
 import hashlib
+import json
+import logging
 import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from functools import lru_cache
-from datetime import datetime
+from typing import Any, Callable, Dict, List, Optional
 
 import backoff
-from redis import Redis
-from google.cloud import aiplatform
-from google.cloud.aiplatform.gapic.schema import predict
-from vertexai.preview.generative_models import (
-    GenerativeModel,
-    ChatSession,
-    Part,
-    Tool,
-    FunctionDeclaration,
-)
 from google.api_core.exceptions import (
     GoogleAPIError,
     ResourceExhausted,
     ServiceUnavailable,
 )
+from google.cloud import aiplatform
+from redis import Redis
+from vertexai.preview.generative_models import (
+    FunctionDeclaration,
+    GenerativeModel,
+    Part,
+    Tool,
+)
 
 from app.config import settings
 from app.services.admin_functions import (
     get_agent_status,
+    get_memory_stats,
+    list_agents,
+    promote_memory,
+    prune_memory,
     start_agent,
     stop_agent,
-    list_agents,
-    prune_memory,
-    promote_memory,
-    get_memory_stats,
 )
 
 logger = logging.getLogger(__name__)
@@ -104,8 +101,6 @@ class CircuitBreakerState:
 
 class GeminiAPIError(Exception):
     """Custom exception for Gemini API errors."""
-
-    pass
 
 
 class GeminiService:

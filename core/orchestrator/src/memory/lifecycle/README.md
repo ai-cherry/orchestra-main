@@ -19,6 +19,7 @@ These components work together to provide more intelligent memory management, op
 The `ImportanceScorer` evaluates the importance of memory items based on various factors, including recency, usage, content, metadata, relationships, and semantic richness.
 
 Key features:
+
 - Multi-factor importance scoring
 - Configurable weights for different factors
 - Detailed component scores for transparency
@@ -56,6 +57,7 @@ print(f"Overall importance score: {score.score:.2f}")
 The `ProgressiveSummarizer` creates multi-level summaries of memory items, from condensed highlights to single-sentence headlines, optimizing storage while preserving context.
 
 Key features:
+
 - Multiple summary levels (full, condensed, key points, headline)
 - AI-powered summarization using Vertex AI
 - Entity and keyword preservation
@@ -83,6 +85,7 @@ headline = summaries[SummaryLevel.HEADLINE].summary_text
 The `MemoryChunker` splits large documents into semantic chunks for more efficient storage and retrieval, using various chunking strategies.
 
 Key features:
+
 - Multiple chunking strategies (paragraph, sentence, fixed size, semantic, hybrid)
 - Semantic chunking using Vertex AI
 - Heading extraction and summary generation
@@ -125,10 +128,10 @@ async def store_with_intelligence(content, item_id):
     chunker = MemoryChunker()
     summarizer = ProgressiveSummarizer()
     scorer = ImportanceScorer()
-    
+
     # Step 1: Chunk the content
     chunks = await chunker.chunk_item(item_id, content)
-    
+
     # Step 2: Score each chunk
     for chunk in chunks:
         # Create a memory item from the chunk
@@ -137,10 +140,10 @@ async def store_with_intelligence(content, item_id):
             "content": chunk.content,
             "created_at": datetime.utcnow()
         }
-        
+
         # Score the item
         score = scorer.score_item(item)
-        
+
         # Step 3: Create appropriate summary based on importance
         if score.score > 0.7:
             # High importance: store full content
@@ -153,7 +156,7 @@ async def store_with_intelligence(content, item_id):
             # Low importance: store key points only
             summaries = await summarizer.create_progressive_summaries(chunk.content, chunk.metadata.chunk_id)
             memory_content = summaries[SummaryLevel.KEY_POINTS].summary_text
-        
+
         # Step 4: Store in memory system
         # memory_manager.store(chunk.metadata.chunk_id, memory_content)
 ```
@@ -180,3 +183,4 @@ Run the tests to verify the functionality:
 
 ```bash
 pytest tests/core/orchestrator/memory/lifecycle/
+```

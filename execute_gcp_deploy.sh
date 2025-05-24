@@ -179,7 +179,7 @@ echo -e "\n${BLUE}[6/7] Saving GitHub secrets to GCP Secret Manager...${NC}"
 add_secret() {
     local name=$1
     local value=$2
-    
+
     if ! gcloud secrets describe "$name" --project="$GCP_PROJECT_ID" &>/dev/null; then
         echo -e "Creating secret: $name"
         echo -n "$value" | gcloud secrets create "$name" --data-file=- --project="$GCP_PROJECT_ID"
@@ -241,11 +241,11 @@ fi
 if command -v gh &> /dev/null; then
     echo -e "\n${BLUE}Waiting for GitHub Actions workflow to start...${NC}"
     sleep 10
-    
+
     if gh workflow list &>/dev/null; then
         echo -e "${GREEN}✓ GitHub Actions workflow listed:${NC}"
         gh workflow list
-        
+
         echo -e "\n${BLUE}Recent GitHub Actions runs:${NC}"
         gh run list --limit 5
     fi

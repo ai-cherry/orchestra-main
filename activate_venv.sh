@@ -33,4 +33,4 @@ if [ $# -gt 0 ]; then
 else
     # If no command, start a shell
     exec $SHELL
-fi 
+fi

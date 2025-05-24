@@ -7,7 +7,7 @@ mcp_servers:
     name: "GCP Cloud Run Manager"
     description: "Deploy and manage Cloud Run services"
     type: "http"
-    url: "http://localhost:8001/mcp/cloud-run"  # Local MCP server endpoint
+    url: "http://localhost:8001/mcp/cloud-run" # Local MCP server endpoint
     capabilities:
       - deploy_service
       - update_service
@@ -16,8 +16,8 @@ mcp_servers:
     required_env:
       - GCP_PROJECT_ID
       - GCP_REGION
-    
-  # Google Secret Manager server  
+
+  # Google Secret Manager server
   gcp_secret_manager:
     name: "GCP Secret Manager"
     description: "Manage secrets in Google Secret Manager"
@@ -30,7 +30,7 @@ mcp_servers:
       - list_secrets
     required_env:
       - GCP_PROJECT_ID
-      
+
   # DragonflyDB management server
   dragonfly_db:
     name: "DragonflyDB Manager"
@@ -46,7 +46,7 @@ mcp_servers:
       - DRAGONFLY_HOST
       - DRAGONFLY_PORT
       - DRAGONFLY_PASSWORD
-      
+
   # Firestore management server
   firestore:
     name: "Firestore Manager"
@@ -69,11 +69,11 @@ claude_code_config:
   # Auto-discover local MCP servers
   auto_discover: true
   # Security settings
-  require_confirmation: true  # Require user confirmation for destructive operations
+  require_confirmation: true # Require user confirmation for destructive operations
   allowed_operations:
     - read
     - create
     - update
   restricted_operations:
-    - delete  # Requires explicit confirmation
-    - deploy  # Requires explicit confirmation 
+    - delete # Requires explicit confirmation
+    - deploy # Requires explicit confirmation

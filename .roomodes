@@ -103,7 +103,7 @@
       "roleDefinition": "You are a senior technical strategist and planner specialized in AI systems architecture and cloud deployment. You excel at high-level reasoning, decision making, and choosing the best approach for complex problems.",
       "customInstructions": "When given a goal or problem, analyze it step-by-step, consider multiple solutions, weigh pros/cons, then recommend a strategy. Justify why this approach is optimal. Focus on performance, GCP resource optimization, efficient containerization strategies, and streamlined AI orchestration patterns. Favor simpler solutions with adequate security over complex, highly-secure ones (see PROJECT_PRIORITIES.md). Temperature: 0.5 for balanced exploration of options.",
       "groups": ["read", "mcp"],
-      "model": "xai/grok-1" 
+      "model": "xai/grok-1"
     },
     {
       "slug": "creative",

@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 # codespaces_gcp_integration.py - Programmatic integration between GitHub Codespaces and GCP
 
-import os
 import argparse
-import json
+import os
 import subprocess
+
 import requests
-from typing import Dict, Any, List, Optional
 from google.cloud import secretmanager
-from google.oauth2 import service_account
-from google.cloud import storage
 
 
 def parse_args():
@@ -81,11 +78,11 @@ def create_codespace_with_gcp(args):
         try:
             response = client.access_secret_version(request={"name": secret_name})
             sa_key_json = response.payload.data.decode("UTF-8")
-            print(f"Using existing service account key from Secret Manager")
+            print("Using existing service account key from Secret Manager")
         except Exception as e:
             print(f"No existing key found, creating new one: {e}")
             # Create new key using gcloud (alternative: use google-auth)
-            result = subprocess.run(
+            subprocess.run(
                 [
                     "gcloud",
                     "iam",
@@ -225,7 +222,7 @@ def create_gcp_sa_for_github(args):
     owner, repo = args.github_repo.split("/")
 
     # Create service account
-    result = subprocess.run(
+    subprocess.run(
         [
             "gcloud",
             "iam",
@@ -257,7 +254,7 @@ def create_gcp_sa_for_github(args):
 
     roles = args.roles or ["roles/viewer"]
     for role in roles:
-        result = subprocess.run(
+        subprocess.run(
             [
                 "gcloud",
                 "projects",
@@ -277,7 +274,7 @@ def create_gcp_sa_for_github(args):
 
     # Create service account key
     key_path = f"/tmp/{args.name}-key.json"
-    result = subprocess.run(
+    subprocess.run(
         [
             "gcloud",
             "iam",
@@ -337,7 +334,7 @@ def create_workload_identity_pool(project_id, github_owner, github_repo):
     """Create a Workload Identity Federation pool for GitHub Actions."""
     # Check if pool already exists
     try:
-        result = subprocess.run(
+        subprocess.run(
             [
                 "gcloud",
                 "iam",
@@ -354,7 +351,7 @@ def create_workload_identity_pool(project_id, github_owner, github_repo):
         print("Workload Identity Pool already exists")
     except subprocess.CalledProcessError:
         # Create pool
-        result = subprocess.run(
+        subprocess.run(
             [
                 "gcloud",
                 "iam",
@@ -377,7 +374,7 @@ def create_workload_identity_pool(project_id, github_owner, github_repo):
 
     # Check if provider exists
     try:
-        result = subprocess.run(
+        subprocess.run(
             [
                 "gcloud",
                 "iam",
@@ -397,7 +394,7 @@ def create_workload_identity_pool(project_id, github_owner, github_repo):
         print("Workload Identity Provider already exists")
     except subprocess.CalledProcessError:
         # Create provider
-        result = subprocess.run(
+        subprocess.run(
             [
                 "gcloud",
                 "iam",
@@ -424,7 +421,7 @@ def create_workload_identity_pool(project_id, github_owner, github_repo):
     provider_name = f"{pool_name}/providers/github-provider"
 
     print(f"Workload Identity Provider: {provider_name}")
-    print(f"This can be used in GitHub Actions to authenticate to GCP")
+    print("This can be used in GitHub Actions to authenticate to GCP")
     print(f"Repository: {github_owner}/{github_repo}")
 
     # Print GitHub Actions YAML example
@@ -432,21 +429,21 @@ def create_workload_identity_pool(project_id, github_owner, github_repo):
     print(
         f"""
     name: GCP Authentication Example
-    
+
     on:
       push:
         branches: [ main ]
-    
+
     jobs:
       deploy:
         runs-on: ubuntu-latest
         permissions:
           contents: read
           id-token: write
-        
+
         steps:
           - uses: actions/checkout@v3
-          
+
           - id: 'auth'
             uses: 'google-github-actions/auth@v1'
             with:

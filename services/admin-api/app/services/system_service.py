@@ -2,18 +2,16 @@
 Service for system-level operations and GCP resource management.
 """
 
-from typing import Dict, Any, Optional
 import logging
+import os
 import platform
 import time
-import os
-import psutil
-import json
 from functools import lru_cache
+from typing import Any, Dict
 
-from google.cloud import resourcemanager_v3
-from google.cloud import monitoring_v3
+import psutil
 from google.api_core.exceptions import GoogleAPIError
+from google.cloud import monitoring_v3, resourcemanager_v3
 
 from app.config import settings
 

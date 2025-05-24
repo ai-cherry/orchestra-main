@@ -56,7 +56,7 @@ The script creates a `.safety-policy.yml` file that sets:
 
 ```yaml
 security:
-  ignore-unpinned-requirements: false  # Report vulnerabilities in unpinned packages
+  ignore-unpinned-requirements: false # Report vulnerabilities in unpinned packages
   ignore-vulnerabilities:
     # Add specific vulnerabilities to ignore here if needed
 ```

@@ -47,14 +47,14 @@ while true; do
     # Run the monitor script
     log_message "${BLUE}Running extension performance monitor...${NC}"
     python3 "${MONITOR_SCRIPT}"
-    
+
     # Check if the script ran successfully
     if [ $? -eq 0 ]; then
         log_message "${GREEN}Monitor completed successfully${NC}"
     else
         log_message "${RED}Monitor failed with exit code $?${NC}"
     fi
-    
+
     # Wait for the next interval
     log_message "${BLUE}Waiting for ${INTERVAL} seconds before next run...${NC}"
     sleep ${INTERVAL}

@@ -31,17 +31,12 @@ import hashlib
 import json
 import logging
 import os
-import platform
-import tempfile
-import time
-import uuid
-import sys
 import subprocess
+import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, TypeVar, Union, cast
+from typing import Any, Dict, List, Optional
 
 # Configure logging
 logging.basicConfig(
@@ -52,10 +47,7 @@ logger = logging.getLogger("vertex_ai_bridge")
 
 # Import optional dependencies for GCP
 try:
-    import google.auth
-    import google.auth.transport.requests
     from google.cloud import aiplatform
-    from google.oauth2 import service_account
 
     GOOGLE_LIBRARIES_AVAILABLE = True
 except ImportError:

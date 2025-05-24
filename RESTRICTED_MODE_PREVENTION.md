@@ -8,7 +8,8 @@ After examining the codebase, several potential issues were identified that coul
 
 1. **Environment Variable Inconsistency**: The `USE_RECOVERY_MODE` and `STANDARD_MODE` environment variables were not consistently set across all components.
 
-2. **Docker Configuration Issues**: 
+2. **Docker Configuration Issues**:
+
    - The Dockerfile was removing Agno dependencies but docker-compose.yml still referenced them
    - Inconsistent virtual environment handling between development and Docker environments
 
@@ -23,6 +24,7 @@ The following solutions have been implemented to ensure Orchestra consistently r
 ### 1. Docker Environment Updates
 
 - **Dockerfile**: Modified to ensure standard mode is enforced:
+
   - Added explicit environment variables: `USE_RECOVERY_MODE=false` and `STANDARD_MODE=true`
   - Created a startup script to enforce mode settings at runtime
   - Configured Poetry to use in-project virtualenvs, consistent with development environment
@@ -36,6 +38,7 @@ The following solutions have been implemented to ensure Orchestra consistently r
 ### 2. New Standard Mode Enforcement Tools
 
 - **ensure_standard_mode.sh**: Created comprehensive script that:
+
   - Sets environment variables in `.bashrc`
   - Updates `.env` file with proper mode settings
   - Verifies Docker configuration
@@ -57,18 +60,20 @@ The following solutions have been implemented to ensure Orchestra consistently r
 To ensure Orchestra always runs in standard mode:
 
 1. **For Local Development**:
+
    ```bash
    # Run the enforcement script
    ./ensure_standard_mode.sh
-   
+
    # Apply environment variables to current session
    source ~/.bashrc
-   
+
    # Verify mode settings
    python force_standard_mode.py
    ```
 
 2. **For Docker Environments**:
+
    ```bash
    # Rebuild and restart containers with updated settings
    docker-compose down

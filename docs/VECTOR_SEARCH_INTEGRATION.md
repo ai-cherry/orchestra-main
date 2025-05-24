@@ -137,6 +137,7 @@ The migration script supports the following options:
 - `--dry-run`: Run without making changes
 
 For Vertex AI Vector Search:
+
 - `--project-id`: Google Cloud project ID
 - `--location`: Google Cloud region (default: "us-west4")
 - `--index-endpoint-id`: Vector Search index endpoint ID

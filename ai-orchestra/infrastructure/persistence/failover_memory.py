@@ -4,11 +4,12 @@ Failover memory provider implementation for AI Orchestra.
 This module provides a memory provider with failover capability using the circuit breaker pattern.
 """
 
-from typing import Any, List, Optional, Tuple
-import time
 import logging
-from ai_orchestra.core.interfaces.memory import MemoryProvider
+import time
+from typing import Any, List, Optional, Tuple
+
 from ai_orchestra.core.errors import MemoryError
+from ai_orchestra.core.interfaces.memory import MemoryProvider
 
 logger = logging.getLogger(__name__)
 

@@ -65,6 +65,7 @@ The mode system defines different operational modes for Roo, each with specific 
 - **Ask Mode**: For research and information retrieval
 
 Each mode has:
+
 - A unique slug (e.g., "code", "architect")
 - A display name (e.g., "💻 Code", "🏗 Architect")
 - A description
@@ -117,6 +118,7 @@ python setup_roo_mcp.py
 ```
 
 This script will:
+
 - Check Python version compatibility
 - Install required dependencies
 - Set up the environment
@@ -186,7 +188,7 @@ processed_response = await adapter.process_response("code", processed_request, r
 ```python
 # Prepare a transition from code to architect mode
 transition = await transition_manager.prepare_transition(
-    "code", "architect", "operation-123", 
+    "code", "architect", "operation-123",
     {"context_data": {"file": "app.py", "issue": "performance"}}
 )
 
@@ -226,8 +228,8 @@ theme = await roo_memory.get_user_preference("theme")
 
 # Store a code change
 await roo_memory.store_code_change(
-    "database.py", "update", 
-    {"before": "...", "after": "..."}, 
+    "database.py", "update",
+    {"before": "...", "after": "..."},
     "code"
 )
 
@@ -354,16 +356,16 @@ class TransitionContext:
 class ModeTransitionManager:
     """Manages transitions between Roo modes with context preservation."""
     async def prepare_transition(
-        self, 
-        source_mode: str, 
-        target_mode: str, 
-        operation_id: str, 
+        self,
+        source_mode: str,
+        target_mode: str,
+        operation_id: str,
         context_data: Dict[str, Any] = None
     ) -> Optional[TransitionContext]
-    
+
     async def complete_transition(
-        self, 
-        transition_id: str, 
+        self,
+        transition_id: str,
         result_data: Dict[str, Any] = None
     ) -> Optional[TransitionContext]
 ```
@@ -374,59 +376,59 @@ class ModeTransitionManager:
 class RooMemoryManager:
     """Specialized memory manager for Roo operations."""
     async def store_mode_context(
-        self, 
-        mode_slug: str, 
-        context_data: Dict[str, Any], 
+        self,
+        mode_slug: str,
+        context_data: Dict[str, Any],
         ttl_seconds: int = 3600
     ) -> Optional[str]
-    
+
     async def retrieve_mode_contexts(
-        self, 
-        mode_slug: str, 
+        self,
+        mode_slug: str,
         limit: int = 10
     ) -> List[Dict[str, Any]]
-    
+
     async def store_code_change(
-        self, 
-        file_path: str, 
-        change_type: str, 
-        content: Dict[str, Any], 
-        mode_slug: str, 
+        self,
+        file_path: str,
+        change_type: str,
+        content: Dict[str, Any],
+        mode_slug: str,
         ttl_seconds: int = 86400
     ) -> Optional[str]
-    
+
     async def get_recent_changes_for_file(
-        self, 
-        file_path: str, 
+        self,
+        file_path: str,
         limit: int = 5
     ) -> List[Dict[str, Any]]
-    
+
     async def store_user_preference(
-        self, 
-        preference_type: str, 
-        value: Any, 
+        self,
+        preference_type: str,
+        value: Any,
         ttl_seconds: int = 2592000
     ) -> Optional[str]
-    
+
     async def get_user_preference(
-        self, 
-        preference_type: str, 
+        self,
+        preference_type: str,
         default_value: Any = None
     ) -> Any
 
 class BoomerangOperation:
     """Implements the boomerang pattern for complex operations."""
     async def start_operation(
-        self, 
+        self,
         initial_mode: str,
         target_modes: List[str],
         operation_data: Dict[str, Any],
         return_mode: str
     ) -> Optional[str]
-    
+
     async def advance_operation(
-        self, 
-        operation_id: str, 
+        self,
+        operation_id: str,
         result: Dict[str, Any] = None
     ) -> Optional[Dict[str, Any]]
 ```
@@ -450,9 +452,9 @@ class Rule:
 class RuleEngine:
     """Engine for evaluating rules against operations."""
     def register_rule(self, rule: Rule) -> None
-    
+
     def register_rules(self, rules: List[Rule]) -> None
-    
+
     def evaluate(self, context: Dict[str, Any]) -> List[Dict[str, Any]]
 ```
 
@@ -462,20 +464,21 @@ class RuleEngine:
 class GeminiRooAdapter:
     """Adapter for integrating Gemini with Roo and MCP."""
     async def process_request(
-        self, 
-        mode_slug: str, 
+        self,
+        mode_slug: str,
         request_data: Dict[str, Any]
     ) -> Dict[str, Any]
-    
+
     async def process_response(
-        self, 
-        mode_slug: str, 
-        request_data: Dict[str, Any], 
+        self,
+        mode_slug: str,
+        request_data: Dict[str, Any],
         response_data: Dict[str, Any]
     ) -> Dict[str, Any]
-    
+
     async def handle_mode_transition(
-        self, 
-        transition_id: str, 
+        self,
+        transition_id: str,
         result_data: Dict[str, Any] = None
     ) -> Dict[str, Any]
+```

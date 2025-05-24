@@ -9,16 +9,19 @@ AI Orchestra uses a layered memory architecture that provides different types of
 ### Memory Layers
 
 1. **Short-term Memory (Redis)**
+
    - Fast, in-memory storage for frequently accessed data
    - Automatically expires after a configurable TTL (default: 1 hour)
    - Ideal for conversation context, recent interactions, and working memory
 
 2. **Mid-term Memory (Firestore)**
+
    - Structured, document-based storage for medium-term persistence
    - Longer TTL than short-term memory (default: 1 day)
    - Ideal for session data, user preferences, and ongoing tasks
 
 3. **Long-term Memory (Firestore)**
+
    - Persistent storage for important information
    - Very long TTL or no expiration (default: 30 days)
    - Ideal for user profiles, learned behaviors, and important facts
@@ -46,16 +49,19 @@ The memory system automatically manages the flow of information between layers:
 The memory system is built on the following GCP services:
 
 1. **Redis (Memorystore)**
+
    - Used for short-term memory
    - Provides fast, in-memory storage with automatic expiration
    - Configured with authentication for security
 
 2. **Firestore**
+
    - Used for mid-term and long-term memory
    - Provides structured, document-based storage
    - Scales automatically with usage
 
 3. **Vertex AI Vector Search**
+
    - Used for semantic memory
    - Provides efficient similarity search for embeddings
    - Integrated with Vertex AI for embedding generation
@@ -69,16 +75,19 @@ The memory system is built on the following GCP services:
 The memory system is implemented as a set of Python classes:
 
 1. **Memory Interface (`MemoryInterface`)**
+
    - Abstract base class defining the memory API
    - Methods for storing, retrieving, and deleting data
    - Methods for semantic search and batch operations
 
 2. **Memory Backends**
+
    - `RedisMemory`: Implementation for Redis
    - `FirestoreMemory`: Implementation for Firestore
    - `VertexMemory`: Implementation for Vertex AI Vector Search
 
 3. **Layered Memory (`LayeredMemory`)**
+
    - Combines multiple memory backends into a unified system
    - Manages the flow of information between layers
    - Provides a single API for accessing all memory types
@@ -133,11 +142,11 @@ agents:
     memory:
       memory_type: layered
       short_term:
-        ttl: 3600  # 1 hour
+        ttl: 3600 # 1 hour
       mid_term:
-        ttl: 86400  # 1 day
+        ttl: 86400 # 1 day
       long_term:
-        ttl: 2592000  # 30 days
+        ttl: 2592000 # 30 days
       semantic:
         vector_dimension: 768
     capabilities:
@@ -181,20 +190,24 @@ The script will:
 ## Best Practices
 
 1. **Memory Layer Selection**
+
    - Use short-term memory for conversation context and working memory
    - Use mid-term memory for session data and user preferences
    - Use long-term memory for user profiles and important facts
    - Use semantic memory for knowledge retrieval and similar examples
 
 2. **TTL Configuration**
+
    - Set appropriate TTLs for each memory layer based on the use case
    - Consider the cost and performance implications of longer TTLs
 
 3. **Batch Operations**
+
    - Use batch operations for better performance when storing or retrieving multiple items
    - Consider the atomicity requirements of your operations
 
 4. **Error Handling**
+
    - Handle memory errors gracefully in your agents
    - Provide fallbacks for when memory operations fail
 
@@ -205,18 +218,22 @@ The script will:
 ## Future Enhancements
 
 1. **Memory Compression**
+
    - Automatically compress and summarize memory items
    - Reduce storage costs and improve retrieval performance
 
 2. **Memory Prioritization**
+
    - Prioritize important memory items for retention
    - Automatically identify and retain important information
 
 3. **Cross-Agent Memory Sharing**
+
    - Enable agents to share memory with each other
    - Implement access controls for memory sharing
 
 4. **Memory Visualization**
+
    - Visualize the contents of the memory system
    - Provide tools for debugging and monitoring
 

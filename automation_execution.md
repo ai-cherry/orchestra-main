@@ -15,13 +15,13 @@ The AI Orchestra automation systems employ four distinct trigger mechanisms:
 
 The automation systems operate in several distinct environments:
 
-| Environment | Description | Best For |
-|-------------|-------------|----------|
-| Cloud Run Services | Serverless container execution | Event-driven workloads |
-| Compute Engine VM | Dedicated virtual machine | Long-running monitoring |
-| GitHub Actions Runners | CI/CD pipeline execution | Repository-triggered automations |
-| GKE Pods | Kubernetes-managed containers | Scheduled jobs and services |
-| Local Development | Developer workstation | Testing and debugging |
+| Environment            | Description                    | Best For                         |
+| ---------------------- | ------------------------------ | -------------------------------- |
+| Cloud Run Services     | Serverless container execution | Event-driven workloads           |
+| Compute Engine VM      | Dedicated virtual machine      | Long-running monitoring          |
+| GitHub Actions Runners | CI/CD pipeline execution       | Repository-triggered automations |
+| GKE Pods               | Kubernetes-managed containers  | Scheduled jobs and services      |
+| Local Development      | Developer workstation          | Testing and debugging            |
 
 ## System-Specific Execution Details
 
@@ -76,20 +76,20 @@ name: Performance Enhancement
 
 on:
   schedule:
-    - cron: '0 2 * * *'  # Run daily at 2 AM UTC
-  workflow_dispatch:     # Allow manual triggering
+    - cron: "0 2 * * *" # Run daily at 2 AM UTC
+  workflow_dispatch: # Allow manual triggering
 
 jobs:
   run-performance-analysis:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - uses: google-github-actions/auth@v1
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.SERVICE_ACCOUNT }}
-      
+
       - id: performance-enhancement
         run: |
           python fully_automated_performance_enhancement.py \
@@ -141,6 +141,7 @@ jobs:
 **Implementation in Git Hooks:**
 
 Pre-commit configuration (`.pre-commit-config.yaml`):
+
 ```yaml
 repos:
   - repo: local
@@ -218,30 +219,30 @@ resource "google_cloud_run_service" "automation_controller" {
     spec {
       containers {
         image = "gcr.io/${var.project_id}/automation-controller:latest"
-        
+
         resources {
           limits = {
             cpu    = "2"
             memory = "2Gi"
           }
         }
-        
+
         env {
           name  = "ENVIRONMENT"
           value = var.environment
         }
-        
+
         env {
           name  = "CONFIG_PATH"
           value = "/etc/automation/config.yaml"
         }
-        
+
         volume_mounts {
           name       = "config-volume"
           mount_path = "/etc/automation"
         }
       }
-      
+
       volumes {
         name = "config-volume"
         secret {
@@ -252,7 +253,7 @@ resource "google_cloud_run_service" "automation_controller" {
           }
         }
       }
-      
+
       service_account_name = google_service_account.automation_service_account.email
     }
   }
@@ -278,29 +279,29 @@ spec:
         app: automation-controller
     spec:
       containers:
-      - name: automation-controller
-        image: gcr.io/PROJECT_ID/automation-controller:latest
-        args:
-        - "--mode"
-        - "continuous"
-        - "--environment"
-        - "production"
-        - "--config"
-        - "/etc/automation/config.yaml"
-        resources:
-          requests:
-            cpu: "1"
-            memory: "1Gi"
-          limits:
-            cpu: "2"
-            memory: "2Gi"
-        volumeMounts:
-        - name: config-volume
-          mountPath: /etc/automation
+        - name: automation-controller
+          image: gcr.io/PROJECT_ID/automation-controller:latest
+          args:
+            - "--mode"
+            - "continuous"
+            - "--environment"
+            - "production"
+            - "--config"
+            - "/etc/automation/config.yaml"
+          resources:
+            requests:
+              cpu: "1"
+              memory: "1Gi"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/automation
       volumes:
-      - name: config-volume
-        secret:
-          secretName: automation-config
+        - name: config-volume
+          secret:
+            secretName: automation-config
       serviceAccountName: automation-service-account
 ```
 
@@ -316,11 +317,11 @@ resource "google_cloud_scheduler_job" "daily_performance_enhancement" {
   http_target {
     uri         = "${google_cloud_run_service.automation_controller.status[0].url}/tasks/performance"
     http_method = "POST"
-    
+
     oidc_token {
       service_account_email = google_service_account.scheduler_service_account.email
     }
-    
+
     body = base64encode(jsonencode({
       "mode": "apply",
       "environment": var.environment
@@ -333,33 +334,33 @@ resource "google_cloud_scheduler_job" "daily_performance_enhancement" {
 
 ### Performance Enhancement Triggers
 
-| Trigger Type | Condition | Action | Environment |
-|--------------|-----------|--------|-------------|
-| Scheduled | Daily at 2 AM | Full analysis and optimization | All |
-| CPU Alert | Utilization > 70% for 15 minutes | Focused CPU optimization | All |
-| Memory Alert | Utilization > 80% for 10 minutes | Memory optimization | All |
-| Latency Alert | P95 > 500ms for 5 minutes | API and caching optimization | Prod only |
-| Manual | User request | User-specified optimization | All |
+| Trigger Type  | Condition                        | Action                         | Environment |
+| ------------- | -------------------------------- | ------------------------------ | ----------- |
+| Scheduled     | Daily at 2 AM                    | Full analysis and optimization | All         |
+| CPU Alert     | Utilization > 70% for 15 minutes | Focused CPU optimization       | All         |
+| Memory Alert  | Utilization > 80% for 10 minutes | Memory optimization            | All         |
+| Latency Alert | P95 > 500ms for 5 minutes        | API and caching optimization   | Prod only   |
+| Manual        | User request                     | User-specified optimization    | All         |
 
 ### Workspace Optimization Triggers
 
-| Trigger Type | Condition | Action | Environment |
-|--------------|-----------|--------|-------------|
-| Git Hook | Pre-commit | Analyze workspace | Local |
-| Git Hook | Post-merge | Optimize workspace | Local |
-| Scheduled | Weekly (Sunday) | Full optimization | All |
-| Repository Size | > 80% of threshold | Size optimization | All |
-| Manual | User request | User-specified optimization | All |
+| Trigger Type    | Condition          | Action                      | Environment |
+| --------------- | ------------------ | --------------------------- | ----------- |
+| Git Hook        | Pre-commit         | Analyze workspace           | Local       |
+| Git Hook        | Post-merge         | Optimize workspace          | Local       |
+| Scheduled       | Weekly (Sunday)    | Full optimization           | All         |
+| Repository Size | > 80% of threshold | Size optimization           | All         |
+| Manual          | User request       | User-specified optimization | All         |
 
 ### Deployment Pipeline Triggers
 
-| Trigger Type | Condition | Action | Environment |
-|--------------|-----------|--------|-------------|
-| Git Push | Branch = main | Deploy to production | Production |
-| Git Push | Branch = develop | Deploy to staging | Staging |
-| Git Push | Any feature branch | Deploy to development | Development |
-| Manual | Approval received | Deploy to specified environment | All |
-| Scheduled | Within deployment window | Apply pending deployments | Staging, Production |
+| Trigger Type | Condition                | Action                          | Environment         |
+| ------------ | ------------------------ | ------------------------------- | ------------------- |
+| Git Push     | Branch = main            | Deploy to production            | Production          |
+| Git Push     | Branch = develop         | Deploy to staging               | Staging             |
+| Git Push     | Any feature branch       | Deploy to development           | Development         |
+| Manual       | Approval received        | Deploy to specified environment | All                 |
+| Scheduled    | Within deployment window | Apply pending deployments       | Staging, Production |
 
 ## Self-Healing Mechanisms
 

@@ -12,18 +12,16 @@ It exposes:
 3. Utilities for comparing GCP resources with code
 """
 
-import os
-import json
-import glob
-import logging
-import datetime
-import subprocess
 import argparse
-from pathlib import Path
-from typing import Dict, List, Any, Optional
+import datetime
+import glob
+import json
+import logging
+import os
+import subprocess
+from typing import Any, Dict, List, Optional
 
-from fastapi import FastAPI, HTTPException, Request, Depends
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 # Set up logging
@@ -165,7 +163,7 @@ def run_snapshot_script(params: GcpSnapshotRequest) -> str:
 
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        logger.info(f"Snapshot completed successfully")
+        logger.info("Snapshot completed successfully")
 
         # Parse the output to find the snapshot directory
         for line in result.stdout.splitlines():
@@ -253,7 +251,7 @@ async def compare_gcp_with_code(request: GcpResourceCompareRequest) -> Dict[str,
 
     # Otherwise, we need to run the comparison
     # Build a comparison file using grep and other tools
-    results = {"untracked_resources": [], "matched_resources": []}
+    # results = {"untracked_resources": [], "matched_resources": []}  # Removed unused assignment
 
     # TODO: Implement comparison logic without running the full script again
     # For now, return an error suggesting to use the snapshot script directly with -c flag

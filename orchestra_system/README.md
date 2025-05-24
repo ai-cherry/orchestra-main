@@ -29,18 +29,21 @@ These components work together to provide AI assistants with real-time awareness
 ### Installation Steps
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/your-org/ai-orchestra.git
    cd ai-orchestra
    ```
 
 2. Create and activate a virtual environment:
+
    ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
 3. Install dependencies:
+
    ```bash
    pip install -r requirements.txt
    ```
@@ -58,6 +61,7 @@ These components work together to provide AI assistants with real-time awareness
 The Resource Registry discovers, tracks, and provides information about available development resources across different environments.
 
 **Key features:**
+
 - Automatic resource discovery
 - Environment-specific resource tracking
 - Resource status verification
@@ -86,6 +90,7 @@ gcp_resources = registry.list_resources(resource_type=ResourceType.GCP_SERVICE)
 The Configuration Manager handles configuration values across different environments, detects conflicts, and provides a unified interface for accessing configuration.
 
 **Key features:**
+
 - Environment-aware configuration
 - Automatic conflict detection and resolution
 - Configuration validation
@@ -119,6 +124,7 @@ is_valid, errors = config_manager.validate()
 The Conflict Resolver detects and resolves conflicts between files, resources, and configurations.
 
 **Key features:**
+
 - Multiple conflict detection strategies
 - Automated and manual resolution options
 - Resolution history tracking
@@ -153,6 +159,7 @@ success = resolver.apply_resolution(resolution.conflict_id)
 The System API provides a unified interface to interact with all components of the AI Orchestra System.
 
 **Key features:**
+
 - Unified interface for all system components
 - Asynchronous API design
 - Context awareness for AI assistants
@@ -260,16 +267,20 @@ print(f"Pending conflicts: {context['conflicts']['pending']}")
 ## Best Practices
 
 1. **Regular Resource Discovery**
+
    - Run resource discovery periodically to maintain an up-to-date registry.
 
 2. **Environment-Specific Configuration**
+
    - Use environment-specific configuration to handle differences between environments.
 
 3. **Conflict Detection and Resolution**
+
    - Run conflict detection before making significant changes to the codebase.
    - Resolve conflicts as soon as they are detected to prevent issues.
 
 4. **Artifact Cleanup**
+
    - Regularly clean up development artifacts to prevent clutter.
 
 5. **System Context Awareness**
@@ -288,6 +299,7 @@ All components are environment-aware, allowing them to provide different behavio
 ### Conflict Resolution Strategies
 
 Multiple conflict resolution strategies are provided to handle different types of conflicts. Strategies include:
+
 - Priority-based resolution (highest priority wins)
 - Environment-based resolution (current environment wins)
 - Timestamp-based resolution (newest wins)

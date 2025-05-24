@@ -8,10 +8,8 @@ This script runs the FastAPI application using uvicorn.
 import argparse
 import logging
 import sys
-from typing import Dict, Any
 
 import uvicorn
-
 from ai_orchestra.core.config import settings
 from ai_orchestra.utils.logging import configure_logging, log_event
 

@@ -44,6 +44,7 @@ There are currently three overlapping implementations of Firestore memory manage
 ### Phase 1: Create Standardized Base Classes
 
 1. Create a common base class for storage operations with:
+
    - Configuration management
    - Error handling utilities
    - Logging standardization
@@ -58,6 +59,7 @@ There are currently three overlapping implementations of Firestore memory manage
 ### Phase 2: Implement Core Storage Logic
 
 1. Develop a pure synchronous implementation:
+
    - Extract core CRUD operations
    - Centralize collection naming and configuration
    - Implement proper resource management
@@ -72,6 +74,7 @@ There are currently three overlapping implementations of Firestore memory manage
 ### Phase 3: Build Interface Adapters
 
 1. Create a clean adapter for the `MemoryManager` interface:
+
    - Implement type conversions in a centralized way
    - Handle model differences consistently
    - Provide pass-through for matching operations
@@ -84,6 +87,7 @@ There are currently three overlapping implementations of Firestore memory manage
 ### Phase 4: Update Tests and Documentation
 
 1. Enhance test coverage:
+
    - Unit tests for all core functionality
    - Integration tests that verify real-world scenarios
    - Performance tests for critical operations

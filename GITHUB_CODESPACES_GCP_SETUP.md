@@ -8,7 +8,7 @@ Before launching a Codespace, you need to set up the following:
 
 1. **Create Service Account Key**: Ensure you have a JSON key file for your service account `orchestra-project-admin-sa@cherry-ai-project.iam.gserviceaccount.com`
 
-2. **Add GitHub Secret**: 
+2. **Add GitHub Secret**:
    - Go to your GitHub repository settings (https://github.com/ai-cherry/orchestra-main)
    - Navigate to Settings > Secrets and variables > Actions
    - Create a new repository secret named `GCP_MASTER_SERVICE_JSON`
@@ -33,11 +33,13 @@ The devcontainer.json configuration in this repository:
 1. The devcontainer.json file is already placed in the `.devcontainer` directory of this repository.
 
 2. To use this configuration:
+
    - Click the green "Code" button on your repository
    - Select the "Codespaces" tab
    - Click "Create codespace on main"
 
 3. When the Codespace launches, it will automatically:
+
    - Install the required tools
    - Set up authentication with your GCP project
    - Configure the environment for development
@@ -53,6 +55,7 @@ We've provided a verification script to ensure your GCP authentication is set up
 ```
 
 This script will:
+
 - Check if the Google Cloud SDK is in your PATH
 - Verify the service account key file exists
 - Confirm you're authenticated with the correct service account
@@ -80,6 +83,7 @@ You should see `orchestra-project-admin-sa@cherry-ai-project.iam.gserviceaccount
 If you encounter authentication issues:
 
 1. Run the verification script to diagnose and fix common issues:
+
    ```bash
    ./verify_gcp_codespace_setup.sh
    ```
@@ -89,11 +93,13 @@ If you encounter authentication issues:
 3. Verify the service account has the necessary permissions in your GCP project
 
 4. Ensure the Google Cloud SDK is in your PATH:
+
    ```bash
    export PATH=$PATH:/workspaces/orchestra-main/google-cloud-sdk/bin
    ```
 
 5. If changes were made to your .bashrc file, apply them to your current session:
+
    ```bash
    source ~/.bashrc
    ```

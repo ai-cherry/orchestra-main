@@ -24,6 +24,7 @@ This file serves as the single source of truth for all extensions used in the pr
 - **optional**: Nice-to-have extensions that aren't essential
 
 Example:
+
 ```json
 {
   "critical": [
@@ -33,17 +34,9 @@ Example:
     "ms-azuretools.vscode-docker",
     "hashicorp.terraform"
   ],
-  "development": [
-    "charliermarsh.ruff",
-    "ms-python.black-formatter"
-  ],
-  "ai": [
-    "github.copilot"
-  ],
-  "optional": [
-    "ms-toolsai.jupyter",
-    "redhat.vscode-yaml"
-  ]
+  "development": ["charliermarsh.ruff", "ms-python.black-formatter"],
+  "ai": ["github.copilot"],
+  "optional": ["ms-toolsai.jupyter", "redhat.vscode-yaml"]
 }
 ```
 
@@ -52,6 +45,7 @@ Example:
 This script updates the `.devcontainer/devcontainer.json` file with the critical extensions from `extensions.json`. This ensures that only essential extensions are installed during container creation, improving startup performance.
 
 Usage:
+
 ```bash
 python update_devcontainer_extensions.py
 ```
@@ -68,6 +62,7 @@ This script implements a tiered approach to extension installation:
 This approach ensures that the most important extensions are available immediately, while less important extensions are installed in the background.
 
 Usage:
+
 ```bash
 bash setup_extensions_optimized.sh
 ```
@@ -77,6 +72,7 @@ bash setup_extensions_optimized.sh
 This script monitors the performance of VS Code extensions by tracking resource usage and identifying problematic extensions. It can be run periodically to collect data and provide recommendations for optimizing extension usage.
 
 Usage:
+
 ```bash
 python monitor_extension_performance.py
 ```
@@ -86,6 +82,7 @@ python monitor_extension_performance.py
 This script runs the `monitor_extension_performance.py` script at regular intervals (default: 30 minutes) to track extension performance over time. It's designed to be started in the background during workspace initialization.
 
 Usage:
+
 ```bash
 bash monitor_extensions.sh &
 ```

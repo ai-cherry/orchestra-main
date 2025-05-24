@@ -29,6 +29,7 @@ python validate_memory_fixes.py
 ```
 
 Expected output should show:
+
 - Successful initialization of memory manager
 - Successful health check
 - Ability to add and retrieve memory items
@@ -77,6 +78,7 @@ terraform apply -var="env=dev"
 ```
 
 Important resources that will be created:
+
 - Firestore database for memory storage
 - Redis instance for caching
 - Cloud Run service for API
@@ -139,6 +141,7 @@ The response should reference "Remember this message for testing".
 ### Authentication Issues
 
 If you see errors related to authentication:
+
 - Verify your service account key is valid
 - Check that GOOGLE_APPLICATION_CREDENTIALS points to the correct file
 - Ensure the service account has the necessary permissions
@@ -146,6 +149,7 @@ If you see errors related to authentication:
 ### Firestore Connection Issues
 
 If Firestore connections fail:
+
 - Check GCP_PROJECT_ID is correct
 - Verify Firestore is enabled in your GCP project
 - Check network connectivity to GCP
@@ -153,6 +157,7 @@ If Firestore connections fail:
 ### Memory Retrieval Issues
 
 If memory items aren't being retrieved:
+
 - Check that the user_id matches between storage and retrieval requests
 - Verify the Firestore collection exists
 - Check logs for any storage errors
@@ -160,6 +165,7 @@ If memory items aren't being retrieved:
 ### Redis Connection Issues
 
 If Redis connection fails:
+
 - Verify REDIS_HOST and REDIS_PORT are correct
 - Check if Redis password is correctly stored in Secret Manager
 - Ensure network connectivity to Redis instance
