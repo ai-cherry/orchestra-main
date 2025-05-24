@@ -17,7 +17,15 @@ install:
 	@pip install --upgrade pip
 	@if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 	@if [ -f orchestrator/requirements.txt ]; then pip install -r orchestrator/requirements.txt; fi
-	@if [ -f codespaces_pip_requirements.txt ]; then pip install -r codespaces_pip_requirements.txt; fi
+	@if [ -f requirements/dev.txt ]; then pip install -r requirements/dev.txt; fi
+
+# install only prod deps
+install-prod:
+	@pip install --upgrade pip
+	@if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+# dev install explicitly
+install-dev: install  ## Install prod and dev dependencies
 
 update:
 	@pip install --upgrade pip
@@ -40,7 +48,11 @@ type-check:
 test:
 	@pytest
 
-# --- All-in-One Validation ---
-validate: venv-check deps-check lint type-check test
+# --- Pre-commit Hooks ---
+pre-commit-run:
+	@pre-commit run --all-files
 
-.PHONY: venv-check deps-check outdated install update lint format type-check test validate
+# --- All-in-One Validation ---
+validate: venv-check deps-check lint type-check test pre-commit-run
+
+.PHONY: venv-check deps-check outdated install update lint format type-check test pre-commit-run validate

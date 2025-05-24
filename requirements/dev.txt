@@ -1,0 +1,6 @@
+# Development-only dependencies
+pre-commit==4.2.0
+black==25.1.0
+ruff==0.4.4
+mypy==1.15.0
+isort==6.0.1

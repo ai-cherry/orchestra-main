@@ -20,7 +20,7 @@ repos:
     rev: 25.1.0
     hooks:
       - id: black
-        language_version: python3.11
+        language_version: python3.10
         args: [--config=pyproject.toml]
 
   - repo: https://github.com/pycqa/isort
@@ -51,15 +51,9 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies: ["types-requests", "types-PyYAML"]
-        # Specify files to avoid running on entire codebase
-        files: >
-          (?x)(
-            automation_controller\.py|
-            fully_automated_performance_enhancement\.py|
-            workspace_optimization\.py|
-            automation_decision_helper\.py|
-            analyze_code_wrapper\.py
-          )
+        # Run on all .py files, excluding specific directories if needed later
+        files: \.py$
+        exclude: ^(venv/|\.venv/|docs/|tests/fixtures/)
 
   #  - repo: https://github.com/antonbabenko/pre-commit-terraform
   #    rev: v1.84.4

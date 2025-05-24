@@ -1,0 +1,3 @@
+# Consolidated requirements pointing to base (prod) and dev extras
+-r requirements/base.txt
+-r requirements/dev.txt
