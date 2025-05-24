@@ -126,15 +126,28 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: 1.5.1
-          virtualenvs-create: true
-          virtualenvs-in-project: true
+      - name: Install pip-tools
+        run: pip install pip-tools
+
+      - name: Compile requirements (if needed)
+        run: |
+          if [ -f requirements/base.in ]; then
+            pip-compile requirements/base.in --output-file requirements/base.txt
+          fi
+          if [ -f requirements/dev.in ]; then
+            pip-compile requirements/dev.in --output-file requirements/dev.txt
+          fi
 
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: |
+          if [ -f requirements/dev.txt ]; then
+            pip install -r requirements/dev.txt
+          elif [ -f requirements/base.txt ]; then
+            pip install -r requirements/base.txt
+          else
+            echo "No requirements file found."
+            exit 1
+          fi
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v1

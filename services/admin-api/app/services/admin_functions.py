@@ -164,7 +164,6 @@ async def get_agent_status(agent_id: str) -> Dict[str, Any]:
     except Exception as e:
         logger.error(f"Error getting agent status: {str(e)}", exc_info=True)
         return {"error": str(e), "status": "error", "success": False}
-        return {"error": str(e), "status": "error"}
 
 
 async def start_agent(agent_id: str) -> Dict[str, Any]:

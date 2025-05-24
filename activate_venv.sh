@@ -8,8 +8,8 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 if [ -f "$SCRIPT_DIR/venv/bin/activate" ]; then
     source "$SCRIPT_DIR/venv/bin/activate"
     echo "✅ Virtual environment activated"
-    echo "🐍 Python: $(which python)"
-    echo "📦 Pip: $(which pip)"
+    echo "🐍 Python: $(command -v python)"
+    echo "📦 Pip: $(command -v pip)"
 else
     echo "❌ No virtual environment found. Creating one..."
     python3 -m venv "$SCRIPT_DIR/venv"

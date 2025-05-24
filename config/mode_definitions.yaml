@@ -101,7 +101,7 @@ modes:
 
   strategy:
     name: "🧠 Strategy"
-    model: "claude-3.7"
+    model: "claude-4"
     description: "Senior technical strategist and planner specialized in AI systems architecture"
     write_access: true
     file_patterns:
@@ -120,7 +120,7 @@ modes:
 
   ask:
     name: "❓ Ask"
-    model: "claude-3.7"
+    model: "claude-4"
     description: "Research assistant with access to documentation and the internet"
     write_access: false
     capabilities:
@@ -135,7 +135,7 @@ modes:
 
   creative:
     name: "🎨 Creative"
-    model: "claude-3.7"
+    model: "claude-4"
     description: "Technical writer and creative communicator"
     write_access: true  # Enhanced to allow documentation creation
     file_patterns:

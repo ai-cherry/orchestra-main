@@ -17,6 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .endpoints import interaction
 from .endpoints import health
 from .endpoints import phidata_chat
+from .endpoints import monitoring
 from core.orchestrator.src.config.settings import get_settings
 from core.orchestrator.src.config.loader import load_persona_configs
 
@@ -125,6 +126,7 @@ app.add_middleware(PersonaMiddleware)
 app.include_router(health.router, prefix="/api")
 app.include_router(interaction.router, prefix="/api")
 app.include_router(phidata_chat.router, prefix="/api")
+app.include_router(monitoring.router, prefix="/api")
 
 
 if __name__ == "__main__":

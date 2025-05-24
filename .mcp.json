@@ -1,0 +1,220 @@
+{
+  "name": "AI Orchestra MCP Configuration",
+  "version": "2.0.0",
+  "description": "Comprehensive MCP servers for AI Orchestra development with memory architecture",
+  "gateway": {
+    "url": "http://localhost:8000",
+    "description": "Unified MCP gateway for all servers",
+    "features": [
+      "Health monitoring",
+      "Request routing",
+      "Error handling",
+      "Metrics collection",
+      "Rate limiting",
+      "Caching"
+    ]
+  },
+  "servers": {
+    "gcp-cloud-run": {
+      "url": "http://localhost:8001",
+      "description": "Deploy and manage Cloud Run services",
+      "capabilities": ["deploy", "update", "status", "list", "logs", "scale"],
+      "requiredPermissions": ["roles/run.admin"],
+      "tools": [
+        {
+          "name": "deploy_service",
+          "description": "Deploy or update a Cloud Run service",
+          "parameters": {
+            "service_name": "string",
+            "image": "string",
+            "env_vars": "object",
+            "memory": "string",
+            "cpu": "string"
+          }
+        },
+        {
+          "name": "get_service_status",
+          "description": "Get the status of a Cloud Run service",
+          "parameters": {
+            "service_name": "string"
+          }
+        }
+      ]
+    },
+    "gcp-secrets": {
+      "url": "http://localhost:8002",
+      "description": "Manage Google Secret Manager",
+      "capabilities": ["get", "create", "update", "list", "versions"],
+      "requiredPermissions": ["roles/secretmanager.admin"],
+      "tools": [
+        {
+          "name": "get_secret",
+          "description": "Retrieve a secret value",
+          "parameters": {
+            "secret_id": "string",
+            "version": "string"
+          }
+        },
+        {
+          "name": "create_secret",
+          "description": "Create a new secret",
+          "parameters": {
+            "secret_id": "string",
+            "value": "string",
+            "labels": "object"
+          }
+        }
+      ]
+    },
+    "memory": {
+      "url": "http://localhost:8003",
+      "description": "Layered memory management system",
+      "capabilities": ["store", "retrieve", "query", "consolidate", "sync"],
+      "backends": {
+        "redis": "Short-term memory cache",
+        "firestore": "Mid-term episodic memory",
+        "qdrant": "Long-term semantic memory"
+      },
+      "tools": [
+        {
+          "name": "store_memory",
+          "description": "Store a memory in the appropriate layer",
+          "parameters": {
+            "content": "string",
+            "importance": "number",
+            "metadata": "object",
+            "agent_id": "string"
+          }
+        },
+        {
+          "name": "query_memory",
+          "description": "Query memories across all layers",
+          "parameters": {
+            "query": "string",
+            "agent_id": "string",
+            "memory_layers": "array",
+            "max_results": "integer"
+          }
+        }
+      ]
+    },
+    "orchestrator": {
+      "url": "http://localhost:8004",
+      "description": "AI agent orchestration and mode management",
+      "capabilities": ["switchMode", "runWorkflow", "getStatus", "executeTask"],
+      "modes": ["standard", "code", "debug", "architect", "strategy", "ask", "creative", "performance"],
+      "tools": [
+        {
+          "name": "switch_mode",
+          "description": "Switch agent to a different operational mode",
+          "parameters": {
+            "mode": "string",
+            "agent_id": "string",
+            "context": "object"
+          }
+        },
+        {
+          "name": "run_workflow",
+          "description": "Execute a predefined workflow",
+          "parameters": {
+            "name": "string",
+            "params": "object",
+            "priority": "integer"
+          }
+        }
+      ]
+    }
+  },
+  "memoryArchitecture": {
+    "shortTerm": {
+      "provider": "Redis",
+      "url": "redis://localhost:6379",
+      "ttl": "1 hour",
+      "purpose": "Recent agent states and temporary data",
+      "maxSize": "1GB"
+    },
+    "midTerm": {
+      "provider": "Firestore",
+      "project": "cherry-ai-project",
+      "retention": "30 days",
+      "purpose": "Episodic memory, conversations, task history",
+      "collections": ["memories", "agents", "conversations", "tasks"]
+    },
+    "longTerm": {
+      "provider": "Qdrant",
+      "url": "http://localhost:6333",
+      "retention": "permanent",
+      "purpose": "Semantic memory, embeddings, knowledge base",
+      "vectorDimension": 384,
+      "embeddingModel": "sentence-transformers/all-MiniLM-L6-v2"
+    }
+  },
+  "workflows": {
+    "code_review": {
+      "description": "Automated code review workflow",
+      "steps": ["analyze_code", "check_style", "generate_report"]
+    },
+    "test_automation": {
+      "description": "Generate and run tests automatically",
+      "steps": ["analyze_code", "generate_tests", "run_tests", "coverage_report"]
+    },
+    "performance_optimization": {
+      "description": "Optimize code performance",
+      "steps": ["profile_code", "identify_bottlenecks", "optimize_performance", "benchmark"]
+    },
+    "deployment": {
+      "description": "Full deployment pipeline",
+      "steps": ["run_tests", "build_image", "deploy_staging", "smoke_test", "deploy_production"]
+    },
+    "memory_consolidation": {
+      "description": "Consolidate short-term memories to long-term storage",
+      "steps": ["extract", "embed", "store", "index"]
+    }
+  },
+  "monitoring": {
+    "healthCheck": {
+      "interval": 30,
+      "endpoints": [
+        "http://localhost:8000/health",
+        "http://localhost:8001/health",
+        "http://localhost:8002/health",
+        "http://localhost:8003/health",
+        "http://localhost:8004/health"
+      ]
+    },
+    "metrics": {
+      "endpoint": "http://localhost:8000/metrics",
+      "format": "prometheus"
+    },
+    "dashboard": {
+      "command": "python mcp_server/monitoring/health_dashboard.py"
+    }
+  },
+  "performance": {
+    "caching": {
+      "enabled": true,
+      "ttl": 300,
+      "maxSize": 1000
+    },
+    "rateLimiting": {
+      "enabled": true,
+      "requestsPerMinute": 1000,
+      "burstSize": 100
+    },
+    "connectionPooling": {
+      "redis": {
+        "maxConnections": 100,
+        "minIdle": 10
+      },
+      "firestore": {
+        "maxConcurrentRequests": 50
+      }
+    }
+  },
+  "scripts": {
+    "start": "./start_mcp_system.sh",
+    "stop": "./stop_mcp_system.sh",
+    "test": "python test_mcp_system.py",
+    "monitor": "python mcp_server/monitoring/health_dashboard.py"
+  }
+}

@@ -56,6 +56,10 @@ class AgentRegistry:
         # Register the enhanced Phidata wrapper with team support
         self.register_wrapper_class("phidata", PhidataTeamAgentWrapper)
 
+        # Register the LangChain wrapper for modular LangChain agent support
+        from packages.agents.src.langchain_agent import LangChainAgentWrapper
+        self.register_wrapper_class("langchain", LangChainAgentWrapper)
+
         # Add other built-in wrappers as they are implemented
         # Example: self.register_wrapper_class("arno", ArnoAgentWrapper)
         # Example: self.register_wrapper_class("adk", ADKAgentWrapper)

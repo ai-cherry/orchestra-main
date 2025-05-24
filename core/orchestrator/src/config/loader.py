@@ -9,9 +9,9 @@ import time
 import logging
 from functools import lru_cache, wraps
 from pathlib import Path
-from typing import Dict, Optional, Callable, TypeVar, Any
+from typing import Dict, Callable, TypeVar, Any
 from google.cloud import secretmanager
-import portkey
+import portkey_ai as portkey
 import os
 
 from packages.shared.src.models.base_models import PersonaConfig
