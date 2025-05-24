@@ -17,7 +17,7 @@ import socket
 import sys
 import time
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 import requests
 
@@ -29,9 +29,9 @@ logger = logging.getLogger(__name__)
 class HealthMonitor:
     """Simple health monitoring for Orchestra services."""
 
-    def __init__(self, admin_ui_url: str = "http://localhost:3000"):
+    def __init__(self, admin_ui_url: str = "http://localhost:3000") -> None:
         self.admin_ui_url = admin_ui_url
-        self.services = {
+        self.services: dict[str, dict[str, Any]] = {
             "mcp_secret_manager": {"port": 8002, "name": "MCP Secret Manager"},
             "mcp_firestore": {"port": 8080, "name": "MCP Firestore"},
             "orchestrator": {"port": 8080, "name": "Core Orchestrator"},
@@ -47,7 +47,7 @@ class HealthMonitor:
         except Exception:
             return False
 
-    def check_service_health(self, service_name: str, config: Dict[str, Any]) -> Dict[str, Any]:
+    def check_service_health(self, service_name: str, config: dict[str, Any]) -> dict[str, Any]:
         """Check health of a specific service."""
         port = config["port"]
         name = config["name"]
@@ -90,11 +90,11 @@ class HealthMonitor:
 
         return result
 
-    def check_all_services(self) -> Dict[str, Any]:
+    def check_all_services(self) -> dict[str, Any]:
         """Check health of all configured services."""
         logger.info("Checking health of all services...")
 
-        results = {
+        results: dict[str, Any] = {
             "timestamp": datetime.now().isoformat(),
             "overall_status": "healthy",
             "services": {},
@@ -116,7 +116,7 @@ class HealthMonitor:
 
         return results
 
-    def send_notification(self, message: str, level: str = "info", data: Dict = None) -> bool:
+    def send_notification(self, message: str, level: str = "info", data: dict[str, Any] | None = None) -> bool:
         """Send notification to admin UI."""
         try:
             notification_payload = {
@@ -186,8 +186,8 @@ class HealthMonitor:
         """Monitor services continuously and alert on changes."""
         logger.info(f"Starting continuous monitoring (interval: {interval}s)")
 
-        previous_status = None
-        consecutive_failures = {}
+        previous_status: dict[str, Any] | None = None
+        consecutive_failures: dict[str, int] = {}
 
         while True:
             try:
@@ -229,9 +229,9 @@ class HealthMonitor:
                 logger.error(f"Error during monitoring: {e}")
                 await asyncio.sleep(interval)
 
-    def check_prerequisites(self) -> Dict[str, Any]:
+    def check_prerequisites(self) -> dict[str, Any]:
         """Check system prerequisites and dependencies."""
-        results = {"timestamp": datetime.now().isoformat(), "status": "ok", "checks": {}}
+        results: dict[str, Any] = {"timestamp": datetime.now().isoformat(), "status": "ok", "checks": {}}
 
         # Check Python version
         python_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
@@ -251,7 +251,7 @@ class HealthMonitor:
         # Check required files
         required_files = ["requirements/base.txt", "scripts/check_venv.py", "core/orchestrator/src/api/app.py"]
 
-        missing_files = []
+        missing_files: list[str] = []
         for file_path in required_files:
             import os
 
@@ -268,7 +268,7 @@ class HealthMonitor:
         return results
 
 
-def main():
+def main() -> int:
     """Main entry point for the health monitor."""
     import argparse
 
@@ -291,12 +291,12 @@ def main():
 
     if args.check_prereqs:
         results = monitor.check_prerequisites()
-        print(json.dumps(results, indent=2))
+        logger.info(json.dumps(results, indent=2))
         return 0 if results["status"] == "ok" else 1
 
     if args.check_services:
         results = monitor.check_all_services()
-        print(json.dumps(results, indent=2))
+        logger.info(json.dumps(results, indent=2))
         return 0 if results["overall_status"] == "healthy" else 1
 
     if args.wait_for:

@@ -22,7 +22,6 @@ import os
 import re
 import subprocess
 import sys
-from typing import Dict, List
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -32,9 +31,9 @@ logger = logging.getLogger(__name__)
 class AICodeReviewer:
     """Reviews code for AI-generated anti-patterns and project consistency."""
 
-    def __init__(self):
-        self.issues = []
-        self.warnings = []
+    def __init__(self) -> None:
+        self.issues: list[str] = []
+        self.warnings: list[str] = []
         self.project_root = os.getcwd()
 
         # Files to exclude from review (contain educational examples)
@@ -87,7 +86,7 @@ class AICodeReviewer:
             "check_dependencies": "scripts/check_dependencies.py",
         }
 
-    def check_file(self, filepath: str) -> Dict[str, List[str]]:
+    def check_file(self, filepath: str) -> dict[str, list[str]]:
         """Check a single file for issues."""
         if not os.path.exists(filepath):
             return {"errors": [f"File not found: {filepath}"], "warnings": []}
@@ -98,7 +97,7 @@ class AICodeReviewer:
             logger.info(f"Skipping excluded file: {filename} (contains educational examples)")
             return {"errors": [], "warnings": []}
 
-        results = {"errors": [], "warnings": []}
+        results: dict[str, list[str]] = {"errors": [], "warnings": []}
 
         # Check if it's a forbidden file type
         if filename in self.forbidden_files:
@@ -110,7 +109,7 @@ class AICodeReviewer:
             return results
 
         try:
-            with open(filepath, "r") as f:
+            with open(filepath) as f:
                 content = f.read()
 
             # Check for forbidden imports
@@ -145,7 +144,7 @@ class AICodeReviewer:
 
         return results
 
-    def _analyze_ast(self, tree: ast.AST, filepath: str, results: Dict[str, List[str]]) -> None:
+    def _analyze_ast(self, tree: ast.AST, filepath: str, results: dict[str, list[str]]) -> None:
         """Analyze AST for patterns."""
         # Check for overly complex classes
         for node in ast.walk(tree):
@@ -164,7 +163,7 @@ class AICodeReviewer:
                 if any(kw.arg == "metaclass" for kw in node.keywords):
                     results["errors"].append(f"Metaclass usage in {node.name} - too complex!")
 
-    def check_for_duplicates(self, filepath: str) -> List[str]:
+    def check_for_duplicates(self, filepath: str) -> list[str]:
         """Check if functionality already exists in the project."""
         if not filepath.endswith(".py"):
             return []
@@ -174,10 +173,10 @@ class AICodeReviewer:
         if filename in self.excluded_files:
             return []
 
-        duplicates = []
+        duplicates: list[str] = []
 
         try:
-            with open(filepath, "r") as f:
+            with open(filepath) as f:
                 content = f.read()
 
             # Check for validator functions
@@ -201,15 +200,19 @@ class AICodeReviewer:
 
         return duplicates
 
-    def check_git_changes(self) -> Dict[str, Dict[str, List[str]]]:
+    def check_git_changes(self) -> dict[str, dict[str, list[str]]]:
         """Check all files changed in git."""
         try:
             # Get list of changed files
-            result = subprocess.run(["git", "diff", "--name-only", "--cached", "HEAD"], capture_output=True, text=True)
+            result = subprocess.run(
+                ["git", "diff", "--name-only", "--cached", "HEAD"], capture_output=True, text=True
+            )  # noqa: S603,S607
 
             if result.returncode != 0:
                 # Try unstaged changes
-                result = subprocess.run(["git", "diff", "--name-only"], capture_output=True, text=True)
+                result = subprocess.run(
+                    ["git", "diff", "--name-only"], capture_output=True, text=True
+                )  # noqa: S603,S607
 
             if result.returncode != 0:
                 return {"error": {"errors": ["Failed to get git changes"], "warnings": []}}
@@ -232,7 +235,7 @@ class AICodeReviewer:
         except Exception as e:
             return {"error": {"errors": [f"Git error: {e}"], "warnings": []}}
 
-    def full_project_scan(self) -> Dict[str, Dict[str, List[str]]]:
+    def full_project_scan(self) -> dict[str, dict[str, list[str]]]:
         """Scan entire project for issues."""
         all_results = {}
 
@@ -242,7 +245,7 @@ class AICodeReviewer:
                 all_results[forbidden_file] = {"errors": [f"Forbidden file exists: {forbidden_file}"], "warnings": []}
 
         # Scan Python files
-        for root, dirs, files in os.walk(self.project_root):
+        for root, _dirs, files in os.walk(self.project_root):
             # Skip virtual environment
             if "venv" in root or "__pycache__" in root:
                 continue
@@ -257,7 +260,7 @@ class AICodeReviewer:
 
         return all_results
 
-    def generate_report(self, results: Dict[str, Dict[str, List[str]]]) -> str:
+    def generate_report(self, results: dict[str, dict[str, list[str]]]) -> str:
         """Generate a readable report from results."""
         if not results:
             return "✅ No issues found! Code follows project standards."
@@ -298,7 +301,7 @@ class AICodeReviewer:
         return "\n".join(report)
 
 
-def main():
+def main() -> int:
     """Main entry point for AI code reviewer."""
     parser = argparse.ArgumentParser(description="AI Code Reviewer - Maintain project consistency")
 
@@ -339,9 +342,9 @@ def main():
     if args.output:
         with open(args.output, "w") as f:
             f.write(report)
-        print(f"Report written to {args.output}")
+        logger.info(f"Report written to {args.output}")
     else:
-        print(report)
+        logger.info(report)
 
     # Return non-zero if errors found
     total_errors = sum(len(r.get("errors", [])) for r in results.values())

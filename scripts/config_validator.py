@@ -18,7 +18,7 @@ import json
 import logging
 import os
 import sys
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import yaml
 from google.cloud import firestore, secretmanager
@@ -32,12 +32,12 @@ logger = logging.getLogger(__name__)
 class ConfigValidator:
     """Comprehensive configuration validator for the Orchestra system."""
 
-    def __init__(self, project_id: str = "cherry-ai-project"):
+    def __init__(self, project_id: str = "cherry-ai-project") -> None:
         self.project_id = project_id
-        self.errors: List[str] = []
-        self.warnings: List[str] = []
+        self.errors: list[str] = []
+        self.warnings: list[str] = []
 
-    async def validate_all(self) -> Tuple[bool, Dict[str, Any]]:
+    async def validate_all(self) -> tuple[bool, dict[str, Any]]:
         """
         Run all validation checks.
 
@@ -46,7 +46,7 @@ class ConfigValidator:
         """
         logger.info("Starting comprehensive configuration validation...")
 
-        results = {"success": True, "checks": {}, "errors": [], "warnings": [], "timestamp": None}
+        results: dict[str, Any] = {"success": True, "checks": {}, "errors": [], "warnings": [], "timestamp": None}
 
         # Run validation checks
         checks = [
@@ -79,7 +79,7 @@ class ConfigValidator:
 
         return results["success"], results
 
-    async def _validate_yaml_configs(self) -> Dict[str, Any]:
+    async def _validate_yaml_configs(self) -> dict[str, Any]:
         """Validate all YAML configuration files."""
         yaml_files = [
             "mcp-servers/gcp-resources-server.yaml",
@@ -90,12 +90,12 @@ class ConfigValidator:
             "cloudbuild_data_sync.yaml",
         ]
 
-        results = {"success": True, "files": {}}
+        results: dict[str, Any] = {"success": True, "files": {}}
 
         for yaml_file in yaml_files:
             if os.path.exists(yaml_file):
                 try:
-                    with open(yaml_file, "r") as f:
+                    with open(yaml_file) as f:
                         yaml.safe_load(f)
                     results["files"][yaml_file] = {"valid": True}
                     logger.info(f"✓ {yaml_file} is valid YAML")
@@ -109,23 +109,25 @@ class ConfigValidator:
 
         return results
 
-    async def _validate_mcp_server_configs(self) -> Dict[str, Any]:
+    async def _validate_mcp_server_configs(self) -> dict[str, Any]:
         """Validate MCP server configurations."""
         mcp_configs = {
             "secret_manager": {"port": 8002, "config_file": "mcp-servers/gcp-resources-server.yaml"},
             "firestore": {"port": 8080, "config_file": "core/orchestrator/src/config/phi_config.yaml"},
         }
 
-        results = {"success": True, "servers": {}}
+        results: dict[str, Any] = {"success": True, "servers": {}}
 
         for server_name, config in mcp_configs.items():
-            server_result = {"config_valid": False, "port_available": False}
+            server_result = {"config_valid": "unknown", "port_status": "unknown"}
 
             # Check config file exists
-            if os.path.exists(config["config_file"]):
-                server_result["config_valid"] = True
+            config_file_path = str(config["config_file"])
+            if os.path.exists(config_file_path):
+                server_result["config_valid"] = "true"
             else:
                 self.errors.append(f"MCP server config missing: {config['config_file']}")
+                server_result["config_valid"] = "false"
                 results["success"] = False
 
             # Check port availability
@@ -139,8 +141,10 @@ class ConfigValidator:
                     if result == 0:
                         server_result["port_status"] = "in_use"
                         logger.info(f"Port {port} is in use (server may be running)")
-                    else:
+                    elif result == 1:
                         server_result["port_status"] = "available"
+                    else:
+                        server_result["port_status"] = f"error: {result}"
             except Exception as e:
                 server_result["port_status"] = f"error: {e}"
                 self.warnings.append(f"Could not check port {port}: {e}")
@@ -149,11 +153,11 @@ class ConfigValidator:
 
         return results
 
-    async def _validate_environment(self) -> Dict[str, Any]:
+    async def _validate_environment(self) -> dict[str, Any]:
         """Validate environment variables and system requirements."""
         required_env = ["PROJECT_ID", "FIRESTORE_COLLECTION", "PREFERRED_LLM_PROVIDER"]
 
-        results = {"success": True, "environment": {}}
+        results: dict[str, Any] = {"success": True, "environment": {}}
 
         for var in required_env:
             value = os.getenv(var)
@@ -178,9 +182,9 @@ class ConfigValidator:
 
         return results
 
-    async def _validate_gcp_connectivity(self) -> Dict[str, Any]:
+    async def _validate_gcp_connectivity(self) -> dict[str, Any]:
         """Validate GCP service connectivity."""
-        results = {"success": True, "services": {}}
+        results: dict[str, Any] = {"success": True, "services": {}}
 
         # Test Firestore connectivity
         try:
@@ -209,9 +213,9 @@ class ConfigValidator:
 
         return results
 
-    async def _validate_firestore_schema(self) -> Dict[str, Any]:
+    async def _validate_firestore_schema(self) -> dict[str, Any]:
         """Validate Firestore collection schema and structure."""
-        results = {"success": True, "collections": {}}
+        results: dict[str, Any] = {"success": True, "collections": {}}
 
         required_collections = ["agents", "agent_logs", "memory_operations", "memories"]
 
@@ -237,9 +241,9 @@ class ConfigValidator:
 
         return results
 
-    async def _validate_secret_access(self) -> Dict[str, Any]:
+    async def _validate_secret_access(self) -> dict[str, Any]:
         """Validate access to required secrets."""
-        results = {"success": True, "secrets": {}}
+        results: dict[str, Any] = {"success": True, "secrets": {}}
 
         # Common secret names that might be used
         common_secrets = ["openrouter-api-key", "anthropic-api-key", "gemini-api-key"]
@@ -265,9 +269,9 @@ class ConfigValidator:
 
         return results
 
-    async def _validate_file_permissions(self) -> Dict[str, Any]:
+    async def _validate_file_permissions(self) -> dict[str, Any]:
         """Validate file permissions for critical files."""
-        results = {"success": True, "files": {}}
+        results: dict[str, Any] = {"success": True, "files": {}}
 
         critical_files = ["scripts/check_venv.py", "scripts/check_dependencies.py", "requirements/base.txt", "Makefile"]
 
@@ -293,9 +297,9 @@ class ConfigValidator:
 
         return results
 
-    async def _validate_agent_configs(self) -> Dict[str, Any]:
+    async def _validate_agent_configs(self) -> dict[str, Any]:
         """Validate agent configuration files."""
-        results = {"success": True, "configs": {}}
+        results: dict[str, Any] = {"success": True, "configs": {}}
 
         agent_config_files = [
             "packages/agents/src/config_examples/phidata_config_example.yaml",
@@ -307,7 +311,7 @@ class ConfigValidator:
         for config_file in agent_config_files:
             if os.path.exists(config_file):
                 try:
-                    with open(config_file, "r") as f:
+                    with open(config_file) as f:
                         config_data = yaml.safe_load(f)
 
                     # Basic validation - check for required fields
@@ -333,7 +337,7 @@ class ConfigValidator:
         return results
 
 
-async def main():
+async def main() -> int:
     """Main entry point for the configuration validator."""
     import argparse
 
@@ -360,27 +364,27 @@ async def main():
     if args.output:
         with open(args.output, "w") as f:
             json.dump(results, f, indent=2)
-        print(f"Results written to {args.output}")
+        logger.info(f"Results written to {args.output}")
 
     # Print summary
-    print(f"\n{'='*60}")
-    print(f"Configuration Validation {'PASSED' if success else 'FAILED'}")
-    print(f"{'='*60}")
+    logger.info(f"\n{'='*60}")
+    logger.info(f"Configuration Validation {'PASSED' if success else 'FAILED'}")
+    logger.info(f"{'='*60}")
 
     if results["errors"]:
-        print(f"\n❌ ERRORS ({len(results['errors'])}):")
+        logger.info(f"\n❌ ERRORS ({len(results['errors'])}):")
         for error in results["errors"]:
-            print(f"  • {error}")
+            logger.info(f"  • {error}")
 
     if results["warnings"]:
-        print(f"\n⚠️  WARNINGS ({len(results['warnings'])}):")
+        logger.info(f"\n⚠️  WARNINGS ({len(results['warnings'])}):")
         for warning in results["warnings"]:
-            print(f"  • {warning}")
+            logger.info(f"  • {warning}")
 
     # Check summary
     passed_checks = sum(1 for check in results["checks"].values() if check.get("success", False))
     total_checks = len(results["checks"])
-    print(f"\n✅ PASSED: {passed_checks}/{total_checks} checks")
+    logger.info(f"\n✅ PASSED: {passed_checks}/{total_checks} checks")
 
     if args.fail_fast and not success:
         sys.exit(1)
