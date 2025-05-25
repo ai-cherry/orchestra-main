@@ -23,4 +23,4 @@ COPY . .
 EXPOSE 8080
 
 # Entrypoint for Cloud Run (use uvicorn directly)
-CMD ["uvicorn", "orchestra_api.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
