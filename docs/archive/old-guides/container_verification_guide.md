@@ -63,7 +63,7 @@
 
 The `verify_container.sh` script will check for the following:
 
-1. **Python version** - Should be version 3.11
+1. **Python version** - Should be version 3.10
 2. **Poetry version**
 3. **Docker version**
 4. **Terraform version** - Should be version 1.5.x
@@ -88,7 +88,7 @@ User: [your username]
 Current directory: [working directory]
 
 ==== Python Version ====
-Python 3.11.x
+Python 3.10.x
 
 ==== Poetry Version ====
 Poetry (version x.x.x)

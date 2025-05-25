@@ -32,13 +32,21 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize FastAPI app
-app = FastAPI(title="Memory Management MCP Server", description="Layered memory system for AI agents", version="1.0.0")
+app = FastAPI(
+    title="Memory Management MCP Server",
+    description="Layered memory system for AI agents",
+    version="1.0.0",
+)
 
 # Configuration (now loaded from unified config)
 REDIS_URL = memory_config.storage.connection_string or "redis://localhost:6379"
-FIRESTORE_PROJECT = os.getenv("FIRESTORE_PROJECT") or os.getenv("GCP_PROJECT_ID") or "default-project"
+FIRESTORE_PROJECT = (
+    os.getenv("FIRESTORE_PROJECT") or os.getenv("GCP_PROJECT_ID") or "default-project"
+)
 QDRANT_URL = os.getenv("QDRANT_URL") or "http://localhost:6333"
-EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL") or "sentence-transformers/all-MiniLM-L6-v2"
+EMBEDDING_MODEL = (
+    os.getenv("EMBEDDING_MODEL") or "sentence-transformers/all-MiniLM-L6-v2"
+)
 
 # Prefer config values if present
 if hasattr(memory_config, "redis_url") and memory_config.redis_url:
@@ -100,8 +108,12 @@ class ConsolidationRequest(BaseModel):
     """Request for memory consolidation"""
 
     agent_id: Optional[str] = None
-    max_age_hours: int = Field(default=24, description="Max age for short-term memories")
-    importance_threshold: float = Field(default=0.7, description="Min importance for long-term")
+    max_age_hours: int = Field(
+        default=24, description="Max age for short-term memories"
+    )
+    importance_threshold: float = Field(
+        default=0.7, description="Min importance for long-term"
+    )
 
 
 class MCPToolDefinition(BaseModel):
@@ -159,7 +171,12 @@ async def store_mid_term(memory: MemoryItem) -> bool:
         # Update agent's memory collection
         if memory.agent_id:
             agent_ref = firestore_client.collection("agents").document(memory.agent_id)
-            agent_ref.update({"memory_ids": firestore.ArrayUnion([memory.id]), "last_updated": datetime.utcnow()})
+            agent_ref.update(
+                {
+                    "memory_ids": firestore.ArrayUnion([memory.id]),
+                    "last_updated": datetime.utcnow(),
+                }
+            )
 
         return True
     except Exception as e:
@@ -177,7 +194,8 @@ async def store_long_term(memory: MemoryItem, embedding: np.ndarray) -> bool:
         collections = qdrant_client.get_collections().collections
         if not any(c.name == "long_term_memory" for c in collections):
             qdrant_client.create_collection(
-                collection_name="long_term_memory", vectors_config=VectorParams(size=384, distance=Distance.COSINE)
+                collection_name="long_term_memory",
+                vectors_config=VectorParams(size=384, distance=Distance.COSINE),
             )
 
         # Store the memory
@@ -214,8 +232,14 @@ async def get_tools() -> List[MCPToolDefinition]:
                 "type": "object",
                 "properties": {
                     "content": {"type": "string", "description": "Memory content"},
-                    "importance": {"type": "number", "description": "Importance score (0-1)"},
-                    "metadata": {"type": "object", "description": "Additional metadata"},
+                    "importance": {
+                        "type": "number",
+                        "description": "Importance score (0-1)",
+                    },
+                    "metadata": {
+                        "type": "object",
+                        "description": "Additional metadata",
+                    },
                     "agent_id": {"type": "string", "description": "Agent identifier"},
                     "memory_type": {"type": "string", "description": "Type of memory"},
                 },
@@ -230,8 +254,14 @@ async def get_tools() -> List[MCPToolDefinition]:
                 "properties": {
                     "query": {"type": "string", "description": "Search query"},
                     "agent_id": {"type": "string", "description": "Filter by agent"},
-                    "memory_layers": {"type": "array", "description": "Layers to search"},
-                    "max_results": {"type": "integer", "description": "Maximum results"},
+                    "memory_layers": {
+                        "type": "array",
+                        "description": "Layers to search",
+                    },
+                    "max_results": {
+                        "type": "integer",
+                        "description": "Maximum results",
+                    },
                 },
                 "required": ["query"],
             },
@@ -242,8 +272,14 @@ async def get_tools() -> List[MCPToolDefinition]:
             parameters={
                 "type": "object",
                 "properties": {
-                    "agent_id": {"type": "string", "description": "Agent to consolidate for"},
-                    "importance_threshold": {"type": "number", "description": "Min importance"},
+                    "agent_id": {
+                        "type": "string",
+                        "description": "Agent to consolidate for",
+                    },
+                    "importance_threshold": {
+                        "type": "number",
+                        "description": "Min importance",
+                    },
                 },
             },
         ),
@@ -254,7 +290,10 @@ async def get_tools() -> List[MCPToolDefinition]:
                 "type": "object",
                 "properties": {
                     "agent_id": {"type": "string", "description": "Agent identifier"},
-                    "memory_layer": {"type": "string", "description": "Memory layer to query"},
+                    "memory_layer": {
+                        "type": "string",
+                        "description": "Memory layer to query",
+                    },
                 },
                 "required": ["agent_id"],
             },
@@ -263,7 +302,9 @@ async def get_tools() -> List[MCPToolDefinition]:
 
 
 @app.post("/mcp/store_memory")
-async def store_memory(memory: MemoryItem, background_tasks: BackgroundTasks) -> Dict[str, Any]:
+async def store_memory(
+    memory: MemoryItem, background_tasks: BackgroundTasks
+) -> Dict[str, Any]:
     """Store a memory in the appropriate layer"""
     # Generate ID if not provided
     if not memory.id:
@@ -320,7 +361,9 @@ async def query_memory(query: MemoryQuery) -> List[Dict[str, Any]]:
 
                     # Simple text matching for short-term
                     if query.query.lower() in memory["content"].lower():
-                        results.append({**memory, "layer": "short-term", "score": 0.8})  # Fixed score for text match
+                        results.append(
+                            {**memory, "layer": "short-term", "score": 0.8}
+                        )  # Fixed score for text match
         except Exception as e:
             logger.error(f"Error searching short-term memory: {e}")
 

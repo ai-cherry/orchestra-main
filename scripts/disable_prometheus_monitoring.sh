@@ -25,14 +25,14 @@ SERVICES=(
 
 for SERVICE in "${SERVICES[@]}"; do
     echo "Processing: $SERVICE"
-    
+
     # Update the service to remove Prometheus sidecar
     gcloud run services update $SERVICE \
         --platform=managed \
         --region=$REGION \
         --clear-env-vars=ENABLE_PROMETHEUS_SIDECAR \
         --quiet 2>/dev/null
-    
+
     if [ $? -eq 0 ]; then
         echo "✅ Successfully disabled Prometheus for $SERVICE"
     else
@@ -55,4 +55,4 @@ echo ""
 echo "To view your Cloud Run metrics:"
 echo "1. Go to: https://console.cloud.google.com/run"
 echo "2. Click on any service"
-echo "3. Navigate to the 'Metrics' tab" 
+echo "3. Navigate to the 'Metrics' tab"

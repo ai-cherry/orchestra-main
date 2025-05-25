@@ -15,7 +15,11 @@ import portkey
 from vertexai.preview import generative_models
 
 from data_source_integrations import DataAggregationOrchestrator
-from enhanced_vector_memory_system import ContextualMemory, ConversationContext, EnhancedVectorMemorySystem
+from enhanced_vector_memory_system import (
+    ContextualMemory,
+    ConversationContext,
+    EnhancedVectorMemorySystem,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -82,7 +86,12 @@ class IntentClassifier:
             r"performance.*of",
         ],
         "ask_question": [r"how.*", r"why.*", r"what.*is", r"explain.*", r"help.*with"],
-        "schedule_action": [r"schedule.*", r"remind.*me", r"set.*up", r"create.*meeting"],
+        "schedule_action": [
+            r"schedule.*",
+            r"remind.*me",
+            r"set.*up",
+            r"create.*meeting",
+        ],
         "data_sync": [r"sync.*data", r"update.*from", r"pull.*latest", r"refresh.*"],
     }
 
@@ -106,7 +115,9 @@ class ContextualResponseGenerator:
 
         # Initialize AI models
         self.gemini = generative_models.GenerativeModel("gemini-1.5-pro")
-        self.portkey = portkey.Client(api_key=portkey_api_key, config={"virtual_key": "vertex-agent-special"})
+        self.portkey = portkey.Client(
+            api_key=portkey_api_key, config={"virtual_key": "vertex-agent-special"}
+        )
 
         # Model routing based on query type
         self.model_routing = {
@@ -127,7 +138,9 @@ class ContextualResponseGenerator:
         """Generate a contextual response with metadata."""
 
         # Build enhanced prompt with context
-        enhanced_prompt = await self._build_enhanced_prompt(query, context, mode, intent)
+        enhanced_prompt = await self._build_enhanced_prompt(
+            query, context, mode, intent
+        )
 
         # Select appropriate model
         model = self.model_routing.get(mode.value, "gemini-pro")
@@ -147,14 +160,24 @@ class ContextualResponseGenerator:
             # Fallback to Gemini
             try:
                 response = self.gemini.generate_content(enhanced_prompt).text
-                metadata = {"model": "gemini-fallback", "timestamp": datetime.utcnow().isoformat()}
+                metadata = {
+                    "model": "gemini-fallback",
+                    "timestamp": datetime.utcnow().isoformat(),
+                }
                 return response, metadata
             except Exception as fallback_error:
                 logger.error(f"All models failed: {fallback_error}")
-                return "I'm having trouble processing your request right now. Please try again.", {}
+                return (
+                    "I'm having trouble processing your request right now. Please try again.",
+                    {},
+                )
 
     async def _build_enhanced_prompt(
-        self, query: str, context: ConversationContext, mode: ConversationMode, intent: Optional[str]
+        self,
+        query: str,
+        context: ConversationContext,
+        mode: ConversationMode,
+        intent: Optional[str],
     ) -> str:
         """Build an enhanced prompt with rich context."""
 
@@ -240,7 +263,9 @@ class ContextualResponseGenerator:
             logger.error(f"Portkey generation failed with model {model}: {e}")
             raise
 
-    async def _extract_response_metadata(self, response: str, context: ConversationContext) -> Dict[str, Any]:
+    async def _extract_response_metadata(
+        self, response: str, context: ConversationContext
+    ) -> Dict[str, Any]:
         """Extract metadata from the generated response."""
 
         metadata = {
@@ -252,10 +277,20 @@ class ContextualResponseGenerator:
         }
 
         # Analyze response for action items
-        action_indicators = ["should", "recommend", "suggest", "next step", "follow up", "schedule", "contact"]
+        action_indicators = [
+            "should",
+            "recommend",
+            "suggest",
+            "next step",
+            "follow up",
+            "schedule",
+            "contact",
+        ]
 
         response_lower = response.lower()
-        suggested_actions = [action for action in action_indicators if action in response_lower]
+        suggested_actions = [
+            action for action in action_indicators if action in response_lower
+        ]
 
         if suggested_actions:
             metadata["suggested_actions"] = suggested_actions
@@ -288,7 +323,9 @@ class EnhancedNaturalLanguageInterface:
 
         # Initialize components
         self.intent_classifier = IntentClassifier()
-        self.response_generator = ContextualResponseGenerator(project_id, portkey_api_key)
+        self.response_generator = ContextualResponseGenerator(
+            project_id, portkey_api_key
+        )
 
         # Active conversations
         self.active_sessions: Dict[str, ConversationSession] = {}
@@ -338,7 +375,9 @@ class EnhancedNaturalLanguageInterface:
 
         session = self.active_sessions.get(conversation_id)
         if not session:
-            raise ValueError(f"No active session found for conversation {conversation_id}")
+            raise ValueError(
+                f"No active session found for conversation {conversation_id}"
+            )
 
         # Classify intent
         intent = self.intent_classifier.classify_intent(message)
@@ -366,7 +405,9 @@ class EnhancedNaturalLanguageInterface:
         else:
             return await self._handle_general_query(session, message)
 
-    async def _handle_data_sync(self, session: ConversationSession, message: str) -> ConversationMessage:
+    async def _handle_data_sync(
+        self, session: ConversationSession, message: str
+    ) -> ConversationMessage:
         """Handle data synchronization requests."""
 
         # Extract data sources from message
@@ -385,7 +426,9 @@ class EnhancedNaturalLanguageInterface:
             sync_results = {}
             for source in sources_mentioned:
                 if source in self.data_orchestrator.integrations:
-                    count = await self.data_orchestrator.integrations[source].sync_data()
+                    count = await self.data_orchestrator.integrations[
+                        source
+                    ].sync_data()
                     sync_results[source] = count
 
         # Generate response
@@ -411,7 +454,9 @@ class EnhancedNaturalLanguageInterface:
 
         return response_message
 
-    async def _handle_memory_search(self, session: ConversationSession, message: str) -> ConversationMessage:
+    async def _handle_memory_search(
+        self, session: ConversationSession, message: str
+    ) -> ConversationMessage:
         """Handle memory search requests."""
 
         # Extract search parameters from message
@@ -436,7 +481,9 @@ class EnhancedNaturalLanguageInterface:
         if memories:
             response_content = f"Found {len(memories)} relevant items:\n\n"
             for i, memory in enumerate(memories[:5], 1):
-                response_content += f"{i}. From {memory.source.upper()}: {memory.content[:200]}...\n"
+                response_content += (
+                    f"{i}. From {memory.source.upper()}: {memory.content[:200]}...\n"
+                )
                 response_content += f"   Relevance: {memory.relevance_score:.2f}\n\n"
         else:
             response_content = "No relevant information found in memory. Try rephrasing your query or check if data has been synchronized recently."
@@ -456,7 +503,9 @@ class EnhancedNaturalLanguageInterface:
 
         return response_message
 
-    async def _handle_data_analysis(self, session: ConversationSession, message: str) -> ConversationMessage:
+    async def _handle_data_analysis(
+        self, session: ConversationSession, message: str
+    ) -> ConversationMessage:
         """Handle data analysis requests."""
 
         # Update context with analytical focus
@@ -466,7 +515,10 @@ class EnhancedNaturalLanguageInterface:
 
         # Generate analytical response
         response_content, metadata = await self.response_generator.generate_response(
-            query=message, context=context, mode=ConversationMode.ANALYTICAL, intent="analyze_data"
+            query=message,
+            context=context,
+            mode=ConversationMode.ANALYTICAL,
+            intent="analyze_data",
         )
 
         response_message = ConversationMessage(
@@ -484,7 +536,9 @@ class EnhancedNaturalLanguageInterface:
 
         return response_message
 
-    async def _handle_general_query(self, session: ConversationSession, message: str) -> ConversationMessage:
+    async def _handle_general_query(
+        self, session: ConversationSession, message: str
+    ) -> ConversationMessage:
         """Handle general queries with full context."""
 
         # Update conversation context
@@ -541,7 +595,9 @@ class EnhancedNaturalLanguageInterface:
 
             # Save conversation summary to memory
             if session.messages:
-                conversation_summary = f"Conversation Summary: {len(session.messages)} messages exchanged"
+                conversation_summary = (
+                    f"Conversation Summary: {len(session.messages)} messages exchanged"
+                )
 
                 await self.memory_system.add_memory(
                     user_id=session.user_id,
@@ -550,7 +606,9 @@ class EnhancedNaturalLanguageInterface:
                     source_metadata={
                         "conversation_id": conversation_id,
                         "message_count": len(session.messages),
-                        "duration": (session.updated_at - session.created_at).total_seconds(),
+                        "duration": (
+                            session.updated_at - session.created_at
+                        ).total_seconds(),
                         "mode": session.mode.value,
                     },
                     context_tags=["conversation", "summary"],
@@ -561,4 +619,8 @@ class EnhancedNaturalLanguageInterface:
 
     def get_active_conversations(self, user_id: str) -> List[ConversationSession]:
         """Get all active conversations for a user."""
-        return [session for session in self.active_sessions.values() if session.user_id == user_id]
+        return [
+            session
+            for session in self.active_sessions.values()
+            if session.user_id == user_id
+        ]

@@ -35,7 +35,11 @@ def print_header(text: str):
 
 def print_status(name: str, status: bool, message: str = ""):
     """Print a status line with color coding"""
-    status_text = f"{Colors.GREEN}✓ PASS{Colors.RESET}" if status else f"{Colors.RED}✗ FAIL{Colors.RESET}"
+    status_text = (
+        f"{Colors.GREEN}✓ PASS{Colors.RESET}"
+        if status
+        else f"{Colors.RED}✗ FAIL{Colors.RESET}"
+    )
     print(f"{name:<40} {status_text} {message}")
 
 
@@ -47,13 +51,21 @@ def print_section(title: str):
 
 class MCPTestSuite:
     def __init__(self):
-        self.results = {"mcp_servers": {}, "claude_api": {}, "monitoring": {}, "configurations": {}, "overall": True}
+        self.results = {
+            "mcp_servers": {},
+            "claude_api": {},
+            "monitoring": {},
+            "configurations": {},
+            "overall": True,
+        }
         self.base_dir = Path("/home/paperspace/orchestra-main")
 
     def run_command(self, cmd: List[str], timeout: int = 30) -> Tuple[int, str, str]:
         """Run a command and return exit code, stdout, stderr"""
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, cwd=self.base_dir)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=timeout, cwd=self.base_dir
+            )
             return result.returncode, result.stdout, result.stderr
         except subprocess.TimeoutExpired:
             return -1, "", "Command timed out"
@@ -82,7 +94,10 @@ class MCPTestSuite:
         try:
             # Start the server process
             process = await asyncio.create_subprocess_exec(
-                *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=self.base_dir
+                *cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=self.base_dir,
             )
 
             # Wait a bit for server to start
@@ -98,7 +113,9 @@ class MCPTestSuite:
             else:
                 # Server crashed
                 stdout, stderr = await process.communicate()
-                print(f"  {Colors.RED}Server crashed with code {process.returncode}{Colors.RESET}")
+                print(
+                    f"  {Colors.RED}Server crashed with code {process.returncode}{Colors.RESET}"
+                )
                 if stderr:
                     print(f"  Error: {stderr.decode()[:200]}...")
                 return False
@@ -121,7 +138,11 @@ class MCPTestSuite:
 
         # Test API connectivity
         try:
-            headers = {"x-api-key": api_key, "anthropic-version": "2023-06-01", "content-type": "application/json"}
+            headers = {
+                "x-api-key": api_key,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json",
+            }
 
             # Simple test request
             data = {
@@ -130,13 +151,22 @@ class MCPTestSuite:
                 "messages": [{"role": "user", "content": "Hi"}],
             }
 
-            response = requests.post("https://api.anthropic.com/v1/messages", headers=headers, json=data, timeout=10)
+            response = requests.post(
+                "https://api.anthropic.com/v1/messages",
+                headers=headers,
+                json=data,
+                timeout=10,
+            )
 
             if response.status_code == 200:
-                print_status("API Connectivity", True, "Successfully connected to Claude API")
+                print_status(
+                    "API Connectivity", True, "Successfully connected to Claude API"
+                )
                 return True
             else:
-                print_status("API Connectivity", False, f"Status code: {response.status_code}")
+                print_status(
+                    "API Connectivity", False, f"Status code: {response.status_code}"
+                )
                 return False
 
         except Exception as e:
@@ -176,7 +206,9 @@ class MCPTestSuite:
             all_good = False
 
         # Check if monitoring endpoints are defined
-        monitoring_script = self.base_dir / "mcp_server" / "utils" / "performance_monitor.py"
+        monitoring_script = (
+            self.base_dir / "mcp_server" / "utils" / "performance_monitor.py"
+        )
         if monitoring_script.exists():
             print_status("Performance Monitor", True, "Module found")
         else:
@@ -317,7 +349,9 @@ class MCPTestSuite:
         else:
             print(f"{Colors.RED}SOME TESTS FAILED{Colors.RESET}")
 
-        print(f"\nTests Passed: {passed_tests}/{total_tests} ({passed_tests/total_tests*100:.1f}%)")
+        print(
+            f"\nTests Passed: {passed_tests}/{total_tests} ({passed_tests/total_tests*100:.1f}%)"
+        )
 
         # Detailed breakdown
         print("\n" + Colors.BOLD + "Detailed Results:" + Colors.RESET)
@@ -356,7 +390,9 @@ class MCPTestSuite:
             print(f"\n{Colors.BOLD}{Colors.YELLOW}⚠ Action Items:{Colors.RESET}")
             if not self.results.get("configurations", {}).get("dependencies", True):
                 print("  - Install missing Python packages")
-            if not self.results.get("mcp_servers", {}).get("GCP Resources Server", True):
+            if not self.results.get("mcp_servers", {}).get(
+                "GCP Resources Server", True
+            ):
                 print("  - Fix MCP server startup issues")
             if not self.results.get("claude_api", {}).get("connectivity", True):
                 print("  - Set up ANTHROPIC_API_KEY environment variable")

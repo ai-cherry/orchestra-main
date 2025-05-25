@@ -2,7 +2,11 @@
 # Script to run tests with coverage analysis
 
 echo "Activating virtual environment..."
-source .venv/bin/activate || echo "Failed to activate virtual environment. Make sure .venv exists."
+if [ ! -d ".venv" ]; then
+    echo "Virtual environment not found. Creating one..."
+    python -m venv .venv
+fi
+source .venv/bin/activate || echo "Failed to activate virtual environment. Proceeding without it."
 
 # Set PYTHONPATH to include the project root directory
 echo "Setting PYTHONPATH to include the project root..."
@@ -38,6 +42,22 @@ if [ "$1" == "critical" ]; then
 elif [ "$1" == "specific" ] && [ -n "$2" ]; then
     echo -e "${YELLOW}Running specific test: $2${NC}"
     run_tests "Specific" "pytest $2 -v"
+    exit 0
+elif [ "$1" == "portkey" ]; then
+    echo -e "${YELLOW}Running Portkey client tests...${NC}"
+    run_tests "Portkey" "pytest tests/packages/shared/llm_client/test_portkey_client.py -v"
+    exit 0
+elif [ "$1" == "memory" ]; then
+    echo -e "${YELLOW}Running memory tests...${NC}"
+    run_tests "Memory" "pytest tests/shared/memory/ -v"
+    exit 0
+elif [ "$1" == "simple" ]; then
+    echo -e "${YELLOW}Running all tests (simple mode, no coverage)...${NC}"
+    run_tests "All" "pytest tests/ -v"
+    exit 0
+elif [ -n "$1" ]; then
+    echo -e "${YELLOW}Running tests in path: $1${NC}"
+    run_tests "Path" "pytest $1 -v"
     exit 0
 fi
 
@@ -81,3 +101,13 @@ pytest tests/ --cov=core.orchestrator.src.agents -v
 
 echo -e "\n${GREEN}Testing completed!${NC}"
 echo -e "${YELLOW}If you see any low coverage areas, consider adding more tests to increase coverage.${NC}"
+
+# Usage instructions
+echo -e "${BLUE}Usage:${NC}"
+echo -e "${BLUE}  ./run_tests.sh                # Full test suite with coverage"
+echo -e "${BLUE}  ./run_tests.sh simple         # All tests, no coverage"
+echo -e "${BLUE}  ./run_tests.sh critical       # Only tests marked as critical"
+echo -e "${BLUE}  ./run_tests.sh specific path  # Run a specific test file"
+echo -e "${BLUE}  ./run_tests.sh portkey        # Run Portkey client tests"
+echo -e "${BLUE}  ./run_tests.sh memory         # Run memory tests"
+echo -e "${BLUE}  ./run_tests.sh <path>         # Run tests in a specific path"

@@ -1,5 +1,5 @@
 # Multi-stage Dockerfile for Web Scraping AI Agents
-FROM python:3.11-slim-bullseye AS builder
+FROM python:3.10-slim-bullseye AS builder
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -35,7 +35,7 @@ RUN pip wheel --no-cache-dir --wheel-dir=/wheels -r requirements-webscraping.txt
 RUN pip wheel --no-cache-dir --wheel-dir=/wheels -r requirements.txt
 
 # Stage 2: Runtime stage
-FROM python:3.11-slim-bullseye AS runtime
+FROM python:3.10-slim-bullseye AS runtime
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1

@@ -55,7 +55,9 @@ class GeminiRooAdapter:
 
         self.boomerang = BoomerangOperation(memory_manager, self.transition_manager)
 
-    async def prepare_context(self, mode_slug: str, request_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def prepare_context(
+        self, mode_slug: str, request_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Prepare context for a Gemini request based on the current mode.
 
@@ -92,7 +94,9 @@ class GeminiRooAdapter:
                         context["operation"] = operation.dict()
 
         # Include recent mode contexts
-        recent_contexts = await self.roo_memory.retrieve_mode_contexts(mode_slug, limit=3)
+        recent_contexts = await self.roo_memory.retrieve_mode_contexts(
+            mode_slug, limit=3
+        )
         if recent_contexts:
             context["recent_contexts"] = recent_contexts
 
@@ -109,7 +113,9 @@ class GeminiRooAdapter:
 
         return context
 
-    async def process_request(self, mode_slug: str, request_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def process_request(
+        self, mode_slug: str, request_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Process a Gemini request.
 
@@ -124,7 +130,9 @@ class GeminiRooAdapter:
         context = await self.prepare_context(mode_slug, request_data)
 
         # Store mode context
-        await self.roo_memory.store_mode_context(mode_slug, {"request": request_data, "context": context})
+        await self.roo_memory.store_mode_context(
+            mode_slug, {"request": request_data, "context": context}
+        )
 
         # Add context to request
         processed_request = {**request_data, "context": context}
@@ -186,7 +194,9 @@ class GeminiRooAdapter:
             operation_id = operation_data.get("operation_id")
 
             if operation_id:
-                result = await self.boomerang.advance_operation(operation_id, operation_data.get("result", {}))
+                result = await self.boomerang.advance_operation(
+                    operation_id, operation_data.get("result", {})
+                )
 
                 if result:
                     response_data["operation_result"] = result
@@ -199,14 +209,20 @@ class GeminiRooAdapter:
                 change_type = change.get("type")
 
                 if file_path and change_type:
-                    await self.roo_memory.store_code_change(file_path, change_type, change, mode_slug)
+                    await self.roo_memory.store_code_change(
+                        file_path, change_type, change, mode_slug
+                    )
 
         # Store response in memory
-        await self.roo_memory.store_mode_context(mode_slug, {"request": request_data, "response": response_data})
+        await self.roo_memory.store_mode_context(
+            mode_slug, {"request": request_data, "response": response_data}
+        )
 
         return response_data
 
-    async def handle_mode_transition(self, transition_id: str, result_data: Dict[str, Any] = None) -> Dict[str, Any]:
+    async def handle_mode_transition(
+        self, transition_id: str, result_data: Dict[str, Any] = None
+    ) -> Dict[str, Any]:
         """
         Handle a completed mode transition.
 
@@ -217,7 +233,9 @@ class GeminiRooAdapter:
         Returns:
             Dictionary with transition completion status
         """
-        transition = await self.transition_manager.complete_transition(transition_id, result_data)
+        transition = await self.transition_manager.complete_transition(
+            transition_id, result_data
+        )
 
         if not transition:
             return {"success": False, "error": "Transition not found"}
@@ -243,14 +261,18 @@ class GeminiRooAdapter:
         Returns:
             Dictionary with operation status
         """
-        operation_id = await self.boomerang.start_operation(initial_mode, target_modes, operation_data, return_mode)
+        operation_id = await self.boomerang.start_operation(
+            initial_mode, target_modes, operation_data, return_mode
+        )
 
         if not operation_id:
             return {"success": False, "error": "Failed to start operation"}
 
         return {"success": True, "operation_id": operation_id}
 
-    async def get_file_history(self, file_path: str, limit: int = 5) -> List[Dict[str, Any]]:
+    async def get_file_history(
+        self, file_path: str, limit: int = 5
+    ) -> List[Dict[str, Any]]:
         """
         Get the history of changes for a file.
 

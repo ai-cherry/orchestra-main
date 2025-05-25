@@ -147,7 +147,9 @@ project priorities.
             )
             logger.info("Created README.md in memory system")
 
-        logger.info("Successfully initialized AI memory system with performance-first directives")
+        logger.info(
+            "Successfully initialized AI memory system with performance-first directives"
+        )
         return True
 
     except Exception as e:

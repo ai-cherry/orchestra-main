@@ -21,7 +21,7 @@ class NotificationManager {
         };
 
         this.notifications.unshift(enrichedNotification);
-        
+
         // Keep only the latest notifications
         if (this.notifications.length > this.maxNotifications) {
             this.notifications = this.notifications.slice(0, this.maxNotifications);
@@ -29,7 +29,7 @@ class NotificationManager {
 
         // Notify listeners
         this.listeners.forEach(callback => callback(enrichedNotification));
-        
+
         return enrichedNotification;
     }
 
@@ -116,7 +116,7 @@ export const notificationAPI = {
 export const startNotificationServer = () => {
     // This is a mock - in real implementation you'd have an actual endpoint
     console.log('🔔 Notification system initialized');
-    
+
     // Example: Add some test notifications
     setTimeout(() => {
         notificationAPI.receiveNotification({
@@ -147,11 +147,11 @@ export const formatNotificationMessage = (notification) => {
         warning: '⚠️',
         error: '❌'
     };
-    
+
     const emoji = levelEmojis[notification.level] || 'ℹ️';
     const timeStr = new Date(notification.timestamp).toLocaleTimeString();
-    
+
     return `${emoji} [${timeStr}] ${notification.message}`;
 };
 
-export default notificationManager; 
+export default notificationManager;

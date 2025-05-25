@@ -26,14 +26,20 @@ from mcp_server.config.models import MCPConfig
 # Load MCP config at startup
 gateway_config: MCPConfig = load_config()
 if not gateway_config.servers:
-    raise RuntimeError("No MCP servers defined in configuration. Please set MCPConfig.servers.")
+    raise RuntimeError(
+        "No MCP servers defined in configuration. Please set MCPConfig.servers."
+    )
 
 # Build MCP_SERVERS registry from config
-MCP_SERVERS = {server_id: server.dict() for server_id, server in gateway_config.servers.items()}
+MCP_SERVERS = {
+    server_id: server.dict() for server_id, server in gateway_config.servers.items()
+}
 # (Removed misplaced comment to resolve linter confusion)
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 logger.info(f"MCP_SERVERS registry loaded from config: {MCP_SERVERS}")
@@ -58,19 +64,31 @@ for path in config_paths:
     else:
         logger.info(f"Config file not found: {path}")
 
-logger.info("No dynamic configuration loading implemented. Using hardcoded MCP_SERVERS registry.")
+logger.info(
+    "No dynamic configuration loading implemented. Using hardcoded MCP_SERVERS registry."
+)
 
 # Log the hardcoded server registry for visibility
 # --- END CONFIGURATION/ENVIRONMENT DIAGNOSTICS ---
 
 # Prometheus metrics
-request_count = Counter("mcp_gateway_requests_total", "Total requests", ["method", "endpoint", "status"])
-request_duration = Histogram("mcp_gateway_request_duration_seconds", "Request duration", ["method", "endpoint"])
+request_count = Counter(
+    "mcp_gateway_requests_total", "Total requests", ["method", "endpoint", "status"]
+)
+request_duration = Histogram(
+    "mcp_gateway_request_duration_seconds", "Request duration", ["method", "endpoint"]
+)
 active_servers = Gauge("mcp_gateway_active_servers", "Number of active MCP servers")
-error_count = Counter("mcp_gateway_errors_total", "Total errors", ["server", "error_type"])
+error_count = Counter(
+    "mcp_gateway_errors_total", "Total errors", ["server", "error_type"]
+)
 
 # Initialize FastAPI app
-app = FastAPI(title="MCP Gateway", description="Unified interface for AI Orchestra MCP servers", version="2.0.0")
+app = FastAPI(
+    title="MCP Gateway",
+    description="Unified interface for AI Orchestra MCP servers",
+    version="2.0.0",
+)
 
 # Add CORS middleware
 app.add_middleware(
@@ -117,7 +135,9 @@ class MCPRequest(BaseModel):
     params: Dict[str, Any] = Field(default={}, description="Parameters for the action")
 
 
-async def check_server_health(server_id: str, server_info: Dict[str, Any]) -> ServerHealth:
+async def check_server_health(
+    server_id: str, server_info: Dict[str, Any]
+) -> ServerHealth:
     """Check health of a single MCP server"""
     start_time = time.time()
 
@@ -149,7 +169,11 @@ async def check_server_health(server_id: str, server_info: Dict[str, Any]) -> Se
         error_count.labels(server=server_id, error_type=type(e).__name__).inc()
 
         return ServerHealth(
-            name=server_info["name"], url=server_info["url"], healthy=False, last_check=datetime.utcnow(), error=str(e)
+            name=server_info["name"],
+            url=server_info["url"],
+            healthy=False,
+            last_check=datetime.utcnow(),
+            error=str(e),
         )
 
 
@@ -162,7 +186,9 @@ async def periodic_health_check():
                 health_cache[server_id] = health.dict()
 
             # Update active servers metric
-            healthy_count = sum(1 for h in health_cache.values() if h.get("healthy", False))
+            healthy_count = sum(
+                1 for h in health_cache.values() if h.get("healthy", False)
+            )
             active_servers.set(healthy_count)
 
         except Exception as e:
@@ -197,8 +223,12 @@ async def track_metrics(request: Request, call_next):
 
     # Record metrics
     duration = time.time() - start_time
-    request_count.labels(method=request.method, endpoint=request.url.path, status=response.status_code).inc()
-    request_duration.labels(method=request.method, endpoint=request.url.path).observe(duration)
+    request_count.labels(
+        method=request.method, endpoint=request.url.path, status=response.status_code
+    ).inc()
+    request_duration.labels(method=request.method, endpoint=request.url.path).observe(
+        duration
+    )
 
     return response
 
@@ -279,8 +309,12 @@ async def execute_mcp_action(request: MCPRequest):
     server_info = MCP_SERVERS[request.server]
 
     # Check if server is healthy
-    if request.server in health_cache and not health_cache[request.server].get("healthy", False):
-        raise HTTPException(status_code=503, detail=f"Server {request.server} is not healthy")
+    if request.server in health_cache and not health_cache[request.server].get(
+        "healthy", False
+    ):
+        raise HTTPException(
+            status_code=503, detail=f"Server {request.server} is not healthy"
+        )
 
     # Retry logic for transient connection errors
     max_retries = 3
@@ -289,21 +323,32 @@ async def execute_mcp_action(request: MCPRequest):
     for attempt in range(1, max_retries + 1):
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.post(f"{server_info['url']}/mcp/{request.action}", json=request.params)
+                response = await client.post(
+                    f"{server_info['url']}/mcp/{request.action}", json=request.params
+                )
 
                 if response.status_code >= 400:
-                    raise HTTPException(status_code=response.status_code, detail=response.text)
+                    raise HTTPException(
+                        status_code=response.status_code, detail=response.text
+                    )
 
                 return response.json()
 
         except httpx.TimeoutException:
             error_count.labels(server=request.server, error_type="timeout").inc()
             if attempt == max_retries:
-                raise HTTPException(status_code=504, detail=f"Request timeout after {max_retries} attempts")
+                raise HTTPException(
+                    status_code=504,
+                    detail=f"Request timeout after {max_retries} attempts",
+                )
             await asyncio.sleep(backoff_base * (2 ** (attempt - 1)))
         except httpx.RequestError as e:
-            error_count.labels(server=request.server, error_type="connection_error").inc()
-            logger.error(f"Connection error on {request.server} (attempt {attempt}): {e}")
+            error_count.labels(
+                server=request.server, error_type="connection_error"
+            ).inc()
+            logger.error(
+                f"Connection error on {request.server} (attempt {attempt}): {e}"
+            )
             if attempt == max_retries:
                 raise HTTPException(
                     status_code=502,
@@ -323,21 +368,28 @@ async def list_all_tools():
 
     for server_id, server_info in MCP_SERVERS.items():
         # Skip unhealthy servers
-        if server_id in health_cache and not health_cache[server_id].get("healthy", False):
+        if server_id in health_cache and not health_cache[server_id].get(
+            "healthy", False
+        ):
             continue
 
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
                 response = await client.get(f"{server_info['url']}/mcp/tools")
                 if response.status_code == 200:
-                    tools[server_id] = {"server": server_info["name"], "tools": response.json()}
+                    tools[server_id] = {
+                        "server": server_info["name"],
+                        "tools": response.json(),
+                    }
         except Exception as e:
             logger.warning(f"Failed to get tools from {server_id}: {e}")
 
     return tools
 
 
-@app.api_route("/mcp/{server}/proxy/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
+@app.api_route(
+    "/mcp/{server}/proxy/{path:path}", methods=["GET", "POST", "PUT", "DELETE"]
+)
 async def proxy_request(server: str, path: str, request: Request):
     """Proxy requests to specific MCP server"""
     if server not in MCP_SERVERS:
@@ -354,13 +406,18 @@ async def proxy_request(server: str, path: str, request: Request):
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.request(
-                    method=request.method, url=target_url, content=await request.body(), headers=dict(request.headers)
+                    method=request.method,
+                    url=target_url,
+                    content=await request.body(),
+                    headers=dict(request.headers),
                 )
 
                 return JSONResponse(
                     content=(
                         response.json()
-                        if response.headers.get("content-type", "").startswith("application/json")
+                        if response.headers.get("content-type", "").startswith(
+                            "application/json"
+                        )
                         else response.text
                     ),
                     status_code=response.status_code,
@@ -370,14 +427,18 @@ async def proxy_request(server: str, path: str, request: Request):
             logger.error(f"Proxy timeout for {server} (attempt {attempt})")
             if attempt == max_retries:
                 raise HTTPException(
-                    status_code=504, detail=f"Proxy request to {server} timed out after {max_retries} attempts"
+                    status_code=504,
+                    detail=f"Proxy request to {server} timed out after {max_retries} attempts",
                 )
             await asyncio.sleep(backoff_base * (2 ** (attempt - 1)))
         except httpx.RequestError as e:
-            logger.error(f"Proxy connection error for {server} (attempt {attempt}): {e}")
+            logger.error(
+                f"Proxy connection error for {server} (attempt {attempt}): {e}"
+            )
             if attempt == max_retries:
                 raise HTTPException(
-                    status_code=502, detail=f"Failed to connect to {server} after {max_retries} attempts: {str(e)}"
+                    status_code=502,
+                    detail=f"Failed to connect to {server} after {max_retries} attempts: {str(e)}",
                 )
             await asyncio.sleep(backoff_base * (2 ** (attempt - 1)))
         except Exception as e:
@@ -385,7 +446,10 @@ async def proxy_request(server: str, path: str, request: Request):
             raise HTTPException(status_code=500, detail=str(e))
 
     # If we reach here, all retries failed without raising (should not happen)
-    raise HTTPException(status_code=500, detail=f"Proxy request to {server} failed after {max_retries} attempts")
+    raise HTTPException(
+        status_code=500,
+        detail=f"Proxy request to {server} failed after {max_retries} attempts",
+    )
 
 
 @app.exception_handler(Exception)
@@ -396,7 +460,11 @@ async def global_exception_handler(request: Request, exc: Exception):
 
     return JSONResponse(
         status_code=500,
-        content={"error": "Internal server error", "message": str(exc), "timestamp": datetime.utcnow().isoformat()},
+        content={
+            "error": "Internal server error",
+            "message": str(exc),
+            "timestamp": datetime.utcnow().isoformat(),
+        },
     )
 
 

@@ -28,7 +28,12 @@ class WebScrapingDeploymentValidator:
 
     def log_result(self, check: str, status: str, message: str):
         """Log validation result."""
-        result = {"timestamp": datetime.now().isoformat(), "check": check, "status": status, "message": message}
+        result = {
+            "timestamp": datetime.now().isoformat(),
+            "check": check,
+            "status": status,
+            "message": message,
+        }
         self.validation_results.append(result)
 
         status_icon = "✅" if status == "PASS" else "❌" if status == "FAIL" else "⚠️"
@@ -61,12 +66,16 @@ class WebScrapingDeploymentValidator:
             if "web_scraping_service" in content:
                 self.log_result("Pulumi Config", "PASS", "Web scraping service defined")
             else:
-                self.log_result("Pulumi Config", "FAIL", "Web scraping service not found")
+                self.log_result(
+                    "Pulumi Config", "FAIL", "Web scraping service not found"
+                )
 
             if "zenrows_secret" in content:
                 self.log_result("Pulumi Config", "PASS", "Zenrows secret configured")
             else:
-                self.log_result("Pulumi Config", "WARN", "Zenrows secret not configured")
+                self.log_result(
+                    "Pulumi Config", "WARN", "Zenrows secret not configured"
+                )
 
             if "apify_secret" in content:
                 self.log_result("Pulumi Config", "PASS", "Apify secret configured")
@@ -74,7 +83,9 @@ class WebScrapingDeploymentValidator:
                 self.log_result("Pulumi Config", "WARN", "Apify secret not configured")
 
         except Exception as e:
-            self.log_result("Pulumi Config", "FAIL", f"Error reading Pulumi config: {e}")
+            self.log_result(
+                "Pulumi Config", "FAIL", f"Error reading Pulumi config: {e}"
+            )
 
     def validate_cloudbuild_config(self):
         """Validate Cloud Build configuration."""
@@ -83,22 +94,34 @@ class WebScrapingDeploymentValidator:
                 content = f.read()
 
             if "Build-WebScraping" in content:
-                self.log_result("Cloud Build", "PASS", "Web scraping build step configured")
+                self.log_result(
+                    "Cloud Build", "PASS", "Web scraping build step configured"
+                )
             else:
-                self.log_result("Cloud Build", "FAIL", "Web scraping build step missing")
+                self.log_result(
+                    "Cloud Build", "FAIL", "Web scraping build step missing"
+                )
 
             if "Deploy-WebScraping" in content:
-                self.log_result("Cloud Build", "PASS", "Web scraping deploy step configured")
+                self.log_result(
+                    "Cloud Build", "PASS", "Web scraping deploy step configured"
+                )
             else:
-                self.log_result("Cloud Build", "FAIL", "Web scraping deploy step missing")
+                self.log_result(
+                    "Cloud Build", "FAIL", "Web scraping deploy step missing"
+                )
 
             if "Dockerfile.webscraping" in content:
                 self.log_result("Cloud Build", "PASS", "Custom Dockerfile referenced")
             else:
-                self.log_result("Cloud Build", "FAIL", "Custom Dockerfile not referenced")
+                self.log_result(
+                    "Cloud Build", "FAIL", "Custom Dockerfile not referenced"
+                )
 
         except Exception as e:
-            self.log_result("Cloud Build", "FAIL", f"Error reading Cloud Build config: {e}")
+            self.log_result(
+                "Cloud Build", "FAIL", f"Error reading Cloud Build config: {e}"
+            )
 
     def validate_docker_config(self):
         """Validate Docker configuration."""
@@ -107,14 +130,24 @@ class WebScrapingDeploymentValidator:
                 content = f.read()
 
             if "playwright install chromium" in content:
-                self.log_result("Docker Config", "PASS", "Playwright browser installation configured")
+                self.log_result(
+                    "Docker Config",
+                    "PASS",
+                    "Playwright browser installation configured",
+                )
             else:
-                self.log_result("Docker Config", "WARN", "Playwright browser installation missing")
+                self.log_result(
+                    "Docker Config", "WARN", "Playwright browser installation missing"
+                )
 
             if "webscraping_app.py" in content:
-                self.log_result("Docker Config", "PASS", "Application entry point configured")
+                self.log_result(
+                    "Docker Config", "PASS", "Application entry point configured"
+                )
             else:
-                self.log_result("Docker Config", "FAIL", "Application entry point missing")
+                self.log_result(
+                    "Docker Config", "FAIL", "Application entry point missing"
+                )
 
             if "USER webscraper" in content:
                 self.log_result("Docker Config", "PASS", "Non-root user configured")
@@ -122,7 +155,9 @@ class WebScrapingDeploymentValidator:
                 self.log_result("Docker Config", "WARN", "Non-root user not configured")
 
         except Exception as e:
-            self.log_result("Docker Config", "FAIL", f"Error reading Docker config: {e}")
+            self.log_result(
+                "Docker Config", "FAIL", f"Error reading Docker config: {e}"
+            )
 
     def validate_dependencies(self):
         """Validate Python dependencies."""
@@ -152,10 +187,20 @@ class WebScrapingDeploymentValidator:
 
     def validate_environment_variables(self):
         """Validate environment variables configuration."""
-        required_env_vars = ["REDIS_HOST", "ZENROWS_API_KEY", "APIFY_API_KEY", "OPENAI_API_KEY", "GOOGLE_CLOUD_PROJECT"]
+        required_env_vars = [
+            "REDIS_HOST",
+            "ZENROWS_API_KEY",
+            "APIFY_API_KEY",
+            "OPENAI_API_KEY",
+            "GOOGLE_CLOUD_PROJECT",
+        ]
 
         # Check if environment variables are mentioned in config files
-        config_files = ["cloudbuild.yaml", "infra/pulumi_gcp/__main__.py", "webscraping_app.py"]
+        config_files = [
+            "cloudbuild.yaml",
+            "infra/pulumi_gcp/__main__.py",
+            "webscraping_app.py",
+        ]
 
         for env_var in required_env_vars:
             found = False
@@ -169,28 +214,41 @@ class WebScrapingDeploymentValidator:
                     continue
 
             if found:
-                self.log_result("Environment Variables", "PASS", f"{env_var} configured")
+                self.log_result(
+                    "Environment Variables", "PASS", f"{env_var} configured"
+                )
             else:
-                self.log_result("Environment Variables", "WARN", f"{env_var} not found in configs")
+                self.log_result(
+                    "Environment Variables", "WARN", f"{env_var} not found in configs"
+                )
 
     def run_gcp_checks(self):
         """Run GCP-specific validation checks."""
         try:
             # Check if gcloud is configured
             result = subprocess.run(
-                ["gcloud", "config", "get-value", "project"], capture_output=True, text=True, timeout=10
+                ["gcloud", "config", "get-value", "project"],
+                capture_output=True,
+                text=True,
+                timeout=10,
             )
 
             if result.returncode == 0:
                 project = result.stdout.strip()
                 if project == self.project_id:
-                    self.log_result("GCP Setup", "PASS", f"gcloud configured for project {project}")
+                    self.log_result(
+                        "GCP Setup", "PASS", f"gcloud configured for project {project}"
+                    )
                 else:
                     self.log_result(
-                        "GCP Setup", "WARN", f"gcloud configured for project {project}, expected {self.project_id}"
+                        "GCP Setup",
+                        "WARN",
+                        f"gcloud configured for project {project}, expected {self.project_id}",
                     )
             else:
-                self.log_result("GCP Setup", "FAIL", "gcloud not configured or not authenticated")
+                self.log_result(
+                    "GCP Setup", "FAIL", "gcloud not configured or not authenticated"
+                )
 
         except subprocess.TimeoutExpired:
             self.log_result("GCP Setup", "FAIL", "gcloud command timed out")
@@ -224,28 +282,48 @@ class WebScrapingDeploymentValidator:
                 if result.returncode == 0:
                     service_url = result.stdout.strip()
                 else:
-                    self.log_result("Service Health", "WARN", "Service not deployed yet")
+                    self.log_result(
+                        "Service Health", "WARN", "Service not deployed yet"
+                    )
                     return
 
             except Exception as e:
-                self.log_result("Service Health", "WARN", f"Could not get service URL: {e}")
+                self.log_result(
+                    "Service Health", "WARN", f"Could not get service URL: {e}"
+                )
                 return
 
         # Test health endpoint
         try:
-            async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=30)) as session:
+            async with aiohttp.ClientSession(
+                timeout=aiohttp.ClientTimeout(total=30)
+            ) as session:
                 async with session.get(f"{service_url}/health") as response:
                     if response.status == 200:
                         data = await response.json()
                         if data.get("status") == "healthy":
-                            self.log_result("Service Health", "PASS", "Health endpoint responding correctly")
+                            self.log_result(
+                                "Service Health",
+                                "PASS",
+                                "Health endpoint responding correctly",
+                            )
                         else:
-                            self.log_result("Service Health", "WARN", f"Health endpoint status: {data.get('status')}")
+                            self.log_result(
+                                "Service Health",
+                                "WARN",
+                                f"Health endpoint status: {data.get('status')}",
+                            )
                     else:
-                        self.log_result("Service Health", "FAIL", f"Health endpoint returned {response.status}")
+                        self.log_result(
+                            "Service Health",
+                            "FAIL",
+                            f"Health endpoint returned {response.status}",
+                        )
 
         except Exception as e:
-            self.log_result("Service Health", "WARN", f"Could not reach health endpoint: {e}")
+            self.log_result(
+                "Service Health", "WARN", f"Could not reach health endpoint: {e}"
+            )
 
     async def validate_mcp_integration(self, service_url: Optional[str] = None):
         """Validate MCP integration."""
@@ -253,7 +331,9 @@ class WebScrapingDeploymentValidator:
             return
 
         try:
-            async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=30)) as session:
+            async with aiohttp.ClientSession(
+                timeout=aiohttp.ClientTimeout(total=30)
+            ) as session:
                 async with session.get(f"{service_url}/mcp/tools") as response:
                     if response.status == 200:
                         data = await response.json()
@@ -261,14 +341,28 @@ class WebScrapingDeploymentValidator:
                         if (
                             len(tools) >= 5
                         ):  # Expected tools: web_search, scrape_website, analyze_content, bulk_scrape, get_task_status
-                            self.log_result("MCP Integration", "PASS", f"MCP tools available: {len(tools)} tools")
+                            self.log_result(
+                                "MCP Integration",
+                                "PASS",
+                                f"MCP tools available: {len(tools)} tools",
+                            )
                         else:
-                            self.log_result("MCP Integration", "WARN", f"Only {len(tools)} MCP tools available")
+                            self.log_result(
+                                "MCP Integration",
+                                "WARN",
+                                f"Only {len(tools)} MCP tools available",
+                            )
                     else:
-                        self.log_result("MCP Integration", "FAIL", f"MCP tools endpoint returned {response.status}")
+                        self.log_result(
+                            "MCP Integration",
+                            "FAIL",
+                            f"MCP tools endpoint returned {response.status}",
+                        )
 
         except Exception as e:
-            self.log_result("MCP Integration", "WARN", f"Could not test MCP integration: {e}")
+            self.log_result(
+                "MCP Integration", "WARN", f"Could not test MCP integration: {e}"
+            )
 
     def generate_report(self):
         """Generate validation report."""
@@ -280,9 +374,15 @@ class WebScrapingDeploymentValidator:
             "results": self.validation_results,
             "summary": {
                 "total_checks": len(self.validation_results),
-                "passed": len([r for r in self.validation_results if r["status"] == "PASS"]),
-                "failed": len([r for r in self.validation_results if r["status"] == "FAIL"]),
-                "warnings": len([r for r in self.validation_results if r["status"] == "WARN"]),
+                "passed": len(
+                    [r for r in self.validation_results if r["status"] == "PASS"]
+                ),
+                "failed": len(
+                    [r for r in self.validation_results if r["status"] == "FAIL"]
+                ),
+                "warnings": len(
+                    [r for r in self.validation_results if r["status"] == "WARN"]
+                ),
             },
         }
 
@@ -329,7 +429,9 @@ class WebScrapingDeploymentValidator:
             print("🎉 All critical validations passed! System is ready for deployment.")
             return True
         else:
-            print(f"⚠️  {failed_checks} critical issues found. Please address before deployment.")
+            print(
+                f"⚠️  {failed_checks} critical issues found. Please address before deployment."
+            )
             return False
 
 
@@ -337,8 +439,12 @@ async def main():
     """Main validation function."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Validate Web Scraping AI Agent System deployment")
-    parser.add_argument("--service-url", help="URL of deployed service for live testing")
+    parser = argparse.ArgumentParser(
+        description="Validate Web Scraping AI Agent System deployment"
+    )
+    parser.add_argument(
+        "--service-url", help="URL of deployed service for live testing"
+    )
     parser.add_argument("--quiet", action="store_true", help="Suppress verbose output")
 
     args = parser.parse_args()

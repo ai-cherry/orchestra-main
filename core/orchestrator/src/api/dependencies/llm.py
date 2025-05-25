@@ -31,7 +31,11 @@ def get_llm_client() -> Any:  # Return type could be LLMClient or an Agno model
     settings = get_settings()
 
     # Check if we should use monitored LiteLLM client
-    use_monitored_litellm = os.environ.get("USE_MONITORED_LITELLM", "").lower() in ("true", "1", "yes")
+    use_monitored_litellm = os.environ.get("USE_MONITORED_LITELLM", "").lower() in (
+        "true",
+        "1",
+        "yes",
+    )
 
     if use_monitored_litellm:
         logger.info("Using MonitoredLiteLLMClient for Claude API monitoring")

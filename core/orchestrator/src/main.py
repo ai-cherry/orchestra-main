@@ -32,7 +32,9 @@ from core.orchestrator.src.api.dependencies.memory import (  # Add the new hexag
     close_memory_service,
     initialize_memory_manager,
 )
-from core.orchestrator.src.api.endpoints import conversations  # Add import for conversations endpoints
+from core.orchestrator.src.api.endpoints import (
+    conversations,
+)  # Add import for conversations endpoints
 from core.orchestrator.src.api.endpoints import (
     agents,
     health,
@@ -63,9 +65,15 @@ RECOVERY_MODE = False  # Hardcoded to False to ensure standard mode
 STANDARD_MODE = True  # Hardcoded to True to ensure standard mode
 
 # Log the current mode
-print(f"🚀 Orchestra core starting in {'RECOVERY' if RECOVERY_MODE else 'STANDARD'} mode")
-print(f"   Environment settings: USE_RECOVERY_MODE={use_recovery_mode_env}, STANDARD_MODE={standard_mode_env}")
-print(f"   Active mode settings: RECOVERY_MODE={RECOVERY_MODE}, STANDARD_MODE={STANDARD_MODE}")
+print(
+    f"🚀 Orchestra core starting in {'RECOVERY' if RECOVERY_MODE else 'STANDARD'} mode"
+)
+print(
+    f"   Environment settings: USE_RECOVERY_MODE={use_recovery_mode_env}, STANDARD_MODE={standard_mode_env}"
+)
+print(
+    f"   Active mode settings: RECOVERY_MODE={RECOVERY_MODE}, STANDARD_MODE={STANDARD_MODE}"
+)
 
 # Original components (maintained for backward compatibility)
 
@@ -99,7 +107,9 @@ async def lifespan(app: FastAPI):
         logger.info(f"Loaded {len(persona_configs)} persona configurations")
     except Exception as e:
         logger.error(f"Failed to load persona configurations: {e}", exc_info=True)
-        logger.warning("Application may run with incomplete or default persona configurations due to loading failure.")
+        logger.warning(
+            "Application may run with incomplete or default persona configurations due to loading failure."
+        )
 
     # Initialize legacy memory manager for backward compatibility
     try:
@@ -107,7 +117,9 @@ async def lifespan(app: FastAPI):
         await initialize_memory_manager(settings)
     except Exception as e:
         logger.error(f"Failed to initialize legacy memory manager: {e}", exc_info=True)
-        logger.warning("Legacy memory manager initialization failed; application may experience memory-related issues.")
+        logger.warning(
+            "Legacy memory manager initialization failed; application may experience memory-related issues."
+        )
 
     # Initialize memory service for hexagonal architecture if available
     if HEX_ARCH_AVAILABLE:
@@ -121,7 +133,9 @@ async def lifespan(app: FastAPI):
                 f"Failed to initialize memory service with hexagonal architecture: {e}",
                 exc_info=True,
             )
-            logger.warning("Hexagonal memory service initialization failed; falling back to legacy if available.")
+            logger.warning(
+                "Hexagonal memory service initialization failed; falling back to legacy if available."
+            )
     else:
         logger.warning("Hexagonal architecture components are not available")
 
@@ -135,7 +149,9 @@ async def lifespan(app: FastAPI):
         logger.info("Default agents registered successfully")
     except Exception as e:
         logger.error(f"Failed to register default agents: {e}", exc_info=True)
-        logger.warning("Default agent registration failed; some functionalities may be unavailable.")
+        logger.warning(
+            "Default agent registration failed; some functionalities may be unavailable."
+        )
 
     # Yield control back to FastAPI
     yield
@@ -156,7 +172,9 @@ async def lifespan(app: FastAPI):
             logger.info("Closing memory service with hexagonal architecture")
             await close_memory_service()
         except Exception as e:
-            logger.error(f"Error closing memory service with hexagonal architecture: {e}")
+            logger.error(
+                f"Error closing memory service with hexagonal architecture: {e}"
+            )
 
     # Close other services
     get_service_registry().close_all()
@@ -194,7 +212,9 @@ def initialize_services(test_mode: bool = False) -> None:
             initialize_llm_providers()
         except Exception as e:
             logger.warning(f"Failed to initialize LLM providers: {e}", exc_info=True)
-            logger.error("LLM providers initialization failed; AI functionalities may be limited or unavailable.")
+            logger.error(
+                "LLM providers initialization failed; AI functionalities may be limited or unavailable."
+            )
 
     # Initialize the LLM agent and register it with the unified registry (skip in test mode)
     if not test_mode:
@@ -205,7 +225,9 @@ def initialize_services(test_mode: bool = False) -> None:
             register(llm_agent)
         except Exception as e:
             logger.warning(f"Failed to initialize LLM agent: {e}", exc_info=True)
-            logger.error("LLM agent initialization failed; related functionalities will not work.")
+            logger.error(
+                "LLM agent initialization failed; related functionalities will not work."
+            )
 
     # Initialize all registered services
     registry.initialize_all()

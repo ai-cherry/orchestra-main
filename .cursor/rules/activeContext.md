@@ -23,7 +23,7 @@ scripts/          # helper & maintenance scripts
 
 ## Coding conventions
 
-1. Python 3.11, use type-hints & docstrings (Google style).
+1. Python 3.10, use type-hints & docstrings (Google style).
 2. Access secrets via `os.getenv()` only.
 3. Keep Dockerfile minimal; requirements pinned.
 4. Lint: `flake8 --ignore=E501` (line length offloaded to Black).

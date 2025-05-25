@@ -79,7 +79,9 @@ class WorkflowEngine:
         self._workflows: Dict[str, WorkflowDefinition] = {}
         self._instances: Dict[str, WorkflowInstance] = {}
         self._conditions: Dict[str, Callable[[Dict[str, Any]], bool]] = {}
-        self._actions: Dict[str, Callable[[Dict[str, Any]], Awaitable[Dict[str, Any]]]] = {}
+        self._actions: Dict[
+            str, Callable[[Dict[str, Any]], Awaitable[Dict[str, Any]]]
+        ] = {}
         self._active_instances: Set[str] = set()
         self._processing_task = None
         logger.info("WorkflowEngine initialized")
@@ -98,7 +100,9 @@ class WorkflowEngine:
         logger.info(f"Workflow registered: {workflow.name} ({workflow.workflow_id})")
         return workflow.workflow_id
 
-    def register_condition(self, name: str, condition: Callable[[Dict[str, Any]], bool]):
+    def register_condition(
+        self, name: str, condition: Callable[[Dict[str, Any]], bool]
+    ):
         """
         Register a condition function.
 
@@ -109,7 +113,9 @@ class WorkflowEngine:
         self._conditions[name] = condition
         logger.debug(f"Condition registered: {name}")
 
-    def register_action(self, name: str, action: Callable[[Dict[str, Any]], Awaitable[Dict[str, Any]]]):
+    def register_action(
+        self, name: str, action: Callable[[Dict[str, Any]], Awaitable[Dict[str, Any]]]
+    ):
         """
         Register an action function.
 
@@ -120,7 +126,9 @@ class WorkflowEngine:
         self._actions[name] = action
         logger.debug(f"Action registered: {name}")
 
-    async def create_instance(self, workflow_id: str, context: Dict[str, Any] = None) -> str:
+    async def create_instance(
+        self, workflow_id: str, context: Dict[str, Any] = None
+    ) -> str:
         """
         Create a new instance of a workflow.
 
@@ -185,12 +193,16 @@ class WorkflowEngine:
 
         # Transition to RUNNING state if in CREATED state
         if instance.current_state == WorkflowState.CREATED:
-            await self._transition_state(instance_id, WorkflowState.CREATED, WorkflowState.RUNNING)
+            await self._transition_state(
+                instance_id, WorkflowState.CREATED, WorkflowState.RUNNING
+            )
 
         # Start processing the instance
         return await self._process_instance(instance_id)
 
-    async def _transition_state(self, instance_id: str, from_state: WorkflowState, to_state: WorkflowState) -> bool:
+    async def _transition_state(
+        self, instance_id: str, from_state: WorkflowState, to_state: WorkflowState
+    ) -> bool:
         """
         Transition an instance from one state to another.
 
@@ -226,7 +238,9 @@ class WorkflowEngine:
             instance.completed_at = time.time()
 
         # Add to history
-        instance.history.append({"from_state": old_state, "to_state": to_state, "timestamp": time.time()})
+        instance.history.append(
+            {"from_state": old_state, "to_state": to_state, "timestamp": time.time()}
+        )
 
         # Publish event
         try:
@@ -258,7 +272,9 @@ class WorkflowEngine:
         workflow = self._workflows[instance.workflow_id]
 
         # Find valid transitions from current state
-        valid_transitions = [t for t in workflow.transitions if t.from_state == instance.current_state]
+        valid_transitions = [
+            t for t in workflow.transitions if t.from_state == instance.current_state
+        ]
 
         # Try each transition
         for transition in valid_transitions:
@@ -289,7 +305,9 @@ class WorkflowEngine:
                 except Exception as e:
                     # Record error and transition to FAILED state
                     instance.context["error"] = str(e)
-                    await self._transition_state(instance_id, instance.current_state, WorkflowState.FAILED)
+                    await self._transition_state(
+                        instance_id, instance.current_state, WorkflowState.FAILED
+                    )
 
                     # Publish error event
                     try:
@@ -302,12 +320,16 @@ class WorkflowEngine:
                             },
                         )
                     except Exception as event_error:
-                        logger.warning(f"Failed to publish workflow_action_failed event: {event_error}")
+                        logger.warning(
+                            f"Failed to publish workflow_action_failed event: {event_error}"
+                        )
 
                     return WorkflowState.FAILED
 
             # Perform the transition
-            success = await self._transition_state(instance_id, instance.current_state, transition.to_state)
+            success = await self._transition_state(
+                instance_id, instance.current_state, transition.to_state
+            )
 
             if success:
                 # If transitioned to a non-terminal state, continue processing
@@ -350,10 +372,14 @@ class WorkflowEngine:
         instance = self._instances[instance_id]
 
         if instance.current_state != WorkflowState.WAITING:
-            raise ValueError(f"Cannot resume instance {instance_id}: not in WAITING state")
+            raise ValueError(
+                f"Cannot resume instance {instance_id}: not in WAITING state"
+            )
 
         # Transition to RUNNING state
-        await self._transition_state(instance_id, WorkflowState.WAITING, WorkflowState.RUNNING)
+        await self._transition_state(
+            instance_id, WorkflowState.WAITING, WorkflowState.RUNNING
+        )
 
         # Process the instance
         return await self._process_instance(instance_id)
@@ -385,7 +411,9 @@ class WorkflowEngine:
             return False
 
         # Transition to CANCELLED state
-        success = await self._transition_state(instance_id, instance.current_state, WorkflowState.CANCELLED)
+        success = await self._transition_state(
+            instance_id, instance.current_state, WorkflowState.CANCELLED
+        )
 
         if success:
             # Remove from active instances

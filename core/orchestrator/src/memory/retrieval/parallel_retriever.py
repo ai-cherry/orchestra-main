@@ -69,7 +69,9 @@ class ParallelMemoryRetriever:
         # Default layer hierarchy (for fallback)
         self.layer_hierarchy = ["short_term", "mid_term", "long_term", "semantic"]
 
-        logger.info(f"ParallelMemoryRetriever initialized with layers: {list(layers.keys())}")
+        logger.info(
+            f"ParallelMemoryRetriever initialized with layers: {list(layers.keys())}"
+        )
 
     async def search(
         self,
@@ -133,7 +135,9 @@ class ParallelMemoryRetriever:
 
         # Log performance metrics
         total_time = (time.time() - start_time) * 1000
-        logger.debug(f"Parallel search completed in {total_time:.2f}ms, found {len(limited_results)} results")
+        logger.debug(
+            f"Parallel search completed in {total_time:.2f}ms, found {len(limited_results)} results"
+        )
 
         return limited_results
 
@@ -158,7 +162,9 @@ class ParallelMemoryRetriever:
 
         try:
             # Execute search with timeout
-            raw_results = await asyncio.wait_for(layer.search(field, value, operator, limit), timeout=self.timeout)
+            raw_results = await asyncio.wait_for(
+                layer.search(field, value, operator, limit), timeout=self.timeout
+            )
 
             # Calculate retrieval time
             retrieval_time = (time.time() - start_time) * 1000
@@ -183,11 +189,15 @@ class ParallelMemoryRetriever:
                 )
                 results.append(result)
 
-            logger.debug(f"Layer {layer_name} returned {len(results)} results in {retrieval_time:.2f}ms")
+            logger.debug(
+                f"Layer {layer_name} returned {len(results)} results in {retrieval_time:.2f}ms"
+            )
             return results
 
         except asyncio.TimeoutError:
-            logger.warning(f"Search in layer {layer_name} timed out after {self.timeout}s")
+            logger.warning(
+                f"Search in layer {layer_name} timed out after {self.timeout}s"
+            )
             return []
         except Exception as e:
             logger.error(f"Error searching layer {layer_name}: {e}")
@@ -218,7 +228,9 @@ class ParallelMemoryRetriever:
         if layers is None:
             # Prioritize semantic layer if available
             if "semantic" in self.layers:
-                semantic_results = await self._search_layer("semantic", "semantic", query, "==", limit)
+                semantic_results = await self._search_layer(
+                    "semantic", "semantic", query, "==", limit
+                )
 
                 # If we have enough semantic results, return them
                 if len(semantic_results) >= limit:
@@ -231,7 +243,9 @@ class ParallelMemoryRetriever:
                 # Create tasks for other layers
                 tasks = []
                 for layer_name in other_layers:
-                    task = self._search_text_in_layer(layer_name, query, remaining_limit)
+                    task = self._search_text_in_layer(
+                        layer_name, query, remaining_limit
+                    )
                     tasks.append(task)
 
                 # Execute all search tasks in parallel
@@ -307,11 +321,15 @@ class ParallelMemoryRetriever:
 
         # Log performance metrics
         total_time = (time.time() - start_time) * 1000
-        logger.debug(f"Parallel semantic search completed in {total_time:.2f}ms, found {len(limited_results)} results")
+        logger.debug(
+            f"Parallel semantic search completed in {total_time:.2f}ms, found {len(limited_results)} results"
+        )
 
         return limited_results
 
-    async def _search_text_in_layer(self, layer_name: str, query: str, limit: int) -> List[SearchResult]:
+    async def _search_text_in_layer(
+        self, layer_name: str, query: str, limit: int
+    ) -> List[SearchResult]:
         """
         Search for text in a non-semantic layer.
 
@@ -349,7 +367,9 @@ class ParallelMemoryRetriever:
                 return results
 
             # If no results, try text field
-            text_results = await asyncio.wait_for(layer.search("text", query, "contains", limit), timeout=self.timeout)
+            text_results = await asyncio.wait_for(
+                layer.search("text", query, "contains", limit), timeout=self.timeout
+            )
 
             # Convert to SearchResult objects
             results = []
@@ -368,7 +388,9 @@ class ParallelMemoryRetriever:
             return results
 
         except asyncio.TimeoutError:
-            logger.warning(f"Text search in layer {layer_name} timed out after {self.timeout}s")
+            logger.warning(
+                f"Text search in layer {layer_name} timed out after {self.timeout}s"
+            )
             return []
         except Exception as e:
             logger.error(f"Error searching text in layer {layer_name}: {e}")

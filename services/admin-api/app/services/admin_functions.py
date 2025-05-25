@@ -311,7 +311,9 @@ async def prune_memory(agent_id: str, older_than_days: int) -> Dict[str, Any]:
     Returns:
         Dict[str, Any]: Result of the operation
     """
-    logger.info(f"Pruning memory for agent {agent_id} older than {older_than_days} days")
+    logger.info(
+        f"Pruning memory for agent {agent_id} older than {older_than_days} days"
+    )
 
     # Validate input
     if older_than_days < 0:
@@ -333,7 +335,9 @@ async def prune_memory(agent_id: str, older_than_days: int) -> Dict[str, Any]:
         # Get total count estimate
         try:
             count_query = await query.count().get()
-            total_count = count_query[0][0].value if count_query and count_query[0] else 0
+            total_count = (
+                count_query[0][0].value if count_query and count_query[0] else 0
+            )
             logger.info(f"Found {total_count} memories eligible for pruning")
         except Exception as count_error:
             logger.warning(f"Could not get exact count: {str(count_error)}")
@@ -359,7 +363,9 @@ async def prune_memory(agent_id: str, older_than_days: int) -> Dict[str, Any]:
                 try:
                     await batch.commit()
                     batch_time = time.time() - batch_start_time
-                    logger.info(f"Committed batch of {batch_size}, total deleted: {deleted_count} ({batch_time:.2f}s)")
+                    logger.info(
+                        f"Committed batch of {batch_size}, total deleted: {deleted_count} ({batch_time:.2f}s)"
+                    )
                     batch_start_time = time.time()
                 except (
                     DeadlineExceeded,
@@ -381,7 +387,9 @@ async def prune_memory(agent_id: str, older_than_days: int) -> Dict[str, Any]:
             deleted_count += 1
 
         # Commit any remaining operations in the final batch
-        if deleted_count > 0 and deleted_count % batch_size != 0:  # check deleted_count > 0
+        if (
+            deleted_count > 0 and deleted_count % batch_size != 0
+        ):  # check deleted_count > 0
             await batch.commit()
             logger.info(f"Committed final batch, total deleted: {deleted_count}")
 
@@ -400,7 +408,8 @@ async def prune_memory(agent_id: str, older_than_days: int) -> Dict[str, Any]:
                     "cutoff_date": cutoff_str,
                 },
                 "result": {
-                    "total_eligible": total_count or deleted_count,  # Use count if available, otherwise use deleted
+                    "total_eligible": total_count
+                    or deleted_count,  # Use count if available, otherwise use deleted
                     "deleted": deleted_count,
                     "execution_time_seconds": round(total_time, 2),
                 },
@@ -464,7 +473,9 @@ async def promote_memory(memory_id: str, tier: str) -> Dict[str, Any]:
 
         # Check if promotion is valid
         tier_hierarchy = ["episodic", "working", "long_term", "core"]
-        current_idx = tier_hierarchy.index(current_tier) if current_tier in tier_hierarchy else -1
+        current_idx = (
+            tier_hierarchy.index(current_tier) if current_tier in tier_hierarchy else -1
+        )
         target_idx = tier_hierarchy.index(tier) if tier in tier_hierarchy else -1
 
         if current_idx >= target_idx:
@@ -529,7 +540,11 @@ async def get_memory_stats(agent_id: str) -> Dict[str, Any]:
 
         # Create all queries
         for tier in tiers:
-            query = memory_collection.where("agent_id", "==", agent_id).where("tier", "==", tier).count()
+            query = (
+                memory_collection.where("agent_id", "==", agent_id)
+                .where("tier", "==", tier)
+                .count()
+            )
             count_queries.append(query.get())
 
         # Add total count query
@@ -546,23 +561,33 @@ async def get_memory_stats(agent_id: str) -> Dict[str, Any]:
         )
 
         # Execute all queries in parallel
-        results = await asyncio.gather(*count_queries, ops_query, return_exceptions=True)
+        results = await asyncio.gather(
+            *count_queries, ops_query, return_exceptions=True
+        )
 
         # Process tier counts (first len(tiers) results)
         counts = {}
         for i, tier in enumerate(tiers):
             if isinstance(results[i], Exception):
-                logger.warning(f"Error getting count for tier {tier}: {str(results[i])}")
+                logger.warning(
+                    f"Error getting count for tier {tier}: {str(results[i])}"
+                )
                 counts[tier] = 0
             else:
-                counts[tier] = results[i][0][0].value if results[i] and results[i][0] else 0
+                counts[tier] = (
+                    results[i][0][0].value if results[i] and results[i][0] else 0
+                )
 
         # Process total count (next result)
         if isinstance(results[len(tiers)], Exception):
             logger.warning(f"Error getting total count: {str(results[len(tiers)])}")
             total_count = sum(counts.values())  # Fall back to sum of tiers
         else:
-            total_count = results[len(tiers)][0][0].value if results[len(tiers)] and results[len(tiers)][0] else 0
+            total_count = (
+                results[len(tiers)][0][0].value
+                if results[len(tiers)] and results[len(tiers)][0]
+                else 0
+            )
 
         # Process operations (last result)
         if isinstance(results[-1], Exception):
@@ -574,7 +599,9 @@ async def get_memory_stats(agent_id: str) -> Dict[str, Any]:
         # Calculate metrics and percentages
         percentages = {}
         for tier, count in counts.items():
-            percentages[tier] = round((count / total_count * 100) if total_count > 0 else 0, 2)
+            percentages[tier] = round(
+                (count / total_count * 100) if total_count > 0 else 0, 2
+            )
 
         # Add timestamp for freshness tracking
         timestamp = datetime.now().isoformat()

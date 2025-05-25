@@ -135,7 +135,12 @@ class LayeredMemory:
                     break
 
         # If item was found and migration is enabled, handle promotion
-        if result is not None and migrate and found_layer in self.layer_hierarchy and self.auto_promote:
+        if (
+            result is not None
+            and migrate
+            and found_layer in self.layer_hierarchy
+            and self.auto_promote
+        ):
             layer_index = self.layer_hierarchy.index(found_layer)
 
             # Promote to all layers above the found layer
@@ -169,7 +174,9 @@ class LayeredMemory:
             if layer in self.layers:
                 if not await self.layers[layer].delete(key):
                     success = False
-                    logger.error(f"Failed to delete item with key {key} from layer {layer}")
+                    logger.error(
+                        f"Failed to delete item with key {key} from layer {layer}"
+                    )
 
         return success
 
@@ -222,7 +229,9 @@ class LayeredMemory:
 
         # If field is "semantic", use semantic search
         if field == "semantic" and "semantic" in self.layers:
-            return await self.layers["semantic"].search("semantic", value, operator, limit)
+            return await self.layers["semantic"].search(
+                "semantic", value, operator, limit
+            )
 
         # If no layers specified, use all layers in hierarchy order
         if layers is None:
@@ -243,10 +252,14 @@ class LayeredMemory:
                     break
 
                 # Search in this layer
-                layer_results = await self.layers[layer].search(field, value, operator, limit - len(results))
+                layer_results = await self.layers[layer].search(
+                    field, value, operator, limit - len(results)
+                )
 
                 # Add unique results
-                existing_keys = {item.get("id", item.get("memory_key", "")) for item in results}
+                existing_keys = {
+                    item.get("id", item.get("memory_key", "")) for item in results
+                }
                 for item in layer_results:
                     item_key = item.get("id", item.get("memory_key", ""))
                     if item_key not in existing_keys:
@@ -255,7 +268,9 @@ class LayeredMemory:
 
         return results
 
-    async def update(self, key: str, updates: Dict[str, Any], layers: Optional[List[str]] = None) -> bool:
+    async def update(
+        self, key: str, updates: Dict[str, Any], layers: Optional[List[str]] = None
+    ) -> bool:
         """
         Update an item in memory.
 
@@ -284,7 +299,9 @@ class LayeredMemory:
             if layer in self.layers:
                 if not await self.layers[layer].update(key, document):
                     success = False
-                    logger.error(f"Failed to update item with key {key} in layer {layer}")
+                    logger.error(
+                        f"Failed to update item with key {key} in layer {layer}"
+                    )
 
         return success
 
@@ -309,11 +326,15 @@ class LayeredMemory:
         # Clear each layer
         for layer in clear_layers:
             if layer in self.layers:
-                if hasattr(self.layers[layer], "clear_all") and callable(getattr(self.layers[layer], "clear_all")):
+                if hasattr(self.layers[layer], "clear_all") and callable(
+                    getattr(self.layers[layer], "clear_all")
+                ):
                     if not await self.layers[layer].clear_all():
                         success = False
                         logger.error(f"Failed to clear layer {layer}")
-                elif hasattr(self.layers[layer], "clear") and callable(getattr(self.layers[layer], "clear")):
+                elif hasattr(self.layers[layer], "clear") and callable(
+                    getattr(self.layers[layer], "clear")
+                ):
                     if not await self.layers[layer].clear():
                         success = False
                         logger.error(f"Failed to clear layer {layer}")
@@ -388,7 +409,9 @@ class LayeredMemory:
         # If no layers specified, use semantic layer if available
         if layers is None:
             if "semantic" in self.layers:
-                return await self.layers["semantic"].search("semantic", query, "==", limit)
+                return await self.layers["semantic"].search(
+                    "semantic", query, "==", limit
+                )
             else:
                 search_layers = self.layer_hierarchy.copy()
         else:
@@ -405,7 +428,9 @@ class LayeredMemory:
 
                 # For semantic layer, use semantic search
                 if layer == "semantic":
-                    layer_results = await self.layers[layer].search("semantic", query, "==", limit - len(results))
+                    layer_results = await self.layers[layer].search(
+                        "semantic", query, "==", limit - len(results)
+                    )
                 # For other layers, use text search
                 else:
                     # Try content field first
@@ -415,12 +440,16 @@ class LayeredMemory:
 
                     # If no results, try text field
                     if not content_results:
-                        layer_results = await self.layers[layer].search("text", query, "contains", limit - len(results))
+                        layer_results = await self.layers[layer].search(
+                            "text", query, "contains", limit - len(results)
+                        )
                     else:
                         layer_results = content_results
 
                 # Add unique results
-                existing_keys = {item.get("id", item.get("memory_key", "")) for item in results}
+                existing_keys = {
+                    item.get("id", item.get("memory_key", "")) for item in results
+                }
                 for item in layer_results:
                     item_key = item.get("id", item.get("memory_key", ""))
                     if item_key not in existing_keys:
@@ -440,7 +469,9 @@ class LayeredMemory:
 
         for layer_name, layer_backend in self.layers.items():
             try:
-                if hasattr(layer_backend, "get_stats") and callable(getattr(layer_backend, "get_stats")):
+                if hasattr(layer_backend, "get_stats") and callable(
+                    getattr(layer_backend, "get_stats")
+                ):
                     layer_stats = await layer_backend.get_stats()
                     stats[layer_name] = layer_stats
                 else:
@@ -477,7 +508,9 @@ class LayeredMemory:
                 logger.warning(f"Layer {layer_name} not found in memory layers")
                 continue
 
-            if hasattr(self.layers[layer_name], "ttl") and callable(getattr(self.layers[layer_name], "ttl")):
+            if hasattr(self.layers[layer_name], "ttl") and callable(
+                getattr(self.layers[layer_name], "ttl")
+            ):
                 result = await self.layers[layer_name].ttl(key, ttl)
                 success = success or result
             else:

@@ -23,7 +23,9 @@ class Settings(BaseSettings):
 
     # API settings
     API_URL: str = Field("http://localhost:8080", description="API base URL")
-    BACKEND_CORS_ORIGINS: Union[str, List[str]] = Field(["*"], description="CORS origins")
+    BACKEND_CORS_ORIGINS: Union[str, List[str]] = Field(
+        ["*"], description="CORS origins"
+    )
 
     # Database settings (Cloud SQL PostgreSQL)
     DATABASE_URL: str = Field(
@@ -36,13 +38,19 @@ class Settings(BaseSettings):
     FIRESTORE_POOL_SIZE: int = Field(10, description="Firestore connection pool size")
 
     # Redis settings for caching
-    REDIS_URL: Optional[str] = Field(None, description="Redis connection URL for caching (optional)")
+    REDIS_URL: Optional[str] = Field(
+        None, description="Redis connection URL for caching (optional)"
+    )
     REDIS_TTL: int = Field(3600, description="Default Redis cache TTL in seconds")
 
     # Gemini settings
-    GEMINI_MODEL_ID: str = Field("gemini-2.5-pro-preview-05-06", description="Gemini model ID")
+    GEMINI_MODEL_ID: str = Field(
+        "gemini-2.5-pro-preview-05-06", description="Gemini model ID"
+    )
     GEMINI_LOCATION: str = Field("us-central1", description="Gemini API location")
-    GEMINI_CACHE_ENABLED: bool = Field(True, description="Enable Gemini response caching")
+    GEMINI_CACHE_ENABLED: bool = Field(
+        True, description="Enable Gemini response caching"
+    )
 
     # Logging
     LOG_LEVEL: str = Field("INFO", description="Logging level")
@@ -60,7 +68,9 @@ class Settings(BaseSettings):
         """
         if self._cors_origins is None:
             if isinstance(self.BACKEND_CORS_ORIGINS, str):
-                self._cors_origins = [origin.strip() for origin in self.BACKEND_CORS_ORIGINS.split(",")]
+                self._cors_origins = [
+                    origin.strip() for origin in self.BACKEND_CORS_ORIGINS.split(",")
+                ]
             else:
                 self._cors_origins = self.BACKEND_CORS_ORIGINS
         return self._cors_origins
@@ -96,7 +106,10 @@ class Settings(BaseSettings):
         """Log the configuration settings (excluding sensitive values)."""
         sensitive_keys = {"DATABASE_URL", "REDIS_URL"}
         config_dict = self.model_dump()
-        safe_config = {k: "***REDACTED***" if k in sensitive_keys else v for k, v in config_dict.items()}
+        safe_config = {
+            k: "***REDACTED***" if k in sensitive_keys else v
+            for k, v in config_dict.items()
+        }
         logger.info(f"Application configuration loaded: {safe_config}")
 
 

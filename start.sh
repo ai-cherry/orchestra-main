@@ -53,23 +53,23 @@ case "${1:-menu}" in
         echo ""
         echo -e "${YELLOW}💡 To get a shell: ./start.sh shell${NC}"
         ;;
-        
+
     "shell"|"4")
         echo -e "${GREEN}🐚 Opening shell in main container...${NC}"
         docker compose exec orchestra-dev /bin/bash
         ;;
-        
+
     "logs"|"5")
         echo -e "${GREEN}📋 Showing logs (Ctrl+C to exit)...${NC}"
         docker compose logs -f
         ;;
-        
+
     "stop"|"down"|"6")
         echo -e "${YELLOW}🛑 Stopping all services...${NC}"
         docker compose down
         echo -e "${GREEN}✅ All services stopped${NC}"
         ;;
-        
+
     "clean"|"nuke"|"7")
         echo -e "${RED}⚠️  This will delete all containers, volumes, and data!${NC}"
         read -p "Are you sure? (y/N) " -n 1 -r
@@ -80,12 +80,12 @@ case "${1:-menu}" in
             echo -e "${GREEN}✅ Everything cleaned${NC}"
         fi
         ;;
-        
+
     "test"|"8")
         echo -e "${GREEN}🧪 Running tests...${NC}"
         docker compose exec orchestra-dev poetry run pytest
         ;;
-        
+
     "menu"|*)
         while true; do
             show_menu
@@ -104,4 +104,4 @@ case "${1:-menu}" in
             esac
         done
         ;;
-esac 
+esac

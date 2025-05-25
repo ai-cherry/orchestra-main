@@ -66,13 +66,17 @@ class MetadataValidator:
         # Check required fields
         missing_fields = cls.required_fields - set(metadata.keys())
         if missing_fields:
-            raise MetadataValidationError(f"Missing required metadata fields: {', '.join(missing_fields)}")
+            raise MetadataValidationError(
+                f"Missing required metadata fields: {', '.join(missing_fields)}"
+            )
 
         # Check for unknown fields
         allowed_fields = cls.required_fields.union(cls.optional_fields)
         unknown_fields = set(metadata.keys()) - allowed_fields
         if unknown_fields:
-            logger.warning(f"Unknown metadata fields will be ignored: {', '.join(unknown_fields)}")
+            logger.warning(
+                f"Unknown metadata fields will be ignored: {', '.join(unknown_fields)}"
+            )
 
         # Validate individual fields
         validated_metadata = {}
@@ -83,7 +87,9 @@ class MetadataValidator:
                     try:
                         validated_metadata[field] = cls.field_validators[field](value)
                     except Exception as e:
-                        raise MetadataValidationError(f"Validation failed for field '{field}': {e}")
+                        raise MetadataValidationError(
+                            f"Validation failed for field '{field}': {e}"
+                        )
                 else:
                     validated_metadata[field] = value
 
@@ -142,14 +148,18 @@ class DevNoteMetadata(MetadataValidator):
             return DevNoteType(value).value
         except ValueError:
             valid_types = [t.value for t in DevNoteType]
-            raise ValueError(f"Invalid note type: {value}. Must be one of: {', '.join(valid_types)}")
+            raise ValueError(
+                f"Invalid note type: {value}. Must be one of: {', '.join(valid_types)}"
+            )
 
     @staticmethod
     def validate_priority(value: str) -> str:
         """Validate priority level."""
         valid_priorities = ["low", "normal", "high", "critical"]
         if value not in valid_priorities:
-            raise ValueError(f"Invalid priority: {value}. Must be one of: {', '.join(valid_priorities)}")
+            raise ValueError(
+                f"Invalid priority: {value}. Must be one of: {', '.join(valid_priorities)}"
+            )
         return value
 
     @staticmethod
@@ -221,7 +231,9 @@ class UserDataMetadata(MetadataValidator):
             return PrivacyLevel(value).value
         except ValueError:
             valid_levels = [l.value for l in PrivacyLevel]
-            raise ValueError(f"Invalid privacy level: {value}. Must be one of: {', '.join(valid_levels)}")
+            raise ValueError(
+                f"Invalid privacy level: {value}. Must be one of: {', '.join(valid_levels)}"
+            )
 
     @staticmethod
     def validate_retention_period(value: int) -> int:
@@ -259,7 +271,9 @@ class UserDataMetadata(MetadataValidator):
     }
 
 
-def validate_metadata(metadata: Dict[str, Any], validator_class: type) -> Dict[str, Any]:
+def validate_metadata(
+    metadata: Dict[str, Any], validator_class: type
+) -> Dict[str, Any]:
     """
     Validate metadata using the specified validator class.
 

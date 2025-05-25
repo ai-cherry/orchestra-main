@@ -1,82 +1,11 @@
 [tool.poetry]
-name = "orchestra-ai"
+name = "orchestra-main"
 version = "0.1.0"
-description = "Orchestra AI - Multi-agent orchestration system"
-authors = ["Orchestra Team"]
-readme = "README.md"
+description = "AI Orchestrator and Modular Agent Framework for GCP"
+authors = ["Your Name <your@email.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
 
-# Web Frameworks
-fastapi = "^0.115.0"
-flask = "^3.0.0"
-uvicorn = {extras = ["standard"], version = "^0.34.0"}
-
-# Google Cloud
-google-cloud-aiplatform = "^1.93.0"
-google-cloud-storage = "^2.19.0"
-google-cloud-secret-manager = "^2.23.0"
-google-cloud-firestore = "^2.20.0"
-google-cloud-bigquery = "*"
-google-auth = "^2.40.0"
-
-# AI/ML
-openai = "^1.82.0"
-litellm = "^1.70.0"
-tiktoken = "^0.7.0"
-transformers = "^4.36.0"
-sentence-transformers = "^2.2.0"
-numpy = "^2.2.0"
-
-# Database
-redis = {extras = ["hiredis"], version = "^6.1.0"}
-sqlalchemy = "^2.0.0"
-psycopg = {extras = ["binary"], version = "^3.1.0"}
-pgvector = "^0.2.0"
-
-# Utilities
-pydantic = "^2.11.0"
-python-dotenv = "^1.0.0"
-click = "^8.2.0"
-rich = "^13.7.0"
-pyyaml = "^6.0"
-httpx = "^0.28.0"
-tenacity = "^8.2.0"
-
 [tool.poetry.dev-dependencies]
-pytest = "^7.4.0"
-pytest-asyncio = "^0.21.0"
-pytest-cov = "^4.1.0"
-black = "^23.7.0"
-flake8 = "^6.1.0"
-mypy = "^1.5.0"
-# isort temporarily removed to unblock dependency resolution
-# ipython temporarily removed to unblock dependency resolution
-# pre-commit temporarily removed to unblock dependency resolution
-
-# gunicorn temporarily removed to unblock dependency resolution
-# prometheus-client temporarily removed to unblock dependency resolution
-# sentry-sdk temporarily removed to unblock CI/CD
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.black]
-line-length = 100
-target-version = ['py310']
-
-[tool.isort]
-profile = "black"
-line_length = 100
-
-[tool.mypy]
-python_version = "3.10"
-ignore_missing_imports = true
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = "test_*.py"
-python_classes = "Test*"
-python_functions = "test_*"
+pre-commit = "^4.2.0"

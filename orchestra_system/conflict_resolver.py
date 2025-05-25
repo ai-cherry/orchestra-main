@@ -43,12 +43,16 @@ try:
     )
     from gcp_migration.mcp_client_enhanced import get_client as get_mcp_client
 except ImportError:
-    logger.warning("Could not import enhanced MCP client, attempting to import basic client")
+    logger.warning(
+        "Could not import enhanced MCP client, attempting to import basic client"
+    )
     try:
         from gcp_migration.mcp_client import MCPClient
         from gcp_migration.mcp_client import get_client as get_mcp_client
     except ImportError:
-        logger.error("Failed to import MCP client. Conflict Resolver will operate in offline mode.")
+        logger.error(
+            "Failed to import MCP client. Conflict Resolver will operate in offline mode."
+        )
         MCPClient = object
 
         def get_mcp_client(*args, **kwargs):
@@ -63,7 +67,9 @@ try:
         get_registry,
     )
 except ImportError:
-    logger.warning("Could not import resource registry, some functionality will be limited")
+    logger.warning(
+        "Could not import resource registry, some functionality will be limited"
+    )
     Resource = None
     ResourceStatus = None
 
@@ -74,7 +80,9 @@ except ImportError:
 try:
     from orchestra_system.config_manager import ConfigConflict, ConfigEntry, get_manager
 except ImportError:
-    logger.warning("Could not import config manager, some functionality will be limited")
+    logger.warning(
+        "Could not import config manager, some functionality will be limited"
+    )
     ConfigEntry = None
     ConfigConflict = None
 
@@ -146,7 +154,9 @@ class Conflict:
         self.items = items
         self.description = description
         self.detected_at = detected_at or datetime.now().isoformat()
-        self.environment = environment or os.environ.get("DEPLOYMENT_ENV", "development")
+        self.environment = environment or os.environ.get(
+            "DEPLOYMENT_ENV", "development"
+        )
         self.severity = severity
 
         # Resolution information
@@ -185,7 +195,9 @@ class Conflict:
         )
 
         # Set resolution information
-        conflict.resolution_status = data.get("resolution_status", ResolutionStatus.PENDING)
+        conflict.resolution_status = data.get(
+            "resolution_status", ResolutionStatus.PENDING
+        )
         conflict.resolution_strategy = data.get("resolution_strategy")
         conflict.resolved_at = data.get("resolved_at")
         conflict.resolution_description = data.get("resolution_description")
@@ -285,28 +297,44 @@ class ConflictResolver:
             if self.mcp_client:
                 # Load conflicts from MCP memory
                 conflicts_response = self.mcp_client.get(self.CONFLICTS_KEY)
-                if conflicts_response and conflicts_response.success and conflicts_response.value:
+                if (
+                    conflicts_response
+                    and conflicts_response.success
+                    and conflicts_response.value
+                ):
                     conflicts_data = conflicts_response.value
                     for conflict_id, conflict_data in conflicts_data.items():
                         self.conflicts[conflict_id] = Conflict.from_dict(conflict_data)
 
                 # Load resolutions from MCP memory
                 resolutions_response = self.mcp_client.get(self.RESOLUTIONS_KEY)
-                if resolutions_response and resolutions_response.success and resolutions_response.value:
+                if (
+                    resolutions_response
+                    and resolutions_response.success
+                    and resolutions_response.value
+                ):
                     resolutions_data = resolutions_response.value
                     for conflict_id, resolution_data in resolutions_data.items():
-                        self.resolutions[conflict_id] = Resolution.from_dict(resolution_data)
+                        self.resolutions[conflict_id] = Resolution.from_dict(
+                            resolution_data
+                        )
 
                 # Load history from MCP memory
                 history_response = self.mcp_client.get(self.HISTORY_KEY)
-                if history_response and history_response.success and history_response.value:
+                if (
+                    history_response
+                    and history_response.success
+                    and history_response.value
+                ):
                     self.resolution_history = history_response.value
 
                 logger.info(
                     f"Loaded {len(self.conflicts)} conflicts and {len(self.resolutions)} resolutions from MCP memory"
                 )
             else:
-                logger.warning("No MCP client available. Conflict state will not be persistent.")
+                logger.warning(
+                    "No MCP client available. Conflict state will not be persistent."
+                )
 
         except Exception as e:
             logger.error(f"Failed to initialize Conflict Resolver: {e}")
@@ -318,17 +346,25 @@ class ConflictResolver:
                 return False
 
             # Save conflicts
-            conflicts_data = {conflict_id: conflict.to_dict() for conflict_id, conflict in self.conflicts.items()}
+            conflicts_data = {
+                conflict_id: conflict.to_dict()
+                for conflict_id, conflict in self.conflicts.items()
+            }
             conflicts_result = self.mcp_client.set(self.CONFLICTS_KEY, conflicts_data)
 
             # Save resolutions
             resolutions_data = {
-                resolution.conflict_id: resolution.to_dict() for resolution in self.resolutions.values()
+                resolution.conflict_id: resolution.to_dict()
+                for resolution in self.resolutions.values()
             }
-            resolutions_result = self.mcp_client.set(self.RESOLUTIONS_KEY, resolutions_data)
+            resolutions_result = self.mcp_client.set(
+                self.RESOLUTIONS_KEY, resolutions_data
+            )
 
             # Save history
-            history_result = self.mcp_client.set(self.HISTORY_KEY, self.resolution_history)
+            history_result = self.mcp_client.set(
+                self.HISTORY_KEY, self.resolution_history
+            )
 
             if not (
                 conflicts_result
@@ -394,7 +430,11 @@ class ConflictResolver:
                     logger.error(f"Failed to process file {file_path}: {e}")
 
             # Find duplicates
-            duplicates = {file_hash: paths for file_hash, paths in files_by_hash.items() if len(paths) > 1}
+            duplicates = {
+                file_hash: paths
+                for file_hash, paths in files_by_hash.items()
+                if len(paths) > 1
+            }
 
             # Create conflicts for duplicates
             conflicts = []
@@ -640,7 +680,9 @@ class ConflictResolver:
 
                 elif file_path.suffix.lower() in [".js", ".ts"]:
                     # JavaScript/TypeScript imports
-                    import_re = re.compile(r'(?:import|require)\s*\(?\s*[\'"]([^\'"]+)[\'"]')
+                    import_re = re.compile(
+                        r'(?:import|require)\s*\(?\s*[\'"]([^\'"]+)[\'"]'
+                    )
                     for match in import_re.finditer(content):
                         try:
                             module = match.group(1)
@@ -837,7 +879,9 @@ class ConflictResolver:
         all_conflicts.extend(file_conflicts)
 
         # Detect reference inconsistencies
-        ref_conflicts = self.detect_reference_inconsistencies(directory, [".py", ".js", ".ts"])
+        ref_conflicts = self.detect_reference_inconsistencies(
+            directory, [".py", ".js", ".ts"]
+        )
         all_conflicts.extend(ref_conflicts)
 
         # Detect configuration conflicts
@@ -877,7 +921,9 @@ class ConflictResolver:
             # For manual resolution, use provided actions
             if strategy == ResolutionStrategy.MANUAL:
                 if not manual_actions:
-                    logger.error("Manual actions required for MANUAL resolution strategy")
+                    logger.error(
+                        "Manual actions required for MANUAL resolution strategy"
+                    )
                     return None
 
                 # Create resolution
@@ -953,7 +999,9 @@ class ConflictResolver:
             logger.error(f"Failed to resolve conflict {conflict_id}: {e}")
             return None
 
-    def _resolve_duplicate_file(self, conflict: Conflict, strategy: ResolutionStrategy) -> Optional[Resolution]:
+    def _resolve_duplicate_file(
+        self, conflict: Conflict, strategy: ResolutionStrategy
+    ) -> Optional[Resolution]:
         """Resolve a duplicate file conflict.
 
         Args:
@@ -1034,7 +1082,9 @@ class ConflictResolver:
                     )
 
             else:
-                logger.error(f"Unsupported resolution strategy for duplicate files: {strategy}")
+                logger.error(
+                    f"Unsupported resolution strategy for duplicate files: {strategy}"
+                )
                 return None
 
             # Create resolution
@@ -1053,7 +1103,9 @@ class ConflictResolver:
             logger.error(f"Failed to resolve duplicate file conflict: {e}")
             return None
 
-    def _resolve_file_conflict(self, conflict: Conflict, strategy: ResolutionStrategy) -> Optional[Resolution]:
+    def _resolve_file_conflict(
+        self, conflict: Conflict, strategy: ResolutionStrategy
+    ) -> Optional[Resolution]:
         """Resolve a file conflict.
 
         Args:
@@ -1138,7 +1190,9 @@ class ConflictResolver:
                         )
 
             else:
-                logger.error(f"Unsupported resolution strategy for file conflicts: {strategy}")
+                logger.error(
+                    f"Unsupported resolution strategy for file conflicts: {strategy}"
+                )
                 return None
 
             # Create resolution
@@ -1157,7 +1211,9 @@ class ConflictResolver:
             logger.error(f"Failed to resolve file conflict: {e}")
             return None
 
-    def _resolve_resource_conflict(self, conflict: Conflict, strategy: ResolutionStrategy) -> Optional[Resolution]:
+    def _resolve_resource_conflict(
+        self, conflict: Conflict, strategy: ResolutionStrategy
+    ) -> Optional[Resolution]:
         """Resolve a resource conflict.
 
         Args:
@@ -1190,7 +1246,9 @@ class ConflictResolver:
             elif strategy == ResolutionStrategy.ENVIRONMENT:
                 # Filter items by environment
                 current_env = os.environ.get("DEPLOYMENT_ENV", "development")
-                env_items = [item for item in items if item["environment"] == current_env]
+                env_items = [
+                    item for item in items if item["environment"] == current_env
+                ]
 
                 if env_items:
                     env_item = env_items[0]
@@ -1215,7 +1273,9 @@ class ConflictResolver:
                     )
 
             else:
-                logger.error(f"Unsupported resolution strategy for resource conflicts: {strategy}")
+                logger.error(
+                    f"Unsupported resolution strategy for resource conflicts: {strategy}"
+                )
                 return None
 
             # Create resolution
@@ -1234,7 +1294,9 @@ class ConflictResolver:
             logger.error(f"Failed to resolve resource conflict: {e}")
             return None
 
-    def _resolve_config_conflict(self, conflict: Conflict, strategy: ResolutionStrategy) -> Optional[Resolution]:
+    def _resolve_config_conflict(
+        self, conflict: Conflict, strategy: ResolutionStrategy
+    ) -> Optional[Resolution]:
         """Resolve a configuration conflict.
 
         Args:
@@ -1267,7 +1329,9 @@ class ConflictResolver:
             elif strategy == ResolutionStrategy.ENVIRONMENT:
                 # Filter items by environment
                 current_env = os.environ.get("DEPLOYMENT_ENV", "development")
-                env_items = [item for item in items if item["environment"] == current_env]
+                env_items = [
+                    item for item in items if item["environment"] == current_env
+                ]
 
                 if env_items:
                     env_item = env_items[0]
@@ -1292,7 +1356,9 @@ class ConflictResolver:
                     )
 
             else:
-                logger.error(f"Unsupported resolution strategy for config conflicts: {strategy}")
+                logger.error(
+                    f"Unsupported resolution strategy for config conflicts: {strategy}"
+                )
                 return None
 
             # Create resolution
@@ -1357,14 +1423,18 @@ class ConflictResolver:
                 return resolution
 
             else:
-                logger.error(f"Unsupported resolution strategy for reference inconsistencies: {strategy}")
+                logger.error(
+                    f"Unsupported resolution strategy for reference inconsistencies: {strategy}"
+                )
                 return None
 
         except Exception as e:
             logger.error(f"Failed to resolve reference inconsistency: {e}")
             return None
 
-    def _resolve_dependency_conflict(self, conflict: Conflict, strategy: ResolutionStrategy) -> Optional[Resolution]:
+    def _resolve_dependency_conflict(
+        self, conflict: Conflict, strategy: ResolutionStrategy
+    ) -> Optional[Resolution]:
         """Resolve a dependency conflict.
 
         Args:
@@ -1383,7 +1453,9 @@ class ConflictResolver:
             logger.error(f"Failed to resolve dependency conflict: {e}")
             return None
 
-    def _resolve_version_conflict(self, conflict: Conflict, strategy: ResolutionStrategy) -> Optional[Resolution]:
+    def _resolve_version_conflict(
+        self, conflict: Conflict, strategy: ResolutionStrategy
+    ) -> Optional[Resolution]:
         """Resolve a version conflict.
 
         Args:
@@ -1465,7 +1537,9 @@ class ConflictResolver:
                     if path and source_path and os.path.exists(source_path):
                         try:
                             # Copy source to destination
-                            with open(source_path, "rb") as src, open(path, "wb") as dst:
+                            with open(source_path, "rb") as src, open(
+                                path, "wb"
+                            ) as dst:
                                 dst.write(src.read())
 
                             logger.info(f"Overwrote file: {path} with {source_path}")
@@ -1510,10 +1584,14 @@ class ConflictResolver:
                             registry = get_registry()
 
                             # Find resources with the name
-                            for resource_id, resource in getattr(registry, "resources", {}).items():
+                            for resource_id, resource in getattr(
+                                registry, "resources", {}
+                            ).items():
                                 if resource.name == name:
                                     resource.access_pattern = access_pattern
-                                    logger.info(f"Updated resource {name} access pattern: {access_pattern}")
+                                    logger.info(
+                                        f"Updated resource {name} access pattern: {access_pattern}"
+                                    )
 
                             # Save registry
                             if hasattr(registry, "_save_to_mcp"):
@@ -1585,7 +1663,9 @@ class ConflictResolver:
         """
         return self.resolutions.get(resolution_id)
 
-    def get_all_conflicts(self, status: Optional[ResolutionStatus] = None) -> List[Conflict]:
+    def get_all_conflicts(
+        self, status: Optional[ResolutionStatus] = None
+    ) -> List[Conflict]:
         """Get all conflicts.
 
         Args:
@@ -1595,11 +1675,17 @@ class ConflictResolver:
             List of conflicts
         """
         if status:
-            return [conflict for conflict in self.conflicts.values() if conflict.resolution_status == status]
+            return [
+                conflict
+                for conflict in self.conflicts.values()
+                if conflict.resolution_status == status
+            ]
         else:
             return list(self.conflicts.values())
 
-    def get_all_resolutions(self, status: Optional[ResolutionStatus] = None) -> List[Resolution]:
+    def get_all_resolutions(
+        self, status: Optional[ResolutionStatus] = None
+    ) -> List[Resolution]:
         """Get all resolutions.
 
         Args:
@@ -1609,7 +1695,11 @@ class ConflictResolver:
             List of resolutions
         """
         if status:
-            return [resolution for resolution in self.resolutions.values() if resolution.status == status]
+            return [
+                resolution
+                for resolution in self.resolutions.values()
+                if resolution.status == status
+            ]
         else:
             return list(self.resolutions.values())
 
@@ -1618,7 +1708,9 @@ class ConflictResolver:
 _default_resolver: Optional[ConflictResolver] = None
 
 
-def get_resolver(mcp_client: Optional[MCPClient] = None, force_new: bool = False) -> ConflictResolver:
+def get_resolver(
+    mcp_client: Optional[MCPClient] = None, force_new: bool = False
+) -> ConflictResolver:
     """Get the default conflict resolver.
 
     Args:
@@ -1649,7 +1741,9 @@ def detect_conflicts(directory: Union[str, Path] = ".") -> List[Conflict]:
     return get_resolver().detect_all_conflicts(directory)
 
 
-def resolve_conflict(conflict_id: str, strategy: ResolutionStrategy, **kwargs) -> Optional[Resolution]:
+def resolve_conflict(
+    conflict_id: str, strategy: ResolutionStrategy, **kwargs
+) -> Optional[Resolution]:
     """Resolve a conflict.
 
     Args:

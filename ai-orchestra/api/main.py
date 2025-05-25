@@ -331,7 +331,9 @@ class DocumentListResponse(BaseModel):
 
 # Exception handlers
 @app.exception_handler(AIServiceError)
-async def ai_service_error_handler(request: Request, exc: AIServiceError) -> JSONResponse:
+async def ai_service_error_handler(
+    request: Request, exc: AIServiceError
+) -> JSONResponse:
     """
     Handle AI service errors.
 
@@ -344,7 +346,12 @@ async def ai_service_error_handler(request: Request, exc: AIServiceError) -> JSO
     """
     logger.error(
         "Handled AI service error",
-        extra={"code": exc.code, "message": exc.message, "path": request.url.path, "error_type": "AIServiceError"},
+        extra={
+            "code": exc.code,
+            "message": exc.message,
+            "path": request.url.path,
+            "error_type": "AIServiceError",
+        },
     )
 
     return JSONResponse(
@@ -1062,7 +1069,9 @@ async def process_document(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         logger.error(
-            "Error processing document", exc_info=True, extra={"file_path": request.file_path, "error_message": str(e)}
+            "Error processing document",
+            exc_info=True,
+            extra={"file_path": request.file_path, "error_message": str(e)},
         )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -1100,7 +1109,9 @@ async def upload_document(
         metadata = json.loads(metadata_json) if metadata_json else {}
 
         # Create a temporary file to store the uploaded content
-        with tempfile.NamedTemporaryFile(delete=False, suffix=f"_{file.filename}") as temp_file:
+        with tempfile.NamedTemporaryFile(
+            delete=False, suffix=f"_{file.filename}"
+        ) as temp_file:
             # Write uploaded file content to the temporary file
             content = await file.read()
             temp_file.write(content)

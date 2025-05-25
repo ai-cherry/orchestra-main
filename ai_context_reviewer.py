@@ -4,13 +4,13 @@ AI CONTEXT: REVIEWER MODE - Orchestra Project (2025+)
 
 READ THIS ENTIRE FILE BEFORE REVIEWING ANY CODE!
 
-Project: Orchestra AI (Python 3.11+, Poetry, Docker Compose, GCP, single-developer)
+Project: Orchestra AI (Python 3.10+, Poetry, Docker Compose, GCP, single-developer)
 Role: You are reviewing code changes for compliance, quality, and stability.
 
 REVIEW CHECKLIST:
 
 1. ENVIRONMENT & DEPENDENCY COMPLIANCE
-   ✅ Python 3.11+ only (no 3.10 or earlier)
+   ✅ Python 3.10+ only (no 3.10 or earlier)
    ✅ All code runs in Docker containers managed by `docker compose`
    ✅ Poetry (version pinned in CI) manages all Python dependencies
    ✅ Node 18+ and `npm ci` for Admin UI (version pinned in Dockerfile)
@@ -52,7 +52,7 @@ APPROVE ONLY IF:
 - No forbidden patterns detected
 - No unnecessary duplication
 - Follows project structure and standards
-- Works with Python 3.11+
+- Works with Python 3.10+
 - Uses existing tools appropriately
 - Has proper error handling and type hints
 

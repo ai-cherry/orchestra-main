@@ -126,7 +126,9 @@ class ClaudeMonitor:
             pass
         # Default to in-memory storage
 
-    def calculate_cost(self, model: str, input_tokens: int, output_tokens: int) -> float:
+    def calculate_cost(
+        self, model: str, input_tokens: int, output_tokens: int
+    ) -> float:
         """Calculate the cost for a Claude API call"""
         if model not in CLAUDE_PRICING:
             logger.warning(f"Unknown model {model}, using default pricing")
@@ -212,7 +214,9 @@ class ClaudeMonitor:
             if session_id:
                 self.session_costs[session_id] += cost_usd
                 if self.session_costs[session_id] > self.alert_threshold_cost:
-                    await self._send_cost_alert(session_id, self.session_costs[session_id])
+                    await self._send_cost_alert(
+                        session_id, self.session_costs[session_id]
+                    )
 
         except Exception as e:
             # Record error metrics
@@ -278,7 +282,11 @@ class ClaudeMonitor:
         """Send alert when cost threshold is exceeded"""
         logger.warning(
             f"Cost threshold exceeded for session {session_id}",
-            extra={"session_id": session_id, "total_cost_usd": total_cost, "threshold_usd": self.alert_threshold_cost},
+            extra={
+                "session_id": session_id,
+                "total_cost_usd": total_cost,
+                "threshold_usd": self.alert_threshold_cost,
+            },
         )
         # TODO: Send actual alert (email, Slack, etc.)
 
@@ -286,7 +294,11 @@ class ClaudeMonitor:
         """Send alert when error threshold is exceeded"""
         logger.error(
             f"Error threshold exceeded for model {model}",
-            extra={"model": model, "consecutive_errors": error_count, "threshold": self.alert_threshold_errors},
+            extra={
+                "model": model,
+                "consecutive_errors": error_count,
+                "threshold": self.alert_threshold_errors,
+            },
         )
         # TODO: Send actual alert (email, Slack, etc.)
 
@@ -305,13 +317,17 @@ class ClaudeMonitor:
         filtered_metrics = self.metrics
 
         if start_time:
-            filtered_metrics = [m for m in filtered_metrics if m.timestamp >= start_time]
+            filtered_metrics = [
+                m for m in filtered_metrics if m.timestamp >= start_time
+            ]
         if end_time:
             filtered_metrics = [m for m in filtered_metrics if m.timestamp <= end_time]
         if user_id:
             filtered_metrics = [m for m in filtered_metrics if m.user_id == user_id]
         if session_id:
-            filtered_metrics = [m for m in filtered_metrics if m.session_id == session_id]
+            filtered_metrics = [
+                m for m in filtered_metrics if m.session_id == session_id
+            ]
         if model:
             filtered_metrics = [m for m in filtered_metrics if m.model == model]
 
@@ -348,7 +364,10 @@ class ClaudeMonitor:
         return summary
 
     def export_metrics(
-        self, format: str = "json", start_time: Optional[datetime] = None, end_time: Optional[datetime] = None
+        self,
+        format: str = "json",
+        start_time: Optional[datetime] = None,
+        end_time: Optional[datetime] = None,
     ) -> Union[str, List[Dict[str, Any]]]:
         """
         Export metrics in the specified format.
@@ -358,7 +377,9 @@ class ClaudeMonitor:
         # Filter metrics
         filtered_metrics = self.metrics
         if start_time:
-            filtered_metrics = [m for m in filtered_metrics if m.timestamp >= start_time]
+            filtered_metrics = [
+                m for m in filtered_metrics if m.timestamp >= start_time
+            ]
         if end_time:
             filtered_metrics = [m for m in filtered_metrics if m.timestamp <= end_time]
 

@@ -4,16 +4,16 @@ AI CONTEXT: PLANNER MODE - Orchestra Project (2025+)
 
 READ THIS ENTIRE FILE BEFORE PLANNING ANY CHANGES!
 
-Project: Orchestra AI (Python 3.11+, Poetry, Docker Compose, GCP, single-developer)
+Project: Orchestra AI (Python 3.10+, Poetry, Docker Compose, GCP, single-developer)
 Role: You are planning a change or feature for this project.
 
 CRITICAL RULES:
-1. Python 3.11+ REQUIRED (no exceptions)
+1. Python 3.10+ REQUIRED (no exceptions)
 2. All code runs in Docker containers managed by `docker compose`
 3. Poetry (version pinned in CI) manages all Python dependencies inside containers
 4. Node 18+ and `npm ci` for Admin UI (version pinned in Dockerfile)
 5. Infrastructure-as-code is Pulumi (Python) for GCP only
-6. GitHub Actions is the only CI/CD system (Python 3.11+, Poetry, GCP deploy)
+6. GitHub Actions is the only CI/CD system (Python 3.10+, Poetry, GCP deploy)
 7. Performance and stability > security or multi-user features (see PROJECT_PRIORITIES.md)
 
 PLANNING CHECKLIST:

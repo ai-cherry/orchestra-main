@@ -43,7 +43,9 @@ class SecretManager:
             local_fallback_path: Path to local secrets file for development.
             cache_ttl_seconds: Time-to-live for secret cache in seconds.
         """
-        self.project_id = project_id or os.environ.get("GCP_PROJECT_ID") or "cherry-ai-project"
+        self.project_id = (
+            project_id or os.environ.get("GCP_PROJECT_ID") or "cherry-ai-project"
+        )
         self.local_fallback_path = local_fallback_path
         self.cache_ttl_seconds = cache_ttl_seconds
         self._client = None
@@ -65,9 +67,13 @@ class SecretManager:
             if path.exists() and path.is_file():
                 with open(path, "r") as f:
                     self._local_secrets = json.load(f)
-                logger.info(f"Loaded {len(self._local_secrets)} secrets from {self.local_fallback_path}")
+                logger.info(
+                    f"Loaded {len(self._local_secrets)} secrets from {self.local_fallback_path}"
+                )
             else:
-                logger.warning(f"Local secrets file not found: {self.local_fallback_path}")
+                logger.warning(
+                    f"Local secrets file not found: {self.local_fallback_path}"
+                )
         except Exception as e:
             logger.error(f"Error loading local secrets: {e}")
 
@@ -105,7 +111,10 @@ class SecretManager:
         if cache_key in self._secret_cache:
             cache_entry = self._secret_cache[cache_key]
             # Check if cache is still valid
-            if cache_entry["timestamp"] + self.cache_ttl_seconds > asyncio.get_event_loop().time():
+            if (
+                cache_entry["timestamp"] + self.cache_ttl_seconds
+                > asyncio.get_event_loop().time()
+            ):
                 logger.debug(f"Using cached secret: {secret_id}")
                 return cache_entry["value"]
             # Cache expired, remove it
@@ -135,7 +144,9 @@ class SecretManager:
 
         return secret_value
 
-    def _get_from_gcp(self, secret_id: str, version_id: str = "latest") -> Optional[str]:
+    def _get_from_gcp(
+        self, secret_id: str, version_id: str = "latest"
+    ) -> Optional[str]:
         """Get a secret from GCP Storage using the GCP_SECRET_MANAGEMENT_KEY.
 
         Args:
@@ -178,7 +189,9 @@ class SecretManager:
 
         return None
 
-    async def get_secret_async(self, secret_id: str, version_id: str = "latest") -> Optional[str]:
+    async def get_secret_async(
+        self, secret_id: str, version_id: str = "latest"
+    ) -> Optional[str]:
         """Get a secret asynchronously.
 
         Args:
@@ -200,7 +213,9 @@ class SecretManager:
         """
         if secret_id:
             # Clear specific secret
-            keys_to_remove = [k for k in self._secret_cache if k.startswith(f"{secret_id}:")]
+            keys_to_remove = [
+                k for k in self._secret_cache if k.startswith(f"{secret_id}:")
+            ]
             for key in keys_to_remove:
                 del self._secret_cache[key]
             logger.debug(f"Cleared cache for secret: {secret_id}")
@@ -223,7 +238,9 @@ class SecretManager:
         """
         return {secret_id: self.get_secret(secret_id) for secret_id in secret_ids}
 
-    async def get_multiple_secrets_async(self, secret_ids: list[str]) -> Dict[str, Optional[str]]:
+    async def get_multiple_secrets_async(
+        self, secret_ids: list[str]
+    ) -> Dict[str, Optional[str]]:
         """Get multiple secrets asynchronously.
 
         Args:

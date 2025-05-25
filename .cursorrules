@@ -36,6 +36,6 @@ For best results, reference these in your prompts:
 ## Forbidden
 - Docker/docker-compose files
 - Poetry/Pipfile
-- Python 3.11+ features (match/case, tomllib)
+- Python 3.10+ features (match/case, tomllib)
 - Complex patterns (metaclasses, multiple inheritance)
 - Heavy dependencies for simple tasks

@@ -193,8 +193,12 @@ class SimpleMCPServer:
 
 def main():
     """Main entry point for the Simple MCP server."""
-    parser = argparse.ArgumentParser(description="Simple Model Context Protocol (MCP) Server")
-    parser.add_argument("--storage", default="./.mcp_memory", help="Path to storage directory")
+    parser = argparse.ArgumentParser(
+        description="Simple Model Context Protocol (MCP) Server"
+    )
+    parser.add_argument(
+        "--storage", default="./.mcp_memory", help="Path to storage directory"
+    )
     parser.add_argument("--port", type=int, default=8080, help="Port to bind to")
 
     args = parser.parse_args()

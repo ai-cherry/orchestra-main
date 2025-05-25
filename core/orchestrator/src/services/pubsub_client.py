@@ -52,7 +52,9 @@ class PubSubClient:
             # Add environment suffix if not already present
             if not topic_name.endswith(f"-{self.environment}"):
                 topic_name = f"{topic_name}-{self.environment}"
-            self.topic_paths[topic_name] = self.publisher.topic_path(self.project_id, topic_name)
+            self.topic_paths[topic_name] = self.publisher.topic_path(
+                self.project_id, topic_name
+            )
         return self.topic_paths[topic_name]
 
     def get_subscription_path(self, subscription_name: str) -> str:
@@ -69,8 +71,8 @@ class PubSubClient:
             # Add environment suffix if not already present
             if not subscription_name.endswith(f"-{self.environment}"):
                 subscription_name = f"{subscription_name}-{self.environment}"
-            self.subscription_paths[subscription_name] = self.subscriber.subscription_path(
-                self.project_id, subscription_name
+            self.subscription_paths[subscription_name] = (
+                self.subscriber.subscription_path(self.project_id, subscription_name)
             )
         return self.subscription_paths[subscription_name]
 
@@ -94,7 +96,9 @@ class PubSubClient:
 
         return topic_path
 
-    def create_subscription(self, subscription_name: str, topic_name: str, filter_expr: Optional[str] = None) -> str:
+    def create_subscription(
+        self, subscription_name: str, topic_name: str, filter_expr: Optional[str] = None
+    ) -> str:
         """
         Create a subscription if it doesn't exist.
 
@@ -221,7 +225,9 @@ class PubSubClient:
                     message.nack()
 
         # Start the subscription
-        streaming_pull_future = self.subscriber.subscribe(subscription_path, wrapped_callback)
+        streaming_pull_future = self.subscriber.subscribe(
+            subscription_path, wrapped_callback
+        )
         self.subscription_futures[subscription_name] = streaming_pull_future
 
         logger.info(f"Listening for messages on {subscription_path}")
@@ -257,7 +263,9 @@ class PubSubClient:
                 message.nack()
 
         # Start the subscription
-        streaming_pull_future = self.subscriber.subscribe(subscription_path, sync_callback)
+        streaming_pull_future = self.subscriber.subscribe(
+            subscription_path, sync_callback
+        )
         self.subscription_futures[subscription_name] = streaming_pull_future
 
         logger.info(f"Listening for messages on {subscription_path}")

@@ -107,7 +107,9 @@ class EnhancedServiceRegistry:
         self._services: List[Any] = []
         self._service_by_type: Dict[Type[Any], Any] = {}
         self._service_factories: Dict[Type[Any], ServiceFactory[Any]] = {}
-        self._service_ids: Set[int] = set()  # Track service object IDs to prevent duplicates
+        self._service_ids: Set[int] = (
+            set()
+        )  # Track service object IDs to prevent duplicates
 
         logger.debug("EnhancedServiceRegistry initialized")
 
@@ -142,7 +144,10 @@ class EnhancedServiceRegistry:
 
         # Register by each base class/interface that it implements
         for base_class in service_type.__mro__[1:]:  # Skip the class itself
-            if base_class not in (object, ABC) and base_class not in self._service_by_type:
+            if (
+                base_class not in (object, ABC)
+                and base_class not in self._service_by_type
+            ):
                 self._service_by_type[base_class] = service
 
         logger.debug(f"Registered service: {service_type.__name__}")
@@ -219,7 +224,9 @@ class EnhancedServiceRegistry:
         """
         service = self.get_service(service_type)
         if service is None:
-            raise ValueError(f"Required service of type {service_type.__name__} not found")
+            raise ValueError(
+                f"Required service of type {service_type.__name__} not found"
+            )
         return service
 
     def unregister(self, service: Any) -> bool:
@@ -261,7 +268,10 @@ class EnhancedServiceRegistry:
         Returns:
             True if the service is available, False otherwise
         """
-        return service_type in self._service_by_type or service_type in self._service_factories
+        return (
+            service_type in self._service_by_type
+            or service_type in self._service_factories
+        )
 
     async def initialize_all_async(self) -> Dict[str, str]:
         """
@@ -283,14 +293,20 @@ class EnhancedServiceRegistry:
             service_name = service.__class__.__name__
 
             # Check if the service supports async initialization
-            if hasattr(service, "initialize_async") and callable(service.initialize_async):
+            if hasattr(service, "initialize_async") and callable(
+                service.initialize_async
+            ):
                 # Create tasks for async initialization
-                task = asyncio.create_task(self._initialize_service_async(service, service_name))
+                task = asyncio.create_task(
+                    self._initialize_service_async(service, service_name)
+                )
                 initialization_tasks.append(task)
             elif hasattr(service, "initialize") and callable(service.initialize):
                 # For synchronous initialize methods, run in thread pool
                 loop = asyncio.get_running_loop()
-                task = asyncio.create_task(self._initialize_service_sync(service, service_name, loop))
+                task = asyncio.create_task(
+                    self._initialize_service_sync(service, service_name, loop)
+                )
                 initialization_tasks.append(task)
 
         # Wait for all initialization tasks to complete
@@ -304,13 +320,17 @@ class EnhancedServiceRegistry:
                     errors[service_name] = error
 
         if errors:
-            logger.warning(f"Service initialization completed with {len(errors)} errors")
+            logger.warning(
+                f"Service initialization completed with {len(errors)} errors"
+            )
         else:
             logger.info("All services initialized successfully")
 
         return errors
 
-    async def _initialize_service_async(self, service: Any, service_name: str) -> tuple[str, Optional[str]]:
+    async def _initialize_service_async(
+        self, service: Any, service_name: str
+    ) -> tuple[str, Optional[str]]:
         """
         Initialize a service using its async initialize method.
 
@@ -326,7 +346,9 @@ class EnhancedServiceRegistry:
             logger.debug(f"Initialized service asynchronously: {service_name}")
             return service_name, None
         except Exception as e:
-            error_msg = f"Failed to initialize service {service_name} asynchronously: {e}"
+            error_msg = (
+                f"Failed to initialize service {service_name} asynchronously: {e}"
+            )
             logger.error(error_msg, exc_info=True)
             return service_name, error_msg
 
@@ -350,7 +372,9 @@ class EnhancedServiceRegistry:
             logger.debug(f"Initialized service in thread pool: {service_name}")
             return service_name, None
         except Exception as e:
-            error_msg = f"Failed to initialize service {service_name} in thread pool: {e}"
+            error_msg = (
+                f"Failed to initialize service {service_name} in thread pool: {e}"
+            )
             logger.error(error_msg, exc_info=True)
             return service_name, error_msg
 
@@ -381,7 +405,9 @@ class EnhancedServiceRegistry:
                     # Don't re-raise, we want to try initializing all services
 
         if errors:
-            logger.warning(f"Service initialization completed with {len(errors)} errors")
+            logger.warning(
+                f"Service initialization completed with {len(errors)} errors"
+            )
         else:
             logger.info("All services initialized successfully")
 
@@ -408,11 +434,15 @@ class EnhancedServiceRegistry:
 
             # Check if the service supports async closure
             if hasattr(service, "close_async") and callable(service.close_async):
-                task = asyncio.create_task(self._close_service_async(service, service_name))
+                task = asyncio.create_task(
+                    self._close_service_async(service, service_name)
+                )
                 closure_tasks.append(task)
             elif hasattr(service, "close") and callable(service.close):
                 loop = asyncio.get_running_loop()
-                task = asyncio.create_task(self._close_service_sync(service, service_name, loop))
+                task = asyncio.create_task(
+                    self._close_service_sync(service, service_name, loop)
+                )
                 closure_tasks.append(task)
 
         # Wait for all closure tasks to complete
@@ -435,7 +465,9 @@ class EnhancedServiceRegistry:
 
         return errors
 
-    async def _close_service_async(self, service: Any, service_name: str) -> tuple[str, Optional[str]]:
+    async def _close_service_async(
+        self, service: Any, service_name: str
+    ) -> tuple[str, Optional[str]]:
         """
         Close a service using its async close method.
 
@@ -580,6 +612,8 @@ def get_required_service(service_type: Type[T]) -> T:
     return get_enhanced_service_registry().get_required_service(service_type)
 
 
-def register_factory(service_type: Type[T], factory: Union[ServiceFactory[T], Callable[[], T]]) -> ServiceFactory[T]:
+def register_factory(
+    service_type: Type[T], factory: Union[ServiceFactory[T], Callable[[], T]]
+) -> ServiceFactory[T]:
     """Register a service factory with the global registry."""
     return get_enhanced_service_registry().register_factory(service_type, factory)

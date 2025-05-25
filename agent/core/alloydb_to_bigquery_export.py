@@ -201,7 +201,9 @@ class AlloyDBToBigQueryExporter:
         )
 
         try:
-            load_job = self.bq_client.load_table_from_uri(gcs_uri, table_id, job_config=job_config)
+            load_job = self.bq_client.load_table_from_uri(
+                gcs_uri, table_id, job_config=job_config
+            )
             load_job.result()  # Wait for the job to complete
             logger.info(f"Loaded {load_job.output_rows} rows into {table_id}.")
         except Exception as e:
@@ -229,7 +231,9 @@ class AlloyDBToBigQueryExporter:
 if __name__ == "__main__":
     # Load configuration from environment variables or defaults
     exporter = AlloyDBToBigQueryExporter(
-        alloydb_connection_name=os.getenv("ALLOYDB_CONNECTION_NAME", "cherry-ai-project:us-central1:orchestra-db"),
+        alloydb_connection_name=os.getenv(
+            "ALLOYDB_CONNECTION_NAME", "cherry-ai-project:us-central1:orchestra-db"
+        ),
         alloydb_db_name=os.getenv("ALLOYDB_DB_NAME", "cherry_ai_db"),
         alloydb_user=os.getenv("ALLOYDB_USER", "postgres"),
         alloydb_password=os.getenv("ALLOYDB_PASSWORD", ""),

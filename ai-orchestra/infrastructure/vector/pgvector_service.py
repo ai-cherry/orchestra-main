@@ -114,7 +114,9 @@ class PGVectorService:
                 """
                 )
             except Exception as e:
-                logger.warning(f"Could not create HNSW index, falling back to IVFFlat: {e}")
+                logger.warning(
+                    f"Could not create HNSW index, falling back to IVFFlat: {e}"
+                )
                 # Fall back to IVFFlat index which is more widely supported
                 await conn.execute(
                     """
@@ -287,7 +289,9 @@ class PGVectorService:
                 # Use a transaction for atomic operation
                 async with conn.transaction():
                     # Delete document (cascade will delete chunks)
-                    await conn.execute("DELETE FROM documents WHERE id = $1", document_id)
+                    await conn.execute(
+                        "DELETE FROM documents WHERE id = $1", document_id
+                    )
                 return True
             except Exception as e:
                 logger.error(f"Error deleting document: {e}")
@@ -329,7 +333,9 @@ class PGVectorService:
                 logger.error(f"Error getting document: {e}")
                 return None
 
-    async def list_documents(self, limit: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
+    async def list_documents(
+        self, limit: int = 100, offset: int = 0
+    ) -> List[Dict[str, Any]]:
         """
         List all documents.
 

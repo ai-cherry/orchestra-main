@@ -1,5 +1,5 @@
 # Stage 1: Builder stage - for installing dependencies including build-time ones
-FROM python:3.11-slim-bullseye AS builder
+FROM python:3.10-slim-bullseye AS builder
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -25,7 +25,7 @@ COPY requirements-app.txt ./
 RUN pip wheel --no-cache-dir --wheel-dir=/wheels -r requirements-app.txt
 
 # Stage 2: Final runtime stage - minimal image
-FROM python:3.11-slim-bullseye AS final
+FROM python:3.10-slim-bullseye AS final
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1

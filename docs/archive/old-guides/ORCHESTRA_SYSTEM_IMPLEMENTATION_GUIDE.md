@@ -19,7 +19,7 @@ This guide provides step-by-step instructions for implementing and integrating t
 
 ### Prerequisites
 
-- Python 3.11+
+- Python 3.10+
 - Poetry
 - Access to GCP resources (for full functionality)
 - Git repository access

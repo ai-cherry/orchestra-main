@@ -61,16 +61,16 @@ SERVICES=$(gcloud run services list --platform=managed --format="value(name)")
 
 for SERVICE in $SERVICES; do
     echo "Checking service: $SERVICE"
-    
+
     # Get the service account used by this service
     SERVICE_SA=$(gcloud run services describe $SERVICE \
         --platform=managed \
         --region=us-central1 \
         --format="value(spec.template.spec.serviceAccountName)" 2>/dev/null)
-    
+
     if [ -n "$SERVICE_SA" ]; then
         echo "  Service account: $SERVICE_SA"
-        
+
         # Grant metrics writing permission to the service's SA
         gcloud projects add-iam-policy-binding $PROJECT_ID \
             --member="serviceAccount:$SERVICE_SA" \
@@ -99,4 +99,4 @@ echo "- No additional permissions needed"
 echo "- Access metrics at: https://console.cloud.google.com/monitoring"
 echo ""
 
-echo "✅ Permissions have been updated. The errors should stop appearing in logs within a few minutes." 
+echo "✅ Permissions have been updated. The errors should stop appearing in logs within a few minutes."

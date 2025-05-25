@@ -102,7 +102,9 @@ def handle_push_event(payload):
     branch = payload.get("ref", "").replace("refs/heads/", "")
     commits = payload.get("commits", [])
 
-    app.logger.info(f"Push to {repo_name} on branch {branch} with {len(commits)} commits")
+    app.logger.info(
+        f"Push to {repo_name} on branch {branch} with {len(commits)} commits"
+    )
 
     # Check if this is a push to main/master
     if branch in ("main", "master"):
@@ -251,7 +253,9 @@ def trigger_cloud_build(repo_name, branch, pr_number=None):
         event_type="build_trigger",
     )
 
-    app.logger.info(f"Triggered Cloud Build for {repo_name}/{branch}: {future.result()}")
+    app.logger.info(
+        f"Triggered Cloud Build for {repo_name}/{branch}: {future.result()}"
+    )
     return jsonify({"status": "success", "message": "Build triggered"})
 
 
@@ -275,31 +279,45 @@ def publish_to_pubsub(event_type, payload):
 
 
 def create_review_codespace(payload: dict) -> None:
-    print(f"Placeholder: Creating review codespace for PR #{payload.get('pull_request', {}).get('number')}")
+    print(
+        f"Placeholder: Creating review codespace for PR #{payload.get('pull_request', {}).get('number')}"
+    )
 
 
 def trigger_deployment(payload: dict) -> None:
-    print(f"Placeholder: Triggering deployment for {payload.get('repository', {}).get('full_name')}")
+    print(
+        f"Placeholder: Triggering deployment for {payload.get('repository', {}).get('full_name')}"
+    )
 
 
 def approve_pr(payload: dict) -> None:
-    print(f"Placeholder: Approving PR for {payload.get('repository', {}).get('full_name')}")
+    print(
+        f"Placeholder: Approving PR for {payload.get('repository', {}).get('full_name')}"
+    )
 
 
 def run_terraform_plan(payload: dict) -> None:
-    print(f"Placeholder: Running terraform plan for {payload.get('repository', {}).get('full_name')}")
+    print(
+        f"Placeholder: Running terraform plan for {payload.get('repository', {}).get('full_name')}"
+    )
 
 
 def merge_approved_pr(payload: dict) -> None:
-    print(f"Placeholder: Merging approved PR for {payload.get('repository', {}).get('full_name')}")
+    print(
+        f"Placeholder: Merging approved PR for {payload.get('repository', {}).get('full_name')}"
+    )
 
 
 def initialize_repository(payload: dict) -> None:
-    print(f"Placeholder: Initializing repository for {payload.get('repository', {}).get('full_name')}")
+    print(
+        f"Placeholder: Initializing repository for {payload.get('repository', {}).get('full_name')}"
+    )
 
 
 def setup_codespace_gcp_auth(payload: dict) -> None:
-    print(f"Placeholder: Setting up codespace GCP auth for {payload.get('repository', {}).get('full_name')}")
+    print(
+        f"Placeholder: Setting up codespace GCP auth for {payload.get('repository', {}).get('full_name')}"
+    )
 
 
 # Execute the Flask app

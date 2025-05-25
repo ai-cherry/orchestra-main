@@ -20,8 +20,8 @@ This approach allows each service to use the optimal Python version for its depe
 The DevContainer is configured to use pyenv for managing multiple Python versions. When you open the project in VS Code with the Dev Containers extension, it will:
 
 1. Install pyenv
-2. Install Python 3.11.9 and 3.10.13
-3. Set Python 3.11.9 as the global default
+2. Install Python 3.10.9 and 3.10.13
+3. Set Python 3.10.9 as the global default
 4. Install Poetry 1.7.1
 5. Set up the project's dependencies
 

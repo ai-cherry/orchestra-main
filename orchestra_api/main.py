@@ -6,13 +6,18 @@ Async FastAPI entrypoint for Orchestra API.
 - Ready for Cloud Run deployment.
 """
 
-import os
 from typing import List, Optional
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from orchestra_api.routers import data_ingestion
+# Use centralized environment configuration
+from core.env_config import settings
+from orchestra_api.routers import agents, data_ingestion
+from orchestrator.enrichment_orchestrator import EnrichmentOrchestrator
+from packages.agents.company_enrichment_agent import CompanyEnrichmentAgent
+from packages.agents.contact_enrichment_agent import ContactEnrichmentAgent
+from packages.agents.property_enrichment_agent import PropertyEnrichmentAgent
 from shared.memory.unified_memory import MemoryItem, UnifiedMemory
 
 app = FastAPI(
@@ -23,15 +28,16 @@ app = FastAPI(
 
 # Include routers
 app.include_router(data_ingestion.router)
+app.include_router(agents.router)
 
 # Initialize unified memory (env-driven config)
 memory = UnifiedMemory(
     use_dragonfly=True,
     use_qdrant=True,
     use_firestore=True,
-    dragonfly_url=os.getenv("DRAGONFLY_URL"),
-    qdrant_url=os.getenv("QDRANT_URL"),
-    firestore_project=os.getenv("GCP_PROJECT"),
+    dragonfly_url=settings.dragonfly_url,
+    qdrant_url=settings.qdrant_url,
+    firestore_project=settings.gcp_project_id,
 )
 
 
@@ -89,3 +95,50 @@ async def delete_memory(memory_id: str):
 async def health_check():
     """Health check for all backends."""
     return memory.health()
+
+
+# --- Enrichment Orchestration Integration ---
+# (imports moved to top of file)
+
+# Instantiate agents and orchestrator (env-driven config)
+property_agent = PropertyEnrichmentAgent(
+    firestore_collection="properties",
+    google_maps_api_key=settings.google_maps_api_key,
+)
+company_agent = CompanyEnrichmentAgent(
+    firestore_collection="properties",
+    serpapi_key=settings.serpapi_key,
+    claude_max_webhook=settings.claude_max_webhook,
+)
+contact_agent = ContactEnrichmentAgent(
+    firestore_collection="companies",
+    apollo_api_key=settings.apollo_api_key,
+    phantombuster_api_key=settings.phantombuster_api_key,
+    browser_use_endpoint=settings.browser_use_endpoint,
+    claude_max_webhook=settings.claude_max_webhook,
+)
+enrichment_orchestrator = EnrichmentOrchestrator(
+    property_agent, company_agent, contact_agent
+)
+
+
+class EnrichmentRequest(BaseModel):
+    properties: List[dict]
+
+
+@app.post("/enrichment/batch", response_model=dict)
+async def run_batch_enrichment(request: EnrichmentRequest):
+    """
+    Trigger full enrichment pipeline for a batch of properties.
+    """
+    enrichment_orchestrator.run_full_enrichment(request.properties)
+    return {"status": "enrichment started", "count": len(request.properties)}
+
+
+@app.post("/enrichment/property/{property_doc_id}", response_model=dict)
+async def run_enrichment_for_property(property_doc_id: str):
+    """
+    Trigger company and contact enrichment for a single property.
+    """
+    enrichment_orchestrator.run_enrichment_for_property(property_doc_id)
+    return {"status": "enrichment started", "property_doc_id": property_doc_id}

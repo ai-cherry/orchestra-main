@@ -95,7 +95,7 @@ Follow these steps to set up the secure credential management system:
 - Google Cloud SDK installed and configured
 - Terraform installed
 - GitHub CLI installed
-- Python 3.11+ installed
+- Python 3.10+ installed
 - Poetry installed
 
 ### 1. Deploy the Infrastructure

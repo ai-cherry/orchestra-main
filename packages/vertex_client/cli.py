@@ -14,7 +14,9 @@ from typing import Any, Dict
 from .vertex_agent_manager import trigger_vertex_task
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 
@@ -45,8 +47,12 @@ def parse_args() -> argparse.Namespace:
     )
 
     # Terraform parser
-    terraform_parser = subparsers.add_parser("terraform", help="Apply Terraform configuration")
-    terraform_parser.add_argument("workspace", choices=["dev", "stage", "prod"], help="Terraform workspace")
+    terraform_parser = subparsers.add_parser(
+        "terraform", help="Apply Terraform configuration"
+    )
+    terraform_parser.add_argument(
+        "workspace", choices=["dev", "stage", "prod"], help="Terraform workspace"
+    )
 
     # Agent team parser
     team_parser = subparsers.add_parser("team", help="Create and deploy an agent team")
@@ -66,7 +72,9 @@ def parse_args() -> argparse.Namespace:
 
     # Game session parser
     game_parser = subparsers.add_parser("game", help="Manage a game session")
-    game_parser.add_argument("type", choices=["trivia", "word_game"], help="Type of game")
+    game_parser.add_argument(
+        "type", choices=["trivia", "word_game"], help="Type of game"
+    )
     game_parser.add_argument("session", help="Session ID")
     game_parser.add_argument("action", help="Player action")
 
@@ -79,7 +87,9 @@ def parse_args() -> argparse.Namespace:
     # Add global options
     parser.add_argument("--project", help="GCP project ID")
     parser.add_argument("--location", help="GCP region")
-    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose output")
+    parser.add_argument(
+        "--verbose", "-v", action="store_true", help="Enable verbose output"
+    )
 
     args = parser.parse_args()
 
@@ -107,7 +117,9 @@ def format_result(result: Dict[str, Any], verbose: bool = False) -> str:
     else:
         # Simplified output for non-verbose mode
         status = result.get("status", "unknown")
-        message = "Success" if status == "success" else result.get("error", "Unknown error")
+        message = (
+            "Success" if status == "success" else result.get("error", "Unknown error")
+        )
 
         output = f"Status: {status}\n"
         if status == "success":

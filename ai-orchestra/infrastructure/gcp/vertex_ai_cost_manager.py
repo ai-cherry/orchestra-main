@@ -101,7 +101,9 @@ class VertexAICostManager:
 
             # Execute query asynchronously
             results = await self._run_async(
-                lambda: self.monitoring_client.query_time_series(name=self.project_name, query=query_str)
+                lambda: self.monitoring_client.query_time_series(
+                    name=self.project_name, query=query_str
+                )
             )
 
             # Sum up the costs
@@ -196,7 +198,9 @@ class VertexAICostManager:
 
             # Execute query asynchronously
             results = await self._run_async(
-                lambda: self.monitoring_client.query_time_series(name=self.project_name, query=query_str)
+                lambda: self.monitoring_client.query_time_series(
+                    name=self.project_name, query=query_str
+                )
             )
 
             # Process results
@@ -214,7 +218,9 @@ class VertexAICostManager:
                     usage_data["total_requests"] += count
 
                     # Get the day for this point
-                    day = datetime.datetime.fromtimestamp(point.interval.end_time.seconds).strftime("%Y-%m-%d")
+                    day = datetime.datetime.fromtimestamp(
+                        point.interval.end_time.seconds
+                    ).strftime("%Y-%m-%d")
 
                     daily_counts.append(count)
                     usage_data["daily_requests"].append(
@@ -226,7 +232,9 @@ class VertexAICostManager:
 
             # Calculate average
             if daily_counts:
-                usage_data["average_daily_requests"] = sum(daily_counts) / len(daily_counts)
+                usage_data["average_daily_requests"] = sum(daily_counts) / len(
+                    daily_counts
+                )
 
             log_end(
                 logger,
@@ -376,7 +384,9 @@ class VertexAICostManager:
 
                 # Execute query asynchronously
                 results = await self._run_async(
-                    lambda: self.monitoring_client.query_time_series(name=self.project_name, query=query_str)
+                    lambda: self.monitoring_client.query_time_series(
+                        name=self.project_name, query=query_str
+                    )
                 )
 
                 # Process results
@@ -461,7 +471,9 @@ class VertexAICostManager:
             # Check if any quota is approaching limit
             for metric, usage_percent in quota_usage.items():
                 if usage_percent > (100.0 * (1.0 - self.quota_buffer)):
-                    logger.warning(f"Quota {metric} at {usage_percent:.1f}% - throttling requests")
+                    logger.warning(
+                        f"Quota {metric} at {usage_percent:.1f}% - throttling requests"
+                    )
                     return True
 
             return False
@@ -471,7 +483,9 @@ class VertexAICostManager:
             # Default to False to avoid blocking operations unnecessarily
             return False
 
-    async def get_budget_from_secret_manager(self, secret_name: str = "vertex-ai-budget") -> Optional[float]:
+    async def get_budget_from_secret_manager(
+        self, secret_name: str = "vertex-ai-budget"
+    ) -> Optional[float]:
         """
         Retrieve budget limit from Secret Manager.
 
@@ -486,7 +500,9 @@ class VertexAICostManager:
             name = f"projects/{self.project_id}/secrets/{secret_name}/versions/latest"
 
             # Access the secret
-            response = await self._run_async(lambda: self.secret_manager_client.access_secret_version(name=name))
+            response = await self._run_async(
+                lambda: self.secret_manager_client.access_secret_version(name=name)
+            )
 
             # Parse the budget value
             budget_str = response.payload.data.decode("UTF-8")
@@ -499,7 +515,9 @@ class VertexAICostManager:
             logger.error(f"Error retrieving budget from Secret Manager: {e}")
             return None
 
-    async def update_budget_in_secret_manager(self, budget: float, secret_name: str = "vertex-ai-budget") -> bool:
+    async def update_budget_in_secret_manager(
+        self, budget: float, secret_name: str = "vertex-ai-budget"
+    ) -> bool:
         """
         Update budget limit in Secret Manager.
 
@@ -516,7 +534,9 @@ class VertexAICostManager:
             secret_path = f"{parent}/secrets/{secret_name}"
 
             try:
-                await self._run_async(lambda: self.secret_manager_client.get_secret(name=secret_path))
+                await self._run_async(
+                    lambda: self.secret_manager_client.get_secret(name=secret_path)
+                )
             except Exception:
                 # Secret doesn't exist, create it
                 await self._run_async(

@@ -8,7 +8,11 @@ import time
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
 
-from google.api_core.exceptions import DeadlineExceeded, ResourceExhausted, ServiceUnavailable
+from google.api_core.exceptions import (
+    DeadlineExceeded,
+    ResourceExhausted,
+    ServiceUnavailable,
+)
 from google.cloud.firestore_v1.async_client import AsyncClient as FirestoreAsyncClient
 from google.cloud.firestore_v1.async_document import AsyncDocumentSnapshot
 from google.cloud.firestore_v1.base_query import AsyncBaseQuery, FieldFilter
@@ -28,15 +32,21 @@ class PlaceholderMemoryEvent:  # TODO: Replace with actual MemoryEvent
 
 class PlaceholderEventType:  # TODO: Replace with actual EventType enum/class
     MEMORY_ITEM_EXPIRED = "MemoryItemExpired"
-    MEMORY_ITEM_DELETED = "MemoryItemDeleted"  # If pruning also publishes general delete
+    MEMORY_ITEM_DELETED = (
+        "MemoryItemDeleted"  # If pruning also publishes general delete
+    )
 
 
 class PlaceholderEventBus:  # TODO: Replace with actual EventBus interface/implementation
     async def publish(self, event: PlaceholderMemoryEvent) -> None:
-        logger.info(f"Event published: type={event.event_type}, key={event.key}, metadata={event.metadata}")
+        logger.info(
+            f"Event published: type={event.event_type}, key={event.key}, metadata={event.metadata}"
+        )
 
 
-def get_placeholder_event_bus() -> PlaceholderEventBus:  # TODO: Replace with actual get_event_bus()
+def get_placeholder_event_bus() -> (
+    PlaceholderEventBus
+):  # TODO: Replace with actual get_event_bus()
     return PlaceholderEventBus()
 
 
@@ -63,17 +73,25 @@ class FirestoreExpiryManager:
             event_bus: An instance of the system's event bus for publishing expiry events.
         """
         if not isinstance(firestore_client, FirestoreAsyncClient):
-            raise TypeError("firestore_client must be an instance of FirestoreAsyncClient.")
+            raise TypeError(
+                "firestore_client must be an instance of FirestoreAsyncClient."
+            )
         if not collection_name or not isinstance(collection_name, str):
             raise ValueError("collection_name must be a non-empty string.")
 
         self.client: FirestoreAsyncClient = firestore_client
         self.collection_name: str = collection_name
         self._collection_ref = self.client.collection(self.collection_name)
-        self.event_bus = event_bus or get_placeholder_event_bus()  # TODO: Replace with actual get_event_bus()
-        logger.info(f"FirestoreExpiryManager initialized for collection: {self.collection_name}")
+        self.event_bus = (
+            event_bus or get_placeholder_event_bus()
+        )  # TODO: Replace with actual get_event_bus()
+        logger.info(
+            f"FirestoreExpiryManager initialized for collection: {self.collection_name}"
+        )
 
-    def calculate_expiry_timestamp(self, ttl_seconds: Optional[int]) -> Optional[datetime]:
+    def calculate_expiry_timestamp(
+        self, ttl_seconds: Optional[int]
+    ) -> Optional[datetime]:
         """
         Calculates a future expiry timestamp based on a TTL.
 
@@ -91,7 +109,9 @@ class FirestoreExpiryManager:
 
         return datetime.now(timezone.utc) + timedelta(seconds=ttl_seconds)
 
-    async def is_item_expired(self, doc_snapshot: AsyncDocumentSnapshot, auto_delete: bool = False) -> bool:
+    async def is_item_expired(
+        self, doc_snapshot: AsyncDocumentSnapshot, auto_delete: bool = False
+    ) -> bool:
         """
         Checks if a Firestore document snapshot represents an expired item.
         Optionally deletes the item if it's found to be expired.
@@ -107,8 +127,12 @@ class FirestoreExpiryManager:
             return False  # Non-existent item cannot be expired in this context
 
         data = doc_snapshot.to_dict()
-        if data is None:  # Should not happen if doc_snapshot.exists is True, but good practice
-            logger.warning(f"Document snapshot for {doc_snapshot.id} has no data despite existing.")
+        if (
+            data is None
+        ):  # Should not happen if doc_snapshot.exists is True, but good practice
+            logger.warning(
+                f"Document snapshot for {doc_snapshot.id} has no data despite existing."
+            )
             return False
 
         expiry_timestamp = data.get("expiry")
@@ -121,7 +145,9 @@ class FirestoreExpiryManager:
                     dt_str = expiry_timestamp.upper().replace("Z", "+00:00")
                     expiry_timestamp = datetime.fromisoformat(dt_str)
                 except ValueError:
-                    logger.warning(f"Invalid expiry date format for item {doc_snapshot.id}: {expiry_timestamp}")
+                    logger.warning(
+                        f"Invalid expiry date format for item {doc_snapshot.id}: {expiry_timestamp}"
+                    )
                     return False  # Treat as not expired if format is wrong
 
             if not isinstance(expiry_timestamp, datetime):
@@ -137,22 +163,31 @@ class FirestoreExpiryManager:
                 expiry_timestamp = expiry_timestamp.astimezone(timezone.utc)
 
             if datetime.now(timezone.utc) > expiry_timestamp:
-                logger.debug(f"Item '{doc_snapshot.id}' is expired (expiry: {expiry_timestamp}).")
+                logger.debug(
+                    f"Item '{doc_snapshot.id}' is expired (expiry: {expiry_timestamp})."
+                )
                 if auto_delete:
                     logger.info(f"Auto-deleting expired item '{doc_snapshot.id}'.")
                     try:
                         await doc_snapshot.reference.delete()
                         await self.event_bus.publish(
                             PlaceholderMemoryEvent(
-                                PlaceholderEventType.MEMORY_ITEM_EXPIRED, key=doc_snapshot.id, reason="auto-deleted"
+                                PlaceholderEventType.MEMORY_ITEM_EXPIRED,
+                                key=doc_snapshot.id,
+                                reason="auto-deleted",
                             )
                         )
                     except Exception as e:
-                        logger.error(f"Error auto-deleting expired item '{doc_snapshot.id}': {e}", exc_info=True)
+                        logger.error(
+                            f"Error auto-deleting expired item '{doc_snapshot.id}': {e}",
+                            exc_info=True,
+                        )
                 return True
         return False
 
-    async def prune_expired_items(self, query_page_size: int = 200, delete_batch_size: int = 400) -> Dict[str, Any]:
+    async def prune_expired_items(
+        self, query_page_size: int = 200, delete_batch_size: int = 400
+    ) -> Dict[str, Any]:
         """
         Finds and deletes all expired items from the collection using batch operations.
 
@@ -177,7 +212,9 @@ class FirestoreExpiryManager:
 
         # Query for potentially expired items (those with an 'expiry' field less than now)
         # This query requires a single-field index on `expiry` in Firestore for optimal performance.
-        query: AsyncBaseQuery = self._collection_ref.where(filter=FieldFilter("expiry", "<", current_time_utc))
+        query: AsyncBaseQuery = self._collection_ref.where(
+            filter=FieldFilter("expiry", "<", current_time_utc)
+        )
 
         doc_stream = query.stream()  # This streams all documents matching the query
 
@@ -207,12 +244,16 @@ class FirestoreExpiryManager:
                         )
                     )
                 except (DeadlineExceeded, ServiceUnavailable, ResourceExhausted) as e:
-                    logger.warning(f"Transient error during batch commit, review failed operations: {e}")
+                    logger.warning(
+                        f"Transient error during batch commit, review failed operations: {e}"
+                    )
                     # For simplicity, we don't retry the failed batch here. Production code might need retry for batch commit.
                 except Exception as e:
                     logger.error(f"Error committing batch delete: {e}", exc_info=True)
                 finally:
-                    batch = self.client.batch()  # Start a new batch regardless of previous commit success/failure
+                    batch = (
+                        self.client.batch()
+                    )  # Start a new batch regardless of previous commit success/failure
                     current_batch_operation_count = 0
 
         # Commit any remaining items in the last batch

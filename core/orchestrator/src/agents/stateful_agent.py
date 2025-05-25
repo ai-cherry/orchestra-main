@@ -115,7 +115,9 @@ class StatefulAgent(Agent):
         """
         super().__init__(config)
         self.states: Dict[str, AgentState] = {}
-        self._state_ttl = config.get("state_ttl", 3600) if config else 3600  # 1 hour default
+        self._state_ttl = (
+            config.get("state_ttl", 3600) if config else 3600
+        )  # 1 hour default
 
     def get_state(self, context: AgentContext) -> AgentState:
         """
@@ -130,7 +132,9 @@ class StatefulAgent(Agent):
         conversation_id = context.session_id or str(uuid.uuid4())
 
         if conversation_id not in self.states:
-            self.states[conversation_id] = AgentState(conversation_id=conversation_id, user_id=context.user_id)
+            self.states[conversation_id] = AgentState(
+                conversation_id=conversation_id, user_id=context.user_id
+            )
 
         return self.states[conversation_id]
 
@@ -188,7 +192,9 @@ class StatefulAgent(Agent):
 
         return memory_id
 
-    async def recall(self, context: AgentContext, query: str, limit: int = 5) -> List[Dict[str, Any]]:
+    async def recall(
+        self, context: AgentContext, query: str, limit: int = 5
+    ) -> List[Dict[str, Any]]:
         """
         Recall relevant memories.
 
@@ -216,13 +222,17 @@ class StatefulAgent(Agent):
                     "id": memory.id,
                     "text": memory.text_content,
                     "metadata": memory.metadata,
-                    "timestamp": memory.timestamp.isoformat() if memory.timestamp else None,
+                    "timestamp": (
+                        memory.timestamp.isoformat() if memory.timestamp else None
+                    ),
                 }
             )
 
         return results
 
-    async def recall_conversation(self, context: AgentContext, limit: int = 10) -> List[Dict[str, Any]]:
+    async def recall_conversation(
+        self, context: AgentContext, limit: int = 10
+    ) -> List[Dict[str, Any]]:
         """
         Recall conversation history.
 
@@ -241,7 +251,9 @@ class StatefulAgent(Agent):
         memory_manager = await get_memory_manager()
 
         # Get conversation history
-        memories = await memory_manager.get_conversation_history(conversation_id=state.conversation_id, limit=limit)
+        memories = await memory_manager.get_conversation_history(
+            conversation_id=state.conversation_id, limit=limit
+        )
 
         # Convert to simplified format
         results = []
@@ -250,8 +262,14 @@ class StatefulAgent(Agent):
                 {
                     "id": memory.id,
                     "text": memory.text_content,
-                    "role": "user" if memory.metadata.get("source") == "user" else "assistant",
-                    "timestamp": memory.timestamp.isoformat() if memory.timestamp else None,
+                    "role": (
+                        "user"
+                        if memory.metadata.get("source") == "user"
+                        else "assistant"
+                    ),
+                    "timestamp": (
+                        memory.timestamp.isoformat() if memory.timestamp else None
+                    ),
                 }
             )
 
@@ -260,7 +278,9 @@ class StatefulAgent(Agent):
 
         return results
 
-    async def process_with_state(self, context: AgentContext) -> Tuple[AgentResponse, AgentState]:
+    async def process_with_state(
+        self, context: AgentContext
+    ) -> Tuple[AgentResponse, AgentState]:
         """
         Process user input with state management.
 
@@ -340,7 +360,9 @@ class ConversationalAgent(StatefulAgent):
     and context-aware responses.
     """
 
-    async def process_with_state(self, context: AgentContext) -> Tuple[AgentResponse, AgentState]:
+    async def process_with_state(
+        self, context: AgentContext
+    ) -> Tuple[AgentResponse, AgentState]:
         """
         Process user input with conversational context.
 

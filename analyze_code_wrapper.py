@@ -103,7 +103,9 @@ Format your response with clear sections and use markdown formatting for readabi
                 "analysis": response.text,
                 "files_analyzed": list(files_content.keys()),
                 "security_issues": security_issues,
-                "has_critical_issues": any(issue["severity"] == "critical" for issue in security_issues),
+                "has_critical_issues": any(
+                    issue["severity"] == "critical" for issue in security_issues
+                ),
             }
 
         return {
@@ -120,7 +122,9 @@ Format your response with clear sections and use markdown formatting for readabi
             "analysis": f"Unable to get Gemini analysis. Basic security scan performed.\nError: {str(e)}",
             "files_analyzed": list(files_content.keys()),
             "security_issues": security_issues,
-            "has_critical_issues": any(issue["severity"] == "critical" for issue in security_issues),
+            "has_critical_issues": any(
+                issue["severity"] == "critical" for issue in security_issues
+            ),
         }
 
 
@@ -198,7 +202,9 @@ def scan_for_security_issues(files_content: Dict[str, str]) -> List[Dict[str, An
 
 def main():
     """Main function to analyze code with Gemini."""
-    parser = argparse.ArgumentParser(description="Analyze code with Gemini 2.5 Pro (unlimited file size)")
+    parser = argparse.ArgumentParser(
+        description="Analyze code with Gemini 2.5 Pro (unlimited file size)"
+    )
     parser.add_argument(
         "--extensions",
         default=".py,.js,.ts",
@@ -255,7 +261,9 @@ def main():
         if results.get("security_issues"):
             print("\n===== Security Issues Found =====\n")
             for issue in results["security_issues"]:
-                print(f"{issue['severity'].upper()} in {issue['file']} (line {issue['line']})")
+                print(
+                    f"{issue['severity'].upper()} in {issue['file']} (line {issue['line']})"
+                )
                 print(f"  Message: {issue['message']}")
                 print(f"  Code: {issue['code']}\n")
             print("================================\n")
@@ -263,7 +271,9 @@ def main():
         # If critical issues are found, exit with error
         if results.get("has_critical_issues"):
             print("Critical security issues found in your code!")
-            print("Please fix the issues before committing or use 'git commit --no-verify' to bypass this check.")
+            print(
+                "Please fix the issues before committing or use 'git commit --no-verify' to bypass this check."
+            )
             return 1
 
         # Handle non-critical issues in pre-commit mode (just warn, don't block)

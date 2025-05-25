@@ -48,7 +48,9 @@ class PortkeyManager:
         self._client = None
 
         if portkey is None:
-            logger.error("Portkey library not available. Install with: pip install portkey-ai")
+            logger.error(
+                "Portkey library not available. Install with: pip install portkey-ai"
+            )
             raise ImportError("Portkey library not available")
 
         # Initialize the Portkey client
@@ -86,7 +88,9 @@ class PortkeyManager:
 
         # Validate required Portkey API methods are available
         required_methods = ["set_strategy", "set_fallbacks", "enable_cache"]
-        missing_methods = [method for method in required_methods if not hasattr(self._client, method)]
+        missing_methods = [
+            method for method in required_methods if not hasattr(self._client, method)
+        ]
 
         if missing_methods:
             error_msg = f"Portkey client is missing required methods: {', '.join(missing_methods)}"
@@ -145,7 +149,9 @@ class PortkeyManager:
             logger.error(f"Error calling Portkey method {method_name}: {e}")
             raise
 
-    async def semantic_cache_get(self, query: str, cache_key: Optional[str] = None) -> Optional[Dict[str, Any]]:
+    async def semantic_cache_get(
+        self, query: str, cache_key: Optional[str] = None
+    ) -> Optional[Dict[str, Any]]:
         """
         Try to retrieve a semantically similar result from Portkey's cache.
 
@@ -171,7 +177,9 @@ class PortkeyManager:
             logger.debug(f"Attempting Portkey semantic cache lookup with key: {key}")
 
             # Try to get from Portkey's semantic cache using the helper method
-            cached_response = await self._run_method(method_name="get_from_cache", prompt=query, cache_key=key)
+            cached_response = await self._run_method(
+                method_name="get_from_cache", prompt=query, cache_key=key
+            )
 
             if cached_response:
                 logger.debug(f"Portkey semantic cache hit for query: {query[:30]}...")
@@ -182,11 +190,15 @@ class PortkeyManager:
 
         except Exception as e:
             # Provide more context in the error message
-            error_msg = f"Portkey semantic cache error with query '{query[:30]}...': {str(e)}"
+            error_msg = (
+                f"Portkey semantic cache error with query '{query[:30]}...': {str(e)}"
+            )
             logger.warning(error_msg)
             # Don't fail silently for unexpected errors
             if not isinstance(e, PortkeyError):
-                logger.error("Unexpected error type in Portkey cache lookup", exc_info=True)
+                logger.error(
+                    "Unexpected error type in Portkey cache lookup", exc_info=True
+                )
             return None
 
     async def semantic_cache_store(
@@ -222,7 +234,9 @@ class PortkeyManager:
 
             cache_ttl = ttl or self._cache_ttl
 
-            logger.debug(f"Storing in Portkey semantic cache with key: {key}, TTL: {cache_ttl}s")
+            logger.debug(
+                f"Storing in Portkey semantic cache with key: {key}, TTL: {cache_ttl}s"
+            )
 
             # Store in Portkey's semantic cache using the helper method
             await self._run_method(
@@ -233,7 +247,9 @@ class PortkeyManager:
                 ttl=cache_ttl,
             )
 
-            logger.debug(f"Successfully stored in Portkey semantic cache: {query[:30]}...")
+            logger.debug(
+                f"Successfully stored in Portkey semantic cache: {query[:30]}..."
+            )
             return True
 
         except Exception as e:
@@ -242,7 +258,9 @@ class PortkeyManager:
             logger.warning(error_msg)
             # Don't fail silently for unexpected errors
             if not isinstance(e, PortkeyError):
-                logger.error("Unexpected error type in Portkey cache storage", exc_info=True)
+                logger.error(
+                    "Unexpected error type in Portkey cache storage", exc_info=True
+                )
             return False
 
     async def clear_cache(self) -> bool:
@@ -267,7 +285,9 @@ class PortkeyManager:
             logger.warning(error_msg)
             # Don't fail silently for unexpected errors
             if not isinstance(e, PortkeyError):
-                logger.error("Unexpected error type in Portkey cache clearing", exc_info=True)
+                logger.error(
+                    "Unexpected error type in Portkey cache clearing", exc_info=True
+                )
             return False
 
     def is_initialized(self) -> bool:

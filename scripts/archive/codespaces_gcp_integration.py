@@ -11,44 +11,74 @@ from google.cloud import secretmanager
 
 def parse_args():
     """Parse command line arguments."""
-    parser = argparse.ArgumentParser(description="GitHub Codespaces and GCP integration tool")
+    parser = argparse.ArgumentParser(
+        description="GitHub Codespaces and GCP integration tool"
+    )
 
     # Main command
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")
 
     # Codespaces commands
-    codespace_parser = subparsers.add_parser("codespace", help="Codespace management commands")
+    codespace_parser = subparsers.add_parser(
+        "codespace", help="Codespace management commands"
+    )
     codespace_subparsers = codespace_parser.add_subparsers(dest="codespace_command")
 
     # Create codespace with GCP env vars
-    create_parser = codespace_subparsers.add_parser("create", help="Create a new codespace with GCP environment")
-    create_parser.add_argument("--repo", required=True, help="Repository name (owner/repo)")
-    create_parser.add_argument("--branch", default="main", help="Branch to create codespace from")
-    create_parser.add_argument("--machine", default="standardLinux32gb", help="Machine type")
+    create_parser = codespace_subparsers.add_parser(
+        "create", help="Create a new codespace with GCP environment"
+    )
+    create_parser.add_argument(
+        "--repo", required=True, help="Repository name (owner/repo)"
+    )
+    create_parser.add_argument(
+        "--branch", default="main", help="Branch to create codespace from"
+    )
+    create_parser.add_argument(
+        "--machine", default="standardLinux32gb", help="Machine type"
+    )
     create_parser.add_argument("--gcp-project", required=True, help="GCP project ID")
     create_parser.add_argument("--service-account", help="Service account email to use")
 
     # Sync GCP secrets to codespace
-    sync_parser = codespace_subparsers.add_parser("sync-secrets", help="Sync GCP secrets to codespace")
+    sync_parser = codespace_subparsers.add_parser(
+        "sync-secrets", help="Sync GCP secrets to codespace"
+    )
     sync_parser.add_argument("--codespace-name", required=True, help="Codespace name")
-    sync_parser.add_argument("--secret-prefix", default="github_", help="Secret prefix in GCP Secret Manager")
+    sync_parser.add_argument(
+        "--secret-prefix", default="github_", help="Secret prefix in GCP Secret Manager"
+    )
 
     # GCP commands
     gcp_parser = subparsers.add_parser("gcp", help="GCP management commands")
     gcp_subparsers = gcp_parser.add_subparsers(dest="gcp_command")
 
     # Create GCP service account for GitHub
-    sa_parser = gcp_subparsers.add_parser("create-sa", help="Create a GCP service account for GitHub")
+    sa_parser = gcp_subparsers.add_parser(
+        "create-sa", help="Create a GCP service account for GitHub"
+    )
     sa_parser.add_argument("--name", required=True, help="Service account name")
     sa_parser.add_argument("--description", help="Service account description")
-    sa_parser.add_argument("--github-repo", required=True, help="GitHub repository to grant access to")
-    sa_parser.add_argument("--roles", nargs="+", help="Roles to grant to the service account")
+    sa_parser.add_argument(
+        "--github-repo", required=True, help="GitHub repository to grant access to"
+    )
+    sa_parser.add_argument(
+        "--roles", nargs="+", help="Roles to grant to the service account"
+    )
 
     # Create GitHub secret from GCP key
-    secret_parser = gcp_subparsers.add_parser("create-secret", help="Create GitHub secret from GCP key")
-    secret_parser.add_argument("--repo", required=True, help="Repository name (owner/repo)")
-    secret_parser.add_argument("--secret-name", required=True, help="Secret name in GitHub")
-    secret_parser.add_argument("--gcp-secret", required=True, help="Secret name in GCP Secret Manager")
+    secret_parser = gcp_subparsers.add_parser(
+        "create-secret", help="Create GitHub secret from GCP key"
+    )
+    secret_parser.add_argument(
+        "--repo", required=True, help="Repository name (owner/repo)"
+    )
+    secret_parser.add_argument(
+        "--secret-name", required=True, help="Secret name in GitHub"
+    )
+    secret_parser.add_argument(
+        "--gcp-secret", required=True, help="Secret name in GCP Secret Manager"
+    )
 
     return parser.parse_args()
 
@@ -57,7 +87,9 @@ def get_github_token() -> str:
     """Get GitHub token from environment."""
     token = os.environ.get("GH_PAT_TOKEN") or os.environ.get("GITHUB_TOKEN")
     if not token:
-        raise ValueError("GitHub token not found. Set GH_PAT_TOKEN or GITHUB_TOKEN environment variable.")
+        raise ValueError(
+            "GitHub token not found. Set GH_PAT_TOKEN or GITHUB_TOKEN environment variable."
+        )
     return token
 
 
@@ -134,7 +166,9 @@ def create_codespace_with_gcp(args):
         "ref": args.branch,
         "machine": args.machine,
         "location": "WestUs2",  # Choose appropriate location
-        "environment_variables": [{"name": name, "value": value} for name, value in gcp_env_vars.items()],
+        "environment_variables": [
+            {"name": name, "value": value} for name, value in gcp_env_vars.items()
+        ],
     }
 
     headers = {
@@ -162,7 +196,9 @@ def sync_gcp_secrets_to_codespace(args):
     project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
 
     if not project_id:
-        raise ValueError("GCP project ID not found. Set GOOGLE_CLOUD_PROJECT environment variable.")
+        raise ValueError(
+            "GCP project ID not found. Set GOOGLE_CLOUD_PROJECT environment variable."
+        )
 
     # List secrets with the given prefix
     parent = f"projects/{project_id}"
@@ -175,7 +211,11 @@ def sync_gcp_secrets_to_codespace(args):
         return
 
     # Filter secrets by prefix
-    filtered_secrets = [secret for secret in secrets if secret.name.split("/")[-1].startswith(args.secret_prefix)]
+    filtered_secrets = [
+        secret
+        for secret in secrets
+        if secret.name.split("/")[-1].startswith(args.secret_prefix)
+    ]
 
     if not filtered_secrets:
         print(f"No secrets found with prefix '{args.secret_prefix}'")
@@ -188,18 +228,28 @@ def sync_gcp_secrets_to_codespace(args):
     for secret in filtered_secrets:
         secret_name = secret.name
         try:
-            response = client.access_secret_version(request={"name": f"{secret_name}/versions/latest"})
+            response = client.access_secret_version(
+                request={"name": f"{secret_name}/versions/latest"}
+            )
             secret_value = response.payload.data.decode("UTF-8")
             # Remove prefix from variable name
-            var_name = secret_name.split("/")[-1].replace(args.secret_prefix, "").upper()
+            var_name = (
+                secret_name.split("/")[-1].replace(args.secret_prefix, "").upper()
+            )
             env_vars[var_name] = secret_value
         except Exception as e:
             print(f"Error accessing secret {secret_name}: {e}")
 
     # Update codespace with the environment variables
-    url = f"https://api.github.com/user/codespaces/{codespace_name}/environment-variables"
+    url = (
+        f"https://api.github.com/user/codespaces/{codespace_name}/environment-variables"
+    )
 
-    data = {"environment_variables": [{"name": name, "value": value} for name, value in env_vars.items()]}
+    data = {
+        "environment_variables": [
+            {"name": name, "value": value} for name, value in env_vars.items()
+        ]
+    }
 
     headers = {
         "Accept": "application/vnd.github+json",
@@ -210,7 +260,9 @@ def sync_gcp_secrets_to_codespace(args):
     response = requests.post(url, headers=headers, json=data)
     response.raise_for_status()
 
-    print(f"Successfully synced {len(env_vars)} secrets to codespace {args.codespace_name}")
+    print(
+        f"Successfully synced {len(env_vars)} secrets to codespace {args.codespace_name}"
+    )
 
 
 def create_gcp_sa_for_github(args):
@@ -370,7 +422,9 @@ def create_workload_identity_pool(project_id, github_owner, github_repo):
         print("Created Workload Identity Pool: github-pool")
 
     # Get pool name
-    pool_name = f"projects/{project_id}/locations/global/workloadIdentityPools/github-pool"
+    pool_name = (
+        f"projects/{project_id}/locations/global/workloadIdentityPools/github-pool"
+    )
 
     # Check if provider exists
     try:
@@ -464,7 +518,9 @@ def create_github_secret_from_gcp(args):
     project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
 
     if not project_id:
-        raise ValueError("GCP project ID not found. Set GOOGLE_CLOUD_PROJECT environment variable.")
+        raise ValueError(
+            "GCP project ID not found. Set GOOGLE_CLOUD_PROJECT environment variable."
+        )
 
     # Get the secret value
     secret_name = f"projects/{project_id}/secrets/{args.gcp_secret}/versions/latest"
@@ -496,7 +552,9 @@ def create_github_secret_from_gcp(args):
 
     def encrypt(public_key: str, secret_value: str) -> str:
         """Encrypt a secret using a public key."""
-        public_key = public.PublicKey(public_key.encode("utf-8"), encoding.Base64Encoder())
+        public_key = public.PublicKey(
+            public_key.encode("utf-8"), encoding.Base64Encoder()
+        )
         sealed_box = public.SealedBox(public_key)
         encrypted = sealed_box.encrypt(secret_value.encode("utf-8"))
         return encoding.Base64Encoder().encode(encrypted).decode("utf-8")
@@ -511,7 +569,9 @@ def create_github_secret_from_gcp(args):
     response = requests.put(url, headers=headers, json=data)
     response.raise_for_status()
 
-    print(f"Successfully created GitHub secret {args.secret_name} from GCP secret {args.gcp_secret}")
+    print(
+        f"Successfully created GitHub secret {args.secret_name} from GCP secret {args.gcp_secret}"
+    )
 
 
 def main():

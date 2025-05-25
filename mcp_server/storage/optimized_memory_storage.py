@@ -322,7 +322,9 @@ class OptimizedMemoryStorage(IMemoryStorage):
             self.perf.record_operation("storage.list_keys.error", duration)
             return []
 
-    async def search(self, query: str, scope: str = "default", limit: int = 10) -> List[Dict[str, Any]]:
+    async def search(
+        self, query: str, scope: str = "default", limit: int = 10
+    ) -> List[Dict[str, Any]]:
         """Search for entries matching a query.
 
         Args:
@@ -487,7 +489,11 @@ class OptimizedMemoryStorage(IMemoryStorage):
                 for scope_data in self.data.values():
                     for key, value in scope_data.items():
                         # Check if it's a MemoryEntry with matching hash
-                        if isinstance(value, dict) and value.get("metadata", {}).get("content_hash") == content_hash:
+                        if (
+                            isinstance(value, dict)
+                            and value.get("metadata", {}).get("content_hash")
+                            == content_hash
+                        ):
                             entry = await self.retrieve(key)
                             if entry:
                                 return entry

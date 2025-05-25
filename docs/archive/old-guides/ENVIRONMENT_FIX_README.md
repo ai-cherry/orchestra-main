@@ -144,4 +144,4 @@ When working on this project, ALWAYS:
 ---
 
 *This fix was implemented on 2024-01-25 to resolve constant version conflicts.*
-*DO NOT change versions without team consensus and updating `.python-version-lock`* 
+*DO NOT change versions without team consensus and updating `.python-version-lock`*

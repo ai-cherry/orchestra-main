@@ -44,7 +44,13 @@ class ConversationMemoryItem(MemoryItem):
     @classmethod
     def from_message(cls, conversation_id: str, role: str, content: str, **kwargs):
         """Create a memory item from a conversation message."""
-        return cls(conversation_id=conversation_id, role=role, content=content, content_type="text", **kwargs)
+        return cls(
+            conversation_id=conversation_id,
+            role=role,
+            content=content,
+            content_type="text",
+            **kwargs
+        )
 
 
 class VectorMemoryItem(MemoryItem):

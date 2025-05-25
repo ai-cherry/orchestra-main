@@ -81,7 +81,9 @@ class ServiceAccountInfo:
 
     def to_temp_file(self) -> str:
         """Write the service account info to a temporary file and return the path."""
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as temp_file:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".json", delete=False
+        ) as temp_file:
             json.dump(self.to_json(), temp_file, indent=2)
             temp_file_path = temp_file.name
 
@@ -126,17 +128,25 @@ class CredentialManager:
             try:
                 # Try to parse as JSON
                 service_account_data = json.loads(service_account_json)
-                self._service_account_info = ServiceAccountInfo.from_json(service_account_data)
+                self._service_account_info = ServiceAccountInfo.from_json(
+                    service_account_data
+                )
                 logger.info("Loaded service account info from environment variable")
             except json.JSONDecodeError:
                 # Try to decode as base64
                 try:
                     decoded = base64.b64decode(service_account_json).decode("utf-8")
                     service_account_data = json.loads(decoded)
-                    self._service_account_info = ServiceAccountInfo.from_json(service_account_data)
-                    logger.info("Loaded base64-encoded service account info from environment variable")
+                    self._service_account_info = ServiceAccountInfo.from_json(
+                        service_account_data
+                    )
+                    logger.info(
+                        "Loaded base64-encoded service account info from environment variable"
+                    )
                 except Exception as e:
-                    logger.warning(f"Failed to decode service account info from environment variable: {e}")
+                    logger.warning(
+                        f"Failed to decode service account info from environment variable: {e}"
+                    )
 
         # Check for service account key file path
         service_account_path = os.environ.get(f"{self.env_prefix}_SERVICE_ACCOUNT_PATH")
@@ -157,11 +167,15 @@ class CredentialManager:
             with open(file_path, "r") as f:
                 service_account_data = json.load(f)
 
-            self._service_account_info = ServiceAccountInfo.from_json(service_account_data)
+            self._service_account_info = ServiceAccountInfo.from_json(
+                service_account_data
+            )
             logger.info(f"Loaded service account info from file: {file_path}")
             return True
         except Exception as e:
-            logger.warning(f"Failed to load service account info from file {file_path}: {e}")
+            logger.warning(
+                f"Failed to load service account info from file {file_path}: {e}"
+            )
             return False
 
     def get_service_account_key(self) -> Optional[ServiceAccountInfo]:
@@ -201,7 +215,9 @@ class CredentialManager:
             return self._service_account_info.project_id
 
         # Try to get from environment variable
-        return os.environ.get(f"{self.env_prefix}_PROJECT_ID") or os.environ.get("GCP_PROJECT_ID")
+        return os.environ.get(f"{self.env_prefix}_PROJECT_ID") or os.environ.get(
+            "GCP_PROJECT_ID"
+        )
 
     def secure_service_account_key(self, file_path: Union[str, Path]) -> bool:
         """
@@ -220,7 +236,9 @@ class CredentialManager:
                 logger.info(f"Removed service account key file: {file_path}")
                 return True
             except Exception as e:
-                logger.warning(f"Failed to remove service account key file {file_path}: {e}")
+                logger.warning(
+                    f"Failed to remove service account key file {file_path}: {e}"
+                )
                 return False
         return False
 

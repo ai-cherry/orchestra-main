@@ -194,7 +194,9 @@ async def test_metrics():
         assert "mcp_gateway_requests_total" in response.text
 
         # Count metric lines
-        metric_lines = [l for l in response.text.split("\n") if l and not l.startswith("#")]
+        metric_lines = [
+            l for l in response.text.split("\n") if l and not l.startswith("#")
+        ]
         return f"Found {len(metric_lines)} metrics"
 
 
@@ -202,7 +204,8 @@ async def run_tests():
     """Run all tests"""
     console.print(
         Panel.fit(
-            "[bold blue]MCP System Integration Tests[/bold blue]\n" f"Testing {len(TESTS)} components...",
+            "[bold blue]MCP System Integration Tests[/bold blue]\n"
+            f"Testing {len(TESTS)} components...",
             border_style="blue",
         )
     )
@@ -216,7 +219,11 @@ async def run_tests():
     passed = 0
     failed = 0
 
-    with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}"), console=console) as progress:
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        console=console,
+    ) as progress:
 
         for test_name, test_func in TESTS:
             task = progress.add_task(f"Running {test_name}...", total=None)
@@ -240,7 +247,9 @@ async def run_tests():
     if failed == 0:
         console.print(f"[bold green]All {total} tests passed! ✨[/bold green]")
     else:
-        console.print(f"[bold yellow]Tests completed: {passed}/{total} passed[/bold yellow]")
+        console.print(
+            f"[bold yellow]Tests completed: {passed}/{total} passed[/bold yellow]"
+        )
         if failed > 0:
             console.print(f"[bold red]{failed} tests failed[/bold red]")
 

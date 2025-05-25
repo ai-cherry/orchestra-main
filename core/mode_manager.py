@@ -127,7 +127,9 @@ class Workflow:
     @property
     def completed(self) -> bool:
         """Check if all steps in the workflow are completed."""
-        return self.current_step >= len(self.steps) or all(step.completed for step in self.steps)
+        return self.current_step >= len(self.steps) or all(
+            step.completed for step in self.steps
+        )
 
 
 class ModeManager:
@@ -212,7 +214,9 @@ class ModeManager:
                     steps=steps,
                 )
 
-            logger.info(f"Loaded {len(self.modes)} modes and {len(self.workflows)} workflows")
+            logger.info(
+                f"Loaded {len(self.modes)} modes and {len(self.workflows)} workflows"
+            )
             return True
 
         except Exception as e:
@@ -277,7 +281,8 @@ class ModeManager:
             allowed_patterns = self.current_mode.file_patterns
             patterns_str = ", ".join(f"'{p}'" for p in allowed_patterns)
             return False, (
-                f"Mode '{self.current_mode.slug}' cannot write to '{file_path}'. " f"Allowed patterns: {patterns_str}"
+                f"Mode '{self.current_mode.slug}' cannot write to '{file_path}'. "
+                f"Allowed patterns: {patterns_str}"
             )
 
         return True, "File access allowed"
@@ -328,7 +333,9 @@ class ModeManager:
 
         # Mark current step as completed
         if 0 <= self.current_workflow.current_step < len(self.current_workflow.steps):
-            self.current_workflow.steps[self.current_workflow.current_step].completed = True
+            self.current_workflow.steps[
+                self.current_workflow.current_step
+            ].completed = True
 
         # Advance to next step
         self.current_workflow.current_step += 1
@@ -344,7 +351,9 @@ class ModeManager:
         if not success:
             return False, f"Failed to advance workflow: {message}"
 
-        logger.info(f"Advanced to step {self.current_workflow.current_step + 1}: {next_step.task}")
+        logger.info(
+            f"Advanced to step {self.current_workflow.current_step + 1}: {next_step.task}"
+        )
         return (
             True,
             f"Advanced to step {self.current_workflow.current_step + 1}: {next_step.task}",
@@ -385,7 +394,9 @@ class ModeManager:
 
                 if slug in self.modes:
                     mode = self.modes[slug]
-                    suggestions.append({"slug": slug, "name": mode.name, "reason": reason})
+                    suggestions.append(
+                        {"slug": slug, "name": mode.name, "reason": reason}
+                    )
 
             # Add recently used modes
             for slug in reversed(self.history[-5:]):
@@ -395,7 +406,9 @@ class ModeManager:
                     and not any(s["slug"] == slug for s in suggestions)
                 ):
                     mode = self.modes[slug]
-                    suggestions.append({"slug": slug, "name": mode.name, "reason": "Recently used"})
+                    suggestions.append(
+                        {"slug": slug, "name": mode.name, "reason": "Recently used"}
+                    )
 
         # Limit suggestions
         return suggestions[:limit]
@@ -428,9 +441,15 @@ class ModeManager:
                 "workflow": self.current_workflow.slug,
                 "current_step": self.current_workflow.current_step,
                 "start_time": (
-                    self.current_workflow.start_time.isoformat() if self.current_workflow.start_time else None
+                    self.current_workflow.start_time.isoformat()
+                    if self.current_workflow.start_time
+                    else None
                 ),
-                "end_time": self.current_workflow.end_time.isoformat() if self.current_workflow.end_time else None,
+                "end_time": (
+                    self.current_workflow.end_time.isoformat()
+                    if self.current_workflow.end_time
+                    else None
+                ),
                 "global_context": self.current_workflow.global_context,
                 "steps": [],
             }
@@ -482,19 +501,33 @@ class ModeManager:
 
             # Parse dates
             if state.get("start_time"):
-                self.current_workflow.start_time = datetime.fromisoformat(state["start_time"])
+                self.current_workflow.start_time = datetime.fromisoformat(
+                    state["start_time"]
+                )
             if state.get("end_time"):
-                self.current_workflow.end_time = datetime.fromisoformat(state["end_time"])
+                self.current_workflow.end_time = datetime.fromisoformat(
+                    state["end_time"]
+                )
 
             # Load steps
             for i, step_dict in enumerate(state.get("steps", [])):
                 if i < len(self.current_workflow.steps):
-                    self.current_workflow.steps[i].context = step_dict.get("context", {})
-                    self.current_workflow.steps[i].completed = step_dict.get("completed", False)
+                    self.current_workflow.steps[i].context = step_dict.get(
+                        "context", {}
+                    )
+                    self.current_workflow.steps[i].completed = step_dict.get(
+                        "completed", False
+                    )
 
             # Switch to current mode
-            if 0 <= self.current_workflow.current_step < len(self.current_workflow.steps):
-                current_step = self.current_workflow.steps[self.current_workflow.current_step]
+            if (
+                0
+                <= self.current_workflow.current_step
+                < len(self.current_workflow.steps)
+            ):
+                current_step = self.current_workflow.steps[
+                    self.current_workflow.current_step
+                ]
                 self.switch_mode(current_step.mode)
 
             logger.info(f"Loaded workflow state from {WORKFLOW_STATE_PATH}")
@@ -543,7 +576,9 @@ if __name__ == "__main__":
         suggestions = manager.suggest_next_modes()
         print("Suggested next modes:")
         for i, suggestion in enumerate(suggestions):
-            print(f"{i+1}. {suggestion['name']} ({suggestion['slug']}): {suggestion['reason']}")
+            print(
+                f"{i+1}. {suggestion['name']} ({suggestion['slug']}): {suggestion['reason']}"
+            )
 
     elif args.check_file:
         success, message = manager.validate_file_access(args.check_file)
@@ -551,12 +586,16 @@ if __name__ == "__main__":
 
     else:
         if manager.current_mode:
-            print(f"Current mode: {manager.current_mode.name} ({manager.current_mode.slug})")
+            print(
+                f"Current mode: {manager.current_mode.name} ({manager.current_mode.slug})"
+            )
             print(f"Model: {manager.current_mode.model}")
             if manager.current_mode.write_access:
                 print("Write access: Yes")
                 if manager.current_mode.file_patterns:
-                    print(f"File patterns: {', '.join(manager.current_mode.file_patterns)}")
+                    print(
+                        f"File patterns: {', '.join(manager.current_mode.file_patterns)}"
+                    )
             else:
                 print("Write access: No")
         else:

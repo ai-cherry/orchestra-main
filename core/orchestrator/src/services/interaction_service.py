@@ -81,7 +81,9 @@ class InteractionService:
             Exception: If processing fails
         """
         # Log the interaction
-        logger.info(f"Processing interaction with persona: {persona_config.name} for user: {user_id}")
+        logger.info(
+            f"Processing interaction with persona: {persona_config.name} for user: {user_id}"
+        )
 
         # Get conversation history using our memory service
         history_items = await self._memory.get_conversation_history_async(
@@ -93,7 +95,9 @@ class InteractionService:
 
         # Format history for LLM
         # This is a business rule: how to format conversation history for the LLM
-        formatted_history = self._format_history_for_llm(history_items, persona_config.name)
+        formatted_history = self._format_history_for_llm(
+            history_items, persona_config.name
+        )
 
         # Construct system prompt using persona_config
         system_message = {
@@ -150,7 +154,9 @@ class InteractionService:
         # Return response and persona
         return llm_response_text, persona_config.name
 
-    def _format_history_for_llm(self, history_items: List[MemoryItem], persona_name: str) -> List[Dict[str, str]]:
+    def _format_history_for_llm(
+        self, history_items: List[MemoryItem], persona_name: str
+    ) -> List[Dict[str, str]]:
         """
         Format conversation history for the LLM.
 
@@ -166,7 +172,9 @@ class InteractionService:
         # Process items in order (oldest to newest)
         for item in reversed(history_items):
             if item.persona_active == persona_name:
-                formatted_history.append({"role": "assistant", "content": item.text_content})
+                formatted_history.append(
+                    {"role": "assistant", "content": item.text_content}
+                )
             else:
                 formatted_history.append({"role": "user", "content": item.text_content})
 

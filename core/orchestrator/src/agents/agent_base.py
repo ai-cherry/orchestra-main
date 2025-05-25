@@ -77,7 +77,9 @@ class AgentContext:
             )
 
         # Add the current user input
-        messages.append({"role": "user", "content": self.user_input, "timestamp": self.timestamp})
+        messages.append(
+            {"role": "user", "content": self.user_input, "timestamp": self.timestamp}
+        )
 
         return messages
 

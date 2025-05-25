@@ -76,7 +76,9 @@ class CircuitBreakerState:
         # Fast path optimization: Only calculate time and log when actually opening
         if self.failure_count >= self.max_failures:
             self.open_until = time.time() + self.reset_timeout
-            logger.warning(f"Circuit breaker opened for {self.reset_timeout}s after {self.failure_count} failures")
+            logger.warning(
+                f"Circuit breaker opened for {self.reset_timeout}s after {self.failure_count} failures"
+            )
 
     def record_success(self) -> None:
         """Record a success using optimized approach."""
@@ -298,7 +300,9 @@ class GeminiService:
         key_hash = hashlib.md5(key_content.encode()).hexdigest()
         return f"gemini:{prefix}:{self.model_id}:{key_hash}"
 
-    async def _call_with_backoff_and_circuit_breaker(self, func: Callable, *args, **kwargs) -> Any:
+    async def _call_with_backoff_and_circuit_breaker(
+        self, func: Callable, *args, **kwargs
+    ) -> Any:
         """
         Call a function with backoff retry and circuit breaker pattern.
 
@@ -315,19 +319,25 @@ class GeminiService:
         """
         # Check if circuit breaker is open
         if self.circuit_breaker.is_open():
-            raise GeminiAPIError("Circuit breaker is open due to multiple failures. " "Try again later.")
+            raise GeminiAPIError(
+                "Circuit breaker is open due to multiple failures. " "Try again later."
+            )
 
         @backoff.on_exception(
             backoff.expo,
             (GoogleAPIError, ResourceExhausted, ServiceUnavailable),
             max_tries=3,
-            on_backoff=lambda details: logger.warning(f"Retrying Gemini API call after {details['wait']:.2f}s delay"),
+            on_backoff=lambda details: logger.warning(
+                f"Retrying Gemini API call after {details['wait']:.2f}s delay"
+            ),
         )
         async def call_with_retry():
             start_time = time.time()
             try:
                 # Use the shared thread pool for all API calls
-                result = await asyncio.get_event_loop().run_in_executor(_thread_pool, lambda: func(*args, **kwargs))
+                result = await asyncio.get_event_loop().run_in_executor(
+                    _thread_pool, lambda: func(*args, **kwargs)
+                )
 
                 # Record success for circuit breaker
                 self.circuit_breaker.record_success()
@@ -413,11 +423,15 @@ class GeminiService:
                     # Send the function result back to Gemini
                     await self._call_with_backoff_and_circuit_breaker(
                         lambda: chat.send_message(
-                            Part.from_function_response(name=function_name, response=function_result)
+                            Part.from_function_response(
+                                name=function_name, response=function_result
+                            )
                         )
                     )
                 else:
-                    logger.warning(f"Unknown function called by Gemini: {function_name}")
+                    logger.warning(
+                        f"Unknown function called by Gemini: {function_name}"
+                    )
 
             # Get the final response
             result = {"response": response.text, "function_calls": function_calls}
@@ -466,11 +480,15 @@ class GeminiService:
             GeminiAPIError: If the request fails after retries
         """
         start_time = time.time()
-        logger.info(f"Analyzing content with type: {analysis_type}, size: {len(content)} chars")
+        logger.info(
+            f"Analyzing content with type: {analysis_type}, size: {len(content)} chars"
+        )
 
         # Check cache if enabled
         if self.enable_caching and redis_client:
-            cache_key = self._generate_cache_key("analysis", content, context=context, analysis_type=analysis_type)
+            cache_key = self._generate_cache_key(
+                "analysis", content, context=context, analysis_type=analysis_type
+            )
 
             # Try to get from cache
             cached_result = redis_client.get(cache_key)
@@ -519,7 +537,9 @@ class GeminiService:
             prompt += "\n\nFormat your response as a structured JSON object with these sections."
 
             # Send the prompt to Gemini with backoff/retry
-            response = await self._call_with_backoff_and_circuit_breaker(lambda: self.model.generate_content(prompt))
+            response = await self._call_with_backoff_and_circuit_breaker(
+                lambda: self.model.generate_content(prompt)
+            )
 
             # Try to parse the response as JSON
             try:
@@ -539,7 +559,9 @@ class GeminiService:
             # Store in cache if enabled
             if self.enable_caching and redis_client:
                 try:
-                    redis_client.setex(cache_key, settings.REDIS_TTL, json.dumps(analysis))
+                    redis_client.setex(
+                        cache_key, settings.REDIS_TTL, json.dumps(analysis)
+                    )
                     logger.info(f"Analysis result cached with key: {cache_key[:20]}...")
                 except Exception as e:
                     logger.warning(f"Failed to cache analysis result: {str(e)}")
@@ -556,7 +578,9 @@ class GeminiService:
 
             # Log error with details
             elapsed = time.time() - start_time
-            logger.error(f"Content analysis failed after {elapsed:.2f}s: {str(e)}", exc_info=True)
+            logger.error(
+                f"Content analysis failed after {elapsed:.2f}s: {str(e)}", exc_info=True
+            )
 
             raise GeminiAPIError(f"Error analyzing content: {str(e)}")
         return analysis
@@ -589,7 +613,9 @@ class GeminiService:
             "project_id": self.project_id,
             "available_functions": functions,
             "caching_enabled": self.enable_caching,
-            "circuit_breaker_state": "open" if self.circuit_breaker.is_open() else "closed",
+            "circuit_breaker_state": (
+                "open" if self.circuit_breaker.is_open() else "closed"
+            ),
             "circuit_breaker_failures": self.circuit_breaker.failure_count,
         }
 

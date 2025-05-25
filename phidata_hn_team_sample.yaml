@@ -92,4 +92,4 @@ phidata_hn_team:
         table_name: "phidata_article_reader_storage"
       # Member-specific tools
       tools:
-        # Removed Newspaper4k tool to avoid Python 3.11 dependency
+        # Removed Newspaper4k tool to avoid Python 3.10 dependency

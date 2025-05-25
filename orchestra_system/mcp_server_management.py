@@ -37,12 +37,16 @@ try:
     )
     from gcp_migration.mcp_client_enhanced import get_client as get_mcp_client
 except ImportError:
-    logger.warning("Could not import enhanced MCP client, attempting to import basic client")
+    logger.warning(
+        "Could not import enhanced MCP client, attempting to import basic client"
+    )
     try:
         from gcp_migration.mcp_client import MCPClient
         from gcp_migration.mcp_client import get_client as get_mcp_client
     except ImportError:
-        logger.error("Failed to import MCP client. MCP server management will operate in standalone mode.")
+        logger.error(
+            "Failed to import MCP client. MCP server management will operate in standalone mode."
+        )
         MCPClient = object
 
         def get_mcp_client(*args, **kwargs):
@@ -249,7 +253,9 @@ class MCPServerManager:
                             # Get -ping to check server identity
                             ping_response = self.mcp_client.get("-ping")
                             if ping_response and ping_response.success:
-                                logger.info(f"MCP server running with {len(self.memory_keys)} keys")
+                                logger.info(
+                                    f"MCP server running with {len(self.memory_keys)} keys"
+                                )
                                 return True
                         except:
                             pass
@@ -355,7 +361,9 @@ class MCPServerManager:
 
                 time.sleep(MCP_SERVER_CHECK_INTERVAL)
 
-            logger.error(f"MCP server did not start within {MCP_SERVER_STARTUP_TIMEOUT} seconds")
+            logger.error(
+                f"MCP server did not start within {MCP_SERVER_STARTUP_TIMEOUT} seconds"
+            )
             return False
 
         except Exception as e:
@@ -484,7 +492,9 @@ class MCPServerManager:
                 "success": True,
                 "results": results,
                 "synced": list(k for k, v in results.items() if v == "success"),
-                "failed": list(k for k, v in results.items() if v != "success" and v != "skipped"),
+                "failed": list(
+                    k for k, v in results.items() if v != "success" and v != "skipped"
+                ),
                 "skipped": list(k for k, v in results.items() if v == "skipped"),
             }
 
@@ -692,9 +702,12 @@ class MCPIntegrationHelper:
 
             # Get component status
             component_status = {
-                "resource_registry": hasattr(api, "registry") and api.registry is not None,
-                "config_manager": hasattr(api, "config_manager") and api.config_manager is not None,
-                "conflict_resolver": hasattr(api, "conflict_resolver") and api.conflict_resolver is not None,
+                "resource_registry": hasattr(api, "registry")
+                and api.registry is not None,
+                "config_manager": hasattr(api, "config_manager")
+                and api.config_manager is not None,
+                "conflict_resolver": hasattr(api, "conflict_resolver")
+                and api.conflict_resolver is not None,
             }
         except:
             component_status = {
@@ -721,7 +734,10 @@ class MCPIntegrationHelper:
             True if successful, False otherwise
         """
         # Start MCP server if not running
-        if not self.server_manager.is_running and not self.server_manager.start_server():
+        if (
+            not self.server_manager.is_running
+            and not self.server_manager.start_server()
+        ):
             logger.error("Failed to start MCP server")
             return False
 
@@ -853,18 +869,26 @@ async def main():
     parser.add_argument("--stop", action="store_true", help="Stop MCP server")
     parser.add_argument("--restart", action="store_true", help="Restart MCP server")
     parser.add_argument("--check", action="store_true", help="Check server status")
-    parser.add_argument("--sync", action="store_true", help="Sync Orchestra data to MCP memory")
+    parser.add_argument(
+        "--sync", action="store_true", help="Sync Orchestra data to MCP memory"
+    )
     parser.add_argument("--info", action="store_true", help="Get server info")
     parser.add_argument("--export", metavar="PATH", help="Export memory to file")
-    parser.add_argument("--import", dest="import_path", metavar="PATH", help="Import memory from file")
-    parser.add_argument("--sync-from", metavar="HOST:PORT", help="Sync memory from another MCP server")
+    parser.add_argument(
+        "--import", dest="import_path", metavar="PATH", help="Import memory from file"
+    )
+    parser.add_argument(
+        "--sync-from", metavar="HOST:PORT", help="Sync memory from another MCP server"
+    )
     parser.add_argument(
         "--format",
         choices=["json", "binary", "auto"],
         default="auto",
         help="Import/export format",
     )
-    parser.add_argument("--overwrite", action="store_true", help="Overwrite existing keys")
+    parser.add_argument(
+        "--overwrite", action="store_true", help="Overwrite existing keys"
+    )
 
     args = parser.parse_args()
 
@@ -913,7 +937,9 @@ async def main():
     # Check server status
     if args.check:
         if manager.check_server_status():
-            print(f"MCP server is running at {manager.config.host}:{manager.config.port}")
+            print(
+                f"MCP server is running at {manager.config.host}:{manager.config.port}"
+            )
         else:
             print("MCP server is not running")
             sys.exit(1)
@@ -929,7 +955,9 @@ async def main():
             print(f"  - {results.get('configs_count', 0)} configurations")
             print(f"  - {results.get('conflicts_count', 0)} conflicts")
         else:
-            print(f"Failed to sync Orchestra data to MCP memory: {results.get('error')}")
+            print(
+                f"Failed to sync Orchestra data to MCP memory: {results.get('error')}"
+            )
             sys.exit(1)
 
     # Get server info
@@ -962,7 +990,9 @@ async def main():
 
     # Import memory
     if args.import_path:
-        if manager.import_memory(args.import_path, format=args.format, overwrite=args.overwrite):
+        if manager.import_memory(
+            args.import_path, format=args.format, overwrite=args.overwrite
+        ):
             print(f"Memory imported from {args.import_path}")
         else:
             print("Failed to import memory")

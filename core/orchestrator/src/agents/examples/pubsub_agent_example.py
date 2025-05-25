@@ -40,12 +40,20 @@ class PubSubAgent(Agent):
         )
 
         # Register event handlers
-        self.communication.register_event_handler("agent_message", self._handle_agent_message)
-        self.communication.register_event_handler("system_notification", self._handle_system_notification)
+        self.communication.register_event_handler(
+            "agent_message", self._handle_agent_message
+        )
+        self.communication.register_event_handler(
+            "system_notification", self._handle_system_notification
+        )
 
         # Register task handlers
-        self.communication.register_task_handler("process_query", self._handle_process_query_task)
-        self.communication.register_task_handler("generate_content", self._handle_generate_content_task)
+        self.communication.register_task_handler(
+            "process_query", self._handle_process_query_task
+        )
+        self.communication.register_task_handler(
+            "generate_content", self._handle_generate_content_task
+        )
 
         self.initialized = True
         logger.info(f"PubSubAgent initialized: {self.agent_id}")
@@ -150,7 +158,9 @@ class PubSubAgent(Agent):
         # For this example, we'll just return a simple response
         return {"response": f"Processed query: {query}", "confidence": 0.9}
 
-    async def _handle_generate_content_task(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _handle_generate_content_task(
+        self, data: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Handle a generate content task.
 
@@ -188,7 +198,9 @@ class PubSubAgent(Agent):
 async def main():
     """Example of using the PubSubAgent."""
     # Create an agent
-    agent = PubSubAgent({"agent_id": "example-agent-1", "conversation_id": "example-conversation-1"})
+    agent = PubSubAgent(
+        {"agent_id": "example-agent-1", "conversation_id": "example-conversation-1"}
+    )
 
     # Initialize the agent
     await agent.initialize_async()

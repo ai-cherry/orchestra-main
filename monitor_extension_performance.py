@@ -25,29 +25,11 @@ THRESHOLD_MEMORY_MB = 200.0  # Memory usage threshold in MB
 HIGH_USAGE_COUNT_THRESHOLD = 5  # Number of high usage occurrences before flagging
 
 
-def setup_logging() -> None:
-    """Set up logging directory."""
-    LOG_DIR.mkdir(exist_ok=True)
+# Use centralized logging configuration from core/logging_config.py
+from core.logging_config import get_logger, setup_logging
 
-    # Create .vscode directory if it doesn't exist
-    vscode_dir = WORKSPACE_ROOT / ".vscode"
-    vscode_dir.mkdir(exist_ok=True)
-
-
-def log_message(message: str) -> None:
-    """
-    Log a message to both console and log file.
-
-    Args:
-        message: The message to log
-    """
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    log_entry = f"[{timestamp}] {message}"
-
-    print(log_entry)
-
-    with open(MONITOR_LOG, "a") as f:
-        f.write(log_entry + "\n")
+# Set up logger for this module
+logger = get_logger(__name__)
 
 
 def get_extension_processes() -> List[Dict[str, Any]]:
@@ -84,7 +66,7 @@ def get_extension_processes() -> List[Dict[str, Any]]:
                     )
         return processes
     except Exception as e:
-        log_message(f"Error getting extension processes: {e}")
+        logger.error(f"Error getting extension processes: {e}")
         return []
 
 
@@ -109,7 +91,7 @@ def get_installed_extensions() -> List[str]:
                 extensions.append(line)
         return extensions
     except Exception as e:
-        log_message(f"Error getting installed extensions: {e}")
+        logger.error(f"Error getting installed extensions: {e}")
         return []
 
 
@@ -125,7 +107,9 @@ def load_performance_log() -> Dict[str, Any]:
             with open(PERFORMANCE_LOG, "r") as f:
                 return json.load(f)
         except json.JSONDecodeError:
-            log_message("Performance log exists but is not valid JSON. Creating new log.")
+            logger.warning(
+                "Performance log exists but is not valid JSON. Creating new log."
+            )
             return {"extensions": {}, "last_updated": "", "high_usage_events": []}
 
     return {"extensions": {}, "last_updated": "", "high_usage_events": []}
@@ -158,11 +142,15 @@ def check_resource_usage(processes: List[Dict[str, Any]]) -> Tuple[bool, bool]:
     for proc in processes:
         if proc["cpu"] > THRESHOLD_CPU_PERCENT:
             high_cpu = True
-            log_message(f"High CPU usage detected: {proc['cpu']}% (PID: {proc['pid']})")
+            logger.warning(
+                f"High CPU usage detected: {proc['cpu']}% (PID: {proc['pid']})"
+            )
 
         if proc["memory"] > THRESHOLD_MEMORY_MB:
             high_memory = True
-            log_message(f"High memory usage detected: {proc['memory']}MB (PID: {proc['pid']})")
+            logger.warning(
+                f"High memory usage detected: {proc['memory']}MB (PID: {proc['pid']})"
+            )
 
     return high_cpu, high_memory
 
@@ -190,7 +178,7 @@ def get_extension_categories() -> Dict[str, str]:
 
         return categories
     except Exception as e:
-        log_message(f"Error loading extension categories: {e}")
+        logger.error(f"Error loading extension categories: {e}")
         return categories
 
 
@@ -226,15 +214,16 @@ def get_problematic_extensions(performance_log: Dict[str, Any]) -> List[Dict[str
 
 def main() -> None:
     """Main entry point for the script."""
-    setup_logging()
-    log_message("Starting VS Code Extension Performance Monitor")
+    # Set up centralized logging (INFO level, JSON format for GCP compatibility)
+    setup_logging(level="INFO", json_format=True)
+    logger.info("Starting VS Code Extension Performance Monitor")
 
     # Get current performance data
     processes = get_extension_processes()
     installed_extensions = get_installed_extensions()
 
-    log_message(f"Found {len(processes)} extension host processes")
-    log_message(f"Found {len(installed_extensions)} installed extensions")
+    logger.info(f"Found {len(processes)} extension host processes")
+    logger.info(f"Found {len(installed_extensions)} installed extensions")
 
     # Load existing log
     performance_log = load_performance_log()
@@ -277,7 +266,9 @@ def main() -> None:
 
         # Keep only the last 10 events to avoid the log growing too large
         if len(performance_log["high_usage_events"]) > 10:
-            performance_log["high_usage_events"] = performance_log["high_usage_events"][-10:]
+            performance_log["high_usage_events"] = performance_log["high_usage_events"][
+                -10:
+            ]
 
         # Increment counters for all extensions
         # This is a simplification - in a real implementation, you would
@@ -295,33 +286,35 @@ def main() -> None:
     # Check for problematic extensions
     problematic = get_problematic_extensions(performance_log)
     if problematic:
-        log_message(f"Found {len(problematic)} potentially problematic extensions:")
+        logger.warning(f"Found {len(problematic)} potentially problematic extensions:")
         for ext in problematic:
             category = ext["category"]
             category_label = f"({category})" if category != "unknown" else ""
-            log_message(
+            logger.warning(
                 f"  - {ext['id']} {category_label}: CPU issues: {ext['high_cpu_count']}, Memory issues: {ext['high_memory_count']}"
             )
 
             # Provide recommendations based on category
             if category == "optional":
-                log_message(f"    Recommendation: Consider disabling {ext['id']} as it's marked as optional")
+                logger.info(
+                    f"    Recommendation: Consider disabling {ext['id']} as it's marked as optional"
+                )
             elif category == "ai":
-                log_message(
+                logger.info(
                     f"    Recommendation: AI extensions like {ext['id']} can be resource intensive. Consider using them only when needed."
                 )
             elif category == "development":
-                log_message(
+                logger.info(
                     f"    Recommendation: {ext['id']} is a development tool. Check if there are lighter alternatives."
                 )
             elif category == "critical":
-                log_message(
+                logger.info(
                     f"    Recommendation: {ext['id']} is marked as critical. Check for updates or configuration issues."
                 )
     else:
-        log_message("No problematic extensions found")
+        logger.info("No problematic extensions found")
 
-    log_message("Extension performance monitoring complete")
+    logger.info("Extension performance monitoring complete")
 
 
 if __name__ == "__main__":

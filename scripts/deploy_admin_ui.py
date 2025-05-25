@@ -36,17 +36,27 @@ def run(cmd: list[str], allow_failure: bool = False) -> None:
             sys.stderr.write(f"[deploy_admin_ui] command failed: {exc.cmd}\n")
             sys.exit(exc.returncode)
         else:
-            sys.stderr.write(f"[deploy_admin_ui] command failed but continuing: {exc.cmd}\n")
+            sys.stderr.write(
+                f"[deploy_admin_ui] command failed but continuing: {exc.cmd}\n"
+            )
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Deploy the Admin UI static site via Pulumi.")
-    parser.add_argument("--stack", required=True, help="Pulumi stack name (e.g. dev, prod)")
-    parser.add_argument("--domain", required=True, help="Primary domain name (e.g. cherry-ai.me)")
+    parser = argparse.ArgumentParser(
+        description="Deploy the Admin UI static site via Pulumi."
+    )
+    parser.add_argument(
+        "--stack", required=True, help="Pulumi stack name (e.g. dev, prod)"
+    )
+    parser.add_argument(
+        "--domain", required=True, help="Primary domain name (e.g. cherry-ai.me)"
+    )
     args = parser.parse_args()
 
     if not UI_DIST.exists():
-        sys.stderr.write("admin-ui/dist not found – build the UI first (npm run build).\n")
+        sys.stderr.write(
+            "admin-ui/dist not found – build the UI first (npm run build).\n"
+        )
         sys.exit(1)
 
     # Ensure stack exists (Pulumi is idempotent – harmless if already created).
@@ -79,7 +89,7 @@ def main() -> None:
             "--cwd",
             str(INFRA_DIR),
         ],
-        allow_failure=True  # Allow failure if infrastructure already exists
+        allow_failure=True,  # Allow failure if infrastructure already exists
     )
 
     # Get bucket name output.

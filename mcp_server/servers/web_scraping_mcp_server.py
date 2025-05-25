@@ -19,9 +19,17 @@ from typing import Any, Dict, List, Optional
 # Import base MCP server
 from .base_mcp_server import BaseMCPServer, MCPServerConfig
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.append(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 
-from web_scraping_ai_agents import ScrapingResult, ScrapingStrategy, ScrapingTask, TaskPriority, WebScrapingOrchestrator
+from web_scraping_ai_agents import (
+    ScrapingResult,
+    ScrapingStrategy,
+    ScrapingTask,
+    TaskPriority,
+    WebScrapingOrchestrator,
+)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -117,14 +125,19 @@ class OrchestraWebScrapingMCPServer(BaseMCPServer):
                 "queue_size": self.orchestrator.task_queue.qsize(),
             }
         else:
-            health_details["orchestrator"] = {"healthy": False, "error": "Not initialized"}
+            health_details["orchestrator"] = {
+                "healthy": False,
+                "error": "Not initialized",
+            }
 
         # Check Redis connection
         try:
             import redis
 
             r = redis.Redis(
-                host=os.getenv("REDIS_HOST", "localhost"), password=os.getenv("REDIS_PASSWORD"), decode_responses=True
+                host=os.getenv("REDIS_HOST", "localhost"),
+                password=os.getenv("REDIS_PASSWORD"),
+                decode_responses=True,
             )
             r.ping()
             health_details["redis"] = {"healthy": True}
@@ -133,7 +146,9 @@ class OrchestraWebScrapingMCPServer(BaseMCPServer):
 
         # Check agent health
         if self.orchestrator:
-            active_agents = sum(1 for agent in self.orchestrator.agents.values() if not agent.is_busy)
+            active_agents = sum(
+                1 for agent in self.orchestrator.agents.values() if not agent.is_busy
+            )
             health_details["agents"] = {
                 "healthy": active_agents > 0,
                 "active": active_agents,
@@ -173,7 +188,11 @@ class OrchestraWebScrapingMCPServer(BaseMCPServer):
                             "default": "google",
                             "description": "Search engine to use",
                         },
-                        "max_results": {"type": "integer", "default": 10, "description": "Maximum number of results"},
+                        "max_results": {
+                            "type": "integer",
+                            "default": 10,
+                            "description": "Maximum number of results",
+                        },
                         "strategy": {
                             "type": "string",
                             "enum": ["fast_static", "dynamic_content", "stealth_mode"],
@@ -193,7 +212,12 @@ class OrchestraWebScrapingMCPServer(BaseMCPServer):
                         "url": {"type": "string", "description": "URL to scrape"},
                         "strategy": {
                             "type": "string",
-                            "enum": ["fast_static", "dynamic_content", "stealth_mode", "bulk_extraction"],
+                            "enum": [
+                                "fast_static",
+                                "dynamic_content",
+                                "stealth_mode",
+                                "bulk_extraction",
+                            ],
                             "default": "fast_static",
                             "description": "Scraping strategy",
                         },
@@ -205,7 +229,10 @@ class OrchestraWebScrapingMCPServer(BaseMCPServer):
                             "type": "string",
                             "description": "Custom JavaScript to execute (dynamic content only)",
                         },
-                        "user_agent": {"type": "string", "description": "Custom user agent string"},
+                        "user_agent": {
+                            "type": "string",
+                            "description": "Custom user agent string",
+                        },
                     },
                     "required": ["url"],
                 },
@@ -216,10 +243,19 @@ class OrchestraWebScrapingMCPServer(BaseMCPServer):
                 "inputSchema": {
                     "type": "object",
                     "properties": {
-                        "content": {"type": "string", "description": "Content to analyze"},
+                        "content": {
+                            "type": "string",
+                            "description": "Content to analyze",
+                        },
                         "analysis_type": {
                             "type": "string",
-                            "enum": ["summary", "sentiment", "entities", "keywords", "general"],
+                            "enum": [
+                                "summary",
+                                "sentiment",
+                                "entities",
+                                "keywords",
+                                "general",
+                            ],
                             "default": "summary",
                             "description": "Type of analysis to perform",
                         },
@@ -233,7 +269,11 @@ class OrchestraWebScrapingMCPServer(BaseMCPServer):
                 "inputSchema": {
                     "type": "object",
                     "properties": {
-                        "urls": {"type": "array", "items": {"type": "string"}, "description": "List of URLs to scrape"},
+                        "urls": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "List of URLs to scrape",
+                        },
                         "strategy": {
                             "type": "string",
                             "enum": ["fast_static", "dynamic_content", "stealth_mode"],
@@ -254,7 +294,9 @@ class OrchestraWebScrapingMCPServer(BaseMCPServer):
                 "description": "Get the status of a scraping task",
                 "inputSchema": {
                     "type": "object",
-                    "properties": {"task_id": {"type": "string", "description": "Task ID to check"}},
+                    "properties": {
+                        "task_id": {"type": "string", "description": "Task ID to check"}
+                    },
                     "required": ["task_id"],
                 },
             },
@@ -296,7 +338,11 @@ class OrchestraWebScrapingMCPServer(BaseMCPServer):
             return f"Error: {str(e)}"
 
     async def handle_web_search(
-        self, query: str, engine: str = "google", max_results: int = 10, strategy: str = "fast_static"
+        self,
+        query: str,
+        engine: str = "google",
+        max_results: int = 10,
+        strategy: str = "fast_static",
     ) -> str:
         """Handle web search requests."""
         task = ScrapingTask(
@@ -319,7 +365,9 @@ class OrchestraWebScrapingMCPServer(BaseMCPServer):
 
         return f"Search task {task_id} is still processing. Use get_task_status to check progress."
 
-    async def handle_scrape_website(self, url: str, strategy: str = "fast_static", **kwargs) -> str:
+    async def handle_scrape_website(
+        self, url: str, strategy: str = "fast_static", **kwargs
+    ) -> str:
         """Handle website scraping requests."""
         task = ScrapingTask(
             task_id=f"scrape_{int(time.time())}_{hash(url) % 10000}",
@@ -341,7 +389,9 @@ class OrchestraWebScrapingMCPServer(BaseMCPServer):
 
         return f"Scraping task {task_id} is still processing. Use get_task_status to check progress."
 
-    async def handle_analyze_content(self, content: str, analysis_type: str = "summary") -> str:
+    async def handle_analyze_content(
+        self, content: str, analysis_type: str = "summary"
+    ) -> str:
         """Handle content analysis requests."""
         task = ScrapingTask(
             task_id=f"analyze_{int(time.time())}_{hash(content[:100]) % 10000}",
@@ -363,7 +413,9 @@ class OrchestraWebScrapingMCPServer(BaseMCPServer):
 
         return f"Analysis task {task_id} is still processing. Use get_task_status to check progress."
 
-    async def handle_bulk_scrape(self, urls: List[str], strategy: str = "fast_static", max_concurrent: int = 5) -> str:
+    async def handle_bulk_scrape(
+        self, urls: List[str], strategy: str = "fast_static", max_concurrent: int = 5
+    ) -> str:
         """Handle bulk scraping requests."""
         task_ids = []
 
@@ -410,7 +462,9 @@ class OrchestraWebScrapingMCPServer(BaseMCPServer):
             for i, item in enumerate(search_data[:5], 1):
                 formatted += f"{i}. {item.get('title', 'No title')}\n"
                 formatted += f"   URL: {item.get('url', 'No URL')}\n"
-                formatted += f"   Description: {item.get('description', 'No description')}\n\n"
+                formatted += (
+                    f"   Description: {item.get('description', 'No description')}\n\n"
+                )
 
             if len(search_data) > 5:
                 formatted += f"... and {len(search_data) - 5} more results\n"
@@ -440,7 +494,9 @@ class OrchestraWebScrapingMCPServer(BaseMCPServer):
             # Include structured data if available
             if result.structured_data:
                 title = result.structured_data.get("title", "No title")
-                description = result.structured_data.get("description", "No description")
+                description = result.structured_data.get(
+                    "description", "No description"
+                )
                 formatted += f"Title: {title}\n"
                 formatted += f"Description: {description}\n"
 

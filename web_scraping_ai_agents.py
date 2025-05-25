@@ -156,9 +156,14 @@ class WebScrapingAgent(ABC):
             words = content.split()
             if len(words) > 50:
                 score += 0.1
-            if any(word.lower() in content.lower() for word in ["title", "description", "article"]):
+            if any(
+                word.lower() in content.lower()
+                for word in ["title", "description", "article"]
+            ):
                 score += 0.1
-            if not any(spam in content.lower() for spam in ["error", "404", "403", "forbidden"]):
+            if not any(
+                spam in content.lower() for spam in ["error", "404", "403", "forbidden"]
+            ):
                 score += 0.1
 
         return min(score, 1.0)
@@ -203,7 +208,9 @@ class SearchSpecialistAgent(WebScrapingAgent):
             }
 
             content = f"Search results for '{query}' from {search_engine}\n"
-            content += "\n".join([f"{i+1}. {r['title']} - {r['url']}" for i, r in enumerate(results)])
+            content += "\n".join(
+                [f"{i+1}. {r['title']} - {r['url']}" for i, r in enumerate(results)]
+            )
 
             quality_score = self.calculate_quality_score(content, structured_data)
 
@@ -235,13 +242,17 @@ class SearchSpecialistAgent(WebScrapingAgent):
                 processing_time=time.time() - start_time,
             )
 
-    async def _stealth_search(self, query: str, engine: str, max_results: int) -> List[Dict]:
+    async def _stealth_search(
+        self, query: str, engine: str, max_results: int
+    ) -> List[Dict]:
         """Search using stealth mode (Zenrows)."""
         # Implementation would use Zenrows API
         logger.info("Using Zenrows for stealth search")
         return await self._fast_search(query, engine, max_results)  # Fallback for now
 
-    async def _dynamic_search(self, query: str, engine: str, max_results: int) -> List[Dict]:
+    async def _dynamic_search(
+        self, query: str, engine: str, max_results: int
+    ) -> List[Dict]:
         """Search using dynamic content scraping."""
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
@@ -265,7 +276,9 @@ class SearchSpecialistAgent(WebScrapingAgent):
                 await browser.close()
                 raise e
 
-    async def _fast_search(self, query: str, engine: str, max_results: int) -> List[Dict]:
+    async def _fast_search(
+        self, query: str, engine: str, max_results: int
+    ) -> List[Dict]:
         """Fast search using requests."""
         # Simplified implementation - would use proper search APIs in production
         return [
@@ -294,7 +307,14 @@ class SearchSpecialistAgent(WebScrapingAgent):
                 description = await desc_elem.inner_text() if desc_elem else ""
 
                 if title and url:
-                    results.append({"title": title, "url": url, "description": description, "rank": i + 1})
+                    results.append(
+                        {
+                            "title": title,
+                            "url": url,
+                            "description": description,
+                            "rank": i + 1,
+                        }
+                    )
             except Exception as e:
                 logger.warning(f"Error extracting Google result {i}: {e}")
 
@@ -331,7 +351,9 @@ class ScraperSpecialistAgent(WebScrapingAgent):
             else:
                 result_data = await self._scrape_fast_static(task)
 
-            quality_score = self.calculate_quality_score(result_data["content"], result_data["structured_data"])
+            quality_score = self.calculate_quality_score(
+                result_data["content"], result_data["structured_data"]
+            )
 
             return ScrapingResult(
                 task_id=task.task_id,
@@ -376,7 +398,9 @@ class ScraperSpecialistAgent(WebScrapingAgent):
             }
 
             async with session.get(
-                "https://api.zenrows.com/v1/", headers={"apikey": self.zenrows_api_key}, params=proxy_params
+                "https://api.zenrows.com/v1/",
+                headers={"apikey": self.zenrows_api_key},
+                params=proxy_params,
             ) as response:
                 html_content = await response.text()
 
@@ -432,7 +456,13 @@ class ScraperSpecialistAgent(WebScrapingAgent):
                         "images": [],
                     }
                 else:
-                    return {"content": "", "structured_data": {}, "metadata": {}, "links": [], "images": []}
+                    return {
+                        "content": "",
+                        "structured_data": {},
+                        "metadata": {},
+                        "links": [],
+                        "images": [],
+                    }
 
     async def _scrape_with_playwright(self, task: ScrapingTask) -> Dict[str, Any]:
         """Scrape using Playwright for dynamic content."""
@@ -443,7 +473,9 @@ class ScraperSpecialistAgent(WebScrapingAgent):
             try:
                 # Configure page based on task parameters
                 if task.parameters.get("user_agent"):
-                    await page.set_extra_http_headers({"User-Agent": task.parameters["user_agent"]})
+                    await page.set_extra_http_headers(
+                        {"User-Agent": task.parameters["user_agent"]}
+                    )
 
                 await page.goto(task.url, wait_until="networkidle")
 
@@ -490,7 +522,8 @@ class ScraperSpecialistAgent(WebScrapingAgent):
         """Fast static content scraping using requests."""
         headers = {
             "User-Agent": task.parameters.get(
-                "user_agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+                "user_agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
             )
         }
 
@@ -526,7 +559,9 @@ class ScraperSpecialistAgent(WebScrapingAgent):
         links = [link for link in links if link.startswith("http")]
 
         # Extract images
-        images = [urljoin(url, img.get("src", "")) for img in soup.find_all("img", src=True)]
+        images = [
+            urljoin(url, img.get("src", "")) for img in soup.find_all("img", src=True)
+        ]
         images = [img for img in images if img.startswith("http")]
 
         # Extract structured data (JSON-LD, microdata, etc.)
@@ -547,7 +582,11 @@ class ScraperSpecialistAgent(WebScrapingAgent):
                 "word_count": len(content.split()),
                 "json_ld": structured_data,
             },
-            "metadata": {"content_length": len(content), "links_count": len(links), "images_count": len(images)},
+            "metadata": {
+                "content_length": len(content),
+                "links_count": len(links),
+                "images_count": len(images),
+            },
             "links": links[:50],  # Limit to first 50 links
             "images": images[:20],  # Limit to first 20 images
         }
@@ -591,7 +630,9 @@ class ContentAnalyzerAgent(WebScrapingAgent):
                 "embeddings": embeddings,
             }
 
-            quality_score = self.calculate_quality_score(str(analysis_result), structured_data)
+            quality_score = self.calculate_quality_score(
+                str(analysis_result), structured_data
+            )
 
             return ScrapingResult(
                 task_id=task.task_id,
@@ -625,8 +666,14 @@ class ContentAnalyzerAgent(WebScrapingAgent):
         response = await self.openai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a helpful assistant that summarizes web content."},
-                {"role": "user", "content": f"Summarize this content in 2-3 sentences:\n\n{content[:2000]}"},
+                {
+                    "role": "system",
+                    "content": "You are a helpful assistant that summarizes web content.",
+                },
+                {
+                    "role": "user",
+                    "content": f"Summarize this content in 2-3 sentences:\n\n{content[:2000]}",
+                },
             ],
             max_tokens=150,
         )
@@ -634,7 +681,8 @@ class ContentAnalyzerAgent(WebScrapingAgent):
         return {
             "summary": response.choices[0].message.content,
             "original_length": len(content),
-            "compression_ratio": len(content) / len(response.choices[0].message.content),
+            "compression_ratio": len(content)
+            / len(response.choices[0].message.content),
         }
 
     async def _analyze_sentiment(self, content: str) -> Dict[str, Any]:
@@ -801,8 +849,12 @@ class WebScrapingOrchestrator:
                 if best_agent:
                     # Assign task to agent
                     task.assigned_agent = best_agent.agent_id
-                    await self.redis_client.lpush(f"agent_queue:{best_agent.agent_id}", task.task_id)
-                    logger.info(f"Assigned task {task.task_id} to agent {best_agent.agent_id}")
+                    await self.redis_client.lpush(
+                        f"agent_queue:{best_agent.agent_id}", task.task_id
+                    )
+                    logger.info(
+                        f"Assigned task {task.task_id} to agent {best_agent.agent_id}"
+                    )
                 else:
                     # Put task back in queue
                     await self.task_queue.put(task)
@@ -820,15 +872,21 @@ class WebScrapingOrchestrator:
         # Filter agents by task type
         if task.task_type in ["search", "google_search", "bing_search"]:
             suitable_agents = [
-                a for a in self.agents.values() if a.agent_type == AgentType.SEARCH_SPECIALIST and not a.is_busy
+                a
+                for a in self.agents.values()
+                if a.agent_type == AgentType.SEARCH_SPECIALIST and not a.is_busy
             ]
         elif task.task_type in ["scrape", "extract", "crawl"]:
             suitable_agents = [
-                a for a in self.agents.values() if a.agent_type == AgentType.SCRAPER_SPECIALIST and not a.is_busy
+                a
+                for a in self.agents.values()
+                if a.agent_type == AgentType.SCRAPER_SPECIALIST and not a.is_busy
             ]
         elif task.task_type in ["analyze", "summarize", "sentiment"]:
             suitable_agents = [
-                a for a in self.agents.values() if a.agent_type == AgentType.CONTENT_ANALYZER and not a.is_busy
+                a
+                for a in self.agents.values()
+                if a.agent_type == AgentType.CONTENT_ANALYZER and not a.is_busy
             ]
 
         if not suitable_agents:
@@ -842,7 +900,9 @@ class WebScrapingOrchestrator:
         while self.is_running:
             try:
                 # Check for tasks in agent's queue
-                task_id = await self.redis_client.brpop(f"agent_queue:{agent.agent_id}", timeout=1)
+                task_id = await self.redis_client.brpop(
+                    f"agent_queue:{agent.agent_id}", timeout=1
+                )
 
                 if task_id:
                     task_id = task_id[1]  # brpop returns (key, value)
@@ -857,7 +917,9 @@ class WebScrapingOrchestrator:
                             url=task_data["url"],
                             task_type=task_data["task_type"],
                             priority=TaskPriority(int(task_data["priority"])),
-                            strategy=ScrapingStrategy(task_data.get("strategy", "fast_static")),
+                            strategy=ScrapingStrategy(
+                                task_data.get("strategy", "fast_static")
+                            ),
                             parameters=json.loads(task_data.get("parameters", "{}")),
                             created_at=datetime.fromisoformat(task_data["created_at"]),
                         )
@@ -885,7 +947,9 @@ class WebScrapingOrchestrator:
                         agent.is_busy = False
                         await agent.update_status("idle")
 
-                        logger.info(f"Agent {agent.agent_id} completed task {task_id} with status {result.status}")
+                        logger.info(
+                            f"Agent {agent.agent_id} completed task {task_id} with status {result.status}"
+                        )
 
             except Exception as e:
                 logger.error(f"Error in agent worker {agent.agent_id}: {e}")
@@ -900,7 +964,9 @@ class WebScrapingMCPServer:
     def __init__(self, orchestrator: WebScrapingOrchestrator):
         self.orchestrator = orchestrator
 
-    async def handle_search_request(self, query: str, engine: str = "google", max_results: int = 10) -> str:
+    async def handle_search_request(
+        self, query: str, engine: str = "google", max_results: int = 10
+    ) -> str:
         """Handle search request from Orchestra AI."""
         task = ScrapingTask(
             task_id=f"search_{int(time.time())}",
@@ -922,7 +988,9 @@ class WebScrapingMCPServer:
 
         return "Search request submitted - check back for results"
 
-    async def handle_scrape_request(self, url: str, strategy: str = "fast_static") -> str:
+    async def handle_scrape_request(
+        self, url: str, strategy: str = "fast_static"
+    ) -> str:
         """Handle scraping request from Orchestra AI."""
         task = ScrapingTask(
             task_id=f"scrape_{int(time.time())}",
@@ -965,7 +1033,11 @@ async def main():
         task_type="search",
         priority=TaskPriority.HIGH,
         strategy=ScrapingStrategy.FAST_STATIC,
-        parameters={"query": "AI web scraping tools", "engine": "google", "max_results": 10},
+        parameters={
+            "query": "AI web scraping tools",
+            "engine": "google",
+            "max_results": 10,
+        },
     )
 
     await orchestrator.submit_task(search_task)

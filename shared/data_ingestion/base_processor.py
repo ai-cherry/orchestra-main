@@ -104,7 +104,9 @@ class BaseProcessor(abc.ABC):
         return total
 
     @abc.abstractmethod
-    async def batch_generator(self, source: Any) -> AsyncGenerator[List[Dict[str, Any]], None]:
+    async def batch_generator(
+        self, source: Any
+    ) -> AsyncGenerator[List[Dict[str, Any]], None]:
         """
         Yields batches of records from the source.
         Must be implemented by subclasses for specific formats/sources.

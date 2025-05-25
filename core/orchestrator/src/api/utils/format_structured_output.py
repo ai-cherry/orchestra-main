@@ -9,7 +9,9 @@ import json
 from typing import Any, Dict, Optional
 
 
-def format_dictionary_as_markdown(data: Dict[str, Any], title: Optional[str] = None) -> str:
+def format_dictionary_as_markdown(
+    data: Dict[str, Any], title: Optional[str] = None
+) -> str:
     """
     Format a dictionary as Markdown for better UI display.
 
@@ -48,7 +50,11 @@ def format_dictionary_as_markdown(data: Dict[str, Any], title: Optional[str] = N
                 if all(set(value[0].keys()) == set(item.keys()) for item in value):
                     # Table header
                     headers = list(value[0].keys())
-                    markdown += "| " + " | ".join(h.replace("_", " ").title() for h in headers) + " |\n"
+                    markdown += (
+                        "| "
+                        + " | ".join(h.replace("_", " ").title() for h in headers)
+                        + " |\n"
+                    )
                     markdown += "| " + " | ".join(["---"] * len(headers)) + " |\n"
 
                     # Table rows
@@ -66,7 +72,9 @@ def format_dictionary_as_markdown(data: Dict[str, Any], title: Optional[str] = N
                     for i, item in enumerate(value):
                         markdown += f"{i+1}. "
                         if isinstance(item, dict):
-                            markdown += "\n```json\n" + json.dumps(item, indent=2) + "\n```\n"
+                            markdown += (
+                                "\n```json\n" + json.dumps(item, indent=2) + "\n```\n"
+                            )
                         else:
                             markdown += f"{item}\n"
                     markdown += "\n"
@@ -147,7 +155,9 @@ def format_salesforce_results(data: Dict[str, Any]) -> str:
             fields = [k for k in records[0].keys() if not k.startswith("attributes")]
 
             # Create table header
-            markdown += "| " + " | ".join(f.replace("_", " ").title() for f in fields) + " |\n"
+            markdown += (
+                "| " + " | ".join(f.replace("_", " ").title() for f in fields) + " |\n"
+            )
             markdown += "| " + " | ".join(["---"] * len(fields)) + " |\n"
 
             # Create table rows
@@ -233,7 +243,9 @@ def format_analysis_results(data: Dict[str, Any]) -> str:
     return markdown
 
 
-def format_structured_output_as_markdown(data: Any, output_type: Optional[str] = None) -> str:
+def format_structured_output_as_markdown(
+    data: Any, output_type: Optional[str] = None
+) -> str:
     """
     Convert structured output to markdown based on the output type.
 

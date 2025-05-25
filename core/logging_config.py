@@ -59,7 +59,9 @@ class JSONFormatter(logging.Formatter):
         return json.dumps(log_data)
 
 
-def setup_logging(level: str = "INFO", json_format: bool = True, log_file: Optional[str] = None) -> None:
+def setup_logging(
+    level: str = "INFO", json_format: bool = True, log_file: Optional[str] = None
+) -> None:
     """
     Set up application-wide logging configuration.
 
@@ -84,7 +86,10 @@ def setup_logging(level: str = "INFO", json_format: bool = True, log_file: Optio
     else:
         # Human-readable format for development
         console_handler.setFormatter(
-            logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+            logging.Formatter(
+                "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                datefmt="%Y-%m-%d %H:%M:%S",
+            )
         )
 
     root_logger.addHandler(console_handler)
@@ -95,7 +100,11 @@ def setup_logging(level: str = "INFO", json_format: bool = True, log_file: Optio
         if json_format:
             file_handler.setFormatter(JSONFormatter())
         else:
-            file_handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+            file_handler.setFormatter(
+                logging.Formatter(
+                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+                )
+            )
         root_logger.addHandler(file_handler)
 
     # Reduce noise from chatty libraries

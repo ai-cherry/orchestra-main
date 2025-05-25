@@ -58,14 +58,18 @@ class PersonaClient:
             Dictionary of persona IDs and their configurations
         """
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"{self.base_url}{self.api_prefix}/personas") as response:
+            async with session.get(
+                f"{self.base_url}{self.api_prefix}/personas"
+            ) as response:
                 if response.status == 200:
                     return await response.json()
                 else:
                     error_text = await response.text()
                     raise Exception(f"Failed to list personas: {error_text}")
 
-    async def start_conversation(self, user_id: str, persona_id: Optional[str] = None) -> str:
+    async def start_conversation(
+        self, user_id: str, persona_id: Optional[str] = None
+    ) -> str:
         """
         Start a new conversation session.
 

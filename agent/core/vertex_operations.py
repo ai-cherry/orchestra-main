@@ -14,7 +14,9 @@ logger = get_logger(__name__)
 # Placeholder for gemini_embeddings function
 # Replace this with your actual Gemini embedding function implementation
 def gemini_embeddings(texts: list[str]) -> list[list[float]]:
-    logger.warning("Using placeholder gemini_embeddings function. Replace with actual implementation.")
+    logger.warning(
+        "Using placeholder gemini_embeddings function. Replace with actual implementation."
+    )
     # Example: return [list(range(768)) for _ in texts] # Return dummy embeddings of correct dimension
     # For actual implementation, you would call the Gemini embedding model here.
     # from vertexai.language_models import TextEmbeddingModel
@@ -52,7 +54,9 @@ class VertexAgent:
             optimization_prediction_type="classification",
             optimization_objective="maximize-au-prc",
         )
-        return job.run(dataset=dataset, target_column="target", budget_milli_node_hours=1000)
+        return job.run(
+            dataset=dataset, target_column="target", budget_milli_node_hours=1000
+        )
 
     def generate_gemini_docs(self, code_path: str):
         """Use Gemini Enterprise to generate documentation with extended context window"""
@@ -79,7 +83,9 @@ class VertexAgent:
 
         # Use Vertex AI model for response generation
         model = aiplatform.GenerativeModel("gemini-pro")
-        response = model.generate_content(contents=[{"role": "user", "parts": [{"text": prompt}]}])
+        response = model.generate_content(
+            contents=[{"role": "user", "parts": [{"text": prompt}]}]
+        )
         return response.text
 
     def configure_auto_scaling(self):
@@ -134,7 +140,9 @@ class VertexAgent:
             )
         except Exception as e:
             # Fall back to cloud storage if local initialization fails
-            log_warning(f"Local vector db initialization failed: {e}. Using cloud storage.")
+            log_warning(
+                f"Local vector db initialization failed: {e}. Using cloud storage."
+            )
             return {
                 "documents": [
                     {

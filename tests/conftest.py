@@ -26,12 +26,16 @@ def mock_persona_for_tests():
     PersonaMiddleware in the actual application.
     """
     # Set up a default persona for all requests
-    default_persona = PersonaConfig(name="Cherry", description="A helpful AI assistant.")
+    default_persona = PersonaConfig(
+        name="Cherry", description="A helpful AI assistant."
+    )
 
     # Patch the request state in test environment to include active_persona
     with patch(
         "starlette.requests.Request.state",
-        new_callable=lambda: type("MockState", (), {"active_persona": default_persona, "_state": {}})(),
+        new_callable=lambda: type(
+            "MockState", (), {"active_persona": default_persona, "_state": {}}
+        )(),
     ):
         yield default_persona
 
@@ -51,6 +55,8 @@ def mock_llm_client():
     mock_client.generate_response.return_value = "This is a mock response from the LLM."
 
     # Mock generate_chat_completion (legacy method)
-    mock_client.generate_chat_completion.return_value = {"choices": [{"message": {"content": "Mock response"}}]}
+    mock_client.generate_chat_completion.return_value = {
+        "choices": [{"message": {"content": "Mock response"}}]
+    }
 
     return mock_client

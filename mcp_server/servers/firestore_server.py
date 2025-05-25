@@ -37,7 +37,9 @@ try:
     if not PROJECT_ID:
         PROJECT_ID = project
     firestore_client = firestore.Client(project=PROJECT_ID, database=DATABASE_ID)
-    logger.info(f"Firestore client initialized for project: {PROJECT_ID}, database: {DATABASE_ID}")
+    logger.info(
+        f"Firestore client initialized for project: {PROJECT_ID}, database: {DATABASE_ID}"
+    )
 except Exception as e:
     logger.error(f"Failed to initialize Firestore client: {e}")
     firestore_client = None
@@ -49,7 +51,9 @@ class DocumentRequest(BaseModel):
     collection: str = Field(..., description="Collection name")
     document_id: str = Field(..., description="Document ID")
     data: Dict[str, Any] = Field(..., description="Document data")
-    merge: bool = Field(default=False, description="Whether to merge with existing document")
+    merge: bool = Field(
+        default=False, description="Whether to merge with existing document"
+    )
 
 
 class UpdateRequest(BaseModel):
@@ -73,14 +77,18 @@ class QueryRequest(BaseModel):
 class BatchWriteRequest(BaseModel):
     """Request model for batch write operations"""
 
-    operations: List[Dict[str, Any]] = Field(..., description="List of write operations")
+    operations: List[Dict[str, Any]] = Field(
+        ..., description="List of write operations"
+    )
 
 
 class CollectionRequest(BaseModel):
     """Request model for collection operations"""
 
     collection: str = Field(..., description="Collection name")
-    parent_document: Optional[Dict[str, str]] = Field(None, description="Parent document path for subcollections")
+    parent_document: Optional[Dict[str, str]] = Field(
+        None, description="Parent document path for subcollections"
+    )
 
 
 class MCPToolDefinition(BaseModel):
@@ -182,7 +190,10 @@ async def get_tools() -> List[MCPToolDefinition]:
                         },
                     },
                     "order_by": {"type": "string", "description": "Field to order by"},
-                    "limit": {"type": "integer", "description": "Maximum number of results"},
+                    "limit": {
+                        "type": "integer",
+                        "description": "Maximum number of results",
+                    },
                 },
                 "required": ["collection"],
             },
@@ -204,7 +215,10 @@ async def get_tools() -> List[MCPToolDefinition]:
                         "items": {
                             "type": "object",
                             "properties": {
-                                "type": {"type": "string", "enum": ["create", "update", "delete"]},
+                                "type": {
+                                    "type": "string",
+                                    "enum": ["create", "update", "delete"],
+                                },
                                 "collection": {"type": "string"},
                                 "document_id": {"type": "string"},
                                 "data": {"type": "object"},
@@ -242,7 +256,9 @@ async def create_document(request: DocumentRequest) -> Dict[str, Any]:
             doc_ref = collection_ref.add(doc_data)
             document_id = doc_ref[1].id
 
-        logger.info(f"Created document {document_id} in collection {request.collection}")
+        logger.info(
+            f"Created document {document_id} in collection {request.collection}"
+        )
 
         return {
             "status": "success",
@@ -276,7 +292,12 @@ async def get_document(collection: str, document_id: str) -> Dict[str, Any]:
             if field in doc_data and hasattr(doc_data[field], "isoformat"):
                 doc_data[field] = doc_data[field].isoformat()
 
-        return {"status": "success", "collection": collection, "document_id": document_id, "data": doc_data}
+        return {
+            "status": "success",
+            "collection": collection,
+            "document_id": document_id,
+            "data": doc_data,
+        }
 
     except HTTPException:
         raise
@@ -292,7 +313,9 @@ async def update_document(request: UpdateRequest) -> Dict[str, Any]:
         raise HTTPException(status_code=500, detail="Firestore client not initialized")
 
     try:
-        doc_ref = firestore_client.collection(request.collection).document(request.document_id)
+        doc_ref = firestore_client.collection(request.collection).document(
+            request.document_id
+        )
 
         # Check if document exists
         if not doc_ref.get().exists:
@@ -304,7 +327,9 @@ async def update_document(request: UpdateRequest) -> Dict[str, Any]:
 
         doc_ref.update(updates)
 
-        logger.info(f"Updated document {request.document_id} in collection {request.collection}")
+        logger.info(
+            f"Updated document {request.document_id} in collection {request.collection}"
+        )
 
         return {
             "status": "success",
@@ -411,9 +436,16 @@ async def query_documents(request: QueryRequest) -> Dict[str, Any]:
 
             results.append({"document_id": doc.id, "data": doc_data})
 
-        logger.info(f"Query returned {len(results)} documents from collection {request.collection}")
+        logger.info(
+            f"Query returned {len(results)} documents from collection {request.collection}"
+        )
 
-        return {"status": "success", "collection": request.collection, "count": len(results), "documents": results}
+        return {
+            "status": "success",
+            "collection": request.collection,
+            "count": len(results),
+            "documents": results,
+        }
 
     except Exception as e:
         logger.error(f"Failed to query documents: {e}")
@@ -432,7 +464,11 @@ async def list_collections() -> Dict[str, Any]:
 
         logger.info(f"Found {len(collection_names)} collections")
 
-        return {"status": "success", "count": len(collection_names), "collections": collection_names}
+        return {
+            "status": "success",
+            "count": len(collection_names),
+            "collections": collection_names,
+        }
 
     except Exception as e:
         logger.error(f"Failed to list collections: {e}")
@@ -501,7 +537,12 @@ async def check_document_exists(collection: str, document_id: str) -> Dict[str, 
         doc_ref = firestore_client.collection(collection).document(document_id)
         exists = doc_ref.get().exists
 
-        return {"status": "success", "collection": collection, "document_id": document_id, "exists": exists}
+        return {
+            "status": "success",
+            "collection": collection,
+            "document_id": document_id,
+            "exists": exists,
+        }
 
     except Exception as e:
         logger.error(f"Failed to check document existence: {e}")

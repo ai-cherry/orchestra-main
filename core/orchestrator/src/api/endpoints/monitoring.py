@@ -63,17 +63,28 @@ async def get_monitoring_summary(
 
         # Get monitoring summary
         summary = llm_client.get_monitoring_summary(
-            start_time=start_time, end_time=end_time, user_id=user_id, session_id=session_id, model=model
+            start_time=start_time,
+            end_time=end_time,
+            user_id=user_id,
+            session_id=session_id,
+            model=model,
         )
 
         # Add period information
-        summary["period"] = {"start_time": start_time.isoformat(), "end_time": end_time.isoformat(), "hours": hours}
+        summary["period"] = {
+            "start_time": start_time.isoformat(),
+            "end_time": end_time.isoformat(),
+            "hours": hours,
+        }
 
         return MonitoringSummaryResponse(**summary)
 
     except AttributeError:
         # Client is not a monitored client
-        raise HTTPException(status_code=501, detail="Monitoring is not enabled. Use MonitoredLiteLLMClient.")
+        raise HTTPException(
+            status_code=501,
+            detail="Monitoring is not enabled. Use MonitoredLiteLLMClient.",
+        )
     except Exception as e:
         logger.error(f"Error getting monitoring summary: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -95,7 +106,9 @@ async def get_cost_breakdown(
         start_time = end_time - timedelta(days=days)
 
         # Get monitoring summary
-        summary = llm_client.get_monitoring_summary(start_time=start_time, end_time=end_time)
+        summary = llm_client.get_monitoring_summary(
+            start_time=start_time, end_time=end_time
+        )
 
         # Get detailed metrics for cost breakdown
         metrics = llm_client.monitor.metrics
@@ -113,11 +126,15 @@ async def get_cost_breakdown(
 
             # By user
             if metric.user_id:
-                cost_by_user[metric.user_id] = cost_by_user.get(metric.user_id, 0.0) + metric.cost_usd
+                cost_by_user[metric.user_id] = (
+                    cost_by_user.get(metric.user_id, 0.0) + metric.cost_usd
+                )
 
             # By session
             if metric.session_id:
-                cost_by_session[metric.session_id] = cost_by_session.get(metric.session_id, 0.0) + metric.cost_usd
+                cost_by_session[metric.session_id] = (
+                    cost_by_session.get(metric.session_id, 0.0) + metric.cost_usd
+                )
 
         return CostBreakdownResponse(
             total_cost_usd=summary["total_cost_usd"],
@@ -129,7 +146,10 @@ async def get_cost_breakdown(
 
     except AttributeError:
         # Client is not a monitored client
-        raise HTTPException(status_code=501, detail="Monitoring is not enabled. Use MonitoredLiteLLMClient.")
+        raise HTTPException(
+            status_code=501,
+            detail="Monitoring is not enabled. Use MonitoredLiteLLMClient.",
+        )
     except Exception as e:
         logger.error(f"Error getting cost breakdown: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -152,7 +172,9 @@ async def export_monitoring_data(
         start_time = end_time - timedelta(hours=hours)
 
         # Export data
-        exported_data = llm_client.export_monitoring_data(format=format, start_time=start_time, end_time=end_time)
+        exported_data = llm_client.export_monitoring_data(
+            format=format, start_time=start_time, end_time=end_time
+        )
 
         if format == "csv":
             return {
@@ -169,7 +191,10 @@ async def export_monitoring_data(
 
     except AttributeError:
         # Client is not a monitored client
-        raise HTTPException(status_code=501, detail="Monitoring is not enabled. Use MonitoredLiteLLMClient.")
+        raise HTTPException(
+            status_code=501,
+            detail="Monitoring is not enabled. Use MonitoredLiteLLMClient.",
+        )
     except Exception as e:
         logger.error(f"Error exporting monitoring data: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -197,7 +222,10 @@ async def test_monitoring_alerts(
 
     except AttributeError:
         # Client is not a monitored client
-        raise HTTPException(status_code=501, detail="Monitoring is not enabled. Use MonitoredLiteLLMClient.")
+        raise HTTPException(
+            status_code=501,
+            detail="Monitoring is not enabled. Use MonitoredLiteLLMClient.",
+        )
     except Exception as e:
         logger.error(f"Error testing alerts: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -208,4 +236,8 @@ async def monitoring_health_check() -> Dict[str, Any]:
     """
     Check monitoring system health.
     """
-    return {"status": "healthy", "service": "claude-monitoring", "timestamp": datetime.utcnow().isoformat()}
+    return {
+        "status": "healthy",
+        "service": "claude-monitoring",
+        "timestamp": datetime.utcnow().isoformat(),
+    }

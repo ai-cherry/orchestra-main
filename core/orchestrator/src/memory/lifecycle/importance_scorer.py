@@ -136,12 +136,15 @@ class ImportanceScorer:
 
         if abs(weights_sum - 1.0) > 0.001:
             logger.warning(
-                f"Importance scoring weights sum to {weights_sum}, not 1.0. " "Scores may not be properly normalized."
+                f"Importance scoring weights sum to {weights_sum}, not 1.0. "
+                "Scores may not be properly normalized."
             )
 
         logger.info("ImportanceScorer initialized")
 
-    def score_item(self, item: Dict[str, Any], factors: Optional[ImportanceFactors] = None) -> ImportanceScore:
+    def score_item(
+        self, item: Dict[str, Any], factors: Optional[ImportanceFactors] = None
+    ) -> ImportanceScore:
         """
         Score a memory item based on its importance factors.
 
@@ -283,10 +286,14 @@ class ImportanceScorer:
             Usage score (0.0 to 1.0)
         """
         # Normalize access count
-        access_score = min(1.0, factors.access_count / self.config.high_access_threshold)
+        access_score = min(
+            1.0, factors.access_count / self.config.high_access_threshold
+        )
 
         # Normalize reference count
-        reference_score = min(1.0, factors.reference_count / self.config.high_reference_threshold)
+        reference_score = min(
+            1.0, factors.reference_count / self.config.high_reference_threshold
+        )
 
         # Combine scores (higher weight on references)
         return 0.4 * access_score + 0.6 * reference_score
@@ -305,7 +312,9 @@ class ImportanceScorer:
         if factors.content_length < self.config.min_content_length:
             length_score = 0.0
         else:
-            length_score = min(1.0, factors.content_length / self.config.significant_content_length)
+            length_score = min(
+                1.0, factors.content_length / self.config.significant_content_length
+            )
 
         # Score based on entities
         entity_score = min(1.0, factors.entity_count / 5.0)
@@ -345,7 +354,9 @@ class ImportanceScorer:
             Relationship score (0.0 to 1.0)
         """
         # Normalize connection count
-        return min(1.0, factors.connected_item_count / self.config.significant_connection_count)
+        return min(
+            1.0, factors.connected_item_count / self.config.significant_connection_count
+        )
 
     def _calculate_semantic_score(self, factors: ImportanceFactors) -> float:
         """

@@ -36,7 +36,7 @@ on:
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REGION: ${{ secrets.GCP_REGION }}
-  PYTHON_VERSION: "3.11"
+  PYTHON_VERSION: "3.10"
   POETRY_VERSION: "1.6.1"
 
 jobs:

@@ -24,7 +24,9 @@ import subprocess
 import sys
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 
@@ -94,14 +96,18 @@ class AICodeReviewer:
         # Skip excluded files
         filename = os.path.basename(filepath)
         if filename in self.excluded_files:
-            logger.info(f"Skipping excluded file: {filename} (contains educational examples)")
+            logger.info(
+                f"Skipping excluded file: {filename} (contains educational examples)"
+            )
             return {"errors": [], "warnings": []}
 
         results: dict[str, list[str]] = {"errors": [], "warnings": []}
 
         # Check if it's a forbidden file type
         if filename in self.forbidden_files:
-            results["errors"].append(f"Forbidden file type: {filename} - We don't use Docker/Poetry!")
+            results["errors"].append(
+                f"Forbidden file type: {filename} - We don't use Docker/Poetry!"
+            )
             return results
 
         # Only check Python files for code issues
@@ -115,22 +121,28 @@ class AICodeReviewer:
             # Check for forbidden imports
             for forbidden in self.forbidden_imports:
                 if re.search(f"import {forbidden}|from {forbidden}", content):
-                    results["errors"].append(f"Forbidden import '{forbidden}' - We use pip/venv only!")
+                    results["errors"].append(
+                        f"Forbidden import '{forbidden}' - We use pip/venv only!"
+                    )
 
-            # Check for Python 3.11+ features
+            # Check for Python 3.10+ features
             for feature_pattern in self.python311_features:
                 if re.search(feature_pattern, content):
                     results["warnings"].append(
-                        f"Python 3.11+ feature detected: {feature_pattern} - Ensure target runtime is 3.11 or newer."
+                        f"Python 3.10+ feature detected: {feature_pattern} - Ensure target runtime is 3.11 or newer."
                     )
 
             # Check for os.system usage
             if "os.system(" in content:
-                results["errors"].append("Found os.system() - Use subprocess.run() instead!")
+                results["errors"].append(
+                    "Found os.system() - Use subprocess.run() instead!"
+                )
 
             # Check for shell=True
             if "shell=True" in content and "subprocess" in content:
-                results["warnings"].append("Found shell=True - Consider using argument list instead!")
+                results["warnings"].append(
+                    "Found shell=True - Consider using argument list instead!"
+                )
 
             # Parse AST for deeper analysis
             try:
@@ -144,24 +156,45 @@ class AICodeReviewer:
 
         return results
 
-    def _analyze_ast(self, tree: ast.AST, filepath: str, results: dict[str, list[str]]) -> None:
+    def _analyze_ast(
+        self, tree: ast.AST, filepath: str, results: dict[str, list[str]]
+    ) -> None:
         """Analyze AST for patterns."""
         # Check for overly complex classes
         for node in ast.walk(tree):
             if isinstance(node, ast.ClassDef):
                 # Check for abstract base classes
-                if any(base.id == "ABC" for base in node.bases if isinstance(base, ast.Name)):
-                    if len([n for n in ast.walk(node) if isinstance(n, ast.FunctionDef)]) < 3:
-                        results["warnings"].append(f"Simple ABC detected in {node.name} - might be over-engineered")
+                if any(
+                    base.id == "ABC"
+                    for base in node.bases
+                    if isinstance(base, ast.Name)
+                ):
+                    if (
+                        len(
+                            [
+                                n
+                                for n in ast.walk(node)
+                                if isinstance(n, ast.FunctionDef)
+                            ]
+                        )
+                        < 3
+                    ):
+                        results["warnings"].append(
+                            f"Simple ABC detected in {node.name} - might be over-engineered"
+                        )
 
                 # Check for multiple inheritance
                 if len(node.bases) > 1:
-                    results["warnings"].append(f"Multiple inheritance in {node.name} - keep it simple!")
+                    results["warnings"].append(
+                        f"Multiple inheritance in {node.name} - keep it simple!"
+                    )
 
             # Check for metaclasses
             if isinstance(node, ast.ClassDef) and node.keywords:
                 if any(kw.arg == "metaclass" for kw in node.keywords):
-                    results["errors"].append(f"Metaclass usage in {node.name} - too complex!")
+                    results["errors"].append(
+                        f"Metaclass usage in {node.name} - too complex!"
+                    )
 
     def check_for_duplicates(self, filepath: str) -> list[str]:
         """Check if functionality already exists in the project."""
@@ -181,19 +214,29 @@ class AICodeReviewer:
 
             # Check for validator functions
             if re.search(r"def.*validat", content, re.IGNORECASE):
-                duplicates.append(f"Validation functionality might duplicate {self.existing_tools['config_validator']}")
+                duplicates.append(
+                    f"Validation functionality might duplicate {self.existing_tools['config_validator']}"
+                )
 
             # Check for monitoring/health functions
-            if re.search(r"def.*(health|monitor|check.*service)", content, re.IGNORECASE):
-                duplicates.append(f"Health/monitoring might duplicate {self.existing_tools['health_monitor']}")
+            if re.search(
+                r"def.*(health|monitor|check.*service)", content, re.IGNORECASE
+            ):
+                duplicates.append(
+                    f"Health/monitoring might duplicate {self.existing_tools['health_monitor']}"
+                )
 
             # Check for CLI tools
             if "argparse" in content or "click" in content:
-                duplicates.append(f"CLI functionality might duplicate {self.existing_tools['orchestra_cli']}")
+                duplicates.append(
+                    f"CLI functionality might duplicate {self.existing_tools['orchestra_cli']}"
+                )
 
             # Check for environment checking
             if re.search(r"def.*check.*(env|venv|virtual)", content, re.IGNORECASE):
-                duplicates.append(f"Environment checking might duplicate {self.existing_tools['check_venv']}")
+                duplicates.append(
+                    f"Environment checking might duplicate {self.existing_tools['check_venv']}"
+                )
 
         except Exception as e:
             logger.error(f"Error checking for duplicates: {e}")
@@ -205,7 +248,9 @@ class AICodeReviewer:
         try:
             # Get list of changed files
             result = subprocess.run(
-                ["git", "diff", "--name-only", "--cached", "HEAD"], capture_output=True, text=True
+                ["git", "diff", "--name-only", "--cached", "HEAD"],
+                capture_output=True,
+                text=True,
             )  # noqa: S603,S607
 
             if result.returncode != 0:
@@ -215,7 +260,9 @@ class AICodeReviewer:
                 )  # noqa: S603,S607
 
             if result.returncode != 0:
-                return {"error": {"errors": ["Failed to get git changes"], "warnings": []}}
+                return {
+                    "error": {"errors": ["Failed to get git changes"], "warnings": []}
+                }
 
             files = result.stdout.strip().split("\n")
             all_results = {}
@@ -242,7 +289,10 @@ class AICodeReviewer:
         # Check for forbidden files
         for forbidden_file in self.forbidden_files:
             if os.path.exists(forbidden_file):
-                all_results[forbidden_file] = {"errors": [f"Forbidden file exists: {forbidden_file}"], "warnings": []}
+                all_results[forbidden_file] = {
+                    "errors": [f"Forbidden file exists: {forbidden_file}"],
+                    "warnings": [],
+                }
 
         # Scan Python files
         for root, _dirs, files in os.walk(self.project_root):
@@ -270,7 +320,9 @@ class AICodeReviewer:
         total_errors = sum(len(r["errors"]) for r in results.values())
         total_warnings = sum(len(r["warnings"]) for r in results.values())
 
-        report.append(f"Found {total_errors} errors and {total_warnings} warnings in {len(results)} files\n")
+        report.append(
+            f"Found {total_errors} errors and {total_warnings} warnings in {len(results)} files\n"
+        )
 
         for filepath, file_results in results.items():
             report.append(f"📄 {filepath}")
@@ -293,7 +345,7 @@ class AICodeReviewer:
                 "1. Replace Docker/Poetry with pip/venv",
                 "2. Use subprocess.run() instead of os.system()",
                 "3. Check existing tools in scripts/ before creating new ones",
-                "4. Ensure Python 3.11+ features are supported in deployment environments",
+                "4. Ensure Python 3.10+ features are supported in deployment environments",
                 "5. Simplify over-engineered patterns",
             ]
         )
@@ -303,10 +355,14 @@ class AICodeReviewer:
 
 def main() -> int:
     """Main entry point for AI code reviewer."""
-    parser = argparse.ArgumentParser(description="AI Code Reviewer - Maintain project consistency")
+    parser = argparse.ArgumentParser(
+        description="AI Code Reviewer - Maintain project consistency"
+    )
 
     parser.add_argument("--check-file", help="Check a specific file")
-    parser.add_argument("--check-changes", action="store_true", help="Check git changes")
+    parser.add_argument(
+        "--check-changes", action="store_true", help="Check git changes"
+    )
     parser.add_argument("--full-scan", action="store_true", help="Scan entire project")
     parser.add_argument("--output", help="Output report to file")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")

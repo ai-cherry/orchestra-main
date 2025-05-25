@@ -49,7 +49,10 @@ class TokenBudgetManager:
             int: Estimated token count
         """
         # Check cache first if content hash is available
-        if entry.metadata.content_hash and entry.metadata.content_hash in self.token_cache:
+        if (
+            entry.metadata.content_hash
+            and entry.metadata.content_hash in self.token_cache
+        ):
             return self.token_cache[entry.metadata.content_hash]
 
         # Convert content to string
@@ -73,14 +76,18 @@ class TokenBudgetManager:
         whitespace_count = len(self.whitespace_pattern.findall(content_str))
 
         # Calculate token estimate
-        token_estimate = int(word_count * 0.75 + special_char_count + whitespace_count * 0.25 + 4)
+        token_estimate = int(
+            word_count * 0.75 + special_char_count + whitespace_count * 0.25 + 4
+        )
 
         # Cache the result if content hash is available
         if entry.metadata.content_hash:
             # Manage cache size
             if len(self.token_cache) >= self.max_cache_size:
                 # Simple strategy: clear half the cache when it gets full
-                keys_to_remove = list(self.token_cache.keys())[: self.max_cache_size // 2]
+                keys_to_remove = list(self.token_cache.keys())[
+                    : self.max_cache_size // 2
+                ]
                 for key in keys_to_remove:
                     del self.token_cache[key]
                 logger.debug(f"Token cache cleared to {len(self.token_cache)} entries")
@@ -117,12 +124,16 @@ class TokenBudgetManager:
             bool: True if the entry was added, False if it couldn't fit
         """
         if not self.can_fit_entry(entry, tool):
-            logger.warning(f"Entry {entry.metadata.content_hash} doesn't fit in {tool}'s budget")
+            logger.warning(
+                f"Entry {entry.metadata.content_hash} doesn't fit in {tool}'s budget"
+            )
             return False
 
         tokens = self.estimate_tokens(entry)
         self.current_usage[tool] += tokens
-        logger.debug(f"Added {tokens} tokens to {tool}, new usage: {self.current_usage[tool]}")
+        logger.debug(
+            f"Added {tokens} tokens to {tool}, new usage: {self.current_usage[tool]}"
+        )
         return True
 
     def remove_entry(self, entry: MemoryEntry, tool: str) -> None:
@@ -138,7 +149,9 @@ class TokenBudgetManager:
 
         tokens = self.estimate_tokens(entry)
         self.current_usage[tool] = max(0, self.current_usage[tool] - tokens)
-        logger.debug(f"Removed {tokens} tokens from {tool}, new usage: {self.current_usage[tool]}")
+        logger.debug(
+            f"Removed {tokens} tokens from {tool}, new usage: {self.current_usage[tool]}"
+        )
 
     def get_available_budget(self, tool: str) -> int:
         """Get the available token budget for a tool.

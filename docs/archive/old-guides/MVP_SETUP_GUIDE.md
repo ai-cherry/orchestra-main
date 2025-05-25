@@ -6,7 +6,7 @@ This guide will help you set up the enhanced Orchestra AI MVP with native natura
 
 ### 1. Prerequisites
 
-- Python 3.11+
+- Python 3.10+
 - Redis server
 - Google Cloud Project with appropriate APIs enabled
 - API keys for data sources (Gong, Salesforce, HubSpot, Slack, Looker)
@@ -20,10 +20,10 @@ This guide will help you set up the enhanced Orchestra AI MVP with native natura
    cd orchestra-main
    ```
 
-2. **Create and activate a Python 3.11+ virtual environment:**
+2. **Create and activate a Python 3.10+ virtual environment:**
 
    ```bash
-   python3.11 -m venv .venv
+   python3.10 -m venv .venv
    source .venv/bin/activate
    pip install --upgrade pip
    ```

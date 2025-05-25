@@ -179,9 +179,13 @@ class EnhancedPersonaManager(PersonaManager):
         # Load enhanced personas (performed lazily on first request)
         self._last_loaded = 0  # Force load on first access
 
-        logger.info("EnhancedPersonaManager initialized - personas will be loaded on first access")
+        logger.info(
+            "EnhancedPersonaManager initialized - personas will be loaded on first access"
+        )
 
-    def get_enhanced_persona(self, persona_id: Optional[str] = None) -> EnhancedPersonaConfig:
+    def get_enhanced_persona(
+        self, persona_id: Optional[str] = None
+    ) -> EnhancedPersonaConfig:
         """
         Get an enhanced persona configuration by ID.
 
@@ -241,7 +245,9 @@ class EnhancedPersonaManager(PersonaManager):
                 prompt_template="Response: {input}",
             )
 
-    def format_response(self, persona_id: Optional[str], response_text: str, **kwargs: Any) -> str:
+    def format_response(
+        self, persona_id: Optional[str], response_text: str, **kwargs: Any
+    ) -> str:
         """
         Format a response according to a persona's template.
 
@@ -256,7 +262,9 @@ class EnhancedPersonaManager(PersonaManager):
         persona = self.get_enhanced_persona(persona_id)
         return persona.format_response(response_text, **kwargs)
 
-    def get_preferred_agent_type(self, persona_id: Optional[str] = None) -> Optional[str]:
+    def get_preferred_agent_type(
+        self, persona_id: Optional[str] = None
+    ) -> Optional[str]:
         """
         Get the preferred agent type for a persona.
 
@@ -360,15 +368,23 @@ class EnhancedPersonaManager(PersonaManager):
 
                                 # Check for agent type mapping
                                 if persona.preferred_agent_type:
-                                    self._agent_type_mappings[persona_id] = persona.preferred_agent_type
+                                    self._agent_type_mappings[persona_id] = (
+                                        persona.preferred_agent_type
+                                    )
 
                                 logger.debug(f"Loaded enhanced persona: {persona.name}")
                         except Exception as e:
-                            logger.error(f"Failed to load enhanced persona {persona_id}: {e}")
+                            logger.error(
+                                f"Failed to load enhanced persona {persona_id}: {e}"
+                            )
 
-                    logger.info(f"Loaded {len(enhanced_personas)} enhanced personas from {config_path}")
+                    logger.info(
+                        f"Loaded {len(enhanced_personas)} enhanced personas from {config_path}"
+                    )
             except Exception as e:
-                logger.error(f"Failed to load enhanced personas from {self._config_path}: {e}")
+                logger.error(
+                    f"Failed to load enhanced personas from {self._config_path}: {e}"
+                )
                 return False
 
         # Update enhanced personas dictionary
@@ -381,7 +397,11 @@ class EnhancedPersonaManager(PersonaManager):
                     # Convert base persona to enhanced
                     enhanced = EnhancedPersonaConfig(
                         name=base_persona.name,
-                        description=(base_persona.background[:100] if base_persona.background else ""),
+                        description=(
+                            base_persona.background[:100]
+                            if base_persona.background
+                            else ""
+                        ),
                         background=base_persona.background or "",
                         interaction_style=base_persona.interaction_style or "helpful",
                         traits=base_persona.traits or [],
@@ -392,7 +412,9 @@ class EnhancedPersonaManager(PersonaManager):
                     # Add to enhanced personas dictionary
                     self._enhanced_personas[persona_id] = enhanced
                 except Exception as e:
-                    logger.error(f"Failed to convert base persona {persona_id} to enhanced: {e}")
+                    logger.error(
+                        f"Failed to convert base persona {persona_id} to enhanced: {e}"
+                    )
 
         return True
 

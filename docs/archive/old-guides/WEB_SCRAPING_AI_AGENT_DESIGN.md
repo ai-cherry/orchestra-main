@@ -492,10 +492,10 @@ Orchestra AI → MCP Server → Orchestrator → Agent Selection → Task Execut
    cd orchestra-main
    ```
 
-2. **Create and activate a Python 3.11+ virtual environment:**
+2. **Create and activate a Python 3.10+ virtual environment:**
 
    ```bash
-   python3.11 -m venv .venv
+   python3.10 -m venv .venv
    source .venv/bin/activate
    pip install --upgrade pip
    ```

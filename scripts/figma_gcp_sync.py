@@ -30,7 +30,9 @@ try:
     GOOGLE_CLOUD_AVAILABLE = True
 except ImportError:
     GOOGLE_CLOUD_AVAILABLE = False
-    print("Warning: Google Cloud libraries not available. Some features will be disabled.")
+    print(
+        "Warning: Google Cloud libraries not available. Some features will be disabled."
+    )
 
 # Configure logging
 logging.basicConfig(
@@ -78,13 +80,17 @@ class StyleGenerator:
 
         # Extract collections and modes
         collections = {}
-        for collection_id, collection in self.variables.get("variableCollections", {}).items():
+        for collection_id, collection in self.variables.get(
+            "variableCollections", {}
+        ).items():
             collections[collection_id] = {
                 "name": collection.get("name", "Default"),
                 "modes": {},
             }
             for mode_id, mode in collection.get("modes", {}).items():
-                collections[collection_id]["modes"][mode_id] = mode.get("name", "Default")
+                collections[collection_id]["modes"][mode_id] = mode.get(
+                    "name", "Default"
+                )
 
         # Extract variables
         for var_id, variable in self.variables.get("variables", {}).items():
@@ -101,11 +107,19 @@ class StyleGenerator:
             # Process by type
             if var_type == "COLOR":
                 for mode_id, mode_values in variable.get("valuesByMode", {}).items():
-                    mode_name = collections[collection_id]["modes"].get(mode_id, "Default")
-                    key = f"{var_name}_{mode_name}" if mode_name != "Default" else var_name
+                    mode_name = collections[collection_id]["modes"].get(
+                        mode_id, "Default"
+                    )
+                    key = (
+                        f"{var_name}_{mode_name}"
+                        if mode_name != "Default"
+                        else var_name
+                    )
 
                     # Convert RGBA to hex
-                    if isinstance(mode_values, dict) and all(k in mode_values for k in ["r", "g", "b"]):
+                    if isinstance(mode_values, dict) and all(
+                        k in mode_values for k in ["r", "g", "b"]
+                    ):
                         r = int(mode_values["r"] * 255)
                         g = int(mode_values["g"] * 255)
                         b = int(mode_values["b"] * 255)
@@ -120,20 +134,38 @@ class StyleGenerator:
 
             elif var_type == "STRING" and "typography" in collection_name.lower():
                 for mode_id, mode_values in variable.get("valuesByMode", {}).items():
-                    mode_name = collections[collection_id]["modes"].get(mode_id, "Default")
-                    key = f"{var_name}_{mode_name}" if mode_name != "Default" else var_name
+                    mode_name = collections[collection_id]["modes"].get(
+                        mode_id, "Default"
+                    )
+                    key = (
+                        f"{var_name}_{mode_name}"
+                        if mode_name != "Default"
+                        else var_name
+                    )
                     result["typography"][key] = mode_values
 
             elif var_type == "FLOAT" and "spacing" in collection_name.lower():
                 for mode_id, mode_values in variable.get("valuesByMode", {}).items():
-                    mode_name = collections[collection_id]["modes"].get(mode_id, "Default")
-                    key = f"{var_name}_{mode_name}" if mode_name != "Default" else var_name
+                    mode_name = collections[collection_id]["modes"].get(
+                        mode_id, "Default"
+                    )
+                    key = (
+                        f"{var_name}_{mode_name}"
+                        if mode_name != "Default"
+                        else var_name
+                    )
                     result["spacing"][key] = mode_values
 
             elif var_type == "FLOAT" and "breakpoint" in collection_name.lower():
                 for mode_id, mode_values in variable.get("valuesByMode", {}).items():
-                    mode_name = collections[collection_id]["modes"].get(mode_id, "Default")
-                    key = f"{var_name}_{mode_name}" if mode_name != "Default" else var_name
+                    mode_name = collections[collection_id]["modes"].get(
+                        mode_id, "Default"
+                    )
+                    key = (
+                        f"{var_name}_{mode_name}"
+                        if mode_name != "Default"
+                        else var_name
+                    )
                     result["breakpoints"][key] = mode_values
 
         return result
@@ -251,7 +283,9 @@ class StyleGenerator:
 
         # Add typography styles
         for name, value in self.processed_variables["typography"].items():
-            android_name = f"typography_{name.lower().replace('-', '_').replace(' ', '_')}"
+            android_name = (
+                f"typography_{name.lower().replace('-', '_').replace(' ', '_')}"
+            )
             styles_xml += f'        <item name="{android_name}">{value}</item>\n'
 
         styles_xml += "    </style>\n"
@@ -276,7 +310,9 @@ class StyleGenerator:
 
         for name, value in self.processed_variables["colors"].items():
             # Convert to Swift-compatible names (camelCase)
-            swift_name = name.replace("-", "_").replace("_", " ").title().replace(" ", "")
+            swift_name = (
+                name.replace("-", "_").replace("_", " ").title().replace(" ", "")
+            )
             swift_name = swift_name[0].lower() + swift_name[1:]
 
             # Parse the hex color
@@ -307,7 +343,9 @@ class StyleGenerator:
         # Typography
         tokens += "    enum Typography {\n"
         for name, value in self.processed_variables["typography"].items():
-            swift_name = name.replace("-", "_").replace("_", " ").title().replace(" ", "")
+            swift_name = (
+                name.replace("-", "_").replace("_", " ").title().replace(" ", "")
+            )
             swift_name = swift_name[0].lower() + swift_name[1:]
             tokens += f'        static let {swift_name} = "{value}"\n'
         tokens += "    }\n\n"
@@ -315,7 +353,9 @@ class StyleGenerator:
         # Spacing
         tokens += "    enum Spacing {\n"
         for name, value in self.processed_variables["spacing"].items():
-            swift_name = name.replace("-", "_").replace("_", " ").title().replace(" ", "")
+            swift_name = (
+                name.replace("-", "_").replace("_", " ").title().replace(" ", "")
+            )
             swift_name = swift_name[0].lower() + swift_name[1:]
             tokens += f"        static let {swift_name}: CGFloat = {value}\n"
         tokens += "    }\n\n"
@@ -323,7 +363,9 @@ class StyleGenerator:
         # Breakpoints
         tokens += "    enum Breakpoints {\n"
         for name, value in self.processed_variables["breakpoints"].items():
-            swift_name = name.replace("-", "_").replace("_", " ").title().replace(" ", "")
+            swift_name = (
+                name.replace("-", "_").replace("_", " ").title().replace(" ", "")
+            )
             swift_name = swift_name[0].lower() + swift_name[1:]
             tokens += f"        static let {swift_name}: CGFloat = {value}\n"
         tokens += "    }\n"
@@ -398,7 +440,9 @@ class GCPManager:
         self.project_id = project_id
 
         if not GOOGLE_CLOUD_AVAILABLE:
-            logger.warning("Google Cloud libraries not available. GCP operations will be skipped.")
+            logger.warning(
+                "Google Cloud libraries not available. GCP operations will be skipped."
+            )
             return
 
         # Initialize clients
@@ -407,7 +451,9 @@ class GCPManager:
     def update_secret(self, secret_id: str, secret_data: str) -> bool:
         """Update a secret in Secret Manager."""
         if not GOOGLE_CLOUD_AVAILABLE:
-            logger.warning("Skipping secret update (Google Cloud libraries not available)")
+            logger.warning(
+                "Skipping secret update (Google Cloud libraries not available)"
+            )
             return False
 
         try:
@@ -428,7 +474,9 @@ class GCPManager:
 
             # Add new version
             secret_data_bytes = secret_data.encode("UTF-8")
-            response = self.secret_manager.add_secret_version(parent=secret_path, payload={"data": secret_data_bytes})
+            response = self.secret_manager.add_secret_version(
+                parent=secret_path, payload={"data": secret_data_bytes}
+            )
 
             logger.info(f"Updated secret {secret_id} with new version: {response.name}")
             return True
@@ -474,7 +522,9 @@ class GCPManager:
             try:
                 result = json.loads(response.text)
 
-                logger.info(f"Validation result: {result.get('validationResult', 'unknown')}")
+                logger.info(
+                    f"Validation result: {result.get('validationResult', 'unknown')}"
+                )
 
                 if result.get("issues"):
                     for issue in result.get("issues", []):
@@ -560,7 +610,9 @@ def sync_figma_variables(args):
             gcp = GCPManager(project_id)
 
             validation_result = gcp.validate_with_vertex(generator.processed_variables)
-            logger.info(f"Validation result: {'Passed' if validation_result else 'Failed'}")
+            logger.info(
+                f"Validation result: {'Passed' if validation_result else 'Failed'}"
+            )
 
         # Update Terraform if enabled
         if args.update_terraform:
@@ -600,7 +652,9 @@ def main():
         help="Directory to output generated style files (default: ./styles)",
     )
 
-    parser.add_argument("--project-id", help="GCP Project ID (can also use GCP_PROJECT_ID env var)")
+    parser.add_argument(
+        "--project-id", help="GCP Project ID (can also use GCP_PROJECT_ID env var)"
+    )
 
     parser.add_argument(
         "--update-secrets",
@@ -608,7 +662,9 @@ def main():
         help="Update GCP Secret Manager with design tokens",
     )
 
-    parser.add_argument("--validate", action="store_true", help="Validate design tokens with Vertex AI")
+    parser.add_argument(
+        "--validate", action="store_true", help="Validate design tokens with Vertex AI"
+    )
 
     parser.add_argument(
         "--update-terraform",

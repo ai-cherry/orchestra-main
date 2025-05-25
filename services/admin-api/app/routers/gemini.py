@@ -13,7 +13,9 @@ router = APIRouter()
 
 
 @router.post("/command", response_model=CommandResponse)
-async def execute_command(request: CommandRequest, gemini_service=Depends(get_gemini_service)) -> CommandResponse:
+async def execute_command(
+    request: CommandRequest, gemini_service=Depends(get_gemini_service)
+) -> CommandResponse:
     """
     Execute a natural language command using Gemini.
 
@@ -38,11 +40,15 @@ async def execute_command(request: CommandRequest, gemini_service=Depends(get_ge
             successful=True,
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error processing command: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error processing command: {str(e)}"
+        )
 
 
 @router.post("/analyze", response_model=Dict[str, Any])
-async def analyze_content(request: Dict[str, Any], gemini_service=Depends(get_gemini_service)) -> Dict[str, Any]:
+async def analyze_content(
+    request: Dict[str, Any], gemini_service=Depends(get_gemini_service)
+) -> Dict[str, Any]:
     """
     Analyze content (logs, metrics, etc.) using Gemini.
 
@@ -57,7 +63,9 @@ async def analyze_content(request: Dict[str, Any], gemini_service=Depends(get_ge
         HTTPException: If the analysis could not be performed
     """
     if "content" not in request:
-        raise HTTPException(status_code=400, detail="Content field is required for analysis")
+        raise HTTPException(
+            status_code=400, detail="Content field is required for analysis"
+        )
 
     try:
         analysis = await gemini_service.analyze_content(
@@ -67,7 +75,9 @@ async def analyze_content(request: Dict[str, Any], gemini_service=Depends(get_ge
         )
         return {"analysis": analysis, "successful": True}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error analyzing content: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error analyzing content: {str(e)}"
+        )
 
 
 @router.get("/capabilities")

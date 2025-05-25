@@ -39,7 +39,9 @@ class MemoryService:
             memory_manager: The memory manager implementation to use
         """
         self._memory_manager = memory_manager
-        logger.info(f"MemoryService initialized with {memory_manager.__class__.__name__}")
+        logger.info(
+            f"MemoryService initialized with {memory_manager.__class__.__name__}"
+        )
 
     def initialize(self):
         """Initialize the underlying memory manager."""

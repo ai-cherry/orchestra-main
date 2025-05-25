@@ -1,4 +1,0 @@
-# Main Requirements File for Orchestra AI Project
-# This includes the core dependencies for the main application
-
--r requirements/base.txt

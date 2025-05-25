@@ -4,16 +4,16 @@ AI CONTEXT: CODER MODE - Orchestra Project (2025+)
 
 READ THIS ENTIRE FILE BEFORE WRITING ANY CODE!
 
-Project: Orchestra AI (Python 3.11+, Poetry, Docker Compose, GCP, single-developer)
+Project: Orchestra AI (Python 3.10+, Poetry, Docker Compose, GCP, single-developer)
 Role: You are implementing code for this project.
 
 ENVIRONMENT CONSTRAINTS:
-- Python 3.11+ (required everywhere)
+- Python 3.10+ (required everywhere)
 - All code runs in Docker containers managed by `docker compose`
 - Poetry (version pinned in CI) manages all Python dependencies inside containers
 - Node 18+ and `npm ci` for Admin UI (version pinned in Dockerfile)
 - GCP is the only supported cloud (infra as code via Pulumi/Python)
-- GitHub Actions is the only CI/CD system (Python 3.11+, Poetry, GCP deploy)
+- GitHub Actions is the only CI/CD system (Python 3.10+, Poetry, GCP deploy)
 - Performance and stability > security or multi-user features (see PROJECT_PRIORITIES.md)
 
 CODING STANDARDS:

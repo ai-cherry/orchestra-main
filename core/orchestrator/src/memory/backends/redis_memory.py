@@ -28,12 +28,16 @@ class RedisMemory(MemoryInterface):
         prefix: str = "orchestra:",
     ):
         """Initialize Redis memory."""
-        self.client = redis.Redis(host=host, port=port, password=password, db=db, decode_responses=True)
+        self.client = redis.Redis(
+            host=host, port=port, password=password, db=db, decode_responses=True
+        )
         self.ttl = ttl
         self.prefix = prefix
         logger.info(f"RedisMemory initialized with host={host}, port={port}")
 
-    async def store(self, key: str, value: Dict[str, Any], ttl: Optional[int] = None) -> bool:
+    async def store(
+        self, key: str, value: Dict[str, Any], ttl: Optional[int] = None
+    ) -> bool:
         """Store an item in Redis."""
         try:
             full_key = f"{self.prefix}{key}"
@@ -107,7 +111,9 @@ class RedisMemory(MemoryInterface):
             logger.error(f"Error getting TTL for item in Redis: {e}")
             return None
 
-    async def search(self, field: str, value: Any, operator: str = "==", limit: int = 10) -> List[Dict[str, Any]]:
+    async def search(
+        self, field: str, value: Any, operator: str = "==", limit: int = 10
+    ) -> List[Dict[str, Any]]:
         """
         Search for items in Redis.
 
@@ -128,7 +134,9 @@ class RedisMemory(MemoryInterface):
             keys = self.client.keys(full_pattern)
 
             # Limit the number of keys to process
-            keys = keys[: limit * 2]  # Get more keys than needed to account for filtering
+            keys = keys[
+                : limit * 2
+            ]  # Get more keys than needed to account for filtering
 
             # Process results
             results = []
@@ -175,7 +183,9 @@ class RedisMemory(MemoryInterface):
                 except json.JSONDecodeError:
                     continue
 
-            logger.debug(f"Found {len(results)} items matching {field} {operator} {value} in Redis")
+            logger.debug(
+                f"Found {len(results)} items matching {field} {operator} {value} in Redis"
+            )
             return results
         except Exception as e:
             logger.error(f"Error searching in Redis: {e}")

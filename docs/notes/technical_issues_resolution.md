@@ -227,7 +227,7 @@ The repository has significant security vulnerabilities detected by GitHub's Dep
          - name: Set up Python
            uses: actions/setup-python@v4
            with:
-             python-version: "3.11"
+             python-version: "3.10"
 
          - name: Install Poetry
            uses: snok/install-poetry@v1
@@ -895,7 +895,7 @@ Multiple automation scripts are being made executable, but one (`automation_deci
          - name: Set up Python
            uses: actions/setup-python@v4
            with:
-             python-version: "3.11"
+             python-version: "3.10"
 
          - name: Install dependencies
            run: |

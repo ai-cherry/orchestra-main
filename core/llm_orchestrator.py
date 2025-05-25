@@ -5,7 +5,9 @@ import portkey
 from google.cloud import aiplatform
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 
@@ -25,7 +27,9 @@ class LLMGateway:
             logger.info("Successfully used Portkey for generation")
             return response
         except Exception as e:
-            logger.warning(f"Portkey failed, falling back to Vertex AI. Error: {str(e)}")
+            logger.warning(
+                f"Portkey failed, falling back to Vertex AI. Error: {str(e)}"
+            )
             response = self.vertex.predict(
                 endpoint="projects/cherry-ai-project/locations/us-west4/endpoints/gemini-pro",
                 instances=[{"content": prompt}],

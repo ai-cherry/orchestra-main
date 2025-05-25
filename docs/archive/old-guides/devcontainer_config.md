@@ -1,5 +1,5 @@
 {
-"image": "mcr.microsoft.com/devcontainers/python:3.11",
+"image": "mcr.microsoft.com/devcontainers/python:3.10",
 "features": {
 "ghcr.io/devcontainers-contrib/features/poetry:2": {},
 "ghcr.io/devcontainers/features/terraform:1": {

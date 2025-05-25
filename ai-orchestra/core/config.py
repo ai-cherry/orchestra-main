@@ -17,8 +17,12 @@ class GCPSettings(BaseSettings):
 
     project_id: str = Field(..., description="GCP project ID")
     region: str = Field("us-west4", description="GCP region")
-    use_workload_identity: bool = Field(True, description="Use Workload Identity Federation")
-    service_account_email: Optional[str] = Field(None, description="Service account email")
+    use_workload_identity: bool = Field(
+        True, description="Use Workload Identity Federation"
+    )
+    service_account_email: Optional[str] = Field(
+        None, description="Service account email"
+    )
 
     @validator("project_id")
     def validate_project_id(cls, v: str) -> str:
@@ -94,13 +98,19 @@ class DatabaseSettings(BaseSettings):
 
     firestore_database: str = Field("firestore", description="Firestore database name")
     use_firestore_emulator: bool = Field(False, description="Use Firestore emulator")
-    firestore_emulator_host: Optional[str] = Field(None, description="Firestore emulator host")
+    firestore_emulator_host: Optional[str] = Field(
+        None, description="Firestore emulator host"
+    )
 
     @validator("firestore_emulator_host")
-    def validate_firestore_emulator_host(cls, v: Optional[str], values: Dict[str, Any]) -> Optional[str]:
+    def validate_firestore_emulator_host(
+        cls, v: Optional[str], values: Dict[str, Any]
+    ) -> Optional[str]:
         """Validate Firestore emulator host."""
         if values.get("use_firestore_emulator", False) and not v:
-            raise ValueError("Firestore emulator host must be provided when use_firestore_emulator is True")
+            raise ValueError(
+                "Firestore emulator host must be provided when use_firestore_emulator is True"
+            )
         return v
 
     class Config:
@@ -171,7 +181,9 @@ class Settings(BaseSettings):
     """Main application settings."""
 
     app_name: str = Field("AI Orchestra", description="Application name")
-    environment: str = Field("development", description="Environment (development, staging, production)")
+    environment: str = Field(
+        "development", description="Environment (development, staging, production)"
+    )
     log_level: str = Field("INFO", description="Logging level")
 
     gcp: GCPSettings = Field(default_factory=GCPSettings)
@@ -185,7 +197,9 @@ class Settings(BaseSettings):
         """Validate environment."""
         valid_environments = {"development", "staging", "production"}
         if v not in valid_environments:
-            raise ValueError(f"Environment must be one of: {', '.join(valid_environments)}")
+            raise ValueError(
+                f"Environment must be one of: {', '.join(valid_environments)}"
+            )
         return v
 
     @validator("log_level")
@@ -205,7 +219,10 @@ class Settings(BaseSettings):
             values["api"].debug = False
 
         # In production, use_firestore_emulator should be False
-        if values.get("environment") == "production" and values.get("database").use_firestore_emulator:
+        if (
+            values.get("environment") == "production"
+            and values.get("database").use_firestore_emulator
+        ):
             values["database"].use_firestore_emulator = False
 
         return values

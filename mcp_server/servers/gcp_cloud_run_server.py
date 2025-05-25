@@ -28,12 +28,16 @@ logger = logging.getLogger(__name__)
 
 # Initialize FastAPI app for MCP server
 app = FastAPI(
-    title="GCP Cloud Run MCP Server", description="MCP server for managing Google Cloud Run services", version="1.0.0"
+    title="GCP Cloud Run MCP Server",
+    description="MCP server for managing Google Cloud Run services",
+    version="1.0.0",
 )
 
 # Get configuration from unified config (with env fallback)
 PROJECT_ID = getattr(gcp_config, "gcp_project_id", None) or os.getenv("GCP_PROJECT_ID")
-REGION = getattr(gcp_config, "gcp_region", None) or os.getenv("GCP_REGION", "us-central1")
+REGION = getattr(gcp_config, "gcp_region", None) or os.getenv(
+    "GCP_REGION", "us-central1"
+)
 
 # Initialize Cloud Run client
 try:
@@ -49,7 +53,9 @@ class DeployRequest(BaseModel):
 
     service_name: str = Field(..., description="Name of the Cloud Run service")
     image: str = Field(..., description="Container image URL")
-    env_vars: Optional[Dict[str, str]] = Field(default={}, description="Environment variables")
+    env_vars: Optional[Dict[str, str]] = Field(
+        default={}, description="Environment variables"
+    )
     memory: str = Field(default="512Mi", description="Memory allocation")
     cpu: str = Field(default="1", description="CPU allocation")
     min_instances: int = Field(default=0, description="Minimum number of instances")
@@ -85,9 +91,18 @@ async def get_tools() -> List[MCPToolDefinition]:
                 "properties": {
                     "service_name": {"type": "string", "description": "Service name"},
                     "image": {"type": "string", "description": "Container image URL"},
-                    "env_vars": {"type": "object", "description": "Environment variables"},
-                    "memory": {"type": "string", "description": "Memory allocation (e.g., 512Mi)"},
-                    "cpu": {"type": "string", "description": "CPU allocation (e.g., 1)"},
+                    "env_vars": {
+                        "type": "object",
+                        "description": "Environment variables",
+                    },
+                    "memory": {
+                        "type": "string",
+                        "description": "Memory allocation (e.g., 512Mi)",
+                    },
+                    "cpu": {
+                        "type": "string",
+                        "description": "CPU allocation (e.g., 1)",
+                    },
                 },
                 "required": ["service_name", "image"],
             },
@@ -97,7 +112,9 @@ async def get_tools() -> List[MCPToolDefinition]:
             description="Get the status of a Cloud Run service",
             parameters={
                 "type": "object",
-                "properties": {"service_name": {"type": "string", "description": "Service name"}},
+                "properties": {
+                    "service_name": {"type": "string", "description": "Service name"}
+                },
                 "required": ["service_name"],
             },
         ),
@@ -123,10 +140,15 @@ async def deploy_service(request: DeployRequest) -> Dict[str, Any]:
 
         # Set environment variables
         if request.env_vars:
-            service.template.containers[0].env = [{"name": k, "value": v} for k, v in request.env_vars.items()]
+            service.template.containers[0].env = [
+                {"name": k, "value": v} for k, v in request.env_vars.items()
+            ]
 
         # Set resource limits
-        service.template.containers[0].resources.limits = {"memory": request.memory, "cpu": request.cpu}
+        service.template.containers[0].resources.limits = {
+            "memory": request.memory,
+            "cpu": request.cpu,
+        }
 
         # Set scaling
         service.template.scaling.min_instance_count = request.min_instances
@@ -135,7 +157,9 @@ async def deploy_service(request: DeployRequest) -> Dict[str, Any]:
         # Deploy the service
         parent = f"projects/{PROJECT_ID}/locations/{REGION}"
 
-        operation = run_client.create_service(parent=parent, service=service, service_id=request.service_name)
+        operation = run_client.create_service(
+            parent=parent, service=service, service_id=request.service_name
+        )
 
         # Wait for operation to complete
         response = operation.result()
@@ -190,8 +214,12 @@ async def list_services() -> List[Dict[str, Any]]:
             {
                 "name": service.name.split("/")[-1],
                 "url": service.uri,
-                "created": service.create_time.isoformat() if service.create_time else None,
-                "updated": service.update_time.isoformat() if service.update_time else None,
+                "created": (
+                    service.create_time.isoformat() if service.create_time else None
+                ),
+                "updated": (
+                    service.update_time.isoformat() if service.update_time else None
+                ),
             }
             for service in services
         ]
@@ -217,10 +245,20 @@ async def pulumi_apply(stack_name: str):
             text=True,
             check=True,
         )
-        return {"status": "success", "stack": stack_name, "stdout": result.stdout, "stderr": result.stderr}
+        return {
+            "status": "success",
+            "stack": stack_name,
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+        }
     except subprocess.CalledProcessError as e:
         logger.error(f"Pulumi apply failed: {e.stderr}")
-        return {"status": "error", "stack": stack_name, "stdout": e.stdout, "stderr": e.stderr}
+        return {
+            "status": "error",
+            "stack": stack_name,
+            "stdout": e.stdout,
+            "stderr": e.stderr,
+        }
 
 
 @app.get("/health")

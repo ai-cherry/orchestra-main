@@ -19,17 +19,25 @@ class TestMVPImports:
     def test_enhanced_vector_memory_system_import(self):
         """Test that the enhanced vector memory system can be imported."""
         try:
-            from enhanced_vector_memory_system import ContextualMemory, EnhancedVectorMemorySystem
+            from enhanced_vector_memory_system import (
+                ContextualMemory,
+                EnhancedVectorMemorySystem,
+            )
 
             assert EnhancedVectorMemorySystem is not None
             assert ContextualMemory is not None
         except ImportError as e:
-            pytest.skip(f"Enhanced vector memory system dependencies not available: {e}")
+            pytest.skip(
+                f"Enhanced vector memory system dependencies not available: {e}"
+            )
 
     def test_data_source_integrations_import(self):
         """Test that data source integrations can be imported."""
         try:
-            from data_source_integrations import DataAggregationOrchestrator, DataSourceConfig
+            from data_source_integrations import (
+                DataAggregationOrchestrator,
+                DataSourceConfig,
+            )
 
             assert DataAggregationOrchestrator is not None
             assert DataSourceConfig is not None
@@ -39,7 +47,10 @@ class TestMVPImports:
     def test_enhanced_natural_language_interface_import(self):
         """Test that the natural language interface can be imported."""
         try:
-            from enhanced_natural_language_interface import ConversationMode, EnhancedNaturalLanguageInterface
+            from enhanced_natural_language_interface import (
+                ConversationMode,
+                EnhancedNaturalLanguageInterface,
+            )
 
             assert EnhancedNaturalLanguageInterface is not None
             assert ConversationMode is not None
@@ -79,7 +90,12 @@ class TestBasicFunctionality:
         try:
             from data_source_integrations import DataSourceConfig
 
-            config = DataSourceConfig(name="test", api_key="test_key", base_url="https://test.com", rate_limit=1.0)
+            config = DataSourceConfig(
+                name="test",
+                api_key="test_key",
+                base_url="https://test.com",
+                rate_limit=1.0,
+            )
 
             assert config.name == "test"
             assert config.api_key == "test_key"

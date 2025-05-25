@@ -33,7 +33,9 @@ class WeaviateAdapter:
         self.endpoint = endpoint or os.environ.get("WEAVIATE_ENDPOINT")
         self.api_key = api_key or os.environ.get("WEAVIATE_API_KEY")
         if not self.endpoint or not self.api_key:
-            raise RuntimeError("WEAVIATE_ENDPOINT and WEAVIATE_API_KEY must be set in environment variables.")
+            raise RuntimeError(
+                "WEAVIATE_ENDPOINT and WEAVIATE_API_KEY must be set in environment variables."
+            )
         self.class_name = class_name
         self._client = None
 
@@ -77,10 +79,15 @@ class WeaviateAdapter:
                 await asyncio.get_event_loop().run_in_executor(None, upsert_batch)
                 logger.info(f"Upserted batch {i}-{i+len(batch)-1} to Weaviate.")
             except Exception as e:
-                logger.error(f"Weaviate upsert failed for batch {i}-{i+len(batch)-1}: {e}")
+                logger.error(
+                    f"Weaviate upsert failed for batch {i}-{i+len(batch)-1}: {e}"
+                )
 
     async def query(
-        self, vector: List[float], top_k: int = 10, filters: Optional[Dict[str, Any]] = None
+        self,
+        vector: List[float],
+        top_k: int = 10,
+        filters: Optional[Dict[str, Any]] = None,
     ) -> List[Dict[str, Any]]:
         """
         Query Weaviate for nearest neighbors.
@@ -91,7 +98,9 @@ class WeaviateAdapter:
 
             def do_query():
                 return (
-                    self._client.query.get(self.class_name, ["_additional { id distance }", "*"])
+                    self._client.query.get(
+                        self.class_name, ["_additional { id distance }", "*"]
+                    )
                     .with_near_vector({"vector": vector})
                     .with_limit(top_k)
                     .with_where(filters)
@@ -103,7 +112,10 @@ class WeaviateAdapter:
             return [
                 {
                     "id": m["_additional"]["id"],
-                    "score": 1.0 - m["_additional"]["distance"],  # Weaviate uses distance, convert to similarity
+                    "score": 1.0
+                    - m["_additional"][
+                        "distance"
+                    ],  # Weaviate uses distance, convert to similarity
                     "properties": {k: v for k, v in m.items() if k != "_additional"},
                 }
                 for m in matches
@@ -119,7 +131,9 @@ class WeaviateAdapter:
 
             def do_delete():
                 for uuid in ids:
-                    self._client.data_object.delete(uuid=get_valid_uuid(uuid), class_name=self.class_name)
+                    self._client.data_object.delete(
+                        uuid=get_valid_uuid(uuid), class_name=self.class_name
+                    )
 
             await asyncio.get_event_loop().run_in_executor(None, do_delete)
             logger.info(f"Deleted {len(ids)} objects from Weaviate.")

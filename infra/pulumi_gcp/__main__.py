@@ -255,16 +255,35 @@ orchestra_api_service = gcp.cloudrun.Service(
                     "image": f"us-central1-docker.pkg.dev/{project}/orchestra-images/orchestra-main:{image_tag}",
                     "envs": [
                         {"name": "GOOGLE_CLOUD_PROJECT", "value": project},
-                        {"name": "REDIS_HOST", "valueFrom": {"secretKeyRef": {"name": "REDIS_HOST", "key": "latest"}}},
+                        {
+                            "name": "REDIS_HOST",
+                            "valueFrom": {
+                                "secretKeyRef": {"name": "REDIS_HOST", "key": "latest"}
+                            },
+                        },
                         {
                             "name": "DRAGONFLY_HOST",
-                            "valueFrom": {"secretKeyRef": {"name": "DRAGONFLY_HOST", "key": "latest"}},
+                            "valueFrom": {
+                                "secretKeyRef": {
+                                    "name": "DRAGONFLY_HOST",
+                                    "key": "latest",
+                                }
+                            },
                         },
-                        {"name": "SERVICE_DIRECTORY_NAMESPACE", "value": service_directory_namespace},
-                        {"name": "PUBSUB_TOPIC_MCP_EVENTS", "value": mcp_events_topic.name},
+                        {
+                            "name": "SERVICE_DIRECTORY_NAMESPACE",
+                            "value": service_directory_namespace,
+                        },
+                        {
+                            "name": "PUBSUB_TOPIC_MCP_EVENTS",
+                            "value": mcp_events_topic.name,
+                        },
                     ],
                     "ports": [{"containerPort": 8080}],
-                    "resources": {"limits": {"cpu": "2", "memory": "4Gi"}, "requests": {"cpu": "1", "memory": "2Gi"}},
+                    "resources": {
+                        "limits": {"cpu": "2", "memory": "4Gi"},
+                        "requests": {"cpu": "1", "memory": "2Gi"},
+                    },
                     "startupProbe": {
                         "httpGet": {"path": "/health", "port": 8080},
                         "initialDelaySeconds": 30,
@@ -307,31 +326,62 @@ web_scraping_service = gcp.cloudrun.Service(
                     "image": f"us-central1-docker.pkg.dev/{project}/orchestra-images/web-scraping-agents:{image_tag}",
                     "envs": [
                         {"name": "GOOGLE_CLOUD_PROJECT", "value": project},
-                        {"name": "REDIS_HOST", "valueFrom": {"secretKeyRef": {"name": "REDIS_HOST", "key": "latest"}}},
+                        {
+                            "name": "REDIS_HOST",
+                            "valueFrom": {
+                                "secretKeyRef": {"name": "REDIS_HOST", "key": "latest"}
+                            },
+                        },
                         {"name": "REDIS_PORT", "value": "6379"},
                         {"name": "SEARCH_AGENTS", "value": "3"},
                         {"name": "SCRAPER_AGENTS", "value": "5"},
                         {"name": "ANALYZER_AGENTS", "value": "3"},
                         {
                             "name": "ZENROWS_API_KEY",
-                            "valueFrom": {"secretKeyRef": {"name": "ZENROWS_API_KEY", "key": "latest"}},
+                            "valueFrom": {
+                                "secretKeyRef": {
+                                    "name": "ZENROWS_API_KEY",
+                                    "key": "latest",
+                                }
+                            },
                         },
                         {
                             "name": "APIFY_API_KEY",
-                            "valueFrom": {"secretKeyRef": {"name": "APIFY_API_KEY", "key": "latest"}},
+                            "valueFrom": {
+                                "secretKeyRef": {
+                                    "name": "APIFY_API_KEY",
+                                    "key": "latest",
+                                }
+                            },
                         },
                         {
                             "name": "PHANTOMBUSTER_API_KEY",
-                            "valueFrom": {"secretKeyRef": {"name": "PHANTOMBUSTER_API_KEY", "key": "latest"}},
+                            "valueFrom": {
+                                "secretKeyRef": {
+                                    "name": "PHANTOMBUSTER_API_KEY",
+                                    "key": "latest",
+                                }
+                            },
                         },
                         {
                             "name": "OPENAI_API_KEY",
-                            "valueFrom": {"secretKeyRef": {"name": "OPENAI_API_KEY", "key": "latest"}},
+                            "valueFrom": {
+                                "secretKeyRef": {
+                                    "name": "OPENAI_API_KEY",
+                                    "key": "latest",
+                                }
+                            },
                         },
-                        {"name": "PUBSUB_TOPIC_WEBSCRAPING", "value": webscraping_events_topic.name},
+                        {
+                            "name": "PUBSUB_TOPIC_WEBSCRAPING",
+                            "value": webscraping_events_topic.name,
+                        },
                     ],
                     "ports": [{"containerPort": 8080}],
-                    "resources": {"limits": {"cpu": "4", "memory": "8Gi"}, "requests": {"cpu": "2", "memory": "4Gi"}},
+                    "resources": {
+                        "limits": {"cpu": "4", "memory": "8Gi"},
+                        "requests": {"cpu": "2", "memory": "4Gi"},
+                    },
                     "startupProbe": {
                         "httpGet": {"path": "/health", "port": 8080},
                         "initialDelaySeconds": 60,
@@ -373,16 +423,25 @@ admin_interface_service = gcp.cloudrun.Service(
                     "image": f"us-central1-docker.pkg.dev/{project}/orchestra-images/admin-interface:{image_tag}",
                     "envs": [
                         {"name": "GOOGLE_CLOUD_PROJECT", "value": project},
-                        {"name": "SERVICE_DIRECTORY_NAMESPACE", "value": service_directory_namespace},
+                        {
+                            "name": "SERVICE_DIRECTORY_NAMESPACE",
+                            "value": service_directory_namespace,
+                        },
                     ],
                     "ports": [{"containerPort": 8080}],
-                    "resources": {"limits": {"cpu": "2", "memory": "2Gi"}, "requests": {"cpu": "1", "memory": "1Gi"}},
+                    "resources": {
+                        "limits": {"cpu": "2", "memory": "2Gi"},
+                        "requests": {"cpu": "1", "memory": "1Gi"},
+                    },
                     "startupProbe": {
                         "httpGet": {"path": "/", "port": 8080},
                         "initialDelaySeconds": 20,
                         "timeoutSeconds": 5,
                     },
-                    "livenessProbe": {"httpGet": {"path": "/", "port": 8080}, "periodSeconds": 30},
+                    "livenessProbe": {
+                        "httpGet": {"path": "/", "port": 8080},
+                        "periodSeconds": 30,
+                    },
                 }
             ],
             "serviceAccountName": admin_sa.email,
@@ -542,7 +601,9 @@ dashboard_json = {
                                             "alignmentPeriod": "60s",
                                             "perSeriesAligner": "ALIGN_RATE",
                                             "crossSeriesReducer": "REDUCE_SUM",
-                                            "groupByFields": ["resource.label.service_name"],
+                                            "groupByFields": [
+                                                "resource.label.service_name"
+                                            ],
                                         },
                                     },
                                 },
@@ -589,7 +650,9 @@ dashboard_json = {
                                         "aggregation": {
                                             "alignmentPeriod": "60s",
                                             "perSeriesAligner": "ALIGN_MEAN",
-                                            "groupByFields": ["resource.label.service_name"],
+                                            "groupByFields": [
+                                                "resource.label.service_name"
+                                            ],
                                         },
                                     },
                                 },
@@ -627,6 +690,9 @@ pulumi.export("service_directory_namespace", service_directory_namespace.name)
 pulumi.export(
     "dashboard_url",
     pulumi.Output.concat(
-        "https://console.cloud.google.com/monitoring/dashboards/custom/", monitoring_dashboard.id, "?project=", project
+        "https://console.cloud.google.com/monitoring/dashboards/custom/",
+        monitoring_dashboard.id,
+        "?project=",
+        project,
     ),
 )

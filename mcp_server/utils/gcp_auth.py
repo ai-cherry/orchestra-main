@@ -62,7 +62,9 @@ class GCPAuth:
                     temp_path = temp.name
 
                 # Load credentials from the temporary file
-                self._credentials = service_account.Credentials.from_service_account_file(temp_path)
+                self._credentials = (
+                    service_account.Credentials.from_service_account_file(temp_path)
+                )
 
                 # Extract project ID
                 creds_data = json.loads(creds_json)
@@ -78,7 +80,9 @@ class GCPAuth:
                 self._project_id = None
         else:
             # Fall back to application default credentials
-            logger.info("GCP_MASTER_SERVICE_JSON not found, using application default credentials")
+            logger.info(
+                "GCP_MASTER_SERVICE_JSON not found, using application default credentials"
+            )
             self._credentials = None
 
             # Try to get project ID from environment
@@ -99,7 +103,9 @@ class GCPAuth:
             firestore.Client: Authenticated Firestore client
         """
         if self._credentials:
-            return firestore.Client(credentials=self._credentials, project=self._project_id)
+            return firestore.Client(
+                credentials=self._credentials, project=self._project_id
+            )
         return firestore.Client()
 
     def get_firestore_async_client(self) -> firestore.AsyncClient:
@@ -109,7 +115,9 @@ class GCPAuth:
             firestore.AsyncClient: Authenticated Firestore async client
         """
         if self._credentials:
-            return firestore.AsyncClient(credentials=self._credentials, project=self._project_id)
+            return firestore.AsyncClient(
+                credentials=self._credentials, project=self._project_id
+            )
         return firestore.AsyncClient()
 
     def get_storage_client(self) -> storage.Client:
@@ -119,7 +127,9 @@ class GCPAuth:
             storage.Client: Authenticated Storage client
         """
         if self._credentials:
-            return storage.Client(credentials=self._credentials, project=self._project_id)
+            return storage.Client(
+                credentials=self._credentials, project=self._project_id
+            )
         return storage.Client()
 
     def init_vertex_ai(self, location: str = "us-west4") -> None:
@@ -130,10 +140,14 @@ class GCPAuth:
         """
         project = self._project_id or os.environ.get("GOOGLE_CLOUD_PROJECT")
         if not project:
-            raise ValueError("Project ID not available. Set GOOGLE_CLOUD_PROJECT environment variable.")
+            raise ValueError(
+                "Project ID not available. Set GOOGLE_CLOUD_PROJECT environment variable."
+            )
 
         if self._credentials:
-            aiplatform.init(project=project, location=location, credentials=self._credentials)
+            aiplatform.init(
+                project=project, location=location, credentials=self._credentials
+            )
         else:
             aiplatform.init(project=project, location=location)
 

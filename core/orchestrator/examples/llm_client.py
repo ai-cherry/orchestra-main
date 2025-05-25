@@ -69,13 +69,17 @@ async def llm_interact(
 
             # Store session ID for reuse
             if not session_id:
-                print(f"\nSession ID for continuing conversation: {result['session_id']}")
+                print(
+                    f"\nSession ID for continuing conversation: {result['session_id']}"
+                )
         else:
             print(f"Error: {response.status_code}")
             print(response.text)
 
 
-async def direct_completion(api_url: str, system_prompt: str, user_message: str, model: Optional[str] = None):
+async def direct_completion(
+    api_url: str, system_prompt: str, user_message: str, model: Optional[str] = None
+):
     """
     Make a direct LLM completion request.
 
@@ -126,7 +130,9 @@ async def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(description="LLM Client Example")
     parser.add_argument("--url", default="http://localhost:8000", help="API URL")
-    parser.add_argument("--mode", choices=["interact", "direct"], default="interact", help="Mode")
+    parser.add_argument(
+        "--mode", choices=["interact", "direct"], default="interact", help="Mode"
+    )
     parser.add_argument("--message", help="User message")
     parser.add_argument("--user-id", default="example-user", help="User ID")
     parser.add_argument("--session-id", help="Session ID for continuing conversation")

@@ -180,7 +180,9 @@ class LayeredMemoryManager:
         store = self._stores[layer_name]
         return await store.store(item)
 
-    async def retrieve(self, item_id: str, layer_name: Optional[str] = None) -> Optional[MemoryItem]:
+    async def retrieve(
+        self, item_id: str, layer_name: Optional[str] = None
+    ) -> Optional[MemoryItem]:
         """
         Retrieve a memory item.
 
@@ -217,7 +219,9 @@ class LayeredMemoryManager:
         # Not found in any layer
         return None
 
-    async def query(self, query: MemoryQuery, layer_name: Optional[str] = None) -> List[MemoryItem]:
+    async def query(
+        self, query: MemoryQuery, layer_name: Optional[str] = None
+    ) -> List[MemoryItem]:
         """
         Query for memory items.
 
@@ -445,7 +449,9 @@ class LayeredMemoryManager:
         # Store in all layers
         return await self.store(item)
 
-    async def get_conversation_history(self, conversation_id: str, limit: int = 50) -> List[MemoryItem]:
+    async def get_conversation_history(
+        self, conversation_id: str, limit: int = 50
+    ) -> List[MemoryItem]:
         """
         Get conversation history.
 

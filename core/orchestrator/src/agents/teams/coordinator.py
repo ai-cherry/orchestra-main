@@ -172,9 +172,13 @@ class AgentTeam:
             )
             steps.append(step)
 
-        return ExecutionPlan(steps=steps, coordinator_notes=response.text, team_mode=self.team_mode)
+        return ExecutionPlan(
+            steps=steps, coordinator_notes=response.text, team_mode=self.team_mode
+        )
 
-    async def _execute_coordinated_plan(self, plan: ExecutionPlan, context: AgentContext) -> List[StepResult]:
+    async def _execute_coordinated_plan(
+        self, plan: ExecutionPlan, context: AgentContext
+    ) -> List[StepResult]:
         """
         Execute a plan in coordinated mode.
 
@@ -216,7 +220,9 @@ class AgentTeam:
 
         return results
 
-    async def _execute_collaborative_plan(self, plan: ExecutionPlan, context: AgentContext) -> List[StepResult]:
+    async def _execute_collaborative_plan(
+        self, plan: ExecutionPlan, context: AgentContext
+    ) -> List[StepResult]:
         """
         Execute a plan in collaborative mode.
 
@@ -258,7 +264,9 @@ class AgentTeam:
 
         return results
 
-    async def _execute_competitive_plan(self, plan: ExecutionPlan, context: AgentContext) -> List[StepResult]:
+    async def _execute_competitive_plan(
+        self, plan: ExecutionPlan, context: AgentContext
+    ) -> List[StepResult]:
         """
         Execute a plan in competitive mode.
 
@@ -298,7 +306,9 @@ class AgentTeam:
 
         return results
 
-    async def _execute_debate_plan(self, plan: ExecutionPlan, context: AgentContext) -> List[StepResult]:
+    async def _execute_debate_plan(
+        self, plan: ExecutionPlan, context: AgentContext
+    ) -> List[StepResult]:
         """
         Execute a plan in debate mode.
 
@@ -320,7 +330,9 @@ class AgentTeam:
 
         # Add initial responses to debate history
         for result in initial_results:
-            debate_history.append({"agent": result.agent_name, "text": result.response.get("text", "")})
+            debate_history.append(
+                {"agent": result.agent_name, "text": result.response.get("text", "")}
+            )
 
         # Debate rounds
         for round_num in range(1, plan.max_iterations):
@@ -446,7 +458,9 @@ class AgentTeam:
 
         return result
 
-    async def _synthesize_response(self, results: List[StepResult], context: AgentContext) -> AgentResponse:
+    async def _synthesize_response(
+        self, results: List[StepResult], context: AgentContext
+    ) -> AgentResponse:
         """
         Synthesize a final response from the results.
 
@@ -500,7 +514,9 @@ class AgentTeam:
                 )
 
             # Select result with highest confidence
-            best_result = max(successful_results, key=lambda r: r.response.get("confidence", 0.0))
+            best_result = max(
+                successful_results, key=lambda r: r.response.get("confidence", 0.0)
+            )
 
             return AgentResponse(
                 text=best_result.response.get("text", ""),
@@ -565,7 +581,9 @@ class TeamCoordinator(StatefulAgent):
     for agent teams, including execution planning and result synthesis.
     """
 
-    async def process_with_state(self, context: AgentContext) -> Tuple[AgentResponse, Any]:
+    async def process_with_state(
+        self, context: AgentContext
+    ) -> Tuple[AgentResponse, Any]:
         """
         Process user input with team coordination.
 
@@ -640,7 +658,9 @@ class TeamCoordinator(StatefulAgent):
             team_mode=team_mode,
         )
 
-    async def synthesize_response(self, results: List[Dict[str, Any]], context: AgentContext) -> AgentResponse:
+    async def synthesize_response(
+        self, results: List[Dict[str, Any]], context: AgentContext
+    ) -> AgentResponse:
         """
         Synthesize a final response from the results.
 

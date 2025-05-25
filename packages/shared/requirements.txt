@@ -1,9 +1,0 @@
-# Shared package requirements
--r ../../requirements-consolidated.txt
-
-# Additional dependencies specific to packages/shared
-# (none at the moment, core dependencies cover shared needs)
-
-# Note: For testing in this package, use the development dependencies
-# pip install -r ../../requirements-dev.txt
-requests

@@ -18,9 +18,15 @@ from google.cloud.firestore_v1.async_client import AsyncClient as FirestoreAsync
 # Placeholder for settings if the actual import isn't readily available
 class PlaceholderSettings:
     def __init__(self):
-        self.gcp_project_id: Optional[str] = os.environ.get("GCP_PROJECT_ID", "your-gcp-project-id")  # Fallback
-        self.database_use_firestore_emulator: bool = os.environ.get("USE_FIRESTORE_EMULATOR", "false").lower() == "true"
-        self.database_firestore_emulator_host: Optional[str] = os.environ.get("FIRESTORE_EMULATOR_HOST")
+        self.gcp_project_id: Optional[str] = os.environ.get(
+            "GCP_PROJECT_ID", "your-gcp-project-id"
+        )  # Fallback
+        self.database_use_firestore_emulator: bool = (
+            os.environ.get("USE_FIRESTORE_EMULATOR", "false").lower() == "true"
+        )
+        self.database_firestore_emulator_host: Optional[str] = os.environ.get(
+            "FIRESTORE_EMULATOR_HOST"
+        )
         # Add other relevant settings attributes if needed by client initialization
         # self.firestore_api_endpoint: Optional[str] = None # Example
 
@@ -71,8 +77,12 @@ class FirestoreClientManager:
                         project_id_to_use = self.settings.gcp_project_id
 
                         if not project_id_to_use:
-                            logger.error("GCP Project ID is not configured. Cannot initialize Firestore client.")
-                            raise ValueError("GCP Project ID is not configured for Firestore client.")
+                            logger.error(
+                                "GCP Project ID is not configured. Cannot initialize Firestore client."
+                            )
+                            raise ValueError(
+                                "GCP Project ID is not configured for Firestore client."
+                            )
 
                         client_options = {}
                         # Example: if hasattr(self.settings, 'firestore_api_endpoint') and self.settings.firestore_api_endpoint:
@@ -82,8 +92,13 @@ class FirestoreClientManager:
                             self.settings.database_use_firestore_emulator
                             and self.settings.database_firestore_emulator_host
                         ):
-                            current_emulator_host_env = os.environ.get("FIRESTORE_EMULATOR_HOST")
-                            if current_emulator_host_env != self.settings.database_firestore_emulator_host:
+                            current_emulator_host_env = os.environ.get(
+                                "FIRESTORE_EMULATOR_HOST"
+                            )
+                            if (
+                                current_emulator_host_env
+                                != self.settings.database_firestore_emulator_host
+                            ):
                                 logger.warning(
                                     f"FIRESTORE_EMULATOR_HOST env var ('{current_emulator_host_env}') "
                                     f"differs from settings ('{self.settings.database_firestore_emulator_host}'). "
@@ -97,12 +112,20 @@ class FirestoreClientManager:
                             )
 
                         FirestoreClientManager._client_instance = FirestoreAsyncClient(
-                            project=project_id_to_use, client_options=client_options if client_options else None
+                            project=project_id_to_use,
+                            client_options=client_options if client_options else None,
                         )
-                        logger.info(f"Firestore AsyncClient initialized for project: {project_id_to_use}.")
+                        logger.info(
+                            f"Firestore AsyncClient initialized for project: {project_id_to_use}."
+                        )
                     except Exception as e:
-                        logger.error(f"Failed to initialize Firestore AsyncClient: {e}", exc_info=True)
-                        raise RuntimeError(f"Could not initialize Firestore client: {e}") from e
+                        logger.error(
+                            f"Failed to initialize Firestore AsyncClient: {e}",
+                            exc_info=True,
+                        )
+                        raise RuntimeError(
+                            f"Could not initialize Firestore client: {e}"
+                        ) from e
 
         return FirestoreClientManager._client_instance
 
@@ -118,7 +141,9 @@ class FirestoreClientManager:
                     None  # Set to None before close to prevent re-use during close
                 )
                 try:
-                    if hasattr(client_to_close, "close") and callable(client_to_close.close):
+                    if hasattr(client_to_close, "close") and callable(
+                        client_to_close.close
+                    ):
                         await client_to_close.close()
                         logger.info("Firestore AsyncClient closed.")
                     else:
@@ -130,7 +155,9 @@ class FirestoreClientManager:
                             "Firestore AsyncClient does not have an explicit close() method or it's managed by other means (e.g. context manager)."
                         )
                 except Exception as e:
-                    logger.error(f"Error closing Firestore AsyncClient: {e}", exc_info=True)
+                    logger.error(
+                        f"Error closing Firestore AsyncClient: {e}", exc_info=True
+                    )
                     # Instance is already set to None, so further calls to get_client will re-initialize.
 
 

@@ -5,50 +5,48 @@ This module provides the FastAPI application and starts the web server.
 It uses standard Python import paths for better maintainability.
 """
 
-import logging
-import os
 import sys
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from loguru import logger
 
-# Read mode from environment variables
-use_recovery_mode_env = os.environ.get("USE_RECOVERY_MODE", "false").lower()
-standard_mode_env = os.environ.get("STANDARD_MODE", "true").lower()
-
-# Set mode based on environment variables
-RECOVERY_MODE = use_recovery_mode_env == "true"
-STANDARD_MODE = standard_mode_env == "true"
-
-# Log the selected mode
-print(f"🔧 Starting Orchestra in {'RECOVERY' if RECOVERY_MODE else 'STANDARD'} mode")
-print(f"   Environment settings: USE_RECOVERY_MODE={use_recovery_mode_env}, STANDARD_MODE={standard_mode_env}")
-
-# Debug: Print all environment variables to help diagnose issues
-print("===== DEBUG: Environment Variables at Startup =====")
-for key, value in sorted(os.environ.items()):
-    if key in ["PYTHONPATH", "USE_RECOVERY_MODE", "STANDARD_MODE", "ENVIRONMENT"]:
-        print(f"{key}={value}")
-print("===== DEBUG: Python Path =====")
-for path in sys.path:
-    print(path)
-print("===== DEBUG: End Environment Info =====")
-
-# Import GCP configuration and memory manager
 from config.gcp_config import get_gcp_config, get_memory_manager_config
 from packages.shared.src.memory.memory_manager import MemoryManagerFactory
 
-# Log the mode we're starting in
-logger.info(f"Starting with RECOVERY_MODE={RECOVERY_MODE}, STANDARD_MODE={STANDARD_MODE}")
-print(f"Starting with RECOVERY_MODE={RECOVERY_MODE}, STANDARD_MODE={STANDARD_MODE}")
+# Centralized environment and logging config
+from core.env_config import settings  # Pydantic-based settings object
+from core.logging_config import configure_logging
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+# Set up logging using centralized config
+logger = configure_logging(__name__)
+
+# Set mode based on centralized settings
+RECOVERY_MODE = settings.use_recovery_mode
+STANDARD_MODE = settings.standard_mode
+
+logger.info(
+    f"🔧 Starting Orchestra in {'RECOVERY' if RECOVERY_MODE else 'STANDARD'} mode"
 )
-logger = logging.getLogger(__name__)
+logger.info(
+    f"   Environment settings: USE_RECOVERY_MODE={settings.use_recovery_mode}, STANDARD_MODE={settings.standard_mode}"
+)
+
+# Debug: Log selected environment variables and Python path
+logger.debug("===== DEBUG: Environment Variables at Startup =====")
+for key, value in sorted(settings.dict().items()):
+    if key.upper() in [
+        "PYTHONPATH",
+        "USE_RECOVERY_MODE",
+        "STANDARD_MODE",
+        "ENVIRONMENT",
+    ]:
+        logger.debug(f"{key.upper()}={value}")
+logger.debug("===== DEBUG: Python Path =====")
+for path in sys.path:
+    logger.debug(path)
+logger.debug("===== DEBUG: End Environment Info =====")
+
+# (imports moved to top of file)
 
 # Create FastAPI app
 app = FastAPI(
@@ -83,7 +81,7 @@ async def startup_event():
 
     # Initialize GCP configuration
     get_gcp_config()
-    environment = os.environ.get("ENVIRONMENT", "development")
+    environment = settings.environment
     logger.info(f"Starting in {environment} environment")
 
     # Initialize memory manager
@@ -108,7 +106,9 @@ async def startup_event():
     register_default_agents()
 
     logger.info("System initialization complete")
-    logger.info(f"Starting API in {'STANDARD' if STANDARD_MODE else 'RECOVERY'} MODE in {environment} environment")
+    logger.info(
+        f"Starting API in {'STANDARD' if STANDARD_MODE else 'RECOVERY'} MODE in {environment} environment"
+    )
 
 
 # Shutdown cleanup
@@ -125,7 +125,7 @@ async def health_check():
     """
     Simple health check endpoint.
     """
-    environment = os.environ.get("ENVIRONMENT", "development")
+    environment = settings.environment
     return {
         "status": "Service is healthy",
         "mode": "standard" if STANDARD_MODE else "recovery",
@@ -154,7 +154,9 @@ async def interact(user_input: dict):
 
         agents = get_all_agents()
         if not agents:
-            return {"response": "No agents are currently available. Please try again later."}
+            return {
+                "response": "No agents are currently available. Please try again later."
+            }
 
         agent = agents[0]  # Use the first registered agent
         response = await agent.process(text)
@@ -175,7 +177,9 @@ async def interact(user_input: dict):
 
         # Store interaction in short-term memory
         try:
-            memory_item = MemoryItem(content=text, response=response, metadata={"source": "user_interaction"})
+            memory_item = MemoryItem(
+                content=text, response=response, metadata={"source": "user_interaction"}
+            )
             short_term_memory.insert(0, memory_item)  # Add to the beginning
             if len(short_term_memory) > SHORT_TERM_MEMORY_SIZE:
                 short_term_memory.pop()  # Remove the oldest item
@@ -193,7 +197,9 @@ if __name__ == "__main__":
     import uvicorn
 
     # Get port from environment or use default
-    port = int(os.environ.get("PORT", 8000))
+    port = settings.port
 
     # Start server
-    uvicorn.run("core.orchestrator.src.main:app", host="0.0.0.0", port=port, reload=True)
+    uvicorn.run(
+        "core.orchestrator.src.main:app", host="0.0.0.0", port=port, reload=True
+    )

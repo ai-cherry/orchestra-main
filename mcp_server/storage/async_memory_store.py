@@ -128,7 +128,9 @@ class AsyncMemoryStore:
 
                             # Check if the memory item has expired
                             if "expiry" in memory_data:
-                                expiry_time = datetime.fromisoformat(memory_data["expiry"])
+                                expiry_time = datetime.fromisoformat(
+                                    memory_data["expiry"]
+                                )
                                 if expiry_time < datetime.now():
                                     # Memory item has expired, delete it
                                     await asyncio.to_thread(memory_file.unlink)
@@ -143,7 +145,9 @@ class AsyncMemoryStore:
             except Exception as e:
                 logger.error(f"Error in cleanup task: {e}")
 
-    async def get(self, key: str, scope: str = "session", tool: Optional[str] = None) -> Optional[Any]:
+    async def get(
+        self, key: str, scope: str = "session", tool: Optional[str] = None
+    ) -> Optional[Any]:
         """Get a memory item.
 
         Args:
@@ -234,7 +238,9 @@ class AsyncMemoryStore:
 
         return success
 
-    async def delete(self, key: str, scope: str = "session", tool: Optional[str] = None) -> bool:
+    async def delete(
+        self, key: str, scope: str = "session", tool: Optional[str] = None
+    ) -> bool:
         """Delete a memory item.
 
         Args:
@@ -265,7 +271,9 @@ class AsyncMemoryStore:
 
         return True
 
-    async def sync(self, key: str, source_tool: str, target_tool: str, scope: str = "session") -> bool:
+    async def sync(
+        self, key: str, source_tool: str, target_tool: str, scope: str = "session"
+    ) -> bool:
         """Sync a memory item between tools.
 
         Args:

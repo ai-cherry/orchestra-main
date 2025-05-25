@@ -20,7 +20,9 @@ logger = logging.getLogger(__name__)
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="GCP Secrets MCP Server", description="MCP server for managing Google Secret Manager", version="1.0.0"
+    title="GCP Secrets MCP Server",
+    description="MCP server for managing Google Secret Manager",
+    version="1.0.0",
 )
 
 # Get configuration
@@ -73,7 +75,10 @@ async def get_tools() -> List[MCPToolDefinition]:
                 "type": "object",
                 "properties": {
                     "secret_id": {"type": "string", "description": "Secret ID"},
-                    "version": {"type": "string", "description": "Version (default: latest)"},
+                    "version": {
+                        "type": "string",
+                        "description": "Version (default: latest)",
+                    },
                 },
                 "required": ["secret_id"],
             },
@@ -108,7 +113,9 @@ async def get_tools() -> List[MCPToolDefinition]:
             description="List all secrets in the project",
             parameters={
                 "type": "object",
-                "properties": {"filter": {"type": "string", "description": "Optional filter"}},
+                "properties": {
+                    "filter": {"type": "string", "description": "Optional filter"}
+                },
             },
         ),
         MCPToolDefinition(
@@ -116,7 +123,9 @@ async def get_tools() -> List[MCPToolDefinition]:
             description="Delete a secret",
             parameters={
                 "type": "object",
-                "properties": {"secret_id": {"type": "string", "description": "Secret ID"}},
+                "properties": {
+                    "secret_id": {"type": "string", "description": "Secret ID"}
+                },
                 "required": ["secret_id"],
             },
         ),
@@ -127,7 +136,9 @@ async def get_tools() -> List[MCPToolDefinition]:
 async def get_secret(secret_id: str, version: str = "latest") -> Dict[str, Any]:
     """Get a secret value"""
     if not client:
-        raise HTTPException(status_code=500, detail="Secret Manager client not initialized")
+        raise HTTPException(
+            status_code=500, detail="Secret Manager client not initialized"
+        )
 
     try:
         name = f"projects/{PROJECT_ID}/secrets/{secret_id}/versions/{version}"
@@ -146,7 +157,9 @@ async def get_secret(secret_id: str, version: str = "latest") -> Dict[str, Any]:
             "secret_id": secret_id,
             "version": version,
             "value": secret_data,
-            "created_time": response.create_time.isoformat() if response.create_time else None,
+            "created_time": (
+                response.create_time.isoformat() if response.create_time else None
+            ),
         }
 
     except Exception as e:
@@ -158,7 +171,9 @@ async def get_secret(secret_id: str, version: str = "latest") -> Dict[str, Any]:
 async def create_secret(request: SecretRequest) -> Dict[str, Any]:
     """Create a new secret"""
     if not client:
-        raise HTTPException(status_code=500, detail="Secret Manager client not initialized")
+        raise HTTPException(
+            status_code=500, detail="Secret Manager client not initialized"
+        )
 
     try:
         parent = f"projects/{PROJECT_ID}"
@@ -168,13 +183,19 @@ async def create_secret(request: SecretRequest) -> Dict[str, Any]:
             request={
                 "parent": parent,
                 "secret_id": request.secret_id,
-                "secret": {"replication": {"automatic": {}}, "labels": request.labels or {}},
+                "secret": {
+                    "replication": {"automatic": {}},
+                    "labels": request.labels or {},
+                },
             }
         )
 
         # Add the initial version
         version = client.add_secret_version(
-            request={"parent": secret.name, "payload": {"data": request.value.encode("UTF-8")}}
+            request={
+                "parent": secret.name,
+                "payload": {"data": request.value.encode("UTF-8")},
+            }
         )
 
         logger.info(f"Created secret: {request.secret_id}")
@@ -189,7 +210,9 @@ async def create_secret(request: SecretRequest) -> Dict[str, Any]:
     except Exception as e:
         logger.error(f"Failed to create secret: {e}")
         if "already exists" in str(e):
-            raise HTTPException(status_code=409, detail=f"Secret {request.secret_id} already exists")
+            raise HTTPException(
+                status_code=409, detail=f"Secret {request.secret_id} already exists"
+            )
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -197,13 +220,17 @@ async def create_secret(request: SecretRequest) -> Dict[str, Any]:
 async def update_secret(secret_id: str, value: str) -> Dict[str, Any]:
     """Add a new version to existing secret"""
     if not client:
-        raise HTTPException(status_code=500, detail="Secret Manager client not initialized")
+        raise HTTPException(
+            status_code=500, detail="Secret Manager client not initialized"
+        )
 
     try:
         parent = f"projects/{PROJECT_ID}/secrets/{secret_id}"
 
         # Add new version
-        version = client.add_secret_version(request={"parent": parent, "payload": {"data": value.encode("UTF-8")}})
+        version = client.add_secret_version(
+            request={"parent": parent, "payload": {"data": value.encode("UTF-8")}}
+        )
 
         logger.info(f"Updated secret: {secret_id}")
 
@@ -223,7 +250,9 @@ async def update_secret(secret_id: str, value: str) -> Dict[str, Any]:
 async def list_secrets(filter: Optional[str] = None) -> List[Dict[str, Any]]:
     """List all secrets"""
     if not client:
-        raise HTTPException(status_code=500, detail="Secret Manager client not initialized")
+        raise HTTPException(
+            status_code=500, detail="Secret Manager client not initialized"
+        )
 
     try:
         parent = f"projects/{PROJECT_ID}"
@@ -236,9 +265,13 @@ async def list_secrets(filter: Optional[str] = None) -> List[Dict[str, Any]]:
             result.append(
                 {
                     "name": secret.name.split("/")[-1],
-                    "created_time": secret.create_time.isoformat() if secret.create_time else None,
+                    "created_time": (
+                        secret.create_time.isoformat() if secret.create_time else None
+                    ),
                     "labels": dict(secret.labels),
-                    "replication": "automatic" if secret.replication.automatic else "user_managed",
+                    "replication": (
+                        "automatic" if secret.replication.automatic else "user_managed"
+                    ),
                 }
             )
 
@@ -253,7 +286,9 @@ async def list_secrets(filter: Optional[str] = None) -> List[Dict[str, Any]]:
 async def list_versions(secret_id: str) -> List[SecretVersion]:
     """List all versions of a secret"""
     if not client:
-        raise HTTPException(status_code=500, detail="Secret Manager client not initialized")
+        raise HTTPException(
+            status_code=500, detail="Secret Manager client not initialized"
+        )
 
     try:
         parent = f"projects/{PROJECT_ID}/secrets/{secret_id}"
@@ -267,8 +302,14 @@ async def list_versions(secret_id: str) -> List[SecretVersion]:
                 SecretVersion(
                     version=int(version.name.split("/")[-1]),
                     state=version.state.name,
-                    created_time=version.create_time.isoformat() if version.create_time else "",
-                    destroyed_time=version.destroy_time.isoformat() if version.destroy_time else None,
+                    created_time=(
+                        version.create_time.isoformat() if version.create_time else ""
+                    ),
+                    destroyed_time=(
+                        version.destroy_time.isoformat()
+                        if version.destroy_time
+                        else None
+                    ),
                 )
             )
 
@@ -283,7 +324,9 @@ async def list_versions(secret_id: str) -> List[SecretVersion]:
 async def delete_secret(secret_id: str) -> Dict[str, Any]:
     """Delete a secret"""
     if not client:
-        raise HTTPException(status_code=500, detail="Secret Manager client not initialized")
+        raise HTTPException(
+            status_code=500, detail="Secret Manager client not initialized"
+        )
 
     try:
         name = f"projects/{PROJECT_ID}/secrets/{secret_id}"
@@ -293,7 +336,11 @@ async def delete_secret(secret_id: str) -> Dict[str, Any]:
 
         logger.info(f"Deleted secret: {secret_id}")
 
-        return {"status": "success", "secret_id": secret_id, "message": f"Secret {secret_id} deleted successfully"}
+        return {
+            "status": "success",
+            "secret_id": secret_id,
+            "message": f"Secret {secret_id} deleted successfully",
+        }
 
     except Exception as e:
         logger.error(f"Failed to delete secret: {e}")

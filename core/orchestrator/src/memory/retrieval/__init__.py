@@ -9,7 +9,9 @@ from core.orchestrator.src.memory.retrieval.hybrid_search import (
     HybridSearchConfig,
     HybridSearchEngine,
 )
-from core.orchestrator.src.memory.retrieval.hybrid_search import QueryType as HybridQueryType
+from core.orchestrator.src.memory.retrieval.hybrid_search import (
+    QueryType as HybridQueryType,
+)
 from core.orchestrator.src.memory.retrieval.parallel_retriever import (
     ParallelMemoryRetriever,
     SearchResult,

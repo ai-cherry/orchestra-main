@@ -44,7 +44,7 @@ The workflow file (`.github/workflows/deploy-cloud-run.yml`) handles the CI/CD p
 
 The Dev Container configuration (`.devcontainer/devcontainer.json`) provides a consistent development environment:
 
-- Installs Python 3.11, Poetry 1.7.1, and Google Cloud CLI
+- Installs Python 3.10, Poetry 1.7.1, and Google Cloud CLI
 - Configures GCP authentication using Workload Identity Federation
 - Sets environment variables for GCP tools
 - Installs necessary VS Code extensions

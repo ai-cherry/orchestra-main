@@ -125,17 +125,25 @@ class RedisConnectionPool:
         # Attempt to use DRAGONFLY_CONNECTION_URI first
         dragonfly_uri_env = os.environ.get("DRAGONFLY_CONNECTION_URI")
         if dragonfly_uri_env:
-            logger.info(f"Connecting to DragonflyDB using DRAGONFLY_CONNECTION_URI: {dragonfly_uri_env}")
+            logger.info(
+                f"Connecting to DragonflyDB using DRAGONFLY_CONNECTION_URI: {dragonfly_uri_env}"
+            )
             try:
                 # from_url handles 'rediss://' scheme and extracts necessary components
-                client = redis.Redis.from_url(dragonfly_uri_env, decode_responses=True, **kwargs)
+                client = redis.Redis.from_url(
+                    dragonfly_uri_env, decode_responses=True, **kwargs
+                )
                 if client.ping():
                     logger.info("Successfully connected to DragonflyDB via URI.")
                     return client
                 else:
-                    logger.warning("Ping failed when connecting to DragonflyDB via URI. Falling back.")
+                    logger.warning(
+                        "Ping failed when connecting to DragonflyDB via URI. Falling back."
+                    )
             except redis.exceptions.RedisError as e:
-                logger.warning(f"Failed to connect to DragonflyDB via URI '{dragonfly_uri_env}': {e}. Falling back.")
+                logger.warning(
+                    f"Failed to connect to DragonflyDB via URI '{dragonfly_uri_env}': {e}. Falling back."
+                )
             # If URI connection fails, we proceed to other methods
 
         # Resolve parameters: Env Vars -> Direct Args -> Settings Fallback
@@ -148,7 +156,11 @@ class RedisConnectionPool:
 
         final_host = df_host_env or host or app_settings.redis.host
 
-        final_port_str = df_port_env_str or (str(port) if port is not None else None) or str(app_settings.redis.port)
+        final_port_str = (
+            df_port_env_str
+            or (str(port) if port is not None else None)
+            or str(app_settings.redis.port)
+        )
         try:
             final_port = int(final_port_str)
         except (ValueError, TypeError):
@@ -157,11 +169,17 @@ class RedisConnectionPool:
 
         final_password = df_password_env or password or app_settings.redis.password
 
-        final_db_index_str = df_db_index_env_str or (str(db) if db is not None else None) or str(app_settings.redis.db)
+        final_db_index_str = (
+            df_db_index_env_str
+            or (str(db) if db is not None else None)
+            or str(app_settings.redis.db)
+        )
         try:
             final_db_index = int(final_db_index_str)
         except (ValueError, TypeError):
-            logger.error(f"Invalid DB index value: {final_db_index_str}. Defaulting to 0.")
+            logger.error(
+                f"Invalid DB index value: {final_db_index_str}. Defaulting to 0."
+            )
             final_db_index = 0
 
         # SSL settings determination (e.g. if host implies rediss, or from URI if we parsed it)
@@ -172,7 +190,9 @@ class RedisConnectionPool:
         if dragonfly_uri_env and dragonfly_uri_env.startswith("rediss://"):
             use_ssl = True
             # ssl_certs = 'CERT_REQUIRED' # More secure for production if not using custom CAs
-        elif final_host and "dragonflydb.cloud" in final_host:  # Heuristic for managed cloud Dragonfly
+        elif (
+            final_host and "dragonflydb.cloud" in final_host
+        ):  # Heuristic for managed cloud Dragonfly
             use_ssl = True  # Managed DragonflyDB often uses rediss
             # ssl_certs = 'CERT_REQUIRED'
 
@@ -191,12 +211,20 @@ class RedisConnectionPool:
 
         # Resolve pool-specific arguments
         final_max_connections = max_connections or app_settings.redis.max_connections
-        final_socket_timeout = socket_timeout if socket_timeout is not None else app_settings.redis.socket_timeout
+        final_socket_timeout = (
+            socket_timeout
+            if socket_timeout is not None
+            else app_settings.redis.socket_timeout
+        )
         final_socket_keepalive = (
-            socket_keepalive if socket_keepalive is not None else app_settings.redis.socket_keepalive
+            socket_keepalive
+            if socket_keepalive is not None
+            else app_settings.redis.socket_keepalive
         )
         final_health_check_interval = (
-            health_check_interval if health_check_interval is not None else app_settings.redis.health_check_interval
+            health_check_interval
+            if health_check_interval is not None
+            else app_settings.redis.health_check_interval
         )
 
         pool = cls.get_pool(
@@ -221,14 +249,18 @@ class RedisConnectionPool:
         client = redis.Redis(connection_pool=pool)
         try:
             if client.ping():
-                logger.info(f"Successfully connected to {final_host}:{final_port}/{final_db_index}.")
+                logger.info(
+                    f"Successfully connected to {final_host}:{final_port}/{final_db_index}."
+                )
             else:
                 # This case should ideally be caught by redis.exceptions.ConnectionError by ping
                 logger.warning(
                     f"Ping failed for {final_host}:{final_port}/{final_db_index} after establishing client from pool."
                 )
         except redis.exceptions.RedisError as e:
-            logger.error(f"Connection test (ping) failed for {final_host}:{final_port}/{final_db_index}: {e}")
+            logger.error(
+                f"Connection test (ping) failed for {final_host}:{final_port}/{final_db_index}: {e}"
+            )
             # Depending on strictness, might raise here or return a non-functional client
             # which will fail on first actual operation. For now, let it proceed.
         return client
@@ -245,13 +277,23 @@ class RedisConnectionPool:
             # Add current connection counts
             for key, pool in cls._pools.items():
                 # Safely access connection stats with proper fallbacks
-                if hasattr(pool, "connection_kwargs") and isinstance(pool.connection_kwargs, dict):
-                    cls._metrics[key]["in_use"] = pool.connection_kwargs.get("_in_use_connections", 0)
-                    cls._metrics[key]["available"] = pool.connection_kwargs.get("_available_connections", 0)
+                if hasattr(pool, "connection_kwargs") and isinstance(
+                    pool.connection_kwargs, dict
+                ):
+                    cls._metrics[key]["in_use"] = pool.connection_kwargs.get(
+                        "_in_use_connections", 0
+                    )
+                    cls._metrics[key]["available"] = pool.connection_kwargs.get(
+                        "_available_connections", 0
+                    )
                 else:
                     # Fallback for newer Redis client versions with different attribute names
-                    cls._metrics[key]["in_use"] = getattr(pool, "_in_use_connections", 0)
-                    cls._metrics[key]["available"] = getattr(pool, "_available_connections", 0)
+                    cls._metrics[key]["in_use"] = getattr(
+                        pool, "_in_use_connections", 0
+                    )
+                    cls._metrics[key]["available"] = getattr(
+                        pool, "_available_connections", 0
+                    )
 
             # Return a copy of the metrics
             return {k: v.copy() for k, v in cls._metrics.items()}
@@ -349,7 +391,9 @@ class RedisClient:
                 f"RedisClient initialized. Target: {self._client.connection_pool.connection_kwargs.get('host')}:{self._client.connection_pool.connection_kwargs.get('port')}/{self._client.connection_pool.connection_kwargs.get('db')}"
             )
         except Exception as e:
-            logger.error(f"RedisClient failed to initialize connection: {e}", exc_info=True)
+            logger.error(
+                f"RedisClient failed to initialize connection: {e}", exc_info=True
+            )
             # self._client will remain None, operations will fail until successfully re-attempted or re-configured.
 
     def _get_client(self) -> redis.Redis:
@@ -435,7 +479,9 @@ class RedisClient:
         """
         client = self._get_client()
         loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(None, lambda: client.set(key, value, ex=ex, px=px, nx=nx, xx=xx))
+        return await loop.run_in_executor(
+            None, lambda: client.set(key, value, ex=ex, px=px, nx=nx, xx=xx)
+        )
 
     @handle_exception(logger=logger)
     async def delete(self, key: str) -> int:
@@ -497,7 +543,9 @@ class RedisClient:
         if self._client is not None:
             # For clients from a pool, close() is a no-op or may release the connection.
             # The pool itself should be disconnected for full cleanup via RedisConnectionPool.clear_pools()
-            logger.debug("RedisClient.close() called. Connection is managed by the pool.")
+            logger.debug(
+                "RedisClient.close() called. Connection is managed by the pool."
+            )
             # self._client.close() # This is often a no-op for pooled connections
             self._client = None
 
@@ -514,4 +562,11 @@ def get_redis_client(
     Get a Redis client, prioritizing DragonflyDB ENV VARS for configuration.
     """
     # The RedisClient constructor now handles the logic of prioritizing ENV VARS
-    return RedisClient(host=host, port=port, db=db, password=password, connection_uri=connection_uri, **kwargs)
+    return RedisClient(
+        host=host,
+        port=port,
+        db=db,
+        password=password,
+        connection_uri=connection_uri,
+        **kwargs,
+    )

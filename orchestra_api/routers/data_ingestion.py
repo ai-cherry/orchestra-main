@@ -26,19 +26,29 @@ pipeline = None
 
 
 @router.post("/file", summary="Ingest a single file")
-async def ingest_file(file: UploadFile = File(...), source_type: str = "csv", background_tasks: BackgroundTasks = None):
+async def ingest_file(
+    file: UploadFile = File(...),
+    source_type: str = "csv",
+    background_tasks: BackgroundTasks = None,
+):
     """
     Ingests a single uploaded file asynchronously.
     """
     if pipeline is None:
-        raise HTTPException(status_code=500, detail="Ingestion pipeline not initialized")
+        raise HTTPException(
+            status_code=500, detail="Ingestion pipeline not initialized"
+        )
     # In a real implementation, file.file would be passed to the appropriate processor.
     background_tasks.add_task(pipeline.ingest, source_type, file.file)
     return {"status": "accepted", "detail": "File ingestion started in background"}
 
 
 @router.post("/directory", summary="Ingest all files in a directory")
-async def ingest_directory(directory_path: str, source_type: str = "csv", background_tasks: BackgroundTasks = None):
+async def ingest_directory(
+    directory_path: str,
+    source_type: str = "csv",
+    background_tasks: BackgroundTasks = None,
+):
     """
     Ingests all files in a specified directory.
     """
@@ -69,7 +79,9 @@ async def webhook_trigger(request: Request, background_tasks: BackgroundTasks = 
     return {"status": "not_implemented"}
 
 
-@router.get("/progress/{task_id}", summary="Get progress of a background ingestion task")
+@router.get(
+    "/progress/{task_id}", summary="Get progress of a background ingestion task"
+)
 async def get_progress(task_id: str):
     """
     Returns progress information for a background ingestion task.

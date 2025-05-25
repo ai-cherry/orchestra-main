@@ -144,7 +144,9 @@ class EnhancedVectorMemorySystem:
         )
 
         # Store in Firestore
-        doc_ref = self.firestore_client.collection(self.memories_collection).document(memory_id)
+        doc_ref = self.firestore_client.collection(self.memories_collection).document(
+            memory_id
+        )
         await doc_ref.set(
             {
                 "id": memory.id,
@@ -179,7 +181,9 @@ class EnhancedVectorMemorySystem:
         query_embedding = await self.create_embedding(query)
 
         # Build Firestore query
-        query_ref = self.firestore_client.collection(self.memories_collection).where("user_id", "==", user_id)
+        query_ref = self.firestore_client.collection(self.memories_collection).where(
+            "user_id", "==", user_id
+        )
 
         # Apply source filtering
         if sources:
@@ -263,7 +267,9 @@ class EnhancedVectorMemorySystem:
         if query and memories:
             query_embedding = await self.create_embedding(query)
             for memory in memories:
-                similarity = cosine_similarity([query_embedding], [memory.embedding])[0][0]
+                similarity = cosine_similarity([query_embedding], [memory.embedding])[
+                    0
+                ][0]
                 memory.relevance_score = similarity
 
             memories.sort(key=lambda m: m.relevance_score, reverse=True)
@@ -308,13 +314,19 @@ class EnhancedVectorMemorySystem:
 
         return "\n".join(context_parts)
 
-    async def _update_user_context(self, user_id: str, new_memory: ContextualMemory) -> None:
+    async def _update_user_context(
+        self, user_id: str, new_memory: ContextualMemory
+    ) -> None:
         """Update user's context with new memory."""
         # This would update conversation contexts that include this user
         # Implementation would depend on conversation management system
 
     async def add_memory_relationship(
-        self, memory_id_1: str, memory_id_2: str, relationship_type: str, strength: float = 1.0
+        self,
+        memory_id_1: str,
+        memory_id_2: str,
+        relationship_type: str,
+        strength: float = 1.0,
     ) -> None:
         """Add relationship between memories for enhanced context."""
         relationship_id = str(uuid.uuid4())
@@ -328,11 +340,13 @@ class EnhancedVectorMemorySystem:
             "created_at": datetime.utcnow(),
         }
 
-        await self.firestore_client.collection(self.relationships_collection).document(relationship_id).set(
-            relationship_doc
-        )
+        await self.firestore_client.collection(self.relationships_collection).document(
+            relationship_id
+        ).set(relationship_doc)
 
-    async def get_related_memories(self, memory_id: str, max_depth: int = 2) -> List[ContextualMemory]:
+    async def get_related_memories(
+        self, memory_id: str, max_depth: int = 2
+    ) -> List[ContextualMemory]:
         """Get related memories through relationship graph."""
         related_ids = set()
         current_level = {memory_id}
@@ -343,7 +357,9 @@ class EnhancedVectorMemorySystem:
             for mid in current_level:
                 # Find relationships
                 relationships = (
-                    await self.firestore_client.collection(self.relationships_collection)
+                    await self.firestore_client.collection(
+                        self.relationships_collection
+                    )
                     .where("memory_id_1", "==", mid)
                     .get()
                 )
@@ -356,7 +372,9 @@ class EnhancedVectorMemorySystem:
 
                 # Check reverse relationships
                 relationships = (
-                    await self.firestore_client.collection(self.relationships_collection)
+                    await self.firestore_client.collection(
+                        self.relationships_collection
+                    )
                     .where("memory_id_2", "==", mid)
                     .get()
                 )
@@ -374,7 +392,11 @@ class EnhancedVectorMemorySystem:
         # Fetch related memories
         related_memories = []
         for related_id in related_ids:
-            memory_doc = await self.firestore_client.collection(self.memories_collection).document(related_id).get()
+            memory_doc = (
+                await self.firestore_client.collection(self.memories_collection)
+                .document(related_id)
+                .get()
+            )
             if memory_doc.exists:
                 data = memory_doc.to_dict()
                 memory = ContextualMemory(
@@ -395,7 +417,9 @@ class EnhancedVectorMemorySystem:
         """Clean up expired memories."""
         now = datetime.utcnow()
 
-        expired_query = self.firestore_client.collection(self.memories_collection).where("expiry", "<", now)
+        expired_query = self.firestore_client.collection(
+            self.memories_collection
+        ).where("expiry", "<", now)
         docs = await expired_query.get()
 
         count = 0

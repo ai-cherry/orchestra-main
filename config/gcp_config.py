@@ -5,28 +5,30 @@ This module contains configurations for connecting to various GCP services
 based on the current environment (development, staging, production).
 """
 
-import os
 from typing import Any, Dict
 
-from loguru import logger
+from core.env_config import settings  # Centralized settings object
+from core.logging_config import configure_logging
 
-# Default environment is development if not specified
-ENVIRONMENT = os.environ.get("ENVIRONMENT", "development").lower()
+logger = configure_logging(__name__)
+
+# Use centralized settings for environment
+ENVIRONMENT = settings.environment.lower()
 
 # Base configuration shared across all environments
 BASE_CONFIG = {
-    "project_id": os.environ.get("GOOGLE_CLOUD_PROJECT", ""),
-    "region": os.environ.get("GCP_REGION", "us-central1"),
+    "project_id": settings.gcp_project_id,
+    "region": settings.gcp_region,
     "memory_type": "firestore",  # Use Firestore for memory management in GCP
     "memory_collection": "memories",
-    "credentials_path": os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "/app/gcp-credentials.json"),
+    "credentials_path": settings.gcp_credentials_path,
 }
 
 # Environment-specific configurations
 ENV_CONFIGS = {
     "development": {
         # Local development can use in-memory storage for quick testing
-        "memory_type": os.environ.get("MEMORY_TYPE", "in-memory"),
+        "memory_type": settings.memory_type or "in-memory",
         "memory_collection": "dev_memories",
     },
     "staging": {
@@ -52,7 +54,9 @@ def get_gcp_config() -> Dict[str, Any]:
     if ENVIRONMENT in ENV_CONFIGS:
         config.update(ENV_CONFIGS[ENVIRONMENT])
     else:
-        logger.warning(f"Unknown environment: {ENVIRONMENT}, using default configuration")
+        logger.warning(
+            f"Unknown environment: {ENVIRONMENT}, using default configuration"
+        )
 
     # Log the active configuration (excluding sensitive info)
     safe_config = config.copy()

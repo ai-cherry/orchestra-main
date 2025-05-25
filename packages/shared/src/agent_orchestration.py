@@ -88,12 +88,18 @@ class BaseAgent:
             logger.error(f"Failed to add memory to agent {self.agent_id}: {str(e)}")
             return False
 
-    async def get_relevant_memories(self, query: str, limit: int = 5) -> List[MemoryItem]:
+    async def get_relevant_memories(
+        self, query: str, limit: int = 5
+    ) -> List[MemoryItem]:
         """Get memories relevant to the query."""
         # This would typically use semantic search, but for now just return most recent
-        return sorted(self.memory_items, key=lambda x: x.timestamp, reverse=True)[:limit]
+        return sorted(self.memory_items, key=lambda x: x.timestamp, reverse=True)[
+            :limit
+        ]
 
-    async def generate_completion(self, prompt: str, model: Optional[str] = None, temperature: float = 0.7) -> str:
+    async def generate_completion(
+        self, prompt: str, model: Optional[str] = None, temperature: float = 0.7
+    ) -> str:
         """Generate text using the gateway."""
         if not self.gateway:
             raise RuntimeError("Agent not initialized")
@@ -192,23 +198,39 @@ class DomainExpertAgent(BaseAgent):
         # Different worker configurations based on specialization
         if self.specialization == "sales":
             # Sales domain needs analysts and CRM integrators
-            self.workers["analyst"] = WorkerAgent(f"{self.agent_id}_analyst", AgentRole.ANALYST)
-            self.workers["crm"] = WorkerAgent(f"{self.agent_id}_crm", AgentRole.CRM_INTEGRATOR)
+            self.workers["analyst"] = WorkerAgent(
+                f"{self.agent_id}_analyst", AgentRole.ANALYST
+            )
+            self.workers["crm"] = WorkerAgent(
+                f"{self.agent_id}_crm", AgentRole.CRM_INTEGRATOR
+            )
 
         elif self.specialization == "research":
             # Research domain needs web researchers and data processors
-            self.workers["web_researcher"] = WorkerAgent(f"{self.agent_id}_web_researcher", AgentRole.WEB_RESEARCHER)
-            self.workers["data_processor"] = WorkerAgent(f"{self.agent_id}_data_processor", AgentRole.DATA_PROCESSOR)
+            self.workers["web_researcher"] = WorkerAgent(
+                f"{self.agent_id}_web_researcher", AgentRole.WEB_RESEARCHER
+            )
+            self.workers["data_processor"] = WorkerAgent(
+                f"{self.agent_id}_data_processor", AgentRole.DATA_PROCESSOR
+            )
 
         elif self.specialization == "tech":
             # Tech domain needs coders and analysts
-            self.workers["coder"] = WorkerAgent(f"{self.agent_id}_coder", AgentRole.CODER)
-            self.workers["analyst"] = WorkerAgent(f"{self.agent_id}_analyst", AgentRole.ANALYST)
+            self.workers["coder"] = WorkerAgent(
+                f"{self.agent_id}_coder", AgentRole.CODER
+            )
+            self.workers["analyst"] = WorkerAgent(
+                f"{self.agent_id}_analyst", AgentRole.ANALYST
+            )
 
         elif self.specialization == "service":
             # Service domain needs CRM integrators and data processors
-            self.workers["crm"] = WorkerAgent(f"{self.agent_id}_crm", AgentRole.CRM_INTEGRATOR)
-            self.workers["data_processor"] = WorkerAgent(f"{self.agent_id}_data_processor", AgentRole.DATA_PROCESSOR)
+            self.workers["crm"] = WorkerAgent(
+                f"{self.agent_id}_crm", AgentRole.CRM_INTEGRATOR
+            )
+            self.workers["data_processor"] = WorkerAgent(
+                f"{self.agent_id}_data_processor", AgentRole.DATA_PROCESSOR
+            )
 
         # Initialize all worker agents
         for worker_id, worker in self.workers.items():
@@ -255,7 +277,9 @@ class DomainExpertAgent(BaseAgent):
         self.active_tasks[task_id]["plan"] = plan
 
         # Determine which workers to assign based on task
-        worker_assignments = await self._determine_worker_assignments(task_type, content, plan)
+        worker_assignments = await self._determine_worker_assignments(
+            task_type, content, plan
+        )
         self.active_tasks[task_id]["worker_assignments"] = worker_assignments
 
         # Execute the plan by dispatching to workers
@@ -276,7 +300,9 @@ class DomainExpertAgent(BaseAgent):
             context={"task_id": task_id, "specialization": self.specialization},
         )
 
-    async def _determine_worker_assignments(self, task_type: str, content: str, plan: str) -> Dict[str, List[str]]:
+    async def _determine_worker_assignments(
+        self, task_type: str, content: str, plan: str
+    ) -> Dict[str, List[str]]:
         """Determine which workers to assign to which subtasks."""
         # Create a message to help determine assignments
         messages = [
@@ -326,7 +352,9 @@ class DomainExpertAgent(BaseAgent):
 
         return results
 
-    async def _execute_worker_task(self, worker: BaseAgent, message: AgentMessage) -> AgentMessage:
+    async def _execute_worker_task(
+        self, worker: BaseAgent, message: AgentMessage
+    ) -> AgentMessage:
         """Execute a task with a specific worker."""
         try:
             return await worker.process_message(message)
@@ -353,7 +381,10 @@ class DomainExpertAgent(BaseAgent):
 
         # Format results for the integration prompt
         formatted_results = "\n\n".join(
-            [f"{worker_id.upper()} RESULTS:\n{content}" for worker_id, content in results_content.items()]
+            [
+                f"{worker_id.upper()} RESULTS:\n{content}"
+                for worker_id, content in results_content.items()
+            ]
         )
 
         # Create integration prompt
@@ -438,7 +469,9 @@ class WorkerAgent(BaseAgent):
             # Generic processing for other roles
             return await self._process_generic_task(content, subtasks, message)
 
-    async def _process_analyst_task(self, content: str, subtasks: List[str], message: AgentMessage) -> AgentMessage:
+    async def _process_analyst_task(
+        self, content: str, subtasks: List[str], message: AgentMessage
+    ) -> AgentMessage:
         """Process an analyst task."""
         system_prompt = """
         You are a data analyst specialized in business intelligence.
@@ -463,7 +496,9 @@ class WorkerAgent(BaseAgent):
             context={"role": "analyst", "capabilities": list(self.capabilities)},
         )
 
-    async def _process_coder_task(self, content: str, subtasks: List[str], message: AgentMessage) -> AgentMessage:
+    async def _process_coder_task(
+        self, content: str, subtasks: List[str], message: AgentMessage
+    ) -> AgentMessage:
         """Process a coder task."""
         system_prompt = """
         You are an expert software developer.
@@ -543,7 +578,9 @@ class WorkerAgent(BaseAgent):
             context={"role": "web_researcher", "capabilities": list(self.capabilities)},
         )
 
-    async def _process_crm_task(self, content: str, subtasks: List[str], message: AgentMessage) -> AgentMessage:
+    async def _process_crm_task(
+        self, content: str, subtasks: List[str], message: AgentMessage
+    ) -> AgentMessage:
         """Process a CRM integration task."""
         system_prompt = """
         You are a CRM integration specialist.
@@ -569,7 +606,9 @@ class WorkerAgent(BaseAgent):
             context={"role": "crm_integrator", "capabilities": list(self.capabilities)},
         )
 
-    async def _process_generic_task(self, content: str, subtasks: List[str], message: AgentMessage) -> AgentMessage:
+    async def _process_generic_task(
+        self, content: str, subtasks: List[str], message: AgentMessage
+    ) -> AgentMessage:
         """Process a generic task for other roles."""
         system_prompt = f"""
         You are a specialized worker with the following capabilities: {', '.join(self.capabilities)}.
@@ -622,12 +661,16 @@ class AgentOrchestrator:
     async def _initialize_domain_experts(self) -> None:
         """Initialize the domain expert agents."""
         # Initialize sales expert
-        sales_expert = DomainExpertAgent("sales_expert", AgentRole.SALES_EXPERT, "sales")
+        sales_expert = DomainExpertAgent(
+            "sales_expert", AgentRole.SALES_EXPERT, "sales"
+        )
         await sales_expert.initialize()
         self.domain_experts["sales"] = sales_expert
 
         # Initialize service expert
-        service_expert = DomainExpertAgent("service_expert", AgentRole.SERVICE_EXPERT, "service")
+        service_expert = DomainExpertAgent(
+            "service_expert", AgentRole.SERVICE_EXPERT, "service"
+        )
         await service_expert.initialize()
         self.domain_experts["service"] = service_expert
 
@@ -637,11 +680,15 @@ class AgentOrchestrator:
         self.domain_experts["tech"] = tech_expert
 
         # Initialize research expert
-        research_expert = DomainExpertAgent("research_expert", AgentRole.RESEARCH_EXPERT, "research")
+        research_expert = DomainExpertAgent(
+            "research_expert", AgentRole.RESEARCH_EXPERT, "research"
+        )
         await research_expert.initialize()
         self.domain_experts["research"] = research_expert
 
-    async def process_user_message(self, user_id: str, message: str, session_id: str = None) -> Dict[str, Any]:
+    async def process_user_message(
+        self, user_id: str, message: str, session_id: str = None
+    ) -> Dict[str, Any]:
         """Process a user message and return a response."""
         # Generate a session ID if not provided
         if not session_id:
@@ -661,7 +708,9 @@ class AgentOrchestrator:
         )
 
         # Determine which domain expert should handle this message
-        domain = await self._determine_domain(message, self.conversation_history[session_id])
+        domain = await self._determine_domain(
+            message, self.conversation_history[session_id]
+        )
 
         # Create a message for the domain expert
         expert_message = AgentMessage(
@@ -713,13 +762,17 @@ class AgentOrchestrator:
                 "error": error_message,
             }
 
-    async def _determine_domain(self, message: str, conversation_history: List[Dict[str, Any]]) -> str:
+    async def _determine_domain(
+        self, message: str, conversation_history: List[Dict[str, Any]]
+    ) -> str:
         """Determine which domain this message belongs to."""
         # Format conversation history for context
         formatted_history = "\n".join(
             [
                 f"{item['role'].upper()}: {item['content']}"
-                for item in conversation_history[-5:]  # Include last 5 messages for context
+                for item in conversation_history[
+                    -5:
+                ]  # Include last 5 messages for context
             ]
         )
 
@@ -750,7 +803,9 @@ class AgentOrchestrator:
             valid_domains = ["sales", "service", "tech", "research"]
             if domain not in valid_domains:
                 # Default to research if unclear
-                logger.warning(f"Invalid domain classification: {domain}, defaulting to research")
+                logger.warning(
+                    f"Invalid domain classification: {domain}, defaulting to research"
+                )
                 domain = "research"
 
             return domain

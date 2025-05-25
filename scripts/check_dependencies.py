@@ -27,8 +27,15 @@ def get_required_packages(requirements_file: str):
                     elif "~=" in line or ">=" in line or "<" in line:
                         # For now, just record the name for range dependencies
                         # More sophisticated parsing could be added here
-                        name = line.split("~", 1)[0].split(">", 1)[0].split("<", 1)[0].strip()
-                        required[name.strip().lower()] = None  # Indicates ranged/unpinned
+                        name = (
+                            line.split("~", 1)[0]
+                            .split(">", 1)[0]
+                            .split("<", 1)[0]
+                            .strip()
+                        )
+                        required[name.strip().lower()] = (
+                            None  # Indicates ranged/unpinned
+                        )
                     else:
                         required[line.strip().lower()] = None  # Unpinned
     except FileNotFoundError:
@@ -47,9 +54,13 @@ def check_dependencies(requirements_file: str, show_outdated: bool = False):
 
     for req_name, req_version in required.items():
         if req_name not in installed:
-            missing_packages.append(f"{req_name}{ '==' + req_version if req_version else ''}")
+            missing_packages.append(
+                f"{req_name}{ '==' + req_version if req_version else ''}"
+            )
         elif req_version and installed[req_name] != req_version:
-            mismatched_versions.append(f"{req_name} (required: {req_version}, installed: {installed[req_name]})")
+            mismatched_versions.append(
+                f"{req_name} (required: {req_version}, installed: {installed[req_name]})"
+            )
 
     if missing_packages:
         print("\nERROR: Missing required packages:")
@@ -64,7 +75,9 @@ def check_dependencies(requirements_file: str, show_outdated: bool = False):
     if not missing_packages and not mismatched_versions:
         print("All required dependencies are installed and versions match.")
     else:
-        print("\nPlease run 'make install' or 'pip install -r requirements.txt' to fix.")
+        print(
+            "\nPlease run 'make install' or 'pip install -r requirements.txt' to fix."
+        )
         sys.exit(1)
 
     if show_outdated:
@@ -73,7 +86,10 @@ def check_dependencies(requirements_file: str, show_outdated: bool = False):
             # Use pip list --outdated. Ensure it runs in the current venv context.
             # The `sys.executable` ensures pip from the current venv is used.
             result = subprocess.run(
-                [sys.executable, "-m", "pip", "list", "--outdated"], capture_output=True, text=True, check=False
+                [sys.executable, "-m", "pip", "list", "--outdated"],
+                capture_output=True,
+                text=True,
+                check=False,
             )
             if result.stdout:
                 print("Outdated packages found:")
@@ -81,7 +97,10 @@ def check_dependencies(requirements_file: str, show_outdated: bool = False):
             else:
                 print("No outdated packages found.")
             if result.stderr:
-                print(f"Error checking outdated packages: {result.stderr}", file=sys.stderr)
+                print(
+                    f"Error checking outdated packages: {result.stderr}",
+                    file=sys.stderr,
+                )
         except Exception as e:
             print(f"Could not check for outdated packages: {e}", file=sys.stderr)
 
@@ -96,7 +115,9 @@ if __name__ == "__main__":
         help=f"Path to the requirements file (default: {DEFAULT_REQUIREMENTS_FILE})",
     )
     parser.add_argument(
-        "--show-outdated", action="store_true", help="Show outdated packages using pip list --outdated."
+        "--show-outdated",
+        action="store_true",
+        help="Show outdated packages using pip list --outdated.",
     )
     args = parser.parse_args()
     check_dependencies(args.file, args.show_outdated)

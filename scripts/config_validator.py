@@ -25,7 +25,9 @@ from google.cloud import firestore, secretmanager
 from google.cloud.exceptions import NotFound
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 
@@ -46,7 +48,13 @@ class ConfigValidator:
         """
         logger.info("Starting comprehensive configuration validation...")
 
-        results: dict[str, Any] = {"success": True, "checks": {}, "errors": [], "warnings": [], "timestamp": None}
+        results: dict[str, Any] = {
+            "success": True,
+            "checks": {},
+            "errors": [],
+            "warnings": [],
+            "timestamp": None,
+        }
 
         # Run validation checks
         checks = [
@@ -105,15 +113,24 @@ class ConfigValidator:
                     results["success"] = False
             else:
                 self.warnings.append(f"YAML file not found: {yaml_file}")
-                results["files"][yaml_file] = {"valid": False, "error": "File not found"}
+                results["files"][yaml_file] = {
+                    "valid": False,
+                    "error": "File not found",
+                }
 
         return results
 
     async def _validate_mcp_server_configs(self) -> dict[str, Any]:
         """Validate MCP server configurations."""
         mcp_configs = {
-            "secret_manager": {"port": 8002, "config_file": "mcp-servers/gcp-resources-server.yaml"},
-            "firestore": {"port": 8080, "config_file": "core/orchestrator/src/config/phi_config.yaml"},
+            "secret_manager": {
+                "port": 8002,
+                "config_file": "mcp-servers/gcp-resources-server.yaml",
+            },
+            "firestore": {
+                "port": 8080,
+                "config_file": "core/orchestrator/src/config/phi_config.yaml",
+            },
         }
 
         results: dict[str, Any] = {"success": True, "servers": {}}
@@ -126,7 +143,9 @@ class ConfigValidator:
             if os.path.exists(config_file_path):
                 server_result["config_valid"] = "true"
             else:
-                self.errors.append(f"MCP server config missing: {config['config_file']}")
+                self.errors.append(
+                    f"MCP server config missing: {config['config_file']}"
+                )
                 server_result["config_valid"] = "false"
                 results["success"] = False
 
@@ -176,8 +195,8 @@ class ConfigValidator:
         python_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
         results["python_version"] = python_version
 
-        if sys.version_info < (3, 11):
-            self.errors.append(f"Python 3.11+ required, found {python_version}")
+        if sys.version_info < (3, 10):
+            self.errors.append(f"Python 3.10+ required, found {python_version}")
             results["success"] = False
 
         return results
@@ -207,7 +226,10 @@ class ConfigValidator:
             _ = await client.list_secrets(request=request)
             results["services"]["secret_manager"] = {"accessible": True}
         except Exception as e:
-            results["services"]["secret_manager"] = {"accessible": False, "error": str(e)}
+            results["services"]["secret_manager"] = {
+                "accessible": False,
+                "error": str(e),
+            }
             self.errors.append(f"Cannot connect to Secret Manager: {e}")
             results["success"] = False
 
@@ -229,10 +251,18 @@ class ConfigValidator:
                     docs = collection_ref.limit(1)
                     doc_count = len([doc async for doc in docs.stream()])
 
-                    results["collections"][collection_name] = {"exists": True, "sample_doc_count": doc_count}
+                    results["collections"][collection_name] = {
+                        "exists": True,
+                        "sample_doc_count": doc_count,
+                    }
                 except Exception as e:
-                    results["collections"][collection_name] = {"exists": False, "error": str(e)}
-                    self.warnings.append(f"Collection {collection_name} may not exist: {e}")
+                    results["collections"][collection_name] = {
+                        "exists": False,
+                        "error": str(e),
+                    }
+                    self.warnings.append(
+                        f"Collection {collection_name} may not exist: {e}"
+                    )
 
             await client.close()
         except Exception as e:
@@ -257,10 +287,18 @@ class ConfigValidator:
                     _ = await client.access_secret_version(request={"name": name})
                     results["secrets"][secret_name] = {"accessible": True}
                 except NotFound:
-                    results["secrets"][secret_name] = {"accessible": False, "reason": "not_found"}
-                    self.warnings.append(f"Secret {secret_name} not found (may not be required)")
+                    results["secrets"][secret_name] = {
+                        "accessible": False,
+                        "reason": "not_found",
+                    }
+                    self.warnings.append(
+                        f"Secret {secret_name} not found (may not be required)"
+                    )
                 except Exception as e:
-                    results["secrets"][secret_name] = {"accessible": False, "reason": str(e)}
+                    results["secrets"][secret_name] = {
+                        "accessible": False,
+                        "reason": str(e),
+                    }
                     self.warnings.append(f"Cannot access secret {secret_name}: {e}")
 
         except Exception as e:
@@ -273,7 +311,12 @@ class ConfigValidator:
         """Validate file permissions for critical files."""
         results: dict[str, Any] = {"success": True, "files": {}}
 
-        critical_files = ["scripts/check_venv.py", "scripts/check_dependencies.py", "requirements/base.txt", "Makefile"]
+        critical_files = [
+            "scripts/check_venv.py",
+            "scripts/check_dependencies.py",
+            "requirements/base.txt",
+            "Makefile",
+        ]
 
         for file_path in critical_files:
             if os.path.exists(file_path):
@@ -315,23 +358,34 @@ class ConfigValidator:
                         config_data = yaml.safe_load(f)
 
                     # Basic validation - check for required fields
-                    required_fields = ["name", "role"] if "personas" in config_file else ["agents"]
+                    required_fields = (
+                        ["name", "role"] if "personas" in config_file else ["agents"]
+                    )
 
-                    config_valid = all(field in config_data for field in required_fields)
+                    config_valid = all(
+                        field in config_data for field in required_fields
+                    )
                     results["configs"][config_file] = {
                         "valid": config_valid,
-                        "structure": "correct" if config_valid else "missing_required_fields",
+                        "structure": (
+                            "correct" if config_valid else "missing_required_fields"
+                        ),
                     }
 
                     if not config_valid:
-                        self.warnings.append(f"Agent config {config_file} missing required fields")
+                        self.warnings.append(
+                            f"Agent config {config_file} missing required fields"
+                        )
 
                 except Exception as e:
                     results["configs"][config_file] = {"valid": False, "error": str(e)}
                     self.errors.append(f"Invalid agent config {config_file}: {e}")
                     results["success"] = False
             else:
-                results["configs"][config_file] = {"valid": False, "error": "File not found"}
+                results["configs"][config_file] = {
+                    "valid": False,
+                    "error": "File not found",
+                }
                 self.warnings.append(f"Agent config file not found: {config_file}")
 
         return results
@@ -342,7 +396,9 @@ async def main() -> int:
     import argparse
 
     parser = argparse.ArgumentParser(description="Validate AI Orchestra configuration")
-    parser.add_argument("--project-id", default="cherry-ai-project", help="GCP Project ID")
+    parser.add_argument(
+        "--project-id", default="cherry-ai-project", help="GCP Project ID"
+    )
     parser.add_argument("--output", help="Output results to JSON file")
     parser.add_argument("--fail-fast", action="store_true", help="Exit on first error")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
@@ -382,7 +438,9 @@ async def main() -> int:
             logger.info(f"  • {warning}")
 
     # Check summary
-    passed_checks = sum(1 for check in results["checks"].values() if check.get("success", False))
+    passed_checks = sum(
+        1 for check in results["checks"].values() if check.get("success", False)
+    )
     total_checks = len(results["checks"])
     logger.info(f"\n✅ PASSED: {passed_checks}/{total_checks} checks")
 

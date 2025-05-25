@@ -116,11 +116,15 @@ class FailoverMemoryProvider(MemoryProvider):
                 # Record failure
                 self.circuit_breakers[name].record_failure()
 
-                logger.warning(f"Operation {operation} failed with provider {name}: {str(e)}")
+                logger.warning(
+                    f"Operation {operation} failed with provider {name}: {str(e)}"
+                )
                 last_error = e
 
         # If we get here, all providers failed
-        raise MemoryError(f"All memory providers failed for operation {operation}", cause=last_error)
+        raise MemoryError(
+            f"All memory providers failed for operation {operation}", cause=last_error
+        )
 
     async def store(self, key: str, value: Any, ttl: Optional[int] = None) -> bool:
         """Store with failover support."""

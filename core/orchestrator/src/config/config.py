@@ -61,7 +61,9 @@ class Settings(BaseSettings):
     USE_RESILIENT_ADAPTER: bool = True  # Whether to use circuit breaker pattern
     USE_VERTEX_VECTOR_SEARCH: bool = False  # Whether to use Vertex Vector Search
     VERTEX_LOCATION: str = "us-central1"  # GCP region for Vertex AI
-    VERTEX_INDEX_ENDPOINT_ID: Optional[str] = None  # Vertex Vector Search index endpoint ID
+    VERTEX_INDEX_ENDPOINT_ID: Optional[str] = (
+        None  # Vertex Vector Search index endpoint ID
+    )
     VERTEX_INDEX_ID: Optional[str] = None  # Vertex Vector Search index ID
     EMBEDDING_DIMENSION: int = 768  # Dimension of embedding vectors
     ENABLE_MEMORY_MONITORING: bool = True  # Whether to enable memory monitoring
@@ -80,7 +82,9 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/api"
 
     # Configure Pydantic to load from .env file
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True)
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
+    )
 
 
 def load_all_persona_configs(settings_instance: Settings) -> Dict[str, PersonaConfig]:
@@ -134,7 +138,9 @@ def load_all_persona_configs(settings_instance: Settings) -> Dict[str, PersonaCo
 settings = Settings()
 
 # Log that settings have been loaded
-logger.info(f"Loaded configuration for {settings.APP_NAME} in {settings.ENVIRONMENT} environment")
+logger.info(
+    f"Loaded configuration for {settings.APP_NAME} in {settings.ENVIRONMENT} environment"
+)
 
 
 def get_settings() -> Settings:

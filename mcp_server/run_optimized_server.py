@@ -129,14 +129,18 @@ def run_server(config: Dict[str, Any], debug: bool = False) -> None:
 
 def main():
     """Main entry point for the optimized MCP server."""
-    parser = argparse.ArgumentParser(description="Run MCP server with performance optimizations")
+    parser = argparse.ArgumentParser(
+        description="Run MCP server with performance optimizations"
+    )
     parser.add_argument(
         "--config",
         default="mcp_server/performance_config.json",
         help="Path to configuration file",
     )
     parser.add_argument("--port", type=int, help="Port to bind to (overrides config)")
-    parser.add_argument("--storage", help="Path to storage directory (overrides config)")
+    parser.add_argument(
+        "--storage", help="Path to storage directory (overrides config)"
+    )
     parser.add_argument("--debug", action="store_true", help="Enable debug mode")
     parser.add_argument(
         "--optimize",

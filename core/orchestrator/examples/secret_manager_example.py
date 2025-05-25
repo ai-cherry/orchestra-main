@@ -38,13 +38,17 @@ def main():
     print("Example 2: Dictionary-like access")
     anthropic_key = secrets["anthropic-api-key"]
     print(f"Anthropic API Key exists: {bool(anthropic_key)}")
-    print(f"Key starts with: {anthropic_key[:4]}..." if anthropic_key else "Key not found")
+    print(
+        f"Key starts with: {anthropic_key[:4]}..." if anthropic_key else "Key not found"
+    )
     print()
 
     # Example 3: Using get() with default value
     print("Example 3: Using get() with default")
     cohere_key = secrets.get("cohere-api-key", "default-value-if-not-found")
-    print(f"Cohere API Key exists: {bool(cohere_key) and cohere_key != 'default-value-if-not-found'}")
+    print(
+        f"Cohere API Key exists: {bool(cohere_key) and cohere_key != 'default-value-if-not-found'}"
+    )
     print()
 
     # Example 4: Check if a secret exists

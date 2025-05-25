@@ -24,7 +24,9 @@ class VertexTaskRequest(BaseModel):
     """Request model for triggering a Vertex AI task."""
 
     task: str = Field(..., description="Task to execute")
-    params: Optional[Dict[str, Any]] = Field(default=None, description="Additional parameters for the task")
+    params: Optional[Dict[str, Any]] = Field(
+        default=None, description="Additional parameters for the task"
+    )
 
 
 class VertexTaskResponse(BaseModel):
@@ -36,7 +38,9 @@ class VertexTaskResponse(BaseModel):
 
 
 # Define background task function
-async def execute_task_in_background(task: str, params: Optional[Dict[str, Any]] = None):
+async def execute_task_in_background(
+    task: str, params: Optional[Dict[str, Any]] = None
+):
     """
     Execute a Vertex AI task in the background.
 
@@ -62,7 +66,9 @@ async def trigger_task(request: VertexTaskRequest, background_tasks: BackgroundT
     """
     try:
         # Start executing the task in the background
-        background_tasks.add_task(execute_task_in_background, request.task, request.params)
+        background_tasks.add_task(
+            execute_task_in_background, request.task, request.params
+        )
 
         return {
             "status": "accepted",
@@ -110,11 +116,15 @@ async def apply_terraform(workspace: str, background_tasks: BackgroundTasks):
             },
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to apply Terraform: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to apply Terraform: {str(e)}"
+        )
 
 
 @app.post("/vertex/agent-teams/{team_name}")
-async def create_agent_team(team_name: str, background_tasks: BackgroundTasks, roles: List[str] = None):
+async def create_agent_team(
+    team_name: str, background_tasks: BackgroundTasks, roles: List[str] = None
+):
     """
     Create and deploy an agent team.
 
@@ -143,11 +153,15 @@ async def create_agent_team(team_name: str, background_tasks: BackgroundTasks, r
             },
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to create agent team: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to create agent team: {str(e)}"
+        )
 
 
 @app.post("/vertex/embeddings/{index_name}")
-async def manage_embeddings(index_name: str, data: str, background_tasks: BackgroundTasks):
+async def manage_embeddings(
+    index_name: str, data: str, background_tasks: BackgroundTasks
+):
     """
     Manage embeddings in Vertex AI Vector Search.
 
@@ -176,7 +190,9 @@ async def manage_embeddings(index_name: str, data: str, background_tasks: Backgr
             },
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to manage embeddings: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to manage embeddings: {str(e)}"
+        )
 
 
 @app.post("/vertex/games/{game_type}/{session_id}")
@@ -215,7 +231,9 @@ async def manage_game_session(
             },
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to manage game session: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to manage game session: {str(e)}"
+        )
 
 
 @app.post("/vertex/monitor")
@@ -241,7 +259,9 @@ async def monitor_resources(background_tasks: BackgroundTasks):
             "result": {"message": "Started monitoring GCP resources"},
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to monitor resources: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to monitor resources: {str(e)}"
+        )
 
 
 @app.post("/vertex/init")
@@ -264,10 +284,14 @@ async def run_init_script(background_tasks: BackgroundTasks):
         return {
             "status": "accepted",
             "task": task,
-            "result": {"message": "Started running infrastructure initialization script"},
+            "result": {
+                "message": "Started running infrastructure initialization script"
+            },
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to run init script: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to run init script: {str(e)}"
+        )
 
 
 # Run the application when executed directly

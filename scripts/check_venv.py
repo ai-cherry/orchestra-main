@@ -1,13 +1,15 @@
 import sys
 
-MIN_PYTHON_VERSION = (3, 10)  # Require Python 3.11+
+MIN_PYTHON_VERSION = (3, 10)  # Require Python 3.10+
 
 
-def check_virtual_environment():
-    """Checks if a virtual environment is active and meets Python version requirements."""
+def check_virtual_environment() -> None:
+    """Check if we're in a virtual environment and provide guidance if not."""
     if not hasattr(sys, "prefix") or sys.prefix == sys.base_prefix:
         print("ERROR: No virtual environment is active.")
-        print("Please activate your virtual environment (e.g., 'source venv/bin/activate')")
+        print(
+            "Please activate your virtual environment (e.g., 'source venv/bin/activate')"
+        )
         sys.exit(1)
 
     print(f"Active venv: {sys.prefix}")

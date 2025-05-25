@@ -17,7 +17,7 @@ Before you begin, you need:
 1. **GCP Service Account Key**: Set as `GCP_MASTER_SERVICE_JSON` environment variable
 2. **GitHub Personal Access Token**: Set as `GH_CLASSIC_PAT_TOKEN` environment variable (for GitHub Actions)
 3. **Docker**: For building and running containers
-4. **Python 3.11+**: For local development
+4. **Python 3.10+**: For local development
 5. **Poetry**: For dependency management
 
 ## Quick Start

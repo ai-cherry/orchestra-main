@@ -32,15 +32,26 @@ class MemoryConfig(BaseModel):
 
     # Validators for specific memory types
     @validator("table_name")
-    def validate_table_name(cls, v: Optional[str], values: Dict[str, Any]) -> Optional[str]:
+    def validate_table_name(
+        cls, v: Optional[str], values: Dict[str, Any]
+    ) -> Optional[str]:
         if values.get("memory_type") in [MemoryType.PGVECTOR] and not v:
-            raise ValueError(f"table_name required for {values['memory_type']} memory type")
+            raise ValueError(
+                f"table_name required for {values['memory_type']} memory type"
+            )
         return v
 
     @validator("vector_dimension")
-    def validate_vector_dimension(cls, v: Optional[int], values: Dict[str, Any]) -> Optional[int]:
-        if values.get("memory_type") in [MemoryType.PGVECTOR, MemoryType.VERTEX_VECTOR] and not v:
-            raise ValueError(f"vector_dimension required for {values['memory_type']} memory type")
+    def validate_vector_dimension(
+        cls, v: Optional[int], values: Dict[str, Any]
+    ) -> Optional[int]:
+        if (
+            values.get("memory_type") in [MemoryType.PGVECTOR, MemoryType.VERTEX_VECTOR]
+            and not v
+        ):
+            raise ValueError(
+                f"vector_dimension required for {values['memory_type']} memory type"
+            )
         return v
 
 
@@ -71,7 +82,9 @@ class AgentConfig(BaseModel):
 
     agent_name: str
     description: str
-    wrapper_type: str = Field(..., description="Framework integration type (phidata, langchain, etc)")
+    wrapper_type: str = Field(
+        ..., description="Framework integration type (phidata, langchain, etc)"
+    )
     agent_class: str = Field(..., description="Fully qualified class path")
     llm_ref: str
     tools: Optional[List[ToolConfig]] = None
@@ -138,7 +151,9 @@ class AgentRegistry(BaseModel):
             if hasattr(config, "members") and isinstance(config.members, list):
                 for member in config.members:
                     if member not in agent_ids:
-                        raise ValueError(f"Team {agent_id} references unknown agent {member}")
+                        raise ValueError(
+                            f"Team {agent_id} references unknown agent {member}"
+                        )
         return values
 
 
@@ -174,7 +189,9 @@ class LLMRegistry(BaseModel):
     default_llm: Optional[str] = None
 
     @validator("default_llm")
-    def validate_default_llm(cls, v: Optional[str], values: Dict[str, Any]) -> Optional[str]:
+    def validate_default_llm(
+        cls, v: Optional[str], values: Dict[str, Any]
+    ) -> Optional[str]:
         if v and v not in values.get("llm_definitions", {}):
             raise ValueError(f"Default LLM {v} not found in llm_definitions")
         return v

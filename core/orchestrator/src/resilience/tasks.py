@@ -55,7 +55,8 @@ class TaskQueueManager:
         self.queue_path = self.client.queue_path(project_id, location_id, queue_name)
 
         logger.info(
-            f"Task Queue Manager initialized for project={project_id}, " f"location={location_id}, queue={queue_name}"
+            f"Task Queue Manager initialized for project={project_id}, "
+            f"location={location_id}, queue={queue_name}"
         )
 
     def schedule_retry(
@@ -117,7 +118,9 @@ class TaskQueueManager:
                 }
 
             # Create the task
-            response = self.client.create_task(request={"parent": self.queue_path, "task": task})
+            response = self.client.create_task(
+                request={"parent": self.queue_path, "task": task}
+            )
 
             task_name = response.name
             logger.info(
@@ -172,7 +175,9 @@ class TaskQueueManager:
                         # Cancel task
                         self.client.delete_task(name=task.name)
                         cancelled_count += 1
-                        logger.info(f"Cancelled retry task for agent '{agent_id}': {task.name}")
+                        logger.info(
+                            f"Cancelled retry task for agent '{agent_id}': {task.name}"
+                        )
                 except (json.JSONDecodeError, UnicodeDecodeError):
                     # Skip if we can't decode the body
                     continue
@@ -180,7 +185,9 @@ class TaskQueueManager:
             return cancelled_count
 
         except Exception as e:
-            logger.error(f"Failed to cancel retry tasks for agent '{agent_id}': {str(e)}")
+            logger.error(
+                f"Failed to cancel retry tasks for agent '{agent_id}': {str(e)}"
+            )
             return 0
 
 
@@ -205,7 +212,9 @@ class VertexAiFallbackHandler:
         self.service_account = service_account
         self._client = None
 
-        logger.info(f"Vertex AI Fallback Handler initialized with service account {service_account}")
+        logger.info(
+            f"Vertex AI Fallback Handler initialized with service account {service_account}"
+        )
 
     @property
     def client(self):
@@ -246,7 +255,9 @@ class VertexAiFallbackHandler:
                 raise RuntimeError("Vertex AI client not initialized")
 
             # Log the fallback activation
-            logger.info(f"Processing user input using Vertex AI fallback: '{user_input[:50]}...'")
+            logger.info(
+                f"Processing user input using Vertex AI fallback: '{user_input[:50]}...'"
+            )
 
             # Use the client to process the input
             # Depending on your VertexAgent implementation, you might need to adjust this
@@ -263,7 +274,11 @@ class VertexAiFallbackHandler:
                     agent_id="phidata",
                     incident_data={
                         "type": "fallback_activation",
-                        "input": user_input[:100] + "..." if len(user_input) > 100 else user_input,
+                        "input": (
+                            user_input[:100] + "..."
+                            if len(user_input) > 100
+                            else user_input
+                        ),
                         "resolution": "processed_by_vertex_ai",
                     },
                 )
@@ -324,7 +339,9 @@ def get_task_queue_manager() -> TaskQueueManager:
             )
 
             # Get service URL - in Cloud Run this is injected as environment variable
-            service_url = os.environ.get("SERVICE_URL", getattr(settings, "SERVICE_URL", "http://localhost:8000"))
+            service_url = os.environ.get(
+                "SERVICE_URL", getattr(settings, "SERVICE_URL", "http://localhost:8000")
+            )
 
             # Service account for authentication
             service_account = os.environ.get(
@@ -378,6 +395,8 @@ def get_fallback_handler() -> VertexAiFallbackHandler:
 
             _fallback_handler = VertexAiFallbackHandler(service_account=service_account)
 
-            logger.info(f"Created global Vertex AI Fallback Handler with service account {service_account}")
+            logger.info(
+                f"Created global Vertex AI Fallback Handler with service account {service_account}"
+            )
 
         return _fallback_handler

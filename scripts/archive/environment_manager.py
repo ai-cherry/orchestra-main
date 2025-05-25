@@ -49,7 +49,9 @@ class Colors:
     def is_supported() -> bool:
         """Check if the terminal supports ANSI color codes."""
         return bool(
-            sys.platform != "win32" or os.environ.get("TERM") or os.environ.get("WT_SESSION")  # Windows Terminal
+            sys.platform != "win32"
+            or os.environ.get("TERM")
+            or os.environ.get("WT_SESSION")  # Windows Terminal
         )
 
 
@@ -159,7 +161,9 @@ class EnvironmentManager:
                 self._update_env_file_status(env_path, env == target_env)
 
         # Create environment file if it doesn't exist
-        target_env_path = self.base_dir / self.ENV_FILES.get(target_env, f".env.{target_env}")
+        target_env_path = self.base_dir / self.ENV_FILES.get(
+            target_env, f".env.{target_env}"
+        )
         if not target_env_path.exists():
             with open(target_env_path, "w") as f:
                 f.write(f"# {target_env.upper()} Environment Configuration\n")
@@ -216,7 +220,9 @@ class EnvironmentManager:
                 settings = json.load(f)
 
             # Set window title to include environment
-            settings["window.title"] = f"AI Orchestra [${{activeEditorShort}}] - {current_env.upper()}"
+            settings["window.title"] = (
+                f"AI Orchestra [${{activeEditorShort}}] - {current_env.upper()}"
+            )
 
             # Set color customizations based on environment
             if "workbench.colorCustomizations" not in settings:
@@ -292,8 +298,12 @@ class EnvironmentManager:
             print(f"  Python version: {python_version}")
 
             pip_path = shutil.which("pip") or "pip"
-            result = subprocess.run([pip_path, "list"], capture_output=True, text=True, check=False)
-            pkg_count = len(result.stdout.strip().split("\n")) - 2  # Subtract header rows
+            result = subprocess.run(
+                [pip_path, "list"], capture_output=True, text=True, check=False
+            )
+            pkg_count = (
+                len(result.stdout.strip().split("\n")) - 2
+            )  # Subtract header rows
             print(f"  Installed packages: {pkg_count}")
         except Exception as e:
             print(f"  Error getting Python info: {str(e)}")
@@ -319,7 +329,9 @@ class EnvironmentManager:
 
         env_text = f"CURRENT ENVIRONMENT: {env.upper()}"
         padding = (width - len(env_text)) // 2
-        print(f"{color}{' ' * padding}{env_text}{' ' * (width - padding - len(env_text))}{Colors.RESET}")
+        print(
+            f"{color}{' ' * padding}{env_text}{' ' * (width - padding - len(env_text))}{Colors.RESET}"
+        )
 
         print(f"{color}{' ' * width}{Colors.RESET}")
         print("=" * width + "\n")
@@ -420,9 +432,7 @@ class EnvironmentManager:
                 settings[key] = value
 
         # Add environment comment
-        settings_comment = (
-            "\n// VS Code settings for AI Orchestra project\n  // Optimized for performance on large repositories\n"
-        )
+        settings_comment = "\n// VS Code settings for AI Orchestra project\n  // Optimized for performance on large repositories\n"
 
         # Write the updated settings
         with open(settings_path, "w") as f:
@@ -430,7 +440,9 @@ class EnvironmentManager:
             settings_str = "{\n" + settings_comment + settings_str[1:]
             f.write(settings_str)
 
-        print("Successfully optimized VS Code workspace settings for better performance")
+        print(
+            "Successfully optimized VS Code workspace settings for better performance"
+        )
 
     def analyze_repository_size(self) -> Dict[str, Any]:
         """
@@ -518,11 +530,17 @@ class EnvironmentManager:
         github_warning = False
         if total_size > 1 * 1024 * 1024 * 1024:  # 1GB
             github_warning = True
-            print("\n⚠️  WARNING: Repository size exceeds 1GB, which may cause issues with GitHub.")
-            print("   Consider using Git LFS for large files or implementing a clean-up strategy.")
+            print(
+                "\n⚠️  WARNING: Repository size exceeds 1GB, which may cause issues with GitHub."
+            )
+            print(
+                "   Consider using Git LFS for large files or implementing a clean-up strategy."
+            )
         elif total_size > 500 * 1024 * 1024:  # 500MB
             github_warning = True
-            print("\n⚠️  WARNING: Repository size is approaching GitHub's recommended maximum (500MB).")
+            print(
+                "\n⚠️  WARNING: Repository size is approaching GitHub's recommended maximum (500MB)."
+            )
             print("   Consider implementing a clean-up strategy soon.")
 
         return {
@@ -744,13 +762,17 @@ def main() -> int:
     )
 
     # Optimize workspace command
-    subparsers.add_parser("optimize-workspace", help="Optimize VS Code workspace settings")
+    subparsers.add_parser(
+        "optimize-workspace", help="Optimize VS Code workspace settings"
+    )
 
     # Repository size command
     subparsers.add_parser("repo-size", help="Analyze repository size")
 
     # Cleanup command
-    cleanup_parser = subparsers.add_parser("cleanup", help="Clean up repository to reduce size")
+    cleanup_parser = subparsers.add_parser(
+        "cleanup", help="Clean up repository to reduce size"
+    )
     cleanup_parser.add_argument(
         "--no-dry-run",
         action="store_true",

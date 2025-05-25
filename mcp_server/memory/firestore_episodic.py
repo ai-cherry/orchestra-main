@@ -66,7 +66,9 @@ class FirestoreEpisodicMemory(BaseMemory):
     async def initialize(self) -> bool:
         """Initialize Firestore client and collection."""
         if not HAS_FIRESTORE:
-            logger.error("google-cloud-firestore not installed. Install with: pip install google-cloud-firestore")
+            logger.error(
+                "google-cloud-firestore not installed. Install with: pip install google-cloud-firestore"
+            )
             return False
 
         try:
@@ -152,7 +154,9 @@ class FirestoreEpisodicMemory(BaseMemory):
         # Calculate expiration time
         expires_at = None
         if entry.metadata.ttl_seconds > 0:
-            expires_at = datetime.utcnow() + timedelta(seconds=entry.metadata.ttl_seconds)
+            expires_at = datetime.utcnow() + timedelta(
+                seconds=entry.metadata.ttl_seconds
+            )
 
         return {
             "key": entry.key,
@@ -280,13 +284,19 @@ class FirestoreEpisodicMemory(BaseMemory):
             if filters:
                 if "tags" in filters:
                     for tag in filters["tags"]:
-                        query_ref = query_ref.where("metadata.tags", "array_contains", tag)
+                        query_ref = query_ref.where(
+                            "metadata.tags", "array_contains", tag
+                        )
 
                 if "min_access_count" in filters:
-                    query_ref = query_ref.where("metadata.access_count", ">=", filters["min_access_count"])
+                    query_ref = query_ref.where(
+                        "metadata.access_count", ">=", filters["min_access_count"]
+                    )
 
                 if "source" in filters:
-                    query_ref = query_ref.where("metadata.source", "==", filters["source"])
+                    query_ref = query_ref.where(
+                        "metadata.source", "==", filters["source"]
+                    )
 
             # Text search (basic contains search)
             if isinstance(query, str) and query:
@@ -339,9 +349,9 @@ class FirestoreEpisodicMemory(BaseMemory):
 
             if prefix:
                 # Firestore range query for prefix matching
-                query_ref = query_ref.where(firestore.FieldPath.document_id(), ">=", prefix).where(
-                    firestore.FieldPath.document_id(), "<", prefix + "\uffff"
-                )
+                query_ref = query_ref.where(
+                    firestore.FieldPath.document_id(), ">=", prefix
+                ).where(firestore.FieldPath.document_id(), "<", prefix + "\uffff")
 
             # Get documents
             docs = await query_ref.select([]).get()
@@ -472,12 +482,16 @@ class FirestoreEpisodicMemory(BaseMemory):
             # Count by tier (should all be WARM)
             tier_counts = {}
             for tier in MemoryTier:
-                tier_query = self._collection.where("metadata.tier", "==", tier.value).count()
+                tier_query = self._collection.where(
+                    "metadata.tier", "==", tier.value
+                ).count()
                 tier_result = await tier_query.get()
                 tier_counts[tier.value] = tier_result[0][0].value
 
             # Get access statistics
-            high_access_query = self._collection.where("metadata.access_count", ">=", 10).count()
+            high_access_query = self._collection.where(
+                "metadata.access_count", ">=", 10
+            ).count()
             high_access_result = await high_access_query.get()
             high_access_count = high_access_result[0][0].value
 
@@ -528,7 +542,9 @@ class FirestoreEpisodicMemory(BaseMemory):
             try:
                 # Query for expired entries
                 now = datetime.utcnow()
-                expired_query = self._collection.where("metadata.expires_at", "<", now).limit(100)
+                expired_query = self._collection.where(
+                    "metadata.expires_at", "<", now
+                ).limit(100)
 
                 expired_docs = await expired_query.get()
 
@@ -539,7 +555,9 @@ class FirestoreEpisodicMemory(BaseMemory):
                         batch.delete(doc.reference)
 
                     await batch.commit()
-                    logger.info(f"Cleaned up {len(expired_docs)} expired entries from Firestore")
+                    logger.info(
+                        f"Cleaned up {len(expired_docs)} expired entries from Firestore"
+                    )
 
                 # Sleep for 5 minutes
                 await asyncio.sleep(300)

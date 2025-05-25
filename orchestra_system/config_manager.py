@@ -16,34 +16,38 @@ Key features:
 """
 
 import json
-import logging
-import os
 from collections import defaultdict
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-)
-logger = logging.getLogger("config-manager")
+# import logging  # Removed: now using centralized logging from core.logging_config
+# Use centralized environment configuration
+from core.env_config import settings
+
+# Use centralized logging configuration
+from core.logging_config import get_logger, setup_logging
+
+# Set up logging for the config manager
+setup_logging(level="INFO", json_format=True)
+logger = get_logger("config-manager")
 
 # Import MCP client
 try:
-    from gcp_migration.mcp_client_enhanced import (
-        MCPClient,
-    )
+    from gcp_migration.mcp_client_enhanced import MCPClient
     from gcp_migration.mcp_client_enhanced import get_client as get_mcp_client
 except ImportError:
-    logger.warning("Could not import enhanced MCP client, attempting to import basic client")
+    logger.warning(
+        "Could not import enhanced MCP client, attempting to import basic client"
+    )
     try:
         from gcp_migration.mcp_client import MCPClient
         from gcp_migration.mcp_client import get_client as get_mcp_client
     except ImportError:
-        logger.error("Failed to import MCP client. Config Manager will operate in offline mode.")
+        logger.error(
+            "Failed to import MCP client. Config Manager will operate in offline mode."
+        )
         MCPClient = object
 
         def get_mcp_client(*args, **kwargs):
@@ -159,7 +163,9 @@ class ConfigEntry:
             tags=data.get("tags", []),
         )
 
-    def update_value(self, value: Any, source: ConfigSource, source_path: Optional[str] = None) -> None:
+    def update_value(
+        self, value: Any, source: ConfigSource, source_path: Optional[str] = None
+    ) -> None:
         """Update the configuration value.
 
         Args:
@@ -181,7 +187,9 @@ class ConfigEntry:
 class ConfigConflict:
     """Represents a conflict between configuration values."""
 
-    def __init__(self, key: str, entries: List[ConfigEntry], detected_at: Optional[str] = None):
+    def __init__(
+        self, key: str, entries: List[ConfigEntry], detected_at: Optional[str] = None
+    ):
         """Initialize a configuration conflict.
 
         Args:
@@ -205,7 +213,9 @@ class ConfigConflict:
     def from_dict(cls, data: Dict[str, Any]) -> "ConfigConflict":
         """Create a conflict from a dictionary."""
         entries = [ConfigEntry.from_dict(entry_data) for entry_data in data["entries"]]
-        return cls(key=data["key"], entries=entries, detected_at=data.get("detected_at"))
+        return cls(
+            key=data["key"], entries=entries, detected_at=data.get("detected_at")
+        )
 
     def resolve_by_priority(self) -> ConfigEntry:
         """Resolve conflict by selecting the entry with highest priority (lowest numerical value).
@@ -280,7 +290,9 @@ class ConfigurationManager:
             environment: Current environment, auto-detected if None
         """
         self.mcp_client = mcp_client or get_mcp_client()
-        self.config_entries: Dict[str, Dict[ConfigEnvironment, ConfigEntry]] = defaultdict(dict)
+        self.config_entries: Dict[str, Dict[ConfigEnvironment, ConfigEntry]] = (
+            defaultdict(dict)
+        )
         self.conflicts: Dict[str, ConfigConflict] = {}
         self.environment = environment or self._detect_environment()
         self.initialized = False
@@ -299,10 +311,14 @@ class ConfigurationManager:
             if self.mcp_client:
                 self._load_from_mcp()
             else:
-                logger.warning("No MCP client available. Configuration will not be persistent.")
+                logger.warning(
+                    "No MCP client available. Configuration will not be persistent."
+                )
 
             self.initialized = True
-            logger.info(f"Configuration Manager initialized for {self.environment} environment")
+            logger.info(
+                f"Configuration Manager initialized for {self.environment} environment"
+            )
 
         except Exception as e:
             logger.error(f"Failed to initialize Configuration Manager: {e}")
@@ -327,11 +343,17 @@ class ConfigurationManager:
                         entry = ConfigEntry.from_dict(entry_data)
                         self.config_entries[key][ConfigEnvironment(env)] = entry
 
-                logger.info(f"Loaded {len(self.config_entries)} configuration entries from MCP memory")
+                logger.info(
+                    f"Loaded {len(self.config_entries)} configuration entries from MCP memory"
+                )
 
             # Load conflicts
             conflicts_response = self.mcp_client.get(self.CONFIG_CONFLICTS_KEY)
-            if conflicts_response and conflicts_response.success and conflicts_response.value:
+            if (
+                conflicts_response
+                and conflicts_response.success
+                and conflicts_response.value
+            ):
                 conflicts_data = conflicts_response.value
 
                 # Clear existing conflicts
@@ -341,7 +363,9 @@ class ConfigurationManager:
                 for key, conflict_data in conflicts_data.items():
                     self.conflicts[key] = ConfigConflict.from_dict(conflict_data)
 
-                logger.info(f"Loaded {len(self.conflicts)} configuration conflicts from MCP memory")
+                logger.info(
+                    f"Loaded {len(self.conflicts)} configuration conflicts from MCP memory"
+                )
 
         except Exception as e:
             logger.error(f"Failed to load configuration from MCP memory: {e}")
@@ -368,7 +392,9 @@ class ConfigurationManager:
                 conflicts_data[key] = conflict.to_dict()
 
             # Save conflicts
-            conflicts_result = self.mcp_client.set(self.CONFIG_CONFLICTS_KEY, conflicts_data)
+            conflicts_result = self.mcp_client.set(
+                self.CONFIG_CONFLICTS_KEY, conflicts_data
+            )
 
             if (not entries_result or not entries_result.success) or (
                 not conflicts_result or not conflicts_result.success
@@ -389,19 +415,19 @@ class ConfigurationManager:
             The detected environment
         """
         # Check for GitHub Codespaces
-        if os.environ.get("CODESPACES") == "true":
+        if settings.codespaces == "true":
             return ConfigEnvironment.CODESPACES
 
         # Check for GCP Cloud Run
-        if os.environ.get("K_SERVICE"):
+        if settings.k_service:
             return ConfigEnvironment.GCP_CLOUD_RUN
 
         # Check for GCP Workstation
-        if os.environ.get("CLOUD_WORKSTATIONS_AGENT"):
+        if settings.cloud_workstations_agent:
             return ConfigEnvironment.GCP_WORKSTATION
 
         # Check for CI/CD
-        if os.environ.get("CI") or os.environ.get("GITHUB_ACTIONS"):
+        if settings.ci or settings.github_actions:
             return ConfigEnvironment.CI_CD
 
         # Default to local
@@ -421,7 +447,9 @@ class ConfigurationManager:
         # Discover environment variables
         env_count = self._discover_environment_variables()
         entry_count += env_count
-        logger.info(f"Discovered {env_count} configuration entries from environment variables")
+        logger.info(
+            f"Discovered {env_count} configuration entries from environment variables"
+        )
 
         # Discover configuration files
         file_count = self._discover_configuration_files()
@@ -444,22 +472,23 @@ class ConfigurationManager:
         # Look for environment variables with common prefixes
         prefixes = ["CONFIG_", "APP_", "ORCHESTRA_", "GCP_", "GITHUB_", "GOOGLE_"]
 
-        for name, value in os.environ.items():
-            # Check if variable name starts with any of the prefixes
-            if any(name.startswith(prefix) for prefix in prefixes):
-                # Convert to config key (lowercase)
+        # Use centralized settings for environment variables
+        for name in prefixes:
+            value = getattr(settings, name.lower(), None)
+            if value is not None:
                 key = name.lower()
-
-                # Add as config entry
                 self.set(
                     key=key,
                     value=value,
                     environment=self.environment,
-                    priority=ConfigPriority.HIGH if name.startswith("CONFIG_") else ConfigPriority.MEDIUM,
+                    priority=(
+                        ConfigPriority.HIGH
+                        if name.startswith("CONFIG_")
+                        else ConfigPriority.MEDIUM
+                    ),
                     source=ConfigSource.ENVIRONMENT,
                     description=f"Environment variable: {name}",
                 )
-
                 entry_count += 1
 
         return entry_count
@@ -607,7 +636,9 @@ class ConfigurationManager:
                             entry_count += 1
 
                 except ImportError:
-                    logger.warning("TOML parser not available, skipping TOML configuration")
+                    logger.warning(
+                        "TOML parser not available, skipping TOML configuration"
+                    )
 
             # Terraform variables file
             elif path.name == "variables.tf":
@@ -619,13 +650,21 @@ class ConfigurationManager:
                     # Extract variable blocks
                     import re
 
-                    var_blocks = re.findall(r'variable\s+"([^"]+)"\s+{([^}]+)}', content)
+                    var_blocks = re.findall(
+                        r'variable\s+"([^"]+)"\s+{([^}]+)}', content
+                    )
 
                     for var_name, var_content in var_blocks:
                         # Extract default value if present
-                        default_match = re.search(r'default\s+=\s+(?:"([^"]+)"|(\d+)|([a-z]+))', var_content)
+                        default_match = re.search(
+                            r'default\s+=\s+(?:"([^"]+)"|(\d+)|([a-z]+))', var_content
+                        )
                         if default_match:
-                            value = default_match.group(1) or default_match.group(2) or default_match.group(3)
+                            value = (
+                                default_match.group(1)
+                                or default_match.group(2)
+                                or default_match.group(3)
+                            )
 
                             # Convert to appropriate type
                             if default_match.group(2):  # Number
@@ -641,7 +680,9 @@ class ConfigurationManager:
 
                             # Extract description if present
                             description = "Terraform variable"
-                            desc_match = re.search(r'description\s+=\s+"([^"]+)"', var_content)
+                            desc_match = re.search(
+                                r'description\s+=\s+"([^"]+)"', var_content
+                            )
                             if desc_match:
                                 description = desc_match.group(1)
 
@@ -913,7 +954,11 @@ class ConfigurationManager:
         # Check for conflicts
         values = {}
         for env, entry in env_entries.items():
-            value_str = json.dumps(entry.value) if isinstance(entry.value, (dict, list)) else str(entry.value)
+            value_str = (
+                json.dumps(entry.value)
+                if isinstance(entry.value, (dict, list))
+                else str(entry.value)
+            )
             if value_str not in values:
                 values[value_str] = []
             values[value_str].append(entry)
@@ -1119,7 +1164,9 @@ class ConfigurationManager:
             values = [entry.value for entry in entries]
             envs = [entry.environment for entry in entries]
 
-            errors.append(f"Conflict for key '{key}': {len(values)} different values across environments {envs}")
+            errors.append(
+                f"Conflict for key '{key}': {len(values)} different values across environments {envs}"
+            )
 
         return len(errors) == 0, errors
 
@@ -1146,7 +1193,9 @@ def get_manager(
     global _default_manager
 
     if _default_manager is None or force_new:
-        _default_manager = ConfigurationManager(mcp_client=mcp_client, environment=environment)
+        _default_manager = ConfigurationManager(
+            mcp_client=mcp_client, environment=environment
+        )
 
     return _default_manager
 
@@ -1192,8 +1241,12 @@ if __name__ == "__main__":
     """Run the configuration manager as a script."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Configuration Manager for AI Orchestra")
-    parser.add_argument("--discover", action="store_true", help="Discover configuration")
+    parser = argparse.ArgumentParser(
+        description="Configuration Manager for AI Orchestra"
+    )
+    parser.add_argument(
+        "--discover", action="store_true", help="Discover configuration"
+    )
     parser.add_argument("--export", metavar="PATH", help="Export configuration to file")
     parser.add_argument(
         "--format",
@@ -1212,7 +1265,9 @@ if __name__ == "__main__":
         choices=[e.value for e in ConfigEnvironment],
         help="Environment",
     )
-    parser.add_argument("--validate", action="store_true", help="Validate configuration")
+    parser.add_argument(
+        "--validate", action="store_true", help="Validate configuration"
+    )
 
     args = parser.parse_args()
 

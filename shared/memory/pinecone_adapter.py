@@ -33,7 +33,9 @@ class PineconeAdapter:
         api_key = os.environ.get("PINECONE_API_KEY")
         if not api_key:
             raise RuntimeError("PINECONE_API_KEY not set in environment variables.")
-        pinecone_env = environment or os.environ.get("PINECONE_ENVIRONMENT", "us-west1-gcp")
+        pinecone_env = environment or os.environ.get(
+            "PINECONE_ENVIRONMENT", "us-west1-gcp"
+        )
         pinecone.init(api_key=api_key, environment=pinecone_env)
         self.index_name = index_name
         self.namespace = namespace
@@ -45,10 +47,14 @@ class PineconeAdapter:
         if self._index is None:
             # Pinecone's client is sync, but can be wrapped for async
             loop = asyncio.get_event_loop()
-            self._index = await loop.run_in_executor(None, lambda: pinecone.Index(self.index_name))
+            self._index = await loop.run_in_executor(
+                None, lambda: pinecone.Index(self.index_name)
+            )
             logger.info(f"Connected to Pinecone index: {self.index_name}")
 
-    async def upsert_vectors(self, vectors: List[Dict[str, Any]], batch_size: int = 100):
+    async def upsert_vectors(
+        self, vectors: List[Dict[str, Any]], batch_size: int = 100
+    ):
         """
         Batch upsert vectors to Pinecone.
         Each vector: {'id': str, 'values': List[float], 'metadata': dict}
@@ -64,14 +70,20 @@ class PineconeAdapter:
             upsert_batch = [(ids[j], values[j], metadata[j]) for j in range(len(batch))]
             try:
                 await asyncio.get_event_loop().run_in_executor(
-                    None, lambda: self._index.upsert(upsert_batch, namespace=self.namespace)
+                    None,
+                    lambda: self._index.upsert(upsert_batch, namespace=self.namespace),
                 )
                 logger.info(f"Upserted batch {i}-{i+len(batch)-1} to Pinecone.")
             except Exception as e:
-                logger.error(f"Pinecone upsert failed for batch {i}-{i+len(batch)-1}: {e}")
+                logger.error(
+                    f"Pinecone upsert failed for batch {i}-{i+len(batch)-1}: {e}"
+                )
 
     async def query(
-        self, vector: List[float], top_k: int = 10, filter: Optional[Dict[str, Any]] = None
+        self,
+        vector: List[float],
+        top_k: int = 10,
+        filter: Optional[Dict[str, Any]] = None,
     ) -> List[Dict[str, Any]]:
         """
         Query Pinecone for nearest neighbors.
@@ -82,11 +94,18 @@ class PineconeAdapter:
             result = await asyncio.get_event_loop().run_in_executor(
                 None,
                 lambda: self._index.query(
-                    vector=vector, top_k=top_k, filter=filter, include_metadata=True, namespace=self.namespace
+                    vector=vector,
+                    top_k=top_k,
+                    filter=filter,
+                    include_metadata=True,
+                    namespace=self.namespace,
                 ),
             )
             matches = result.get("matches", [])
-            return [{"id": m["id"], "score": m["score"], "metadata": m.get("metadata", {})} for m in matches]
+            return [
+                {"id": m["id"], "score": m["score"], "metadata": m.get("metadata", {})}
+                for m in matches
+            ]
         except Exception as e:
             logger.error(f"Pinecone query failed: {e}")
             return []

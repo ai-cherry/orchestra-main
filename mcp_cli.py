@@ -52,7 +52,9 @@ try:
     from roo_workflow_manager import MODE_MAP as ROO_MODES
 except ImportError as e:
     print(f"Error importing MCP components: {e}")
-    print("Make sure unified_mcp_orchestrator.py, roo_workflow_manager.py, and cline_integration.py are available.")
+    print(
+        "Make sure unified_mcp_orchestrator.py, roo_workflow_manager.py, and cline_integration.py are available."
+    )
     sys.exit(1)
 
 
@@ -117,7 +119,9 @@ def handle_memory_commands(args: Dict[str, Any]) -> None:
         source_tool = AITool(args["--from"])
         target_tool = AITool(args["--to"])
 
-        result = memory_manager.sync_between_tools(key, source_tool=source_tool, target_tool=target_tool, scope=scope)
+        result = memory_manager.sync_between_tools(
+            key, source_tool=source_tool, target_tool=target_tool, scope=scope
+        )
         print(f"Memory sync {'succeeded' if result else 'failed'}")
 
 
@@ -248,7 +252,9 @@ def handle_server_commands(args: Dict[str, Any]) -> None:
                 print(f"Error parsing parameters JSON: {args['--params']}")
                 sys.exit(1)
 
-        result = server_manager.execute_server_operation(server_name, operation, parameters)
+        result = server_manager.execute_server_operation(
+            server_name, operation, parameters
+        )
         if result:
             print(result)
         else:

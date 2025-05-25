@@ -145,7 +145,9 @@ class PersonaLoader:
 
             # Ensure default persona exists
             if self.default_persona_id not in self.personas:
-                logger.warning(f"Default persona '{self.default_persona_id}' not found, creating it")
+                logger.warning(
+                    f"Default persona '{self.default_persona_id}' not found, creating it"
+                )
                 self._create_default_persona()
         except Exception as e:
             logger.error(f"Failed to load personas from {self.config_path}: {e}")
@@ -252,7 +254,9 @@ class PersonaManager:
 
         return self._processors[persona.name]
 
-    def format_response(self, response_text: str, persona_id: Optional[str] = None, **kwargs: Any) -> str:
+    def format_response(
+        self, response_text: str, persona_id: Optional[str] = None, **kwargs: Any
+    ) -> str:
         """
         Format a response according to a persona's template.
 

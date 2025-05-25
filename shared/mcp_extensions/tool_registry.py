@@ -32,7 +32,9 @@ import time
 import uuid
 from typing import Any, Dict, List, Optional
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger("tool_registry")
 
 
@@ -87,7 +89,9 @@ class ToolRegistry:
             usage_stats = self.mcp_client.get(self.USAGE_STATS_KEY)
             if not usage_stats:
                 logger.info("Initializing tool usage stats in MCP memory")
-                self.mcp_client.set(self.USAGE_STATS_KEY, {"tools": {}, "last_reset": time.time()})
+                self.mcp_client.set(
+                    self.USAGE_STATS_KEY, {"tools": {}, "last_reset": time.time()}
+                )
         except Exception as e:
             logger.error(f"Failed to initialize registry: {e}")
             raise
@@ -277,7 +281,9 @@ class ToolRegistry:
 
             # Check permissions if agent_id is provided
             if agent_id and not self._check_permission(agent_id, tool_id):
-                raise PermissionError(f"Agent {agent_id} not allowed to use tool {tool_id}")
+                raise PermissionError(
+                    f"Agent {agent_id} not allowed to use tool {tool_id}"
+                )
 
             # Record usage stats
             invocation_id = str(uuid.uuid4())
@@ -320,7 +326,9 @@ class ToolRegistry:
         except Exception as e:
             logger.error(f"Failed to initialize tool stats for {tool_id}: {e}")
 
-    def _record_usage(self, tool_id: str, agent_id: Optional[str], invocation_id: str) -> None:
+    def _record_usage(
+        self, tool_id: str, agent_id: Optional[str], invocation_id: str
+    ) -> None:
         """Record tool usage statistics.
 
         Args:
@@ -425,7 +433,9 @@ class ToolRegistry:
             logger.error(f"Failed to get tool info for {tool_id}: {e}")
             return None
 
-    def get_usage_stats(self, tool_id: Optional[str] = None, agent_id: Optional[str] = None) -> Dict[str, Any]:
+    def get_usage_stats(
+        self, tool_id: Optional[str] = None, agent_id: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Get usage statistics for tools.
 
         Args:
@@ -450,7 +460,9 @@ class ToolRegistry:
             if agent_id:
                 result = {}
                 for tid, tool_stat in tools_stats.items():
-                    agent_invocations = tool_stat.get("invocations_by_agent", {}).get(agent_id)
+                    agent_invocations = tool_stat.get("invocations_by_agent", {}).get(
+                        agent_id
+                    )
                     if agent_invocations:
                         result[tid] = {
                             "total_invocations": agent_invocations,

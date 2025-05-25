@@ -80,8 +80,12 @@ class AgentRouting:
             # Initialize Matching Engine endpoint if provided
             self.matching_engine_endpoint = None
             if matching_engine_endpoint_name:
-                self.matching_engine_endpoint = aiplatform.MatchingEngineIndexEndpoint(matching_engine_endpoint_name)
-                logger.info(f"Initialized Matching Engine endpoint: {matching_engine_endpoint_name}")
+                self.matching_engine_endpoint = aiplatform.MatchingEngineIndexEndpoint(
+                    matching_engine_endpoint_name
+                )
+                logger.info(
+                    f"Initialized Matching Engine endpoint: {matching_engine_endpoint_name}"
+                )
         except Exception as e:
             logger.error(f"Failed to initialize Vertex AI: {str(e)}")
             raise RouterConnectionError("Failed to initialize Vertex AI", e)
@@ -97,7 +101,9 @@ class AgentRouting:
             if use_async_db:
                 from google.cloud import spanner_v1
 
-                self.async_spanner_client = spanner_v1.services.spanner.SpannerAsyncClient()
+                self.async_spanner_client = (
+                    spanner_v1.services.spanner.SpannerAsyncClient()
+                )
         except Exception as e:
             logger.error(f"Failed to initialize Spanner: {str(e)}")
             raise RouterConnectionError("Failed to initialize Spanner", e)
@@ -115,7 +121,9 @@ class AgentRouting:
         self.agent_costs: Dict[str, float] = {}
         self.agent_capabilities: Dict[str, List[str]] = {}
         self.agent_success_rates: Dict[str, float] = {}
-        self.shadow_agents: Dict[str, str] = {}  # Mapping of production agent ID to shadow agent ID
+        self.shadow_agents: Dict[str, str] = (
+            {}
+        )  # Mapping of production agent ID to shadow agent ID
 
         # Last update timestamps
         self._last_score_update = time.time()
@@ -145,17 +153,22 @@ class AgentRouting:
                     self.agent_scores[agent_id] = score if score is not None else 0.0
                     self.agent_load[agent_id] = load if load is not None else 0
                     self.agent_costs[agent_id] = cost if cost is not None else 0.0
-                    self.agent_success_rates[agent_id] = success_rate if success_rate is not None else 0.0
+                    self.agent_success_rates[agent_id] = (
+                        success_rate if success_rate is not None else 0.0
+                    )
 
                     # Parse capabilities (stored as comma-separated values)
                     if capabilities_str:
-                        self.agent_capabilities[agent_id] = [c.strip() for c in capabilities_str.split(",")]
+                        self.agent_capabilities[agent_id] = [
+                            c.strip() for c in capabilities_str.split(",")
+                        ]
                     else:
                         self.agent_capabilities[agent_id] = []
 
                 # Query for shadow testing mappings
                 shadow_results = snapshot.execute_sql(
-                    "SELECT production_agent_id, shadow_agent_id " "FROM shadow_testing_table"
+                    "SELECT production_agent_id, shadow_agent_id "
+                    "FROM shadow_testing_table"
                 )
                 for row in shadow_results:
                     prod_id, shadow_id = row
@@ -164,7 +177,9 @@ class AgentRouting:
             logger.info(f"Loaded routing data for {len(self.agent_scores)} agents")
 
         except Exception as e:
-            logger.error(f"Failed to load routing data from Spanner: {str(e)}", exc_info=True)
+            logger.error(
+                f"Failed to load routing data from Spanner: {str(e)}", exc_info=True
+            )
             raise RouterConnectionError("Failed to load routing data from Spanner", e)
 
     @error_boundary(propagate_types=[AgentRoutingError])
@@ -183,7 +198,9 @@ class AgentRouting:
             await loop.run_in_executor(None, self._load_routing_data_from_spanner)
 
         except Exception as e:
-            logger.error(f"Failed to load routing data asynchronously: {str(e)}", exc_info=True)
+            logger.error(
+                f"Failed to load routing data asynchronously: {str(e)}", exc_info=True
+            )
             raise RouterConnectionError("Failed to load routing data asynchronously", e)
 
     @error_boundary(propagate_types=[AgentRoutingError])
@@ -205,7 +222,9 @@ class AgentRouting:
                 # Use Vertex AI Matching Engine for real scoring
                 for agent_id, capabilities in self.agent_capabilities.items():
                     # Generate a query vector from agent capabilities and performance metrics
-                    query_vector = await self._generate_agent_performance_vector(agent_id)
+                    query_vector = await self._generate_agent_performance_vector(
+                        agent_id
+                    )
 
                     # Query the Matching Engine for similarity score
                     response = self.matching_engine_endpoint.match(
@@ -221,7 +240,9 @@ class AgentRouting:
 
                         # Use exponential moving average to smooth score changes
                         current_score = self.agent_scores.get(agent_id, 0.0)
-                        self.agent_scores[agent_id] = (0.7 * current_score) + (0.3 * updated_score)
+                        self.agent_scores[agent_id] = (0.7 * current_score) + (
+                            0.3 * updated_score
+                        )
 
                         # Add to batch updates
                         updates.append((agent_id, self.agent_scores[agent_id]))
@@ -229,8 +250,12 @@ class AgentRouting:
                 # Fall back to capability-based scoring if Matching Engine isn't available
                 for agent_id, capabilities in self.agent_capabilities.items():
                     # Calculate score based on capabilities and success rate
-                    capability_weight = len(capabilities) / 10.0  # Scale based on number of capabilities
-                    success_rate = self.agent_success_rates.get(agent_id, 0.8)  # Default to 80% if unknown
+                    capability_weight = (
+                        len(capabilities) / 10.0
+                    )  # Scale based on number of capabilities
+                    success_rate = self.agent_success_rates.get(
+                        agent_id, 0.8
+                    )  # Default to 80% if unknown
 
                     # Calculate a weighted score
                     updated_score = (0.6 * capability_weight) + (0.4 * success_rate)
@@ -259,7 +284,9 @@ class AgentRouting:
             logger.error(f"Failed to update capability scores: {str(e)}", exc_info=True)
             raise MatchingEngineError("Failed to update capability scores", e)
 
-    async def _async_batch_update_scores(self, updates: List[Tuple[str, float]]) -> None:
+    async def _async_batch_update_scores(
+        self, updates: List[Tuple[str, float]]
+    ) -> None:
         """
         Helper method to perform async batch updates of scores in Spanner.
 
@@ -326,7 +353,9 @@ class AgentRouting:
         for i in range(128):
             # Add some signal from the success rate to the vector
             if i % 10 == 0:
-                value = success_rate + (random.random() * 0.2 - 0.1)  # Add some randomness
+                value = success_rate + (
+                    random.random() * 0.2 - 0.1
+                )  # Add some randomness
             else:
                 value = random.random()
             vector.append(value)
@@ -387,14 +416,18 @@ class AgentRouting:
 
                 # More capabilities = higher cost
                 capability_count = len(self.agent_capabilities.get(agent_id, []))
-                base_cost = 0.05 + (capability_count * 0.01)  # Base cost with capability factor
+                base_cost = 0.05 + (
+                    capability_count * 0.01
+                )  # Base cost with capability factor
 
                 # Add small random variation (±10%)
                 variation = (random.random() * 0.2) - 0.1  # -10% to +10%
                 cost = base_cost * (1 + variation)
 
                 # Apply cost decay function: costs decrease over time due to optimization
-                days_online = (hash(agent_id) % 100) + 30  # Simulate agent age (30-130 days)
+                days_online = (
+                    hash(agent_id) % 100
+                ) + 30  # Simulate agent age (30-130 days)
                 cost_decay = min(0.3, days_online / 1000)  # Max 30% cost reduction
                 cost = cost * (1 - cost_decay)
 
@@ -497,7 +530,9 @@ class AgentRouting:
 
             # If no eligible agents, return empty string
             if not eligible_agents:
-                logger.warning(f"No eligible agents found for capabilities: {requested_capabilities}")
+                logger.warning(
+                    f"No eligible agents found for capabilities: {requested_capabilities}"
+                )
                 return ""
 
             # Prepare scoring logic
@@ -530,13 +565,17 @@ class AgentRouting:
 
                 # Calculate composite score
                 score = (
-                    (capability_score * weight_capability) - (load_factor * weight_load) - (cost_factor * weight_cost)
+                    (capability_score * weight_capability)
+                    - (load_factor * weight_load)
+                    - (cost_factor * weight_cost)
                 )
 
                 agent_scores[agent_id] = score
 
             # Select top 3 agents by score
-            top_agents = sorted(agent_scores.items(), key=lambda x: x[1], reverse=True)[:3]
+            top_agents = sorted(agent_scores.items(), key=lambda x: x[1], reverse=True)[
+                :3
+            ]
 
             # If high priority or only one agent, select the top agent
             if high_priority or len(top_agents) == 1:
@@ -562,21 +601,31 @@ class AgentRouting:
 
             # Update load for selected agent
             if best_agent_id:
-                self.agent_load[best_agent_id] = self.agent_load.get(best_agent_id, 0) + 1
+                self.agent_load[best_agent_id] = (
+                    self.agent_load.get(best_agent_id, 0) + 1
+                )
 
                 # Update load in Spanner (asynchronously, don't block selection)
-                asyncio.create_task(self._update_agent_load(best_agent_id, self.agent_load[best_agent_id]))
+                asyncio.create_task(
+                    self._update_agent_load(
+                        best_agent_id, self.agent_load[best_agent_id]
+                    )
+                )
 
                 # Check for shadow testing
                 if best_agent_id in self.shadow_agents:
                     shadow_id = self.shadow_agents[best_agent_id]
                     # Log shadow request (in a real implementation, send request to shadow agent as well)
-                    logger.info(f"Shadow testing active: Production agent {best_agent_id}, Shadow agent {shadow_id}")
+                    logger.info(
+                        f"Shadow testing active: Production agent {best_agent_id}, Shadow agent {shadow_id}"
+                    )
 
                     # Increment load for shadow agent as well
                     self.agent_load[shadow_id] = self.agent_load.get(shadow_id, 0) + 1
                     # Update shadow load in Spanner (asynchronously)
-                    asyncio.create_task(self._update_agent_load(shadow_id, self.agent_load[shadow_id]))
+                    asyncio.create_task(
+                        self._update_agent_load(shadow_id, self.agent_load[shadow_id])
+                    )
 
                 return best_agent_id
             else:
@@ -600,7 +649,9 @@ class AgentRouting:
                 # Use a threadpool to run the synchronous version for now
                 # In a real implementation, this would use the async Spanner client
                 loop = asyncio.get_event_loop()
-                await loop.run_in_executor(None, self._sync_update_agent_load, agent_id, load)
+                await loop.run_in_executor(
+                    None, self._sync_update_agent_load, agent_id, load
+                )
             else:
                 # Synchronous update
                 self._sync_update_agent_load(agent_id, load)
@@ -617,7 +668,9 @@ class AgentRouting:
             )
 
     @error_boundary(propagate_types=[AgentRoutingError], fallback_value=False)
-    async def register_shadow_agent(self, production_agent_id: str, shadow_agent_id: str) -> bool:
+    async def register_shadow_agent(
+        self, production_agent_id: str, shadow_agent_id: str
+    ) -> bool:
         """
         Register a shadow agent for testing a new version alongside a production agent.
 
@@ -643,14 +696,18 @@ class AgentRouting:
             else:
                 self._sync_register_shadow_agent(production_agent_id, shadow_agent_id)
 
-            logger.info(f"Registered shadow agent {shadow_agent_id} for production agent {production_agent_id}")
+            logger.info(
+                f"Registered shadow agent {shadow_agent_id} for production agent {production_agent_id}"
+            )
             return True
 
         except Exception as e:
             logger.error(f"Failed to register shadow agent: {str(e)}", exc_info=True)
             raise AgentRoutingError("Failed to register shadow agent", e)
 
-    def _sync_register_shadow_agent(self, production_agent_id: str, shadow_agent_id: str) -> None:
+    def _sync_register_shadow_agent(
+        self, production_agent_id: str, shadow_agent_id: str
+    ) -> None:
         """Synchronous shadow agent registration."""
         with self.database.batch() as batch:
             batch.insert_or_update(
@@ -677,11 +734,15 @@ class AgentRouting:
                 if self.use_async_db and self.async_spanner_client:
                     # Use a threadpool for now
                     loop = asyncio.get_event_loop()
-                    await loop.run_in_executor(None, self._sync_remove_shadow_agent, production_agent_id)
+                    await loop.run_in_executor(
+                        None, self._sync_remove_shadow_agent, production_agent_id
+                    )
                 else:
                     self._sync_remove_shadow_agent(production_agent_id)
 
-                logger.info(f"Removed shadow agent mapping for production agent {production_agent_id}")
+                logger.info(
+                    f"Removed shadow agent mapping for production agent {production_agent_id}"
+                )
             return True
 
         except Exception as e:

@@ -96,7 +96,9 @@ async def demo_error_handling():
     # Try multiple calls to trigger error alert
     for i in range(3):
         try:
-            await client.chat_completion(messages=messages, model="claude-3-sonnet", session_id="error_demo")
+            await client.chat_completion(
+                messages=messages, model="claude-3-sonnet", session_id="error_demo"
+            )
         except Exception as e:
             logger.error(f"Expected error {i+1}: {str(e)}")
 
@@ -110,7 +112,9 @@ async def demo_cost_tracking():
     logger.info("\nStarting cost tracking demo...")
 
     monitor = ClaudeMonitor(alert_threshold_cost=0.1)  # Low threshold for demo
-    client = MonitoredLiteLLMClient(monitor=monitor, api_key_anthropic=os.getenv("ANTHROPIC_API_KEY"))
+    client = MonitoredLiteLLMClient(
+        monitor=monitor, api_key_anthropic=os.getenv("ANTHROPIC_API_KEY")
+    )
 
     # Simulate multiple users/sessions
     sessions = [
@@ -120,11 +124,19 @@ async def demo_cost_tracking():
     ]
 
     for session in sessions:
-        messages = [LLMMessage(role="user", content=f"Generate a 50-word story for {session['user_id']}")]
+        messages = [
+            LLMMessage(
+                role="user",
+                content=f"Generate a 50-word story for {session['user_id']}",
+            )
+        ]
 
         try:
             await client.chat_completion(
-                messages=messages, model="claude-3-haiku", max_tokens=100, **session  # Use cheaper model
+                messages=messages,
+                model="claude-3-haiku",
+                max_tokens=100,
+                **session,  # Use cheaper model
             )
             logger.info(f"Generated story for {session['user_id']}")
         except Exception as e:
@@ -146,7 +158,9 @@ async def demo_export_data():
     logger.info("\nStarting data export demo...")
 
     monitor = ClaudeMonitor()
-    client = MonitoredLiteLLMClient(monitor=monitor, api_key_anthropic=os.getenv("ANTHROPIC_API_KEY"))
+    client = MonitoredLiteLLMClient(
+        monitor=monitor, api_key_anthropic=os.getenv("ANTHROPIC_API_KEY")
+    )
 
     # Make a few calls to generate data
     messages = [LLMMessage(role="user", content="Count from 1 to 5")]
@@ -176,7 +190,9 @@ async def demo_performance_monitoring():
     logger.info("\nStarting performance monitoring demo...")
 
     monitor = ClaudeMonitor()
-    client = MonitoredLiteLLMClient(monitor=monitor, api_key_anthropic=os.getenv("ANTHROPIC_API_KEY"))
+    client = MonitoredLiteLLMClient(
+        monitor=monitor, api_key_anthropic=os.getenv("ANTHROPIC_API_KEY")
+    )
 
     # Test different models for performance comparison
     models = ["claude-3-haiku", "claude-3-sonnet"]
@@ -188,7 +204,10 @@ async def demo_performance_monitoring():
         for i in range(3):
             try:
                 await client.chat_completion(
-                    messages=messages, model=model, max_tokens=10, metadata={"test": "performance", "iteration": i}
+                    messages=messages,
+                    model=model,
+                    max_tokens=10,
+                    metadata={"test": "performance", "iteration": i},
                 )
             except Exception as e:
                 logger.error(f"Error with {model}: {str(e)}")

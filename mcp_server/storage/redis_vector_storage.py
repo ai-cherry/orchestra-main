@@ -94,7 +94,9 @@ class RedisVectorStorage(IMemoryStorage):
             bool: True if initialization was successful
         """
         if not HAS_REDIS:
-            logger.error("Redis package not installed. Install with 'pip install redis'")
+            logger.error(
+                "Redis package not installed. Install with 'pip install redis'"
+            )
             return False
 
         logger.info(f"Initializing Redis vector storage with URL: {self.redis_url}")
@@ -109,7 +111,9 @@ class RedisVectorStorage(IMemoryStorage):
             self._has_redisearch = any(module[1] == b"search" for module in modules)
 
             if not self._has_redisearch:
-                logger.warning("Redis does not have the RediSearch module loaded. Vector search will not be available.")
+                logger.warning(
+                    "Redis does not have the RediSearch module loaded. Vector search will not be available."
+                )
                 # Continue anyway for basic functionality
             else:
                 # Create vector index if it doesn't exist
@@ -274,7 +278,9 @@ class RedisVectorStorage(IMemoryStorage):
             entry.update_access()
 
             # Update the entry in Redis with new access metadata
-            await redis_client.hset(redis_key, "metadata", json.dumps(entry.metadata.to_dict()))
+            await redis_client.hset(
+                redis_key, "metadata", json.dumps(entry.metadata.to_dict())
+            )
 
             logger.debug(f"Retrieved memory entry from Redis: {key}")
             return entry
@@ -315,7 +321,9 @@ class RedisVectorStorage(IMemoryStorage):
                         hash_key = f"{self.hash_prefix}{content_hash}"
                         await redis_client.delete(hash_key)
                 except Exception as e:
-                    logger.warning(f"Error processing content hash during deletion: {e}")
+                    logger.warning(
+                        f"Error processing content hash during deletion: {e}"
+                    )
 
             # Delete the entry
             deleted = await redis_client.delete(redis_key)
@@ -355,7 +363,9 @@ class RedisVectorStorage(IMemoryStorage):
             cursor = 0
 
             while True:
-                cursor, batch = await redis_client.scan(cursor, match=f"{full_prefix}*", count=100)
+                cursor, batch = await redis_client.scan(
+                    cursor, match=f"{full_prefix}*", count=100
+                )
 
                 # Extract the key part after the prefix
                 for key in batch:
@@ -404,7 +414,9 @@ class RedisVectorStorage(IMemoryStorage):
             return None
 
     @with_correlation_id
-    async def search(self, query: str, limit: int = 10) -> List[Tuple[str, MemoryEntry, float]]:
+    async def search(
+        self, query: str, limit: int = 10
+    ) -> List[Tuple[str, MemoryEntry, float]]:
         """Search for memory entries using vector similarity or text search.
 
         Args:

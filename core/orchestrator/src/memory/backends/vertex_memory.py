@@ -58,7 +58,9 @@ class VertexMemory(MemoryInterface):
         # Initialize embedding model
         self.model = aiplatform.TextEmbeddingModel.from_pretrained(embedding_model)
 
-        logger.info(f"VertexMemory initialized with project={project_id}, location={location}")
+        logger.info(
+            f"VertexMemory initialized with project={project_id}, location={location}"
+        )
 
     async def _generate_embedding(self, text: str) -> List[float]:
         """
@@ -84,7 +86,9 @@ class VertexMemory(MemoryInterface):
             logger.error(f"Error generating embedding: {e}")
             return []
 
-    async def store(self, key: str, value: Dict[str, Any], ttl: Optional[int] = None) -> bool:
+    async def store(
+        self, key: str, value: Dict[str, Any], ttl: Optional[int] = None
+    ) -> bool:
         """
         Store an item in Vertex AI.
 
@@ -227,7 +231,9 @@ class VertexMemory(MemoryInterface):
             logger.error(f"Error checking if item exists in Vertex AI: {e}")
             return False
 
-    async def search(self, field: str, value: Any, operator: str = "==", limit: int = 10) -> List[Dict[str, Any]]:
+    async def search(
+        self, field: str, value: Any, operator: str = "==", limit: int = 10
+    ) -> List[Dict[str, Any]]:
         """
         Search for items in Vertex AI.
 
@@ -290,13 +296,17 @@ class VertexMemory(MemoryInterface):
                 data["id"] = doc.id
                 results.append(data)
 
-            logger.debug(f"Found {len(results)} items matching {field} {operator} {value} in Vertex AI")
+            logger.debug(
+                f"Found {len(results)} items matching {field} {operator} {value} in Vertex AI"
+            )
             return results
         except Exception as e:
             logger.error(f"Error searching in Vertex AI: {e}")
             return []
 
-    async def _semantic_search(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
+    async def _semantic_search(
+        self, query: str, limit: int = 10
+    ) -> List[Dict[str, Any]]:
         """
         Perform semantic search using Vertex AI Vector Search.
 
@@ -353,7 +363,9 @@ class VertexMemory(MemoryInterface):
             # Limit results
             results = results[:limit]
 
-            logger.debug(f"Found {len(results)} items semantically matching query: {query}")
+            logger.debug(
+                f"Found {len(results)} items semantically matching query: {query}"
+            )
             return results
         except Exception as e:
             logger.error(f"Error performing semantic search in Vertex AI: {e}")

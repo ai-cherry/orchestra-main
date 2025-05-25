@@ -472,7 +472,9 @@ class VertexAIService:
                     classification = json.loads(json_str)
                 else:
                     # Fallback: create a uniform distribution
-                    classification = {category: 1.0 / len(categories) for category in categories}
+                    classification = {
+                        category: 1.0 / len(categories) for category in categories
+                    }
 
                 # Ensure all categories are present
                 for category in categories:
@@ -498,7 +500,9 @@ class VertexAIService:
 
             except json.JSONDecodeError:
                 # Fallback: create a uniform distribution
-                classification = {category: 1.0 / len(categories) for category in categories}
+                classification = {
+                    category: 1.0 / len(categories) for category in categories
+                }
 
                 log_end(
                     logger,
@@ -640,7 +644,9 @@ class VertexAIService:
                 prompt=prompt,
                 model_id=model_id,
                 temperature=0.3,  # Lower temperature for more factual responses
-                max_tokens=max_length // 4 if max_length else None,  # Rough estimate of tokens from characters
+                max_tokens=(
+                    max_length // 4 if max_length else None
+                ),  # Rough estimate of tokens from characters
             )
 
             log_end(
@@ -742,5 +748,10 @@ class VertexAIService:
         """Get embeddings for a list of texts in batches."""
         start_time = time.time()
         embeddings = await self.generate_embeddings(texts, model_id)
-        log_end(logger, "batch_get_embeddings", start_time, {"embedding_count": len(embeddings)})
+        log_end(
+            logger,
+            "batch_get_embeddings",
+            start_time,
+            {"embedding_count": len(embeddings)},
+        )
         return embeddings

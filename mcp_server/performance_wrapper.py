@@ -30,10 +30,14 @@ with open(os.path.join(os.path.dirname(__file__), "config/performance.yaml"), "r
     PERF_CONFIG = yaml.safe_load(f)
 
 # Metrics
-request_latency = Histogram("mcp_request_duration_seconds", "Request latency", ["server", "endpoint"])
+request_latency = Histogram(
+    "mcp_request_duration_seconds", "Request latency", ["server", "endpoint"]
+)
 cache_hits = Counter("mcp_cache_hits_total", "Cache hits", ["cache_name"])
 cache_misses = Counter("mcp_cache_misses_total", "Cache misses", ["cache_name"])
-connection_pool_size = Gauge("mcp_connection_pool_size", "Connection pool size", ["pool_name"])
+connection_pool_size = Gauge(
+    "mcp_connection_pool_size", "Connection pool size", ["pool_name"]
+)
 
 # Initialize caches
 memory_cache = Cache(Cache.MEMORY, serializer=PickleSerializer())
@@ -135,7 +139,9 @@ def timed(server: str, endpoint: str):
                 return result
             finally:
                 duration = time.time() - start_time
-                request_latency.labels(server=server, endpoint=endpoint).observe(duration)
+                request_latency.labels(server=server, endpoint=endpoint).observe(
+                    duration
+                )
 
         return wrapper
 
@@ -181,7 +187,9 @@ class ConnectionPool:
 class BatchProcessor:
     """Batch processing for better performance"""
 
-    def __init__(self, process_func: Callable, max_batch_size: int = 100, timeout: float = 0.1):
+    def __init__(
+        self, process_func: Callable, max_batch_size: int = 100, timeout: float = 0.1
+    ):
         self.process_func = process_func
         self.max_batch_size = max_batch_size
         self.timeout = timeout
@@ -293,4 +301,12 @@ def optimize_app(app, server_name: str):
 
 
 # Export optimization utilities
-__all__ = ["cached", "rate_limited", "timed", "ConnectionPool", "BatchProcessor", "optimize_app", "init_redis_cache"]
+__all__ = [
+    "cached",
+    "rate_limited",
+    "timed",
+    "ConnectionPool",
+    "BatchProcessor",
+    "optimize_app",
+    "init_redis_cache",
+]

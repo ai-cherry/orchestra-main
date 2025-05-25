@@ -52,7 +52,9 @@ def handle_query():
     data = request.json
     user_id = data.get("user_id")
     query = data.get("query", "")
-    logger.info("User query received", extra={"user_id": user_id, "query_length": len(query)})
+    logger.info(
+        "User query received", extra={"user_id": user_id, "query_length": len(query)}
+    )
     return {"status": "ok"}
 
 
@@ -64,12 +66,20 @@ def call_llm():
         model = data.get("model", "gpt-3.5-turbo")
 
         # Use litellm for LLM API calls
-        response = litellm.completion(model=model, messages=[{"role": "user", "content": prompt}])
+        response = litellm.completion(
+            model=model, messages=[{"role": "user", "content": prompt}]
+        )
 
         logger.info("LLM API call successful", extra={"model": model})
-        return jsonify({"status": "success", "response": response.choices[0].message.content})
+        return jsonify(
+            {"status": "success", "response": response.choices[0].message.content}
+        )
     except Exception as e:
-        logger.error("LLM API call failed", exc_info=False, extra={"api_endpoint": model, "error": str(e)})
+        logger.error(
+            "LLM API call failed",
+            exc_info=False,
+            extra={"api_endpoint": model, "error": str(e)},
+        )
         return jsonify({"error": "LLM API call failed"}), 500
 
 
@@ -107,7 +117,11 @@ def handle_exception(e):
         logger.error(
             "Unhandled exception",
             exc_info=True,
-            extra={"path": request.path, "method": request.method, "remote_addr": request.remote_addr},
+            extra={
+                "path": request.path,
+                "method": request.method,
+                "remote_addr": request.remote_addr,
+            },
         )
         return jsonify({"error": str(e)}), 500
 

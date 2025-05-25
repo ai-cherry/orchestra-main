@@ -70,7 +70,9 @@ class VertexAIAgentBuilder:
                 self.GenerationConfig = GenerationConfig
                 self.ChatMessage = ChatMessage
             except ImportError:
-                logger.warning("Vertex AI libraries not available. Install with: pip install google-cloud-aiplatform")
+                logger.warning(
+                    "Vertex AI libraries not available. Install with: pip install google-cloud-aiplatform"
+                )
                 return False
 
             # Initialize Vertex AI client
@@ -115,7 +117,9 @@ class VertexAIAgentBuilder:
             logger.error(f"Failed to initialize Vertex AI Agent Builder: {e}")
             return False
 
-    async def create_agent(self, agent_config: Dict[str, Any], tools: List[Dict[str, Any]] = None) -> str:
+    async def create_agent(
+        self, agent_config: Dict[str, Any], tools: List[Dict[str, Any]] = None
+    ) -> str:
         """
         Create a new agent using Vertex AI Agent Builder.
 
@@ -164,7 +168,9 @@ class VertexAIAgentBuilder:
             logger.error(f"Error creating Vertex AI Agent: {e}")
             return None
 
-    async def deploy_agent(self, agent_id: str, deployment_name: str = "production") -> bool:
+    async def deploy_agent(
+        self, agent_id: str, deployment_name: str = "production"
+    ) -> bool:
         """
         Deploy an agent to a Vertex AI endpoint.
 
@@ -203,7 +209,9 @@ class VertexAIAgentBuilder:
             logger.error(f"Error deploying Vertex AI Agent: {e}")
             return False
 
-    async def run_agent(self, agent_id: str, prompt: str, parameters: Dict[str, Any] = None) -> Dict[str, Any]:
+    async def run_agent(
+        self, agent_id: str, prompt: str, parameters: Dict[str, Any] = None
+    ) -> Dict[str, Any]:
         """
         Run an agent with a prompt and optional parameters.
 
@@ -236,7 +244,9 @@ class VertexAIAgentBuilder:
             else:
                 # Get the deployed agent
                 deployment_name = agent_info["deployment"]["endpoint"]
-                conversation = self.Agent.get_deployed_agent(deployment_name).start_conversation()
+                conversation = self.Agent.get_deployed_agent(
+                    deployment_name
+                ).start_conversation()
 
             # Run the agent with the prompt
             response = conversation.send_message(message=prompt, tool_params=parameters)
@@ -244,7 +254,9 @@ class VertexAIAgentBuilder:
             # Process the response
             result = {
                 "text": response.text,
-                "tool_calls": response.tool_calls if hasattr(response, "tool_calls") else [],
+                "tool_calls": (
+                    response.tool_calls if hasattr(response, "tool_calls") else []
+                ),
             }
 
             # Add citation information if available
@@ -376,7 +388,9 @@ class VertexAIAgentBuilder:
                 parameters.append(vertex_param)
 
             # Define the function declaration
-            function_declaration = self.FunctionDeclaration(name=name, description=description, parameters=parameters)
+            function_declaration = self.FunctionDeclaration(
+                name=name, description=description, parameters=parameters
+            )
 
             # Create the tool with function declaration
             tool = self.Tool(function_declarations=[function_declaration])
@@ -413,7 +427,9 @@ class VertexAIAgentBuilder:
             if "deployment" in agent_info:
                 # Get the deployed agent
                 deployment_name = agent_info["deployment"]["endpoint"]
-                conversation = self.Agent.get_deployed_agent(deployment_name).start_conversation()
+                conversation = self.Agent.get_deployed_agent(
+                    deployment_name
+                ).start_conversation()
             else:
                 # Create a conversation using the agent directly
                 conversation = vertex_agent.start_conversation()

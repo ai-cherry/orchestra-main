@@ -20,7 +20,10 @@ from typing import Any, Dict
 # Add parent directories to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from mcp_server.config.dragonfly_config import log_dragonfly_config, validate_dragonfly_config
+from mcp_server.config.dragonfly_config import (
+    log_dragonfly_config,
+    validate_dragonfly_config,
+)
 from mcp_server.memory.base import MemoryEntry, MemoryMetadata
 from mcp_server.memory.dragonfly_cache import DragonflyCache
 
@@ -82,7 +85,10 @@ class DragonflyConnectionTest:
 
             if initialized:
                 print(f"✅ Connected successfully (init time: {init_time:.2f}ms)")
-                self.test_results["connection"] = {"status": "success", "init_time_ms": init_time}
+                self.test_results["connection"] = {
+                    "status": "success",
+                    "init_time_ms": init_time,
+                }
                 return True
             else:
                 print("❌ Failed to initialize connection")
@@ -102,8 +108,13 @@ class DragonflyConnectionTest:
             # Create/Save test
             test_entry = MemoryEntry(
                 key="test_key_1",
-                content={"message": "Hello DragonflyDB!", "timestamp": datetime.utcnow().isoformat()},
-                metadata=MemoryMetadata(tags=["test", "crud"], source="test_script", ttl_seconds=300),  # 5 minutes
+                content={
+                    "message": "Hello DragonflyDB!",
+                    "timestamp": datetime.utcnow().isoformat(),
+                },
+                metadata=MemoryMetadata(
+                    tags=["test", "crud"], source="test_script", ttl_seconds=300
+                ),  # 5 minutes
             )
 
             start = time.time()
@@ -188,7 +199,9 @@ class DragonflyConnectionTest:
             batch_save_time = (time.time() - start) * 1000
 
             success_count = sum(1 for success in save_results.values() if success)
-            print(f"  ✅ Batch save: {success_count}/100 succeeded ({batch_save_time:.2f}ms)")
+            print(
+                f"  ✅ Batch save: {success_count}/100 succeeded ({batch_save_time:.2f}ms)"
+            )
             print(f"     Rate: {(100 / (batch_save_time / 1000)):.0f} ops/sec")
 
             results["batch_save"] = {
@@ -304,7 +317,11 @@ class DragonflyConnectionTest:
 
             print(f"  📊 Throughput: {throughput:.0f} ops/sec")
 
-            results["throughput"] = {"ops_per_sec": throughput, "total_ops": 1000, "duration_sec": duration}
+            results["throughput"] = {
+                "ops_per_sec": throughput,
+                "total_ops": 1000,
+                "duration_sec": duration,
+            }
 
             # Cleanup
             await self.cache.clear(prefix="perf_test_")
@@ -383,7 +400,13 @@ class DragonflyConnectionTest:
         """Clean up test data and close connections."""
         try:
             # Clear all test data
-            prefixes = ["test_", "batch_test_", "perf_test_", "throughput_test_", "pool_test_"]
+            prefixes = [
+                "test_",
+                "batch_test_",
+                "perf_test_",
+                "throughput_test_",
+                "pool_test_",
+            ]
             for prefix in prefixes:
                 await self.cache.clear(prefix=prefix)
 
@@ -416,7 +439,8 @@ async def main():
 
         # Overall status
         all_passed = all(
-            result.get("status") == "success" or (isinstance(result, dict) and not result.get("error"))
+            result.get("status") == "success"
+            or (isinstance(result, dict) and not result.get("error"))
             for result in results.values()
             if isinstance(result, dict)
         )

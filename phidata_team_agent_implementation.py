@@ -73,7 +73,9 @@ class PhidataAgentWrapper:
 
         # Extract team-level settings
         team_name = team_config.get("name", "HN Analysis Team")
-        team_mode = team_config.get("team_mode", "coordinate")  # "coordinate", "collaborate", etc.
+        team_mode = team_config.get(
+            "team_mode", "coordinate"
+        )  # "coordinate", "collaborate", etc.
         team_model_ref = team_config.get("team_model_ref")
         team_instructions = team_config.get("team_instructions", [])
         team_success_criteria = team_config.get("team_success_criteria", "")
@@ -83,11 +85,17 @@ class PhidataAgentWrapper:
         cloudsql_config = team_config.get("cloudsql_config", {})
 
         # Initialize team-level storage and memory
-        storage_table = team_config.get("storage", {}).get("table_name", f"{self.id}_storage")
-        memory_table = team_config.get("memory", {}).get("table_name", f"{self.id}_memory")
+        storage_table = team_config.get("storage", {}).get(
+            "table_name", f"{self.id}_storage"
+        )
+        memory_table = team_config.get("memory", {}).get(
+            "table_name", f"{self.id}_memory"
+        )
 
         # Set up PgAgentStorage for conversation history
-        self.agent_storage = get_pg_agent_storage(agent_id=self.id, config=cloudsql_config, table_name=storage_table)
+        self.agent_storage = get_pg_agent_storage(
+            agent_id=self.id, config=cloudsql_config, table_name=storage_table
+        )
         logger.info(f"Initialized team storage with table: {storage_table}")
 
         # Set up PgVector for memory/knowledge
@@ -101,7 +109,9 @@ class PhidataAgentWrapper:
         # Get the members list from configuration
         members_config = team_config.get("members", [])
         if not members_config:
-            raise ValueError("PhidataAgentWrapper with Team requires 'members' in config")
+            raise ValueError(
+                "PhidataAgentWrapper with Team requires 'members' in config"
+            )
 
         # Initialize each team member agent
         members = []
@@ -112,14 +122,18 @@ class PhidataAgentWrapper:
             instructions = member_config.get("instructions", [])
 
             # Get member's model reference, use team's default if not specified
-            member_llm_ref = member_config.get("llm_ref", team_config.get("default_llm_ref"))
+            member_llm_ref = member_config.get(
+                "llm_ref", team_config.get("default_llm_ref")
+            )
 
             if not name:
                 logger.warning("Member config missing required 'name' field, skipping")
                 continue
 
             if not member_llm_ref:
-                logger.warning(f"Member '{name}' missing llm_ref and no default_llm_ref provided, skipping")
+                logger.warning(
+                    f"Member '{name}' missing llm_ref and no default_llm_ref provided, skipping"
+                )
                 continue
 
             try:
@@ -127,11 +141,17 @@ class PhidataAgentWrapper:
                 member_model = self._get_llm_model(member_llm_ref)
 
                 # Initialize member-specific tools
-                member_tools = self._init_member_tools(member_config.get("tools", []), name)
+                member_tools = self._init_member_tools(
+                    member_config.get("tools", []), name
+                )
 
                 # Set up member-specific storage and memory if configured
-                member_storage = self._init_member_storage(member_config, name, cloudsql_config)
-                member_memory = self._init_member_memory(member_config, name, cloudsql_config)
+                member_storage = self._init_member_storage(
+                    member_config, name, cloudsql_config
+                )
+                member_memory = self._init_member_memory(
+                    member_config, name, cloudsql_config
+                )
 
                 # Create the Agent instance for this team member
                 member_agent = Agent(
@@ -176,7 +196,9 @@ class PhidataAgentWrapper:
             memory=self.agent_memory,
         )
 
-        logger.info(f"Successfully initialized Phidata Team '{team_name}' with {len(members)} members")
+        logger.info(
+            f"Successfully initialized Phidata Team '{team_name}' with {len(members)} members"
+        )
 
     def _get_llm_model(self, model_ref: str) -> Any:
         """
@@ -213,7 +235,9 @@ class PhidataAgentWrapper:
                 tool_name = tool_config.get("name")
 
                 if not tool_type:
-                    logger.warning(f"Skipping tool config without 'type' for member '{member_name}'")
+                    logger.warning(
+                        f"Skipping tool config without 'type' for member '{member_name}'"
+                    )
                     continue
 
                 # Handle tools from the registry
@@ -225,7 +249,9 @@ class PhidataAgentWrapper:
                         phidata_tool = orchestra_tool.to_phidata_tool(**tool_params)
                         if phidata_tool:
                             member_tools.append(phidata_tool)
-                            logger.info(f"Added registry tool '{tool_id}' to member '{member_name}'")
+                            logger.info(
+                                f"Added registry tool '{tool_id}' to member '{member_name}'"
+                            )
                     continue
 
                 # Handle direct tool class references
@@ -242,12 +268,16 @@ class PhidataAgentWrapper:
                 logger.info(f"Added tool '{tool_type}' to member '{member_name}'")
 
             except Exception as e:
-                logger.error(f"Failed to initialize tool for member '{member_name}': {e}")
+                logger.error(
+                    f"Failed to initialize tool for member '{member_name}': {e}"
+                )
                 # Continue with other tools even if one fails
 
         return member_tools
 
-    def _init_member_storage(self, member_config: Dict, member_name: str, cloudsql_config: Dict) -> Any:
+    def _init_member_storage(
+        self, member_config: Dict, member_name: str, cloudsql_config: Dict
+    ) -> Any:
         """
         Initialize member-specific storage or use team's shared storage.
 
@@ -264,7 +294,9 @@ class PhidataAgentWrapper:
 
         # Set up member-specific storage if configured
         if "storage" in member_config:
-            storage_table = member_config["storage"].get("table_name", f"{member_name.lower()}_storage")
+            storage_table = member_config["storage"].get(
+                "table_name", f"{member_name.lower()}_storage"
+            )
 
             try:
                 storage = get_pg_agent_storage(
@@ -274,13 +306,17 @@ class PhidataAgentWrapper:
                 )
                 logger.info(f"Initialized member-specific storage for '{member_name}'")
             except Exception as e:
-                logger.error(f"Failed to initialize storage for member '{member_name}': {e}")
+                logger.error(
+                    f"Failed to initialize storage for member '{member_name}': {e}"
+                )
                 # Fall back to team storage
                 storage = self.agent_storage
 
         return storage
 
-    def _init_member_memory(self, member_config: Dict, member_name: str, cloudsql_config: Dict) -> Any:
+    def _init_member_memory(
+        self, member_config: Dict, member_name: str, cloudsql_config: Dict
+    ) -> Any:
         """
         Initialize member-specific memory or use team's shared memory.
 
@@ -297,7 +333,9 @@ class PhidataAgentWrapper:
 
         # Set up member-specific memory if configured
         if "memory" in member_config:
-            memory_table = member_config["memory"].get("table_name", f"{member_name.lower()}_memory")
+            memory_table = member_config["memory"].get(
+                "table_name", f"{member_name.lower()}_memory"
+            )
 
             try:
                 memory = get_pgvector_memory(
@@ -307,7 +345,9 @@ class PhidataAgentWrapper:
                 )
                 logger.info(f"Initialized member-specific memory for '{member_name}'")
             except Exception as e:
-                logger.error(f"Failed to initialize memory for member '{member_name}': {e}")
+                logger.error(
+                    f"Failed to initialize memory for member '{member_name}': {e}"
+                )
                 # Fall back to team memory
                 memory = self.agent_memory
 

@@ -85,7 +85,9 @@ def check_docker_buildkit_support() -> bool:
     try:
         import subprocess
 
-        result = subprocess.run(["docker", "--version"], capture_output=True, text=True, check=True)
+        result = subprocess.run(
+            ["docker", "--version"], capture_output=True, text=True, check=True
+        )
         version_str = result.stdout
 
         # Parse version string
@@ -216,10 +218,14 @@ def init_providers(providers: Optional[List[str]] = None) -> bool:
             try:
                 import litellm
 
-                litellm.set_verbose = os.environ.get("LITELLM_VERBOSE", "false").lower() == "true"
+                litellm.set_verbose = (
+                    os.environ.get("LITELLM_VERBOSE", "false").lower() == "true"
+                )
                 logger.info("LiteLLM initialized successfully")
             except ImportError:
-                logger.warning("LiteLLM not available. Install with: pip install litellm")
+                logger.warning(
+                    "LiteLLM not available. Install with: pip install litellm"
+                )
                 success = False
             except Exception as e:
                 logger.error(f"Error initializing LiteLLM: {str(e)}")
@@ -232,7 +238,9 @@ def init_providers(providers: Optional[List[str]] = None) -> bool:
 
                 logger.info("Portkey initialized successfully")
             except ImportError:
-                logger.warning("Portkey not available. Install with: pip install portkey-ai")
+                logger.warning(
+                    "Portkey not available. Install with: pip install portkey-ai"
+                )
                 # Not critical, don't set success to False
             except Exception as e:
                 logger.error(f"Error initializing Portkey: {str(e)}")
@@ -253,7 +261,9 @@ def init_providers(providers: Optional[List[str]] = None) -> bool:
 
                 logger.info("OpenRouter initialized successfully")
             except ImportError:
-                logger.warning("OpenRouter not available. Install with: pip install openrouter")
+                logger.warning(
+                    "OpenRouter not available. Install with: pip install openrouter"
+                )
                 # Not critical, don't set success to False
             except Exception as e:
                 logger.error(f"Error initializing OpenRouter: {str(e)}")
@@ -329,10 +339,16 @@ def init_circuit_breaker() -> bool:
             try:
                 import prometheus_client
 
-                prometheus_client.start_http_server(port=int(os.environ.get("METRICS_PORT", "8000")))
-                logger.info(f"Prometheus metrics server started on port {os.environ.get('METRICS_PORT', '8000')}")
+                prometheus_client.start_http_server(
+                    port=int(os.environ.get("METRICS_PORT", "8000"))
+                )
+                logger.info(
+                    f"Prometheus metrics server started on port {os.environ.get('METRICS_PORT', '8000')}"
+                )
             except ImportError:
-                logger.warning("Prometheus client not available. Metrics server not started.")
+                logger.warning(
+                    "Prometheus client not available. Metrics server not started."
+                )
             except Exception as e:
                 logger.error(f"Error starting Prometheus metrics server: {str(e)}")
 
@@ -384,12 +400,16 @@ def validate_poetry_install() -> bool:
     try:
         import subprocess
 
-        result = subprocess.run(["poetry", "env", "info"], capture_output=True, text=True, check=True)
+        result = subprocess.run(
+            ["poetry", "env", "info"], capture_output=True, text=True, check=True
+        )
 
         logger.info("Poetry environment is available")
 
         # Check for the existence of our custom dependency groups
-        result = subprocess.run(["poetry", "show", "--tree"], capture_output=True, text=True)
+        result = subprocess.run(
+            ["poetry", "show", "--tree"], capture_output=True, text=True
+        )
 
         # List of packages that should be present
         required_packages = [
@@ -435,7 +455,9 @@ def validate_llm_environment() -> bool:
         buildkit_supported = check_docker_buildkit_support()
         if not buildkit_supported:
             logger.warning("Docker BuildKit not supported. Container builds may fail.")
-            logger.warning("Set DOCKER_BUILDKIT=1 environment variable before building.")
+            logger.warning(
+                "Set DOCKER_BUILDKIT=1 environment variable before building."
+            )
             # This is not critical for runtime, so don't set success to False
 
     # Check required environment variables
@@ -443,19 +465,25 @@ def validate_llm_environment() -> bool:
     if not env_success:
         for provider, vars in missing_vars.items():
             vars_str = ", ".join(vars)
-            logger.error(f"Missing required environment variables for {provider}: {vars_str}")
+            logger.error(
+                f"Missing required environment variables for {provider}: {vars_str}"
+            )
         success = False
 
     # Check optional environment variables
     missing_optional = check_optional_environment_variables()
     for provider, vars in missing_optional.items():
         vars_str = ", ".join(vars)
-        logger.warning(f"Missing optional environment variables for {provider}: {vars_str}")
+        logger.warning(
+            f"Missing optional environment variables for {provider}: {vars_str}"
+        )
 
     # Validate Poetry install
     poetry_success = validate_poetry_install()
     if not poetry_success:
-        logger.warning("Poetry environment validation failed. Some features may not work.")
+        logger.warning(
+            "Poetry environment validation failed. Some features may not work."
+        )
         # Not critical for runtime if dependencies were installed through other means
 
     # Initialize providers

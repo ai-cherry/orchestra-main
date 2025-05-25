@@ -108,7 +108,9 @@ class PersonaAwareAgent(Agent):
         interaction_style = persona.interaction_style or "formal"
 
         # Style the response based on the persona's interaction style
-        styled_response = self._apply_interaction_style(base_response, interaction_style)
+        styled_response = self._apply_interaction_style(
+            base_response, interaction_style
+        )
 
         # Apply trait-specific templates
         final_response = self._apply_trait_template(styled_response, persona_traits)
@@ -176,7 +178,9 @@ class PersonaAwareAgent(Agent):
         expertise = persona.background or "general knowledge"
 
         if "tech" in expertise.lower() or "software" in expertise.lower():
-            response = f"Based on my technical background, I can share insights about {topic}."
+            response = (
+                f"Based on my technical background, I can share insights about {topic}."
+            )
         elif "creative" in expertise.lower() or "art" in expertise.lower():
             response = f"From a creative perspective, there are many interesting aspects to {topic}."
         elif "business" in expertise.lower() or "finance" in expertise.lower():
@@ -223,7 +227,9 @@ class PersonaAwareAgent(Agent):
             trait = random.choice(available_traits).lower()
 
         # Select a random template for the trait
-        templates = self.response_templates.get(trait, self.response_templates["helpful"])
+        templates = self.response_templates.get(
+            trait, self.response_templates["helpful"]
+        )
         template = random.choice(templates)
 
         # Apply the template
@@ -316,9 +322,7 @@ class DomainSpecificAgent(PersonaAwareAgent):
         if self.domain != "general":
             # In a real implementation, this would access domain-specific
             # knowledge bases, APIs, or specialized models
-            domain_addition = (
-                f" In the {self.domain} domain, we often consider additional factors specific to this field."
-            )
+            domain_addition = f" In the {self.domain} domain, we often consider additional factors specific to this field."
 
             # Update the response
             enhanced_text = f"{base_response.text} {domain_addition}"
@@ -386,7 +390,9 @@ class DomainSpecificAgent(PersonaAwareAgent):
 
 
 # Factory function to create specialized agents
-def create_specialized_agent(agent_type: str, config: Optional[Dict[str, Any]] = None) -> Agent:
+def create_specialized_agent(
+    agent_type: str, config: Optional[Dict[str, Any]] = None
+) -> Agent:
     """
     Create a specialized agent based on type and configuration.
 

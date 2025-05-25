@@ -46,8 +46,12 @@ def patch_module():
         import core.orchestrator.src.main
 
         # Print debug info
-        print(f"DEBUG: Environment would set RECOVERY_MODE={core.orchestrator.src.main.RECOVERY_MODE}")
-        print(f"DEBUG: Environment would set STANDARD_MODE={core.orchestrator.src.main.STANDARD_MODE}")
+        print(
+            f"DEBUG: Environment would set RECOVERY_MODE={core.orchestrator.src.main.RECOVERY_MODE}"
+        )
+        print(
+            f"DEBUG: Environment would set STANDARD_MODE={core.orchestrator.src.main.STANDARD_MODE}"
+        )
 
         # Force override the mode
         core.orchestrator.src.main.RECOVERY_MODE = False
@@ -59,7 +63,9 @@ def patch_module():
         print(f"Warning: Could not import core.orchestrator.src.main module: {e}")
         print("Will continue with environment variables only.")
 
-    print("тЪая╕П APPLYING HARD OVERRIDE: Forcing standard mode and disabling recovery mode!")
+    print(
+        "тЪая╕П APPLYING HARD OVERRIDE: Forcing standard mode and disabling recovery mode!"
+    )
 
 
 # Always run when imported

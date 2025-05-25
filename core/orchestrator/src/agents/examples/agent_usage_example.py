@@ -35,7 +35,9 @@ class CalculatorTool(Tool):
 
     def __init__(self):
         """Initialize the calculator tool."""
-        super().__init__(name="calculator", description="Perform basic arithmetic calculations")
+        super().__init__(
+            name="calculator", description="Perform basic arithmetic calculations"
+        )
 
     async def execute(self, expression: str) -> float:
         """
@@ -70,7 +72,9 @@ class WeatherTool(Tool):
 
     def __init__(self):
         """Initialize the weather tool."""
-        super().__init__(name="weather", description="Get weather information for a location")
+        super().__init__(
+            name="weather", description="Get weather information for a location"
+        )
 
     async def execute(self, location: str) -> Dict[str, Any]:
         """
@@ -114,7 +118,9 @@ class ExampleToolUsingAgent(ToolUsingAgent, StatefulAgent):
         StatefulAgent.__init__(self, config)
         ToolUsingAgent.__init__(self, tools=[CalculatorTool(), WeatherTool()])
 
-    async def process_with_state(self, context: AgentContext) -> tuple[AgentResponse, Any]:
+    async def process_with_state(
+        self, context: AgentContext
+    ) -> tuple[AgentResponse, Any]:
         """
         Process user input with tools and state.
 
@@ -228,7 +234,9 @@ class ExampleObservableAgent(ObservableAgent):
             "Generic error handler for all other exceptions",
         )
 
-    async def _handle_value_error(self, context: AgentContext, error: Exception) -> AgentResponse:
+    async def _handle_value_error(
+        self, context: AgentContext, error: Exception
+    ) -> AgentResponse:
         """
         Handle value errors.
 
@@ -245,7 +253,9 @@ class ExampleObservableAgent(ObservableAgent):
             metadata={"error": str(error), "error_type": "ValueError", "handled": True},
         )
 
-    async def _handle_generic_error(self, context: AgentContext, error: Exception) -> AgentResponse:
+    async def _handle_generic_error(
+        self, context: AgentContext, error: Exception
+    ) -> AgentResponse:
         """
         Handle generic errors.
 

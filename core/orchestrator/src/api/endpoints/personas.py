@@ -52,7 +52,9 @@ async def reload_personas() -> dict:
             "personas": list(personas.keys()),
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to reload personas: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to reload personas: {str(e)}"
+        )
 
 
 @router.get("/{name}", response_model=PersonaConfig)
@@ -76,7 +78,9 @@ async def get_persona(name: str) -> PersonaConfig:
 
 
 @router.post("/", status_code=201)
-async def create_persona(persona_config: PersonaConfig, settings: Settings = Depends(get_settings)):
+async def create_persona(
+    persona_config: PersonaConfig, settings: Settings = Depends(get_settings)
+):
     """
     Create a new persona with the provided configuration.
 
@@ -99,10 +103,14 @@ async def create_persona(persona_config: PersonaConfig, settings: Settings = Dep
     # Check if the persona already exists
     personas = load_persona_configs()
     if name_lower in personas:
-        raise HTTPException(status_code=409, detail=f"Persona '{persona_config.name}' already exists")
+        raise HTTPException(
+            status_code=409, detail=f"Persona '{persona_config.name}' already exists"
+        )
 
     # Get the persona file path
-    persona_dir = os.path.dirname(os.path.join(os.path.dirname(__file__), "../../config/personas.yaml"))
+    persona_dir = os.path.dirname(
+        os.path.join(os.path.dirname(__file__), "../../config/personas.yaml")
+    )
 
     # Ensure the persona directory exists
     os.makedirs(persona_dir, exist_ok=True)
@@ -141,7 +149,9 @@ async def create_persona(persona_config: PersonaConfig, settings: Settings = Dep
 
 
 @router.post("/{name}/update", status_code=200)
-async def update_persona(name: str, persona_config: PersonaConfig, settings: Settings = Depends(get_settings)):
+async def update_persona(
+    name: str, persona_config: PersonaConfig, settings: Settings = Depends(get_settings)
+):
     """
     Update a persona configuration by writing changes to the corresponding YAML file.
 
@@ -164,7 +174,9 @@ async def update_persona(name: str, persona_config: PersonaConfig, settings: Set
         raise HTTPException(status_code=404, detail=f"Persona '{name}' not found")
 
     # Get the persona file path
-    persona_dir = os.path.dirname(os.path.join(os.path.dirname(__file__), "../../config/personas.yaml"))
+    persona_dir = os.path.dirname(
+        os.path.join(os.path.dirname(__file__), "../../config/personas.yaml")
+    )
     yaml_path = os.path.join(persona_dir, "personas.yaml")
 
     # Ensure the persona name in the config matches the requested name
@@ -191,7 +203,9 @@ async def update_persona(name: str, persona_config: PersonaConfig, settings: Set
             "message": f"Persona '{name}' has been updated successfully",
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to update persona '{name}': {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to update persona '{name}': {str(e)}"
+        )
 
 
 @router.delete("/{name}", status_code=status.HTTP_200_OK)
@@ -217,7 +231,9 @@ async def delete_persona(name: str, settings: Settings = Depends(get_settings)):
         raise HTTPException(status_code=404, detail=f"Persona '{name}' not found")
 
     # Get the persona file path
-    persona_dir = os.path.dirname(os.path.join(os.path.dirname(__file__), "../../config/personas.yaml"))
+    persona_dir = os.path.dirname(
+        os.path.join(os.path.dirname(__file__), "../../config/personas.yaml")
+    )
     yaml_path = os.path.join(persona_dir, "personas.yaml")
 
     try:
@@ -250,4 +266,6 @@ async def delete_persona(name: str, settings: Settings = Depends(get_settings)):
         # Re-raise HTTP exceptions
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to delete persona '{name}': {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to delete persona '{name}': {str(e)}"
+        )

@@ -83,7 +83,9 @@ async def run_agent_task(
         )
 
         # Add the agent run to background tasks
-        background_tasks.add_task(_execute_agent_task, agent=agent, context=request.context, task_id=task_id)
+        background_tasks.add_task(
+            _execute_agent_task, agent=agent, context=request.context, task_id=task_id
+        )
 
         return {"status": "Task started", "agent_name": agent_name, "task_id": task_id}
 
@@ -95,7 +97,9 @@ async def run_agent_task(
     except Exception as e:
         # Other unexpected errors
         logger.error(f"Error starting agent task: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Failed to start agent task: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to start agent task: {str(e)}"
+        )
 
 
 async def _execute_agent_task(agent, context: Dict[str, Any], task_id: str) -> None:
@@ -114,11 +118,15 @@ async def _execute_agent_task(agent, context: Dict[str, Any], task_id: str) -> N
     try:
         # Execute the agent
         result = await agent.run(context)
-        logger.info(f"Agent task {task_id} completed successfully: {result.get('status', 'unknown')}")
+        logger.info(
+            f"Agent task {task_id} completed successfully: {result.get('status', 'unknown')}"
+        )
 
     except Exception as e:
         logger.error(f"Agent task {task_id} failed with error: {str(e)}", exc_info=True)
-        logger.warning(f"Failure of agent task {task_id} may affect dependent processes or results.")
+        logger.warning(
+            f"Failure of agent task {task_id} may affect dependent processes or results."
+        )
 
     finally:
         # Ensure agent is properly shut down
@@ -127,4 +135,6 @@ async def _execute_agent_task(agent, context: Dict[str, Any], task_id: str) -> N
             logger.debug(f"Agent {agent.name} shut down after task {task_id}")
         except Exception as e:
             logger.warning(f"Error shutting down agent: {str(e)}", exc_info=True)
-            logger.warning(f"Agent shutdown failure for {agent.name} may lead to resource leaks.")
+            logger.warning(
+                f"Agent shutdown failure for {agent.name} may lead to resource leaks."
+            )

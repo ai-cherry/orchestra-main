@@ -74,12 +74,16 @@ class SecretManager:
                     # Try to get project ID from credentials
                     _, project_id = default()
                     self.project_id = project_id
-                logger.info(f"Secret Manager initialized with project: {self.project_id}")
+                logger.info(
+                    f"Secret Manager initialized with project: {self.project_id}"
+                )
             except Exception as e:
                 logger.warning(f"Failed to initialize Secret Manager client: {str(e)}")
                 logger.warning("Will fall back to environment variables for secrets")
         else:
-            logger.warning("Google Cloud libraries not available. Using environment variables.")
+            logger.warning(
+                "Google Cloud libraries not available. Using environment variables."
+            )
             logger.warning("Install with: pip install google-cloud-secretmanager")
 
     def get_secret(self, secret_id: str, version: str = "latest") -> Optional[str]:
@@ -101,7 +105,9 @@ class SecretManager:
         # First try Secret Manager if available
         if self.client and self.project_id:
             try:
-                secret_path = f"projects/{self.project_id}/secrets/{secret_id}/versions/{version}"
+                secret_path = (
+                    f"projects/{self.project_id}/secrets/{secret_id}/versions/{version}"
+                )
                 response = self.client.access_secret_version(name=secret_path)
                 secret_value = response.payload.data.decode("UTF-8")
 
@@ -121,7 +127,9 @@ class SecretManager:
             self._add_to_cache(secret_id, version, env_value)
             return env_value
 
-        logger.warning(f"Secret {secret_id} not found in Secret Manager or environment variables")
+        logger.warning(
+            f"Secret {secret_id} not found in Secret Manager or environment variables"
+        )
         return None
 
     def _add_to_cache(self, secret_id: str, version: str, value: str) -> None:

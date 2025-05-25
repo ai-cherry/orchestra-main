@@ -2,7 +2,7 @@ This file marks a known stable dev container configuration as of April 20, 2025.
 DO NOT DELETE THIS FILE - it serves as a reference point.
 
 Key stability factors:
-- Using python:3.11-slim-bullseye base image
+- Using python:3.10-slim-bullseye base image
 - Minimal system dependencies
 - No Docker-related extensions
 - Simple setup.sh with basic operations only

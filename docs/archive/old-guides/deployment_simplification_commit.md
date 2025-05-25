@@ -20,7 +20,7 @@ and enhanced Docker security with multi-stage builds and non-root user.
   - Builder stage: compiles dependencies with gcc
   - Final stage: minimal runtime without build tools
 - Added non-root user (appuser) for security
-- Updated to specific base image: python:3.11-slim-bullseye
+- Updated to specific base image: python:3.10-slim-bullseye
 - Optimized layer caching and reduced image size
 
 ### Cleanup

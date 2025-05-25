@@ -27,7 +27,9 @@ class ServiceRegistry:
     def __init__(self):
         """Initialize the service registry."""
         self._services: List[Any] = []
-        self._service_ids: Set[int] = set()  # Track service object IDs to prevent duplicates
+        self._service_ids: Set[int] = (
+            set()
+        )  # Track service object IDs to prevent duplicates
         logger.debug("ServiceRegistry initialized")
 
     def register(self, service: Any) -> Any:
@@ -47,7 +49,9 @@ class ServiceRegistry:
 
         # Check if service is already registered
         if service_id in self._service_ids:
-            logger.warning(f"Service {service.__class__.__name__} is already registered")
+            logger.warning(
+                f"Service {service.__class__.__name__} is already registered"
+            )
             return service
 
         # Register the service
@@ -96,7 +100,9 @@ class ServiceRegistry:
                     service.initialize()
                     logger.debug(f"Initialized service: {service.__class__.__name__}")
                 except Exception as e:
-                    logger.error(f"Failed to initialize service {service.__class__.__name__}: {e}")
+                    logger.error(
+                        f"Failed to initialize service {service.__class__.__name__}: {e}"
+                    )
                     # Don't re-raise, we want to try initializing all services
 
     def close_all(self) -> List[str]:
@@ -119,7 +125,9 @@ class ServiceRegistry:
                     service.close()
                     logger.debug(f"Closed service: {service.__class__.__name__}")
                 except Exception as e:
-                    error_msg = f"Failed to close service {service.__class__.__name__}: {e}"
+                    error_msg = (
+                        f"Failed to close service {service.__class__.__name__}: {e}"
+                    )
                     logger.error(error_msg)
                     errors.append(error_msg)
 

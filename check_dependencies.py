@@ -16,7 +16,11 @@ import sys
 
 import pkg_resources
 
-REQUIREMENTS_FILES = ["requirements.txt", "orchestrator/requirements.txt", "codespaces_pip_requirements.txt"]
+REQUIREMENTS_FILES = [
+    "requirements.txt",
+    "orchestrator/requirements.txt",
+    "codespaces_pip_requirements.txt",
+]
 
 
 def find_requirements_file():
@@ -29,7 +33,9 @@ def find_requirements_file():
 
 def parse_requirements(req_file):
     with open(req_file, "r") as f:
-        lines = [line.strip() for line in f if line.strip() and not line.startswith("#")]
+        lines = [
+            line.strip() for line in f if line.strip() and not line.startswith("#")
+        ]
     return [pkg_resources.Requirement.parse(line) for line in lines]
 
 
@@ -57,8 +63,12 @@ def show_outdated():
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description="Validate pip dependencies against requirements.txt")
-    parser.add_argument("--show-outdated", action="store_true", help="List outdated packages")
+    parser = argparse.ArgumentParser(
+        description="Validate pip dependencies against requirements.txt"
+    )
+    parser.add_argument(
+        "--show-outdated", action="store_true", help="List outdated packages"
+    )
     args = parser.parse_args()
 
     req_file = find_requirements_file()

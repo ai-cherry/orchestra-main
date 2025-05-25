@@ -5,7 +5,7 @@ alwaysApply: false
 ---
 **Docker Best Practices:**
 
-1.  **Use Specific Base Image Versions:** Always pin base images to a specific version (e.g., `python:3.11-slim-bullseye`) instead of using `latest` or broad tags like `python:3.11`. This ensures reproducible builds.
+1.  **Use Specific Base Image Versions:** Always pin base images to a specific version (e.g., `python:3.10-slim-bullseye`) instead of using `latest` or broad tags like `python:3.10`. This ensures reproducible builds.
 2.  **Multi-Stage Builds:** Utilize multi-stage builds to keep production images small and secure. For example, have a build stage with all build-time dependencies (compilers, dev libraries) and a final runtime stage that only copies necessary artifacts and runtime dependencies.
 3.  **Minimize Layers:** Each `RUN`, `COPY`, and `ADD` instruction creates a layer. Consolidate commands where possible (e.g., use `&&` in `RUN` instructions to combine package installs and cleanup in a single layer).
 4.  **Non-Root User:** Run applications with a non-root user inside the container for enhanced security. Create a dedicated user and group, and use the `USER` instruction. Example:

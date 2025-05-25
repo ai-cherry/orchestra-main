@@ -14,7 +14,9 @@ from typing import Dict, List, Optional
 
 import requests
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger("pat_rotation")
 
 
@@ -61,7 +63,9 @@ class GitHubPATRotator:
             logger.error(f"Failed to create new token: {str(e)}")
             return None
 
-    def update_github_secret(self, repo_name: str, secret_name: str, secret_value: str) -> bool:
+    def update_github_secret(
+        self, repo_name: str, secret_name: str, secret_value: str
+    ) -> bool:
         """Update a GitHub repository secret with the new PAT.
 
         Args:
@@ -83,10 +87,14 @@ class GitHubPATRotator:
             # Use the public key to encrypt the secret
             from nacl import encoding, public
 
-            public_key = public.PublicKey(key_data["key"].encode("utf-8"), encoding.Base64Encoder())
+            public_key = public.PublicKey(
+                key_data["key"].encode("utf-8"), encoding.Base64Encoder()
+            )
             sealed_box = public.SealedBox(public_key)
             encrypted_secret = sealed_box.encrypt(secret_value.encode("utf-8"))
-            encrypted_secret_base64 = encoding.Base64Encoder.encode(encrypted_secret).decode("utf-8")
+            encrypted_secret_base64 = encoding.Base64Encoder.encode(
+                encrypted_secret
+            ).decode("utf-8")
 
             # Update the secret
             secret_endpoint = f"{self.api_base}/repos/{self.github_username}/{repo_name}/actions/secrets/{secret_name}"
@@ -95,7 +103,9 @@ class GitHubPATRotator:
                 "key_id": key_data["key_id"],
             }
 
-            secret_response = requests.put(secret_endpoint, headers=self.headers, json=secret_data)
+            secret_response = requests.put(
+                secret_endpoint, headers=self.headers, json=secret_data
+            )
             secret_response.raise_for_status()
             return True
         except Exception as e:
@@ -151,7 +161,9 @@ class GitHubPATRotator:
 
 def main():
     """Entry point for the script."""
-    parser = argparse.ArgumentParser(description="Rotate GitHub Personal Access Tokens safely")
+    parser = argparse.ArgumentParser(
+        description="Rotate GitHub Personal Access Tokens safely"
+    )
     parser.add_argument("--username", required=True, help="GitHub username")
     parser.add_argument(
         "--current-pat",
@@ -159,8 +171,12 @@ def main():
         help="Current GitHub PAT with sufficient permissions",
     )
     parser.add_argument("--token-name", required=True, help="Name for the new PAT")
-    parser.add_argument("--scopes", required=True, help="Comma-separated list of scopes for the new PAT")
-    parser.add_argument("--repos", required=True, help="Comma-separated list of repositories to update")
+    parser.add_argument(
+        "--scopes", required=True, help="Comma-separated list of scopes for the new PAT"
+    )
+    parser.add_argument(
+        "--repos", required=True, help="Comma-separated list of repositories to update"
+    )
     parser.add_argument(
         "--secret-name",
         default="GITHUB_PAT",

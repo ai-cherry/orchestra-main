@@ -82,7 +82,10 @@ async def get_tools() -> List[MCPToolDefinition]:
                 "properties": {
                     "bucket_name": {"type": "string", "description": "Bucket name"},
                     "object_name": {"type": "string", "description": "Object name"},
-                    "file": {"type": "string", "description": "File content (base64 or multipart)"},
+                    "file": {
+                        "type": "string",
+                        "description": "File content (base64 or multipart)",
+                    },
                 },
                 "required": ["bucket_name", "object_name", "file"],
             },
@@ -92,7 +95,9 @@ async def get_tools() -> List[MCPToolDefinition]:
             description="List all objects in a bucket",
             parameters={
                 "type": "object",
-                "properties": {"bucket_name": {"type": "string", "description": "Bucket name"}},
+                "properties": {
+                    "bucket_name": {"type": "string", "description": "Bucket name"}
+                },
                 "required": ["bucket_name"],
             },
         ),
@@ -140,7 +145,9 @@ async def list_buckets():
 
 
 @app.post("/mcp/storage/upload_object")
-async def upload_object(bucket_name: str, object_name: str, file: UploadFile = File(...)):
+async def upload_object(
+    bucket_name: str, object_name: str, file: UploadFile = File(...)
+):
     """Upload an object to a bucket."""
     if not storage_client:
         raise HTTPException(status_code=500, detail="Storage client not initialized")
@@ -148,7 +155,11 @@ async def upload_object(bucket_name: str, object_name: str, file: UploadFile = F
         bucket = storage_client.bucket(bucket_name)
         blob = bucket.blob(object_name)
         blob.upload_from_file(file.file)
-        return {"status": "success", "bucket_name": bucket_name, "object_name": object_name}
+        return {
+            "status": "success",
+            "bucket_name": bucket_name,
+            "object_name": object_name,
+        }
     except Exception as e:
         logger.error(f"Failed to upload object: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -177,9 +188,16 @@ async def delete_object(bucket_name: str, object_name: str):
         bucket = storage_client.bucket(bucket_name)
         blob = bucket.blob(object_name)
         blob.delete()
-        return {"status": "success", "bucket_name": bucket_name, "object_name": object_name}
+        return {
+            "status": "success",
+            "bucket_name": bucket_name,
+            "object_name": object_name,
+        }
     except NotFound:
-        raise HTTPException(status_code=404, detail=f"Object {object_name} not found in bucket {bucket_name}")
+        raise HTTPException(
+            status_code=404,
+            detail=f"Object {object_name} not found in bucket {bucket_name}",
+        )
     except Exception as e:
         logger.error(f"Failed to delete object: {e}")
         raise HTTPException(status_code=500, detail=str(e))

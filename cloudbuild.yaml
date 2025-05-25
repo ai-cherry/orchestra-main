@@ -17,12 +17,12 @@ steps:
         asdf install --all
 
   # 2. Install Python application dependencies
-  - name: "python:3.11"
+  - name: "python:3.10"
     entrypoint: "pip"
     args: ["install", "-r", "requirements.txt"]
 
   # 3. Run pre-commit checks
-  - name: "python:3.11"
+  - name: "python:3.10"
     entrypoint: "bash"
     args:
       - "-c"

@@ -200,7 +200,7 @@ subprocess.run(cmd, shell=True)  # Avoid shell=True
 - Multiple inheritance
 - Metaclasses
 - Abstract base classes for simple tasks
-- Python 3.11+ only features
+- Python 3.10+ only features
 
 ## 🔍 Quick Reference
 

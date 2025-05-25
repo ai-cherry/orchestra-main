@@ -97,7 +97,9 @@ class ConfigLoader(Generic[T]):
                     try:
                         self._create_default_config_file(file_path)
                     except Exception as create_error:
-                        logger.warning(f"Error creating default config file at {file_path}: {str(create_error)}")
+                        logger.warning(
+                            f"Error creating default config file at {file_path}: {str(create_error)}"
+                        )
 
         # Override with environment variables
         env_config = self._load_from_env_vars()
@@ -136,11 +138,15 @@ class ConfigLoader(Generic[T]):
                 elif file_extension == ".json":
                     return json.load(f)
                 else:
-                    logger.warning(f"Unsupported file extension for config: {file_extension}")
+                    logger.warning(
+                        f"Unsupported file extension for config: {file_extension}"
+                    )
                     return {}
         except Exception as e:
             logger.error(f"Error reading config file {file_path}: {str(e)}")
-            raise ConfigurationError(f"Failed to read config file {file_path}", original_error=e)
+            raise ConfigurationError(
+                f"Failed to read config file {file_path}", original_error=e
+            )
 
     def _load_from_env_vars(self) -> Dict[str, Any]:
         """
@@ -152,7 +158,11 @@ class ConfigLoader(Generic[T]):
         env_config = {}
 
         # Get model fields to know what to look for in env vars
-        model_fields = self.config_class.__fields__ if hasattr(self.config_class, "__fields__") else {}
+        model_fields = (
+            self.config_class.__fields__
+            if hasattr(self.config_class, "__fields__")
+            else {}
+        )
 
         for field_name, field in model_fields.items():
             # Convert from snake_case to UPPER_SNAKE_CASE with prefix

@@ -20,7 +20,9 @@ class MemoryFactory:
     """Factory for creating memory instances."""
 
     @staticmethod
-    def create_memory_from_config(config: Dict[str, Any]) -> Optional[LayeredMemoryManager]:
+    def create_memory_from_config(
+        config: Dict[str, Any]
+    ) -> Optional[LayeredMemoryManager]:
         """
         Create a memory manager from configuration.
 
@@ -78,7 +80,9 @@ class MemoryFactory:
         Returns:
             Initialized RedisMemory
         """
-        return RedisMemory(host=host, port=port, password=password, db=db, ttl=ttl, prefix=prefix)
+        return RedisMemory(
+            host=host, port=port, password=password, db=db, ttl=ttl, prefix=prefix
+        )
 
     @staticmethod
     def create_firestore_memory(
@@ -164,12 +168,20 @@ class MemoryFactory:
         # Add Firestore configuration
         firestore_config = {}
         if mid_term_config:
-            firestore_config["mid_term_collection"] = mid_term_config.get("collection_name", "orchestra_mid_term")
-            firestore_config["mid_term_ttl"] = mid_term_config.get("ttl", 86400)  # 1 day
+            firestore_config["mid_term_collection"] = mid_term_config.get(
+                "collection_name", "orchestra_mid_term"
+            )
+            firestore_config["mid_term_ttl"] = mid_term_config.get(
+                "ttl", 86400
+            )  # 1 day
 
         if long_term_config:
-            firestore_config["long_term_collection"] = long_term_config.get("collection_name", "orchestra_long_term")
-            firestore_config["long_term_ttl"] = long_term_config.get("ttl", 2592000)  # 30 days
+            firestore_config["long_term_collection"] = long_term_config.get(
+                "collection_name", "orchestra_long_term"
+            )
+            firestore_config["long_term_ttl"] = long_term_config.get(
+                "ttl", 2592000
+            )  # 30 days
 
         if firestore_config:
             config["firestore"] = firestore_config

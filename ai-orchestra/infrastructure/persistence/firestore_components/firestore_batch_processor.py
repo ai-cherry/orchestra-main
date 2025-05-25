@@ -38,16 +38,22 @@ class FirestoreBatchProcessor:
             collection_name: The name of the Firestore collection to operate on.
         """
         if not isinstance(firestore_client, FirestoreAsyncClient):
-            raise TypeError("firestore_client must be an instance of FirestoreAsyncClient.")
+            raise TypeError(
+                "firestore_client must be an instance of FirestoreAsyncClient."
+            )
         if not collection_name or not isinstance(collection_name, str):
             raise ValueError("collection_name must be a non-empty string.")
 
         self.client: FirestoreAsyncClient = firestore_client
         self.collection_name: str = collection_name
         self._collection_ref = self.client.collection(self.collection_name)
-        logger.info(f"FirestoreBatchProcessor initialized for collection: {self.collection_name}")
+        logger.info(
+            f"FirestoreBatchProcessor initialized for collection: {self.collection_name}"
+        )
 
-    async def _execute_batches(self, operations: List[Tuple[str, str, Optional[Dict[str, Any]]]]) -> Dict[str, int]:
+    async def _execute_batches(
+        self, operations: List[Tuple[str, str, Optional[Dict[str, Any]]]]
+    ) -> Dict[str, int]:
         """
         Internal helper to execute operations in batches.
 
@@ -90,7 +96,9 @@ class FirestoreBatchProcessor:
                 elif op_type == "delete":
                     batch.delete(doc_ref)
                 else:
-                    logger.warning(f"Unknown batch operation type '{op_type}' for item '{item_id}'. Skipping.")
+                    logger.warning(
+                        f"Unknown batch operation type '{op_type}' for item '{item_id}'. Skipping."
+                    )
                     continue
                 actual_ops_in_this_batch += 1
 
@@ -105,14 +113,26 @@ class FirestoreBatchProcessor:
                 )
             except GoogleAPIError as e:
                 failed_ops += actual_ops_in_this_batch
-                logger.error(f"Error committing a batch to '{self.collection_name}': {e}", exc_info=True)
+                logger.error(
+                    f"Error committing a batch to '{self.collection_name}': {e}",
+                    exc_info=True,
+                )
             except Exception as e:
                 failed_ops += actual_ops_in_this_batch
-                logger.error(f"Unexpected error committing a batch to '{self.collection_name}': {e}", exc_info=True)
+                logger.error(
+                    f"Unexpected error committing a batch to '{self.collection_name}': {e}",
+                    exc_info=True,
+                )
 
-        return {"successful": successful_ops, "failed": failed_ops, "total_attempted": num_operations}
+        return {
+            "successful": successful_ops,
+            "failed": failed_ops,
+            "total_attempted": num_operations,
+        }
 
-    async def batch_create_items(self, items_data: Dict[str, Dict[str, Any]]) -> Dict[str, int]:
+    async def batch_create_items(
+        self, items_data: Dict[str, Dict[str, Any]]
+    ) -> Dict[str, int]:
         """
         Creates multiple new documents in Firestore using batch operations.
         Fails for an item if a document with the same item_id already exists (handled by batch.create behavior).
@@ -130,15 +150,21 @@ class FirestoreBatchProcessor:
         operations: List[Tuple[str, str, Optional[Dict[str, Any]]]] = []
         for item_id, data in items_data.items():
             if not isinstance(item_id, str) or not item_id:
-                logger.warning(f"Invalid item_id found in batch_create_items: {item_id}. Skipping.")
+                logger.warning(
+                    f"Invalid item_id found in batch_create_items: {item_id}. Skipping."
+                )
                 continue
             if not isinstance(data, dict):
-                logger.warning(f"Invalid data for item_id '{item_id}' in batch_create_items. Skipping.")
+                logger.warning(
+                    f"Invalid data for item_id '{item_id}' in batch_create_items. Skipping."
+                )
                 continue
             operations.append(("create", item_id, data))
         return await self._execute_batches(operations)
 
-    async def batch_set_items(self, items_data: Dict[str, Dict[str, Any]], merge: bool = False) -> Dict[str, int]:
+    async def batch_set_items(
+        self, items_data: Dict[str, Dict[str, Any]], merge: bool = False
+    ) -> Dict[str, int]:
         """
         Creates or overwrites/merges multiple documents in Firestore using batch operations.
 
@@ -158,15 +184,21 @@ class FirestoreBatchProcessor:
         operations: List[Tuple[str, str, Optional[Dict[str, Any]]]] = []
         for item_id, data in items_data.items():
             if not isinstance(item_id, str) or not item_id:
-                logger.warning(f"Invalid item_id found in batch_set_items: {item_id}. Skipping.")
+                logger.warning(
+                    f"Invalid item_id found in batch_set_items: {item_id}. Skipping."
+                )
                 continue
             if not isinstance(data, dict):
-                logger.warning(f"Invalid data for item_id '{item_id}' in batch_set_items. Skipping.")
+                logger.warning(
+                    f"Invalid data for item_id '{item_id}' in batch_set_items. Skipping."
+                )
                 continue
             operations.append((op_type, item_id, data))
         return await self._execute_batches(operations)
 
-    async def batch_update_items(self, items_updates: Dict[str, Dict[str, Any]]) -> Dict[str, int]:
+    async def batch_update_items(
+        self, items_updates: Dict[str, Dict[str, Any]]
+    ) -> Dict[str, int]:
         """
         Updates multiple existing documents in Firestore using batch operations.
         An update for a specific item_id will fail if the document does not exist (Firestore batch.update behavior).
@@ -184,10 +216,14 @@ class FirestoreBatchProcessor:
         operations: List[Tuple[str, str, Optional[Dict[str, Any]]]] = []
         for item_id, updates in items_updates.items():
             if not isinstance(item_id, str) or not item_id:
-                logger.warning(f"Invalid item_id found in batch_update_items: {item_id}. Skipping.")
+                logger.warning(
+                    f"Invalid item_id found in batch_update_items: {item_id}. Skipping."
+                )
                 continue
             if not isinstance(updates, dict) or not updates:  # Updates cannot be empty
-                logger.warning(f"Invalid or empty updates for item_id '{item_id}' in batch_update_items. Skipping.")
+                logger.warning(
+                    f"Invalid or empty updates for item_id '{item_id}' in batch_update_items. Skipping."
+                )
                 continue
             operations.append(("update", item_id, updates))
         return await self._execute_batches(operations)
@@ -203,7 +239,9 @@ class FirestoreBatchProcessor:
         Returns:
             A dictionary with counts: {"successful": int, "failed": int, "total_attempted": int}.
         """
-        if not isinstance(item_ids, list) or not all(isinstance(item_id, str) and item_id for item_id in item_ids):
+        if not isinstance(item_ids, list) or not all(
+            isinstance(item_id, str) and item_id for item_id in item_ids
+        ):
             raise ValueError("item_ids must be a list of non-empty strings.")
 
         operations: List[Tuple[str, str, Optional[Dict[str, Any]]]] = [

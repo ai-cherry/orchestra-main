@@ -63,7 +63,9 @@ class CopilotAdapter(IToolAdapter):
                         break
 
             # If extension is found, consider initialized
-            if self.vscode_extension_path and os.path.exists(self.vscode_extension_path):
+            if self.vscode_extension_path and os.path.exists(
+                self.vscode_extension_path
+            ):
                 logger.info(f"Copilot extension found at {self.vscode_extension_path}")
                 self.initialized = True
                 return True
@@ -144,7 +146,9 @@ class CopilotAdapter(IToolAdapter):
             logger.error(f"Error syncing deletion to Copilot: {e}")
             return False
 
-    async def execute(self, mode: str, prompt: str, context: Optional[Dict[str, Any]] = None) -> Optional[str]:
+    async def execute(
+        self, mode: str, prompt: str, context: Optional[Dict[str, Any]] = None
+    ) -> Optional[str]:
         """Execute a prompt with Copilot."""
         if not self.initialized:
             logger.error("Copilot adapter not initialized")

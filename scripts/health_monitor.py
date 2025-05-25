@@ -22,7 +22,9 @@ from typing import Any
 import requests
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 
@@ -47,7 +49,9 @@ class HealthMonitor:
         except Exception:
             return False
 
-    def check_service_health(self, service_name: str, config: dict[str, Any]) -> dict[str, Any]:
+    def check_service_health(
+        self, service_name: str, config: dict[str, Any]
+    ) -> dict[str, Any]:
         """Check health of a specific service."""
         port = config["port"]
         name = config["name"]
@@ -116,7 +120,9 @@ class HealthMonitor:
 
         return results
 
-    def send_notification(self, message: str, level: str = "info", data: dict[str, Any] | None = None) -> bool:
+    def send_notification(
+        self, message: str, level: str = "info", data: dict[str, Any] | None = None
+    ) -> bool:
         """Send notification to admin UI."""
         try:
             notification_payload = {
@@ -128,13 +134,19 @@ class HealthMonitor:
             }
 
             # Try to send to admin UI notification endpoint
-            response = requests.post(f"{self.admin_ui_url}/api/notifications", json=notification_payload, timeout=5)
+            response = requests.post(
+                f"{self.admin_ui_url}/api/notifications",
+                json=notification_payload,
+                timeout=5,
+            )
 
             if response.status_code in [200, 201]:
                 logger.info(f"Notification sent successfully: {message}")
                 return True
             else:
-                logger.warning(f"Notification failed with status {response.status_code}")
+                logger.warning(
+                    f"Notification failed with status {response.status_code}"
+                )
                 return False
 
         except Exception as e:
@@ -143,7 +155,9 @@ class HealthMonitor:
             logger.warning(f"NOTIFICATION: [{level.upper()}] {message}")
             return False
 
-    def wait_for_service(self, service_name: str, max_wait: int = 120, check_interval: int = 5) -> bool:
+    def wait_for_service(
+        self, service_name: str, max_wait: int = 120, check_interval: int = 5
+    ) -> bool:
         """
         Wait for a service to become healthy with dynamic checking.
         Replaces fixed sleep with intelligent waiting.
@@ -153,7 +167,9 @@ class HealthMonitor:
             return False
 
         config = self.services[service_name]
-        logger.info(f"Waiting for {config['name']} to become healthy (max {max_wait}s)...")
+        logger.info(
+            f"Waiting for {config['name']} to become healthy (max {max_wait}s)..."
+        )
 
         start_time = time.time()
         while time.time() - start_time < max_wait:
@@ -201,11 +217,15 @@ class HealthMonitor:
                         if previous.get("status") != current["status"]:
                             if current["status"] == "healthy":
                                 self.send_notification(
-                                    f"Service {current['name']} recovered", level="success", data=current
+                                    f"Service {current['name']} recovered",
+                                    level="success",
+                                    data=current,
                                 )
                                 consecutive_failures.pop(service_name, None)
                             else:
-                                consecutive_failures[service_name] = consecutive_failures.get(service_name, 0) + 1
+                                consecutive_failures[service_name] = (
+                                    consecutive_failures.get(service_name, 0) + 1
+                                )
                                 failure_count = consecutive_failures[service_name]
 
                                 self.send_notification(
@@ -217,7 +237,9 @@ class HealthMonitor:
                 # Log current status
                 healthy_count = current_status["summary"]["healthy"]
                 total_count = current_status["summary"]["total"]
-                logger.info(f"Health check: {healthy_count}/{total_count} services healthy")
+                logger.info(
+                    f"Health check: {healthy_count}/{total_count} services healthy"
+                )
 
                 previous_status = current_status
                 await asyncio.sleep(interval)
@@ -231,7 +253,11 @@ class HealthMonitor:
 
     def check_prerequisites(self) -> dict[str, Any]:
         """Check system prerequisites and dependencies."""
-        results: dict[str, Any] = {"timestamp": datetime.now().isoformat(), "status": "ok", "checks": {}}
+        results: dict[str, Any] = {
+            "timestamp": datetime.now().isoformat(),
+            "status": "ok",
+            "checks": {},
+        }
 
         # Check Python version
         python_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
@@ -245,11 +271,20 @@ class HealthMonitor:
             results["status"] = "error"
 
         # Check virtual environment
-        in_venv = hasattr(sys, "real_prefix") or (hasattr(sys, "base_prefix") and sys.base_prefix != sys.prefix)
-        results["checks"]["virtual_environment"] = {"status": "ok" if in_venv else "warning", "active": in_venv}
+        in_venv = hasattr(sys, "real_prefix") or (
+            hasattr(sys, "base_prefix") and sys.base_prefix != sys.prefix
+        )
+        results["checks"]["virtual_environment"] = {
+            "status": "ok" if in_venv else "warning",
+            "active": in_venv,
+        }
 
         # Check required files
-        required_files = ["requirements/base.txt", "scripts/check_venv.py", "core/orchestrator/src/api/app.py"]
+        required_files = [
+            "requirements/base.txt",
+            "scripts/check_venv.py",
+            "core/orchestrator/src/api/app.py",
+        ]
 
         missing_files: list[str] = []
         for file_path in required_files:
@@ -273,13 +308,25 @@ def main() -> int:
     import argparse
 
     parser = argparse.ArgumentParser(description="AI Orchestra Health Monitor")
-    parser.add_argument("--check-services", action="store_true", help="Check all services once")
+    parser.add_argument(
+        "--check-services", action="store_true", help="Check all services once"
+    )
     parser.add_argument("--monitor", action="store_true", help="Monitor continuously")
     parser.add_argument("--wait-for", help="Wait for specific service to be healthy")
-    parser.add_argument("--interval", type=int, default=30, help="Monitoring interval in seconds")
-    parser.add_argument("--max-wait", type=int, default=120, help="Maximum wait time for service")
-    parser.add_argument("--admin-ui-url", default="http://localhost:3000", help="Admin UI URL for notifications")
-    parser.add_argument("--check-prereqs", action="store_true", help="Check system prerequisites")
+    parser.add_argument(
+        "--interval", type=int, default=30, help="Monitoring interval in seconds"
+    )
+    parser.add_argument(
+        "--max-wait", type=int, default=120, help="Maximum wait time for service"
+    )
+    parser.add_argument(
+        "--admin-ui-url",
+        default="http://localhost:3000",
+        help="Admin UI URL for notifications",
+    )
+    parser.add_argument(
+        "--check-prereqs", action="store_true", help="Check system prerequisites"
+    )
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
 
     args = parser.parse_args()

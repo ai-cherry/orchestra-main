@@ -19,7 +19,9 @@ from packages.shared.src.memory.tiered_storage import TieredStorageManager
 from packages.shared.src.models.base_models import MemoryItem
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 
@@ -51,12 +53,15 @@ class BaseMemoryManager(MemoryInterface):
         """Get a memory item by ID."""
         return self._items.get(item_id)
 
-    async def get_conversation_history(self, user_id, session_id=None, limit=20, filters=None):
+    async def get_conversation_history(
+        self, user_id, session_id=None, limit=20, filters=None
+    ):
         """Get conversation history."""
         items = [
             item
             for item in self._items.values()
-            if item.user_id == user_id and (session_id is None or item.session_id == session_id)
+            if item.user_id == user_id
+            and (session_id is None or item.session_id == session_id)
         ]
         return items[:limit]
 
@@ -140,7 +145,9 @@ async def main():
 
     # 7. Retrieve and display memory items
     logger.info("Retrieving memory items from tiered storage")
-    history = await tiered_storage.get_conversation_history(user_id, session_id, limit=10)
+    history = await tiered_storage.get_conversation_history(
+        user_id, session_id, limit=10
+    )
     logger.info(f"Retrieved {len(history)} items from conversation history")
 
     for item in history[:3]:  # Show first few items
@@ -158,7 +165,9 @@ async def main():
     # 9. Check memory pressure
     logger.info("Checking memory metrics")
     await memory_profiler.collect_metrics()
-    logger.info(f"Memory pressure detected: {memory_profiler.is_memory_pressure_detected()}")
+    logger.info(
+        f"Memory pressure detected: {memory_profiler.is_memory_pressure_detected()}"
+    )
     logger.info(f"Memory alerts: {memory_profiler.get_alerts()}")
 
     # 10. Demonstrate Redis LRU cache directly

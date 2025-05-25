@@ -35,11 +35,21 @@ class AgentModeConfig(BaseModel):
     name: str = Field(..., description="Display name of the agent mode")
     description: str = Field(..., description="Description of the agent mode's purpose")
     system_prompt: str = Field(..., description="System prompt for the agent mode")
-    required_context: List[str] = Field(default_factory=list, description="Required context fields for this mode")
-    suggested_tools: List[str] = Field(default_factory=list, description="Suggested tools for this mode")
-    example_prompts: List[str] = Field(default_factory=list, description="Example prompts for this mode")
-    token_multiplier: float = Field(default=1.0, description="Token budget multiplier for this mode")
-    constraints: List[str] = Field(default_factory=list, description="Constraints for this mode")
+    required_context: List[str] = Field(
+        default_factory=list, description="Required context fields for this mode"
+    )
+    suggested_tools: List[str] = Field(
+        default_factory=list, description="Suggested tools for this mode"
+    )
+    example_prompts: List[str] = Field(
+        default_factory=list, description="Example prompts for this mode"
+    )
+    token_multiplier: float = Field(
+        default=1.0, description="Token budget multiplier for this mode"
+    )
+    constraints: List[str] = Field(
+        default_factory=list, description="Constraints for this mode"
+    )
 
     @validator("token_multiplier")
     def validate_token_multiplier(cls, v: float) -> float:
@@ -59,8 +69,12 @@ class AgentMode(BaseModel):
 
     mode_type: AgentModeType
     config: AgentModeConfig
-    active: bool = Field(default=False, description="Whether this mode is currently active")
-    context: Dict[str, Any] = Field(default_factory=dict, description="Current context for this mode")
+    active: bool = Field(
+        default=False, description="Whether this mode is currently active"
+    )
+    context: Dict[str, Any] = Field(
+        default_factory=dict, description="Current context for this mode"
+    )
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization."""
@@ -112,7 +126,9 @@ Perform the following task:
         if not self.config.required_context:
             return []
 
-        return [key for key in self.config.required_context if key not in provided_context]
+        return [
+            key for key in self.config.required_context if key not in provided_context
+        ]
 
     def format_prompt(self, task: str, context: Dict[str, Any]) -> str:
         """Format the prompt template with task and context."""

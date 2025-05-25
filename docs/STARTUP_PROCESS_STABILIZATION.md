@@ -17,7 +17,7 @@ This document outlines the steps taken and recommendations for stabilizing the A
 - **Update Base Image**: Consider using a more specific Python image version in `.devcontainer/devcontainer.json`:
 
   ```json
-  "image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
+  "image": "mcr.microsoft.com/devcontainers/python:3.10-bullseye",
   ```
 
 - **Add Development Tools**: Add development tools to the DevContainer for better debugging:
@@ -144,7 +144,7 @@ This document outlines the steps taken and recommendations for stabilizing the A
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |

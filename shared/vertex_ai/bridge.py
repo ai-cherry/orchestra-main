@@ -51,7 +51,9 @@ try:
 
     GOOGLE_LIBRARIES_AVAILABLE = True
 except ImportError:
-    logger.warning("Google Cloud libraries not available. Some functionality will be limited.")
+    logger.warning(
+        "Google Cloud libraries not available. Some functionality will be limited."
+    )
     GOOGLE_LIBRARIES_AVAILABLE = False
 
 
@@ -344,7 +346,9 @@ class VertexAIClient:
     def initialize_client(self) -> None:
         """Initialize the Vertex AI client based on the environment."""
         if not GOOGLE_LIBRARIES_AVAILABLE:
-            logger.warning("Google Cloud libraries not available. Cannot initialize client.")
+            logger.warning(
+                "Google Cloud libraries not available. Cannot initialize client."
+            )
             return
 
         try:
@@ -405,7 +409,9 @@ class VertexAIClient:
             RuntimeError: If authentication fails
         """
         if not GOOGLE_LIBRARIES_AVAILABLE:
-            raise RuntimeError("Google Cloud libraries not available. Cannot authenticate.")
+            raise RuntimeError(
+                "Google Cloud libraries not available. Cannot authenticate."
+            )
 
         if self.environment == EnvironmentType.CODESPACES:
             self._authenticate_codespaces()
@@ -413,9 +419,13 @@ class VertexAIClient:
             self._authenticate_gcp_workstation()
         else:
             # Try to authenticate using Application Default Credentials
-            logger.info("Environment type unknown, trying Application Default Credentials")
+            logger.info(
+                "Environment type unknown, trying Application Default Credentials"
+            )
 
-    def _format_gemini_prompt(self, prompt: str, system_prompt: Optional[str] = None) -> Dict[str, Any]:
+    def _format_gemini_prompt(
+        self, prompt: str, system_prompt: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Format a prompt for the Gemini model.
 
         Args:
@@ -436,7 +446,9 @@ class VertexAIClient:
 
         return {"contents": contents}
 
-    def _format_palm_prompt(self, prompt: str, system_prompt: Optional[str] = None) -> Dict[str, Any]:
+    def _format_palm_prompt(
+        self, prompt: str, system_prompt: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Format a prompt for the PaLM model.
 
         Args:
@@ -500,7 +512,9 @@ class VertexAIClient:
         self._ensure_authenticated()
 
         if not GOOGLE_LIBRARIES_AVAILABLE:
-            raise RuntimeError("Google Cloud libraries not available. Cannot generate text.")
+            raise RuntimeError(
+                "Google Cloud libraries not available. Cannot generate text."
+            )
 
         try:
             # Initialize parameters based on model type
@@ -622,7 +636,9 @@ class VertexAIClient:
         self._ensure_authenticated()
 
         if not GOOGLE_LIBRARIES_AVAILABLE:
-            raise RuntimeError("Google Cloud libraries not available. Cannot generate embeddings.")
+            raise RuntimeError(
+                "Google Cloud libraries not available. Cannot generate embeddings."
+            )
 
         try:
             # Create the embedding
@@ -857,7 +873,9 @@ def analyze_code(
     client = get_vertex_client()
 
     # Format the prompt for code analysis
-    analysis_prompt = f"Instructions: {instructions}\n\nCode to analyze:\n```\n{code}\n```"
+    analysis_prompt = (
+        f"Instructions: {instructions}\n\nCode to analyze:\n```\n{code}\n```"
+    )
 
     # Create an analysis-optimized configuration
     config = ModelConfig(
@@ -900,7 +918,9 @@ async def analyze_code_async(
     client = get_vertex_client()
 
     # Format the prompt for code analysis
-    analysis_prompt = f"Instructions: {instructions}\n\nCode to analyze:\n```\n{code}\n```"
+    analysis_prompt = (
+        f"Instructions: {instructions}\n\nCode to analyze:\n```\n{code}\n```"
+    )
 
     # Create an analysis-optimized configuration
     config = ModelConfig(
@@ -950,11 +970,15 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Vertex AI Bridge demo")
     parser.add_argument("--prompt", type=str, help="Prompt to send to the model")
     parser.add_argument("--model", type=str, default="gemini-pro", help="Model to use")
-    parser.add_argument("--temperature", type=float, default=0.2, help="Temperature for generation")
+    parser.add_argument(
+        "--temperature", type=float, default=0.2, help="Temperature for generation"
+    )
     parser.add_argument("--project", type=str, help="GCP project ID")
     parser.add_argument("--code", action="store_true", help="Generate code")
     parser.add_argument("--analyze", type=str, help="Code to analyze")
-    parser.add_argument("--location", type=str, default="us-central1", help="GCP location")
+    parser.add_argument(
+        "--location", type=str, default="us-central1", help="GCP location"
+    )
 
     args = parser.parse_args()
 
@@ -968,7 +992,9 @@ if __name__ == "__main__":
     try:
         model_type = ModelType(args.model)
     except ValueError:
-        print(f"Invalid model type: {args.model}. Using {ModelType.GEMINI_PRO.value} instead.")
+        print(
+            f"Invalid model type: {args.model}. Using {ModelType.GEMINI_PRO.value} instead."
+        )
         model_type = ModelType.GEMINI_PRO
 
     # Generate text, code, or analyze code

@@ -35,14 +35,18 @@ class FirestoreCrudOperations:
             collection_name: The name of the Firestore collection to operate on.
         """
         if not isinstance(firestore_client, FirestoreAsyncClient):
-            raise TypeError("firestore_client must be an instance of FirestoreAsyncClient.")
+            raise TypeError(
+                "firestore_client must be an instance of FirestoreAsyncClient."
+            )
         if not collection_name or not isinstance(collection_name, str):
             raise ValueError("collection_name must be a non-empty string.")
 
         self.client: FirestoreAsyncClient = firestore_client
         self.collection_name: str = collection_name
         self._collection_ref = self.client.collection(self.collection_name)
-        logger.info(f"FirestoreCrudOperations initialized for collection: {self.collection_name}")
+        logger.info(
+            f"FirestoreCrudOperations initialized for collection: {self.collection_name}"
+        )
 
     async def create_item(self, item_id: str, data: Dict[str, Any]) -> bool:
         """
@@ -66,15 +70,24 @@ class FirestoreCrudOperations:
         if not isinstance(data, dict):
             raise ValueError("data must be a dictionary.")
 
-        logger.debug(f"Attempting to create item '{item_id}' in '{self.collection_name}'")
+        logger.debug(
+            f"Attempting to create item '{item_id}' in '{self.collection_name}'"
+        )
         doc_ref: AsyncDocumentReference = self._collection_ref.document(item_id)
         try:
             # Use create() to ensure the document doesn't already exist.
             await doc_ref.create(document_data=data)
-            logger.info(f"Successfully created item '{item_id}' in '{self.collection_name}'.")
+            logger.info(
+                f"Successfully created item '{item_id}' in '{self.collection_name}'."
+            )
             return True
-        except Exception as e:  # Replace with more specific google.cloud.exceptions.Conflict if needed
-            logger.error(f"Error creating item '{item_id}' in '{self.collection_name}': {e}", exc_info=True)
+        except (
+            Exception
+        ) as e:  # Replace with more specific google.cloud.exceptions.Conflict if needed
+            logger.error(
+                f"Error creating item '{item_id}' in '{self.collection_name}': {e}",
+                exc_info=True,
+            )
             # Could be a google.cloud.exceptions.Conflict if item_id already exists
             # Or other Firestore errors.
             return False  # Or re-raise a custom domain error
@@ -100,16 +113,23 @@ class FirestoreCrudOperations:
         if not isinstance(data, dict):
             raise ValueError("data must be a dictionary.")
 
-        logger.debug(f"Attempting to set (create/update) item '{item_id}' in '{self.collection_name}'")
+        logger.debug(
+            f"Attempting to set (create/update) item '{item_id}' in '{self.collection_name}'"
+        )
         doc_ref: AsyncDocumentReference = self._collection_ref.document(item_id)
         try:
             # Using set() with merge=False will overwrite the document if it exists,
             # or create it if it doesn't.
             await doc_ref.set(document_data=data, merge=False)
-            logger.info(f"Successfully set item '{item_id}' in '{self.collection_name}'.")
+            logger.info(
+                f"Successfully set item '{item_id}' in '{self.collection_name}'."
+            )
             return True
         except Exception as e:
-            logger.error(f"Error setting item '{item_id}' in '{self.collection_name}': {e}", exc_info=True)
+            logger.error(
+                f"Error setting item '{item_id}' in '{self.collection_name}': {e}",
+                exc_info=True,
+            )
             return False  # Or re-raise
 
     async def get_item(self, item_id: str) -> Optional[Dict[str, Any]]:
@@ -129,7 +149,9 @@ class FirestoreCrudOperations:
         if not item_id or not isinstance(item_id, str):
             raise ValueError("item_id must be a non-empty string.")
 
-        logger.debug(f"Attempting to get item '{item_id}' from '{self.collection_name}'")
+        logger.debug(
+            f"Attempting to get item '{item_id}' from '{self.collection_name}'"
+        )
         doc_ref: AsyncDocumentReference = self._collection_ref.document(item_id)
         try:
             doc_snapshot = await doc_ref.get()
@@ -166,7 +188,9 @@ class FirestoreCrudOperations:
         if not isinstance(updates, dict) or not updates:
             raise ValueError("updates must be a non-empty dictionary.")
 
-        logger.debug(f"Attempting to update item '{item_id}' in '{self.collection_name}' with: {updates}")
+        logger.debug(
+            f"Attempting to update item '{item_id}' in '{self.collection_name}' with: {updates}"
+        )
         doc_ref: AsyncDocumentReference = self._collection_ref.document(item_id)
         try:
             # First, check if the document exists before attempting an update.
@@ -179,7 +203,9 @@ class FirestoreCrudOperations:
             await doc_ref.update(updates)
             logger.info(f"Successfully updated item '{item_id}'.")
             return True
-        except Exception as e:  # Replace with more specific google.cloud.exceptions.NotFound if needed for update
+        except (
+            Exception
+        ) as e:  # Replace with more specific google.cloud.exceptions.NotFound if needed for update
             logger.error(f"Error updating item '{item_id}': {e}", exc_info=True)
             return False  # Or re-raise
 
@@ -201,7 +227,9 @@ class FirestoreCrudOperations:
         if not item_id or not isinstance(item_id, str):
             raise ValueError("item_id must be a non-empty string.")
 
-        logger.debug(f"Attempting to delete item '{item_id}' from '{self.collection_name}'")
+        logger.debug(
+            f"Attempting to delete item '{item_id}' from '{self.collection_name}'"
+        )
         doc_ref: AsyncDocumentReference = self._collection_ref.document(item_id)
         try:
             await doc_ref.delete()
@@ -230,7 +258,9 @@ class FirestoreCrudOperations:
         if not item_id or not isinstance(item_id, str):
             raise ValueError("item_id must be a non-empty string.")
 
-        logger.debug(f"Checking existence of item '{item_id}' in '{self.collection_name}'")
+        logger.debug(
+            f"Checking existence of item '{item_id}' in '{self.collection_name}'"
+        )
         doc_ref: AsyncDocumentReference = self._collection_ref.document(item_id)
         try:
             doc_snapshot = await doc_ref.get()
@@ -238,5 +268,7 @@ class FirestoreCrudOperations:
             logger.debug(f"Item '{item_id}' exists: {exists}")
             return exists
         except Exception as e:
-            logger.error(f"Error checking existence of item '{item_id}': {e}", exc_info=True)
+            logger.error(
+                f"Error checking existence of item '{item_id}': {e}", exc_info=True
+            )
             return False  # Or re-raise, or return False indicating not findable due to error

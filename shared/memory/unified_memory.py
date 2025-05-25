@@ -36,9 +36,13 @@ class MemoryItem(BaseModel):
     content: str = Field(..., description="Content of the memory")
     source: str = Field(..., description="Source of the memory (e.g., agent ID)")
     timestamp: str = Field(..., description="Timestamp when memory was created")
-    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
+    metadata: Dict[str, Any] = Field(
+        default_factory=dict, description="Additional metadata"
+    )
     priority: float = Field(default=0.5, description="Priority of the memory (0.0-1.0)")
-    embedding: Optional[List[float]] = Field(default=None, description="Vector embedding of the memory content")
+    embedding: Optional[List[float]] = Field(
+        default=None, description="Vector embedding of the memory content"
+    )
 
 
 # --- Unified Memory Abstraction ---
@@ -72,13 +76,17 @@ class UnifiedMemory:
         self.qdrant = None
         self.qdrant_collection = qdrant_collection
         if use_qdrant and QdrantClient:
-            self.qdrant = QdrantClient(url=qdrant_url or os.getenv("QDRANT_URL", "http://localhost:6333"))
+            self.qdrant = QdrantClient(
+                url=qdrant_url or os.getenv("QDRANT_URL", "http://localhost:6333")
+            )
 
         # --- Firestore (Persistent) ---
         self.firestore = None
         self.firestore_collection = firestore_collection
         if use_firestore and firestore:
-            self.firestore = firestore.Client(project=firestore_project or os.getenv("GCP_PROJECT"))
+            self.firestore = firestore.Client(
+                project=firestore_project or os.getenv("GCP_PROJECT")
+            )
 
     # --- Store Memory ---
     def store(self, item: MemoryItem) -> str:
@@ -94,12 +102,16 @@ class UnifiedMemory:
         if self.qdrant and item.embedding:
             self.qdrant.upsert(
                 collection_name=self.qdrant_collection,
-                points=[PointStruct(id=item.id, vector=item.embedding, payload=item.dict())],
+                points=[
+                    PointStruct(id=item.id, vector=item.embedding, payload=item.dict())
+                ],
             )
 
         # Firestore (persistent)
         if self.firestore:
-            self.firestore.collection(self.firestore_collection).document(item.id).set(item.dict())
+            self.firestore.collection(self.firestore_collection).document(item.id).set(
+                item.dict()
+            )
 
         return item.id
 
@@ -118,14 +130,20 @@ class UnifiedMemory:
 
         # Fallback to Firestore
         if self.firestore:
-            doc = self.firestore.collection(self.firestore_collection).document(memory_id).get()
+            doc = (
+                self.firestore.collection(self.firestore_collection)
+                .document(memory_id)
+                .get()
+            )
             if doc.exists:
                 return MemoryItem(**doc.to_dict())
 
         return None
 
     # --- Search Memory (Semantic/Vector) ---
-    def search(self, query: Union[str, List[float]], limit: int = 10) -> List[MemoryItem]:
+    def search(
+        self, query: Union[str, List[float]], limit: int = 10
+    ) -> List[MemoryItem]:
         """
         Search memory items.
         - If query is a string: perform metadata/content search (cache or Firestore).
@@ -159,7 +177,9 @@ class UnifiedMemory:
 
         # Fallback to Firestore
         if self.firestore:
-            docs = self.firestore.collection(self.firestore_collection).limit(100).stream()
+            docs = (
+                self.firestore.collection(self.firestore_collection).limit(100).stream()
+            )
             for doc in docs:
                 data = doc.to_dict()
                 if query.lower() in data.get("content", "").lower():
@@ -181,11 +201,16 @@ class UnifiedMemory:
             deleted = self.dragonfly.delete(f"memory:{memory_id}") or deleted
 
         if self.qdrant:
-            self.qdrant.delete(collection_name=self.qdrant_collection, points_selector={"points": [memory_id]})
+            self.qdrant.delete(
+                collection_name=self.qdrant_collection,
+                points_selector={"points": [memory_id]},
+            )
             deleted = True
 
         if self.firestore:
-            self.firestore.collection(self.firestore_collection).document(memory_id).delete()
+            self.firestore.collection(self.firestore_collection).document(
+                memory_id
+            ).delete()
             deleted = True
 
         return deleted

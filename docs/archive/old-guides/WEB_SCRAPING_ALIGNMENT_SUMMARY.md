@@ -140,11 +140,11 @@ web_scraping_service = gcp.cloudrun.Service(
 
 ```dockerfile
 # Stage 1: Build dependencies
-FROM python:3.11-slim-bullseye AS builder
+FROM python:3.10-slim-bullseye AS builder
 # Install build tools and create wheels
 
 # Stage 2: Runtime with Playwright
-FROM python:3.11-slim-bullseye AS runtime
+FROM python:3.10-slim-bullseye AS runtime
 # Install runtime dependencies and browsers
 RUN playwright install chromium
 ```

@@ -56,7 +56,9 @@ def get_dragonfly_config() -> Dict[str, Any]:
     else:
         # Build connection URL
         auth_part = f":{DRAGONFLY_PASSWORD}@" if DRAGONFLY_PASSWORD else ""
-        redis_url = f"redis://{auth_part}{DRAGONFLY_HOST}:{DRAGONFLY_PORT}/{DRAGONFLY_DB_INDEX}"
+        redis_url = (
+            f"redis://{auth_part}{DRAGONFLY_HOST}:{DRAGONFLY_PORT}/{DRAGONFLY_DB_INDEX}"
+        )
 
     config = {
         # Connection settings

@@ -122,7 +122,9 @@ class StateCheckpointManager:
         # If no checkpoint ID provided, get the latest
         if checkpoint_id is None:
             checkpoint_list_key = self._get_checkpoint_list_key(agent_id)
-            checkpoint_list = await self.memory_provider.retrieve(checkpoint_list_key) or []
+            checkpoint_list = (
+                await self.memory_provider.retrieve(checkpoint_list_key) or []
+            )
 
             if not checkpoint_list:
                 return None
@@ -179,7 +181,9 @@ class StateCheckpointManager:
         checkpoint_list = await self.memory_provider.retrieve(checkpoint_list_key) or []
 
         # Remove the checkpoint from the list
-        checkpoint_list = [c for c in checkpoint_list if c["checkpoint_id"] != checkpoint_id]
+        checkpoint_list = [
+            c for c in checkpoint_list if c["checkpoint_id"] != checkpoint_id
+        ]
 
         # Update the checkpoint list
         await self.memory_provider.store(

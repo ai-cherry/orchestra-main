@@ -156,7 +156,9 @@ class ServiceFactory:
         )
 
         self.registrations[service_type] = registration
-        logger.debug(f"Registered service {service_type.__name__} with scope {scope.value}")
+        logger.debug(
+            f"Registered service {service_type.__name__} with scope {scope.value}"
+        )
 
     def register_instance(self, service_type: Type[T], instance: T) -> None:
         """
@@ -244,7 +246,9 @@ class ServiceFactory:
                     try:
                         registration.lifecycle_hooks[ServiceLifecycle.DISPOSE](instance)
                     except Exception as e:
-                        logger.warning(f"Error disposing service {service_type.__name__}: {str(e)}")
+                        logger.warning(
+                            f"Error disposing service {service_type.__name__}: {str(e)}"
+                        )
 
         # Clear instances
         self.instances.clear()
@@ -328,7 +332,9 @@ class ServiceContainer:
         # Get the constructor parameters
         constructor = concrete_type.__init__
         if not constructor:
-            raise ServiceError(f"Cannot auto-register {concrete_type.__name__} without a constructor")
+            raise ServiceError(
+                f"Cannot auto-register {concrete_type.__name__} without a constructor"
+            )
 
         signature = inspect.signature(constructor)
         dependency_types = []

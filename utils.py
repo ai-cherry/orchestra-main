@@ -25,7 +25,8 @@ def retry(max_attempts: int = 3, delay: float = 1.0, exponential_backoff: float 
                         raise
                     wait_time = delay * (exponential_backoff**attempt)
                     logger.warning(
-                        f"Attempt {attempt + 1} failed for {func.__name__}: {e}. " f"Retrying in {wait_time} seconds..."
+                        f"Attempt {attempt + 1} failed for {func.__name__}: {e}. "
+                        f"Retrying in {wait_time} seconds..."
                     )
                     time.sleep(wait_time)
             return None
@@ -51,7 +52,9 @@ class APIKeyManager:
             if self.keys[service.lower()]:
                 logger.info(f"Loaded API key for {service}")
             else:
-                logger.warning(f"No API key found for {service} (looking for {key_name})")
+                logger.warning(
+                    f"No API key found for {service} (looking for {key_name})"
+                )
 
     def get_key(self, service: str) -> Optional[str]:
         """Get API key for a specific service."""
@@ -75,7 +78,8 @@ def get_project_id() -> str:
 def setup_logging(level: str = "INFO"):
     """Configure logging for the application."""
     logging.basicConfig(
-        level=getattr(logging, level.upper()), format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        level=getattr(logging, level.upper()),
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
 
 

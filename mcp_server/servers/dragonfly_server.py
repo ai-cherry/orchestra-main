@@ -25,7 +25,9 @@ logger = logging.getLogger(__name__)
 
 # Initialize FastAPI app for MCP server
 app = FastAPI(
-    title="DragonflyDB MCP Server", description="MCP server for managing DragonflyDB cache operations", version="1.0.0"
+    title="DragonflyDB MCP Server",
+    description="MCP server for managing DragonflyDB cache operations",
+    version="1.0.0",
 )
 
 # Get configuration from environment
@@ -129,7 +131,9 @@ async def get_redis_client() -> redis.Redis:
         # Test connection
         try:
             await redis_client.ping()
-            logger.info(f"Connected to DragonflyDB at {DRAGONFLY_HOST}:{DRAGONFLY_PORT}")
+            logger.info(
+                f"Connected to DragonflyDB at {DRAGONFLY_HOST}:{DRAGONFLY_PORT}"
+            )
         except Exception as e:
             logger.error(f"Failed to connect to DragonflyDB: {e}")
             redis_client = None
@@ -174,8 +178,14 @@ async def get_tools() -> List[MCPToolDefinition]:
                 "properties": {
                     "key": {"type": "string", "description": "Cache key"},
                     "value": {"description": "Value to cache"},
-                    "ttl": {"type": "integer", "description": "Time to live in seconds"},
-                    "nx": {"type": "boolean", "description": "Only set if key doesn't exist"},
+                    "ttl": {
+                        "type": "integer",
+                        "description": "Time to live in seconds",
+                    },
+                    "nx": {
+                        "type": "boolean",
+                        "description": "Only set if key doesn't exist",
+                    },
                     "xx": {"type": "boolean", "description": "Only set if key exists"},
                 },
                 "required": ["key", "value"],
@@ -195,7 +205,13 @@ async def get_tools() -> List[MCPToolDefinition]:
             description="Delete one or more keys from the cache",
             parameters={
                 "type": "object",
-                "properties": {"keys": {"type": "array", "items": {"type": "string"}, "description": "Keys to delete"}},
+                "properties": {
+                    "keys": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Keys to delete",
+                    }
+                },
                 "required": ["keys"],
             },
         ),
@@ -206,7 +222,10 @@ async def get_tools() -> List[MCPToolDefinition]:
                 "type": "object",
                 "properties": {
                     "key": {"type": "string", "description": "Cache key"},
-                    "ttl": {"type": "integer", "description": "Time to live in seconds"},
+                    "ttl": {
+                        "type": "integer",
+                        "description": "Time to live in seconds",
+                    },
                 },
                 "required": ["key", "ttl"],
             },
@@ -220,7 +239,10 @@ async def get_tools() -> List[MCPToolDefinition]:
                 "properties": {
                     "key": {"type": "string", "description": "List key"},
                     "values": {"type": "array", "description": "Values to push"},
-                    "left": {"type": "boolean", "description": "Push to left (head) of list"},
+                    "left": {
+                        "type": "boolean",
+                        "description": "Push to left (head) of list",
+                    },
                 },
                 "required": ["key", "values"],
             },
@@ -232,8 +254,14 @@ async def get_tools() -> List[MCPToolDefinition]:
                 "type": "object",
                 "properties": {
                     "key": {"type": "string", "description": "List key"},
-                    "count": {"type": "integer", "description": "Number of values to pop"},
-                    "left": {"type": "boolean", "description": "Pop from left (head) of list"},
+                    "count": {
+                        "type": "integer",
+                        "description": "Number of values to pop",
+                    },
+                    "left": {
+                        "type": "boolean",
+                        "description": "Pop from left (head) of list",
+                    },
                 },
                 "required": ["key"],
             },
@@ -293,9 +321,15 @@ async def get_tools() -> List[MCPToolDefinition]:
                 "type": "object",
                 "properties": {
                     "key": {"type": "string", "description": "Hash key"},
-                    "field": {"type": "string", "description": "Field name (for single field)"},
+                    "field": {
+                        "type": "string",
+                        "description": "Field name (for single field)",
+                    },
                     "value": {"description": "Field value (for single field)"},
-                    "fields": {"type": "object", "description": "Multiple fields and values"},
+                    "fields": {
+                        "type": "object",
+                        "description": "Multiple fields and values",
+                    },
                 },
                 "required": ["key"],
             },
@@ -307,7 +341,10 @@ async def get_tools() -> List[MCPToolDefinition]:
                 "type": "object",
                 "properties": {
                     "key": {"type": "string", "description": "Hash key"},
-                    "field": {"type": "string", "description": "Field name (for single field)"},
+                    "field": {
+                        "type": "string",
+                        "description": "Field name (for single field)",
+                    },
                 },
                 "required": ["key"],
             },
@@ -319,7 +356,11 @@ async def get_tools() -> List[MCPToolDefinition]:
                 "type": "object",
                 "properties": {
                     "key": {"type": "string", "description": "Hash key"},
-                    "fields": {"type": "array", "items": {"type": "string"}, "description": "Fields to delete"},
+                    "fields": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Fields to delete",
+                    },
                 },
                 "required": ["key", "fields"],
             },
@@ -350,7 +391,11 @@ async def cache_set(request: CacheSetRequest) -> Dict[str, Any]:
 
         result = await client.set(request.key, value, **set_kwargs)
 
-        return {"status": "success" if result else "failed", "key": request.key, "ttl": request.ttl}
+        return {
+            "status": "success" if result else "failed",
+            "key": request.key,
+            "ttl": request.ttl,
+        }
     except Exception as e:
         logger.error(f"Failed to set cache value: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -375,7 +420,12 @@ async def cache_get(request: CacheGetRequest) -> Dict[str, Any]:
         # Get TTL
         ttl = await client.ttl(request.key)
 
-        return {"status": "success", "key": request.key, "value": value, "ttl": ttl if ttl > 0 else None}
+        return {
+            "status": "success",
+            "key": request.key,
+            "value": value,
+            "ttl": ttl if ttl > 0 else None,
+        }
     except Exception as e:
         logger.error(f"Failed to get cache value: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -388,7 +438,11 @@ async def cache_delete(request: CacheDeleteRequest) -> Dict[str, Any]:
         client = await get_redis_client()
         deleted_count = await client.delete(*request.keys)
 
-        return {"status": "success", "deleted_count": deleted_count, "keys": request.keys}
+        return {
+            "status": "success",
+            "deleted_count": deleted_count,
+            "keys": request.keys,
+        }
     except Exception as e:
         logger.error(f"Failed to delete cache keys: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -401,7 +455,11 @@ async def cache_expire(request: CacheExpireRequest) -> Dict[str, Any]:
         client = await get_redis_client()
         result = await client.expire(request.key, request.ttl)
 
-        return {"status": "success" if result else "key_not_found", "key": request.key, "ttl": request.ttl}
+        return {
+            "status": "success" if result else "key_not_found",
+            "key": request.key,
+            "ttl": request.ttl,
+        }
     except Exception as e:
         logger.error(f"Failed to set expiration: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -415,7 +473,9 @@ async def list_push(request: ListOperationRequest) -> Dict[str, Any]:
         client = await get_redis_client()
 
         # Serialize values
-        values = [json.dumps(v) if not isinstance(v, str) else v for v in request.values]
+        values = [
+            json.dumps(v) if not isinstance(v, str) else v for v in request.values
+        ]
 
         # Push left or right
         left = request.__dict__.get("left", False)
@@ -424,7 +484,12 @@ async def list_push(request: ListOperationRequest) -> Dict[str, Any]:
         else:
             length = await client.rpush(request.key, *values)
 
-        return {"status": "success", "key": request.key, "length": length, "pushed": len(values)}
+        return {
+            "status": "success",
+            "key": request.key,
+            "length": length,
+            "pushed": len(values),
+        }
     except Exception as e:
         logger.error(f"Failed to push to list: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -457,7 +522,12 @@ async def list_pop(request: ListOperationRequest) -> Dict[str, Any]:
 
             values.append(value)
 
-        return {"status": "success", "key": request.key, "values": values, "popped": len(values)}
+        return {
+            "status": "success",
+            "key": request.key,
+            "values": values,
+            "popped": len(values),
+        }
     except Exception as e:
         logger.error(f"Failed to pop from list: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -501,7 +571,9 @@ async def set_add(request: SetOperationRequest) -> Dict[str, Any]:
         client = await get_redis_client()
 
         # Serialize members
-        members = [json.dumps(m) if not isinstance(m, str) else m for m in request.members]
+        members = [
+            json.dumps(m) if not isinstance(m, str) else m for m in request.members
+        ]
 
         added = await client.sadd(request.key, *members)
 
@@ -523,7 +595,9 @@ async def set_remove(request: SetOperationRequest) -> Dict[str, Any]:
         client = await get_redis_client()
 
         # Serialize members
-        members = [json.dumps(m) if not isinstance(m, str) else m for m in request.members]
+        members = [
+            json.dumps(m) if not isinstance(m, str) else m for m in request.members
+        ]
 
         removed = await client.srem(request.key, *members)
 
@@ -611,7 +685,12 @@ async def hash_get(request: HashOperationRequest) -> Dict[str, Any]:
                 except (json.JSONDecodeError, TypeError):
                     pass
 
-            return {"status": "success", "key": request.key, "field": request.field, "value": value}
+            return {
+                "status": "success",
+                "key": request.key,
+                "field": request.field,
+                "value": value,
+            }
         else:
             # All fields
             fields = await client.hgetall(request.key)
@@ -623,7 +702,12 @@ async def hash_get(request: HashOperationRequest) -> Dict[str, Any]:
                 except (json.JSONDecodeError, TypeError):
                     pass
 
-            return {"status": "success", "key": request.key, "fields": fields, "count": len(fields)}
+            return {
+                "status": "success",
+                "key": request.key,
+                "fields": fields,
+                "count": len(fields),
+            }
     except Exception as e:
         logger.error(f"Failed to get hash fields: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -635,10 +719,19 @@ async def hash_delete(request: HashOperationRequest) -> Dict[str, Any]:
     try:
         client = await get_redis_client()
 
-        fields = request.fields if isinstance(request.fields, list) else list(request.fields.keys())
+        fields = (
+            request.fields
+            if isinstance(request.fields, list)
+            else list(request.fields.keys())
+        )
         deleted = await client.hdel(request.key, *fields)
 
-        return {"status": "success", "key": request.key, "deleted": deleted, "fields": fields}
+        return {
+            "status": "success",
+            "key": request.key,
+            "deleted": deleted,
+            "fields": fields,
+        }
     except Exception as e:
         logger.error(f"Failed to delete hash fields: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -661,7 +754,9 @@ async def get_info() -> Dict[str, Any]:
             "memory": {
                 "used_memory_human": info.get("used_memory_human", "0B"),
                 "used_memory_peak_human": info.get("used_memory_peak_human", "0B"),
-                "total_system_memory_human": info.get("total_system_memory_human", "0B"),
+                "total_system_memory_human": info.get(
+                    "total_system_memory_human", "0B"
+                ),
             },
             "stats": {
                 "connected_clients": info.get("connected_clients", 0),
@@ -680,7 +775,11 @@ async def health_check():
     try:
         client = await get_redis_client()
         await client.ping()
-        return {"status": "healthy", "service": "dragonfly-mcp", "host": f"{DRAGONFLY_HOST}:{DRAGONFLY_PORT}"}
+        return {
+            "status": "healthy",
+            "service": "dragonfly-mcp",
+            "host": f"{DRAGONFLY_HOST}:{DRAGONFLY_PORT}",
+        }
     except Exception as e:
         return {"status": "unhealthy", "service": "dragonfly-mcp", "error": str(e)}
 

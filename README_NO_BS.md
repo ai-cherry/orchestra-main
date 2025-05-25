@@ -24,7 +24,7 @@ docker compose build
 
 # You're now inside Docker. Run stuff:
 run-api      # Start API server
-run-ui       # Start Admin UI  
+run-ui       # Start Admin UI
 run-tests    # Run tests
 fix-format   # Format code
 ```
@@ -67,4 +67,4 @@ git push origin main
 
 No more setup. No more auth hell. No more dependency conflicts.
 
-Just code. 
+Just code.

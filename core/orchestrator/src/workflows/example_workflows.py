@@ -113,7 +113,9 @@ def create_query_workflow() -> WorkflowDefinition:
         ],
         transitions=[
             # From CREATED to RUNNING
-            WorkflowTransition(from_state=WorkflowState.CREATED, to_state=WorkflowState.RUNNING),
+            WorkflowTransition(
+                from_state=WorkflowState.CREATED, to_state=WorkflowState.RUNNING
+            ),
             # From RUNNING to WAITING after querying knowledge base
             WorkflowTransition(
                 from_state=WorkflowState.RUNNING,
@@ -168,7 +170,9 @@ def create_multi_agent_workflow() -> WorkflowDefinition:
         ],
         transitions=[
             # From CREATED to RUNNING
-            WorkflowTransition(from_state=WorkflowState.CREATED, to_state=WorkflowState.RUNNING),
+            WorkflowTransition(
+                from_state=WorkflowState.CREATED, to_state=WorkflowState.RUNNING
+            ),
             # From RUNNING to WAITING after task assignment
             WorkflowTransition(
                 from_state=WorkflowState.RUNNING,

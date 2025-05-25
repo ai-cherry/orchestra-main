@@ -348,8 +348,14 @@ class MemoryKey:
             return False
 
         # This key must be less specific than the other key
-        this_specificity = sum(1 for x in [self.scope, self.user_id, self.session_id, self.agent_id] if x)
-        other_specificity = sum(1 for x in [other.scope, other.user_id, other.session_id, other.agent_id] if x)
+        this_specificity = sum(
+            1 for x in [self.scope, self.user_id, self.session_id, self.agent_id] if x
+        )
+        other_specificity = sum(
+            1
+            for x in [other.scope, other.user_id, other.session_id, other.agent_id]
+            if x
+        )
 
         return this_specificity < other_specificity
 
@@ -501,4 +507,6 @@ def create_memory_key_pattern(
     Returns:
         A MemoryKeyPattern object
     """
-    return MemoryKeyPattern(namespace, key_pattern, scope, user_id, session_id, agent_id)
+    return MemoryKeyPattern(
+        namespace, key_pattern, scope, user_id, session_id, agent_id
+    )

@@ -12,7 +12,10 @@ from datetime import datetime
 from typing import Any, Dict, Optional
 
 from data_source_integrations import DataAggregationOrchestrator, DataSourceConfig
-from enhanced_natural_language_interface import ConversationMode, EnhancedNaturalLanguageInterface
+from enhanced_natural_language_interface import (
+    ConversationMode,
+    EnhancedNaturalLanguageInterface,
+)
 from enhanced_vector_memory_system import EnhancedVectorMemorySystem
 
 # Configure logging
@@ -35,7 +38,9 @@ class OrchestraAIMVP:
     - Real-time conversation capabilities
     """
 
-    def __init__(self, project_id: str = "cherry-ai-project", user_id: str = "default_user"):
+    def __init__(
+        self, project_id: str = "cherry-ai-project", user_id: str = "default_user"
+    ):
         self.project_id = project_id
         self.user_id = user_id
 
@@ -47,7 +52,9 @@ class OrchestraAIMVP:
         # Configuration
         self.configs: Dict[str, DataSourceConfig] = {}
 
-        logger.info(f"Orchestra AI MVP initialized for project {project_id}, user {user_id}")
+        logger.info(
+            f"Orchestra AI MVP initialized for project {project_id}, user {user_id}"
+        )
 
     async def initialize(self) -> None:
         """Initialize all MVP components."""
@@ -55,13 +62,17 @@ class OrchestraAIMVP:
 
         # Initialize memory system
         self.memory_system = EnhancedVectorMemorySystem(
-            project_id=self.project_id, embedding_model="all-MiniLM-L6-v2", redis_url="redis://localhost:6379"
+            project_id=self.project_id,
+            embedding_model="all-MiniLM-L6-v2",
+            redis_url="redis://localhost:6379",
         )
         await self.memory_system.initialize()
         logger.info("✓ Enhanced Vector Memory System initialized")
 
         # Initialize data orchestrator
-        self.data_orchestrator = DataAggregationOrchestrator(memory_system=self.memory_system, user_id=self.user_id)
+        self.data_orchestrator = DataAggregationOrchestrator(
+            memory_system=self.memory_system, user_id=self.user_id
+        )
 
         # Setup data source configurations
         await self._setup_data_source_configs()
@@ -109,12 +120,16 @@ class OrchestraAIMVP:
                 name="salesforce",
                 api_key=os.getenv("SALESFORCE_CLIENT_ID"),
                 base_url="https://login.salesforce.com",
-                additional_headers={"client_secret": os.getenv("SALESFORCE_CLIENT_SECRET")},
+                additional_headers={
+                    "client_secret": os.getenv("SALESFORCE_CLIENT_SECRET")
+                },
                 rate_limit=2.0,  # 2 requests per second
             )
             logger.info("✓ Salesforce configuration loaded")
         else:
-            logger.warning("Salesforce integration skipped: SALESFORCE_CLIENT_ID or SALESFORCE_CLIENT_SECRET not set.")
+            logger.warning(
+                "Salesforce integration skipped: SALESFORCE_CLIENT_ID or SALESFORCE_CLIENT_SECRET not set."
+            )
 
         # --- HubSpot ---
         # Requires: HUBSPOT_API_KEY
@@ -148,13 +163,17 @@ class OrchestraAIMVP:
             self.configs["looker"] = DataSourceConfig(
                 name="looker",
                 api_key=os.getenv("LOOKER_CLIENT_ID"),
-                base_url=os.getenv("LOOKER_BASE_URL", "https://your-company.looker.com"),
+                base_url=os.getenv(
+                    "LOOKER_BASE_URL", "https://your-company.looker.com"
+                ),
                 additional_headers={"client_secret": os.getenv("LOOKER_CLIENT_SECRET")},
                 rate_limit=5.0,  # 5 requests per second
             )
             logger.info("✓ Looker configuration loaded")
         else:
-            logger.warning("Looker integration skipped: LOOKER_CLIENT_ID or LOOKER_CLIENT_SECRET not set.")
+            logger.warning(
+                "Looker integration skipped: LOOKER_CLIENT_ID or LOOKER_CLIENT_SECRET not set."
+            )
 
         total_sources = len(self.configs)
         logger.info(f"✓ Configured {total_sources} data sources")
@@ -174,7 +193,9 @@ class OrchestraAIMVP:
 
         return results
 
-    async def start_conversation(self, initial_query: Optional[str] = None, mode: str = "casual") -> str:
+    async def start_conversation(
+        self, initial_query: Optional[str] = None, mode: str = "casual"
+    ) -> str:
         """Start a new conversation session."""
         if not self.nl_interface:
             raise RuntimeError("MVP not initialized. Call initialize() first.")
@@ -197,7 +218,9 @@ class OrchestraAIMVP:
         logger.info(f"Processed message in conversation {conversation_id}")
         return response_msg.content
 
-    async def search_memory(self, query: str, sources: Optional[list] = None, top_k: int = 5) -> list:
+    async def search_memory(
+        self, query: str, sources: Optional[list] = None, top_k: int = 5
+    ) -> list:
         """Search across all aggregated data with semantic search."""
         if not self.memory_system:
             raise RuntimeError("MVP not initialized. Call initialize() first.")
@@ -218,7 +241,9 @@ class OrchestraAIMVP:
                 }
             )
 
-        logger.info(f"Memory search returned {len(results)} results for query: {query[:50]}...")
+        logger.info(
+            f"Memory search returned {len(results)} results for query: {query[:50]}..."
+        )
         return results
 
     async def get_conversation_context(self, conversation_id: str) -> Dict[str, Any]:
@@ -260,19 +285,27 @@ class OrchestraAIMVP:
 # CLI Interface
 async def main():
     """Command-line interface for Orchestra AI MVP."""
-    parser = argparse.ArgumentParser(description="Orchestra AI MVP - Enhanced AI Assistant")
+    parser = argparse.ArgumentParser(
+        description="Orchestra AI MVP - Enhanced AI Assistant"
+    )
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # Initialize command
     init_parser = subparsers.add_parser("init", help="Initialize the MVP system")
-    init_parser.add_argument("--project-id", default="cherry-ai-project", help="GCP Project ID")
+    init_parser.add_argument(
+        "--project-id", default="cherry-ai-project", help="GCP Project ID"
+    )
     init_parser.add_argument("--user-id", default="default_user", help="User ID")
 
     # Sync command
     sync_parser = subparsers.add_parser("sync", help="Sync data from all sources")
-    sync_parser.add_argument("--hours", type=int, default=24, help="Hours of data to sync")
-    sync_parser.add_argument("--project-id", default="cherry-ai-project", help="GCP Project ID")
+    sync_parser.add_argument(
+        "--hours", type=int, default=24, help="Hours of data to sync"
+    )
+    sync_parser.add_argument(
+        "--project-id", default="cherry-ai-project", help="GCP Project ID"
+    )
     sync_parser.add_argument("--user-id", default="default_user", help="User ID")
 
     # Chat command
@@ -283,15 +316,21 @@ async def main():
         choices=["casual", "analytical", "technical", "strategic", "creative"],
         help="Conversation mode",
     )
-    chat_parser.add_argument("--project-id", default="cherry-ai-project", help="GCP Project ID")
+    chat_parser.add_argument(
+        "--project-id", default="cherry-ai-project", help="GCP Project ID"
+    )
     chat_parser.add_argument("--user-id", default="default_user", help="User ID")
 
     # Search command
     search_parser = subparsers.add_parser("search", help="Search memory")
     search_parser.add_argument("query", help="Search query")
-    search_parser.add_argument("--sources", nargs="+", help="Specific sources to search")
+    search_parser.add_argument(
+        "--sources", nargs="+", help="Specific sources to search"
+    )
     search_parser.add_argument("--top-k", type=int, default=5, help="Number of results")
-    search_parser.add_argument("--project-id", default="cherry-ai-project", help="GCP Project ID")
+    search_parser.add_argument(
+        "--project-id", default="cherry-ai-project", help="GCP Project ID"
+    )
     search_parser.add_argument("--user-id", default="default_user", help="User ID")
 
     args = parser.parse_args()
@@ -319,11 +358,15 @@ async def main():
 
         elif args.command == "search":
             await mvp.initialize()
-            results = await mvp.search_memory(query=args.query, sources=args.sources, top_k=args.top_k)
+            results = await mvp.search_memory(
+                query=args.query, sources=args.sources, top_k=args.top_k
+            )
 
             print(f"\n🔍 Search Results for: '{args.query}'")
             for i, result in enumerate(results, 1):
-                print(f"\n{i}. [{result['source'].upper()}] (Relevance: {result['relevance']:.3f})")
+                print(
+                    f"\n{i}. [{result['source'].upper()}] (Relevance: {result['relevance']:.3f})"
+                )
                 print(f"   {result['content']}")
                 print(f"   Time: {result['timestamp']}")
 
@@ -358,7 +401,9 @@ async def main():
                         results = await mvp.search_memory(query, top_k=3)
                         print(f"\n🔍 Found {len(results)} results:")
                         for i, result in enumerate(results, 1):
-                            print(f"  {i}. [{result['source'].upper()}] {result['content'][:100]}...")
+                            print(
+                                f"  {i}. [{result['source'].upper()}] {result['content'][:100]}..."
+                            )
                         continue
 
                     if not user_input:

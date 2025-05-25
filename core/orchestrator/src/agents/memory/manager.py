@@ -211,7 +211,9 @@ class RedisMemoryStore(MemoryStore):
             password = self.config.get("password")
 
             # Create Redis client
-            self._client = redis.Redis(host=host, port=port, db=db, password=password, decode_responses=True)
+            self._client = redis.Redis(
+                host=host, port=port, db=db, password=password, decode_responses=True
+            )
 
             # Test connection
             await self._client.ping()
@@ -329,7 +331,10 @@ class RedisMemoryStore(MemoryStore):
                             continue
 
                     # Apply text filter
-                    if query.text and query.text.lower() not in item.text_content.lower():
+                    if (
+                        query.text
+                        and query.text.lower() not in item.text_content.lower()
+                    ):
                         continue
 
                     # Apply time range filter
@@ -429,7 +434,9 @@ class FirestoreMemoryStore(MemoryStore):
 
             logger.info(f"Firestore memory store initialized: {project}/{collection}")
         except ImportError:
-            logger.error("Firestore package not installed. Install with: pip install google-cloud-firestore")
+            logger.error(
+                "Firestore package not installed. Install with: pip install google-cloud-firestore"
+            )
             raise
         except Exception as e:
             logger.error(f"Failed to initialize Firestore memory store: {e}")

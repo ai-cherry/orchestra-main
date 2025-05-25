@@ -27,7 +27,9 @@ try:
     from flask_cors import CORS
     from flask_socketio import SocketIO
 except ImportError:
-    print("Flask dependencies not found. Install with: pip install flask flask-cors flask-socketio")
+    print(
+        "Flask dependencies not found. Install with: pip install flask flask-cors flask-socketio"
+    )
     print("Continuing with limited functionality...")
 
 # Import configuration loader
@@ -127,9 +129,17 @@ class MCPServer:
 
             self.perf_tuner = PerformanceTuner()
         except ImportError:
-            logger.warning("Performance tuner not available. Performance optimizations disabled.")
-            self.perf_tuner = None  # Use injected dependencies or create optimized instances
-        memory_config = self.config.get("memory", {}) if isinstance(self.config, dict) else self.config.memory.dict()
+            logger.warning(
+                "Performance tuner not available. Performance optimizations disabled."
+            )
+            self.perf_tuner = (
+                None  # Use injected dependencies or create optimized instances
+            )
+        memory_config = (
+            self.config.get("memory", {})
+            if isinstance(self.config, dict)
+            else self.config.memory.dict()
+        )
         self.memory_store = MemoryStore(memory_config)
 
         # Initialize performance monitor
@@ -167,7 +177,9 @@ class MCPServer:
         except Exception as e:
             logger.error(f"Failed to initialize memory components: {e}")
             # Fall back to default memory manager
-            self.memory_manager = memory_manager or PerformanceMemoryManager(config=memory_config)
+            self.memory_manager = memory_manager or PerformanceMemoryManager(
+                config=memory_config
+            )
 
         # Initialize the tool manager with the performance-optimized memory manager
         self.tool_manager = tool_manager or ToolManager(
@@ -195,7 +207,9 @@ class MCPServer:
         self.socketio = SocketIO(
             self.app,
             cors_allowed_origins=(
-                "*" if not self.config.security.allowed_origins else self.config.security.allowed_origins
+                "*"
+                if not self.config.security.allowed_origins
+                else self.config.security.allowed_origins
             ),
             async_mode="gevent",  # Use gevent for better performance
         )
@@ -310,7 +324,12 @@ class MCPServer:
         def sync_memory():
             data = request.json
 
-            if not data or "key" not in data or "source_tool" not in data or "target_tool" not in data:
+            if (
+                not data
+                or "key" not in data
+                or "source_tool" not in data
+                or "target_tool" not in data
+            ):
                 return jsonify({"error": "Missing required parameters"}), 400
 
             key = data["key"]
@@ -328,7 +347,12 @@ class MCPServer:
         def execute():
             data = request.json
 
-            if not data or "tool" not in data or "mode" not in data or "prompt" not in data:
+            if (
+                not data
+                or "tool" not in data
+                or "mode" not in data
+                or "prompt" not in data
+            ):
                 return jsonify({"error": "Missing required parameters"}), 400
 
             tool = data["tool"]
@@ -358,7 +382,9 @@ class MCPServer:
             parameters = data.get("parameters")
             tool = data.get("tool")
 
-            result = self.workflow_manager.execute_workflow(workflow_id, parameters, tool)
+            result = self.workflow_manager.execute_workflow(
+                workflow_id, parameters, tool
+            )
             if result is None:
                 return (
                     jsonify({"error": f"Failed to execute workflow {workflow_id}"}),
@@ -377,10 +403,16 @@ class MCPServer:
             workflow_id = data["workflow_id"]
             tools = data.get("tools")
 
-            result = self.workflow_manager.execute_cross_tool_workflow(workflow_id, tools)
+            result = self.workflow_manager.execute_cross_tool_workflow(
+                workflow_id, tools
+            )
             if result is None:
                 return (
-                    jsonify({"error": f"Failed to execute cross-tool workflow {workflow_id}"}),
+                    jsonify(
+                        {
+                            "error": f"Failed to execute cross-tool workflow {workflow_id}"
+                        }
+                    ),
                     500,
                 )
 
@@ -407,7 +439,9 @@ class MCPServer:
                 "tuner": self.perf_tuner.get_metrics(),
             }
 
-            self.perf_tuner.record_operation("get_performance_metrics", time.time() - start_time)
+            self.perf_tuner.record_operation(
+                "get_performance_metrics", time.time() - start_time
+            )
             return jsonify(metrics)
 
         @self.app.route("/api/performance/slow-operations", methods=["GET"])
@@ -417,7 +451,9 @@ class MCPServer:
 
             slow_ops = self.perf_tuner.get_slow_operations()
 
-            self.perf_tuner.record_operation("get_slow_operations", time.time() - start_time)
+            self.perf_tuner.record_operation(
+                "get_slow_operations", time.time() - start_time
+            )
             return jsonify({"slow_operations": slow_ops})
 
         @self.app.route("/api/performance/reset", methods=["POST"])

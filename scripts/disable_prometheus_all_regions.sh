@@ -13,14 +13,14 @@ echo ""
 # Get all services with their regions
 gcloud run services list --platform=managed --format="csv(name,region)" | tail -n +2 | while IFS=',' read -r SERVICE REGION; do
     echo "Processing: $SERVICE in $REGION"
-    
+
     # Update the service to remove Prometheus sidecar
     gcloud run services update $SERVICE \
         --platform=managed \
         --region=$REGION \
         --clear-env-vars=ENABLE_PROMETHEUS_SIDECAR \
         --quiet 2>&1 | grep -v "No change"
-    
+
     if [ $? -eq 0 ] || [ $? -eq 1 ]; then
         echo "✅ Successfully processed $SERVICE"
     else
@@ -50,4 +50,4 @@ fi
 
 echo ""
 echo "📈 Google Cloud Monitoring is now active for all services"
-echo "View your metrics at: https://console.cloud.google.com/monitoring" 
+echo "View your metrics at: https://console.cloud.google.com/monitoring"

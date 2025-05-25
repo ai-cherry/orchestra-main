@@ -37,7 +37,7 @@ Orchestra AI is a cloud-native, AI-powered orchestration platform built on Googl
 
 ### Prerequisites
 
-- Python 3.11+
+- Python 3.10+
 - `gcloud` CLI configured
 - Access to GCP project `cherry-ai-project`
 - Required API keys in GCP Secret Manager
@@ -50,7 +50,7 @@ git clone <repo-url>
 cd orchestra-main
 
 # Set up Python environment
-python3.11 -m venv .venv
+python3.10 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
 

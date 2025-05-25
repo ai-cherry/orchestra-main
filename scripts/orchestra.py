@@ -23,7 +23,9 @@ import sys
 from typing import List
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 
@@ -33,11 +35,15 @@ class OrchestaCLI:
     def __init__(self):
         self.script_dir = "scripts"
 
-    def run_command(self, cmd: List[str], capture_output: bool = False) -> subprocess.CompletedProcess:
+    def run_command(
+        self, cmd: List[str], capture_output: bool = False
+    ) -> subprocess.CompletedProcess:
         """Run a command and return the result."""
         try:
             logger.debug(f"Running: {' '.join(cmd)}")
-            result = subprocess.run(cmd, capture_output=capture_output, text=True, check=False)
+            result = subprocess.run(
+                cmd, capture_output=capture_output, text=True, check=False
+            )
             return result
         except Exception as e:
             logger.error(f"Command failed: {e}")
@@ -90,7 +96,12 @@ class OrchestaCLI:
 
         logger.info(f"Waiting for service: {args.service}")
 
-        cmd = ["python", f"{self.script_dir}/health_monitor.py", "--wait-for", args.service]
+        cmd = [
+            "python",
+            f"{self.script_dir}/health_monitor.py",
+            "--wait-for",
+            args.service,
+        ]
         if args.max_wait:
             cmd.extend(["--max-wait", str(args.max_wait)])
 
@@ -105,7 +116,11 @@ class OrchestaCLI:
         try:
             import socket
 
-            services = {8002: "MCP Secret Manager", 8080: "Orchestrator/Firestore", 3000: "Admin UI"}
+            services = {
+                8002: "MCP Secret Manager",
+                8080: "Orchestrator/Firestore",
+                3000: "Admin UI",
+            }
 
             status = {}
             for port, name in services.items():
@@ -135,8 +150,14 @@ class OrchestaCLI:
 
         # Start services in order
         services = [
-            {"name": "MCP Secret Manager", "cmd": ["python", "-m", "mcp_servers.secret_manager", "--port", "8002"]},
-            {"name": "Core Orchestrator", "cmd": ["python", "core/orchestrator/src/api/app.py"]},
+            {
+                "name": "MCP Secret Manager",
+                "cmd": ["python", "-m", "mcp_servers.secret_manager", "--port", "8002"],
+            },
+            {
+                "name": "Core Orchestrator",
+                "cmd": ["python", "core/orchestrator/src/api/app.py"],
+            },
         ]
 
         for service in services:
@@ -257,9 +278,13 @@ Examples:
     config_parser = subparsers.add_parser("config", help="Configuration management")
     config_subparsers = config_parser.add_subparsers(dest="config_action")
 
-    validate_parser = config_subparsers.add_parser("validate", help="Validate configuration")
+    validate_parser = config_subparsers.add_parser(
+        "validate", help="Validate configuration"
+    )
     validate_parser.add_argument("--output", help="Output file for results")
-    validate_parser.add_argument("--fail-fast", action="store_true", help="Exit on first error")
+    validate_parser.add_argument(
+        "--fail-fast", action="store_true", help="Exit on first error"
+    )
 
     # Health commands
     health_parser = subparsers.add_parser("health", help="Health monitoring")
@@ -267,12 +292,22 @@ Examples:
 
     health_subparsers.add_parser("check", help="Check service health once")
 
-    monitor_parser = health_subparsers.add_parser("monitor", help="Monitor continuously")
-    monitor_parser.add_argument("--interval", type=int, default=30, help="Check interval in seconds")
+    monitor_parser = health_subparsers.add_parser(
+        "monitor", help="Monitor continuously"
+    )
+    monitor_parser.add_argument(
+        "--interval", type=int, default=30, help="Check interval in seconds"
+    )
 
-    wait_parser = health_subparsers.add_parser("wait", help="Wait for service to be healthy")
-    wait_parser.add_argument("--service", required=True, help="Service name to wait for")
-    wait_parser.add_argument("--max-wait", type=int, default=120, help="Maximum wait time")
+    wait_parser = health_subparsers.add_parser(
+        "wait", help="Wait for service to be healthy"
+    )
+    wait_parser.add_argument(
+        "--service", required=True, help="Service name to wait for"
+    )
+    wait_parser.add_argument(
+        "--max-wait", type=int, default=120, help="Maximum wait time"
+    )
 
     # Services commands
     services_parser = subparsers.add_parser("services", help="Service management")
@@ -286,7 +321,9 @@ Examples:
     infra_parser = subparsers.add_parser("infra", help="Infrastructure management")
     infra_subparsers = infra_parser.add_subparsers(dest="infra_action")
 
-    infra_subparsers.add_parser("validate", help="Validate infrastructure configuration")
+    infra_subparsers.add_parser(
+        "validate", help="Validate infrastructure configuration"
+    )
 
     # Environment commands
     env_parser = subparsers.add_parser("env", help="Environment management")

@@ -18,7 +18,9 @@ router = APIRouter()
 
 @router.get("/")
 async def get_all_agents(
-    status: Optional[str] = Query("all", description="Filter agents by status", enum=["running", "stopped", "all"])
+    status: Optional[str] = Query(
+        "all", description="Filter agents by status", enum=["running", "stopped", "all"]
+    )
 ) -> Dict[str, Any]:
     """
     Get a list of all agents, optionally filtered by status.
@@ -63,7 +65,9 @@ async def start_agent_endpoint(agent_id: str) -> Dict[str, Any]:
     result = await start_agent(agent_id=agent_id)
     if not result.get("success", False):
         status_code = 404 if "not found" in result.get("error", "") else 500
-        raise HTTPException(status_code=status_code, detail=result.get("error", "Unknown error"))
+        raise HTTPException(
+            status_code=status_code, detail=result.get("error", "Unknown error")
+        )
     return result
 
 
@@ -81,5 +85,7 @@ async def stop_agent_endpoint(agent_id: str) -> Dict[str, Any]:
     result = await stop_agent(agent_id=agent_id)
     if not result.get("success", False):
         status_code = 404 if "not found" in result.get("error", "") else 500
-        raise HTTPException(status_code=status_code, detail=result.get("error", "Unknown error"))
+        raise HTTPException(
+            status_code=status_code, detail=result.get("error", "Unknown error")
+        )
     return result

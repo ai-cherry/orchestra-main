@@ -8,7 +8,7 @@ This document outlines the comprehensive plan to stabilize, enhance, and automat
 
 The DevContainer has been updated to provide a more stable and consistent development environment:
 
-- Updated base image to `mcr.microsoft.com/devcontainers/python:3.11-bookworm` for better stability and security
+- Updated base image to `mcr.microsoft.com/devcontainers/python:3.10-bookworm` for better stability and security
 - Added TFLint to Terraform feature for better validation
 - Enhanced Poetry installation in setup script with proper uninstallation before reinstallation
 - Added verification steps to ensure Poetry is properly installed

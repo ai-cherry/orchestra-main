@@ -112,4 +112,4 @@ This project values:
 
 ---
 **LAST UPDATED**: 2024-01-25
-**STANDARDIZED ON**: Python 3.10 
+**STANDARDIZED ON**: Python 3.10

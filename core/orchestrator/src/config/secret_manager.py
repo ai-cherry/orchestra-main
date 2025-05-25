@@ -54,15 +54,21 @@ def get_secret(secret_name: str, default: Optional[str] = None) -> Optional[Secr
     # Only try Secret Manager if GCP project ID is set
     if settings.GCP_PROJECT_ID:
         try:
-            return _get_from_secret_manager(secret_name, settings.GCP_PROJECT_ID, settings.ENVIRONMENT)
+            return _get_from_secret_manager(
+                secret_name, settings.GCP_PROJECT_ID, settings.ENVIRONMENT
+            )
         except Exception as e:
-            logger.warning(f"Failed to get secret '{secret_name}' from Secret Manager: {e}")
+            logger.warning(
+                f"Failed to get secret '{secret_name}' from Secret Manager: {e}"
+            )
 
     # Return default value if provided
     return default
 
 
-def _get_from_secret_manager(secret_name: str, project_id: str, environment: str) -> Optional[Secret]:
+def _get_from_secret_manager(
+    secret_name: str, project_id: str, environment: str
+) -> Optional[Secret]:
     """
     Get a secret value from Google Secret Manager.
 

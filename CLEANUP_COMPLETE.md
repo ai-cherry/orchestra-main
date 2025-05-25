@@ -2,8 +2,8 @@
 
 ## What Was Fixed:
 
-### 1. **Python Version Standardized to 3.11**
-   - All files now use Python 3.11 (matches your system and CI)
+### 1. **Python Version Standardized to 3.10**
+   - All files now use Python 3.10 (matches your system and CI)
    - No more version conflicts
    - Updated: pyproject.toml, Dockerfile.dev, AI context files
 
@@ -11,7 +11,7 @@
    - Archived 70+ conflicting documentation files to `docs/archive/old-guides/`
    - Kept only 3 essential files:
      - `README.md` - Points to the right places
-     - `README_NO_BS.md` - Quick reference  
+     - `README_NO_BS.md` - Quick reference
      - `UNFUCK_EVERYTHING.md` - Complete guide
 
 ### 3. **Docker-Based Development**
@@ -20,7 +20,7 @@
    - Consistent across all environments
 
 ### 4. **Simplified CI/CD**
-   - `.github/workflows/main.yml` - Uses Python 3.11 and Poetry 1.7.1
+   - `.github/workflows/main.yml` - Uses Python 3.10 and Poetry 1.7.1
    - Push to main = Deploy
    - No complex auth flows
 
@@ -64,13 +64,13 @@ git push origin main
 > **Note:** All services run inside Docker containers managed by `docker compose`. Use only the provided scripts for starting/stopping services.
 
 - **API**: http://localhost:8000
-- **Admin UI**: http://localhost:3001  
+- **Admin UI**: http://localhost:3001
 - **Redis**: localhost:6379
 - **PostgreSQL**: localhost:5432
 
 ## Dependency & Version Management:
 
-- **Python:** Use Python 3.11+ everywhere. Upgrade pip with `pip install --upgrade pip` after creating your venv.
+- **Python:** Use Python 3.10+ everywhere. Upgrade pip with `pip install --upgrade pip` after creating your venv.
 - **Poetry:** Managed inside the container, version pinned in CI (`poetry==1.7.1`).
 - **Node/NPM:** Use Node 18+ and run `npm ci` (not `npm install`) in `admin-interface` for reproducible installs. Node/npm version is managed in the Dockerfile.
 - **Docker Compose:** All workflows use `docker compose` (not `docker-compose`).
@@ -94,4 +94,4 @@ git push origin main
 For GCP infrastructure-as-code, see [`infra/README.md`](infra/README.md) for Pulumi workflows and best practices.
 
 
-**That's it. No more bullshit. Just code.** 
+**That's it. No more bullshit. Just code.**

@@ -79,7 +79,9 @@ async def demo_conversation_with_persona(persona_id: str):
 
         # Generate response
         try:
-            response = await llm_provider.generate_chat_completion(messages=messages, temperature=0.7)
+            response = await llm_provider.generate_chat_completion(
+                messages=messages, temperature=0.7
+            )
 
             # Extract response text
             response_text = response["content"]
@@ -138,7 +140,9 @@ async def demo_direct_completion():
         ]
 
         try:
-            response = await llm_provider.generate_chat_completion(messages=messages, temperature=0.8)
+            response = await llm_provider.generate_chat_completion(
+                messages=messages, temperature=0.8
+            )
 
             # Print the response
             print(f"Assistant: {response['content']}")
@@ -168,7 +172,9 @@ async def main():
     # Check for API key
     settings = get_settings()
     if not hasattr(settings, "OPENROUTER_API_KEY") or not settings.OPENROUTER_API_KEY:
-        print("Warning: OpenRouter API key not found. Please set OPENROUTER_API_KEY in your environment.")
+        print(
+            "Warning: OpenRouter API key not found. Please set OPENROUTER_API_KEY in your environment."
+        )
 
         # Set a dummy key for testing
         os.environ["OPENROUTER_API_KEY"] = "dummy_key"

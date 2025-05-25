@@ -56,7 +56,9 @@ class PerformanceMonitor:
 
             # Log slow operations
             if duration_ms > self.slow_threshold:
-                logger.warning(f"Slow operation detected: {name} took {duration_ms:.2f}ms")
+                logger.warning(
+                    f"Slow operation detected: {name} took {duration_ms:.2f}ms"
+                )
 
     def monitor(self, name: Optional[str] = None):
         """Decorator to monitor function execution time.
@@ -105,7 +107,9 @@ class PerformanceMonitor:
 
         return metrics
 
-    def get_slow_operations(self, threshold_ms: Optional[float] = None) -> Dict[str, Any]:
+    def get_slow_operations(
+        self, threshold_ms: Optional[float] = None
+    ) -> Dict[str, Any]:
         """Get operations exceeding the slow threshold.
 
         Args:
@@ -138,7 +142,12 @@ class PerformanceMonitor:
                 }
 
         # Sort by slow percentage (highest first)
-        return {k: v for k, v in sorted(result.items(), key=lambda x: x[1]["slow_percentage"], reverse=True)}
+        return {
+            k: v
+            for k, v in sorted(
+                result.items(), key=lambda x: x[1]["slow_percentage"], reverse=True
+            )
+        }
 
     def reset(self) -> None:
         """Reset all performance metrics."""
@@ -163,7 +172,11 @@ class PerformanceMonitor:
             recommendations.append(
                 {
                     "type": "performance",
-                    "severity": "high" if any(op["slow_percentage"] > 50 for op in slow_ops.values()) else "medium",
+                    "severity": (
+                        "high"
+                        if any(op["slow_percentage"] > 50 for op in slow_ops.values())
+                        else "medium"
+                    ),
                     "message": f"Found {len(slow_ops)} slow operations that exceed {self.slow_threshold}ms threshold",
                     "operations": list(slow_ops.keys()),
                 }
@@ -178,7 +191,9 @@ class PerformanceMonitor:
 _performance_monitor = None
 
 
-def get_performance_monitor(config: Optional[Dict[str, Any]] = None) -> PerformanceMonitor:
+def get_performance_monitor(
+    config: Optional[Dict[str, Any]] = None
+) -> PerformanceMonitor:
     """Get or create the global performance monitor instance.
 
     Args:

@@ -105,7 +105,7 @@ Adapters provide model-specific implementations of the Roo-MCP integration:
 
 ### Prerequisites
 
-- Python 3.11 or higher
+- Python 3.10 or higher
 - Access to the MCP server
 - Required Python packages (see `setup_roo_mcp.py`)
 

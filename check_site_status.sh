@@ -71,4 +71,4 @@ fi
 
 echo ""
 echo "Last checked: $(date)"
-echo "Run again: ./check_site_status.sh" 
+echo "Run again: ./check_site_status.sh"

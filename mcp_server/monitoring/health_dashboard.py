@@ -41,7 +41,12 @@ async def check_health(name: str, url: str) -> dict:
 
             if response.status_code == 200:
                 data = response.json()
-                return {"name": name, "status": "✅ Healthy", "latency": f"{latency:.0f}ms", "details": data}
+                return {
+                    "name": name,
+                    "status": "✅ Healthy",
+                    "latency": f"{latency:.0f}ms",
+                    "details": data,
+                }
             else:
                 return {
                     "name": name,
@@ -50,12 +55,19 @@ async def check_health(name: str, url: str) -> dict:
                     "details": {},
                 }
     except Exception as e:
-        return {"name": name, "status": "❌ Down", "latency": "N/A", "details": {"error": str(e)}}
+        return {
+            "name": name,
+            "status": "❌ Down",
+            "latency": "N/A",
+            "details": {"error": str(e)},
+        }
 
 
 def create_health_table(health_data: list) -> Table:
     """Create health status table"""
-    table = Table(title="MCP Server Health Status", show_header=True, header_style="bold magenta")
+    table = Table(
+        title="MCP Server Health Status", show_header=True, header_style="bold magenta"
+    )
     table.add_column("Server", style="cyan", width=15)
     table.add_column("Status", width=15)
     table.add_column("Latency", justify="right", width=10)
@@ -138,7 +150,12 @@ async def monitor_health(interval: int = 5):
 
             # Add timestamp
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            layout["health"].update(Panel(create_health_table(health_data), title=f"MCP System Health - {timestamp}"))
+            layout["health"].update(
+                Panel(
+                    create_health_table(health_data),
+                    title=f"MCP System Health - {timestamp}",
+                )
+            )
 
             live.update(layout)
             await asyncio.sleep(interval)

@@ -6,10 +6,10 @@
 
 1. **Simplicity Over Complexity**
 
-   - ❌ NO Docker unless absolutely necessary
-   - ❌ NO Poetry - use pip/venv
-   - ✅ Use existing tools and patterns
-   - ✅ Prefer Python's built-in libraries
+   - ✅ All development and deployment must use Docker Compose v2 and Poetry for Python dependency management.
+   - ✅ Python 3.10+ is required for all services and scripts.
+   - ✅ Use existing tools and patterns from the codebase.
+   - ✅ Prefer Python's built-in libraries and minimal dependencies.
 
 2. **Performance & Stability First**
 
@@ -25,7 +25,7 @@
    - Use existing patterns from codebase
 
 4. **Python Standards**
-   - Python 3.10+ (not 3.11 due to system constraints)
+   - Python 3.10+ (standardized across all environments and CI)
    - Type hints for all new functions
    - Google-style docstrings
    - Black formatting
@@ -50,8 +50,6 @@ See `AI_CONTEXT_FILES.md` for detailed usage examples.
 ```python
 # ❌ AI often suggests:
 import pandas as pd  # Don't add heavy deps for simple tasks
-import docker       # We don't use Docker
-from poetry import Poetry  # No Poetry!
 
 # ✅ Instead use:
 import csv          # Built-in for data handling
@@ -144,10 +142,10 @@ make before-ai-coding  # Creates git checkpoint and documents state
 
 ### **2. Configuration Files**
 
-- `requirements/base.txt` - Core dependencies only
+- `pyproject.toml` - All Python dependencies managed by Poetry
 - `scripts/` - All automation tools
 - `Makefile` - Build targets (check before adding)
-- NO `poetry.lock`, `Pipfile`, `docker-compose.yml`
+- NO `Pipfile`, `requirements.txt` (except those exported from Poetry), or legacy dependency files
 
 ### **3. Import Patterns**
 
@@ -275,11 +273,11 @@ Watch for these warning signs:
 
 1. **New dependency management files**
 
-   - `Pipfile`, `poetry.lock`, `setup.cfg`, `pyproject.toml`
+   - `Pipfile`, `setup.cfg`, or any requirements files not exported from Poetry
 
 2. **Container files**
 
-   - `Dockerfile`, `docker-compose.yml`, `.dockerignore`
+   - Only use `Dockerfile`, `docker-compose.yml`, `.dockerignore` as part of the standardized workflow
 
 3. **Complex patterns**
 
@@ -338,7 +336,7 @@ black scripts/*.py
 # Remove unused imports
 autoflake --remove-all-unused-imports -i scripts/*.py
 
-# Check for Python 3.11+ features
+# Check for Python 3.10+ features
 python -m py_compile scripts/*.py  # Will fail on syntax errors
 
 # Find and review os.system usage
@@ -353,9 +351,9 @@ diff -u <(grep "def " scripts/health_monitor.py | sort) <(grep "def " scripts/ne
 Before committing AI-generated code:
 
 - [ ] Used appropriate ai*context*\*.py file for the task
-- [ ] No new dependency management tools (Poetry, Pipenv)
-- [ ] No Docker/container files
-- [ ] No Python 3.11+ only features
+- [ ] No new dependency management tools (Pipenv, Pipfile, etc.)
+- [ ] Only use Docker/Poetry as specified
+- [ ] Uses Python 3.10+ features as standard
 - [ ] Uses existing patterns from scripts/
 - [ ] Follows naming conventions
 - [ ] Has proper type hints

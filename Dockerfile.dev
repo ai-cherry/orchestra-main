@@ -46,4 +46,4 @@ RUN pip install --user \
 RUN echo 'PS1="\[\033[1;36m\]🐳 orchestra-dev\[\033[0m\] \[\033[1;34m\]\w\[\033[0m\] $ "' >> ~/.bashrc
 
 # Keep container running
-CMD ["/bin/bash"] 
+CMD ["/bin/bash"]

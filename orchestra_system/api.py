@@ -17,18 +17,16 @@ Key features:
 
 import asyncio
 import json
-import logging
 import os
 import time
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
+from core.env_config import settings  # Centralized settings object
+from core.logging_config import configure_logging
+
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-)
-logger = logging.getLogger("orchestra-system-api")
+logger = configure_logging("orchestra-system-api")
 
 # Import system components
 try:
@@ -124,12 +122,12 @@ except ImportError:
 
 # Try to import MCP client
 try:
-    from gcp_migration.mcp_client_enhanced import (
-        MCPClient,
-    )
+    from gcp_migration.mcp_client_enhanced import MCPClient
     from gcp_migration.mcp_client_enhanced import get_client as get_mcp_client
 except ImportError:
-    logger.warning("Could not import enhanced MCP client, attempting to import basic client")
+    logger.warning(
+        "Could not import enhanced MCP client, attempting to import basic client"
+    )
     try:
         from gcp_migration.mcp_client import MCPClient
         from gcp_migration.mcp_client import get_client as get_mcp_client
@@ -187,19 +185,19 @@ class OrchestraSystemAPI:
             Environment name
         """
         # Check for GitHub Codespaces
-        if os.environ.get("CODESPACES") == "true":
+        if settings.codespaces:
             return "codespaces"
 
         # Check for GCP Cloud Run
-        if os.environ.get("K_SERVICE"):
+        if settings.k_service:
             return "gcp_cloud_run"
 
         # Check for GCP Workstation
-        if os.environ.get("CLOUD_WORKSTATIONS_AGENT"):
+        if settings.cloud_workstations_agent:
             return "gcp_workstation"
 
         # Check for CI/CD
-        if os.environ.get("CI") or os.environ.get("GITHUB_ACTIONS"):
+        if settings.ci or settings.github_actions:
             return "ci_cd"
 
         # Default to local
@@ -258,10 +256,14 @@ class OrchestraSystemAPI:
                 component_status["resource_registry"] = {
                     "discovered_resources": len(resources),
                     "available_resources": sum(
-                        1 for status in resource_status.values() if status == ResourceStatus.AVAILABLE
+                        1
+                        for status in resource_status.values()
+                        if status == ResourceStatus.AVAILABLE
                     ),
                     "unavailable_resources": sum(
-                        1 for status in resource_status.values() if status != ResourceStatus.AVAILABLE
+                        1
+                        for status in resource_status.values()
+                        if status != ResourceStatus.AVAILABLE
                     ),
                 }
 
@@ -270,7 +272,9 @@ class OrchestraSystemAPI:
                 logger.error(f"Failed to initialize resource registry: {e}")
                 component_status["resource_registry"] = {"error": str(e)}
         else:
-            component_status["resource_registry"] = {"error": "Resource registry not available"}
+            component_status["resource_registry"] = {
+                "error": "Resource registry not available"
+            }
 
         # Initialize configuration manager
         if self.config_manager:
@@ -289,7 +293,9 @@ class OrchestraSystemAPI:
                 logger.error(f"Failed to initialize configuration manager: {e}")
                 component_status["config_manager"] = {"error": str(e)}
         else:
-            component_status["config_manager"] = {"error": "Configuration manager not available"}
+            component_status["config_manager"] = {
+                "error": "Configuration manager not available"
+            }
 
         # Initialize conflict resolver
         if self.conflict_resolver:
@@ -298,8 +304,16 @@ class OrchestraSystemAPI:
 
                 component_status["conflict_resolver"] = {
                     "detected_conflicts": len(conflicts),
-                    "pending_conflicts": sum(1 for c in conflicts if c.resolution_status == ResolutionStatus.PENDING),
-                    "resolved_conflicts": sum(1 for c in conflicts if c.resolution_status == ResolutionStatus.RESOLVED),
+                    "pending_conflicts": sum(
+                        1
+                        for c in conflicts
+                        if c.resolution_status == ResolutionStatus.PENDING
+                    ),
+                    "resolved_conflicts": sum(
+                        1
+                        for c in conflicts
+                        if c.resolution_status == ResolutionStatus.RESOLVED
+                    ),
                 }
 
                 self.system_state["conflicts_count"] = len(conflicts)
@@ -307,7 +321,9 @@ class OrchestraSystemAPI:
                 logger.error(f"Failed to initialize conflict resolver: {e}")
                 component_status["conflict_resolver"] = {"error": str(e)}
         else:
-            component_status["conflict_resolver"] = {"error": "Conflict resolver not available"}
+            component_status["conflict_resolver"] = {
+                "error": "Conflict resolver not available"
+            }
 
         # Update system state
         self.system_state["initialization_status"] = component_status
@@ -329,21 +345,21 @@ class OrchestraSystemAPI:
             try:
                 resources = list(getattr(self.registry, "resources", {}).values())
                 self.system_state["resources_count"] = len(resources)
-            except:
+            except Exception:
                 pass
 
         if self.config_manager:
             try:
                 configs = self.config_manager.get_all()
                 self.system_state["configs_count"] = len(configs)
-            except:
+            except Exception:
                 pass
 
         if self.conflict_resolver:
             try:
                 conflicts = getattr(self.conflict_resolver, "conflicts", {})
                 self.system_state["conflicts_count"] = len(conflicts)
-            except:
+            except Exception:
                 pass
 
         return self.system_state
@@ -369,7 +385,9 @@ class OrchestraSystemAPI:
             result = [r.to_dict() for r in resources]
 
             # Update system state
-            self.system_state["resources_count"] = len(getattr(self.registry, "resources", {}))
+            self.system_state["resources_count"] = len(
+                getattr(self.registry, "resources", {})
+            )
             self._save_system_state()
 
             return result
@@ -459,7 +477,9 @@ class OrchestraSystemAPI:
 
         try:
             statuses = await verify_resources()
-            return {resource_id: status.value for resource_id, status in statuses.items()}
+            return {
+                resource_id: status.value for resource_id, status in statuses.items()
+            }
         except Exception as e:
             logger.error(f"Failed to verify resources: {e}")
             return {}
@@ -543,7 +563,9 @@ class OrchestraSystemAPI:
                 source_enum = getattr(ConfigSource, source.upper())
 
             # Set configuration
-            self.config_manager.set(key=key, value=value, environment=env_enum, source=source_enum)
+            self.config_manager.set(
+                key=key, value=value, environment=env_enum, source=source_enum
+            )
 
             return True
         except Exception as e:
@@ -821,7 +843,10 @@ class OrchestraSystemAPI:
                         file_path = os.path.join(root, file)
 
                         # Match file patterns
-                        if not any(self._match_pattern(file, pattern) for pattern in file_patterns):
+                        if not any(
+                            self._match_pattern(file, pattern)
+                            for pattern in file_patterns
+                        ):
                             continue
 
                         # Check file age
@@ -829,7 +854,7 @@ class OrchestraSystemAPI:
                             file_mtime = os.path.getmtime(file_path)
                             if file_mtime > max_age_timestamp:
                                 continue
-                        except:
+                        except Exception:
                             continue
 
                         files_to_delete.append(file_path)
@@ -865,7 +890,11 @@ class OrchestraSystemAPI:
                 history_response = self.mcp_client.get(self.CLEANUP_HISTORY_KEY)
                 history = []
 
-                if history_response and history_response.success and history_response.value:
+                if (
+                    history_response
+                    and history_response.success
+                    and history_response.value
+                ):
                     history = history_response.value
 
                 # Add current report to history
@@ -937,10 +966,14 @@ class OrchestraSystemAPI:
                 context["resources"] = {
                     "total": len(resources),
                     "by_type": {rtype: len(items) for rtype, items in by_type.items()},
-                    "available": sum(1 for r in resources if r.get("status") == "available"),
-                    "high_priority": sum(1 for r in resources if r.get("priority", 2) <= 1),
+                    "available": sum(
+                        1 for r in resources if r.get("status") == "available"
+                    ),
+                    "high_priority": sum(
+                        1 for r in resources if r.get("priority", 2) <= 1
+                    ),
                 }
-            except:
+            except Exception:
                 pass
 
         # Get configuration info
@@ -956,11 +989,13 @@ class OrchestraSystemAPI:
                     "environments": list(
                         set(
                             getattr(entry, "environment", "unknown")
-                            for entry in getattr(self.config_manager, "config_entries", {}).values()
+                            for entry in getattr(
+                                self.config_manager, "config_entries", {}
+                            ).values()
                         )
                     ),
                 }
-            except:
+            except Exception:
                 pass
 
         # Get conflict info
@@ -971,8 +1006,12 @@ class OrchestraSystemAPI:
                 context["conflicts"] = {
                     "total": len(conflicts),
                     "by_type": {},
-                    "pending": sum(1 for c in conflicts if c.get("resolution_status") == "pending"),
-                    "resolved": sum(1 for c in conflicts if c.get("resolution_status") == "resolved"),
+                    "pending": sum(
+                        1 for c in conflicts if c.get("resolution_status") == "pending"
+                    ),
+                    "resolved": sum(
+                        1 for c in conflicts if c.get("resolution_status") == "resolved"
+                    ),
                 }
 
                 # Group by conflict type
@@ -981,7 +1020,7 @@ class OrchestraSystemAPI:
                     if conflict_type not in context["conflicts"]["by_type"]:
                         context["conflicts"]["by_type"][conflict_type] = 0
                     context["conflicts"]["by_type"][conflict_type] += 1
-            except:
+            except Exception:
                 pass
 
         return context
@@ -991,7 +1030,9 @@ class OrchestraSystemAPI:
 _default_api: Optional[OrchestraSystemAPI] = None
 
 
-def get_api(mcp_client: Optional[MCPClient] = None, force_new: bool = False) -> OrchestraSystemAPI:
+def get_api(
+    mcp_client: Optional[MCPClient] = None, force_new: bool = False
+) -> OrchestraSystemAPI:
     """Get the default system API.
 
     Args:
@@ -1053,38 +1094,38 @@ if __name__ == "__main__":
     api = get_api()
 
     if args.init:
-        print("Initializing system...")
+        logger.info("Initializing system...")
         state = loop.run_until_complete(api.initialize_system())
-        print(json.dumps(state, indent=2))
+        logger.info(json.dumps(state, indent=2))
 
     if args.discover:
-        print("Discovering resources...")
+        logger.info("Discovering resources...")
         resources = loop.run_until_complete(api.discover_resources())
-        print(f"Discovered {len(resources)} resources")
+        logger.info(f"Discovered {len(resources)} resources")
 
     if args.conflicts:
-        print("Detecting conflicts...")
+        logger.info("Detecting conflicts...")
         conflicts = api.detect_conflicts()
-        print(f"Detected {len(conflicts)} conflicts")
+        logger.info(f"Detected {len(conflicts)} conflicts")
 
     if args.config:
-        print("Discovering configuration...")
+        logger.info("Discovering configuration...")
         count = api.discover_configuration()
-        print(f"Discovered {count} configuration entries")
+        logger.info(f"Discovered {count} configuration entries")
 
     if args.cleanup:
-        print("Cleaning up artifacts...")
+        logger.info("Cleaning up artifacts...")
         report = loop.run_until_complete(api.cleanup_artifacts(dry_run=args.dry_run))
-        print(f"Found {report['files_found']} files to clean up")
+        logger.info(f"Found {report['files_found']} files to clean up")
         if not args.dry_run:
-            print(f"Deleted {report['files_deleted']} files")
+            logger.info(f"Deleted {report['files_deleted']} files")
         else:
-            print("Dry run, no files deleted")
+            logger.info("Dry run, no files deleted")
 
     if args.context:
-        print("Getting current context...")
+        logger.info("Getting current context...")
         context = loop.run_until_complete(api.get_context())
-        print(json.dumps(context, indent=2))
+        logger.info(json.dumps(context, indent=2))
 
     if not any(
         [
@@ -1097,6 +1138,6 @@ if __name__ == "__main__":
         ]
     ):
         # Default action is to get system state
-        print("Getting system state...")
+        logger.info("Getting system state...")
         state = loop.run_until_complete(api.get_system_state())
-        print(json.dumps(state, indent=2))
+        logger.info(json.dumps(state, indent=2))

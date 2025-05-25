@@ -24,11 +24,17 @@ from mcp_server.servers.web_scraping_mcp_server import OrchestraWebScrapingMCPSe
 from web_scraping_ai_agents import WebScrapingOrchestrator
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 # Initialize FastAPI app
-app = FastAPI(title="Web Scraping AI Agents", description="Orchestra AI Web Scraping Agent Team", version="1.0.0")
+app = FastAPI(
+    title="Web Scraping AI Agents",
+    description="Orchestra AI Web Scraping Agent Team",
+    version="1.0.0",
+)
 
 # Add CORS middleware
 app.add_middleware(
@@ -167,7 +173,10 @@ async def search_web(request: SearchRequest):
 
     try:
         result = await mcp_server.handle_web_search(
-            query=request.query, engine=request.engine, max_results=request.max_results, strategy=request.strategy
+            query=request.query,
+            engine=request.engine,
+            max_results=request.max_results,
+            strategy=request.strategy,
         )
         return {"result": result}
     except Exception as e:
@@ -190,7 +199,9 @@ async def scrape_website(request: ScrapeRequest):
         if request.user_agent:
             kwargs["user_agent"] = request.user_agent
 
-        result = await mcp_server.handle_scrape_website(url=request.url, strategy=request.strategy, **kwargs)
+        result = await mcp_server.handle_scrape_website(
+            url=request.url, strategy=request.strategy, **kwargs
+        )
         return {"result": result}
     except Exception as e:
         logger.error(f"Error in website scraping: {e}")
@@ -204,7 +215,9 @@ async def analyze_content(request: AnalyzeRequest):
         raise HTTPException(status_code=503, detail="MCP server not initialized")
 
     try:
-        result = await mcp_server.handle_analyze_content(content=request.content, analysis_type=request.analysis_type)
+        result = await mcp_server.handle_analyze_content(
+            content=request.content, analysis_type=request.analysis_type
+        )
         return {"result": result}
     except Exception as e:
         logger.error(f"Error in content analysis: {e}")
@@ -219,7 +232,9 @@ async def bulk_scrape(request: BulkScrapeRequest):
 
     try:
         result = await mcp_server.handle_bulk_scrape(
-            urls=request.urls, strategy=request.strategy, max_concurrent=request.max_concurrent
+            urls=request.urls,
+            strategy=request.strategy,
+            max_concurrent=request.max_concurrent,
         )
         return {"result": result}
     except Exception as e:

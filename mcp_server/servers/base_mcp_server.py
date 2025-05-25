@@ -42,7 +42,12 @@ class MCPServerConfig(BaseModel):
     enable_service_directory: bool = True
     enable_pubsub: bool = True
     health_check_interval: int = 30  # seconds
-    retry_config: Dict[str, int] = {"max_retries": 3, "initial_delay": 1, "max_delay": 60, "exponential_base": 2}
+    retry_config: Dict[str, int] = {
+        "max_retries": 3,
+        "initial_delay": 1,
+        "max_delay": 60,
+        "exponential_base": 2,
+    }
 
 
 class HealthStatus(BaseModel):
@@ -64,7 +69,10 @@ class BaseMCPServer(ABC):
         self.publisher = None
         self.service_client = None
         self.health_status = HealthStatus(
-            status="initializing", timestamp=datetime.utcnow(), details={}, uptime_seconds=0
+            status="initializing",
+            timestamp=datetime.utcnow(),
+            details={},
+            uptime_seconds=0,
         )
         self._health_check_task = None
         self._shutdown = False
@@ -92,8 +100,12 @@ class BaseMCPServer(ABC):
         if self.config.enable_pubsub:
             try:
                 self.publisher = pubsub_v1.PublisherClient()
-                self.topic_path = self.publisher.topic_path(self.config.project_id, self.config.pubsub_topic)
-                logger.info(f"Initialized Pub/Sub publisher for topic: {self.topic_path}")
+                self.topic_path = self.publisher.topic_path(
+                    self.config.project_id, self.config.pubsub_topic
+                )
+                logger.info(
+                    f"Initialized Pub/Sub publisher for topic: {self.topic_path}"
+                )
             except Exception as e:
                 logger.error(f"Failed to initialize Pub/Sub: {e}")
                 self.config.enable_pubsub = False
@@ -119,7 +131,11 @@ class BaseMCPServer(ABC):
         # Publish startup event
         await self.publish_event(
             "server_started",
-            {"name": self.config.name, "version": self.config.version, "timestamp": datetime.utcnow().isoformat()},
+            {
+                "name": self.config.name,
+                "version": self.config.version,
+                "timestamp": datetime.utcnow().isoformat(),
+            },
         )
 
         # Start server-specific logic
@@ -146,7 +162,8 @@ class BaseMCPServer(ABC):
 
         # Publish shutdown event
         await self.publish_event(
-            "server_stopped", {"name": self.config.name, "timestamp": datetime.utcnow().isoformat()}
+            "server_stopped",
+            {"name": self.config.name, "timestamp": datetime.utcnow().isoformat()},
         )
 
         # Stop server-specific logic
@@ -161,9 +178,7 @@ class BaseMCPServer(ABC):
 
         try:
             # Create namespace if it doesn't exist
-            namespace_path = (
-                f"projects/{self.config.project_id}/locations/{self.config.region}/namespaces/{self.config.namespace}"
-            )
+            namespace_path = f"projects/{self.config.project_id}/locations/{self.config.region}/namespaces/{self.config.namespace}"
 
             try:
                 self.service_client.get_namespace(name=namespace_path)
@@ -189,11 +204,15 @@ class BaseMCPServer(ABC):
             }
 
             try:
-                self.service_client.create_service(parent=namespace_path, service_id=service_id, service=service)
+                self.service_client.create_service(
+                    parent=namespace_path, service_id=service_id, service=service
+                )
                 logger.info(f"Registered service: {service_id}")
             except gcp_exceptions.AlreadyExists:
                 # Update existing service
-                self.service_client.update_service(service={"name": service_path, "metadata": service["metadata"]})
+                self.service_client.update_service(
+                    service={"name": service_path, "metadata": service["metadata"]}
+                )
                 logger.info(f"Updated existing service: {service_id}")
 
             # Register endpoint (if applicable)
@@ -206,7 +225,9 @@ class BaseMCPServer(ABC):
                 }
 
                 try:
-                    self.service_client.create_endpoint(parent=service_path, endpoint_id=endpoint_id, endpoint=endpoint)
+                    self.service_client.create_endpoint(
+                        parent=service_path, endpoint_id=endpoint_id, endpoint=endpoint
+                    )
                     logger.info(f"Registered endpoint: {endpoint_id}")
                 except gcp_exceptions.AlreadyExists:
                     pass
@@ -245,7 +266,10 @@ class BaseMCPServer(ABC):
             future = self.publisher.publish(self.topic_path, message)
 
             # Wait for publish to complete (with timeout)
-            await asyncio.wait_for(asyncio.get_event_loop().run_in_executor(None, future.result), timeout=5.0)
+            await asyncio.wait_for(
+                asyncio.get_event_loop().run_in_executor(None, future.result),
+                timeout=5.0,
+            )
 
             logger.debug(f"Published event: {event_type}")
         except Exception as e:
@@ -264,9 +288,17 @@ class BaseMCPServer(ABC):
                 self.health_status.details = health_details
 
                 # Determine overall status
-                if all(v.get("healthy", False) for v in health_details.values() if isinstance(v, dict)):
+                if all(
+                    v.get("healthy", False)
+                    for v in health_details.values()
+                    if isinstance(v, dict)
+                ):
                     self.health_status.status = "healthy"
-                elif any(v.get("healthy", False) for v in health_details.values() if isinstance(v, dict)):
+                elif any(
+                    v.get("healthy", False)
+                    for v in health_details.values()
+                    if isinstance(v, dict)
+                ):
                     self.health_status.status = "degraded"
                 else:
                     self.health_status.status = "unhealthy"
@@ -362,7 +394,9 @@ class RetryHelper:
             except Exception as e:
                 last_exception = e
                 if attempt < max_retries:
-                    logger.warning(f"Attempt {attempt + 1} failed: {e}. Retrying in {delay}s...")
+                    logger.warning(
+                        f"Attempt {attempt + 1} failed: {e}. Retrying in {delay}s..."
+                    )
                     await asyncio.sleep(delay)
                     delay = min(delay * exponential_base, max_delay)
                 else:

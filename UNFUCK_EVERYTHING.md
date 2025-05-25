@@ -57,7 +57,7 @@ docker compose build
 ./start.sh shell
 
 # Inside container, you'll see:
-# 🐳 orchestra-dev /workspace $ 
+# 🐳 orchestra-dev /workspace $
 ```
 
 ## Phase 3: Google Cloud Fix (15 minutes)
@@ -188,24 +188,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
-      
+          python-version: "3.10"
+
       - name: Install Poetry
         run: |
           pip install --upgrade pip
           pip install poetry==1.7.1
           poetry config virtualenvs.create false
-      
+
       - name: Install dependencies
         run: poetry install
-      
+
       - name: Run tests
         run: poetry run pytest
-      
+
       - name: Run linting
         run: |
           poetry run black --check .
@@ -218,7 +218,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Deploy to GCP
         run: |
           echo "Deploy step - customize as needed"
@@ -289,7 +289,7 @@ cat > README_SIMPLE.md << 'EOF'
 
 Inside container:
 - `run-api` - Start API
-- `run-ui` - Start UI  
+- `run-ui` - Start UI
 - `run-tests` - Run tests
 - `fix-format` - Format code
 
@@ -336,7 +336,7 @@ scp service-account-key.json paperspace@[YOUR_IP]:~/orchestra-main/
 Now you can:
 - Login with ONE command: `./start.sh shell`
 - All dependencies are managed by Poetry/Docker
-- Python 3.11+ and Node 18+ are required everywhere (see infra/README.md for IaC details)
+- Python 3.10+ and Node 18+ are required everywhere (see infra/README.md for IaC details)
 - No more version conflicts
 - No more auth bullshit
 - Just code and push
@@ -365,4 +365,4 @@ poetry run pytest -v
 
 ---
 
-**That's it. No more bullshit. Just code.** 
+**That's it. No more bullshit. Just code.**

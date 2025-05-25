@@ -28,10 +28,16 @@ class AgentCommunicationService:
         self.agent_id = None
         self.conversation_id = None
         self.subscriptions: Set[str] = set()
-        self.event_handlers: Dict[str, List[Callable[[Dict[str, Any]], Awaitable[None]]]] = {}
-        self.task_handlers: Dict[str, Callable[[Dict[str, Any]], Awaitable[Dict[str, Any]]]] = {}
+        self.event_handlers: Dict[
+            str, List[Callable[[Dict[str, Any]], Awaitable[None]]]
+        ] = {}
+        self.task_handlers: Dict[
+            str, Callable[[Dict[str, Any]], Awaitable[Dict[str, Any]]]
+        ] = {}
 
-    async def initialize(self, agent_id: str, conversation_id: Optional[str] = None) -> None:
+    async def initialize(
+        self, agent_id: str, conversation_id: Optional[str] = None
+    ) -> None:
         """
         Initialize the communication service.
 
@@ -48,18 +54,24 @@ class AgentCommunicationService:
         self.pubsub_client.create_topic("agent-results")
 
         # Create agent-specific subscription for events
-        agent_filter = f'attributes.recipient_id = "{agent_id}" OR attributes.recipient_id = "all"'
+        agent_filter = (
+            f'attributes.recipient_id = "{agent_id}" OR attributes.recipient_id = "all"'
+        )
         if conversation_id:
             agent_filter += f' AND attributes.conversation_id = "{conversation_id}"'
 
-        self.pubsub_client.create_subscription(f"agent-events-{agent_id}", "agent-events", filter_expr=agent_filter)
+        self.pubsub_client.create_subscription(
+            f"agent-events-{agent_id}", "agent-events", filter_expr=agent_filter
+        )
 
         # Create agent-specific subscription for tasks
         task_filter = f'attributes.agent_id = "{agent_id}"'
         if conversation_id:
             task_filter += f' AND attributes.conversation_id = "{conversation_id}"'
 
-        self.pubsub_client.create_subscription(f"agent-tasks-{agent_id}", "agent-tasks", filter_expr=task_filter)
+        self.pubsub_client.create_subscription(
+            f"agent-tasks-{agent_id}", "agent-tasks", filter_expr=task_filter
+        )
 
         # Start listening for events
         await self.start_event_listener()
@@ -74,7 +86,9 @@ class AgentCommunicationService:
         subscription_name = f"agent-events-{self.agent_id}"
 
         # Define the callback for events
-        async def event_callback(data: Dict[str, Any], attributes: Dict[str, str]) -> None:
+        async def event_callback(
+            data: Dict[str, Any], attributes: Dict[str, str]
+        ) -> None:
             event_type = attributes.get("event_type")
             if not event_type:
                 logger.warning(f"Received event without event_type: {attributes}")
@@ -89,7 +103,9 @@ class AgentCommunicationService:
                         logger.error(f"Error in event handler for {event_type}: {e}")
 
         # Start the subscription
-        asyncio.create_task(self.pubsub_client.subscribe_async(subscription_name, event_callback))
+        asyncio.create_task(
+            self.pubsub_client.subscribe_async(subscription_name, event_callback)
+        )
         self.subscriptions.add(subscription_name)
 
         logger.info(f"Started event listener for agent {self.agent_id}")
@@ -99,7 +115,9 @@ class AgentCommunicationService:
         subscription_name = f"agent-tasks-{self.agent_id}"
 
         # Define the callback for tasks
-        async def task_callback(data: Dict[str, Any], attributes: Dict[str, str]) -> None:
+        async def task_callback(
+            data: Dict[str, Any], attributes: Dict[str, str]
+        ) -> None:
             task_type = attributes.get("task_type")
             if not task_type:
                 logger.warning(f"Received task without task_type: {attributes}")
@@ -129,12 +147,16 @@ class AgentCommunicationService:
                     )
 
         # Start the subscription
-        asyncio.create_task(self.pubsub_client.subscribe_async(subscription_name, task_callback))
+        asyncio.create_task(
+            self.pubsub_client.subscribe_async(subscription_name, task_callback)
+        )
         self.subscriptions.add(subscription_name)
 
         logger.info(f"Started task listener for agent {self.agent_id}")
 
-    def register_event_handler(self, event_type: str, handler: Callable[[Dict[str, Any]], Awaitable[None]]) -> None:
+    def register_event_handler(
+        self, event_type: str, handler: Callable[[Dict[str, Any]], Awaitable[None]]
+    ) -> None:
         """
         Register a handler for a specific event type.
 
@@ -160,7 +182,9 @@ class AgentCommunicationService:
         """
         self.task_handlers[task_type] = handler
 
-    async def publish_event(self, event_type: str, data: Dict[str, Any], recipient_id: str = "all") -> str:
+    async def publish_event(
+        self, event_type: str, data: Dict[str, Any], recipient_id: str = "all"
+    ) -> str:
         """
         Publish an event.
 

@@ -108,7 +108,10 @@ class BatchProcessor:
 
                 # Check if the oldest item has been waiting too long
                 oldest_timestamp = self.batch_queue[0]["added_at"]
-                if time.time() - oldest_timestamp > self.max_wait_time and len(self.batch_queue) >= self.min_batch_size:
+                if (
+                    time.time() - oldest_timestamp > self.max_wait_time
+                    and len(self.batch_queue) >= self.min_batch_size
+                ):
                     asyncio.create_task(self._process_batch())
 
     async def _process_batch(self) -> None:
@@ -195,7 +198,9 @@ class BatchProcessor:
         Returns:
             Dictionary with statistics
         """
-        avg_batch_size = sum(self.batch_sizes) / len(self.batch_sizes) if self.batch_sizes else 0
+        avg_batch_size = (
+            sum(self.batch_sizes) / len(self.batch_sizes) if self.batch_sizes else 0
+        )
 
         return {
             "total_requests": self.total_requests,
@@ -203,7 +208,9 @@ class BatchProcessor:
             "total_items_processed": self.total_items_processed,
             "average_batch_size": avg_batch_size,
             "current_queue_size": len(self.batch_queue),
-            "batch_size_distribution": self.batch_sizes[-10:] if self.batch_sizes else [],
+            "batch_size_distribution": (
+                self.batch_sizes[-10:] if self.batch_sizes else []
+            ),
         }
 
 
@@ -503,7 +510,9 @@ class OptimizedVertexAIService:
 
             # Store in semantic cache if caching is enabled
             if self.enable_caching:
-                await self.semantic_cache.set(semantic_query, {"text": result, "model_id": model_id})
+                await self.semantic_cache.set(
+                    semantic_query, {"text": result, "model_id": model_id}
+                )
 
             log_end(
                 logger,
@@ -682,7 +691,12 @@ class OptimizedVertexAIService:
                 raise ModelNotFoundError(model_id)
 
             # Process requests in parallel for better performance
-            results = await asyncio.gather(*[self._generate_single_embedding(text, vertex_model_id) for text in texts])
+            results = await asyncio.gather(
+                *[
+                    self._generate_single_embedding(text, vertex_model_id)
+                    for text in texts
+                ]
+            )
 
             log_end(
                 logger,
@@ -878,7 +892,9 @@ class OptimizedVertexAIService:
                     classification = json.loads(json_str)
                 else:
                     # Fallback: create a uniform distribution
-                    classification = {category: 1.0 / len(categories) for category in categories}
+                    classification = {
+                        category: 1.0 / len(categories) for category in categories
+                    }
 
                 # Ensure all categories are present
                 for category in categories:
@@ -904,7 +920,9 @@ class OptimizedVertexAIService:
 
             except json.JSONDecodeError:
                 # Fallback: create a uniform distribution
-                classification = {category: 1.0 / len(categories) for category in categories}
+                classification = {
+                    category: 1.0 / len(categories) for category in categories
+                }
 
                 log_end(
                     logger,
@@ -1048,7 +1066,9 @@ class OptimizedVertexAIService:
                 prompt=prompt,
                 model_id=model_id,
                 temperature=0.3,  # Moderate temperature for balance
-                max_tokens=max_length // 4 if max_length else None,  # Approximate token limit
+                max_tokens=(
+                    max_length // 4 if max_length else None
+                ),  # Approximate token limit
             )
 
             log_end(
