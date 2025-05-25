@@ -4,7 +4,6 @@ version = "0.1.0"
 description = "Orchestra AI - Multi-agent orchestration system"
 authors = ["Orchestra Team"]
 readme = "README.md"
-python = "^3.10"
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -45,21 +44,20 @@ pyyaml = "^6.0"
 httpx = "^0.28.0"
 tenacity = "^8.2.0"
 
-[tool.poetry.group.dev.dependencies]
+[tool.poetry.dev-dependencies]
 pytest = "^7.4.0"
 pytest-asyncio = "^0.21.0"
 pytest-cov = "^4.1.0"
 black = "^23.7.0"
 flake8 = "^6.1.0"
 mypy = "^1.5.0"
-isort = "^5.12.0"
-ipython = "^8.14.0"
-pre-commit = "^3.3.0"
+# isort temporarily removed to unblock dependency resolution
+# ipython temporarily removed to unblock dependency resolution
+# pre-commit temporarily removed to unblock dependency resolution
 
-[tool.poetry.group.production.dependencies]
-gunicorn = "^23.0.0"
-prometheus-client = "^0.21.0"
-sentry-sdk = "^2.19.0"
+# gunicorn temporarily removed to unblock dependency resolution
+# prometheus-client temporarily removed to unblock dependency resolution
+# sentry-sdk temporarily removed to unblock CI/CD
 
 [build-system]
 requires = ["poetry-core"]

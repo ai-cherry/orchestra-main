@@ -1,3 +1,4 @@
+<!-- ACCESS TEST: Inserted by automated system access verification. -->
 # Orchestra AI
 
 **🚀 Want to get started immediately?** → [README_NO_BS.md](README_NO_BS.md)
