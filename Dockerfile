@@ -1,3 +1,9 @@
+# Dockerfile - Orchestra Main Application
+# LOCKED VERSION - DO NOT CHANGE WITHOUT APPROVAL
+
+# Use exact Python version - no ambiguity
+FROM python:3.10.12-slim-bullseye AS base
+
 # Stage 1: Builder stage - for installing dependencies including build-time ones
 FROM python:3.10-slim-bullseye AS builder
 
