@@ -32,8 +32,8 @@ Yes, if your system rebuilds and ends up in restricted mode, you should run the 
    - For Docker environments:
      ```bash
      # Complete rebuild to apply all changes
-     docker-compose down
-     docker-compose up --build -d
+     docker compose down
+     docker compose up --build -d
      ```
 
 The `ensure_standard_mode.sh` script performs multiple actions to fix restricted mode:
@@ -54,7 +54,7 @@ To prevent getting into restricted mode again:
 
 2. **For Docker environments**:
 
-   - Always use the updated Dockerfile and docker-compose.yml files
+   - Always use the updated Dockerfile and docker compose.yml files
    - The modified Dockerfile enforces standard mode at the container level
 
 3. **For VSCode**:

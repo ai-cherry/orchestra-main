@@ -209,11 +209,11 @@ if [ -f .env ]; then
 fi
 
 # Start the services
-docker-compose up -d
+docker compose up -d
 
 # Show running containers
 echo "Running containers:"
-docker-compose ps
+docker compose ps
 
 echo ""
 echo "Access the services at:"
@@ -223,5 +223,5 @@ echo "- LLM Testing Service: http://localhost:8001"
 echo "- Grafana Dashboards: http://localhost:3001 (admin/admin)"
 echo "- Prometheus: http://localhost:9090"
 echo ""
-echo "To view logs, use: docker-compose logs -f [service_name]"
-echo "To stop all services: docker-compose down"
+echo "To view logs, use: docker compose logs -f [service_name]"
+echo "To stop all services: docker compose down"

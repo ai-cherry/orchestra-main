@@ -1,83 +1,84 @@
+[tool.poetry]
+name = "orchestra-ai"
+version = "0.1.0"
+description = "Orchestra AI - Multi-agent orchestration system"
+authors = ["Orchestra Team"]
+readme = "README.md"
+python = "^3.10"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+# Web Frameworks
+fastapi = "^0.115.0"
+flask = "^3.0.0"
+uvicorn = {extras = ["standard"], version = "^0.34.0"}
+
+# Google Cloud
+google-cloud-aiplatform = "^1.93.0"
+google-cloud-storage = "^2.19.0"
+google-cloud-secret-manager = "^2.23.0"
+google-cloud-firestore = "^2.20.0"
+google-cloud-bigquery = "*"
+google-auth = "^2.40.0"
+
+# AI/ML
+openai = "^1.82.0"
+litellm = "^1.70.0"
+tiktoken = "^0.7.0"
+transformers = "^4.36.0"
+sentence-transformers = "^2.2.0"
+numpy = "^2.2.0"
+
+# Database
+redis = {extras = ["hiredis"], version = "^6.1.0"}
+sqlalchemy = "^2.0.0"
+psycopg = {extras = ["binary"], version = "^3.1.0"}
+pgvector = "^0.2.0"
+
+# Utilities
+pydantic = "^2.11.0"
+python-dotenv = "^1.0.0"
+click = "^8.2.0"
+rich = "^13.7.0"
+pyyaml = "^6.0"
+httpx = "^0.28.0"
+tenacity = "^8.2.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+pytest-asyncio = "^0.21.0"
+pytest-cov = "^4.1.0"
+black = "^23.7.0"
+flake8 = "^6.1.0"
+mypy = "^1.5.0"
+isort = "^5.12.0"
+ipython = "^8.14.0"
+pre-commit = "^3.3.0"
+
+[tool.poetry.group.production.dependencies]
+gunicorn = "^23.0.0"
+prometheus-client = "^0.21.0"
+sentry-sdk = "^2.19.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.black]
-line-length = 120
-target-version = ['py311']
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # Directories
-  \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | venv
-  | _build
-  | buck-out
-  | build
-  | dist
-  | node_modules
-  | \.terraform
-)/
-'''
+line-length = 100
+target-version = ['py310']
 
 [tool.isort]
 profile = "black"
-line_length = 120
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
-ensure_newline_before_comments = true
-skip_gitignore = true
-sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+line_length = 100
 
 [tool.mypy]
-python_version = "3.11"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = true
-no_implicit_optional = true
-strict_optional = true
-exclude = [
-    "venv/",
-    "build/",
-    "dist/",
-    "__pycache__/",
-    ".git/",
-    ".terraform/"
-]
+python_version = "3.10"
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-asyncio_mode = "auto"
-addopts = "-v --tb=short"
-python_files = ["test_*.py", "*_test.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-
-[tool.ruff]
-line-length = 120
-target-version = "py311"
-exclude = [
-    ".git",
-    ".mypy_cache",
-    ".tox",
-    ".venv",
-    "venv",
-    "_build",
-    "buck-out",
-    "build",
-    "dist",
-    "node_modules",
-    ".terraform"
-]
-
-[tool.ruff.lint]
-select = ["E", "F", "W", "I", "N", "UP", "S", "B", "A", "C4", "T20"]
-ignore = ["E501"]  # Line too long (handled by black)
-
-[tool.ruff.lint.isort]
-known-first-party = ["orchestra_ai", "mcp_server", "core", "utils"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"

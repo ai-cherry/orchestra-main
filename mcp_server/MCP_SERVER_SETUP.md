@@ -40,7 +40,7 @@ For containerized deployment, use Docker Compose:
 
 ```bash
 cd mcp_server/scripts
-docker-compose up -d
+docker compose up -d
 ```
 
 This will build and start the MCP server in a Docker container, with proper volume mounting for persistent data.
@@ -98,7 +98,7 @@ If this file doesn't exist, it will be created automatically from the example co
 
 - Ensure Docker is installed and running
 - Check Docker logs: `docker logs mcp-server_mcp-server_1`
-- Rebuild the container: `docker-compose build --no-cache`
+- Rebuild the container: `docker compose build --no-cache`
 
 ## Logs and Monitoring
 

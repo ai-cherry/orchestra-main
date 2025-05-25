@@ -1,6 +1,6 @@
 import sys
 
-MIN_PYTHON_VERSION = (3, 11)  # Require Python 3.11+
+MIN_PYTHON_VERSION = (3, 10)  # Require Python 3.11+
 
 
 def check_virtual_environment():

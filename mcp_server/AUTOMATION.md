@@ -81,20 +81,20 @@ journalctl -u mcp-server.service -f
 
 ## 3. Docker Container
 
-For Docker environments, use the provided Dockerfile and docker-compose.yml:
+For Docker environments, use the provided Dockerfile and docker compose.yml:
 
 ```bash
 # Navigate to the scripts directory
 cd mcp_server/scripts
 
-# Start with docker-compose (builds and runs)
-docker-compose up -d
+# Start with docker compose (builds and runs)
+docker compose up -d
 
 # Stop the container
-docker-compose down
+docker compose down
 
 # View logs
-docker-compose logs -f
+docker compose logs -f
 ```
 
 The Docker setup includes:
@@ -109,7 +109,7 @@ The Docker setup includes:
 To rebuild the container after code changes:
 
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 ## 4. Universal Startup Script
@@ -153,7 +153,7 @@ If the MCP server fails to start:
 
    - Direct run: `/tmp/mcp-server.log`
    - Systemd: `journalctl -u mcp-server.service -f`
-   - Docker: `docker-compose logs -f`
+   - Docker: `docker compose logs -f`
 
 2. Common issues:
 

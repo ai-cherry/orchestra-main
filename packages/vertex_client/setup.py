@@ -36,7 +36,7 @@ setup(
     ],
     keywords="vertex-ai, google-cloud, orchestration, automation",
     packages=find_packages(include=["vertex_client", "vertex_client.*"]),
-    python_requires=">=3.11, <4",
+    python_requires=">=3.10, <4",
     install_requires=requirements,
     entry_points={
         "console_scripts": [

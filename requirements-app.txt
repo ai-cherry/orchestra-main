@@ -1,4 +1,0 @@
-# Application Requirements for Orchestra AI Project
-# Production-optimized dependencies for containerized deployment
-
--r requirements/production.txt

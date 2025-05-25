@@ -1,51 +1,69 @@
-# Version control
+# Git
 .git
-.github
 .gitignore
 
-# Python cache files
-__pycache__/
-*.py[cod]
-*$py.class
-.pytest_cache/
-.coverage
-htmlcov/
-.coverage.*
-coverage.xml
-
-# Environment and local config
-.env
-.venv
-env/
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
 venv/
+venv_*/
 ENV/
-.env.*
-.python-version
-.pyenv/
+env/
+pip-log.txt
+pip-delete-this-directory.txt
 .tox/
+.coverage
+.coverage.*
+.cache
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
 
-# Development tools
+# IDEs
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
-# Documentation
-docs/
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Terraform
-terraform/.terraform/
-*.tfstate
-*.tfstate.backup
-*.tfvars
-
-# Logs
-logs/
+# Project specific
+service-account-key.json
 *.log
-
-# Temporary files
-tmp/
-temp/
+*.pid
+*.seed
+*.pid.lock
+node_modules/
+.env
+.env.*
+!.env.example
+docs/archive/
+scripts/archive/
+*.tar.gz
+*.zip
 
 # Build artifacts
-*.egg-info/
 dist/
 build/
+*.egg-info/
+.eggs/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+
+# Docker
+docker-compose.override.yml

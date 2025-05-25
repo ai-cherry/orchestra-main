@@ -63,7 +63,7 @@ class AdminUiSite(pulumi.ComponentResource):
                 not_found_page="index.html",
             ),
             cors=[
-                gcp.storage.BucketCorsArgs(
+                gcp.storage.BucketCorArgs(
                     max_age_seconds=3600,
                     methods=["GET", "HEAD"],
                     origins=["*"],
@@ -94,7 +94,7 @@ class AdminUiSite(pulumi.ComponentResource):
         # 3. HTTPS load balancer (URL Map → Target Proxy → Forwarding Rule)
         url_map = gcp.compute.URLMap(
             f"{name}-url-map",
-            default_backend_bucket=backend_bucket.id,
+            default_service=backend_bucket.self_link,
             opts=pulumi.ResourceOptions(parent=self),
         )
 

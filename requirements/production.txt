@@ -24,10 +24,10 @@ orjson==3.10.12
 ujson==5.10.0
 
 # Production Configuration
-dynaconf==3.3.2
+dynaconf==3.2.11
 
 # Error Tracking (if using Sentry)
 sentry-sdk==2.19.2
 
 # Production Health Checks
-health-check==3.4.7
+health-check==3.4.1

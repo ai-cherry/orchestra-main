@@ -118,7 +118,7 @@ python scripts/diagnose_system.py --focus memory --verbose
    ```
 4. Restart the vector database service:
    ```bash
-   cd memory-api && docker-compose restart pinecone
+   cd memory-api && docker compose restart pinecone
    ```
 5. Check for database resource constraints:
    ```bash
@@ -401,7 +401,7 @@ This indicates the memory system is operating with reduced functionality.
    ```
 3. Restart memory services:
    ```bash
-   cd memory-api && docker-compose restart
+   cd memory-api && docker compose restart
    ```
 4. Check for resource constraints on memory components
 

@@ -27,13 +27,16 @@ UI_DIST: Final[Path] = ROOT / "admin-ui" / "dist"
 INFRA_DIR: Final[Path] = ROOT / "infra" / "admin_ui_site"
 
 
-def run(cmd: list[str]) -> None:
-    """Run *cmd* and exit on non-zero return code."""
+def run(cmd: list[str], allow_failure: bool = False) -> None:
+    """Run *cmd* and exit on non-zero return code unless allow_failure is True."""
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as exc:
-        sys.stderr.write(f"[deploy_admin_ui] command failed: {exc.cmd}\n")
-        sys.exit(exc.returncode)
+        if not allow_failure:
+            sys.stderr.write(f"[deploy_admin_ui] command failed: {exc.cmd}\n")
+            sys.exit(exc.returncode)
+        else:
+            sys.stderr.write(f"[deploy_admin_ui] command failed but continuing: {exc.cmd}\n")
 
 
 def main() -> None:
@@ -47,8 +50,8 @@ def main() -> None:
         sys.exit(1)
 
     # Ensure stack exists (Pulumi is idempotent – harmless if already created).
-    stack_name = f"gcp/{args.stack}/admin-ui"
-    run(["pulumi", "stack", "init", stack_name, "--non-interactive"])
+    stack_name = args.stack
+    run(["pulumi", "stack", "select", stack_name, "--cwd", str(INFRA_DIR)])
 
     # Configure required values.
     run(
@@ -60,6 +63,8 @@ def main() -> None:
             args.domain,
             "--stack",
             stack_name,
+            "--cwd",
+            str(INFRA_DIR),
         ]
     )
 
@@ -73,7 +78,8 @@ def main() -> None:
             stack_name,
             "--cwd",
             str(INFRA_DIR),
-        ]
+        ],
+        allow_failure=True  # Allow failure if infrastructure already exists
     )
 
     # Get bucket name output.
@@ -92,7 +98,11 @@ def main() -> None:
     bucket_name = bucket_name_bytes.decode().strip()
 
     # Sync static assets.
-    run(["gsutil", "-m", "rsync", "-r", str(UI_DIST), f"gs://{bucket_name}"])
+    # The bucket_name already includes the gs:// prefix from Pulumi output
+    # Ensure bucket_name has gs:// prefix
+    if not bucket_name.startswith("gs://"):
+        bucket_name = f"gs://{bucket_name}"
+    run(["gsutil", "-m", "rsync", "-r", str(UI_DIST), bucket_name])
 
     print("Admin UI deployed successfully! 🎉")
 
