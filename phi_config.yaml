@@ -1,9 +1,0 @@
-storage:
-  type: gcp-firestore
-  project: cherry-ai.me
-  collection: agent_sessions
-
-secrets:
-  source: gcp-secret-manager
-  project: cherry-ai.me
-  auto_load: true
