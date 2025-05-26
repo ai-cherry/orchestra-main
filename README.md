@@ -53,3 +53,20 @@
 ---
 
 **This project is now fully automated and streamlined for solo or team development.**
+
+## Internals Documentation
+
+Detailed docs live under [`/docs`](docs/):
+
+* [`docs/memory_overview.md`](docs/memory_overview.md) – how the layered memory system works.
+* [`AGENTS.md`](AGENTS.md) – how to configure and register new agents.
+
+## 🧪 Testing
+
+Run the **smoke test suite** (fast!) locally:
+
+```bash
+pytest -q tests/core/orchestrator
+```
+
+Add more tests under `tests/` – the CI will pick them up automatically.
