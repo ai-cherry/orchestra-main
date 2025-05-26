@@ -1,3 +1,0 @@
-"""
-Admin API application package.
-"""
