@@ -1,5 +1,5 @@
 name: orchestra-infra
-description: Pulumi GCP stack for Orchestra AI secrets and infra automation
+description: Pulumi DigitalOcean stack for Orchestra AI infrastructure
 runtime:
   name: python
   options:

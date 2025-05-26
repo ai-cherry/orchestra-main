@@ -25,13 +25,13 @@
    ```
 4. **Deploy:**
    ```bash
-   bash scripts/deploy_orchestra.sh
+   # Run via Pulumi (DigitalOcean)
+   cd infra && pulumi stack select dev && pulumi up
    ```
 
 ## 🛡️ CI/CD
-- All secrets are managed via GitHub Actions secrets and Pulumi.
-- No manual steps required for deploys.
-- The deploy workflow (`.github/workflows/deploy.yaml`) is fully automated. It uses secrets for all credentials and never prompts for input. To trigger a deploy, just push to `main`.
+- All secrets are managed via GitHub Actions secrets and Pulumi. The only cloud credential required is `DIGITALOCEAN_TOKEN`.
+- The deploy workflow (`.github/workflows/deploy.yaml`) is fully automated for DigitalOcean – push to `main` and a new droplet is provisioned / updated automatically.
 
 ## Pulumi Secrets
 - The Pulumi config passphrase is set automatically via:
@@ -70,3 +70,7 @@ pytest -q tests/core/orchestrator
 ```
 
 Add more tests under `tests/` – the CI will pick them up automatically.
+
+## 🌐 Cloud Target
+
+**DigitalOcean** is now the sole deployment target. The old GCP stack files are kept only for reference.
