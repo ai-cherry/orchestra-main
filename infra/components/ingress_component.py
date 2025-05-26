@@ -4,9 +4,10 @@ Ingress Component for Domain Configuration
 Configures NGINX ingress with SSL/TLS for cherry-ai.me
 """
 
+from typing import Any, Dict, Optional
+
 import pulumi_kubernetes as k8s
 from pulumi import ComponentResource, ResourceOptions
-from typing import Dict, Any, Optional
 
 
 class IngressComponent(ComponentResource):

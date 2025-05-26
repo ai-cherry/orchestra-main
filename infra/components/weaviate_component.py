@@ -19,9 +19,11 @@ Usage:
     )
 """
 
+from typing import Any, Dict, Optional
+
 import pulumi_kubernetes as k8s
 from pulumi import ComponentResource, ResourceOptions
-from typing import Dict, Any, Optional
+
 from .secret_helper import create_k8s_secret_from_config
 
 

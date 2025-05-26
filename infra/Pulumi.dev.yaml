@@ -5,7 +5,7 @@ config:
   orchestra-infra:zone: us-central1-a
   orchestra-infra:weaviate_rest_endpoint: http://weaviate.superagi.svc.cluster.local:8080
   orchestra-infra:grafana_admin_password:
-    secure: v1:FG82h71JOFXs1W7M:WPZmNWuTKF3NCrRg+tU7aoXLl29VYNJskAagnzmdalnu66+fXRGssVIqgEXuTaviv3Su0zFNkOE7CYWy
+    secure: v1:jLYwPbDLtGlYArGe:5mtf6rJg/YlQjhKz7ED3DqK27zpyZeqMn27rtPtXUr81ySG72Y1bcJCM+t9s6WPU84j5AGxdru4ml0WU
   gcp:project: cherry-ai-project
   gcp:region: us-central1
   orchestra-infra:mongodb_uri:

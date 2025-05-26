@@ -4,9 +4,10 @@ Monitoring Component for SuperAGI
 Deploys Prometheus, Grafana, and alerting infrastructure
 """
 
-import pulumi_kubernetes as k8s
-from pulumi import ComponentResource, ResourceOptions, Output
 from typing import Optional
+
+import pulumi_kubernetes as k8s
+from pulumi import ComponentResource, Output, ResourceOptions
 
 
 class MonitoringComponent(ComponentResource):

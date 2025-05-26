@@ -16,9 +16,10 @@ Usage:
     )
 """
 
+from typing import Any, Dict, List
+
 import pulumi
 import pulumi_kubernetes as k8s
-from typing import List, Dict, Any
 
 
 def create_k8s_secret_from_config(

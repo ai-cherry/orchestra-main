@@ -4,12 +4,12 @@ Database Component for Pulumi Infrastructure
 Modular component for managing database resources (DragonflyDB, MongoDB, Firestore)
 """
 
-import pulumi
-import pulumi_kubernetes as k8s
-import pulumi_gcp as gcp
-from pulumi import ComponentResource, ResourceOptions
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
+import pulumi
+import pulumi_gcp as gcp
+import pulumi_kubernetes as k8s
+from pulumi import ComponentResource, ResourceOptions
 
 from .secret_helper import create_k8s_secret_from_config
 
