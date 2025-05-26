@@ -46,7 +46,7 @@ kubectl get services -n superagi
 echo -e "\n5. Checking ingress..."
 if kubectl get ingress -n superagi &> /dev/null; then
     kubectl get ingress -n superagi
-    
+
     # Get ingress IP
     INGRESS_IP=$(kubectl get ingress superagi-ingress -n superagi -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
     if [ -n "$INGRESS_IP" ]; then
@@ -97,7 +97,7 @@ echo -e "\n10. Testing endpoints..."
 if [ -n "$INGRESS_IP" ]; then
     echo "Testing HTTP redirect..."
     curl -I -s "http://$INGRESS_IP" -H "Host: cherry-ai.me" | head -1
-    
+
     echo "Testing HTTPS..."
     curl -I -s -k "https://$INGRESS_IP" -H "Host: cherry-ai.me" | head -1
 fi
@@ -131,4 +131,4 @@ echo
 echo "Useful commands:"
 echo "- View logs: kubectl logs -f deployment/superagi -n superagi"
 echo "- Port forward: kubectl port-forward svc/superagi 8080:8080 -n superagi"
-echo "- Watch ingress: kubectl get ingress -n superagi -w" 
+echo "- Watch ingress: kubectl get ingress -n superagi -w"

@@ -1,0 +1,268 @@
+name: Pulumi Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'infra/**'
+      - '.github/workflows/pulumi-deploy.yml'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'infra/**'
+      - '.github/workflows/pulumi-deploy.yml'
+  workflow_dispatch:
+    inputs:
+      stack:
+        description: 'Pulumi stack to deploy'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+env:
+  PULUMI_VERSION: "3.100.0"
+  PYTHON_VERSION: "3.10"
+  GCP_REGION: "us-central1"
+
+jobs:
+  validate:
+    name: Validate Infrastructure Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('infra/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          cd infra
+          pip install -r requirements.txt
+          pip install pylint black mypy
+
+      - name: Run linters
+        run: |
+          cd infra
+          black --check .
+          pylint *.py components/*.py
+          mypy --ignore-missing-imports .
+
+      - name: Run tests
+        run: |
+          cd infra
+          python -m pytest tests/ -v --cov=./ --cov-report=xml
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./infra/coverage.xml
+          flags: infrastructure
+
+  preview:
+    name: Preview Changes
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: write
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Install Pulumi ESC
+        uses: pulumi/esc-action@v1
+        with:
+          environment: ${{ github.event.inputs.stack || 'dev' }}
+
+      - name: Preview with Pulumi
+        uses: pulumi/actions@v5
+        with:
+          command: preview
+          stack-name: ${{ github.event.inputs.stack || 'dev' }}
+          work-dir: ./infra
+          comment-on-pr: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+  deploy:
+    name: Deploy Infrastructure
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
+      id-token: write
+    environment:
+      name: ${{ github.event.inputs.stack || (github.ref == 'refs/heads/main' && 'prod' || 'dev') }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Install Pulumi ESC
+        uses: pulumi/esc-action@v1
+        with:
+          environment: ${{ github.event.inputs.stack || (github.ref == 'refs/heads/main' && 'prod' || 'dev') }}
+
+      - name: Deploy with Pulumi
+        uses: pulumi/actions@v5
+        with:
+          command: up
+          stack-name: ${{ github.event.inputs.stack || (github.ref == 'refs/heads/main' && 'prod' || 'dev') }}
+          work-dir: ./infra
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      - name: Export stack outputs
+        id: pulumi-outputs
+        uses: pulumi/actions@v5
+        with:
+          command: stack output --json
+          stack-name: ${{ github.event.inputs.stack || (github.ref == 'refs/heads/main' && 'prod' || 'dev') }}
+          work-dir: ./infra
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      - name: Update deployment status
+        run: |
+          echo "Deployment completed successfully"
+          echo "Cluster: $(echo '${{ steps.pulumi-outputs.outputs.stdout }}' | jq -r '.cluster_name')"
+          echo "SuperAGI Endpoint: $(echo '${{ steps.pulumi-outputs.outputs.stdout }}' | jq -r '.superagi_endpoint')"
+
+  build-and-push:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker
+
+      - name: Build and push SuperAGI image
+        run: |
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/superagi:latest -f Dockerfile.superagi .
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/superagi:latest
+
+      - name: Deploy to Kubernetes
+        run: |
+          gcloud container clusters get-credentials orchestra-cluster-${{ github.event.inputs.stack || (github.ref == 'refs/heads/main' && 'prod' || 'dev') }} \
+            --zone=${{ env.GCP_REGION }}-a \
+            --project=${{ secrets.GCP_PROJECT_ID }}
+          kubectl rollout restart deployment/superagi -n superagi
+          kubectl rollout status deployment/superagi -n superagi
+
+  integration-tests:
+    name: Run Integration Tests
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install test dependencies
+        run: |
+          pip install pytest requests
+
+      - name: Wait for services to be ready
+        run: |
+          echo "Waiting for services to stabilize..."
+          sleep 60
+
+      - name: Run integration tests
+        run: |
+          cd tests/integration
+          pytest test_superagi_deployment.py -v
+
+      - name: Run MCP connectivity tests
+        run: |
+          cd tests/integration
+          pytest test_mcp_servers.py -v
+
+  notify:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [deploy, build-and-push, integration-tests]
+    if: always()
+    steps:
+      - name: Send notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            Deployment Status: ${{ job.status }}
+            Stack: ${{ github.event.inputs.stack || (github.ref == 'refs/heads/main' && 'prod' || 'dev') }}
+            Triggered by: ${{ github.actor }}
+            Commit: ${{ github.sha }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+        if: ${{ env.SLACK_WEBHOOK_URL != '' }}

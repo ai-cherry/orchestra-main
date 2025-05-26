@@ -165,9 +165,9 @@ The configuration includes:
 
 ## Infrastructure Setup
 
-The memory infrastructure is provisioned using Terraform:
+The memory infrastructure is provisioned using Pulumi:
 
-1. **Terraform Module**: `terraform/modules/memory_infrastructure/`
+1. **Pulumi Module**: `infra/modules/memory_infrastructure/`
 2. **Setup Script**: `scripts/setup_memory_infrastructure.sh`
 
 To set up the infrastructure:
@@ -185,7 +185,7 @@ The script will:
 1. Create a service account for the memory system
 2. Grant the necessary permissions
 3. Create a storage bucket for vector embeddings
-4. Apply the Terraform configuration
+4. Apply the Pulumi configuration
 
 ## Best Practices
 

@@ -57,6 +57,7 @@ class LayeredMemory:
     ) -> bool:
         """
         Store an item in memory.
+        Logs operation duration and errors for observability.
 
         Args:
             key: The key to store the value under
@@ -68,40 +69,51 @@ class LayeredMemory:
         Returns:
             True if successful, False otherwise
         """
-        # Check if the specified layer exists
-        if layer not in self.layers:
-            logger.error(f"Layer '{layer}' not found")
+        start_time = time.perf_counter()
+        try:
+            # Check if the specified layer exists
+            if layer not in self.layers:
+                logger.error(f"Layer '{layer}' not found")
+                return False
+
+            # Add metadata
+            document = value.copy()
+            document["stored_at"] = int(time.time())
+            document["memory_key"] = key
+            document["memory_layer"] = layer
+
+            # Store in the specified layer
+            success = await self.layers[layer].store(key, document, ttl)
+
+            if not success:
+                logger.error(f"Failed to store item with key {key} in layer {layer}")
+                return False
+
+            # If cascade is enabled, store in lower layers
+            if cascade and layer in self.layer_hierarchy:
+                layer_index = self.layer_hierarchy.index(layer)
+
+                # Store in all layers below the specified layer
+                for lower_layer in self.layer_hierarchy[:layer_index]:
+                    if lower_layer in self.layers:
+                        await self.layers[lower_layer].store(key, document, ttl)
+
+            return True
+        except Exception as e:
+            logger.exception(
+                f"Exception during store operation for key {key} in layer {layer}: {e}"
+            )
             return False
-
-        # Add metadata
-        document = value.copy()
-        document["stored_at"] = int(time.time())
-        document["memory_key"] = key
-        document["memory_layer"] = layer
-
-        # Store in the specified layer
-        success = await self.layers[layer].store(key, document, ttl)
-
-        if not success:
-            logger.error(f"Failed to store item with key {key} in layer {layer}")
-            return False
-
-        # If cascade is enabled, store in lower layers
-        if cascade and layer in self.layer_hierarchy:
-            layer_index = self.layer_hierarchy.index(layer)
-
-            # Store in all layers below the specified layer
-            for lower_layer in self.layer_hierarchy[:layer_index]:
-                if lower_layer in self.layers:
-                    await self.layers[lower_layer].store(key, document, ttl)
-
-        return True
+        finally:
+            duration = time.perf_counter() - start_time
+            logger.info(f"store(key={key}, layer={layer}) took {duration:.4f}s")
 
     async def retrieve(
         self, key: str, layers: Optional[List[str]] = None, migrate: bool = True
     ) -> Optional[Dict[str, Any]]:
         """
         Retrieve an item from memory.
+        Logs operation duration and errors for observability.
 
         Args:
             key: The key to retrieve
@@ -111,44 +123,52 @@ class LayeredMemory:
         Returns:
             The stored value, or None if not found
         """
-        result = None
-        found_layer = None
+        start_time = time.perf_counter()
+        try:
+            result = None
+            found_layer = None
 
-        # If no layers specified, use all layers in hierarchy order
-        if layers is None:
-            search_layers = self.layer_hierarchy.copy()
+            # If no layers specified, use all layers in hierarchy order
+            if layers is None:
+                search_layers = self.layer_hierarchy.copy()
 
-            # Add any layers not in the hierarchy
-            for layer in self.layers:
-                if layer not in search_layers:
-                    search_layers.append(layer)
-        else:
-            search_layers = layers
+                # Add any layers not in the hierarchy
+                for layer in self.layers:
+                    if layer not in search_layers:
+                        search_layers.append(layer)
+            else:
+                search_layers = layers
 
-        # Search in each layer
-        for layer in search_layers:
-            if layer in self.layers:
-                result = await self.layers[layer].retrieve(key)
+            # Search in each layer
+            for layer in search_layers:
+                if layer in self.layers:
+                    result = await self.layers[layer].retrieve(key)
 
-                if result is not None:
-                    found_layer = layer
-                    break
+                    if result is not None:
+                        found_layer = layer
+                        break
 
-        # If item was found and migration is enabled, handle promotion
-        if (
-            result is not None
-            and migrate
-            and found_layer in self.layer_hierarchy
-            and self.auto_promote
-        ):
-            layer_index = self.layer_hierarchy.index(found_layer)
+            # If item was found and migration is enabled, handle promotion
+            if (
+                result is not None
+                and migrate
+                and found_layer in self.layer_hierarchy
+                and self.auto_promote
+            ):
+                layer_index = self.layer_hierarchy.index(found_layer)
 
-            # Promote to all layers above the found layer
-            for higher_layer in self.layer_hierarchy[layer_index + 1 :]:
-                if higher_layer in self.layers:
-                    await self.layers[higher_layer].store(key, result)
+                # Promote to all layers above the found layer
+                for higher_layer in self.layer_hierarchy[layer_index + 1 :]:
+                    if higher_layer in self.layers:
+                        await self.layers[higher_layer].store(key, result)
 
-        return result
+            return result
+        except Exception as e:
+            logger.exception(f"Exception during retrieve operation for key {key}: {e}")
+            return None
+        finally:
+            duration = time.perf_counter() - start_time
+            logger.info(f"retrieve(key={key}) took {duration:.4f}s")
 
     async def delete(self, key: str, layers: Optional[List[str]] = None) -> bool:
         """
@@ -214,6 +234,7 @@ class LayeredMemory:
     ) -> List[Dict[str, Any]]:
         """
         Search for items in memory.
+        Logs operation duration and errors for observability.
 
         Args:
             field: The field to search on
@@ -225,48 +246,58 @@ class LayeredMemory:
         Returns:
             List of matching items
         """
-        results = []
+        start_time = time.perf_counter()
+        try:
+            results = []
 
-        # If field is "semantic", use semantic search
-        if field == "semantic" and "semantic" in self.layers:
-            return await self.layers["semantic"].search(
-                "semantic", value, operator, limit
-            )
-
-        # If no layers specified, use all layers in hierarchy order
-        if layers is None:
-            search_layers = self.layer_hierarchy.copy()
-
-            # Add any layers not in the hierarchy
-            for layer in self.layers:
-                if layer not in search_layers:
-                    search_layers.append(layer)
-        else:
-            search_layers = layers
-
-        # Search in each layer
-        for layer in search_layers:
-            if layer in self.layers:
-                # Skip if we already have enough results
-                if len(results) >= limit:
-                    break
-
-                # Search in this layer
-                layer_results = await self.layers[layer].search(
-                    field, value, operator, limit - len(results)
+            # If field is "semantic", use semantic search
+            if field == "semantic" and "semantic" in self.layers:
+                return await self.layers["semantic"].search(
+                    "semantic", value, operator, limit
                 )
 
-                # Add unique results
-                existing_keys = {
-                    item.get("id", item.get("memory_key", "")) for item in results
-                }
-                for item in layer_results:
-                    item_key = item.get("id", item.get("memory_key", ""))
-                    if item_key not in existing_keys:
-                        results.append(item)
-                        existing_keys.add(item_key)
+            # If no layers specified, use all layers in hierarchy order
+            if layers is None:
+                search_layers = self.layer_hierarchy.copy()
 
-        return results
+                # Add any layers not in the hierarchy
+                for layer in self.layers:
+                    if layer not in search_layers:
+                        search_layers.append(layer)
+            else:
+                search_layers = layers
+
+            # Search in each layer
+            for layer in search_layers:
+                if layer in self.layers:
+                    # Skip if we already have enough results
+                    if len(results) >= limit:
+                        break
+
+                    # Search in this layer
+                    layer_results = await self.layers[layer].search(
+                        field, value, operator, limit - len(results)
+                    )
+
+                    # Add unique results
+                    existing_keys = {
+                        item.get("id", item.get("memory_key", "")) for item in results
+                    }
+                    for item in layer_results:
+                        item_key = item.get("id", item.get("memory_key", ""))
+                        if item_key not in existing_keys:
+                            results.append(item)
+                            existing_keys.add(item_key)
+
+            return results
+        except Exception as e:
+            logger.exception(
+                f"Exception during search operation for field {field}: {e}"
+            )
+            return []
+        finally:
+            duration = time.perf_counter() - start_time
+            logger.info(f"search(field={field}) took {duration:.4f}s")
 
     async def update(
         self, key: str, updates: Dict[str, Any], layers: Optional[List[str]] = None
@@ -398,14 +429,25 @@ class LayeredMemory:
         """
         Perform semantic search.
 
-        Args:
-            query: The query text
-            limit: Maximum number of results to return
-            layers: The layers to search in (default: semantic layer)
+        This method always prioritizes the "semantic" layer (e.g., Weaviate or other vector DB) if available,
+        offloading heavy computation to the vector DB for optimal scalability and performance.
+        If the "semantic" layer is not present, falls back to text search in other layers.
 
-        Returns:
-            List of matching items
+        Parameters
+        ----------
+        query : str
+            The query text.
+        limit : int
+            Maximum number of results to return.
+        layers : Optional[List[str]]
+            The layers to search in (default: semantic layer).
+
+        Returns
+        -------
+        List[Dict[str, Any]]
+            List of matching items.
         """
+
         # If no layers specified, use semantic layer if available
         if layers is None:
             if "semantic" in self.layers:

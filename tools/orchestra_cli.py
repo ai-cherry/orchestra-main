@@ -12,13 +12,15 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import click
-from dotenv import load_dotenv, set_key
+
+# Removed load_dotenv for production: all secrets are managed via GCP Secret Manager and Pulumi config.
 from google.api_core import exceptions as gcp_exceptions
 from google.cloud import secretmanager
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
+from dotenv import set_key
 
 # Add project root to path
 sys.path.append(str(Path(__file__).parent.parent))
@@ -195,8 +197,8 @@ def cli(ctx, verbose):
     ctx.ensure_object(dict)
     ctx.obj["verbose"] = verbose
 
-    # Load environment
-    load_dotenv()
+    # Environment variables for secrets are injected by GCP infra or set in CI/CD.
+    # Do NOT use load_dotenv in production.
 
 
 @cli.group()
@@ -577,8 +579,8 @@ def reload(ctx):
         # Validate secrets first
         ctx.invoke(validate)
 
-        # Reload environment
-        load_dotenv(override=True)
+        # Reload environment (for local/dev only; not used in production)
+        # load_dotenv(override=True)
 
         # Signal orchestrator to reload (this would be implemented based on your orchestrator)
         console.print("[green]✓ Orchestrator configuration reloaded[/green]")

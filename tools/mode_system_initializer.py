@@ -337,21 +337,21 @@ def print_workflow_summary():
 def print_usage_instructions():
     """Print instructions for using the enhanced mode system."""
     print(f"\n{Fore.GREEN}{Style.BRIGHT}Usage Instructions:{Style.RESET_ALL}")
-    print(f"\n1. Switch between modes using the mode switcher tool:")
+    print("\n1. Switch between modes using the mode switcher tool:")
     print(f"   {Fore.CYAN}python tools/mode_switcher.py --switch code{Style.RESET_ALL}")
 
-    print(f"\n2. Start a workflow:")
+    print("\n2. Start a workflow:")
     print(
         f"   {Fore.CYAN}python tools/mode_switcher.py --workflow feature_development{Style.RESET_ALL}"
     )
 
-    print(f"\n3. Use interactive mode:")
+    print("\n3. Use interactive mode:")
     print(f"   {Fore.CYAN}python tools/mode_switcher.py --interactive{Style.RESET_ALL}")
 
-    print(f"\n4. Get suggested next steps:")
+    print("\n4. Get suggested next steps:")
     print(f"   {Fore.CYAN}python tools/mode_switcher.py --suggestions{Style.RESET_ALL}")
 
-    print(f"\n5. See all available modes and workflows:")
+    print("\n5. See all available modes and workflows:")
     print(f"   {Fore.CYAN}python tools/mode_switcher.py --list{Style.RESET_ALL}")
 
     print(

@@ -8,7 +8,7 @@ Author: AI Orchestrator Team
 """
 
 import logging
-from typing import List, Optional
+from typing import List
 
 from packages.agents.company_enrichment_agent import CompanyEnrichmentAgent
 from packages.agents.contact_enrichment_agent import ContactEnrichmentAgent

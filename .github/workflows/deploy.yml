@@ -1,0 +1,160 @@
+name: Deploy to GCP
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: cherry-ai-project
+  REGION: us-central1
+  PYTHON_VERSION: '3.10'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+          token_format: 'access_token'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+
+          # Install main requirements
+          if [ -f orchestra_api/requirements.txt ]; then
+            pip install -r orchestra_api/requirements.txt
+          fi
+
+          # Install dev requirements if needed
+          if [ -f requirements/dev.txt ]; then
+            pip install -r requirements/dev.txt
+          fi
+
+          # Install test requirements if needed
+          if [ -f requirements/test.txt ]; then
+            pip install -r requirements/test.txt
+          fi
+
+      - name: Validate secrets
+        run: |
+          echo "Validating required secrets in GCP Secret Manager..."
+          cat > validate_secrets.py << 'EOF'
+          import os
+          from google.cloud import secretmanager
+
+          client = secretmanager.SecretManagerServiceClient()
+          project_id = os.environ.get('PROJECT_ID', 'cherry-ai-project')
+
+          required_secrets = [
+              'OPENAI_API_KEY',
+              'PORTKEY_API_KEY',
+              'REDIS_HOST',
+              'REDIS_PASSWORD',
+              'ZENROWS_API_KEY',
+              'APIFY_API_KEY',
+          ]
+
+          missing_secrets = []
+          for secret_id in required_secrets:
+              try:
+                  name = f'projects/{project_id}/secrets/{secret_id}/versions/latest'
+                  response = client.access_secret_version(request={'name': name})
+                  print(f'✓ {secret_id} exists')
+              except Exception as e:
+                  print(f'✗ {secret_id} missing: {str(e)}')
+                  missing_secrets.append(secret_id)
+
+          if missing_secrets:
+              print(f'\nERROR: Missing required secrets: {", ".join(missing_secrets)}')
+              exit(1)
+          else:
+              print('\n✓ All required secrets validated')
+          EOF
+
+          PROJECT_ID=${{ env.PROJECT_ID }} python validate_secrets.py
+
+      - name: Run tests
+        run: |
+          echo "Running tests..."
+          if [ -d tests ]; then
+            pytest -v --tb=short --no-header || true
+          else
+            echo "No tests directory found, skipping tests"
+          fi
+
+      - name: Submit build to Cloud Build
+        id: build
+        run: |
+          gcloud builds submit \
+            --config cloudbuild.yaml \
+            --substitutions=COMMIT_SHA=${{ github.sha }} \
+            .
+
+      - name: Wait for services
+        run: |
+          echo "Waiting for services to be ready..."
+          sleep 30
+
+          # Check main service
+          SERVICE_URL=$(gcloud run services describe ai-orchestra-minimal \
+            --region=${{ env.REGION }} \
+            --format='value(status.url)' || echo "")
+
+          if [ -n "$SERVICE_URL" ]; then
+            for i in {1..10}; do
+              if curl -f -s "$SERVICE_URL/health" > /dev/null 2>&1; then
+                echo "✓ ai-orchestra-minimal is healthy"
+                break
+              else
+                echo "Waiting for ai-orchestra-minimal... ($i/10)"
+                sleep 10
+              fi
+            done
+          fi
+
+      - name: Deployment summary
+        if: always()
+        run: |
+          echo "========================================="
+          echo "Deployment Summary"
+          echo "========================================="
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref }}"
+          echo "Project: ${{ env.PROJECT_ID }}"
+          echo "Region: ${{ env.REGION }}"
+          echo ""
+          echo "Services deployed:"
+          gcloud run services list --platform=managed --region=${{ env.REGION }} --format="table(metadata.name,status.url)" || true

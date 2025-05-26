@@ -152,7 +152,7 @@ class GitHubPATRotator:
 
         # Allow time for GitHub to propagate the secrets
         if success_count > 0:
-            logger.info(f"Waiting for GitHub to propagate secrets...")
+            logger.info("Waiting for GitHub to propagate secrets...")
             time.sleep(30)  # Wait 30 seconds for propagation
 
         # Return success if at least half of the repositories were updated

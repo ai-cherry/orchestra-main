@@ -30,8 +30,8 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           token_format: 'access_token'
-          workload_identity_provider: 'projects/525398941159/locations/global/workloadIdentityPools/github-wif-pool/providers/github-actions'
-          service_account: 'cicd-sa@cherry-ai-project.iam.gserviceaccount.com'
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
 
       # 4. Set up gcloud CLI
       - name: Set up gcloud CLI
@@ -225,9 +225,3 @@ jobs:
           echo ""
           echo "View logs at: https://console.cloud.google.com/logs/query;query=resource.type%3D%22cloud_run_revision%22?project=cherry-ai-project"
           echo "View monitoring at: https://console.cloud.google.com/monitoring?project=cherry-ai-project"
-
-# --- Audit helpers -------------------------------------------------
-audit-code:  ## create audit/inventory.json
-	@python scripts/code_inventory.py > audit/inventory.json
-audit-configs:  ## map all config files
-	@python scripts/config_inventory.py > audit/config_map.json

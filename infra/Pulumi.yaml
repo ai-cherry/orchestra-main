@@ -1,0 +1,11 @@
+name: orchestra-infra
+description: Pulumi GCP stack for Orchestra AI secrets and infra automation
+runtime:
+  name: python
+  options:
+    toolchain: pip
+    virtualenv: ../venv
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: python

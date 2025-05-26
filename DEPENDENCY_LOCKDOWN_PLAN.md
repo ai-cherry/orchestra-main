@@ -253,4 +253,4 @@ If everything is broken:
 4. `./start_dev.sh`
 
 **Last Known Good Commit**: `________________`
-**Last Known Good Date**: `________________` 
+**Last Known Good Date**: `________________`

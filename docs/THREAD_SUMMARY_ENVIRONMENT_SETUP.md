@@ -177,4 +177,4 @@ All components are successfully installed and configured:
 To deploy the infrastructure, simply run:
 ```bash
 ./scripts/deploy_optimized_infrastructure.sh
-``` 
+```

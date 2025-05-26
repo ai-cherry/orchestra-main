@@ -77,7 +77,7 @@ orchestra-main/
    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
    chmod +x kubectl
    sudo mv kubectl /usr/local/bin/
-   
+
    # Install Pulumi
    curl -fsSL https://get.pulumi.com | sh
    ```
@@ -132,4 +132,4 @@ The environment is now properly organized with:
 - ✅ Environment verification tools
 - ✅ Clear deployment path
 
-The only remaining items are tool installations (kubectl, Pulumi) and GCP authentication, which are user-specific and cannot be automated in this context. 
+The only remaining items are tool installations (kubectl, Pulumi) and GCP authentication, which are user-specific and cannot be automated in this context.

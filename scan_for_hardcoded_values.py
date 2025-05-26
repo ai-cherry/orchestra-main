@@ -206,7 +206,7 @@ def scan_directory(
 
 
 def print_results(
-    results: Dict[Path, Dict[str, List[Tuple[int, str, str, Optional[str]]]]]
+    results: Dict[Path, Dict[str, List[Tuple[int, str, str, Optional[str]]]]],
 ) -> None:
     """
     Print scan results.

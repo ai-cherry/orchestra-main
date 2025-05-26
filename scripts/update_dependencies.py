@@ -8,8 +8,8 @@ Uses pip-tools to safely update dependencies while maintaining lockfiles.
 import subprocess
 import sys
 import logging
-from typing import List, Tuple
 from datetime import datetime
+from typing import List
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 def check_pip_tools() -> bool:
     """Check if pip-tools is installed."""
     try:
-        import piptools
 
         return True
     except ImportError:

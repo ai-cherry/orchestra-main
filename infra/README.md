@@ -1,121 +1,102 @@
-# GCP Infrastructure as Code (`infra/`)
+# Pulumi Infrastructure (`infra/`)
 
-This directory contains all infrastructure-as-code for GCP using [Pulumi](https://www.pulumi.com/) with Python.
-**No Poetry or extra tooling required—just Python venv and pip for maximum simplicity and reproducibility.**
+This directory contains the Pulumi infrastructure code for AI Orchestra.
 
----
+## Structure
 
-## Dependency Management
+```
+infra/
+├── main.py                    # Main infrastructure orchestration
+├── components/
+│   ├── database_component.py  # Database resources (DragonflyDB, MongoDB)
+│   └── superagi_component.py  # SuperAGI and MCP deployments
+├── requirements.txt           # Pulumi Python dependencies
+├── Pulumi.yaml               # Project configuration
+└── Pulumi.*.yaml             # Stack-specific configs
+```
 
-### Requirements Structure
+## Prerequisites
 
-- `requirements/base.txt`: Core dependencies
-- `requirements/development.txt`: Dev/test/lint tools
-- `requirements/production.txt`: Production-only extras
-- `requirements/webscraping.txt`: Web scraping agent dependencies
+- Python 3.10 (exactly - not 3.11+)
+- Pulumi CLI installed
+- GCP authentication configured
 
-All environments inherit from `base.txt` for consistency.
+## Quick Start
 
-## Setup
+```bash
+# Install dependencies
+pip install -r requirements.txt
 
-**Python 3.11+ is required for all infrastructure work.**
+# Initialize stack
+pulumi stack init dev
+pulumi config set gcp_project_id <your-project-id>
 
-**Pulumi state backend:**
-- All stacks use the GCS bucket `gs://cherry-ai-project-pulumi-state` for state storage.
+# Deploy
+pulumi up
+```
 
-**Admin UI stack:**
-- The static admin UI is managed in `infra/admin_ui_site/` and deployed via the `admin-ui` Pulumi stack (see `.github/workflows/admin-ui.yml` and `scripts/deploy_admin_ui.py`).
+## Stack Configuration
 
-1. Create a virtual environment:
-   ```bash
-   python3.11 -m venv .venv
-   source .venv/bin/activate
-   pip install --upgrade pip
-   ```
-2. Install infra dependencies:
-   ```bash
-   pip install -r ../requirements.txt
-   ```
+Required configuration values:
 
-## Quickstart
+```bash
+pulumi config set gcp_project_id <project-id>
+pulumi config set region us-central1  # optional, defaults to us-central1
+pulumi config set --secret mongodb_password <password>  # auto-generated if not set
+pulumi config set --secret openrouter_api_key <api-key>  # for SuperAGI
+```
 
-1. **Bootstrap the Environment**
+## State Management
 
-   ```bash
-   cd infra
-   bash bootstrap_pulumi_venv.sh
-   ```
+Pulumi state is stored in GCS bucket: `gs://cherry-ai-project-pulumi-state`
 
-   This creates a Python virtual environment, installs all dependencies, and prints next steps.
+This is configured automatically when you run `pulumi login gs://cherry-ai-project-pulumi-state`.
 
-2. **Initialize Pulumi Project (First Time Only)**
+## Component Architecture
 
-   ```bash
-   pulumi new gcp-python
-   # Follow prompts for project name, stack, and region.
-   ```
+### DatabaseComponent
 
-3. **Configure Your Stack**
+Manages:
+- DragonflyDB deployment (Redis-compatible)
+- MongoDB StatefulSet
+- Firestore configuration
+- Persistent volumes and services
 
-   ```bash
-   pulumi stack init dev
-   pulumi config set gcp:project <your-gcp-project-id>
-   pulumi config set gcp:region <your-gcp-region>
-   ```
+### SuperAGIComponent
 
-4. **Define Infrastructure**
+Manages:
+- SuperAGI deployment with HPA
+- MCP servers (MongoDB and Weaviate)
+- ConfigMaps and secrets
+- LoadBalancer service
 
-   - Edit [`__main__.py`](./__main__.py) to add/modify GCP resources.
-   - Example: A storage bucket is included as a template.
+## Common Operations
 
-5. **Deploy**
+```bash
+# Preview changes
+pulumi preview
 
-   ```bash
-   pulumi up
-   ```
+# Update specific resource
+pulumi up --target <resource-urn>
 
-6. **Teardown**
+# Refresh state
+pulumi refresh
 
-   ```bash
-   pulumi destroy
-   ```
+# Export stack outputs
+pulumi stack output --json
 
----
-
-## Best Practices
-
-- Use stack configuration for project/region.
-- Store secrets using `pulumi config set --secret`.
-- Keep resource names deterministic for reproducibility.
-- Document all changes and keep this README up to date.
-
----
+# Destroy infrastructure
+pulumi destroy
+```
 
 ## Troubleshooting
 
-- **Virtual environment issues:**
-  Re-run `source venv/bin/activate` in `infra/`.
+1. **Authentication errors**: Run `gcloud auth application-default login`
+2. **State lock issues**: Check no other Pulumi operations are running
+3. **Resource conflicts**: Use `pulumi refresh` to sync state
 
-- **Pulumi CLI not found:**
-  Ensure `venv/bin` is in your PATH or install Pulumi globally.
+## References
 
-- **GCP authentication:**
-  Make sure you are authenticated with `gcloud auth application-default login`.
-
----
-
-## Extending
-
-- Add new GCP resources in [`__main__.py`](./__main__.py).
-- For multi-env (dev/prod), use separate stacks:
-  `pulumi stack init prod`
-
----
-
-## Philosophy
-
-- **Minimal dependencies:** Only venv + pip.
-- **Performance & stability:** No unnecessary complexity.
-- **Single-developer focus:** No multi-user IAM or org-policy overhead.
-
-See [`docs/gcp-optimization-checklist.md`](../docs/gcp-optimization-checklist.md) for further optimization tips.
+- [Main Infrastructure Guide](../docs/INFRASTRUCTURE_GUIDE.md)
+- [Pulumi GCP Provider](https://www.pulumi.com/registry/packages/gcp/)
+- [Pulumi Kubernetes Provider](https://www.pulumi.com/registry/packages/kubernetes/)

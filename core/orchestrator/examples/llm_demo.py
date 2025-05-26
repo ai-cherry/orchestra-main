@@ -16,7 +16,7 @@ import asyncio
 import logging
 import os
 
-from dotenv import load_dotenv
+# Removed load_dotenv for production: all secrets are managed via GCP Secret Manager and Pulumi config.
 
 from core.orchestrator.src.agents.llm_agent import ConversationFormatter
 from core.orchestrator.src.config.config import get_settings
@@ -166,8 +166,8 @@ async def demo_direct_completion():
 
 async def main():
     """Run the complete demo."""
-    # Load environment variables
-    load_dotenv()
+    # Environment variables for secrets are injected by GCP infra or set in CI/CD.
+    # Do NOT use load_dotenv in production.
 
     # Check for API key
     settings = get_settings()

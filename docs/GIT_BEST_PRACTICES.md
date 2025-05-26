@@ -325,4 +325,4 @@ echo "feat: add new feature" | grep -E "^(feat|fix|docs|style|refactor|perf|test
 - [Conventional Commits](https://www.conventionalcommits.org/)
 - [GitHub Flow](https://guides.github.com/introduction/flow/)
 - [Pro Git Book](https://git-scm.com/book/en/v2)
-- [Project Contributing Guide](../CONTRIBUTING.md) 
+- [Project Contributing Guide](../CONTRIBUTING.md)

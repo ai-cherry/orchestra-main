@@ -56,7 +56,7 @@ class GcpService:
         vertex_models = await loop.run_in_executor(
             None,
             lambda: aiplatform.Model.list(
-                filter=f"display_name=*",
+                filter="display_name=*",
                 project=self.project_id,
                 location=settings.GEMINI_LOCATION,
             ),

@@ -192,7 +192,7 @@ _performance_monitor = None
 
 
 def get_performance_monitor(
-    config: Optional[Dict[str, Any]] = None
+    config: Optional[Dict[str, Any]] = None,
 ) -> PerformanceMonitor:
     """Get or create the global performance monitor instance.
 

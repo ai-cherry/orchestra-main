@@ -1,0 +1,18 @@
+encryptionsalt: v1:k2pMfYlKnEk=:v1:yAkZqoMlnAuGxHBO:ao6jSs3zEtTWGJfYND6K1gpal076HA==
+config:
+  orchestra-infra:gcp_project_id: cherry-ai-project
+  orchestra-infra:region: us-central1
+  orchestra-infra:zone: us-central1-a
+  orchestra-infra:weaviate_rest_endpoint: http://weaviate.superagi.svc.cluster.local:8080
+  orchestra-infra:grafana_admin_password:
+    secure: v1:FG82h71JOFXs1W7M:WPZmNWuTKF3NCrRg+tU7aoXLl29VYNJskAagnzmdalnu66+fXRGssVIqgEXuTaviv3Su0zFNkOE7CYWy
+  gcp:project: cherry-ai-project
+  gcp:region: us-central1
+  orchestra-infra:mongodb_uri:
+    secure: v1:fSFF8QnD/+6rnzPj:XyxwWvd+Q/PJRz1IFhczI+958BFx63/0OhDOx5xR/G+qTYI3eZfw1hZ2x7LvKlkBf+3E3eRxEXvvtX0vgAnpQG1OaO0jp6KeP7n3GgB61I0rHkRrtJ3xxewUi6yH9npwFwDiW5rdrUPOdqkjcLqedYBmMorDUBcpwZs4KD4dL8zBZtU=
+  orchestra-infra:dragonfly_url:
+    secure: v1:mH1JhRXSie/bKWUq:gyHx5y6i/VdgMKONWPkkKp/wSryTSH7gN+vm81LQZUijyRvCL60imPWMB89Usk/o6XiZwXb56k9CPATUYvcfFLA0nX2p+9YgHCJBZN3L
+  orchestra-infra:weaviate_endpoint:
+    secure: v1:cLCTcCXX38Zx4vbJ:nQWbn2VMB4ilvjL1KfctKoUm2aoMwS7izcWWK+mGEI2pIoW0TSZZLDZKGqf/UWjneTwKN0UGtOvuEoiylohl6FHOziGbp48aAhzpIA==
+  orchestra-infra:weaviate_api_key:
+    secure: v1:K/tZ9mj/zQ6qFZ6X:r2i5jOzhGGR/V8tCrtZWqcs5jILUEldtCdAJzqP3VUqeNvQqicweryjdpXcLckNdo7lVZA==

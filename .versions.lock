@@ -34,4 +34,4 @@ DEBIAN_VERSION=bullseye
 # Container Base Images
 PYTHON_BASE_IMAGE=python:3.10.12-slim-bullseye
 NODE_BASE_IMAGE=node:18.20.2-alpine3.18
-PULUMI_BASE_IMAGE=pulumi/pulumi:3.88.0 
+PULUMI_BASE_IMAGE=pulumi/pulumi:3.88.0

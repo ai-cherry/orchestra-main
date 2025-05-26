@@ -91,3 +91,54 @@ echo "1. Run: source fix_mcp_issues.sh"
 echo "2. Set your API key: export ANTHROPIC_API_KEY='your-key-here'"
 echo "3. Run simple test: ./test_mcp_simple.py"
 echo "4. Run full test: python test_mcp_implementation.py"
+
+echo "=== Fixing Authentication and Service Access ==="
+echo
+
+# Step 1: Force refresh authentication
+echo "Step 1: Refreshing authentication..."
+gcloud auth revoke --all 2>/dev/null || true
+gcloud auth login --no-launch-browser
+
+# Step 2: Ensure correct account is active
+echo
+echo "Step 2: Setting correct account..."
+gcloud config set account scoobyjava@cherry-ai.me
+gcloud config set project cherry-ai-project
+
+# Step 3: Test authentication
+echo
+echo "Step 3: Testing authentication..."
+if gcloud projects describe cherry-ai-project --format="value(projectId)" 2>/dev/null; then
+    echo "✅ Authentication working!"
+else
+    echo "❌ Authentication failed. Trying alternative method..."
+    gcloud auth application-default login
+fi
+
+# Step 4: Make the service public (this is the fix for 403)
+echo
+echo "Step 4: Making ai-orchestra-minimal public..."
+gcloud run services add-iam-policy-binding ai-orchestra-minimal \
+    --region=us-central1 \
+    --member="allUsers" \
+    --role="roles/run.invoker" \
+    --quiet 2>&1 || echo "Failed to update IAM policy. Use Cloud Console instead."
+
+# Step 5: Test the service
+echo
+echo "Step 5: Testing the service..."
+SERVICE_URL="https://ai-orchestra-minimal-yshgcxa7ta-uc.a.run.app"
+echo "Testing $SERVICE_URL/health"
+curl -s "$SERVICE_URL/health" | head -20
+
+echo
+echo "=== Summary ==="
+echo "If the service still returns 403/401, please:"
+echo "1. Go to: https://console.cloud.google.com/run?project=cherry-ai-project"
+echo "2. Click on 'ai-orchestra-minimal'"
+echo "3. Go to PERMISSIONS tab"
+echo "4. Add 'allUsers' with 'Cloud Run Invoker' role"
+echo
+echo "Direct link to service:"
+echo "https://console.cloud.google.com/run/detail/us-central1/ai-orchestra-minimal/permissions?project=cherry-ai-project"

@@ -12,6 +12,7 @@ import litellm
 from pydantic import BaseModel, Field
 
 from core.orchestrator.src.config.loader import get_settings
+from core.orchestrator.src.utils.error_handling import retry
 
 logger = logging.getLogger(__name__)
 
@@ -139,6 +140,7 @@ class LiteLLMClient:
         # Set up logging
         litellm.set_verbose = True
 
+    @retry(max_attempts=3, delay_seconds=1.0, backoff_factor=2.0)
     async def chat_completion(
         self,
         messages: List[LLMMessage],
@@ -222,6 +224,7 @@ class LiteLLMClient:
             logger.error(f"Error in chat completion: {str(e)}")
             raise
 
+    @retry(max_attempts=3, delay_seconds=1.0, backoff_factor=2.0)
     async def text_completion(
         self,
         prompt: str,
@@ -268,6 +271,7 @@ class LiteLLMClient:
             timeout=timeout,
         )
 
+    @retry(max_attempts=3, delay_seconds=1.0, backoff_factor=2.0)
     async def get_embedding(
         self,
         text: str,

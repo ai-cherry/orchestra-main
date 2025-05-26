@@ -321,7 +321,7 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
                 tool_name = tool_config.get("name")
 
                 if not tool_type:
-                    logger.warning(f"Skipping tool definition without 'type' in config")
+                    logger.warning("Skipping tool definition without 'type' in config")
                     continue
 
                 # Check if this is a reference to a tool in the registry
@@ -577,7 +577,7 @@ class PhidataAgentWrapper(OrchestraAgentBase, AgentProtocol):
                 # Add knowledge_base if configured
                 if hasattr(self, "knowledge_base") and self.knowledge_base is not None:
                     agent_params["knowledge"] = self.knowledge_base
-                    logger.info(f"Adding knowledge base to agent")
+                    logger.info("Adding knowledge base to agent")
 
                 # Add response_model if configured - this is crucial for structured output agents
                 if hasattr(self, "response_model") and self.response_model is not None:

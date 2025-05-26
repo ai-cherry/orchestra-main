@@ -63,7 +63,7 @@ from typing import Dict, Any, Optional
 
 class IngressComponent(ComponentResource):
     """Configure ingress with SSL for cherry-ai.me"""
-    
+
     def __init__(
         self,
         name: str,
@@ -72,35 +72,35 @@ class IngressComponent(ComponentResource):
         opts: Optional[ResourceOptions] = None
     ):
         super().__init__("orchestra:ingress:Component", name, None, opts)
-        
+
         self.namespace = config.get("namespace", "superagi")
         self.domain = config.get("domain", "cherry-ai.me")
-        
+
         # Create child options
         child_opts = ResourceOptions(parent=self)
-        
+
         # Install cert-manager for automatic SSL
         self._install_cert_manager(child_opts)
-        
+
         # Create ingress
         self.ingress = self._create_ingress(service_name, child_opts)
-        
+
         # Create certificate
         self.certificate = self._create_certificate(child_opts)
-        
+
     def _install_cert_manager(self, opts: ResourceOptions):
         """Install cert-manager for automatic SSL certificates"""
-        
+
         # Apply cert-manager CRDs
         k8s.yaml.ConfigFile(
             "cert-manager",
             file="https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml",
             opts=opts,
         )
-    
+
     def _create_ingress(self, service_name: str, opts: ResourceOptions) -> k8s.networking.v1.Ingress:
         """Create ingress for cherry-ai.me"""
-        
+
         return k8s.networking.v1.Ingress(
             f"{self._name}-ingress",
             metadata=k8s.meta.v1.ObjectMetaArgs(
@@ -165,10 +165,10 @@ class IngressComponent(ComponentResource):
             ),
             opts=opts,
         )
-    
+
     def _create_certificate(self, opts: ResourceOptions):
         """Create Let's Encrypt certificate"""
-        
+
         # Create ClusterIssuer for Let's Encrypt
         k8s.apiextensions.CustomResource(
             f"{self._name}-letsencrypt-issuer",
@@ -229,7 +229,7 @@ pulumi.export("https_endpoint", f"https://cherry-ai.me")
    ```bash
    # Get the ingress IP
    kubectl get ingress superagi-ingress -n superagi -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-   
+
    # Add A records in your DNS provider:
    # cherry-ai.me -> INGRESS_IP
    # www.cherry-ai.me -> INGRESS_IP
@@ -244,7 +244,7 @@ pulumi.export("https_endpoint", f"https://cherry-ai.me")
        dns_name="cherry-ai.me.",
        description="DNS zone for cherry-ai.me",
    )
-   
+
    dns_record = gcp.dns.RecordSet(
        "cherry-ai-a-record",
        name="cherry-ai.me.",
@@ -376,4 +376,4 @@ The deployment plan ensures:
 - ✅ Integrated MCP servers for natural language queries
 - ✅ Comprehensive monitoring and logging
 
-The system will be accessible at https://cherry-ai.me with full SuperAGI capabilities and MCP integration. 
+The system will be accessible at https://cherry-ai.me with full SuperAGI capabilities and MCP integration.

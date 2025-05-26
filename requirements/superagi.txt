@@ -1,0 +1,43 @@
+# SuperAGI Integration Requirements
+# Core SuperAGI dependencies
+superagi==0.0.1
+fastapi==0.115.12
+uvicorn==0.24.0
+pydantic==2.10.5
+sqlalchemy==2.0.30
+
+# AI/ML dependencies
+openai==1.82.0
+anthropic==0.52.0
+langchain==0.1.0
+transformers==4.36.0
+tiktoken==0.5.2
+
+# Memory and storage
+redis==5.0.1
+psycopg2-binary==2.9.9
+google-cloud-firestore==2.20.2
+google-cloud-storage==2.19.0
+
+# Orchestra integration
+google-cloud-pubsub==2.18.4
+google-cloud-run==0.10.18
+google-cloud-logging==3.8.0
+google-cloud-monitoring==2.18.0
+
+# Async and networking
+aiohttp==3.11.18
+httpx==0.28.1
+websockets==12.0
+
+# Utilities
+python-multipart==0.0.6
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+celery==5.3.4
+flower==2.0.1
+
+# Development and monitoring
+prometheus-client==0.19.0
+structlog==24.1.0
+python-json-logger==2.0.7

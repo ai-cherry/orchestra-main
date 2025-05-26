@@ -101,4 +101,4 @@ echo "✓ Project set to cherry-ai-project"
 echo "✓ API keys available via Secret Manager"
 echo
 echo "Environment is ready for deployment!"
-echo "Run: ./scripts/deploy_optimized_infrastructure.sh" 
+echo "Run: ./scripts/deploy_optimized_infrastructure.sh"

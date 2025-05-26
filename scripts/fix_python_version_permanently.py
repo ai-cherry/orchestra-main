@@ -151,7 +151,7 @@ def update_file(filepath: str, replacements: List[Tuple[str, str]]) -> bool:
 
 def create_version_lock_file():
     """Create a version lock file to prevent future confusion."""
-    lock_content = f"""# PYTHON VERSION LOCK FILE
+    lock_content = """# PYTHON VERSION LOCK FILE
 # DO NOT MODIFY WITHOUT TEAM CONSENSUS
 
 # This project uses Python {PYTHON_VERSION}
@@ -279,10 +279,10 @@ def main():
     # Create validator
     create_environment_validator()
 
-    logger.info(f"\n📊 Summary:")
+    logger.info("\n📊 Summary:")
     logger.info(f"✅ Updated {updated_count} files")
-    logger.info(f"✅ Created version lock file")
-    logger.info(f"✅ Created environment validator")
+    logger.info("✅ Created version lock file")
+    logger.info("✅ Created environment validator")
 
     logger.info("\n🎯 Next Steps:")
     logger.info("1. Run: python scripts/validate_environment.py")

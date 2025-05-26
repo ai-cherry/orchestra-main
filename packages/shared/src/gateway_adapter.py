@@ -393,7 +393,7 @@ class GatewayAdapterFactory:
                 success = await adapter.initialize()
                 if not success:
                     raise RuntimeError(
-                        f"Failed to initialize both primary and fallback gateways"
+                        "Failed to initialize both primary and fallback gateways"
                     )
             else:
                 raise RuntimeError(

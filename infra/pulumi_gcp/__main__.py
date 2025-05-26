@@ -205,33 +205,73 @@ redis = gcp.redis.Instance(
 )
 
 # --- SECRET MANAGER ---
+# --- SECRETS MANAGEMENT (Pulumi Config + GCP Secret Manager) ---
+# All sensitive values are pulled from Pulumi config as secrets and provisioned to GCP Secret Manager.
+
+
+# Helper to create a secret and its initial version from Pulumi config
+def provision_secret(secret_name: str, config_key: str, description: str = ""):
+    secret = gcp.secretmanager.Secret(
+        f"{secret_name}-secret",
+        secret_id=secret_name.upper(),
+        replication={"automatic": {}},
+        project=project,
+        description=description,
+    )
+    secret_value = config.require_secret(config_key)
+    gcp.secretmanager.SecretVersion(
+        f"{secret_name}-secret-version",
+        secret=secret.id,
+        secret_data=secret_value,
+    )
+    return secret
+
+
 # API Keys
-api_key_secret = gcp.secretmanager.Secret(
-    "orchestra-api-key",
-    replication={"automatic": {}},
-    project=project,
+api_key_secret = provision_secret(
+    "orchestra-api-key", "orchestra_api_key", "API key for Orchestra AI platform"
 )
 
 # Web scraping API keys
-zenrows_secret = gcp.secretmanager.Secret(
-    "zenrows-api-key",
-    secret_id="ZENROWS_API_KEY",
-    replication={"automatic": {}},
-    project=project,
+zenrows_secret = provision_secret(
+    "zenrows-api-key", "zenrows_api_key", "ZenRows API key for web scraping"
 )
 
-apify_secret = gcp.secretmanager.Secret(
-    "apify-api-key",
-    secret_id="APIFY_API_KEY",
-    replication={"automatic": {}},
-    project=project,
+apify_secret = provision_secret(
+    "apify-api-key", "apify_api_key", "Apify API key for web scraping"
 )
 
-phantombuster_secret = gcp.secretmanager.Secret(
+phantombuster_secret = provision_secret(
     "phantombuster-api-key",
-    secret_id="PHANTOMBUSTER_API_KEY",
-    replication={"automatic": {}},
-    project=project,
+    "phantombuster_api_key",
+    "PhantomBuster API key for web scraping",
+)
+
+# --- MongoDB & Weaviate SECRETS ---
+
+# MongoDB
+mongodb_connection_string_secret = provision_secret(
+    "mongodb-connection-string",
+    "mongodb_connection_string",
+    "MongoDB Atlas connection string",
+)
+mongodb_service_client_id_secret = provision_secret(
+    "mongodb-service-client-id",
+    "mongodb_service_client_id",
+    "MongoDB service client ID",
+)
+mongodb_service_client_secret_secret = provision_secret(
+    "mongodb-service-client-secret",
+    "mongodb_service_client_secret",
+    "MongoDB service client secret",
+)
+
+# Weaviate
+weaviate_rest_endpoint_secret = provision_secret(
+    "weaviate-rest-endpoint", "weaviate_rest_endpoint", "Weaviate REST endpoint"
+)
+weaviate_api_key_secret = provision_secret(
+    "weaviate-api-key", "weaviate_api_key", "Weaviate API key"
 )
 
 # --- CLOUD RUN SERVICES ---
@@ -680,6 +720,13 @@ pulumi.export("admin_service_account", admin_sa.email)
 pulumi.export("redis_instance", redis.id)
 pulumi.export("redis_host", redis.host)
 pulumi.export("api_key_secret", api_key_secret.id)
+pulumi.export("mongodb_connection_string_secret", mongodb_connection_string_secret.id)
+pulumi.export("mongodb_service_client_id_secret", mongodb_service_client_id_secret.id)
+pulumi.export(
+    "mongodb_service_client_secret_secret", mongodb_service_client_secret_secret.id
+)
+pulumi.export("weaviate_rest_endpoint_secret", weaviate_rest_endpoint_secret.id)
+pulumi.export("weaviate_api_key_secret", weaviate_api_key_secret.id)
 pulumi.export("artifact_registry", artifact_registry.id)
 pulumi.export("orchestra_api_url", orchestra_api_service.statuses[0].url)
 pulumi.export("admin_interface_url", admin_interface_service.statuses[0].url)

@@ -21,7 +21,7 @@ class MemoryFactory:
 
     @staticmethod
     def create_memory_from_config(
-        config: Dict[str, Any]
+        config: Dict[str, Any],
     ) -> Optional[LayeredMemoryManager]:
         """
         Create a memory manager from configuration.
