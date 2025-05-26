@@ -1,92 +1,55 @@
-# AI Orchestra
+# Orchestra AI
 
-AI Orchestra is a comprehensive AI agent orchestration platform that integrates SuperAGI with managed cloud services for scalable, production-ready deployments.
+## Project Structure (Authoritative)
+- **Orchestrator:** `core/orchestrator/src/`
+- **Admin UI:** `admin-ui/`
+- **Utility Scripts:** `scripts/`
+- **Infrastructure as Code:** `infra/`
 
-## Quick Start
+## 🚀 Quick Start
 
-Deploy AI Orchestra with one command:
-
-```bash
-./scripts/deploy_simple.sh
-```
-
-This deploys:
-- SuperAGI agent framework
-- MongoDB Atlas for persistent storage
-- DragonflyDB Cloud for high-performance caching (12.5GB)
-- Weaviate Cloud for semantic search
-- Optional monitoring stack (Prometheus + Grafana)
-
-## Prerequisites
-
-- Google Cloud Platform account with billing enabled
-- `gcloud` CLI installed and authenticated
-- `kubectl` installed
-- `pulumi` installed
-- Python 3.10
-
-## Deployment Options
-
-### Development Deployment
-```bash
-./scripts/deploy_simple.sh dev
-```
-
-### Production Deployment
-```bash
-./scripts/deploy_simple.sh prod
-```
-
-### Custom Deployment
-For more control, use the main deployment script:
-```bash
-ENVIRONMENT=prod REGION=us-east1 ./scripts/deploy_orchestra.sh
-```
-
-## Architecture
-
-AI Orchestra uses:
-- **GKE** for container orchestration
-- **SuperAGI** for agent execution
-- **MongoDB Atlas** for document storage
-- **DragonflyDB Cloud** for caching (Redis-compatible)
-- **Weaviate Cloud** for vector search
-- **Pulumi** for infrastructure as code
-
-## Post-Deployment
-
-After deployment, you can:
-
-1. **Access SuperAGI locally**:
+1. **Clone the repo**
+2. **Set your secrets as environment variables:**
    ```bash
-   kubectl port-forward -n ai-orchestra svc/ai-orchestra 8080:8080
+   export OPENAI_API_KEY=...
+   export WEAVIATE_API_KEY=...
+   export MONGODB_CONNECTION_STRING=...
+   export MONGODB_SERVICE_CLIENT_ID=...
+   export MONGODB_SERVICE_CLIENT_SECRET=...
+   export GRAFANA_ADMIN_PASSWORD=...
+   export PULUMI_CONFIG_PASSPHRASE="orchestra-dev-123"
    ```
-   Then open http://localhost:8080
-
-2. **View logs**:
+3. **Run the setup script:**
    ```bash
-   kubectl logs -f deployment/ai-orchestra -n ai-orchestra
+   bash scripts/setup_local_env.sh
+   ```
+4. **Deploy:**
+   ```bash
+   bash scripts/deploy_orchestra.sh
    ```
 
-3. **Check deployment status**:
-   ```bash
-   kubectl get all -n ai-orchestra
-   ```
+## 🛡️ CI/CD
+- All secrets are managed via GitHub Actions secrets and Pulumi.
+- No manual steps required for deploys.
+- The deploy workflow (`.github/workflows/deploy.yaml`) is fully automated. It uses secrets for all credentials and never prompts for input. To trigger a deploy, just push to `main`.
 
-## Documentation
+## Pulumi Secrets
+- The Pulumi config passphrase is set automatically via:
+  ```bash
+  export PULUMI_CONFIG_PASSPHRASE="orchestra-dev-123"
+  ```
+- You never need to enter it manually.
+- All secrets (API keys, DB credentials, etc.) are managed via Pulumi and GitHub Actions secrets. Never store secrets in code or scripts. To update a secret, set the environment variable and re-run `scripts/setup_local_env.sh`.
 
-- [Deployment Scripts Guide](docs/DEPLOYMENT_SCRIPTS_GUIDE.md)
-- [SuperAGI Integration](SUPERAGI_INTEGRATION.md)
-- [Enhancement Guide](docs/SUPERAGI_ENHANCEMENTS.md)
+## Troubleshooting
+- If Pulumi prompts for a passphrase, make sure `PULUMI_CONFIG_PASSPHRASE` is set in your environment.
+- If a deploy fails, check that all required secrets are set as environment variables or GitHub secrets.
+- If you see `[WARN] ... key not set` during deploy, set it with `pulumi config set --secret ...` as above.
 
-## Cleanup
+## Maintenance
+- Only one orchestrator, one admin UI, and one set of utility scripts are maintained.
+- All legacy/archived code has been removed for clarity and maintainability.
 
-To remove all resources:
-```bash
-cd infra
-pulumi destroy --yes
-```
+---
 
-## Support
-
-For issues or questions, please check the documentation or create an issue in the repository.
+**This project is now fully automated and streamlined for solo or team development.**
