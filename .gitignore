@@ -63,3 +63,7 @@ infra_legacy/
 
 # Ignore Google Cloud service account key
 .secrets/orchestra-service-key.json
+
+# Environment files
+.env
+config/managed-services.env

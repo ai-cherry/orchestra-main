@@ -1,15 +1,37 @@
 config:
   orchestra-infra:env: dev
   digitalocean:token:
-    secure: v1:oQ4JO8W8Q537psvP:1KcAzd80ttv2dc/L7hNDVimLuXAnDG/+TfKOiv3cOpvqgfmctTdF0fp9aGvR9XleNLpLY95+PwX06R0mnQGid1MJ8xLWWntcFxNailqf8VcLvzSSgEHg
+    secure: v1:R7oWg5r0ef0C6db6:6aF0JiFuJuxTasFyAP9fvZIXBm0BAqdObPvBGynM0ZlonAGdKY41BrcXAlZRzaf+0T/Q+xmFV3ToXtyhXa0aJ2gXicdhHI/tD4GaU3oYIb3rv3B03naL
   orchestra-infra:root_password:
-    secure: v1:dVTsV7t+c/Qje2zK:Q3eX+loE1bF+9ffEqsUm4OzVSB+tVSFrAVlM8von
+    secure: v1:ithgu6jFALvK5uuy:RcAn6knjnZsfeBG6L5WVT0NDscAgK0IHL7YhoZqm
   orchestra-infra:dragonfly_uri:
-    secure: v1:4TkOQf8VKp+rKwkv:Wu6iEUPYm+T/iQV7g2o3uWfueuykrImXXeO88Ty/Woa5Bmo3Fiv7uQt8dfU2NukVLhiUxXeoMsiFxazbFg==
+    secure: v1:RBMowDB8xwyhmhpr:qO1kVGhs2Kp1FbP+IIGbAPfHAYCTa+aQ85/hNWJkyeGXt0g/vJI3BN+9cMP8rAiF5X1+psM6w8yXoFxIQwleW3+a44SNLGHVldnwop1h
   orchestra-infra:mongo_uri:
-    secure: v1:urEkVl5xM83BPMcH:mMg0CskjRC6gvms4fk1xuWZEBXAbgK4JHEXRurNxD4DZPcuejiUVPb4Q1enoJQqwfMbCksnSGJYRLcQ1Lh8yaBf6RmQxFzdLvcuL1rXEzRTC9xKCQWEH1jY9clZ35tYY
+    secure: v1:g5HTylPmT6r66H4T:LJkBXxXcpEmgPW2xEJf2egt3ZzmxSP4oPwrl+TvmMP1gJ+xaKKG891G40t6FMVBHzLAXQIYsDpaP3oR/JBRVWq7Zmc1NYwA6VUH1PG7WNu9sENu/eZ2a76cYGGk0SjPLM4AgDmF8BZWiFlCtIKFxM3EQHK1L3bjbvM+Hy6ah8u9OOAU=
   orchestra-infra:weaviate_url:
-    secure: v1:gkEiKrSC+MAZkdgl:vdeUkO+bcqLWdAsPqmCBOaXeuTqUph9P2pyzObfwheqfLgKr8crwntByIn/pMOAPrNR1
+    secure: v1:wtmJFcxHYSoDm/ZD:SJEueUbqGQ/UgU4YnB41Xj+7uK1c5UYNXkt9DrWh5Av5sMdEMCLfr4AHySN/P7zgyExOmXdMQr4GZio9xfiiVWft/tllLB3WOxLpEA==
   orchestra-infra:weaviate_api_key:
-    secure: v1:Nkkks2ITDXZw+gKr:mOcJVg+n6XKfHcN+VCte/ynNb+D9HU/bPLEGosjmYSs7aIG4/Q==
+    secure: v1:DxuC1Ie8vTT5Txa6:lacAkrw65EYCxcuctqdsCQrhPId7YW8jYUiSTCdcl/ucHqxouy64mwrvrso9PCIPinUYzA==
+  orchestra-infra:openai_api_key:
+    secure: v1:mpamAaEWvd9ppdsp:LZSY/03fVuBImnE5oLp4Jx21RywvDc2aVuZ4ovJZDa82YmU=
+  orchestra-infra:anthropic_api_key:
+    secure: v1:7RsMcdZ8jfFvqA8m:V67kTHK9XywgcnDJh8wC9vXYuect4zK7LDadWGOBnf8TDH9Otkc=
+  orchestra-infra:openrouter_api_key:
+    secure: v1:d1h+vqG9BqP36mUW:b3PIFRSpGeBnP67HSbijaZQWqb6+KeOnDYY+vBpy8xEIgYkiHiIf
+  orchestra-infra:portkey_api_key:
+    secure: v1:qI7aQwqVey3V+YHS:BRUPbFBa2dkhWgS2dPeL6eqBEg3+L+UJm72xCox+bwklBEej
+  orchestra-infra:pulumi_access_token:
+    secure: v1:I0q5CLwMm+V8ghjo:fSfnHaaet1oMbC/OioQyGEQSdU1Ul+l78agRUnMX6dG/mqR6YAhnZ+juokv+ZAC4PdIxJG1s3/oKTeX/
+  orchestra-infra:perplexity_api_key:
+    secure: v1:f9xsmO9ViIy33G0g:w4Q4u9Sj5XpIyVZ8pf2P3S+P6j1YI1/luwHIzhjUfYGfL2ae+9Lvl6B0canB27nYJvW61wThY58B0q3iD95Dm8cHN8Kw
+  orchestra-infra:mongodb_org_id:
+    secure: v1:/pFynN6o7GgPQ3/t:Hy/1UC7CMQCruk+IZbBSbdla1TUziJTkbmkd1hx1wcf1fG3B5cMEKw==
+  orchestra-infra:mongodb_api_public_key:
+    secure: v1:r5aqYKxPUwkC4O0n:UExO3ryRhkUoRjWrf/vtPFs3zymuMeoV
+  orchestra-infra:mongodb_api_private_key:
+    secure: v1:Y27VLhKe8Rp2H8+y:ahZ2ijJ9Nm+BIwnq+O25uv9TFpzVvw/pbWFXk4Y105IYgdEjsB4IxEFNr1Qu6go/hUoFAA==
+  orchestra-infra:mongodb_service_client_id:
+    secure: v1:v5ZxL454Sidj2VmC:2zGOdCb7s7YoBsjwAZAgTy22DeAHfNdfVRFCWGGAxJUh9B1nGDV1FGgwTV1dzamTC0A=
+  orchestra-infra:mongodb_service_client_secret:
+    secure: v1:w3K5eEzsaiKn54lA:KuMWehJk+oIYSzUB4G944SmFXzY82f+Qxa3k8OiLc4cGSJIifgChlVwPI0GudC6717NFdRU6CciKTcVYNxRhzd7E
 encryptionsalt: v1:yLqMcZtWgDg=:v1:ILTt7LJiZ9F0MPzW:Oujsbek3GDNno38VZBTb0Ej7b5mw9g==
