@@ -1,6 +1,0 @@
-encryptionsalt: v1:+yfO1Xu5c+4=:v1:P2GQ1jHHPKAuEIga:plwRSQ5rqlmoMgtt5g3jwhpA3EJBXg==
-config:
-  admin-ui-site:domainName: cherry-ai.me
-  gcp:project: cherry-ai-project
-  gcp:region: us-central1
-  admin-ui-site:dnsZone: cherry-ai-zone

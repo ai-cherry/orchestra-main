@@ -1,5 +1,0 @@
-encryptionsalt: v1:r0v47DLLWQY=:v1:ZTJktSfEVEHWzARb:R3i3EASgv8OI0SQ3QNoutH7md7i+qA==
-config:
-  # gcp:project: cherry-ai-project  # Set via GOOGLE_CLOUD_PROJECT env var
-  # orchestra-gcp-infra:project: cherry-ai-project  # Set via GOOGLE_CLOUD_PROJECT env var
-  gcp:region: us-central1

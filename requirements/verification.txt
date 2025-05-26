@@ -1,5 +1,0 @@
-# Requirements for SuperAGI deployment verification
-requests==2.31.0
-kubernetes==28.1.0
-google-cloud-firestore==2.20.2
-redis==5.0.1

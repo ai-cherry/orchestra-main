@@ -1,3 +1,0 @@
-# Example .envrc for Orchestra System
-export GOOGLE_APPLICATION_CREDENTIALS=.gcp/wif.json
-# Add other required environment variables here
