@@ -28,6 +28,9 @@ fi
 if [ -n "${GRAFANA_ADMIN_PASSWORD:-}" ]; then
   pulumi config set --secret grafana_admin_password "$GRAFANA_ADMIN_PASSWORD"
 fi
+if [ -n "${DIGITALOCEAN_TOKEN:-}" ]; then
+  pulumi config set --secret digitalocean:token "$DIGITALOCEAN_TOKEN"
+fi
 cd ..
 
 echo "Local environment setup complete. Pulumi passphrase and secrets are set."

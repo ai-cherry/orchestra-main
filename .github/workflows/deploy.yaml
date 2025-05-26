@@ -28,6 +28,12 @@ jobs:
         run: pip install -r infra/requirements.txt
       - name: Set up Pulumi stack secrets and passphrase
         run: bash scripts/setup_local_env.sh
+      - name: Preconfigure Pulumi provider secrets
+        run: |
+          cd infra
+          pulumi stack select dev || pulumi stack init dev
+          pulumi config set --secret digitalocean:token "$DIGITALOCEAN_TOKEN"
+          cd ..
       - name: Deploy with Pulumi
         run: |
           cd infra
