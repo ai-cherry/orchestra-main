@@ -1,0 +1,85 @@
+{
+  "name": "Orchestra AI MCP",
+  "version": "4.1.0",
+  "description": "Automated MCP setup for Orchestra AI - GCP-free edition with tool awareness",
+  "servers": {
+    "orchestrator": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/orchestrator_server.py"
+      ],
+      "env": {
+        "PYTHONPATH": "${PYTHONPATH}:${PWD}"
+      },
+      "capabilities": {
+        "tools": true,
+        "resources": true,
+        "prompts": true
+      }
+    },
+    "memory": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/memory_server.py"
+      ],
+      "env": {
+        "MONGODB_URI": "${MONGODB_URI}",
+        "REDIS_HOST": "${REDIS_HOST}",
+        "REDIS_PORT": "${REDIS_PORT}"
+      },
+      "capabilities": {
+        "tools": true,
+        "resources": true
+      }
+    },
+    "deployment": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/deployment_server.py"
+      ],
+      "capabilities": {
+        "tools": true
+      }
+    },
+    "tools": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/tools_server.py"
+      ],
+      "env": {
+        "PYTHONPATH": "${PYTHONPATH}:${PWD}",
+        "REDIS_HOST": "${REDIS_HOST}",
+        "REDIS_PORT": "${REDIS_PORT}",
+        "MONGODB_URI": "${MONGODB_URI}",
+        "WEAVIATE_URL": "${WEAVIATE_URL}"
+      },
+      "capabilities": {
+        "tools": true,
+        "resources": true
+      },
+      "description": "Tool discovery and execution server with rich metadata"
+    }
+  },
+  "client": {
+    "mcpServers": {
+      "orchestrator": {
+        "command": "python",
+        "args": [
+          "mcp_server/servers/orchestrator_server.py"
+        ]
+      },
+      "memory": {
+        "command": "python",
+        "args": [
+          "mcp_server/servers/memory_server.py"
+        ]
+      },
+      "tools": {
+        "command": "python",
+        "args": [
+          "mcp_server/servers/tools_server.py"
+        ]
+      }
+    }
+  }
+}

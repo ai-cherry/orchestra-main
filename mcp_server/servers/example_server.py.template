@@ -1,0 +1,155 @@
+#!/usr/bin/env python3
+"""
+Example MCP Server Template
+
+This template demonstrates the basic structure for creating an MCP server
+that integrates with the AI Orchestra system.
+"""
+
+import asyncio
+import logging
+import os
+import sys
+from typing import Dict, Any
+
+# Add parent directory to path for imports
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from mcp_server.server import MCPServer
+from mcp_server.exceptions import MCPError
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+
+class ExampleMCPServer(MCPServer):
+    """Example MCP Server implementation"""
+
+    def __init__(self):
+        super().__init__(
+            name="example",
+            version="1.0.0",
+            description="Example MCP server template"
+        )
+
+        # Initialize any required resources
+        self.config = self._load_config()
+
+        # Register available tools
+        self._register_tools()
+
+    def _load_config(self) -> Dict[str, Any]:
+        """Load configuration from environment or config file"""
+        config = {
+            "example_setting": os.getenv("EXAMPLE_SETTING", "default_value"),
+            "debug": os.getenv("DEBUG", "false").lower() == "true"
+        }
+
+        if config["debug"]:
+            logger.setLevel(logging.DEBUG)
+
+        return config
+
+    def _register_tools(self):
+        """Register all available tools for this server"""
+
+        @self.tool(
+            name="example_tool",
+            description="An example tool that echoes input",
+            parameters={
+                "message": {
+                    "type": "string",
+                    "description": "Message to echo",
+                    "required": True
+                },
+                "uppercase": {
+                    "type": "boolean",
+                    "description": "Convert to uppercase",
+                    "required": False,
+                    "default": False
+                }
+            }
+        )
+        async def example_tool(message: str, uppercase: bool = False) -> Dict[str, Any]:
+            """Example tool implementation"""
+            try:
+                result = message.upper() if uppercase else message
+                return {
+                    "success": True,
+                    "result": result,
+                    "metadata": {
+                        "original_length": len(message),
+                        "processed_length": len(result)
+                    }
+                }
+            except Exception as e:
+                logger.error(f"Error in example_tool: {str(e)}")
+                raise MCPError(f"Failed to process message: {str(e)}")
+
+        @self.tool(
+            name="example_async_tool",
+            description="An example async tool that simulates work",
+            parameters={
+                "duration": {
+                    "type": "number",
+                    "description": "Duration to wait in seconds",
+                    "required": False,
+                    "default": 1.0
+                }
+            }
+        )
+        async def example_async_tool(duration: float = 1.0) -> Dict[str, Any]:
+            """Example async tool implementation"""
+            start_time = asyncio.get_event_loop().time()
+
+            # Simulate async work
+            await asyncio.sleep(duration)
+
+            end_time = asyncio.get_event_loop().time()
+
+            return {
+                "success": True,
+                "elapsed_time": end_time - start_time,
+                "message": f"Completed after {duration} seconds"
+            }
+
+    async def initialize(self):
+        """Initialize server resources"""
+        logger.info(f"Initializing {self.name} server...")
+
+        # Perform any async initialization here
+        # e.g., connect to databases, load models, etc.
+
+        logger.info(f"{self.name} server initialized successfully")
+
+    async def cleanup(self):
+        """Clean up server resources"""
+        logger.info(f"Cleaning up {self.name} server...")
+
+        # Perform any cleanup here
+        # e.g., close connections, save state, etc.
+
+        logger.info(f"{self.name} server cleaned up successfully")
+
+
+async def main():
+    """Main entry point"""
+    server = ExampleMCPServer()
+
+    try:
+        await server.initialize()
+        await server.run()
+    except KeyboardInterrupt:
+        logger.info("Received interrupt signal")
+    except Exception as e:
+        logger.error(f"Server error: {str(e)}", exc_info=True)
+    finally:
+        await server.cleanup()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

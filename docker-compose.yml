@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  # Main development environment
+  orchestra-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: orchestra-main
+    volumes:
+      - .:/workspace
+      - vscode-extensions:/home/developer/.vscode-server/extensions
+      - pip-cache:/home/developer/.cache/pip
+      - npm-cache:/home/developer/.npm
+    environment:
+      - PYTHONPATH=/workspace
+      - NODE_ENV=development
+    ports:
+      - "8000:8000"  # FastAPI
+      - "8080:8080"  # Orchestrator
+      - "8002:8002"  # MCP
+      - "3000:3000"  # Admin UI
+      - "5000:5000"  # Flask
+    command: /bin/bash
+    stdin_open: true
+    tty: true
+    networks:
+      - orchestra-network
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: orchestra-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - orchestra-network
+
+  # PostgreSQL for main data
+  postgres:
+    image: postgres:15-alpine
+    container_name: orchestra-postgres
+    environment:
+      POSTGRES_DB: orchestra
+      POSTGRES_USER: orchestra
+      POSTGRES_PASSWORD: orchestra123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - orchestra-network
+
+  # Admin UI (separate for hot reload)
+  admin-ui:
+    build:
+      context: ./admin-ui
+      dockerfile: Dockerfile
+    container_name: orchestra-admin-ui
+    volumes:
+      - ./admin-interface:/app
+      - /app/node_modules  # Prevent overwriting node_modules
+    ports:
+      - "3001:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    command: npm start
+    networks:
+      - orchestra-network
+
+networks:
+  orchestra-network:
+    driver: bridge
+
+volumes:
+  vscode-extensions:
+  pip-cache:
+  npm-cache:
+  redis-data:
+  postgres-data:

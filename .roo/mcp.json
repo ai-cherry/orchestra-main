@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "memory-bank": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "MEMORY_BANK_ROOT",
+        "-v",
+        "${workspaceFolder}/.roo/memory:/mnt/memory_bank",
+        "allpepper/memory-bank-mcp:latest"
+      ],
+      "env": {
+        "MEMORY_BANK_ROOT": "/mnt/memory_bank"
+      },
+      "alwaysAllow": [
+        "memory_bank_read",
+        "memory_bank_write",
+        "memory_bank_update"
+      ]
+    },
+    "portkey-router": {
+      "command": "node",
+      "args": ["${workspaceFolder}/.roo/scripts/portkey-router.js"],
+      "alwaysAllow": ["route_model_request"]
+    }
+  }
+}

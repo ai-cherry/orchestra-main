@@ -1,0 +1,198 @@
+# GitHub Actions Workload Identity Federation Setup
+
+## Configuration File
+
+Great! You've successfully set up Workload Identity Federation and received the configuration JSON file:
+
+```json
+{
+  "universe_domain": "googleapis.com",
+  "type": "external_account",
+  "audience": "//iam.googleapis.com/projects/525398941159/locations/global/workloadIdentityPools/github-wif-pool/providers/github-actions",
+  "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
+  "token_url": "https://sts.googleapis.com/v1/token",
+  "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/codespaces-powerful-sa@cherry-ai-project.iam.gserviceaccount.com:generateAccessToken",
+  "credential_source": {
+    "file": "/.github/workflows/oidc-token",
+    "format": {
+      "type": "text"
+    }
+  }
+}
+```
+
+## Using the Configuration in GitHub Actions
+
+There are two ways to use this configuration in your GitHub Actions workflow:
+
+### Option 1: Use the google-github-actions/auth Action (Recommended)
+
+This is the simplest approach and doesn't require storing the JSON file:
+
+```yaml
+- id: auth
+  name: Authenticate to Google Cloud
+  uses: google-github-actions/auth@v1
+  with:
+    token_format: 'access_token'
+    workload_identity_provider: 'projects/525398941159/locations/global/workloadIdentityPools/github-wif-pool/providers/github-actions'
+    service_account: 'codespaces-powerful-sa@cherry-ai-project.iam.gserviceaccount.com'
+```
+
+### Option 2: Store the JSON as a Secret
+
+If you prefer to use the JSON file directly:
+
+1. Save the JSON configuration as a GitHub secret named `GCP_WORKLOAD_IDENTITY_CONFIG`
+2. In your workflow, write the JSON to a file and set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable:
+
+```yaml
+- name: Set up GCP credentials
+  run: |
+    echo '${{ secrets.GCP_WORKLOAD_IDENTITY_CONFIG }}' > /tmp/gcp-credentials.json
+    echo "GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp-credentials.json" >> $GITHUB_ENV
+```
+
+## GitHub Secrets to Add
+
+Add these secrets to your GitHub repository:
+
+1. **Option 1 (Recommended):**
+   - `GCP_PROJECT_ID`: cherry-ai-project
+   - `GCP_REGION`: your-preferred-region (e.g., us-central1)
+   - `GCP_WORKLOAD_IDENTITY_PROVIDER`: projects/525398941159/locations/global/workloadIdentityPools/github-wif-pool/providers/github-actions
+   - `GCP_SERVICE_ACCOUNT`: codespaces-powerful-sa@cherry-ai-project.iam.gserviceaccount.com
+
+2. **Option 2:**
+   - `GCP_WORKLOAD_IDENTITY_CONFIG`: The entire JSON configuration file
+   - `GCP_PROJECT_ID`: cherry-ai-project
+   - `GCP_REGION`: your-preferred-region (e.g., us-central1)
+
+## Complete GitHub Actions Workflow
+
+Here's the complete workflow file using Option 1:
+
+```yaml
+name: Deploy MCP Server with Workload Identity Federation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'mcp_server/**'
+      - '.github/workflows/deploy-mcp-server.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: ${{ secrets.GCP_REGION }}
+  SERVICE_NAME: mcp-server
+
+jobs:
+  deploy:
+    name: Deploy MCP Server
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # Required for requesting the JWT
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: 'pip'
+
+      # Install Poetry directly
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Verify Poetry installation
+        run: poetry --version
+
+      # Generate lock file if needed
+      - name: Generate lock file if needed
+        run: |
+          cd mcp_server
+          if [ ! -f poetry.lock ]; then
+            poetry lock --no-update
+          fi
+
+      - name: Install dependencies
+        run: |
+          cd mcp_server
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
+          poetry install --no-interaction --no-root
+
+      - name: Determine environment
+        id: env
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "ENVIRONMENT=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+          else
+            echo "ENVIRONMENT=dev" >> $GITHUB_ENV
+          fi
+
+      # Authenticate to Google Cloud using Workload Identity Federation
+      - id: auth
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      # Setup gcloud CLI
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      # Configure Docker to use gcloud credentials
+      - name: Authorize Docker push
+        run: gcloud auth configure-docker gcr.io
+
+      # Build and push the Docker image
+      - name: Build and push Docker image
+        run: |
+          IMAGE_NAME="gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}-${{ env.ENVIRONMENT }}"
+          docker build -t $IMAGE_NAME -f mcp_server/Dockerfile.optimized .
+          docker push $IMAGE_NAME
+
+      # Deploy to Cloud Run
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v1
+        with:
+          service: ${{ env.SERVICE_NAME }}-${{ env.ENVIRONMENT }}
+          image: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}-${{ env.ENVIRONMENT }}
+          region: ${{ env.REGION }}
+          flags: |
+            --allow-unauthenticated
+            --memory=1Gi
+            --cpu=1
+            --concurrency=80
+            --timeout=300s
+            --set-env-vars=ENV=${{ env.ENVIRONMENT }},PROJECT_ID=${{ env.PROJECT_ID }}
+
+      # Show the deployed service URL
+      - name: Show Output
+        run: |
+          echo "Service URL: ${{ steps.deploy.outputs.url }}"

@@ -1,0 +1,5 @@
+# Web Scraping Requirements for Orchestra AI Project
+# All dependencies for the web scraping AI agent team are now managed in requirements-consolidated.txt at the project root.
+# This ensures a single source of truth for all Python dependencies.
+
+-r requirements-consolidated.txt

@@ -1,0 +1,45 @@
+name: Deploy Orchestra AI
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
+      DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      WEAVIATE_API_KEY: ${{ secrets.WEAVIATE_API_KEY }}
+      MONGODB_CONNECTION_STRING: ${{ secrets.MONGODB_CONNECTION_STRING }}
+      DRAGONFLY_URI: ${{ secrets.DRAGONFLY_URI }}
+      MONGO_URI: ${{ secrets.MONGO_URI }}
+      WEAVIATE_URL: ${{ secrets.WEAVIATE_URL }}
+      MONGODB_SERVICE_CLIENT_ID: ${{ secrets.MONGODB_SERVICE_CLIENT_ID }}
+      MONGODB_SERVICE_CLIENT_SECRET: ${{ secrets.MONGODB_SERVICE_CLIENT_SECRET }}
+      GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
+      DO_ROOT_PASSWORD: ${{ secrets.DO_ROOT_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install Pulumi CLI
+        uses: pulumi/setup-pulumi@v2
+      - name: Install dependencies
+        run: pip install -r infra/requirements.txt
+      - name: Set up Pulumi stack secrets and passphrase
+        run: bash scripts/setup_local_env.sh
+      - name: Preconfigure Pulumi provider secrets
+        run: |
+          cd infra
+          pulumi stack select dev || pulumi stack init dev
+          pulumi config set --secret digitalocean:token "$DIGITALOCEAN_TOKEN"
+          cd ..
+      - name: Deploy with Pulumi
+        run: |
+          cd infra
+          pulumi stack select dev
+          pulumi up --yes

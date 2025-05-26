@@ -1,0 +1,23 @@
+[flake8]
+# Ignore these annoying style warnings
+ignore = E501,W503,E203,E402,E731
+
+# Only check Python files
+exclude =
+    .git,
+    __pycache__,
+    venv,
+    .venv,
+    build,
+    dist,
+    *.egg-info,
+    .pytest_cache,
+    node_modules,
+    migrations,
+    .terraform
+
+# Reasonable line length when we do check
+max-line-length = 120
+
+# Focus on real issues: F=PyFlakes, E9=Runtime errors, W6=Deprecation
+select = F,E9,W6

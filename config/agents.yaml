@@ -1,0 +1,30 @@
+agent_definitions:
+  # Example LangChain Agent: Modular, plug-and-play integration
+  langchain_example_agent:
+    agent_name: LangChain Example
+    description: "A modular agent powered by LangChain"
+    wrapper_type: langchain
+    langchain_agent_class: myproject.langchain.MyLangChainAgent  # Update with actual import path
+    llm_ref: llm_gpt4_turbo_via_portkey
+    tools: []
+    role: "Perform tasks using LangChain"
+    instructions:
+      - "Respond to user queries using LangChain chains and tools"
+      - "Leverage memory and context for improved answers"
+    memory:
+      memory_type: pgvector
+
+  # Gong Agent: Analyzes call recordings and transcripts
+  phidata_gong_analyst:
+    agent_name: Gong Analyst
+    description: "Analyzes Gong call recordings, transcripts, and sentiment to extract insights"
+    wrapper_type: phidata
+    phidata_agent_class: phi.agent.Agent
+    llm_ref: openai_gpt4
+    tools: []
+    role: "Call analysis and insights extraction"
+    instructions:
+      - "Analyze call transcripts for key insights"
+      - "Extract action items and follow-ups"
+    memory:
+      memory_type: redis

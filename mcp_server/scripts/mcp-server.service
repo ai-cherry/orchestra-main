@@ -1,0 +1,16 @@
+[Unit]
+Description=Model Context Protocol (MCP) Memory Server
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=vscode
+WorkingDirectory=/workspaces/orchestra-main
+ExecStart=/usr/bin/python -m mcp_server.main
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

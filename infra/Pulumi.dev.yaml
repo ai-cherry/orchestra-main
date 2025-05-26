@@ -1,0 +1,15 @@
+config:
+  orchestra-infra:env: dev
+  digitalocean:token:
+    secure: v1:oQ4JO8W8Q537psvP:1KcAzd80ttv2dc/L7hNDVimLuXAnDG/+TfKOiv3cOpvqgfmctTdF0fp9aGvR9XleNLpLY95+PwX06R0mnQGid1MJ8xLWWntcFxNailqf8VcLvzSSgEHg
+  orchestra-infra:root_password:
+    secure: v1:dVTsV7t+c/Qje2zK:Q3eX+loE1bF+9ffEqsUm4OzVSB+tVSFrAVlM8von
+  orchestra-infra:dragonfly_uri:
+    secure: v1:4TkOQf8VKp+rKwkv:Wu6iEUPYm+T/iQV7g2o3uWfueuykrImXXeO88Ty/Woa5Bmo3Fiv7uQt8dfU2NukVLhiUxXeoMsiFxazbFg==
+  orchestra-infra:mongo_uri:
+    secure: v1:urEkVl5xM83BPMcH:mMg0CskjRC6gvms4fk1xuWZEBXAbgK4JHEXRurNxD4DZPcuejiUVPb4Q1enoJQqwfMbCksnSGJYRLcQ1Lh8yaBf6RmQxFzdLvcuL1rXEzRTC9xKCQWEH1jY9clZ35tYY
+  orchestra-infra:weaviate_url:
+    secure: v1:gkEiKrSC+MAZkdgl:vdeUkO+bcqLWdAsPqmCBOaXeuTqUph9P2pyzObfwheqfLgKr8crwntByIn/pMOAPrNR1
+  orchestra-infra:weaviate_api_key:
+    secure: v1:Nkkks2ITDXZw+gKr:mOcJVg+n6XKfHcN+VCte/ynNb+D9HU/bPLEGosjmYSs7aIG4/Q==
+encryptionsalt: v1:yLqMcZtWgDg=:v1:ILTt7LJiZ9F0MPzW:Oujsbek3GDNno38VZBTb0Ej7b5mw9g==

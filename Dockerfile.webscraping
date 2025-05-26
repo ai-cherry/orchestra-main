@@ -1,0 +1,112 @@
+# Multi-stage Dockerfile for Web Scraping AI Agents
+FROM python:3.10-slim-bullseye AS builder
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV DEBIAN_FRONTEND=noninteractive
+
+WORKDIR /app
+
+# Install system dependencies for building
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
+    build-essential \
+    wget \
+    curl \
+    ca-certificates \
+    libffi-dev \
+    libssl-dev \
+    libxml2-dev \
+    libxslt1-dev \
+    zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python build tools
+RUN pip install --upgrade pip wheel setuptools
+
+# Copy requirements files
+COPY requirements-webscraping.txt ./
+COPY requirements.txt ./
+
+# Build wheels for all dependencies
+RUN pip wheel --no-cache-dir --wheel-dir=/wheels -r requirements-webscraping.txt
+RUN pip wheel --no-cache-dir --wheel-dir=/wheels -r requirements.txt
+
+# Stage 2: Runtime stage
+FROM python:3.10-slim-bullseye AS runtime
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PORT=8080
+ENV APP_HOME=/app
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+
+WORKDIR ${APP_HOME}
+
+# Install runtime system dependencies for Playwright
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget \
+    curl \
+    ca-certificates \
+    fonts-liberation \
+    libappindicator3-1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libatspi2.0-0 \
+    libcups2 \
+    libdbus-1-3 \
+    libdrm2 \
+    libgtk-3-0 \
+    libnspr4 \
+    libnss3 \
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    libxss1 \
+    libxtst6 \
+    xdg-utils \
+    libu2f-udev \
+    libvulkan1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN groupadd --system webscraper && useradd --system --gid webscraper webscraper
+
+# Copy built wheels from builder stage
+COPY --from=builder /wheels /wheels
+
+# Install Python dependencies from wheels
+COPY requirements-webscraping.txt ./
+COPY requirements.txt ./
+RUN pip install --no-cache-dir --no-index --find-links=/wheels -r requirements-webscraping.txt \
+    && pip install --no-cache-dir --no-index --find-links=/wheels -r requirements.txt \
+    && rm -rf /wheels
+
+# Install Playwright browsers
+RUN playwright install chromium
+RUN playwright install-deps chromium
+
+# Copy application code
+COPY web_scraping_ai_agents.py ${APP_HOME}/
+COPY webscraping_app.py ${APP_HOME}/
+COPY mcp_server/ ${APP_HOME}/mcp_server/
+COPY core/ ${APP_HOME}/core/
+COPY utils.py ${APP_HOME}/
+COPY enhanced_vector_memory_system.py ${APP_HOME}/
+
+# Set proper permissions
+RUN chown -R webscraper:webscraper ${APP_HOME}
+
+# Switch to non-root user
+USER webscraper
+
+# Expose the port
+EXPOSE 8080
+
+# Start the application
+CMD ["python", "webscraping_app.py"]

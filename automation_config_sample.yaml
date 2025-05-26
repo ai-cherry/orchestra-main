@@ -1,0 +1,230 @@
+# AI Orchestra Automation Configuration
+# This configuration file controls all aspects of the automation system
+
+# Performance Enhancement Configuration
+performance:
+  enabled: true # Set to false to disable all performance automation
+  automation_level: 2 # 1=conservative, 2=moderate, 3=aggressive, 4=self-tuning
+  analysis_frequency_hours: 24 # How often to analyze and apply enhancements
+  apply_threshold: # Risk threshold for automatic application (higher = more permissive)
+    development: 0.7 # 70% of recommendations will be applied automatically
+    staging: 0.5 # 50% of recommendations will be applied automatically
+    production: 0.3 # Only 30% (lowest risk) recommendations applied automatically
+
+  # Specific enhancement categories (all default to true)
+  cloud_run_optimization: true # Optimize Cloud Run configuration
+  redis_optimization: true # Optimize Redis connection pooling
+  caching_optimization: true # Implement tiered caching strategy
+  api_optimization: true # API response compression and optimization
+  vertex_optimization: true # Vertex AI request batching and caching
+
+  # Resource limits
+  resources:
+    max_memory_increase_percent: 50 # Maximum memory increase recommendation
+    max_cpu_increase_percent: 100 # Maximum CPU increase recommendation
+    min_response_time_ms: 50 # Don't optimize below this response time
+
+# Workspace Optimization Configuration
+workspace:
+  enabled: true # Set to false to disable all workspace optimization
+  file_exclusion_enabled: true # Optimize VSCode file exclusions
+  git_optimization_enabled: true # Optimize Git configuration
+  workspace_segmentation_enabled: true # Create workspace segments
+  env_standardization_enabled: true # Standardize environment files
+  repo_size_management_enabled: true # Manage repository size
+
+  # Workspace segmentation configuration
+  segments:
+    frontend:
+      - "apps/"
+      - "llm-chat/"
+      - "admin-interface/"
+    backend:
+      - "ai-orchestra/"
+      - "core/"
+      - "packages/"
+      - "services/"
+    infrastructure:
+      - "terraform/"
+      - "infra/"
+      - "terraform-modules/"
+    documentation:
+      - "docs/"
+    tools:
+      - "scripts/"
+      - "tools/"
+
+  # Repository size management
+  repo_size_management:
+    max_repo_size_mb: 1000 # Maximum repository size
+    lfs_threshold_kb: 500 # Use Git LFS for files larger than this
+    retention_policies:
+      log_files_days: 7 # Retain log files for 7 days
+      temp_files_days: 1 # Retain temp files for 1 day
+      build_artifacts_days: 30 # Retain build artifacts for 30 days
+
+# Deployment Pipeline Configuration
+deployment:
+  enabled: true # Set to false to disable all deployment automation
+  auto_deployment: # Automatic deployment by environment
+    development: true # Auto-deploy to development
+    staging: false # Require manual approval for staging
+    production: false # Require manual approval for production
+
+  deployment_window: # When deployments are allowed
+    development: "anytime" # Deploy anytime
+    staging: "8-18:00" # 8am to 6pm
+    production: "2-5:00" # 2am to 5am
+
+  approval_required: # Whether approval is required for deployment
+    development: false # No approval needed for development
+    staging: true # Approval required for staging
+    production: true # Approval required for production
+
+  # Deployment phases configuration
+  phases:
+    preparation:
+      timeout_minutes: 10
+      fail_fast: true
+    build_and_test:
+      timeout_minutes: 30
+      fail_fast: true
+    infrastructure_provisioning:
+      timeout_minutes: 20
+      fail_fast: true
+    deployment:
+      timeout_minutes: 15
+      fail_fast: false
+    verification:
+      timeout_minutes: 10
+      fail_fast: false
+
+# Testing Automation Configuration
+testing:
+  enabled: true # Set to false to disable all testing automation
+  unit_test_frequency_hours: 4 # Run unit tests every 4 hours
+  integration_test_frequency_hours: 8 # Run integration tests every 8 hours
+  performance_test_frequency_hours: 24 # Run performance tests every 24 hours
+  test_environments: # Environments to run tests in
+    - development
+    - staging
+
+  # Test types configuration
+  types:
+    unit:
+      timeout_minutes: 10
+      fail_threshold: 1 # Fail if any tests fail
+    integration:
+      timeout_minutes: 20
+      fail_threshold: 1 # Fail if any tests fail
+    performance:
+      timeout_minutes: 30
+      fail_threshold: 5 # Allow up to 5 performance test failures
+
+# AI Service Optimization Configuration
+ai_service:
+  enabled: true # Set to false to disable all AI service optimization
+  caching_enabled: true # Enable semantic caching
+  batching_enabled: true # Enable request batching
+  model_selection_optimization: true # Enable automatic model selection
+  semantic_cache_threshold: 0.85 # Semantic similarity threshold for caching
+  cache_ttl_seconds: 3600 # Cache TTL in seconds
+
+  # Service-specific configurations
+  services:
+    embedding:
+      batch_size: 32
+      cache_enabled: true
+      model_fallback_enabled: true
+    text_generation:
+      batch_size: 8
+      cache_enabled: true
+      max_tokens_cache_threshold: 1000
+    image_analysis:
+      batch_size: 16
+      cache_enabled: true
+
+  # Resource optimizations
+  optimizations:
+    token_optimization_enabled: true # Optimize token usage
+    compute_deduplication_enabled: true # Deduplicate compute operations
+    request_coalescing_enabled: true # Coalesce similar requests
+
+# Cost Optimization Configuration
+cost:
+  enabled: true # Set to false to disable all cost optimization
+  alert_threshold_percent: 20 # Alert on 20% cost increase
+  auto_optimization_enabled: false # Don't automatically optimize costs
+  billing_export_dataset: "billing_export" # BigQuery dataset for billing export
+  recommendation_frequency_days: 7 # Generate recommendations every 7 days
+
+  # Service-specific cost thresholds
+  thresholds:
+    compute_engine:
+      monthly_budget_usd: 500
+      alert_threshold_percent: 15
+    cloud_run:
+      monthly_budget_usd: 300
+      alert_threshold_percent: 20
+    vertex_ai:
+      monthly_budget_usd: 1000
+      alert_threshold_percent: 10
+    bigquery:
+      monthly_budget_usd: 200
+      alert_threshold_percent: 25
+
+  # Cost optimization strategies
+  strategies:
+    rightsizing_enabled: true # Recommend rightsizing resources
+    scheduling_enabled: true # Recommend scheduling for non-critical resources
+    commitment_discount_enabled: true # Recommend commitment discounts
+    unused_resource_cleanup_enabled: true # Recommend cleanup of unused resources
+
+# Infrastructure Adaptation Configuration
+infrastructure:
+  enabled: true # Set to false to disable all infrastructure adaptation
+  self_tuning_enabled: false # Don't automatically tune infrastructure
+  adaptation_frequency_hours: 24 # Check for adaptations every 24 hours
+  prediction_window_days: 7 # Predict 7 days ahead
+  terraform_dir: "./terraform" # Terraform directory
+
+  # Resource types to adapt
+  resources:
+    cloud_run:
+      min_instances: 1
+      max_instances: 10
+      cpu_utilization_target: 0.6
+    compute_engine:
+      min_instances: 1
+      max_instances: 5
+      cpu_utilization_target: 0.7
+    gke:
+      min_nodes: 3
+      max_nodes: 10
+      cpu_utilization_target: 0.65
+
+  # Adaptation strategies
+  strategies:
+    predictive_scaling_enabled: true # Scale based on predicted load
+    horizontal_scaling_preferred: true # Prefer horizontal to vertical scaling
+    stateful_workload_aware: true # Be cautious with stateful workloads
+
+# Notification Configuration
+notification:
+  email_enabled: false # Set to true to enable email notifications
+  email_recipients: [] # List of email recipients
+  slack_enabled: false # Set to true to enable Slack notifications
+  slack_webhook: "" # Slack webhook URL
+
+  # Notification levels
+  levels:
+    info: false # Don't notify on info events
+    warning: true # Notify on warning events
+    error: true # Notify on error events
+    success: true # Notify on successful operations
+
+  # Notification schedules
+  schedules:
+    daily_summary: true # Send daily summary
+    weekly_report: true # Send weekly report
+    immediate_alerts: true # Send immediate alerts for critical events

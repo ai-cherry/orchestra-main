@@ -1,0 +1,58 @@
+{
+  "servers": {
+    "gcp_cloud_run": {
+      "name": "GCP Cloud Run Manager",
+      "description": "Deploy and manage Cloud Run services",
+      "type": "http",
+      "url": "http://localhost:8001/mcp/cloud-run",
+      "capabilities": [
+        "deploy_service",
+        "update_service",
+        "list_services",
+        "get_service_status"
+      ],
+      "required_env": ["GCP_PROJECT_ID", "GCP_REGION"]
+    },
+    "gcp_secret_manager": {
+      "name": "GCP Secret Manager",
+      "description": "Manage secrets in Google Secret Manager",
+      "type": "http",
+      "url": "http://localhost:8002/mcp/secrets",
+      "capabilities": [
+        "get_secret",
+        "create_secret",
+        "update_secret",
+        "list_secrets"
+      ],
+      "required_env": ["GCP_PROJECT_ID"]
+    },
+    "dragonfly_db": {
+      "name": "DragonflyDB Manager",
+      "description": "Interact with DragonflyDB for caching",
+      "type": "http",
+      "url": "http://localhost:8003/mcp/dragonfly",
+      "capabilities": ["get_cache", "set_cache", "delete_cache", "list_keys"],
+      "required_env": ["DRAGONFLY_HOST", "DRAGONFLY_PORT", "DRAGONFLY_PASSWORD"]
+    },
+    "firestore": {
+      "name": "Firestore Manager",
+      "description": "Manage Firestore collections and documents",
+      "type": "http",
+      "url": "http://localhost:8004/mcp/firestore",
+      "capabilities": [
+        "create_document",
+        "read_document",
+        "update_document",
+        "query_collection"
+      ],
+      "required_env": ["GCP_PROJECT_ID", "FIRESTORE_NAMESPACE"]
+    }
+  },
+  "claude_code_config": {
+    "enable_mcp": true,
+    "auto_discover": true,
+    "require_confirmation": true,
+    "allowed_operations": ["read", "create", "update"],
+    "restricted_operations": ["delete", "deploy"]
+  }
+}

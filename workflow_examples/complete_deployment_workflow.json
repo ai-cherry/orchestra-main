@@ -1,0 +1,141 @@
+[
+  {
+    "type": "comment",
+    "content": "IMPORTANT: This workflow is designed for the roo_workflow_manager.py utility, which is completely separate from the main Project Orchestra implementation."
+  },
+  {
+    "type": "mode",
+    "mode": "strategy",
+    "task": "Develop an implementation strategy for building and deploying a FastAPI-based data processing service that integrates with our multi-agent system, uses Google Cloud IAM for authentication, and deploys to Cloud Run using Terraform."
+  },
+  {
+    "type": "mode",
+    "mode": "architect",
+    "task": "Design the architecture for the data processing API service. Include API endpoints, data models, authentication flow using Google Cloud IAM, and integration points with our existing multi-agent system. Consider scalability, security, and maintainability."
+  },
+  {
+    "type": "github",
+    "operation": "create_branch",
+    "parameters": {
+      "branch_name": "feature/data-processing-api",
+      "base_branch": "main"
+    }
+  },
+  {
+    "type": "vs_code_task",
+    "task_id": "github_gcp_init",
+    "inputs": {}
+  },
+  {
+    "type": "mode",
+    "mode": "code",
+    "task": "Implement the FastAPI data processing service based on the architecture design. Include proper error handling, request validation, Google Cloud IAM authentication, and comprehensive logging. Create the file structure including separate modules for routes, models, services, and utilities."
+  },
+  {
+    "type": "mode",
+    "mode": "code",
+    "task": "Implement unit tests for the data processing API using pytest. Cover all key functionality including endpoint behavior, authentication, error cases, and integration with the multi-agent system."
+  },
+  {
+    "type": "mode",
+    "mode": "reviewer",
+    "task": "Review the implemented API code and tests for security issues, code quality, error handling completeness, and adherence to best practices. Pay special attention to authentication implementation and potential vulnerabilities."
+  },
+  {
+    "type": "mode",
+    "mode": "code",
+    "task": "Address the issues identified in the code review. Fix any security vulnerabilities, improve error handling, and enhance test coverage as needed."
+  },
+  {
+    "type": "mode",
+    "mode": "code",
+    "task": "Create a Dockerfile for the FastAPI service that follows best practices including proper base image selection, multi-stage builds, non-root user execution, and minimal dependencies."
+  },
+  {
+    "type": "github",
+    "operation": "commit_changes",
+    "parameters": {
+      "message": "Implement data processing API with tests and Dockerfile",
+      "files": []
+    }
+  },
+  {
+    "type": "mode",
+    "mode": "code",
+    "task": "Create Terraform configuration for deploying the service to Cloud Run with appropriate IAM permissions, environment variables, and resource allocations. Place the configuration in the terraform directory following existing patterns."
+  },
+  {
+    "type": "terraform",
+    "operation": "init",
+    "working_dir": "terraform",
+    "parameters": {}
+  },
+  {
+    "type": "terraform",
+    "operation": "validate",
+    "working_dir": "terraform",
+    "parameters": {}
+  },
+  {
+    "type": "terraform",
+    "operation": "plan",
+    "working_dir": "terraform",
+    "parameters": {
+      "out_file": "data_processing_api_plan"
+    }
+  },
+  {
+    "type": "mode",
+    "mode": "reviewer",
+    "task": "Review the Terraform configuration for the service deployment. Check for security best practices, resource configuration, IAM permissions, and adherence to the least privilege principle."
+  },
+  {
+    "type": "github",
+    "operation": "commit_changes",
+    "parameters": {
+      "message": "Add Terraform configuration for data processing API",
+      "files": ["terraform/"]
+    }
+  },
+  {
+    "type": "vs_code_task",
+    "task_id": "run_cloud_build",
+    "inputs": {}
+  },
+  {
+    "type": "terraform",
+    "operation": "apply",
+    "working_dir": "terraform",
+    "parameters": {
+      "plan_file": "data_processing_api_plan"
+    }
+  },
+  {
+    "type": "mode",
+    "mode": "code",
+    "task": "Create integration tests that verify the deployed API functions correctly in the Cloud Run environment. Include tests for authentication, error handling, and core functionality."
+  },
+  {
+    "type": "mode",
+    "mode": "creative",
+    "task": "Create comprehensive API documentation including setup instructions, authentication details, endpoint reference, request/response examples, error codes, and integration examples with the multi-agent system."
+  },
+  {
+    "type": "github",
+    "operation": "commit_changes",
+    "parameters": {
+      "message": "Add integration tests and API documentation",
+      "files": []
+    }
+  },
+  {
+    "type": "vs_code_task",
+    "task_id": "github_gcp_pr",
+    "inputs": {}
+  },
+  {
+    "type": "mode",
+    "mode": "creative",
+    "task": "Create a deployment summary that includes what was built, how it was deployed, where to find the documentation, how to test the service, and any next steps for future enhancements."
+  }
+]

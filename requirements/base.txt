@@ -1,0 +1,58 @@
+# Orchestra Base Requirements - LOCKED VERSIONS
+# DO NOT MODIFY WITHOUT TEAM APPROVAL
+# Last updated: 2025-01-20
+# Python: 3.10.12
+
+# Core Web Framework
+fastapi==0.115.12
+uvicorn==0.29.0
+pydantic==2.11.4
+pydantic-settings==2.9.1
+
+# Database & Storage
+sqlalchemy==2.0.30
+redis==5.0.1
+psycopg==3.1.18
+
+# Google Cloud Platform
+
+# LLM & AI
+litellm==1.70.4
+openai==1.82.0
+anthropic==0.39.0
+phidata==2.7.10
+
+# HTTP & Networking
+httpx==0.28.1
+requests==2.32.3
+aiohttp==3.11.18
+websockets==15.0.1
+
+# Utilities
+python-dotenv==1.1.0
+pyyaml==6.0.2
+click==8.1.8
+rich==14.0.0
+tenacity==8.2.3
+
+# Data Processing
+numpy==1.26.4
+pandas==2.2.0
+joblib==1.5.1
+
+# Monitoring & Logging
+prometheus-client==0.19.0
+structlog==24.1.0
+
+# Vector Storage
+pgvector==0.2.5
+chromadb==0.4.22
+
+# Async Support
+anyio==4.9.0
+asyncio==3.4.3
+
+# Serialization
+protobuf==6.31.0
+grpcio==1.72.0rc1
+pymongo==4.6.1

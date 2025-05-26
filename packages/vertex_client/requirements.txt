@@ -1,0 +1,20 @@
+# Requirements for the Vertex AI Agent Manager
+
+# Google Cloud dependencies
+google-cloud-aiplatform>=1.30.0
+google-cloud-pubsub>=2.13.0
+google-cloud-run>=0.10.0
+google-cloud-secret-manager>=2.16.0
+
+# FastAPI dependencies
+fastapi>=0.95.0
+uvicorn>=0.21.0
+pydantic>=1.10.7
+
+# Utilities
+python-dotenv>=1.0.0
+tenacity>=8.2.0
+
+# For async operations
+asyncio>=3.4.3
+aiohttp>=3.8.4

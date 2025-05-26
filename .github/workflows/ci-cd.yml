@@ -1,0 +1,78 @@
+# ci-cd.yml
+# Robust CI/CD pipeline for Python/Node/Docker/Poetry monorepo.
+# Enforces linting, type checks, tests, Docker build, and GCP deploy readiness.
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  lint-test-build:
+    runs-on: ubuntu-latest
+    env:
+      POETRY_VIRTUALENVS_CREATE: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install Python dependencies
+        run: poetry install --no-interaction --no-root
+
+      - name: Lint Python code
+        run: poetry run flake8 .
+
+      - name: Type check Python code
+        run: poetry run mypy .
+
+      - name: Run Python tests
+        run: poetry run pytest
+
+      # Set up Node.js (pin to patch version for reproducibility, enable npm cache)
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.11.1"
+          cache: 'npm'
+
+      - name: Install Node dependencies (admin-ui)
+        run: |
+          cd admin-ui
+          npm ci
+
+      - name: Lint Node code (admin-ui)
+        run: |
+          cd admin-ui
+          npm run lint
+
+      - name: Build Node app (admin-ui)
+        run: |
+          cd admin-ui
+          npm run build
+
+      - name: Docker Compose Build (all services)
+        run: docker compose build
+
+      - name: Poetry Export Requirements (for Docker)
+        run: poetry export -f requirements.txt --output requirements.txt --without-hashes
+
+      - name: Check for uncommitted changes
+        run: |
+          git diff --exit-code || (echo "Uncommitted changes after build. Please commit all generated files." && exit 1)
+
+
+      - name: Success
+        run: echo "CI/CD pipeline completed successfully."

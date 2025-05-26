@@ -1,0 +1,14 @@
+index:
+  name: "agent_memory"
+  prefix: "memory:"
+  fields:
+    - name: "text_content"
+      type: "text"
+      weight: 1.0
+    - name: "embedding"
+      type: "vector"
+      attrs:
+        dim: 1536
+        algorithm: "hnsw"
+        distance_metric: "cosine"
+        initial_size: 1000

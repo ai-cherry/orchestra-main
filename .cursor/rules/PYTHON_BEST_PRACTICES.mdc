@@ -1,0 +1,18 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+---
+description: Core Python 3.10+ style, type hinting, logging, error handling, and dependency management standards for the orchestra-main AI agent application.
+globs: ["agent/**/*.py", "ai-orchestra/**/*.py", "core/**/*.py", "services/**/*.py", "packages/**/*.py", "scripts/**/*.py", "*.py"]
+autoAttach: true
+---
+**Python Development Standards:**
+- **Version:** Target Python 3.10+.
+- **Formatting:** Strictly adhere to Black. Use isort for imports.
+- **Type Hints:** Mandatory for all function signatures and important variable declarations.
+- **Docstrings:** Google-style for all public modules, classes, functions.
+- **Dependencies:** Managed with Poetry (`pyproject.toml`).
+- **Linting:** Aim for Pylint and Flake8 clean code.
+- **Error Handling:** Use specific exceptions. Implement `try-except` blocks appropriately.

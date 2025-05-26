@@ -1,0 +1,49 @@
+FROM python:3.10-bullseye
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    vim \
+    curl \
+    build-essential \
+    postgresql-client \
+    redis-tools \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js 18
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs
+
+# Install Poetry
+RUN pip install --upgrade pip \
+    && pip install poetry==1.7.1
+
+# Configure Poetry
+ENV POETRY_NO_INTERACTION=1 \
+    POETRY_VIRTUALENVS_IN_PROJECT=1 \
+    POETRY_VIRTUALENVS_CREATE=1 \
+    POETRY_CACHE_DIR=/tmp/poetry_cache
+
+# Create non-root user
+RUN useradd -m -s /bin/bash developer
+USER developer
+WORKDIR /workspace
+
+# Install global npm packages as user
+RUN npm config set prefix ~/.npm-global \
+    && echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
+
+# Pre-install some dev tools
+RUN pip install --user \
+    ipython \
+    black \
+    flake8 \
+    mypy \
+    pytest \
+    httpie
+
+# Set up nice prompt
+RUN echo 'PS1="\[\033[1;36m\]🐳 orchestra-dev\[\033[0m\] \[\033[1;34m\]\w\[\033[0m\] $ "' >> ~/.bashrc
+
+# Keep container running
+CMD ["/bin/bash"]

@@ -1,0 +1,10 @@
+# Agent package requirements
+
+# Basic dependencies
+requests==2.31.0
+
+# Future web scraping API integrations may need these packages
+# apify-client>=1.0.0
+# playwright>=1.30.0  # For browser automation if needed
+# beautifulsoup4>=4.11.0  # For HTML parsing
+# httpx>=0.24.0  # Modern HTTP client with async support

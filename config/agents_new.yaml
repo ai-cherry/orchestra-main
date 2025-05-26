@@ -1,0 +1,161 @@
+# AI Orchestra Agent Configuration
+# This file defines the configuration for AI Orchestra agents
+
+# Global configuration
+global:
+  default_model: gemini-pro
+  default_temperature: 0.7
+  default_memory:
+    memory_type: layered
+    short_term:
+      ttl: 3600 # 1 hour
+    mid_term:
+      ttl: 86400 # 1 day
+    long_term:
+      ttl: 2592000 # 30 days
+    semantic:
+      vector_dimension: 768
+
+# Agent definitions
+agents:
+  # Persona agent - handles conversation and personality
+  persona_agent:
+    type: persona
+    model: gemini-pro
+    temperature: 0.7
+    memory:
+      memory_type: layered
+      short_term:
+        ttl: 3600 # 1 hour
+      mid_term:
+        ttl: 86400 # 1 day
+      long_term:
+        ttl: 2592000 # 30 days
+      semantic:
+        vector_dimension: 768
+    capabilities:
+      - conversation
+      - personality
+      - knowledge_retrieval
+    priority: 10
+
+  # Knowledge agent - handles knowledge retrieval and fact-checking
+  knowledge_agent:
+    type: knowledge
+    model: gemini-pro
+    temperature: 0.2
+    memory:
+      memory_type: layered
+      short_term:
+        ttl: 1800 # 30 minutes
+      mid_term:
+        ttl: 86400 # 1 day
+      semantic:
+        vector_dimension: 768
+    capabilities:
+      - knowledge_retrieval
+      - fact_checking
+    priority: 8
+
+  # Tool agent - handles tool usage and execution
+  tool_agent:
+    type: tool
+    model: gemini-pro
+    temperature: 0.3
+    memory:
+      memory_type: redis
+      ttl: 1800 # 30 minutes
+    capabilities:
+      - tool_usage
+      - code_execution
+    priority: 7
+
+  # Planning agent - handles task planning and decomposition
+  planning_agent:
+    type: planning
+    model: gemini-pro
+    temperature: 0.4
+    memory:
+      memory_type: firestore
+      table_name: planning_memory
+      ttl: 86400 # 1 day
+    capabilities:
+      - task_planning
+      - task_decomposition
+    priority: 9
+
+  # Critic agent - handles evaluation and feedback
+  critic_agent:
+    type: critic
+    model: gemini-pro
+    temperature: 0.3
+    memory:
+      memory_type: vertex_vector
+      vector_dimension: 768
+    capabilities:
+      - evaluation
+      - feedback
+    priority: 6
+
+  # Router agent - handles routing requests to appropriate agents
+  router_agent:
+    type: router
+    model: gemini-pro
+    temperature: 0.2
+    memory:
+      memory_type: in_memory
+      ttl: 300 # 5 minutes
+    capabilities:
+      - routing
+      - agent_selection
+    priority: 11
+
+# Team definitions
+teams:
+  # Conversation team - handles user conversations
+  conversation_team:
+    agents:
+      - persona_agent
+      - knowledge_agent
+      - tool_agent
+    coordinator: persona_agent
+
+  # Research team - handles research tasks
+  research_team:
+    agents:
+      - knowledge_agent
+      - planning_agent
+      - critic_agent
+    coordinator: planning_agent
+
+  # Development team - handles development tasks
+  development_team:
+    agents:
+      - planning_agent
+      - tool_agent
+      - critic_agent
+    coordinator: planning_agent
+
+# Memory configuration
+memory:
+  # Redis configuration for short-term memory
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    password_secret: redis-password
+    db: 0
+
+  # Firestore configuration for mid/long-term memory
+  firestore:
+    project_id: ${GCP_PROJECT_ID}
+    mid_term_collection: orchestra_mid_term
+    long_term_collection: orchestra_long_term
+
+  # Vertex AI configuration for semantic memory
+  vertex:
+    project_id: ${GCP_PROJECT_ID}
+    region: ${GCP_REGION}
+    index_name: orchestra-semantic-memory
+    endpoint_name: orchestra-semantic-memory-endpoint
+    embedding_model: textembedding-gecko@003
+    vector_dimension: 768

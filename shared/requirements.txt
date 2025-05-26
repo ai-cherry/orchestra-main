@@ -1,0 +1,10 @@
+pydantic>=2.0.0,<3.0.0
+google-cloud-firestore>=2.11.0,<3.0.0
+redis>=4.5.0,<5.0.0
+requests==2.31.0
+python-dotenv>=1.0.0,<2.0.0
+httpx>=0.24.0,<1.0.0
+
+# Development dependencies (consider moving to separate dev-requirements.txt)
+pytest==7.3.1
+black>=23.0.0,<24.0.0

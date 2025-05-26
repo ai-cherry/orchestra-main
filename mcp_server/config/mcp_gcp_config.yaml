@@ -1,0 +1,79 @@
+# MCP Server Configuration for Google Cloud Services
+# This enables Claude 4 to interact with GCP resources via MCP
+
+mcp_servers:
+  # Google Cloud Run deployment server
+  gcp_cloud_run:
+    name: "GCP Cloud Run Manager"
+    description: "Deploy and manage Cloud Run services"
+    type: "http"
+    url: "http://localhost:8001/mcp/cloud-run" # Local MCP server endpoint
+    capabilities:
+      - deploy_service
+      - update_service
+      - list_services
+      - get_service_status
+    required_env:
+      - GCP_PROJECT_ID
+      - GCP_REGION
+
+  # Google Secret Manager server
+  gcp_secret_manager:
+    name: "GCP Secret Manager"
+    description: "Manage secrets in Google Secret Manager"
+    type: "http"
+    url: "http://localhost:8002/mcp/secrets"
+    capabilities:
+      - get_secret
+      - create_secret
+      - update_secret
+      - list_secrets
+    required_env:
+      - GCP_PROJECT_ID
+
+  # DragonflyDB management server
+  dragonfly_db:
+    name: "DragonflyDB Manager"
+    description: "Interact with DragonflyDB for caching"
+    type: "http"
+    url: "http://localhost:8003/mcp/dragonfly"
+    capabilities:
+      - get_cache
+      - set_cache
+      - delete_cache
+      - list_keys
+    required_env:
+      - DRAGONFLY_HOST
+      - DRAGONFLY_PORT
+      - DRAGONFLY_PASSWORD
+
+  # Firestore management server
+  firestore:
+    name: "Firestore Manager"
+    description: "Manage Firestore collections and documents"
+    type: "http"
+    url: "http://localhost:8004/mcp/firestore"
+    capabilities:
+      - create_document
+      - read_document
+      - update_document
+      - query_collection
+    required_env:
+      - GCP_PROJECT_ID
+      - FIRESTORE_NAMESPACE
+
+# MCP client configuration for Claude Code
+claude_code_config:
+  # Enable MCP in Claude Code sessions
+  enable_mcp: true
+  # Auto-discover local MCP servers
+  auto_discover: true
+  # Security settings
+  require_confirmation: true # Require user confirmation for destructive operations
+  allowed_operations:
+    - read
+    - create
+    - update
+  restricted_operations:
+    - delete # Requires explicit confirmation
+    - deploy # Requires explicit confirmation

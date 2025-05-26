@@ -1,0 +1,90 @@
+{
+  "name": "AI Orchestra MCP Configuration (GCP-Free)",
+  "version": "3.0.0",
+  "description": "MCP servers for AI Orchestra with external cloud services",
+  "servers": {
+    "memory": {
+      "url": "http://localhost:8003",
+      "description": "Layered memory management system",
+      "capabilities": ["store", "retrieve", "query", "consolidate", "sync"],
+      "backends": {
+        "redis": "Short-term memory cache (local or Dragonfly)",
+        "mongodb": "Mid-term episodic memory (MongoDB Atlas)",
+        "weaviate": "Long-term semantic memory (Weaviate Cloud)"
+      },
+      "tools": [
+        {
+          "name": "store_memory",
+          "description": "Store a memory in the appropriate layer",
+          "parameters": {
+            "content": "string",
+            "importance": "number",
+            "metadata": "object",
+            "agent_id": "string"
+          }
+        },
+        {
+          "name": "query_memory",
+          "description": "Query memories across all layers",
+          "parameters": {
+            "query": "string",
+            "agent_id": "string",
+            "memory_layers": "array",
+            "max_results": "integer"
+          }
+        }
+      ]
+    },
+    "orchestrator": {
+      "url": "http://localhost:8004",
+      "description": "AI agent orchestration and mode management",
+      "capabilities": ["switchMode", "runWorkflow", "getStatus", "executeTask"],
+      "modes": [
+        "standard",
+        "code",
+        "debug",
+        "architect",
+        "strategy",
+        "ask",
+        "creative",
+        "performance"
+      ]
+    },
+    "deployment": {
+      "url": "http://localhost:8005",
+      "description": "DigitalOcean deployment management",
+      "capabilities": ["deploy", "status", "logs", "scale"],
+      "tools": [
+        {
+          "name": "deploy_to_droplet",
+          "description": "Deploy to DigitalOcean Droplet",
+          "parameters": {
+            "droplet_id": "string",
+            "image": "string",
+            "env_vars": "object"
+          }
+        }
+      ]
+    }
+  },
+  "memoryArchitecture": {
+    "shortTerm": {
+      "provider": "Redis/Dragonfly",
+      "url": "${DRAGONFLY_URI}",
+      "ttl": "1 hour",
+      "purpose": "Recent agent states and temporary data"
+    },
+    "midTerm": {
+      "provider": "MongoDB Atlas",
+      "url": "${MONGODB_URI}",
+      "retention": "30 days",
+      "purpose": "Episodic memory, conversations, task history"
+    },
+    "longTerm": {
+      "provider": "Weaviate Cloud",
+      "url": "${WEAVIATE_URL}",
+      "retention": "permanent",
+      "purpose": "Semantic memory, embeddings, knowledge base"
+    }
+  }
+}

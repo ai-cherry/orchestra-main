@@ -1,0 +1,135 @@
+# GitHub Actions workflow template using Workload Identity Federation for GCP authentication
+# This template demonstrates how to use WIF for secure authentication to Google Cloud
+
+name: Deploy with Workload Identity Federation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Required for requesting the JWT token
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PROJECT_ID: cherry-ai-project
+  REGION: us-west4
+  SERVICE_NAME: orchestrator-api
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.5.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load cached dependencies
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER_ID }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+          token_format: access_token
+          create_credentials_file: true
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Verify authentication
+        run: |
+          gcloud auth list
+          gcloud config set project ${{ env.PROJECT_ID }}
+          gcloud projects describe ${{ env.PROJECT_ID }}
+
+      - name: Access secrets from Secret Manager
+        id: secrets
+        run: |
+          # Access API keys and other secrets
+          echo "Accessing secrets from Secret Manager..."
+          OPENROUTER_API_KEY=$(gcloud secrets versions access latest --secret="openrouter-api-key")
+          PORTKEY_API_KEY=$(gcloud secrets versions access latest --secret="portkey-api-key")
+
+          # Set as environment variables for later steps
+          echo "OPENROUTER_API_KEY=$OPENROUTER_API_KEY" >> $GITHUB_ENV
+          echo "PORTKEY_API_KEY=$PORTKEY_API_KEY" >> $GITHUB_ENV
+
+          echo "Successfully retrieved secrets from Secret Manager"
+
+      - name: Run tests
+        run: |
+          poetry run pytest tests/
+
+      - name: Build Docker image
+        run: |
+          # Build the Docker image using Poetry
+          docker build \
+            --build-arg OPENROUTER_API_KEY=${{ env.OPENROUTER_API_KEY }} \
+            --build-arg PORTKEY_API_KEY=${{ env.PORTKEY_API_KEY }} \
+            -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }} .
+
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker gcr.io
+
+      - name: Push Docker image to GCR
+        run: docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+
+      - name: Deploy to Cloud Run
+        id: deploy
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }} \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --set-env-vars="OPENROUTER_API_KEY=${{ env.OPENROUTER_API_KEY }}" \
+            --set-env-vars="PORTKEY_API_KEY=${{ env.PORTKEY_API_KEY }}" \
+            --allow-unauthenticated
+
+      - name: Validate deployment
+        run: |
+          DEPLOYED_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} --platform managed --region ${{ env.REGION }} --format='value(status.url)')
+          echo "Deployed URL: $DEPLOYED_URL"
+
+          # Wait for the service to be fully available
+          echo "Waiting for service to be available..."
+          sleep 10
+
+          # Check the health endpoint
+          echo "Checking health endpoint..."
+          curl -s "${DEPLOYED_URL}/health" | grep -q "ok" || (echo "Health check failed" && exit 1)
+
+          echo "Deployment validated successfully"
+
+      - name: Post-deployment notification
+        if: success()
+        run: |
+          echo "Deployment successful!"
+          echo "Service URL: $(gcloud run services describe ${{ env.SERVICE_NAME }} --platform managed --region ${{ env.REGION }} --format='value(status.url)')"
