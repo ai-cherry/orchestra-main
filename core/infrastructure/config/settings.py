@@ -8,7 +8,8 @@ for type safety and validation.
 from enum import Enum
 from typing import Dict, List, Optional
 
-from pydantic import BaseSettings, Field, HttpUrl, SecretStr, validator
+from pydantic_settings import BaseSettings
+from pydantic import Field, HttpUrl, SecretStr, field_validator
 
 
 class Environment(str, Enum):
@@ -52,8 +53,7 @@ class MongoDBSettings(ServiceSettings):
     max_pool_size: int = Field(default=100, env="MONGODB_MAX_POOL_SIZE")
     min_pool_size: int = Field(default=10, env="MONGODB_MIN_POOL_SIZE")
 
-    class Config:
-        env_prefix = "MONGODB_"
+    model_config = {"env_prefix": "MONGODB_"}
 
 
 class DragonflySettings(ServiceSettings):
@@ -63,8 +63,7 @@ class DragonflySettings(ServiceSettings):
     decode_responses: bool = Field(default=True, env="DRAGONFLY_DECODE_RESPONSES")
     max_connections: int = Field(default=50, env="DRAGONFLY_MAX_CONNECTIONS")
 
-    class Config:
-        env_prefix = "DRAGONFLY_"
+    model_config = {"env_prefix": "DRAGONFLY_"}
 
 
 class WeaviateSettings(ServiceSettings):
@@ -76,8 +75,7 @@ class WeaviateSettings(ServiceSettings):
         default={"timeout": 60, "startup": 30}, env="WEAVIATE_TIMEOUT_CONFIG"
     )
 
-    class Config:
-        env_prefix = "WEAVIATE_"
+    model_config = {"env_prefix": "WEAVIATE_"}
 
 
 class LLMProviderSettings(ServiceSettings):
@@ -93,8 +91,7 @@ class LLMProviderSettings(ServiceSettings):
     temperature: float = Field(default=0.7, env="LLM_TEMPERATURE")
     max_tokens: int = Field(default=2000, env="LLM_MAX_TOKENS")
 
-    class Config:
-        env_prefix = "LLM_"
+    model_config = {"env_prefix": "LLM_"}
 
 
 class DeploymentSettings(BaseSettings):
@@ -112,8 +109,7 @@ class DeploymentSettings(BaseSettings):
     pulumi_access_token: Optional[SecretStr] = Field(None, env="PULUMI_ACCESS_TOKEN")
     pulumi_stack: str = Field(default="dev", env="PULUMI_STACK")
 
-    class Config:
-        env_prefix = "DEPLOYMENT_"
+    model_config = {"env_prefix": "DEPLOYMENT_"}
 
 
 class APISettings(BaseSettings):
@@ -129,8 +125,7 @@ class APISettings(BaseSettings):
     cors_methods: List[str] = Field(default=["*"], env="API_CORS_METHODS")
     cors_headers: List[str] = Field(default=["*"], env="API_CORS_HEADERS")
 
-    class Config:
-        env_prefix = "API_"
+    model_config = {"env_prefix": "API_"}
 
 
 class FeatureFlags(BaseSettings):
@@ -146,8 +141,7 @@ class FeatureFlags(BaseSettings):
         default=False, env="FF_ENABLE_ADVANCED_ROUTING"
     )
 
-    class Config:
-        env_prefix = "FF_"
+    model_config = {"env_prefix": "FF_"}
 
 
 class Settings(BaseSettings):
@@ -160,27 +154,28 @@ class Settings(BaseSettings):
     debug: bool = Field(default=False, env="DEBUG")
     log_level: LogLevel = Field(default=LogLevel.INFO, env="LOG_LEVEL")
 
-    # Services
-    mongodb: MongoDBSettings = MongoDBSettings()
-    dragonfly: DragonflySettings = DragonflySettings()
-    weaviate: WeaviateSettings = WeaviateSettings()
-    llm: LLMProviderSettings = LLMProviderSettings()
+    # Services - These will be initialized from environment variables
+    mongodb: MongoDBSettings = Field(default_factory=MongoDBSettings)
+    dragonfly: DragonflySettings = Field(default_factory=DragonflySettings)
+    weaviate: WeaviateSettings = Field(default_factory=WeaviateSettings)
+    llm: LLMProviderSettings = Field(default_factory=LLMProviderSettings)
 
     # Deployment
-    deployment: DeploymentSettings = DeploymentSettings()
+    deployment: DeploymentSettings = Field(default_factory=DeploymentSettings)
 
     # API
-    api: APISettings = APISettings()
+    api: APISettings = Field(default_factory=APISettings)
 
     # Feature flags
-    features: FeatureFlags = FeatureFlags()
+    features: FeatureFlags = Field(default_factory=FeatureFlags)
 
     # Security
-    secret_key: SecretStr = Field(..., env="SECRET_KEY")
+    secret_key: SecretStr = Field(default="dev-secret-key", env="SECRET_KEY")
     jwt_algorithm: str = Field(default="HS256", env="JWT_ALGORITHM")
     jwt_expiration_minutes: int = Field(default=30, env="JWT_EXPIRATION_MINUTES")
 
-    @validator("environment", pre=True)
+    @field_validator("environment", mode="before")
+    @classmethod
     def validate_environment(cls, v: str) -> Environment:
         """Validate and convert environment string."""
         try:
@@ -203,10 +198,11 @@ class Settings(BaseSettings):
         """Check if running in test mode."""
         return self.environment == Environment.TEST
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = False
+    model_config = {
+        "env_file": ".env",
+        "env_file_encoding": "utf-8",
+        "case_sensitive": False,
+    }
 
 
 # Singleton instance
