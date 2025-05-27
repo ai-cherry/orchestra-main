@@ -135,8 +135,7 @@ make before-ai-coding  # Creates git checkpoint and documents state
 
 ### **1. MCP Server Guidelines**
 
-- Port 8002: Secret Manager (don't duplicate)
-- Port 8080: Firestore/Orchestrator (shared)
+- Port 8002: - Port 8080: MongoDB
 - Port 3000: Admin UI
 - Check `mcp-servers/` before creating new ones
 
@@ -159,8 +158,7 @@ from typing import Dict, List
 import yaml
 import requests
 
-# GCP imports
-from google.cloud import firestore
+# from google.cloud import MongoDB
 
 # Local imports
 from scripts.config_validator import ConfigValidator
@@ -309,7 +307,7 @@ def wait_for_service(self, service_name: str, timeout: int = 60) -> bool:
     Wait for a service to become healthy.
 
     Args:
-        service_name: Name of the service (e.g., 'mcp_firestore')
+        service_name: Name of the service (e.g., 'mcp_MongoDB
         timeout: Maximum seconds to wait
 
     Returns:

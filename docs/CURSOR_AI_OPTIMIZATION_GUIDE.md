@@ -30,8 +30,7 @@ cat > .cursorrules << 'EOF'
 - Pulumi for infrastructure (Python SDK)
 - SuperAGI for agent orchestration
 - MCP for natural language data access
-- GCP as cloud provider
-
+-
 ## Code Standards
 - Type hints for all functions
 - Google-style docstrings
@@ -96,8 +95,7 @@ Restrictions: Don't use synchronous HTTP calls, don't hardcode endpoints, don't 
 ```
 Write a Pulumi component in Python that deploys a Weaviate cluster on GKE with:
 - 3 replicas for high availability
-- Persistent storage using GCP disks
-- Horizontal pod autoscaling based on CPU/memory
+- Persistent storage using - Horizontal pod autoscaling based on CPU/memory
 - Integration with existing MongoDB and SuperAGI components
 - Proper health checks and readiness probes
 
@@ -220,8 +218,7 @@ Analyze this error and provide a fix:
 Consider:
 - Python 3.10 compatibility
 - Async context issues
-- GCP permission problems
-- Kubernetes RBAC
+- - Kubernetes RBAC
 
 Provide the exact code changes needed.
 ```

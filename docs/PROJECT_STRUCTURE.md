@@ -25,8 +25,7 @@ orchestra-main/
 │
 ├── mcp-servers/               # MCP server implementations
 │   ├── secret_manager.py      # Port 8002
-│   └── gcp-resources-server.yaml
-│
+│   └── │
 ├── core/orchestrator/         # Core orchestration logic
 │   └── src/
 │       ├── api/               # API endpoints
@@ -58,8 +57,7 @@ All automation tools MUST go in the `scripts/` directory:
 
 | Script                | Purpose                                    | Usage                                                |
 | --------------------- | ------------------------------------------ | ---------------------------------------------------- |
-| `config_validator.py` | Validates YAML, env vars, GCP connectivity | `python scripts/config_validator.py`                 |
-| `health_monitor.py`   | Dynamic health checks, replaces sleep      | `python scripts/health_monitor.py --monitor`         |
+| `config_validator.py` | Validates YAML, env vars, | `health_monitor.py`   | Dynamic health checks, replaces sleep      | `python scripts/health_monitor.py --monitor`         |
 | `orchestra.py`        | Unified CLI for all operations             | `python scripts/orchestra.py services status`        |
 | `ai_code_reviewer.py` | Checks for AI anti-patterns                | `python scripts/ai_code_reviewer.py --check-changes` |
 
@@ -67,8 +65,7 @@ All automation tools MUST go in the `scripts/` directory:
 
 Fixed port assignments - DO NOT duplicate:
 
-- **8002**: MCP Secret Manager
-- **8080**: Core Orchestrator / Firestore MCP
+- **8002**: MCP - **8080**: Core Orchestrator / MongoDB
 - **3000**: Admin UI
 - **6379**: Redis (if running)
 

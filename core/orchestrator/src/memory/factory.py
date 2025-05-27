@@ -8,7 +8,7 @@ import logging
 from typing import Any, Dict, Optional
 
 from core.orchestrator.src.config.models import MemoryConfig
-from core.orchestrator.src.memory.backends.firestore_memory import FirestoreMemory
+from core.orchestrator.src.memory.backends.mongodb_memory import MongoDBMemory
 from core.orchestrator.src.memory.backends.redis_memory import RedisMemory
 from core.orchestrator.src.memory.backends.vertex_memory import VertexMemory
 from core.orchestrator.src.memory.layered_memory_manager import LayeredMemoryManager
@@ -85,23 +85,23 @@ class MemoryFactory:
         )
 
     @staticmethod
-    def create_firestore_memory(
+    def create_mongodb_memory(
         collection_name: str = "orchestra_memory",
         ttl: Optional[int] = None,
         client=None,
-    ) -> FirestoreMemory:
+    ) -> MongoDBMemory:
         """
-        Create a Firestore memory backend.
+        Create a MongoDB memory backend.
 
         Args:
-            collection_name: Firestore collection name
+            collection_name: MongoDB collection name
             ttl: Time-to-live in seconds
-            client: Firestore client
+            client: MongoDB client
 
         Returns:
-            Initialized FirestoreMemory
+            Initialized MongoDBMemory
         """
-        return FirestoreMemory(collection_name=collection_name, ttl=ttl, client=client)
+        return MongoDBMemory(collection_name=collection_name, ttl=ttl, client=client)
 
     @staticmethod
     def create_vertex_memory(
@@ -111,7 +111,7 @@ class MemoryFactory:
         embedding_model: str = "textembedding-gecko@003",
         collection_name: str = "vertex_memory",
         client=None,
-        firestore_client=None,
+        mongodb_client=None,
     ) -> VertexMemory:
         """
         Create a Vertex AI memory backend.
@@ -121,9 +121,9 @@ class MemoryFactory:
             location: GCP region
             index_name: Vector index name
             embedding_model: Embedding model name
-            collection_name: Firestore collection name
+            collection_name: MongoDB collection name
             client: Vertex AI client
-            firestore_client: Firestore client
+            mongodb_client: MongoDB client
 
         Returns:
             Initialized VertexMemory
@@ -135,7 +135,7 @@ class MemoryFactory:
             embedding_model=embedding_model,
             collection_name=collection_name,
             client=client,
-            firestore_client=firestore_client,
+            mongodb_client=mongodb_client,
         )
 
     @staticmethod
@@ -165,26 +165,24 @@ class MemoryFactory:
         if short_term_config:
             config["redis"] = short_term_config
 
-        # Add Firestore configuration
-        firestore_config = {}
+        # Add MongoDB configuration
+        mongodb_config = {}
         if mid_term_config:
-            firestore_config["mid_term_collection"] = mid_term_config.get(
+            mongodb_config["mid_term_collection"] = mid_term_config.get(
                 "collection_name", "orchestra_mid_term"
             )
-            firestore_config["mid_term_ttl"] = mid_term_config.get(
-                "ttl", 86400
-            )  # 1 day
+            mongodb_config["mid_term_ttl"] = mid_term_config.get("ttl", 86400)  # 1 day
 
         if long_term_config:
-            firestore_config["long_term_collection"] = long_term_config.get(
+            mongodb_config["long_term_collection"] = long_term_config.get(
                 "collection_name", "orchestra_long_term"
             )
-            firestore_config["long_term_ttl"] = long_term_config.get(
+            mongodb_config["long_term_ttl"] = long_term_config.get(
                 "ttl", 2592000
             )  # 30 days
 
-        if firestore_config:
-            config["firestore"] = firestore_config
+        if mongodb_config:
+            config["mongodb"] = mongodb_config
 
         # Add Vertex AI configuration
         if semantic_config:

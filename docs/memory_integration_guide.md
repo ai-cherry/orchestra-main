@@ -32,28 +32,26 @@ This guide will show you how to integrate these memory types with your agents.
 - Ideal for conversation context, recent interactions, and working memory
 - Implemented using Redis (Memorystore)
 
-### Mid-term Memory (Firestore)
+### Mid-term Memory (MongoDB
 
 - Structured, document-based storage
 - Longer TTL than short-term memory (default: 1 day)
 - Ideal for session data, user preferences, and ongoing tasks
-- Implemented using Firestore
+- Implemented using MongoDB
 
-### Long-term Memory (Firestore)
+### Long-term Memory (MongoDB
 
 - Persistent storage for important information
 - Very long TTL or no expiration (default: 30 days)
 - Ideal for user profiles, learned behaviors, and important facts
-- Implemented using Firestore
+- Implemented using MongoDB
 
-### Semantic Memory (Vertex AI Vector Search)
-
+### Semantic Memory (
 - Vector-based storage for semantic search
 - Stores embeddings for text data
 - Enables similarity search and retrieval of relevant information
 - Ideal for knowledge retrieval, similar examples, and contextual understanding
-- Implemented using Vertex AI Vector Search
-
+- Implemented using
 ## Configuration
 
 ### Memory Configuration in YAML
@@ -104,15 +102,14 @@ redis_memory_config = MemoryConfig(
     ttl=3600
 )
 
-# Configure Firestore memory
-firestore_memory_config = MemoryConfig(
-    memory_type=MemoryType.FIRESTORE,
+# Configure MongoDB
+MongoDB
+    memory_type=MemoryType.MongoDB
     table_name="agent_memory",
     ttl=86400
 )
 
-# Configure Vertex AI Vector Search memory
-vertex_memory_config = MemoryConfig(
+# Configure vertex_memory_config = MemoryConfig(
     memory_type=MemoryType.VERTEX_VECTOR,
     vector_dimension=768
 )
@@ -444,7 +441,7 @@ async def test_layered_memory():
 
 #### Connection Issues
 
-If you're having trouble connecting to Redis or Firestore, check the following:
+If you're having trouble connecting to Redis or MongoDB
 
 1. Ensure that the services are running and accessible
 2. Check that the connection parameters (host, port, etc.) are correct
@@ -464,8 +461,7 @@ If semantic search is not working, check the following:
 
 1. Ensure that the embedding model is correctly configured
 2. Check that the embeddings are being generated correctly
-3. Verify that the Vertex AI Vector Search index is properly set up
-
+3. Verify that the
 ### Logging
 
 The memory system uses Python's logging module for debugging. You can enable debug logging to see more information:

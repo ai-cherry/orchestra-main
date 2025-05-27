@@ -29,7 +29,7 @@ from core.orchestrator.src.utils.error_handling import error_boundary
 # Import required components - moved to functions to avoid circular imports
 # Use flag variables to track availability
 MEMORY_MANAGER_AVAILABLE = False
-FIRESTORE_AVAILABLE = False
+MONGODB_AVAILABLE = False
 HEX_ARCH_AVAILABLE = False
 USE_STUBS = False
 
@@ -37,7 +37,7 @@ USE_STUBS = False
 # Initialize imports safely
 def _initialize_imports():
     """Initialize imports and set availability flags."""
-    global MEMORY_MANAGER_AVAILABLE, FIRESTORE_AVAILABLE, HEX_ARCH_AVAILABLE, USE_STUBS
+    global MEMORY_MANAGER_AVAILABLE, MONGODB_AVAILABLE, HEX_ARCH_AVAILABLE, USE_STUBS
 
     # Import the memory manager interface and implementations
     try:
@@ -54,21 +54,21 @@ def _initialize_imports():
         MEMORY_MANAGER_AVAILABLE = True
         logger.info("Successfully imported memory managers")
 
-        # Try to import the Firestore adapter
+        # Try to import the MongoDB adapter
         try:
-            logger.info("Attempting to import FirestoreMemoryAdapter")
-            global FirestoreMemoryAdapter
-            from packages.shared.src.memory.firestore_adapter import (
-                FirestoreMemoryAdapter,
+            logger.info("Attempting to import MongoDBMemoryAdapter")
+            global MongoDBMemoryAdapter
+            from packages.shared.src.memory.mongodb_adapter import (
+                MongoDBMemoryAdapter,
             )
 
-            FIRESTORE_AVAILABLE = True
-            logger.info("Successfully imported FirestoreMemoryAdapter")
+            MONGODB_AVAILABLE = True
+            logger.info("Successfully imported MongoDBMemoryAdapter")
         except ImportError as e:
             logger.warning(
-                f"Failed to import FirestoreMemoryAdapter, Firestore storage will not be available: {str(e)}"
+                f"Failed to import MongoDBMemoryAdapter, MongoDB storage will not be available: {str(e)}"
             )
-            FIRESTORE_AVAILABLE = False
+            MONGODB_AVAILABLE = False
 
         # Using main implementation, not stubs
         USE_STUBS = False
@@ -87,7 +87,7 @@ def _initialize_imports():
             )
 
             MEMORY_MANAGER_AVAILABLE = True
-            FIRESTORE_AVAILABLE = False
+            MONGODB_AVAILABLE = False
             USE_STUBS = True
             logger.info("Using stub memory manager implementation")
         except ImportError as stub_error:
@@ -101,9 +101,9 @@ def _initialize_imports():
         logger.info(
             "Attempting to import hexagonal architecture components for memory service"
         )
-        global MemoryService, MemoryServiceFactory, FirestoreStorageAdapter, PostgresStorageAdapter
-        from packages.shared.src.memory.adapters.firestore_adapter import (
-            FirestoreStorageAdapter,
+        global MemoryService, MemoryServiceFactory, MongoDBStorageAdapter, PostgresStorageAdapter
+        from packages.shared.src.memory.adapters.mongodb_adapter import (
+            MongoDBStorageAdapter,
         )
         from packages.shared.src.memory.adapters.postgres_adapter import (
             PostgresStorageAdapter,
@@ -155,34 +155,34 @@ def create_memory_manager(settings: Settings) -> "MemoryManager":
         raise DependencyError("Memory manager components are not available")
 
     # Determine if we need cloud storage based on environment and project ID
-    use_firestore = (
+    use_mongodb = (
         settings.ENVIRONMENT in ["prod", "production", "stage", "staging"]
         and settings.get_gcp_project_id() is not None
-        and FIRESTORE_AVAILABLE
+        and MONGODB_AVAILABLE
     )
 
-    # Use Firestore if available and configured
-    if use_firestore:
+    # Use MongoDB if available and configured
+    if use_mongodb:
         try:
             logger.info(
-                f"Creating Firestore memory adapter for environment: {settings.ENVIRONMENT}"
+                f"Creating MongoDB memory adapter for environment: {settings.ENVIRONMENT}"
             )
-            return FirestoreMemoryAdapter(
+            return MongoDBMemoryAdapter(
                 project_id=settings.get_gcp_project_id(),
                 credentials_path=settings.get_gcp_credentials_path(),
-                namespace=settings.FIRESTORE_NAMESPACE
+                namespace=settings.MONGODB_NAMESPACE
                 or f"orchestra-{settings.ENVIRONMENT}",
             )
         except Exception as e:
-            logger.error(f"Failed to create Firestore memory adapter: {str(e)}")
+            logger.error(f"Failed to create MongoDB memory adapter: {str(e)}")
             logger.warning("Falling back to in-memory implementation")
             # Convert general exception to a specific memory error
             raise MemoryConnectionError(
-                f"Failed to connect to Firestore: {str(e)}", original_error=e
+                f"Failed to connect to MongoDB: {str(e)}", original_error=e
             )
 
     # Use in-memory implementation
-    namespace = settings.FIRESTORE_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
+    namespace = settings.MONGODB_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
     logger.info(f"Using in-memory memory manager with namespace: {namespace}")
     return InMemoryMemoryManager(namespace=namespace)
 
@@ -219,10 +219,10 @@ async def get_memory_manager(
         try:
             _memory_manager = create_memory_manager(settings)
         except MemoryError as e:
-            # If we can't create the Firestore adapter, fall back to in-memory
+            # If we can't create the MongoDB adapter, fall back to in-memory
             logger.warning(f"Creating in-memory manager due to error: {str(e)}")
             namespace = (
-                settings.FIRESTORE_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
+                settings.MONGODB_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
             )
             _memory_manager = InMemoryMemoryManager(namespace=namespace)
 
@@ -237,7 +237,7 @@ async def get_memory_manager(
                 logger.warning("Falling back to in-memory implementation")
                 try:
                     namespace = (
-                        settings.FIRESTORE_NAMESPACE
+                        settings.MONGODB_NAMESPACE
                         or f"orchestra-{settings.ENVIRONMENT}"
                     )
                     _memory_manager = InMemoryMemoryManager(namespace=namespace)
@@ -281,7 +281,7 @@ async def initialize_memory_manager(settings: Settings = None) -> None:
             # If we can't create the preferred adapter, fall back to in-memory
             logger.warning(f"Creating in-memory manager due to error: {str(e)}")
             namespace = (
-                settings.FIRESTORE_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
+                settings.MONGODB_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
             )
             _memory_manager = InMemoryMemoryManager(namespace=namespace)
 
@@ -297,7 +297,7 @@ async def initialize_memory_manager(settings: Settings = None) -> None:
                 f"Falling back to in-memory implementation after error: {str(e)}"
             )
             namespace = (
-                settings.FIRESTORE_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
+                settings.MONGODB_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
             )
             _memory_manager = InMemoryMemoryManager(namespace=namespace)
             await _memory_manager.initialize()
@@ -373,11 +373,11 @@ async def get_memory_service(
                 settings.ENVIRONMENT in ["prod", "production", "stage", "staging"]
                 and settings.get_gcp_project_id() is not None
             ):
-                storage_type = "firestore"
+                storage_type = "mongodb"
                 storage_config = {
                     "project_id": settings.get_gcp_project_id(),
                     "credentials_path": settings.get_gcp_credentials_path(),
-                    "namespace": settings.FIRESTORE_NAMESPACE
+                    "namespace": settings.MONGODB_NAMESPACE
                     or f"orchestra-{settings.ENVIRONMENT}",
                 }
             else:

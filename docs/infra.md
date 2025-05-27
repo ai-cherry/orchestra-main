@@ -1,19 +1,14 @@
 # Orchestra Infrastructure Documentation
 
-This document describes the infrastructure setup for the Orchestra platform using Terraform on Google Cloud Platform.
-
+This document describes the infrastructure setup for the Orchestra platform using Terraform on
 ## Overview
 
-Orchestra's infrastructure is managed using Terraform and deployed on Google Cloud Platform. The infrastructure is organized into environments (dev, prod) with shared modules for common components. Each environment has its own separate state but uses the same module code.
-
+Orchestra's infrastructure is managed using Terraform and deployed on
 ### Key Components
 
-- **Cloud Run**: Hosts the Orchestra API services
-- **Firestore**: Provides structured data storage
+- **- **MongoDB
 - **Pub/Sub**: Event bus for communication between services
-- **Vertex AI Vector Search**: Powers semantic search capabilities
-- **Secret Manager**: Securely stores API keys and credentials
-- **Artifact Registry**: Stores Docker images
+- **- **- **Artifact Registry**: Stores Docker images
 
 ## Directory Structure
 
@@ -24,30 +19,24 @@ infra/
 ├── prod/                # Production environment configuration
 │   └── main.tf
 ├── modules/             # Shared Terraform modules
-│   ├── cloud-run/       # Cloud Run service module
-│   ├── firestore/       # Firestore database module
+│   ├── cloud-run/       # │   ├── MongoDB
 │   ├── pubsub/          # Pub/Sub topics module
-│   └── vertex/          # Vertex AI Vector Search module
-└── README.md            # Infrastructure overview
+│   └── vertex/          # └── README.md            # Infrastructure overview
 ```
 
 ## Prerequisites
 
 Before you begin, ensure you have:
 
-1. [Google Cloud SDK](https://cloud.google.com/sdk/docs/install) installed
-2. [Terraform](https://www.terraform.io/downloads.html) (version 1.5+ recommended) installed
-3. Access to the `cherry-ai-project` GCP project
-4. A service account key with appropriate permissions
+1. [2. [Terraform](https://www.terraform.io/downloads.html) (version 1.5+ recommended) installed
+3. Access to the `cherry-ai-project` 4. A service account key with appropriate permissions
 
 ## Authentication
 
-To authenticate with Google Cloud:
-
+To authenticate with
 ```bash
 # Using a service account key
-echo "$GCP_API_KEY" | base64 -d > /tmp/gsa-key.json
-gcloud auth activate-service-account --key-file=/tmp/gsa-key.json
+echo "$gcloud auth activate-service-account --key-file=/tmp/gsa-key.json
 
 # Set default project and region
 gcloud config set project cherry-ai-project
@@ -151,11 +140,9 @@ jobs:
         with:
           terraform_version: 1.5.0
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v1
+      - name: Authenticate to         uses: google-github-actions/auth@v1
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-
+          credentials_json: ${{ secrets.
       - name: Initialize Terraform
         working-directory: infra/dev # or infra/prod
         run: terraform init
@@ -222,8 +209,7 @@ terraform workspace delete test-feature
 
 For assistance with infrastructure issues:
 
-- Check the [Terraform GCP provider documentation](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
-- Review the module code in `infra/modules/`
+- Check the [Terraform - Review the module code in `infra/modules/`
 - Consult the Orchestra team Slack channel
 
 ## RC-Arena Non-Profit Project Integration

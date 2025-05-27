@@ -18,7 +18,7 @@ These enhancements improve the maintainability, flexibility, and observability o
 The configuration system is based on Pydantic models, which provide validation, serialization, and deserialization capabilities. The main configuration classes are:
 
 - `MemoryConfig`: Root configuration for the memory system
-- `FirestoreConfig`: Configuration for Firestore backend
+- `MongoDB
 - `RedisConfig`: Configuration for Redis backend
 - `InMemoryConfig`: Configuration for in-memory backend
 - `VectorSearchConfig`: Configuration for vector search
@@ -30,15 +30,15 @@ The configuration system is based on Pydantic models, which provide validation, 
 from packages.shared.src.memory.config import (
     MemoryConfig,
     MemoryBackendType,
-    FirestoreConfig,
+    MongoDB
     VectorSearchConfig,
     VectorSearchType
 )
 
 # Create configuration
 config = MemoryConfig(
-    backend=MemoryBackendType.FIRESTORE,
-    firestore=FirestoreConfig(
+    backend=MemoryBackendType.MongoDB
+    MongoDB
         namespace="example",
         connection_pool_size=5
     ),
@@ -52,9 +52,8 @@ config = MemoryConfig(
 
 The configuration system supports environment variables for common settings:
 
-- `MEMORY_BACKEND`: Memory backend to use (firestore, redis, in_memory)
-- `GOOGLE_CLOUD_PROJECT`: Google Cloud project ID
-- `GOOGLE_APPLICATION_CREDENTIALS`: Path to service account credentials file
+- `MEMORY_BACKEND`: Memory backend to use (MongoDB
+- `GOOGLE_CLOUD_PROJECT`: - `GOOGLE_APPLICATION_CREDENTIALS`: Path to service account credentials file
 - `REDIS_HOST`: Redis host
 - `REDIS_PORT`: Redis port
 - `REDIS_PASSWORD`: Redis password
@@ -69,7 +68,7 @@ from packages.shared.src.memory.config import MemoryConfig
 
 # Set environment variables
 import os
-os.environ["MEMORY_BACKEND"] = "firestore"
+os.environ["MEMORY_BACKEND"] = "MongoDB
 os.environ["VECTOR_SEARCH_PROVIDER"] = "in_memory"
 
 # Load configuration from environment variables

@@ -101,11 +101,9 @@ log "${BLUE}Starting MCP System Components${NC}"
 log "${BLUE}========================================${NC}"
 
 # Export required environment variables
-export GCP_PROJECT_ID="${GCP_PROJECT_ID:-cherry-ai-project}"
-export GCP_REGION="${GCP_REGION:-us-central1}"
+export export GCP_REGION="${GCP_REGION:-us-central1}"
 export REDIS_URL="${REDIS_URL:-redis://localhost:6379}"
-export FIRESTORE_PROJECT="${FIRESTORE_PROJECT:-$GCP_PROJECT_ID}"
-export QDRANT_URL="${QDRANT_URL:-http://localhost:6333}"
+export FIRESTORE_PROJECT="${FIRESTORE_PROJECT:-$export QDRANT_URL="${QDRANT_URL:-http://localhost:6333}"
 
 # 1. Start Cloud Run MCP Server
 start_server "Cloud Run MCP" \

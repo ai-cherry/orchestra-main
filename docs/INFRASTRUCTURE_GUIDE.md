@@ -2,8 +2,7 @@
 
 ## Overview
 
-AI Orchestra is a multi-agent AI system deployed on Google Cloud Platform (GCP) using Kubernetes (GKE) for container orchestration and Pulumi for infrastructure as code. The system integrates SuperAGI for agent management with a sophisticated memory architecture.
-
+AI Orchestra is a multi-agent AI system deployed on
 ## Architecture
 
 ### Core Components
@@ -22,9 +21,8 @@ AI Orchestra is a multi-agent AI system deployed on Google Cloud Platform (GCP) 
 │  └──────┬──────┘  └─────────────┘  └─────────────┘            │
 │         │                                                       │
 │  ┌──────▼──────┐  ┌─────────────┐  ┌─────────────┐           │
-│  │ MCP MongoDB │  │MCP Weaviate │  │  Firestore  │           │
-│  │   Server    │  │   Server    │  │   (GCP)     │           │
-│  └─────────────┘  └─────────────┘  └─────────────┘           │
+│  │ MCP MongoDB │  │MCP Weaviate │  │  MongoDB
+│  │   Server    │  │   Server    │  │   (│  └─────────────┘  └─────────────┘  └─────────────┘           │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -41,7 +39,7 @@ AI Orchestra is a multi-agent AI system deployed on Google Cloud Platform (GCP) 
 | Short-term Memory | DragonflyDB | Latest | Redis-compatible cache |
 | Structured Storage | MongoDB | 7.0 | Document database |
 | Vector Storage | Weaviate | Latest | Semantic search |
-| Cloud Storage | Firestore | - | Long-term persistence |
+| Cloud Storage | MongoDB
 | Natural Language | MCP Servers | 1.0 | Query interfaces |
 
 ## Memory Architecture
@@ -58,11 +56,10 @@ AI Orchestra is a multi-agent AI system deployed on Google Cloud Platform (GCP) 
    - Use case: Session data, user preferences
    - Storage: 100Gi persistent volume
 
-3. **Long-term Memory (Firestore)**
+3. **Long-term Memory (MongoDB
    - TTL: 30 days or permanent
    - Use case: User profiles, learned behaviors
-   - Storage: Unlimited (GCP managed)
-
+   - Storage: Unlimited (
 4. **Semantic Memory (Weaviate)**
    - No expiration
    - Use case: Vector search, similarity matching
@@ -98,18 +95,15 @@ infra/
    - ConfigMaps: Application configuration
    - Secrets: API keys, database credentials
 
-3. **GCP Services**
-   - Artifact Registry: Docker images
-   - Secret Manager: Sensitive configuration
-   - Firestore: Document storage
+3. **   - Artifact Registry: Docker images
+   -    - MongoDB
    - IAM: Service accounts and permissions
 
 ## Deployment
 
 ### Prerequisites
 
-- GCP Project with billing enabled
-- Python 3.10 installed
+- - Python 3.10 installed
 - Docker installed
 - Pulumi account (free tier works)
 - GitHub repository (for CI/CD)
@@ -118,8 +112,7 @@ infra/
 
 ```bash
 # Set environment variables
-export GCP_PROJECT_ID="your-project-id"
-export OPENROUTER_API_KEY="your-api-key"
+export export OPENROUTER_API_KEY="your-api-key"
 
 # Run deployment script
 ./scripts/deploy_optimized_infrastructure.sh
@@ -127,8 +120,7 @@ export OPENROUTER_API_KEY="your-api-key"
 
 This script handles:
 - Environment setup
-- GCP API enablement
-- Pulumi stack initialization
+- - Pulumi stack initialization
 - Docker image building
 - Infrastructure deployment
 - Kubernetes configuration
@@ -145,16 +137,14 @@ pip install -r requirements.txt
 
 # Initialize Pulumi stack
 pulumi stack init dev
-pulumi config set gcp_project_id $GCP_PROJECT_ID
-
+pulumi config set
 # Deploy infrastructure
 pulumi up
 
 # Configure kubectl
 gcloud container clusters get-credentials orchestra-cluster-dev \
   --zone=us-central1-a \
-  --project=$GCP_PROJECT_ID
-```
+  --project=$```
 
 ## CI/CD Pipeline
 
@@ -239,23 +229,19 @@ Estimated monthly costs:
 Cost optimization:
 - Use preemptible nodes
 - Scale down when idle
-- Consider Cloud Run for lighter workloads
-
+- Consider
 ## Security
 
 ### Authentication
-- Workload Identity for GCP services
-- Kubernetes RBAC for cluster access
-- API keys in Secret Manager
-
+- Workload Identity for - Kubernetes RBAC for cluster access
+- API keys in
 ### Network Security
 - Private GKE cluster option
 - Network policies for pod communication
 - HTTPS for all external endpoints
 
 ### Data Security
-- Encryption at rest (GCP managed)
-- Encryption in transit (TLS)
+- Encryption at rest (- Encryption in transit (TLS)
 - Regular secret rotation
 
 ## Troubleshooting
@@ -323,8 +309,7 @@ pulumi stack output --json
 
 - DragonflyDB: Automated snapshots to GCS
 - MongoDB: Regular mongodump to GCS
-- Firestore: GCP managed backups
-
+- MongoDB
 ### Disaster Recovery
 
 1. **Infrastructure**: Pulumi state in GCS

@@ -14,20 +14,19 @@ AI Orchestra uses a layered memory architecture that provides different types of
    - Automatically expires after a configurable TTL (default: 1 hour)
    - Ideal for conversation context, recent interactions, and working memory
 
-2. **Mid-term Memory (Firestore)**
+2. **Mid-term Memory (MongoDB
 
    - Structured, document-based storage for medium-term persistence
    - Longer TTL than short-term memory (default: 1 day)
    - Ideal for session data, user preferences, and ongoing tasks
 
-3. **Long-term Memory (Firestore)**
+3. **Long-term Memory (MongoDB
 
    - Persistent storage for important information
    - Very long TTL or no expiration (default: 30 days)
    - Ideal for user profiles, learned behaviors, and important facts
 
-4. **Semantic Memory (Vertex AI Vector Search)**
-   - Vector-based storage for semantic search
+4. **Semantic Memory (   - Vector-based storage for semantic search
    - Stores embeddings for text data
    - Enables similarity search and retrieval of relevant information
    - Ideal for knowledge retrieval, similar examples, and contextual understanding
@@ -46,28 +45,24 @@ The memory system automatically manages the flow of information between layers:
 
 ## Infrastructure Components
 
-The memory system is built on the following GCP services:
-
+The memory system is built on the following
 1. **Redis (Memorystore)**
 
    - Used for short-term memory
    - Provides fast, in-memory storage with automatic expiration
    - Configured with authentication for security
 
-2. **Firestore**
+2. **MongoDB
 
    - Used for mid-term and long-term memory
    - Provides structured, document-based storage
    - Scales automatically with usage
 
-3. **Vertex AI Vector Search**
-
+3. **
    - Used for semantic memory
    - Provides efficient similarity search for embeddings
-   - Integrated with Vertex AI for embedding generation
-
-4. **Secret Manager**
-   - Stores sensitive configuration (e.g., Redis password)
+   - Integrated with
+4. **   - Stores sensitive configuration (e.g., Redis password)
    - Securely accessed by the application
 
 ## Memory System Implementation
@@ -83,9 +78,8 @@ The memory system is implemented as a set of Python classes:
 2. **Memory Backends**
 
    - `RedisMemory`: Implementation for Redis
-   - `FirestoreMemory`: Implementation for Firestore
-   - `VertexMemory`: Implementation for Vertex AI Vector Search
-
+   - `MongoDB
+   - `VertexMemory`: Implementation for
 3. **Layered Memory (`LayeredMemory`)**
 
    - Combines multiple memory backends into a unified system
@@ -243,4 +237,4 @@ The script will:
 
 ## Conclusion
 
-The AI Orchestra memory system provides a robust foundation for building intelligent agents with different types of memory. By leveraging GCP services and a layered architecture, it offers a scalable, performant, and flexible solution for agent memory needs.
+The AI Orchestra memory system provides a robust foundation for building intelligent agents with different types of memory. By leveraging

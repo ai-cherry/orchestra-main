@@ -60,33 +60,33 @@ class RedisShortTermMemory:
         return json.loads(data) if data else None
 ```
 
-#### Mid-term Memory (Firestore)
+#### Mid-term Memory (MongoDB
 
 ```python
 # core/orchestrator/src/memory/mid_term.py
 from typing import Any, Dict, List, Optional
-from google.cloud import firestore
+from google.cloud import MongoDB
 from pydantic import BaseModel
 
-class FirestoreConfig(BaseModel):
+class MongoDB
     project_id: str
     collection_prefix: str = "orchestra"
 
-class FirestoreMidTermMemory:
-    """Mid-term memory implementation using Firestore"""
+class MongoDB
+    """Mid-term memory implementation using MongoDB
 
-    def __init__(self, config: FirestoreConfig):
+    def __init__(self, config: MongoDB
         self.config = config
-        self.db = firestore.AsyncClient(project=config.project_id)
+        self.db = MongoDB
         self.collection_prefix = config.collection_prefix
 
     async def store(self, key: str, value: Any, namespace: str = "conversations") -> None:
-        """Store data in Firestore"""
+        """Store data in MongoDB
         collection = self.db.collection(f"{self.collection_prefix}_{namespace}")
         await collection.document(key).set(value)
 
     async def retrieve(self, key: str, namespace: str = "conversations") -> Optional[Dict]:
-        """Retrieve data from Firestore"""
+        """Retrieve data from MongoDB
         collection = self.db.collection(f"{self.collection_prefix}_{namespace}")
         doc = await collection.document(key).get()
         return doc.to_dict() if doc.exists else None
@@ -107,14 +107,12 @@ class VectorSearchConfig(BaseModel):
     deployed_index_id: str
 
 class VectorLongTermMemory:
-    """Long-term memory implementation using Vertex AI Vector Search"""
-
+    """Long-term memory implementation using
     def __init__(self, config: VectorSearchConfig, embedding_service):
         self.config = config
         self.embedding_service = embedding_service
 
-        # Initialize Vertex AI
-        aiplatform.init(project=config.project_id, location=config.region)
+        # Initialize         aiplatform.init(project=config.project_id, location=config.region)
 
         # Get the index endpoint
         self.index_endpoint = aiplatform.MatchingEngineIndexEndpoint(
@@ -173,7 +171,7 @@ from enum import Enum
 from pydantic import BaseModel
 
 from .short_term import RedisShortTermMemory
-from .mid_term import FirestoreMidTermMemory
+from .mid_term import MongoDB
 from .long_term import VectorLongTermMemory
 
 class MemoryImportance(str, Enum):
@@ -186,7 +184,7 @@ class LayeredMemoryManager:
 
     def __init__(self, config, embedding_service):
         self.short_term = RedisShortTermMemory(config.short_term)
-        self.mid_term = FirestoreMidTermMemory(config.mid_term)
+        self.mid_term = MongoDB
         self.long_term = VectorLongTermMemory(config.long_term, embedding_service)
 
     async def store(self, data: Dict[str, Any], importance: MemoryImportance = MemoryImportance.LOW) -> None:
@@ -251,13 +249,11 @@ terraform/
 └── outputs.tf
 ```
 
-### 2. Compute Module (Cloud Run)
-
+### 2. Compute Module (
 ```hcl
 # terraform/modules/compute/main.tf
 
-# Cloud Run service
-resource "google_cloud_run_v2_service" "api" {
+# resource "google_cloud_run_v2_service" "api" {
   name     = var.service_name
   location = var.region
 
@@ -273,8 +269,7 @@ resource "google_cloud_run_v2_service" "api" {
       }
 
       env {
-        name  = "GCP_PROJECT_ID"
-        value = var.project_id
+        name  = "        value = var.project_id
       }
 
       # Secret environment variables
@@ -308,8 +303,7 @@ resource "google_cloud_run_v2_service" "api" {
 }
 ```
 
-### 3. AI Module (Vertex AI)
-
+### 3. AI Module (
 ```hcl
 # terraform/modules/ai/main.tf
 
@@ -467,9 +461,8 @@ class AgentTeam:
 1. **Implement Memory Architecture**:
 
    - Start with the short-term memory (Redis) implementation
-   - Add mid-term memory (Firestore) for persistent storage
-   - Integrate Vertex AI Vector Search for semantic memory
-
+   - Add mid-term memory (MongoDB
+   - Integrate
 2. **Set Up Infrastructure**:
 
    - Create Terraform modules for each component
@@ -484,5 +477,4 @@ class AgentTeam:
 
 4. **Integration with LLM Providers**:
    - Implement LiteLLM adapter for multi-provider support
-   - Add support for Vertex AI Gemini models
-   - Implement fallback mechanisms for reliability
+   - Add support for    - Implement fallback mechanisms for reliability

@@ -6,8 +6,7 @@ This guide will help you deploy the optimized AI Orchestra infrastructure with m
 
 ## Prerequisites
 
-- GCP Project with billing enabled
-- Python 3.10 installed
+- - Python 3.10 installed
 - Docker installed
 - GitHub repository (for CI/CD)
 - Pulumi account (free tier works)
@@ -20,8 +19,7 @@ git clone <your-repo-url>
 cd orchestra-main
 
 # Set environment variables
-export GCP_PROJECT_ID="your-project-id"
-export GITHUB_REPOSITORY="owner/repo"  # e.g., "myusername/orchestra-main"
+export export GITHUB_REPOSITORY="owner/repo"  # e.g., "myusername/orchestra-main"
 export OPENROUTER_API_KEY="your-api-key"  # Get from OpenRouter
 
 # Install GitHub CLI (if not installed)
@@ -39,8 +37,7 @@ export OPENROUTER_API_KEY="your-api-key"  # Get from OpenRouter
 This script will:
 - ✅ Check prerequisites
 - ✅ Set up Python environment
-- ✅ Configure GCP APIs
-- ✅ Initialize Pulumi stack
+- ✅ Configure - ✅ Initialize Pulumi stack
 - ✅ Build and push Docker images
 - ✅ Deploy infrastructure
 - ✅ Configure kubectl
@@ -106,9 +103,8 @@ Analyze why pods are failing in the superagi namespace and provide kubectl comma
 │  └──────┬──────┘  └─────────────┘  └─────────────┘            │
 │         │                                                       │
 │  ┌──────▼──────┐  ┌─────────────┐  ┌─────────────┐           │
-│  │ MCP MongoDB │  │MCP Weaviate │  │  Firestore  │           │
-│  │   Server    │  │   Server    │  │   (GCP)     │           │
-│  └─────────────┘  └─────────────┘  └─────────────┘           │
+│  │ MCP MongoDB │  │MCP Weaviate │  │  MongoDB
+│  │   Server    │  │   Server    │  │   (│  └─────────────┘  └─────────────┘  └─────────────┘           │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -166,8 +162,7 @@ Current setup costs (estimated):
 To reduce costs:
 1. Use preemptible nodes: Add `preemptible: true` to node config
 2. Scale down when not in use: `kubectl scale deployment --all --replicas=0 -n superagi`
-3. Use Cloud Run instead of GKE for lighter workloads
-
+3. Use
 ## Next Steps
 
 1. **Configure Agents**: Access SuperAGI UI and create your AI agents

@@ -4,8 +4,7 @@ This document outlines the step-by-step implementation plan for deploying the ne
 
 ## Phase 1: Infrastructure Setup (Week 1)
 
-### Day 1-2: Set Up Credentials and GCP Resources
-
+### Day 1-2: Set Up Credentials and
 1. **Run setup scripts**:
 
    ```bash
@@ -24,7 +23,7 @@ This document outlines the step-by-step implementation plan for deploying the ne
 
    ```bash
    # Add required dependencies
-   poetry add google-cloud-secret-manager google-cloud-firestore \
+   poetry add google-cloud-secret-manager google-cloud-MongoDB
      google-cloud-redis google-cloud-aiplatform redis
 
    # Add development dependencies
@@ -40,8 +39,7 @@ This document outlines the step-by-step implementation plan for deploying the ne
    ```
 
 4. **Update GitHub organization secrets**:
-   - Add `GCP_PROJECT_ID`, `GCP_REGION`, `GCP_SECRET_MANAGEMENT_KEY`, and `GCP_PROJECT_ADMIN_KEY`
-
+   - Add `
 ## Phase 2: Memory Backend Implementation (Week 1-2)
 
 ### Day 3-5: Implement Memory Backends
@@ -84,9 +82,8 @@ This document outlines the step-by-step implementation plan for deploying the ne
    ```
 
 2. **Implement Redis memory backend** for short-term memory
-3. **Implement Firestore memory backend** for mid/long-term memory
-4. **Implement Vertex AI Vector Search backend** for semantic memory
-
+3. **Implement MongoDB
+4. **Implement
 ## Phase 3: Layered Memory Implementation (Week 2)
 
 1. **Implement layered memory system**:
@@ -181,17 +178,17 @@ This document outlines the step-by-step implementation plan for deploying the ne
    from core.orchestrator.src.config.models import MemoryConfig, MemoryType
    from core.orchestrator.src.memory.layered_memory import LayeredMemory
    from core.orchestrator.src.memory.backends.redis_memory import RedisMemory
-   from core.orchestrator.src.memory.backends.firestore_memory import FirestoreMemory
+   from core.orchestrator.src.memory.backends.MongoDB
    from core.orchestrator.src.memory.backends.vertex_memory import VertexMemory
    from core.orchestrator.src.services.unified_registry import Service
 
    class MemoryFactory(Service):
        """Factory for creating memory systems based on configuration."""
 
-       def __init__(self, redis_client=None, firestore_client=None, vertex_client=None):
+       def __init__(self, redis_client=None, MongoDB
            """Initialize with optional clients for different backends."""
            self.redis_client = redis_client
-           self.firestore_client = firestore_client
+           self.MongoDB
            self.vertex_client = vertex_client
 
        def create_layered_memory(self, config: Dict[str, Any]) -> LayeredMemory:
@@ -203,10 +200,10 @@ This document outlines the step-by-step implementation plan for deploying the ne
                layers["short_term"] = self._create_redis_memory(config["short_term"])
 
            if "mid_term" in config:
-               layers["mid_term"] = self._create_firestore_memory(config["mid_term"])
+               layers["mid_term"] = self._create_MongoDB
 
            if "long_term" in config:
-               layers["long_term"] = self._create_firestore_memory(config["long_term"])
+               layers["long_term"] = self._create_MongoDB
 
            if "semantic" in config:
                layers["semantic"] = self._create_vertex_memory(config["semantic"])
@@ -219,8 +216,8 @@ This document outlines the step-by-step implementation plan for deploying the ne
                return self._create_redis_memory({
                    "ttl": memory_config.ttl
                })
-           elif memory_config.memory_type == MemoryType.FIRESTORE:
-               return self._create_firestore_memory({
+           elif memory_config.memory_type == MemoryType.MongoDB
+               return self._create_MongoDB
                    "collection": memory_config.table_name,
                    "ttl": memory_config.ttl
                })

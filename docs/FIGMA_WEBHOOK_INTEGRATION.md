@@ -9,8 +9,7 @@ The integration automatically updates our design assets when changes are made to
 1. Pulls the latest design tokens from Figma
 2. Converts them to platform-specific formats (CSS, JS, Android, iOS)
 3. Updates our Terraform configuration
-4. Validates the design tokens using Vertex AI
-5. Deploys the changes with a canary release strategy
+4. Validates the design tokens using 5. Deploys the changes with a canary release strategy
 
 ## Requirements
 
@@ -30,18 +29,13 @@ The integration automatically updates our design assets when changes are made to
 - Repository secrets:
   - `FIGMA_PAT`: Figma Personal Access Token
   - `FIGMA_WEBHOOK_SECRET`: Secret for webhook validation
-  - `GCP_SA_KEY_JSON`: GCP Service Account key for Secret Manager and Vertex AI access
-  - `GCP_PROJECT_ID`: Google Cloud Project ID
-  - `REDIS_PASSWORD`: Redis password for caching
-
-### GCP Requirements
-
+  - `  - `
+###
 - Service account with roles:
   - `roles/secretmanager.secretAccessor`
   - `roles/aiplatform.user`
   - `roles/redis.editor`
-- Vertex AI Workbench instance (n1-standard-4)
-- Firestore NATIVE with backup policies
+- - MongoDB
 - Memorystore Redis (3GB)
 
 ## Setup Instructions
@@ -113,23 +107,17 @@ This checks for:
 
 - figma-sync (v1.3.0+)
 - terraform-linter (v2.8+)
-- gcp-cost (v0.9+)
-
+-
 ## Workflow Details
 
 ### GitHub Actions Workflow
 
-The webhook triggers the `.github/workflows/figma-gcp-sync.yml` workflow which performs:
-
+The webhook triggers the `.github/workflows/figma-
 1. **Validation**: Validates the Figma PAT scopes and webhook signature
-2. **Synchronization**: Runs `figma_gcp_sync.py` to fetch design variables
-3. **Verification**: Validates design tokens with Vertex AI
-4. **Deployment**: Deploys updates to Cloud Run with a 10% canary strategy
-
+2. **Synchronization**: Runs `figma_3. **Verification**: Validates design tokens with 4. **Deployment**: Deploys updates to
 ### Design Token Generation
 
-The `figma_gcp_sync.py` script:
-
+The `figma_
 - Fetches design variables from Figma
 - Generates platform-specific implementation files:
   - CSS variables
@@ -137,8 +125,7 @@ The `figma_gcp_sync.py` script:
   - Android XML resources
   - iOS Swift files
   - Terraform variables
-- Updates Secret Manager with the latest tokens
-
+- Updates
 ### Error Handling
 
 The workflow includes error handling for:
@@ -162,13 +149,10 @@ If the webhook fails to trigger:
 3. Ensure the Figma PAT has not expired
 4. Check the GitHub repository dispatch endpoint is accessible
 
-#### GCP Permissions
-
-If GCP operations fail:
-
+####
+If
 1. Verify the service account has the required roles
-2. Check that Vertex AI API is enabled
-3. Ensure the service account key is correctly stored in GitHub secrets
+2. Check that 3. Ensure the service account key is correctly stored in GitHub secrets
 
 #### Design Token Validation Errors
 
@@ -196,15 +180,12 @@ Monitor the webhook health:
 
 - Check GitHub Actions workflow runs
 - Review Figma webhook logs in Team settings
-- Monitor GCP logs for sync operations
-
+- Monitor
 ## References
 
 - [Figma API Documentation](https://www.figma.com/developers/api)
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [GCP Secret Manager Documentation](https://cloud.google.com/secret-manager/docs)
-- [Vertex AI Documentation](https://cloud.google.com/vertex-ai/docs)
-
+- [- [
 ## Support
 
 If you encounter issues with this integration, please contact the design system team at design-system@example.com.

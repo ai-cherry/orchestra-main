@@ -25,8 +25,7 @@ The GitHub Actions workflow has been updated to address Poetry dependency/versio
 - Implemented cache clearing between retry attempts
 - Enhanced Terraform validation with detailed error output
 - Added verification step to ensure dependencies are properly installed
-- Updated Cloud Run deployment to use Workload Identity Federation instead of service account keys
-
+- Updated
 These changes make the CI/CD pipeline more reliable and secure, reducing build failures and deployment issues.
 
 ## 2. Infrastructure as Code Enhancements
@@ -35,17 +34,13 @@ These changes make the CI/CD pipeline more reliable and secure, reducing build f
 
 The Terraform configuration has been updated to fix validation errors and improve resource management:
 
-- Fixed Cloud Run service configuration to use variables consistently
-- Updated IAM binding for Cloud Run to use the correct resource type
-- Added Vertex AI Vector Search module for semantic memory capabilities
-- Improved resource naming and organization
+- Fixed - Updated IAM binding for - Added - Improved resource naming and organization
 
 These changes ensure that infrastructure can be reliably deployed and managed through code, reducing manual configuration and potential errors.
 
 ### 2.2 Terraform Backend Initialization
 
-A script has been created to initialize the Terraform backend on GCP:
-
+A script has been created to initialize the Terraform backend on
 - Creates a GCS bucket for Terraform state storage
 - Enables versioning and lifecycle policies for state management
 - Initializes Terraform with the correct backend configuration
@@ -60,8 +55,7 @@ A script has been created to set up Workload Identity Federation for GitHub Acti
 
 - Creates a service account with appropriate permissions
 - Sets up a Workload Identity Pool and Provider
-- Configures authentication binding between GitHub and GCP
-- Provides instructions for adding secrets to GitHub
+- Configures authentication binding between GitHub and - Provides instructions for adding secrets to GitHub
 
 This setup eliminates the need for service account keys, improving security and reducing the risk of credential leakage.
 
@@ -83,16 +77,14 @@ These changes reduce the attack surface of the deployed application and improve 
 A comprehensive layered memory system has been implemented to support multi-agent teams:
 
 - Short-term memory using Redis for fast, ephemeral storage
-- Mid-term memory using Firestore for persistent, structured storage
-- Long-term memory using Firestore + Vector Search for semantic search capabilities
+- Mid-term memory using MongoDB
+- Long-term memory using MongoDB
 - Unified interface for storing, retrieving, and searching memories
 
 This implementation enables agents to maintain context across conversations and leverage past experiences for better decision-making.
 
-### 4.2 Vertex AI Vector Search Integration
-
-A Terraform module has been created to set up Vertex AI Vector Search for semantic memory:
-
+### 4.2
+A Terraform module has been created to set up
 - Creates a Vector Search index for storing embeddings
 - Sets up an endpoint for querying the index
 - Configures appropriate IAM permissions

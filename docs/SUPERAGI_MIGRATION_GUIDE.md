@@ -20,20 +20,16 @@ This guide provides step-by-step instructions for migrating the Orchestra AI sys
 | Component | Current (Orchestra) | With SuperAGI |
 |-----------|-------------------|---------------|
 | Agent Runtime | Custom Python | SuperAGI Engine |
-| Memory | Firestore + Custom | DragonflyDB + Firestore |
-| Deployment | Cloud Run | GKE + SuperAGI |
-| Scaling | Manual | Auto-scaling |
+| Memory | MongoDB
+| Deployment | | Scaling | Manual | Auto-scaling |
 | Tools | Limited | Extensible Plugin System |
 
 ## Prerequisites
 
 Before starting the migration:
 
-1. **GCP Project Setup**
-   ```bash
-   export GCP_PROJECT_ID="your-project-id"
-   export GCP_REGION="us-central1"
-   ```
+1. **   ```bash
+   export    export    ```
 
 2. **Required Tools**
    - gcloud CLI
@@ -64,9 +60,7 @@ Before starting the migration:
 
 3. **Build and Push Docker Image**
    ```bash
-   docker build -f Dockerfile.superagi -t gcr.io/${GCP_PROJECT_ID}/superagi:latest .
-   docker push gcr.io/${GCP_PROJECT_ID}/superagi:latest
-   ```
+   docker build -f Dockerfile.superagi -t gcr.io/${   docker push gcr.io/${   ```
 
 ### Phase 2: Agent Migration
 
@@ -126,7 +120,7 @@ Before starting the migration:
        provider: redis
        ttl: 3600
      long_term:
-       provider: firestore
+       provider: MongoDB
    ```
 
 2. **Update Memory Access Patterns**
@@ -247,8 +241,7 @@ ab -n 1000 -c 10 -p request.json -T application/json \
 If issues arise during migration:
 
 1. **Keep Original Services Running**
-   - Don't delete Cloud Run services immediately
-   - Run SuperAGI in parallel initially
+   - Don't delete    - Run SuperAGI in parallel initially
 
 2. **Feature Flags**
    ```python
@@ -262,8 +255,8 @@ If issues arise during migration:
 
 3. **Data Backup**
    ```bash
-   # Backup Firestore
-   gcloud firestore export gs://${BUCKET}/backups/$(date +%Y%m%d)
+   # Backup MongoDB
+   gcloud MongoDB
    ```
 
 ## Monitoring and Observability
@@ -305,9 +298,7 @@ kubectl logs deployment/superagi -n superagi | \
    - Monitor DragonflyDB memory usage
 
 3. **Security**
-   - Use Workload Identity for GCP access
-   - Store secrets in Secret Manager
-   - Enable network policies in GKE
+   - Use Workload Identity for    - Store secrets in    - Enable network policies in GKE
 
 ## Troubleshooting
 

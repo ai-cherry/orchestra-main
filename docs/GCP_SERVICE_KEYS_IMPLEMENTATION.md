@@ -1,11 +1,8 @@
-# GCP Service Keys Implementation Guide
-
-This document provides a comprehensive guide to the implementation of GCP service account keys and GitHub secrets for the AI Orchestra project.
-
+#
+This document provides a comprehensive guide to the implementation of
 ## Overview
 
-We've implemented a secure and comprehensive approach to managing GCP service account keys and GitHub secrets for Vertex AI and Gemini services. This implementation includes:
-
+We've implemented a secure and comprehensive approach to managing
 1. Enhanced service account creation script
 2. Terraform configuration for service accounts
 3. Updated GitHub workflow configuration
@@ -15,11 +12,9 @@ We've implemented a secure and comprehensive approach to managing GCP service ac
 
 The following service accounts have been created with appropriate IAM roles:
 
-### Vertex AI Administrator Service Account
-
+###
 - **Account ID**: `vertex-ai-admin`
-- **Purpose**: Provides comprehensive access to Vertex AI services
-- **Key IAM Roles**:
+- **Purpose**: Provides comprehensive access to - **Key IAM Roles**:
   - `roles/aiplatform.admin`
   - `roles/aiplatform.user`
   - `roles/storage.admin`
@@ -35,8 +30,7 @@ The following service accounts have been created with appropriate IAM roles:
 ### Secret Management Administrator Service Account
 
 - **Account ID**: `secret-management-admin`
-- **Purpose**: Manages secrets in Secret Manager
-- **Key IAM Roles**:
+- **Purpose**: Manages secrets in - **Key IAM Roles**:
   - `roles/secretmanager.admin`
   - `roles/secretmanager.secretAccessor`
 
@@ -46,20 +40,15 @@ The following GitHub organization-level secrets have been configured:
 
 | Secret Name                           | Description                             | Used For                                      |
 | ------------------------------------- | --------------------------------------- | --------------------------------------------- |
-| `VERTEX_AI_FULL_ACCESS_KEY`           | Vertex AI admin service account key     | Vertex AI operations                          |
-| `GEMINI_API_FULL_ACCESS_KEY`          | Gemini API service account key          | Gemini API operations                         |
+| `VERTEX_AI_FULL_ACCESS_KEY`           | | `GEMINI_API_FULL_ACCESS_KEY`          | Gemini API service account key          | Gemini API operations                         |
 | `GEMINI_CODE_ASSIST_FULL_ACCESS_KEY`  | Gemini Code Assist service account key  | Gemini Code Assist operations                 |
 | `GEMINI_CLOUD_ASSIST_FULL_ACCESS_KEY` | Gemini Cloud Assist service account key | Gemini Cloud Assist operations                |
-| `GCP_SECRET_MANAGEMENT_KEY`           | Secret Management service account key   | Secret Manager operations                     |
-| `GCP_PROJECT_ID`                      | The Google Cloud Project ID             | Identifying the project in all GCP operations |
-
-## Usage in GitHub Actions
+| `| `## Usage in GitHub Actions
 
 The GitHub Actions workflows have been updated to use the appropriate service account keys for different operations. For example:
 
 ```yaml
-- name: Authenticate to Google Cloud
-  uses: google-github-actions/auth@v1
+- name: Authenticate to   uses: google-github-actions/auth@v1
   with:
     credentials_json: ${{ secrets.VERTEX_AI_FULL_ACCESS_KEY }}
 ```
@@ -71,9 +60,7 @@ The service accounts are defined in Terraform, making it easy to manage and vers
 ```hcl
 resource "google_service_account" "vertex_ai_admin" {
   account_id   = "vertex-ai-admin"
-  display_name = "Vertex AI Administrator"
-  description  = "Service account for Vertex AI operations"
-  project      = var.project_id
+  display_name = "  description  = "Service account for   project      = var.project_id
 }
 
 resource "google_project_iam_binding" "vertex_ai_admin_bindings" {
@@ -114,5 +101,4 @@ If you encounter issues with service account authentication:
 
 1. Verify that the service account has the necessary permissions
 2. Check that the GitHub secrets are correctly configured
-3. Ensure that the required APIs are enabled in the GCP project
-4. Run the `create_badass_service_keys.sh` script to regenerate keys if needed
+3. Ensure that the required APIs are enabled in the 4. Run the `create_badass_service_keys.sh` script to regenerate keys if needed

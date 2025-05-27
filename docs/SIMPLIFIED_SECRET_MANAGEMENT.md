@@ -29,8 +29,7 @@ api_key = os.getenv("API_KEY")
 
 ### 2. Cloud Deployment
 
-For cloud deployment, use GCP Secret Manager with simplified access:
-
+For cloud deployment, use
 ```terraform
 # Simple secret definition
 resource "google_secret_manager_secret" "api_key" {
@@ -65,13 +64,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Auth to GCP
-        uses: google-github-actions/auth@v1
+      - name: Auth to         uses: google-github-actions/auth@v1
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-      - name: Deploy to Cloud Run
-        uses: google-github-actions/deploy-cloudrun@v1
+          credentials_json: ${{ secrets.
+      - name: Deploy to         uses: google-github-actions/deploy-cloudrun@v1
         with:
           service: my-service
           region: us-central1
@@ -82,9 +78,7 @@ jobs:
 ## Security Essentials Maintained
 
 1. **Gitignore Protection**: Sensitive files are still added to .gitignore
-2. **Secret Manager**: Secrets are still stored in GCP Secret Manager
-3. **Service Account Access**: Proper IAM roles are maintained
-
+2. **
 ## Eliminated Complexity
 
 1. **Automated Rotation**: Weekly rotation schedules removed
@@ -96,7 +90,6 @@ jobs:
 
 1. **Use .env files** for local development
 2. **Keep secrets out of code** using environment variables
-3. **Use Secret Manager** for cloud deployments
-4. **Maintain a simple .gitignore** to prevent accidental commits
+3. **Use 4. **Maintain a simple .gitignore** to prevent accidental commits
 
 This simplified approach maintains essential security while eliminating unnecessary overhead for single-developer projects.

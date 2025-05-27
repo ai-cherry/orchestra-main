@@ -1,7 +1,6 @@
 # Orchestra Agent Framework Integrations
 
-This document provides comprehensive information about integrating Orchestra with modern agent frameworks including SuperAGI, AutoGen, LangChain, and Vertex AI Agent Builder. These integrations enable advanced agent capabilities, enhanced memory systems, and enterprise-grade features.
-
+This document provides comprehensive information about integrating Orchestra with modern agent frameworks including SuperAGI, AutoGen, LangChain, and
 ## Table of Contents
 
 1. [Architecture Overview](#architecture-overview)
@@ -93,10 +92,8 @@ Enhances Orchestra's memory system with LangChain's specialized memory modules.
 - Structured knowledge bases
 - Enhanced semantic search
 
-### 5. Vertex AI Agent Builder
-
-Provides enterprise-grade agent management via Google's Vertex AI platform.
-
+### 5.
+Provides enterprise-grade agent management via Google's
 **Key Features:**
 
 - Enterprise compliance features
@@ -109,8 +106,7 @@ Provides enterprise-grade agent management via Google's Vertex AI platform.
 ### Prerequisites
 
 - Python 3.8+
-- Google Cloud SDK
-- Terraform (optional, for infrastructure)
+- - Terraform (optional, for infrastructure)
 - Access to relevant API keys
 
 ### Installation
@@ -125,8 +121,7 @@ This script will:
 
 - Install required dependencies
 - Set up configuration files
-- Enable Google Cloud APIs
-- Test the Gemini Context Manager
+- Enable - Test the Gemini Context Manager
 - Create environment variable scripts
 
 2. Source the environment variables:
@@ -201,8 +196,7 @@ langchain:
   embedding_model: "textembedding-gecko@latest" # Embedding model
 ```
 
-### Vertex AI Integration
-
+###
 ```yaml
 vertex_ai:
   enabled: true
@@ -320,13 +314,11 @@ memories = await adapter.get_memories(
 )
 ```
 
-### Vertex AI Agent Builder
-
+###
 ```python
 from packages.shared.src.integrations.vertex_ai.agent_builder import VertexAIAgentBuilder
 
-# Initialize Vertex AI Agent Builder
-builder = VertexAIAgentBuilder(config={
+# Initialize builder = VertexAIAgentBuilder(config={
     "project_id": "your-project-id",
     "region": "us-central1"
 })
@@ -384,18 +376,15 @@ The system uses a prioritization algorithm based on:
 
 ## Infrastructure Setup
 
-The integration components are supported by Google Cloud infrastructure:
-
+The integration components are supported by
 - **Memory System Infrastructure**
 
   - Redis for real-time caching layer
   - AlloyDB with vector extension for persistent storage
-  - BigQuery for analytics
-
+  -
 - **Security Infrastructure**
 
-  - Secret Manager for API keys
-  - Workload Identity Federation for GitHub Actions
+  -   - Workload Identity Federation for GitHub Actions
   - IAM permissions for secure access
 
 - **Monitoring and Optimization**
@@ -427,9 +416,7 @@ terraform apply
 └────────┬──────────────────────────┬────────┘
          │                          │
 ┌────────▼────────┐        ┌────────▼────────┐
-│  Secret Manager  │        │  BigQuery       │
-│  (API Keys)      │        │  (Analytics)    │
-└─────────────────┘        └─────────────────┘
+│  └─────────────────┘        └─────────────────┘
 ```
 
 ## Troubleshooting
@@ -442,10 +429,8 @@ terraform apply
 
 **Solution**:
 
-- Verify API keys are correctly set in Secret Manager or environment variables
-- Check if API key has necessary permissions
-- Confirm the API is enabled in Google Cloud Console
-
+- Verify API keys are correctly set in - Check if API key has necessary permissions
+- Confirm the API is enabled in
 #### 2. Integration Initialization Failures
 
 **Problem**: "Failed to initialize [Integration] adapter"
@@ -490,4 +475,4 @@ python3 scripts/test_integrations.py
 
 - Check logs in `./logs/integrations.log`
 - Review the configuration files in `./config/`
-- Consult GCP documentation for platform-specific issues
+- Consult

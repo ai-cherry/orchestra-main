@@ -2,8 +2,7 @@
 
 ## Overview
 
-This document provides a summary of the implementation of secret management in our CI/CD pipeline. The integration allows secure handling of API keys and other sensitive credentials during deployment, using GitHub Actions and Google Cloud Secret Manager.
-
+This document provides a summary of the implementation of secret management in our CI/CD pipeline. The integration allows secure handling of API keys and other sensitive credentials during deployment, using GitHub Actions and
 ## Implementation Details
 
 ### 1. Files Created or Modified
@@ -28,27 +27,21 @@ This document provides a summary of the implementation of secret management in o
 
 ### 2. Integration Flow
 
-1. **Authentication**: The workflow authenticates with GCP using a service account key stored in GitHub Secrets
-2. **Secret File Creation**: Creates a temporary file from GitHub Secrets during the build
-3. **Secret Management**: Uses `secrets_setup.sh` to create/update secrets in GCP Secret Manager
-4. **Cleanup**: Removes temporary files to maintain security
-5. **Deployment**: Deploys to Cloud Run with the secret injected as an environment variable
-
+1. **Authentication**: The workflow authenticates with 2. **Secret File Creation**: Creates a temporary file from GitHub Secrets during the build
+3. **Secret Management**: Uses `secrets_setup.sh` to create/update secrets in 4. **Cleanup**: Removes temporary files to maintain security
+5. **Deployment**: Deploys to
 ### 3. Required GitHub Secrets
 
 - `PORTKEY_KEY_CONTENT`: The raw content of the Portkey API key file
-- `GCP_SA_KEY_6833bc94f0e3ef8648efc1578caa23ba2b8a8a52`: The GCP service account JSON key
-
+- `
 ### 4. Service Accounts and Permissions
 
 - **vertex-agent@cherry-ai-project.iam.gserviceaccount.com**:
 
-  - Used for managing secrets with Secret Manager
-  - Requires `roles/secretmanager.secretAccessor` and `roles/aiplatform.reasoningEngineServiceAgent`
+  - Used for managing secrets with   - Requires `roles/secretmanager.secretAccessor` and `roles/aiplatform.reasoningEngineServiceAgent`
 
 - **orchestra-cloud-run-prod@cherry-ai-project.iam.gserviceaccount.com**:
-  - Runtime service account for Cloud Run
-  - Needs access to the secrets during runtime
+  - Runtime service account for   - Needs access to the secrets during runtime
 
 ## Testing and Validation
 
@@ -57,8 +50,7 @@ The integration includes a validation script (`scripts/validate_secret_cicd.sh`)
 - Presence of all required files
 - Executable permissions
 - Essential content in configuration files
-- GCP permissions (when available)
-
+-
 ## Developer Workflow
 
 1. **Local Development**:
@@ -69,8 +61,7 @@ The integration includes a validation script (`scripts/validate_secret_cicd.sh`)
 2. **CI/CD Pipeline**:
    - Push changes to trigger the workflow
    - Secrets are automatically managed in the pipeline
-   - Cloud Run deployment receives the secrets as environment variables
-
+   -
 ## Security Considerations
 
 - Secrets are never committed to the repository
@@ -90,5 +81,4 @@ Potential improvements for future iterations:
 ## Related Documentation
 
 - [Secret Management CI/CD Guide](./SECRET_MANAGEMENT_CICD.md)
-- [GCP Secret Manager Documentation](https://cloud.google.com/secret-manager/docs)
-- [GitHub Actions Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+- [- [GitHub Actions Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)

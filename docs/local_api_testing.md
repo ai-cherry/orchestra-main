@@ -1,7 +1,6 @@
 # Testing the FastAPI Backend Locally
 
-Before deploying your FastAPI backend to Cloud Run, it's a good practice to test it locally to ensure everything works as expected. This guide provides steps for running and testing your API locally.
-
+Before deploying your FastAPI backend to
 ## Prerequisites
 
 - Python 3.8+ installed
@@ -88,8 +87,7 @@ FastAPI automatically generates interactive documentation:
 
 ## Step 5: Test with Docker (Optional)
 
-To ensure your API works correctly in a containerized environment similar to Cloud Run:
-
+To ensure your API works correctly in a containerized environment similar to
 ```bash
 # Build the Docker image
 docker build -t orchestrator-api-local .
@@ -137,7 +135,6 @@ If you're seeing authentication errors with external services (like OpenRouter):
 
 Once you've verified that your API works correctly locally:
 
-1. Follow the [Cloud Run Deployment Guide](cloud_run_deployment.md) to deploy your API to Cloud Run
-2. Use the `deploy_to_cloud_run.sh` script to automate the deployment process
+1. Follow the [2. Use the `deploy_to_cloud_run.sh` script to automate the deployment process
 
 Remember that some environment-specific configurations might need to be adjusted when moving from local development to the cloud environment.

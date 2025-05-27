@@ -1,14 +1,11 @@
 # Orchestra Deployment Steps
 
-This document provides a step-by-step guide for deploying the Orchestra application to Google Cloud Platform.
-
+This document provides a step-by-step guide for deploying the Orchestra application to
 ## Prerequisites
 
 Before starting the deployment process, ensure you have:
 
-- Access to the `cherry-ai-project` GCP project
-- Permissions to create service accounts and resources in GCP
-- GitHub repository access (if using CI/CD deployment)
+- Access to the `cherry-ai-project` - Permissions to create service accounts and resources in - GitHub repository access (if using CI/CD deployment)
 
 ## Environment Preparation
 
@@ -38,17 +35,14 @@ Before starting the deployment process, ensure you have:
 
 ## Authentication and Infrastructure Setup
 
-1. **Set Up GCP Authentication**
-
+1. **Set Up
    ```bash
    ./setup_vertex_key.sh
    ```
 
    This script:
 
-   - Installs Google Cloud SDK if not already installed
-   - Sets up authentication with GCP
-   - Creates or imports a vertex-agent service account key
+   - Installs    - Sets up authentication with    - Creates or imports a vertex-agent service account key
    - Tests authentication with the service account key
 
 2. **Set Up Redis for Production**
@@ -59,9 +53,7 @@ Before starting the deployment process, ensure you have:
 
    This script:
 
-   - Creates a Redis instance in GCP
-   - Generates a secure password and stores it in Secret Manager
-   - Updates the .env file with Redis connection information
+   - Creates a Redis instance in    - Generates a secure password and stores it in    - Updates the .env file with Redis connection information
 
 3. **Install Deployment Requirements**
 
@@ -75,8 +67,7 @@ Before starting the deployment process, ensure you have:
 
 Choose one of the following deployment methods:
 
-### Option 1: Direct Cloud Run Deployment
-
+### Option 1: Direct
 This is the simplest method for quick deployment:
 
 ```bash
@@ -87,8 +78,7 @@ This script:
 
 - Builds a Docker image of the application
 - Pushes the image to Google Artifact Registry
-- Deploys the application to Cloud Run
-- Sets up environment variables and secrets
+- Deploys the application to - Sets up environment variables and secrets
 
 ### Option 2: Terraform Infrastructure Deployment
 
@@ -99,13 +89,10 @@ cd infra
 ./run_terraform.sh
 ```
 
-This creates all the required GCP resources:
-
-- Cloud Run service
-- Firestore database
+This creates all the required
+- - MongoDB
 - Redis instance
-- Secret Manager secrets
-- VPC network and connector
+- - VPC network and connector
 - Monitoring and logging
 
 ### Option 3: GitHub Actions CI/CD (Recommended for Production)
@@ -137,9 +124,7 @@ After deployment is complete:
 1. **Test the API Endpoint**
 
    ```bash
-   # For Cloud Run deployment
-   curl $(gcloud run services describe orchestrator-api-prod --region=us-west4 --format="value(status.url)")/health
-   ```
+   # For    curl $(g   ```
 
 2. **Monitor Logs**
 
@@ -149,8 +134,7 @@ After deployment is complete:
 
 3. **Check Metrics Dashboard**
 
-   Visit the GCP console to view metrics for your deployed service:
-   https://console.cloud.google.com/monitoring/dashboards?project=cherry-ai-project
+   Visit the    https://console.cloud.google.com/monitoring/dashboards?project=cherry-ai-project
 
 ## Troubleshooting
 
@@ -159,8 +143,7 @@ If you encounter issues during deployment:
 1. **Check Authentication**
 
    ```bash
-   ./test_gcp_auth.py
-   ```
+   ./test_   ```
 
 2. **Verify Environment Configuration**
 
@@ -170,11 +153,9 @@ If you encounter issues during deployment:
 
    Ensure that all required environment variables are set correctly.
 
-3. **Check Cloud Run Service**
-
+3. **Check
    ```bash
-   gcloud run services describe orchestrator-api-prod --region=us-west4
-   ```
+   g   ```
 
 4. **View Build Logs**
 
@@ -194,8 +175,7 @@ If you encounter issues during deployment:
 
 2. **Secret Management**
 
-   - Use Secret Manager for all sensitive information
-   - Avoid hardcoding secrets in configuration files
+   - Use    - Avoid hardcoding secrets in configuration files
 
 3. **Network Security**
    - Configure VPC for proper isolation
@@ -213,10 +193,8 @@ If you encounter issues during deployment:
 
 3. **Backup Data**
 
-   Regularly back up Firestore data for disaster recovery.
+   Regularly back up MongoDB
 
 ## Additional Resources
 
-- [GCP Deployment Guide](./gcp_deployment_guide.md)
-- [Cloud Run Documentation](https://cloud.google.com/run/docs)
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
+- [- [- [GitHub Actions Documentation](https://docs.github.com/en/actions)

@@ -127,10 +127,8 @@ For developing new API endpoints or services:
 5. **🪃 Orchestrator**: Review the implementation for quality and security
 6. **🎨 Creative**: Create API documentation and usage examples
 
-### GCP Infrastructure Chain
-
-For setting up or modifying GCP infrastructure:
-
+###
+For setting up or modifying
 1. **🏗 Architect**: Design the infrastructure components and dependencies
 2. **💻 Code**: Implement the Terraform/HCL code for the infrastructure
 3. **🪃 Orchestrator**: Review for security best practices and compliance

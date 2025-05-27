@@ -15,14 +15,12 @@
 
 ## System Overview
 
-Orchestra AI is a cloud-native, AI-powered orchestration platform built on Google Cloud Platform (GCP). It features:
-
+Orchestra AI is a cloud-native, AI-powered orchestration platform built on
 - **MCP (Model Context Protocol)** servers for modular AI capabilities
 - **Web scraping AI agent teams** with Zenrows, Apify, and PhantomBuster
 - **Enhanced vector memory system** with Redis caching
 - **Multi-source data integration** (Gong, Salesforce, HubSpot, Slack, Looker)
-- **GCP-native integration** with Pub/Sub, Service Directory, and Cloud Monitoring
-
+- **
 ### Key Services
 
 | Service                | Purpose           | URL Pattern                              |
@@ -39,9 +37,7 @@ Orchestra AI is a cloud-native, AI-powered orchestration platform built on Googl
 
 - Python 3.10+
 - `gcloud` CLI configured
-- Access to GCP project `cherry-ai-project`
-- Required API keys in GCP Secret Manager
-
+- Access to - Required API keys in
 ### Initial Setup
 
 ```bash
@@ -64,8 +60,7 @@ python tools/orchestra_cli.py init
 
 This will:
 
-1. Sync all secrets from GCP Secret Manager
-2. Validate configuration
+1. Sync all secrets from 2. Validate configuration
 3. Run comprehensive health checks
 
 ---
@@ -76,8 +71,7 @@ The Orchestra CLI (`tools/orchestra_cli.py`) is your primary interface for syste
 
 ### Secrets Management
 
-#### Sync Secrets from GCP
-
+#### Sync Secrets from
 ```bash
 # Sync all secrets to local .env
 python tools/orchestra_cli.py secrets sync
@@ -96,8 +90,7 @@ python tools/orchestra_cli.py secrets sync --env-file .env.local
 python tools/orchestra_cli.py secrets validate
 ```
 
-#### Set/Update Secrets in GCP
-
+#### Set/Update Secrets in
 ```bash
 # Set a new secret (will prompt for value)
 python tools/orchestra_cli.py secrets set MY_API_KEY
@@ -145,8 +138,7 @@ python tools/orchestra_cli.py diagnostics health
 This checks:
 
 - Secret availability
-- GCP connectivity
-- Redis connection
+- - Redis connection
 - MCP Gateway status
 - Adapter readiness
 
@@ -174,11 +166,9 @@ python tools/orchestra_cli.py orchestrator status
 
 Deployment is automated via GitHub Actions when pushing to `main` branch:
 
-1. **Secret Validation**: Ensures all required secrets exist in GCP
-2. **Testing & Linting**: Runs pytest and code quality checks
+1. **Secret Validation**: Ensures all required secrets exist in 2. **Testing & Linting**: Runs pytest and code quality checks
 3. **Cloud Build**: Builds and pushes Docker images
-4. **Deployment**: Updates Cloud Run services
-5. **Health Checks**: Validates services are healthy
+4. **Deployment**: Updates 5. **Health Checks**: Validates services are healthy
 
 ### Manual Deployment
 
@@ -188,8 +178,7 @@ gcloud builds submit --config cloudbuild.yaml \
   --substitutions=COMMIT_SHA=$(git rev-parse HEAD)
 
 # Deploy specific service
-gcloud run deploy ai-orchestra-minimal \
-  --image us-central1-docker.pkg.dev/cherry-ai-project/orchestra-images/orchestra-main:latest \
+g  --image us-central1-docker.pkg.dev/cherry-ai-project/orchestra-images/orchestra-main:latest \
   --region us-central1
 ```
 
@@ -197,8 +186,7 @@ gcloud run deploy ai-orchestra-minimal \
 
 ```bash
 # Navigate to infrastructure directory
-cd infra/pulumi_gcp
-
+cd infra/pulumi_
 # Preview changes
 pulumi preview
 
@@ -264,8 +252,7 @@ Custom metrics track:
 
 ```bash
 # Stream logs for a service
-gcloud run services logs read ai-orchestra-minimal \
-  --region us-central1 \
+g  --region us-central1 \
   --tail 50 \
   --follow
 
@@ -289,15 +276,12 @@ gcloud logging read 'resource.type="cloud_run_revision" AND severity="ERROR"' \
 
 ```bash
 # Check service logs
-gcloud run services logs read [service-name] --region us-central1 --limit 100
-
+g
 # Check secret availability
 python tools/orchestra_cli.py secrets validate
 
 # Force service restart
-gcloud run services update [service-name] --region us-central1 --no-traffic
-gcloud run services update [service-name] --region us-central1 --to-latest
-```
+gg```
 
 #### 2. Missing Secrets
 
@@ -350,8 +334,7 @@ gcloud monitoring read \
   --start-time -1h
 
 # Scale up if needed
-gcloud run services update [service-name] \
-  --memory 8Gi \
+g  --memory 8Gi \
   --region us-central1
 ```
 
@@ -359,14 +342,11 @@ gcloud run services update [service-name] \
 
 ```bash
 # Get service details
-gcloud run services describe [service-name] --region us-central1
-
+g
 # List recent revisions
-gcloud run revisions list --service [service-name] --region us-central1
-
+g
 # Check IAM bindings
-gcloud run services get-iam-policy [service-name] --region us-central1
-
+g
 # Test service directly
 curl -H "Authorization: Bearer $(gcloud auth print-identity-token)" \
   https://[service-url]/health
@@ -393,8 +373,7 @@ Each service runs with least-privilege IAM:
 python tools/orchestra_cli.py secrets set API_KEY_NAME
 
 # Redeploy services to pick up new secret
-gcloud run services update [service-name] --region us-central1 --to-latest
-```
+g```
 
 ### Network Security
 
@@ -445,8 +424,7 @@ gcloud run services update [service-name] --region us-central1 --to-latest
 ### Development
 
 1. **Always validate secrets** before deployment
-2. **Use the CLI** for all operations (avoid manual GCP console changes)
-3. **Test locally** with synced secrets before pushing
+2. **Use the CLI** for all operations (avoid manual 3. **Test locally** with synced secrets before pushing
 4. **Monitor logs** during deployment for early issue detection
 
 ### Production
@@ -469,7 +447,7 @@ gcloud run services update [service-name] --region us-central1 --to-latest
 2. **Data Loss**:
 
    - Redis has replication enabled
-   - Firestore has automatic backups
+   - MongoDB
    - Check audit logs for actions
 
 3. **Security Incident**:
@@ -506,10 +484,7 @@ APIFY_API_KEY=...
 
 ### Useful Links
 
-- [GCP Console](https://console.cloud.google.com/?project=cherry-ai-project)
-- [Cloud Run Services](https://console.cloud.google.com/run?project=cherry-ai-project)
-- [Secret Manager](https://console.cloud.google.com/security/secret-manager?project=cherry-ai-project)
-- [Monitoring Dashboard](https://console.cloud.google.com/monitoring?project=cherry-ai-project)
+- [- [- [- [Monitoring Dashboard](https://console.cloud.google.com/monitoring?project=cherry-ai-project)
 - [Cloud Build History](https://console.cloud.google.com/cloud-build/builds?project=cherry-ai-project)
 
 ### Support

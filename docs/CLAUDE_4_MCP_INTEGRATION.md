@@ -20,8 +20,7 @@ This guide explains how to use the Model Context Protocol (MCP) servers with Cla
     ┌────▼──────────────────────────┐
     │      MCP Servers              │
     ├───────────────────────────────┤
-    │ • Cloud Run MCP    :8001      │
-    │ • Secrets MCP      :8002      │
+    │ •     │ • Secrets MCP      :8002      │
     │ • Memory MCP       :8003      │
     │ • Orchestrator MCP :8004      │
     └───────────────────────────────┘
@@ -63,10 +62,8 @@ Add the MCP configuration to your Claude settings:
 
 Claude can now use these tools:
 
-#### Cloud Run Management
-
-- `deploy_service` - Deploy or update Cloud Run services
-- `get_service_status` - Check service status
+####
+- `deploy_service` - Deploy or update - `get_service_status` - Check service status
 - `list_services` - List all deployed services
 
 #### Secret Management
@@ -95,8 +92,7 @@ Claude can now use these tools:
 ### Deploy a Service
 
 ```
-Claude, deploy the admin API to Cloud Run with the image gcr.io/cherry-ai-project/admin-api:latest
-```
+Claude, deploy the admin API to ```
 
 Claude will use:
 
@@ -165,7 +161,7 @@ The MCP memory system uses a three-layer architecture:
 - **TTL**: 1 hour
 - **Use cases**: Current conversation context, temporary flags
 
-### 2. Mid-term Memory (Firestore)
+### 2. Mid-term Memory (MongoDB
 
 - **Purpose**: Episodic memory and task history
 - **Retention**: 30 days
@@ -261,8 +257,7 @@ Create custom workflows by adding them to the orchestrator configuration.
 
 ### 3. Security
 
-- Store sensitive data in Secret Manager
-- Use service accounts for authentication
+- Store sensitive data in - Use service accounts for authentication
 - Rotate secrets regularly
 
 ### 4. Performance
@@ -289,12 +284,10 @@ lsof -i :8000-8004
 ### Authentication Issues
 
 ```bash
-# Check GCP authentication
-gcloud auth application-default print-access-token
+# Check gcloud auth application-default print-access-token
 
 # Set project
-export GCP_PROJECT_ID=your-project-id
-```
+export ```
 
 ### Memory Backend Issues
 
@@ -302,8 +295,8 @@ export GCP_PROJECT_ID=your-project-id
 # Check Redis
 redis-cli ping
 
-# Check Firestore
-gcloud firestore operations list
+# Check MongoDB
+gcloud MongoDB
 
 # Check Qdrant
 curl http://localhost:6333/health
@@ -316,8 +309,7 @@ curl http://localhost:6333/health
 While the gateway provides a unified interface, you can also access servers directly:
 
 ```python
-# Direct Cloud Run operations
-curl -X POST http://localhost:8001/mcp/deploy \
+# Direct curl -X POST http://localhost:8001/mcp/deploy \
   -H "Content-Type: application/json" \
   -d '{"service_name": "test", "image": "gcr.io/test/image"}'
 ```
@@ -358,8 +350,7 @@ All operations are async for better concurrency.
 
 ### 1. Authentication
 
-- Service account authentication for GCP
-- API key authentication for external services
+- Service account authentication for - API key authentication for external services
 - Role-based access control
 
 ### 2. Encryption
@@ -378,8 +369,7 @@ All operations are async for better concurrency.
 
 1. **Extend functionality**: Add more tools and workflows
 2. **Improve monitoring**: Add Grafana dashboards
-3. **Scale horizontally**: Deploy to Cloud Run
-4. **Add webhooks**: Real-time notifications
+3. **Scale horizontally**: Deploy to 4. **Add webhooks**: Real-time notifications
 5. **Create plugins**: IDE integrations
 
 ## Support

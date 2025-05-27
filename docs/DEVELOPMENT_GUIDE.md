@@ -10,8 +10,7 @@ This guide covers local development setup, testing procedures, debugging techniq
 
 - Python 3.10 (exactly - not 3.11+)
 - Docker Desktop
-- Google Cloud SDK (`gcloud`)
-- Pulumi CLI
+- - Pulumi CLI
 - kubectl
 - Git
 
@@ -40,16 +39,13 @@ This guide covers local development setup, testing procedures, debugging techniq
    ```bash
    cp .env.example .env
    # Edit .env with your values:
-   # GCP_PROJECT_ID=your-project-id
-   # OPENROUTER_API_KEY=your-api-key
+   #    # OPENROUTER_API_KEY=your-api-key
    # Add other required variables
    ```
 
-5. **Configure GCP authentication**
-   ```bash
+5. **Configure    ```bash
    gcloud auth login
-   gcloud config set project $GCP_PROJECT_ID
-   gcloud auth application-default login
+   gcloud config set project $   gcloud auth application-default login
    ```
 
 ## Local Development
@@ -267,8 +263,7 @@ ps aux | grep "port-forward"
 
 #### 3. Authentication Errors
 
-**Problem**: GCP authentication failures
-
+**Problem**:
 **Solution**:
 ```bash
 # Re-authenticate
@@ -278,8 +273,7 @@ gcloud auth application-default login
 gcloud config get-value project
 
 # Set correct project
-gcloud config set project $GCP_PROJECT_ID
-```
+gcloud config set project $```
 
 ### Debugging Tools
 
@@ -365,8 +359,7 @@ gcloud config set project $GCP_PROJECT_ID
 
 1. **Never commit secrets**
    - Use `.env` files (gitignored)
-   - Use GCP Secret Manager
-   - Use Pulumi secrets
+   - Use    - Use Pulumi secrets
 
 2. **Dependency management**
    - Regularly update dependencies
@@ -442,4 +435,4 @@ See [Cursor AI Optimization Guide](CURSOR_AI_OPTIMIZATION_GUIDE.md) for AI-assis
 - [Python Style Guide](https://www.python.org/dev/peps/pep-0008/)
 - [Pulumi Best Practices](https://www.pulumi.com/docs/guides/self-hosted/components/)
 - [Kubernetes Debugging](https://kubernetes.io/docs/tasks/debug/)
-- [GCP Documentation](https://cloud.google.com/docs)
+- [

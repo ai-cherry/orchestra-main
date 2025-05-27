@@ -27,7 +27,7 @@ Our implementation separates these data types through:
 2. **Metadata Schema Validation** (`DevNoteMetadata` vs `UserDataMetadata`)
 3. **Specialized Managers** (`DevNotesManager` vs `PrivacyEnhancedMemoryManager`)
 4. **Collection Namespacing** (Environment, privacy level, tenant separation)
-5. **Firestore Security Rules** (Access controls and permissions)
+5. **MongoDB
 
 ## Deployment Strategy
 
@@ -85,26 +85,26 @@ This separation is managed by the `get_collection_name()` function in `StorageCo
 ```python
 # Development context manager (used by development tools)
 dev_notes_manager = DevNotesManager(
-    memory_manager=FirestoreMemoryAdapter(),
+    memory_manager=MongoDB
     config=dev_config
 )
 
 # Personal information manager (used by user-facing systems)
 privacy_manager = PrivacyEnhancedMemoryManager(
-    underlying_manager=FirestoreMemoryAdapter(),
+    underlying_manager=MongoDB
     config=prod_config
 )
 ```
 
 Each manager encapsulates the appropriate validation, storage, and access patterns for its data type.
 
-## Firestore Security Rules
+## MongoDB
 
-The separation is enforced at the database level through Firestore security rules:
+The separation is enforced at the database level through MongoDB
 
 ```javascript
 rules_version = '2';
-service cloud.firestore {
+service cloud.MongoDB
   match /databases/{database}/documents {
     // Development notes access - restricted to developers
     match /dev_notes_{environment}/{document=**} {
@@ -153,7 +153,7 @@ To ensure ongoing separation of concerns:
 When deploying the memory system, ensure:
 
 - [ ] Configuration uses the correct environment and privacy settings
-- [ ] Firestore security rules are deployed with proper access controls
+- [ ] MongoDB
 - [ ] Development notes are not migrated to production environments
 - [ ] Personal information is properly classified by privacy level
 - [ ] PII detection and redaction is enabled in production
@@ -192,7 +192,7 @@ On rare occasions when access to development context is needed in production:
 async def record_deployment_notes(deployment_id: str, version: str, changes: List[str]):
     """Record deployment notes for future reference."""
     dev_notes_manager = DevNotesManager(
-        memory_manager=FirestoreMemoryAdapter(),
+        memory_manager=MongoDB
         config=StorageConfig(environment="prod", enable_dev_notes=True)
     )
 
@@ -228,7 +228,7 @@ async def record_deployment_notes(deployment_id: str, version: str, changes: Lis
 async def store_user_conversation(user_id: str, session_id: str, message: str):
     """Store a user conversation message with privacy protections."""
     # Create underlying manager
-    base_manager = FirestoreMemoryAdapter(
+    base_manager = MongoDB
         project_id="my-project",
         namespace=f"tenant_{get_tenant_for_user(user_id)}"
     )

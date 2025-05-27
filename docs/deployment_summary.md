@@ -6,41 +6,33 @@ This document summarizes the deployment requirements and options for the Orchest
 
 ### Required Accounts and Access
 
-- **Google Cloud Platform Account** with access to `cherry-ai-project` project
-- **GitHub Account** with access to the repository (for CI/CD deployment)
+- **- **GitHub Account** with access to the repository (for CI/CD deployment)
 - **Docker Hub Account** (if using Docker Hub for image storage)
 
 ### Required API Keys and Credentials
 
-- **GCP Service Account Key** with appropriate permissions
-  - Current service account: `vertex-agent@cherry-ai-project.iam.gserviceaccount.com`
+- **  - Current service account: `vertex-agent@cherry-ai-project.iam.gserviceaccount.com`
   - Key must be stored at `/tmp/vertex-agent-key.json`
 - **Portkey API Key**: Present in `.env` file
 - **OpenRouter API Key**: Present in `.env` file
 
 ### Required Infrastructure
 
-- **Cloud Run** for hosting the API service
-- **Firestore** for persistent memory storage
+- **- **MongoDB
 - **Redis** for caching (currently configured for localhost in `.env`)
-- **Secret Manager** for secure credentials storage
-- **VPC Network** for secure connectivity
-- **Vertex AI Vector Search** for semantic search capabilities
-
+- **- **VPC Network** for secure connectivity
+- **
 ## Current Deployment Status
 
 ### Missing Components
 
-1. **GCP Service Account Key** - The key file is missing from `/tmp/vertex-agent-key.json`
-2. **Required Tools**:
-   - Google Cloud SDK (gcloud) is not installed
-   - Docker is not installed
+1. **2. **Required Tools**:
+   -    - Docker is not installed
 
 ### Configuration Issues
 
 1. **Redis Configuration** - Currently configured for localhost in `.env`, needs to point to a managed Redis instance for production
-2. **Security Best Practices** - API keys should be moved to Secret Manager instead of .env file
-
+2. **Security Best Practices** - API keys should be moved to
 ## Deployment Options
 
 ### 1. GitHub Actions CI/CD (Recommended for Production)
@@ -50,18 +42,14 @@ This document summarizes the deployment requirements and options for the Orchest
 - Supports both application deployment and infrastructure provisioning
 - Handles both staging and production environments
 
-### 2. Cloud Run Direct Deployment
-
+### 2.
 - Use `deploy_to_cloud_run.sh` script for quick deployment
-- Requires Docker and Google Cloud SDK
-- Builds and deploys directly to Cloud Run
-- Supports different environments (dev, stage, prod)
+- Requires Docker and - Builds and deploys directly to - Supports different environments (dev, stage, prod)
 
 ### 3. Terraform Infrastructure Deployment
 
 - Use `run_terraform.sh` or Terraform directly for infrastructure provisioning
-- Creates all required GCP resources (Cloud Run, Firestore, Redis, etc.)
-- Configures networking, security, and monitoring
+- Creates all required - Configures networking, security, and monitoring
 - Supports multiple environments through Terraform workspaces
 
 ## Deployment Steps
@@ -78,8 +66,7 @@ This document summarizes the deployment requirements and options for the Orchest
 2. Push changes to the main branch to trigger deployment
 3. Monitor deployment progress in GitHub Actions
 
-### Option 2: Direct Cloud Run Deployment
-
+### Option 2: Direct
 1. Run `./deploy_to_cloud_run.sh prod` for production
 2. Wait for the deployment to complete
 3. Test the deployed service using the provided URL
@@ -100,8 +87,7 @@ This document summarizes the deployment requirements and options for the Orchest
 
 2. **API Keys**
 
-   - Should be stored in Secret Manager for production
-   - Should be accessed securely in the application
+   - Should be stored in    - Should be accessed securely in the application
 
 3. **Network Security**
    - Use VPC networks for isolation
@@ -123,6 +109,4 @@ This document summarizes the deployment requirements and options for the Orchest
 ## Additional Resources
 
 - `docs/github_org_secrets.md` - Details on required GitHub secrets
-- `docs/cloud_run_deployment.md` - Step-by-step guide for Cloud Run deployment
-- `docs/gcp_deployment_guide.md` - Overview of GCP deployment architecture
-- `infra/README.md` - Details on Terraform infrastructure
+- `docs/cloud_run_deployment.md` - Step-by-step guide for - `docs/- `infra/README.md` - Details on Terraform infrastructure

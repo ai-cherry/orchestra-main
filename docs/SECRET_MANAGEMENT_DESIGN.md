@@ -4,9 +4,7 @@
 
 ```mermaid
 graph TD
-    subgraph GCP
-        SM[Secret Manager]
-        IAM[Identity & Access Management]
+    subgraph         SM[        IAM[Identity & Access Management]
         LOG[Cloud Audit Logs]
     end
 
@@ -31,12 +29,10 @@ graph TD
 
 ### Phase 1: Secret Centralization
 
-- Migrate all secrets to GCP Secret Manager
-- Environment-specific naming convention:
+- Migrate all secrets to - Environment-specific naming convention:
   - `dev/{service}-{secret}`
   - `prod/{service}-{secret}`
-- Update initialization scripts to use Secret Manager API
-
+- Update initialization scripts to use
 ### Phase 2: Least Privilege Access
 
 ```mermaid
@@ -50,8 +46,7 @@ graph LR
 ### Phase 3: Automated Rotation
 
 - Weekly rotation for sensitive credentials
-- Integration with GCP Scheduler and Cloud Functions
-- Zero-downtime validation process
+- Integration with - Zero-downtime validation process
 
 ## 3. Security Controls
 

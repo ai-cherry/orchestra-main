@@ -9,7 +9,7 @@
 - ✅ Created custom Grafana dashboard for SuperAGI metrics
 
 ### 2. **Backup Management**
-- ✅ Created `scripts/backup_manager.py` - Automated backup solution for DragonflyDB and Firestore
+- ✅ Created `scripts/backup_manager.py` - Automated backup solution for DragonflyDB and MongoDB
 - ✅ Supports scheduled backups, verification, and restoration
 - ✅ Integrates with GCS for backup storage
 
@@ -163,7 +163,7 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} \
   --member="serviceAccount:superagi-sa-${ENVIRONMENT}@${PROJECT_ID}.iam.gserviceaccount.com" \
   --role="roles/storage.admin"
 
-# Check Firestore export permissions
+# Check MongoDB
 gcloud projects add-iam-policy-binding ${PROJECT_ID} \
   --member="serviceAccount:superagi-sa-${ENVIRONMENT}@${PROJECT_ID}.iam.gserviceaccount.com" \
   --role="roles/datastore.importExportAdmin"
@@ -193,6 +193,5 @@ Track these KPIs to measure success:
 ## Resources
 
 - [SuperAGI Documentation](https://superagi.com/docs)
-- [Pulumi GCP Reference](https://www.pulumi.com/registry/packages/gcp/)
-- [Prometheus Best Practices](https://prometheus.io/docs/practices/)
+- [Pulumi - [Prometheus Best Practices](https://prometheus.io/docs/practices/)
 - [GKE Monitoring Guide](https://cloud.google.com/kubernetes-engine/docs/how-to/monitoring)

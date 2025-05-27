@@ -9,26 +9,23 @@ The AI Orchestra project now supports pluggable vector search backends for seman
 Two vector search backends are currently supported:
 
 1. **In-Memory Vector Search**: A simple in-memory implementation suitable for development and testing.
-2. **Vertex AI Vector Search**: A scalable, managed vector search service from Google Cloud, suitable for production use.
+2. **## Configuration
 
-## Configuration
+### MongoDB
 
-### FirestoreMemoryManagerV2
-
-The `FirestoreMemoryManagerV2` class now accepts additional parameters for vector search configuration:
+The `MongoDB
 
 ```python
-from packages.shared.src.storage.firestore.v2 import FirestoreMemoryManagerV2
+from packages.shared.src.storage.MongoDB
 
 # Using in-memory vector search (default)
-memory_manager = FirestoreMemoryManagerV2(
+memory_manager = MongoDB
     project_id="your-project-id",
     namespace="your-namespace",
     vector_search_provider="in_memory"
 )
 
-# Using Vertex AI Vector Search
-memory_manager = FirestoreMemoryManagerV2(
+# Using memory_manager = MongoDB
     project_id="your-project-id",
     namespace="your-namespace",
     vector_search_provider="vertex",
@@ -57,8 +54,7 @@ in_memory_search = VectorSearchFactory.create_vector_search(
     config={"dimensions": 768}
 )
 
-# Create Vertex AI Vector Search
-vertex_search = VectorSearchFactory.create_vector_search(
+# Create vertex_search = VectorSearchFactory.create_vector_search(
     provider="vertex",
     config={
         "project_id": "your-project-id",
@@ -111,14 +107,13 @@ for item in results:
 
 ## Migration
 
-To migrate existing embeddings from Firestore to a vector search backend, use the provided migration script:
+To migrate existing embeddings from MongoDB
 
 ```bash
 # Migrate to in-memory vector search (for testing)
 python scripts/migrate_embeddings_to_vector_search.py --namespace your-namespace --provider in_memory
 
-# Migrate to Vertex AI Vector Search
-python scripts/migrate_embeddings_to_vector_search.py \
+# Migrate to python scripts/migrate_embeddings_to_vector_search.py \
     --namespace your-namespace \
     --provider vertex \
     --project-id your-project-id \
@@ -136,17 +131,12 @@ The migration script supports the following options:
 - `--provider`: Vector search provider to use (default: "in_memory")
 - `--dry-run`: Run without making changes
 
-For Vertex AI Vector Search:
-
-- `--project-id`: Google Cloud project ID
-- `--location`: Google Cloud region (default: "us-west4")
-- `--index-endpoint-id`: Vector Search index endpoint ID
+For
+- `--project-id`: - `--location`: - `--index-endpoint-id`: Vector Search index endpoint ID
 - `--index-id`: Vector Search index ID
 
-## Setting Up Vertex AI Vector Search
-
-To use Vertex AI Vector Search, you need to set up an index and index endpoint:
-
+## Setting Up
+To use
 1. **Create an Index**:
 
 ```bash
@@ -183,20 +173,19 @@ gcloud ai index-endpoints deploy-index \
 
 - **In-Memory Vector Search**: Suitable for small datasets (up to a few thousand embeddings). All embeddings are loaded into memory, which can be memory-intensive for large datasets.
 
-- **Vertex AI Vector Search**: Highly scalable and optimized for large datasets. Supports efficient approximate nearest neighbor (ANN) search, which is much faster than exact search for large datasets.
-
+- **
 - **Batch Operations**: When adding multiple memory items with embeddings, consider using batch operations to reduce the number of API calls.
 
-- **Connection Pooling**: The system uses connection pooling for both Firestore and Vector Search to improve performance and reduce resource usage.
+- **Connection Pooling**: The system uses connection pooling for both MongoDB
 
 ## Troubleshooting
 
 ### Vector Search Not Available
 
-If vector search is not available, the system will fall back to the original implementation using Firestore. Check the logs for error messages:
+If vector search is not available, the system will fall back to the original implementation using MongoDB
 
 ```
-Vector search not available, falling back to direct Firestore search
+Vector search not available, falling back to direct MongoDB
 ```
 
 ### Migration Failures

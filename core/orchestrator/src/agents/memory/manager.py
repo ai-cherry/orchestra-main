@@ -2,7 +2,7 @@
 Memory Management System for AI Orchestration System.
 
 This module provides a unified interface for managing different types of memory
-storage (short-term, long-term, semantic) across various backends (Redis, Firestore,
+storage (short-term, long-term, semantic) across various backends (Redis, MongoDB,
 Vertex AI Vector Search, etc.).
 """
 
@@ -190,10 +190,10 @@ class MemoryStore(Generic[T], ABC):
             if hasattr(self._stats, key):
                 setattr(self._stats, key, value)
 
-    def _initialize_firestore(self):
-        """Initialize Firestore client for memory persistence."""
+    def _initialize_mongodb(self):
+        """Initialize MongoDB client for memory persistence."""
         try:
-            # Use MongoDB instead of Firestore
+            # Use MongoDB instead of MongoDB
             from .mongodb_manager import MongoDBMemoryManager
 
             self.db = MongoDBMemoryManager()
@@ -422,48 +422,48 @@ class RedisMemoryStore(MemoryStore):
             raise ConnectionError(f"Redis clear failed: {e}")
 
 
-class FirestoreMemoryStore(MemoryStore):
+class MongoDBMemoryStore(MemoryStore):
     """
-    Firestore-based memory store implementation.
+    MongoDB-based memory store implementation.
 
-    This class implements the MemoryStore interface using Firestore as the
+    This class implements the MemoryStore interface using MongoDB as the
     backend storage system, making it suitable for long-term memory.
     """
 
     async def initialize(self) -> None:
-        """Initialize the Firestore memory store."""
+        """Initialize the MongoDB memory store."""
         try:
 
-            # Extract Firestore configuration
+            # Extract MongoDB configuration
             collection = self.config.get("collection", "memory")
             project = self.config.get("project", "cherry-ai-project")
 
-            # Create Firestore client
-            self._client = firestore.AsyncClient(project=project)
+            # Create MongoDB client
+            self._client = mongodb.AsyncClient(project=project)
             self._collection = self._client.collection(collection)
 
             # Set initialized flag
             self._initialized = True
 
-            logger.info(f"Firestore memory store initialized: {project}/{collection}")
+            logger.info(f"MongoDB memory store initialized: {project}/{collection}")
         except ImportError:
             logger.error(
-                "Firestore package not installed. Install with: pip install google-cloud-firestore"
+                "MongoDB package not installed. Install with: pip install google-cloud-mongodb"
             )
             raise
         except Exception as e:
-            logger.error(f"Failed to initialize Firestore memory store: {e}")
-            raise ConnectionError(f"Firestore connection failed: {e}")
+            logger.error(f"Failed to initialize MongoDB memory store: {e}")
+            raise ConnectionError(f"MongoDB connection failed: {e}")
 
     async def close(self) -> None:
-        """Close the Firestore memory store."""
+        """Close the MongoDB memory store."""
         if self._client:
             await self._client.close()
             self._initialized = False
-            logger.debug("Firestore memory store closed")
+            logger.debug("MongoDB memory store closed")
 
     async def store(self, item: MemoryItem) -> str:
-        """Store a memory item in Firestore."""
+        """Store a memory item in MongoDB."""
         if not self._initialized:
             await self.initialize()
 
@@ -476,15 +476,15 @@ class FirestoreMemoryStore(MemoryStore):
             # Prepare item for storage
             item_dict = item.dict()
 
-            # Convert datetime to Firestore timestamp
-            from google.cloud.firestore import SERVER_TIMESTAMP
+            # Convert datetime to MongoDB timestamp
+            from google.cloud.mongodb import SERVER_TIMESTAMP
 
             if item_dict.get("timestamp"):
                 item_dict["timestamp"] = item_dict["timestamp"]
             else:
                 item_dict["timestamp"] = SERVER_TIMESTAMP
 
-            # Store in Firestore
+            # Store in MongoDB
             doc_ref = self._collection.document(item_id)
             await doc_ref.set(item_dict)
 
@@ -503,11 +503,11 @@ class FirestoreMemoryStore(MemoryStore):
 
             return item_id
         except Exception as e:
-            logger.error(f"Failed to store item in Firestore: {e}")
-            raise ConnectionError(f"Firestore storage failed: {e}")
+            logger.error(f"Failed to store item in MongoDB: {e}")
+            raise ConnectionError(f"MongoDB storage failed: {e}")
 
     async def retrieve(self, item_id: str) -> Optional[MemoryItem]:
-        """Retrieve a memory item from Firestore."""
+        """Retrieve a memory item from MongoDB."""
         if not self._initialized:
             await self.initialize()
 
@@ -524,7 +524,7 @@ class FirestoreMemoryStore(MemoryStore):
             # Convert to MemoryItem
             item_dict = doc.to_dict()
 
-            # Convert Firestore timestamp to datetime
+            # Convert MongoDB timestamp to datetime
             if "timestamp" in item_dict and item_dict["timestamp"]:
                 item_dict["timestamp"] = item_dict["timestamp"].isoformat()
 
@@ -536,11 +536,11 @@ class FirestoreMemoryStore(MemoryStore):
 
             return item
         except Exception as e:
-            logger.error(f"Failed to retrieve item from Firestore: {e}")
-            raise ConnectionError(f"Firestore retrieval failed: {e}")
+            logger.error(f"Failed to retrieve item from MongoDB: {e}")
+            raise ConnectionError(f"MongoDB retrieval failed: {e}")
 
     async def query(self, query: MemoryQuery) -> List[MemoryItem]:
-        """Query for memory items in Firestore."""
+        """Query for memory items in MongoDB."""
         if not self._initialized:
             await self.initialize()
 
@@ -571,13 +571,13 @@ class FirestoreMemoryStore(MemoryStore):
             for doc in docs:
                 item_dict = doc.to_dict()
 
-                # Convert Firestore timestamp to datetime
+                # Convert MongoDB timestamp to datetime
                 if "timestamp" in item_dict and item_dict["timestamp"]:
                     item_dict["timestamp"] = item_dict["timestamp"].isoformat()
 
                 item = MemoryItem.parse_obj(item_dict)
 
-                # Apply text filter (Firestore doesn't support full-text search natively)
+                # Apply text filter (MongoDB doesn't support full-text search natively)
                 if query.text and query.text.lower() not in item.text_content.lower():
                     continue
 
@@ -589,11 +589,11 @@ class FirestoreMemoryStore(MemoryStore):
 
             return items
         except Exception as e:
-            logger.error(f"Failed to query items from Firestore: {e}")
-            raise ConnectionError(f"Firestore query failed: {e}")
+            logger.error(f"Failed to query items from MongoDB: {e}")
+            raise ConnectionError(f"MongoDB query failed: {e}")
 
     async def delete(self, item_id: str) -> bool:
-        """Delete a memory item from Firestore."""
+        """Delete a memory item from MongoDB."""
         if not self._initialized:
             await self.initialize()
 
@@ -618,11 +618,11 @@ class FirestoreMemoryStore(MemoryStore):
 
             return True
         except Exception as e:
-            logger.error(f"Failed to delete item from Firestore: {e}")
-            raise ConnectionError(f"Firestore deletion failed: {e}")
+            logger.error(f"Failed to delete item from MongoDB: {e}")
+            raise ConnectionError(f"MongoDB deletion failed: {e}")
 
     async def clear(self) -> int:
-        """Clear all memory items from Firestore."""
+        """Clear all memory items from MongoDB."""
         if not self._initialized:
             await self.initialize()
 
@@ -644,5 +644,5 @@ class FirestoreMemoryStore(MemoryStore):
 
             return count
         except Exception as e:
-            logger.error(f"Failed to clear items from Firestore: {e}")
-            raise ConnectionError(f"Firestore clear failed: {e}")
+            logger.error(f"Failed to clear items from MongoDB: {e}")
+            raise ConnectionError(f"MongoDB clear failed: {e}")

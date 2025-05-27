@@ -28,8 +28,7 @@ bash scripts/validate_python_env.sh
 - **Python:** 3.11+ (enforced everywhere)
 - **Poetry:** 1.8+ (dependency management)
 - **Docker Compose:** v2+
-- **GCP SDK:** For deployment and secret management
-
+- **
 ---
 
 ## Developer Workflow

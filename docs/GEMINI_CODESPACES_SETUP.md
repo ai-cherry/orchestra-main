@@ -17,8 +17,7 @@ The `.devcontainer/devcontainer.json` file has been configured to automatically:
    - Enable context-aware code completion
    - Enable Gemini-powered code review
 
-3. Set up Google Cloud authentication:
-   - Authenticate using the service account key
+3. Set up    - Authenticate using the service account key
    - Set the active project to `cherry-ai-project`
 
 When you open the project in Codespaces, these configurations are automatically applied.
@@ -34,11 +33,9 @@ If you need to manually set up or refresh the configuration, you can run the pro
 This script will:
 
 - Install the required VS Code extensions
-- Check for Google Cloud authentication
-- Set the active project to `cherry-ai-project`
+- Check for - Set the active project to `cherry-ai-project`
 - Configure VS Code settings for Gemini Code Assist
-- Enable required GCP APIs
-
+- Enable required
 ## Using Gemini Code Assist
 
 Once configured, you can use Gemini Code Assist in your development workflow:

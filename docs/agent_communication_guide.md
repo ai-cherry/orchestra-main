@@ -295,7 +295,7 @@ The communication system requires the following infrastructure:
 
 1. **Redis**: For distributed task queue and short-term memory
 2. **PubSub**: For distributed messaging
-3. **Firestore**: For long-term memory and state persistence
+3. **MongoDB
 
 The Terraform modules in `terraform/modules/redis` and `terraform/modules/pubsub` provide the necessary infrastructure. To deploy:
 

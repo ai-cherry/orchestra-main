@@ -55,27 +55,17 @@ Example usage in a script:
 source "$(dirname "$0")/load_env.sh"
 
 # Get configuration values with fallbacks
-PROJECT_ID=$(get_config GCP_PROJECT_ID "cherry-ai-project")
-REGION=$(get_config GCP_REGION "us-central1")
-```
+PROJECT_ID=$(get_config REGION=$(get_config ```
 
 ## Configuration Categories
 
-### GCP Project Configuration
-
-- `GCP_PROJECT_ID`: Google Cloud project ID
-- `GCP_REGION`: Default Google Cloud region
-- `GCP_ZONE`: Default Google Cloud zone
-- `GCP_SERVICE_ACCOUNT`: Service account email
-
+###
+- `
 ### Workload Identity Federation
 
-- `GCP_WIF_PROVIDER`: Workload Identity Federation provider path
-
-### Cloud Run Configuration
-
-- `CLOUD_RUN_SERVICE_NAME`: Cloud Run service name
-- `CLOUD_RUN_MIN_INSTANCES`: Minimum number of instances
+- `
+###
+- `CLOUD_RUN_SERVICE_NAME`: - `CLOUD_RUN_MIN_INSTANCES`: Minimum number of instances
 - `CLOUD_RUN_MAX_INSTANCES`: Maximum number of instances
 - `CLOUD_RUN_MEMORY`: Memory allocation
 - `CLOUD_RUN_CPU`: CPU allocation
@@ -93,11 +83,8 @@ REGION=$(get_config GCP_REGION "us-central1")
 - `WORKSTATION_NAME`: Cloud Workstation instance name
 - `WORKSTATION_MACHINE_TYPE`: Machine type for Cloud Workstation
 
-### Vertex AI Workbench Configuration
-
-- `NOTEBOOK_NAME`: Vertex AI Workbench notebook name
-- `NOTEBOOK_MACHINE_TYPE`: Machine type for Vertex AI Workbench
-
+###
+- `NOTEBOOK_NAME`: - `NOTEBOOK_MACHINE_TYPE`: Machine type for
 ### Repository Configuration
 
 - `REPO_URL`: GitHub repository URL
@@ -122,9 +109,7 @@ Example workflow step:
 - name: Create .env file
   run: |
     cat > .env << EOF
-    GCP_PROJECT_ID=${{ env.PROJECT_ID }}
-    GCP_REGION=${{ env.REGION }}
-    # Additional configuration...
+            # Additional configuration...
     EOF
 ```
 
@@ -134,8 +119,7 @@ Example workflow step:
 2. **Use environment variables** for all configuration
 3. **Provide sensible defaults** for all configuration values
 4. **Document all configuration options** in this file
-5. **Keep sensitive information** in GitHub secrets or GCP Secret Manager
-6. **Use different configurations** for different environments
+5. **Keep sensitive information** in GitHub secrets or 6. **Use different configurations** for different environments
 
 ## Migration Guide
 

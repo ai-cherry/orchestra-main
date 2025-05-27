@@ -20,22 +20,18 @@ This guide provides a comprehensive overview of the infrastructure optimizations
 
 The AI Orchestra infrastructure has been optimized to improve security, scalability, maintainability, and developer experience. The changes include:
 
-1. **Security Improvements**: Removed hardcoded credentials, implemented Secret Manager integration, and set up Workload Identity Federation.
-2. **Container Orchestration**: Optimized Docker builds with multi-stage builds and resource limits.
+1. **Security Improvements**: Removed hardcoded credentials, implemented 2. **Container Orchestration**: Optimized Docker builds with multi-stage builds and resource limits.
 3. **Development Environment**: Enhanced setup scripts and configuration for consistent environments.
 4. **Dependency Management**: Improved Poetry configuration and dependency organization.
 5. **Infrastructure as Code**: Modularized Terraform configuration with variables and best practices.
 6. **CI/CD Pipeline**: Enhanced GitHub Actions workflow with proper secret management and deployment verification.
-7. **Cloud Deployment**: Optimized Cloud Run configuration for better performance and scalability.
-
+7. **Cloud Deployment**: Optimized
 ## Security Improvements
 
 ### Credential Management
 
-We've implemented a comprehensive credential management system using Google Cloud Secret Manager:
-
-- **Secret Manager Integration**: All sensitive credentials are stored in Secret Manager.
-- **Service Account Management**: Service accounts with least privilege for different components.
+We've implemented a comprehensive credential management system using
+- **- **Service Account Management**: Service accounts with least privilege for different components.
 - **Workload Identity Federation**: Secure authentication for GitHub Actions without long-lived credentials.
 - **Credential Rotation**: Support for regular credential rotation.
 
@@ -109,8 +105,7 @@ We've modularized the Terraform configuration for better maintainability and reu
 
 - `terraform/environments/dev/main.tf`: Main Terraform configuration
 - `terraform/environments/dev/variables.tf`: Variable definitions
-- `terraform/modules/cloud-run/main.tf`: Cloud Run module
-- `terraform/modules/secure-credentials/main.tf`: Secure credentials module
+- `terraform/modules/cloud-run/main.tf`: - `terraform/modules/secure-credentials/main.tf`: Secure credentials module
 
 ## CI/CD Pipeline
 
@@ -129,35 +124,26 @@ We've enhanced the GitHub Actions workflow for better security, reliability, and
 
 ## Secret Management
 
-### Secret Manager Integration
-
-We've integrated Google Cloud Secret Manager for secure credential management:
-
-- **Secret Storage**: All sensitive credentials stored in Secret Manager.
-- **Access Control**: Fine-grained access control for secrets.
+###
+We've integrated
+- **Secret Storage**: All sensitive credentials stored in - **Access Control**: Fine-grained access control for secrets.
 - **Environment Isolation**: Separate secrets for different environments.
 - **Rotation**: Support for regular credential rotation.
 
 ### Implementation Files
 
-- `setup_secure_credentials.sh`: Script to set up Secret Manager
-- `GCP_SECRET_MANAGEMENT_KEY`: Use this key for secure credential management.
-
+- `setup_secure_credentials.sh`: Script to set up - `
 ## Cloud Deployment
 
-### Cloud Run Optimization
-
-We've optimized the Cloud Run configuration for better performance, scalability, and security:
-
+###
+We've optimized the
 - **Resource Allocation**: Appropriate CPU and memory allocation.
 - **Scaling Configuration**: Proper min and max instances for different environments.
 - **VPC Connectivity**: Secure VPC connectivity for private services.
-- **Secret Integration**: Secure integration with Secret Manager.
-
+- **Secret Integration**: Secure integration with
 ### Implementation Files
 
-- `terraform/modules/cloud-run/main.tf`: Cloud Run module
-
+- `terraform/modules/cloud-run/main.tf`:
 ## Implementation Steps
 
 Follow these steps to implement the infrastructure optimizations:

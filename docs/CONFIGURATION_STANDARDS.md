@@ -17,26 +17,19 @@ This document outlines the standards and best practices for configuration manage
 
 1. **Dual-mode Support**:
 
-   - Environment variables are supported via both `.env` files and Secret Manager
-   - Environment variables take precedence over Secret Manager (for backward compatibility)
-
+   - Environment variables are supported via both `.env` files and    - Environment variables take precedence over
 2. **Placement Guidelines**:
 
    - `.env` file: Development-only variables, non-sensitive configuration
-   - Secret Manager: Production credentials, API keys, sensitive information
-
+   -
 3. **Type Separation**:
    - Configuration values: `.env` file or YAML configuration
-   - Secrets: Should be properly secured in Secret Manager (redundantly in `.env` for development)
-
+   - Secrets: Should be properly secured in
 ### Standard Environment Variables
 
-| Category        | Environment Variable            | Terraform/Secret Manager Name | Description                                         |
-| --------------- | ------------------------------- | ----------------------------- | --------------------------------------------------- |
+| Category        | Environment Variable            | Terraform/| --------------- | ------------------------------- | ----------------------------- | --------------------------------------------------- |
 | **Environment** | `ENVIRONMENT`                   | `env`                         | Environment name (development, staging, production) |
-| **GCP**         | `GCP_PROJECT_ID`                | `project_id`                  | Google Cloud Project ID                             |
-|                 | `GCP_LOCATION`                  | `region`                      | Primary GCP region                                  |
-| **Database**    | `POSTGRES_HOST`                 | N/A                           | PostgreSQL host address                             |
+| **| **Database**    | `POSTGRES_HOST`                 | N/A                           | PostgreSQL host address                             |
 |                 | `POSTGRES_DATABASE`             | N/A                           | PostgreSQL database name                            |
 |                 | `POSTGRES_USER`                 | N/A                           | PostgreSQL username                                 |
 |                 | `POSTGRES_PASSWORD_SECRET_NAME` | `postgres-password-[env]`     | Secret name for PostgreSQL password                 |
@@ -51,8 +44,7 @@ This document outlines the standards and best practices for configuration manage
 ### Dual Access Pattern
 
 ```python
-# Using the new Secret Manager utility
-from config.secret_manager import get_secret, secrets
+# Using the new from config.secret_manager import get_secret, secrets
 
 # Option 1: Function call
 api_key = get_secret("openai-api-key")
@@ -67,14 +59,11 @@ api_key = secrets.get("openai-api-key", "default-value")
 ### Adding New Secrets
 
 1. **Add to `.env`** for development (temporarily)
-2. **Add to `add_secrets_to_manager.sh`** for migration to Secret Manager
-3. **Add to `secrets.tf`** for Terraform management
-4. **Update code** to use the Secret Manager utility
-
+2. **Add to `add_secrets_to_manager.sh`** for migration to 3. **Add to `secrets.tf`** for Terraform management
+4. **Update code** to use the
 ### Secret Naming Convention
 
-- **Secret Manager**: `service-name-purpose-env`
-
+- **
   - Example: `openai-api-key-production`
 
 - **Environment Variable**: `SERVICE_NAME_PURPOSE`
@@ -98,11 +87,9 @@ api_key = secrets.get("openai-api-key", "default-value")
 ### Resource Organization
 
 - `main.tf`: Core infrastructure setup
-- `cloudrun.tf`: Cloud Run services configuration
-- `cloudsql.tf`: Database configuration
+- `cloudrun.tf`: - `cloudsql.tf`: Database configuration
 - `network.tf`: Networking configuration
-- `secrets.tf`: Secret Manager resources
-
+- `secrets.tf`:
 ### Secret Integration
 
 Terraform integrates secrets in two ways:
@@ -117,8 +104,7 @@ Terraform integrates secrets in two ways:
    }
    ```
 
-2. **Resource Access in Cloud Run**:
-   ```terraform
+2. **Resource Access in    ```terraform
    env {
      name = "OPENAI_API_KEY"
      value_source {
@@ -146,23 +132,19 @@ Terraform integrates secrets in two ways:
 - **YAML**: `lower_snake_case` for keys
 - **Environment Variables**: `UPPER_SNAKE_CASE`
 - **Terraform Resources**: `lower_snake_case`
-- **Secret Manager**: `hyphenated-lower-case`
-
+- **
 ## Migration Guide
 
-### Step 1: Setup Secret Manager Integration
-
+### Step 1: Setup
 1. Add the `secret_manager.py` utility to your project
 2. Ensure `google-cloud-secret-manager` is in your requirements
 
-### Step 2: Copy Secrets to Secret Manager
-
+### Step 2: Copy Secrets to
 ```bash
 # Make the script executable
 chmod +x add_secrets_to_manager.sh
 
-# Run the script (requires GCP authentication)
-./add_secrets_to_manager.sh
+# Run the script (requires ./add_secrets_to_manager.sh
 ```
 
 ### Step 3: Update Terraform
@@ -178,8 +160,7 @@ terraform init
 terraform apply
 ```
 
-### Step 4: Update Code to Use Secret Manager
-
+### Step 4: Update Code to Use
 ```python
 # Old way
 api_key = os.environ.get("OPENAI_API_KEY")

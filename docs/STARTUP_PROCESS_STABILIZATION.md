@@ -95,8 +95,7 @@ This document outlines the steps taken and recommendations for stabilizing the A
         with:
           terraform_version: 1.11.3
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+      - name: Authenticate to         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER_ID }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
@@ -159,13 +158,10 @@ This document outlines the steps taken and recommendations for stabilizing the A
           bandit -r . -x tests/
   ```
 
-## 3. GCP Integration Improvements
-
+## 3.
 ### Completed Changes
 
-- **Updated GCP API Enablement**: Modified `scripts/enable_gcp_apis.py` to use Google Cloud Python client library instead of gcloud CLI
-
-### Additional Recommendations
+- **Updated ### Additional Recommendations
 
 - **Use Terraform for API Enablement**: Move API enablement to Terraform:
 
@@ -180,7 +176,7 @@ This document outlines the steps taken and recommendations for stabilizing the A
       "run.googleapis.com",
       "secretmanager.googleapis.com",
       "aiplatform.googleapis.com",
-      "firestore.googleapis.com",
+      "MongoDB
       "redis.googleapis.com",
       "cloudbuild.googleapis.com",
       "iam.googleapis.com",
@@ -282,17 +278,17 @@ class RedisShortTermMemory:
         return json.loads(data) if data else None
 ```
 
-### Mid-term Memory (Firestore)
+### Mid-term Memory (MongoDB
 
-- Use Firestore for structured data that needs to persist across sessions
+- Use MongoDB
 - Store conversation summaries, agent knowledge, and user preferences
 - Organize by collections for different data types
 
 ```python
-# Example Firestore memory implementation
-class FirestoreMidTermMemory:
-    def __init__(self, firestore_client):
-        self.db = firestore_client
+# Example MongoDB
+class MongoDB
+    def __init__(self, MongoDB
+        self.db = MongoDB
 
     async def store(self, collection, document_id, data):
         doc_ref = self.db.collection(collection).document(document_id)
@@ -306,8 +302,7 @@ class FirestoreMidTermMemory:
 
 ### Long-term Memory (Vector Search)
 
-- Use Vertex AI Vector Search for semantic search capabilities
-- Store embeddings of important information for retrieval by similarity
+- Use - Store embeddings of important information for retrieval by similarity
 - Index by conversation, topic, or agent
 
 ```python
@@ -371,4 +366,4 @@ class LayeredMemoryManager:
 
 4. **Implement Memory Architecture**: Start implementing the layered memory architecture using the recommended approach.
 
-5. **Move to Terraform**: Gradually move manual GCP setup to Terraform for better infrastructure as code practices.
+5. **Move to Terraform**: Gradually move manual

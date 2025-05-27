@@ -2,8 +2,7 @@
 
 ## 🎯 Overview
 
-Orchestra AI now uses **Pulumi as the single source of truth** for all secrets. This guide documents the complete setup after migrating from GitHub Secrets and Google Secret Manager.
-
+Orchestra AI now uses **Pulumi as the single source of truth** for all secrets. This guide documents the complete setup after migrating from GitHub Secrets and Google
 ## 🏗️ Architecture
 
 ```
@@ -27,8 +26,7 @@ Orchestra AI now uses **Pulumi as the single source of truth** for all secrets. 
 
 ## 📦 What Was Migrated
 
-### From Google Secret Manager (51 secrets found):
-- All LLM API keys (OpenAI, Anthropic, Perplexity, etc.)
+### From Google - All LLM API keys (OpenAI, Anthropic, Perplexity, etc.)
 - Service credentials (MongoDB, Weaviate, DragonflyDB)
 - Integration tokens (Slack, HuggingFace, Docker, etc.)
 - Platform keys (Pulumi, GitHub PATs)
@@ -105,8 +103,7 @@ source .env
 
 ### 1. **Comprehensive Migration Script**
 `scripts/migrate_all_secrets_to_pulumi.py`
-- Collects secrets from GitHub, GCP, and local configs
-- Automatically stores them in Pulumi
+- Collects secrets from GitHub, - Automatically stores them in Pulumi
 - Generates migration report
 
 ### 2. **Environment Generator**
@@ -232,4 +229,4 @@ Your secrets are now:
 - ✅ Easy to rotate
 - ✅ Simple to use locally
 
-No more juggling between GitHub Secrets, GCP Secret Manager, and local files!
+No more juggling between GitHub Secrets,

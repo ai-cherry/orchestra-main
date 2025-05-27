@@ -1,7 +1,7 @@
 """
 Layered Memory Manager for AI Orchestra
 Provides a unified interface for managing short-term, mid-term, and long-term memory
-with semantic search capabilities using Redis, Firestore, and Vertex AI Vector Search.
+with semantic search capabilities using Redis, MongoDB, and Vertex AI Vector Search.
 """
 
 import logging
@@ -27,8 +27,8 @@ class LayeredMemoryManager:
 
     Memory Layers:
     - Short-term: Redis (fast, ephemeral, high-frequency access)
-    - Mid-term: Firestore (persistent, structured, moderate access)
-    - Long-term: Firestore + Vector Search (persistent, semantic search)
+    - Mid-term: MongoDB (persistent, structured, moderate access)
+    - Long-term: MongoDB + Vector Search (persistent, semantic search)
     """
 
     def __init__(
@@ -55,8 +55,8 @@ class LayeredMemoryManager:
         )
         self.redis_pool = None  # Will be initialized in connect()
 
-        # Initialize Firestore for mid-term and long-term memory
-        self.firestore_client = firestore.Client(project=self.project_id)
+        # Initialize MongoDB for mid-term and long-term memory
+        self.mongodb_client = mongodb.Client(project=self.project_id)
 
         # Initialize Vector Search for semantic search
         self.vector_index_endpoint = vector_index_endpoint
@@ -123,16 +123,16 @@ class LayeredMemoryManager:
             await self._store_in_redis(memory_entry)
 
         elif memory_type == MemoryType.MID_TERM:
-            # Store in Firestore with mid-term expiration
-            self._store_in_firestore(memory_entry, self.mid_term_expiry)
+            # Store in MongoDB with mid-term expiration
+            self._store_in_mongodb(memory_entry, self.mid_term_expiry)
 
         elif memory_type == MemoryType.LONG_TERM:
             # Ensure embedding is provided for long-term memory
             if not embedding:
                 raise ValueError("Embedding is required for LONG_TERM memory")
 
-            # Store in Firestore without expiration
-            self._store_in_firestore(memory_entry)
+            # Store in MongoDB without expiration
+            self._store_in_mongodb(memory_entry)
 
             # Store embedding in Vector Search if initialized
             if self.vector_search_initialized:
@@ -155,8 +155,8 @@ class LayeredMemoryManager:
         if memory:
             return memory
 
-        # Check Firestore
-        memory = self._retrieve_from_firestore(memory_id)
+        # Check MongoDB
+        memory = self._retrieve_from_mongodb(memory_id)
         return memory
 
     async def search_memory(
@@ -195,9 +195,9 @@ class LayeredMemoryManager:
             )
             results.extend(short_term_results)
 
-        # Search mid-term memory in Firestore
+        # Search mid-term memory in MongoDB
         if MemoryType.MID_TERM in memory_types:
-            mid_term_results = self._search_in_firestore(
+            mid_term_results = self._search_in_mongodb(
                 query, MemoryType.MID_TERM, limit, metadata_filter
             )
             results.extend(mid_term_results)
@@ -211,8 +211,8 @@ class LayeredMemoryManager:
                 )
                 results.extend(long_term_results)
             else:
-                # Fall back to text search in Firestore
-                long_term_results = self._search_in_firestore(
+                # Fall back to text search in MongoDB
+                long_term_results = self._search_in_mongodb(
                     query, MemoryType.LONG_TERM, limit, metadata_filter
                 )
                 results.extend(long_term_results)
@@ -234,15 +234,15 @@ class LayeredMemoryManager:
         # Try to delete from Redis
         redis_deleted = await self._delete_from_redis(memory_id)
 
-        # Try to delete from Firestore
-        firestore_deleted = self._delete_from_firestore(memory_id)
+        # Try to delete from MongoDB
+        mongodb_deleted = self._delete_from_mongodb(memory_id)
 
         # If vector search is initialized, try to delete from there too
         vector_deleted = False
         if self.vector_search_initialized:
             vector_deleted = await self._delete_from_vector_search(memory_id)
 
-        return redis_deleted or firestore_deleted or vector_deleted
+        return redis_deleted or mongodb_deleted or vector_deleted
 
     # Private methods for Redis operations
 
@@ -343,33 +343,31 @@ class LayeredMemoryManager:
 
         return True
 
-    # Private methods for Firestore operations
+    # Private methods for MongoDB operations
 
-    def _store_in_firestore(
+    def _store_in_mongodb(
         self, memory: MemoryEntry, ttl_seconds: Optional[int] = None
     ) -> None:
-        """Store a memory in Firestore with optional TTL."""
-        # Convert memory to dict for Firestore
+        """Store a memory in MongoDB with optional TTL."""
+        # Convert memory to dict for MongoDB
         memory_dict = memory.model_dump(exclude={"embedding"})
 
         # Add TTL if provided
         if ttl_seconds:
             memory_dict["expiry_time"] = datetime.utcnow().timestamp() + ttl_seconds
 
-        # Store in Firestore
-        self.firestore_client.collection("memories").document(memory.id).set(
-            memory_dict
-        )
+        # Store in MongoDB
+        self.mongodb_client.collection("memories").document(memory.id).set(memory_dict)
 
-    def _retrieve_from_firestore(self, memory_id: str) -> Optional[MemoryEntry]:
-        """Retrieve a memory from Firestore."""
-        doc_ref = self.firestore_client.collection("memories").document(memory_id)
+    def _retrieve_from_mongodb(self, memory_id: str) -> Optional[MemoryEntry]:
+        """Retrieve a memory from MongoDB."""
+        doc_ref = self.mongodb_client.collection("memories").document(memory_id)
         doc = doc_ref.get()
 
         if not doc.exists:
             return None
 
-        # Convert Firestore document to MemoryEntry
+        # Convert MongoDB document to MemoryEntry
         memory_data = doc.to_dict()
 
         # Check if memory has expired
@@ -384,7 +382,7 @@ class LayeredMemoryManager:
 
         return MemoryEntry(**memory_data)
 
-    def _search_in_firestore(
+    def _search_in_mongodb(
         self,
         query: str,
         memory_type: MemoryType,
@@ -392,26 +390,26 @@ class LayeredMemoryManager:
         metadata_filter: Optional[Dict[str, Any]] = None,
     ) -> List[MemorySearchResult]:
         """
-        Search for memories in Firestore.
+        Search for memories in MongoDB.
         This is a simple implementation that filters by memory_type and agent_id.
         """
         results = []
 
         # Build query
-        firestore_query = (
-            self.firestore_client.collection("memories")
+        mongodb_query = (
+            self.mongodb_client.collection("memories")
             .where("memory_type", "==", memory_type.value)
             .where("agent_id", "==", self.agent_id)
         )
 
         # Add conversation_id filter if provided
         if self.conversation_id:
-            firestore_query = firestore_query.where(
+            mongodb_query = mongodb_query.where(
                 "conversation_id", "==", self.conversation_id
             )
 
         # Execute query
-        docs = firestore_query.limit(
+        docs = mongodb_query.limit(
             limit * 2
         ).stream()  # Get more than needed for filtering
 
@@ -454,9 +452,9 @@ class LayeredMemoryManager:
         results.sort(key=lambda x: x.relevance, reverse=True)
         return results[:limit]
 
-    def _delete_from_firestore(self, memory_id: str) -> bool:
-        """Delete a memory from Firestore."""
-        doc_ref = self.firestore_client.collection("memories").document(memory_id)
+    def _delete_from_mongodb(self, memory_id: str) -> bool:
+        """Delete a memory from MongoDB."""
+        doc_ref = self.mongodb_client.collection("memories").document(memory_id)
         doc = doc_ref.get()
 
         if not doc.exists:
@@ -512,8 +510,8 @@ class LayeredMemoryManager:
             memory_id = neighbor.id
             distance = neighbor.distance
 
-            # Retrieve the full memory from Firestore
-            memory = self._retrieve_from_firestore(memory_id)
+            # Retrieve the full memory from MongoDB
+            memory = self._retrieve_from_mongodb(memory_id)
             if not memory:
                 continue
 

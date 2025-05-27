@@ -18,8 +18,7 @@ The AI Orchestra secure credential management system provides a robust, scalable
 
 Key features:
 
-- Secure storage of credentials in Google Cloud Secret Manager
-- Service account management with least privilege
+- Secure storage of credentials in - Service account management with least privilege
 - Workload Identity Federation for GitHub Actions
 - Automatic credential rotation
 - Environment-specific credentials (dev, staging, prod)
@@ -33,8 +32,7 @@ The system consists of the following components:
 
 - `secure_credential_manager.sh`: CLI tool for credential management
 
-  - Get secrets from Secret Manager
-  - Create and update secrets
+  - Get secrets from   - Create and update secrets
   - Rotate service account keys
   - Set up Workload Identity Federation
 
@@ -43,15 +41,13 @@ The system consists of the following components:
   - Set up Workload Identity Federation
   - Migrate existing credentials
   - Update application code
-  - Sync GitHub and GCP secrets
-  - Set up automatic credential rotation
+  - Sync GitHub and   - Set up automatic credential rotation
 
 ### 2. Python Modules
 
 - `core/security/credential_manager.py`: Python interface for credential management
 
-  - Access secrets from Secret Manager
-  - Cache credentials for performance
+  - Access secrets from   - Cache credentials for performance
   - Handle credential rotation
   - Support for different environments
 
@@ -64,8 +60,7 @@ The system consists of the following components:
 
 - `terraform/modules/secure-credentials/main.tf`: Terraform module
   - Service account creation
-  - Secret Manager resources
-  - Workload Identity Federation configuration
+  -   - Workload Identity Federation configuration
   - IAM permissions
 
 ### 4. GitHub Actions
@@ -73,8 +68,7 @@ The system consists of the following components:
 - `.github/workflows/secure-deployment.yml`: GitHub Actions workflow
   - Uses Workload Identity Federation for authentication
   - Securely accesses credentials
-  - Deploys to Cloud Run
-
+  - Deploys to
 ### 5. Documentation
 
 - `docs/SECURE_CREDENTIAL_MANAGEMENT.md`: Architecture and best practices
@@ -92,8 +86,7 @@ Follow these steps to set up the secure credential management system:
 
 ### Prerequisites
 
-- Google Cloud SDK installed and configured
-- Terraform installed
+- - Terraform installed
 - GitHub CLI installed
 - Python 3.10+ installed
 - Poetry installed
@@ -129,9 +122,7 @@ pip install google-cloud-secret-manager google-cloud-iam redis cryptography
 Set the required environment variables:
 
 ```bash
-# Set the GCP project ID
-export GCP_PROJECT_ID="cherry-ai-project"
-
+# Set the export
 # Set the environment (dev, staging, prod)
 export ENVIRONMENT="dev"
 
@@ -207,8 +198,7 @@ async def predict(
     request: PredictRequest,
     credentials: dict = Depends(get_vertex_ai_credentials)
 ):
-    # Use credentials to access Vertex AI
-    return {"prediction": "result"}
+    # Use credentials to access     return {"prediction": "result"}
 ```
 
 ### Using the Example Script
@@ -236,14 +226,11 @@ To manually rotate a credential:
 ./secure_credential_manager.sh rotate-key service-account@project-id.iam.gserviceaccount.com
 ```
 
-### Syncing GitHub and GCP Secrets
-
-To sync secrets between GitHub and GCP:
-
+### Syncing GitHub and
+To sync secrets between GitHub and
 ```bash
 # Run the sync script
-./sync_github_gcp_secrets.sh
-```
+./sync_github_```
 
 ### Updating the Infrastructure
 
@@ -264,8 +251,7 @@ Select the appropriate option to update the infrastructure.
 
 3. **Short-Lived Credentials**: Use Workload Identity Federation when possible, and rotate service account keys regularly.
 
-4. **Secure Storage**: Store all credentials in Secret Manager.
-
+4. **Secure Storage**: Store all credentials in
 5. **Audit Logging**: Enable audit logging for all credential access.
 
 6. **Environment Isolation**: Use separate credentials for different environments.
@@ -306,8 +292,7 @@ Select the appropriate option to update the infrastructure.
 
    Check:
 
-   - Does the secret exist in Secret Manager?
-   - Are you using the correct name and environment suffix?
+   - Does the secret exist in    - Are you using the correct name and environment suffix?
    - Do you have permission to access the secret?
 
 3. **Workload Identity Federation Issues**
@@ -330,5 +315,4 @@ For additional help with credential management:
 
 1. Check the logs in Cloud Logging
 2. Review the IAM permissions for your service accounts
-3. Verify Secret Manager access in the GCP Console
-4. Refer to the documentation in the `docs` directory
+3. Verify

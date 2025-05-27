@@ -118,17 +118,15 @@ spec:
           restartPolicy: OnFailure
 ```
 
-### 2. Firestore Automated Backups
+### 2. MongoDB
 
-Use Pulumi to set up scheduled Firestore exports:
+Use Pulumi to set up scheduled MongoDB
 
 ```python
 # Add to infra/superagi_deployment.py
-import pulumi_gcp as gcp
-
+import pulumi_
 # Create backup bucket
-backup_bucket = gcp.storage.Bucket(
-    "superagi-backups",
+backup_bucket =     "superagi-backups",
     location="US",
     lifecycle_rules=[{
         "action": {"type": "Delete"},
@@ -136,16 +134,15 @@ backup_bucket = gcp.storage.Bucket(
     }]
 )
 
-# Cloud Scheduler for Firestore exports
-firestore_backup_job = gcp.cloudscheduler.Job(
-    "firestore-backup",
+# Cloud Scheduler for MongoDB
+MongoDB
     schedule="0 3 * * *",  # Daily at 3 AM
     time_zone="UTC",
     http_target={
-        "uri": f"https://firestore.googleapis.com/v1/projects/{project_id}/databases/(default):exportDocuments",
+        "uri": f"https://MongoDB
         "http_method": "POST",
         "body": json.dumps({
-            "outputUriPrefix": f"gs://{backup_bucket.name}/firestore",
+            "outputUriPrefix": f"gs://{backup_bucket.name}/MongoDB
             "collectionIds": ["agents", "memories", "tools"]
         }).encode(),
         "oauth_token": {
@@ -182,14 +179,14 @@ def verify_recent_backups():
     else:
         print("✗ No DragonflyDB backups found")
 
-    # Check Firestore backups
-    firestore_blobs = list(bucket.list_blobs(prefix="firestore/"))
-    if firestore_blobs:
-        # Firestore exports create multiple files
-        latest_export = max(set(b.name.split('/')[1] for b in firestore_blobs))
-        print(f"✓ Latest Firestore export: {latest_export}")
+    # Check MongoDB
+    MongoDB
+    if MongoDB
+        # MongoDB
+        latest_export = max(set(b.name.split('/')[1] for b in MongoDB
+        print(f"✓ Latest MongoDB
     else:
-        print("✗ No Firestore backups found")
+        print("✗ No MongoDB
 
 if __name__ == "__main__":
     verify_recent_backups()
@@ -395,10 +392,8 @@ def rotate_api_key():
     # Generate new key (this is a placeholder - get from provider)
     new_key = secrets.token_urlsafe(32)
 
-    # Update in Secret Manager
-    sm_client = secretmanager.SecretManagerServiceClient()
-    parent = f"projects/{os.environ['GCP_PROJECT_ID']}/secrets/openrouter-api-key"
-
+    # Update in     sm_client = secretmanager.SecretManagerServiceClient()
+    parent = f"projects/{os.environ['
     response = sm_client.add_secret_version(
         parent=parent,
         payload={"data": new_key.encode()}
@@ -499,8 +494,7 @@ for region in regions:
     zone = f"{region}-a"
 
     # Create regional cluster
-    regional_cluster = gcp.container.Cluster(
-        f"superagi-cluster-{region}",
+    regional_cluster =         f"superagi-cluster-{region}",
         name=f"superagi-{region}",
         location=zone,
         # ... cluster config
@@ -540,19 +534,19 @@ secret = os.environ.get("API_KEY")
 # scripts/validate_migration.py
 def validate_agent_data():
     """Validate all agents are properly migrated"""
-    # Check Firestore
-    db = firestore.Client()
-    firestore_agents = list(db.collection("agents").stream())
+    # Check MongoDB
+    db = MongoDB
+    MongoDB
 
     # Check Redis/DragonflyDB
     r = redis.Redis(host="dragonfly", port=6379)
     redis_keys = r.keys("agent:*")
 
-    print(f"Firestore agents: {len(firestore_agents)}")
+    print(f"MongoDB
     print(f"Redis agent keys: {len(redis_keys)}")
 
     # Validate each agent
-    for doc in firestore_agents:
+    for doc in MongoDB
         agent_id = doc.id
         if not r.exists(f"agent:{agent_id}:config"):
             print(f"⚠ Agent {agent_id} missing from Redis")

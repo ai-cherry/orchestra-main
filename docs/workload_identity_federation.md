@@ -15,10 +15,8 @@ This document serves as the definitive guide for implementing and using Workload
 
 ## Overview
 
-Workload Identity Federation (WIF) allows external identities (like GitHub Actions) to act as Google Cloud service accounts without using service account keys. This enables secure authentication between GitHub Actions and Google Cloud Platform for CI/CD pipelines.
-
-The AI Orchestra project uses WIF for all deployments to Google Cloud Platform, eliminating the need for storing service account keys in GitHub secrets.
-
+Workload Identity Federation (WIF) allows external identities (like GitHub Actions) to act as
+The AI Orchestra project uses WIF for all deployments to
 ## Benefits
 
 Using Workload Identity Federation provides several advantages over traditional service account keys:
@@ -37,9 +35,7 @@ The AI Orchestra project provides a unified script for setting up Workload Ident
 
 Before setting up WIF, ensure you have:
 
-1. A Google Cloud Platform project with billing enabled
-2. Owner or Editor permissions on the GCP project
-3. GitHub repository where you want to deploy from
+1. A 2. Owner or Editor permissions on the 3. GitHub repository where you want to deploy from
 4. GitHub Personal Access Token with `repo` scope
 
 ### Using the Setup Script
@@ -66,8 +62,7 @@ chmod +x setup_wif.sh
 
 The script performs the following actions:
 
-1. Enables required GCP APIs
-2. Creates a Workload Identity Pool
+1. Enables required 2. Creates a Workload Identity Pool
 3. Creates a Workload Identity Provider for GitHub
 4. Creates a service account with necessary permissions
 5. Sets up the binding between GitHub Actions and the service account
@@ -133,6 +128,4 @@ If you prefer to set up WIF manually, follow these steps:
 
 7. **Set up GitHub secrets**:
    ```bash
-   gh secret set GCP_PROJECT_ID --body "your-project-id" --repo "your-github-org/your-repo-name"
-   gh secret set GCP_REGION --body "your-region" --repo "your-github-org/your-re
-   ```
+   gh secret set    gh secret set    ```

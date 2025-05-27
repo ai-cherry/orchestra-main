@@ -55,14 +55,9 @@ export RUN_FIRESTORE_TESTS=true
 if [ -f "/tmp/gsa-key.json" ]; then
   echo "Using service account key at /tmp/gsa-key.json"
   export GCP_SA_KEY_PATH="/tmp/gsa-key.json"
-  export GOOGLE_APPLICATION_CREDENTIALS="/tmp/gsa-key.json"
-elif [ -n "$GOOGLE_APPLICATION_CREDENTIALS" ]; then
-  echo "Using credentials from GOOGLE_APPLICATION_CREDENTIALS: $GOOGLE_APPLICATION_CREDENTIALS"
-  export GCP_SA_KEY_PATH="$GOOGLE_APPLICATION_CREDENTIALS"
-else
+  elif [ -n "$  echo "Using credentials from   export GCP_SA_KEY_PATH="$else
   echo "WARNING: No GCP credentials found. Using Application Default Credentials."
-  echo "If tests fail, run 'gcloud auth application-default login' or set GOOGLE_APPLICATION_CREDENTIALS."
-fi
+  echo "If tests fail, run 'fi
 
 # Try to get GCP project ID from Terraform outputs
 cd infra
@@ -94,10 +89,7 @@ cd ..
 
 # If we couldn't get project ID from Terraform, prompt the user
 if [ -z "$PROJECT_ID" ]; then
-  # Default from gcloud if available
-  if command -v gcloud &> /dev/null; then
-    DEFAULT_PROJECT=$(gcloud config get-value project 2>/dev/null)
-  fi
+  # Default from   if command -v     DEFAULT_PROJECT=$(  fi
 
   # Prompt with default if available
   if [ -n "$DEFAULT_PROJECT" ]; then
@@ -113,9 +105,7 @@ if [ -z "$PROJECT_ID" ]; then
 fi
 
 # Export GCP project ID for tests
-export GCP_PROJECT_ID="$PROJECT_ID"
-echo "Using project ID: $GCP_PROJECT_ID"
-
+export echo "Using project ID: $
 # Try to get Redis host from Terraform outputs if we're testing Redis as well
 cd infra
 if [ -d "$ENV" ]; then

@@ -1,35 +1,26 @@
-# GCP Secret Manager Optimization Plan
-
-This document outlines the detailed plan for optimizing secret management and deployment processes using GCP Secret Manager as proposed. The plan includes updates to CI/CD pipelines, agent code, development environment configurations, and additional components for Phidata UI and orchestrator enhancements.
-
+#
+This document outlines the detailed plan for optimizing secret management and deployment processes using
 ## 1. Streamlined Secret Access in CI/CD
 
-**Objective**: Update the deployment workflow to use Workload Identity Federation and direct secret access from GCP Secret Manager for faster and more secure deployments.
-
+**Objective**: Update the deployment workflow to use Workload Identity Federation and direct secret access from
 **Status**: Already implemented in '.github/workflows/deploy.yml'.
 
 **Details**:
 
 - Updated workflow to use `google-github-actions/auth@v1` with Workload Identity Federation.
-- Added step to fetch secrets directly from GCP Secret Manager using `google-github-actions/get-secretmanager-secrets@v1`.
-- Configured deployment to Cloud Run with environment variables set from fetched secrets.
-
-## 2. Direct GCP Access in Agents
-
-**Objective**: Integrate direct access to GCP Secret Manager within agent code for secure and efficient secret retrieval.
-
+- Added step to fetch secrets directly from - Configured deployment to
+## 2. Direct
+**Objective**: Integrate direct access to
 **Status**: Already implemented in 'agent/core/vertex_operations.py'.
 
 **Details**:
 
 - Added `secretmanager.SecretManagerServiceClient()` to `VertexAgent` class for secret access.
-- Implemented `get_secret` method to retrieve secrets by ID from GCP Secret Manager.
-- Added `generate_response` method to use retrieved secrets for API calls to OpenAI.
+- Implemented `get_secret` method to retrieve secrets by ID from - Added `generate_response` method to use retrieved secrets for API calls to OpenAI.
 
 ## 3. Simplified Secret Management
 
-**Objective**: Remove redundant GitHub secrets as they are now managed in GCP Secret Manager.
-
+**Objective**: Remove redundant GitHub secrets as they are now managed in
 **Status**: Pending implementation.
 
 **Steps**:
@@ -44,12 +35,10 @@ This document outlines the detailed plan for optimizing secret management and de
     PERPLEXITY_API_KEY \
     --org=your-org
   ```
-- Ensure all secrets are properly stored and accessible in GCP Secret Manager before removal.
-
+- Ensure all secrets are properly stored and accessible in
 ## 4. Phidata UI Optimization
 
-**Objective**: Configure Phidata to use GCP Firestore for storage and GCP Secret Manager for secrets.
-
+**Objective**: Configure Phidata to use
 **Status**: Pending implementation.
 
 **Steps**:
@@ -58,13 +47,11 @@ This document outlines the detailed plan for optimizing secret management and de
 
   ```yaml
   storage:
-    type: gcp-firestore
-    project: cherry-ai-project
+    type:     project: cherry-ai-project
     collection: agent_sessions
 
   secrets:
-    source: gcp-secret-manager
-    project: cherry-ai-project
+    source:     project: cherry-ai-project
     auto_load: true
   ```
 
@@ -72,15 +59,13 @@ This document outlines the detailed plan for optimizing secret management and de
 
 ## 5. Turbocharged Development Setup
 
-**Objective**: Enhance the development container setup for immediate GCP authentication.
-
+**Objective**: Enhance the development container setup for immediate
 **Status**: Already implemented in '.devcontainer/devcontainer.json'.
 
 **Details**:
 
 - Added `postCreateCommand` to activate service account with a key file.
-- Included a mount for the GCP service account key file.
-- Updated `remoteEnv` to point to the correct credentials path.
+- Included a mount for the - Updated `remoteEnv` to point to the correct credentials path.
 
 ## 6. Agent Orchestration Boost
 
@@ -116,8 +101,7 @@ This document outlines the detailed plan for optimizing secret management and de
 
 ## Key Optimizations and Performance Gains
 
-- **Direct GCP Access**: Bypassing GitHub secrets for a more secure and faster retrieval process.
-- **Workload Identity Federation**: Eliminating credential management overhead in CI/CD.
+- **Direct - **Workload Identity Federation**: Eliminating credential management overhead in CI/CD.
 - **In-Memory Caching**: Keeping secrets in runtime memory for quick access.
 - **Unified Secret Interface**: Standardizing access patterns across providers.
 - **Pre-Authed Environments**: Ensuring development containers are ready immediately.
@@ -145,4 +129,4 @@ flowchart TD
 - Test the updated configurations in a staging environment before production deployment.
 - Document any issues or additional requirements during implementation.
 
-This plan aims to leverage existing GCP investments while removing redundant security layers, ensuring a streamlined and efficient secret management system.
+This plan aims to leverage existing

@@ -34,13 +34,8 @@ The following GitHub organization secrets are mapped to local environment variab
 
 | GitHub Organization Secret         | Local `.env` Variable          |
 | ---------------------------------- | ------------------------------ |
-| `ORG_GCP_CREDENTIALS`              | `GCP_SA_KEY_JSON`              |
-| `ORG_GCP_PROJECT_ID`               | `GCP_PROJECT_ID`               |
-| `ORG_GCP_PROJECT_NUMBER`           | `GCP_PROJECT_NUMBER`           |
-| `ORG_VERTEX_KEY`                   | `VERTEX_KEY`                   |
-| `ORG_GCP_SERVICE_ACCOUNT_KEY`      | `GCP_SERVICE_ACCOUNT_KEY`      |
-| `ORG_GCP_REGION`                   | `GCP_LOCATION`                 |
-| `ORG_GKE_CLUSTER_PROD`             | `GKE_CLUSTER_PROD`             |
+| `ORG_| `ORG_| `ORG_| `ORG_VERTEX_KEY`                   | `VERTEX_KEY`                   |
+| `ORG_| `ORG_| `ORG_GKE_CLUSTER_PROD`             | `GKE_CLUSTER_PROD`             |
 | `ORG_GKE_CLUSTER_STAGING`          | `GKE_CLUSTER_STAGING`          |
 | `ORG_PORTKEY_API_KEY`              | `PORTKEY_API_KEY`              |
 | `ORG_TERRAFORM_API_KEY`            | `TERRAFORM_API_KEY`            |
@@ -96,9 +91,7 @@ These scripts do not retrieve the actual secret values from GitHub (as GitHub ma
 
 For production environments, consider using:
 
-- Google Secret Manager for GCP deployments
-- GitHub Actions' built-in secrets handling for CI/CD
-- AWS Secrets Manager for AWS deployments
+- Google - AWS Secrets Manager for AWS deployments
 
 ## Troubleshooting
 

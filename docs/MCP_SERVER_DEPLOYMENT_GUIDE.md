@@ -1,28 +1,17 @@
 # MCP Server Deployment Guide
 
-This guide provides instructions for deploying the MCP (Model Context Protocol) server to Google Cloud Platform (GCP) using the provided deployment scripts and GitHub Actions workflow.
-
+This guide provides instructions for deploying the MCP (Model Context Protocol) server to
 ## Prerequisites
 
 Before deploying the MCP server, ensure you have the following:
 
-1. A GCP project with the following APIs enabled:
-
-   - Cloud Run API
-   - Container Registry API
-   - Secret Manager API
-   - IAM API
+1. A
+   -    - Container Registry API
+   -    - IAM API
 
 2. GitHub organization with the following secrets configured:
 
-   - `GCP_PROJECT_ID`: The ID of your GCP project
-   - `GCP_PROJECT_NUMBER`: The numeric ID of your GCP project
-   - `GCP_REGION`: The GCP region to deploy to (e.g., `us-central1`)
-   - `GCP_PROJECT_ADMIN_KEY`: Service account key with admin permissions
-   - `GCP_SECRET_MANAGEMENT_KEY`: Service account key for secret management
-   - `GCP_WORKLOAD_IDENTITY_PROVIDER`: The Workload Identity Federation provider
-   - `GCP_SERVICE_ACCOUNT`: The service account email for Workload Identity Federation
-
+   - `   - `   - `   - `   - `   - `   - `
 3. Docker installed locally for building and testing the container
 
 ## Deployment Options
@@ -41,23 +30,19 @@ Where `[environment]` is optional and defaults to `dev`. Valid environments are 
 
 This script will:
 
-1. Set up GCP credentials using the `GCP_PROJECT_ADMIN_KEY` environment variable
-2. Update Poetry dependencies
+1. Set up 2. Update Poetry dependencies
 3. Build a Docker image
-4. Deploy the image to Cloud Run
-
+4. Deploy the image to
 ### 2. Setting Up Powerful Service Accounts
 
-To set up powerful service accounts for Vertex AI and Gemini, run:
-
+To set up powerful service accounts for
 ```bash
 ./setup_badass_credentials.sh
 ```
 
 This script will:
 
-1. Create a Vertex AI service account with extensive permissions
-2. Create a Gemini service account with necessary permissions
+1. Create a 2. Create a Gemini service account with necessary permissions
 3. Update GitHub organization secrets with the new service account keys
 
 ### 3. Automated Deployment with GitHub Actions
@@ -77,8 +62,7 @@ To manually trigger a deployment:
 The MCP server uses the following environment variables:
 
 - `ENV`: The deployment environment (`dev`, `staging`, or `prod`)
-- `PROJECT_ID`: The GCP project ID
-
+- `PROJECT_ID`: The
 ## Troubleshooting
 
 ### Poetry Dependency Issues
@@ -104,22 +88,18 @@ If you encounter dependency resolution issues with Poetry, try the following:
 
 ### Authentication Issues
 
-If you encounter authentication issues with GCP, ensure that:
-
-1. The `GCP_PROJECT_ADMIN_KEY` environment variable is set correctly
-2. The service account has the necessary permissions
+If you encounter authentication issues with
+1. The `2. The service account has the necessary permissions
 3. The service account key is valid and not expired
 
 ### Deployment Issues
 
-If the deployment fails, check the Cloud Run logs for more information:
-
+If the deployment fails, check the
 ```bash
 gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=mcp-server-dev" --limit=10
 ```
 
 ## Additional Resources
 
-- [Cloud Run Documentation](https://cloud.google.com/run/docs)
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
+- [- [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [Poetry Documentation](https://python-poetry.org/docs/)

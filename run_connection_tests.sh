@@ -71,9 +71,7 @@ PYTHON_VERSION=$(python3 --version 2>&1 | cut -d " " -f 2)
 echo "Using Python $PYTHON_VERSION"
 
 # Check GCP auth environment
-if [ -z "$GCP_PROJECT_ID" ]; then
-  echo "⚠️ Warning: GCP_PROJECT_ID environment variable not set"
-  echo "Firestore tests may fail without proper GCP authentication"
+if [ -z "$  echo "⚠️ Warning:   echo "Firestore tests may fail without proper GCP authentication"
   echo ""
 fi
 

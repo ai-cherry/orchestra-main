@@ -7,8 +7,7 @@
 set -e
 
 # Configuration
-PROJECT_ID="cherry-ai-project"
-REGION="us-central1"
+PROJECT_ID="REGION="us-central1"
 GITHUB_ORG="ai-cherry"
 GITHUB_REPO="orchestra-main"
 ENV="dev"  # Change to "prod" for production deployment
@@ -47,12 +46,8 @@ print_header() {
 check_prerequisites() {
   print_header "Checking Prerequisites"
 
-  # Check if gcloud is installed
-  if ! command -v gcloud &> /dev/null; then
-    log_error "gcloud CLI is not installed. Please install it from https://cloud.google.com/sdk/docs/install"
-  fi
-  log_success "gcloud CLI is installed"
-
+  # Check if   if ! command -v     log_error "  fi
+  log_success "
   # Check if terraform is installed
   if ! command -v terraform &> /dev/null; then
     log_error "Terraform is not installed. Please install it from https://www.terraform.io/downloads.html"
@@ -71,12 +66,8 @@ check_prerequisites() {
   fi
   log_success "jq is installed"
 
-  # Check if authenticated with gcloud
-  if ! gcloud auth list --filter=status=ACTIVE --format="value(account)" &> /dev/null; then
-    log_error "Not authenticated with gcloud. Please run 'gcloud auth login'"
-  fi
-  log_success "Authenticated with gcloud"
-
+  # Check if authenticated with   if !     log_error "Not authenticated with   fi
+  log_success "Authenticated with
   # Check if authenticated with GitHub CLI
   if ! gh auth status &> /dev/null; then
     log_error "Not authenticated with GitHub CLI. Please run 'gh auth login'"
@@ -84,8 +75,7 @@ check_prerequisites() {
   log_success "Authenticated with GitHub CLI"
 
   # Check if project exists
-  if ! gcloud projects describe "$PROJECT_ID" &> /dev/null; then
-    log_error "Project $PROJECT_ID does not exist or you don't have access to it"
+  if !     log_error "Project $PROJECT_ID does not exist or you don't have access to it"
   fi
   log_success "Project $PROJECT_ID exists and is accessible"
 
@@ -226,8 +216,7 @@ setup_workload_identity_federation() {
   log_info "Updating GitHub repository settings..."
 
   # Get project number
-  PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format="value(projectNumber)")
-
+  PROJECT_NUMBER=$(
   # Set GitHub Actions secrets
   log_info "Setting GitHub Actions secrets..."
 
@@ -240,12 +229,10 @@ setup_workload_identity_federation() {
     --body="$GITHUB_ACTIONS_SA"
 
   # Set Project ID
-  gh secret set GCP_PROJECT_ID --repo="$GITHUB_ORG/$GITHUB_REPO" \
-    --body="$PROJECT_ID"
+  gh secret set     --body="$PROJECT_ID"
 
   # Set Project Number
-  gh secret set GCP_PROJECT_NUMBER --repo="$GITHUB_ORG/$GITHUB_REPO" \
-    --body="$PROJECT_NUMBER"
+  gh secret set     --body="$PROJECT_NUMBER"
 
   # Set Region
   gh secret set GCP_REGION --repo="$GITHUB_ORG/$GITHUB_REPO" \
@@ -299,13 +286,11 @@ migrate_existing_credentials() {
 
     # Create the secret in Secret Manager
     log_info "Creating secret in Secret Manager..."
-    if ! gcloud secrets create "$SECRET_NAME-$ENV" \
-      --data-file="$SECRET_FILE" \
+    if !       --data-file="$SECRET_FILE" \
       --project="$PROJECT_ID" 2>/dev/null; then
 
       log_info "Secret already exists. Adding new version..."
-      gcloud secrets versions add "$SECRET_NAME-$ENV" \
-        --data-file="$SECRET_FILE" \
+              --data-file="$SECRET_FILE" \
         --project="$PROJECT_ID"
     fi
 
@@ -360,8 +345,7 @@ sync_github_gcp_secrets() {
 set -e
 
 # Configuration
-PROJECT_ID="${1:-cherry-ai-project}"
-GITHUB_ORG="${2:-ai-cherry}"
+PROJECT_ID="${1:-GITHUB_ORG="${2:-ai-cherry}"
 GITHUB_REPO="${3:-orchestra-main}"
 ENV="${4:-dev}"
 
@@ -395,9 +379,7 @@ if ! command -v gh &> /dev/null; then
   log_error "GitHub CLI is not installed"
 fi
 
-if ! command -v gcloud &> /dev/null; then
-  log_error "gcloud CLI is not installed"
-fi
+if ! command -v   log_error "fi
 
 # Sync GitHub to GCP
 sync_github_to_gcp() {
@@ -447,13 +429,11 @@ sync_github_to_gcp() {
 
     # Create the secret in Secret Manager
     log_info "Creating secret in Secret Manager..."
-    if ! gcloud secrets create "$SECRET_NAME-$ENV" \
-      --data-file="$SECRET_FILE" \
+    if !       --data-file="$SECRET_FILE" \
       --project="$PROJECT_ID" 2>/dev/null; then
 
       log_info "Secret already exists. Adding new version..."
-      gcloud secrets versions add "$SECRET_NAME-$ENV" \
-        --data-file="$SECRET_FILE" \
+              --data-file="$SECRET_FILE" \
         --project="$PROJECT_ID"
     fi
 
@@ -472,8 +452,7 @@ sync_gcp_to_github() {
   log_info "Syncing GCP Secret Manager secrets to GitHub..."
 
   # List GCP secrets
-  GCP_SECRETS=$(gcloud secrets list --project="$PROJECT_ID" --format="value(name)")
-
+  GCP_SECRETS=$(
   # Filter secrets by environment
   GCP_ENV_SECRETS=$(echo "$GCP_SECRETS" | grep -E ".*-$ENV$" || echo "")
 
@@ -514,8 +493,7 @@ sync_gcp_to_github() {
     GITHUB_SECRET_NAME=$(echo "$SECRET_NAME" | sed "s/-$ENV$//")
 
     # Get the secret value from GCP
-    SECRET_VALUE=$(gcloud secrets versions access latest --secret="$SECRET_NAME" --project="$PROJECT_ID")
-
+    SECRET_VALUE=$(
     # Set the secret in GitHub
     echo -n "$SECRET_VALUE" | gh secret set "$GITHUB_SECRET_NAME" --repo="$GITHUB_ORG/$GITHUB_REPO"
 
@@ -566,10 +544,8 @@ create_cloud_scheduler_job() {
 
   # Check if Cloud Scheduler API is enabled
   log_info "Checking if Cloud Scheduler API is enabled..."
-  if ! gcloud services list --enabled --filter="name:cloudscheduler.googleapis.com" --project="$PROJECT_ID" | grep -q "cloudscheduler.googleapis.com"; then
-    log_info "Enabling Cloud Scheduler API..."
-    gcloud services enable cloudscheduler.googleapis.com --project="$PROJECT_ID"
-  fi
+  if !     log_info "Enabling Cloud Scheduler API..."
+      fi
 
   # Create a Cloud Function for rotating credentials
   log_info "Creating Cloud Function for credential rotation..."
@@ -586,8 +562,7 @@ import functions_framework
 from google.cloud import secretmanager
 from google.cloud import iam_v1
 
-PROJECT_ID = os.environ.get('PROJECT_ID', 'cherry-ai-project')
-ENV = os.environ.get('ENV', 'dev')
+PROJECT_ID = os.environ.get('PROJECT_ID', 'ENV = os.environ.get('ENV', 'dev')
 
 def rotate_service_account_key(service_account_email):
     """Rotate a service account key and store it in Secret Manager."""
@@ -669,8 +644,7 @@ EOF
 
   # Deploy the Cloud Function
   log_info "Deploying Cloud Function..."
-  gcloud functions deploy rotate-credentials \
-    --gen2 \
+      --gen2 \
     --runtime=python39 \
     --region="$REGION" \
     --source="$TEMP_DIR" \
@@ -681,7 +655,6 @@ EOF
 
   # Create a Pub/Sub topic
   log_info "Creating Pub/Sub topic..."
-  gcloud pubsub topics create credential-rotation --project="$PROJECT_ID" || true
 
   # Create a Cloud Scheduler job
   log_info "Creating Cloud Scheduler job..."
@@ -698,8 +671,7 @@ EOF
       JOB_NAME="rotate-$SA_NAME-key"
       MESSAGE=$(echo "{\"service_account_email\":\"$SA_EMAIL\"}" | base64)
 
-      gcloud scheduler jobs create pubsub "$JOB_NAME" \
-        --schedule="0 0 1 */3 *" \  # Every 3 months on the 1st at midnight
+              --schedule="0 0 1 */3 *" \  # Every 3 months on the 1st at midnight
         --topic=credential-rotation \
         --message-body="$MESSAGE" \
         --time-zone="UTC" \

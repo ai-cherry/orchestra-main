@@ -1,7 +1,6 @@
 # AI Orchestra Agent Infrastructure Setup Guide
 
-This document provides a comprehensive guide for setting up the AI Orchestra agent infrastructure on Google Cloud Platform (GCP). It covers the bootstrap process, infrastructure components, and best practices for secure deployment.
-
+This document provides a comprehensive guide for setting up the AI Orchestra agent infrastructure on
 ## Table of Contents
 
 1. [Overview](#overview)
@@ -18,16 +17,14 @@ The AI Orchestra agent infrastructure provides a robust foundation for deploying
 
 - **Scalable**: Support for multiple agent types and teams
 - **Flexible**: Configurable memory systems and tool integrations
-- **Secure**: Integration with GCP Secret Manager and IAM
-- **Observable**: Monitoring and logging for agent operations
+- **Secure**: Integration with - **Observable**: Monitoring and logging for agent operations
 - **Maintainable**: Centralized configuration and validation
 
 ## Prerequisites
 
 Before running the bootstrap script, ensure you have the following:
 
-1. **GCP Project**: Access to the `cherry-ai-project` GCP project
-2. **Command Line Tools**:
+1. **2. **Command Line Tools**:
 
    - `gcloud` CLI installed and configured
    - `terraform` CLI installed (version 1.0.0+)
@@ -39,11 +36,9 @@ Before running the bootstrap script, ensure you have the following:
 
 We've created a comprehensive bootstrap script that sets up the entire infrastructure in one go. The script handles:
 
-1. Authentication with GCP
-2. Enabling necessary APIs
+1. Authentication with 2. Enabling necessary APIs
 3. Creating Terraform state bucket
-4. Setting up Secret Manager secrets
-5. Configuring Workload Identity Federation for GitHub Actions
+4. Setting up 5. Configuring Workload Identity Federation for GitHub Actions
 6. Initializing and applying Terraform configuration
 7. Updating GitHub Actions workflow file
 8. Cleaning up temporary credentials
@@ -68,11 +63,8 @@ The script will output progress information and provide next steps at the end.
 
 ### What the Bootstrap Script Does
 
-1. **Authentication**: Uses the provided service account key to authenticate with GCP
-2. **API Enablement**: Enables all necessary GCP APIs for the project
-3. **Terraform Backend**: Creates a GCS bucket for Terraform state
-4. **Secret Management**: Creates initial secrets in Secret Manager
-5. **Workload Identity**: Sets up Workload Identity Federation for GitHub Actions
+1. **Authentication**: Uses the provided service account key to authenticate with 2. **API Enablement**: Enables all necessary 3. **Terraform Backend**: Creates a GCS bucket for Terraform state
+4. **Secret Management**: Creates initial secrets in 5. **Workload Identity**: Sets up Workload Identity Federation for GitHub Actions
 6. **Infrastructure**: Applies Terraform configuration to create infrastructure
 7. **GitHub Actions**: Updates the GitHub Actions workflow file
 8. **Cleanup**: Revokes and deletes the service account key
@@ -89,21 +81,19 @@ The infrastructure includes the following components:
    - Used for active conversation context
    - TTL: 1 hour
 
-2. **Firestore** (Mid/Long-term Memory):
+2. **MongoDB
 
    - Document database for structured data
    - Used for persistent storage
    - TTL: Configurable (1 day to 30 days)
 
-3. **Vertex AI Vector Search** (Semantic Memory):
-   - Vector database for semantic search
+3. **   - Vector database for semantic search
    - Used for knowledge retrieval
    - Dimensions: 768 (configurable)
 
 ### Secret Management
 
-All sensitive information is stored in Secret Manager:
-
+All sensitive information is stored in
 - API keys (OpenAI, Anthropic, etc.)
 - Database credentials
 - Encryption keys
@@ -112,8 +102,7 @@ All sensitive information is stored in Secret Manager:
 
 1. **Agent Service Account**:
 
-   - Used by agents to access GCP resources
-   - Least privilege permissions
+   - Used by agents to access    - Least privilege permissions
 
 2. **Deployment Service Account**:
    - Used by GitHub Actions for deployment
@@ -129,12 +118,10 @@ All sensitive information is stored in Secret Manager:
 
 ### Workload Identity Federation
 
-The infrastructure uses Workload Identity Federation for GitHub Actions, which is more secure than using service account keys. This allows GitHub Actions to authenticate with GCP without storing long-lived credentials.
-
+The infrastructure uses Workload Identity Federation for GitHub Actions, which is more secure than using service account keys. This allows GitHub Actions to authenticate with
 ### Secret Management
 
-Sensitive information is stored in Secret Manager and accessed securely by the application. The bootstrap script creates initial secrets with placeholder values, which should be updated with real values after setup.
-
+Sensitive information is stored in
 ### Service Account Keys
 
 The bootstrap script uses a service account key for initial setup, but it's revoked and deleted after setup is complete. In production, all authentication should be done via Workload Identity Federation or other secure methods.
@@ -146,7 +133,7 @@ The infrastructure includes monitoring and observability features:
 1. **Cloud Monitoring Dashboard**:
 
    - Redis memory usage
-   - Firestore operations
+   - MongoDB
    - Vector search queries
    - Agent errors
 
@@ -164,8 +151,7 @@ The infrastructure includes monitoring and observability features:
 
 After running the bootstrap script, you should:
 
-1. **Update Secrets**: Replace placeholder values in Secret Manager with real values
-2. **Configure GitHub Repository**:
+1. **Update Secrets**: Replace placeholder values in 2. **Configure GitHub Repository**:
 
    - Enable GitHub Actions
    - Update repository settings for Workload Identity Federation
@@ -180,9 +166,8 @@ After running the bootstrap script, you should:
 4. **Implement Memory Backends**:
 
    - Implement Redis memory backend
-   - Implement Firestore memory backend
-   - Implement Vertex AI Vector Search backend
-
+   - Implement MongoDB
+   - Implement
 5. **Create Unit Tests**:
    - Test configuration validation
    - Test memory systems
@@ -190,6 +175,5 @@ After running the bootstrap script, you should:
 
 ## Conclusion
 
-The AI Orchestra agent infrastructure provides a solid foundation for building and deploying AI agents on GCP. By following this guide and using the provided bootstrap script, you can quickly set up a secure, scalable, and observable infrastructure for your agents.
-
+The AI Orchestra agent infrastructure provides a solid foundation for building and deploying AI agents on
 For more detailed information on the agent configuration system and memory architecture, see the [Agent Infrastructure Documentation](agent_infrastructure.md).

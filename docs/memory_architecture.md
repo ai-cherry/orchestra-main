@@ -9,12 +9,11 @@ The AI Orchestra memory system provides persistent storage and retrieval of memo
 ```mermaid
 graph TD
     A[Client] --> B[MemoryManager Factory]
-    B --> C[FirestoreMemoryManagerV2]
-    C --> D[AsyncFirestoreStorageManager]
+    B --> C[MongoDB
+    C --> D[AsyncMongoDB
     C --> E[VectorSearchProvider]
-    D --> F[Firestore]
-    E --> G[GCP Vector Search]
-    E --> H[In-Memory Vector Search]
+    D --> F[MongoDB
+    E --> G[    E --> H[In-Memory Vector Search]
 ```
 
 ## Components
@@ -23,18 +22,18 @@ graph TD
 
 The `MemoryManager` class in `packages/shared/src/memory/memory_manager.py` serves as a factory for creating concrete memory manager implementations. It provides a unified interface for memory operations and delegates to the appropriate backend implementation.
 
-### FirestoreMemoryManagerV2
+### MongoDB
 
-The `FirestoreMemoryManagerV2` class in `packages/shared/src/storage/firestore/v2/adapter.py` is the main implementation of the memory manager interface. It provides:
+The `MongoDB
 
 - Storage and retrieval of memory items
 - Conversation history management
 - Semantic search capabilities
 - Health checks and monitoring
 
-### AsyncFirestoreStorageManager
+### AsyncMongoDB
 
-The `AsyncFirestoreStorageManager` class in `packages/shared/src/storage/firestore/v2/async_core.py` provides asynchronous access to Firestore. It includes:
+The `AsyncMongoDB
 
 - Connection pooling for better performance
 - Batch operations for efficient data access
@@ -46,13 +45,11 @@ The `AsyncFirestoreStorageManager` class in `packages/shared/src/storage/firesto
 The `VectorSearchProvider` protocol in `packages/shared/src/storage/vector/vector_search.py` defines the interface for vector search providers. Implementations include:
 
 - `InMemoryVectorSearch`: A simple in-memory implementation for testing and development
-- `GCPVectorSearch`: An implementation using Google Cloud Vertex AI Vector Search (coming soon)
-
-## Data Flow
+- `## Data Flow
 
 1. Client code calls methods on the `MemoryManager` factory
-2. The factory delegates to the appropriate concrete implementation (e.g., `FirestoreMemoryManagerV2`)
-3. The concrete implementation uses `AsyncFirestoreStorageManager` for Firestore operations
+2. The factory delegates to the appropriate concrete implementation (e.g., `MongoDB
+3. The concrete implementation uses `AsyncMongoDB
 4. For semantic search, the concrete implementation uses a `VectorSearchProvider`
 
 ## Configuration
@@ -61,7 +58,7 @@ The memory system can be configured through the `MemoryManager` factory:
 
 ```python
 memory_manager = MemoryManager(
-    memory_backend_type="firestore_v2",  # Use V2 implementation
+    memory_backend_type="MongoDB
     project_id="your-project-id",
     credentials_path="/path/to/credentials.json",
     connection_pool_size=10,  # Connection pool size
@@ -91,7 +88,7 @@ health = await memory_manager.health_check()
 The health check returns a dictionary with:
 
 - `status`: Overall status ("healthy", "degraded", or "unhealthy")
-- `firestore`: Boolean indicating Firestore health
+- `MongoDB
 - `redis`: Boolean indicating Redis health (if applicable)
 - `error_count`: Number of errors encountered
 - `details`: Additional details about the health check
@@ -111,7 +108,6 @@ The memory system is designed for high performance:
 
 Planned enhancements to the memory system include:
 
-- Full integration with GCP Vector Search for improved semantic search performance
-- Enhanced caching strategies for frequently accessed data
+- Full integration with - Enhanced caching strategies for frequently accessed data
 - Support for additional storage backends
 - Advanced memory management features like summarization and forgetting

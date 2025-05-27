@@ -1,7 +1,5 @@
-# GCP MCP Integration Guide: Pub/Sub & Service Directory
-
-This guide details the recommended code modifications and best practices for integrating MCP servers with Google Cloud Pub/Sub and Service Directory, ensuring clarity, efficiency, and maintainability.
-
+#
+This guide details the recommended code modifications and best practices for integrating MCP servers with
 ---
 
 ## 1. Pub/Sub Integration
@@ -24,8 +22,7 @@ from google.cloud import pubsub_v1
 import os
 
 publisher = pubsub_v1.PublisherClient()
-topic_path = publisher.topic_path(os.environ["GCP_PROJECT"], os.environ["PUBSUB_TOPIC"])
-
+topic_path = publisher.topic_path(os.environ["
 def publish_event(event_type, payload):
     data = json.dumps({"type": event_type, "payload": payload}).encode("utf-8")
     future = publisher.publish(topic_path, data)
@@ -39,8 +36,7 @@ from google.cloud import pubsub_v1
 import os
 
 subscriber = pubsub_v1.SubscriberClient()
-subscription_path = subscriber.subscription_path(os.environ["GCP_PROJECT"], os.environ["PUBSUB_SUBSCRIPTION"])
-
+subscription_path = subscriber.subscription_path(os.environ["
 def callback(message):
     print(f"Received: {message.data}")
     message.ack()
@@ -117,9 +113,7 @@ for endpoint in response.service.endpoints:
 
 - [Pub/Sub Python Client](https://cloud.google.com/pubsub/docs/publisher)
 - [Service Directory Python Client](https://cloud.google.com/service-directory/docs/reference/libraries)
-- [Pulumi GCP Docs](https://www.pulumi.com/registry/packages/gcp/)
-- [GCP IAM Best Practices](https://cloud.google.com/iam/docs/least-privilege)
-
+- [Pulumi - [
 ---
 
-**This guide ensures your MCP servers are cloud-native, observable, and ready for robust, scalable orchestration on GCP.**
+**This guide ensures your MCP servers are cloud-native, observable, and ready for robust, scalable orchestration on

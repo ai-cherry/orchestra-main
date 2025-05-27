@@ -61,10 +61,9 @@ export MONITOR_STORAGE_BACKEND=redis
 export REDIS_HOST=localhost
 export REDIS_PORT=6379
 
-# Or use Firestore
-export MONITOR_STORAGE_BACKEND=firestore
-export GCP_PROJECT_ID=your-project-id
-```
+# Or use MongoDB
+export MONITOR_STORAGE_BACKEND=MongoDB
+export ```
 
 ### 3. Start the API Server
 
@@ -257,7 +256,7 @@ The monitoring system integrates seamlessly with:
 - **Logging Infrastructure**: Uses the centralized logging config
 - **LiteLLM**: Extends the existing LiteLLM client
 - **FastAPI**: Provides RESTful endpoints
-- **Memory Systems**: Can store metrics in Redis or Firestore
+- **Memory Systems**: Can store metrics in Redis or MongoDB
 
 ## Future Enhancements
 

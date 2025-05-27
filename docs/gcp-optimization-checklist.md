@@ -1,12 +1,10 @@
-# GCP Environment Optimization Checklist for Orchestra AI
-
+#
 ---
 
 ## 1. Project & API Setup
 
 - [ ] Project created and billing enabled
-- [ ] All required APIs enabled (see gcp_env_optimize.sh)
-- [ ] Quotas reviewed and increased as needed
+- [ ] All required APIs enabled (see - [ ] Quotas reviewed and increased as needed
 
 ## 2. IAM & Service Accounts
 
@@ -18,15 +16,12 @@
 
 - [ ] Custom VPC and subnet created for isolation and performance
 - [ ] Firewall rules configured for required ports/services
-- [ ] VPC connectors set up for Cloud Run/Functions as needed
-
+- [ ] VPC connectors set up for
 ## 4. Core Managed Services
 
-- [ ] Cloud Run service deployed with correct image and environment variables
-- [ ] Redis (MemoryStore) provisioned and connected
+- [ ] - [ ] Redis (MemoryStore) provisioned and connected
 - [ ] AlloyDB instance created and configured
-- [ ] Secret Manager entries created for all sensitive data
-- [ ] Storage buckets (GCS) created for data and logs
+- [ ] - [ ] Storage buckets (GCS) created for data and logs
 
 ## 5. Monitoring & Logging
 
@@ -50,8 +45,7 @@
 
 ## 8. Performance & Cost Optimization
 
-- [ ] Autoscaling enabled for Cloud Run and managed DBs
-- [ ] Resource sizes tuned for workload (CPU/memory)
+- [ ] Autoscaling enabled for - [ ] Resource sizes tuned for workload (CPU/memory)
 - [ ] Unused resources cleaned up regularly
 - [ ] Cost monitoring and alerts set up
 
@@ -64,6 +58,5 @@
 ---
 
 **Tip:**
-Run `bash gcp_env_optimize.sh` for automated setup, and use `infra/pulumi_gcp` for reproducible, code-driven infrastructure management.
-
+Run `bash
 ---

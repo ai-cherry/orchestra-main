@@ -17,8 +17,7 @@ This checklist verifies that Claude 4 and MCP are optimally configured to enhanc
   - ✓ Direct Anthropic API integration (no unnecessary layers)
   - ✓ Placeholder model IDs ready for official release
 - [x] **API Key Management**:
-  - ✓ ANTHROPIC_API_KEY sourced from Google Secret Manager
-  - ✓ No hardcoded credentials
+  - ✓ ANTHROPIC_API_KEY sourced from Google   - ✓ No hardcoded credentials
 
 ### Recommendations for Improvement:
 
@@ -30,17 +29,14 @@ This checklist verifies that Claude 4 and MCP are optimally configured to enhanc
 
 ### Implemented Components
 
-- [x] **Cloud Run Server** (`gcp_cloud_run_server.py`):
-  - ✓ FastAPI-based implementation
-  - ✓ Tool definitions for Claude
+- [x] **  - ✓ Tool definitions for Claude
   - ✓ Deploy, status, and list operations
   - ✓ Proper error handling
 
 ### Missing Critical Components (TODO)
 
-- [ ] **Secret Manager Server** - Essential for secure credential management
-- [ ] **DragonflyDB Server** - Critical for short-term memory
-- [ ] **Firestore Server** - Required for episodic memory
+- [ ] **- [ ] **DragonflyDB Server** - Critical for short-term memory
+- [ ] **MongoDB
 - [ ] **Qdrant Server** - Needed for semantic memory
 - [ ] **Orchestrator Server** - Core for mode/workflow management
 
@@ -57,7 +53,7 @@ This checklist verifies that Claude 4 and MCP are optimally configured to enhanc
 
 - [x] **Configuration**: All three tiers defined in `.mcp.json`:
   - ✓ Short-term: DragonflyDB (1-hour TTL)
-  - ✓ Mid-term: Firestore (30-day retention)
+  - ✓ Mid-term: MongoDB
   - ✓ Long-term: Qdrant (permanent)
 - [ ] **Implementation**: MCP servers for each tier pending
 - [x] **Use Cases**: Clear separation of concerns defined
@@ -116,14 +112,12 @@ This checklist verifies that Claude 4 and MCP are optimally configured to enhanc
 
 2. **Implement Critical MCP Servers**:
 
-   - Start with `gcp_secret_manager_server.py` (security)
-   - Then `dragonfly_server.py` (performance)
+   - Start with `   - Then `dragonfly_server.py` (performance)
    - Follow with memory tier servers
 
 3. **Add Authentication**:
    - Implement API key validation for MCP servers
-   - Use service accounts for GCP operations
-
+   - Use service accounts for
 ### Medium-term Improvements
 
 1. **Monitoring & Observability**:
@@ -169,16 +163,14 @@ This checklist verifies that Claude 4 and MCP are optimally configured to enhanc
 ### Performance Targets
 
 - [ ] DragonflyDB: < 10ms cache operations
-- [ ] Firestore: < 100ms document operations
+- [ ] MongoDB
 - [ ] Qdrant: < 200ms vector searches
-- [ ] Cloud Run: < 30s deployments
-
+- [ ]
 ## 🚀 Next Steps Priority
 
 1. **Critical Path** (Week 1):
 
-   - Implement Secret Manager MCP server
-   - Test end-to-end deployment workflow
+   - Implement    - Test end-to-end deployment workflow
    - Add basic authentication
 
 2. **Enhancement** (Week 2-3):

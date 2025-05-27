@@ -14,12 +14,10 @@ This document outlines the secure credential management architecture for the AI 
 
 ## Overview
 
-AI Orchestra requires secure access to various GCP services, including Vertex AI, Gemini, Firestore, and Redis. The secure credential management system provides a robust, scalable, and secure way to manage and access credentials across different environments.
-
+AI Orchestra requires secure access to various
 Key features:
 
-- Secret storage in Google Cloud Secret Manager
-- Service account management with least privilege
+- Secret storage in - Service account management with least privilege
 - Workload Identity Federation for GitHub Actions
 - Credential caching and automatic refresh
 - Environment-specific credentials (dev, staging, prod)
@@ -32,30 +30,24 @@ The secure credential management architecture follows a multi-layered approach:
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │  Access Layer   │     │  Secret Layer    │     │  Service Layer  │
 │                 │     │                  │     │                 │
-│ - GitHub Actions│────▶│ - Secret Manager │────▶│ - Vertex AI     │
-│ - FastAPI App   │     │ - IAM            │     │ - Gemini        │
-│ - CLI Scripts   │     │ - Key Rotation   │     │ - Firestore     │
+│ - GitHub Actions│────▶│ - │ - CLI Scripts   │     │ - Key Rotation   │     │ - MongoDB
 └─────────────────┘     └─────────────────┘     └─────────────────┘
 ```
 
 ### Components:
 
-1. **Access Layer**: How applications and services authenticate to GCP
-
+1. **Access Layer**: How applications and services authenticate to
    - GitHub Actions: Uses Workload Identity Federation
    - FastAPI App: Uses service account keys or Workload Identity
    - CLI Scripts: Uses service account keys or user credentials
 
 2. **Secret Layer**: How credentials are stored and managed
 
-   - Secret Manager: Stores all credentials securely
-   - IAM: Controls access to credentials
+   -    - IAM: Controls access to credentials
    - Key Rotation: Automatically rotates credentials
 
-3. **Service Layer**: The GCP services being accessed
-   - Vertex AI: For machine learning operations
-   - Gemini: For generative AI capabilities
-   - Firestore/Redis: For memory management
+3. **Service Layer**: The    -    - Gemini: For generative AI capabilities
+   - MongoDB
 
 ## Security Best Practices
 
@@ -68,8 +60,7 @@ The AI Orchestra credential management system follows these security best practi
 
 2. **No Hardcoded Credentials**
 
-   - All credentials are stored in Secret Manager
-   - No credentials in code, config files, or environment variables
+   - All credentials are stored in    - No credentials in code, config files, or environment variables
 
 3. **Short-Lived Credentials**
 
@@ -92,8 +83,7 @@ The AI Orchestra credential management system follows these security best practi
 The `secure_credential_manager.sh` script provides CLI tools for managing credentials:
 
 ```bash
-# Get a secret from Secret Manager
-./secure_credential_manager.sh get-secret vertex-ai-key
+# Get a secret from ./secure_credential_manager.sh get-secret vertex-ai-key
 
 # Create a new secret
 ./secure_credential_manager.sh create-secret api-key ./api-key.txt
@@ -105,7 +95,7 @@ The `secure_credential_manager.sh` script provides CLI tools for managing creden
 ./secure_credential_manager.sh setup-wif
 
 # Create a service account with specific roles
-./secure_credential_manager.sh create-sa memory-system roles/firestore.user,roles/redis.editor
+./secure_credential_manager.sh create-sa memory-system roles/MongoDB
 ```
 
 ### 2. Python Library
@@ -140,8 +130,7 @@ app = FastAPI()
 
 @app.get("/vertex-info")
 async def get_vertex_info(credentials: dict = Depends(get_vertex_ai_credentials)):
-    # Use credentials to access Vertex AI
-    return {"status": "authenticated"}
+    # Use credentials to access     return {"status": "authenticated"}
 ```
 
 ### 4. Terraform Module
@@ -161,8 +150,7 @@ module "secure_credentials" {
 
 ## Usage Examples
 
-### Example 1: Accessing Vertex AI from FastAPI
-
+### Example 1: Accessing
 ```python
 from fastapi import Depends, FastAPI
 from google.cloud import aiplatform
@@ -175,15 +163,13 @@ async def predict(
     request: PredictRequest,
     credentials: dict = Depends(get_vertex_ai_credentials)
 ):
-    # Initialize Vertex AI with credentials
-    aiplatform.init(
+    # Initialize     aiplatform.init(
         project=credentials["project_id"],
         location="us-central1",
         credentials=credentials
     )
 
-    # Use Vertex AI
-    endpoint = aiplatform.Endpoint(request.endpoint_id)
+    # Use     endpoint = aiplatform.Endpoint(request.endpoint_id)
     prediction = endpoint.predict(instances=request.instances)
 
     return {"prediction": prediction}
@@ -192,8 +178,7 @@ async def predict(
 ### Example 2: GitHub Actions Workflow
 
 ```yaml
-name: Deploy to Cloud Run
-
+name: Deploy to
 on:
   push:
     branches: [main]
@@ -211,15 +196,12 @@ jobs:
 
       # Authenticate using Workload Identity Federation
       - id: "auth"
-        name: "Authenticate to Google Cloud"
-        uses: "google-github-actions/auth@v1"
+        name: "Authenticate to         uses: "google-github-actions/auth@v1"
         with:
           workload_identity_provider: "projects/525398941159/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
           service_account: "github-actions@cherry-ai-project.iam.gserviceaccount.com"
 
-      # Deploy to Cloud Run
-      - name: Deploy to Cloud Run
-        uses: google-github-actions/deploy-cloudrun@v1
+      # Deploy to       - name: Deploy to         uses: google-github-actions/deploy-cloudrun@v1
         with:
           service: ai-orchestra
           region: us-central1
@@ -232,8 +214,7 @@ jobs:
 #!/bin/bash
 # deploy_model.sh
 
-# Get credentials from Secret Manager
-export GOOGLE_APPLICATION_CREDENTIALS=$(mktemp)
+# Get credentials from export GOOGLE_APPLICATION_CREDENTIALS=$(mktemp)
 ./secure_credential_manager.sh get-secret vertex-ai-key > "$GOOGLE_APPLICATION_CREDENTIALS"
 chmod 600 "$GOOGLE_APPLICATION_CREDENTIALS"
 
@@ -265,8 +246,7 @@ The project uses Cloud Scheduler and Cloud Functions to automatically rotate cre
 
 1. A Cloud Scheduler job triggers a Cloud Function every 90 days
 2. The Cloud Function rotates the service account key
-3. The new key is stored in Secret Manager
-4. Applications automatically pick up the new key on their next request
+3. The new key is stored in 4. Applications automatically pick up the new key on their next request
 
 ## Troubleshooting
 
@@ -296,8 +276,7 @@ The project uses Cloud Scheduler and Cloud Functions to automatically rotate cre
 
    Check:
 
-   - Does the secret exist in Secret Manager?
-   - Are you using the correct name and environment suffix?
+   - Does the secret exist in    - Are you using the correct name and environment suffix?
    - Do you have permission to access the secret?
 
 3. **Workload Identity Federation Issues**
@@ -320,11 +299,8 @@ For additional help with credential management:
 
 1. Check the logs in Cloud Logging
 2. Review the IAM permissions for your service accounts
-3. Verify Secret Manager access in the GCP Console
-4. Contact the AI Orchestra security team
-
+3. Verify
 ## Further Reading
 
-- [Google Cloud Secret Manager Documentation](https://cloud.google.com/secret-manager/docs)
-- [Workload Identity Federation](https://cloud.google.com/iam/docs/workload-identity-federation)
-- [GCP Security Best Practices](https://cloud.google.com/security/best-practices)
+- [- [Workload Identity Federation](https://cloud.google.com/iam/docs/workload-identity-federation)
+- [

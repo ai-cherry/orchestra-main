@@ -34,8 +34,7 @@ This thread focused on cleaning up the AI Orchestra project environment, establi
   - Environment variables
   - Git configuration
   - Required tools (gcloud, docker, kubectl, pulumi)
-  - GCP authentication
-  - Directory structure
+  -   - Directory structure
 
 ### 4. Environment Setup Progress
 
@@ -49,8 +48,7 @@ This thread focused on cleaning up the AI Orchestra project environment, establi
 - gcloud CLI installed
 - **Pulumi CLI installed** (v3.171.0)
 - **kubectl installed** (v1.33.1)
-- **GCP authentication configured** (logged in as scoobyjava@cherry-ai.me)
-- Project set to `cherry-ai-project`
+- **- Project set to `cherry-ai-project`
 - Created missing `tests/unit/` directory
 
 #### ✅ All Tasks Completed!
@@ -94,9 +92,7 @@ orchestra-main/
 ### .env
 ```
 GOOGLE_CLOUD_PROJECT=cherry-ai-project
-GCP_PROJECT_ID=cherry-ai-project
-# API keys managed by GCP Secret Manager
-```
+# API keys managed by ```
 
 ### .gitmessage
 Configured template for conventional commits with:
@@ -158,8 +154,7 @@ The environment has been successfully cleaned up and configured with:
 - ✅ Proper Python 3.10 environment
 - ✅ Git best practices and templates
 - ✅ All required tools installed
-- ✅ GCP authentication configured
-- ✅ Comprehensive verification tooling
+- ✅ - ✅ Comprehensive verification tooling
 
 The project is now **fully configured and ready for deployment**!
 
@@ -170,10 +165,8 @@ All components are successfully installed and configured:
 - ✅ Virtual environment active
 - ✅ Git configured with commit template
 - ✅ All tools installed (kubectl v1.33.1, pulumi v3.171.0, gcloud 523.0.0, docker 26.1.3)
-- ✅ GCP authenticated as platform-admin@cherry-ai-project.iam.gserviceaccount.com
-- ✅ Project set to cherry-ai-project
-- ✅ API keys available via Secret Manager (OPENROUTER_API_KEY, ANTHROPIC_API_KEY, etc.)
-
+- ✅ - ✅ Project set to cherry-ai-project
+- ✅ API keys available via
 To deploy the infrastructure, simply run:
 ```bash
 ./scripts/deploy_optimized_infrastructure.sh

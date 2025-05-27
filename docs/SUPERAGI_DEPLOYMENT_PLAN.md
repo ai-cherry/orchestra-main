@@ -12,8 +12,7 @@ This document details the complete deployment plan for SuperAGI on Google Kubern
 3. **MongoDB**: Document store for agent data (100Gi storage)
 4. **Weaviate**: Vector database for semantic search (50Gi storage)
 5. **MCP Servers**: Natural language interfaces for MongoDB and Weaviate
-6. **Firestore**: Long-term persistent storage (GCP managed)
-
+6. **MongoDB
 ### Infrastructure Stack
 - **Platform**: Google Kubernetes Engine (GKE)
 - **IaC**: Pulumi with Python
@@ -238,15 +237,13 @@ pulumi.export("https_endpoint", f"https://cherry-ai.me")
 2. **Or use Cloud DNS** (automated):
    ```python
    # Add to infra/main.py
-   dns_zone = gcp.dns.ManagedZone(
-       "cherry-ai-zone",
+   dns_zone =        "cherry-ai-zone",
        name="cherry-ai-zone",
        dns_name="cherry-ai.me.",
        description="DNS zone for cherry-ai.me",
    )
 
-   dns_record = gcp.dns.RecordSet(
-       "cherry-ai-a-record",
+   dns_record =        "cherry-ai-a-record",
        name="cherry-ai.me.",
        type="A",
        ttl=300,
@@ -261,8 +258,7 @@ pulumi.export("https_endpoint", f"https://cherry-ai.me")
 - [x] Python 3.10.12 environment
 - [x] Pulumi CLI installed (v3.171.0)
 - [x] kubectl configured (v1.33.1)
-- [x] GCP authenticated (platform-admin@cherry-ai-project.iam.gserviceaccount.com)
-- [x] Docker installed
+- [x] - [x] Docker installed
 - [ ] Domain DNS access configured
 
 ### 2. Update Infrastructure Code
@@ -278,8 +274,7 @@ cp docs/SUPERAGI_DEPLOYMENT_PLAN.md infra/components/ingress_component.py
 ### 3. Deploy Infrastructure
 ```bash
 # Set environment variables
-export GCP_PROJECT_ID=cherry-ai-project
-export PULUMI_STACK=dev
+export export PULUMI_STACK=dev
 
 # Run deployment
 ./scripts/deploy_optimized_infrastructure.sh

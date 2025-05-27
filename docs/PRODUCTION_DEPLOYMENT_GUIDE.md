@@ -41,8 +41,7 @@ Orchestra uses a two-service deployment architecture:
    - Frontend UI service using the official Phidata Agent UI container image (`phidata/agent_ui:1.0.0`)
    - Serves as a placeholder UI for interacting with the Orchestra backend
    - Connects to the Orchestra API using the `PHIDATA_API_URL` environment variable
-   - Runs as a separate Cloud Run service without direct access to databases or LLMs
-
+   - Runs as a separate
 This separation of concerns allows for:
 
 - Independent scaling of frontend and backend services
@@ -50,8 +49,7 @@ This separation of concerns allows for:
 - Clear API contract between frontend and backend
 - Future replacements of either component without affecting the other
 
-Both services are deployed together using Terraform or the Cloud Run deployment method.
-
+Both services are deployed together using Terraform or the
 ## Deployment Scripts
 
 We've created several scripts to automate and streamline the deployment process:
@@ -64,8 +62,7 @@ We've created several scripts to automate and streamline the deployment process:
 
 2. **`scripts/setup_prod_secrets.sh`**
 
-   - Sets up production secrets in Google Secret Manager
-   - Creates or updates required secrets for production
+   - Sets up production secrets in Google    - Creates or updates required secrets for production
    - Configures IAM permissions for service accounts
 
 3. **`deploy_to_production.sh`**
@@ -87,7 +84,7 @@ This script checks:
 - PostgreSQL setup with pgvector extensions
 - Credentials validity
 - System diagnostics
-- Integration tests (Firestore, Redis, PostgreSQL, LLM)
+- Integration tests (MongoDB
 - UI validation
 
 Review the output carefully and fix any issues before proceeding to production deployment.
@@ -128,8 +125,7 @@ This script helps you create and manage:
 - Redis credentials
 - Other sensitive information
 
-The secrets are stored in Google Secret Manager with proper IAM permissions.
-
+The secrets are stored in Google
 ## Production Deployment
 
 When you're ready to deploy to production, use:
@@ -157,15 +153,13 @@ After deployment, verify both services:
 1. **API Health**: Check if the API is responding correctly
 
    ```bash
-   curl $(gcloud run services describe orchestrator-api-prod --region=us-central1 --format="value(status.url)")/api/health
-   ```
+   curl $(g   ```
 
 2. **Phidata UI**: Verify the UI is accessible
 
    ```bash
    # Get the UI service URL
-   UI_URL=$(gcloud run services describe phidata-agent-ui-prod --region=us-central1 --format="value(status.url)")
-   echo $UI_URL
+   UI_URL=$(g   echo $UI_URL
    ```
 
    - Visit this URL in your web browser to confirm the Phidata Agent UI is working
@@ -192,8 +186,7 @@ The deployment script sets up basic monitoring and alerting for:
 
 For more advanced monitoring:
 
-1. Open the Google Cloud Console
-2. Navigate to Monitoring → Dashboards
+1. Open the 2. Navigate to Monitoring → Dashboards
 3. Create custom dashboards for Orchestra metrics
 4. Set up additional alerting policies as needed
 
@@ -209,11 +202,10 @@ After successful production deployment, follow the prioritized cleanup plan:
   - `diagnose_patrick_issues.py`
 - Remove older setup scripts
   - `setup.sh`
-  - `setup_gcp_auth.sh`
-
+  - `setup_
 ### Priority 2 (Requires Care)
 
-- Remove `future/firestore_memory_manager.py` after validating the V2 adapter works correctly
+- Remove `future/MongoDB
 
 ### Priority 3 (Requires Care)
 
@@ -231,8 +223,7 @@ After successful production deployment, follow the prioritized cleanup plan:
 
 1. **API Key Errors**
 
-   - Check Secret Manager for proper key storage
-   - Verify IAM permissions are correctly set
+   - Check    - Verify IAM permissions are correctly set
 
 2. **Database Connection Issues**
 

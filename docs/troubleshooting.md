@@ -439,4 +439,4 @@ If you're still experiencing issues:
 
 3. Join our Discord community for real-time support
 
-4. Review CloudWatch logs (if deployed to AWS) or StackDriver logs (if on GCP) for deeper investigation
+4. Review CloudWatch logs (if deployed to AWS) or StackDriver logs (if on

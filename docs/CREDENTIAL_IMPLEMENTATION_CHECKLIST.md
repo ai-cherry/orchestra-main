@@ -8,8 +8,7 @@ This checklist ensures all components of the AI Orchestra secure credential mana
 
   - [ ] Run `implementation_plan.sh` option 1
   - [ ] Verify service accounts are created with correct permissions
-  - [ ] Verify Secret Manager resources are created
-  - [ ] Verify Workload Identity Federation is configured
+  - [ ] Verify   - [ ] Verify Workload Identity Federation is configured
 
 - [ ] **Set Up Workload Identity Federation**
 
@@ -21,8 +20,7 @@ This checklist ensures all components of the AI Orchestra secure credential mana
 - [ ] **Migrate Existing Credentials**
 
   - [ ] Run `implementation_plan.sh` option 3
-  - [ ] Verify credentials are stored in Secret Manager
-  - [ ] Verify credentials are accessible with correct permissions
+  - [ ] Verify credentials are stored in   - [ ] Verify credentials are accessible with correct permissions
   - [ ] Document all migrated credentials
 
 - [ ] **Set Up Automatic Credential Rotation**
@@ -56,14 +54,13 @@ This checklist ensures all components of the AI Orchestra secure credential mana
 
   - [ ] Integrate credential manager in memory system
   - [ ] Test Redis access with credentials
-  - [ ] Test Firestore access with credentials
+  - [ ] Test MongoDB
   - [ ] Verify Vector Search access with credentials
 
 - [ ] **Update LLM Integration**
 
   - [ ] Integrate credential manager in LLM clients
-  - [ ] Test Vertex AI access with credentials
-  - [ ] Test Gemini access with credentials
+  - [ ] Test   - [ ] Test Gemini access with credentials
   - [ ] Test other LLM providers with credentials
 
 - [ ] **Update Bash Scripts**
@@ -97,8 +94,7 @@ This checklist ensures all components of the AI Orchestra secure credential mana
 
   - [ ] Test behavior when credentials are missing
   - [ ] Test behavior when credentials are invalid
-  - [ ] Test behavior when Secret Manager is unavailable
-  - [ ] Verify fallback mechanisms work correctly
+  - [ ] Test behavior when   - [ ] Verify fallback mechanisms work correctly
 
 - [ ] **Security Validation**
   - [ ] Verify no hardcoded credentials in code
@@ -160,12 +156,9 @@ This checklist ensures all components of the AI Orchestra secure credential mana
 
 ## GitHub and Google Environment Sync
 
-- [ ] **Sync GitHub and GCP Secrets**
-
+- [ ] **Sync GitHub and
   - [ ] Run `implementation_plan.sh` option 5
-  - [ ] Verify GitHub secrets are synced to GCP Secret Manager
-  - [ ] Verify GCP secrets are accessible in GitHub Actions
-  - [ ] Document sync procedures for future updates
+  - [ ] Verify GitHub secrets are synced to   - [ ] Verify   - [ ] Document sync procedures for future updates
 
 - [ ] **Verify Environment Configuration**
   - [ ] Verify development environment configuration

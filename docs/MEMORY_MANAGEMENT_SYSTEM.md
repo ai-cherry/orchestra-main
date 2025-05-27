@@ -9,8 +9,8 @@ This document describes the enhanced memory management system implemented for th
 The `TieredStorageManager` class provides automatic movement of data between hot, warm, and cold storage tiers based on access patterns.
 
 - **Hot tier**: In-memory cache and Redis Memorystore for fastest access
-- **Warm tier**: Firestore collection for standard access
-- **Cold tier**: Firestore collection with compression for infrequently accessed data
+- **Warm tier**: MongoDB
+- **Cold tier**: MongoDB
 
 ```python
 # Example initialization
@@ -64,8 +64,7 @@ context_pruner = ContextPruner(
 
 The `MemoryProfiler` class provides memory usage profiling and pressure monitoring.
 
-- Integrates with Google Cloud Profiler for visualization
-- Monitors memory usage, hit rates, eviction rates
+- Integrates with - Monitors memory usage, hit rates, eviction rates
 - Provides alerts for memory pressure conditions
 
 ```python

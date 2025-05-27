@@ -15,8 +15,7 @@ Welcome! Start here to navigate the most relevant, up-to-date documentation for 
 
 ## 3 — Infrastructure & Deployment (Pulumi-first)
 
-- [gcp_deployment_guide.md](gcp_deployment_guide.md)
-- [cloud_run_deployment.md](cloud_run_deployment.md)
+- [- [cloud_run_deployment.md](cloud_run_deployment.md)
 - [infra.md](infra.md) — high-level infra topology
 - **Legacy Terraform appendix:** [TERRAFORM_INFRASTRUCTURE_GUIDE.md](TERRAFORM_INFRASTRUCTURE_GUIDE.md)
 

@@ -18,8 +18,7 @@ This guide explains how to integrate the secure credential management system int
 
 ## Overview
 
-The AI Orchestra secure credential management system provides a unified way to access credentials across different environments and components. It uses Google Cloud Secret Manager for secure storage and retrieval of credentials, with support for:
-
+The AI Orchestra secure credential management system provides a unified way to access credentials across different environments and components. It uses
 - Environment-specific credentials (dev, staging, prod)
 - Credential caching for performance
 - Automatic credential rotation
@@ -30,8 +29,7 @@ The AI Orchestra secure credential management system provides a unified way to a
 Before integrating the credential management system, ensure you have:
 
 1. Deployed the Terraform infrastructure using `implementation_plan.sh`
-2. Migrated existing credentials to Secret Manager
-3. Set up Workload Identity Federation for GitHub Actions
+2. Migrated existing credentials to 3. Set up Workload Identity Federation for GitHub Actions
 4. Added the required dependencies:
    ```bash
    poetry add google-cloud-secret-manager
@@ -59,12 +57,9 @@ async def predict(
     credentials: dict = Depends(get_vertex_ai_credentials)
 ):
     """
-    Make a prediction using Vertex AI.
-
-    Uses the Vertex AI credentials injected by the dependency.
-    """
-    # Initialize Vertex AI with credentials
-    from google.cloud import aiplatform
+    Make a prediction using
+    Uses the     """
+    # Initialize     from google.cloud import aiplatform
 
     aiplatform.init(
         project=credentials["project_id"],
@@ -72,8 +67,7 @@ async def predict(
         credentials=credentials
     )
 
-    # Use Vertex AI
-    endpoint = aiplatform.Endpoint(request.endpoint_id)
+    # Use     endpoint = aiplatform.Endpoint(request.endpoint_id)
     prediction = endpoint.predict(instances=request.instances)
 
     return {"prediction": prediction}
@@ -137,21 +131,18 @@ For agent components, use the credential manager directly:
 from core.security.credential_manager import get_credential_manager
 
 class VertexAgent:
-    """Agent that uses Vertex AI for predictions."""
-
+    """Agent that uses
     def __init__(self, project_id=None, environment=None):
         """
         Initialize the Vertex Agent.
 
         Args:
-            project_id: Google Cloud project ID.
-            environment: Environment name (dev, staging, prod).
+            project_id:             environment: Environment name (dev, staging, prod).
         """
         self.credential_manager = get_credential_manager(project_id, environment)
         self.credentials = self.credential_manager.get_service_account_key("vertex-ai-agent")
 
-        # Initialize Vertex AI
-        from google.cloud import aiplatform
+        # Initialize         from google.cloud import aiplatform
 
         aiplatform.init(
             project=self.credentials["project_id"],
@@ -161,11 +152,9 @@ class VertexAgent:
 
     async def predict(self, endpoint_id, instances):
         """
-        Make a prediction using Vertex AI.
-
+        Make a prediction using
         Args:
-            endpoint_id: The Vertex AI endpoint ID.
-            instances: The instances to predict.
+            endpoint_id: The             instances: The instances to predict.
 
         Returns:
             The prediction results.
@@ -198,8 +187,7 @@ class MemoryManager:
         Initialize the Memory Manager.
 
         Args:
-            project_id: Google Cloud project ID.
-            environment: Environment name (dev, staging, prod).
+            project_id:             environment: Environment name (dev, staging, prod).
         """
         self.credential_manager = get_credential_manager(project_id, environment)
         self.redis_config = {
@@ -207,7 +195,7 @@ class MemoryManager:
             "port": self.credential_manager.get_secret("redis-port"),
             "password": self.credential_manager.get_secret("redis-password"),
         }
-        self.firestore_credentials = self.credential_manager.get_service_account_key("memory-system")
+        self.MongoDB
 
     def get_redis_client(self):
         """
@@ -225,18 +213,18 @@ class MemoryManager:
             ssl=True
         )
 
-    def get_firestore_client(self):
+    def get_MongoDB
         """
-        Get a Firestore client.
+        Get a MongoDB
 
         Returns:
-            A Firestore client.
+            A MongoDB
         """
-        from google.cloud import firestore
+        from google.cloud import MongoDB
 
-        return firestore.Client(
-            project=self.firestore_credentials["project_id"],
-            credentials=self.firestore_credentials
+        return MongoDB
+            project=self.MongoDB
+            credentials=self.MongoDB
         )
 
     async def store_short_term(self, key: str, value: Any, ttl: int = 3600):
@@ -266,19 +254,19 @@ class MemoryManager:
 
     async def store_long_term(self, collection: str, document_id: str, data: Dict[str, Any]):
         """
-        Store a value in long-term memory (Firestore).
+        Store a value in long-term memory (MongoDB
 
         Args:
             collection: The collection to store in.
             document_id: The document ID.
             data: The data to store.
         """
-        client = self.get_firestore_client()
+        client = self.get_MongoDB
         client.collection(collection).document(document_id).set(data)
 
     async def retrieve_long_term(self, collection: str, document_id: str) -> Optional[Dict[str, Any]]:
         """
-        Retrieve a value from long-term memory (Firestore).
+        Retrieve a value from long-term memory (MongoDB
 
         Args:
             collection: The collection to retrieve from.
@@ -287,7 +275,7 @@ class MemoryManager:
         Returns:
             The data, or None if not found.
         """
-        client = self.get_firestore_client()
+        client = self.get_MongoDB
         doc = client.collection(collection).document(document_id).get()
         return doc.to_dict() if doc.exists else None
 ```
@@ -312,8 +300,7 @@ class LLMManager:
         Initialize the LLM Manager.
 
         Args:
-            project_id: Google Cloud project ID.
-            environment: Environment name (dev, staging, prod).
+            project_id:             environment: Environment name (dev, staging, prod).
         """
         self.credential_manager = get_credential_manager(project_id, environment)
 
@@ -325,8 +312,7 @@ class LLMManager:
 
     async def generate_vertex(self, prompt: str, model: str = "text-bison") -> str:
         """
-        Generate text using Vertex AI.
-
+        Generate text using
         Args:
             prompt: The prompt to generate from.
             model: The model to use.
@@ -425,8 +411,7 @@ For bash scripts, use the `secure_credential_manager.sh` script to access creden
 #!/bin/bash
 # deploy_model.sh
 
-# Get credentials from Secret Manager
-export GOOGLE_APPLICATION_CREDENTIALS=$(mktemp)
+# Get credentials from export GOOGLE_APPLICATION_CREDENTIALS=$(mktemp)
 ./secure_credential_manager.sh get-secret vertex-ai-key > "$GOOGLE_APPLICATION_CREDENTIALS"
 chmod 600 "$GOOGLE_APPLICATION_CREDENTIALS"
 
@@ -445,8 +430,7 @@ rm -f "$GOOGLE_APPLICATION_CREDENTIALS"
 For GitHub Actions, use Workload Identity Federation:
 
 ```yaml
-name: Deploy to Cloud Run
-
+name: Deploy to
 on:
   push:
     branches: [main]
@@ -464,8 +448,7 @@ jobs:
 
       # Authenticate using Workload Identity Federation
       - id: "auth"
-        name: "Authenticate to Google Cloud"
-        uses: "google-github-actions/auth@v1"
+        name: "Authenticate to         uses: "google-github-actions/auth@v1"
         with:
           workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.SERVICE_ACCOUNT_EMAIL }}
@@ -474,14 +457,11 @@ jobs:
       - name: "Set up Cloud SDK"
         uses: "google-github-actions/setup-gcloud@v1"
 
-      # Deploy to Cloud Run
-      - name: Deploy to Cloud Run
-        uses: google-github-actions/deploy-cloudrun@v1
+      # Deploy to       - name: Deploy to         uses: google-github-actions/deploy-cloudrun@v1
         with:
           service: ai-orchestra
           region: us-central1
-          image: gcr.io/${{ secrets.GCP_PROJECT_ID }}/ai-orchestra:${{ github.sha }}
-```
+          image: gcr.io/${{ secrets.```
 
 ## Terraform Integration
 
@@ -591,13 +571,11 @@ If you encounter issues with the credential management system:
 1. **Authentication Failures**:
 
    - Check if the service account has the necessary permissions
-   - Verify that the credentials are correctly stored in Secret Manager
-   - Ensure the environment variables are set correctly
+   - Verify that the credentials are correctly stored in    - Ensure the environment variables are set correctly
 
 2. **Secret Not Found**:
 
-   - Check if the secret exists in Secret Manager
-   - Verify that you're using the correct name and environment suffix
+   - Check if the secret exists in    - Verify that you're using the correct name and environment suffix
    - Ensure you have permission to access the secret
 
 3. **Workload Identity Federation Issues**:
