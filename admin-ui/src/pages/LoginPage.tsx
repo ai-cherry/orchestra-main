@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useTheme } from '@/context/ThemeContext';
+import { useTheme } from '@/context/useTheme';
 import { Palette, Moon, Sun, AlertTriangle } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useNavigate } from '@tanstack/react-router'; // For navigation
