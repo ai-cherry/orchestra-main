@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet, createRootRoute, redirect, useRouterState } from '@tanstack/react-router';
+import { Outlet, createRootRoute, redirect } from '@tanstack/react-router';
 import AppLayout from '@/components/layout/AppLayout';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { useAuthStore } from '@/store/authStore'; // Import auth store
@@ -46,9 +46,6 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
-  const { isAuthenticated } = useAuthStore(); // Subscribe to state for re-renders if needed
-  const routerState = useRouterState(); // Get router state
-
   // This useEffect is an alternative/additional way to handle redirection,
   // especially if beforeLoad has timing issues or if you need component context.
   // useEffect(() => {
@@ -60,7 +57,7 @@ function RootComponent() {
   return (
     <ThemeProvider defaultTheme="neutral" defaultMode="light" storageKey="admin-ui-theme">
       {/* Conditionally render AppLayout only if authenticated, or if it's the login page which might not use AppLayout */}
-      {/* This logic can be complex. For now, AppLayout is always rendered by __root, 
+      {/* This logic can be complex. For now, AppLayout is always rendered by __root,
           and LoginPage itself doesn't use PageWrapper or relies on AppLayout's structure. */}
       <AppLayout>
         <Outlet />

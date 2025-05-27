@@ -3,7 +3,7 @@ import PageWrapper from '@/components/layout/PageWrapper';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import StatusIndicator from '@/components/ui/StatusIndicator'; // Ensure this path is correct
-import { MoreHorizontal, Edit, Trash2, Eye, Download, RefreshCw, PlusCircle, FileText, Link as LinkIcon, FileArchive, FileUp, FileQuestion } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, Download, RefreshCw, FileText, Link as LinkIcon, FileArchive, FileUp, FileQuestion } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -95,9 +95,9 @@ export function ResourcesPage() {
                   <TableCell>{resource.size}</TableCell>
                   <TableCell className="text-xs font-mono">{resource.dateAdded}</TableCell>
                   <TableCell>
-                    <StatusIndicator 
-                      status={mapResourceStatusToIndicator(resource.status)} 
-                      text={resource.status} 
+                    <StatusIndicator
+                      status={mapResourceStatusToIndicator(resource.status)}
+                      text={resource.status}
                     />
                   </TableCell>
                   <TableCell className="text-right">
@@ -121,7 +121,7 @@ export function ResourcesPage() {
                           <RefreshCw className="mr-2 h-4 w-4" /> Re-process
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => handleAction('Delete Resource', resource.id, resource.name)}
                           className="text-destructive hover:!bg-destructive/10 focus:!bg-destructive/10 focus:!text-destructive"
                         >

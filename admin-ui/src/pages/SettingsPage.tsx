@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
-import { useTheme, Theme as AppTheme, Mode as AppMode } from '@/context/ThemeContext'; // Import Theme and Mode types
+import { useTheme, Theme as AppTheme } from '@/context/ThemeContext'; // Import Theme type
 
 const themes: { name: string; value: AppTheme }[] = [
   { name: 'Neutral', value: 'neutral' },
@@ -28,7 +28,7 @@ export function SettingsPage() {
 
   return (
     <PageWrapper title="Settings">
-      {/* The PageWrapper already provides a main title container. 
+      {/* The PageWrapper already provides a main title container.
           If a secondary h1 is desired, it can be added here, but typically PageWrapper handles the main page title.
           The example had an additional h1, I'll stick to PageWrapper's title for consistency.
       */}
@@ -82,7 +82,7 @@ export function SettingsPage() {
             </div>
           </CardContent>
         </Card>
-        
+
         {/* Placeholder for more settings cards */}
         {/* <Card>
           <CardHeader>
