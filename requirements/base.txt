@@ -50,7 +50,6 @@ chromadb==0.4.22
 
 # Async Support
 anyio==4.9.0
-asyncio==3.4.3
 
 # Serialization
 protobuf==6.31.0
