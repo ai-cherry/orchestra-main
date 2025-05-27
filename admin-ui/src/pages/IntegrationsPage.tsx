@@ -59,9 +59,9 @@ export function IntegrationsPage() {
                 <integration.Icon className="h-10 w-10 text-theme-accent-primary mt-1" /> {/* Slightly larger icon, themed */}
                 <div>
                   <CardTitle className="text-xl mb-1">{integration.name}</CardTitle>
-                  <StatusIndicator 
-                    status={mapIntegrationStatusToIndicator(integration.status)} 
-                    text={integration.status} 
+                  <StatusIndicator
+                    status={mapIntegrationStatusToIndicator(integration.status)}
+                    text={integration.status}
                   />
                 </div>
               </div>
@@ -70,17 +70,17 @@ export function IntegrationsPage() {
               <CardDescription className="text-sm">{integration.description}</CardDescription>
             </CardContent>
             <CardFooter className="flex justify-end space-x-2 pt-4"> {/* Added pt-4 for spacing */}
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => handleConfigure(integration.id)}
                 aria-label={`Configure ${integration.name}`}
               >
                 <Settings2 className="mr-1.5 h-4 w-4" /> Configure
               </Button>
-              <Button 
-                variant="destructive" 
-                size="sm" 
+              <Button
+                variant="destructive"
+                size="sm"
                 onClick={() => handleDisconnect(integration.id)}
                 aria-label={`Disconnect ${integration.name}`}
               >

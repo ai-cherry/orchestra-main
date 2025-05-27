@@ -16,6 +16,16 @@ from opentelemetry.exporter.cloud_trace import CloudTraceSpanExporter
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
+# Optional: Google Cloud Monitoring and Logging integration
+try:
+    import monitoring_v3
+except ImportError:
+    monitoring_v3 = None
+try:
+    import cloud_logging
+except ImportError:
+    cloud_logging = None
+
 # Configure logging
 logger = logging.getLogger(__name__)
 

@@ -46,9 +46,9 @@ export function LogsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
           <div className="space-y-1">
             <label htmlFor="search-logs" className="text-sm font-medium text-muted-foreground">Search Logs</label>
-            <Input 
+            <Input
               id="search-logs"
-              placeholder="By message, source..." 
+              placeholder="By message, source..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -114,7 +114,7 @@ export function LogsPage() {
           </Table>
         </div>
       </div>
-      
+
       {/* Placeholder Pagination */}
       <div className="mt-6 flex justify-center items-center space-x-2">
         <Button variant="outline" size="sm" disabled>Previous</Button>

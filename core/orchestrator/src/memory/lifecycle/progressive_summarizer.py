@@ -12,6 +12,12 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from pydantic import BaseModel, Field
 
+# Optional: Vertex AI integration for summarization
+try:
+    import aiplatform
+except ImportError:
+    aiplatform = None
+
 # Configure logging
 logger = logging.getLogger(__name__)
 

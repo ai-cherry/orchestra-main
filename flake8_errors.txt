@@ -1,0 +1,116 @@
+./agent/orchestration.py:16:13: F821 undefined name 'workflows'
+./analyze_code_wrapper.py:65:9: F821 undefined name 'aiplatform'
+./core/orchestrator/src/agents/memory/manager.py:442:28: F821 undefined name 'mongodb'
+./core/orchestrator/src/config/config.py:54:13: E999 IndentationError: unexpected indent
+./core/orchestrator/src/config/loader.py:280:18: F821 undefined name 'secretmanager'
+./core/orchestrator/src/config/settings_clean.py:8:1: F401 'typing.Any' imported but unused
+./core/orchestrator/src/config/settings_clean.py:8:1: F401 'typing.List' imported but unused
+./core/orchestrator/src/memory/layered_memory_manager.py:59:31: F821 undefined name 'mongodb'
+./core/orchestrator/src/memory/layered_memory_manager.py:78:13: F821 undefined name 'aiplatform'
+./core/orchestrator/src/memory/layered_memory_manager.py:495:20: F821 undefined name 'aiplatform'
+./core/orchestrator/src/memory/lifecycle/memory_chunker.py:158:13: F821 undefined name 'aiplatform'
+./core/orchestrator/src/memory/lifecycle/memory_chunker.py:163:38: F821 undefined name 'aiplatform'
+./core/orchestrator/src/memory/lifecycle/memory_chunker.py:167:38: F821 undefined name 'aiplatform'
+./core/orchestrator/src/memory/lifecycle/progressive_summarizer.py:130:13: F821 undefined name 'aiplatform'
+./core/orchestrator/src/memory/lifecycle/progressive_summarizer.py:135:38: F821 undefined name 'aiplatform'
+./core/orchestrator/src/memory/lifecycle/progressive_summarizer.py:139:38: F821 undefined name 'aiplatform'
+./core/orchestrator/src/memory/retrieval/query_classifier.py:176:13: F821 undefined name 'aiplatform'
+./core/orchestrator/src/memory/retrieval/query_classifier.py:181:38: F821 undefined name 'aiplatform'
+./core/orchestrator/src/memory/retrieval/query_classifier.py:185:38: F821 undefined name 'aiplatform'
+./core/orchestrator/src/resilience/incident_reporter.py:40:35: F821 undefined name 'cloud_logging'
+./core/orchestrator/src/resilience/monitoring.py:42:23: F821 undefined name 'monitoring_v3'
+./core/orchestrator/src/resilience/monitoring.py:90:22: F821 undefined name 'monitoring_v3'
+./core/orchestrator/src/resilience/monitoring.py:103:21: F821 undefined name 'monitoring_v3'
+./core/orchestrator/src/resilience/monitoring.py:160:22: F821 undefined name 'monitoring_v3'
+./core/orchestrator/src/resilience/monitoring.py:162:34: F821 undefined name 'monitoring_v3'
+./core/orchestrator/src/resilience/monitoring.py:163:33: F821 undefined name 'monitoring_v3'
+./core/orchestrator/src/resilience/monitoring.py:192:30: F821 undefined name 'cloud_logging'
+./core/orchestrator/src/resilience/tasks.py:51:23: F821 undefined name 'tasks_v2'
+./core/orchestrator/src/resilience/tasks.py:104:36: F821 undefined name 'tasks_v2'
+./core/persistency/mode_config_persistence.py:155:42: F821 undefined name 'secretmanager'
+./core/persistency/mode_config_persistence.py:162:39: F821 undefined name 'storage'
+./core/persistency/mode_config_persistence.py:169:41: F821 undefined name 'mongodb'
+./core/persistency/mode_config_persistence.py:420:43: F821 undefined name 'mongodb'
+./core/persistency/mode_config_persistence.py:504:43: F821 undefined name 'mongodb'
+./core/persistency/mode_config_persistence.py:921:39: F821 undefined name 'mongodb'
+./dragonfly_config.py:39:22: F821 undefined name 'secretmanager'
+./execute_strategy_workflow.py:43:19: F821 undefined name 'SubtaskManager'
+./infra/do_superagi_stack.py:211:150: E999 SyntaxError: unterminated string literal (detected at line 211)
+./mcp_cli.py:142:43: F821 undefined name 'ROO_MODES'
+./mcp_cli.py:144:45: F821 undefined name 'ROO_MODES'
+./mcp_cli.py:292:35: F821 undefined name 'ROO_MODES'
+./mcp_server/memory/langchain_memory.py:90:28: F821 undefined name 'FirestoreEpisodicMemory'
+./mcp_server/scripts/deploy_monitoring.py:110:14: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:114:22: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:117:34: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:120:33: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:127:32: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:130:43: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:156:14: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:164:18: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:166:27: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:172:25: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:185:35: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:187:54: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:192:29: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:199:29: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:203:21: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:220:43: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:223:33: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:229:37: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:254:24: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:374:14: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:382:17: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:387:26: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:396:24: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:412:27: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:415:21: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:444:14: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:452:22: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:455:34: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:458:33: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:465:32: F821 undefined name 'monitoring_v3'
+./mcp_server/scripts/deploy_monitoring.py:468:43: F821 undefined name 'monitoring_v3'
+./mcp_server/servers/base_mcp_server.py:100:34: F821 undefined name 'pubsub_v1'
+./mcp_server/servers/base_mcp_server.py:113:39: F821 undefined name 'servicedirectory_v1'
+./mcp_server/servers/base_mcp_server.py:183:20: F821 undefined name 'gcp_exceptions'
+./mcp_server/servers/base_mcp_server.py:209:20: F821 undefined name 'gcp_exceptions'
+./mcp_server/servers/base_mcp_server.py:230:24: F821 undefined name 'gcp_exceptions'
+./mcp_server/servers/deployment_server.py:6:1: F401 'json' imported but unused
+./mcp_server/servers/memory_server.py:6:1: F401 'json' imported but unused
+./mcp_server/servers/orchestrator_server.py:6:1: F401 'json' imported but unused
+./mcp_server/utils/secret_manager.py:89:32: F821 undefined name 'storage'
+./packages/agents/company_enrichment_agent.py:31:19: F821 undefined name 'mongodb'
+./packages/agents/contact_enrichment_agent.py:39:19: F821 undefined name 'mongodb'
+./packages/agents/property_enrichment_agent.py:28:19: F821 undefined name 'mongodb'
+./packages/agents/src/routing.py:77:13: F821 undefined name 'aiplatform'
+./packages/agents/src/routing.py:82:49: F821 undefined name 'aiplatform'
+./packages/agents/src/routing.py:94:35: F821 undefined name 'spanner'
+./packages/agents/src/routing.py:103:21: F821 undefined name 'spanner_v1'
+./packages/agents/src/routing.py:111:35: F821 undefined name 'billing_v1'
+./packages/agents/src/routing.py:755:24: F821 undefined name 'spanner'
+./scripts/orchestra_complete_setup.py:6:1: F401 'os' imported but unused
+./scripts/orchestra_complete_setup.py:7:1: F401 'sys' imported but unused
+./scripts/orchestra_complete_setup.py:9:1: F401 'subprocess' imported but unused
+./scripts/orchestra_complete_setup.py:12:1: F401 'typing.Dict' imported but unused
+./scripts/orchestra_complete_setup.py:12:1: F401 'typing.Set' imported but unused
+./scripts/orchestra_complete_setup.py:12:1: F401 'typing.Tuple' imported but unused
+./scripts/orchestra_complete_setup.py:13:1: F401 're' imported but unused
+./scripts/orchestra_setup_wizard.py:9:1: F401 'json' imported but unused
+./scripts/orchestra_setup_wizard.py:11:1: F401 'typing.Dict' imported but unused
+./scripts/orchestra_setup_wizard.py:11:1: F401 'typing.List' imported but unused
+./scripts/orchestra_setup_wizard.py:11:1: F401 'typing.Optional' imported but unused
+./scripts/orchestra_status.py:6:1: F401 'os' imported but unused
+./scripts/setup_orchestra_environment.py:9:1: F401 'json' imported but unused
+./scripts/setup_orchestra_environment.py:12:1: F401 'typing.Dict' imported but unused
+./scripts/setup_orchestra_environment.py:12:1: F401 'typing.Optional' imported but unused
+./scripts/setup_orchestra_environment.py:12:1: F401 'typing.Tuple' imported but unused
+./scripts/test_new_setup.py:10:1: F401 'datetime.datetime' imported but unused
+./shared/memory/memory_manager.py:95:27: F821 undefined name 'mongodb'
+./shared/memory/memory_manager.py:101:27: F821 undefined name 'mongodb'
+./shared/vertex_ai/bridge.py:355:13: F821 undefined name 'aiplatform'
+./shared/vertex_ai/bridge.py:522:32: F821 undefined name 'aiplatform'
+./shared/vertex_ai/bridge.py:552:28: F821 undefined name 'aiplatform'
+./shared/vertex_ai/bridge.py:644:21: F821 undefined name 'aiplatform'
+./tools/orchestra_cli.py:70:23: F821 undefined name 'secretmanager'
+./tools/orchestra_cli.py:511:18: F821 undefined name 'secretmanager'

@@ -93,9 +93,9 @@ export function WorkflowsPage() {
                      </div>
                   </TableCell>
                   <TableCell>
-                    <StatusIndicator 
-                      status={mapWorkflowStatusToIndicator(workflow.status)} 
-                      text={workflow.status} 
+                    <StatusIndicator
+                      status={mapWorkflowStatusToIndicator(workflow.status)}
+                      text={workflow.status}
                     />
                   </TableCell>
                   <TableCell className="text-xs font-mono">{workflow.lastRun}</TableCell>
@@ -136,7 +136,7 @@ export function WorkflowsPage() {
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => handleAction('Delete Workflow', workflow.id, workflow.name)}
                           className="text-destructive hover:!bg-destructive/10 focus:!bg-destructive/10 focus:!text-destructive"
                         >

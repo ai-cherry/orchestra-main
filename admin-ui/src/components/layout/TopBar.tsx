@@ -2,10 +2,10 @@ import React from 'react';
 import { Menu, X, Moon, Sun, User, Palette, LogOut } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { Button } from '@/components/ui/button'; // Actual import
-import { 
-  DropdownMenu, 
-  DropdownMenuTrigger, 
-  DropdownMenuContent, 
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu'; // Actual import
@@ -42,7 +42,7 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
     }
     return 'Admin'; // Default title
   };
-  
+
   const currentPageTitle = deriveTitleFromPath(routerState.location.pathname);
 
   return (

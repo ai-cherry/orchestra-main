@@ -11,6 +11,12 @@ import uuid
 from datetime import datetime
 from typing import Any, Dict, Optional
 
+# Optional: Google Cloud Logging integration
+try:
+    import cloud_logging
+except ImportError:
+    cloud_logging = None
+
 
 # Configure logging
 logger = logging.getLogger(__name__)

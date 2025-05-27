@@ -42,6 +42,7 @@ class Settings(BaseSettings):
     REDIS_ENABLED: bool = True
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
+    REDIS_PASSWORD: Optional[str] = None
 
     # Resource paths
     PERSONA_CONFIG_PATH: str = "core/orchestrator/src/config/personas"
@@ -51,11 +52,10 @@ class Settings(BaseSettings):
     MEMORY_BACKEND_TYPE: str = "mongodb"
     CONVERSATION_HISTORY_LIMIT: int = 10
     MEMORY_CACHE_TTL: int = 3600  # 1 hour default
-            REDIS_PASSWORD: Optional[str] = None
 
     # Enhanced memory settings
     USE_RESILIENT_ADAPTER: bool = True  # Whether to use circuit breaker pattern
-                    EMBEDDING_DIMENSION: int = 768  # Dimension of embedding vectors
+    EMBEDDING_DIMENSION: int = 768  # Dimension of embedding vectors
     ENABLE_MEMORY_MONITORING: bool = True  # Whether to enable memory monitoring
 
     # Agent settings

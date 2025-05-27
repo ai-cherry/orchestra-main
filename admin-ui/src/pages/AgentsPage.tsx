@@ -86,7 +86,7 @@ export function AgentsPage() {
                         <DropdownMenuItem onClick={() => handleAction('Edit', agent.id)}>
                           <Edit className="mr-2 h-4 w-4" /> Edit Agent
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => handleAction('Delete', agent.id)}
                           className="text-red-500 hover:!text-red-600 focus:text-red-600"
                         >
