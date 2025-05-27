@@ -499,14 +499,13 @@ def create_default_memory_manager() -> LayeredMemoryManager:
             name="long_term",
             store_type=MemoryType.mongodb,
             priority=2,
-            config={"collection": "memory", "project": "cherry-ai-project"},
+            config={"collection": "memory"},
         ),
         MemoryLayer(
             name="semantic",
             store_type=MemoryType.OPENAI_VECTOR,
             priority=1,
             config={
-                "project": "cherry-ai-project",
                 "location": "us-west4",
                 "index_name": "memory-index",
                 "embedding_model": "textembedding-gecko@latest",
