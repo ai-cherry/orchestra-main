@@ -16,8 +16,8 @@ class MemoryType(str, Enum):
 
     REDIS = "redis"
     PGVECTOR = "pgvector"
-    FIRESTORE = "firestore"
-    VERTEX_VECTOR = "vertex_vector"
+    mongodb = "mongodb"
+    OPENAI_VECTOR = "vertex_vector"
     IN_MEMORY = "in_memory"
 
 
@@ -46,7 +46,7 @@ class MemoryConfig(BaseModel):
         cls, v: Optional[int], values: Dict[str, Any]
     ) -> Optional[int]:
         if (
-            values.get("memory_type") in [MemoryType.PGVECTOR, MemoryType.VERTEX_VECTOR]
+            values.get("memory_type") in [MemoryType.PGVECTOR, MemoryType.OPENAI_VECTOR]
             and not v
         ):
             raise ValueError(
@@ -163,7 +163,7 @@ class LLMProvider(str, Enum):
     OPENAI = "openai"
     AZURE = "azure"
     ANTHROPIC = "anthropic"
-    VERTEX = "vertex"
+    OPENAI = "vertex"
     PORTKEY = "portkey"
     OPENROUTER = "openrouter"
 

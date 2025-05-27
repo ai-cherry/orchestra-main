@@ -34,10 +34,9 @@ except ImportError:
         not DRAGONFLY_HOST or not DRAGONFLY_PASSWORD or not DRAGONFLY_CONNECTION_URI
     ) and os.getenv("GOOGLE_CLOUD_PROJECT"):
         try:
-            from google.cloud import secretmanager
 
             project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
-            client = secretmanager.SecretManagerServiceClient()
+            client = secretmanager.EnvironmentConfigServiceClient()
 
             def get_secret(secret_id):
                 name = f"projects/{project_id}/secrets/{secret_id}/versions/latest"
@@ -54,7 +53,7 @@ except ImportError:
                 DRAGONFLY_PORT = int(get_secret("DRAGONFLY_PORT"))
             if not DRAGONFLY_DB_INDEX:
                 DRAGONFLY_DB_INDEX = int(get_secret("DRAGONFLY_DB_INDEX"))
-            _SOURCE = "gcp_secret_manager"
+            _SOURCE = "gcp_os.environ"
         except Exception:
             # If GCP Secret Manager is unavailable, fail gracefully
             pass

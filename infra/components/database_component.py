@@ -1,7 +1,7 @@
 """
 Database Component for Pulumi Infrastructure
 ===========================================
-Modular component for managing database resources (DragonflyDB, MongoDB, Firestore)
+Modular component for managing database resources (DragonflyDB, MongoDB, mongodb)
 """
 
 from typing import Any, Dict, Optional
@@ -17,7 +17,7 @@ from .secret_helper import create_k8s_secret_from_config
 class DatabaseComponent(ComponentResource):
     """
     Reusable database component for the AI Orchestra system.
-    Manages DragonflyDB, MongoDB, and Firestore resources.
+    Manages DragonflyDB, MongoDB, and mongodb resources.
     """
 
     def __init__(
@@ -50,7 +50,7 @@ class DatabaseComponent(ComponentResource):
             )
             self.mongodb = self._create_mongodb(child_opts)
 
-        # Configure Firestore
+        # Configure mongodb
         self.firestore_config = self._configure_firestore(child_opts)
 
         # Register outputs
@@ -293,19 +293,19 @@ class DatabaseComponent(ComponentResource):
         }
 
     def _configure_firestore(self, opts: ResourceOptions) -> Dict[str, Any]:
-        """Configure Firestore for document storage"""
+        """Configure mongodb for document storage"""
 
-        # Ensure Firestore API is enabled
+        # Ensure mongodb API is enabled
         firestore_api = gcp.projects.Service(
-            f"{self._name}-firestore-api",
-            service="firestore.googleapis.com",
+            f"{self._name}-mongodb-api",
+            service="mongodb.googleapis.com",
             project=self.project_id,
             disable_on_destroy=False,
             opts=opts,
         )
 
-        # Create Firestore database (if not exists)
-        # Note: Firestore database creation via Pulumi requires specific API
+        # Create mongodb database (if not exists)
+        # Note: mongodb database creation via Pulumi requires specific API
         # For now, we'll ensure the API is enabled and document the setup
 
         return {

@@ -34,8 +34,8 @@ class HealthMonitor:
     def __init__(self, admin_ui_url: str = "http://localhost:3000") -> None:
         self.admin_ui_url = admin_ui_url
         self.services: dict[str, dict[str, Any]] = {
-            "mcp_secret_manager": {"port": 8002, "name": "MCP Secret Manager"},
-            "mcp_firestore": {"port": 8080, "name": "MCP Firestore"},
+            "mcp_os.environ": {"port": 8002, "name": "MCP Secret Manager"},
+            "mcp_firestore": {"port": 8080, "name": "MCP mongodb"},
             "orchestrator": {"port": 8080, "name": "Core Orchestrator"},
         }
 

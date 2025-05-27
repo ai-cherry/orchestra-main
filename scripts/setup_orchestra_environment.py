@@ -212,7 +212,7 @@ Orchestra AI is now a **GCP-free** system using:
 
 - No GCP dependencies remain in the codebase
 - All Google Cloud imports have been removed
-- Firestore replaced with MongoDB
+- mongodb replaced with MongoDB
 - Secret Manager replaced with environment variables
 """
 

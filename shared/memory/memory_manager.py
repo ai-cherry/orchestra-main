@@ -73,7 +73,7 @@ class InMemoryMemoryManager(MemoryManager):
 
 
 class FirestoreMemoryManager(MemoryManager):
-    """Firestore implementation of MemoryManager for GCP integration."""
+    """mongodb implementation of MemoryManager for GCP integration."""
 
     def __init__(
         self, collection_name: str = "memories", credentials_path: Optional[str] = None
@@ -82,7 +82,7 @@ class FirestoreMemoryManager(MemoryManager):
         Initialize the FirestoreMemoryManager.
 
         Args:
-            collection_name: The Firestore collection to use
+            collection_name: The mongodb collection to use
             credentials_path: Path to the GCP service account credentials file.
                               If not provided, will use environment variable GOOGLE_APPLICATION_CREDENTIALS
         """
@@ -92,42 +92,42 @@ class FirestoreMemoryManager(MemoryManager):
                 credentials = service_account.Credentials.from_service_account_file(
                     credentials_path
                 )
-                self.db = firestore.Client(credentials=credentials)
+                self.db = mongodb.Client(credentials=credentials)
                 logger.info(
-                    f"Initialized Firestore client with credentials from {credentials_path}"
+                    f"Initialized mongodb client with credentials from {credentials_path}"
                 )
             else:
                 # Otherwise, rely on default authentication (GOOGLE_APPLICATION_CREDENTIALS env var)
-                self.db = firestore.Client()
-                logger.info("Initialized Firestore client with default credentials")
+                self.db = mongodb.Client()
+                logger.info("Initialized mongodb client with default credentials")
 
             self.collection = self.db.collection(collection_name)
-            logger.info(f"Using Firestore collection: {collection_name}")
+            logger.info(f"Using mongodb collection: {collection_name}")
         except Exception as e:
-            logger.error(f"Error initializing Firestore client: {str(e)}")
+            logger.error(f"Error initializing mongodb client: {str(e)}")
             raise
 
     async def store(self, memory_item: MemoryItem) -> str:
-        """Store a memory item in Firestore."""
+        """Store a memory item in mongodb."""
         try:
             if not memory_item.id:
                 memory_item.id = f"mem_{int(time.time() * 1000)}"
 
-            # Convert the memory item to a dictionary for Firestore
+            # Convert the memory item to a dictionary for mongodb
             memory_dict = memory_item.model_dump()
 
-            # Store in Firestore
+            # Store in mongodb
             doc_ref = self.collection.document(memory_item.id)
             doc_ref.set(memory_dict)
 
             logger.debug(f"Stored memory item with ID: {memory_item.id}")
             return memory_item.id
         except Exception as e:
-            logger.error(f"Error storing memory item in Firestore: {str(e)}")
+            logger.error(f"Error storing memory item in mongodb: {str(e)}")
             raise
 
     async def retrieve(self, memory_id: str) -> Optional[MemoryItem]:
-        """Retrieve a memory item from Firestore by ID."""
+        """Retrieve a memory item from mongodb by ID."""
         try:
             doc_ref = self.collection.document(memory_id)
             doc = doc_ref.get()
@@ -138,12 +138,12 @@ class FirestoreMemoryManager(MemoryManager):
                 logger.debug(f"Memory item not found with ID: {memory_id}")
                 return None
         except Exception as e:
-            logger.error(f"Error retrieving memory item from Firestore: {str(e)}")
+            logger.error(f"Error retrieving memory item from mongodb: {str(e)}")
             raise
 
     async def search(self, query: str, limit: int = 10) -> List[MemoryItem]:
         """
-        Search for memory items in Firestore.
+        Search for memory items in mongodb.
         Note: This is a simple implementation. For more advanced searches,
         consider adding a proper search index or using a specialized service like Algolia.
         """
@@ -165,11 +165,11 @@ class FirestoreMemoryManager(MemoryManager):
 
             return results
         except Exception as e:
-            logger.error(f"Error searching memory items in Firestore: {str(e)}")
+            logger.error(f"Error searching memory items in mongodb: {str(e)}")
             raise
 
     async def delete(self, memory_id: str) -> bool:
-        """Delete a memory item from Firestore by ID."""
+        """Delete a memory item from mongodb by ID."""
         try:
             doc_ref = self.collection.document(memory_id)
             doc = doc_ref.get()
@@ -182,7 +182,7 @@ class FirestoreMemoryManager(MemoryManager):
                 logger.debug(f"Memory item not found with ID: {memory_id}")
                 return False
         except Exception as e:
-            logger.error(f"Error deleting memory item from Firestore: {str(e)}")
+            logger.error(f"Error deleting memory item from mongodb: {str(e)}")
             raise
 
 
@@ -195,7 +195,7 @@ class MemoryManagerFactory:
         Create a memory manager instance based on the specified type.
 
         Args:
-            memory_type: Type of memory manager to create ('in-memory' or 'firestore')
+            memory_type: Type of memory manager to create ('in-memory' or 'mongodb')
             **kwargs: Additional arguments to pass to the memory manager constructor
 
         Returns:
@@ -206,7 +206,7 @@ class MemoryManagerFactory:
         """
         if memory_type.lower() == "in-memory":
             return InMemoryMemoryManager()
-        elif memory_type.lower() == "firestore":
+        elif memory_type.lower() == "mongodb":
             collection = kwargs.get("collection_name", "memories")
             creds_path = kwargs.get(
                 "credentials_path", os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")

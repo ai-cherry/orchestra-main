@@ -31,7 +31,6 @@ except ImportError:
 from ..utils.structured_logging import get_logger
 from .base import MemoryEntry, MemoryMetadata, MemoryTier
 from .dragonfly_cache import DragonflyCache
-from .firestore_episodic import FirestoreEpisodicMemory
 from .qdrant_semantic import QdrantSemanticMemory
 
 logger = get_logger(__name__)
@@ -69,7 +68,7 @@ class LangChainMemoryWrapper(BaseChatMemory):
             output_key: Key for output messages
             return_messages: Whether to return messages or strings
             dragonfly_config: Configuration for DragonflyDB cache
-            firestore_config: Configuration for Firestore episodic memory
+            firestore_config: Configuration for mongodb episodic memory
             qdrant_config: Configuration for Qdrant semantic memory
             session_id: Optional session identifier for isolation
         """

@@ -2,7 +2,7 @@
 Contact Enrichment Agent
 
 Finds and verifies executive contacts for companies, enriches CRM records.
-Integrates with Firestore for data storage, Apollo.io and PhantomBuster for contact search,
+Integrates with mongodb for data storage, Apollo.io and PhantomBuster for contact search,
 and supports Browser Use for LinkedIn scraping and Claude Max for validation.
 
 Author: AI Orchestrator Team
@@ -30,13 +30,13 @@ class ContactEnrichmentAgent:
     ):
         """
         Args:
-            firestore_collection: Name of the Firestore collection for companies/contacts.
+            firestore_collection: Name of the mongodb collection for companies/contacts.
             apollo_api_key: API key for Apollo.io.
             phantombuster_api_key: API key for PhantomBuster.
             browser_use_endpoint: HTTP endpoint for Browser Use automation.
             claude_max_webhook: Webhook URL for Claude Max validation.
         """
-        self.db = firestore.Client()
+        self.db = mongodb.Client()
         self.collection = firestore_collection
         self.apollo_api_key = apollo_api_key
         self.phantombuster_api_key = phantombuster_api_key
@@ -45,10 +45,10 @@ class ContactEnrichmentAgent:
 
     def enrich_company_contacts(self, company_doc_id: str) -> None:
         """
-        Enriches executive contacts for a company and updates Firestore.
+        Enriches executive contacts for a company and updates mongodb.
 
         Args:
-            company_doc_id: Firestore document ID for the company.
+            company_doc_id: mongodb document ID for the company.
         """
         doc_ref = self.db.collection(self.collection).document(company_doc_id)
         company = doc_ref.get().to_dict()
@@ -198,5 +198,5 @@ if __name__ == "__main__":
         browser_use_endpoint=BROWSER_USE_ENDPOINT,
         claude_max_webhook=CLAUDE_MAX_WEBHOOK,
     )
-    # Example: Enrich contacts for a company by Firestore doc ID
+    # Example: Enrich contacts for a company by mongodb doc ID
     agent.enrich_company_contacts("example_company_doc_id")

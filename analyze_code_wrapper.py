@@ -14,7 +14,6 @@ from typing import Any, Dict, List, Optional
 
 # Import Google Cloud libraries with proper error handling
 try:
-    from google.cloud import aiplatform
     from vertexai.generative_models import GenerationConfig, GenerativeModel
 except ImportError:
     print("Error: Required Google Cloud libraries not found.")

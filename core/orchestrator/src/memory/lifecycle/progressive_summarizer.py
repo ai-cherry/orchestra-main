@@ -81,8 +81,8 @@ class ProgressiveSummarizerConfig(BaseModel):
     max_keywords_to_preserve: int = 15
 
     # Use Vertex AI for summarization
-    use_vertex_ai: bool = True
-    vertex_ai_config: Dict[str, Any] = Field(default_factory=dict)
+    use_openai: bool = True
+    openai_config: Dict[str, Any] = Field(default_factory=dict)
 
     # Fallback to rule-based summarization if AI fails
     enable_fallback: bool = True
@@ -104,17 +104,17 @@ class ProgressiveSummarizer:
             config: Optional configuration for progressive summarization
         """
         self.config = config or ProgressiveSummarizerConfig()
-        self.vertex_ai_client = None
+        self.openai_client = None
 
         # Initialize Vertex AI client if enabled
-        if self.config.use_vertex_ai:
-            self._init_vertex_ai()
+        if self.config.use_openai:
+            self._init_openai()
 
         logger.info(
-            f"ProgressiveSummarizer initialized (Vertex AI: {self.config.use_vertex_ai})"
+            f"ProgressiveSummarizer initialized (Vertex AI: {self.config.use_openai})"
         )
 
-    def _init_vertex_ai(self) -> None:
+    def _init_openai(self) -> None:
         """
         Initialize Vertex AI client for summarization.
 
@@ -123,20 +123,20 @@ class ProgressiveSummarizer:
         try:
 
             # Extract configuration
-            project = self.config.vertex_ai_config.get("project", "cherry-ai-project")
-            location = self.config.vertex_ai_config.get("location", "us-central1")
+            project = self.config.openai_config.get("project", "cherry-ai-project")
+            location = self.config.openai_config.get("location", "us-central1")
 
             # Initialize Vertex AI
             aiplatform.init(project=project, location=location)
 
             # Set up endpoint for text generation
-            endpoint_name = self.config.vertex_ai_config.get("endpoint_name")
+            endpoint_name = self.config.openai_config.get("endpoint_name")
             if endpoint_name:
-                self.vertex_ai_client = aiplatform.Endpoint(endpoint_name)
+                self.openai_client = aiplatform.Endpoint(endpoint_name)
                 logger.info(f"Vertex AI endpoint initialized: {endpoint_name}")
             else:
                 # Use foundation model for summarization
-                self.vertex_ai_client = aiplatform.TextGenerationModel.from_pretrained(
+                self.openai_client = aiplatform.TextGenerationModel.from_pretrained(
                     "text-bison@latest"
                 )
                 logger.info("Vertex AI foundation model initialized for summarization")
@@ -145,10 +145,10 @@ class ProgressiveSummarizer:
             logger.warning(
                 "google-cloud-aiplatform package not installed. Falling back to rule-based summarization."
             )
-            self.config.use_vertex_ai = False
+            self.config.use_openai = False
         except Exception as e:
             logger.error(f"Failed to initialize Vertex AI: {e}")
-            self.config.use_vertex_ai = False
+            self.config.use_openai = False
 
     async def summarize(
         self,
@@ -253,8 +253,8 @@ class ProgressiveSummarizer:
 
         # Perform summarization
         try:
-            if self.config.use_vertex_ai and self.vertex_ai_client:
-                summary_text = await self._summarize_with_vertex_ai(content, level)
+            if self.config.use_openai and self.openai_client:
+                summary_text = await self._summarize_with_openai(content, level)
             else:
                 summary_text = self._summarize_with_rules(content, level)
 
@@ -286,7 +286,7 @@ class ProgressiveSummarizer:
             logger.error(f"Summarization failed: {e}")
 
             # Fall back to rule-based summarization if AI fails
-            if self.config.enable_fallback and self.config.use_vertex_ai:
+            if self.config.enable_fallback and self.config.use_openai:
                 logger.info("Falling back to rule-based summarization")
                 return await self.summarize(content, item_id, level, metadata)
 
@@ -300,7 +300,7 @@ class ProgressiveSummarizer:
                 estimated_quality=0.5,
             )
 
-    async def _summarize_with_vertex_ai(self, content: str, level: SummaryLevel) -> str:
+    async def _summarize_with_openai(self, content: str, level: SummaryLevel) -> str:
         """
         Summarize content using Vertex AI.
 
@@ -339,9 +339,9 @@ class ProgressiveSummarizer:
         """
 
         # Call Vertex AI
-        if hasattr(self.vertex_ai_client, "predict"):
+        if hasattr(self.openai_client, "predict"):
             # Using custom endpoint
-            response = await self.vertex_ai_client.predict_async(
+            response = await self.openai_client.predict_async(
                 instances=[{"prompt": prompt}]
             )
 
@@ -350,7 +350,7 @@ class ProgressiveSummarizer:
 
         else:
             # Using foundation model
-            response = await self.vertex_ai_client.predict_async(
+            response = await self.openai_client.predict_async(
                 prompt=prompt,
                 max_output_tokens=1024,
                 temperature=0.2,

@@ -15,7 +15,6 @@ import click
 
 # Removed load_dotenv for production: all secrets are managed via GCP Secret Manager and Pulumi config.
 from google.api_core import exceptions as gcp_exceptions
-from google.cloud import secretmanager
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
@@ -58,17 +57,17 @@ REQUIRED_SECRETS = {
         "ANTHROPIC_API_KEY",
         "PERPLEXITY_API_KEY",
         "GOOGLE_API_KEY",
-        "VERTEX_API_KEY",
+        "OPENAI_API_KEY",
     ],
 }
 
 
-class SecretManager:
+class EnvironmentConfig:
     """Handles GCP Secret Manager operations."""
 
     def __init__(self, project_id: str):
         self.project_id = project_id
-        self.client = secretmanager.SecretManagerServiceClient()
+        self.client = secretmanager.EnvironmentConfigServiceClient()
         self.parent = f"projects/{project_id}"
 
     def list_secrets(self) -> List[str]:
@@ -220,7 +219,7 @@ def sync(ctx, env_file, dry_run):
         Panel(f"[bold blue]Syncing secrets from GCP project: {project_id}[/bold blue]")
     )
 
-    secret_manager = SecretManager(project_id)
+    os.environ = EnvironmentConfig(project_id)
 
     # Get all secrets from GCP
     with Progress(
@@ -229,7 +228,7 @@ def sync(ctx, env_file, dry_run):
         console=console,
     ) as progress:
         task = progress.add_task("Fetching secrets from GCP...", total=None)
-        gcp_secrets = secret_manager.list_secrets()
+        gcp_secrets = os.environ.list_secrets()
         progress.update(task, completed=True)
 
     console.print(f"[green]Found {len(gcp_secrets)} secrets in GCP[/green]")
@@ -255,7 +254,7 @@ def sync(ctx, env_file, dry_run):
             progress.update(task, description=f"Syncing {secret_id}...")
 
             if secret_id in gcp_secrets:
-                value = secret_manager.get_secret(secret_id)
+                value = os.environ.get_secret(secret_id)
                 if value:
                     if not dry_run:
                         # Update .env file
@@ -338,19 +337,19 @@ def validate(ctx):
 def set(ctx, secret_id, value):
     """Set or update a secret in GCP Secret Manager."""
     project_id = os.getenv("GOOGLE_CLOUD_PROJECT", "cherry-ai-project")
-    secret_manager = SecretManager(project_id)
+    os.environ = EnvironmentConfig(project_id)
 
     # Check if secret exists
-    existing_secrets = secret_manager.list_secrets()
+    existing_secrets = os.environ.list_secrets()
 
     if secret_id in existing_secrets:
         if click.confirm(f"Secret {secret_id} already exists. Update it?"):
-            if secret_manager.update_secret(secret_id, value):
+            if os.environ.update_secret(secret_id, value):
                 console.print(f"[green]✓ Updated secret {secret_id}[/green]")
             else:
                 console.print(f"[red]✗ Failed to update secret {secret_id}[/red]")
     else:
-        if secret_manager.create_secret(secret_id, value):
+        if os.environ.create_secret(secret_id, value):
             console.print(f"[green]✓ Created secret {secret_id}[/green]")
         else:
             console.print(f"[red]✗ Failed to create secret {secret_id}[/red]")
@@ -509,7 +508,7 @@ def check_gcp_health():
             return False, "GOOGLE_CLOUD_PROJECT not set"
 
         # Try to access secret manager
-        client = secretmanager.SecretManagerServiceClient()
+        client = secretmanager.EnvironmentConfigServiceClient()
         parent = f"projects/{project_id}"
         list(client.list_secrets(request={"parent": parent}, page_size=1))
         return True, f"Connected to project {project_id}"

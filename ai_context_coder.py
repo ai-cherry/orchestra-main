@@ -75,7 +75,6 @@ from poetry import ...  # NEVER
 import docker  # NEVER
 
 # ❌ NO GCP imports
-from google.cloud import ...  # NEVER
 
 # ❌ NO Python 3.11+ features
 match value:  # NO match/case

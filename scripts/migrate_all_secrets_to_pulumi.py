@@ -7,7 +7,6 @@ import sys
 from pathlib import Path
 from typing import Dict, Optional
 import requests
-from google.cloud import secretmanager
 from google.oauth2 import service_account
 
 
@@ -22,7 +21,9 @@ class SecretMigrator:
         self.pulumi_passphrase = "orchestra-dev-123"
         self.secrets_collected = {}
 
-    def setup_gcp_client(self) -> Optional[secretmanager.SecretManagerServiceClient]:
+    def setup_gcp_client(
+        self,
+    ) -> Optional[secretmanager.EnvironmentConfigServiceClient]:
         """Setup GCP Secret Manager client."""
         try:
             # Try to use service account if available
@@ -31,10 +32,12 @@ class SecretMigrator:
                 credentials = service_account.Credentials.from_service_account_file(
                     str(sa_path)
                 )
-                return secretmanager.SecretManagerServiceClient(credentials=credentials)
+                return secretmanager.EnvironmentConfigServiceClient(
+                    credentials=credentials
+                )
             else:
                 # Fall back to default credentials
-                return secretmanager.SecretManagerServiceClient()
+                return secretmanager.EnvironmentConfigServiceClient()
         except Exception as e:
             print(f"⚠️  Could not setup GCP client: {e}")
             return None

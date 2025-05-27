@@ -346,7 +346,7 @@ async def optimized_semantic_search(
         return top_items
 
     except GoogleAPIError as e:
-        error_msg = f"Failed to perform semantic search in Firestore: {e}"
+        error_msg = f"Failed to perform semantic search in mongodb: {e}"
         logger.error(error_msg)
         raise StorageError(error_msg)
     except Exception as e:
@@ -376,7 +376,7 @@ async def cleanup_expired_items_with_progress(self) -> int:
 
     # Configurable batch sizes
     QUERY_BATCH_SIZE = 100
-    DELETE_BATCH_SIZE = 400  # Firestore limit is 500
+    DELETE_BATCH_SIZE = 400  # mongodb limit is 500
 
     try:
         # Get current time
@@ -418,7 +418,7 @@ async def cleanup_expired_items_with_progress(self) -> int:
             # Check if there are potentially more items
             has_more_items = batch_count == QUERY_BATCH_SIZE
 
-            # Delete items in sub-batches to stay within Firestore limits
+            # Delete items in sub-batches to stay within mongodb limits
             delete_batch = self._async_client.batch()
             items_in_batch = 0
 
@@ -458,7 +458,7 @@ async def cleanup_expired_items_with_progress(self) -> int:
 
         return total_deleted
     except GoogleAPIError as e:
-        error_msg = f"Failed to cleanup expired items in Firestore: {e}"
+        error_msg = f"Failed to cleanup expired items in mongodb: {e}"
         logger.error(error_msg)
         raise StorageError(error_msg)
     except Exception as e:
@@ -474,7 +474,7 @@ async def cleanup_expired_items_with_progress(self) -> int:
 
 class ImprovedFirestoreMemoryAdapter(MemoryManager):
     """
-    Improved Firestore memory adapter with optimized performance, error handling, and cloud-native patterns.
+    Improved mongodb memory adapter with optimized performance, error handling, and cloud-native patterns.
 
     This class demonstrates the recommended implementation patterns for
     a production-ready FirestoreMemoryAdapter.
@@ -489,7 +489,7 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
         batch_size: int = 400,
     ):
         """
-        Initialize the improved Firestore memory adapter.
+        Initialize the improved mongodb memory adapter.
 
         Args:
             project_id: Optional Google Cloud project ID
@@ -498,8 +498,8 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
             namespace: Namespace for collection prefixing
             batch_size: Batch size for batch operations
         """
-        # Initialize the underlying Firestore manager
-        # In actual implementation, this would be replaced with direct Firestore clients
+        # Initialize the underlying mongodb manager
+        # In actual implementation, this would be replaced with direct mongodb clients
         self._firestore_manager = None  # Placeholder
 
         # Store configuration
@@ -525,7 +525,7 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
             return
 
         try:
-            # In a real implementation, would initialize Firestore clients directly
+            # In a real implementation, would initialize mongodb clients directly
             # For demonstration, using ThreadPoolManager to run sync initialization
             await ThreadPoolManager.run_in_thread(self._initialize_sync)
             self._is_initialized = True
@@ -533,8 +533,8 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
                 f"ImprovedFirestoreMemoryAdapter initialized with namespace {self.namespace}"
             )
         except Exception as e:
-            logger.error(f"Failed to initialize Firestore adapter: {e}")
-            raise ConnectionError(f"Failed to initialize Firestore connection: {e}")
+            logger.error(f"Failed to initialize mongodb adapter: {e}")
+            raise ConnectionError(f"Failed to initialize mongodb connection: {e}")
 
     def _initialize_sync(self):
         """Synchronous initialization for running in thread pool."""
@@ -557,7 +557,7 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
 
     def _close_sync(self):
         """Synchronous close method for running in thread pool."""
-        # In a real implementation, would close Firestore clients
+        # In a real implementation, would close mongodb clients
 
     def _check_initialized(self) -> None:
         """Check if initialized and raise appropriate exception if not."""
@@ -580,7 +580,7 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
         if not item.user_id:
             raise ValidationError("user_id is required for memory items")
 
-        # Store in Firestore using ThreadPoolManager
+        # Store in mongodb using ThreadPoolManager
         await ThreadPoolManager.run_in_thread(self._add_item_sync, item)
 
         logger.debug(f"Saved memory item {item.id} for user {item.user_id}")
@@ -588,7 +588,7 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
 
     def _add_item_sync(self, item: MemoryItem) -> None:
         """Synchronous add item method for running in thread pool."""
-        # In a real implementation, would convert item to dict and store in Firestore
+        # In a real implementation, would convert item to dict and store in mongodb
 
     # Other methods would be implemented similarly using the patterns demonstrated above
     # Each method would use the ThreadPoolManager, error handling, and retry decorators
@@ -603,18 +603,18 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
     @with_retry()
     async def health_check(self) -> MemoryHealth:
         """
-        Perform a health check on the Firestore connection.
+        Perform a health check on the mongodb connection.
 
         Returns:
             Dictionary with health status information
         """
         health: MemoryHealth = {
             "status": "healthy",
-            "firestore": False,
+            "mongodb": False,
             "redis": False,  # Not using Redis directly
             "error_count": 0,
             "details": {
-                "provider": "firestore",
+                "provider": "mongodb",
                 "adapter": "ImprovedFirestoreMemoryAdapter",
                 "namespace": self.namespace,
             },
@@ -631,27 +631,27 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
 
         try:
             # Attempt a lightweight operation to verify connection
-            # In a real implementation, would check actual Firestore connection
+            # In a real implementation, would check actual mongodb connection
             await ThreadPoolManager.run_in_thread(self._check_connection_sync)
 
-            health["firestore"] = True
+            health["mongodb"] = True
             return health
         except Exception as e:
             return {
                 "status": "error",
-                "firestore": False,
+                "mongodb": False,
                 "redis": False,
                 "error_count": 1,
                 "last_error": str(e),
                 "details": {
-                    "message": f"Firestore health check failed: {e}",
+                    "message": f"mongodb health check failed: {e}",
                     "namespace": self.namespace,
                 },
             }
 
     def _check_connection_sync(self) -> bool:
         """Synchronous connection check for running in thread pool."""
-        # In a real implementation, would perform a lightweight Firestore operation
+        # In a real implementation, would perform a lightweight mongodb operation
         return True
 
 

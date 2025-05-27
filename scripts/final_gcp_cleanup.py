@@ -62,7 +62,7 @@ def clean_config_files():
         if content != original_content:
             with open(file_path, "w") as f:
                 f.write(content)
-            print(f"  ✓ Updated")
+            print("  ✓ Updated")
 
 
 def clean_memory_files():
@@ -103,7 +103,7 @@ def clean_memory_files():
         if content != original_content:
             with open(file_path, "w") as f:
                 f.write(content)
-            print(f"  ✓ Updated")
+            print("  ✓ Updated")
 
 
 def clean_shell_scripts():
@@ -143,7 +143,7 @@ def clean_shell_scripts():
         if content != original_content:
             with open(file_path, "w") as f:
                 f.write(content)
-            print(f"  ✓ Updated")
+            print("  ✓ Updated")
 
 
 def clean_documentation():
@@ -175,7 +175,7 @@ def clean_documentation():
         if content != original_content:
             with open(file_path, "w") as f:
                 f.write(content)
-            print(f"  ✓ Updated")
+            print("  ✓ Updated")
 
 
 def main():

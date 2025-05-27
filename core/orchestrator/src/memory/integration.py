@@ -177,7 +177,7 @@ class MemoryAwareAgentRegistry(AgentRegistry):
                 "project_id": "cherry-ai-project",
                 "collection": "memory",
             },
-            "vertex_ai_config": {
+            "openai_config": {
                 "project_id": "cherry-ai-project",
                 "location": "us-west4",
                 "index_name": "orchestra-memory-index",
@@ -196,7 +196,7 @@ class MemoryAwareAgentRegistry(AgentRegistry):
         self._memory_manager = LayeredMemoryManager(
             redis_config=self.memory_config.get("redis_config"),
             firestore_config=self.memory_config.get("firestore_config"),
-            vertex_ai_config=self.memory_config.get("vertex_ai_config"),
+            openai_config=self.memory_config.get("openai_config"),
         )
         await self._memory_manager.initialize()
 

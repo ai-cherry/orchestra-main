@@ -317,7 +317,7 @@ SECURITY_RULES = [
                 pattern=r"(password|secret|key|token|credential)\s*=\s*['\"][^'\"]+['\"]",
             )
         ],
-        action="use_secret_manager",
+        action="use_os.environ",
         severity=RuleSeverity.ERROR,
     ),
     Rule(

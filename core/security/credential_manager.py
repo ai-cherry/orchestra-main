@@ -39,7 +39,7 @@ class CredentialSource(Enum):
 
     ENV_VAR = "environment_variable"
     FILE = "file"
-    SECRET_MANAGER = "secret_manager"
+    os.environ = "os.environ"
     WORKLOAD_IDENTITY = "workload_identity"
 
 

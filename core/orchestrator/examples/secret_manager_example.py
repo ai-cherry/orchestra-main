@@ -18,7 +18,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 logging.basicConfig(level=logging.INFO)
 
 # Import the secret manager module
-from config.secret_manager import get_secret, secrets
+from config.os.environ import get_secret, secrets
 
 
 def main():

@@ -101,8 +101,8 @@ class ChunkerConfig(BaseModel):
     chunk_overlap_chars: int = 50
 
     # Semantic chunking parameters
-    use_vertex_ai: bool = True
-    vertex_ai_config: Dict[str, Any] = Field(default_factory=dict)
+    use_openai: bool = True
+    openai_config: Dict[str, Any] = Field(default_factory=dict)
 
     # Hybrid chunking parameters
     hybrid_strategies: List[ChunkingStrategy] = Field(
@@ -132,17 +132,17 @@ class MemoryChunker:
             config: Optional configuration for memory chunking
         """
         self.config = config or ChunkerConfig()
-        self.vertex_ai_client = None
+        self.openai_client = None
 
         # Initialize Vertex AI client if enabled
-        if self.config.use_vertex_ai:
-            self._init_vertex_ai()
+        if self.config.use_openai:
+            self._init_openai()
 
         logger.info(
             f"MemoryChunker initialized (strategy: {self.config.default_strategy})"
         )
 
-    def _init_vertex_ai(self) -> None:
+    def _init_openai(self) -> None:
         """
         Initialize Vertex AI client for semantic chunking.
 
@@ -151,20 +151,20 @@ class MemoryChunker:
         try:
 
             # Extract configuration
-            project = self.config.vertex_ai_config.get("project", "cherry-ai-project")
-            location = self.config.vertex_ai_config.get("location", "us-central1")
+            project = self.config.openai_config.get("project", "cherry-ai-project")
+            location = self.config.openai_config.get("location", "us-central1")
 
             # Initialize Vertex AI
             aiplatform.init(project=project, location=location)
 
             # Set up endpoint for text analysis
-            endpoint_name = self.config.vertex_ai_config.get("endpoint_name")
+            endpoint_name = self.config.openai_config.get("endpoint_name")
             if endpoint_name:
-                self.vertex_ai_client = aiplatform.Endpoint(endpoint_name)
+                self.openai_client = aiplatform.Endpoint(endpoint_name)
                 logger.info(f"Vertex AI endpoint initialized: {endpoint_name}")
             else:
                 # Use foundation model for text analysis
-                self.vertex_ai_client = aiplatform.TextGenerationModel.from_pretrained(
+                self.openai_client = aiplatform.TextGenerationModel.from_pretrained(
                     "text-bison@latest"
                 )
                 logger.info("Vertex AI foundation model initialized for text analysis")
@@ -173,10 +173,10 @@ class MemoryChunker:
             logger.warning(
                 "google-cloud-aiplatform package not installed. Falling back to rule-based chunking."
             )
-            self.config.use_vertex_ai = False
+            self.config.use_openai = False
         except Exception as e:
             logger.error(f"Failed to initialize Vertex AI: {e}")
-            self.config.use_vertex_ai = False
+            self.config.use_openai = False
 
     async def chunk_item(
         self,
@@ -437,7 +437,7 @@ class MemoryChunker:
             List of chunks
         """
         # If Vertex AI is not available, fall back to paragraph chunking
-        if not self.config.use_vertex_ai or not self.vertex_ai_client:
+        if not self.config.use_openai or not self.openai_client:
             logger.warning(
                 "Semantic chunking not available, falling back to paragraph chunking"
             )
@@ -464,9 +464,9 @@ class MemoryChunker:
             """
 
             # Call Vertex AI
-            if hasattr(self.vertex_ai_client, "predict"):
+            if hasattr(self.openai_client, "predict"):
                 # Using custom endpoint
-                response = await self.vertex_ai_client.predict_async(
+                response = await self.openai_client.predict_async(
                     instances=[{"prompt": prompt}]
                 )
 
@@ -482,7 +482,7 @@ class MemoryChunker:
 
             else:
                 # Using foundation model
-                response = await self.vertex_ai_client.predict_async(
+                response = await self.openai_client.predict_async(
                     prompt=prompt, max_output_tokens=1024, temperature=0.2
                 )
 

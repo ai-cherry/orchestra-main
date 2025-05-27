@@ -11,7 +11,7 @@ It supports multiple storage backends:
 3. Optional GCP integrations when available:
    - Google Cloud Storage - For cross-environment synchronization
    - Secret Manager - For secure storage of sensitive configurations
-   - Firestore - For structured query access to configuration
+   - mongodb - For structured query access to configuration
 
 Usage:
     from core.persistency.mode_config_persistence import get_persistence_manager
@@ -73,7 +73,7 @@ class PersistenceManager:
 
     This class provides methods to save and load configuration from multiple
     storage backends, including local files, GCP Secret Manager, Cloud Storage,
-    and Firestore.
+    and mongodb.
     """
 
     def __init__(
@@ -92,7 +92,7 @@ class PersistenceManager:
             environment: Deployment environment (development, staging, production)
             bucket_name: Cloud Storage bucket name
             secret_name: Secret Manager secret name
-            collection_name: Firestore collection name
+            collection_name: mongodb collection name
         """
         self.project_id = project_id
         self.environment = environment
@@ -104,7 +104,7 @@ class PersistenceManager:
         self.gcp_enabled = self._check_gcp_available()
 
         # Initialize GCP clients if available
-        self.secret_manager_client = None
+        self.os.environ_client = None
         self.storage_client = None
         self.firestore_client = None
 
@@ -152,7 +152,7 @@ class PersistenceManager:
 
             # Initialize Secret Manager client
             try:
-                self.secret_manager_client = secretmanager.SecretManagerServiceClient()
+                self.os.environ_client = secretmanager.EnvironmentConfigServiceClient()
                 logger.debug("Initialized Secret Manager client")
             except Exception as e:
                 logger.warning(f"Failed to initialize Secret Manager client: {str(e)}")
@@ -164,12 +164,12 @@ class PersistenceManager:
             except Exception as e:
                 logger.warning(f"Failed to initialize Cloud Storage client: {str(e)}")
 
-            # Initialize Firestore client
+            # Initialize mongodb client
             try:
-                self.firestore_client = firestore.Client(project=self.project_id)
-                logger.debug("Initialized Firestore client")
+                self.firestore_client = mongodb.Client(project=self.project_id)
+                logger.debug("Initialized mongodb client")
             except Exception as e:
-                logger.warning(f"Failed to initialize Firestore client: {str(e)}")
+                logger.warning(f"Failed to initialize mongodb client: {str(e)}")
 
         except ImportError:
             logger.info("Failed to import Google Cloud libraries.")
@@ -339,7 +339,7 @@ class PersistenceManager:
             )
 
             # 2. Save to GCP Secret Manager
-            if self.gcp_enabled and self.secret_manager_client:
+            if self.gcp_enabled and self.os.environ_client:
                 try:
                     from google.api_core.exceptions import NotFound
 
@@ -349,12 +349,10 @@ class PersistenceManager:
 
                     try:
                         # Check if secret exists
-                        self.secret_manager_client.get_secret(
-                            request={"name": secret_name}
-                        )
+                        self.os.environ_client.get_secret(request={"name": secret_name})
                     except NotFound:
                         # Create secret if it doesn't exist
-                        self.secret_manager_client.create_secret(
+                        self.os.environ_client.create_secret(
                             request={
                                 "parent": f"projects/{self.project_id}",
                                 "secret_id": self.secret_name,
@@ -364,7 +362,7 @@ class PersistenceManager:
                         logger.info(f"Created secret {self.secret_name}")
 
                     # Add new secret version
-                    self.secret_manager_client.add_secret_version(
+                    self.os.environ_client.add_secret_version(
                         request={
                             "parent": secret_name,
                             "payload": {"data": content.encode("UTF-8")},
@@ -407,7 +405,7 @@ class PersistenceManager:
                     )
                     success = False
 
-            # 4. Save to Firestore
+            # 4. Save to mongodb
             if self.gcp_enabled and self.firestore_client:
                 try:
 
@@ -419,16 +417,16 @@ class PersistenceManager:
                         {
                             "environment": self.environment,
                             "content": content,
-                            "updated_at": firestore.SERVER_TIMESTAMP,
+                            "updated_at": mongodb.SERVER_TIMESTAMP,
                             "version": hashlib.md5(content.encode()).hexdigest(),
                         }
                     )
                     logger.info(
-                        f"Saved mode definitions to Firestore collection: {self.collection_name}"
+                        f"Saved mode definitions to mongodb collection: {self.collection_name}"
                     )
                 except Exception as e:
                     logger.error(
-                        f"Failed to save mode definitions to Firestore: {str(e)}"
+                        f"Failed to save mode definitions to mongodb: {str(e)}"
                     )
                     success = False
 
@@ -492,7 +490,7 @@ class PersistenceManager:
                     )
                     success = False
 
-            # 2. Save to Firestore
+            # 2. Save to mongodb
             if self.firestore_client:
                 try:
 
@@ -503,14 +501,12 @@ class PersistenceManager:
                         {
                             "environment": self.environment,
                             "content": content,
-                            "updated_at": firestore.SERVER_TIMESTAMP,
+                            "updated_at": mongodb.SERVER_TIMESTAMP,
                         }
                     )
-                    logger.info("Saved workflow state to Firestore")
+                    logger.info("Saved workflow state to mongodb")
                 except Exception as e:
-                    logger.error(
-                        f"Failed to save workflow state to Firestore: {str(e)}"
-                    )
+                    logger.error(f"Failed to save workflow state to mongodb: {str(e)}")
                     success = False
 
             return success
@@ -544,12 +540,12 @@ class PersistenceManager:
                 )
 
         # 2. Try GCP Secret Manager
-        if not content and self.gcp_enabled and self.secret_manager_client:
+        if not content and self.gcp_enabled and self.os.environ_client:
             try:
                 from google.api_core.exceptions import NotFound
 
                 secret_name = f"projects/{self.project_id}/secrets/{self.secret_name}/versions/latest"
-                response = self.secret_manager_client.access_secret_version(
+                response = self.os.environ_client.access_secret_version(
                     request={"name": secret_name}
                 )
                 content = response.payload.data.decode("UTF-8")
@@ -584,7 +580,7 @@ class PersistenceManager:
                     f"Failed to load mode definitions from Cloud Storage: {str(e)}"
                 )
 
-        # 4. Try Firestore
+        # 4. Try mongodb
         if not content and self.gcp_enabled and self.firestore_client:
             try:
                 doc_ref = self.firestore_client.collection(
@@ -593,14 +589,12 @@ class PersistenceManager:
                 doc = doc_ref.get()
                 if doc.exists:
                     content = doc.to_dict().get("content")
-                    source = "Firestore"
-                    logger.info("Loaded mode definitions from Firestore")
+                    source = "mongodb"
+                    logger.info("Loaded mode definitions from mongodb")
                 else:
-                    logger.warning("Mode definitions not found in Firestore")
+                    logger.warning("Mode definitions not found in mongodb")
             except Exception as e:
-                logger.error(
-                    f"Failed to load mode definitions from Firestore: {str(e)}"
-                )
+                logger.error(f"Failed to load mode definitions from mongodb: {str(e)}")
 
         # If content was loaded, parse and validate
         if content:
@@ -676,7 +670,7 @@ class PersistenceManager:
                     f"Failed to load workflow state from Cloud Storage: {str(e)}"
                 )
 
-        # 3. Try Firestore
+        # 3. Try mongodb
         if not content and self.gcp_enabled and self.firestore_client:
             try:
                 doc_ref = self.firestore_client.collection(
@@ -685,12 +679,12 @@ class PersistenceManager:
                 doc = doc_ref.get()
                 if doc.exists:
                     content = doc.to_dict().get("content")
-                    source = "Firestore"
-                    logger.info("Loaded workflow state from Firestore")
+                    source = "mongodb"
+                    logger.info("Loaded workflow state from mongodb")
                 else:
-                    logger.warning("Workflow state not found in Firestore")
+                    logger.warning("Workflow state not found in mongodb")
             except Exception as e:
-                logger.error(f"Failed to load workflow state from Firestore: {str(e)}")
+                logger.error(f"Failed to load workflow state from mongodb: {str(e)}")
 
         # If content was loaded, parse
         if content:
@@ -747,18 +741,18 @@ class PersistenceManager:
                 )
 
         # 2. Secret Manager
-        if self.gcp_enabled and self.secret_manager_client:
+        if self.gcp_enabled and self.os.environ_client:
             try:
                 from google.api_core.exceptions import NotFound
 
                 secret_name = f"projects/{self.project_id}/secrets/{self.secret_name}/versions/latest"
-                response = self.secret_manager_client.access_secret_version(
+                response = self.os.environ_client.access_secret_version(
                     request={"name": secret_name}
                 )
                 secret_content = response.payload.data.decode("UTF-8")
                 self._validate_yaml_config(secret_content)
                 secret_hash = hashlib.md5(secret_content.encode()).hexdigest()
-                sources.append(("secret_manager", secret_content, secret_hash))
+                sources.append(("os.environ", secret_content, secret_hash))
             except NotFound:
                 logger.warning("Mode definitions not found in Secret Manager")
             except Exception as e:
@@ -785,7 +779,7 @@ class PersistenceManager:
                     f"Failed to load mode definitions from Cloud Storage: {str(e)}"
                 )
 
-        # 4. Firestore
+        # 4. mongodb
         if self.gcp_enabled and self.firestore_client:
             try:
                 doc_ref = self.firestore_client.collection(
@@ -796,13 +790,11 @@ class PersistenceManager:
                     firestore_content = doc.to_dict().get("content")
                     self._validate_yaml_config(firestore_content)
                     firestore_hash = hashlib.md5(firestore_content.encode()).hexdigest()
-                    sources.append(("firestore", firestore_content, firestore_hash))
+                    sources.append(("mongodb", firestore_content, firestore_hash))
                 else:
-                    logger.warning("Mode definitions not found in Firestore")
+                    logger.warning("Mode definitions not found in mongodb")
             except Exception as e:
-                logger.error(
-                    f"Failed to load mode definitions from Firestore: {str(e)}"
-                )
+                logger.error(f"Failed to load mode definitions from mongodb: {str(e)}")
 
         # If no sources found, return False
         if not sources:
@@ -849,8 +841,8 @@ class PersistenceManager:
         # 2. Sync to Secret Manager
         if (
             self.gcp_enabled
-            and self.secret_manager_client
-            and source_to_use[0] != "secret_manager"
+            and self.os.environ_client
+            and source_to_use[0] != "os.environ"
         ):
             try:
                 from google.api_core.exceptions import NotFound
@@ -859,10 +851,10 @@ class PersistenceManager:
 
                 try:
                     # Check if secret exists
-                    self.secret_manager_client.get_secret(request={"name": secret_name})
+                    self.os.environ_client.get_secret(request={"name": secret_name})
                 except NotFound:
                     # Create secret if it doesn't exist
-                    self.secret_manager_client.create_secret(
+                    self.os.environ_client.create_secret(
                         request={
                             "parent": f"projects/{self.project_id}",
                             "secret_id": self.secret_name,
@@ -872,7 +864,7 @@ class PersistenceManager:
                     logger.info(f"Created secret {self.secret_name}")
 
                 # Add new secret version
-                self.secret_manager_client.add_secret_version(
+                self.os.environ_client.add_secret_version(
                     request={
                         "parent": secret_name,
                         "payload": {"data": content_to_sync.encode("UTF-8")},
@@ -915,12 +907,8 @@ class PersistenceManager:
                 logger.error(f"Failed to sync configuration to Cloud Storage: {str(e)}")
                 return False
 
-        # 4. Sync to Firestore
-        if (
-            self.gcp_enabled
-            and self.firestore_client
-            and source_to_use[0] != "firestore"
-        ):
+        # 4. Sync to mongodb
+        if self.gcp_enabled and self.firestore_client and source_to_use[0] != "mongodb":
             try:
 
                 doc_ref = self.firestore_client.collection(
@@ -930,15 +918,15 @@ class PersistenceManager:
                     {
                         "environment": self.environment,
                         "content": content_to_sync,
-                        "updated_at": firestore.SERVER_TIMESTAMP,
+                        "updated_at": mongodb.SERVER_TIMESTAMP,
                         "version": hashlib.md5(content_to_sync.encode()).hexdigest(),
                     }
                 )
                 logger.info(
-                    f"Synced configuration to Firestore collection: {self.collection_name}"
+                    f"Synced configuration to mongodb collection: {self.collection_name}"
                 )
             except Exception as e:
-                logger.error(f"Failed to sync configuration to Firestore: {str(e)}")
+                logger.error(f"Failed to sync configuration to mongodb: {str(e)}")
                 return False
 
         return True

@@ -15,9 +15,7 @@ from core.orchestrator.src.config.config import settings
 from packages.shared.src.memory.memory_manager import MemoryManager
 from packages.shared.src.models.base_models import AgentData, MemoryItem, PersonaConfig
 
-# Removed legacy import: from future.firestore_memory_manager import FirestoreMemoryManager
-# Removed incorrect import: from packages.shared.src.storage.enhanced_firestore_stub import EnhancedFirestoreManager
-
+# Removed legacy import: # Removed incorrect import:
 # Configure logging
 logger = logging.getLogger(__name__)
 

@@ -43,7 +43,7 @@ PRIORITIES = {
             "GCP_REGION",
             "GCP_SECRET_MANAGEMENT_KEY",
             "GCP_WORKLOAD_IDENTITY_PROVIDER",
-            "VERTEX_AGENT_KEY",
+            "OPENAI_AGENT_KEY",
         ],
     },
     "philosophy": "Single-developer project prioritizing performance over complex security measures",

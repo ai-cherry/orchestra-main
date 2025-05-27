@@ -25,7 +25,7 @@ REDIS_CONFIG: Dict[str, Any] = {
     "timeout": 3600,
 }
 
-# Firestore configuration for warm memory tier
+# mongodb configuration for warm memory tier
 FIRESTORE_CONFIG: Dict[str, Any] = {
     "database": "memory-store",
     "collection": "memory_entries",
@@ -62,7 +62,7 @@ MEMORY_TIER_CONFIG: Dict[str, Any] = {
         "priority_threshold": 8,  # Priority 8-10 goes to hot tier
     },
     "warm": {
-        "storage_type": "firestore",
+        "storage_type": "mongodb",
         "config": FIRESTORE_CONFIG,
         "ttl_seconds": 86400,  # 1 day
         "max_size_bytes": 10 * 1024 * 1024 * 1024,  # 10 GB

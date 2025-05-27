@@ -62,8 +62,8 @@ try:
     # Redis for short-term memory
     redis_client = redis.from_url(REDIS_URL, decode_responses=True)
 
-    # Firestore for mid-term memory
-    firestore_client = firestore.Client(project=FIRESTORE_PROJECT)
+    # mongodb for mid-term memory
+    firestore_client = mongodb.Client(project=FIRESTORE_PROJECT)
 
     # Qdrant for long-term memory
     qdrant_client = qdrant_client.QdrantClient(url=QDRANT_URL)
@@ -155,7 +155,7 @@ async def store_short_term(memory: MemoryItem) -> bool:
 
 
 async def store_mid_term(memory: MemoryItem) -> bool:
-    """Store in mid-term memory (Firestore)"""
+    """Store in mid-term memory (mongodb)"""
     if not firestore_client:
         return False
 
@@ -172,7 +172,7 @@ async def store_mid_term(memory: MemoryItem) -> bool:
             agent_ref = firestore_client.collection("agents").document(memory.agent_id)
             agent_ref.update(
                 {
-                    "memory_ids": firestore.ArrayUnion([memory.id]),
+                    "memory_ids": mongodb.ArrayUnion([memory.id]),
                     "last_updated": datetime.utcnow(),
                 }
             )
@@ -369,7 +369,7 @@ async def query_memory(query: MemoryQuery) -> List[Dict[str, Any]]:
     # Search mid-term memory
     if "mid" in query.memory_layers and firestore_client:
         try:
-            # Query Firestore
+            # Query mongodb
             query_ref = firestore_client.collection("memories")
 
             if query.agent_id:
@@ -526,7 +526,7 @@ async def health_check():
         "service": "memory-mcp",
         "backends": {
             "redis": redis_client is not None,
-            "firestore": firestore_client is not None,
+            "mongodb": firestore_client is not None,
             "qdrant": qdrant_client is not None,
             "embedder": embedder is not None,
         },

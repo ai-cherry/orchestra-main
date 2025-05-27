@@ -2,7 +2,7 @@
 Company Enrichment Agent
 
 Matches properties to management/owner companies, enriches company profiles.
-Integrates with Firestore for data storage, SerpAPI for web search, and Claude Max for reasoning.
+Integrates with mongodb for data storage, SerpAPI for web search, and Claude Max for reasoning.
 
 Author: AI Orchestrator Team
 """
@@ -24,21 +24,21 @@ class CompanyEnrichmentAgent:
     ):
         """
         Args:
-            firestore_collection: Name of the Firestore collection for properties/companies.
+            firestore_collection: Name of the mongodb collection for properties/companies.
             serpapi_key: API key for SerpAPI.
             claude_max_webhook: Webhook URL for Claude Max reasoning.
         """
-        self.db = firestore.Client()
+        self.db = mongodb.Client()
         self.collection = firestore_collection
         self.serpapi_key = serpapi_key
         self.claude_max_webhook = claude_max_webhook
 
     def enrich_property(self, property_doc_id: str) -> None:
         """
-        Enriches a property by searching for its management/owner company and updating Firestore.
+        Enriches a property by searching for its management/owner company and updating mongodb.
 
         Args:
-            property_doc_id: Firestore document ID for the property.
+            property_doc_id: mongodb document ID for the property.
         """
         doc_ref = self.db.collection(self.collection).document(property_doc_id)
         prop = doc_ref.get().to_dict()
@@ -61,7 +61,7 @@ class CompanyEnrichmentAgent:
             doc_ref.update({"company_enrichment_status": "ambiguous"})
             return
 
-        # Update Firestore with company info
+        # Update mongodb with company info
         doc_ref.update(
             {"company_name": company_name, "company_enrichment_status": "enriched"}
         )
@@ -131,5 +131,5 @@ if __name__ == "__main__":
         serpapi_key=SERPAPI_KEY,
         claude_max_webhook=CLAUDE_MAX_WEBHOOK,
     )
-    # Example: Enrich a property by Firestore doc ID
+    # Example: Enrich a property by mongodb doc ID
     agent.enrich_property("example_property_doc_id")

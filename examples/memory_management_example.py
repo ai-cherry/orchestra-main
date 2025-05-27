@@ -101,8 +101,8 @@ async def example_with_config():
 
     # Create configuration
     config = MemoryConfig(
-        backend=MemoryBackendType.FIRESTORE,
-        firestore=FirestoreConfig(namespace="example", connection_pool_size=5),
+        backend=MemoryBackendType.mongodb,
+        mongodb=FirestoreConfig(namespace="example", connection_pool_size=5),
         vector_search=VectorSearchConfig(provider=VectorSearchType.IN_MEMORY),
         telemetry=TelemetryConfig(enabled=True, log_level="INFO"),
     )
@@ -153,7 +153,7 @@ async def example_from_env():
     logger.info("Starting example with configuration from environment variables")
 
     # Set environment variables
-    os.environ["MEMORY_BACKEND"] = "firestore"
+    os.environ["MEMORY_BACKEND"] = "mongodb"
     os.environ["VECTOR_SEARCH_PROVIDER"] = "in_memory"
 
     # Create memory manager from environment variables

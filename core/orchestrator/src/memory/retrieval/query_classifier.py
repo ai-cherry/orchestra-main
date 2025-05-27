@@ -78,26 +78,26 @@ class QueryClassifier:
 
     def __init__(
         self,
-        use_vertex_ai: bool = False,
-        vertex_ai_config: Optional[Dict[str, Any]] = None,
+        use_openai: bool = False,
+        openai_config: Optional[Dict[str, Any]] = None,
         confidence_threshold: float = 0.6,
     ):
         """
         Initialize query classifier.
 
         Args:
-            use_vertex_ai: Whether to use Vertex AI for classification
-            vertex_ai_config: Configuration for Vertex AI
+            use_openai: Whether to use Vertex AI for classification
+            openai_config: Configuration for Vertex AI
             confidence_threshold: Minimum confidence threshold for classification
         """
-        self.use_vertex_ai = use_vertex_ai
-        self.vertex_ai_config = vertex_ai_config or {}
+        self.use_openai = use_openai
+        self.openai_config = openai_config or {}
         self.confidence_threshold = confidence_threshold
-        self.vertex_ai_client = None
+        self.openai_client = None
 
         # Initialize Vertex AI client if enabled
-        if self.use_vertex_ai:
-            self._init_vertex_ai()
+        if self.use_openai:
+            self._init_openai()
 
         # Define indicator terms for rule-based classification
         self.factual_indicators = [
@@ -158,9 +158,9 @@ class QueryClassifier:
             "nice to meet you",
         ]
 
-        logger.info(f"QueryClassifier initialized (Vertex AI: {use_vertex_ai})")
+        logger.info(f"QueryClassifier initialized (Vertex AI: {use_openai})")
 
-    def _init_vertex_ai(self) -> None:
+    def _init_openai(self) -> None:
         """
         Initialize Vertex AI client for query classification.
 
@@ -169,20 +169,20 @@ class QueryClassifier:
         try:
 
             # Extract configuration
-            project = self.vertex_ai_config.get("project", "cherry-ai-project")
-            location = self.vertex_ai_config.get("location", "us-central1")
+            project = self.openai_config.get("project", "cherry-ai-project")
+            location = self.openai_config.get("location", "us-central1")
 
             # Initialize Vertex AI
             aiplatform.init(project=project, location=location)
 
             # Set up endpoint for text classification
-            endpoint_name = self.vertex_ai_config.get("endpoint_name")
+            endpoint_name = self.openai_config.get("endpoint_name")
             if endpoint_name:
-                self.vertex_ai_client = aiplatform.Endpoint(endpoint_name)
+                self.openai_client = aiplatform.Endpoint(endpoint_name)
                 logger.info(f"Vertex AI endpoint initialized: {endpoint_name}")
             else:
                 # Use foundation model for classification
-                self.vertex_ai_client = aiplatform.TextEmbeddingModel.from_pretrained(
+                self.openai_client = aiplatform.TextEmbeddingModel.from_pretrained(
                     "textembedding-gecko@latest"
                 )
                 logger.info(
@@ -193,10 +193,10 @@ class QueryClassifier:
             logger.warning(
                 "google-cloud-aiplatform package not installed. Falling back to rule-based classification."
             )
-            self.use_vertex_ai = False
+            self.use_openai = False
         except Exception as e:
             logger.error(f"Failed to initialize Vertex AI: {e}")
-            self.use_vertex_ai = False
+            self.use_openai = False
 
     async def classify(self, query: str) -> QueryClassificationResult:
         """
@@ -221,9 +221,9 @@ class QueryClassifier:
             )
 
         # Use Vertex AI if enabled and available
-        if self.use_vertex_ai and self.vertex_ai_client:
+        if self.use_openai and self.openai_client:
             try:
-                result = await self._classify_with_vertex_ai(query)
+                result = await self._classify_with_openai(query)
                 result.processing_time_ms = (time.time() - start_time) * 1000
                 return result
             except Exception as e:
@@ -235,7 +235,7 @@ class QueryClassifier:
         result.processing_time_ms = (time.time() - start_time) * 1000
         return result
 
-    async def _classify_with_vertex_ai(self, query: str) -> QueryClassificationResult:
+    async def _classify_with_openai(self, query: str) -> QueryClassificationResult:
         """
         Classify a query using Vertex AI.
 
@@ -262,9 +262,9 @@ class QueryClassifier:
             """
 
             # Call Vertex AI endpoint
-            if hasattr(self.vertex_ai_client, "predict"):
+            if hasattr(self.openai_client, "predict"):
                 # Using custom endpoint
-                response = await self.vertex_ai_client.predict_async(
+                response = await self.openai_client.predict_async(
                     instances=[{"prompt": prompt}]
                 )
 

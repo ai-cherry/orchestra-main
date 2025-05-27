@@ -278,7 +278,7 @@ class VertexAiFallbackHandler:
                             if len(user_input) > 100
                             else user_input
                         ),
-                        "resolution": "processed_by_vertex_ai",
+                        "resolution": "processed_by_openai",
                     },
                 )
             except Exception as log_err:
@@ -384,10 +384,10 @@ def get_fallback_handler() -> VertexAiFallbackHandler:
             settings = get_settings()
 
             service_account = os.environ.get(
-                "VERTEX_FALLBACK_SERVICE_ACCOUNT",
+                "OPENAI_FALLBACK_SERVICE_ACCOUNT",
                 getattr(
                     settings,
-                    "VERTEX_FALLBACK_SERVICE_ACCOUNT",
+                    "OPENAI_FALLBACK_SERVICE_ACCOUNT",
                     "vertex-agent@cherry-ai-project.iam.gserviceaccount.com",
                 ),
             )

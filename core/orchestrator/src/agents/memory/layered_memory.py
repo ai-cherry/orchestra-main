@@ -117,7 +117,7 @@ class LayeredMemoryManager:
         # Create store based on type
         if layer.store_type == MemoryType.REDIS:
             return RedisMemoryStore(config)
-        elif layer.store_type == MemoryType.FIRESTORE:
+        elif layer.store_type == MemoryType.mongodb:
             return FirestoreMemoryStore(config)
         elif layer.store_type == MemoryType.IN_MEMORY:
             from core.orchestrator.src.agents.memory.in_memory import InMemoryStore
@@ -127,7 +127,7 @@ class LayeredMemoryManager:
             from core.orchestrator.src.agents.memory.pgvector import PGVectorStore
 
             return PGVectorStore(config)
-        elif layer.store_type == MemoryType.VERTEX_VECTOR:
+        elif layer.store_type == MemoryType.OPENAI_VECTOR:
             from core.orchestrator.src.agents.memory.vertex import (
                 VertexVectorMemoryStore,
             )
@@ -368,7 +368,7 @@ class LayeredMemoryManager:
         vector_results = []
 
         for layer in self.layers:
-            if layer.store_type in [MemoryType.PGVECTOR, MemoryType.VERTEX_VECTOR]:
+            if layer.store_type in [MemoryType.PGVECTOR, MemoryType.OPENAI_VECTOR]:
                 store = self._stores[layer.name]
                 query = MemoryQuery(text=text, limit=limit)
 
@@ -393,7 +393,7 @@ class LayeredMemoryManager:
         keyword_results = []
 
         for layer in self.layers:
-            if layer.store_type not in [MemoryType.PGVECTOR, MemoryType.VERTEX_VECTOR]:
+            if layer.store_type not in [MemoryType.PGVECTOR, MemoryType.OPENAI_VECTOR]:
                 store = self._stores[layer.name]
                 query = MemoryQuery(text=text, limit=remaining)
 
@@ -481,7 +481,7 @@ def create_default_memory_manager() -> LayeredMemoryManager:
 
     This function creates a memory manager with three layers:
     - Short-term memory (Redis)
-    - Long-term memory (Firestore)
+    - Long-term memory (mongodb)
     - Semantic memory (Vertex AI Vector Search)
 
     Returns:
@@ -497,13 +497,13 @@ def create_default_memory_manager() -> LayeredMemoryManager:
         ),
         MemoryLayer(
             name="long_term",
-            store_type=MemoryType.FIRESTORE,
+            store_type=MemoryType.mongodb,
             priority=2,
             config={"collection": "memory", "project": "cherry-ai-project"},
         ),
         MemoryLayer(
             name="semantic",
-            store_type=MemoryType.VERTEX_VECTOR,
+            store_type=MemoryType.OPENAI_VECTOR,
             priority=1,
             config={
                 "project": "cherry-ai-project",

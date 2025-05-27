@@ -15,12 +15,12 @@ Key features:
 
 Usage:
     # Direct model access
-    from gcp_migration.vertex_ai_bridge import get_vertex_client
+    from gcp_migration.openai_bridge import get_vertex_client
     client = get_vertex_client()
     response = client.generate_text("Generate a function to sort a list")
 
     # Higher-level functions
-    from gcp_migration.vertex_ai_bridge import generate_code, analyze_code
+    from gcp_migration.openai_bridge import generate_code, analyze_code
     code = generate_code("Create a Python function to check if a string is a palindrome")
     analysis = analyze_code("def add(a, b): return a + b", "Check for type hints")
 """
@@ -43,7 +43,7 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s - %(message)s",
 )
-logger = logging.getLogger("vertex_ai_bridge")
+logger = logging.getLogger("openai_bridge")
 
 # Import optional dependencies for GCP
 try:

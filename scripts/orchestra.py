@@ -118,7 +118,7 @@ class OrchestaCLI:
 
             services = {
                 8002: "MCP Secret Manager",
-                8080: "Orchestrator/Firestore",
+                8080: "Orchestrator/mongodb",
                 3000: "Admin UI",
             }
 
@@ -152,7 +152,7 @@ class OrchestaCLI:
         services = [
             {
                 "name": "MCP Secret Manager",
-                "cmd": ["python", "-m", "mcp_servers.secret_manager", "--port", "8002"],
+                "cmd": ["python", "-m", "mcp_servers.os.environ", "--port", "8002"],
             },
             {
                 "name": "Core Orchestrator",

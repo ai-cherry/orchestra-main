@@ -61,7 +61,7 @@ async def check_health(
     Check the health of the system components.
 
     This endpoint checks the status of various system components including:
-    - Storage backends (Firestore)
+    - Storage backends (mongodb)
     - Cache system (Redis)
     - Cloud platform connectivity
     - Runtime information

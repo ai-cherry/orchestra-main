@@ -2,7 +2,7 @@
 Property Enrichment Agent
 
 Handles property data ingestion, address normalization, deduplication, and initial web search.
-Integrates with Firestore for data storage and Google Maps API for address normalization.
+Integrates with mongodb for data storage and Google Maps API for address normalization.
 
 Author: AI Orchestrator Team
 """
@@ -22,16 +22,16 @@ class PropertyEnrichmentAgent:
     def __init__(self, firestore_collection: str, google_maps_api_key: str):
         """
         Args:
-            firestore_collection: Name of the Firestore collection for properties.
+            firestore_collection: Name of the mongodb collection for properties.
             google_maps_api_key: API key for Google Maps Geocoding API.
         """
-        self.db = firestore.Client()
+        self.db = mongodb.Client()
         self.collection = firestore_collection
         self.maps_api_key = google_maps_api_key
 
     def ingest_properties(self, properties: List[Dict]) -> None:
         """
-        Ingests a list of property records, normalizes addresses, deduplicates, and stores them in Firestore.
+        Ingests a list of property records, normalizes addresses, deduplicates, and stores them in mongodb.
 
         Args:
             properties: List of property dicts with at least 'address' field.
@@ -55,7 +55,7 @@ class PropertyEnrichmentAgent:
                 logger.info(f"Duplicate property found for address: {normalized}")
                 continue
 
-            # Store in Firestore
+            # Store in mongodb
             self.db.collection(self.collection).add(prop)
             logger.info(f"Ingested property: {normalized}")
 

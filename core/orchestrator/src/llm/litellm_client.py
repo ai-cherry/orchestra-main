@@ -24,7 +24,7 @@ class ModelProvider(str, Enum):
     ANTHROPIC = "anthropic"
     GOOGLE = "google"
     AZURE_OPENAI = "azure_openai"
-    VERTEX_AI = "vertex_ai"
+    openai = "openai"
 
 
 class ModelType(str, Enum):
@@ -134,8 +134,8 @@ class LiteLLMClient:
 
         # Configure Vertex AI if project and location are provided
         if self.vertex_project and self.vertex_location:
-            os.environ["VERTEX_PROJECT"] = self.vertex_project
-            os.environ["VERTEX_LOCATION"] = self.vertex_location
+            os.environ["OPENAI_PROJECT"] = self.vertex_project
+            os.environ["OPENAI_LOCATION"] = self.vertex_location
 
         # Set up logging
         litellm.set_verbose = True

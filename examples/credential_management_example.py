@@ -13,7 +13,7 @@ Usage:
 
 Requirements:
     - google-cloud-secret-manager
-    - google-cloud-firestore
+    - google-cloud-mongodb
     - google-cloud-aiplatform
     - fastapi
     - redis
@@ -106,8 +106,7 @@ async def example_gcp_services():
     )
 
     # This is just a demonstration - in a real application, you would do:
-    # from google.cloud import aiplatform
-    # aiplatform.init(
+    #     # aiplatform.init(
     #     project=vertex_credentials["project_id"],
     #     location="us-central1",
     #     credentials=vertex_credentials
@@ -142,7 +141,7 @@ async def example_memory_system():
         redis_port = "12345"
         redis_password = "mock-password"
 
-    # Get Firestore credentials
+    # Get mongodb credentials
     try:
         # Note: This will fail if the service account key doesn't exist
         firestore_credentials = credential_manager.get_service_account_key(
@@ -150,8 +149,8 @@ async def example_memory_system():
         )
         print(f"\nFirestore Credentials: {firestore_credentials['client_email']}")
     except Exception as e:
-        print(f"\nError getting Firestore credentials: {str(e)}")
-        print("Creating mock Firestore credentials for demonstration purposes...")
+        print(f"\nError getting mongodb credentials: {str(e)}")
+        print("Creating mock mongodb credentials for demonstration purposes...")
         firestore_credentials = {
             "type": "service_account",
             "project_id": "cherry-ai-project",
@@ -172,16 +171,15 @@ async def example_memory_system():
     # )
     # r.set("test_key", "test_value")
 
-    # Use the credentials with Firestore
-    print("\nConnecting to Firestore...")
+    # Use the credentials with mongodb
+    print("\nConnecting to mongodb...")
     print(f"Project ID: {firestore_credentials.get('project_id', 'cherry-ai-project')}")
     print(
         f"Service Account: {firestore_credentials.get('client_email', 'memory-system@cherry-ai-project.iam.gserviceaccount.com')}"
     )
 
     # This is just a demonstration - in a real application, you would do:
-    # from google.cloud import firestore
-    # db = firestore.Client(
+    #     # db = mongodb.Client(
     #     project=firestore_credentials["project_id"],
     #     credentials=firestore_credentials
     # )
@@ -190,7 +188,7 @@ async def example_memory_system():
 
     return {
         "redis": {"host": redis_host, "port": redis_port, "password": redis_password},
-        "firestore": firestore_credentials,
+        "mongodb": firestore_credentials,
     }
 
 
@@ -202,7 +200,7 @@ async def example_fastapi_integration():
     print("In a FastAPI application, you would use the dependencies like this:")
     print("\nfrom fastapi import Depends, FastAPI")
     print("from core.orchestrator.src.api.dependencies.credentials import (")
-    print("    get_vertex_ai_credentials,")
+    print("    get_openai_credentials,")
     print("    get_gemini_credentials,")
     print("    get_redis_credentials,")
     print(")")
@@ -210,7 +208,7 @@ async def example_fastapi_integration():
     print("\n@app.post('/vertex/predict')")
     print("async def predict(")
     print("    request: PredictRequest,")
-    print("    credentials: dict = Depends(get_vertex_ai_credentials)")
+    print("    credentials: dict = Depends(get_openai_credentials)")
     print("):")
     print("    # Initialize Vertex AI with credentials")
     print("    aiplatform.init(")
