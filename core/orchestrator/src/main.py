@@ -41,6 +41,7 @@ from core.orchestrator.src.api.endpoints import (
     interaction,
     llm_interaction,
     personas,
+    resources,  # Added resources router import
 )
 from core.orchestrator.src.config.loader import get_settings, load_persona_configs
 from core.orchestrator.src.services.unified_event_bus import (
@@ -263,6 +264,8 @@ app.include_router(personas.router, prefix="/api/personas")
 app.include_router(agents.router, prefix="/api/agents")
 # Add conversations router
 app.include_router(conversations.router, prefix="/api/conversations")
+# Add resources router
+app.include_router(resources.router, prefix="/api/resources")
 
 
 if __name__ == "__main__":
