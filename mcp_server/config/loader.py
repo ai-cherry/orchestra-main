@@ -165,9 +165,10 @@ def merge_configs(
     return result
 
 
-def load_config(config_path: Optional[str] = None) -> MCPConfig:
+def load_config(config_path: Optional[str] = "mcp_config.json") -> MCPConfig:
     """
     Load and validate configuration from multiple sources.
+
 
     Configuration is loaded and merged from the following sources (in order of precedence):
     1. Environment variables

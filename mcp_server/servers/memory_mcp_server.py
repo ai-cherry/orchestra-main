@@ -18,6 +18,7 @@ from fastapi import BackgroundTasks, FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from qdrant_client.models import Distance, PointStruct, VectorParams
 from sentence_transformers import SentenceTransformer
+import pymongo  # Added for MongoDB mid-term memory support
 
 # --- MCP CONFIG IMPORTS ---
 from mcp_server.config.loader import load_config
@@ -39,9 +40,7 @@ app = FastAPI(
 
 # Configuration (now loaded from unified config)
 REDIS_URL = memory_config.storage.connection_string or "redis://localhost:6379"
-FIRESTORE_PROJECT = (
-    os.getenv("FIRESTORE_PROJECT") or os.getenv("GCP_PROJECT_ID") or "default-project"
-)
+MONGODB_URL = memory_config.storage.connection_string or "mongodb://localhost:27017"
 QDRANT_URL = os.getenv("QDRANT_URL") or "http://localhost:6333"
 EMBEDDING_MODEL = (
     os.getenv("EMBEDDING_MODEL") or "sentence-transformers/all-MiniLM-L6-v2"
@@ -62,8 +61,11 @@ try:
     # Redis for short-term memory
     redis_client = redis.from_url(REDIS_URL, decode_responses=True)
 
-    # mongodb for mid-term memory
-    firestore_client = mongodb.Client(project=FIRESTORE_PROJECT)
+    # MongoDB for mid-term memory
+    mongo_client = pymongo.MongoClient(MONGODB_URL)
+    mongo_db = mongo_client.get_database("orchestra")
+    mongo_memories = mongo_db.get_collection("memories")
+    mongo_agents = mongo_db.get_collection("agents")
 
     # Qdrant for long-term memory
     qdrant_client = qdrant_client.QdrantClient(url=QDRANT_URL)
@@ -74,7 +76,10 @@ try:
 except Exception as e:
     logger.error(f"Failed to initialize memory clients: {e}")
     redis_client = None
-    firestore_client = None
+    mongo_client = None
+    mongo_db = None
+    mongo_memories = None
+    mongo_agents = None
     qdrant_client = None
     embedder = None
 
@@ -155,26 +160,30 @@ async def store_short_term(memory: MemoryItem) -> bool:
 
 
 async def store_mid_term(memory: MemoryItem) -> bool:
-    """Store in mid-term memory (mongodb)"""
-    if not firestore_client:
+    """Store in mid-term memory (MongoDB)"""
+    if not mongo_memories:
         return False
 
     try:
-        doc_ref = firestore_client.collection("memories").document(memory.id)
         data = memory.dict()
         data["timestamp"] = data["timestamp"]
         data["expiry"] = datetime.utcnow() + timedelta(days=30)
-
-        doc_ref.set(data)
+        # Upsert memory by id
+        mongo_memories.update_one(
+            {"_id": memory.id},
+            {"$set": data},
+            upsert=True,
+        )
 
         # Update agent's memory collection
-        if memory.agent_id:
-            agent_ref = firestore_client.collection("agents").document(memory.agent_id)
-            agent_ref.update(
+        if memory.agent_id and mongo_agents:
+            mongo_agents.update_one(
+                {"_id": memory.agent_id},
                 {
-                    "memory_ids": mongodb.ArrayUnion([memory.id]),
-                    "last_updated": datetime.utcnow(),
-                }
+                    "$addToSet": {"memory_ids": memory.id},
+                    "$set": {"last_updated": datetime.utcnow()},
+                },
+                upsert=True,
             )
 
         return True
@@ -367,22 +376,23 @@ async def query_memory(query: MemoryQuery) -> List[Dict[str, Any]]:
             logger.error(f"Error searching short-term memory: {e}")
 
     # Search mid-term memory
-    if "mid" in query.memory_layers and firestore_client:
+    if "mid" in query.memory_layers and mongo_memories:
         try:
-            # Query mongodb
-            query_ref = firestore_client.collection("memories")
-
+            # Build query
+            mongo_query = {}
             if query.agent_id:
-                query_ref = query_ref.where("agent_id", "==", query.agent_id)
+                mongo_query["agent_id"] = query.agent_id
 
             # Get all documents and filter
-            docs = query_ref.stream()
-            for doc in docs:
-                memory = doc.to_dict()
-
+            docs = mongo_memories.find(mongo_query)
+            for memory in docs:
                 # Simple text matching
-                if query.query.lower() in memory["content"].lower():
-                    memory["timestamp"] = memory["timestamp"].isoformat()
+                if query.query.lower() in memory.get("content", "").lower():
+                    memory["timestamp"] = (
+                        memory["timestamp"].isoformat()
+                        if isinstance(memory["timestamp"], datetime)
+                        else str(memory["timestamp"])
+                    )
                     results.append({**memory, "layer": "mid-term", "score": 0.85})
         except Exception as e:
             logger.error(f"Error searching mid-term memory: {e}")
@@ -526,7 +536,7 @@ async def health_check():
         "service": "memory-mcp",
         "backends": {
             "redis": redis_client is not None,
-            "mongodb": firestore_client is not None,
+            "mongodb": mongo_memories is not None,
             "qdrant": qdrant_client is not None,
             "embedder": embedder is not None,
         },

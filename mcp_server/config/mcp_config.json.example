@@ -1,0 +1,41 @@
+{
+  // Example MCP server configuration file.
+  // Copy and rename to mcp_config.json for local use.
+
+  "storage": {
+    "type": "in_memory", // Options: "in_memory", "redis", "mongodb", etc.
+    "connection_string": null, // e.g., "mongodb://localhost:27017"
+    "max_entries": 10000,
+    "ttl_seconds": 86400
+  },
+  "copilot": {
+    "enabled": true,
+    "api_key": null,
+    "token_limit": 5000,
+    "vscode_extension_path": null,
+    "use_openai_fallback": true,
+    "openai_model": "gpt-3.5-turbo"
+  },
+  "gemini": {
+    "enabled": true,
+    "api_key": null,
+    "model": "gemini-pro",
+    "embeddings_model": "embedding-001",
+    "token_limit": 200000
+  },
+  "debug": false,
+  "log_level": "INFO",
+  "port": 8080,
+  "host": "0.0.0.0",
+  "servers": {
+    "memory": {
+      "name": "Memory MCP Server",
+      "url": "http://localhost:9001",
+      "health": "/health",
+      "capabilities": ["short_term", "mid_term", "long_term"],
+      "port": 9001,
+      "host": "0.0.0.0"
+    }
+    // Add additional servers as needed
+  }
+}

@@ -1,113 +1,157 @@
 """
-Settings configuration for the AI Orchestration System.
-Cleaned version without GCP dependencies.
+Configuration module for AI Orchestration System.
+
+This module provides configuration loading and access for the orchestration
+system, centralizing settings management for clarity and maintainability.
 """
 
-import json
 import logging
-from typing import Any, Dict, List, Optional
+import os
+from typing import Dict, List, Optional
 
+import yaml
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Use relative import for packages within the same project
+try:
+    from ....packages.shared.src.models.core_models import PersonaConfig
+except ImportError:
+    # Fallback to absolute import if relative import fails
+    from packages.shared.src.models.core_models import PersonaConfig
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 
 class Settings(BaseSettings):
-    """Application settings loaded from environment variables."""
+    """
+    Configuration settings for the AI Orchestration System.
 
-    # General settings
+    Centralizes all configuration settings for the application,
+    with automatic loading from environment variables and sensible defaults.
+    """
+
+    # Basic configuration
+    APP_NAME: str = "AI Orchestration System"
     ENVIRONMENT: str = "development"
-    DEFAULT_LLM_MODEL: str = "gpt-4"
-    DEFAULT_LLM_MODEL_PRIMARY: str = "openai/gpt-4o"
-    DEFAULT_LLM_MODEL_FALLBACK_OPENAI: Optional[str] = "gpt-4o"
-    DEFAULT_LLM_MODEL_FALLBACK_ANTHROPIC: Optional[str] = "claude-3-5-sonnet-20240620"
+    DEBUG: bool = False
+    LOG_LEVEL: str = "INFO"
 
-    # API keys
-    OPENROUTER_API_KEY: Optional[str] = None
-    PORTKEY_API_KEY: Optional[str] = None
-
-    # External Services (Non-GCP)
-    DRAGONFLY_URI: Optional[str] = None  # Aiven DragonflyDB
-    MONGODB_URI: Optional[str] = None  # MongoDB Atlas
-    WEAVIATE_URL: Optional[str] = None  # Weaviate Cloud
-    WEAVIATE_API_KEY: Optional[str] = None
-
-    # Redis Cache Settings (Local or External)
-    REDIS_HOST: Optional[str] = None
+    # Storage configuration
+    REDIS_ENABLED: bool = True
+    REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
-    REDIS_AUTH_SECRET: Optional[str] = None
-    REDIS_CACHE_TTL: int = 3600
-    REDIS_CACHE_ENABLED: bool = False
 
-    # Vector Search Settings
-    VECTOR_DIMENSION: int = 1536
-    VECTOR_DISTANCE_TYPE: str = "COSINE"
+    # Resource paths
+    PERSONA_CONFIG_PATH: str = "core/orchestrator/src/config/personas"
 
-    # OpenRouter Configuration
-    OPENROUTER_HEADERS: Optional[str] = None
-    OPENROUTER_DEFAULT_MODEL: str = "openai/gpt-3.5-turbo"
-    OPENROUTER_FREE_FALLBACKS: Optional[str] = None
-    PREFERRED_LLM_PROVIDER: str = "openrouter"
-
-    # Mode and Agent model mappings
-    MODE_MODEL_MAP: Optional[str] = None
-    AGENT_MODEL_MAP: Optional[str] = None
-
-    # LLM request parameters
-    LLM_REQUEST_TIMEOUT: int = 30
-    LLM_MAX_RETRIES: int = 3
-    LLM_RETRY_DELAY: float = 1.0
-    LLM_RETRY_MAX_DELAY: float = 60.0
-    LLM_RETRYABLE_ERRORS: str = (
-        "connection_error,timeout_error,rate_limit_error,service_error"
+    # Memory settings
+    MEMORY_PROVIDER: str = (
+        "in_memory"  # For orchestrator's internal/simple memory needs
     )
+    CONVERSATION_HISTORY_LIMIT: int = 10
+    MEMORY_CACHE_TTL: int = 3600  # 1 hour default
+    REDIS_PASSWORD: Optional[str] = None
 
-    # Semantic caching
-    LLM_SEMANTIC_CACHE_ENABLED: bool = False
-    LLM_SEMANTIC_CACHE_THRESHOLD: float = 0.85
-    LLM_SEMANTIC_CACHE_TTL: int = 3600
+    # Enhanced memory settings
+    USE_RESILIENT_ADAPTER: bool = True  # Whether to use circuit breaker pattern
+    EMBEDDING_DIMENSION: int = 768  # Dimension of embedding vectors
+    ENABLE_MEMORY_MONITORING: bool = True  # Whether to enable memory monitoring
 
-    # Portkey configuration
-    TRACE_ID: Optional[str] = None
-    MASTER_PORTKEY_ADMIN_KEY: Optional[str] = None
-    PORTKEY_CONFIG_ID: Optional[str] = None
-    PORTKEY_STRATEGY: str = "fallback"
-    PORTKEY_CACHE_ENABLED: bool = False
+    # Agent settings
+    DEFAULT_AGENT_TYPE: str = "simple_text"
+    PREFERRED_AGENTS_ENABLED: bool = True
+    AGENT_TIMEOUT_SECONDS: int = 30
 
-    # Portkey Virtual Keys
-    PORTKEY_VIRTUAL_KEY_OPENAI: Optional[str] = None
-    PORTKEY_VIRTUAL_KEY_ANTHROPIC: Optional[str] = None
-    PORTKEY_VIRTUAL_KEY_MISTRAL: Optional[str] = None
-    PORTKEY_VIRTUAL_KEY_OPENROUTER: Optional[str] = None
+    # LLM settings
+    OPENROUTER_API_KEY: Optional[SecretStr] = None
+    DEFAULT_LLM_MODEL: str = "openai/gpt-3.5-turbo"
 
-    # Site information
-    SITE_URL: str = "http://localhost"
-    SITE_TITLE: str = "Orchestra-Main Development"
+    # API settings
+    CORS_ORIGINS: List[str] = ["*"]
+    API_PREFIX: str = "/api"
 
+    # Configure Pydantic to load from .env file
     model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        case_sensitive=True,
-        extra="allow",
+        env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
     )
 
-    def get_openrouter_headers(self) -> Dict[str, str]:
-        """Get OpenRouter custom headers."""
-        headers = {
-            "HTTP-Referer": self.SITE_URL,
-            "X-Title": self.SITE_TITLE,
-        }
-        if self.OPENROUTER_FREE_FALLBACKS:
-            free_models = self.OPENROUTER_FREE_FALLBACKS.replace(" ", "").split(",")
-            if free_models:
-                headers["fallback_providers"] = ":".join(free_models)
-        if self.OPENROUTER_HEADERS:
+
+def load_all_persona_configs(settings_instance: Settings) -> Dict[str, PersonaConfig]:
+    """
+    Load all persona configurations from YAML files.
+
+    Scans the persona config directory specified in the settings
+    and loads each YAML file into a PersonaConfig object.
+
+    Args:
+        settings_instance: The settings instance containing configuration paths
+
+    Returns:
+        Dict[str, PersonaConfig]: A dictionary mapping persona names to their configuration objects
+    """
+    personas: Dict[str, PersonaConfig] = {}
+    persona_dir = settings_instance.PERSONA_CONFIG_PATH
+
+    # Check if the directory exists
+    if not os.path.exists(persona_dir):
+        logger.warning(f"Persona config directory '{persona_dir}' not found")
+        return personas
+
+    # Scan the directory for YAML files
+    for filename in os.listdir(persona_dir):
+        if filename.endswith((".yaml", ".yml")):
+            file_path = os.path.join(persona_dir, filename)
             try:
-                custom_headers = json.loads(self.OPENROUTER_HEADERS)
-                headers.update(custom_headers)
-            except json.JSONDecodeError as e:
-                logging.error(f"Failed to parse OPENROUTER_HEADERS: {e}")
-        return headers
+                with open(file_path, "r") as file:
+                    # Load YAML content
+                    yaml_data = yaml.safe_load(file)
+
+                    # Create PersonaConfig from YAML data
+                    persona_config = PersonaConfig(**yaml_data)
+
+                    # Use lowercase filename (without extension) as the key
+                    persona_name = os.path.splitext(filename)[0].lower()
+                    personas[persona_name] = persona_config
+
+                    logger.info(f"Loaded persona configuration for '{persona_name}'")
+            except Exception as e:
+                logger.error(f"Error loading persona config from {file_path}: {str(e)}")
+
+    if not personas:
+        logger.warning("No persona configurations found")
+
+    return personas
+
+
+# Global settings instance for singleton pattern
+settings = Settings()
+
+# Log that settings have been loaded
+logger.info(
+    f"Loaded configuration for {settings.APP_NAME} in {settings.ENVIRONMENT} environment"
+)
 
 
 def get_settings() -> Settings:
-    """Get application settings."""
-    return Settings()
+    """
+    Get application settings.
+
+    Returns:
+        Settings: Application settings instance.
+    """
+    return settings
+
+
+def get_persona_configs() -> Dict[str, PersonaConfig]:
+    """
+    Get all persona configurations.
+
+    This function is a convenience wrapper around load_all_persona_configs
+    that uses the global settings instance.
+
+    Returns:
+        Dict[str, PersonaConfig]: A dictionary mapping persona names to their configuration objects
+    """
+    return load_all_persona_configs(settings)
