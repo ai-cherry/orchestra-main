@@ -1,14 +1,15 @@
 """
 UnifiedMemory: A sophisticated, extensible memory abstraction for AI orchestration.
 
-Integrates DragonflyDB (in-memory cache), Qdrant (vector/semantic search), and Firestore (persistent storage)
-under a single, polished interface. Designed for high performance, modularity, and seamless GCP/cloud deployment.
+Integrates DragonflyDB (in-memory cache), Weaviate (vector/semantic search), and Firestore (persistent storage)
+under a single, polished interface. Designed for high performance, modularity, and seamless stack-native deployment.
 
 Author: AI Orchestrator
 """
 
-import os
 from typing import Any, Dict, List, Optional, Union
+
+from core.env_config import settings
 
 # Import backend clients (assume these are installed and configured)
 try:
@@ -17,10 +18,9 @@ except ImportError:
     redis = None
 
 try:
-    from qdrant_client import QdrantClient
-    from qdrant_client.http.models import PointStruct
+    import weaviate
 except ImportError:
-    QdrantClient = None
+    weaviate = None
 
 try:
     from google.cloud import firestore
@@ -49,7 +49,7 @@ class MemoryItem(BaseModel):
 class UnifiedMemory:
     """
     UnifiedMemory provides a seamless, high-performance interface for storing, retrieving,
-    searching, and deleting memory items across DragonflyDB, Qdrant, and Firestore backends.
+    searching, and deleting memory items across DragonflyDB, Weaviate, and Firestore backends.
 
     Backend selection is controlled via environment variables or constructor arguments.
     """
@@ -57,35 +57,40 @@ class UnifiedMemory:
     def __init__(
         self,
         use_dragonfly: bool = True,
-        use_qdrant: bool = True,
+        use_weaviate: bool = True,
         use_firestore: bool = True,
         dragonfly_url: Optional[str] = None,
-        qdrant_url: Optional[str] = None,
+        weaviate_url: Optional[str] = None,
+        weaviate_api_key: Optional[str] = None,
         firestore_project: Optional[str] = None,
-        qdrant_collection: str = "memory_items",
+        weaviate_class: str = "MemoryItem",
         firestore_collection: str = "memory_items",
     ):
         # --- DragonflyDB (Redis-compatible) ---
         self.dragonfly = None
         if use_dragonfly and redis:
             self.dragonfly = redis.Redis.from_url(
-                dragonfly_url or os.getenv("DRAGONFLY_URL", "redis://localhost:6379/0")
+                dragonfly_url or settings.dragonfly_url or "redis://localhost:6379/0"
             )
 
-        # --- Qdrant (Vector DB) ---
-        self.qdrant = None
-        self.qdrant_collection = qdrant_collection
-        if use_qdrant and QdrantClient:
-            self.qdrant = QdrantClient(
-                url=qdrant_url or os.getenv("QDRANT_URL", "http://localhost:6333")
-            )
+        # --- Weaviate (Vector DB) ---
+        self.weaviate = None
+        self.weaviate_class = weaviate_class
+        if use_weaviate and weaviate:
+            endpoint = weaviate_url or settings.weaviate_endpoint
+            api_key = weaviate_api_key or settings.weaviate_api_key
+            if endpoint and api_key:
+                self.weaviate = weaviate.Client(
+                    url=endpoint,
+                    auth_client_secret=weaviate.AuthApiKey(api_key=api_key),
+                )
 
         # --- Firestore (Persistent) ---
         self.firestore = None
         self.firestore_collection = firestore_collection
         if use_firestore and firestore:
             self.firestore = firestore.Client(
-                project=firestore_project or os.getenv("GCP_PROJECT")
+                project=firestore_project or settings.gcp_project_id
             )
 
     # --- Store Memory ---
@@ -98,14 +103,23 @@ class UnifiedMemory:
         if self.dragonfly:
             self.dragonfly.hset(f"memory:{item.id}", mapping=item.dict())
 
-        # Qdrant (vector search)
-        if self.qdrant and item.embedding:
-            self.qdrant.upsert(
-                collection_name=self.qdrant_collection,
-                points=[
-                    PointStruct(id=item.id, vector=item.embedding, payload=item.dict())
-                ],
-            )
+        # Weaviate (vector search)
+        if self.weaviate and item.embedding:
+            try:
+                self.weaviate.data_object.create(
+                    data_object=item.dict(),
+                    class_name=self.weaviate_class,
+                    uuid=item.id,
+                    vector=item.embedding,
+                )
+            except Exception:
+                # Attempt update if already exists
+                self.weaviate.data_object.replace(
+                    data_object=item.dict(),
+                    class_name=self.weaviate_class,
+                    uuid=item.id,
+                    vector=item.embedding,
+                )
 
         # Firestore (persistent)
         if self.firestore:
@@ -147,19 +161,24 @@ class UnifiedMemory:
         """
         Search memory items.
         - If query is a string: perform metadata/content search (cache or Firestore).
-        - If query is a vector: perform semantic search (Qdrant).
+        - If query is a vector: perform semantic search (Weaviate).
         """
         results = []
 
-        # Vector search (Qdrant)
-        if self.qdrant and isinstance(query, list):
-            search_result = self.qdrant.search(
-                collection_name=self.qdrant_collection,
-                query_vector=query,
-                limit=limit,
+        # Vector search (Weaviate)
+        if self.weaviate and isinstance(query, list):
+            res = (
+                self.weaviate.query.get(
+                    self.weaviate_class, ["*", "_additional { id distance }"]
+                )
+                .with_near_vector({"vector": query})
+                .with_limit(limit)
+                .do()
             )
-            for point in search_result:
-                results.append(MemoryItem(**point.payload))
+            matches = res.get("data", {}).get("Get", {}).get(self.weaviate_class, [])
+            for m in matches:
+                payload = {k: v for k, v in m.items() if k != "_additional"}
+                results.append(MemoryItem(**payload))
             return results
 
         # Text search (DragonflyDB or Firestore)
@@ -200,12 +219,14 @@ class UnifiedMemory:
         if self.dragonfly:
             deleted = self.dragonfly.delete(f"memory:{memory_id}") or deleted
 
-        if self.qdrant:
-            self.qdrant.delete(
-                collection_name=self.qdrant_collection,
-                points_selector={"points": [memory_id]},
-            )
-            deleted = True
+        if self.weaviate:
+            try:
+                self.weaviate.data_object.delete(
+                    uuid=memory_id, class_name=self.weaviate_class
+                )
+                deleted = True
+            except Exception:
+                pass
 
         if self.firestore:
             self.firestore.collection(self.firestore_collection).document(
@@ -228,13 +249,13 @@ class UnifiedMemory:
                 status["dragonfly"] = True
             except Exception:
                 status["dragonfly"] = False
-        # Qdrant
-        if self.qdrant:
+        # Weaviate
+        if self.weaviate:
             try:
-                self.qdrant.get_collections()
-                status["qdrant"] = True
+                self.weaviate.is_ready()
+                status["weaviate"] = True
             except Exception:
-                status["qdrant"] = False
+                status["weaviate"] = False
         # Firestore
         if self.firestore:
             try:

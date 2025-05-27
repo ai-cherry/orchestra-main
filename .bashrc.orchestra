@@ -1,0 +1,48 @@
+#!/bin/bash
+# Orchestra AI Environment Configuration
+# Source this file to set up your Orchestra development environment
+
+# Pulumi Configuration - No more passphrase prompts!
+export PULUMI_CONFIG_PASSPHRASE="orchestra-dev-123"
+export PULUMI_SKIP_UPDATE_CHECK=true
+
+# Python path
+export PYTHONPATH="${PYTHONPATH}:${PWD}"
+
+# Convenience aliases
+alias pulumi-orchestra="PULUMI_CONFIG_PASSPHRASE='orchestra-dev-123' pulumi"
+alias deploy-orchestra="cd ${PWD}/infra && PULUMI_CONFIG_PASSPHRASE='orchestra-dev-123' pulumi up --yes"
+alias orchestra-status="cd ${PWD}/infra && PULUMI_CONFIG_PASSPHRASE='orchestra-dev-123' pulumi stack output"
+alias orchestra-logs="cd ${PWD}/infra && PULUMI_CONFIG_PASSPHRASE='orchestra-dev-123' pulumi logs -f"
+
+# Function to run Orchestra commands without passphrase prompts
+orchestra() {
+    export PULUMI_CONFIG_PASSPHRASE="orchestra-dev-123"
+    case "$1" in
+        deploy)
+            cd "${PWD}/infra" && pulumi up --yes
+            ;;
+        status)
+            cd "${PWD}/infra" && pulumi stack output
+            ;;
+        destroy)
+            cd "${PWD}/infra" && pulumi destroy --yes
+            ;;
+        test)
+            python test_modular_system.py
+            ;;
+        api)
+            cd core && python -m api.main
+            ;;
+        *)
+            echo "Usage: orchestra {deploy|status|destroy|test|api}"
+            ;;
+    esac
+}
+
+echo "Orchestra environment loaded! Available commands:"
+echo "  orchestra deploy  - Deploy to DigitalOcean"
+echo "  orchestra status  - Show deployment status"
+echo "  orchestra destroy - Tear down infrastructure"
+echo "  orchestra test    - Test the modular system"
+echo "  orchestra api     - Start the API locally"

@@ -167,7 +167,7 @@ The MCP memory system uses a three-layer architecture:
 - **Retention**: 30 days
 - **Use cases**: Recent project changes, completed tasks
 
-### 3. Long-term Memory (Qdrant)
+### 3. Long-term Memory (Weaviate)
 
 - **Purpose**: Semantic memory and knowledge base
 - **Retention**: Permanent
@@ -298,8 +298,8 @@ redis-cli ping
 # Check MongoDB
 gcloud MongoDB
 
-# Check Qdrant
-curl http://localhost:6333/health
+# Check Weaviate
+curl http://localhost:8082/v1/.well-known/ready
 ```
 
 ## Advanced Usage

@@ -92,19 +92,24 @@ droplet = do.Droplet(
 
 # --- REMOTE COMMAND: RUN SUPERAGI DOCKER CONTAINER ---
 # Determine connection arguments
-if root_password:
+if ssh_private_key_path:
+    # Read the SSH private key
+    ssh_private_key_path_str = config.get("ssh_private_key_path")
+    if ssh_private_key_path_str:
+        with open(os.path.expanduser(ssh_private_key_path_str), "r") as f:
+            ssh_private_key_content = f.read()
+        connection = command.remote.ConnectionArgs(
+            host=droplet.ipv4_address,
+            user="root",
+            private_key=ssh_private_key_content,
+        )
+    else:
+        raise pulumi.RunError("ssh_private_key_path is configured but empty")
+elif root_password:
     connection = command.remote.ConnectionArgs(
         host=droplet.ipv4_address,
         user="root",
         password=root_password,
-    )
-elif ssh_private_key_path:
-    with open(os.path.expanduser(ssh_private_key_path), "r") as f:
-        ssh_private_key_content = f.read()
-    connection = command.remote.ConnectionArgs(
-        host=droplet.ipv4_address,
-        user="root",
-        private_key=ssh_private_key_content,
     )
 else:
     # Fallback or error if no auth method provided
@@ -124,12 +129,40 @@ run_superagi = command.remote.Command(
         weaviate_api_key=weaviate_api_key,
     ).apply(
         lambda args: f"""
-docker run -d --restart unless-stopped -p 8080:8080 \\
-  -e DRAGONFLY_URI='{args['dragonfly_uri']}' \\
-  -e MONGO_URI='{args['mongo_uri']}' \\
-  -e WEAVIATE_URL='{args['weaviate_url']}' \\
-  -e WEAVIATE_API_KEY='{args['weaviate_api_key']}' \\
-  {superagi_image}
+# Install Python and dependencies
+apt-get update && apt-get install -y python3-pip git
+cd /opt
+git clone https://github.com/ai-cherry/orchestra-main.git orchestra
+cd orchestra
+pip3 install -r requirements/base.txt
+pip3 install uvicorn portkey-ai weaviate-client
+
+# Create systemd service
+cat > /etc/systemd/system/orchestra-api.service << 'EOF'
+[Unit]
+Description=Orchestra AI API
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/orchestra
+Environment="PYTHONPATH=/opt/orchestra"
+Environment="DRAGONFLY_URI={args['dragonfly_uri']}"
+Environment="MONGO_URI={args['mongo_uri']}"
+Environment="WEAVIATE_URL={args['weaviate_url']}"
+Environment="WEAVIATE_API_KEY={args['weaviate_api_key']}"
+ExecStart=/usr/bin/python3 -m uvicorn core.api.main:app --host 0.0.0.0 --port 8080
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Start the service
+systemctl daemon-reload
+systemctl enable orchestra-api
+systemctl start orchestra-api
 """
     ),
     opts=pulumi.ResourceOptions(depends_on=[droplet]),
@@ -140,12 +173,12 @@ firewall_rules_inbound = [
     do.FirewallInboundRuleArgs(
         protocol="tcp",
         port_range="8080",  # SuperAGI
-        sources=do.FirewallInboundRuleSourcesArgs(addresses=["0.0.0.0/0", "::/0"]),
+        source_addresses=["0.0.0.0/0", "::/0"],
     ),
     do.FirewallInboundRuleArgs(
         protocol="tcp",
         port_range="22",  # SSH
-        sources=do.FirewallInboundRuleSourcesArgs(addresses=["0.0.0.0/0", "::/0"]),
+        source_addresses=["0.0.0.0/0", "::/0"],
     ),
 ]
 
@@ -158,21 +191,20 @@ firewall = do.Firewall(
         do.FirewallOutboundRuleArgs(
             protocol="tcp",
             port_range="all",
-            destinations=do.FirewallOutboundRuleDestinationsArgs(
-                addresses=["0.0.0.0/0", "::/0"]
-            ),
+            destination_addresses=["0.0.0.0/0", "::/0"],
         ),
         do.FirewallOutboundRuleArgs(
             protocol="udp",
             port_range="all",
-            destinations=do.FirewallOutboundRuleDestinationsArgs(
-                addresses=["0.0.0.0/0", "::/0"]
-            ),
+            destination_addresses=["0.0.0.0/0", "::/0"],
         ),
     ],
 )
 
 # --- DigitalOcean App Platform for Admin UI ---
+# NOTE: Temporarily disabled - App Platform requires git source for static sites
+# TODO: Either push admin-ui to a git repo or use a different deployment method
+"""
 # Check if the admin_ui_dist_path exists. This is a deployment-time check.
 # Pulumi needs this path to be valid on the machine running `pulumi up`.
 # In CI, this path (`../admin-ui/dist` relative to `infra/`) must contain the build artifact.
@@ -197,21 +229,17 @@ admin_app_spec_dict = {
 }
 
 if admin_ui_custom_domain_name:
-    admin_app_spec_dict["domains"] = [
-        do.AppSpecDomainArgs(
-            domain=admin_ui_custom_domain_name,
-            type="PRIMARY",
-        )
-    ]
+    admin_app_spec_dict["domains"] = [admin_ui_custom_domain_name]
 
 admin_app = do.App(
     f"admin-ui-app-{env}",
     spec=do.AppSpecArgs(**admin_app_spec_dict),
 )
+"""
 
 # --- OUTPUTS ---
 pulumi.export("droplet_ip", droplet.ipv4_address)
 pulumi.export("superagi_url", Output.concat("http://", droplet.ipv4_address, ":8080"))
 pulumi.export("hostname", droplet.name)
-pulumi.export("admin_ui_default_url", admin_app.default_ingress)
-pulumi.export("admin_ui_live_url", admin_app.live_url)
+# pulumi.export("admin_ui_default_url", admin_app.default_ingress)
+# pulumi.export("admin_ui_live_url", admin_app.live_url)
