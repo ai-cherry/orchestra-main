@@ -2,8 +2,6 @@ config:
   orchestra-infra:env: dev
   digitalocean:token:
     secure: v1:R7oWg5r0ef0C6db6:6aF0JiFuJuxTasFyAP9fvZIXBm0BAqdObPvBGynM0ZlonAGdKY41BrcXAlZRzaf+0T/Q+xmFV3ToXtyhXa0aJ2gXicdhHI/tD4GaU3oYIb3rv3B03naL
-  orchestra-infra:root_password:
-    secure: v1:ithgu6jFALvK5uuy:RcAn6knjnZsfeBG6L5WVT0NDscAgK0IHL7YhoZqm
   orchestra-infra:dragonfly_uri:
     secure: v1:RBMowDB8xwyhmhpr:qO1kVGhs2Kp1FbP+IIGbAPfHAYCTa+aQ85/hNWJkyeGXt0g/vJI3BN+9cMP8rAiF5X1+psM6w8yXoFxIQwleW3+a44SNLGHVldnwop1h
   orchestra-infra:mongo_uri:
@@ -35,4 +33,7 @@ config:
   orchestra-infra:mongodb_service_client_secret:
     secure: v1:w3K5eEzsaiKn54lA:KuMWehJk+oIYSzUB4G944SmFXzY82f+Qxa3k8OiLc4cGSJIifgChlVwPI0GudC6717NFdRU6CciKTcVYNxRhzd7E
   orchestra-infra:adminUiCustomDomain: cherry-ai.me
+  orchestra-infra:ssh_pubkey_path: /home/paperspace/.ssh/orchestra_do_key.pub
+  orchestra-infra:ssh_private_key_path:
+    secure: v1:ZT0gr7KVtxqPr1nA:xY9vbzpC31FlKx/LPe9KqF+Mxk2SLWZ9zYwPFKo5RLGw6LXVaje2Od2TYUUNDIZGNToawpp9
 encryptionsalt: v1:yLqMcZtWgDg=:v1:ILTt7LJiZ9F0MPzW:Oujsbek3GDNno38VZBTb0Ej7b5mw9g==

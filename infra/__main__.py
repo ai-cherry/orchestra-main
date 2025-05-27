@@ -1,10 +1,11 @@
-# DigitalOcean entry-point for Orchestra AI
-# --------------------------------------
-# The stack definition now lives in `do_superagi_stack.py`.
-# This thin shim simply imports that module so Pulumi picks up
-# the resources.
+#!/usr/bin/env python3
+"""
+Main entry point for Pulumi infrastructure deployment.
+"""
 
-from importlib import import_module
+# Import the stack to register resources
+import do_superagi_stack  # noqa: F401
 
-# Importing executes resource declarations immediately.
-import_module("infra.do_superagi_stack")
+if __name__ == "__main__":
+    # Pulumi will handle the rest
+    pass

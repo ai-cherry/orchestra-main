@@ -1,15 +1,16 @@
 """
 Pinecone Vector Storage Adapter for Orchestra AI
 High-performance, async batch upsert/query/delete with robust error handling.
-Credentials are loaded from environment variables (populated by Google Secret Manager at runtime).
+Credentials are loaded from centralized settings (via Pulumi/environment).
 
 Performance, stability, and optimization are prioritized over cost and complex security.
 """
 
 import asyncio
 import logging
-import os
 from typing import Any, Dict, List, Optional
+
+from core.env_config import settings
 
 import pinecone  # Requires 'pinecone-client' package
 
@@ -29,13 +30,11 @@ class PineconeAdapter:
         dimension: Optional[int] = None,
         environment: Optional[str] = None,
     ):
-        # Credentials loaded from environment variables (set by Secret Manager)
-        api_key = os.environ.get("PINECONE_API_KEY")
+        # Credentials loaded from centralized settings
+        api_key = settings.pinecone_api_key
         if not api_key:
-            raise RuntimeError("PINECONE_API_KEY not set in environment variables.")
-        pinecone_env = environment or os.environ.get(
-            "PINECONE_ENVIRONMENT", "us-west1-gcp"
-        )
+            raise RuntimeError("PINECONE_API_KEY not configured.")
+        pinecone_env = environment or settings.pinecone_environment or "us-west1-gcp"
         pinecone.init(api_key=api_key, environment=pinecone_env)
         self.index_name = index_name
         self.namespace = namespace

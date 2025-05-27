@@ -7,8 +7,9 @@ focusing on the basic operations needed by the Tool Registry.
 """
 
 import logging
-import os
 from typing import Any, Dict, List, Optional
+
+from core.env_config import settings
 
 import requests
 
@@ -26,7 +27,7 @@ class MCPClient:
         self, base_url: str = "http://localhost:8080/api", api_key: Optional[str] = None
     ):
         self.base_url = base_url
-        self.api_key = api_key or os.environ.get("MCP_API_KEY")
+        self.api_key = api_key or settings.mcp_api_key
         self.session = requests.Session()
 
         # Add API key to all requests if available

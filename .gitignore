@@ -67,3 +67,6 @@ infra_legacy/
 # Environment files
 .env
 config/managed-services.env
+
+# Pulumi passphrase file
+.pulumi-passphrase

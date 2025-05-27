@@ -147,7 +147,7 @@ Implements layered memory architecture:
 
 - **Short-term (Redis)**: TTL 1 hour, for temporary data
 - **Mid-term (Firestore)**: 30-day retention, for episodic memory
-- **Long-term (Qdrant)**: Permanent, for semantic memory
+- **Long-term (Weaviate)**: Permanent, for semantic memory
 
 **Tools:**
 
@@ -283,7 +283,7 @@ Key metrics:
 
 - Redis: 100 max connections
 - Firestore: 50 concurrent requests
-- Qdrant: 20 connections with gRPC compression
+- Weaviate: 20 connections with gRPC compression
 
 ### 2. Caching Strategy
 
@@ -334,8 +334,8 @@ Key metrics:
    # Test Firestore
    gcloud firestore operations list
 
-   # Test Qdrant
-   curl http://localhost:6333/health
+   # Test Weaviate
+   curl http://localhost:8082/v1/.well-known/ready
    ```
 
 ### Debug Mode
@@ -427,7 +427,7 @@ env:
   GCP_REGION: ${{ secrets.GCP_REGION }}
   REDIS_URL: ${{ secrets.REDIS_URL }}
   FIRESTORE_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
-  QDRANT_URL: ${{ secrets.QDRANT_URL }}
+  WEAVIATE_ENDPOINT: ${{ secrets.WEAVIATE_ENDPOINT }}
 ```
 
 ## Next Steps

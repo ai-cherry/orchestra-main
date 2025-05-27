@@ -1,15 +1,16 @@
 """
 Weaviate Vector Storage Adapter for Orchestra AI
 High-performance, async batch upsert/query/delete with robust error handling.
-Credentials and endpoint are loaded from environment variables (populated by Google Secret Manager at runtime).
+Credentials and endpoint are loaded from centralized settings (via Pulumi/environment).
 
 Performance, stability, and optimization are prioritized over cost and complex security.
 """
 
 import asyncio
 import logging
-import os
 from typing import Any, Dict, List, Optional
+
+from core.env_config import settings
 
 import weaviate
 from weaviate.util import get_valid_uuid
@@ -29,12 +30,12 @@ class WeaviateAdapter:
         endpoint: Optional[str] = None,
         api_key: Optional[str] = None,
     ):
-        # Credentials and endpoint loaded from environment variables (set by Secret Manager)
-        self.endpoint = endpoint or os.environ.get("WEAVIATE_ENDPOINT")
-        self.api_key = api_key or os.environ.get("WEAVIATE_API_KEY")
+        # Credentials and endpoint loaded from centralized settings
+        self.endpoint = endpoint or settings.weaviate_endpoint
+        self.api_key = api_key or settings.weaviate_api_key
         if not self.endpoint or not self.api_key:
             raise RuntimeError(
-                "WEAVIATE_ENDPOINT and WEAVIATE_API_KEY must be set in environment variables."
+                "WEAVIATE_ENDPOINT and WEAVIATE_API_KEY must be configured"
             )
         self.class_name = class_name
         self._client = None

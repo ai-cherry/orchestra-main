@@ -82,7 +82,7 @@ def create_health_table(health_data: list) -> Table:
                 # Format details based on server type
                 if server["name"] == "Memory":
                     backends = server["details"].get("backends", {})
-                    details = f"Redis: {backends.get('redis', '❌')}, mongodb: {backends.get('mongodb', '❌')}, Qdrant: {backends.get('qdrant', '❌')}"
+                    details = f"Redis: {backends.get('redis', '❌')}, mongodb: {backends.get('mongodb', '❌')}, Weaviate: {backends.get('weaviate', '❌')}"
                 elif server["name"] == "Orchestrator":
                     details = f"Mode: {server['details'].get('current_mode', 'N/A')}, Workflows: {server['details'].get('active_workflows', 0)}"
                 elif server["name"] == "Gateway":
