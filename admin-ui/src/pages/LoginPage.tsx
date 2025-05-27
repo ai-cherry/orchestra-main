@@ -15,7 +15,7 @@ const LoginThemeToggle = () => {
     <div className="absolute top-4 right-4 flex space-x-2">
       <select
         value={theme}
-        onChange={(e) => setTheme(e.target.value as any)}
+        onChange={(e) => setTheme(e.target.value as Theme)}
         className="p-2 rounded bg-muted text-foreground border border-border"
       >
         <option value="neutral">Neutral</option>
@@ -70,7 +70,7 @@ export function LoginPage() {
 
   if (isAuthenticated) {
     // Render nothing or a loading indicator while redirecting
-    return null; 
+    return null;
   }
 
   return (
@@ -129,8 +129,8 @@ export function LoginPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col items-center">
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={isLoading}
               className="w-full bg-theme-accent-primary hover:bg-opacity-85 text-theme-accent-text font-semibold py-3 rounded-md transition-colors duration-300"
             >
