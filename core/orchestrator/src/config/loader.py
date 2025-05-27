@@ -18,6 +18,12 @@ from packages.shared.src.models.base_models import PersonaConfig
 
 from .settings import Settings
 
+# Optional: Google Secret Manager integration
+try:
+    import secretmanager
+except ImportError:
+    secretmanager = None
+
 # Configure logging
 logger = logging.getLogger(__name__)
 

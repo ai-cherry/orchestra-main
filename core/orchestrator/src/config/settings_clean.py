@@ -5,7 +5,7 @@ Cleaned version without GCP dependencies.
 
 import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Dict, Optional
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 

@@ -18,6 +18,16 @@ from core.orchestrator.src.memory.models import (
     MemoryType,
 )
 
+# Optional: MongoDB and Vertex AI integration for memory backends
+try:
+    import mongodb
+except ImportError:
+    mongodb = None
+try:
+    import aiplatform
+except ImportError:
+    aiplatform = None
+
 logger = logging.getLogger(__name__)
 
 

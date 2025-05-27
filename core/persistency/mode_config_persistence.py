@@ -62,6 +62,20 @@ DEFAULT_BUCKET = os.environ.get(ENV_BUCKET, f"{DEFAULT_PROJECT_ID}-mode-config")
 DEFAULT_SECRET = os.environ.get(ENV_SECRET, "mode-system-config")
 DEFAULT_COLLECTION = os.environ.get(ENV_COLLECTION, "mode_system_config")
 
+# Optional: Google Secret Manager, Cloud Storage, and MongoDB integration
+try:
+    import secretmanager
+except ImportError:
+    secretmanager = None
+try:
+    import storage
+except ImportError:
+    storage = None
+try:
+    import mongodb
+except ImportError:
+    mongodb = None
+
 
 class PersistenceError(Exception):
     """Base exception for persistence errors."""

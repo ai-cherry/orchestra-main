@@ -13,7 +13,7 @@ describe('MetricsDisplayCard', () => {
 
   it('renders the title, value, and description', () => {
     render(<MetricsDisplayCard {...mockProps} />);
-    
+
     expect(screen.getByText(mockProps.title)).toBeInTheDocument();
     expect(screen.getByText(mockProps.value)).toBeInTheDocument();
     expect(screen.getByText(mockProps.description)).toBeInTheDocument();
@@ -21,7 +21,7 @@ describe('MetricsDisplayCard', () => {
 
   it('renders the icon', () => {
     render(<MetricsDisplayCard {...mockProps} />);
-    
+
     // Check for the presence of an SVG element, as lucide-react icons are SVGs
     // It's hard to test for a specific icon without adding test-ids or specific class names to the icon wrapper
     const svgElement = screen.getByText(mockProps.title).parentElement?.querySelector('svg');
@@ -52,7 +52,7 @@ describe('MetricsDisplayCard', () => {
   it('renders without description if not provided', () => {
     const { description, ...propsWithoutDescription } = mockProps;
     render(<MetricsDisplayCard {...propsWithoutDescription} />);
-    
+
     expect(screen.queryByText(description)).not.toBeInTheDocument();
   });
 });

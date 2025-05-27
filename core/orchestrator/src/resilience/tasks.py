@@ -16,6 +16,12 @@ from google.protobuf import timestamp_pb2
 # Configure logging
 logger = logging.getLogger(__name__)
 
+# Optional: Google Cloud Tasks integration
+try:
+    import tasks_v2
+except ImportError:
+    tasks_v2 = None
+
 
 class TaskQueueManager:
     """

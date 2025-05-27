@@ -15,6 +15,12 @@ from pydantic import BaseModel, Field
 # Configure logging
 logger = logging.getLogger(__name__)
 
+# Optional: Vertex AI integration for chunking
+try:
+    import aiplatform
+except ImportError:
+    aiplatform = None
+
 
 class ChunkingStrategy(str, Enum):
     """Strategies for chunking memory items."""

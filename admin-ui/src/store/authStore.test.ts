@@ -32,7 +32,7 @@ describe('useAuthStore', () => {
   it('should update state on login', () => {
     const testEmail = 'test@example.com';
     const testToken = 'test-token-123';
-    
+
     // Spy on console.log to check if it's called during login
     const consoleSpy = vi.spyOn(console, 'log');
 
@@ -45,7 +45,7 @@ describe('useAuthStore', () => {
     expect(user).toEqual({ email: testEmail });
     expect(token).toBe(testToken);
     expect(consoleSpy).toHaveBeenCalledWith('User logged in:', { email: testEmail });
-    
+
     consoleSpy.mockRestore(); // Clean up spy
   });
 
@@ -60,7 +60,7 @@ describe('useAuthStore', () => {
     act(() => {
       useAuthStore.getState().login(testEmail, testToken);
     });
-    
+
     // Then logout
     act(() => {
       useAuthStore.getState().logout();
@@ -94,7 +94,7 @@ describe('useAuthStore', () => {
         expect(storedState.state.token).toBe(testToken);
       }
     });
-    
+
     act(() => {
       useAuthStore.getState().logout();
     });
