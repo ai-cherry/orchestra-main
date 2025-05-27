@@ -15,6 +15,7 @@ from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar
 from pydantic import BaseModel, Field
 
 from packages.shared.src.models.base_models import MemoryItem
+from optional_integrations import mongodb  # Optional integration
 
 # Configure logging
 logger = logging.getLogger(__name__)

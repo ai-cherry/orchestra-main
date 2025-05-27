@@ -15,12 +15,6 @@ from pydantic import BaseModel
 # Configure logging
 logger = logging.getLogger(__name__)
 
-# Optional: Vertex AI integration for query classification
-try:
-    import aiplatform
-except ImportError:
-    aiplatform = None
-
 
 class QueryType(str, Enum):
     """Types of queries for memory retrieval optimization."""

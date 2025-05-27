@@ -17,16 +17,7 @@ from core.orchestrator.src.memory.models import (
     MemorySearchResult,
     MemoryType,
 )
-
-# Optional: MongoDB and Vertex AI integration for memory backends
-try:
-    import mongodb
-except ImportError:
-    mongodb = None
-try:
-    import aiplatform
-except ImportError:
-    aiplatform = None
+from optional_integrations import mongodb, aiplatform  # Optional integrations
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +76,6 @@ class LayeredMemoryManager:
 
         # Initialize Vector Search if endpoint is provided
         if self.vector_index_endpoint and self.vector_deployed_index_id:
-            aiplatform.init(project=self.project_id, location=self.region)
             self.vector_search_initialized = True
 
     async def disconnect(self):
@@ -143,10 +133,6 @@ class LayeredMemoryManager:
 
             # Store in MongoDB without expiration
             self._store_in_mongodb(memory_entry)
-
-            # Store embedding in Vector Search if initialized
-            if self.vector_search_initialized:
-                await self._store_in_vector_search(memory_entry)
 
         return memory_id
 

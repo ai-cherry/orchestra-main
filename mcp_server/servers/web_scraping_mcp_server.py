@@ -2,8 +2,7 @@
 """
 Web Scraping MCP Server for Orchestra AI
 
-Integrates the Web Scraping AI Agent Team with the Orchestra AI ecosystem,
-now with full GCP integration via Service Directory and Pub/Sub.
+Integrates the Web Scraping AI Agent Team with the Orchestra AI ecosystem.
 """
 
 import asyncio
@@ -57,7 +56,7 @@ class OrchestraWebScrapingMCPServer(BaseMCPServer):
                 "REDIS_PORT",
                 "REDIS_DB",
             ],
-            project_id=os.getenv("GOOGLE_CLOUD_PROJECT", "cherry-ai-project"),
+            project_id=os.getenv("PROJECT_ID", "orchestra-local"),
             pubsub_topic="web-scraping-events",
         )
 

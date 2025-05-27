@@ -34,6 +34,11 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 import yaml
+from optional_integrations import (
+    secretmanager,
+    storage,
+    mongodb,
+)  # Optional integrations
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

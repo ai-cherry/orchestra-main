@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """
-Base MCP Server with GCP Integration
+Base MCP Server
 
 Provides a standard base class for all MCP servers with:
-- Automatic Service Directory registration
-- Pub/Sub event publishing
 - Health check endpoints
 - Dynamic configuration
 - Self-healing capabilities
@@ -59,13 +57,11 @@ class HealthStatus(BaseModel):
 
 
 class BaseMCPServer(ABC):
-    """Base class for all MCP servers with GCP integration."""
+    """Base class for all MCP servers (no GCP integration)."""
 
     def __init__(self, config: MCPServerConfig):
         self.config = config
         self.start_time = time.time()
-        self.publisher = None
-        self.service_client = None
         self.health_status = HealthStatus(
             status="initializing",
             timestamp=datetime.utcnow(),
@@ -77,9 +73,6 @@ class BaseMCPServer(ABC):
 
         # Validate required secrets
         self._validate_secrets()
-
-        # Initialize GCP clients
-        self._init_gcp_clients()
 
     def _validate_secrets(self):
         """Validate that all required secrets are present."""
@@ -93,48 +86,15 @@ class BaseMCPServer(ABC):
 
         logger.info(f"All required secrets validated for {self.config.name}")
 
-    def _init_gcp_clients(self):
-        """Initialize GCP clients."""
-        if self.config.enable_pubsub:
-            try:
-                self.publisher = pubsub_v1.PublisherClient()
-                self.topic_path = self.publisher.topic_path(
-                    self.config.project_id, self.config.pubsub_topic
-                )
-                logger.info(
-                    f"Initialized Pub/Sub publisher for topic: {self.topic_path}"
-                )
-            except Exception as e:
-                logger.error(f"Failed to initialize Pub/Sub: {e}")
-                self.config.enable_pubsub = False
-
-        if self.config.enable_service_directory:
-            try:
-                self.service_client = servicedirectory_v1.RegistrationServiceClient()
-                logger.info("Initialized Service Directory client")
-            except Exception as e:
-                logger.error(f"Failed to initialize Service Directory: {e}")
-                self.config.enable_service_directory = False
+    # No-op: GCP client initialization removed.
+    # All event publishing and service registration is stack-agnostic or handled by adapters.
 
     async def start(self):
         """Start the MCP server."""
         logger.info(f"Starting {self.config.name} MCP server...")
 
-        # Register with Service Directory
-        await self._register_service()
-
         # Start health check loop
         self._health_check_task = asyncio.create_task(self._health_check_loop())
-
-        # Publish startup event
-        await self.publish_event(
-            "server_started",
-            {
-                "name": self.config.name,
-                "version": self.config.version,
-                "timestamp": datetime.utcnow().isoformat(),
-            },
-        )
 
         # Start server-specific logic
         await self.on_start()
@@ -155,123 +115,14 @@ class BaseMCPServer(ABC):
             except asyncio.CancelledError:
                 pass
 
-        # Deregister from Service Directory
-        await self._deregister_service()
-
-        # Publish shutdown event
-        await self.publish_event(
-            "server_stopped",
-            {"name": self.config.name, "timestamp": datetime.utcnow().isoformat()},
-        )
-
         # Stop server-specific logic
         await self.on_stop()
 
         logger.info(f"{self.config.name} MCP server stopped")
 
-    async def _register_service(self):
-        """Register with GCP Service Directory."""
-        if not self.config.enable_service_directory or not self.service_client:
-            return
+    # GCP Service Directory registration/deregistration removed.
 
-        try:
-            # Create namespace if it doesn't exist
-            namespace_path = f"projects/{self.config.project_id}/locations/{self.config.region}/namespaces/{self.config.namespace}"
-
-            try:
-                self.service_client.get_namespace(name=namespace_path)
-            except gcp_exceptions.NotFound:
-                logger.info(f"Creating namespace: {self.config.namespace}")
-                self.service_client.create_namespace(
-                    parent=f"projects/{self.config.project_id}/locations/{self.config.region}",
-                    namespace_id=self.config.namespace,
-                    namespace={},
-                )
-
-            # Register service
-            service_id = f"{self.config.name}-{self.config.service_type}"
-            service_path = f"{namespace_path}/services/{service_id}"
-
-            service = {
-                "metadata": {
-                    "version": self.config.version,
-                    "type": self.config.service_type,
-                    "health_endpoint": self.config.health_endpoint,
-                    "started_at": datetime.utcnow().isoformat(),
-                }
-            }
-
-            try:
-                self.service_client.create_service(
-                    parent=namespace_path, service_id=service_id, service=service
-                )
-                logger.info(f"Registered service: {service_id}")
-            except gcp_exceptions.AlreadyExists:
-                # Update existing service
-                self.service_client.update_service(
-                    service={"name": service_path, "metadata": service["metadata"]}
-                )
-                logger.info(f"Updated existing service: {service_id}")
-
-            # Register endpoint (if applicable)
-            if hasattr(self, "endpoint_url"):
-                endpoint_id = f"{service_id}-endpoint"
-                endpoint = {
-                    "address": self.endpoint_url,
-                    "port": getattr(self, "port", 8080),
-                    "metadata": {"protocol": "https"},
-                }
-
-                try:
-                    self.service_client.create_endpoint(
-                        parent=service_path, endpoint_id=endpoint_id, endpoint=endpoint
-                    )
-                    logger.info(f"Registered endpoint: {endpoint_id}")
-                except gcp_exceptions.AlreadyExists:
-                    pass
-
-        except Exception as e:
-            logger.error(f"Failed to register with Service Directory: {e}")
-
-    async def _deregister_service(self):
-        """Deregister from GCP Service Directory."""
-        if not self.config.enable_service_directory or not self.service_client:
-            return
-
-        try:
-            service_id = f"{self.config.name}-{self.config.service_type}"
-            service_path = f"projects/{self.config.project_id}/locations/{self.config.region}/namespaces/{self.config.namespace}/services/{service_id}"
-
-            self.service_client.delete_service(name=service_path)
-            logger.info(f"Deregistered service: {service_id}")
-        except Exception as e:
-            logger.error(f"Failed to deregister from Service Directory: {e}")
-
-    async def publish_event(self, event_type: str, data: Dict[str, Any]):
-        """Publish event to Pub/Sub."""
-        if not self.config.enable_pubsub or not self.publisher:
-            return
-
-        try:
-            event = {
-                "event_type": event_type,
-                "source": self.config.name,
-                "timestamp": datetime.utcnow().isoformat(),
-                "data": data,
-            }
-
-            message = json.dumps(event).encode("utf-8")
-            future = self.publisher.publish(self.topic_path, message)
-
-            # Wait for publish to complete (with timeout)
-            await asyncio.wait_for(
-                asyncio.get_event_loop().run_in_executor(None, future.result),
-                timeout=5.0,
-            )
-
-            logger.debug(f"Published event: {event_type}")
-        except Exception as e:
-            logger.error(f"Failed to publish event {event_type}: {e}")
+    # Pub/Sub event publishing removed. Use stack-native event hooks or logging.
 
     async def _health_check_loop(self):
         """Periodic health check loop."""
@@ -330,8 +181,7 @@ class BaseMCPServer(ABC):
             # Re-validate secrets
             self._validate_secrets()
 
-            # Re-initialize GCP clients
-            self._init_gcp_clients()
+            # Re-initialize stack-native clients if needed (no GCP).
 
             # Call custom self-heal logic
             await self.self_heal()
@@ -430,7 +280,7 @@ if __name__ == "__main__":
         name="example",
         service_type="example",
         required_secrets=[],
-        project_id=os.getenv("GOOGLE_CLOUD_PROJECT", "cherry-ai-project"),
+        project_id=os.getenv("PROJECT_ID", "orchestra-local"),
     )
 
     server = ExampleMCPServer(config)
