@@ -6,11 +6,29 @@ on:
     tags-ignore: ['v*.*.*'] # Dev deployment ignores tags
   pull_request: # Run build and tests on PRs to any branch
   workflow_dispatch: # Allow manual triggering for any job, including prod
+  schedule:
+    - cron: '0 3 * * *' # Nightly at 3am UTC
 
 jobs:
+  pre-commit:
+    name: Pre-commit Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install pre-commit
+        run: pip install pre-commit
+      - name: Run pre-commit
+        run: pre-commit run --all-files --show-diff-on-failure
+
   build-and-test-admin-ui:
     name: Build and Test Admin UI
     runs-on: ubuntu-latest
+    needs: pre-commit
     outputs:
       admin_ui_built: ${{ steps.build_step.conclusion == 'success' }}
     steps:
@@ -215,4 +233,36 @@ jobs:
         with:
           name: playwright-report-prod
           path: admin-ui/playwright-report/ # Default Playwright HTML report path
+          retention-days: 7
+
+  nightly-e2e:
+    name: Nightly Playwright E2E (Dev)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Admin UI - Install Dependencies
+        working-directory: ./admin-ui
+        run: pnpm install --frozen-lockfile
+      - name: Install Playwright Browsers
+        working-directory: ./admin-ui
+        run: pnpm exec playwright install --with-deps
+      - name: Run Playwright E2E Tests (Dev)
+        working-directory: ./admin-ui
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ secrets.ADMIN_UI_DEV_URL }}
+        run: pnpm e2e
+      - name: Upload Playwright E2E Report (Nightly)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-nightly
+          path: admin-ui/playwright-report/
           retention-days: 7
