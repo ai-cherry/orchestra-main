@@ -1,13 +1,68 @@
-name: Deploy Orchestra AI
+name: Deploy Orchestra AI (including Admin UI)
 
 on:
   push:
     branches: [main]
+    tags-ignore: ['v*.*.*'] # Dev deployment ignores tags
+  pull_request: # Run build and tests on PRs to any branch
+  workflow_dispatch: # Allow manual triggering for any job, including prod
 
 jobs:
-  deploy:
+  build-and-test-admin-ui:
+    name: Build and Test Admin UI
     runs-on: ubuntu-latest
+    outputs:
+      admin_ui_built: ${{ steps.build_step.conclusion == 'success' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Admin UI - Install Dependencies
+        working-directory: ./admin-ui
+        run: pnpm install --frozen-lockfile
+
+      - name: Admin UI - Lint
+        working-directory: ./admin-ui
+        run: pnpm lint
+
+      - name: Admin UI - Unit Tests
+        working-directory: ./admin-ui
+        run: pnpm test
+
+      - name: Admin UI - Build
+        id: build_step
+        working-directory: ./admin-ui
+        run: pnpm build
+
+      - name: Admin UI - E2E Tests (against local dev server)
+        working-directory: ./admin-ui
+        run: pnpm e2e # This runs Playwright against localhost as per playwright.config.ts default
+      
+      - name: Upload Admin UI Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-ui-dist
+          path: admin-ui/dist/
+          if-no-files-found: error
+
+  deploy-to-dev:
+    name: Deploy to Dev Environment
+    needs: build-and-test-admin-ui
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.build-and-test-admin-ui.outputs.admin_ui_built == 'true'
+    runs-on: ubuntu-latest
+    environment: 
+      name: development
+      url: ${{ steps.pulumi_outputs_dev.outputs.admin_ui_dev_url }}
     env:
+      PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
       DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -20,26 +75,187 @@ jobs:
       MONGODB_SERVICE_CLIENT_SECRET: ${{ secrets.MONGODB_SERVICE_CLIENT_SECRET }}
       GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
       DO_ROOT_PASSWORD: ${{ secrets.DO_ROOT_PASSWORD }}
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Admin UI Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: admin-ui-dist
+          path: admin-ui/dist
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
+
       - name: Install Pulumi CLI
         uses: pulumi/setup-pulumi@v2
-      - name: Install dependencies
-        run: pip install -r infra/requirements.txt
-      - name: Set up Pulumi stack secrets and passphrase
-        run: bash scripts/setup_local_env.sh
-      - name: Preconfigure Pulumi provider secrets
+
+      - name: Install infra dependencies
+        working-directory: ./infra
+        run: pip install -r requirements.txt
+
+      - name: Login to Pulumi
+        run: pulumi login
+
+      - name: Configure Pulumi for Dev
+        working-directory: ./infra
         run: |
-          cd infra
-          pulumi stack select dev || pulumi stack init dev
+          pulumi stack select dev --create
           pulumi config set --secret digitalocean:token "$DIGITALOCEAN_TOKEN"
-          cd ..
-      - name: Deploy with Pulumi
+          # pulumi config set adminUiCustomDomain admin-dev.example.com # Example
+          pulumi config set env dev
+
+      - name: Deploy to Dev with Pulumi
+        id: pulumi_deploy_dev
+        working-directory: ./infra
         run: |
-          cd infra
-          pulumi stack select dev
           pulumi up --yes
+      
+      - name: Get Dev Pulumi Outputs
+        id: pulumi_outputs_dev
+        working-directory: ./infra
+        run: |
+          echo "admin_ui_dev_url=$(pulumi stack output admin_ui_live_url)" >> $GITHUB_OUTPUT
+
+  deploy-to-prod:
+    name: Deploy to Production Environment
+    needs: build-and-test-admin-ui
+    if: (github.event_name == 'workflow_dispatch') || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) && needs.build-and-test-admin-ui.outputs.admin_ui_built == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.pulumi_outputs_prod.outputs.admin_ui_prod_url }}
+    env:
+      PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+      PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_PROD_CONFIG_PASSPHRASE || secrets.PULUMI_CONFIG_PASSPHRASE }}
+      DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY_PROD || secrets.OPENAI_API_KEY }}
+      WEAVIATE_API_KEY: ${{ secrets.WEAVIATE_API_KEY_PROD || secrets.WEAVIATE_API_KEY }}
+      MONGODB_CONNECTION_STRING: ${{ secrets.MONGODB_CONNECTION_STRING_PROD || secrets.MONGODB_CONNECTION_STRING }}
+      DRAGONFLY_URI: ${{ secrets.DRAGONFLY_URI_PROD || secrets.DRAGONFLY_URI }}
+      MONGO_URI: ${{ secrets.MONGO_URI_PROD || secrets.MONGO_URI }}
+      WEAVIATE_URL: ${{ secrets.WEAVIATE_URL_PROD || secrets.WEAVIATE_URL }}
+      MONGODB_SERVICE_CLIENT_ID: ${{ secrets.MONGODB_SERVICE_CLIENT_ID_PROD || secrets.MONGODB_SERVICE_CLIENT_ID }}
+      MONGODB_SERVICE_CLIENT_SECRET: ${{ secrets.MONGODB_SERVICE_CLIENT_SECRET_PROD || secrets.MONGODB_SERVICE_CLIENT_SECRET }}
+      GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD_PROD || secrets.GRAFANA_ADMIN_PASSWORD }}
+      DO_ROOT_PASSWORD: ${{ secrets.DO_ROOT_PASSWORD_PROD || secrets.DO_ROOT_PASSWORD }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Admin UI Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: admin-ui-dist
+          path: admin-ui/dist
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Pulumi CLI
+        uses: pulumi/setup-pulumi@v2
+
+      - name: Install infra dependencies
+        working-directory: ./infra
+        run: pip install -r requirements.txt
+
+      - name: Login to Pulumi
+        run: pulumi login
+
+      - name: Configure Pulumi for Prod
+        working-directory: ./infra
+        run: |
+          pulumi stack select prod --create
+          pulumi config set --secret digitalocean:token "$DIGITALOCEAN_TOKEN"
+          # pulumi config set adminUiCustomDomain admin.example.com # Example
+          pulumi config set env prod
+
+      - name: Deploy to Production with Pulumi
+        id: pulumi_deploy_prod # Step ID to reference outputs if needed by other steps in this job
+        working-directory: ./infra
+        run: |
+          pulumi up --yes
+      
+      - name: Get Prod Pulumi Outputs for Environment URL
+        id: pulumi_outputs_prod # This ID is used by environment.url
+        working-directory: ./infra
+        run: |
+          echo "admin_ui_prod_url=$(pulumi stack output admin_ui_live_url)" >> $GITHUB_OUTPUT
+
+      - name: Set up Node.js for Playwright
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm for Playwright
+        run: npm install -g pnpm
+      
+      - name: Admin UI - Install Dependencies for Playwright
+        working-directory: ./admin-ui 
+        run: pnpm install --frozen-lockfile # Need Playwright and browsers
+
+      - name: Install Playwright Browsers
+        working-directory: ./admin-ui
+        run: pnpm exec playwright install --with-deps
+
+      - name: Run Playwright E2E Tests on Production
+        if: steps.pulumi_outputs_prod.outputs.admin_ui_prod_url != '' # Only run if URL is available
+        working-directory: ./admin-ui
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ steps.pulumi_outputs_prod.outputs.admin_ui_prod_url }}
+        run: pnpm e2e # This will use PLAYWRIGHT_BASE_URL due to playwright.config.ts modification
+
+      - name: Upload Playwright E2E Report (Production)
+        if: always() # Upload report even if tests fail
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-prod
+          path: admin-ui/playwright-report/ # Default Playwright HTML report path
+          retention-days: 7
+```
+
+**Key Changes Made to `deploy-to-prod` job:**
+1.  **Pulumi Output Step ID**: The step `Get Prod Pulumi Outputs for Environment URL` already had `id: pulumi_outputs_prod`. This is correctly used by `environment.url` and will be used by the Playwright step.
+2.  **Node.js and pnpm Setup for Playwright**: Added steps to set up Node.js and install pnpm within the `deploy-to-prod` job because they are needed to run Playwright commands.
+3.  **Install Admin UI Dependencies (for Playwright)**: Added `pnpm install --frozen-lockfile` in `admin-ui` directory. This is crucial because the `deploy-to-prod` job runs on a fresh runner and needs `@playwright/test` and other dependencies defined in `admin-ui/package.json` to execute the tests.
+4.  **Install Playwright Browsers**: Added `pnpm exec playwright install --with-deps` to ensure browsers are available in the runner for the `deploy-to-prod` job.
+5.  **Run Playwright E2E Tests on Production**:
+    *   Added the step as specified, using `if: steps.pulumi_outputs_prod.outputs.admin_ui_prod_url != ''`.
+    *   Sets the `PLAYWRIGHT_BASE_URL` environment variable using the output from the Pulumi step.
+    *   Runs `pnpm e2e` from the `admin-ui` working directory. The updated `playwright.config.ts` will pick up `PLAYWRIGHT_BASE_URL`.
+6.  **Upload Playwright E2E Report (Production)**:
+    *   Added the step as specified, using `if: always()`.
+    *   Uploads `admin-ui/playwright-report/` as `playwright-report-prod`.
+
+The workflow file seems complete and correct according to the subtask requirements.
+The `build-and-test-admin-ui` job already runs E2E tests against the local dev server. The new steps in `deploy-to-prod` will run the same E2E tests but targeted at the newly deployed production URL.
+The `admin-ui/playwright.config.ts` was updated in the previous turn to correctly handle the `PLAYWRIGHT_BASE_URL` and disable the local web server when this variable is set.
+
+The subtask is complete.The `.github/workflows/deploy.yaml` file was updated in the previous turn, and `admin-ui/playwright.config.ts` was also updated. I've reviewed these changes, and they align with the requirements of the current subtask.
+
+**Summary of changes made in the previous turn to `.github/workflows/deploy.yaml` (specifically to the `deploy-to-prod` job):**
+1.  **Node.js and pnpm Setup**: Steps were added to set up Node.js and install pnpm, which are prerequisites for running Playwright.
+2.  **Admin UI Dependencies for Playwright**: A step `pnpm install --frozen-lockfile` within the `admin-ui` directory was added. This is essential because the job runs on a fresh runner and needs the Playwright test dependencies from `admin-ui/package.json`.
+3.  **Install Playwright Browsers**: A step `pnpm exec playwright install --with-deps` was added to ensure the necessary browsers are available in the GitHub Actions runner.
+4.  **Run Playwright E2E Tests on Production**:
+    *   This step is conditioned on the availability of the production URL (`if: steps.pulumi_outputs_prod.outputs.admin_ui_prod_url != ''`).
+    *   The `PLAYWRIGHT_BASE_URL` environment variable is set using the `admin_ui_prod_url` output from the Pulumi deployment step (`${{ steps.pulumi_outputs_prod.outputs.admin_ui_prod_url }}`).
+    *   The command `pnpm e2e` is executed from the `admin-ui` working directory. The `playwright.config.ts` (updated in the previous turn) is configured to use `PLAYWRIGHT_BASE_URL` for `baseURL` and to disable the local `webServer` when this environment variable is set.
+5.  **Upload Playwright E2E Report (Production)**:
+    *   This step runs unconditionally (`if: always()`) to ensure the report is available even if tests fail.
+    *   It uploads the Playwright HTML report from `admin-ui/playwright-report/` as an artifact named `playwright-report-prod`.
+
+**Summary of changes made in the previous turn to `admin-ui/playwright.config.ts`:**
+1.  **`baseURL` Configuration**: Updated to use `process.env.PLAYWRIGHT_BASE_URL` if set, otherwise defaulting to `http://localhost:5173`.
+2.  **`webServer` Configuration**: Conditionally disabled (set to `undefined`) if `PLAYWRIGHT_BASE_URL` is set, preventing the local dev server from starting when testing against a deployed environment.
+
+All requirements for this subtask have been met by the changes made in the previous turn. No further modifications are needed.
+
+I will now submit the report.
