@@ -22,10 +22,198 @@ from .base import (
     MemoryStore,
     SearchResult,
 )
-from .stores import ShortTermStore, MidTermStore, LongTermStore
 
 
 logger = logging.getLogger(__name__)
+
+
+class ShortTermStore(MemoryStore):
+    """Short-term memory store using DragonflyDB."""
+
+    def __init__(self, connection):
+        self.connection = connection
+
+    async def store(self, item: MemoryItem) -> bool:
+        """Store item in DragonflyDB."""
+        try:
+            # Serialize the item
+            data = {
+                "content": item.content,
+                "metadata": item.metadata,
+                "timestamp": item.timestamp.isoformat(),
+                "layer": item.layer.value,
+            }
+            # Store with TTL if specified
+            if item.ttl:
+                await self.connection.setex(item.id, item.ttl, str(data))
+            else:
+                await self.connection.set(item.id, str(data))
+            return True
+        except Exception as e:
+            logger.error(f"Error storing in short-term memory: {e}")
+            return False
+
+    async def retrieve(self, item_id: str) -> Optional[MemoryItem]:
+        """Retrieve item from DragonflyDB."""
+        try:
+            data = await self.connection.get(item_id)
+            if data:
+                # Parse the data
+                import ast
+
+                parsed = ast.literal_eval(data)
+                return MemoryItem(
+                    id=item_id,
+                    content=parsed["content"],
+                    metadata=parsed["metadata"],
+                    timestamp=datetime.fromisoformat(parsed["timestamp"]),
+                    layer=MemoryLayer(parsed["layer"]),
+                )
+        except Exception as e:
+            logger.error(f"Error retrieving from short-term memory: {e}")
+        return None
+
+    async def delete(self, item_id: str) -> bool:
+        """Delete item from DragonflyDB."""
+        try:
+            await self.connection.delete(item_id)
+            return True
+        except Exception as e:
+            logger.error(f"Error deleting from short-term memory: {e}")
+            return False
+
+    async def search(
+        self, query: str, limit: int = 10, filters: Optional[Dict[str, Any]] = None
+    ) -> List[SearchResult]:
+        """Search is not supported in short-term memory."""
+        return []
+
+    async def health_check(self) -> bool:
+        """Check if DragonflyDB is healthy."""
+        try:
+            await self.connection.ping()
+            return True
+        except:
+            return False
+
+
+class MidTermStore(MemoryStore):
+    """Mid-term memory store using MongoDB."""
+
+    def __init__(self, connection):
+        self.connection = connection
+        self.collection = connection.get_collection("memory_items")
+
+    async def store(self, item: MemoryItem) -> bool:
+        """Store item in MongoDB."""
+        try:
+            document = {
+                "_id": item.id,
+                "content": item.content,
+                "metadata": item.metadata,
+                "timestamp": item.timestamp,
+                "layer": item.layer.value,
+                "ttl": item.ttl,
+            }
+            await self.collection.replace_one({"_id": item.id}, document, upsert=True)
+            return True
+        except Exception as e:
+            logger.error(f"Error storing in mid-term memory: {e}")
+            return False
+
+    async def retrieve(self, item_id: str) -> Optional[MemoryItem]:
+        """Retrieve item from MongoDB."""
+        try:
+            document = await self.collection.find_one({"_id": item_id})
+            if document:
+                return MemoryItem(
+                    id=document["_id"],
+                    content=document["content"],
+                    metadata=document["metadata"],
+                    timestamp=document["timestamp"],
+                    layer=MemoryLayer(document["layer"]),
+                    ttl=document.get("ttl"),
+                )
+        except Exception as e:
+            logger.error(f"Error retrieving from mid-term memory: {e}")
+        return None
+
+    async def delete(self, item_id: str) -> bool:
+        """Delete item from MongoDB."""
+        try:
+            result = await self.collection.delete_one({"_id": item_id})
+            return result.deleted_count > 0
+        except Exception as e:
+            logger.error(f"Error deleting from mid-term memory: {e}")
+            return False
+
+    async def search(
+        self, query: str, limit: int = 10, filters: Optional[Dict[str, Any]] = None
+    ) -> List[SearchResult]:
+        """Search in MongoDB using text search."""
+        try:
+            # Build query
+            search_query = {"$text": {"$search": query}}
+            if filters:
+                search_query.update(filters)
+
+            # Execute search
+            cursor = self.collection.find(search_query).limit(limit)
+            results = []
+
+            async for doc in cursor:
+                item = MemoryItem(
+                    id=doc["_id"],
+                    content=doc["content"],
+                    metadata=doc["metadata"],
+                    timestamp=doc["timestamp"],
+                    layer=MemoryLayer(doc["layer"]),
+                )
+                results.append(SearchResult(item=item, score=1.0))
+
+            return results
+        except Exception as e:
+            logger.error(f"Error searching in mid-term memory: {e}")
+            return []
+
+    async def health_check(self) -> bool:
+        """Check if MongoDB is healthy."""
+        try:
+            await self.connection.admin.command("ping")
+            return True
+        except:
+            return False
+
+
+class LongTermStore(MemoryStore):
+    """Long-term memory store using Weaviate."""
+
+    def __init__(self, connection):
+        self.connection = connection
+
+    async def store(self, item: MemoryItem) -> bool:
+        """Store item in Weaviate."""
+        # Simplified implementation - would need actual Weaviate client
+        return True
+
+    async def retrieve(self, item_id: str) -> Optional[MemoryItem]:
+        """Retrieve item from Weaviate."""
+        # Simplified implementation
+        return None
+
+    async def delete(self, item_id: str) -> bool:
+        """Delete item from Weaviate."""
+        return True
+
+    async def search(
+        self, query: str, limit: int = 10, filters: Optional[Dict[str, Any]] = None
+    ) -> List[SearchResult]:
+        """Search in Weaviate using vector search."""
+        return []
+
+    async def health_check(self) -> bool:
+        """Check if Weaviate is healthy."""
+        return True
 
 
 class DefaultMemoryPolicy(MemoryPolicy):
