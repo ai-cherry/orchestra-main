@@ -15,12 +15,6 @@ from pydantic import BaseModel, Field
 # Configure logging
 logger = logging.getLogger(__name__)
 
-# Optional: Vertex AI integration for chunking
-try:
-    import aiplatform
-except ImportError:
-    aiplatform = None
-
 
 class ChunkingStrategy(str, Enum):
     """Strategies for chunking memory items."""
@@ -138,51 +132,10 @@ class MemoryChunker:
             config: Optional configuration for memory chunking
         """
         self.config = config or ChunkerConfig()
-        self.openai_client = None
-
-        # Initialize Vertex AI client if enabled
-        if self.config.use_openai:
-            self._init_openai()
 
         logger.info(
             f"MemoryChunker initialized (strategy: {self.config.default_strategy})"
         )
-
-    def _init_openai(self) -> None:
-        """
-        Initialize Vertex AI client for semantic chunking.
-
-        This method sets up the Vertex AI client for text analysis.
-        """
-        try:
-
-            # Extract configuration
-            project = self.config.openai_config.get("project", "cherry-ai-project")
-            location = self.config.openai_config.get("location", "us-central1")
-
-            # Initialize Vertex AI
-            aiplatform.init(project=project, location=location)
-
-            # Set up endpoint for text analysis
-            endpoint_name = self.config.openai_config.get("endpoint_name")
-            if endpoint_name:
-                self.openai_client = aiplatform.Endpoint(endpoint_name)
-                logger.info(f"Vertex AI endpoint initialized: {endpoint_name}")
-            else:
-                # Use foundation model for text analysis
-                self.openai_client = aiplatform.TextGenerationModel.from_pretrained(
-                    "text-bison@latest"
-                )
-                logger.info("Vertex AI foundation model initialized for text analysis")
-
-        except ImportError:
-            logger.warning(
-                "google-cloud-aiplatform package not installed. Falling back to rule-based chunking."
-            )
-            self.config.use_openai = False
-        except Exception as e:
-            logger.error(f"Failed to initialize Vertex AI: {e}")
-            self.config.use_openai = False
 
     async def chunk_item(
         self,
@@ -443,7 +396,7 @@ class MemoryChunker:
             List of chunks
         """
         # If Vertex AI is not available, fall back to paragraph chunking
-        if not self.config.use_openai or not self.openai_client:
+        if not self.config.use_openai:
             logger.warning(
                 "Semantic chunking not available, falling back to paragraph chunking"
             )
@@ -470,9 +423,9 @@ class MemoryChunker:
             """
 
             # Call Vertex AI
-            if hasattr(self.openai_client, "predict"):
+            if hasattr(self.config.openai_client, "predict"):
                 # Using custom endpoint
-                response = await self.openai_client.predict_async(
+                response = await self.config.openai_client.predict_async(
                     instances=[{"prompt": prompt}]
                 )
 
@@ -488,7 +441,7 @@ class MemoryChunker:
 
             else:
                 # Using foundation model
-                response = await self.openai_client.predict_async(
+                response = await self.config.openai_client.predict_async(
                     prompt=prompt, max_output_tokens=1024, temperature=0.2
                 )
 

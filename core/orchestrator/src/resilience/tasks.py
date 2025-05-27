@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
 
 from google.protobuf import timestamp_pb2
+from optional_integrations import tasks_v2  # Optional integration
 
 # Configure logging
 logger = logging.getLogger(__name__)

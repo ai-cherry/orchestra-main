@@ -1,3 +1,11 @@
-# Example .envrc for Orchestra System
-export GOOGLE_APPLICATION_CREDENTIALS=.gcp/wif.json
+# Example .envrc for Orchestra MCP System
+
+# Example: Database and service URIs
+export DRAGONFLY_URL=redis://localhost:6379
+export MONGODB_URI=mongodb://localhost:27017
+export WEAVIATE_URL=http://localhost:8080
+
+# Example: API keys and secrets (managed by Pulumi secrets)
+# export API_KEY_EXAMPLE=...
+
 # Add other required environment variables here

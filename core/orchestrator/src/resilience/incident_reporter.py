@@ -13,7 +13,7 @@ from typing import Any, Dict, Optional
 
 # Optional: Google Cloud Logging integration
 try:
-    import cloud_logging
+    from optional_integrations import cloud_logging
 except ImportError:
     cloud_logging = None
 

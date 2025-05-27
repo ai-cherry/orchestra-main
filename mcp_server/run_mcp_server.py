@@ -15,8 +15,8 @@ from typing import Any, Dict, Optional
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 
-from mcp_server.adapters.copilot_adapter import CopilotAdapter
-from mcp_server.adapters.gemini_adapter import GeminiAdapter
+import importlib
+import pkgutil
 from mcp_server.config import MCPConfig, load_config
 from mcp_server.managers.standard_memory_manager import StandardMemoryManager
 from mcp_server.storage.in_memory_storage import InMemoryStorage
@@ -53,19 +53,26 @@ class MCPApplication:
         # Initialize memory manager
         self.memory_manager = StandardMemoryManager(self.storage)
 
-        # Initialize and register tools
-        copilot_config = self.config.get("copilot", {})
-        gemini_config = self.config.get("gemini", {})
+        # Dynamically discover and register all adapters in mcp_server/adapters/
+        import mcp_server.adapters
+        adapter_pkg = mcp_server.adapters
 
-        # Initialize Copilot adapter
-        copilot_adapter = CopilotAdapter(copilot_config)
-        self.memory_manager.register_tool(copilot_adapter)
-        self.tools["copilot"] = copilot_adapter
-
-        # Initialize Gemini adapter
-        gemini_adapter = GeminiAdapter(gemini_config)
-        self.memory_manager.register_tool(gemini_adapter)
-        self.tools["gemini"] = gemini_adapter
+        for finder, name, ispkg in pkgutil.iter_modules(adapter_pkg.__path__):
+            if not name.endswith("_adapter"):
+                continue
+            module = importlib.import_module(f"mcp_server.adapters.{name}")
+            # Find the adapter class (by convention: PascalCase of file, e.g., CopilotAdapter)
+            class_name = "".join([part.capitalize() for part in name.replace("_adapter", "").split("_")]) + "Adapter"
+            adapter_cls = getattr(module, class_name, None)
+            if adapter_cls is None:
+                logger.warning(f"Adapter class {class_name} not found in {name}")
+                continue
+            # Get config for this adapter if present
+            adapter_config = self.config.get(name.replace("_adapter", ""), {})
+            adapter_instance = adapter_cls(adapter_config)
+            self.memory_manager.register_tool(adapter_instance)
+            self.tools[name.replace("_adapter", "")] = adapter_instance
+            logger.info(f"Registered adapter: {class_name}")
 
         # Initialize memory manager
         init_success = await self.memory_manager.initialize()
