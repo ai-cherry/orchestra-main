@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import MetricsDisplayCard from '@/components/ui/MetricsDisplayCard'; // Created in previous step
 import StatusIndicator from '@/components/ui/StatusIndicator';   // Created in previous step
-import { Users, Workflow, Database, BarChart3, PlusCircle, Settings as SettingsIcon, ExternalLink, Briefcase } from 'lucide-react';
+import { Users, Workflow, BarChart3, PlusCircle, Settings as SettingsIcon, ExternalLink, Briefcase } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 
 // Dummy data
