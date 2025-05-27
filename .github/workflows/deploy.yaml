@@ -45,7 +45,7 @@ jobs:
       - name: Admin UI - E2E Tests (against local dev server)
         working-directory: ./admin-ui
         run: pnpm e2e # This runs Playwright against localhost as per playwright.config.ts default
-      
+
       - name: Upload Admin UI Build Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -58,7 +58,7 @@ jobs:
     needs: build-and-test-admin-ui
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.build-and-test-admin-ui.outputs.admin_ui_built == 'true'
     runs-on: ubuntu-latest
-    environment: 
+    environment:
       name: development
       url: ${{ steps.pulumi_outputs_dev.outputs.admin_ui_dev_url }}
     env:
@@ -114,7 +114,7 @@ jobs:
         working-directory: ./infra
         run: |
           pulumi up --yes
-      
+
       - name: Get Dev Pulumi Outputs
         id: pulumi_outputs_dev
         working-directory: ./infra
@@ -182,7 +182,7 @@ jobs:
         working-directory: ./infra
         run: |
           pulumi up --yes
-      
+
       - name: Get Prod Pulumi Outputs for Environment URL
         id: pulumi_outputs_prod # This ID is used by environment.url
         working-directory: ./infra
@@ -196,9 +196,9 @@ jobs:
 
       - name: Install pnpm for Playwright
         run: npm install -g pnpm
-      
+
       - name: Admin UI - Install Dependencies for Playwright
-        working-directory: ./admin-ui 
+        working-directory: ./admin-ui
         run: pnpm install --frozen-lockfile # Need Playwright and browsers
 
       - name: Install Playwright Browsers
@@ -219,43 +219,3 @@ jobs:
           name: playwright-report-prod
           path: admin-ui/playwright-report/ # Default Playwright HTML report path
           retention-days: 7
-```
-
-**Key Changes Made to `deploy-to-prod` job:**
-1.  **Pulumi Output Step ID**: The step `Get Prod Pulumi Outputs for Environment URL` already had `id: pulumi_outputs_prod`. This is correctly used by `environment.url` and will be used by the Playwright step.
-2.  **Node.js and pnpm Setup for Playwright**: Added steps to set up Node.js and install pnpm within the `deploy-to-prod` job because they are needed to run Playwright commands.
-3.  **Install Admin UI Dependencies (for Playwright)**: Added `pnpm install --frozen-lockfile` in `admin-ui` directory. This is crucial because the `deploy-to-prod` job runs on a fresh runner and needs `@playwright/test` and other dependencies defined in `admin-ui/package.json` to execute the tests.
-4.  **Install Playwright Browsers**: Added `pnpm exec playwright install --with-deps` to ensure browsers are available in the runner for the `deploy-to-prod` job.
-5.  **Run Playwright E2E Tests on Production**:
-    *   Added the step as specified, using `if: steps.pulumi_outputs_prod.outputs.admin_ui_prod_url != ''`.
-    *   Sets the `PLAYWRIGHT_BASE_URL` environment variable using the output from the Pulumi step.
-    *   Runs `pnpm e2e` from the `admin-ui` working directory. The updated `playwright.config.ts` will pick up `PLAYWRIGHT_BASE_URL`.
-6.  **Upload Playwright E2E Report (Production)**:
-    *   Added the step as specified, using `if: always()`.
-    *   Uploads `admin-ui/playwright-report/` as `playwright-report-prod`.
-
-The workflow file seems complete and correct according to the subtask requirements.
-The `build-and-test-admin-ui` job already runs E2E tests against the local dev server. The new steps in `deploy-to-prod` will run the same E2E tests but targeted at the newly deployed production URL.
-The `admin-ui/playwright.config.ts` was updated in the previous turn to correctly handle the `PLAYWRIGHT_BASE_URL` and disable the local web server when this variable is set.
-
-The subtask is complete.The `.github/workflows/deploy.yaml` file was updated in the previous turn, and `admin-ui/playwright.config.ts` was also updated. I've reviewed these changes, and they align with the requirements of the current subtask.
-
-**Summary of changes made in the previous turn to `.github/workflows/deploy.yaml` (specifically to the `deploy-to-prod` job):**
-1.  **Node.js and pnpm Setup**: Steps were added to set up Node.js and install pnpm, which are prerequisites for running Playwright.
-2.  **Admin UI Dependencies for Playwright**: A step `pnpm install --frozen-lockfile` within the `admin-ui` directory was added. This is essential because the job runs on a fresh runner and needs the Playwright test dependencies from `admin-ui/package.json`.
-3.  **Install Playwright Browsers**: A step `pnpm exec playwright install --with-deps` was added to ensure the necessary browsers are available in the GitHub Actions runner.
-4.  **Run Playwright E2E Tests on Production**:
-    *   This step is conditioned on the availability of the production URL (`if: steps.pulumi_outputs_prod.outputs.admin_ui_prod_url != ''`).
-    *   The `PLAYWRIGHT_BASE_URL` environment variable is set using the `admin_ui_prod_url` output from the Pulumi deployment step (`${{ steps.pulumi_outputs_prod.outputs.admin_ui_prod_url }}`).
-    *   The command `pnpm e2e` is executed from the `admin-ui` working directory. The `playwright.config.ts` (updated in the previous turn) is configured to use `PLAYWRIGHT_BASE_URL` for `baseURL` and to disable the local `webServer` when this environment variable is set.
-5.  **Upload Playwright E2E Report (Production)**:
-    *   This step runs unconditionally (`if: always()`) to ensure the report is available even if tests fail.
-    *   It uploads the Playwright HTML report from `admin-ui/playwright-report/` as an artifact named `playwright-report-prod`.
-
-**Summary of changes made in the previous turn to `admin-ui/playwright.config.ts`:**
-1.  **`baseURL` Configuration**: Updated to use `process.env.PLAYWRIGHT_BASE_URL` if set, otherwise defaulting to `http://localhost:5173`.
-2.  **`webServer` Configuration**: Conditionally disabled (set to `undefined`) if `PLAYWRIGHT_BASE_URL` is set, preventing the local dev server from starting when testing against a deployed environment.
-
-All requirements for this subtask have been met by the changes made in the previous turn. No further modifications are needed.
-
-I will now submit the report.
