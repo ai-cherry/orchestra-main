@@ -18,12 +18,6 @@ from packages.shared.src.models.base_models import PersonaConfig
 
 from .settings import Settings
 
-# Optional: Google Secret Manager integration
-try:
-    import secretmanager
-except ImportError:
-    secretmanager = None
-
 # Configure logging
 logger = logging.getLogger(__name__)
 
@@ -276,18 +270,16 @@ def get_settings() -> Settings:
 
 def initialize_portkey():
     """
-    Initialize Portkey for observability with API key from GCP Secret Manager.
+    Initialize Portkey for observability with API key from environment variables.
 
     Returns:
         bool: True if initialization is successful, False otherwise.
     """
     try:
-        # Retrieve Portkey API key from Secret Manager
-        client = secretmanager.EnvironmentConfigServiceClient()
-        project_id = os.environ.get("GCP_PROJECT_ID", "cherry-ai-project")
-        secret_name = f"projects/{project_id}/secrets/portkey-api-key/versions/latest"
-        response = client.access_secret_version(name=secret_name)
-        PORTKEY_API_KEY = response.payload.data.decode("UTF-8")
+        PORTKEY_API_KEY = os.getenv("PORTKEY_API_KEY")
+        if not PORTKEY_API_KEY:
+            logger.error("PORTKEY_API_KEY environment variable not set")
+            return False
 
         # Initialize Portkey
         portkey.init(

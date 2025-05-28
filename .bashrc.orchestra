@@ -2,22 +2,27 @@
 # Orchestra AI Environment Configuration
 # Source this file to set up your Orchestra development environment
 
-# Pulumi Configuration - No more passphrase prompts!
-export PULUMI_CONFIG_PASSPHRASE="orchestra-dev-123"
-export PULUMI_SKIP_UPDATE_CHECK=true
+# Pulumi Cloud authentication (no passphrase ever)
+export PULUMI_ACCESS_TOKEN="pul-1b1a580210be93c4d2d1d7b271ca5f7f153d51c1"
+export PULUMI_SKIP_UPDATE_CHECK=true # Optional: skips "new version available" messages
+
+# Attempt to log in to Pulumi Cloud if not already. Errors are suppressed.
+# This ensures subsequent pulumi commands use the cloud backend.
+pulumi login --cloud-url https://api.pulumi.com > /dev/null 2>&1 || true
 
 # Python path
 export PYTHONPATH="${PYTHONPATH}:${PWD}"
 
 # Convenience aliases
-alias pulumi-orchestra="PULUMI_CONFIG_PASSPHRASE='orchestra-dev-123' pulumi"
-alias deploy-orchestra="cd ${PWD}/infra && PULUMI_CONFIG_PASSPHRASE='orchestra-dev-123' pulumi up --yes"
-alias orchestra-status="cd ${PWD}/infra && PULUMI_CONFIG_PASSPHRASE='orchestra-dev-123' pulumi stack output"
-alias orchestra-logs="cd ${PWD}/infra && PULUMI_CONFIG_PASSPHRASE='orchestra-dev-123' pulumi logs -f"
+# Note: Removed PULUMI_CONFIG_PASSPHRASE from aliases as it's no longer needed
+alias pulumi-orchestra="pulumi" # Simpler, as login is handled above
+alias deploy-orchestra="cd ${PWD}/infra && pulumi up --yes"
+alias orchestra-status="cd ${PWD}/infra && pulumi stack output"
+alias orchestra-logs="cd ${PWD}/infra && pulumi logs -f"
 
-# Function to run Orchestra commands without passphrase prompts
+# Function to run Orchestra commands
+# Note: Removed PULUMI_CONFIG_PASSPHRASE as it's no longer needed
 orchestra() {
-    export PULUMI_CONFIG_PASSPHRASE="orchestra-dev-123"
     case "$1" in
         deploy)
             cd "${PWD}/infra" && pulumi up --yes
@@ -40,7 +45,7 @@ orchestra() {
     esac
 }
 
-echo "Orchestra environment loaded! Available commands:"
+echo "Orchestra environment (Pulumi Cloud Mode) loaded! Available commands:"
 echo "  orchestra deploy  - Deploy to DigitalOcean"
 echo "  orchestra status  - Show deployment status"
 echo "  orchestra destroy - Tear down infrastructure"

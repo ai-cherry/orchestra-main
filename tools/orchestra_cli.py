@@ -9,12 +9,9 @@ including adapters, credentials, diagnostics, and orchestration.
 import os
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 import click
-
-# Removed load_dotenv for production: all secrets are managed via GCP Secret Manager and Pulumi config.
-from google.api_core import exceptions as gcp_exceptions
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
@@ -62,75 +59,23 @@ REQUIRED_SECRETS = {
 }
 
 
-class EnvironmentConfig:
-    """Handles GCP Secret Manager operations."""
-
-    def __init__(self, project_id: str):
-        self.project_id = project_id
-        self.client = secretmanager.EnvironmentConfigServiceClient()
-        self.parent = f"projects/{project_id}"
-
-    def list_secrets(self) -> List[str]:
-        """List all secret IDs in the project."""
-        secrets = []
-        try:
-            for secret in self.client.list_secrets(request={"parent": self.parent}):
-                secret_id = secret.name.split("/")[-1]
-                secrets.append(secret_id)
-        except Exception as e:
-            console.print(f"[red]Error listing secrets: {e}[/red]")
-        return secrets
-
-    def get_secret(self, secret_id: str) -> Optional[str]:
-        """Get the latest version of a secret."""
-        try:
-            name = f"{self.parent}/secrets/{secret_id}/versions/latest"
-            response = self.client.access_secret_version(request={"name": name})
-            return response.payload.data.decode("UTF-8")
-        except gcp_exceptions.NotFound:
-            return None
-        except Exception as e:
-            console.print(f"[red]Error accessing secret {secret_id}: {e}[/red]")
-            return None
-
-    def create_secret(self, secret_id: str, value: str) -> bool:
-        """Create a new secret."""
-        try:
-            # Create the secret
-            secret = self.client.create_secret(
-                request={
-                    "parent": self.parent,
-                    "secret_id": secret_id,
-                    "secret": {"replication": {"automatic": {}}},
-                }
-            )
-
-            # Add secret version
-            self.client.add_secret_version(
-                request={
-                    "parent": secret.name,
-                    "payload": {"data": value.encode("UTF-8")},
-                }
-            )
-            return True
-        except Exception as e:
-            console.print(f"[red]Error creating secret {secret_id}: {e}[/red]")
-            return False
-
-    def update_secret(self, secret_id: str, value: str) -> bool:
-        """Update an existing secret by adding a new version."""
-        try:
-            secret_name = f"{self.parent}/secrets/{secret_id}"
-            self.client.add_secret_version(
-                request={
-                    "parent": secret_name,
-                    "payload": {"data": value.encode("UTF-8")},
-                }
-            )
-            return True
-        except Exception as e:
-            console.print(f"[red]Error updating secret {secret_id}: {e}[/red]")
-            return False
+def get_pulumi_secrets() -> Dict[str, str]:
+    """Get secrets from Pulumi-generated .env file."""
+    secrets = {}
+    try:
+        with open(".env", "r") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    key, value = line.split("=", 1)
+                    secrets[key] = value
+    except FileNotFoundError:
+        console.print(
+            "[red]Error: .env file not found. Run 'pulumi config' first[/red]"
+        )
+    except Exception as e:
+        console.print(f"[red]Error reading .env file: {e}[/red]")
+    return secrets
 
 
 class AdapterConfig:
@@ -212,26 +157,15 @@ def secrets():
 )
 @click.pass_context
 def sync(ctx, env_file, dry_run):
-    """Sync secrets from GCP Secret Manager to local environment."""
-    project_id = os.getenv("GOOGLE_CLOUD_PROJECT", "cherry-ai-project")
-
+    """Sync secrets from Pulumi configuration to local environment."""
     console.print(
-        Panel(f"[bold blue]Syncing secrets from GCP project: {project_id}[/bold blue]")
+        Panel("[bold blue]Syncing secrets from Pulumi configuration[/bold blue]")
     )
 
-    os.environ = EnvironmentConfig(project_id)
-
-    # Get all secrets from GCP
-    with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        console=console,
-    ) as progress:
-        task = progress.add_task("Fetching secrets from GCP...", total=None)
-        gcp_secrets = os.environ.list_secrets()
-        progress.update(task, completed=True)
-
-    console.print(f"[green]Found {len(gcp_secrets)} secrets in GCP[/green]")
+    pulumi_secrets = get_pulumi_secrets()
+    if not pulumi_secrets:
+        console.print("[red]No secrets found in Pulumi configuration[/red]")
+        return False
 
     # Track sync results
     synced = []
@@ -253,19 +187,17 @@ def sync(ctx, env_file, dry_run):
         for secret_id in all_required:
             progress.update(task, description=f"Syncing {secret_id}...")
 
-            if secret_id in gcp_secrets:
-                value = os.environ.get_secret(secret_id)
-                if value:
-                    if not dry_run:
-                        # Update .env file
-                        set_key(env_file, secret_id, value)
-                        # Also set in current environment
-                        os.environ[secret_id] = value
-                    synced.append(secret_id)
-                else:
-                    errors.append(f"{secret_id}: Failed to fetch value")
+            value = pulumi_secrets.get(secret_id)
+            if value:
+                if not dry_run:
+                    # Update .env file
+                    set_key(env_file, secret_id, value)
+                    # Also set in current environment
+                    os.environ[secret_id] = value
+                synced.append(secret_id)
             else:
                 missing.append(secret_id)
+                errors.append(f"{secret_id}: Not found in Pulumi config")
 
             progress.advance(task)
 
@@ -277,7 +209,7 @@ def sync(ctx, env_file, dry_run):
                 console.print(f"  - {s}")
 
     if missing:
-        console.print(f"\n[yellow]⚠ Missing {len(missing)} secrets in GCP:[/yellow]")
+        console.print(f"\n[yellow]⚠ Missing {len(missing)} secrets:[/yellow]")
         for m in missing:
             console.print(f"  - {m}")
 
@@ -289,7 +221,7 @@ def sync(ctx, env_file, dry_run):
     if dry_run:
         console.print("\n[yellow]DRY RUN - No changes were made[/yellow]")
     else:
-        console.print(f"\n[green]Secrets written to {env_file}[/green]")
+        console.print(f"\n[green]✓ Synced {len(synced)} secrets to {env_file}[/green]")
 
 
 @secrets.command()
@@ -326,7 +258,9 @@ def validate(ctx):
         console.print("\n[green]✓ All required secrets are present[/green]")
     else:
         console.print("\n[red]✗ Some required secrets are missing[/red]")
-        console.print("[yellow]Run 'orchestra secrets sync' to fetch from GCP[/yellow]")
+        console.print(
+            "[yellow]Run 'orchestra secrets sync' to fetch from Pulumi[/yellow]"
+        )
         sys.exit(1)
 
 
@@ -335,24 +269,30 @@ def validate(ctx):
 @click.option("--value", prompt=True, hide_input=True, confirmation_prompt=True)
 @click.pass_context
 def set(ctx, secret_id, value):
-    """Set or update a secret in GCP Secret Manager."""
-    project_id = os.getenv("GOOGLE_CLOUD_PROJECT", "cherry-ai-project")
-    os.environ = EnvironmentConfig(project_id)
+    """Set or update a secret in Pulumi configuration."""
+    # Get current secrets
+    pulumi_secrets = get_pulumi_secrets()
 
     # Check if secret exists
-    existing_secrets = os.environ.list_secrets()
+    secret_exists = secret_id in pulumi_secrets
 
-    if secret_id in existing_secrets:
-        if click.confirm(f"Secret {secret_id} already exists. Update it?"):
-            if os.environ.update_secret(secret_id, value):
-                console.print(f"[green]✓ Updated secret {secret_id}[/green]")
-            else:
-                console.print(f"[red]✗ Failed to update secret {secret_id}[/red]")
-    else:
-        if os.environ.create_secret(secret_id, value):
-            console.print(f"[green]✓ Created secret {secret_id}[/green]")
+    if secret_exists:
+        if not click.confirm(f"Secret {secret_id} already exists. Update it?"):
+            return
+
+    # Update environment immediately
+    os.environ[secret_id] = value
+
+    # Update .env file
+    try:
+        set_key(".env", secret_id, value)
+        if secret_exists:
+            console.print(f"[green]✓ Updated secret {secret_id}[/green]")
         else:
-            console.print(f"[red]✗ Failed to create secret {secret_id}[/red]")
+            console.print(f"[green]✓ Created secret {secret_id}[/green]")
+    except Exception as e:
+        console.print(f"[red]✗ Failed to update secret {secret_id}: {str(e)}[/red]")
+        sys.exit(1)
 
 
 @cli.group()
@@ -455,7 +395,7 @@ def health(ctx):
 
     checks = {
         "Secrets": check_secrets_health(),
-        "GCP Connection": check_gcp_health(),
+        "Pulumi Config": check_pulumi_health(),
         "Redis": check_redis_health(),
         "MCP Gateway": check_mcp_health(),
         "Adapters": check_adapters_health(),
@@ -500,20 +440,19 @@ def check_secrets_health():
         return False, f"{present}/{total} secrets present"
 
 
-def check_gcp_health():
-    """Check GCP connectivity."""
+def check_pulumi_health():
+    """Check Pulumi configuration."""
     try:
-        project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
-        if not project_id:
-            return False, "GOOGLE_CLOUD_PROJECT not set"
+        if not os.path.exists(".env"):
+            return False, ".env file missing - run 'pulumi config'"
 
-        # Try to access secret manager
-        client = secretmanager.EnvironmentConfigServiceClient()
-        parent = f"projects/{project_id}"
-        list(client.list_secrets(request={"parent": parent}, page_size=1))
-        return True, f"Connected to project {project_id}"
+        required = ["PORTKEY_API_KEY", "OPENAI_API_KEY"]
+        missing = [key for key in required if key not in os.environ]
+        if missing:
+            return False, f"Missing secrets: {', '.join(missing)}"
+        return True, "Pulumi config loaded successfully"
     except Exception as e:
-        return False, f"Connection failed: {str(e)[:50]}..."
+        return False, f"Pulumi check failed: {str(e)[:50]}..."
 
 
 def check_redis_health():
@@ -631,7 +570,7 @@ def init(ctx):
         console=console,
     ) as progress:
         # Step 1: Sync secrets
-        task = progress.add_task("Syncing secrets from GCP...", total=None)
+        task = progress.add_task("Syncing secrets from Pulumi...", total=None)
         ctx.invoke(sync)
         progress.update(task, completed=True)
 
