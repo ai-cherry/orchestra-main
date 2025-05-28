@@ -23,7 +23,7 @@ bandit==1.7.6
 types-PyYAML==6.0.12.20250516
 types-requests==2.31.0.20240125
 types-redis==4.6.0.20240106
-types-protobuf==4.24.0.20240129
+types-protobuf==6.30.2.20250516
 
 # Pre-commit
 pre-commit==3.5.0
