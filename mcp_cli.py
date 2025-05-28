@@ -48,6 +48,7 @@ try:
         UnifiedModeManager,
         UnifiedWorkflowOrchestrator,
     )
+    from mcp_server.roo import MODES as ROO_MODES
 
     # Removed archive import
 except ImportError as e:

@@ -1,11 +1,18 @@
 name: admin-ui-site
-description: Pulumi stack for Admin UI static site
-runtime:
-  name: python
-  options:
-    toolchain: pip
-    virtualenv: venv
-config:
-  pulumi:tags:
-    value:
-      pulumi:template: gcp-python
+runtime: python
+description: DigitalOcean App Platform deployment for Orchestra Admin UI
+
+template:
+  config:
+    digitalocean:token:
+      type: string
+      secret: true
+    admin-ui-site:domainName:
+      type: string
+      default: ""
+    region:
+      type: string
+      default: "nyc3"
+    appSize:
+      type: string
+      default: "basic-xxs"

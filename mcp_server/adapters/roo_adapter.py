@@ -7,11 +7,13 @@ Implements the IToolAdapter interface for standardized tool access.
 
 from mcp_server.interfaces.tool_adapter import IToolAdapter
 
+
 class RooAdapter(IToolAdapter):
     """
     Adapter for Roo Code AI platform.
     Extend this class to implement Roo-specific tool calls and memory sync.
     """
+
     def __init__(self, config=None):
         self.config = config or {}
 

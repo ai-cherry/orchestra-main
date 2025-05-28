@@ -3,12 +3,16 @@ Deployment MCP Server - Manages deployments
 """
 
 import asyncio
-import json
-from typing import Any, Dict, List
+
+# import logging # Removed
+# import os # Removed
+from typing import Any, Dict, List  # Removed , Optional
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import Tool, TextContent
+
+# from .base_mcp_server import BaseMCPServer, MCPServerConfig # Removed
 
 
 class DeploymentServer:

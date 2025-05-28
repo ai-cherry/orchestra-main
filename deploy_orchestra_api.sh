@@ -1,77 +1,90 @@
 #!/bin/bash
 # deploy_orchestra_api.sh
-# Canonical, simple, and stable deployment script for Orchestra API on GCP
-# - Builds Docker image using Google Cloud Build (no local Docker needed)
-# - Pushes to Artifact Registry
-# - Deploys to Cloud Run
-# - Ensures Redis is present
-# - Prints a checklist for ongoing evaluation
+# DigitalOcean deployment script for Orchestra API
+# - Builds Docker image locally and pushes to DigitalOcean Container Registry
+# - Deploys to DigitalOcean App Platform
+# - Ensures Redis is present via Managed Database
+# - Prints deployment checklist
 
 set -e
 
 # Configurable variables
-PROJECT_ID="cherry-ai-project"
-REGION="us-west4"
+DO_REGION="nyc3"
 SERVICE_NAME="orchestra-api"
 IMAGE_NAME="orchestra-api"
-ARTIFACT_REPO="ai-orchestra"
-REDIS_INSTANCE="orchestra-redis"
-REDIS_REGION="us-central1"
-REDIS_TIER="BASIC"
-REDIS_SIZE_GB=1
+CONTAINER_REGISTRY="ai-orchestra"
+REDIS_NAME="orchestra-redis"
+REDIS_SIZE="db-s-1vcpu-1gb"
+REDIS_VERSION="7"
 
-# 1. Authenticate with GCP (assumes gcloud is already authenticated)
-echo "Authenticating with GCP..."
-gcloud config set project "$PROJECT_ID"
-gcloud config set run/region "$REGION"
-gcloud config set artifacts/location "$REGION"
+# 1. Authenticate with DigitalOcean
+echo "Authenticating with DigitalOcean..."
+doctl auth init
 
 # 2. Ensure requirements.txt is present in build context
 echo "Copying requirements/base.txt to orchestra_api/requirements.txt..."
 cp requirements/base.txt orchestra_api/requirements.txt
 
-# 3. Build and push Docker image using Google Cloud Build
-IMAGE_URI="$REGION-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REPO/$IMAGE_NAME:latest"
-echo "Building and pushing Docker image with Google Cloud Build..."
-gcloud builds submit ./orchestra_api --tag "$IMAGE_URI"
+# 3. Build and push Docker image to DigitalOcean Container Registry
+echo "Building Docker image..."
+docker build -t $IMAGE_NAME ./orchestra_api
 
-# 4. Deploy to Cloud Run using the pushed image
-echo "Deploying to Cloud Run..."
-gcloud run deploy "$SERVICE_NAME" \
-  --image "$IMAGE_URI" \
-  --region "$REGION" \
-  --platform managed \
-  --allow-unauthenticated \
-  --memory 1Gi \
-  --timeout 300
+echo "Tagging and pushing to DigitalOcean Container Registry..."
+doctl registry login
+docker tag $IMAGE_NAME registry.digitalocean.com/$CONTAINER_REGISTRY/$IMAGE_NAME
+docker push registry.digitalocean.com/$CONTAINER_REGISTRY/$IMAGE_NAME
 
-# 5. Ensure Redis instance exists (create if missing)
+# 4. Deploy to DigitalOcean App Platform
+echo "Deploying to DigitalOcean App Platform..."
+doctl apps create --spec <(cat <<EOF
+name: $SERVICE_NAME
+region: $DO_REGION
+services:
+- name: $SERVICE_NAME
+  github:
+    branch: main
+    deploy_on_push: true
+  dockerfile_path: ./orchestra_api/Dockerfile
+  instance_size_slug: basic-xxs
+  instance_count: 1
+  envs:
+  - key: DRAGONFLY_URI
+    scope: RUN_TIME
+    value: ${DRAGONFLY_URI}
+  - key: MONGO_URI
+    scope: RUN_TIME
+    value: ${MONGO_URI}
+EOF
+)
+
+# 5. Ensure Redis instance exists
 echo "Checking for Redis instance..."
-if ! gcloud redis instances describe "$REDIS_INSTANCE" --region="$REDIS_REGION" >/dev/null 2>&1; then
-  echo "Redis instance not found. Creating..."
-  gcloud redis instances create "$REDIS_INSTANCE" \
-    --size="$REDIS_SIZE_GB" \
-    --region="$REDIS_REGION" \
-    --tier="$REDIS_TIER"
+if ! doctl databases list | grep -q $REDIS_NAME; then
+  echo "Creating Redis instance..."
+  doctl databases create $REDIS_NAME \
+    --engine redis \
+    --version $REDIS_VERSION \
+    --size $REDIS_SIZE \
+    --region $DO_REGION
 else
-  echo "Redis instance '$REDIS_INSTANCE' already exists."
+  echo "Redis instance '$REDIS_NAME' already exists."
 fi
 
-# 6. Print checklist for ongoing evaluation
+# 6. Print deployment checklist
 cat <<EOF
 
 ==========================
 DEPLOYMENT COMPLETE
 
 Checklist for Ongoing Evaluation:
-- [ ] Confirm Cloud Run service '$SERVICE_NAME' is running and healthy.
-- [ ] Confirm Redis instance '$REDIS_INSTANCE' is available in region '$REDIS_REGION'.
-- [ ] Confirm secrets are synced via Secret Manager.
-- [ ] Run 'gcp_environment_audit.sh' after major changes.
-- [ ] Monitor logs and metrics in GCP Console.
-- [ ] Update this script and documentation as needed.
+- [ ] Confirm App Platform service '$SERVICE_NAME' is running
+- [ ] Confirm Redis instance '$REDIS_NAME' is available
+- [ ] Confirm secrets are properly configured
+- [ ] Monitor logs via DigitalOcean dashboard
+- [ ] Update this script as needed
 
-This workflow is 100% GCP-native: Google Cloud Build → Artifact Registry → Cloud Run. No local Docker, no Docker Cloud, no Docker Hub. Maximum stability and simplicity.
+This workflow uses DigitalOcean native services:
+Container Registry → App Platform → Managed Databases
 ==========================
 
 EOF

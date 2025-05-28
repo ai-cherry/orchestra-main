@@ -34,6 +34,7 @@ except ImportError:
         not DRAGONFLY_HOST or not DRAGONFLY_PASSWORD or not DRAGONFLY_CONNECTION_URI
     ) and os.getenv("GOOGLE_CLOUD_PROJECT"):
         try:
+            from google.cloud import secretmanager
 
             project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
             client = secretmanager.EnvironmentConfigServiceClient()

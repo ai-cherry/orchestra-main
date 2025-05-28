@@ -55,6 +55,7 @@ class MCPApplication:
 
         # Dynamically discover and register all adapters in mcp_server/adapters/
         import mcp_server.adapters
+
         adapter_pkg = mcp_server.adapters
 
         for finder, name, ispkg in pkgutil.iter_modules(adapter_pkg.__path__):
@@ -62,7 +63,15 @@ class MCPApplication:
                 continue
             module = importlib.import_module(f"mcp_server.adapters.{name}")
             # Find the adapter class (by convention: PascalCase of file, e.g., CopilotAdapter)
-            class_name = "".join([part.capitalize() for part in name.replace("_adapter", "").split("_")]) + "Adapter"
+            class_name = (
+                "".join(
+                    [
+                        part.capitalize()
+                        for part in name.replace("_adapter", "").split("_")
+                    ]
+                )
+                + "Adapter"
+            )
             adapter_cls = getattr(module, class_name, None)
             if adapter_cls is None:
                 logger.warning(f"Adapter class {class_name} not found in {name}")

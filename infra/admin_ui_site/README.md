@@ -1,77 +1,60 @@
-# Pulumi GCP Python Storage Bucket Template
+# DigitalOcean Admin UI Site Deployment
 
- A minimal Pulumi template for provisioning a Google Cloud Storage bucket using Python.
+This template helps you get started with Pulumi and the `pulumi-digitalocean` provider to deploy a static site to DigitalOcean App Platform.
 
- This template helps you get started with Pulumi and the `pulumi-gcp` provider to create a simple storage bucket and export its URL.
+## Prerequisites
 
- ## When to Use
+- [Pulumi CLI](https://www.pulumi.com/docs/get-started/install/)
+- [DigitalOcean CLI](https://docs.digitalocean.com/reference/doctl/how-to/install/)
+- DigitalOcean account with API access
 
- - You need a quick example of using Pulumi with Google Cloud in Python.
- - You want to manage a Google Cloud Storage bucket as code.
- - You’re looking for a minimal scaffold to build more complex GCP infrastructure.
+## Getting Started
 
- ## Prerequisites
+1. Install dependencies:
 
- - A Google Cloud account and a target GCP project.
- - Authentication set up via `gcloud auth login` or the `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
- - Python 3.7 or later installed on your machine.
- - Pulumi CLI installed and logged in to your Pulumi account.
+```bash
+pip install -r requirements.txt
+```
 
- ## Usage
+2. Configure DigitalOcean credentials:
 
- Run the following command to scaffold a new project from this template:
+```bash
+doctl auth init
+pulumi config set digitalocean:token --secret YOUR_API_TOKEN
+```
 
- ```bash
- pulumi new gcp-python
- ```
+3. Deploy:
 
- Follow the interactive prompts:
- - **Project Name**: Your project name.
- - **Project Description**: A short description of your project.
- - **gcp:project**: The ID of the Google Cloud project where resources will be created.
+```bash
+pulumi up
+```
 
- After the project is generated, navigate into your project directory and deploy:
+## Configuration
 
- ```bash
- cd <project-name>
- pulumi up
- ```
+### Required Settings
 
- Confirm the changes to provision your storage bucket.
+- **digitalocean:token**: (Required) The DigitalOcean API token
+- **admin-ui-site:domainName**: The custom domain for your site (optional)
 
- ## Project Layout
+### Optional Settings
 
- ```
- .
- ├── __main__.py        # Pulumi program defining resources
- ├── Pulumi.yaml        # Project configuration and template metadata
- └── requirements.txt   # Python dependencies for Pulumi and GCP
- ```
+- **region**: DigitalOcean region (default: nyc3)
+- **appSize**: App Platform size (default: basic-xxs)
 
- ## Configuration
+## Architecture
 
- - **gcp:project**: (Required) The Google Cloud project ID where resources will be created.
+- **DigitalOcean App Platform**: Hosts the static site
+- **DigitalOcean CDN**: Provides global content delivery
+- **DigitalOcean Spaces**: Optional asset storage
 
- ## Resources Created
+## Maintenance
 
- - **Storage Bucket** (`pulumi_gcp.storage.Bucket`): A bucket named `my-bucket` in the `US` location.
+- Update dependencies: `pip install -U -r requirements.txt`
+- View logs: `doctl apps logs --tail 100`
+- Monitor: `doctl apps list`
 
- ## Outputs
+## Resources
 
- - **bucket_name**: The URL of the created storage bucket.
-
- ## Next Steps
-
- - Modify `__main__.py` to customize the bucket:
-   - Change the bucket name.
-   - Adjust the `location` or add bucket labels and IAM policies.
- - Add more GCP resources such as Pub/Sub topics, Compute instances, or BigQuery datasets.
- - Integrate with CI/CD pipelines using `pulumi preview` and `pulumi up --yes`.
- - Explore the [Pulumi GCP Provider Documentation](https://www.pulumi.com/registry/packages/gcp/) for more examples.
-
- ## Need Help?
-
- - Pulumi Docs: https://www.pulumi.com/docs/
- - GCP Provider Docs: https://www.pulumi.com/registry/packages/gcp/
- - Community Slack: https://slack.pulumi.com/
- - GitHub Issues: https://github.com/pulumi/pulumi/issues
+- Pulumi Docs: https://www.pulumi.com/docs/
+- DigitalOcean Provider Docs: https://www.pulumi.com/registry/packages/digitalocean/
+- Community Slack: https://slack.pulumi.com/

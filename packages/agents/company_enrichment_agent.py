@@ -12,6 +12,7 @@ import os
 from typing import Dict, Optional
 
 import requests
+from google.cloud import firestore
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -28,7 +29,7 @@ class CompanyEnrichmentAgent:
             serpapi_key: API key for SerpAPI.
             claude_max_webhook: Webhook URL for Claude Max reasoning.
         """
-        self.db = mongodb.Client()
+        self.db = firestore.Client()
         self.collection = firestore_collection
         self.serpapi_key = serpapi_key
         self.claude_max_webhook = claude_max_webhook
