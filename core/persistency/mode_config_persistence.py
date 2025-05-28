@@ -34,11 +34,6 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 import yaml
-from optional_integrations import (
-    secretmanager,
-    storage,
-    mongodb,
-)  # Optional integrations
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -67,17 +62,16 @@ DEFAULT_BUCKET = os.environ.get(ENV_BUCKET, f"{DEFAULT_PROJECT_ID}-mode-config")
 DEFAULT_SECRET = os.environ.get(ENV_SECRET, "mode-system-config")
 DEFAULT_COLLECTION = os.environ.get(ENV_COLLECTION, "mode_system_config")
 
-# Optional: Google Secret Manager, Cloud Storage, and MongoDB integration
+# Optional integrations
 try:
-    import secretmanager
-except ImportError:
-    secretmanager = None
-try:
-    import storage
+    from google.cloud import storage
+    from google.api_core import exceptions as gcp_exceptions
 except ImportError:
     storage = None
+    gcp_exceptions = None
+
 try:
-    import mongodb
+    from google.cloud import firestore as mongodb
 except ImportError:
     mongodb = None
 
@@ -168,13 +162,6 @@ class PersistenceManager:
         """Initialize Google Cloud clients if possible."""
         try:
             # Import GCP libraries
-
-            # Initialize Secret Manager client
-            try:
-                self.os.environ_client = secretmanager.EnvironmentConfigServiceClient()
-                logger.debug("Initialized Secret Manager client")
-            except Exception as e:
-                logger.warning(f"Failed to initialize Secret Manager client: {str(e)}")
 
             # Initialize Cloud Storage client
             try:
@@ -357,46 +344,7 @@ class PersistenceManager:
                 f"Mode definitions already saved locally at {MODE_DEFINITIONS_PATH}"
             )
 
-            # 2. Save to GCP Secret Manager
-            if self.gcp_enabled and self.os.environ_client:
-                try:
-                    from google.api_core.exceptions import NotFound
-
-                    secret_name = (
-                        f"projects/{self.project_id}/secrets/{self.secret_name}"
-                    )
-
-                    try:
-                        # Check if secret exists
-                        self.os.environ_client.get_secret(request={"name": secret_name})
-                    except NotFound:
-                        # Create secret if it doesn't exist
-                        self.os.environ_client.create_secret(
-                            request={
-                                "parent": f"projects/{self.project_id}",
-                                "secret_id": self.secret_name,
-                                "secret": {"replication": {"automatic": {}}},
-                            }
-                        )
-                        logger.info(f"Created secret {self.secret_name}")
-
-                    # Add new secret version
-                    self.os.environ_client.add_secret_version(
-                        request={
-                            "parent": secret_name,
-                            "payload": {"data": content.encode("UTF-8")},
-                        }
-                    )
-                    logger.info(
-                        f"Saved mode definitions to Secret Manager: {secret_name}"
-                    )
-                except Exception as e:
-                    logger.error(
-                        f"Failed to save mode definitions to Secret Manager: {str(e)}"
-                    )
-                    success = False
-
-            # 3. Save to Cloud Storage
+            # 2. Save to Cloud Storage
             if self.gcp_enabled and self.storage_client:
                 try:
                     from google.api_core.exceptions import NotFound
@@ -558,28 +506,7 @@ class PersistenceManager:
                     f"Failed to load mode definitions from local file: {str(e)}"
                 )
 
-        # 2. Try GCP Secret Manager
-        if not content and self.gcp_enabled and self.os.environ_client:
-            try:
-                from google.api_core.exceptions import NotFound
-
-                secret_name = f"projects/{self.project_id}/secrets/{self.secret_name}/versions/latest"
-                response = self.os.environ_client.access_secret_version(
-                    request={"name": secret_name}
-                )
-                content = response.payload.data.decode("UTF-8")
-                source = "Secret Manager"
-                logger.info(
-                    f"Loaded mode definitions from Secret Manager: {secret_name}"
-                )
-            except NotFound:
-                logger.warning("Mode definitions not found in Secret Manager")
-            except Exception as e:
-                logger.error(
-                    f"Failed to load mode definitions from Secret Manager: {str(e)}"
-                )
-
-        # 3. Try GCP Cloud Storage
+        # 2. Try GCP Cloud Storage
         if not content and self.gcp_enabled and self.storage_client:
             try:
                 from google.api_core.exceptions import NotFound
