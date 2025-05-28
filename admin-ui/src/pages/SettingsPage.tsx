@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
-import { useTheme, Theme as AppTheme } from '@/context/ThemeContext'; // Import Theme type
+import { useTheme } from '@/context/useTheme';
+import type { Theme as AppTheme } from '@/context/ThemeContext';
 
 const themes: { name: string; value: AppTheme }[] = [
   { name: 'Neutral', value: 'neutral' },
@@ -16,9 +17,9 @@ export function SettingsPage() {
   const { theme, setTheme, mode, setMode } = useTheme();
 
   const handleThemeChange = (newThemeValue: string) => {
-    // Ensure the value is a valid theme before setting
-    if (themes.some(t => t.value === newThemeValue)) {
-      setTheme(newThemeValue as AppTheme);
+    const selectedTheme = themes.find(t => t.value === newThemeValue);
+    if (selectedTheme) {
+      setTheme(selectedTheme.value);
     }
   };
 

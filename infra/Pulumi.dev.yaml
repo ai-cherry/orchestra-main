@@ -32,7 +32,7 @@ config:
     secure: v1:v5ZxL454Sidj2VmC:2zGOdCb7s7YoBsjwAZAgTy22DeAHfNdfVRFCWGGAxJUh9B1nGDV1FGgwTV1dzamTC0A=
   orchestra-infra:mongodb_service_client_secret:
     secure: v1:w3K5eEzsaiKn54lA:KuMWehJk+oIYSzUB4G944SmFXzY82f+Qxa3k8OiLc4cGSJIifgChlVwPI0GudC6717NFdRU6CciKTcVYNxRhzd7E
-  orchestra-infra:adminUiCustomDomain: cherry-ai.me
+  orchestra-infra:adminUiCustomDomain: admin.cherry-ai.me
   orchestra-infra:ssh_pubkey_path: /home/paperspace/.ssh/orchestra_do_key.pub
   orchestra-infra:ssh_private_key_path:
     secure: v1:ZT0gr7KVtxqPr1nA:xY9vbzpC31FlKx/LPe9KqF+Mxk2SLWZ9zYwPFKo5RLGw6LXVaje2Od2TYUUNDIZGNToawpp9
