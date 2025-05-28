@@ -7,7 +7,6 @@ Tests all major components and connections.
 import os
 import sys
 import asyncio
-from datetime import datetime
 from typing import Dict, List, Tuple
 
 # Add project root to path
@@ -121,7 +120,7 @@ class SetupTester:
             return True
 
         except Exception as e:
-            print(f"  ⚠️  Local Redis failed, trying Dragonfly...")
+            print("  ⚠️  Local Redis failed, trying Dragonfly...")
 
             # Try Dragonfly
             try:
@@ -283,9 +282,9 @@ class SetupTester:
 
     def print_summary(self):
         """Print test summary."""
-        print("\n" + "=" * 50)
+        print("\n" + "=" * 60)
         print("📊 TEST SUMMARY")
-        print("=" * 50)
+        print("=" * 60)
 
         passed = sum(1 for success, _ in self.results.values() if success)
         total = len(self.results)

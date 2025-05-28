@@ -6,9 +6,7 @@ Orchestra AI Setup Wizard - Complete setup and validation tool.
 import os
 import sys
 import subprocess
-import json
 from pathlib import Path
-from typing import Dict, List, Optional
 import shutil
 import time
 
@@ -99,7 +97,7 @@ class OrchestraSetupWizard:
         # MongoDB
         print("1️⃣ MongoDB Atlas")
         if self.config.get("MONGODB_URI"):
-            print(f"   ✓ Already configured")
+            print("   ✓ Already configured")
             self.services_status["mongodb"] = True
         else:
             print("   ℹ️  Sign up at: https://www.mongodb.com/cloud/atlas")
@@ -116,7 +114,7 @@ class OrchestraSetupWizard:
         # DragonflyDB
         print("2️⃣ DragonflyDB (Aiven)")
         if self.config.get("DRAGONFLY_URI"):
-            print(f"   ✓ Already configured")
+            print("   ✓ Already configured")
             self.services_status["dragonfly"] = True
         else:
             print("   ℹ️  Sign up at: https://aiven.io/dragonfly")
@@ -133,7 +131,7 @@ class OrchestraSetupWizard:
         # Weaviate
         print("3️⃣ Weaviate Cloud")
         if self.config.get("WEAVIATE_URL") and self.config.get("WEAVIATE_API_KEY"):
-            print(f"   ✓ Already configured")
+            print("   ✓ Already configured")
             self.services_status["weaviate"] = True
         else:
             print("   ℹ️  Sign up at: https://console.weaviate.cloud")
@@ -320,6 +318,12 @@ class OrchestraSetupWizard:
         print("\n✨ Your Orchestra AI is ready for development!")
         print("   No more GCP complexity - just clean, simple architecture.")
         print()
+
+        print("\n" + "=" * 60)
+        print("Orchestra setup complete!")
+        print("=" * 60)
+        print("You can now use Orchestra CLI and Admin UI.")
+        print("=" * 60)
 
 
 if __name__ == "__main__":

@@ -3,11 +3,10 @@
 Orchestra AI Status - Show complete system status
 """
 
-import os
-import json
 import subprocess
 from pathlib import Path
 from datetime import datetime
+import json
 
 
 def check_service(name: str, command: list) -> tuple:
