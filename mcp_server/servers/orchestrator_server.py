@@ -3,7 +3,6 @@ Orchestrator MCP Server - Manages agent coordination
 """
 
 import asyncio
-import json
 from typing import Any, Dict, List
 
 from mcp.server import Server

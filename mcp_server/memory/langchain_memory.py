@@ -32,6 +32,9 @@ from ..utils.structured_logging import get_logger
 from .base import MemoryEntry, MemoryMetadata, MemoryTier
 from .dragonfly_cache import DragonflyCache
 from .qdrant_semantic import QdrantSemanticMemory
+from shared.memory.memory_manager import (
+    FirestoreMemoryManager as FirestoreEpisodicMemory,
+)
 
 logger = get_logger(__name__)
 

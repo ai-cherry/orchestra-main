@@ -18,10 +18,6 @@ from optional_integrations import tasks_v2  # Optional integration
 logger = logging.getLogger(__name__)
 
 # Optional: Google Cloud Tasks integration
-try:
-    import tasks_v2
-except ImportError:
-    tasks_v2 = None
 
 
 class TaskQueueManager:

@@ -24,10 +24,6 @@ logger = logging.getLogger(__name__)
 T = TypeVar("T")
 
 # Optional: MongoDB integration for long-term memory
-try:
-    import mongodb
-except ImportError:
-    mongodb = None  # MongoDB integration not available
 
 
 class MemoryQuery(BaseModel):

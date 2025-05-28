@@ -7,11 +7,13 @@ Implements the IToolAdapter interface for standardized tool access.
 
 from mcp_server.interfaces.tool_adapter import IToolAdapter
 
+
 class JulesGoogleAdapter(IToolAdapter):
     """
     Adapter for Jules Google AI platform.
     Extend this class to implement Jules Google-specific tool calls and memory sync.
     """
+
     def __init__(self, config=None):
         self.config = config or {}
 

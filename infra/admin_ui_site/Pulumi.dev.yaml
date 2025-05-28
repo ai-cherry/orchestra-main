@@ -1,6 +1,7 @@
 encryptionsalt: v1:+yfO1Xu5c+4=:v1:P2GQ1jHHPKAuEIga:plwRSQ5rqlmoMgtt5g3jwhpA3EJBXg==
 config:
   admin-ui-site:domainName: admin.cherry-ai.me
-  gcp:project: cherry-ai-project
-  gcp:region: us-central1
+  digitalocean:token:
+    secure: v1:R7oWg5r0ef0C6db6:6aF0JiFuJuxTasFyAP9fvZIXBm0BAqdObPvBGynM0ZlonAGdKY41BrcXAlZRzaf+0T/Q+xmFV3ToXtyhXa0aJ2gXicdhHI/tD4GaU3oYIb3rv3B03naL
+  digitalocean:region: nyc3
   admin-ui-site:dnsZone: cherry-ai-zone

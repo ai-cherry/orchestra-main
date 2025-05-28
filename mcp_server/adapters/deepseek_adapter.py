@@ -7,11 +7,13 @@ Implements the IToolAdapter interface for standardized tool access.
 
 from mcp_server.interfaces.tool_adapter import IToolAdapter
 
+
 class DeepSeekAdapter(IToolAdapter):
     """
     Adapter for DeepSeek AI assistant.
     Extend this class to implement DeepSeek-specific tool calls and memory sync.
     """
+
     def __init__(self, config=None):
         self.config = config or {}
 

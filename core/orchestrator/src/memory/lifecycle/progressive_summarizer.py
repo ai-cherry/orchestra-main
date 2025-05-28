@@ -11,6 +11,7 @@ from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
 
 from pydantic import BaseModel, Field
+from google.cloud import aiplatform
 
 # Configure logging
 logger = logging.getLogger(__name__)
