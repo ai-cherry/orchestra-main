@@ -3,7 +3,7 @@
 
 # Pulumi core
 pulumi>=3.100.0,<4.0.0
-pulumi-digitalocean>=5.0.0,<6.0.0
+# pulumi-digitalocean is managed as a Pulumi plugin, not a PyPI package
 pulumi-command>=0.9.0,<1.0.0
 
 # Removed pulumi-gcp and pulumi-kubernetes (not needed after migration)

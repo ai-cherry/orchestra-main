@@ -3,16 +3,16 @@ Weaviate service for vector search and RAG operations.
 Provides clean interface for AI applications.
 """
 
-from typing import List, Dict, Optional, Any
-import weaviate
-from weaviate.classes.init import AdditionalConfig, Timeout
 import logging
+import os
+from typing import Any, Dict, List, Optional
+
+import weaviate
 from pydantic import BaseModel
+from weaviate.classes.init import AdditionalConfig, Timeout
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -46,20 +46,28 @@ class WeaviateService:
         self._verify_connection()
 
     def _initialize_client(self) -> weaviate.Client:
-        """Create and configure Weaviate client."""
+        """Create and configure Weaviate client with Paperspace support."""
         try:
-            return weaviate.connect_to_local(
-                host=self.config.host,
-                port=self.config.port,
-                timeout=Timeout(connect=self.config.timeout),
-                additional_config=AdditionalConfig(
-                    auth=(
-                        weaviate.AuthApiKey(self.config.api_key)
-                        if self.config.api_key
-                        else None
-                    )
-                ),
-            )
+            if os.getenv("PAPERSPACE_ENV") == "true":
+                # Paperspace local configuration
+                return weaviate.connect_to_local(
+                    host="localhost",
+                    port=int(os.getenv("MCP_WEAVIATE_SERVER_PORT", "8081")),
+                    timeout=Timeout(connect=self.config.timeout),
+                    additional_config=AdditionalConfig(
+                        auth=weaviate.AuthApiKey(os.getenv("PAPERSPACE_WEAVIATE_API_KEY"))
+                    ),
+                )
+            else:
+                # DigitalOcean production configuration
+                return weaviate.connect_to_local(
+                    host=self.config.host,
+                    port=self.config.port,
+                    timeout=Timeout(connect=self.config.timeout),
+                    additional_config=AdditionalConfig(
+                        auth=(weaviate.AuthApiKey(self.config.api_key) if self.config.api_key else None)
+                    ),
+                )
         except Exception as e:
             logger.error("Weaviate initialization failed: %s", str(e))
             raise
@@ -92,9 +100,7 @@ class WeaviateService:
         try:
             with self.client as client:
                 collection = client.collections.get(collection)
-                response = collection.query.near_vector(
-                    near_vector=query_vector, limit=limit, filters=filters
-                )
+                response = collection.query.near_vector(near_vector=query_vector, limit=limit, filters=filters)
                 return [
                     VectorSearchResult(
                         id=result.uuid,

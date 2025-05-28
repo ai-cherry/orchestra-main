@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: pre-commit
     outputs:
-      admin_ui_built: ${{ steps.build_step.conclusion == 'success' }}
+      admin_ui_built: ${{ steps.build_step.outputs.admin_ui_built }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -58,7 +58,9 @@ jobs:
       - name: Admin UI - Build
         id: build_step
         working-directory: ./admin-ui
-        run: pnpm build
+        run: |
+          pnpm build
+          echo "admin_ui_built=true" >> "$GITHUB_OUTPUT"
 
       - name: Admin UI - E2E Tests (against local dev server)
         working-directory: ./admin-ui
@@ -111,7 +113,7 @@ jobs:
 
       - name: Install infra dependencies
         working-directory: ./infra
-        run: pip install -r requirements.txt
+        run: pip install -r ../requirements/base.txt
 
       - name: Login to Pulumi
         run: pulumi login
@@ -141,9 +143,7 @@ jobs:
     needs: build-and-test-admin-ui
     if: (github.event_name == 'workflow_dispatch') || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) && needs.build-and-test-admin-ui.outputs.admin_ui_built == 'true'
     runs-on: ubuntu-latest
-    environment:
-      name: production
-      url: ${{ steps.pulumi_outputs_prod.outputs.admin_ui_prod_url }}
+    environment: production
     env:
       PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_PROD_CONFIG_PASSPHRASE || secrets.PULUMI_CONFIG_PASSPHRASE }}
@@ -179,7 +179,7 @@ jobs:
 
       - name: Install infra dependencies
         working-directory: ./infra
-        run: pip install -r requirements.txt
+        run: pip install -r ../requirements/base.txt
 
       - name: Login to Pulumi
         run: pulumi login
