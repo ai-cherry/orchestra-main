@@ -76,7 +76,7 @@ jobs:
   deploy-to-dev:
     name: Deploy to Dev Environment
     needs: build-and-test-admin-ui
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.build-and-test-admin-ui.outputs.admin_ui_built == 'true'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && needs.build-and-test-admin-ui.outputs.admin_ui_built == 'true'
     runs-on: ubuntu-latest
     env:
       PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
@@ -141,7 +141,7 @@ jobs:
   deploy-to-prod:
     name: Deploy to Production Environment
     needs: build-and-test-admin-ui
-    if: (github.event_name == 'workflow_dispatch') || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) && needs.build-and-test-admin-ui.outputs.admin_ui_built == 'true'
+    if: ((github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch') || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))) && needs.build-and-test-admin-ui.outputs.admin_ui_built == 'true'
     runs-on: ubuntu-latest
     environment: production
     env:
