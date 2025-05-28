@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 
-type Theme = "neutral" | "cherry" | "sophia" | "gordon";
-type Mode = "light" | "dark";
+export type Theme = "neutral" | "cherry" | "sophia" | "gordon";
+export type Mode = "light" | "dark";
 
 interface ThemeContextType {
   theme: Theme;
@@ -12,7 +12,7 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeProvider: React.FC<{ children: ReactNode; defaultTheme?: Theme; defaultMode?: Mode, storageKey?: string }> = ({
+const ThemeProvider: React.FC<{ children: ReactNode; defaultTheme?: Theme; defaultMode?: Mode, storageKey?: string }> = ({
   children,
   defaultTheme = "neutral",
   defaultMode = "light",

@@ -202,9 +202,6 @@ firewall = do.Firewall(
 )
 
 # --- DigitalOcean App Platform for Admin UI ---
-# NOTE: Temporarily disabled - App Platform requires git source for static sites
-# TODO: Either push admin-ui to a git repo or use a different deployment method
-"""
 # Check if the admin_ui_dist_path exists. This is a deployment-time check.
 # Pulumi needs this path to be valid on the machine running `pulumi up`.
 # In CI, this path (`../admin-ui/dist` relative to `infra/`) must contain the build artifact.
@@ -219,11 +216,11 @@ admin_app_spec_dict = {
     "static_sites": [
         do.AppSpecStaticSiteArgs(
             name="admin-ui-site",
-            build_command=None,
-            source_dir=admin_ui_dist_path,
+            build_command=None,  # No build command needed as we provide pre-built static assets
+            source_dir=admin_ui_dist_path,  # Path to the directory containing static files
             index_document="index.html",
-            error_document="index.html",
-            catchall_document="index.html",
+            error_document="index.html",  # Optional: custom error page
+            catchall_document="index.html",  # Optional: for SPAs, route all paths to index.html
         )
     ],
 }
@@ -235,11 +232,10 @@ admin_app = do.App(
     f"admin-ui-app-{env}",
     spec=do.AppSpecArgs(**admin_app_spec_dict),
 )
-"""
 
 # --- OUTPUTS ---
 pulumi.export("droplet_ip", droplet.ipv4_address)
 pulumi.export("superagi_url", Output.concat("http://", droplet.ipv4_address, ":8080"))
 pulumi.export("hostname", droplet.name)
-# pulumi.export("admin_ui_default_url", admin_app.default_ingress)
-# pulumi.export("admin_ui_live_url", admin_app.live_url)
+pulumi.export("admin_ui_default_url", admin_app.default_ingress)
+pulumi.export("admin_ui_live_url", admin_app.live_url)

@@ -1,4 +1,3 @@
-import React from 'react';
 import PageWrapper from '@/components/layout/PageWrapper';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';

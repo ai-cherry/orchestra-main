@@ -1,4 +1,3 @@
-import React from 'react';
 import { Outlet, createRootRoute, redirect } from '@tanstack/react-router';
 import AppLayout from '@/components/layout/AppLayout';
 import { ThemeProvider } from '@/context/ThemeContext';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from '@tanstack/react-router';
-import { Home, Brain, Workflow, Settings, BotMessageSquare, FileText, Zap } from 'lucide-react'; // Example icons
+import { Home, Brain, Workflow, Settings, MessageSquare, FileText, Zap } from 'lucide-react'; // Example icons
 
 interface SidebarProps {
   open: boolean;
