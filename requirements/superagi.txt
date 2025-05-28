@@ -20,7 +20,7 @@ psycopg2-binary==2.9.9
 # Orchestra integration
 
 # Async and networking
-aiohttp==3.11.18
+aiohttp==3.12.2
 httpx==0.28.1
 websockets==12.0
 
