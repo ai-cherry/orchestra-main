@@ -1,7 +1,7 @@
 # Agent package requirements
 
 # Basic dependencies
-requests==2.31.0
+requests>=2.32.0
 
 # Future web scraping API integrations may need these packages
 # apify-client>=1.0.0
