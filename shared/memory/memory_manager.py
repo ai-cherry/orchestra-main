@@ -9,6 +9,7 @@ from typing import Dict, List, Optional
 
 from google.oauth2 import service_account
 from loguru import logger
+from google.cloud import firestore
 
 from core.env_config import settings
 from packages.shared.src.models.base_models import MemoryItem

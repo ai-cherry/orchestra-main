@@ -3,15 +3,11 @@
 Orchestra AI Complete Setup - Clean, Configure, and Automate Everything
 """
 
-import os
-import sys
-import json
-import subprocess
 import shutil
 from pathlib import Path
-from typing import Dict, List, Set, Tuple
-import re
 import time
+from typing import List
+import json
 
 
 class OrchestraCompleteSetup:
@@ -152,8 +148,6 @@ class OrchestraCompleteSetup:
         # Configure each service
         for service_name, service_config in services.items():
             print(f"\n  {service_name}:")
-            configured = True
-
             for var_name, default_value in service_config["vars"].items():
                 if var_name not in self.config or not self.config[var_name]:
                     self.config[var_name] = default_value
@@ -161,7 +155,6 @@ class OrchestraCompleteSetup:
                         print(f"    ✓ {var_name} = {default_value}")
                     else:
                         print(f"    ⚠️  {var_name} not configured")
-                        configured = False
                 else:
                     print(f"    ✓ {var_name} already configured")
 
@@ -567,31 +560,10 @@ echo "✓ Orchestra AI stopped"
     def print_summary(self):
         """Print setup summary."""
         print("\n" + "=" * 60)
-        print("📊 SETUP COMPLETE")
+        print("Orchestra setup complete!")
         print("=" * 60)
-
-        print(f"\n🧹 Cleanup:")
-        print(f"  - Removed {len(self.removed_files)} archive directories")
-        print(f"  - Updated {len(self.updated_files)} files")
-
-        print(f"\n⚙️  Configuration:")
-        print(f"  - MongoDB: {self.config.get('MONGODB_URI', 'Not configured')}")
-        print(
-            f"  - Redis: {self.config.get('REDIS_HOST', 'Not configured')}:{self.config.get('REDIS_PORT', '6379')}"
-        )
-
-        print(f"\n🤖 Automation:")
-        print(f"  - Start: ./start_orchestra.sh")
-        print(f"  - Stop: ./stop_orchestra.sh")
-
-        print(f"\n🚀 Quick Start:")
-        print(f"  1. Configure external services in .env (optional)")
-        print(f"  2. Run: ./start_orchestra.sh")
-        print(f"  3. Open: http://localhost:8000")
-
-        print(f"\n✨ Your Orchestra AI is ready!")
-        print(f"   Clean, configured, and automated.")
-        print()
+        print("You can now use Orchestra CLI and Admin UI.")
+        print("=" * 60)
 
 
 if __name__ == "__main__":

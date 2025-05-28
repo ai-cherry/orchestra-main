@@ -6,10 +6,9 @@ Sets up all configurations, dependencies, and validates the setup.
 
 import os
 import sys
-import json
 import subprocess
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List
 import shutil
 
 
@@ -142,7 +141,7 @@ class OrchestraSetup:
             print("  ✓ Dependencies installed")
         except subprocess.CalledProcessError as e:
             self.errors.append(f"Failed to install dependencies: {e}")
-            print(f"  ✗ Failed to install dependencies")
+            print("  ✗ Failed to install dependencies")
 
     def update_configurations(self):
         """Update configuration files."""
@@ -310,9 +309,9 @@ Orchestra AI is now a **GCP-free** system using:
 
     def print_summary(self):
         """Print setup summary."""
-        print("\n" + "=" * 50)
+        print("\n" + "=" * 60)
         print("📊 SETUP SUMMARY")
-        print("=" * 50)
+        print("=" * 60)
 
         if not self.errors and not self.warnings:
             print("\n✅ Setup completed successfully!")
