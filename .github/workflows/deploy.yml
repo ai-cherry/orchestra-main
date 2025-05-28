@@ -71,7 +71,7 @@ jobs:
           ./scripts/run_smoke_tests.sh
 
       - name: Notify Slack
-        uses: slackapi/slack-github-action@v1
+        uses: slackapi/slack-github-action@v2
         if: always()
         with:
           channel-id: 'deployments'
