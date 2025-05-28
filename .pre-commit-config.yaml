@@ -3,6 +3,13 @@
 # All hooks use python3.10 and run in the Poetry-managed environment.
 
 repos:
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        name: isort (python3.10, profile=black)
+        language_version: python3.10
+        args: [--profile=black]
   - repo: https://github.com/psf/black
     rev: 24.4.2
     hooks:

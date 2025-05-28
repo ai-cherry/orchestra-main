@@ -5,7 +5,7 @@ version: 2
 updates:
   # Python dependencies
   - package-ecosystem: "pip"
-    directory: "/"
+    directory: "/requirements"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
@@ -40,4 +40,18 @@ updates:
       - "docker"
     commit-message:
       prefix: "docker"
+      include: "scope"
+
+  # Node.js (Admin UI)
+  - package-ecosystem: "npm"
+    directory: "/admin-ui"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "security"
+      - "admin-ui"
+    commit-message:
+      prefix: "deps"
       include: "scope"

@@ -447,38 +447,3 @@ For issues or questions:
 3. Run integration tests
 4. Check this documentation
 5. Review individual server code
-
-## Legacy Deployment Guide
-
-For information about the legacy deployment process, see the sections below:
-
-### Prerequisites (Legacy)
-
-Before deploying the MCP server using legacy scripts, ensure you have:
-
-1. A GCP project with APIs enabled
-2. GitHub organization secrets configured
-3. Docker installed locally
-
-### Legacy Deployment Options
-
-#### Setting Up Powerful Service Accounts
-
-```bash
-./setup_badass_credentials.sh
-```
-
-#### Manual Deployment
-
-```bash
-./deploy_mcp_server.sh [environment]
-```
-
-### Troubleshooting Legacy Issues
-
-For Poetry dependency issues:
-
-1. Update Poetry: `pip install --upgrade poetry`
-2. Clear cache: `poetry cache clear --all pypi`
-3. Rebuild lock: `poetry lock --no-update`
-4. Update deps: `poetry update`
