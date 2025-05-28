@@ -123,7 +123,7 @@ jobs:
         run: |
           pulumi stack select dev --create
           pulumi config set --secret digitalocean:token "$DIGITALOCEAN_TOKEN"
-          # pulumi config set adminUiCustomDomain admin-dev.example.com # Example
+          # dev environment can set custom domain if desired
           pulumi config set env dev
 
       - name: Deploy to Dev with Pulumi
@@ -189,7 +189,7 @@ jobs:
         run: |
           pulumi stack select prod --create
           pulumi config set --secret digitalocean:token "$DIGITALOCEAN_TOKEN"
-          # pulumi config set adminUiCustomDomain admin.example.com # Example
+          pulumi config set adminUiCustomDomain cherry-ai.me
           pulumi config set env prod
 
       - name: Deploy to Production with Pulumi
