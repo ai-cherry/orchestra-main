@@ -48,7 +48,7 @@ httpie>=3.2.4
 locust==2.20.1
 
 # Database Tools
-alembic==1.13.1
+alembic==1.16.1
 pgcli==4.0.1
 
 # Debugging
