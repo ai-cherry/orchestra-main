@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTheme } from '@/context/useTheme';
+import type { Theme } from '@/context/ThemeContext';
 import { Palette, Moon, Sun, AlertTriangle } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useNavigate } from '@tanstack/react-router'; // For navigation

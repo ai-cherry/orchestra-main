@@ -1,93 +1,90 @@
 import PageWrapper from '@/components/layout/PageWrapper';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import StatusIndicator from '@/components/ui/StatusIndicator'; // Ensure this path is correct
-import { Cpu, FolderKanban, MessageSquare, Settings2, Trash2, PlusCircle, Zap } from 'lucide-react'; // Added Zap for a generic integration icon
-import { Link } from '@tanstack/react-router'; // For "Add New Integration" button link
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import StatusIndicator from '@/components/ui/StatusIndicator';
+import { Search, RefreshCw } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
 
-type IntegrationStatus = 'Connected' | 'Disconnected' | 'Needs Attention';
-
-// Mock Data
-const mockIntegrations = [
-  { id: '1', name: 'OpenAI GPT-4', Icon: Cpu, status: 'Connected' as IntegrationStatus, description: 'Advanced language model for content generation and analysis.' },
-  { id: '2', name: 'Google Drive', Icon: FolderKanban, status: 'Disconnected' as IntegrationStatus, description: 'Cloud storage for documents and collaboration.' },
-  { id: '3', name: 'Slack Workspace', Icon: MessageSquare, status: 'Needs Attention' as IntegrationStatus, description: 'Team communication and real-time notifications.' },
-  { id: '4', name: 'Generic API', Icon: Zap, status: 'Connected' as IntegrationStatus, description: 'Connect to a custom third-party API endpoint.' },
+// Dummy data for integrations
+const integrationsData = [
+  { id: '1', name: 'Slack', type: 'Communication', status: 'active', lastSync: '5 minutes ago' },
+  { id: '2', name: 'Google Drive', type: 'Storage', status: 'active', lastSync: '1 hour ago' },
+  { id: '3', name: 'GitHub', type: 'Development', status: 'error', lastSync: '2 days ago' },
+  { id: '4', name: 'Salesforce', type: 'CRM', status: 'idle', lastSync: '3 hours ago' },
+  { id: '5', name: 'Jira', type: 'Project Management', status: 'active', lastSync: '30 minutes ago' },
+  { id: '6', name: 'Zendesk', type: 'Support', status: 'idle', lastSync: '1 day ago' },
+  { id: '7', name: 'Stripe', type: 'Payment', status: 'active', lastSync: '15 minutes ago' },
+  { id: '8', name: 'HubSpot', type: 'Marketing', status: 'error', lastSync: '4 hours ago' },
 ];
 
-// Helper to map integration status text to StatusIndicator's 'status' prop values
-const mapIntegrationStatusToIndicator = (status: IntegrationStatus): string => {
-  switch (status) {
-    case 'Connected': return 'active';       // Maps to green
-    case 'Disconnected': return 'offline';    // Maps to gray
-    case 'Needs Attention': return 'warn';     // Maps to yellow
-    default: return 'offline';               // Default to gray
-  }
-};
-
 export function IntegrationsPage() {
-  // Placeholder for handling actions
-  const handleConfigure = (integrationId: string) => {
-    alert(`Configure action for integration ${integrationId}`);
-    console.log(`Configure action for integration ${integrationId}`);
-  };
-
-  const handleDisconnect = (integrationId: string) => {
-    alert(`Disconnect action for integration ${integrationId}`);
-    console.log(`Disconnect action for integration ${integrationId}`);
-  };
-
   return (
-    <PageWrapper title="Integrations Management">
-      <div className="flex items-center justify-between mb-6">
-        <p className="text-muted-foreground">
-          Connect and manage your third-party service integrations.
-        </p>
-        <Button asChild>
-          <Link to="/integrations/new"> {/* Assuming a route for adding new integrations */}
-            <PlusCircle className="mr-2 h-4 w-4" /> Add New Integration
-          </Link>
-        </Button>
-      </div>
+    <PageWrapper title="Integrations">
+      <div className="flex flex-col space-y-6">
+        {/* Header with search and actions */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative max-w-sm">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search integrations..."
+              className="w-full rounded-md pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
+            />
+          </div>
+          <Button asChild>
+            <Link to="/integrations">
+              <RefreshCw className="mr-2 h-4 w-4" /> Refresh Integrations
+            </Link>
+          </Button>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {mockIntegrations.map((integration) => (
-          <Card key={integration.id} className="flex flex-col justify-between shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <CardHeader>
-              <div className="flex items-start space-x-4 mb-3"> {/* items-start for better alignment with multiline title */}
-                <integration.Icon className="h-10 w-10 text-theme-accent-primary mt-1" /> {/* Slightly larger icon, themed */}
-                <div>
-                  <CardTitle className="text-xl mb-1">{integration.name}</CardTitle>
-                  <StatusIndicator
-                    status={mapIntegrationStatusToIndicator(integration.status)}
-                    text={integration.status}
-                  />
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <CardDescription className="text-sm">{integration.description}</CardDescription>
-            </CardContent>
-            <CardFooter className="flex justify-end space-x-2 pt-4"> {/* Added pt-4 for spacing */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleConfigure(integration.id)}
-                aria-label={`Configure ${integration.name}`}
-              >
-                <Settings2 className="mr-1.5 h-4 w-4" /> Configure
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => handleDisconnect(integration.id)}
-                aria-label={`Disconnect ${integration.name}`}
-              >
-                <Trash2 className="mr-1.5 h-4 w-4" /> Disconnect
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
+        {/* Main content */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Connected Services</CardTitle>
+            <CardDescription>Manage your external service integrations.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Last Sync</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {integrationsData.map((integration) => (
+                  <TableRow key={integration.id}>
+                    <TableCell className="font-medium">{integration.name}</TableCell>
+                    <TableCell>{integration.type}</TableCell>
+                    <TableCell>
+                      <StatusIndicator status={integration.status} />
+                    </TableCell>
+                    <TableCell>{integration.lastSync}</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="sm">Configure</Button>
+                      <Button variant="ghost" size="sm">Sync Now</Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+          <CardFooter className="flex items-center justify-between">
+            <div className="text-xs text-muted-foreground">
+              Showing <strong>{integrationsData.length}</strong> integrations
+            </div>
+            <div className="space-x-2">
+              <Button variant="outline" size="sm" disabled>Previous</Button>
+              <Button variant="outline" size="sm" disabled>Next</Button>
+            </div>
+          </CardFooter>
+        </Card>
       </div>
     </PageWrapper>
   );
