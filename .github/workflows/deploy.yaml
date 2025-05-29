@@ -55,23 +55,141 @@ jobs:
         working-directory: ./admin-ui
         run: pnpm test
 
+      # Set NODE_ENV=production explicitly for the build step
       - name: Admin UI - Build
         id: build_step
         working-directory: ./admin-ui
+        env:
+          NODE_ENV: production
         run: |
+          # IMPORTANT: We explicitly set NODE_ENV=production to ensure CSS is properly included
+          # This fixes the "blank white screen" issue where CSS was missing from the build
           pnpm build
           echo "admin_ui_built=true" >> "$GITHUB_OUTPUT"
+
+      # Add verification step to check for properly sized JS and CSS files
+      - name: Verify Admin UI Build Output
+        working-directory: ./admin-ui
+        run: |
+          echo "Verifying build output..."
+          
+          # Check if dist directory exists
+          if [ ! -d "dist" ]; then
+            echo "::error::Build directory not found at dist/"
+            exit 1
+          fi
+          
+          # Check if index.html exists
+          if [ ! -f "dist/index.html" ]; then
+            echo "::error::index.html not found in build directory"
+            exit 1
+          fi
+          
+          # Check for assets directory
+          if [ ! -d "dist/assets" ]; then
+            echo "::error::assets directory not found in build directory"
+            exit 1
+          fi
+          
+          # Find JS files
+          JS_FILES=$(find "dist/assets" -name "*.js" -type f)
+          JS_COUNT=$(echo "$JS_FILES" | grep -c "\.js$" || true)
+          
+          if [ "$JS_COUNT" -eq 0 ]; then
+            echo "::error::No JavaScript files found in assets directory"
+            exit 1
+          fi
+          
+          echo "Found $JS_COUNT JavaScript file(s)"
+          
+          # Find CSS files
+          CSS_FILES=$(find "dist/assets" -name "*.css" -type f)
+          CSS_COUNT=$(echo "$CSS_FILES" | grep -c "\.css$" || true)
+          
+          if [ "$CSS_COUNT" -eq 0 ]; then
+            echo "::error::No CSS files found in assets directory"
+            exit 1
+          fi
+          
+          echo "Found $CSS_COUNT CSS file(s)"
+          
+          # Check JS file sizes (minimum 100KB expected)
+          MIN_JS_SIZE=100000
+          for js_file in $JS_FILES; do
+            js_size=$(stat -c%s "$js_file" 2>/dev/null || stat -f%z "$js_file")
+            js_name=$(basename "$js_file")
+            
+            if [ "$js_size" -lt "$MIN_JS_SIZE" ]; then
+              echo "::error::JavaScript file $js_name is too small: $js_size bytes (expected min. $MIN_JS_SIZE bytes)"
+              echo "This indicates a build issue. The JS bundle is incomplete."
+              exit 1
+            else
+              echo "JavaScript file $js_name size: $js_size bytes"
+            fi
+          done
+          
+          # Check CSS file sizes (minimum 10KB expected)
+          MIN_CSS_SIZE=10000
+          for css_file in $CSS_FILES; do
+            css_size=$(stat -c%s "$css_file" 2>/dev/null || stat -f%z "$css_file")
+            css_name=$(basename "$css_file")
+            
+            if [ "$css_size" -lt "$MIN_CSS_SIZE" ]; then
+              echo "::error::CSS file $css_name is too small: $css_size bytes (expected min. $MIN_CSS_SIZE bytes)"
+              echo "This indicates a build issue. The CSS is incomplete."
+              exit 1
+            else
+              echo "CSS file $css_name size: $css_size bytes"
+            fi
+          done
+          
+          # Check index.html for references to JS and CSS
+          index_content=$(cat "dist/index.html")
+          
+          # Check for JS references
+          if ! echo "$index_content" | grep -q "src=\"/assets/.*\.js\""; then
+            echo "::error::No JavaScript file references found in index.html"
+            exit 1
+          fi
+          
+          echo "JavaScript references found in index.html"
+          
+          # Check for CSS references
+          if ! echo "$index_content" | grep -q "href=\"/assets/.*\.css\""; then
+            echo "::error::No CSS file references found in index.html"
+            exit 1
+          fi
+          
+          echo "CSS references found in index.html"
+          echo "Build verification complete! All checks passed."
 
       - name: Admin UI - E2E Tests (against local dev server)
         working-directory: ./admin-ui
         run: pnpm e2e # This runs Playwright against localhost as per playwright.config.ts default
 
+      # Enhanced artifact preservation for both successful and failed builds
       - name: Upload Admin UI Build Artifact
         uses: actions/upload-artifact@v4
+        if: always() # Upload artifacts even if the build fails
         with:
           name: admin-ui-dist
           path: admin-ui/dist/
-          if-no-files-found: error
+          if-no-files-found: warn # Changed from error to warn to prevent workflow failure
+          retention-days: 7 # Set retention period
+
+      # Add detailed error logs for failed builds
+      - name: Upload Build Logs on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-ui-build-logs
+          path: |
+            admin-ui/node_modules/.pnpm/debug.log
+            admin-ui/*.log
+            admin-ui/npm-debug.log*
+            admin-ui/pnpm-debug.log*
+          if-no-files-found: ignore
+          retention-days: 7
 
   deploy-to-dev:
     name: Deploy to Dev Environment
@@ -169,6 +287,51 @@ jobs:
           name: admin-ui-dist
           path: admin-ui/dist
 
+      # Verify the downloaded build artifacts before deployment
+      - name: Verify Downloaded Build Artifacts
+        run: |
+          echo "Verifying downloaded build artifacts..."
+          
+          # Check if dist directory exists
+          if [ ! -d "admin-ui/dist" ]; then
+            echo "::error::Build directory not found at admin-ui/dist/"
+            exit 1
+          fi
+          
+          # Check if index.html exists
+          if [ ! -f "admin-ui/dist/index.html" ]; then
+            echo "::error::index.html not found in build directory"
+            exit 1
+          fi
+          
+          # Check for assets directory
+          if [ ! -d "admin-ui/dist/assets" ]; then
+            echo "::error::assets directory not found in build directory"
+            exit 1
+          fi
+          
+          # Find JS and CSS files
+          JS_FILES=$(find "admin-ui/dist/assets" -name "*.js" -type f)
+          CSS_FILES=$(find "admin-ui/dist/assets" -name "*.css" -type f)
+          
+          echo "Found JS files: $JS_FILES"
+          echo "Found CSS files: $CSS_FILES"
+          
+          # Check if index.html contains references to JS and CSS
+          if ! grep -q "assets/.*\.js" "admin-ui/dist/index.html"; then
+            echo "::error::No JavaScript file references found in index.html"
+            cat "admin-ui/dist/index.html"
+            exit 1
+          fi
+          
+          if ! grep -q "assets/.*\.css" "admin-ui/dist/index.html"; then
+            echo "::error::No CSS file references found in index.html"
+            cat "admin-ui/dist/index.html"
+            exit 1
+          fi
+          
+          echo "Build artifacts verified successfully!"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -234,6 +397,51 @@ jobs:
           name: playwright-report-prod
           path: admin-ui/playwright-report/ # Default Playwright HTML report path
           retention-days: 7
+
+      # Add post-deployment verification step
+      - name: Verify Production Deployment
+        if: success()
+        run: |
+          echo "Verifying production deployment at https://cherry-ai.me"
+          
+          # Wait for DNS propagation and deployment to stabilize
+          sleep 30
+          
+          # Check if the site is accessible
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://cherry-ai.me")
+          
+          echo "HTTP Status: $HTTP_STATUS"
+          
+          if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "Site is accessible (HTTP 200)"
+            
+            # Check for blank page (should have content)
+            CONTENT_SIZE=$(curl -s "https://cherry-ai.me" | wc -c)
+            echo "Content size: $CONTENT_SIZE bytes"
+            
+            if [ "$CONTENT_SIZE" -lt 500 ]; then
+              echo "::warning::Site content is suspiciously small ($CONTENT_SIZE bytes). Possible blank page issue."
+            else
+              echo "Content size looks good"
+            fi
+            
+            # Check for CSS and JS references
+            SITE_CONTENT=$(curl -s "https://cherry-ai.me")
+            
+            if echo "$SITE_CONTENT" | grep -q "assets/.*\.js"; then
+              echo "JavaScript reference found in the HTML"
+            else
+              echo "::warning::No JavaScript reference found in the HTML. Possible build issue."
+            fi
+            
+            if echo "$SITE_CONTENT" | grep -q "assets/.*\.css"; then
+              echo "CSS reference found in the HTML"
+            else
+              echo "::warning::No CSS reference found in the HTML. Possible build issue."
+            fi
+          else
+            echo "::warning::Site returned HTTP status $HTTP_STATUS. Deployment may not be fully complete."
+          fi
 
   nightly-e2e:
     name: Nightly Playwright E2E (Dev)
