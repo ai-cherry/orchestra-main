@@ -12,12 +12,8 @@ from typing import Any, Dict, List, Optional
 import aioredis
 
 from core.orchestrator.src.config.loader import get_settings
-from core.orchestrator.src.memory.models import (
-    MemoryEntry,
-    MemorySearchResult,
-    MemoryType,
-)
-from optional_integrations import mongodb, aiplatform  # Optional integrations
+from core.orchestrator.src.memory.models import MemoryEntry, MemorySearchResult, MemoryType
+from optional_integrations import aiplatform, mongodb  # Optional integrations
 
 logger = logging.getLogger(__name__)
 
@@ -51,9 +47,7 @@ class LayeredMemoryManager:
         self.region = settings.gcp_region
 
         # Initialize Redis for short-term memory
-        self.redis_url = (
-            redis_url or f"redis://{settings.redis_host}:{settings.redis_port}"
-        )
+        self.redis_url = redis_url or f"redis://{settings.redis_host}:{settings.redis_port}"
         self.redis_pool = None  # Will be initialized in connect()
 
         # Initialize MongoDB for mid-term and long-term memory
@@ -186,31 +180,23 @@ class LayeredMemoryManager:
 
         # Search short-term memory in Redis
         if MemoryType.SHORT_TERM in memory_types:
-            short_term_results = await self._search_in_redis(
-                query, limit, metadata_filter
-            )
+            short_term_results = await self._search_in_redis(query, limit, metadata_filter)
             results.extend(short_term_results)
 
         # Search mid-term memory in MongoDB
         if MemoryType.MID_TERM in memory_types:
-            mid_term_results = self._search_in_mongodb(
-                query, MemoryType.MID_TERM, limit, metadata_filter
-            )
+            mid_term_results = self._search_in_mongodb(query, MemoryType.MID_TERM, limit, metadata_filter)
             results.extend(mid_term_results)
 
         # Search long-term memory with semantic search
         if MemoryType.LONG_TERM in memory_types:
             # Use vector search if embedding is provided and vector search is initialized
             if embedding and self.vector_search_initialized:
-                long_term_results = await self._search_in_vector_search(
-                    embedding, limit, metadata_filter
-                )
+                long_term_results = await self._search_in_vector_search(embedding, limit, metadata_filter)
                 results.extend(long_term_results)
             else:
                 # Fall back to text search in MongoDB
-                long_term_results = self._search_in_mongodb(
-                    query, MemoryType.LONG_TERM, limit, metadata_filter
-                )
+                long_term_results = self._search_in_mongodb(query, MemoryType.LONG_TERM, limit, metadata_filter)
                 results.extend(long_term_results)
 
         # Sort by relevance score and limit results
@@ -255,9 +241,7 @@ class LayeredMemoryManager:
 
         # Add to conversation's memory set if conversation_id is provided
         if self.conversation_id:
-            await self.redis_pool.sadd(
-                f"conversation:{self.conversation_id}:memories", memory.id
-            )
+            await self.redis_pool.sadd(f"conversation:{self.conversation_id}:memories", memory.id)
 
     async def _retrieve_from_redis(self, memory_id: str) -> Optional[MemoryEntry]:
         """Retrieve a memory from Redis."""
@@ -280,13 +264,9 @@ class LayeredMemoryManager:
 
         # Get all memory IDs for the agent or conversation
         if self.conversation_id:
-            memory_ids = await self.redis_pool.smembers(
-                f"conversation:{self.conversation_id}:memories"
-            )
+            memory_ids = await self.redis_pool.smembers(f"conversation:{self.conversation_id}:memories")
         else:
-            memory_ids = await self.redis_pool.smembers(
-                f"agent:{self.agent_id}:memories"
-            )
+            memory_ids = await self.redis_pool.smembers(f"agent:{self.agent_id}:memories")
 
         # Retrieve each memory and check if it matches the query
         for memory_id in memory_ids:
@@ -295,9 +275,7 @@ class LayeredMemoryManager:
                 continue
 
             # Apply metadata filter if provided
-            if metadata_filter and not self._matches_metadata_filter(
-                memory.metadata, metadata_filter
-            ):
+            if metadata_filter and not self._matches_metadata_filter(memory.metadata, metadata_filter):
                 continue
 
             # Simple text matching (could be improved)
@@ -333,17 +311,13 @@ class LayeredMemoryManager:
 
         # Remove from conversation's memory set if conversation_id is provided
         if self.conversation_id:
-            await self.redis_pool.srem(
-                f"conversation:{self.conversation_id}:memories", memory_id
-            )
+            await self.redis_pool.srem(f"conversation:{self.conversation_id}:memories", memory_id)
 
         return True
 
     # Private methods for MongoDB operations
 
-    def _store_in_mongodb(
-        self, memory: MemoryEntry, ttl_seconds: Optional[int] = None
-    ) -> None:
+    def _store_in_mongodb(self, memory: MemoryEntry, ttl_seconds: Optional[int] = None) -> None:
         """Store a memory in MongoDB with optional TTL."""
         # Convert memory to dict for MongoDB
         memory_dict = memory.model_dump(exclude={"embedding"})
@@ -400,14 +374,10 @@ class LayeredMemoryManager:
 
         # Add conversation_id filter if provided
         if self.conversation_id:
-            mongodb_query = mongodb_query.where(
-                "conversation_id", "==", self.conversation_id
-            )
+            mongodb_query = mongodb_query.where("conversation_id", "==", self.conversation_id)
 
         # Execute query
-        docs = mongodb_query.limit(
-            limit * 2
-        ).stream()  # Get more than needed for filtering
+        docs = mongodb_query.limit(limit * 2).stream()  # Get more than needed for filtering
 
         # Process results
         for doc in docs:
@@ -424,17 +394,13 @@ class LayeredMemoryManager:
                 del memory_data["expiry_time"]
 
             # Apply metadata filter if provided
-            if metadata_filter and not self._matches_metadata_filter(
-                memory_data.get("metadata", {}), metadata_filter
-            ):
+            if metadata_filter and not self._matches_metadata_filter(memory_data.get("metadata", {}), metadata_filter):
                 continue
 
             # Simple text matching (could be improved)
             if query.lower() in memory_data.get("content", "").lower():
                 # Calculate a simple relevance score based on string matching
-                relevance = self._calculate_text_relevance(
-                    query, memory_data.get("content", "")
-                )
+                relevance = self._calculate_text_relevance(query, memory_data.get("content", ""))
 
                 memory = MemoryEntry(**memory_data)
                 results.append(
@@ -488,9 +454,7 @@ class LayeredMemoryManager:
             return []
 
         # Create a MatchingEngineIndexEndpoint client
-        endpoint = aiplatform.MatchingEngineIndexEndpoint(
-            index_endpoint_name=self.vector_index_endpoint
-        )
+        endpoint = aiplatform.MatchingEngineIndexEndpoint(index_endpoint_name=self.vector_index_endpoint)
 
         # Query the index
         response = endpoint.find_neighbors(
@@ -512,9 +476,7 @@ class LayeredMemoryManager:
                 continue
 
             # Apply metadata filter if provided
-            if metadata_filter and not self._matches_metadata_filter(
-                memory.metadata, metadata_filter
-            ):
+            if metadata_filter and not self._matches_metadata_filter(memory.metadata, metadata_filter):
                 continue
 
             # Convert distance to relevance score (1.0 is most relevant)
@@ -545,9 +507,7 @@ class LayeredMemoryManager:
 
     # Utility methods
 
-    def _matches_metadata_filter(
-        self, metadata: Dict[str, Any], metadata_filter: Dict[str, Any]
-    ) -> bool:
+    def _matches_metadata_filter(self, metadata: Dict[str, Any], metadata_filter: Dict[str, Any]) -> bool:
         """Check if metadata matches the filter."""
         for key, value in metadata_filter.items():
             if key not in metadata or metadata[key] != value:

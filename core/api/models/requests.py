@@ -14,12 +14,8 @@ class ConversationRequest(BaseModel):
 
     user_id: str = Field(..., description="User ID")
     message: str = Field(..., description="User message")
-    context: Optional[Dict[str, Any]] = Field(
-        default=None, description="Additional context"
-    )
-    persona_id: Optional[str] = Field(
-        default=None, description="Specific persona to use"
-    )
+    context: Optional[Dict[str, Any]] = Field(default=None, description="Additional context")
+    persona_id: Optional[str] = Field(default=None, description="Specific persona to use")
 
 
 class WorkflowExecutionRequest(BaseModel):
@@ -36,9 +32,7 @@ class AgentMessageRequest(BaseModel):
     agent_id: str = Field(..., description="Target agent ID")
     message: str = Field(..., description="Message content")
     message_type: str = Field(default="text", description="Type of message")
-    metadata: Optional[Dict[str, Any]] = Field(
-        default=None, description="Additional metadata"
-    )
+    metadata: Optional[Dict[str, Any]] = Field(default=None, description="Additional metadata")
 
 
 class AgentTaskRequest(BaseModel):
@@ -55,12 +49,8 @@ class MemoryStoreRequest(BaseModel):
 
     key: str = Field(..., description="Storage key")
     value: Any = Field(..., description="Value to store")
-    metadata: Optional[Dict[str, Any]] = Field(
-        default=None, description="Additional metadata"
-    )
-    ttl_seconds: Optional[int] = Field(
-        default=None, description="Time to live in seconds"
-    )
+    metadata: Optional[Dict[str, Any]] = Field(default=None, description="Additional metadata")
+    ttl_seconds: Optional[int] = Field(default=None, description="Time to live in seconds")
 
 
 class MemorySearchRequest(BaseModel):
@@ -68,12 +58,8 @@ class MemorySearchRequest(BaseModel):
 
     query: str = Field(..., description="Search query")
     limit: int = Field(default=10, ge=1, le=100, description="Maximum results")
-    metadata_filter: Optional[Dict[str, Any]] = Field(
-        default=None, description="Metadata filters"
-    )
-    similarity_threshold: float = Field(
-        default=0.7, ge=0.0, le=1.0, description="Similarity threshold"
-    )
+    metadata_filter: Optional[Dict[str, Any]] = Field(default=None, description="Metadata filters")
+    similarity_threshold: float = Field(default=0.7, ge=0.0, le=1.0, description="Similarity threshold")
 
 
 class PersonaCreateRequest(BaseModel):
@@ -84,12 +70,8 @@ class PersonaCreateRequest(BaseModel):
     description: str = Field(..., description="Persona description")
     traits: List[str] = Field(default_factory=list, description="Persona traits")
     style: str = Field(default="conversational", description="Response style")
-    system_prompt: Optional[str] = Field(
-        default=None, description="Custom system prompt"
-    )
-    temperature: float = Field(
-        default=0.7, ge=0.0, le=2.0, description="LLM temperature"
-    )
+    system_prompt: Optional[str] = Field(default=None, description="Custom system prompt")
+    temperature: float = Field(default=0.7, ge=0.0, le=2.0, description="LLM temperature")
     max_tokens: int = Field(default=2000, ge=1, le=8000, description="Maximum tokens")
 
 
@@ -119,12 +101,6 @@ class ResearchRequest(BaseModel):
     """Request for research task."""
 
     topic: str = Field(..., description="Research topic")
-    depth: str = Field(
-        default="standard", description="Research depth: shallow, standard, deep"
-    )
-    max_sources: int = Field(
-        default=5, ge=1, le=20, description="Maximum sources to consult"
-    )
-    output_format: str = Field(
-        default="detailed", description="Output format: summary, detailed, raw"
-    )
+    depth: str = Field(default="standard", description="Research depth: shallow, standard, deep")
+    max_sources: int = Field(default=5, ge=1, le=20, description="Maximum sources to consult")
+    output_format: str = Field(default="detailed", description="Output format: summary, detailed, raw")

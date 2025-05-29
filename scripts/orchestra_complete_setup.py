@@ -3,11 +3,11 @@
 Orchestra AI Complete Setup - Clean, Configure, and Automate Everything
 """
 
-import shutil
-from pathlib import Path
-import time
-from typing import List
 import json
+import shutil
+import time
+from pathlib import Path
+from typing import List
 
 
 class OrchestraCompleteSetup:
@@ -74,9 +74,7 @@ class OrchestraCompleteSetup:
                     "Workflow manager not available",
                 ),
             ],
-            "mcp_server/demo_memory_sync.py": [
-                ('"roo_workflow_manager",', '# "roo_workflow_manager", # Removed')
-            ],
+            "mcp_server/demo_memory_sync.py": [('"roo_workflow_manager",', '# "roo_workflow_manager", # Removed')],
             "mcp_cli.py": [
                 (
                     "from roo_workflow_manager import MODE_MAP as ROO_MODES",
@@ -123,16 +121,12 @@ class OrchestraCompleteSetup:
         services = {
             "MongoDB Atlas": {
                 "url": "https://www.mongodb.com/cloud/atlas",
-                "vars": {
-                    "MONGODB_URI": "mongodb://localhost:27017/orchestra"  # Local default
-                },
+                "vars": {"MONGODB_URI": "mongodb://localhost:27017/orchestra"},  # Local default
                 "note": "Using local MongoDB for development",
             },
             "DragonflyDB": {
                 "url": "https://aiven.io/dragonfly",
-                "vars": {
-                    "DRAGONFLY_URI": "redis://localhost:6379"  # Local Redis default
-                },
+                "vars": {"DRAGONFLY_URI": "redis://localhost:6379"},  # Local Redis default
                 "note": "Using local Redis for development",
             },
             "Weaviate": {
@@ -539,12 +533,8 @@ echo "✓ Orchestra AI stopped"
             ".mcp.json exists": (self.root_dir / ".mcp.json").exists(),
             "MongoDB configured": bool(self.config.get("MONGODB_URI")),
             "Redis configured": bool(self.config.get("REDIS_HOST")),
-            "No archive directories": not (
-                self.root_dir / "scripts" / "archive"
-            ).exists(),
-            "MCP servers created": (
-                self.root_dir / "mcp_server" / "servers" / "orchestrator_server.py"
-            ).exists(),
+            "No archive directories": not (self.root_dir / "scripts" / "archive").exists(),
+            "MCP servers created": (self.root_dir / "mcp_server" / "servers" / "orchestrator_server.py").exists(),
             "Start script created": (self.root_dir / "start_orchestra.sh").exists(),
         }
 

@@ -7,10 +7,10 @@ Supports async operations, connection pooling, adapter registration, and MCP ser
 Author: Orchestra AI Platform
 """
 
-from typing import Any, Dict, List, Optional, Protocol, Type
-import logging
-import functools
 import asyncio
+import functools
+import logging
+from typing import Any, Dict, List, Optional, Protocol, Type
 
 logger = logging.getLogger("unified_memory")
 
@@ -22,9 +22,7 @@ def log_and_handle_errors(func):
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            logger.error(
-                f"Memory operation failed in {func.__name__}: {e}", exc_info=True
-            )
+            logger.error(f"Memory operation failed in {func.__name__}: {e}", exc_info=True)
             raise
 
     return wrapper
@@ -36,9 +34,7 @@ def async_log_and_handle_errors(func):
         try:
             return await func(*args, **kwargs)
         except Exception as e:
-            logger.error(
-                f"Async memory operation failed in {func.__name__}: {e}", exc_info=True
-            )
+            logger.error(f"Async memory operation failed in {func.__name__}: {e}", exc_info=True)
             raise
 
     return wrapper
@@ -76,9 +72,7 @@ class MemoryAdapterRegistry:
 class MongoDBMemoryAdapter:
     """MongoDB-backed memory adapter with connection pooling."""
 
-    def __init__(
-        self, mongo_uri: str, db_name: str = "orchestra", collection: str = "memory"
-    ):
+    def __init__(self, mongo_uri: str, db_name: str = "orchestra", collection: str = "memory"):
         from pymongo import MongoClient
 
         self.client = MongoClient(mongo_uri, maxPoolSize=10)
@@ -91,9 +85,7 @@ class MongoDBMemoryAdapter:
 
     @log_and_handle_errors
     def set(self, key: str, value: Any) -> None:
-        self.collection.update_one(
-            {"_id": key}, {"$set": {"value": value}}, upsert=True
-        )
+        self.collection.update_one({"_id": key}, {"$set": {"value": value}}, upsert=True)
 
     @log_and_handle_errors
     def delete(self, key: str) -> None:
@@ -101,9 +93,7 @@ class MongoDBMemoryAdapter:
 
     @log_and_handle_errors
     def search(self, query: str, top_k: int = 5) -> List[Any]:
-        results = self.collection.find(
-            {"value": {"$regex": query, "$options": "i"}}
-        ).limit(top_k)
+        results = self.collection.find({"value": {"$regex": query, "$options": "i"}}).limit(top_k)
         return [doc["value"] for doc in results]
 
 
@@ -117,16 +107,12 @@ class WeaviateMemoryAdapter:
     def __init__(self, weaviate_url: str, api_key: str):
         import weaviate
 
-        self.client = weaviate.Client(
-            url=weaviate_url, auth_client_secret=weaviate.AuthApiKey(api_key)
-        )
+        self.client = weaviate.Client(url=weaviate_url, auth_client_secret=weaviate.AuthApiKey(api_key))
 
     @async_log_and_handle_errors
     async def get(self, key: str) -> Optional[Any]:
         loop = asyncio.get_event_loop()
-        res = await loop.run_in_executor(
-            None, lambda: self.client.data_object.get_by_id(key)
-        )
+        res = await loop.run_in_executor(None, lambda: self.client.data_object.get_by_id(key))
         return res["properties"] if res else None
 
     @async_log_and_handle_errors
@@ -134,17 +120,13 @@ class WeaviateMemoryAdapter:
         loop = asyncio.get_event_loop()
         await loop.run_in_executor(
             None,
-            lambda: self.client.data_object.create(
-                data_object=value, class_name="Memory", uuid=key
-            ),
+            lambda: self.client.data_object.create(data_object=value, class_name="Memory", uuid=key),
         )
 
     @async_log_and_handle_errors
     async def delete(self, key: str) -> None:
         loop = asyncio.get_event_loop()
-        await loop.run_in_executor(
-            None, lambda: self.client.data_object.delete(uuid=key, class_name="Memory")
-        )
+        await loop.run_in_executor(None, lambda: self.client.data_object.delete(uuid=key, class_name="Memory"))
 
     @async_log_and_handle_errors
     async def search(self, query: str, top_k: int = 5) -> List[Any]:
@@ -205,9 +187,7 @@ class UnifiedMemoryManager:
         adapter_cls = MemoryAdapterRegistry.get_adapter(backend)
         if not adapter_cls:
             raise ValueError(f"Unsupported memory backend: {backend}")
-        self.adapter = adapter_cls(
-            **{k: v for k, v in config.items() if k != "backend"}
-        )
+        self.adapter = adapter_cls(**{k: v for k, v in config.items() if k != "backend"})
 
     def get(self, key: str) -> Optional[Any]:
         return self.adapter.get(key)
@@ -222,31 +202,23 @@ class UnifiedMemoryManager:
         return self.adapter.search(query, top_k)
 
     async def aget(self, key: str) -> Optional[Any]:
-        if hasattr(self.adapter, "get") and asyncio.iscoroutinefunction(
-            self.adapter.get
-        ):
+        if hasattr(self.adapter, "get") and asyncio.iscoroutinefunction(self.adapter.get):
             return await self.adapter.get(key)
         return self.get(key)
 
     async def aset(self, key: str, value: Any) -> None:
-        if hasattr(self.adapter, "set") and asyncio.iscoroutinefunction(
-            self.adapter.set
-        ):
+        if hasattr(self.adapter, "set") and asyncio.iscoroutinefunction(self.adapter.set):
             await self.adapter.set(key, value)
         else:
             self.set(key, value)
 
     async def adelete(self, key: str) -> None:
-        if hasattr(self.adapter, "delete") and asyncio.iscoroutinefunction(
-            self.adapter.delete
-        ):
+        if hasattr(self.adapter, "delete") and asyncio.iscoroutinefunction(self.adapter.delete):
             await self.adapter.delete(key)
         else:
             self.delete(key)
 
     async def asearch(self, query: str, top_k: int = 5) -> List[Any]:
-        if hasattr(self.adapter, "search") and asyncio.iscoroutinefunction(
-            self.adapter.search
-        ):
+        if hasattr(self.adapter, "search") and asyncio.iscoroutinefunction(self.adapter.search):
             return await self.adapter.search(query, top_k)
         return self.search(query, top_k)

@@ -27,9 +27,7 @@ class TransitionContext(BaseModel):
     )
     source_mode: str = Field(..., description="Slug of the source mode")
     target_mode: str = Field(..., description="Slug of the target mode")
-    operation_id: str = Field(
-        ..., description="ID of the operation this transition is part of"
-    )
+    operation_id: str = Field(..., description="ID of the operation this transition is part of")
     timestamp: float = Field(
         default_factory=time.time,
         description="Timestamp when this transition was created",
@@ -38,12 +36,8 @@ class TransitionContext(BaseModel):
         default_factory=list,
         description="Keys of memory entries related to this transition",
     )
-    metadata: Dict[str, Any] = Field(
-        default_factory=dict, description="Additional metadata for this transition"
-    )
-    completed: bool = Field(
-        default=False, description="Whether this transition has been completed"
-    )
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata for this transition")
+    completed: bool = Field(default=False, description="Whether this transition has been completed")
 
     def add_memory_key(self, key: str) -> None:
         """Add a memory key to track during transition."""
@@ -126,9 +120,7 @@ class ModeTransitionManager:
             context.add_memory_key(memory_key)
             self.active_transitions[context.id] = context
 
-            logger.info(
-                f"Prepared transition {context.id}: {source_mode} -> {target_mode}"
-            )
+            logger.info(f"Prepared transition {context.id}: {source_mode} -> {target_mode}")
             return context
         except Exception as e:
             logger.error(f"Failed to prepare transition: {e}")
@@ -236,9 +228,7 @@ class ModeTransitionManager:
         """
         return list(self.active_transitions.values())
 
-    async def get_transitions_for_operation(
-        self, operation_id: str
-    ) -> List[TransitionContext]:
+    async def get_transitions_for_operation(self, operation_id: str) -> List[TransitionContext]:
         """
         Get all transitions for a specific operation.
 
@@ -249,19 +239,13 @@ class ModeTransitionManager:
             List of transition contexts for the operation
         """
         # First check active transitions
-        transitions = [
-            t
-            for t in self.active_transitions.values()
-            if t.operation_id == operation_id
-        ]
+        transitions = [t for t in self.active_transitions.values() if t.operation_id == operation_id]
 
         # Then search in memory
         try:
             # This would ideally use a more efficient query mechanism
             # For now, we'll just use a simple search
-            results = await self.memory_manager.search(
-                f"transition:.*:{operation_id}", limit=100
-            )
+            results = await self.memory_manager.search(f"transition:.*:{operation_id}", limit=100)
             for result in results:
                 if isinstance(result, dict) and "content" in result:
                     try:

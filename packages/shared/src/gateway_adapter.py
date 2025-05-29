@@ -98,9 +98,7 @@ class PortkeyGatewayAdapter(GatewayAdapter):
             self._initialized = True
             return True
         except ImportError:
-            logger.error(
-                "Failed to import portkey_ai - please install with: pip install portkey-ai"
-            )
+            logger.error("Failed to import portkey_ai - please install with: pip install portkey-ai")
             return False
         except Exception as e:
             logger.error(f"Failed to initialize Portkey gateway: {str(e)}")
@@ -285,9 +283,7 @@ class PortkeyGatewayAdapter(GatewayAdapter):
         self._last_errors[provider_lower].append(now)
 
         # Keep only errors from the last 5 minutes
-        self._last_errors[provider_lower] = [
-            t for t in self._last_errors[provider_lower] if now - t < 300
-        ]  # 5 minutes
+        self._last_errors[provider_lower] = [t for t in self._last_errors[provider_lower] if now - t < 300]  # 5 minutes
 
 
 class KongGatewayAdapter(GatewayAdapter):
@@ -360,9 +356,7 @@ class GatewayAdapterFactory:
         gateway_config = GatewayAdapterFactory._load_config(config_path)
 
         # Get primary provider from config
-        primary_provider = gateway_config.get("llm_gateway", {}).get(
-            "primary_provider", "portkey"
-        )
+        primary_provider = gateway_config.get("llm_gateway", {}).get("primary_provider", "portkey")
 
         # Create adapter based on primary provider
         if primary_provider == "portkey":
@@ -378,13 +372,9 @@ class GatewayAdapterFactory:
         success = await adapter.initialize()
         if not success:
             # Try fallback provider if initialization fails
-            fallback_provider = gateway_config.get("llm_gateway", {}).get(
-                "fallback_provider"
-            )
+            fallback_provider = gateway_config.get("llm_gateway", {}).get("fallback_provider")
             if fallback_provider and fallback_provider != primary_provider:
-                logger.warning(
-                    f"Primary provider {primary_provider} failed, trying fallback: {fallback_provider}"
-                )
+                logger.warning(f"Primary provider {primary_provider} failed, trying fallback: {fallback_provider}")
                 if fallback_provider == "portkey":
                     adapter = PortkeyGatewayAdapter(gateway_config.get("portkey", {}))
                 elif fallback_provider == "kong":
@@ -392,13 +382,9 @@ class GatewayAdapterFactory:
 
                 success = await adapter.initialize()
                 if not success:
-                    raise RuntimeError(
-                        "Failed to initialize both primary and fallback gateways"
-                    )
+                    raise RuntimeError("Failed to initialize both primary and fallback gateways")
             else:
-                raise RuntimeError(
-                    f"Failed to initialize gateway {primary_provider} and no fallback specified"
-                )
+                raise RuntimeError(f"Failed to initialize gateway {primary_provider} and no fallback specified")
 
         return adapter
 
@@ -409,9 +395,7 @@ class GatewayAdapterFactory:
             # Default config path
             config_path = os.environ.get(
                 "LLM_GATEWAY_CONFIG_PATH",
-                str(
-                    Path(__file__).parent.parent / "config" / "llm_gateway_config.yaml"
-                ),
+                str(Path(__file__).parent.parent / "config" / "llm_gateway_config.yaml"),
             )
 
         try:
@@ -431,9 +415,7 @@ class GatewayAdapterFactory:
                     "api_key": os.environ.get("PORTKEY_API_KEY", ""),
                     "virtual_keys": {
                         "openai": os.environ.get("PORTKEY_VIRTUAL_KEY_OPENAI", ""),
-                        "anthropic": os.environ.get(
-                            "PORTKEY_VIRTUAL_KEY_ANTHROPIC", ""
-                        ),
+                        "anthropic": os.environ.get("PORTKEY_VIRTUAL_KEY_ANTHROPIC", ""),
                     },
                     "default_models": {"primary": "openai/gpt-4o"},
                 },
@@ -444,11 +426,7 @@ class GatewayAdapterFactory:
         """Process environment variables in configuration."""
         if isinstance(config, dict):
             for key, value in config.items():
-                if (
-                    isinstance(value, str)
-                    and value.startswith("${")
-                    and value.endswith("}")
-                ):
+                if isinstance(value, str) and value.startswith("${") and value.endswith("}"):
                     # Extract environment variable name
                     env_var = value[2:-1]
                     # Replace with environment variable value or empty string
@@ -466,10 +444,7 @@ class GatewayAdapterFactory:
 
 async def get_gateway_adapter() -> GatewayAdapter:
     """Get gateway adapter singleton."""
-    if (
-        not hasattr(get_gateway_adapter, "_instance")
-        or get_gateway_adapter._instance is None
-    ):
+    if not hasattr(get_gateway_adapter, "_instance") or get_gateway_adapter._instance is None:
         get_gateway_adapter._instance = await GatewayAdapterFactory.create_adapter()
 
     return get_gateway_adapter._instance

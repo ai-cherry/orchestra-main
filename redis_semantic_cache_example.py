@@ -26,15 +26,11 @@ try:
     from langchain_redis.cache import RedisSemanticCache
     from redisvl import SemanticCacher
 
-    from packages.shared.src.memory.redis_semantic_cacher import (
-        RedisSemanticCacheProvider,
-    )
+    from packages.shared.src.memory.redis_semantic_cacher import RedisSemanticCacheProvider
     from packages.shared.src.models.base_models import MemoryItem
 except ImportError as e:
     logger.error(f"Failed to import required libraries: {e}")
-    logger.error(
-        "Please install required packages: pip install redisvl langchain-redis langchain-google-genai"
-    )
+    logger.error("Please install required packages: pip install redisvl langchain-redis langchain-google-genai")
     sys.exit(1)
 
 

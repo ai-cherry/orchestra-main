@@ -103,9 +103,7 @@ class FinalCleanup:
         skip_dirs = {".git", ".mypy_cache", "venv", "__pycache__", "node_modules"}
 
         for file_path in self.root_dir.rglob("*"):
-            if file_path.is_file() and not any(
-                skip in str(file_path) for skip in skip_dirs
-            ):
+            if file_path.is_file() and not any(skip in str(file_path) for skip in skip_dirs):
                 try:
                     content = file_path.read_text(encoding="utf-8")
                     for pattern in self.gcp_patterns:
@@ -182,11 +180,7 @@ class FinalCleanup:
             ".git/",
         ]
 
-        gcp_files = [
-            f
-            for f in gcp_files
-            if not any(pattern in str(f) for pattern in exclude_patterns)
-        ]
+        gcp_files = [f for f in gcp_files if not any(pattern in str(f) for pattern in exclude_patterns)]
 
         if gcp_files:
             print(f"\nFound {len(gcp_files)} files with GCP references:")

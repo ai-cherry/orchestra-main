@@ -20,10 +20,7 @@ from typing import Any, Dict
 # Add parent directories to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from mcp_server.config.dragonfly_config import (
-    log_dragonfly_config,
-    validate_dragonfly_config,
-)
+from mcp_server.config.dragonfly_config import log_dragonfly_config, validate_dragonfly_config
 from mcp_server.memory.base import MemoryEntry, MemoryMetadata
 from mcp_server.memory.dragonfly_cache import DragonflyCache
 
@@ -112,9 +109,7 @@ class DragonflyConnectionTest:
                     "message": "Hello DragonflyDB!",
                     "timestamp": datetime.utcnow().isoformat(),
                 },
-                metadata=MemoryMetadata(
-                    tags=["test", "crud"], source="test_script", ttl_seconds=300
-                ),  # 5 minutes
+                metadata=MemoryMetadata(tags=["test", "crud"], source="test_script", ttl_seconds=300),  # 5 minutes
             )
 
             start = time.time()
@@ -199,9 +194,7 @@ class DragonflyConnectionTest:
             batch_save_time = (time.time() - start) * 1000
 
             success_count = sum(1 for success in save_results.values() if success)
-            print(
-                f"  ✅ Batch save: {success_count}/100 succeeded ({batch_save_time:.2f}ms)"
-            )
+            print(f"  ✅ Batch save: {success_count}/100 succeeded ({batch_save_time:.2f}ms)")
             print(f"     Rate: {(100 / (batch_save_time / 1000)):.0f} ops/sec")
 
             results["batch_save"] = {
@@ -439,8 +432,7 @@ async def main():
 
         # Overall status
         all_passed = all(
-            result.get("status") == "success"
-            or (isinstance(result, dict) and not result.get("error"))
+            result.get("status") == "success" or (isinstance(result, dict) and not result.get("error"))
             for result in results.values()
             if isinstance(result, dict)
         )

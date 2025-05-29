@@ -4,12 +4,13 @@ Integration Tests for MCP Servers
 Tests for MongoDB and Weaviate MCP server connectivity
 """
 
-import pytest
 import os
+
+import pytest
 
 # Mock the MCP module if not available
 try:
-    from scripts.mcp_integration import MCPIntegration, MCPConfig, MCPAgentInterface
+    from scripts.mcp_integration import MCPAgentInterface, MCPConfig, MCPIntegration
 except ImportError:
     pytest.skip("MCP integration module not available", allow_module_level=True)
 
@@ -22,9 +23,7 @@ class TestMCPServers:
         """Create MCP integration instance"""
         config = MCPConfig(
             mongodb_endpoint=os.getenv("MCP_MONGODB_ENDPOINT", "http://localhost:8081"),
-            weaviate_endpoint=os.getenv(
-                "MCP_WEAVIATE_ENDPOINT", "http://localhost:8082"
-            ),
+            weaviate_endpoint=os.getenv("MCP_WEAVIATE_ENDPOINT", "http://localhost:8082"),
             timeout=10,
         )
         mcp = MCPIntegration(config)
@@ -47,9 +46,7 @@ class TestMCPServers:
             await mcp_integration.initialize()
 
             # Test query
-            result = await mcp_integration.query_mongodb(
-                "Show all agents with status active"
-            )
+            result = await mcp_integration.query_mongodb("Show all agents with status active")
 
             assert isinstance(result, dict)
             assert "success" in result
@@ -65,9 +62,7 @@ class TestMCPServers:
             await mcp_integration.initialize()
 
             # Test semantic search
-            result = await mcp_integration.semantic_search(
-                "machine learning optimization techniques"
-            )
+            result = await mcp_integration.semantic_search("machine learning optimization techniques")
 
             assert isinstance(result, dict)
             assert "success" in result
@@ -83,9 +78,7 @@ class TestMCPServers:
             await mcp_integration.initialize()
 
             # Test hybrid query
-            result = await mcp_integration.hybrid_query(
-                "Find active agents similar to research assistant"
-            )
+            result = await mcp_integration.hybrid_query("Find active agents similar to research assistant")
 
             assert isinstance(result, dict)
             assert "success" in result
@@ -100,9 +93,7 @@ class TestMCPServers:
             agent = MCPAgentInterface(mcp_integration)
 
             # Test question answering
-            answer = await agent.answer_question(
-                "Show me all conversations about API integration"
-            )
+            answer = await agent.answer_question("Show me all conversations about API integration")
 
             assert isinstance(answer, str)
             assert len(answer) > 0

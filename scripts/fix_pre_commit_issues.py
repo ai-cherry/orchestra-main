@@ -112,9 +112,7 @@ def main():
     print("Fixing common pre-commit issues...")
 
     # Get list of files with issues from flake8
-    result = subprocess.run(
-        ["flake8", "--select=F401,F541,F841,W605", "."], capture_output=True, text=True
-    )
+    result = subprocess.run(["flake8", "--select=F401,F541,F841,W605", "."], capture_output=True, text=True)
 
     issues = result.stdout.strip().split("\n") if result.stdout else []
 
@@ -152,9 +150,7 @@ def main():
     print("\nRunning black formatter...")
     subprocess.run(["black", "."])
 
-    print(
-        "\nDone! Please review the changes and run 'pre-commit run --all-files' to verify."
-    )
+    print("\nDone! Please review the changes and run 'pre-commit run --all-files' to verify.")
 
 
 if __name__ == "__main__":

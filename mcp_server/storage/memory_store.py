@@ -94,9 +94,7 @@ class MemoryStore:
 
                                 # Check if the memory item has expired
                                 if "expiry" in memory_data:
-                                    expiry_time = datetime.fromisoformat(
-                                        memory_data["expiry"]
-                                    )
+                                    expiry_time = datetime.fromisoformat(memory_data["expiry"])
                                     if expiry_time < datetime.now():
                                         # Memory item has expired, delete it
                                         memory_file.unlink()
@@ -106,9 +104,7 @@ class MemoryStore:
                                         if key in self.memory_cache:
                                             del self.memory_cache[key]
                         except Exception as e:
-                            logger.error(
-                                f"Error checking memory file {memory_file}: {e}"
-                            )
+                            logger.error(f"Error checking memory file {memory_file}: {e}")
                 except Exception as e:
                     logger.error(f"Error in cleanup task: {e}")
 
@@ -116,9 +112,7 @@ class MemoryStore:
         cleanup_thread = threading.Thread(target=cleanup_task, daemon=True)
         cleanup_thread.start()
 
-    def get(
-        self, key: str, scope: str = "session", tool: Optional[str] = None
-    ) -> Optional[Any]:
+    def get(self, key: str, scope: str = "session", tool: Optional[str] = None) -> Optional[Any]:
         """Get a memory item.
 
         Args:
@@ -208,9 +202,7 @@ class MemoryStore:
             logger.error(f"Error writing memory file {memory_file}: {e}")
             return False
 
-    def delete(
-        self, key: str, scope: str = "session", tool: Optional[str] = None
-    ) -> bool:
+    def delete(self, key: str, scope: str = "session", tool: Optional[str] = None) -> bool:
         """Delete a memory item.
 
         Args:
@@ -240,9 +232,7 @@ class MemoryStore:
 
         return True
 
-    def sync(
-        self, key: str, source_tool: str, target_tool: str, scope: str = "session"
-    ) -> bool:
+    def sync(self, key: str, source_tool: str, target_tool: str, scope: str = "session") -> bool:
         """Sync a memory item between tools.
 
         Args:

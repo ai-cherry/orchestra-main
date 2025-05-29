@@ -15,9 +15,7 @@ import logging
 import os
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("portkey-demo")
 
 # Add parent directory to path
@@ -39,9 +37,7 @@ async def run_model(client: PortkeyClient, model: str, prompt: str) -> None:
     ]
 
     try:
-        response = await client.generate_response(
-            model=model, messages=messages, temperature=0.7, max_tokens=150
-        )
+        response = await client.generate_response(model=model, messages=messages, temperature=0.7, max_tokens=150)
 
         logger.info(f"Response from {model}:")
         logger.info(f"{response}\n")
@@ -68,9 +64,7 @@ async def main() -> None:
         available_keys.append(("OpenRouter", "openai/gpt-3.5-turbo"))
 
     if not available_keys:
-        logger.error(
-            "No virtual keys configured. Please set up at least one virtual key in your .env file."
-        )
+        logger.error("No virtual keys configured. Please set up at least one virtual key in your .env file.")
         logger.info("Example: PORTKEY_VIRTUAL_KEY_OPENAI=vk_openai_...")
         return
 
@@ -85,9 +79,7 @@ async def main() -> None:
         return
 
     # Test prompt
-    prompt = (
-        "Explain the concept of virtual keys in API management in a single paragraph."
-    )
+    prompt = "Explain the concept of virtual keys in API management in a single paragraph."
 
     # Run queries against all available models
     for provider, model in available_keys:

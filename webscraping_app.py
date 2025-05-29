@@ -24,9 +24,7 @@ from mcp_server.servers.web_scraping_mcp_server import OrchestraWebScrapingMCPSe
 from web_scraping_ai_agents import WebScrapingOrchestrator
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Initialize FastAPI app
@@ -199,9 +197,7 @@ async def scrape_website(request: ScrapeRequest):
         if request.user_agent:
             kwargs["user_agent"] = request.user_agent
 
-        result = await mcp_server.handle_scrape_website(
-            url=request.url, strategy=request.strategy, **kwargs
-        )
+        result = await mcp_server.handle_scrape_website(url=request.url, strategy=request.strategy, **kwargs)
         return {"result": result}
     except Exception as e:
         logger.error(f"Error in website scraping: {e}")
@@ -215,9 +211,7 @@ async def analyze_content(request: AnalyzeRequest):
         raise HTTPException(status_code=503, detail="MCP server not initialized")
 
     try:
-        result = await mcp_server.handle_analyze_content(
-            content=request.content, analysis_type=request.analysis_type
-        )
+        result = await mcp_server.handle_analyze_content(content=request.content, analysis_type=request.analysis_type)
         return {"result": result}
     except Exception as e:
         logger.error(f"Error in content analysis: {e}")

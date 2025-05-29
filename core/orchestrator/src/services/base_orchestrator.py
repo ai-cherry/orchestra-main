@@ -114,9 +114,7 @@ class BaseOrchestrator(ABC):
 
         # Fall back to synchronous add in executor
         loop = asyncio.get_running_loop()
-        return await loop.run_in_executor(
-            None, self._memory_service.add_memory_item, item
-        )
+        return await loop.run_in_executor(None, self._memory_service.add_memory_item, item)
 
     async def _retrieve_context(
         self, user_id: str, session_id: str, current_input: str, persona: PersonaConfig
@@ -144,10 +142,8 @@ class BaseOrchestrator(ABC):
 
         # Use async version if available to avoid blocking
         if hasattr(self._memory_service, "get_conversation_history_async"):
-            conversation_history = (
-                await self._memory_service.get_conversation_history_async(
-                    user_id=user_id, session_id=session_id, limit=history_limit
-                )
+            conversation_history = await self._memory_service.get_conversation_history_async(
+                user_id=user_id, session_id=session_id, limit=history_limit
             )
         else:
             # Fall back to synchronous version in a thread pool

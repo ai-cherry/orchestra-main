@@ -47,9 +47,7 @@ class Settings(BaseSettings):
     PERSONA_CONFIG_PATH: str = "core/orchestrator/src/config/personas"
 
     # Memory settings
-    MEMORY_PROVIDER: str = (
-        "in_memory"  # For orchestrator's internal/simple memory needs
-    )
+    MEMORY_PROVIDER: str = "in_memory"  # For orchestrator's internal/simple memory needs
     CONVERSATION_HISTORY_LIMIT: int = 10
     MEMORY_CACHE_TTL: int = 3600  # 1 hour default
     REDIS_PASSWORD: Optional[str] = None
@@ -73,9 +71,7 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/api"
 
     # Configure Pydantic to load from .env file
-    model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True
-    )
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True)
 
 
 def load_all_persona_configs(settings_instance: Settings) -> Dict[str, PersonaConfig]:
@@ -129,9 +125,7 @@ def load_all_persona_configs(settings_instance: Settings) -> Dict[str, PersonaCo
 settings = Settings()
 
 # Log that settings have been loaded
-logger.info(
-    f"Loaded configuration for {settings.APP_NAME} in {settings.ENVIRONMENT} environment"
-)
+logger.info(f"Loaded configuration for {settings.APP_NAME} in {settings.ENVIRONMENT} environment")
 
 
 def get_settings() -> Settings:

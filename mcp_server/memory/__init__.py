@@ -7,13 +7,7 @@ This package implements a three-tier memory architecture:
 3. Long-term semantic (Qdrant) - Cold data with vector search capabilities
 """
 
-from .base import (
-    BaseMemory,
-    MemoryEntry,
-    MemoryMetadata,
-    MemorySearchResult,
-    MemoryTier,
-)
+from .base import BaseMemory, MemoryEntry, MemoryMetadata, MemorySearchResult, MemoryTier
 from .dragonfly_cache import DragonflyCache
 from .langchain_memory import LangChainMemoryWrapper
 from .qdrant_semantic import QdrantSemanticMemory

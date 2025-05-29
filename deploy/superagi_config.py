@@ -3,16 +3,15 @@ SuperAGI deployment configuration for DigitalOcean.
 Manages containerized deployment with proper environment setup.
 """
 
-from typing import Dict
-import pulumi
-from pulumi import Config
-import pulumi_digitalocean as do
 import logging
+from typing import Dict
+
+import pulumi
+import pulumi_digitalocean as do
+from pulumi import Config
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -40,17 +39,13 @@ class SuperAGIDeployment:
     def _deploy_container(self) -> None:
         """Deploy SuperAGI container with proper configuration."""
         # Get container registry
-        registry = do.ContainerRegistry(
-            f"{self.name}-registry", subscription_tier_slug="basic"
-        )
+        registry = do.ContainerRegistry(f"{self.name}-registry", subscription_tier_slug="basic")
 
         # Configure container environment
         env_vars = [
             do.AppSpecEnvArgs(key="DB_URL", value=self.config["db_url"]),
             do.AppSpecEnvArgs(key="WEAVIATE_URL", value=self.config["weaviate_url"]),
-            do.AppSpecEnvArgs(
-                key="ENVIRONMENT", value=self.config.get("env", "production")
-            ),
+            do.AppSpecEnvArgs(key="ENVIRONMENT", value=self.config.get("env", "production")),
         ]
 
         # Create container app

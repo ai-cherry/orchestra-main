@@ -46,11 +46,7 @@ class PropertyEnrichmentAgent:
             prop["status"] = "ingested"
 
             # Deduplication: check if property already exists by normalized address
-            existing = (
-                self.db.collection(self.collection)
-                .where("normalized_address", "==", normalized)
-                .get()
-            )
+            existing = self.db.collection(self.collection).where("normalized_address", "==", normalized).get()
             if existing:
                 logger.info(f"Duplicate property found for address: {normalized}")
                 continue
@@ -80,9 +76,7 @@ class PropertyEnrichmentAgent:
             if data.get("status") == "OK" and data["results"]:
                 return data["results"][0]["formatted_address"]
             else:
-                logger.warning(
-                    f"Geocoding failed for address: {address} - {data.get('status')}"
-                )
+                logger.warning(f"Geocoding failed for address: {address} - {data.get('status')}")
                 return None
         except Exception as e:
             logger.error(f"Error normalizing address '{address}': {e}")

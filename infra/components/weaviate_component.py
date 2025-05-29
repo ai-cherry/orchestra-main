@@ -33,9 +33,7 @@ class WeaviateComponent(ComponentResource):
     Provisions Weaviate as a Kubernetes Deployment + Service, with secrets managed via Pulumi config.
     """
 
-    def __init__(
-        self, name: str, config: Dict[str, Any], opts: Optional[ResourceOptions] = None
-    ):
+    def __init__(self, name: str, config: Dict[str, Any], opts: Optional[ResourceOptions] = None):
         super().__init__("orchestra:weaviate:Component", name, None, opts)
 
         self.config = config
@@ -89,9 +87,7 @@ class WeaviateComponent(ComponentResource):
                             k8s.core.v1.ContainerArgs(
                                 name="weaviate",
                                 image="semitechnologies/weaviate:1.24.7",
-                                ports=[
-                                    k8s.core.v1.ContainerPortArgs(container_port=8080)
-                                ],
+                                ports=[k8s.core.v1.ContainerPortArgs(container_port=8080)],
                                 env=[
                                     k8s.core.v1.EnvVarArgs(
                                         name="WEAVIATE_API_KEY",

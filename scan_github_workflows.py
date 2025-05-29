@@ -75,15 +75,10 @@ def scan_action_versions(workflow_data: Dict[str, Any]) -> List[WorkflowIssue]:
                         match = re.match(r"([^@]+)@(v\d+)", action)
                         if match:
                             action_name, version = match.groups()
-                            if (
-                                action_name in latest_versions
-                                and version != latest_versions[action_name]
-                            ):
+                            if action_name in latest_versions and version != latest_versions[action_name]:
                                 issues.append(
                                     WorkflowIssue(
-                                        file_path=Path(
-                                            "unknown"
-                                        ),  # Will be set by caller
+                                        file_path=Path("unknown"),  # Will be set by caller
                                         issue_type="Outdated Action Version",
                                         description=f"Action {action_name} is using version {version} instead of {latest_versions[action_name]}",
                                         suggested_fix=f"Update to: {action_name}@{latest_versions[action_name]}",
@@ -150,9 +145,7 @@ def scan_hardcoded_values(workflow_data: Dict[str, Any]) -> List[WorkflowIssue]:
                                 if isinstance(value, str) and re.search(pattern, value):
                                     issues.append(
                                         WorkflowIssue(
-                                            file_path=Path(
-                                                "unknown"
-                                            ),  # Will be set by caller
+                                            file_path=Path("unknown"),  # Will be set by caller
                                             issue_type="Hardcoded Value",
                                             description=f"Hardcoded {name} in step {i+1} with.{key}: {value}",
                                             suggested_fix=f"Use environment variable: {replacement}",
@@ -195,10 +188,7 @@ def scan_authentication_methods(workflow_data: Dict[str, Any]) -> List[WorkflowI
                             )
 
                     # Check for outdated Workload Identity Federation
-                    if (
-                        "uses" in step
-                        and step["uses"] == "google-github-actions/auth@v1"
-                    ):
+                    if "uses" in step and step["uses"] == "google-github-actions/auth@v1":
                         issues.append(
                             WorkflowIssue(
                                 file_path=Path("unknown"),  # Will be set by caller
@@ -228,17 +218,13 @@ def scan_python_versions(workflow_data: Dict[str, Any]) -> List[WorkflowIssue]:
         for job_name, job_data in workflow_data["jobs"].items():
             if "steps" in job_data:
                 for i, step in enumerate(job_data["steps"]):
-                    if "uses" in step and step["uses"].startswith(
-                        "actions/setup-python@"
-                    ):
+                    if "uses" in step and step["uses"].startswith("actions/setup-python@"):
                         if "with" in step and "python-version" in step["with"]:
                             python_version = step["with"]["python-version"]
                             if python_version != "3.10":
                                 issues.append(
                                     WorkflowIssue(
-                                        file_path=Path(
-                                            "unknown"
-                                        ),  # Will be set by caller
+                                        file_path=Path("unknown"),  # Will be set by caller
                                         issue_type="Inconsistent Python Version",
                                         description=f"Using Python version {python_version} instead of 3.10 in step {i+1}",
                                         suggested_fix="Update to Python 3.10",
@@ -340,9 +326,7 @@ def print_issues(issues: List[WorkflowIssue]) -> None:
 
 def main() -> None:
     """Main function."""
-    parser = argparse.ArgumentParser(
-        description="Scan GitHub workflow files for inconsistencies"
-    )
+    parser = argparse.ArgumentParser(description="Scan GitHub workflow files for inconsistencies")
     parser.add_argument(
         "--path",
         type=str,

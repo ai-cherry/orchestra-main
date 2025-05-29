@@ -16,8 +16,7 @@ from packages.shared.src.llm_client.portkey_client import PortkeyClient
 from packages.shared.src.memory.memory_manager import MemoryManager
 
 # Updated imports to use the current module paths
-from packages.shared.src.models.domain_models import AgentResponse as AgentOutput
-from packages.shared.src.models.domain_models import UserRequest as AgentInput
+from packages.shared.src.models.domain_models import AgentResponse as AgentOutput, UserRequest as AgentInput
 from packages.shared.src.storage.base import ToolRegistry
 
 logger = logging.getLogger(__name__)

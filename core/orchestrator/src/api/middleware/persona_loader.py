@@ -9,10 +9,7 @@ from typing import Dict
 
 from fastapi import Depends, Request
 
-from core.orchestrator.src.config.loader import (
-    force_reload_personas,
-    load_persona_configs,
-)
+from core.orchestrator.src.config.loader import force_reload_personas, load_persona_configs
 from packages.shared.src.models.base_models import PersonaConfig
 
 # Configure logging
@@ -110,9 +107,7 @@ async def get_active_persona(
 
     # Log persona selection result
     if persona_name != active_persona.name.lower():
-        logger.info(
-            f"Using '{active_persona.name}' instead of requested '{persona_name}'"
-        )
+        logger.info(f"Using '{active_persona.name}' instead of requested '{persona_name}'")
     else:
         logger.debug(f"Using requested persona '{persona_name}'")
 

@@ -13,7 +13,6 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
 import aiohttp
-
 from enhanced_vector_memory_system import EnhancedVectorMemorySystem
 
 logger = logging.getLogger(__name__)
@@ -52,9 +51,7 @@ class BaseDataSourceIntegration:
             if self.config.additional_headers:
                 headers.update(self.config.additional_headers)
 
-            self._session = aiohttp.ClientSession(
-                headers=headers, timeout=aiohttp.ClientTimeout(total=30)
-            )
+            self._session = aiohttp.ClientSession(headers=headers, timeout=aiohttp.ClientTimeout(total=30))
         return self._session
 
     async def _rate_limit(self) -> None:
@@ -139,10 +136,7 @@ class GongIntegration(BaseDataSourceIntegration):
                                 "call_id": call.get("id"),
                                 "title": call.get("title"),
                                 "duration": call.get("duration"),
-                                "participants": [
-                                    p.get("emailAddress")
-                                    for p in call.get("participants", [])
-                                ],
+                                "participants": [p.get("emailAddress") for p in call.get("participants", [])],
                                 "date": call.get("actualStart"),
                                 "deal_id": call.get("dealId"),
                             },
@@ -169,9 +163,7 @@ class GongIntegration(BaseDataSourceIntegration):
 
         return count
 
-    async def _sync_insights(
-        self, session: aiohttp.ClientSession, since: datetime
-    ) -> int:
+    async def _sync_insights(self, session: aiohttp.ClientSession, since: datetime) -> int:
         """Sync meeting insights and analytics."""
         # Implementation for Gong insights API
         return 0
@@ -236,9 +228,7 @@ class SalesforceIntegration(BaseDataSourceIntegration):
 
         return synced_count
 
-    async def _sync_accounts(
-        self, session: aiohttp.ClientSession, since: datetime
-    ) -> int:
+    async def _sync_accounts(self, session: aiohttp.ClientSession, since: datetime) -> int:
         """Sync Salesforce accounts."""
         await self._rate_limit()
 
@@ -287,9 +277,7 @@ class SalesforceIntegration(BaseDataSourceIntegration):
 
         return count
 
-    async def _sync_opportunities(
-        self, session: aiohttp.ClientSession, since: datetime
-    ) -> int:
+    async def _sync_opportunities(self, session: aiohttp.ClientSession, since: datetime) -> int:
         """Sync Salesforce opportunities."""
         await self._rate_limit()
 
@@ -339,16 +327,12 @@ class SalesforceIntegration(BaseDataSourceIntegration):
 
         return count
 
-    async def _sync_contacts(
-        self, session: aiohttp.ClientSession, since: datetime
-    ) -> int:
+    async def _sync_contacts(self, session: aiohttp.ClientSession, since: datetime) -> int:
         """Sync Salesforce contacts."""
         # Similar implementation to accounts
         return 0
 
-    async def _sync_activities(
-        self, session: aiohttp.ClientSession, since: datetime
-    ) -> int:
+    async def _sync_activities(self, session: aiohttp.ClientSession, since: datetime) -> int:
         """Sync Salesforce activities (tasks, events)."""
         # Implementation for activities
         return 0
@@ -375,9 +359,7 @@ class HubSpotIntegration(BaseDataSourceIntegration):
 
         return synced_count
 
-    async def _sync_contacts(
-        self, session: aiohttp.ClientSession, headers: Dict[str, str], since: datetime
-    ) -> int:
+    async def _sync_contacts(self, session: aiohttp.ClientSession, headers: Dict[str, str], since: datetime) -> int:
         """Sync HubSpot contacts."""
         await self._rate_limit()
 
@@ -422,16 +404,12 @@ class HubSpotIntegration(BaseDataSourceIntegration):
 
         return count
 
-    async def _sync_companies(
-        self, session: aiohttp.ClientSession, headers: Dict[str, str], since: datetime
-    ) -> int:
+    async def _sync_companies(self, session: aiohttp.ClientSession, headers: Dict[str, str], since: datetime) -> int:
         """Sync HubSpot companies."""
         # Similar implementation to contacts
         return 0
 
-    async def _sync_deals(
-        self, session: aiohttp.ClientSession, headers: Dict[str, str], since: datetime
-    ) -> int:
+    async def _sync_deals(self, session: aiohttp.ClientSession, headers: Dict[str, str], since: datetime) -> int:
         """Sync HubSpot deals."""
         # Similar implementation to contacts
         return 0
@@ -454,15 +432,11 @@ class SlackIntegration(BaseDataSourceIntegration):
         channels = await self._get_channels(session, headers)
 
         for channel in channels:
-            synced_count += await self._sync_channel_messages(
-                session, headers, channel, since
-            )
+            synced_count += await self._sync_channel_messages(session, headers, channel, since)
 
         return synced_count
 
-    async def _get_channels(
-        self, session: aiohttp.ClientSession, headers: Dict[str, str]
-    ) -> List[Dict[str, Any]]:
+    async def _get_channels(self, session: aiohttp.ClientSession, headers: Dict[str, str]) -> List[Dict[str, Any]]:
         """Get list of Slack channels."""
         await self._rate_limit()
 
@@ -666,15 +640,11 @@ class DataAggregationOrchestrator:
         self.user_id = user_id
         self.integrations: Dict[str, BaseDataSourceIntegration] = {}
 
-    def add_integration(
-        self, name: str, integration: BaseDataSourceIntegration
-    ) -> None:
+    def add_integration(self, name: str, integration: BaseDataSourceIntegration) -> None:
         """Add a data source integration."""
         self.integrations[name] = integration
 
-    async def sync_all_sources(
-        self, since: Optional[datetime] = None
-    ) -> Dict[str, int]:
+    async def sync_all_sources(self, since: Optional[datetime] = None) -> Dict[str, int]:
         """Sync data from all configured sources."""
         results = {}
 
@@ -692,9 +662,7 @@ class DataAggregationOrchestrator:
 
         return results
 
-    async def setup_default_integrations(
-        self, configs: Dict[str, DataSourceConfig]
-    ) -> None:
+    async def setup_default_integrations(self, configs: Dict[str, DataSourceConfig]) -> None:
         """Set up all default integrations."""
         if "gong" in configs:
             self.add_integration(
@@ -705,17 +673,13 @@ class DataAggregationOrchestrator:
         if "salesforce" in configs:
             self.add_integration(
                 "salesforce",
-                SalesforceIntegration(
-                    configs["salesforce"], self.memory_system, self.user_id
-                ),
+                SalesforceIntegration(configs["salesforce"], self.memory_system, self.user_id),
             )
 
         if "hubspot" in configs:
             self.add_integration(
                 "hubspot",
-                HubSpotIntegration(
-                    configs["hubspot"], self.memory_system, self.user_id
-                ),
+                HubSpotIntegration(configs["hubspot"], self.memory_system, self.user_id),
             )
 
         if "slack" in configs:

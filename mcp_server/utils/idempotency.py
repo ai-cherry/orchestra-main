@@ -189,18 +189,12 @@ class InMemoryIdempotencyStore:
         now = time.time()
 
         # Clean up expired results
-        expired_keys = [
-            key
-            for key, entry in self.store.items()
-            if entry["timestamp"] + self.ttl_seconds <= now
-        ]
+        expired_keys = [key for key, entry in self.store.items() if entry["timestamp"] + self.ttl_seconds <= now]
         for key in expired_keys:
             del self.store[key]
 
         # Clean up expired in-progress markers
-        expired_markers = [
-            key for key, timestamp in self.in_progress.items() if timestamp + 300 <= now
-        ]
+        expired_markers = [key for key, timestamp in self.in_progress.items() if timestamp + 300 <= now]
         for key in expired_markers:
             del self.in_progress[key]
 
@@ -222,9 +216,7 @@ class RedisIdempotencyStore:
             prefix: Prefix for Redis keys
         """
         if not HAS_REDIS:
-            raise ImportError(
-                "Redis package not installed. Install with 'pip install redis'"
-            )
+            raise ImportError("Redis package not installed. Install with 'pip install redis'")
 
         self.redis = redis_client
         self.ttl_seconds = ttl_seconds
@@ -260,9 +252,7 @@ class RedisIdempotencyStore:
         """
         try:
             result_json = json.dumps(result)
-            await self.redis.set(
-                f"{self.prefix}{key}", result_json, ex=self.ttl_seconds
-            )
+            await self.redis.set(f"{self.prefix}{key}", result_json, ex=self.ttl_seconds)
 
             # Clear in-progress marker
             await self.clear_in_progress(key)
@@ -343,9 +333,7 @@ class IdempotencyManager:
             ImportError: If Redis is not installed
         """
         if not HAS_REDIS:
-            raise ImportError(
-                "Redis package not installed. Install with 'pip install redis'"
-            )
+            raise ImportError("Redis package not installed. Install with 'pip install redis'")
 
         redis_client = redis.from_url(
             redis_url,
@@ -358,9 +346,7 @@ class IdempotencyManager:
         store = RedisIdempotencyStore(redis_client, ttl_seconds, prefix)
         return IdempotencyManager(store, ttl_seconds)
 
-    async def execute_idempotent(
-        self, key: str, func: Callable[..., Awaitable[R]], *args: Any, **kwargs: Any
-    ) -> R:
+    async def execute_idempotent(self, key: str, func: Callable[..., Awaitable[R]], *args: Any, **kwargs: Any) -> R:
         """Execute a function idempotently.
 
         Args:
@@ -463,9 +449,7 @@ def idempotent(
                     # Generate from arguments
                     idempotency_key = IdempotencyKey.from_args(*args, **kwargs)
 
-            return await idempotency_manager.execute_idempotent(
-                idempotency_key, func, *args, **kwargs
-            )
+            return await idempotency_manager.execute_idempotent(idempotency_key, func, *args, **kwargs)
 
         return wrapper
 
@@ -499,13 +483,9 @@ def configure_idempotency(
     global _default_manager
 
     if redis_url and HAS_REDIS:
-        _default_manager = IdempotencyManager.create_with_redis(
-            redis_url, ttl_seconds, prefix
-        )
+        _default_manager = IdempotencyManager.create_with_redis(redis_url, ttl_seconds, prefix)
     else:
-        _default_manager = IdempotencyManager(
-            InMemoryIdempotencyStore(ttl_seconds), ttl_seconds
-        )
+        _default_manager = IdempotencyManager(InMemoryIdempotencyStore(ttl_seconds), ttl_seconds)
 
     logger.info(f"Configured idempotency manager with TTL: {ttl_seconds} seconds")
 

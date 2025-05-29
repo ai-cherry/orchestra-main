@@ -54,15 +54,11 @@ class ConversationService:
     def __init__(self):
         """Initialize the conversation service."""
         self._event_bus = get_event_bus()
-        self._memory_manager = (
-            get_memory_manager()
-        )  # Updated to use the new memory manager
+        self._memory_manager = get_memory_manager()  # Updated to use the new memory manager
         self._active_conversations = {}  # user_id -> ConversationState
         logger.info("ConversationService initialized")
 
-    async def start_conversation(
-        self, user_id: str, persona_name: Optional[str] = None
-    ) -> str:
+    async def start_conversation(self, user_id: str, persona_name: Optional[str] = None) -> str:
         """
         Start a new conversation session.
 
@@ -118,9 +114,7 @@ class ConversationService:
 
         return session_id
 
-    async def end_conversation(
-        self, user_id: str, session_id: Optional[str] = None
-    ) -> bool:
+    async def end_conversation(self, user_id: str, session_id: Optional[str] = None) -> bool:
         """
         End an active conversation session.
 
@@ -152,9 +146,7 @@ class ConversationService:
                 "persona_name": conversation.persona_active,
                 "session_id": conversation.session_id,
                 "timestamp": datetime.utcnow().isoformat(),
-                "duration_seconds": (
-                    datetime.utcnow() - conversation.start_time
-                ).total_seconds(),
+                "duration_seconds": (datetime.utcnow() - conversation.start_time).total_seconds(),
                 "turn_count": conversation.turn_count,
                 "success_status": True,  # Added field to indicate normal conversation end
             },

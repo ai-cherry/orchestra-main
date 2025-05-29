@@ -11,14 +11,7 @@ from typing import Any, Dict, List, Optional
 
 from core.business.llm.provider import LLMRequest, get_llm_service
 from core.business.personas.base import PersonaTrait, ResponseStyle, get_persona_manager
-from core.services.agents.base import (
-    Agent,
-    AgentCapability,
-    AgentConfig,
-    AgentMessage,
-    get_agent_manager,
-)
-
+from core.services.agents.base import Agent, AgentCapability, AgentConfig, AgentMessage, get_agent_manager
 
 logger = logging.getLogger(__name__)
 
@@ -54,9 +47,7 @@ class ConversationalAgent(Agent):
             )
 
         # Generate response
-        response = await llm_service.complete_with_persona(
-            prompt=message.content, persona=persona
-        )
+        response = await llm_service.complete_with_persona(prompt=message.content, persona=persona)
 
         # Remember the conversation
         await self.remember(
@@ -148,9 +139,7 @@ class TaskExecutorAgent(Agent):
         elif task_type == "analysis":
             # Use LLM for analysis
             llm_service = get_llm_service()
-            request = LLMRequest(
-                prompt=f"Analyze the following: {task}", max_tokens=500
-            )
+            request = LLMRequest(prompt=f"Analyze the following: {task}", max_tokens=500)
             response = await llm_service.complete(request)
             return {"analysis": response.text}
 
@@ -217,9 +206,7 @@ class ResearchAgent(Agent):
         # Synthesize results
         synthesis_request = LLMRequest(
             prompt=f"Synthesize the following research findings about '{topic}':\n\n"
-            + "\n\n".join(
-                [f"Query: {r['query']}\nFindings: {r['findings']}" for r in results]
-            ),
+            + "\n\n".join([f"Query: {r['query']}\nFindings: {r['findings']}" for r in results]),
             max_tokens=1500,
             temperature=0.5,
         )
@@ -297,9 +284,7 @@ class CollaborativeAgent(Agent):
         # Could analyze pending tasks and suggest collaborations
         pass
 
-    async def _coordinate_task(
-        self, task: str, context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _coordinate_task(self, task: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """Coordinate task execution across multiple agents."""
         agent_manager = get_agent_manager()
 

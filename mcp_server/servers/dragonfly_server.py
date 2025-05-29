@@ -131,9 +131,7 @@ async def get_redis_client() -> redis.Redis:
         # Test connection
         try:
             await redis_client.ping()
-            logger.info(
-                f"Connected to DragonflyDB at {DRAGONFLY_HOST}:{DRAGONFLY_PORT}"
-            )
+            logger.info(f"Connected to DragonflyDB at {DRAGONFLY_HOST}:{DRAGONFLY_PORT}")
         except Exception as e:
             logger.error(f"Failed to connect to DragonflyDB: {e}")
             redis_client = None
@@ -473,9 +471,7 @@ async def list_push(request: ListOperationRequest) -> Dict[str, Any]:
         client = await get_redis_client()
 
         # Serialize values
-        values = [
-            json.dumps(v) if not isinstance(v, str) else v for v in request.values
-        ]
+        values = [json.dumps(v) if not isinstance(v, str) else v for v in request.values]
 
         # Push left or right
         left = request.__dict__.get("left", False)
@@ -571,9 +567,7 @@ async def set_add(request: SetOperationRequest) -> Dict[str, Any]:
         client = await get_redis_client()
 
         # Serialize members
-        members = [
-            json.dumps(m) if not isinstance(m, str) else m for m in request.members
-        ]
+        members = [json.dumps(m) if not isinstance(m, str) else m for m in request.members]
 
         added = await client.sadd(request.key, *members)
 
@@ -595,9 +589,7 @@ async def set_remove(request: SetOperationRequest) -> Dict[str, Any]:
         client = await get_redis_client()
 
         # Serialize members
-        members = [
-            json.dumps(m) if not isinstance(m, str) else m for m in request.members
-        ]
+        members = [json.dumps(m) if not isinstance(m, str) else m for m in request.members]
 
         removed = await client.srem(request.key, *members)
 
@@ -719,11 +711,7 @@ async def hash_delete(request: HashOperationRequest) -> Dict[str, Any]:
     try:
         client = await get_redis_client()
 
-        fields = (
-            request.fields
-            if isinstance(request.fields, list)
-            else list(request.fields.keys())
-        )
+        fields = request.fields if isinstance(request.fields, list) else list(request.fields.keys())
         deleted = await client.hdel(request.key, *fields)
 
         return {
@@ -754,9 +742,7 @@ async def get_info() -> Dict[str, Any]:
             "memory": {
                 "used_memory_human": info.get("used_memory_human", "0B"),
                 "used_memory_peak_human": info.get("used_memory_peak_human", "0B"),
-                "total_system_memory_human": info.get(
-                    "total_system_memory_human", "0B"
-                ),
+                "total_system_memory_human": info.get("total_system_memory_human", "0B"),
             },
             "stats": {
                 "connected_clients": info.get("connected_clients", 0),

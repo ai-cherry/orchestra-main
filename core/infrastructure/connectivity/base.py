@@ -12,13 +12,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Callable, Dict, Optional, TypeVar
 
-from tenacity import (
-    retry,
-    stop_after_attempt,
-    wait_exponential,
-    retry_if_exception_type,
-)
-
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 logger = logging.getLogger(__name__)
 T = TypeVar("T")
@@ -193,9 +187,7 @@ class ServiceRegistry:
             try:
                 results[name] = await service.health_check()
             except Exception as e:
-                results[name] = ServiceHealth(
-                    status=ServiceStatus.UNKNOWN, error=str(e)
-                )
+                results[name] = ServiceHealth(status=ServiceStatus.UNKNOWN, error=str(e))
 
         # Check pools
         for pool_name, pool in self._pools.items():
@@ -203,8 +195,6 @@ class ServiceRegistry:
                 try:
                     results[f"{pool_name}[{i}]"] = await conn.health_check()
                 except Exception as e:
-                    results[f"{pool_name}[{i}]"] = ServiceHealth(
-                        status=ServiceStatus.UNKNOWN, error=str(e)
-                    )
+                    results[f"{pool_name}[{i}]"] = ServiceHealth(status=ServiceStatus.UNKNOWN, error=str(e))
 
         return results

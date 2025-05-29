@@ -15,10 +15,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from ..interfaces.memory_manager import IMemoryManager
 from ..interfaces.storage import IMemoryStorage
 from ..interfaces.tool_adapter import IToolAdapter
-from ..models.memory import (
-    CompressionLevel,
-    MemoryEntry,
-)
+from ..models.memory import CompressionLevel, MemoryEntry
 
 logger = logging.getLogger(__name__)
 
@@ -125,41 +122,31 @@ class MemoryCompressionEngine:
                     paragraphs = entry.content.split("\n\n")
                     if len(paragraphs) > 2:
                         compressed_entry.content = (
-                            paragraphs[0]
-                            + "\n\n... [highly compressed] ...\n\n"
-                            + paragraphs[-1]
+                            paragraphs[0] + "\n\n... [highly compressed] ...\n\n" + paragraphs[-1]
                         )
 
             elif entry.compression_level == CompressionLevel.EXTREME:
                 # Extreme compression: keep only first paragraph
                 if len(entry.content) > 100:
                     paragraphs = entry.content.split("\n\n")
-                    compressed_entry.content = (
-                        paragraphs[0] + " ... [extremely compressed]"
-                    )
+                    compressed_entry.content = paragraphs[0] + " ... [extremely compressed]"
 
             elif entry.compression_level == CompressionLevel.REFERENCE_ONLY:
                 # Reference only: keep only a reference to the original content
-                compressed_entry.content = (
-                    f"[Reference: memory with hash {entry.metadata.content_hash}]"
-                )
+                compressed_entry.content = f"[Reference: memory with hash {entry.metadata.content_hash}]"
 
         elif isinstance(entry.content, dict):
             if entry.compression_level == CompressionLevel.LIGHT:
                 # For dictionaries, keep only key fields
                 important_keys = set(list(entry.content.keys())[:5])
-                compressed_entry.content = {
-                    k: v for k, v in entry.content.items() if k in important_keys
-                }
+                compressed_entry.content = {k: v for k, v in entry.content.items() if k in important_keys}
                 if len(entry.content) > len(compressed_entry.content):
                     compressed_entry.content["_compressed"] = True
 
             elif entry.compression_level == CompressionLevel.MEDIUM:
                 # Keep only 3 key fields
                 important_keys = set(list(entry.content.keys())[:3])
-                compressed_entry.content = {
-                    k: v for k, v in entry.content.items() if k in important_keys
-                }
+                compressed_entry.content = {k: v for k, v in entry.content.items() if k in important_keys}
                 compressed_entry.content["_compressed"] = True
 
             elif entry.compression_level in [
@@ -223,9 +210,7 @@ class StandardMemoryManager(IMemoryManager):
         self.tools[tool_name] = adapter
         logger.info(f"Registered tool adapter: {tool_name}")
 
-    async def create_memory(
-        self, key: str, entry: MemoryEntry, source_tool: str
-    ) -> bool:
+    async def create_memory(self, key: str, entry: MemoryEntry, source_tool: str) -> bool:
         """Create a new memory entry."""
         if not self.initialized:
             logger.error("Memory manager not initialized")
@@ -248,20 +233,12 @@ class StandardMemoryManager(IMemoryManager):
                 if tool_name != source_tool:
                     try:
                         # Compress if necessary for the target tool
-                        compressed_entry = await self._compress_for_tool(
-                            entry, tool_name
-                        )
-                        sync_success = await adapter.sync_create(
-                            key, compressed_entry or entry
-                        )
+                        compressed_entry = await self._compress_for_tool(entry, tool_name)
+                        sync_success = await adapter.sync_create(key, compressed_entry or entry)
                         if not sync_success:
-                            logger.warning(
-                                f"Failed to sync memory entry {key} to tool {tool_name}"
-                            )
+                            logger.warning(f"Failed to sync memory entry {key} to tool {tool_name}")
                     except Exception as e:
-                        logger.error(
-                            f"Error syncing memory entry {key} to tool {tool_name}: {e}"
-                        )
+                        logger.error(f"Error syncing memory entry {key} to tool {tool_name}: {e}")
 
         logger.info(f"Created memory entry: {key} from {source_tool}")
         return True
@@ -294,9 +271,7 @@ class StandardMemoryManager(IMemoryManager):
         logger.debug(f"Retrieved memory entry: {key} for {tool}")
         return entry
 
-    async def update_memory(
-        self, key: str, entry: MemoryEntry, source_tool: str
-    ) -> bool:
+    async def update_memory(self, key: str, entry: MemoryEntry, source_tool: str) -> bool:
         """Update an existing memory entry."""
         if not self.initialized:
             logger.error("Memory manager not initialized")
@@ -327,20 +302,12 @@ class StandardMemoryManager(IMemoryManager):
                 if tool_name != source_tool:
                     try:
                         # Compress if necessary for the target tool
-                        compressed_entry = await self._compress_for_tool(
-                            entry, tool_name
-                        )
-                        sync_success = await adapter.sync_update(
-                            key, compressed_entry or entry
-                        )
+                        compressed_entry = await self._compress_for_tool(entry, tool_name)
+                        sync_success = await adapter.sync_update(key, compressed_entry or entry)
                         if not sync_success:
-                            logger.warning(
-                                f"Failed to sync updated memory entry {key} to tool {tool_name}"
-                            )
+                            logger.warning(f"Failed to sync updated memory entry {key} to tool {tool_name}")
                     except Exception as e:
-                        logger.error(
-                            f"Error syncing updated memory entry {key} to tool {tool_name}: {e}"
-                        )
+                        logger.error(f"Error syncing updated memory entry {key} to tool {tool_name}: {e}")
 
         logger.info(f"Updated memory entry: {key} from {source_tool}")
         return True
@@ -370,20 +337,14 @@ class StandardMemoryManager(IMemoryManager):
                     try:
                         sync_success = await adapter.sync_delete(key)
                         if not sync_success:
-                            logger.warning(
-                                f"Failed to sync deletion of memory entry {key} to tool {tool_name}"
-                            )
+                            logger.warning(f"Failed to sync deletion of memory entry {key} to tool {tool_name}")
                     except Exception as e:
-                        logger.error(
-                            f"Error syncing deletion of memory entry {key} to tool {tool_name}: {e}"
-                        )
+                        logger.error(f"Error syncing deletion of memory entry {key} to tool {tool_name}: {e}")
 
         logger.info(f"Deleted memory entry: {key} from {source_tool}")
         return True
 
-    async def search_memory(
-        self, query: str, tool: str, limit: int = 10
-    ) -> List[Tuple[str, MemoryEntry, float]]:
+    async def search_memory(self, query: str, tool: str, limit: int = 10) -> List[Tuple[str, MemoryEntry, float]]:
         """Search for memory entries for a specific tool."""
         if not self.initialized:
             logger.error("Memory manager not initialized")
@@ -406,14 +367,10 @@ class StandardMemoryManager(IMemoryManager):
                     compressed_results.append((key, entry, score))
             search_results = compressed_results
 
-        logger.info(
-            f"Search for '{query}' found {len(search_results)} results for {tool}"
-        )
+        logger.info(f"Search for '{query}' found {len(search_results)} results for {tool}")
         return search_results
 
-    async def optimize_context_window(
-        self, tool: str, required_keys: Optional[List[str]] = None
-    ) -> int:
+    async def optimize_context_window(self, tool: str, required_keys: Optional[List[str]] = None) -> int:
         """Optimize the context window for a specific tool."""
         if not self.initialized:
             logger.error("Memory manager not initialized")
@@ -437,15 +394,11 @@ class StandardMemoryManager(IMemoryManager):
                     entry = await self.storage.get(key)
                     if entry and not entry.is_expired():
                         entries.append((key, entry))
-                        token_estimate = self.token_budget_manager.estimate_tokens(
-                            entry
-                        )
+                        token_estimate = self.token_budget_manager.estimate_tokens(entry)
                         available_budget -= token_estimate
 
         # Get other entries within budget
-        other_keys = [
-            k for k in all_keys if required_keys is None or k not in required_keys
-        ]
+        other_keys = [k for k in all_keys if required_keys is None or k not in required_keys]
 
         # Sort by priority and relevance
         other_entries = []
@@ -454,9 +407,7 @@ class StandardMemoryManager(IMemoryManager):
             if entry and not entry.is_expired():
                 other_entries.append((key, entry))
 
-        other_entries.sort(
-            key=lambda x: (x[1].priority, x[1].metadata.context_relevance), reverse=True
-        )
+        other_entries.sort(key=lambda x: (x[1].priority, x[1].metadata.context_relevance), reverse=True)
 
         # Add entries until budget is exhausted
         optimized_entries = entries
@@ -472,16 +423,12 @@ class StandardMemoryManager(IMemoryManager):
                 # Try to compress
                 compressed_entry = await self._compress_for_tool(entry, tool)
                 if compressed_entry:
-                    compressed_tokens = self.token_budget_manager.estimate_tokens(
-                        compressed_entry
-                    )
+                    compressed_tokens = self.token_budget_manager.estimate_tokens(compressed_entry)
                     if compressed_tokens <= available_budget:
                         optimized_entries.append((key, compressed_entry))
                         available_budget -= compressed_tokens
 
-        logger.info(
-            f"Optimized context window for {tool}: {len(optimized_entries)} entries"
-        )
+        logger.info(f"Optimized context window for {tool}: {len(optimized_entries)} entries")
         return len(optimized_entries)
 
     async def get_memory_status(self) -> Dict[str, Any]:
@@ -527,9 +474,7 @@ class StandardMemoryManager(IMemoryManager):
             type_counts[mem_type] = type_counts.get(mem_type, 0) + 1
 
         return {
-            "status": (
-                "healthy" if storage_health.get("status") == "healthy" else "unhealthy"
-            ),
+            "status": ("healthy" if storage_health.get("status") == "healthy" else "unhealthy"),
             "entry_count": entry_count,
             "tool_counts": tool_counts,
             "scope_counts": scope_counts,
@@ -538,9 +483,7 @@ class StandardMemoryManager(IMemoryManager):
             "tools": tool_status,
         }
 
-    async def _compress_for_tool(
-        self, entry: MemoryEntry, tool: str
-    ) -> Optional[MemoryEntry]:
+    async def _compress_for_tool(self, entry: MemoryEntry, tool: str) -> Optional[MemoryEntry]:
         """Compress an entry to fit in a tool's context window."""
         if tool not in self.tools:
             return None
@@ -566,7 +509,5 @@ class StandardMemoryManager(IMemoryManager):
                 return compressed_entry
 
         # If we can't compress enough, return None
-        logger.warning(
-            f"Unable to compress entry enough to fit in tool's context window: {tool}"
-        )
+        logger.warning(f"Unable to compress entry enough to fit in tool's context window: {tool}")
         return None

@@ -106,9 +106,7 @@ async def get_cost_breakdown(
         start_time = end_time - timedelta(days=days)
 
         # Get monitoring summary
-        summary = llm_client.get_monitoring_summary(
-            start_time=start_time, end_time=end_time
-        )
+        summary = llm_client.get_monitoring_summary(start_time=start_time, end_time=end_time)
 
         # Get detailed metrics for cost breakdown
         metrics = llm_client.monitor.metrics
@@ -126,15 +124,11 @@ async def get_cost_breakdown(
 
             # By user
             if metric.user_id:
-                cost_by_user[metric.user_id] = (
-                    cost_by_user.get(metric.user_id, 0.0) + metric.cost_usd
-                )
+                cost_by_user[metric.user_id] = cost_by_user.get(metric.user_id, 0.0) + metric.cost_usd
 
             # By session
             if metric.session_id:
-                cost_by_session[metric.session_id] = (
-                    cost_by_session.get(metric.session_id, 0.0) + metric.cost_usd
-                )
+                cost_by_session[metric.session_id] = cost_by_session.get(metric.session_id, 0.0) + metric.cost_usd
 
         return CostBreakdownResponse(
             total_cost_usd=summary["total_cost_usd"],
@@ -172,9 +166,7 @@ async def export_monitoring_data(
         start_time = end_time - timedelta(hours=hours)
 
         # Export data
-        exported_data = llm_client.export_monitoring_data(
-            format=format, start_time=start_time, end_time=end_time
-        )
+        exported_data = llm_client.export_monitoring_data(format=format, start_time=start_time, end_time=end_time)
 
         if format == "csv":
             return {

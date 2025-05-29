@@ -9,23 +9,12 @@ import asyncio
 import logging
 import time
 from enum import Enum
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    TypeVar,
-)
+from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar
 
 from pydantic import BaseModel
 
 from core.orchestrator.src.memory.interface import MemoryInterface
-from core.orchestrator.src.memory.retrieval.parallel_retriever import (
-    ParallelMemoryRetriever,
-    SearchResult,
-)
+from core.orchestrator.src.memory.retrieval.parallel_retriever import ParallelMemoryRetriever, SearchResult
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -154,9 +143,7 @@ class HybridSearchEngine:
         keyword_task = self._execute_keyword_search(query, limit * 2, layers)
         semantic_task = self._execute_semantic_search(query, limit * 2, layers)
 
-        keyword_results, semantic_results = await asyncio.gather(
-            keyword_task, semantic_task, return_exceptions=True
-        )
+        keyword_results, semantic_results = await asyncio.gather(keyword_task, semantic_task, return_exceptions=True)
 
         # Handle exceptions
         if isinstance(keyword_results, Exception):
@@ -168,12 +155,8 @@ class HybridSearchEngine:
             semantic_results = []
 
         # Apply minimum scores
-        keyword_results = [
-            r for r in keyword_results if r.score >= self.config.min_keyword_score
-        ]
-        semantic_results = [
-            r for r in semantic_results if r.score >= self.config.min_semantic_score
-        ]
+        keyword_results = [r for r in keyword_results if r.score >= self.config.min_keyword_score]
+        semantic_results = [r for r in semantic_results if r.score >= self.config.min_semantic_score]
 
         # Combine results using the configured fusion method
         if self.config.fusion_method == "reciprocal_rank_fusion":
@@ -199,9 +182,7 @@ class HybridSearchEngine:
 
         return limited_results
 
-    async def _execute_keyword_search(
-        self, query: str, limit: int, layers: Optional[List[str]]
-    ) -> List[SearchResult]:
+    async def _execute_keyword_search(self, query: str, limit: int, layers: Optional[List[str]]) -> List[SearchResult]:
         """
         Execute keyword-based search.
 
@@ -245,17 +226,13 @@ class HybridSearchEngine:
 
             return results
         except asyncio.TimeoutError:
-            logger.warning(
-                f"Keyword search timed out after {self.config.keyword_timeout}s"
-            )
+            logger.warning(f"Keyword search timed out after {self.config.keyword_timeout}s")
             return []
         except Exception as e:
             logger.error(f"Error in keyword search: {e}")
             return []
 
-    async def _execute_semantic_search(
-        self, query: str, limit: int, layers: Optional[List[str]]
-    ) -> List[SearchResult]:
+    async def _execute_semantic_search(self, query: str, limit: int, layers: Optional[List[str]]) -> List[SearchResult]:
         """
         Execute semantic search.
 
@@ -279,9 +256,7 @@ class HybridSearchEngine:
 
             return results
         except asyncio.TimeoutError:
-            logger.warning(
-                f"Semantic search timed out after {self.config.semantic_timeout}s"
-            )
+            logger.warning(f"Semantic search timed out after {self.config.semantic_timeout}s")
             return []
         except Exception as e:
             logger.error(f"Error in semantic search: {e}")
@@ -474,19 +449,13 @@ class HybridSearchEngine:
 
         # Count matches for each type
         factual_count = sum(1 for indicator in factual_indicators if indicator in query)
-        conceptual_count = sum(
-            1 for indicator in conceptual_indicators if indicator in query
-        )
-        conversational_count = sum(
-            1 for indicator in conversational_indicators if indicator in query
-        )
+        conceptual_count = sum(1 for indicator in conceptual_indicators if indicator in query)
+        conversational_count = sum(1 for indicator in conversational_indicators if indicator in query)
 
         # Determine the type with the most matches
         if factual_count > conceptual_count and factual_count > conversational_count:
             return QueryType.FACTUAL
-        elif (
-            conceptual_count > factual_count and conceptual_count > conversational_count
-        ):
+        elif conceptual_count > factual_count and conceptual_count > conversational_count:
             return QueryType.CONCEPTUAL
         elif conversational_count > 0:
             return QueryType.CONVERSATIONAL

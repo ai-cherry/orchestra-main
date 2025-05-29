@@ -1,13 +1,14 @@
-import pytest
-from unittest.mock import MagicMock, patch, AsyncMock
-from fastapi.testclient import TestClient
 from io import BytesIO
+from unittest.mock import AsyncMock, MagicMock, patch
 
-# Import the FastAPI app instance
-from core.orchestrator.src.main import app
+import pytest
+from fastapi.testclient import TestClient
 
 # Models for mocking return types if necessary
 from core.orchestrator.src.llm.litellm_client import LLMEmbeddingResponse, LLMUsage
+
+# Import the FastAPI app instance
+from core.orchestrator.src.main import app
 
 # Test client for the FastAPI app
 client = TestClient(app)
@@ -75,19 +76,13 @@ def test_upload_csv_success(
 
     assert response.status_code == 200
     json_response = response.json()
-    assert (
-        json_response["message"]
-        == "File processed and ingested successfully to Firestore and Weaviate"
-    )
+    assert json_response["message"] == "File processed and ingested successfully to Firestore and Weaviate"
     assert json_response["filename"] == "test.csv"
 
     mock_litellm_client_instance.get_embedding.assert_called()
     assert mock_litellm_client_instance.get_embedding.call_count == 2
 
-    if (
-        hasattr(mock_memory_service, "add_memory_items_async")
-        and mock_memory_service.add_memory_items_async.called
-    ):
+    if hasattr(mock_memory_service, "add_memory_items_async") and mock_memory_service.add_memory_items_async.called:
         mock_memory_service.add_memory_items_async.assert_called_once()
     else:
         assert mock_memory_service.add_memory_item_async.call_count == 2
@@ -124,17 +119,11 @@ def test_upload_jsonl_success(
 
     assert response.status_code == 200
     json_response = response.json()
-    assert (
-        json_response["message"]
-        == "File processed and ingested successfully to Firestore and Weaviate"
-    )
+    assert json_response["message"] == "File processed and ingested successfully to Firestore and Weaviate"
     assert json_response["filename"] == "test.jsonl"
 
     assert mock_litellm_client_instance.get_embedding.call_count == 2
-    if (
-        hasattr(mock_memory_service, "add_memory_items_async")
-        and mock_memory_service.add_memory_items_async.called
-    ):
+    if hasattr(mock_memory_service, "add_memory_items_async") and mock_memory_service.add_memory_items_async.called:
         mock_memory_service.add_memory_items_async.assert_called_once()
     else:
         assert mock_memory_service.add_memory_item_async.call_count == 2
@@ -169,17 +158,11 @@ def test_upload_json_success(
 
     assert response.status_code == 200
     json_response = response.json()
-    assert (
-        json_response["message"]
-        == "File processed and ingested successfully to Firestore and Weaviate"
-    )
+    assert json_response["message"] == "File processed and ingested successfully to Firestore and Weaviate"
     assert json_response["filename"] == "test.json"
 
     assert mock_litellm_client_instance.get_embedding.call_count == 2
-    if (
-        hasattr(mock_memory_service, "add_memory_items_async")
-        and mock_memory_service.add_memory_items_async.called
-    ):
+    if hasattr(mock_memory_service, "add_memory_items_async") and mock_memory_service.add_memory_items_async.called:
         mock_memory_service.add_memory_items_async.assert_called_once()
     else:
         assert mock_memory_service.add_memory_item_async.call_count == 2
@@ -239,9 +222,7 @@ def test_upload_embedding_error(
     mock_litellm_client_constructor.return_value = mock_litellm_client_instance
     mock_weaviate_adapter_constructor.return_value = mock_weaviate_adapter_instance
 
-    mock_litellm_client_instance.get_embedding.side_effect = Exception(
-        "Embedding API Error"
-    )
+    mock_litellm_client_instance.get_embedding.side_effect = Exception("Embedding API Error")
 
     csv_content = "header1,header2\nvalue1,value2"
     file_bytes = BytesIO(csv_content.encode("utf-8"))
@@ -282,13 +263,9 @@ def test_upload_memory_service_store_error(
     mock_weaviate_adapter_constructor.return_value = mock_weaviate_adapter_instance
 
     if hasattr(mock_memory_service, "add_memory_items_async"):
-        mock_memory_service.add_memory_items_async.side_effect = Exception(
-            "Firestore Error"
-        )
+        mock_memory_service.add_memory_items_async.side_effect = Exception("Firestore Error")
     else:
-        mock_memory_service.add_memory_item_async.side_effect = Exception(
-            "Firestore Error"
-        )
+        mock_memory_service.add_memory_item_async.side_effect = Exception("Firestore Error")
 
     csv_content = "header1,header2\nvalue1,value2"
     file_bytes = BytesIO(csv_content.encode("utf-8"))
@@ -300,10 +277,7 @@ def test_upload_memory_service_store_error(
 
     assert response.status_code == 500
     json_response = response.json()
-    assert (
-        "Could not store processed data to Firestore: Firestore Error"
-        in json_response["detail"]
-    )
+    assert "Could not store processed data to Firestore: Firestore Error" in json_response["detail"]
 
     mock_weaviate_adapter_instance.batch_upsert.assert_not_called()
 
@@ -326,9 +300,7 @@ def test_upload_weaviate_store_error(
     mock_litellm_client_constructor.return_value = mock_litellm_client_instance
     mock_weaviate_adapter_constructor.return_value = mock_weaviate_adapter_instance
 
-    mock_weaviate_adapter_instance.batch_upsert.side_effect = Exception(
-        "Weaviate Error"
-    )
+    mock_weaviate_adapter_instance.batch_upsert.side_effect = Exception("Weaviate Error")
 
     csv_content = "header1,header2\nvalue1,value2"
     file_bytes = BytesIO(csv_content.encode("utf-8"))
@@ -341,23 +313,15 @@ def test_upload_weaviate_store_error(
 
         assert response.status_code == 200
         json_response = response.json()
-        assert (
-            json_response["message"]
-            == "File processed and ingested successfully to Firestore and Weaviate"
-        )
+        assert json_response["message"] == "File processed and ingested successfully to Firestore and Weaviate"
 
-        if (
-            hasattr(mock_memory_service, "add_memory_items_async")
-            and mock_memory_service.add_memory_items_async.called
-        ):
+        if hasattr(mock_memory_service, "add_memory_items_async") and mock_memory_service.add_memory_items_async.called:
             mock_memory_service.add_memory_items_async.assert_called_once()
         else:
             mock_memory_service.add_memory_item_async.assert_called()
 
         mock_weaviate_adapter_instance.batch_upsert.assert_called_once()
-        mock_logger.error.assert_any_call(
-            "Error adding batch to Weaviate for test.csv: Weaviate Error", exc_info=True
-        )
+        mock_logger.error.assert_any_call("Error adding batch to Weaviate for test.csv: Weaviate Error", exc_info=True)
 
 
 @patch("core.orchestrator.src.api.endpoints.resources.shutil.copyfileobj")
@@ -419,14 +383,10 @@ def test_upload_no_filename(
 
     file_bytes = BytesIO(b"content")
 
-    response = client.post(
-        "/api/resources/upload", files={"uploaded_file": ("", file_bytes, "text/csv")}
-    )
+    response = client.post("/api/resources/upload", files={"uploaded_file": ("", file_bytes, "text/csv")})
     assert response.status_code == 400
     assert response.json()["detail"] == "No filename provided."
 
-    response = client.post(
-        "/api/resources/upload", files={"uploaded_file": (None, file_bytes, "text/csv")}
-    )
+    response = client.post("/api/resources/upload", files={"uploaded_file": (None, file_bytes, "text/csv")})
     assert response.status_code == 400
     assert response.json()["detail"] == "No filename provided."

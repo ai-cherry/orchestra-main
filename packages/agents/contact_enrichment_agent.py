@@ -60,9 +60,7 @@ class ContactEnrichmentAgent:
         if not contacts:
             contacts = self.search_contacts_phantombuster(company["company_name"])
         if not contacts:
-            contacts = self.scrape_contacts_browser_use(
-                company["company_name"], company.get("website")
-            )
+            contacts = self.scrape_contacts_browser_use(company["company_name"], company.get("website"))
 
         validated_contacts = self.validate_contacts_claude(contacts)
         if validated_contacts:
@@ -72,9 +70,7 @@ class ContactEnrichmentAgent:
                     "contact_enrichment_status": "enriched",
                 }
             )
-            logger.info(
-                f"Enriched company {company_doc_id} with {len(validated_contacts)} contacts."
-            )
+            logger.info(f"Enriched company {company_doc_id} with {len(validated_contacts)} contacts.")
         else:
             doc_ref.update({"contact_enrichment_status": "not_found"})
             logger.warning(f"No valid contacts found for company: {company_doc_id}")
@@ -129,9 +125,7 @@ class ContactEnrichmentAgent:
             logger.error(f"PhantomBuster contact search failed for {company_name}: {e}")
             return None
 
-    def scrape_contacts_browser_use(
-        self, company_name: str, website: Optional[str]
-    ) -> Optional[List[Dict]]:
+    def scrape_contacts_browser_use(self, company_name: str, website: Optional[str]) -> Optional[List[Dict]]:
         """
         Uses Browser Use automation to scrape executive contacts from LinkedIn or company website.
 
@@ -144,9 +138,7 @@ class ContactEnrichmentAgent:
         """
         payload = {"company_name": company_name, "website": website}
         try:
-            response = requests.post(
-                self.browser_use_endpoint, json=payload, timeout=60
-            )
+            response = requests.post(self.browser_use_endpoint, json=payload, timeout=60)
             response.raise_for_status()
             data = response.json()
             return data.get("contacts")
@@ -154,9 +146,7 @@ class ContactEnrichmentAgent:
             logger.error(f"Browser Use scraping failed for {company_name}: {e}")
             return None
 
-    def validate_contacts_claude(
-        self, contacts: Optional[List[Dict]]
-    ) -> Optional[List[Dict]]:
+    def validate_contacts_claude(self, contacts: Optional[List[Dict]]) -> Optional[List[Dict]]:
         """
         Uses Claude Max to validate and deduplicate contacts.
 

@@ -14,10 +14,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from core.orchestrator.src.api.dependencies.llm import get_llm_client
-from core.orchestrator.src.api.dependencies.memory import (
-    get_memory_manager,
-    get_memory_service,
-)
+from core.orchestrator.src.api.dependencies.memory import get_memory_manager, get_memory_service
 from core.orchestrator.src.config.settings import get_settings
 from core.orchestrator.src.services.interaction_service import InteractionService
 from packages.shared.src.llm_client.interface import LLMClient
@@ -64,9 +61,7 @@ async def get_interaction_service(
     memory_service = await get_memory_service()
 
     # Use the primary model if available, otherwise fall back to the legacy model setting
-    model_to_use = getattr(
-        settings, "DEFAULT_LLM_MODEL_PRIMARY", settings.DEFAULT_LLM_MODEL
-    )
+    model_to_use = getattr(settings, "DEFAULT_LLM_MODEL_PRIMARY", settings.DEFAULT_LLM_MODEL)
 
     # Create and return the interaction service
     return InteractionService(
@@ -110,11 +105,7 @@ async def interact(
         persona_config = request.state.active_persona
 
         # Extract session ID and request ID from request state if available
-        session_id = (
-            str(request.state.session_id)
-            if hasattr(request.state, "session_id")
-            else None
-        )
+        session_id = str(request.state.session_id) if hasattr(request.state, "session_id") else None
         request_id = getattr(request.state, "request_id", None)
 
         # Delegate to the interaction service
@@ -138,9 +129,5 @@ async def interact(
                 "endpoint_path": "interaction_endpoint_placeholder",
             },
         )
-        logger.warning(
-            "Interaction processing failure may impact user experience or conversation continuity."
-        )
-        raise HTTPException(
-            status_code=500, detail=f"Failed to process interaction: {str(e)}"
-        )
+        logger.warning("Interaction processing failure may impact user experience or conversation continuity.")
+        raise HTTPException(status_code=500, detail=f"Failed to process interaction: {str(e)}")

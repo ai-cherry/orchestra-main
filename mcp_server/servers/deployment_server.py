@@ -10,7 +10,7 @@ from typing import Any, Dict, List  # Removed , Optional
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
-from mcp.types import Tool, TextContent
+from mcp.types import TextContent, Tool
 
 # from .base_mcp_server import BaseMCPServer, MCPServerConfig # Removed
 

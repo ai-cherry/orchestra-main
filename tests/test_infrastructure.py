@@ -2,16 +2,13 @@
 Test infrastructure components.
 """
 
-import pytest
 from unittest.mock import AsyncMock, patch
 
-from core.infrastructure.config.settings import Settings, Environment
-from core.infrastructure.connectivity.base import (
-    ServiceRegistry,
-    ServiceHealth,
-    ServiceStatus,
-)
-from core.services.events.event_bus import EventBus, Event, EventPriority
+import pytest
+
+from core.infrastructure.config.settings import Environment, Settings
+from core.infrastructure.connectivity.base import ServiceHealth, ServiceRegistry, ServiceStatus
+from core.services.events.event_bus import Event, EventBus, EventPriority
 
 
 class TestConfiguration:
@@ -65,9 +62,7 @@ class TestServiceRegistry:
 
         # Create mock service
         mock_service = AsyncMock()
-        mock_service.health_check.return_value = ServiceHealth(
-            status=ServiceStatus.HEALTHY, latency_ms=10.0
-        )
+        mock_service.health_check.return_value = ServiceHealth(status=ServiceStatus.HEALTHY, latency_ms=10.0)
 
         # Register service
         registry.register_service("test_service", mock_service)
@@ -142,15 +137,9 @@ class TestEventBus:
         async def low_priority_handler(event: Event):
             execution_order.append("low")
 
-        event_bus.subscribe(
-            "test.event", low_priority_handler, priority=EventPriority.LOW
-        )
-        event_bus.subscribe(
-            "test.event", high_priority_handler, priority=EventPriority.HIGH
-        )
-        event_bus.subscribe(
-            "test.event", normal_priority_handler, priority=EventPriority.NORMAL
-        )
+        event_bus.subscribe("test.event", low_priority_handler, priority=EventPriority.LOW)
+        event_bus.subscribe("test.event", high_priority_handler, priority=EventPriority.HIGH)
+        event_bus.subscribe("test.event", normal_priority_handler, priority=EventPriority.NORMAL)
 
         # Publish event
         await event_bus.publish("test.event", {})

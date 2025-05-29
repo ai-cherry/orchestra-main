@@ -8,10 +8,10 @@ Provides natural language query interfaces for MongoDB and Weaviate
 import asyncio
 import json
 import logging
-from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
-from mcp import MCPClient, Tool
+from typing import Any, Dict, List, Optional
 
+from mcp import MCPClient, Tool
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -42,15 +42,11 @@ class MCPIntegration:
         """Initialize MCP clients"""
         try:
             # Initialize MongoDB MCP client
-            self.mongodb_client = MCPClient(
-                server_url=self.config.mongodb_endpoint, timeout=self.config.timeout
-            )
+            self.mongodb_client = MCPClient(server_url=self.config.mongodb_endpoint, timeout=self.config.timeout)
             await self.mongodb_client.connect()
 
             # Initialize Weaviate MCP client
-            self.weaviate_client = MCPClient(
-                server_url=self.config.weaviate_endpoint, timeout=self.config.timeout
-            )
+            self.weaviate_client = MCPClient(server_url=self.config.weaviate_endpoint, timeout=self.config.timeout)
             await self.weaviate_client.connect()
 
             self._initialized = True
@@ -229,9 +225,7 @@ class MCPAgentInterface:
         keywords_structured = ["count", "list", "show", "find", "get", "filter"]
 
         use_semantic = any(keyword in question.lower() for keyword in keywords_semantic)
-        use_structured = any(
-            keyword in question.lower() for keyword in keywords_structured
-        )
+        use_structured = any(keyword in question.lower() for keyword in keywords_structured)
 
         results = []
 
@@ -239,22 +233,16 @@ class MCPAgentInterface:
             # Default to semantic search for open-ended questions
             semantic_result = await self.mcp.semantic_search(question)
             if semantic_result["success"]:
-                results.append(
-                    f"Found {semantic_result['total']} semantically similar results"
-                )
+                results.append(f"Found {semantic_result['total']} semantically similar results")
                 for idx, result in enumerate(semantic_result["results"][:3]):
-                    results.append(
-                        f"{idx+1}. {result.get('title', 'Untitled')}: {result.get('summary', '')}"
-                    )
+                    results.append(f"{idx+1}. {result.get('title', 'Untitled')}: {result.get('summary', '')}")
 
         if use_structured:
             # Use MongoDB for structured queries
             mongodb_result = await self.mcp.query_mongodb(question)
             if mongodb_result["success"]:
                 results.append(f"\nFound {mongodb_result['count']} matching documents")
-                results.append(
-                    f"Query interpretation: {mongodb_result['query_interpretation']}"
-                )
+                results.append(f"Query interpretation: {mongodb_result['query_interpretation']}")
                 for doc in mongodb_result["data"][:3]:
                     results.append(f"- {json.dumps(doc, indent=2)}")
 

@@ -57,16 +57,12 @@ class CloudProvider(ABC):
         self.config = config
 
     @abstractmethod
-    def create_compute_instance(
-        self, name: str, image: str, user_data: Optional[str] = None
-    ) -> Output[str]:
+    def create_compute_instance(self, name: str, image: str, user_data: Optional[str] = None) -> Output[str]:
         """Create a compute instance and return its IP address."""
         pass
 
     @abstractmethod
-    def create_managed_database(
-        self, name: str, engine: str, version: str
-    ) -> Output[Dict[str, Any]]:
+    def create_managed_database(self, name: str, engine: str, version: str) -> Output[Dict[str, Any]]:
         """Create a managed database and return connection info."""
         pass
 

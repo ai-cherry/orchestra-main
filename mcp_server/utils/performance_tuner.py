@@ -96,14 +96,10 @@ class PerformanceTuner:
 
         if "MAX_CONCURRENT_REQUESTS" in os.environ:
             try:
-                self.max_concurrent_requests = int(
-                    os.environ["MAX_CONCURRENT_REQUESTS"]
-                )
+                self.max_concurrent_requests = int(os.environ["MAX_CONCURRENT_REQUESTS"])
                 self.request_semaphore = asyncio.Semaphore(self.max_concurrent_requests)
             except (ValueError, TypeError):
-                logger.warning(
-                    f"Invalid MAX_CONCURRENT_REQUESTS: {os.environ['MAX_CONCURRENT_REQUESTS']}"
-                )
+                logger.warning(f"Invalid MAX_CONCURRENT_REQUESTS: {os.environ['MAX_CONCURRENT_REQUESTS']}")
 
     def _start_monitoring(self) -> None:
         """Start a background thread to monitor resource usage."""
@@ -113,12 +109,8 @@ class PerformanceTuner:
                 try:
                     # Update metrics
                     process = psutil.Process(os.getpid())
-                    self.metrics["memory_usage"] = process.memory_info().rss / (
-                        1024 * 1024
-                    )  # MB
-                    self.metrics["cpu_usage"] = (
-                        process.cpu_percent() / psutil.cpu_count()
-                    )
+                    self.metrics["memory_usage"] = process.memory_info().rss / (1024 * 1024)  # MB
+                    self.metrics["cpu_usage"] = process.cpu_percent() / psutil.cpu_count()
 
                     # Check if memory usage exceeds limit
                     if self.metrics["memory_usage"] > self.memory_limit_mb * 0.9:
@@ -242,15 +234,11 @@ class PerformanceTuner:
             # Update metrics
             self.metrics["request_count"] += 1
             self._total_response_time += elapsed_time
-            self.metrics["average_response_time"] = (
-                self._total_response_time / self.metrics["request_count"]
-            )
+            self.metrics["average_response_time"] = self._total_response_time / self.metrics["request_count"]
 
             # Log slow operations
             if elapsed_time > 1.0:
-                logger.warning(
-                    f"Slow operation: {func.__name__} took {elapsed_time:.2f} seconds"
-                )
+                logger.warning(f"Slow operation: {func.__name__} took {elapsed_time:.2f} seconds")
 
             return result
 
@@ -268,15 +256,11 @@ class PerformanceTuner:
             # Update metrics
             self.metrics["request_count"] += 1
             self._total_response_time += elapsed_time
-            self.metrics["average_response_time"] = (
-                self._total_response_time / self.metrics["request_count"]
-            )
+            self.metrics["average_response_time"] = self._total_response_time / self.metrics["request_count"]
 
             # Log slow operations
             if elapsed_time > 1.0:
-                logger.warning(
-                    f"Slow operation: {func.__name__} took {elapsed_time:.2f} seconds"
-                )
+                logger.warning(f"Slow operation: {func.__name__} took {elapsed_time:.2f} seconds")
 
             return result
 
@@ -311,17 +295,13 @@ class PerformanceTuner:
         memory_usage_percent = self.metrics["memory_usage"] / self.memory_limit_mb
         if memory_usage_percent > 0.8:
             # Reduce batch size proportionally to memory pressure
-            reduction_factor = (
-                1 - (memory_usage_percent - 0.8) * 5
-            )  # Scale from 1.0 to 0.0
+            reduction_factor = 1 - (memory_usage_percent - 0.8) * 5  # Scale from 1.0 to 0.0
             batch_size = max(1, int(batch_size * reduction_factor))
 
         # Reduce batch size if CPU usage is high
         if self.metrics["cpu_usage"] > 80:
             # Reduce batch size proportionally to CPU pressure
-            reduction_factor = (
-                1 - (self.metrics["cpu_usage"] - 80) / 20
-            )  # Scale from 1.0 to 0.0
+            reduction_factor = 1 - (self.metrics["cpu_usage"] - 80) / 20  # Scale from 1.0 to 0.0
             batch_size = max(1, int(batch_size * reduction_factor))
 
         # Ensure batch size is not larger than data size

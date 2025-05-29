@@ -12,11 +12,7 @@ from core.orchestrator.src.agents.agent_base import Agent, AgentContext, AgentRe
 from core.orchestrator.src.agents.message_handler_mixin import MessageHandlerMixin
 from core.orchestrator.src.protocols.agent_protocol import (
     AgentQuery,
-)
-from core.orchestrator.src.protocols.agent_protocol import (
     AgentResponse as ProtocolResponse,
-)
-from core.orchestrator.src.protocols.agent_protocol import (
     MessageType,
     create_protocol_message,
 )
@@ -122,9 +118,7 @@ class MessagingAgent(Agent, MessageHandlerMixin):
         query_content = AgentQuery(query=query, context=context or {})
 
         # Create protocol message
-        message_dict = create_protocol_message(
-            sender=sender_id, recipient=recipient_id, content=query_content
-        )
+        message_dict = create_protocol_message(sender=sender_id, recipient=recipient_id, content=query_content)
 
         # Convert to AgentMessage
         message = AgentMessage(**message_dict)
@@ -157,9 +151,7 @@ class MessagingAgent(Agent, MessageHandlerMixin):
 
             # Create protocol message
             response_dict = create_protocol_message(
-                sender=self.config.get(
-                    "agent_id", f"{self.__class__.__name__}_{id(self)}"
-                ),
+                sender=self.config.get("agent_id", f"{self.__class__.__name__}_{id(self)}"),
                 recipient=message.sender_id,
                 content=response_content,
                 correlation_id=message.message_id,

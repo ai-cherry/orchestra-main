@@ -3,9 +3,9 @@ Cache tool implementations using Redis/DragonflyDB
 """
 
 import os
-import redis
 from typing import Optional
 
+import redis
 
 # Initialize Redis client
 redis_client = redis.Redis(

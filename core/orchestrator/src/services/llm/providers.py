@@ -27,11 +27,7 @@ from openai import (
     InternalServerError,
     RateLimitError,
 )
-from tenacity import (
-    retry,
-    stop_after_attempt,
-    wait_exponential,
-)
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 try:
     from portkey_ai import PortkeyAPIError, PortkeyException
@@ -242,9 +238,7 @@ class OpenRouterProvider(LLMProvider):
     Enhanced for Pro Tier with improved rate limit handling and model routing.
     """
 
-    def __init__(
-        self, config: LLMProviderConfig, headers: Optional[Dict[str, str]] = None
-    ):
+    def __init__(self, config: LLMProviderConfig, headers: Optional[Dict[str, str]] = None):
         """
         Initialize OpenRouter provider.
 
@@ -288,12 +282,8 @@ class OpenRouterProvider(LLMProvider):
             # Assuming settings instance has get_agent_model_map method
             self.agent_model_map = settings.get_agent_model_map()
 
-            logger.info(
-                f"Initialized {self.provider_name} provider with model {self.config.default_model}"
-            )
-            logger.info(
-                f"OpenRouter Pro Tier configuration active with {len(self.custom_headers)} custom headers"
-            )
+            logger.info(f"Initialized {self.provider_name} provider with model {self.config.default_model}")
+            logger.info(f"OpenRouter Pro Tier configuration active with {len(self.custom_headers)} custom headers")
         except Exception as e:
             logger.error(
                 f"Failed to initialize {self.provider_name} provider: {e}",
@@ -314,9 +304,7 @@ class OpenRouterProvider(LLMProvider):
                 self._client.close()
                 logger.debug(f"Closed {self.provider_name} provider client")
             except Exception as e:
-                logger.warning(
-                    f"Error closing {self.provider_name} provider client: {e}"
-                )
+                logger.warning(f"Error closing {self.provider_name} provider client: {e}")
 
         self._client = None
 
@@ -335,9 +323,7 @@ class OpenRouterProvider(LLMProvider):
         """Check if provider is initialized."""
         return self._client is not None
 
-    def get_model_for_agent(
-        self, agent_type: Optional[str] = None, mode: Optional[str] = None
-    ) -> str:
+    def get_model_for_agent(self, agent_type: Optional[str] = None, mode: Optional[str] = None) -> str:
         """
         Get the appropriate model for a specific agent type or mode.
 
@@ -372,25 +358,13 @@ class OpenRouterProvider(LLMProvider):
         Returns:
             True if the exception should be retried, False otherwise
         """
-        if (
-            isinstance(exception, LLMProviderConnectionError)
-            and "connection_error" in self.config.retryable_errors
-        ):
+        if isinstance(exception, LLMProviderConnectionError) and "connection_error" in self.config.retryable_errors:
             return True
-        elif (
-            isinstance(exception, LLMProviderTimeoutError)
-            and "timeout_error" in self.config.retryable_errors
-        ):
+        elif isinstance(exception, LLMProviderTimeoutError) and "timeout_error" in self.config.retryable_errors:
             return True
-        elif (
-            isinstance(exception, LLMProviderRateLimitError)
-            and "rate_limit_error" in self.config.retryable_errors
-        ):
+        elif isinstance(exception, LLMProviderRateLimitError) and "rate_limit_error" in self.config.retryable_errors:
             return True
-        elif (
-            isinstance(exception, LLMProviderServiceError)
-            and "service_error" in self.config.retryable_errors
-        ):
+        elif isinstance(exception, LLMProviderServiceError) and "service_error" in self.config.retryable_errors:
             return True
         return False
 
@@ -506,10 +480,7 @@ class OpenRouterProvider(LLMProvider):
         # Check if mode requires a different provider
         if mode:
             mode_model_map = settings.get_mode_model_map()
-            if (
-                mode in mode_model_map
-                and mode_model_map[mode]["provider"] != self.provider_name
-            ):
+            if mode in mode_model_map and mode_model_map[mode]["provider"] != self.provider_name:
                 logger.info(
                     f"Mode '{mode}' requires provider '{mode_model_map[mode]['provider']}' instead of '{self.provider_name}'"
                 )
@@ -521,9 +492,7 @@ class OpenRouterProvider(LLMProvider):
 
         for msg in messages:
             if not isinstance(msg, dict) or "role" not in msg or "content" not in msg:
-                raise LLMProviderInvalidRequestError(
-                    "Each message must be a dict with 'role' and 'content' keys"
-                )
+                raise LLMProviderInvalidRequestError("Each message must be a dict with 'role' and 'content' keys")
 
         # Apply retry decorator dynamically
         retry_decorator = self._get_retry_decorator()
@@ -555,9 +524,7 @@ class OpenRouterProvider(LLMProvider):
                 headers = self.custom_headers.copy()
 
                 # Make the API call
-                response = await self._client.chat.completions.create(
-                    **params, extra_headers=headers
-                )
+                response = await self._client.chat.completions.create(**params, extra_headers=headers)
 
                 # Calculate request duration
                 duration_ms = int((time.time() - start_time) * 1000)
@@ -584,21 +551,15 @@ class OpenRouterProvider(LLMProvider):
                 }
 
             except AuthenticationError as e:
-                logger.error(
-                    f"Authentication error with {self.provider_name}: {str(e)}"
-                )
-                raise LLMProviderAuthenticationError(
-                    f"API authentication failed: {str(e)}"
-                )
+                logger.error(f"Authentication error with {self.provider_name}: {str(e)}")
+                raise LLMProviderAuthenticationError(f"API authentication failed: {str(e)}")
 
             except APIConnectionError as e:
                 logger.error(f"Connection error with {self.provider_name}: {str(e)}")
                 raise LLMProviderConnectionError(f"API connection failed: {str(e)}")
 
             except RateLimitError as e:
-                logger.warning(
-                    f"Rate limit exceeded for {self.provider_name}: {str(e)}"
-                )
+                logger.warning(f"Rate limit exceeded for {self.provider_name}: {str(e)}")
                 # This will be retried by the decorator if configured
                 raise LLMProviderRateLimitError(f"Rate limit exceeded: {str(e)}")
 
@@ -607,20 +568,14 @@ class OpenRouterProvider(LLMProvider):
                 raise LLMProviderInvalidRequestError(f"Invalid request: {str(e)}")
 
             except InternalServerError as e:
-                logger.error(
-                    f"Internal server error from {self.provider_name}: {str(e)}"
-                )
+                logger.error(f"Internal server error from {self.provider_name}: {str(e)}")
                 # This will be retried by the decorator if configured
                 raise LLMProviderServiceError(f"Service error: {str(e)}")
 
             except asyncio.TimeoutError:
-                logger.error(
-                    f"Request to {self.provider_name} timed out after {self.config.request_timeout}s"
-                )
+                logger.error(f"Request to {self.provider_name} timed out after {self.config.request_timeout}s")
                 # This will be retried by the decorator if configured
-                raise LLMProviderTimeoutError(
-                    f"Request timed out after {self.config.request_timeout} seconds"
-                )
+                raise LLMProviderTimeoutError(f"Request timed out after {self.config.request_timeout} seconds")
 
             except APIError as e:
                 if "model" in str(e).lower():
@@ -683,11 +638,7 @@ class PortkeyProvider(LLMProvider):
             "retry": {
                 "attempts": self.config.max_retries,
             },
-            "trace_id": (
-                self.settings_instance.TRACE_ID
-                if hasattr(self.settings_instance, "TRACE_ID")
-                else None
-            ),
+            "trace_id": (self.settings_instance.TRACE_ID if hasattr(self.settings_instance, "TRACE_ID") else None),
             "virtual_key": (
                 self.settings_instance.PORTKEY_VIRTUAL_KEY_OPENROUTER
                 if hasattr(self.settings_instance, "PORTKEY_VIRTUAL_KEY_OPENROUTER")
@@ -704,9 +655,7 @@ class PortkeyProvider(LLMProvider):
         # Initialize Portkey client
         self._client = Portkey(**portkey_config)
 
-        logger.info(
-            f"Initialized {self.provider_name} provider with model {self.config.default_model}"
-        )
+        logger.info(f"Initialized {self.provider_name} provider with model {self.config.default_model}")
 
     def close(self) -> None:
         """
@@ -730,9 +679,7 @@ class PortkeyProvider(LLMProvider):
         """Check if provider is initialized."""
         return self._client is not None
 
-    def get_model_for_mode(
-        self, agent_type: Optional[str] = None, mode: Optional[str] = None
-    ) -> str:
+    def get_model_for_mode(self, agent_type: Optional[str] = None, mode: Optional[str] = None) -> str:
         """
         Get the appropriate model based on Roo mode and agent type.
 
@@ -826,10 +773,7 @@ class PortkeyProvider(LLMProvider):
         # Check if mode requires a different provider
         if mode:
             mode_model_map = settings.get_mode_model_map()
-            if (
-                mode in mode_model_map
-                and mode_model_map[mode]["provider"] != self.provider_name
-            ):
+            if mode in mode_model_map and mode_model_map[mode]["provider"] != self.provider_name:
                 logger.info(
                     f"Mode '{mode}' requires provider '{mode_model_map[mode]['provider']}' instead of '{self.provider_name}'"
                 )
@@ -863,13 +807,8 @@ class PortkeyProvider(LLMProvider):
             client = self._client.with_options(default_headers={"model": model})
 
             # Apply the config ID if available
-            if (
-                hasattr(self.settings_instance, "PORTKEY_CONFIG_ID")
-                and self.settings_instance.PORTKEY_CONFIG_ID
-            ):
-                client = client.with_options(
-                    config=self.settings_instance.PORTKEY_CONFIG_ID
-                )
+            if hasattr(self.settings_instance, "PORTKEY_CONFIG_ID") and self.settings_instance.PORTKEY_CONFIG_ID:
+                client = client.with_options(config=self.settings_instance.PORTKEY_CONFIG_ID)
 
             response = await client.chat.completions.create(**params)
 
@@ -939,13 +878,8 @@ def _validate_openrouter_environment(settings_instance) -> None:
         ValueError: If required settings are missing
     """
     # Use the settings_instance directly
-    if (
-        not hasattr(settings_instance, "OPENROUTER_API_KEY")
-        or not settings_instance.OPENROUTER_API_KEY
-    ):
-        raise ValueError(
-            "OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment."
-        )
+    if not hasattr(settings_instance, "OPENROUTER_API_KEY") or not settings_instance.OPENROUTER_API_KEY:
+        raise ValueError("OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.")
 
 
 def _validate_portkey_environment(settings_instance) -> None:
@@ -959,13 +893,8 @@ def _validate_portkey_environment(settings_instance) -> None:
         ValueError: If required settings are missing
     """
     # Use the settings_instance directly
-    if (
-        not hasattr(settings_instance, "PORTKEY_API_KEY")
-        or not settings_instance.PORTKEY_API_KEY
-    ):
-        raise ValueError(
-            "Portkey API key not configured. Please set PORTKEY_API_KEY in your environment."
-        )
+    if not hasattr(settings_instance, "PORTKEY_API_KEY") or not settings_instance.PORTKEY_API_KEY:
+        raise ValueError("Portkey API key not configured. Please set PORTKEY_API_KEY in your environment.")
 
 
 # Global provider registry - this will be managed through the unified registry now
@@ -1028,15 +957,11 @@ def get_llm_provider(provider_name: str = None) -> LLMProvider:
             raise LLMProviderAuthenticationError(str(e))
 
         # Get default model and other settings from the settings instance
-        default_model = getattr(
-            settings, "OPENROUTER_DEFAULT_MODEL", "openai/gpt-3.5-turbo"
-        )
+        default_model = getattr(settings, "OPENROUTER_DEFAULT_MODEL", "openai/gpt-3.5-turbo")
         request_timeout = getattr(settings, "LLM_REQUEST_TIMEOUT", 30)
         max_retries = getattr(settings, "LLM_MAX_RETRIES", 3)
         retry_delay = getattr(settings, "LLM_RETRY_DELAY", 1.0)
-        retry_max_delay = getattr(
-            settings, "LLM_RETRY_MAX_DELAY", 60.0
-        )  # Increased for Pro Tier
+        retry_max_delay = getattr(settings, "LLM_RETRY_MAX_DELAY", 60.0)  # Increased for Pro Tier
 
         # Get retryable error types if configured
         retryable_errors = None
@@ -1071,9 +996,7 @@ def get_llm_provider(provider_name: str = None) -> LLMProvider:
 
             return provider
         except Exception as e:
-            logger.error(
-                f"Failed to initialize OpenRouter provider: {str(e)}", exc_info=True
-            )
+            logger.error(f"Failed to initialize OpenRouter provider: {str(e)}", exc_info=True)
             raise LLMProviderError(f"Failed to initialize provider: {str(e)}")
 
     # Initialize Portkey provider if requested
@@ -1123,15 +1046,11 @@ def get_llm_provider(provider_name: str = None) -> LLMProvider:
 
             return provider
         except Exception as e:
-            logger.error(
-                f"Failed to initialize Portkey provider: {str(e)}", exc_info=True
-            )
+            logger.error(f"Failed to initialize Portkey provider: {str(e)}", exc_info=True)
             raise LLMProviderError(f"Failed to initialize provider: {str(e)}")
 
     # Raise error if provider not found
-    raise LLMProviderError(
-        f"LLM provider '{provider_name}' not registered and no factory available"
-    )
+    raise LLMProviderError(f"LLM provider '{provider_name}' not registered and no factory available")
 
 
 def initialize_llm_providers() -> None:
@@ -1151,11 +1070,7 @@ def initialize_llm_providers() -> None:
         logger.info(f"Initialized preferred LLM provider: {preferred_provider}")
 
         # Also initialize Portkey provider if configured and not already loaded
-        if (
-            preferred_provider != "portkey"
-            and hasattr(settings, "PORTKEY_API_KEY")
-            and settings.PORTKEY_API_KEY
-        ):
+        if preferred_provider != "portkey" and hasattr(settings, "PORTKEY_API_KEY") and settings.PORTKEY_API_KEY:
             try:
                 get_llm_provider("portkey")
                 logger.info("Portkey provider initialized as fallback")

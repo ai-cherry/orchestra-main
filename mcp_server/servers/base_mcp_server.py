@@ -136,17 +136,9 @@ class BaseMCPServer(ABC):
                 self.health_status.details = health_details
 
                 # Determine overall status
-                if all(
-                    v.get("healthy", False)
-                    for v in health_details.values()
-                    if isinstance(v, dict)
-                ):
+                if all(v.get("healthy", False) for v in health_details.values() if isinstance(v, dict)):
                     self.health_status.status = "healthy"
-                elif any(
-                    v.get("healthy", False)
-                    for v in health_details.values()
-                    if isinstance(v, dict)
-                ):
+                elif any(v.get("healthy", False) for v in health_details.values() if isinstance(v, dict)):
                     self.health_status.status = "degraded"
                 else:
                     self.health_status.status = "unhealthy"
@@ -241,9 +233,7 @@ class RetryHelper:
             except Exception as e:
                 last_exception = e
                 if attempt < max_retries:
-                    logger.warning(
-                        f"Attempt {attempt + 1} failed: {e}. Retrying in {delay}s..."
-                    )
+                    logger.warning(f"Attempt {attempt + 1} failed: {e}. Retrying in {delay}s...")
                     await asyncio.sleep(delay)
                     delay = min(delay * exponential_base, max_delay)
                 else:

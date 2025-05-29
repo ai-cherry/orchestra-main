@@ -16,7 +16,6 @@ from uuid import UUID, uuid4
 
 from core.services.events.event_bus import Event, get_event_bus
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -195,9 +194,7 @@ class Workflow:
             # Execute tasks level by level
             for level in execution_levels:
                 # Sort tasks in level by priority
-                sorted_tasks = sorted(
-                    level, key=lambda tid: self.tasks[tid].priority.value, reverse=True
-                )
+                sorted_tasks = sorted(level, key=lambda tid: self.tasks[tid].priority.value, reverse=True)
 
                 # Execute tasks in parallel within each level
                 await self._execute_level(sorted_tasks, context)
@@ -230,9 +227,7 @@ class Workflow:
 
         return context
 
-    async def _execute_level(
-        self, task_ids: List[str], context: WorkflowContext
-    ) -> None:
+    async def _execute_level(self, task_ids: List[str], context: WorkflowContext) -> None:
         """Execute tasks in parallel."""
         tasks = []
 
@@ -244,9 +239,7 @@ class Workflow:
         # Execute all tasks in parallel
         await asyncio.gather(*tasks, return_exceptions=True)
 
-    async def _execute_task(
-        self, task_def: TaskDefinition, context: WorkflowContext
-    ) -> None:
+    async def _execute_task(self, task_def: TaskDefinition, context: WorkflowContext) -> None:
         """Execute a single task with retry logic."""
         attempts = 0
         max_attempts = task_def.retry_count + 1
@@ -275,9 +268,7 @@ class Workflow:
 
                 # Execute with timeout if specified
                 if task_def.timeout_seconds:
-                    output = await asyncio.wait_for(
-                        task_def.handler(context), timeout=task_def.timeout_seconds
-                    )
+                    output = await asyncio.wait_for(task_def.handler(context), timeout=task_def.timeout_seconds)
                 else:
                     output = await task_def.handler(context)
 
@@ -337,9 +328,7 @@ class Workflow:
                 # Wait before retry
                 await asyncio.sleep(2**attempts)  # Exponential backoff
 
-    async def _emit_task_failed(
-        self, task_def: TaskDefinition, context: WorkflowContext, error: str
-    ) -> None:
+    async def _emit_task_failed(self, task_def: TaskDefinition, context: WorkflowContext, error: str) -> None:
         """Emit task failed event."""
         await self._event_bus.publish(
             Event(
@@ -375,9 +364,7 @@ class WorkflowEngine:
         """List all registered workflow names."""
         return list(self._workflows.keys())
 
-    async def execute_workflow(
-        self, workflow_name: str, inputs: Dict[str, Any]
-    ) -> WorkflowContext:
+    async def execute_workflow(self, workflow_name: str, inputs: Dict[str, Any]) -> WorkflowContext:
         """Execute a workflow by name."""
         workflow = self._workflows.get(workflow_name)
         if not workflow:
@@ -402,9 +389,7 @@ class WorkflowEngine:
             return False
 
         # Emit cancellation event
-        await self._event_bus.publish(
-            Event(type="workflow.cancelled", data={"workflow_id": str(workflow_id)})
-        )
+        await self._event_bus.publish(Event(type="workflow.cancelled", data={"workflow_id": str(workflow_id)}))
 
         # Remove from running workflows
         del self._running_workflows[workflow_id]
