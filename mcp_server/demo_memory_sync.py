@@ -43,9 +43,7 @@ class MockToolAdapter:
         self.name = name
         self.context_window = context_window
         self.memory: Dict[str, Any] = {}
-        logger.info(
-            f"Initialized mock tool adapter: {name} with context window: {context_window}"
-        )
+        logger.info(f"Initialized mock tool adapter: {name} with context window: {context_window}")
 
     def sync_create(self, key: str, entry: MemoryEntry) -> bool:
         """Create a memory entry in the tool's memory."""
@@ -88,9 +86,7 @@ class MockToolAdapter:
 
         for key, entry in self.memory.items():
             compression_level = entry["compression_level"]
-            compression_counts[compression_level] = (
-                compression_counts.get(compression_level, 0) + 1
-            )
+            compression_counts[compression_level] = compression_counts.get(compression_level, 0) + 1
 
             # Rough size estimate
             total_size += len(json.dumps(entry))
@@ -147,9 +143,7 @@ def create_demo_memories(sync_engine: MemorySyncEngine) -> None:
         compression_level=CompressionLevel.NONE,
         ttl_seconds=3600,
         content="This is a small shared memory entry that should fit in all tools' context windows.",
-        metadata=MemoryMetadata(
-            source_tool=ToolType.ROO, last_modified=time.time(), context_relevance=0.9
-        ),
+        metadata=MemoryMetadata(source_tool=ToolType.ROO, last_modified=time.time(), context_relevance=0.9),
     )
 
     # Create a medium shared memory entry (fits in some tools)
@@ -193,9 +187,7 @@ def create_demo_memories(sync_engine: MemorySyncEngine) -> None:
         large_content += f"### {tool}\n\n"
         large_content += "**Strengths:**\n\n"
         for _ in range(5):
-            large_content += (
-                f"- {'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' * 2}\n"
-            )
+            large_content += f"- {'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' * 2}\n"
 
         large_content += "\n**Limitations:**\n\n"
         for _ in range(3):
@@ -246,9 +238,7 @@ def create_demo_memories(sync_engine: MemorySyncEngine) -> None:
             ],
             "mode_history": ["architect", "code", "orchestrator"],
         },
-        metadata=MemoryMetadata(
-            source_tool=ToolType.ROO, last_modified=time.time(), context_relevance=0.85
-        ),
+        metadata=MemoryMetadata(source_tool=ToolType.ROO, last_modified=time.time(), context_relevance=0.85),
     )
 
     cline_entry = MemoryEntry(
@@ -266,9 +256,7 @@ def create_demo_memories(sync_engine: MemorySyncEngine) -> None:
             ],
             "active_file": "mcp_server/memory_sync_engine.py",
         },
-        metadata=MemoryMetadata(
-            source_tool=ToolType.CLINE, last_modified=time.time(), context_relevance=0.8
-        ),
+        metadata=MemoryMetadata(source_tool=ToolType.CLINE, last_modified=time.time(), context_relevance=0.8),
     )
 
     # Save the entries to the sync engine
@@ -378,8 +366,7 @@ def demonstrate_context_window_optimization(sync_engine: MemorySyncEngine) -> No
             priority=11 - i,  # Decreasing priority
             compression_level=CompressionLevel.NONE,
             ttl_seconds=3600,
-            content=f"This is optimization test entry #{i}: "
-            + ("Lorem ipsum " * (50 * i)),
+            content=f"This is optimization test entry #{i}: " + ("Lorem ipsum " * (50 * i)),
             metadata=MemoryMetadata(
                 source_tool=ToolType.GEMINI,
                 last_modified=time.time(),
@@ -418,12 +405,8 @@ def demonstrate_context_window_optimization(sync_engine: MemorySyncEngine) -> No
 
 def main():
     """Run the Memory Synchronization Engine demonstration."""
-    parser = argparse.ArgumentParser(
-        description="Demonstrate the Memory Synchronization Engine"
-    )
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable verbose logging"
-    )
+    parser = argparse.ArgumentParser(description="Demonstrate the Memory Synchronization Engine")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
 
     args = parser.parse_args()
 
@@ -431,9 +414,7 @@ def main():
         logging.getLogger().setLevel(logging.DEBUG)
 
     print("=== Memory Synchronization Engine Demonstration ===\n")
-    print(
-        "This demonstration shows how memory is synchronized between different AI tools"
-    )
+    print("This demonstration shows how memory is synchronized between different AI tools")
     print("with different context window sizes and capabilities.\n")
 
     # Set up the demo environment

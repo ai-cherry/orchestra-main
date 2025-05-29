@@ -42,9 +42,7 @@ class IMemoryStorage(ABC):
         """Retrieve a memory entry by its content hash."""
 
     @abstractmethod
-    async def search(
-        self, query: str, limit: int = 10
-    ) -> List[tuple[str, MemoryEntry, float]]:
+    async def search(self, query: str, limit: int = 10) -> List[tuple[str, MemoryEntry, float]]:
         """Search for memory entries matching the query."""
 
     @abstractmethod
@@ -86,13 +84,9 @@ class SyncMemoryStorage:
 
     def get_by_hash(self, content_hash: str) -> Optional[MemoryEntry]:
         """Retrieve a memory entry by its content hash."""
-        return self.loop.run_until_complete(
-            self.async_storage.get_by_hash(content_hash)
-        )
+        return self.loop.run_until_complete(self.async_storage.get_by_hash(content_hash))
 
-    def search(
-        self, query: str, limit: int = 10
-    ) -> List[tuple[str, MemoryEntry, float]]:
+    def search(self, query: str, limit: int = 10) -> List[tuple[str, MemoryEntry, float]]:
         """Search for memory entries matching the query."""
         return self.loop.run_until_complete(self.async_storage.search(query, limit))
 

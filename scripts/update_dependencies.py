@@ -5,15 +5,13 @@ Dependency update management for Orchestra AI.
 Uses pip-tools to safely update dependencies while maintaining lockfiles.
 """
 
+import logging
 import subprocess
 import sys
-import logging
 from datetime import datetime
 from typing import List
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -58,10 +56,7 @@ def check_outdated() -> List[str]:
             import json
 
             outdated = json.loads(result.stdout)
-            return [
-                f"{pkg['name']}=={pkg['version']} -> {pkg['latest_version']}"
-                for pkg in outdated
-            ]
+            return [f"{pkg['name']}=={pkg['version']} -> {pkg['latest_version']}" for pkg in outdated]
     except Exception as e:
         logger.error(f"Error checking outdated packages: {e}")
     return []
@@ -72,17 +67,13 @@ def security_audit() -> List[str]:
     vulnerabilities = []
     try:
         # Check if pip-audit is installed
-        result = subprocess.run(
-            ["pip-audit", "--format", "json"], capture_output=True, text=True
-        )
+        result = subprocess.run(["pip-audit", "--format", "json"], capture_output=True, text=True)
         if result.returncode == 0:
             import json
 
             audit_results = json.loads(result.stdout)
             for vuln in audit_results.get("vulnerabilities", []):
-                vulnerabilities.append(
-                    f"{vuln['name']}=={vuln['version']}: {vuln['description']}"
-                )
+                vulnerabilities.append(f"{vuln['name']}=={vuln['version']}: {vuln['description']}")
     except FileNotFoundError:
         logger.warning("pip-audit not installed. Run: pip install pip-audit")
     except Exception as e:
@@ -133,9 +124,7 @@ def main():
 
         if choice == "1":
             logger.info("\n📈 Upgrading all dependencies...")
-            compile_requirements(
-                "requirements/base.in", "requirements/base.txt", upgrade=True
-            )
+            compile_requirements("requirements/base.in", "requirements/base.txt", upgrade=True)
             compile_requirements(
                 "requirements/production.in",
                 "requirements/production.txt",

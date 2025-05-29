@@ -13,7 +13,6 @@ from core.api.models.responses import ConversationResponse
 from core.business.workflows.base import get_workflow_engine
 from core.services.agents.base import AgentCapability, get_agent_manager
 
-
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/conversation", tags=["conversation"])
 
@@ -42,9 +41,7 @@ async def chat(request: ConversationRequest) -> ConversationResponse:
         )
 
         # Extract results
-        response_text = context.outputs.get(
-            "response", "I'm sorry, I couldn't generate a response."
-        )
+        response_text = context.outputs.get("response", "I'm sorry, I couldn't generate a response.")
         intent = context.outputs.get("intent")
 
         return ConversationResponse(
@@ -73,14 +70,10 @@ async def agent_chat(request: ConversationRequest) -> ConversationResponse:
         agent_manager = get_agent_manager()
 
         # Find a conversational agent
-        conv_agents = agent_manager.find_agents_by_capability(
-            AgentCapability.CONVERSATION
-        )
+        conv_agents = agent_manager.find_agents_by_capability(AgentCapability.CONVERSATION)
 
         if not conv_agents:
-            raise HTTPException(
-                status_code=503, detail="No conversational agents available"
-            )
+            raise HTTPException(status_code=503, detail="No conversational agents available")
 
         # Use the first available agent
         agent = conv_agents[0]
@@ -102,9 +95,7 @@ async def agent_chat(request: ConversationRequest) -> ConversationResponse:
         response_message = await agent.process_message(message)
 
         if not response_message:
-            raise HTTPException(
-                status_code=500, detail="Agent did not return a response"
-            )
+            raise HTTPException(status_code=500, detail="Agent did not return a response")
 
         return ConversationResponse(
             success=True,

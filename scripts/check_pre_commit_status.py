@@ -51,9 +51,7 @@ def check_flake8_issues():
     # Parse flake8 output
     issues = defaultdict(list)
     for line in output.split("\n"):
-        if ":" in line and any(
-            code in line for code in ["F401", "F541", "F841", "W605", "F821"]
-        ):
+        if ":" in line and any(code in line for code in ["F401", "F541", "F841", "W605", "F821"]):
             parts = line.split(":", 3)
             if len(parts) >= 4:
                 file_path = parts[0]

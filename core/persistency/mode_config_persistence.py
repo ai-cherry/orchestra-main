@@ -40,9 +40,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Constants
-PROJECT_ROOT = Path(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-)
+PROJECT_ROOT = Path(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 CONFIG_DIR = PROJECT_ROOT / "config"
 MODE_DEFINITIONS_PATH = CONFIG_DIR / "mode_definitions.yaml"
 WORKFLOW_STATE_PATH = CONFIG_DIR / "workflow_state.yaml"
@@ -64,8 +62,8 @@ DEFAULT_COLLECTION = os.environ.get(ENV_COLLECTION, "mode_system_config")
 
 # Optional integrations
 try:
-    from google.cloud import storage
     from google.api_core import exceptions as gcp_exceptions
+    from google.cloud import storage
 except ImportError:
     storage = None
     gcp_exceptions = None
@@ -153,9 +151,7 @@ class PersistenceManager:
 
             return True
         except ImportError:
-            logger.info(
-                "Google Cloud libraries not available. Operating in local-only mode."
-            )
+            logger.info("Google Cloud libraries not available. Operating in local-only mode.")
             return False
 
     def _initialize_gcp_clients(self):
@@ -203,38 +199,28 @@ class PersistenceManager:
 
             # Check for required sections
             if not isinstance(config, dict):
-                raise PersistenceError(
-                    "Invalid configuration format: root must be a dictionary"
-                )
+                raise PersistenceError("Invalid configuration format: root must be a dictionary")
 
             if "modes" not in config:
-                raise PersistenceError(
-                    "Invalid configuration: 'modes' section is required"
-                )
+                raise PersistenceError("Invalid configuration: 'modes' section is required")
 
             # Validate modes section
             modes = config["modes"]
             if not isinstance(modes, dict):
-                raise PersistenceError(
-                    "Invalid configuration: 'modes' must be a dictionary"
-                )
+                raise PersistenceError("Invalid configuration: 'modes' must be a dictionary")
 
             # Check each mode has required fields
             for mode_slug, mode_data in modes.items():
                 required_fields = ["name", "model", "description"]
                 for field in required_fields:
                     if field not in mode_data:
-                        raise PersistenceError(
-                            f"Invalid mode '{mode_slug}': missing required field '{field}'"
-                        )
+                        raise PersistenceError(f"Invalid mode '{mode_slug}': missing required field '{field}'")
 
             # Validate workflows section if present
             if "workflows" in config:
                 workflows = config["workflows"]
                 if not isinstance(workflows, dict):
-                    raise PersistenceError(
-                        "Invalid configuration: 'workflows' must be a dictionary"
-                    )
+                    raise PersistenceError("Invalid configuration: 'workflows' must be a dictionary")
 
                 # Check each workflow has required fields
                 for workflow_slug, workflow_data in workflows.items():
@@ -248,9 +234,7 @@ class PersistenceManager:
                     # Check steps
                     steps = workflow_data["steps"]
                     if not isinstance(steps, list):
-                        raise PersistenceError(
-                            f"Invalid workflow '{workflow_slug}': 'steps' must be a list"
-                        )
+                        raise PersistenceError(f"Invalid workflow '{workflow_slug}': 'steps' must be a list")
 
                     for i, step in enumerate(steps):
                         if "mode" not in step or "task" not in step:
@@ -312,9 +296,7 @@ class PersistenceManager:
             True if save was successful, False otherwise
         """
         if not MODE_DEFINITIONS_PATH.exists():
-            logger.error(
-                f"Mode definitions file does not exist: {MODE_DEFINITIONS_PATH}"
-            )
+            logger.error(f"Mode definitions file does not exist: {MODE_DEFINITIONS_PATH}")
             return False
 
         # Create backup of mode definitions
@@ -340,9 +322,7 @@ class PersistenceManager:
             success = True
 
             # 1. Local file (already exists)
-            logger.info(
-                f"Mode definitions already saved locally at {MODE_DEFINITIONS_PATH}"
-            )
+            logger.info(f"Mode definitions already saved locally at {MODE_DEFINITIONS_PATH}")
 
             # 2. Save to Cloud Storage
             if self.gcp_enabled and self.storage_client:
@@ -354,22 +334,16 @@ class PersistenceManager:
                         bucket = self.storage_client.get_bucket(self.bucket_name)
                     except NotFound:
                         # Create bucket if it doesn't exist
-                        bucket = self.storage_client.create_bucket(
-                            self.bucket_name, location="us-central1"
-                        )
+                        bucket = self.storage_client.create_bucket(self.bucket_name, location="us-central1")
                         logger.info(f"Created bucket {self.bucket_name}")
 
                     # Create blob with path based on environment
                     blob_path = f"{self.environment}/mode_definitions.yaml"
                     blob = bucket.blob(blob_path)
                     blob.upload_from_string(content)
-                    logger.info(
-                        f"Saved mode definitions to Cloud Storage: gs://{self.bucket_name}/{blob_path}"
-                    )
+                    logger.info(f"Saved mode definitions to Cloud Storage: gs://{self.bucket_name}/{blob_path}")
                 except Exception as e:
-                    logger.error(
-                        f"Failed to save mode definitions to Cloud Storage: {str(e)}"
-                    )
+                    logger.error(f"Failed to save mode definitions to Cloud Storage: {str(e)}")
                     success = False
 
             # 4. Save to mongodb
@@ -377,9 +351,7 @@ class PersistenceManager:
                 try:
 
                     # Save as document with environment as ID
-                    doc_ref = self.firestore_client.collection(
-                        self.collection_name
-                    ).document("mode_definitions")
+                    doc_ref = self.firestore_client.collection(self.collection_name).document("mode_definitions")
                     doc_ref.set(
                         {
                             "environment": self.environment,
@@ -388,13 +360,9 @@ class PersistenceManager:
                             "version": hashlib.md5(content.encode()).hexdigest(),
                         }
                     )
-                    logger.info(
-                        f"Saved mode definitions to mongodb collection: {self.collection_name}"
-                    )
+                    logger.info(f"Saved mode definitions to mongodb collection: {self.collection_name}")
                 except Exception as e:
-                    logger.error(
-                        f"Failed to save mode definitions to mongodb: {str(e)}"
-                    )
+                    logger.error(f"Failed to save mode definitions to mongodb: {str(e)}")
                     success = False
 
             return success
@@ -448,22 +416,16 @@ class PersistenceManager:
                     blob_path = f"{self.environment}/workflow_state.yaml"
                     blob = bucket.blob(blob_path)
                     blob.upload_from_string(content)
-                    logger.info(
-                        f"Saved workflow state to Cloud Storage: gs://{self.bucket_name}/{blob_path}"
-                    )
+                    logger.info(f"Saved workflow state to Cloud Storage: gs://{self.bucket_name}/{blob_path}")
                 except Exception as e:
-                    logger.error(
-                        f"Failed to save workflow state to Cloud Storage: {str(e)}"
-                    )
+                    logger.error(f"Failed to save workflow state to Cloud Storage: {str(e)}")
                     success = False
 
             # 2. Save to mongodb
             if self.firestore_client:
                 try:
 
-                    doc_ref = self.firestore_client.collection(
-                        self.collection_name
-                    ).document("workflow_state")
+                    doc_ref = self.firestore_client.collection(self.collection_name).document("workflow_state")
                     doc_ref.set(
                         {
                             "environment": self.environment,
@@ -498,13 +460,9 @@ class PersistenceManager:
                 with open(MODE_DEFINITIONS_PATH, "r") as f:
                     content = f.read()
                 source = "local file"
-                logger.info(
-                    f"Loaded mode definitions from local file: {MODE_DEFINITIONS_PATH}"
-                )
+                logger.info(f"Loaded mode definitions from local file: {MODE_DEFINITIONS_PATH}")
             except Exception as e:
-                logger.error(
-                    f"Failed to load mode definitions from local file: {str(e)}"
-                )
+                logger.error(f"Failed to load mode definitions from local file: {str(e)}")
 
         # 2. Try GCP Cloud Storage
         if not content and self.gcp_enabled and self.storage_client:
@@ -516,22 +474,16 @@ class PersistenceManager:
                 blob = bucket.blob(blob_path)
                 content = blob.download_as_text()
                 source = "Cloud Storage"
-                logger.info(
-                    f"Loaded mode definitions from Cloud Storage: gs://{self.bucket_name}/{blob_path}"
-                )
+                logger.info(f"Loaded mode definitions from Cloud Storage: gs://{self.bucket_name}/{blob_path}")
             except NotFound:
                 logger.warning("Mode definitions not found in Cloud Storage")
             except Exception as e:
-                logger.error(
-                    f"Failed to load mode definitions from Cloud Storage: {str(e)}"
-                )
+                logger.error(f"Failed to load mode definitions from Cloud Storage: {str(e)}")
 
         # 4. Try mongodb
         if not content and self.gcp_enabled and self.firestore_client:
             try:
-                doc_ref = self.firestore_client.collection(
-                    self.collection_name
-                ).document("mode_definitions")
+                doc_ref = self.firestore_client.collection(self.collection_name).document("mode_definitions")
                 doc = doc_ref.get()
                 if doc.exists:
                     content = doc.to_dict().get("content")
@@ -546,25 +498,17 @@ class PersistenceManager:
         if content:
             try:
                 config = self._validate_yaml_config(content)
-                logger.info(
-                    f"Successfully loaded and validated mode definitions from {source}"
-                )
+                logger.info(f"Successfully loaded and validated mode definitions from {source}")
 
                 # Save to local file if loaded from remote source
                 if source != "local file":
                     try:
-                        os.makedirs(
-                            os.path.dirname(MODE_DEFINITIONS_PATH), exist_ok=True
-                        )
+                        os.makedirs(os.path.dirname(MODE_DEFINITIONS_PATH), exist_ok=True)
                         with open(MODE_DEFINITIONS_PATH, "w") as f:
                             f.write(content)
-                        logger.info(
-                            f"Saved remote mode definitions to local file: {MODE_DEFINITIONS_PATH}"
-                        )
+                        logger.info(f"Saved remote mode definitions to local file: {MODE_DEFINITIONS_PATH}")
                     except Exception as e:
-                        logger.error(
-                            f"Failed to save remote mode definitions locally: {str(e)}"
-                        )
+                        logger.error(f"Failed to save remote mode definitions locally: {str(e)}")
 
                 return config
             except PersistenceError as e:
@@ -590,9 +534,7 @@ class PersistenceManager:
                 with open(WORKFLOW_STATE_PATH, "r") as f:
                     content = f.read()
                 source = "local file"
-                logger.info(
-                    f"Loaded workflow state from local file: {WORKFLOW_STATE_PATH}"
-                )
+                logger.info(f"Loaded workflow state from local file: {WORKFLOW_STATE_PATH}")
             except Exception as e:
                 logger.error(f"Failed to load workflow state from local file: {str(e)}")
 
@@ -606,22 +548,16 @@ class PersistenceManager:
                 blob = bucket.blob(blob_path)
                 content = blob.download_as_text()
                 source = "Cloud Storage"
-                logger.info(
-                    f"Loaded workflow state from Cloud Storage: gs://{self.bucket_name}/{blob_path}"
-                )
+                logger.info(f"Loaded workflow state from Cloud Storage: gs://{self.bucket_name}/{blob_path}")
             except NotFound:
                 logger.warning("Workflow state not found in Cloud Storage")
             except Exception as e:
-                logger.error(
-                    f"Failed to load workflow state from Cloud Storage: {str(e)}"
-                )
+                logger.error(f"Failed to load workflow state from Cloud Storage: {str(e)}")
 
         # 3. Try mongodb
         if not content and self.gcp_enabled and self.firestore_client:
             try:
-                doc_ref = self.firestore_client.collection(
-                    self.collection_name
-                ).document("workflow_state")
+                doc_ref = self.firestore_client.collection(self.collection_name).document("workflow_state")
                 doc = doc_ref.get()
                 if doc.exists:
                     content = doc.to_dict().get("content")
@@ -644,13 +580,9 @@ class PersistenceManager:
                         os.makedirs(os.path.dirname(WORKFLOW_STATE_PATH), exist_ok=True)
                         with open(WORKFLOW_STATE_PATH, "w") as f:
                             f.write(content)
-                        logger.info(
-                            f"Saved remote workflow state to local file: {WORKFLOW_STATE_PATH}"
-                        )
+                        logger.info(f"Saved remote workflow state to local file: {WORKFLOW_STATE_PATH}")
                     except Exception as e:
-                        logger.error(
-                            f"Failed to save remote workflow state locally: {str(e)}"
-                        )
+                        logger.error(f"Failed to save remote workflow state locally: {str(e)}")
 
                 return state
             except yaml.YAMLError as e:
@@ -682,9 +614,7 @@ class PersistenceManager:
                     local_hash = hashlib.md5(local_content.encode()).hexdigest()
                     sources.append(("local_file", local_content, local_hash))
             except Exception as e:
-                logger.error(
-                    f"Failed to load mode definitions from local file: {str(e)}"
-                )
+                logger.error(f"Failed to load mode definitions from local file: {str(e)}")
 
         # 2. Secret Manager
         if self.gcp_enabled and self.os.environ_client:
@@ -692,9 +622,7 @@ class PersistenceManager:
                 from google.api_core.exceptions import NotFound
 
                 secret_name = f"projects/{self.project_id}/secrets/{self.secret_name}/versions/latest"
-                response = self.os.environ_client.access_secret_version(
-                    request={"name": secret_name}
-                )
+                response = self.os.environ_client.access_secret_version(request={"name": secret_name})
                 secret_content = response.payload.data.decode("UTF-8")
                 self._validate_yaml_config(secret_content)
                 secret_hash = hashlib.md5(secret_content.encode()).hexdigest()
@@ -702,9 +630,7 @@ class PersistenceManager:
             except NotFound:
                 logger.warning("Mode definitions not found in Secret Manager")
             except Exception as e:
-                logger.error(
-                    f"Failed to load mode definitions from Secret Manager: {str(e)}"
-                )
+                logger.error(f"Failed to load mode definitions from Secret Manager: {str(e)}")
 
         # 3. Cloud Storage
         if self.gcp_enabled and self.storage_client:
@@ -721,16 +647,12 @@ class PersistenceManager:
             except NotFound:
                 logger.warning("Mode definitions not found in Cloud Storage")
             except Exception as e:
-                logger.error(
-                    f"Failed to load mode definitions from Cloud Storage: {str(e)}"
-                )
+                logger.error(f"Failed to load mode definitions from Cloud Storage: {str(e)}")
 
         # 4. mongodb
         if self.gcp_enabled and self.firestore_client:
             try:
-                doc_ref = self.firestore_client.collection(
-                    self.collection_name
-                ).document("mode_definitions")
+                doc_ref = self.firestore_client.collection(self.collection_name).document("mode_definitions")
                 doc = doc_ref.get()
                 if doc.exists:
                     firestore_content = doc.to_dict().get("content")
@@ -777,19 +699,13 @@ class PersistenceManager:
                 os.makedirs(os.path.dirname(MODE_DEFINITIONS_PATH), exist_ok=True)
                 with open(MODE_DEFINITIONS_PATH, "w") as f:
                     f.write(content_to_sync)
-                logger.info(
-                    f"Synced configuration to local file: {MODE_DEFINITIONS_PATH}"
-                )
+                logger.info(f"Synced configuration to local file: {MODE_DEFINITIONS_PATH}")
             except Exception as e:
                 logger.error(f"Failed to sync configuration to local file: {str(e)}")
                 return False
 
         # 2. Sync to Secret Manager
-        if (
-            self.gcp_enabled
-            and self.os.environ_client
-            and source_to_use[0] != "os.environ"
-        ):
+        if self.gcp_enabled and self.os.environ_client and source_to_use[0] != "os.environ":
             try:
                 from google.api_core.exceptions import NotFound
 
@@ -818,17 +734,11 @@ class PersistenceManager:
                 )
                 logger.info(f"Synced configuration to Secret Manager: {secret_name}")
             except Exception as e:
-                logger.error(
-                    f"Failed to sync configuration to Secret Manager: {str(e)}"
-                )
+                logger.error(f"Failed to sync configuration to Secret Manager: {str(e)}")
                 return False
 
         # 3. Sync to Cloud Storage
-        if (
-            self.gcp_enabled
-            and self.storage_client
-            and source_to_use[0] != "cloud_storage"
-        ):
+        if self.gcp_enabled and self.storage_client and source_to_use[0] != "cloud_storage":
             try:
                 from google.api_core.exceptions import NotFound
 
@@ -837,18 +747,14 @@ class PersistenceManager:
                     bucket = self.storage_client.get_bucket(self.bucket_name)
                 except NotFound:
                     # Create bucket if it doesn't exist
-                    bucket = self.storage_client.create_bucket(
-                        self.bucket_name, location="us-central1"
-                    )
+                    bucket = self.storage_client.create_bucket(self.bucket_name, location="us-central1")
                     logger.info(f"Created bucket {self.bucket_name}")
 
                 # Create blob with path based on environment
                 blob_path = f"{self.environment}/mode_definitions.yaml"
                 blob = bucket.blob(blob_path)
                 blob.upload_from_string(content_to_sync)
-                logger.info(
-                    f"Synced configuration to Cloud Storage: gs://{self.bucket_name}/{blob_path}"
-                )
+                logger.info(f"Synced configuration to Cloud Storage: gs://{self.bucket_name}/{blob_path}")
             except Exception as e:
                 logger.error(f"Failed to sync configuration to Cloud Storage: {str(e)}")
                 return False
@@ -857,9 +763,7 @@ class PersistenceManager:
         if self.gcp_enabled and self.firestore_client and source_to_use[0] != "mongodb":
             try:
 
-                doc_ref = self.firestore_client.collection(
-                    self.collection_name
-                ).document("mode_definitions")
+                doc_ref = self.firestore_client.collection(self.collection_name).document("mode_definitions")
                 doc_ref.set(
                     {
                         "environment": self.environment,
@@ -868,9 +772,7 @@ class PersistenceManager:
                         "version": hashlib.md5(content_to_sync.encode()).hexdigest(),
                     }
                 )
-                logger.info(
-                    f"Synced configuration to mongodb collection: {self.collection_name}"
-                )
+                logger.info(f"Synced configuration to mongodb collection: {self.collection_name}")
             except Exception as e:
                 logger.error(f"Failed to sync configuration to mongodb: {str(e)}")
                 return False
@@ -894,9 +796,7 @@ if __name__ == "__main__":
     # Simple CLI for testing the persistence manager
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Mode Configuration Persistence Manager"
-    )
+    parser = argparse.ArgumentParser(description="Mode Configuration Persistence Manager")
     parser.add_argument(
         "--action",
         choices=["save", "load", "sync"],
@@ -920,9 +820,7 @@ if __name__ == "__main__":
         config = manager.load_mode_definitions()
         if config:
             print("Mode definitions loaded successfully")
-            print(
-                f"Loaded {len(config.get('modes', {}))} modes and {len(config.get('workflows', {}))} workflows"
-            )
+            print(f"Loaded {len(config.get('modes', {}))} modes and {len(config.get('workflows', {}))} workflows")
         else:
             print("Failed to load mode definitions")
             sys.exit(1)

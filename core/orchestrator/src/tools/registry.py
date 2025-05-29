@@ -2,7 +2,8 @@
 Tool Registry - Central registry for all available tools with rich metadata
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel
 
 
@@ -53,9 +54,7 @@ class ToolRegistry:
                         type="string",
                         description="MongoDB collection name",
                     ),
-                    ToolParameter(
-                        name="query", type="object", description="MongoDB query object"
-                    ),
+                    ToolParameter(name="query", type="object", description="MongoDB query object"),
                     ToolParameter(
                         name="projection",
                         type="object",
@@ -96,11 +95,7 @@ class ToolRegistry:
                 name="cache_get",
                 description="Get value from Redis/DragonflyDB cache",
                 category="cache",
-                parameters=[
-                    ToolParameter(
-                        name="key", type="string", description="Cache key to retrieve"
-                    )
-                ],
+                parameters=[ToolParameter(name="key", type="string", description="Cache key to retrieve")],
                 output_type="string | None",
                 when_to_use="For fast retrieval of frequently accessed data, session data, or temporary values",
                 constraints="Data may expire; always handle None returns",
@@ -120,9 +115,7 @@ class ToolRegistry:
                 category="cache",
                 parameters=[
                     ToolParameter(name="key", type="string", description="Cache key"),
-                    ToolParameter(
-                        name="value", type="string", description="Value to cache"
-                    ),
+                    ToolParameter(name="value", type="string", description="Value to cache"),
                     ToolParameter(
                         name="ttl",
                         type="integer",
@@ -261,9 +254,7 @@ class ToolRegistry:
             return [t for t in self.tools.values() if t.category == category]
         return list(self.tools.values())
 
-    def search_tools(
-        self, query: str, category: Optional[str] = None
-    ) -> List[ToolDefinition]:
+    def search_tools(self, query: str, category: Optional[str] = None) -> List[ToolDefinition]:
         """Search tools by query and optional category."""
         results = []
         query_lower = query.lower()
@@ -274,8 +265,7 @@ class ToolRegistry:
 
             # Search in multiple fields
             searchable_text = (
-                f"{tool.name} {tool.description} {tool.when_to_use} "
-                f"{' '.join(tool.examples or [])} {tool.category}"
+                f"{tool.name} {tool.description} {tool.when_to_use} " f"{' '.join(tool.examples or [])} {tool.category}"
             ).lower()
 
             if query_lower in searchable_text:
@@ -288,11 +278,7 @@ class ToolRegistry:
         cost_levels = {"low": 1, "medium": 2, "high": 3}
         max_level = cost_levels.get(max_cost, 3)
 
-        return [
-            tool
-            for tool in self.tools.values()
-            if cost_levels.get(tool.cost_indicator, 3) <= max_level
-        ]
+        return [tool for tool in self.tools.values() if cost_levels.get(tool.cost_indicator, 3) <= max_level]
 
     def to_function_calling_schema(self) -> List[Dict]:
         """Convert to OpenAI function calling format."""

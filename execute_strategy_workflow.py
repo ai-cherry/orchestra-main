@@ -66,9 +66,7 @@ def execute_roo_workflow(workflow_def):
         return result
 
     except ImportError:
-        logger.error(
-            "Workflow manager not available. Make sure roo_workflow_manager.py is available."
-        )
+        logger.error("Workflow manager not available. Make sure roo_workflow_manager.py is available.")
         return None
     except Exception as e:
         logger.error(f"Error executing workflow: {e}")

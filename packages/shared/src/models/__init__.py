@@ -5,8 +5,7 @@ This module exports all models for easy importing throughout the application.
 """
 
 # Export classes from base_models (legacy models)
-from .base_models import MemoryItem
-from .base_models import PersonaConfig as LegacyPersonaConfig
+from .base_models import MemoryItem, PersonaConfig as LegacyPersonaConfig
 
 # Export classes from core_models (definitive versions going forward)
 from .core_models import AgentData, PersonaConfig, UserInteraction

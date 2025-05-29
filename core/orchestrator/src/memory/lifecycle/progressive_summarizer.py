@@ -10,8 +10,8 @@ import re
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
 
-from pydantic import BaseModel, Field
 from google.cloud import aiplatform
+from pydantic import BaseModel, Field
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -111,9 +111,7 @@ class ProgressiveSummarizer:
         if self.config.use_openai:
             self._init_openai()
 
-        logger.info(
-            f"ProgressiveSummarizer initialized (Vertex AI: {self.config.use_openai})"
-        )
+        logger.info(f"ProgressiveSummarizer initialized (Vertex AI: {self.config.use_openai})")
 
     def _init_openai(self) -> None:
         """
@@ -137,15 +135,11 @@ class ProgressiveSummarizer:
                 logger.info(f"Vertex AI endpoint initialized: {endpoint_name}")
             else:
                 # Use foundation model for summarization
-                self.openai_client = aiplatform.TextGenerationModel.from_pretrained(
-                    "text-bison@latest"
-                )
+                self.openai_client = aiplatform.TextGenerationModel.from_pretrained("text-bison@latest")
                 logger.info("Vertex AI foundation model initialized for summarization")
 
         except ImportError:
-            logger.warning(
-                "google-cloud-aiplatform package not installed. Falling back to rule-based summarization."
-            )
+            logger.warning("google-cloud-aiplatform package not installed. Falling back to rule-based summarization.")
             self.config.use_openai = False
         except Exception as e:
             logger.error(f"Failed to initialize Vertex AI: {e}")
@@ -183,13 +177,8 @@ class ProgressiveSummarizer:
 
         # Check minimum length requirements
         content_length = len(content)
-        if (
-            level == SummaryLevel.CONDENSED
-            and content_length < self.config.min_length_for_condensed
-        ):
-            logger.info(
-                f"Content too short for {level} summarization, returning full content"
-            )
+        if level == SummaryLevel.CONDENSED and content_length < self.config.min_length_for_condensed:
+            logger.info(f"Content too short for {level} summarization, returning full content")
             return SummaryResult(
                 original_id=item_id,
                 original_length=content_length,
@@ -199,10 +188,7 @@ class ProgressiveSummarizer:
                 estimated_quality=1.0,
             )
 
-        if (
-            level == SummaryLevel.KEY_POINTS
-            and content_length < self.config.min_length_for_key_points
-        ):
+        if level == SummaryLevel.KEY_POINTS and content_length < self.config.min_length_for_key_points:
             # Fall back to condensed if available
             if content_length >= self.config.min_length_for_condensed:
                 level = SummaryLevel.CONDENSED
@@ -216,10 +202,7 @@ class ProgressiveSummarizer:
                     estimated_quality=1.0,
                 )
 
-        if (
-            level == SummaryLevel.HEADLINE
-            and content_length < self.config.min_length_for_headline
-        ):
+        if level == SummaryLevel.HEADLINE and content_length < self.config.min_length_for_headline:
             # Fall back to key points or condensed if available
             if content_length >= self.config.min_length_for_key_points:
                 level = SummaryLevel.KEY_POINTS
@@ -239,18 +222,12 @@ class ProgressiveSummarizer:
         entities = []
         keywords = []
         if self.config.preserve_entities or self.config.preserve_keywords:
-            entities, keywords = await self._extract_entities_and_keywords(
-                content, metadata
-            )
+            entities, keywords = await self._extract_entities_and_keywords(content, metadata)
 
         # Truncate content if too long
-        if (
-            content_length > self.config.max_input_tokens * 4
-        ):  # Approximate chars to tokens
+        if content_length > self.config.max_input_tokens * 4:  # Approximate chars to tokens
             content = content[: self.config.max_input_tokens * 4]
-            logger.warning(
-                f"Content truncated to {self.config.max_input_tokens} tokens"
-            )
+            logger.warning(f"Content truncated to {self.config.max_input_tokens} tokens")
 
         # Perform summarization
         try:
@@ -342,9 +319,7 @@ class ProgressiveSummarizer:
         # Call Vertex AI
         if hasattr(self.openai_client, "predict"):
             # Using custom endpoint
-            response = await self.openai_client.predict_async(
-                instances=[{"prompt": prompt}]
-            )
+            response = await self.openai_client.predict_async(instances=[{"prompt": prompt}])
 
             # Extract summary from response
             summary = response[0].get("content", "")
@@ -470,9 +445,7 @@ class ProgressiveSummarizer:
 
         # Sort by frequency
         sorted_entities = sorted(word_counts.items(), key=lambda x: x[1], reverse=True)
-        entities = [
-            word for word, _ in sorted_entities[: self.config.max_entities_to_preserve]
-        ]
+        entities = [word for word, _ in sorted_entities[: self.config.max_entities_to_preserve]]
 
         # Extract keywords (most frequent words, excluding stopwords)
         stopwords = {
@@ -505,9 +478,7 @@ class ProgressiveSummarizer:
 
         # Sort by frequency
         sorted_keywords = sorted(word_counts.items(), key=lambda x: x[1], reverse=True)
-        keywords = [
-            word for word, _ in sorted_keywords[: self.config.max_keywords_to_preserve]
-        ]
+        keywords = [word for word, _ in sorted_keywords[: self.config.max_keywords_to_preserve]]
 
         return entities, keywords
 
@@ -601,23 +572,17 @@ class ProgressiveSummarizer:
 
         # Check if content is long enough for condensed summary
         if len(content) >= self.config.min_length_for_condensed:
-            condensed = await self.summarize(
-                content, item_id, SummaryLevel.CONDENSED, metadata
-            )
+            condensed = await self.summarize(content, item_id, SummaryLevel.CONDENSED, metadata)
             results[SummaryLevel.CONDENSED] = condensed
 
         # Check if content is long enough for key points
         if len(content) >= self.config.min_length_for_key_points:
-            key_points = await self.summarize(
-                content, item_id, SummaryLevel.KEY_POINTS, metadata
-            )
+            key_points = await self.summarize(content, item_id, SummaryLevel.KEY_POINTS, metadata)
             results[SummaryLevel.KEY_POINTS] = key_points
 
         # Check if content is long enough for headline
         if len(content) >= self.config.min_length_for_headline:
-            headline = await self.summarize(
-                content, item_id, SummaryLevel.HEADLINE, metadata
-            )
+            headline = await self.summarize(content, item_id, SummaryLevel.HEADLINE, metadata)
             results[SummaryLevel.HEADLINE] = headline
 
         return results

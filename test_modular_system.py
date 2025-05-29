@@ -7,16 +7,10 @@ This script tests the core functionality of the modular architecture.
 import asyncio
 import logging
 
-from core.business.personas.base import (
-    PersonaConfig,
-    PersonaTrait,
-    ResponseStyle,
-    get_persona_manager,
-)
+from core.business.personas.base import PersonaConfig, PersonaTrait, ResponseStyle, get_persona_manager
 from core.business.workflows.examples import register_example_workflows
 from core.main import OrchestraSystem
 from core.services.agents.examples import register_example_agents
-
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -85,9 +79,7 @@ async def test_system():
     agents = agent_manager.list_agents()
     logger.info(f"\nRegistered agents ({len(agents)}):")
     for agent in agents:
-        logger.info(
-            f"  - {agent.name} ({agent.id}): {', '.join(cap.value for cap in agent.capabilities)}"
-        )
+        logger.info(f"  - {agent.name} ({agent.id}): {', '.join(cap.value for cap in agent.capabilities)}")
 
     # Test memory service
     from core.services.memory.unified_memory import get_memory_service

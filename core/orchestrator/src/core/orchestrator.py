@@ -10,19 +10,9 @@ import uuid
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from core.orchestrator.src.core.agents import (
-    Agent,
-    AgentContext,
-    get_agent_registry,
-)
-from core.orchestrator.src.core.memory import (
-    MemoryManager,
-    get_memory_manager,
-)
-from core.orchestrator.src.core.personas import (
-    PersonaManager,
-    get_persona_manager,
-)
+from core.orchestrator.src.core.agents import Agent, AgentContext, get_agent_registry
+from core.orchestrator.src.core.memory import MemoryManager, get_memory_manager
+from core.orchestrator.src.core.personas import PersonaManager, get_persona_manager
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -193,9 +183,7 @@ class Orchestrator:
         try:
             # Get persona
             persona = self._persona_manager.get_persona(persona_id)
-            logger.info(
-                f"Using persona {persona.name} for interaction {interaction_id}"
-            )
+            logger.info(f"Using persona {persona.name} for interaction {interaction_id}")
 
             # Publish interaction started event
             self._events.publish(
@@ -223,9 +211,7 @@ class Orchestrator:
             )
 
             # Get conversation history
-            conversation_history = self._memory_manager.get_conversation_history(
-                user_id=user_id, session_id=session_id
-            )
+            conversation_history = self._memory_manager.get_conversation_history(user_id=user_id, session_id=session_id)
 
             # Create agent context
             agent_context = AgentContext(
@@ -245,9 +231,7 @@ class Orchestrator:
             agent_response = await agent.process(agent_context)
 
             # Format response according to persona
-            formatted_response = self._persona_manager.format_response(
-                agent_response.text, persona_id
-            )
+            formatted_response = self._persona_manager.format_response(agent_response.text, persona_id)
 
             # Store response in memory
             response_metadata = {
@@ -325,9 +309,7 @@ class Orchestrator:
             )
 
             # Create fallback result
-            fallback_message = (
-                "I'm sorry, but I encountered an error processing your request."
-            )
+            fallback_message = "I'm sorry, but I encountered an error processing your request."
             result = InteractionResult(
                 message=fallback_message,
                 persona_id=persona_id or "default",

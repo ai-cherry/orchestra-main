@@ -26,18 +26,14 @@ class MonitoringComponent(ComponentResource):
         # Create monitoring namespace
         monitoring_ns = k8s.core.v1.Namespace(
             f"{name}-namespace",
-            metadata=k8s.meta.v1.ObjectMetaArgs(
-                name=namespace, labels={"name": namespace, "monitoring": "true"}
-            ),
+            metadata=k8s.meta.v1.ObjectMetaArgs(name=namespace, labels={"name": namespace, "monitoring": "true"}),
             opts=ResourceOptions(parent=self),
         )
 
         # Prometheus ConfigMap
         prometheus_config = k8s.core.v1.ConfigMap(
             f"{name}-prometheus-config",
-            metadata=k8s.meta.v1.ObjectMetaArgs(
-                name="prometheus-config", namespace=namespace
-            ),
+            metadata=k8s.meta.v1.ObjectMetaArgs(name="prometheus-config", namespace=namespace),
             data={
                 "prometheus.yml": """
 global:
@@ -117,9 +113,7 @@ scrape_configs:
         # Alerting rules ConfigMap
         alerting_rules = k8s.core.v1.ConfigMap(
             f"{name}-alerting-rules",
-            metadata=k8s.meta.v1.ObjectMetaArgs(
-                name="alerting-rules", namespace=namespace
-            ),
+            metadata=k8s.meta.v1.ObjectMetaArgs(name="alerting-rules", namespace=namespace),
             data={
                 "alerts.yml": """
 groups:
@@ -199,28 +193,18 @@ groups:
                 kind="ClusterRole",
                 name="prometheus",
             ),
-            subjects=[
-                k8s.rbac.v1.SubjectArgs(
-                    kind="ServiceAccount", name="prometheus", namespace=namespace
-                )
-            ],
-            opts=ResourceOptions(
-                parent=self, depends_on=[prometheus_sa, prometheus_cluster_role]
-            ),
+            subjects=[k8s.rbac.v1.SubjectArgs(kind="ServiceAccount", name="prometheus", namespace=namespace)],
+            opts=ResourceOptions(parent=self, depends_on=[prometheus_sa, prometheus_cluster_role]),
         )
 
         # Prometheus PVC
         prometheus_pvc = k8s.core.v1.PersistentVolumeClaim(
             f"{name}-prometheus-pvc",
-            metadata=k8s.meta.v1.ObjectMetaArgs(
-                name="prometheus-data", namespace=namespace
-            ),
+            metadata=k8s.meta.v1.ObjectMetaArgs(name="prometheus-data", namespace=namespace),
             spec=k8s.core.v1.PersistentVolumeClaimSpecArgs(
                 access_modes=["ReadWriteOnce"],
                 storage_class_name=storage_class,
-                resources=k8s.core.v1.ResourceRequirementsArgs(
-                    requests={"storage": "50Gi"}
-                ),
+                resources=k8s.core.v1.ResourceRequirementsArgs(requests={"storage": "50Gi"}),
             ),
             opts=ResourceOptions(parent=self, depends_on=[monitoring_ns]),
         )
@@ -228,14 +212,10 @@ groups:
         # Prometheus Deployment
         prometheus_deployment = k8s.apps.v1.Deployment(
             f"{name}-prometheus",
-            metadata=k8s.meta.v1.ObjectMetaArgs(
-                name="prometheus", namespace=namespace, labels={"app": "prometheus"}
-            ),
+            metadata=k8s.meta.v1.ObjectMetaArgs(name="prometheus", namespace=namespace, labels={"app": "prometheus"}),
             spec=k8s.apps.v1.DeploymentSpecArgs(
                 replicas=1,
-                selector=k8s.meta.v1.LabelSelectorArgs(
-                    match_labels={"app": "prometheus"}
-                ),
+                selector=k8s.meta.v1.LabelSelectorArgs(match_labels={"app": "prometheus"}),
                 template=k8s.core.v1.PodTemplateSpecArgs(
                     metadata=k8s.meta.v1.ObjectMetaArgs(
                         labels={"app": "prometheus"},
@@ -258,21 +238,11 @@ groups:
                                     "--web.enable-lifecycle",
                                     "--storage.tsdb.retention.time=30d",
                                 ],
-                                ports=[
-                                    k8s.core.v1.ContainerPortArgs(
-                                        container_port=9090, name="web"
-                                    )
-                                ],
+                                ports=[k8s.core.v1.ContainerPortArgs(container_port=9090, name="web")],
                                 volume_mounts=[
-                                    k8s.core.v1.VolumeMountArgs(
-                                        name="config", mount_path="/etc/prometheus"
-                                    ),
-                                    k8s.core.v1.VolumeMountArgs(
-                                        name="rules", mount_path="/etc/prometheus/rules"
-                                    ),
-                                    k8s.core.v1.VolumeMountArgs(
-                                        name="data", mount_path="/prometheus"
-                                    ),
+                                    k8s.core.v1.VolumeMountArgs(name="config", mount_path="/etc/prometheus"),
+                                    k8s.core.v1.VolumeMountArgs(name="rules", mount_path="/etc/prometheus/rules"),
+                                    k8s.core.v1.VolumeMountArgs(name="data", mount_path="/prometheus"),
                                 ],
                                 resources=k8s.core.v1.ResourceRequirementsArgs(
                                     requests={"memory": "1Gi", "cpu": "500m"},
@@ -283,15 +253,11 @@ groups:
                         volumes=[
                             k8s.core.v1.VolumeArgs(
                                 name="config",
-                                config_map=k8s.core.v1.ConfigMapVolumeSourceArgs(
-                                    name="prometheus-config"
-                                ),
+                                config_map=k8s.core.v1.ConfigMapVolumeSourceArgs(name="prometheus-config"),
                             ),
                             k8s.core.v1.VolumeArgs(
                                 name="rules",
-                                config_map=k8s.core.v1.ConfigMapVolumeSourceArgs(
-                                    name="alerting-rules"
-                                ),
+                                config_map=k8s.core.v1.ConfigMapVolumeSourceArgs(name="alerting-rules"),
                             ),
                             k8s.core.v1.VolumeArgs(
                                 name="data",
@@ -317,14 +283,10 @@ groups:
         # Prometheus Service
         prometheus_service = k8s.core.v1.Service(
             f"{name}-prometheus-service",
-            metadata=k8s.meta.v1.ObjectMetaArgs(
-                name="prometheus", namespace=namespace, labels={"app": "prometheus"}
-            ),
+            metadata=k8s.meta.v1.ObjectMetaArgs(name="prometheus", namespace=namespace, labels={"app": "prometheus"}),
             spec=k8s.core.v1.ServiceSpecArgs(
                 selector={"app": "prometheus"},
-                ports=[
-                    k8s.core.v1.ServicePortArgs(port=9090, target_port=9090, name="web")
-                ],
+                ports=[k8s.core.v1.ServicePortArgs(port=9090, target_port=9090, name="web")],
                 type="ClusterIP",
             ),
             opts=ResourceOptions(parent=self, depends_on=[prometheus_deployment]),
@@ -333,9 +295,7 @@ groups:
         # Grafana ConfigMap
         grafana_config = k8s.core.v1.ConfigMap(
             f"{name}-grafana-config",
-            metadata=k8s.meta.v1.ObjectMetaArgs(
-                name="grafana-config", namespace=namespace
-            ),
+            metadata=k8s.meta.v1.ObjectMetaArgs(name="grafana-config", namespace=namespace),
             data={
                 "grafana.ini": """
 [server]
@@ -368,9 +328,7 @@ datasources:
         # Grafana Dashboard ConfigMap
         grafana_dashboards = k8s.core.v1.ConfigMap(
             f"{name}-grafana-dashboards",
-            metadata=k8s.meta.v1.ObjectMetaArgs(
-                name="grafana-dashboards", namespace=namespace
-            ),
+            metadata=k8s.meta.v1.ObjectMetaArgs(name="grafana-dashboards", namespace=namespace),
             data={"superagi-dashboard.json": self._get_grafana_dashboard()},
             opts=ResourceOptions(parent=self, depends_on=[monitoring_ns]),
         )
@@ -378,9 +336,7 @@ datasources:
         # Grafana Deployment
         grafana_deployment = k8s.apps.v1.Deployment(
             f"{name}-grafana",
-            metadata=k8s.meta.v1.ObjectMetaArgs(
-                name="grafana", namespace=namespace, labels={"app": "grafana"}
-            ),
+            metadata=k8s.meta.v1.ObjectMetaArgs(name="grafana", namespace=namespace, labels={"app": "grafana"}),
             spec=k8s.apps.v1.DeploymentSpecArgs(
                 replicas=1,
                 selector=k8s.meta.v1.LabelSelectorArgs(match_labels={"app": "grafana"}),
@@ -391,11 +347,7 @@ datasources:
                             k8s.core.v1.ContainerArgs(
                                 name="grafana",
                                 image="grafana/grafana:10.0.0",
-                                ports=[
-                                    k8s.core.v1.ContainerPortArgs(
-                                        container_port=3000, name="web"
-                                    )
-                                ],
+                                ports=[k8s.core.v1.ContainerPortArgs(container_port=3000, name="web")],
                                 env=[
                                     k8s.core.v1.EnvVarArgs(
                                         name="GRAFANA_ADMIN_PASSWORD",
@@ -403,9 +355,7 @@ datasources:
                                     )
                                 ],
                                 volume_mounts=[
-                                    k8s.core.v1.VolumeMountArgs(
-                                        name="config", mount_path="/etc/grafana"
-                                    ),
+                                    k8s.core.v1.VolumeMountArgs(name="config", mount_path="/etc/grafana"),
                                     k8s.core.v1.VolumeMountArgs(
                                         name="datasources",
                                         mount_path="/etc/grafana/provisioning/datasources",
@@ -424,9 +374,7 @@ datasources:
                         volumes=[
                             k8s.core.v1.VolumeArgs(
                                 name="config",
-                                config_map=k8s.core.v1.ConfigMapVolumeSourceArgs(
-                                    name="grafana-config"
-                                ),
+                                config_map=k8s.core.v1.ConfigMapVolumeSourceArgs(name="grafana-config"),
                             ),
                             k8s.core.v1.VolumeArgs(
                                 name="datasources",
@@ -442,44 +390,32 @@ datasources:
                             ),
                             k8s.core.v1.VolumeArgs(
                                 name="dashboards",
-                                config_map=k8s.core.v1.ConfigMapVolumeSourceArgs(
-                                    name="grafana-dashboards"
-                                ),
+                                config_map=k8s.core.v1.ConfigMapVolumeSourceArgs(name="grafana-dashboards"),
                             ),
                         ],
                     ),
                 ),
             ),
-            opts=ResourceOptions(
-                parent=self, depends_on=[grafana_config, grafana_dashboards]
-            ),
+            opts=ResourceOptions(parent=self, depends_on=[grafana_config, grafana_dashboards]),
         )
 
         # Grafana Service
         grafana_service = k8s.core.v1.Service(
             f"{name}-grafana-service",
-            metadata=k8s.meta.v1.ObjectMetaArgs(
-                name="grafana", namespace=namespace, labels={"app": "grafana"}
-            ),
+            metadata=k8s.meta.v1.ObjectMetaArgs(name="grafana", namespace=namespace, labels={"app": "grafana"}),
             spec=k8s.core.v1.ServiceSpecArgs(
                 selector={"app": "grafana"},
-                ports=[
-                    k8s.core.v1.ServicePortArgs(port=3000, target_port=3000, name="web")
-                ],
+                ports=[k8s.core.v1.ServicePortArgs(port=3000, target_port=3000, name="web")],
                 type="LoadBalancer",
             ),
             opts=ResourceOptions(parent=self, depends_on=[grafana_deployment]),
         )
 
         # Export endpoints
-        self.prometheus_endpoint = Output.concat(
-            "http://", prometheus_service.metadata.name, ":", "9090"
-        )
+        self.prometheus_endpoint = Output.concat("http://", prometheus_service.metadata.name, ":", "9090")
         self.grafana_endpoint = grafana_service.status.apply(
             lambda status: (
-                f"http://{status.load_balancer.ingress[0].ip}:3000"
-                if status.load_balancer.ingress
-                else "pending"
+                f"http://{status.load_balancer.ingress[0].ip}:3000" if status.load_balancer.ingress else "pending"
             )
         )
 

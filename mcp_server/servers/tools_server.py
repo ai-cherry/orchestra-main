@@ -4,22 +4,21 @@ Tools MCP Server - Exposes available tools to AI assistants
 
 import asyncio
 import json
-import sys
 import os
+import sys
 from typing import Any, Dict, List
 
 # Add parent directories to path
-sys.path.append(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-)
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
-from mcp.types import Tool, TextContent
+from mcp.types import TextContent, Tool
+
+from core.orchestrator.src.tools.executor import ToolExecutor
 
 # Import our tool system
 from core.orchestrator.src.tools.registry import ToolRegistry
-from core.orchestrator.src.tools.executor import ToolExecutor
 
 
 class ToolsServer:
@@ -127,9 +126,7 @@ class ToolsServer:
             """Handle tool calls."""
 
             if name == "search_tools":
-                results = self.registry.search_tools(
-                    arguments["query"], arguments.get("category")
-                )
+                results = self.registry.search_tools(arguments["query"], arguments.get("category"))
 
                 # Format results
                 output = f"Found {len(results)} tools:\n\n"
@@ -170,9 +167,7 @@ class ToolsServer:
                         output += f"**Constraints**: {tool.constraints}\n\n"
 
                     if tool.related_tools:
-                        output += (
-                            f"**Related tools**: {', '.join(tool.related_tools)}\n"
-                        )
+                        output += f"**Related tools**: {', '.join(tool.related_tools)}\n"
 
                     return [TextContent(type="text", text=output)]
                 else:
@@ -187,11 +182,7 @@ class ToolsServer:
                 categories = set(tool.category for tool in self.registry.tools.values())
                 output = "Available tool categories:\n\n"
                 for category in sorted(categories):
-                    tools_in_cat = [
-                        t
-                        for t in self.registry.tools.values()
-                        if t.category == category
-                    ]
+                    tools_in_cat = [t for t in self.registry.tools.values() if t.category == category]
                     output += f"- **{category}** ({len(tools_in_cat)} tools)\n"
 
                 return [TextContent(type="text", text=output)]

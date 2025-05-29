@@ -93,11 +93,9 @@ class LiteLLMClient:
         # Set API keys from parameters or environment variables
         self.api_keys = {
             ModelProvider.OPENAI: api_key_openai or os.environ.get("OPENAI_API_KEY"),
-            ModelProvider.ANTHROPIC: api_key_anthropic
-            or os.environ.get("ANTHROPIC_API_KEY"),
+            ModelProvider.ANTHROPIC: api_key_anthropic or os.environ.get("ANTHROPIC_API_KEY"),
             ModelProvider.GOOGLE: api_key_google or os.environ.get("GEMINI_API_KEY"),
-            ModelProvider.AZURE_OPENAI: api_key_azure
-            or os.environ.get("AZURE_OPENAI_API_KEY"),
+            ModelProvider.AZURE_OPENAI: api_key_azure or os.environ.get("AZURE_OPENAI_API_KEY"),
         }
 
         # Set Azure API base
@@ -109,9 +107,7 @@ class LiteLLMClient:
 
         # Set default models
         self.default_model = default_model or "gpt-3.5-turbo"
-        self.default_embedding_model = (
-            default_embedding_model or "text-embedding-ada-002"
-        )
+        self.default_embedding_model = default_embedding_model or "text-embedding-ada-002"
 
         # Configure LiteLLM
         self._configure_litellm()
@@ -213,11 +209,7 @@ class LiteLLMClient:
                 content=content,
                 usage=usage,
                 finish_reason=response.choices[0].finish_reason,
-                raw_response=(
-                    response.model_dump()
-                    if hasattr(response, "model_dump")
-                    else response.dict()
-                ),
+                raw_response=(response.model_dump() if hasattr(response, "model_dump") else response.dict()),
             )
 
         except Exception as e:
@@ -314,11 +306,7 @@ class LiteLLMClient:
                 model=model,
                 embedding=embedding,
                 usage=usage,
-                raw_response=(
-                    response.model_dump()
-                    if hasattr(response, "model_dump")
-                    else response.dict()
-                ),
+                raw_response=(response.model_dump() if hasattr(response, "model_dump") else response.dict()),
             )
 
         except Exception as e:

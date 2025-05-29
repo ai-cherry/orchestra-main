@@ -4,10 +4,10 @@ Environment Verification Script for AI Orchestra
 Ensures all environment components are properly configured
 """
 
-import os
-import sys
-import subprocess
 import json
+import os
+import subprocess
+import sys
 from pathlib import Path
 from typing import Dict, Tuple
 
@@ -37,9 +37,7 @@ def check_python_version() -> Tuple[bool, str]:
 
 def check_virtual_env() -> Tuple[bool, str]:
     """Check if running in virtual environment."""
-    if hasattr(sys, "real_prefix") or (
-        hasattr(sys, "base_prefix") and sys.base_prefix != sys.prefix
-    ):
+    if hasattr(sys, "real_prefix") or (hasattr(sys, "base_prefix") and sys.base_prefix != sys.prefix):
         return True, sys.prefix
     return False, "Not in virtual environment"
 
@@ -87,9 +85,7 @@ def check_environment_variables() -> Dict[str, bool]:
                 if var in env_content or var in os.environ:
                     results[f"{var} (optional)"] = True
                 else:
-                    results[f"{var} (optional)"] = (
-                        None  # None means optional and not set
-                    )
+                    results[f"{var} (optional)"] = None  # None means optional and not set
 
     return results
 
@@ -141,9 +137,7 @@ def check_dependencies() -> Dict[str, bool]:
             env = os.environ.copy()
             env["PATH"] = f"{env['PATH']}:{os.path.expanduser('~/.pulumi/bin')}"
 
-            subprocess.run(
-                [tool, "--version"], capture_output=True, check=True, env=env
-            )
+            subprocess.run([tool, "--version"], capture_output=True, check=True, env=env)
             results[f"{tool} ({description})"] = True
         except (subprocess.CalledProcessError, FileNotFoundError):
             results[f"{tool} ({description})"] = False
@@ -273,13 +267,9 @@ def main():
         missing_files = [f for f, exists in file_results.items() if not exists]
         critical_issues.append(f"Missing files: {', '.join(missing_files)}")
 
-    required_env_missing = [
-        var for var, status in env_results.items() if "required" in var and not status
-    ]
+    required_env_missing = [var for var, status in env_results.items() if "required" in var and not status]
     if required_env_missing:
-        critical_issues.append(
-            f"Missing required env vars: {', '.join(required_env_missing)}"
-        )
+        critical_issues.append(f"Missing required env vars: {', '.join(required_env_missing)}")
 
     missing_tools = [tool for tool, installed in dep_results.items() if not installed]
     if missing_tools:

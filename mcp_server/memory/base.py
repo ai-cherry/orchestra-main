@@ -91,15 +91,9 @@ class MemoryEntry:
         metadata_dict = data.get("metadata", {})
         metadata = MemoryMetadata(
             id=metadata_dict.get("id", str(uuid4())),
-            created_at=datetime.fromisoformat(
-                metadata_dict.get("created_at", datetime.utcnow().isoformat())
-            ),
-            updated_at=datetime.fromisoformat(
-                metadata_dict.get("updated_at", datetime.utcnow().isoformat())
-            ),
-            accessed_at=datetime.fromisoformat(
-                metadata_dict.get("accessed_at", datetime.utcnow().isoformat())
-            ),
+            created_at=datetime.fromisoformat(metadata_dict.get("created_at", datetime.utcnow().isoformat())),
+            updated_at=datetime.fromisoformat(metadata_dict.get("updated_at", datetime.utcnow().isoformat())),
+            accessed_at=datetime.fromisoformat(metadata_dict.get("accessed_at", datetime.utcnow().isoformat())),
             access_count=metadata_dict.get("access_count", 0),
             tier=MemoryTier(metadata_dict.get("tier", MemoryTier.HOT.value)),
             ttl_seconds=metadata_dict.get("ttl_seconds", 3600),
@@ -286,13 +280,9 @@ class BaseMemory(ABC):
                 if not self._initialized:
                     self._initialized = await self.initialize()
                     if not self._initialized:
-                        raise RuntimeError(
-                            f"Failed to initialize {self.tier.value} memory backend"
-                        )
+                        raise RuntimeError(f"Failed to initialize {self.tier.value} memory backend")
 
-    async def migrate_to_tier(
-        self, entry: MemoryEntry, target_tier: MemoryTier
-    ) -> bool:
+    async def migrate_to_tier(self, entry: MemoryEntry, target_tier: MemoryTier) -> bool:
         """
         Migrate an entry to a different tier.
 

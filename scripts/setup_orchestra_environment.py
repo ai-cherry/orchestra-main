@@ -5,11 +5,11 @@ Sets up all configurations, dependencies, and validates the setup.
 """
 
 import os
-import sys
+import shutil
 import subprocess
+import sys
 from pathlib import Path
 from typing import List
-import shutil
 
 
 class OrchestraSetup:
@@ -266,13 +266,9 @@ Orchestra AI is now a **GCP-free** system using:
         # Check Python version
         python_version = sys.version_info
         if python_version.major == 3 and python_version.minor >= 10:
-            print(
-                f"  ✓ Python {python_version.major}.{python_version.minor} is compatible"
-            )
+            print(f"  ✓ Python {python_version.major}.{python_version.minor} is compatible")
         else:
-            self.warnings.append(
-                f"Python 3.10+ recommended, found {python_version.major}.{python_version.minor}"
-            )
+            self.warnings.append(f"Python 3.10+ recommended, found {python_version.major}.{python_version.minor}")
 
         # Check key files exist
         key_files = [

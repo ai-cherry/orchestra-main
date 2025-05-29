@@ -102,12 +102,8 @@ firewall = do.Firewall(
             port_range="22",
             source_addresses=["0.0.0.0/0"],  # Restrict in production
         ),
-        do.FirewallInboundRuleArgs(
-            protocol="tcp", port_range="80", source_addresses=["0.0.0.0/0"]
-        ),
-        do.FirewallInboundRuleArgs(
-            protocol="tcp", port_range="443", source_addresses=["0.0.0.0/0"]
-        ),
+        do.FirewallInboundRuleArgs(protocol="tcp", port_range="80", source_addresses=["0.0.0.0/0"]),
+        do.FirewallInboundRuleArgs(protocol="tcp", port_range="443", source_addresses=["0.0.0.0/0"]),
         do.FirewallInboundRuleArgs(
             protocol="tcp",
             port_range="8080",  # Orchestra API
@@ -115,9 +111,7 @@ firewall = do.Firewall(
         ),
     ],
     outbound_rules=[
-        do.FirewallOutboundRuleArgs(
-            protocol="tcp", port_range="1-65535", destination_addresses=["0.0.0.0/0"]
-        )
+        do.FirewallOutboundRuleArgs(protocol="tcp", port_range="1-65535", destination_addresses=["0.0.0.0/0"])
     ],
 )
 

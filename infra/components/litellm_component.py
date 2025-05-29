@@ -13,9 +13,7 @@ from pulumi import ComponentResource, Output, ResourceOptions
 class LiteLLMComponent(ComponentResource):
     """LiteLLM gateway for unified LLM access"""
 
-    def __init__(
-        self, name: str, config: Dict[str, Any], opts: Optional[ResourceOptions] = None
-    ):
+    def __init__(self, name: str, config: Dict[str, Any], opts: Optional[ResourceOptions] = None):
         super().__init__("orchestra:llm:LiteLLM", name, {}, opts)
 
         namespace = config["namespace"]
@@ -27,9 +25,7 @@ class LiteLLMComponent(ComponentResource):
         # Create ConfigMap for LiteLLM configuration
         litellm_config = k8s.core.v1.ConfigMap(
             f"{name}-config",
-            metadata=k8s.meta.v1.ObjectMetaArgs(
-                name="litellm-config", namespace=namespace
-            ),
+            metadata=k8s.meta.v1.ObjectMetaArgs(name="litellm-config", namespace=namespace),
             data={
                 "config.yaml": """
 model_list:
@@ -79,9 +75,7 @@ general_settings:
         # Create Secret for API keys
         litellm_secret = k8s.core.v1.Secret(
             f"{name}-secret",
-            metadata=k8s.meta.v1.ObjectMetaArgs(
-                name="litellm-secret", namespace=namespace
-            ),
+            metadata=k8s.meta.v1.ObjectMetaArgs(name="litellm-secret", namespace=namespace),
             string_data={
                 **api_keys,
                 "LITELLM_MASTER_KEY": "sk-1234567890abcdef",  # Generate a secure key
@@ -93,9 +87,7 @@ general_settings:
         # Create Deployment
         deployment = k8s.apps.v1.Deployment(
             f"{name}-deployment",
-            metadata=k8s.meta.v1.ObjectMetaArgs(
-                name="litellm", namespace=namespace, labels={"app": "litellm"}
-            ),
+            metadata=k8s.meta.v1.ObjectMetaArgs(name="litellm", namespace=namespace, labels={"app": "litellm"}),
             spec=k8s.apps.v1.DeploymentSpecArgs(
                 replicas=replicas,
                 selector=k8s.meta.v1.LabelSelectorArgs(match_labels={"app": "litellm"}),
@@ -122,38 +114,26 @@ general_settings:
                                     "--num_workers",
                                     "4",
                                 ],
-                                ports=[
-                                    k8s.core.v1.ContainerPortArgs(
-                                        container_port=port, name="http"
-                                    )
-                                ],
+                                ports=[k8s.core.v1.ContainerPortArgs(container_port=port, name="http")],
                                 env_from=[
                                     k8s.core.v1.EnvFromSourceArgs(
-                                        secret_ref=k8s.core.v1.SecretEnvSourceArgs(
-                                            name="litellm-secret"
-                                        )
+                                        secret_ref=k8s.core.v1.SecretEnvSourceArgs(name="litellm-secret")
                                     )
                                 ],
                                 volume_mounts=[
-                                    k8s.core.v1.VolumeMountArgs(
-                                        name="config", mount_path="/app", read_only=True
-                                    )
+                                    k8s.core.v1.VolumeMountArgs(name="config", mount_path="/app", read_only=True)
                                 ],
                                 resources=k8s.core.v1.ResourceRequirementsArgs(
                                     requests={"memory": "512Mi", "cpu": "500m"},
                                     limits={"memory": "1Gi", "cpu": "1"},
                                 ),
                                 liveness_probe=k8s.core.v1.ProbeArgs(
-                                    http_get=k8s.core.v1.HTTPGetActionArgs(
-                                        path="/health", port=port
-                                    ),
+                                    http_get=k8s.core.v1.HTTPGetActionArgs(path="/health", port=port),
                                     initial_delay_seconds=30,
                                     period_seconds=10,
                                 ),
                                 readiness_probe=k8s.core.v1.ProbeArgs(
-                                    http_get=k8s.core.v1.HTTPGetActionArgs(
-                                        path="/health/readiness", port=port
-                                    ),
+                                    http_get=k8s.core.v1.HTTPGetActionArgs(path="/health/readiness", port=port),
                                     initial_delay_seconds=10,
                                     period_seconds=5,
                                 ),
@@ -162,32 +142,22 @@ general_settings:
                         volumes=[
                             k8s.core.v1.VolumeArgs(
                                 name="config",
-                                config_map=k8s.core.v1.ConfigMapVolumeSourceArgs(
-                                    name="litellm-config"
-                                ),
+                                config_map=k8s.core.v1.ConfigMapVolumeSourceArgs(name="litellm-config"),
                             )
                         ],
                     ),
                 ),
             ),
-            opts=ResourceOptions(
-                parent=self, depends_on=[litellm_config, litellm_secret]
-            ),
+            opts=ResourceOptions(parent=self, depends_on=[litellm_config, litellm_secret]),
         )
 
         # Create Service
         service = k8s.core.v1.Service(
             f"{name}-service",
-            metadata=k8s.meta.v1.ObjectMetaArgs(
-                name="litellm", namespace=namespace, labels={"app": "litellm"}
-            ),
+            metadata=k8s.meta.v1.ObjectMetaArgs(name="litellm", namespace=namespace, labels={"app": "litellm"}),
             spec=k8s.core.v1.ServiceSpecArgs(
                 selector={"app": "litellm"},
-                ports=[
-                    k8s.core.v1.ServicePortArgs(
-                        port=port, target_port=port, name="http"
-                    )
-                ],
+                ports=[k8s.core.v1.ServicePortArgs(port=port, target_port=port, name="http")],
                 type="ClusterIP",
             ),
             opts=ResourceOptions(parent=self, depends_on=[deployment]),
@@ -196,9 +166,7 @@ general_settings:
         # Create HPA for auto-scaling
         k8s.autoscaling.v2.HorizontalPodAutoscaler(
             f"{name}-hpa",
-            metadata=k8s.meta.v1.ObjectMetaArgs(
-                name="litellm-hpa", namespace=namespace
-            ),
+            metadata=k8s.meta.v1.ObjectMetaArgs(name="litellm-hpa", namespace=namespace),
             spec=k8s.autoscaling.v2.HorizontalPodAutoscalerSpecArgs(
                 scale_target_ref=k8s.autoscaling.v2.CrossVersionObjectReferenceArgs(
                     api_version="apps/v1", kind="Deployment", name="litellm"
@@ -210,18 +178,14 @@ general_settings:
                         type="Resource",
                         resource=k8s.autoscaling.v2.ResourceMetricSourceArgs(
                             name="cpu",
-                            target=k8s.autoscaling.v2.MetricTargetArgs(
-                                type="Utilization", average_utilization=70
-                            ),
+                            target=k8s.autoscaling.v2.MetricTargetArgs(type="Utilization", average_utilization=70),
                         ),
                     ),
                     k8s.autoscaling.v2.MetricSpecArgs(
                         type="Resource",
                         resource=k8s.autoscaling.v2.ResourceMetricSourceArgs(
                             name="memory",
-                            target=k8s.autoscaling.v2.MetricTargetArgs(
-                                type="Utilization", average_utilization=80
-                            ),
+                            target=k8s.autoscaling.v2.MetricTargetArgs(type="Utilization", average_utilization=80),
                         ),
                     ),
                 ],

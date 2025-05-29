@@ -7,9 +7,7 @@ def check_virtual_environment() -> None:
     """Check if we're in a virtual environment and provide guidance if not."""
     if not hasattr(sys, "prefix") or sys.prefix == sys.base_prefix:
         print("ERROR: No virtual environment is active.")
-        print(
-            "Please activate your virtual environment (e.g., 'source venv/bin/activate')"
-        )
+        print("Please activate your virtual environment (e.g., 'source venv/bin/activate')")
         sys.exit(1)
 
     print(f"Active venv: {sys.prefix}")

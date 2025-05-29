@@ -77,9 +77,7 @@ def configure_phidata_model(model_class: Type[T], config: LLMProviderConfig) -> 
         Configured Phidata/Agno model instance
     """
     # Create headers with Portkey authentication
-    headers = create_portkey_headers(
-        api_key=config.api_key, provider=config.provider, virtual_key=config.virtual_key
-    )
+    headers = create_portkey_headers(api_key=config.api_key, provider=config.provider, virtual_key=config.virtual_key)
 
     # Common initialization parameters
     model_args = {"base_url": config.base_url, "default_headers": headers}
@@ -95,9 +93,7 @@ def configure_phidata_model(model_class: Type[T], config: LLMProviderConfig) -> 
         raise
 
 
-def configure_model_from_settings(
-    model_class: Type[T], settings: Settings, provider: str
-) -> T:
+def configure_model_from_settings(model_class: Type[T], settings: Settings, provider: str) -> T:
     """
     Configure a model using application settings.
 

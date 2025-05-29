@@ -17,6 +17,7 @@ sys.path.insert(0, project_root)
 
 import importlib
 import pkgutil
+
 from mcp_server.config import MCPConfig, load_config
 from mcp_server.managers.standard_memory_manager import StandardMemoryManager
 from mcp_server.storage.in_memory_storage import InMemoryStorage
@@ -63,15 +64,7 @@ class MCPApplication:
                 continue
             module = importlib.import_module(f"mcp_server.adapters.{name}")
             # Find the adapter class (by convention: PascalCase of file, e.g., CopilotAdapter)
-            class_name = (
-                "".join(
-                    [
-                        part.capitalize()
-                        for part in name.replace("_adapter", "").split("_")
-                    ]
-                )
-                + "Adapter"
-            )
+            class_name = "".join([part.capitalize() for part in name.replace("_adapter", "").split("_")]) + "Adapter"
             adapter_cls = getattr(module, class_name, None)
             if adapter_cls is None:
                 logger.warning(f"Adapter class {class_name} not found in {name}")

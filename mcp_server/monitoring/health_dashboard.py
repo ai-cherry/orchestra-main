@@ -65,9 +65,7 @@ async def check_health(name: str, url: str) -> dict:
 
 def create_health_table(health_data: list) -> Table:
     """Create health status table"""
-    table = Table(
-        title="MCP Server Health Status", show_header=True, header_style="bold magenta"
-    )
+    table = Table(title="MCP Server Health Status", show_header=True, header_style="bold magenta")
     table.add_column("Server", style="cyan", width=15)
     table.add_column("Status", width=15)
     table.add_column("Latency", justify="right", width=10)

@@ -3,12 +3,13 @@ MongoDB-based memory manager for AI agents.
 Replaces Firestore with MongoDB Atlas.
 """
 
+import logging
 import os
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
-from pymongo import MongoClient, ASCENDING, DESCENDING
+
+from pymongo import ASCENDING, DESCENDING, MongoClient
 from pymongo.errors import ConnectionFailure, OperationFailure
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -57,9 +58,7 @@ class MongoDBMemoryManager:
             self._db = self.client[self.database_name]
         return self._db
 
-    def store_memory(
-        self, agent_id: str, memory_type: str, content: Dict[str, Any]
-    ) -> str:
+    def store_memory(self, agent_id: str, memory_type: str, content: Dict[str, Any]) -> str:
         """
         Store a memory entry.
 
@@ -125,9 +124,7 @@ class MongoDBMemoryManager:
 
         return memories
 
-    def update_memory(
-        self, agent_id: str, memory_type: str, memory_id: str, updates: Dict[str, Any]
-    ) -> bool:
+    def update_memory(self, agent_id: str, memory_type: str, memory_id: str, updates: Dict[str, Any]) -> bool:
         """
         Update a memory entry.
 
@@ -147,9 +144,7 @@ class MongoDBMemoryManager:
         # Add update timestamp
         updates["last_updated"] = datetime.now(timezone.utc)
 
-        result = collection.update_one(
-            {"_id": ObjectId(memory_id), "agent_id": agent_id}, {"$set": updates}
-        )
+        result = collection.update_one({"_id": ObjectId(memory_id), "agent_id": agent_id}, {"$set": updates})
 
         return result.modified_count > 0
 
@@ -169,9 +164,7 @@ class MongoDBMemoryManager:
 
         collection = self.db[f"{agent_id}_{memory_type}"]
 
-        result = collection.delete_one(
-            {"_id": ObjectId(memory_id), "agent_id": agent_id}
-        )
+        result = collection.delete_one({"_id": ObjectId(memory_id), "agent_id": agent_id})
 
         return result.deleted_count > 0
 
@@ -199,9 +192,7 @@ class MongoDBMemoryManager:
             pass  # Index already exists
 
         # Perform text search
-        cursor = collection.find(
-            {"$text": {"$search": text_query}, "agent_id": agent_id}
-        ).limit(limit)
+        cursor = collection.find({"$text": {"$search": text_query}, "agent_id": agent_id}).limit(limit)
 
         # Convert results
         memories = []
@@ -224,11 +215,7 @@ class MongoDBMemoryManager:
         stats = {}
 
         # Get all collections for this agent
-        collection_names = [
-            name
-            for name in self.db.list_collection_names()
-            if name.startswith(f"{agent_id}_")
-        ]
+        collection_names = [name for name in self.db.list_collection_names() if name.startswith(f"{agent_id}_")]
 
         for collection_name in collection_names:
             memory_type = collection_name.replace(f"{agent_id}_", "")
@@ -241,12 +228,8 @@ class MongoDBMemoryManager:
             }
 
             # Get oldest and newest
-            oldest = collection.find_one(
-                {"agent_id": agent_id}, sort=[("timestamp", ASCENDING)]
-            )
-            newest = collection.find_one(
-                {"agent_id": agent_id}, sort=[("timestamp", DESCENDING)]
-            )
+            oldest = collection.find_one({"agent_id": agent_id}, sort=[("timestamp", ASCENDING)])
+            newest = collection.find_one({"agent_id": agent_id}, sort=[("timestamp", DESCENDING)])
 
             if oldest:
                 stats[memory_type]["oldest"] = oldest.get("timestamp")
@@ -255,9 +238,7 @@ class MongoDBMemoryManager:
 
         return stats
 
-    def clear_agent_memories(
-        self, agent_id: str, memory_type: Optional[str] = None
-    ) -> int:
+    def clear_agent_memories(self, agent_id: str, memory_type: Optional[str] = None) -> int:
         """
         Clear all memories for an agent.
 
@@ -277,11 +258,7 @@ class MongoDBMemoryManager:
             total_deleted = result.deleted_count
         else:
             # Clear all memory types
-            collection_names = [
-                name
-                for name in self.db.list_collection_names()
-                if name.startswith(f"{agent_id}_")
-            ]
+            collection_names = [name for name in self.db.list_collection_names() if name.startswith(f"{agent_id}_")]
 
             for collection_name in collection_names:
                 collection = self.db[collection_name]

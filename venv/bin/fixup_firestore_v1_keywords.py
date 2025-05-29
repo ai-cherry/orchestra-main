@@ -20,9 +20,7 @@ import os
 try:
     import libcst as cst
 except ImportError:
-    raise ImportError(
-        'Run `python -m pip install "libcst >= 0.2.5"` to install libcst.'
-    )
+    raise ImportError('Run `python -m pip install "libcst >= 0.2.5"` to install libcst.')
 
 
 import pathlib
@@ -30,9 +28,7 @@ import sys
 from typing import Any, Callable, Dict, List, Sequence, Tuple
 
 
-def partition(
-    predicate: Callable[[Any], bool], iterator: Sequence[Any]
-) -> Tuple[List[Any], List[Any]]:
+def partition(predicate: Callable[[Any], bool], iterator: Sequence[Any]) -> Tuple[List[Any], List[Any]]:
     """A stable, out-of-place partition."""
     results = ([], [])
 
@@ -166,14 +162,11 @@ class firestoreCallTransformer(cst.CSTTransformer):
             # We've already fixed this file, don't fix it again.
             return updated
 
-        kwargs, ctrl_kwargs = partition(
-            lambda a: a.keyword.value not in self.CTRL_PARAMS, kwargs
-        )
+        kwargs, ctrl_kwargs = partition(lambda a: a.keyword.value not in self.CTRL_PARAMS, kwargs)
 
         args, ctrl_args = args[: len(kword_params)], args[len(kword_params) :]
         ctrl_kwargs.extend(
-            cst.Arg(value=a.value, keyword=cst.Name(value=ctrl))
-            for a, ctrl in zip(ctrl_args, self.CTRL_PARAMS)
+            cst.Arg(value=a.value, keyword=cst.Name(value=ctrl)) for a, ctrl in zip(ctrl_args, self.CTRL_PARAMS)
         )
 
         request_arg = cst.Arg(

@@ -20,9 +20,7 @@ logger = logging.getLogger("CompanyEnrichmentAgent")
 
 
 class CompanyEnrichmentAgent:
-    def __init__(
-        self, firestore_collection: str, serpapi_key: str, claude_max_webhook: str
-    ):
+    def __init__(self, firestore_collection: str, serpapi_key: str, claude_max_webhook: str):
         """
         Args:
             firestore_collection: Name of the mongodb collection for properties/companies.
@@ -56,16 +54,12 @@ class CompanyEnrichmentAgent:
         # Use Claude Max for reasoning if ambiguous
         company_name = self.resolve_company_with_claude(search_result)
         if not company_name:
-            logger.warning(
-                f"Claude Max could not resolve company for property: {property_doc_id}"
-            )
+            logger.warning(f"Claude Max could not resolve company for property: {property_doc_id}")
             doc_ref.update({"company_enrichment_status": "ambiguous"})
             return
 
         # Update mongodb with company info
-        doc_ref.update(
-            {"company_name": company_name, "company_enrichment_status": "enriched"}
-        )
+        doc_ref.update({"company_name": company_name, "company_enrichment_status": "enriched"})
         logger.info(f"Enriched property {property_doc_id} with company: {company_name}")
 
     def search_company(self, address: str) -> Optional[Dict]:

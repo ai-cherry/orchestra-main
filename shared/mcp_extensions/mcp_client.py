@@ -9,23 +9,19 @@ focusing on the basic operations needed by the Tool Registry.
 import logging
 from typing import Any, Dict, List, Optional
 
-from core.env_config import settings
-
 import requests
 
+from core.env_config import settings
+
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("mcp-client")
 
 
 class MCPClient:
     """Simple client for interacting with MCP server."""
 
-    def __init__(
-        self, base_url: str = "http://localhost:8080/api", api_key: Optional[str] = None
-    ):
+    def __init__(self, base_url: str = "http://localhost:8080/api", api_key: Optional[str] = None):
         self.base_url = base_url
         self.api_key = api_key or settings.mcp_api_key
         self.session = requests.Session()
@@ -95,9 +91,7 @@ class MCPClient:
             True if successful, False otherwise
         """
         try:
-            response = self.session.delete(
-                f"{self.base_url}/memory", params={"key": key}
-            )
+            response = self.session.delete(f"{self.base_url}/memory", params={"key": key})
 
             if response.status_code == 200:
                 return True
@@ -143,9 +137,7 @@ class MCPClient:
             List of matching memory items
         """
         try:
-            response = self.session.get(
-                f"{self.base_url}/memory/search", params={"query": query}
-            )
+            response = self.session.get(f"{self.base_url}/memory/search", params={"query": query})
 
             if response.status_code == 200:
                 return response.json().get("results", [])

@@ -120,16 +120,12 @@ def print_summary(results: Dict[str, List[Dict[str, Any]]]) -> None:
     # Print counts by type
     print("Issues by type:")
     for code, count in issue_counts.most_common():
-        description = CRITICAL_ISSUES.get(
-            code, COMPLEXITY_ISSUES.get(code, "Other issue")
-        )
+        description = CRITICAL_ISSUES.get(code, COMPLEXITY_ISSUES.get(code, "Other issue"))
         print(f"  {code}: {count} issues - {description}")
 
     # Print files with the most issues
     print("\nTop files with issues:")
-    files_by_issue_count = sorted(
-        results.items(), key=lambda x: len(x[1]), reverse=True
-    )
+    files_by_issue_count = sorted(results.items(), key=lambda x: len(x[1]), reverse=True)
     for i, (filename, issues) in enumerate(files_by_issue_count[:10]):
         print(f"  {i+1}. {filename}: {len(issues)} issues")
 
@@ -150,18 +146,14 @@ def print_detailed_report(results: Dict[str, List[Dict[str, Any]]]) -> None:
         for line_num in sorted(issues_by_line.keys()):
             for issue in issues_by_line[line_num]:
                 code = issue["code"]
-                description = CRITICAL_ISSUES.get(
-                    code, COMPLEXITY_ISSUES.get(code, "Other issue")
-                )
+                description = CRITICAL_ISSUES.get(code, COMPLEXITY_ISSUES.get(code, "Other issue"))
                 print(f"  Line {line_num}: {code} - {description}")
                 print(f"    {issue['message']}")
 
 
 def main():
     """Main entry point."""
-    parser = argparse.ArgumentParser(
-        description="Find critical linting issues across the codebase."
-    )
+    parser = argparse.ArgumentParser(description="Find critical linting issues across the codebase.")
     parser.add_argument("--path", type=str, default=".", help="Path to check")
     parser.add_argument("--detailed", action="store_true", help="Show detailed report")
     parser.add_argument(
@@ -169,9 +161,7 @@ def main():
         action="store_true",
         help="Only check for complexity issues",
     )
-    parser.add_argument(
-        "--critical-only", action="store_true", help="Only check for critical issues"
-    )
+    parser.add_argument("--critical-only", action="store_true", help="Only check for critical issues")
     args = parser.parse_args()
 
     # Select issues to check

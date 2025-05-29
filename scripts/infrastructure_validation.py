@@ -4,13 +4,14 @@ Infrastructure Validation Script
 Tests all API connections, tokens, and services
 """
 
-import os
-import sys
 import json
+import os
 import subprocess
-from typing import Tuple
-import requests
+import sys
 from datetime import datetime
+from typing import Tuple
+
+import requests
 
 # Color codes for output
 GREEN = "\033[92m"
@@ -48,9 +49,7 @@ def test_digitalocean_api(token: str) -> Tuple[bool, str]:
     """Test DigitalOcean API access"""
     try:
         headers = {"Authorization": f"Bearer {token}"}
-        response = requests.get(
-            "https://api.digitalocean.com/v2/account", headers=headers, timeout=10
-        )
+        response = requests.get("https://api.digitalocean.com/v2/account", headers=headers, timeout=10)
         if response.status_code == 200:
             data = response.json()
             return True, f"Account: {data['account']['email']}"
@@ -91,9 +90,7 @@ def test_github_pat(pat: str) -> Tuple[bool, str]:
     """Test GitHub Personal Access Token"""
     try:
         headers = {"Authorization": f"token {pat}"}
-        response = requests.get(
-            "https://api.github.com/user", headers=headers, timeout=10
-        )
+        response = requests.get("https://api.github.com/user", headers=headers, timeout=10)
         if response.status_code == 200:
             data = response.json()
             return True, f"User: {data['login']}"
@@ -110,9 +107,7 @@ def check_pulumi_state() -> Tuple[bool, str]:
         if os.path.exists("infra"):
             os.chdir("infra")
 
-        result = subprocess.run(
-            ["pulumi", "stack", "ls", "--json"], capture_output=True, text=True
-        )
+        result = subprocess.run(["pulumi", "stack", "ls", "--json"], capture_output=True, text=True)
         if result.returncode == 0:
             stacks = json.loads(result.stdout)
             if stacks:
@@ -168,9 +163,7 @@ def main():
         print_status("DigitalOcean API", False, "Token not set")
 
     # Test MongoDB
-    mongo_uri = os.environ.get("MONGODB_CONNECTION_STRING") or os.environ.get(
-        "MONGO_URI"
-    )
+    mongo_uri = os.environ.get("MONGODB_CONNECTION_STRING") or os.environ.get("MONGO_URI")
     if mongo_uri:
         success, msg = test_mongodb_connection(mongo_uri)
         print_status("MongoDB Connection", success, msg)
@@ -179,9 +172,7 @@ def main():
 
     # Test Weaviate
     if env_status.get("WEAVIATE_URL") and env_status.get("WEAVIATE_API_KEY"):
-        success, msg = test_weaviate_connection(
-            os.environ["WEAVIATE_URL"], os.environ["WEAVIATE_API_KEY"]
-        )
+        success, msg = test_weaviate_connection(os.environ["WEAVIATE_URL"], os.environ["WEAVIATE_API_KEY"])
         print_status("Weaviate Connection", success, msg)
     else:
         print_status("Weaviate Connection", False, "URL or API key not set")
@@ -216,9 +207,7 @@ def main():
     # 5. Summary
     print_header("Summary")
 
-    total_checks = (
-        len(required_vars) + 4 + 1 + len(required_files)
-    )  # env + apis + pulumi + files
+    total_checks = len(required_vars) + 4 + 1 + len(required_files)  # env + apis + pulumi + files
     passed_checks = sum(
         [
             sum(1 for exists in env_status.values() if exists),

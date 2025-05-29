@@ -133,9 +133,7 @@ class MemoryChunker:
         """
         self.config = config or ChunkerConfig()
 
-        logger.info(
-            f"MemoryChunker initialized (strategy: {self.config.default_strategy})"
-        )
+        logger.info(f"MemoryChunker initialized (strategy: {self.config.default_strategy})")
 
     async def chunk_item(
         self,
@@ -172,9 +170,7 @@ class MemoryChunker:
         elif strategy == ChunkingStrategy.HYBRID:
             chunks = await self._chunk_by_hybrid(item_id, content)
         else:
-            logger.warning(
-                f"Unknown chunking strategy: {strategy}, falling back to paragraph"
-            )
+            logger.warning(f"Unknown chunking strategy: {strategy}, falling back to paragraph")
             chunks = self._chunk_by_paragraph(item_id, content)
 
         # Apply post-processing
@@ -183,8 +179,7 @@ class MemoryChunker:
         # Limit number of chunks if needed
         if len(chunks) > self.config.max_chunks_per_item:
             logger.warning(
-                f"Too many chunks generated ({len(chunks)}), "
-                f"limiting to {self.config.max_chunks_per_item}"
+                f"Too many chunks generated ({len(chunks)}), " f"limiting to {self.config.max_chunks_per_item}"
             )
             chunks = chunks[: self.config.max_chunks_per_item]
 
@@ -397,9 +392,7 @@ class MemoryChunker:
         """
         # If Vertex AI is not available, fall back to paragraph chunking
         if not self.config.use_openai:
-            logger.warning(
-                "Semantic chunking not available, falling back to paragraph chunking"
-            )
+            logger.warning("Semantic chunking not available, falling back to paragraph chunking")
             return self._chunk_by_paragraph(item_id, content)
 
         try:
@@ -425,9 +418,7 @@ class MemoryChunker:
             # Call Vertex AI
             if hasattr(self.config.openai_client, "predict"):
                 # Using custom endpoint
-                response = await self.config.openai_client.predict_async(
-                    instances=[{"prompt": prompt}]
-                )
+                response = await self.config.openai_client.predict_async(instances=[{"prompt": prompt}])
 
                 # Extract chunks from response
                 try:
@@ -513,9 +504,7 @@ class MemoryChunker:
         """
         # Use the first strategy as primary
         primary_strategy = (
-            self.config.hybrid_strategies[0]
-            if self.config.hybrid_strategies
-            else ChunkingStrategy.PARAGRAPH
+            self.config.hybrid_strategies[0] if self.config.hybrid_strategies else ChunkingStrategy.PARAGRAPH
         )
 
         # Get chunks using primary strategy
@@ -544,9 +533,7 @@ class MemoryChunker:
 
                     # Apply secondary strategy
                     if secondary_strategy == ChunkingStrategy.SEMANTIC:
-                        sub_chunks = await self._chunk_by_semantic(
-                            temp_id, chunk.content
-                        )
+                        sub_chunks = await self._chunk_by_semantic(temp_id, chunk.content)
                     elif secondary_strategy == ChunkingStrategy.PARAGRAPH:
                         sub_chunks = self._chunk_by_paragraph(temp_id, chunk.content)
                     elif secondary_strategy == ChunkingStrategy.SENTENCE:
@@ -570,9 +557,7 @@ class MemoryChunker:
 
         return chunks
 
-    def _post_process_chunks(
-        self, chunks: List[Chunk], metadata: Optional[Dict[str, Any]] = None
-    ) -> List[Chunk]:
+    def _post_process_chunks(self, chunks: List[Chunk], metadata: Optional[Dict[str, Any]] = None) -> List[Chunk]:
         """
         Apply post-processing to chunks.
 

@@ -3,9 +3,9 @@ Tool Executor - Execute tools with error handling
 """
 
 import asyncio
-from typing import Any, Dict, List
-import traceback
 import time
+import traceback
+from typing import Any, Dict, List
 
 from .registry import ToolRegistry
 
@@ -22,9 +22,7 @@ class ToolExecutor:
         """Register a tool implementation."""
         self._tool_implementations[tool_name] = implementation
 
-    async def execute(
-        self, tool_name: str, parameters: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def execute(self, tool_name: str, parameters: Dict[str, Any]) -> Dict[str, Any]:
         """Execute a tool and return results."""
         start_time = time.time()
 
@@ -51,9 +49,7 @@ class ToolExecutor:
             if asyncio.iscoroutinefunction(implementation):
                 result = await implementation(**parameters)
             else:
-                result = await asyncio.get_event_loop().run_in_executor(
-                    None, lambda: implementation(**parameters)
-                )
+                result = await asyncio.get_event_loop().run_in_executor(None, lambda: implementation(**parameters))
 
             execution_time = time.time() - start_time
 

@@ -38,9 +38,7 @@ def load_personas(settings: Settings) -> Dict[str, PersonaConfig]:
 
     # Default personas if none are configured
     default_personas = {
-        "cherry": PersonaConfig(
-            name="Cherry", description="A helpful and friendly AI assistant."
-        ),
+        "cherry": PersonaConfig(name="Cherry", description="A helpful and friendly AI assistant."),
         "sophia": PersonaConfig(
             name="Sophia",
             description="A thoughtful AI assistant focused on detailed analysis.",

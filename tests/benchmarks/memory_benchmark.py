@@ -17,9 +17,7 @@ import pytest
 
 from packages.shared.src.memory.concrete_memory_manager import FirestoreV1MemoryManager
 from packages.shared.src.models.base_models import MemoryItem
-from packages.shared.src.storage.firestore.firestore_memory import (
-    FirestoreMemoryManager,
-)
+from packages.shared.src.storage.firestore.firestore_memory import FirestoreMemoryManager
 from packages.shared.src.storage.firestore.v2 import FirestoreMemoryManagerV2
 
 # Configure logging
@@ -161,9 +159,7 @@ class MemoryBenchmark:
             "v2_duration": v2_duration,
             "v1_items_per_second": len(items) / v1_duration,
             "v2_items_per_second": len(items) / v2_duration,
-            "improvement_factor": (
-                v1_duration / v2_duration if v2_duration > 0 else float("inf")
-            ),
+            "improvement_factor": (v1_duration / v2_duration if v2_duration > 0 else float("inf")),
         }
 
         logger.info(f"Add benchmark results: {json.dumps(results, indent=2)}")
@@ -198,17 +194,13 @@ class MemoryBenchmark:
             "v2_duration": v2_duration,
             "v1_items_per_second": len(item_ids) / v1_duration,
             "v2_items_per_second": len(item_ids) / v2_duration,
-            "improvement_factor": (
-                v1_duration / v2_duration if v2_duration > 0 else float("inf")
-            ),
+            "improvement_factor": (v1_duration / v2_duration if v2_duration > 0 else float("inf")),
         }
 
         logger.info(f"Get benchmark results: {json.dumps(results, indent=2)}")
         return results
 
-    async def run_search_benchmark(
-        self, query_embedding: List[float], top_k: int = 5
-    ) -> Dict[str, float]:
+    async def run_search_benchmark(self, query_embedding: List[float], top_k: int = 5) -> Dict[str, float]:
         """
         Benchmark semantic search.
 
@@ -244,9 +236,7 @@ class MemoryBenchmark:
             "v2_duration": v2_duration,
             "v1_result_count": len(v1_results),
             "v2_result_count": len(v2_results),
-            "improvement_factor": (
-                v1_duration / v2_duration if v2_duration > 0 else float("inf")
-            ),
+            "improvement_factor": (v1_duration / v2_duration if v2_duration > 0 else float("inf")),
         }
 
         logger.info(f"Search benchmark results: {json.dumps(results, indent=2)}")
@@ -285,9 +275,7 @@ class MemoryBenchmark:
             "v2_duration": v2_duration,
             "v1_result_count": len(v1_results),
             "v2_result_count": len(v2_results),
-            "improvement_factor": (
-                v1_duration / v2_duration if v2_duration > 0 else float("inf")
-            ),
+            "improvement_factor": (v1_duration / v2_duration if v2_duration > 0 else float("inf")),
         }
 
         logger.info(f"History benchmark results: {json.dumps(results, indent=2)}")

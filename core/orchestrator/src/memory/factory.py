@@ -80,9 +80,7 @@ class MemoryFactory:
         Returns:
             Initialized RedisMemory
         """
-        return RedisMemory(
-            host=host, port=port, password=password, db=db, ttl=ttl, prefix=prefix
-        )
+        return RedisMemory(host=host, port=port, password=password, db=db, ttl=ttl, prefix=prefix)
 
     @staticmethod
     def create_mongodb_memory(
@@ -168,18 +166,12 @@ class MemoryFactory:
         # Add MongoDB configuration
         mongodb_config = {}
         if mid_term_config:
-            mongodb_config["mid_term_collection"] = mid_term_config.get(
-                "collection_name", "orchestra_mid_term"
-            )
+            mongodb_config["mid_term_collection"] = mid_term_config.get("collection_name", "orchestra_mid_term")
             mongodb_config["mid_term_ttl"] = mid_term_config.get("ttl", 86400)  # 1 day
 
         if long_term_config:
-            mongodb_config["long_term_collection"] = long_term_config.get(
-                "collection_name", "orchestra_long_term"
-            )
-            mongodb_config["long_term_ttl"] = long_term_config.get(
-                "ttl", 2592000
-            )  # 30 days
+            mongodb_config["long_term_collection"] = long_term_config.get("collection_name", "orchestra_long_term")
+            mongodb_config["long_term_ttl"] = long_term_config.get("ttl", 2592000)  # 30 days
 
         if mongodb_config:
             config["mongodb"] = mongodb_config

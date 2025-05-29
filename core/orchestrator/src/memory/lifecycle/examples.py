@@ -17,9 +17,7 @@ from core.orchestrator.src.memory.lifecycle import (
 )
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -168,26 +166,18 @@ async def memory_chunker_example():
     item_id = "doc123"
 
     # Paragraph chunking
-    paragraph_chunks = await chunker.chunk_item(
-        item_id, content, ChunkingStrategy.PARAGRAPH
-    )
+    paragraph_chunks = await chunker.chunk_item(item_id, content, ChunkingStrategy.PARAGRAPH)
 
     # Sentence chunking
-    sentence_chunks = await chunker.chunk_item(
-        item_id, content, ChunkingStrategy.SENTENCE
-    )
+    sentence_chunks = await chunker.chunk_item(item_id, content, ChunkingStrategy.SENTENCE)
 
     # Fixed size chunking
-    fixed_chunks = await chunker.chunk_item(
-        item_id, content, ChunkingStrategy.FIXED_SIZE
-    )
+    fixed_chunks = await chunker.chunk_item(item_id, content, ChunkingStrategy.FIXED_SIZE)
 
     # Print the results
     logger.info(f"\nParagraph chunking: {len(paragraph_chunks)} chunks")
     for i, chunk in enumerate(paragraph_chunks):
-        logger.info(
-            f"  Chunk {i+1}: {len(chunk.content)} chars, Heading: {chunk.metadata.heading}"
-        )
+        logger.info(f"  Chunk {i+1}: {len(chunk.content)} chars, Heading: {chunk.metadata.heading}")
 
     logger.info(f"\nSentence chunking: {len(sentence_chunks)} chunks")
     for i, chunk in enumerate(sentence_chunks[:3]):  # Show first 3 chunks
@@ -256,9 +246,7 @@ async def integrated_example():
     all_summaries = []
     for i, chunk in enumerate(chunks):
         chunk_id = f"{item_id}_chunk_{i}"
-        summaries = await summarizer.create_progressive_summaries(
-            chunk.content, chunk_id
-        )
+        summaries = await summarizer.create_progressive_summaries(chunk.content, chunk_id)
         all_summaries.append(summaries)
         logger.info(f"Created summaries for chunk {i+1}")
 

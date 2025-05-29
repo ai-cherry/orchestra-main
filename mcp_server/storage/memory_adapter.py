@@ -124,9 +124,7 @@ class StorageBridgeAdapter(IMemoryStorage):
                     return await self.get(result_key)
         return None
 
-    async def search(
-        self, query: str, limit: int = 10
-    ) -> List[Tuple[str, MemoryEntry, float]]:
+    async def search(self, query: str, limit: int = 10) -> List[Tuple[str, MemoryEntry, float]]:
         """Search for memory entries matching the query.
 
         Args:
@@ -170,9 +168,7 @@ class StorageBridgeAdapter(IMemoryStorage):
                     # Fall back to raw entry
                     memory_entry = entry
 
-            converted_results.append(
-                (key, memory_entry, 1.0)
-            )  # Score is hardcoded for now
+            converted_results.append((key, memory_entry, 1.0))  # Score is hardcoded for now
 
         return converted_results
 

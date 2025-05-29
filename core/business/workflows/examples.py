@@ -10,14 +10,8 @@ from typing import Any, Dict, List
 
 from core.business.llm.provider import LLMRequest, get_llm_service
 from core.business.personas.base import get_persona_manager
-from core.business.workflows.base import (
-    TaskPriority,
-    Workflow,
-    WorkflowContext,
-    get_workflow_engine,
-)
+from core.business.workflows.base import TaskPriority, Workflow, WorkflowContext, get_workflow_engine
 from core.services.memory.unified_memory import get_memory_service
-
 
 logger = logging.getLogger(__name__)
 
@@ -106,8 +100,7 @@ Please provide an appropriate response."""
     # Generate response with persona
     response = await llm_service.complete_with_persona(
         prompt=prompt,
-        persona=persona_manager.get_persona(persona_id)
-        or persona_manager.get_default_persona(),
+        persona=persona_manager.get_persona(persona_id) or persona_manager.get_default_persona(),
     )
 
     return response.text

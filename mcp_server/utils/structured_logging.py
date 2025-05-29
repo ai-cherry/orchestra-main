@@ -152,9 +152,7 @@ class StructuredLogger(logging.Logger):
         self._log_with_extra(logging.ERROR, msg, args, **kwargs)
 
 
-def configure_logging(
-    level: int = logging.INFO, json_output: bool = True, log_file: Optional[str] = None
-) -> None:
+def configure_logging(level: int = logging.INFO, json_output: bool = True, log_file: Optional[str] = None) -> None:
     """Configure structured logging.
 
     Args:
@@ -174,9 +172,7 @@ def configure_logging(
         console_handler.setFormatter(StructuredLogFormatter())
     else:
         console_handler.setFormatter(
-            logging.Formatter(
-                "%(asctime)s [%(levelname)s] [%(correlation_id)s] %(name)s: %(message)s"
-            )
+            logging.Formatter("%(asctime)s [%(levelname)s] [%(correlation_id)s] %(name)s: %(message)s")
         )
     handlers.append(console_handler)
 
@@ -265,9 +261,7 @@ def with_correlation_id(func: F) -> F:
             caller_module = inspect.getmodule(inspect.currentframe().f_back)
             logger = cast(
                 StructuredLogger,
-                logging.getLogger(
-                    caller_module.__name__ if caller_module else __name__
-                ),
+                logging.getLogger(caller_module.__name__ if caller_module else __name__),
             )
 
             try:
@@ -313,9 +307,7 @@ def with_correlation_id(func: F) -> F:
             caller_module = inspect.getmodule(inspect.currentframe().f_back)
             logger = cast(
                 StructuredLogger,
-                logging.getLogger(
-                    caller_module.__name__ if caller_module else __name__
-                ),
+                logging.getLogger(caller_module.__name__ if caller_module else __name__),
             )
 
             try:

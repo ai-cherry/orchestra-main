@@ -12,11 +12,11 @@ from pathlib import Path
 from typing import Any, Dict
 
 import click
+from dotenv import set_key
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
-from dotenv import set_key
 
 # Add project root to path
 sys.path.append(str(Path(__file__).parent.parent))
@@ -70,9 +70,7 @@ def get_pulumi_secrets() -> Dict[str, str]:
                     key, value = line.split("=", 1)
                     secrets[key] = value
     except FileNotFoundError:
-        console.print(
-            "[red]Error: .env file not found. Run 'pulumi config' first[/red]"
-        )
+        console.print("[red]Error: .env file not found. Run 'pulumi config' first[/red]")
     except Exception as e:
         console.print(f"[red]Error reading .env file: {e}[/red]")
     return secrets
@@ -152,15 +150,11 @@ def secrets():
 
 @secrets.command()
 @click.option("--env-file", default=".env", help="Path to .env file")
-@click.option(
-    "--dry-run", is_flag=True, help="Show what would be synced without making changes"
-)
+@click.option("--dry-run", is_flag=True, help="Show what would be synced without making changes")
 @click.pass_context
 def sync(ctx, env_file, dry_run):
     """Sync secrets from Pulumi configuration to local environment."""
-    console.print(
-        Panel("[bold blue]Syncing secrets from Pulumi configuration[/bold blue]")
-    )
+    console.print(Panel("[bold blue]Syncing secrets from Pulumi configuration[/bold blue]"))
 
     pulumi_secrets = get_pulumi_secrets()
     if not pulumi_secrets:
@@ -258,9 +252,7 @@ def validate(ctx):
         console.print("\n[green]✓ All required secrets are present[/green]")
     else:
         console.print("\n[red]✗ Some required secrets are missing[/red]")
-        console.print(
-            "[yellow]Run 'orchestra secrets sync' to fetch from Pulumi[/yellow]"
-        )
+        console.print("[yellow]Run 'orchestra secrets sync' to fetch from Pulumi[/yellow]")
         sys.exit(1)
 
 
@@ -315,15 +307,9 @@ def list(ctx):
 
     for adapter_id, config in adapters.items():
         # Check if required secrets are present
-        secrets_present = all(
-            os.getenv(secret) is not None for secret in config["required_secrets"]
-        )
+        secrets_present = all(os.getenv(secret) is not None for secret in config["required_secrets"])
 
-        status = (
-            "[green]✓ Ready[/green]"
-            if secrets_present
-            else "[red]✗ Missing secrets[/red]"
-        )
+        status = "[green]✓ Ready[/green]" if secrets_present else "[red]✗ Missing secrets[/red]"
 
         table.add_row(
             adapter_id,
@@ -373,13 +359,9 @@ def check_adapter(ctx, adapter_id):
                 console.print(f"  [yellow]○[/yellow] {secret} - Not set")
 
     if all_present:
-        console.print(
-            f"\n[green]✓ {config['name']} adapter is properly configured[/green]"
-        )
+        console.print(f"\n[green]✓ {config['name']} adapter is properly configured[/green]")
     else:
-        console.print(
-            f"\n[red]✗ {config['name']} adapter is missing required configuration[/red]"
-        )
+        console.print(f"\n[red]✗ {config['name']} adapter is missing required configuration[/red]")
 
 
 @cli.group()
@@ -409,9 +391,7 @@ def health(ctx):
     all_healthy = True
 
     for component, (status, details) in checks.items():
-        status_display = (
-            "[green]✓ Healthy[/green]" if status else "[red]✗ Unhealthy[/red]"
-        )
+        status_display = "[green]✓ Healthy[/green]" if status else "[red]✗ Unhealthy[/red]"
         table.add_row(component, status_display, details)
         if not status:
             all_healthy = False
@@ -427,12 +407,7 @@ def health(ctx):
 def check_secrets_health():
     """Check if all required secrets are present."""
     total = sum(len(secrets) for secrets in REQUIRED_SECRETS.values())
-    present = sum(
-        1
-        for secrets in REQUIRED_SECRETS.values()
-        for secret in secrets
-        if os.getenv(secret)
-    )
+    present = sum(1 for secrets in REQUIRED_SECRETS.values() for secret in secrets if os.getenv(secret))
 
     if present == total:
         return True, f"All {total} required secrets present"
@@ -489,11 +464,7 @@ def check_mcp_health():
 def check_adapters_health():
     """Check adapter readiness."""
     adapters = AdapterConfig.get_adapter_configs()
-    ready = sum(
-        1
-        for config in adapters.values()
-        if all(os.getenv(secret) for secret in config["required_secrets"])
-    )
+    ready = sum(1 for config in adapters.values() if all(os.getenv(secret) for secret in config["required_secrets"]))
     total = len(adapters)
 
     if ready == total:
