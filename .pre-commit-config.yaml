@@ -16,20 +16,35 @@ repos:
       - id: black
         language_version: python3.10
 
-# Temporarily disabled mypy due to extensive type annotation requirements
-#  - repo: https://github.com/pre-commit/mirrors-mypy
-#    rev: v1.8.0
-#    hooks:
-#      - id: mypy
-#        language_version: python3.10
-#        exclude: ^(services/|secret-management/|test_.*\.py|main_app\.py|venv/|\.venv/)
-#        args: [--ignore-missing-imports, --no-strict-optional, --allow-untyped-defs]
+  - repo: https://github.com/pre-commit/mirrors-autoflake
+    rev: v1.4
+    hooks:
+      - id: autoflake
+        args: [--remove-all-unused-imports, --remove-unused-variables, --expand-star-imports]
+        language_version: python3.10
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        language_version: python3.10
+        exclude: ^(services/|secret-management/|test_.*\\.py|main_app\\.py|venv/|\\.venv/)
+        args: [--ignore-missing-imports, --no-strict-optional, --allow-untyped-defs]
 
   - repo: https://github.com/PyCQA/flake8
     rev: 7.0.0
     hooks:
       - id: flake8
         language_version: python3.10
+
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v8.57.0
+    hooks:
+      - id: eslint
+        name: eslint (admin-ui)
+        entry: npx eslint admin-ui --ext .ts,.tsx --fix
+        language: node
+        always_run: true
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0

@@ -17,6 +17,7 @@ flake8==7.0.0
 mypy==1.8.0
 pylint==3.0.3
 isort==5.13.2
+autoflake==1.4
 bandit==1.7.6
 
 # Type Stubs
