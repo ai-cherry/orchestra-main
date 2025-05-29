@@ -1,14 +1,11 @@
 #!/bin/bash
-# populate_pulumi_secrets.sh - A script to assist in setting Pulumi Cloud secrets for the 'dev' stack
-# This script guides the user through setting secrets for Pulumi Cloud configuration.
-# It ensures that secrets are set securely without being stored in plaintext in version control.
+# populate_pulumi_secrets.sh - Script to configure Pulumi secrets using GitHub org secrets
+# Supports both manual entry (backward compat) and GitHub secrets via env vars
 
-echo "Pulumi Cloud Secret Population Script for Orchestra AI"
+echo "Pulumi Secret Configuration Script for Orchestra AI"
 echo "=============================================="
-echo "This script will help you set secrets for your Pulumi 'dev' stack in Pulumi Cloud."
-echo "You will be prompted to enter each secret value manually or provide a source (if applicable)."
-echo "These values are NOT stored in this script or in version control."
-echo "Ensure you have Pulumi CLI authenticated with Pulumi Cloud."
+echo "This script configures Pulumi secrets using GitHub organization secrets"
+echo "Secrets are read from environment variables when available"
 echo "=============================================="
 
 # Check if Pulumi is logged in to Cloud
@@ -30,9 +27,9 @@ if [[ "$CURRENT_STACK" != "dev" ]]; then
 fi
 
 echo "Current Pulumi stack: $(pulumi stack --show-name)"
-echo "Proceeding to set secrets for Pulumi Cloud configuration..."
+echo "Proceeding to configure secrets..."
 
-# List of secret keys to set for Pulumi configuration
+# List of secret keys to configure
 SECRET_KEYS=(
   "digitalocean:token"
   "orchestra-infra:dragonfly_uri"
@@ -57,41 +54,64 @@ SECRET_KEYS=(
 TOTAL_SECRETS=${#SECRET_KEYS[@]}
 SET_SECRETS=0
 
-# Loop through each secret key and prompt user for input
+# Configure Pulumi passphrase from env var if available
+if [[ -n "$PULUMI_CONFIGURE_PASSPHRASE" ]]; then
+  echo "Configuring Pulumi passphrase from environment variable..."
+  export PULUMI_CONFIG_PASSPHRASE="$PULUMI_CONFIGURE_PASSPHRASE"
+  echo "Pulumi passphrase configured from environment variable"
+fi
+
+# Loop through each secret key
 for KEY in "${SECRET_KEYS[@]}"; do
   echo "----------------------------------------------"
-  echo "Setting secret for: $KEY"
-  echo "Please enter the value for $KEY (input will be hidden for security):"
-  read -s SECRET_VALUE
-  echo ""
+  echo "Configuring secret for: $KEY"
 
-  if [[ -n "$SECRET_VALUE" ]]; then
-    # Set the secret in Pulumi Cloud configuration
-    echo "Setting secret in Pulumi Cloud..."
-    echo "$SECRET_VALUE" | pulumi config set --secret "$KEY"
+  # Generate env var name (convert : to _ and uppercase)
+  ENV_VAR_NAME="ORG_${KEY//:/_}"
+  ENV_VAR_NAME="${ENV_VAR_NAME^^}"
+
+  # Check if env var is set
+  if [[ -n "${!ENV_VAR_NAME}" ]]; then
+    echo "Using value from environment variable $ENV_VAR_NAME"
+    echo "${!ENV_VAR_NAME}" | pulumi config set --secret "$KEY"
     if [[ $? -eq 0 ]]; then
-      echo "Successfully set secret for $KEY in Pulumi Cloud."
+      echo "Successfully set secret for $KEY from environment variable"
       ((SET_SECRETS++))
     else
-      echo "ERROR: Failed to set secret for $KEY. Please check your input or Pulumi authentication."
+      echo "ERROR: Failed to set secret for $KEY from environment variable"
     fi
   else
-    echo "WARNING: Empty value provided for $KEY. Skipping..."
+    # Fallback to manual entry
+    echo "Environment variable $ENV_VAR_NAME not set"
+    echo "Please enter the value for $KEY (input will be hidden for security):"
+    read -s SECRET_VALUE
+    echo ""
+
+    if [[ -n "$SECRET_VALUE" ]]; then
+      echo "$SECRET_VALUE" | pulumi config set --secret "$KEY"
+      if [[ $? -eq 0 ]]; then
+        echo "Successfully set secret for $KEY manually"
+        ((SET_SECRETS++))
+      else
+        echo "ERROR: Failed to set secret for $KEY"
+      fi
+    else
+      echo "WARNING: Empty value provided for $KEY. Skipping..."
+    fi
   fi
 done
 
 echo "=============================================="
-echo "Secret Setting Summary:"
-echo "Total secrets to set: $TOTAL_SECRETS"
-echo "Secrets successfully set: $SET_SECRETS"
+echo "Secret Configuration Summary:"
+echo "Total secrets to configure: $TOTAL_SECRETS"
+echo "Secrets successfully configured: $SET_SECRETS"
 echo "=============================================="
 
 if [[ $SET_SECRETS -eq $TOTAL_SECRETS ]]; then
-  echo "All secrets have been set successfully!"
-  echo "You can now proceed with deployment or other Pulumi operations without passphrase prompts."
-  echo "Please inform your AI assistant by typing 'SECRETS SET' to continue with cleanup and deployment."
+  echo "All secrets have been configured successfully!"
+  echo "You can now proceed with deployment or other Pulumi operations."
 else
-  echo "WARNING: Not all secrets were set. You may need to rerun this script or manually set the remaining secrets."
+  echo "WARNING: Not all secrets were configured. You may need to rerun this script."
   echo "To set a specific secret manually, use: pulumi config set --secret <key> <value>"
 fi
 
