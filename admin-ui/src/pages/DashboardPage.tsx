@@ -128,13 +128,13 @@ export function DashboardPage() {
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
             <Button asChild>
-              <Link to="/agents/new"> {/* Assuming a route like /agents/new or similar */}
-                <PlusCircle className="mr-2 h-4 w-4" /> Create New Agent
+              <Link to="/agents">
+                <PlusCircle className="mr-2 h-4 w-4" /> View Agents
               </Link>
             </Button>
             <Button asChild variant="secondary">
-              <Link to="/workflows/new"> {/* Assuming a route like /workflows/new */}
-                 <PlusCircle className="mr-2 h-4 w-4" /> Define New Workflow
+              <Link to="/workflows">
+                 <PlusCircle className="mr-2 h-4 w-4" /> View Workflows
               </Link>
             </Button>
             <Button asChild variant="secondary">
