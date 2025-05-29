@@ -15,71 +15,64 @@ import { SettingsPage } from './pages/SettingsPage';
 import { LoginPage } from './pages/LoginPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
-// Update rootRoute to include NotFoundPage as the default notFoundComponent
-const rootRouteWithNotFound = createRoute({
-    ...rootRoute.options, // Spread existing options like component
-    notFoundComponent: NotFoundPage, // Add default notFoundComponent
-});
-
-
 // Route Definitions
 const indexRoute = createRoute({
-  getParentRoute: () => rootRouteWithNotFound,
+  getParentRoute: () => rootRoute,
   path: '/',
   component: DashboardPage,
 });
 
 const agentsRoute = createRoute({
-  getParentRoute: () => rootRouteWithNotFound,
+  getParentRoute: () => rootRoute,
   path: '/agents',
   component: AgentsPage,
 });
 
 const personasRoute = createRoute({
-  getParentRoute: () => rootRouteWithNotFound,
+  getParentRoute: () => rootRoute,
   path: '/personas',
   component: PersonasPage,
 });
 
 const workflowsRoute = createRoute({
-  getParentRoute: () => rootRouteWithNotFound,
+  getParentRoute: () => rootRoute,
   path: '/workflows',
   component: WorkflowsPage,
 });
 
 const integrationsRoute = createRoute({
-  getParentRoute: () => rootRouteWithNotFound,
+  getParentRoute: () => rootRoute,
   path: '/integrations',
   component: IntegrationsPage,
 });
 
 const resourcesRoute = createRoute({
-  getParentRoute: () => rootRouteWithNotFound,
+  getParentRoute: () => rootRoute,
   path: '/resources',
   component: ResourcesPage,
 });
 
 const logsRoute = createRoute({
-  getParentRoute: () => rootRouteWithNotFound,
+  getParentRoute: () => rootRoute,
   path: '/logs',
   component: LogsPage,
 });
 
 const settingsRoute = createRoute({
-  getParentRoute: () => rootRouteWithNotFound,
+  getParentRoute: () => rootRoute,
   path: '/settings',
   component: SettingsPage,
 });
 
 const loginRoute = createRoute({
-  getParentRoute: () => rootRouteWithNotFound, // Login might eventually have a different root or no root layout
+  getParentRoute: () => rootRoute,
   path: '/login',
   component: LoginPage,
 });
 
 // Route Tree
-// Note: The rootRoute used here is the one with notFoundComponent
-const routeTree = rootRouteWithNotFound.addChildren([
+// Use the original rootRoute directly
+const routeTree = rootRoute.addChildren([
   indexRoute,
   agentsRoute,
   personasRoute,
@@ -91,11 +84,10 @@ const routeTree = rootRouteWithNotFound.addChildren([
   loginRoute,
 ]);
 
-// Create Router Instance
+// Create Router Instance with notFoundComponent specified here
 export const router = createRouter({
   routeTree,
-  // Optionally, configure a default notFoundComponent at router level if not on root.
-  // defaultNotFoundComponent: NotFoundPage,
+  defaultNotFoundComponent: NotFoundPage,
 });
 
 // Register Router for typesafety
