@@ -2,156 +2,93 @@
 Centralized environment configuration for Orchestra AI.
 Uses Pydantic BaseSettings to provide a single source of truth for all environment variables.
 Import this module wherever environment configuration is needed.
-
-Environment variables are sourced from:
-1. GitHub organization secrets (preferred for production/CI)
-2. Pulumi-managed secrets (for infrastructure resources)
-3. Local .env files (for development only)
 """
 
-import warnings
-from typing import Optional
-from pydantic import BaseSettings, Field, validator
+from pydantic import BaseSettings, Field
 
 
 class OrchestraSettings(BaseSettings):
     """
     Centralized environment variables for Orchestra AI.
+    All secrets and endpoints should be managed via Pulumi/environment.
     
-    All secrets should be managed via:
-    - GitHub organization secrets (for CI/CD pipelines)
-    - Pulumi config/secrets (for infrastructure)
-    - DigitalOcean App Platform environment variables (for runtime)
-    
-    DO NOT hardcode secrets or use service-specific environment files.
+    Database Priority (Weaviate-first architecture):
+    1. Weaviate - Primary vector/document store with ACORN hybrid search
+    2. PostgreSQL - ACID operations, structured data, pgvector fallback
+    3. Dragonfly - Optional micro-cache for high-throughput scenarios
     """
 
-    # ======================================================================
-    # DEPRECATED: Legacy GCP fields - scheduled for removal in v2.0
-    # These are maintained only for backward compatibility
-    # ======================================================================
-    gcp_project_id: Optional[str] = Field(
-        default=None, 
-        env="GCP_PROJECT", 
-        deprecated=True,
-        description="DEPRECATED: Use DigitalOcean resources instead of GCP"
-    )
-    gcp_service_account_key: Optional[str] = Field(
-        default=None, 
-        env="GOOGLE_APPLICATION_CREDENTIALS",
-        deprecated=True,
-        description="DEPRECATED: Use DigitalOcean resources instead of GCP"
+    # Legacy GCP fields (deprecated, kept for compatibility)
+    gcp_project_id: str = Field(default=None, env="GCP_PROJECT")
+    gcp_service_account_key: str = Field(
+        default=None, env="GOOGLE_APPLICATION_CREDENTIALS"
     )
 
-    @validator("gcp_project_id", "gcp_service_account_key")
-    def warn_deprecated_gcp(cls, v, values, **kwargs):
-        if v is not None:
-            warnings.warn(
-                f"GCP credentials are deprecated and scheduled for removal in v2.0. "
-                f"Orchestra now uses DigitalOcean for all infrastructure.",
-                DeprecationWarning, 
-                stacklevel=2
-            )
-        return v
+    # GitHub and CI/CD
+    github_token: str = Field(default=None, env="GITHUB_TOKEN")
+    codespaces: str = Field(default=None, env="CODESPACES")
+    k_service: str = Field(default=None, env="K_SERVICE")
+    cloud_workstations_agent: str = Field(default=None, env="CLOUD_WORKSTATIONS_AGENT")
+    ci: str = Field(default=None, env="CI")
+    github_actions: str = Field(default=None, env="GITHUB_ACTIONS")
 
-    # ======================================================================
-    # CI/CD Environment Detection
-    # ======================================================================
-    github_token: Optional[str] = Field(
-        default=None, 
-        env="GITHUB_TOKEN",
-        description="GitHub token for API access during CI/CD"
-    )
-    ci: Optional[str] = Field(
-        default=None, 
-        env="CI",
-        description="Set by CI systems to indicate running in CI environment"
-    )
-    github_actions: Optional[str] = Field(
-        default=None, 
-        env="GITHUB_ACTIONS",
-        description="Set by GitHub Actions to indicate running in GitHub Actions"
-    )
-
-    # ======================================================================
-    # Database & Memory Storage Endpoints
-    # ======================================================================
-    # Primary vector/memory storage
-    weaviate_endpoint: Optional[str] = Field(
-        default=None, 
-        env="WEAVIATE_ENDPOINT",
-        description="Weaviate vector database endpoint URL"
-    )
-    weaviate_api_key: Optional[str] = Field(
-        default=None, 
-        env="WEAVIATE_API_KEY",
-        description="Weaviate authentication API key"
-    )
+    # Weaviate Configuration (Primary Vector Database)
+    weaviate_endpoint: str = Field(default=None, env="WEAVIATE_ENDPOINT")
+    weaviate_api_key: str = Field(default=None, env="WEAVIATE_API_KEY")
+    weaviate_grpc_endpoint: str = Field(default=None, env="WEAVIATE_GRPC_ENDPOINT")
+    weaviate_batch_size: int = Field(default=100, env="WEAVIATE_BATCH_SIZE")
+    weaviate_enable_acorn: bool = Field(default=True, env="WEAVIATE_ENABLE_ACORN")
+    weaviate_enable_agents: bool = Field(default=True, env="WEAVIATE_ENABLE_AGENTS")
     
-    # Caching layer
-    dragonfly_url: Optional[str] = Field(
-        default=None, 
-        env="DRAGONFLY_URL",
-        description="Dragonfly Redis-compatible caching endpoint"
-    )
+    # PostgreSQL Configuration (ACID Operations)
+    postgres_dsn: str = Field(default=None, env="POSTGRES_DSN")
+    postgres_host: str = Field(default=None, env="POSTGRES_HOST")
+    postgres_port: int = Field(default=5432, env="POSTGRES_PORT")
+    postgres_user: str = Field(default=None, env="POSTGRES_USER")
+    postgres_password: str = Field(default=None, env="POSTGRES_PASSWORD")
+    postgres_db: str = Field(default=None, env="POSTGRES_DB")
     
-    # Alternative vector stores (used by specific components)
-    pinecone_api_key: Optional[str] = Field(
-        default=None, 
-        env="PINECONE_API_KEY",
-        description="Pinecone vector DB API key (if used)"
-    )
-    pinecone_environment: Optional[str] = Field(
-        default=None, 
-        env="PINECONE_ENVIRONMENT",
-        description="Pinecone environment name (if used)"
-    )
+    # Dragonfly Configuration (Optional Micro-Cache)
+    dragonfly_url: str = Field(default=None, env="DRAGONFLY_URL")
+    dragonfly_uri: str = Field(default=None, env="DRAGONFLY_URI")  # Redis-compatible URI
+    enable_micro_cache: bool = Field(default=False, env="ENABLE_MICRO_CACHE")
     
-    # Deprecated vector store - use Weaviate instead
-    qdrant_url: Optional[str] = Field(
-        default=None, 
-        env="QDRANT_URL", 
-        deprecated=True,
-        description="DEPRECATED: Use Weaviate instead of Qdrant"
-    )
+    # Legacy Vector DB endpoints (deprecated, use Weaviate instead)
+    pinecone_api_key: str = Field(default=None, env="PINECONE_API_KEY")
+    pinecone_environment: str = Field(default=None, env="PINECONE_ENVIRONMENT")
+    qdrant_url: str = Field(default=None, env="QDRANT_URL")
 
-    # ======================================================================
-    # API Keys & Integration Secrets
-    # ======================================================================
-    # MCP API key for internal services
-    mcp_api_key: Optional[str] = Field(
-        default=None, 
-        env="MCP_API_KEY",
-        description="API key for MCP server authentication"
-    )
+    # MCP Configuration
+    mcp_api_key: str = Field(default=None, env="MCP_API_KEY")
+    mcp_server_endpoint: str = Field(default=None, env="MCP_SERVER_ENDPOINT")
     
-    # Recraft API for programmatic asset generation
-    recraft_api_key: Optional[str] = Field(
-        default=None, 
-        env="RECRAFT_API_KEY",
-        description="Recraft.ai API key for image generation"
-    )
+    # Monitoring and Observability
+    langfuse_host: str = Field(default=None, env="LANGFUSE_HOST")
+    langfuse_public_key: str = Field(default=None, env="LANGFUSE_PUBLIC_KEY")
+    langfuse_secret_key: str = Field(default=None, env="LANGFUSE_SECRET_KEY")
+    enable_performance_monitoring: bool = Field(default=True, env="ENABLE_PERFORMANCE_MONITORING")
+    
+    # Domain Configuration
+    default_domain: str = Field(default="Personal", env="DEFAULT_DOMAIN")
+    available_domains: str = Field(default="Personal,PayReady,ParagonRX", env="AVAILABLE_DOMAINS")
+    
+    # Recraft API Key for Recraft integrations (set via Pulumi Secret Manager)
+    recraft_api_key: str = Field(default=None, env="RECRAFT_API_KEY")
 
-    # ======================================================================
-    # Configuration Options
-    # ======================================================================
+    # Deployment Environment
+    environment: str = Field(default="dev", env="ENVIRONMENT")
+    paperspace_env: str = Field(default=None, env="PAPERSPACE_ENV")
+    
+    # Add all other environment variables used in the project here, with clear comments.
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
-        # Enable case-insensitive environment variables
-        case_sensitive = False
-        # Enable validation of field values
-        validate_assignment = True
 
 
 # Singleton instance for use throughout the project
 settings = OrchestraSettings()
 
-# Usage examples:
+# Usage example (in other modules):
 # from core.env_config import settings
-# 
-# # Access settings
-# weaviate_url = settings.weaviate_endpoint
-# 
-# # Check if running in CI
-# is_ci = settings.ci is not None
+# weaviate_endpoint = settings.weaviate_endpoint
