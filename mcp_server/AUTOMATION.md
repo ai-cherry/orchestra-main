@@ -1,174 +1,115 @@
-# MCP Server Automation Guide
+# MCP Server Automation
 
-This document explains how to set up the MCP memory system to run automatically on startup or after rebuilding your environment.
+This document outlines the automation and integration features of the MCP (Model Control Plane) server system.
 
-## Automation Options
+## Overview
 
-The MCP memory system provides several automation options:
+The MCP server provides several automation features to streamline development and deployment:
 
-1. **VS Code Tasks** - Automatic startup in VSCode
-2. **Systemd Service** - For Linux systems with systemd
-3. **Docker Container** - Containerized deployment
-4. **Manual Script** - Universal startup script
+1. **Auto-start**: The server can be configured to start automatically when the development environment initializes
+2. **Health monitoring**: Automated health checks ensure the server is running properly
+3. **Memory synchronization**: Automatic synchronization between memory stores
+4. **Integration with development tools**: Seamless integration with Cursor IDE
 
-## 1. VS Code Tasks
+## Startup Automation
 
-The `.vscode/tasks.json` file includes a task to automatically start the MCP server when you open the project folder in VS Code:
-
-```json
-{
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "Start MCP Server",
-      "type": "shell",
-      "command": "${workspaceFolder}/mcp_server/scripts/start_mcp_server.sh",
-      "runOptions": {
-        "runOn": "folderOpen"
-      }
-    }
-  ]
-}
-```
-
-This task runs automatically when you open the project in VS Code. You can also run it manually:
-
-1. Press `Ctrl+Shift+P` to open the Command Palette
-2. Type "Tasks: Run Task"
-3. Select "Start MCP Server"
-
-## 2. Systemd Service
-
-For Linux systems with systemd, you can install the MCP server as a system service:
-
-```bash
-sudo ./mcp_server/scripts/install_mcp_service.sh
-```
-
-This will:
-
-- Install the MCP package
-- Create a systemd service
-- Enable autostart on system boot
-- Start the service
-
-### Manual Service Management
-
-Once installed, you can manage the service with standard systemd commands:
-
-```bash
-# Check service status
-systemctl status mcp-server.service
-
-# Start the service
-systemctl start mcp-server.service
-
-# Stop the service
-systemctl stop mcp-server.service
-
-# Restart the service
-systemctl restart mcp-server.service
-
-# Enable autostart on boot
-systemctl enable mcp-server.service
-
-# Disable autostart
-systemctl disable mcp-server.service
-
-# View logs
-journalctl -u mcp-server.service -f
-```
-
-## 3. Docker Container
-
-For Docker environments, use the provided Dockerfile and docker compose.yml:
-
-```bash
-# Navigate to the scripts directory
-cd mcp_server/scripts
-
-# Start with docker compose (builds and runs)
-docker compose up -d
-
-# Stop the container
-docker compose down
-
-# View logs
-docker compose logs -f
-```
-
-The Docker setup includes:
-
-- Automatic restart on container crash
-- Volume for persistent data storage
-- Port exposure (8080)
-- Environment variable support for configuration
-
-### Docker Rebuild
-
-To rebuild the container after code changes:
-
-```bash
-docker compose up -d --build
-```
-
-## 4. Universal Startup Script
-
-For any environment, you can use the universal startup script:
+The MCP server includes a startup script that can detect the environment and initialize the server appropriately:
 
 ```bash
 ./mcp_server/scripts/start_mcp_server.sh
 ```
 
-This script:
+This script handles:
 
-- Detects your environment (Docker, Codespace, systemd, or standard)
-- Uses the appropriate method to start the server
-- Installs dependencies if needed
-- Creates configuration if missing
-- Ensures only one instance is running
+- Environment detection (development vs. production)
+- Dependency verification
+- Configuration loading
+- Server initialization with appropriate parameters
 
-## GitHub Codespaces Integration
+### Automatic Environment Detection
 
-For GitHub Codespaces:
+The startup script automatically detects the environment:
 
-1. The VS Code task will automatically start the server when opening the codespace
-2. The startup script will detect Codespaces and use the direct run method
-3. The server will run in the background
+1. In local development environments, it will use the standard startup method
+2. In production environments, it will use systemd service management
 
-## Environment Detection
+## Cursor IDE Integration
 
-The startup script automatically detects your environment:
+For Cursor IDE development:
 
-- **Docker container**: Uses direct run method
-- **GitHub Codespace**: Uses direct run method
-- **System with systemd**: Uses the systemd service
-- **Other environments**: Uses direct run method with background process
+1. The MCP server can be started from the integrated terminal
+2. Cursor's AI features can be used to navigate and understand the MCP codebase
+3. Debugging and testing can be performed directly within the IDE
+
+To set up the MCP server in Cursor:
+
+1. Open the repository in Cursor
+2. Open the integrated terminal (Ctrl+`)
+3. Run the startup script:
+   ```bash
+   ./mcp_server/scripts/start_mcp_server.sh
+   ```
+
+## CI/CD Integration
+
+The MCP server includes GitHub Actions workflows for continuous integration and deployment:
+
+1. Automated testing on pull requests
+2. Deployment to staging environments
+3. Production deployment with approval gates
+
+See `.github/workflows/deploy.yml` for the complete CI/CD configuration.
+
+## Monitoring Integration
+
+The MCP server includes Prometheus-compatible metrics endpoints for monitoring:
+
+1. `/metrics` - Standard Prometheus metrics
+2. `/health` - Health check endpoint
+
+These endpoints can be integrated with monitoring systems like Grafana for visualization and alerting.
+
+## Local Development Workflow
+
+For local development:
+
+1. Start the MCP server:
+   ```bash
+   ./mcp_server/scripts/start_mcp_server.sh
+   ```
+
+2. Verify the server is running:
+   ```bash
+   curl http://localhost:8000/health
+   ```
+
+3. Make changes to the code
+
+4. Restart the server to apply changes:
+   ```bash
+   ./mcp_server/scripts/start_mcp_server.sh --restart
+   ```
 
 ## Troubleshooting
 
 If the MCP server fails to start:
 
 1. Check the logs:
-
-   - Direct run: `/tmp/mcp-server.log`
-   - Systemd: `journalctl -u mcp-server.service -f`
-   - Docker: `docker compose logs -f`
-
-2. Common issues:
-
-   - Port 8080 already in use
-   - Missing dependencies
-   - Permission issues in systemd service
-   - Configuration file errors
-
-3. Manual start for debugging:
    ```bash
-   python -m mcp_server.main --config mcp_server/config.json
+   tail -f mcp_server.log
    ```
 
-## Automatic Restart on Crashes
+2. Verify dependencies are installed:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-- **Systemd**: The service is configured to restart automatically on crashes
-- **Docker**: The container has `restart: always` set
-- **Direct run**: Use a tool like `supervisor` or `pm2` for crash recovery
+3. Check configuration:
+   ```bash
+   cat mcp_server/config/mcp_config.json
+   ```
+
+4. Ensure ports are available:
+   ```bash
+   netstat -tuln | grep 8000
+   ```
