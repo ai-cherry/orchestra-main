@@ -9,7 +9,7 @@ interface SidebarProps {
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: Home },
-  { href: '/agents', label: 'Agents', icon: BotMessageSquare },
+  { href: '/agents', label: 'Agents', icon: MessageSquare },
   { href: '/personas', label: 'Personas', icon: Brain },
   { href: '/workflows', label: 'Workflows', icon: Workflow },
   { href: '/integrations', label: 'Integrations', icon: Zap },

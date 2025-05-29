@@ -1,7 +1,6 @@
 import React from 'react';
 import { Menu, X, Moon, Sun, User, Palette, LogOut } from 'lucide-react';
 import { useTheme } from '@/context/useTheme';
-import type { Theme } from '@/context/ThemeContext';
 import { Button } from '@/components/ui/button'; // Actual import
 import {
   DropdownMenu,
