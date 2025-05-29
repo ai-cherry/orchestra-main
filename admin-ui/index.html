@@ -5,15 +5,23 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Cherry Admin UI - Administrative dashboard for the Cherry AI orchestration platform" />
   <!-- Allow Vite/React build to execute scripts that rely on eval/new Function -->
+  <!-- CSP configured to allow styles, API connections, and necessary script execution -->
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' https:; img-src 'self' data:; font-src 'self';" />
+    content="default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline' blob:; connect-src 'self' https: wss:; img-src 'self' data: blob:; font-src 'self' data:;" />
   <title>Cherry Admin UI</title>
-  <!-- Force rebuild to include CSS -->
+  <!-- CSS is automatically injected by Vite during the build process from index.css and component imports -->
 </head>
 
 <body>
   <div id="root"></div>
+  <noscript>
+    <div style="padding: 20px; text-align: center; font-family: sans-serif;">
+      <h2>JavaScript Required</h2>
+      <p>This application requires JavaScript to function. Please enable JavaScript in your browser settings to use the Cherry Admin UI.</p>
+    </div>
+  </noscript>
   <script type="module" src="/src/main.tsx"></script>
 </body>
 
