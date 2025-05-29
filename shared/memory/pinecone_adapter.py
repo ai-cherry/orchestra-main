@@ -10,9 +10,9 @@ import asyncio
 import logging
 from typing import Any, Dict, List, Optional
 
-from core.env_config import settings
-
 import pinecone  # Requires 'pinecone-client' package
+
+from core.env_config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -46,14 +46,10 @@ class PineconeAdapter:
         if self._index is None:
             # Pinecone's client is sync, but can be wrapped for async
             loop = asyncio.get_event_loop()
-            self._index = await loop.run_in_executor(
-                None, lambda: pinecone.Index(self.index_name)
-            )
+            self._index = await loop.run_in_executor(None, lambda: pinecone.Index(self.index_name))
             logger.info(f"Connected to Pinecone index: {self.index_name}")
 
-    async def upsert_vectors(
-        self, vectors: List[Dict[str, Any]], batch_size: int = 100
-    ):
+    async def upsert_vectors(self, vectors: List[Dict[str, Any]], batch_size: int = 100):
         """
         Batch upsert vectors to Pinecone.
         Each vector: {'id': str, 'values': List[float], 'metadata': dict}
@@ -74,9 +70,7 @@ class PineconeAdapter:
                 )
                 logger.info(f"Upserted batch {i}-{i+len(batch)-1} to Pinecone.")
             except Exception as e:
-                logger.error(
-                    f"Pinecone upsert failed for batch {i}-{i+len(batch)-1}: {e}"
-                )
+                logger.error(f"Pinecone upsert failed for batch {i}-{i+len(batch)-1}: {e}")
 
     async def query(
         self,
@@ -101,10 +95,7 @@ class PineconeAdapter:
                 ),
             )
             matches = result.get("matches", [])
-            return [
-                {"id": m["id"], "score": m["score"], "metadata": m.get("metadata", {})}
-                for m in matches
-            ]
+            return [{"id": m["id"], "score": m["score"], "metadata": m.get("metadata", {})} for m in matches]
         except Exception as e:
             logger.error(f"Pinecone query failed: {e}")
             return []

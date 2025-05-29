@@ -71,9 +71,7 @@ class MCPIntegrationChecker:
             # Check for forbidden patterns
             for pattern, desc in forbidden_patterns:
                 if re.search(pattern, content) and "GCP-Free" not in content:
-                    self.issues.append(
-                        f"{filename}: Contains {desc} (should be GCP-free)"
-                    )
+                    self.issues.append(f"{filename}: Contains {desc} (should be GCP-free)")
 
             # Check for required patterns
             for pattern, desc in required_patterns:
@@ -108,9 +106,7 @@ class MCPIntegrationChecker:
                 self.successes.append(f"MCP server '{server}' is configured")
 
                 # Check if server file exists
-                server_file = (
-                    self.root_dir / "mcp_server" / "servers" / f"{server}_server.py"
-                )
+                server_file = self.root_dir / "mcp_server" / "servers" / f"{server}_server.py"
                 if server_file.exists():
                     self.successes.append(f"MCP server file exists: {server_file.name}")
                 else:
@@ -136,9 +132,7 @@ class MCPIntegrationChecker:
             if "NO Poetry, Docker, Pipenv" in content:
                 self.successes.append(".cursorrules correctly forbids Poetry/Docker")
             else:
-                self.warnings.append(
-                    ".cursorrules should explicitly forbid Poetry/Docker"
-                )
+                self.warnings.append(".cursorrules should explicitly forbid Poetry/Docker")
         else:
             self.issues.append("Missing .cursorrules file")
 
@@ -154,9 +148,7 @@ class MCPIntegrationChecker:
         print("\n🚀 Checking MCP Server Status...")
 
         try:
-            result = subprocess.run(
-                ["ps", "aux"], capture_output=True, text=True, check=False
-            )
+            result = subprocess.run(["ps", "aux"], capture_output=True, text=True, check=False)
 
             servers_to_check = [
                 ("orchestrator_server", "Orchestrator MCP server"),
@@ -168,9 +160,7 @@ class MCPIntegrationChecker:
                 if process_name in result.stdout:
                     self.successes.append(f"{desc} is running")
                 else:
-                    self.warnings.append(
-                        f"{desc} is not running (run ./start_orchestra.sh)"
-                    )
+                    self.warnings.append(f"{desc} is not running (run ./start_orchestra.sh)")
 
         except Exception as e:
             self.warnings.append(f"Could not check server status: {e}")
@@ -193,9 +183,7 @@ class MCPIntegrationChecker:
                 if os.access(script_path, os.X_OK):
                     self.successes.append(f"  ✓ {script} is executable")
                 else:
-                    self.warnings.append(
-                        f"  ⚠️  {script} is not executable (run chmod +x)"
-                    )
+                    self.warnings.append(f"  ⚠️  {script} is not executable (run chmod +x)")
             else:
                 self.warnings.append(f"Missing launch script: {script}")
 
@@ -245,9 +233,7 @@ class MCPIntegrationChecker:
             print("  • Make scripts executable: chmod +x *.sh")
 
         if total_issues == 0 and total_warnings == 0:
-            print(
-                "  🎉 Everything looks great! Your MCP integration is properly configured."
-            )
+            print("  🎉 Everything looks great! Your MCP integration is properly configured.")
 
         # Usage instructions
         print("\n🚀 QUICK START:")

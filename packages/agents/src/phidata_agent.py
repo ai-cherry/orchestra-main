@@ -6,8 +6,7 @@ This module provides integration with Phidata's agent framework.
 
 import logging
 
-from packages.shared.src.models.domain_models import AgentResponse as AgentOutput
-from packages.shared.src.models.domain_models import UserRequest as AgentInput
+from packages.shared.src.models.domain_models import AgentResponse as AgentOutput, UserRequest as AgentInput
 
 from ._base import OrchestraAgentBase
 

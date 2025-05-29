@@ -4,9 +4,9 @@ Test script to verify the new GCP-free setup is functional.
 Tests all major components and connections.
 """
 
+import asyncio
 import os
 import sys
-import asyncio
 from typing import Dict, List, Tuple
 
 # Add project root to path
@@ -50,9 +50,7 @@ class SetupTester:
         print("\n🔍 Testing MongoDB Connection...")
 
         try:
-            from core.orchestrator.src.agents.memory.mongodb_manager import (
-                MongoDBMemoryManager,
-            )
+            from core.orchestrator.src.agents.memory.mongodb_manager import MongoDBMemoryManager
 
             # Try to connect
             manager = MongoDBMemoryManager()
@@ -97,9 +95,7 @@ class SetupTester:
             redis_host = os.getenv("REDIS_HOST", "localhost")
             redis_port = int(os.getenv("REDIS_PORT", 6379))
 
-            client = redis.Redis(
-                host=redis_host, port=redis_port, decode_responses=True
-            )
+            client = redis.Redis(host=redis_host, port=redis_port, decode_responses=True)
 
             # Test connection
             client.ping()
@@ -157,11 +153,7 @@ class SetupTester:
             # Create client
             client = weaviate.Client(
                 url=weaviate_url,
-                auth_client_secret=(
-                    weaviate.AuthApiKey(api_key=weaviate_api_key)
-                    if weaviate_api_key
-                    else None
-                ),
+                auth_client_secret=(weaviate.AuthApiKey(api_key=weaviate_api_key) if weaviate_api_key else None),
             )
 
             # Test connection
@@ -232,9 +224,7 @@ class SetupTester:
                     False,
                     "docker-compose.yml still contains GCP references",
                 )
-                print(
-                    "  ✗ docker-compose.yml still contains GOOGLE_APPLICATION_CREDENTIALS"
-                )
+                print("  ✗ docker-compose.yml still contains GOOGLE_APPLICATION_CREDENTIALS")
                 return False
             else:
                 print("  ✓ docker-compose.yml is clean of GCP references")

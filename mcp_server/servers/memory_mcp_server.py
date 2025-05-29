@@ -9,20 +9,20 @@ MemoryMCPServer: Neo4j-backed, LLM-augmented, production-grade memory server for
 - Exposes a clean, tool-based API for agent integration.
 """
 
-import os
+import asyncio
+import hashlib
 import json
 import logging
-import hashlib
-import asyncio
+import os
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
-from neo4j import GraphDatabase, Driver
-from sentence_transformers import SentenceTransformer
-from openai import AsyncOpenAI
 import redis.asyncio as aioredis
+from fastapi import FastAPI, HTTPException
+from neo4j import Driver, GraphDatabase
+from openai import AsyncOpenAI
+from pydantic import BaseModel, Field
+from sentence_transformers import SentenceTransformer
 
 from mcp_server.config.loader import load_config
 from mcp_server.config.models import MCPConfig
@@ -46,12 +46,8 @@ VECTOR_INDEX_NAME = os.getenv("NEO4J_VECTOR_INDEX_NAME", "memory_embeddings")
 
 # --- Initialize Clients ---
 try:
-    neo4j_driver: Optional[Driver] = GraphDatabase.driver(
-        NEO4J_URL, auth=(NEO4J_USERNAME, NEO4J_PASSWORD)
-    )
-    asyncio.get_event_loop().run_until_complete(
-        asyncio.to_thread(neo4j_driver.verify_connectivity)
-    )
+    neo4j_driver: Optional[Driver] = GraphDatabase.driver(NEO4J_URL, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
+    asyncio.get_event_loop().run_until_complete(asyncio.to_thread(neo4j_driver.verify_connectivity))
     logger.info(f"Connected to Neo4j at {NEO4J_URL}")
 
     embedder = SentenceTransformer(EMBEDDING_MODEL)
@@ -61,11 +57,7 @@ try:
     if llm_client:
         logger.info("LLM client initialized for entity extraction.")
 
-    cache_client = (
-        aioredis.from_url(CACHE_URL, encoding="utf-8", decode_responses=True)
-        if CACHE_ENABLED
-        else None
-    )
+    cache_client = aioredis.from_url(CACHE_URL, encoding="utf-8", decode_responses=True) if CACHE_ENABLED else None
     if cache_client:
         logger.info(f"Cache enabled at {CACHE_URL}")
 
@@ -153,9 +145,7 @@ async def store_memory_logic(memory: MemoryItem) -> Dict[str, Any]:
     if not memory.id:
         memory.id = generate_id(memory.content, memory.group_id, memory.memory_type)
     if memory.embedding is None:
-        memory.embedding = (
-            await asyncio.to_thread(embedder.encode, memory.content)
-        ).tolist()
+        memory.embedding = (await asyncio.to_thread(embedder.encode, memory.content)).tolist()
 
     node_label = memory.memory_type.capitalize()
 
@@ -186,9 +176,7 @@ async def store_memory_logic(memory: MemoryItem) -> Dict[str, Any]:
         )
 
     await run_sync_neo4j_op(lambda: get_neo4j_session().execute_write(_create_node_tx))
-    logger.info(
-        f"Stored memory '{memory.id}' (type: {node_label}, group: {memory.group_id})."
-    )
+    logger.info(f"Stored memory '{memory.id}' (type: {node_label}, group: {memory.group_id}).")
 
     # Entity extraction (episodes only)
     if memory.memory_type == "episode" and llm_client:
@@ -201,9 +189,7 @@ async def store_memory_logic(memory: MemoryItem) -> Dict[str, Any]:
     return {"status": "success", "memory_id": memory.id, "group_id": memory.group_id}
 
 
-async def extract_entities_with_llm(
-    text_content: str, group_id: str
-) -> List[Dict[str, Any]]:
+async def extract_entities_with_llm(text_content: str, group_id: str) -> List[Dict[str, Any]]:
     if not llm_client:
         logger.info("LLM client not available. Skipping entity extraction.")
         return []
@@ -224,14 +210,9 @@ async def extract_entities_with_llm(
         if not extracted_data_str:
             return []
         if extracted_data_str.strip().startswith("```json"):
-            extracted_data_str = (
-                extracted_data_str.split("```json")[1].split("```")[0].strip()
-            )
+            extracted_data_str = extracted_data_str.split("```json")[1].split("```")[0].strip()
         extracted_entities_raw = json.loads(extracted_data_str)
-        if (
-            isinstance(extracted_entities_raw, dict)
-            and "entities" in extracted_entities_raw
-        ):
+        if isinstance(extracted_entities_raw, dict) and "entities" in extracted_entities_raw:
             extracted_entities = extracted_entities_raw["entities"]
         elif isinstance(extracted_entities_raw, list):
             extracted_entities = extracted_entities_raw
@@ -248,9 +229,7 @@ async def extract_entities_with_llm(
         return []
 
 
-async def store_extracted_entities(
-    episode_id: str, entities: List[Dict[str, Any]], group_id: str
-):
+async def store_extracted_entities(episode_id: str, entities: List[Dict[str, Any]], group_id: str):
     if not neo4j_driver:
         return
 
@@ -294,9 +273,7 @@ async def query_memory_logic(query: MemoryQuery) -> List[Dict[str, Any]]:
             str(query.max_results),
             str(query.similarity_threshold),
         ]
-        cache_key = (
-            f"query_memory:{hashlib.md5(':'.join(key_parts).encode()).hexdigest()}"
-        )
+        cache_key = f"query_memory:{hashlib.md5(':'.join(key_parts).encode()).hexdigest()}"
         cached = await cache_client.get(cache_key)
         if cached:
             logger.info(f"Cache hit for query (group: {query.group_id})")
@@ -314,9 +291,7 @@ async def query_memory_logic(query: MemoryQuery) -> List[Dict[str, Any]]:
             cypher += "AND EXISTS {MATCH (m)-[:ASSOCIATED_WITH_AGENT]->(a:Agent {id: $agent_id, group_id: $group_id})} "
         if query.conversation_id:
             cypher += "AND EXISTS {MATCH (m)-[:PART_OF_CONVERSATION]->(c:Conversation {id: $conversation_id, group_id: $group_id})} "
-        cypher += (
-            "RETURN m, score ORDER BY score DESC, m.timestamp DESC LIMIT $final_limit"
-        )
+        cypher += "RETURN m, score ORDER BY score DESC, m.timestamp DESC LIMIT $final_limit"
         params = {
             "index_name": index_name,
             "embedding": query_embedding,
@@ -344,20 +319,14 @@ async def query_memory_logic(query: MemoryQuery) -> List[Dict[str, Any]]:
             except Exception:
                 pass
         results.append({**node_data, "score": score if score is not None else 0.0})
-    results.sort(
-        key=lambda x: (x.get("score", 0.0), x.get("timestamp", "")), reverse=True
-    )
+    results.sort(key=lambda x: (x.get("score", 0.0), x.get("timestamp", "")), reverse=True)
     final_results = results[: query.max_results]
     if cache_client and CACHE_ENABLED and cache_key:
-        await cache_client.setex(
-            cache_key, CACHE_TTL_SECONDS, json.dumps(final_results)
-        )
+        await cache_client.setex(cache_key, CACHE_TTL_SECONDS, json.dumps(final_results))
     return final_results
 
 
-async def get_agent_memories_logic(
-    agent_id: str, group_id: str
-) -> List[Dict[str, Any]]:
+async def get_agent_memories_logic(agent_id: str, group_id: str) -> List[Dict[str, Any]]:
     if not neo4j_driver:
         raise ConnectionError("Neo4j driver not initialized.")
 
@@ -396,14 +365,10 @@ async def delete_memory_logic(memory_id: str, group_id: str) -> Dict[str, Any]:
         )
         return result.single()["deleted_count"]
 
-    deleted_count = await run_sync_neo4j_op(
-        lambda: get_neo4j_session().execute_write(_tx)
-    )
+    deleted_count = await run_sync_neo4j_op(lambda: get_neo4j_session().execute_write(_tx))
     if deleted_count > 0:
         return {"status": "success", "deleted_count": deleted_count}
-    raise ValueError(
-        f"Memory {memory_id} not found in group {group_id} or already deleted."
-    )
+    raise ValueError(f"Memory {memory_id} not found in group {group_id} or already deleted.")
 
 
 async def clear_graph_logic(group_id: str) -> Dict[str, Any]:
@@ -417,9 +382,7 @@ async def clear_graph_logic(group_id: str) -> Dict[str, Any]:
         )
         return result.single()["deleted_count"]
 
-    deleted_count = await run_sync_neo4j_op(
-        lambda: get_neo4j_session().execute_write(_tx)
-    )
+    deleted_count = await run_sync_neo4j_op(lambda: get_neo4j_session().execute_write(_tx))
     return {"status": "success", "nodes_deleted": deleted_count}
 
 

@@ -18,7 +18,6 @@ from core.business.workflows.base import WorkflowContext, get_workflow_engine
 from core.services.events.event_bus import Event, get_event_bus
 from core.services.memory.unified_memory import get_memory_service
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -163,9 +162,7 @@ class Agent(ABC):
 
         logger.info(f"Agent {self.config.name} stopped")
 
-    async def send_message(
-        self, recipient_id: str, content: str, metadata: Optional[Dict[str, Any]] = None
-    ) -> None:
+    async def send_message(self, recipient_id: str, content: str, metadata: Optional[Dict[str, Any]] = None) -> None:
         """Send a message to another agent or user."""
         message = AgentMessage(
             sender_id=self.config.id,
@@ -195,9 +192,7 @@ class Agent(ABC):
         if self.state.status == AgentStatus.IDLE:
             await self._process_message_queue()
 
-    async def execute_workflow(
-        self, workflow_name: str, inputs: Dict[str, Any]
-    ) -> WorkflowContext:
+    async def execute_workflow(self, workflow_name: str, inputs: Dict[str, Any]) -> WorkflowContext:
         """Execute a workflow."""
         if workflow_name not in self.config.workflow_names:
             raise ValueError(f"Workflow '{workflow_name}' not available for this agent")
@@ -207,9 +202,7 @@ class Agent(ABC):
 
         try:
             # Execute workflow
-            context = await self._workflow_engine.execute_workflow(
-                workflow_name, inputs
-            )
+            context = await self._workflow_engine.execute_workflow(workflow_name, inputs)
 
             # Track active workflow
             self.state.active_workflows.append(context.workflow_id)
@@ -221,9 +214,7 @@ class Agent(ABC):
             if not self.state.active_workflows:
                 self.state.status = AgentStatus.IDLE
 
-    async def remember(
-        self, key: str, value: Any, metadata: Optional[Dict[str, Any]] = None
-    ) -> None:
+    async def remember(self, key: str, value: Any, metadata: Optional[Dict[str, Any]] = None) -> None:
         """Store information in agent's memory."""
         if not self._memory_service:
             return
@@ -234,9 +225,7 @@ class Agent(ABC):
             **(metadata or {}),
         }
 
-        await self._memory_service.store(
-            key=f"agent:{self.config.id}:{key}", value=value, metadata=agent_metadata
-        )
+        await self._memory_service.store(key=f"agent:{self.config.id}:{key}", value=value, metadata=agent_metadata)
 
     async def recall(self, query: str, limit: int = 10) -> List[Any]:
         """Recall information from agent's memory."""
@@ -249,9 +238,7 @@ class Agent(ABC):
 
         return results
 
-    async def collaborate_with(
-        self, agent_id: str, task: str, context: Dict[str, Any]
-    ) -> Any:
+    async def collaborate_with(self, agent_id: str, task: str, context: Dict[str, Any]) -> Any:
         """Collaborate with another agent on a task."""
         if not self.config.collaboration_enabled:
             raise ValueError("Collaboration is not enabled for this agent")
@@ -299,9 +286,7 @@ class Agent(ABC):
                 await asyncio.sleep(0.1)
 
             except Exception as e:
-                logger.error(
-                    f"Error in agent {self.config.name} main loop: {e}", exc_info=True
-                )
+                logger.error(f"Error in agent {self.config.name} main loop: {e}", exc_info=True)
                 self.state.status = AgentStatus.ERROR
                 await asyncio.sleep(1)  # Back off on error
 
@@ -397,13 +382,9 @@ class AgentManager:
         tasks = [agent.stop() for agent in self._agents.values()]
         await asyncio.gather(*tasks)
 
-    async def broadcast_message(
-        self, sender_id: str, content: str, metadata: Optional[Dict[str, Any]] = None
-    ) -> None:
+    async def broadcast_message(self, sender_id: str, content: str, metadata: Optional[Dict[str, Any]] = None) -> None:
         """Broadcast a message to all agents."""
-        message = AgentMessage(
-            sender_id=sender_id, content=content, metadata=metadata or {}
-        )
+        message = AgentMessage(sender_id=sender_id, content=content, metadata=metadata or {})
 
         # Send to all agents except sender
         for agent_id, agent in self._agents.items():
@@ -412,15 +393,9 @@ class AgentManager:
 
     def find_agents_by_capability(self, capability: AgentCapability) -> List[Agent]:
         """Find agents with a specific capability."""
-        return [
-            agent
-            for agent in self._agents.values()
-            if capability in agent.config.capabilities
-        ]
+        return [agent for agent in self._agents.values() if capability in agent.config.capabilities]
 
-    async def assign_task(
-        self, task: str, required_capability: AgentCapability
-    ) -> Optional[str]:
+    async def assign_task(self, task: str, required_capability: AgentCapability) -> Optional[str]:
         """Assign a task to the most suitable agent."""
         suitable_agents = self.find_agents_by_capability(required_capability)
 
@@ -432,9 +407,7 @@ class AgentManager:
 
         # Send task to agent
         await best_agent.receive_message(
-            AgentMessage(
-                sender_id="system", content=task, metadata={"type": "task_assignment"}
-            )
+            AgentMessage(sender_id="system", content=task, metadata={"type": "task_assignment"})
         )
 
         return best_agent.config.id

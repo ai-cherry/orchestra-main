@@ -15,12 +15,7 @@ from typing import Any, Dict, List, Optional
 import yaml
 
 # Import from relative paths
-from ..models.agent_mode import (
-    DEFAULT_AGENT_MODES,
-    AgentMode,
-    AgentModeConfig,
-    AgentModeType,
-)
+from ..models.agent_mode import DEFAULT_AGENT_MODES, AgentMode, AgentModeConfig, AgentModeType
 from ..utils.structured_logging import get_logger, with_correlation_id
 
 logger = get_logger(__name__)
@@ -29,9 +24,7 @@ logger = get_logger(__name__)
 class AgentModeManager:
     """Manager for agent modes and their configurations."""
 
-    def __init__(
-        self, config_path: Optional[str] = None, auto_load_defaults: bool = True
-    ):
+    def __init__(self, config_path: Optional[str] = None, auto_load_defaults: bool = True):
         """Initialize the agent mode manager.
 
         Args:
@@ -223,9 +216,7 @@ class AgentModeManager:
         Returns:
             Dictionary mapping mode types to display names
         """
-        return {
-            mode_type.value: mode.config.name for mode_type, mode in self.modes.items()
-        }
+        return {mode_type.value: mode.config.name for mode_type, mode in self.modes.items()}
 
     def format_prompt(self, task: str, context: Dict[str, Any] = None) -> str:
         """Format a prompt using the active agent mode.
@@ -248,9 +239,7 @@ class AgentModeManager:
 
         return active_mode.format_prompt(task, context or {})
 
-    def update_mode_context(
-        self, mode_type: AgentModeType, context: Dict[str, Any]
-    ) -> bool:
+    def update_mode_context(self, mode_type: AgentModeType, context: Dict[str, Any]) -> bool:
         """Update the context for a specific mode.
 
         Args:

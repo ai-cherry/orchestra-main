@@ -73,9 +73,7 @@ class Issue:
         self.severity = ISSUE_SEVERITY.get(category, "warning")
 
     def __str__(self) -> str:
-        severity_color = {"error": RED, "warning": YELLOW, "info": BLUE}.get(
-            self.severity, RESET
-        )
+        severity_color = {"error": RED, "warning": YELLOW, "info": BLUE}.get(self.severity, RESET)
 
         return f"{self.file_path}:{self.line} - {severity_color}{self.severity.upper()}{RESET}: {self.message}"
 
@@ -270,11 +268,7 @@ class CodeVisitor(ast.NodeVisitor):
         # Check for unused imports
         for name in self.imported_names:
             if name not in self.used_names and name != "__future__":
-                self.issues.append(
-                    Issue(
-                        self.file_path, 1, "unused_import", f"Unused import: '{name}'"
-                    )
-                )
+                self.issues.append(Issue(self.file_path, 1, "unused_import", f"Unused import: '{name}'"))
 
         # Check for unused variables
         for name in self.defined_names:
@@ -318,13 +312,9 @@ def analyze_file(file_path: str) -> List[Issue]:
         return visitor.analyze()
 
     except SyntaxError as e:
-        return [
-            Issue(file_path, e.lineno or 1, "undefined_name", f"Syntax error: {str(e)}")
-        ]
+        return [Issue(file_path, e.lineno or 1, "undefined_name", f"Syntax error: {str(e)}")]
     except Exception as e:
-        return [
-            Issue(file_path, 1, "undefined_name", f"Error analyzing file: {str(e)}")
-        ]
+        return [Issue(file_path, 1, "undefined_name", f"Error analyzing file: {str(e)}")]
 
 
 def analyze_codebase(directory: str) -> List[Issue]:
@@ -365,13 +355,9 @@ def print_summary(issues: List[Issue]) -> None:
     print(f"Found {len(issues)} issues in {len(issues_by_file)} files\n")
 
     print(f"{BLUE}Issues by category:{RESET}")
-    for category, category_issues in sorted(
-        issues_by_category.items(), key=lambda x: len(x[1]), reverse=True
-    ):
+    for category, category_issues in sorted(issues_by_category.items(), key=lambda x: len(x[1]), reverse=True):
         severity = ISSUE_SEVERITY.get(category, "warning")
-        severity_color = {"error": RED, "warning": YELLOW, "info": BLUE}.get(
-            severity, RESET
-        )
+        severity_color = {"error": RED, "warning": YELLOW, "info": BLUE}.get(severity, RESET)
 
         print(f"  {severity_color}{category}{RESET}: {len(category_issues)} issues")
 
@@ -399,13 +385,9 @@ def print_detailed_report(issues: List[Issue]) -> None:
 
         # Sort issues by line number
         for issue in sorted(file_issues, key=lambda x: x.line):
-            severity_color = {"error": RED, "warning": YELLOW, "info": BLUE}.get(
-                issue.severity, RESET
-            )
+            severity_color = {"error": RED, "warning": YELLOW, "info": BLUE}.get(issue.severity, RESET)
 
-            print(
-                f"  Line {issue.line}: {severity_color}{issue.category}{RESET} - {issue.message}"
-            )
+            print(f"  Line {issue.line}: {severity_color}{issue.category}{RESET} - {issue.message}")
 
 
 def main() -> int:

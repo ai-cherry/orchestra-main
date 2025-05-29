@@ -32,9 +32,7 @@ MODE_DEFINITIONS_PATH = os.getenv(
     "MODE_DEFINITIONS_PATH",
     "/home/paperspace/orchestra-main/config/mode_definitions.yaml",
 )
-AGENTS_CONFIG_PATH = os.getenv(
-    "AGENTS_CONFIG_PATH", "/home/paperspace/orchestra-main/config/agents.yaml"
-)
+AGENTS_CONFIG_PATH = os.getenv("AGENTS_CONFIG_PATH", "/home/paperspace/orchestra-main/config/agents.yaml")
 
 # Global state
 current_mode = "standard"
@@ -132,17 +130,13 @@ def load_configurations():
         if os.path.exists(MODE_DEFINITIONS_PATH):
             with open(MODE_DEFINITIONS_PATH, "r") as f:
                 mode_definitions = yaml.safe_load(f)
-                logger.info(
-                    f"Loaded {len(mode_definitions.get('modes', {}))} mode definitions"
-                )
+                logger.info(f"Loaded {len(mode_definitions.get('modes', {}))} mode definitions")
 
         # Load agents config
         if os.path.exists(AGENTS_CONFIG_PATH):
             with open(AGENTS_CONFIG_PATH, "r") as f:
                 agents_config = yaml.safe_load(f)
-                logger.info(
-                    f"Loaded {len(agents_config.get('agents', {}))} agent configurations"
-                )
+                logger.info(f"Loaded {len(agents_config.get('agents', {}))} agent configurations")
 
     except Exception as e:
         logger.error(f"Failed to load configurations: {e}")
@@ -334,9 +328,7 @@ async def switch_mode(request: ModeSwitch) -> Dict[str, Any]:
 
 
 @app.post("/mcp/run_workflow")
-async def run_workflow(
-    request: WorkflowRequest, background_tasks: BackgroundTasks
-) -> Dict[str, Any]:
+async def run_workflow(request: WorkflowRequest, background_tasks: BackgroundTasks) -> Dict[str, Any]:
     """Execute a workflow"""
     # Create workflow instance
     workflow = Workflow(
@@ -465,9 +457,7 @@ async def execute_task_endpoint(
 
 
 @app.post("/mcp/get_status")
-async def get_orchestrator_status(
-    include_workflows: bool = True, include_tasks: bool = True
-) -> Dict[str, Any]:
+async def get_orchestrator_status(include_workflows: bool = True, include_tasks: bool = True) -> Dict[str, Any]:
     """Get current orchestrator status"""
     status = {
         "current_mode": current_mode,
@@ -477,21 +467,9 @@ async def get_orchestrator_status(
 
     if include_workflows:
         status["workflows"] = {
-            "active": sum(
-                1
-                for w in active_workflows.values()
-                if w.status == WorkflowStatus.RUNNING
-            ),
-            "completed": sum(
-                1
-                for w in active_workflows.values()
-                if w.status == WorkflowStatus.COMPLETED
-            ),
-            "failed": sum(
-                1
-                for w in active_workflows.values()
-                if w.status == WorkflowStatus.FAILED
-            ),
+            "active": sum(1 for w in active_workflows.values() if w.status == WorkflowStatus.RUNNING),
+            "completed": sum(1 for w in active_workflows.values() if w.status == WorkflowStatus.COMPLETED),
+            "failed": sum(1 for w in active_workflows.values() if w.status == WorkflowStatus.FAILED),
             "recent": [
                 {
                     "id": w.id,
@@ -500,9 +478,7 @@ async def get_orchestrator_status(
                     "progress": f"{w.current_step}/{len(w.steps)}",
                     "created_at": w.created_at.isoformat(),
                 }
-                for w in sorted(
-                    active_workflows.values(), key=lambda x: x.created_at, reverse=True
-                )[:5]
+                for w in sorted(active_workflows.values(), key=lambda x: x.created_at, reverse=True)[:5]
             ],
         }
 
@@ -554,9 +530,7 @@ async def get_workflow_details(workflow_id: str) -> Dict[str, Any]:
         "results": workflow.results,
         "context": workflow.context,
         "created_at": workflow.created_at.isoformat(),
-        "completed_at": (
-            workflow.completed_at.isoformat() if workflow.completed_at else None
-        ),
+        "completed_at": (workflow.completed_at.isoformat() if workflow.completed_at else None),
     }
 
 
@@ -567,9 +541,7 @@ async def health_check():
         "status": "healthy",
         "service": "orchestrator-mcp",
         "current_mode": current_mode,
-        "active_workflows": len(
-            [w for w in active_workflows.values() if w.status == WorkflowStatus.RUNNING]
-        ),
+        "active_workflows": len([w for w in active_workflows.values() if w.status == WorkflowStatus.RUNNING]),
         "queue_size": task_queue.qsize(),
         "configurations_loaded": bool(mode_definitions) and bool(agents_config),
     }

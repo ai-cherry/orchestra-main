@@ -84,20 +84,13 @@ class OptimizedMemoryManager:
         for tool_name, adapter in self.tools.items():
             if tool_name != source_tool:
                 # Simple content truncation for tools with smaller context windows
-                if (
-                    isinstance(content, str)
-                    and len(content) > adapter.context_window // 4
-                ):
-                    truncated = (
-                        content[: adapter.context_window // 8] + "... [truncated]"
-                    )
+                if isinstance(content, str) and len(content) > adapter.context_window // 4:
+                    truncated = content[: adapter.context_window // 8] + "... [truncated]"
                     adapter.store(key, truncated)
                 else:
                     adapter.store(key, content)
 
-        logger.info(
-            f"Shared memory '{key}' from {source_tool} with {len(self.tools)-1} other tools"
-        )
+        logger.info(f"Shared memory '{key}' from {source_tool} with {len(self.tools)-1} other tools")
 
     def get_memory_status(self) -> Dict[str, Any]:
         """Get memory status across all tools."""

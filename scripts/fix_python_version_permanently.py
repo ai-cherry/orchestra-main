@@ -6,15 +6,13 @@ This script standardizes on Python 3.10 as the minimum version
 since that's what's actually running and working.
 """
 
+import logging
 import os
 import re
 import subprocess
-import logging
 from typing import List, Tuple
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # The ACTUAL Python version we're using
@@ -286,12 +284,8 @@ def main():
 
     logger.info("\n🎯 Next Steps:")
     logger.info("1. Run: python scripts/validate_environment.py")
-    logger.info(
-        "2. Commit these changes: git add -A && git commit -m 'Fix: Standardize on Python 3.10'"
-    )
-    logger.info(
-        "3. Always check environment before starting: python scripts/validate_environment.py"
-    )
+    logger.info("2. Commit these changes: git add -A && git commit -m 'Fix: Standardize on Python 3.10'")
+    logger.info("3. Always check environment before starting: python scripts/validate_environment.py")
 
 
 if __name__ == "__main__":

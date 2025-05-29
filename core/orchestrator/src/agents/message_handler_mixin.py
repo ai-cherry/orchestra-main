@@ -26,15 +26,11 @@ class MessageHandlerMixin:
     def __init__(self, *args, **kwargs):
         """Initialize the mixin."""
         super().__init__(*args, **kwargs)
-        self._message_handlers: Dict[
-            str, List[Callable[[AgentMessage], Awaitable[None]]]
-        ] = {}
+        self._message_handlers: Dict[str, List[Callable[[AgentMessage], Awaitable[None]]]] = {}
         self._message_processor_task = None
         self._processing_messages = False
 
-    def register_message_handler(
-        self, message_type: str, handler: Callable[[AgentMessage], Awaitable[None]]
-    ):
+    def register_message_handler(self, message_type: str, handler: Callable[[AgentMessage], Awaitable[None]]):
         """
         Register a handler for a specific message type.
 
@@ -89,9 +85,7 @@ class MessageHandlerMixin:
     async def _process_messages(self):
         """Background task to process messages."""
         # Get agent ID from config or generate one
-        agent_id = getattr(self, "config", {}).get(
-            "agent_id", f"{self.__class__.__name__}_{id(self)}"
-        )
+        agent_id = getattr(self, "config", {}).get("agent_id", f"{self.__class__.__name__}_{id(self)}")
 
         message_queue = get_message_queue()
 
@@ -105,9 +99,7 @@ class MessageHandlerMixin:
                     handled = await self.handle_message(message)
 
                     if not handled:
-                        logger.warning(
-                            f"No handler for message type: {message.message_type}"
-                        )
+                        logger.warning(f"No handler for message type: {message.message_type}")
             except asyncio.CancelledError:
                 break
             except Exception as e:

@@ -3,10 +3,10 @@
 Orchestra AI Status - Show complete system status
 """
 
-import subprocess
-from pathlib import Path
-from datetime import datetime
 import json
+import subprocess
+from datetime import datetime
+from pathlib import Path
 
 
 def check_service(name: str, command: list) -> tuple:
@@ -35,9 +35,7 @@ def main():
         print("✓ .env file configured")
         # Count configured services
         with open(env_file, "r") as f:
-            lines = [
-                l.strip() for l in f if l.strip() and not l.startswith("#") and "=" in l
-            ]
+            lines = [l.strip() for l in f if l.strip() and not l.startswith("#") and "=" in l]
         print(f"  {len(lines)} environment variables set")
     else:
         print("✗ .env file missing")
@@ -68,9 +66,7 @@ def main():
             mcp_config = json.load(f)
 
         for server_name in mcp_config.get("servers", {}).keys():
-            server_file = (
-                root_dir / "mcp_server" / "servers" / f"{server_name}_server.py"
-            )
+            server_file = root_dir / "mcp_server" / "servers" / f"{server_name}_server.py"
             if server_file.exists():
                 print(f"✓ {server_name} server - Ready")
             else:

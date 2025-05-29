@@ -72,9 +72,7 @@ class DragonflyConnection(RetryableConnection):
     async def health_check(self) -> ServiceHealth:
         """Perform health check on DragonflyDB."""
         if not self.client:
-            return ServiceHealth(
-                status=ServiceStatus.UNHEALTHY, error="Client not initialized"
-            )
+            return ServiceHealth(status=ServiceStatus.UNHEALTHY, error="Client not initialized")
 
         try:
             start_time = time.time()
@@ -103,9 +101,7 @@ class DragonflyConnection(RetryableConnection):
             )
 
         except TimeoutError:
-            return ServiceHealth(
-                status=ServiceStatus.UNHEALTHY, error="Connection timeout"
-            )
+            return ServiceHealth(status=ServiceStatus.UNHEALTHY, error="Connection timeout")
         except Exception as e:
             return ServiceHealth(status=ServiceStatus.UNHEALTHY, error=str(e))
 
@@ -201,9 +197,7 @@ class DragonflyConnection(RetryableConnection):
 
         return await self.client.set(key, json.dumps(value), ex=ex)
 
-    async def cache_get_or_set(
-        self, key: str, factory: callable, ttl: int = 3600
-    ) -> Any:
+    async def cache_get_or_set(self, key: str, factory: callable, ttl: int = 3600) -> Any:
         """Get from cache or compute and set."""
         value = await self.client.get(key)
         if value is not None:

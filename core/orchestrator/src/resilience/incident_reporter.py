@@ -170,9 +170,7 @@ class IncidentReporter:
             severity="WARNING",
         )
 
-    def report_recovery(
-        self, agent_id: str, retry_attempt: int, recovery_time_seconds: int
-    ) -> str:
+    def report_recovery(self, agent_id: str, retry_attempt: int, recovery_time_seconds: int) -> str:
         """
         Report an agent recovery incident.
 
@@ -241,9 +239,7 @@ def get_incident_reporter() -> IncidentReporter:
 
         settings = get_settings()
 
-        project_id = os.environ.get(
-            "GCP_PROJECT_ID", getattr(settings, "GCP_PROJECT_ID", "cherry-ai-project")
-        )
+        project_id = os.environ.get("GCP_PROJECT_ID", getattr(settings, "GCP_PROJECT_ID", "cherry-ai-project"))
 
         log_name = os.environ.get(
             "INCIDENT_LOG_NAME",

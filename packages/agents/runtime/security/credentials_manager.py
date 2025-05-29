@@ -67,24 +67,18 @@ class CredentialsManager(BaseAgent):
             try:
                 # OnePasswordAgent integration is currently disabled due to missing implementation.
                 # To re-enable, implement OnePasswordAgent and restore this logic.
-                logger.warning(
-                    "1Password integration is currently disabled: OnePasswordAgent not implemented."
-                )
+                logger.warning("1Password integration is currently disabled: OnePasswordAgent not implemented.")
             except Exception as e:
                 logger.error(f"Failed to initialize 1Password provider: {str(e)}")
         else:
-            logger.info(
-                "1Password service token not found in environment, provider not registered"
-            )
+            logger.info("1Password service token not found in environment, provider not registered")
 
         # Could add other credential providers here (AWS Secrets Manager, HashiCorp Vault, etc.)
 
         if not self.providers:
             logger.warning("No credential providers were initialized")
         else:
-            logger.info(
-                f"Credentials Manager initialized with providers: {', '.join(self.providers.keys())}"
-            )
+            logger.info(f"Credentials Manager initialized with providers: {', '.join(self.providers.keys())}")
 
     async def run(self, context: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -140,9 +134,7 @@ class CredentialsManager(BaseAgent):
             if not credential_name:
                 return {"status": "error", "message": "No credential name provided."}
 
-            result = await self.check_credential_exists(
-                credential_name, provider=provider, vault=context.get("vault")
-            )
+            result = await self.check_credential_exists(credential_name, provider=provider, vault=context.get("vault"))
 
             return {
                 "status": "success",
@@ -211,17 +203,13 @@ class CredentialsManager(BaseAgent):
         provider_agent = self.providers[provider]
 
         if provider == "1password":
-            return await provider_agent.get_credential(
-                credential_name, field=field, vault=vault
-            )
+            return await provider_agent.get_credential(credential_name, field=field, vault=vault)
 
         # Add handlers for other providers as needed
 
         return None
 
-    async def check_credential_exists(
-        self, credential_name: str, provider: str = None, vault: str = None
-    ) -> bool:
+    async def check_credential_exists(self, credential_name: str, provider: str = None, vault: str = None) -> bool:
         """
         Check if a credential exists in the specified provider.
 
@@ -242,9 +230,7 @@ class CredentialsManager(BaseAgent):
         provider_agent = self.providers[provider]
 
         if provider == "1password":
-            return await provider_agent.check_credential_exists(
-                credential_name, vault=vault
-            )
+            return await provider_agent.check_credential_exists(credential_name, vault=vault)
 
         # Add handlers for other providers as needed
 
@@ -273,9 +259,7 @@ class CredentialsManager(BaseAgent):
         provider_agent = self.providers[provider]
 
         if provider == "1password":
-            return await provider_agent.list_available_credentials(
-                vault=vault, category=category
-            )
+            return await provider_agent.list_available_credentials(vault=vault, category=category)
 
         # Add handlers for other providers as needed
 
@@ -309,9 +293,7 @@ class CredentialsManager(BaseAgent):
         provider_agent = self.providers[provider]
 
         if provider == "1password":
-            return await provider_agent.inject_credentials_to_env(
-                credential_names, vault=vault, env_map=env_map
-            )
+            return await provider_agent.inject_credentials_to_env(credential_names, vault=vault, env_map=env_map)
 
         # Add handlers for other providers as needed
 

@@ -10,10 +10,10 @@ import asyncio
 import logging
 from typing import Any, Dict, List, Optional
 
-from core.env_config import settings
-
 import weaviate
 from weaviate.util import get_valid_uuid
+
+from core.env_config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -34,9 +34,7 @@ class WeaviateAdapter:
         self.endpoint = endpoint or settings.weaviate_endpoint
         self.api_key = api_key or settings.weaviate_api_key
         if not self.endpoint or not self.api_key:
-            raise RuntimeError(
-                "WEAVIATE_ENDPOINT and WEAVIATE_API_KEY must be configured"
-            )
+            raise RuntimeError("WEAVIATE_ENDPOINT and WEAVIATE_API_KEY must be configured")
         self.class_name = class_name
         self._client = None
 
@@ -80,9 +78,7 @@ class WeaviateAdapter:
                 await asyncio.get_event_loop().run_in_executor(None, upsert_batch)
                 logger.info(f"Upserted batch {i}-{i+len(batch)-1} to Weaviate.")
             except Exception as e:
-                logger.error(
-                    f"Weaviate upsert failed for batch {i}-{i+len(batch)-1}: {e}"
-                )
+                logger.error(f"Weaviate upsert failed for batch {i}-{i+len(batch)-1}: {e}")
 
     async def query(
         self,
@@ -99,9 +95,7 @@ class WeaviateAdapter:
 
             def do_query():
                 return (
-                    self._client.query.get(
-                        self.class_name, ["_additional { id distance }", "*"]
-                    )
+                    self._client.query.get(self.class_name, ["_additional { id distance }", "*"])
                     .with_near_vector({"vector": vector})
                     .with_limit(top_k)
                     .with_where(filters)
@@ -113,10 +107,7 @@ class WeaviateAdapter:
             return [
                 {
                     "id": m["_additional"]["id"],
-                    "score": 1.0
-                    - m["_additional"][
-                        "distance"
-                    ],  # Weaviate uses distance, convert to similarity
+                    "score": 1.0 - m["_additional"]["distance"],  # Weaviate uses distance, convert to similarity
                     "properties": {k: v for k, v in m.items() if k != "_additional"},
                 }
                 for m in matches
@@ -132,9 +123,7 @@ class WeaviateAdapter:
 
             def do_delete():
                 for uuid in ids:
-                    self._client.data_object.delete(
-                        uuid=get_valid_uuid(uuid), class_name=self.class_name
-                    )
+                    self._client.data_object.delete(uuid=get_valid_uuid(uuid), class_name=self.class_name)
 
             await asyncio.get_event_loop().run_in_executor(None, do_delete)
             logger.info(f"Deleted {len(ids)} objects from Weaviate.")

@@ -11,16 +11,13 @@ from typing import Optional
 
 from core.infrastructure.config.settings import get_settings
 from core.infrastructure.connectivity.base import ServiceRegistry
-from core.infrastructure.connectivity.mongodb import MongoDBConnection
 from core.infrastructure.connectivity.dragonfly import DragonflyConnection
+from core.infrastructure.connectivity.mongodb import MongoDBConnection
+from core.services.events.event_bus import EventPriority, get_event_bus
 from core.services.memory.unified_memory import get_memory_service
-from core.services.events.event_bus import get_event_bus, EventPriority
-
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -122,9 +119,7 @@ class OrchestraCore:
             logger.info("Shutdown event received")
             await self.shutdown()
 
-        self.event_bus.subscribe(
-            "core.shutdown", handle_shutdown, priority=EventPriority.CRITICAL
-        )
+        self.event_bus.subscribe("core.shutdown", handle_shutdown, priority=EventPriority.CRITICAL)
 
     async def start(self) -> None:
         """Start the orchestration core."""
@@ -194,9 +189,7 @@ class OrchestraCore:
                 logger.error(f"Error disconnecting {service_name}: {e}")
 
         # Publish shutdown complete event
-        await self.event_bus.publish(
-            "core.shutdown_complete", {}, priority=EventPriority.CRITICAL
-        )
+        await self.event_bus.publish("core.shutdown_complete", {}, priority=EventPriority.CRITICAL)
 
         logger.info("Orchestra AI Core shutdown complete")
 

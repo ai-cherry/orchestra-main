@@ -41,17 +41,11 @@ class MemoryCompressionEngine:
 
         # Apply different compression strategies based on content type
         if isinstance(entry.content, str):
-            compressed_entry.content = MemoryCompressionEngine._compress_string(
-                entry.content, entry.compression_level
-            )
+            compressed_entry.content = MemoryCompressionEngine._compress_string(entry.content, entry.compression_level)
         elif isinstance(entry.content, dict):
-            compressed_entry.content = MemoryCompressionEngine._compress_dict(
-                entry.content, entry.compression_level
-            )
+            compressed_entry.content = MemoryCompressionEngine._compress_dict(entry.content, entry.compression_level)
         elif isinstance(entry.content, list):
-            compressed_entry.content = MemoryCompressionEngine._compress_list(
-                entry.content, entry.compression_level
-            )
+            compressed_entry.content = MemoryCompressionEngine._compress_list(entry.content, entry.compression_level)
         else:
             # For other types, try to convert to string and compress
             try:
@@ -60,9 +54,7 @@ class MemoryCompressionEngine:
                     content_str, entry.compression_level
                 )
             except Exception as e:
-                logger.warning(
-                    f"Failed to compress content of type {type(entry.content)}: {e}"
-                )
+                logger.warning(f"Failed to compress content of type {type(entry.content)}: {e}")
 
         return compressed_entry
 
@@ -126,9 +118,7 @@ class MemoryCompressionEngine:
                 "_reference": True,
                 "_content_type": "str",
                 "_content_length": content_len,
-                "_content_preview": (
-                    content[:50] + "..." if content_len > 50 else content
-                ),
+                "_content_preview": (content[:50] + "..." if content_len > 50 else content),
             }
 
         return content
@@ -211,8 +201,7 @@ class MemoryCompressionEngine:
                 "_type": "dict",
                 "_total_keys": key_count,
                 "_content_size": content_size,
-                "_keys_preview": list(content.keys())[:3]
-                + (["..."] if key_count > 3 else []),
+                "_keys_preview": list(content.keys())[:3] + (["..."] if key_count > 3 else []),
             }
 
         return content
@@ -263,11 +252,7 @@ class MemoryCompressionEngine:
                 except (pickle.PickleError, TypeError):
                     # Fallback for non-picklable content: keep only a few items
                     if item_count > 3:
-                        return (
-                            content[:1]
-                            + ["..."]
-                            + [f"[{item_count-2} items compressed]"]
-                        )
+                        return content[:1] + ["..."] + [f"[{item_count-2} items compressed]"]
             # Otherwise, keep only a few items
             elif item_count > 3:
                 return content[:1] + ["..."] + [f"[{item_count-2} items compressed]"]
@@ -310,18 +295,12 @@ class MemoryCompressionEngine:
                 try:
                     if compression_type == "zlib" and original_type == "str":
                         # Decompress zlib-compressed string
-                        compressed_data = bytes.fromhex(
-                            entry.content["_compressed_data"]
-                        )
-                        decompressed_entry.content = zlib.decompress(
-                            compressed_data
-                        ).decode()
+                        compressed_data = bytes.fromhex(entry.content["_compressed_data"])
+                        decompressed_entry.content = zlib.decompress(compressed_data).decode()
 
                     elif compression_type == "zlib+pickle":
                         # Decompress zlib+pickle compressed object
-                        compressed_data = bytes.fromhex(
-                            entry.content["_compressed_data"]
-                        )
+                        compressed_data = bytes.fromhex(entry.content["_compressed_data"])
                         decompressed_data = zlib.decompress(compressed_data)
                         decompressed_entry.content = pickle.loads(decompressed_data)
 
@@ -347,12 +326,8 @@ class MemoryCompressionEngine:
             "is_compressed": entry.compression_level != CompressionLevel.NONE,
         }
 
-        if isinstance(entry.content, dict) and (
-            "_compressed" in entry.content or "_compressed_data" in entry.content
-        ):
-            stats["compressed_type"] = (
-                "binary" if "_compressed_data" in entry.content else "structural"
-            )
+        if isinstance(entry.content, dict) and ("_compressed" in entry.content or "_compressed_data" in entry.content):
+            stats["compressed_type"] = "binary" if "_compressed_data" in entry.content else "structural"
 
             if "_original_size" in entry.content:
                 stats["original_size"] = entry.content["_original_size"]
@@ -369,9 +344,7 @@ class MemoryCompressionEngine:
                 stats["compressed_size"] = compressed_size
 
                 if "original_size" in stats:
-                    stats["compression_ratio"] = round(
-                        stats["original_size"] / compressed_size, 2
-                    )
+                    stats["compression_ratio"] = round(stats["original_size"] / compressed_size, 2)
             except (TypeError, ValueError):
                 pass
 

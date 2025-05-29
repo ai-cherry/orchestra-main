@@ -8,8 +8,7 @@ enabling modular, plug-and-play use of LangChain agents within the Orchestra sys
 import asyncio
 import logging
 
-from packages.shared.src.models.domain_models import AgentResponse as AgentOutput
-from packages.shared.src.models.domain_models import UserRequest as AgentInput
+from packages.shared.src.models.domain_models import AgentResponse as AgentOutput, UserRequest as AgentInput
 
 from ._base import OrchestraAgentBase
 
@@ -98,9 +97,7 @@ class LangChainAgentWrapper(OrchestraAgentBase):
             # 3. Call the LangChain agent's processing method
             logger.info(f"Processing input with LangChain agent: {self.name}")
             # Assume the LangChain agent exposes an async 'process' method
-            if hasattr(self.langchain_agent, "process") and asyncio.iscoroutinefunction(
-                self.langchain_agent.process
-            ):
+            if hasattr(self.langchain_agent, "process") and asyncio.iscoroutinefunction(self.langchain_agent.process):
                 agent_response = await self.langchain_agent.process(context)
             elif hasattr(self.langchain_agent, "process"):
                 # Fallback to sync method if async not available

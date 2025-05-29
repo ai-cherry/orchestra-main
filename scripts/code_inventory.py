@@ -26,11 +26,7 @@ for root in ROOTS:
                 inventory["python_modules"].append(path)
                 if "adapter" in fname or "Adapter" in fname:
                     inventory["adapters"].append(path)
-                if (
-                    os.access(path, os.X_OK)
-                    or path.startswith("scripts/")
-                    or path.startswith("tools/")
-                ):
+                if os.access(path, os.X_OK) or path.startswith("scripts/") or path.startswith("tools/"):
                     inventory["cli_scripts"].append(path)
             elif fname.endswith(".sh") or fname.endswith(".bash"):
                 inventory["cli_scripts"].append(path)

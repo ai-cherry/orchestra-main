@@ -11,9 +11,7 @@ import logging
 import uvicorn
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -26,9 +24,7 @@ def main():
 
     args = parser.parse_args()
 
-    logger.info(
-        f"Starting Vertex AI Agent Manager API server on {args.host}:{args.port}"
-    )
+    logger.info(f"Starting Vertex AI Agent Manager API server on {args.host}:{args.port}")
 
     # Import the API module
 

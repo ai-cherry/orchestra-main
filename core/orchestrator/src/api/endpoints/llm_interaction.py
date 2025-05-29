@@ -13,9 +13,7 @@ from pydantic import BaseModel, Field
 
 from core.orchestrator.src.config.config import get_settings
 from core.orchestrator.src.personas.dependency import get_persona_manager
-from core.orchestrator.src.services.enhanced_agent_orchestrator import (
-    get_enhanced_agent_orchestrator,
-)
+from core.orchestrator.src.services.enhanced_agent_orchestrator import get_enhanced_agent_orchestrator
 from core.orchestrator.src.services.llm.exceptions import (
     LLMProviderAuthenticationError,
     LLMProviderConnectionError,
@@ -40,22 +38,12 @@ class LLMRequestModel(BaseModel):
 
     message: str = Field(..., description="The user's message")
     user_id: str = Field(..., description="User identifier")
-    session_id: Optional[str] = Field(
-        None, description="Session identifier for conversation continuity"
-    )
-    persona_id: Optional[str] = Field(
-        None, description="Persona identifier to use for this interaction"
-    )
+    session_id: Optional[str] = Field(None, description="Session identifier for conversation continuity")
+    persona_id: Optional[str] = Field(None, description="Persona identifier to use for this interaction")
     model: Optional[str] = Field(None, description="LLM model to use")
-    temperature: Optional[float] = Field(
-        0.7, description="Temperature for generation", ge=0.0, le=2.0
-    )
-    max_tokens: Optional[int] = Field(
-        None, description="Maximum tokens to generate", gt=0
-    )
-    context: Optional[Dict[str, Any]] = Field(
-        None, description="Additional context for the interaction"
-    )
+    temperature: Optional[float] = Field(0.7, description="Temperature for generation", ge=0.0, le=2.0)
+    max_tokens: Optional[int] = Field(None, description="Maximum tokens to generate", gt=0)
+    context: Optional[Dict[str, Any]] = Field(None, description="Additional context for the interaction")
 
 
 class LLMResponseModel(BaseModel):
@@ -69,9 +57,7 @@ class LLMResponseModel(BaseModel):
     usage: Optional[Dict[str, int]] = Field(None, description="Token usage information")
     session_id: str = Field(..., description="The session identifier")
     interaction_id: str = Field(..., description="The interaction identifier")
-    response_time_ms: Optional[int] = Field(
-        None, description="Response time in milliseconds"
-    )
+    response_time_ms: Optional[int] = Field(None, description="Response time in milliseconds")
 
 
 class ErrorResponse(BaseModel):
@@ -112,9 +98,7 @@ class ErrorResponse(BaseModel):
         },
     },
 )
-async def llm_interact(
-    request: LLMRequestModel, persona_manager=Depends(get_persona_manager)
-):
+async def llm_interact(request: LLMRequestModel, persona_manager=Depends(get_persona_manager)):
     """
     Process a user interaction using an LLM provider.
 
@@ -135,10 +119,7 @@ async def llm_interact(
         settings = get_settings()
 
         # Check for API key
-        if (
-            not hasattr(settings, "OPENROUTER_API_KEY")
-            or not settings.OPENROUTER_API_KEY
-        ):
+        if not hasattr(settings, "OPENROUTER_API_KEY") or not settings.OPENROUTER_API_KEY:
             raise LLMProviderAuthenticationError(
                 "OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment."
             )
@@ -178,9 +159,7 @@ async def llm_interact(
             # Log the error but still return a successful response with the fallback message
             error_type = conversation_context.get("error")
             error_message = conversation_context.get("error_message", "Unknown error")
-            logger.warning(
-                f"LLM error handled by agent: {error_type} - {error_message}"
-            )
+            logger.warning(f"LLM error handled by agent: {error_type} - {error_message}")
 
         # Return formatted response
         return LLMResponseModel(
@@ -232,9 +211,7 @@ async def llm_interact(
 
     except LLMProviderModelError as e:
         logger.error(f"Model error: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=f"Model error: {str(e)}"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Model error: {str(e)}")
 
     except LLMProviderServiceError as e:
         logger.error(f"Service error: {e}")
@@ -319,9 +296,7 @@ async def direct_llm_completion(
 
         for msg in messages:
             if not isinstance(msg, dict) or "role" not in msg or "content" not in msg:
-                raise LLMProviderInvalidRequestError(
-                    "Each message must be a dict with 'role' and 'content' keys"
-                )
+                raise LLMProviderInvalidRequestError("Each message must be a dict with 'role' and 'content' keys")
 
         # Get LLM provider
         llm_provider = get_llm_provider("openrouter")
@@ -348,16 +323,12 @@ async def direct_llm_completion(
 
     except LLMProviderInvalidRequestError as e:
         logger.error(f"Invalid request: {e}", exc_info=True)
-        logger.warning(
-            "Invalid request may indicate input or configuration issues in direct completion."
-        )
+        logger.warning("Invalid request may indicate input or configuration issues in direct completion.")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
     except LLMProviderTimeoutError as e:
         logger.error(f"Request timeout: {e}", exc_info=True)
-        logger.warning(
-            "Timeout may impact direct completion; consider retrying or adjusting timeout settings."
-        )
+        logger.warning("Timeout may impact direct completion; consider retrying or adjusting timeout settings.")
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
             detail=f"Request timed out: {str(e)}",
@@ -374,9 +345,7 @@ async def direct_llm_completion(
 
     except LLMProviderConnectionError as e:
         logger.error(f"Connection error: {e}", exc_info=True)
-        logger.warning(
-            "Connection issues may prevent direct LLM completion; check network or provider status."
-        )
+        logger.warning("Connection issues may prevent direct LLM completion; check network or provider status.")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"Service unavailable: {str(e)}",
@@ -385,18 +354,12 @@ async def direct_llm_completion(
 
     except LLMProviderModelError as e:
         logger.error(f"Model error: {e}", exc_info=True)
-        logger.warning(
-            "Model error may require configuration or model selection adjustments for direct completion."
-        )
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=f"Model error: {str(e)}"
-        )
+        logger.warning("Model error may require configuration or model selection adjustments for direct completion.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Model error: {str(e)}")
 
     except LLMProviderServiceError as e:
         logger.error(f"Service error: {e}", exc_info=True)
-        logger.warning(
-            "Service error may indicate provider issues; consider fallback options for direct completion."
-        )
+        logger.warning("Service error may indicate provider issues; consider fallback options for direct completion.")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"Service error: {str(e)}",
@@ -413,9 +376,7 @@ async def direct_llm_completion(
 
     except Exception as e:
         logger.error(f"Error in direct LLM completion: {e}", exc_info=True)
-        logger.warning(
-            "Unexpected error may impact direct completion processing; review logs for details."
-        )
+        logger.warning("Unexpected error may impact direct completion processing; review logs for details.")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"LLM completion failed: {str(e)}",

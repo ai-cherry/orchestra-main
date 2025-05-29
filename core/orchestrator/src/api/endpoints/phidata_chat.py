@@ -16,9 +16,7 @@ from pydantic import BaseModel, Field
 from core.orchestrator.src.agents.agent_registry import get_agent_registry
 from core.orchestrator.src.api.dependencies.llm import get_llm_client
 from core.orchestrator.src.api.dependencies.memory import get_memory_manager
-from core.orchestrator.src.api.utils.format_structured_output import (
-    format_structured_output_as_markdown,
-)
+from core.orchestrator.src.api.utils.format_structured_output import format_structured_output_as_markdown
 from packages.ingestion.src.api.chat_integration import (
     IngestionChatMiddleware,
     get_ingestion_middleware,
@@ -50,9 +48,7 @@ class PhidataRequest(BaseModel):
     # Optional fields
     agent_id: Optional[str] = Field(None, description="Agent identifier")
     metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
-    tools: Optional[List[Dict[str, Any]]] = Field(
-        None, description="List of tools to use"
-    )
+    tools: Optional[List[Dict[str, Any]]] = Field(None, description="List of tools to use")
 
 
 class PhidataResponse(BaseModel):
@@ -64,15 +60,9 @@ class PhidataResponse(BaseModel):
     tool call visibility control.
     """
 
-    response_content: str = Field(
-        ..., description="Assistant's response text (markdown supported)"
-    )
-    response_type: str = Field(
-        "text", description="Type of response (text, image, etc.)"
-    )
-    content_format: str = Field(
-        "markdown", description="Format of response content (markdown, plain, etc.)"
-    )
+    response_content: str = Field(..., description="Assistant's response text (markdown supported)")
+    response_type: str = Field("text", description="Type of response (text, image, etc.)")
+    content_format: str = Field("markdown", description="Format of response content (markdown, plain, etc.)")
 
     # Optional fields
     session_id: Optional[str] = Field(None, description="Session identifier")
@@ -80,9 +70,7 @@ class PhidataResponse(BaseModel):
     agent_id: Optional[str] = Field(None, description="Agent identifier")
     agent_name: Optional[str] = Field(None, description="Agent name for display")
     metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
-    tool_calls: Optional[List[Dict[str, Any]]] = Field(
-        None, description="List of tool calls made during processing"
-    )
+    tool_calls: Optional[List[Dict[str, Any]]] = Field(None, description="List of tool calls made during processing")
     timestamp: Optional[str] = Field(None, description="Response timestamp")
 
 
@@ -92,9 +80,7 @@ async def phidata_chat(
     req: Request,
     memory: MemoryManager = Depends(get_memory_manager),
     llm_client: Optional[LLMClient] = Depends(get_llm_client),
-    ingestion_middleware: Optional[IngestionChatMiddleware] = Depends(
-        get_ingestion_middleware
-    ),
+    ingestion_middleware: Optional[IngestionChatMiddleware] = Depends(get_ingestion_middleware),
 ) -> PhidataResponse:
     """
     Process a Phidata chat request with markdown formatting support.
@@ -125,8 +111,7 @@ async def phidata_chat(
         agent_registry = get_agent_registry()
 
         logger.info(
-            f"Processing Phidata chat request for user_id: {request.user_id}, "
-            f"session_id: {request.session_id}"
+            f"Processing Phidata chat request for user_id: {request.user_id}, " f"session_id: {request.session_id}"
         )
 
         # Determine the agent type to use
@@ -148,9 +133,7 @@ async def phidata_chat(
         # Get active persona from request state or use default
         persona_config = getattr(req.state, "active_persona", default_persona)
         if not persona_config:
-            raise HTTPException(
-                status_code=500, detail="No persona configuration available"
-            )
+            raise HTTPException(status_code=500, detail="No persona configuration available")
 
         # Check if the message is an ingestion command
         ingestion_response = None
@@ -191,9 +174,7 @@ async def phidata_chat(
             agent_response = await agent.process(context)
         except Exception as e:
             logger.error(f"Agent processing failed: {e}", exc_info=True)
-            raise HTTPException(
-                status_code=500, detail=f"Agent processing failed: {str(e)}"
-            )
+            raise HTTPException(status_code=500, detail=f"Agent processing failed: {str(e)}")
 
         # Create memory item for the response
         memory_item = MemoryItem(
@@ -228,21 +209,12 @@ async def phidata_chat(
         # Check if response is a structured output that should be formatted
         if isinstance(agent_response.text, dict) or (
             agent_response.metadata
-            and agent_response.metadata.get("content_type")
-            in ["application/json", "structured"]
+            and agent_response.metadata.get("content_type") in ["application/json", "structured"]
         ):
             # This appears to be a structured output, format it as markdown
-            output_type = (
-                agent_response.metadata.get("output_type")
-                if agent_response.metadata
-                else None
-            )
-            response_content = format_structured_output_as_markdown(
-                agent_response.text, output_type
-            )
-            logger.info(
-                f"Formatted structured output as markdown for response (type: {output_type})"
-            )
+            output_type = agent_response.metadata.get("output_type") if agent_response.metadata else None
+            response_content = format_structured_output_as_markdown(agent_response.text, output_type)
+            logger.info(f"Formatted structured output as markdown for response (type: {output_type})")
 
         # If this was an ingestion command, augment the agent response
         # with information about the ingestion task
@@ -253,9 +225,7 @@ async def phidata_chat(
             # If we have an ingestion message, we may want to append it to the response
             if "message" in ingestion_response:
                 # Add a note about the ingestion task to the response
-                ingestion_msg = (
-                    f"\n\n---\n**File Ingestion:** {ingestion_response['message']}"
-                )
+                ingestion_msg = f"\n\n---\n**File Ingestion:** {ingestion_response['message']}"
                 response_content = response_content + ingestion_msg
 
         # Get agent name for UI display
@@ -280,6 +250,4 @@ async def phidata_chat(
 
     except Exception as e:
         logger.error(f"Phidata chat processing failed: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=500, detail=f"Failed to process Phidata chat: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to process Phidata chat: {str(e)}")

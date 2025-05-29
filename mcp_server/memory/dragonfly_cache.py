@@ -64,9 +64,7 @@ class DragonflyCache(BaseMemory):
     async def initialize(self) -> bool:
         """Initialize DragonflyDB connection with pooling."""
         if not HAS_REDIS:
-            logger.error(
-                "redis package not installed. Install with: pip install redis[hiredis]"
-            )
+            logger.error("redis package not installed. Install with: pip install redis[hiredis]")
             return False
 
         if not validate_dragonfly_config():
@@ -240,12 +238,8 @@ class DragonflyCache(BaseMemory):
                             if isinstance(query, str):
                                 content_str = json.dumps(entry.content).lower()
                                 if query.lower() in content_str:
-                                    score = content_str.count(query.lower()) / len(
-                                        content_str
-                                    )
-                                    results.append(
-                                        MemorySearchResult(entry, score, self.tier)
-                                    )
+                                    score = content_str.count(query.lower()) / len(content_str)
+                                    results.append(MemorySearchResult(entry, score, self.tier))
                             else:
                                 # No vector search in cache tier
                                 pass
@@ -274,9 +268,7 @@ class DragonflyCache(BaseMemory):
 
             cursor = 0
             while True:
-                cursor, batch = await self._client.scan(
-                    cursor, match=pattern, count=1000
-                )
+                cursor, batch = await self._client.scan(cursor, match=pattern, count=1000)
 
                 # Strip prefix from keys
                 for key in batch:
@@ -325,9 +317,7 @@ class DragonflyCache(BaseMemory):
             saved_count = sum(1 for success in results.values() if success)
             await self._client.hincrby("mcp:stats:hot", "batch_saves", saved_count)
 
-            logger.info(
-                f"Batch saved {saved_count}/{len(entries)} entries to DragonflyDB"
-            )
+            logger.info(f"Batch saved {saved_count}/{len(entries)} entries to DragonflyDB")
 
         except Exception as e:
             logger.error(f"Failed to batch save to DragonflyDB: {e}")
@@ -353,9 +343,7 @@ class DragonflyCache(BaseMemory):
                 batch_keys = full_keys[i : i + self.batch_size]
                 batch_values = await self._client.mget(batch_keys)
 
-                for key, full_key, value in zip(
-                    keys[i : i + self.batch_size], batch_keys, batch_values
-                ):
+                for key, full_key, value in zip(keys[i : i + self.batch_size], batch_keys, batch_values):
                     if value:
                         try:
                             data = json.loads(value)
@@ -364,9 +352,7 @@ class DragonflyCache(BaseMemory):
                             results[key] = entry
 
                             # Update access in background
-                            asyncio.create_task(
-                                self._update_access_metadata(full_key, entry)
-                            )
+                            asyncio.create_task(self._update_access_metadata(full_key, entry))
                         except Exception as e:
                             logger.warning(f"Failed to parse entry {key}: {e}")
                             results[key] = None
@@ -402,9 +388,7 @@ class DragonflyCache(BaseMemory):
             # Use SCAN to find keys
             cursor = 0
             while True:
-                cursor, keys = await self._client.scan(
-                    cursor, match=pattern, count=1000
-                )
+                cursor, keys = await self._client.scan(cursor, match=pattern, count=1000)
 
                 if keys:
                     # Delete in pipeline
@@ -440,9 +424,7 @@ class DragonflyCache(BaseMemory):
             key_count = 0
             cursor = 0
             while True:
-                cursor, keys = await self._client.scan(
-                    cursor, match=f"{self.key_prefix}*", count=1000
-                )
+                cursor, keys = await self._client.scan(cursor, match=f"{self.key_prefix}*", count=1000)
                 key_count += len(keys)
                 if cursor == 0:
                     break

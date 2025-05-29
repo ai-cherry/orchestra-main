@@ -15,9 +15,7 @@ class OrchestraSettings(BaseSettings):
 
     # Legacy GCP fields (deprecated, kept for compatibility)
     gcp_project_id: str = Field(default=None, env="GCP_PROJECT")
-    gcp_service_account_key: str = Field(
-        default=None, env="GOOGLE_APPLICATION_CREDENTIALS"
-    )
+    gcp_service_account_key: str = Field(default=None, env="GOOGLE_APPLICATION_CREDENTIALS")
 
     # GitHub and CI/CD
     github_token: str = Field(default=None, env="GITHUB_TOKEN")

@@ -11,18 +11,10 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
-from core.infrastructure.connectivity.base import ServiceRegistry
 from core.infrastructure.config.settings import get_settings
+from core.infrastructure.connectivity.base import ServiceRegistry
 
-from .base import (
-    MemoryItem,
-    MemoryLayer,
-    MemoryPolicy,
-    MemoryService,
-    MemoryStore,
-    SearchResult,
-)
-
+from .base import MemoryItem, MemoryLayer, MemoryPolicy, MemoryService, MemoryStore, SearchResult
 
 logger = logging.getLogger(__name__)
 
@@ -82,9 +74,7 @@ class ShortTermStore(MemoryStore):
             logger.error(f"Error deleting from short-term memory: {e}")
             return False
 
-    async def search(
-        self, query: str, limit: int = 10, filters: Optional[Dict[str, Any]] = None
-    ) -> List[SearchResult]:
+    async def search(self, query: str, limit: int = 10, filters: Optional[Dict[str, Any]] = None) -> List[SearchResult]:
         """Search is not supported in short-term memory."""
         return []
 
@@ -147,9 +137,7 @@ class MidTermStore(MemoryStore):
             logger.error(f"Error deleting from mid-term memory: {e}")
             return False
 
-    async def search(
-        self, query: str, limit: int = 10, filters: Optional[Dict[str, Any]] = None
-    ) -> List[SearchResult]:
+    async def search(self, query: str, limit: int = 10, filters: Optional[Dict[str, Any]] = None) -> List[SearchResult]:
         """Search in MongoDB using text search."""
         try:
             # Build query
@@ -205,9 +193,7 @@ class LongTermStore(MemoryStore):
         """Delete item from Weaviate."""
         return True
 
-    async def search(
-        self, query: str, limit: int = 10, filters: Optional[Dict[str, Any]] = None
-    ) -> List[SearchResult]:
+    async def search(self, query: str, limit: int = 10, filters: Optional[Dict[str, Any]] = None) -> List[SearchResult]:
         """Search in Weaviate using vector search."""
         return []
 
@@ -219,9 +205,7 @@ class LongTermStore(MemoryStore):
 class DefaultMemoryPolicy(MemoryPolicy):
     """Default memory management policy."""
 
-    def should_promote(
-        self, item: MemoryItem, access_count: int
-    ) -> Optional[MemoryLayer]:
+    def should_promote(self, item: MemoryItem, access_count: int) -> Optional[MemoryLayer]:
         """Promote frequently accessed items to higher layers."""
         if item.layer == MemoryLayer.SHORT_TERM and access_count > 10:
             return MemoryLayer.MID_TERM
@@ -264,9 +248,7 @@ class UnifiedMemoryService(MemoryService):
     - Long-term memory (Weaviate) for vector search
     """
 
-    def __init__(
-        self, service_registry: ServiceRegistry, policy: Optional[MemoryPolicy] = None
-    ):
+    def __init__(self, service_registry: ServiceRegistry, policy: Optional[MemoryPolicy] = None):
         self.registry = service_registry
         self.policy = policy or DefaultMemoryPolicy()
         self.stores: Dict[MemoryLayer, MemoryStore] = {}
@@ -303,9 +285,7 @@ class UnifiedMemoryService(MemoryService):
                 logger.info("Initialized long-term memory store")
 
         self._initialized = True
-        logger.info(
-            f"Unified memory service initialized with {len(self.stores)} stores"
-        )
+        logger.info(f"Unified memory service initialized with {len(self.stores)} stores")
 
     async def store(
         self,
@@ -371,9 +351,7 @@ class UnifiedMemoryService(MemoryService):
                 item = await store.retrieve(item_id)
                 if item:
                     # Update access tracking
-                    self._access_counts[item_id] = (
-                        self._access_counts.get(item_id, 0) + 1
-                    )
+                    self._access_counts[item_id] = self._access_counts.get(item_id, 0) + 1
                     self._last_access[item_id] = datetime.utcnow()
 
                     # Check if item should be promoted

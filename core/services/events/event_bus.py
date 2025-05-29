@@ -74,13 +74,9 @@ class EventHandler:
                 retries += 1
                 if retries <= self.max_retries:
                     await asyncio.sleep(0.1 * retries)  # Exponential backoff
-                    logger.warning(
-                        f"Retry {retries}/{self.max_retries} for handler {self.handler.__name__}"
-                    )
+                    logger.warning(f"Retry {retries}/{self.max_retries} for handler {self.handler.__name__}")
 
-        logger.error(
-            f"Handler {self.handler.__name__} failed after {retries} retries: {last_error}"
-        )
+        logger.error(f"Handler {self.handler.__name__} failed after {retries} retries: {last_error}")
         raise last_error
 
 
@@ -140,9 +136,7 @@ class EventBus:
         if event_name == "*":
             self._wildcard_handlers.sort(key=lambda h: h.priority.value, reverse=True)
         else:
-            self._handlers[event_name].sort(
-                key=lambda h: h.priority.value, reverse=True
-            )
+            self._handlers[event_name].sort(key=lambda h: h.priority.value, reverse=True)
 
         logger.debug(f"Subscribed {handler.__name__} to {event_name}")
 
@@ -160,15 +154,11 @@ class EventBus:
         removed = False
 
         if event_name == "*":
-            self._wildcard_handlers = [
-                h for h in self._wildcard_handlers if h.handler != handler
-            ]
+            self._wildcard_handlers = [h for h in self._wildcard_handlers if h.handler != handler]
             removed = True
         elif event_name in self._handlers:
             original_count = len(self._handlers[event_name])
-            self._handlers[event_name] = [
-                h for h in self._handlers[event_name] if h.handler != handler
-            ]
+            self._handlers[event_name] = [h for h in self._handlers[event_name] if h.handler != handler]
             removed = len(self._handlers[event_name]) < original_count
 
             # Clean up empty lists
@@ -263,9 +253,7 @@ class EventBus:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         try:
-            return loop.run_until_complete(
-                self.publish(event_name, data, priority, source)
-            )
+            return loop.run_until_complete(self.publish(event_name, data, priority, source))
         finally:
             loop.close()
 
@@ -280,9 +268,7 @@ class EventBus:
 
         return handlers
 
-    def get_event_history(
-        self, event_name: Optional[str] = None, limit: int = 100
-    ) -> List[Event]:
+    def get_event_history(self, event_name: Optional[str] = None, limit: int = 100) -> List[Event]:
         """Get event history, optionally filtered by event name."""
         history = self._event_history
 
@@ -295,8 +281,7 @@ class EventBus:
         """Get event bus statistics."""
         return {
             **self._stats,
-            "total_handlers": sum(len(h) for h in self._handlers.values())
-            + len(self._wildcard_handlers),
+            "total_handlers": sum(len(h) for h in self._handlers.values()) + len(self._wildcard_handlers),
             "event_types": list(self._handlers.keys()),
             "history_size": len(self._event_history),
         }

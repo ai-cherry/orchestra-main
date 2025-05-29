@@ -57,9 +57,7 @@ class MongoDBConnection(RetryableConnection):
     async def health_check(self) -> ServiceHealth:
         """Perform health check on MongoDB."""
         if not self.client:
-            return ServiceHealth(
-                status=ServiceStatus.UNHEALTHY, error="Client not initialized"
-            )
+            return ServiceHealth(status=ServiceStatus.UNHEALTHY, error="Client not initialized")
 
         try:
             start_time = time.time()
@@ -82,9 +80,7 @@ class MongoDBConnection(RetryableConnection):
             )
 
         except ServerSelectionTimeoutError:
-            return ServiceHealth(
-                status=ServiceStatus.UNHEALTHY, error="Server selection timeout"
-            )
+            return ServiceHealth(status=ServiceStatus.UNHEALTHY, error="Server selection timeout")
         except Exception as e:
             return ServiceHealth(status=ServiceStatus.UNHEALTHY, error=str(e))
 
@@ -119,9 +115,7 @@ class MongoDBConnection(RetryableConnection):
         cursor = coll.find(filter or {}, **kwargs)
         return await cursor.to_list(length=kwargs.get("limit", None))
 
-    async def _find_one(
-        self, collection: str, filter: Dict = None, **kwargs
-    ) -> Optional[Dict]:
+    async def _find_one(self, collection: str, filter: Dict = None, **kwargs) -> Optional[Dict]:
         """Find a single document."""
         coll = self.database[collection]
         return await coll.find_one(filter or {}, **kwargs)
@@ -132,17 +126,13 @@ class MongoDBConnection(RetryableConnection):
         result = await coll.insert_one(document, **kwargs)
         return result.inserted_id
 
-    async def _insert_many(
-        self, collection: str, documents: list[Dict], **kwargs
-    ) -> list:
+    async def _insert_many(self, collection: str, documents: list[Dict], **kwargs) -> list:
         """Insert multiple documents."""
         coll = self.database[collection]
         result = await coll.insert_many(documents, **kwargs)
         return result.inserted_ids
 
-    async def _update_one(
-        self, collection: str, filter: Dict, update: Dict, **kwargs
-    ) -> Dict:
+    async def _update_one(self, collection: str, filter: Dict, update: Dict, **kwargs) -> Dict:
         """Update a single document."""
         coll = self.database[collection]
         result = await coll.update_one(filter, update, **kwargs)
@@ -152,9 +142,7 @@ class MongoDBConnection(RetryableConnection):
             "upserted_id": result.upserted_id,
         }
 
-    async def _update_many(
-        self, collection: str, filter: Dict, update: Dict, **kwargs
-    ) -> Dict:
+    async def _update_many(self, collection: str, filter: Dict, update: Dict, **kwargs) -> Dict:
         """Update multiple documents."""
         coll = self.database[collection]
         result = await coll.update_many(filter, update, **kwargs)
@@ -181,9 +169,7 @@ class MongoDBConnection(RetryableConnection):
         cursor = coll.aggregate(pipeline, **kwargs)
         return await cursor.to_list(length=None)
 
-    async def _count_documents(
-        self, collection: str, filter: Dict = None, **kwargs
-    ) -> int:
+    async def _count_documents(self, collection: str, filter: Dict = None, **kwargs) -> int:
         """Count documents in a collection."""
         coll = self.database[collection]
         return await coll.count_documents(filter or {}, **kwargs)

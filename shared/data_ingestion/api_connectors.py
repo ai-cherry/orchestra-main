@@ -151,9 +151,7 @@ class APIProcessor(BaseProcessor):
         """Get or create aiohttp session."""
         if not self._session or self._session.closed:
             connector = aiohttp.TCPConnector(limit=100)
-            self._session = aiohttp.ClientSession(
-                connector=connector, timeout=self.timeout, headers=self.headers
-            )
+            self._session = aiohttp.ClientSession(connector=connector, timeout=self.timeout, headers=self.headers)
         return self._session
 
     async def _apply_rate_limit(self) -> None:
@@ -182,9 +180,7 @@ class APIProcessor(BaseProcessor):
                     if "api_key_header" in self.auth:
                         self.headers[self.auth["api_key_header"]] = self.auth["api_key"]
                     else:
-                        kwargs.setdefault("params", {})["api_key"] = self.auth[
-                            "api_key"
-                        ]
+                        kwargs.setdefault("params", {})["api_key"] = self.auth["api_key"]
 
         # Apply rate limiting
         await self._apply_rate_limit()
@@ -276,11 +272,7 @@ class RESTAPIProcessor(APIProcessor):
                     for key in results_path.split("."):
                         results = results.get(key, [])
                 else:
-                    results = (
-                        response_data
-                        if isinstance(response_data, list)
-                        else [response_data]
-                    )
+                    results = response_data if isinstance(response_data, list) else [response_data]
 
                 # Process results
                 for idx, item in enumerate(results):
@@ -296,16 +288,10 @@ class RESTAPIProcessor(APIProcessor):
                             "method": method,
                             "endpoint": endpoint,
                             "page": current_page if pagination_type == "page" else None,
-                            "offset": (
-                                current_offset if pagination_type == "offset" else None
-                            ),
-                            "cursor": (
-                                current_cursor if pagination_type == "cursor" else None
-                            ),
+                            "offset": (current_offset if pagination_type == "offset" else None),
+                            "cursor": (current_cursor if pagination_type == "cursor" else None),
                             "item_index": idx,
-                            "response_keys": (
-                                list(item.keys()) if isinstance(item, dict) else []
-                            ),
+                            "response_keys": (list(item.keys()) if isinstance(item, dict) else []),
                         },
                         checksum=checksum,
                         processing_stats={
@@ -336,11 +322,7 @@ class RESTAPIProcessor(APIProcessor):
                     # Extract next cursor
                     next_cursor = response_data
                     for key in next_cursor_path.split("."):
-                        next_cursor = (
-                            next_cursor.get(key)
-                            if isinstance(next_cursor, dict)
-                            else None
-                        )
+                        next_cursor = next_cursor.get(key) if isinstance(next_cursor, dict) else None
 
                     if not next_cursor:
                         break
@@ -366,9 +348,7 @@ class GraphQLProcessor(APIProcessor):
         if isinstance(source, str) and source.startswith("http"):
             url = source
         else:
-            url = urljoin(
-                self.base_url, source if isinstance(source, str) else "/graphql"
-            )
+            url = urljoin(self.base_url, source if isinstance(source, str) else "/graphql")
 
         # Prepare GraphQL request
         payload = {
@@ -419,9 +399,7 @@ class GraphQLProcessor(APIProcessor):
                             "operation_name": operation_name,
                             "item_index": idx,
                             "query_hash": self.calculate_checksum(query)[:8],
-                            "response_keys": (
-                                list(item.keys()) if isinstance(item, dict) else []
-                            ),
+                            "response_keys": (list(item.keys()) if isinstance(item, dict) else []),
                         },
                         checksum=checksum,
                         processing_stats={
@@ -507,11 +485,7 @@ class WebSocketProcessor(BaseProcessor):
 
                         async for msg in ws:
                             # Check timeout
-                            if (
-                                timeout
-                                and (asyncio.get_event_loop().time() - start_time)
-                                > timeout
-                            ):
+                            if timeout and (asyncio.get_event_loop().time() - start_time) > timeout:
                                 break
 
                             # Check message limit
@@ -546,16 +520,13 @@ class WebSocketProcessor(BaseProcessor):
                                         "message_number": messages_processed,
                                         "timestamp": datetime.utcnow().isoformat(),
                                         "data_keys": (
-                                            list(parsed_data.keys())
-                                            if isinstance(parsed_data, dict)
-                                            else []
+                                            list(parsed_data.keys()) if isinstance(parsed_data, dict) else []
                                         ),
                                     },
                                     checksum=checksum,
                                     processing_stats={
                                         "total_messages": messages_processed,
-                                        "connection_duration": asyncio.get_event_loop().time()
-                                        - start_time,
+                                        "connection_duration": asyncio.get_event_loop().time() - start_time,
                                     },
                                 )
 
@@ -592,10 +563,7 @@ class WebSocketProcessor(BaseProcessor):
                     checksum="",
                 )
 
-                if (
-                    self.reconnect_on_error
-                    and reconnect_attempts < self.max_reconnect_attempts
-                ):
+                if self.reconnect_on_error and reconnect_attempts < self.max_reconnect_attempts:
                     # Wait before reconnecting
                     await asyncio.sleep(min(reconnect_attempts * 2, 30))
                 else:

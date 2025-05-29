@@ -33,15 +33,9 @@ class InMemoryStorage(IMemoryStorage):
 
         # Performance optimizations
         self.expiry_heap: List[Tuple[float, str]] = []  # Min heap of (expiry_time, key)
-        self.type_index: Dict[MemoryType, Set[str]] = defaultdict(
-            set
-        )  # Index by memory type
-        self.scope_index: Dict[MemoryScope, Set[str]] = defaultdict(
-            set
-        )  # Index by scope
-        self.text_index: Dict[str, Set[str]] = defaultdict(
-            set
-        )  # Simple text-based index
+        self.type_index: Dict[MemoryType, Set[str]] = defaultdict(set)  # Index by memory type
+        self.scope_index: Dict[MemoryScope, Set[str]] = defaultdict(set)  # Index by scope
+        self.text_index: Dict[str, Set[str]] = defaultdict(set)  # Simple text-based index
 
         # Cache settings
         self.cache_ttl = self.config.get("cache_ttl", 300)  # 5 minutes default
@@ -160,9 +154,7 @@ class InMemoryStorage(IMemoryStorage):
         key = self.hash_map[content_hash]
         return await self.get(key)
 
-    async def search(
-        self, query: str, limit: int = 10
-    ) -> List[Tuple[str, MemoryEntry, float]]:
+    async def search(self, query: str, limit: int = 10) -> List[Tuple[str, MemoryEntry, float]]:
         """Search for memory entries matching the query with optimized text search.
 
         This implementation uses pre-built indexes for faster searching.
@@ -200,9 +192,7 @@ class InMemoryStorage(IMemoryStorage):
         results.sort(key=lambda x: x[2], reverse=True)
         limited_results = results[:limit]
 
-        logger.debug(
-            f"Optimized search for '{query}' found {len(limited_results)} results"
-        )
+        logger.debug(f"Optimized search for '{query}' found {len(limited_results)} results")
         return limited_results
 
     async def health_check(self) -> Dict[str, Any]:
@@ -237,8 +227,7 @@ class InMemoryStorage(IMemoryStorage):
             "type_index_stats": type_index_stats,
             "scope_index_stats": scope_index_stats,
             "text_index_size": len(self.text_index),
-            "cleanup_task_running": self.cleanup_task is not None
-            and not self.cleanup_task.done(),
+            "cleanup_task_running": self.cleanup_task is not None and not self.cleanup_task.done(),
         }
 
     # Helper methods for optimized implementation
@@ -270,9 +259,7 @@ class InMemoryStorage(IMemoryStorage):
                         break
 
                 if cleaned_count > 0:
-                    logger.info(
-                        f"Background cleanup removed {cleaned_count} expired entries"
-                    )
+                    logger.info(f"Background cleanup removed {cleaned_count} expired entries")
         except asyncio.CancelledError:
             logger.info("Background cleanup task cancelled")
         except Exception as e:
@@ -323,9 +310,7 @@ class InMemoryStorage(IMemoryStorage):
         # Split on non-alphanumeric characters and filter out empty strings
         return [token for token in re.split(r"\W+", text) if token]
 
-    def _calculate_relevance(
-        self, entry: MemoryEntry, query_tokens: List[str]
-    ) -> float:
+    def _calculate_relevance(self, entry: MemoryEntry, query_tokens: List[str]) -> float:
         """Calculate relevance score based on token matching."""
         if isinstance(entry.content, str):
             content_tokens = self._tokenize_text(entry.content.lower())

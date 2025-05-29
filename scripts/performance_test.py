@@ -18,9 +18,7 @@ import requests
 from kubernetes import client, config
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -45,9 +43,7 @@ class TestResult:
 class PerformanceTester:
     """Performance testing for SuperAGI deployment"""
 
-    def __init__(
-        self, superagi_endpoint: str, prometheus_endpoint: Optional[str] = None
-    ):
+    def __init__(self, superagi_endpoint: str, prometheus_endpoint: Optional[str] = None):
         self.superagi_endpoint = superagi_endpoint.rstrip("/")
         self.prometheus_endpoint = prometheus_endpoint
         self.results: List[TestResult] = []
@@ -67,9 +63,7 @@ class PerformanceTester:
         agent_id: str = "researcher",
     ) -> TestResult:
         """Test agent execution performance"""
-        logger.info(
-            f"Starting agent execution test: {num_requests} requests, {concurrent_requests} concurrent"
-        )
+        logger.info(f"Starting agent execution test: {num_requests} requests, {concurrent_requests} concurrent")
 
         latencies = []
         errors = 0
@@ -157,9 +151,7 @@ class PerformanceTester:
         self._print_result(result)
         return result
 
-    async def test_memory_operations(
-        self, num_operations: int = 100, concurrent_operations: int = 10
-    ) -> TestResult:
+    async def test_memory_operations(self, num_operations: int = 100, concurrent_operations: int = 10) -> TestResult:
         """Test memory store/retrieve performance"""
         logger.info(f"Starting memory operations test: {num_operations} operations")
 
@@ -167,9 +159,7 @@ class PerformanceTester:
         errors = 0
         start_time = time.time()
 
-        async def memory_operation(
-            session: aiohttp.ClientSession, operation_id: int
-        ) -> float:
+        async def memory_operation(session: aiohttp.ClientSession, operation_id: int) -> float:
             """Perform a memory store and retrieve operation"""
             memory_data = {
                 "agent_id": "test_agent",
@@ -267,22 +257,16 @@ class PerformanceTester:
         self._print_result(result)
         return result
 
-    async def test_concurrent_agents(
-        self, num_agents: int = 5, tasks_per_agent: int = 10
-    ) -> TestResult:
+    async def test_concurrent_agents(self, num_agents: int = 5, tasks_per_agent: int = 10) -> TestResult:
         """Test multiple agents running concurrently"""
-        logger.info(
-            f"Starting concurrent agents test: {num_agents} agents, {tasks_per_agent} tasks each"
-        )
+        logger.info(f"Starting concurrent agents test: {num_agents} agents, {tasks_per_agent} tasks each")
 
         agent_ids = [f"agent_{i}" for i in range(num_agents)]
         latencies = []
         errors = 0
         start_time = time.time()
 
-        async def agent_tasks(
-            session: aiohttp.ClientSession, agent_id: str
-        ) -> List[float]:
+        async def agent_tasks(session: aiohttp.ClientSession, agent_id: str) -> List[float]:
             """Execute multiple tasks for a single agent"""
             agent_latencies = []
 
@@ -382,9 +366,7 @@ class PerformanceTester:
 
                 for result in data.get("data", {}).get("result", []):
                     pod = result["metric"].get("pod", "unknown")
-                    value = float(result["value"][1]) / (
-                        1024 * 1024 * 1024
-                    )  # Convert to GB
+                    value = float(result["value"][1]) / (1024 * 1024 * 1024)  # Convert to GB
                     metrics[f"{pod}_memory_gb"] = value
 
                 return {"resources": metrics}
@@ -455,32 +437,22 @@ async def main():
         help="Test to run",
     )
     parser.add_argument("--requests", type=int, default=100, help="Number of requests")
-    parser.add_argument(
-        "--concurrent", type=int, default=10, help="Concurrent requests"
-    )
+    parser.add_argument("--concurrent", type=int, default=10, help="Concurrent requests")
     parser.add_argument("--output", help="Output report file")
 
     args = parser.parse_args()
 
-    tester = PerformanceTester(
-        superagi_endpoint=args.endpoint, prometheus_endpoint=args.prometheus
-    )
+    tester = PerformanceTester(superagi_endpoint=args.endpoint, prometheus_endpoint=args.prometheus)
 
     # Run tests
     if args.test in ["all", "agent"]:
-        await tester.test_agent_execution(
-            num_requests=args.requests, concurrent_requests=args.concurrent
-        )
+        await tester.test_agent_execution(num_requests=args.requests, concurrent_requests=args.concurrent)
 
     if args.test in ["all", "memory"]:
-        await tester.test_memory_operations(
-            num_operations=args.requests, concurrent_operations=args.concurrent
-        )
+        await tester.test_memory_operations(num_operations=args.requests, concurrent_operations=args.concurrent)
 
     if args.test in ["all", "concurrent"]:
-        await tester.test_concurrent_agents(
-            num_agents=5, tasks_per_agent=args.requests // 5
-        )
+        await tester.test_concurrent_agents(num_agents=5, tasks_per_agent=args.requests // 5)
 
     # Generate report
     report = tester.generate_report()

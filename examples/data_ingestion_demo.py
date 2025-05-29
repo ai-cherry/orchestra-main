@@ -81,23 +81,17 @@ async def demo_file_ingestion(pipeline: DataIngestionPipeline) -> None:
 
     # Ingest CSV file
     print("\n1. Ingesting CSV file...")
-    csv_results = await pipeline.ingest_file(
-        csv_file, processor_kwargs={"chunk_size": 2}
-    )  # Small chunk for demo
+    csv_results = await pipeline.ingest_file(csv_file, processor_kwargs={"chunk_size": 2})  # Small chunk for demo
     print(f"   - Processed {len(csv_results)} chunks from CSV")
 
     # Ingest JSON file
     print("\n2. Ingesting JSON file...")
-    json_results = await pipeline.ingest_file(
-        json_file, processor_kwargs={"flatten": True}
-    )
+    json_results = await pipeline.ingest_file(json_file, processor_kwargs={"flatten": True})
     print(f"   - Processed {len(json_results)} items from JSON")
 
     # Ingest XML file
     print("\n3. Ingesting XML file...")
-    xml_results = await pipeline.ingest_file(
-        xml_file, processor_kwargs={"xpath_filter": ".//item"}
-    )
+    xml_results = await pipeline.ingest_file(xml_file, processor_kwargs={"xpath_filter": ".//item"})
     print(f"   - Processed {len(xml_results)} items from XML")
 
     # Ingest entire directory
@@ -166,9 +160,7 @@ async def demo_batch_ingestion(pipeline: DataIngestionPipeline) -> None:
     ]
 
     print("\n1. Processing batch of mixed sources...")
-    batch_results = await pipeline.ingest_batch(
-        batch_sources, parallel=True, max_concurrent=3
-    )
+    batch_results = await pipeline.ingest_batch(batch_sources, parallel=True, max_concurrent=3)
 
     print(f"   - Processed {len(batch_results)} sources")
     for source_id, results in batch_results.items():
@@ -200,9 +192,7 @@ async def main():
 
     # Initialize pipeline
     print("\nInitializing data ingestion pipeline...")
-    pipeline = DataIngestionPipeline(
-        enable_embedding_generation=False, batch_size=10
-    )  # Disabled for demo
+    pipeline = DataIngestionPipeline(enable_embedding_generation=False, batch_size=10)  # Disabled for demo
 
     try:
         # Run demonstrations
