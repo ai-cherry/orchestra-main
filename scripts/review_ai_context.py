@@ -4,15 +4,13 @@ Review AI context files for the Orchestra AI project.
 Validates that all AI context files are properly configured and accessible.
 """
 
+import logging
 import os
 import sys
-import logging
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 AI_CONTEXT_FILES = [
@@ -42,9 +40,7 @@ def check_python_version() -> bool:
     logger.info(f"Current Python version: {sys.version}")
     if sys.version_info < (3, 10):
         logger.error(
-            "❌ Python 3.10+ required, but running {}.{}".format(
-                sys.version_info.major, sys.version_info.minor
-            )
+            "❌ Python 3.10+ required, but running {}.{}".format(sys.version_info.major, sys.version_info.minor)
         )
         return False
     logger.info("✅ Python version meets requirements")
@@ -69,9 +65,7 @@ def validate_ai_context_files() -> Dict[str, Any]:
                 content = f.read()
                 for pattern in FORBIDDEN_PATTERNS:
                     if pattern in content and f"NO {pattern}" not in content:
-                        results["validation_errors"].append(
-                            f"Found forbidden pattern '{pattern}' in {filename}"
-                        )
+                        results["validation_errors"].append(f"Found forbidden pattern '{pattern}' in {filename}")
         else:
             results["files_missing"].append(filename)
             logger.error(f"❌ Missing: {filename}")

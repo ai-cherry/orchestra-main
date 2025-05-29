@@ -8,8 +8,8 @@ for type safety and validation.
 from enum import Enum
 from typing import Dict, List, Optional
 
-from pydantic_settings import BaseSettings
 from pydantic import Field, HttpUrl, SecretStr, field_validator
+from pydantic_settings import BaseSettings
 
 
 class Environment(str, Enum):
@@ -35,14 +35,10 @@ class ServiceSettings(BaseSettings):
     """Base settings for external services."""
 
     enabled: bool = True
-    connection_timeout: int = Field(
-        default=5000, description="Connection timeout in ms"
-    )
+    connection_timeout: int = Field(default=5000, description="Connection timeout in ms")
     request_timeout: int = Field(default=30000, description="Request timeout in ms")
     max_retries: int = Field(default=3, description="Maximum retry attempts")
-    retry_delay: float = Field(
-        default=1.0, description="Initial retry delay in seconds"
-    )
+    retry_delay: float = Field(default=1.0, description="Initial retry delay in seconds")
 
 
 class MongoDBSettings(ServiceSettings):
@@ -71,9 +67,7 @@ class WeaviateSettings(ServiceSettings):
 
     url: HttpUrl = Field(..., env="WEAVIATE_URL")
     api_key: SecretStr = Field(..., env="WEAVIATE_API_KEY")
-    timeout_config: Dict[str, int] = Field(
-        default={"timeout": 60, "startup": 30}, env="WEAVIATE_TIMEOUT_CONFIG"
-    )
+    timeout_config: Dict[str, int] = Field(default={"timeout": 60, "startup": 30}, env="WEAVIATE_TIMEOUT_CONFIG")
 
     model_config = {"env_prefix": "WEAVIATE_"}
 
@@ -134,12 +128,8 @@ class FeatureFlags(BaseSettings):
     use_new_memory_service: bool = Field(default=False, env="FF_USE_NEW_MEMORY_SERVICE")
     use_unified_registry: bool = Field(default=True, env="FF_USE_UNIFIED_REGISTRY")
     enable_shadow_testing: bool = Field(default=False, env="FF_ENABLE_SHADOW_TESTING")
-    enable_cost_optimization: bool = Field(
-        default=True, env="FF_ENABLE_COST_OPTIMIZATION"
-    )
-    enable_advanced_routing: bool = Field(
-        default=False, env="FF_ENABLE_ADVANCED_ROUTING"
-    )
+    enable_cost_optimization: bool = Field(default=True, env="FF_ENABLE_COST_OPTIMIZATION")
+    enable_advanced_routing: bool = Field(default=False, env="FF_ENABLE_ADVANCED_ROUTING")
 
     model_config = {"env_prefix": "FF_"}
 

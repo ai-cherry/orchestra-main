@@ -102,9 +102,7 @@ class IngressComponent(ComponentResource):
             opts=opts,
         )
 
-    def _create_ingress(
-        self, service_name: str, opts: ResourceOptions
-    ) -> k8s.networking.v1.Ingress:
+    def _create_ingress(self, service_name: str, opts: ResourceOptions) -> k8s.networking.v1.Ingress:
         """Create ingress for cherry-ai.me"""
 
         return k8s.networking.v1.Ingress(

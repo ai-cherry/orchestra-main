@@ -56,9 +56,7 @@ class Settings(BaseSettings):
     LLM_MAX_RETRIES: int = 3
     LLM_RETRY_DELAY: float = 1.0
     LLM_RETRY_MAX_DELAY: float = 60.0
-    LLM_RETRYABLE_ERRORS: str = (
-        "connection_error,timeout_error,rate_limit_error,service_error"
-    )
+    LLM_RETRYABLE_ERRORS: str = "connection_error,timeout_error,rate_limit_error,service_error"
 
     # Semantic caching
     LLM_SEMANTIC_CACHE_ENABLED: bool = False

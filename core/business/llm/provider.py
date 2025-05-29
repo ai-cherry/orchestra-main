@@ -12,9 +12,8 @@ from typing import Any, Dict, List, Optional
 
 from portkey_ai import Portkey
 
-from core.infrastructure.config.settings import get_settings
 from core.business.personas.base import PersonaConfig
-
+from core.infrastructure.config.settings import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -167,9 +166,7 @@ class LLMService:
         config = {"mode": "fallback", "targets": []}
 
         # Add providers based on priority
-        sorted_providers = sorted(
-            self._provider_configs.items(), key=lambda x: x[1].get("priority", 999)
-        )
+        sorted_providers = sorted(self._provider_configs.items(), key=lambda x: x[1].get("priority", 999))
 
         for provider_enum, provider_config in sorted_providers:
             if provider and provider != provider_enum:
@@ -194,9 +191,7 @@ class LLMService:
                 messages = []
 
                 if request.system_prompt:
-                    messages.append(
-                        {"role": "system", "content": request.system_prompt}
-                    )
+                    messages.append({"role": "system", "content": request.system_prompt})
 
                 messages.append({"role": "user", "content": request.prompt})
 
@@ -322,9 +317,7 @@ class LLMService:
 
         return " ".join(prompt_parts)
 
-    def estimate_cost(
-        self, request: LLMRequest, provider: LLMProvider, model: str
-    ) -> float:
+    def estimate_cost(self, request: LLMRequest, provider: LLMProvider, model: str) -> float:
         """Estimate the cost of a request."""
         # Token estimation (rough)
         prompt_tokens = len(request.prompt.split()) * 1.3

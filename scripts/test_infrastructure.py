@@ -5,10 +5,10 @@ Test Infrastructure Setup
 Quick tests to verify the AI Orchestra infrastructure is working
 """
 
-import subprocess
 import json
+import subprocess
 import sys
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 
 def run_command(cmd: List[str]) -> Dict[str, Any]:
@@ -109,9 +109,7 @@ def test_services():
     available_services = []
 
     for service in services:
-        result = run_command(
-            ["kubectl", "get", "svc", service, "-n", "superagi", "-o", "json"]
-        )
+        result = run_command(["kubectl", "get", "svc", service, "-n", "superagi", "-o", "json"])
 
         if result["success"]:
             try:
@@ -119,9 +117,7 @@ def test_services():
                 svc_type = svc["spec"]["type"]
 
                 if svc_type == "LoadBalancer":
-                    ingress = (
-                        svc.get("status", {}).get("loadBalancer", {}).get("ingress", [])
-                    )
+                    ingress = svc.get("status", {}).get("loadBalancer", {}).get("ingress", [])
                     if ingress:
                         ip = ingress[0].get("ip", "pending")
                         print(f"✅ {service}: {ip}")

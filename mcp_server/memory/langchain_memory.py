@@ -28,13 +28,12 @@ except ImportError:
     ChatMessageHistory = object
     ConversationSummaryBufferMemory = object
 
+from shared.memory.memory_manager import FirestoreMemoryManager as FirestoreEpisodicMemory
+
 from ..utils.structured_logging import get_logger
 from .base import MemoryEntry, MemoryMetadata, MemoryTier
 from .dragonfly_cache import DragonflyCache
 from .qdrant_semantic import QdrantSemanticMemory
-from shared.memory.memory_manager import (
-    FirestoreMemoryManager as FirestoreEpisodicMemory,
-)
 
 logger = get_logger(__name__)
 
@@ -76,9 +75,7 @@ class LangChainMemoryWrapper(BaseChatMemory):
             session_id: Optional session identifier for isolation
         """
         if not HAS_LANGCHAIN:
-            raise ImportError(
-                "langchain not installed. Install with: pip install langchain"
-            )
+            raise ImportError("langchain not installed. Install with: pip install langchain")
 
         super().__init__(**kwargs)
 
@@ -168,12 +165,7 @@ class LangChainMemoryWrapper(BaseChatMemory):
             return {self.memory_key: self._message_cache}
         else:
             # Convert messages to string
-            messages_str = "\n".join(
-                [
-                    f"{msg.__class__.__name__}: {msg.content}"
-                    for msg in self._message_cache
-                ]
-            )
+            messages_str = "\n".join([f"{msg.__class__.__name__}: {msg.content}" for msg in self._message_cache])
             return {self.memory_key: messages_str}
 
     def save_context(self, inputs: Dict[str, Any], outputs: Dict[str, str]) -> None:
@@ -183,17 +175,13 @@ class LangChainMemoryWrapper(BaseChatMemory):
         loop = asyncio.new_event_loop()
         loop.run_until_complete(self.asave_context(inputs, outputs))
 
-    async def asave_context(
-        self, inputs: Dict[str, Any], outputs: Dict[str, str]
-    ) -> None:
+    async def asave_context(self, inputs: Dict[str, Any], outputs: Dict[str, str]) -> None:
         """Save context to memory asynchronously."""
         await self.initialize()
 
         try:
             # Extract input and output
-            input_key = self.input_key or get_prompt_input_key(
-                inputs, self.memory_variables
-            )
+            input_key = self.input_key or get_prompt_input_key(inputs, self.memory_variables)
             output_key = self.output_key or list(outputs.keys())[0]
 
             human_message = inputs.get(input_key, "")
@@ -298,10 +286,7 @@ class LangChainMemoryWrapper(BaseChatMemory):
             # Clear cache
             self._message_cache.clear()
 
-            logger.info(
-                f"Cleared session {self.session_id}: "
-                f"hot={hot_count}, warm={warm_count}, cold={cold_count}"
-            )
+            logger.info(f"Cleared session {self.session_id}: " f"hot={hot_count}, warm={warm_count}, cold={cold_count}")
 
         except Exception as e:
             logger.error(f"Failed to clear memory: {e}")
@@ -331,9 +316,7 @@ class LangChainMemoryWrapper(BaseChatMemory):
         try:
             # Search each tier
             if MemoryTier.HOT in search_tiers:
-                hot_results = await self.hot_memory.search(
-                    query, limit, {"prefix": self.session_id}
-                )
+                hot_results = await self.hot_memory.search(query, limit, {"prefix": self.session_id})
                 results.extend(
                     [
                         {
@@ -346,9 +329,7 @@ class LangChainMemoryWrapper(BaseChatMemory):
                 )
 
             if MemoryTier.WARM in search_tiers:
-                warm_results = await self.warm_memory.search(
-                    query, limit, {"tags": [self.session_id]}
-                )
+                warm_results = await self.warm_memory.search(query, limit, {"tags": [self.session_id]})
                 results.extend(
                     [
                         {
@@ -361,9 +342,7 @@ class LangChainMemoryWrapper(BaseChatMemory):
                 )
 
             if MemoryTier.COLD in search_tiers:
-                cold_results = await self.cold_memory.search(
-                    query, limit, {"tags": [self.session_id]}
-                )
+                cold_results = await self.cold_memory.search(query, limit, {"tags": [self.session_id]})
                 results.extend(
                     [
                         {

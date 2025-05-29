@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Deep cleanup script to analyze and remove files that don't fit current structure."""
 
+import json
 import re
 from pathlib import Path
-from typing import List, Dict
-import json
+from typing import Dict, List
 
 
 class DeepCleanup:
@@ -102,18 +102,13 @@ class DeepCleanup:
 
         # Delete old GCP-specific files
         if "gcp_specific" in analysis["categories"]:
-            if any(
-                x in rel_path.lower()
-                for x in ["gemini", "vertex", "workstation", "cloudbuild"]
-            ):
+            if any(x in rel_path.lower() for x in ["gemini", "vertex", "workstation", "cloudbuild"]):
                 analysis["reason"] = "GCP-specific tool/service"
                 return "delete"
 
         # Delete old deployment files
         if "deployment" in analysis["categories"]:
-            if any(
-                x in rel_path.lower() for x in ["gcp", "google", "cloud-run", "gke"]
-            ):
+            if any(x in rel_path.lower() for x in ["gcp", "google", "cloud-run", "gke"]):
                 analysis["reason"] = "GCP deployment file"
                 return "delete"
 
@@ -161,9 +156,7 @@ class DeepCleanup:
         skip_dirs = {".git", ".mypy_cache", "venv", "__pycache__", "node_modules"}
 
         for file_path in self.root_dir.rglob("*"):
-            if file_path.is_file() and not any(
-                skip in str(file_path) for skip in skip_dirs
-            ):
+            if file_path.is_file() and not any(skip in str(file_path) for skip in skip_dirs):
                 try:
                     content = file_path.read_text(encoding="utf-8")
                     for pattern in self.gcp_patterns:
@@ -240,12 +233,8 @@ class DeepCleanup:
             "update": len(results["update"]),
             "keep": len(results["keep"]),
             "files": {
-                "delete": [
-                    str(x["path"].relative_to(self.root_dir)) for x in results["delete"]
-                ],
-                "update": [
-                    str(x["path"].relative_to(self.root_dir)) for x in results["update"]
-                ][:20],
+                "delete": [str(x["path"].relative_to(self.root_dir)) for x in results["delete"]],
+                "update": [str(x["path"].relative_to(self.root_dir)) for x in results["update"]][:20],
             },
         }
 
@@ -255,12 +244,8 @@ class DeepCleanup:
         print(f"\n📄 Analysis report saved to: {report_path}")
         print("\nNext steps:")
         print("1. Review the changes: git status")
-        print(
-            "2. Commit if satisfied: git add -A && git commit -m 'chore: Deep cleanup of GCP references'"
-        )
-        print(
-            "3. For remaining files needing updates, use the report to guide manual updates"
-        )
+        print("2. Commit if satisfied: git add -A && git commit -m 'chore: Deep cleanup of GCP references'")
+        print("3. For remaining files needing updates, use the report to guide manual updates")
 
 
 def main():

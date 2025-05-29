@@ -72,9 +72,7 @@ class RedisAlloyDBSyncWorker:
         Establish connections to Redis and AlloyDB.
         """
         try:
-            self.redis_client = redis.Redis(
-                host=self.redis_host, port=self.redis_port, decode_responses=True
-            )
+            self.redis_client = redis.Redis(host=self.redis_host, port=self.redis_port, decode_responses=True)
             await self.redis_client.ping()
             logger.info("Connected to Redis successfully.")
         except redis.ConnectionError as e:
@@ -138,9 +136,7 @@ class RedisAlloyDBSyncWorker:
         while self.is_running:
             try:
                 # Read changes from Redis stream
-                changes = await self.redis_client.xread(
-                    {"agent_memory": last_id}, count=self.batch_size, block=500
-                )
+                changes = await self.redis_client.xread({"agent_memory": last_id}, count=self.batch_size, block=500)
 
                 if changes:
                     batch = []
@@ -154,9 +150,7 @@ class RedisAlloyDBSyncWorker:
                                 version = int(msg_data.get("version", "0"))
                                 checksum = self.compute_checksum(msg_data)
 
-                                batch.append(
-                                    (record_id, vector, data, version, checksum)
-                                )
+                                batch.append((record_id, vector, data, version, checksum))
                                 last_id = msg_id
                             except Exception as e:
                                 logger.error(f"Error processing message {msg_id}: {e}")
@@ -181,9 +175,7 @@ class RedisAlloyDBSyncWorker:
                                 """,
                                     batch,
                                 )
-                            logger.info(
-                                f"Successfully synced {len(batch)} records to AlloyDB."
-                            )
+                            logger.info(f"Successfully synced {len(batch)} records to AlloyDB.")
                             sync_count += len(batch)
                         except psycopg2.Error as e:
                             logger.error(f"Error updating AlloyDB: {e}")
@@ -197,9 +189,7 @@ class RedisAlloyDBSyncWorker:
                 # Log sync metrics periodically
                 current_time = asyncio.get_event_loop().time()
                 if current_time - start_time >= 60:  # Every minute
-                    logger.info(
-                        f"Sync Metrics: {sync_count} records synced, {error_count} errors encountered."
-                    )
+                    logger.info(f"Sync Metrics: {sync_count} records synced, {error_count} errors encountered.")
                     start_time = current_time
                     sync_count = 0
                     error_count = 0

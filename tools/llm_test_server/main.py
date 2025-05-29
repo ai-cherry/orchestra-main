@@ -37,9 +37,7 @@ REQUEST_LATENCY = prom.Histogram(
     "LLM request latency in seconds",
     ["provider", "model", "status"],
 )
-REQUEST_COUNT = prom.Counter(
-    "llm_request_count", "Count of LLM requests", ["provider", "model", "status"]
-)
+REQUEST_COUNT = prom.Counter("llm_request_count", "Count of LLM requests", ["provider", "model", "status"])
 TOKEN_COUNT = prom.Counter(
     "llm_token_count",
     "Count of tokens processed",
@@ -297,12 +295,8 @@ async def call_provider(
             await asyncio.wait_for(execute_call(), timeout=timeout)
         except asyncio.TimeoutError:
             elapsed_ms = (time.time() - start_time) * 1000
-            REQUEST_COUNT.labels(
-                provider=provider_name, model=model, status="timeout"
-            ).inc()
-            REQUEST_LATENCY.labels(
-                provider=provider_name, model=model, status="timeout"
-            ).observe(elapsed_ms / 1000)
+            REQUEST_COUNT.labels(provider=provider_name, model=model, status="timeout").inc()
+            REQUEST_LATENCY.labels(provider=provider_name, model=model, status="timeout").observe(elapsed_ms / 1000)
             return ProviderResponse(
                 provider=provider_name,
                 model=provider_model,
@@ -316,21 +310,19 @@ async def call_provider(
         elapsed_ms = (time.time() - start_time) * 1000
 
         # Record metrics
-        REQUEST_COUNT.labels(
-            provider=provider_name, model=provider_model, status="success"
-        ).inc()
-        REQUEST_LATENCY.labels(
-            provider=provider_name, model=provider_model, status="success"
-        ).observe(elapsed_ms / 1000)
+        REQUEST_COUNT.labels(provider=provider_name, model=provider_model, status="success").inc()
+        REQUEST_LATENCY.labels(provider=provider_name, model=provider_model, status="success").observe(
+            elapsed_ms / 1000
+        )
 
         if token_counts["input"] > 0:
-            TOKEN_COUNT.labels(
-                provider=provider_name, model=provider_model, direction="input"
-            ).inc(token_counts["input"])
+            TOKEN_COUNT.labels(provider=provider_name, model=provider_model, direction="input").inc(
+                token_counts["input"]
+            )
         if token_counts["output"] > 0:
-            TOKEN_COUNT.labels(
-                provider=provider_name, model=provider_model, direction="output"
-            ).inc(token_counts["output"])
+            TOKEN_COUNT.labels(provider=provider_name, model=provider_model, direction="output").inc(
+                token_counts["output"]
+            )
 
         # Return successful response
         return ProviderResponse(
@@ -347,12 +339,10 @@ async def call_provider(
 
         # Log and record error
         logger.error(f"Error calling {provider_name} with model {model}: {e}")
-        REQUEST_COUNT.labels(
-            provider=provider_name, model=model or "unknown", status="error"
-        ).inc()
-        REQUEST_LATENCY.labels(
-            provider=provider_name, model=model or "unknown", status="error"
-        ).observe(elapsed_ms / 1000)
+        REQUEST_COUNT.labels(provider=provider_name, model=model or "unknown", status="error").inc()
+        REQUEST_LATENCY.labels(provider=provider_name, model=model or "unknown", status="error").observe(
+            elapsed_ms / 1000
+        )
 
         return ProviderResponse(
             provider=provider_name,
@@ -441,9 +431,7 @@ async def test_providers(request: TestRequest):
 
 
 @app.post("/benchmark", response_model=TestResponse)
-async def benchmark_providers(
-    request: BenchmarkRequest, background_tasks: BackgroundTasks
-):
+async def benchmark_providers(request: BenchmarkRequest, background_tasks: BackgroundTasks):
     """Benchmark multiple providers with the same prompt over multiple runs."""
     results = []
     successful = set()
@@ -524,10 +512,7 @@ async def test_cascade(request: CascadeTestRequest):
 
         results.append(response)
 
-        if (
-            response.status == "success"
-            and response.provider not in successful_providers
-        ):
+        if response.status == "success" and response.provider not in successful_providers:
             successful_providers.append(response.provider)
 
     return TestResponse(

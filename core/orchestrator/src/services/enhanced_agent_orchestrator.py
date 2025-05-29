@@ -13,12 +13,8 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from core.orchestrator.src.agents.agent_base import AgentResponse
-from core.orchestrator.src.agents.enhanced_agent_registry import (
-    get_enhanced_agent_registry,
-)
-from core.orchestrator.src.personas.enhanced_persona_manager import (
-    get_enhanced_persona_manager,
-)
+from core.orchestrator.src.agents.enhanced_agent_registry import get_enhanced_agent_registry
+from core.orchestrator.src.personas.enhanced_persona_manager import get_enhanced_persona_manager
 from core.orchestrator.src.services.base_orchestrator import BaseOrchestrator
 from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
 
@@ -81,12 +77,8 @@ class EnhancedAgentOrchestrator(BaseOrchestrator):
 
         try:
             # Get enhanced persona
-            enhanced_persona = self._enhanced_persona_manager.get_enhanced_persona(
-                persona_id
-            )
-            logger.info(
-                f"Using persona {enhanced_persona.name} for interaction {interaction_id}"
-            )
+            enhanced_persona = self._enhanced_persona_manager.get_enhanced_persona(persona_id)
+            logger.info(f"Using persona {enhanced_persona.name} for interaction {interaction_id}")
 
             # Create base persona for agent context
             base_persona = PersonaConfig(
@@ -247,34 +239,26 @@ class EnhancedAgentOrchestrator(BaseOrchestrator):
 
         # Select appropriate agent
         try:
-            preferred_agent_type = (
-                enhanced_persona.preferred_agent_type if use_preferred_agents else None
-            )
+            preferred_agent_type = enhanced_persona.preferred_agent_type if use_preferred_agents else None
 
             if preferred_agent_type:
                 # Use preferred agent type if specified and enabled
                 agent = agent_registry.get_agent(preferred_agent_type)
                 agent_type = preferred_agent_type
-                logger.info(
-                    f"Using preferred agent type '{preferred_agent_type}' for persona {persona.name}"
-                )
+                logger.info(f"Using preferred agent type '{preferred_agent_type}' for persona {persona.name}")
             else:
                 # Otherwise, select based on capability
                 agent = agent_registry.select_agent_for_context(agent_context)
                 agent_type = agent.__class__.__name__
 
-            logger.info(
-                f"Selected agent type: {agent_type} for interaction {interaction_id}"
-            )
+            logger.info(f"Selected agent type: {agent_type} for interaction {interaction_id}")
         except Exception as e:
             logger.error(f"Error selecting agent: {e}", exc_info=True)
             # Fall back to simple text agent
             agent_type = "simple_text"
             try:
                 agent = agent_registry.get_agent(agent_type)
-                logger.warning(
-                    f"Falling back to {agent_type} for interaction {interaction_id}"
-                )
+                logger.warning(f"Falling back to {agent_type} for interaction {interaction_id}")
             except Exception as e2:
                 logger.critical(
                     f"Critical failure - even fallback agent unavailable: {e2}",
@@ -294,13 +278,9 @@ class EnhancedAgentOrchestrator(BaseOrchestrator):
             # Create a task with timeout
             try:
                 response_task = asyncio.create_task(agent.process(agent_context))
-                response = await asyncio.wait_for(
-                    response_task, timeout=timeout_seconds
-                )
+                response = await asyncio.wait_for(response_task, timeout=timeout_seconds)
             except asyncio.TimeoutError:
-                logger.warning(
-                    f"Agent processing timed out after {timeout_seconds}s for interaction {interaction_id}"
-                )
+                logger.warning(f"Agent processing timed out after {timeout_seconds}s for interaction {interaction_id}")
                 # Generate a timeout response
                 return AgentResponse(
                     text=f"I need a bit more time to think about this. As {persona.name}, I want to give you a thoughtful response.",
@@ -322,18 +302,14 @@ class EnhancedAgentOrchestrator(BaseOrchestrator):
 
             # Check for empty or very short responses (possible agent failure)
             if not response.text or len(response.text) < 10:
-                logger.warning(
-                    f"Agent returned suspiciously short response: '{response.text}'"
-                )
+                logger.warning(f"Agent returned suspiciously short response: '{response.text}'")
 
                 # Append warning to metadata but don't override response
                 response.metadata["warning"] = "suspiciously_short_response"
                 if response.confidence > 0.5:  # Lower confidence for short responses
                     response.confidence = 0.5
 
-            logger.info(
-                f"Agent {agent_type} processed interaction {interaction_id} in {process_time}ms"
-            )
+            logger.info(f"Agent {agent_type} processed interaction {interaction_id} in {process_time}ms")
             return response
         except Exception as e:
             logger.error(f"Agent processing failed: {e}", exc_info=True)

@@ -14,8 +14,8 @@ from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar
 
 from pydantic import BaseModel, Field
 
-from packages.shared.src.models.base_models import MemoryItem
 from optional_integrations import mongodb  # Optional integration
+from packages.shared.src.models.base_models import MemoryItem
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -202,9 +202,7 @@ class MemoryStore(Generic[T], ABC):
             self.db = MongoDBMemoryManager()
             logger.info("Initialized MongoDB memory backend")
         except Exception as e:
-            logger.warning(
-                f"MongoDB initialization failed: {e}. Using in-memory storage only."
-            )
+            logger.warning(f"MongoDB initialization failed: {e}. Using in-memory storage only.")
             self.db = None
 
 
@@ -228,9 +226,7 @@ class RedisMemoryStore(MemoryStore):
             password = self.config.get("password")
 
             # Create Redis client
-            self._client = redis.Redis(
-                host=host, port=port, db=db, password=password, decode_responses=True
-            )
+            self._client = redis.Redis(host=host, port=port, db=db, password=password, decode_responses=True)
 
             # Test connection
             await self._client.ping()
@@ -348,10 +344,7 @@ class RedisMemoryStore(MemoryStore):
                             continue
 
                     # Apply text filter
-                    if (
-                        query.text
-                        and query.text.lower() not in item.text_content.lower()
-                    ):
+                    if query.text and query.text.lower() not in item.text_content.lower():
                         continue
 
                     # Apply time range filter
@@ -450,9 +443,7 @@ class MongoDBMemoryStore(MemoryStore):
 
             logger.info(f"MongoDB memory store initialized: {project}/{collection}")
         except ImportError:
-            logger.error(
-                "MongoDB package not installed. Install with: pip install google-cloud-mongodb"
-            )
+            logger.error("MongoDB package not installed. Install with: pip install google-cloud-mongodb")
             raise
         except Exception as e:
             logger.error(f"Failed to initialize MongoDB memory store: {e}")

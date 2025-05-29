@@ -99,9 +99,7 @@ def __init__(
         name = member_config.get("name")
         role = member_config.get("role", "")
         instructions = member_config.get("instructions", [])
-        member_llm_ref = member_config.get(
-            "llm_ref", self.team_config.get("default_llm_ref")
-        )
+        member_llm_ref = member_config.get("llm_ref", self.team_config.get("default_llm_ref"))
         tools_config = member_config.get("tools", [])
 
         if not name:
@@ -109,9 +107,7 @@ def __init__(
             continue
 
         if not member_llm_ref:
-            logger.error(
-                f"Member '{name}' missing llm_ref and no default_llm_ref provided"
-            )
+            logger.error(f"Member '{name}' missing llm_ref and no default_llm_ref provided")
             continue
 
         # Get the LLM model for this member from Portkey client
@@ -130,9 +126,7 @@ def __init__(
                 tool_params = tool_config.get("params", {})
 
                 if not tool_type:
-                    logger.warning(
-                        f"Skipping tool config without 'type' for member '{name}'"
-                    )
+                    logger.warning(f"Skipping tool config without 'type' for member '{name}'")
                     continue
 
                 # Handle registry tools
@@ -143,9 +137,7 @@ def __init__(
                         phidata_tool = orchestra_tool.to_phidata_tool(**tool_params)
                         if phidata_tool:
                             member_tools.append(phidata_tool)
-                            logger.info(
-                                f"Added registry tool '{tool_id}' to member '{name}'"
-                            )
+                            logger.info(f"Added registry tool '{tool_id}' to member '{name}'")
                     continue
 
                 # Handle direct tool class references
@@ -170,9 +162,7 @@ def __init__(
 
         # Use member-specific storage if configured
         if "storage" in member_config:
-            storage_table = member_config["storage"].get(
-                "table_name", f"{name.lower()}_storage"
-            )
+            storage_table = member_config["storage"].get("table_name", f"{name.lower()}_storage")
             cloudsql_config = self.team_config.get("cloudsql_config", {})
 
             try:
@@ -187,9 +177,7 @@ def __init__(
 
         # Use member-specific memory if configured
         if "memory" in member_config:
-            memory_table = member_config["memory"].get(
-                "table_name", f"{name.lower()}_memory"
-            )
+            memory_table = member_config["memory"].get("table_name", f"{name.lower()}_memory")
             cloudsql_config = self.team_config.get("cloudsql_config", {})
 
             try:
@@ -241,9 +229,7 @@ def __init__(
             storage=self.agent_storage,
             memory=self.agent_memory,
         )
-        logger.info(
-            f"Successfully initialized Phidata Team '{self.team_name}' with {len(members)} members"
-        )
+        logger.info(f"Successfully initialized Phidata Team '{self.team_name}' with {len(members)} members")
     except Exception as e:
         logger.error(f"Failed to initialize Phidata Team: {e}")
         raise RuntimeError(f"Failed to initialize Phidata Team: {e}")

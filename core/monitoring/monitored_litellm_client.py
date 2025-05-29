@@ -9,12 +9,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from core.logging_config import get_logger
 from core.monitoring.claude_monitor import ClaudeMonitor
-from core.orchestrator.src.llm.litellm_client import (
-    LiteLLMClient,
-    LLMEmbeddingResponse,
-    LLMMessage,
-    LLMResponse,
-)
+from core.orchestrator.src.llm.litellm_client import LiteLLMClient, LLMEmbeddingResponse, LLMMessage, LLMResponse
 
 logger = get_logger(__name__)
 
@@ -27,12 +22,7 @@ class MonitoredLiteLLMClient(LiteLLMClient):
     capabilities specifically for Claude models.
     """
 
-    def __init__(
-        self,
-        monitor: Optional[ClaudeMonitor] = None,
-        monitor_all_models: bool = False,
-        **kwargs
-    ):
+    def __init__(self, monitor: Optional[ClaudeMonitor] = None, monitor_all_models: bool = False, **kwargs):
         """
         Initialize the monitored client.
 
@@ -187,9 +177,7 @@ class MonitoredLiteLLMClient(LiteLLMClient):
             ) as ctx:
                 try:
                     # Make the actual API call
-                    response = await super().get_embedding(
-                        text=text, model=model, user=user, timeout=timeout
-                    )
+                    response = await super().get_embedding(text=text, model=model, user=user, timeout=timeout)
 
                     # Set token usage in monitor context
                     ctx.set_tokens(response.usage)
@@ -202,9 +190,7 @@ class MonitoredLiteLLMClient(LiteLLMClient):
                     raise
         else:
             # No monitoring for non-Claude models
-            return await super().get_embedding(
-                text=text, model=model, user=user, timeout=timeout
-            )
+            return await super().get_embedding(text=text, model=model, user=user, timeout=timeout)
 
     def get_monitoring_summary(self, **kwargs) -> Dict[str, Any]:
         """

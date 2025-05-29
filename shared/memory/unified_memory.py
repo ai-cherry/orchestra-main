@@ -36,13 +36,9 @@ class MemoryItem(BaseModel):
     content: str = Field(..., description="Content of the memory")
     source: str = Field(..., description="Source of the memory (e.g., agent ID)")
     timestamp: str = Field(..., description="Timestamp when memory was created")
-    metadata: Dict[str, Any] = Field(
-        default_factory=dict, description="Additional metadata"
-    )
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     priority: float = Field(default=0.5, description="Priority of the memory (0.0-1.0)")
-    embedding: Optional[List[float]] = Field(
-        default=None, description="Vector embedding of the memory content"
-    )
+    embedding: Optional[List[float]] = Field(default=None, description="Vector embedding of the memory content")
 
 
 # --- Unified Memory Abstraction ---
@@ -69,9 +65,7 @@ class UnifiedMemory:
         # --- DragonflyDB (Redis-compatible) ---
         self.dragonfly = None
         if use_dragonfly and redis:
-            self.dragonfly = redis.Redis.from_url(
-                dragonfly_url or settings.dragonfly_url or "redis://localhost:6379/0"
-            )
+            self.dragonfly = redis.Redis.from_url(dragonfly_url or settings.dragonfly_url or "redis://localhost:6379/0")
 
         # --- Weaviate (Vector DB) ---
         self.weaviate = None
@@ -89,9 +83,7 @@ class UnifiedMemory:
         self.firestore = None
         self.firestore_collection = firestore_collection
         if use_firestore and firestore:
-            self.firestore = firestore.Client(
-                project=firestore_project or settings.gcp_project_id
-            )
+            self.firestore = firestore.Client(project=firestore_project or settings.gcp_project_id)
 
     # --- Store Memory ---
     def store(self, item: MemoryItem) -> str:
@@ -123,9 +115,7 @@ class UnifiedMemory:
 
         # Firestore (persistent)
         if self.firestore:
-            self.firestore.collection(self.firestore_collection).document(item.id).set(
-                item.dict()
-            )
+            self.firestore.collection(self.firestore_collection).document(item.id).set(item.dict())
 
         return item.id
 
@@ -144,20 +134,14 @@ class UnifiedMemory:
 
         # Fallback to Firestore
         if self.firestore:
-            doc = (
-                self.firestore.collection(self.firestore_collection)
-                .document(memory_id)
-                .get()
-            )
+            doc = self.firestore.collection(self.firestore_collection).document(memory_id).get()
             if doc.exists:
                 return MemoryItem(**doc.to_dict())
 
         return None
 
     # --- Search Memory (Semantic/Vector) ---
-    def search(
-        self, query: Union[str, List[float]], limit: int = 10
-    ) -> List[MemoryItem]:
+    def search(self, query: Union[str, List[float]], limit: int = 10) -> List[MemoryItem]:
         """
         Search memory items.
         - If query is a string: perform metadata/content search (cache or Firestore).
@@ -168,9 +152,7 @@ class UnifiedMemory:
         # Vector search (Weaviate)
         if self.weaviate and isinstance(query, list):
             res = (
-                self.weaviate.query.get(
-                    self.weaviate_class, ["*", "_additional { id distance }"]
-                )
+                self.weaviate.query.get(self.weaviate_class, ["*", "_additional { id distance }"])
                 .with_near_vector({"vector": query})
                 .with_limit(limit)
                 .do()
@@ -196,9 +178,7 @@ class UnifiedMemory:
 
         # Fallback to Firestore
         if self.firestore:
-            docs = (
-                self.firestore.collection(self.firestore_collection).limit(100).stream()
-            )
+            docs = self.firestore.collection(self.firestore_collection).limit(100).stream()
             for doc in docs:
                 data = doc.to_dict()
                 if query.lower() in data.get("content", "").lower():
@@ -221,17 +201,13 @@ class UnifiedMemory:
 
         if self.weaviate:
             try:
-                self.weaviate.data_object.delete(
-                    uuid=memory_id, class_name=self.weaviate_class
-                )
+                self.weaviate.data_object.delete(uuid=memory_id, class_name=self.weaviate_class)
                 deleted = True
             except Exception:
                 pass
 
         if self.firestore:
-            self.firestore.collection(self.firestore_collection).document(
-                memory_id
-            ).delete()
+            self.firestore.collection(self.firestore_collection).document(memory_id).delete()
             deleted = True
 
         return deleted

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Generate .env file from Pulumi secrets."""
 
+import json
 import os
 import subprocess
-import json
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
 
 def get_pulumi_config() -> Dict[str, Any]:
@@ -151,9 +151,7 @@ def main():
         if gitignore_path.exists():
             gitignore_content = gitignore_path.read_text()
             if ".env" not in gitignore_content:
-                gitignore_path.write_text(
-                    gitignore_content + "\n# Environment files\n.env\n"
-                )
+                gitignore_path.write_text(gitignore_content + "\n# Environment files\n.env\n")
                 print("✅ Added .env to .gitignore")
 
         print("\n🎉 Environment setup complete!")

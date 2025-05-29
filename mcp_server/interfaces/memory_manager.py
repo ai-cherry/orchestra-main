@@ -21,9 +21,7 @@ class IMemoryManager(ABC):
         """Initialize the memory manager."""
 
     @abstractmethod
-    async def create_memory(
-        self, key: str, entry: MemoryEntry, source_tool: str
-    ) -> bool:
+    async def create_memory(self, key: str, entry: MemoryEntry, source_tool: str) -> bool:
         """Create a new memory entry."""
 
     @abstractmethod
@@ -31,9 +29,7 @@ class IMemoryManager(ABC):
         """Retrieve a memory entry for a specific tool."""
 
     @abstractmethod
-    async def update_memory(
-        self, key: str, entry: MemoryEntry, source_tool: str
-    ) -> bool:
+    async def update_memory(self, key: str, entry: MemoryEntry, source_tool: str) -> bool:
         """Update an existing memory entry."""
 
     @abstractmethod
@@ -41,15 +37,11 @@ class IMemoryManager(ABC):
         """Delete a memory entry."""
 
     @abstractmethod
-    async def search_memory(
-        self, query: str, tool: str, limit: int = 10
-    ) -> List[tuple[str, MemoryEntry, float]]:
+    async def search_memory(self, query: str, tool: str, limit: int = 10) -> List[tuple[str, MemoryEntry, float]]:
         """Search for memory entries for a specific tool."""
 
     @abstractmethod
-    async def optimize_context_window(
-        self, tool: str, required_keys: Optional[List[str]] = None
-    ) -> int:
+    async def optimize_context_window(self, tool: str, required_keys: Optional[List[str]] = None) -> int:
         """Optimize the context window for a specific tool."""
 
     @abstractmethod
@@ -77,9 +69,7 @@ class SyncMemoryManager:
 
     def create_memory(self, key: str, entry: MemoryEntry, source_tool: str) -> bool:
         """Create a new memory entry."""
-        return self.loop.run_until_complete(
-            self.async_manager.create_memory(key, entry, source_tool)
-        )
+        return self.loop.run_until_complete(self.async_manager.create_memory(key, entry, source_tool))
 
     def get_memory(self, key: str, tool: str) -> Optional[MemoryEntry]:
         """Retrieve a memory entry for a specific tool."""
@@ -87,31 +77,19 @@ class SyncMemoryManager:
 
     def update_memory(self, key: str, entry: MemoryEntry, source_tool: str) -> bool:
         """Update an existing memory entry."""
-        return self.loop.run_until_complete(
-            self.async_manager.update_memory(key, entry, source_tool)
-        )
+        return self.loop.run_until_complete(self.async_manager.update_memory(key, entry, source_tool))
 
     def delete_memory(self, key: str, source_tool: str) -> bool:
         """Delete a memory entry."""
-        return self.loop.run_until_complete(
-            self.async_manager.delete_memory(key, source_tool)
-        )
+        return self.loop.run_until_complete(self.async_manager.delete_memory(key, source_tool))
 
-    def search_memory(
-        self, query: str, tool: str, limit: int = 10
-    ) -> List[tuple[str, MemoryEntry, float]]:
+    def search_memory(self, query: str, tool: str, limit: int = 10) -> List[tuple[str, MemoryEntry, float]]:
         """Search for memory entries for a specific tool."""
-        return self.loop.run_until_complete(
-            self.async_manager.search_memory(query, tool, limit)
-        )
+        return self.loop.run_until_complete(self.async_manager.search_memory(query, tool, limit))
 
-    def optimize_context_window(
-        self, tool: str, required_keys: Optional[List[str]] = None
-    ) -> int:
+    def optimize_context_window(self, tool: str, required_keys: Optional[List[str]] = None) -> int:
         """Optimize the context window for a specific tool."""
-        return self.loop.run_until_complete(
-            self.async_manager.optimize_context_window(tool, required_keys)
-        )
+        return self.loop.run_until_complete(self.async_manager.optimize_context_window(tool, required_keys))
 
     def get_memory_status(self) -> Dict[str, Any]:
         """Get the status of the memory system."""

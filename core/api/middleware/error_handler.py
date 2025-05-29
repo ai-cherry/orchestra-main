@@ -14,7 +14,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from core.api.models.responses import ErrorResponse
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -77,11 +76,7 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
                 message="An internal error occurred",
                 details={
                     "path": str(request.url.path),
-                    "traceback": (
-                        traceback.format_exc()
-                        if logger.level <= logging.DEBUG
-                        else None
-                    ),
+                    "traceback": (traceback.format_exc() if logger.level <= logging.DEBUG else None),
                 },
             )
             return JSONResponse(status_code=500, content=error_response.dict())
@@ -105,9 +100,7 @@ def handle_api_error(error: Exception, status_code: int = 500) -> JSONResponse:
         message=str(error),
         details={
             "type": error_type,
-            "traceback": (
-                traceback.format_exc() if logger.level <= logging.DEBUG else None
-            ),
+            "traceback": (traceback.format_exc() if logger.level <= logging.DEBUG else None),
         },
     )
 

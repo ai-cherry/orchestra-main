@@ -73,9 +73,7 @@ def get_encoding(model_name: str) -> Any:
         ValueError: If tiktoken is not available or the model is not supported
     """
     if not HAS_TIKTOKEN:
-        raise ValueError(
-            "tiktoken is not installed. Install with 'pip install tiktoken'"
-        )
+        raise ValueError("tiktoken is not installed. Install with 'pip install tiktoken'")
 
     # Check cache first
     if model_name in _ENCODER_CACHE:
@@ -94,9 +92,7 @@ def get_encoding(model_name: str) -> Any:
                 encoding = tiktoken.encoding_for_model(model_name)
             except KeyError:
                 # Fall back to cl100k_base for unknown models
-                logger.warning(
-                    f"Unknown model: {model_name}, falling back to cl100k_base encoding"
-                )
+                logger.warning(f"Unknown model: {model_name}, falling back to cl100k_base encoding")
                 encoding = tiktoken.get_encoding("cl100k_base")
 
         # Cache the encoding
@@ -181,9 +177,7 @@ def count_tokens(text: str, model_name: str = "gpt-4") -> int:
     whitespace_count = len(whitespace_pattern.findall(text))
 
     # Calculate token estimate
-    token_estimate = int(
-        word_count * 0.75 + special_char_count + whitespace_count * 0.25 + 4
-    )
+    token_estimate = int(word_count * 0.75 + special_char_count + whitespace_count * 0.25 + 4)
 
     # Cache the result
     _TOKEN_COUNT_CACHE[cache_key] = token_estimate

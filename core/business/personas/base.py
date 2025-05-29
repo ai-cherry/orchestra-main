@@ -161,9 +161,7 @@ class PersonaManager:
         """Set the persona processor."""
         self._processor = processor
 
-    def process_with_persona(
-        self, input_text: str, persona_id: Optional[str] = None
-    ) -> Optional[str]:
+    def process_with_persona(self, input_text: str, persona_id: Optional[str] = None) -> Optional[str]:
         """Process input with a specific persona."""
         if not self._processor:
             return None
@@ -180,9 +178,7 @@ class PersonaManager:
         # Process input
         return self._processor.process_input(input_text, persona)
 
-    def format_response_with_persona(
-        self, response: str, persona_id: Optional[str] = None
-    ) -> Optional[str]:
+    def format_response_with_persona(self, response: str, persona_id: Optional[str] = None) -> Optional[str]:
         """Format response with a specific persona."""
         if not self._processor:
             return response

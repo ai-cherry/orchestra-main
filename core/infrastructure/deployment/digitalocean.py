@@ -28,9 +28,7 @@ class DigitalOceanProvider(CloudProvider):
         self.ssh_key_id = ssh_key_id
         self._created_resources = []
 
-    def create_compute_instance(
-        self, name: str, image: str, user_data: Optional[str] = None
-    ) -> Output[str]:
+    def create_compute_instance(self, name: str, image: str, user_data: Optional[str] = None) -> Output[str]:
         """Create a DigitalOcean droplet and return its IP address."""
         # Map generic image names to DigitalOcean slugs
         image_mapping = {
@@ -59,9 +57,7 @@ class DigitalOceanProvider(CloudProvider):
         self._created_resources.append(droplet)
         return droplet.ipv4_address
 
-    def create_managed_database(
-        self, name: str, engine: str, version: str
-    ) -> Output[Dict[str, Any]]:
+    def create_managed_database(self, name: str, engine: str, version: str) -> Output[Dict[str, Any]]:
         """Create a managed database cluster."""
         # Map generic engine names to DigitalOcean engines
         engine_mapping = {
@@ -157,9 +153,7 @@ class DigitalOceanProvider(CloudProvider):
         ]
 
         # Get droplet IDs from created resources
-        droplet_ids = [
-            r.id for r in self._created_resources if isinstance(r, do.Droplet)
-        ]
+        droplet_ids = [r.id for r in self._created_resources if isinstance(r, do.Droplet)]
 
         # Create the firewall
         firewall = do.Firewall(

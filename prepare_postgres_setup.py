@@ -148,12 +148,8 @@ def main():
     use_iam_auth = os.environ.get("CLOUD_SQL_USE_IAM_AUTH", "").lower() == "true"
 
     if not use_iam_auth and not os.environ.get("CLOUD_SQL_PASSWORD_SECRET_NAME"):
-        print_warning(
-            "Neither IAM authentication nor a password secret name is specified."
-        )
-        print_warning(
-            "You will need to provide a password directly when running the script."
-        )
+        print_warning("Neither IAM authentication nor a password secret name is specified.")
+        print_warning("You will need to provide a password directly when running the script.")
 
     # Generate the setup command
     generate_setup_command(use_iam_auth)

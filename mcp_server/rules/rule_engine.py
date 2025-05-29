@@ -420,27 +420,19 @@ class RuleEngine:
         # Determine which rules to check
         if active_rule_set and active_rule_set in self.rule_sets:
             rule_ids = self.rule_sets[active_rule_set]
-            rules_to_check = [
-                rule for rule_id, rule in self.rules.items() if rule_id in rule_ids
-            ]
+            rules_to_check = [rule for rule_id, rule in self.rules.items() if rule_id in rule_ids]
         else:
             rules_to_check = list(self.rules.values())
 
         # Apply filters
         if categories:
-            rules_to_check = [
-                rule for rule in rules_to_check if rule.category in categories
-            ]
+            rules_to_check = [rule for rule in rules_to_check if rule.category in categories]
 
         if severities:
-            rules_to_check = [
-                rule for rule in rules_to_check if rule.severity in severities
-            ]
+            rules_to_check = [rule for rule in rules_to_check if rule.severity in severities]
 
         if tags:
-            rules_to_check = [
-                rule for rule in rules_to_check if any(tag in rule.tags for tag in tags)
-            ]
+            rules_to_check = [rule for rule in rules_to_check if any(tag in rule.tags for tag in tags)]
 
         # Check each rule
         for rule in rules_to_check:
@@ -534,9 +526,7 @@ class RuleEngine:
             # Prepare data for serialization
             data = {
                 "rules": rules_data,
-                "rule_sets": {
-                    name: list(rule_ids) for name, rule_ids in self.rule_sets.items()
-                },
+                "rule_sets": {name: list(rule_ids) for name, rule_ids in self.rule_sets.items()},
             }
 
             if self.default_rule_set:
@@ -581,9 +571,7 @@ def check_content(
     tags: Optional[List[str]] = None,
 ) -> List[RuleViolation]:
     """Convenience function to check content using the default rule engine."""
-    return get_rule_engine().check_content(
-        content, rule_set, categories, severities, tags
-    )
+    return get_rule_engine().check_content(content, rule_set, categories, severities, tags)
 
 
 def load_rules_from_file(file_path: str) -> bool:

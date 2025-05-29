@@ -10,31 +10,26 @@ Instructions:
 - Run `pulumi up` to provision and deploy.
 """
 
-import pulumi
-import pulumi_digitalocean as do
-import pulumi_command as command
-from pulumi import Config, Output
 import os  # Added for path joining
+
+import pulumi
+import pulumi_command as command
+import pulumi_digitalocean as do
+from pulumi import Config, Output
 
 # --- CONFIGURATION ---
 config = Config()
 env = config.require("env")  # "dev" or "prod"
-droplet_size = config.get("droplet_size") or (
-    "s-1vcpu-2gb" if env == "dev" else "s-2vcpu-4gb"
-)
+droplet_size = config.get("droplet_size") or ("s-1vcpu-2gb" if env == "dev" else "s-2vcpu-4gb")
 region = config.get("region") or "sfo2"  # Ensure this region supports App Platform
 hostname = config.get("hostname") or (
-    f"superagi-{env}-sfo2-01"
-    if env == "dev"
-    else "ubuntu-s-2vcpu-8gb-160gb-intel-sfo2-01"
+    f"superagi-{env}-sfo2-01" if env == "dev" else "ubuntu-s-2vcpu-8gb-160gb-intel-sfo2-01"
 )
 # SSH authentication – either pubkey+private key or root password
 
 root_password = config.get_secret("root_password")
 ssh_pubkey_path = config.get("ssh_pubkey_path")  # Path to local SSH public key file
-ssh_private_key_path = config.get_secret(
-    "ssh_private_key_path"
-)  # Path to local SSH private key file
+ssh_private_key_path = config.get_secret("ssh_private_key_path")  # Path to local SSH private key file
 
 # --- SECRETS ---
 dragonfly_uri = config.require_secret("dragonfly_uri")
@@ -49,9 +44,7 @@ admin_ui_custom_domain_name = config.get("adminUiCustomDomain")
 # Assumes `pulumi up` is run from `infra/` directory.
 # `os.path.dirname(__file__)` gives the directory of the current script (`infra/`)
 # `os.path.join(script_dir, "..", "admin-ui", "dist")` constructs `infra/../admin-ui/dist`
-admin_ui_dist_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "admin-ui", "dist")
-)
+admin_ui_dist_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "admin-ui", "dist"))
 
 
 # --- SSH KEY RESOURCE ---
@@ -59,9 +52,7 @@ ssh_key_resource = None
 if ssh_pubkey_path:
     with open(os.path.expanduser(ssh_pubkey_path), "r") as f:
         ssh_pubkey_content = f.read()
-    ssh_key_resource = do.SshKey(
-        f"{env}-ssh-key", name=f"{env}-ssh-key-{env}", public_key=ssh_pubkey_content
-    )
+    ssh_key_resource = do.SshKey(f"{env}-ssh-key", name=f"{env}-ssh-key-{env}", public_key=ssh_pubkey_content)
 
 # --- DROPLET ---
 cloud_init = f"""#cloud-config
@@ -113,9 +104,7 @@ elif root_password:
     )
 else:
     # Fallback or error if no auth method provided
-    raise pulumi.RunError(
-        "Either root_password or ssh_private_key_path must be provided for droplet connection."
-    )
+    raise pulumi.RunError("Either root_password or ssh_private_key_path must be provided for droplet connection.")
 
 
 run_superagi = command.remote.Command(

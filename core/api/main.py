@@ -14,17 +14,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from core.api.endpoints import conversation
 from core.api.middleware.error_handler import ErrorHandlerMiddleware
 from core.api.models.responses import HealthCheckResponse
-from core.business.personas.base import (
-    PersonaConfig,
-    PersonaTrait,
-    ResponseStyle,
-    get_persona_manager,
-)
+from core.business.personas.base import PersonaConfig, PersonaTrait, ResponseStyle, get_persona_manager
 from core.business.workflows.examples import register_example_workflows
 from core.infrastructure.config.settings import get_settings
 from core.main import OrchestraSystem
 from core.services.agents.examples import register_example_agents
-
 
 logger = logging.getLogger(__name__)
 
@@ -230,15 +224,11 @@ async def health_check() -> HealthCheckResponse:
             overall_status = "degraded"
             break
 
-    return HealthCheckResponse(
-        success=True, status=overall_status, services=services_health, version="1.0.0"
-    )
+    return HealthCheckResponse(success=True, status=overall_status, services=services_health, version="1.0.0")
 
 
 if __name__ == "__main__":
     import uvicorn
 
     # Run the application
-    uvicorn.run(
-        "core.api.main:app", host="0.0.0.0", port=8000, reload=True, log_level="info"
-    )
+    uvicorn.run("core.api.main:app", host="0.0.0.0", port=8000, reload=True, log_level="info")

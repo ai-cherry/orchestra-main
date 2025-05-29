@@ -107,9 +107,7 @@ def load_performance_log() -> Dict[str, Any]:
             with open(PERFORMANCE_LOG, "r") as f:
                 return json.load(f)
         except json.JSONDecodeError:
-            logger.warning(
-                "Performance log exists but is not valid JSON. Creating new log."
-            )
+            logger.warning("Performance log exists but is not valid JSON. Creating new log.")
             return {"extensions": {}, "last_updated": "", "high_usage_events": []}
 
     return {"extensions": {}, "last_updated": "", "high_usage_events": []}
@@ -142,15 +140,11 @@ def check_resource_usage(processes: List[Dict[str, Any]]) -> Tuple[bool, bool]:
     for proc in processes:
         if proc["cpu"] > THRESHOLD_CPU_PERCENT:
             high_cpu = True
-            logger.warning(
-                f"High CPU usage detected: {proc['cpu']}% (PID: {proc['pid']})"
-            )
+            logger.warning(f"High CPU usage detected: {proc['cpu']}% (PID: {proc['pid']})")
 
         if proc["memory"] > THRESHOLD_MEMORY_MB:
             high_memory = True
-            logger.warning(
-                f"High memory usage detected: {proc['memory']}MB (PID: {proc['pid']})"
-            )
+            logger.warning(f"High memory usage detected: {proc['memory']}MB (PID: {proc['pid']})")
 
     return high_cpu, high_memory
 
@@ -266,9 +260,7 @@ def main() -> None:
 
         # Keep only the last 10 events to avoid the log growing too large
         if len(performance_log["high_usage_events"]) > 10:
-            performance_log["high_usage_events"] = performance_log["high_usage_events"][
-                -10:
-            ]
+            performance_log["high_usage_events"] = performance_log["high_usage_events"][-10:]
 
         # Increment counters for all extensions
         # This is a simplification - in a real implementation, you would
@@ -296,9 +288,7 @@ def main() -> None:
 
             # Provide recommendations based on category
             if category == "optional":
-                logger.info(
-                    f"    Recommendation: Consider disabling {ext['id']} as it's marked as optional"
-                )
+                logger.info(f"    Recommendation: Consider disabling {ext['id']} as it's marked as optional")
             elif category == "ai":
                 logger.info(
                     f"    Recommendation: AI extensions like {ext['id']} can be resource intensive. Consider using them only when needed."

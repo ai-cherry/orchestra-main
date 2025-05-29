@@ -75,9 +75,7 @@ class MemoryStore(ABC):
         pass
 
     @abstractmethod
-    async def search(
-        self, query: str, limit: int = 10, filters: Optional[Dict[str, Any]] = None
-    ) -> List[SearchResult]:
+    async def search(self, query: str, limit: int = 10, filters: Optional[Dict[str, Any]] = None) -> List[SearchResult]:
         """Search for items matching the query."""
         pass
 
@@ -204,9 +202,7 @@ class MemoryPolicy(ABC):
     """Abstract base class for memory management policies."""
 
     @abstractmethod
-    def should_promote(
-        self, item: MemoryItem, access_count: int
-    ) -> Optional[MemoryLayer]:
+    def should_promote(self, item: MemoryItem, access_count: int) -> Optional[MemoryLayer]:
         """Determine if an item should be promoted to another layer."""
         pass
 

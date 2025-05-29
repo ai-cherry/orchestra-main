@@ -28,18 +28,14 @@ class MessageInput(BaseModel):
         True,
         description="Whether this is a user message (True) or system message (False)",
     )
-    metadata: Optional[Dict[str, Any]] = Field(
-        None, description="Optional metadata for the message"
-    )
+    metadata: Optional[Dict[str, Any]] = Field(None, description="Optional metadata for the message")
 
 
 class ConversationStartInput(BaseModel):
     """Input model for starting a conversation."""
 
     user_id: str = Field(..., description="User identifier")
-    persona_name: Optional[str] = Field(
-        None, description="Optional persona name to activate"
-    )
+    persona_name: Optional[str] = Field(None, description="Optional persona name to activate")
 
 
 class ConversationEndInput(BaseModel):
@@ -73,9 +69,7 @@ async def start_conversation(
         return {"session_id": session_id, "status": "created"}
     except Exception as e:
         logger.error(f"Failed to start conversation: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=500, detail=f"Failed to start conversation: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to start conversation: {str(e)}")
 
 
 @router.post("/{session_id}/end", response_model=Dict[str, str])
@@ -99,9 +93,7 @@ async def end_conversation(
     conversation_service = get_conversation_service()
 
     try:
-        result = await conversation_service.end_conversation(
-            user_id=input_data.user_id, session_id=session_id
-        )
+        result = await conversation_service.end_conversation(user_id=input_data.user_id, session_id=session_id)
 
         if not result:
             raise HTTPException(
@@ -114,9 +106,7 @@ async def end_conversation(
         raise
     except Exception as e:
         logger.error(f"Failed to end conversation: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=500, detail=f"Failed to end conversation: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to end conversation: {str(e)}")
 
 
 @router.post("/{session_id}/messages", response_model=Dict[str, str])
@@ -159,9 +149,7 @@ async def add_message(
 async def get_conversation_history(
     session_id: str,
     user_id: str = Query(..., description="User identifier"),
-    limit: int = Query(
-        20, ge=1, le=100, description="Maximum number of messages to retrieve"
-    ),
+    limit: int = Query(20, ge=1, le=100, description="Maximum number of messages to retrieve"),
     persona_name: Optional[str] = Query(None, description="Filter by persona name"),
 ) -> List[Dict[str, Any]]:
     """
@@ -191,9 +179,7 @@ async def get_conversation_history(
         return history
     except Exception as e:
         logger.error(f"Failed to retrieve conversation history: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=500, detail=f"Failed to retrieve conversation history: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve conversation history: {str(e)}")
 
 
 @router.get("/active", response_model=Dict[str, Any])
@@ -230,6 +216,4 @@ async def get_active_conversation(
             return {"status": "no_active_conversation"}
     except Exception as e:
         logger.error(f"Failed to get active conversation: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=500, detail=f"Failed to get active conversation: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to get active conversation: {str(e)}")

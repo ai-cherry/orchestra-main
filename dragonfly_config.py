@@ -30,9 +30,9 @@ except ImportError:
     _SOURCE = "env"
 
     # 3. Optionally, fetch from GCP Secret Manager if running in GCP and any secret is missing
-    if (
-        not DRAGONFLY_HOST or not DRAGONFLY_PASSWORD or not DRAGONFLY_CONNECTION_URI
-    ) and os.getenv("GOOGLE_CLOUD_PROJECT"):
+    if (not DRAGONFLY_HOST or not DRAGONFLY_PASSWORD or not DRAGONFLY_CONNECTION_URI) and os.getenv(
+        "GOOGLE_CLOUD_PROJECT"
+    ):
         try:
             from google.cloud import secretmanager
 

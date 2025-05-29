@@ -17,9 +17,7 @@ except FileNotFoundError:
 
 # Read requirements from requirements.txt
 with open(os.path.join(here, "requirements.txt"), encoding="utf-8") as f:
-    requirements = [
-        line.strip() for line in f if line.strip() and not line.startswith("#")
-    ]
+    requirements = [line.strip() for line in f if line.strip() and not line.startswith("#")]
 
 setup(
     name="orchestra-vertex-client",
