@@ -1,72 +1,56 @@
 # GitHub Organization Secrets Configuration
 
-This document provides information about the GitHub organization secrets required for CI/CD deployment of the Orchestra application.
-
 ## Required Secrets
 
-These secrets are used by GitHub Actions workflows to deploy the application to
-| Secret Name               | Description                            | Example Value                                                     |
-| ------------------------- | -------------------------------------- | ----------------------------------------------------------------- |
-| `ORG_| `ORG_| `ORG_GKE_CLUSTER_PROD`    | GKE Cluster name for production        | `autopilot-cluster-1`                                             |
-| `ORG_GKE_CLUSTER_STAGING` | GKE Cluster name for staging           | `autopilot-cluster-1`                                             |
-| `ORG_REDIS_HOST`          | Redis instance hostname                | `redis-12345.c12345.us-west4-1.| `ORG_REDIS_PORT`          | Redis instance port                    | `6379`                                                            |
-| `ORG_REDIS_PASSWORD`      | Redis instance password                | `your-redis-password`                                             |
-| `DOCKERHUB_USERNAME`      | Docker Hub username for storing images | `your-dockerhub-username`                                         |
-| `DOCKERHUB_TOKEN`         | Docker Hub access token                | `your-dockerhub-token`                                            |
-| `SLACK_WEBHOOK_URL`       | Slack webhook URL for notifications    | `https://hooks.slack.com/services/...`                            |
+### Pulumi Configuration
+| Secret Name | Description | Example Value |
+|-------------|-------------|---------------|
+| `PULUMI_CONFIGURE_PASSPHRASE` | Encryption passphrase for Pulumi state | `your-secure-passphrase` |
+| `ORG_PULUMI_ACCESS_TOKEN` | Pulumi Cloud access token | `pul-1234567890abcdef` |
+
+### Infrastructure Providers
+| Secret Name | Description | Example Value |
+|-------------|-------------|---------------|
+| `ORG_DIGITALOCEAN_TOKEN` | DigitalOcean API token | `dop_v1_1234567890abcdef` |
+| `ORG_MONGODB_ORG_ID` | MongoDB Atlas Organization ID | `1234567890abcdef12345678` |
+| `ORG_MONGODB_API_PUBLIC_KEY` | MongoDB Atlas API Public Key | `abcdefgh-1234-5678-90ab-cdef12345678` |
+| `ORG_MONGODB_API_PRIVATE_KEY` | MongoDB Atlas API Private Key | `12345678-90ab-cdef-1234-567890abcdef` |
+
+### AI Service APIs
+| Secret Name | Description | Example Value |
+|-------------|-------------|---------------|
+| `ORG_OPENAI_API_KEY` | OpenAI API key | `sk-1234567890abcdef1234567890abcdef` |
+| `ORG_ANTHROPIC_API_KEY` | Anthropic API key | `sk-ant-api03-1234567890abcdef-12345678` |
+| `ORG_OPENROUTER_API_KEY` | OpenRouter API key | `sk-or-1234567890abcdef1234567890abcdef` |
 
 ## Setting Up Secrets
 
-You can set up these secrets using one of the following methods:
-
-### Method 1: Using GitHub Web Interface
-
-1. Navigate to your GitHub repository
-2. Go to Settings → Secrets and variables → Actions
-3. Click on "New repository secret"
-4. Enter the name and value of the secret
-5. Click "Add secret"
-
-### Method 2: Using GitHub CLI
-
+### Using GitHub CLI
 ```bash
-gh secret set ```
-
-### Method 3: Using the Provided Script
-
-We've created a script to help you set up these secrets:
-
-```bash
-./update_github_secrets.sh
+gh secret set PULUMI_CONFIGURE_PASSPHRASE --body "your-passphrase" --org your-org
+gh secret set ORG_DIGITALOCEAN_TOKEN --body "your-do-token" --org your-org
 ```
 
-The script will guide you through setting up all required secrets.
+### Using the Provided Script
+```bash
+./infra/populate_pulumi_secrets.sh
+```
 
-## Service Account Requirements
-
-The
-- - Service Account User (`roles/iam.serviceAccountUser`)
-- Storage Admin (`roles/storage.admin`)
-- Artifact Registry Admin (`roles/artifactregistry.admin`)
-- Kubernetes Engine Admin (`roles/container.admin`) - If using GKE
--
-## Secret Rotation
-
-It's recommended to rotate sensitive secrets periodically:
-
-1. 2. Docker Hub Tokens: Rotate every 180 days
-3. Redis passwords: Rotate every 180 days
-
-After rotating secrets, update the corresponding GitHub secrets with the new values.
+## Secret Rotation Schedule
+| Secret Type | Rotation Frequency | Notes |
+|-------------|--------------------|-------|
+| Pulumi Passphrase | 90 days | Must update all environments |
+| API Tokens | 180 days | Rotate via provider dashboards |
+| Database Credentials | 90 days | Coordinate with maintenance windows |
 
 ## Troubleshooting
 
-If you encounter issues with GitHub Actions deployment related to secrets:
+### Common Issues
+1. **Missing Secrets**: Verify all required secrets are set in GitHub org
+2. **Permission Issues**: Ensure workflows have `secrets: read` permission
+3. **Format Errors**: Check for trailing whitespace in secret values
 
-1. Verify that all required secrets are set correctly
-2. Check that the 3. Ensure the service account key hasn't expired or been revoked
-4. Verify the JSON format of the
-## Additional Resources
-
-- [GitHub Actions Documentation](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
-- [
+## Security Best Practices
+- Never commit secret values to version control
+- Use minimal required permissions for each secret
+- Audit secret access logs monthly
