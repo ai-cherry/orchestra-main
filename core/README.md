@@ -220,3 +220,12 @@ When adding new features:
 ## License
 
 [Your License Here]
+
+## Deployment (Vultr Single Node)
+
+Run the unified stack using Pulumi and Docker Compose:
+
+```bash
+pulumi preview --stack=vultr-dev
+docker compose -f deploy/docker-compose.vultr.yml config --quiet
+```
