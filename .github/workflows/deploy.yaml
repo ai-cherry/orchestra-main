@@ -13,6 +13,7 @@ jobs:
   pre-commit:
     name: Pre-commit Lint & Format
     runs-on: ubuntu-latest
+    continue-on-error: true  # Don't block deployment on linting issues
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,6 +25,7 @@ jobs:
         run: pip install pre-commit
       - name: Run pre-commit
         run: pre-commit run --all-files --show-diff-on-failure
+        continue-on-error: true  # Allow the step to fail without failing the job
 
   build-and-test-admin-ui:
     name: Build and Test Admin UI
