@@ -43,7 +43,9 @@ services:
           memory: 8g
 
   orchestrator:
-    build: ../core
+    build:
+      context: ..
+      dockerfile: core/Dockerfile
     restart: always
     logging:
       driver: "json-file"
@@ -57,9 +59,16 @@ services:
       - weaviate
     ports:
       - "8000:8000"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 4g
 
   mcp:
-    build: ../mcp_server
+    build:
+      context: ..
+      dockerfile: mcp_server/Dockerfile
     restart: always
     logging:
       driver: "json-file"
@@ -73,6 +82,11 @@ services:
       - weaviate
     ports:
       - "9000:9000"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 4g
 
   langfuse:
     image: ghcr.io/langfuse/langfuse:latest
@@ -84,16 +98,14 @@ services:
       - postgres
 
   redis:
-    image: docker.dragonflydb.io/dragonflydb/dragonfly:v1.5
+    image: redis:7-alpine
     restart: always
     ports:
       - "6379:6379"
     volumes:
       - redis-data:/data
     deploy:
-      replicas: 0
-      restart_policy:
-        condition: on-failure
+      replicas: "${REDIS_REPLICAS:-0}"
 
 volumes:
   weaviate-data:

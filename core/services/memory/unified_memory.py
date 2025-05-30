@@ -94,7 +94,8 @@ class ShortTermStore(MemoryStore):
         try:
             await self.connection.ping()
             return True
-        except: # Broad exception for connection issues
+        except Exception as e: # Broad exception for connection issues
+            logger.error(f"Short-term store health check failed: {e}")
             return False
 
 
