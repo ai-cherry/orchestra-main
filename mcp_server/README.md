@@ -189,7 +189,7 @@ Manages agent modes and workflows:
 **Tools:**
 
 - `switch_mode`: Change operational mode
-- `run_workflow`: Execute predefined workflows
+- `execute`: Execute predefined workflows
 - `execute_task`: Run specific tasks
 - `get_status`: Get orchestrator status
 

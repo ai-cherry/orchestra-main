@@ -3,16 +3,31 @@ services:
   weaviate:
     image: semitechnologies/weaviate:1.30
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
     environment:
       - QUERY_DEFAULT_ACORN_ENABLED=true
+      - VECTOR_INDEX_EF_SEARCH=64
+      - ENABLE_MODULES=text2vec-openai,reranker-openai,agents
     ports:
       - "8080:8080"
     volumes:
       - weaviate-data:/var/lib/weaviate
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 8g
 
   postgres:
     image: postgres:16
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -21,9 +36,19 @@ services:
       - "5432:5432"
     volumes:
       - pg-data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 8g
 
   orchestrator:
     build: ../core
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
     environment:
       - POSTGRES_DSN=${POSTGRES_DSN}
       - WEAVIATE_URL=http://weaviate:8080
@@ -35,6 +60,11 @@ services:
 
   mcp:
     build: ../mcp_server
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
     environment:
       - POSTGRES_DSN=${POSTGRES_DSN}
       - WEAVIATE_URL=http://weaviate:8080
