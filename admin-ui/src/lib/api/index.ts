@@ -2,7 +2,12 @@ import { useQuery } from '@tanstack/react-query'
 
 const API_URL = import.meta.env.VITE_API_URL
 
-export function useQueryApi(body: any) {
+// Define the QueryBody interface with a query string property
+export interface QueryBody {
+  query: string
+}
+
+export function useQueryApi(body: QueryBody) {
   return useQuery({
     queryKey: ['query', body],
     queryFn: async () => {

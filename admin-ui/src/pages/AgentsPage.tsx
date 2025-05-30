@@ -8,6 +8,15 @@ import { Search, RefreshCw } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { useAgents } from '@/lib/api';
 
+// Define Agent interface with required properties
+interface Agent {
+  id: string | number;
+  name: string;
+  type: string;
+  status: string; // e.g., 'active', 'inactive', 'error'
+  lastRun: string; // ISO date string or human-readable
+}
+
 export function AgentsPage() {
   const { data: agentsData = [] } = useAgents()
   return (
@@ -48,7 +57,7 @@ export function AgentsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {agentsData.map((agent: any) => (
+                {agentsData.map((agent: Agent) => (
                   <TableRow key={agent.id}>
                     <TableCell className="font-medium">{agent.name}</TableCell>
                     <TableCell>{agent.type}</TableCell>
