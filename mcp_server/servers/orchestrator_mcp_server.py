@@ -13,7 +13,7 @@ from enum import Enum
 from typing import Any, Dict, List, Optional
 
 import yaml
-from fastapi import BackgroundTasks, FastAPI, HTTPException
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Request, Depends
 from pydantic import BaseModel, Field
 
 # Configure logging
@@ -247,7 +247,7 @@ async def get_tools() -> List[MCPToolDefinition]:
             },
         ),
         MCPToolDefinition(
-            name="run_workflow",
+            name="execute",
             description="Execute a predefined workflow",
             parameters={
                 "type": "object",
@@ -327,8 +327,21 @@ async def switch_mode(request: ModeSwitch) -> Dict[str, Any]:
     }
 
 
-@app.post("/mcp/run_workflow")
-async def run_workflow(request: WorkflowRequest, background_tasks: BackgroundTasks) -> Dict[str, Any]:
+import hashlib
+import hmac
+
+SECRET = os.getenv("MCP_SHARED_SECRET", "secret")
+
+async def verify_signature(req: Request):
+    body = await req.body()
+    signature = req.headers.get("X-MCP-Signature", "")
+    expected = hmac.new(SECRET.encode(), body, hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(signature, expected):
+        raise HTTPException(status_code=403, detail="Invalid signature")
+
+
+@app.post("/mcp/execute")
+async def run_workflow(request: WorkflowRequest, background_tasks: BackgroundTasks, _: None = Depends(verify_signature)) -> Dict[str, Any]:
     """Execute a workflow"""
     # Create workflow instance
     workflow = Workflow(

@@ -25,6 +25,12 @@ jobs:
           python-version: "3.10"
           cache: "pip"
 
+      - name: Cache pip wheels
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: python-${{ runner.os }}-${{ hashFiles('**/requirements*.txt') }}
+      
       - name: Install Python dev requirements
         run: pip install -r requirements/dev.txt
 
@@ -54,6 +60,13 @@ jobs:
 
       - name: Validate docker-compose
         run: docker compose -f deploy/docker-compose.vultr.yml config --quiet
+
+      - name: Check Weaviate readiness
+        run: |
+          docker compose -f deploy/docker-compose.vultr.yml up -d weaviate
+          sleep 15
+          curl -f http://localhost:8080/v1/.well-known/ready
+          docker compose -f deploy/docker-compose.vultr.yml down
 
       - name: Pulumi preview
         uses: pulumi/actions@v4
