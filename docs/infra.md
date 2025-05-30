@@ -1,28 +1,25 @@
 # Orchestra Infrastructure Documentation
 
-This document describes the infrastructure setup for the Orchestra platform using Terraform on
+This document describes the infrastructure setup for the Orchestra platform. The stack now runs on a single Vultr bare-metal server provisioned via **Pulumi**. Older references to Terraform and GCP are kept for historical context but are no longer used.
 ## Overview
 
-Orchestra's infrastructure is managed using Terraform and deployed on
+Infrastructure is managed with Pulumi's Vultr provider. Pulumi creates the instance, block-storage volume, firewall rules, and a nightly snapshot schedule.
 ### Key Components
 
-- **- **MongoDB
-- **Pub/Sub**: Event bus for communication between services
-- **- **- **Artifact Registry**: Stores Docker images
+- **Vultr Bare Metal** – hosts the entire Docker Compose stack
+- **Block Storage** – mounted at `/data` and snapshotted nightly
+- **Pulumi** – IaC for server provisioning and networking
 
 ## Directory Structure
 
 ```
 infra/
-├── dev/                 # Development environment configuration
-│   └── main.tf
-├── prod/                # Production environment configuration
-│   └── main.tf
-├── modules/             # Shared Terraform modules
-│   ├── cloud-run/       # │   ├── MongoDB
-│   ├── pubsub/          # Pub/Sub topics module
-│   └── vertex/          # └── README.md            # Infrastructure overview
+├── components/          # Pulumi component resources
+│   └── vultr_server_component.py
+├── Pulumi.yaml          # Pulumi project config
 ```
+
+The remainder of this file contains the legacy Terraform/GCP setup and can be ignored for current deployments.
 
 ## Prerequisites
 

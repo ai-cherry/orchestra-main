@@ -1,0 +1,5 @@
+agents:
+  - name: ToolAgent
+    tools:
+      - name: ExampleTool
+        endpoint: https://example.com/api

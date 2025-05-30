@@ -47,4 +47,23 @@ class VultrServerComponent(ComponentResource):
             """,
         )
 
+        # Nightly snapshot cron job
+        self.snapshot_cron = command.remote.Command(
+            f"{name}-snapshot-cron",
+            connection=conn,
+            create="""
+                cat > /root/snapshot.sh <<'EOF'
+#!/bin/bash
+set -e
+VOLUME_ID="{volume_id}"
+SNAP_ID=$(vultr-cli snapshot create "$VOLUME_ID" | awk '{print $NF}')
+echo "Snapshot $SNAP_ID created" >> /var/log/vultr-snapshot.log
+EOF
+                chmod +x /root/snapshot.sh
+                # snapshot.sh usage documented in docs/RECOVERY.md
+                (crontab -l 2>/dev/null || echo "") | grep -v 'snapshot.sh' | { cat; echo '0 3 * * * /root/snapshot.sh'; } | crontab -
+            """.format(volume_id=self.volume.id),
+            opts=ResourceOptions(parent=self.attach),
+        )
+
         self.register_outputs({"ip": self.server.main_ip, "volume_id": self.volume.id})
