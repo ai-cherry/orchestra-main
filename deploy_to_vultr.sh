@@ -4,9 +4,12 @@
 
 set -e
 
-VULTR_IP="45.32.69.157"
-GITHUB_REPO="https://github.com/ai-cherry/orchestra-main.git"
-SSH_KEY="~/.ssh/vultr_orchestra"
+# Values should come from GitHub Actions secrets
+export VULTR_IP="${VULTR_IP:-${VULTR_SERVER_IP}}"
+export POSTGRES_PASSWORD="${POSTGRES_PASSWORD}"
+export POSTGRES_DSN="${POSTGRES_DSN}"
+GITHUB_REPO="${GITHUB_REPO:-https://github.com/ai-cherry/orchestra-main.git}"
+SSH_KEY="${SSH_KEY:-$HOME/.ssh/vultr_orchestra}"
 
 echo "🚀 Orchestra AI Vultr Deployment"
 echo "==============================="
@@ -32,7 +35,7 @@ vultr_exec << 'EOF'
 # Create orchestrator database and user
 sudo -u postgres psql << SQL
 CREATE DATABASE orchestrator;
-CREATE USER orchestrator WITH ENCRYPTED PASSWORD 'orchestra-prod-2025';
+CREATE USER orchestrator WITH ENCRYPTED PASSWORD '${POSTGRES_PASSWORD}';
 GRANT ALL PRIVILEGES ON DATABASE orchestrator TO orchestrator;
 \c orchestrator
 CREATE EXTENSION IF NOT EXISTS pgvector;
@@ -68,7 +71,7 @@ vultr_exec << 'EOF'
 cat > /opt/orchestra/.env << ENV
 # Orchestra Production Environment
 ORCHESTRA_ENV=production
-DATABASE_URL=postgresql://orchestrator:orchestra-prod-2025@localhost/orchestrator
+DATABASE_URL=${POSTGRES_DSN}
 WEAVIATE_URL=http://localhost:8080
 REDIS_URL=redis://localhost:6379
 
@@ -138,7 +141,7 @@ vultr_exec << 'EOF'
 cd /opt/orchestra
 source venv/bin/activate
 export PYTHONPATH=/opt/orchestra
-export DRAGONFLY_URI="rediss://qpwj3s2ae.dragonflydb.cloud:6385"
+export DRAGONFLY_URI="${DRAGONFLY_URI}"
 
 # Create a modified migration script for Redis
 cat > /opt/orchestra/scripts/migrate_to_redis.py << 'PYTHON'
@@ -149,7 +152,7 @@ from datetime import datetime
 
 try:
     # Connect to DragonflyDB
-    dragonfly_url = os.getenv('DRAGONFLY_URI', 'rediss://qpwj3s2ae.dragonflydb.cloud:6385')
+    dragonfly_url = os.getenv('DRAGONFLY_URI')
     print(f"Connecting to DragonflyDB: {dragonfly_url}")
     source = redis.from_url(dragonfly_url, decode_responses=True)
 
@@ -193,20 +196,7 @@ EOF
 
 echo "🔧 Step 9: Updating all configuration files..."
 vultr_exec << 'EOF'
-# Update all references to external services
 cd /opt/orchestra
-
-# Replace DragonflyDB references with Redis
-find . -name "*.py" -type f -exec sed -i 's/DRAGONFLY_URI/REDIS_URL/g' {} \;
-find . -name "*.py" -type f -exec sed -i 's/dragonfly/redis/gi' {} \;
-find . -name "*.yml" -type f -exec sed -i 's/dragonfly/redis/gi' {} \;
-find . -name "*.yaml" -type f -exec sed -i 's/dragonfly/redis/gi' {} \;
-
-# Update any DigitalOcean IPs to Vultr
-find . -name "*.py" -type f -exec sed -i 's/159.65.79.26/45.32.69.157/g' {} \;
-find . -name "*.py" -type f -exec sed -i 's/68.183.170.81/45.32.69.157/g' {} \;
-find . -name "*.md" -type f -exec sed -i 's/159.65.79.26/45.32.69.157/g' {} \;
-find . -name "*.md" -type f -exec sed -i 's/68.183.170.81/45.32.69.157/g' {} \;
 
 # Restart services with new config
 systemctl restart orchestra-api orchestra-mcp
