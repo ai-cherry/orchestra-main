@@ -1,0 +1,5 @@
+config:
+  orchestra-infra:env: dev
+  vultr:apiKey:
+    secure: <encrypted>
+  orchestra-infra:ssh_key_ids: "12345"

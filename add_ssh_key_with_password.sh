@@ -4,11 +4,11 @@
 echo "🔑 Adding SSH key to DigitalOcean droplets..."
 
 # Your SSH public key
-SSH_PUBLIC_KEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICq38OXXQVPAqVHzP99JvpDJBw+Myl8kItDGXOrurNYB paperspace@ai-cherry-orchestra"
+SSH_PUBLIC_KEY="${SSH_PUBLIC_KEY}"
 
 # Droplet IPs
-VECTOR_IP="68.183.170.81"
-APP_IP="159.65.79.26"
+VECTOR_IP="${VECTOR_IP}"
+APP_IP="${APP_IP}"
 
 # Check if sshpass is installed
 if ! command -v sshpass &> /dev/null; then
@@ -24,7 +24,7 @@ add_key_to_droplet() {
     echo "📌 Adding SSH key to $name droplet ($ip)..."
 
     # Add the SSH key using sshpass
-    sshpass -p 'xTD.8HBd?-+Bib' ssh -o StrictHostKeyChecking=no root@$ip "mkdir -p ~/.ssh && echo '$SSH_PUBLIC_KEY' >> ~/.ssh/authorized_keys && chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys && echo 'SSH key added successfully'"
+    sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@$ip "mkdir -p ~/.ssh && echo '$SSH_PUBLIC_KEY' >> ~/.ssh/authorized_keys && chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys && echo 'SSH key added successfully'"
 
     if [ $? -eq 0 ]; then
         echo "✅ SSH key added to $name droplet"

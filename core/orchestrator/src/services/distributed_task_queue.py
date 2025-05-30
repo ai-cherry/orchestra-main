@@ -14,7 +14,9 @@ from typing import Any, Awaitable, Callable, Dict, List, Optional, Set
 
 import aioredis
 
-from core.orchestrator.src.config.config import settings
+from shared.memory.weaviate_session_cache import cache as weaviate_cache
+
+from core.env_config import settings
 from core.orchestrator.src.services.event_bus import get_event_bus
 
 # Handle both pydantic v1 and v2
@@ -62,6 +64,7 @@ class DistributedTaskQueue:
 
     def __init__(self):
         """Initialize the distributed task queue."""
+        self._use_redis = settings.use_redis
         self._redis = None
         self._event_bus = get_event_bus()
         self._task_handlers: Dict[str, Callable[[TaskInstance], Awaitable[Dict[str, Any]]]] = {}
@@ -71,7 +74,10 @@ class DistributedTaskQueue:
         logger.info("DistributedTaskQueue initialized")
 
     async def initialize(self):
-        """Initialize the Redis connection."""
+        """Initialize the Redis connection if enabled."""
+        if not self._use_redis:
+            logger.info("Redis disabled via USE_REDIS; using Weaviate session cache")
+            return
         if self._redis is None:
             try:
                 self._redis = await aioredis.create_redis_pool(
@@ -102,6 +108,8 @@ class DistributedTaskQueue:
             await self._redis.wait_closed()
             self._redis = None
             logger.info("DistributedTaskQueue closed")
+        else:
+            self._running = False
 
     async def enqueue_task(self, task_def: TaskDefinition) -> str:
         """
@@ -131,14 +139,18 @@ class DistributedTaskQueue:
             updated_at=now,
         )
 
-        # Store task definition
-        await self._redis.set(f"task:def:{task_def.task_id}", json.dumps(task_def.dict()))
+        if self._use_redis:
+            # Store task definition
+            await self._redis.set(f"task:def:{task_def.task_id}", json.dumps(task_def.dict()))
 
-        # Store task instance
-        await self._redis.set(f"task:instance:{instance_id}", json.dumps(task_instance.dict()))
+            # Store task instance
+            await self._redis.set(f"task:instance:{instance_id}", json.dumps(task_instance.dict()))
 
-        # Add to pending queue with priority
-        await self._redis.zadd(f"task:queue:{task_def.task_type}", task_def.priority, instance_id)
+            # Add to pending queue with priority
+            await self._redis.zadd(f"task:queue:{task_def.task_type}", task_def.priority, instance_id)
+        else:
+            await weaviate_cache.set_json(f"task:def:{task_def.task_id}", task_def.dict())
+            await weaviate_cache.set_json(f"task:instance:{instance_id}", task_instance.dict())
 
         # Publish event
         try:
@@ -178,6 +190,8 @@ class DistributedTaskQueue:
         Args:
             num_workers: Number of worker tasks to start
         """
+        if not self._use_redis:
+            raise NotImplementedError("Non-Redis queue workers not implemented")
         if self._redis is None:
             await self.initialize()
 
@@ -442,5 +456,6 @@ async def get_task_queue() -> DistributedTaskQueue:
     global _task_queue
     if _task_queue is None:
         _task_queue = DistributedTaskQueue()
-        await _task_queue.initialize()
+        if settings.use_redis:
+            await _task_queue.initialize()
     return _task_queue
