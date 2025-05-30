@@ -19,7 +19,7 @@ infra/
 
 - Python 3.10 (exactly - not 3.11+)
 - Pulumi CLI installed
-- GCP authentication configured
+- Vultr API token configured (`VULTR_API_KEY`)
 
 ## Quick Start
 
@@ -29,7 +29,9 @@ pip install -r requirements.txt
 
 # Initialize stack
 pulumi stack init dev
-pulumi config set gcp_project_id <your-project-id>
+
+# Set the Vultr API key (pulumi config set --secret vultr:apiKey <token>)
+pulumi config set --secret vultr:apiKey <your-token>
 
 # Deploy
 pulumi up
@@ -40,17 +42,14 @@ pulumi up
 Required configuration values:
 
 ```bash
-pulumi config set gcp_project_id <project-id>
-pulumi config set region us-central1  # optional, defaults to us-central1
+pulumi config set vultr:region <vultr-region>
 pulumi config set --secret mongodb_password <password>  # auto-generated if not set
 pulumi config set --secret openrouter_api_key <api-key>  # for SuperAGI
 ```
 
 ## State Management
 
-Pulumi state is stored in GCS bucket: `gs://cherry-ai-project-pulumi-state`
-
-This is configured automatically when you run `pulumi login gs://cherry-ai-project-pulumi-state`.
+Pulumi state is stored in the Pulumi Cloud by default. You can use a local backend by running `pulumi login file://./pulumi-state`.
 
 ## Component Architecture
 
@@ -91,12 +90,12 @@ pulumi destroy
 
 ## Troubleshooting
 
-1. **Authentication errors**: Run `gcloud auth application-default login`
+1. **Authentication errors**: Ensure `VULTR_API_KEY` is set
 2. **State lock issues**: Check no other Pulumi operations are running
 3. **Resource conflicts**: Use `pulumi refresh` to sync state
 
 ## References
 
 - [Main Infrastructure Guide](../docs/INFRASTRUCTURE_GUIDE.md)
-- [Pulumi GCP Provider](https://www.pulumi.com/registry/packages/gcp/)
+- [Pulumi Vultr Provider](https://www.pulumi.com/registry/packages/vultr/)
 - [Pulumi Kubernetes Provider](https://www.pulumi.com/registry/packages/kubernetes/)

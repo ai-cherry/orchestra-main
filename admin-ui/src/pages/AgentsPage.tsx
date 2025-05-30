@@ -6,20 +6,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import StatusIndicator from '@/components/ui/StatusIndicator';
 import { Search, RefreshCw } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
+import { useAgents } from '@/lib/api';
 
-// Dummy data
-const agentsData = [
-  { id: '1', name: 'Data Collector', type: 'Web Scraper', status: 'active', lastRun: '2 minutes ago' },
-  { id: '2', name: 'Email Processor', type: 'Communication', status: 'idle', lastRun: '3 hours ago' },
-  { id: '3', name: 'Sentiment Analyzer', type: 'NLP', status: 'error', lastRun: '1 day ago' },
-  { id: '4', name: 'Content Generator', type: 'Creative', status: 'active', lastRun: '45 minutes ago' },
-  { id: '5', name: 'Data Validator', type: 'Quality Control', status: 'idle', lastRun: '5 hours ago' },
-  { id: '6', name: 'Transaction Monitor', type: 'Security', status: 'active', lastRun: '17 minutes ago' },
-  { id: '7', name: 'Customer Support Bot', type: 'Communication', status: 'active', lastRun: '1 minute ago' },
-  { id: '8', name: 'Log Analyzer', type: 'Monitoring', status: 'error', lastRun: '2 hours ago' },
-];
+interface Agent {
+  id: string
+  name: string
+  type: string
+  status: string
+  lastRun: string
+}
 
 export function AgentsPage() {
+  const { data: agentsData = [] } = useAgents()
   return (
     <PageWrapper title="Agents">
       <div className="flex flex-col space-y-6">
@@ -58,7 +56,7 @@ export function AgentsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {agentsData.map((agent) => (
+                {agentsData.map((agent: Agent) => (
                   <TableRow key={agent.id}>
                     <TableCell className="font-medium">{agent.name}</TableCell>
                     <TableCell>{agent.type}</TableCell>
