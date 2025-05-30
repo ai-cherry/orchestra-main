@@ -40,6 +40,7 @@ from core.orchestrator.src.api.endpoints import (  # Add import for conversation
     interaction,
     llm_interaction,
     personas,
+    query_agent,
 )
 from core.orchestrator.src.config.loader import get_settings, load_persona_configs
 from core.orchestrator.src.services.unified_event_bus import get_event_bus
@@ -232,7 +233,9 @@ app.include_router(health.router, prefix="/api")
 app.include_router(interaction.router, prefix="/api")
 app.include_router(llm_interaction.router, prefix="/api")
 app.include_router(personas.router, prefix="/api/personas")
+# Query agent endpoint
 app.include_router(agents.router, prefix="/api/agents")
+app.include_router(query_agent.router, prefix="/api")
 # Add conversations router
 app.include_router(conversations.router, prefix="/api/conversations")
 # Add resources router
