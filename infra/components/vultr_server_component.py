@@ -41,9 +41,17 @@ class VultrServerComponent(ComponentResource):
             f"{name}-setup",
             connection=conn,
             create="""
-                apt-get update && apt-get install -y docker.io docker-compose curl
+                apt-get update && apt-get install -y docker.io docker-compose curl vultr-cli
                 mkdir -p /data
-                mount {device} /data || true
+                if [ -b /dev/vdb ]; then
+                  if ! blkid /dev/vdb;
+                  then
+                    mkfs.ext4 -F /dev/vdb
+                  fi
+                  mount /dev/vdb /data
+                else
+                  echo "ERROR: /dev/vdb not found"
+                fi
             """,
         )
 
@@ -56,11 +64,11 @@ class VultrServerComponent(ComponentResource):
 #!/bin/bash
 set -e
 VOLUME_ID="{volume_id}"
-SNAP_ID=$(vultr-cli snapshot create "$VOLUME_ID" | awk '{print $NF}')
+SNAP_ID=$(vultr-cli snapshot create "$VOLUME_ID" | awk '{{print $NF}}')
 echo "Snapshot $SNAP_ID created" >> /var/log/vultr-snapshot.log
 EOF
                 chmod +x /root/snapshot.sh
-                (crontab -l 2>/dev/null || echo "") | grep -v 'snapshot.sh' | { cat; echo '0 3 * * * /root/snapshot.sh'; } | crontab -
+                (crontab -l 2>/dev/null || echo "") | grep -v 'snapshot.sh' | {{ cat; echo '0 3 * * * /root/snapshot.sh'; }} | crontab -
             """.format(volume_id=self.volume.id),
             opts=ResourceOptions(parent=self.attach),
         )

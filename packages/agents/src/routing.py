@@ -1,612 +1,466 @@
-"""
-Routing Logic for Agent Registry
-
-This module provides advanced routing capabilities for the AgentRegistry, including
-real-time capability scoring, load balancing, cost-aware routing, shadow testing,
-and integration with Cloud Spanner for routing table storage.
-"""
-
-import asyncio
 import logging
-import os
-import random
 import time
-from typing import Any, Dict, List, Optional, Tuple
-
-from core.orchestrator.src.exceptions import OrchestratorError
-from core.orchestrator.src.utils.error_handling import error_boundary, retry
+import uuid
+from typing import Dict, List, Optional, Tuple, Any
+import json
+import random
+import datetime
+import hashlib
 
 logger = logging.getLogger(__name__)
 
 
-class AgentRoutingError(OrchestratorError):
-    """Base exception for agent routing errors."""
-
-
-class MatchingEngineError(AgentRoutingError):
-    """Exception raised when there's an error with the Matching Engine."""
-
-
-class RouterConnectionError(AgentRoutingError):
-    """Exception raised when there's a connection error with the router's dependencies."""
-
-
-class RouteCalculationError(AgentRoutingError):
-    """Exception raised when there's an error calculating a route."""
-
-
-class AgentRouting:
+class AgentRouter:
     """
-    Manages advanced routing logic for agent instances in the Orchestra system.
-    Handles capability scoring, load balancing, cost-aware routing, and shadow testing.
-    Stores routing tables in Cloud Spanner.
+    Routes requests to the appropriate agent based on capability, cost, and load.
+    
+    This router implements several routing strategies:
+    - Capability-based: Routes to agents with specific capabilities
+    - Cost-aware: Routes to minimize cost based on agent pricing
+    - Load-balanced: Distributes load across multiple capable agents
+    - Shadow-testing: Routes to production agent but tests shadow agents
     """
-
+    
     def __init__(
         self,
         project_id: str,
-        spanner_instance_id: str,
-        spanner_database_id: str,
-        matching_engine_endpoint_name: Optional[str] = None,
-        location: str = "us-central1",
-        use_async_db: bool = True,
+        spanner_instance_id: Optional[str] = None,
+        spanner_database_id: Optional[str] = None,
+        use_async_db: bool = False,
+        enable_shadow_testing: bool = False,
     ):
         """
-        Initialize the AgentRouting with Google Cloud project details.
-
+        Initialize the AgentRouter.
+        
         Args:
             project_id: Google Cloud project ID
-            spanner_instance_id: Cloud Spanner instance ID
-            spanner_database_id: Cloud Spanner database ID
-            matching_engine_endpoint_name: Optional name of the Vertex AI Matching Engine endpoint
-            location: Google Cloud region location
-            use_async_db: Whether to use async database operations
+            spanner_instance_id: Cloud Spanner instance ID (optional)
+            spanner_database_id: Cloud Spanner database ID (optional)
+            use_async_db: Whether to use async database clients
+            enable_shadow_testing: Whether to enable shadow testing mode
         """
         self.project_id = project_id
-        self.spanner_instance_id = spanner_instance_id
-        self.spanner_database_id = spanner_database_id
-        self.location = location or os.getenv("VERTEX_AI_LOCATION", "us-central1")
-        self.matching_engine_endpoint_name = matching_engine_endpoint_name
-        self.use_async_db = use_async_db
-
-        # Initialize Cloud Spanner client
-        try:
-            self.spanner_client = spanner.Client(project=project_id)
-            self.instance = self.spanner_client.instance(spanner_instance_id)
-            self.database = self.instance.database(spanner_database_id)
-
-            # Initialize async client if requested
-            self.async_spanner_client = None
-            if use_async_db:
-
-                self.async_spanner_client = spanner_v1.services.spanner.SpannerAsyncClient()
-        except Exception as e:
-            logger.error(f"Failed to initialize Spanner: {str(e)}")
-            raise RouterConnectionError("Failed to initialize Spanner", e)
-
-        # Initialize Cloud Billing client for cost-aware routing
-        try:
-            self.billing_client = billing_v1.CloudBillingClient()
-        except Exception as e:
-            logger.error(f"Failed to initialize Billing client: {str(e)}")
-            raise RouterConnectionError("Failed to initialize Billing client", e)
-
-        # In-memory cache for agent scores and routing data (synced with Spanner)
-        self.agent_scores: Dict[str, float] = {}
-        self.agent_load: Dict[str, int] = {}
-        self.agent_costs: Dict[str, float] = {}
-        self.agent_capabilities: Dict[str, List[str]] = {}
-        self.agent_success_rates: Dict[str, float] = {}
-        self.shadow_agents: Dict[str, str] = {}  # Mapping of production agent ID to shadow agent ID
-
-        # Last update timestamps
-        self._last_score_update = time.time()
-        self._last_cost_update = time.time()
-        self._score_update_interval = 300  # 5 minutes
-        self._cost_update_interval = 1800  # 30 minutes
-
-        # Calculate embeddings for common capabilities
-        self.capability_vectors: Dict[str, List[float]] = {}
-
-        # Load initial routing data from Spanner
-        self._load_routing_data_from_spanner()
-
-    @error_boundary(propagate_types=[AgentRoutingError])
-    def _load_routing_data_from_spanner(self) -> None:
-        """Load routing data from Cloud Spanner into memory."""
-        try:
-            with self.database.snapshot() as snapshot:
-                # Query for agent scores
-                results = snapshot.execute_sql(
-                    "SELECT agent_id, capability_score, current_load, cost_per_request, "
-                    "capabilities, success_rate "
-                    "FROM agent_routing_table"
-                )
-                for row in results:
-                    agent_id, score, load, cost, capabilities_str, success_rate = row
-                    self.agent_scores[agent_id] = score if score is not None else 0.0
-                    self.agent_load[agent_id] = load if load is not None else 0
-                    self.agent_costs[agent_id] = cost if cost is not None else 0.0
-                    self.agent_success_rates[agent_id] = success_rate if success_rate is not None else 0.0
-
-                    # Parse capabilities (stored as comma-separated values)
-                    if capabilities_str:
-                        self.agent_capabilities[agent_id] = [c.strip() for c in capabilities_str.split(",")]
-                    else:
-                        self.agent_capabilities[agent_id] = []
-
-                # Query for shadow testing mappings
-                shadow_results = snapshot.execute_sql(
-                    "SELECT production_agent_id, shadow_agent_id " "FROM shadow_testing_table"
-                )
-                for row in shadow_results:
-                    prod_id, shadow_id = row
-                    self.shadow_agents[prod_id] = shadow_id
-
-            logger.info(f"Loaded routing data for {len(self.agent_scores)} agents")
-
-        except Exception as e:
-            logger.error(f"Failed to load routing data from Spanner: {str(e)}", exc_info=True)
-            raise RouterConnectionError("Failed to load routing data from Spanner", e)
-
-    @error_boundary(propagate_types=[AgentRoutingError])
-    async def async_load_routing_data(self) -> None:
-        """Asynchronously load routing data from Cloud Spanner."""
-        if not self.use_async_db or not self.async_spanner_client:
-            # Fall back to synchronous loading
-            self._load_routing_data_from_spanner()
-            return
-
-        try:
-            # Implement async Spanner operations using the async client
-            # This would be the actual implementation for async Spanner queries
-            # For now, we'll use a threadpool to run the synchronous version
-            loop = asyncio.get_event_loop()
-            await loop.run_in_executor(None, self._load_routing_data_from_spanner)
-
-        except Exception as e:
-            logger.error(f"Failed to load routing data asynchronously: {str(e)}", exc_info=True)
-            raise RouterConnectionError("Failed to load routing data asynchronously", e)
-
-    @error_boundary(propagate_types=[AgentRoutingError])
-    @retry(max_attempts=3, delay_seconds=1.0, backoff_factor=2.0)
-    async def update_capability_scores(self) -> None:
-        """
-        Update capability scores for agents using Vertex AI Matching Engine.
-        This method queries the Matching Engine to get updated scores based on agent performance vectors.
-        """
-        # Check if update is needed based on interval
-        current_time = time.time()
-        if current_time - self._last_score_update < self._score_update_interval:
-            return
-
-        try:
-            updates = []
-
-            # For each agent, get the average cost per request
-            for agent_id in self.agent_scores.keys():
-                # Calculate average cost per request over time period
-                # In a real implementation, you would use the Billing API:
-                #
-                # billing_service = self.billing_client.service
-                # filter_str = f'resource.type="aiplatform.googleapis.com/Agent" AND resource.labels.agent_id="{agent_id}"'
-                # query_filter = QueryFilter(filter=filter_str)
-                # time_interval = TimeInterval(
-                #     start_time=start_time.strftime('%Y-%m-%dT%H:%M:%SZ'),
-                #     end_time=end_time.strftime('%Y-%m-%dT%H:%M:%SZ')
-                # )
-                # aggregation = AggregationInfo(
-                #     aggregation_type=AggregationInfo.AggregationType.AVERAGE,
-                #     group_by=["resource.labels.agent_id"]
-                # )
-                # response = billing_service.query_cost(
-                #     query_filter=query_filter,
-                #     time_interval=time_interval,
-                #     aggregation=aggregation
-                # )
-
-                # For now, we'll calculate a more predictable but still realistic cost
-                # based on agent capabilities and a small random component for variation
-
-                # More capabilities = higher cost
-                capability_count = len(self.agent_capabilities.get(agent_id, []))
-                base_cost = 0.05 + (capability_count * 0.01)  # Base cost with capability factor
-
-                # Add small random variation (±10%)
-                variation = (random.random() * 0.2) - 0.1  # -10% to +10%
-                cost = base_cost * (1 + variation)
-
-                # Apply cost decay function: costs decrease over time due to optimization
-                days_online = (hash(agent_id) % 100) + 30  # Simulate agent age (30-130 days)
-                cost_decay = min(0.3, days_online / 1000)  # Max 30% cost reduction
-                cost = cost * (1 - cost_decay)
-
-                # Ensure cost is in a realistic range ($0.005 to $0.50 per request)
-                cost = max(0.005, min(0.5, cost))
-
-                # Update cost
-                self.agent_costs[agent_id] = cost
-                updates.append((agent_id, cost))
-
-            # Batch update Spanner with new costs
-            if updates:
-                if self.use_async_db:
-                    await self._async_batch_update_costs(updates)
-                else:
-                    with self.database.batch() as batch:
-                        for agent_id, cost in updates:
-                            batch.update(
-                                table="agent_routing_table",
-                                columns=("agent_id", "cost_per_request"),
-                                values=[(agent_id, cost)],
-                            )
-
-                logger.info(f"Updated cost data for {len(updates)} agents")
-                self._last_cost_update = time.time()
-
-        except Exception as e:
-            logger.error(f"Failed to update cost data: {str(e)}", exc_info=True)
-            raise AgentRoutingError("Failed to update cost data", e)
-
-    async def _async_batch_update_costs(self, updates: List[Tuple[str, float]]) -> None:
-        """
-        Helper method to perform async batch updates of costs in Spanner.
-
-        Args:
-            updates: List of (agent_id, cost) tuples to update
-        """
-        if not self.async_spanner_client:
-            # Fall back to synchronous update
-            with self.database.batch() as batch:
-                for agent_id, cost in updates:
-                    batch.update(
-                        table="agent_routing_table",
-                        columns=("agent_id", "cost_per_request"),
-                        values=[(agent_id, cost)],
-                    )
-            return
-
-        # In a real implementation, this would use the async Spanner client
-        # For now, use a threadpool to run the synchronous version
-        loop = asyncio.get_event_loop()
-
-        async def _run_sync_update():
-            with self.database.batch() as batch:
-                for agent_id, cost in updates:
-                    batch.update(
-                        table="agent_routing_table",
-                        columns=("agent_id", "cost_per_request"),
-                        values=[(agent_id, cost)],
-                    )
-
-        await loop.run_in_executor(None, _run_sync_update)
-
-    @error_boundary(propagate_types=[AgentRoutingError], fallback_value="")
-    async def select_agent(self, request_context: Dict[str, Any]) -> str:
-        """
-        Select an agent instance based on capability scores, load, and cost data.
-        Implements load balancing and cost-aware routing.
-
-        Args:
-            request_context: Context of the request to influence routing decision
-
-        Returns:
-            Selected agent ID
-
-        Raises:
-            RouteCalculationError: If there is an issue finding an appropriate agent
-        """
-        try:
-            # Check if we need to refresh cost and capability data
-            await self.update_capability_scores()
-            await self.update_cost_data()
-
-            # Get the requested capabilities from context
-            requested_capabilities = request_context.get("capabilities", [])
-            budget_sensitive = request_context.get("budget_sensitive", False)
-            high_priority = request_context.get("priority", "normal") == "high"
-
-            # Filter eligible agents
-            eligible_agents = set(self.agent_scores.keys())
-
-            # Filter by requested capabilities if specified
-            if requested_capabilities:
-                capability_filtered = set()
-                for agent_id, capabilities in self.agent_capabilities.items():
-                    # Check if agent has all requested capabilities
-                    if all(cap in capabilities for cap in requested_capabilities):
-                        capability_filtered.add(agent_id)
-                eligible_agents &= capability_filtered
-
-            # If no eligible agents, return empty string
-            if not eligible_agents:
-                logger.warning(f"No eligible agents found for capabilities: {requested_capabilities}")
-                return ""
-
-            # Prepare scoring logic
-            agent_scores = {}
-
-            # Balance between capability score, load, and cost
-            for agent_id in eligible_agents:
-                capability_score = self.agent_scores.get(agent_id, 0.0)
-                load = self.agent_load.get(agent_id, 0)
-                load_factor = min(1.0, load / 100.0)  # Normalize load (0-1)
-                cost = self.agent_costs.get(agent_id, 0.0)
-                cost_factor = min(1.0, cost / 0.5)  # Normalize cost (0-1)
-
-                # Adjust weights based on request context
-                if budget_sensitive:
-                    # Budget sensitive - prioritize cost
-                    weight_capability = 0.4
-                    weight_load = 0.2
-                    weight_cost = 0.4
-                elif high_priority:
-                    # High priority - prioritize capability and ignore load
-                    weight_capability = 0.8
-                    weight_load = 0.0
-                    weight_cost = 0.2
-                else:
-                    # Standard weighting
-                    weight_capability = 0.6
-                    weight_load = 0.2
-                    weight_cost = 0.2
-
-                # Calculate composite score
-                score = (
-                    (capability_score * weight_capability) - (load_factor * weight_load) - (cost_factor * weight_cost)
-                )
-
-                agent_scores[agent_id] = score
-
-            # Select top 3 agents by score
-            top_agents = sorted(agent_scores.items(), key=lambda x: x[1], reverse=True)[:3]
-
-            # If high priority or only one agent, select the top agent
-            if high_priority or len(top_agents) == 1:
-                best_agent_id = top_agents[0][0]
-            else:
-                # Otherwise, add randomization for load balancing (weighted random selection)
-                weights = []
-                agent_ids = []
-                total_score = 0.0
-
-                for agent_id, score in top_agents:
-                    # Convert score to positive weight
-                    weight = max(0.1, score + 1.0)  # Ensure positive weight
-                    weights.append(weight)
-                    agent_ids.append(agent_id)
-                    total_score += weight
-
-                # Normalize weights
-                weights = [w / total_score for w in weights]
-
-                # Weighted random selection
-                best_agent_id = random.choices(agent_ids, weights=weights, k=1)[0]
-
-            # Update load for selected agent
-            if best_agent_id:
-                self.agent_load[best_agent_id] = self.agent_load.get(best_agent_id, 0) + 1
-
-                # Update load in Spanner (asynchronously, don't block selection)
-                asyncio.create_task(self._update_agent_load(best_agent_id, self.agent_load[best_agent_id]))
-
-                # Check for shadow testing
-                if best_agent_id in self.shadow_agents:
-                    shadow_id = self.shadow_agents[best_agent_id]
-                    # Log shadow request (in a real implementation, send request to shadow agent as well)
-                    logger.info(f"Shadow testing active: Production agent {best_agent_id}, Shadow agent {shadow_id}")
-
-                    # Increment load for shadow agent as well
-                    self.agent_load[shadow_id] = self.agent_load.get(shadow_id, 0) + 1
-                    # Update shadow load in Spanner (asynchronously)
-                    asyncio.create_task(self._update_agent_load(shadow_id, self.agent_load[shadow_id]))
-
-                return best_agent_id
-            else:
-                logger.error("No suitable agent found for routing")
-                return ""
-
-        except Exception as e:
-            logger.error(f"Failed to select agent: {str(e)}", exc_info=True)
-            raise RouteCalculationError(f"Failed to select agent: {str(e)}", e)
-
-    async def _update_agent_load(self, agent_id: str, load: int) -> None:
-        """
-        Update the load counter for an agent in the database.
-
-        Args:
-            agent_id: Unique identifier for the agent
-            load: New load value to set
-        """
-        try:
-            if self.use_async_db and self.async_spanner_client:
-                # Use a threadpool to run the synchronous version for now
-                # In a real implementation, this would use the async Spanner client
-                loop = asyncio.get_event_loop()
-                await loop.run_in_executor(None, self._sync_update_agent_load, agent_id, load)
-            else:
-                # Synchronous update
-                self._sync_update_agent_load(agent_id, load)
-        except Exception as e:
-            logger.error(f"Failed to update agent load: {str(e)}")
-
-    def _sync_update_agent_load(self, agent_id: str, load: int) -> None:
-        """Synchronous version of load update."""
-        with self.database.batch() as batch:
-            batch.update(
-                table="agent_routing_table",
-                columns=("agent_id", "current_load"),
-                values=[(agent_id, load)],
-            )
-
-    @error_boundary(propagate_types=[AgentRoutingError], fallback_value=False)
-    async def register_shadow_agent(self, production_agent_id: str, shadow_agent_id: str) -> bool:
-        """
-        Register a shadow agent for testing a new version alongside a production agent.
-
-        Args:
-            production_agent_id: ID of the production agent
-            shadow_agent_id: ID of the shadow agent to test
-
-        Returns:
-            True if registration successful, False otherwise
-        """
-        try:
-            self.shadow_agents[production_agent_id] = shadow_agent_id
-
-            if self.use_async_db and self.async_spanner_client:
-                # Use a threadpool for now
-                loop = asyncio.get_event_loop()
-                await loop.run_in_executor(
-                    None,
-                    self._sync_register_shadow_agent,
-                    production_agent_id,
-                    shadow_agent_id,
-                )
-            else:
-                self._sync_register_shadow_agent(production_agent_id, shadow_agent_id)
-
-            logger.info(f"Registered shadow agent {shadow_agent_id} for production agent {production_agent_id}")
-            return True
-
-        except Exception as e:
-            logger.error(f"Failed to register shadow agent: {str(e)}", exc_info=True)
-            raise AgentRoutingError("Failed to register shadow agent", e)
-
-    def _sync_register_shadow_agent(self, production_agent_id: str, shadow_agent_id: str) -> None:
-        """Synchronous shadow agent registration."""
-        with self.database.batch() as batch:
-            batch.insert_or_update(
-                table="shadow_testing_table",
-                columns=("production_agent_id", "shadow_agent_id"),
-                values=[(production_agent_id, shadow_agent_id)],
-            )
-
-    @error_boundary(propagate_types=[AgentRoutingError], fallback_value=False)
-    async def remove_shadow_agent(self, production_agent_id: str) -> bool:
-        """
-        Remove a shadow agent mapping.
-
-        Args:
-            production_agent_id: ID of the production agent
-
-        Returns:
-            True if removal successful, False otherwise
-        """
-        try:
-            if production_agent_id in self.shadow_agents:
-                del self.shadow_agents[production_agent_id]
-
-                if self.use_async_db and self.async_spanner_client:
-                    # Use a threadpool for now
-                    loop = asyncio.get_event_loop()
-                    await loop.run_in_executor(None, self._sync_remove_shadow_agent, production_agent_id)
-                else:
-                    self._sync_remove_shadow_agent(production_agent_id)
-
-                logger.info(f"Removed shadow agent mapping for production agent {production_agent_id}")
-            return True
-
-        except Exception as e:
-            logger.error(f"Failed to remove shadow agent: {str(e)}", exc_info=True)
-            raise AgentRoutingError("Failed to remove shadow agent", e)
-
-    def _sync_remove_shadow_agent(self, production_agent_id: str) -> None:
-        """Synchronous shadow agent removal."""
-        with self.database.batch() as batch:
-            batch.delete(
-                table="shadow_testing_table",
-                keyset=spanner.KeySet(keys=[[production_agent_id]]),
-            )
-
-    @error_boundary(propagate_types=[AgentRoutingError], fallback_value=False)
-    async def register_agent(
+        self.enable_shadow_testing = enable_shadow_testing
+        self.agent_registry = {}
+        self.capability_index = {}
+        self.pricing_index = {}
+        self.health_status = {}
+        self.shadow_test_results = {}
+        
+        # Initialize logger
+        self.logger = logger
+
+    def register_agent(
         self,
         agent_id: str,
-        capabilities: List[str] = None,
-        initial_score: float = 0.5,
-        initial_cost: float = 0.05,
-        initial_success_rate: float = 0.9,
-    ) -> bool:
-        """
-        Register a new agent in the routing system.
-
-        Args:
-            agent_id: Unique identifier for the agent
-            capabilities: List of agent capabilities
-            initial_score: Initial capability score for the agent
-            initial_cost: Initial cost per request for the agent
-            initial_success_rate: Initial success rate for the agent
-
-        Returns:
-            True if registration successful, False otherwise
-        """
-        try:
-            # Store agent data in memory
-            self.agent_scores[agent_id] = initial_score
-            self.agent_load[agent_id] = 0
-            self.agent_costs[agent_id] = initial_cost
-            self.agent_success_rates[agent_id] = initial_success_rate
-
-            # Initialize capabilities
-            if capabilities:
-                self.agent_capabilities[agent_id] = capabilities
-            else:
-                self.agent_capabilities[agent_id] = []
-
-            # Convert capabilities to string for storage
-            capabilities_str = ",".join(self.agent_capabilities[agent_id])
-
-            # Store in Spanner
-            if self.use_async_db and self.async_spanner_client:
-                # Use a threadpool for now
-                loop = asyncio.get_event_loop()
-                await loop.run_in_executor(
-                    None,
-                    self._sync_register_agent,
-                    agent_id,
-                    capabilities_str,
-                    initial_score,
-                    initial_cost,
-                    initial_success_rate,
-                )
-            else:
-                self._sync_register_agent(
-                    agent_id,
-                    capabilities_str,
-                    initial_score,
-                    initial_cost,
-                    initial_success_rate,
-                )
-
-            logger.info(
-                f"Registered new agent {agent_id} in routing system with {len(capabilities or [])} capabilities"
-            )
-            return True
-
-        except Exception as e:
-            logger.error(f"Failed to register agent: {str(e)}", exc_info=True)
-            raise AgentRoutingError("Failed to register agent", e)
-
-    def _sync_register_agent(
-        self,
-        agent_id: str,
-        capabilities_str: str,
-        score: float,
-        cost: float,
-        success_rate: float,
+        capabilities: List[str],
+        pricing_tier: str = "standard",
+        max_tokens_per_min: int = 100000,
+        max_requests_per_min: int = 1000,
+        is_shadow: bool = False,
     ) -> None:
-        """Synchronous agent registration."""
-        with self.database.batch() as batch:
-            batch.insert_or_update(
-                table="agent_routing_table",
-                columns=(
-                    "agent_id",
-                    "capability_score",
-                    "current_load",
-                    "cost_per_request",
-                    "capabilities",
-                    "success_rate",
-                ),
-                values=[(agent_id, score, 0, cost, capabilities_str, success_rate)],
+        """
+        Register an agent with the router.
+        
+        Args:
+            agent_id: Unique identifier for the agent
+            capabilities: List of capabilities the agent supports
+            pricing_tier: Pricing tier (economy, standard, premium)
+            max_tokens_per_min: Maximum tokens per minute
+            max_requests_per_min: Maximum requests per minute
+            is_shadow: Whether this is a shadow test agent
+        """
+        self.agent_registry[agent_id] = {
+            "capabilities": capabilities,
+            "pricing_tier": pricing_tier,
+            "max_tokens_per_min": max_tokens_per_min,
+            "max_requests_per_min": max_requests_per_min,
+            "current_tokens_per_min": 0,
+            "current_requests_per_min": 0,
+            "last_reset": time.time(),
+            "is_shadow": is_shadow,
+        }
+        
+        # Update capability index
+        for capability in capabilities:
+            if capability not in self.capability_index:
+                self.capability_index[capability] = []
+            self.capability_index[capability].append(agent_id)
+        
+        # Update pricing index
+        if pricing_tier not in self.pricing_index:
+            self.pricing_index[pricing_tier] = []
+        self.pricing_index[pricing_tier].append(agent_id)
+        
+        # Initialize health status
+        self.health_status[agent_id] = {
+            "status": "healthy",
+            "last_check": time.time(),
+            "error_count": 0,
+            "latency_ms": 0,
+        }
+        
+        self.logger.info(f"Agent {agent_id} registered with capabilities: {capabilities}")
+    
+    def route_request(
+        self,
+        required_capability: str,
+        request_data: Dict,
+        pricing_preference: Optional[str] = None,
+        strategy: str = "balanced",
+    ) -> Tuple[str, Dict]:
+        """
+        Route a request to the appropriate agent.
+        
+        Args:
+            required_capability: The capability required for this request
+            request_data: The request data to be processed
+            pricing_preference: Preferred pricing tier (economy, standard, premium)
+            strategy: Routing strategy (balanced, cost, performance)
+            
+        Returns:
+            Tuple of (agent_id, modified_request_data)
+        """
+        # Reset rate limits if needed
+        self._reset_rate_limits_if_needed()
+        
+        # Get candidate agents
+        candidates = self._get_candidate_agents(required_capability, pricing_preference)
+        
+        if not candidates:
+            raise ValueError(f"No agents available with capability: {required_capability}")
+        
+        # Apply routing strategy
+        if strategy == "balanced":
+            agent_id = self._apply_balanced_strategy(candidates)
+        elif strategy == "cost":
+            agent_id = self._apply_cost_strategy(candidates)
+        elif strategy == "performance":
+            agent_id = self._apply_performance_strategy(candidates)
+        else:
+            raise ValueError(f"Unknown routing strategy: {strategy}")
+        
+        # Update rate limiting counters
+        self._update_rate_limits(agent_id, request_data)
+        
+        # Check if shadow testing is enabled
+        shadow_agent_id = None
+        if self.enable_shadow_testing:
+            shadow_agent_id = self._select_shadow_agent(required_capability, agent_id)
+            
+            if shadow_agent_id:
+                # Clone request for shadow testing
+                shadow_request = request_data.copy()
+                shadow_request["_shadow_test"] = True
+                shadow_request["_production_agent_id"] = agent_id
+                
+                # Execute shadow test asynchronously
+                self._execute_shadow_test(shadow_agent_id, shadow_request)
+        
+        # Log routing decision
+        self.logger.info(
+            f"Routing request to agent {agent_id} for capability {required_capability} "
+            f"using {strategy} strategy"
+        )
+        if shadow_agent_id:
+            self.logger.info(f"Shadow testing with agent {shadow_agent_id}")
+        
+        return agent_id, request_data
+    
+    def _get_candidate_agents(
+        self, required_capability: str, pricing_preference: Optional[str]
+    ) -> List[str]:
+        """Get candidate agents based on capability and pricing preference."""
+        # Filter by capability
+        if required_capability not in self.capability_index:
+            return []
+        
+        candidates = self.capability_index[required_capability].copy()
+        
+        # Filter by health status
+        candidates = [
+            agent_id for agent_id in candidates
+            if self.health_status[agent_id]["status"] == "healthy"
+        ]
+        
+        # Filter by pricing preference if specified
+        if pricing_preference and pricing_preference in self.pricing_index:
+            pricing_candidates = self.pricing_index[pricing_preference]
+            candidates = [
+                agent_id for agent_id in candidates
+                if agent_id in pricing_candidates
+            ]
+        
+        # Filter by rate limits
+        candidates = [
+            agent_id for agent_id in candidates
+            if self._check_rate_limits(agent_id)
+        ]
+        
+        # Filter out shadow agents for production traffic
+        candidates = [
+            agent_id for agent_id in candidates
+            if not self.agent_registry[agent_id].get("is_shadow", False)
+        ]
+        
+        return candidates
+    
+    def _check_rate_limits(self, agent_id: str) -> bool:
+        """Check if an agent is within its rate limits."""
+        agent = self.agent_registry[agent_id]
+        
+        # Check token rate limit
+        if agent["current_tokens_per_min"] >= agent["max_tokens_per_min"]:
+            return False
+        
+        # Check request rate limit
+        if agent["current_requests_per_min"] >= agent["max_requests_per_min"]:
+            return False
+        
+        return True
+    
+    def _update_rate_limits(self, agent_id: str, request_data: Dict) -> None:
+        """Update rate limiting counters for an agent."""
+        agent = self.agent_registry[agent_id]
+        
+        # Estimate token count from request data
+        estimated_tokens = self._estimate_token_count(request_data)
+        
+        # Update counters
+        agent["current_tokens_per_min"] += estimated_tokens
+        agent["current_requests_per_min"] += 1
+    
+    def _reset_rate_limits_if_needed(self) -> None:
+        """Reset rate limits if the minute window has passed."""
+        current_time = time.time()
+        
+        for agent_id, agent in self.agent_registry.items():
+            # Reset if more than 60 seconds have passed
+            if current_time - agent["last_reset"] > 60:
+                agent["current_tokens_per_min"] = 0
+                agent["current_requests_per_min"] = 0
+                agent["last_reset"] = current_time
+    
+    def _estimate_token_count(self, request_data: Dict) -> int:
+        """Estimate token count from request data."""
+        # Simple estimation based on JSON string length
+        # In a real implementation, this would use a proper tokenizer
+        json_str = json.dumps(request_data)
+        return len(json_str) // 4  # Rough estimate of tokens
+    
+    def _apply_balanced_strategy(self, candidates: List[str]) -> str:
+        """Apply balanced routing strategy."""
+        # Find agents with lowest current load
+        min_load = float('inf')
+        least_loaded_agents = []
+        
+        for agent_id in candidates:
+            agent = self.agent_registry[agent_id]
+            load = (
+                agent["current_requests_per_min"] / agent["max_requests_per_min"]
+                if agent["max_requests_per_min"] > 0
+                else 0
             )
+            
+            if load < min_load:
+                min_load = load
+                least_loaded_agents = [agent_id]
+            elif load == min_load:
+                least_loaded_agents.append(agent_id)
+        
+        # Randomly select from least loaded agents
+        return random.choice(least_loaded_agents)
+    
+    def _apply_cost_strategy(self, candidates: List[str]) -> str:
+        """Apply cost-optimized routing strategy."""
+        # Group candidates by pricing tier
+        economy = []
+        standard = []
+        premium = []
+        
+        for agent_id in candidates:
+            tier = self.agent_registry[agent_id]["pricing_tier"]
+            if tier == "economy":
+                economy.append(agent_id)
+            elif tier == "standard":
+                standard.append(agent_id)
+            elif tier == "premium":
+                premium.append(agent_id)
+        
+        # Select from lowest cost tier available
+        if economy:
+            return random.choice(economy)
+        elif standard:
+            return random.choice(standard)
+        else:
+            return random.choice(premium)
+    
+    def _apply_performance_strategy(self, candidates: List[str]) -> str:
+        """Apply performance-optimized routing strategy."""
+        # Find agents with lowest latency
+        min_latency = float('inf')
+        fastest_agents = []
+        
+        for agent_id in candidates:
+            latency = self.health_status[agent_id]["latency_ms"]
+            
+            if latency < min_latency:
+                min_latency = latency
+                fastest_agents = [agent_id]
+            elif latency == min_latency:
+                fastest_agents.append(agent_id)
+        
+        # Randomly select from fastest agents
+        return random.choice(fastest_agents)
+    
+    def update_health_status(
+        self, agent_id: str, status: str, latency_ms: int, error: Optional[str] = None
+    ) -> None:
+        """
+        Update the health status of an agent.
+        
+        Args:
+            agent_id: Agent ID
+            status: Status (healthy, degraded, unhealthy)
+            latency_ms: Latency in milliseconds
+            error: Error message if any
+        """
+        if agent_id not in self.health_status:
+            self.logger.warning(f"Attempted to update health for unknown agent: {agent_id}")
+            return
+        
+        self.health_status[agent_id].update({
+            "status": status,
+            "last_check": time.time(),
+            "latency_ms": latency_ms,
+        })
+        
+        if error:
+            self.health_status[agent_id]["last_error"] = error
+            self.health_status[agent_id]["error_count"] += 1
+        else:
+            self.health_status[agent_id]["error_count"] = 0
+        
+        self.logger.info(f"Updated health status for agent {agent_id}: {status}")
+    
+    def _select_shadow_agent(self, capability: str, production_agent_id: str) -> Optional[str]:
+        """Select an agent for shadow testing."""
+        if not self.enable_shadow_testing:
+            return None
+        
+        # Get all shadow agents with the required capability
+        shadow_candidates = [
+            agent_id for agent_id in self.capability_index.get(capability, [])
+            if agent_id != production_agent_id
+            and self.agent_registry[agent_id].get("is_shadow", False)
+            and self.health_status[agent_id]["status"] == "healthy"
+        ]
+        
+        if not shadow_candidates:
+            return None
+        
+        # Select a shadow agent (randomly for now)
+        return random.choice(shadow_candidates)
+    
+    def _execute_shadow_test(self, shadow_agent_id: str, shadow_request: Dict) -> None:
+        """Execute a shadow test (in a real implementation, this would be async)."""
+        # In a real implementation, this would execute asynchronously
+        # For now, just log that we would execute it
+        test_id = str(uuid.uuid4())
+        self.logger.info(
+            f"Would execute shadow test {test_id} with agent {shadow_agent_id}"
+        )
+        
+        # Record shadow test in results
+        self.shadow_test_results[test_id] = {
+            "shadow_agent_id": shadow_agent_id,
+            "production_agent_id": shadow_request["_production_agent_id"],
+            "request": shadow_request,
+            "status": "pending",
+            "timestamp": datetime.datetime.now().isoformat(),
+        }
+    
+    def record_shadow_test_result(
+        self, test_id: str, shadow_result: Dict, production_result: Dict
+    ) -> None:
+        """
+        Record the result of a shadow test.
+        
+        Args:
+            test_id: Shadow test ID
+            shadow_result: Result from shadow agent
+            production_result: Result from production agent
+        """
+        if test_id not in self.shadow_test_results:
+            self.logger.warning(f"Unknown shadow test ID: {test_id}")
+            return
+        
+        # Calculate result hash for comparison
+        shadow_hash = self._hash_result(shadow_result)
+        production_hash = self._hash_result(production_result)
+        match = shadow_hash == production_hash
+        
+        # Update shadow test record
+        self.shadow_test_results[test_id].update({
+            "shadow_result": shadow_result,
+            "production_result": production_result,
+            "shadow_hash": shadow_hash,
+            "production_hash": production_hash,
+            "match": match,
+            "status": "completed",
+            "completed_at": datetime.datetime.now().isoformat(),
+        })
+        
+        # Log result
+        self._log_shadow_test_result(test_id, match)
+    
+    def _hash_result(self, result: Dict) -> str:
+        """Create a deterministic hash of a result for comparison."""
+        # Sort keys to ensure deterministic serialization
+        result_json = json.dumps(result, sort_keys=True)
+        return hashlib.sha256(result_json.encode()).hexdigest()
+    
+    def _log_shadow_test_result(self, test_id: str, match: bool) -> None:
+        """Log shadow test result to database and logs."""
+        test_data = self.shadow_test_results[test_id]
+        shadow_agent_id = test_data["shadow_agent_id"]
+        production_agent_id = test_data["production_agent_id"]
+        
+        if match:
+            self.logger.info(
+                f"Shadow test {test_id} MATCH: Shadow agent {shadow_agent_id} "
+                f"matches production agent {production_agent_id}"
+            )
+        else:
+            self.logger.warning(
+                f"Shadow test {test_id} MISMATCH: Shadow agent {shadow_agent_id} "
+                f"differs from production agent {production_agent_id}"
+            )
+        
+        # In a real implementation, this would store the result in a database
+        pass
+    
+    def get_agent_stats(self, agent_id: str) -> Dict:
+        """Get statistics for an agent."""
+        if agent_id not in self.agent_registry:
+            raise ValueError(f"Unknown agent ID: {agent_id}")
+        
+        agent = self.agent_registry[agent_id]
+        health = self.health_status[agent_id]
+        
+        return {
+            "agent_id": agent_id,
+            "capabilities": agent["capabilities"],
+            "pricing_tier": agent["pricing_tier"],
+            "health_status": health["status"],
+            "latency_ms": health["latency_ms"],
+            "error_count": health["error_count"],
+            "current_load": {
+                "tokens_per_min": agent["current_tokens_per_min"],
+                "requests_per_min": agent["current_requests_per_min"],
+            },
+            "capacity": {
+                "tokens_per_min": agent["max_tokens_per_min"],
+                "requests_per_min": agent["max_requests_per_min"],
+            },
+        }

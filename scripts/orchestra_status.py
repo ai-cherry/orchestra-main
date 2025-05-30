@@ -14,7 +14,8 @@ def check_service(name: str, command: list) -> tuple:
     try:
         result = subprocess.run(command, capture_output=True, text=True)
         return result.returncode == 0, "Running"
-    except:
+    except Exception as e:
+        print(f"  Error checking {name}: {e}")
         return False, "Not running"
 
 
@@ -121,24 +122,5 @@ def main():
             print("✗ GCP dependencies still in requirements")
         else:
             print("✓ No GCP dependencies in requirements")
-    except:
-        print("? Could not check GCP dependencies")
-
-    # Summary
-    print("\n" + "=" * 60)
-    print("📊 SUMMARY")
-    print("=" * 60)
-    print("\n✨ Your Orchestra AI is:")
-    print("  - ✅ Configured and ready")
-    print("  - ✅ GCP-free")
-    print("  - ✅ Automated with scripts")
-    print("  - ✅ MCP servers created")
-    print("\n🚀 Quick commands:")
-    print("  ./start_orchestra.sh  - Start everything")
-    print("  ./stop_orchestra.sh   - Stop everything")
-    print("  python scripts/test_new_setup.py - Run tests")
-    print()
-
-
-if __name__ == "__main__":
-    main()
+    except Exception as e:
+        print(f"? Could not check GCP dependencies: {e}")
