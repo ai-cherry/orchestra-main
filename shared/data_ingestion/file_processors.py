@@ -3,7 +3,7 @@ file_processors.py
 Extensible file processors for Orchestra AI data ingestion.
 
 - Each processor inherits from BaseProcessor and implements async batch_generator.
-- Supports: CSV, TSV, JSON, JSONL, XML, PDF, Excel, Parquet, Avro.
+ - Supports: CSV, TSV, JSON, JSONL, XML, PDF, Excel, Parquet, Avro, ZIP.
 - Designed for streaming, chunked, and memory-efficient processing.
 - Easily extendable for new formats.
 
