@@ -2,7 +2,7 @@
 
 ## 1. Project Overview
 
-The goal of this project was to create, clean up, and establish a deployment pipeline for a world-class Admin UI for the Cherry-AI platform. This involved inventory of existing assets, designing a new architecture, implementing key UI pages and features, and setting up a robust CI/CD pipeline for deployment to DigitalOcean.
+The goal of this project was to create, clean up, and establish a deployment pipeline for a world-class Admin UI for the Cherry-AI platform. This involved inventory of existing assets, designing a new architecture, implementing key UI pages and features, and setting up a robust CI/CD pipeline for deployment to a Vultr host.
 
 ## 2. Key Decisions & Achievements
 
@@ -35,8 +35,8 @@ The goal of this project was to create, clean up, and establish a deployment pip
 ### 2.3. CI/CD Pipeline & Deployment
 *   **Workflow File**: `.github/workflows/deploy.yaml` was significantly updated.
 *   **Build & Test**: The workflow now builds and tests the `admin-ui` (lint, unit tests, E2E tests).
-*   **Deployment Target**: DigitalOcean.
-*   **Pulumi**: The `infra/do_superagi_stack.py` Pulumi script was updated to deploy the `admin-ui` static assets to DigitalOcean App Platform.
+*   **Deployment Target**: Vultr bare-metal server.
+*   **Pulumi**: The `infra/vultr_server_component.py` component provisions the server and copies the `admin-ui` static assets.
 *   **Environments & Promotion:**
     *   `dev` environment: Deployed automatically on pushes to `main` (excluding tags).
     *   `prod` environment: Deployed via manual `workflow_dispatch` or on version tag pushes. This deployment targets a "production" GitHub Environment, enabling manual approval workflows.
