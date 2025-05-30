@@ -18,6 +18,14 @@ We have identified duplication in deployment scripts. **DO NOT** create new depl
 ENVIRONMENT=prod ./scripts/deploy_orchestra.sh
 ```
 
+### 2. `deploy/deploy_stack.sh` - Single-node Vultr stack
+Use this script on the Vultr server to run the unified Docker Compose stack.
+
+```bash
+cp deploy/.env.compose.example deploy/.env.compose
+./deploy/deploy_stack.sh
+```
+
 ### 2. `deploy_with_managed_services.sh` - Quick Deployment with Managed DBs
 **Purpose**: Deploy to existing cluster using managed database services
 **Use This For**:

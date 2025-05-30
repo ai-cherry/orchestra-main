@@ -1,0 +1,74 @@
+version: '3.8'
+services:
+  weaviate:
+    image: semitechnologies/weaviate:1.30
+    restart: always
+    environment:
+      - QUERY_DEFAULT_ACORN_ENABLED=true
+    ports:
+      - "8080:8080"
+    volumes:
+      - weaviate-data:/var/lib/weaviate
+
+  postgres:
+    image: postgres:16
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+
+  orchestrator:
+    build: ../core
+    environment:
+      - POSTGRES_DSN=${POSTGRES_DSN}
+      - WEAVIATE_URL=http://weaviate:8080
+    depends_on:
+      - postgres
+      - weaviate
+    ports:
+      - "8000:8000"
+
+  mcp:
+    build: ../mcp_server
+    environment:
+      - POSTGRES_DSN=${POSTGRES_DSN}
+      - WEAVIATE_URL=http://weaviate:8080
+    depends_on:
+      - postgres
+      - weaviate
+    ports:
+      - "9000:9000"
+
+  langfuse:
+    image: ghcr.io/langfuse/langfuse:latest
+    environment:
+      - DATABASE_URL=${POSTGRES_DSN}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+
+  redis:
+    image: docker.dragonflydb.io/dragonflydb/dragonfly:v1.5
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    deploy:
+      replicas: 0
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  weaviate-data:
+    driver: local
+  pg-data:
+    driver: local
+  redis-data:
+    driver: local
