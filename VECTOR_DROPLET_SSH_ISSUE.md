@@ -1,14 +1,14 @@
-# Vector Droplet SSH Configuration Issue
+# Vector Droplet SSH Configuration Issue (Legacy)
 
-## Current Status
+## Current Status (2019 legacy notes)
 - ✅ **App Droplet (159.65.79.26)**: SSH key successfully added, accessible
 - ❌ **Vector Droplet (68.183.170.81)**: Password authentication disabled, requires manual intervention
 
 ## Quick Solution
 
-### Option 1: Use DigitalOcean Console (Recommended)
-1. Log into [DigitalOcean Control Panel](https://cloud.digitalocean.com)
-2. Find droplet: `superagi-dev-sfo2-01`
+### Option 1: Use the provider console (legacy)
+1. Log into the DigitalOcean control panel (used before migrating to Vultr)
+2. Find the old droplet: `superagi-dev-sfo2-01`
 3. Click "Access" → "Launch Droplet Console"
 4. In the browser console, run:
 ```bash
@@ -22,7 +22,7 @@ From the DigitalOcean console:
 sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
 systemctl restart sshd
 
-# Then from Paperspace, run:
+# Then from the old Paperspace VM, run (legacy):
 sshpass -p 'xTD.8HBd?-+Bib' ssh root@68.183.170.81 "echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICq38OXXQVPAqVHzP99JvpDJBw+Myl8kItDGXOrurNYB paperspace@ai-cherry-orchestra' >> ~/.ssh/authorized_keys"
 
 # Disable password auth again

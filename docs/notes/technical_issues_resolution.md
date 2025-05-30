@@ -73,8 +73,8 @@ The repository has a pre-commit hook configured to run Gemini code analysis on P
 
        Args:
            files_content: Dictionary mapping file paths to content
-           project_id: GCP project ID
-           location: GCP region
+           project_id: project ID (legacy GCP example)
+           location: region name
 
        Returns:
            Analysis results

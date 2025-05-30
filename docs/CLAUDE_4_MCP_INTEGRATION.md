@@ -83,7 +83,7 @@ Claude can now use these tools:
 #### Orchestration
 
 - `switch_mode` - Change agent operational mode
-- `run_workflow` - Execute predefined workflows
+ - `execute` - Execute predefined workflows
 - `execute_task` - Run specific tasks
 - `get_status` - Get orchestrator status
 
@@ -130,7 +130,7 @@ Claude, run the code review workflow on the current changes
 Claude will use:
 
 ```python
-run_workflow(
+execute(
     name="code_review",
     params={"branch": "main", "files": ["*.py"]}
 )

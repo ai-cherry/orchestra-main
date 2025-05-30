@@ -65,4 +65,4 @@ EXPOSE 8080
 
 # Start the app with uvicorn (FastAPI ASGI server)
 # exec ensures uvicorn replaces the shell, correctly handling signals
-CMD exec uvicorn app:app --host 0.0.0.0 --port ${PORT:-8080}
+CMD ["gunicorn", "core.orchestrator.src.api.app:app", "-k", "uvicorn.workers.UvicornWorker", "-w", "4", "-b", "0.0.0.0:8000", "--graceful-timeout", "30"]

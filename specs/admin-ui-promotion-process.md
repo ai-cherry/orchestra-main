@@ -8,9 +8,9 @@ This document outlines the process for promoting the Admin UI to the production 
 *   **Environments:**
     *   `dev`: Deployed automatically on pushes to the `main` branch (excluding version tags). This serves as the staging/testing environment.
     *   `prod`: Deployed on pushing a version tag (e.g., `v1.0.0`, `v1.0.1`) or via manual `workflow_dispatch`. This deployment targets a GitHub "production" environment, which should be configured with required reviewers for manual approval.
-*   **Deployment Tool:** Pulumi is used for infrastructure and application deployment to DigitalOcean.
-*   **Admin UI Hosting:** The Admin UI is deployed as a static site on DigitalOcean App Platform.
-*   **Backend Services (e.g., SuperAGI):** Deployed as Docker containers on a DigitalOcean Droplet.
+*   **Deployment Tool:** Pulumi is used for infrastructure and application deployment to the Vultr server.
+*   **Admin UI Hosting:** The Admin UI files are served by Nginx on the Vultr host.
+*   **Backend Services (e.g., SuperAGI):** Deployed as Docker containers on the same Vultr instance.
 
 ## Promotion Process to Production
 
@@ -33,7 +33,7 @@ This document outlines the process for promoting the Admin UI to the production 
 5.  **Production Deployment Execution:**
     *   Upon approval (if configured), the `deploy-to-prod` job proceeds.
     *   It uses the same build artifact (`admin-ui-dist`) that was tested for the `dev` deployment.
-    *   Pulumi selects the `prod` stack and deploys the Admin UI and any other infrastructure changes to the production environment on DigitalOcean.
+    *   Pulumi selects the `prod` stack and deploys the Admin UI and any other infrastructure changes to the production environment on the Vultr server.
 
 6.  **Post-Production Verification:**
     *   The production URL (provided by Pulumi output `admin_ui_live_url` for the `prod` stack) is tested again (e.g., a subset of smoke tests).
@@ -41,15 +41,15 @@ This document outlines the process for promoting the Admin UI to the production 
 
 ## Zero-Downtime Rollout Considerations
 
-*   **Admin UI (DigitalOcean App Platform):**
-    *   DigitalOcean App Platform typically handles zero-downtime deployments for static sites and other app components by default. When a new version is deployed, App Platform provisions the new version and seamlessly switches traffic once the new version is healthy and passes any configured health checks. This ensures no downtime for users accessing the Admin UI.
+*   **Admin UI (Vultr host):**
+    *   Nginx serves the static files. Docker Compose performs an in-place upgrade with minimal downtime.
 
 *   **Backend Services (e.g., SuperAGI on Droplet):**
     *   The current Pulumi script (`infra/do_superagi_stack.py`) deploys the SuperAGI Docker container to a single Droplet. This setup does **not** inherently support zero-downtime rollouts for the SuperAGI service itself.
     *   To achieve zero-downtime for backend services, a more advanced setup would be required, such as:
         *   **Blue/Green Deployments:** Provisioning a second Droplet (or set of Droplets) with the new version, testing it, and then switching traffic at a load balancer level.
         *   **Rolling Updates:** If using an orchestrator like Kubernetes or Docker Swarm on multiple Droplets, performing rolling updates.
-        *   **Load Balancers:** Introducing a DigitalOcean Load Balancer to distribute traffic if multiple backend instances are used.
+        *   **Load Balancers:** Consider introducing a Vultr Load Balancer if multiple backend instances are used.
     *   These backend zero-downtime strategies are significant infrastructure changes and are currently out of scope for the Admin UI deployment but should be considered for overall platform reliability.
 
 ## Rollback Strategy
@@ -58,4 +58,4 @@ This document outlines the process for promoting the Admin UI to the production 
 *   **Pulumi:** Pulumi state history allows for inspecting previous configurations. A rollback can be performed by checking out a previous Git commit (that contains the desired infrastructure code) and running `pulumi up` again, or by using Pulumi's explicit rollback features if available for specific changes.
 *   **Backend Services:** Rollback involves redeploying a previous Docker image version for SuperAGI.
 
-This process ensures that production deployments are intentional, approved, and leverage the zero-downtime capabilities of DigitalOcean App Platform for the Admin UI.
+This process ensures that production deployments are intentional, approved, and leverage Nginx on Vultr for near zero downtime.
