@@ -5,8 +5,8 @@
 set -e
 
 # Configuration
-VECTOR_IP="68.183.170.81"  # superagi-dev-sfo2-01
-APP_IP="159.65.79.26"      # ubuntu-s-2vcpu-8gb-160gb-intel-sfo2-01
+VECTOR_IP="${VECTOR_IP}"  # provided via Pulumi output
+APP_IP="${APP_IP}"        # provided via Pulumi output
 SSH_KEY_PATH="~/.ssh/id_ed25519"  # Updated to use existing key
 
 echo "🚀 Setting up DigitalOcean development environment..."
