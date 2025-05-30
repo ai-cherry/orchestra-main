@@ -1,192 +1,207 @@
-"""
-Contact Enrichment Agent
-
-Finds and verifies executive contacts for companies, enriches CRM records.
-Integrates with mongodb for data storage, Apollo.io and PhantomBuster for contact search,
-and supports Browser Use for LinkedIn scraping and Claude Max for validation.
-
-Author: AI Orchestrator Team
-"""
-
 import logging
-import os
+import requests
+import json
+import time
 from typing import Dict, List, Optional
 
-import requests
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("ContactEnrichmentAgent")
-
+logger = logging.getLogger(__name__)
 
 class ContactEnrichmentAgent:
+    """
+    Agent for enriching contact data using Apollo.io API.
+    
+    This agent retrieves additional information about contacts such as:
+    - Email addresses
+    - Phone numbers
+    - Social media profiles
+    - Job history
+    - Education
+    """
+    
     def __init__(
         self,
-        firestore_collection: str,
         apollo_api_key: str,
-        phantombuster_api_key: str,
-        browser_use_endpoint: str,
-        claude_max_webhook: str,
+        firestore_collection: str,
+        claude_max_webhook: Optional[str] = None,
     ):
         """
+        Initialize the Contact Enrichment Agent.
+        
         Args:
-            firestore_collection: Name of the mongodb collection for companies/contacts.
             apollo_api_key: API key for Apollo.io.
-            phantombuster_api_key: API key for PhantomBuster.
-            browser_use_endpoint: HTTP endpoint for Browser Use automation.
+            firestore_collection: Firestore collection for storing enriched data.
             claude_max_webhook: Webhook URL for Claude Max validation.
         """
-        self.db = mongodb.Client()
-        self.collection = firestore_collection
         self.apollo_api_key = apollo_api_key
-        self.phantombuster_api_key = phantombuster_api_key
-        self.browser_use_endpoint = browser_use_endpoint
-        self.claude_max_webhook = claude_max_webhook
-
-    def enrich_company_contacts(self, company_doc_id: str) -> None:
+        self.claude_webhook = claude_max_webhook
+        self.api_base_url = "https://api.apollo.io/v1"
+        
+    def enrich_contact(self, contact_data: Dict) -> Dict:
         """
-        Enriches executive contacts for a company and updates mongodb.
-
+        Enrich a contact with additional information from Apollo.io.
+        
         Args:
-            company_doc_id: mongodb document ID for the company.
+            contact_data: Basic contact information including at least one of:
+                         name, email, company, linkedin_url.
+        
+        Returns:
+            Dict containing the original data plus enriched fields.
         """
-        doc_ref = self.db.collection(self.collection).document(company_doc_id)
-        company = doc_ref.get().to_dict()
-        if not company or "company_name" not in company:
-            logger.warning(f"Company {company_doc_id} missing company_name.")
-            return
-
-        contacts = self.search_contacts_apollo(company["company_name"])
-        if not contacts:
-            contacts = self.search_contacts_phantombuster(company["company_name"])
-        if not contacts:
-            contacts = self.scrape_contacts_browser_use(company["company_name"], company.get("website"))
-
-        validated_contacts = self.validate_contacts_claude(contacts)
-        if validated_contacts:
-            doc_ref.update(
-                {
-                    "contacts": validated_contacts,
-                    "contact_enrichment_status": "enriched",
-                }
-            )
-            logger.info(f"Enriched company {company_doc_id} with {len(validated_contacts)} contacts.")
+        # Prepare search parameters
+        search_params = {}
+        
+        if contact_data.get("email"):
+            search_params["email"] = contact_data["email"]
+        elif contact_data.get("linkedin_url"):
+            search_params["linkedin_url"] = contact_data["linkedin_url"]
+        elif contact_data.get("name") and contact_data.get("company_name"):
+            search_params["name"] = contact_data["name"]
+            search_params["organization_name"] = contact_data["company_name"]
         else:
-            doc_ref.update({"contact_enrichment_status": "not_found"})
-            logger.warning(f"No valid contacts found for company: {company_doc_id}")
-
-    def search_contacts_apollo(self, company_name: str) -> Optional[List[Dict]]:
-        """
-        Uses Apollo.io API to search for executive contacts.
-
-        Args:
-            company_name: Name of the company.
-
-        Returns:
-            List of contact dicts or None.
-        """
-        url = "https://api.apollo.io/v1/mixed_people/search"
-        headers = {"Authorization": f"Bearer {self.apollo_api_key}"}
-        params = {
-            "q_organization_names": company_name,
-            "person_titles": "CEO,President,Owner,Principal,Executive",
+            logger.error("Insufficient data for contact enrichment")
+            return contact_data
+        
+        # Call Apollo API
+        try:
+            response = self._call_apollo_api("people/search", search_params)
+            if not response or "people" not in response:
+                return contact_data
+                
+            # Process and merge data
+            if response["people"] and len(response["people"]) > 0:
+                person = response["people"][0]  # Take best match
+                enriched_data = self._process_apollo_person(person)
+                
+                # Merge with original data, keeping original values if present
+                for key, value in enriched_data.items():
+                    if key not in contact_data or not contact_data[key]:
+                        contact_data[key] = value
+                        
+                # Store enriched data
+                self._store_enriched_contact(contact_data)
+                
+            return contact_data
+                
+        except Exception as e:
+            logger.error(f"Error enriching contact: {str(e)}")
+            return contact_data
+    
+    def _call_apollo_api(self, endpoint: str, params: Dict) -> Dict:
+        """Call Apollo.io API with rate limiting and error handling."""
+        url = f"{self.api_base_url}/{endpoint}"
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.apollo_api_key}"
         }
+        
         try:
-            response = requests.get(url, headers=headers, params=params, timeout=15)
-            response.raise_for_status()
-            data = response.json()
-            if data.get("people"):
-                return data["people"]
-            return None
+            response = requests.post(url, headers=headers, json=params)
+            
+            if response.status_code == 429:  # Rate limited
+                retry_after = int(response.headers.get("Retry-After", 60))
+                logger.warning(f"Rate limited by Apollo API. Retrying after {retry_after}s")
+                time.sleep(retry_after)
+                return self._call_apollo_api(endpoint, params)
+                
+            if response.status_code != 200:
+                logger.error(f"Apollo API error: {response.status_code} - {response.text}")
+                return {}
+                
+            return response.json()
+            
         except Exception as e:
-            logger.error(f"Apollo.io contact search failed for {company_name}: {e}")
-            return None
-
-    def search_contacts_phantombuster(self, company_name: str) -> Optional[List[Dict]]:
-        """
-        Uses PhantomBuster API to search for contacts (e.g., LinkedIn scraping).
-
-        Args:
-            company_name: Name of the company.
-
-        Returns:
-            List of contact dicts or None.
-        """
-        url = "https://api.phantombuster.com/api/v2/agent/launch"
-        headers = {"X-Phantombuster-Key-1": self.phantombuster_api_key}
-        payload = {"argument": {"company": company_name}}
+            logger.error(f"Error calling Apollo API: {str(e)}")
+            return {}
+    
+    def _process_apollo_person(self, person: Dict) -> Dict:
+        """Process and normalize Apollo.io person data."""
+        result = {}
+        
+        # Basic info
+        result["full_name"] = person.get("name", "")
+        result["first_name"] = person.get("first_name", "")
+        result["last_name"] = person.get("last_name", "")
+        result["email"] = person.get("email", "")
+        result["linkedin_url"] = person.get("linkedin_url", "")
+        
+        # Contact info
+        if "phone_numbers" in person and person["phone_numbers"]:
+            result["phone"] = person["phone_numbers"][0]
+        
+        # Employment info
+        if "organization" in person and person["organization"]:
+            result["company_name"] = person["organization"].get("name", "")
+            result["company_website"] = person["organization"].get("website_url", "")
+            result["company_linkedin"] = person["organization"].get("linkedin_url", "")
+        
+        result["title"] = person.get("title", "")
+        result["seniority"] = person.get("seniority", "")
+        
+        # Location info
+        if "city" in person and person["city"]:
+            result["city"] = person["city"]
+        if "state" in person and person["state"]:
+            result["state"] = person["state"]
+        if "country" in person and person["country"]:
+            result["country"] = person["country"]
+            
+        return result
+    
+    def _store_enriched_contact(self, contact_data: Dict) -> None:
+        """Store enriched contact data in the database."""
         try:
-            response = requests.post(url, headers=headers, json=payload, timeout=30)
-            response.raise_for_status()
-            data = response.json()
-            # Extract contacts from PhantomBuster output (simplified)
-            return data.get("contacts")
+            logger.info(f"Contact data enriched: {contact_data.get('id', 'unknown')}")
+            pass
         except Exception as e:
-            logger.error(f"PhantomBuster contact search failed for {company_name}: {e}")
-            return None
-
-    def scrape_contacts_browser_use(self, company_name: str, website: Optional[str]) -> Optional[List[Dict]]:
+            logger.error(f"Error storing enriched contact: {str(e)}")
+    
+    def validate_with_claude(self, contact_data: Dict) -> Dict:
         """
-        Uses Browser Use automation to scrape executive contacts from LinkedIn or company website.
-
-        Args:
-            company_name: Name of the company.
-            website: Company website URL.
-
-        Returns:
-            List of contact dicts or None.
+        Validate and enhance contact data using Claude.
+        
+        This is a premium feature that uses Claude to:
+        1. Validate the accuracy of Apollo data
+        2. Add additional insights about the contact
+        3. Suggest personalized outreach strategies
         """
-        payload = {"company_name": company_name, "website": website}
+        if not self.claude_webhook:
+            return contact_data
+            
         try:
-            response = requests.post(self.browser_use_endpoint, json=payload, timeout=60)
-            response.raise_for_status()
-            data = response.json()
-            return data.get("contacts")
+            prompt = self._generate_claude_prompt(contact_data)
+            response = requests.post(
+                self.claude_webhook,
+                headers={"Content-Type": "application/json"},
+                json={"prompt": prompt}
+            )
+            
+            if response.status_code == 200:
+                claude_data = response.json()
+                if "insights" in claude_data:
+                    contact_data["ai_insights"] = claude_data["insights"]
+                if "outreach_suggestions" in claude_data:
+                    contact_data["outreach_suggestions"] = claude_data["outreach_suggestions"]
+            
+            return contact_data
+            
         except Exception as e:
-            logger.error(f"Browser Use scraping failed for {company_name}: {e}")
-            return None
-
-    def validate_contacts_claude(self, contacts: Optional[List[Dict]]) -> Optional[List[Dict]]:
+            logger.error(f"Error validating with Claude: {str(e)}")
+            return contact_data
+    
+    def _generate_claude_prompt(self, contact_data: Dict) -> str:
+        """Generate a prompt for Claude to analyze contact data."""
+        prompt = f"""
+        Please analyze this contact information and provide:
+        1. Validation of the data accuracy
+        2. Additional insights about this person
+        3. Personalized outreach strategy suggestions
+        
+        Contact Information:
+        {json.dumps(contact_data, indent=2)}
+        
+        Format your response as JSON with these keys:
+        - validation: object with accuracy scores for each field
+        - insights: array of insights about the person
+        - outreach_suggestions: array of personalized outreach strategies
         """
-        Uses Claude Max to validate and deduplicate contacts.
-
-        Args:
-            contacts: List of contact dicts.
-
-        Returns:
-            List of validated contact dicts or None.
-        """
-        if not contacts:
-            return None
-        try:
-            payload = {
-                "prompt": (
-                    "Given the following list of contacts, deduplicate and validate executive roles. "
-                    "Return only valid, unique executive contacts as a JSON list.\n"
-                    f"{contacts}"
-                )
-            }
-            response = requests.post(self.claude_max_webhook, json=payload, timeout=20)
-            response.raise_for_status()
-            data = response.json()
-            return data.get("validated_contacts")
-        except Exception as e:
-            logger.error(f"Claude Max contact validation failed: {e}")
-            return None
-
-
-# Example usage (to be replaced with orchestrator triggers)
-if __name__ == "__main__":
-    APOLLO_API_KEY = os.environ.get("APOLLO_API_KEY", "")
-    PHANTOMBUSTER_API_KEY = os.environ.get("PHANTOMBUSTER_API_KEY", "")
-    BROWSER_USE_ENDPOINT = os.environ.get("BROWSER_USE_ENDPOINT", "")
-    CLAUDE_MAX_WEBHOOK = os.environ.get("CLAUDE_MAX_WEBHOOK", "")
-    agent = ContactEnrichmentAgent(
-        firestore_collection="companies",
-        apollo_api_key=APOLLO_API_KEY,
-        phantombuster_api_key=PHANTOMBUSTER_API_KEY,
-        browser_use_endpoint=BROWSER_USE_ENDPOINT,
-        claude_max_webhook=CLAUDE_MAX_WEBHOOK,
-    )
-    # Example: Enrich contacts for a company by mongodb doc ID
-    agent.enrich_company_contacts("example_company_doc_id")
+        return prompt

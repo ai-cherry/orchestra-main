@@ -48,9 +48,9 @@ async def main():
         try:
             with open("gemini.key", "r") as f:
                 gemini_api_key = f.read().strip()
-        except:
+        except FileNotFoundError as e:
             logger.error(
-                "Gemini API key not found. Set GEMINI_API_KEY environment variable or create a gemini.key file."
+                f"Gemini API key file 'gemini.key' not found: {e}. Set GEMINI_API_KEY environment variable or create the file."
             )
             sys.exit(1)
 
@@ -128,44 +128,12 @@ async def main():
             query="Tell me about orchestration",
             limit=5,
         )
-
-        logger.info(f"Retrieved {len(memories)} memories through semantic search")
+        logger.info(f"Retrieved {len(memories)} memories")
         for i, mem in enumerate(memories):
-            logger.info(f"Memory {i+1}: {mem.text_content[:50]}...")
+            logger.info(f"Memory {i+1}: {mem.text_content}")
     except Exception as e:
         logger.error(f"Failed to retrieve memories: {e}")
 
-    # 6. Demonstrate LangChain caching
-    try:
-        logger.info("Testing LangChain caching integration")
-
-        # Example query that would be cached
-        test_query = "How does semantic caching improve agent memory?"
-
-        # The first time would compute embeddings and store in cache
-        result1 = langchain_cache.lookup(test_query)
-
-        if result1:
-            logger.info("Got cached result (unexpected for first query)")
-        else:
-            logger.info("No cache hit for first query (expected)")
-
-            # Simulate storing a result
-            test_result = "Semantic caching improves agent memory by efficiently retrieving similar contexts."
-            langchain_cache.update(test_query, test_result)
-            logger.info("Added result to cache")
-
-            # Try lookup again
-            result2 = langchain_cache.lookup(test_query)
-            if result2:
-                logger.info(f"Cache hit on second try: {result2}")
-            else:
-                logger.info("Still no cache hit (unexpected)")
-    except Exception as e:
-        logger.error(f"Error testing LangChain caching: {e}")
-
-    # Close connections
-    await provider.close()
     logger.info("Redis semantic caching example completed")
 
 

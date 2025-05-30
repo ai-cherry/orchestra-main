@@ -19,6 +19,35 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
+      - name: Verify Secrets Presence
+        run: |
+          echo "::add-mask::${{ secrets.VULTR_API_KEY }}"
+          echo "VULTR_API_KEY present: ${{ secrets.VULTR_API_KEY != '' }}"
+          
+          echo "::add-mask::${{ secrets.PULUMI_ACCESS_TOKEN }}"
+          echo "PULUMI_ACCESS_TOKEN present: ${{ secrets.PULUMI_ACCESS_TOKEN != '' }}"
+          
+          echo "::add-mask::${{ secrets.POSTGRES_PASSWORD }}"
+          echo "POSTGRES_PASSWORD present: ${{ secrets.POSTGRES_PASSWORD != '' }}"
+          
+          echo "::add-mask::${{ secrets.POSTGRES_DSN }}"
+          echo "POSTGRES_DSN present: ${{ secrets.POSTGRES_DSN != '' }}"
+          
+          echo "::add-mask::${{ secrets.JWT_SECRET }}"
+          echo "JWT_SECRET present: ${{ secrets.JWT_SECRET != '' }}"
+          
+          echo "::add-mask::${{ secrets.WEAVIATE_API_KEY }}"
+          echo "WEAVIATE_API_KEY present: ${{ secrets.WEAVIATE_API_KEY != '' }}" # Optional, depending on Weaviate config
+          
+          echo "::add-mask::${{ secrets.OPENAI_API_KEY }}"
+          echo "OPENAI_API_KEY present: ${{ secrets.OPENAI_API_KEY != '' }}"
+          
+          echo "::add-mask::${{ secrets.ANTHROPIC_API_KEY }}"
+          echo "ANTHROPIC_API_KEY present: ${{ secrets.ANTHROPIC_API_KEY != '' }}"
+          
+          echo "::add-mask::${{ secrets.PORTKEY_API_KEY }}"
+          echo "PORTKEY_API_KEY present: ${{ secrets.PORTKEY_API_KEY != '' }}"
+
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
@@ -40,10 +69,10 @@ jobs:
       - name: Run tests (pytest)
         run: pytest -q
 
-      - name: Set up Node.js 18
+      - name: Set up Node.js 20
         uses: actions/setup-node@v3
         with:
-          node-version: "18"
+          node-version: "20"
           cache: "npm"
 
       - name: Install frontend dependencies

@@ -51,7 +51,8 @@ class PerformanceTester:
         # Load Kubernetes config
         try:
             config.load_incluster_config()
-        except:
+        except config.ConfigException as e:
+            logger.warning(f"Could not load Kubernetes config, proceeding with defaults or limited functionality: {e}")
             config.load_kube_config()
 
         self.k8s_v1 = client.CoreV1Api()

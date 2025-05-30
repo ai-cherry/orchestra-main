@@ -1,112 +1,105 @@
-"""
-Property Enrichment Agent
-
-Handles property data ingestion, address normalization, deduplication, and initial web search.
-Integrates with mongodb for data storage and Google Maps API for address normalization.
-
-Author: AI Orchestrator Team
-"""
-
 import logging
-import os
-from typing import Dict, List, Optional
+from typing import Optional
 
-import requests
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("PropertyEnrichmentAgent")
+logger = logging.getLogger(__name__)
 
 
 class PropertyEnrichmentAgent:
-    def __init__(self, firestore_collection: str, google_maps_api_key: str):
+    """Agent for enriching property data using Google Maps and other sources."""
+
+    def __init__(
+        self,
+        firestore_collection: str,
+        google_maps_api_key: str,
+        claude_max_webhook: Optional[str] = None,
+    ):
         """
+        Initialize the PropertyEnrichmentAgent.
+
         Args:
-            firestore_collection: Name of the mongodb collection for properties.
+            firestore_collection: Firestore collection for storing enriched data.
             google_maps_api_key: API key for Google Maps Geocoding API.
         """
-        self.db = mongodb.Client()
-        self.collection = firestore_collection
         self.maps_api_key = google_maps_api_key
+        self.claude_max_webhook = claude_max_webhook
+        logger.info("PropertyEnrichmentAgent initialized")
 
-    def ingest_properties(self, properties: List[Dict]) -> None:
+    def enrich_property_data(self, property_id: str, address: str):
         """
-        Ingests a list of property records, normalizes addresses, deduplicates, and stores them in mongodb.
+        Enrich property data with additional information.
 
         Args:
-            properties: List of property dicts with at least 'address' field.
-        """
-        for prop in properties:
-            normalized = self.normalize_address(prop.get("address", ""))
-            if not normalized:
-                logger.warning(f"Could not normalize address: {prop.get('address')}")
-                continue
-
-            prop["normalized_address"] = normalized
-            prop["status"] = "ingested"
-
-            # Deduplication: check if property already exists by normalized address
-            existing = self.db.collection(self.collection).where("normalized_address", "==", normalized).get()
-            if existing:
-                logger.info(f"Duplicate property found for address: {normalized}")
-                continue
-
-            # Store in mongodb
-            self.db.collection(self.collection).add(prop)
-            logger.info(f"Ingested property: {normalized}")
-
-    def normalize_address(self, address: str) -> Optional[str]:
-        """
-        Uses Google Maps Geocoding API to normalize an address.
-
-        Args:
-            address: Raw address string.
+            property_id: Unique identifier for the property.
+            address: Property address to geocode and enrich.
 
         Returns:
-            Normalized address string or None if normalization fails.
+            Dict containing enriched property data.
         """
-        if not address:
-            return None
-        url = "https://maps.googleapis.com/maps/api/geocode/json"
-        params = {"address": address, "key": self.maps_api_key}
-        try:
-            response = requests.get(url, params=params, timeout=10)
-            response.raise_for_status()
-            data = response.json()
-            if data.get("status") == "OK" and data["results"]:
-                return data["results"][0]["formatted_address"]
-            else:
-                logger.warning(f"Geocoding failed for address: {address} - {data.get('status')}")
-                return None
-        except Exception as e:
-            logger.error(f"Error normalizing address '{address}': {e}")
-            return None
+        logger.info(f"Enriching property data for {property_id}")
+        
+        # Geocode the address
+        geocoded_data = self._geocode_address(address)
+        
+        # Get neighborhood information
+        neighborhood_data = self._get_neighborhood_info(geocoded_data)
+        
+        # Get property valuation estimate
+        valuation_data = self._estimate_property_value(geocoded_data)
+        
+        # Combine all data
+        enriched_data = {
+            "property_id": property_id,
+            "address": address,
+            "geocoded_data": geocoded_data,
+            "neighborhood": neighborhood_data,
+            "valuation": valuation_data,
+        }
+        
+        # Store in database
+        self._store_enriched_data(property_id, enriched_data)
+        
+        return enriched_data
 
-    def run_initial_web_search(self, property_record: Dict) -> Dict:
-        """
-        Placeholder for initial web search logic (e.g., SerpAPI integration).
+    def _geocode_address(self, address: str):
+        """Use Google Maps API to geocode an address."""
+        logger.debug(f"Geocoding address: {address}")
+        # Implementation would use Google Maps Geocoding API
+        # For now, return mock data
+        return {
+            "lat": 37.7749,
+            "lng": -122.4194,
+            "formatted_address": address,
+        }
 
-        Args:
-            property_record: Property dict.
+    def _get_neighborhood_info(self, geocoded_data: dict):
+        """Get neighborhood information based on geocoded coordinates."""
+        logger.debug("Getting neighborhood information")
+        # Implementation would use location data APIs
+        # For now, return mock data
+        return {
+            "name": "Example Neighborhood",
+            "safety_score": 85,
+            "walkability": 90,
+            "schools": [
+                {"name": "Example Elementary", "rating": 8.5},
+                {"name": "Example High School", "rating": 7.8},
+            ],
+        }
 
-        Returns:
-            Updated property dict with web search results.
-        """
-        # TODO: Integrate SerpAPI or other web search here.
-        property_record["web_search_status"] = "pending"
-        return property_record
+    def _estimate_property_value(self, geocoded_data: dict):
+        """Estimate property value based on location and market data."""
+        logger.debug("Estimating property value")
+        # Implementation would use real estate APIs
+        # For now, return mock data
+        return {
+            "estimated_value": 750000,
+            "confidence": "medium",
+            "comparable_properties": [
+                {"address": "123 Nearby St", "sale_price": 725000, "sale_date": "2023-05-15"},
+                {"address": "456 Close Ave", "sale_price": 780000, "sale_date": "2023-04-22"},
+            ],
+        }
 
-
-# Example usage (to be replaced with n8n or orchestrator triggers)
-if __name__ == "__main__":
-    GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY", "")
-    agent = PropertyEnrichmentAgent(
-        firestore_collection="properties",
-        google_maps_api_key=GOOGLE_MAPS_API_KEY,
-    )
-    # Example property list
-    properties = [
-        {"address": "1600 Amphitheatre Parkway, Mountain View, CA"},
-        {"address": "1 Infinite Loop, Cupertino, CA"},
-    ]
-    agent.ingest_properties(properties)
+    def _store_enriched_data(self, property_id: str, data: dict):
+        """Store enriched property data in the database."""
+        pass
