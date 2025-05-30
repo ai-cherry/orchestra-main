@@ -1,0 +1,99 @@
+name: Deploy to Vultr
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      deploy_type:
+        description: 'Deployment type'
+        required: true
+        default: 'update'
+        type: choice
+        options:
+        - update
+        - full
+        - rollback
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.VULTR_SSH_KEY }}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+        ssh-keyscan -H ${{ secrets.VULTR_IP_ADDRESS }} >> ~/.ssh/known_hosts
+
+    - name: Test connection
+      run: |
+        ssh -i ~/.ssh/id_ed25519 root@${{ secrets.VULTR_IP_ADDRESS }} "echo 'Connected to Vultr server'"
+
+    - name: Deploy updates
+      if: github.event.inputs.deploy_type == 'update' || github.event_name == 'push'
+      run: |
+        # Update code
+        ssh -i ~/.ssh/id_ed25519 root@${{ secrets.VULTR_IP_ADDRESS }} << 'EOF'
+        cd /opt/orchestra
+        git pull origin main
+        source venv/bin/activate
+        pip install -r requirements/base.txt
+
+        # Restart services
+        systemctl restart orchestra-api orchestra-mcp
+
+        # Health check
+        sleep 5
+        curl -s http://localhost/health || exit 1
+        EOF
+
+    - name: Full deployment
+      if: github.event.inputs.deploy_type == 'full'
+      run: |
+        # Update the deploy script with actual repo URL
+        sed -i "s|https://github.com/yourusername/orchestra-main.git|${{ github.server_url }}/${{ github.repository }}.git|" deploy_to_vultr.sh
+
+        # Run full deployment
+        ./deploy_to_vultr.sh
+
+    - name: Rollback
+      if: github.event.inputs.deploy_type == 'rollback'
+      run: |
+        ssh -i ~/.ssh/id_ed25519 root@${{ secrets.VULTR_IP_ADDRESS }} << 'EOF'
+        cd /opt/orchestra
+        git reset --hard HEAD~1
+        systemctl restart orchestra-api orchestra-mcp
+        EOF
+
+    - name: Post-deployment check
+      if: always()
+      run: |
+        echo "🔍 Checking deployment status..."
+        ssh -i ~/.ssh/id_ed25519 root@${{ secrets.VULTR_IP_ADDRESS }} << 'EOF'
+        echo "=== Service Status ==="
+        systemctl is-active orchestra-api orchestra-mcp docker postgresql nginx
+
+        echo -e "\n=== API Health ==="
+        curl -s http://localhost/health | jq . || echo "API not responding"
+
+        echo -e "\n=== Resource Usage ==="
+        free -h
+        df -h /
+
+        echo -e "\n=== Recent Logs ==="
+        journalctl -u orchestra-api --no-pager -n 10
+        EOF
+
+    - name: Notify deployment status
+      if: always()
+      run: |
+        if [ ${{ job.status }} == 'success' ]; then
+          echo "✅ Deployment successful!"
+        else
+          echo "❌ Deployment failed!"
+        fi
