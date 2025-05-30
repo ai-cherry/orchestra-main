@@ -37,15 +37,6 @@ repos:
       - id: flake8
         language_version: python3.10
 
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.57.0
-    hooks:
-      - id: eslint
-        name: eslint (admin-ui)
-        entry: npx eslint admin-ui --ext .ts,.tsx --fix
-        language: node
-        always_run: true
-
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
@@ -62,3 +53,13 @@ repos:
         language: script
         pass_filenames: false
         always_run: true
+
+# Temporarily disabled due to GitHub Actions issues
+# - repo: https://github.com/pre-commit/mirrors-eslint
+#   rev: v8.57.0
+#   hooks:
+#     - id: eslint
+#       name: eslint (admin-ui)
+#       entry: npx eslint admin-ui --ext .ts,.tsx --fix
+#       language: node
+#       always_run: true
