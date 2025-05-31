@@ -1,8 +1,8 @@
 {
   "version": "1.0",
-  "generated": "2025-05-30T22:08:10.025493",
+  "generated": "2025-05-30T22:12:57.965132",
   "python_version": "3.10.12",
-  "pip_version": "25.1.1",
+  "pip_version": "24.0",
   "strategy": "constraints-based-locking",
   "files": {
     "constraints": "requirements/constraints.txt",

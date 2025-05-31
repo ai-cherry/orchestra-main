@@ -1,0 +1,34 @@
+DNS RECORDS TO UPDATE FOR cherry-ai.me
+=====================================
+
+DELETE the existing A record pointing to: 34.160.252.197
+
+ADD these new A records:
+
+Type: A
+Name: @ (or leave blank for root domain)
+Value: 45.32.69.157
+TTL: 300
+
+Type: A  
+Name: www
+Value: 45.32.69.157
+TTL: 300
+
+Type: A
+Name: admin
+Value: 45.32.69.157
+TTL: 300
+
+Type: A
+Name: api
+Value: 45.32.69.157
+TTL: 300
+
+SAVE ALL CHANGES
+
+After updating, these URLs will work:
+- http://cherry-ai.me
+- http://www.cherry-ai.me
+- http://admin.cherry-ai.me
+- http://api.cherry-ai.me 

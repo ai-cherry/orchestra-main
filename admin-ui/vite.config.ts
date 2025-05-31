@@ -56,10 +56,18 @@ export default defineConfig(({ mode }) => ({
     // Ensure proper CSS handling
     cssTarget: 'es2015'
   },
-  // Ensure proper HTML handling
+  // Server configuration with API proxy
   server: {
     // Ensure proper hot module replacement
-    hmr: true
+    hmr: true,
+    // Proxy API requests to the backend
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        secure: false
+      }
+    }
   },
   // Keep test configuration
   test: {

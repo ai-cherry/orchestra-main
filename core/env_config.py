@@ -24,7 +24,6 @@ class OrchestraSettings(BaseSettings):
 
     # GitHub and CI/CD
     github_token: str = Field(default=None, env="GITHUB_TOKEN")
-    codespaces: str = Field(default=None, env="CODESPACES")
     k_service: str = Field(default=None, env="K_SERVICE")
     cloud_workstations_agent: str = Field(default=None, env="CLOUD_WORKSTATIONS_AGENT")
     ci: str = Field(default=None, env="CI")
