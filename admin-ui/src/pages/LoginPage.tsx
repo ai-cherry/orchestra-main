@@ -55,17 +55,30 @@ export function LoginPage() {
     setError(null);
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      // Use the password field as the API key
+      const apiKey = password;
 
-    if (email === "admin@example.com" && password === "password") {
-      const dummyToken = "fake-jwt-token-" + Date.now();
-      login(email, dummyToken); // Call login action from auth store
-      console.log('Login successful, navigating to dashboard...');
-      navigate({ to: '/' }); // Redirect to Dashboard
-    } else {
-      setError("Invalid email or password. Please try again.");
+      // Test the API key by trying to fetch agents
+      const response = await fetch(`${window.location.origin}/api/agents`, {
+        headers: {
+          'X-API-Key': apiKey,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        // API key is valid - store it as the token
+        login(email, apiKey);
+        console.log('Login successful, navigating to dashboard...');
+        navigate({ to: '/' });
+      } else {
+        setError("Invalid email or password. Please try again.");
+      }
+    } catch (err) {
+      setError("Failed to connect to server. Please try again.");
     }
+
     setIsLoading(false);
   };
 
