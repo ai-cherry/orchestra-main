@@ -18,3 +18,6 @@ python tools/orchestra_cli.py init
 ```
 
 See `docs/PROJECT_STRUCTURE.md` and `docs/ORCHESTRA_AI_OPERATIONS_GUIDE.md` for full details.
+Additional docs:
+- [Architecture](docs/ARCHITECTURE.md)
+- [Status](docs/STATUS.md)

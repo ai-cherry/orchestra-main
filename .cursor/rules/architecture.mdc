@@ -1,0 +1,8 @@
+---
+description: Repository architecture overview
+globs: "*"
+---
+- Core orchestrator located in `core/orchestrator/`
+- FastAPI API with agents and MCP servers
+- Memory layers: DragonflyDB, MongoDB, Weaviate
+- Deployment managed with Pulumi on Vultr

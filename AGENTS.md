@@ -16,7 +16,7 @@ This document provides clear, actionable guidance for configuring, registering, 
 
 ## 2. Agent Configuration
 
-- Agent configuration is centralized in `core/env_config.py` and/or `orchestrator/agents/config.py`.
+- Agent configuration is centralized in `core/env_config.py` and `core/orchestrator/src/config/settings.py`.
 - All environment variables and secrets should be managed via the centralized settings object.
 - Example agent configuration block:
 
