@@ -1,0 +1,3 @@
+Generate a FastAPI endpoint for user login.
+Inputs: username and password.
+Return a JWT token on success.
