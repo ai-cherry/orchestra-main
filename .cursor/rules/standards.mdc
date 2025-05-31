@@ -1,0 +1,10 @@
+---
+description: Project coding standards
+globs: "**/*.py"
+---
+- Use Python 3.10 features only; avoid 3.11-specific syntax
+- Pip and virtualenv for dependencies, no Poetry or Docker builds
+- Prefer subprocess.run over os.system
+- Include type hints and Google-style docstrings
+- Keep code simple and reuse scripts in `scripts/`
+- Format with Black and isort
