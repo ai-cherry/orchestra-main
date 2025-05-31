@@ -1,6 +1,6 @@
 # .pre-commit-config.yaml
-# Enforces Python 3.10+ and Poetry for all pre-commit hooks.
-# All hooks use python3.10 and run in the Poetry-managed environment.
+# Enforces Python 3.10+ and pip-managed virtualenv for all hooks.
+# All hooks use python3.10 within the standard virtual environment.
 
 repos:
   - repo: https://github.com/pycqa/isort

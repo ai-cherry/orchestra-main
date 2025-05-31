@@ -16,7 +16,7 @@ This is a clean, modular implementation of the Orchestra AI core system, designe
 
 #### 2. Service Connectivity (`infrastructure/connectivity/`)
 - **base.py**: Service connection interfaces with health checks
-- **mongodb.py**: MongoDB connection with retry logic
+- **postgres.py**: PostgreSQL connection with retry logic
 - **dragonfly.py**: DragonflyDB (Redis-compatible) connection
 - Connection pooling and failover support
 - Unified health check system
@@ -32,7 +32,7 @@ This is a clean, modular implementation of the Orchestra AI core system, designe
 #### 1. Memory Service (`services/memory/`)
 - **Layered Architecture**:
   - Short-term: DragonflyDB (hot cache)
-  - Mid-term: MongoDB (document storage)
+  - Mid-term: PostgreSQL (document storage)
   - Long-term: Weaviate (vector search)
 - **Smart Policies**:
   - Automatic promotion based on access patterns
@@ -152,7 +152,7 @@ Create a `.env` file:
 ENVIRONMENT=dev
 SECRET_KEY=your-secret-key
 
-# MongoDB
+# PostgreSQL
 MONGODB_URI=mongodb://localhost:27017
 MONGODB_DATABASE=orchestra
 
