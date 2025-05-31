@@ -35,13 +35,26 @@ class ErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex min-h-screen items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-red-600">Something went wrong!</h1>
-            <p className="mt-2 text-gray-600">Please refresh the page or try again.</p>
+        <div className="flex min-h-screen items-center justify-center bg-gray-50">
+          <div className="text-center max-w-md p-6 bg-white rounded-lg shadow-lg">
+            <h1 className="text-2xl font-bold text-red-600 mb-4">Something went wrong!</h1>
+            <p className="mt-2 text-gray-600 mb-4">Please refresh the page or try again.</p>
+            {/* Show error details in development */}
+            {this.state.error && (
+              <details className="text-left mb-4">
+                <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
+                  Error details (click to expand)
+                </summary>
+                <pre className="mt-2 p-3 bg-gray-100 rounded text-xs overflow-auto">
+                  {this.state.error.message}
+                  {'\n\n'}
+                  {this.state.error.stack}
+                </pre>
+              </details>
+            )}
             <button
               onClick={() => window.location.reload()}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="mt-4 px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
             >
               Refresh Page
             </button>
@@ -56,29 +69,22 @@ class ErrorBoundary extends React.Component<
 
 export const Route = createRootRoute({
   beforeLoad: async ({ location }) => {
-    const { isAuthenticated } = useAuthStore.getState(); // Get latest auth state
-
-    console.log('Root beforeLoad: isAuthenticated', isAuthenticated, 'location.pathname', location.pathname);
-
-    if (!isAuthenticated && location.pathname !== '/login') {
-      console.log('User not authenticated, redirecting to /login');
-      throw redirect({
-        to: '/login',
-        // Optional: pass the original intended path to redirect back after login
-        search: {
-          redirect: location.pathname,
-        },
-      });
+    // Only check auth for non-login routes
+    if (location.pathname !== '/login') {
+      const { isAuthenticated } = useAuthStore.getState();
+      
+      console.log('Root beforeLoad: checking auth for', location.pathname, 'isAuthenticated:', isAuthenticated);
+      
+      if (!isAuthenticated) {
+        console.log('Not authenticated, redirecting to login');
+        throw redirect({
+          to: '/login',
+          search: {
+            redirect: location.pathname,
+          },
+        });
+      }
     }
-    // If authenticated and trying to access /login, redirect to dashboard
-    // This case is better handled in LoginPage.tsx itself using useEffect to avoid flashing login page.
-    // However, it can also be enforced here.
-    // if (isAuthenticated && location.pathname === '/login') {
-    //   console.log('User authenticated, redirecting from /login to /');
-    //   throw redirect({
-    //     to: '/',
-    //   });
-    // }
   },
   component: RootComponent,
   // Add notFoundComponent to the root route options if not already defined in routes.tsx

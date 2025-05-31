@@ -72,6 +72,7 @@ const loginRoute = createRoute({
 
 // Route Tree
 // Use the original rootRoute directly
+console.log('Creating route tree...');
 const routeTree = rootRoute.addChildren([
   indexRoute,
   agentsRoute,
@@ -83,12 +84,15 @@ const routeTree = rootRoute.addChildren([
   settingsRoute,
   loginRoute,
 ]);
+console.log('Route tree created:', routeTree);
 
 // Create Router Instance with notFoundComponent specified here
+console.log('Creating router instance...');
 export const router = createRouter({
   routeTree,
   defaultNotFoundComponent: NotFoundPage,
 });
+console.log('Router created successfully');
 
 // Register Router for typesafety
 declare module '@tanstack/react-router' {
