@@ -1,35 +1,56 @@
 # Admin UI Deployment Guide
 
-This guide explains how to build and deploy the React Admin UI to the Vultr server.
+This guide explains how to build and deploy the React Admin UI on the unified Vultr server.
 
-## 1. Build Pipeline
+## Prerequisites
+- Node.js 20+ installed on the server
+- Direct SSH access to the Vultr server
 
-| Step | Command | Notes |
-|------|---------|-------|
-| Install PNPM | `npm install -g pnpm` | Node 20 is used in CI |
-| Install deps | `cd admin-ui && pnpm install --frozen-lockfile` | |
-| Lint & test | `pnpm lint && pnpm test` | Fails on any warnings |
-| Build | `pnpm build` | Outputs to `admin-ui/dist` |
-
-## 2. Deployment via GitHub Actions
-
-Pushing to `main` triggers `.github/workflows/deploy.yaml` which:
-1. Builds the Admin UI
-2. Runs `pulumi up` to update the Vultr stack
-3. Copies the built files to the server via SSH
-
-No manual steps are required if the workflow succeeds.
-
-## 3. Manual Deployment
-
+## 1. Local Build and Deploy
 ```bash
-# Build locally
-cd admin-ui
-pnpm install --frozen-lockfile
-pnpm build
+# SSH to server
+ssh root@45.32.69.157
 
-# Copy files to server
-scp -r dist/* root@<VULTR_IP>:/opt/orchestra/admin-ui/
+# Navigate to project
+cd /root/orchestra-main
+
+# Build Admin UI
+cd admin-ui
+npm install
+npm run build
+
+# Files are automatically served by Nginx
 ```
 
-The Admin UI is served by the Nginx container and is available at `http://<VULTR_IP>`.
+## 2. Automatic Sync via GitHub
+Any push to the main branch automatically:
+1. Syncs code to the server
+2. Optionally rebuilds if package.json changed
+3. No manual intervention needed
+
+## 3. Access
+The Admin UI is served by Nginx and available at:
+- `http://45.32.69.157` - Direct IP access
+- Port 80 - Default HTTP
+
+## 4. Troubleshooting
+```bash
+# Check Nginx status
+systemctl status nginx
+
+# View Nginx logs
+tail -f /var/log/nginx/access.log
+tail -f /var/log/nginx/error.log
+
+# Rebuild Admin UI
+cd /root/orchestra-main/admin-ui
+npm run build
+```
+
+## 5. Development Mode
+For local development on the server:
+```bash
+cd /root/orchestra-main/admin-ui
+npm run dev
+# Access at http://45.32.69.157:3000
+```

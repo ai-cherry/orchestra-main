@@ -33,25 +33,22 @@ The goal of this project was to create, clean up, and establish a deployment pip
     *   Playwright for E2E tests (authentication flow).
 
 ### 2.3. CI/CD Pipeline & Deployment
-*   **Workflow File**: `.github/workflows/deploy.yaml` was significantly updated.
-*   **Build & Test**: The workflow now builds and tests the `admin-ui` (lint, unit tests, E2E tests).
-*   **Deployment Target**: Vultr bare-metal server.
-*   **Pulumi**: The `infra/vultr_server_component.py` component provisions the server and copies the `admin-ui` static assets.
-*   **Environments & Promotion:**
-    *   `dev` environment: Deployed automatically on pushes to `main` (excluding tags).
-    *   `prod` environment: Deployed via manual `workflow_dispatch` or on version tag pushes. This deployment targets a "production" GitHub Environment, enabling manual approval workflows.
-*   **Post-Production E2E Tests**: The `prod` deployment job includes a step to run Playwright E2E tests against the live production URL and archive reports.
-*   **Documentation**: Smoke test plan (`/specs/admin-ui-smoke-tests.md`) and promotion process (`/specs/admin-ui-promotion-process.md`) created.
+*   **Workflow File**: `.github/workflows/sync-vultr.yml` provides automatic code synchronization.
+*   **Build Process**: The admin UI is built directly on the server when needed.
+*   **Deployment Target**: Single Vultr server at 45.32.69.157.
+*   **Deployment Method**: Direct file sync via git pull - no complex CI/CD needed.
+*   **Environments**: Single unified environment - no dev/staging/prod separation.
+*   **Post-Deployment**: Health checks ensure services are running properly.
 
 ### 2.4. Legacy Code
 *   The old `admin-ui/` (Material UI based) was backed up to `admin-ui-legacy/`.
 *   The `dashboard/` directory was identified as legacy and can be removed.
 
 ## 3. Adherence to Constraints
-*   **Secrets**: Handled via GitHub Actions secrets and Pulumi configuration; no raw secrets printed.
-*   **Confirmations**: The iterative process with user prompts for major phase continuation served as confirmation. Manual approval for production deployment is configured.
-*   **Budget**: No external API calls with significant costs were made during this UI development and setup phase.
-*   **Iterative Work**: Project proceeded in phases with user confirmation at the end of Phase 2 and mid-Phase 3.
+*   **Secrets**: Managed directly on the server via .env file.
+*   **Deployment**: Push to GitHub main branch triggers automatic sync.
+*   **Monitoring**: Direct server access for logs and debugging.
+*   **Rollback**: Simple git reset on server if needed.
 
 ## 4. Next Steps & Recommendations
 

@@ -2,7 +2,7 @@ PYTHON?=python3
 
 .PHONY: dev-start validate service-status start-services stop-services \
     health-check health-monitor wait-for-mcp ai-review-changes \
-    before-ai-coding after-ai-coding
+    before-ai-coding after-ai-coding restart-services
 
 dev-start:
 bash start_orchestra.sh
@@ -18,6 +18,8 @@ $(PYTHON) scripts/orchestra.py start
 
 stop-services:
 $(PYTHON) scripts/orchestra.py stop
+
+restart-services: stop-services start-services
 
 health-check:
 $(PYTHON) scripts/orchestra.py health

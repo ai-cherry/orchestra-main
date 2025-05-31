@@ -4,29 +4,33 @@ The following context should be provided to the AI assistant for every session.
 
 ---
 
-## High-level architecture
+## Project Context
+• Single unified Vultr server (45.32.69.157)
+• Development, deployment, and production all on same server
+• Direct SSH/Cursor development - no CI/CD needed
+• Python 3.10 with pip/venv (no Poetry)
+• Instant deployment - changes are live immediately
 
-See `docs/PROJECT_BLUEPRINT.md` for details.
-• Dev on Paperspace VM via SSH (Cursor)
-• Secrets via Secret Manager – exported at login by `~/.gcp_env_setup.sh`
-• Deployment: GitHub Actions ➜ Cloud Build ➜ Cloud Run (`ai-orchestra-minimal` in `us-central1`).
+## Key Directories
+admin-ui/          # React admin interface
+agent/             # FastAPI agent service
+core/              # Core orchestrator
+mcp_server/        # MCP server components
+scripts/           # Automation tools
+.github/workflows/ # GitHub sync workflow
 
-## Key directories (keep short)
+## Development Workflow
+1. SSH to server or use Cursor Remote
+2. Edit files directly in /root/orchestra-main
+3. Changes are instant
+4. Use `make` commands for service management
 
-```
-app.py            # Flask entry-point (Gunicorn target)
-agent/            # FastAPI agent micro-service
-orchestra_system/ # core libraries/utilities
-scripts/          # helper & maintenance scripts
-.github/workflows/ # CI/CD
-```
-
-## Coding conventions
-
-1. Python 3.10, use type-hints & docstrings (Google style).
-2. Access secrets via `os.getenv()` only.
-3. Keep Dockerfile minimal; requirements pinned.
-4. Lint: `flake8 --ignore=E501` (line length offloaded to Black).
+## Available Make Commands
+- `make start-services` - Start all services
+- `make stop-services` - Stop all services  
+- `make health-check` - Check service health
+- `make validate` - Run code validation
+- `make service-status` - Show service status
 
 ---
 

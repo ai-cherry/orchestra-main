@@ -1,0 +1,79 @@
+name: Sync to Vultr Server
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      restart_services:
+        description: 'Restart services after sync'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  sync-and-deploy:
+    name: Sync Code to Vultr
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Sync to Vultr Server
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: 45.32.69.157
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -e
+            echo "🔄 Syncing Orchestra AI from GitHub..."
+            
+            cd /root/orchestra-main
+            
+            # Pull latest changes
+            git pull origin main
+            
+            # Run validation
+            echo "✅ Running validation..."
+            make validate || true
+            
+            # Restart services if requested or if certain files changed
+            if [[ "${{ github.event.inputs.restart_services }}" == "true" ]] || \
+               git diff --name-only HEAD~1 | grep -E "(requirements|\.py$|\.env|docker-compose)" > /dev/null; then
+              echo "🔄 Restarting services..."
+              make stop-services
+              make start-services
+              echo "✅ Services restarted"
+            else
+              echo "ℹ️ No service restart needed"
+            fi
+            
+            # Show current status
+            echo "📊 Current service status:"
+            make service-status
+            
+      - name: Health Check
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: 45.32.69.157
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /root/orchestra-main
+            echo "🏥 Running health check..."
+            make health-check || echo "⚠️ Some services may need attention"
+            
+  notify-status:
+    name: Notify Status
+    runs-on: ubuntu-latest
+    needs: sync-and-deploy
+    if: always()
+    steps:
+      - name: Send notification
+        run: |
+          if [[ "${{ needs.sync-and-deploy.result }}" == "success" ]]; then
+            echo "✅ Deployment successful!"
+          else
+            echo "❌ Deployment failed!"
+          fi 

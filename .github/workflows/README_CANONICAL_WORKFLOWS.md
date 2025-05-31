@@ -1,44 +1,45 @@
-# Canonical Workflows for Orchestra AI
+# GitHub Workflows - Unified Vultr Architecture
+
+## Overview
+Orchestra AI uses a simplified GitHub Actions workflow that syncs code directly to the production Vultr server where all development and deployment occur.
 
 ## Active Workflows
 
-### Primary Workflow
+### 1. `sync-vultr.yml` - Main Deployment Workflow
+- **Trigger**: Push to main branch or manual dispatch
+- **Purpose**: Sync code from GitHub to Vultr server
+- **Features**:
+  - Automatic git pull on server
+  - Optional service restart
+  - Health checks after deployment
+  - Smart restart detection (only restarts if Python/requirements change)
 
-- **main.yml**: The primary CI/CD workflow for deployment to GCP Cloud Run. Triggers on pushes to main branch and handles:
-  - Authentication via Workload Identity Federation
-  - Python testing and linting
-  - Cloud Build submission using `cloudbuild.yaml`
-  - Deployment to Cloud Run service `ai-orchestra-minimal`
+## Deprecated Workflows
+The following workflows are kept for reference but are no longer used:
+- `deploy.yaml` - Old multi-environment deployment
+- `deploy-vultr.yml` - Superseded by sync-vultr.yml
+- `ci.yml` - Testing now happens on server
+- `pulumi-deploy.yml` - Infrastructure is stable, no frequent changes
 
-### Component-Specific Workflows
+## Usage
 
-- **admin-interface/.github/workflows/deploy.yml**: Deployment workflow for the React/TypeScript admin interface
-- **gcp-ide-sync/.github/workflows/deploy.yml**: Deployment workflow for GCP IDE synchronization components
-- **mcp_server/.github/workflows/deploy.yml**: Deployment workflow for MCP (Model Context Protocol) servers
+### Automatic Deployment
+Every push to main automatically:
+1. SSHs to Vultr server
+2. Pulls latest code
+3. Runs validation
+4. Restarts services if needed
 
-## Best Practices
+### Manual Deployment
+Use workflow dispatch to:
+- Force a sync
+- Optionally restart services
 
-- Validate all workflow YAMLs with `yamllint` and `actionlint` before pushing.
-- Use the appropriate workflow for your component:
-  - Main application changes: Triggers `main.yml` automatically
-  - Admin interface changes: Use `admin-interface/` workflow
-  - MCP server changes: Use `mcp_server/` workflow
-  - GCP IDE sync changes: Use `gcp-ide-sync/` workflow
-- All GCP secrets must be referenced directly in workflow steps.
-- Docker build context and COPY paths must be explicit and correct.
-- Run `terraform validate` and `poetry check` in CI to catch errors early.
+## Required Secrets
+- `SSH_PRIVATE_KEY`: SSH key for Vultr server access
 
-## Service Deployment Targets
-
-- **Main Application**: Deploys to `ai-orchestra-minimal` Cloud Run service in `us-central1`
-- **Admin Interface**: Deploys to dedicated admin interface service
-- **MCP Servers**: Deploy to individual MCP service endpoints
-
-## Workflow Coordination
-
-All workflows use Workload Identity Federation for secure GCP authentication and follow the same general pattern:
-
-1. Checkout code
-2. Authenticate to GCP
-3. Build and test (if applicable)
-4. Deploy to appropriate Cloud Run service
+## Benefits
+- No environment confusion
+- Instant deployments
+- Simple and reliable
+- Direct server development
