@@ -1,4 +1,5 @@
-import { Outlet, createRootRoute, redirect } from '@tanstack/react-router';
+import React from 'react';
+import { Outlet, createRootRoute, redirect, useLocation } from '@tanstack/react-router';
 import AppLayout from '@/components/layout/AppLayout';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { useAuthStore } from '@/store/authStore'; // Import auth store
@@ -12,6 +13,46 @@ import { useAuthStore } from '@/store/authStore'; // Import auth store
 //           default: res.TanStackRouterDevtools,
 //         })),
 //       );
+
+// Simple error boundary component
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Error caught by boundary:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-red-600">Something went wrong!</h1>
+            <p className="mt-2 text-gray-600">Please refresh the page or try again.</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Refresh Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 export const Route = createRootRoute({
   beforeLoad: async ({ location }) => {
@@ -45,25 +86,24 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
-  // This useEffect is an alternative/additional way to handle redirection,
-  // especially if beforeLoad has timing issues or if you need component context.
-  // useEffect(() => {
-  //   if (!isAuthenticated && routerState.location.pathname !== '/login') {
-  //     router.navigate({ to: '/login', search: { redirect: routerState.location.pathname }});
-  //   }
-  // }, [isAuthenticated, routerState.location.pathname, router]);
-
+  const location = useLocation();
+  const isLoginPage = location.pathname === '/login';
+  
   return (
-    <ThemeProvider defaultTheme="neutral" defaultMode="light" storageKey="admin-ui-theme">
-      {/* Conditionally render AppLayout only if authenticated, or if it's the login page which might not use AppLayout */}
-      {/* This logic can be complex. For now, AppLayout is always rendered by __root,
-          and LoginPage itself doesn't use PageWrapper or relies on AppLayout's structure. */}
-      <AppLayout>
-        <Outlet />
-      </AppLayout>
-      {/* <React.Suspense fallback={null}>
-        <TanStackRouterDevtools position="bottom-right" />
-      </React.Suspense> */}
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider defaultTheme="neutral" defaultMode="light" storageKey="admin-ui-theme">
+        {/* Only wrap with AppLayout if not on login page */}
+        {isLoginPage ? (
+          <Outlet />
+        ) : (
+          <AppLayout>
+            <Outlet />
+          </AppLayout>
+        )}
+        {/* <React.Suspense fallback={null}>
+          <TanStackRouterDevtools position="bottom-right" />
+        </React.Suspense> */}
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
