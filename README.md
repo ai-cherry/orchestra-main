@@ -21,3 +21,4 @@ See `docs/PROJECT_STRUCTURE.md` and `docs/ORCHESTRA_AI_OPERATIONS_GUIDE.md` for 
 Additional docs:
 - [Architecture](docs/ARCHITECTURE.md)
 - [Status](docs/STATUS.md)
+- [Unified Vultr Setup](docs/UNIFIED_VULTR_ARCHITECTURE.md)
