@@ -41,10 +41,10 @@ export default defineConfig(({ mode }) => ({
     // Rollup options for better optimization
     rollupOptions: {
       output: {
-        // Ensure CSS is included in the main entry
-        entryFileNames: 'assets/[name]-[hash].js',
-        chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]',
+        // Force new hash on every build
+        entryFileNames: `assets/[name]-[hash]-${Date.now()}.js`,
+        chunkFileNames: `assets/[name]-[hash]-${Date.now()}.js`,
+        assetFileNames: `assets/[name]-[hash]-${Date.now()}.[ext]`,
         // Ensure main CSS is not code-split
         manualChunks: undefined
       }
