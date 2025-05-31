@@ -1,33 +1,37 @@
 #!/bin/bash
-# Deploy real agents to production server
+# Deploy real agents on local Vultr server
 
-SERVER="45.32.69.157"
-SSH_USER="root"
+set -e
 
-echo "🚀 Deploying REAL Orchestra AI agents to production..."
+echo "🚀 Deploying REAL Orchestra AI agents locally..."
 
-# Kill any existing API process on server
-echo "⏹️  Stopping existing API..."
-sshpass -p 'vultr-server-password' ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SERVER} "pkill -f 'uvicorn agent.app.main' || true"
+# Ensure we're in the right directory
+cd /root/orchestra-main
 
-# Copy the updated files
-echo "📦 Copying agent files..."
-sshpass -p 'vultr-server-password' scp -o StrictHostKeyChecking=no agent/app/routers/admin.py ${SSH_USER}@${SERVER}:/root/orchestra-main/agent/app/routers/
-sshpass -p 'vultr-server-password' scp -o StrictHostKeyChecking=no agent/app/services/real_agents.py ${SSH_USER}@${SERVER}:/root/orchestra-main/agent/app/services/
-sshpass -p 'vultr-server-password' scp -o StrictHostKeyChecking=no agent/app/services/__init__.py ${SSH_USER}@${SERVER}:/root/orchestra-main/agent/app/services/
+# Pull latest changes
+echo "📥 Pulling latest changes..."
+git pull origin main
 
-# Install psutil on server
+# Activate virtual environment
+source venv/bin/activate
+
+# Install/update dependencies
 echo "📦 Installing dependencies..."
-sshpass -p 'vultr-server-password' ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SERVER} "cd /root/orchestra-main && source venv/bin/activate && pip install psutil"
+pip install -r requirements/base.txt
 
-# Start the API
-echo "🔥 Starting REAL Orchestra AI API..."
-sshpass -p 'vultr-server-password' ssh -o StrictHostKeyChecking=no ${SSH_USER}@${SERVER} "cd /root/orchestra-main && source venv/bin/activate && nohup python -m uvicorn agent.app.main:app --host 0.0.0.0 --port 8080 > /root/api.log 2>&1 &"
+# Run validation
+echo "✅ Validating code..."
+make validate || true
 
-sleep 3
+# Restart services
+echo "🔄 Restarting services..."
+make stop-services
+make start-services
 
-# Test the API
-echo "✅ Testing API..."
-curl -X GET "https://cherry-ai.me/api/agents" -H "X-API-Key: 4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd" | jq '.'
+# Check health
+echo "🏥 Running health check..."
+make health-check
 
-echo "🎉 Deployment complete! Your REAL AI agents are now live at https://cherry-ai.me" 
+echo "🎉 Deployment complete! Your REAL AI agents are now live!"
+echo "📊 Access the API at: http://localhost:8000"
+echo "🌐 Admin UI at: http://$(hostname -I | awk '{print $1}')" 
