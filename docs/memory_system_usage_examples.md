@@ -12,8 +12,8 @@ These examples demonstrate how to properly separate development context from per
 
 Before using these examples, make sure you have:
 
-- Firebase/MongoDB
-- Required Python dependencies installed (`google-cloud-MongoDB
+- PostgreSQL
+- Required Python dependencies installed (`psycopg2
 - Configured environment variables (or provide explicit values in code)
 
 ## Storing Development Context
@@ -26,7 +26,7 @@ Development notes capture technical decisions, implementation details, and archi
 import asyncio
 from datetime import datetime, timedelta
 from packages.shared.src.memory.dev_notes_manager import DevNotesManager
-from packages.shared.src.memory.MongoDB
+from packages.shared.src.memory.PostgreSQL
 from packages.shared.src.models.metadata_schemas import DevNoteType
 from packages.shared.src.storage.config import StorageConfig
 
@@ -38,7 +38,7 @@ async def store_development_context():
     )
 
     # Create memory adapter
-    adapter = MongoDB
+    adapter = PostgreSQL
         project_id="your-project-id",
         credentials_path="/path/to/credentials.json"
     )
@@ -58,14 +58,14 @@ async def store_development_context():
     # Store an architecture decision note
     await dev_notes.add_architecture_note(
         component="memory_system",
-        decision="Use MongoDB
+        decision="Use PostgreSQL
         context="Need scalable cloud storage with transactions and flexible querying",
         alternatives=[
             "Redis for faster performance but less persistence",
             "Postgres for stronger schema validation",
             "DynamoDB for potentially lower costs at scale"
         ],
-        consequences="MongoDB
+        consequences="PostgreSQL
         metadata={
             "author": "Jane Developer",
             "commit_id": "abc123def456",
@@ -76,15 +76,15 @@ async def store_development_context():
 
     # Store an implementation note
     await dev_notes.add_implementation_note(
-        component="MongoDB
-        overview="Implemented retry mechanism for MongoDB
+        component="PostgreSQL
+        overview="Implemented retry mechanism for PostgreSQL
         implementation_details="""
-        Added exponential backoff retry logic for all MongoDB
+        Added exponential backoff retry logic for all PostgreSQL
         transient connection issues. The retry mechanism uses a maximum of 3 attempts
         with increasing delays between each attempt.
         """,
         affected_files=[
-            "packages/shared/src/storage/MongoDB
+            "packages/shared/src/storage/PostgreSQL
             "packages/shared/src/storage/exceptions.py"
         ],
         testing_status="unit_tests_passed",
@@ -127,7 +127,7 @@ asyncio.run(store_development_context())
 async def retrieve_development_notes():
     # Setup similar to previous example
     config = StorageConfig(environment="dev", enable_dev_notes=True)
-    adapter = MongoDB
+    adapter = PostgreSQL
     await adapter.initialize()
 
     dev_notes = DevNotesManager(memory_manager=adapter, config=config)
@@ -168,7 +168,7 @@ from packages.shared.src.memory.privacy_enhanced_memory_manager import (
     PIIDetectionConfig,
     PrivacyEnhancedMemoryManager,
 )
-from packages.shared.src.memory.MongoDB
+from packages.shared.src.memory.PostgreSQL
 from packages.shared.src.models.base_models import MemoryItem
 from packages.shared.src.storage.config import StorageConfig
 
@@ -186,7 +186,7 @@ async def store_personal_information():
     pii_config.DEFAULT_RETENTION_DAYS = 90  # Shorter retention in production
 
     # Create base adapter
-    adapter = MongoDB
+    adapter = PostgreSQL
         project_id="your-production-project",
         credentials_path="/path/to/prod_credentials.json"
     )
@@ -248,7 +248,7 @@ asyncio.run(store_personal_information())
 async def retrieve_conversation_history():
     # Similar setup to previous example
     config = StorageConfig(environment="prod")
-    adapter = MongoDB
+    adapter = PostgreSQL
     await adapter.initialize()
 
     privacy_manager = PrivacyEnhancedMemoryManager(

@@ -241,6 +241,13 @@ def test_complex_response(snapshot):
 9. **Parameterized Tests**: Use parameterization for testing multiple inputs
 10. **Integration Coverage**: Ensure key integration points are tested across components
 
+### Local Quick Start
+Run tests locally with your environment loaded:
+```bash
+source .env
+python -m pytest
+```
+
 ## Continuous Integration
 
 Tests are automatically run in the CI pipeline:

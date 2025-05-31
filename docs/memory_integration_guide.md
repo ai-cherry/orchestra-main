@@ -32,19 +32,19 @@ This guide will show you how to integrate these memory types with your agents.
 - Ideal for conversation context, recent interactions, and working memory
 - Implemented using Redis (Memorystore)
 
-### Mid-term Memory (MongoDB
+### Mid-term Memory (PostgreSQL
 
 - Structured, document-based storage
 - Longer TTL than short-term memory (default: 1 day)
 - Ideal for session data, user preferences, and ongoing tasks
-- Implemented using MongoDB
+- Implemented using PostgreSQL
 
-### Long-term Memory (MongoDB
+### Long-term Memory (PostgreSQL
 
 - Persistent storage for important information
 - Very long TTL or no expiration (default: 30 days)
 - Ideal for user profiles, learned behaviors, and important facts
-- Implemented using MongoDB
+- Implemented using PostgreSQL
 
 ### Semantic Memory (
 - Vector-based storage for semantic search
@@ -102,9 +102,9 @@ redis_memory_config = MemoryConfig(
     ttl=3600
 )
 
-# Configure MongoDB
-MongoDB
-    memory_type=MemoryType.MongoDB
+# Configure PostgreSQL
+PostgreSQL
+    memory_type=MemoryType.PostgreSQL
     table_name="agent_memory",
     ttl=86400
 )
@@ -441,7 +441,7 @@ async def test_layered_memory():
 
 #### Connection Issues
 
-If you're having trouble connecting to Redis or MongoDB
+If you're having trouble connecting to Redis or PostgreSQL
 
 1. Ensure that the services are running and accessible
 2. Check that the connection parameters (host, port, etc.) are correct
