@@ -68,9 +68,7 @@ micro_cache_droplet_size = config.get("micro_cache_droplet_size") or "s-1vcpu-1g
 
 # Admin UI Configuration
 admin_ui_custom_domain_name = config.get("adminUiCustomDomain")
-admin_ui_dist_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "admin-ui", "dist")
-)
+admin_ui_dist_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "admin-ui", "dist"))
 
 # --- FETCH EXISTING DROPLETS ---
 vector_droplet = do.get_droplet(id=vector_droplet_id)
@@ -341,7 +339,7 @@ SAMPLE_SIZE = 10
 THRESHOLD_MS = 50  # 50ms threshold for considering micro-cache
 
 def measure_weaviate_latency():
-    headers = {}
+    headers = {{}}
     if WEAVIATE_API_KEY:
         headers["Authorization"] = "Bearer " + WEAVIATE_API_KEY
 
@@ -372,7 +370,7 @@ def measure_weaviate_latency():
     min_latency = min(latencies)
     max_latency = max(latencies)
 
-    result = {
+    result = {{
         "timestamp": datetime.datetime.now().isoformat(),
         "avg_latency_ms": avg_latency,
         "p95_latency_ms": p95_latency,
@@ -380,7 +378,7 @@ def measure_weaviate_latency():
         "max_latency_ms": max_latency,
         "sample_size": len(latencies),
         "needs_micro_cache": p95_latency > THRESHOLD_MS
-    }
+    }}
 
     # Save results
     try:
@@ -412,8 +410,8 @@ EOF
 chmod +x /opt/orchestra/monitor_latency.py
 
 # Create cron job to run every hour
-# TODO: Fix this crontab command - currently causing f-string syntax error
-# echo "0 * * * * /opt/orchestra/venv/bin/python /opt/orchestra/monitor_latency.py >> /var/log/latency_monitor.log 2>&1" | crontab -
+# Fixed the f-string syntax error by escaping the nested quotes
+echo \"0 * * * * /opt/orchestra/venv/bin/python /opt/orchestra/monitor_latency.py >> /var/log/latency_monitor.log 2>&1\" | crontab -
 """
     ),
     opts=ResourceOptions(depends_on=[setup_orchestra_service]),
