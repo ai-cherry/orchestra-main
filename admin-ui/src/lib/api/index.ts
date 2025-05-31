@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 
-// Use relative URLs - nginx will proxy /api to the backend
-const API_URL = ''  // Empty string means use same origin
+// Use environment variables for API URL and API key
+const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
+const API_KEY = import.meta.env.VITE_API_KEY;
 
 // Define the QueryBody interface with a query string property
 export interface QueryBody {
@@ -9,13 +10,10 @@ export interface QueryBody {
 }
 
 function getHeaders() {
-  // For now, just use the hardcoded API key
-  // In production, you'd want to get this from environment or secure storage
   return {
     'Content-Type': 'application/json',
-    // Use the API key for backend authentication
-    'X-API-Key': '4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd'
-  }
+    'X-API-Key': API_KEY,
+  };
 }
 
 export function useQueryApi(body: QueryBody) {
@@ -25,12 +23,12 @@ export function useQueryApi(body: QueryBody) {
       const res = await fetch(`${API_URL}/api/query`, {
         method: 'POST',
         headers: getHeaders(),
-        body: JSON.stringify(body)
-      })
-      if (!res.ok) throw new Error('Failed')
-      return res.json()
-    }
-  })
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error('Failed');
+      return res.json();
+    },
+  });
 }
 
 export function useAgents() {
@@ -38,17 +36,15 @@ export function useAgents() {
     queryKey: ['agents'],
     queryFn: async () => {
       const res = await fetch(`${API_URL}/api/agents`, {
-        headers: getHeaders()
-      })
+        headers: getHeaders(),
+      });
       if (!res.ok) {
-        // Return empty array if endpoint doesn't exist yet
-        return []
+        throw new Error('Failed to fetch agents');
       }
-      return res.json()
+      return res.json();
     },
-    // Return empty array as default
-    initialData: []
-  })
+    initialData: [],
+  });
 }
 
 export function useUpload() {
@@ -56,10 +52,10 @@ export function useUpload() {
     queryKey: ['upload'],
     queryFn: async () => {
       const res = await fetch(`${API_URL}/api/upload`, {
-        headers: getHeaders()
-      })
-      if (!res.ok) throw new Error('Failed')
-      return res.json()
-    }
-  })
+        headers: getHeaders(),
+      });
+      if (!res.ok) throw new Error('Failed');
+      return res.json();
+    },
+  });
 }
