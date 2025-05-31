@@ -6,7 +6,7 @@
 
 1. **Simplicity Over Complexity**
 
-   - ✅ All development and deployment must use Docker Compose v2 and Poetry for Python dependency management.
+   - ✅ Use Docker Compose v2 for services and manage Python dependencies with pip and virtual environments.
    - ✅ Python 3.10+ is required for all services and scripts.
    - ✅ Use existing tools and patterns from the codebase.
    - ✅ Prefer Python's built-in libraries and minimal dependencies.
@@ -141,10 +141,10 @@ make before-ai-coding  # Creates git checkpoint and documents state
 
 ### **2. Configuration Files**
 
-- `pyproject.toml` - All Python dependencies managed by Poetry
+ - `requirements/` - Pinned dependencies for pip
 - `scripts/` - All automation tools
 - `Makefile` - Build targets (check before adding)
-- NO `Pipfile`, `requirements.txt` (except those exported from Poetry), or legacy dependency files
+- NO Poetry, Pipenv, or other dependency files
 
 ### **3. Import Patterns**
 
@@ -205,7 +205,7 @@ This project prioritizes:
 1. Simplicity over complexity
 2. Performance over security
 3. Using existing patterns
-4. No Docker/Poetry
+4. Use pip/venv for dependencies
 5. Python 3.10 compatibility
 
 Always reference: ai_context_planner.py, ai_context_coder.py, ai_context_reviewer.py, ai_context_debugger.py
@@ -268,10 +268,8 @@ grep -r "3\.11\|match.*case\|tomllib" --include="*.py"
 ## 🚦 Red Flags in AI-Generated Code
 
 Watch for these warning signs:
-
-1. **New dependency management files**
-
-   - `Pipfile`, `setup.cfg`, or any requirements files not exported from Poetry
+   - Any Pipfile, setup.cfg, or other dependency file
+   - Any Pipfile or stray dependency manager
 
 2. **Container files**
 
@@ -350,7 +348,7 @@ Before committing AI-generated code:
 
 - [ ] Used appropriate ai*context*\*.py file for the task
 - [ ] No new dependency management tools (Pipenv, Pipfile, etc.)
-- [ ] Only use Docker/Poetry as specified
+- [ ] Use pip/venv for dependencies
 - [ ] Uses Python 3.10+ features as standard
 - [ ] Uses existing patterns from scripts/
 - [ ] Follows naming conventions
