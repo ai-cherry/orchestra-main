@@ -6,23 +6,66 @@ import MetricsDisplayCard from '@/components/ui/MetricsDisplayCard'; // Created 
 import StatusIndicator from '@/components/ui/StatusIndicator';   // Created in previous step
 import { Users, Workflow, BarChart3, PlusCircle, Settings as SettingsIcon, ExternalLink, Briefcase } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
+import { useAgents } from '@/lib/api';
+import { useEffect, useState } from 'react';
 
-// Dummy data
-const agentsData = [
-  { name: 'Agent Smith', status: 'active', lastActivity: '2m ago' },
-  { name: 'Agent 007', status: 'idle', lastActivity: '1h ago' },
-  { name: 'ErrorBot', status: 'error', lastActivity: '5m ago' },
-  { name: 'DataCruncher', status: 'active', lastActivity: '15m ago' },
-];
-
-const systemStatus = [
-  { name: 'API Services', status: 'healthy' as const },
-  { name: 'Database Connection', status: 'healthy' as const },
-  { name: 'Background Workers', status: 'active' as const },
-];
+// Helper function to format the last run time
+const formatLastRun = (lastRun: string) => {
+  const date = new Date(lastRun);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return date.toLocaleDateString();
+};
 
 export function DashboardPage() {
   const userName = "Admin User"; // Placeholder
+  const { data: agentsData = [] } = useAgents();
+  const [metrics, setMetrics] = useState<any>(null);
+
+  // Fetch metrics data
+  useEffect(() => {
+    const fetchMetrics = async () => {
+      try {
+        // Get auth token from the auth store
+        const authData = localStorage.getItem('admin-auth-storage');
+        let token = '';
+        if (authData) {
+          try {
+            const parsed = JSON.parse(authData);
+            token = parsed.state?.token || '';
+          } catch (e) {
+            console.error('Failed to parse auth data:', e);
+          }
+        }
+        
+        const response = await fetch(`${window.location.origin}/api/metrics`, {
+          headers: {
+            'X-API-Key': token,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setMetrics(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch metrics:', error);
+      }
+    };
+    fetchMetrics();
+  }, []);
+
+  // Calculate real metrics
+  const activeAgents = agentsData.filter((agent: any) => agent.status === 'active').length;
+  const totalAgents = agentsData.length;
+  const totalTasksCompleted = agentsData.reduce((sum: number, agent: any) => sum + (agent.tasks_completed || 0), 0);
+  const avgMemoryUsage = agentsData.length > 0 
+    ? (agentsData.reduce((sum: number, agent: any) => sum + (agent.memory_usage || 0), 0) / agentsData.length).toFixed(1)
+    : '0';
 
   return (
     <PageWrapper title={`Welcome, ${userName}!`}>
@@ -31,28 +74,28 @@ export function DashboardPage() {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           <MetricsDisplayCard
             title="Active Agents"
-            value="12"
+            value={`${activeAgents}/${totalAgents}`}
             icon={Users}
             description="Currently running agents"
           />
           <MetricsDisplayCard
-            title="Workflows Executed"
-            value="157"
+            title="Tasks Completed"
+            value={totalTasksCompleted.toString()}
             icon={Workflow}
-            description="Past 24 hours"
+            description="Total tasks completed"
           />
           <MetricsDisplayCard
-            title="Resources Monitored"
-            value="75%"
-            icon={Briefcase} // Changed from Database for variety
-            description="Total capacity utilization"
+            title="Avg Memory Usage"
+            value={`${avgMemoryUsage}%`}
+            icon={Briefcase}
+            description="Average agent memory usage"
           />
           <MetricsDisplayCard
-            title="API Calls Today"
-            value="1.2M"
+            title="System CPU"
+            value={metrics?.cpu_usage ? `${metrics.cpu_usage.toFixed(1)}%` : '--'}
             icon={BarChart3}
-            description="+5% from yesterday"
-            colorClassName="text-green-500"
+            description={metrics?.uptime || 'Loading...'}
+            colorClassName={metrics?.cpu_usage > 80 ? 'text-red-500' : 'text-green-500'}
           />
         </div>
 
@@ -62,25 +105,27 @@ export function DashboardPage() {
           <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle>Agent Activity</CardTitle>
-              <CardDescription>Overview of recent agent statuses.</CardDescription>
+              <CardDescription>Real-time agent status overview</CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Agent Name</TableHead>
+                    <TableHead>Type</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Last Activity</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {agentsData.slice(0,4).map((agent) => ( // Show top 4
-                    <TableRow key={agent.name}>
+                  {agentsData.slice(0,4).map((agent: any) => (
+                    <TableRow key={agent.id}>
                       <TableCell className="font-medium">{agent.name}</TableCell>
+                      <TableCell>{agent.type}</TableCell>
                       <TableCell>
                         <StatusIndicator status={agent.status} />
                       </TableCell>
-                      <TableCell>{agent.lastActivity}</TableCell>
+                      <TableCell>{formatLastRun(agent.lastRun)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -93,23 +138,30 @@ export function DashboardPage() {
             </CardFooter>
           </Card>
 
-          {/* Card 2: System Health / Logs Summary (Span 1/3 on large screens) */}
+          {/* Card 2: System Health */}
           <Card>
             <CardHeader>
               <CardTitle>System Health</CardTitle>
-              <CardDescription>Current status of core services.</CardDescription>
+              <CardDescription>Real system metrics</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="h-32 flex items-center justify-center bg-muted rounded-md">
-                <p className="text-sm text-muted-foreground">Uptime chart placeholder</p>
-              </div>
               <ul className="space-y-2">
-                {systemStatus.map(service => (
-                  <li key={service.name} className="flex items-center justify-between">
-                    <span className="text-sm">{service.name}</span>
-                    <StatusIndicator status={service.status} />
-                  </li>
-                ))}
+                <li className="flex items-center justify-between">
+                  <span className="text-sm">API Services</span>
+                  <StatusIndicator status="active" />
+                </li>
+                <li className="flex items-center justify-between">
+                  <span className="text-sm">CPU Usage</span>
+                  <span className="text-sm font-medium">{metrics?.cpu_usage ? `${metrics.cpu_usage.toFixed(1)}%` : '--'}</span>
+                </li>
+                <li className="flex items-center justify-between">
+                  <span className="text-sm">Memory Usage</span>
+                  <span className="text-sm font-medium">{metrics?.memory_usage ? `${metrics.memory_usage.toFixed(1)}%` : '--'}</span>
+                </li>
+                <li className="flex items-center justify-between">
+                  <span className="text-sm">Disk Usage</span>
+                  <span className="text-sm font-medium">{metrics?.disk_usage ? `${metrics.disk_usage.toFixed(1)}%` : '--'}</span>
+                </li>
               </ul>
             </CardContent>
             <CardFooter className="flex justify-end">

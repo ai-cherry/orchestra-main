@@ -39,14 +39,22 @@ const LoginThemeToggle = () => {
 export function LoginPage() {
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuthStore();
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
       navigate({ to: '/' });
+    }
+    
+    // Auto-fill credentials if remembered
+    const savedCreds = localStorage.getItem('orchestra-remember');
+    if (savedCreds === 'true') {
+      setUsername('scoobyjava');
+      setRememberMe(true);
     }
   }, [isAuthenticated, navigate]);
 
@@ -55,28 +63,23 @@ export function LoginPage() {
     setError(null);
     setIsLoading(true);
 
-    try {
-      // Use the password field as the API key
-      const apiKey = password;
-
-      // Test the API key by trying to fetch agents
-      const response = await fetch(`${window.location.origin}/api/agents`, {
-        headers: {
-          'X-API-Key': apiKey,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        // API key is valid - store it as the token
-        login(email, apiKey);
-        console.log('Login successful, navigating to dashboard...');
-        navigate({ to: '/' });
+    // Simple hardcoded authentication for single user
+    if (username === 'scoobyjava' && password === 'Huskers1983$') {
+      // Use the hardcoded API key for backend authentication
+      const apiKey = '4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd';
+      
+      // Save remember me preference
+      if (rememberMe) {
+        localStorage.setItem('orchestra-remember', 'true');
       } else {
-        setError("Invalid email or password. Please try again.");
+        localStorage.removeItem('orchestra-remember');
       }
-    } catch (err) {
-      setError("Failed to connect to server. Please try again.");
+      
+      login(username, apiKey);
+      console.log('Login successful, navigating to dashboard...');
+      navigate({ to: '/' });
+    } else {
+      setError("Invalid username or password. Please try again.");
     }
 
     setIsLoading(false);
@@ -109,15 +112,15 @@ export function LoginPage() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-foreground">Email Address</Label>
+              <Label htmlFor="username" className="text-sm font-medium text-foreground">Username</Label>
               <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="admin@example.com"
+                id="username"
+                name="username"
+                type="text"
+                placeholder="Enter your username"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 disabled={isLoading}
                 className="w-full px-4 py-3 rounded-md border-border focus:ring-theme-accent-primary focus:border-theme-accent-primary"
               />
@@ -140,6 +143,18 @@ export function LoginPage() {
                 disabled={isLoading}
                 className="w-full px-4 py-3 rounded-md border-border focus:ring-theme-accent-primary focus:border-theme-accent-primary"
               />
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="remember"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-theme-accent-primary focus:ring-theme-accent-primary"
+              />
+              <Label htmlFor="remember" className="text-sm text-foreground">
+                Remember me
+              </Label>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col items-center">
