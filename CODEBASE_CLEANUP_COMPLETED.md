@@ -1,4 +1,4 @@
-# Codebase Cleanup – Completion Report  
+w# Codebase Cleanup – Completion Report  
 Repository: `orchestra-main`  
 Date: **29 May 2025**
 
@@ -9,7 +9,6 @@ This sprint removed all obsolete **Codespaces** artefacts, deprecated **GCP/Goog
 
 | Category                   | Status  | Notes |
 |----------------------------|---------|-------|
-| Codespaces artifacts       | **Deleted** | `.devcontainer/**/*`, `codespaces_pip_requirements.txt`, Gemeni Codespaces doc, related scripts |
 | Legacy GCP references      | **Archived / Deleted** | GCP deployment scripts & docs moved to `archive/legacy/` or removed |
 | Deprecated adapters        | **Removed** | `mcp_server/adapters/jules_google_adapter.py` (unused Google adapter) |
 | Secret naming consistency  | **Enforced** | All CI secrets now use `ORG_` prefix; workflow validated |
@@ -21,8 +20,6 @@ This sprint removed all obsolete **Codespaces** artefacts, deprecated **GCP/Goog
 
 ### Deleted
 ```
-codespaces_pip_requirements.txt
-docs/GEMINI_CODESPACES_SETUP.md
 check_admin_ui_deployment.sh
 manage_workstations.sh
 restart_gemini_code_assist.sh
@@ -69,8 +66,8 @@ Generated report: `SECRET_ANALYSIS_REPORT.md`
 Run these locally to confirm the cleanup.
 
 ```bash
-# 1. No Codespaces refs
-git grep -i codespaces -- . ':(exclude)archive/legacy' || echo "✔️ no codespaces refs"
+# 1. Cleanup verification
+git grep -i "legacy_gcp" -- . ':(exclude)archive/legacy' || echo "✔️ no legacy gcp refs"
 
 # 2. Minimal GCP refs (<= 10, all intentional)
 git grep -i gcp -- . ':(exclude)archive/legacy' | wc -l

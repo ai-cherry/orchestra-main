@@ -1,5 +1,5 @@
 # Production requirements with exact versions
-# Generated: 2025-05-30T22:08:10.025169
+# Generated: 2025-05-30T22:12:57.964648
 # Use with: pip install -r requirements/production/requirements.txt -c requirements/constraints.txt
 
 anthropic==0.39.0

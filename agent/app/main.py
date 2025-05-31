@@ -6,6 +6,9 @@ import structlog
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
+# Import the admin router
+from agent.app.routers.admin import router as admin_router
+
 # import openai  # Removed unused import
 
 # Configure structlog for structured logging
@@ -24,6 +27,9 @@ structlog.configure(
 logger = structlog.get_logger()
 
 app = FastAPI()
+
+# Include the admin router
+app.include_router(admin_router)
 
 # Middleware for logging requests and latency
 
