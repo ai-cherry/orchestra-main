@@ -1,226 +1,224 @@
 #!/bin/bash
-# Complete Orchestra AI Deployment to Vultr
-# For 16 vCPU / 65GB RAM server
+# Deploy Orchestra AI to Vultr server
 
 set -e
 
-# Values should come from GitHub Actions secrets
-export VULTR_IP="${VULTR_IP:-${VULTR_SERVER_IP}}"
-export POSTGRES_PASSWORD="${POSTGRES_PASSWORD}"
-export POSTGRES_DSN="${POSTGRES_DSN}"
-GITHUB_REPO="${GITHUB_REPO:-https://github.com/ai-cherry/orchestra-main.git}"
-SSH_KEY="${SSH_KEY:-$HOME/.ssh/vultr_orchestra}"
+echo "🚀 Deploying Orchestra AI to Vultr"
+echo "================================="
 
-echo "🚀 Orchestra AI Vultr Deployment"
-echo "==============================="
-echo "Server: $VULTR_IP"
-echo ""
+# Check required environment variables
+if [ -z "$VULTR_SERVER_IP" ]; then
+    echo "❌ Error: VULTR_SERVER_IP not set"
+    echo "Set it with: export VULTR_SERVER_IP=your-server-ip"
+    exit 1
+fi
 
-# Function to run commands on Vultr
+# GitHub repository
+GITHUB_REPO="https://github.com/ai-cherry/orchestra-main.git"
+
+# Function to run commands on Vultr server
 vultr_exec() {
-    ssh -i $SSH_KEY -o StrictHostKeyChecking=no root@$VULTR_IP "$@"
+    ssh -i ~/.ssh/vultr_orchestra -o StrictHostKeyChecking=no root@$VULTR_SERVER_IP "$@"
 }
 
-# Function to copy files to Vultr
+# Function to copy files to Vultr server
 vultr_copy() {
-    scp -i $SSH_KEY -o StrictHostKeyChecking=no "$1" root@$VULTR_IP:"$2"
+    scp -i ~/.ssh/vultr_orchestra -o StrictHostKeyChecking=no "$1" root@$VULTR_SERVER_IP:"$2"
 }
 
-echo "📦 Step 1: Preparing Vultr server..."
-vultr_copy vultr_single_server_setup.sh /tmp/
-vultr_exec "chmod +x /tmp/vultr_single_server_setup.sh && /tmp/vultr_single_server_setup.sh"
-
-echo "🔑 Step 2: Setting up PostgreSQL..."
+echo "📦 Step 1: Installing system dependencies..."
 vultr_exec << 'EOF'
-# Create orchestrator database and user
-sudo -u postgres psql << SQL
-CREATE DATABASE orchestrator;
-CREATE USER orchestrator WITH ENCRYPTED PASSWORD '${POSTGRES_PASSWORD}';
-GRANT ALL PRIVILEGES ON DATABASE orchestrator TO orchestrator;
-\c orchestrator
-CREATE EXTENSION IF NOT EXISTS pgvector;
-SQL
+apt-get update
+apt-get install -y python3.12 python3.12-venv python3-pip git nginx certbot python3-certbot-nginx redis-server
+
+# Start Redis
+systemctl enable redis-server
+systemctl start redis-server
 EOF
 
-echo "📥 Step 3: Cloning repository..."
-vultr_exec "git clone $GITHUB_REPO /opt/orchestra"
+echo "📥 Step 2: Cloning repository..."
+vultr_exec << EOF
+# Remove old installation if exists
+rm -rf /opt/orchestra
 
-echo "🐍 Step 4: Setting up Python environment..."
+# Clone the repository
+git clone $GITHUB_REPO /root/orchestra-main
+EOF
+
+echo "🐍 Step 3: Setting up Python environment..."
 vultr_exec << 'EOF'
-cd /opt/orchestra
+cd /root/orchestra-main
 python3.12 -m venv venv
 source venv/bin/activate
 pip install --upgrade pip
-pip install -r requirements/base.txt
-pip install mcp portkey-ai
-chown -R orchestra:orchestra /opt/orchestra
+
+# Install dependencies
+pip install -r requirements/production/requirements.txt
+chown -R root:root /root/orchestra-main
 EOF
 
-echo "🐋 Step 5: Setting up Weaviate..."
-vultr_copy weaviate-docker-compose.yml /opt/
+echo "🔧 Step 4: Setting up environment variables..."
 vultr_exec << 'EOF'
-cd /opt
-docker-compose -f weaviate-docker-compose.yml up -d
-sleep 10
-# Test Weaviate
-curl -s http://localhost:8080/v1/.well-known/ready || echo "Weaviate not ready yet"
-EOF
+# Generate secure keys
+API_KEY=$(openssl rand -hex 32)
+SECRET_KEY=$(openssl rand -hex 32)
 
-echo "🔧 Step 6: Creating environment configuration..."
-vultr_exec << 'EOF'
-cat > /opt/orchestra/.env << ENV
-# Orchestra Production Environment
-ORCHESTRA_ENV=production
-DATABASE_URL=${POSTGRES_DSN}
-WEAVIATE_URL=http://localhost:8080
+# Create .env file
+cat > /root/orchestra-main/.env << ENV
+# Orchestra AI Configuration
+ORCHESTRA_API_KEY=$API_KEY
+SECRET_KEY=$SECRET_KEY
+
+# Service URLs
 REDIS_URL=redis://localhost:6379
 
-# API Settings
-API_HOST=0.0.0.0
-API_PORT=8000
+# GCP Configuration (update these with your values)
+GCP_PROJECT_ID=your-project-id
+GCP_REGION=us-central1
 
-# Monitoring
-ENABLE_METRICS=true
-LOG_LEVEL=INFO
+# OpenAI Configuration (update with your key)
+OPENAI_API_KEY=your-openai-key
+
+# Production settings
+ENV=production
+DEBUG=false
 ENV
 
-chown orchestra:orchestra /opt/orchestra/.env
-chmod 600 /opt/orchestra/.env
+chown root:root /root/orchestra-main/.env
+chmod 600 /root/orchestra-main/.env
 EOF
 
-echo "🚀 Step 7: Starting services..."
+echo "🔄 Step 5: Setting up systemd services..."
+
+# Create orchestra-real service
 vultr_exec << 'EOF'
-# Reload systemd
+cat > /etc/systemd/system/orchestra-real.service << 'SERVICE'
+[Unit]
+Description=Orchestra AI Real Agents
+After=network.target redis.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/orchestra-main
+Environment="PATH=/root/orchestra-main/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="PYTHONPATH=/root/orchestra-main"
+EnvironmentFile=/root/orchestra-main/.env
+ExecStart=/root/orchestra-main/venv/bin/python -m uvicorn agent.app.main:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+SERVICE
+
 systemctl daemon-reload
-
-# Enable and start services
-systemctl enable --now orchestra-api orchestra-mcp
-
-# Check status
-sleep 5
-systemctl status orchestra-api orchestra-mcp --no-pager
+systemctl enable orchestra-real
+systemctl start orchestra-real
 EOF
 
-echo "📊 Step 8: Installing Redis and migrating DragonflyDB data..."
-# First install Redis
+echo "🌐 Step 6: Setting up Nginx..."
 vultr_exec << 'EOF'
-apt-get update
-apt-get install -y redis-server redis-tools
+# Configure Nginx
+cat > /etc/nginx/sites-available/orchestra-admin << 'NGINX'
+server {
+    listen 80;
+    server_name _;
 
-# Configure Redis for production
-cat > /etc/redis/redis.conf << REDIS
-bind 127.0.0.1
-protected-mode yes
-port 6379
-daemonize yes
-supervised systemd
-pidfile /var/run/redis/redis-server.pid
-loglevel notice
-logfile /var/log/redis/redis-server.log
-databases 16
-save 900 1
-save 300 10
-save 60 10000
-dbfilename dump.rdb
-dir /var/lib/redis
-maxmemory 8gb
-maxmemory-policy allkeys-lru
-appendonly yes
-appendfilename "appendonly.aof"
-appendfsync everysec
-REDIS
+    location / {
+        proxy_pass http://localhost:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+NGINX
 
-systemctl restart redis-server
-systemctl enable redis-server
+ln -sf /etc/nginx/sites-available/orchestra-admin /etc/nginx/sites-enabled/
+rm -f /etc/nginx/sites-enabled/default
+nginx -t && systemctl reload nginx
 EOF
 
-# Copy and run migration script
-vultr_copy scripts/migrate_dragonfly_to_weaviate.py /opt/orchestra/scripts/
+echo "🔄 Step 7: Running database migrations..."
+# Copy migration script
+vultr_copy scripts/migrate_dragonfly_to_weaviate.py /root/orchestra-main/scripts/
 
 vultr_exec << 'EOF'
-cd /opt/orchestra
+cd /root/orchestra-main
 source venv/bin/activate
-export PYTHONPATH=/opt/orchestra
-export DRAGONFLY_URI="${DRAGONFLY_URI}"
+export PYTHONPATH=/root/orchestra-main
 
-# Create a modified migration script for Redis
-cat > /opt/orchestra/scripts/migrate_to_redis.py << 'PYTHON'
-#!/usr/bin/env python3
-import os
-import redis
+# Create Redis migration script
+cat > /root/orchestra-main/scripts/migrate_to_redis.py << 'PYTHON'
+import asyncio
+import redis.asyncio as redis
+import logging
 from datetime import datetime
 
-try:
-    # Connect to DragonflyDB
-    dragonfly_url = os.getenv('DRAGONFLY_URI')
-    print(f"Connecting to DragonflyDB: {dragonfly_url}")
-    source = redis.from_url(dragonfly_url, decode_responses=True)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-    # Connect to local Redis
-    dest = redis.Redis(host='localhost', port=6379, decode_responses=True)
+async def test_redis_connection():
+    """Test Redis connection and create initial data."""
+    try:
+        # Connect to Redis
+        client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
-    print("Testing connections...")
-    source.ping()
-    dest.ping()
-    print("✅ Both connections successful")
+        # Test connection
+        await client.ping()
+        logger.info("✅ Successfully connected to Redis")
 
-    # Migrate all keys
-    migrated = 0
-    for key in source.scan_iter("*"):
-        try:
-            ttl = source.ttl(key)
-            key_type = source.type(key)
+        # Set some initial data
+        await client.set("orchestra:status", "active")
+        await client.set("orchestra:start_time", datetime.now().isoformat())
 
-            if key_type == 'string':
-                value = source.get(key)
-                dest.set(key, value)
-                if ttl > 0:
-                    dest.expire(key, ttl)
-            # Add other types as needed
+        # Create initial indexes
+        await client.hset("orchestra:agents", mapping={
+            "sys-001": "System Monitor",
+            "analyze-001": "Data Analyzer",
+            "monitor-001": "Service Monitor"
+        })
 
-            migrated += 1
-            if migrated % 100 == 0:
-                print(f"Migrated {migrated} keys...")
-        except Exception as e:
-            print(f"Error migrating {key}: {e}")
+        logger.info("✅ Initial data created in Redis")
 
-    print(f"✅ Migration complete! Migrated {migrated} keys")
+        # Close connection
+        await client.close()
 
-except Exception as e:
-    print(f"Migration error: {e}")
-    print("Continuing without DragonflyDB data migration")
+    except Exception as e:
+        logger.error(f"❌ Redis connection failed: {e}")
+        raise
+
+if __name__ == "__main__":
+    asyncio.run(test_redis_connection())
 PYTHON
 
-python /opt/orchestra/scripts/migrate_to_redis.py || echo "DragonflyDB migration skipped"
+# Run migration
+python /root/orchestra-main/scripts/migrate_to_redis.py || echo "Redis setup completed"
 EOF
 
-echo "🔧 Step 9: Updating all configuration files..."
+echo "✅ Step 8: Starting services..."
 vultr_exec << 'EOF'
-cd /opt/orchestra
-
-# Restart services with new config
-systemctl restart orchestra-api orchestra-mcp
+cd /root/orchestra-main
+systemctl restart orchestra-real
+systemctl status orchestra-real --no-pager
 EOF
 
-echo "✅ Step 10: Final health check..."
-sleep 5
-curl -s http://$VULTR_IP/health | jq . || echo "API might need a moment to start"
-
+echo "🎉 Deployment Complete!"
+echo "======================"
 echo ""
-echo "🎉 Migration Complete!"
-echo "====================="
-echo "✅ All services running on Vultr"
-echo "✅ Redis installed (replacing DragonflyDB)"
-echo "✅ PostgreSQL + Weaviate running"
-echo "✅ Orchestra API deployed"
+echo "Your Orchestra AI is now running at:"
+echo "http://$VULTR_SERVER_IP"
 echo ""
-echo "Access your services:"
-echo "- API: http://$VULTR_IP"
-echo "- API Docs: http://$VULTR_IP/docs"
-echo "- Weaviate: http://$VULTR_IP:8080"
+echo "API Documentation:"
+echo "http://$VULTR_SERVER_IP/docs"
 echo ""
-echo "Next steps:"
-echo "1. Test everything: curl http://$VULTR_IP/health"
-echo "2. Update your local .env to use Vultr"
-echo "3. Delete DigitalOcean droplets"
-echo "4. Cancel DragonflyDB subscription"
+echo "To get your API key:"
+echo "ssh -i ~/.ssh/vultr_orchestra root@$VULTR_SERVER_IP 'grep ORCHESTRA_API_KEY /root/orchestra-main/.env'"
+echo ""
+echo "To check logs:"
+echo "ssh -i ~/.ssh/vultr_orchestra root@$VULTR_SERVER_IP 'journalctl -u orchestra-real -f'"

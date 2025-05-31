@@ -12,6 +12,7 @@ litellm==1.70.4
 mcp==1.9.1
 openai==1.82.0
 phidata==2.7.10
+psutil==7.0.0
 pydantic==2.11.4
 python-dotenv==1.1.0
 python-multipart==0.0.9

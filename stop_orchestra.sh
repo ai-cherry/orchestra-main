@@ -1,16 +1,22 @@
 #!/bin/bash
-# Orchestra AI - Stop Everything
+# Stop Orchestra AI Services
 
-echo "🛑 Stopping Orchestra AI..."
+echo "🛑 Stopping Orchestra AI Services..."
 
-# Stop Python processes
-pkill -f "orchestrator_server.py"
-pkill -f "memory_server.py"
-pkill -f "uvicorn"
+# Stop API server
+echo "Stopping API server..."
+pkill -f "uvicorn agent.app.main" || echo "API server not running"
 
-# Stop Docker Compose if running
-if command -v docker-compose &> /dev/null; then
-    docker-compose down
+# Stop any background agents
+pkill -f "agent.app" || true
+
+# Clean up any orphaned processes
+pkill -f "orchestra" || true
+
+echo "✅ All services stopped"
+
+# Check if anything is still running on port 8000
+if lsof -i:8000 > /dev/null 2>&1; then
+    echo "⚠️  Warning: Something is still using port 8000:"
+    lsof -i:8000
 fi
-
-echo "✓ Orchestra AI stopped"

@@ -1,15 +1,15 @@
 [Unit]
-Description=Orchestra AI API Service
-After=network.target
+Description=Orchestra AI Real Agents API
+After=network.target redis.service
 
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/opt/orchestra
-Environment="PATH=/usr/local/bin:/usr/bin:/bin"
-Environment="PULUMI_CONFIG_PASSPHRASE=orchestra-dev-123"
-Environment="PYTHONPATH=/opt/orchestra"
-ExecStart=/usr/bin/python3 -m uvicorn core.api.main:app --host 0.0.0.0 --port 8000
+WorkingDirectory=/root/orchestra-main
+Environment="PATH=/root/orchestra-main/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="PYTHONPATH=/root/orchestra-main"
+EnvironmentFile=/root/orchestra-main/.env
+ExecStart=/root/orchestra-main/venv/bin/python -m uvicorn agent.app.main:app --host 0.0.0.0 --port 8000
 Restart=always
 RestartSec=10
 

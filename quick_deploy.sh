@@ -1,102 +1,83 @@
 #!/bin/bash
-# Quick Manual Deployment Script
+# Quick deployment script for real agents
 
-set -e
+echo "🚀 Deploying Orchestra AI with REAL agents..."
 
-echo "🚀 Quick Manual Deployment"
-echo "========================="
+# Server details
+SERVER="45.32.69.157"
+PASSWORD='z+G3D,$n9M3.=Dr}'
 
-# Check required environment variables
-if [ -z "$VULTR_SERVER_IP" ]; then
-    echo "❌ Error: VULTR_SERVER_IP not set"
-    echo "Set it with: export VULTR_SERVER_IP=your-server-ip"
-    exit 1
-fi
+# Create deployment command
+DEPLOY_CMD='
+cd /root/orchestra-main
 
-if [ ! -f "$HOME/.ssh/vultr_orchestra" ]; then
-    echo "❌ Error: SSH key not found at $HOME/.ssh/vultr_orchestra"
-    echo "Make sure you have the SSH key configured"
-    exit 1
-fi
+# Stop any existing API
+pkill -f uvicorn || true
+sleep 2
 
-echo "📦 Deploying to Vultr server: $VULTR_SERVER_IP"
-
-# Function to run commands on server
-vultr_exec() {
-    ssh -i $HOME/.ssh/vultr_orchestra -o StrictHostKeyChecking=no root@$VULTR_SERVER_IP "$@"
-}
-
-echo "🔄 Step 1: Pulling latest code on server..."
-vultr_exec << 'EOF'
-cd /opt/orchestra
-git pull origin main
-EOF
-
-echo "🐍 Step 2: Installing new dependencies..."
-vultr_exec << 'EOF'
-cd /opt/orchestra
+# Start the real API
 source venv/bin/activate
+nohup python -m uvicorn agent.app.main:app --host 0.0.0.0 --port 8080 > /root/api_real.log 2>&1 &
+sleep 3
 
-# Use the new safe install method with constraints
-if [ -f scripts/safe_install.sh ]; then
-    echo "Using safe_install.sh..."
-    chmod +x scripts/safe_install.sh
-    ./scripts/safe_install.sh
-else
-    # Fallback to old method
-    pip install -r requirements/base.txt
+# Test the API
+echo "Testing API..."
+curl -s -X GET "http://localhost:8080/api/agents" \
+     -H "X-API-Key: 4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd" | \
+     python3 -m json.tool | head -20
+
+# Install nodejs if needed
+if ! command -v node &> /dev/null; then
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    apt-get install -y nodejs
 fi
 
-# Ensure MCP is installed
-pip install mcp portkey-ai -c requirements/constraints.txt 2>/dev/null || pip install mcp portkey-ai
+# Install pnpm
+npm install -g pnpm
+
+# Build Admin UI
+cd admin-ui
+pnpm install --no-frozen-lockfile
+pnpm build
+
+# Deploy to web root
+mkdir -p /var/www/orchestra-admin
+cp -r dist/* /var/www/orchestra-admin/
+
+# Configure nginx
+cat > /etc/nginx/sites-available/orchestra-admin << EOF
+server {
+    listen 80;
+    server_name cherry-ai.me;
+
+    root /var/www/orchestra-admin;
+    index index.html;
+
+    location / {
+        try_files \$uri \$uri/ /index.html;
+    }
+
+    location /api {
+        proxy_pass http://localhost:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+}
 EOF
 
-echo "🔧 Step 3: Updating auth configuration..."
-vultr_exec << 'EOF'
-cd /opt/orchestra
+# Enable site
+ln -sf /etc/nginx/sites-available/orchestra-admin /etc/nginx/sites-enabled/
+rm -f /etc/nginx/sites-enabled/default
+nginx -t && systemctl reload nginx
 
-# Add ORCHESTRA_API_KEY if not already in .env
-if ! grep -q "ORCHESTRA_API_KEY" .env 2>/dev/null; then
-    echo "" >> .env
-    echo "# Simple API Authentication" >> .env
-    echo "ORCHESTRA_API_KEY=$(openssl rand -hex 32)" >> .env
-    echo "✅ Generated new ORCHESTRA_API_KEY"
-fi
+echo "✅ Deployment complete!"
+echo "🌐 Visit https://cherry-ai.me to see your REAL AI agents!"
+'
 
-chown orchestra:orchestra .env
-chmod 600 .env
-EOF
-
-echo "🔄 Step 4: Restarting services..."
-vultr_exec << 'EOF'
-systemctl daemon-reload
-systemctl restart orchestra-api orchestra-mcp || true
-
-# Wait for services to start
-sleep 10
-
-# Check status
-systemctl status orchestra-api --no-pager || echo "API service status check failed"
-systemctl status orchestra-mcp --no-pager || echo "MCP service status check failed"
-EOF
-
-echo "✅ Step 5: Health check..."
-sleep 5
-
-# Test API
-echo "Testing API health..."
-curl -s http://$VULTR_SERVER_IP:8000/health | jq . || echo "API health check failed"
-
-# Test Weaviate
-echo "Testing Weaviate..."
-curl -s http://$VULTR_SERVER_IP:8080/v1/.well-known/ready || echo "Weaviate check failed"
-
-echo ""
-echo "🎉 Deployment Complete!"
-echo "======================"
-echo "API: http://$VULTR_SERVER_IP:8000"
-echo "API Docs: http://$VULTR_SERVER_IP:8000/docs"
-echo "Admin UI: http://$VULTR_SERVER_IP"
-echo ""
-echo "To get your API key:"
-echo "ssh -i ~/.ssh/vultr_orchestra root@$VULTR_SERVER_IP 'grep ORCHESTRA_API_KEY /opt/orchestra/.env'"
+# Execute on server
+sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no root@$SERVER "$DEPLOY_CMD"
