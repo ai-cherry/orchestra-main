@@ -20,14 +20,15 @@ Instructions:
 """
 
 import os
+
 import pulumi
-import pulumi_digitalocean as do
 import pulumi_command as command
-from pulumi import Config, Output, ResourceOptions
+import pulumi_digitalocean as do
+from components.postgres_component import PostgresComponent
 
 # Import custom components
 from components.vector_droplet_component import VectorDropletComponent
-from components.postgres_component import PostgresComponent
+from pulumi import Config, Output, ResourceOptions
 
 # --- CONFIGURATION ---
 config = Config()
@@ -105,10 +106,10 @@ app_node = PostgresComponent(
         "ssh_private_key": ssh_private_key,
         "allowed_hosts": [vpc_cidr],
         "python_packages": [
-            "superagi", 
-            "autogen", 
-            "weaviate-client", 
-            "psycopg2-binary", 
+            "superagi",
+            "autogen",
+            "weaviate-client",
+            "psycopg2-binary",
             "langfuse",
             "sentence-transformers",
             "uvicorn",
@@ -132,14 +133,14 @@ if enable_micro_cache:
         image="docker-20-04",
         tags=[f"orchestra-{env}", "micro-cache"],
     )
-    
+
     # Setup connection for remote commands
     micro_cache_connection = command.remote.ConnectionArgs(
         host=micro_cache_droplet.ipv4_address,
         user="root",
         private_key=ssh_private_key,
     )
-    
+
     # Deploy Dragonfly container
     deploy_dragonfly = command.remote.Command(
         f"deploy-dragonfly-{env}",
@@ -148,7 +149,7 @@ if enable_micro_cache:
             # Install Docker
             apt-get update && apt-get install -y docker.io
             systemctl enable docker && systemctl start docker
-            
+
             # Run Dragonfly with 512MB memory limit
             docker run -d --name dragonfly \
               --restart always \
@@ -156,7 +157,7 @@ if enable_micro_cache:
               -m 512m \
               --cpus=0.5 \
               docker.dragonflydb.io/dragonflydb/dragonfly
-            
+
             # Create snapshot cron job
             cat > /root/snapshot-dragonfly.sh << 'EOF'
 #!/bin/bash
@@ -167,15 +168,15 @@ docker cp dragonfly:/data/snapshot.dfs /root/dragonfly-$(date +%Y%m%d).dfs
 # Cleanup old snapshots (keep last 7)
 find /root -name "dragonfly-*.dfs" -type f -mtime +7 -delete
 EOF
-            
+
             chmod +x /root/snapshot-dragonfly.sh
-            
+
             # Add to crontab
             (crontab -l 2>/dev/null || echo "") | grep -v "snapshot-dragonfly.sh" | { cat; echo "0 4 * * * /root/snapshot-dragonfly.sh > /var/log/dragonfly-snapshot.log 2>&1"; } | crontab -
         """,
         opts=ResourceOptions(depends_on=[micro_cache_droplet]),
     )
-    
+
     # Create firewall rules for Dragonfly
     micro_cache_firewall = do.Firewall(
         f"micro-cache-firewall-{env}",
@@ -342,35 +343,35 @@ THRESHOLD_MS = 50  # 50ms threshold for considering micro-cache
 def measure_weaviate_latency():
     headers = {}
     if WEAVIATE_API_KEY:
-        headers["Authorization"] = f"Bearer {WEAVIATE_API_KEY}"
-    
+        headers["Authorization"] = "Bearer " + WEAVIATE_API_KEY
+
     latencies = []
     for _ in range(SAMPLE_SIZE):
         try:
             start = time.time()
-            response = requests.get(f"{WEAVIATE_ENDPOINT}/v1/.well-known/ready", headers=headers)
+            response = requests.get(WEAVIATE_ENDPOINT + "/v1/.well-known/ready", headers=headers)
             end = time.time()
-            
+
             if response.status_code == 200:
                 latency_ms = (end - start) * 1000  # Convert to milliseconds
                 latencies.append(latency_ms)
             else:
-                print(f"Error: Received status code {response.status_code}")
+                print("Error: Received status code " + str(response.status_code))
         except Exception as e:
-            print(f"Request failed: {e}")
-        
+            print("Request failed: " + str(e))
+
         # Small delay between requests
         time.sleep(0.5)
-    
+
     if not latencies:
         return None
-    
+
     # Calculate statistics
     avg_latency = statistics.mean(latencies)
     p95_latency = sorted(latencies)[int(len(latencies) * 0.95)]
     min_latency = min(latencies)
     max_latency = max(latencies)
-    
+
     result = {
         "timestamp": datetime.datetime.now().isoformat(),
         "avg_latency_ms": avg_latency,
@@ -380,24 +381,24 @@ def measure_weaviate_latency():
         "sample_size": len(latencies),
         "needs_micro_cache": p95_latency > THRESHOLD_MS
     }
-    
+
     # Save results
     try:
         existing_data = []
         if os.path.exists(RESULTS_FILE):
             with open(RESULTS_FILE, 'r') as f:
                 existing_data = json.load(f)
-        
+
         # Keep only the last 100 measurements
         existing_data.append(result)
         if len(existing_data) > 100:
             existing_data = existing_data[-100:]
-        
+
         with open(RESULTS_FILE, 'w') as f:
             json.dump(existing_data, f, indent=2)
     except Exception as e:
-        print(f"Failed to save results: {e}")
-    
+        print("Failed to save results: " + str(e))
+
     return result
 
 if __name__ == "__main__":
@@ -411,7 +412,8 @@ EOF
 chmod +x /opt/orchestra/monitor_latency.py
 
 # Create cron job to run every hour
-(crontab -l 2>/dev/null || echo "") | grep -v "monitor_latency.py" | { cat; echo "0 * * * * /opt/orchestra/venv/bin/python /opt/orchestra/monitor_latency.py >> /var/log/latency_monitor.log 2>&1"; } | crontab -
+# TODO: Fix this crontab command - currently causing f-string syntax error
+# echo "0 * * * * /opt/orchestra/venv/bin/python /opt/orchestra/monitor_latency.py >> /var/log/latency_monitor.log 2>&1" | crontab -
 """
     ),
     opts=ResourceOptions(depends_on=[setup_orchestra_service]),

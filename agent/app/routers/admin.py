@@ -43,7 +43,7 @@ class QueryResponse(BaseModel):
     """Query response model."""
 
     response: str
-    agent_id: str = "orchestrator-001"
+    agent_id: str
     timestamp: str
     tokens_used: int = 0
 

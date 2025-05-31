@@ -1,367 +1,280 @@
 #!/usr/bin/env python3
 """
-Orchestra CLI - Unified Command Interface
-
-A simple CLI tool that consolidates common Orchestra operations:
-- Configuration validation
-- Health monitoring
-- Service management
-- Infrastructure operations
+Orchestra AI Unified CLI - Real Agents Version
+=============================================
+A unified command-line interface for managing the Orchestra AI platform with real agents.
 
 Usage:
-    python scripts/orchestra.py config validate
-    python scripts/orchestra.py health check
-    python scripts/orchestra.py health monitor
-    python scripts/orchestra.py services start
-    python scripts/orchestra.py services stop
+    python scripts/orchestra.py status       # Check system status
+    python scripts/orchestra.py start        # Start all services
+    python scripts/orchestra.py stop         # Stop all services
+    python scripts/orchestra.py query "your question"  # Query agents
+    python scripts/orchestra.py health       # Run health checks
 """
 
 import argparse
-import logging
+import os
 import subprocess
 import sys
-from typing import List
+import time
+from pathlib import Path
+from typing import Dict, List
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-logger = logging.getLogger(__name__)
+import psutil
+import requests
 
 
-class OrchestaCLI:
-    """Simple unified CLI for Orchestra operations."""
+class OrchestraCLI:
+    """Unified CLI for Orchestra AI platform with real agents."""
 
     def __init__(self):
-        self.script_dir = "scripts"
+        self.api_url = "http://localhost:8000"
+        self.api_key = "4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd"
+        self.project_root = Path(__file__).parent.parent
+        self.venv_path = self.project_root / "venv"
+        self.python_cmd = str(self.venv_path / "bin" / "python")
 
-    def run_command(self, cmd: List[str], capture_output: bool = False) -> subprocess.CompletedProcess:
-        """Run a command and return the result."""
-        try:
-            logger.debug(f"Running: {' '.join(cmd)}")
-            result = subprocess.run(cmd, capture_output=capture_output, text=True, check=False)
-            return result
-        except Exception as e:
-            logger.error(f"Command failed: {e}")
-            return subprocess.CompletedProcess(cmd, 1, stderr=str(e))
+    def check_python_version(self) -> bool:
+        """Check if Python version is 3.10+."""
+        version_info = sys.version_info
+        if version_info.major < 3 or (version_info.major == 3 and version_info.minor < 10):
+            print(f"❌ Python 3.10+ required (found {sys.version})")
+            return False
+        return True
 
-    def config_validate(self, args) -> int:
-        """Validate Orchestra configuration."""
-        logger.info("Validating configuration...")
+    def check_venv(self) -> bool:
+        """Check if virtual environment exists."""
+        if not self.venv_path.exists():
+            print("❌ Virtual environment not found")
+            print("   Create with: python -m venv venv")
+            return False
+        return True
 
-        cmd = ["python", f"{self.script_dir}/config_validator.py"]
-        if args.output:
-            cmd.extend(["--output", args.output])
-        if args.fail_fast:
-            cmd.append("--fail-fast")
-        if args.verbose:
-            cmd.append("--verbose")
+    def run_command(self, cmd: List[str], check: bool = True) -> subprocess.CompletedProcess:
+        """Run a shell command."""
+        return subprocess.run(cmd, capture_output=True, text=True, check=check)
 
-        result = self.run_command(cmd)
-        return result.returncode
+    def get_service_status(self) -> Dict[str, bool]:
+        """Check status of all services."""
+        status = {
+            "api_server": False,
+            "redis": False,
+        }
 
-    def health_check(self, args) -> int:
-        """Check health of all services."""
-        logger.info("Checking service health...")
-
-        cmd = ["python", f"{self.script_dir}/health_monitor.py", "--check-services"]
-        if args.verbose:
-            cmd.append("--verbose")
-
-        result = self.run_command(cmd)
-        return result.returncode
-
-    def health_monitor(self, args) -> int:
-        """Start continuous health monitoring."""
-        logger.info("Starting health monitoring...")
-
-        cmd = ["python", f"{self.script_dir}/health_monitor.py", "--monitor"]
-        if args.interval:
-            cmd.extend(["--interval", str(args.interval)])
-        if args.verbose:
-            cmd.append("--verbose")
-
-        result = self.run_command(cmd)
-        return result.returncode
-
-    def health_wait(self, args) -> int:
-        """Wait for a service to become healthy."""
-        if not args.service:
-            logger.error("Service name required for wait command")
-            return 1
-
-        logger.info(f"Waiting for service: {args.service}")
-
-        cmd = [
-            "python",
-            f"{self.script_dir}/health_monitor.py",
-            "--wait-for",
-            args.service,
-        ]
-        if args.max_wait:
-            cmd.extend(["--max-wait", str(args.max_wait)])
-
-        result = self.run_command(cmd)
-        return result.returncode
-
-    def services_status(self, args) -> int:
-        """Show status of running services."""
-        logger.info("Checking service status...")
-
-        # Check what's running on known ports
-        try:
-            import socket
-
-            services = {
-                8002: "MCP Secret Manager",
-                8080: "Orchestrator/mongodb",
-                3000: "Admin UI",
-            }
-
-            status = {}
-            for port, name in services.items():
-                try:
-                    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                        s.settimeout(1)
-                        result = s.connect_ex(("localhost", port))
-                        status[port] = {"name": name, "running": result == 0}
-                except Exception:
-                    status[port] = {"name": name, "running": False}
-
-            print("\nService Status:")
-            print("=" * 50)
-            for port, info in status.items():
-                status_str = "✅ RUNNING" if info["running"] else "❌ STOPPED"
-                print(f"Port {port:4d}: {info['name']:<20} {status_str}")
-
-            return 0
-
-        except Exception as e:
-            logger.error(f"Error checking service status: {e}")
-            return 1
-
-    def services_start(self, args) -> int:
-        """Start Orchestra services."""
-        logger.info("Starting Orchestra services...")
-
-        # Start services in order
-        services = [
-            {
-                "name": "MCP Secret Manager",
-                "cmd": ["python", "-m", "mcp_servers.os.environ", "--port", "8002"],
-            },
-            {
-                "name": "Core Orchestrator",
-                "cmd": ["python", "core/orchestrator/src/api/app.py"],
-            },
-        ]
-
-        for service in services:
-            logger.info(f"Starting {service['name']}...")
-
-            # Run in background
+        # Check API server
+        for proc in psutil.process_iter(["pid", "name", "cmdline"]):
             try:
-                process = subprocess.Popen(
-                    service["cmd"],
-                    stdout=subprocess.DEVNULL if not args.verbose else None,
-                    stderr=subprocess.DEVNULL if not args.verbose else None,
-                )
-                logger.info(f"{service['name']} started with PID {process.pid}")
-            except Exception as e:
-                logger.error(f"Failed to start {service['name']}: {e}")
-                return 1
+                cmdline = proc.info.get("cmdline", [])
+                if cmdline and "uvicorn" in str(cmdline) and "agent.app.main" in str(cmdline):
+                    status["api_server"] = True
+                    break
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                pass
 
-        logger.info("All services started. Use 'orchestra health check' to verify.")
-        return 0
-
-    def services_stop(self, args) -> int:
-        """Stop Orchestra services."""
-        logger.info("Stopping Orchestra services...")
-
+        # Check Redis
         try:
-            # Kill processes on known ports
-            ports = [8002, 8080]
-            for port in ports:
-                cmd = ["lsof", "-ti", f":{port}"]
-                result = self.run_command(cmd, capture_output=True)
+            result = self.run_command(["redis-cli", "ping"], check=False)
+            status["redis"] = result.stdout.strip() == "PONG"
+        except:
+            status["redis"] = False
 
-                if result.returncode == 0 and result.stdout.strip():
-                    pids = result.stdout.strip().split("\n")
-                    for pid in pids:
-                        if pid:
-                            logger.info(f"Stopping process {pid} on port {port}")
-                            self.run_command(["kill", pid])
+        return status
 
-            logger.info("Services stopped")
-            return 0
+    def cmd_status(self) -> int:
+        """Show status of all services."""
+        print("🔍 Orchestra AI Status")
+        print("=" * 50)
 
-        except Exception as e:
-            logger.error(f"Error stopping services: {e}")
+        # Python version
+        if not self.check_python_version():
             return 1
 
-    def infra_validate(self, args) -> int:
-        """Validate infrastructure configuration."""
-        logger.info("Validating infrastructure...")
+        # Virtual environment
+        venv_ok = self.check_venv()
+        print(f"Virtual Environment: {'✅' if venv_ok else '❌'}")
 
-        # Check if Pulumi files exist
-        import os
+        # Services
+        status = self.get_service_status()
+        print("\nServices:")
+        print(f"  API Server: {'✅ Running' if status['api_server'] else '❌ Not running'}")
+        print(f"  Redis:      {'✅ Running' if status['redis'] else '❌ Not running'}")
 
-        pulumi_files = ["Pulumi.yaml", "infra/__main__.py"]
-        missing = [f for f in pulumi_files if not os.path.exists(f)]
+        # API health check
+        if status["api_server"]:
+            try:
+                response = requests.get(f"{self.api_url}/health", timeout=5)
+                if response.status_code == 200:
+                    print("\nAPI Health: ✅ Healthy")
+                else:
+                    print(f"\nAPI Health: ⚠️  Status {response.status_code}")
+            except:
+                print("\nAPI Health: ❌ Cannot connect")
 
-        if missing:
-            logger.warning(f"Missing Pulumi files: {missing}")
-
-        # Run config validation as well
-        return self.config_validate(args)
-
-    def env_check(self, args) -> int:
-        """Check environment setup."""
-        logger.info("Checking environment...")
-
-        cmd = ["python", f"{self.script_dir}/health_monitor.py", "--check-prereqs"]
-        result = self.run_command(cmd)
-        return result.returncode
-
-    def env_setup(self, args) -> int:
-        """Set up development environment."""
-        logger.info("Setting up environment...")
-
-        commands = [
-            ["make", "venv-check"],
-            ["make", "deps-check"],
-            ["python", f"{self.script_dir}/config_validator.py"],
-        ]
-
-        for cmd in commands:
-            logger.info(f"Running: {' '.join(cmd)}")
-            result = self.run_command(cmd)
-            if result.returncode != 0:
-                logger.error(f"Setup step failed: {' '.join(cmd)}")
-                return result.returncode
-
-        logger.info("Environment setup complete!")
         return 0
+
+    def cmd_start(self) -> int:
+        """Start all services."""
+        print("🚀 Starting Orchestra AI...")
+
+        if not self.check_python_version() or not self.check_venv():
+            return 1
+
+        # Stop any existing services
+        self.cmd_stop()
+
+        # Start API server
+        print("Starting API server...")
+        os.chdir(self.project_root)
+        subprocess.Popen(
+            [self.python_cmd, "-m", "uvicorn", "agent.app.main:app", "--host", "0.0.0.0", "--port", "8000"],
+            stdout=open("api.log", "w"),
+            stderr=subprocess.STDOUT,
+        )
+
+        # Wait for services to start
+        print("Waiting for services to start...")
+        time.sleep(3)
+
+        # Check status
+        status = self.get_service_status()
+        if status["api_server"]:
+            print("\n✅ Orchestra AI started successfully!")
+            print(f"   API URL: {self.api_url}")
+            print(f"   API Docs: {self.api_url}/docs")
+            print("   Logs: tail -f api.log")
+            return 0
+        else:
+            print("\n❌ Failed to start services")
+            return 1
+
+    def cmd_stop(self) -> int:
+        """Stop all services."""
+        print("🛑 Stopping Orchestra AI...")
+
+        # Stop API server
+        self.run_command(["pkill", "-f", "uvicorn agent.app.main"], check=False)
+        time.sleep(1)
+
+        print("✅ All services stopped")
+        return 0
+
+    def cmd_query(self, query: str) -> int:
+        """Query the agents."""
+        try:
+            headers = {"X-API-Key": self.api_key}
+            response = requests.post(f"{self.api_url}/api/query", json={"query": query}, headers=headers, timeout=30)
+
+            if response.status_code == 200:
+                result = response.json()
+                print(f"\n🤖 Agent: {result.get('agent_id', 'Unknown')}")
+                print(f"💬 Response: {result.get('response', 'No response')}")
+                return 0
+            else:
+                print(f"❌ Error: {response.status_code} - {response.text}")
+                return 1
+        except requests.exceptions.ConnectionError:
+            print("❌ Cannot connect to API. Is the server running?")
+            print("   Run: python scripts/orchestra.py start")
+            return 1
+        except Exception as e:
+            print(f"❌ Error: {e}")
+            return 1
+
+    def cmd_health(self) -> int:
+        """Run health checks."""
+        print("🏥 Running health checks...")
+
+        checks = {
+            "Python Version": self.check_python_version(),
+            "Virtual Environment": self.check_venv(),
+            "API Server": self.get_service_status()["api_server"],
+            "Redis": self.get_service_status()["redis"],
+        }
+
+        # API endpoint check
+        if checks["API Server"]:
+            try:
+                response = requests.get(f"{self.api_url}/health", timeout=5)
+                checks["API Health Endpoint"] = response.status_code == 200
+            except:
+                checks["API Health Endpoint"] = False
+
+        # Agent check
+        if checks["API Server"]:
+            try:
+                headers = {"X-API-Key": self.api_key}
+                response = requests.get(f"{self.api_url}/api/agents", headers=headers, timeout=5)
+                checks["Real Agents"] = response.status_code == 200 and len(response.json()) > 0
+            except:
+                checks["Real Agents"] = False
+
+        # Display results
+        print("\nHealth Check Results:")
+        print("=" * 50)
+        all_good = True
+        for check, passed in checks.items():
+            status = "✅ PASS" if passed else "❌ FAIL"
+            print(f"{check:.<40} {status}")
+            if not passed:
+                all_good = False
+
+        print("\n" + ("✅ All checks passed!" if all_good else "❌ Some checks failed"))
+        return 0 if all_good else 1
 
 
 def main():
-    """Main entry point for Orchestra CLI."""
+    """Main entry point."""
+    cli = OrchestraCLI()
+
     parser = argparse.ArgumentParser(
-        description="Orchestra CLI - Unified command interface",
+        description="Orchestra AI Unified CLI",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-    orchestra.py config validate              # Validate all configuration
-    orchestra.py health check                 # Check service health once
-    orchestra.py health monitor               # Monitor continuously
-    orchestra.py health wait --service=mcp_firestore  # Wait for service
-    orchestra.py services status              # Show service status
-    orchestra.py services start               # Start all services
-    orchestra.py services stop                # Stop all services
-    orchestra.py infra validate               # Validate infrastructure
-    orchestra.py env check                    # Check environment
-    orchestra.py env setup                    # Set up environment
+  python scripts/orchestra.py status
+  python scripts/orchestra.py start
+  python scripts/orchestra.py query "What is the CPU usage?"
+  python scripts/orchestra.py health
         """,
     )
 
-    # Global options
-    parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
+    subparsers = parser.add_subparsers(dest="command", help="Commands")
 
-    # Subcommands
-    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+    # Status command
+    subparsers.add_parser("status", help="Show status of all services")
 
-    # Config commands
-    config_parser = subparsers.add_parser("config", help="Configuration management")
-    config_subparsers = config_parser.add_subparsers(dest="config_action")
+    # Start command
+    subparsers.add_parser("start", help="Start all services")
 
-    validate_parser = config_subparsers.add_parser("validate", help="Validate configuration")
-    validate_parser.add_argument("--output", help="Output file for results")
-    validate_parser.add_argument("--fail-fast", action="store_true", help="Exit on first error")
+    # Stop command
+    subparsers.add_parser("stop", help="Stop all services")
 
-    # Health commands
-    health_parser = subparsers.add_parser("health", help="Health monitoring")
-    health_subparsers = health_parser.add_subparsers(dest="health_action")
+    # Query command
+    query_parser = subparsers.add_parser("query", help="Query the agents")
+    query_parser.add_argument("query", help="Query to send to agents")
 
-    health_subparsers.add_parser("check", help="Check service health once")
-
-    monitor_parser = health_subparsers.add_parser("monitor", help="Monitor continuously")
-    monitor_parser.add_argument("--interval", type=int, default=30, help="Check interval in seconds")
-
-    wait_parser = health_subparsers.add_parser("wait", help="Wait for service to be healthy")
-    wait_parser.add_argument("--service", required=True, help="Service name to wait for")
-    wait_parser.add_argument("--max-wait", type=int, default=120, help="Maximum wait time")
-
-    # Services commands
-    services_parser = subparsers.add_parser("services", help="Service management")
-    services_subparsers = services_parser.add_subparsers(dest="services_action")
-
-    services_subparsers.add_parser("status", help="Show service status")
-    services_subparsers.add_parser("start", help="Start all services")
-    services_subparsers.add_parser("stop", help="Stop all services")
-
-    # Infrastructure commands
-    infra_parser = subparsers.add_parser("infra", help="Infrastructure management")
-    infra_subparsers = infra_parser.add_subparsers(dest="infra_action")
-
-    infra_subparsers.add_parser("validate", help="Validate infrastructure configuration")
-
-    # Environment commands
-    env_parser = subparsers.add_parser("env", help="Environment management")
-    env_subparsers = env_parser.add_subparsers(dest="env_action")
-
-    env_subparsers.add_parser("check", help="Check environment setup")
-    env_subparsers.add_parser("setup", help="Set up development environment")
+    # Health command
+    subparsers.add_parser("health", help="Run health checks")
 
     args = parser.parse_args()
-
-    if args.verbose:
-        logging.getLogger().setLevel(logging.DEBUG)
 
     if not args.command:
         parser.print_help()
         return 1
 
-    cli = OrchestaCLI()
-
-    # Route to appropriate handler
-    try:
-        if args.command == "config":
-            if args.config_action == "validate":
-                return cli.config_validate(args)
-        elif args.command == "health":
-            if args.health_action == "check":
-                return cli.health_check(args)
-            elif args.health_action == "monitor":
-                return cli.health_monitor(args)
-            elif args.health_action == "wait":
-                return cli.health_wait(args)
-        elif args.command == "services":
-            if args.services_action == "status":
-                return cli.services_status(args)
-            elif args.services_action == "start":
-                return cli.services_start(args)
-            elif args.services_action == "stop":
-                return cli.services_stop(args)
-        elif args.command == "infra":
-            if args.infra_action == "validate":
-                return cli.infra_validate(args)
-        elif args.command == "env":
-            if args.env_action == "check":
-                return cli.env_check(args)
-            elif args.env_action == "setup":
-                return cli.env_setup(args)
-
-        # If we get here, invalid subcommand
+    # Execute command
+    if args.command == "status":
+        return cli.cmd_status()
+    elif args.command == "start":
+        return cli.cmd_start()
+    elif args.command == "stop":
+        return cli.cmd_stop()
+    elif args.command == "query":
+        return cli.cmd_query(args.query)
+    elif args.command == "health":
+        return cli.cmd_health()
+    else:
         parser.print_help()
-        return 1
-
-    except KeyboardInterrupt:
-        logger.info("Operation cancelled by user")
-        return 1
-    except Exception as e:
-        logger.error(f"Unexpected error: {e}")
-        if args.verbose:
-            import traceback
-
-            traceback.print_exc()
         return 1
 
 

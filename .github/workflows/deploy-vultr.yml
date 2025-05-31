@@ -2,7 +2,7 @@ name: Deploy to Vultr
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   workflow_dispatch:
     inputs:
       deploy_type:
@@ -21,31 +21,35 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v3
 
     - name: Setup SSH
+      env:
+        VULTR_SSH_KEY: ${{ secrets.VULTR_SSH_KEY }}
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.VULTR_SSH_KEY }}" > ~/.ssh/id_ed25519
-        chmod 600 ~/.ssh/id_ed25519
+        echo "$VULTR_SSH_KEY" > ~/.ssh/vultr_key
+        chmod 600 ~/.ssh/vultr_key
         ssh-keyscan -H ${{ secrets.VULTR_IP_ADDRESS }} >> ~/.ssh/known_hosts
 
     - name: Test connection
       run: |
-        ssh -i ~/.ssh/id_ed25519 root@${{ secrets.VULTR_IP_ADDRESS }} "echo 'Connected to Vultr server'"
+        ssh -i ~/.ssh/vultr_key root@${{ secrets.VULTR_IP_ADDRESS }} "echo 'Connected to Vultr server'"
 
     - name: Deploy updates
       if: github.event.inputs.deploy_type == 'update' || github.event_name == 'push'
+      env:
+        VULTR_IP: ${{ secrets.VULTR_IP }}
       run: |
         # Update code
-        ssh -i ~/.ssh/id_ed25519 root@${{ secrets.VULTR_IP_ADDRESS }} << 'EOF'
-        cd /opt/orchestra
+        ssh -o StrictHostKeyChecking=no -i ~/.ssh/vultr_key root@$VULTR_IP << 'EOF'
+        cd /root/orchestra-main
         git pull origin main
         source venv/bin/activate
-        pip install -r requirements/base.txt
+        pip install -r requirements/production/requirements.txt
 
         # Restart services
-        systemctl restart orchestra-api orchestra-mcp
+        systemctl restart orchestra-real
 
         # Health check
         sleep 5
@@ -64,19 +68,19 @@ jobs:
     - name: Rollback
       if: github.event.inputs.deploy_type == 'rollback'
       run: |
-        ssh -i ~/.ssh/id_ed25519 root@${{ secrets.VULTR_IP_ADDRESS }} << 'EOF'
-        cd /opt/orchestra
+        ssh -i ~/.ssh/vultr_key root@${{ secrets.VULTR_IP_ADDRESS }} << 'EOF'
+        cd /root/orchestra-main
         git reset --hard HEAD~1
-        systemctl restart orchestra-api orchestra-mcp
+        systemctl restart orchestra-real
         EOF
 
     - name: Post-deployment check
       if: always()
       run: |
         echo "🔍 Checking deployment status..."
-        ssh -i ~/.ssh/id_ed25519 root@${{ secrets.VULTR_IP_ADDRESS }} << 'EOF'
+        ssh -i ~/.ssh/vultr_key root@${{ secrets.VULTR_IP_ADDRESS }} << 'EOF'
         echo "=== Service Status ==="
-        systemctl is-active orchestra-api orchestra-mcp docker postgresql nginx
+        systemctl is-active orchestra-real docker postgresql nginx
 
         echo -e "\n=== API Health ==="
         curl -s http://localhost/health | jq . || echo "API not responding"
@@ -86,7 +90,7 @@ jobs:
         df -h /
 
         echo -e "\n=== Recent Logs ==="
-        journalctl -u orchestra-api --no-pager -n 10
+        journalctl -u orchestra-real --no-pager -n 10
         EOF
 
     - name: Notify deployment status
@@ -97,3 +101,8 @@ jobs:
         else
           echo "❌ Deployment failed!"
         fi
+
+    - name: Cleanup
+      if: always()
+      run: |
+        rm -f ~/.ssh/vultr_key
