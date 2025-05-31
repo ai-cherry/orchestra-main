@@ -8,12 +8,27 @@
 // is to have main.tsx set up the RouterProvider.
 
 import { RouterProvider } from '@tanstack/react-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { router } from './routes'; // Assuming routes.tsx exports the router instance
+
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 function App() {
   console.log('App component rendering...');
   try {
-    return <RouterProvider router={router} />;
+    return (
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    );
   } catch (error) {
     console.error('Error rendering router:', error);
     return (

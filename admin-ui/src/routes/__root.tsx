@@ -1,8 +1,8 @@
 import React from 'react';
-import { Outlet, createRootRoute, redirect, useLocation } from '@tanstack/react-router';
+import { Outlet, createRootRoute, useLocation } from '@tanstack/react-router';
 import AppLayout from '@/components/layout/AppLayout';
 import { ThemeProvider } from '@/context/ThemeContext';
-import { useAuthStore } from '@/store/authStore'; // Import auth store
+// import { useAuthStore } from '@/store/authStore'; // Temporarily commented out
 
 // Placeholder for TanStack Query Devtools
 // const TanStackRouterDevtools =
@@ -68,24 +68,25 @@ class ErrorBoundary extends React.Component<
 }
 
 export const Route = createRootRoute({
-  beforeLoad: async ({ location }) => {
-    // Only check auth for non-login routes
-    if (location.pathname !== '/login') {
-      const { isAuthenticated } = useAuthStore.getState();
+  // Temporarily disable auth check to debug
+  // beforeLoad: async ({ location }) => {
+  //   // Only check auth for non-login routes
+  //   if (location.pathname !== '/login') {
+  //     const { isAuthenticated } = useAuthStore.getState();
       
-      console.log('Root beforeLoad: checking auth for', location.pathname, 'isAuthenticated:', isAuthenticated);
+  //     console.log('Root beforeLoad: checking auth for', location.pathname, 'isAuthenticated:', isAuthenticated);
       
-      if (!isAuthenticated) {
-        console.log('Not authenticated, redirecting to login');
-        throw redirect({
-          to: '/login',
-          search: {
-            redirect: location.pathname,
-          },
-        });
-      }
-    }
-  },
+  //     if (!isAuthenticated) {
+  //       console.log('Not authenticated, redirecting to login');
+  //       throw redirect({
+  //         to: '/login',
+  //         search: {
+  //           redirect: location.pathname,
+  //         },
+  //       });
+  //     }
+  //   }
+  // },
   component: RootComponent,
   // Add notFoundComponent to the root route options if not already defined in routes.tsx
   // notFoundComponent: () => <NotFoundPage />, // Assuming NotFoundPage is imported
