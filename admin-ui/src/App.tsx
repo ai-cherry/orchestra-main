@@ -11,7 +11,18 @@ import { RouterProvider } from '@tanstack/react-router';
 import { router } from './routes'; // Assuming routes.tsx exports the router instance
 
 function App() {
-  return <RouterProvider router={router} />;
+  console.log('App component rendering...');
+  try {
+    return <RouterProvider router={router} />;
+  } catch (error) {
+    console.error('Error rendering router:', error);
+    return (
+      <div className="p-4 text-red-600">
+        <h1 className="text-2xl font-bold">Router Error</h1>
+        <pre className="mt-2">{error instanceof Error ? error.message : 'Unknown error'}</pre>
+      </div>
+    );
+  }
 }
 
 export default App;
