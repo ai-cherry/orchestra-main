@@ -27,7 +27,7 @@ Our implementation separates these data types through:
 2. **Metadata Schema Validation** (`DevNoteMetadata` vs `UserDataMetadata`)
 3. **Specialized Managers** (`DevNotesManager` vs `PrivacyEnhancedMemoryManager`)
 4. **Collection Namespacing** (Environment, privacy level, tenant separation)
-5. **MongoDB
+5. **PostgreSQL
 
 ## Deployment Strategy
 
@@ -85,26 +85,26 @@ This separation is managed by the `get_collection_name()` function in `StorageCo
 ```python
 # Development context manager (used by development tools)
 dev_notes_manager = DevNotesManager(
-    memory_manager=MongoDB
+    memory_manager=PostgreSQL
     config=dev_config
 )
 
 # Personal information manager (used by user-facing systems)
 privacy_manager = PrivacyEnhancedMemoryManager(
-    underlying_manager=MongoDB
+    underlying_manager=PostgreSQL
     config=prod_config
 )
 ```
 
 Each manager encapsulates the appropriate validation, storage, and access patterns for its data type.
 
-## MongoDB
+## PostgreSQL
 
-The separation is enforced at the database level through MongoDB
+The separation is enforced at the database level through PostgreSQL
 
 ```javascript
 rules_version = '2';
-service cloud.MongoDB
+service cloud.PostgreSQL
   match /databases/{database}/documents {
     // Development notes access - restricted to developers
     match /dev_notes_{environment}/{document=**} {
@@ -153,7 +153,7 @@ To ensure ongoing separation of concerns:
 When deploying the memory system, ensure:
 
 - [ ] Configuration uses the correct environment and privacy settings
-- [ ] MongoDB
+- [ ] PostgreSQL
 - [ ] Development notes are not migrated to production environments
 - [ ] Personal information is properly classified by privacy level
 - [ ] PII detection and redaction is enabled in production
@@ -192,7 +192,7 @@ On rare occasions when access to development context is needed in production:
 async def record_deployment_notes(deployment_id: str, version: str, changes: List[str]):
     """Record deployment notes for future reference."""
     dev_notes_manager = DevNotesManager(
-        memory_manager=MongoDB
+        memory_manager=PostgreSQL
         config=StorageConfig(environment="prod", enable_dev_notes=True)
     )
 
@@ -228,7 +228,7 @@ async def record_deployment_notes(deployment_id: str, version: str, changes: Lis
 async def store_user_conversation(user_id: str, session_id: str, message: str):
     """Store a user conversation message with privacy protections."""
     # Create underlying manager
-    base_manager = MongoDB
+    base_manager = PostgreSQL
         project_id="my-project",
         namespace=f"tenant_{get_tenant_for_user(user_id)}"
     )
