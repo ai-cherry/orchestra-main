@@ -8,7 +8,7 @@ This document provides comprehensive information about integrating Orchestra wit
 3. [Setup Instructions](#setup-instructions)
 4. [Configuration Options](#configuration-options)
 5. [Usage Examples](#usage-examples)
-6. [Gemini 2.5 Context Window](#gemini-25-context-window)
+6. [Gemini 1.5 Context Window](#gemini-15-context-window)
 7. [Infrastructure Setup](#infrastructure-setup)
 8. [Troubleshooting](#troubleshooting)
 
@@ -50,7 +50,7 @@ The integration architecture enhances Orchestra's agent capabilities by connecti
 
 ### 1. Gemini Context Manager
 
-Leverages Gemini 2.5's 2M token context window for cross-agent memory sharing.
+Leverages Gemini 1.5's large token context window for cross-agent memory sharing.
 
 **Key Features:**
 
@@ -349,9 +349,9 @@ response = await builder.run_agent(
 )
 ```
 
-## Gemini 2.5 Context Window
+## Gemini 1.5 Context Window
 
-The Gemini Context Manager leverages Gemini 2.5's 2M token context window for efficient cross-agent memory sharing. This extensive context window enables:
+The Gemini Context Manager leverages Gemini 1.5's large token context window for efficient cross-agent memory sharing. This extensive context window enables:
 
 1. **Long-Term Conversation Tracking**: Maintain context across lengthy agent interactions without frequent pruning.
 

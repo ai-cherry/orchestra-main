@@ -2,8 +2,8 @@
 """
 Gemini code analysis wrapper for pre-commit hooks.
 
-This script sends Python files to Google's Gemini 2.5 Pro API for code analysis,
-providing immediate feedback before commit. Utilizes Gemini 2.5 Pro's 1M+ token
+This script sends Python files to Google's Gemini 1.5 Pro API for code analysis,
+providing immediate feedback before commit. Utilizes Gemini 1.5 Pro's large token
 context window to analyze files of any size.
 """
 
@@ -51,7 +51,7 @@ def analyze_code_with_gemini(
     location: str = "us-central1",
 ) -> Dict[str, Any]:
     """
-    Analyze code using Gemini 2.5 Pro API with 1M+ token context window.
+    Analyze code using Gemini 1.5 Pro API with large context window.
 
     Args:
         files_content: Dictionary mapping file paths to content
@@ -65,8 +65,8 @@ def analyze_code_with_gemini(
     try:
         aiplatform.init(project=project_id, location=location)
 
-        # Create the model with 2.5 Pro and configure for large context window
-        model = GenerativeModel("gemini-2.5-pro")
+        # Create the model with 1.5 Pro and configure for large context window
+        model = GenerativeModel("gemini-1.5-pro")
 
         # Configure generation parameters to leverage extended context window
         generation_config = GenerationConfig(
@@ -198,7 +198,7 @@ def scan_for_security_issues(files_content: Dict[str, str]) -> List[Dict[str, An
 
 def main():
     """Main function to analyze code with Gemini."""
-    parser = argparse.ArgumentParser(description="Analyze code with Gemini 2.5 Pro (unlimited file size)")
+    parser = argparse.ArgumentParser(description="Analyze code with Gemini 1.5 Pro (large file support)")
     parser.add_argument(
         "--extensions",
         default=".py,.js,.ts",
@@ -226,10 +226,10 @@ def main():
         print("No matching files to analyze.")
         return 0
 
-    print("Running Gemini 2.5 Pro code analysis on files...")
+    print("Running Gemini 1.5 Pro code analysis on files...")
     print(f"Files: {','.join(staged_files)}")
 
-    # Read file contents - no line limits with Gemini 2.5 Pro
+    # Read file contents - large file support with Gemini 1.5 Pro
     files_content = {}
     for file_path in staged_files:
         content = read_file_content(file_path)
@@ -243,11 +243,11 @@ def main():
         return 1
 
     try:
-        # Analyze code with Gemini 2.5 Pro's extended context window
+        # Analyze code with Gemini 1.5 Pro's extended context window
         results = analyze_code_with_gemini(files_content)
 
         # Print analysis results
-        print("\n===== Gemini 2.5 Pro Code Analysis =====\n")
+        print("\n===== Gemini 1.5 Pro Code Analysis =====\n")
         print(results["analysis"])
         print("\n=========================================\n")
 

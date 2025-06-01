@@ -1,0 +1,35 @@
+# Pulumi configuration for development environment
+# This file contains environment-specific settings for the dev/staging deployment
+
+config:
+  # GCP Configuration
+  gcp:project: ${GCP_PROJECT_ID}
+  gcp:region: us-central1
+  
+  # Application Configuration
+  admin-ui-infrastructure:environment: dev
+  admin-ui-infrastructure:apiUrl: https://api-dev.example.com
+  admin-ui-infrastructure:minInstances: 0
+  admin-ui-infrastructure:maxInstances: 5
+  admin-ui-infrastructure:cpuLimit: "1"
+  admin-ui-infrastructure:memoryLimit: "512Mi"
+  
+  # Feature Flags
+  admin-ui-infrastructure:enableCdn: false
+  admin-ui-infrastructure:enableWaf: false
+  admin-ui-infrastructure:enableAutoScaling: true
+  
+  # Monitoring Configuration
+  admin-ui-infrastructure:enableMonitoring: true
+  admin-ui-infrastructure:logRetentionDays: 7
+  
+  # Database Configuration
+  admin-ui-infrastructure:dbTier: db-f1-micro
+  admin-ui-infrastructure:dbBackupEnabled: false
+  admin-ui-infrastructure:dbHighAvailability: false
+  
+  # Networking
+  admin-ui-infrastructure:allowedCorsOrigins:
+    - http://localhost:3000
+    - http://localhost:3001
+    - https://dev.example.com

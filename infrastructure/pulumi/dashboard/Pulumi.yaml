@@ -1,0 +1,23 @@
+name: admin-ui-infrastructure
+description: Infrastructure for Admin UI deployment on Google Cloud Platform
+runtime:
+  name: nodejs
+  options:
+    typescript: true
+config:
+  gcp:project:
+    description: The Google Cloud project ID
+  gcp:region:
+    description: The Google Cloud region
+    default: us-central1
+  apiUrl:
+    description: Backend API URL
+    default: http://localhost:8080
+  apiKey:
+    description: API key for authentication
+    secret: true
+  gcpServiceAccountKey:
+    description: GCP service account key for Docker registry
+    secret: true
+  alertChannelId:
+    description: Monitoring alert notification channel ID (optional)

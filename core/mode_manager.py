@@ -13,9 +13,9 @@ that transition between modes. It supports:
 5. Enforcing file access permissions
 
 The system optimizes model usage by assigning:
-- Gemini 2.5 Pro: architect, orchestrator, and reviewer modes
-- GPT-4.1: code and debug modes
-- Claude 3.7: strategy, ask, and creative modes
+- Gemini 1.5 Pro: architect, orchestrator, and reviewer modes
+- GPT-4: code and debug modes
+- Claude 3 Opus: strategy, ask, and creative modes
 """
 
 import logging

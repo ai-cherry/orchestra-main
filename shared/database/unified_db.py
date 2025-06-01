@@ -11,6 +11,7 @@ from typing import Dict, List, Optional, Any, Union
 from datetime import datetime, timedelta
 from functools import lru_cache
 import json
+from uuid import UUID
 
 from .postgresql_client import PostgreSQLClient
 from .weaviate_client import WeaviateClient

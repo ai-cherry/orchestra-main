@@ -4,6 +4,11 @@
 
 set -e  # Exit on any error
 
+# Load environment variables from .env file
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs)
+fi
+
 # Color codes for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -109,25 +114,25 @@ export API_KEY="${API_KEY:-4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280c
 # Only start the MCP servers that use PostgreSQL + Weaviate
 # 1. Start Memory Server (uses PostgreSQL + Weaviate)
 start_server "Memory MCP" \
-    "python -m mcp_server.servers.memory_server" \
+    "./venv/bin/python -m mcp_server.servers.memory_server" \
     8003 \
     "http://localhost:8003/health"
 
 # 2. Start Orchestrator Server (uses PostgreSQL)
 start_server "Orchestrator MCP" \
-    "python -m mcp_server.servers.orchestrator_server" \
+    "./venv/bin/python -m mcp_server.servers.orchestrator_server" \
     8002 \
     "http://localhost:8002/health"
 
 # 3. Start Tools Server (database agnostic)
 start_server "Tools MCP" \
-    "python -m mcp_server.servers.tools_server" \
+    "./venv/bin/python -m mcp_server.servers.tools_server" \
     8006 \
     "http://localhost:8006/health"
 
 # 4. Start Weaviate Direct Server
 start_server "Weaviate Direct MCP" \
-    "python -m mcp_server.servers.weaviate_direct_mcp_server" \
+    "./venv/bin/python -m mcp_server.servers.weaviate_direct_mcp_server" \
     8001 \
     "http://localhost:8001/health"
 

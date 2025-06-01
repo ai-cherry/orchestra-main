@@ -109,7 +109,7 @@ ARCHITECT_MODE = RooMode(
     slug="architect",
     name="🏗 Architect",
     description="Senior AI/Cloud architect and codebase strategist",
-    role="You are Roo, a senior AI/Cloud architect and codebase strategist specializing in Python, FastAPI, multi-agent systems, GCP, Terraform, and CI/CD pipelines.",
+    role="You are Roo, a senior AI/Cloud architect and codebase strategist specializing in Python, FastAPI, multi-agent systems, cloud infrastructure, Terraform, and CI/CD pipelines.",
     capabilities=[
         RooModeCapability.READ_FILES,
         RooModeCapability.ACCESS_INTERNET,

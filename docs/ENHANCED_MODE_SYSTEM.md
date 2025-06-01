@@ -20,14 +20,14 @@ We've optimized the AI model assignments based on each mode's primary function:
 
 | Mode            | Model          | Context Window | Specialization                                      |
 | --------------- | -------------- | -------------- | --------------------------------------------------- |
-| 💻 Code         | GPT-4.1        | 128K tokens    | Implementation-focused with strong coding abilities |
-| 🪲 Debug        | GPT-4.1        | 128K tokens    | Error analysis and runtime diagnostics              |
-| 🏗 Architect    | Gemini 2.5 Pro | 1M+ tokens     | System design with large context awareness          |
-| 🪃 Orchestrator | Gemini 2.5 Pro | 1M+ tokens     | Comprehensive code review and analysis              |
-| 🕵️ Reviewer     | Gemini 2.5 Pro | 1M+ tokens     | Quality assurance and documentation                 |
-| 🧠 Strategy     | Claude 3.7     | 200K tokens    | Planning and roadmapping                            |
-| ❓ Ask          | Claude 3.7     | 100K tokens    | Research and information gathering                  |
-| 🎨 Creative     | Claude 3.7     | 100K tokens    | Technical writing and documentation                 |
+| 💻 Code         | GPT-4          | 128K tokens    | Implementation-focused with strong coding abilities |
+| 🪲 Debug        | GPT-4          | 128K tokens    | Error analysis and runtime diagnostics              |
+| 🏗 Architect    | Gemini 1.5 Pro | 1M+ tokens     | System design with large context awareness          |
+| 🪃 Orchestrator | Gemini 1.5 Pro | 1M+ tokens     | Comprehensive code review and analysis              |
+| 🕵️ Reviewer     | Gemini 1.5 Pro | 1M+ tokens     | Quality assurance and documentation                 |
+| 🧠 Strategy     | Claude 3 Opus  | 200K tokens    | Planning and roadmapping                            |
+| ❓ Ask          | Claude 3 Opus  | 100K tokens    | Research and information gathering                  |
+| 🎨 Creative     | Claude 3 Opus  | 100K tokens    | Technical writing and documentation                 |
 
 ### Enhanced Access Permissions
 
@@ -169,21 +169,21 @@ Based on analysis of the AI Orchestra project, we recommend considering these ad
 
 1. **📊 MLOps Mode**: Specialized in AI model deployment, versioning, and monitoring
 
-   - Model: Gemini 2.5 Pro (for large context understanding)
+   - Model: Gemini 1.5 Pro (for large context understanding)
    - Focus: AI pipeline optimization, model performance metrics, dataset management
 
 2. **🔐 Security Mode**: Dedicated to security audits and vulnerability management
 
-   - Model: GPT-4.1 (for precise vulnerability detection)
+   - Model: GPT-4 (for precise vulnerability detection)
    - Focus: Security scanning, vulnerability remediation, compliance checking
 
 3. **📡 Integration Mode**: Specialized in third-party API integration
 
-   - Model: Claude 3.7 (for context understanding of external systems)
+   - Model: Claude 3 Opus (for context understanding of external systems)
    - Focus: API client implementation, authentication flow, data mapping
 
 4. **🧪 Testing Mode**: Focused on test case generation and validation
-   - Model: GPT-4.1 (for precise test case generation)
+   - Model: GPT-4 (for precise test case generation)
    - Focus: Unit tests, integration tests, test coverage analysis
 
 ## Conclusion

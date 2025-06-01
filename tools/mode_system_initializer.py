@@ -6,9 +6,9 @@ This script initializes the enhanced mode system by setting up the necessary dir
 and configuration files. It also provides utilities for migrating from the previous
 mode system and setting up the recommended model assignments:
 
-- Gemini 2.5 Pro: architect, review, and orchestrator modes
-- GPT-4.1: code and debug modes
-- Claude 3.7: strategy, ask, and creative modes
+- Gemini 1.5 Pro: architect, review, and orchestrator modes
+- GPT-4: code and debug modes
+- Claude 3 Opus: strategy, ask, and creative modes
 
 This ensures optimal performance and capabilities for each mode.
 """
@@ -159,14 +159,14 @@ def verify_model_assignments():
 
         # Expected model assignments
         expected_assignments = {
-            "architect": "gemini-2.5-pro",
-            "orchestrator": "gemini-2.5-pro",
-            "reviewer": "gemini-2.5-pro",
-            "code": "gpt-4.1",
-            "debug": "gpt-4.1",
-            "strategy": "claude-3.7",
-            "ask": "claude-3.7",
-            "creative": "claude-3.7",
+            "architect": "gemini-1.5-pro",
+            "orchestrator": "gemini-1.5-pro",
+            "reviewer": "gemini-1.5-pro",
+            "code": "gpt-4",
+            "debug": "gpt-4",
+            "strategy": "claude-3-opus",
+            "ask": "claude-3-opus",
+            "creative": "claude-3-opus",
         }
 
         # Verify each mode's model assignment
