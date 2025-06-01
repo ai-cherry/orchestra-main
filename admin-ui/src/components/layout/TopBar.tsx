@@ -1,17 +1,18 @@
 import React from 'react';
 import { Menu, X, Moon, Sun, User, Palette, LogOut } from 'lucide-react';
 import { useTheme } from '@/context/useTheme';
-import { Button } from '@/components/ui/button'; 
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator
-} from '@/components/ui/dropdown-menu'; 
+} from '@/components/ui/dropdown-menu';
 import { useAuthStore } from '@/store/authStore';
 import { useNavigate, useRouterState } from '@tanstack/react-router';
-import usePersonaStore from '../../store/personaStore'; // Step 1: Import usePersonaStore
+import usePersonaStore from '../../store/personaStore';
+import OmniSearch from './OmniSearch';
 
 interface TopBarProps {
   sidebarOpen: boolean;
@@ -23,9 +24,20 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   const { isAuthenticated, user, logout } = useAuthStore();
   const navigate = useNavigate();
   const routerState = useRouterState();
-
-  // Step 2: Get getCurrentPersona from the store
   const currentPersona = usePersonaStore((state) => state.getCurrentPersona());
+
+  const handleOmniQuery = (text: string, files?: FileList) => {
+    console.log('OmniSearch Query:', text);
+    if (files && files.length > 0) {
+      console.log('OmniSearch Files:', Array.from(files).map(f => f.name));
+    }
+    // TODO: Implement actual query handling logic (e.g., API call)
+  };
+
+  const quickActions = [
+    { icon: '🤖', label: 'New Agent', domain: 'all', action: () => navigate({ to: '/agents' }) },
+    { icon: '📁', label: 'Process ZIP', domain: 'sophia', action: () => console.log("Process ZIP clicked") },
+  ];
 
   const handleLogout = () => {
     logout();
@@ -41,14 +53,15 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
     }
-    return 'Admin'; 
+    return 'Admin';
   };
 
   const currentPageTitle = deriveTitleFromPath(routerState.location.pathname);
 
   return (
-    <header className="flex h-16 items-center justify-between bg-background border-b border-border px-4 md:px-6">
-      <div className="flex items-center">
+    <header className="flex h-auto md:h-16 items-center justify-between bg-background border-b border-border px-4 md:px-6 py-2 md:py-0 flex-wrap md:flex-nowrap">
+      {/* Left Section */}
+      <div className="flex items-center flex-shrink-0">
         <Button
           variant="ghost"
           size="icon"
@@ -58,25 +71,32 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
           {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </Button>
         <span className="text-lg font-semibold ml-2 hidden md:block text-[var(--theme-accent-primary)]">Orchestra</span>
-        <h1 className="ml-4 text-xl font-semibold text-foreground">{currentPageTitle}</h1>
+        <h1 className="ml-4 text-xl font-semibold text-foreground hidden lg:block">{currentPageTitle}</h1>
       </div>
 
-      <div className="flex items-center space-x-3">
-        {/* Step 3: Display current persona's name and domain */}
+      {/* Center Section - OmniSearch */}
+      <div className="w-full md:flex-grow md:mx-4 order-3 md:order-2 mt-2 md:mt-0 flex justify-center">
+        <OmniSearch onQuery={handleOmniQuery} quickActions={quickActions} />
+      </div>
+
+      {/* Right Section */}
+      <div className="flex items-center space-x-2 md:space-x-3 flex-shrink-0 order-2 md:order-3">
+        {/* Current Persona Display */}
         {currentPersona && (
-          <div className="flex items-center space-x-2 mr-2">
+          <div className="hidden sm:flex items-center space-x-2">
             <span 
-              className="text-sm font-medium" 
+              className="text-sm font-medium"
               style={{ color: 'var(--theme-accent-primary)' }}
             >
               {currentPersona.name}
             </span>
             <span className="text-xs text-gray-500 dark:text-gray-400">
-              ({currentPersona.domain} Domain)
+              ({currentPersona.domain})
             </span>
           </div>
         )}
 
+        {/* Theme Selector */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" aria-label="Select Theme">
@@ -85,17 +105,28 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {(['neutral', 'cherry', 'sophia', 'gordon'] as const).map((t) => (
-              <DropdownMenuItem key={t} onClick={() => setTheme(t)} className={theme === t ? 'bg-accent text-accent-foreground' : ''}>
+              <DropdownMenuItem 
+                key={t} 
+                onClick={() => setTheme(t)} 
+                className={theme === t ? 'bg-accent text-accent-foreground' : ''}
+              >
                 {t.charAt(0).toUpperCase() + t.slice(1)}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Button variant="ghost" size="icon" onClick={() => setMode(mode === 'light' ? 'dark' : 'light')} aria-label={mode === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}>
+        {/* Dark/Light Mode Toggle */}
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => setMode(mode === 'light' ? 'dark' : 'light')} 
+          aria-label={mode === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+        >
           {mode === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
         </Button>
 
+        {/* User Menu */}
         {isAuthenticated && user ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -105,10 +136,13 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem disabled className="text-sm text-muted-foreground">
+                {user.email}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => navigate({ to: '/settings' })}>
                 Settings
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
