@@ -1,4 +1,9 @@
-PYTHON?=python3
+VENV_PYTHON := $(wildcard venv/bin/python)
+ifeq ($(VENV_PYTHON),)
+    PYTHON ?= python3
+else
+    PYTHON := $(VENV_PYTHON)
+endif
 
 .PHONY: dev-start validate service-status start-services stop-services \
     health-check health-monitor wait-for-mcp ai-review-changes \

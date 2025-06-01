@@ -14,6 +14,7 @@ from agent.app.routers.resources import router as resources_router
 from agent.app.routers.system import router as system_router
 from agent.app.routers.audit import router as audit_router
 from agent.app.routers.automation import router as automation_router
+from agent.app.routers.natural_language import router as natural_language_router
 
 # import openai  # Removed unused import
 
@@ -42,6 +43,7 @@ app.include_router(resources_router)
 app.include_router(system_router)
 app.include_router(audit_router)
 app.include_router(automation_router)
+app.include_router(natural_language_router)
 
 # Middleware for logging requests and latency
 
