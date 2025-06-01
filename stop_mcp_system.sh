@@ -1,49 +1,44 @@
 #!/bin/bash
-# Stop all MCP System Components
+# MCP System Stop Script - PostgreSQL + Weaviate ONLY
 
-set -e
-
-# Color codes
+# Color codes for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+NC='\033[0m' # No Color
 
-LOG_DIR="/var/log/mcp"
+# Log directory
+LOG_DIR="$HOME/.mcp/logs"
 
-echo -e "${BLUE}Stopping MCP System Components...${NC}"
+echo -e "${YELLOW}Stopping MCP System Components...${NC}"
 
 # Function to stop a service
 stop_service() {
     local name=$1
     local pid_file="$LOG_DIR/${name}.pid"
-
+    
     if [ -f "$pid_file" ]; then
-        local pid=$(cat "$pid_file")
-        if kill -0 $pid 2>/dev/null; then
-            echo -e "${YELLOW}Stopping $name (PID: $pid)...${NC}"
+        pid=$(cat "$pid_file")
+        if ps -p $pid > /dev/null 2>&1; then
             kill $pid
-            rm -f "$pid_file"
-            echo -e "${GREEN}✓ $name stopped${NC}"
+            echo -e "${GREEN}✓ Stopped $name (PID: $pid)${NC}"
         else
             echo -e "${YELLOW}$name not running (stale PID file)${NC}"
-            rm -f "$pid_file"
         fi
+        rm -f "$pid_file"
     else
         echo -e "${YELLOW}$name not running (no PID file)${NC}"
     fi
 }
 
-# Stop all services
-stop_service "MCP Gateway"
-stop_service "Cloud Run MCP"
-stop_service "Secrets MCP"
+# Stop all MCP services
 stop_service "Memory MCP"
 stop_service "Orchestrator MCP"
+stop_service "Tools MCP"
+stop_service "Weaviate Direct MCP"
 
-# Also check for any processes on the known ports
-for port in 8000 8001 8002 8003 8004; do
+# Clean up any orphaned processes on MCP ports
+for port in 8001 8002 8003 8006; do
     if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then
         echo -e "${YELLOW}Cleaning up process on port $port${NC}"
         lsof -ti:$port | xargs kill -9 2>/dev/null || true

@@ -1,6 +1,6 @@
 #!/bin/bash
-# Unified MCP System Startup Script
-# This script starts all MCP servers with health monitoring and error handling
+# MCP System Startup Script - PostgreSQL + Weaviate ONLY
+# NO GCP, NO Redis, NO Firestore, NO MongoDB, NO DragonflyDB!
 
 set -e  # Exit on any error
 
@@ -11,17 +11,9 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Prefer system log dir, fall back to user home if not writable
-SYSTEM_LOG_DIR="/var/log/mcp"
-USER_LOG_DIR="$HOME/.mcp/logs"
-
-if mkdir -p "$SYSTEM_LOG_DIR" 2>/dev/null; then
-  LOG_DIR="$SYSTEM_LOG_DIR"
-else
-  echo "WARNING: No permission for /var/log, using $USER_LOG_DIR instead."
-  mkdir -p "$USER_LOG_DIR"
-  LOG_DIR="$USER_LOG_DIR"
-fi
+# Log directory
+LOG_DIR="$HOME/.mcp/logs"
+mkdir -p "$LOG_DIR"
 
 # Log file
 LOG_FILE="$LOG_DIR/mcp_system_$(date +%Y%m%d_%H%M%S).log"
@@ -97,52 +89,62 @@ start_server() {
 
 # Main execution
 log "${BLUE}========================================${NC}"
-log "${BLUE}Starting MCP System Components${NC}"
+log "${BLUE}Starting MCP System (PostgreSQL + Weaviate)${NC}"
 log "${BLUE}========================================${NC}"
 
-# Export required environment variables
-export export GCP_REGION="${GCP_REGION:-us-central1}"
-export REDIS_URL="${REDIS_URL:-redis://localhost:6379}"
-export FIRESTORE_PROJECT="${FIRESTORE_PROJECT:-$export QDRANT_URL="${QDRANT_URL:-http://localhost:6333}"
+# Export ONLY the required environment variables for PostgreSQL + Weaviate
+export POSTGRES_HOST="${POSTGRES_HOST:-localhost}"
+export POSTGRES_PORT="${POSTGRES_PORT:-5432}"
+export POSTGRES_DB="${POSTGRES_DB:-orchestra}"
+export POSTGRES_USER="${POSTGRES_USER:-postgres}"
+export POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-}"
 
-# 1. Start Cloud Run MCP Server
-start_server "Cloud Run MCP" \
-    "python -m mcp_server.servers.gcp_cloud_run_server" \
-    8001 \
-    "http://localhost:8001/health"
+export WEAVIATE_HOST="${WEAVIATE_HOST:-localhost}"
+export WEAVIATE_PORT="${WEAVIATE_PORT:-8080}"
+export WEAVIATE_API_KEY="${WEAVIATE_API_KEY:-}"
 
-# 2. Start Secrets Manager MCP Server
-start_server "Secrets MCP" \
-    "python -m mcp_server.servers.gcp_secrets_server" \
+export API_URL="${API_URL:-http://localhost:8080}"
+export API_KEY="${API_KEY:-4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd}"
+
+# Only start the MCP servers that use PostgreSQL + Weaviate
+# 1. Start Memory Server (uses PostgreSQL + Weaviate)
+start_server "Memory MCP" \
+    "python -m mcp_server.servers.memory_server" \
+    8003 \
+    "http://localhost:8003/health"
+
+# 2. Start Orchestrator Server (uses PostgreSQL)
+start_server "Orchestrator MCP" \
+    "python -m mcp_server.servers.orchestrator_server" \
     8002 \
     "http://localhost:8002/health"
 
-# 3. Start Memory Management MCP Server (disabled until dependencies resolved)
-# echo -e "${YELLOW}Skipping Memory MCP (dependencies not ready)${NC}"
+# 3. Start Tools Server (database agnostic)
+start_server "Tools MCP" \
+    "python -m mcp_server.servers.tools_server" \
+    8006 \
+    "http://localhost:8006/health"
 
-# 4. Start Orchestrator MCP Server
-start_server "Orchestrator MCP" \
-    "python -m mcp_server.servers.orchestrator_mcp_server" \
-    8004 \
-    "http://localhost:8004/health"
-
-# 5. Start MCP Gateway (unified interface)
-start_server "MCP Gateway" \
-    "python -m mcp_server.gateway" \
-    8000 \
-    "http://localhost:8000/health"
+# 4. Start Weaviate Direct Server
+start_server "Weaviate Direct MCP" \
+    "python -m mcp_server.servers.weaviate_direct_mcp_server" \
+    8001 \
+    "http://localhost:8001/health"
 
 # Summary
 log "${BLUE}========================================${NC}"
 log "${GREEN}MCP System Startup Complete${NC}"
 log "${BLUE}========================================${NC}"
 log ""
-log "Services running:"
-log "  - MCP Gateway: http://localhost:8000"
-log "  - Cloud Run MCP: http://localhost:8001"
-log "  - Secrets MCP: http://localhost:8002"
+log "Services running (PostgreSQL + Weaviate ONLY):"
 log "  - Memory MCP: http://localhost:8003"
-log "  - Orchestrator MCP: http://localhost:8004"
+log "  - Orchestrator MCP: http://localhost:8002"  
+log "  - Tools MCP: http://localhost:8006"
+log "  - Weaviate Direct MCP: http://localhost:8001"
+log ""
+log "Database connections:"
+log "  - PostgreSQL: ${POSTGRES_HOST}:${POSTGRES_PORT}"
+log "  - Weaviate: ${WEAVIATE_HOST}:${WEAVIATE_PORT}"
 log ""
 log "Logs available at: $LOG_DIR"
 log ""
