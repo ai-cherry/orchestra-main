@@ -19,27 +19,28 @@ const ThemeProvider: React.FC<{ children: ReactNode; defaultTheme?: Theme; defau
   defaultMode = "light",
   storageKey = "vite-ui-theme",
 }) => {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    try {
-      return (localStorage.getItem(`${storageKey}-app`) as Theme) || defaultTheme;
-    } catch (e) {
-      console.warn("Failed to read app theme from localStorage", e);
-      return defaultTheme;
+  const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem(storageKey) as Theme) || defaultTheme);
+  const [mode, setMode] = useState<'light' | 'dark'>(() => (localStorage.getItem(`${storageKey}-mode`) as 'light' | 'dark') || defaultMode);
+  
+  // Use activePersonaId instead of currentPersonaId
+  const activePersonaId = usePersonaStore((state) => state.activePersonaId);
+  
+  // Watch for persona changes
+  useEffect(() => {
+    if (activePersonaId) {
+      const persona = usePersonaStore.getState().getPersonaById(activePersonaId);
+      if (persona) {
+        // Map persona to theme (using valid theme names)
+        const personaThemeMap: Record<string, Theme> = {
+          'cherry': 'cherry',
+          'sophia': 'sophia',
+          'karen': 'gordon'  // Using gordon as a green theme for karen
+        };
+        const newTheme = personaThemeMap[persona.id] || 'neutral';
+        setTheme(newTheme);
+      }
     }
-  });
-
-  const [mode, setModeState] = useState<Mode>(() => {
-    try {
-      return (localStorage.getItem(`${storageKey}-mode`) as Mode) || defaultMode;
-    } catch (e) {
-      console.warn("Failed to read mode from localStorage", e);
-      return defaultMode;
-    }
-  });
-
-  // Step 2: Get currentPersonaId and accentColors from usePersonaStore
-  const currentPersonaId = usePersonaStore((state) => state.currentPersonaId);
-  const accentColors = usePersonaStore((state) => state.accentColors);
+  }, [activePersonaId]);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -59,30 +60,12 @@ const ThemeProvider: React.FC<{ children: ReactNode; defaultTheme?: Theme; defau
     root.classList.remove(...themeClassesToRemove);
     root.classList.add(`theme-${theme}`);
      try {
-      localStorage.setItem(`${storageKey}-app`, theme);
+      localStorage.setItem(storageKey, theme);
     } catch (e) {
       console.warn("Failed to save app theme to localStorage", e);
     }
 
-    // Step 3a & 3b: Apply dynamic accent color based on current persona
-    const currentAccentColor = accentColors[currentPersonaId];
-    if (currentAccentColor) {
-      root.style.setProperty('--theme-accent-primary', currentAccentColor);
-    } else {
-      // Fallback or remove if no specific accent color for the current persona
-      // For now, let's remove it if not found, or you could set a default
-      root.style.removeProperty('--theme-accent-primary');
-    }
-
-  }, [theme, mode, storageKey, currentPersonaId, accentColors]); // Step 3c: Add dependencies
-
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
-  };
-
-  const setMode = (newMode: Mode) => {
-    setModeState(newMode);
-  };
+  }, [theme, mode, storageKey]);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, mode, setMode }}>
