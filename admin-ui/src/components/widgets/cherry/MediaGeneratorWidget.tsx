@@ -27,9 +27,9 @@ const MediaGeneratorWidget: React.FC<MediaGeneratorWidgetProps> = ({ api = 'Port
   ]);
   
   const mediaTypes = [
-    { type: 'image' as const, icon: Image, label: 'Images', color: 'bg-purple-500' },
-    { type: 'video' as const, icon: Video, label: 'Videos', color: 'bg-blue-500' },
-    { type: 'audio' as const, icon: Music, label: 'Audio', color: 'bg-green-500' },
+    { type: 'image' as const, icon: Image, label: 'Images' },
+    { type: 'video' as const, icon: Video, label: 'Videos' },
+    { type: 'audio' as const, icon: Music, label: 'Audio' },
   ];
 
   const handleGenerate = async () => {
@@ -82,7 +82,7 @@ const MediaGeneratorWidget: React.FC<MediaGeneratorWidgetProps> = ({ api = 'Port
       </div>
 
       <div className="grid grid-cols-3 gap-2 mb-6">
-        {mediaTypes.map(({ type, icon: Icon, label, color }) => (
+        {mediaTypes.map(({ type, icon: Icon, label }) => (
           <button
             key={type}
             onClick={() => setSelectedType(type)}
