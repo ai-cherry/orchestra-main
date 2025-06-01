@@ -29,6 +29,15 @@ jobs:
             set -e
             echo "🔄 Syncing Orchestra AI from GitHub..."
             
+            # Activate the virtual environment
+            if [ -f /root/orchestra-main/venv/bin/activate ]; then
+              echo "🚀 Activating virtual environment..."
+              source /root/orchestra-main/venv/bin/activate
+            else
+              echo "⚠️ Virtual environment not found at /root/orchestra-main/venv/bin/activate. Skipping activation."
+              # Optionally, you could attempt to create it here or fail the job
+            fi
+            
             cd /root/orchestra-main
             
             # Pull latest changes
