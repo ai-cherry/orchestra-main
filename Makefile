@@ -39,3 +39,6 @@ git add -A && git commit -m "checkpoint: before AI coding session" && $(PYTHON) 
 after-ai-coding:
 $(MAKE) ai-review-changes
 $(MAKE) validate
+
+vultr-deploy:
+	$(PYTHON) scripts/vultr_provision.py $(ARGS)
