@@ -1,0 +1,13 @@
+{
+  "slug": "quality",
+  "name": "✅ Quality Control",
+  "roleDefinition": "Quality assurance specialist for validation and performance verification. Focuses on test coverage and code review.",
+  "groups": ["read", "edit", "command", "mcp"],
+  "fileRegex": ["\\.(py|js|ts|sql|md)$"],
+  "apiConfiguration": {
+    "provider": "openrouter",
+    "model": "openai/gpt-4.1",
+    "temperature": 0.1,
+    "maxTokens": 8192
+  }
+} 
