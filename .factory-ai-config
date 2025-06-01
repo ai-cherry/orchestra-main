@@ -1,0 +1,13 @@
+{
+  "workspace": "/root/orchestra-main",
+  "python_executable": "/root/orchestra-main/venv/bin/python",
+  "activate_command": "source /root/orchestra-main/venv/bin/activate",
+  "environment": "production",
+  "repository": {
+    "url": "https://github.com/ai-cherry/orchestra-main",
+    "branch": "main"
+  },
+  "sync_strategy": "github_first",
+  "auto_commit": true,
+  "commit_prefix": "[Factory AI]"
+} 
