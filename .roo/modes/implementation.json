@@ -1,0 +1,13 @@
+{
+  "slug": "implementation",
+  "name": "⚙️ Implementation",
+  "roleDefinition": "Operations implementation expert for deployment, process execution, and Pulumi IaC. Ensures rapid, reliable setup on Vultr.",
+  "groups": ["read", "edit", "command", "mcp"],
+  "fileRegex": ["\\.(py|sh|yaml|yml|json|md)$"],
+  "apiConfiguration": {
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash-preview-05-20",
+    "temperature": 0.1,
+    "maxTokens": 8192
+  }
+} 

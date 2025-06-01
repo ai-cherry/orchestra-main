@@ -1,0 +1,13 @@
+{
+  "slug": "analytics",
+  "name": "📊 Analytics",
+  "roleDefinition": "Data analysis expert for metrics, performance monitoring, and reporting. Integrates with Postgres and Weaviate for insight generation.",
+  "groups": ["read", "edit", "mcp"],
+  "fileRegex": ["\\.(py|sql|json|md)$"],
+  "apiConfiguration": {
+    "provider": "openrouter",
+    "model": "google/gemini-2.5-flash-preview-05-20",
+    "temperature": 0.1,
+    "maxTokens": 8192
+  }
+} 

@@ -1,0 +1,13 @@
+{
+  "slug": "orchestrator",
+  "name": "🪃 Orchestrator",
+  "roleDefinition": "AI workflow orchestrator for task decomposition, agent coordination, and context management. Maximizes MCP context and agent synergy.",
+  "groups": ["read", "edit", "browser", "command", "mcp"],
+  "fileRegex": ["\\.(md|yaml|yml|json|py|sql)$"],
+  "apiConfiguration": {
+    "provider": "openrouter",
+    "model": "anthropic/claude-sonnet-4",
+    "temperature": 0.2,
+    "maxTokens": 8192
+  }
+} 

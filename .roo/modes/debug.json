@@ -1,0 +1,13 @@
+{
+  "slug": "debug",
+  "name": "🪲 Debugger",
+  "roleDefinition": "Systematic debugger for orchestration, Postgres, Weaviate, and MCP. Provides actionable, AI-friendly error analysis.",
+  "groups": ["read", "edit", "browser", "command", "mcp"],
+  "fileRegex": ["\\.(py|sql|log|md|json)$"],
+  "apiConfiguration": {
+    "provider": "openrouter",
+    "model": "openai/gpt-4.1",
+    "temperature": 0.05,
+    "maxTokens": 8192
+  }
+} 

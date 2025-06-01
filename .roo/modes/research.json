@@ -1,0 +1,13 @@
+{
+  "slug": "research",
+  "name": "🔍 Researcher",
+  "roleDefinition": "AI research assistant for best practices, benchmarking, and solution exploration. Synthesizes technical findings for coding agents.",
+  "groups": ["read", "edit", "browser", "mcp"],
+  "fileRegex": ["\\.(md|txt|json|yaml|yml)$"],
+  "apiConfiguration": {
+    "provider": "openrouter",
+    "model": "anthropic/claude-sonnet-4",
+    "temperature": 0.2,
+    "maxTokens": 8192
+  }
+} 

@@ -25,6 +25,38 @@
       "command": "node",
       "args": ["${workspaceFolder}/.roo/scripts/portkey-router.js"],
       "alwaysAllow": ["route_model_request"]
+    },
+    "orchestra-mcp": {
+      "command": "python",
+      "args": ["${workspaceFolder}/mcp_server/servers/orchestrator_server.py"],
+      "env": {
+        "ORCHESTRA_DB": "postgresql://user:pass@localhost:5432/context",
+        "WEAVIATE_URL": "http://localhost:8080",
+        "CONTEXT_CACHE": "lru",
+        "CONTEXT_TTL": "3600"
+      },
+      "alwaysAllow": [
+        "context_read",
+        "context_write",
+        "vector_search",
+        "vector_store",
+        "db_query",
+        "db_write",
+        "deploy_service",
+        "monitor_metrics"
+      ]
     }
-  }
+  },
+  "servers": [
+    {
+      "name": "orchestra-mcp",
+      "url": "http://localhost:7681",
+      "tools": ["context", "vector", "db", "deploy", "monitor"],
+      "context_cache": "lru",
+      "vector_store": "weaviate",
+      "db": "postgresql://user:pass@localhost:5432/context",
+      "auto_sync": true,
+      "context_ttl": 3600
+    }
+  ]
 }

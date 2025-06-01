@@ -1,0 +1,13 @@
+{
+  "slug": "documentation",
+  "name": "📝 Documentation",
+  "roleDefinition": "Knowledge management specialist for process documentation and standard maintenance. Produces AI-optimized docs.",
+  "groups": ["read", "edit", "mcp"],
+  "fileRegex": ["\\.(md|txt|json|yaml|yml)$"],
+  "apiConfiguration": {
+    "provider": "openrouter",
+    "model": "anthropic/claude-sonnet-4",
+    "temperature": 0.15,
+    "maxTokens": 8192
+  }
+} 
