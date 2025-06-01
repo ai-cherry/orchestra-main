@@ -51,6 +51,15 @@ class OrchestraSettings(BaseSettings):
     enable_micro_cache: bool = Field(default=False, env="ENABLE_MICRO_CACHE")
     use_redis: bool = Field(default=False, env="USE_REDIS")
 
+    # Persona-specific memory settings
+    redis_db_cherry: int = Field(default=0, env="REDIS_DB_CHERRY")
+    redis_db_sophia: int = Field(default=1, env="REDIS_DB_SOPHIA")
+    redis_db_karen: int = Field(default=2, env="REDIS_DB_KAREN")
+    postgres_schema_cherry: str = Field(default="cherry", env="POSTGRES_SCHEMA_CHERRY")
+    postgres_schema_sophia: str = Field(default="sophia", env="POSTGRES_SCHEMA_SOPHIA")
+    postgres_schema_karen: str = Field(default="karen", env="POSTGRES_SCHEMA_KAREN")
+    neo4j_url: str = Field(default=None, env="NEO4J_URL")
+
     # Legacy Vector DB endpoints (deprecated, use Weaviate instead)
     pinecone_api_key: str = Field(default=None, env="PINECONE_API_KEY")
     pinecone_environment: str = Field(default=None, env="PINECONE_ENVIRONMENT")

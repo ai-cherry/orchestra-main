@@ -1,6 +1,13 @@
 # Context-Aware Memory Management System
 
-This document describes the enhanced memory management system implemented for the AI Orchestration System. The system optimizes memory usage while maintaining conversation context integrity through several integrated components.
+This document describes the enhanced memory management system implemented for the AI Orchestration System. The platform now uses a **four-layer memory architecture** with persona isolation:
+
+1. **Redis** – episodic memory (per persona databases)
+2. **Weaviate** – semantic memory with namespace isolation
+3. **PostgreSQL** – procedural memory using persona schemas
+4. **Neo4j** – meta-memory for cross-persona relationships
+
+Queries are routed via the new `PersonaMemoryRouter` which aggregates results across these layers and can optionally bridge related personas.
 
 ## System Components
 
@@ -8,9 +15,9 @@ This document describes the enhanced memory management system implemented for th
 
 The `TieredStorageManager` class provides automatic movement of data between hot, warm, and cold storage tiers based on access patterns.
 
-- **Hot tier**: In-memory cache and Redis Memorystore for fastest access
-- **Warm tier**: MongoDB
-- **Cold tier**: MongoDB
+- **Hot tier**: In-memory cache and Redis
+- **Warm tier**: PostgreSQL
+- **Cold tier**: Weaviate
 
 ```python
 # Example initialization

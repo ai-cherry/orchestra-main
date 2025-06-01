@@ -10,7 +10,7 @@ import os
 from typing import Dict, List, Optional
 
 import yaml
-from pydantic import SecretStr
+from pydantic import SecretStr, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Use relative import for packages within the same project
@@ -51,6 +51,13 @@ class Settings(BaseSettings):
     CONVERSATION_HISTORY_LIMIT: int = 10
     MEMORY_CACHE_TTL: int = 3600  # 1 hour default
     REDIS_PASSWORD: Optional[str] = None
+    REDIS_DB_CHERRY: int = Field(0, validation_alias="REDIS_DB_CHERRY")
+    REDIS_DB_SOPHIA: int = Field(1, validation_alias="REDIS_DB_SOPHIA")
+    REDIS_DB_KAREN: int = Field(2, validation_alias="REDIS_DB_KAREN")
+    POSTGRES_SCHEMA_CHERRY: str = Field("cherry", validation_alias="POSTGRES_SCHEMA_CHERRY")
+    POSTGRES_SCHEMA_SOPHIA: str = Field("sophia", validation_alias="POSTGRES_SCHEMA_SOPHIA")
+    POSTGRES_SCHEMA_KAREN: str = Field("karen", validation_alias="POSTGRES_SCHEMA_KAREN")
+    NEO4J_URL: Optional[str] = Field(default=None, validation_alias="NEO4J_URL")
 
     # Enhanced memory settings
     USE_RESILIENT_ADAPTER: bool = True  # Whether to use circuit breaker pattern
