@@ -4,13 +4,13 @@
 
 ## Overview
 
-The Model Context Protocol (MCP) implementation for AI Orchestra provides a comprehensive set of servers that enable Claude 4 and other AI assistants to interact with the project's infrastructure through a standardized protocol.
+The Model Context Protocol (MCP) implementation for AI Orchestra provides a comprehensive set of servers that enable Claude and other AI assistants to interact with the project's infrastructure through a standardized protocol.
 
 ## Architecture
 
 ```
 ┌─────────────────┐
-│   Claude 4      │
+│   Claude        │
 │  (MCP Client)   │
 └────────┬────────┘
          │

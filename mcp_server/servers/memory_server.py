@@ -371,7 +371,7 @@ class MemoryServer:
             print("✅ Database connections healthy")
         
         async with stdio_server() as (read_stream, write_stream):
-            await self.server.run(read_stream, write_stream)
+            await self.server.run(read_stream, write_stream, {})
 
 
 if __name__ == "__main__":

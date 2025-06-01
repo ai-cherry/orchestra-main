@@ -1,4 +1,7 @@
-# Placeholder for FastAPI app definition
+"""
+Orchestra AI FastAPI Application
+Main entry point for the Orchestra API server
+"""
 import os
 import time
 
@@ -6,7 +9,7 @@ import structlog
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
-# Import the admin router
+# Import routers
 from agent.app.routers.admin import router as admin_router
 from agent.app.routers.agents import router as agents_router
 from agent.app.routers.workflows import router as workflows_router
@@ -15,8 +18,10 @@ from agent.app.routers.system import router as system_router
 from agent.app.routers.audit import router as audit_router
 from agent.app.routers.automation import router as automation_router
 from agent.app.routers.natural_language import router as natural_language_router
-
-# import openai  # Removed unused import
+from agent.app.routers.intent import router as intent_router
+from agent.app.routers.suggestions import router as suggestions_router
+from agent.app.routers.llm import router as llm_router
+from agent.app.routers.llm_admin import router as llm_admin_router
 
 # Configure structlog for structured logging
 structlog.configure(
@@ -44,6 +49,10 @@ app.include_router(system_router)
 app.include_router(audit_router)
 app.include_router(automation_router)
 app.include_router(natural_language_router)
+app.include_router(intent_router)
+app.include_router(suggestions_router)
+app.include_router(llm_router)
+app.include_router(llm_admin_router)
 
 # Middleware for logging requests and latency
 

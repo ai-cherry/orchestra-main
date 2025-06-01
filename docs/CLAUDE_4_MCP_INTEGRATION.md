@@ -1,14 +1,14 @@
-# Claude 4 MCP Integration Guide
+# Claude MCP Integration Guide
 
 ## Overview
 
-This guide explains how to use the Model Context Protocol (MCP) servers with Claude 4 to enable powerful AI-assisted development capabilities for the AI Orchestra project.
+This guide explains how to use the Model Context Protocol (MCP) servers with Claude to enable powerful AI-assisted development capabilities for the AI Orchestra project.
 
 ## Architecture
 
 ```
 ┌─────────────────┐
-│   Claude 4      │
+│   Claude        │
 │  (MCP Client)   │
 └────────┬────────┘
          │
@@ -41,7 +41,7 @@ chmod +x start_mcp_system.sh stop_mcp_system.sh
 curl http://localhost:8000/health
 ```
 
-### 2. Configure Claude 4
+### 2. Configure Claude
 
 Add the MCP configuration to your Claude settings:
 

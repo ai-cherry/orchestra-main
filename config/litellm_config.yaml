@@ -62,65 +62,6 @@ model_list:
         anthropic-beta: "mcp-client-2025-04-04"
       max_tokens: 4096
 
-  # Claude 4 models (placeholder names - update when Anthropic releases official model identifiers)
-  # Expected release: Q1 2025
-  # Note: These model names are placeholders and will need to be updated
-  # when Anthropic announces the official Claude 4 model identifiers
-
-  - model_name: claude-4
-    litellm_params:
-      model: anthropic/claude-4-20250522 # PLACEHOLDER - Update when official name is released
-      api_key: ${ANTHROPIC_API_KEY}
-      # Enable MCP connector support
-      extra_headers:
-        anthropic-beta: "mcp-client-2025-04-04"
-      # Cost optimization settings
-      max_tokens: 8192
-      temperature: 0.7
-      # Enable streaming for better UX
-      stream: true
-
-  - model_name: claude-4-opus
-    litellm_params:
-      model: anthropic/claude-4-opus-20250522 # PLACEHOLDER - Update when official name is released
-      api_key: ${ANTHROPIC_API_KEY}
-      extra_headers:
-        anthropic-beta: "mcp-client-2025-04-04"
-      max_tokens: 8192
-      temperature: 0.7
-      stream: true
-      # Premium model - use for complex reasoning tasks only
-      metadata:
-        tier: "premium"
-        use_case: "complex_reasoning"
-
-  - model_name: claude-4-sonnet
-    litellm_params:
-      model: anthropic/claude-4-sonnet-20250522 # PLACEHOLDER - Update when official name is released
-      api_key: ${ANTHROPIC_API_KEY}
-      extra_headers:
-        anthropic-beta: "mcp-client-2025-04-04"
-      max_tokens: 4096
-      temperature: 0.7
-      stream: true
-      # Standard model - balance of cost and performance
-      metadata:
-        tier: "standard"
-        use_case: "general_purpose"
-
-  - model_name: claude-4-haiku
-    litellm_params:
-      model: anthropic/claude-4-haiku-20250522 # PLACEHOLDER - Update when official name is released
-      api_key: ${ANTHROPIC_API_KEY}
-      extra_headers:
-        anthropic-beta: "mcp-client-2025-04-04"
-      max_tokens: 2048
-      temperature: 0.7
-      stream: true
-      # Economy model - use for simple tasks
-      metadata:
-        tier: "economy"
-        use_case: "simple_tasks"
 
   # Portkey integration with proper headers
   - model_name: portkey/gpt-4o
@@ -186,21 +127,19 @@ router_settings:
   # Fallback models if primary fails
   fallbacks:
     [
-      { "model": "claude-4-opus", "fallback_model": "gpt-4" },
-      { "model": "claude-4-sonnet", "fallback_model": "claude-3-sonnet" },
-      { "model": "claude-4", "fallback_model": "claude-3-opus" },
       { "model": "gpt-4", "fallback_model": "claude-3-opus" },
       { "model": "claude-3-opus", "fallback_model": "gpt-4" },
+      { "model": "claude-3-sonnet", "fallback_model": "gpt-3.5-turbo" },
     ]
 
   # Model selection based on task complexity
   model_selection:
     # Use economy models for simple tasks
-    simple_tasks: ["claude-4-haiku", "gpt-3.5-turbo"]
+    simple_tasks: ["gpt-3.5-turbo"]
     # Use standard models for general purpose
-    general_tasks: ["claude-4-sonnet", "claude-3-sonnet"]
+    general_tasks: ["claude-3-sonnet"]
     # Use premium models for complex reasoning
-    complex_tasks: ["claude-4-opus", "gpt-4", "claude-3-opus"]
+    complex_tasks: ["gpt-4", "claude-3-opus"]
 
 # Cache configuration
 cache_settings:
@@ -311,9 +250,8 @@ budget_manager:
   max_budget: 100.0
   # Per-model budgets
   model_budgets:
-    "claude-4-opus": 30.0
-    "claude-4-sonnet": 25.0
-    "claude-4-haiku": 10.0
+    "claude-3-opus": 30.0
+    "claude-3-sonnet": 20.0
     "gpt-4": 25.0
     "gpt-3.5-turbo": 10.0
   # Budget reached callback

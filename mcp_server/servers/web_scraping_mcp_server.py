@@ -503,7 +503,7 @@ class OrchestraWebScrapingMCPServer(BaseMCPServer):
 WebScrapingMCPServer = OrchestraWebScrapingMCPServer
 
 
-# FastAPI integration for Cloud Run deployment
+# FastAPI integration for deployment
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 

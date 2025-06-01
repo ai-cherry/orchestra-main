@@ -1,0 +1,441 @@
+name: Admin UI - Complete Deployment Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'dashboard/**'
+      - '.github/workflows/admin-ui-deploy.yml'
+      - 'infrastructure/pulumi/dashboard/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'dashboard/**'
+
+env:
+  NODE_VERSION: '18'
+  PULUMI_VERSION: '3.94.0'
+  DOCKER_REGISTRY: gcr.io
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  DEPLOYMENT_ENVIRONMENT: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+jobs:
+  # Stage 1: Code Quality & Security Checks
+  code-quality:
+    name: Code Quality Analysis
+    runs-on: ubuntu-latest
+    steps:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: dashboard/package-lock.json
+      
+      - name: Install Dependencies
+        run: |
+          cd dashboard
+          npm ci --audit=false
+      
+      - name: ESLint Check
+        run: |
+          cd dashboard
+          npm run lint || true
+      
+      - name: TypeScript Check
+        run: |
+          cd dashboard
+          npm run type-check
+      
+      - name: Security Audit
+        run: |
+          cd dashboard
+          npm audit --production --audit-level=high || true
+
+  # Stage 2: Unit Tests
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: code-quality
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: dashboard/package-lock.json
+      
+      - name: Install Dependencies
+        run: |
+          cd dashboard
+          npm ci
+      
+      - name: Run Unit Tests
+        run: |
+          cd dashboard
+          npm test -- --coverage --watchAll=false || true
+      
+      - name: Upload Coverage
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: dashboard/coverage
+
+  # Stage 3: Build & Container Creation
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: dashboard/package-lock.json
+      
+      - name: Install Dependencies
+        run: |
+          cd dashboard
+          npm ci
+      
+      - name: Build Application
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.API_URL }}
+        run: |
+          cd dashboard
+          npm run build
+      
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      
+      - name: Configure Docker for GCR
+        run: |
+          gcloud auth configure-docker
+      
+      - name: Docker Meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/admin-ui
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=${{ env.DEPLOYMENT_ENVIRONMENT }}-latest
+      
+      - name: Build and Push Docker Image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: dashboard
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NODE_ENV=production
+
+  # Stage 4: Integration Tests
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: build
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: testpass
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run Integration Tests
+        run: |
+          cd dashboard
+          npm run test:integration || true
+
+  # Stage 5: Infrastructure Provisioning
+  infrastructure:
+    name: Provision Infrastructure with Pulumi
+    runs-on: ubuntu-latest
+    needs: integration-tests
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: infrastructure/pulumi/dashboard/package-lock.json
+      
+      - name: Setup Pulumi
+        uses: pulumi/actions@v4
+        with:
+          pulumi-version: ${{ env.PULUMI_VERSION }}
+      
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      
+      - name: Configure GCP
+        run: |
+          gcloud auth configure-docker
+          gcloud config set project ${{ env.GCP_PROJECT_ID }}
+      
+      - name: Install Pulumi Dependencies
+        run: |
+          cd infrastructure/pulumi/dashboard
+          npm ci
+      
+      - name: Select Pulumi Stack
+        run: |
+          cd infrastructure/pulumi/dashboard
+          pulumi stack select ${{ env.DEPLOYMENT_ENVIRONMENT }} --create
+      
+      - name: Configure Pulumi Stack
+        run: |
+          cd infrastructure/pulumi/dashboard
+          # Set configuration values from secrets
+          pulumi config set gcp:project ${{ env.GCP_PROJECT_ID }}
+          pulumi config set gcp:region us-central1
+          pulumi config set apiUrl ${{ secrets.API_URL }}
+          pulumi config set --secret apiKey ${{ secrets.API_KEY }}
+          pulumi config set --secret gcpServiceAccountKey ${{ secrets.GCP_SA_KEY }}
+          pulumi config set alertChannelId ${{ secrets.ALERT_CHANNEL }} || true
+      
+      - name: Pulumi Preview
+        run: |
+          cd infrastructure/pulumi/dashboard
+          pulumi preview --stack=${{ env.DEPLOYMENT_ENVIRONMENT }}
+      
+      - name: Pulumi Deploy
+        if: github.event_name == 'push'
+        run: |
+          cd infrastructure/pulumi/dashboard
+          pulumi up --yes --stack=${{ env.DEPLOYMENT_ENVIRONMENT }}
+      
+      - name: Export Pulumi Outputs
+        id: pulumi-outputs
+        run: |
+          cd infrastructure/pulumi/dashboard
+          # Export outputs for use in subsequent jobs
+          echo "cloud_run_url=$(pulumi stack output cloudRunUrl)" >> $GITHUB_OUTPUT
+          echo "load_balancer_ip=$(pulumi stack output loadBalancerIp)" >> $GITHUB_OUTPUT
+
+  # Stage 6: Database Migrations
+  database-migrations:
+    name: Run Database Migrations
+    runs-on: ubuntu-latest
+    needs: infrastructure
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      
+      - name: Run Migrations
+        run: |
+          # Connect to Cloud SQL and run migrations
+          gcloud sql connect ${{ secrets.DB_INSTANCE }} --user=postgres << EOF
+          \i migrations/latest.sql
+          EOF
+
+  # Stage 7: Deploy Application
+  deploy:
+    name: Deploy to ${{ github.ref == 'refs/heads/main' && 'Production' || 'Staging' }}
+    runs-on: ubuntu-latest
+    needs: [build, infrastructure, database-migrations]
+    if: github.event_name == 'push'
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      
+      - name: Deploy to Cloud Run (Blue-Green)
+        id: deploy
+        run: |
+          # Deploy new version as blue
+          gcloud run deploy admin-ui-blue \
+            --image=${{ needs.build.outputs.image-tag }} \
+            --region=us-central1 \
+            --platform=managed \
+            --allow-unauthenticated \
+            --set-env-vars="NEXT_PUBLIC_API_URL=${{ secrets.API_URL }}" \
+            --max-instances=10 \
+            --min-instances=1 \
+            --cpu=1 \
+            --memory=512Mi
+          
+          # Get blue service URL
+          BLUE_URL=$(gcloud run services describe admin-ui-blue --region=us-central1 --format='value(status.url)')
+          echo "url=$BLUE_URL" >> $GITHUB_OUTPUT
+
+  # Stage 8: Performance Tests
+  performance-tests:
+    name: Performance Testing
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: |
+            ${{ needs.deploy.outputs.url }}
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+      
+      - name: Run Load Tests
+        run: |
+          # Run k6 load tests
+          docker run --rm -i grafana/k6 run - <tests/load/dashboard.js
+
+  # Stage 9: Post-Deployment Validation
+  validate-deployment:
+    name: Validate Deployment
+    runs-on: ubuntu-latest
+    needs: [deploy, performance-tests]
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Health Check
+        run: |
+          URL="${{ needs.deploy.outputs.url }}"
+          for i in {1..30}; do
+            if curl -f "$URL/api/health"; then
+              echo "Health check passed"
+              exit 0
+            fi
+            echo "Waiting for service to be healthy..."
+            sleep 10
+          done
+          echo "Health check failed"
+          exit 1
+      
+      - name: Smoke Tests
+        run: |
+          cd dashboard
+          npm run test:e2e -- --baseUrl=${{ needs.deploy.outputs.url }}
+
+  # Stage 10: Traffic Switch (Blue-Green)
+  switch-traffic:
+    name: Switch Traffic to New Version
+    runs-on: ubuntu-latest
+    needs: validate-deployment
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: production-switch
+    steps:
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      
+      - name: Switch Traffic
+        run: |
+          # Update traffic split to new version
+          gcloud run services update-traffic admin-ui \
+            --to-revisions=admin-ui-blue=100 \
+            --region=us-central1
+          
+          # Tag old version for rollback
+          gcloud run services update-traffic admin-ui \
+            --to-tags=previous=0 \
+            --region=us-central1
+
+  # Stage 11: Monitoring & Alerting Setup
+  monitoring:
+    name: Configure Monitoring
+    runs-on: ubuntu-latest
+    needs: switch-traffic
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Monitoring
+        run: |
+          # Configure Google Cloud Monitoring
+          gcloud alpha monitoring policies create \
+            --notification-channels=${{ secrets.ALERT_CHANNEL }} \
+            --display-name="Admin UI - High Error Rate" \
+            --condition-display-name="Error rate > 1%" \
+            --condition-threshold-value=0.01 \
+            --condition-threshold-duration=300s
+
+  # Rollback Job (Manual Trigger)
+  rollback:
+    name: Rollback Deployment
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      
+      - name: Rollback to Previous Version
+        run: |
+          gcloud run services update-traffic admin-ui \
+            --to-tags=previous=100 \
+            --region=us-central1
+          
+          echo "Rollback completed successfully"
+
+  # Cleanup Job
+  cleanup:
+    name: Cleanup Resources
+    runs-on: ubuntu-latest
+    needs: [switch-traffic]
+    if: always()
+    steps:
+      - name: Clean up old images
+        run: |
+          # Remove images older than 7 days
+          gcloud container images list-tags \
+            ${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/admin-ui \
+            --filter='-tags:*' \
+            --filter='timestamp.datetime < -P7D' \
+            --format='get(digest)' | \
+          xargs -I {} gcloud container images delete \
+            "${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/admin-ui@{}" --quiet

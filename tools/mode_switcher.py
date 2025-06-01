@@ -11,9 +11,9 @@ including:
 4. Getting suggested next steps based on the current context
 
 Each mode is optimized with a specific AI model:
-- Gemini 2.5 Pro: architect, orchestrator, and reviewer modes
-- GPT-4.1: code and debug modes
-- Claude 3.7: strategy, ask, and creative modes
+- Gemini 1.5 Pro: architect, orchestrator, and reviewer modes
+- GPT-4: code and debug modes
+- Claude 3 Opus: strategy, ask, and creative modes
 """
 
 import argparse

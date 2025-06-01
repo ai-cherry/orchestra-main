@@ -152,11 +152,6 @@ The system uses current Claude API pricing (as of 2025):
 | Claude 3 Opus     | $15.00                | $75.00                 |
 | Claude 3 Sonnet   | $3.00                 | $15.00                 |
 | Claude 3 Haiku    | $0.25                 | $1.25                  |
-| Claude 4\*        | $20.00                | $100.00                |
-| Claude 4 Opus\*   | $25.00                | $125.00                |
-| Claude 4 Sonnet\* | $5.00                 | $25.00                 |
-
-\*Claude 4 pricing is placeholder - update when official pricing is announced.
 
 ## Alerts and Thresholds
 
