@@ -29,8 +29,8 @@ REQUIRED_VARS = {
         'JWT_SECRET',
         'ADMIN_API_KEY'
     ],
-    'Portkey': [
-        'PORTKEY_API_KEY'
+    'AI Services (at least one)': [
+        'PORTKEY_API_KEY'  # Preferred
     ]
 }
 
@@ -41,6 +41,15 @@ OPTIONAL_VARS = {
         'PORTKEY_GEMINI_VIRTUAL_KEY',
         'PORTKEY_PERPLEXITY_VIRTUAL_KEY'
     ],
+    'Direct AI Keys (Alternative to Portkey)': [
+        'OPENAI_API_KEY',
+        'ANTHROPIC_API_KEY',
+        'DEEPSEEK_API_KEY',
+        'PERPLEXITY_API_KEY',
+        'MISTRAL_API_KEY',
+        'OPENROUTER_API_KEY',
+        'HUGGINGFACE_API_TOKEN'
+    ],
     'Feature Flags': [
         'ENABLE_IMAGE_GEN',
         'ENABLE_VIDEO_SYNTH',
@@ -49,17 +58,33 @@ OPTIONAL_VARS = {
     ],
     'Media Services': [
         'PEXELS_API_KEY',
-        'RESEMBLE_API_KEY'
+        'RESEMBLE_API_KEY',
+        'RESEMBLE_SYNTHESIS_ENDPOINT',
+        'RESEMBLE_STREAMING_ENDPOINT',
+        'ELEVENLABS_API_KEY',
+        'RECRAFT_API_KEY'
     ],
     'Monitoring': [
         'SENTRY_DSN',
-        'LOG_LEVEL'
+        'LOG_LEVEL',
+        'LANGSMITH_API_KEY'
     ],
     'Cost Management': [
         'DAILY_COST_LIMIT_USD',
         'COST_ALERT_THRESHOLD',
         'MAX_DALLE_REQUESTS_PER_DAY',
         'MAX_GPT4_TOKENS_PER_DAY'
+    ],
+    'Infrastructure': [
+        'GCP_PROJECT_ID',
+        'PULUMI_ACCESS_TOKEN',
+        'DIGITALOCEAN_TOKEN'
+    ],
+    'Integration Services': [
+        'SLACK_BOT_TOKEN',
+        'NOTION_API_KEY',
+        'GONG_ACCESS_KEY',
+        'APOLLO_API_KEY'
     ]
 }
 
@@ -81,7 +106,7 @@ def check_env_var(var_name: str) -> Tuple[bool, str]:
     value = os.environ.get(var_name)
     if value:
         # Mask sensitive values
-        if 'KEY' in var_name or 'SECRET' in var_name or 'PASSWORD' in var_name:
+        if 'KEY' in var_name or 'SECRET' in var_name or 'PASSWORD' in var_name or 'TOKEN' in var_name:
             masked = value[:4] + '*' * (len(value) - 8) + value[-4:] if len(value) > 8 else '*' * len(value)
             return True, masked
         else:
@@ -101,6 +126,21 @@ def print_section(title: str):
     print('=' * 60)
 
 
+def check_ai_service_config() -> bool:
+    """Check if at least one AI service is configured"""
+    has_portkey = os.environ.get('PORTKEY_API_KEY')
+    direct_keys = [
+        'OPENAI_API_KEY',
+        'ANTHROPIC_API_KEY',
+        'DEEPSEEK_API_KEY',
+        'PERPLEXITY_API_KEY',
+        'MISTRAL_API_KEY'
+    ]
+    has_direct = any(os.environ.get(key) for key in direct_keys)
+    
+    return bool(has_portkey or has_direct)
+
+
 def main():
     """Main function to check environment configuration"""
     print("Orchestra AI Environment Configuration Checker")
@@ -115,8 +155,20 @@ def main():
             exists, value = check_env_var(var)
             status = "✅" if exists else "❌"
             print(f"  {status} {var}: {value}")
-            if not exists:
+            if not exists and var != 'PORTKEY_API_KEY':  # Special handling for AI services
                 missing_required.append(var)
+    
+    # Special check for AI services
+    print("\n🤖 AI Service Configuration:")
+    if check_ai_service_config():
+        print("  ✅ At least one AI service is configured")
+        if os.environ.get('PORTKEY_API_KEY'):
+            print("  ✅ Using Portkey (recommended)")
+        else:
+            print("  ⚠️  Using direct API keys (consider Portkey for better management)")
+    else:
+        print("  ❌ No AI service configured!")
+        missing_required.append('AI_SERVICE')
     
     print_section("Checking Optional Variables")
     
@@ -138,20 +190,31 @@ def main():
         'PORTKEY_PERPLEXITY_VIRTUAL_KEY'
     ]
     
-    for var in portkey_vars:
-        value = os.environ.get(var)
-        if value:
-            if validate_portkey_virtual_key(value):
-                provider = PORTKEY_VIRTUAL_KEYS.get(value, 'Unknown')
-                print(f"  ✅ {var}: {value} ({provider})")
-            else:
-                print(f"  ⚠️  {var}: {value} (NOT a valid Portkey virtual key)")
+    if os.environ.get('PORTKEY_API_KEY'):
+        print("\n✅ Portkey API Key is set")
+        for var in portkey_vars:
+            value = os.environ.get(var)
+            if value:
+                if validate_portkey_virtual_key(value):
+                    provider = PORTKEY_VIRTUAL_KEYS.get(value, 'Unknown')
+                    print(f"  ✅ {var}: {value} ({provider})")
+                else:
+                    print(f"  ⚠️  {var}: {value} (NOT a valid Portkey virtual key)")
+        
+        print("\nAvailable Portkey Virtual Keys:")
+        for key, provider in PORTKEY_VIRTUAL_KEYS.items():
+            print(f"  • {key} - {provider}")
+    else:
+        print("\n⚠️  Portkey not configured - using direct API keys")
     
-    print_section("Available Portkey Virtual Keys")
+    print_section("Configuration Recommendations")
     
-    print("\nYour Portkey account has these virtual keys available:")
-    for key, provider in PORTKEY_VIRTUAL_KEYS.items():
-        print(f"  • {key} - {provider}")
+    print("\n🎯 Best Practices:")
+    print("1. Use Portkey for unified AI service management")
+    print("2. Set up monitoring with Sentry or similar")
+    print("3. Configure cost limits for AI services")
+    print("4. Enable feature flags based on your needs")
+    print("5. Use environment-specific configurations")
     
     print_section("Summary")
     
@@ -163,7 +226,17 @@ def main():
         return 1
     else:
         print("\n✅ All required environment variables are set!")
-        print("\n💡 Tip: Check optional variables for enhanced functionality")
+        
+        # Additional recommendations
+        if not os.environ.get('PORTKEY_API_KEY'):
+            print("\n💡 Consider using Portkey for better AI service management")
+        
+        if not os.environ.get('SENTRY_DSN'):
+            print("\n💡 Consider setting up error monitoring with Sentry")
+        
+        if not os.environ.get('SLACK_BOT_TOKEN'):
+            print("\n💡 Consider setting up Slack notifications")
+        
         return 0
 
 
