@@ -180,3 +180,18 @@ Following these configuration standards will ensure:
 4. Clear separation of concerns between configuration types
 
 For questions or improvements to these standards, please file an issue or pull request.
+
+### Persona Memory Variables
+
+The persona memory system uses separate Redis databases and PostgreSQL schemas for each persona. Example variables:
+
+```
+REDIS_DB_CHERRY=0
+REDIS_DB_SOPHIA=1
+REDIS_DB_KAREN=2
+POSTGRES_SCHEMA_CHERRY=cherry
+POSTGRES_SCHEMA_SOPHIA=sophia
+POSTGRES_SCHEMA_KAREN=karen
+NEO4J_URL=bolt://localhost:7687
+```
+
