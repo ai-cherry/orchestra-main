@@ -3,31 +3,39 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import StatusIndicator from '@/components/ui/StatusIndicator';
-import { Search, RefreshCw } from 'lucide-react';
-import { Link } from '@tanstack/react-router';
-
-// Dummy data for resources
-const resourcesData = [
-  { id: '1', name: 'API Documentation', type: 'Document', status: 'active', lastUpdated: '2 days ago' },
-  { id: '2', name: 'User Guide', type: 'Document', status: 'active', lastUpdated: '1 week ago' },
-  { id: '3', name: 'System Architecture', type: 'Diagram', status: 'active', lastUpdated: '3 days ago' },
-  { id: '4', name: 'Database Schema', type: 'Diagram', status: 'outdated', lastUpdated: '2 months ago' },
-  { id: '5', name: 'Deployment Guide', type: 'Document', status: 'active', lastUpdated: '5 days ago' },
-  { id: '6', name: 'Training Videos', type: 'Media', status: 'active', lastUpdated: '1 month ago' },
-  { id: '7', name: 'Code Samples', type: 'Repository', status: 'active', lastUpdated: '1 day ago' },
-  { id: '8', name: 'Security Policy', type: 'Document', status: 'active', lastUpdated: '2 weeks ago' },
-];
-
-// Status mapping for resource status indicators
-const statusMap = {
-  'active': 'healthy',
-  'outdated': 'warning',
-  'archived': 'idle',
-  'error': 'error',
-} as const;
+import { Search, RefreshCw, Eye, Download } from 'lucide-react';
+import { useResources } from '@/lib/api';
 
 export function ResourcesPage() {
+  const { data: resourcesData = [], refetch } = useResources();
+
+  const getResourceIcon = (type: string) => {
+    switch(type) {
+      case 'script': return '📜';
+      case 'document': return '📄';
+      case 'config': return '⚙️';
+      case 'database': return '🗄️';
+      case 'log': return '📋';
+      default: return '📁';
+    }
+  };
+
+  const formatModified = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor(diff / 3600000);
+    const mins = Math.floor(diff / 60000);
+    
+    if (mins < 60) return `${mins} minutes ago`;
+    if (hours < 24) return `${hours} hours ago`;
+    if (days < 7) return `${days} days ago`;
+    return date.toLocaleDateString();
+  };
+
   return (
     <PageWrapper title="Resources">
       <div className="flex flex-col space-y-6">
@@ -41,10 +49,8 @@ export function ResourcesPage() {
               className="w-full rounded-md pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
             />
           </div>
-          <Button asChild>
-            <Link to="/resources">
-              <RefreshCw className="mr-2 h-4 w-4" /> Refresh Resources
-            </Link>
+          <Button onClick={() => refetch()}>
+            <RefreshCw className="mr-2 h-4 w-4" /> Refresh Resources
           </Button>
         </div>
 
@@ -52,7 +58,7 @@ export function ResourcesPage() {
         <Card>
           <CardHeader>
             <CardTitle>Resource Library</CardTitle>
-            <CardDescription>Manage and access your knowledge resources.</CardDescription>
+            <CardDescription>Manage and access your system resources and files.</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
@@ -60,23 +66,46 @@ export function ResourcesPage() {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Type</TableHead>
+                  <TableHead>Size</TableHead>
+                  <TableHead>Modified</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Last Updated</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {resourcesData.map((resource) => (
+                {resourcesData.map((resource: any) => (
                   <TableRow key={resource.id}>
-                    <TableCell className="font-medium">{resource.name}</TableCell>
-                    <TableCell>{resource.type}</TableCell>
-                    <TableCell>
-                      <StatusIndicator status={statusMap[resource.status as keyof typeof statusMap] || 'error'} />
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">{getResourceIcon(resource.type)}</span>
+                        <span className="max-w-xs truncate" title={resource.name}>
+                          {resource.name}
+                        </span>
+                      </div>
                     </TableCell>
-                    <TableCell>{resource.lastUpdated}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="capitalize">
+                        {resource.type}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {resource.size}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {formatModified(resource.modified)}
+                    </TableCell>
+                    <TableCell>
+                      <StatusIndicator status={resource.status === 'available' ? 'active' : resource.status === 'active' ? 'active' : 'idle'} />
+                    </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">View</Button>
-                      <Button variant="ghost" size="sm">Edit</Button>
+                      <Button variant="ghost" size="sm">
+                        <Eye className="h-3 w-3 mr-1" />
+                        View
+                      </Button>
+                      <Button variant="ghost" size="sm">
+                        <Download className="h-3 w-3 mr-1" />
+                        Download
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

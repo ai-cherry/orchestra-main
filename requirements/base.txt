@@ -57,5 +57,4 @@ passlib[bcrypt]==1.7.4
 # Serialization
 protobuf==6.31.0
 grpcio==1.72.0rc1
-pymongo>=4.6.3
 llama-index==0.10.38

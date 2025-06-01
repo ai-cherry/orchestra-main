@@ -4,39 +4,50 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import StatusIndicator from '@/components/ui/StatusIndicator'; // Already adapted for log levels
-
-// Mock Data
-const mockLogs = [
-  { id: 'log_001', timestamp: '2024-07-30 10:00:00', level: 'INFO', source: 'AgentService', message: 'Agent X (ID: agt_123) started successfully and is now processing data stream alpha.' },
-  { id: 'log_002', timestamp: '2024-07-30 10:01:15', level: 'WARN', source: 'APIService', message: 'Rate limit approaching for external API (XYZ-Weather). Current usage: 85%.' },
-  { id: 'log_003', timestamp: '2024-07-30 10:02:30', level: 'ERROR', source: 'DatabaseConnector', message: 'Failed to connect to primary database cluster (db-main-01) after 3 retries. Error: Connection timeout.' },
-  { id: 'log_004', timestamp: '2024-07-30 10:03:45', level: 'INFO', source: 'WorkflowEngine', message: 'Workflow "DailyReportGen" (ID: wf_789) completed successfully in 12.5s.' },
-  { id: 'log_005', timestamp: '2024-07-30 10:05:00', level: 'DEBUG', source: 'AgentService', message: 'Received new task for Agent Y (ID: agt_456): Process input file input.csv. Payload size: 2.5MB.' }, // Debug is not explicitly mapped, will use default
-  { id: 'log_006', timestamp: '2024-07-30 10:06:20', level: 'INFO', source: 'APIService', message: 'User admin@example.com authenticated successfully via OAuth2.' },
-  { id: 'log_007', timestamp: '2024-07-30 10:07:50', level: 'WARN', source: 'ResourceMonitor', message: 'Memory usage for Agent Z (ID: agt_789) at 92%. Threshold is 90%.' },
-  { id: 'log_008', timestamp: '2024-07-30 10:08:30', level: 'ERROR', source: 'AgentService', message: 'Unhandled exception in Agent X (ID: agt_123) while processing task task_abc. Error: NullPointerException at processData:123.' },
-  { id: 'log_009', timestamp: '2024-07-30 10:10:00', level: 'INFO', source: 'System', message: 'Scheduled maintenance window starting in 1 hour.' },
-  { id: 'log_010', timestamp: '2024-07-30 10:11:00', level: 'INFO', source: 'WorkflowEngine', message: 'Workflow "DataBackup" (ID: wf_001) initiated by system scheduler.' },
-  { id: 'log_011', timestamp: '2024-07-30 10:12:00', level: 'WARN', source: 'SecurityService', message: 'Multiple failed login attempts for user `unknown_user` from IP 192.168.1.100.' },
-  { id: 'log_012', timestamp: '2024-07-30 10:13:00', level: 'ERROR', source: 'PaymentGateway', message: 'Transaction failed for order ORD_123. Gateway error: Insufficient funds (Code: 51).' },
-];
-
-// The StatusIndicator component already handles mapping status to color,
-// and the `text` prop will display the log level directly.
-// So, `logLevelVariant` helper is not strictly needed if StatusIndicator is used as intended.
-// The `status` prop of StatusIndicator will be 'info', 'warn', 'error'.
+import { Badge } from '@/components/ui/badge';
+import { RefreshCw } from 'lucide-react';
+import { useLogs } from '@/lib/api';
 
 export function LogsPage() {
-  // Placeholder state and handlers for filters
+  // State for filters
   const [searchTerm, setSearchTerm] = React.useState('');
   const [logLevelFilter, setLogLevelFilter] = React.useState('all');
   const [dateRangeFilter, setDateRangeFilter] = React.useState('all');
+  const [limit, setLimit] = React.useState(50);
+
+  const { data: logsData = [], refetch } = useLogs(limit);
+
+  // Filter logs based on search and filters
+  const filteredLogs = React.useMemo(() => {
+    return logsData.filter((log: any) => {
+      // Search filter
+      if (searchTerm && !log.message.toLowerCase().includes(searchTerm.toLowerCase()) &&
+          !log.source.toLowerCase().includes(searchTerm.toLowerCase())) {
+        return false;
+      }
+      
+      // Level filter
+      if (logLevelFilter !== 'all' && log.level.toLowerCase() !== logLevelFilter) {
+        return false;
+      }
+      
+      return true;
+    });
+  }, [logsData, searchTerm, logLevelFilter]);
 
   const handleApplyFilters = () => {
-    // In a real app, this would trigger data fetching with the selected filters
-    alert(`Applying filters: Search='${searchTerm}', Level='${logLevelFilter}', Date='${dateRangeFilter}'`);
-    console.log({ searchTerm, logLevelFilter, dateRangeFilter });
+    refetch();
+  };
+
+  // Get level badge variant
+  const getLevelVariant = (level: string) => {
+    switch(level.toUpperCase()) {
+      case 'ERROR': return 'destructive';
+      case 'WARN': return 'warning';
+      case 'INFO': return 'default';
+      case 'DEBUG': return 'secondary';
+      default: return 'outline';
+    }
   };
 
   return (
@@ -78,12 +89,15 @@ export function LogsPage() {
               </SelectContent>
             </Select>
           </div>
-          <Button onClick={handleApplyFilters} className="w-full md:w-auto">Apply Filters</Button>
+          <Button onClick={handleApplyFilters}>
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Apply Filters
+          </Button>
         </div>
       </div>
 
       {/* Logs Table */}
-      <div className="bg-card p-0 border rounded-lg shadow-sm"> {/* p-0 for table to span full width */}
+      <div className="bg-card p-0 border rounded-lg shadow-sm">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -95,16 +109,19 @@ export function LogsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockLogs.map((log) => (
-                <TableRow key={log.id}>
-                  <TableCell className="text-xs text-muted-foreground font-mono">{log.timestamp}</TableCell>
+              {filteredLogs.map((log: any, index: number) => (
+                <TableRow key={`log-${index}`}>
+                  <TableCell className="text-xs text-muted-foreground font-mono">
+                    {new Date(log.timestamp).toLocaleString()}
+                  </TableCell>
                   <TableCell>
-                    {/* Pass log.level (e.g., 'INFO') to status, and also as text for display */}
-                    <StatusIndicator status={log.level.toLowerCase()} text={log.level.toUpperCase()} />
+                    <Badge variant={getLevelVariant(log.level) as any}>
+                      {log.level}
+                    </Badge>
                   </TableCell>
                   <TableCell className="font-medium text-sm">{log.source}</TableCell>
-                  <TableCell className="text-sm max-w-md lg:max-w-lg xl:max-w-xl">
-                    <div className="truncate" title={log.message}>
+                  <TableCell className="text-sm">
+                    <div className="max-w-xl">
                       {log.message}
                     </div>
                   </TableCell>
@@ -115,11 +132,27 @@ export function LogsPage() {
         </div>
       </div>
 
-      {/* Placeholder Pagination */}
-      <div className="mt-6 flex justify-center items-center space-x-2">
-        <Button variant="outline" size="sm" disabled>Previous</Button>
-        <span className="text-sm text-muted-foreground">Page 1 of 10 (Placeholder)</span>
-        <Button variant="outline" size="sm">Next</Button>
+      {/* Info and Controls */}
+      <div className="mt-6 flex justify-between items-center">
+        <div className="text-sm text-muted-foreground">
+          Showing {filteredLogs.length} of {logsData.length} logs • Auto-refreshing every 5 seconds
+        </div>
+        <div className="flex items-center gap-2">
+          <Select value={limit.toString()} onValueChange={(v) => setLimit(parseInt(v))}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="25">25 logs</SelectItem>
+              <SelectItem value="50">50 logs</SelectItem>
+              <SelectItem value="100">100 logs</SelectItem>
+              <SelectItem value="200">200 logs</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline" size="sm" onClick={() => refetch()}>
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </PageWrapper>
   );

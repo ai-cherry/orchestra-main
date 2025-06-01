@@ -3,22 +3,33 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import StatusIndicator from '@/components/ui/StatusIndicator';
-import { Search, RefreshCw } from 'lucide-react';
-import { Link } from '@tanstack/react-router';
-
-// Dummy data
-const workflowsData = [
-  { id: '1', name: 'Data Ingestion Pipeline', status: 'active', lastRun: '15 minutes ago', nextRun: 'In 45 minutes' },
-  { id: '2', name: 'Weekly Report Generator', status: 'idle', lastRun: '3 days ago', nextRun: 'In 4 days' },
-  { id: '3', name: 'Customer Onboarding', status: 'error', lastRun: '1 hour ago', nextRun: 'Manual trigger' },
-  { id: '4', name: 'Inventory Sync', status: 'active', lastRun: '30 minutes ago', nextRun: 'In 30 minutes' },
-  { id: '5', name: 'Log Cleanup', status: 'idle', lastRun: '1 day ago', nextRun: 'Tomorrow, 2:00 AM' },
-  { id: '6', name: 'Security Scan', status: 'active', lastRun: '4 hours ago', nextRun: 'In 20 hours' },
-  { id: '7', name: 'Database Backup', status: 'active', lastRun: '12 hours ago', nextRun: 'In 12 hours' },
-];
+import { Search, RefreshCw, Play } from 'lucide-react';
+import { useWorkflows } from '@/lib/api';
 
 export function WorkflowsPage() {
+  const { data: workflowsData = [], refetch } = useWorkflows();
+
+  // Format the datetime strings to be more readable
+  const formatDateTime = (dateStr: string) => {
+    if (dateStr === 'Manual trigger') return dateStr;
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = date.getTime() - now.getTime();
+    
+    if (Math.abs(diff) < 86400000) { // Less than 24 hours
+      const hours = Math.floor(Math.abs(diff) / 3600000);
+      const mins = Math.floor((Math.abs(diff) % 3600000) / 60000);
+      if (diff > 0) {
+        return hours > 0 ? `In ${hours}h ${mins}m` : `In ${mins} minutes`;
+      } else {
+        return hours > 0 ? `${hours}h ${mins}m ago` : `${mins} minutes ago`;
+      }
+    }
+    return date.toLocaleString();
+  };
+
   return (
     <PageWrapper title="Workflows">
       <div className="flex flex-col space-y-6">
@@ -32,10 +43,8 @@ export function WorkflowsPage() {
               className="w-full rounded-md pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
             />
           </div>
-          <Button asChild>
-            <Link to="/workflows">
-              <RefreshCw className="mr-2 h-4 w-4" /> Refresh Workflows
-            </Link>
+          <Button onClick={() => refetch()}>
+            <RefreshCw className="mr-2 h-4 w-4" /> Refresh Workflows
           </Button>
         </div>
 
@@ -53,21 +62,28 @@ export function WorkflowsPage() {
                   <TableHead>Status</TableHead>
                   <TableHead>Last Run</TableHead>
                   <TableHead>Next Run</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>Actions</TableHead>
+                  <TableHead className="text-right">Controls</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {workflowsData.map((workflow) => (
+                {workflowsData.map((workflow: any) => (
                   <TableRow key={workflow.id}>
                     <TableCell className="font-medium">{workflow.name}</TableCell>
                     <TableCell>
                       <StatusIndicator status={workflow.status} />
                     </TableCell>
-                    <TableCell>{workflow.lastRun}</TableCell>
-                    <TableCell>{workflow.nextRun}</TableCell>
+                    <TableCell>{formatDateTime(workflow.last_run)}</TableCell>
+                    <TableCell>{formatDateTime(workflow.next_run)}</TableCell>
+                    <TableCell>
+                      <Badge variant="secondary">{workflow.actions} steps</Badge>
+                    </TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="sm">Edit</Button>
-                      <Button variant="ghost" size="sm">Run Now</Button>
+                      <Button variant="ghost" size="sm">
+                        <Play className="h-3 w-3 mr-1" />
+                        Run Now
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

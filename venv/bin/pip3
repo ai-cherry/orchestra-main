@@ -1,4 +1,4 @@
-#!/home/paperspace/orchestra-main/venv/bin/python3.10
+#!/root/orchestra-main/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
