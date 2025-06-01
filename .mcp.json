@@ -9,7 +9,9 @@
         "mcp_server/servers/orchestrator_server.py"
       ],
       "env": {
-        "PYTHONPATH": "${PYTHONPATH}:${PWD}"
+        "API_URL": "${API_URL:-http://localhost:8080}",
+        "API_KEY": "${API_KEY:-test_key}",
+        "MCP_ORCHESTRATOR_PORT": "${MCP_ORCHESTRATOR_PORT:-8002}"
       },
       "capabilities": {
         "tools": true,
@@ -23,13 +25,34 @@
         "mcp_server/servers/memory_server.py"
       ],
       "env": {
-        "MONGODB_URI": "${MONGODB_URI}",
-        "REDIS_HOST": "${REDIS_HOST}",
-        "REDIS_PORT": "${REDIS_PORT}"
+        "POSTGRES_HOST": "${POSTGRES_HOST:-localhost}",
+        "POSTGRES_PORT": "${POSTGRES_PORT:-5432}",
+        "POSTGRES_DB": "${POSTGRES_DB:-orchestra}",
+        "POSTGRES_USER": "${POSTGRES_USER:-postgres}",
+        "POSTGRES_PASSWORD": "${POSTGRES_PASSWORD:-}",
+        "WEAVIATE_HOST": "${WEAVIATE_HOST:-localhost}",
+        "WEAVIATE_PORT": "${WEAVIATE_PORT:-8080}",
+        "WEAVIATE_API_KEY": "${WEAVIATE_API_KEY:-}",
+        "MCP_MEMORY_PORT": "${MCP_MEMORY_PORT:-8003}"
       },
       "capabilities": {
         "tools": true,
         "resources": true
+      }
+    },
+    "weaviate": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/weaviate_direct_mcp_server.py"
+      ],
+      "env": {
+        "MCP_WEAVIATE_DIRECT_PORT": "${MCP_WEAVIATE_DIRECT_PORT:-8001}",
+        "WEAVIATE_HOST": "${WEAVIATE_HOST:-localhost}",
+        "WEAVIATE_PORT": "${WEAVIATE_PORT:-8080}",
+        "WEAVIATE_GRPC_PORT": "${WEAVIATE_GRPC_PORT:-50051}",
+        "WEAVIATE_API_KEY": "${WEAVIATE_API_KEY:-}",
+        "WEAVIATE_SECURED": "${WEAVIATE_SECURED:-false}",
+        "WEAVIATE_SKIP_VERIFICATION": "${WEAVIATE_SKIP_VERIFICATION:-false}"
       }
     },
     "deployment": {
@@ -37,6 +60,9 @@
       "args": [
         "mcp_server/servers/deployment_server.py"
       ],
+      "env": {
+        "MCP_DEPLOYMENT_PORT": "${MCP_DEPLOYMENT_PORT:-8005}"
+      },
       "capabilities": {
         "tools": true
       }
@@ -47,15 +73,11 @@
         "mcp_server/servers/tools_server.py"
       ],
       "env": {
-        "PYTHONPATH": "${PYTHONPATH}:${PWD}",
-        "REDIS_HOST": "${REDIS_HOST}",
-        "REDIS_PORT": "${REDIS_PORT}",
-        "MONGODB_URI": "${MONGODB_URI}",
-        "WEAVIATE_URL": "${WEAVIATE_URL}"
+        "MCP_TOOLS_PORT": "${MCP_TOOLS_PORT:-8006}"
       },
       "capabilities": {
         "tools": true,
-        "resources": true
+        "resources": true"
       },
       "description": "Tool discovery and execution server with rich metadata"
     }
