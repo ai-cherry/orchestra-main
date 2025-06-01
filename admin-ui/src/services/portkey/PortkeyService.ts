@@ -159,6 +159,42 @@ export class PortkeyService {
   }
   
   /**
+   * Generate text using OpenRouter's model catalog
+   */
+  async generateWithOpenRouter(prompt: string, modelId: string, options?: TextOptions) {
+    try {
+      const messages = [
+        ...(options?.systemPrompt ? [{ role: 'system' as const, content: options.systemPrompt }] : []),
+        { role: 'user' as const, content: prompt }
+      ];
+      
+      const response = await this.client.chat.completions.create({
+        model: modelId, // Use OpenRouter model ID directly
+        messages,
+        temperature: options?.temperature || 0.7,
+        max_tokens: options?.maxTokens || 1000,
+        virtualKey: getVirtualKey('openrouter')
+      });
+      
+      const content = response.choices?.[0]?.message?.content || '';
+      
+      return {
+        success: true,
+        data: content,
+        usage: response.usage,
+        model: response.model
+      };
+    } catch (error: any) {
+      console.error('OpenRouter generation failed:', error);
+      throw {
+        code: error?.code || 'UNKNOWN_ERROR',
+        message: error?.message || 'Failed to generate with OpenRouter',
+        provider: 'openrouter'
+      };
+    }
+  }
+  
+  /**
    * List available models for a provider
    */
   async listModels(provider: keyof typeof PORTKEY_CONFIG.virtualKeys) {
