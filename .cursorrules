@@ -14,6 +14,12 @@ For best results, reference these in your prompts:
 - Performance > Security (within reason)
 - Existing patterns > New patterns
 
+## Database Architecture ⚠️ IMPORTANT
+- **USE ONLY**: PostgreSQL (relational) + Weaviate (vector)
+- **DO NOT USE**: MongoDB, Redis, DragonflyDB
+- **Always use**: shared.database.UnifiedDatabase class
+- **Ignore**: Old database references in legacy code
+
 ## Project Structure
 - Automation tools: scripts/
 - Config validation: scripts/config_validator.py
@@ -39,3 +45,5 @@ For best results, reference these in your prompts:
 - Python 3.10+ features (match/case, tomllib)
 - Complex patterns (metaclasses, multiple inheritance)
 - Heavy dependencies for simple tasks
+- Direct database connections (use UnifiedDatabase)
+- MongoDB/Redis/DragonflyDB usage
