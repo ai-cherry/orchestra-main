@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from '@tanstack/react-router';
 import { Home, Brain, Workflow, Settings, MessageSquare, FileText, Zap, 
   Heart, Activity, Users, DollarSign, CreditCard, FileCheck, 
-  Pill, TestTube, Shield } from 'lucide-react';
+  Pill, TestTube, Shield, GitBranch, Monitor } from 'lucide-react';
 import usePersonaStore from '../../store/personaStore';
 
 interface SidebarProps {
@@ -15,6 +15,8 @@ const baseNavItems = [
   { href: '/', label: 'Dashboard', icon: Home },
   { href: '/agents', label: 'Agents', icon: MessageSquare },
   { href: '/workflows', label: 'Workflows', icon: Workflow },
+  { href: '/orchestration', label: 'Orchestration', icon: GitBranch },
+  { href: '/monitoring', label: 'Monitoring', icon: Monitor },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
