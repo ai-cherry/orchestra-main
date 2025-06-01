@@ -12,6 +12,7 @@ import {
 import { useAuthStore } from '@/store/authStore';
 import { useNavigate, useRouterState } from '@tanstack/react-router';
 import usePersonaStore from '../../store/personaStore';
+import OmniSearch from './OmniSearch';
 
 interface TopBarProps {
   sidebarOpen: boolean;
@@ -24,6 +25,19 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   const navigate = useNavigate();
   const routerState = useRouterState();
   const currentPersona = usePersonaStore((state) => state.getCurrentPersona());
+
+  const handleOmniQuery = (text: string, files?: FileList) => {
+    console.log('OmniSearch Query:', text);
+    if (files && files.length > 0) {
+      console.log('OmniSearch Files:', Array.from(files).map(f => f.name));
+    }
+    // TODO: Implement actual query handling logic (e.g., API call)
+  };
+
+  const quickActions = [
+    { icon: '🤖', label: 'New Agent', domain: 'all', action: () => navigate({ to: '/agents' }) },
+    { icon: '📁', label: 'Process ZIP', domain: 'sophia', action: () => console.log("Process ZIP clicked") },
+  ];
 
   const handleLogout = () => {
     logout();
@@ -45,8 +59,9 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   const currentPageTitle = deriveTitleFromPath(routerState.location.pathname);
 
   return (
-    <header className="flex h-16 items-center justify-between bg-background border-b border-border px-4 md:px-6">
-      <div className="flex items-center">
+    <header className="flex h-auto md:h-16 items-center justify-between bg-background border-b border-border px-4 md:px-6 py-2 md:py-0 flex-wrap md:flex-nowrap">
+      {/* Left Section */}
+      <div className="flex items-center flex-shrink-0">
         <Button
           variant="ghost"
           size="icon"
@@ -59,16 +74,19 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
         <h1 className="ml-4 text-xl font-semibold text-foreground hidden lg:block">{currentPageTitle}</h1>
       </div>
 
-      <div className="flex-1 mx-4 hidden md:block">
-        {/* OmniSearch will be integrated here in Phase 2 */}
+      {/* Center Section - OmniSearch */}
+      <div className="w-full md:flex-grow md:mx-4 order-3 md:order-2 mt-2 md:mt-0 flex justify-center">
+        <OmniSearch onQuery={handleOmniQuery} quickActions={quickActions} />
       </div>
 
-      <div className="flex items-center space-x-3">
+      {/* Right Section */}
+      <div className="flex items-center space-x-2 md:space-x-3 flex-shrink-0 order-2 md:order-3">
+        {/* Current Persona Display */}
         {currentPersona && (
           <div className="hidden sm:flex items-center space-x-2">
             <span 
               className="text-sm font-medium"
-              style={{ color: currentPersona.color }}
+              style={{ color: 'var(--theme-accent-primary)' }}
             >
               {currentPersona.name}
             </span>
@@ -78,6 +96,7 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
           </div>
         )}
 
+        {/* Theme Selector */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" aria-label="Select Theme">
@@ -97,6 +116,7 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
           </DropdownMenuContent>
         </DropdownMenu>
 
+        {/* Dark/Light Mode Toggle */}
         <Button 
           variant="ghost" 
           size="icon" 
@@ -106,6 +126,7 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
           {mode === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
         </Button>
 
+        {/* User Menu */}
         {isAuthenticated && user ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
