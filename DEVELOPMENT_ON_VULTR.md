@@ -41,3 +41,14 @@ systemctl restart orchestra-api  # or whatever service name
 2. Test on different port before deploying
 3. Use git branches for major changes
 4. Keep production service running while developing
+
+## Automated Provisioning
+Use `scripts/vultr_provision.py` to spin up a fresh Vultr VM and attach block storage.
+
+```bash
+export VULTR_API_KEY=your-api-key
+python scripts/vultr_provision.py --region ewr --plan vc2-1c-2gb --os 215 \
+    --label orchestra-dev --ssh-key <key_id> --volume <volume_id>
+```
+
+The script interacts with the Vultr API to create the server and optionally attach an existing volume.
