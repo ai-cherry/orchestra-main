@@ -34,17 +34,19 @@ Orchestra AI runs on a single Vultr server that serves as development, deploymen
    ```
 
 ## Port Allocation
-- **8000**: Production API
-- **8001**: Development/testing API (if needed)
-- **80**: Admin UI (served by Nginx)
-- **5432**: PostgreSQL
-- **6333**: Qdrant vector DB
+| Port | Service |
+|------|---------|
+| **80**  | Nginx (Admin-UI static files + API proxy) |
+| **8000** | FastAPI Orchestrator (production + dev, reloader enabled) |
+| **5432** | PostgreSQL 14 (structured data) |
+| **6379** | Redis 5 (short-term cache / pub-sub) |
+| **8080** | Weaviate (vector memory) |
 
 ## Safety Measures
-1. **Git Version Control**: All changes tracked
-2. **Nightly Snapshots**: Automated at 03:00 UTC
-3. **Service Isolation**: Docker containers for each service
-4. **Quick Rollback**: `git reset` for code, snapshots for data
+1. **Git Version Control** – All changes tracked on GitHub `main`.
+2. **Secrets via GitHub** – Deployment pulls `.env` from GitHub Actions secrets; no secrets live in code.
+3. **Nightly Snapshots** – Vultr automatic block-storage snapshots at 03:00 UTC.
+4. **Quick Rollback** – `git reset --hard` for code, snapshot restore for data.
 
 ## Best Practices
 1. Always pull latest changes before starting work

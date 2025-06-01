@@ -3,20 +3,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import { Search, RefreshCw } from 'lucide-react';
-import { Link } from '@tanstack/react-router';
-
-// Dummy data
-const personasData = [
-  { id: '1', name: 'Customer Support', description: 'Friendly and helpful support agent', lastUsed: '2 hours ago' },
-  { id: '2', name: 'Technical Expert', description: 'Detailed technical knowledge provider', lastUsed: '1 day ago' },
-  { id: '3', name: 'Creative Writer', description: 'Content creation specialist', lastUsed: '3 hours ago' },
-  { id: '4', name: 'Data Analyst', description: 'Analytical insights provider', lastUsed: '5 days ago' },
-  { id: '5', name: 'Executive Summary', description: 'Concise business information', lastUsed: '12 hours ago' },
-  { id: '6', name: 'Sales Representative', description: 'Persuasive product promoter', lastUsed: '2 days ago' },
-];
+import { usePersonas } from '@/lib/api';
 
 export function PersonasPage() {
+  const { data: personasData = [], refetch } = usePersonas();
+
   return (
     <PageWrapper title="Personas">
       <div className="flex flex-col space-y-6">
@@ -30,10 +23,8 @@ export function PersonasPage() {
               className="w-full rounded-md pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
             />
           </div>
-          <Button asChild>
-            <Link to="/personas">
-              <RefreshCw className="mr-2 h-4 w-4" /> Refresh Personas
-            </Link>
+          <Button onClick={() => refetch()}>
+            <RefreshCw className="mr-2 h-4 w-4" /> Refresh Personas
           </Button>
         </div>
 
@@ -48,20 +39,43 @@ export function PersonasPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
+                  <TableHead>Type</TableHead>
                   <TableHead>Description</TableHead>
-                  <TableHead>Last Used</TableHead>
+                  <TableHead>Capabilities</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {personasData.map((persona) => (
+                {personasData.map((persona: any) => (
                   <TableRow key={persona.id}>
                     <TableCell className="font-medium">{persona.name}</TableCell>
-                    <TableCell>{persona.description}</TableCell>
-                    <TableCell>{persona.lastUsed}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{persona.agent_type}</Badge>
+                    </TableCell>
+                    <TableCell className="max-w-xs truncate">{persona.description}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {persona.capabilities.slice(0, 2).map((cap: string, idx: number) => (
+                          <Badge key={idx} variant="secondary" className="text-xs">
+                            {cap}
+                          </Badge>
+                        ))}
+                        {persona.capabilities.length > 2 && (
+                          <Badge variant="secondary" className="text-xs">
+                            +{persona.capabilities.length - 2}
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={persona.active ? "default" : "secondary"}>
+                        {persona.active ? "Active" : "Inactive"}
+                      </Badge>
+                    </TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="sm">Edit</Button>
-                      <Button variant="ghost" size="sm">Use</Button>
+                      <Button variant="ghost" size="sm" disabled={!persona.active}>Use</Button>
                     </TableCell>
                   </TableRow>
                 ))}

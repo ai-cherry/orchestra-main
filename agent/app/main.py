@@ -8,6 +8,12 @@ from pydantic import BaseModel
 
 # Import the admin router
 from agent.app.routers.admin import router as admin_router
+from agent.app.routers.agents import router as agents_router
+from agent.app.routers.workflows import router as workflows_router
+from agent.app.routers.resources import router as resources_router
+from agent.app.routers.system import router as system_router
+from agent.app.routers.audit import router as audit_router
+from agent.app.routers.automation import router as automation_router
 
 # import openai  # Removed unused import
 
@@ -26,10 +32,16 @@ structlog.configure(
 )
 logger = structlog.get_logger()
 
-app = FastAPI()
+app = FastAPI(title="Orchestra API", version="1.0.0")
 
 # Include the admin router
 app.include_router(admin_router)
+app.include_router(agents_router)
+app.include_router(workflows_router)
+app.include_router(resources_router)
+app.include_router(system_router)
+app.include_router(audit_router)
+app.include_router(automation_router)
 
 # Middleware for logging requests and latency
 

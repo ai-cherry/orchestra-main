@@ -1,32 +1,33 @@
-# Orchestra AI Architecture (Post-GCP)
+# Orchestra AI Architecture (Unified Vultr Server)
 
 ## System Architecture
 
 ### Core Services
-1. **Orchestrator** (`core/orchestrator/`) - Main coordination service
-2. **Memory Manager** - Layered memory system with MongoDB/Redis/Weaviate
-3. **Agent System** - Phidata-based agents
-4. **API Layer** - FastAPI endpoints
+1. **Orchestrator** (`agent/app/main.py`) – FastAPI application that routes API requests and coordinates agents, memory, and tools.
+2. **Memory Layer** – Multi-tier memory (Redis short-term, Postgres mid-term, Weaviate vector long-term).
+3. **Agent System** – Async Python agents (phidata style) running in-process workers.
+4. **Admin UI** – React/Vite application served by Nginx.
 
-### Memory Architecture
+### Memory Architecture (Current)
+
 ```
-┌─────────────────┐
-│   Short-term    │ → DragonflyDB (Aiven)
-├─────────────────┤
-│   Mid-term      │ → MongoDB Atlas
-├─────────────────┤
-│   Long-term     │ → Weaviate Cloud
-└─────────────────┘
+┌──────────────────┐
+│ Short-term cache │ → Redis 5 (local)
+├──────────────────┤
+│ Mid-term store   │ → PostgreSQL 14 (local)
+├──────────────────┤
+│ Long-term vector │ → Weaviate 1.24 (docker)
+└──────────────────┘
 ```
 
 ### External Dependencies
-- **LLM Providers**: OpenRouter, OpenAI, Anthropic (via Portkey)
-- **Memory Storage**: MongoDB Atlas, DragonflyDB, Weaviate
-- **Deployment**: DigitalOcean Droplets
+• **LLM Providers:** OpenAI GPT-4o, Anthropic Claude 3 (via Portkey)
+• **Storage:** Postgres, Redis, Weaviate (all local to Vultr server)
+• **Hosting:** Single Vultr dedicated instance
 
 ### Development Stack
 - Python 3.10
 - FastAPI
 - Phidata (agent framework)
-- Docker Compose (local dev)
-- Pulumi (infrastructure as code)
+- Docker (only for Weaviate)
+- Bash scripts for deploy & backup (no Pulumi/terraform in production)

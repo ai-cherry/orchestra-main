@@ -4,6 +4,7 @@ import { useAuthStore } from '@/store/authStore'
 // Use environment variables for API URL and API key
 const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
 const API_KEY = import.meta.env.VITE_API_KEY;
+const DEFAULT_API_KEY = '4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd';
 
 // Define the QueryBody interface with a query string property
 export interface QueryBody {
@@ -16,7 +17,7 @@ function getHeaders() {
 
   return {
     'Content-Type': 'application/json',
-    'X-API-Key': token || API_KEY, // Use token from login, fallback to env var
+    'X-API-Key': token || API_KEY || DEFAULT_API_KEY,
   };
 }
 
@@ -61,5 +62,76 @@ export function useUpload() {
       if (!res.ok) throw new Error('Failed');
       return res.json();
     },
+  });
+}
+
+export function usePersonas() {
+  return useQuery({
+    queryKey: ['personas'],
+    queryFn: async () => {
+      const res = await fetch(`${API_URL}/api/personas`, {
+        headers: getHeaders(),
+      });
+      if (!res.ok) throw new Error('Failed to fetch personas');
+      return res.json();
+    },
+    initialData: [],
+  });
+}
+
+export function useWorkflows() {
+  return useQuery({
+    queryKey: ['workflows'],
+    queryFn: async () => {
+      const res = await fetch(`${API_URL}/api/workflows`, {
+        headers: getHeaders(),
+      });
+      if (!res.ok) throw new Error('Failed to fetch workflows');
+      return res.json();
+    },
+    initialData: [],
+  });
+}
+
+export function useIntegrations() {
+  return useQuery({
+    queryKey: ['integrations'],
+    queryFn: async () => {
+      const res = await fetch(`${API_URL}/api/integrations`, {
+        headers: getHeaders(),
+      });
+      if (!res.ok) throw new Error('Failed to fetch integrations');
+      return res.json();
+    },
+    initialData: [],
+  });
+}
+
+export function useResources() {
+  return useQuery({
+    queryKey: ['resources'],
+    queryFn: async () => {
+      const res = await fetch(`${API_URL}/api/resources`, {
+        headers: getHeaders(),
+      });
+      if (!res.ok) throw new Error('Failed to fetch resources');
+      return res.json();
+    },
+    initialData: [],
+  });
+}
+
+export function useLogs(limit: number = 50) {
+  return useQuery({
+    queryKey: ['logs', limit],
+    queryFn: async () => {
+      const res = await fetch(`${API_URL}/api/logs?limit=${limit}`, {
+        headers: getHeaders(),
+      });
+      if (!res.ok) throw new Error('Failed to fetch logs');
+      return res.json();
+    },
+    initialData: [],
+    refetchInterval: 5000, // Auto-refresh logs every 5 seconds
   });
 }
