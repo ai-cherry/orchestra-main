@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    /* Shadcn/ui Default Light Theme (example, customize further based on actual shadcn init) */
+    /* Shadcn/ui Default Light Theme */
     --background: 0 0% 100%; /* White */
     --foreground: 222.2 84% 4.9%; /* Dark Gray */
     --card: 0 0% 100%;
@@ -17,7 +17,7 @@
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%; /* This is shadcn's 'accent', distinct from our theme accents */
+    --accent: 210 40% 96.1%; /* This is shadcn's 'accent' */
     --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -26,15 +26,19 @@
     --ring: 222.2 84% 4.9%;
     --radius: 0.5rem;
 
-    /* Default Theme: Neutral (Light Mode) */
-    --theme-name: "neutral"; /* For JS identification if needed */
-    --accent-primary: #8B5CF6;
+    /* Default Theme Accents (used by shadcn and as fallbacks) */
+    --accent-primary: #8B5CF6; /* General accent, e.g. for shadcn components if not overridden */
     --accent-secondary: #A78BFA;
-    --accent-text: #FFFFFF; /* Typically for use on accent-primary/secondary backgrounds */
+    --accent-text: #FFFFFF;
+
+    /* Dynamic Persona Theme Accents (to be set by JS) */
+    --theme-accent-primary: #8B5CF6; /* Fallback to neutral purple */
+    --theme-accent-secondary: #A78BFA; /* Fallback */
+    --theme-accent-text: #FFFFFF; /* Fallback */
   }
 
   .dark {
-    /* Shadcn/ui Default Dark Theme (example, customize further) */
+    /* Shadcn/ui Default Dark Theme */
     --background: 222.2 84% 4.9%; /* Dark Gray */
     --foreground: 210 40% 98%; /* Almost White */
     --card: 222.2 84% 4.9%;
@@ -55,60 +59,15 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
 
-    /* Default Theme: Neutral (Dark Mode) - values might be same as light or adjusted if needed */
-    --accent-primary: #8B5CF6;
+    /* Default Theme Accents (Dark Mode) */
+    --accent-primary: #8B5CF6; /* General accent */
     --accent-secondary: #A78BFA;
     --accent-text: #FFFFFF;
-  }
 
-  .theme-neutral { /* Explicit Neutral theme class, can be same as :root if Neutral is default */
-    --theme-name: "neutral";
-    --accent-primary: #8B5CF6;
-    --accent-secondary: #A78BFA;
-    --accent-text: #FFFFFF;
-  }
-  .dark.theme-neutral {
-    --accent-primary: #8B5CF6; /* Ensure dark mode overrides if necessary */
-    --accent-secondary: #A78BFA;
-    --accent-text: #FFFFFF;
-  }
-
-  .theme-cherry {
-    --theme-name: "cherry";
-    --accent-primary: #E04DDA;
-    --accent-secondary: #F0ABFC;
-    --accent-text: #FFFFFF;
-  }
-  .dark.theme-cherry {
-    /* Cherry dark mode might be same as light, or could have specific dark adjustments */
-    --accent-primary: #E04DDA;
-    --accent-secondary: #F0ABFC;
-    --accent-text: #FFFFFF;
-  }
-
-  .theme-sophia {
-    --theme-name: "sophia";
-    --accent-primary: #38BDF8;
-    --accent-secondary: #7DD3FC;
-    --accent-text: #FFFFFF; /* Figma spec says #FFFFFF, check contrast */
-  }
-  .dark.theme-sophia {
-    --accent-primary: #38BDF8;
-    --accent-secondary: #7DD3FC;
-    --accent-text: #FFFFFF;
-  }
-
-  .theme-gordon { /* Renamed from "Gordon Gekko" for CSS class name sanity */
-    --theme-name: "gordon";
-    --accent-primary: #F97316;
-    --accent-secondary: #FDBA74;
-    --accent-text: #1A1A1A; /* Figma spec says #1A1A1A, good for light accent backgrounds */
-  }
-  .dark.theme-gordon {
-    /* Gordon dark values might need adjustment for dark backgrounds if accents are dark */
-    --accent-primary: #F97316;
-    --accent-secondary: #FDBA74;
-    --accent-text: #1A1A1A; /* Check contrast on dark backgrounds */
+    /* Dynamic Persona Theme Accents (Dark Mode - JS will set these, provide fallbacks) */
+    --theme-accent-primary: #8B5CF6; /* Fallback to neutral purple */
+    --theme-accent-secondary: #A78BFA; /* Fallback */
+    --theme-accent-text: #FFFFFF; /* Fallback */
   }
 }
 
