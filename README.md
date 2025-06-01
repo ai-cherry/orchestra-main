@@ -22,3 +22,7 @@ Additional docs:
 - [Architecture](docs/ARCHITECTURE.md)
 - [Status](docs/STATUS.md)
 - [Unified Vultr Setup](docs/UNIFIED_VULTR_ARCHITECTURE.md)
+
+## Persona Memory Architecture
+See [docs/PERSONA_MEMORY_ARCHITECTURE.md](docs/PERSONA_MEMORY_ARCHITECTURE.md) for the proposed four-layer memory system and routing approach.
+
