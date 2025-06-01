@@ -1,16 +1,17 @@
 import React from 'react';
 import { Menu, X, Moon, Sun, User, Palette, LogOut } from 'lucide-react';
 import { useTheme } from '@/context/useTheme';
-import { Button } from '@/components/ui/button'; // Actual import
+import { Button } from '@/components/ui/button'; 
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator
-} from '@/components/ui/dropdown-menu'; // Actual import
+} from '@/components/ui/dropdown-menu'; 
 import { useAuthStore } from '@/store/authStore';
 import { useNavigate, useRouterState } from '@tanstack/react-router';
+import usePersonaStore from '../../store/personaStore'; // Step 1: Import usePersonaStore
 
 interface TopBarProps {
   sidebarOpen: boolean;
@@ -23,14 +24,14 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   const navigate = useNavigate();
   const routerState = useRouterState();
 
+  // Step 2: Get getCurrentPersona from the store
+  const currentPersona = usePersonaStore((state) => state.getCurrentPersona());
+
   const handleLogout = () => {
     logout();
     navigate({ to: '/login' });
   };
 
-  // Attempt to get page title from router - This is a common pattern.
-  // The exact way to get a "title" might depend on how routes are configured (e.g., custom route data).
-  // For now, use a simple heuristic based on pathname.
   const deriveTitleFromPath = (pathname: string): string => {
     if (pathname === '/') return 'Dashboard';
     const parts = pathname.split('/').filter(Boolean);
@@ -40,7 +41,7 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
     }
-    return 'Admin'; // Default title
+    return 'Admin'; 
   };
 
   const currentPageTitle = deriveTitleFromPath(routerState.location.pathname);
@@ -56,11 +57,26 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
         >
           {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </Button>
-        <span className="text-lg font-semibold ml-2 hidden md:block text-theme-accent-primary">Orchestra</span>
+        <span className="text-lg font-semibold ml-2 hidden md:block text-[var(--theme-accent-primary)]">Orchestra</span>
         <h1 className="ml-4 text-xl font-semibold text-foreground">{currentPageTitle}</h1>
       </div>
 
       <div className="flex items-center space-x-3">
+        {/* Step 3: Display current persona's name and domain */}
+        {currentPersona && (
+          <div className="flex items-center space-x-2 mr-2">
+            <span 
+              className="text-sm font-medium" 
+              style={{ color: 'var(--theme-accent-primary)' }}
+            >
+              {currentPersona.name}
+            </span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              ({currentPersona.domain} Domain)
+            </span>
+          </div>
+        )}
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" aria-label="Select Theme">
@@ -83,18 +99,16 @@ const TopBar: React.FC<TopBarProps> = ({ sidebarOpen, setSidebarOpen }) => {
         {isAuthenticated && user ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full" aria-label="User Menu">
+              <Button variant="ghost" className="flex items-center space-x-2">
                 <User className="h-5 w-5" />
+                <span className="text-sm font-medium hidden sm:inline">{user.username || 'User'}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem disabled className="text-sm text-muted-foreground">
-                {user.email}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate({ to: '/settings' })}> {/* Example navigation */}
+              <DropdownMenuItem onClick={() => navigate({ to: '/settings' })}>
                 Settings
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
