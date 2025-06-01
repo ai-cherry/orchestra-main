@@ -1,4 +1,4 @@
-import Portkey from '@portkey-ai/portkey-node';
+import Portkey from 'portkey-ai';
 import { PORTKEY_CONFIG, getVirtualKey, isPortkeyConfigured } from '@/config/portkey.config';
 
 interface ImageOptions {
@@ -52,11 +52,11 @@ export class PortkeyService {
           total_tokens: prompt.length / 4
         }
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Image generation failed:', error);
       throw {
-        code: error.code || 'UNKNOWN_ERROR',
-        message: error.message || 'Failed to generate image',
+        code: error?.code || 'UNKNOWN_ERROR',
+        message: error?.message || 'Failed to generate image',
         provider: 'openai'
       };
     }
@@ -84,8 +84,8 @@ export class PortkeyService {
     
     try {
       const messages = [
-        ...(options?.systemPrompt ? [{ role: 'system', content: options.systemPrompt }] : []),
-        { role: 'user', content: prompt }
+        ...(options?.systemPrompt ? [{ role: 'system' as const, content: options.systemPrompt }] : []),
+        { role: 'user' as const, content: prompt }
       ];
       
       const response = await this.client.chat.completions.create({
@@ -96,17 +96,19 @@ export class PortkeyService {
         virtualKey
       });
       
+      const content = response.choices?.[0]?.message?.content || '';
+      
       return {
         success: true,
-        data: response.choices[0].message.content,
+        data: content,
         usage: response.usage,
         model: response.model
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Text generation failed:', error);
       throw {
-        code: error.code || 'UNKNOWN_ERROR',
-        message: error.message || 'Failed to generate text',
+        code: error?.code || 'UNKNOWN_ERROR',
+        message: error?.message || 'Failed to generate text',
         provider: virtualKey
       };
     }
@@ -144,10 +146,13 @@ export class PortkeyService {
   async checkUsage(service: string) {
     // This would typically call a Portkey endpoint to check usage
     // For now, return mock data
+    const dailyLimits = PORTKEY_CONFIG.costLimits.daily as Record<string, number>;
+    const limit = dailyLimits[service] || 1000;
+    
     return {
       service,
       used: Math.floor(Math.random() * 500),
-      limit: PORTKEY_CONFIG.costLimits.daily[service] || 1000,
+      limit,
       remaining: 500,
       resetAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
     };

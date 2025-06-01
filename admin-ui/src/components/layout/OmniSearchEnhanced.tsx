@@ -112,7 +112,7 @@ const OmniSearchEnhanced: React.FC<OmniSearchEnhancedProps> = ({
         const searchResult: SearchResult = {
           id: Date.now().toString(),
           type: 'answer',
-          content: result.data || 'No results found',
+          content: typeof result.data === 'string' ? result.data : JSON.stringify(result.data) || 'No results found',
           source: searchMode,
           confidence: 0.95
         };
