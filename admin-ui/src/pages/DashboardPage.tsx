@@ -1,13 +1,18 @@
+import React from 'react';
 import PageWrapper from '@/components/layout/PageWrapper';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import MetricsDisplayCard from '@/components/ui/MetricsDisplayCard'; // Created in previous step
-import StatusIndicator from '@/components/ui/StatusIndicator';   // Created in previous step
-import { Users, Workflow, BarChart3, PlusCircle, Settings as SettingsIcon, ExternalLink, Briefcase } from 'lucide-react';
+import MetricsDisplayCard from '@/components/ui/MetricsDisplayCard';
+import StatusIndicator from '@/components/ui/StatusIndicator';
+import { Users, Workflow, BarChart3, PlusCircle, Settings as SettingsIcon, ExternalLink, Briefcase, AlertCircle } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { useAgents } from '@/lib/api';
 import { useEffect, useState } from 'react';
+import usePersonaStore from '../store/personaStore';
+import CherryDashboardWidgets from '../components/widgets/CherryDashboardWidgets';
+import SophiaDashboardWidgets from '../components/widgets/SophiaDashboardWidgets';
+import KarenDashboardWidgets from '../components/widgets/KarenDashboardWidgets';
 
 // Helper function to format the last run time
 const formatLastRun = (lastRun: string) => {
@@ -26,6 +31,8 @@ export function DashboardPage() {
   const userName = "Admin User"; // Placeholder
   const { data: agentsData = [] } = useAgents();
   const [metrics, setMetrics] = useState<any>(null);
+  const { getCurrentPersona } = usePersonaStore();
+  const currentPersona = getCurrentPersona();
 
   // Fetch metrics data
   useEffect(() => {
@@ -67,10 +74,64 @@ export function DashboardPage() {
     ? (agentsData.reduce((sum: number, agent: any) => sum + (agent.memory_usage || 0), 0) / agentsData.length).toFixed(1)
     : '0';
 
+  // Render persona-specific content
+  const renderPersonaContent = () => {
+    if (!currentPersona) {
+      return (
+        <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+              <span>No Persona Selected</span>
+            </CardTitle>
+            <CardDescription>Please select a persona from the sidebar to see personalized dashboard widgets.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Each persona provides specialized tools and insights:
+            </p>
+            <ul className="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-400">
+              <li>• <span className="font-medium text-red-600 dark:text-red-400">Cherry</span> - Personal health, habits, and lifestyle management</li>
+              <li>• <span className="font-medium text-blue-600 dark:text-blue-400">Sophia</span> - Financial operations and payment processing</li>
+              <li>• <span className="font-medium text-green-600 dark:text-green-400">Karen</span> - Healthcare compliance and clinical trials</li>
+            </ul>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    switch (currentPersona.id) {
+      case 'cherry':
+        return <CherryDashboardWidgets />;
+      case 'sophia':
+        return <SophiaDashboardWidgets />;
+      case 'karen':
+        return <KarenDashboardWidgets />;
+      default:
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Dashboard</CardTitle>
+              <CardDescription>No specific widgets configured for {currentPersona.name}</CardDescription>
+            </CardHeader>
+          </Card>
+        );
+    }
+  };
+
+  const pageTitle = currentPersona 
+    ? `${currentPersona.name} Dashboard - ${currentPersona.domain}` 
+    : `Welcome, ${userName}!`;
+
   return (
-    <PageWrapper title={`Welcome, ${userName}!`}>
+    <PageWrapper title={pageTitle}>
       <div className="space-y-6">
-        {/* Row 1: Quick Stats */}
+        {/* Persona-specific content */}
+        <div className="mb-6">
+          {renderPersonaContent()}
+        </div>
+
+        {/* Row 1: Quick Stats (Common for all personas) */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           <MetricsDisplayCard
             title="Active Agents"
