@@ -1,228 +1,303 @@
-# MCP & AI Context Integration Guide
+# MCP (Model Context Protocol) AI Integration Guide
 
-## 🎯 Overview
+## Overview
+This guide details the integration of MCP servers with the Orchestra AI system, using PostgreSQL for relational data and Weaviate for vector operations.
 
-Orchestra AI uses MCP (Model Context Protocol) servers and AI context files to provide intelligent coding assistance. This guide explains how everything works together.
-
-## 🏗️ Architecture
+## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    AI CODING ASSISTANT                   │
-│                  (Cursor, Claude, Roo)                   │
-└────────────────────┬───────────────────┬────────────────┘
-                     │                   │
-                     ▼                   ▼
-        ┌────────────────────┐ ┌─────────────────────┐
-        │  AI Context Files  │ │    MCP Servers      │
-        ├────────────────────┤ ├─────────────────────┤
-        │ • ai_context_*.py  │ │ • orchestrator      │
-        │ • Project rules    │ │ • memory            │
-        │ • Coding patterns  │ │ • deployment        │
-        └────────────────────┘ └─────────────────────┘
-                     │                   │
-                     ▼                   ▼
-        ┌─────────────────────────────────────────────┐
-        │           ORCHESTRA AI SYSTEM               │
-        │  • MongoDB (persistent memory)              │
-        │  • DragonflyDB (fast cache)                │
-        │  • Weaviate (vector search)                │
-        └─────────────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│           Cursor/Claude AI              │
+│         (MCP Protocol Client)           │
+└────────────────┬────────────────────────┘
+                 │ stdio/pipes
+┌────────────────┴────────────────────────┐
+│            MCP Servers                  │
+├─────────────────────────────────────────┤
+│  • Orchestrator (Agent coordination)    │
+│  • Memory (PostgreSQL + Weaviate)       │
+│  • Tools (Tool discovery/execution)     │
+│  • Deployment (Infrastructure mgmt)     │
+└────────────────┬────────────────────────┘
+                 │
+┌────────────────┴────────────────────────┐
+│         Orchestra AI System             │
+├─────────────────────────────────────────┤
+│  • PostgreSQL (Structured data)         │
+│  • Weaviate (Vector search)             │
+│  • FastAPI (REST API)                   │
+│  • Agent System                         │
+└─────────────────────────────────────────┘
 ```
 
-## 📁 AI Context Files (Static Guidance)
+## MCP Servers
 
-### Purpose
-Provide phase-specific guidance to AI assistants without running any code.
+### 1. Orchestrator Server
+**Purpose**: Agent coordination and workflow management
 
-### Files
-- **`ai_context_planner.py`** - Planning phase (before coding)
-- **`ai_context_coder.py`** - Implementation phase
-- **`ai_context_reviewer.py`** - Code review phase
-- **`ai_context_debugger.py`** - Debugging phase
+**Tools**:
+- `list_agents` - List available agents
+- `run_agent` - Execute agent with input
+- `switch_mode` - Change orchestration mode
+- `run_workflow` - Execute multi-agent workflow
 
-### Usage
+**Configuration**:
+```json
+{
+  "orchestrator": {
+    "command": "python",
+    "args": ["mcp_server/servers/orchestrator_server.py"],
+    "env": {
+      "API_URL": "${API_URL:-http://localhost:8080}",
+      "API_KEY": "${API_KEY}"
+    }
+  }
+}
 ```
-# In your AI prompt:
-"Read ai_context_coder.py and implement a function to process user data"
+
+### 2. Memory Server
+**Purpose**: Unified memory management using PostgreSQL and Weaviate
+
+**Tools**:
+- `store_memory` - Store agent memory in Weaviate
+- `search_memories` - Semantic search for memories
+- `get_recent_memories` - Retrieve recent memories
+- `store_conversation` - Store conversation history
+- `get_conversation_history` - Retrieve conversation
+- `create_session` - Create new session (PostgreSQL)
+- `add_knowledge` - Add to knowledge base
+- `search_knowledge` - Search knowledge base
+
+**Database Split**:
+- **PostgreSQL**: Sessions, audit logs, configurations
+- **Weaviate**: Memories, conversations, knowledge, embeddings
+
+### 3. Tools Server
+**Purpose**: Tool discovery and execution
+
+**Features**:
+- Rich tool metadata
+- Input/output validation
+- Error handling
+- Tool categorization
+
+### 4. Weaviate Direct Server
+**Purpose**: Direct Weaviate operations for advanced vector search
+
+**Tools**:
+- Vector operations
+- Collection management
+- Hybrid search
+- Schema operations
+
+## Database Architecture
+
+### PostgreSQL (Relational Data)
+```sql
+orchestra.agents          -- Agent configurations
+orchestra.workflows       -- Workflow definitions
+orchestra.sessions        -- User sessions
+orchestra.audit_logs      -- System events
+orchestra.api_keys        -- Authentication
+orchestra.memory_snapshots -- Vector references
 ```
 
-### Key Features
-- ✅ GCP-Free setup (MongoDB, DragonflyDB, Weaviate)
-- ✅ Python 3.10 only (no 3.11+ features)
-- ✅ pip/venv workflow (NO Poetry/Docker/Pipenv)
-- ✅ External managed services
-- ✅ Simple > Complex philosophy
+### Weaviate (Vector Data)
+```python
+AgentMemory     # Agent memories with embeddings
+Knowledge       # Knowledge base
+Conversation    # Conversation history
+Document        # Document storage
+```
 
-## 🤖 MCP Servers (Dynamic Integration)
+## Integration Patterns
 
-### Purpose
-Provide real-time context and memory to AI assistants while coding.
+### 1. Agent Memory Storage
+```python
+# Via MCP
+await mcp.call_tool("store_memory", {
+    "agent_id": "agent-123",
+    "content": "User prefers technical explanations",
+    "memory_type": "preference",
+    "importance": 0.8
+})
 
-### Servers
+# Direct via UnifiedDatabase
+db.weaviate.store_memory(
+    agent_id="agent-123",
+    content="User prefers technical explanations",
+    memory_type="preference"
+)
+```
 
-#### 1. **Orchestrator Server** (`orchestrator_server.py`)
-- Manages agent coordination
-- Switches between modes
-- Runs workflows
+### 2. Context Retrieval
+```python
+# Search memories
+memories = await mcp.call_tool("search_memories", {
+    "agent_id": "agent-123",
+    "query": "user preferences",
+    "limit": 5
+})
 
-#### 2. **Memory Server** (`memory_server.py`)
-- Stores/retrieves memories
-- Integrates with MongoDB/Redis
-- Provides context from past sessions
+# Get conversation context
+history = await mcp.call_tool("get_conversation_history", {
+    "session_id": session_id,
+    "limit": 10
+})
+```
 
-#### 3. **Deployment Server** (`deployment_server.py`)
-- Handles deployment tasks
-- Integrates with DigitalOcean
-- Manages infrastructure
+### 3. Session Management
+```python
+# Create session (PostgreSQL)
+session = await mcp.call_tool("create_session", {
+    "user_id": "user-123",
+    "agent_id": "agent-456",
+    "ttl_hours": 24
+})
 
-### How MCP Works
-1. **IDE Integration**: Tracks open files, cursor position, selections
-2. **Memory Sync**: Shares context between different AI tools
-3. **Tool Execution**: Runs specific actions (search, deploy, etc.)
+# Store interaction
+await mcp.call_tool("store_conversation", {
+    "session_id": session["id"],
+    "agent_id": "agent-456",
+    "message": "Hello, how can I help?",
+    "role": "assistant"
+})
+```
 
-## 🚀 Getting Started
+## Setup Instructions
 
-### 1. Start Everything
+### 1. Environment Setup
 ```bash
-./start_orchestra.sh
-```
-This starts:
-- MCP servers
-- Local services (if using docker-compose)
-- Orchestra API
+# PostgreSQL
+export POSTGRES_HOST=localhost
+export POSTGRES_PORT=5432
+export POSTGRES_DB=orchestra
+export POSTGRES_USER=postgres
+export POSTGRES_PASSWORD=your_password
 
-### 2. Launch AI Assistant
+# Weaviate
+export WEAVIATE_HOST=localhost
+export WEAVIATE_PORT=8080
+export WEAVIATE_API_KEY=your_key  # Optional
+
+# API
+export API_URL=http://localhost:8080
+export API_KEY=your_api_key
+```
+
+### 2. Database Initialization
 ```bash
-# For Cursor with Claude
-./launch_cursor_with_claude.sh
+# Setup PostgreSQL schema
+python scripts/setup_postgres_schema.py
 
-# Or manually start Cursor
-cursor .
+# Verify setup
+python scripts/setup_postgres_schema.py --verify-only
 ```
 
-### 3. Use AI Context Files
-In your prompts, always reference the appropriate context file:
-
-```
-# Planning
-"Read ai_context_planner.py and help me design a caching system"
-
-# Coding
-"Read ai_context_coder.py and implement the cache using Redis"
-
-# Reviewing
-"Read ai_context_reviewer.py and review this implementation"
-
-# Debugging
-"Read ai_context_debugger.py and help fix this connection error"
-```
-
-## 📋 Integration Files
-
-### `.cursorrules`
-- Configures Cursor AI behavior
-- References AI context files
-- Enforces project constraints
-
-### `.roomodes`
-- Defines different AI modes
-- Configures model selection
-- Sets temperature and capabilities
-
-### `.mcp.json`
-- MCP server configuration
-- Defines available servers
-- Sets capabilities and environment
-
-## 🔍 Verification
-
-Run the integration checker:
+### 3. Start MCP Servers
 ```bash
-python scripts/mcp_integration_check.py
-```
-
-This verifies:
-- AI context files are GCP-free
-- MCP servers are configured
-- Integration files are consistent
-- No conflicting information
-
-## 💡 Best Practices
-
-### 1. **Always Reference Context Files**
-```
-# Good
-"Read ai_context_coder.py and implement..."
-
-# Bad
-"Implement a function..." (no context)
-```
-
-### 2. **Use Appropriate Phase**
-- Planning → `ai_context_planner.py`
-- Coding → `ai_context_coder.py`
-- Review → `ai_context_reviewer.py`
-- Debug → `ai_context_debugger.py`
-
-### 3. **Let MCP Handle Memory**
-- Don't manually track context
-- MCP servers remember previous interactions
-- Automatic context window optimization
-
-### 4. **Follow Project Constraints**
-- Python 3.10 only
-- pip/venv workflow
-- External services (MongoDB, Redis, Weaviate)
-- No GCP dependencies
-
-## 🛠️ Troubleshooting
-
-### MCP Servers Not Running
-```bash
-# Check status
-ps aux | grep -E "orchestrator|memory|deployment"
-
-# Start manually
+# In separate terminals
 python mcp_server/servers/orchestrator_server.py
+python mcp_server/servers/memory_server.py
+python mcp_server/servers/weaviate_direct_mcp_server.py
+python mcp_server/servers/tools_server.py
 ```
 
-### Context Files Outdated
+### 4. Configure Cursor
+Update `.mcp.json` in your Cursor configuration directory with the servers configuration.
+
+## Best Practices
+
+### 1. Memory Management
+- Use PostgreSQL for structured queries and state
+- Use Weaviate for semantic search and embeddings
+- Store vector IDs in PostgreSQL for cross-referencing
+
+### 2. Session Handling
+- Create sessions in PostgreSQL with TTL
+- Store conversation vectors in Weaviate
+- Link via session_id
+
+### 3. Performance
+- Batch operations when possible
+- Use connection pooling (built-in)
+- Cache frequently accessed data
+- Index PostgreSQL queries
+
+### 4. Error Handling
+```python
+try:
+    result = await mcp.call_tool("store_memory", {...})
+except Exception as e:
+    # Fallback to direct storage
+    db.weaviate.store_memory(...)
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Connection Errors**
+   - Check database services are running
+   - Verify credentials in environment
+   - Test connections individually
+
+2. **Schema Issues**
+   - Run schema setup script
+   - Check Weaviate collections exist
+   - Verify PostgreSQL tables
+
+3. **MCP Server Issues**
+   - Check server logs
+   - Verify Python environment
+   - Test tools individually
+
+### Debug Commands
 ```bash
-# Check for issues
-python scripts/ai_code_reviewer.py --check-file ai_context_coder.py
+# Test PostgreSQL
+psql -U postgres -d orchestra -c "\dt orchestra.*"
 
-# Verify integration
-python scripts/mcp_integration_check.py
+# Test Weaviate
+curl http://localhost:8080/v1/meta
+
+# Test MCP tools
+python -m mcp_server.servers.memory_server --test
 ```
 
-### AI Not Following Rules
-1. Ensure you reference context files in prompts
-2. Check `.cursorrules` is present
-3. Verify MCP servers are running
+## Advanced Usage
 
-## 📊 Benefits
+### Custom Tools
+```python
+@self.server.list_tools()
+async def list_tools():
+    return [{
+        "name": "custom_analysis",
+        "description": "Perform custom analysis",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "data": {"type": "object"},
+                "analysis_type": {"type": "string"}
+            }
+        }
+    }]
+```
 
-### With This Integration:
-- ✅ **Consistent Code**: AI follows project patterns
-- ✅ **No Repeated Explanations**: Context is automatic
-- ✅ **Memory Across Sessions**: MCP remembers previous work
-- ✅ **Correct Dependencies**: No Poetry/Docker mistakes
-- ✅ **Proper Error Handling**: Debugger knows common issues
+### Workflow Automation
+```python
+workflow = {
+    "name": "research_workflow",
+    "steps": [
+        {"agent": "research_agent", "action": "search"},
+        {"agent": "analysis_agent", "action": "analyze"},
+        {"agent": "report_agent", "action": "summarize"}
+    ]
+}
 
-### Without This Integration:
-- ❌ AI suggests Poetry/Docker
-- ❌ Uses Python 3.11+ features
-- ❌ Creates duplicate functionality
-- ❌ Adds GCP dependencies
-- ❌ Over-engineers solutions
+result = await mcp.call_tool("run_workflow", {
+    "workflow": workflow,
+    "input": "AI trends 2024"
+})
+```
 
-## 🎯 Summary
-
-The MCP & AI Context integration creates a "smart coding environment" where:
-1. **Static guidance** from context files ensures consistency
-2. **Dynamic context** from MCP servers provides memory
-3. **Integration files** configure AI behavior
-4. **External services** handle data persistence
-
-This results in AI assistants that understand your project's specific requirements without constant reminders!
+This architecture provides a clean separation of concerns with PostgreSQL handling all relational data and Weaviate managing all vector/semantic operations.
