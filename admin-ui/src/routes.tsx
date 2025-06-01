@@ -14,6 +14,8 @@ import { LogsPage } from './pages/LogsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { LoginPage } from './pages/LoginPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { OrchestrationPage } from './pages/OrchestrationPage';
+import { MonitoringPage } from './pages/MonitoringPage';
 
 // Route Definitions
 const indexRoute = createRoute({
@@ -38,6 +40,18 @@ const workflowsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/workflows',
   component: WorkflowsPage,
+});
+
+const orchestrationRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/orchestration',
+  component: OrchestrationPage,
+});
+
+const monitoringRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/monitoring',
+  component: MonitoringPage,
 });
 
 const integrationsRoute = createRoute({
@@ -78,6 +92,8 @@ const routeTree = rootRoute.addChildren([
   agentsRoute,
   personasRoute,
   workflowsRoute,
+  orchestrationRoute,
+  monitoringRoute,
   integrationsRoute,
   resourcesRoute,
   logsRoute,
