@@ -69,7 +69,7 @@ const usePersonaStore = create<PersonaState>()(
     persist(
       (set, get) => ({
         personas: initialPersonas,
-        activePersonaId: null,
+        activePersonaId: 'cherry',
         
         setActivePersona: (personaId: string) => {
           const persona = get().getPersonaById(personaId);

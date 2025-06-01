@@ -1,0 +1,157 @@
+# Factory AI Configuration
+# This file defines the integration settings for Factory AI Droids
+
+version: "1.0.0"
+environment: "development"  # development, staging, production
+
+# Factory AI API Configuration
+factory_ai:
+  api_key: "${FACTORY_AI_API_KEY}"
+  base_url: "https://api.factoryai.com/v1"
+  timeout: 30
+  max_retries: 3
+  retry_delay: 1.0
+
+# Droid Configuration
+droids:
+  architect:
+    enabled: true
+    model: "factory-architect-v1"
+    temperature: 0.7
+    max_tokens: 4096
+    capabilities:
+      - system_design
+      - architecture_planning
+      - integration_design
+    mcp_mapping: "orchestrator_server"
+    
+  code:
+    enabled: true
+    model: "factory-code-v1"
+    temperature: 0.3
+    max_tokens: 8192
+    capabilities:
+      - code_generation
+      - refactoring
+      - optimization
+    mcp_mapping: "tools_server"
+    
+  debug:
+    enabled: true
+    model: "factory-debug-v1"
+    temperature: 0.1
+    max_tokens: 4096
+    capabilities:
+      - error_analysis
+      - debugging
+      - performance_profiling
+    mcp_mapping: "tools_server"
+    
+  reliability:
+    enabled: true
+    model: "factory-reliability-v1"
+    temperature: 0.2
+    max_tokens: 4096
+    capabilities:
+      - deployment
+      - monitoring
+      - infrastructure
+    mcp_mapping: "deployment_server"
+    
+  knowledge:
+    enabled: true
+    model: "factory-knowledge-v1"
+    temperature: 0.5
+    max_tokens: 4096
+    capabilities:
+      - documentation
+      - knowledge_management
+      - context_retrieval
+    mcp_mapping: "memory_server"
+
+# Performance Configuration
+performance:
+  cache:
+    enabled: true
+    ttl: 3600  # seconds
+    max_size: 1000  # entries
+    eviction_policy: "lru"
+  
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 60
+    burst_size: 10
+  
+  circuit_breaker:
+    enabled: true
+    failure_threshold: 5
+    recovery_timeout: 60  # seconds
+    half_open_requests: 3
+
+# Context Management
+context:
+  storage:
+    type: "hybrid"  # memory, postgres, weaviate, hybrid
+    postgres:
+      enabled: true
+      connection_string: "${POSTGRES_CONNECTION_STRING}"
+      pool_size: 10
+    weaviate:
+      enabled: true
+      url: "${WEAVIATE_URL}"
+      api_key: "${WEAVIATE_API_KEY}"
+    redis:
+      enabled: true
+      url: "${REDIS_URL}"
+      db: 0
+  
+  synchronization:
+    enabled: true
+    interval: 30  # seconds
+    batch_size: 100
+    
+# Monitoring Configuration
+monitoring:
+  prometheus:
+    enabled: true
+    port: 9090
+    path: "/metrics"
+  
+  logging:
+    level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+    format: "json"
+    output: "stdout"
+    
+  tracing:
+    enabled: true
+    service_name: "factory-ai-bridge"
+    jaeger_endpoint: "${JAEGER_ENDPOINT}"
+
+# Security Configuration
+security:
+  authentication:
+    enabled: true
+    type: "api_key"  # api_key, oauth2, jwt
+    header_name: "X-Factory-API-Key"
+  
+  encryption:
+    enabled: true
+    algorithm: "AES-256-GCM"
+    key_rotation_days: 30
+    
+  audit:
+    enabled: true
+    log_all_requests: false
+    sensitive_data_masking: true
+
+# Vultr Infrastructure Configuration
+infrastructure:
+  vultr:
+    api_key: "${VULTR_API_KEY}"
+    region: "ewr"  # New Jersey
+    instance_type: "vc2-2c-4gb"
+    
+  pulumi:
+    passphrase: "${PULUMI_CONFIG_PASSPHRASE}"
+    stack: "factory-ai-integration"
+    backend: "file://./pulumi"

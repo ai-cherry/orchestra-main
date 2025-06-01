@@ -21,7 +21,7 @@ from agent.app.routers.natural_language import router as natural_language_router
 from agent.app.routers.intent import router as intent_router
 from agent.app.routers.suggestions import router as suggestions_router
 from agent.app.routers.llm import router as llm_router
-from agent.app.routers.llm_admin import router as llm_admin_router
+# from agent.app.routers.llm_admin import router as llm_admin_router  # Commented out - missing dependencies
 
 # Configure structlog for structured logging
 structlog.configure(
@@ -52,7 +52,7 @@ app.include_router(natural_language_router)
 app.include_router(intent_router)
 app.include_router(suggestions_router)
 app.include_router(llm_router)
-app.include_router(llm_admin_router)
+# app.include_router(llm_admin_router)  # Commented out - missing dependencies
 
 # Middleware for logging requests and latency
 

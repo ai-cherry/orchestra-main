@@ -1,29 +1,33 @@
 #!/bin/bash
-# Quick deploy script for Admin UI
+# Deploy Admin UI to Vultr nginx
+set -e
 
 echo "🚀 Deploying Admin UI..."
 
-# Navigate to admin UI directory
-cd /root/orchestra-main/admin-ui
+cd admin-ui
 
-# Build the project
+# Build
 echo "📦 Building Admin UI..."
-npm run build
+pnpm run build-no-ts || pnpm build
 
-# Clear old files and deploy new ones
+# Deploy
 echo "🗑️  Clearing old files..."
-rm -rf /var/www/orchestra-admin/*
+sudo rm -rf /var/www/orchestra-admin/*
 
 echo "📤 Deploying new build..."
-cp -r dist/* /var/www/orchestra-admin/
+sudo cp -r dist/* /var/www/orchestra-admin/
 
-# Reload nginx to ensure no caching issues
+# Set permissions
+sudo chown -R www-data:www-data /var/www/orchestra-admin
+sudo chmod -R 755 /var/www/orchestra-admin
+
+# Reload nginx
 echo "🔄 Reloading nginx..."
-systemctl reload nginx
+sudo systemctl reload nginx
 
 echo "✅ Admin UI deployed successfully!"
-echo "🌐 Access at: https://cherry-ai.me"
+echo "🌐 Access at: https://cherry-ai.me/admin/"
 echo ""
 echo "📝 Login credentials:"
 echo "   Username: scoobyjava"
-echo "   Password: Huskers1983$" 
+echo "   Password: Huskers1983$"

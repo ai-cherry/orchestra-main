@@ -2,19 +2,19 @@ import React from 'react';
 import usePersonaStore from '../../store/personaStore';
 
 const DomainSwitcher: React.FC = () => {
-  const { personas, currentPersonaId, setPersona, accentColors } = usePersonaStore();
+  const { personas, activePersonaId, setActivePersona } = usePersonaStore();
 
   return (
     <div className="flex flex-col space-y-1 p-2">
       {personas.map((persona) => {
-        const isActive = persona.id === currentPersonaId;
-        // Use accentColor from the store; fallback to persona.color if not found
-        const activeBgColor = accentColors[persona.id] || persona.color;
+        const isActive = persona.id === activePersonaId;
+        // Use persona.color directly
+        const activeBgColor = persona.color;
 
         return (
           <button
             key={persona.id}
-            onClick={() => setPersona(persona.id)}
+            onClick={() => setActivePersona(persona.id)}
             className={`
               w-full text-left px-3 py-2 rounded-md text-sm font-medium
               transition-all duration-150 ease-in-out

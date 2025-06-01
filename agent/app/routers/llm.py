@@ -39,6 +39,37 @@ class LLMResponse(BaseModel):
     usage: Optional[Dict[str, int]] = None
 
 
+class CodeGenerationRequest(BaseModel):
+    """Request model for code generation"""
+    prompt: str = Field(..., description="Code generation prompt")
+    tier: ModelTier = ModelTier.STANDARD
+
+
+class ArchitectureRequest(BaseModel):
+    """Request model for architecture design"""
+    requirements: str = Field(..., description="Architecture requirements")
+    tier: ModelTier = ModelTier.PREMIUM
+
+
+class DebugRequest(BaseModel):
+    """Request model for debugging"""
+    code: str = Field(..., description="Code to debug")
+    error: str = Field(..., description="Error message or description")
+
+
+class ChatRequest(BaseModel):
+    """Request model for chat"""
+    message: str = Field(..., description="Chat message")
+    history: Optional[List[Dict[str, str]]] = Field(None, description="Conversation history")
+    tier: ModelTier = ModelTier.STANDARD
+
+
+class EmbeddingRequest(BaseModel):
+    """Request model for embeddings"""
+    text: Union[str, List[str]] = Field(..., description="Text to embed")
+    model: str = Field("openai/text-embedding-3-small", description="Embedding model")
+
+
 @router.post("/complete", response_model=LLMResponse)
 async def complete(request: LLMRequest) -> LLMResponse:
     """
@@ -69,18 +100,15 @@ async def complete(request: LLMRequest) -> LLMResponse:
 
 
 @router.post("/generate-code")
-async def generate_code(
-    prompt: str = Field(..., description="Code generation prompt"),
-    tier: ModelTier = ModelTier.STANDARD
-) -> Dict[str, str]:
+async def generate_code(request: CodeGenerationRequest) -> Dict[str, str]:
     """Generate code using the appropriate model"""
     try:
         llm_router = get_dynamic_llm_router()
         
         response = await llm_router.complete(
-            prompt,
+            request.prompt,
             use_case=UseCase.CODE_GENERATION,
-            tier=tier
+            tier=request.tier
         )
         
         return {
@@ -93,18 +121,15 @@ async def generate_code(
 
 
 @router.post("/design-architecture")
-async def design_architecture(
-    requirements: str = Field(..., description="Architecture requirements"),
-    tier: ModelTier = ModelTier.PREMIUM
-) -> Dict[str, str]:
+async def design_architecture(request: ArchitectureRequest) -> Dict[str, str]:
     """Design system architecture based on requirements"""
     try:
         llm_router = get_dynamic_llm_router()
         
         response = await llm_router.complete(
-            requirements,
+            request.requirements,
             use_case=UseCase.ARCHITECTURE_DESIGN,
-            tier=tier
+            tier=request.tier
         )
         
         return {
@@ -117,15 +142,12 @@ async def design_architecture(
 
 
 @router.post("/debug-code")
-async def debug_code(
-    code: str = Field(..., description="Code to debug"),
-    error: str = Field(..., description="Error message or description")
-) -> Dict[str, str]:
+async def debug_code(request: DebugRequest) -> Dict[str, str]:
     """Debug code with error context"""
     try:
         llm_router = get_dynamic_llm_router()
         
-        prompt = f"Debug this code:\n\n{code}\n\nError:\n{error}"
+        prompt = f"Debug this code:\n\n{request.code}\n\nError:\n{request.error}"
         response = await llm_router.complete(
             prompt,
             use_case=UseCase.DEBUGGING,
@@ -142,22 +164,18 @@ async def debug_code(
 
 
 @router.post("/chat")
-async def chat(
-    message: str = Field(..., description="Chat message"),
-    history: Optional[List[Dict[str, str]]] = Field(None, description="Conversation history"),
-    tier: ModelTier = ModelTier.STANDARD
-) -> Dict[str, str]:
+async def chat(request: ChatRequest) -> Dict[str, str]:
     """Chat conversation with context"""
     try:
         llm_router = get_dynamic_llm_router()
         
-        messages = history or []
-        messages.append({"role": "user", "content": message})
+        messages = request.history or []
+        messages.append({"role": "user", "content": request.message})
         
         response = await llm_router.complete(
             messages,
             use_case=UseCase.CHAT_CONVERSATION,
-            tier=tier
+            tier=request.tier
         )
         
         return {
@@ -209,18 +227,15 @@ async def get_available_models() -> Dict[str, Any]:
 
 
 @router.post("/embed")
-async def generate_embeddings(
-    text: Union[str, List[str]] = Field(..., description="Text to embed"),
-    model: str = Field("openai/text-embedding-3-small", description="Embedding model")
-) -> Dict[str, Any]:
+async def generate_embeddings(request: EmbeddingRequest) -> Dict[str, Any]:
     """Generate embeddings for text"""
     try:
         llm_router = get_dynamic_llm_router()
-        embeddings = await llm_router.embed(text, model)
+        embeddings = await llm_router.embed(request.text, request.model)
         
         return {
             "embeddings": embeddings,
-            "model": model,
+            "model": request.model,
             "dimension": len(embeddings[0]) if isinstance(embeddings[0], list) else len(embeddings)
         }
         

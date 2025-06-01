@@ -6,18 +6,18 @@ alwaysApply: true
 \
 \\
 ---
-description: Standards for Pulumi Python IaC on GCP for Project Symphony, focusing on Cloud Run deployments and GCS state backend.
+description: Standards for Pulumi Python IaC on Vultr for Project Symphony, focusing on VPS deployments and local state backend.
 globs: ["infra/**/*.py", "**/Pulumi.yaml", "**/Pulumi.*.yaml"]
 autoAttach: true
 ---
 
-**Pulumi GCP Standards:**
-- **Language:** Use Pulumi with Python SDK (`pulumi_gcp` or `pulumi_gcp_native`).
+**Pulumi Vultr Standards:**
+- **Language:** Use Pulumi with Python SDK (`pulumi_vultr`).
 - **Idempotency:** All stacks must be idempotent.
-- **State Backend:** GCS bucket `gs://cherry-ai-project-pulumi-state`.
-- **Config:** Use Pulumi stack configuration for environment-specific values. Fetch sensitive values from GCP Secret Manager at runtime if possible, or use Pulumi secrets.
+- **State Backend:** Local file system or S3-compatible storage.
+- **Config:** Use Pulumi stack configuration for environment-specific values. Use environment variables for sensitive values.
 - **Components:** Structure resources into reusable Pulumi Components where appropriate.
 - **Naming:** Follow consistent naming conventions for resources.
 - **Secrets in Pulumi:** For secrets managed *by* Pulumi (e.g., a generated DB password), use `pulumi.Output.secret()` and `pulumi config set --secret`.
-- **Cloud Run Specifics**: When defining `gcp.cloudrun.Service` resources, ensure appropriate settings for concurrency, min/max instances, and CPU allocation based on expected workload. Always include health check configurations (`livenessProbe`, `startupProbe`).
-- **IAM Best Practices**: Follow the principle of least privilege for IAM bindings. Define roles at the most granular level possible (e.g., per-service service accounts) rather than broad project-level roles.
+- **VPS Specifics**: When defining Vultr instances, ensure appropriate settings for CPU, memory, and storage based on expected workload. Always include startup scripts for initial configuration.
+- **IAM Best Practices**: Use API keys with minimal required permissions. Store API keys securely and rotate regularly.

@@ -47,3 +47,14 @@ For best results, reference these in your prompts:
 - Heavy dependencies for simple tasks
 - Direct database connections (use UnifiedDatabase)
 - MongoDB/Redis/DragonflyDB usage
+
+## New Rules
+- Always provide Python code with PEP 484 type hints.
+- Prioritize Python 3.11+ features and syntax.
+- Emphasize solutions that are performant, stable, simple, and directly maintainable.
+- When explaining concepts, be concise first, then offer to elaborate if requested.
+- If suggesting external libraries, briefly justify their inclusion based on significant simplification or performance gains.
+- Prefer Pulumi with Python for new Infrastructure as Code.
+- Default to Vultr services unless specified otherwise.
+- For Dockerfiles, ensure they are multi-stage, use specific base image versions, minimize layers, and follow security best practices like non-root users.
+- Remember to focus on optimization, performance, simplicity and stability over security and cost.
