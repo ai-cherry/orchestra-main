@@ -43,9 +43,7 @@ class CodeAdapter(FactoryMCPAdapter):
         self.streaming_enabled = droid_config.get("streaming", True)
         self.chunk_size = droid_config.get("chunk_size", 1024)
 
-    async def translate_to_factory(
-        self, mcp_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def translate_to_factory(self, mcp_request: Dict[str, Any]) -> Dict[str, Any]:
         """Translate MCP request to Factory AI Code format.
 
         Args:
@@ -80,9 +78,7 @@ class CodeAdapter(FactoryMCPAdapter):
         # Handle specific code generation scenarios
         if method == "generate_code":
             factory_request["context"]["template"] = params.get("template", "")
-            factory_request["context"]["specifications"] = params.get(
-                "specifications", {}
-            )
+            factory_request["context"]["specifications"] = params.get("specifications", {})
 
         elif method == "optimize_code":
             factory_request["context"]["optimization_goals"] = params.get(
@@ -91,27 +87,17 @@ class CodeAdapter(FactoryMCPAdapter):
             factory_request["context"]["metrics"] = params.get("metrics", {})
 
         elif method == "refactor_code":
-            factory_request["context"]["refactor_type"] = params.get(
-                "refactor_type", "general"
-            )
-            factory_request["context"]["target_patterns"] = params.get(
-                "patterns", []
-            )
+            factory_request["context"]["refactor_type"] = params.get("refactor_type", "general")
+            factory_request["context"]["target_patterns"] = params.get("patterns", [])
 
         elif method == "complete_code":
-            factory_request["context"]["cursor_position"] = params.get(
-                "cursor_position", 0
-            )
-            factory_request["context"]["completion_type"] = params.get(
-                "completion_type", "line"
-            )
+            factory_request["context"]["cursor_position"] = params.get("cursor_position", 0)
+            factory_request["context"]["completion_type"] = params.get("completion_type", "line")
 
         logger.debug(f"Translated to Factory request: {factory_request}")
         return factory_request
 
-    async def translate_to_mcp(
-        self, factory_response: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def translate_to_mcp(self, factory_response: Dict[str, Any]) -> Dict[str, Any]:
         """Translate Factory AI Code response to MCP format.
 
         Args:
@@ -124,15 +110,13 @@ class CodeAdapter(FactoryMCPAdapter):
             return {
                 "error": {
                     "code": -32603,
-                    "message": factory_response["error"].get(
-                        "message", "Unknown error"
-                    ),
+                    "message": factory_response["error"].get("message", "Unknown error"),
                     "data": factory_response["error"].get("details", {}),
                 }
             }
 
         result = factory_response.get("result", {})
-        
+
         # Handle streaming responses
         if result.get("streaming"):
             return {
@@ -171,9 +155,7 @@ class CodeAdapter(FactoryMCPAdapter):
         logger.debug(f"Translated to MCP response: {mcp_response}")
         return mcp_response
 
-    async def _call_factory_droid(
-        self, factory_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _call_factory_droid(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
         """Call the Factory AI Code droid.
 
         Args:
@@ -189,9 +171,7 @@ class CodeAdapter(FactoryMCPAdapter):
             if not self._factory_client:
                 self._factory_client = FactoryAI(
                     api_key=self.droid_config.get("api_key"),
-                    base_url=self.droid_config.get(
-                        "base_url", "https://api.factory.ai"
-                    ),
+                    base_url=self.droid_config.get("base_url", "https://api.factory.ai"),
                 )
 
             # Handle streaming requests
@@ -215,9 +195,7 @@ class CodeAdapter(FactoryMCPAdapter):
             logger.error(f"Error calling Code droid: {e}", exc_info=True)
             raise
 
-    async def _handle_streaming_request(
-        self, factory_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _handle_streaming_request(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
         """Handle streaming code generation request.
 
         Args:
@@ -229,12 +207,10 @@ class CodeAdapter(FactoryMCPAdapter):
         try:
             # Create streaming session
             stream_id = f"stream_{id(factory_request)}"
-            
+
             # Start async streaming task
-            asyncio.create_task(
-                self._stream_code_generation(stream_id, factory_request)
-            )
-            
+            asyncio.create_task(self._stream_code_generation(stream_id, factory_request))
+
             return {
                 "result": {
                     "streaming": True,
@@ -245,9 +221,7 @@ class CodeAdapter(FactoryMCPAdapter):
             logger.error(f"Error setting up streaming: {e}", exc_info=True)
             raise
 
-    async def _stream_code_generation(
-        self, stream_id: str, factory_request: Dict[str, Any]
-    ) -> None:
+    async def _stream_code_generation(self, stream_id: str, factory_request: Dict[str, Any]) -> None:
         """Stream code generation responses.
 
         Args:
@@ -263,7 +237,7 @@ class CodeAdapter(FactoryMCPAdapter):
                 # Send chunk to MCP server's streaming handler
                 if hasattr(self.mcp_server, "send_stream_chunk"):
                     await self.mcp_server.send_stream_chunk(stream_id, chunk)
-                    
+
         except Exception as e:
             logger.error(f"Error in streaming: {e}", exc_info=True)
             if hasattr(self.mcp_server, "close_stream"):
@@ -288,9 +262,7 @@ class CodeAdapter(FactoryMCPAdapter):
         }
         return method_mapping.get(method, "generate")
 
-    def _get_mock_response(
-        self, factory_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def _get_mock_response(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
         """Generate mock response for testing.
 
         Args:
@@ -301,7 +273,7 @@ class CodeAdapter(FactoryMCPAdapter):
         """
         action = factory_request["action"]
         language = factory_request["context"].get("language", "python")
-        
+
         if action == "generate":
             code = self._generate_mock_code(language, factory_request["context"])
             return {
@@ -320,7 +292,7 @@ class CodeAdapter(FactoryMCPAdapter):
                     ],
                 }
             }
-        
+
         elif action == "optimize":
             return {
                 "result": {
@@ -334,7 +306,7 @@ class CodeAdapter(FactoryMCPAdapter):
                     "generation_time": 0.3,
                 }
             }
-        
+
         elif action == "refactor":
             return {
                 "result": {
@@ -352,7 +324,7 @@ class CodeAdapter(FactoryMCPAdapter):
                     "generation_time": 0.4,
                 }
             }
-        
+
         return {
             "result": {
                 "message": f"Mock response for action: {action}",
@@ -361,9 +333,7 @@ class CodeAdapter(FactoryMCPAdapter):
             }
         }
 
-    def _generate_mock_code(
-        self, language: str, context: Dict[str, Any]
-    ) -> str:
+    def _generate_mock_code(self, language: str, context: Dict[str, Any]) -> str:
         """Generate mock code based on language and context.
 
         Args:

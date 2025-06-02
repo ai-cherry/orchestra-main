@@ -69,7 +69,9 @@ echo "Snapshot $SNAP_ID created" >> /var/log/vultr-snapshot.log
 EOF
                 chmod +x /root/snapshot.sh
                 (crontab -l 2>/dev/null || echo "") | grep -v 'snapshot.sh' | {{ cat; echo '0 3 * * * /root/snapshot.sh'; }} | crontab -
-            """.format(volume_id=self.volume.id),
+            """.format(
+                volume_id=self.volume.id
+            ),
             opts=ResourceOptions(parent=self.attach),
         )
 

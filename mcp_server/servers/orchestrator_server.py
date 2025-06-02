@@ -20,7 +20,7 @@ from agent.app.services.agent_control import (
     restart_agent,
     get_agent_config,
     update_agent_config,
-    get_agent_metrics
+    get_agent_metrics,
 )
 from agent.app.services.workflow_runner import run_workflow as run_workflow_sync
 
@@ -42,14 +42,14 @@ async def run_agent_task(agent_id: str, task: str, parameters: Dict[str, Any] = 
     # Stub implementation - in production, this would dispatch to the actual agent
     if parameters is None:
         parameters = {}
-    
+
     # Simulate agent execution
     result = {
         "agent_id": agent_id,
         "task": task,
         "status": "completed",
         "output": f"Executed task '{task}' on agent '{agent_id}' with parameters: {parameters}",
-        "metrics": get_agent_metrics(agent_id)
+        "metrics": get_agent_metrics(agent_id),
     }
     return result
 
@@ -58,7 +58,7 @@ async def run_workflow(workflow_name: str, params: Dict[str, Any] = None) -> Dic
     """Async wrapper for workflow runner."""
     if params is None:
         params = {}
-    
+
     # Call the sync function - in production, this would be properly async
     result = run_workflow_sync(workflow_name)
     result["params"] = params
@@ -150,9 +150,14 @@ class OrchestratorServer:
                 agent_id = arguments.get("agent_id")
                 task = arguments.get("task")
                 params = arguments.get("parameters", {})
-                
+
                 result = await run_agent_task(agent_id, task, params)
-                return [TextContent(type="text", text=f"Agent {agent_id} result:\nStatus: {result['status']}\nOutput: {result['output']}")]
+                return [
+                    TextContent(
+                        type="text",
+                        text=f"Agent {agent_id} result:\nStatus: {result['status']}\nOutput: {result['output']}",
+                    )
+                ]
 
             if name == "switch_mode":
                 mode = arguments.get("mode")
@@ -164,23 +169,23 @@ class OrchestratorServer:
             if name == "run_workflow":
                 workflow_name = arguments.get("workflow")
                 params = arguments.get("params", {})
-                
+
                 result = await run_workflow(workflow_name, params)
                 return [TextContent(type="text", text=f"Workflow '{workflow_name}' result: {result}")]
 
             if name == "get_agent_status":
                 agent_id = arguments.get("agent_id")
-                
+
                 # Get various agent information
                 config = get_agent_config(agent_id)
                 metrics = get_agent_metrics(agent_id)
                 logs = get_agent_logs(agent_id)
-                
+
                 status_text = f"""Agent Status for {agent_id}:
 Configuration: {config}
 Metrics: CPU: {metrics['cpu']}%, Memory: {metrics['mem']}MB
 Recent Logs: {', '.join(logs['logs'][:2])}"""
-                
+
                 return [TextContent(type="text", text=status_text)]
 
             return [TextContent(type="text", text=f"Unknown tool: {name}")]
@@ -189,9 +194,7 @@ Recent Logs: {', '.join(logs['logs'][:2])}"""
         """Run the MCP server."""
         async with stdio_server() as (read_stream, write_stream):
             await self.server.run(
-                read_stream, 
-                write_stream,
-                initialization_options={}  # Add empty initialization options
+                read_stream, write_stream, initialization_options={}  # Add empty initialization options
             )
 
 

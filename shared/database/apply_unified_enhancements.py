@@ -17,29 +17,29 @@ logger = logging.getLogger(__name__)
 def update_imports_in_file(file_path: Path, replacements: dict) -> bool:
     """
     Update imports in a Python file.
-    
+
     Args:
         file_path: Path to the file
         replacements: Dictionary of old import -> new import
-        
+
     Returns:
         True if file was modified, False otherwise
     """
     try:
         content = file_path.read_text()
         original_content = content
-        
+
         for old_import, new_import in replacements.items():
             if old_import in content:
                 content = content.replace(old_import, new_import)
                 logger.info(f"Updated import in {file_path}: {old_import} -> {new_import}")
-        
+
         if content != original_content:
             file_path.write_text(content)
             return True
-            
+
         return False
-        
+
     except Exception as e:
         logger.error(f"Error updating {file_path}: {e}")
         return False
@@ -78,8 +78,8 @@ __all__ = [
     'close_unified_postgresql'
 ]
 '''
-    
-    wrapper_path = Path('shared/database/unified_compat.py')
+
+    wrapper_path = Path("shared/database/unified_compat.py")
     wrapper_path.write_text(wrapper_content)
     logger.info(f"Created compatibility wrapper at {wrapper_path}")
 
@@ -88,30 +88,24 @@ def update_unified_db_v2():
     """
     Update unified_db_v2.py to fix method signature issues.
     """
-    file_path = Path('shared/database/unified_db_v2.py')
-    
+    file_path = Path("shared/database/unified_db_v2.py")
+
     try:
         content = file_path.read_text()
-        
+
         # Fix agent_create method call
         content = content.replace(
-            'agent = await self._postgres.agent_create(**agent_data)',
-            'agent = await self._postgres.agent_create(agent_data)'
+            "agent = await self._postgres.agent_create(**agent_data)",
+            "agent = await self._postgres.agent_create(agent_data)",
         )
-        
+
         # Fix workflow_create method call
-        content = content.replace(
-            'workflow = await self._postgres.workflow_create({',
-            'workflow_data = {'
-        )
-        content = content.replace(
-            '})',
-            '}\n        workflow = await self._postgres.workflow_create(workflow_data)'
-        )
-        
+        content = content.replace("workflow = await self._postgres.workflow_create({", "workflow_data = {")
+        content = content.replace("})", "}\n        workflow = await self._postgres.workflow_create(workflow_data)")
+
         file_path.write_text(content)
         logger.info("Updated unified_db_v2.py with method signature fixes")
-        
+
     except Exception as e:
         logger.error(f"Error updating unified_db_v2.py: {e}")
 
@@ -183,8 +177,8 @@ async def initialize_enhanced_system():
 if __name__ == "__main__":
     asyncio.run(initialize_enhanced_system())
 '''
-    
-    init_path = Path('scripts/initialize_enhanced_system.py')
+
+    init_path = Path("scripts/initialize_enhanced_system.py")
     init_path.write_text(init_content)
     os.chmod(init_path, 0o755)
     logger.info(f"Created initialization script at {init_path}")
@@ -295,8 +289,8 @@ async def test_enhanced_methods():
 if __name__ == "__main__":
     asyncio.run(test_enhanced_methods())
 '''
-    
-    test_path = Path('tests/test_enhanced_methods.py')
+
+    test_path = Path("tests/test_enhanced_methods.py")
     test_path.write_text(test_content)
     os.chmod(test_path, 0o755)
     logger.info(f"Created test script at {test_path}")
@@ -307,42 +301,40 @@ def main():
     Main function to apply all enhancements.
     """
     logger.info("Applying unified PostgreSQL enhancements...")
-    
+
     # Create compatibility wrapper
     create_compatibility_wrapper()
-    
+
     # Update unified_db_v2.py
     update_unified_db_v2()
-    
+
     # Create initialization script
     create_initialization_script()
-    
+
     # Create test script
     create_test_enhanced_methods()
-    
+
     # Update imports in key files
     replacements = {
-        'from shared.database.connection_manager import get_connection_manager':
-            'from shared.database.connection_manager_enhanced import get_connection_manager_enhanced as get_connection_manager',
-        'from shared.database.unified_postgresql import get_unified_postgresql':
-            'from shared.database.unified_postgresql_enhanced import get_unified_postgresql_enhanced as get_unified_postgresql',
+        "from shared.database.connection_manager import get_connection_manager": "from shared.database.connection_manager_enhanced import get_connection_manager_enhanced as get_connection_manager",
+        "from shared.database.unified_postgresql import get_unified_postgresql": "from shared.database.unified_postgresql_enhanced import get_unified_postgresql_enhanced as get_unified_postgresql",
     }
-    
+
     # Find Python files that need updating
     python_files = []
-    for pattern in ['agent/**/*.py', 'tests/*.py', 'scripts/*.py']:
-        python_files.extend(Path('.').glob(pattern))
-    
+    for pattern in ["agent/**/*.py", "tests/*.py", "scripts/*.py"]:
+        python_files.extend(Path(".").glob(pattern))
+
     updated_count = 0
     for file_path in python_files:
         if update_imports_in_file(file_path, replacements):
             updated_count += 1
-    
+
     logger.info(f"Updated {updated_count} files with enhanced imports")
-    
-    print("\n" + "="*60)
+
+    print("\n" + "=" * 60)
     print("UNIFIED POSTGRESQL ENHANCEMENTS APPLIED")
-    print("="*60)
+    print("=" * 60)
     print("\nAll missing methods have been added through mixins:")
     print("✓ Connection Manager: get_pool_stats() and related methods")
     print("✓ Cache: cache_get_by_tags(), cache_get_many(), cache_info()")
@@ -355,7 +347,7 @@ def main():
     print("   python tests/test_enhanced_methods.py")
     print("3. Run the migration if upgrading:")
     print("   python scripts/migrate_to_unified_postgresql.py")
-    print("="*60)
+    print("=" * 60)
 
 
 if __name__ == "__main__":

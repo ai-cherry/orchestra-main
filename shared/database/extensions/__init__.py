@@ -10,9 +10,4 @@ from .session_extensions import SessionExtensionsMixin
 from .memory_extensions import MemoryExtensionsMixin
 from .pool_extensions import PoolExtensionsMixin
 
-__all__ = [
-    'CacheExtensionsMixin',
-    'SessionExtensionsMixin', 
-    'MemoryExtensionsMixin',
-    'PoolExtensionsMixin'
-]
+__all__ = ["CacheExtensionsMixin", "SessionExtensionsMixin", "MemoryExtensionsMixin", "PoolExtensionsMixin"]

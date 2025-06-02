@@ -37,9 +37,7 @@ class VectorDropletComponent(ComponentResource):
     Configures an existing DigitalOcean droplet for Weaviate with Docker.
     """
 
-    def __init__(
-        self, name: str, config: Dict[str, Any], opts: Optional[ResourceOptions] = None
-    ):
+    def __init__(self, name: str, config: Dict[str, Any], opts: Optional[ResourceOptions] = None):
         super().__init__("orchestra:vector:DropletComponent", name, None, opts)
 
         self.config = config
@@ -106,7 +104,7 @@ class VectorDropletComponent(ComponentResource):
             create=Output.concat(
                 "device=$(lsblk -o NAME,SERIAL -J | jq -r '.blockdevices[] | select(.serial == \"",
                 self.volume.id,
-                "\") | \"/dev/\" + .name')\n",
+                '") | "/dev/" + .name\')\n',
                 """
                 echo "Mounting $device to /mnt/vector-data"
                 
@@ -131,7 +129,7 @@ class VectorDropletComponent(ComponentResource):
                 # Set permissions
                 chown -R root:root /mnt/vector-data
                 chmod -R 755 /mnt/vector-data
-                """
+                """,
             ),
             opts=ResourceOptions(parent=self, depends_on=[self.setup_docker]),
         )
@@ -177,7 +175,9 @@ services:
     volumes:
       - /mnt/vector-data:/var/lib/weaviate
     environment:
-      - """, env_vars_str, """
+      - """,
+                env_vars_str,
+                """
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/v1/.well-known/ready"]
       interval: 10s
@@ -193,7 +193,7 @@ EOF
                 echo "Waiting for Weaviate to be ready..."
                 timeout 300 bash -c 'until curl -s -f http://localhost:8080/v1/.well-known/ready; do sleep 5; done'
                 echo "Weaviate is ready!"
-                """
+                """,
             ),
             opts=ResourceOptions(parent=self, depends_on=[self.mount_volume]),
         )

@@ -39,9 +39,7 @@ class ArchitectAdapter(FactoryMCPAdapter):
             "validate_design",
         ]
 
-    async def translate_to_factory(
-        self, mcp_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def translate_to_factory(self, mcp_request: Dict[str, Any]) -> Dict[str, Any]:
         """Translate MCP request to Factory AI Architect format.
 
         Args:
@@ -61,9 +59,7 @@ class ArchitectAdapter(FactoryMCPAdapter):
                 "project_type": params.get("project_type", "microservices"),
                 "requirements": params.get("requirements", []),
                 "constraints": params.get("constraints", {}),
-                "existing_infrastructure": params.get(
-                    "existing_infrastructure", {}
-                ),
+                "existing_infrastructure": params.get("existing_infrastructure", {}),
             },
             "options": {
                 "generate_diagrams": params.get("generate_diagrams", True),
@@ -75,34 +71,20 @@ class ArchitectAdapter(FactoryMCPAdapter):
 
         # Handle special cases for architectural diagrams
         if method == "create_diagram":
-            factory_request["context"]["diagram_type"] = params.get(
-                "diagram_type", "system"
-            )
-            factory_request["context"]["components"] = params.get(
-                "components", []
-            )
-            factory_request["options"]["diagram_format"] = params.get(
-                "format", "mermaid"
-            )
+            factory_request["context"]["diagram_type"] = params.get("diagram_type", "system")
+            factory_request["context"]["components"] = params.get("components", [])
+            factory_request["options"]["diagram_format"] = params.get("format", "mermaid")
 
         # Handle Pulumi IaC generation
         if method == "generate_infrastructure":
-            factory_request["context"]["stack_name"] = params.get(
-                "stack_name", "main"
-            )
-            factory_request["context"]["resources"] = params.get(
-                "resources", []
-            )
-            factory_request["options"]["pulumi_config"] = params.get(
-                "pulumi_config", {}
-            )
+            factory_request["context"]["stack_name"] = params.get("stack_name", "main")
+            factory_request["context"]["resources"] = params.get("resources", [])
+            factory_request["options"]["pulumi_config"] = params.get("pulumi_config", {})
 
         logger.debug(f"Translated to Factory request: {factory_request}")
         return factory_request
 
-    async def translate_to_mcp(
-        self, factory_response: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def translate_to_mcp(self, factory_response: Dict[str, Any]) -> Dict[str, Any]:
         """Translate Factory AI Architect response to MCP format.
 
         Args:
@@ -115,9 +97,7 @@ class ArchitectAdapter(FactoryMCPAdapter):
             return {
                 "error": {
                     "code": -32603,
-                    "message": factory_response["error"].get(
-                        "message", "Unknown error"
-                    ),
+                    "message": factory_response["error"].get("message", "Unknown error"),
                     "data": factory_response["error"].get("details", {}),
                 }
             }
@@ -126,9 +106,7 @@ class ArchitectAdapter(FactoryMCPAdapter):
         mcp_response = {
             "result": {
                 "design": result.get("design", {}),
-                "diagrams": self._format_diagrams(
-                    result.get("diagrams", [])
-                ),
+                "diagrams": self._format_diagrams(result.get("diagrams", [])),
                 "infrastructure_code": result.get("infrastructure_code", ""),
                 "recommendations": result.get("recommendations", []),
                 "validation_results": result.get("validation_results", {}),
@@ -151,9 +129,7 @@ class ArchitectAdapter(FactoryMCPAdapter):
         logger.debug(f"Translated to MCP response: {mcp_response}")
         return mcp_response
 
-    async def _call_factory_droid(
-        self, factory_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _call_factory_droid(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
         """Call the Factory AI Architect droid.
 
         Args:
@@ -169,9 +145,7 @@ class ArchitectAdapter(FactoryMCPAdapter):
             if not self._factory_client:
                 self._factory_client = FactoryAI(
                     api_key=self.droid_config.get("api_key"),
-                    base_url=self.droid_config.get(
-                        "base_url", "https://api.factory.ai"
-                    ),
+                    base_url=self.droid_config.get("base_url", "https://api.factory.ai"),
                 )
 
             # Call the Architect droid
@@ -184,9 +158,7 @@ class ArchitectAdapter(FactoryMCPAdapter):
             return {"result": response}
 
         except ImportError:
-            logger.warning(
-                "Factory AI SDK not available, using mock response"
-            )
+            logger.warning("Factory AI SDK not available, using mock response")
             # Return mock response for testing
             return self._get_mock_response(factory_request)
 
@@ -234,9 +206,7 @@ class ArchitectAdapter(FactoryMCPAdapter):
             )
         return formatted_diagrams
 
-    def _get_mock_response(
-        self, factory_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def _get_mock_response(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
         """Generate mock response for testing.
 
         Args:
@@ -246,7 +216,7 @@ class ArchitectAdapter(FactoryMCPAdapter):
             Mock response
         """
         action = factory_request["action"]
-        
+
         if action == "design_architecture":
             return {
                 "result": {
@@ -297,7 +267,7 @@ class ArchitectAdapter(FactoryMCPAdapter):
                     "complexity_score": 7.5,
                 }
             }
-        
+
         elif action == "generate_iac":
             return {
                 "result": {
@@ -330,7 +300,7 @@ pulumi.export("api_ip", api_instance.main_ip)
                     "generation_time": 1.8,
                 }
             }
-        
+
         return {
             "result": {
                 "message": f"Mock response for action: {action}",

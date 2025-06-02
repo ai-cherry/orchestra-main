@@ -4,11 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Search, RefreshCw } from 'lucide-react';
+import { Search, RefreshCw, Edit } from 'lucide-react';
 import { usePersonas } from '@/lib/api';
+import { useNavigate } from '@tanstack/react-router';
 
 export function PersonasPage() {
   const { data: personasData = [], refetch } = usePersonas();
+  const navigate = useNavigate();
 
   return (
     <PageWrapper title="Personas">
@@ -74,7 +76,14 @@ export function PersonasPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">Edit</Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigate({ to: '/personas/$personaId', params: { personaId: persona.id } })}
+                      >
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit
+                      </Button>
                       <Button variant="ghost" size="sm" disabled={!persona.active}>Use</Button>
                     </TableCell>
                   </TableRow>

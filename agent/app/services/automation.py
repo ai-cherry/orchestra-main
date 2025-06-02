@@ -2,6 +2,7 @@
 Orchestra AI Automation Services
 Provides automation functionality for system operations
 """
+
 import os
 import json
 from datetime import datetime
@@ -49,7 +50,7 @@ def snapshot_env() -> Dict[str, Dict[str, str]]:
         "ENABLE_VIDEO_SYNTH": os.getenv("ENABLE_VIDEO_SYNTH", "true"),
         "ENABLE_ADVANCED_SEARCH": os.getenv("ENABLE_ADVANCED_SEARCH", "true"),
         "ENABLE_MULTIMODAL": os.getenv("ENABLE_MULTIMODAL", "true"),
-        "SNAPSHOT_TIME": datetime.utcnow().isoformat()
+        "SNAPSHOT_TIME": datetime.utcnow().isoformat(),
     }
-    
+
     return {"env": env_snapshot}

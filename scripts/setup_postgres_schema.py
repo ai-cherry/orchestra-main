@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from shared.database.postgresql_client import PostgreSQLClient
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -129,46 +129,24 @@ DEFAULT_AGENTS = [
     {
         "name": "research_agent",
         "description": "Specialized in research and information gathering",
-        "capabilities": {
-            "web_search": True,
-            "document_analysis": True,
-            "summarization": True
-        },
+        "capabilities": {"web_search": True, "document_analysis": True, "summarization": True},
         "autonomy_level": 2,
-        "model_config": {
-            "model": "gpt-4",
-            "temperature": 0.7
-        }
+        "model_config": {"model": "gpt-4", "temperature": 0.7},
     },
     {
         "name": "code_agent",
         "description": "Specialized in code generation and review",
-        "capabilities": {
-            "code_generation": True,
-            "code_review": True,
-            "debugging": True,
-            "testing": True
-        },
+        "capabilities": {"code_generation": True, "code_review": True, "debugging": True, "testing": True},
         "autonomy_level": 3,
-        "model_config": {
-            "model": "gpt-4",
-            "temperature": 0.3
-        }
+        "model_config": {"model": "gpt-4", "temperature": 0.3},
     },
     {
         "name": "orchestrator",
         "description": "Main orchestrator agent for coordinating other agents",
-        "capabilities": {
-            "agent_coordination": True,
-            "workflow_management": True,
-            "task_delegation": True
-        },
+        "capabilities": {"agent_coordination": True, "workflow_management": True, "task_delegation": True},
         "autonomy_level": 4,
-        "model_config": {
-            "model": "gpt-4",
-            "temperature": 0.5
-        }
-    }
+        "model_config": {"model": "gpt-4", "temperature": 0.5},
+    },
 ]
 
 
@@ -181,30 +159,27 @@ def setup_schema(db: PostgreSQLClient, drop_existing: bool = False) -> None:
                 cur.execute("DROP SCHEMA IF EXISTS orchestra CASCADE")
                 conn.commit()
         logger.info("Existing schema dropped")
-    
+
     logger.info("Creating schema and tables...")
     with db.get_connection() as conn:
         with conn.cursor() as cur:
             # Execute schema SQL
-            for statement in SCHEMA_SQL.split(';'):
+            for statement in SCHEMA_SQL.split(";"):
                 if statement.strip():
                     cur.execute(statement)
             conn.commit()
-    
+
     logger.info("Schema created successfully")
 
 
 def insert_default_agents(db: PostgreSQLClient) -> None:
     """Insert default agents if they don't exist."""
     logger.info("Inserting default agents...")
-    
+
     for agent_data in DEFAULT_AGENTS:
         # Check if agent already exists
-        existing = db.execute_query(
-            "SELECT id FROM orchestra.agents WHERE name = %s",
-            (agent_data["name"],)
-        )
-        
+        existing = db.execute_query("SELECT id FROM orchestra.agents WHERE name = %s", (agent_data["name"],))
+
         if not existing:
             agent = db.create_agent(agent_data)
             logger.info(f"Created agent: {agent['name']} (ID: {agent['id']})")
@@ -215,7 +190,7 @@ def insert_default_agents(db: PostgreSQLClient) -> None:
 def verify_schema(db: PostgreSQLClient) -> None:
     """Verify schema was created correctly."""
     logger.info("Verifying schema...")
-    
+
     # Check tables exist
     tables_query = """
     SELECT table_name 
@@ -223,18 +198,18 @@ def verify_schema(db: PostgreSQLClient) -> None:
     WHERE table_schema = 'orchestra'
     ORDER BY table_name
     """
-    
+
     tables = db.execute_query(tables_query)
-    table_names = [t['table_name'] for t in tables]
-    
-    expected_tables = ['agents', 'api_keys', 'audit_logs', 'memory_snapshots', 'sessions', 'workflows']
-    
+    table_names = [t["table_name"] for t in tables]
+
+    expected_tables = ["agents", "api_keys", "audit_logs", "memory_snapshots", "sessions", "workflows"]
+
     for table in expected_tables:
         if table in table_names:
             logger.info(f"✓ Table 'orchestra.{table}' exists")
         else:
             logger.error(f"✗ Table 'orchestra.{table}' is missing!")
-    
+
     # Check indexes
     indexes_query = """
     SELECT indexname 
@@ -242,10 +217,10 @@ def verify_schema(db: PostgreSQLClient) -> None:
     WHERE schemaname = 'orchestra'
     ORDER BY indexname
     """
-    
+
     indexes = db.execute_query(indexes_query)
     logger.info(f"Found {len(indexes)} indexes in orchestra schema")
-    
+
     # Check triggers
     triggers_query = """
     SELECT trigger_name, event_object_table
@@ -253,7 +228,7 @@ def verify_schema(db: PostgreSQLClient) -> None:
     WHERE trigger_schema = 'orchestra'
     ORDER BY trigger_name
     """
-    
+
     triggers = db.execute_query(triggers_query)
     logger.info(f"Found {len(triggers)} triggers in orchestra schema")
 
@@ -263,37 +238,37 @@ def main():
     parser.add_argument("--drop", action="store_true", help="Drop existing schema before creating")
     parser.add_argument("--no-defaults", action="store_true", help="Don't insert default agents")
     parser.add_argument("--verify-only", action="store_true", help="Only verify existing schema")
-    
+
     args = parser.parse_args()
-    
+
     # Initialize database client
     db = PostgreSQLClient()
-    
+
     try:
         # Test connection
         if not db.health_check():
             logger.error("Failed to connect to PostgreSQL")
             return 1
-        
+
         logger.info("Connected to PostgreSQL successfully")
-        
+
         if args.verify_only:
             verify_schema(db)
         else:
             # Setup schema
             setup_schema(db, drop_existing=args.drop)
-            
+
             # Insert default agents
             if not args.no_defaults:
                 insert_default_agents(db)
-            
+
             # Verify
             verify_schema(db)
-            
+
             logger.info("✅ PostgreSQL schema setup completed successfully!")
-        
+
         return 0
-        
+
     except Exception as e:
         logger.error(f"Setup failed: {e}")
         return 1
@@ -302,4 +277,4 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main()) 
+    sys.exit(main())

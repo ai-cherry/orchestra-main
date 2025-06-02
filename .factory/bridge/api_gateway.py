@@ -351,9 +351,7 @@ class FactoryBridgeGateway:
             self.metrics["average_response_time"] = new_time
         else:
             current_avg = self.metrics["average_response_time"]
-            self.metrics["average_response_time"] = (
-                (current_avg * (total - 1) + new_time) / total
-            )
+            self.metrics["average_response_time"] = (current_avg * (total - 1) + new_time) / total
 
     def get_metrics(self) -> Dict[str, Any]:
         """Get current performance metrics."""
@@ -369,14 +367,9 @@ class FactoryBridgeGateway:
             "active_requests": len(self.active_requests),
         }
 
-    def get_request_history(
-        self, limit: int = 100
-    ) -> List[Tuple[str, FactoryResponse]]:
+    def get_request_history(self, limit: int = 100) -> List[Tuple[str, FactoryResponse]]:
         """Get recent request history."""
-        return [
-            (str(task_id), response)
-            for task_id, response in self.request_history[-limit:]
-        ]
+        return [(str(task_id), response) for task_id, response in self.request_history[-limit:]]
 
 
 # FastAPI app setup
@@ -451,8 +444,7 @@ async def get_history(limit: int = 100) -> List[Dict[str, Any]]:
     if not gateway:
         return []
     return [
-        {"task_id": task_id, "response": response.dict()}
-        for task_id, response in gateway.get_request_history(limit)
+        {"task_id": task_id, "response": response.dict()} for task_id, response in gateway.get_request_history(limit)
     ]
 
 

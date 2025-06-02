@@ -4,6 +4,7 @@ import './index.css';
 
 // Additional CSS imports for the application (if any)
 // Import any component-specific CSS here
+import './styles/orchestrator.css';
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';

@@ -62,9 +62,7 @@ class CircuitBreaker:
         self.last_failure_time: Optional[datetime] = None
         self.state = CircuitState.CLOSED
 
-    async def call(
-        self, func: Callable[..., T], *args: Any, **kwargs: Any
-    ) -> T:
+    async def call(self, func: Callable[..., T], *args: Any, **kwargs: Any) -> T:
         """Execute function with circuit breaker protection.
 
         Args:
@@ -95,10 +93,8 @@ class CircuitBreaker:
 
     def _should_attempt_reset(self) -> bool:
         """Check if enough time has passed to attempt reset."""
-        return (
-            self.last_failure_time is not None
-            and datetime.now() - self.last_failure_time
-            > timedelta(seconds=self.recovery_timeout)
+        return self.last_failure_time is not None and datetime.now() - self.last_failure_time > timedelta(
+            seconds=self.recovery_timeout
         )
 
     def _on_success(self) -> None:
@@ -170,9 +166,7 @@ class FactoryMCPAdapter(ABC):
         self._factory_client: Optional[Any] = None
 
     @abstractmethod
-    async def translate_to_factory(
-        self, mcp_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def translate_to_factory(self, mcp_request: Dict[str, Any]) -> Dict[str, Any]:
         """Translate MCP request to Factory AI format.
 
         Args:
@@ -184,9 +178,7 @@ class FactoryMCPAdapter(ABC):
         pass
 
     @abstractmethod
-    async def translate_to_mcp(
-        self, factory_response: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def translate_to_mcp(self, factory_response: Dict[str, Any]) -> Dict[str, Any]:
         """Translate Factory AI response to MCP format.
 
         Args:
@@ -198,9 +190,7 @@ class FactoryMCPAdapter(ABC):
         pass
 
     @abstractmethod
-    async def _call_factory_droid(
-        self, factory_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _call_factory_droid(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
         """Call the Factory AI droid with the translated request.
 
         Args:
@@ -211,9 +201,7 @@ class FactoryMCPAdapter(ABC):
         """
         pass
 
-    async def process_request(
-        self, request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def process_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Process request with circuit breaker and metrics.
 
         This is the main entry point for processing requests. It handles:
@@ -237,50 +225,34 @@ class FactoryMCPAdapter(ABC):
 
             # Use circuit breaker for Factory AI calls
             factory_request = await self.translate_to_factory(request)
-            factory_response = await self.circuit_breaker.call(
-                self._call_factory_droid, factory_request
-            )
+            factory_response = await self.circuit_breaker.call(self._call_factory_droid, factory_request)
             mcp_response = await self.translate_to_mcp(factory_response)
 
             self.metrics["successes"] += 1
-            self.request_counter.labels(
-                adapter=self.adapter_name, status="success"
-            ).inc()
-            logger.info(
-                f"Successfully processed request via Factory AI: {request.get('method', 'unknown')}"
-            )
+            self.request_counter.labels(adapter=self.adapter_name, status="success").inc()
+            logger.info(f"Successfully processed request via Factory AI: {request.get('method', 'unknown')}")
             return mcp_response
 
         except CircuitBreakerError:
-            logger.warning(
-                "Circuit breaker is open, falling back to direct MCP"
-            )
+            logger.warning("Circuit breaker is open, falling back to direct MCP")
             self.metrics["failures"] += 1
             self.metrics["fallback_count"] += 1
-            self.request_counter.labels(
-                adapter=self.adapter_name, status="circuit_open"
-            ).inc()
+            self.request_counter.labels(adapter=self.adapter_name, status="circuit_open").inc()
             return await self._fallback_to_mcp(request)
 
         except Exception as e:
             logger.error(f"Error processing request: {e}", exc_info=True)
             self.metrics["failures"] += 1
-            self.request_counter.labels(
-                adapter=self.adapter_name, status="failure"
-            ).inc()
+            self.request_counter.labels(adapter=self.adapter_name, status="failure").inc()
             # Fallback to direct MCP server
             return await self._fallback_to_mcp(request)
 
         finally:
             latency = (datetime.now() - start_time).total_seconds()
             self.metrics["total_latency"] += latency
-            self.request_duration.labels(adapter=self.adapter_name).observe(
-                latency
-            )
+            self.request_duration.labels(adapter=self.adapter_name).observe(latency)
 
-    async def _fallback_to_mcp(
-        self, request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _fallback_to_mcp(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Fallback to direct MCP server call.
 
         This method is called when Factory AI is unavailable or errors occur.
@@ -319,9 +291,7 @@ class FactoryMCPAdapter(ABC):
             CircuitState.OPEN: 1,
             CircuitState.HALF_OPEN: 2,
         }
-        self.circuit_breaker_state.labels(adapter=self.adapter_name).set(
-            state_value[self.circuit_breaker.state]
-        )
+        self.circuit_breaker_state.labels(adapter=self.adapter_name).set(state_value[self.circuit_breaker.state])
 
     def get_metrics(self) -> Dict[str, Any]:
         """Get current metrics.
@@ -329,16 +299,8 @@ class FactoryMCPAdapter(ABC):
         Returns:
             Dictionary containing current metrics
         """
-        avg_latency = (
-            self.metrics["total_latency"] / self.metrics["requests"]
-            if self.metrics["requests"] > 0
-            else 0
-        )
-        success_rate = (
-            self.metrics["successes"] / self.metrics["requests"]
-            if self.metrics["requests"] > 0
-            else 0
-        )
+        avg_latency = self.metrics["total_latency"] / self.metrics["requests"] if self.metrics["requests"] > 0 else 0
+        success_rate = self.metrics["successes"] / self.metrics["requests"] if self.metrics["requests"] > 0 else 0
 
         return {
             "adapter": self.adapter_name,
@@ -358,10 +320,7 @@ class FactoryMCPAdapter(ABC):
             Health status including metrics and circuit breaker state
         """
         metrics = self.get_metrics()
-        is_healthy = (
-            self.circuit_breaker.state != CircuitState.OPEN
-            and metrics["success_rate"] > 0.5
-        )
+        is_healthy = self.circuit_breaker.state != CircuitState.OPEN and metrics["success_rate"] > 0.5
 
         return {
             "healthy": is_healthy,

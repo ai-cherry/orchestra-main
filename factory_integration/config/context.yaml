@@ -1,0 +1,189 @@
+# Factory AI Context Management Configuration
+# This configuration controls the unified context manager and caching system
+
+context_management:
+  # Synchronization interval between Factory AI and MCP (seconds)
+  sync_interval: 5
+  
+  # Maximum size for a single context (bytes)
+  max_context_size: 10485760  # 10MB
+  
+  # Number of versions to retain per context
+  version_retention: 100
+  
+  # Enable automatic context pruning
+  auto_prune: true
+  
+  # Context pruning age threshold (days)
+  prune_age_days: 30
+
+cache:
+  # L1 Cache (In-Memory) Configuration
+  l1:
+    # Maximum number of entries
+    max_size: 1000
+    
+    # Time-to-live in seconds
+    ttl: 300  # 5 minutes
+    
+    # Enable LRU eviction
+    lru_enabled: true
+  
+  # L2 Cache (Redis) Configuration
+  l2:
+    # Redis connection URL
+    redis_url: "redis://localhost:6379/0"
+    
+    # Time-to-live in seconds
+    ttl: 3600  # 1 hour
+    
+    # Connection pool size
+    pool_size: 10
+    
+    # Enable compression for large values
+    compression_enabled: true
+    compression_threshold: 1024  # bytes
+  
+  # L3 Cache (PostgreSQL) Configuration
+  l3:
+    # Cleanup interval for expired entries (seconds)
+    cleanup_interval: 86400  # Daily cleanup
+    
+    # Enable automatic cleanup
+    auto_cleanup: true
+    
+    # Maximum cache table size (MB)
+    max_table_size: 1024  # 1GB
+    
+    # Enable cache statistics collection
+    collect_stats: true
+
+# PostgreSQL Configuration
+postgresql:
+  # Database connection settings
+  host: localhost
+  port: 5432
+  database: orchestra
+  user: orchestra_user
+  
+  # Connection pool settings
+  pool_size: 20
+  min_pool_size: 10
+  max_pool_size: 50
+  
+  # Query timeout (seconds)
+  query_timeout: 30
+  
+  # Enable SSL
+  ssl_mode: prefer
+  
+  # Statement timeout (milliseconds)
+  statement_timeout: 30000
+
+# Weaviate Configuration
+weaviate:
+  # Weaviate URL
+  url: "http://localhost:8080"
+  
+  # Batch import settings
+  batch_size: 100
+  batch_timeout: 30
+  
+  # Connection timeout (seconds)
+  timeout: 30
+  
+  # Retry settings
+  max_retries: 3
+  retry_delay: 1  # seconds
+  
+  # Vector index settings
+  vector_index_config:
+    # Distance metric: cosine, l2, dot
+    distance_metric: cosine
+    
+    # HNSW settings
+    ef_construction: 128
+    ef: 64
+    max_connections: 16
+    
+    # Dynamic ef settings
+    dynamic_ef_min: 100
+    dynamic_ef_max: 500
+    dynamic_ef_factor: 8
+
+# Embedding Configuration
+embeddings:
+  # Model to use for generating embeddings
+  model: "text-embedding-ada-002"
+  
+  # API settings
+  api_key_env: "OPENAI_API_KEY"
+  
+  # Embedding dimensions
+  dimensions: 1536
+  
+  # Batch size for embedding generation
+  batch_size: 100
+  
+  # Cache embeddings
+  cache_embeddings: true
+
+# Performance Monitoring
+monitoring:
+  # Enable performance metrics collection
+  enabled: true
+  
+  # Metrics collection interval (seconds)
+  interval: 60
+  
+  # Cache hit rate target (percentage)
+  cache_hit_rate_target: 85
+  
+  # Alert thresholds
+  alerts:
+    # Alert if cache hit rate falls below this percentage
+    cache_hit_rate_min: 75
+    
+    # Alert if sync latency exceeds this (milliseconds)
+    sync_latency_max: 100
+    
+    # Alert if context size exceeds this percentage of max
+    context_size_warning: 80
+
+# Logging Configuration
+logging:
+  # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  level: INFO
+  
+  # Log format
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+  # Enable structured logging
+  structured: true
+  
+  # Log destinations
+  handlers:
+    - type: console
+      level: INFO
+    - type: file
+      level: DEBUG
+      filename: "factory_context.log"
+      max_bytes: 10485760  # 10MB
+      backup_count: 5
+
+# Feature Flags
+features:
+  # Enable bidirectional sync
+  bidirectional_sync: true
+  
+  # Enable semantic search
+  semantic_search: true
+  
+  # Enable context merging
+  context_merging: true
+  
+  # Enable cache warming
+  cache_warming: true
+  
+  # Enable automatic version cleanup
+  auto_version_cleanup: true

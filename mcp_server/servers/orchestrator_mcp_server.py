@@ -332,6 +332,7 @@ import hmac
 
 SECRET = os.getenv("MCP_SHARED_SECRET", "secret")
 
+
 async def verify_signature(req: Request):
     body = await req.body()
     signature = req.headers.get("X-MCP-Signature", "")
@@ -341,7 +342,9 @@ async def verify_signature(req: Request):
 
 
 @app.post("/mcp/execute")
-async def run_workflow(request: WorkflowRequest, background_tasks: BackgroundTasks, _: None = Depends(verify_signature)) -> Dict[str, Any]:
+async def run_workflow(
+    request: WorkflowRequest, background_tasks: BackgroundTasks, _: None = Depends(verify_signature)
+) -> Dict[str, Any]:
     """Execute a workflow"""
     # Create workflow instance
     workflow = Workflow(
