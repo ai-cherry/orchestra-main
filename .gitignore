@@ -68,3 +68,4 @@ config/managed-services.env
 
 # Pulumi passphrase file
 .pulumi-passphrase
+nohup.out
