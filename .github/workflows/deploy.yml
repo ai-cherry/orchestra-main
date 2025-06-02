@@ -1,0 +1,19 @@
+name: Deploy to Vultr
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy to Vultr
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: 45.32.69.157
+        username: root
+        key: ${{ secrets.VULTR_SSH_KEY }}
+        script: |
+          cd /root/orchestra-main
+          ./deploy.sh
