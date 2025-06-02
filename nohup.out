@@ -1338,3 +1338,17 @@ INFO:     45.32.69.157:0 - "GET /api/health HTTP/1.1" 200 OK
 INFO:     45.32.69.157:0 - "POST /api/auth/login HTTP/1.1" 200 OK
 INFO:     127.0.0.1:37426 - "GET /health HTTP/1.1" 404 Not Found
 INFO:     127.0.0.1:51052 - "GET /health HTTP/1.1" 404 Not Found
+2025-06-02 16:29:45 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 174, in async_wrapper
+    return await func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 176, in get_memory_manager
+core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
+2025-06-02 16:29:45 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
+INFO:     45.32.69.157:0 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     45.32.69.157:0 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39066 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:48906 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54532 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:42950 - "GET /health HTTP/1.1" 404 Not Found
