@@ -8,8 +8,9 @@ to ensure data integrity across the application.
 from typing import Any, Dict, List, Optional, Union
 import re
 from datetime import datetime
-from pydantic import BaseModel, Field, StrictStr, StrictInt, validator, field_validator, ValidationError
+from pydantic import BaseModel, Field, StrictStr, StrictInt, validator, field_validator, ValidationError, computed_field, model_validator, field_serializer
 from pydantic.config import ConfigDict
+from decimal import Decimal
 
 # Strict type aliases for common fields
 StrictEmail = StrictStr
@@ -200,4 +201,128 @@ class ValidationContext:
             "validated": self.validated_count,
             "errors": len(self.errors),
             "error_details": self.errors[:10]  # First 10 errors
-        } 
+        }
+
+
+# Performance-optimized validation with computed fields
+class EnhancedPersonaConfig(StrictBaseModel):
+    """Enhanced persona configuration with computed fields for performance."""
+    
+    name: StrictStr = Field(..., min_length=1, max_length=100)
+    slug: str = Field(...)
+    description: StrictStr = Field(..., min_length=1, max_length=1000)
+    temperature: float = Field(0.7, ge=0.0, le=2.0)
+    max_tokens: StrictInt = Field(2000, ge=100, le=32000)
+    capabilities: List[str] = Field(default_factory=list)
+    
+    @computed_field
+    @property
+    def capability_count(self) -> int:
+        """Computed field for UI display - no DB query needed."""
+        return len(self.capabilities)
+    
+    @computed_field
+    @property  
+    def complexity_score(self) -> float:
+        """Performance scoring for LLM routing decisions."""
+        base_score = len(self.capabilities) * 0.1
+        temp_factor = self.temperature * 0.5
+        token_factor = (self.max_tokens / 1000) * 0.2
+        return round(base_score + temp_factor + token_factor, 2)
+    
+    @field_validator("capabilities")
+    def validate_capabilities(cls, v: List[str]) -> List[str]:
+        """Ensure capabilities are valid and normalized."""
+        valid_capabilities = {
+            'text-generation', 'code-generation', 'analysis', 
+            'summarization', 'translation', 'reasoning'
+        }
+        for cap in v:
+            if cap not in valid_capabilities:
+                raise ValueError(f"Invalid capability: {cap}")
+        return list(set(v))  # Remove duplicates
+
+
+# Cross-field validation for LLM routing
+class LLMRoutingConfig(StrictBaseModel):
+    """LLM routing configuration with business rule validation."""
+    
+    primary_model: StrictStr
+    fallback_models: List[str] = Field(default_factory=list)
+    use_fallback: bool = Field(default=True)
+    max_cost_per_request: Decimal = Field(default=Decimal('0.10'))
+    max_latency_ms: int = Field(default=5000, ge=100, le=30000)
+    
+    @model_validator(mode='after')
+    def validate_routing_logic(self):
+        """Ensure routing configuration is logically consistent."""
+        if self.use_fallback and not self.fallback_models:
+            raise ValueError("Fallback models required when use_fallback=True")
+        
+        if self.primary_model in self.fallback_models:
+            raise ValueError("Primary model cannot be in fallback list")
+        
+        # Business rule: expensive models should have fallbacks
+        expensive_models = {'gpt-4', 'claude-3-opus', 'gemini-pro'}
+        if (self.primary_model in expensive_models and 
+            not self.fallback_models and 
+            self.max_cost_per_request > Decimal('0.05')):
+            raise ValueError("Expensive models should have fallback options")
+        
+        return self
+
+
+# API response model with custom serialization
+class APIResponseModel(StrictBaseModel):
+    """Enhanced API response with custom serialization for frontend."""
+    
+    status: str = Field(...)
+    data: Any = Field(...)
+    cost: Optional[Decimal] = Field(None)
+    processing_time_ms: Optional[int] = Field(None)
+    
+    @field_serializer('cost')
+    def serialize_cost(self, value: Optional[Decimal]) -> Optional[str]:
+        """Format cost for frontend display."""
+        if value is None:
+            return None
+        return f"${value:.4f}"
+    
+    @computed_field
+    @property
+    def performance_grade(self) -> str:
+        """Performance grade based on response time."""
+        if self.processing_time_ms is None:
+            return "unknown"
+        
+        if self.processing_time_ms < 1000:
+            return "excellent"
+        elif self.processing_time_ms < 3000:
+            return "good"
+        elif self.processing_time_ms < 5000:
+            return "fair"
+        else:
+            return "poor"
+
+
+# Enhanced validation context with caching
+class CachedValidationContext(ValidationContext):
+    """Validation context with performance caching."""
+    
+    def __init__(self, cache_size: int = 1000):
+        super().__init__()
+        self._validation_cache: Dict[str, Any] = {}
+        self._cache_size = cache_size
+    
+    def validate_item_cached(self, model_class: type[BaseModel], data: Dict[str, Any], cache_key: Optional[str] = None) -> Optional[BaseModel]:
+        """Validate with caching for repeated validations."""
+        if cache_key and cache_key in self._validation_cache:
+            self.validated_count += 1
+            return self._validation_cache[cache_key]
+        
+        result = self.validate_item(model_class, data)
+        
+        if cache_key and result and len(self._validation_cache) < self._cache_size:
+            self._validation_cache[cache_key] = result
+        
+        return result 
