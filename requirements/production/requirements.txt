@@ -1,5 +1,6 @@
 # Production requirements with exact versions
 # Generated: 2025-05-30T22:12:57.964648
+# Updated: 2025-06-02 (Security fixes applied)
 # Use with: pip install -r requirements/production/requirements.txt -c requirements/constraints.txt
 
 anthropic==0.39.0
@@ -14,7 +15,7 @@ phidata==2.7.10
 psutil==7.0.0
 pydantic==2.11.4
 python-dotenv==1.1.0
-python-multipart==0.0.9
-redis==5.0.1
+python-multipart==0.0.20  # Updated: Security fix for GHSA-59g5-xgcq-4qw3
+redis==6.2.0  # Updated: Security fix for PYSEC-2023-312
 uvicorn==0.29.0
 weaviate-client==4.14.4
