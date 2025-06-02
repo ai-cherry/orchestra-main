@@ -135,14 +135,15 @@ async def lifespan(app: FastAPI):
 
     # Close memory services
     try:
-
-    # Close hexagonal architecture memory service if available
-    if HEX_ARCH_AVAILABLE:
-        try:
-            logger.info("Closing memory service with hexagonal architecture")
-            await close_memory_service()
-        except Exception as e:
-            logger.error(f"Error closing memory service with hexagonal architecture: {e}")
+        # Close hexagonal architecture memory service if available
+        if HEX_ARCH_AVAILABLE:
+            try:
+                logger.info("Closing memory service with hexagonal architecture")
+                await close_memory_service()
+            except Exception as e:
+                logger.error(f"Error closing memory service with hexagonal architecture: {e}")
+    except Exception as e:
+        logger.error(f"Error during memory service cleanup: {e}")
 
     # Close other services
     get_service_registry().close_all()

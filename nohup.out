@@ -1380,3 +1380,41 @@ INFO:     127.0.0.1:33186 - "GET /health HTTP/1.1" 404 Not Found
 INFO:     127.0.0.1:55308 - "GET /health HTTP/1.1" 404 Not Found
 INFO:     127.0.0.1:47410 - "GET /health HTTP/1.1" 404 Not Found
 INFO:     127.0.0.1:43934 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49448 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54796 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     52.170.195.61:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+2025-06-02 17:37:13 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 174, in async_wrapper
+    return await func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 176, in get_memory_manager
+core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
+2025-06-02 17:37:13 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
+INFO:     45.32.69.157:0 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     45.32.69.157:0 - "GET /api/personas HTTP/1.1" 404 Not Found
+INFO:     45.32.69.157:0 - "GET /api/personas HTTP/1.1" 404 Not Found
+INFO:     45.32.69.157:0 - "GET /api/docs HTTP/1.1" 404 Not Found
+INFO:     45.32.69.157:0 - "GET /api/openapi.json HTTP/1.1" 404 Not Found
+INFO:     45.32.69.157:0 - "POST /api/llm HTTP/1.1" 404 Not Found
+INFO:     45.32.69.157:0 - "GET /api/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:42594 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53026 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:39168 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:44344 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:47144 - "GET /health HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     165.154.138.85:58554 - "GET / HTTP/1.1" 404 Not Found
+INFO:     165.154.138.85:58560 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     165.154.138.85:58564 - "GET /robots.txt HTTP/1.1" 404 Not Found
+INFO:     165.154.138.85:58568 - "GET /sitemap.xml HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:39206 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:41504 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54190 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2025-06-02 17:47:43 - core.orchestrator.src.main - INFO - Application shutting down
+2025-06-02 17:47:43 - core.orchestrator.src.main - INFO - Closing legacy memory manager
+2025-06-02 17:47:43 - core.orchestrator.src.services.unified_registry - INFO - All services closed successfully
+INFO:     Application shutdown complete.
+INFO:     Finished server process [629818]
