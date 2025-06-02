@@ -24,11 +24,9 @@ This document outlines all secrets and environment variables required for the Or
 ### Media & Voice Services
 | Secret Name | Description | Last Updated | Status |
 |------------|-------------|--------------|---------|
-| `RESEMBLE_API_KEY` | Resemble AI voice synthesis | 5 hours ago | ✅ Documented |
-| `RESEMBLE_SYNTHESIS_ENDPOINT` | Resemble synthesis endpoint | 5 hours ago | Voice generation |
-| `RESEMBLE_STREAMING_ENDPOINT` | Resemble streaming endpoint | 5 hours ago | Real-time voice |
-| `ELEVENLABS_API_KEY` | ElevenLabs voice API | 2 months ago | Alternative voice |
+| `ELEVENLABS_API_KEY` | ElevenLabs voice synthesis | 2 hours ago | ✅ Primary voice |
 | `RECRAFT_API_KEY` | Recraft API for image generation | 3 days ago | Alternative to DALL-E |
+| `PEXELS_API_KEY` | Pexels image search | 2 months ago | Optional media |
 
 ### Database & Storage
 | Secret Name | Description | Last Updated | Status |
@@ -119,7 +117,7 @@ Use Portkey virtual keys for unified billing, monitoring, and fallback handling:
 
 ### 2. Direct API Keys (When Needed)
 Use direct API keys for:
-- Services not available through Portkey (Resemble, ElevenLabs, etc.)
+- Services not available through Portkey (ElevenLabs, specialized APIs, etc.)
 - When you need provider-specific features
 - Development/testing with specific providers
 
@@ -203,3 +201,22 @@ For issues with:
 - **GitHub Secrets**: Contact repository admin
 - **GCP secrets**: Use Secret Manager
 - **Local development**: See DEVELOPMENT.md 
+
+## Non-Portkey Services
+
+Some services aren't available through Portkey and require direct API keys:
+
+- Voice synthesis (ElevenLabs)
+- Media services (Pexels)
+- Services not available through Portkey (ElevenLabs, specialized APIs, etc.)
+
+### Voice & Media Services
+
+1. `ELEVENLABS_API_KEY` - Voice synthesis
+2. `PEXELS_API_KEY` - Stock images (optional)
+
+### Sentry
+
+| Secret Name | Description | Last Updated | Status |
+|------------|-------------|--------------|---------|
+| `SENTRY_DSN` | Error tracking | 3 months ago | ⚠️ Optional | 

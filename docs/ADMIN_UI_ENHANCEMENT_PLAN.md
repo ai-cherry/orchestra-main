@@ -126,10 +126,11 @@ app.include_router(suggestions_router)
 ## Future Enhancements
 
 ### Voice Integration (Phase 3)
-- Resemble AI integration for voice cloning
-- Emotion detection in voice input
-- Multi-language support
-- Voice output for responses
+- Visual workflow builder
+- Drag-and-drop interface
+- Real-time execution monitoring
+- Error handling visualizations
+- ElevenLabs integration for voice synthesis
 
 ### Advanced Search (Phase 4)
 - Elasticsearch backend integration
@@ -142,6 +143,8 @@ app.include_router(suggestions_router)
 - Visual persona selection
 - Capability configuration
 - Live testing interface
+
+### 4. Multi-Agent Dashboard
 
 ## Deployment Considerations
 
