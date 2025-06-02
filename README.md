@@ -2,17 +2,25 @@
 
 ## Quick Start
 
-1. **Clone locally** (on YOUR computer, not Paperspace):
+1. **SSH to Vultr server**:
    ```bash
-   git clone https://github.com/yourusername/orchestra-main.git
-   cd orchestra-main
+   ssh root@45.32.69.157
+   cd /root/orchestra-main
    ```
 
-2. **Deploy to production** (cherry-ai.me):
+2. **Code directly on Vultr**:
+   - Edit files on the server
+   - Test changes locally on the server
+   - Commit and push from the server
+
+3. **Deploy changes**:
+   ```bash
+   ./deploy.sh
+   ```
+   Or push to GitHub for auto-deploy:
    ```bash
    git push origin main
    ```
-   GitHub Actions automatically deploys to Vultr in ~2 minutes.
 
 ## Architecture
 
@@ -32,28 +40,34 @@
 - `deploy.sh` - Manual deployment script
 - `.env` - Environment variables (add your API keys)
 
-## Commands
+## Working on Vultr
 
-**SSH to production:**
+**Connect to server:**
 ```bash
 ssh root@45.32.69.157
+cd /root/orchestra-main
+```
+
+**Edit files:**
+```bash
+nano file.py  # or vim, or install your preferred editor
+```
+
+**Deploy changes:**
+```bash
+./deploy.sh
 ```
 
 **View logs:**
 ```bash
-ssh root@45.32.69.157 "docker-compose logs -f"
-```
-
-**Manual deploy:**
-```bash
-ssh root@45.32.69.157 "cd /root/orchestra-main && ./deploy.sh"
+docker-compose logs -f
 ```
 
 ## Workflow
 
-1. Code locally
-2. Push to GitHub
-3. Auto-deploys to cherry-ai.me
-4. That's it
+1. SSH to Vultr server
+2. Edit code directly on server
+3. Run `./deploy.sh` to deploy
+4. Changes live at cherry-ai.me
 
-No Paperspace. No GCP. No complexity.
+No local development. No Paperspace. Just Vultr.
