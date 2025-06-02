@@ -1,17 +1,41 @@
 # Dependabot configuration for AI Orchestra project
 # Automatically updates dependencies to address security vulnerabilities
+# Updated: 2025-06-02 - Enhanced for comprehensive security scanning
 
 version: 2
 updates:
-  # Python dependencies
+  # Python dependencies - Base requirements
   - package-ecosystem: "pip"
     directory: "/requirements"
     schedule:
-      interval: "weekly"
+      interval: "daily"  # Check daily for security updates
     open-pull-requests-limit: 10
     labels:
       - "dependencies"
       - "security"
+      - "python"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    # Prioritize security updates
+    priority: 1
+    groups:
+      python-security:
+        patterns:
+          - "*"
+        update-types:
+          - "security"
+
+  # Python dependencies - Root directory
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "security"
+      - "python"
     commit-message:
       prefix: "deps"
       include: "scope"
@@ -46,7 +70,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/admin-ui"
     schedule:
-      interval: "weekly"
+      interval: "daily"  # Daily for security
     open-pull-requests-limit: 10
     labels:
       - "dependencies"
@@ -55,3 +79,10 @@ updates:
     commit-message:
       prefix: "deps"
       include: "scope"
+    # Group security updates
+    groups:
+      npm-security:
+        patterns:
+          - "*"
+        update-types:
+          - "security"
