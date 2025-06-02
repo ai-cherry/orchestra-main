@@ -12,11 +12,29 @@ This guide covers setting up ElevenLabs voice synthesis for Orchestra AI, provid
 
 ### 1. Environment Variables
 
-Add the following to your `.env` file:
+There are several secure ways to configure your API key:
 
+#### Option A: Using the Setup Script (Recommended)
+```bash
+# First, export your API key as an environment variable
+export ELEVENLABS_API_KEY=your_api_key_here
+
+# Then run the setup script
+./scripts/setup_api_keys.sh
+```
+
+#### Option B: Manual Configuration
+Add the following to your `.env` file:
 ```bash
 # ElevenLabs Configuration
-ELEVENLABS_API_KEY=your_elevenlabs_api_key_here
+ELEVENLABS_API_KEY=your_api_key_here
+```
+
+#### Option C: Environment Variable
+Set it directly in your shell session:
+```bash
+export ELEVENLABS_API_KEY=your_api_key_here
+source .env  # Load other environment variables
 ```
 
 ### 2. Getting Your ElevenLabs API Key
@@ -24,8 +42,17 @@ ELEVENLABS_API_KEY=your_elevenlabs_api_key_here
 1. Sign in to [ElevenLabs](https://elevenlabs.io)
 2. Navigate to your Profile Settings
 3. Copy your API key from the API section
+4. Store it securely - never commit it to version control!
 
-### 3. Voice Selection
+### 3. Security Best Practices
+
+- **NEVER** commit your actual API key to Git
+- Always use environment variables or `.env` files (which are gitignored)
+- Use GitHub Secrets for CI/CD workflows
+- Rotate your API keys regularly
+- Monitor usage in your ElevenLabs dashboard
+
+### 4. Voice Selection
 
 ElevenLabs offers several high-quality voices. The system will automatically select the most suitable voice, prioritizing:
 - Conversational voices
