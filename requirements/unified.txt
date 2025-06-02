@@ -2,21 +2,21 @@
 # ========================================
 # All dependencies for Orchestra AI in a single, well-organized file
 # Python 3.10+ required
-# Last updated: 2025-01-20
+# Last updated: 2025-06-02 (Security fixes applied)
 
 # Core Web Framework & API
 fastapi==0.115.12
 uvicorn[standard]==0.29.0
 pydantic==2.11.4
 pydantic-settings==2.9.1
-python-multipart==0.0.10
+python-multipart==0.0.20  # Updated: Security fix
 
 # Database & Storage
 sqlalchemy==2.0.30
 asyncpg==0.29.0
 pgvector==0.2.5
 weaviate-client==4.14.4
-redis==5.0.1
+redis==6.2.0  # Updated: Security fix for PYSEC-2023-312
 psycopg==3.1.18
 psycopg-pool>=3.1.0
 
@@ -66,7 +66,7 @@ opentelemetry-api==1.33.1
 opentelemetry-sdk==1.33.1
 
 # Serialization & Protocols
-protobuf==6.31.0
+protobuf>=5.26.1,<6.0  # Updated: Fixed version conflict
 grpcio==1.72.0rc1
 msgpack==1.1.0
 
