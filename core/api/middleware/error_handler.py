@@ -11,6 +11,7 @@ from typing import Callable
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
+from pydantic import ValidationError
 
 from core.api.models.responses import ErrorResponse
 
@@ -25,8 +26,29 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
             return response
 
+        except ValidationError as e:
+            # Handle Pydantic validation errors specifically
+            logger.warning(f"Pydantic validation error: {e.errors()}")
+            
+            # Format validation errors for frontend consumption
+            formatted_errors = []
+            for error in e.errors():
+                location = " → ".join(str(loc) for loc in error.get("loc", []))
+                message = error.get("msg", "Validation error")
+                formatted_errors.append(f"{location}: {message}")
+            
+            error_response = ErrorResponse(
+                error="ValidationError",
+                message=", ".join(formatted_errors),
+                details={
+                    "path": str(request.url.path),
+                    "validation_errors": e.errors()
+                },
+            )
+            return JSONResponse(status_code=422, content=error_response.dict())
+
         except ValueError as e:
-            # Handle validation errors
+            # Handle other validation errors
             logger.warning(f"Validation error: {str(e)}")
             error_response = ErrorResponse(
                 error="ValidationError",

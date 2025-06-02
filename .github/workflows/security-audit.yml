@@ -10,6 +10,8 @@ on:
       - 'poetry.lock'
       - 'Pipfile'
       - 'Pipfile.lock'
+      - 'admin-ui/package.json'
+      - 'admin-ui/pnpm-lock.yaml'
   pull_request:
     branches: [ main, develop ]
     paths:
@@ -19,6 +21,8 @@ on:
       - 'poetry.lock'
       - 'Pipfile'
       - 'Pipfile.lock'
+      - 'admin-ui/package.json'
+      - 'admin-ui/pnpm-lock.yaml'
   schedule:
     # Run every Monday at 2 AM UTC
     - cron: '0 2 * * 1'
@@ -30,8 +34,9 @@ on:
         default: 'false'
 
 jobs:
-  security-audit:
+  python-security-audit:
     runs-on: ubuntu-latest
+    name: Python Security Audit
     
     steps:
     - name: Checkout code
@@ -158,4 +163,106 @@ jobs:
       if: steps.pip_audit.outcome == 'failure' || steps.safety_check.outcome == 'failure'
       run: |
         echo "❌ Security vulnerabilities detected. Please fix before merging."
-        exit 1 
+        exit 1
+        
+  pnpm-security-audit:
+    runs-on: ubuntu-latest
+    name: Frontend Security Audit
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10.10.0
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'pnpm'
+        cache-dependency-path: admin-ui/pnpm-lock.yaml
+        
+    - name: Install dependencies
+      working-directory: admin-ui
+      run: pnpm install --frozen-lockfile
+      
+    - name: Run security audit
+      id: pnpm_audit
+      working-directory: admin-ui
+      continue-on-error: true
+      run: |
+        echo "## pnpm Security Audit Results" >> $GITHUB_STEP_SUMMARY
+        
+        # Run the custom security audit script
+        if node scripts/security-audit.js; then
+          echo "✅ No critical vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Security vulnerabilities detected" >> $GITHUB_STEP_SUMMARY
+          exit 1
+        fi
+        
+    - name: Check for outdated packages
+      if: github.event_name == 'schedule' || github.event.inputs.detailed_scan == 'true'
+      working-directory: admin-ui
+      continue-on-error: true
+      run: |
+        echo "## Outdated Packages" >> $GITHUB_STEP_SUMMARY
+        pnpm outdated >> $GITHUB_STEP_SUMMARY || echo "Failed to check outdated packages" >> $GITHUB_STEP_SUMMARY
+        
+    - name: Upload frontend security reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-security-reports-${{ github.run_id }}
+        path: |
+          admin-ui/security-report.json
+        retention-days: 30
+        
+    - name: Comment on PR (Frontend)
+      if: github.event_name == 'pull_request' && steps.pnpm_audit.outcome == 'failure'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const comment = `## ⚠️ Frontend Security Vulnerabilities Detected
+          
+          The admin-ui has dependencies with known security vulnerabilities.
+          Please run \`pnpm run security:fix\` in the admin-ui directory and review the changes.
+          
+          [View detailed report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+          
+  security-summary:
+    needs: [python-security-audit, pnpm-security-audit]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Security Check Summary
+      run: |
+        echo "## 🔒 Security Audit Summary" >> $GITHUB_STEP_SUMMARY
+        
+        if [[ "${{ needs.python-security-audit.result }}" == "success" ]]; then
+          echo "✅ Python dependencies: Secure" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Python dependencies: Vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        if [[ "${{ needs.pnpm-security-audit.result }}" == "success" ]]; then
+          echo "✅ Frontend dependencies: Secure" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Frontend dependencies: Vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Fail the workflow if either audit failed
+        if [[ "${{ needs.python-security-audit.result }}" != "success" ]] || [[ "${{ needs.pnpm-security-audit.result }}" != "success" ]]; then
+          exit 1
+        fi 
