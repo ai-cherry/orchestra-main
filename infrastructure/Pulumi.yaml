@@ -1,0 +1,13 @@
+name: ai-orchestrator-infrastructure
+runtime: python
+description: Infrastructure for AI Orchestrator on Vultr with PostgreSQL, Weaviate, and Airbyte integrations
+config:
+  vultr:region:
+    description: The Vultr region to deploy resources in
+    default: ewr
+  environment:
+    description: The deployment environment (development, staging, production)
+    default: production
+  instance_plan:
+    description: The Vultr instance plan for the main server
+    default: vc2-4c-8gb
