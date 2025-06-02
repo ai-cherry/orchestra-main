@@ -38,10 +38,10 @@ class TestCircuitBreaker:
     async def test_circuit_breaker_closed_state(self):
         """Test circuit breaker in closed state allows calls."""
         cb = CircuitBreaker(failure_threshold=3, recovery_timeout=60)
-        
+
         async def success_func():
             return "success"
-        
+
         result = await cb.call(success_func)
         assert result == "success"
         assert cb.state == CircuitState.CLOSED
@@ -50,15 +50,15 @@ class TestCircuitBreaker:
     async def test_circuit_breaker_opens_after_failures(self):
         """Test circuit breaker opens after threshold failures."""
         cb = CircuitBreaker(failure_threshold=3, recovery_timeout=60)
-        
+
         async def failing_func():
             raise Exception("Test failure")
-        
+
         # Fail 3 times to open circuit
         for _ in range(3):
             with pytest.raises(Exception):
                 await cb.call(failing_func)
-        
+
         assert cb.state == CircuitState.OPEN
         assert cb.failure_count == 3
 
@@ -66,21 +66,21 @@ class TestCircuitBreaker:
     async def test_circuit_breaker_half_open_after_timeout(self):
         """Test circuit breaker enters half-open state after timeout."""
         cb = CircuitBreaker(failure_threshold=1, recovery_timeout=1)
-        
+
         async def failing_func():
             raise Exception("Test failure")
-        
+
         # Open the circuit
         with pytest.raises(Exception):
             await cb.call(failing_func)
-        
+
         # Wait for recovery timeout
         await asyncio.sleep(1.1)
-        
+
         # Should attempt reset on next call
         async def success_func():
             return "recovered"
-        
+
         result = await cb.call(success_func)
         assert result == "recovered"
         assert cb.state == CircuitState.CLOSED
@@ -92,16 +92,17 @@ class TestFactoryMCPAdapter:
     @pytest.fixture
     def mock_adapter(self):
         """Create a mock adapter for testing."""
+
         class TestAdapter(FactoryMCPAdapter):
             async def translate_to_factory(self, mcp_request: Dict[str, Any]) -> Dict[str, Any]:
                 return {"translated": "to_factory", **mcp_request}
-            
+
             async def translate_to_mcp(self, factory_response: Dict[str, Any]) -> Dict[str, Any]:
                 return {"translated": "to_mcp", **factory_response}
-            
+
             async def _call_factory_droid(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
                 return {"result": {"success": True}}
-        
+
         mcp_server = MockMCPServer()
         droid_config = {"failure_threshold": 3, "recovery_timeout": 60}
         return TestAdapter(mcp_server, droid_config, "test")
@@ -110,9 +111,9 @@ class TestFactoryMCPAdapter:
     async def test_successful_request_processing(self, mock_adapter):
         """Test successful request processing through adapter."""
         request = {"method": "test_method", "params": {"test": "value"}}
-        
+
         response = await mock_adapter.process_request(request)
-        
+
         assert "translated" in response
         assert response["translated"] == "to_mcp"
         assert mock_adapter.metrics["requests"] == 1
@@ -124,10 +125,10 @@ class TestFactoryMCPAdapter:
         """Test fallback to MCP server on error."""
         # Make factory call fail
         mock_adapter._call_factory_droid = AsyncMock(side_effect=Exception("Factory error"))
-        
+
         request = {"method": "test_method", "params": {"test": "value"}}
         response = await mock_adapter.process_request(request)
-        
+
         # Should fallback to MCP server
         assert response["result"]["mock"] is True
         assert mock_adapter.metrics["failures"] == 1
@@ -142,9 +143,9 @@ class TestFactoryMCPAdapter:
             "total_latency": 50.0,
             "fallback_count": 5,
         }
-        
+
         metrics = mock_adapter.get_metrics()
-        
+
         assert metrics["total_requests"] == 100
         assert metrics["successful_requests"] == 85
         assert metrics["failed_requests"] == 15
@@ -171,11 +172,11 @@ class TestArchitectAdapter:
                 "project_type": "microservices",
                 "requirements": ["scalable", "fault-tolerant"],
                 "cloud_provider": "vultr",
-            }
+            },
         }
-        
+
         factory_request = await architect_adapter.translate_to_factory(mcp_request)
-        
+
         assert factory_request["droid"] == "architect"
         assert factory_request["action"] == "design_architecture"
         assert factory_request["context"]["project_type"] == "microservices"
@@ -190,11 +191,11 @@ class TestArchitectAdapter:
                 "stack_name": "production",
                 "resources": ["vpc", "instances", "database"],
                 "pulumi_config": {"region": "ewr"},
-            }
+            },
         }
-        
+
         factory_request = await architect_adapter.translate_to_factory(mcp_request)
-        
+
         assert factory_request["action"] == "generate_iac"
         assert factory_request["context"]["stack_name"] == "production"
         assert factory_request["options"]["pulumi_config"]["region"] == "ewr"
@@ -219,11 +220,11 @@ class TestCodeAdapter:
                 "language": "python",
                 "requirements": ["async", "type hints"],
                 "template": "fastapi_endpoint",
-            }
+            },
         }
-        
+
         factory_request = await code_adapter.translate_to_factory(mcp_request)
-        
+
         assert factory_request["droid"] == "code"
         assert factory_request["action"] == "generate"
         assert factory_request["context"]["language"] == "python"
@@ -238,9 +239,9 @@ class TestCodeAdapter:
                 "stream_id": "stream_123",
             }
         }
-        
+
         mcp_response = await code_adapter.translate_to_mcp(factory_response)
-        
+
         assert mcp_response["result"]["streaming"] is True
         assert mcp_response["result"]["stream_id"] == "stream_123"
 
@@ -264,11 +265,11 @@ class TestDebugAdapter:
                 "error_type": "ConnectionError",
                 "stack_trace": "Traceback...",
                 "environment": "production",
-            }
+            },
         }
-        
+
         factory_request = await debug_adapter.translate_to_factory(mcp_request)
-        
+
         assert factory_request["droid"] == "debug"
         assert factory_request["action"] == "diagnose"
         assert factory_request["context"]["error_type"] == "ConnectionError"
@@ -283,11 +284,11 @@ class TestDebugAdapter:
                 "query": "SELECT * FROM users WHERE...",
                 "query_type": "sql",
                 "schema": {"users": ["id", "name", "email"]},
-            }
+            },
         }
-        
+
         factory_request = await debug_adapter.translate_to_factory(mcp_request)
-        
+
         assert factory_request["action"] == "optimize_query"
         assert factory_request["context"]["query_type"] == "sql"
         assert "users" in factory_request["context"]["schema"]
@@ -311,11 +312,11 @@ class TestReliabilityAdapter:
             "params": {
                 "system_state": {"cpu": 95, "memory": 85},
                 "alerts": [{"type": "high_cpu", "severity": "high"}],
-            }
+            },
         }
-        
+
         factory_request = await reliability_adapter.translate_to_factory(mcp_request)
-        
+
         assert factory_request["droid"] == "reliability"
         assert factory_request["action"] == "detect"
         assert factory_request["context"]["system_state"]["cpu"] == 95
@@ -329,14 +330,14 @@ class TestReliabilityAdapter:
             {"id": "alert2", "message": "High Memory"},
             {"id": "alert3", "message": "Disk Space Low"},
         ]
-        
+
         # Add alerts to buffer
         reliability_adapter.alert_buffer = alerts
-        
+
         # Process when threshold is reached
         reliability_adapter.alert_threshold = 3
         result = await reliability_adapter.process_alert_stream([])
-        
+
         assert "result" in result
         assert len(reliability_adapter.alert_buffer) == 0  # Buffer cleared
 
@@ -364,11 +365,11 @@ class TestKnowledgeAdapter:
                 "content": "PostgreSQL best practices...",
                 "collection": "documentation",
                 "metadata": {"category": "database"},
-            }
+            },
         }
-        
+
         factory_request = await knowledge_adapter.translate_to_factory(mcp_request)
-        
+
         assert factory_request["droid"] == "knowledge"
         assert factory_request["action"] == "store"
         assert factory_request["context"]["collection"] == "documentation"
@@ -383,11 +384,11 @@ class TestKnowledgeAdapter:
                 "query": "connection pooling",
                 "search_type": "semantic",
                 "max_results": 5,
-            }
+            },
         }
-        
+
         factory_request = await knowledge_adapter.translate_to_factory(mcp_request)
-        
+
         assert factory_request["action"] == "search"
         assert factory_request["context"]["query"] == "connection pooling"
         assert factory_request["options"]["max_results"] == 5
@@ -399,12 +400,12 @@ class TestKnowledgeAdapter:
             {"content": "Test document 1"},
             {"content": "Test document 2"},
         ]
-        
+
         # Pre-populate cache
         knowledge_adapter.embedding_cache["Test document 1"] = [0.1] * 1536
-        
+
         result = await knowledge_adapter.optimize_embeddings(documents)
-        
+
         assert result["result"]["cache_stats"]["cached"] == 1
         assert result["result"]["cache_stats"]["processed"] == 1
 
@@ -418,7 +419,7 @@ class TestIntegration:
         """Test health check functionality across all adapters."""
         mcp_server = MockMCPServer()
         droid_config = {"api_key": "test"}
-        
+
         adapters = [
             ArchitectAdapter(mcp_server, droid_config),
             CodeAdapter(mcp_server, droid_config),
@@ -426,7 +427,7 @@ class TestIntegration:
             ReliabilityAdapter(mcp_server, droid_config),
             KnowledgeAdapter(mcp_server, droid_config),
         ]
-        
+
         for adapter in adapters:
             health = await adapter.health_check()
             assert "healthy" in health
@@ -438,21 +439,21 @@ class TestIntegration:
         """Test circuit breaker behavior is consistent across adapters."""
         mcp_server = MockMCPServer()
         droid_config = {"failure_threshold": 2, "recovery_timeout": 1}
-        
+
         adapters = [
             ArchitectAdapter(mcp_server, droid_config),
             CodeAdapter(mcp_server, droid_config),
         ]
-        
+
         for adapter in adapters:
             # Make factory calls fail
             adapter._call_factory_droid = AsyncMock(side_effect=Exception("Test failure"))
-            
+
             # Process requests until circuit opens
             for _ in range(3):
                 response = await adapter.process_request({"method": "test"})
                 assert "result" in response  # Should fallback
-            
+
             # Circuit should be open
             assert adapter.circuit_breaker.state == CircuitState.OPEN
             assert adapter.metrics["fallback_count"] >= 2

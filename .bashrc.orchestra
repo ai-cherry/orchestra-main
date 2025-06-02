@@ -51,3 +51,37 @@ echo "  orchestra status  - Show deployment status"
 echo "  orchestra destroy - Tear down infrastructure"
 echo "  orchestra test    - Test the modular system"
 echo "  orchestra api     - Start the API locally"
+
+# Auto-activate virtual environment when in orchestra directory
+if [[ "$PWD" == *"/orchestra-main"* ]] && [[ -f "venv/bin/activate" ]]; then
+    source venv/bin/activate
+fi
+
+# Ensure critical services are running
+if [[ "$PWD" == *"/orchestra-main"* ]]; then
+    # Quick PostgreSQL check
+    if ! systemctl is-active --quiet postgresql 2>/dev/null; then
+        echo "⚠️  PostgreSQL is not running. Starting..."
+        sudo systemctl start postgresql
+    fi
+    
+    # Quick connection test (silent)
+    if ! PGPASSWORD=orch3str4_2024 psql -h localhost -U orchestrator -d orchestrator -c "SELECT 1;" >/dev/null 2>&1; then
+        echo "🔧 Fixing PostgreSQL permissions..."
+        sudo -u postgres psql -c "ALTER USER orchestrator WITH PASSWORD 'orch3str4_2024';" >/dev/null 2>&1
+    fi
+fi
+
+# Helpful aliases
+alias mcp-check='bash scripts/ensure_services_running.sh'
+alias mcp-logs='echo "MCP servers are started by Cursor - check Cursor logs"'
+alias orchestra-status='bash scripts/ensure_services_running.sh'
+
+# Show reminder on directory entry
+if [[ "$PWD" == *"/orchestra-main"* ]] && [[ -z "$ORCHESTRA_REMINDED" ]]; then
+    export ORCHESTRA_REMINDED=1
+    echo "🎼 Orchestra AI Environment"
+    echo "   MCP servers: Started automatically by Cursor"
+    echo "   Quick check: run 'orchestra-status'"
+    echo "   Config help: see CRITICAL_CONFIG.md"
+fi

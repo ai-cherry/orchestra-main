@@ -36,16 +36,16 @@ class PropertyEnrichmentAgent:
             Dict containing enriched property data.
         """
         logger.info(f"Enriching property data for {property_id}")
-        
+
         # Geocode the address
         geocoded_data = self._geocode_address(address)
-        
+
         # Get neighborhood information
         neighborhood_data = self._get_neighborhood_info(geocoded_data)
-        
+
         # Get property valuation estimate
         valuation_data = self._estimate_property_value(geocoded_data)
-        
+
         # Combine all data
         enriched_data = {
             "property_id": property_id,
@@ -54,10 +54,10 @@ class PropertyEnrichmentAgent:
             "neighborhood": neighborhood_data,
             "valuation": valuation_data,
         }
-        
+
         # Store in database
         self._store_enriched_data(property_id, enriched_data)
-        
+
         return enriched_data
 
     def _geocode_address(self, address: str):

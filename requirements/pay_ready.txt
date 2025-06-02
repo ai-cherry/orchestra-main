@@ -1,0 +1,50 @@
+# Pay Ready Domain Requirements
+# =============================
+# Dependencies for the Pay Ready ETL orchestration system
+
+# Core Dependencies
+aiohttp>=3.8.0,<4.0.0
+asyncio-throttle>=1.0.0
+asyncpg>=0.27.0
+
+# ETL and Orchestration
+prefect>=2.14.0,<3.0.0
+prefect-aws>=0.4.0  # For S3 result storage if needed
+prefect-slack>=0.2.0  # For Slack notifications
+
+# Entity Resolution
+rapidfuzz>=3.5.0,<4.0.0
+email-validator>=2.1.0,<3.0.0
+phonenumbers>=8.13.0  # For phone number normalization if needed
+
+# Vector Database
+weaviate-client>=4.4.0,<5.0.0
+
+# Data Processing
+pandas>=2.0.0,<3.0.0  # For data manipulation if needed
+pyarrow>=14.0.0  # For efficient data serialization
+
+# API Clients
+# Note: These are placeholders - actual Airbyte client may differ
+requests>=2.31.0,<3.0.0
+httpx>=0.25.0,<1.0.0  # Alternative async HTTP client
+
+# Monitoring and Logging
+prometheus-client>=0.19.0,<1.0.0
+structlog>=23.2.0,<24.0.0  # Structured logging
+
+# Testing (optional, for development)
+pytest>=7.4.0,<8.0.0
+pytest-asyncio>=0.21.0,<1.0.0
+pytest-cov>=4.1.0,<5.0.0
+pytest-mock>=3.12.0,<4.0.0
+
+# Type Checking (optional, for development)
+mypy>=1.7.0,<2.0.0
+types-requests>=2.31.0
+types-aiofiles>=23.2.0
+
+# Code Quality (optional, for development)
+black>=23.11.0,<24.0.0
+flake8>=6.1.0,<7.0.0
+isort>=5.12.0,<6.0.0

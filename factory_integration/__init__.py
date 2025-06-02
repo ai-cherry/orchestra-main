@@ -24,22 +24,21 @@ from .factory.context import FactoryContextManager
 
 def setup_factory_integration() -> None:
     """Initialize Factory AI integration.
-    
+
     This function sets up all necessary components for Factory AI integration,
     including database connections, cache initialization, and monitoring setup.
     """
     import logging
     import os
-    
+
     # Configure logging
     logging.basicConfig(
-        level=os.getenv("LOG_LEVEL", "INFO"),
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        level=os.getenv("LOG_LEVEL", "INFO"), format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
-    
+
     logger = logging.getLogger(__name__)
     logger.info("Initializing Factory AI integration...")
-    
+
     # Validate environment
     required_vars = [
         "FACTORY_AI_API_KEY",
@@ -47,11 +46,9 @@ def setup_factory_integration() -> None:
         "WEAVIATE_URL",
         "REDIS_URL",
     ]
-    
+
     missing_vars = [var for var in required_vars if not os.getenv(var)]
     if missing_vars:
-        raise EnvironmentError(
-            f"Missing required environment variables: {', '.join(missing_vars)}"
-        )
-    
+        raise EnvironmentError(f"Missing required environment variables: {', '.join(missing_vars)}")
+
     logger.info("Factory AI integration initialized successfully")

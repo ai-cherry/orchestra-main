@@ -1,0 +1,31 @@
+# Factory AI Integration Requirements
+# Phase 3.3: Context Management System
+
+# Core Dependencies
+asyncpg>=0.29.0          # PostgreSQL async driver
+aioredis>=2.0.1          # Redis async client
+weaviate-client>=4.4.0   # Weaviate vector database client
+pydantic>=2.5.0          # Data validation and settings
+numpy>=1.24.0            # Numerical operations for embeddings
+
+# Optional Dependencies (for embeddings generation)
+openai>=1.0.0            # For generating embeddings with OpenAI
+tiktoken>=0.5.0          # Token counting for OpenAI models
+
+# Development Dependencies
+pytest>=7.4.0            # Testing framework
+pytest-asyncio>=0.21.0   # Async test support
+pytest-cov>=4.1.0        # Coverage reporting
+pytest-mock>=3.12.0      # Mocking support
+black>=23.0.0            # Code formatting
+isort>=5.12.0            # Import sorting
+mypy>=1.7.0              # Type checking
+flake8>=6.1.0            # Linting
+
+# Monitoring and Logging
+structlog>=23.2.0        # Structured logging
+prometheus-client>=0.19.0 # Metrics collection
+
+# Configuration
+pyyaml>=6.0.1            # YAML configuration parsing
+python-dotenv>=1.0.0     # Environment variable management

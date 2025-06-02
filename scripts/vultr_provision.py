@@ -24,7 +24,9 @@ def _headers(api_key: str) -> dict[str, str]:
     return {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
 
-def create_instance(api_key: str, region: str, plan: str, os_id: str, label: str, ssh_key: Optional[str]) -> tuple[str, str]:
+def create_instance(
+    api_key: str, region: str, plan: str, os_id: str, label: str, ssh_key: Optional[str]
+) -> tuple[str, str]:
     payload = {"region": region, "plan": plan, "os_id": os_id, "label": label}
     if ssh_key:
         payload["sshkey_id"] = ssh_key

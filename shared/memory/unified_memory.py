@@ -45,16 +45,10 @@ class MemoryItem(BaseModel):
     content: str = Field(..., description="Content of the memory")
     source: str = Field(..., description="Source of the memory (e.g., agent ID)")
     timestamp: str = Field(..., description="Timestamp when memory was created")
-    metadata: Dict[str, Any] = Field(
-        default_factory=dict, description="Additional metadata"
-    )
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     priority: float = Field(default=0.5, description="Priority of the memory (0.0-1.0)")
-    embedding: Optional[List[float]] = Field(
-        default=None, description="Vector embedding of the memory content"
-    )
-    domain: Optional[str] = Field(
-        default="Personal", description="Business domain (Personal, PayReady, ParagonRX)"
-    )
+    embedding: Optional[List[float]] = Field(default=None, description="Vector embedding of the memory content")
+    domain: Optional[str] = Field(default="Personal", description="Business domain (Personal, PayReady, ParagonRX)")
 
 
 # --- Domain Collection Types ---
@@ -65,7 +59,7 @@ DomainType = Literal["Personal", "PayReady", "ParagonRX", "Session"]
 class UnifiedMemory:
     """
     UnifiedMemory provides a seamless, high-performance interface for storing, retrieving,
-    searching, and deleting memory items across Weaviate (primary), PostgreSQL (ACID), 
+    searching, and deleting memory items across Weaviate (primary), PostgreSQL (ACID),
     and optionally DragonflyDB (cache) backends.
 
     Backend selection is controlled via environment variables or constructor arguments.
@@ -114,17 +108,13 @@ class UnifiedMemory:
         # --- DragonflyDB (Redis-compatible - Optional Cache) ---
         self.dragonfly = None
         if use_dragonfly and redis:
-            self.dragonfly = redis.Redis.from_url(
-                dragonfly_url or settings.dragonfly_url or "redis://localhost:6379/0"
-            )
+            self.dragonfly = redis.Redis.from_url(dragonfly_url or settings.dragonfly_url or "redis://localhost:6379/0")
 
         # --- Firestore (Legacy Support) ---
         self.firestore = None
         self.firestore_collection = firestore_collection
         if use_firestore and firestore:
-            self.firestore = firestore.Client(
-                project=firestore_project or settings.gcp_project_id
-            )
+            self.firestore = firestore.Client(project=firestore_project or settings.gcp_project_id)
 
     def _ensure_postgres_table(self):
         """Create the memory_items table in PostgreSQL if it doesn't exist."""
@@ -154,11 +144,11 @@ class UnifiedMemory:
         """Map domain to the appropriate Weaviate collection."""
         if not domain or domain == "Session":
             return self.weaviate_class
-        
+
         # Map to one of the three business domains
         if domain in ["Personal", "PayReady", "ParagonRX"]:
             return domain
-        
+
         # Default to Session for unknown domains
         return self.weaviate_class
 
@@ -171,7 +161,7 @@ class UnifiedMemory:
         # Generate ID if not provided
         if not item.id:
             item.id = str(uuid.uuid4())
-            
+
         # Set timestamp if not provided
         if not item.timestamp:
             item.timestamp = datetime.now().isoformat()
@@ -240,9 +230,7 @@ class UnifiedMemory:
 
         # Firestore (legacy support)
         if self.firestore:
-            self.firestore.collection(self.firestore_collection).document(item.id).set(
-                item.dict()
-            )
+            self.firestore.collection(self.firestore_collection).document(item.id).set(item.dict())
 
         return item.id
 
@@ -251,37 +239,37 @@ class UnifiedMemory:
         """
         Store structured data requiring ACID guarantees in PostgreSQL.
         Ideal for billing records, job status, and other transactional data.
-        
+
         Args:
             table: PostgreSQL table name
             data: Dictionary of column:value pairs
             key_field: Primary key field name
-            
+
         Returns:
             ID of the stored record
         """
         if not self.postgres:
             raise RuntimeError("PostgreSQL is required for structured_store operations")
-            
+
         # Ensure ID exists
         if key_field not in data:
             data[key_field] = str(uuid.uuid4())
-            
+
         try:
             # Dynamically build SQL based on data dict
             columns = list(data.keys())
             placeholders = ["%s"] * len(columns)
             values = [data[col] for col in columns]
-            
+
             # Handle JSON fields
             for i, val in enumerate(values):
                 if isinstance(val, dict) or isinstance(val, list):
                     values[i] = psycopg2.extras.Json(val)
-            
+
             # Build update clause for conflict resolution
             update_clauses = [f"{col} = EXCLUDED.{col}" for col in columns if col != key_field]
             update_sql = ", ".join(update_clauses)
-            
+
             with self.postgres.cursor() as cursor:
                 cursor.execute(
                     f"""
@@ -293,7 +281,7 @@ class UnifiedMemory:
                     values,
                 )
                 self.postgres.commit()
-                
+
             return data[key_field]
         except Exception as e:
             print(f"PostgreSQL structured_store error: {e}")
@@ -305,23 +293,21 @@ class UnifiedMemory:
     def retrieve(self, memory_id: str, domain: Optional[str] = None) -> Optional[MemoryItem]:
         """
         Retrieve a memory item by ID, preferring Weaviate, then PostgreSQL, then cache.
-        
+
         Args:
             memory_id: The ID of the memory item to retrieve
             domain: Optional domain to search in (Personal, PayReady, ParagonRX)
-            
+
         Returns:
             MemoryItem if found, None otherwise
         """
         weaviate_class = self._get_collection_for_domain(domain)
-        
+
         # Try Weaviate first (primary)
         if self.weaviate:
             try:
                 result = self.weaviate.data_object.get_by_id(
-                    uuid=memory_id, 
-                    class_name=weaviate_class, 
-                    with_vector=True
+                    uuid=memory_id, class_name=weaviate_class, with_vector=True
                 )
                 if result:
                     # Extract vector from _additional if present
@@ -329,12 +315,9 @@ class UnifiedMemory:
                     if "_additional" in result and "vector" in result["_additional"]:
                         embedding = result["_additional"]["vector"]
                         del result["_additional"]
-                    
+
                     # Create MemoryItem from result
-                    return MemoryItem(
-                        **result,
-                        embedding=embedding
-                    )
+                    return MemoryItem(**result, embedding=embedding)
             except Exception as e:
                 print(f"Weaviate retrieve error: {e}")
 
@@ -355,6 +338,7 @@ class UnifiedMemory:
                         item_dict = dict(row)
                         if isinstance(item_dict["metadata"], str):
                             import json
+
                             item_dict["metadata"] = json.loads(item_dict["metadata"])
                         return MemoryItem(**item_dict)
             except Exception as e:
@@ -370,11 +354,7 @@ class UnifiedMemory:
 
         # Fallback to Firestore (legacy)
         if self.firestore:
-            doc = (
-                self.firestore.collection(self.firestore_collection)
-                .document(memory_id)
-                .get()
-            )
+            doc = self.firestore.collection(self.firestore_collection).document(memory_id).get()
             if doc.exists:
                 return MemoryItem(**doc.to_dict())
 
@@ -382,29 +362,29 @@ class UnifiedMemory:
 
     # --- Search Memory (Semantic/Vector) ---
     def search(
-        self, 
-        query: Union[str, List[float]], 
+        self,
+        query: Union[str, List[float]],
         limit: int = 10,
         domain: Optional[str] = None,
-        filters: Optional[Dict[str, Any]] = None
+        filters: Optional[Dict[str, Any]] = None,
     ) -> List[MemoryItem]:
         """
         Search memory items across backends.
         - If query is a vector: perform semantic search in Weaviate (primary).
         - If query is a string: perform hybrid search in Weaviate or text search in other backends.
-        
+
         Args:
             query: Vector for semantic search or text for keyword search
             limit: Maximum number of results to return
             domain: Optional domain to search in (Personal, PayReady, ParagonRX)
             filters: Optional filters to apply to the search
-            
+
         Returns:
             List of matching MemoryItem objects
         """
         results = []
         weaviate_class = self._get_collection_for_domain(domain)
-        
+
         # Prepare filters for Weaviate
         weaviate_where = None
         if filters:
@@ -413,17 +393,15 @@ class UnifiedMemory:
             for key, value in filters.items():
                 if isinstance(value, list):
                     # Handle IN operator
-                    weaviate_where["operands"].append({
-                        "operator": "Or",
-                        "operands": [{"path": [key], "operator": "Equal", "valueString": v} for v in value]
-                    })
+                    weaviate_where["operands"].append(
+                        {
+                            "operator": "Or",
+                            "operands": [{"path": [key], "operator": "Equal", "valueString": v} for v in value],
+                        }
+                    )
                 else:
                     # Handle simple equality
-                    weaviate_where["operands"].append({
-                        "path": [key],
-                        "operator": "Equal",
-                        "valueString": value
-                    })
+                    weaviate_where["operands"].append({"path": [key], "operator": "Equal", "valueString": value})
 
         # Vector search in Weaviate (primary approach)
         if self.weaviate:
@@ -431,62 +409,54 @@ class UnifiedMemory:
                 if isinstance(query, list):
                     # Vector search
                     result = (
-                        self.weaviate.query
-                        .get(weaviate_class, ["*", "_additional { id distance vector }"])
+                        self.weaviate.query.get(weaviate_class, ["*", "_additional { id distance vector }"])
                         .with_near_vector({"vector": query})
                         .with_limit(limit)
                     )
-                    
+
                     # Apply filters if provided
                     if weaviate_where:
                         result = result.with_where(weaviate_where)
-                        
+
                     # Execute query
                     res = result.do()
-                    
+
                     # Process results
                     matches = res.get("data", {}).get("Get", {}).get(weaviate_class, [])
                     for m in matches:
                         # Extract and remove _additional
                         additional = m.pop("_additional", {})
                         embedding = additional.get("vector")
-                        
+
                         # Create MemoryItem
-                        results.append(MemoryItem(
-                            **m,
-                            embedding=embedding
-                        ))
-                    
+                        results.append(MemoryItem(**m, embedding=embedding))
+
                     return results
                 else:
                     # Text/hybrid search
                     result = (
-                        self.weaviate.query
-                        .get(weaviate_class, ["*", "_additional { id distance vector }"])
+                        self.weaviate.query.get(weaviate_class, ["*", "_additional { id distance vector }"])
                         .with_hybrid(query=query, alpha=0.5)  # Hybrid search with ACORN
                         .with_limit(limit)
                     )
-                    
+
                     # Apply filters if provided
                     if weaviate_where:
                         result = result.with_where(weaviate_where)
-                        
+
                     # Execute query
                     res = result.do()
-                    
+
                     # Process results
                     matches = res.get("data", {}).get("Get", {}).get(weaviate_class, [])
                     for m in matches:
                         # Extract and remove _additional
                         additional = m.pop("_additional", {})
                         embedding = additional.get("vector")
-                        
+
                         # Create MemoryItem
-                        results.append(MemoryItem(
-                            **m,
-                            embedding=embedding
-                        ))
-                    
+                        results.append(MemoryItem(**m, embedding=embedding))
+
                     if results:
                         return results
             except Exception as e:
@@ -497,12 +467,12 @@ class UnifiedMemory:
             try:
                 sql_filters = []
                 sql_params = [f"%{query}%"]  # For content LIKE
-                
+
                 # Add domain filter if provided
                 if domain:
                     sql_filters.append("domain = %s")
                     sql_params.append(domain)
-                
+
                 # Add additional filters if provided
                 if filters:
                     for key, value in filters.items():
@@ -513,12 +483,12 @@ class UnifiedMemory:
                         else:
                             sql_filters.append(f"{key} = %s")
                             sql_params.append(value)
-                
+
                 # Build WHERE clause
                 where_clause = "content ILIKE %s"
                 if sql_filters:
                     where_clause += " AND " + " AND ".join(sql_filters)
-                
+
                 with self.postgres.cursor(cursor_factory=psycopg2.extras.DictCursor) as cursor:
                     cursor.execute(
                         f"""
@@ -535,9 +505,10 @@ class UnifiedMemory:
                         item_dict = dict(row)
                         if isinstance(item_dict["metadata"], str):
                             import json
+
                             item_dict["metadata"] = json.loads(item_dict["metadata"])
                         results.append(MemoryItem(**item_dict))
-                    
+
                     if results:
                         return results
             except Exception as e:
@@ -551,20 +522,20 @@ class UnifiedMemory:
                 if domain:
                     # We'll filter in-memory since Redis doesn't support complex patterns
                     pass
-                
+
                 # Scan keys and filter by content
                 for key in self.dragonfly.scan_iter(key_pattern):
                     data = self.dragonfly.hgetall(key)
                     if not data:
                         continue
-                        
+
                     # Decode data
                     decoded = {k.decode(): v.decode() for k, v in data.items()}
-                    
+
                     # Check domain filter if provided
                     if domain and decoded.get("domain") != domain:
                         continue
-                        
+
                     # Check additional filters if provided
                     if filters:
                         skip = False
@@ -579,7 +550,7 @@ class UnifiedMemory:
                                     break
                         if skip:
                             continue
-                    
+
                     # Check if content contains query
                     if query.lower() in decoded.get("content", "").lower():
                         results.append(MemoryItem(**decoded))
@@ -593,11 +564,11 @@ class UnifiedMemory:
             try:
                 # Start with base query
                 base_query = self.firestore.collection(self.firestore_collection)
-                
+
                 # Apply domain filter if provided
                 if domain:
                     base_query = base_query.where("domain", "==", domain)
-                
+
                 # Apply additional filters if provided
                 filtered_query = base_query
                 if filters:
@@ -608,14 +579,14 @@ class UnifiedMemory:
                             pass
                         else:
                             filtered_query = filtered_query.where(key, "==", value)
-                
+
                 # Execute query
                 docs = filtered_query.limit(100).stream()
-                
+
                 # Process results and apply in-memory filtering
                 for doc in docs:
                     data = doc.to_dict()
-                    
+
                     # Apply list filters in-memory if needed
                     if filters:
                         skip = False
@@ -626,7 +597,7 @@ class UnifiedMemory:
                                     break
                         if skip:
                             continue
-                    
+
                     # Check if content contains query
                     if query.lower() in data.get("content", "").lower():
                         results.append(MemoryItem(**data))
@@ -642,11 +613,11 @@ class UnifiedMemory:
         """
         Delete a memory item from all enabled backends.
         Returns True if deleted from at least one backend.
-        
+
         Args:
             memory_id: ID of the memory item to delete
             domain: Optional domain the memory belongs to
-            
+
         Returns:
             True if successfully deleted from at least one backend
         """
@@ -656,9 +627,7 @@ class UnifiedMemory:
         # Delete from Weaviate (primary)
         if self.weaviate:
             try:
-                self.weaviate.data_object.delete(
-                    uuid=memory_id, class_name=weaviate_class
-                )
+                self.weaviate.data_object.delete(uuid=memory_id, class_name=weaviate_class)
                 deleted = True
             except Exception as e:
                 print(f"Weaviate delete error: {e}")
@@ -687,9 +656,7 @@ class UnifiedMemory:
 
         # Delete from Firestore (legacy)
         if self.firestore:
-            self.firestore.collection(self.firestore_collection).document(
-                memory_id
-            ).delete()
+            self.firestore.collection(self.firestore_collection).document(memory_id).delete()
             deleted = True
 
         return deleted
@@ -700,14 +667,14 @@ class UnifiedMemory:
         Returns a dictionary indicating the health of each backend.
         """
         status = {}
-        
+
         # Weaviate (primary)
         if self.weaviate:
             try:
                 status["weaviate"] = self.weaviate.is_ready()
             except Exception:
                 status["weaviate"] = False
-                
+
         # PostgreSQL (ACID)
         if self.postgres:
             try:
@@ -716,14 +683,14 @@ class UnifiedMemory:
                     status["postgres"] = cursor.fetchone()[0] == 1
             except Exception:
                 status["postgres"] = False
-                
+
         # DragonflyDB (cache)
         if self.dragonfly:
             try:
                 status["dragonfly"] = self.dragonfly.ping()
             except Exception:
                 status["dragonfly"] = False
-                
+
         # Firestore (legacy)
         if self.firestore:
             try:
@@ -732,19 +699,14 @@ class UnifiedMemory:
                 status["firestore"] = True
             except Exception:
                 status["firestore"] = False
-                
+
         return status
 
 
 # --- Example Usage ---
 if __name__ == "__main__":
     # Example: Initialize UnifiedMemory with Weaviate-first configuration
-    memory = UnifiedMemory(
-        use_weaviate=True,
-        use_postgres=True,
-        use_dragonfly=False,
-        use_firestore=False
-    )
+    memory = UnifiedMemory(use_weaviate=True, use_postgres=True, use_dragonfly=False, use_firestore=False)
 
     # Example: Store a memory item in Personal domain
     item = MemoryItem(
@@ -755,7 +717,7 @@ if __name__ == "__main__":
         metadata={"demo": True},
         priority=0.8,
         embedding=[0.1, 0.2, 0.3, 0.4, 0.5],
-        domain="Personal"
+        domain="Personal",
     )
     memory.store(item)
 
@@ -767,8 +729,8 @@ if __name__ == "__main__":
                 "job_name": "data_import",
                 "status": "running",
                 "started_at": datetime.now().isoformat(),
-                "params": {"source": "api", "batch_size": 100}
-            }
+                "params": {"source": "api", "batch_size": 100},
+            },
         )
         print(f"Stored job with ID: {job_id}")
     except Exception as e:
@@ -779,18 +741,11 @@ if __name__ == "__main__":
     print("Retrieved:", retrieved)
 
     # Example: Search in PayReady domain with filters
-    results = memory.search(
-        "apartment", 
-        domain="PayReady",
-        filters={"status": "active"}
-    )
+    results = memory.search("apartment", domain="PayReady", filters={"status": "active"})
     print("Text search results:", results)
 
     # Example: Vector search in ParagonRX domain
-    results = memory.search(
-        [0.1, 0.2, 0.3, 0.4, 0.5],
-        domain="ParagonRX"
-    )
+    results = memory.search([0.1, 0.2, 0.3, 0.4, 0.5], domain="ParagonRX")
     print("Vector search results:", results)
 
     # Example: Delete

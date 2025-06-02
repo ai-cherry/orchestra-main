@@ -67,9 +67,7 @@ class ReliabilityAdapter(FactoryMCPAdapter):
         self.alert_buffer: List[Dict[str, Any]] = []
         self.remediation_history: List[Dict[str, Any]] = []
 
-    async def translate_to_factory(
-        self, mcp_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def translate_to_factory(self, mcp_request: Dict[str, Any]) -> Dict[str, Any]:
         """Translate MCP request to Factory AI Reliability format.
 
         Args:
@@ -93,9 +91,7 @@ class ReliabilityAdapter(FactoryMCPAdapter):
                 "historical_data": params.get("historical_data", {}),
             },
             "options": {
-                "severity_threshold": params.get(
-                    "severity_threshold", IncidentSeverity.MEDIUM.value
-                ),
+                "severity_threshold": params.get("severity_threshold", IncidentSeverity.MEDIUM.value),
                 "auto_remediate": params.get("auto_remediate", self.auto_remediation),
                 "correlation_window": params.get("correlation_window", 300),
                 "include_predictions": params.get("include_predictions", True),
@@ -106,39 +102,23 @@ class ReliabilityAdapter(FactoryMCPAdapter):
         # Handle specific reliability scenarios
         if method == "manage_incident":
             factory_request["context"]["incident_id"] = params.get("incident_id", "")
-            factory_request["context"]["incident_details"] = params.get(
-                "incident_details", {}
-            )
-            factory_request["context"]["affected_services"] = params.get(
-                "affected_services", []
-            )
+            factory_request["context"]["incident_details"] = params.get("incident_details", {})
+            factory_request["context"]["affected_services"] = params.get("affected_services", [])
 
         elif method == "aggregate_alerts":
-            factory_request["context"]["time_window"] = params.get(
-                "time_window", 3600
-            )
-            factory_request["context"]["grouping_rules"] = params.get(
-                "grouping_rules", {}
-            )
-            factory_request["options"]["deduplication"] = params.get(
-                "deduplication", True
-            )
+            factory_request["context"]["time_window"] = params.get("time_window", 3600)
+            factory_request["context"]["grouping_rules"] = params.get("grouping_rules", {})
+            factory_request["options"]["deduplication"] = params.get("deduplication", True)
 
         elif method == "trigger_remediation":
-            factory_request["context"]["remediation_type"] = params.get(
-                "remediation_type", "auto"
-            )
-            factory_request["context"]["target_resources"] = params.get(
-                "resources", []
-            )
+            factory_request["context"]["remediation_type"] = params.get("remediation_type", "auto")
+            factory_request["context"]["target_resources"] = params.get("resources", [])
             factory_request["context"]["playbook"] = params.get("playbook", {})
 
         logger.debug(f"Translated to Factory request: {factory_request}")
         return factory_request
 
-    async def translate_to_mcp(
-        self, factory_response: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def translate_to_mcp(self, factory_response: Dict[str, Any]) -> Dict[str, Any]:
         """Translate Factory AI Reliability response to MCP format.
 
         Args:
@@ -151,9 +131,7 @@ class ReliabilityAdapter(FactoryMCPAdapter):
             return {
                 "error": {
                     "code": -32603,
-                    "message": factory_response["error"].get(
-                        "message", "Unknown error"
-                    ),
+                    "message": factory_response["error"].get("message", "Unknown error"),
                     "data": factory_response["error"].get("details", {}),
                 }
             }
@@ -163,9 +141,7 @@ class ReliabilityAdapter(FactoryMCPAdapter):
             "result": {
                 "incidents": self._format_incidents(result.get("incidents", [])),
                 "alerts": result.get("alerts", []),
-                "remediation_actions": self._format_remediation_actions(
-                    result.get("remediation_actions", [])
-                ),
+                "remediation_actions": self._format_remediation_actions(result.get("remediation_actions", [])),
                 "reliability_score": result.get("reliability_score", 0),
                 "recommendations": result.get("recommendations", []),
                 "predictions": result.get("predictions", {}),
@@ -198,9 +174,7 @@ class ReliabilityAdapter(FactoryMCPAdapter):
         logger.debug(f"Translated to MCP response: {mcp_response}")
         return mcp_response
 
-    async def _call_factory_droid(
-        self, factory_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _call_factory_droid(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
         """Call the Factory AI Reliability droid.
 
         Args:
@@ -216,9 +190,7 @@ class ReliabilityAdapter(FactoryMCPAdapter):
             if not self._factory_client:
                 self._factory_client = FactoryAI(
                     api_key=self.droid_config.get("api_key"),
-                    base_url=self.droid_config.get(
-                        "base_url", "https://api.factory.ai"
-                    ),
+                    base_url=self.droid_config.get("base_url", "https://api.factory.ai"),
                 )
 
             # Call the Reliability droid
@@ -262,9 +234,7 @@ class ReliabilityAdapter(FactoryMCPAdapter):
         }
         return method_mapping.get(method, "detect")
 
-    def _format_incidents(
-        self, incidents: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+    def _format_incidents(self, incidents: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Format incidents for MCP response.
 
         Args:
@@ -292,9 +262,7 @@ class ReliabilityAdapter(FactoryMCPAdapter):
             )
         return formatted_incidents
 
-    def _format_remediation_actions(
-        self, actions: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+    def _format_remediation_actions(self, actions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Format remediation actions for MCP response.
 
         Args:
@@ -318,7 +286,7 @@ class ReliabilityAdapter(FactoryMCPAdapter):
                 "rollback_plan": action.get("rollback_plan", ""),
             }
             formatted_actions.append(formatted_action)
-            
+
             # Track remediation history
             self.remediation_history.append(
                 {
@@ -326,12 +294,10 @@ class ReliabilityAdapter(FactoryMCPAdapter):
                     "timestamp": datetime.now().isoformat(),
                 }
             )
-        
+
         return formatted_actions
 
-    def _get_mock_response(
-        self, factory_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def _get_mock_response(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
         """Generate mock response for testing.
 
         Args:
@@ -341,7 +307,7 @@ class ReliabilityAdapter(FactoryMCPAdapter):
             Mock response
         """
         action = factory_request["action"]
-        
+
         if action == "detect":
             return {
                 "result": {
@@ -376,7 +342,7 @@ class ReliabilityAdapter(FactoryMCPAdapter):
                     "version": "1.0.0",
                 }
             }
-        
+
         elif action == "aggregate":
             return {
                 "result": {
@@ -409,7 +375,7 @@ class ReliabilityAdapter(FactoryMCPAdapter):
                     "analysis_time": 1.2,
                 }
             }
-        
+
         elif action == "remediate":
             return {
                 "result": {
@@ -435,7 +401,7 @@ kubectl rollout restart deployment/postgres""",
                     "analysis_time": 0.5,
                 }
             }
-        
+
         elif action == "generate_runbook":
             return {
                 "result": {
@@ -471,7 +437,7 @@ If issues persist, revert to previous configuration.""",
                     "version": "1.0.0",
                 }
             }
-        
+
         return {
             "result": {
                 "message": f"Mock response for action: {action}",
@@ -480,9 +446,7 @@ If issues persist, revert to previous configuration.""",
             }
         }
 
-    async def process_alert_stream(
-        self, alerts: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+    async def process_alert_stream(self, alerts: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Process a stream of alerts for correlation and aggregation.
 
         Args:
@@ -493,7 +457,7 @@ If issues persist, revert to previous configuration.""",
         """
         # Add to buffer
         self.alert_buffer.extend(alerts)
-        
+
         # Check if we should trigger aggregation
         if len(self.alert_buffer) >= self.alert_threshold:
             request = {
@@ -504,14 +468,14 @@ If issues persist, revert to previous configuration.""",
                     "deduplication": True,
                 },
             }
-            
+
             result = await self.process_request(request)
-            
+
             # Clear buffer after processing
             self.alert_buffer.clear()
-            
+
             return result
-        
+
         return {
             "result": {
                 "buffered_alerts": len(self.alert_buffer),

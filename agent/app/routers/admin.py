@@ -57,7 +57,7 @@ async def get_agents(api_key: str = Depends(verify_api_key)) -> List[Agent]:
     """Get list of all agents - REAL agents doing REAL work."""
     # Get actual agents from the real agent service
     agents_data = await get_all_agents()
-    
+
     # Convert to API model
     return [Agent(**agent_data) for agent_data in agents_data]
 
@@ -66,10 +66,10 @@ async def get_agents(api_key: str = Depends(verify_api_key)) -> List[Agent]:
 async def process_query(request: QueryRequest, api_key: str = Depends(verify_api_key)) -> QueryResponse:
     """Process a query through the orchestrator - actually run tasks on agents."""
     from datetime import datetime
-    
+
     # Determine which agent should handle this query
     query_lower = request.query.lower()
-    
+
     if "cpu" in query_lower or "memory" in query_lower or "disk" in query_lower or "system" in query_lower:
         agent_id = "sys-001"
     elif "analyze" in query_lower or "count" in query_lower or "data" in query_lower:
@@ -79,7 +79,7 @@ async def process_query(request: QueryRequest, api_key: str = Depends(verify_api
     else:
         # Default to system agent
         agent_id = "sys-001"
-    
+
     try:
         # Actually run the task on the agent
         result = await run_agent_task(agent_id, request.query)
@@ -113,4 +113,3 @@ async def get_metrics(api_key: str = Depends(verify_api_key)) -> Dict[str, Any]:
     """Get REAL system metrics from the ACTUAL running system."""
     # Get real metrics from the system
     return await get_system_metrics()
-

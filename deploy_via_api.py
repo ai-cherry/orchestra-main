@@ -8,7 +8,7 @@ files_to_deploy = {
     "agent/app/services/real_agents.py": open("agent/app/services/real_agents.py").read(),
     "agent/app/services/__init__.py": open("agent/app/services/__init__.py").read(),
     "agent/app/routers/admin.py": open("agent/app/routers/admin.py").read(),
-    "test_real_agents.py": open("test_real_agents.py").read()
+    "test_real_agents.py": open("test_real_agents.py").read(),
 }
 
 # Create deployment script
@@ -56,7 +56,7 @@ curl -X GET "http://localhost:8080/api/agents" -H "X-API-Key: 4010007a9aa5443fc7
     real_agents=files_to_deploy["agent/app/services/real_agents.py"],
     services_init=files_to_deploy["agent/app/services/__init__.py"],
     admin_router=files_to_deploy["agent/app/routers/admin.py"],
-    test_script=files_to_deploy["test_real_agents.py"]
+    test_script=files_to_deploy["test_real_agents.py"],
 )
 
 # Save deployment script
@@ -72,4 +72,4 @@ print("3. Create the script: nano /tmp/deploy_real_agents.sh")
 print("4. Paste the content and save (Ctrl+X, Y, Enter)")
 print("5. Run it: bash /tmp/deploy_real_agents.sh")
 print("")
-print("Or use the web terminal at https://my.vultr.com/") 
+print("Or use the web terminal at https://my.vultr.com/")

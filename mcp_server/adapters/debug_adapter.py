@@ -43,9 +43,7 @@ class DebugAdapter(FactoryMCPAdapter):
         self.profiling_enabled = droid_config.get("profiling_enabled", True)
         self.max_stack_depth = droid_config.get("max_stack_depth", 50)
 
-    async def translate_to_factory(
-        self, mcp_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def translate_to_factory(self, mcp_request: Dict[str, Any]) -> Dict[str, Any]:
         """Translate MCP request to Factory AI Debug format.
 
         Args:
@@ -80,45 +78,25 @@ class DebugAdapter(FactoryMCPAdapter):
         # Handle specific debugging scenarios
         if method == "optimize_query":
             factory_request["context"]["query"] = params.get("query", "")
-            factory_request["context"]["query_type"] = params.get(
-                "query_type", "sql"
-            )
+            factory_request["context"]["query_type"] = params.get("query_type", "sql")
             factory_request["context"]["schema"] = params.get("schema", {})
-            factory_request["context"]["execution_plan"] = params.get(
-                "execution_plan", ""
-            )
-            factory_request["context"]["performance_metrics"] = params.get(
-                "metrics", {}
-            )
+            factory_request["context"]["execution_plan"] = params.get("execution_plan", "")
+            factory_request["context"]["performance_metrics"] = params.get("metrics", {})
 
         elif method == "analyze_stack_trace":
-            factory_request["context"]["exception_type"] = params.get(
-                "exception_type", ""
-            )
-            factory_request["context"]["source_maps"] = params.get(
-                "source_maps", {}
-            )
-            factory_request["options"]["symbolicate"] = params.get(
-                "symbolicate", True
-            )
+            factory_request["context"]["exception_type"] = params.get("exception_type", "")
+            factory_request["context"]["source_maps"] = params.get("source_maps", {})
+            factory_request["options"]["symbolicate"] = params.get("symbolicate", True)
 
         elif method == "profile_performance":
-            factory_request["context"]["profile_data"] = params.get(
-                "profile_data", {}
-            )
-            factory_request["context"]["bottlenecks"] = params.get(
-                "bottlenecks", []
-            )
-            factory_request["context"]["resource_usage"] = params.get(
-                "resource_usage", {}
-            )
+            factory_request["context"]["profile_data"] = params.get("profile_data", {})
+            factory_request["context"]["bottlenecks"] = params.get("bottlenecks", [])
+            factory_request["context"]["resource_usage"] = params.get("resource_usage", {})
 
         logger.debug(f"Translated to Factory request: {factory_request}")
         return factory_request
 
-    async def translate_to_mcp(
-        self, factory_response: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def translate_to_mcp(self, factory_response: Dict[str, Any]) -> Dict[str, Any]:
         """Translate Factory AI Debug response to MCP format.
 
         Args:
@@ -131,9 +109,7 @@ class DebugAdapter(FactoryMCPAdapter):
             return {
                 "error": {
                     "code": -32603,
-                    "message": factory_response["error"].get(
-                        "message", "Unknown error"
-                    ),
+                    "message": factory_response["error"].get("message", "Unknown error"),
                     "data": factory_response["error"].get("details", {}),
                 }
             }
@@ -143,9 +119,7 @@ class DebugAdapter(FactoryMCPAdapter):
             "result": {
                 "diagnosis": result.get("diagnosis", {}),
                 "root_cause": result.get("root_cause", ""),
-                "solutions": self._format_solutions(
-                    result.get("solutions", [])
-                ),
+                "solutions": self._format_solutions(result.get("solutions", [])),
                 "stack_analysis": result.get("stack_analysis", {}),
                 "performance_insights": result.get("performance_insights", {}),
                 "recommendations": result.get("recommendations", []),
@@ -179,9 +153,7 @@ class DebugAdapter(FactoryMCPAdapter):
         logger.debug(f"Translated to MCP response: {mcp_response}")
         return mcp_response
 
-    async def _call_factory_droid(
-        self, factory_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _call_factory_droid(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
         """Call the Factory AI Debug droid.
 
         Args:
@@ -197,9 +169,7 @@ class DebugAdapter(FactoryMCPAdapter):
             if not self._factory_client:
                 self._factory_client = FactoryAI(
                     api_key=self.droid_config.get("api_key"),
-                    base_url=self.droid_config.get(
-                        "base_url", "https://api.factory.ai"
-                    ),
+                    base_url=self.droid_config.get("base_url", "https://api.factory.ai"),
                 )
 
             # Call the Debug droid
@@ -238,9 +208,7 @@ class DebugAdapter(FactoryMCPAdapter):
         }
         return method_mapping.get(method, "diagnose")
 
-    def _format_solutions(
-        self, solutions: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+    def _format_solutions(self, solutions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Format debug solutions for MCP response.
 
         Args:
@@ -264,9 +232,7 @@ class DebugAdapter(FactoryMCPAdapter):
             )
         return formatted_solutions
 
-    def _get_mock_response(
-        self, factory_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def _get_mock_response(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
         """Generate mock response for testing.
 
         Args:
@@ -276,7 +242,7 @@ class DebugAdapter(FactoryMCPAdapter):
             Mock response
         """
         action = factory_request["action"]
-        
+
         if action == "diagnose":
             return {
                 "result": {
@@ -333,7 +299,7 @@ def get_db_connection():
                     "version": "1.0.0",
                 }
             }
-        
+
         elif action == "optimize_query":
             return {
                 "result": {
@@ -362,7 +328,7 @@ CREATE INDEX idx_orders_user_id ON orders(user_id);""",
                     "analysis_time": 0.8,
                 }
             }
-        
+
         elif action == "profile":
             return {
                 "result": {
@@ -407,7 +373,7 @@ CREATE INDEX idx_orders_user_id ON orders(user_id);""",
                     "version": "1.0.0",
                 }
             }
-        
+
         return {
             "result": {
                 "message": f"Mock response for action: {action}",
@@ -416,9 +382,7 @@ CREATE INDEX idx_orders_user_id ON orders(user_id);""",
             }
         }
 
-    async def analyze_error_context(
-        self, error: Exception, context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def analyze_error_context(self, error: Exception, context: Dict[str, Any]) -> Dict[str, Any]:
         """Analyze error with additional context.
 
         Args:
@@ -430,7 +394,7 @@ CREATE INDEX idx_orders_user_id ON orders(user_id);""",
         """
         stack_trace = traceback.format_exc()
         error_type = type(error).__name__
-        
+
         request = {
             "method": "diagnose_error",
             "params": {
@@ -445,5 +409,5 @@ CREATE INDEX idx_orders_user_id ON orders(user_id);""",
                 },
             },
         }
-        
+
         return await self.process_request(request)

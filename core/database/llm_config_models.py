@@ -6,8 +6,17 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional, List, Dict, Any
 from sqlalchemy import (
-    Column, Integer, String, Boolean, DateTime, 
-    ForeignKey, UniqueConstraint, Index, DECIMAL, TEXT, Date
+    Column,
+    Integer,
+    String,
+    Boolean,
+    DateTime,
+    ForeignKey,
+    UniqueConstraint,
+    Index,
+    DECIMAL,
+    TEXT,
+    Date,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declarative_base
@@ -19,8 +28,9 @@ Base = declarative_base()
 
 class LLMProvider(Base):
     """Model for LLM provider configurations"""
-    __tablename__ = 'llm_providers'
-    
+
+    __tablename__ = "llm_providers"
+
     id = Column(Integer, primary_key=True)
     name = Column(String(50), unique=True, nullable=False)
     api_key_env_var = Column(String(100))
@@ -29,10 +39,10 @@ class LLMProvider(Base):
     priority = Column(Integer, default=0)  # Lower = higher priority
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     # Relationships
     models = relationship("LLMModel", back_populates="provider", cascade="all, delete-orphan")
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for API responses"""
         return {
@@ -43,16 +53,17 @@ class LLMProvider(Base):
             "is_active": self.is_active,
             "priority": self.priority,
             "created_at": self.created_at.isoformat() if self.created_at else None,
-            "updated_at": self.updated_at.isoformat() if self.updated_at else None
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
 
 
 class LLMModel(Base):
     """Model for available LLM models from providers"""
-    __tablename__ = 'llm_models'
-    
+
+    __tablename__ = "llm_models"
+
     id = Column(Integer, primary_key=True)
-    provider_id = Column(Integer, ForeignKey('llm_providers.id', ondelete='CASCADE'))
+    provider_id = Column(Integer, ForeignKey("llm_providers.id", ondelete="CASCADE"))
     model_identifier = Column(String(255), nullable=False)
     display_name = Column(String(255))
     capabilities = Column(JSONB, default={})
@@ -61,22 +72,22 @@ class LLMModel(Base):
     last_checked = Column(DateTime)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     # Relationships
     provider = relationship("LLMProvider", back_populates="models")
-    primary_assignments = relationship("LLMModelAssignment", 
-                                     foreign_keys="LLMModelAssignment.primary_model_id",
-                                     back_populates="primary_model")
+    primary_assignments = relationship(
+        "LLMModelAssignment", foreign_keys="LLMModelAssignment.primary_model_id", back_populates="primary_model"
+    )
     fallback_assignments = relationship("LLMFallbackModel", back_populates="model")
     metrics = relationship("LLMMetric", back_populates="model")
-    
+
     # Constraints
     __table_args__ = (
-        UniqueConstraint('provider_id', 'model_identifier'),
-        Index('idx_llm_models_provider', 'provider_id'),
-        Index('idx_llm_models_available', 'is_available'),
+        UniqueConstraint("provider_id", "model_identifier"),
+        Index("idx_llm_models_provider", "provider_id"),
+        Index("idx_llm_models_available", "is_available"),
     )
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for API responses"""
         return {
@@ -88,14 +99,15 @@ class LLMModel(Base):
             "capabilities": self.capabilities,
             "cost_per_1k_tokens": float(self.cost_per_1k_tokens) if self.cost_per_1k_tokens else None,
             "is_available": self.is_available,
-            "last_checked": self.last_checked.isoformat() if self.last_checked else None
+            "last_checked": self.last_checked.isoformat() if self.last_checked else None,
         }
 
 
 class LLMUseCase(Base):
     """Model for LLM use case configurations"""
-    __tablename__ = 'llm_use_cases'
-    
+
+    __tablename__ = "llm_use_cases"
+
     id = Column(Integer, primary_key=True)
     use_case = Column(String(50), unique=True, nullable=False)
     display_name = Column(String(255))
@@ -105,11 +117,11 @@ class LLMUseCase(Base):
     default_system_prompt = Column(TEXT)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     # Relationships
     assignments = relationship("LLMModelAssignment", back_populates="use_case", cascade="all, delete-orphan")
     metrics = relationship("LLMMetric", back_populates="use_case")
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for API responses"""
         return {
@@ -119,35 +131,36 @@ class LLMUseCase(Base):
             "description": self.description,
             "default_temperature": float(self.default_temperature) if self.default_temperature else None,
             "default_max_tokens": self.default_max_tokens,
-            "default_system_prompt": self.default_system_prompt
+            "default_system_prompt": self.default_system_prompt,
         }
 
 
 class LLMModelAssignment(Base):
     """Model for assigning models to use cases and tiers"""
-    __tablename__ = 'llm_model_assignments'
-    
+
+    __tablename__ = "llm_model_assignments"
+
     id = Column(Integer, primary_key=True)
-    use_case_id = Column(Integer, ForeignKey('llm_use_cases.id', ondelete='CASCADE'))
+    use_case_id = Column(Integer, ForeignKey("llm_use_cases.id", ondelete="CASCADE"))
     tier = Column(String(20), nullable=False)  # 'premium', 'standard', 'economy'
-    primary_model_id = Column(Integer, ForeignKey('llm_models.id', ondelete='SET NULL'))
+    primary_model_id = Column(Integer, ForeignKey("llm_models.id", ondelete="SET NULL"))
     temperature_override = Column(DECIMAL(3, 2))
     max_tokens_override = Column(Integer)
     system_prompt_override = Column(TEXT)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     # Relationships
     use_case = relationship("LLMUseCase", back_populates="assignments")
     primary_model = relationship("LLMModel", foreign_keys=[primary_model_id], back_populates="primary_assignments")
     fallback_models = relationship("LLMFallbackModel", back_populates="assignment", cascade="all, delete-orphan")
-    
+
     # Constraints
     __table_args__ = (
-        UniqueConstraint('use_case_id', 'tier'),
-        Index('idx_llm_assignments_use_case', 'use_case_id'),
+        UniqueConstraint("use_case_id", "tier"),
+        Index("idx_llm_assignments_use_case", "use_case_id"),
     )
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for API responses"""
         return {
@@ -159,37 +172,37 @@ class LLMModelAssignment(Base):
             "temperature_override": float(self.temperature_override) if self.temperature_override else None,
             "max_tokens_override": self.max_tokens_override,
             "system_prompt_override": self.system_prompt_override,
-            "fallback_models": [fb.model.to_dict() for fb in sorted(self.fallback_models, key=lambda x: x.priority)]
+            "fallback_models": [fb.model.to_dict() for fb in sorted(self.fallback_models, key=lambda x: x.priority)],
         }
 
 
 class LLMFallbackModel(Base):
     """Model for fallback model configurations"""
-    __tablename__ = 'llm_fallback_models'
-    
+
+    __tablename__ = "llm_fallback_models"
+
     id = Column(Integer, primary_key=True)
-    assignment_id = Column(Integer, ForeignKey('llm_model_assignments.id', ondelete='CASCADE'))
-    model_id = Column(Integer, ForeignKey('llm_models.id', ondelete='CASCADE'))
+    assignment_id = Column(Integer, ForeignKey("llm_model_assignments.id", ondelete="CASCADE"))
+    model_id = Column(Integer, ForeignKey("llm_models.id", ondelete="CASCADE"))
     priority = Column(Integer, default=0)  # Order of fallback
     created_at = Column(DateTime, default=datetime.utcnow)
-    
+
     # Relationships
     assignment = relationship("LLMModelAssignment", back_populates="fallback_models")
     model = relationship("LLMModel", back_populates="fallback_assignments")
-    
+
     # Constraints
-    __table_args__ = (
-        UniqueConstraint('assignment_id', 'model_id'),
-    )
+    __table_args__ = (UniqueConstraint("assignment_id", "model_id"),)
 
 
 class LLMMetric(Base):
     """Model for tracking LLM performance metrics"""
-    __tablename__ = 'llm_metrics'
-    
+
+    __tablename__ = "llm_metrics"
+
     id = Column(Integer, primary_key=True)
-    model_id = Column(Integer, ForeignKey('llm_models.id', ondelete='CASCADE'))
-    use_case_id = Column(Integer, ForeignKey('llm_use_cases.id', ondelete='CASCADE'))
+    model_id = Column(Integer, ForeignKey("llm_models.id", ondelete="CASCADE"))
+    use_case_id = Column(Integer, ForeignKey("llm_use_cases.id", ondelete="CASCADE"))
     request_count = Column(Integer, default=0)
     success_count = Column(Integer, default=0)
     failure_count = Column(Integer, default=0)
@@ -198,18 +211,18 @@ class LLMMetric(Base):
     avg_latency_ms = Column(DECIMAL(10, 2))
     date = Column(Date, default=func.current_date())
     created_at = Column(DateTime, default=datetime.utcnow)
-    
+
     # Relationships
     model = relationship("LLMModel", back_populates="metrics")
     use_case = relationship("LLMUseCase", back_populates="metrics")
-    
+
     # Constraints
     __table_args__ = (
-        UniqueConstraint('model_id', 'use_case_id', 'date'),
-        Index('idx_llm_metrics_date', 'date'),
-        Index('idx_llm_metrics_model_use_case', 'model_id', 'use_case_id'),
+        UniqueConstraint("model_id", "use_case_id", "date"),
+        Index("idx_llm_metrics_date", "date"),
+        Index("idx_llm_metrics_model_use_case", "model_id", "use_case_id"),
     )
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for API responses"""
         return {
@@ -223,5 +236,5 @@ class LLMMetric(Base):
             "total_tokens": self.total_tokens,
             "total_cost": float(self.total_cost) if self.total_cost else 0,
             "avg_latency_ms": float(self.avg_latency_ms) if self.avg_latency_ms else None,
-            "date": self.date.isoformat() if self.date else None
+            "date": self.date.isoformat() if self.date else None,
         }

@@ -14,51 +14,43 @@ from core.llm_router_base import BaseLLMRouter
 from core.config import get_settings
 
 # Type variable for router types
-T = TypeVar('T', bound=BaseLLMRouter)
+T = TypeVar("T", bound=BaseLLMRouter)
 
 # Global router instances
 _router_instances: Dict[Type[BaseLLMRouter], BaseLLMRouter] = {}
 _lock = asyncio.Lock()
 
 
-async def create_router(
-    router_class: Type[T],
-    config: Optional[RouterConfig] = None,
-    **kwargs
-) -> T:
+async def create_router(router_class: Type[T], config: Optional[RouterConfig] = None, **kwargs) -> T:
     """
     Create and initialize a router instance.
-    
+
     Args:
         router_class: The router class to instantiate
         config: Optional router configuration
         **kwargs: Additional arguments for the router
-    
+
     Returns:
         Initialized router instance
     """
     # Create router instance
     router = router_class(config=config, **kwargs)
-    
+
     # Initialize async components
     await router.initialize()
-    
+
     return router
 
 
-async def get_router(
-    router_class: Type[T],
-    config: Optional[RouterConfig] = None,
-    **kwargs
-) -> T:
+async def get_router(router_class: Type[T], config: Optional[RouterConfig] = None, **kwargs) -> T:
     """
     Get or create a singleton router instance.
-    
+
     Args:
         router_class: The router class to get/create
         config: Optional router configuration (only used on first call)
         **kwargs: Additional arguments (only used on first call)
-    
+
     Returns:
         Singleton router instance
     """
@@ -67,33 +59,29 @@ async def get_router(
             # Create new instance
             router = await create_router(router_class, config, **kwargs)
             _router_instances[router_class] = router
-        
+
         return _router_instances[router_class]
 
 
 @asynccontextmanager
-async def router_context(
-    router_class: Type[T],
-    config: Optional[RouterConfig] = None,
-    **kwargs
-):
+async def router_context(router_class: Type[T], config: Optional[RouterConfig] = None, **kwargs):
     """
     Context manager for router lifecycle management.
-    
+
     Usage:
         async with router_context(MyRouter) as router:
             response = await router.complete("Hello")
-    
+
     Args:
         router_class: The router class to use
         config: Optional router configuration
         **kwargs: Additional arguments for the router
-    
+
     Yields:
         Initialized router instance
     """
     router = await create_router(router_class, config, **kwargs)
-    
+
     try:
         yield router
     finally:
@@ -105,7 +93,7 @@ async def close_all_routers():
     async with _lock:
         for router in _router_instances.values():
             await router.close()
-        
+
         _router_instances.clear()
 
 
@@ -113,30 +101,26 @@ async def close_all_routers():
 async def get_unified_router(config: Optional[RouterConfig] = None):
     """Get or create the unified LLM router"""
     from core.llm_router import UnifiedLLMRouter
+
     return await get_router(UnifiedLLMRouter, config)
 
 
-async def get_dynamic_router(
-    config: Optional[RouterConfig] = None,
-    db_url: Optional[str] = None
-):
+async def get_dynamic_router(config: Optional[RouterConfig] = None, db_url: Optional[str] = None):
     """Get or create the dynamic LLM router"""
     from core.llm_router_dynamic import DynamicLLMRouter
+
     return await get_router(DynamicLLMRouter, config, db_url=db_url)
 
 
 # Convenience function for backward compatibility
-async def get_llm_router(
-    dynamic: bool = True,
-    config: Optional[RouterConfig] = None
-) -> BaseLLMRouter:
+async def get_llm_router(dynamic: bool = True, config: Optional[RouterConfig] = None) -> BaseLLMRouter:
     """
     Get the appropriate LLM router.
-    
+
     Args:
         dynamic: Whether to use dynamic (database-driven) router
         config: Optional router configuration
-    
+
     Returns:
         Router instance
     """

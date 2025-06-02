@@ -44,9 +44,7 @@ WEAVIATE_PASSWORD: Optional[str] = os.getenv("WEAVIATE_PASSWORD")
 
 # Additional Headers (e.g., for custom proxy authentication, module-specific headers)
 # Should be a JSON string like: '{"X-My-Header": "value", "Authorization": "Bearer ..."}'
-WEAVIATE_ADDITIONAL_HEADERS_JSON: Optional[str] = os.getenv(
-    "WEAVIATE_ADDITIONAL_HEADERS"
-)
+WEAVIATE_ADDITIONAL_HEADERS_JSON: Optional[str] = os.getenv("WEAVIATE_ADDITIONAL_HEADERS")
 
 
 def log_weaviate_config() -> None:
@@ -116,10 +114,10 @@ def get_weaviate_client_params() -> Dict[str, Any]:
         "http_host": WEAVIATE_HOST,
         "http_port": WEAVIATE_PORT,
         "http_secure": WEAVIATE_SECURED,
-        "grpc_host": WEAVIATE_HOST, # Assuming gRPC is on the same host by default
+        "grpc_host": WEAVIATE_HOST,  # Assuming gRPC is on the same host by default
         "grpc_port": WEAVIATE_GRPC_PORT,
         "grpc_secure": WEAVIATE_SECURED,
-        "skip_init_checks": False, # Perform initial checks by default
+        "skip_init_checks": False,  # Perform initial checks by default
     }
 
     # Authentication
@@ -142,13 +140,10 @@ def get_weaviate_client_params() -> Dict[str, Any]:
             # client_id=WEAVIATE_CLIENT_ID # client_id might not be needed for all flows
         )
     elif WEAVIATE_USERNAME and WEAVIATE_PASSWORD:
-        auth_credentials = AuthClientPassword(
-            username=WEAVIATE_USERNAME, password=WEAVIATE_PASSWORD
-        )
+        auth_credentials = AuthClientPassword(username=WEAVIATE_USERNAME, password=WEAVIATE_PASSWORD)
 
     if auth_credentials:
         params["auth_client_secret"] = auth_credentials
-
 
     # Additional Headers
     headers: Dict[str, str] = {}
@@ -158,7 +153,7 @@ def get_weaviate_client_params() -> Dict[str, Any]:
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse WEAVIATE_ADDITIONAL_HEADERS_JSON: {e}")
             # Potentially raise an error or continue without them
-    
+
     # If an API key is provided and not handled by auth_credentials (e.g. some custom setups),
     # it might be expected in headers. Weaviate's AuthApiKey is preferred.
     # Example: if WEAVIATE_API_KEY and not auth_credentials:
@@ -166,7 +161,7 @@ def get_weaviate_client_params() -> Dict[str, Any]:
 
     if headers:
         params["additional_headers"] = headers
-    
+
     # TLS verification skip
     # This is typically handled by the client library's underlying HTTP/gRPC client
     # For `requests` (used by Weaviate client for HTTP), `verify=False`
@@ -217,4 +212,3 @@ if __name__ == "__main__":
         logger.info(f"Generated client params: {client_params}")
     else:
         logger.error("Invalid Weaviate configuration.")
-

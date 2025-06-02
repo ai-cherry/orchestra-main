@@ -87,10 +87,12 @@ class KnowledgeConfig(DroidConfig):
     max_results: int = 10
     auto_chunk: bool = True
     chunk_size: int = 512
-    weaviate: Dict[str, Any] = field(default_factory=lambda: {
-        "url": os.getenv("WEAVIATE_URL", "http://localhost:8080"),
-        "api_key": os.getenv("WEAVIATE_API_KEY", ""),
-    })
+    weaviate: Dict[str, Any] = field(
+        default_factory=lambda: {
+            "url": os.getenv("WEAVIATE_URL", "http://localhost:8080"),
+            "api_key": os.getenv("WEAVIATE_API_KEY", ""),
+        }
+    )
 
 
 @dataclass
@@ -102,7 +104,7 @@ class AdapterSystemConfig:
     debug: DebugConfig = field(default_factory=DebugConfig)
     reliability: ReliabilityConfig = field(default_factory=ReliabilityConfig)
     knowledge: KnowledgeConfig = field(default_factory=KnowledgeConfig)
-    
+
     # Global settings
     enable_metrics: bool = True
     metrics_port: int = 9090
@@ -117,7 +119,7 @@ def load_config_from_env() -> AdapterSystemConfig:
         Complete adapter system configuration
     """
     config = AdapterSystemConfig()
-    
+
     # Load API key for all droids
     api_key = os.getenv("FACTORY_AI_API_KEY", "")
     if api_key:
@@ -129,7 +131,7 @@ def load_config_from_env() -> AdapterSystemConfig:
             config.knowledge,
         ]:
             droid_config.api_key = api_key
-    
+
     # Load specific overrides
     if base_url := os.getenv("FACTORY_AI_BASE_URL"):
         for droid_config in [
@@ -140,7 +142,7 @@ def load_config_from_env() -> AdapterSystemConfig:
             config.knowledge,
         ]:
             droid_config.base_url = base_url
-    
+
     # Circuit breaker settings
     if failure_threshold := os.getenv("CIRCUIT_BREAKER_THRESHOLD"):
         threshold = int(failure_threshold)
@@ -152,24 +154,24 @@ def load_config_from_env() -> AdapterSystemConfig:
             config.knowledge,
         ]:
             droid_config.circuit_breaker.failure_threshold = threshold
-    
+
     # Adapter-specific settings
     if streaming := os.getenv("CODE_ADAPTER_STREAMING"):
         config.code.streaming = streaming.lower() == "true"
-    
+
     if auto_remediation := os.getenv("RELIABILITY_AUTO_REMEDIATION"):
         config.reliability.auto_remediation = auto_remediation.lower() == "true"
-    
+
     if embedding_model := os.getenv("KNOWLEDGE_EMBEDDING_MODEL"):
         config.knowledge.embedding_model = embedding_model
-    
+
     # Global settings
     if metrics_enabled := os.getenv("ADAPTER_METRICS_ENABLED"):
         config.enable_metrics = metrics_enabled.lower() == "true"
-    
+
     if log_level := os.getenv("ADAPTER_LOG_LEVEL"):
         config.log_level = log_level.upper()
-    
+
     return config
 
 
@@ -192,7 +194,7 @@ def validate_config(config: AdapterSystemConfig) -> None:
     ]:
         if not droid_config.api_key:
             raise ValueError(f"API key required for {name} adapter")
-    
+
     # Validate circuit breaker settings
     for name, droid_config in [
         ("architect", config.architect),
@@ -205,14 +207,14 @@ def validate_config(config: AdapterSystemConfig) -> None:
             raise ValueError(f"Invalid failure threshold for {name} adapter")
         if droid_config.circuit_breaker.recovery_timeout < 1:
             raise ValueError(f"Invalid recovery timeout for {name} adapter")
-    
+
     # Validate adapter-specific settings
     if config.code.chunk_size < 1:
         raise ValueError("Code adapter chunk size must be positive")
-    
+
     if config.knowledge.vector_dimension < 1:
         raise ValueError("Knowledge adapter vector dimension must be positive")
-    
+
     if not 0 <= config.knowledge.similarity_threshold <= 1:
         raise ValueError("Knowledge adapter similarity threshold must be between 0 and 1")
 

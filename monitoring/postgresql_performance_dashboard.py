@@ -25,7 +25,7 @@ from shared.database.unified_db_v2 import get_unified_database
 
 class PerformanceMonitor:
     """Collects and aggregates performance metrics."""
-    
+
     def __init__(self, history_minutes: int = 60):
         self.history_minutes = history_minutes
         self.metrics_history = deque(maxlen=history_minutes * 60)  # Store per-second data
@@ -33,83 +33,89 @@ class PerformanceMonitor:
         self.cache_operations = defaultdict(int)  # Track cache hit/miss
         self.active_connections = []
         self.start_time = time.time()
-        
+
     async def collect_metrics(self) -> Dict[str, Any]:
         """Collect current performance metrics."""
         manager = await get_connection_manager()
         unified_pg = await get_unified_postgresql()
         unified_db = await get_unified_database()
-        
+
         # Get connection pool stats
         pool_stats = await manager.get_pool_stats()
-        
+
         # Get health checks
         manager_health = await manager.health_check()
         pg_health = await unified_pg.health_check()
         db_health = await unified_db.health_check()
-        
+
         # Get performance metrics
         perf_metrics = await unified_db.get_performance_metrics()
-        
+
         # Calculate derived metrics
         uptime = time.time() - self.start_time
-        
+
         metrics = {
-            'timestamp': datetime.utcnow().isoformat(),
-            'uptime_seconds': uptime,
-            'connection_pool': {
-                'total': pool_stats['total_connections'],
-                'used': pool_stats['used_connections'],
-                'idle': pool_stats['idle_connections'],
-                'utilization': (pool_stats['used_connections'] / pool_stats['total_connections'] * 100) if pool_stats['total_connections'] > 0 else 0
+            "timestamp": datetime.utcnow().isoformat(),
+            "uptime_seconds": uptime,
+            "connection_pool": {
+                "total": pool_stats["total_connections"],
+                "used": pool_stats["used_connections"],
+                "idle": pool_stats["idle_connections"],
+                "utilization": (
+                    (pool_stats["used_connections"] / pool_stats["total_connections"] * 100)
+                    if pool_stats["total_connections"] > 0
+                    else 0
+                ),
             },
-            'cache': {
-                'hit_rate': perf_metrics['cache']['hit_rate'],
-                'total_hits': perf_metrics['cache']['hits'],
-                'total_misses': perf_metrics['cache']['misses'],
-                'size': db_health.get('cache_stats', {}).get('size', 0)
+            "cache": {
+                "hit_rate": perf_metrics["cache"]["hit_rate"],
+                "total_hits": perf_metrics["cache"]["hits"],
+                "total_misses": perf_metrics["cache"]["misses"],
+                "size": db_health.get("cache_stats", {}).get("size", 0),
             },
-            'operations': {
-                'total': perf_metrics['operations']['total'],
-                'by_type': perf_metrics['operations']['by_type'],
-                'avg_duration_ms': perf_metrics['operations']['avg_duration_ms']
+            "operations": {
+                "total": perf_metrics["operations"]["total"],
+                "by_type": perf_metrics["operations"]["by_type"],
+                "avg_duration_ms": perf_metrics["operations"]["avg_duration_ms"],
             },
-            'health': {
-                'postgresql': manager_health['status'],
-                'unified_pg': pg_health['status'],
-                'unified_db': db_health['status'],
-                'overall': 'healthy' if all(
-                    s['status'] == 'healthy' 
-                    for s in [manager_health, pg_health, db_health]
-                ) else 'degraded'
+            "health": {
+                "postgresql": manager_health["status"],
+                "unified_pg": pg_health["status"],
+                "unified_db": db_health["status"],
+                "overall": (
+                    "healthy"
+                    if all(s["status"] == "healthy" for s in [manager_health, pg_health, db_health])
+                    else "degraded"
+                ),
             },
-            'database': {
-                'size_mb': manager_health['database'].get('size_mb', 0),
-                'connections': manager_health['database'].get('active_connections', 0),
-                'version': manager_health['database'].get('version', 'unknown')
-            }
+            "database": {
+                "size_mb": manager_health["database"].get("size_mb", 0),
+                "connections": manager_health["database"].get("active_connections", 0),
+                "version": manager_health["database"].get("version", "unknown"),
+            },
         }
-        
+
         # Store in history
         self.metrics_history.append(metrics)
-        
+
         return metrics
-        
+
     async def get_historical_metrics(self, minutes: int = 5) -> List[Dict[str, Any]]:
         """Get historical metrics for the specified time range."""
         if minutes > self.history_minutes:
             minutes = self.history_minutes
-            
+
         # Get last N minutes of data
         samples_needed = minutes * 60
         return list(self.metrics_history)[-samples_needed:]
-        
+
     async def get_query_performance(self) -> Dict[str, Any]:
         """Get query performance statistics."""
         unified_pg = await get_unified_postgresql()
-        
+
         # Get slow queries
-        slow_queries = await unified_pg._connection_manager.fetch("""
+        slow_queries = await unified_pg._connection_manager.fetch(
+            """
             SELECT 
                 query,
                 calls,
@@ -120,18 +126,17 @@ class PerformanceMonitor:
             WHERE mean_exec_time > 100  -- Queries averaging over 100ms
             ORDER BY mean_exec_time DESC
             LIMIT 10
-        """)
-        
-        return {
-            'slow_queries': [dict(q) for q in slow_queries],
-            'query_stats': dict(self.query_times)
-        }
-        
+        """
+        )
+
+        return {"slow_queries": [dict(q) for q in slow_queries], "query_stats": dict(self.query_times)}
+
     async def get_table_stats(self) -> List[Dict[str, Any]]:
         """Get table size and performance statistics."""
         manager = await get_connection_manager()
-        
-        table_stats = await manager.fetch("""
+
+        table_stats = await manager.fetch(
+            """
             SELECT 
                 schemaname,
                 tablename,
@@ -146,8 +151,9 @@ class PerformanceMonitor:
             FROM pg_stat_user_tables
             WHERE schemaname IN ('orchestra', 'cache', 'sessions')
             ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC
-        """)
-        
+        """
+        )
+
         return [dict(stat) for stat in table_stats]
 
 
@@ -164,14 +170,14 @@ async def websocket_endpoint(websocket: WebSocket):
     """WebSocket endpoint for real-time metrics."""
     await websocket.accept()
     connected_clients.add(websocket)
-    
+
     try:
         while True:
             # Send metrics every second
             metrics = await monitor.collect_metrics()
             await websocket.send_json(metrics)
             await asyncio.sleep(1)
-            
+
     except WebSocketDisconnect:
         connected_clients.remove(websocket)
     except Exception as e:
@@ -183,7 +189,8 @@ async def websocket_endpoint(websocket: WebSocket):
 @app.get("/")
 async def dashboard():
     """Serve the dashboard HTML."""
-    return HTMLResponse(content="""
+    return HTMLResponse(
+        content="""
 <!DOCTYPE html>
 <html>
 <head>
@@ -500,7 +507,8 @@ async def dashboard():
     </script>
 </body>
 </html>
-    """)
+    """
+    )
 
 
 @app.get("/api/metrics/current")
@@ -550,7 +558,7 @@ async def shutdown_event():
     from shared.database.connection_manager import close_connection_manager
     from shared.database.unified_postgresql import close_unified_postgresql
     from shared.database.unified_db_v2 import close_unified_database
-    
+
     await close_unified_database()
     await close_unified_postgresql()
     await close_connection_manager()
@@ -558,9 +566,4 @@ async def shutdown_event():
 
 if __name__ == "__main__":
     # Run the dashboard
-    uvicorn.run(
-        "postgresql_performance_dashboard:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True
-    )
+    uvicorn.run("postgresql_performance_dashboard:app", host="0.0.0.0", port=8000, reload=True)

@@ -14,55 +14,58 @@ from typing import List, Dict, Any
 # Add parent directory to path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from shared.database.connection_manager_enhanced import get_connection_manager_enhanced as get_connection_manager, close_connection_manager
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+from shared.database.connection_manager_enhanced import (
+    get_connection_manager_enhanced as get_connection_manager,
+    close_connection_manager,
 )
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
 class UnifiedPostgreSQLInitializer:
     """Handles initialization of the unified PostgreSQL system."""
-    
+
     def __init__(self):
         self.manager = None
         self.schemas_created = []
         self.indexes_created = []
         self.functions_created = []
-        
+
     async def initialize(self):
         """Initialize database connection."""
         logger.info("Connecting to PostgreSQL...")
         self.manager = await get_connection_manager()
         logger.info("Connected successfully")
-        
+
     async def create_schemas(self):
         """Create all required schemas."""
         schemas = [
             ("orchestra", "Main application schema for agents, workflows, and audit logs"),
             ("cache", "High-performance caching schema"),
-            ("sessions", "User and agent session management")
+            ("sessions", "User and agent session management"),
         ]
-        
+
         for schema_name, comment in schemas:
             try:
-                await self.manager.execute(f"""
+                await self.manager.execute(
+                    f"""
                     CREATE SCHEMA IF NOT EXISTS {schema_name};
                     COMMENT ON SCHEMA {schema_name} IS '{comment}';
-                """)
+                """
+                )
                 self.schemas_created.append(schema_name)
                 logger.info(f"Created schema: {schema_name}")
             except Exception as e:
                 logger.error(f"Failed to create schema {schema_name}: {e}")
                 raise
-                
+
     async def create_tables(self):
         """Create all required tables with optimal structure."""
-        
+
         # Cache entries table
-        await self.manager.execute("""
+        await self.manager.execute(
+            """
             CREATE TABLE IF NOT EXISTS cache.entries (
                 key VARCHAR(255) PRIMARY KEY,
                 value JSONB NOT NULL,
@@ -85,11 +88,13 @@ class UnifiedPostgreSQLInitializer:
             COMMENT ON COLUMN cache.entries.value IS 'Cached value in JSONB format';
             COMMENT ON COLUMN cache.entries.expires_at IS 'Expiration timestamp for TTL';
             COMMENT ON COLUMN cache.entries.tags IS 'Tags for grouping and bulk operations';
-        """)
+        """
+        )
         logger.info("Created cache.entries table")
-        
+
         # Sessions table
-        await self.manager.execute("""
+        await self.manager.execute(
+            """
             CREATE TABLE IF NOT EXISTS sessions.sessions (
                 id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                 user_id VARCHAR(255),
@@ -113,11 +118,13 @@ class UnifiedPostgreSQLInitializer:
             COMMENT ON TABLE sessions.sessions IS 'User and agent session storage';
             COMMENT ON COLUMN sessions.sessions.id IS 'Unique session identifier';
             COMMENT ON COLUMN sessions.sessions.data IS 'Session data in JSONB format';
-        """)
+        """
+        )
         logger.info("Created sessions.sessions table")
-        
+
         # Agents table
-        await self.manager.execute("""
+        await self.manager.execute(
+            """
             CREATE TABLE IF NOT EXISTS orchestra.agents (
                 id SERIAL PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
@@ -139,11 +146,13 @@ class UnifiedPostgreSQLInitializer:
             
             -- Comments
             COMMENT ON TABLE orchestra.agents IS 'AI agent configurations and metadata';
-        """)
+        """
+        )
         logger.info("Created orchestra.agents table")
-        
+
         # Workflows table
-        await self.manager.execute("""
+        await self.manager.execute(
+            """
             CREATE TABLE IF NOT EXISTS orchestra.workflows (
                 id SERIAL PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
@@ -165,11 +174,13 @@ class UnifiedPostgreSQLInitializer:
             
             -- Comments
             COMMENT ON TABLE orchestra.workflows IS 'Workflow definitions and configurations';
-        """)
+        """
+        )
         logger.info("Created orchestra.workflows table")
-        
+
         # Audit logs table
-        await self.manager.execute("""
+        await self.manager.execute(
+            """
             CREATE TABLE IF NOT EXISTS orchestra.audit_logs (
                 id BIGSERIAL PRIMARY KEY,
                 timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -207,11 +218,13 @@ class UnifiedPostgreSQLInitializer:
             
             -- Comments
             COMMENT ON TABLE orchestra.audit_logs IS 'Comprehensive audit trail for all operations';
-        """)
+        """
+        )
         logger.info("Created orchestra.audit_logs table")
-        
+
         # Memory snapshots table
-        await self.manager.execute("""
+        await self.manager.execute(
+            """
             CREATE TABLE IF NOT EXISTS orchestra.memory_snapshots (
                 id SERIAL PRIMARY KEY,
                 agent_id VARCHAR(255) NOT NULL,
@@ -230,14 +243,16 @@ class UnifiedPostgreSQLInitializer:
             
             -- Comments
             COMMENT ON TABLE orchestra.memory_snapshots IS 'Agent memory state snapshots';
-        """)
+        """
+        )
         logger.info("Created orchestra.memory_snapshots table")
-        
+
     async def create_functions(self):
         """Create database functions for maintenance and optimization."""
-        
+
         # Function to cleanup expired cache entries
-        await self.manager.execute("""
+        await self.manager.execute(
+            """
             CREATE OR REPLACE FUNCTION cache.cleanup_expired_entries()
             RETURNS INTEGER AS $$
             DECLARE
@@ -253,11 +268,13 @@ class UnifiedPostgreSQLInitializer:
             
             COMMENT ON FUNCTION cache.cleanup_expired_entries() IS 
             'Remove expired cache entries and return count of deleted rows';
-        """)
-        self.functions_created.append('cache.cleanup_expired_entries')
-        
+        """
+        )
+        self.functions_created.append("cache.cleanup_expired_entries")
+
         # Function to cleanup expired sessions
-        await self.manager.execute("""
+        await self.manager.execute(
+            """
             CREATE OR REPLACE FUNCTION sessions.cleanup_expired_sessions()
             RETURNS INTEGER AS $$
             DECLARE
@@ -273,11 +290,13 @@ class UnifiedPostgreSQLInitializer:
             
             COMMENT ON FUNCTION sessions.cleanup_expired_sessions() IS 
             'Remove expired sessions and return count of deleted rows';
-        """)
-        self.functions_created.append('sessions.cleanup_expired_sessions')
-        
+        """
+        )
+        self.functions_created.append("sessions.cleanup_expired_sessions")
+
         # Function to update cache access statistics
-        await self.manager.execute("""
+        await self.manager.execute(
+            """
             CREATE OR REPLACE FUNCTION cache.update_access_stats(p_key VARCHAR)
             RETURNS VOID AS $$
             BEGIN
@@ -290,11 +309,13 @@ class UnifiedPostgreSQLInitializer:
             
             COMMENT ON FUNCTION cache.update_access_stats(VARCHAR) IS 
             'Update access timestamp and count for cache entries';
-        """)
-        self.functions_created.append('cache.update_access_stats')
-        
+        """
+        )
+        self.functions_created.append("cache.update_access_stats")
+
         # Function to get cache statistics
-        await self.manager.execute("""
+        await self.manager.execute(
+            """
             CREATE OR REPLACE FUNCTION cache.get_statistics()
             RETURNS TABLE (
                 total_entries BIGINT,
@@ -321,16 +342,18 @@ class UnifiedPostgreSQLInitializer:
             
             COMMENT ON FUNCTION cache.get_statistics() IS 
             'Get comprehensive cache statistics';
-        """)
-        self.functions_created.append('cache.get_statistics')
-        
+        """
+        )
+        self.functions_created.append("cache.get_statistics")
+
         logger.info(f"Created {len(self.functions_created)} database functions")
-        
+
     async def create_triggers(self):
         """Create triggers for automatic updates."""
-        
+
         # Update timestamp triggers
-        await self.manager.execute("""
+        await self.manager.execute(
+            """
             -- Generic function for updating timestamps
             CREATE OR REPLACE FUNCTION update_updated_at_column()
             RETURNS TRIGGER AS $$
@@ -360,47 +383,48 @@ class UnifiedPostgreSQLInitializer:
                 BEFORE UPDATE ON sessions.sessions
                 FOR EACH ROW
                 EXECUTE FUNCTION update_updated_at_column();
-        """)
+        """
+        )
         logger.info("Created update timestamp triggers")
-        
+
     async def optimize_settings(self):
         """Apply PostgreSQL performance optimizations."""
-        
+
         # Note: Some settings require superuser privileges
         optimizations = [
             # Autovacuum settings for better performance
             "ALTER SYSTEM SET autovacuum_vacuum_scale_factor = 0.05",
             "ALTER SYSTEM SET autovacuum_analyze_scale_factor = 0.05",
-            
             # Enable pg_stat_statements for query monitoring
             "CREATE EXTENSION IF NOT EXISTS pg_stat_statements",
-            
             # Enable UUID generation
             "CREATE EXTENSION IF NOT EXISTS pgcrypto",
-            
             # Enable trigram search for better text search
             "CREATE EXTENSION IF NOT EXISTS pg_trgm",
         ]
-        
+
         for optimization in optimizations:
             try:
                 await self.manager.execute(optimization)
                 logger.info(f"Applied: {optimization}")
             except Exception as e:
                 logger.warning(f"Could not apply optimization '{optimization}': {e}")
-                
+
     async def create_initial_data(self):
         """Create initial data for testing."""
-        
+
         # Create a default agent
-        await self.manager.execute("""
+        await self.manager.execute(
+            """
             INSERT INTO orchestra.agents (name, type, config, capabilities, status)
             VALUES ('System Assistant', 'system', '{"model": "gpt-4"}', '{"admin", "debug"}', 'active')
             ON CONFLICT DO NOTHING;
-        """)
-        
+        """
+        )
+
         # Create a sample workflow
-        await self.manager.execute("""
+        await self.manager.execute(
+            """
             INSERT INTO orchestra.workflows (name, description, definition, status)
             VALUES (
                 'Sample Workflow',
@@ -409,80 +433,87 @@ class UnifiedPostgreSQLInitializer:
                 'active'
             )
             ON CONFLICT DO NOTHING;
-        """)
-        
+        """
+        )
+
         logger.info("Created initial data")
-        
+
     async def verify_installation(self):
         """Verify the installation is complete and working."""
-        
+
         # Check schemas
-        schemas = await self.manager.fetch("""
+        schemas = await self.manager.fetch(
+            """
             SELECT schema_name 
             FROM information_schema.schemata 
             WHERE schema_name IN ('orchestra', 'cache', 'sessions')
-        """)
-        
+        """
+        )
+
         if len(schemas) != 3:
             raise Exception("Not all schemas were created")
-            
+
         # Check tables
-        tables = await self.manager.fetch("""
+        tables = await self.manager.fetch(
+            """
             SELECT table_schema, table_name 
             FROM information_schema.tables 
             WHERE table_schema IN ('orchestra', 'cache', 'sessions')
             AND table_type = 'BASE TABLE'
-        """)
-        
+        """
+        )
+
         expected_tables = 6  # Total number of tables
         if len(tables) < expected_tables:
             raise Exception(f"Expected {expected_tables} tables, found {len(tables)}")
-            
+
         # Test basic operations
         test_key = "test_init_key"
-        await self.manager.execute("""
+        await self.manager.execute(
+            """
             INSERT INTO cache.entries (key, value, expires_at)
             VALUES ($1, $2, CURRENT_TIMESTAMP + INTERVAL '1 hour')
             ON CONFLICT (key) DO UPDATE SET value = $2
-        """, test_key, '{"test": true}')
-        
-        result = await self.manager.fetchval(
-            "SELECT value FROM cache.entries WHERE key = $1", 
-            test_key
+        """,
+            test_key,
+            '{"test": true}',
         )
-        
+
+        result = await self.manager.fetchval("SELECT value FROM cache.entries WHERE key = $1", test_key)
+
         if not result:
             raise Exception("Cache test failed")
-            
+
         # Cleanup test data
-        await self.manager.execute(
-            "DELETE FROM cache.entries WHERE key = $1", 
-            test_key
-        )
-        
+        await self.manager.execute("DELETE FROM cache.entries WHERE key = $1", test_key)
+
         logger.info("Installation verified successfully")
-        
+
     async def print_summary(self):
         """Print installation summary."""
-        
+
         # Get database size
-        db_size = await self.manager.fetchval("""
+        db_size = await self.manager.fetchval(
+            """
             SELECT pg_size_pretty(pg_database_size(current_database()))
-        """)
-        
+        """
+        )
+
         # Get table counts
-        table_stats = await self.manager.fetch("""
+        table_stats = await self.manager.fetch(
+            """
             SELECT 
                 schemaname || '.' || tablename as table_name,
                 n_live_tup as row_count
             FROM pg_stat_user_tables
             WHERE schemaname IN ('orchestra', 'cache', 'sessions')
             ORDER BY schemaname, tablename
-        """)
-        
-        print("\n" + "="*60)
+        """
+        )
+
+        print("\n" + "=" * 60)
         print("UNIFIED POSTGRESQL INITIALIZATION COMPLETE")
-        print("="*60)
+        print("=" * 60)
         print(f"\nDatabase Size: {db_size}")
         print(f"\nSchemas Created: {', '.join(self.schemas_created)}")
         print(f"\nFunctions Created: {len(self.functions_created)}")
@@ -496,41 +527,41 @@ class UnifiedPostgreSQLInitializer:
         print("   python monitoring/postgresql_performance_dashboard.py")
         print("3. Run tests to verify functionality:")
         print("   pytest tests/test_unified_postgresql.py -v")
-        print("="*60 + "\n")
-        
+        print("=" * 60 + "\n")
+
     async def run(self):
         """Run the complete initialization process."""
         try:
             await self.initialize()
-            
+
             logger.info("Starting PostgreSQL initialization...")
-            
+
             # Create schemas
             await self.create_schemas()
-            
+
             # Create tables
             await self.create_tables()
-            
+
             # Create functions
             await self.create_functions()
-            
+
             # Create triggers
             await self.create_triggers()
-            
+
             # Apply optimizations
             await self.optimize_settings()
-            
+
             # Create initial data
             await self.create_initial_data()
-            
+
             # Verify installation
             await self.verify_installation()
-            
+
             # Print summary
             await self.print_summary()
-            
+
             logger.info("Initialization completed successfully!")
-            
+
         except Exception as e:
             logger.error(f"Initialization failed: {e}")
             raise

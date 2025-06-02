@@ -7,6 +7,7 @@ import { Route as rootRoute } from './routes/__root';
 import { DashboardPage } from './pages/DashboardPage';
 import { AgentsPage } from './pages/AgentsPage';
 import { PersonasPage } from './pages/PersonasPage';
+import { PersonaCustomizationPage } from './pages/PersonaCustomizationPage';
 import { WorkflowsPage } from './pages/WorkflowsPage';
 import { IntegrationsPage } from './pages/IntegrationsPage';
 import { ResourcesPage } from './pages/ResourcesPage';
@@ -16,6 +17,7 @@ import { LoginPage } from './pages/LoginPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { OrchestrationPage } from './pages/OrchestrationPage';
 import { MonitoringPage } from './pages/MonitoringPage';
+import { OrchestratorLandingPage } from './pages/OrchestratorLandingPage';
 
 // Route Definitions
 const indexRoute = createRoute({
@@ -34,6 +36,12 @@ const personasRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/personas',
   component: PersonasPage,
+});
+
+const personaCustomizationRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/personas/$personaId',
+  component: PersonaCustomizationPage,
 });
 
 const workflowsRoute = createRoute({
@@ -84,6 +92,12 @@ const loginRoute = createRoute({
   component: LoginPage,
 });
 
+const orchestratorLandingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/orchestrator',
+  component: OrchestratorLandingPage,
+});
+
 // Route Tree
 // Use the original rootRoute directly
 console.log('Creating route tree...');
@@ -91,8 +105,10 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   agentsRoute,
   personasRoute,
+  personaCustomizationRoute,
   workflowsRoute,
   orchestrationRoute,
+  orchestratorLandingRoute,
   monitoringRoute,
   integrationsRoute,
   resourcesRoute,

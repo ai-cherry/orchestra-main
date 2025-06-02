@@ -5,13 +5,7 @@ from .first_agent_template import (
     CustomAgentConfig,
     AutonomyLevel,
     CustomAgentCapability,
-    create_agent_from_answers
+    create_agent_from_answers,
 )
 
-__all__ = [
-    "YourFirstAgent",
-    "CustomAgentConfig", 
-    "AutonomyLevel",
-    "CustomAgentCapability",
-    "create_agent_from_answers"
-] 
+__all__ = ["YourFirstAgent", "CustomAgentConfig", "AutonomyLevel", "CustomAgentCapability", "create_agent_from_answers"]

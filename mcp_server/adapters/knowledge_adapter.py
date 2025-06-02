@@ -46,9 +46,7 @@ class KnowledgeAdapter(FactoryMCPAdapter):
         self.cache_embeddings = droid_config.get("cache_embeddings", True)
         self.embedding_cache: Dict[str, List[float]] = {}
 
-    async def translate_to_factory(
-        self, mcp_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def translate_to_factory(self, mcp_request: Dict[str, Any]) -> Dict[str, Any]:
         """Translate MCP request to Factory AI Knowledge format.
 
         Args:
@@ -83,54 +81,32 @@ class KnowledgeAdapter(FactoryMCPAdapter):
 
         # Handle specific knowledge operations
         if method == "store_knowledge":
-            factory_request["context"]["collection"] = params.get(
-                "collection", "default"
-            )
-            factory_request["context"]["document_type"] = params.get(
-                "document_type", "general"
-            )
-            factory_request["options"]["auto_chunk"] = params.get(
-                "auto_chunk", True
-            )
-            factory_request["options"]["chunk_size"] = params.get(
-                "chunk_size", 512
-            )
+            factory_request["context"]["collection"] = params.get("collection", "default")
+            factory_request["context"]["document_type"] = params.get("document_type", "general")
+            factory_request["options"]["auto_chunk"] = params.get("auto_chunk", True)
+            factory_request["options"]["chunk_size"] = params.get("chunk_size", 512)
 
         elif method == "search_knowledge":
-            factory_request["context"]["search_type"] = params.get(
-                "search_type", "semantic"
-            )
+            factory_request["context"]["search_type"] = params.get("search_type", "semantic")
             factory_request["context"]["filters"] = params.get("filters", {})
             factory_request["options"]["rerank"] = params.get("rerank", True)
-            factory_request["options"]["explain_scores"] = params.get(
-                "explain_scores", False
-            )
+            factory_request["options"]["explain_scores"] = params.get("explain_scores", False)
 
         elif method == "generate_documentation":
-            factory_request["context"]["doc_type"] = params.get(
-                "doc_type", "technical"
-            )
-            factory_request["context"]["target_audience"] = params.get(
-                "target_audience", "developers"
-            )
+            factory_request["context"]["doc_type"] = params.get("doc_type", "technical")
+            factory_request["context"]["target_audience"] = params.get("target_audience", "developers")
             factory_request["context"]["sections"] = params.get("sections", [])
             factory_request["options"]["format"] = params.get("format", "markdown")
 
         elif method == "analyze_knowledge_graph":
-            factory_request["context"]["graph_type"] = params.get(
-                "graph_type", "concept"
-            )
+            factory_request["context"]["graph_type"] = params.get("graph_type", "concept")
             factory_request["context"]["depth"] = params.get("depth", 3)
-            factory_request["options"]["visualization"] = params.get(
-                "visualization", True
-            )
+            factory_request["options"]["visualization"] = params.get("visualization", True)
 
         logger.debug(f"Translated to Factory request: {factory_request}")
         return factory_request
 
-    async def translate_to_mcp(
-        self, factory_response: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def translate_to_mcp(self, factory_response: Dict[str, Any]) -> Dict[str, Any]:
         """Translate Factory AI Knowledge response to MCP format.
 
         Args:
@@ -143,9 +119,7 @@ class KnowledgeAdapter(FactoryMCPAdapter):
             return {
                 "error": {
                     "code": -32603,
-                    "message": factory_response["error"].get(
-                        "message", "Unknown error"
-                    ),
+                    "message": factory_response["error"].get("message", "Unknown error"),
                     "data": factory_response["error"].get("details", {}),
                 }
             }
@@ -156,9 +130,7 @@ class KnowledgeAdapter(FactoryMCPAdapter):
                 "status": result.get("status", "success"),
                 "data": result.get("data", {}),
                 "embeddings": result.get("embeddings", []),
-                "search_results": self._format_search_results(
-                    result.get("search_results", [])
-                ),
+                "search_results": self._format_search_results(result.get("search_results", [])),
                 "documentation": result.get("documentation", ""),
                 "insights": result.get("insights", []),
                 "metadata": {
@@ -172,15 +144,9 @@ class KnowledgeAdapter(FactoryMCPAdapter):
         # Include Weaviate-specific results if present
         if "weaviate_response" in result:
             mcp_response["result"]["weaviate"] = {
-                "objects_created": result["weaviate_response"].get(
-                    "objects_created", 0
-                ),
-                "objects_updated": result["weaviate_response"].get(
-                    "objects_updated", 0
-                ),
-                "schema_changes": result["weaviate_response"].get(
-                    "schema_changes", []
-                ),
+                "objects_created": result["weaviate_response"].get("objects_created", 0),
+                "objects_updated": result["weaviate_response"].get("objects_updated", 0),
+                "schema_changes": result["weaviate_response"].get("schema_changes", []),
             }
 
         # Include knowledge graph analysis if present
@@ -195,9 +161,7 @@ class KnowledgeAdapter(FactoryMCPAdapter):
         logger.debug(f"Translated to MCP response: {mcp_response}")
         return mcp_response
 
-    async def _call_factory_droid(
-        self, factory_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def _call_factory_droid(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
         """Call the Factory AI Knowledge droid.
 
         Args:
@@ -213,9 +177,7 @@ class KnowledgeAdapter(FactoryMCPAdapter):
             if not self._factory_client:
                 self._factory_client = FactoryAI(
                     api_key=self.droid_config.get("api_key"),
-                    base_url=self.droid_config.get(
-                        "base_url", "https://api.factory.ai"
-                    ),
+                    base_url=self.droid_config.get("base_url", "https://api.factory.ai"),
                 )
 
             # Call the Knowledge droid
@@ -260,9 +222,7 @@ class KnowledgeAdapter(FactoryMCPAdapter):
         }
         return method_mapping.get(method, "store")
 
-    def _format_search_results(
-        self, results: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+    def _format_search_results(self, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Format search results for MCP response.
 
         Args:
@@ -288,9 +248,7 @@ class KnowledgeAdapter(FactoryMCPAdapter):
             )
         return formatted_results
 
-    def _get_mock_response(
-        self, factory_request: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def _get_mock_response(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
         """Generate mock response for testing.
 
         Args:
@@ -300,7 +258,7 @@ class KnowledgeAdapter(FactoryMCPAdapter):
             Mock response
         """
         action = factory_request["action"]
-        
+
         if action == "store":
             return {
                 "result": {
@@ -321,7 +279,7 @@ class KnowledgeAdapter(FactoryMCPAdapter):
                     "version": "1.0.0",
                 }
             }
-        
+
         elif action == "search":
             query = factory_request["context"].get("query", "")
             return {
@@ -357,7 +315,7 @@ class KnowledgeAdapter(FactoryMCPAdapter):
                     "version": "1.0.0",
                 }
             }
-        
+
         elif action == "generate_docs":
             return {
                 "result": {
@@ -404,7 +362,7 @@ Generated by Knowledge Droid v1.0.0""",
                     "version": "1.0.0",
                 }
             }
-        
+
         elif action == "analyze_graph":
             return {
                 "result": {
@@ -455,7 +413,7 @@ Generated by Knowledge Droid v1.0.0""",
                     "version": "1.0.0",
                 }
             }
-        
+
         return {
             "result": {
                 "message": f"Mock response for action: {action}",
@@ -464,9 +422,7 @@ Generated by Knowledge Droid v1.0.0""",
             }
         }
 
-    async def optimize_embeddings(
-        self, documents: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+    async def optimize_embeddings(self, documents: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Optimize embeddings for a batch of documents.
 
         Args:
@@ -478,14 +434,14 @@ Generated by Knowledge Droid v1.0.0""",
         # Check cache first
         cached_count = 0
         new_embeddings = []
-        
+
         for doc in documents:
             content_key = doc.get("content", "")[:100]
             if content_key in self.embedding_cache:
                 cached_count += 1
             else:
                 new_embeddings.append(doc)
-        
+
         if new_embeddings:
             # Process new embeddings
             request = {
@@ -496,7 +452,7 @@ Generated by Knowledge Droid v1.0.0""",
                     "use_cache": True,
                 },
             }
-            
+
             result = await self.process_request(request)
         else:
             result = {
@@ -505,18 +461,16 @@ Generated by Knowledge Droid v1.0.0""",
                     "message": "All embeddings found in cache",
                 }
             }
-        
+
         result["result"]["cache_stats"] = {
             "cached": cached_count,
             "processed": len(new_embeddings),
             "total": len(documents),
         }
-        
+
         return result
 
-    async def build_knowledge_index(
-        self, collection: str, options: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def build_knowledge_index(self, collection: str, options: Dict[str, Any]) -> Dict[str, Any]:
         """Build or rebuild knowledge index for a collection.
 
         Args:
@@ -536,5 +490,5 @@ Generated by Knowledge Droid v1.0.0""",
                 "rebuild_index": True,
             },
         }
-        
+
         return await self.process_request(request)
