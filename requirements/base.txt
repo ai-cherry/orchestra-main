@@ -61,7 +61,7 @@ grpcio==1.72.0rc1
 llama-index==0.10.38
 httpx==0.28.1
 portkey-ai==1.13.0
-elevenlabs==1.17.0
+elevenlabs==2.1.0
 weaviate-client==4.14.4
 python-jose[cryptography]
 python-multipart
