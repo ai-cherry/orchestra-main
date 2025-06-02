@@ -11,7 +11,7 @@ const DEFAULT_API_KEY = '4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf8
 function getHeaders() {
   const { token } = useAuthStore.getState();
   const activePersona = usePersonaStore.getState().getActivePersona();
-  
+
   return {
     'Content-Type': 'application/json',
     'X-API-Key': token || API_KEY || DEFAULT_API_KEY,
@@ -103,9 +103,28 @@ class WorkflowApiError extends Error {
 async function handleApiResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
+
+    // Handle Pydantic validation errors (422 status)
+    if (response.status === 422 && errorData.detail && Array.isArray(errorData.detail)) {
+      // Convert validation errors to readable messages
+      const validationErrors = errorData.detail.map((err: any) => {
+        if (err.loc && err.msg) {
+          const location = err.loc.join(' → ');
+          return `${location}: ${err.msg}`;
+        }
+        return err.msg || 'Validation error';
+      });
+
+      throw new WorkflowApiError(
+        response.status,
+        validationErrors.join(', '),
+        errorData
+      );
+    }
+
     throw new WorkflowApiError(
       response.status,
-      errorData.message || `API Error: ${response.statusText}`,
+      errorData.message || errorData.detail || `API Error: ${response.statusText}`,
       errorData
     );
   }
@@ -116,13 +135,13 @@ async function handleApiResponse<T>(response: Response): Promise<T> {
 export const workflowQueryKeys = {
   all: ['workflows'] as const,
   lists: () => [...workflowQueryKeys.all, 'list'] as const,
-  list: (filters?: { personaId?: string; status?: string }) => 
+  list: (filters?: { personaId?: string; status?: string }) =>
     [...workflowQueryKeys.lists(), filters] as const,
   details: () => [...workflowQueryKeys.all, 'detail'] as const,
   detail: (id: string) => [...workflowQueryKeys.details(), id] as const,
-  executions: (workflowId: string) => 
+  executions: (workflowId: string) =>
     [...workflowQueryKeys.detail(workflowId), 'executions'] as const,
-  execution: (workflowId: string, executionId: string) => 
+  execution: (workflowId: string, executionId: string) =>
     [...workflowQueryKeys.executions(workflowId), executionId] as const,
 };
 
@@ -203,7 +222,7 @@ export function useCreateWorkflow() {
     onSuccess: (newWorkflow) => {
       // Invalidate workflow lists
       queryClient.invalidateQueries({ queryKey: workflowQueryKeys.lists() });
-      
+
       // Add to cache
       queryClient.setQueryData(workflowQueryKeys.detail(newWorkflow.id), newWorkflow);
     },
@@ -229,7 +248,7 @@ export function useUpdateWorkflow(workflowId: string) {
     onSuccess: (updatedWorkflow) => {
       // Update cache
       queryClient.setQueryData(workflowQueryKeys.detail(workflowId), updatedWorkflow);
-      
+
       // Invalidate lists
       queryClient.invalidateQueries({ queryKey: workflowQueryKeys.lists() });
     },
@@ -258,7 +277,7 @@ export function useDeleteWorkflow() {
     onSuccess: (workflowId) => {
       // Remove from cache
       queryClient.removeQueries({ queryKey: workflowQueryKeys.detail(workflowId) });
-      
+
       // Invalidate lists
       queryClient.invalidateQueries({ queryKey: workflowQueryKeys.lists() });
     },
@@ -283,13 +302,13 @@ export function useExecuteWorkflow(workflowId: string) {
     },
     onSuccess: (execution) => {
       // Invalidate executions list for this workflow
-      queryClient.invalidateQueries({ 
-        queryKey: workflowQueryKeys.executions(workflowId) 
+      queryClient.invalidateQueries({
+        queryKey: workflowQueryKeys.executions(workflowId)
       });
-      
+
       // Add to cache
       queryClient.setQueryData(
-        workflowQueryKeys.execution(workflowId, execution.id), 
+        workflowQueryKeys.execution(workflowId, execution.id),
         execution
       );
     },
@@ -379,10 +398,10 @@ export function useCancelWorkflowExecution(workflowId: string) {
         workflowQueryKeys.execution(workflowId, execution.id),
         execution
       );
-      
+
       // Invalidate executions list
-      queryClient.invalidateQueries({ 
-        queryKey: workflowQueryKeys.executions(workflowId) 
+      queryClient.invalidateQueries({
+        queryKey: workflowQueryKeys.executions(workflowId)
       });
     },
   });
@@ -407,7 +426,7 @@ export function useCloneWorkflow() {
     onSuccess: (newWorkflow) => {
       // Invalidate workflow lists
       queryClient.invalidateQueries({ queryKey: workflowQueryKeys.lists() });
-      
+
       // Add to cache
       queryClient.setQueryData(workflowQueryKeys.detail(newWorkflow.id), newWorkflow);
     },
@@ -433,10 +452,10 @@ export function useImportWorkflow() {
     onSuccess: (importedWorkflow) => {
       // Invalidate workflow lists
       queryClient.invalidateQueries({ queryKey: workflowQueryKeys.lists() });
-      
+
       // Add to cache
       queryClient.setQueryData(
-        workflowQueryKeys.detail(importedWorkflow.id), 
+        workflowQueryKeys.detail(importedWorkflow.id),
         importedWorkflow
       );
     },
