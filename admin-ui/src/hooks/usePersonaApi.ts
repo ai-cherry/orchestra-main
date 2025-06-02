@@ -59,9 +59,28 @@ class PersonaApiError extends Error {
 async function handleApiResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
+
+    // Handle Pydantic validation errors (422 status)
+    if (response.status === 422 && errorData.detail && Array.isArray(errorData.detail)) {
+      // Convert validation errors to readable messages
+      const validationErrors = errorData.detail.map((err: any) => {
+        if (err.loc && err.msg) {
+          const location = err.loc.join(' → ');
+          return `${location}: ${err.msg}`;
+        }
+        return err.msg || 'Validation error';
+      });
+
+      throw new PersonaApiError(
+        response.status,
+        validationErrors.join(', '),
+        errorData
+      );
+    }
+
     throw new PersonaApiError(
       response.status,
-      errorData.message || `API Error: ${response.statusText}`,
+      errorData.message || errorData.detail || `API Error: ${response.statusText}`,
       errorData
     );
   }
@@ -111,11 +130,11 @@ export function usePersonas(options?: {
         });
 
         const data = await handleApiResponse<PersonaResponse>(response);
-        
+
         // Update store with fetched personas
         setPersonas(data.personas);
         markAsSynced();
-        
+
         return data;
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to fetch personas';
@@ -147,10 +166,10 @@ export function usePersona(personaId: string) {
         });
 
         const persona = await handleApiResponse<Persona>(response);
-        
+
         // Update store with fetched persona
         updatePersona(personaId, persona);
-        
+
         return persona;
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to fetch persona';
@@ -184,10 +203,10 @@ export function useCreatePersona() {
     onSuccess: (newPersona) => {
       // Update store
       addPersona(newPersona);
-      
+
       // Invalidate and refetch personas list
       queryClient.invalidateQueries({ queryKey: personaQueryKeys.lists() });
-      
+
       // Add the new persona to the cache
       queryClient.setQueryData(personaQueryKeys.detail(newPersona.id), newPersona);
     },
@@ -218,10 +237,10 @@ export function useUpdatePersona(personaId: string) {
     onSuccess: (updatedPersona) => {
       // Update store
       updatePersona(personaId, updatedPersona);
-      
+
       // Update cache
       queryClient.setQueryData(personaQueryKeys.detail(personaId), updatedPersona);
-      
+
       // Invalidate list queries to ensure consistency
       queryClient.invalidateQueries({ queryKey: personaQueryKeys.lists() });
     },
@@ -255,10 +274,10 @@ export function useDeletePersona() {
     onSuccess: (personaId) => {
       // Update store
       removePersona(personaId);
-      
+
       // Remove from cache
       queryClient.removeQueries({ queryKey: personaQueryKeys.detail(personaId) });
-      
+
       // Invalidate list queries
       queryClient.invalidateQueries({ queryKey: personaQueryKeys.lists() });
     },
@@ -289,10 +308,10 @@ export function useUpdatePersonaSettings(personaId: string) {
     onSuccess: (updatedSettings) => {
       // Update store
       updatePersonaSettings(personaId, updatedSettings);
-      
+
       // Update cache
       queryClient.setQueryData(personaQueryKeys.settings(personaId), updatedSettings);
-      
+
       // Invalidate the persona detail to ensure consistency
       queryClient.invalidateQueries({ queryKey: personaQueryKeys.detail(personaId) });
     },
@@ -327,12 +346,12 @@ export function useBatchUpdatePersonas() {
         updates: persona,
       }));
       updateMultiplePersonas(updates);
-      
+
       // Update cache for each persona
       updatedPersonas.forEach(persona => {
         queryClient.setQueryData(personaQueryKeys.detail(persona.id), persona);
       });
-      
+
       // Invalidate list queries
       queryClient.invalidateQueries({ queryKey: personaQueryKeys.lists() });
     },
@@ -353,7 +372,7 @@ export function useSyncPersonas() {
   return useMutation({
     mutationFn: async () => {
       setSyncStatus({ isSyncing: true });
-      
+
       const response = await fetch(`${API_URL}/api/personas/sync`, {
         method: 'POST',
         headers: getHeaders(),
@@ -365,16 +384,16 @@ export function useSyncPersonas() {
       // Update store with synced personas
       setPersonas(data.personas);
       markAsSynced();
-      
+
       // Invalidate all persona queries
       queryClient.invalidateQueries({ queryKey: personaQueryKeys.all });
     },
     onError: (error) => {
       const errorMessage = error instanceof Error ? error.message : 'Failed to sync personas';
       setError(errorMessage);
-      setSyncStatus({ 
-        isSyncing: false, 
-        error: errorMessage 
+      setSyncStatus({
+        isSyncing: false,
+        error: errorMessage
       });
     },
   });
@@ -419,8 +438,8 @@ export function useOptimisticPersonaUpdate() {
           if (!old) return old;
           return {
             ...old,
-            personas: old.personas.map(p => 
-              p.id === personaId 
+            personas: old.personas.map(p =>
+              p.id === personaId
                 ? { ...p, ...updates, updatedAt: new Date().toISOString() }
                 : p
             ),

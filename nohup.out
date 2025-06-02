@@ -1370,3 +1370,5 @@ INFO:     127.0.0.1:55924 - "GET /health HTTP/1.1" 404 Not Found
 INFO:     127.0.0.1:55950 - "GET /health HTTP/1.1" 404 Not Found
 INFO:     127.0.0.1:58568 - "GET /health HTTP/1.1" 404 Not Found
 INFO:     24.234.150.219:0 - "POST /api/token HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:37832 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59524 - "GET /health HTTP/1.1" 404 Not Found

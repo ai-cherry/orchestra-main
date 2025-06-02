@@ -11,7 +11,7 @@ const DEFAULT_API_KEY = '4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf8
 function getHeaders() {
   const { token } = useAuthStore.getState();
   const activePersona = usePersonaStore.getState().getActivePersona();
-  
+
   return {
     'Content-Type': 'application/json',
     'X-API-Key': token || API_KEY || DEFAULT_API_KEY,
@@ -120,9 +120,28 @@ class AgentApiError extends Error {
 async function handleApiResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
+
+    // Handle Pydantic validation errors (422 status)
+    if (response.status === 422 && errorData.detail && Array.isArray(errorData.detail)) {
+      // Convert validation errors to readable messages
+      const validationErrors = errorData.detail.map((err: any) => {
+        if (err.loc && err.msg) {
+          const location = err.loc.join(' → ');
+          return `${location}: ${err.msg}`;
+        }
+        return err.msg || 'Validation error';
+      });
+
+      throw new AgentApiError(
+        response.status,
+        validationErrors.join(', '),
+        errorData
+      );
+    }
+
     throw new AgentApiError(
       response.status,
-      errorData.message || `API Error: ${response.statusText}`,
+      errorData.message || errorData.detail || `API Error: ${response.statusText}`,
       errorData
     );
   }
@@ -133,13 +152,13 @@ async function handleApiResponse<T>(response: Response): Promise<T> {
 export const agentQueryKeys = {
   all: ['agents'] as const,
   lists: () => [...agentQueryKeys.all, 'list'] as const,
-  list: (filters?: { personaId?: string; type?: string; status?: string }) => 
+  list: (filters?: { personaId?: string; type?: string; status?: string }) =>
     [...agentQueryKeys.lists(), filters] as const,
   details: () => [...agentQueryKeys.all, 'detail'] as const,
   detail: (id: string) => [...agentQueryKeys.details(), id] as const,
   performance: (id: string) => [...agentQueryKeys.detail(id), 'performance'] as const,
   sessions: (agentId: string) => [...agentQueryKeys.detail(agentId), 'sessions'] as const,
-  session: (agentId: string, sessionId: string) => 
+  session: (agentId: string, sessionId: string) =>
     [...agentQueryKeys.sessions(agentId), sessionId] as const,
 };
 
@@ -158,10 +177,10 @@ export function useAgents(options?: {
   const personaId = options?.personaId || activePersona?.id;
 
   return useQuery({
-    queryKey: agentQueryKeys.list({ 
-      personaId, 
-      type: options?.type, 
-      status: options?.status 
+    queryKey: agentQueryKeys.list({
+      personaId,
+      type: options?.type,
+      status: options?.status
     }),
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -226,7 +245,7 @@ export function useCreateAgent() {
     onSuccess: (newAgent) => {
       // Invalidate agent lists
       queryClient.invalidateQueries({ queryKey: agentQueryKeys.lists() });
-      
+
       // Add to cache
       queryClient.setQueryData(agentQueryKeys.detail(newAgent.id), newAgent);
     },
@@ -252,7 +271,7 @@ export function useUpdateAgent(agentId: string) {
     onSuccess: (updatedAgent) => {
       // Update cache
       queryClient.setQueryData(agentQueryKeys.detail(agentId), updatedAgent);
-      
+
       // Invalidate lists
       queryClient.invalidateQueries({ queryKey: agentQueryKeys.lists() });
     },
@@ -281,7 +300,7 @@ export function useDeleteAgent() {
     onSuccess: (agentId) => {
       // Remove from cache
       queryClient.removeQueries({ queryKey: agentQueryKeys.detail(agentId) });
-      
+
       // Invalidate lists
       queryClient.invalidateQueries({ queryKey: agentQueryKeys.lists() });
     },
@@ -307,8 +326,8 @@ export function useChatWithAgent(agentId: string) {
     onSuccess: (response) => {
       // Invalidate session data if sessionId is provided
       if (response.sessionId) {
-        queryClient.invalidateQueries({ 
-          queryKey: agentQueryKeys.session(agentId, response.sessionId) 
+        queryClient.invalidateQueries({
+          queryKey: agentQueryKeys.session(agentId, response.sessionId)
         });
       }
     },
@@ -446,7 +465,7 @@ export function useCloneAgent() {
     onSuccess: (newAgent) => {
       // Invalidate agent lists
       queryClient.invalidateQueries({ queryKey: agentQueryKeys.lists() });
-      
+
       // Add to cache
       queryClient.setQueryData(agentQueryKeys.detail(newAgent.id), newAgent);
     },
@@ -500,7 +519,7 @@ export function useBatchAgentOperations() {
         updatedAgents.forEach(agent => {
           queryClient.setQueryData(agentQueryKeys.detail(agent.id), agent);
         });
-        
+
         // Invalidate lists
         queryClient.invalidateQueries({ queryKey: agentQueryKeys.lists() });
       },
@@ -521,7 +540,7 @@ export function useBatchAgentOperations() {
         result.deleted.forEach(agentId => {
           queryClient.removeQueries({ queryKey: agentQueryKeys.detail(agentId) });
         });
-        
+
         // Invalidate lists
         queryClient.invalidateQueries({ queryKey: agentQueryKeys.lists() });
       },
