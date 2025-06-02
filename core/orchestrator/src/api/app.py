@@ -16,8 +16,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from core.orchestrator.src.config.loader import load_persona_configs
 from core.orchestrator.src.config.settings import get_settings
 
-# Import endpoints
-from .endpoints import health, interaction, monitoring, phidata_chat
+# Import endpoints - only include working ones
+from .endpoints import auth, health, stubs
 
 # Configure logging
 logging.basicConfig(
@@ -28,7 +28,6 @@ logger = logging.getLogger(__name__)
 
 # Load settings
 settings = get_settings()
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -65,8 +64,6 @@ async def lifespan(app: FastAPI):
 
     # Log environment information
     logger.info(f"Running in environment: {settings.ENVIRONMENT}")
-    if settings.get_gcp_project_id():
-        logger.info(f"Connected to GCP project: {settings.get_gcp_project_id()}")
 
     logger.info("Application startup complete")
 
@@ -96,7 +93,6 @@ async def lifespan(app: FastAPI):
 
     logger.info("Application shutdown complete")
 
-
 # Create FastAPI app
 app = FastAPI(
     title="AI Orchestration API",
@@ -123,11 +119,9 @@ from .middleware.persona_middleware import PersonaMiddleware
 app.add_middleware(PersonaMiddleware)
 
 # Register API routes
+app.include_router(auth.router, prefix="/api")
 app.include_router(health.router, prefix="/api")
-app.include_router(interaction.router, prefix="/api")
-app.include_router(phidata_chat.router, prefix="/api")
-app.include_router(monitoring.router, prefix="/api")
-
+app.include_router(stubs.router, prefix="/api")
 
 if __name__ == "__main__":
     import uvicorn

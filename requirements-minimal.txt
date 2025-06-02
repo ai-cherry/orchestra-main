@@ -1,0 +1,17 @@
+fastapi==0.115.12
+uvicorn==0.29.0
+gunicorn==20.1.0
+pydantic==2.11.4
+pydantic-settings==2.9.1
+python-jose[cryptography]
+python-multipart
+pyjwt==2.8.0
+passlib[bcrypt]==1.7.4
+python-dotenv==1.1.0
+structlog==24.1.0
+redis==5.0.1
+httpx==0.28.1
+requests==2.32.3
+portkey-ai==1.13.0
+pyyaml==6.0.2
+tenacity==8.2.3

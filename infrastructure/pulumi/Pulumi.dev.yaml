@@ -1,0 +1,7 @@
+# Development environment configuration
+config:
+  cherry-ai-infrastructure:region: ewr
+  cherry-ai-infrastructure:k8s_node_plan: vc2-1c-2gb  # Smaller instances for dev
+  cherry-ai-infrastructure:monitoring_plan: vc2-1c-1gb  # Minimal monitoring
+  cherry-ai-infrastructure:postgres_plan: vultr-dbaas-hobbyist-cc-1-25-1  # Smaller DB
+  cherry-ai-infrastructure:redis_plan: vultr-dbaas-hobbyist-cc-1-25-1
