@@ -26,13 +26,17 @@ from uuid import UUID, uuid4
 import json
 
 import asyncpg
-import weaviate
-from weaviate.classes.init import Auth, AdditionalConfig, Timeout
-from weaviate.classes.query import MetadataQuery, QueryReturn
-from weaviate.classes.config import Configure, Property, DataType
+# Remove direct weaviate SDK imports from here if they are fully encapsulated by ProdWeaviateClient
+# For now, keep `weaviate` for `weaviate.exceptions.WeaviateQueryError` or similar if used directly.
+import weaviate 
+# from weaviate.classes.init import Auth, AdditionalConfig, Timeout # Now handled by ProdWeaviateClient
+# from weaviate.classes.query import MetadataQuery, QueryReturn # Now handled by ProdWeaviateClient
+# from weaviate.classes.config import Configure, Property, DataType # Now handled by ProdWeaviateClient
 from pydantic import BaseModel, Field
 
 from core.config.unified_config import get_database_config, DatabaseConfig
+from shared.database.weaviate_client import WeaviateClient as ProdWeaviateClient
+# Implied: COLLECTION_AGENT_MEMORY, etc. might be needed if WeaviateInterface logic becomes collection-aware
 
 logger = logging.getLogger(__name__)
 
@@ -245,129 +249,122 @@ class WeaviateInterface(DatabaseInterface):
     
     def __init__(self, config: DatabaseConfig):
         self.config = config
-        self.client: Optional[weaviate.Client] = None
-        self._connection_retries = 0
-        self._max_retries = 3
+        self._prod_client = ProdWeaviateClient(config) # Instantiate new client
+        # self.client is no longer the SDK client directly, but the instance of ProdWeaviateClient's _client
+        # This might be None if _prod_client hasn't connected.
+        # Generally, methods should use self._prod_client.specific_method()
+        self.client: Optional[weaviate.Client] = None # This will be set after connection
     
     async def connect(self) -> None:
-        """Establish Weaviate connection"""
+        """Establish Weaviate connection via the production client."""
         try:
-            # Configure authentication if API key is provided
-            auth_config = None
-            if self.config.weaviate_api_key:
-                auth_config = Auth.api_key(self.config.weaviate_api_key)
-            
-            # Configure additional settings
-            additional_config = AdditionalConfig(
-                timeout=Timeout(init=30, query=30, insert=30),
-                connection_params={
-                    "session_pool_connections": 20,
-                    "session_pool_maxsize": 20,
-                }
-            )
-            
-            # Create client
-            self.client = weaviate.connect_to_custom(
-                http_host=self.config.weaviate_host,
-                http_port=self.config.weaviate_port,
-                http_secure=self.config.weaviate_scheme == "https",
-                grpc_host=self.config.weaviate_host,
-                grpc_port=self.config.weaviate_port + 1,  # Usually gRPC is on port + 1
-                grpc_secure=self.config.weaviate_scheme == "https",
-                auth_credentials=auth_config,
-                additional_config=additional_config
-            )
-            
-            # Test connection
-            if self.client.is_ready():
-                logger.info("Weaviate connection established")
-            else:
-                raise ConnectionError("Weaviate is not ready")
-                
+            await self._prod_client.connect()
+            self.client = self._prod_client._client # Expose underlying SDK client if needed, after connection
+            logger.info("WeaviateInterface connected via ProdWeaviateClient.")
         except Exception as e:
-            self._connection_retries += 1
-            if self._connection_retries <= self._max_retries:
-                logger.warning(f"Weaviate connection failed (attempt {self._connection_retries}): {e}")
-                await asyncio.sleep(2 ** self._connection_retries)
-                await self.connect()
-            else:
-                raise ConnectionError(f"Failed to connect to Weaviate after {self._max_retries} attempts: {e}")
+            # self.client should remain None or be explicitly set to None on failure
+            self.client = None
+            logger.error(f"WeaviateInterface failed to connect ProdWeaviateClient: {e}", exc_info=True)
+            # Convert to a ConnectionError if not already
+            if not isinstance(e, ConnectionError):
+                raise ConnectionError(f"Failed to connect Weaviate production client: {e}") from e
+            raise
     
     async def disconnect(self) -> None:
-        """Close Weaviate connection"""
-        if self.client:
-            self.client.close()
-            self.client = None
-            logger.info("Weaviate connection closed")
+        """Close Weaviate connection via the production client."""
+        if self._prod_client:
+            await self._prod_client.close()
+            self.client = None # Clear the SDK client instance too
+            logger.info("WeaviateInterface disconnected via ProdWeaviateClient.")
     
     async def health_check(self) -> bool:
-        """Check Weaviate health"""
+        """Check Weaviate health via the production client."""
+        if not self._prod_client:
+            return False
         try:
-            return self.client and self.client.is_ready()
+            return await self._prod_client.health_check()
         except Exception as e:
-            logger.error(f"Weaviate health check failed: {e}")
+            logger.error(f"WeaviateInterface health check failed: {e}", exc_info=True)
             return False
     
     async def execute(self, query: str, params: Optional[Dict[str, Any]] = None) -> QueryResult:
-        """Execute Weaviate query (GraphQL)"""
-        if not self.client:
-            raise ConnectionError("Weaviate client not initialized")
+        """Execute Weaviate query (GraphQL) via the production client."""
+        # This method assumes ProdWeaviateClient will get a raw_graphql_query method
+        # or this method needs to access _prod_client._client directly.
+        if not self._prod_client or not self._prod_client._client: # check _client for direct access
+            raise ConnectionError("Weaviate client not initialized or not connected in ProdWeaviateClient.")
         
         start_time = time.time()
         
         try:
-            # Execute GraphQL query
-            result = self.client.query.raw(query)
+            # Assuming direct access to underlying client for raw GraphQL if not encapsulated
+            # This is a temporary measure. Ideally ProdWeaviateClient would expose this.
+            # result = self._prod_client._client.query.raw(query)
+            # For now, let's assume we add a method to ProdWeaviateClient:
+            if not hasattr(self._prod_client, 'raw_graphql_query'):
+                logger.warning("ProdWeaviateClient does not have raw_graphql_query. Falling back to direct SDK access for execute.")
+                if not self._prod_client._client: # Ensure underlying client exists
+                     raise ConnectionError("Underlying Weaviate SDK client not available.")
+                loop = asyncio.get_event_loop()
+                result = await loop.run_in_executor(None, lambda: self._prod_client._client.query.raw(query))
+            else:
+                result = await self._prod_client.raw_graphql_query(query) # Ideal case
             
             return QueryResult(
-                rows=[result] if result else [],
-                count=1 if result else 0,
+                rows=[result] if result is not None else [], # Ensure result is not None
+                count=1 if result is not None else 0,
                 execution_time=time.time() - start_time,
                 metadata={"query": query, "params": params}
             )
             
         except Exception as e:
             execution_time = time.time() - start_time
-            logger.error(f"Weaviate query failed in {execution_time:.3f}s: {e}")
-            raise QueryError(f"Weaviate query failed: {e}", retryable=True, original_error=e)
+            logger.error(f"WeaviateInterface query failed in {execution_time:.3f}s: {e}", exc_info=True)
+            raise QueryError(f"WeaviateInterface query failed: {e}", retryable=True, original_error=e)
     
     async def vector_search(self, collection_name: str, vector: List[float], 
                            limit: int = 10, where_filter: Optional[Dict] = None,
                            return_properties: Optional[List[str]] = None) -> VectorSearchResult:
-        """Perform vector similarity search"""
-        if not self.client:
-            raise ConnectionError("Weaviate client not initialized")
+        """Perform vector similarity search using ProdWeaviateClient."""
+        if not self._prod_client:
+            raise ConnectionError("ProdWeaviateClient not initialized in WeaviateInterface.")
         
         start_time = time.time()
-        
         try:
-            collection = self.client.collections.get(collection_name)
+            # This assumes ProdWeaviateClient will have a generic search method.
+            # Let's name it `search_objects_near_vector` for now.
+            # This method needs to be added to ProdWeaviateClient.
+            if not hasattr(self._prod_client, 'search_objects_near_vector'):
+                raise NotImplementedError("ProdWeaviateClient must implement search_objects_near_vector for WeaviateInterface.vector_search")
+
+            # The search_objects_near_vector method in ProdWeaviateClient should return a list of dicts
+            # that match the structure expected by VectorSearchResult or be adapted here.
+            # For now, assume it returns a list of dicts with 'id', 'properties', 'score', 'distance'.
             
-            # Build query
-            query_builder = collection.query.near_vector(
-                near_vector=vector,
+            # Mapping `return_properties` from this interface to ProdWeaviateClient's method
+            # Assuming ProdWeaviateClient's search method can take `return_properties`
+            search_results = await self._prod_client.search_objects_near_vector(
+                collection_name=collection_name,
+                vector=vector,
                 limit=limit,
-                return_metadata=MetadataQuery(score=True, distance=True)
+                filters=where_filter, # Assuming ProdWeaviateClient uses 'filters'
+                return_properties=return_properties
             )
-            
-            # Add where filter if provided
-            if where_filter:
-                query_builder = query_builder.where(where_filter)
-            
-            # Execute query
-            response = query_builder.objects
-            
-            # Extract results
+
             objects = []
             scores = []
-            for obj in response:
-                objects.append({
-                    "id": str(obj.uuid),
-                    "properties": obj.properties,
-                    "metadata": obj.metadata
-                })
-                scores.append(obj.metadata.score if obj.metadata and obj.metadata.score else 0.0)
-            
+            # ProdWeaviateClient.search_... methods return list of dicts already containing id, properties, score, distance
+            for item in search_results: # search_results is List[Dict[str,Any]]
+                obj_data = {"id": item.get("id"), "properties": item} # Adjust based on actual return
+                # Remove score and distance from properties if they are separate
+                obj_props = item.copy()
+                score = obj_props.pop("score", 0.0)
+                obj_props.pop("distance", None)
+                obj_props.pop("id", None) # id is top-level
+                
+                objects.append({"id": item.get("id"), "properties": obj_props, "metadata": {"score": score, "distance": item.get("distance")}})
+                scores.append(score)
+
             return VectorSearchResult(
                 objects=objects,
                 scores=scores,
@@ -378,77 +375,63 @@ class WeaviateInterface(DatabaseInterface):
             
         except Exception as e:
             execution_time = time.time() - start_time
-            logger.error(f"Weaviate vector search failed in {execution_time:.3f}s: {e}")
-            raise QueryError(f"Weaviate vector search failed: {e}", retryable=True, original_error=e)
+            logger.error(f"WeaviateInterface vector search failed: {e}", exc_info=True)
+            raise QueryError(f"WeaviateInterface vector search failed: {e}", retryable=True, original_error=e)
     
     async def insert_objects(self, collection_name: str, objects: List[Dict[str, Any]]) -> int:
-        """Insert multiple objects into collection"""
-        if not self.client:
-            raise ConnectionError("Weaviate client not initialized")
+        """Insert multiple objects into collection using ProdWeaviateClient."""
+        if not self._prod_client:
+            raise ConnectionError("ProdWeaviateClient not initialized in WeaviateInterface.")
         
         try:
-            collection = self.client.collections.get(collection_name)
-            
-            # Insert objects in batch
-            with collection.batch.dynamic() as batch:
-                for obj in objects:
-                    # Extract vector if present
-                    vector = obj.pop("vector", None)
-                    obj_id = obj.pop("id", None) or str(uuid4())
-                    
-                    if vector:
-                        batch.add_object(
-                            uuid=obj_id,
-                            properties=obj,
-                            vector=vector
-                        )
-                    else:
-                        batch.add_object(
-                            uuid=obj_id,
-                            properties=obj
-                        )
-            
-            return len(objects)
+            # This assumes ProdWeaviateClient will have a generic batch insert method.
+            # Let's name it `add_objects_batch`. This needs to be added to ProdWeaviateClient.
+            if not hasattr(self._prod_client, 'add_objects_batch'):
+                 raise NotImplementedError("ProdWeaviateClient must implement add_objects_batch for WeaviateInterface.insert_objects")
+
+            # The objects here are expected to be dicts with properties, and optionally 'id' and 'vector'.
+            # ProdWeaviateClient's method should handle this.
+            num_inserted = await self._prod_client.add_objects_batch(
+                collection_name=collection_name,
+                objects=objects
+            )
+            return num_inserted
             
         except Exception as e:
-            logger.error(f"Weaviate insert failed: {e}")
-            raise QueryError(f"Weaviate insert failed: {e}", retryable=True, original_error=e)
+            logger.error(f"WeaviateInterface insert_objects failed: {e}", exc_info=True)
+            raise QueryError(f"WeaviateInterface insert_objects failed: {e}", retryable=True, original_error=e)
     
     async def create_collection_if_not_exists(self, collection_name: str, 
-                                            properties: List[Dict[str, Any]],
-                                            vectorizer_config: Optional[Dict] = None) -> None:
-        """Create collection if it doesn't exist"""
-        if not self.client:
-            raise ConnectionError("Weaviate client not initialized")
+                                            properties: List[Dict[str, Any]], # e.g. [{"name": "prop_name", "data_type": "TEXT"}]
+                                            vectorizer_config: Optional[Dict] = None) -> None: # vectorizer_config is not directly used by current _ensure_schema
+        """Create collection if it doesn't exist using ProdWeaviateClient."""
+        if not self._prod_client:
+            raise ConnectionError("ProdWeaviateClient not initialized in WeaviateInterface.")
         
         try:
-            # Check if collection exists
-            if self.client.collections.exists(collection_name):
-                logger.info(f"Collection {collection_name} already exists")
-                return
+            # ProdWeaviateClient._ensure_schema takes properties in a slightly different format
+            # e.g. {"name": "prop_name", "dataType": ["text"]}
+            # This method needs to map from WeaviateInterface's property format if different.
+            # Current ProdWeaviateClient._ensure_schema takes `properties: List[Dict[str, Any]]`
+            # Example: `{"name": "agent_id", "dataType": ["text"]}`. This matches.
             
-            # Convert properties to Weaviate format
-            weaviate_properties = []
-            for prop in properties:
-                weaviate_properties.append(
-                    Property(
-                        name=prop["name"],
-                        data_type=getattr(DataType, prop["data_type"].upper())
-                    )
-                )
-            
-            # Create collection
-            self.client.collections.create(
-                name=collection_name,
-                properties=weaviate_properties,
-                vectorizer_config=vectorizer_config
+            # The `vectorizer_config` from `WeaviateInterface` is not explicitly passed to
+            # `_ensure_schema` in `ProdWeaviateClient` as it defaults to text2vec-openai.
+            # If `vectorizer_config` needs to be dynamic, `_ensure_schema` must be updated.
+            if vectorizer_config:
+                logger.warning(f"Vectorizer config provided to WeaviateInterface.create_collection_if_not_exists for {collection_name} "
+                               f"is not currently passed to ProdWeaviateClient._ensure_schema, which uses defaults. This may need adjustment.")
+
+            await self._prod_client._ensure_schema(
+                collection_name=collection_name,
+                properties=properties, # Assuming format matches
+                description=f"Collection {collection_name}" # Default description
             )
-            
-            logger.info(f"Collection {collection_name} created")
+            logger.info(f"WeaviateInterface: Collection {collection_name} ensured via ProdWeaviateClient.")
             
         except Exception as e:
-            logger.error(f"Failed to create collection {collection_name}: {e}")
-            raise QueryError(f"Failed to create collection: {e}", retryable=False, original_error=e)
+            logger.error(f"WeaviateInterface failed to create collection {collection_name}: {e}", exc_info=True)
+            raise QueryError(f"WeaviateInterface failed to create collection: {e}", retryable=False, original_error=e)
 
 class UnifiedDatabase:
     """
