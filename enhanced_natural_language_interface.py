@@ -13,12 +13,11 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import portkey
 from enhanced_vector_memory_system import ContextualMemory, ConversationContext, EnhancedVectorMemorySystem
-from vertexai.preview import generative_models
+from weaviate.preview import generative_models
 
 from data_source_integrations import DataAggregationOrchestrator
 
 logger = logging.getLogger(__name__)
-
 
 class ConversationMode(Enum):
     """Different conversation modes for context-aware responses."""
@@ -28,7 +27,6 @@ class ConversationMode(Enum):
     TECHNICAL = "technical"
     STRATEGIC = "strategic"
     CREATIVE = "creative"
-
 
 @dataclass
 class ConversationMessage:
@@ -44,7 +42,6 @@ class ConversationMessage:
     intent: Optional[str] = None
     entities: List[Dict[str, Any]] = field(default_factory=list)
 
-
 @dataclass
 class ConversationSession:
     """Complete conversation session with context."""
@@ -58,7 +55,6 @@ class ConversationSession:
     created_at: datetime
     updated_at: datetime
     metadata: Dict[str, Any] = field(default_factory=dict)
-
 
 class IntentClassifier:
     """Classifies user intents from natural language input."""
@@ -101,7 +97,6 @@ class IntentClassifier:
                     return intent
 
         return "general_query"
-
 
 class ContextualResponseGenerator:
     """Generates context-aware responses using multiple AI models."""
@@ -284,7 +279,6 @@ class ContextualResponseGenerator:
             metadata["suggested_actions"] = suggested_actions
 
         return metadata
-
 
 class EnhancedNaturalLanguageInterface:
     """

@@ -20,7 +20,6 @@ logging.basicConfig(level=logging.INFO)
 # Import the secret manager module
 from config.os.environ import get_secret, secrets
 
-
 def main():
     """Demonstrate different ways to access secrets."""
 
@@ -64,7 +63,6 @@ def main():
         print("Note: Environment variables take precedence over Secret Manager")
 
     print("\n=== End of Examples ===")
-
 
 if __name__ == "__main__":
     main()

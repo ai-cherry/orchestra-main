@@ -8,14 +8,12 @@ import json
 from datetime import datetime
 from typing import Dict, Any
 
-
 def trigger_backup() -> Dict[str, str]:
     """
     Trigger a backup of code, config, and/or DB.
     Currently returns a success status for API compatibility.
     """
     return {"status": "success", "message": "Backup started."}
-
 
 def run_healthcheck() -> Dict[str, str]:
     """
@@ -24,14 +22,12 @@ def run_healthcheck() -> Dict[str, str]:
     """
     return {"status": "success", "message": "Healthcheck complete."}
 
-
 def trigger_deploy() -> Dict[str, str]:
     """
     Trigger a UI/API redeploy.
     Currently returns a success status for API compatibility.
     """
     return {"status": "success", "message": "Deployment triggered."}
-
 
 def snapshot_env() -> Dict[str, Dict[str, str]]:
     """

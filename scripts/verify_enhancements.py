@@ -11,7 +11,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import importlib.util
 from pathlib import Path
 
-
 def verify_file_exists(filepath):
     """Check if a file exists."""
     path = Path(filepath)
@@ -21,7 +20,6 @@ def verify_file_exists(filepath):
     else:
         print(f"✗ {filepath} - MISSING")
         return False
-
 
 def verify_module_imports(module_path, module_name):
     """Try to import a module to verify syntax."""
@@ -35,7 +33,6 @@ def verify_module_imports(module_path, module_name):
     except Exception as e:
         print(f"✗ {module_name} - Error: {e}")
         return False
-
 
 def main():
     """Verify all enhancement files."""
@@ -146,7 +143,6 @@ def main():
     print("- Memory: Added snapshot management for agent memories")
     print("- Pool: Added comprehensive monitoring and diagnostics")
     print("- Performance: Optimized queries, indexes, and connection pooling")
-
 
 if __name__ == "__main__":
     main()

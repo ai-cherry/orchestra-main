@@ -23,14 +23,12 @@ from agent.app.services.natural_language_processor import ResponseGenerator
 
 logger = logging.getLogger(__name__)
 
-
 class CustomAgentCapability(Enum):
     """Additional agent capabilities for your custom agent"""
 
     DATA_COLLECTION = "data_collection"
     TASK_AUTOMATION = "task_automation"
     INTEGRATION = "integration"
-
 
 class AutonomyLevel(Enum):
     """How autonomous the agent should be"""
@@ -39,7 +37,6 @@ class AutonomyLevel(Enum):
     SEMI_AUTONOMOUS = "semi_autonomous"
     GUIDED = "guided"
     ASSISTANT = "assistant"
-
 
 @dataclass
 class CustomAgentConfig:
@@ -55,7 +52,6 @@ class CustomAgentConfig:
     memory_type: str
     voice_personality: str
     custom_capability: Optional[CustomAgentCapability] = None
-
 
 class YourFirstAgent(Agent):
     """
@@ -262,7 +258,6 @@ class YourFirstAgent(Agent):
             self.task_queue.append(task)
             return True
         return False
-
 
 # Factory function to create agents based on questionnaire answers
 def create_agent_from_answers(answers: Dict[str, str]) -> YourFirstAgent:

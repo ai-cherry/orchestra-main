@@ -5,7 +5,6 @@ import os
 import subprocess
 import sys
 
-
 def check_python():
     """Check Python version."""
     required = (3, 10)
@@ -17,7 +16,6 @@ def check_python():
     print(f"✅ Python version OK: {'.'.join(map(str, current))}")
     return True
 
-
 def check_venv():
     """Check if in virtual environment."""
     if not os.environ.get("VIRTUAL_ENV"):
@@ -26,7 +24,6 @@ def check_venv():
         return False
     print(f"✅ Virtual environment active: {os.environ['VIRTUAL_ENV']}")
     return True
-
 
 def check_npm():
     """Check Node/NPM for admin UI."""
@@ -45,7 +42,6 @@ def check_npm():
             print("⚠️  NPM not found (needed for admin UI)")
     except FileNotFoundError:
         print("⚠️  Node.js/NPM not found (needed for admin UI)")
-
 
 def main():
     """Run all checks."""
@@ -67,7 +63,6 @@ def main():
     else:
         print("\n❌ Environment issues found. Fix them before proceeding.")
         sys.exit(1)
-
 
 if __name__ == "__main__":
     main()

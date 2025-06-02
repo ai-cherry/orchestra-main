@@ -23,7 +23,6 @@ from typing import Dict, List
 import psutil
 import requests
 
-
 class OrchestraCLI:
     """Unified CLI for Orchestra AI platform with real agents."""
 
@@ -221,7 +220,6 @@ class OrchestraCLI:
         print("\n" + ("✅ All checks passed!" if all_good else "❌ Some checks failed"))
         return 0 if all_good else 1
 
-
 def main():
     """Main entry point."""
     cli = OrchestraCLI()
@@ -276,7 +274,6 @@ Examples:
     else:
         parser.print_help()
         return 1
-
 
 if __name__ == "__main__":
     sys.exit(main())

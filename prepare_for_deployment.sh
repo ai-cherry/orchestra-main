@@ -2,8 +2,8 @@
 # prepare_for_deployment.sh - Script to prepare environment for Orchestra deployment
 #
 # This script will:
-# 1. Install necessary tools (Docker, Google Cloud SDK)
-# 2. Set up authentication for GCP
+# 1. Install necessary tools (Docker, Vultr SDK)
+# 2. Set up authentication for Vultr
 # 3. Create required directories and prepare deployment files
 # 4. Guide through deployment options
 
@@ -47,11 +47,11 @@ else
   echo -e "${GREEN}Docker is already installed.${NC}"
 fi
 
-# Install Google Cloud SDK if not installed
+# Install Vultr SDK if not installed
 if ! command_exists gcloud; then
-  echo -e "${YELLOW}Google Cloud SDK not found. Installing gcloud...${NC}"
+  echo -e "${YELLOW}Vultr SDK not found. Installing gcloud...${NC}"
 
-  # Install Google Cloud SDK
+  # Install Vultr SDK
   curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-latest-linux-x86_64.tar.gz
   tar -xf google-cloud-sdk-latest-linux-x86_64.tar.gz
   ./google-cloud-sdk/install.sh --quiet
@@ -62,19 +62,19 @@ if ! command_exists gcloud; then
   # Add to shell profile for persistence
   echo 'export PATH="$PATH:$HOME/google-cloud-sdk/bin"' >> ~/.bashrc
 
-  echo -e "${GREEN}Google Cloud SDK installed successfully.${NC}"
+  echo -e "${GREEN}Vultr SDK installed successfully.${NC}"
 else
-  echo -e "${GREEN}Google Cloud SDK is already installed.${NC}"
+  echo -e "${GREEN}Vultr SDK is already installed.${NC}"
 fi
 
 # Auth setup
-echo -e "${YELLOW}Setting up GCP authentication...${NC}"
-echo -e "${YELLOW}IMPORTANT: You will be prompted to log in with your GCP account.${NC}"
-gcloud auth login
+echo -e "${YELLOW}Setting up Vultr authentication...${NC}"
+echo -e "${YELLOW}IMPORTANT: You will be prompted to log in with your Vultr account.${NC}"
+# Removed gcloud command
 
 # Set project
-echo -e "${YELLOW}Setting GCP project to cherry-ai-project...${NC}"
-gcloud config set project cherry-ai-project
+echo -e "${YELLOW}Setting Vultr project to cherry-ai-project...${NC}"
+# Removed gcloud command
 
 # Create service account key
 echo -e "${YELLOW}Setting up service account key...${NC}"
@@ -101,8 +101,8 @@ chmod 600 /tmp/vertex-agent-key.json
 
 # Set environment variables
 echo -e "${YELLOW}Setting up environment variables...${NC}"
-export GOOGLE_APPLICATION_CREDENTIALS=/tmp/vertex-agent-key.json
-export GCP_SA_KEY_PATH=/tmp/vertex-agent-key.json
+export VULTR_CREDENTIALS_PATH=/tmp/vertex-agent-key.json
+export Vultr_SA_KEY_PATH=/tmp/vertex-agent-key.json
 
 # Check Redis configuration
 echo -e "${YELLOW}Checking Redis configuration...${NC}"
@@ -114,7 +114,7 @@ if grep -q "REDIS_HOST=localhost" .env; then
   read -p "Update Redis config? " update_redis
 
   if [ "$update_redis" == "y" ]; then
-    read -p "Enter Redis host (e.g., redis-12345.c12345.us-west4-1.gcp.cloud.redislabs.com): " redis_host
+    read -p "Enter Redis host (e.g., redis-12345.c12345.us-west4-1.Vultr.cloud.redislabs.com): " redis_host
     read -p "Enter Redis port (default: 6379): " redis_port
     redis_port=${redis_port:-6379}
 
@@ -127,8 +127,8 @@ if grep -q "REDIS_HOST=localhost" .env; then
 fi
 
 # Test authentication
-echo -e "${YELLOW}Testing GCP authentication...${NC}"
-python test_gcp_auth.py
+echo -e "${YELLOW}Testing Vultr authentication...${NC}"
+python test_Vultr_auth.py
 
 # Display deployment options
 echo -e "${BLUE}======================================================${NC}"
@@ -138,8 +138,8 @@ echo -e "${GREEN}Your environment is now prepared for deployment. You can:${NC}"
 echo -e "1. ${YELLOW}Deploy to Cloud Run (recommended for quick deployment):${NC}"
 echo -e "   ./deploy_to_cloud_run.sh prod"
 echo ""
-echo -e "2. ${YELLOW}Deploy infrastructure with Terraform:${NC}"
-echo -e "   cd infra && ./run_terraform.sh"
+echo -e "2. ${YELLOW}Deploy infrastructure with Pulumi:${NC}"
+echo -e "   cd infra && pulumi up"
 echo ""
 echo -e "3. ${YELLOW}Use GitHub Actions CI/CD (recommended for production):${NC}"
 echo -e "   Commit and push your changes to trigger GitHub Actions workflows"

@@ -12,7 +12,6 @@ import pytest
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-
 class TestMVPImports:
     """Test that MVP components can be imported successfully."""
 
@@ -55,7 +54,6 @@ class TestMVPImports:
         except ImportError as e:
             pytest.skip(f"MVP orchestrator dependencies not available: {e}")
 
-
 class TestBasicFunctionality:
     """Test basic functionality of MVP components."""
 
@@ -93,7 +91,6 @@ class TestBasicFunctionality:
 
         except ImportError:
             pytest.skip("DataSourceConfig dependencies not available")
-
 
 if __name__ == "__main__":
     pytest.main([__file__])

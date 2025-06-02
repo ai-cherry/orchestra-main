@@ -18,7 +18,6 @@ import yaml
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class GatewayAdapter(ABC):
     """Abstract base class for LLM gateway adapters."""
 
@@ -65,7 +64,6 @@ class GatewayAdapter(ABC):
     @abstractmethod
     async def monitor_credits(self) -> Dict[str, Any]:
         """Monitor credit usage."""
-
 
 class PortkeyGatewayAdapter(GatewayAdapter):
     """Adapter for Portkey API Gateway."""
@@ -285,7 +283,6 @@ class PortkeyGatewayAdapter(GatewayAdapter):
         # Keep only errors from the last 5 minutes
         self._last_errors[provider_lower] = [t for t in self._last_errors[provider_lower] if now - t < 300]  # 5 minutes
 
-
 class KongGatewayAdapter(GatewayAdapter):
     """Adapter for Kong AI Gateway."""
 
@@ -344,7 +341,6 @@ class KongGatewayAdapter(GatewayAdapter):
         """Monitor credit usage for Kong."""
         # Kong integration would be implemented here
         raise NotImplementedError("Kong gateway adapter is not implemented yet")
-
 
 class GatewayAdapterFactory:
     """Factory for creating gateway adapters."""
@@ -440,7 +436,6 @@ class GatewayAdapterFactory:
                     config[i] = GatewayAdapterFactory._process_env_vars(item)
 
         return config
-
 
 async def get_gateway_adapter() -> GatewayAdapter:
     """Get gateway adapter singleton."""

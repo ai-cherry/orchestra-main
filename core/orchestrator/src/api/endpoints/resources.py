@@ -8,7 +8,6 @@ from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
 
-
 class MemoryServiceStorageAdapter:
     """Enhanced storage adapter with deduplication support"""
 

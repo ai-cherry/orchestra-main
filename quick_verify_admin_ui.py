@@ -67,7 +67,6 @@ STATUS_WARNING = f"{Fore.YELLOW}⚠{Style.RESET_ALL}"
 STATUS_ERROR = f"{Fore.RED}✗{Style.RESET_ALL}"
 STATUS_INFO = f"{Fore.BLUE}ℹ{Style.RESET_ALL}"
 
-
 class AdminUIVerifier:
     """Main verifier class for Cherry Admin UI."""
 
@@ -786,7 +785,6 @@ class AdminUIVerifier:
             else:
                 return 0
 
-
 def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(description="Verify Cherry Admin UI deployment")
@@ -820,7 +818,6 @@ def parse_args() -> argparse.Namespace:
 
     return parser.parse_args()
 
-
 def main() -> None:
     """Main function."""
     args = parse_args()
@@ -836,7 +833,6 @@ def main() -> None:
 
     # Exit with appropriate code
     sys.exit(verifier.get_exit_code())
-
 
 if __name__ == "__main__":
     main()

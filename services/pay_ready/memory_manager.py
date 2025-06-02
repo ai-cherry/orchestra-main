@@ -18,7 +18,6 @@ from services.weaviate_service import WeaviateService
 
 logger = logging.getLogger(__name__)
 
-
 class MemoryTier:
     """Memory tier levels"""
 
@@ -26,7 +25,6 @@ class MemoryTier:
     WARM = "warm"  # Redis/Dragonfly (last 7 days)
     COLD = "cold"  # PostgreSQL (everything)
     VECTOR = "vector"  # Weaviate (semantic search)
-
 
 class PayReadyMemoryManager:
     """

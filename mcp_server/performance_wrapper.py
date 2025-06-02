@@ -39,7 +39,6 @@ connection_pool_size = Gauge("mcp_connection_pool_size", "Connection pool size",
 memory_cache = Cache(Cache.MEMORY, serializer=PickleSerializer())
 redis_cache = None
 
-
 async def init_redis_cache():
     """Initialize Redis cache with connection pooling"""
     global redis_cache
@@ -55,7 +54,6 @@ async def init_redis_cache():
 
     connection_pool_size.labels(pool_name="redis").set(redis_config["max_connections"])
     logger.info("Redis cache initialized with connection pooling")
-
 
 def cached(cache_name: str, ttl: int = 300, key_func: Optional[Callable] = None):
     """Decorator for caching function results"""
@@ -95,7 +93,6 @@ def cached(cache_name: str, ttl: int = 300, key_func: Optional[Callable] = None)
 
     return decorator
 
-
 def rate_limited(endpoint: str, default_limit: int = 100):
     """Decorator for rate limiting"""
     limit = PERF_CONFIG["rate_limiting"]["per_endpoint"].get(endpoint, default_limit)
@@ -122,7 +119,6 @@ def rate_limited(endpoint: str, default_limit: int = 100):
 
     return decorator
 
-
 def timed(server: str, endpoint: str):
     """Decorator to measure request latency"""
 
@@ -140,7 +136,6 @@ def timed(server: str, endpoint: str):
         return wrapper
 
     return decorator
-
 
 class ConnectionPool:
     """Generic connection pool implementation"""
@@ -176,7 +171,6 @@ class ConnectionPool:
             # Pool is full, close the connection
             if hasattr(conn, "close"):
                 await conn.close()
-
 
 class BatchProcessor:
     """Batch processing for better performance"""
@@ -265,7 +259,6 @@ class BatchProcessor:
             except Exception as e:
                 logger.error(f"Error in batch processor: {e}")
 
-
 def optimize_app(app, server_name: str):
     """Apply performance optimizations to FastAPI app"""
 
@@ -290,7 +283,6 @@ def optimize_app(app, server_name: str):
         logger.info(f"Performance optimizations initialized for {server_name}")
 
     return app
-
 
 # Export optimization utilities
 __all__ = [

@@ -22,7 +22,6 @@ from shared.database.connection_manager_enhanced import (
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
 class UnifiedPostgreSQLInitializer:
     """Handles initialization of the unified PostgreSQL system."""
 
@@ -568,12 +567,10 @@ class UnifiedPostgreSQLInitializer:
         finally:
             await close_connection_manager()
 
-
 async def main():
     """Main entry point."""
     initializer = UnifiedPostgreSQLInitializer()
     await initializer.run()
-
 
 if __name__ == "__main__":
     asyncio.run(main())

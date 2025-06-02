@@ -16,7 +16,6 @@ try:
 except ImportError:
     from pydantic import BaseModel, Field  # For pydantic v1
 
-
 class MessageType(str, Enum):
     """Types of messages in the agent communication protocol"""
 
@@ -30,13 +29,11 @@ class MessageType(str, Enum):
     MEMORY = "memory"
     WORKFLOW = "workflow"
 
-
 class AgentQuery(BaseModel):
     """Query from one agent to another"""
 
     query: str
     context: Dict[str, Any] = Field(default_factory=dict)
-
 
 class AgentResponse(BaseModel):
     """Response to a query"""
@@ -45,7 +42,6 @@ class AgentResponse(BaseModel):
     confidence: float = 0.0
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
-
 class AgentNotification(BaseModel):
     """Notification message"""
 
@@ -53,13 +49,11 @@ class AgentNotification(BaseModel):
     message: str
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
-
 class AgentStatus(BaseModel):
     """Status update from an agent"""
 
     status: str
     details: Dict[str, Any] = Field(default_factory=dict)
-
 
 class AgentError(BaseModel):
     """Error message"""
@@ -67,7 +61,6 @@ class AgentError(BaseModel):
     error_type: str
     message: str
     details: Dict[str, Any] = Field(default_factory=dict)
-
 
 class AgentTask(BaseModel):
     """Task assignment"""
@@ -77,7 +70,6 @@ class AgentTask(BaseModel):
     priority: int = 0
     deadline: Optional[float] = None
 
-
 class AgentResult(BaseModel):
     """Task result"""
 
@@ -85,7 +77,6 @@ class AgentResult(BaseModel):
     success: bool = True
     error: Optional[str] = None
     metrics: Dict[str, Any] = Field(default_factory=dict)
-
 
 class MemoryOperation(BaseModel):
     """Memory operation"""
@@ -95,7 +86,6 @@ class MemoryOperation(BaseModel):
     value: Optional[Any] = None
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
-
 class WorkflowEvent(BaseModel):
     """Workflow state change event"""
 
@@ -103,7 +93,6 @@ class WorkflowEvent(BaseModel):
     state: str
     transition: str
     data: Dict[str, Any] = Field(default_factory=dict)
-
 
 # Type for message content
 MessageContent = Union[
@@ -117,7 +106,6 @@ MessageContent = Union[
     MemoryOperation,
     WorkflowEvent,
 ]
-
 
 def create_protocol_message(
     sender: str,
@@ -185,7 +173,6 @@ def create_protocol_message(
         "timestamp": time.time(),
         "ttl": ttl,
     }
-
 
 def validate_protocol_message(message: Dict[str, Any]) -> bool:
     """

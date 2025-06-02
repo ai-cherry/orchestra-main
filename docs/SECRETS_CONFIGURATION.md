@@ -55,7 +55,7 @@ This document outlines all secrets and environment variables required for the Or
 |------------|-------------|--------------|---------|
 | `PULUMI_ACCESS_TOKEN` | Pulumi IaC token | 3 days ago | Infrastructure |
 | `PULUMI_CONFIGURE_PASSPHRASE` | Pulumi passphrase | 3 days ago | Encryption |
-| `TERRAFORM_API_TOKEN` | Terraform Cloud token | - | Alternative IaC |
+| `PULUMI_CLOUD_TOKEN` | Pulumi Cloud token | - | Infrastructure as Code |
 | `DOCKERHUB_USERNAME` | DockerHub username | 3 days ago | Container registry |
 | `DOCKER_PERSONAL_ACCESS_TOKEN` | Docker PAT | 3 days ago | Registry auth |
 | `GITHUB_TOKEN` | GitHub Actions token | - | Built-in |

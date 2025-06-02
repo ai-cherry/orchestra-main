@@ -21,8 +21,7 @@ from optional_integrations import cloud_logging, monitoring_v3  # Optional integ
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
-class GCPMonitoringClient:
+class PrometheusClient:
     """
     Client for reporting metrics to Google Cloud Monitoring and tracing with Cloud Trace.
 
@@ -201,18 +200,16 @@ class GCPMonitoringClient:
             logger.error(f"Failed to create incident report: {str(e)}")
             logger.error(f"Incident details: {incident_data}")
 
-
 # Global instance
 _monitoring_client = None
 _monitoring_client_lock = threading.RLock()
 
-
-def get_monitoring_client() -> GCPMonitoringClient:
+def get_monitoring_client() -> PrometheusClient:
     """
     Get the global monitoring client instance.
 
     Returns:
-        Global GCPMonitoringClient instance
+        Global PrometheusClient instance
     """
     global _monitoring_client
 
@@ -225,11 +222,11 @@ def get_monitoring_client() -> GCPMonitoringClient:
 
             settings = get_settings()
             project_id = os.environ.get(
-                "GCP_PROJECT_ID",
-                getattr(settings, "GCP_PROJECT_ID", "cherry-ai-project"),
+                "VULTR_PROJECT_ID",
+                getattr(settings, "VULTR_PROJECT_ID", "cherry-ai-project"),
             )
 
-            _monitoring_client = GCPMonitoringClient(project_id)
+            _monitoring_client = PrometheusClient(project_id)
 
             logger.info(f"Created global GCP Monitoring client for project {project_id}")
 

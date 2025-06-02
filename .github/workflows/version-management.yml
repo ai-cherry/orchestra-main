@@ -1,0 +1,466 @@
+name: Version Management
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  
+  workflow_dispatch:
+    inputs:
+      command:
+        description: 'Command to run (scan, check, update, report)'
+        required: true
+        default: 'check'
+        type: choice
+        options:
+          - scan
+          - check
+          - update
+          - report
+      strategy:
+        description: 'Update strategy'
+        required: false
+        default: 'minor'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - security
+      max_risk:
+        description: 'Maximum risk score (0-10)'
+        required: false
+        default: '5'
+        type: string
+
+  pull_request:
+    paths:
+      - '**/requirements*.txt'
+      - '**/package.json'
+      - '**/Dockerfile*'
+      - '.github/workflows/version-management.yml'
+
+env:
+  PYTHON_VERSION: '3.10'
+  NODE_VERSION: '18'
+
+jobs:
+  version-scan:
+    name: Dependency Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Cache Python dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      
+      - name: Install version management tools
+        run: |
+          pip install --upgrade pip
+          pip install pyyaml aiohttp prometheus-client semantic-version
+          
+      - name: Run dependency scan
+        id: scan
+        run: |
+          python scripts/version_manager.py scan --output scan-results.json
+          echo "scan_complete=true" >> $GITHUB_OUTPUT
+      
+      - name: Upload scan results
+        uses: actions/upload-artifact@v3
+        with:
+          name: scan-results
+          path: scan-results.json
+          retention-days: 30
+
+  security-check:
+    name: Security Vulnerability Check
+    runs-on: ubuntu-latest
+    needs: version-scan
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install security tools
+        run: |
+          pip install safety bandit
+          npm install -g npm-audit-html snyk
+      
+      - name: Download scan results
+        uses: actions/download-artifact@v3
+        with:
+          name: scan-results
+      
+      - name: Check Python vulnerabilities
+        id: python_security
+        continue-on-error: true
+        run: |
+          # Run safety check
+          safety check --json > python-vulnerabilities.json || true
+          
+          # Run bandit for code security
+          bandit -r . -f json -o bandit-report.json || true
+          
+          # Check for critical vulnerabilities
+          if grep -q '"severity": "critical"' python-vulnerabilities.json; then
+            echo "critical_found=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Check JavaScript vulnerabilities
+        id: npm_security
+        continue-on-error: true
+        working-directory: ./admin-ui
+        run: |
+          # Run npm audit
+          npm audit --json > ../npm-vulnerabilities.json || true
+          
+          # Generate HTML report
+          npm audit --json | npm-audit-html -o ../npm-audit-report.html || true
+          
+          # Check for critical vulnerabilities
+          if grep -q '"severity": "critical"' ../npm-vulnerabilities.json; then
+            echo "critical_found=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Check Docker image vulnerabilities
+        id: docker_security
+        continue-on-error: true
+        run: |
+          # Install trivy
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install trivy
+          
+          # Scan Dockerfiles
+          for dockerfile in $(find . -name "Dockerfile*"); do
+            trivy config "$dockerfile" --format json --pulumi.export("${dockerfile}.trivy.json", || true
+          done
+      
+      - name: Generate security report
+        run: |
+          python scripts/version_manager.py check --output security-report.json
+      
+      - name: Upload security reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-reports
+          path: |
+            *-vulnerabilities.json
+            *-report.*
+            security-report.json
+          retention-days: 30
+      
+      - name: Comment PR with security summary
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const report = JSON.parse(fs.readFileSync('security-report.json', 'utf8'));
+            
+            let comment = '## 🔒 Security Check Results\n\n';
+            
+            if (report.summary.vulnerable_dependencies > 0) {
+              comment += `⚠️ Found **${report.summary.vulnerable_dependencies}** dependencies with vulnerabilities\n\n`;
+              
+              if (report.critical_updates && report.critical_updates.length > 0) {
+                comment += '### Critical Updates Required:\n';
+                report.critical_updates.forEach(dep => {
+                  comment += `- **${dep.name}** (${dep.vulnerabilities} vulnerabilities)\n`;
+                });
+              }
+            } else {
+              comment += '✅ No security vulnerabilities detected\n';
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+      
+      - name: Fail if critical vulnerabilities
+        if: steps.python_security.outputs.critical_found == 'true' || steps.npm_security.outputs.critical_found == 'true'
+        run: |
+          echo "❌ Critical security vulnerabilities found!"
+          exit 1
+
+  version-update:
+    name: Automated Version Updates
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.command == 'update')
+    needs: security-check
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Configure git
+        run: |
+          git config --global user.name "Version Bot"
+          git config --global user.email "version-bot@orchestra.ai"
+      
+      - name: Install dependencies
+        run: |
+          pip install -r scripts/requirements-version-management.txt
+      
+      - name: Check for updates
+        id: check_updates
+        run: |
+          STRATEGY="${{ github.event.inputs.strategy || 'minor' }}"
+          MAX_RISK="${{ github.event.inputs.max_risk || '5' }}"
+          
+          python scripts/version_updater.py check \
+            --strategy "$STRATEGY" \
+            --output available-updates.json
+          
+          # Count available updates
+          UPDATE_COUNT=$(jq length available-updates.json)
+          echo "update_count=$UPDATE_COUNT" >> $GITHUB_OUTPUT
+          
+          if [ "$UPDATE_COUNT" -gt 0 ]; then
+            echo "updates_available=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Apply updates
+        if: steps.check_updates.outputs.updates_available == 'true'
+        id: apply_updates
+        run: |
+          STRATEGY="${{ github.event.inputs.strategy || 'minor' }}"
+          MAX_RISK="${{ github.event.inputs.max_risk || '5' }}"
+          
+          python scripts/version_updater.py update \
+            --strategy "$STRATEGY" \
+            --max-risk "$MAX_RISK" \
+            --output update-report.json
+          
+          # Check if any updates were successful
+          SUCCESS_COUNT=$(jq '.summary.successful' update-report.json)
+          if [ "$SUCCESS_COUNT" -gt 0 ]; then
+            echo "updates_applied=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Run tests
+        if: steps.apply_updates.outputs.updates_applied == 'true'
+        run: |
+          # Run Python tests
+          python -m pytest tests/ -v --tb=short || true
+          
+          # Run JavaScript tests
+          cd admin-ui && npm test || true
+      
+      - name: Create pull request
+        if: steps.apply_updates.outputs.updates_applied == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: automated dependency updates'
+          title: '🤖 Automated Dependency Updates'
+          body: |
+            ## Automated Dependency Updates
+            
+            This PR contains automated dependency updates based on the configured strategy.
+            
+            ### Update Summary
+            ```json
+            ${{ steps.apply_updates.outputs.update_summary }}
+            ```
+            
+            ### Testing
+            - [ ] All tests pass
+            - [ ] No breaking changes detected
+            - [ ] Security vulnerabilities addressed
+            
+            Please review the changes and merge if everything looks good.
+          branch: deps/automated-update-${{ github.run_number }}
+          delete-branch: true
+          labels: |
+            dependencies
+            automated
+            version-management
+
+  monitoring:
+    name: Version Health Monitoring
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install monitoring tools
+        run: |
+          pip install -r scripts/requirements-version-management.txt
+      
+      - name: Run health checks
+        id: health_check
+        run: |
+          python scripts/version_monitor.py --once --output health-report.json
+          
+          # Extract overall status
+          STATUS=$(jq -r '.status' health-report.json)
+          echo "health_status=$STATUS" >> $GITHUB_OUTPUT
+          
+          # Count active alerts
+          ALERT_COUNT=$(jq '.active_alerts' health-report.json)
+          echo "alert_count=$ALERT_COUNT" >> $GITHUB_OUTPUT
+      
+      - name: Upload health report
+        uses: actions/upload-artifact@v3
+        with:
+          name: health-report
+          path: health-report.json
+          retention-days: 30
+      
+      - name: Send alerts if unhealthy
+        if: steps.health_check.outputs.health_status != 'healthy'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const report = JSON.parse(fs.readFileSync('health-report.json', 'utf8'));
+            
+            // Create issue if critical
+            if (report.status === 'critical') {
+              const issue = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: '🚨 Critical: Version Health Issues Detected',
+                body: `## Version Health Alert
+                
+                The automated version health check has detected critical issues:
+                
+                ${report.checks.filter(c => c.status === 'critical').map(c => 
+                  `- **${c.name}**: ${c.message}`
+                ).join('\n')}
+                
+                ### Active Alerts: ${report.active_alerts}
+                
+                Please investigate and resolve these issues immediately.
+                
+                [View full report](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
+                labels: ['critical', 'version-health', 'automated']
+              });
+              
+              console.log(`Created issue #${issue.data.number}`);
+            }
+      
+      - name: Update status badge
+        if: always()
+        run: |
+          STATUS="${{ steps.health_check.outputs.health_status || 'unknown' }}"
+          COLOR="brightgreen"
+          
+          if [ "$STATUS" = "warning" ]; then
+            COLOR="yellow"
+          elif [ "$STATUS" = "critical" ]; then
+            COLOR="red"
+          elif [ "$STATUS" = "unknown" ]; then
+            COLOR="lightgrey"
+          fi
+          
+          # This would update a status badge in your README
+          echo "Version Health: $STATUS (color: $COLOR)"
+
+  report:
+    name: Generate Version Report
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.command == 'report'
+    needs: [version-scan, security-check]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+      
+      - name: Generate comprehensive report
+        run: |
+          python scripts/version_manager.py report --output version-report.json
+          
+          # Generate markdown report
+          python -c "
+          import json
+          with open('version-report.json') as f:
+              data = json.load(f)
+          
+          print('# Version Management Report')
+          print(f'\\nGenerated: {data[\"summary\"][\"scan_timestamp\"]}')
+          print(f'\\n## Summary')
+          print(f'- Total Dependencies: {data[\"summary\"][\"total_dependencies\"]}')
+          print(f'- Vulnerable: {data[\"summary\"][\"vulnerable_dependencies\"]}')
+          print(f'- Outdated: {data[\"summary\"][\"high_priority_updates\"]}')
+          " > version-report.md
+      
+      - name: Upload report
+        uses: actions/upload-artifact@v3
+        with:
+          name: version-report
+          path: |
+            version-report.json
+            version-report.md
+          retention-days: 90
+      
+      - name: Comment report summary
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('version-report.md', 'utf8');
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: report
+            });

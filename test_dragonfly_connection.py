@@ -24,7 +24,6 @@ from mcp_server.config.dragonfly_config import log_dragonfly_config, validate_dr
 from mcp_server.memory.base import MemoryEntry, MemoryMetadata
 from mcp_server.memory.dragonfly_cache import DragonflyCache
 
-
 class DragonflyConnectionTest:
     """Test suite for DragonflyDB connection and operations."""
 
@@ -409,7 +408,6 @@ class DragonflyConnectionTest:
         except Exception as e:
             print(f"Warning: Cleanup error: {e}")
 
-
 async def main():
     """Run the test suite."""
     tester = DragonflyConnectionTest()
@@ -445,7 +443,6 @@ async def main():
     finally:
         # Cleanup
         await tester.cleanup()
-
 
 if __name__ == "__main__":
     asyncio.run(main())

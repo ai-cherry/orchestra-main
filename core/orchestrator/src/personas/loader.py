@@ -13,46 +13,45 @@ from typing import Dict, Optional
 
 import yaml
 
-from packages.shared.src.models.base_models import PersonaConfig
+from packages.shared.src.models.base_models import PersonaConfig, PersonaTraits
 
 # Configure logging
 logger = logging.getLogger(__name__)
 
 # Default persona for fallback
 DEFAULT_PERSONA = PersonaConfig(
+    id="default",
     name="Default",
-    description="A standard default persona.",  # Added missing description
-    background="Default persona for when no specific persona is selected or available.",
-    interaction_style="Helpful and informative",
-    traits={"sarcasm": 10, "creativity": 50, "strategy": 50},
+    description="A standard default persona for when no specific persona is selected or available.",
+    traits=PersonaTraits(creativity=50, analytical_thinking=50),
+    system_prompt="You are a helpful AI assistant. Please provide accurate and informative responses to user queries.",
 )
 
 # Dictionary of fallback personas
 FALLBACK_PERSONAS = {
     "default": DEFAULT_PERSONA,
     "cherry": PersonaConfig(
+        id="cherry",
         name="Cherry",
-        description="A cheerful and optimistic persona.",  # Added missing description
-        background="Cheerful and optimistic persona with a focus on positive thinking.",
-        interaction_style="Upbeat and encouraging",
-        traits={"sarcasm": 5, "creativity": 80, "strategy": 40},
+        description="A cheerful and optimistic persona with a focus on positive thinking.",
+        traits=PersonaTraits(creativity=80, social_awareness=70, adaptability=60),
+        system_prompt="You are Cherry, a cheerful and optimistic AI assistant. Always approach problems with positivity and encourage users while providing helpful solutions.",
     ),
     "sage": PersonaConfig(
+        id="sage",
         name="Sage",
-        description="A wise and thoughtful persona.",  # Added missing description
-        background="Wise and thoughtful persona with a focus on careful analysis.",
-        interaction_style="Deliberate and measured",
-        traits={"sarcasm": 5, "creativity": 40, "strategy": 90},
+        description="A wise and thoughtful persona with a focus on careful analysis.",
+        traits=PersonaTraits(analytical_thinking=90, technical_depth=80, detail_orientation=85),
+        system_prompt="You are Sage, a wise and thoughtful AI assistant. Take time to carefully consider problems and provide well-reasoned, strategic advice.",
     ),
     "wit": PersonaConfig(
+        id="wit",
         name="Wit",
-        description="A clever and quick-witted persona.",  # Added missing description
-        background="Clever and quick-witted persona with a sharp sense of humor.",
-        interaction_style="Clever and playful",
-        traits={"sarcasm": 70, "creativity": 85, "strategy": 60},
+        description="A clever and quick-witted persona with a sharp sense of humor.",
+        traits=PersonaTraits(creativity=85, social_awareness=75, adaptability=70),
+        system_prompt="You are Wit, a clever and quick-witted AI assistant. Use humor and wordplay appropriately while providing insightful and creative solutions.",
     ),
 }
-
 
 class PersonaManager:
     """

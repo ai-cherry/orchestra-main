@@ -14,7 +14,6 @@ from mcp.types import TextContent, Tool
 
 # from .base_mcp_server import BaseMCPServer, MCPServerConfig # Removed
 
-
 class DeploymentServer:
     """MCP server for deployment."""
 
@@ -57,7 +56,6 @@ class DeploymentServer:
         """Run the MCP server."""
         async with stdio_server() as (read_stream, write_stream):
             await self.server.run(read_stream, write_stream)
-
 
 if __name__ == "__main__":
     server = DeploymentServer()

@@ -34,7 +34,6 @@ from agent.app.core.database import get_db
 
 logger = logging.getLogger(__name__)
 
-
 class WorkflowStatus(Enum):
     """Workflow execution status"""
     PENDING = "pending"
@@ -44,7 +43,6 @@ class WorkflowStatus(Enum):
     CANCELLED = "cancelled"
     PAUSED = "paused"
 
-
 class TaskStatus(Enum):
     """Individual task status"""
     PENDING = "pending"
@@ -53,7 +51,6 @@ class TaskStatus(Enum):
     FAILED = "failed"
     SKIPPED = "skipped"
     RETRYING = "retrying"
-
 
 @dataclass
 class WorkflowTask:
@@ -70,7 +67,6 @@ class WorkflowTask:
     retry_count: int = 0
     max_retries: int = 3
 
-
 @dataclass
 class Workflow:
     """Workflow definition and state"""
@@ -83,7 +79,6 @@ class Workflow:
     completed_at: Optional[datetime] = None
     context: Dict[str, Any] = field(default_factory=dict)
     checkpoints: List[Dict[str, Any]] = field(default_factory=list)
-
 
 class CircuitBreaker:
     """Circuit breaker for external service calls"""
@@ -122,7 +117,6 @@ class CircuitBreaker:
                 return True
         
         return False
-
 
 class AgentOrchestrator:
     """
@@ -579,10 +573,8 @@ class AgentOrchestrator:
         
         logger.info(f"Cancelled workflow {workflow_id}")
 
-
 # Singleton instance
 _orchestrator_instance: Optional[AgentOrchestrator] = None
-
 
 def get_agent_orchestrator() -> AgentOrchestrator:
     """Get or create the singleton orchestrator instance"""
@@ -590,7 +582,6 @@ def get_agent_orchestrator() -> AgentOrchestrator:
     if _orchestrator_instance is None:
         _orchestrator_instance = AgentOrchestrator()
     return _orchestrator_instance
-
 
 # Example workflow definitions
 

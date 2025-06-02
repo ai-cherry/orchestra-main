@@ -8,7 +8,6 @@ import subprocess
 from datetime import datetime
 from pathlib import Path
 
-
 def check_service(name: str, command: list) -> tuple:
     """Check if a service is running."""
     try:
@@ -17,7 +16,6 @@ def check_service(name: str, command: list) -> tuple:
     except Exception as e:
         print(f"  Error checking {name}: {e}")
         return False, "Not running"
-
 
 def main():
     """Show Orchestra AI status."""

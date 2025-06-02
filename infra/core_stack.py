@@ -9,7 +9,6 @@ import pulumi
 import pulumi_digitalocean as do
 from pulumi import Config, Output
 
-
 class CoreStack:
     def __init__(self, name: str, config: Dict[str, str]):
         """
@@ -158,7 +157,6 @@ class CoreStack:
             """
 
             pulumi.export("startup_script", startup_script)
-
 
 # Example usage
 if __name__ == "__main__":

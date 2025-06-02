@@ -12,7 +12,6 @@ from typing import Any, Callable, Dict, List, Optional, Union
 
 logger = logging.getLogger(__name__)
 
-
 def param_transformer(func: Callable) -> Callable:
     """
     Decorator that transforms parameters between dict and keyword arguments.
@@ -53,7 +52,6 @@ def param_transformer(func: Callable) -> Callable:
         return await func(self, **kwargs)
     
     return wrapper
-
 
 def ensure_dict_param(param_name: str = 'data') -> Callable:
     """
@@ -103,7 +101,6 @@ def ensure_dict_param(param_name: str = 'data') -> Callable:
         
         return wrapper
     return decorator
-
 
 def retry_on_connection_error(max_attempts: int = 3, backoff_factor: float = 1.0):
     """

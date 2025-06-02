@@ -1,0 +1,6 @@
+name: orchestra-ai
+runtime: python
+description: Orchestra AI infrastructure on Vultr
+config:
+  vultr:region: ewr
+  orchestra:environment: ${PULUMI_STACK}

@@ -9,26 +9,26 @@ python --version
 # Check Poetry version
 poetry --version
 
-# Check Terraform version
-terraform --version
+# Check Pulumi version
+pulumi --version
 
 # Check gcloud CLI
-gcloud --version
+# Removed gcloud command
 
-# Verify GCP authentication
-if [ -n "$GCP_SA_KEY_JSON" ]; then
-  echo "GCP service account key found, activating..."
-  echo "$GCP_SA_KEY_JSON" > /tmp/gcp-key.json
-  gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
-  rm /tmp/gcp-key.json
-elif [ -n "$GOOGLE_APPLICATION_CREDENTIALS" ]; then
+# Verify Vultr authentication
+if [ -n "$Vultr_SA_KEY_JSON" ]; then
+  echo "Vultr service account key found, activating..."
+  echo "$Vultr_SA_KEY_JSON" > /tmp/Vultr-key.json
+  # vultr-cli auth activate-service-account --key-file=/tmp/Vultr-key.json
+  rm /tmp/Vultr-key.json
+elif [ -n "$VULTR_CREDENTIALS_PATH" ]; then
   echo "GOOGLE_APPLICATION_CREDENTIALS is set, using for authentication"
 else
-  echo "No GCP credentials found, authentication may be required"
+  echo "No Vultr credentials found, authentication may be required"
 fi
 
 # Set default project
-gcloud config set project cherry-ai-project
+# Removed gcloud command
 
 # Check if Poetry virtual environment is activated
 if [ -d ".venv" ]; then
@@ -41,7 +41,7 @@ fi
 echo "Checking for required Python packages..."
 python -c "import fastapi; print(f'FastAPI version: {fastapi.__version__}')" || echo "FastAPI not installed"
 python -c "import pydantic; print(f'Pydantic version: {pydantic.__version__}')" || echo "Pydantic not installed"
-python -c "import google.cloud; print('Google Cloud SDK available')" || echo "Google Cloud SDK not installed"
+python -c "import google.cloud; print('Vultr SDK available')" || echo "Vultr SDK not installed"
 
 # Verify restricted mode is disabled
 echo "Checking restricted mode status..."

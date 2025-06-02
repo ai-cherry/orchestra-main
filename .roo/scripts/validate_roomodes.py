@@ -5,7 +5,6 @@ import yaml
 import sys
 from pathlib import Path
 
-
 def validate_roomodes():
     """Validate the .roomodes file."""
     roomodes_file = Path(".roomodes")
@@ -105,7 +104,6 @@ def validate_roomodes():
         print("❌ Some issues found. Please review the configuration above.")
 
     return all_ok
-
 
 if __name__ == "__main__":
     success = validate_roomodes()

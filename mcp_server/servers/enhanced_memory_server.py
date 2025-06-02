@@ -22,7 +22,6 @@ from mcp.types import TextContent, Tool
 from mcp_server.base.enhanced_server_base import EnhancedMCPServerBase
 from shared.database import UnifiedDatabase
 
-
 class LRUCache:
     """Simple LRU cache implementation for memory operations"""
 
@@ -69,7 +68,6 @@ class LRUCache:
         self.cache.clear()
         self.timestamps.clear()
 
-
 class VectorBatchProcessor:
     """Process vectors in batches to optimize memory usage"""
 
@@ -89,7 +87,6 @@ class VectorBatchProcessor:
             await asyncio.sleep(0)
 
         return results
-
 
 class EnhancedMemoryServer(EnhancedMCPServerBase):
     """Enhanced MCP server for memory management with performance optimizations"""
@@ -500,7 +497,6 @@ class EnhancedMemoryServer(EnhancedMCPServerBase):
         # Implementation of original tools would go here
         # For brevity, returning a placeholder
         return [TextContent(type="text", text=f"Tool {name} executed with arguments: {arguments}")]
-
 
 if __name__ == "__main__":
     server = EnhancedMemoryServer()

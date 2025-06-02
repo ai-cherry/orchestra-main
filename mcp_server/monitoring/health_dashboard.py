@@ -30,7 +30,6 @@ SERVERS = {
 # Metrics endpoint
 METRICS_URL = "http://localhost:8000/metrics"
 
-
 async def check_health(name: str, url: str) -> dict:
     """Check health of a single server"""
     try:
@@ -62,7 +61,6 @@ async def check_health(name: str, url: str) -> dict:
             "details": {"error": str(e)},
         }
 
-
 def create_health_table(health_data: list) -> Table:
     """Create health status table"""
     table = Table(title="MCP Server Health Status", show_header=True, header_style="bold magenta")
@@ -91,7 +89,6 @@ def create_health_table(health_data: list) -> Table:
         table.add_row(server["name"], server["status"], server["latency"], details)
 
     return table
-
 
 async def get_metrics() -> dict:
     """Get Prometheus metrics"""

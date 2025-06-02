@@ -15,7 +15,6 @@ from core.orchestrator.src.api.dependencies.personas import get_persona_config
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class PersonaMiddleware(BaseHTTPMiddleware):
     """
     Middleware that sets the active persona for incoming requests.

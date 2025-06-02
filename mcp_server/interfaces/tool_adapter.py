@@ -12,7 +12,6 @@ from typing import Any, Dict, List, Optional
 
 from ..models.memory import MemoryEntry
 
-
 class IToolAdapter(ABC):
     """Interface for tool-specific adapters."""
 
@@ -57,7 +56,6 @@ class IToolAdapter(ABC):
     @abstractmethod
     async def get_status(self) -> Dict[str, Any]:
         """Get the status of the tool adapter."""
-
 
 class CopilotAdapter(IToolAdapter):
     """GitHub Copilot adapter for MCP."""
@@ -130,7 +128,6 @@ class CopilotAdapter(IToolAdapter):
         # This is a placeholder implementation
         # In a real implementation, this would use Copilot's API
         return True
-
 
 class GeminiAdapter(IToolAdapter):
     """Google Gemini adapter for MCP."""
@@ -223,7 +220,6 @@ class GeminiAdapter(IToolAdapter):
             "context_window_used": 0,
             "context_window_size": self.context_window_size,
         }
-
 
 import logging
 

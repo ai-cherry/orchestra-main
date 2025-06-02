@@ -8,7 +8,7 @@ The integration automatically updates our design assets when changes are made to
 
 1. Pulls the latest design tokens from Figma
 2. Converts them to platform-specific formats (CSS, JS, Android, iOS)
-3. Updates our Terraform configuration
+3. Updates our Pulumi configuration
 4. Validates the design tokens using 5. Deploys the changes with a canary release strategy
 
 ## Requirements
@@ -106,7 +106,7 @@ python scripts/verify_cline_tools.py
 This checks for:
 
 - figma-sync (v1.3.0+)
-- terraform-linter (v2.8+)
+- pulumi-linter (v2.8+)
 -
 ## Workflow Details
 
@@ -124,7 +124,7 @@ The `figma_
   - JavaScript module
   - Android XML resources
   - iOS Swift files
-  - Terraform variables
+  - Pulumi variables
 - Updates
 ### Error Handling
 

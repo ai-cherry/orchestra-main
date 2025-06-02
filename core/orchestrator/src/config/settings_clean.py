@@ -9,7 +9,6 @@ from typing import Dict, Optional
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
@@ -104,7 +103,6 @@ class Settings(BaseSettings):
             except json.JSONDecodeError as e:
                 logging.error(f"Failed to parse OPENROUTER_HEADERS: {e}")
         return headers
-
 
 def get_settings() -> Settings:
     """Get application settings."""

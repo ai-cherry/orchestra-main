@@ -15,7 +15,6 @@ from packages.shared.src.models.base_models import PersonaConfig
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 def get_persona_configs(force_refresh: bool = False) -> Dict[str, PersonaConfig]:
     """
     Get all available persona configurations.
@@ -28,7 +27,6 @@ def get_persona_configs(force_refresh: bool = False) -> Dict[str, PersonaConfig]
     """
     return load_persona_configs(force_refresh=force_refresh)
 
-
 def reload_personas() -> Dict[str, PersonaConfig]:
     """
     Force reload persona configurations from disk.
@@ -40,7 +38,6 @@ def reload_personas() -> Dict[str, PersonaConfig]:
         Dict[str, PersonaConfig]: Refreshed dictionary of persona configurations
     """
     return force_reload_personas()
-
 
 async def get_active_persona(
     request: Request,

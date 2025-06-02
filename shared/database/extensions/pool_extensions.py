@@ -11,7 +11,6 @@ import asyncpg
 
 logger = logging.getLogger(__name__)
 
-
 class PoolExtensionsMixin:
     """
     Mixin that adds missing pool functionality to PostgreSQLConnectionManager.

@@ -28,7 +28,7 @@ REQUIRED_SECRETS = {
     "core": [
         "OPENAI_API_KEY",
         "PORTKEY_API_KEY",
-        "GOOGLE_CLOUD_PROJECT",
+        "VULTR_PROJECT_ID",
     ],
     "data_sources": [
         "GONG_API_KEY",
@@ -58,7 +58,6 @@ REQUIRED_SECRETS = {
     ],
 }
 
-
 def get_pulumi_secrets() -> Dict[str, str]:
     """Get secrets from Pulumi-generated .env file."""
     secrets = {}
@@ -74,7 +73,6 @@ def get_pulumi_secrets() -> Dict[str, str]:
     except Exception as e:
         console.print(f"[red]Error reading .env file: {e}[/red]")
     return secrets
-
 
 class AdapterConfig:
     """Standard adapter configuration interface."""
@@ -130,7 +128,6 @@ class AdapterConfig:
             },
         }
 
-
 @click.group()
 @click.option("--verbose", "-v", is_flag=True, help="Enable verbose output")
 @click.pass_context
@@ -142,11 +139,9 @@ def cli(ctx, verbose):
     # Environment variables for secrets are injected by GCP infra or set in CI/CD.
     # Do NOT use load_dotenv in production.
 
-
 @cli.group()
 def secrets():
     """Manage secrets and credentials."""
-
 
 @secrets.command()
 @click.option("--env-file", default=".env", help="Path to .env file")
@@ -217,7 +212,6 @@ def sync(ctx, env_file, dry_run):
     else:
         console.print(f"\n[green]✓ Synced {len(synced)} secrets to {env_file}[/green]")
 
-
 @secrets.command()
 @click.pass_context
 def validate(ctx):
@@ -255,7 +249,6 @@ def validate(ctx):
         console.print("[yellow]Run 'orchestra secrets sync' to fetch from Pulumi[/yellow]")
         sys.exit(1)
 
-
 @secrets.command()
 @click.argument("secret_id")
 @click.option("--value", prompt=True, hide_input=True, confirmation_prompt=True)
@@ -286,11 +279,9 @@ def set(ctx, secret_id, value):
         console.print(f"[red]✗ Failed to update secret {secret_id}: {str(e)}[/red]")
         sys.exit(1)
 
-
 @cli.group()
 def adapters():
     """Manage data source adapters."""
-
 
 @adapters.command()
 @click.pass_context
@@ -320,7 +311,6 @@ def list(ctx):
         )
 
     console.print(table)
-
 
 @adapters.command(name="check")
 @click.argument("adapter_id")
@@ -363,11 +353,9 @@ def check_adapter(ctx, adapter_id):
     else:
         console.print(f"\n[red]✗ {config['name']} adapter is missing required configuration[/red]")
 
-
 @cli.group()
 def diagnostics():
     """Run system diagnostics and health checks."""
-
 
 @diagnostics.command()
 @click.pass_context
@@ -403,7 +391,6 @@ def health(ctx):
     else:
         console.print("\n[red]✗ Some systems need attention[/red]")
 
-
 def check_secrets_health():
     """Check if all required secrets are present."""
     total = sum(len(secrets) for secrets in REQUIRED_SECRETS.values())
@@ -413,7 +400,6 @@ def check_secrets_health():
         return True, f"All {total} required secrets present"
     else:
         return False, f"{present}/{total} secrets present"
-
 
 def check_pulumi_health():
     """Check Pulumi configuration."""
@@ -429,7 +415,6 @@ def check_pulumi_health():
     except Exception as e:
         return False, f"Pulumi check failed: {str(e)[:50]}..."
 
-
 def check_redis_health():
     """Check Redis connectivity."""
     try:
@@ -443,7 +428,6 @@ def check_redis_health():
         return True, f"Connected to {host}"
     except Exception as e:
         return False, f"Connection failed: {str(e)[:50]}..."
-
 
 def check_mcp_health():
     """Check MCP Gateway status."""
@@ -460,7 +444,6 @@ def check_mcp_health():
     except Exception as e:
         return False, f"Import check failed: {str(e)[:50]}..."
 
-
 def check_adapters_health():
     """Check adapter readiness."""
     adapters = AdapterConfig.get_adapter_configs()
@@ -472,11 +455,9 @@ def check_adapters_health():
     else:
         return False, f"{ready}/{total} adapters ready"
 
-
 @cli.group()
 def orchestrator():
     """Manage the orchestration system."""
-
 
 @orchestrator.command()
 @click.pass_context
@@ -496,7 +477,6 @@ def reload(ctx):
     except Exception as e:
         console.print(f"[red]✗ Failed to reload: {e}[/red]")
 
-
 @orchestrator.command()
 @click.pass_context
 def status(ctx):
@@ -510,7 +490,7 @@ def status(ctx):
     table.add_column("Property", style="cyan")
     table.add_column("Value", style="white")
 
-    table.add_row("Project ID", os.getenv("GOOGLE_CLOUD_PROJECT", "Not set"))
+    table.add_row("Project ID", os.getenv("VULTR_PROJECT_ID", "Not set"))
     table.add_row("Environment", os.getenv("ENVIRONMENT", "development"))
     table.add_row("Redis Host", os.getenv("REDIS_HOST", "Not set"))
     table.add_row(
@@ -527,7 +507,6 @@ def status(ctx):
     )
 
     console.print(table)
-
 
 @cli.command()
 @click.pass_context
@@ -556,7 +535,6 @@ def init(ctx):
         progress.update(task, completed=True)
 
     console.print("\n[green]✓ Orchestra AI system initialized successfully![/green]")
-
 
 if __name__ == "__main__":
     cli()

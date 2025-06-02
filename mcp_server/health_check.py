@@ -5,7 +5,6 @@ health_check.py - Health check endpoint for the MCP server
 This module adds a health check endpoint to the MCP server for deployment monitoring.
 """
 
-
 def register_health_endpoints(app):
     """Register health check endpoints for the Flask application.
 

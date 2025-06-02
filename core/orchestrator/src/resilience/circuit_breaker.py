@@ -22,14 +22,12 @@ logger = logging.getLogger(__name__)
 # Type variable for generic return type
 T = TypeVar("T")
 
-
 class CircuitState(Enum):
     """Circuit states for the circuit breaker."""
 
     CLOSED = "CLOSED"  # Normal operation - requests flow through
     OPEN = "OPEN"  # Circuit tripped - requests go to fallback
     HALF_OPEN = "HALF_OPEN"  # Testing if service is recovered
-
 
 class CircuitBreaker(Generic[T]):
     """
@@ -576,11 +574,9 @@ class CircuitBreaker(Generic[T]):
                 logger.info(f"Circuit for agent '{agent_id}' was force reset to CLOSED state")
                 self._report_metric(f"{agent_id}.circuit_force_reset", 1)
 
-
 # Global instance for singleton access
 _circuit_breaker = None
 _circuit_breaker_lock = threading.RLock()
-
 
 def get_circuit_breaker() -> CircuitBreaker:
     """

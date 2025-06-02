@@ -297,12 +297,12 @@ The communication system requires the following infrastructure:
 2. **PubSub**: For distributed messaging
 3. **MongoDB
 
-The Terraform modules in `terraform/modules/redis` and `terraform/modules/pubsub` provide the necessary infrastructure. To deploy:
+The Pulumi modules in `pulumi/modules/redis` and `pulumi/modules/pubsub` provide the necessary infrastructure. To deploy:
 
 ```bash
-cd terraform
-terraform init
-terraform apply -target=module.redis -target=module.pubsub
+cd pulumi
+pulumi init
+pulumi apply -target=module.redis -target=module.pubsub
 ```
 
 ## Best Practices

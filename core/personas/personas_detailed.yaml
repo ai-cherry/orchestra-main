@@ -70,8 +70,8 @@ knowledge_domains:
     related_tools:
       - "Kubernetes"
       - "Docker"
-      - "Terraform"
-      - "AWS/GCP/Azure"
+      - "Pulumi"
+      - "AWS/Vultr/Azure"
     context_keywords:
       - "architecture"
       - "system design"

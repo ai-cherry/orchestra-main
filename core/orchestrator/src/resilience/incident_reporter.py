@@ -17,10 +17,8 @@ try:
 except ImportError:
     cloud_logging = None
 
-
 # Configure logging
 logger = logging.getLogger(__name__)
-
 
 class IncidentReporter:
     """
@@ -217,10 +215,8 @@ class IncidentReporter:
         # Log to standard logger
         logger.log(level, f"INCIDENT: {json.dumps(incident_data)}")
 
-
 # Global instance
 _incident_reporter = None
-
 
 def get_incident_reporter() -> IncidentReporter:
     """
@@ -239,7 +235,7 @@ def get_incident_reporter() -> IncidentReporter:
 
         settings = get_settings()
 
-        project_id = os.environ.get("GCP_PROJECT_ID", getattr(settings, "GCP_PROJECT_ID", "cherry-ai-project"))
+        project_id = os.environ.get("VULTR_PROJECT_ID", getattr(settings, "VULTR_PROJECT_ID", "cherry-ai-project"))
 
         log_name = os.environ.get(
             "INCIDENT_LOG_NAME",

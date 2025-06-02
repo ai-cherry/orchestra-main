@@ -23,7 +23,6 @@ from core.orchestrator.src.services.event_bus import get_event_bus
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class WorkflowState(str, Enum):
     """States for a workflow"""
 
@@ -34,7 +33,6 @@ class WorkflowState(str, Enum):
     FAILED = "failed"
     CANCELLED = "cancelled"
 
-
 class WorkflowTransition(BaseModel):
     """Transition between workflow states"""
 
@@ -42,7 +40,6 @@ class WorkflowTransition(BaseModel):
     to_state: WorkflowState
     condition_name: Optional[str] = None
     action_name: Optional[str] = None
-
 
 class WorkflowDefinition(BaseModel):
     """Definition of a workflow"""
@@ -54,7 +51,6 @@ class WorkflowDefinition(BaseModel):
     states: List[WorkflowState]
     transitions: List[WorkflowTransition]
     metadata: Dict[str, Any] = Field(default_factory=dict)
-
 
 class WorkflowInstance(BaseModel):
     """Instance of a running workflow"""
@@ -68,7 +64,6 @@ class WorkflowInstance(BaseModel):
     updated_at: float = Field(default_factory=time.time)
     completed_at: Optional[float] = None
     metadata: Dict[str, Any] = Field(default_factory=dict)
-
 
 class WorkflowEngine:
     """Engine for executing workflows"""
@@ -460,10 +455,8 @@ class WorkflowEngine:
                 logger.error(f"Error processing workflows: {e}")
                 await asyncio.sleep(5.0)  # Longer sleep on error
 
-
 # Singleton instance
 _workflow_engine = None
-
 
 def get_workflow_engine() -> WorkflowEngine:
     """

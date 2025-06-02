@@ -17,7 +17,6 @@ from ..models.memory import MemoryEntry
 
 logger = logging.getLogger(__name__)
 
-
 class TokenBudgetManager:
     """Optimized token budget manager with caching and heuristics."""
 

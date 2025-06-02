@@ -16,7 +16,6 @@ from core.orchestrator.src.core.personas import PersonaConfig
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 @dataclass
 class AgentContext:
     """
@@ -34,7 +33,6 @@ class AgentContext:
     interaction_id: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
 
-
 @dataclass
 class AgentResponse:
     """
@@ -47,7 +45,6 @@ class AgentResponse:
     text: str
     confidence: float = 1.0
     metadata: Optional[Dict[str, Any]] = None
-
 
 class Agent(ABC):
     """
@@ -89,7 +86,6 @@ class Agent(ABC):
         """
         return []
 
-
 class SimpleTextAgent(Agent):
     """
     Simple text-based agent.
@@ -118,7 +114,6 @@ class SimpleTextAgent(Agent):
         response_text = f"As {name}, I acknowledge your message: '{context.user_input}'"
 
         return AgentResponse(text=response_text, confidence=0.8, metadata={"agent_type": self.agent_type})
-
 
 class PersonaAwareAgent(SimpleTextAgent):
     """
@@ -153,7 +148,6 @@ class PersonaAwareAgent(SimpleTextAgent):
             confidence=0.9,
             metadata={"agent_type": self.agent_type, "persona_traits": persona.traits},
         )
-
 
 class AgentRegistry:
     """
@@ -244,10 +238,8 @@ class AgentRegistry:
 
         raise RuntimeError("No agents registered in registry")
 
-
 # Global agent registry instance
 _agent_registry = None
-
 
 def get_agent_registry() -> AgentRegistry:
     """

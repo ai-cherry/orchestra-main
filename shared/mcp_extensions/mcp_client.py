@@ -17,7 +17,6 @@ from core.env_config import settings
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("mcp-client")
 
-
 class MCPClient:
     """Simple client for interacting with MCP server."""
 

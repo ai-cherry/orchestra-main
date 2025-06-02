@@ -45,9 +45,9 @@ workspace:
       - "packages/"
       - "services/"
     infrastructure:
-      - "terraform/"
+      - "pulumi/"
       - "infra/"
-      - "terraform-modules/"
+      - "pulumi-modules/"
     documentation:
       - "docs/"
     tools:
@@ -169,7 +169,7 @@ cost:
     vertex_ai:
       monthly_budget_usd: 1000
       alert_threshold_percent: 10
-    bigquery:
+    postgresql:
       monthly_budget_usd: 200
       alert_threshold_percent: 25
 
@@ -186,7 +186,7 @@ infrastructure:
   self_tuning_enabled: false # Don't automatically tune infrastructure
   adaptation_frequency_hours: 24 # Check for adaptations every 24 hours
   prediction_window_days: 7 # Predict 7 days ahead
-  terraform_dir: "./terraform" # Terraform directory
+  pulumi_dir: "./pulumi" # Pulumi directory
 
   # Resource types to adapt
   resources:

@@ -29,13 +29,11 @@ logger = logging.getLogger(__name__)
 # Create router
 router = APIRouter()
 
-
 class UserInput(BaseModel):
     """User input model for interaction endpoint."""
 
     text: str = Field(..., min_length=1, description="User's message text")
     user_id: Optional[str] = Field(None, description="User identifier")
-
 
 # Dependency for getting the interaction service
 async def get_interaction_service(
@@ -69,7 +67,6 @@ async def get_interaction_service(
         llm_client=llm_client,
         default_model=model_to_use,
     )
-
 
 @router.post("/interact", response_model=Dict[str, str], tags=["interaction"])
 async def interact(

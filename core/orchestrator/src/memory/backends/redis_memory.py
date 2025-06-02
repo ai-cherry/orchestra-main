@@ -14,7 +14,6 @@ from core.orchestrator.src.memory.interface import MemoryInterface
 
 logger = logging.getLogger(__name__)
 
-
 class RedisMemory(MemoryInterface):
     """Redis-based memory implementation for short-term storage."""
 

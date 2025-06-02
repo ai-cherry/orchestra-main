@@ -28,13 +28,11 @@ from agent.app.core.database import get_db
 
 logger = logging.getLogger(__name__)
 
-
 class AgentType(Enum):
     """Types of specialized agents"""
     PERSONAL = "personal"
     PAY_READY = "pay_ready"
     PARAGON_MEDICAL = "paragon_medical"
-
 
 @dataclass
 class UserPreference:
@@ -44,7 +42,6 @@ class UserPreference:
     positive_signals: int = 0
     negative_signals: int = 0
     last_updated: datetime = field(default_factory=datetime.utcnow)
-
 
 @dataclass
 class ApartmentListing:
@@ -61,7 +58,6 @@ class ApartmentListing:
     tech_score: float
     overall_score: float = 0.0
 
-
 @dataclass
 class ClinicalTrial:
     """Clinical trial data structure"""
@@ -74,7 +70,6 @@ class ClinicalTrial:
     locations: List[Dict[str, Any]]
     distance_miles: Optional[float] = None
     relevance_score: float = 0.0
-
 
 class BaseSpecializedAgent:
     """Base class for specialized agents"""
@@ -133,7 +128,6 @@ class BaseSpecializedAgent:
             "last_activity": self.last_activity.isoformat(),
             "tasks_completed": self.tasks_completed
         }
-
 
 class PersonalAgent(BaseSpecializedAgent):
     """
@@ -348,7 +342,6 @@ class PersonalAgent(BaseSpecializedAgent):
             
         finally:
             self.status = "idle"
-
 
 class PayReadyAgent(BaseSpecializedAgent):
     """
@@ -581,7 +574,6 @@ class PayReadyAgent(BaseSpecializedAgent):
             
         finally:
             self.status = "idle"
-
 
 class ParagonMedicalResearchAgent(BaseSpecializedAgent):
     """
@@ -895,14 +887,12 @@ class ParagonMedicalResearchAgent(BaseSpecializedAgent):
         finally:
             self.status = "idle"
 
-
 # Agent Registry
 SPECIALIZED_AGENTS = {
     AgentType.PERSONAL.value: PersonalAgent(),
     AgentType.PAY_READY.value: PayReadyAgent(),
     AgentType.PARAGON_MEDICAL.value: ParagonMedicalResearchAgent()
 }
-
 
 async def get_specialized_agent(agent_type: str) -> BaseSpecializedAgent:
     """Get a specialized agent by type"""
@@ -911,7 +901,6 @@ async def get_specialized_agent(agent_type: str) -> BaseSpecializedAgent:
         raise ValueError(f"Unknown agent type: {agent_type}")
     return agent
 
-
 async def process_agent_task(
     agent_type: str,
     task: Dict[str, Any]
@@ -919,6 +908,5 @@ async def process_agent_task(
     """Process a task with the appropriate specialized agent"""
     agent = await get_specialized_agent(agent_type)
     return await agent.process_task(task)
-
 
 # Background task to check medical trial alerts

@@ -16,7 +16,6 @@ import abc
 import hashlib
 from typing import Any, AsyncGenerator, Callable, Dict, List, Optional
 
-
 class StorageAdapter(abc.ABC):
     """
     Abstract interface for storage backends (cache, vector DB, persistent storage, etc.).
@@ -34,7 +33,6 @@ class StorageAdapter(abc.ABC):
     @abc.abstractmethod
     async def close(self) -> None:
         """Clean up resources (connections, etc.)."""
-
 
 class BaseProcessor(abc.ABC):
     """

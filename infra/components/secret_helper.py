@@ -21,7 +21,6 @@ from typing import Any, Dict, List
 import pulumi
 import pulumi_kubernetes as k8s
 
-
 def create_k8s_secret_from_config(
     name: str,
     namespace: str,

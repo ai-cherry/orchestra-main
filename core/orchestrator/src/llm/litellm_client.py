@@ -16,7 +16,6 @@ from core.orchestrator.src.utils.error_handling import retry
 
 logger = logging.getLogger(__name__)
 
-
 class ModelProvider(str, Enum):
     """Supported model providers."""
 
@@ -26,7 +25,6 @@ class ModelProvider(str, Enum):
     AZURE_OPENAI = "azure_openai"
     openai = "openai"
 
-
 class ModelType(str, Enum):
     """Types of models."""
 
@@ -34,14 +32,12 @@ class ModelType(str, Enum):
     COMPLETION = "completion"
     EMBEDDING = "embedding"
 
-
 class LLMMessage(BaseModel):
     """A message for LLM interaction."""
 
     role: str
     content: str
     name: Optional[str] = None
-
 
 class LLMResponse(BaseModel):
     """Response from an LLM."""
@@ -52,7 +48,6 @@ class LLMResponse(BaseModel):
     finish_reason: Optional[str] = None
     raw_response: Optional[Dict[str, Any]] = None
 
-
 class LLMEmbeddingResponse(BaseModel):
     """Response from an embedding model."""
 
@@ -60,7 +55,6 @@ class LLMEmbeddingResponse(BaseModel):
     embedding: List[float]
     usage: Dict[str, int] = Field(default_factory=dict)
     raw_response: Optional[Dict[str, Any]] = None
-
 
 class LiteLLMClient:
     """
@@ -102,8 +96,8 @@ class LiteLLMClient:
         self.api_base_azure = api_base_azure or os.environ.get("AZURE_OPENAI_API_BASE")
 
         # Set Vertex AI project and location
-        self.vertex_project = vertex_project or settings.gcp_project_id
-        self.vertex_location = vertex_location or settings.gcp_region
+        self.vertex_project = vertex_project or settings.vultr_project_id
+        self.vertex_location = vertex_location or settings.vultr_region
 
         # Set default models
         self.default_model = default_model or "gpt-3.5-turbo"

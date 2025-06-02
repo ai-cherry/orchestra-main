@@ -7,7 +7,6 @@ from typing import Any, Dict, Optional
 
 from .weaviate_adapter import WeaviateAdapter
 
-
 class WeaviateSessionCache:
     """Store and retrieve small JSON blobs in Weaviate."""
 
@@ -30,6 +29,5 @@ class WeaviateSessionCache:
         if results:
             return results[0]["properties"].get("data")
         return None
-
 
 cache = WeaviateSessionCache()

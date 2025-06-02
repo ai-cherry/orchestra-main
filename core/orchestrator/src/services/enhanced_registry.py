@@ -17,7 +17,6 @@ logger = logging.getLogger(__name__)
 T = TypeVar("T")
 S = TypeVar("S")
 
-
 class Service(ABC):
     """
     Base interface for services managed by the registry.
@@ -37,7 +36,6 @@ class Service(ABC):
 
     async def close_async(self) -> None:
         """Release resources held by the service asynchronously."""
-
 
 class ServiceFactory(Generic[T]):
     """
@@ -75,7 +73,6 @@ class ServiceFactory(Generic[T]):
         This forces the factory to create a new instance next time get_instance is called.
         """
         self._instance = None
-
 
 class EnhancedServiceRegistry:
     """
@@ -534,10 +531,8 @@ class EnhancedServiceRegistry:
         """
         return [service.__class__.__name__ for service in self._services]
 
-
 # Global enhanced service registry instance
 _enhanced_service_registry = EnhancedServiceRegistry()
-
 
 def get_enhanced_service_registry() -> EnhancedServiceRegistry:
     """
@@ -551,22 +546,18 @@ def get_enhanced_service_registry() -> EnhancedServiceRegistry:
     """
     return _enhanced_service_registry
 
-
 # Add type-safe helper functions
 def register_service(service: T) -> T:
     """Register a service with the global registry."""
     return get_enhanced_service_registry().register(service)
 
-
 def get_service(service_type: Type[T]) -> Optional[T]:
     """Get a service from the global registry by type."""
     return get_enhanced_service_registry().get_service(service_type)
 
-
 def get_required_service(service_type: Type[T]) -> T:
     """Get a required service from the global registry by type."""
     return get_enhanced_service_registry().get_required_service(service_type)
-
 
 def register_factory(service_type: Type[T], factory: Union[ServiceFactory[T], Callable[[], T]]) -> ServiceFactory[T]:
     """Register a service factory with the global registry."""

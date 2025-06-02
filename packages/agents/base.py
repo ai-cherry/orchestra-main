@@ -11,7 +11,6 @@ from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
 
-
 class BaseAgent(ABC):
     """
     Base class for all agents in the AI Orchestration System.

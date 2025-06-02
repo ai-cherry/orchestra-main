@@ -26,13 +26,11 @@ from .models import (
     TraitCategory,
 )
 
-
 @pytest.fixture
 def temp_config_dir() -> Generator[Path, None, None]:
     """Create a temporary directory for test configurations."""
     with tempfile.TemporaryDirectory() as tmpdir:
         yield Path(tmpdir)
-
 
 @pytest.fixture
 def sample_persona_data() -> dict:
@@ -64,7 +62,6 @@ def sample_persona_data() -> dict:
         "max_tokens": 2000,
     }
 
-
 @pytest.fixture
 def manager_with_personas(temp_config_dir: Path, sample_persona_data: dict) -> PersonaConfigManager:
     """Create a manager with pre-loaded test personas."""
@@ -76,7 +73,6 @@ def manager_with_personas(temp_config_dir: Path, sample_persona_data: dict) -> P
     manager = PersonaConfigManager(temp_config_dir)
     manager.load_all_personas()
     return manager
-
 
 class TestPersonaConfigManager:
     """Test cases for PersonaConfigManager."""

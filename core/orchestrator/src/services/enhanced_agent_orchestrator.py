@@ -13,14 +13,13 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from core.orchestrator.src.agents.agent_base import AgentResponse
-from core.orchestrator.src.agents.enhanced_agent_registry import get_enhanced_agent_registry
+from core.orchestrator.src.agents.simplified_agent_registry import get_simplified_agent_registry
 from core.orchestrator.src.personas.enhanced_persona_manager import get_enhanced_persona_manager
 from core.orchestrator.src.services.base_orchestrator import BaseOrchestrator
 from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
 
 # Configure logging
 logger = logging.getLogger(__name__)
-
 
 class EnhancedAgentOrchestrator(BaseOrchestrator):
     """
@@ -232,8 +231,8 @@ class EnhancedAgentOrchestrator(BaseOrchestrator):
         timeout_seconds = getattr(settings, "AGENT_TIMEOUT_SECONDS", 30)
         use_preferred_agents = getattr(settings, "PREFERRED_AGENTS_ENABLED", True)
 
-        # Get enhanced agent registry
-        agent_registry = get_enhanced_agent_registry()
+        # Get simplified agent registry
+        agent_registry = get_simplified_agent_registry()
         agent = None
         agent_type = None
 
@@ -324,10 +323,8 @@ class EnhancedAgentOrchestrator(BaseOrchestrator):
                 metadata={"error": str(e), "fallback": True, "agent_type": agent_type},
             )
 
-
 # Global enhanced agent orchestrator instance
 _enhanced_agent_orchestrator = None
-
 
 def get_enhanced_agent_orchestrator() -> EnhancedAgentOrchestrator:
     """

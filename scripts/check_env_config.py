@@ -53,7 +53,7 @@ OPTIONAL_VARS = {
         "MAX_DALLE_REQUESTS_PER_DAY",
         "MAX_GPT4_TOKENS_PER_DAY",
     ],
-    "Infrastructure": ["GCP_PROJECT_ID", "PULUMI_ACCESS_TOKEN", "DIGITALOCEAN_TOKEN"],
+    "Infrastructure": ["VULTR_PROJECT_ID", "PULUMI_ACCESS_TOKEN", "DIGITALOCEAN_TOKEN"],
     "Integration Services": ["SLACK_BOT_TOKEN", "NOTION_API_KEY", "GONG_ACCESS_KEY", "APOLLO_API_KEY"],
 }
 
@@ -69,7 +69,6 @@ PORTKEY_VIRTUAL_KEYS = {
     "openrouter-api-15df95": "OpenRouter",
 }
 
-
 def check_env_var(var_name: str) -> Tuple[bool, str]:
     """Check if an environment variable is set and return its value (masked)"""
     value = os.environ.get(var_name)
@@ -82,18 +81,15 @@ def check_env_var(var_name: str) -> Tuple[bool, str]:
             return True, value
     return False, "NOT SET"
 
-
 def validate_portkey_virtual_key(key_value: str) -> bool:
     """Validate if a virtual key matches known Portkey virtual keys"""
     return key_value in PORTKEY_VIRTUAL_KEYS
-
 
 def print_section(title: str):
     """Print a formatted section header"""
     print(f"\n{'=' * 60}")
     print(f"{title:^60}")
     print("=" * 60)
-
 
 def check_ai_service_config() -> bool:
     """Check if at least one AI service is configured"""
@@ -102,7 +98,6 @@ def check_ai_service_config() -> bool:
     has_direct = any(os.environ.get(key) for key in direct_keys)
 
     return bool(has_portkey or has_direct)
-
 
 def main():
     """Main function to check environment configuration"""
@@ -201,7 +196,6 @@ def main():
             print("\n💡 Consider setting up Slack notifications")
 
         return 0
-
 
 if __name__ == "__main__":
     # Load .env file if it exists

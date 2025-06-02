@@ -19,7 +19,6 @@ from shared.database.unified_db_v2 import get_unified_database
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 async def initialize_enhanced_system():
     """Initialize all enhanced components."""
     try:
@@ -61,7 +60,6 @@ async def initialize_enhanced_system():
     except Exception as e:
         logger.error(f"Failed to initialize enhanced system: {e}")
         raise
-
 
 if __name__ == "__main__":
     asyncio.run(initialize_enhanced_system())

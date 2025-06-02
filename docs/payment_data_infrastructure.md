@@ -39,7 +39,7 @@ graph TB
 
 This architecture has been implemented with the following components:
 
-### 1. Terraform Module for Payment Infrastructure
+### 1. Pulumi Module for Payment Infrastructure
 
 A complete infrastructure-as-code module is provided in `infra/modules/payment/` with:
 
@@ -117,7 +117,7 @@ Before deploying the payment infrastructure:
 ### 2. Core Infrastructure Deployment
 
 ```hcl
-module "payment_processing" {
+payment_processing = ComponentResource( {
   source = "./modules/payment"
 
   project_id     = "payment-processing-dev"

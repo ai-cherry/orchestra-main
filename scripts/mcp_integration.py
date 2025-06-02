@@ -16,7 +16,6 @@ from mcp import MCPClient, Tool
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 @dataclass
 class MCPConfig:
     """Configuration for MCP servers"""
@@ -25,7 +24,6 @@ class MCPConfig:
     weaviate_endpoint: str = "http://mcp-weaviate:8080"
     timeout: int = 30
     max_retries: int = 3
-
 
 class MCPIntegration:
     """
@@ -207,7 +205,6 @@ class MCPIntegration:
             await self.weaviate_client.close()
         self._initialized = False
 
-
 class MCPAgentInterface:
     """
     High-level interface for AI agents to use MCP
@@ -270,7 +267,6 @@ class MCPAgentInterface:
 
         return False
 
-
 # Example usage and testing
 async def main():
     """Example usage of MCP integration"""
@@ -308,7 +304,6 @@ async def main():
 
     finally:
         await mcp.close()
-
 
 if __name__ == "__main__":
     asyncio.run(main())

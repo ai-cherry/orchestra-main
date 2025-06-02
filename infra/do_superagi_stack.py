@@ -46,7 +46,6 @@ admin_ui_custom_domain_name = config.get("adminUiCustomDomain")
 # `os.path.join(script_dir, "..", "admin-ui", "dist")` constructs `infra/../admin-ui/dist`
 admin_ui_dist_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "admin-ui", "dist"))
 
-
 # --- SSH KEY RESOURCE ---
 ssh_key_resource = None
 if ssh_pubkey_path:
@@ -80,7 +79,6 @@ droplet = do.Droplet(
     user_data=cloud_init,
 )
 
-
 # --- REMOTE COMMAND: RUN SUPERAGI DOCKER CONTAINER ---
 # Determine connection arguments
 if ssh_private_key_path:
@@ -105,7 +103,6 @@ elif root_password:
 else:
     # Fallback or error if no auth method provided
     raise pulumi.RunError("Either root_password or ssh_private_key_path must be provided for droplet connection.")
-
 
 run_superagi = command.remote.Command(
     f"run-superagi-{env}",

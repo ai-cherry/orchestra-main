@@ -10,12 +10,10 @@ import sys
 from datetime import datetime
 from typing import Dict, List, Tuple
 
-
 def run_command(cmd: List[str]) -> Tuple[int, str, str]:
     """Run a command and return exit code, stdout, stderr."""
     result = subprocess.run(cmd, capture_output=True, text=True)
     return result.returncode, result.stdout, result.stderr
-
 
 def get_installed_packages() -> Dict[str, str]:
     """Get all installed packages with their versions."""
@@ -26,7 +24,6 @@ def get_installed_packages() -> Dict[str, str]:
 
     packages = json.loads(stdout)
     return {pkg["name"]: pkg["version"] for pkg in packages}
-
 
 def generate_constraints_file() -> str:
     """Generate a complete constraints file with ALL current versions."""
@@ -46,7 +43,6 @@ def generate_constraints_file() -> str:
 
     return "\n".join(constraints)
 
-
 def create_lock_file() -> str:
     """Create a complete lock file with hashes."""
     print("📦 Generating complete lock file with hashes...")
@@ -59,7 +55,6 @@ def create_lock_file() -> str:
 
     return stdout
 
-
 def analyze_conflicts() -> List[str]:
     """Analyze and report any dependency conflicts."""
     print("🔍 Analyzing dependency conflicts...")
@@ -71,7 +66,6 @@ def analyze_conflicts() -> List[str]:
         conflicts = [c for c in conflicts if c.strip()]
 
     return conflicts
-
 
 def create_deployment_requirements() -> None:
     """Create deployment-ready requirements files."""
@@ -169,7 +163,6 @@ echo "✅ Installation complete!"
     os.chmod("scripts/safe_install.sh", 0o755)
     print("✅ Created: scripts/safe_install.sh")
 
-
 def create_forever_fix_config() -> None:
     """Create a configuration that ensures pip peace forever."""
     config = {
@@ -196,7 +189,6 @@ def create_forever_fix_config() -> None:
         json.dump(config, f, indent=2)
 
     print("✅ Created: pip_forever_fix.json")
-
 
 def main() -> None:
     """Main execution."""
@@ -230,7 +222,6 @@ def main() -> None:
     print("2. Fresh install: ./scripts/safe_install.sh")
     print("3. Update constraints: python scripts/pip_forever_fix.py")
     print("\n🎉 No more dependency conflicts!")
-
 
 if __name__ == "__main__":
     main()

@@ -17,9 +17,7 @@ from packages.agents.base import BaseAgent
 # If 1Password integration is required, refactor and implement OnePasswordAgent in the correct location.
 # from future.packages.agents.runtime.security.onepassword_agent import OnePasswordAgent
 
-
 logger = logging.getLogger(__name__)
-
 
 class CredentialsManager(BaseAgent):
     """
@@ -73,7 +71,7 @@ class CredentialsManager(BaseAgent):
         else:
             logger.info("1Password service token not found in environment, provider not registered")
 
-        # Could add other credential providers here (AWS Secrets Manager, HashiCorp Vault, etc.)
+        # Could add other credential providers here (AWS Secrets Manager, Pulumi Vault, etc.)
 
         if not self.providers:
             logger.warning("No credential providers were initialized")
@@ -370,10 +368,8 @@ class CredentialsManager(BaseAgent):
         logger.info("Shutting down Credentials Manager")
         super().shutdown()
 
-
 # Global credential manager instance
 _credentials_manager = None
-
 
 def get_credentials_manager() -> CredentialsManager:
     """

@@ -22,14 +22,12 @@ from mcp_server.adapters import (
 )
 from mcp_server.adapters.factory_mcp_adapter import CircuitState
 
-
 class MockMCPServer:
     """Mock MCP server for testing."""
 
     async def handle_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Mock request handler."""
         return {"result": {"mock": True, "method": request.get("method")}}
-
 
 class TestCircuitBreaker:
     """Test circuit breaker functionality."""
@@ -84,7 +82,6 @@ class TestCircuitBreaker:
         result = await cb.call(success_func)
         assert result == "recovered"
         assert cb.state == CircuitState.CLOSED
-
 
 class TestFactoryMCPAdapter:
     """Test base adapter functionality."""
@@ -152,7 +149,6 @@ class TestFactoryMCPAdapter:
         assert metrics["average_latency_seconds"] == 0.5
         assert metrics["success_rate"] == 0.85
 
-
 class TestArchitectAdapter:
     """Test Architect adapter functionality."""
 
@@ -200,7 +196,6 @@ class TestArchitectAdapter:
         assert factory_request["context"]["stack_name"] == "production"
         assert factory_request["options"]["pulumi_config"]["region"] == "ewr"
 
-
 class TestCodeAdapter:
     """Test Code adapter functionality."""
 
@@ -244,7 +239,6 @@ class TestCodeAdapter:
 
         assert mcp_response["result"]["streaming"] is True
         assert mcp_response["result"]["stream_id"] == "stream_123"
-
 
 class TestDebugAdapter:
     """Test Debug adapter functionality."""
@@ -293,7 +287,6 @@ class TestDebugAdapter:
         assert factory_request["context"]["query_type"] == "sql"
         assert "users" in factory_request["context"]["schema"]
 
-
 class TestReliabilityAdapter:
     """Test Reliability adapter functionality."""
 
@@ -340,7 +333,6 @@ class TestReliabilityAdapter:
 
         assert "result" in result
         assert len(reliability_adapter.alert_buffer) == 0  # Buffer cleared
-
 
 class TestKnowledgeAdapter:
     """Test Knowledge adapter functionality."""
@@ -409,7 +401,6 @@ class TestKnowledgeAdapter:
         assert result["result"]["cache_stats"]["cached"] == 1
         assert result["result"]["cache_stats"]["processed"] == 1
 
-
 # Integration tests
 class TestIntegration:
     """Integration tests for adapter system."""
@@ -457,7 +448,6 @@ class TestIntegration:
             # Circuit should be open
             assert adapter.circuit_breaker.state == CircuitState.OPEN
             assert adapter.metrics["fallback_count"] >= 2
-
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

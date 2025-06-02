@@ -12,14 +12,12 @@ from typing import Any, Dict, List, Optional, TypeVar
 
 T = TypeVar("T")
 
-
 class MemoryLayer(Enum):
     """Memory layer types."""
 
     SHORT_TERM = "short_term"  # Hot cache (DragonflyDB)
     MID_TERM = "mid_term"  # Document store (MongoDB)
     LONG_TERM = "long_term"  # Vector store (Weaviate)
-
 
 @dataclass
 class MemoryItem:
@@ -43,7 +41,6 @@ class MemoryItem:
             "ttl": self.ttl,
         }
 
-
 @dataclass
 class SearchResult:
     """Result from a memory search operation."""
@@ -51,7 +48,6 @@ class SearchResult:
     item: MemoryItem
     score: float
     source: MemoryLayer
-
 
 class MemoryStore(ABC):
     """Abstract base class for memory stores."""
@@ -98,7 +94,6 @@ class MemoryStore(ABC):
     async def health_check(self) -> bool:
         """Check if the store is healthy."""
         pass
-
 
 class MemoryService(ABC):
     """Abstract base class for the unified memory service."""
@@ -196,7 +191,6 @@ class MemoryService(ABC):
             Dictionary with stats for each layer
         """
         pass
-
 
 class MemoryPolicy(ABC):
     """Abstract base class for memory management policies."""

@@ -12,7 +12,6 @@ from typing import Any, Dict, List, Optional
 
 from ..models.memory import MemoryEntry
 
-
 class IMemoryManager(ABC):
     """Interface for memory managers."""
 
@@ -47,7 +46,6 @@ class IMemoryManager(ABC):
     @abstractmethod
     async def get_memory_status(self) -> Dict[str, Any]:
         """Get the status of the memory system."""
-
 
 class SyncMemoryManager:
     """Synchronous wrapper for async memory manager interfaces.

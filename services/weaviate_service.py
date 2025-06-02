@@ -15,7 +15,6 @@ from weaviate.classes.init import AdditionalConfig, Timeout
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
 class WeaviateConfig(BaseModel):
     """Configuration model for Weaviate connection."""
 
@@ -24,14 +23,12 @@ class WeaviateConfig(BaseModel):
     api_key: Optional[str] = None
     timeout: int = 10
 
-
 class VectorSearchResult(BaseModel):
     """Model for vector search results."""
 
     id: str
     distance: float
     metadata: Dict[str, Any]
-
 
 class WeaviateService:
     def __init__(self, config: WeaviateConfig):
@@ -135,7 +132,6 @@ class WeaviateService:
         """Cleanup client connection."""
         if hasattr(self, "client") and self.client:
             self.client.close()
-
 
 # Example usage
 if __name__ == "__main__":

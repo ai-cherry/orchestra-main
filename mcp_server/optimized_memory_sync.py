@@ -24,7 +24,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("optimized-memory-sync")
 
-
 class FastToolAdapter:
     """Lightweight adapter for simulating AI tool integration."""
 
@@ -59,7 +58,6 @@ class FastToolAdapter:
             "total_size_bytes": total_size,
             "estimated_tokens": total_size // 4,
         }
-
 
 class OptimizedMemoryManager:
     """Optimized memory manager for single-developer projects."""
@@ -102,7 +100,6 @@ class OptimizedMemoryManager:
             status["total_entries"] += stats["entry_count"]
 
         return status
-
 
 def run_demo():
     """Run the optimized memory synchronization demo."""
@@ -147,7 +144,6 @@ def run_demo():
         print(f"  Estimated Tokens: {stats['estimated_tokens']}")
 
     print("\n=== Demo Complete ===")
-
 
 if __name__ == "__main__":
     run_demo()

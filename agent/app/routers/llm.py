@@ -10,7 +10,6 @@ from core.llm_router_dynamic import get_dynamic_llm_router, UseCase, ModelTier, 
 
 router = APIRouter(prefix="/llm", tags=["llm"])
 
-
 class LLMRequest(BaseModel):
     """Request model for LLM completion"""
 
@@ -24,7 +23,6 @@ class LLMRequest(BaseModel):
     stream: bool = False
     cache: bool = True
 
-
 class LLMResponse(BaseModel):
     """Response model for LLM completion"""
 
@@ -35,13 +33,11 @@ class LLMResponse(BaseModel):
     choices: List[Dict[str, Any]]
     usage: Optional[Dict[str, int]] = None
 
-
 class CodeGenerationRequest(BaseModel):
     """Request model for code generation"""
 
     prompt: str = Field(..., description="Code generation prompt")
     tier: ModelTier = ModelTier.STANDARD
-
 
 class ArchitectureRequest(BaseModel):
     """Request model for architecture design"""
@@ -49,13 +45,11 @@ class ArchitectureRequest(BaseModel):
     requirements: str = Field(..., description="Architecture requirements")
     tier: ModelTier = ModelTier.PREMIUM
 
-
 class DebugRequest(BaseModel):
     """Request model for debugging"""
 
     code: str = Field(..., description="Code to debug")
     error: str = Field(..., description="Error message or description")
-
 
 class ChatRequest(BaseModel):
     """Request model for chat"""
@@ -64,13 +58,11 @@ class ChatRequest(BaseModel):
     history: Optional[List[Dict[str, str]]] = Field(None, description="Conversation history")
     tier: ModelTier = ModelTier.STANDARD
 
-
 class EmbeddingRequest(BaseModel):
     """Request model for embeddings"""
 
     text: Union[str, List[str]] = Field(..., description="Text to embed")
     model: str = Field("openai/text-embedding-3-small", description="Embedding model")
-
 
 @router.post("/complete", response_model=LLMResponse)
 async def complete(request: LLMRequest) -> LLMResponse:
@@ -100,7 +92,6 @@ async def complete(request: LLMRequest) -> LLMResponse:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @router.post("/generate-code")
 async def generate_code(request: CodeGenerationRequest) -> Dict[str, str]:
     """Generate code using the appropriate model"""
@@ -113,7 +104,6 @@ async def generate_code(request: CodeGenerationRequest) -> Dict[str, str]:
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @router.post("/design-architecture")
 async def design_architecture(request: ArchitectureRequest) -> Dict[str, str]:
@@ -130,7 +120,6 @@ async def design_architecture(request: ArchitectureRequest) -> Dict[str, str]:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @router.post("/debug-code")
 async def debug_code(request: DebugRequest) -> Dict[str, str]:
     """Debug code with error context"""
@@ -144,7 +133,6 @@ async def debug_code(request: DebugRequest) -> Dict[str, str]:
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @router.post("/chat")
 async def chat(request: ChatRequest) -> Dict[str, str]:
@@ -162,7 +150,6 @@ async def chat(request: ChatRequest) -> Dict[str, str]:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @router.get("/metrics")
 async def get_metrics() -> Dict[str, Any]:
     """Get LLM router metrics"""
@@ -172,7 +159,6 @@ async def get_metrics() -> Dict[str, Any]:
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @router.get("/models")
 async def get_available_models() -> Dict[str, Any]:
@@ -200,7 +186,6 @@ async def get_available_models() -> Dict[str, Any]:
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @router.post("/embed")
 async def generate_embeddings(request: EmbeddingRequest) -> Dict[str, Any]:

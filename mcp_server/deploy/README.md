@@ -39,7 +39,7 @@ Before deploying the MCP Server, ensure you have the following:
 The MCP Server can be deployed using one of the following methods:
 
 1. **Manual Deployment**: Using the `deploy_optimized.sh` script
-2. **Terraform Deployment**: Using the Terraform configuration in `terraform/main.tf`
+2. **Pulumi Deployment**: Using the Pulumi configuration in `pulumi/main.py`
 3. **CI/CD Deployment**: Using GitHub Actions workflow in `.github/workflows/deploy.yml`
 
 ## Quick Start
@@ -94,26 +94,26 @@ Available options:
 | `--redis-tier`     | Redis tier               | `STANDARD_HA`       |
 | `--redis-size`     | Redis size in GB         | `10`                |
 
-### 2. Terraform Deployment
+### 2. Pulumi Deployment
 
-The Terraform configuration in `terraform/main.tf` provides a declarative way to deploy the MCP Server:
+The Pulumi configuration in `pulumi/main.py` provides a declarative way to deploy the MCP Server:
 
 ```bash
-# Initialize Terraform
-cd mcp_server/terraform
-terraform init \
-  -backend-config="bucket=cherry-ai-project-terraform-state" \
+# Initialize Pulumi
+cd mcp_server/pulumi
+pulumi init \
+  -backend-config="bucket=cherry-ai-project-pulumi-state" \
   -backend-config="prefix=mcp-server"
 
 # Plan the deployment
-terraform plan \
+pulumi plan \
   -var="project_id=cherry-ai-project" \
   -var="region=us-central1" \
   -var="env=dev" \
-  -out=tfplan
+  -out=pulumi-plan
 
 # Apply the deployment
-terraform apply tfplan
+pulumi apply pulumi-plan
 ```
 
 ### 3. CI/CD Deployment
@@ -146,7 +146,7 @@ The MCP Server uses environment-specific configurations:
 To customize the environment configuration:
 
 1. For manual deployment: Use command-line options
-2. For Terraform deployment: Modify `locals.env_config` in `terraform/main.tf`
+2. For Pulumi deployment: Modify `locals.env_config` in `pulumi/main.py`
 3. For CI/CD deployment: Modify environment variables in `.github/workflows/deploy.yml`
 
 ## Monitoring and Observability

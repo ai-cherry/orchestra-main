@@ -14,7 +14,6 @@ from core.orchestrator.src.agents.agent_base import Agent, AgentContext
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class AgentCapability(Enum):
     """
     Basic capabilities that agents can provide.
@@ -27,7 +26,6 @@ class AgentCapability(Enum):
     SUMMARIZATION = "summarization"
     CODE_GENERATION = "code_generation"
     GENERAL = "general"  # For basic agents that don't have specialized capabilities
-
 
 class SimplifiedAgentRegistry:
     """
@@ -208,10 +206,8 @@ class SimplifiedAgentRegistry:
             "agent_count": len(self._agents),
         }
 
-
 # Global agent registry instance
 _simplified_agent_registry = None
-
 
 def get_simplified_agent_registry() -> SimplifiedAgentRegistry:
     """
@@ -226,7 +222,6 @@ def get_simplified_agent_registry() -> SimplifiedAgentRegistry:
         _simplified_agent_registry = SimplifiedAgentRegistry()
 
     return _simplified_agent_registry
-
 
 def register_default_agents():
     """

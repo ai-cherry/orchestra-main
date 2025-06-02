@@ -7,7 +7,7 @@ Cloud Monitoring integration, and fallback mechanisms to ensure robust agent ope
 
 from core.orchestrator.src.resilience.circuit_breaker import CircuitBreaker, get_circuit_breaker
 from core.orchestrator.src.resilience.incident_reporter import IncidentReporter, get_incident_reporter
-from core.orchestrator.src.resilience.monitoring import GCPMonitoringClient, get_monitoring_client
+from core.orchestrator.src.resilience.monitoring import PrometheusClient, get_monitoring_client
 from core.orchestrator.src.resilience.tasks import (
     TaskQueueManager,
     VertexAiFallbackHandler,
@@ -18,7 +18,7 @@ from core.orchestrator.src.resilience.tasks import (
 __all__ = [
     "CircuitBreaker",
     "get_circuit_breaker",
-    "GCPMonitoringClient",
+    "PrometheusClient",
     "get_monitoring_client",
     "TaskQueueManager",
     "VertexAiFallbackHandler",

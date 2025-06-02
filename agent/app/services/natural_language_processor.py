@@ -21,7 +21,6 @@ elevenlabs_client = None
 if ELEVENLABS_API_KEY:
     elevenlabs_client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
 
-
 class IntentCategory(Enum):
     """Categories of user intents"""
 
@@ -30,7 +29,6 @@ class IntentCategory(Enum):
     WORKFLOW = "workflow"
     GENERAL = "general"
     HELP = "help"
-
 
 @dataclass
 class Intent:
@@ -46,7 +44,6 @@ class Intent:
     def __post_init__(self):
         if self.entities is None:
             self.entities = {}
-
 
 class NaturalLanguageProcessor:
     """Main NLP processor for Orchestra AI"""
@@ -84,7 +81,6 @@ class NaturalLanguageProcessor:
                 (r"(how do i|how to)\s+(.+)", IntentCategory.HELP, "how_to"),
             ],
         }
-
 
 class IntentClassifier:
     """Classify user intents from natural language"""
@@ -152,7 +148,6 @@ class IntentClassifier:
             return "generic_analysis_workflow"
         return "custom_workflow"
 
-
 class VoiceTranscriber:
     """Handle voice transcription using Whisper or similar"""
 
@@ -192,7 +187,6 @@ class VoiceTranscriber:
             # Clean up temp file
             if os.path.exists(temp_file):
                 os.remove(temp_file)
-
 
 class ResponseGenerator:
     """Generate natural language responses"""

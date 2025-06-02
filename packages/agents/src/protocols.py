@@ -9,7 +9,6 @@ from typing import Protocol
 
 from packages.core.src.models import AgentInput, AgentOutput
 
-
 class AgentProtocol(Protocol):
     """
     Protocol defining the interface for agent interactions.

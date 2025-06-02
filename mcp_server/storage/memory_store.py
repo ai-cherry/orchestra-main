@@ -17,7 +17,6 @@ from typing import Any, Dict, Optional
 # Configure logging
 logger = logging.getLogger("mcp-memory-store")
 
-
 class MemoryStore:
     """Persistent memory store for MCP server."""
 

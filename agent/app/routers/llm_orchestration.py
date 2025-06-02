@@ -29,7 +29,6 @@ from agent.app.services.specialized_agents import (
 
 router = APIRouter(prefix="/api/orchestration", tags=["orchestration"])
 
-
 # Pydantic models for requests/responses
 
 class TestRoutingRequest(BaseModel):
@@ -38,19 +37,16 @@ class TestRoutingRequest(BaseModel):
     context: Optional[Dict[str, Any]] = None
     force_query_type: Optional[str] = None
 
-
 class WorkflowCreateRequest(BaseModel):
     """Create a new workflow"""
     name: str
     tasks: List[Dict[str, Any]]
     context: Optional[Dict[str, Any]] = None
 
-
 class AgentTaskRequest(BaseModel):
     """Execute a task with a specific agent"""
     agent_type: str = Field(..., description="Agent type: personal, pay_ready, or paragon_medical")
     task: Dict[str, Any] = Field(..., description="Task data for the agent")
-
 
 class PersonalSearchRequest(BaseModel):
     """Personal agent search request"""
@@ -58,12 +54,10 @@ class PersonalSearchRequest(BaseModel):
     query: str
     search_type: str = "general"
 
-
 class ApartmentAnalysisRequest(BaseModel):
     """Pay Ready agent apartment analysis"""
     listing_data: Dict[str, Any]
     user_preferences: Optional[Dict[str, Any]] = None
-
 
 class ClinicalTrialSearchRequest(BaseModel):
     """Paragon Medical agent trial search"""
@@ -71,7 +65,6 @@ class ClinicalTrialSearchRequest(BaseModel):
     phases: List[str] = Field(default=["Phase 3", "Phase 4"])
     location: Optional[Dict[str, float]] = None
     max_distance_miles: float = 50
-
 
 # Intelligent Routing Endpoints
 
@@ -107,7 +100,6 @@ async def test_intelligent_routing(request: TestRoutingRequest) -> Dict[str, Any
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Routing failed: {str(e)}")
 
-
 @router.get("/routing-analytics")
 async def get_routing_analytics() -> Dict[str, Any]:
     """Get analytics on routing decisions and model performance"""
@@ -116,7 +108,6 @@ async def get_routing_analytics() -> Dict[str, Any]:
     analytics = await router.get_routing_analytics()
     
     return analytics
-
 
 @router.get("/query-types")
 async def get_query_types() -> List[Dict[str, str]]:
@@ -130,7 +121,6 @@ async def get_query_types() -> List[Dict[str, str]]:
         }
         for qt in QueryType
     ]
-
 
 # Agent Management Endpoints
 
@@ -159,7 +149,6 @@ async def get_all_agents() -> Dict[str, Any]:
             if status.get("status") == "active"
         )
     }
-
 
 @router.post("/agents/{agent_type}/execute")
 async def execute_agent_task(
@@ -192,7 +181,6 @@ async def execute_agent_task(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Task execution failed: {str(e)}")
 
-
 # Specialized Agent Endpoints
 
 @router.post("/personal/search")
@@ -208,7 +196,6 @@ async def personal_agent_search(request: PersonalSearchRequest) -> Dict[str, Any
     )
     
     return result
-
 
 @router.post("/personal/learn-preference")
 async def learn_user_preference(
@@ -233,7 +220,6 @@ async def learn_user_preference(
         "signal_type": signal_type
     }
 
-
 @router.post("/payready/analyze")
 async def analyze_apartment_listing(request: ApartmentAnalysisRequest) -> Dict[str, Any]:
     """Analyze an apartment listing with Pay Ready Agent"""
@@ -255,7 +241,6 @@ async def analyze_apartment_listing(request: ApartmentAnalysisRequest) -> Dict[s
         ]
     }
 
-
 @router.post("/payready/market-analysis")
 async def apartment_market_analysis(
     location: str = Query(..., description="Location for market analysis"),
@@ -268,7 +253,6 @@ async def apartment_market_analysis(
     result = await agent.market_analysis(location, criteria)
     
     return result
-
 
 @router.post("/paragon/search-trials")
 async def search_clinical_trials(request: ClinicalTrialSearchRequest) -> Dict[str, Any]:
@@ -293,7 +277,6 @@ async def search_clinical_trials(request: ClinicalTrialSearchRequest) -> Dict[st
         }
     }
 
-
 @router.post("/paragon/setup-alert")
 async def setup_trial_alert(
     user_id: str,
@@ -307,7 +290,6 @@ async def setup_trial_alert(
     result = await agent.setup_trial_alert(user_id, criteria, notification_method)
     
     return result
-
 
 # Workflow Management Endpoints
 
@@ -338,7 +320,6 @@ async def create_workflow(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-
 @router.post("/workflows/{workflow_id}/execute")
 async def execute_workflow(
     workflow_id: str,
@@ -357,7 +338,6 @@ async def execute_workflow(
         "message": "Workflow execution started in background"
     }
 
-
 @router.get("/workflows/{workflow_id}/status")
 async def get_workflow_status(workflow_id: str) -> Dict[str, Any]:
     """Get detailed workflow execution status"""
@@ -369,7 +349,6 @@ async def get_workflow_status(workflow_id: str) -> Dict[str, Any]:
         return status
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
-
 
 @router.post("/workflows/{workflow_id}/cancel")
 async def cancel_workflow(workflow_id: str) -> Dict[str, Any]:
@@ -386,7 +365,6 @@ async def cancel_workflow(workflow_id: str) -> Dict[str, Any]:
         }
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-
 
 @router.post("/workflows/comprehensive-search")
 async def create_comprehensive_search(
@@ -420,7 +398,6 @@ async def create_comprehensive_search(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 # System Monitoring Endpoints
 
 @router.get("/system/metrics")
@@ -445,7 +422,6 @@ async def get_system_metrics() -> Dict[str, Any]:
         },
         "timestamp": datetime.utcnow().isoformat()
     }
-
 
 @router.get("/system/health")
 async def get_system_health() -> Dict[str, Any]:

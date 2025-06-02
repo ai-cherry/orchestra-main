@@ -9,7 +9,6 @@ from datetime import datetime
 from shared.database.connection_manager_enhanced import get_connection_manager_enhanced
 from shared.database.unified_postgresql_enhanced import get_unified_postgresql_enhanced
 
-
 async def test_enhanced_methods():
     """Test all methods added by mixins."""
 
@@ -88,7 +87,6 @@ async def test_enhanced_methods():
     await postgres.memory_snapshot_delete(snapshot_id)
 
     print("\n✅ All enhanced methods tested successfully!")
-
 
 if __name__ == "__main__":
     asyncio.run(test_enhanced_methods())

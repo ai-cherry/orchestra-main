@@ -6,7 +6,6 @@ from pathlib import Path
 from shared.data_ingestion.zip_processor import ZipProcessor
 from shared.data_ingestion.base_processor import StorageAdapter
 
-
 class InMemoryAdapter(StorageAdapter):
     def __init__(self):
         self.records = {}
@@ -21,7 +20,6 @@ class InMemoryAdapter(StorageAdapter):
     async def close(self):
         pass
 
-
 def create_zip(tmp_path: Path):
     file1 = tmp_path / "a.txt"
     file2 = tmp_path / "b.txt"
@@ -34,7 +32,6 @@ def create_zip(tmp_path: Path):
         zf.write(file2, arcname="b.txt")
     data.seek(0)
     return data
-
 
 def test_zip_dedup(tmp_path):
     adapter = InMemoryAdapter()

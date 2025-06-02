@@ -3,7 +3,6 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-
 class PropertyEnrichmentAgent:
     """Agent for enriching property data using Google Maps and other sources."""
 

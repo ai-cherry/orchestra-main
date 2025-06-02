@@ -1,8 +1,6 @@
 import asyncio
 
-
 from shared.memory.weaviate_session_cache import WeaviateSessionCache
-
 
 class DummyAdapter:
     def __init__(self):
@@ -15,7 +13,6 @@ class DummyAdapter:
     async def query(self, **kwargs):
         self.query_calls.append(kwargs)
         return [{"properties": {"data": {"foo": "bar"}}}]
-
 
 def test_set_get(monkeypatch):
     cache = WeaviateSessionCache()

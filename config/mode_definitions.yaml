@@ -46,7 +46,7 @@ modes:
   architect:
     name: "🏗 Architect"
     model: "gemini-2.5-pro"
-    description: "Senior AI/Cloud architect specializing in multi-agent systems and GCP infrastructure"
+    description: "Senior AI/Cloud architect specializing in multi-agent systems and Vultr infrastructure"
     write_access: true
     file_patterns:
       - ".*\\.md$"

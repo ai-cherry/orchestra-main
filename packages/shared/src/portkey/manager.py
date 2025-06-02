@@ -21,10 +21,8 @@ except ImportError:
     class PortkeyError(Exception):
         pass
 
-
 # Configure logger
 logger = logging.getLogger(__name__)
-
 
 class PortkeyManager:
     """

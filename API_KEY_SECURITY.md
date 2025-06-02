@@ -54,7 +54,7 @@ This guide ensures that sensitive API keys are never exposed in your codebase or
 2. **Or use a secrets management service:**
    - AWS Secrets Manager
    - Google Secret Manager
-   - HashiCorp Vault
+   - Pulumi Vault
    - GitHub Secrets (for GitHub Actions)
 
 ## Checking for Exposed Keys

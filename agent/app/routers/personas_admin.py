@@ -26,7 +26,6 @@ router = APIRouter(prefix="/api/personas", tags=["personas-admin"])
 PERSONAS_CONFIG_DIR = Path("config/personas")
 persona_manager: Optional[PersonaConfigManager] = None
 
-
 def get_persona_manager() -> PersonaConfigManager:
     """
     Get or initialize the PersonaConfigManager instance.
@@ -53,7 +52,6 @@ def get_persona_manager() -> PersonaConfigManager:
 
     return persona_manager
 
-
 def verify_api_key(x_api_key: str = Header(None)) -> str:
     """
     Verify API key authentication.
@@ -72,14 +70,12 @@ def verify_api_key(x_api_key: str = Header(None)) -> str:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API Key")
     return x_api_key
 
-
 class PersonaListResponse(BaseModel):
     """Response model for persona list endpoint."""
 
     personas: List[PersonaConfiguration]
     total: int = Field(..., description="Total number of personas")
     filtered: int = Field(..., description="Number of personas after filtering")
-
 
 class PersonaUpdateRequest(BaseModel):
     """Request model for updating persona configuration."""
@@ -99,12 +95,10 @@ class PersonaUpdateRequest(BaseModel):
 
         json_schema_extra = {"example": {"status": "active", "temperature": 0.7, "tags": ["updated", "technical"]}}
 
-
 class PersonaExportRequest(BaseModel):
     """Request model for exporting persona configuration."""
 
     output_path: str = Field(..., description="Path where to export the persona YAML")
-
 
 class ValidationReport(BaseModel):
     """Response model for validation endpoint."""
@@ -113,7 +107,6 @@ class ValidationReport(BaseModel):
     issues: Dict[str, List[str]] = Field(default_factory=dict, description="Map of persona slugs to validation issues")
     total_personas: int = Field(..., description="Total number of personas validated")
     personas_with_issues: int = Field(..., description="Number of personas with issues")
-
 
 @router.get("/", response_model=PersonaListResponse)
 async def list_personas(
@@ -152,7 +145,6 @@ async def list_personas(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to list personas: {str(e)}"
         )
 
-
 @router.get("/{slug}", response_model=PersonaConfiguration)
 async def get_persona(slug: str, api_key: str = Depends(verify_api_key)) -> PersonaConfiguration:
     """
@@ -180,7 +172,6 @@ async def get_persona(slug: str, api_key: str = Depends(verify_api_key)) -> Pers
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to get persona: {str(e)}"
         )
-
 
 @router.put("/{slug}", response_model=PersonaConfiguration)
 async def update_persona(
@@ -233,7 +224,6 @@ async def update_persona(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to update persona: {str(e)}"
         )
 
-
 @router.post("/{slug}/reload", response_model=PersonaConfiguration)
 async def reload_persona(slug: str, api_key: str = Depends(verify_api_key)) -> PersonaConfiguration:
     """
@@ -264,7 +254,6 @@ async def reload_persona(slug: str, api_key: str = Depends(verify_api_key)) -> P
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to reload persona: {str(e)}"
         )
 
-
 @router.get("/validate/all", response_model=ValidationReport)
 async def validate_all_personas(api_key: str = Depends(verify_api_key)) -> ValidationReport:
     """
@@ -292,7 +281,6 @@ async def validate_all_personas(api_key: str = Depends(verify_api_key)) -> Valid
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to validate personas: {str(e)}"
         )
-
 
 @router.post("/{slug}/export")
 async def export_persona(
@@ -342,7 +330,6 @@ async def export_persona(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to export persona: {str(e)}"
         )
 
-
 @router.post("/check-updates")
 async def check_for_updates(api_key: str = Depends(verify_api_key)) -> Dict[str, Any]:
     """
@@ -373,7 +360,6 @@ async def check_for_updates(api_key: str = Depends(verify_api_key)) -> Dict[str,
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to check for updates: {str(e)}"
         )
-
 
 @router.get("/health/status")
 async def personas_health_check() -> Dict[str, Any]:

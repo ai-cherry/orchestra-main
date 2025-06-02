@@ -22,7 +22,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("quick-check")
 
-
 # ANSI colors for terminal output
 class Colors:
     GREEN = "\033[92m"
@@ -31,7 +30,6 @@ class Colors:
     BLUE = "\033[94m"
     ENDC = "\033[0m"
     BOLD = "\033[1m"
-
 
 def check_env_file():
     """Check if .env file exists and has required variables."""
@@ -47,7 +45,7 @@ def check_env_file():
     required_vars = {
         "PORTKEY_API_KEY": "Required for LLM integration",
         "OPENROUTER_API_KEY": "Alternate LLM provider (recommended as fallback)",
-        "GOOGLE_APPLICATION_CREDENTIALS": "Required for Firestore memory storage",
+        "VULTR_CREDENTIALS_PATH": "Required for Firestore memory storage",
     }
 
     found_vars = {}
@@ -73,7 +71,6 @@ def check_env_file():
             all_good = False
 
     return all_good
-
 
 def check_critical_files():
     """Check if critical files and directories exist."""
@@ -103,7 +100,6 @@ def check_critical_files():
             all_exist = False
 
     return all_exist
-
 
 def check_api_configuration():
     """Check if API is properly configured."""
@@ -139,7 +135,6 @@ def check_api_configuration():
     except Exception as e:
         print(f"  {Colors.RED}✗ Error checking API configuration: {e}{Colors.ENDC}")
         return False
-
 
 def check_hardcoded_references():
     """Check for hardcoded user references that could affect Patrick."""
@@ -183,7 +178,6 @@ def check_hardcoded_references():
 
     return not issues_found
 
-
 def main():
     """Run all quick checks."""
     print(f"{Colors.BOLD}Orchestrator Quick Check Tool{Colors.ENDC}")
@@ -213,7 +207,6 @@ def main():
         print("  The system has critical configuration or file structure issues.")
         print("  Fix these basic issues before running the full diagnostic.")
         return 2
-
 
 if __name__ == "__main__":
     # Make script executable

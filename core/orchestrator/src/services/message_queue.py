@@ -22,7 +22,6 @@ from core.orchestrator.src.services.event_bus import get_event_bus
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class AgentMessage(BaseModel):
     """Standardized message format for agent communication"""
 
@@ -35,7 +34,6 @@ class AgentMessage(BaseModel):
     reply_to: Optional[str] = None  # For request-response patterns
     timestamp: float = Field(default_factory=time.time)
     ttl: Optional[int] = None  # Time-to-live in seconds
-
 
 class MessageQueue:
     """Message queue for reliable agent communication"""
@@ -197,10 +195,8 @@ class MessageQueue:
             # Clean up handler
             self.unregister_handler(request.sender_id, response_handler)
 
-
 # Singleton instance
 _message_queue = None
-
 
 def get_message_queue() -> MessageQueue:
     """

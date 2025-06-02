@@ -29,7 +29,6 @@ extra_context: ContextVar[Dict[str, Any]] = ContextVar("extra_context", default=
 F = TypeVar("F", bound=Callable[..., Any])
 AsyncF = TypeVar("AsyncF", bound=Callable[..., Any])
 
-
 class StructuredLogFormatter(logging.Formatter):
     """Formatter that outputs JSON formatted logs with correlation IDs."""
 
@@ -83,7 +82,6 @@ class StructuredLogFormatter(logging.Formatter):
         log_record = {k: v for k, v in log_record.items() if v is not None}
 
         return json.dumps(log_record)
-
 
 class StructuredLogger(logging.Logger):
     """Logger subclass that adds structured logging capabilities."""
@@ -151,7 +149,6 @@ class StructuredLogger(logging.Logger):
         kwargs["exc_info"] = kwargs.get("exc_info", True)
         self._log_with_extra(logging.ERROR, msg, args, **kwargs)
 
-
 def configure_logging(level: int = logging.INFO, json_output: bool = True, log_file: Optional[str] = None) -> None:
     """Configure structured logging.
 
@@ -208,7 +205,6 @@ def configure_logging(level: int = logging.INFO, json_output: bool = True, log_f
         },
     )
 
-
 def get_correlation_id() -> str:
     """Get the current correlation ID or generate a new one.
 
@@ -221,7 +217,6 @@ def get_correlation_id() -> str:
         correlation_id.set(current_id)
     return current_id
 
-
 def set_correlation_id(corr_id: str) -> None:
     """Set the correlation ID for the current context.
 
@@ -229,7 +224,6 @@ def set_correlation_id(corr_id: str) -> None:
         corr_id: The correlation ID to set
     """
     correlation_id.set(corr_id)
-
 
 def with_correlation_id(func: F) -> F:
     """Decorator to ensure a correlation ID is set for the function call.
@@ -335,7 +329,6 @@ def with_correlation_id(func: F) -> F:
 
         return cast(F, sync_wrapper)
 
-
 def add_context(key: str, value: Any) -> None:
     """Add a key-value pair to the logging context.
 
@@ -346,7 +339,6 @@ def add_context(key: str, value: Any) -> None:
     context = extra_context.get().copy()
     context[key] = value
     extra_context.set(context)
-
 
 def remove_context(key: str) -> None:
     """Remove a key from the logging context.
@@ -359,11 +351,9 @@ def remove_context(key: str) -> None:
         del context[key]
         extra_context.set(context)
 
-
 def clear_context() -> None:
     """Clear all keys from the logging context."""
     extra_context.set({})
-
 
 class LogContext:
     """Context manager for temporarily adding context to logs."""
@@ -388,7 +378,6 @@ class LogContext:
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         """Restore previous context when exiting."""
         extra_context.set(self.previous_context)
-
 
 def get_logger(name: str) -> StructuredLogger:
     """Get a structured logger with the given name.

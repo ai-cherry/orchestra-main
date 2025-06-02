@@ -19,7 +19,6 @@ from .extensions.memory_extensions import MemoryExtensionsMixin
 
 logger = logging.getLogger(__name__)
 
-
 class UnifiedPostgreSQLEnhanced(UnifiedPostgreSQL, CacheExtensionsMixin, SessionExtensionsMixin, MemoryExtensionsMixin):
     """
     Enhanced unified PostgreSQL client that includes all missing methods.
@@ -185,10 +184,8 @@ class UnifiedPostgreSQLEnhanced(UnifiedPostgreSQL, CacheExtensionsMixin, Session
             logger.error(f"Error exporting state: {e}")
             return {"error": str(e), "version": "2.0", "timestamp": datetime.utcnow().isoformat()}
 
-
 # Global instance management for enhanced version
 _unified_postgresql_enhanced: Optional[UnifiedPostgreSQLEnhanced] = None
-
 
 async def get_unified_postgresql_enhanced() -> UnifiedPostgreSQLEnhanced:
     """
@@ -206,14 +203,12 @@ async def get_unified_postgresql_enhanced() -> UnifiedPostgreSQLEnhanced:
         await _unified_postgresql_enhanced.initialize()
     return _unified_postgresql_enhanced
 
-
 async def close_unified_postgresql_enhanced() -> None:
     """Close the global enhanced unified PostgreSQL client."""
     global _unified_postgresql_enhanced
     if _unified_postgresql_enhanced:
         await _unified_postgresql_enhanced.close()
         _unified_postgresql_enhanced = None
-
 
 # Import datetime for export_state method
 from datetime import datetime

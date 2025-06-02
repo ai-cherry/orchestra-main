@@ -15,7 +15,6 @@ from packages.agents.runtime.web_scraper import WebScraperRuntimeAgent
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 def get_agent_instance(
     agent_name: str,
     config: Optional[Dict[str, Any]] = None,

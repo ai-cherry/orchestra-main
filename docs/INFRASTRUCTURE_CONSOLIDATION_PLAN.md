@@ -17,7 +17,7 @@ After reviewing the codebase, I've identified multiple infrastructure documentat
 - Multiple deployment guides in docs/ directory
 
 ### 3. Inconsistent Infrastructure Descriptions
-- `docs/agent_infrastructure.md` - describes Terraform-based setup
+- `docs/agent_infrastructure.md` - describes Pulumi-based setup
 - `infra/README.md` - describes Pulumi-based setup
 - `SUPERAGI_INTEGRATION.md` - describes yet another deployment approach
 
@@ -69,7 +69,7 @@ Move to `docs/archive/`:
 #### 3.1 Consistent Technology Stack
 Standardize on:
 - **Python**: 3.10 (not 3.11+)
-- **Infrastructure**: Pulumi (not Terraform)
+- **Infrastructure**: Pulumi (not Pulumi)
 - **Container Runtime**: Kubernetes (not Docker Compose)
 - **Package Management**: pip/venv (not Poetry)
 - **CI/CD**: GitHub Actions with Workload Identity Federation

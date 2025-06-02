@@ -16,7 +16,6 @@ from core.services.agents.base import AgentCapability, get_agent_manager
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/conversation", tags=["conversation"])
 
-
 @router.post("/chat", response_model=ConversationResponse)
 async def chat(request: ConversationRequest) -> ConversationResponse:
     """
@@ -55,7 +54,6 @@ async def chat(request: ConversationRequest) -> ConversationResponse:
     except Exception as e:
         logger.error(f"Error in chat endpoint: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @router.post("/agent-chat", response_model=ConversationResponse)
 async def agent_chat(request: ConversationRequest) -> ConversationResponse:
@@ -109,7 +107,6 @@ async def agent_chat(request: ConversationRequest) -> ConversationResponse:
     except Exception as e:
         logger.error(f"Error in agent chat endpoint: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @router.get("/history/{user_id}")
 async def get_conversation_history(user_id: str, limit: int = 10) -> dict:

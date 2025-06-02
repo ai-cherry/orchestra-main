@@ -17,7 +17,6 @@ from pydantic import BaseModel
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 class EnhancedInteractionRequest(BaseModel):
     """Request model for enhanced interactions."""
 
@@ -26,7 +25,6 @@ class EnhancedInteractionRequest(BaseModel):
     session_id: Optional[str] = None
     persona_id: Optional[str] = None
     context: Optional[Dict[str, Any]] = None
-
 
 class PersonaClient:
     """
@@ -139,7 +137,6 @@ class PersonaClient:
                     error_text = await response.text()
                     raise Exception(f"Failed to send message: {error_text}")
 
-
 async def run_example():
     """Run an example conversation with different personas."""
 
@@ -179,7 +176,6 @@ async def run_example():
             print("--------------------------------\n")
         except Exception as e:
             print(f"Error with {persona_id} persona: {e}")
-
 
 if __name__ == "__main__":
     # Run the example

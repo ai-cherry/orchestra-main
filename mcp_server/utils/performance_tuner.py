@@ -19,7 +19,6 @@ import psutil
 
 logger = logging.getLogger(__name__)
 
-
 class PerformanceTuner:
     """Performance optimization manager for MCP Server."""
 
@@ -309,10 +308,8 @@ class PerformanceTuner:
 
         return batch_size
 
-
 # Singleton instance for global use
 _default_instance: Optional[PerformanceTuner] = None
-
 
 def get_performance_tuner() -> PerformanceTuner:
     """Get the default PerformanceTuner instance."""
@@ -321,32 +318,26 @@ def get_performance_tuner() -> PerformanceTuner:
         _default_instance = PerformanceTuner()
     return _default_instance
 
-
 # Convenience decorators
 def cache_result(ttl: Optional[int] = None) -> Callable:
     """Decorator to cache function results with TTL."""
     return get_performance_tuner().cache_result(ttl)
 
-
 async def async_cache_result(ttl: Optional[int] = None) -> Callable:
     """Decorator to cache async function results with TTL."""
     return await get_performance_tuner().async_cache_result(ttl)
-
 
 def track_performance(func: Callable) -> Callable:
     """Decorator to track function performance."""
     return get_performance_tuner().track_performance(func)
 
-
 async def async_track_performance(func: Callable) -> Callable:
     """Decorator to track async function performance."""
     return await get_performance_tuner().async_track_performance(func)
 
-
 def limit_concurrency(func: Callable) -> Callable:
     """Decorator to limit concurrency of async functions."""
     return get_performance_tuner().limit_concurrency(func)
-
 
 def get_metrics() -> Dict[str, Any]:
     """Get current performance metrics."""

@@ -48,7 +48,6 @@ app = FastAPI(
 unified_memory_service: Optional[UnifiedMemoryService] = None
 mcp_service_registry: Optional["MCPServiceRegistry"] = None
 
-
 class MCPServiceRegistry(ServiceRegistry):
     """
     A simplified ServiceRegistry for the MCP server context.
@@ -158,7 +157,6 @@ class MCPServiceRegistry(ServiceRegistry):
             self.weaviate_client_instance.close()
             logger.info("Weaviate client connection closed.")
 
-
 @app.on_event("startup")
 async def startup_event():
     global unified_memory_service, mcp_service_registry
@@ -175,13 +173,11 @@ async def startup_event():
         logger.critical(f"Critical error during MCP server startup: {e}", exc_info=True)
         # Optionally, sys.exit(1) if a clean startup is mandatory
 
-
 @app.on_event("shutdown")
 async def shutdown_event():
     logger.info("Orchestra Memory MCP Server shutting down...")
     if mcp_service_registry:
         await mcp_service_registry.shutdown_services()
-
 
 async def get_ums() -> UnifiedMemoryService:
     if unified_memory_service is None:
@@ -192,7 +188,6 @@ async def get_ums() -> UnifiedMemoryService:
         await unified_memory_service.initialize()  # Attempt re-init
     return unified_memory_service
 
-
 # --- Pydantic Models ---
 class MemoryItemResponse(BaseModel):
     id: str
@@ -202,11 +197,9 @@ class MemoryItemResponse(BaseModel):
     layer: str  # Enum value as string
     ttl: Optional[int] = None
 
-
 class SearchResultResponse(BaseModel):
     item: MemoryItemResponse
     score: float
-
 
 class RememberRequest(BaseModel):
     content: Any
@@ -214,16 +207,13 @@ class RememberRequest(BaseModel):
     importance: Optional[float] = None
     ttl_seconds: Optional[int] = None
 
-
 class RememberResponse(BaseModel):
     status: Literal["success", "failed"]
     item_id: Optional[str] = None
     error: Optional[str] = None
 
-
 class RecallRequest(BaseModel):
     item_id: str
-
 
 class SearchMemoriesRequest(BaseModel):
     query: str
@@ -232,42 +222,34 @@ class SearchMemoriesRequest(BaseModel):
     layers: Optional[List[Literal["SHORT_TERM", "MID_TERM", "LONG_TERM"]]] = None
     filters: Optional[Dict[str, Any]] = None
 
-
 class SearchMemoriesResponse(BaseModel):
     results: List[SearchResultResponse]
     count: int
 
-
 class ForgetRequest(BaseModel):
     item_id: str
-
 
 class ForgetResponse(BaseModel):
     status: Literal["success", "failed", "not_found"]
     error: Optional[str] = None
 
-
 class GetMemoryStatsResponse(BaseModel):
     stats: Dict[str, Any]
-
 
 class MCPToolProperty(BaseModel):
     type: str
     description: Optional[str] = None
     items: Optional[Dict[str, Any]] = None
 
-
 class MCPToolParameters(BaseModel):
     type: str = "object"
     properties: Dict[str, MCPToolProperty]
     required: Optional[List[str]] = None
 
-
 class MCPToolDefinition(BaseModel):
     name: str
     description: str
     parameters: MCPToolParameters
-
 
 # --- MCP Tool Definitions Endpoint ---
 @app.get("/mcp/orchestra_memory/tools", response_model=List[MCPToolDefinition])
@@ -340,7 +322,6 @@ async def get_mcp_tools_list():
         ),
     ]
 
-
 # --- Tool Endpoints ---
 @app.post("/mcp/orchestra_memory/remember", response_model=RememberResponse)
 async def remember_endpoint(request: RememberRequest, ums: UnifiedMemoryService = Depends(get_ums)):
@@ -360,7 +341,6 @@ async def remember_endpoint(request: RememberRequest, ums: UnifiedMemoryService 
         logger.error(f"MCP Remember error: {e}", exc_info=True)
         return RememberResponse(status="failed", error=str(e))
 
-
 @app.post("/mcp/orchestra_memory/recall", response_model=Optional[MemoryItemResponse])
 async def recall_endpoint(request: RecallRequest, ums: UnifiedMemoryService = Depends(get_ums)):
     try:
@@ -378,7 +358,6 @@ async def recall_endpoint(request: RecallRequest, ums: UnifiedMemoryService = De
     except Exception as e:
         logger.error(f"MCP Recall error for item {request.item_id}: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.post("/mcp/orchestra_memory/search_memories", response_model=SearchMemoriesResponse)
 async def search_memories_endpoint(request: SearchMemoriesRequest, ums: UnifiedMemoryService = Depends(get_ums)):
@@ -431,7 +410,6 @@ async def search_memories_endpoint(request: SearchMemoriesRequest, ums: UnifiedM
         logger.error(f"MCP Search Memories error: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/mcp/orchestra_memory/forget", response_model=ForgetResponse)
 async def forget_endpoint(request: ForgetRequest, ums: UnifiedMemoryService = Depends(get_ums)):
     try:
@@ -453,7 +431,6 @@ async def forget_endpoint(request: ForgetRequest, ums: UnifiedMemoryService = De
         logger.error(f"MCP Forget error for item {request.item_id}: {e}", exc_info=True)
         return ForgetResponse(status="failed", error=str(e))
 
-
 @app.get("/mcp/orchestra_memory/get_memory_stats", response_model=GetMemoryStatsResponse)
 async def get_memory_stats_endpoint(ums: UnifiedMemoryService = Depends(get_ums)):
     try:
@@ -462,7 +439,6 @@ async def get_memory_stats_endpoint(ums: UnifiedMemoryService = Depends(get_ums)
     except Exception as e:
         logger.error(f"MCP Get Memory Stats error: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # --- Health Endpoint ---
 @app.get("/health")
@@ -492,7 +468,6 @@ async def health_check_endpoint(ums: UnifiedMemoryService = Depends(get_ums)):
     except Exception as e:
         logger.error(f"Health check endpoint error: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Health check failed: {str(e)}")
-
 
 if __name__ == "__main__":
     port = int(os.getenv("MCP_ORCHESTRA_MEMORY_PORT", "8002"))

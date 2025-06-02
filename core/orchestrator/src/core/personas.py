@@ -15,7 +15,6 @@ import yaml
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 @dataclass
 class PersonaConfig:
     """
@@ -32,7 +31,6 @@ class PersonaConfig:
     interaction_style: str = "helpful"
     traits: List[str] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
-
 
 class PersonaProcessor:
     """
@@ -76,7 +74,6 @@ class PersonaProcessor:
             logger.error(f"Error formatting response: {e}")
             # Last resort fallback
             return response_text
-
 
 class PersonaLoader:
     """
@@ -201,7 +198,6 @@ class PersonaLoader:
         """
         return dict(self.personas)
 
-
 class PersonaManager:
     """
     Manager for persona operations.
@@ -276,10 +272,8 @@ class PersonaManager:
         """
         return self._loader.get_all_personas()
 
-
 # Global persona manager instance
 _persona_manager = None
-
 
 def get_persona_manager(config_path: Optional[str] = None) -> PersonaManager:
     """

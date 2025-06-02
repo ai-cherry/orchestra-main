@@ -69,7 +69,6 @@ POSTGRES_SCHEMA_CHERRY = os.getenv("POSTGRES_SCHEMA_CHERRY", "cherry")
 POSTGRES_SCHEMA_SOPHIA = os.getenv("POSTGRES_SCHEMA_SOPHIA", "sophia")
 POSTGRES_SCHEMA_KAREN = os.getenv("POSTGRES_SCHEMA_KAREN", "karen")
 
-
 def get_database_url(schema: Optional[str] = None) -> str:
     """
     Get database URL with optional schema specification
@@ -84,11 +83,9 @@ def get_database_url(schema: Optional[str] = None) -> str:
         return f"{DATABASE_URL}?options=-csearch_path%3D{schema}"
     return DATABASE_URL
 
-
 def is_production() -> bool:
     """Check if running in production environment"""
     return ENVIRONMENT.lower() in ["production", "prod"]
-
 
 def is_development() -> bool:
     """Check if running in development environment"""

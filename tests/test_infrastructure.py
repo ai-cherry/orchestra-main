@@ -10,7 +10,6 @@ from core.infrastructure.config.settings import Environment, Settings
 from core.infrastructure.connectivity.base import ServiceHealth, ServiceRegistry, ServiceStatus
 from core.services.events.event_bus import Event, EventBus, EventPriority
 
-
 class TestConfiguration:
     """Test configuration management."""
 
@@ -51,7 +50,6 @@ class TestConfiguration:
             assert settings.is_production is True
             assert settings.is_development is False
 
-
 class TestServiceRegistry:
     """Test service registry."""
 
@@ -75,7 +73,6 @@ class TestServiceRegistry:
         health_results = await registry.health_check_all()
         assert "test_service" in health_results
         assert health_results["test_service"].status == ServiceStatus.HEALTHY
-
 
 class TestEventBus:
     """Test event bus functionality."""
@@ -181,7 +178,6 @@ class TestEventBus:
         assert stats["events_handled"] == 2
         assert stats["total_handlers"] == 1
         assert "test.event" in stats["event_types"]
-
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

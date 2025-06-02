@@ -13,7 +13,6 @@ from core.orchestrator.src.memory.layered_memory import LayeredMemoryManager
 
 logger = logging.getLogger(__name__)
 
-
 class MemoryEnhancedAgentContext(AgentContext):
     """
     Enhanced agent context with memory access.
@@ -137,7 +136,6 @@ class MemoryEnhancedAgentContext(AgentContext):
 
         return conversation_items
 
-
 class MemoryAwareAgentRegistry(AgentRegistry):
     """
     Agent registry with integrated memory system.
@@ -232,7 +230,6 @@ class MemoryAwareAgentRegistry(AgentRegistry):
 
         # Select agent using standard logic
         return await super().select_agent_for_context(context)
-
 
 # Example usage
 async def example_usage():

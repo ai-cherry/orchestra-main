@@ -4,7 +4,7 @@ This checklist ensures all components of the AI Orchestra secure credential mana
 
 ## Infrastructure Setup
 
-- [ ] **Deploy Terraform Infrastructure**
+- [ ] **Deploy Pulumi Infrastructure**
 
   - [ ] Run `implementation_plan.sh` option 1
   - [ ] Verify service accounts are created with correct permissions

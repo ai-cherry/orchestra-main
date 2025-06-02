@@ -26,7 +26,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from core.orchestrator.src.config.settings import get_settings
 from packages.shared.src.llm_client.portkey_client import PortkeyClient
 
-
 async def run_model(client: PortkeyClient, model: str, prompt: str) -> None:
     """Run a query against a specified model using Portkey."""
     logger.info(f"Running query with model: {model}")
@@ -43,7 +42,6 @@ async def run_model(client: PortkeyClient, model: str, prompt: str) -> None:
         logger.info(f"{response}\n")
     except Exception as e:
         logger.error(f"Error with {model}: {e}")
-
 
 async def main() -> None:
     """Main function demonstrating Portkey virtual keys with multiple providers."""
@@ -87,7 +85,6 @@ async def main() -> None:
         await run_model(client, model, prompt)
 
     logger.info("Demo completed successfully")
-
 
 if __name__ == "__main__":
     asyncio.run(main())

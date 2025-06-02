@@ -63,88 +63,15 @@ DEFAULT_COLLECTION = os.environ.get(ENV_COLLECTION, "mode_system_config")
 # Optional integrations
 try:
     from google.api_core import exceptions as gcp_exceptions
-    from google.cloud import storage
+    # Removed GCP import import storage
 except ImportError:
     storage = None
     gcp_exceptions = None
 
-try:
-    from google.cloud import firestore as mongodb
-except ImportError:
-    mongodb = None
-
-
-class PersistenceError(Exception):
-    """Base exception for persistence errors."""
-
-
-class PersistenceManager:
-    """
-    Manager for persisting mode system configuration across restarts and deployments.
-
-    This class provides methods to save and load configuration from multiple
-    storage backends, including local files, GCP Secret Manager, Cloud Storage,
-    and mongodb.
-    """
-
-    def __init__(
-        self,
-        project_id: str = DEFAULT_PROJECT_ID,
-        environment: str = DEFAULT_ENVIRONMENT,
-        bucket_name: str = DEFAULT_BUCKET,
-        secret_name: str = DEFAULT_SECRET,
-        collection_name: str = DEFAULT_COLLECTION,
-    ):
-        """
-        Initialize the persistence manager.
-
-        Args:
-            project_id: GCP project ID
-            environment: Deployment environment (development, staging, production)
-            bucket_name: Cloud Storage bucket name
-            secret_name: Secret Manager secret name
-            collection_name: mongodb collection name
-        """
-        self.project_id = project_id
-        self.environment = environment
-        self.bucket_name = bucket_name
-        self.secret_name = secret_name
-        self.collection_name = collection_name
-
-        # Check for GCP libraries and environment
-        self.gcp_enabled = self._check_gcp_available()
-
-        # Initialize GCP clients if available
-        self.os.environ_client = None
-        self.storage_client = None
-        self.firestore_client = None
-
-        if self.gcp_enabled:
-            self._initialize_gcp_clients()
-
-        # Create backup directory if it doesn't exist
-        os.makedirs(BACKUP_DIR, exist_ok=True)
-
-        logger.info(
-            f"Initialized persistence manager for {self.environment} environment "
-            + f"with GCP integration {'enabled' if self.gcp_enabled else 'disabled'}"
-        )
-
-    def _check_gcp_available(self) -> bool:
-        """
-        Check if GCP libraries are available and environment is configured.
-
-        Returns:
-            True if GCP integration is possible, False otherwise
-        """
-        try:
-            # Try to import Google Cloud libraries
-            pass
-
             # Check for GCP environment indicators
             # GCP environment indicator check (was unused variable)
             (
-                os.environ.get("GOOGLE_CLOUD_PROJECT") is not None
+                os.environ.get("VULTR_PROJECT_ID") is not None
                 or os.environ.get("K_SERVICE") is not None
                 or os.path.exists("/var/run/secrets/kubernetes.io")
             )
@@ -779,10 +706,8 @@ class PersistenceManager:
 
         return True
 
-
 # Singleton instance
 _instance = None
-
 
 def get_persistence_manager() -> PersistenceManager:
     """Get singleton instance of PersistenceManager."""
@@ -790,7 +715,6 @@ def get_persistence_manager() -> PersistenceManager:
     if _instance is None:
         _instance = PersistenceManager()
     return _instance
-
 
 if __name__ == "__main__":
     # Simple CLI for testing the persistence manager

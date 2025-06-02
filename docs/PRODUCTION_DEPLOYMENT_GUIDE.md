@@ -49,7 +49,7 @@ This separation of concerns allows for:
 - Clear API contract between frontend and backend
 - Future replacements of either component without affecting the other
 
-Both services are deployed together using Terraform or the
+Both services are deployed together using Pulumi or the
 ## Deployment Scripts
 
 We've created several scripts to automate and streamline the deployment process:
@@ -68,7 +68,7 @@ We've created several scripts to automate and streamline the deployment process:
 3. **`deploy_to_production.sh`**
    - Orchestrates the full production deployment process
    - Guides you through all necessary steps
-   - Handles Terraform workspace and configuration
+   - Handles Pulumi workspace and configuration
 
 ## Pre-Deployment Verification
 
@@ -91,9 +91,9 @@ Review the output carefully and fix any issues before proceeding to production d
 
 ## Setting Up Production Environment
 
-### 1. Production Terraform Configuration
+### 1. Production Pulumi Configuration
 
-We've created a production configuration file at `infra/prod.tfvars` with appropriate settings:
+We've created a production configuration file at `infra/prod.yaml` with appropriate settings:
 
 ```hcl
 # Key production settings
@@ -140,7 +140,7 @@ This script guides you through:
 2. Running pre-deployment checks (if not already done)
 3. Setting up production secrets (if not already done)
 4. Reviewing production configuration
-5. Deploying using Terraform
+5. Deploying using Pulumi
 6. Verifying the deployment
 7. Setting up monitoring and alerts
 
@@ -232,7 +232,7 @@ After successful production deployment, follow the prioritized cleanup plan:
    - Check service account permissions
 
 3. **Deployment Failures**
-   - Review Terraform logs for detailed error information
+   - Review Pulumi logs for detailed error information
    - Check Cloud Build logs if using CI/CD
 
 ### Getting Help

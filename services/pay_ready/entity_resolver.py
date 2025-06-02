@@ -18,7 +18,6 @@ from email_validator import validate_email, EmailNotValidError
 
 logger = logging.getLogger(__name__)
 
-
 class PayReadyEntityResolver:
     """
     Resolves entities (persons and companies) across different systems.

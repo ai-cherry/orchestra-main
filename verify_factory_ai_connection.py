@@ -10,7 +10,6 @@ import subprocess
 import json
 from pathlib import Path
 
-
 def check_environment():
     """Check and display environment information"""
     print("🔍 Factory AI Connection Verification")
@@ -94,7 +93,6 @@ def check_environment():
         print("   ✅ Everything looks good!")
 
     return len(issues) == 0
-
 
 if __name__ == "__main__":
     if check_environment():

@@ -20,7 +20,6 @@ from core.orchestrator.src.tools.executor import ToolExecutor
 # Import our tool system
 from core.orchestrator.src.tools.registry import ToolRegistry
 
-
 class ToolsServer:
     """MCP server for tool discovery and execution."""
 
@@ -209,7 +208,6 @@ class ToolsServer:
         """Run the MCP server."""
         async with stdio_server() as (read_stream, write_stream):
             await self.server.run(read_stream, write_stream)
-
 
 if __name__ == "__main__":
     server = ToolsServer()

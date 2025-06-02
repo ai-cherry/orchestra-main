@@ -13,7 +13,6 @@ from typing import Any, Callable, Dict, Optional
 
 from .base_processor import BaseProcessor, StorageAdapter
 
-
 class IngestionPipeline:
     """
     Orchestrates data ingestion from multiple sources and formats.

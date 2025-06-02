@@ -12,7 +12,6 @@ import json
 
 logger = logging.getLogger(__name__)
 
-
 class SessionExtensionsMixin:
     """
     Mixin that adds missing session functionality to UnifiedPostgreSQL.

@@ -38,8 +38,8 @@ The following GitHub organization secrets are mapped to local environment variab
 | `ORG_| `ORG_| `ORG_GKE_CLUSTER_PROD`             | `GKE_CLUSTER_PROD`             |
 | `ORG_GKE_CLUSTER_STAGING`          | `GKE_CLUSTER_STAGING`          |
 | `ORG_PORTKEY_API_KEY`              | `PORTKEY_API_KEY`              |
-| `ORG_TERRAFORM_API_KEY`            | `TERRAFORM_API_KEY`            |
-| `ORG_TERRAFORM_ORGANIZATION_TOKEN` | `TERRAFORM_ORGANIZATION_TOKEN` |
+| `ORG_PULUMI_API_KEY`               | `PULUMI_API_KEY`               |
+| `ORG_PULUMI_ORGANIZATION_TOKEN`    | `PULUMI_ORGANIZATION_TOKEN`    |
 | `ORG_REDIS_HOST`                   | `REDIS_HOST`                   |
 | `ORG_REDIS_PORT`                   | `REDIS_PORT`                   |
 | `ORG_REDIS_USER`                   | `REDIS_USER`                   |

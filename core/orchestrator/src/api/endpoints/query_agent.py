@@ -6,7 +6,6 @@ from core.orchestrator.src.config.settings import get_settings
 
 router = APIRouter()
 
-
 @router.post("/query", tags=["query"])
 async def query_agent(payload: dict) -> dict:
     settings = get_settings()

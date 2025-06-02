@@ -26,7 +26,6 @@ from web_scraping_ai_agents import ScrapingResult, ScrapingStrategy, ScrapingTas
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 class OrchestraWebScrapingMCPServer(BaseMCPServer):
     """MCP Server for Web Scraping AI Agent Team integration with Orchestra AI."""
 
@@ -498,10 +497,8 @@ class OrchestraWebScrapingMCPServer(BaseMCPServer):
         else:
             return f"Analysis failed: {result.data.get('error', 'Unknown error')}"
 
-
 # For backward compatibility
 WebScrapingMCPServer = OrchestraWebScrapingMCPServer
-
 
 # FastAPI integration for deployment
 from fastapi import FastAPI, HTTPException
@@ -510,7 +507,6 @@ from fastapi.responses import JSONResponse
 app = FastAPI(title="Web Scraping MCP Server")
 server_instance: Optional[OrchestraWebScrapingMCPServer] = None
 
-
 @app.on_event("startup")
 async def startup_event():
     """Initialize the MCP server on startup."""
@@ -518,13 +514,11 @@ async def startup_event():
     server_instance = OrchestraWebScrapingMCPServer()
     await server_instance.start()
 
-
 @app.on_event("shutdown")
 async def shutdown_event():
     """Stop the MCP server on shutdown."""
     if server_instance:
         await server_instance.stop()
-
 
 @app.get("/health")
 async def health_check():
@@ -543,7 +537,6 @@ async def health_check():
         },
     )
 
-
 @app.get("/mcp/tools")
 async def list_tools():
     """List available MCP tools."""
@@ -552,7 +545,6 @@ async def list_tools():
 
     tools = await server_instance.list_tools()
     return {"tools": tools}
-
 
 @app.post("/mcp/call/{tool_name}")
 async def call_tool(tool_name: str, arguments: Dict[str, Any]):
@@ -565,7 +557,6 @@ async def call_tool(tool_name: str, arguments: Dict[str, Any]):
         return {"result": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 if __name__ == "__main__":
     import uvicorn

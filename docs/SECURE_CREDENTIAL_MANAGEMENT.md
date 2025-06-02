@@ -133,12 +133,12 @@ async def get_vertex_info(credentials: dict = Depends(get_vertex_ai_credentials)
     # Use credentials to access     return {"status": "authenticated"}
 ```
 
-### 4. Terraform Module
+### 4. Pulumi Module
 
-The `terraform/modules/secure-credentials` module provides infrastructure-as-code for setting up the credential management system:
+The `pulumi/modules/secure-credentials` module provides infrastructure-as-code for setting up the credential management system:
 
 ```hcl
-module "secure_credentials" {
+secure_credentials = ComponentResource( {
   source      = "./modules/secure-credentials"
   project_id  = var.project_id
   region      = var.region

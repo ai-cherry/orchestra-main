@@ -5,7 +5,6 @@ import sys
 
 BANNED = ["DigitalOcean", "digitalocean", "GCP"]
 
-
 def main() -> int:
     docs = Path("docs")
     bad = False
@@ -16,7 +15,6 @@ def main() -> int:
                 print(f"{md}: contains '{term}'")
                 bad = True
     return 1 if bad else 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

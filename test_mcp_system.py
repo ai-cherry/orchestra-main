@@ -18,7 +18,6 @@ console = Console()
 GATEWAY_URL = "http://localhost:8000"
 TESTS = []
 
-
 def test(name: str):
     """Decorator to register tests"""
 
@@ -27,7 +26,6 @@ def test(name: str):
         return func
 
     return decorator
-
 
 @test("Gateway Health Check")
 async def test_gateway_health():
@@ -38,7 +36,6 @@ async def test_gateway_health():
         data = response.json()
         assert data["status"] in ["healthy", "degraded"]
         return f"Gateway status: {data['status']}"
-
 
 @test("Server Status Check")
 async def test_server_status():
@@ -54,7 +51,6 @@ async def test_server_status():
 
         return "\n".join(results)
 
-
 @test("List Available Tools")
 async def test_list_tools():
     """Test listing all MCP tools"""
@@ -65,7 +61,6 @@ async def test_list_tools():
 
         tool_count = sum(len(server["tools"]) for server in data.values())
         return f"Found {tool_count} tools across {len(data)} servers"
-
 
 @test("Store Memory")
 async def test_store_memory():
@@ -89,7 +84,6 @@ async def test_store_memory():
 
         return f"Memory stored in {len(data['layers_stored'])} layers"
 
-
 @test("Query Memory")
 async def test_query_memory():
     """Test querying memories"""
@@ -105,7 +99,6 @@ async def test_query_memory():
         data = response.json()
 
         return f"Found {len(data)} memories"
-
 
 @test("Create Secret")
 async def test_create_secret():
@@ -133,7 +126,6 @@ async def test_create_secret():
             else:
                 raise Exception(f"Failed to create secret: {data}")
 
-
 @test("Switch Mode")
 async def test_switch_mode():
     """Test switching orchestrator mode"""
@@ -149,7 +141,6 @@ async def test_switch_mode():
         data = response.json()
 
         return f"Switched from {data['previous_mode']} to {data['current_mode']}"
-
 
 @test("Run Workflow")
 async def test_run_workflow():
@@ -167,7 +158,6 @@ async def test_run_workflow():
 
         return f"Started workflow: {data['workflow_id']}"
 
-
 @test("Get Orchestrator Status")
 async def test_orchestrator_status():
     """Test getting orchestrator status"""
@@ -184,7 +174,6 @@ async def test_orchestrator_status():
 
         return f"Mode: {data['current_mode']}, Active workflows: {data['workflows']['active']}"
 
-
 @test("Prometheus Metrics")
 async def test_metrics():
     """Test Prometheus metrics endpoint"""
@@ -196,7 +185,6 @@ async def test_metrics():
         # Count metric lines
         metric_lines = [l for l in response.text.split("\n") if l and not l.startswith("#")]
         return f"Found {len(metric_lines)} metrics"
-
 
 async def run_tests():
     """Run all tests"""
@@ -250,7 +238,6 @@ async def run_tests():
 
     return failed == 0
 
-
 async def main():
     """Main test runner"""
     # Wait a bit for servers to be ready
@@ -263,7 +250,6 @@ async def main():
     except Exception as e:
         console.print(f"[bold red]Test execution failed: {e}[/bold red]")
         exit(1)
-
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -61,7 +61,6 @@ app.include_router(llm_orchestration_router)
 
 # Middleware for logging requests and latency
 
-
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     logger.info("request_received", method=request.method, path=request.url.path)
@@ -77,17 +76,14 @@ async def log_requests(request: Request, call_next):
     )
     return response
 
-
 class QueryRequest(BaseModel):
     prompt: str
-
 
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
     logger.info("health_check_accessed")
     return {"status": "ok"}
-
 
 @app.post("/query")
 async def process_query(query_request: QueryRequest):
@@ -124,7 +120,6 @@ async def process_query(query_request: QueryRequest):
     return {
         "response": f"Mock response to prompt: '{query_request.prompt}' using API key ending with ...{api_key[-4:] if api_key else 'N/A'}"
     }
-
 
 # Initialize an __init__.py file in the app directory if it doesn't exist,
 # to ensure the module can be found by Uvicorn.

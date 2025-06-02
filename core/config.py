@@ -11,7 +11,6 @@ from functools import lru_cache
 from pydantic import BaseSettings, validator, Field
 from core.llm_types import RouterConfig
 
-
 class Settings(BaseSettings):
     """
     Application settings with environment variable support.
@@ -111,7 +110,6 @@ class Settings(BaseSettings):
         case_sensitive = False
         validate_assignment = True
 
-
 @lru_cache()
 def get_settings() -> Settings:
     """
@@ -122,11 +120,9 @@ def get_settings() -> Settings:
     """
     return Settings()
 
-
 def get_router_config() -> RouterConfig:
     """Get router configuration from settings"""
     return get_settings().to_router_config()
-
 
 # Export commonly used settings
 settings = get_settings()

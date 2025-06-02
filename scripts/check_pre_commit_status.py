@@ -5,12 +5,10 @@ import subprocess
 import sys
 from collections import defaultdict
 
-
 def run_command(cmd: str) -> tuple[int, str]:
     """Run a command and return exit code and output."""
     result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
     return result.returncode, result.stdout + result.stderr
-
 
 def check_hook_status():
     """Check status of all pre-commit hooks."""
@@ -36,7 +34,6 @@ def check_hook_status():
         print(f"{emoji} {hook}: {status}")
 
     return hooks_status
-
 
 def check_flake8_issues():
     """Get detailed flake8 issues."""
@@ -70,7 +67,6 @@ def check_flake8_issues():
 
     return issues
 
-
 def check_mypy_issues():
     """Get detailed mypy issues."""
     print("\n🔍 Checking mypy issues...\n")
@@ -100,7 +96,6 @@ def check_mypy_issues():
         print(f"\n  ... and {len(errors) - 10} more errors")
 
     return error_count
-
 
 def main():
     """Main function."""
@@ -138,7 +133,6 @@ def main():
         print("4. Fix invalid escape sequences (W605)")
         print("5. Run 'pre-commit run --all-files' to verify")
         return 1
-
 
 if __name__ == "__main__":
     sys.exit(main())

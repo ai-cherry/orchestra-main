@@ -33,7 +33,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 @app.get("/health")
 async def health_check():
     """
@@ -43,7 +42,6 @@ async def health_check():
         A dictionary with status message for Patrick
     """
     return {"status": "I'm alive, Patrick!"}
-
 
 @app.post("/interact")
 async def interact(user_input: dict):
@@ -67,7 +65,6 @@ async def interact(user_input: dict):
         logger.error(f"Interaction failed: {e}")
         # Return a simple error response rather than raising an exception
         return {"response": f"Error processing request: {str(e)}"}
-
 
 if __name__ == "__main__":
     import uvicorn

@@ -19,7 +19,6 @@ from packages.shared.src.models.base_models import MemoryItem
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class MemoryLayer(BaseModel):
     """
     Configuration for a memory layer.
@@ -36,7 +35,6 @@ class MemoryLayer(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
-
 
 class LayeredMemoryManager:
     """
@@ -461,7 +459,6 @@ class LayeredMemoryManager:
 
         return await self.query(query)
 
-
 def create_default_memory_manager() -> LayeredMemoryManager:
     """
     Create a default memory manager with standard layers.
@@ -502,10 +499,8 @@ def create_default_memory_manager() -> LayeredMemoryManager:
 
     return LayeredMemoryManager(layers)
 
-
 # Singleton instance
 _memory_manager: Optional[LayeredMemoryManager] = None
-
 
 async def get_memory_manager() -> LayeredMemoryManager:
     """

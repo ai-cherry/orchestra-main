@@ -31,7 +31,6 @@ from packages.shared.src.models.base_models import MemoryItem
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("memory_example")
 
-
 @trace_operation("example_add_memory_items")
 async def add_memory_items(memory_manager, items: List[MemoryItem]) -> List[str]:
     """
@@ -56,7 +55,6 @@ async def add_memory_items(memory_manager, items: List[MemoryItem]) -> List[str]
             item_id=item_id,
         )
     return item_ids
-
 
 @trace_operation("example_semantic_search")
 async def perform_semantic_search(
@@ -85,7 +83,6 @@ async def perform_semantic_search(
     )
 
     return results
-
 
 async def example_with_config():
     """Example using explicit configuration."""
@@ -139,7 +136,6 @@ async def example_with_config():
         await memory_manager.close()
         logger.info("Memory manager closed")
 
-
 async def example_from_env():
     """Example using configuration from environment variables."""
     logger.info("Starting example with configuration from environment variables")
@@ -169,7 +165,6 @@ async def example_from_env():
         await memory_manager.close()
         logger.info("Memory manager closed")
 
-
 async def main():
     """Main entry point."""
     logger.info("Starting memory management example")
@@ -180,7 +175,6 @@ async def main():
     await example_from_env()
 
     logger.info("Memory management example completed")
-
 
 if __name__ == "__main__":
     asyncio.run(main())

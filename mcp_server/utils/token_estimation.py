@@ -59,7 +59,6 @@ _ENCODER_CACHE: Dict[str, Any] = {}
 _TOKEN_COUNT_CACHE: Dict[str, int] = {}
 _MAX_CACHE_SIZE = 10000
 
-
 def get_encoding(model_name: str) -> Any:
     """Get the tokenizer encoding for a specific model.
 
@@ -103,7 +102,6 @@ def get_encoding(model_name: str) -> Any:
         logger.error(f"Error getting encoding for model {model_name}: {e}")
         raise ValueError(f"Failed to get encoding for model {model_name}: {e}")
 
-
 def _compute_hash(content: Any) -> str:
     """Compute a hash of the content for caching.
 
@@ -123,7 +121,6 @@ def _compute_hash(content: Any) -> str:
 
     return hashlib.md5(content_str.encode("utf-8")).hexdigest()
 
-
 def _manage_cache_size() -> None:
     """Manage the token count cache size."""
     if len(_TOKEN_COUNT_CACHE) >= _MAX_CACHE_SIZE:
@@ -132,7 +129,6 @@ def _manage_cache_size() -> None:
         for key in keys_to_remove:
             del _TOKEN_COUNT_CACHE[key]
         logger.debug(f"Token count cache cleared to {len(_TOKEN_COUNT_CACHE)} entries")
-
 
 def count_tokens(text: str, model_name: str = "gpt-4") -> int:
     """Count the number of tokens in a text string.
@@ -185,7 +181,6 @@ def count_tokens(text: str, model_name: str = "gpt-4") -> int:
 
     return token_estimate
 
-
 def count_tokens_recursive(content: Any, model_name: str = "gpt-4") -> int:
     """Count tokens recursively for nested data structures.
 
@@ -227,7 +222,6 @@ def count_tokens_recursive(content: Any, model_name: str = "gpt-4") -> int:
 
     return token_count
 
-
 def estimate_memory_entry_tokens(entry: MemoryEntry, model_name: str = "gpt-4") -> int:
     """Estimate the number of tokens in a memory entry.
 
@@ -258,7 +252,6 @@ def estimate_memory_entry_tokens(entry: MemoryEntry, model_name: str = "gpt-4") 
         _manage_cache_size()
 
     return token_count
-
 
 def with_token_counting(
     model_name: str = "gpt-4",
@@ -305,7 +298,6 @@ def with_token_counting(
         return wrapper
 
     return decorator
-
 
 class TokenEstimator:
     """Accurate token estimation for different LLM models."""

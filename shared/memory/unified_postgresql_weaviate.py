@@ -20,13 +20,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class MemoryType(str, Enum):
     """Types of memory storage."""
     SHORT_TERM = "short_term"  # PostgreSQL with TTL
     LONG_TERM = "long_term"    # PostgreSQL persistent
     SEMANTIC = "semantic"      # Weaviate vector storage
-
 
 class UnifiedMemoryManager:
     """

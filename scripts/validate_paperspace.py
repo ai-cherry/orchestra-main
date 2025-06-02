@@ -16,7 +16,6 @@ from pymongo import MongoClient
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
 def check_weaviate() -> bool:
     """Test Weaviate connection."""
     try:
@@ -32,7 +31,6 @@ def check_weaviate() -> bool:
         logger.error(f"Weaviate check failed: {str(e)}")
         return False
 
-
 def check_redis() -> bool:
     """Test Redis/DragonflyDB connection."""
     try:
@@ -47,7 +45,6 @@ def check_redis() -> bool:
         logger.error(f"Redis check failed: {str(e)}")
         return False
 
-
 def check_mongodb() -> bool:
     """Test MongoDB connection."""
     try:
@@ -56,7 +53,6 @@ def check_mongodb() -> bool:
     except Exception as e:
         logger.error(f"MongoDB check failed: {str(e)}")
         return False
-
 
 def main() -> int:
     """Run all validation checks."""
@@ -81,7 +77,6 @@ def main() -> int:
 
     logger.info("All services validated successfully")
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

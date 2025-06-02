@@ -19,7 +19,6 @@ from shared.database.postgresql_client import PostgreSQLClient
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
 SCHEMA_SQL = """
 -- Create schema if not exists
 CREATE SCHEMA IF NOT EXISTS orchestra;
@@ -149,7 +148,6 @@ DEFAULT_AGENTS = [
     },
 ]
 
-
 def setup_schema(db: PostgreSQLClient, drop_existing: bool = False) -> None:
     """Setup PostgreSQL schema."""
     if drop_existing:
@@ -171,7 +169,6 @@ def setup_schema(db: PostgreSQLClient, drop_existing: bool = False) -> None:
 
     logger.info("Schema created successfully")
 
-
 def insert_default_agents(db: PostgreSQLClient) -> None:
     """Insert default agents if they don't exist."""
     logger.info("Inserting default agents...")
@@ -185,7 +182,6 @@ def insert_default_agents(db: PostgreSQLClient) -> None:
             logger.info(f"Created agent: {agent['name']} (ID: {agent['id']})")
         else:
             logger.info(f"Agent already exists: {agent_data['name']}")
-
 
 def verify_schema(db: PostgreSQLClient) -> None:
     """Verify schema was created correctly."""
@@ -232,7 +228,6 @@ def verify_schema(db: PostgreSQLClient) -> None:
     triggers = db.execute_query(triggers_query)
     logger.info(f"Found {len(triggers)} triggers in orchestra schema")
 
-
 def main():
     parser = argparse.ArgumentParser(description="Setup PostgreSQL schema for Orchestra AI")
     parser.add_argument("--drop", action="store_true", help="Drop existing schema before creating")
@@ -274,7 +269,6 @@ def main():
         return 1
     finally:
         db.close()
-
 
 if __name__ == "__main__":
     sys.exit(main())

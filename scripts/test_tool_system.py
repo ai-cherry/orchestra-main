@@ -13,7 +13,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from core.orchestrator.src.tools.executor import ToolExecutor
 from core.orchestrator.src.tools.registry import ToolRegistry
 
-
 async def test_tool_system():
     """Test the tool awareness system."""
     print("🔧 Testing AI Tool Awareness System")
@@ -80,7 +79,6 @@ async def test_tool_system():
     print(f"  Average time: {stats['average_execution_time']:.3f}s")
 
     print("\n✅ Tool system test complete!")
-
 
 if __name__ == "__main__":
     asyncio.run(test_tool_system())

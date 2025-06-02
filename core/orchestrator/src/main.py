@@ -25,23 +25,17 @@ from typing import Dict
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from core.orchestrator.src.agents.agent_registry import register_default_agents
-from core.orchestrator.src.agents.unified_agent_registry import get_agent_registry
+from core.orchestrator.src.agents.simplified_agent_registry import register_default_agents, get_simplified_agent_registry
 from core.orchestrator.src.api.dependencies.memory import (  # Add the new hexagonal architecture components
     close_memory_manager,
     close_memory_service,
     initialize_memory_manager,
 )
-from core.orchestrator.src.api.endpoints import resources  # Added resources router import
-from core.orchestrator.src.api.endpoints import (  # Add import for conversations endpoints
-    agents,
-    conversations,
-    health,
-    interaction,
-    llm_interaction,
-    personas,
-    query_agent,
-)
+from core.orchestrator.src.api.endpoints import health, auth
+
+# Commented out heavy endpoints to minimize dependencies during initial startup
+# from core.orchestrator.src.api.endpoints import interaction, llm_interaction, personas, agents, query_agent
+
 from core.orchestrator.src.config.loader import get_settings, load_persona_configs
 from core.orchestrator.src.services.unified_event_bus import get_event_bus
 from core.orchestrator.src.services.unified_registry import get_service_registry, register
@@ -80,6 +74,12 @@ except ImportError:
 settings = get_settings()
 persona_configs: Dict[str, PersonaConfig] = {}
 
+try:
+    from core.orchestrator.src.api.endpoints import conversations
+    _HAS_CONVERSATIONS = True
+except ImportError:
+    logger.warning("conversations endpoint not available; skipping conversations routes")
+    _HAS_CONVERSATIONS = False
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -98,13 +98,6 @@ async def lifespan(app: FastAPI):
         logger.error(f"Failed to load persona configurations: {e}", exc_info=True)
         logger.warning("Application may run with incomplete or default persona configurations due to loading failure.")
 
-    # Initialize legacy memory manager for backward compatibility
-    try:
-        logger.info("Initializing legacy memory manager")
-        await initialize_memory_manager(settings)
-    except Exception as e:
-        logger.error(f"Failed to initialize legacy memory manager: {e}", exc_info=True)
-        logger.warning("Legacy memory manager initialization failed; application may experience memory-related issues.")
 
     # Initialize memory service for hexagonal architecture if available
     if HEX_ARCH_AVAILABLE:
@@ -142,10 +135,6 @@ async def lifespan(app: FastAPI):
 
     # Close memory services
     try:
-        logger.info("Closing legacy memory manager")
-        await close_memory_manager()
-    except Exception as e:
-        logger.error(f"Error closing legacy memory manager: {e}")
 
     # Close hexagonal architecture memory service if available
     if HEX_ARCH_AVAILABLE:
@@ -157,7 +146,6 @@ async def lifespan(app: FastAPI):
 
     # Close other services
     get_service_registry().close_all()
-
 
 def initialize_services(test_mode: bool = False) -> None:
     """
@@ -178,7 +166,7 @@ def initialize_services(test_mode: bool = False) -> None:
     register(event_bus)
 
     # Register the agent registry as a service
-    agent_registry = get_agent_registry()
+    agent_registry = get_simplified_agent_registry()
     register(agent_registry)
 
     # Initialize LLM providers (skip in test mode unless explicitly mocked)
@@ -207,7 +195,6 @@ def initialize_services(test_mode: bool = False) -> None:
 
     logger.info(f"Unified services initialized {'(test mode)' if test_mode else ''}")
 
-
 # Create FastAPI app
 app = FastAPI(
     title=settings.ENVIRONMENT,
@@ -230,17 +217,13 @@ app.add_middleware(
 # Register API routes
 # Use settings.API_PREFIX if available
 app.include_router(health.router, prefix="/api")
-app.include_router(interaction.router, prefix="/api")
-app.include_router(llm_interaction.router, prefix="/api")
-app.include_router(personas.router, prefix="/api/personas")
+app.include_router(auth.router, prefix="/api")
 # Query agent endpoint
-app.include_router(agents.router, prefix="/api/agents")
-app.include_router(query_agent.router, prefix="/api")
+# app.include_router(agents.router, prefix="/api/agents")
 # Add conversations router
-app.include_router(conversations.router, prefix="/api/conversations")
-# Add resources router
-app.include_router(resources.router, prefix="/api/resources")
-
+if _HAS_CONVERSATIONS:
+    # app.include_router(conversations.router, prefix="/api/conversations")
+    pass
 
 if __name__ == "__main__":
     import uvicorn

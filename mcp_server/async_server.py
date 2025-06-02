@@ -45,7 +45,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("mcp-async-server")
 
-
 # Pydantic models for API requests and responses
 class StatusResponse(BaseModel):
     """Status response model."""
@@ -53,7 +52,6 @@ class StatusResponse(BaseModel):
     status: str
     tools: List[str]
     workflows: int
-
 
 class MemoryRequest(BaseModel):
     """Memory request model."""
@@ -64,13 +62,11 @@ class MemoryRequest(BaseModel):
     tool: Optional[str] = None
     ttl: Optional[int] = None
 
-
 class MemoryResponse(BaseModel):
     """Memory response model."""
 
     key: str
     content: Any
-
 
 class MemorySyncRequest(BaseModel):
     """Memory sync request model."""
@@ -80,7 +76,6 @@ class MemorySyncRequest(BaseModel):
     target_tool: str
     scope: Optional[str] = "session"
 
-
 class ExecuteRequest(BaseModel):
     """Execute request model."""
 
@@ -89,12 +84,10 @@ class ExecuteRequest(BaseModel):
     prompt: str
     context: Optional[str] = None
 
-
 class ExecuteResponse(BaseModel):
     """Execute response model."""
 
     result: str
-
 
 class WorkflowRequest(BaseModel):
     """Workflow request model."""
@@ -103,25 +96,21 @@ class WorkflowRequest(BaseModel):
     parameters: Optional[Dict[str, Any]] = None
     tool: Optional[str] = None
 
-
 class CrossToolWorkflowRequest(BaseModel):
     """Cross-tool workflow request model."""
 
     workflow_id: str
     tools: Optional[List[str]] = None
 
-
 class WorkflowResponse(BaseModel):
     """Workflow response model."""
 
     result: str
 
-
 class SuccessResponse(BaseModel):
     """Success response model."""
 
     success: bool
-
 
 class ErrorResponse(BaseModel):
     """Error response model."""
@@ -129,7 +118,6 @@ class ErrorResponse(BaseModel):
     error: str
     code: str
     details: Optional[Dict[str, Any]] = None
-
 
 class AsyncMCPServer:
     """Asynchronous Model Context Protocol (MCP) Server."""
@@ -328,7 +316,6 @@ class AsyncMCPServer:
         logger.info(f"Starting async MCP server on {host}:{port}")
         uvicorn.run(self.app, host=host, port=port, debug=debug)
 
-
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description="Async MCP Server")
@@ -341,7 +328,6 @@ def main():
     # Create and run the server
     server = AsyncMCPServer(config_path)
     server.run()
-
 
 if __name__ == "__main__":
     main()

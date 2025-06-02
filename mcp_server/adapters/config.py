@@ -8,7 +8,6 @@ import os
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional
 
-
 @dataclass
 class CircuitBreakerConfig:
     """Configuration for circuit breaker functionality."""
@@ -16,7 +15,6 @@ class CircuitBreakerConfig:
     failure_threshold: int = 5
     recovery_timeout: int = 60
     expected_exception: type[Exception] = Exception
-
 
 @dataclass
 class DroidConfig:
@@ -28,7 +26,6 @@ class DroidConfig:
     timeout: int = 30
     max_retries: int = 3
 
-
 @dataclass
 class ArchitectConfig(DroidConfig):
     """Configuration for Architect droid adapter."""
@@ -37,7 +34,6 @@ class ArchitectConfig(DroidConfig):
     include_iac: bool = True
     default_cloud_provider: str = "vultr"
     output_format: str = "pulumi"
-
 
 @dataclass
 class CodeConfig(DroidConfig):
@@ -51,7 +47,6 @@ class CodeConfig(DroidConfig):
     include_docs: bool = True
     max_tokens: int = 4096
 
-
 @dataclass
 class DebugConfig(DroidConfig):
     """Configuration for Debug droid adapter."""
@@ -63,7 +58,6 @@ class DebugConfig(DroidConfig):
     profile_depth: str = "detailed"
     max_solutions: int = 5
 
-
 @dataclass
 class ReliabilityConfig(DroidConfig):
     """Configuration for Reliability droid adapter."""
@@ -74,7 +68,6 @@ class ReliabilityConfig(DroidConfig):
     include_predictions: bool = True
     runbook_format: str = "markdown"
     severity_threshold: str = "medium"
-
 
 @dataclass
 class KnowledgeConfig(DroidConfig):
@@ -94,7 +87,6 @@ class KnowledgeConfig(DroidConfig):
         }
     )
 
-
 @dataclass
 class AdapterSystemConfig:
     """Complete configuration for the adapter system."""
@@ -110,7 +102,6 @@ class AdapterSystemConfig:
     metrics_port: int = 9090
     log_level: str = "INFO"
     health_check_interval: int = 60
-
 
 def load_config_from_env() -> AdapterSystemConfig:
     """Load configuration from environment variables.
@@ -174,7 +165,6 @@ def load_config_from_env() -> AdapterSystemConfig:
 
     return config
 
-
 def validate_config(config: AdapterSystemConfig) -> None:
     """Validate adapter configuration.
 
@@ -218,10 +208,8 @@ def validate_config(config: AdapterSystemConfig) -> None:
     if not 0 <= config.knowledge.similarity_threshold <= 1:
         raise ValueError("Knowledge adapter similarity threshold must be between 0 and 1")
 
-
 # Default configuration instance
 DEFAULT_CONFIG = AdapterSystemConfig()
-
 
 # Example configuration for different environments
 DEVELOPMENT_CONFIG = AdapterSystemConfig(
@@ -255,7 +243,6 @@ DEVELOPMENT_CONFIG = AdapterSystemConfig(
     enable_metrics=True,
     log_level="DEBUG",
 )
-
 
 PRODUCTION_CONFIG = AdapterSystemConfig(
     architect=ArchitectConfig(

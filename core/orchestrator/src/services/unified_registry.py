@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 T = TypeVar("T")
 S = TypeVar("S")
 
-
 class Service(ABC):
     """
     Base interface for services managed by the registry.
@@ -56,7 +55,6 @@ class Service(ABC):
         if hasattr(self, "close") and callable(self.close):
             loop = asyncio.get_running_loop()
             await loop.run_in_executor(None, self.close)
-
 
 class ServiceFactory(Generic[T]):
     """
@@ -101,7 +99,6 @@ class ServiceFactory(Generic[T]):
     def is_singleton(self) -> bool:
         """Get whether this factory creates singleton instances."""
         return self._singleton
-
 
 class ServiceRegistry:
     """
@@ -532,10 +529,8 @@ class ServiceRegistry:
         """
         return [service.__class__.__name__ for service in self._services]
 
-
 # Global service registry instance
 _service_registry = ServiceRegistry()
-
 
 def get_service_registry() -> ServiceRegistry:
     """
@@ -549,30 +544,24 @@ def get_service_registry() -> ServiceRegistry:
     """
     return _service_registry
 
-
 # Type-safe helper functions for more ergonomic API
 def register(service: T) -> T:
     """Register a service with the global registry."""
     return get_service_registry().register(service)
 
-
 @overload
 def get(service_type: Type[T]) -> Optional[T]: ...
 
-
 @overload
 def get(service_type: Type[T], default: S) -> Union[T, S]: ...
-
 
 def get(service_type: Type[T], default: Any = None) -> Any:
     """Get a service from the global registry by type."""
     return get_service_registry().get_service(service_type, default)
 
-
 def require(service_type: Type[T]) -> T:
     """Get a required service from the global registry by type."""
     return get_service_registry().get_required_service(service_type)
-
 
 def register_factory(
     service_type: Type[T],

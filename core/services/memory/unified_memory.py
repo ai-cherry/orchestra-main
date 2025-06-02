@@ -27,9 +27,7 @@ from .base import (
     SearchResult,
 )
 
-
 logger = logging.getLogger(__name__)
-
 
 class ShortTermStore(MemoryStore):
     """Short-term memory store using DragonflyDB."""
@@ -95,7 +93,6 @@ class ShortTermStore(MemoryStore):
         except Exception as e:  # Broad exception for connection issues
             logger.error(f"Short-term store health check failed: {e}")
             return False
-
 
 class MidTermStore(MemoryStore):
     """Mid-term memory store using MongoDB."""
@@ -190,7 +187,6 @@ class MidTermStore(MemoryStore):
             return True
         except Exception:  # Broad exception for connection issues
             return False
-
 
 class LongTermStore(MemoryStore):
     """Long-term memory store using Weaviate."""
@@ -336,7 +332,6 @@ class LongTermStore(MemoryStore):
             logger.error(f"Weaviate health check failed: {e}")
             return False
 
-
 class DefaultMemoryPolicy(MemoryPolicy):
     """Default memory management policy."""
 
@@ -383,7 +378,6 @@ class DefaultMemoryPolicy(MemoryPolicy):
             return MemoryLayer.LONG_TERM
 
         return MemoryLayer.MID_TERM
-
 
 class UnifiedMemoryService(MemoryService):
     """
@@ -771,9 +765,7 @@ class UnifiedMemoryService(MemoryService):
         if evicted_count > 0:
             logger.info(f"Memory cleanup: Evicted {evicted_count} items based on policy.")
 
-
 _memory_service: Optional[UnifiedMemoryService] = None
-
 
 def get_memory_service(service_registry: ServiceRegistry) -> UnifiedMemoryService:
     """Get the global memory service instance."""

@@ -28,7 +28,6 @@ MONGODB_AVAILABLE = False
 HEX_ARCH_AVAILABLE = False
 USE_STUBS = False
 
-
 # Initialize imports safely
 def _initialize_imports():
     """Initialize imports and set availability flags."""
@@ -91,10 +90,8 @@ def _initialize_imports():
         logger.info("Successfully imported hexagonal architecture components")
     except ImportError as e:
         logger.warning(
-            f"Failed to import hexagonal architecture components, falling back to legacy implementation: {str(e)}"
         )
         HEX_ARCH_AVAILABLE = False
-
 
 # Initialize imports
 _initialize_imports()
@@ -102,7 +99,6 @@ _initialize_imports()
 # Global memory manager and service instances (using type hints)
 _memory_manager: Optional["MemoryManager"] = None
 _memory_service: Optional["MemoryService"] = None
-
 
 @error_boundary(fallback_value=None, propagate_types=[MemoryError], log_to_monitoring=True)
 def create_memory_manager(settings: Settings) -> "MemoryManager":
@@ -129,7 +125,7 @@ def create_memory_manager(settings: Settings) -> "MemoryManager":
     # Determine if we need cloud storage based on environment and project ID
     use_mongodb = (
         settings.ENVIRONMENT in ["prod", "production", "stage", "staging"]
-        and settings.get_gcp_project_id() is not None
+        and settings.get_vultr_project_id() is not None
         and MONGODB_AVAILABLE
     )
 
@@ -138,8 +134,8 @@ def create_memory_manager(settings: Settings) -> "MemoryManager":
         try:
             logger.info(f"Creating MongoDB memory adapter for environment: {settings.ENVIRONMENT}")
             return MongoDBMemoryAdapter(
-                project_id=settings.get_gcp_project_id(),
-                credentials_path=settings.get_gcp_credentials_path(),
+                project_id=settings.get_vultr_project_id(),
+                credentials_path=settings.get_vultr_credentials_path(),
                 namespace=settings.MONGODB_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}",
             )
         except Exception as e:
@@ -152,7 +148,6 @@ def create_memory_manager(settings: Settings) -> "MemoryManager":
     namespace = settings.MONGODB_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
     logger.info(f"Using in-memory memory manager with namespace: {namespace}")
     return InMemoryMemoryManager(namespace=namespace)
-
 
 @error_boundary(fallback_value=None, propagate_types=[MemoryError], log_to_monitoring=True)
 async def get_memory_manager(
@@ -212,7 +207,6 @@ async def get_memory_manager(
 
     return _memory_manager
 
-
 @error_boundary(propagate_types=[MemoryError], log_to_monitoring=True)
 async def initialize_memory_manager(settings: Settings = None) -> None:
     """
@@ -267,7 +261,6 @@ async def initialize_memory_manager(settings: Settings = None) -> None:
         except Exception as e:
             logger.warning(f"Memory manager health check failed: {str(e)}")
 
-
 @error_boundary(log_to_monitoring=True)
 async def close_memory_manager() -> None:
     """
@@ -284,7 +277,6 @@ async def close_memory_manager() -> None:
             logger.error(f"Error closing memory manager: {str(e)}")
         finally:
             _memory_manager = None
-
 
 @error_boundary(fallback_value=None, propagate_types=[MemoryError], log_to_monitoring=True)
 async def get_memory_service(
@@ -319,12 +311,12 @@ async def get_memory_service(
             # Determine storage type and configuration based on settings
             if (
                 settings.ENVIRONMENT in ["prod", "production", "stage", "staging"]
-                and settings.get_gcp_project_id() is not None
+                and settings.get_vultr_project_id() is not None
             ):
                 storage_type = "mongodb"
                 storage_config = {
-                    "project_id": settings.get_gcp_project_id(),
-                    "credentials_path": settings.get_gcp_credentials_path(),
+                    "project_id": settings.get_vultr_project_id(),
+                    "credentials_path": settings.get_vultr_credentials_path(),
                     "namespace": settings.MONGODB_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}",
                 }
             else:
@@ -378,7 +370,6 @@ async def get_memory_service(
                 )
 
     return _memory_service
-
 
 @error_boundary(log_to_monitoring=True)
 async def close_memory_service() -> None:

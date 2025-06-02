@@ -15,14 +15,12 @@ from pydantic import BaseModel
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
 class DatabaseCommand(BaseModel):
     """Request model for MCP commands."""
 
     command: str
     args: Dict[str, Any] = {}
     options: Dict[str, Any] = {}
-
 
 class MCPRedisServer:
     def __init__(self, config: Dict[str, str]):
@@ -95,7 +93,6 @@ class MCPRedisServer:
             "args": args,
         }
 
-
 def get_redis_config() -> Dict[str, Any]:
     """Get Redis/DragonflyDB configuration based on environment."""
     if os.getenv("PAPERSPACE_ENV") == "true":
@@ -112,17 +109,14 @@ def get_redis_config() -> Dict[str, Any]:
             "port": int(os.getenv("REDIS_PORT", 6379)),
         }
 
-
 # FastAPI application setup
 app = FastAPI(title="DragonflyDB MCP Server")
 server = MCPRedisServer(get_redis_config())
-
 
 @app.post("/execute")
 async def execute_command(command: DatabaseCommand):
     """API endpoint for command execution."""
     return server.execute_command(command)
-
 
 @app.get("/health")
 async def health_check():

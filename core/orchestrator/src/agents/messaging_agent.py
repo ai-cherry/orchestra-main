@@ -21,7 +21,6 @@ from core.orchestrator.src.services.message_queue import AgentMessage, get_messa
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class MessagingAgent(Agent, MessageHandlerMixin):
     """
     Agent that communicates with other agents via the messaging system.

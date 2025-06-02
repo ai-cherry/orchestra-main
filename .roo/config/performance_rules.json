@@ -1,0 +1,166 @@
+{
+    "globalSettings": {
+        "performanceFirst": true,
+        "zeroJunkPolicy": true,
+        "autoCleanupIntegration": true,
+        "defaultPythonVersion": "3.10",
+        "primaryDataStore": "PostgreSQL",
+        "vectorStore": "Weaviate",
+        "databaseAccessClass": "shared.database.UnifiedDatabase"
+    },
+    "modePriorities": {
+        "architect": {
+            "model": "anthropic/claude-3.5-sonnet",
+            "temperature": 0.2,
+            "constraints": [
+                "no-temp-files-without-lifecycle",
+                "integration-preferred-over-standalone",
+                "performance-analysis-mandatory-for-db-io",
+                "adhere-to-project-structure",
+                "use-pulumi-python-vultr-for-iac"
+            ],
+            "optimizationRules": {
+                "dependency-minimization": true,
+                "cache-strategy-awareness": "application-level",
+                "resource-budgeting": "contextual"
+            },
+            "instructions": [
+                "Prioritize integrating new functionalities into existing modules.",
+                "Ensure all PostgreSQL queries are optimized and include EXPLAIN ANALYZE in development.",
+                "Design for simplicity and maintainability using established project patterns."
+            ]
+        },
+        "code": {
+            "model": "anthropic/claude-3.5-sonnet",
+            "temperature": 0.1,
+            "constraints": [
+                "max-file-size: 700kb",
+                "cyclomatic-complexity < 15",
+                "no-standalone-scripts-by-default",
+                "benchmark-required-for-loops-over-1k-iterations",
+                "type-hints-mandatory",
+                "google-style-docstrings"
+            ],
+            "instructions": [
+                "Generate Python 3.10 compatible code.",
+                "Always use type hints and Google-style docstrings.",
+                "If creating a temporary file, use the 'transient_file' decorator or ensure explicit cleanup.",
+                "Avoid 'os.system()'; use 'subprocess.run()'.",
+                "Access databases ONLY via 'shared.database.UnifiedDatabase'."
+            ]
+        },
+        "debug": {
+            "model": "anthropic/claude-3.5-sonnet",
+            "temperature": 0.05,
+            "constraints": [
+                "no-debug-print-to-stdout-in-prod-code",
+                "integrate-logging-via-project-logger",
+                "performance-profiling-for-bottlenecks"
+            ],
+            "instructions": [
+                "Identify root causes and suggest fixes adhering to project standards.",
+                "Do not add temporary debug files; use integrated logging."
+            ]
+        },
+        "orchestrator": {
+            "model": "anthropic/claude-opus-4",
+            "temperature": 0.3,
+            "constraints": [
+                "atomic-task-decomposition",
+                "dependency-graph-generation",
+                "checkpoint-implementation",
+                "mcp-context-management"
+            ],
+            "instructions": [
+                "Break complex tasks into atomic units with clear inputs/outputs.",
+                "Create dependency graphs for parallel execution.",
+                "Implement checkpointing for long workflows.",
+                "Use MCP context for state management."
+            ]
+        },
+        "research": {
+            "model": "anthropic/claude-3.5-sonnet",
+            "temperature": 0.4,
+            "constraints": [
+                "evidence-based-recommendations",
+                "performance-benchmark-citations",
+                "best-practice-references"
+            ],
+            "instructions": [
+                "Research and recommend performance optimizations.",
+                "Cite benchmarks and best practices.",
+                "Focus on practical, implementable solutions."
+            ]
+        },
+        "quality": {
+            "model": "anthropic/claude-3.5-sonnet",
+            "temperature": 0.1,
+            "constraints": [
+                "comprehensive-test-coverage",
+                "performance-regression-detection",
+                "code-quality-metrics"
+            ],
+            "instructions": [
+                "Ensure comprehensive test coverage.",
+                "Detect performance regressions.",
+                "Monitor code quality metrics."
+            ]
+        }
+    },
+    "cleanupProtocols": {
+        "awareness": {
+            "inventoryScript": "scripts/comprehensive_inventory.sh",
+            "cleanupEngine": "scripts/cleanup_engine.py",
+            "transientFileDecorator": "core.utils.file_management.transient_file"
+        },
+        "autoPurgeSuggestionPatterns": [
+            "tmp_*",
+            "temp_*",
+            "ai_generated_debug_*",
+            "test_output_*",
+            "draft_v*_*.md",
+            "*.bak",
+            "*.tmp",
+            "*.pyc",
+            "*.pyo",
+            "__pycache__",
+            ".DS_Store",
+            "*.swp",
+            "*.swo"
+        ],
+        "protectedPatterns": [
+            "requirements*.txt",
+            "*.yaml",
+            "*.yml",
+            "README*",
+            "Makefile",
+            "pyproject.toml",
+            ".gitignore",
+            "Pulumi*"
+        ]
+    },
+    "performanceTargets": {
+        "api": {
+            "latency_p99_ms": 250,
+            "throughput_rps": 500,
+            "error_rate_percent": 0.05
+        },
+        "database": {
+            "query_timeout_seconds": 30,
+            "connection_pool_size": 20,
+            "slow_query_threshold_ms": 100
+        },
+        "file_operations": {
+            "max_temp_file_lifetime_hours": 72,
+            "max_log_file_size_mb": 100,
+            "log_rotation_days": 7
+        }
+    },
+    "projectSpecificRules": [
+        ".roo/rules-architect/01-core-principles.md",
+        ".roo/rules-code/01-coding-standards.md",
+        ".roo/rules-orchestrator/01-workflow.md",
+        ".roo/rules-debug/01-debugging-standards.md",
+        ".roo/rules-quality/01-quality-standards.md"
+    ]
+}

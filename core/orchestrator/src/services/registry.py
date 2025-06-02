@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 # Generic type for services
 T = TypeVar("T")
 
-
 class ServiceRegistry:
     """
     Registry for tracking and managing services.
@@ -152,10 +151,8 @@ class ServiceRegistry:
         """
         return [service.__class__.__name__ for service in self._services]
 
-
 # Global service registry instance
 _service_registry = ServiceRegistry()
-
 
 def get_service_registry() -> ServiceRegistry:
     """

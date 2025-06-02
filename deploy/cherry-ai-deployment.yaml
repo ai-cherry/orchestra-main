@@ -1,0 +1,427 @@
+# Kubernetes deployment configuration for cherry-ai.me data ingestion system
+# This deployment includes all components with deduplication and real-time support
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cherry-ai
+  labels:
+    app: cherry-ai
+    component: data-ingestion
+
+---
+# ConfigMap for application configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: data-ingestion-config
+  namespace: cherry-ai
+data:
+  DEDUP_NEAR_THRESHOLD: "0.95"
+  DEDUP_SEMANTIC_THRESHOLD: "0.85"
+  DEDUP_PARTIAL_THRESHOLD: "0.7"
+  CACHE_TTL_HOURS: "1"
+  MAX_FILE_SIZE_MB: "500"
+  BATCH_SIZE: "100"
+  VECTOR_DIMENSIONS: "1536"
+  SUPPORTED_SOURCES: "slack,gong,salesforce,looker,hubspot"
+
+---
+# Secret for sensitive configuration
+apiVersion: v1
+kind: Secret
+metadata:
+  name: data-ingestion-secrets
+  namespace: cherry-ai
+type: Opaque
+stringData:
+  POSTGRES_URL: "postgresql://user:pass@postgres:5432/data_ingestion"
+  REDIS_URL: "redis://:pass@redis:6379/0"
+  WEAVIATE_URL: "http://weaviate:8080"
+  S3_ENDPOINT: "https://s3.vultr.com"
+  S3_ACCESS_KEY: "your-access-key"
+  S3_SECRET_KEY: "your-secret-key"
+  OPENAI_API_KEY: "your-openai-key"
+  JWT_SECRET: "your-jwt-secret"
+
+---
+# Main API Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-ingestion-api
+  namespace: cherry-ai
+  labels:
+    app: data-ingestion
+    component: api
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: data-ingestion
+      component: api
+  template:
+    metadata:
+      labels:
+        app: data-ingestion
+        component: api
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: api
+        image: registry.vultr.com/cherry-ai/data-ingestion-api:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+          name: http
+        - containerPort: 9090
+          name: metrics
+        env:
+        - name: ENVIRONMENT
+          value: "production"
+        - name: LOG_LEVEL
+          value: "INFO"
+        - name: WORKERS
+          value: "4"
+        envFrom:
+        - configMapRef:
+            name: data-ingestion-config
+        - secretRef:
+            name: data-ingestion-secrets
+        resources:
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: temp-storage
+          mountPath: /tmp/uploads
+      volumes:
+      - name: temp-storage
+        emptyDir:
+          sizeLimit: 10Gi
+
+---
+# WebSocket Service for real-time updates
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: websocket-server
+  namespace: cherry-ai
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: data-ingestion
+      component: websocket
+  template:
+    metadata:
+      labels:
+        app: data-ingestion
+        component: websocket
+    spec:
+      containers:
+      - name: websocket
+        image: registry.vultr.com/cherry-ai/websocket-server:latest
+        ports:
+        - containerPort: 8001
+          name: ws
+        env:
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: data-ingestion-secrets
+              key: REDIS_URL
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "1"
+            memory: "2Gi"
+
+---
+# Background Worker for async processing
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: processing-worker
+  namespace: cherry-ai
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: data-ingestion
+      component: worker
+  template:
+    metadata:
+      labels:
+        app: data-ingestion
+        component: worker
+    spec:
+      containers:
+      - name: worker
+        image: registry.vultr.com/cherry-ai/processing-worker:latest
+        env:
+        - name: WORKER_TYPE
+          value: "processor"
+        - name: CONCURRENCY
+          value: "10"
+        envFrom:
+        - configMapRef:
+            name: data-ingestion-config
+        - secretRef:
+            name: data-ingestion-secrets
+        resources:
+          requests:
+            cpu: "2"
+            memory: "4Gi"
+          limits:
+            cpu: "4"
+            memory: "8Gi"
+
+---
+# Service for API
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-ingestion-api
+  namespace: cherry-ai
+  labels:
+    app: data-ingestion
+    component: api
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8000
+    targetPort: 8000
+    name: http
+  - port: 9090
+    targetPort: 9090
+    name: metrics
+  selector:
+    app: data-ingestion
+    component: api
+
+---
+# Service for WebSocket
+apiVersion: v1
+kind: Service
+metadata:
+  name: websocket-server
+  namespace: cherry-ai
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8001
+    targetPort: 8001
+    name: ws
+  selector:
+    app: data-ingestion
+    component: websocket
+
+---
+# Ingress for cherry-ai.me
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cherry-ai-ingress
+  namespace: cherry-ai
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: "500m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://cherry-ai.me"
+    nginx.ingress.kubernetes.io/websocket-services: "websocket-server"
+spec:
+  tls:
+  - hosts:
+    - cherry-ai.me
+    - api.cherry-ai.me
+    - ws.cherry-ai.me
+    secretName: cherry-ai-tls
+  rules:
+  - host: cherry-ai.me
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 3000
+  - host: api.cherry-ai.me
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: data-ingestion-api
+            port:
+              number: 8000
+  - host: ws.cherry-ai.me
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: websocket-server
+            port:
+              number: 8001
+
+---
+# HorizontalPodAutoscaler for API
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-hpa
+  namespace: cherry-ai
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: data-ingestion-api
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+# HorizontalPodAutoscaler for Workers
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: worker-hpa
+  namespace: cherry-ai
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: processing-worker
+  minReplicas: 5
+  maxReplicas: 20
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+# PodDisruptionBudget for high availability
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: api-pdb
+  namespace: cherry-ai
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: data-ingestion
+      component: api
+
+---
+# NetworkPolicy for security
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: data-ingestion-network-policy
+  namespace: cherry-ai
+spec:
+  podSelector:
+    matchLabels:
+      app: data-ingestion
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    - podSelector:
+        matchLabels:
+          app: data-ingestion
+    ports:
+    - protocol: TCP
+      port: 8000
+    - protocol: TCP
+      port: 8001
+    - protocol: TCP
+      port: 9090
+  egress:
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 5432  # PostgreSQL
+    - protocol: TCP
+      port: 6379  # Redis
+    - protocol: TCP
+      port: 8080  # Weaviate
+    - protocol: TCP
+      port: 443   # HTTPS for external APIs
+    - protocol: TCP
+      port: 53    # DNS
+    - protocol: UDP
+      port: 53    # DNS
+
+---
+# ServiceMonitor for Prometheus
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: data-ingestion-metrics
+  namespace: cherry-ai
+  labels:
+    app: data-ingestion
+spec:
+  selector:
+    matchLabels:
+      app: data-ingestion
+      component: api
+  endpoints:
+  - port: metrics
+    interval: 30s
+    path: /metrics

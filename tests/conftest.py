@@ -15,7 +15,6 @@ from packages.shared.src.models.base_models import PersonaConfig
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 @pytest.fixture(autouse=True)
 def mock_persona_for_tests():
     """
@@ -39,7 +38,6 @@ def mock_persona_for_tests():
         new_callable=lambda: type("MockState", (), {"active_persona": default_persona, "_state": {}})(),
     ):
         yield default_persona
-
 
 @pytest.fixture
 def mock_llm_client():

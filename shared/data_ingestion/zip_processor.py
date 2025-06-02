@@ -8,7 +8,6 @@ from typing import Any
 
 from .base_processor import BaseProcessor
 
-
 class ZipProcessor(BaseProcessor):
     """Unpack ZIP archives and feed contained files to existing processors."""
 

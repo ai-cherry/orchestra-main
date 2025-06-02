@@ -24,7 +24,6 @@ WEAVIATE_GRPC_PORT: int = int(os.getenv("WEAVIATE_GRPC_PORT", "50051"))
 WEAVIATE_SECURED: bool = os.getenv("WEAVIATE_SECURED", "false").lower() == "true"
 WEAVIATE_SKIP_VERIFICATION: bool = os.getenv("WEAVIATE_SKIP_VERIFICATION", "false").lower() == "true"
 
-
 # Authentication: Choose ONE method. API Key is common for many cloud/self-hosted.
 # WCS or specific OAuth setups might use Client ID/Secret.
 # Username/Password is less common for Weaviate but supported by some modules.
@@ -41,11 +40,9 @@ WEAVIATE_CLIENT_SECRET: Optional[str] = os.getenv("WEAVIATE_CLIENT_SECRET")
 WEAVIATE_USERNAME: Optional[str] = os.getenv("WEAVIATE_USERNAME")
 WEAVIATE_PASSWORD: Optional[str] = os.getenv("WEAVIATE_PASSWORD")
 
-
 # Additional Headers (e.g., for custom proxy authentication, module-specific headers)
 # Should be a JSON string like: '{"X-My-Header": "value", "Authorization": "Bearer ..."}'
 WEAVIATE_ADDITIONAL_HEADERS_JSON: Optional[str] = os.getenv("WEAVIATE_ADDITIONAL_HEADERS")
-
 
 def log_weaviate_config() -> None:
     """Logs the loaded Weaviate configuration, masking sensitive details."""
@@ -78,7 +75,6 @@ def log_weaviate_config() -> None:
     else:
         logger.info("  Additional Headers: Not set")
 
-
 def validate_weaviate_config() -> bool:
     """
     Validates that essential Weaviate configuration parameters are present.
@@ -99,7 +95,6 @@ def validate_weaviate_config() -> bool:
     # Log the (masked) configuration details after validation
     log_weaviate_config()
     return True
-
 
 def get_weaviate_client_params() -> Dict[str, Any]:
     """
@@ -185,7 +180,6 @@ def get_weaviate_client_params() -> Dict[str, Any]:
         # the environment (e.g., custom CA certs) is set up correctly.
 
     return params
-
 
 __all__ = [
     "get_weaviate_client_params",

@@ -29,14 +29,12 @@ logger = logging.getLogger(__name__)
 # Create router
 router = APIRouter()
 
-
 class ComponentHealth(BaseModel):
     """Schema for a system component's health status."""
 
     status: str  # "healthy", "degraded", "unavailable"
     message: Optional[str] = None
     details: Dict[str, Any] = {}
-
 
 class HealthStatus(BaseModel):
     """Schema for system health status."""
@@ -48,7 +46,6 @@ class HealthStatus(BaseModel):
     components: Dict[str, ComponentHealth]
     runtime_info: Dict[str, str] = {}
     cloud_info: Dict[str, Any] = {}
-
 
 @router.get("/health", summary="Check system health")
 async def check_health(
@@ -82,12 +79,9 @@ async def check_health(
         "hostname": platform.node(),
     }
 
-    # Cloud information
+    # Cloud information (removed GCP references)
     cloud_info = {}
-    if settings.get_gcp_project_id():
-        cloud_info["platform"] = "gcp"
-        cloud_info["project_id"] = settings.get_gcp_project_id()
-        cloud_info["region"] = settings.GCP_LOCATION
+    # If you want to add Vultr or other info, do it here, but do not reference GCP.
 
     # Check memory system health
     try:
@@ -176,7 +170,6 @@ async def check_health(
         runtime_info=runtime_info,
         cloud_info=cloud_info,
     )
-
 
 @router.get("/ping", summary="Simple ping endpoint")
 async def ping() -> Dict[str, str]:

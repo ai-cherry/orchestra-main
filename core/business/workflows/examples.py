@@ -15,9 +15,7 @@ from core.services.memory.unified_memory import get_memory_service
 
 logger = logging.getLogger(__name__)
 
-
 # Task implementations
-
 
 async def fetch_user_context(context: WorkflowContext) -> Dict[str, Any]:
     """Fetch user context from memory."""
@@ -36,7 +34,6 @@ async def fetch_user_context(context: WorkflowContext) -> Dict[str, Any]:
     preferences = await memory_service.get(f"preferences:{user_id}")
 
     return {"recent_interactions": recent_interactions, "preferences": preferences}
-
 
 async def analyze_intent(context: WorkflowContext) -> str:
     """Analyze user intent from input."""
@@ -68,7 +65,6 @@ Return only the intent category."""
     context.set_output("intent", intent)
 
     return intent
-
 
 async def generate_response(context: WorkflowContext) -> str:
     """Generate response based on intent and context."""
@@ -105,7 +101,6 @@ Please provide an appropriate response."""
 
     return response.text
 
-
 async def store_interaction(context: WorkflowContext) -> None:
     """Store the interaction in memory."""
     user_id = context.inputs.get("user_id")
@@ -130,7 +125,6 @@ async def store_interaction(context: WorkflowContext) -> None:
 
     logger.info(f"Stored interaction for user {user_id}")
 
-
 async def summarize_document(context: WorkflowContext) -> str:
     """Summarize a document."""
     document = context.inputs.get("document")
@@ -147,7 +141,6 @@ async def summarize_document(context: WorkflowContext) -> str:
 
     response = await llm_service.complete(request)
     return response.text
-
 
 async def extract_entities(context: WorkflowContext) -> List[Dict[str, str]]:
     """Extract entities from document."""
@@ -179,7 +172,6 @@ Return as a JSON list with format: [{{"type": "PERSON|ORG|LOCATION", "name": "en
         logger.error(f"Failed to parse entities: {response.text}")
         return []
 
-
 async def generate_keywords(context: WorkflowContext) -> List[str]:
     """Generate keywords from document."""
     document = context.inputs.get("document")
@@ -203,7 +195,6 @@ Return keywords as a comma-separated list.""",
     keywords = [k.strip() for k in response.text.split(",")]
 
     return keywords
-
 
 async def store_analysis(context: WorkflowContext) -> None:
     """Store document analysis results."""
@@ -231,7 +222,6 @@ async def store_analysis(context: WorkflowContext) -> None:
     context.set_output("summary", summary)
     context.set_output("entities", entities)
     context.set_output("keywords", keywords)
-
 
 def create_conversation_workflow() -> Workflow:
     """Create a conversation handling workflow."""
@@ -275,7 +265,6 @@ def create_conversation_workflow() -> Workflow:
 
     return workflow
 
-
 def create_document_analysis_workflow() -> Workflow:
     """Create a document analysis workflow."""
     workflow = Workflow(
@@ -318,7 +307,6 @@ def create_document_analysis_workflow() -> Workflow:
     )
 
     return workflow
-
 
 def register_example_workflows() -> None:
     """Register all example workflows with the engine."""

@@ -9,7 +9,6 @@ from typing import Any, Dict, Optional
 import pulumi_kubernetes as k8s
 from pulumi import ComponentResource, ResourceOptions
 
-
 class IngressComponent(ComponentResource):
     """Configure ingress with SSL for cherry-ai.me"""
 

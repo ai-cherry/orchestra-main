@@ -16,7 +16,6 @@ from typing import Any, Dict, Optional
 # Configure logging
 logger = logging.getLogger("mcp-async-memory-store")
 
-
 class AsyncMemoryStore:
     """Asynchronous memory store for MCP server."""
 

@@ -5,7 +5,6 @@ import os
 import psycopg
 from psycopg import sql
 
-
 def setup_mcp_database():
     """Create basic tables for MCP functionality"""
 
@@ -156,7 +155,6 @@ def setup_mcp_database():
         print("  1. PostgreSQL is running")
         print("  2. User 'orchestrator' exists with correct password")
         print("  3. Database 'orchestrator' exists")
-
 
 if __name__ == "__main__":
     setup_mcp_database()

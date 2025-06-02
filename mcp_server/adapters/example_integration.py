@@ -28,7 +28,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-
 class MockMCPServer:
     """Mock MCP server for demonstration."""
 
@@ -44,7 +43,6 @@ class MockMCPServer:
                 "method": request.get("method"),
             }
         }
-
 
 class IntegratedAdapterSystem:
     """Integrated system using all Factory AI adapters."""
@@ -312,7 +310,6 @@ class IntegratedAdapterSystem:
 
         return health_results
 
-
 async def main():
     """Main function demonstrating adapter integration."""
     # Initialize the integrated system
@@ -364,7 +361,6 @@ async def main():
     # Summary
     healthy_count = sum(1 for h in health_status.values() if h.get("healthy", False))
     logger.info(f"\nHealth Summary: {healthy_count}/{len(health_status)} adapters healthy")
-
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -1,11 +1,9 @@
-name: orchestra-infra
-description: Pulumi DigitalOcean stack for Orchestra AI infrastructure
+name: cherry-ai-infrastructure
 runtime:
   name: python
   options:
-    toolchain: pip
-    virtualenv: ../venv
+    virtualenv: venv
+description: Infrastructure as Code for Cherry-AI.me on Vultr
 config:
-  pulumi:tags:
-    value:
-      pulumi:template: python
+  vultr:region: ewr  # New Jersey region
+  environment: production

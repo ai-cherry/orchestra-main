@@ -198,12 +198,12 @@ fi
 echo -e "\n${BLUE}${BOLD}5. UI Verification${NC}"
 echo -e "${YELLOW}⚠️  This step requires manual verification and cannot be automated.${NC}"
 
-# Get the UI URL from Terraform output if possible
+# Get the UI URL from Pulumi output if possible
 ui_url=""
-if command -v terraform &> /dev/null && [ -d "infra/orchestra-terraform" ]; then
-  echo -e "${YELLOW}Attempting to get UI URL from Terraform output...${NC}"
-  terraform_output=$(terraform -chdir="infra/orchestra-terraform" output -json service_urls 2>/dev/null || echo '{}')
-  ui_url=$(echo $terraform_output | jq -r '.ui // empty' 2>/dev/null)
+if command -v pulumi &> /dev/null && [ -d "infra/orchestra-pulumi" ]; then
+  echo -e "${YELLOW}Attempting to get UI URL from Pulumi output...${NC}"
+  pulumi_output=$(pulumi -chdir="infra/orchestra-pulumi" output -json service_urls 2>/dev/null || echo '{}')
+  ui_url=$(echo $pulumi_output | jq -r '.ui // empty' 2>/dev/null)
 
   if [ -n "$ui_url" ] && [ "$ui_url" != "null" ]; then
     echo -e "${GREEN}Found UI URL: $ui_url${NC}"
@@ -219,10 +219,10 @@ if command -v terraform &> /dev/null && [ -d "infra/orchestra-terraform" ]; then
       echo -e "${YELLOW}Could not detect a command to open URLs. Please open the URL manually.${NC}"
     fi
   else
-    echo -e "${YELLOW}Could not get UI URL from Terraform output.${NC}"
+    echo -e "${YELLOW}Could not get UI URL from Pulumi output.${NC}"
   fi
 else
-  echo -e "${YELLOW}Terraform not found or infra/orchestra-terraform directory not found.${NC}"
+  echo -e "${YELLOW}Pulumi not found or infra/orchestra-pulumi directory not found.${NC}"
   echo -e "${YELLOW}You will need to manually obtain the UI URL.${NC}"
 fi
 
@@ -282,7 +282,7 @@ echo -e "${YELLOW}2. Complete any remaining manual verification steps${NC}"
 echo -e "${YELLOW}3. Follow the code duplication cleanup recommendations${NC}"
 echo -e "${YELLOW}4. Proceed with deployment using one of the available methods:${NC}"
 echo -e "   - ./deploy_to_cloud_run.sh prod${NC}"
-echo -e "   - cd infra && ./run_terraform.sh${NC}"
+echo -e "   - cd infra && pulumi up${NC}"
 echo -e "   - Push to GitHub to trigger CI/CD pipeline${NC}"
 
 echo -e "${BLUE}======================================================${NC}"

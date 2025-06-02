@@ -21,7 +21,6 @@ from core.orchestrator.src.config.models import MemoryType, PersonaConfig, TeamM
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 class CalculatorTool(Tool):
     """Example tool that performs basic calculations."""
 
@@ -55,7 +54,6 @@ class CalculatorTool(Tool):
             return float(result)
         except Exception as e:
             raise ValueError(f"Error evaluating expression: {e}")
-
 
 class WeatherTool(Tool):
     """Example tool that provides weather information."""
@@ -91,7 +89,6 @@ class WeatherTool(Tool):
             "humidity": 45,
             "wind_speed": 5,
         }
-
 
 class ExampleToolUsingAgent(ToolUsingAgent, StatefulAgent):
     """Example agent that uses tools."""
@@ -194,7 +191,6 @@ class ExampleToolUsingAgent(ToolUsingAgent, StatefulAgent):
 
         return response, state
 
-
 class ExampleObservableAgent(ObservableAgent):
     """Example agent with observability features."""
 
@@ -284,7 +280,6 @@ class ExampleObservableAgent(ObservableAgent):
             metadata={"metrics": self.get_metrics()},
         )
 
-
 async def setup_memory_manager() -> LayeredMemoryManager:
     """
     Set up the memory manager with different layers.
@@ -316,7 +311,6 @@ async def setup_memory_manager() -> LayeredMemoryManager:
 
     return memory_manager
 
-
 async def setup_agent_team() -> AgentTeam:
     """
     Set up an agent team with different agent types.
@@ -345,7 +339,6 @@ async def setup_agent_team() -> AgentTeam:
     )
 
     return team
-
 
 async def run_example() -> None:
     """Run the example."""
@@ -380,7 +373,6 @@ async def run_example() -> None:
 
     # Clean up
     await memory_manager.close()
-
 
 if __name__ == "__main__":
     # Run the example

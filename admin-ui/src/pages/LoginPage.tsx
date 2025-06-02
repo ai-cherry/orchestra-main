@@ -63,10 +63,26 @@ export function LoginPage() {
     setError(null);
     setIsLoading(true);
 
-    // Simple hardcoded authentication for single user
-    if (username === 'scoobyjava' && password === 'Huskers1983$') {
-      // Use the hardcoded API key for backend authentication
-      const apiKey = '4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd';
+    try {
+      // Make actual API call to backend
+      const apiUrl = import.meta.env.VITE_API_URL || window.location.origin;
+      const response = await fetch(`${apiUrl}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || 'Invalid credentials');
+      }
+
+      const data = await response.json();
       
       // Save remember me preference
       if (rememberMe) {
@@ -75,14 +91,17 @@ export function LoginPage() {
         localStorage.removeItem('orchestra-remember');
       }
       
-      login(username, apiKey);
+      // Store the token in auth store
+      login(username, data.access_token || data.token);
+      
       console.log('Login successful, navigating to dashboard...');
       navigate({ to: '/' });
-    } else {
-      setError("Invalid username or password. Please try again.");
+    } catch (error) {
+      console.error('Login error:', error);
+      setError(error instanceof Error ? error.message : "Invalid username or password. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   if (isAuthenticated) {

@@ -22,7 +22,6 @@ from packages.agents.src.routing import AgentRouting
 
 logger = logging.getLogger(__name__)
 
-
 class AgentRegistry:
     """
     Registry for agent wrappers in the Orchestra system.
@@ -184,14 +183,12 @@ class AgentRegistry:
             logger.error(f"Failed to load wrapper class from path: {class_path}: {e}")
             return False
 
-
 # Create a singleton instance with default project settings
 agent_registry = AgentRegistry(
     project_id="cherry-ai-project",
     spanner_instance_id="orchestra-instance",
     spanner_database_id="orchestra-db",
 )
-
 
 def get_registry(
     project_id: str = "cherry-ai-project",

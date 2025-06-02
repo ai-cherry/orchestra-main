@@ -31,12 +31,12 @@ except ImportError:
 
     # 3. Optionally, fetch from GCP Secret Manager if running in GCP and any secret is missing
     if (not DRAGONFLY_HOST or not DRAGONFLY_PASSWORD or not DRAGONFLY_CONNECTION_URI) and os.getenv(
-        "GOOGLE_CLOUD_PROJECT"
+        "VULTR_PROJECT_ID"
     ):
         try:
-            from google.cloud import secretmanager
+            # Removed GCP import import secretmanager
 
-            project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
+            project_id = os.getenv("VULTR_PROJECT_ID")
             client = secretmanager.EnvironmentConfigServiceClient()
 
             def get_secret(secret_id):
@@ -58,7 +58,6 @@ except ImportError:
         except Exception:
             # If GCP Secret Manager is unavailable, fail gracefully
             pass
-
 
 # For debugging (never print secrets)
 def log_dragonfly_config():

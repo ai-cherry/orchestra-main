@@ -9,7 +9,6 @@ import hashlib
 
 logger = logging.getLogger(__name__)
 
-
 class AgentRouter:
     """
     Routes requests to the appropriate agent based on capability, cost, and load.

@@ -23,7 +23,7 @@ The AI Orchestra infrastructure has been optimized to improve security, scalabil
 1. **Security Improvements**: Removed hardcoded credentials, implemented 2. **Container Orchestration**: Optimized Docker builds with multi-stage builds and resource limits.
 3. **Development Environment**: Enhanced setup scripts and configuration for consistent environments.
 4. **Dependency Management**: Improved Poetry configuration and dependency organization.
-5. **Infrastructure as Code**: Modularized Terraform configuration with variables and best practices.
+5. **Infrastructure as Code**: Modularized Pulumi configuration with variables and best practices.
 6. **CI/CD Pipeline**: Enhanced GitHub Actions workflow with proper secret management and deployment verification.
 7. **Cloud Deployment**: Optimized
 ## Security Improvements
@@ -40,7 +40,7 @@ We've implemented a comprehensive credential management system using
 - `secure_credential_manager.sh`: CLI tool for credential management
 - `core/security/credential_manager.py`: Python module for credential access
 - `core/orchestrator/src/api/dependencies/credentials.py`: FastAPI dependencies
-- `terraform/modules/secure-credentials/main.tf`: Infrastructure for credential management
+- `pulumi/modules/secure-credentials/main.py`: Infrastructure for credential management
 - `setup_secure_credentials.sh`: Script to set up the credential management system
 
 ## Container Orchestration
@@ -92,9 +92,9 @@ We've improved the Poetry configuration for better dependency management:
 
 ## Infrastructure as Code
 
-### Terraform Optimization
+### Pulumi Optimization
 
-We've modularized the Terraform configuration for better maintainability and reusability:
+We've modularized the Pulumi configuration for better maintainability and reusability:
 
 - **Module Structure**: Separate modules for different components.
 - **Variable Management**: Consistent variable definitions and usage.
@@ -103,9 +103,9 @@ We've modularized the Terraform configuration for better maintainability and reu
 
 ### Implementation Files
 
-- `terraform/environments/dev/main.tf`: Main Terraform configuration
-- `terraform/environments/dev/variables.tf`: Variable definitions
-- `terraform/modules/cloud-run/main.tf`: - `terraform/modules/secure-credentials/main.tf`: Secure credentials module
+- `pulumi/environments/dev/main.py`: Main Pulumi configuration
+- `pulumi/environments/dev/variables.py`: Variable definitions
+- `pulumi/modules/cloud-run/main.py`: - `pulumi/modules/secure-credentials/main.py`: Secure credentials module
 
 ## CI/CD Pipeline
 
@@ -143,7 +143,7 @@ We've optimized the
 - **Secret Integration**: Secure integration with
 ### Implementation Files
 
-- `terraform/modules/cloud-run/main.tf`:
+- `pulumi/modules/cloud-run/main.py`:
 ## Implementation Steps
 
 Follow these steps to implement the infrastructure optimizations:
@@ -174,13 +174,13 @@ Follow these steps to implement the infrastructure optimizations:
    cp docker-compose.optimized.yml docker-compose.yml
    ```
 
-5. **Deploy Terraform Infrastructure**:
+5. **Deploy Pulumi Infrastructure**:
 
    ```bash
-   cd terraform/environments/dev
-   terraform init
-   terraform plan
-   terraform apply
+   cd pulumi/environments/dev
+   pulumi init
+   pulumi plan
+   pulumi apply
    ```
 
 6. **Update GitHub Actions Workflow**:
@@ -201,13 +201,13 @@ Follow these steps to implement the infrastructure optimizations:
 - **Credential Rotation**: Rotate credentials regularly using the `secure_credential_manager.sh` script.
 - **Dependency Updates**: Update dependencies regularly using Poetry.
 - **Security Scanning**: Run security scans regularly using the GitHub Actions workflow.
-- **Infrastructure Updates**: Update Terraform modules as needed for new features or security patches.
+- **Infrastructure Updates**: Update Pulumi modules as needed for new features or security patches.
 
 ### Best Practices
 
 - **No Hardcoded Credentials**: Never hardcode credentials in code or configuration files.
 - **Least Privilege**: Use service accounts with only the permissions they need.
-- **Infrastructure as Code**: Always use Terraform for infrastructure changes.
+- **Infrastructure as Code**: Always use Pulumi for infrastructure changes.
 - **CI/CD**: Always use the CI/CD pipeline for deployments.
 - **Documentation**: Keep documentation up to date with infrastructure changes.
 

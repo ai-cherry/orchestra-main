@@ -27,7 +27,6 @@ S = TypeVar("S")
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class ServiceError(BaseError):
     """Exception raised when there is a service error."""
 
@@ -52,7 +51,6 @@ class ServiceError(BaseError):
             cause=cause,
         )
 
-
 class ServiceScope(Enum):
     """Service scope types."""
 
@@ -65,7 +63,6 @@ class ServiceScope(Enum):
     # Service is created for each scope/context and reused within that scope
     SCOPED = "scoped"
 
-
 class ServiceLifecycle(Enum):
     """Service lifecycle events."""
 
@@ -77,7 +74,6 @@ class ServiceLifecycle(Enum):
 
     # Called when the service is being disposed
     DISPOSE = "dispose"
-
 
 class ServiceRegistration(Generic[T]):
     """Registration information for a service."""
@@ -105,7 +101,6 @@ class ServiceRegistration(Generic[T]):
         self.scope = scope
         self.lifecycle_hooks = lifecycle_hooks or {}
         self.dependencies = dependencies or []
-
 
 class ServiceFactory:
     """
@@ -238,7 +233,6 @@ class ServiceFactory:
 
         # Clear instances
         self.instances.clear()
-
 
 class ServiceContainer:
     """
@@ -397,7 +391,6 @@ class ServiceContainer:
 
         self.is_disposed = True
 
-
 # Factory functions for creating service containers
 def create_container(parent: Optional[ServiceContainer] = None) -> ServiceContainer:
     """
@@ -411,7 +404,6 @@ def create_container(parent: Optional[ServiceContainer] = None) -> ServiceContai
     """
     return ServiceContainer(parent=parent)
 
-
 def create_factory() -> ServiceFactory:
     """
     Create a service factory.
@@ -420,7 +412,6 @@ def create_factory() -> ServiceFactory:
         A new service factory
     """
     return ServiceFactory()
-
 
 # Example usage
 if __name__ == "__main__":

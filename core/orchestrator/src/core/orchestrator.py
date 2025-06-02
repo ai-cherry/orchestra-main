@@ -17,7 +17,6 @@ from core.orchestrator.src.core.personas import PersonaManager, get_persona_mana
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class InteractionResult:
     """
     Result of an interaction processing.
@@ -53,7 +52,6 @@ class InteractionResult:
         self.interaction_id = interaction_id
         self.timestamp = datetime.utcnow()
         self.metadata = metadata or {}
-
 
 class EventEmitter:
     """
@@ -105,7 +103,6 @@ class EventEmitter:
                     handler(data)
                 except Exception as e:
                     logger.error(f"Error in event handler for {event}: {e}")
-
 
 class Orchestrator:
     """
@@ -334,10 +331,8 @@ class Orchestrator:
         # Use the agent registry to select an agent
         return self._agent_registry.select_agent_for_context(context)
 
-
 # Global orchestrator instance
 _orchestrator = None
-
 
 def get_orchestrator() -> Orchestrator:
     """

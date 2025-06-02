@@ -106,7 +106,7 @@ Provides enterprise-grade agent management via Google's
 ### Prerequisites
 
 - Python 3.8+
-- - Terraform (optional, for infrastructure)
+- - Pulumi (optional, for infrastructure)
 - Access to relevant API keys
 
 ### Installation
@@ -135,9 +135,9 @@ source ./set_integration_env.sh
 4. For infrastructure deployment (optional):
 
 ```bash
-cd terraform
-terraform init
-terraform apply
+cd pulumi
+pulumi init
+pulumi apply
 ```
 
 ### Enabling Specific Integrations
@@ -395,9 +395,9 @@ The integration components are supported by
 To deploy the infrastructure:
 
 ```bash
-cd terraform
-terraform init
-terraform apply
+cd pulumi
+pulumi init
+pulumi apply
 ```
 
 ### Infrastructure Diagram
@@ -444,13 +444,13 @@ terraform apply
 
 #### 3. Infrastructure Deployment Issues
 
-**Problem**: Terraform deployment fails
+**Problem**: Pulumi deployment fails
 
 **Solution**:
 
 - Check project permissions
 - Verify quota limits for resources
-- Review error messages in Terraform output
+- Review error messages in Pulumi output
 - Try deploying specific modules separately
 
 #### 4. Context Window Limitations

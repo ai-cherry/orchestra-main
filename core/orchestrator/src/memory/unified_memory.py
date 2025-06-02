@@ -14,7 +14,6 @@ from typing import Any, Dict, List, Optional, Protocol, Type
 
 logger = logging.getLogger("unified_memory")
 
-
 # --- Error Handling Decorator ---
 def log_and_handle_errors(func):
     @functools.wraps(func)
@@ -27,7 +26,6 @@ def log_and_handle_errors(func):
 
     return wrapper
 
-
 def async_log_and_handle_errors(func):
     @functools.wraps(func)
     async def wrapper(*args, **kwargs):
@@ -39,7 +37,6 @@ def async_log_and_handle_errors(func):
 
     return wrapper
 
-
 # --- Protocols ---
 class MemoryAdapter(Protocol):
     def get(self, key: str) -> Optional[Any]: ...
@@ -47,13 +44,11 @@ class MemoryAdapter(Protocol):
     def delete(self, key: str) -> None: ...
     def search(self, query: str, top_k: int = 5) -> List[Any]: ...
 
-
 class AsyncMemoryAdapter(Protocol):
     async def get(self, key: str) -> Optional[Any]: ...
     async def set(self, key: str, value: Any) -> None: ...
     async def delete(self, key: str) -> None: ...
     async def search(self, query: str, top_k: int = 5) -> List[Any]: ...
-
 
 # --- Adapter Registry ---
 class MemoryAdapterRegistry:
@@ -66,7 +61,6 @@ class MemoryAdapterRegistry:
     @classmethod
     def get_adapter(cls, name: str) -> Optional[Type]:
         return cls._registry.get(name)
-
 
 # --- MongoDB Adapter (Sync) ---
 class MongoDBMemoryAdapter:
@@ -96,9 +90,7 @@ class MongoDBMemoryAdapter:
         results = self.collection.find({"value": {"$regex": query, "$options": "i"}}).limit(top_k)
         return [doc["value"] for doc in results]
 
-
 MemoryAdapterRegistry.register("mongodb", MongoDBMemoryAdapter)
-
 
 # --- Weaviate Adapter (Async) ---
 class WeaviateMemoryAdapter:
@@ -140,9 +132,7 @@ class WeaviateMemoryAdapter:
         )
         return [item["content"] for item in res["data"]["Get"]["Memory"]]
 
-
 MemoryAdapterRegistry.register("weaviate", WeaviateMemoryAdapter)
-
 
 # --- Dragonfly Adapter (Sync) ---
 class DragonflyMemoryAdapter:
@@ -171,9 +161,7 @@ class DragonflyMemoryAdapter:
         matches = [k for k in keys if query in k]
         return [self.client.get(k) for k in matches[:top_k]]
 
-
 MemoryAdapterRegistry.register("dragonfly", DragonflyMemoryAdapter)
-
 
 # --- Unified Memory Manager ---
 class UnifiedMemoryManager:

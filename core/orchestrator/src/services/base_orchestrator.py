@@ -11,17 +11,16 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
 
 from core.orchestrator.src.agents.agent_base import AgentContext
-from core.orchestrator.src.agents.agent_registry import get_agent_registry
+from core.orchestrator.src.agents.simplified_agent_registry import get_simplified_agent_registry
 
 # Import the settings instance directly
 from core.orchestrator.src.config.config import settings
-from core.orchestrator.src.services.event_bus import get_event_bus
+from core.services.events.event_bus import get_event_bus
 from core.orchestrator.src.services.memory_service import get_memory_service
 from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
 
 # Configure logging
 logger = logging.getLogger(__name__)
-
 
 class BaseOrchestrator(ABC):
     """
@@ -40,7 +39,7 @@ class BaseOrchestrator(ABC):
         """Initialize common orchestrator components."""
         self._event_bus = get_event_bus()
         self._memory_service = get_memory_service()
-        self._agent_registry = get_agent_registry()
+        self._agent_registry = get_simplified_agent_registry()
         # Use the global settings instance directly
         self._settings = settings
 

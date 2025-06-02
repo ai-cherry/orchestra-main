@@ -16,7 +16,6 @@ from core.env_config import settings
 
 logger = logging.getLogger(__name__)
 
-
 class PineconeAdapter:
     """
     Async adapter for Pinecone vector database.

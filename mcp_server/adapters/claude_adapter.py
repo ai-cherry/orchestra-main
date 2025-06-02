@@ -7,7 +7,6 @@ Implements the IToolAdapter interface for standardized tool access.
 
 from mcp_server.interfaces.tool_adapter import IToolAdapter
 
-
 class ClaudeAdapter(IToolAdapter):
     """
     Adapter for Anthropic Claude AI assistant.

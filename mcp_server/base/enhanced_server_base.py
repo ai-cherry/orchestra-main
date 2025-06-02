@@ -22,14 +22,12 @@ T = TypeVar("T")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 class CircuitState:
     """Circuit breaker states"""
 
     CLOSED = "closed"
     OPEN = "open"
     HALF_OPEN = "half_open"
-
 
 class CircuitBreaker:
     """Circuit breaker for preventing cascading failures"""
@@ -78,7 +76,6 @@ class CircuitBreaker:
         if self.failure_count >= self.failure_threshold:
             self.state = CircuitState.OPEN
 
-
 class ConnectionPoolManager:
     """Manages database connection pools for optimal performance"""
 
@@ -111,7 +108,6 @@ class ConnectionPoolManager:
         """Close all connections in pool"""
         if self._pool:
             await self._pool.close()
-
 
 class MCPMetrics:
     """Prometheus metrics for MCP servers"""
@@ -156,7 +152,6 @@ class MCPMetrics:
             return wrapper
 
         return decorator
-
 
 class EnhancedMCPServerBase:
     """Enhanced base class for all MCP servers"""

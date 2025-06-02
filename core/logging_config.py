@@ -9,7 +9,6 @@ import sys
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
-
 class JSONFormatter(logging.Formatter):
     """Custom JSON formatter for structured logging."""
 
@@ -58,7 +57,6 @@ class JSONFormatter(logging.Formatter):
 
         return json.dumps(log_data)
 
-
 def setup_logging(level: str = "INFO", json_format: bool = True, log_file: Optional[str] = None) -> None:
     """
     Set up application-wide logging configuration.
@@ -105,7 +103,6 @@ def setup_logging(level: str = "INFO", json_format: bool = True, log_file: Optio
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logging.getLogger("google").setLevel(logging.WARNING)
     logging.getLogger("asyncio").setLevel(logging.WARNING)
-
 
 def get_logger(name: str) -> logging.Logger:
     """

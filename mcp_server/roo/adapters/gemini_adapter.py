@@ -16,7 +16,6 @@ from ..transitions import ModeTransitionManager
 
 logger = logging.getLogger(__name__)
 
-
 class GeminiRooAdapter:
     """
     Adapter for integrating Gemini with Roo and MCP.

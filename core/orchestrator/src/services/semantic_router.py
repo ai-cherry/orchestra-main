@@ -16,7 +16,6 @@ from core.orchestrator.src.services.memory_service import get_memory_service
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class SemanticRouter:
     """Routes requests to agents based on semantic similarity"""
 
@@ -151,10 +150,8 @@ class SemanticRouter:
         embedding_dim = 768  # Common embedding dimension
         return list(np.random.randn(embedding_dim))
 
-
 # Singleton instance
 _semantic_router = None
-
 
 async def get_semantic_router() -> SemanticRouter:
     """

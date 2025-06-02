@@ -47,14 +47,12 @@ app.add_middleware(
 orchestrator: Optional[WebScrapingOrchestrator] = None
 mcp_server: Optional[OrchestraWebScrapingMCPServer] = None
 
-
 # Request/Response models
 class SearchRequest(BaseModel):
     query: str
     engine: str = "google"
     max_results: int = 10
     strategy: str = "fast_static"
-
 
 class ScrapeRequest(BaseModel):
     url: str
@@ -63,17 +61,14 @@ class ScrapeRequest(BaseModel):
     custom_js: Optional[str] = None
     user_agent: Optional[str] = None
 
-
 class AnalyzeRequest(BaseModel):
     content: str
     analysis_type: str = "summary"
-
 
 class BulkScrapeRequest(BaseModel):
     urls: List[str]
     strategy: str = "fast_static"
     max_concurrent: int = 5
-
 
 @app.on_event("startup")
 async def startup_event():
@@ -108,7 +103,6 @@ async def startup_event():
         logger.error(f"Failed to initialize web scraping system: {e}")
         raise
 
-
 @app.on_event("shutdown")
 async def shutdown_event():
     """Cleanup on shutdown."""
@@ -116,7 +110,6 @@ async def shutdown_event():
     logger.info("Shutting down Web Scraping AI Agent Team...")
     if orchestrator:
         await orchestrator.stop()
-
 
 @app.get("/health")
 async def health_check():
@@ -127,7 +120,6 @@ async def health_check():
         "agents_initialized": orchestrator is not None,
         "agent_count": len(orchestrator.agents) if orchestrator else 0,
     }
-
 
 @app.get("/")
 async def root():
@@ -148,7 +140,6 @@ async def root():
         },
     }
 
-
 @app.get("/mcp/tools")
 async def get_mcp_tools():
     """Get available MCP tools."""
@@ -161,7 +152,6 @@ async def get_mcp_tools():
     except Exception as e:
         logger.error(f"Error getting MCP tools: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.post("/search")
 async def search_web(request: SearchRequest):
@@ -180,7 +170,6 @@ async def search_web(request: SearchRequest):
     except Exception as e:
         logger.error(f"Error in web search: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.post("/scrape")
 async def scrape_website(request: ScrapeRequest):
@@ -203,7 +192,6 @@ async def scrape_website(request: ScrapeRequest):
         logger.error(f"Error in website scraping: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/analyze")
 async def analyze_content(request: AnalyzeRequest):
     """Content analysis endpoint."""
@@ -216,7 +204,6 @@ async def analyze_content(request: AnalyzeRequest):
     except Exception as e:
         logger.error(f"Error in content analysis: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.post("/bulk-scrape")
 async def bulk_scrape(request: BulkScrapeRequest):
@@ -235,7 +222,6 @@ async def bulk_scrape(request: BulkScrapeRequest):
         logger.error(f"Error in bulk scraping: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.get("/task/{task_id}")
 async def get_task_status(task_id: str):
     """Get task status endpoint."""
@@ -248,7 +234,6 @@ async def get_task_status(task_id: str):
     except Exception as e:
         logger.error(f"Error getting task status: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.get("/agents/status")
 async def get_agents_status():
@@ -263,7 +248,6 @@ async def get_agents_status():
         logger.error(f"Error getting agent status: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.get("/tasks/active")
 async def get_active_tasks():
     """Get active tasks endpoint."""
@@ -276,7 +260,6 @@ async def get_active_tasks():
     except Exception as e:
         logger.error(f"Error getting active tasks: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.get("/results/recent")
 async def get_recent_results():
@@ -291,7 +274,6 @@ async def get_recent_results():
         logger.error(f"Error getting recent results: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 # MCP integration endpoints for direct tool calls
 @app.post("/mcp/call-tool")
 async def call_mcp_tool(tool_name: str, arguments: Dict[str, Any]):
@@ -305,7 +287,6 @@ async def call_mcp_tool(tool_name: str, arguments: Dict[str, Any]):
     except Exception as e:
         logger.error(f"Error calling MCP tool {tool_name}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))

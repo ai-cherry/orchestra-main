@@ -25,7 +25,6 @@ from .memory_manager import PayReadyMemoryManager
 
 logger = logging.getLogger(__name__)
 
-
 class SourceType(Enum):
     """Supported data source types"""
 
@@ -34,7 +33,6 @@ class SourceType(Enum):
     HUBSPOT = "hubspot"
     SALESFORCE = "salesforce"
 
-
 class SyncStatus(Enum):
     """Sync job status"""
 
@@ -42,7 +40,6 @@ class SyncStatus(Enum):
     RUNNING = "running"
     SUCCEEDED = "succeeded"
     FAILED = "failed"
-
 
 class PayReadyETLOrchestrator:
     """
@@ -524,7 +521,6 @@ class PayReadyETLOrchestrator:
 
         # Cache recent interactions
         await self.memory_manager.warm_cache()
-
 
 class AirbyteClient:
     """Client for Airbyte Cloud API"""

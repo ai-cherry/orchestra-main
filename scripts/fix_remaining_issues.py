@@ -4,7 +4,6 @@
 import re
 from pathlib import Path
 
-
 def fix_file(file_path: Path, fixes: list) -> bool:
     """Apply fixes to a specific file."""
     try:
@@ -31,7 +30,6 @@ def fix_file(file_path: Path, fixes: list) -> bool:
     except Exception as e:
         print(f"Error fixing {file_path}: {e}")
         return False
-
 
 def main():
     """Main function to fix issues."""
@@ -94,7 +92,6 @@ def main():
             print(f"  ✗ File not found: {file_path}")
 
     print("\nDone!")
-
 
 if __name__ == "__main__":
     main()

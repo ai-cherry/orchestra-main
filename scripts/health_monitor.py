@@ -25,7 +25,6 @@ import requests
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
 class HealthMonitor:
     """Simple health monitoring for Orchestra services."""
 
@@ -284,7 +283,6 @@ class HealthMonitor:
 
         return results
 
-
 def main() -> int:
     """Main entry point for the health monitor."""
     import argparse
@@ -334,7 +332,6 @@ def main() -> int:
     # Default: show help
     parser.print_help()
     return 1
-
 
 if __name__ == "__main__":
     sys.exit(main())

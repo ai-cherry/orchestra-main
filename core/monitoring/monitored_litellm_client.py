@@ -13,7 +13,6 @@ from core.orchestrator.src.llm.litellm_client import LiteLLMClient, LLMEmbedding
 
 logger = get_logger(__name__)
 
-
 class MonitoredLiteLLMClient(LiteLLMClient):
     """
     Extended LiteLLM client that automatically monitors Claude API calls.

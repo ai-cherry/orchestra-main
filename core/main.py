@@ -20,7 +20,6 @@ from core.services.memory.unified_memory import get_memory_service
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
 class OrchestraCore:
     """Main orchestration core that manages all services."""
 
@@ -207,10 +206,8 @@ class OrchestraCore:
         finally:
             await self.shutdown()
 
-
 # Global instance
 _orchestra_core: Optional[OrchestraCore] = None
-
 
 def get_orchestra_core() -> OrchestraCore:
     """Get the global orchestra core instance."""
@@ -220,7 +217,6 @@ def get_orchestra_core() -> OrchestraCore:
         _orchestra_core = OrchestraCore()
 
     return _orchestra_core
-
 
 async def main():
     """Main entry point."""
@@ -236,7 +232,6 @@ async def main():
 
     # Run the core
     await core.run()
-
 
 if __name__ == "__main__":
     asyncio.run(main())

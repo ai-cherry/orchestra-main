@@ -16,7 +16,6 @@ from ..models.memory import MemoryEntry, MemoryMetadata
 
 logger = logging.getLogger(__name__)
 
-
 class StorageBridgeAdapter(IMemoryStorage):
     """
     Adapter class that bridges between our new optimized storage implementation

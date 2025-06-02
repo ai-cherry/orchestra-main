@@ -27,7 +27,6 @@ from core.orchestrator.src.agents.simplified_agent_registry import (
     register_default_agents,
 )
 
-
 class SimpleAgent:
     """A simple agent implementation for demonstration purposes."""
 
@@ -40,7 +39,6 @@ class SimpleAgent:
     async def process(self, user_input: str) -> str:
         """Process user input and return a response."""
         return f"SimpleAgent ({self.agent_type}) processed: {user_input}"
-
 
 class CodeAgent:
     """A simple code-focused agent implementation."""
@@ -55,7 +53,6 @@ class CodeAgent:
         """Process user input and return code."""
         return f"```python\n# Generated code for: {user_input}\ndef example():\n    print('Hello, world!')\n```"
 
-
 def create_context(user_input: str, metadata: Dict[str, Any] = None) -> AgentContext:
     """Create a simple agent context for testing."""
     return AgentContext(
@@ -64,7 +61,6 @@ def create_context(user_input: str, metadata: Dict[str, Any] = None) -> AgentCon
         conversation_id="test-conversation",
         message_id="test-message",
     )
-
 
 async def run_example():
     """Run the simplified agent registry example."""
@@ -106,7 +102,6 @@ async def run_example():
         # Process the input
         response = await agent.process(user_input)
         logger.info(f"Response: {response}")
-
 
 if __name__ == "__main__":
     import asyncio

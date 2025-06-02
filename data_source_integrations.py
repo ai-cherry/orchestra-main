@@ -17,7 +17,6 @@ from enhanced_vector_memory_system import EnhancedVectorMemorySystem
 
 logger = logging.getLogger(__name__)
 
-
 @dataclass
 class DataSourceConfig:
     """Configuration for data source connections."""
@@ -27,7 +26,6 @@ class DataSourceConfig:
     base_url: str
     rate_limit: float = 1.0  # requests per second
     additional_headers: Dict[str, str] = None
-
 
 class BaseDataSourceIntegration:
     """Base class for all data source integrations."""
@@ -72,7 +70,6 @@ class BaseDataSourceIntegration:
     async def sync_data(self, since: Optional[datetime] = None) -> int:
         """Sync data from source. To be implemented by subclasses."""
         raise NotImplementedError
-
 
 class GongIntegration(BaseDataSourceIntegration):
     """Integration for Gong.io call intelligence platform."""
@@ -172,7 +169,6 @@ class GongIntegration(BaseDataSourceIntegration):
         """Sync deal intelligence."""
         # Implementation for Gong deals API
         return 0
-
 
 class SalesforceIntegration(BaseDataSourceIntegration):
     """Integration for Salesforce CRM."""
@@ -337,7 +333,6 @@ class SalesforceIntegration(BaseDataSourceIntegration):
         # Implementation for activities
         return 0
 
-
 class HubSpotIntegration(BaseDataSourceIntegration):
     """Integration for HubSpot CRM and marketing platform."""
 
@@ -413,7 +408,6 @@ class HubSpotIntegration(BaseDataSourceIntegration):
         """Sync HubSpot deals."""
         # Similar implementation to contacts
         return 0
-
 
 class SlackIntegration(BaseDataSourceIntegration):
     """Integration for Slack workspace communications."""
@@ -529,7 +523,6 @@ class SlackIntegration(BaseDataSourceIntegration):
 
         return []
 
-
 class LookerIntegration(BaseDataSourceIntegration):
     """Integration for Looker business intelligence platform."""
 
@@ -630,7 +623,6 @@ class LookerIntegration(BaseDataSourceIntegration):
         """Sync Looker explores and data models."""
         # Implementation for explores
         return 0
-
 
 class DataAggregationOrchestrator:
     """Orchestrates data collection from all sources."""

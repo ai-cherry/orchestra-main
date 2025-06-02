@@ -8,7 +8,6 @@ from typing import List, Optional
 from packages.shared.src.models.base_models import MemoryItem
 from shared.memory.memory_manager import MemoryManager
 
-
 class PatrickMemoryManager(MemoryManager):
     """
     A stub memory manager that always returns Patrick Star themed memories.

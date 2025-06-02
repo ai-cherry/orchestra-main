@@ -228,12 +228,12 @@ class LayeredMemoryManager:
 
 ## Infrastructure as Code Implementation
 
-### 1. Terraform Module Structure
+### 1. Pulumi Module Structure
 
-Organize your Terraform code into modules for better maintainability:
+Organize your Pulumi code into modules for better maintainability:
 
 ```
-terraform/
+pulumi/
 ├── modules/
 │   ├── compute/
 │   ├── storage/
@@ -244,16 +244,16 @@ terraform/
 │   ├── dev/
 │   ├── staging/
 │   └── prod/
-├── main.tf
-├── variables.tf
-└── outputs.tf
+├── main.py
+├── variables.py
+└── outputs.py
 ```
 
 ### 2. Compute Module (
 ```hcl
-# terraform/modules/compute/main.tf
+# pulumi/modules/compute/main.py
 
-# resource "google_cloud_run_v2_service" "api" {
+# api = google_cloud_run_v2_service( {
   name     = var.service_name
   location = var.region
 
@@ -305,10 +305,10 @@ terraform/
 
 ### 3. AI Module (
 ```hcl
-# terraform/modules/ai/main.tf
+# pulumi/modules/ai/main.py
 
 # Vector Search Index
-resource "google_vertex_ai_index" "vector_index" {
+vector_index = google_vertex_ai_index( {
   region       = var.region
   display_name = "${var.prefix}-vector-index"
 
@@ -329,7 +329,7 @@ resource "google_vertex_ai_index" "vector_index" {
 }
 
 # Vector Search Index Endpoint
-resource "google_vertex_ai_index_endpoint" "vector_endpoint" {
+vector_endpoint = google_vertex_ai_index_endpoint( {
   region       = var.region
   display_name = "${var.prefix}-vector-endpoint"
 
@@ -465,7 +465,7 @@ class AgentTeam:
    - Integrate
 2. **Set Up Infrastructure**:
 
-   - Create Terraform modules for each component
+   - Create Pulumi modules for each component
    - Define environments (dev, staging, prod)
    - Implement CI/CD pipeline for infrastructure deployment
 

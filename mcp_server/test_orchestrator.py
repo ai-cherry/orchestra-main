@@ -11,7 +11,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Import the functions we created
 from servers.orchestrator_server import get_all_agents, run_agent_task, run_workflow
 
-
 async def test_functions():
     """Test the orchestrator functions."""
     print("Testing Orchestrator Server Functions...\n")
@@ -35,7 +34,6 @@ async def test_functions():
     print(f"   Result: {workflow_result}")
 
     print("\n✅ All tests passed! The orchestrator server functions are working correctly.")
-
 
 if __name__ == "__main__":
     asyncio.run(test_functions())

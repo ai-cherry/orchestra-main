@@ -30,7 +30,6 @@ from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class ConversationFormatter:
     """
     Utility for formatting conversations for LLM input.
@@ -84,7 +83,6 @@ class ConversationFormatter:
             system_content += f"Your traits are: {traits_desc}."
 
         return {"role": "system", "content": system_content}
-
 
 class LLMAgent(Agent, Service):
     """

@@ -9,7 +9,6 @@ from typing import Any, Dict, Optional
 import pulumi_kubernetes as k8s
 from pulumi import ComponentResource, Output, ResourceOptions
 
-
 class LiteLLMComponent(ComponentResource):
     """LiteLLM gateway for unified LLM access"""
 

@@ -26,7 +26,6 @@ router = APIRouter()
 memory_manager = InMemoryMemoryManagerStub()
 memory_manager.initialize()
 
-
 class AgentRunRequest(BaseModel):
     """Request model for running an agent."""
 
@@ -34,14 +33,12 @@ class AgentRunRequest(BaseModel):
     config: Optional[Dict[str, Any]] = None
     persona_id: Optional[str] = None
 
-
 class AgentRunResponse(BaseModel):
     """Response model for the agent run endpoint."""
 
     status: str
     agent_name: str
     task_id: str
-
 
 @router.post("/run/{agent_name}", response_model=AgentRunResponse, tags=["agents"])
 async def run_agent_task(
@@ -96,7 +93,6 @@ async def run_agent_task(
         # Other unexpected errors
         logger.error(f"Error starting agent task: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Failed to start agent task: {str(e)}")
-
 
 async def _execute_agent_task(agent, context: Dict[str, Any], task_id: str) -> None:
     """

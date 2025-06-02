@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 from typing import Dict, Optional
 
 from pydantic import BaseModel
+from packages.shared.src.memory.stubs import InMemoryMemoryManagerStub
 
 logger = logging.getLogger(__name__)
-
 
 class HashRecord(BaseModel):
     """Model for storing hash metadata"""
@@ -15,7 +15,6 @@ class HashRecord(BaseModel):
     reference: str  # Original content reference
     timestamp: str
     ttl: Optional[int] = None  # TTL in seconds
-
 
 class MemoryService:
     """Enhanced with Redis SCAN cleanup"""
@@ -81,3 +80,31 @@ class MemoryService:
         while True:
             await self.cleanup_hashes()
             await asyncio.sleep(interval)
+
+# Global memory service instance
+_memory_service = None
+
+def get_memory_service() -> MemoryService:
+    """
+    Get the global memory service instance.
+    
+    Note: This returns None until a memory manager is available.
+    """
+    global _memory_service
+    
+    if _memory_service is None:
+        # Initialize with an in-memory stub for basic operations
+        _memory_service = InMemoryMemoryManagerStub()
+        logger.warning("Memory service not initialized - using InMemoryMemoryManagerStub")
+
+    return _memory_service
+
+def initialize_memory_service(memory_manager):
+    """Initialize the global memory service with a memory manager."""
+    global _memory_service
+    _memory_service = MemoryService(memory_manager)
+    logger.info("Memory service initialized")
+
+def get_memory_manager():
+    """Backward compatibility wrapper alias for legacy imports."""
+    return get_memory_service()

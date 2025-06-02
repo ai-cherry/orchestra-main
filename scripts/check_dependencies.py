@@ -6,12 +6,10 @@ import pkg_resources
 
 DEFAULT_REQUIREMENTS_FILE = "requirements.txt"
 
-
 def get_installed_packages():
     """Returns a dictionary of installed packages and their versions."""
     installed_packages = {pkg.key: pkg.version for pkg in pkg_resources.working_set}
     return installed_packages
-
 
 def get_required_packages(requirements_file: str):
     """Parses a requirements file and returns a dictionary of required packages and versions."""
@@ -35,7 +33,6 @@ def get_required_packages(requirements_file: str):
         print(f"ERROR: Requirements file not found: {requirements_file}")
         sys.exit(1)
     return required
-
 
 def check_dependencies(requirements_file: str, show_outdated: bool = False):
     """Checks if all required packages are installed and optionally shows outdated packages."""
@@ -92,7 +89,6 @@ def check_dependencies(requirements_file: str, show_outdated: bool = False):
             print(f"Could not check for outdated packages: {e}", file=sys.stderr)
 
     sys.exit(0)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Check Python dependencies.")

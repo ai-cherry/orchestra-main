@@ -21,7 +21,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("strategy-workflow-executor")
 
-
 def load_workflow(workflow_path):
     """Load a workflow definition from a JSON file."""
     try:
@@ -30,7 +29,6 @@ def load_workflow(workflow_path):
     except (json.JSONDecodeError, IOError) as e:
         logger.error(f"Error loading workflow: {e}")
         return None
-
 
 def execute_roo_workflow(workflow_def):
     """Execute a workflow using Roo's workflow manager."""
@@ -72,7 +70,6 @@ def execute_roo_workflow(workflow_def):
         logger.error(f"Error executing workflow: {e}")
         return None
 
-
 def main():
     """Main function to execute the strategic analysis workflow."""
     # Path to the workflow definition
@@ -95,7 +92,6 @@ def main():
     else:
         logger.error("Failed to execute workflow")
         sys.exit(1)
-
 
 if __name__ == "__main__":
     main()

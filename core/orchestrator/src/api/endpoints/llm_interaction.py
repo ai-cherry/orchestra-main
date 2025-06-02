@@ -32,7 +32,6 @@ logger = logging.getLogger(__name__)
 # Create router
 router = APIRouter(prefix="/llm", tags=["llm"])
 
-
 class LLMRequestModel(BaseModel):
     """Request model for LLM interaction API."""
 
@@ -44,7 +43,6 @@ class LLMRequestModel(BaseModel):
     temperature: Optional[float] = Field(0.7, description="Temperature for generation", ge=0.0, le=2.0)
     max_tokens: Optional[int] = Field(None, description="Maximum tokens to generate", gt=0)
     context: Optional[Dict[str, Any]] = Field(None, description="Additional context for the interaction")
-
 
 class LLMResponseModel(BaseModel):
     """Response model for LLM interaction API."""
@@ -59,14 +57,12 @@ class LLMResponseModel(BaseModel):
     interaction_id: str = Field(..., description="The interaction identifier")
     response_time_ms: Optional[int] = Field(None, description="Response time in milliseconds")
 
-
 class ErrorResponse(BaseModel):
     """Standard error response model."""
 
     detail: str = Field(..., description="Error detail message")
     error_type: Optional[str] = Field(None, description="Type of error")
     status_code: int = Field(..., description="HTTP status code")
-
 
 @router.post(
     "/interact",
@@ -234,7 +230,6 @@ async def llm_interact(request: LLMRequestModel, persona_manager=Depends(get_per
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to process interaction: {str(e)}",
         )
-
 
 @router.post(
     "/direct",

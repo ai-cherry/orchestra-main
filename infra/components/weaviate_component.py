@@ -26,7 +26,6 @@ from pulumi import ComponentResource, ResourceOptions
 
 from .secret_helper import create_k8s_secret_from_config
 
-
 class WeaviateComponent(ComponentResource):
     """
     Reusable Weaviate deployment component for the AI Orchestra system.

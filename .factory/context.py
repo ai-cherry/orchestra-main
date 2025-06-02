@@ -17,7 +17,6 @@ import yaml
 
 logger = logging.getLogger(__name__)
 
-
 @dataclass
 class DroidContext:
     """Context information for a specific Factory AI Droid."""
@@ -57,7 +56,6 @@ class DroidContext:
             parent_context_id=UUID(data["parent_context_id"]) if data.get("parent_context_id") else None,
             child_context_ids={UUID(cid) for cid in data.get("child_context_ids", [])},
         )
-
 
 class FactoryContextManager:
     """Manages context for Factory AI Droid operations."""
@@ -283,7 +281,6 @@ class FactoryContextManager:
 
         logger.info(f"Cleaned up {len(to_remove)} old contexts")
         return len(to_remove)
-
 
 # Import timedelta for cleanup function
 from datetime import timedelta

@@ -16,7 +16,6 @@ from factory_integration.context_manager import (
     UnifiedContextManager,
 )
 
-
 @pytest.fixture
 async def mock_db_pool():
     """Create a mock database pool."""
@@ -29,7 +28,6 @@ async def mock_db_pool():
 
     return pool
 
-
 @pytest.fixture
 def mock_weaviate_client():
     """Create a mock Weaviate client."""
@@ -39,7 +37,6 @@ def mock_weaviate_client():
     }
     return client
 
-
 @pytest.fixture
 async def mock_cache_manager():
     """Create a mock cache manager."""
@@ -48,7 +45,6 @@ async def mock_cache_manager():
     cache.set.return_value = None
     cache.get_metrics.return_value = {"hit_rate": 85.0}
     return cache
-
 
 @pytest.fixture
 async def context_manager(mock_db_pool, mock_weaviate_client, mock_cache_manager):
@@ -64,7 +60,6 @@ async def context_manager(mock_db_pool, mock_weaviate_client, mock_cache_manager
     await manager.start()
     yield manager
     await manager.stop()
-
 
 class TestUnifiedContextManager:
     """Test cases for UnifiedContextManager."""

@@ -21,7 +21,6 @@ from kubernetes import client, config
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
-
 @dataclass
 class TestResult:
     """Performance test result"""
@@ -38,7 +37,6 @@ class TestResult:
     throughput_rps: float
     error_rate: float
     timestamp: datetime
-
 
 class PerformanceTester:
     """Performance testing for SuperAGI deployment"""
@@ -423,7 +421,6 @@ class PerformanceTester:
 
         return "\n".join(report)
 
-
 async def main():
     """Main function for CLI usage"""
     import argparse
@@ -463,7 +460,6 @@ async def main():
         with open(args.output, "w") as f:
             f.write(report)
         logger.info(f"Report saved to {args.output}")
-
 
 if __name__ == "__main__":
     asyncio.run(main())

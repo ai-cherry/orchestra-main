@@ -6,7 +6,6 @@ Provides audit logging functionality for system and user activities
 from datetime import datetime
 from typing import List, Dict, Any
 
-
 def get_audit_log() -> Dict[str, List[str]]:
     """
     Get all system and user activity logs.
@@ -21,7 +20,6 @@ def get_audit_log() -> Dict[str, List[str]]:
         f"Configuration snapshot created - {datetime.utcnow().isoformat()}",
     ]
     return {"logs": sample_logs}
-
 
 def export_audit_log() -> Dict[str, Any]:
     """

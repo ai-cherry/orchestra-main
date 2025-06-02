@@ -18,7 +18,6 @@ from shared.database import UnifiedDatabase
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
 def test_postgresql_operations(db: UnifiedDatabase):
     """Test PostgreSQL operations."""
     logger.info("Testing PostgreSQL operations...")
@@ -73,7 +72,6 @@ def test_postgresql_operations(db: UnifiedDatabase):
         logger.error(f"PostgreSQL test failed: {e}")
         return False
 
-
 def test_weaviate_operations(db: UnifiedDatabase):
     """Test Weaviate operations."""
     logger.info("\nTesting Weaviate operations...")
@@ -126,7 +124,6 @@ def test_weaviate_operations(db: UnifiedDatabase):
         logger.error(f"Weaviate test failed: {e}")
         return False
 
-
 def test_unified_operations(db: UnifiedDatabase):
     """Test unified database operations."""
     logger.info("\nTesting unified operations...")
@@ -162,7 +159,6 @@ def test_unified_operations(db: UnifiedDatabase):
     except Exception as e:
         logger.error(f"Unified operations test failed: {e}")
         return False
-
 
 def main():
     """Run all database tests."""
@@ -208,7 +204,6 @@ def main():
     else:
         logger.error("❌ Some tests failed. Please check the logs above.")
         return 1
-
 
 if __name__ == "__main__":
     sys.exit(main())

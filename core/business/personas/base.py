@@ -12,7 +12,6 @@ from typing import Any, Dict, List, Optional
 
 import yaml
 
-
 class PersonaTrait(Enum):
     """Common persona traits."""
 
@@ -27,7 +26,6 @@ class PersonaTrait(Enum):
     DETAILED = "detailed"
     HUMOROUS = "humorous"
 
-
 class ResponseStyle(Enum):
     """Response formatting styles."""
 
@@ -36,7 +34,6 @@ class ResponseStyle(Enum):
     TECHNICAL = "technical"
     EDUCATIONAL = "educational"
     CONVERSATIONAL = "conversational"
-
 
 @dataclass
 class PersonaConfig:
@@ -100,7 +97,6 @@ class PersonaConfig:
             "metadata": self.metadata,
         }
 
-
 class PersonaProcessor(ABC):
     """Abstract base class for persona processors."""
 
@@ -118,7 +114,6 @@ class PersonaProcessor(ABC):
     def generate_system_prompt(self, persona: PersonaConfig) -> str:
         """Generate system prompt for the persona."""
         pass
-
 
 class PersonaManager:
     """Manages persona configurations and processing."""
@@ -219,10 +214,8 @@ class PersonaManager:
 
         return loaded_count
 
-
 # Global persona manager instance
 _persona_manager: Optional[PersonaManager] = None
-
 
 def get_persona_manager() -> PersonaManager:
     """Get the global persona manager instance."""

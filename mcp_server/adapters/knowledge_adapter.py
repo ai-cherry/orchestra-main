@@ -13,7 +13,6 @@ from .factory_mcp_adapter import FactoryMCPAdapter
 
 logger = logging.getLogger(__name__)
 
-
 class KnowledgeAdapter(FactoryMCPAdapter):
     """Adapter for Knowledge Droid to memory MCP server communication.
 

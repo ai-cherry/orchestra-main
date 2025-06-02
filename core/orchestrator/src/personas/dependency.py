@@ -16,7 +16,6 @@ from core.orchestrator.src.personas.loader import PersonaManager
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 @lru_cache()
 def get_persona_manager() -> PersonaManager:
     """
@@ -54,7 +53,6 @@ def get_persona_manager() -> PersonaManager:
         # Return a default manager as fallback
         logger.warning("Falling back to default PersonaManager")
         return PersonaManager()
-
 
 def get_persona_by_id(persona_id: Optional[str] = None):
     """

@@ -62,7 +62,6 @@ model_list:
         anthropic-beta: "mcp-client-2025-04-04"
       max_tokens: 4096
 
-
   # Portkey integration with proper headers
   - model_name: portkey/gpt-4o
     litellm_params:
@@ -95,7 +94,7 @@ model_list:
   - model_name: llm_gemini_pro
     litellm_params:
       model: vertex_ai/gemini-1.5-pro-preview-0514
-      vertex_project: ${GOOGLE_CLOUD_PROJECT}
+      vertex_project: ${VULTR_PROJECT_ID}
       vertex_location: us-central1
       temperature: 0.7
       max_tokens: 2048
@@ -103,7 +102,7 @@ model_list:
   - model_name: llm_gemini_flash
     litellm_params:
       model: vertex_ai/gemini-1.5-flash-preview-0514
-      vertex_project: ${GOOGLE_CLOUD_PROJECT}
+      vertex_project: ${VULTR_PROJECT_ID}
       vertex_location: us-central1
       temperature: 0.7
       max_tokens: 2048
@@ -111,7 +110,7 @@ model_list:
   - model_name: llm_gemini_ultra
     litellm_params:
       model: vertex_ai/gemini-ultra
-      vertex_project: ${GOOGLE_CLOUD_PROJECT}
+      vertex_project: ${VULTR_PROJECT_ID}
       vertex_location: us-central1
       temperature: 0.7
       max_tokens: 4096
@@ -179,10 +178,10 @@ monitoring:
       port: 9090
       path: "/metrics"
 
-    # Google Cloud Monitoring
+    # Vultr Monitoring
     cloud_monitoring:
       enabled: true
-      project_id: ${GCP_PROJECT_ID}
+      project_id: ${Vultr_PROJECT_ID}
 
     # Custom webhooks for alerts
     webhooks:
@@ -198,7 +197,7 @@ monitoring:
 
 # Logging configuration
 logging:
-  # Log to Cloud Logging in GCP environments
+  # Log to Cloud Logging in Vultr environments
   cloud_logging: true
   # Log level
   level: "INFO" # DEBUG, INFO, WARNING, ERROR (use INFO in production)

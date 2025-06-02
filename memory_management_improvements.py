@@ -36,7 +36,6 @@ MEMORY_ITEMS_COLLECTION = "memory_items_default_collection"  # Placeholder value
 # Thread Pool Management
 # ============================
 
-
 class ThreadPoolManager:
     """
     Singleton thread pool manager to prevent resource exhaustion.
@@ -93,23 +92,18 @@ class ThreadPoolManager:
             cls._instance._thread_pool = None
             logger.info("Thread pool shut down")
 
-
 # ============================
 # Error Handling Decorators
 # ============================
 
-
 class StorageError(Exception):
     """Base exception for storage-related errors."""
-
 
 class ValidationError(Exception):
     """Exception for validation errors in storage operations."""
 
-
 class ConnectionError(Exception):
     """Exception for connection-related errors."""
-
 
 def handle_storage_errors(func):
     """
@@ -146,7 +140,6 @@ def handle_storage_errors(func):
             raise StorageError(error_msg) from e
 
     return wrapper
-
 
 def with_retry(
     max_retries=3,
@@ -188,11 +181,9 @@ def with_retry(
 
     return decorator
 
-
 # ============================
 # Improved Semantic Search
 # ============================
-
 
 async def optimized_semantic_search(
     self,
@@ -338,11 +329,9 @@ async def optimized_semantic_search(
         logger.error(error_msg)
         raise StorageError(error_msg)
 
-
 # ============================
 # Improved Cleanup Operations
 # ============================
-
 
 async def cleanup_expired_items_with_progress(self) -> int:
     """
@@ -446,11 +435,9 @@ async def cleanup_expired_items_with_progress(self) -> int:
         logger.error(error_msg)
         raise StorageError(error_msg)
 
-
 # ============================
 # Complete FirestoreMemoryAdapter Example
 # ============================
-
 
 class ImprovedFirestoreMemoryAdapter(MemoryManager):
     """
@@ -630,11 +617,9 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
         # In a real implementation, would perform a lightweight mongodb operation
         return True
 
-
 # ============================
 # Usage Example
 # ============================
-
 
 async def usage_example():
     """Example of using the improved FirestoreMemoryAdapter."""
@@ -677,7 +662,6 @@ async def usage_example():
         # Ensure proper cleanup
         await memory_manager.close()
         await ThreadPoolManager.shutdown()
-
 
 if __name__ == "__main__":
     # Configure logging

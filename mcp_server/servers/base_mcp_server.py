@@ -20,7 +20,6 @@ from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
-
 class MCPServerConfig(BaseModel):
     """Configuration for MCP servers."""
 
@@ -44,7 +43,6 @@ class MCPServerConfig(BaseModel):
         "exponential_base": 2,
     }
 
-
 class HealthStatus(BaseModel):
     """Health status model."""
 
@@ -53,7 +51,6 @@ class HealthStatus(BaseModel):
     details: Dict[str, Any]
     uptime_seconds: float
     last_error: Optional[str] = None
-
 
 class BaseMCPServer(ABC):
     """Base class for all MCP servers (no GCP integration)."""
@@ -211,7 +208,6 @@ class BaseMCPServer(ABC):
     async def call_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Any:
         """Call a tool with arguments."""
 
-
 class RetryHelper:
     """Helper class for retry logic."""
 
@@ -240,7 +236,6 @@ class RetryHelper:
                     logger.error(f"All {max_retries + 1} attempts failed")
 
         raise last_exception
-
 
 # Example usage
 if __name__ == "__main__":

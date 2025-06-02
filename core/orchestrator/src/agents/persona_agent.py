@@ -14,8 +14,8 @@ from core.orchestrator.src.agents.agent_base import Agent, AgentContext, AgentRe
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class PersonaAwareAgent(Agent):
+    agent_type = "simple_text"
     """
     Agent that adapts its response style based on persona traits.
 
@@ -269,7 +269,6 @@ class PersonaAwareAgent(Agent):
         """Apply a professional style to text."""
         return f"From a professional standpoint, {text}"
 
-
 class DomainSpecificAgent(PersonaAwareAgent):
     """
     Agent specializing in a specific knowledge domain.
@@ -383,7 +382,6 @@ class DomainSpecificAgent(PersonaAwareAgent):
         relevance = min(1.0, matches / max(1, len(keywords) * 0.3))
 
         return relevance
-
 
 # Factory function to create specialized agents
 def create_specialized_agent(agent_type: str, config: Optional[Dict[str, Any]] = None) -> Agent:

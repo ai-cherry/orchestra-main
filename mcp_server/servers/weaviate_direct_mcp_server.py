@@ -41,13 +41,11 @@ app = FastAPI(
 # Global Weaviate client instance
 weaviate_client: Optional[weaviate.WeaviateClient] = None
 
-
 # --- Pydantic Models for Requests and Responses ---
 class GetSchemaRequest(BaseModel):
     class_names: Optional[List[str]] = Field(
         None, description="List of class names to get schema for. If None, get full schema."
     )
-
 
 class AddObjectRequest(BaseModel):
     collection_name: str = Field(..., description="Name of the Weaviate collection (class).")
@@ -55,18 +53,15 @@ class AddObjectRequest(BaseModel):
     vector: Optional[List[float]] = Field(None, description="Optional pre-computed vector.")
     uuid: Optional[str] = Field(None, description="Optional UUID for the object.")
 
-
 class AddObjectResponse(BaseModel):
     status: str = Field(..., description="Status of the operation ('success' or 'failed').")
     uuid: Optional[str] = Field(None, description="UUID of the added object.")
     error: Optional[str] = Field(None, description="Error message if operation failed.")
 
-
 class GetObjectRequest(BaseModel):
     collection_name: str = Field(..., description="Name of the Weaviate collection.")
     uuid: str = Field(..., description="UUID of the object to retrieve.")
     include_vector: bool = Field(False, description="Whether to include the object's vector.")
-
 
 class GetObjectResponse(BaseModel):
     properties: Optional[Dict[str, Any]] = Field(None, description="Properties of the retrieved object.")
@@ -74,16 +69,13 @@ class GetObjectResponse(BaseModel):
     vector: Optional[List[float]] = None
     error: Optional[str] = None
 
-
 class DeleteObjectRequest(BaseModel):
     collection_name: str = Field(..., description="Name of the Weaviate collection.")
     uuid: str = Field(..., description="UUID of the object to delete.")
 
-
 class DeleteObjectResponse(BaseModel):
     status: str = Field(..., description="Status of the operation ('success' or 'failed').")
     error: Optional[str] = Field(None, description="Error message if operation failed.")
-
 
 class HybridSearchRequest(BaseModel):
     collection_name: str = Field(..., description="Name of the Weaviate collection.")
@@ -101,7 +93,6 @@ class HybridSearchRequest(BaseModel):
     )
     include_vector: bool = Field(False, description="Whether to include the object's vector in results.")
 
-
 class SearchResultItem(BaseModel):
     uuid: str
     properties: Dict[str, Any]
@@ -109,38 +100,31 @@ class SearchResultItem(BaseModel):
     explain_score: Optional[str] = None
     vector: Optional[List[float]] = None
 
-
 class HybridSearchResponse(BaseModel):
     results: List[SearchResultItem]
     count: int
 
-
 class RawGraphQLRequest(BaseModel):
     graphql_query: str = Field(..., description="The raw GraphQL query string.")
-
 
 class RawGraphQLResponse(BaseModel):
     data: Optional[Dict[str, Any]] = None
     errors: Optional[List[Dict[str, Any]]] = None
-
 
 class MCPToolProperty(BaseModel):
     type: str
     description: Optional[str] = None
     items: Optional[Dict[str, Any]] = None  # For array type
 
-
 class MCPToolParameters(BaseModel):
     type: str = "object"
     properties: Dict[str, MCPToolProperty]
     required: Optional[List[str]] = None
 
-
 class MCPToolDefinition(BaseModel):
     name: str
     description: str
     parameters: MCPToolParameters
-
 
 # --- Weaviate Client Management ---
 async def init_weaviate_client():
@@ -183,7 +167,6 @@ async def init_weaviate_client():
         weaviate_client = None  # Ensure client is None if connection failed
         raise RuntimeError(f"Weaviate connection failed: {e}")
 
-
 async def get_client() -> weaviate.WeaviateClient:
     if weaviate_client is None or not weaviate_client.is_connected():
         logger.warning("Weaviate client not initialized or not connected. Attempting to re-initialize.")
@@ -191,7 +174,6 @@ async def get_client() -> weaviate.WeaviateClient:
     if weaviate_client is None:  # Check again after attempt
         raise HTTPException(status_code=503, detail="Weaviate service unavailable - client not initialized.")
     return weaviate_client
-
 
 @app.on_event("startup")
 async def startup_event():
@@ -205,14 +187,12 @@ async def startup_event():
             f"Critical error during Weaviate client initialization: {e}. Server might not function correctly."
         )
 
-
 @app.on_event("shutdown")
 async def shutdown_event():
     logger.info("Weaviate Direct MCP Server shutting down...")
     if weaviate_client and weaviate_client.is_connected():
         weaviate_client.close()
         logger.info("Weaviate client connection closed.")
-
 
 # --- MCP Tool Definitions ---
 @app.get("/mcp/weaviate_direct/tools", response_model=List[MCPToolDefinition])
@@ -308,7 +288,6 @@ async def get_mcp_tools():
     ]
     return tools
 
-
 # --- Tool Endpoints ---
 @app.post("/mcp/weaviate_direct/get_schema")
 async def get_schema(request: GetSchemaRequest, client: weaviate.WeaviateClient = Depends(get_client)):
@@ -328,7 +307,6 @@ async def get_schema(request: GetSchemaRequest, client: weaviate.WeaviateClient 
         logger.error(f"Error getting schema: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Error getting schema: {str(e)}")
 
-
 @app.post("/mcp/weaviate_direct/add_object", response_model=AddObjectResponse)
 async def add_object(request: AddObjectRequest, client: weaviate.WeaviateClient = Depends(get_client)):
     try:
@@ -340,7 +318,6 @@ async def add_object(request: AddObjectRequest, client: weaviate.WeaviateClient 
     except Exception as e:
         logger.error(f"Error adding object to {request.collection_name}: {e}", exc_info=True)
         return AddObjectResponse(status="failed", error=str(e))
-
 
 @app.post("/mcp/weaviate_direct/get_object", response_model=GetObjectResponse)
 async def get_object(request: GetObjectRequest, client: weaviate.WeaviateClient = Depends(get_client)):
@@ -360,7 +337,6 @@ async def get_object(request: GetObjectRequest, client: weaviate.WeaviateClient 
         logger.error(f"Error getting object {request.uuid} from {request.collection_name}: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/mcp/weaviate_direct/delete_object", response_model=DeleteObjectResponse)
 async def delete_object(request: DeleteObjectRequest, client: weaviate.WeaviateClient = Depends(get_client)):
     try:
@@ -377,7 +353,6 @@ async def delete_object(request: DeleteObjectRequest, client: weaviate.WeaviateC
     except Exception as e:
         logger.error(f"Error deleting object {request.uuid} from {request.collection_name}: {e}", exc_info=True)
         return DeleteObjectResponse(status="failed", error=str(e))
-
 
 def _translate_simple_filters(filters_dict: Optional[Dict[str, Any]]) -> Optional[wvc.query.Filter]:
     if not filters_dict:
@@ -409,7 +384,6 @@ def _translate_simple_filters(filters_dict: Optional[Dict[str, Any]]) -> Optiona
     if len(filter_conditions) == 1:
         return filter_conditions[0]
     return wvc.query.Filter.all_of(filter_conditions)
-
 
 @app.post("/mcp/weaviate_direct/hybrid_search", response_model=HybridSearchResponse)
 async def hybrid_search(request: HybridSearchRequest, client: weaviate.WeaviateClient = Depends(get_client)):
@@ -446,7 +420,6 @@ async def hybrid_search(request: HybridSearchRequest, client: weaviate.WeaviateC
         logger.error(f"Error performing hybrid search on {request.collection_name}: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/mcp/weaviate_direct/raw_graphql_query", response_model=RawGraphQLResponse)
 async def raw_graphql_query(request: RawGraphQLRequest, client: weaviate.WeaviateClient = Depends(get_client)):
     try:
@@ -461,7 +434,6 @@ async def raw_graphql_query(request: RawGraphQLRequest, client: weaviate.Weaviat
             error_detail = e.messages
         raise HTTPException(status_code=500, detail=error_detail)
 
-
 # --- Health Endpoint ---
 @app.get("/mcp/weaviate_direct/health")
 async def health_check_endpoint(client: weaviate.WeaviateClient = Depends(get_client)):
@@ -470,7 +442,6 @@ async def health_check_endpoint(client: weaviate.WeaviateClient = Depends(get_cl
     else:
         logger.error("Health check failed: Weaviate client not ready or not connected.")
         raise HTTPException(status_code=503, detail="Weaviate service unavailable or not ready")
-
 
 if __name__ == "__main__":
     port = int(os.getenv("MCP_WEAVIATE_DIRECT_PORT", "8001"))

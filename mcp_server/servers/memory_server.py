@@ -19,7 +19,6 @@ from mcp.types import TextContent, Tool
 
 from shared.database import UnifiedDatabase
 
-
 class MemoryServer:
     """MCP server for memory management using PostgreSQL and Weaviate."""
 
@@ -359,7 +358,6 @@ class MemoryServer:
 
         async with stdio_server() as (read_stream, write_stream):
             await self.server.run(read_stream, write_stream, {})
-
 
 if __name__ == "__main__":
     server = MemoryServer()

@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 # Create router
 router = APIRouter(prefix="/conversations", tags=["conversations"])
 
-
 class MessageInput(BaseModel):
     """Input model for adding a message to a conversation."""
 
@@ -30,19 +29,16 @@ class MessageInput(BaseModel):
     )
     metadata: Optional[Dict[str, Any]] = Field(None, description="Optional metadata for the message")
 
-
 class ConversationStartInput(BaseModel):
     """Input model for starting a conversation."""
 
     user_id: str = Field(..., description="User identifier")
     persona_name: Optional[str] = Field(None, description="Optional persona name to activate")
 
-
 class ConversationEndInput(BaseModel):
     """Input model for ending a conversation."""
 
     user_id: str = Field(..., description="User identifier")
-
 
 @router.post("/start", response_model=Dict[str, str])
 async def start_conversation(
@@ -70,7 +66,6 @@ async def start_conversation(
     except Exception as e:
         logger.error(f"Failed to start conversation: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Failed to start conversation: {str(e)}")
-
 
 @router.post("/{session_id}/end", response_model=Dict[str, str])
 async def end_conversation(
@@ -108,7 +103,6 @@ async def end_conversation(
         logger.error(f"Failed to end conversation: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Failed to end conversation: {str(e)}")
 
-
 @router.post("/{session_id}/messages", response_model=Dict[str, str])
 async def add_message(
     session_id: str,
@@ -143,7 +137,6 @@ async def add_message(
     except Exception as e:
         logger.error(f"Failed to add message: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Failed to add message: {str(e)}")
-
 
 @router.get("/{session_id}/history", response_model=List[Dict[str, Any]])
 async def get_conversation_history(
@@ -180,7 +173,6 @@ async def get_conversation_history(
     except Exception as e:
         logger.error(f"Failed to retrieve conversation history: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Failed to retrieve conversation history: {str(e)}")
-
 
 @router.get("/active", response_model=Dict[str, Any])
 async def get_active_conversation(

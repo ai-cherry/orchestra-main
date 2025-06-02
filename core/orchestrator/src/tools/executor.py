@@ -9,7 +9,6 @@ from typing import Any, Dict, List
 
 from .registry import ToolRegistry
 
-
 class ToolExecutor:
     """Execute tools with proper error handling."""
 

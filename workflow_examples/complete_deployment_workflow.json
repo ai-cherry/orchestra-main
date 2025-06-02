@@ -6,12 +6,12 @@
   {
     "type": "mode",
     "mode": "strategy",
-    "task": "Develop an implementation strategy for building and deploying a FastAPI-based data processing service that integrates with our multi-agent system, uses Google Cloud IAM for authentication, and deploys to Cloud Run using Terraform."
+    "task": "Develop an implementation strategy for building and deploying a FastAPI-based data processing service that integrates with our multi-agent system, uses Vultr API for authentication, and deploys to containers using Pulumi."
   },
   {
     "type": "mode",
     "mode": "architect",
-    "task": "Design the architecture for the data processing API service. Include API endpoints, data models, authentication flow using Google Cloud IAM, and integration points with our existing multi-agent system. Consider scalability, security, and maintainability."
+    "task": "Design the architecture for the data processing API service. Include API endpoints, data models, authentication flow using Vultr API, and integration points with our existing multi-agent system. Consider scalability, security, and maintainability."
   },
   {
     "type": "github",
@@ -29,7 +29,7 @@
   {
     "type": "mode",
     "mode": "code",
-    "task": "Implement the FastAPI data processing service based on the architecture design. Include proper error handling, request validation, Google Cloud IAM authentication, and comprehensive logging. Create the file structure including separate modules for routes, models, services, and utilities."
+    "task": "Implement the FastAPI data processing service based on the architecture design. Include proper error handling, request validation, Vultr API authentication, and comprehensive logging. Create the file structure including separate modules for routes, models, services, and utilities."
   },
   {
     "type": "mode",
@@ -62,39 +62,27 @@
   {
     "type": "mode",
     "mode": "code",
-    "task": "Create Terraform configuration for deploying the service to Cloud Run with appropriate IAM permissions, environment variables, and resource allocations. Place the configuration in the terraform directory following existing patterns."
+    "task": "Create Pulumi configuration for deploying the service to containers with appropriate permissions, environment variables, and resource allocations. Place the configuration in the pulumi directory following existing patterns."
   },
   {
-    "type": "terraform",
-    "operation": "init",
-    "working_dir": "terraform",
-    "parameters": {}
-  },
-  {
-    "type": "terraform",
-    "operation": "validate",
-    "working_dir": "terraform",
-    "parameters": {}
-  },
-  {
-    "type": "terraform",
-    "operation": "plan",
-    "working_dir": "terraform",
+    "type": "pulumi",
+    "operation": "preview",
+    "working_dir": "pulumi",
     "parameters": {
-      "out_file": "data_processing_api_plan"
+      "stack": "data-processing-api"
     }
   },
   {
     "type": "mode",
     "mode": "reviewer",
-    "task": "Review the Terraform configuration for the service deployment. Check for security best practices, resource configuration, IAM permissions, and adherence to the least privilege principle."
+    "task": "Review the Pulumi configuration for the service deployment. Check for security best practices, resource configuration, permissions, and adherence to the least privilege principle."
   },
   {
     "type": "github",
     "operation": "commit_changes",
     "parameters": {
-      "message": "Add Terraform configuration for data processing API",
-      "files": ["terraform/"]
+      "message": "Add Pulumi configuration for data processing API",
+      "files": ["pulumi/"]
     }
   },
   {
@@ -103,17 +91,17 @@
     "inputs": {}
   },
   {
-    "type": "terraform",
-    "operation": "apply",
-    "working_dir": "terraform",
+    "type": "pulumi",
+    "operation": "up",
+    "working_dir": "pulumi",
     "parameters": {
-      "plan_file": "data_processing_api_plan"
+      "stack": "data-processing-api"
     }
   },
   {
     "type": "mode",
     "mode": "code",
-    "task": "Create integration tests that verify the deployed API functions correctly in the Cloud Run environment. Include tests for authentication, error handling, and core functionality."
+    "task": "Create integration tests that verify the deployed API functions correctly in the container environment. Include tests for authentication, error handling, and core functionality."
   },
   {
     "type": "mode",

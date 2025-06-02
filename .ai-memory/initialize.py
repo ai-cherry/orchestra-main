@@ -37,12 +37,12 @@ PRIORITIES = {
     "tokens": {
         "github": ["GH_CLASSIC_PAT_TOKEN", "GH_FINE_GRAINED_TOKEN"],
         "gcp": [
-            "GCP_MASTER_SERVICE_JSON",
+            "VULTR_CREDENTIALS",
             "GCP_PROJECT_AUTHENTICATION_EMAIL",
-            "GCP_PROJECT_ID",
-            "GCP_REGION",
-            "GCP_SECRET_MANAGEMENT_KEY",
-            "GCP_WORKLOAD_IDENTITY_PROVIDER",
+            "VULTR_PROJECT_ID",
+            "VULTR_REGION",
+            "VULTR_SECRET_KEY",
+            "",
             "OPENAI_AGENT_KEY",
         ],
     },
@@ -62,7 +62,6 @@ PRIORITIES = {
         "access_control": "all_assistants",
     },
 }
-
 
 def initialize_memory_system():
     """Initialize the AI memory system with performance-first directives."""
@@ -153,7 +152,6 @@ project priorities.
     except Exception as e:
         logger.error(f"Error initializing memory system: {e}")
         return False
-
 
 if __name__ == "__main__":
     success = initialize_memory_system()

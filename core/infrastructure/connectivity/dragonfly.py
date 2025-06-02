@@ -13,7 +13,6 @@ from redis.exceptions import ConnectionError, TimeoutError
 
 from .base import RetryableConnection, ServiceHealth, ServiceStatus
 
-
 class DragonflyConnection(RetryableConnection):
     """DragonflyDB connection with health checks and retries."""
 

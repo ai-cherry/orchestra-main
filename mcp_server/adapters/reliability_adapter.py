@@ -15,7 +15,6 @@ from .factory_mcp_adapter import FactoryMCPAdapter
 
 logger = logging.getLogger(__name__)
 
-
 class IncidentSeverity(Enum):
     """Incident severity levels."""
 
@@ -25,7 +24,6 @@ class IncidentSeverity(Enum):
     LOW = "low"
     INFO = "info"
 
-
 class RemediationStatus(Enum):
     """Remediation action status."""
 
@@ -33,7 +31,6 @@ class RemediationStatus(Enum):
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
     FAILED = "failed"
-
 
 class ReliabilityAdapter(FactoryMCPAdapter):
     """Adapter for Reliability Droid to deployment MCP server communication.

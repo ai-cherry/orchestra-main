@@ -14,7 +14,6 @@ from shared.database import UnifiedDatabase
 import json
 from datetime import datetime
 
-
 def check_mcp_data():
     print("🔍 Checking MCP Database Content...")
     print("=" * 50)
@@ -158,7 +157,6 @@ def check_mcp_data():
         print("  1. PostgreSQL is running: sudo systemctl status postgresql")
         print("  2. Weaviate is running: docker ps | grep weaviate")
         print("  3. Run: orchestra-status")
-
 
 if __name__ == "__main__":
     check_mcp_data()

@@ -24,13 +24,11 @@ THRESHOLD_CPU_PERCENT = 20.0  # CPU usage threshold in percent
 THRESHOLD_MEMORY_MB = 200.0  # Memory usage threshold in MB
 HIGH_USAGE_COUNT_THRESHOLD = 5  # Number of high usage occurrences before flagging
 
-
 # Use centralized logging configuration from core/logging_config.py
 from core.logging_config import get_logger, setup_logging
 
 # Set up logger for this module
 logger = get_logger(__name__)
-
 
 def get_extension_processes() -> List[Dict[str, Any]]:
     """
@@ -69,7 +67,6 @@ def get_extension_processes() -> List[Dict[str, Any]]:
         logger.error(f"Error getting extension processes: {e}")
         return []
 
-
 def get_installed_extensions() -> List[str]:
     """
     Get list of installed VS Code extensions.
@@ -94,7 +91,6 @@ def get_installed_extensions() -> List[str]:
         logger.error(f"Error getting installed extensions: {e}")
         return []
 
-
 def load_performance_log() -> Dict[str, Any]:
     """
     Load existing performance log.
@@ -112,7 +108,6 @@ def load_performance_log() -> Dict[str, Any]:
 
     return {"extensions": {}, "last_updated": "", "high_usage_events": []}
 
-
 def save_performance_log(data: Dict[str, Any]) -> None:
     """
     Save performance log.
@@ -122,7 +117,6 @@ def save_performance_log(data: Dict[str, Any]) -> None:
     """
     with open(PERFORMANCE_LOG, "w") as f:
         json.dump(data, f, indent=2)
-
 
 def check_resource_usage(processes: List[Dict[str, Any]]) -> Tuple[bool, bool]:
     """
@@ -147,7 +141,6 @@ def check_resource_usage(processes: List[Dict[str, Any]]) -> Tuple[bool, bool]:
             logger.warning(f"High memory usage detected: {proc['memory']}MB (PID: {proc['pid']})")
 
     return high_cpu, high_memory
-
 
 def get_extension_categories() -> Dict[str, str]:
     """
@@ -174,7 +167,6 @@ def get_extension_categories() -> Dict[str, str]:
     except Exception as e:
         logger.error(f"Error loading extension categories: {e}")
         return categories
-
 
 def get_problematic_extensions(performance_log: Dict[str, Any]) -> List[Dict[str, Any]]:
     """
@@ -204,7 +196,6 @@ def get_problematic_extensions(performance_log: Dict[str, Any]) -> List[Dict[str
             )
 
     return problematic
-
 
 def main() -> None:
     """Main entry point for the script."""
@@ -305,7 +296,6 @@ def main() -> None:
         logger.info("No problematic extensions found")
 
     logger.info("Extension performance monitoring complete")
-
 
 if __name__ == "__main__":
     main()

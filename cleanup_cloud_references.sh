@@ -2,7 +2,7 @@
 #
 # cleanup_cloud_references.sh
 #
-# This script helps identify and clean up DigitalOcean and GCP references
+# This script helps identify and clean up DigitalOcean and Vultr references
 # from the Orchestra AI codebase, ensuring only Vultr infrastructure is referenced
 #
 
@@ -78,15 +78,15 @@ echo -e "${BLUE}Scanning codebase for cloud provider references...${NC}"
 
 # Count references
 DO_COUNT=$(count_references "digitalocean\|digital ocean")
-GCP_COUNT=$(count_references "gcp\|google cloud\|google-cloud")
+Vultr_COUNT=$(count_references "Vultr\|Vultr\|google-cloud")
 
 echo -e "\n${BLUE}Summary:${NC}"
 echo -e "  DigitalOcean references: ${YELLOW}$DO_COUNT${NC}"
-echo -e "  GCP references: ${YELLOW}$GCP_COUNT${NC}"
+echo -e "  Vultr references: ${YELLOW}$Vultr_COUNT${NC}"
 
 # Find specific references
 find_references "digitalocean\|digital ocean" "DigitalOcean"
-find_references "gcp\|google cloud\|google-cloud" "GCP"
+find_references "Vultr\|Vultr\|google-cloud" "Vultr"
 
 # List specific files that need attention
 echo -e "\n${BLUE}High-priority files to clean up:${NC}"
@@ -95,7 +95,7 @@ PRIORITY_FILES=(
     "fix_admin_ui_blank_screen.sh"
     ".cursor/mcp.json"
     ".cursor/rules/ALWAYS_APPLY_main_directives.mdc"
-    ".cursor/rules/PULUMI_GCP_PATTERNS.mdc"
+    ".cursor/rules/PULUMI_Vultr_PATTERNS.mdc"
     "infra/Pulumi.yaml"
     "infra/Pulumi.dev.yaml"
     "mcp_server/servers/deployment_server.py"
@@ -105,7 +105,7 @@ PRIORITY_FILES=(
 
 for file in "${PRIORITY_FILES[@]}"; do
     if [ -f "$file" ]; then
-        if grep -q -i "digitalocean\|gcp\|google cloud" "$file" 2>/dev/null; then
+        if grep -q -i "digitalocean\|Vultr\|Vultr" "$file" 2>/dev/null; then
             echo -e "  ${YELLOW}⚠ $file${NC}"
         else
             echo -e "  ${GREEN}✓ $file${NC}"
@@ -117,8 +117,8 @@ done
 echo -e "\n${BLUE}Recommended Actions:${NC}"
 echo -e "1. Replace fix_admin_ui_blank_screen.sh with fix_admin_ui_vultr.sh"
 echo -e "2. Update .cursor/mcp.json to use only local services (PostgreSQL + Weaviate)"
-echo -e "3. Update Cursor rules to reference Vultr instead of GCP"
-echo -e "4. Remove any Pulumi configurations for DigitalOcean or GCP"
+echo -e "3. Update Cursor rules to reference Vultr instead of Vultr"
+echo -e "4. Remove any Pulumi configurations for DigitalOcean or Vultr"
 echo -e "5. Update deployment scripts to use Vultr infrastructure"
 echo -e "6. Clean up documentation to reflect Vultr-only architecture"
 

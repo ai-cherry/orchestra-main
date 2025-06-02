@@ -9,7 +9,6 @@ from typing import Optional
 import pulumi_kubernetes as k8s
 from pulumi import ComponentResource, Output, ResourceOptions
 
-
 class MonitoringComponent(ComponentResource):
     """Monitoring stack with Prometheus, Grafana, and alerting"""
 

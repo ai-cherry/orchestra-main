@@ -15,8 +15,8 @@ on:
 env:
   NODE_VERSION: '18'
   PULUMI_VERSION: '3.94.0'
-  DOCKER_REGISTRY: gcr.io
-  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  DOCKER_REGISTRY: registry.vultr.com
+  Vultr_PROJECT_ID: ${{ secrets.Vultr_PROJECT_ID }}
   DEPLOYMENT_ENVIRONMENT: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
@@ -125,20 +125,20 @@ jobs:
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
       
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v1
+      - name: Authenticate to Vultr
+        uses: # Removed GCP action/auth@v1
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: ${{ secrets.Vultr_SA_KEY }}
       
       - name: Configure Docker for GCR
         run: |
-          gcloud auth configure-docker
+          vultr-cli auth configure-docker
       
       - name: Docker Meta
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/admin-ui
+          images: ${{ env.DOCKER_REGISTRY }}/${{ env.Vultr_PROJECT_ID }}/admin-ui
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -201,15 +201,15 @@ jobs:
         with:
           pulumi-version: ${{ env.PULUMI_VERSION }}
       
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v1
+      - name: Authenticate to Vultr
+        uses: # Removed GCP action/auth@v1
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: ${{ secrets.Vultr_SA_KEY }}
       
-      - name: Configure GCP
+      - name: Configure Vultr
         run: |
-          gcloud auth configure-docker
-          gcloud config set project ${{ env.GCP_PROJECT_ID }}
+          vultr-cli auth configure-docker
+          vultr-cli config set project ${{ env.Vultr_PROJECT_ID }}
       
       - name: Install Pulumi Dependencies
         run: |
@@ -225,11 +225,11 @@ jobs:
         run: |
           cd infrastructure/pulumi/dashboard
           # Set configuration values from secrets
-          pulumi config set gcp:project ${{ env.GCP_PROJECT_ID }}
-          pulumi config set gcp:region us-central1
+          pulumi config set vultr:project ${{ env.Vultr_PROJECT_ID }}
+          pulumi config set vultr:region us-central1
           pulumi config set apiUrl ${{ secrets.API_URL }}
           pulumi config set --secret apiKey ${{ secrets.API_KEY }}
-          pulumi config set --secret gcpServiceAccountKey ${{ secrets.GCP_SA_KEY }}
+          pulumi config set --secret VultrServiceAccountKey ${{ secrets.Vultr_SA_KEY }}
           pulumi config set alertChannelId ${{ secrets.ALERT_CHANNEL }} || true
       
       - name: Pulumi Preview
@@ -260,15 +260,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v1
+      - name: Authenticate to Vultr
+        uses: # Removed GCP action/auth@v1
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: ${{ secrets.Vultr_SA_KEY }}
       
       - name: Run Migrations
         run: |
           # Connect to Cloud SQL and run migrations
-          gcloud sql connect ${{ secrets.DB_INSTANCE }} --user=postgres << EOF
+          vultr-cli sql connect ${{ secrets.DB_INSTANCE }} --user=postgres << EOF
           \i migrations/latest.sql
           EOF
 
@@ -284,16 +284,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v1
+      - name: Authenticate to Vultr
+        uses: # Removed GCP action/auth@v1
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: ${{ secrets.Vultr_SA_KEY }}
       
       - name: Deploy to Cloud Run (Blue-Green)
         id: deploy
         run: |
           # Deploy new version as blue
-          gcloud run deploy admin-ui-blue \
+          vultr-cli run deploy admin-ui-blue \
             --image=${{ needs.build.outputs.image-tag }} \
             --region=us-central1 \
             --platform=managed \
@@ -305,7 +305,7 @@ jobs:
             --memory=512Mi
           
           # Get blue service URL
-          BLUE_URL=$(gcloud run services describe admin-ui-blue --region=us-central1 --format='value(status.url)')
+          BLUE_URL=$(vultr-cli run services describe admin-ui-blue --region=us-central1 --format='value(status.url)')
           echo "url=$BLUE_URL" >> $GITHUB_OUTPUT
 
   # Stage 8: Performance Tests
@@ -367,20 +367,20 @@ jobs:
     environment:
       name: production-switch
     steps:
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v1
+      - name: Authenticate to Vultr
+        uses: # Removed GCP action/auth@v1
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: ${{ secrets.Vultr_SA_KEY }}
       
       - name: Switch Traffic
         run: |
           # Update traffic split to new version
-          gcloud run services update-traffic admin-ui \
+          vultr-cli run services update-traffic admin-ui \
             --to-revisions=admin-ui-blue=100 \
             --region=us-central1
           
           # Tag old version for rollback
-          gcloud run services update-traffic admin-ui \
+          vultr-cli run services update-traffic admin-ui \
             --to-tags=previous=0 \
             --region=us-central1
 
@@ -395,8 +395,8 @@ jobs:
       
       - name: Setup Monitoring
         run: |
-          # Configure Google Cloud Monitoring
-          gcloud alpha monitoring policies create \
+          # Configure Vultr Monitoring
+          vultr-cli alpha monitoring policies create \
             --notification-channels=${{ secrets.ALERT_CHANNEL }} \
             --display-name="Admin UI - High Error Rate" \
             --condition-display-name="Error rate > 1%" \
@@ -409,14 +409,14 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
     steps:
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v1
+      - name: Authenticate to Vultr
+        uses: # Removed GCP action/auth@v1
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: ${{ secrets.Vultr_SA_KEY }}
       
       - name: Rollback to Previous Version
         run: |
-          gcloud run services update-traffic admin-ui \
+          vultr-cli run services update-traffic admin-ui \
             --to-tags=previous=100 \
             --region=us-central1
           
@@ -432,10 +432,10 @@ jobs:
       - name: Clean up old images
         run: |
           # Remove images older than 7 days
-          gcloud container images list-tags \
-            ${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/admin-ui \
+          vultr-cli container images list-tags \
+            ${{ env.DOCKER_REGISTRY }}/${{ env.Vultr_PROJECT_ID }}/admin-ui \
             --filter='-tags:*' \
             --filter='timestamp.datetime < -P7D' \
             --format='get(digest)' | \
-          xargs -I {} gcloud container images delete \
-            "${{ env.DOCKER_REGISTRY }}/${{ env.GCP_PROJECT_ID }}/admin-ui@{}" --quiet
+          xargs -I {} vultr-cli container images delete \
+            "${{ env.DOCKER_REGISTRY }}/${{ env.Vultr_PROJECT_ID }}/admin-ui@{}" --quiet

@@ -15,7 +15,6 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from shared.data_ingestion.ingestion_pipeline import DataIngestionPipeline
 
-
 async def demo_file_ingestion(pipeline: DataIngestionPipeline) -> None:
     """Demonstrate file ingestion capabilities."""
     print("\n=== FILE INGESTION DEMO ===")
@@ -101,7 +100,6 @@ async def demo_file_ingestion(pipeline: DataIngestionPipeline) -> None:
     for file_path, results in dir_results.items():
         print(f"     - {Path(file_path).name}: {len(results)} items")
 
-
 async def demo_api_ingestion(pipeline: DataIngestionPipeline) -> None:
     """Demonstrate API ingestion capabilities."""
     print("\n=== API INGESTION DEMO ===")
@@ -131,7 +129,6 @@ async def demo_api_ingestion(pipeline: DataIngestionPipeline) -> None:
     except Exception as e:
         print(f"   - API demo failed: {e}")
         print("   - Note: Requires internet connection")
-
 
 async def demo_batch_ingestion(pipeline: DataIngestionPipeline) -> None:
     """Demonstrate batch ingestion capabilities."""
@@ -167,7 +164,6 @@ async def demo_batch_ingestion(pipeline: DataIngestionPipeline) -> None:
         source_type = "File" if "/" in source_id else "API"
         print(f"     - {source_type}: {len(results)} items")
 
-
 async def demo_statistics(pipeline: DataIngestionPipeline) -> None:
     """Show ingestion statistics."""
     print("\n=== INGESTION STATISTICS ===")
@@ -182,7 +178,6 @@ async def demo_statistics(pipeline: DataIngestionPipeline) -> None:
     print("\n2. Available Processors:")
     print(f"   - File types: {', '.join(stats['processors_available']['file_types'])}")
     print(f"   - API types: {', '.join(stats['processors_available']['api_types'])}")
-
 
 async def main():
     """Run all demonstrations."""
@@ -216,7 +211,6 @@ async def main():
     print("\n" + "=" * 60)
     print("DEMONSTRATION COMPLETE")
     print("=" * 60)
-
 
 if __name__ == "__main__":
     # Run the demonstration

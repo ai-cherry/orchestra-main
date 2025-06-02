@@ -11,7 +11,7 @@ echo -e "${GREEN}🚀 Launching AI Orchestra Development Environment${NC}"
 
 # Load environment
 echo -e "${YELLOW}Loading environment...${NC}"
-source ~/.gcp_env_setup.sh 2>/dev/null || true
+source ~/.Vultr_env_setup.sh 2>/dev/null || true
 [ -f .env ] && source .env
 
 # Verify critical services
@@ -25,13 +25,13 @@ if [ "${MCP_AUTO_START:-true}" = "true" ]; then
     mkdir -p logs/mcp
 
     echo "Starting Cloud Run MCP server..."
-    python ~/orchestra-main/mcp_server/servers/gcp_cloud_run_server.py \
+    python ~/orchestra-main/mcp_server/servers/Vultr_cloud_run_server.py \
         > logs/mcp/cloud_run.log 2>&1 &
     MCP_PIDS+=($!)
 
     # Add other servers as they're implemented
     # echo "Starting Secret Manager MCP server..."
-    # python ~/orchestra-main/mcp_server/servers/gcp_secret_manager_server.py \
+    # python ~/orchestra-main/mcp_server/servers/Vultr_secret_manager_server.py \
     #     > logs/mcp/secrets.log 2>&1 &
     # MCP_PIDS+=($!)
 

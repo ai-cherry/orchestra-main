@@ -30,20 +30,17 @@ logging.basicConfig(
 )
 logger = logging.getLogger("mcp-memory-sync-engine")
 
-
 class MemoryType(str, Enum):
     """Memory type classification."""
 
     SHARED = "shared"
     TOOL_SPECIFIC = "tool_specific"
 
-
 class MemoryScope(str, Enum):
     """Memory scope classification - simplified for single-user project."""
 
     SESSION = "session"  # Keep session scope for basic functionality
     GLOBAL = "global"  # Keep global scope for shared data
-
 
 class ToolType(str, Enum):
     """Supported AI tools."""
@@ -52,7 +49,6 @@ class ToolType(str, Enum):
     CLINE = "cline"
     GEMINI = "gemini"
     COPILOT = "copilot"
-
 
 class CompressionLevel(int, Enum):
     """Memory compression levels."""
@@ -64,14 +60,12 @@ class CompressionLevel(int, Enum):
     EXTREME = 4
     REFERENCE_ONLY = 5
 
-
 class StorageTier(str, Enum):
     """Memory storage tiers."""
 
     HOT = "hot"  # Frequently accessed, high-priority content
     WARM = "warm"  # Recent but not critical content
     COLD = "cold"  # Historical content, primarily in large context tools
-
 
 @dataclass
 class MemoryMetadata:
@@ -85,7 +79,6 @@ class MemoryMetadata:
     version: int = 1
     sync_status: Dict[str, int] = field(default_factory=dict)
     content_hash: Optional[str] = None
-
 
 @dataclass
 class MemoryEntry:
@@ -165,7 +158,6 @@ class MemoryEntry:
     def update_hash(self) -> None:
         """Update the content hash."""
         self.metadata.content_hash = self.compute_hash()
-
 
 class MemoryCompressionEngine:
     """Handles memory compression and decompression."""
@@ -271,7 +263,6 @@ class MemoryCompressionEngine:
         # In a real implementation, we might store the original separately
         return entry
 
-
 class TokenBudgetManager:
     """Manages token budgets for different tools."""
 
@@ -367,7 +358,6 @@ class TokenBudgetManager:
 
         return optimized_entries
 
-
 class MemoryStorage:
     """Base class for memory storage backends."""
 
@@ -390,7 +380,6 @@ class MemoryStorage:
     def get_by_hash(self, content_hash: str) -> Optional[MemoryEntry]:
         """Retrieve a memory entry by its content hash."""
         raise NotImplementedError
-
 
 class InMemoryStorage(MemoryStorage):
     """In-memory implementation of memory storage."""
@@ -449,7 +438,6 @@ class InMemoryStorage(MemoryStorage):
         key = self.hash_map[content_hash]
         return self.get(key)
 
-
 class SyncEvent(Enum):
     """Types of synchronization events."""
 
@@ -457,7 +445,6 @@ class SyncEvent(Enum):
     UPDATED = "updated"
     DELETED = "deleted"
     ACCESSED = "accessed"
-
 
 @dataclass
 class SyncOperation:
@@ -469,7 +456,6 @@ class SyncOperation:
     source_tool: Optional[ToolType] = None
     target_tools: List[ToolType] = field(default_factory=list)
     timestamp: float = field(default_factory=time.time)
-
 
 class MemorySyncEngine:
     """Core memory synchronization engine."""

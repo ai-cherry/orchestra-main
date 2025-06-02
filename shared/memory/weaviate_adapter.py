@@ -17,7 +17,6 @@ from core.env_config import settings
 
 logger = logging.getLogger(__name__)
 
-
 class WeaviateAdapter:
     """
     Async adapter for Weaviate vector database.

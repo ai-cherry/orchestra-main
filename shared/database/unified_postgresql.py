@@ -20,7 +20,6 @@ from .connection_manager import get_connection_manager, PostgreSQLConnectionMana
 
 logger = logging.getLogger(__name__)
 
-
 class UnifiedPostgreSQL:
     """
     Unified PostgreSQL interface combining all functionality with shared resources.
@@ -821,10 +820,8 @@ class UnifiedPostgreSQL:
         rows = await self._manager.fetch(query, *args)
         return [self._record_to_dict(row) for row in rows]
 
-
 # Global instance
 _unified_postgresql: Optional[UnifiedPostgreSQL] = None
-
 
 async def get_unified_postgresql() -> UnifiedPostgreSQL:
     """Get or create the global unified PostgreSQL client."""
@@ -833,7 +830,6 @@ async def get_unified_postgresql() -> UnifiedPostgreSQL:
         _unified_postgresql = UnifiedPostgreSQL()
         await _unified_postgresql.initialize()
     return _unified_postgresql
-
 
 async def close_unified_postgresql() -> None:
     """Close the global unified PostgreSQL client."""

@@ -22,7 +22,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Pattern, Tuple
 
-
 @dataclass
 class HardcodedPattern:
     """Pattern for detecting hardcoded values."""
@@ -34,53 +33,51 @@ class HardcodedPattern:
     file_patterns: List[str]
     exclude_patterns: List[str] = None
 
-
 # Define patterns to search for
 PATTERNS = [
     HardcodedPattern(
         name="GCP Project ID",
         pattern=re.compile(r'["\']cherry-ai-project["\']'),
-        env_var="GCP_PROJECT_ID",
+        env_var="VULTR_PROJECT_ID",
         description="Google Cloud project ID",
-        file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.tf$", r"\.py$"],
+        file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.py$"],
     ),
     HardcodedPattern(
         name="GCP Region",
         pattern=re.compile(r'["\']us-central1["\']'),
-        env_var="GCP_REGION",
+        env_var="VULTR_REGION",
         description="Google Cloud region",
-        file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.tf$", r"\.py$"],
+        file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.py$"],
     ),
     HardcodedPattern(
         name="GCP Zone",
         pattern=re.compile(r'["\']us-central1-[a-z]["\']'),
-        env_var="GCP_ZONE",
+        env_var="VULTR_ZONE",
         description="Google Cloud zone",
-        file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.tf$", r"\.py$"],
+        file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.py$"],
     ),
     HardcodedPattern(
         name="Service Account",
         pattern=re.compile(r'["\'][a-z-]+@cherry-ai-project\.iam\.gserviceaccount\.com["\']'),
-        env_var="GCP_SERVICE_ACCOUNT",
+        env_var="VULTR_API_KEY",
         description="Service account email",
-        file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.tf$", r"\.py$"],
+        file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.py$"],
     ),
     HardcodedPattern(
         name="Cloud Run Service",
         pattern=re.compile(r'["\']orchestra-api(?:-[a-z]+)?["\']'),
         env_var="CLOUD_RUN_SERVICE_NAME",
         description="Cloud Run service name",
-        file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.tf$", r"\.py$"],
+        file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.py$"],
     ),
     HardcodedPattern(
         name="Artifact Registry",
         pattern=re.compile(r'["\']orchestra-repo["\']'),
         env_var="ARTIFACT_REGISTRY_REPO",
         description="Artifact Registry repository name",
-        file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.tf$", r"\.py$"],
+        file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.py$"],
     ),
 ]
-
 
 def should_scan_file(file_path: Path, pattern: HardcodedPattern) -> bool:
     """Check if a file should be scanned based on patterns."""
@@ -97,7 +94,6 @@ def should_scan_file(file_path: Path, pattern: HardcodedPattern) -> bool:
         return False
 
     return True
-
 
 def scan_file(file_path: Path, pattern: HardcodedPattern) -> List[Tuple[int, str, str]]:
     """
@@ -123,7 +119,6 @@ def scan_file(file_path: Path, pattern: HardcodedPattern) -> List[Tuple[int, str
 
     return results
 
-
 def generate_fix(file_path: Path, pattern: HardcodedPattern, line: str, match: str) -> str:
     """
     Generate a suggested fix for a hardcoded value.
@@ -143,16 +138,12 @@ def generate_fix(file_path: Path, pattern: HardcodedPattern, line: str, match: s
     elif file_path.suffix in (".yml", ".yaml"):
         # For YAML files
         return line.replace(match, f"${{{{ env.{pattern.env_var} }}}}")
-    elif file_path.suffix == ".tf":
-        # For Terraform files
-        return line.replace(match, f"var.{pattern.env_var.lower()}")
     elif file_path.suffix == ".py":
         # For Python files
         return line.replace(match, f'os.environ.get("{pattern.env_var}", {match})')
     else:
         # Default
         return line.replace(match, f"${{{pattern.env_var}}}")
-
 
 def scan_directory(
     directory: Path, fix: bool = False
@@ -194,7 +185,6 @@ def scan_directory(
 
     return results
 
-
 def print_results(
     results: Dict[Path, Dict[str, List[Tuple[int, str, str, Optional[str]]]]],
 ) -> None:
@@ -219,7 +209,6 @@ def print_results(
                     print(f"    Suggested fix: {fix}")
                 print()
 
-
 def main() -> None:
     """Main function."""
     parser = argparse.ArgumentParser(description="Scan for hardcoded values in AI Orchestra codebase")
@@ -240,7 +229,6 @@ def main() -> None:
     print(f"Scanning {directory} for hardcoded values...")
     results = scan_directory(directory, args.fix)
     print_results(results)
-
 
 if __name__ == "__main__":
     main()

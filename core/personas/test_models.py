@@ -28,7 +28,6 @@ from core.personas.models import (
     VoiceConfiguration,
 )
 
-
 class TestPersonaTrait:
     """Test PersonaTrait model validation and behavior."""
 
@@ -82,7 +81,6 @@ class TestPersonaTrait:
         with pytest.raises(ValidationError):
             PersonaTrait(name="empathy", category=TraitCategory.PERSONALITY, value=80, weight=15)
 
-
 class TestResponseStyle:
     """Test ResponseStyle model validation and behavior."""
 
@@ -130,7 +128,6 @@ class TestResponseStyle:
                 verbosity=0,
             )
 
-
 class TestKnowledgeDomain:
     """Test KnowledgeDomain model validation and behavior."""
 
@@ -171,7 +168,6 @@ class TestKnowledgeDomain:
         assert "Also Valid" in domain.topics
         assert len(domain.related_tools) == 2
 
-
 class TestBehaviorRule:
     """Test BehaviorRule model validation and behavior."""
 
@@ -209,7 +205,6 @@ class TestBehaviorRule:
                 priority=11,
             )
 
-
 class TestMemoryConfiguration:
     """Test MemoryConfiguration model validation and behavior."""
 
@@ -239,7 +234,6 @@ class TestMemoryConfiguration:
         # Invalid max tokens (too high)
         with pytest.raises(ValidationError):
             MemoryConfiguration(max_context_tokens=64000)
-
 
 class TestVoiceConfiguration:
     """Test VoiceConfiguration model validation and behavior."""
@@ -273,7 +267,6 @@ class TestVoiceConfiguration:
         # Invalid volume
         with pytest.raises(ValidationError):
             VoiceConfiguration(volume=1.5)
-
 
 class TestPersonaTemplate:
     """Test PersonaTemplate model validation and behavior."""
@@ -311,7 +304,6 @@ class TestPersonaTemplate:
         assert isinstance(template.created_at, datetime)
         assert isinstance(template.updated_at, datetime)
         assert template.created_at <= template.updated_at
-
 
 class TestPersonaMetrics:
     """Test PersonaMetrics model validation and behavior."""
@@ -354,7 +346,6 @@ class TestPersonaMetrics:
                 persona_id=uuid4(),
                 user_satisfaction_score=6.0,
             )
-
 
 class TestPersonaConfiguration:
     """Test PersonaConfiguration model validation and behavior."""
@@ -512,7 +503,6 @@ class TestPersonaConfiguration:
         assert isinstance(config_json, str)
         assert "Serialization Test" in config_json
 
-
 class TestEnumValues:
     """Test all enum values are accessible and valid."""
 
@@ -547,7 +537,6 @@ class TestEnumValues:
         assert InteractionMode.ANALYTICAL == "analytical"
         assert InteractionMode.CREATIVE == "creative"
         assert InteractionMode.ADVISORY == "advisory"
-
 
 class TestComplexScenarios:
     """Test complex scenarios and edge cases."""
@@ -707,7 +696,6 @@ class TestComplexScenarios:
         assert len(minimal_persona.behavior_rules) == 0
         assert minimal_persona.memory_config is None
         assert minimal_persona.voice_config is None
-
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

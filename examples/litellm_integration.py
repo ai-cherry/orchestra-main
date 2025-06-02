@@ -75,7 +75,6 @@ except ImportError:
     HAS_OPENROUTER = False
     logger.warning("OpenRouter not installed. Run: poetry install --with llm_gateways")
 
-
 def setup_litellm() -> None:
     """Initialize LiteLLM with configuration"""
 
@@ -133,7 +132,6 @@ def setup_litellm() -> None:
         litellm.cache = litellm.Cache(type="redis", redis_url=redis_url)
         logger.info("Redis caching enabled")
 
-
 def basic_completion_example() -> None:
     """Demonstrate basic completion with LiteLLM"""
     logger.info("Running basic completion example...")
@@ -156,7 +154,6 @@ def basic_completion_example() -> None:
 
     except Exception as e:
         logger.error(f"Error in basic completion: {str(e)}")
-
 
 def advanced_routing_example(input_length: int = 500) -> None:
     """Demonstrate advanced routing based on input length"""
@@ -189,7 +186,6 @@ def advanced_routing_example(input_length: int = 500) -> None:
 
     except Exception as e:
         logger.error(f"Error in advanced routing: {str(e)}")
-
 
 def portkey_integration_example() -> None:
     """Demonstrate integration with Portkey for advanced features"""
@@ -226,7 +222,6 @@ def portkey_integration_example() -> None:
     except Exception as e:
         logger.error(f"Error in Portkey integration: {str(e)}")
 
-
 def openrouter_integration_example() -> None:
     """Demonstrate integration with OpenRouter for wide model access"""
     if not HAS_OPENROUTER:
@@ -258,7 +253,6 @@ def openrouter_integration_example() -> None:
     except Exception as e:
         logger.error(f"Error in OpenRouter integration: {str(e)}")
 
-
 def fallback_example() -> None:
     """Demonstrate fallback behavior when a model fails"""
     logger.info("Running fallback example...")
@@ -287,7 +281,6 @@ def fallback_example() -> None:
             os.environ["AZURE_API_KEY"] = original_api_key
         else:
             os.environ.pop("AZURE_API_KEY", None)
-
 
 def multi_provider_example() -> None:
     """Demonstrate using all three tools in the same environment"""
@@ -371,7 +364,6 @@ def multi_provider_example() -> None:
 
         except Exception as e:
             logger.error(f"Error with {route['provider']}: {str(e)}")
-
 
 if __name__ == "__main__":
     # Initialize LiteLLM

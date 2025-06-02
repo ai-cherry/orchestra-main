@@ -28,7 +28,7 @@ We've implemented a comprehensive set of improvements to the MCP server to enhan
 
 ### Phase 4: Cloud Deployment Strategy
 
-- Created Terraform module for Cloud Run deployment
+- Created Pulumi module for Cloud Run deployment
 - Configured Secret Manager for API keys
 - Set up IAM permissions and service accounts
 - Added Firestore integration for data persistence
@@ -74,7 +74,7 @@ The MCP server now follows a modern, cloud-native architecture:
 
 - Consistent dependency management with Poetry
 - Comprehensive documentation
-- Infrastructure as code with Terraform
+- Infrastructure as code with Pulumi
 - Automated deployment process
 
 ## Getting Started
@@ -96,9 +96,9 @@ To work with the improved MCP server:
 
 3. **Cloud Deployment**:
    ```bash
-   # Using Terraform
-   cd terraform
-   terraform apply -target=module.mcp_server
+   # Using Pulumi
+   cd pulumi
+   pulumi apply -target=module.mcp_server
    ```
 
 ## Next Steps

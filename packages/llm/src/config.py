@@ -14,7 +14,6 @@ from core.orchestrator.src.config.settings import Settings
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class LLMProviderConfig(BaseModel):
     """Provider-specific configuration for LLM models."""
 
@@ -25,7 +24,6 @@ class LLMProviderConfig(BaseModel):
     default_model: Optional[str] = None
     fallback_model: Optional[str] = None
     extra_params: Dict[str, Any] = {}
-
 
 def get_provider_config(settings: Settings, provider: str) -> LLMProviderConfig:
     """
@@ -86,7 +84,6 @@ def get_provider_config(settings: Settings, provider: str) -> LLMProviderConfig:
         default_model=default_model,
         extra_params={},
     )
-
 
 def get_model_name_for_provider(model_name: str, provider: str) -> str:
     """

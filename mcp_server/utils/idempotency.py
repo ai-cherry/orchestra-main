@@ -31,7 +31,6 @@ logger = get_logger(__name__)
 T = TypeVar("T")
 R = TypeVar("R")
 
-
 class IdempotencyKey:
     """Generate and validate idempotency keys."""
 
@@ -96,7 +95,6 @@ class IdempotencyKey:
             return True
 
         return False
-
 
 class InMemoryIdempotencyStore:
     """In-memory store for idempotency keys and their results."""
@@ -198,7 +196,6 @@ class InMemoryIdempotencyStore:
         for key in expired_markers:
             del self.in_progress[key]
 
-
 class RedisIdempotencyStore:
     """Redis-based store for idempotency keys and their results."""
 
@@ -296,7 +293,6 @@ class RedisIdempotencyStore:
         except Exception as e:
             logger.error(f"Error clearing in-progress marker: {e}")
             return False
-
 
 class IdempotencyManager:
     """Manager for idempotent operations."""
@@ -417,7 +413,6 @@ class IdempotencyManager:
             # Clear in-progress marker
             await self.store.clear_in_progress(key)
 
-
 def idempotent(
     store: Optional[Union[InMemoryIdempotencyStore, RedisIdempotencyStore]] = None,
     key_func: Optional[Callable[..., str]] = None,
@@ -455,10 +450,8 @@ def idempotent(
 
     return decorator
 
-
 # Singleton instance for global use
 _default_manager: Optional[IdempotencyManager] = None
-
 
 def get_idempotency_manager() -> IdempotencyManager:
     """Get the default IdempotencyManager instance."""
@@ -466,7 +459,6 @@ def get_idempotency_manager() -> IdempotencyManager:
     if _default_manager is None:
         _default_manager = IdempotencyManager()
     return _default_manager
-
 
 def configure_idempotency(
     redis_url: Optional[str] = None,
@@ -488,7 +480,6 @@ def configure_idempotency(
         _default_manager = IdempotencyManager(InMemoryIdempotencyStore(ttl_seconds), ttl_seconds)
 
     logger.info(f"Configured idempotency manager with TTL: {ttl_seconds} seconds")
-
 
 # Convenience decorator using the default manager
 def default_idempotent(

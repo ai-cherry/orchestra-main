@@ -169,10 +169,10 @@ except subprocess.TimeoutExpired:
 
 ```python
 # ✅ GOOD - Secure
-subprocess.run(["terraform", "plan", "-out=tfplan"], check=True)
+subprocess.run(["pulumi", "plan", "-out=pulumi-plan"], check=True)
 
 # ❌ BAD - Insecure
-os.system(f"terraform plan -out=tfplan")
+os.system(f"pulumi plan -out=pulumi-plan")
 subprocess.run(cmd, shell=True)  # Avoid shell=True
 ```
 

@@ -22,7 +22,6 @@ from packages.shared.src.models.base_models import MemoryItem
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
 class BaseMemoryManager(MemoryInterface):
     """
     Basic memory manager implementation for example purposes.
@@ -64,10 +63,9 @@ class BaseMemoryManager(MemoryInterface):
         """Health check."""
         return {"status": "healthy", "item_count": len(self._items)}
 
-
 async def main():
     # Get GCP project ID and other configuration from environment
-    project_id = os.environ.get("GCP_PROJECT_ID", "your-project-id")
+    project_id = os.environ.get("VULTR_PROJECT_ID", "your-project-id")
     redis_host = os.environ.get("REDIS_HOST", "localhost")
 
     # 1. Create and initialize the base memory manager
@@ -179,10 +177,9 @@ async def main():
 
     logger.info("Memory management integration example completed")
 
-
 def check_environment_variables():
     """Check and set environment variables required for the example."""
-    required_vars = ["GCP_PROJECT_ID"]
+    required_vars = ["VULTR_PROJECT_ID"]
     missing = [var for var in required_vars if not os.environ.get(var)]
 
     if missing:
@@ -190,9 +187,8 @@ def check_environment_variables():
         logger.warning("Using default placeholder values for missing variables")
 
         # Set defaults for missing variables
-        if "GCP_PROJECT_ID" in missing:
-            os.environ["GCP_PROJECT_ID"] = "example-project-id"
-
+        if "VULTR_PROJECT_ID" in missing:
+            os.environ["VULTR_PROJECT_ID"] = "example-project-id"
 
 if __name__ == "__main__":
     # Check environment

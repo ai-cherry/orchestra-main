@@ -23,10 +23,8 @@ logger = logging.getLogger(__name__)
 # Base URL for Portkey Management API
 PORTKEY_API_BASE_URL = "https://api.portkey.ai/v1"
 
-
 class PortkeyAdminException(Exception):
     """Exception raised for errors in the Portkey Admin client."""
-
 
 @dataclass
 class VirtualKey:
@@ -40,7 +38,6 @@ class VirtualKey:
     metadata: Optional[Dict[str, Any]] = None
     usage_stats: Optional[Dict[str, Any]] = None
 
-
 @dataclass
 class GatewayConfig:
     """Data class representing a Portkey Gateway Configuration."""
@@ -52,7 +49,6 @@ class GatewayConfig:
     cache_config: Optional[Dict[str, Any]] = None
     created_at: str = None
     updated_at: str = None
-
 
 class PortkeyAdminClient:
     """

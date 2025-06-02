@@ -15,14 +15,12 @@ from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 from uuid import uuid4
 
-
 class MemoryTier(Enum):
     """Memory storage tiers with different performance characteristics."""
 
     HOT = "hot"  # DragonflyDB - Sub-millisecond access
     WARM = "warm"  # Firestore - Millisecond access
     COLD = "cold"  # Qdrant - Vector search optimized
-
 
 @dataclass
 class MemoryMetadata:
@@ -49,7 +47,6 @@ class MemoryMetadata:
         content_str = json.dumps(content, sort_keys=True)
         self.content_hash = hashlib.sha256(content_str.encode()).hexdigest()
         return self.content_hash
-
 
 @dataclass
 class MemoryEntry:
@@ -109,7 +106,6 @@ class MemoryEntry:
             embedding=data.get("embedding"),
         )
 
-
 @dataclass
 class MemorySearchResult:
     """Result from memory search operations."""
@@ -121,7 +117,6 @@ class MemorySearchResult:
     def __lt__(self, other: "MemorySearchResult") -> bool:
         """Compare by score for sorting."""
         return self.score < other.score
-
 
 class BaseMemory(ABC):
     """

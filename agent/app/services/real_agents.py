@@ -10,7 +10,6 @@ import psutil
 # Real agent registry - stores actual running agents
 AGENT_REGISTRY: Dict[str, "RealAgent"] = {}
 
-
 class RealAgent:
     """A real agent that actually does something."""
 
@@ -113,7 +112,6 @@ class RealAgent:
         else:
             return f"Monitoring: All systems normal"
 
-
 # Initialize some real agents
 def initialize_real_agents():
     """Create initial set of real agents."""
@@ -128,10 +126,8 @@ def initialize_real_agents():
         # Update memory usage
         agent.memory_usage = psutil.Process().memory_info().rss / (1024 * 1024)  # MB
 
-
 # Initialize agents on module load
 initialize_real_agents()
-
 
 async def get_all_agents() -> List[Dict[str, Any]]:
     """Get all real agents."""
@@ -147,7 +143,6 @@ async def get_all_agents() -> List[Dict[str, Any]]:
 
     return [agent.to_dict() for agent in AGENT_REGISTRY.values()]
 
-
 async def run_agent_task(agent_id: str, task: str) -> Dict[str, Any]:
     """Run a task on a specific agent."""
     agent = AGENT_REGISTRY.get(agent_id)
@@ -156,7 +151,6 @@ async def run_agent_task(agent_id: str, task: str) -> Dict[str, Any]:
 
     result = await agent.run_task(task)
     return {"agent_id": agent_id, "task": task, "result": result, "timestamp": datetime.now().isoformat()}
-
 
 async def get_system_metrics() -> Dict[str, Any]:
     """Get real system metrics."""

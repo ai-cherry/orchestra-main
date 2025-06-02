@@ -24,9 +24,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-
 # API Models
-
 
 class InteractionRequest(BaseModel):
     """Request model for interaction API."""
@@ -36,7 +34,6 @@ class InteractionRequest(BaseModel):
     session_id: Optional[str] = Field(None, description="Session identifier for conversation continuity")
     persona_id: Optional[str] = Field(None, description="Persona identifier to use for this interaction")
     context: Optional[Dict[str, Any]] = Field(None, description="Additional context for the interaction")
-
 
 class InteractionResponse(BaseModel):
     """Response model for interaction API."""
@@ -49,7 +46,6 @@ class InteractionResponse(BaseModel):
     timestamp: str = Field(..., description="Timestamp of the interaction")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
 
-
 class PersonaInfo(BaseModel):
     """Persona information model."""
 
@@ -58,16 +54,13 @@ class PersonaInfo(BaseModel):
     description: str = Field(..., description="The persona description")
     traits: List[str] = Field(default_factory=list, description="The persona traits")
 
-
 class PersonaListResponse(BaseModel):
     """Response model for persona listing API."""
 
     personas: Dict[str, PersonaInfo] = Field(..., description="Dictionary of available personas")
     default_persona_id: str = Field(..., description="The default persona identifier")
 
-
 # App Factory
-
 
 def create_app() -> FastAPI:
     """
@@ -179,11 +172,9 @@ def create_app() -> FastAPI:
 
     return app
 
-
 # Main entry point
 
 app = create_app()
-
 
 if __name__ == "__main__":
     import uvicorn

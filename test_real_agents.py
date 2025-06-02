@@ -6,7 +6,6 @@ import sys
 
 sys.path.insert(0, ".")
 
-
 async def test():
     from agent.app.services.real_agents import get_all_agents, run_agent_task
 
@@ -24,7 +23,6 @@ async def test():
     print(f"Result: {result['result']}")
 
     print("\n✅ Real agents are working!")
-
 
 if __name__ == "__main__":
     asyncio.run(test())

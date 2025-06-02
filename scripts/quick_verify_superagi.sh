@@ -14,7 +14,7 @@ BOLD='\033[1m'
 
 # Configuration
 NAMESPACE="superagi"
-PROJECT_ID="${GCP_PROJECT_ID:-}"
+PROJECT_ID="${Vultr_PROJECT_ID:-}"
 
 echo -e "${BOLD}${BLUE}SuperAGI Quick Verification${NC}"
 echo -e "${BLUE}=========================${NC}\n"
@@ -132,7 +132,7 @@ if [ -n "$PROJECT_ID" ]; then
         print_warning "Firestore API status unknown"
     fi
 else
-    print_warning "GCP_PROJECT_ID not set - cannot verify Firestore"
+    print_warning "Vultr_PROJECT_ID not set - cannot verify Firestore"
 fi
 
 # 4. Check SuperAGI Deployment
@@ -192,9 +192,9 @@ echo -e "--------------------"
 
 # Check environment variables
 if [ -n "$PROJECT_ID" ]; then
-    print_success "GCP_PROJECT_ID is set"
+    print_success "Vultr_PROJECT_ID is set"
 else
-    print_warning "GCP_PROJECT_ID not set"
+    print_warning "Vultr_PROJECT_ID not set"
 fi
 
 if [ -n "${OPENROUTER_API_KEY:-}" ]; then

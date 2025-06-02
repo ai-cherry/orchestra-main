@@ -14,7 +14,6 @@ from pydantic import BaseModel, Field
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class ImportanceFactors(BaseModel):
     """
     Factors that contribute to a memory item's importance score.
@@ -46,7 +45,6 @@ class ImportanceFactors(BaseModel):
     # Semantic factors
     semantic_richness: float = 0.0  # Higher values indicate more information density
 
-
 class ImportanceScore(BaseModel):
     """
     Result of importance scoring for a memory item.
@@ -74,7 +72,6 @@ class ImportanceScore(BaseModel):
 
     # Timestamp
     scored_at: datetime = Field(default_factory=datetime.utcnow)
-
 
 class ImportanceScoringConfig(BaseModel):
     """
@@ -105,7 +102,6 @@ class ImportanceScoringConfig(BaseModel):
 
     # Relationship thresholds
     significant_connection_count: int = 3
-
 
 class ImportanceScorer:
     """

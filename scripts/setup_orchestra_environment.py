@@ -11,7 +11,6 @@ import sys
 from pathlib import Path
 from typing import List
 
-
 class OrchestraSetup:
     """Setup Orchestra AI environment."""
 
@@ -161,7 +160,7 @@ class OrchestraSetup:
             with open(docker_compose, "r") as f:
                 content = f.read()
 
-            if "GOOGLE_APPLICATION_CREDENTIALS" not in content:
+            if "VULTR_CREDENTIALS_PATH" not in content:
                 print("  ✓ docker-compose.yml is clean")
             else:
                 self.warnings.append("docker-compose.yml may still have GCP references")
@@ -328,7 +327,6 @@ Orchestra AI is now a **GCP-free** system using:
                     print(f"  - {warning}")
 
             print("\n📋 Please fix the issues above before proceeding.")
-
 
 if __name__ == "__main__":
     setup = OrchestraSetup()

@@ -41,13 +41,11 @@ logger = logging.getLogger(__name__)
 # Initialize colorama
 colorama.init()
 
-
 def print_header():
     """Print a colorized header for the CLI."""
     print(f"\n{Fore.CYAN}============================================={Style.RESET_ALL}")
     print(f"{Fore.CYAN}{Style.BRIGHT}  AI Orchestra Mode Switcher{Style.RESET_ALL}")
     print(f"{Fore.CYAN}============================================={Style.RESET_ALL}\n")
-
 
 def print_modes(manager: ModeManager, current_slug: Optional[str] = None):
     """
@@ -89,7 +87,6 @@ def print_modes(manager: ModeManager, current_slug: Optional[str] = None):
 
         print()
 
-
 def print_workflows(manager: ModeManager, current_workflow: Optional[str] = None):
     """
     Print all available workflows with their details.
@@ -112,7 +109,6 @@ def print_workflows(manager: ModeManager, current_workflow: Optional[str] = None
             print(f"     {i+1}. {status}[{step.mode}] {step.task}")
 
         print()
-
 
 def print_current_state(manager: ModeManager):
     """
@@ -155,7 +151,6 @@ def print_current_state(manager: ModeManager):
                 print(f"Current Task: {workflow.steps[workflow.current_step].task}")
     else:
         print(f"\n{Fore.YELLOW}No active mode selected{Style.RESET_ALL}")
-
 
 def interactive_mode_switcher(manager: ModeManager):
     """
@@ -260,7 +255,6 @@ def interactive_mode_switcher(manager: ModeManager):
             print(f"{Fore.RED}Invalid choice. Please enter a number from 1-7.{Style.RESET_ALL}")
 
         print("\n" + ("-" * 50))
-
 
 def main():
     """Main entry point for the mode switcher CLI."""
@@ -398,7 +392,6 @@ def main():
         # If no specific command was given, show current state
         print_header()
         print_current_state(manager)
-
 
 if __name__ == "__main__":
     main()

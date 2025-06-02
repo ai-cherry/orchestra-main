@@ -14,7 +14,6 @@ from core.orchestrator.src.personas.loader import PersonaManager
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class PersonaTemplate:
     """
     Persona template for formatting responses.
@@ -72,7 +71,6 @@ class PersonaTemplate:
             logger.error(f"Error formatting template: {e}")
             # Last resort fallback
             return input_text
-
 
 class EnhancedPersonaConfig:
     """
@@ -143,7 +141,6 @@ class EnhancedPersonaConfig:
             The formatted response
         """
         return self._template.format(response_text, **kwargs)
-
 
 class EnhancedPersonaManager(PersonaManager):
     """
@@ -396,10 +393,8 @@ class EnhancedPersonaManager(PersonaManager):
 
         return True
 
-
 # Global enhanced persona manager instance
 _enhanced_persona_manager = None
-
 
 def get_enhanced_persona_manager() -> EnhancedPersonaManager:
     """

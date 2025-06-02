@@ -14,7 +14,6 @@ from typing import Any, Dict, List, Optional
 # Configure logging
 logger = logging.getLogger("mcp-workflow-manager")
 
-
 class WorkflowManager:
     """Manager for cross-tool workflows."""
 

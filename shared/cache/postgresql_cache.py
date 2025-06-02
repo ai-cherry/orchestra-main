@@ -15,7 +15,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class PostgreSQLCache:
     """
     PostgreSQL-based cache implementation with TTL support.
@@ -382,7 +381,6 @@ class PostgreSQLCache:
             except Exception as e:
                 logger.error(f"Error in cache cleanup: {e}")
 
-
 class CacheManager:
     """
     High-level cache manager supporting multiple cache instances.
@@ -417,10 +415,8 @@ class CacheManager:
             await cache.close()
         self.caches.clear()
 
-
 # Singleton instance for easy access
 _cache_manager: Optional[CacheManager] = None
-
 
 async def get_cache_manager(dsn: str) -> CacheManager:
     """Get the global cache manager instance."""
@@ -428,7 +424,6 @@ async def get_cache_manager(dsn: str) -> CacheManager:
     if _cache_manager is None:
         _cache_manager = CacheManager(dsn)
     return _cache_manager
-
 
 async def get_cache(name: str = "default", **kwargs) -> PostgreSQLCache:
     """Get a cache instance by name."""

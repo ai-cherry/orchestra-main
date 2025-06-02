@@ -16,7 +16,6 @@ from core.orchestrator.src.services.agent_communication import get_agent_communi
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class PubSubAgent(Agent):
     """Example agent that uses PubSub for communication."""
 
@@ -183,7 +182,6 @@ class PubSubAgent(Agent):
         # This agent can handle any context, but with moderate confidence
         return 0.7
 
-
 # Example usage
 async def main():
     """Example of using the PubSubAgent."""
@@ -228,7 +226,6 @@ async def main():
     finally:
         # Close the agent
         await agent.close_async()
-
 
 if __name__ == "__main__":
     # Set up logging

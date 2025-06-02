@@ -24,7 +24,6 @@ from agent.app.services.agent_control import (
 )
 from agent.app.services.workflow_runner import run_workflow as run_workflow_sync
 
-
 # Create the missing functions as stubs
 async def get_all_agents() -> List[Dict[str, Any]]:
     """Get all available agents."""
@@ -35,7 +34,6 @@ async def get_all_agents() -> List[Dict[str, Any]]:
         {"id": "task-scheduler", "name": "Task Scheduler Agent", "status": "active"},
         {"id": "monitoring", "name": "System Monitor Agent", "status": "active"},
     ]
-
 
 async def run_agent_task(agent_id: str, task: str, parameters: Dict[str, Any] = None) -> Dict[str, Any]:
     """Run a task on a specific agent."""
@@ -53,7 +51,6 @@ async def run_agent_task(agent_id: str, task: str, parameters: Dict[str, Any] = 
     }
     return result
 
-
 async def run_workflow(workflow_name: str, params: Dict[str, Any] = None) -> Dict[str, Any]:
     """Async wrapper for workflow runner."""
     if params is None:
@@ -63,7 +60,6 @@ async def run_workflow(workflow_name: str, params: Dict[str, Any] = None) -> Dic
     result = run_workflow_sync(workflow_name)
     result["params"] = params
     return result
-
 
 class OrchestratorServer:
     """MCP server for orchestrator."""
@@ -196,7 +192,6 @@ Recent Logs: {', '.join(logs['logs'][:2])}"""
             await self.server.run(
                 read_stream, write_stream, initialization_options={}  # Add empty initialization options
             )
-
 
 if __name__ == "__main__":
     server = OrchestratorServer()

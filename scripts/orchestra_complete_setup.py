@@ -9,7 +9,6 @@ import time
 from pathlib import Path
 from typing import List
 
-
 class OrchestraCompleteSetup:
     """Complete setup and cleanup for Orchestra AI."""
 
@@ -293,7 +292,6 @@ from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import Tool, TextContent
 
-
 class {class_name}:
     """MCP server for {name}."""
 
@@ -320,7 +318,6 @@ class {class_name}:
         """Run the MCP server."""
         async with stdio_server() as (read_stream, write_stream):
             await self.server.run(read_stream, write_stream)
-
 
 if __name__ == "__main__":
     server = {class_name}()
@@ -554,7 +551,6 @@ echo "✓ Orchestra AI stopped"
         print("=" * 60)
         print("You can now use Orchestra CLI and Admin UI.")
         print("=" * 60)
-
 
 if __name__ == "__main__":
     setup = OrchestraCompleteSetup()

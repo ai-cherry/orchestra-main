@@ -1,0 +1,75 @@
+name: Deploy Cherry AI to Vultr
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'core/**'
+      - 'agent/**'
+      - 'packages/**'
+      - 'requirements-minimal.txt'
+      - 'Dockerfile.minimal'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Build Docker image
+      run: |
+        docker build -f Dockerfile.minimal -t orchestra-api-minimal:latest .
+        docker save orchestra-api-minimal:latest | gzip > orchestra-api-minimal.tar.gz
+    
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/vultr_key
+        chmod 600 ~/.ssh/vultr_key
+        ssh-keyscan -H 45.32.69.157 >> ~/.ssh/known_hosts
+    
+    - name: Copy Docker image to server
+      run: |
+        scp -i ~/.ssh/vultr_key orchestra-api-minimal.tar.gz root@45.32.69.157:/tmp/
+    
+    - name: Deploy to server
+      run: |
+        ssh -i ~/.ssh/vultr_key root@45.32.69.157 << 'ENDSSH'
+        set -e
+        
+        # Load Docker image
+        cd /opt/orchestra
+        mv /tmp/orchestra-api-minimal.tar.gz .
+        docker load < orchestra-api-minimal.tar.gz
+        
+        # Stop existing container
+        docker stop orchestra-api 2>/dev/null || true
+        docker rm orchestra-api 2>/dev/null || true
+        
+        # Run new container
+        docker run -d \
+          --name orchestra-api \
+          --restart unless-stopped \
+          -p 8000:8000 \
+          -v /opt/orchestra/config:/app/core/orchestrator/src/config \
+          -e ENVIRONMENT=production \
+          -e CORS_ORIGINS="*" \
+          orchestra-api-minimal:latest
+        
+        # Wait and check
+        sleep 5
+        docker ps | grep orchestra-api
+        curl -s http://localhost:8000/api/health | jq .
+        ENDSSH
+    
+    - name: Test deployment
+      run: |
+        sleep 10
+        curl -f http://cherry-ai.me/api/health || exit 1
+        echo "Cherry-ai.me is working!"

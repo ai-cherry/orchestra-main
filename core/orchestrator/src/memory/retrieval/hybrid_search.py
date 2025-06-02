@@ -22,7 +22,6 @@ logger = logging.getLogger(__name__)
 # Type variable for search result items
 T = TypeVar("T", bound=Dict[str, Any])
 
-
 class QueryType(str, Enum):
     """Types of queries for hybrid search."""
 
@@ -30,7 +29,6 @@ class QueryType(str, Enum):
     CONCEPTUAL = "conceptual"  # Prioritize semantic matches
     CONVERSATIONAL = "conversational"  # Balance between exact and semantic
     UNKNOWN = "unknown"  # Default type
-
 
 class HybridSearchConfig(BaseModel):
     """
@@ -65,7 +63,6 @@ class HybridSearchConfig(BaseModel):
     # Timeout settings
     keyword_timeout: float = 3.0
     semantic_timeout: float = 5.0
-
 
 class HybridSearchEngine:
     """

@@ -11,7 +11,6 @@ from typing import Dict, List, Optional
 from pydantic import Field, HttpUrl, SecretStr, field_validator
 from pydantic_settings import BaseSettings
 
-
 class Environment(str, Enum):
     """Application environment."""
 
@@ -19,7 +18,6 @@ class Environment(str, Enum):
     STAGING = "staging"
     PROD = "prod"
     TEST = "test"
-
 
 class LogLevel(str, Enum):
     """Logging levels."""
@@ -30,7 +28,6 @@ class LogLevel(str, Enum):
     ERROR = "ERROR"
     CRITICAL = "CRITICAL"
 
-
 class ServiceSettings(BaseSettings):
     """Base settings for external services."""
 
@@ -39,7 +36,6 @@ class ServiceSettings(BaseSettings):
     request_timeout: int = Field(default=30000, description="Request timeout in ms")
     max_retries: int = Field(default=3, description="Maximum retry attempts")
     retry_delay: float = Field(default=1.0, description="Initial retry delay in seconds")
-
 
 class MongoDBSettings(ServiceSettings):
     """MongoDB configuration."""
@@ -51,7 +47,6 @@ class MongoDBSettings(ServiceSettings):
 
     model_config = {"env_prefix": "MONGODB_"}
 
-
 class DragonflySettings(ServiceSettings):
     """DragonflyDB (Redis-compatible) configuration."""
 
@@ -61,7 +56,6 @@ class DragonflySettings(ServiceSettings):
 
     model_config = {"env_prefix": "DRAGONFLY_"}
 
-
 class WeaviateSettings(ServiceSettings):
     """Weaviate vector database configuration."""
 
@@ -70,7 +64,6 @@ class WeaviateSettings(ServiceSettings):
     timeout_config: Dict[str, int] = Field(default={"timeout": 60, "startup": 30}, env="WEAVIATE_TIMEOUT_CONFIG")
 
     model_config = {"env_prefix": "WEAVIATE_"}
-
 
 class LLMProviderSettings(ServiceSettings):
     """LLM provider configuration."""
@@ -86,7 +79,6 @@ class LLMProviderSettings(ServiceSettings):
     max_tokens: int = Field(default=2000, env="LLM_MAX_TOKENS")
 
     model_config = {"env_prefix": "LLM_"}
-
 
 class DeploymentSettings(BaseSettings):
     """Deployment configuration."""
@@ -105,7 +97,6 @@ class DeploymentSettings(BaseSettings):
 
     model_config = {"env_prefix": "DEPLOYMENT_"}
 
-
 class APISettings(BaseSettings):
     """API server configuration."""
 
@@ -121,7 +112,6 @@ class APISettings(BaseSettings):
 
     model_config = {"env_prefix": "API_"}
 
-
 class FeatureFlags(BaseSettings):
     """Feature flags for gradual rollout."""
 
@@ -132,7 +122,6 @@ class FeatureFlags(BaseSettings):
     enable_advanced_routing: bool = Field(default=False, env="FF_ENABLE_ADVANCED_ROUTING")
 
     model_config = {"env_prefix": "FF_"}
-
 
 class Settings(BaseSettings):
     """Main application settings."""
@@ -194,10 +183,8 @@ class Settings(BaseSettings):
         "case_sensitive": False,
     }
 
-
 # Singleton instance
 _settings: Optional[Settings] = None
-
 
 def get_settings() -> Settings:
     """Get the global settings instance."""
@@ -207,7 +194,6 @@ def get_settings() -> Settings:
         _settings = Settings()
 
     return _settings
-
 
 def reload_settings() -> Settings:
     """Reload settings from environment."""

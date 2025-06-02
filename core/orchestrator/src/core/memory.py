@@ -15,7 +15,6 @@ from typing import Any, Dict, List, Optional
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 @dataclass
 class MemoryItem:
     """Base class for items stored in memory."""
@@ -27,7 +26,6 @@ class MemoryItem:
     item_type: str = "generic"
     content: Any = None
     metadata: Dict[str, Any] = field(default_factory=dict)
-
 
 class MemoryProvider(ABC):
     """Abstract base class for memory providers."""
@@ -77,7 +75,6 @@ class MemoryProvider(ABC):
             List of memory items
         """
 
-
 class InMemoryProvider(MemoryProvider):
     """Memory provider that stores items in memory."""
 
@@ -121,7 +118,6 @@ class InMemoryProvider(MemoryProvider):
         # Sort by timestamp
         items.sort(key=lambda x: x.timestamp)
         return items
-
 
 class MemoryManager:
     """
@@ -232,10 +228,8 @@ class MemoryManager:
         """
         return self._provider.get_items(user_id=user_id, session_id=session_id, item_type=item_type, limit=limit)
 
-
 # Global memory manager instance
 _memory_manager = None
-
 
 def get_memory_manager() -> MemoryManager:
     """

@@ -18,7 +18,6 @@ from packages.tools.src.base import ToolRegistry
 
 logger = logging.getLogger(__name__)
 
-
 class PhidataAgentWrapper:
     def __init__(
         self,

@@ -146,15 +146,15 @@ memory:
     db: 0
 
   # Firestore configuration for mid/long-term memory
-  firestore:
-    project_id: ${GCP_PROJECT_ID}
+  postgresql:
+    project_id: ${Vultr_PROJECT_ID}
     mid_term_collection: orchestra_mid_term
     long_term_collection: orchestra_long_term
 
   # Vertex AI configuration for semantic memory
-  vertex:
-    project_id: ${GCP_PROJECT_ID}
-    region: ${GCP_REGION}
+  weaviate:
+    project_id: ${Vultr_PROJECT_ID}
+    region: ${Vultr_REGION}
     index_name: orchestra-semantic-memory
     endpoint_name: orchestra-semantic-memory-endpoint
     embedding_model: textembedding-gecko@003

@@ -20,7 +20,6 @@ F = TypeVar("F", bound=Callable[..., Any])
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 def log_error(
     error: Exception,
     context: Optional[Dict[str, Any]] = None,
@@ -81,7 +80,6 @@ def log_error(
         except Exception as monitoring_error:
             logger.warning(f"Failed to log error to monitoring: {monitoring_error}")
 
-
 def handle_error(
     error: Exception,
     context: Optional[Dict[str, Any]] = None,
@@ -135,7 +133,6 @@ def handle_error(
 
     # Otherwise return the fallback value
     return fallback_value
-
 
 def error_boundary(
     fallback_value: Optional[Any] = None,
@@ -237,7 +234,6 @@ def error_boundary(
             return cast(F, sync_wrapper)
 
     return decorator
-
 
 def retry(
     max_attempts: int = 3,
@@ -391,7 +387,6 @@ def retry(
             return cast(F, sync_wrapper)
 
     return decorator
-
 
 def convert_exceptions(
     mapping: Dict[Type[Exception], Type[Exception]],

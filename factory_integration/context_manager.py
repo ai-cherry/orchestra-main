@@ -23,7 +23,6 @@ from .cache_manager import CacheManager
 
 logger = logging.getLogger(__name__)
 
-
 class ContextMetadata(BaseModel):
     """Metadata for context entries."""
 
@@ -35,7 +34,6 @@ class ContextMetadata(BaseModel):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     embeddings: Optional[List[float]] = Field(default=None, description="Vector embeddings")
 
-
 class ContextVersion(BaseModel):
     """Version history entry for context changes."""
 
@@ -45,7 +43,6 @@ class ContextVersion(BaseModel):
     changed_by: Optional[str] = None
     changed_at: datetime = Field(default_factory=datetime.utcnow)
     change_type: str = Field(description="Type: 'create', 'update', 'merge'")
-
 
 class UnifiedContextManager:
     """Manages context for both Roo and Factory AI systems.

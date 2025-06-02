@@ -7,7 +7,6 @@ This module defines the interface for memory implementations.
 import abc
 from typing import Any, Dict, List, Optional
 
-
 class MemoryInterface(abc.ABC):
     """Abstract base class for memory implementations."""
 

@@ -6,15 +6,14 @@ import re
 from pathlib import Path
 from typing import Dict, List
 
-
 class DeepCleanup:
     """Performs deep analysis and cleanup of GCP references."""
 
     def __init__(self):
         self.root_dir = Path(__file__).parent.parent
         self.gcp_patterns = [
-            r"GCP_PROJECT_ID",
-            r"GOOGLE_CLOUD_PROJECT",
+            r"VULTR_PROJECT_ID",
+            r"VULTR_PROJECT_ID",
             r"google-cloud-",
             r"gcp-secret",
             r"secret-manager",
@@ -247,12 +246,10 @@ class DeepCleanup:
         print("2. Commit if satisfied: git add -A && git commit -m 'chore: Deep cleanup of GCP references'")
         print("3. For remaining files needing updates, use the report to guide manual updates")
 
-
 def main():
     """Main entry point."""
     cleanup = DeepCleanup()
     cleanup.run()
-
 
 if __name__ == "__main__":
     main()

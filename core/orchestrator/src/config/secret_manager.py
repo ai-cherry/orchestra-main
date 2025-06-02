@@ -22,7 +22,6 @@ logger = logging.getLogger(__name__)
 # Type alias
 Secret = str
 
-
 @lru_cache(maxsize=128)
 def get_secret(secret_name: str, default: Optional[str] = None) -> Optional[Secret]:
     """
@@ -52,15 +51,14 @@ def get_secret(secret_name: str, default: Optional[str] = None) -> Optional[Secr
         return os.environ[env_var_name]
 
     # Only try Secret Manager if GCP project ID is set
-    if settings.GCP_PROJECT_ID:
+    if settings.VULTR_PROJECT_ID:
         try:
-            return _get_from_secret_manager(secret_name, settings.GCP_PROJECT_ID, settings.ENVIRONMENT)
+            return _get_from_secret_manager(secret_name, settings.VULTR_PROJECT_ID, settings.ENVIRONMENT)
         except Exception as e:
             logger.warning(f"Failed to get secret '{secret_name}' from Secret Manager: {e}")
 
     # Return default value if provided
     return default
-
 
 def _get_from_secret_manager(secret_name: str, project_id: str, environment: str) -> Optional[Secret]:
     """
@@ -79,7 +77,7 @@ def _get_from_secret_manager(secret_name: str, project_id: str, environment: str
     """
     # Import here to avoid unnecessary dependencies if using env vars only
     try:
-        from google.cloud import secretmanager
+        # Removed GCP import import secretmanager
     except ImportError:
         logger.warning(
             "google-cloud-secret-manager package not installed. "
@@ -102,7 +100,6 @@ def _get_from_secret_manager(secret_name: str, project_id: str, environment: str
         logger.warning(f"Error accessing secret {full_secret_id}: {e}")
         return None
 
-
 # Dictionary-like interface for accessing secrets
 class SecretManager:
     """Dictionary-like interface for accessing secrets."""
@@ -121,7 +118,6 @@ class SecretManager:
     def __contains__(self, key: str) -> bool:
         """Check if a secret exists."""
         return get_secret(key) is not None
-
 
 # Singleton instance
 secrets = SecretManager()

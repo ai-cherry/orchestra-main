@@ -20,7 +20,6 @@ from core.services.memory.unified_memory import get_memory_service
 
 logger = logging.getLogger(__name__)
 
-
 class AgentStatus(Enum):
     """Agent lifecycle status."""
 
@@ -30,7 +29,6 @@ class AgentStatus(Enum):
     EXECUTING = "executing"
     ERROR = "error"
     STOPPED = "stopped"
-
 
 class AgentCapability(Enum):
     """Agent capabilities."""
@@ -44,7 +42,6 @@ class AgentCapability(Enum):
     MONITORING = "monitoring"
     COLLABORATION = "collaboration"
 
-
 @dataclass
 class AgentMessage:
     """Message between agents or from users."""
@@ -56,7 +53,6 @@ class AgentMessage:
     message_type: str = "text"
     metadata: Dict[str, Any] = field(default_factory=dict)
     timestamp: datetime = field(default_factory=datetime.utcnow)
-
 
 @dataclass
 class AgentConfig:
@@ -73,7 +69,6 @@ class AgentConfig:
     collaboration_enabled: bool = True
     metadata: Dict[str, Any] = field(default_factory=dict)
 
-
 @dataclass
 class AgentState:
     """Current state of an agent."""
@@ -85,7 +80,6 @@ class AgentState:
     message_queue: List[AgentMessage] = field(default_factory=list)
     last_activity: datetime = field(default_factory=datetime.utcnow)
     metadata: Dict[str, Any] = field(default_factory=dict)
-
 
 class Agent(ABC):
     """Abstract base class for AI agents."""
@@ -333,7 +327,6 @@ class Agent(ABC):
 
             await self._event_bus.subscribe("agent.collaboration", handle_collaboration)
 
-
 class AgentManager:
     """Manages multiple agents and their interactions."""
 
@@ -412,10 +405,8 @@ class AgentManager:
 
         return best_agent.config.id
 
-
 # Global agent manager instance
 _agent_manager: Optional[AgentManager] = None
-
 
 def get_agent_manager() -> AgentManager:
     """Get the global agent manager instance."""

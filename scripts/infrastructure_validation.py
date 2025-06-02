@@ -20,20 +20,17 @@ YELLOW = "\033[93m"
 BLUE = "\033[94m"
 RESET = "\033[0m"
 
-
 def print_status(service: str, status: bool, message: str = ""):
     """Print colored status message"""
     icon = "✅" if status else "❌"
     color = GREEN if status else RED
     print(f"{color}{icon} {service}: {message}{RESET}")
 
-
 def print_header(title: str):
     """Print section header"""
     print(f"\n{BLUE}{'='*60}{RESET}")
     print(f"{BLUE}{title.center(60)}{RESET}")
     print(f"{BLUE}{'='*60}{RESET}\n")
-
 
 def check_env_var(var_name: str) -> Tuple[bool, str]:
     """Check if environment variable is set"""
@@ -43,7 +40,6 @@ def check_env_var(var_name: str) -> Tuple[bool, str]:
         masked = value[:8] + "..." + value[-4:] if len(value) > 12 else "***"
         return True, masked
     return False, "Not set"
-
 
 def test_digitalocean_api(token: str) -> Tuple[bool, str]:
     """Test DigitalOcean API access"""
@@ -58,7 +54,6 @@ def test_digitalocean_api(token: str) -> Tuple[bool, str]:
     except Exception as e:
         return False, str(e)
 
-
 def test_mongodb_connection(uri: str) -> Tuple[bool, str]:
     """Test MongoDB connection"""
     try:
@@ -72,7 +67,6 @@ def test_mongodb_connection(uri: str) -> Tuple[bool, str]:
     except Exception as e:
         return False, str(e)
 
-
 def test_weaviate_connection(url: str, api_key: str) -> Tuple[bool, str]:
     """Test Weaviate connection"""
     try:
@@ -84,7 +78,6 @@ def test_weaviate_connection(url: str, api_key: str) -> Tuple[bool, str]:
             return False, f"API returned {response.status_code}"
     except Exception as e:
         return False, str(e)
-
 
 def test_github_pat(pat: str) -> Tuple[bool, str]:
     """Test GitHub Personal Access Token"""
@@ -98,7 +91,6 @@ def test_github_pat(pat: str) -> Tuple[bool, str]:
             return False, f"API returned {response.status_code}"
     except Exception as e:
         return False, str(e)
-
 
 def check_pulumi_state() -> Tuple[bool, str]:
     """Check Pulumi stack state"""
@@ -123,7 +115,6 @@ def check_pulumi_state() -> Tuple[bool, str]:
         # Return to original directory
         if os.path.basename(os.getcwd()) == "infra":
             os.chdir("..")
-
 
 def main():
     """Run all infrastructure validation tests"""
@@ -225,7 +216,6 @@ def main():
     else:
         print(f"\n{YELLOW}⚠️  Some checks failed. Review the output above.{RESET}")
         return 1
-
 
 if __name__ == "__main__":
     sys.exit(main())

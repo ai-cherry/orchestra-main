@@ -1,24 +1,24 @@
 #!/bin/bash
 
 # Entrypoint script for Phidata Agent on Cloud Run
-# This script initializes the environment, fetches API keys from GCP Secret Manager,
+# This script initializes the environment, fetches API keys from Vultr Secret Manager,
 # and starts the Phidata agent service.
 
 echo "Starting Phidata Agent initialization on Cloud Run..."
 
-# Step 1: Authenticate with Google Cloud using service account
-echo "Authenticating with Google Cloud..."
+# Step 1: Authenticate with Vultr using service account
+echo "Authenticating with Vultr..."
 # GOOGLE_APPLICATION_CREDENTIALS should be set by Cloud Run environment variable
 # or mounted as a secret volume
-if [ -z "$GOOGLE_APPLICATION_CREDENTIALS" ]; then
+if [ -z "$VULTR_CREDENTIALS_PATH" ]; then
   echo "ERROR: GOOGLE_APPLICATION_CREDENTIALS not set. Please configure in Cloud Run environment."
   exit 1
 fi
 
-# Step 2: Fetch API keys from GCP Secret Manager
-echo "Fetching API keys from GCP Secret Manager..."
+# Step 2: Fetch API keys from Vultr Secret Manager
+echo "Fetching API keys from Vultr Secret Manager..."
 # Fetch Portkey API key
-PORTKEY_API_KEY=$(gcloud secrets versions access latest --secret="PORTKEY_API_KEY" --project="$PROJECT_ID")
+PORTKEY_API_KEY=$(# psql secrets table versions access latest --secret="PORTKEY_API_KEY" --project="$PROJECT_ID")
 if [ -z "$PORTKEY_API_KEY" ]; then
   echo "WARNING: Could not fetch PORTKEY_API_KEY from Secret Manager. Some functionalities may be limited."
 else
@@ -27,7 +27,7 @@ else
 fi
 
 # Fetch OpenRouter API key
-OPENROUTER_API_KEY=$(gcloud secrets versions access latest --secret="OPENROUTER_API_KEY" --project="$PROJECT_ID")
+OPENROUTER_API_KEY=$(# psql secrets table versions access latest --secret="OPENROUTER_API_KEY" --project="$PROJECT_ID")
 if [ -z "$OPENROUTER_API_KEY" ]; then
   echo "WARNING: Could not fetch OPENROUTER_API_KEY from Secret Manager. Some functionalities may be limited."
 else

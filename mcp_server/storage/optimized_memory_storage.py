@@ -19,7 +19,6 @@ from ..utils.performance_monitor import get_performance_monitor
 
 logger = logging.getLogger(__name__)
 
-
 class OptimizedMemoryStorage(IMemoryStorage):
     """High-performance in-memory storage implementation.
 

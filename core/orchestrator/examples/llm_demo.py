@@ -23,14 +23,12 @@ from core.orchestrator.src.services.llm.providers import get_llm_provider
 
 # Removed load_dotenv for production: all secrets are managed via GCP Secret Manager and Pulumi config.
 
-
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
 logger = logging.getLogger(__name__)
-
 
 async def demo_conversation_with_persona(persona_id: str):
     """
@@ -107,7 +105,6 @@ async def demo_conversation_with_persona(persona_id: str):
             print(f"Error: {e}")
             break
 
-
 async def demo_direct_completion():
     """Demonstrate direct completions without personas or history."""
     print("\n\n=== Direct Completions ===\n")
@@ -158,7 +155,6 @@ async def demo_direct_completion():
         except Exception as e:
             print(f"Error: {e}")
 
-
 async def main():
     """Run the complete demo."""
     # Environment variables for secrets are injected by GCP infra or set in CI/CD.
@@ -189,7 +185,6 @@ async def main():
     print("\n" + "=" * 50)
     print(" Demo Complete ")
     print("=" * 50 + "\n")
-
 
 if __name__ == "__main__":
     # Run the demo

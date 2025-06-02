@@ -13,7 +13,6 @@ from typing import Any, Dict, List, Optional
 # Configure logging
 logger = logging.getLogger("mcp-tool-manager")
 
-
 class ToolManager:
     """Manager for AI tool integrations."""
 

@@ -13,7 +13,6 @@ from typing import Any, Dict, List, Optional
 
 from ..models.memory import MemoryEntry
 
-
 class IMemoryStorage(ABC):
     """Base interface for all memory storage implementations."""
 
@@ -48,7 +47,6 @@ class IMemoryStorage(ABC):
     @abstractmethod
     async def health_check(self) -> Dict[str, Any]:
         """Check the health of the storage backend."""
-
 
 class SyncMemoryStorage:
     """Synchronous wrapper for async memory storage interfaces.

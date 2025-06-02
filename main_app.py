@@ -16,7 +16,6 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-
 @app.route("/")
 def home():
     return jsonify(
@@ -24,16 +23,14 @@ def home():
             "status": "success",
             "message": "GCP deployment successful!",
             "environment": "Cloud Run",
-            "project": os.environ.get("GOOGLE_CLOUD_PROJECT", "unknown"),
+            "project": os.environ.get("VULTR_PROJECT_ID", "unknown"),
             "service_account": os.environ.get("GOOGLE_SERVICE_ACCOUNT", "unknown"),
         }
     )
 
-
 @app.route("/health")
 def health():
     return jsonify({"status": "healthy"})
-
 
 @app.route("/info")
 def info():
@@ -46,7 +43,6 @@ def info():
         }
     )
 
-
 @app.route("/query", methods=["POST"])
 def handle_query():
     data = request.json
@@ -54,7 +50,6 @@ def handle_query():
     query = data.get("query", "")
     logger.info("User query received", extra={"user_id": user_id, "query_length": len(query)})
     return {"status": "ok"}
-
 
 @app.route("/call-llm", methods=["POST"])
 def call_llm():
@@ -76,7 +71,6 @@ def call_llm():
         )
         return jsonify({"error": "LLM API call failed"}), 500
 
-
 @app.route("/health/detailed")
 def health_detailed():
     """Detailed health check endpoint"""
@@ -84,7 +78,7 @@ def health_detailed():
         "status": "healthy",
         "services": {
             "app": "running",
-            "gcp_project": os.environ.get("GOOGLE_CLOUD_PROJECT", "not_set"),
+            "gcp_project": os.environ.get("VULTR_PROJECT_ID", "not_set"),
             "api_keys_loaded": {
                 "openai": bool(os.environ.get("OPENAI_API_KEY")),
                 "anthropic": bool(os.environ.get("ANTHROPIC_API_KEY")),
@@ -92,7 +86,6 @@ def health_detailed():
         },
     }
     return jsonify(health_status)
-
 
 @app.errorhandler(Exception)
 def handle_exception(e):
@@ -118,7 +111,6 @@ def handle_exception(e):
             },
         )
         return jsonify({"error": str(e)}), 500
-
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))

@@ -16,7 +16,6 @@ from weaviate.agents.query import QueryAgent
 
 logger = logging.getLogger(__name__)
 
-
 class PayReadyQueryAgent:
     """
     Provides natural language query capabilities for Pay Ready domain data.

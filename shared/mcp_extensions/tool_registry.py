@@ -11,7 +11,6 @@ from typing import Dict, List, Optional, Any, Callable, Union
 
 logger = logging.getLogger(__name__)
 
-
 class ToolRegistry:
     """
     Registry for MCP tools with access control.
@@ -176,10 +175,8 @@ class ToolRegistry:
         handler = tool["handler"]
         return handler(**params)
 
-
 # Singleton instance for global access
 default_registry = ToolRegistry()
-
 
 def register_tool(
     name: str, handler: Callable, description: str = "", parameters: Dict[str, Any] = None, required_role: str = "user"
@@ -198,7 +195,6 @@ def register_tool(
         name=name, handler=handler, description=description, parameters=parameters, required_role=required_role
     )
 
-
 def get_tool(name: str) -> Optional[Dict[str, Any]]:
     """
     Get a tool from the default registry.
@@ -210,7 +206,6 @@ def get_tool(name: str) -> Optional[Dict[str, Any]]:
         Tool configuration dictionary or None if not found
     """
     return default_registry.get_tool(name)
-
 
 def list_tools(environment: str = "production", role: str = "user") -> List[Dict[str, Any]]:
     """
@@ -224,7 +219,6 @@ def list_tools(environment: str = "production", role: str = "user") -> List[Dict
         List of available tools with their metadata
     """
     return default_registry.list_tools(environment, role)
-
 
 def execute_tool(name: str, params: Dict[str, Any], environment: str = "production", role: str = "user") -> Any:
     """

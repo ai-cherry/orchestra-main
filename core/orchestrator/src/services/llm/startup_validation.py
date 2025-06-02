@@ -69,7 +69,6 @@ PROVIDER_REQUIRED_PACKAGES = {
     "retry": ["tenacity"],
 }
 
-
 def check_docker_buildkit_support() -> bool:
     """
     Check if Docker BuildKit is supported in the current environment.
@@ -101,7 +100,6 @@ def check_docker_buildkit_support() -> bool:
         logger.warning(f"Error checking Docker version: {str(e)}")
 
     return False
-
 
 def check_environment_variables(
     providers: Optional[List[str]] = None,
@@ -138,7 +136,6 @@ def check_environment_variables(
 
     return success, missing_vars
 
-
 def check_optional_environment_variables(
     providers: Optional[List[str]] = None,
 ) -> Dict[str, List[str]]:
@@ -170,7 +167,6 @@ def check_optional_environment_variables(
 
     return missing_vars
 
-
 def check_package_availability(provider: str) -> Tuple[bool, List[str]]:
     """
     Check if required packages for a provider are installed.
@@ -192,7 +188,6 @@ def check_package_availability(provider: str) -> Tuple[bool, List[str]]:
             missing_packages.append(package)
 
     return len(missing_packages) == 0, missing_packages
-
 
 def init_providers(providers: Optional[List[str]] = None) -> bool:
     """
@@ -261,7 +256,6 @@ def init_providers(providers: Optional[List[str]] = None) -> bool:
 
     return success
 
-
 def init_secret_manager() -> bool:
     """
     Initialize the Secret Manager.
@@ -274,7 +268,7 @@ def init_secret_manager() -> bool:
         from core.orchestrator.src.services.llm.secret_manager import get_secret_manager
 
         # Try to get the project ID from environment
-        project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+        project_id = os.environ.get("VULTR_PROJECT_ID")
 
         # Initialize the Secret Manager
         secret_manager = get_secret_manager(project_id=project_id)
@@ -304,7 +298,6 @@ def init_secret_manager() -> bool:
     except Exception as e:
         logger.error(f"Error initializing Secret Manager: {str(e)}")
         return False
-
 
 def init_circuit_breaker() -> bool:
     """
@@ -342,7 +335,6 @@ def init_circuit_breaker() -> bool:
         logger.error(f"Error initializing Circuit Breaker: {str(e)}")
         return False
 
-
 def setup_header_validation(app: Any) -> bool:
     """
     Set up header validation middleware for a FastAPI app.
@@ -368,7 +360,6 @@ def setup_header_validation(app: Any) -> bool:
     except Exception as e:
         logger.error(f"Error setting up header validation: {str(e)}")
         return False
-
 
 def validate_poetry_install() -> bool:
     """
@@ -415,7 +406,6 @@ def validate_poetry_install() -> bool:
     except Exception as e:
         logger.error(f"Error validating Poetry environment: {str(e)}")
         return False
-
 
 def validate_llm_environment() -> bool:
     """
@@ -478,7 +468,6 @@ def validate_llm_environment() -> bool:
         logger.error("LLM environment validation failed")
 
     return success
-
 
 if __name__ == "__main__":
     # Configure logging

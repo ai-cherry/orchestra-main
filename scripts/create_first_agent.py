@@ -50,7 +50,6 @@ SIMPLIFIED_ANSWERS = {
     "agent_name": "Data Monitor & Processor",
 }
 
-
 async def test_agent():
     """Test the created agent"""
     print("🤖 Creating your first agent based on questionnaire answers...")
@@ -138,7 +137,6 @@ async def test_agent():
 
     print("\n✅ Test completed!")
 
-
 def main():
     """Main entry point"""
     print("=" * 60)
@@ -153,7 +151,6 @@ def main():
 
     # Run the test
     asyncio.run(test_agent())
-
 
 if __name__ == "__main__":
     main()
