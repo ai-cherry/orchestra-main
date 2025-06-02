@@ -288,17 +288,17 @@ Just tell me in natural language what you need!"""
             return None
 
         try:
-            # Generate speech using ElevenLabs
-            audio = elevenlabs_client.generate(
+            # Generate speech using ElevenLabs v2 API
+            audio = elevenlabs_client.text_to_speech.convert(
                 text=text,
-                voice=self.voice_id,
+                voice_id=self.voice_id,
                 voice_settings=self.voice_settings,
-                model="eleven_monolingual_v1",  # Or use "eleven_turbo_v2" for faster generation
+                model_id="eleven_monolingual_v1",  # Or use "eleven_turbo_v2" for faster generation
                 output_format="mp3_44100_128"
             )
             
             # Convert audio generator to bytes
-            audio_bytes = b"".join(audio)
+            audio_bytes = b"".join(chunk for chunk in audio)
             
             # Convert to base64 for API response
             audio_base64 = base64.b64encode(audio_bytes).decode('utf-8')
