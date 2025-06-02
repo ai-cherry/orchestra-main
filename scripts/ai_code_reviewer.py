@@ -27,7 +27,6 @@ import sys
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
 class AICodeReviewer:
     """Reviews code for AI-generated anti-patterns and project consistency."""
 
@@ -316,7 +315,6 @@ class AICodeReviewer:
 
         return "\n".join(report)
 
-
 def main() -> int:
     """Main entry point for AI code reviewer."""
     parser = argparse.ArgumentParser(description="AI Code Reviewer - Maintain project consistency")
@@ -365,7 +363,6 @@ def main() -> int:
     # Return non-zero if errors found
     total_errors = sum(len(r.get("errors", [])) for r in results.values())
     return 1 if total_errors > 0 else 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

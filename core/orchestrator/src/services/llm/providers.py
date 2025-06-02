@@ -52,7 +52,6 @@ from core.orchestrator.src.services.unified_registry import Service, register
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class LLMProviderConfig:
     """Configuration for LLM provider."""
 
@@ -117,7 +116,6 @@ class LLMProviderConfig:
 
         if self.max_retries < 0:
             raise ValueError("Max retries cannot be negative")
-
 
 class LLMProvider(Service, ABC):
     """
@@ -226,7 +224,6 @@ class LLMProvider(Service, ABC):
         Raises:
             LLMProviderError: Base class for all LLM provider errors
         """
-
 
 class OpenRouterProvider(LLMProvider):
     """
@@ -595,7 +592,6 @@ class OpenRouterProvider(LLMProvider):
         # Call the decorated function
         return await _make_api_call()
 
-
 class PortkeyProvider(LLMProvider):
     """
     Portkey LLM provider implementation with basic functionality.
@@ -840,7 +836,6 @@ class PortkeyProvider(LLMProvider):
             logger.error(f"Error with {self.provider_name}: {str(exc)}", exc_info=True)
             raise LLMProviderError(f"API error: {str(exc)}")
 
-
 def get_provider_for_mode(mode: Optional[str] = None) -> str:
     """
     Determine the appropriate provider based on the Roo mode.
@@ -866,7 +861,6 @@ def get_provider_for_mode(mode: Optional[str] = None) -> str:
     # Default to preferred provider
     return getattr(settings, "PREFERRED_LLM_PROVIDER", "openrouter")
 
-
 def _validate_openrouter_environment(settings_instance) -> None:
     """
     Validate OpenRouter environment settings.
@@ -880,7 +874,6 @@ def _validate_openrouter_environment(settings_instance) -> None:
     # Use the settings_instance directly
     if not hasattr(settings_instance, "OPENROUTER_API_KEY") or not settings_instance.OPENROUTER_API_KEY:
         raise ValueError("OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.")
-
 
 def _validate_portkey_environment(settings_instance) -> None:
     """
@@ -896,10 +889,8 @@ def _validate_portkey_environment(settings_instance) -> None:
     if not hasattr(settings_instance, "PORTKEY_API_KEY") or not settings_instance.PORTKEY_API_KEY:
         raise ValueError("Portkey API key not configured. Please set PORTKEY_API_KEY in your environment.")
 
-
 # Global provider registry - this will be managed through the unified registry now
 _llm_providers: Dict[str, LLMProvider] = {}
-
 
 def register_llm_provider(provider: LLMProvider) -> LLMProvider:
     """
@@ -921,7 +912,6 @@ def register_llm_provider(provider: LLMProvider) -> LLMProvider:
 
     logger.info(f"Registered LLM provider: {provider.provider_name}")
     return provider
-
 
 def get_llm_provider(provider_name: str = None) -> LLMProvider:
     """
@@ -1051,7 +1041,6 @@ def get_llm_provider(provider_name: str = None) -> LLMProvider:
 
     # Raise error if provider not found
     raise LLMProviderError(f"LLM provider '{provider_name}' not registered and no factory available")
-
 
 def initialize_llm_providers() -> None:
     """

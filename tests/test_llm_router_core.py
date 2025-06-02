@@ -16,7 +16,6 @@ from core.connection_manager import ConnectionManager, CircuitBreakerState
 from core.health_monitor import HealthMonitor, HealthStatus
 from core.llm_router_enhanced import UnifiedLLMRouter
 
-
 class TestCacheManager:
     """Test cases for CacheManager"""
 
@@ -90,7 +89,6 @@ class TestCacheManager:
         finally:
             await cache.stop()
 
-
 class TestConnectionManager:
     """Test cases for ConnectionManager"""
 
@@ -150,7 +148,6 @@ class TestConnectionManager:
 
         assert breaker.is_open
         assert breaker.half_open_retry_time is not None
-
 
 class TestHealthMonitor:
     """Test cases for HealthMonitor"""
@@ -216,7 +213,6 @@ class TestHealthMonitor:
 
         finally:
             await monitor.stop()
-
 
 class TestUnifiedLLMRouter:
     """Test cases for UnifiedLLMRouter"""
@@ -316,7 +312,6 @@ class TestUnifiedLLMRouter:
             mock_cache.get.assert_called_once()
             mock_cache.set.assert_called_once()
 
-
 class TestIntegration:
     """Integration tests for the complete system"""
 
@@ -364,7 +359,6 @@ class TestIntegration:
             mock_cache_mgr.return_value.stop.assert_called_once()
             mock_conn_mgr.return_value.close.assert_called_once()
             mock_health.return_value.stop.assert_called_once()
-
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

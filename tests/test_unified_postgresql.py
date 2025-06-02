@@ -22,7 +22,6 @@ from shared.database.unified_postgresql_enhanced import (
 )
 from shared.database.unified_db_v2 import get_unified_database, close_unified_database
 
-
 class TestConnectionManager:
     """Test the connection manager singleton and pooling."""
 
@@ -79,7 +78,6 @@ class TestConnectionManager:
         # Check pool didn't exceed limits
         stats = await manager.get_pool_stats()
         assert stats["total_connections"] <= 20  # Max pool size
-
 
 class TestUnifiedPostgreSQL:
     """Test the unified PostgreSQL client."""
@@ -307,7 +305,6 @@ class TestUnifiedPostgreSQL:
         assert len(snapshots) > 0
         assert any(s["id"] == snapshot_id for s in snapshots)
 
-
 class TestUnifiedDatabase:
     """Test the unified database interface."""
 
@@ -409,7 +406,6 @@ class TestUnifiedDatabase:
         assert metrics["operations"]["total"] >= 15  # 3 ops per iteration * 5
         assert metrics["cache"]["hit_rate"] >= 0
 
-
 class TestBackgroundTasks:
     """Test background cleanup tasks."""
 
@@ -453,14 +449,12 @@ class TestBackgroundTasks:
         assert await client.session_get(expired_id) is None
         assert await client.session_get(valid_id) is not None
 
-
 @pytest.fixture(scope="session")
 def event_loop():
     """Create an instance of the default event loop for the test session."""
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
-
 
 @pytest.fixture(autouse=True)
 async def cleanup():
@@ -471,7 +465,6 @@ async def cleanup():
     await close_unified_database()
     await close_unified_postgresql()
     await close_connection_manager()
-
 
 if __name__ == "__main__":
     # Run tests

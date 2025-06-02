@@ -20,7 +20,6 @@ from ..utils.performance_monitor import get_performance_monitor
 
 logger = logging.getLogger(__name__)
 
-
 class PerformanceMemoryManager(IMemoryManager):
     """Memory manager optimized for performance.
 

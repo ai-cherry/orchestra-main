@@ -21,7 +21,6 @@ import sys
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-
 @dataclass
 class ServerMetrics:
     """Metrics for a single server"""
@@ -41,7 +40,6 @@ class ServerMetrics:
     health_details: Dict[str, Any] = field(default_factory=dict)
     response_times: deque = field(default_factory=lambda: deque(maxlen=60))
     error_history: deque = field(default_factory=lambda: deque(maxlen=100))
-
 
 class MCPHealthDashboard:
     """Real-time health monitoring dashboard for MCP servers"""
@@ -392,7 +390,6 @@ class MCPHealthDashboard:
 
         return results
 
-
 def main():
     """Main entry point"""
     parser = argparse.ArgumentParser(description="MCP Health Monitoring Dashboard")
@@ -420,7 +417,6 @@ def main():
             curses.wrapper(lambda stdscr: asyncio.run(dashboard.run_monitoring_loop(stdscr)))
         except KeyboardInterrupt:
             print("\nDashboard stopped.")
-
 
 if __name__ == "__main__":
     main()

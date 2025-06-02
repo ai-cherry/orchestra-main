@@ -16,7 +16,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class PostgreSQLSessionStore:
     """
     PostgreSQL-based session store with automatic expiration and high performance.
@@ -476,10 +475,8 @@ class PostgreSQLSessionStore:
             except Exception as e:
                 logger.error(f"Error in session cleanup: {e}")
 
-
 # Convenience functions for session management
 _session_store: Optional[PostgreSQLSessionStore] = None
-
 
 async def get_session_store(dsn: str, **kwargs) -> PostgreSQLSessionStore:
     """Get the global session store instance."""
@@ -489,24 +486,20 @@ async def get_session_store(dsn: str, **kwargs) -> PostgreSQLSessionStore:
         await _session_store.initialize()
     return _session_store
 
-
 async def create_session(**kwargs) -> str:
     """Create a new session using the global store."""
     store = await get_session_store(kwargs.pop("dsn", ""))
     return await store.create_session(**kwargs)
-
 
 async def get_session(session_id: str, dsn: str = "") -> Optional[Dict[str, Any]]:
     """Get session data using the global store."""
     store = await get_session_store(dsn)
     return await store.get_session(session_id)
 
-
 async def update_session(session_id: str, data: Dict[str, Any], dsn: str = "") -> bool:
     """Update session data using the global store."""
     store = await get_session_store(dsn)
     return await store.update_session(session_id, data)
-
 
 async def delete_session(session_id: str, dsn: str = "") -> bool:
     """Delete a session using the global store."""

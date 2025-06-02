@@ -29,7 +29,6 @@ from shared.database.unified_db_v2 import get_unified_database
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
 class UnifiedPostgreSQLMigration:
     """Handles migration to unified PostgreSQL architecture."""
 
@@ -378,7 +377,6 @@ class UnifiedPostgreSQLMigration:
         logger.info("   - shared/sessions/postgresql_sessions.py")
         logger.info("   - shared/database/unified_db.py")
 
-
 async def main():
     """Run the migration."""
     migration = UnifiedPostgreSQLMigration()
@@ -406,7 +404,6 @@ async def main():
         await close_unified_database()
         await close_unified_postgresql()
         await close_connection_manager()
-
 
 if __name__ == "__main__":
     asyncio.run(main())

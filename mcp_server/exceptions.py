@@ -8,7 +8,6 @@ allowing for more specific error handling and better error messages.
 
 from typing import Any, Dict, Optional
 
-
 class MCPError(Exception):
     """Base exception for all MCP server errors."""
 
@@ -44,7 +43,6 @@ class MCPError(Exception):
             }
         }
 
-
 # Memory Store Exceptions
 class MemoryError(MCPError):
     """Base exception for memory store errors."""
@@ -56,7 +54,6 @@ class MemoryError(MCPError):
         details: Optional[Dict[str, Any]] = None,
     ):
         super().__init__(message, code, details)
-
 
 class MemoryNotFoundError(MemoryError):
     """Exception raised when a memory item is not found."""
@@ -72,7 +69,6 @@ class MemoryNotFoundError(MemoryError):
             "MEMORY_NOT_FOUND",
             details,
         )
-
 
 class MemoryWriteError(MemoryError):
     """Exception raised when a memory item cannot be written."""
@@ -98,7 +94,6 @@ class MemoryWriteError(MemoryError):
             details,
         )
 
-
 class MemoryDeleteError(MemoryError):
     """Exception raised when a memory item cannot be deleted."""
 
@@ -122,7 +117,6 @@ class MemoryDeleteError(MemoryError):
             "MEMORY_DELETE_ERROR",
             details,
         )
-
 
 class MemorySyncError(MemoryError):
     """Exception raised when a memory item cannot be synced."""
@@ -150,7 +144,6 @@ class MemorySyncError(MemoryError):
             details,
         )
 
-
 # Tool Manager Exceptions
 class ToolError(MCPError):
     """Base exception for tool manager errors."""
@@ -163,13 +156,11 @@ class ToolError(MCPError):
     ):
         super().__init__(message, code, details)
 
-
 class ToolNotEnabledError(ToolError):
     """Exception raised when a tool is not enabled."""
 
     def __init__(self, tool: str):
         super().__init__(f"Tool not enabled: {tool}", "TOOL_NOT_ENABLED", {"tool": tool})
-
 
 class ToolExecutionError(ToolError):
     """Exception raised when a tool execution fails."""
@@ -188,13 +179,11 @@ class ToolExecutionError(ToolError):
             details,
         )
 
-
 class ToolNotImplementedError(ToolError):
     """Exception raised when a tool is not implemented."""
 
     def __init__(self, tool: str):
         super().__init__(f"Tool not implemented: {tool}", "TOOL_NOT_IMPLEMENTED", {"tool": tool})
-
 
 # Workflow Manager Exceptions
 class WorkflowError(MCPError):
@@ -208,7 +197,6 @@ class WorkflowError(MCPError):
     ):
         super().__init__(message, code, details)
 
-
 class WorkflowNotFoundError(WorkflowError):
     """Exception raised when a workflow is not found."""
 
@@ -218,7 +206,6 @@ class WorkflowNotFoundError(WorkflowError):
             "WORKFLOW_NOT_FOUND",
             {"workflow_id": workflow_id},
         )
-
 
 class WorkflowExecutionError(WorkflowError):
     """Exception raised when a workflow execution fails."""
@@ -238,7 +225,6 @@ class WorkflowExecutionError(WorkflowError):
 
         super().__init__(message, "WORKFLOW_EXECUTION_ERROR", details)
 
-
 class WorkflowStepTypeError(WorkflowError):
     """Exception raised when a workflow step has an invalid type."""
 
@@ -253,7 +239,6 @@ class WorkflowStepTypeError(WorkflowError):
             },
         )
 
-
 class WorkflowNoStepsError(WorkflowError):
     """Exception raised when a workflow has no steps."""
 
@@ -264,7 +249,6 @@ class WorkflowNoStepsError(WorkflowError):
             {"workflow_id": workflow_id},
         )
 
-
 class WorkflowNoToolsError(WorkflowError):
     """Exception raised when no tools are available for a workflow."""
 
@@ -274,7 +258,6 @@ class WorkflowNoToolsError(WorkflowError):
             "WORKFLOW_NO_TOOLS",
             {"workflow_id": workflow_id},
         )
-
 
 # Configuration Exceptions
 class ConfigError(MCPError):
@@ -288,7 +271,6 @@ class ConfigError(MCPError):
     ):
         super().__init__(message, code, details)
 
-
 class ConfigFileError(ConfigError):
     """Exception raised when a configuration file cannot be loaded."""
 
@@ -301,7 +283,6 @@ class ConfigFileError(ConfigError):
 
         super().__init__(f"Failed to load configuration file: {path}", "CONFIG_FILE_ERROR", details)
 
-
 class ConfigValidationError(ConfigError):
     """Exception raised when a configuration is invalid."""
 
@@ -311,7 +292,6 @@ class ConfigValidationError(ConfigError):
             "CONFIG_VALIDATION_ERROR",
             {"errors": errors},
         )
-
 
 # Server Exceptions
 class ServerError(MCPError):
@@ -325,7 +305,6 @@ class ServerError(MCPError):
     ):
         super().__init__(message, code, details)
 
-
 class ServerStartupError(ServerError):
     """Exception raised when the server fails to start."""
 
@@ -336,7 +315,6 @@ class ServerStartupError(ServerError):
 
         super().__init__("Failed to start server", "SERVER_STARTUP_ERROR", details)
 
-
 class ServerShutdownError(ServerError):
     """Exception raised when the server fails to shut down."""
 
@@ -346,7 +324,6 @@ class ServerShutdownError(ServerError):
             details["reason"] = reason
 
         super().__init__("Failed to shut down server", "SERVER_SHUTDOWN_ERROR", details)
-
 
 # Authentication Exceptions
 class AuthError(MCPError):
@@ -360,7 +337,6 @@ class AuthError(MCPError):
     ):
         super().__init__(message, code, details)
 
-
 class AuthTokenError(AuthError):
     """Exception raised when an authentication token is invalid."""
 
@@ -370,7 +346,6 @@ class AuthTokenError(AuthError):
             details["reason"] = reason
 
         super().__init__("Invalid authentication token", "AUTH_TOKEN_ERROR", details)
-
 
 class AuthPermissionError(AuthError):
     """Exception raised when a user does not have permission to access a resource."""

@@ -11,7 +11,6 @@ import redis
 import weaviate
 from pymongo import MongoClient
 
-
 class TestPaperspaceIntegration(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -43,7 +42,6 @@ class TestPaperspaceIntegration(unittest.TestCase):
         """Test MongoDB service connectivity."""
         client = MongoClient(os.getenv("MONGO_URI", "mongodb://localhost:27017"))
         self.assertEqual(client.admin.command("ping").get("ok"), 1.0)
-
 
 if __name__ == "__main__":
     unittest.main()

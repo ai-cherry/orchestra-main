@@ -13,7 +13,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from agent.app.services.natural_language_processor import IntentClassifier, ResponseGenerator, IntentCategory
 
-
 # Simple Agent Demo (without full infrastructure)
 class SimpleAgent:
     def __init__(self, name="Data Monitor & Processor"):
@@ -51,7 +50,6 @@ class SimpleAgent:
         self.status = "idle"
         return result
 
-
 async def test_natural_language():
     """Test the natural language interface"""
     print("\n🧪 Testing Natural Language Interface")
@@ -85,7 +83,6 @@ async def test_natural_language():
         response = await response_gen.generate(intent, mock_result)
         print(f"   Response: {response}")
 
-
 async def test_simple_agent():
     """Test the simple agent"""
     print("\n\n🤖 Testing Simple Agent")
@@ -111,7 +108,6 @@ async def test_simple_agent():
     print(f"\n📜 Task History ({len(agent.task_history)} tasks):")
     for task in agent.task_history:
         print(f"   - {task['task']}: {task['result']['status']} at {task['timestamp'].strftime('%H:%M:%S')}")
-
 
 async def test_nl_to_agent():
     """Test natural language commands controlling the agent"""
@@ -150,7 +146,6 @@ async def test_nl_to_agent():
         else:
             print(f"🤖 Agent: I understood your request about {intent.category.value}")
 
-
 async def main():
     """Run all tests"""
     print("=" * 60)
@@ -171,7 +166,6 @@ async def main():
     print("1. Add your ELEVENLABS_API_KEY to enable voice synthesis")
     print("2. Connect real data sources for monitoring")
     print("3. Implement specific workflows for your use case")
-
 
 if __name__ == "__main__":
     asyncio.run(main())

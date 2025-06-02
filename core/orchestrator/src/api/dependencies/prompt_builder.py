@@ -17,7 +17,6 @@ from packages.shared.src.prompt_builder import PromptBuilder, PromptFormat
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 @lru_cache()
 def get_prompt_builder() -> PromptBuilder:
     """
@@ -30,7 +29,6 @@ def get_prompt_builder() -> PromptBuilder:
     """
     logger.debug("Creating PromptBuilder instance")
     return PromptBuilder()
-
 
 def build_prompt_for_persona(
     persona: PersonaConfig,

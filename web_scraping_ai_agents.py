@@ -30,7 +30,6 @@ from sentence_transformers import SentenceTransformer
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 class AgentType(Enum):
     """Types of web scraping agents."""
 
@@ -41,7 +40,6 @@ class AgentType(Enum):
     MONITORING_AGENT = "monitoring_agent"
     QUALITY_ASSURANCE = "quality_assurance"
 
-
 class ScrapingStrategy(Enum):
     """Web scraping strategies."""
 
@@ -50,7 +48,6 @@ class ScrapingStrategy(Enum):
     STEALTH_MODE = "stealth_mode"  # Zenrows/Apify
     BULK_EXTRACTION = "bulk_extraction"  # PhantomBuster
 
-
 class TaskPriority(Enum):
     """Task priority levels."""
 
@@ -58,7 +55,6 @@ class TaskPriority(Enum):
     HIGH = 2
     MEDIUM = 3
     LOW = 4
-
 
 @dataclass
 class ScrapingTask:
@@ -77,7 +73,6 @@ class ScrapingTask:
     max_retries: int = 3
     metadata: Dict[str, Any] = field(default_factory=dict)
 
-
 @dataclass
 class ScrapingResult:
     """Represents the result of a scraping operation."""
@@ -95,7 +90,6 @@ class ScrapingResult:
     quality_score: float = 0.0
     extracted_links: List[str] = field(default_factory=list)
     images: List[str] = field(default_factory=list)
-
 
 class WebScrapingAgent(ABC):
     """Abstract base class for web scraping agents."""
@@ -162,7 +156,6 @@ class WebScrapingAgent(ABC):
                 score += 0.1
 
         return min(score, 1.0)
-
 
 class SearchSpecialistAgent(WebScrapingAgent):
     """Specialized agent for web search operations."""
@@ -311,7 +304,6 @@ class SearchSpecialistAgent(WebScrapingAgent):
         """Extract Bing search results."""
         # Similar implementation for Bing
         return []
-
 
 class ScraperSpecialistAgent(WebScrapingAgent):
     """Specialized agent for web scraping operations."""
@@ -572,7 +564,6 @@ class ScraperSpecialistAgent(WebScrapingAgent):
             "images": images[:20],  # Limit to first 20 images
         }
 
-
 class ContentAnalyzerAgent(WebScrapingAgent):
     """Specialized agent for content analysis and processing."""
 
@@ -726,7 +717,6 @@ class ContentAnalyzerAgent(WebScrapingAgent):
             "paragraph_count": len(content.split("\n\n")),
             "reading_time_minutes": len(content.split()) / 200,  # Average reading speed
         }
-
 
 class WebScrapingOrchestrator:
     """Main orchestrator for the web scraping AI agent team."""
@@ -918,7 +908,6 @@ class WebScrapingOrchestrator:
                 agent.is_busy = False
                 await agent.update_status("error")
 
-
 # Integration with Orchestra AI MCP Server
 class WebScrapingMCPServer:
     """MCP server for web scraping agent team integration."""
@@ -961,7 +950,6 @@ class WebScrapingMCPServer:
 
         task_id = await self.orchestrator.submit_task(task)
         return f"Scraping task {task_id} submitted for {url}"
-
 
 # Example usage and configuration
 async def main():
@@ -1025,7 +1013,6 @@ async def main():
         print(f"Scrape result quality: {scrape_result.quality_score}")
 
     await orchestrator.stop()
-
 
 if __name__ == "__main__":
     asyncio.run(main())

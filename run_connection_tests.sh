@@ -70,14 +70,14 @@ chmod +x automate_connection_testing.py
 PYTHON_VERSION=$(python3 --version 2>&1 | cut -d " " -f 2)
 echo "Using Python $PYTHON_VERSION"
 
-# Check GCP auth environment
-if [ -z "$  echo "⚠️ Warning:   echo "Firestore tests may fail without proper GCP authentication"
+# Check Vultr auth environment
+if [ -z "$  echo "⚠️ Warning:   echo "Firestore tests may fail without proper Vultr authentication"
   echo ""
 fi
 
-if [ -z "$GCP_SA_KEY_PATH" ] && [ -z "$GCP_SA_KEY_JSON" ]; then
-  echo "⚠️ Warning: Neither GCP_SA_KEY_PATH nor GCP_SA_KEY_JSON is set"
-  echo "Firestore tests may fail without proper GCP authentication"
+if [ -z "$Vultr_SA_KEY_PATH" ] && [ -z "$Vultr_SA_KEY_JSON" ]; then
+  echo "⚠️ Warning: Neither Vultr_SA_KEY_PATH nor Vultr_SA_KEY_JSON is set"
+  echo "Firestore tests may fail without proper Vultr authentication"
   echo ""
 fi
 

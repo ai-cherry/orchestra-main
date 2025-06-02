@@ -91,7 +91,6 @@ app.add_middleware(
 health_cache: Dict[str, Dict[str, Any]] = {}
 HEALTH_CHECK_INTERVAL = 30  # seconds
 
-
 class ServerHealth(BaseModel):
     """Health status of an MCP server"""
 
@@ -102,7 +101,6 @@ class ServerHealth(BaseModel):
     response_time_ms: Optional[float] = None
     error: Optional[str] = None
 
-
 class GatewayStatus(BaseModel):
     """Overall gateway status"""
 
@@ -112,14 +110,12 @@ class GatewayStatus(BaseModel):
     healthy_servers: int
     timestamp: datetime
 
-
 class MCPRequest(BaseModel):
     """Generic MCP request model"""
 
     server: str = Field(..., description="Target MCP server")
     action: str = Field(..., description="Action to perform")
     params: Dict[str, Any] = Field(default={}, description="Parameters for the action")
-
 
 async def check_server_health(server_id: str, server_info: Dict[str, Any]) -> ServerHealth:
     """Check health of a single MCP server"""
@@ -160,7 +156,6 @@ async def check_server_health(server_id: str, server_info: Dict[str, Any]) -> Se
             error=str(e),
         )
 
-
 async def periodic_health_check():
     """Periodically check health of all MCP servers"""
     while True:
@@ -178,7 +173,6 @@ async def periodic_health_check():
 
         await asyncio.sleep(HEALTH_CHECK_INTERVAL)
 
-
 @app.on_event("startup")
 async def startup_event():
     """Initialize gateway on startup"""
@@ -194,7 +188,6 @@ async def startup_event():
 
     logger.info("MCP Gateway started successfully")
 
-
 @app.middleware("http")
 async def track_metrics(request: Request, call_next):
     """Track request metrics"""
@@ -209,7 +202,6 @@ async def track_metrics(request: Request, call_next):
     request_duration.labels(method=request.method, endpoint=request.url.path).observe(duration)
 
     return response
-
 
 @app.get("/")
 async def root():
@@ -229,7 +221,6 @@ async def root():
         },
     }
 
-
 @app.get("/health")
 async def health_check():
     """Overall gateway health check"""
@@ -245,7 +236,6 @@ async def health_check():
         "total_servers": total_count,
         "timestamp": datetime.utcnow().isoformat(),
     }
-
 
 @app.get("/status", response_model=GatewayStatus)
 async def detailed_status():
@@ -271,12 +261,10 @@ async def detailed_status():
         timestamp=datetime.utcnow(),
     )
 
-
 @app.get("/metrics")
 async def metrics():
     """Prometheus metrics endpoint"""
     return Response(content=generate_latest(), media_type="text/plain")
-
 
 @app.post("/mcp/execute")
 async def execute_mcp_action(request: MCPRequest):
@@ -326,7 +314,6 @@ async def execute_mcp_action(request: MCPRequest):
             logger.error(f"Error executing action on {request.server}: {e}")
             raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.get("/mcp/tools")
 async def list_all_tools():
     """List all available MCP tools across all servers"""
@@ -349,7 +336,6 @@ async def list_all_tools():
             logger.warning(f"Failed to get tools from {server_id}: {e}")
 
     return tools
-
 
 @app.api_route("/mcp/{server}/proxy/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
 async def proxy_request(server: str, path: str, request: Request):
@@ -409,7 +395,6 @@ async def proxy_request(server: str, path: str, request: Request):
         detail=f"Proxy request to {server} failed after {max_retries} attempts",
     )
 
-
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     """Global exception handler"""
@@ -424,7 +409,6 @@ async def global_exception_handler(request: Request, exc: Exception):
             "timestamp": datetime.utcnow().isoformat(),
         },
     )
-
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info", access_log=True)

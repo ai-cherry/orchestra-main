@@ -28,7 +28,6 @@ R = TypeVar("R")
 # Track last reload time for configurations
 _last_reload_time = time.time()
 
-
 def refreshable_cache(ttl_seconds: int = 300):
     """
     A cache decorator that allows refreshing after a specified TTL or on demand.
@@ -67,7 +66,6 @@ def refreshable_cache(ttl_seconds: int = 300):
         return wrapper
 
     return decorator
-
 
 @refreshable_cache(ttl_seconds=300)  # Refresh every 5 minutes or on demand
 def load_persona_configs(force_refresh: bool = False) -> Dict[str, PersonaConfig]:
@@ -175,7 +173,6 @@ def load_persona_configs(force_refresh: bool = False) -> Dict[str, PersonaConfig
     logger.info(f"Successfully loaded {len(persona_configs)} persona configurations.")
     return persona_configs
 
-
 def create_default_persona_configs() -> Dict[str, PersonaConfig]:
     """
     Create a default persona configuration when personas.yaml is missing or invalid.
@@ -222,7 +219,6 @@ def create_default_persona_configs() -> Dict[str, PersonaConfig]:
     logger.info("Created default persona configurations with 3 personas.")
     return persona_configs
 
-
 # Function to force reload personas - can be called from API to refresh without restart
 def force_reload_personas() -> Dict[str, PersonaConfig]:
     """
@@ -237,7 +233,6 @@ def force_reload_personas() -> Dict[str, PersonaConfig]:
     logger.info("Force reloading persona configurations")
     return load_persona_configs(force_refresh=True)
 
-
 def get_settings() -> Settings:
     """
     Get application settings.
@@ -248,7 +243,6 @@ def get_settings() -> Settings:
         Settings: Application settings instance.
     """
     return Settings()
-
 
 def initialize_portkey():
     """
@@ -278,7 +272,6 @@ def initialize_portkey():
     except Exception as e:
         logger.error(f"Failed to initialize Portkey: {str(e)}")
         return False
-
 
 # Initialize Portkey when module is loaded
 initialize_portkey()

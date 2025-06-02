@@ -17,7 +17,6 @@ from core.orchestrator.src.llm.litellm_client import LLMMessage
 setup_logging(level="INFO", json_format=False)
 logger = get_logger(__name__)
 
-
 async def demo_basic_monitoring():
     """Demonstrate basic monitoring functionality"""
     logger.info("Starting basic monitoring demo...")
@@ -80,7 +79,6 @@ async def demo_basic_monitoring():
     logger.info(f"Calls by model: {summary['calls_by_model']}")
     logger.info(f"Cost by model: {summary['cost_by_model']}")
 
-
 async def demo_error_handling():
     """Demonstrate error monitoring"""
     logger.info("\nStarting error handling demo...")
@@ -103,7 +101,6 @@ async def demo_error_handling():
     # Check error metrics
     summary = client.get_monitoring_summary()
     logger.info(f"\nError summary: {summary['errors_by_type']}")
-
 
 async def demo_cost_tracking():
     """Demonstrate cost tracking across sessions"""
@@ -148,7 +145,6 @@ async def demo_cost_tracking():
     for session_id, cost in monitor.session_costs.items():
         logger.info(f"  {session_id}: ${cost:.4f}")
 
-
 async def demo_export_data():
     """Demonstrate data export functionality"""
     logger.info("\nStarting data export demo...")
@@ -177,7 +173,6 @@ async def demo_export_data():
 
     csv_export = client.export_monitoring_data(format="csv")
     logger.info(f"\nCSV export preview:\n{csv_export.split(chr(10))[:3]}")
-
 
 async def demo_performance_monitoring():
     """Demonstrate performance monitoring"""
@@ -214,7 +209,6 @@ async def demo_performance_monitoring():
             avg_latency = sum(m.latency_ms for m in model_metrics) / len(model_metrics)
             logger.info(f"{model}: avg latency = {avg_latency:.0f}ms")
 
-
 async def main():
     """Run all demos"""
     logger.info("Claude API Monitoring System Demo\n" + "=" * 40)
@@ -232,7 +226,6 @@ async def main():
     await demo_performance_monitoring()
 
     logger.info("\nDemo completed!")
-
 
 if __name__ == "__main__":
     asyncio.run(main())

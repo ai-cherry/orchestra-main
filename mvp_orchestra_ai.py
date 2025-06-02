@@ -24,7 +24,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("orchestra_ai_mvp")
 
-
 class OrchestraAIMVP:
     """
     Complete Orchestra AI MVP integration.
@@ -259,7 +258,6 @@ class OrchestraAIMVP:
 
         logger.info("✓ Orchestra AI MVP connections closed")
 
-
 # CLI Interface
 async def main():
     """Command-line interface for Orchestra AI MVP."""
@@ -385,7 +383,6 @@ async def main():
 
     finally:
         await mvp.close()
-
 
 if __name__ == "__main__":
     asyncio.run(main())

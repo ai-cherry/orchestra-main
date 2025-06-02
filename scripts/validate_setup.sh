@@ -1,17 +1,17 @@
 #!/bin/bash
-# Quick validation script for the GCP-free setup
+# Quick validation script for the Vultr-free setup
 
 echo "🔍 Orchestra AI - Setup Validation"
 echo "=================================="
 
-# Check for GCP references
-echo -e "\n📋 Checking for remaining GCP references..."
-GCP_COUNT=$(grep -r "google-cloud\|gcp\|firestore" --include="*.py" --include="*.txt" . 2>/dev/null | grep -v "venv/" | grep -v "__pycache__" | wc -l)
+# Check for Vultr references
+echo -e "\n📋 Checking for remaining Vultr references..."
+Vultr_COUNT=$(grep -r "google-cloud\|Vultr\|firestore" --include="*.py" --include="*.txt" . 2>/dev/null | grep -v "venv/" | grep -v "__pycache__" | wc -l)
 
-if [ "$GCP_COUNT" -eq 0 ]; then
-    echo "✅ No GCP references found in code"
+if [ "$Vultr_COUNT" -eq 0 ]; then
+    echo "✅ No Vultr references found in code"
 else
-    echo "⚠️  Found $GCP_COUNT GCP references remaining"
+    echo "⚠️  Found $Vultr_COUNT Vultr references remaining"
 fi
 
 # Check requirements
@@ -82,7 +82,7 @@ fi
 # Summary
 echo -e "\n📊 SUMMARY"
 echo "=========="
-echo "1. GCP cleanup: ${GCP_COUNT} references remaining"
+echo "1. Vultr cleanup: ${Vultr_COUNT} references remaining"
 echo "2. Environment: Check .env configuration"
 echo "3. Dependencies: Install with 'pip install -r requirements/base.txt'"
 echo "4. Test setup: Run 'python scripts/test_new_setup.py'"

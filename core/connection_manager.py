@@ -18,7 +18,6 @@ from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_excep
 
 logger = logging.getLogger(__name__)
 
-
 @dataclass
 class CircuitBreakerState:
     """Circuit breaker state for a provider"""
@@ -35,7 +34,6 @@ class CircuitBreakerState:
     half_open_requests: int = 0
     half_open_successes: int = 0
     half_open_max: int = 3
-
 
 class ConnectionManager:
     """
@@ -253,10 +251,8 @@ class ConnectionManager:
 
         return status
 
-
 # Global connection manager instance
 _connection_manager: Optional[ConnectionManager] = None
-
 
 async def get_connection_manager(
     pool_size: Optional[int] = None,

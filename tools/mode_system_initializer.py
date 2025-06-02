@@ -40,13 +40,11 @@ MODE_MANAGER_PATH = CORE_DIR / "mode_manager.py"
 MODE_SWITCHER_PATH = TOOLS_DIR / "mode_switcher.py"
 DOCS_PATH = DOCS_DIR / "ENHANCED_MODE_SYSTEM.md"
 
-
 def print_header():
     """Print the tool header."""
     print(f"\n{Fore.CYAN}============================================={Style.RESET_ALL}")
     print(f"{Fore.CYAN}{Style.BRIGHT}  AI Orchestra Mode System Initializer{Style.RESET_ALL}")
     print(f"{Fore.CYAN}============================================={Style.RESET_ALL}\n")
-
 
 def check_file_exists(path: Path) -> bool:
     """Check if a file exists and print its status."""
@@ -54,7 +52,6 @@ def check_file_exists(path: Path) -> bool:
     status = f"{Fore.GREEN}✓ Found" if exists else f"{Fore.RED}✗ Missing"
     print(f"{status}{Style.RESET_ALL} {path.relative_to(PROJECT_ROOT)}")
     return exists
-
 
 def create_directory(path: Path) -> bool:
     """Create a directory if it doesn't exist."""
@@ -70,7 +67,6 @@ def create_directory(path: Path) -> bool:
         print(f"{Fore.GREEN}✓ Directory exists{Style.RESET_ALL} {path.relative_to(PROJECT_ROOT)}")
         return True
 
-
 def validate_project_structure() -> bool:
     """Validate and set up the project directory structure."""
     print(f"\n{Fore.GREEN}{Style.BRIGHT}Validating project structure:{Style.RESET_ALL}")
@@ -84,7 +80,6 @@ def validate_project_structure() -> bool:
         return False
 
     return True
-
 
 def check_required_files() -> bool:
     """Check if all required files exist."""
@@ -100,7 +95,6 @@ def check_required_files() -> bool:
     all_exist = all(check_file_exists(file) for file in required_files)
 
     return all_exist
-
 
 def initialize_mode_system() -> bool:
     """Initialize the enhanced mode system."""
@@ -143,7 +137,6 @@ def initialize_mode_system() -> bool:
     except Exception as e:
         print(f"{Fore.RED}Error initializing mode system: {str(e)}{Style.RESET_ALL}")
         return False
-
 
 def verify_model_assignments():
     """Verify the AI model assignments for each mode."""
@@ -195,7 +188,6 @@ def verify_model_assignments():
     except Exception as e:
         print(f"{Fore.RED}Error verifying model assignments: {str(e)}{Style.RESET_ALL}")
 
-
 def verify_enhanced_access_permissions():
     """Verify the enhanced access permissions for each mode."""
     print(f"\n{Fore.GREEN}{Style.BRIGHT}Verifying enhanced access permissions:{Style.RESET_ALL}")
@@ -245,7 +237,6 @@ def verify_enhanced_access_permissions():
     except Exception as e:
         print(f"{Fore.RED}Error verifying access permissions: {str(e)}{Style.RESET_ALL}")
 
-
 def print_workflow_summary():
     """Print a summary of the available workflows."""
     print(f"\n{Fore.GREEN}{Style.BRIGHT}Available workflows:{Style.RESET_ALL}")
@@ -277,7 +268,6 @@ def print_workflow_summary():
     except Exception as e:
         print(f"{Fore.RED}Error showing workflows: {str(e)}{Style.RESET_ALL}")
 
-
 def print_usage_instructions():
     """Print instructions for using the enhanced mode system."""
     print(f"\n{Fore.GREEN}{Style.BRIGHT}Usage Instructions:{Style.RESET_ALL}")
@@ -297,7 +287,6 @@ def print_usage_instructions():
     print(f"   {Fore.CYAN}python tools/mode_switcher.py --list{Style.RESET_ALL}")
 
     print(f"\nFor more details, see the documentation at {Fore.CYAN}docs/ENHANCED_MODE_SYSTEM.md{Style.RESET_ALL}")
-
 
 def main():
     """Main function for the mode system initializer."""
@@ -328,7 +317,6 @@ def main():
             verify_enhanced_access_permissions()
             print_workflow_summary()
             print_usage_instructions()
-
 
 if __name__ == "__main__":
     main()

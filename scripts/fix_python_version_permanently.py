@@ -119,7 +119,6 @@ FILES_TO_UPDATE = [
     ),
 ]
 
-
 def update_file(filepath: str, replacements: List[Tuple[str, str]]) -> bool:
     """Update a file with the given replacements."""
     if not os.path.exists(filepath):
@@ -145,7 +144,6 @@ def update_file(filepath: str, replacements: List[Tuple[str, str]]) -> bool:
     except Exception as e:
         logger.error(f"❌ Error updating {filepath}: {e}")
         return False
-
 
 def create_version_lock_file():
     """Create a version lock file to prevent future confusion."""
@@ -178,7 +176,6 @@ NPM_VERSION=9
     with open(".python-version-lock", "w") as f:
         f.write(lock_content)
     logger.info("✅ Created .python-version-lock file")
-
 
 def create_environment_validator():
     """Create a script to validate the environment."""
@@ -258,7 +255,6 @@ if __name__ == "__main__":
     subprocess.run(["chmod", "+x", "scripts/validate_environment.py"], check=True)
     logger.info("✅ Created scripts/validate_environment.py")
 
-
 def main():
     """Fix Python version issues across the codebase."""
     logger.info("🔧 Fixing Python Version Issues Permanently")
@@ -286,7 +282,6 @@ def main():
     logger.info("1. Run: python scripts/validate_environment.py")
     logger.info("2. Commit these changes: git add -A && git commit -m 'Fix: Standardize on Python 3.10'")
     logger.info("3. Always check environment before starting: python scripts/validate_environment.py")
-
 
 if __name__ == "__main__":
     main()

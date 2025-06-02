@@ -30,11 +30,11 @@ else
     echo "✅ PULUMI_ACCESS_TOKEN is set"
 fi
 
-# Check GCP authentication
-if gcloud auth list --filter=status:ACTIVE --format="value(account)" &> /dev/null; then
-    echo "✅ GCP authenticated as: $(gcloud auth list --filter=status:ACTIVE --format='value(account)')"
+# Check Vultr authentication
+if # vultr-cli auth list --filter=status:ACTIVE --format="value(account)" &> /dev/null; then
+    echo "✅ Vultr authenticated as: $(# vultr-cli auth list --filter=status:ACTIVE --format='value(account)')"
 else
-    echo "❌ Not authenticated to GCP"
+    echo "❌ Not authenticated to Vultr"
 fi
 
 echo

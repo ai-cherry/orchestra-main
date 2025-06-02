@@ -17,7 +17,6 @@ from packages.shared.src.models.base_models import PersonaConfig
 
 router = APIRouter()
 
-
 @router.get("/", response_model=list[str])
 async def get_personas() -> list[str]:
     """
@@ -28,7 +27,6 @@ async def get_personas() -> list[str]:
     """
     personas = load_persona_configs()
     return list(personas.keys())
-
 
 @router.get("/reload", response_model=dict)
 async def reload_personas() -> dict:
@@ -51,7 +49,6 @@ async def reload_personas() -> dict:
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to reload personas: {str(e)}")
 
-
 @router.get("/{name}", response_model=PersonaConfig)
 async def get_persona(name: str) -> PersonaConfig:
     """
@@ -70,7 +67,6 @@ async def get_persona(name: str) -> PersonaConfig:
     if name not in personas:
         raise HTTPException(status_code=404, detail=f"Persona '{name}' not found")
     return personas[name]
-
 
 @router.post("/", status_code=201)
 async def create_persona(persona_config: PersonaConfig, settings: Settings = Depends(get_settings)):
@@ -136,7 +132,6 @@ async def create_persona(persona_config: PersonaConfig, settings: Settings = Dep
             detail=f"Failed to create persona '{persona_config.name}': {str(e)}",
         )
 
-
 @router.post("/{name}/update", status_code=200)
 async def update_persona(name: str, persona_config: PersonaConfig, settings: Settings = Depends(get_settings)):
     """
@@ -189,7 +184,6 @@ async def update_persona(name: str, persona_config: PersonaConfig, settings: Set
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to update persona '{name}': {str(e)}")
-
 
 @router.delete("/{name}", status_code=status.HTTP_200_OK)
 async def delete_persona(name: str, settings: Settings = Depends(get_settings)):

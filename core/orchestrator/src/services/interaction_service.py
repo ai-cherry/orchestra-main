@@ -17,7 +17,6 @@ from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class InteractionService:
     """
     Service for handling user interactions.

@@ -16,7 +16,6 @@ from core.api.models.responses import ErrorResponse
 
 logger = logging.getLogger(__name__)
 
-
 class ErrorHandlerMiddleware(BaseHTTPMiddleware):
     """Middleware for handling exceptions across all endpoints."""
 
@@ -80,7 +79,6 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
                 },
             )
             return JSONResponse(status_code=500, content=error_response.dict())
-
 
 def handle_api_error(error: Exception, status_code: int = 500) -> JSONResponse:
     """

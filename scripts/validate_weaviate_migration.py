@@ -50,7 +50,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("validation")
 
-
 def parse_args():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(description="Validate Weaviate migration")
@@ -85,7 +84,6 @@ def parse_args():
         help="Enable verbose output",
     )
     return parser.parse_args()
-
 
 def connect_to_weaviate(endpoint: str, api_key: Optional[str] = None) -> weaviate.Client:
     """
@@ -130,7 +128,6 @@ def connect_to_weaviate(endpoint: str, api_key: Optional[str] = None) -> weaviat
     # If we get here, all retries failed
     raise ConnectionError(f"Failed to connect to Weaviate at {endpoint} after {max_retries} attempts")
 
-
 def connect_to_postgres(dsn: str) -> psycopg2.extensions.connection:
     """
     Connect to PostgreSQL database.
@@ -150,7 +147,6 @@ def connect_to_postgres(dsn: str) -> psycopg2.extensions.connection:
     except Exception as e:
         logger.error(f"Failed to connect to PostgreSQL: {str(e)}")
         raise
-
 
 def connect_to_dragonfly(uri: str) -> Optional[redis.Redis]:
     """
@@ -180,7 +176,6 @@ def connect_to_dragonfly(uri: str) -> Optional[redis.Redis]:
         logger.warning(f"Failed to connect to Dragonfly: {str(e)}")
         return None
 
-
 def load_embedding_model() -> SentenceTransformer:
     """
     Load the sentence transformer model for generating embeddings.
@@ -197,7 +192,6 @@ def load_embedding_model() -> SentenceTransformer:
     except Exception as e:
         logger.error(f"Failed to load embedding model: {str(e)}")
         raise
-
 
 def validate_collections(weaviate_client: weaviate.Client) -> bool:
     """
@@ -230,7 +224,6 @@ def validate_collections(weaviate_client: weaviate.Client) -> bool:
     except Exception as e:
         logger.error(f"Failed to validate collections: {str(e)}")
         return False
-
 
 def validate_collection_schema(weaviate_client: weaviate.Client, collection_name: str) -> bool:
     """
@@ -281,7 +274,6 @@ def validate_collection_schema(weaviate_client: weaviate.Client, collection_name
     except Exception as e:
         logger.error(f"Failed to validate schema for collection {collection_name}: {str(e)}")
         return False
-
 
 def test_insert_retrieve(
     weaviate_client: weaviate.Client, collection_name: str, embedding_model: SentenceTransformer
@@ -355,7 +347,6 @@ def test_insert_retrieve(
         logger.error(f"Failed to insert/retrieve for collection {collection_name}: {str(e)}")
         return False, None
 
-
 def test_vector_search(
     weaviate_client: weaviate.Client, collection_name: str, object_id: str, embedding_model: SentenceTransformer
 ) -> bool:
@@ -416,7 +407,6 @@ def test_vector_search(
         logger.error(f"Failed to test vector search for collection {collection_name}: {str(e)}")
         return False
 
-
 def test_hybrid_search(weaviate_client: weaviate.Client, collection_name: str, object_id: str) -> bool:
     """
     Test hybrid search functionality for a collection.
@@ -473,7 +463,6 @@ def test_hybrid_search(weaviate_client: weaviate.Client, collection_name: str, o
     except Exception as e:
         logger.error(f"Failed to test hybrid search for collection {collection_name}: {str(e)}")
         return False
-
 
 def test_postgres_integration(
     postgres_conn: psycopg2.extensions.connection,
@@ -572,7 +561,6 @@ def test_postgres_integration(
         except Exception as e:
             logger.warning(f"Failed to clean up PostgreSQL test table: {str(e)}")
 
-
 def test_dragonfly_integration(
     dragonfly_client: redis.Redis, weaviate_client: weaviate.Client, collection_name: str, object_id: str
 ) -> bool:
@@ -630,7 +618,6 @@ def test_dragonfly_integration(
     except Exception as e:
         logger.error(f"Failed to test Dragonfly integration: {str(e)}")
         return False
-
 
 def run_performance_tests(weaviate_client: weaviate.Client, embedding_model: SentenceTransformer) -> Dict[str, Any]:
     """
@@ -734,7 +721,6 @@ def run_performance_tests(weaviate_client: weaviate.Client, embedding_model: Sen
     except Exception as e:
         logger.error(f"Failed to run performance tests: {str(e)}")
         return results
-
 
 def main():
     """Main validation function."""
@@ -888,7 +874,6 @@ def main():
     except Exception as e:
         logger.error(f"Validation failed with error: {str(e)}")
         return 1
-
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -10,14 +10,12 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
-
 class MemoryType(Enum):
     """Types of memory available in the system."""
 
     SHORT_TERM = "short_term"  # Redis-based, fast access, limited retention
     MID_TERM = "mid_term"  # Firestore-based, structured data
     LONG_TERM = "long_term"  # Vector-based semantic search (Vertex AI)
-
 
 class MemoryItem(BaseModel):
     """Base model for items stored in memory."""
@@ -33,7 +31,6 @@ class MemoryItem(BaseModel):
     class Config:
         arbitrary_types_allowed = True
 
-
 class ConversationMemoryItem(MemoryItem):
     """Memory item for conversation history."""
 
@@ -46,7 +43,6 @@ class ConversationMemoryItem(MemoryItem):
         """Create a memory item from a conversation message."""
         return cls(conversation_id=conversation_id, role=role, content=content, content_type="text", **kwargs)
 
-
 class VectorMemoryItem(MemoryItem):
     """Memory item with vector embedding for semantic search."""
 
@@ -57,7 +53,6 @@ class VectorMemoryItem(MemoryItem):
     def from_text(cls, text: str, **kwargs):
         """Create a vector memory item from text."""
         return cls(content=text, content_type="text", **kwargs)
-
 
 class MemorySearchResult(BaseModel):
     """Result of a memory search operation."""

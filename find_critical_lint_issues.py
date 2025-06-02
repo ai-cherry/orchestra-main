@@ -45,7 +45,6 @@ EXCLUSIONS = [
     "dist",
 ]
 
-
 def run_ruff(path: str, select: str, format_type: str = "text") -> str:
     """Run ruff with the specified options and return the output."""
     try:
@@ -67,7 +66,6 @@ def run_ruff(path: str, select: str, format_type: str = "text") -> str:
     except subprocess.CalledProcessError as e:
         print(f"Error running ruff: {e}")
         return ""
-
 
 def parse_ruff_text_output(output: str) -> Dict[str, List[Dict[str, Any]]]:
     """Parse ruff text output into a structured format."""
@@ -94,14 +92,12 @@ def parse_ruff_text_output(output: str) -> Dict[str, List[Dict[str, Any]]]:
 
     return results
 
-
 def parse_ruff_json_output(output: str) -> List[Dict[str, Any]]:
     """Parse ruff JSON output into a structured format."""
     try:
         return json.loads(output)
     except json.JSONDecodeError:
         return []
-
 
 def print_summary(results: Dict[str, List[Dict[str, Any]]]) -> None:
     """Print a summary of the linting issues."""
@@ -129,7 +125,6 @@ def print_summary(results: Dict[str, List[Dict[str, Any]]]) -> None:
     for i, (filename, issues) in enumerate(files_by_issue_count[:10]):
         print(f"  {i+1}. {filename}: {len(issues)} issues")
 
-
 def print_detailed_report(results: Dict[str, List[Dict[str, Any]]]) -> None:
     """Print a detailed report of all linting issues."""
     print("\n===== Detailed Linting Issues Report =====")
@@ -149,7 +144,6 @@ def print_detailed_report(results: Dict[str, List[Dict[str, Any]]]) -> None:
                 description = CRITICAL_ISSUES.get(code, COMPLEXITY_ISSUES.get(code, "Other issue"))
                 print(f"  Line {line_num}: {code} - {description}")
                 print(f"    {issue['message']}")
-
 
 def main():
     """Main entry point."""
@@ -194,7 +188,6 @@ def main():
         print("\nRun with --detailed for a full report of all issues")
 
     return 1 if results else 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

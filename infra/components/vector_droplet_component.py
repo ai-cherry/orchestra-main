@@ -30,7 +30,6 @@ import pulumi_digitalocean as do
 import pulumi_command as command
 from pulumi import ComponentResource, ResourceOptions, Output
 
-
 class VectorDropletComponent(ComponentResource):
     """
     Reusable Vector Droplet component for the AI Orchestra system.

@@ -12,7 +12,6 @@ from typing import Dict, List, Tuple
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-
 class SetupTester:
     """Test the new GCP-free setup."""
 
@@ -187,8 +186,8 @@ class SetupTester:
 
             # Check that GCP settings are gone
             gcp_attrs = [
-                "GCP_PROJECT_ID",
-                "GOOGLE_CLOUD_PROJECT",
+                "VULTR_PROJECT_ID",
+                "VULTR_PROJECT_ID",
                 "FIRESTORE_NAMESPACE",
             ]
             has_gcp = False
@@ -219,12 +218,12 @@ class SetupTester:
             with open("docker-compose.yml", "r") as f:
                 content = f.read()
 
-            if "GOOGLE_APPLICATION_CREDENTIALS" in content:
+            if "VULTR_CREDENTIALS_PATH" in content:
                 self.results["docker"] = (
                     False,
                     "docker-compose.yml still contains GCP references",
                 )
-                print("  ✗ docker-compose.yml still contains GOOGLE_APPLICATION_CREDENTIALS")
+                print("  ✗ docker-compose.yml still contains VULTR_CREDENTIALS_PATH")
                 return False
             else:
                 print("  ✓ docker-compose.yml is clean of GCP references")
@@ -311,12 +310,10 @@ class SetupTester:
         # Print summary
         self.print_summary()
 
-
 async def main():
     """Main test runner."""
     tester = SetupTester()
     await tester.run_all_tests()
-
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -18,7 +18,6 @@ from packages.shared.src.models.base_models import AgentMessage, MemoryItem
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class AgentRole(Enum):
     """Defines the roles that agents can play in the orchestration system."""
 
@@ -46,7 +45,6 @@ class AgentRole(Enum):
     # Utility roles
     MEMORY_MANAGER = "memory_manager"
     ERROR_HANDLER = "error_handler"
-
 
 class BaseAgent:
     """Base class for all agents in the orchestration system."""
@@ -155,7 +153,6 @@ class BaseAgent:
     def log_exception(self, message_text: str) -> None:
         # Changed message to logger.exception
         logger.exception(f"[Agent: {self.agent_id}] {message_text}")
-
 
 class DomainExpertAgent(BaseAgent):
     """
@@ -379,7 +376,6 @@ class DomainExpertAgent(BaseAgent):
         """Get a value from the context store."""
         return self.context_store.get(key)
 
-
 class WorkerAgent(BaseAgent):
     """
     Worker agent that performs specialized tasks as directed by domain experts.
@@ -590,7 +586,6 @@ class WorkerAgent(BaseAgent):
             recipient=message.sender,
             context={"role": self.role.value, "capabilities": list(self.capabilities)},
         )
-
 
 class AgentOrchestrator:
     """

@@ -9,7 +9,6 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
-
 class MemoryItem(BaseModel):
     """Memory item stored by agents."""
 
@@ -23,7 +22,6 @@ class MemoryItem(BaseModel):
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata for the memory")
     priority: float = Field(default=0.5, description="Priority of the memory (0.0-1.0)")
     embedding: Optional[List[float]] = Field(default=None, description="Vector embedding of the memory content")
-
 
 class AgentMessage(BaseModel):
     """Message exchanged between agents."""
@@ -39,7 +37,6 @@ class AgentMessage(BaseModel):
     message_id: Optional[str] = Field(default=None, description="Unique message identifier")
     parent_id: Optional[str] = Field(default=None, description="ID of parent message if this is a reply")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata for the message")
-
 
 class PersonaTraits(BaseModel):
     """Traits that define a persona."""
@@ -57,7 +54,6 @@ class PersonaTraits(BaseModel):
     technical_depth: int = Field(default=50, ge=0, le=100, description="Depth of technical knowledge (0-100)")
     leadership: int = Field(default=50, ge=0, le=100, description="Leadership capabilities (0-100)")
     analytical_thinking: int = Field(default=50, ge=0, le=100, description="Analytical thinking ability (0-100)")
-
 
 class PersonaConfig(BaseModel):
     """Configuration for a persona."""
@@ -77,7 +73,6 @@ class PersonaConfig(BaseModel):
         description="Timestamp when the persona was last updated",
     )
 
-
 class AgentConfig(BaseModel):
     """Configuration for an agent."""
 
@@ -96,3 +91,9 @@ class AgentConfig(BaseModel):
         default_factory=lambda: datetime.now().isoformat(),
         description="Timestamp when the agent was last updated",
     )
+
+class AgentData(BaseModel):
+    """Minimal data payload for agent runtime interactions (placeholder)."""
+
+    id: str = Field(..., description="Unique identifier for the data item")
+    payload: Dict[str, Any] = Field(default_factory=dict, description="Arbitrary data payload for the agent")

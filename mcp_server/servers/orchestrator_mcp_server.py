@@ -42,7 +42,6 @@ task_queue = asyncio.Queue()
 mode_definitions = {}
 agents_config = {}
 
-
 class AgentMode(str, Enum):
     """Available agent modes"""
 
@@ -55,7 +54,6 @@ class AgentMode(str, Enum):
     CREATIVE = "creative"
     PERFORMANCE = "performance"
 
-
 class WorkflowStatus(str, Enum):
     """Workflow execution status"""
 
@@ -64,7 +62,6 @@ class WorkflowStatus(str, Enum):
     COMPLETED = "completed"
     FAILED = "failed"
     CANCELLED = "cancelled"
-
 
 class Task(BaseModel):
     """Task model"""
@@ -81,7 +78,6 @@ class Task(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     completed_at: Optional[datetime] = None
 
-
 class Workflow(BaseModel):
     """Workflow model"""
 
@@ -96,14 +92,12 @@ class Workflow(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     completed_at: Optional[datetime] = None
 
-
 class ModeSwitch(BaseModel):
     """Mode switch request"""
 
     mode: AgentMode
     agent_id: Optional[str] = None
     context: Dict[str, Any] = Field(default_factory=dict)
-
 
 class WorkflowRequest(BaseModel):
     """Workflow execution request"""
@@ -112,14 +106,12 @@ class WorkflowRequest(BaseModel):
     params: Dict[str, Any] = Field(default_factory=dict)
     priority: int = Field(default=5, ge=1, le=10)
 
-
 class MCPToolDefinition(BaseModel):
     """MCP tool definition"""
 
     name: str
     description: str
     parameters: Dict[str, Any]
-
 
 def load_configurations():
     """Load mode definitions and agent configurations"""
@@ -141,10 +133,8 @@ def load_configurations():
     except Exception as e:
         logger.error(f"Failed to load configurations: {e}")
 
-
 # Load configurations on startup
 load_configurations()
-
 
 async def execute_task(task: Task):
     """Execute a single task"""
@@ -187,7 +177,6 @@ async def execute_task(task: Task):
         task.completed_at = datetime.utcnow()
         logger.error(f"Task {task.id} failed: {e}")
 
-
 async def task_worker():
     """Background worker to process tasks"""
     while True:
@@ -198,7 +187,6 @@ async def task_worker():
             logger.error(f"Error in task worker: {e}")
         await asyncio.sleep(0.1)
 
-
 @app.on_event("startup")
 async def startup_event():
     """Initialize orchestrator on startup"""
@@ -208,7 +196,6 @@ async def startup_event():
     asyncio.create_task(task_worker())
 
     logger.info("Orchestrator MCP Server started successfully")
-
 
 @app.get("/mcp/tools")
 async def get_tools() -> List[MCPToolDefinition]:
@@ -295,7 +282,6 @@ async def get_tools() -> List[MCPToolDefinition]:
         ),
     ]
 
-
 @app.post("/mcp/switch_mode")
 async def switch_mode(request: ModeSwitch) -> Dict[str, Any]:
     """Switch agent mode"""
@@ -326,12 +312,10 @@ async def switch_mode(request: ModeSwitch) -> Dict[str, Any]:
         "message": f"Successfully switched to {current_mode} mode",
     }
 
-
 import hashlib
 import hmac
 
 SECRET = os.getenv("MCP_SHARED_SECRET", "secret")
-
 
 async def verify_signature(req: Request):
     body = await req.body()
@@ -339,7 +323,6 @@ async def verify_signature(req: Request):
     expected = hmac.new(SECRET.encode(), body, hashlib.sha256).hexdigest()
     if not hmac.compare_digest(signature, expected):
         raise HTTPException(status_code=403, detail="Invalid signature")
-
 
 @app.post("/mcp/execute")
 async def run_workflow(
@@ -369,7 +352,6 @@ async def run_workflow(
         "total_steps": len(workflow.steps),
         "message": f"Workflow {workflow.name} started",
     }
-
 
 def get_workflow_steps(workflow_name: str) -> List[Dict[str, Any]]:
     """Get workflow steps based on name"""
@@ -401,7 +383,6 @@ def get_workflow_steps(workflow_name: str) -> List[Dict[str, Any]]:
     }
 
     return workflows.get(workflow_name, [{"name": "generic_task", "type": "task"}])
-
 
 async def execute_workflow(workflow: Workflow):
     """Execute workflow steps"""
@@ -438,7 +419,6 @@ async def execute_workflow(workflow: Workflow):
         workflow.status = WorkflowStatus.FAILED
         logger.error(f"Workflow {workflow.id} failed: {e}")
 
-
 @app.post("/mcp/execute_task")
 async def execute_task_endpoint(
     name: str,
@@ -470,7 +450,6 @@ async def execute_task_endpoint(
         "queue_size": task_queue.qsize(),
         "message": f"Task {task.name} queued for execution",
     }
-
 
 @app.post("/mcp/get_status")
 async def get_orchestrator_status(include_workflows: bool = True, include_tasks: bool = True) -> Dict[str, Any]:
@@ -509,7 +488,6 @@ async def get_orchestrator_status(include_workflows: bool = True, include_tasks:
 
     return status
 
-
 @app.get("/mcp/workflows")
 async def list_workflows() -> List[Dict[str, Any]]:
     """List all workflows"""
@@ -525,7 +503,6 @@ async def list_workflows() -> List[Dict[str, Any]]:
         }
         for w in active_workflows.values()
     ]
-
 
 @app.get("/mcp/workflow/{workflow_id}")
 async def get_workflow_details(workflow_id: str) -> Dict[str, Any]:
@@ -549,7 +526,6 @@ async def get_workflow_details(workflow_id: str) -> Dict[str, Any]:
         "completed_at": (workflow.completed_at.isoformat() if workflow.completed_at else None),
     }
 
-
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
@@ -561,7 +537,6 @@ async def health_check():
         "queue_size": task_queue.qsize(),
         "configurations_loaded": bool(mode_definitions) and bool(agents_config),
     }
-
 
 if __name__ == "__main__":
     import uvicorn

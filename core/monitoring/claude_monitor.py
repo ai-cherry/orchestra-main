@@ -21,7 +21,6 @@ from core.logging_config import get_logger
 
 logger = get_logger(__name__)
 
-
 # Claude pricing as of 2025 (prices per 1M tokens)
 CLAUDE_PRICING = {
     "claude-3-opus-20240229": {"input": 15.00, "output": 75.00},
@@ -31,7 +30,6 @@ CLAUDE_PRICING = {
     "claude-4-opus-20250522": {"input": 25.00, "output": 125.00},
     "claude-4-sonnet-20250522": {"input": 5.00, "output": 25.00},
 }
-
 
 @dataclass
 class APICallMetrics:
@@ -51,7 +49,6 @@ class APICallMetrics:
     session_id: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
 
-
 @dataclass
 class AggregatedMetrics:
     """Aggregated metrics for reporting"""
@@ -69,7 +66,6 @@ class AggregatedMetrics:
     )
     cost_by_model: Dict[str, float] = field(default_factory=lambda: defaultdict(float))
     errors_by_type: Dict[str, int] = field(default_factory=lambda: defaultdict(int))
-
 
 class ClaudeMonitor:
     """

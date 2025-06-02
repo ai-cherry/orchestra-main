@@ -15,7 +15,6 @@ from core.services.agents.base import Agent, AgentCapability, AgentConfig, Agent
 
 logger = logging.getLogger(__name__)
 
-
 class ConversationalAgent(Agent):
     """Agent specialized in natural conversations."""
 
@@ -77,7 +76,6 @@ class ConversationalAgent(Agent):
     async def act(self) -> None:
         """No autonomous actions for conversational agent."""
         pass
-
 
 class TaskExecutorAgent(Agent):
     """Agent specialized in executing specific tasks."""
@@ -146,7 +144,6 @@ class TaskExecutorAgent(Agent):
         else:
             # Generic task execution
             return {"task": task, "status": "completed"}
-
 
 class ResearchAgent(Agent):
     """Agent specialized in research and information gathering."""
@@ -247,7 +244,6 @@ class ResearchAgent(Agent):
 
         return queries[:num_queries]
 
-
 class CollaborativeAgent(Agent):
     """Agent that coordinates with other agents."""
 
@@ -331,7 +327,6 @@ class CollaborativeAgent(Agent):
 
         return capabilities
 
-
 def create_example_agents() -> List[Agent]:
     """Create example agent instances."""
     agents = []
@@ -386,7 +381,6 @@ def create_example_agents() -> List[Agent]:
     agents.append(collab_agent)
 
     return agents
-
 
 def register_example_agents() -> None:
     """Register all example agents with the manager."""

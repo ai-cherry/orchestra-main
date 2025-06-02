@@ -7,7 +7,6 @@ Implements the IToolAdapter interface for standardized tool access.
 
 from mcp_server.interfaces.tool_adapter import IToolAdapter
 
-
 class OpenAIAdapter(IToolAdapter):
     """
     Adapter for OpenAI models (GPT-3, GPT-4, Codex).

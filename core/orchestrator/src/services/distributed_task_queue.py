@@ -28,7 +28,6 @@ except ImportError:
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class TaskDefinition(BaseModel):
     """Definition of a task that can be executed by agents"""
 
@@ -43,7 +42,6 @@ class TaskDefinition(BaseModel):
     created_at: float = Field(default_factory=time.time)
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
-
 class TaskInstance(BaseModel):
     """Instance of a task being executed"""
 
@@ -57,7 +55,6 @@ class TaskInstance(BaseModel):
     updated_at: float = Field(default_factory=time.time)
     completed_at: Optional[float] = None
     metadata: Dict[str, Any] = Field(default_factory=dict)
-
 
 class DistributedTaskQueue:
     """Redis-backed distributed task queue for agent coordination"""
@@ -441,10 +438,8 @@ class DistributedTaskQueue:
 
         return True
 
-
 # Singleton instance
 _task_queue = None
-
 
 async def get_task_queue() -> DistributedTaskQueue:
     """

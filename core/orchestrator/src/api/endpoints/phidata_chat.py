@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from core.orchestrator.src.agents.agent_registry import get_agent_registry
+from core.orchestrator.src.agents.simplified_agent_registry import get_simplified_agent_registry
 from core.orchestrator.src.api.dependencies.llm import get_llm_client
 from core.orchestrator.src.api.dependencies.memory import get_memory_manager
 from core.orchestrator.src.api.utils.format_structured_output import format_structured_output_as_markdown
@@ -32,7 +32,6 @@ logger = logging.getLogger(__name__)
 # Create router
 router = APIRouter()
 
-
 class PhidataRequest(BaseModel):
     """
     Request model for Phidata chat endpoint.
@@ -49,7 +48,6 @@ class PhidataRequest(BaseModel):
     agent_id: Optional[str] = Field(None, description="Agent identifier")
     metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
     tools: Optional[List[Dict[str, Any]]] = Field(None, description="List of tools to use")
-
 
 class PhidataResponse(BaseModel):
     """
@@ -72,7 +70,6 @@ class PhidataResponse(BaseModel):
     metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
     tool_calls: Optional[List[Dict[str, Any]]] = Field(None, description="List of tool calls made during processing")
     timestamp: Optional[str] = Field(None, description="Response timestamp")
-
 
 @router.post("/phidata/chat", response_model=PhidataResponse, tags=["phidata"])
 async def phidata_chat(
@@ -108,7 +105,7 @@ async def phidata_chat(
     """
     try:
         # Get agent registry
-        agent_registry = get_agent_registry()
+        agent_registry = get_simplified_agent_registry()
 
         logger.info(
             f"Processing Phidata chat request for user_id: {request.user_id}, " f"session_id: {request.session_id}"

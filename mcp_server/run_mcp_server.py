@@ -31,7 +31,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("mcp-main")
 
-
 class MCPApplication:
     """Main MCP application class."""
 
@@ -111,7 +110,6 @@ class MCPApplication:
             "tools": tool_statuses,
         }
 
-
 async def main_async(config_path: Optional[str] = None):
     """Async main function."""
     try:
@@ -151,7 +149,6 @@ async def main_async(config_path: Optional[str] = None):
 
     return 0
 
-
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description="MCP Memory System")
@@ -160,7 +157,6 @@ def main():
 
     exit_code = asyncio.run(main_async(args.config))
     sys.exit(exit_code)
-
 
 if __name__ == "__main__":
     main()

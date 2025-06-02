@@ -20,7 +20,6 @@ except ImportError:
     def Field(*args, **kwargs):
         return field(default=None)
 
-
 class UserRequest(BaseModel):
     """
     Represents incoming requests to the API.
@@ -46,7 +45,6 @@ class UserRequest(BaseModel):
     status: str = Field(default="pending", description="Current processing status of the request")
     timestamp: datetime = Field(default_factory=datetime.utcnow, description="When the request was received")
 
-
 class AgentResponse(BaseModel):
     """
     Represents the standard output from agents.
@@ -69,7 +67,6 @@ class AgentResponse(BaseModel):
     content: str = Field(description="The actual response content")
     status: str = Field(default="completed", description="Processing status of the response")
     timestamp: datetime = Field(default_factory=datetime.utcnow, description="When the response was generated")
-
 
 class MemoryRecord(BaseModel):
     """
@@ -98,7 +95,6 @@ class MemoryRecord(BaseModel):
     )
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional structured data about the memory")
 
-
 class WorkflowState(BaseModel):
     """
     Represents data passed between Temporal activities/workflows.
@@ -124,7 +120,6 @@ class WorkflowState(BaseModel):
         default_factory=datetime.utcnow,
         description="When this workflow state was last updated",
     )
-
 
 class PayReadyContact(BaseModel):
     """
@@ -155,7 +150,6 @@ class PayReadyContact(BaseModel):
         description="When this contact record was created or updated",
     )
 
-
 class PayReadyLead(BaseModel):
     """
     Represents leads in the PayReady system.
@@ -181,7 +175,6 @@ class PayReadyLead(BaseModel):
         default_factory=datetime.utcnow,
         description="When this lead record was created or updated",
     )
-
 
 class Configuration(BaseModel):
     """

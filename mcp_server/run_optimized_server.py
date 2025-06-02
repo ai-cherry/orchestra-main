@@ -32,7 +32,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("optimized-mcp-server")
 
-
 def load_config(config_path: str) -> Dict[str, Any]:
     """Load configuration from JSON file."""
     try:
@@ -42,7 +41,6 @@ def load_config(config_path: str) -> Dict[str, Any]:
         logger.error(f"Error loading configuration: {e}")
         logger.info("Using default configuration")
         return {}
-
 
 def optimize_for_memory(config: Dict[str, Any]) -> Dict[str, Any]:
     """Optimize configuration for low memory usage."""
@@ -58,7 +56,6 @@ def optimize_for_memory(config: Dict[str, Any]) -> Dict[str, Any]:
 
     return config
 
-
 def optimize_for_cpu(config: Dict[str, Any]) -> Dict[str, Any]:
     """Optimize configuration for low CPU usage."""
     config["server"]["workers"] = 1
@@ -72,7 +69,6 @@ def optimize_for_cpu(config: Dict[str, Any]) -> Dict[str, Any]:
             tool["update_interval"] = tool["update_interval"] * 2
 
     return config
-
 
 def optimize_for_speed(config: Dict[str, Any]) -> Dict[str, Any]:
     """Optimize configuration for maximum speed."""
@@ -90,7 +86,6 @@ def optimize_for_speed(config: Dict[str, Any]) -> Dict[str, Any]:
             tool["update_interval"] = 0.5
 
     return config
-
 
 def run_server(config: Dict[str, Any], debug: bool = False) -> None:
     """Run the MCP server with the provided configuration."""
@@ -125,7 +120,6 @@ def run_server(config: Dict[str, Any], debug: bool = False) -> None:
     except Exception as e:
         logger.error(f"Error running server: {e}")
         sys.exit(1)
-
 
 def main():
     """Main entry point for the optimized MCP server."""
@@ -169,7 +163,6 @@ def main():
 
     # Run the server
     run_server(config, args.debug)
-
 
 if __name__ == "__main__":
     main()

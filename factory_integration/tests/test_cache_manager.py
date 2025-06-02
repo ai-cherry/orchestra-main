@@ -19,7 +19,6 @@ from factory_integration.cache_manager import (
     create_cache_manager,
 )
 
-
 class TestCacheEntry:
     """Test cases for CacheEntry model."""
 
@@ -33,7 +32,6 @@ class TestCacheEntry:
         assert entry.created_at > 0
         assert entry.last_accessed > 0
         assert entry.expires_at is None
-
 
 class TestCacheMetrics:
     """Test cases for CacheMetrics model."""
@@ -58,7 +56,6 @@ class TestCacheMetrics:
         metrics = CacheMetrics()
         assert metrics.hit_rate == 0.0
         assert metrics.l1_hit_rate == 0.0
-
 
 class TestL1Cache:
     """Test cases for L1 in-memory cache."""
@@ -147,7 +144,6 @@ class TestL1Cache:
         assert metrics["hits"] == 0
         assert metrics["misses"] == 0
         assert metrics["hit_rate"] == 0.0
-
 
 class TestL2Cache:
     """Test cases for L2 Redis cache."""
@@ -250,7 +246,6 @@ class TestL2Cache:
         assert result is None
         assert l2_cache.misses == 1
 
-
 class TestL3Cache:
     """Test cases for L3 PostgreSQL cache."""
 
@@ -339,7 +334,6 @@ class TestL3Cache:
 
         # Cleanup task should be cancelled
         assert l3_cache._cleanup_task.cancelled()
-
 
 class TestCacheManager:
     """Test cases for the unified CacheManager."""
@@ -522,7 +516,6 @@ class TestCacheManager:
 
         # Should not call warm_cache immediately (waits 5 minutes)
         cache_manager.warm_cache.assert_not_called()
-
 
 class TestCreateCacheManager:
     """Test the factory function."""

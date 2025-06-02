@@ -17,7 +17,6 @@ from langchain.schema import BaseMessage, ChatGeneration, ChatMessage, LLMResult
 
 from core.orchestrator.src.llm.litellm_client import LiteLLMClient, LLMMessage
 
-
 class LiteLLMLangChainLLM(BaseLLM):
     """
     LangChain-compatible LLM interface for text completions using LiteLLMClient.
@@ -70,7 +69,6 @@ class LiteLLMLangChainLLM(BaseLLM):
             **kwargs,
         )
         return response.content
-
 
 class LiteLLMLangChainChat(BaseChatModel):
     """

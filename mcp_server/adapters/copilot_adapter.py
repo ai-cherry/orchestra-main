@@ -18,7 +18,6 @@ from ..models.memory import MemoryEntry
 
 logger = logging.getLogger(__name__)
 
-
 class CopilotAdapter(IToolAdapter):
     """GitHub Copilot adapter for MCP."""
 

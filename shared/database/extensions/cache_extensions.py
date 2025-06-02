@@ -10,7 +10,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class CacheExtensionsMixin:
     """
     Mixin that adds missing cache functionality to UnifiedPostgreSQL.

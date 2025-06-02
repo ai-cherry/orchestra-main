@@ -14,11 +14,11 @@ echo "Lines: $LINES"
 echo
 
 # Check if service exists
-if ! gcloud run services describe $SERVICE --region=$REGION &>/dev/null; then
+if ! # vultr-cli kubernetes services describe $SERVICE --region=$REGION &>/dev/null; then
     echo "Error: Service '$SERVICE' not found in region $REGION"
     echo
     echo "Available services:"
-    gcloud run services list --region=$REGION --format="value(metadata.name)"
+    # vultr-cli kubernetes services list --region=$REGION --format="value(metadata.name)"
     exit 1
 fi
 
@@ -27,7 +27,7 @@ echo "Press Ctrl+C to stop"
 echo
 
 # Get logs with follow option
-gcloud run services logs read $SERVICE \
+# Removed gcloud command
     --region=$REGION \
     --limit=$LINES \
     --format="table(
@@ -41,4 +41,4 @@ echo "To follow logs in real-time, use:"
 echo "gcloud alpha run services logs tail $SERVICE --region=$REGION"
 echo
 echo "To filter for errors only:"
-echo "gcloud run services logs read $SERVICE --region=$REGION --filter='severity>=ERROR'"
+echo "# vultr-cli kubernetes services logs read $SERVICE --region=$REGION --filter='severity>=ERROR'"

@@ -19,7 +19,6 @@ from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
-
 class SecretManager:
     """Interface for retrieving secrets from environment variables or local files."""
 
@@ -165,10 +164,8 @@ class SecretManager:
         results = await asyncio.gather(*tasks)
         return dict(zip(secret_ids, results))
 
-
 # Singleton instance for global use
 _default_instance: Optional[SecretManager] = None
-
 
 def get_secret_manager() -> SecretManager:
     """Get the default SecretManager instance."""
@@ -177,11 +174,9 @@ def get_secret_manager() -> SecretManager:
         _default_instance = SecretManager()
     return _default_instance
 
-
 def get_secret(secret_id: str, version_id: str = "latest") -> Optional[str]:
     """Convenience function to get a secret from the default SecretManager."""
     return get_secret_manager().get_secret(secret_id, version_id)
-
 
 async def get_secret_async(secret_id: str, version_id: str = "latest") -> Optional[str]:
     """Convenience function to get a secret asynchronously from the default SecretManager."""

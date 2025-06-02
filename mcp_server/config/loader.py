@@ -14,7 +14,6 @@ from .models import MCPConfig
 
 logger = logging.getLogger(__name__)
 
-
 def load_config_from_file(file_path: str) -> Dict[str, Any]:
     """
     Load configuration from a JSON file.
@@ -33,7 +32,6 @@ def load_config_from_file(file_path: str) -> Dict[str, Any]:
     with open(file_path, "r") as f:
         config = json.load(f)
     return config
-
 
 def load_config_from_env() -> Dict[str, Any]:
     """
@@ -131,7 +129,6 @@ def load_config_from_env() -> Dict[str, Any]:
 
     return config
 
-
 def merge_configs(base_config: Dict[str, Any], override_config: Dict[str, Any]) -> Dict[str, Any]:
     """
     Merge two configurations, with override_config taking precedence.
@@ -156,11 +153,9 @@ def merge_configs(base_config: Dict[str, Any], override_config: Dict[str, Any]) 
 
     return result
 
-
 def load_config(config_path: Optional[str] = "mcp_config.json") -> MCPConfig:
     """
     Load and validate configuration from multiple sources.
-
 
     Configuration is loaded and merged from the following sources (in order of precedence):
     1. Environment variables

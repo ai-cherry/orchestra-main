@@ -15,7 +15,6 @@ from core.services.agents.examples import register_example_agents
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 async def test_system():
     """Test the modular Orchestra AI system."""
     logger.info("Starting modular system test...")
@@ -125,7 +124,6 @@ async def test_system():
     logger.info("✓ System shut down successfully")
 
     logger.info("\n=== All tests completed ===")
-
 
 if __name__ == "__main__":
     asyncio.run(test_system())

@@ -14,7 +14,7 @@ exclude =
     .pytest_cache,
     node_modules,
     migrations,
-    .terraform
+    .pulumi
 
 # Reasonable line length when we do check
 max-line-length = 120

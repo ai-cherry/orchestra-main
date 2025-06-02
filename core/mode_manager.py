@@ -38,14 +38,11 @@ CONFIG_DIR = PROJECT_ROOT / "config"
 MODE_CONFIG_PATH = CONFIG_DIR / "mode_definitions.yaml"
 WORKFLOW_STATE_PATH = CONFIG_DIR / "workflow_state.yaml"
 
-
 class FileAccessError(Exception):
     """Exception raised when a mode attempts to access a restricted file."""
 
-
 class WorkflowError(Exception):
     """Exception raised for workflow-related errors."""
-
 
 @dataclass
 class Mode:
@@ -91,7 +88,6 @@ class Mode:
 
         return False
 
-
 @dataclass
 class WorkflowStep:
     """
@@ -104,7 +100,6 @@ class WorkflowStep:
     task: str
     context: Dict[str, Any] = field(default_factory=dict)
     completed: bool = False
-
 
 @dataclass
 class Workflow:
@@ -128,7 +123,6 @@ class Workflow:
     def completed(self) -> bool:
         """Check if all steps in the workflow are completed."""
         return self.current_step >= len(self.steps) or all(step.completed for step in self.steps)
-
 
 class ModeManager:
     """
@@ -504,10 +498,8 @@ class ModeManager:
             logger.error(f"Failed to load workflow state: {e}")
             return False
 
-
 # Singleton instance
 _instance = None
-
 
 def get_mode_manager() -> ModeManager:
     """Get singleton instance of ModeManager."""
@@ -515,7 +507,6 @@ def get_mode_manager() -> ModeManager:
     if _instance is None:
         _instance = ModeManager()
     return _instance
-
 
 if __name__ == "__main__":
     # Simple CLI for testing

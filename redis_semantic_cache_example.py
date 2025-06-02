@@ -33,7 +33,6 @@ except ImportError as e:
     logger.error("Please install required packages: pip install redisvl langchain-redis langchain-google-genai")
     sys.exit(1)
 
-
 async def main():
     """
     Main function to demonstrate Redis semantic caching functionality.
@@ -135,7 +134,6 @@ async def main():
         logger.error(f"Failed to retrieve memories: {e}")
 
     logger.info("Redis semantic caching example completed")
-
 
 if __name__ == "__main__":
     asyncio.run(main())

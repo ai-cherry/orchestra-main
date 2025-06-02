@@ -13,7 +13,7 @@ This guide explains how to integrate the secure credential management system int
   - [LLM Integration](#llm-integration)
 - [Bash Script Integration](#bash-script-integration)
 - [GitHub Actions Integration](#github-actions-integration)
-- [Terraform Integration](#terraform-integration)
+- [Pulumi Integration](#pulumi-integration)
 - [Monitoring and Troubleshooting](#monitoring-and-troubleshooting)
 
 ## Overview
@@ -28,7 +28,7 @@ The AI Orchestra secure credential management system provides a unified way to a
 
 Before integrating the credential management system, ensure you have:
 
-1. Deployed the Terraform infrastructure using `implementation_plan.sh`
+1. Deployed the Pulumi infrastructure using `implementation_plan.sh`
 2. Migrated existing credentials to 3. Set up Workload Identity Federation for GitHub Actions
 4. Added the required dependencies:
    ```bash
@@ -463,12 +463,12 @@ jobs:
           region: us-central1
           image: gcr.io/${{ secrets.```
 
-## Terraform Integration
+## Pulumi Integration
 
-For Terraform, use the `secure-credentials` module:
+For Pulumi, use the `secure-credentials` module:
 
 ```hcl
-module "secure_credentials" {
+secure_credentials = ComponentResource( {
   source      = "./modules/secure-credentials"
   project_id  = var.project_id
   region      = var.region
@@ -478,11 +478,11 @@ module "secure_credentials" {
 }
 
 # Use the outputs
-output "service_account_emails" {
+pulumi.export("service_account_emails", {
   value = module.secure_credentials.service_account_emails
 }
 
-output "workload_identity_provider" {
+pulumi.export("workload_identity_provider", {
   value = module.secure_credentials.workload_identity_provider
 }
 ```

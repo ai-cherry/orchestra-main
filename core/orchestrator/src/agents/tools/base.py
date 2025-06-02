@@ -18,7 +18,6 @@ logger = logging.getLogger(__name__)
 # Type variable for tool return types
 T = TypeVar("T")
 
-
 class ToolParameter(BaseModel):
     """
     Metadata about a tool parameter.
@@ -32,7 +31,6 @@ class ToolParameter(BaseModel):
     description: str
     required: bool = True
     default: Optional[Any] = None
-
 
 class ToolMetadata(BaseModel):
     """
@@ -48,7 +46,6 @@ class ToolMetadata(BaseModel):
     return_type: str
     requires_async: bool = True
     categories: List[str] = Field(default_factory=list)
-
 
 class Tool(ABC):
     """
@@ -162,7 +159,6 @@ class Tool(ABC):
         model_name = f"{self.name.title()}Input"
         return create_model(model_name, **fields)
 
-
 class ToolRegistry:
     """
     Registry for tools that agents can use.
@@ -251,7 +247,6 @@ class ToolRegistry:
             A list of all registered tool names
         """
         return list(self._tools.keys())
-
 
 class ToolUsingAgent:
     """
@@ -362,10 +357,8 @@ class ToolUsingAgent:
 
         return result
 
-
 # Global tool registry
 _global_registry = ToolRegistry()
-
 
 def get_tool_registry() -> ToolRegistry:
     """

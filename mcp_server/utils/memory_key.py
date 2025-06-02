@@ -15,7 +15,6 @@ from .structured_logging import get_logger
 
 logger = get_logger(__name__)
 
-
 class MemoryKeyScope(str, Enum):
     """Predefined scopes for memory keys."""
 
@@ -26,7 +25,6 @@ class MemoryKeyScope(str, Enum):
     SESSION = "session"
     AGENT = "agent"
     TOOL = "tool"
-
 
 class MemoryKey:
     """Hierarchical memory key structure."""
@@ -368,7 +366,6 @@ class MemoryKey:
             return f"{prefix}-{unique_id}"
         return unique_id
 
-
 class MemoryKeyPattern:
     """Pattern for matching memory keys."""
 
@@ -443,7 +440,6 @@ class MemoryKeyPattern:
 
         return key_obj.matches_pattern(self)
 
-
 def create_memory_key(
     namespace: str,
     key: str,
@@ -467,7 +463,6 @@ def create_memory_key(
     """
     return MemoryKey.create(namespace, key, scope, user_id, session_id, agent_id)
 
-
 def parse_memory_key(key_str: str) -> Optional[MemoryKey]:
     """Convenience function to parse a memory key string.
 
@@ -478,7 +473,6 @@ def parse_memory_key(key_str: str) -> Optional[MemoryKey]:
         A MemoryKey object, or None if parsing fails
     """
     return MemoryKey.parse(key_str)
-
 
 def create_memory_key_pattern(
     namespace: Optional[str] = None,

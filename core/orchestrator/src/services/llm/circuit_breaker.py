@@ -58,14 +58,12 @@ T = TypeVar("T")
 SyncOrAsyncCallable = Callable[..., Union[T, Awaitable[T]]]
 SyncOrAsyncResult = Union[T, Awaitable[T]]
 
-
 class CircuitState(Enum):
     """Possible states for a circuit breaker."""
 
     CLOSED = "closed"  # Normal operation, requests go through
     OPEN = "open"  # Circuit is open, requests are blocked
     HALF_OPEN = "half_open"  # Testing if service is healthy again
-
 
 class ProviderCircuitOpenError(Exception):
     """Exception raised when a provider circuit is open."""
@@ -74,7 +72,6 @@ class ProviderCircuitOpenError(Exception):
         self.provider = provider
         message = f"Circuit for provider '{provider}' is open due to too many failures"
         super().__init__(message)
-
 
 class CircuitBreaker:
     """
@@ -457,10 +454,8 @@ class CircuitBreaker:
                 self.last_failure_time = {}
                 self.half_open_calls = {}
 
-
 # Singleton instance for convenience
 _default_circuit_breaker = None
-
 
 def get_circuit_breaker(max_failures: int = 5, reset_timeout: int = 60) -> CircuitBreaker:
     """

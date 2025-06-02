@@ -11,7 +11,6 @@ from pulumi import Output
 
 from .base import CloudProvider, DeploymentConfig, ResourceSize
 
-
 class DigitalOceanProvider(CloudProvider):
     """DigitalOcean implementation of CloudProvider."""
 

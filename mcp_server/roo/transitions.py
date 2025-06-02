@@ -17,7 +17,6 @@ from .modes import get_mode
 
 logger = logging.getLogger(__name__)
 
-
 class TransitionContext(BaseModel):
     """Context information preserved during mode transitions."""
 
@@ -48,7 +47,6 @@ class TransitionContext(BaseModel):
         """Mark this transition as completed."""
         self.completed = True
         self.metadata["completed_at"] = time.time()
-
 
 class ModeTransitionManager:
     """

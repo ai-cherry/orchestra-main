@@ -17,12 +17,10 @@ YELLOW = "\033[1;33m"
 RED = "\033[0;31m"
 NC = "\033[0m"  # No Color
 
-
 def print_status(message: str, status: str) -> None:
     """Print colored status message."""
     color = GREEN if status == "OK" else YELLOW if status == "WARNING" else RED
     print(f"{message}: {color}{status}{NC}")
-
 
 def check_python_version() -> Tuple[bool, str]:
     """Check Python version is exactly 3.10."""
@@ -34,13 +32,11 @@ def check_python_version() -> Tuple[bool, str]:
         f"Python {version.major}.{version.minor}.{version.micro} (requires 3.10)",
     )
 
-
 def check_virtual_env() -> Tuple[bool, str]:
     """Check if running in virtual environment."""
     if hasattr(sys, "real_prefix") or (hasattr(sys, "base_prefix") and sys.base_prefix != sys.prefix):
         return True, sys.prefix
     return False, "Not in virtual environment"
-
 
 def check_required_files() -> Dict[str, bool]:
     """Check existence of required files."""
@@ -61,10 +57,9 @@ def check_required_files() -> Dict[str, bool]:
 
     return results
 
-
 def check_environment_variables() -> Dict[str, bool]:
     """Check required environment variables."""
-    required_vars = ["GCP_PROJECT_ID", "GOOGLE_CLOUD_PROJECT"]
+    required_vars = ["VULTR_PROJECT_ID", "VULTR_PROJECT_ID"]
 
     optional_vars = ["OPENROUTER_API_KEY", "ANTHROPIC_API_KEY", "OPENAI_API_KEY"]
 
@@ -88,7 +83,6 @@ def check_environment_variables() -> Dict[str, bool]:
                     results[f"{var} (optional)"] = None  # None means optional and not set
 
     return results
-
 
 def check_git_config() -> Dict[str, bool]:
     """Check Git configuration."""
@@ -120,7 +114,6 @@ def check_git_config() -> Dict[str, bool]:
 
     return results
 
-
 def check_dependencies() -> Dict[str, bool]:
     """Check if required tools are installed."""
     tools = {
@@ -144,7 +137,6 @@ def check_dependencies() -> Dict[str, bool]:
 
     return results
 
-
 def check_gcp_auth() -> Tuple[bool, str]:
     """Check GCP authentication status."""
     try:
@@ -160,7 +152,6 @@ def check_gcp_auth() -> Tuple[bool, str]:
         return False, "No active account"
     except Exception as e:
         return False, str(e)
-
 
 def check_directory_structure() -> Dict[str, bool]:
     """Check required directory structure."""
@@ -179,7 +170,6 @@ def check_directory_structure() -> Dict[str, bool]:
         results[dir_path] = path.exists() and path.is_dir()
 
     return results
-
 
 def main():
     """Run all environment checks."""
@@ -297,7 +287,6 @@ def main():
     else:
         print(f"{RED}Environment has critical issues that must be resolved.{NC}")
         sys.exit(1)
-
 
 if __name__ == "__main__":
     main()

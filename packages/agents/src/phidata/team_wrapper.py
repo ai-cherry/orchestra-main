@@ -19,7 +19,6 @@ from packages.phidata.src.cloudsql_pgvector import get_pg_agent_storage, get_pgv
 
 logger = logging.getLogger(__name__)
 
-
 class PhidataTeamAgentWrapper(PhidataAgentWrapper, AgentProtocol):
     """
     Enhanced PhidataAgentWrapper that supports resolving team member references.

@@ -33,7 +33,6 @@ from typing import Any, Dict, Optional, Union
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 class CredentialSource(Enum):
     """Enum representing the source of credentials."""
 
@@ -41,7 +40,6 @@ class CredentialSource(Enum):
     FILE = "file"
     os.environ = "os.environ"
     WORKLOAD_IDENTITY = "workload_identity"
-
 
 @dataclass
 class ServiceAccountInfo:
@@ -89,7 +87,6 @@ class ServiceAccountInfo:
         os.chmod(temp_file_path, 0o600)
 
         return temp_file_path
-
 
 class CredentialManager:
     """
@@ -201,7 +198,7 @@ class CredentialManager:
             return self._service_account_info.project_id
 
         # Try to get from environment variable
-        return os.environ.get(f"{self.env_prefix}_PROJECT_ID") or os.environ.get("GCP_PROJECT_ID")
+        return os.environ.get(f"{self.env_prefix}_PROJECT_ID") or os.environ.get("VULTR_PROJECT_ID")
 
     def secure_service_account_key(self, file_path: Union[str, Path]) -> bool:
         """
@@ -238,7 +235,6 @@ class CredentialManager:
         """Destructor to ensure cleanup."""
         self.cleanup()
 
-
 def secure_credentials() -> None:
     """
     Secure credentials by loading them into memory and removing the files.
@@ -266,7 +262,6 @@ def secure_credentials() -> None:
         os.environ["ORCHESTRA_PROJECT_ID"] = project_id
 
     logger.info("Credentials secured successfully")
-
 
 if __name__ == "__main__":
     secure_credentials()

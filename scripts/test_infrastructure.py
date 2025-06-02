@@ -10,7 +10,6 @@ import subprocess
 import sys
 from typing import Any, Dict, List
 
-
 def run_command(cmd: List[str]) -> Dict[str, Any]:
     """Run a command and return the result"""
     try:
@@ -18,7 +17,6 @@ def run_command(cmd: List[str]) -> Dict[str, Any]:
         return {"success": True, "output": result.stdout, "error": None}
     except subprocess.CalledProcessError as e:
         return {"success": False, "output": e.stdout, "error": e.stderr}
-
 
 def test_pulumi_stack():
     """Test Pulumi stack status"""
@@ -35,7 +33,6 @@ def test_pulumi_stack():
 
     return True
 
-
 def test_kubernetes_connection():
     """Test Kubernetes cluster connection"""
     print("\n🔍 Checking Kubernetes connection...")
@@ -50,7 +47,6 @@ def test_kubernetes_connection():
 
     return True
 
-
 def test_namespace_resources():
     """Test resources in superagi namespace"""
     print("\n🔍 Checking SuperAGI namespace resources...")
@@ -64,7 +60,6 @@ def test_namespace_resources():
         return False
 
     return True
-
 
 def test_pod_status():
     """Test pod status"""
@@ -100,7 +95,6 @@ def test_pod_status():
         print("❌ Cannot get pod status")
         return False
 
-
 def test_services():
     """Test service endpoints"""
     print("\n🔍 Checking service endpoints...")
@@ -135,7 +129,6 @@ def test_services():
 
     return len(available_services) > 0
 
-
 def test_pulumi_outputs():
     """Test Pulumi stack outputs"""
     print("\n🔍 Checking Pulumi outputs...")
@@ -158,7 +151,6 @@ def test_pulumi_outputs():
     else:
         print("❌ Cannot get stack outputs")
         return False
-
 
 def main():
     """Run all infrastructure tests"""
@@ -196,7 +188,6 @@ def main():
     else:
         print("⚠️  Some tests failed. Check the output above.")
         return 1
-
 
 if __name__ == "__main__":
     sys.exit(main())

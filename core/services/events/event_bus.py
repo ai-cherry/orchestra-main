@@ -14,7 +14,6 @@ from typing import Any, Callable, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
-
 class EventPriority(Enum):
     """Event priority levels."""
 
@@ -22,7 +21,6 @@ class EventPriority(Enum):
     NORMAL = 1
     HIGH = 2
     CRITICAL = 3
-
 
 @dataclass
 class Event:
@@ -37,7 +35,6 @@ class Event:
     def __post_init__(self):
         if self.timestamp is None:
             self.timestamp = datetime.utcnow()
-
 
 class EventHandler:
     """Wrapper for event handlers with metadata."""
@@ -78,7 +75,6 @@ class EventHandler:
 
         logger.error(f"Handler {self.handler.__name__} failed after {retries} retries: {last_error}")
         raise last_error
-
 
 class EventBus:
     """
@@ -298,10 +294,8 @@ class EventBus:
             "errors": 0,
         }
 
-
 # Global event bus instance
 _event_bus: Optional[EventBus] = None
-
 
 def get_event_bus() -> EventBus:
     """Get the global event bus instance."""

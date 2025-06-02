@@ -12,7 +12,6 @@ from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError
 
 from .base import RetryableConnection, ServiceHealth, ServiceStatus
 
-
 class MongoDBConnection(RetryableConnection):
     """MongoDB connection with health checks and retries."""
 

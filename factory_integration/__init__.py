@@ -21,7 +21,6 @@ __all__ = [
 from .factory.bridge import FactoryBridgeGateway
 from .factory.context import FactoryContextManager
 
-
 def setup_factory_integration() -> None:
     """Initialize Factory AI integration.
 

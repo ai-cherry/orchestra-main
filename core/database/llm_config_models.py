@@ -25,7 +25,6 @@ from sqlalchemy.sql import func
 
 Base = declarative_base()
 
-
 class LLMProvider(Base):
     """Model for LLM provider configurations"""
 
@@ -55,7 +54,6 @@ class LLMProvider(Base):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }
-
 
 class LLMModel(Base):
     """Model for available LLM models from providers"""
@@ -102,7 +100,6 @@ class LLMModel(Base):
             "last_checked": self.last_checked.isoformat() if self.last_checked else None,
         }
 
-
 class LLMUseCase(Base):
     """Model for LLM use case configurations"""
 
@@ -133,7 +130,6 @@ class LLMUseCase(Base):
             "default_max_tokens": self.default_max_tokens,
             "default_system_prompt": self.default_system_prompt,
         }
-
 
 class LLMModelAssignment(Base):
     """Model for assigning models to use cases and tiers"""
@@ -175,7 +171,6 @@ class LLMModelAssignment(Base):
             "fallback_models": [fb.model.to_dict() for fb in sorted(self.fallback_models, key=lambda x: x.priority)],
         }
 
-
 class LLMFallbackModel(Base):
     """Model for fallback model configurations"""
 
@@ -193,7 +188,6 @@ class LLMFallbackModel(Base):
 
     # Constraints
     __table_args__ = (UniqueConstraint("assignment_id", "model_id"),)
-
 
 class LLMMetric(Base):
     """Model for tracking LLM performance metrics"""

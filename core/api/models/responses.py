@@ -10,14 +10,12 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-
 class BaseResponse(BaseModel):
     """Base response model."""
 
     success: bool = Field(..., description="Whether the request was successful")
     message: Optional[str] = Field(default=None, description="Response message")
     timestamp: datetime = Field(default_factory=datetime.utcnow, description="Response timestamp")
-
 
 class ConversationResponse(BaseResponse):
     """Response from conversation endpoint."""
@@ -26,7 +24,6 @@ class ConversationResponse(BaseResponse):
     intent: Optional[str] = Field(default=None, description="Detected intent")
     persona_used: Optional[str] = Field(default=None, description="Persona ID used")
     conversation_id: Optional[str] = Field(default=None, description="Conversation ID for tracking")
-
 
 class WorkflowExecutionResponse(BaseResponse):
     """Response from workflow execution."""
@@ -37,7 +34,6 @@ class WorkflowExecutionResponse(BaseResponse):
     outputs: Optional[Dict[str, Any]] = Field(default=None, description="Workflow outputs")
     task_results: Optional[Dict[str, Any]] = Field(default=None, description="Individual task results")
 
-
 class AgentResponse(BaseResponse):
     """Response from agent operations."""
 
@@ -46,13 +42,11 @@ class AgentResponse(BaseResponse):
     status: str = Field(..., description="Agent status")
     result: Optional[Any] = Field(default=None, description="Operation result")
 
-
 class AgentListResponse(BaseResponse):
     """Response listing agents."""
 
     agents: List[Dict[str, Any]] = Field(..., description="List of agents")
     total: int = Field(..., description="Total number of agents")
-
 
 class MemoryResponse(BaseResponse):
     """Response from memory operations."""
@@ -62,7 +56,6 @@ class MemoryResponse(BaseResponse):
     results: Optional[List[Dict[str, Any]]] = Field(default=None, description="Search results")
     count: Optional[int] = Field(default=None, description="Number of results")
 
-
 class PersonaResponse(BaseResponse):
     """Response from persona operations."""
 
@@ -70,13 +63,11 @@ class PersonaResponse(BaseResponse):
     persona_name: str = Field(..., description="Persona name")
     persona_data: Optional[Dict[str, Any]] = Field(default=None, description="Persona configuration")
 
-
 class PersonaListResponse(BaseResponse):
     """Response listing personas."""
 
     personas: List[Dict[str, Any]] = Field(..., description="List of personas")
     total: int = Field(..., description="Total number of personas")
-
 
 class LLMCompletionResponse(BaseResponse):
     """Response from LLM completion."""
@@ -87,7 +78,6 @@ class LLMCompletionResponse(BaseResponse):
     usage: Dict[str, int] = Field(..., description="Token usage statistics")
     latency_ms: float = Field(..., description="Response latency in milliseconds")
 
-
 class DocumentAnalysisResponse(BaseResponse):
     """Response from document analysis."""
 
@@ -96,7 +86,6 @@ class DocumentAnalysisResponse(BaseResponse):
     entities: Optional[List[Dict[str, str]]] = Field(default=None, description="Extracted entities")
     keywords: Optional[List[str]] = Field(default=None, description="Generated keywords")
     workflow_id: Optional[UUID] = Field(default=None, description="Analysis workflow ID")
-
 
 class ResearchResponse(BaseResponse):
     """Response from research task."""
@@ -107,14 +96,12 @@ class ResearchResponse(BaseResponse):
     raw_findings: Optional[List[Dict[str, Any]]] = Field(default=None, description="Raw research data")
     depth: str = Field(..., description="Research depth used")
 
-
 class HealthCheckResponse(BaseResponse):
     """Response from health check."""
 
     status: str = Field(..., description="System status")
     services: Dict[str, Dict[str, Any]] = Field(..., description="Service health details")
     version: str = Field(..., description="API version")
-
 
 class ErrorResponse(BaseModel):
     """Error response model."""

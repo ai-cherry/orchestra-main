@@ -44,7 +44,6 @@ MODEL_PROVIDER_MAP = {
     "mistral-": "openrouter",
 }
 
-
 def validate_provider_headers(headers: Mapping[str, str], provider: str, strict: bool = False) -> bool:
     """
     Validate that all required headers for a given provider are present.
@@ -86,7 +85,6 @@ def validate_provider_headers(headers: Mapping[str, str], provider: str, strict:
 
     return True
 
-
 def extract_provider_from_model(model_name: str) -> Optional[str]:
     """
     Extract the provider name from a model name.
@@ -112,7 +110,6 @@ def extract_provider_from_model(model_name: str) -> Optional[str]:
             return provider
 
     return None
-
 
 def extract_provider_from_request(request: Request) -> Optional[str]:
     """
@@ -155,7 +152,6 @@ def extract_provider_from_request(request: Request) -> Optional[str]:
             pass
 
     return None
-
 
 async def validate_headers_middleware(request: Request, call_next):
     """

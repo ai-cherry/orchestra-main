@@ -23,7 +23,6 @@ import yaml
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
 def is_phidata_agent_config(config: Dict[str, Any]) -> bool:
     """
     Check if a dictionary is a Phidata agent configuration.
@@ -36,7 +35,6 @@ def is_phidata_agent_config(config: Dict[str, Any]) -> bool:
     """
     # Check for wrapper_type = phidata or phidata_agent_class
     return isinstance(config, dict) and (config.get("wrapper_type") == "phidata" or "phidata_agent_class" in config)
-
 
 def update_agent_config(config: Dict[str, Any], agent_key: str) -> Tuple[Dict[str, Any], bool]:
     """
@@ -112,7 +110,6 @@ def update_agent_config(config: Dict[str, Any], agent_key: str) -> Tuple[Dict[st
     config[agent_key] = agent_config
     return config, changes_made
 
-
 def process_yaml_file(file_path: str, dry_run: bool = False) -> bool:
     """
     Process a YAML file to update Phidata agent configurations.
@@ -154,7 +151,6 @@ def process_yaml_file(file_path: str, dry_run: bool = False) -> bool:
         logger.error(f"Error processing {file_path}: {e}")
         return False
 
-
 def process_directory(directory: str, dry_run: bool = False) -> Tuple[int, int]:
     """
     Process all YAML files in a directory.
@@ -179,7 +175,6 @@ def process_directory(directory: str, dry_run: bool = False) -> Tuple[int, int]:
                     files_changed += 1
 
     return files_processed, files_changed
-
 
 def main():
     parser = argparse.ArgumentParser(description="Update Phidata agent configs with UI optimization settings")
@@ -217,7 +212,6 @@ def main():
             logger.info("Run without --dry-run to apply these changes.")
     else:
         logger.info("No changes needed to Phidata agent configurations.")
-
 
 if __name__ == "__main__":
     main()

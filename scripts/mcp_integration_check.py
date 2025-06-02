@@ -23,7 +23,6 @@ RED = "\033[91m"
 YELLOW = "\033[93m"
 RESET = "\033[0m"
 
-
 class MCPIntegrationChecker:
     """Check MCP and AI context integration."""
 
@@ -257,12 +256,10 @@ class MCPIntegrationChecker:
         # Return exit code based on issues
         return 1 if self.issues else 0
 
-
 def main():
     """Main entry point."""
     checker = MCPIntegrationChecker()
     sys.exit(checker.run())
-
 
 if __name__ == "__main__":
     main()

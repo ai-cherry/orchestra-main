@@ -22,7 +22,6 @@ from core.personas import (
     PersonaStatus,
 )
 
-
 @pytest.fixture
 def mock_persona_config() -> PersonaConfiguration:
     """Create a mock persona configuration for testing."""
@@ -62,7 +61,6 @@ def mock_persona_config() -> PersonaConfiguration:
         tags=["test", "mock"],
     )
 
-
 @pytest.fixture
 def mock_persona_manager(mock_persona_config: PersonaConfiguration) -> MagicMock:
     """Create a mock PersonaConfigManager."""
@@ -73,7 +71,6 @@ def mock_persona_manager(mock_persona_config: PersonaConfiguration) -> MagicMock
     manager.validate_all.return_value = {}
     manager.check_for_updates.return_value = set()
     return manager
-
 
 @pytest.fixture
 def test_client(mock_persona_manager: MagicMock) -> TestClient:
@@ -87,12 +84,10 @@ def test_client(mock_persona_manager: MagicMock) -> TestClient:
         client = TestClient(app)
         yield client
 
-
 @pytest.fixture
 def valid_api_key() -> str:
     """Return the valid API key for testing."""
     return "4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd"
-
 
 class TestPersonasAdminRouter:
     """Test cases for the personas admin router."""
@@ -264,7 +259,6 @@ class TestPersonasAdminRouter:
 
             assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
             assert "Failed to initialize persona manager" in response.json()["detail"]
-
 
 class TestPersonasAdminIntegration:
     """Integration tests for personas admin router."""

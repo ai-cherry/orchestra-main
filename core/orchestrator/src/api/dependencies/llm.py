@@ -16,7 +16,6 @@ from core.orchestrator.src.config.settings import Settings, get_settings
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 @lru_cache()
 def get_llm_client() -> Any:  # Return type could be LLMClient or an Agno model
     """
@@ -47,8 +46,8 @@ def get_llm_client() -> Any:  # Return type could be LLMClient or an Agno model
                 api_key_anthropic=os.environ.get("ANTHROPIC_API_KEY"),
                 api_key_openai=os.environ.get("OPENAI_API_KEY"),
                 api_key_google=os.environ.get("GEMINI_API_KEY"),
-                vertex_project=settings.gcp_project_id,
-                vertex_location=settings.gcp_region,
+                vertex_project=settings.vultr_project_id,
+                vertex_location=settings.vultr_region,
             )
         except Exception as e:
             logger.error(f"Failed to initialize MonitoredLiteLLMClient: {e}")
@@ -86,7 +85,6 @@ def get_llm_client() -> Any:  # Return type could be LLMClient or an Agno model
 
         return MockPortkeyClient(settings)
 
-
 def use_phidata_implementation(settings: Settings) -> bool:
     """
     Determine whether to use the Phidata/Agno implementation.
@@ -111,7 +109,6 @@ def use_phidata_implementation(settings: Settings) -> bool:
     except ImportError:
         logger.warning("Phidata/Agno packages not available, using legacy LLM client")
         return False
-
 
 def get_phidata_llm_model(settings: Settings) -> Any:
     """

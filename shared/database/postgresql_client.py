@@ -20,7 +20,6 @@ from psycopg_pool import ConnectionPool
 
 logger = logging.getLogger(__name__)
 
-
 class PostgreSQLClient:
     """PostgreSQL client with connection pooling and common operations."""
 

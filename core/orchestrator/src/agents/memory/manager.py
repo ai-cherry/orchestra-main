@@ -25,7 +25,6 @@ T = TypeVar("T")
 
 # Optional: MongoDB integration for long-term memory
 
-
 class MemoryQuery(BaseModel):
     """
     Query parameters for memory retrieval.
@@ -40,7 +39,6 @@ class MemoryQuery(BaseModel):
     offset: int = 0
     time_range: Optional[Tuple[datetime, datetime]] = None
     similarity_threshold: Optional[float] = None
-
 
 class MemoryStats(BaseModel):
     """
@@ -57,7 +55,6 @@ class MemoryStats(BaseModel):
     avg_storage_time_ms: Optional[float] = None
     last_pruned: Optional[datetime] = None
     last_optimized: Optional[datetime] = None
-
 
 class MemoryStore(Generic[T], ABC):
     """
@@ -204,7 +201,6 @@ class MemoryStore(Generic[T], ABC):
         except Exception as e:
             logger.warning(f"MongoDB initialization failed: {e}. Using in-memory storage only.")
             self.db = None
-
 
 class RedisMemoryStore(MemoryStore):
     """
@@ -417,7 +413,6 @@ class RedisMemoryStore(MemoryStore):
             logger.error(f"Failed to clear items from Redis: {e}")
             raise ConnectionError(f"Redis clear failed: {e}")
 
-
 class MongoDBMemoryStore(MemoryStore):
     """
     MongoDB-based memory store implementation.
@@ -471,7 +466,7 @@ class MongoDBMemoryStore(MemoryStore):
             item_dict = item.dict()
 
             # Convert datetime to MongoDB timestamp
-            from google.cloud.mongodb import SERVER_TIMESTAMP
+            # Removed GCP import.mongodb import SERVER_TIMESTAMP
 
             if item_dict.get("timestamp"):
                 item_dict["timestamp"] = item_dict["timestamp"]

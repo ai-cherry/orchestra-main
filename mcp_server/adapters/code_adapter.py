@@ -13,7 +13,6 @@ from .factory_mcp_adapter import FactoryMCPAdapter
 
 logger = logging.getLogger(__name__)
 
-
 class CodeAdapter(FactoryMCPAdapter):
     """Adapter for Code Droid to tools MCP server communication.
 

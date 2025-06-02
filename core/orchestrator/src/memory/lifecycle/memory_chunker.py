@@ -15,7 +15,6 @@ from pydantic import BaseModel, Field
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class ChunkingStrategy(str, Enum):
     """Strategies for chunking memory items."""
 
@@ -24,7 +23,6 @@ class ChunkingStrategy(str, Enum):
     FIXED_SIZE = "fixed_size"  # Split by fixed token/character count
     SEMANTIC = "semantic"  # Split by semantic boundaries using AI
     HYBRID = "hybrid"  # Combine multiple strategies
-
 
 class ChunkMetadata(BaseModel):
     """
@@ -58,7 +56,6 @@ class ChunkMetadata(BaseModel):
     # Additional metadata
     custom_metadata: Dict[str, Any] = Field(default_factory=dict)
 
-
 class Chunk(BaseModel):
     """
     A chunk of a memory item.
@@ -75,7 +72,6 @@ class Chunk(BaseModel):
 
     # Optional embedding for semantic search
     embedding: Optional[List[float]] = None
-
 
 class ChunkerConfig(BaseModel):
     """
@@ -114,7 +110,6 @@ class ChunkerConfig(BaseModel):
     generate_summaries: bool = False
     min_chunk_length: int = 50
     max_chunks_per_item: int = 100
-
 
 class MemoryChunker:
     """
@@ -632,6 +627,5 @@ class MemoryChunker:
                 chunk.metadata.summary = summary
 
         return chunks
-
 
 # Import datetime here to avoid circular import

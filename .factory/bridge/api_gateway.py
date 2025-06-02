@@ -24,7 +24,6 @@ from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
-
 class DroidType(str, Enum):
     """Available Factory AI Droid types."""
 
@@ -33,7 +32,6 @@ class DroidType(str, Enum):
     DEBUG = "debug"
     RELIABILITY = "reliability"
     KNOWLEDGE = "knowledge"
-
 
 class TaskStatus(str, Enum):
     """Task execution status."""
@@ -44,7 +42,6 @@ class TaskStatus(str, Enum):
     FAILED = "failed"
     CANCELLED = "cancelled"
 
-
 @dataclass
 class CircuitBreakerState:
     """Circuit breaker state for fault tolerance."""
@@ -53,7 +50,6 @@ class CircuitBreakerState:
     last_failure_time: Optional[float] = None
     is_open: bool = False
     half_open_attempts: int = 0
-
 
 class FactoryRequest(BaseModel):
     """Request model for Factory AI operations."""
@@ -65,7 +61,6 @@ class FactoryRequest(BaseModel):
     priority: int = Field(default=5, ge=1, le=10)
     timeout: Optional[int] = Field(default=30, ge=1, le=300)
 
-
 class FactoryResponse(BaseModel):
     """Response model for Factory AI operations."""
 
@@ -75,7 +70,6 @@ class FactoryResponse(BaseModel):
     error: Optional[str] = None
     metadata: Dict[str, Any] = Field(default_factory=dict)
     processing_time: Optional[float] = None
-
 
 class FactoryBridgeGateway:
     """Main gateway for Factory AI Bridge operations."""
@@ -371,7 +365,6 @@ class FactoryBridgeGateway:
         """Get recent request history."""
         return [(str(task_id), response) for task_id, response in self.request_history[-limit:]]
 
-
 # FastAPI app setup
 app = FastAPI(
     title="Factory AI Bridge Gateway",
@@ -391,7 +384,6 @@ app.add_middleware(
 # Global gateway instance (initialized on startup)
 gateway: Optional[FactoryBridgeGateway] = None
 
-
 @app.on_event("startup")
 async def startup_event():
     """Initialize gateway on startup."""
@@ -407,7 +399,6 @@ async def startup_event():
             DroidType.KNOWLEDGE: "http://localhost:8004/mcp/memory",
         },
     )
-
 
 @app.post("/api/v1/execute", response_model=FactoryResponse)
 async def execute_task(request: FactoryRequest) -> FactoryResponse:
@@ -429,14 +420,12 @@ async def execute_task(request: FactoryRequest) -> FactoryResponse:
         except Exception:
             raise
 
-
 @app.get("/api/v1/metrics")
 async def get_metrics() -> Dict[str, Any]:
     """Get gateway performance metrics."""
     if not gateway:
         return {"error": "Gateway not initialized"}
     return gateway.get_metrics()
-
 
 @app.get("/api/v1/history")
 async def get_history(limit: int = 100) -> List[Dict[str, Any]]:
@@ -446,7 +435,6 @@ async def get_history(limit: int = 100) -> List[Dict[str, Any]]:
     return [
         {"task_id": task_id, "response": response.dict()} for task_id, response in gateway.get_request_history(limit)
     ]
-
 
 @app.get("/health")
 async def health_check() -> Dict[str, str]:

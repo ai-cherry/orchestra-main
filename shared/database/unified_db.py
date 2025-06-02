@@ -18,7 +18,6 @@ from .weaviate_client import WeaviateClient
 
 logger = logging.getLogger(__name__)
 
-
 class UnifiedDatabase:
     """Unified interface for all database operations."""
 

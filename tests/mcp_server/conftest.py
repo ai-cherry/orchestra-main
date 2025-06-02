@@ -15,13 +15,11 @@ from mcp_server.storage.memory_store import MemoryStore
 from mcp_server.tools.tool_manager import ToolManager
 from mcp_server.workflows.workflow_manager import WorkflowManager
 
-
 @pytest.fixture
 def temp_dir():
     """Create a temporary directory for testing."""
     with tempfile.TemporaryDirectory() as temp_dir:
         yield Path(temp_dir)
-
 
 @pytest.fixture
 def memory_config(temp_dir):
@@ -33,12 +31,10 @@ def memory_config(temp_dir):
         "enable_compression": True,
     }
 
-
 @pytest.fixture
 def memory_store(memory_config):
     """Create a memory store instance for testing."""
     return MemoryStore(memory_config)
-
 
 @pytest.fixture
 def tool_config():
@@ -61,18 +57,15 @@ def tool_config():
         },
     }
 
-
 @pytest.fixture
 def mock_memory_store():
     """Create a mock memory store for testing."""
     return MagicMock()
 
-
 @pytest.fixture
 def tool_manager(tool_config, mock_memory_store):
     """Create a tool manager instance for testing."""
     return ToolManager(tool_config, mock_memory_store)
-
 
 @pytest.fixture
 def mock_tool_manager():
@@ -81,14 +74,12 @@ def mock_tool_manager():
     mock.get_enabled_tools.return_value = ["roo", "gemini"]
     return mock
 
-
 @pytest.fixture
 def workflow_manager(mock_tool_manager, mock_memory_store):
     """Create a workflow manager instance for testing."""
     # We need to patch the Path class to use a temporary directory for workflows
     # This is done in the individual test files
     return WorkflowManager(mock_tool_manager, mock_memory_store)
-
 
 @pytest.fixture
 def test_workflow():
@@ -105,7 +96,6 @@ def test_workflow():
             }
         ],
     }
-
 
 @pytest.fixture
 def test_workflow_with_params():

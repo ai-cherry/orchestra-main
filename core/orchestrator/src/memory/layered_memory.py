@@ -12,7 +12,6 @@ from core.orchestrator.src.memory.interface import MemoryInterface
 
 logger = logging.getLogger(__name__)
 
-
 class LayeredMemory:
     """
     Layered memory implementation for AI Orchestra.

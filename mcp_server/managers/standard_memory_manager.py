@@ -19,7 +19,6 @@ from ..models.memory import CompressionLevel, MemoryEntry
 
 logger = logging.getLogger(__name__)
 
-
 class TokenBudgetManager:
     """Manages token budgets for different tools."""
 
@@ -86,7 +85,6 @@ class TokenBudgetManager:
             return 0
 
         return self.tool_budgets[tool] - self.current_usage[tool]
-
 
 class MemoryCompressionEngine:
     """Handles memory compression and decompression."""
@@ -161,7 +159,6 @@ class MemoryCompressionEngine:
                 }
 
         return compressed_entry
-
 
 class StandardMemoryManager(IMemoryManager):
     """Standard implementation of memory manager."""

@@ -1,23 +1,23 @@
-name: gcp-resources
-display_name: GCP Resources
-description: Access and compare Google Cloud resources with your code
+name: Vultr-resources
+display_name: Vultr Resources
+description: Access and compare Vultr resources with your code
 version: 1.0.0
 base_url: http://localhost:8085
 healthcheck_path: /health
 
 tools:
-  - name: create_gcp_snapshot
-    path: /mcp/tools/create_gcp_snapshot
-    display_name: Create GCP Snapshot
+  - name: create_Vultr_snapshot
+    path: /mcp/tools/create_Vultr_snapshot
+    display_name: Create Vultr Snapshot
     description: |
-      Capture a comprehensive snapshot of your GCP project resources.
-      This tool runs the snapshot_gcp_resources.sh script to generate JSON files with resource details.
-      Use this when you need to analyze your current GCP resources or compare them with your code.
+      Capture a comprehensive snapshot of your Vultr project resources.
+      This tool runs the snapshot_Vultr_resources.sh script to generate JSON files with resource details.
+      Use this when you need to analyze your current Vultr resources or compare them with your code.
     parameters:
       project_id:
         type: string
         required: true
-        description: The GCP project ID to snapshot
+        description: The Vultr project ID to snapshot
       comprehensive:
         type: boolean
         required: false
@@ -34,7 +34,7 @@ tools:
         default: "."
         description: Directory containing code to compare (if comparing)
     examples:
-      - description: Create a basic snapshot of a GCP project
+      - description: Create a basic snapshot of a Vultr project
         parameters:
           project_id: cherry-ai-project
       - description: Create a comprehensive snapshot with code comparison
@@ -44,11 +44,11 @@ tools:
           compare_with_code: true
           code_dir: /workspaces/orchestra-main
 
-  - name: list_gcp_resources
-    path: /mcp/tools/list_gcp_resources
-    display_name: List GCP Resources
+  - name: list_Vultr_resources
+    path: /mcp/tools/list_Vultr_resources
+    display_name: List Vultr Resources
     description: |
-      List resources of a specific type from a GCP snapshot.
+      List resources of a specific type from a Vultr snapshot.
       This tool retrieves structured information about resources such as compute instances,
       Cloud Run services, storage buckets, etc. from a previously captured snapshot.
     parameters:
@@ -77,11 +77,11 @@ tools:
           snapshot_id: cherry-ai-project_2025-05-11-123456
           resource_type: storage
 
-  - name: compare_gcp_with_code
-    path: /mcp/tools/compare_gcp_with_code
-    display_name: Compare GCP with Code
+  - name: compare_Vultr_with_code
+    path: /mcp/tools/compare_Vultr_with_code
+    display_name: Compare Vultr with Code
     description: |
-      Compare GCP resources with code to identify gaps or inconsistencies.
+      Compare Vultr resources with code to identify gaps or inconsistencies.
       This tool analyzes resources in a snapshot and compares them with your codebase
       to find resources that might not be properly tracked in infrastructure-as-code.
     parameters:
@@ -109,22 +109,22 @@ tools:
         default: "."
         description: Directory to compare with
     examples:
-      - description: Compare Cloud Run services with Terraform code
+      - description: Compare Cloud Run services with Pulumi code
         parameters:
           snapshot_id: cherry-ai-project_2025-05-11-123456
           resource_types: ["compute"]
-          code_dir: /workspaces/orchestra-main/terraform
+          code_dir: /workspaces/orchestra-main/pulumi
 
 resources:
   - name: available_snapshots
     path: /mcp/resources/available_snapshots
-    display_name: Available GCP Snapshots
-    description: List all available GCP resource snapshots
+    display_name: Available Vultr Snapshots
+    description: List all available Vultr resource snapshots
 
   - name: snapshot
     path: /mcp/resources/snapshot/{snapshot_id}
-    display_name: GCP Snapshot
-    description: Get information about a specific GCP snapshot
+    display_name: Vultr Snapshot
+    description: Get information about a specific Vultr snapshot
     parameters:
       snapshot_id:
         type: string
@@ -133,8 +133,8 @@ resources:
 
   - name: snapshot_summary
     path: /mcp/resources/snapshot/{snapshot_id}/summary
-    display_name: GCP Snapshot Summary
-    description: Get a human-readable summary of a GCP snapshot
+    display_name: Vultr Snapshot Summary
+    description: Get a human-readable summary of a Vultr snapshot
     parameters:
       snapshot_id:
         type: string
@@ -143,8 +143,8 @@ resources:
 
   - name: resource_file
     path: /mcp/resources/snapshot/{snapshot_id}/resources/{resource_type}/{resource_file}
-    display_name: GCP Resource File
-    description: Get a specific resource file from a GCP snapshot
+    display_name: Vultr Resource File
+    description: Get a specific resource file from a Vultr snapshot
     parameters:
       snapshot_id:
         type: string
@@ -160,5 +160,5 @@ resources:
         description: The resource file to retrieve
 
 startup:
-  command: python3 gcp_resources_mcp_server.py
+  command: python3 Vultr_resources_mcp_server.py
   working_directory: /workspaces/orchestra-main

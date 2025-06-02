@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 # Type variable for search result items
 T = TypeVar("T", bound=Dict[str, Any])
 
-
 class SearchResult(BaseModel, Generic[T]):
     """
     Result of a memory search operation.
@@ -33,7 +32,6 @@ class SearchResult(BaseModel, Generic[T]):
     score: float = 0.0
     source_layer: str = "unknown"
     retrieval_time_ms: float = 0.0
-
 
 class ParallelMemoryRetriever:
     """

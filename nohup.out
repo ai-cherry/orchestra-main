@@ -1,0 +1,1340 @@
+2025-06-02 10:00:18 - core.orchestrator.src.config.config - INFO - Loaded configuration for AI Orchestration System in unified environment
+2025-06-02 10:00:19 - core.orchestrator.src.config.settings - INFO - Loaded configuration for AI Orchestration System in unified environment
+2025-06-02 10:00:19 - core.orchestrator.src.api.dependencies.memory - INFO - Attempting to import memory managers from packages.shared.src.memory
+2025-06-02 10:00:19 - core.orchestrator.src.api.dependencies.memory - WARNING - Failed to import memory managers from packages.shared.src.memory, falling back to stub implementation: No module named 'packages.shared.src.memory.memory_manager'
+2025-06-02 10:00:19 - core.orchestrator.src.api.dependencies.memory - ERROR - Failed to import even stub memory managers: No module named 'packages.shared.src.memory.memory_manager'
+2025-06-02 10:00:19 - core.orchestrator.src.api.dependencies.memory - INFO - Attempting to import hexagonal architecture components for memory service
+2025-06-02 10:00:19 - core.orchestrator.src.api.dependencies.memory - WARNING - Failed to import hexagonal architecture components, falling back to legacy implementation: No module named 'packages.shared.src.memory.adapters'
+2025-06-02 10:00:19 - core.orchestrator.src.config.loader - ERROR - PORTKEY_API_KEY environment variable not set
+INFO:     Started server process [619398]
+INFO:     Waiting for application startup.
+🚀 Orchestra core starting in STANDARD mode
+   Environment settings: USE_RECOVERY_MODE=false, STANDARD_MODE=true
+   Active mode settings: RECOVERY_MODE=False, STANDARD_MODE=True
+2025-06-02 10:00:19 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'cherry': 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:00:19 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'sophia': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:00:19 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'gordon_gekko': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:00:19 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'cherry': 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:00:19 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'sophia': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:00:19 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'gordon_gekko': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:00:19 - core.orchestrator.src.config.loader - ERROR - All persona configurations are invalid. Using default configurations.
+2025-06-02 10:00:19 - core.orchestrator.src.main - ERROR - Failed to load persona configurations: 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/main.py", line 96, in lifespan
+    persona_configs = load_persona_configs()
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 62, in wrapper
+    return cached_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 143, in load_persona_configs
+    return create_default_persona_configs()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 200, in create_default_persona_configs
+    persona_configs["cherry"] = PersonaConfig(**cherry_config)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/main.py", line 253, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:00:19 - core.orchestrator.src.main - WARNING - Application may run with incomplete or default persona configurations due to loading failure.
+2025-06-02 10:00:19 - core.orchestrator.src.main - INFO - Initializing legacy memory manager
+2025-06-02 10:00:19 - core.orchestrator.src.api.dependencies.memory - ERROR - Memory manager components are not available
+2025-06-02 10:00:19 - core.orchestrator.src.main - WARNING - Hexagonal architecture components are not available
+2025-06-02 10:00:19 - core.orchestrator.src.agents.simplified_agent_registry - INFO - SimplifiedAgentRegistry initialized
+2025-06-02 10:00:19 - core.orchestrator.src.services.llm.providers - ERROR - OpenRouter environment validation failed: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:00:19 - core.orchestrator.src.services.llm.providers - WARNING - Failed to initialize default LLM providers: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:00:19 - core.orchestrator.src.agents.llm_agent - INFO - LLMAgent initialized with provider: openrouter
+2025-06-02 10:00:19 - core.orchestrator.src.services.unified_registry - INFO - Initializing 3 services
+2025-06-02 10:00:19 - core.orchestrator.src.services.llm.providers - ERROR - OpenRouter environment validation failed: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:00:19 - core.orchestrator.src.agents.llm_agent - ERROR - Failed to initialize LLM provider: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:00:19 - core.orchestrator.src.services.unified_registry - INFO - All services initialized successfully
+2025-06-02 10:00:19 - core.orchestrator.src.main - INFO - Unified services initialized 
+2025-06-02 10:00:19 - core.orchestrator.src.main - INFO - Registering default agents
+2025-06-02 10:00:19 - core.orchestrator.src.agents.simplified_agent_registry - INFO - Registered agent type: simple_text
+2025-06-02 10:00:19 - core.orchestrator.src.agents.simplified_agent_registry - INFO - Registered agent type: llm_agent
+2025-06-02 10:00:19 - core.orchestrator.src.main - ERROR - Failed to register default agents: 'PersonaAwareAgent' object has no attribute 'agent_type'
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/main.py", line 132, in lifespan
+    register_default_agents()
+  File "/root/orchestra-main/core/orchestrator/src/agents/simplified_agent_registry.py", line 255, in register_default_agents
+    registry.register_agent(persona_agent)
+  File "/root/orchestra-main/core/orchestrator/src/agents/simplified_agent_registry.py", line 56, in register_agent
+    agent_type = agent.agent_type
+                 ^^^^^^^^^^^^^^^^
+AttributeError: 'PersonaAwareAgent' object has no attribute 'agent_type'
+2025-06-02 10:00:19 - core.orchestrator.src.main - WARNING - Default agent registration failed; some functionalities may be unavailable.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2025-06-02 10:00:21 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 177, in async_wrapper
+    return await func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 180, in get_memory_manager
+    raise DependencyError("Memory manager components are not available")
+core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
+2025-06-02 10:00:21 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
+INFO:     127.0.0.1:60220 - "GET /api/health HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 411, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 69, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
+    raise exc
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/routing.py", line 291, in app
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 638, in solve_dependencies
+    solved = await call(**solved_result.values)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/cache.py", line 94, in get_redis_cache
+    _redis_cache = create_redis_cache(settings)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unhashable type: 'Settings'
+2025-06-02 10:01:20 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 177, in async_wrapper
+    return await func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 180, in get_memory_manager
+    raise DependencyError("Memory manager components are not available")
+core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
+2025-06-02 10:01:20 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
+INFO:     127.0.0.1:34054 - "GET /api/health HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 411, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 69, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
+    raise exc
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/routing.py", line 291, in app
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 638, in solve_dependencies
+    solved = await call(**solved_result.values)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/cache.py", line 94, in get_redis_cache
+    _redis_cache = create_redis_cache(settings)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unhashable type: 'Settings'
+INFO:     104.46.201.141:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56680 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60024 - "GET /health HTTP/1.1" 404 Not Found
+2025-06-02 10:06:42 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 177, in async_wrapper
+    return await func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 180, in get_memory_manager
+    raise DependencyError("Memory manager components are not available")
+core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
+2025-06-02 10:06:42 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
+INFO:     127.0.0.1:40336 - "GET /api/health HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 411, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 69, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
+    raise exc
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/routing.py", line 291, in app
+    solved_result = await solve_dependencies(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/dependencies/utils.py", line 638, in solve_dependencies
+    solved = await call(**solved_result.values)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/cache.py", line 94, in get_redis_cache
+    _redis_cache = create_redis_cache(settings)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: unhashable type: 'Settings'
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2025-06-02 10:07:36 - core.orchestrator.src.main - INFO - Application shutting down
+2025-06-02 10:07:36 - core.orchestrator.src.main - INFO - Closing legacy memory manager
+2025-06-02 10:07:36 - core.orchestrator.src.services.unified_registry - INFO - All services closed successfully
+INFO:     Application shutdown complete.
+INFO:     Finished server process [619398]
+2025-06-02 10:07:38 - core.orchestrator.src.config.config - INFO - Loaded configuration for AI Orchestration System in unified environment
+2025-06-02 10:07:39 - core.orchestrator.src.config.settings - INFO - Loaded configuration for AI Orchestration System in unified environment
+2025-06-02 10:07:39 - core.orchestrator.src.api.dependencies.memory - INFO - Attempting to import memory managers from packages.shared.src.memory
+2025-06-02 10:07:39 - core.orchestrator.src.api.dependencies.memory - WARNING - Failed to import memory managers from packages.shared.src.memory, falling back to stub implementation: No module named 'packages.shared.src.memory.memory_manager'
+2025-06-02 10:07:39 - core.orchestrator.src.api.dependencies.memory - ERROR - Failed to import even stub memory managers: No module named 'packages.shared.src.memory.memory_manager'
+2025-06-02 10:07:39 - core.orchestrator.src.api.dependencies.memory - INFO - Attempting to import hexagonal architecture components for memory service
+2025-06-02 10:07:39 - core.orchestrator.src.api.dependencies.memory - WARNING - Failed to import hexagonal architecture components, falling back to legacy implementation: No module named 'packages.shared.src.memory.adapters'
+2025-06-02 10:07:39 - core.orchestrator.src.config.loader - ERROR - PORTKEY_API_KEY environment variable not set
+INFO:     Started server process [623194]
+INFO:     Waiting for application startup.
+🚀 Orchestra core starting in STANDARD mode
+   Environment settings: USE_RECOVERY_MODE=false, STANDARD_MODE=true
+   Active mode settings: RECOVERY_MODE=False, STANDARD_MODE=True
+2025-06-02 10:07:39 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'cherry': 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:07:39 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'sophia': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:07:39 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'gordon_gekko': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:07:39 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'cherry': 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:07:39 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'sophia': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:07:39 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'gordon_gekko': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:07:39 - core.orchestrator.src.config.loader - ERROR - All persona configurations are invalid. Using default configurations.
+2025-06-02 10:07:39 - core.orchestrator.src.main - ERROR - Failed to load persona configurations: 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/main.py", line 96, in lifespan
+    persona_configs = load_persona_configs()
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 62, in wrapper
+    return cached_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 143, in load_persona_configs
+    return create_default_persona_configs()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 200, in create_default_persona_configs
+    persona_configs["cherry"] = PersonaConfig(**cherry_config)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/main.py", line 253, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:07:39 - core.orchestrator.src.main - WARNING - Application may run with incomplete or default persona configurations due to loading failure.
+2025-06-02 10:07:39 - core.orchestrator.src.main - INFO - Initializing legacy memory manager
+2025-06-02 10:07:39 - core.orchestrator.src.api.dependencies.memory - ERROR - Memory manager components are not available
+2025-06-02 10:07:39 - core.orchestrator.src.main - WARNING - Hexagonal architecture components are not available
+2025-06-02 10:07:39 - core.orchestrator.src.agents.simplified_agent_registry - INFO - SimplifiedAgentRegistry initialized
+2025-06-02 10:07:39 - core.orchestrator.src.services.llm.providers - ERROR - OpenRouter environment validation failed: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:07:39 - core.orchestrator.src.services.llm.providers - WARNING - Failed to initialize default LLM providers: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:07:39 - core.orchestrator.src.agents.llm_agent - INFO - LLMAgent initialized with provider: openrouter
+2025-06-02 10:07:39 - core.orchestrator.src.services.unified_registry - INFO - Initializing 3 services
+2025-06-02 10:07:39 - core.orchestrator.src.services.llm.providers - ERROR - OpenRouter environment validation failed: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:07:39 - core.orchestrator.src.agents.llm_agent - ERROR - Failed to initialize LLM provider: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:07:39 - core.orchestrator.src.services.unified_registry - INFO - All services initialized successfully
+2025-06-02 10:07:39 - core.orchestrator.src.main - INFO - Unified services initialized 
+2025-06-02 10:07:39 - core.orchestrator.src.main - INFO - Registering default agents
+2025-06-02 10:07:39 - core.orchestrator.src.agents.simplified_agent_registry - INFO - Registered agent type: simple_text
+2025-06-02 10:07:39 - core.orchestrator.src.agents.simplified_agent_registry - INFO - Registered agent type: llm_agent
+2025-06-02 10:07:39 - core.orchestrator.src.main - ERROR - Failed to register default agents: 'PersonaAwareAgent' object has no attribute 'agent_type'
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/main.py", line 132, in lifespan
+    register_default_agents()
+  File "/root/orchestra-main/core/orchestrator/src/agents/simplified_agent_registry.py", line 255, in register_default_agents
+    registry.register_agent(persona_agent)
+  File "/root/orchestra-main/core/orchestrator/src/agents/simplified_agent_registry.py", line 56, in register_agent
+    agent_type = agent.agent_type
+                 ^^^^^^^^^^^^^^^^
+AttributeError: 'PersonaAwareAgent' object has no attribute 'agent_type'
+2025-06-02 10:07:39 - core.orchestrator.src.main - WARNING - Default agent registration failed; some functionalities may be unavailable.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2025-06-02 10:07:48 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 177, in async_wrapper
+    return await func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 180, in get_memory_manager
+    raise DependencyError("Memory manager components are not available")
+core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
+2025-06-02 10:07:48 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
+INFO:     127.0.0.1:50974 - "GET /api/health HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 411, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 69, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
+    raise exc
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/api/endpoints/health.py", line 87, in check_health
+    if settings.get_gcp_project_id():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/main.py", line 989, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'Settings' object has no attribute 'get_gcp_project_id'
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2025-06-02 10:08:33 - core.orchestrator.src.main - INFO - Application shutting down
+2025-06-02 10:08:33 - core.orchestrator.src.main - INFO - Closing legacy memory manager
+2025-06-02 10:08:33 - core.orchestrator.src.services.unified_registry - INFO - All services closed successfully
+INFO:     Application shutdown complete.
+INFO:     Finished server process [623194]
+2025-06-02 10:08:35 - core.orchestrator.src.config.config - INFO - Loaded configuration for AI Orchestration System in unified environment
+2025-06-02 10:08:36 - core.orchestrator.src.config.settings - INFO - Loaded configuration for AI Orchestration System in unified environment
+2025-06-02 10:08:36 - core.orchestrator.src.api.dependencies.memory - INFO - Attempting to import memory managers from packages.shared.src.memory
+2025-06-02 10:08:36 - core.orchestrator.src.api.dependencies.memory - WARNING - Failed to import memory managers from packages.shared.src.memory, falling back to stub implementation: No module named 'packages.shared.src.memory.memory_manager'
+2025-06-02 10:08:36 - core.orchestrator.src.api.dependencies.memory - ERROR - Failed to import even stub memory managers: No module named 'packages.shared.src.memory.memory_manager'
+2025-06-02 10:08:36 - core.orchestrator.src.api.dependencies.memory - INFO - Attempting to import hexagonal architecture components for memory service
+2025-06-02 10:08:36 - core.orchestrator.src.api.dependencies.memory - WARNING - Failed to import hexagonal architecture components, falling back to legacy implementation: No module named 'packages.shared.src.memory.adapters'
+2025-06-02 10:08:36 - core.orchestrator.src.config.loader - ERROR - PORTKEY_API_KEY environment variable not set
+INFO:     Started server process [623851]
+INFO:     Waiting for application startup.
+🚀 Orchestra core starting in STANDARD mode
+   Environment settings: USE_RECOVERY_MODE=false, STANDARD_MODE=true
+   Active mode settings: RECOVERY_MODE=False, STANDARD_MODE=True
+2025-06-02 10:08:36 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'cherry': 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:08:36 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'sophia': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:08:36 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'gordon_gekko': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:08:36 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'cherry': 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:08:36 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'sophia': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:08:36 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'gordon_gekko': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:08:36 - core.orchestrator.src.config.loader - ERROR - All persona configurations are invalid. Using default configurations.
+2025-06-02 10:08:36 - core.orchestrator.src.main - ERROR - Failed to load persona configurations: 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/main.py", line 96, in lifespan
+    persona_configs = load_persona_configs()
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 62, in wrapper
+    return cached_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 143, in load_persona_configs
+    return create_default_persona_configs()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 200, in create_default_persona_configs
+    persona_configs["cherry"] = PersonaConfig(**cherry_config)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/main.py", line 253, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:08:36 - core.orchestrator.src.main - WARNING - Application may run with incomplete or default persona configurations due to loading failure.
+2025-06-02 10:08:36 - core.orchestrator.src.main - INFO - Initializing legacy memory manager
+2025-06-02 10:08:36 - core.orchestrator.src.api.dependencies.memory - ERROR - Memory manager components are not available
+2025-06-02 10:08:36 - core.orchestrator.src.main - WARNING - Hexagonal architecture components are not available
+2025-06-02 10:08:36 - core.orchestrator.src.agents.simplified_agent_registry - INFO - SimplifiedAgentRegistry initialized
+2025-06-02 10:08:36 - core.orchestrator.src.services.llm.providers - ERROR - OpenRouter environment validation failed: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:08:36 - core.orchestrator.src.services.llm.providers - WARNING - Failed to initialize default LLM providers: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:08:36 - core.orchestrator.src.agents.llm_agent - INFO - LLMAgent initialized with provider: openrouter
+2025-06-02 10:08:36 - core.orchestrator.src.services.unified_registry - INFO - Initializing 3 services
+2025-06-02 10:08:36 - core.orchestrator.src.services.llm.providers - ERROR - OpenRouter environment validation failed: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:08:36 - core.orchestrator.src.agents.llm_agent - ERROR - Failed to initialize LLM provider: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:08:36 - core.orchestrator.src.services.unified_registry - INFO - All services initialized successfully
+2025-06-02 10:08:36 - core.orchestrator.src.main - INFO - Unified services initialized 
+2025-06-02 10:08:36 - core.orchestrator.src.main - INFO - Registering default agents
+2025-06-02 10:08:36 - core.orchestrator.src.agents.simplified_agent_registry - INFO - Registered agent type: simple_text
+2025-06-02 10:08:36 - core.orchestrator.src.agents.simplified_agent_registry - INFO - Registered agent type: llm_agent
+2025-06-02 10:08:36 - core.orchestrator.src.agents.simplified_agent_registry - INFO - Registered agent: simple_text
+2025-06-02 10:08:36 - core.orchestrator.src.agents.llm_agent - INFO - LLMAgent initialized with provider: openrouter
+2025-06-02 10:08:36 - core.orchestrator.src.main - ERROR - Failed to register default agents: property 'capabilities' of 'LLMAgent' object has no setter
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/main.py", line 132, in lifespan
+    register_default_agents()
+  File "/root/orchestra-main/core/orchestrator/src/agents/simplified_agent_registry.py", line 260, in register_default_agents
+    llm_agent.capabilities = [
+    ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: property 'capabilities' of 'LLMAgent' object has no setter
+2025-06-02 10:08:36 - core.orchestrator.src.main - WARNING - Default agent registration failed; some functionalities may be unavailable.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2025-06-02 10:08:36 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 177, in async_wrapper
+    return await func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 180, in get_memory_manager
+    raise DependencyError("Memory manager components are not available")
+core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
+2025-06-02 10:08:36 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
+INFO:     127.0.0.1:38154 - "GET /api/health HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 411, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 69, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
+    raise exc
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/fastapi/routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/api/endpoints/health.py", line 87, in check_health
+    if settings.get_gcp_project_id():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/main.py", line 989, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'Settings' object has no attribute 'get_gcp_project_id'
+INFO:     127.0.0.1:51016 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51632 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2025-06-02 10:10:40 - core.orchestrator.src.main - INFO - Application shutting down
+2025-06-02 10:10:40 - core.orchestrator.src.main - INFO - Closing legacy memory manager
+2025-06-02 10:10:40 - core.orchestrator.src.services.unified_registry - INFO - All services closed successfully
+INFO:     Application shutdown complete.
+INFO:     Finished server process [623851]
+2025-06-02 10:10:43 - core.orchestrator.src.config.config - INFO - Loaded configuration for AI Orchestration System in unified environment
+2025-06-02 10:10:44 - core.orchestrator.src.config.settings - INFO - Loaded configuration for AI Orchestration System in unified environment
+2025-06-02 10:10:44 - core.orchestrator.src.api.dependencies.memory - INFO - Attempting to import memory managers from packages.shared.src.memory
+2025-06-02 10:10:44 - core.orchestrator.src.api.dependencies.memory - WARNING - Failed to import memory managers from packages.shared.src.memory, falling back to stub implementation: No module named 'packages.shared.src.memory.memory_manager'
+2025-06-02 10:10:44 - core.orchestrator.src.api.dependencies.memory - ERROR - Failed to import even stub memory managers: No module named 'packages.shared.src.memory.memory_manager'
+2025-06-02 10:10:44 - core.orchestrator.src.api.dependencies.memory - INFO - Attempting to import hexagonal architecture components for memory service
+2025-06-02 10:10:44 - core.orchestrator.src.api.dependencies.memory - WARNING - Failed to import hexagonal architecture components, falling back to legacy implementation: No module named 'packages.shared.src.memory.adapters'
+2025-06-02 10:10:44 - core.orchestrator.src.config.loader - ERROR - PORTKEY_API_KEY environment variable not set
+INFO:     Started server process [625122]
+INFO:     Waiting for application startup.
+🚀 Orchestra core starting in STANDARD mode
+   Environment settings: USE_RECOVERY_MODE=false, STANDARD_MODE=true
+   Active mode settings: RECOVERY_MODE=False, STANDARD_MODE=True
+2025-06-02 10:10:44 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'cherry': 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:10:44 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'sophia': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:10:44 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'gordon_gekko': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:10:44 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'cherry': 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:10:44 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'sophia': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:10:44 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'gordon_gekko': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:10:44 - core.orchestrator.src.config.loader - ERROR - All persona configurations are invalid. Using default configurations.
+2025-06-02 10:10:44 - core.orchestrator.src.main - ERROR - Failed to load persona configurations: 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/main.py", line 96, in lifespan
+    persona_configs = load_persona_configs()
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 62, in wrapper
+    return cached_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 143, in load_persona_configs
+    return create_default_persona_configs()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 200, in create_default_persona_configs
+    persona_configs["cherry"] = PersonaConfig(**cherry_config)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/main.py", line 253, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:10:44 - core.orchestrator.src.main - WARNING - Application may run with incomplete or default persona configurations due to loading failure.
+2025-06-02 10:10:44 - core.orchestrator.src.main - INFO - Initializing legacy memory manager
+2025-06-02 10:10:44 - core.orchestrator.src.api.dependencies.memory - ERROR - Memory manager components are not available
+2025-06-02 10:10:44 - core.orchestrator.src.main - WARNING - Hexagonal architecture components are not available
+2025-06-02 10:10:44 - core.orchestrator.src.agents.simplified_agent_registry - INFO - SimplifiedAgentRegistry initialized
+2025-06-02 10:10:44 - core.orchestrator.src.services.llm.providers - ERROR - OpenRouter environment validation failed: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:10:44 - core.orchestrator.src.services.llm.providers - WARNING - Failed to initialize default LLM providers: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:10:44 - core.orchestrator.src.agents.llm_agent - INFO - LLMAgent initialized with provider: openrouter
+2025-06-02 10:10:44 - core.orchestrator.src.services.unified_registry - INFO - Initializing 3 services
+2025-06-02 10:10:44 - core.orchestrator.src.services.llm.providers - ERROR - OpenRouter environment validation failed: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:10:44 - core.orchestrator.src.agents.llm_agent - ERROR - Failed to initialize LLM provider: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:10:44 - core.orchestrator.src.services.unified_registry - INFO - All services initialized successfully
+2025-06-02 10:10:44 - core.orchestrator.src.main - INFO - Unified services initialized 
+2025-06-02 10:10:44 - core.orchestrator.src.main - INFO - Registering default agents
+2025-06-02 10:10:44 - core.orchestrator.src.agents.simplified_agent_registry - INFO - Registered agent type: simple_text
+2025-06-02 10:10:44 - core.orchestrator.src.agents.simplified_agent_registry - INFO - Registered agent type: llm_agent
+2025-06-02 10:10:44 - core.orchestrator.src.agents.simplified_agent_registry - INFO - Registered agent: simple_text
+2025-06-02 10:10:44 - core.orchestrator.src.agents.llm_agent - INFO - LLMAgent initialized with provider: openrouter
+2025-06-02 10:10:44 - core.orchestrator.src.main - ERROR - Failed to register default agents: property 'capabilities' of 'LLMAgent' object has no setter
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/main.py", line 132, in lifespan
+    register_default_agents()
+  File "/root/orchestra-main/core/orchestrator/src/agents/simplified_agent_registry.py", line 260, in register_default_agents
+    llm_agent.capabilities = [
+    ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: property 'capabilities' of 'LLMAgent' object has no setter
+2025-06-02 10:10:44 - core.orchestrator.src.main - WARNING - Default agent registration failed; some functionalities may be unavailable.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2025-06-02 10:10:54 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 177, in async_wrapper
+    return await func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 180, in get_memory_manager
+    raise DependencyError("Memory manager components are not available")
+core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
+2025-06-02 10:10:54 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
+INFO:     127.0.0.1:40732 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     70.191.9.28:0 - "POST /api/token HTTP/1.1" 404 Not Found
+INFO:     70.191.9.28:0 - "POST /api/token HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:38772 - "GET /ws/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:38820 - "GET /ws/ec/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php HTTP/1.1" 404 Not Found
+INFO:     185.126.200.177:0 - "GET /api/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51400 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51204 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2025-06-02 10:15:40 - core.orchestrator.src.main - INFO - Application shutting down
+2025-06-02 10:15:40 - core.orchestrator.src.main - INFO - Closing legacy memory manager
+2025-06-02 10:15:40 - core.orchestrator.src.services.unified_registry - INFO - All services closed successfully
+INFO:     Application shutdown complete.
+INFO:     Finished server process [625122]
+2025-06-02 10:15:42 - core.orchestrator.src.config.config - INFO - Loaded configuration for AI Orchestration System in unified environment
+2025-06-02 10:15:43 - core.orchestrator.src.config.settings - INFO - Loaded configuration for AI Orchestration System in unified environment
+2025-06-02 10:15:43 - core.orchestrator.src.api.dependencies.memory - INFO - Attempting to import memory managers from packages.shared.src.memory
+2025-06-02 10:15:43 - core.orchestrator.src.api.dependencies.memory - WARNING - Failed to import memory managers from packages.shared.src.memory, falling back to stub implementation: No module named 'packages.shared.src.memory.memory_manager'
+2025-06-02 10:15:43 - core.orchestrator.src.api.dependencies.memory - ERROR - Failed to import even stub memory managers: No module named 'packages.shared.src.memory.memory_manager'
+2025-06-02 10:15:43 - core.orchestrator.src.api.dependencies.memory - INFO - Attempting to import hexagonal architecture components for memory service
+2025-06-02 10:15:43 - core.orchestrator.src.api.dependencies.memory - WARNING - Failed to import hexagonal architecture components, falling back to legacy implementation: No module named 'packages.shared.src.memory.adapters'
+2025-06-02 10:15:43 - core.orchestrator.src.config.loader - ERROR - PORTKEY_API_KEY environment variable not set
+INFO:     Started server process [627909]
+INFO:     Waiting for application startup.
+🚀 Orchestra core starting in STANDARD mode
+   Environment settings: USE_RECOVERY_MODE=false, STANDARD_MODE=true
+   Active mode settings: RECOVERY_MODE=False, STANDARD_MODE=True
+2025-06-02 10:15:43 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'cherry': 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:15:43 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'sophia': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:15:43 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'gordon_gekko': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:15:43 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'cherry': 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:15:43 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'sophia': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:15:43 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'gordon_gekko': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:15:43 - core.orchestrator.src.config.loader - ERROR - All persona configurations are invalid. Using default configurations.
+2025-06-02 10:15:43 - core.orchestrator.src.main - ERROR - Failed to load persona configurations: 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/main.py", line 96, in lifespan
+    persona_configs = load_persona_configs()
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 62, in wrapper
+    return cached_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 143, in load_persona_configs
+    return create_default_persona_configs()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 200, in create_default_persona_configs
+    persona_configs["cherry"] = PersonaConfig(**cherry_config)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/main.py", line 253, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:15:43 - core.orchestrator.src.main - WARNING - Application may run with incomplete or default persona configurations due to loading failure.
+2025-06-02 10:15:43 - core.orchestrator.src.main - INFO - Initializing legacy memory manager
+2025-06-02 10:15:43 - core.orchestrator.src.api.dependencies.memory - ERROR - Memory manager components are not available
+2025-06-02 10:15:43 - core.orchestrator.src.main - WARNING - Hexagonal architecture components are not available
+2025-06-02 10:15:43 - core.orchestrator.src.agents.simplified_agent_registry - INFO - SimplifiedAgentRegistry initialized
+2025-06-02 10:15:43 - core.orchestrator.src.services.llm.providers - ERROR - OpenRouter environment validation failed: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:15:43 - core.orchestrator.src.services.llm.providers - WARNING - Failed to initialize default LLM providers: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:15:43 - core.orchestrator.src.agents.llm_agent - INFO - LLMAgent initialized with provider: openrouter
+2025-06-02 10:15:43 - core.orchestrator.src.services.unified_registry - INFO - Initializing 3 services
+2025-06-02 10:15:43 - core.orchestrator.src.services.llm.providers - ERROR - OpenRouter environment validation failed: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:15:43 - core.orchestrator.src.agents.llm_agent - ERROR - Failed to initialize LLM provider: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:15:43 - core.orchestrator.src.services.unified_registry - INFO - All services initialized successfully
+2025-06-02 10:15:43 - core.orchestrator.src.main - INFO - Unified services initialized 
+2025-06-02 10:15:43 - core.orchestrator.src.main - INFO - Registering default agents
+2025-06-02 10:15:43 - core.orchestrator.src.agents.simplified_agent_registry - INFO - Registered agent type: simple_text
+2025-06-02 10:15:43 - core.orchestrator.src.agents.simplified_agent_registry - INFO - Registered agent type: llm_agent
+2025-06-02 10:15:43 - core.orchestrator.src.agents.simplified_agent_registry - INFO - Registered agent: simple_text
+2025-06-02 10:15:43 - core.orchestrator.src.agents.llm_agent - INFO - LLMAgent initialized with provider: openrouter
+2025-06-02 10:15:43 - core.orchestrator.src.main - ERROR - Failed to register default agents: property 'capabilities' of 'LLMAgent' object has no setter
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/main.py", line 132, in lifespan
+    register_default_agents()
+  File "/root/orchestra-main/core/orchestrator/src/agents/simplified_agent_registry.py", line 260, in register_default_agents
+    llm_agent.capabilities = [
+    ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: property 'capabilities' of 'LLMAgent' object has no setter
+2025-06-02 10:15:43 - core.orchestrator.src.main - WARNING - Default agent registration failed; some functionalities may be unavailable.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:40752 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     70.191.9.28:0 - "POST /api/token HTTP/1.1" 404 Not Found
+INFO:     70.191.9.28:0 - "POST /api/token HTTP/1.1" 404 Not Found
+INFO:     70.191.9.28:0 - "POST /api/token HTTP/1.1" 404 Not Found
+INFO:     70.191.9.28:0 - "POST /api/token HTTP/1.1" 404 Not Found
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2025-06-02 10:19:06 - core.orchestrator.src.main - INFO - Application shutting down
+2025-06-02 10:19:06 - core.orchestrator.src.main - INFO - Closing legacy memory manager
+2025-06-02 10:19:06 - core.orchestrator.src.services.unified_registry - INFO - All services closed successfully
+INFO:     Application shutdown complete.
+INFO:     Finished server process [627909]
+2025-06-02 10:19:08 - core.orchestrator.src.config.config - INFO - Loaded configuration for AI Orchestration System in unified environment
+2025-06-02 10:19:09 - core.orchestrator.src.config.settings - INFO - Loaded configuration for AI Orchestration System in unified environment
+2025-06-02 10:19:09 - core.orchestrator.src.api.dependencies.memory - INFO - Attempting to import memory managers from packages.shared.src.memory
+2025-06-02 10:19:09 - core.orchestrator.src.api.dependencies.memory - WARNING - Failed to import memory managers from packages.shared.src.memory, falling back to stub implementation: No module named 'packages.shared.src.memory.memory_manager'
+2025-06-02 10:19:09 - core.orchestrator.src.api.dependencies.memory - ERROR - Failed to import even stub memory managers: No module named 'packages.shared.src.memory.memory_manager'
+2025-06-02 10:19:09 - core.orchestrator.src.api.dependencies.memory - INFO - Attempting to import hexagonal architecture components for memory service
+2025-06-02 10:19:09 - core.orchestrator.src.api.dependencies.memory - WARNING - Failed to import hexagonal architecture components, falling back to legacy implementation: No module named 'packages.shared.src.memory.adapters'
+2025-06-02 10:19:09 - core.orchestrator.src.config.loader - ERROR - PORTKEY_API_KEY environment variable not set
+INFO:     Started server process [629818]
+INFO:     Waiting for application startup.
+🚀 Orchestra core starting in STANDARD mode
+   Environment settings: USE_RECOVERY_MODE=false, STANDARD_MODE=true
+   Active mode settings: RECOVERY_MODE=False, STANDARD_MODE=True
+2025-06-02 10:19:09 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'cherry': 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:19:09 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'sophia': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:19:09 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'gordon_gekko': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:19:09 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'cherry': 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:19:09 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'sophia': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Sophia', 'descr... 'style': 'analytical'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:19:09 - core.orchestrator.src.config.loader - ERROR - Invalid configuration for persona 'gordon_gekko': 2 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+system_prompt
+  Field required [type=missing, input_value={'name': 'Gordon Gekko', ..., 'domain': 'business'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:19:09 - core.orchestrator.src.config.loader - ERROR - All persona configurations are invalid. Using default configurations.
+2025-06-02 10:19:09 - core.orchestrator.src.main - ERROR - Failed to load persona configurations: 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/main.py", line 95, in lifespan
+    persona_configs = load_persona_configs()
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 61, in wrapper
+    return cached_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 141, in load_persona_configs
+    return create_default_persona_configs()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/config/loader.py", line 197, in create_default_persona_configs
+    persona_configs["cherry"] = PersonaConfig(**cherry_config)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/main.py", line 253, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 3 validation errors for PersonaConfig
+id
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+traits.creativity
+  Input should be a valid integer, got a number with a fractional part [type=int_from_float, input_value=0.9, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.11/v/int_from_float
+system_prompt
+  Field required [type=missing, input_value={'name': 'Cherry', 'descr...e, 'style': 'creative'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/missing
+2025-06-02 10:19:09 - core.orchestrator.src.main - WARNING - Application may run with incomplete or default persona configurations due to loading failure.
+2025-06-02 10:19:09 - core.orchestrator.src.main - INFO - Initializing legacy memory manager
+2025-06-02 10:19:09 - core.orchestrator.src.api.dependencies.memory - ERROR - Memory manager components are not available
+2025-06-02 10:19:09 - core.orchestrator.src.main - WARNING - Hexagonal architecture components are not available
+2025-06-02 10:19:09 - core.orchestrator.src.agents.simplified_agent_registry - INFO - SimplifiedAgentRegistry initialized
+2025-06-02 10:19:09 - core.orchestrator.src.services.llm.providers - ERROR - OpenRouter environment validation failed: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:19:09 - core.orchestrator.src.services.llm.providers - WARNING - Failed to initialize default LLM providers: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:19:09 - core.orchestrator.src.agents.llm_agent - INFO - LLMAgent initialized with provider: openrouter
+2025-06-02 10:19:09 - core.orchestrator.src.services.unified_registry - INFO - Initializing 3 services
+2025-06-02 10:19:09 - core.orchestrator.src.services.llm.providers - ERROR - OpenRouter environment validation failed: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:19:09 - core.orchestrator.src.agents.llm_agent - ERROR - Failed to initialize LLM provider: OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment.
+2025-06-02 10:19:09 - core.orchestrator.src.services.unified_registry - INFO - All services initialized successfully
+2025-06-02 10:19:09 - core.orchestrator.src.main - INFO - Unified services initialized 
+2025-06-02 10:19:09 - core.orchestrator.src.main - INFO - Registering default agents
+2025-06-02 10:19:09 - core.orchestrator.src.agents.simplified_agent_registry - INFO - Registered agent type: simple_text
+2025-06-02 10:19:09 - core.orchestrator.src.agents.simplified_agent_registry - INFO - Registered agent type: llm_agent
+2025-06-02 10:19:09 - core.orchestrator.src.agents.simplified_agent_registry - INFO - Registered agent: simple_text
+2025-06-02 10:19:09 - core.orchestrator.src.agents.llm_agent - INFO - LLMAgent initialized with provider: openrouter
+2025-06-02 10:19:09 - core.orchestrator.src.main - ERROR - Failed to register default agents: property 'capabilities' of 'LLMAgent' object has no setter
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/main.py", line 131, in lifespan
+    register_default_agents()
+  File "/root/orchestra-main/core/orchestrator/src/agents/simplified_agent_registry.py", line 255, in register_default_agents
+    llm_agent.capabilities = [
+    ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: property 'capabilities' of 'LLMAgent' object has no setter
+2025-06-02 10:19:09 - core.orchestrator.src.main - WARNING - Default agent registration failed; some functionalities may be unavailable.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     70.191.9.28:0 - "POST /api/token HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:51312 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57494 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56618 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56618 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     172.203.19.242:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:32824 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:34692 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:45996 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:41152 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56088 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:37448 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     137.117.14.43:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:35428 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54868 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:37514 - "GET / HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+INFO:     127.0.0.1:59446 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54650 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     13.91.225.210:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60578 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:48546 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54906 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:47390 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55644 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55984 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     104.42.106.101:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53764 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59612 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:46218 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56428 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56072 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:43598 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:46758 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58152 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     20.241.38.162:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:40152 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59472 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:34358 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:47566 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     20.163.69.171:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52038 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:35850 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:44452 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55252 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:33824 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36092 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     104.209.46.233:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:41580 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:33268 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:41300 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56348 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57924 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54820 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:35112 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:45410 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     172.183.45.75:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36964 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36626 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:37886 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50882 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58548 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:42580 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     172.183.24.175:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:47624 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:41502 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53580 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59016 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:33294 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57936 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56864 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:43478 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59702 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54636 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     20.39.34.107:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52864 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:38500 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57240 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53352 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60286 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:44248 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     185.247.137.44:38231 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:35774 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:35240 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51306 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:39444 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     13.91.176.192:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:43590 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:37398 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     184.105.139.80:29039 - "GET / HTTP/1.1" 404 Not Found
+INFO:     184.105.139.108:30341 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     184.105.139.116:20753 - "GET /?format=json HTTP/1.1" 404 Not Found
+WARNING:  Unsupported upgrade request.
+WARNING:  No supported WebSocket library detected. Please use "pip install 'uvicorn[standard]'", or install 'websockets' or 'wsproto' manually.
+WARNING:  Invalid HTTP request received.
+INFO:     127.0.0.1:53532 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:40508 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55390 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:33594 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     172.191.57.117:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50498 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:41710 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56108 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:44396 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:33932 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53420 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     13.91.160.221:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:35150 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:39794 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:37774 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:32946 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     40.121.155.46:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36412 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52822 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:39150 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50322 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     172.178.9.175:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:43990 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55292 - "GET /health HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     127.0.0.1:45598 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:48314 - "GET /health HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+INFO:     127.0.0.1:35544 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55516 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:39996 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:41622 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     172.183.160.3:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54892 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56958 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:40930 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:41240 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:33798 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:45826 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     65.52.27.58:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49398 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:48384 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55934 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:39274 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     13.91.36.129:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:42270 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56448 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36750 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:48550 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:43554 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58656 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     104.209.35.93:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52588 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59682 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51758 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52134 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:43744 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59170 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36586 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:43142 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     172.183.68.110:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55990 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:46830 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36058 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:41892 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:38380 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:37118 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     40.79.248.29:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:45058 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51762 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53852 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60464 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     52.177.131.182:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:39262 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49046 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52928 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:37342 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55480 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60194 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     20.185.50.83:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:47644 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:36224 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53082 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52670 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:33188 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51664 - "GET /health HTTP/1.1" 404 Not Found
+2025-06-02 16:15:49 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 174, in async_wrapper
+    return await func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 176, in get_memory_manager
+    raise DependencyError("Memory manager components are not available")
+core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
+2025-06-02 16:15:49 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
+INFO:     127.0.0.1:43688 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:36900 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50410 - "GET /api/personas HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:42784 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54538 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     172.236.228.39:22942 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50186 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51678 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     172.56.209.174:0 - "GET /api/agents HTTP/1.1" 404 Not Found
+INFO:     172.203.71.249:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
+2025-06-02 16:24:04 - core.orchestrator.src.utils.error_handling - ERROR - DependencyError: Memory manager components are not available | Context: function=get_memory_manager
+Traceback (most recent call last):
+  File "/root/orchestra-main/core/orchestrator/src/utils/error_handling.py", line 174, in async_wrapper
+    return await func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/orchestra-main/core/orchestrator/src/api/dependencies/memory.py", line 176, in get_memory_manager
+    raise DependencyError("Memory manager components are not available")
+core.orchestrator.src.exceptions.DependencyError: Memory manager components are not available
+2025-06-02 16:24:04 - core.orchestrator.src.utils.error_handling - WARNING - Failed to log error to monitoring: No module named 'opentelemetry.exporter.cloud_trace'
+INFO:     45.32.69.157:0 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     45.32.69.157:0 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37426 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51052 - "GET /health HTTP/1.1" 404 Not Found

@@ -16,7 +16,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class PostgreSQLConnectionManager:
     """
     Singleton connection manager for all PostgreSQL operations.
@@ -186,10 +185,8 @@ class PostgreSQLConnectionManager:
             logger.error(f"Health check failed: {e}")
             return {"status": "unhealthy", "error": str(e)}
 
-
 # Global instance
 _connection_manager: Optional[PostgreSQLConnectionManager] = None
-
 
 async def get_connection_manager() -> PostgreSQLConnectionManager:
     """Get or create the global connection manager."""
@@ -198,7 +195,6 @@ async def get_connection_manager() -> PostgreSQLConnectionManager:
         _connection_manager = PostgreSQLConnectionManager()
         await _connection_manager.initialize()
     return _connection_manager
-
 
 async def close_connection_manager() -> None:
     """Close the global connection manager."""

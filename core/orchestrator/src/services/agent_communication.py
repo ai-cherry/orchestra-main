@@ -17,7 +17,6 @@ from core.orchestrator.src.services.pubsub_client import get_pubsub_client
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class AgentCommunicationService:
     """Service for agent communication using PubSub."""
 
@@ -264,10 +263,8 @@ class AgentCommunicationService:
         self.subscriptions.clear()
         logger.info(f"Agent communication closed for agent {self.agent_id}")
 
-
 # Singleton instance
 _agent_communication = None
-
 
 async def get_agent_communication(
     agent_id: Optional[str] = None, conversation_id: Optional[str] = None

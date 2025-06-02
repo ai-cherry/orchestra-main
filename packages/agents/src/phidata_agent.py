@@ -12,7 +12,6 @@ from ._base import OrchestraAgentBase
 
 logger = logging.getLogger(__name__)
 
-
 class PhidataAgentWrapper(OrchestraAgentBase):
     """
     Wrapper for integrating Phidata-based agents with Orchestra.

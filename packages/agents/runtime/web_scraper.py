@@ -20,7 +20,6 @@ from packages.shared.src.models.base_models import AgentData
 
 logger = logging.getLogger(__name__)
 
-
 class WebScraperRuntimeAgent(BaseAgent):
     """
     Runtime Agent for scraping web content from specified URLs.

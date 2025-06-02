@@ -14,7 +14,6 @@ from pulumi import Config
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
 class SuperAGIDeployment:
     def __init__(self, name: str, config: Dict[str, str]):
         """
@@ -76,7 +75,6 @@ class SuperAGIDeployment:
         # Export useful endpoints
         pulumi.export("superagi_url", self.app.live_url)
         pulumi.export("container_registry", registry.endpoint)
-
 
 # Example usage
 if __name__ == "__main__":

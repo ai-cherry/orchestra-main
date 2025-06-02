@@ -7,7 +7,6 @@ import pulumi
 import pulumi_digitalocean as do
 from pulumi import Output
 
-
 class DatabaseComponent:
     def __init__(self, name, config):
         self._name = name

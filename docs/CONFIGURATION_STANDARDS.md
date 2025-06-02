@@ -7,7 +7,7 @@ This document outlines the standards and best practices for configuration manage
 - [Environment Variable Management](#environment-variable-management)
 - [Secret Management](#secret-management)
 - [Configuration Files](#configuration-files)
-- [Terraform Infrastructure](#terraform-infrastructure)
+- [Pulumi Infrastructure](#pulumi-infrastructure)
 - [Naming Conventions](#naming-conventions)
 - [Migration Guide](#migration-guide)
 
@@ -27,7 +27,7 @@ This document outlines the standards and best practices for configuration manage
    - Secrets: Should be properly secured in
 ### Standard Environment Variables
 
-| Category        | Environment Variable            | Terraform/| --------------- | ------------------------------- | ----------------------------- | --------------------------------------------------- |
+| Category        | Environment Variable            | Pulumi/| --------------- | ------------------------------- | ----------------------------- | --------------------------------------------------- |
 | **Environment** | `ENVIRONMENT`                   | `env`                         | Environment name (development, staging, production) |
 | **| **Database**    | `POSTGRES_HOST`                 | N/A                           | PostgreSQL host address                             |
 |                 | `POSTGRES_DATABASE`             | N/A                           | PostgreSQL database name                            |
@@ -59,7 +59,7 @@ api_key = secrets.get("openai-api-key", "default-value")
 ### Adding New Secrets
 
 1. **Add to `.env`** for development (temporarily)
-2. **Add to `add_secrets_to_manager.sh`** for migration to 3. **Add to `secrets.tf`** for Terraform management
+2. **Add to `add_secrets_to_manager.sh`** for migration to 3. **Add to `secrets.py`** for Pulumi management
 4. **Update code** to use the
 ### Secret Naming Convention
 
@@ -82,29 +82,29 @@ api_key = secrets.get("openai-api-key", "default-value")
 - `config/loader.py`: Configuration loading utilities
 - `config/secret_manager.py`: Secret access utilities
 
-## Terraform Infrastructure
+## Pulumi Infrastructure
 
 ### Resource Organization
 
-- `main.tf`: Core infrastructure setup
-- `cloudrun.tf`: - `cloudsql.tf`: Database configuration
-- `network.tf`: Networking configuration
-- `secrets.tf`:
+- `main.py`: Core infrastructure setup
+- `cloudrun.py`: - `cloudsql.py`: Database configuration
+- `network.py`: Networking configuration
+- `secrets.py`:
 ### Secret Integration
 
-Terraform integrates secrets in two ways:
+Pulumi integrates secrets in two ways:
 
 1. **Resource Creation**:
 
-   ```terraform
-   resource "google_secret_manager_secret" "llm_api_keys" {
+   ```pulumi
+   llm_api_keys = google_secret_manager_secret( {
      for_each = { ... }
      secret_id = "${each.key}-${var.env}"
      ...
    }
    ```
 
-2. **Resource Access in    ```terraform
+2. **Resource Access in    ```pulumi
    env {
      name = "OPENAI_API_KEY"
      value_source {
@@ -121,7 +121,7 @@ Terraform integrates secrets in two ways:
 ### File Extensions
 
 - `.yaml` or `.yml`: YAML configuration files
-- `.tf`: Terraform files
+- `.py`: Python source code (including Pulumi)
 - `.sh`: Shell scripts
 - `.py`: Python source code
 - `.env`: Environment variable files (not checked into git)
@@ -131,7 +131,7 @@ Terraform integrates secrets in two ways:
 
 - **YAML**: `lower_snake_case` for keys
 - **Environment Variables**: `UPPER_SNAKE_CASE`
-- **Terraform Resources**: `lower_snake_case`
+- **Pulumi Resources**: `lower_snake_case`
 - **
 ## Migration Guide
 
@@ -147,17 +147,17 @@ chmod +x add_secrets_to_manager.sh
 # Run the script (requires ./add_secrets_to_manager.sh
 ```
 
-### Step 3: Update Terraform
+### Step 3: Update Pulumi
 
 ```bash
-# Navigate to Terraform directory
-cd infra/orchestra-terraform
+# Navigate to Pulumi directory
+cd infra/orchestra-pulumi
 
-# Initialize Terraform
-terraform init
+# Initialize Pulumi
+pulumi init
 
 # Apply changes
-terraform apply
+pulumi apply
 ```
 
 ### Step 4: Update Code to Use

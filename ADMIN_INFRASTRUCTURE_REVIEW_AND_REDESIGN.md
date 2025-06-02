@@ -281,7 +281,7 @@ groups:
 ### 5.2 Security Hardening
 
 1. **Zero Trust Network**: Service mesh with mTLS
-2. **Secrets Management**: HashiCorp Vault integration
+2. **Secrets Management**: Pulumi Vault integration
 3. **RBAC**: Fine-grained access control
 4. **Audit Logging**: Comprehensive audit trail
 
@@ -617,7 +617,7 @@ groups:
 ### 5.2 Security Hardening
 
 1. **Zero Trust Network**: Service mesh with mTLS
-2. **Secrets Management**: HashiCorp Vault integration
+2. **Secrets Management**: Pulumi Vault integration
 3. **RBAC**: Fine-grained access control
 4. **Audit Logging**: Comprehensive audit trail
 

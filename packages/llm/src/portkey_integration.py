@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 # Type variable for model classes
 T = TypeVar("T")
 
-
 def create_portkey_headers(
     api_key: str,
     provider: str,
@@ -64,7 +63,6 @@ def create_portkey_headers(
             **({"x-portkey-trace-id": trace_id} if trace_id else {}),
         }
 
-
 def configure_phidata_model(model_class: Type[T], config: LLMProviderConfig) -> T:
     """
     Configure a Phidata/Agno model with Portkey integration.
@@ -91,7 +89,6 @@ def configure_phidata_model(model_class: Type[T], config: LLMProviderConfig) -> 
     except Exception as e:
         logger.error(f"Error initializing {model_class.__name__}: {e}")
         raise
-
 
 def configure_model_from_settings(model_class: Type[T], settings: Settings, provider: str) -> T:
     """

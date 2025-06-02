@@ -25,7 +25,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("optimized-ide-integration")
 
-
 class LightweightIDEContext:
     """Simplified IDE context tracker."""
 
@@ -98,7 +97,6 @@ class LightweightIDEContext:
 
         return context
 
-
 class FastIDEIntegration:
     """Optimized IDE integration for single-developer projects."""
 
@@ -158,7 +156,6 @@ class FastIDEIntegration:
         # Here we just simulate a response
         return f"Completion for: {prompt}\n[Using editor context from {context['active_file']}]"
 
-
 def simulate_coding_session():
     """Simulate a coding session with the optimized IDE integration."""
     print("=== Optimized IDE Integration Demo ===\n")
@@ -217,7 +214,6 @@ if __name__ == "__main__":
     print("2. Simplified context management")
     print("3. Throttled updates to improve performance")
     print("4. Direct memory access without complex synchronization")
-
 
 if __name__ == "__main__":
     simulate_coding_session()

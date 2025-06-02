@@ -19,7 +19,6 @@ from .transitions import ModeTransitionManager
 
 logger = logging.getLogger(__name__)
 
-
 class OperationStatus(str, Enum):
     """Status of a boomerang operation."""
 
@@ -27,7 +26,6 @@ class OperationStatus(str, Enum):
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
     FAILED = "failed"
-
 
 class OperationContext(BaseModel):
     """Context for a boomerang operation."""
@@ -67,7 +65,6 @@ class OperationContext(BaseModel):
         """Update the status of the operation."""
         self.status = status
         self.updated_at = time.time()
-
 
 class BoomerangOperation:
     """
@@ -356,7 +353,6 @@ class BoomerangOperation:
 
         return None
 
-
 class RooMemoryCategory(str, Enum):
     """Categories of memory entries related to Roo operations."""
 
@@ -366,7 +362,6 @@ class RooMemoryCategory(str, Enum):
     CODE_CHANGE = "code_change"
     ANALYSIS = "analysis"
     USER_PREFERENCE = "user_preference"
-
 
 class RooMemoryManager:
     """

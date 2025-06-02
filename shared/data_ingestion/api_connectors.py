@@ -29,10 +29,8 @@ from shared.data_ingestion.base_processor import (  # This is for the *existing*
 # This BaseProcessor is from the *new* design in base_processor.py
 # from .base_processor import BaseProcessor, ProcessedData # This was for the other design
 
-
 # ---- User-provided/Newer API Connector Structure ----
 # from typing import Any, AsyncGenerator, Dict, List, Optional # Already imported
-
 
 class BaseAPIConnector(abc.ABC):
     """
@@ -63,7 +61,6 @@ class BaseAPIConnector(abc.ABC):
             # import asyncio # Already imported
             await asyncio.sleep(self.throttle)
 
-
 class RESTConnector(BaseAPIConnector):
     """
     Async connector for REST APIs with auto-pagination and adaptive throttling.
@@ -74,7 +71,6 @@ class RESTConnector(BaseAPIConnector):
     ) -> AsyncGenerator[List[Dict[str, Any]], None]:
         # TODO: Implement with httpx or aiohttp, support for pagination (offset, cursor, token)
         raise NotImplementedError
-
 
 class GraphQLConnector(BaseAPIConnector):
     """
@@ -87,7 +83,6 @@ class GraphQLConnector(BaseAPIConnector):
         # TODO: Implement with httpx or aiohttp, support for queries, mutations, subscriptions
         raise NotImplementedError
 
-
 class WebSocketConnector(BaseAPIConnector):
     """
     Async connector for WebSocket APIs (real-time streaming ingestion).
@@ -98,7 +93,6 @@ class WebSocketConnector(BaseAPIConnector):
     ) -> AsyncGenerator[List[Dict[str, Any]], None]:
         # TODO: Implement with websockets or aiohttp, support for message chunking
         raise NotImplementedError
-
 
 class GRPCConnector(BaseAPIConnector):
     """
@@ -111,7 +105,6 @@ class GRPCConnector(BaseAPIConnector):
         # TODO: Implement with grpc.aio, support for streaming and unary calls
         raise NotImplementedError
 
-
 class CustomAPIConnector(BaseAPIConnector):
     """
     Async connector for custom or proprietary APIs.
@@ -122,7 +115,6 @@ class CustomAPIConnector(BaseAPIConnector):
     ) -> AsyncGenerator[List[Dict[str, Any]], None]:
         # TODO: Implement custom protocol logic
         raise NotImplementedError
-
 
 # ---- Previously Generated & Integrated API Processor Structure ----
 # Note: This APIProcessor inherits from the BaseProcessor used by the current pipeline.
@@ -202,7 +194,6 @@ class APIProcessor(BaseProcessor):
 
     def supported_formats(self) -> List[str]:
         return ["api", "rest", "http"]
-
 
 class RESTAPIProcessor(APIProcessor):
     """Process data from REST APIs with pagination support."""
@@ -331,7 +322,6 @@ class RESTAPIProcessor(APIProcessor):
         finally:
             await self.close()
 
-
 class GraphQLProcessor(APIProcessor):
     """Process data from GraphQL APIs."""
 
@@ -433,7 +423,6 @@ class GraphQLProcessor(APIProcessor):
             items.append(data)
 
         return items
-
 
 class WebSocketProcessor(BaseProcessor):
     """Process streaming data from WebSocket connections."""

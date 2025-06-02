@@ -14,7 +14,6 @@ from ._base import OrchestraAgentBase
 
 logger = logging.getLogger(__name__)
 
-
 class LangChainAgentWrapper(OrchestraAgentBase):
     """
     Wrapper for integrating LangChain-based agents with Orchestra.

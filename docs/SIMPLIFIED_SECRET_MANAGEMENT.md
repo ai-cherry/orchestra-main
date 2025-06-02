@@ -30,9 +30,9 @@ api_key = os.getenv("API_KEY")
 ### 2. Cloud Deployment
 
 For cloud deployment, use
-```terraform
+```pulumi
 # Simple secret definition
-resource "google_secret_manager_secret" "api_key" {
+api_key = google_secret_manager_secret( {
   secret_id = "api-key"
   replication {
     automatic = true
@@ -40,7 +40,7 @@ resource "google_secret_manager_secret" "api_key" {
 }
 
 # Simple access for the service account
-resource "google_secret_manager_secret_iam_binding" "binding" {
+binding = google_secret_manager_secret_iam_binding( {
   secret_id = google_secret_manager_secret.api_key.id
   role      = "roles/secretmanager.secretAccessor"
   members   = ["serviceAccount:${var.service_account}"]

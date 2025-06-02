@@ -7,7 +7,6 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-
 def check_json_validity(file_path: Path) -> Tuple[bool, str]:
     """Check if a JSON file is valid."""
     try:
@@ -18,7 +17,6 @@ def check_json_validity(file_path: Path) -> Tuple[bool, str]:
         return False, f"JSON Error: {e}"
     except Exception as e:
         return False, f"Error: {e}"
-
 
 def validate_mode_structure(mode_data: dict, mode_name: str) -> List[str]:
     """Validate the structure of a mode configuration."""
@@ -44,7 +42,6 @@ def validate_mode_structure(mode_data: dict, mode_name: str) -> List[str]:
         errors.append(f"Slug mismatch: expected '{mode_name}', got '{mode_data.get('slug')}'")
 
     return errors
-
 
 def validate_modes() -> Dict[str, Dict]:
     """Validate all mode configurations."""
@@ -110,7 +107,6 @@ def validate_modes() -> Dict[str, Dict]:
 
     return results
 
-
 def validate_rules() -> Dict[str, Dict]:
     """Validate rules directories and content."""
     rules_base = Path(".roo")
@@ -143,7 +139,6 @@ def validate_rules() -> Dict[str, Dict]:
         results[mode] = result
 
     return results
-
 
 def validate_mcp_config() -> Dict[str, any]:
     """Validate MCP configuration."""
@@ -179,7 +174,6 @@ def validate_mcp_config() -> Dict[str, any]:
 
     return result
 
-
 def check_legacy_files() -> List[str]:
     """Check for legacy configuration files that might interfere."""
     potential_conflicts = []
@@ -195,7 +189,6 @@ def check_legacy_files() -> List[str]:
             potential_conflicts.append(f"{config} (UI configuration - should be blank/default)")
 
     return potential_conflicts
-
 
 def print_results(modes_results, rules_results, mcp_result, legacy_files):
     """Print comprehensive validation results."""
@@ -286,7 +279,6 @@ def print_results(modes_results, rules_results, mcp_result, legacy_files):
         if legacy_files:
             print("- Remove or clear legacy configuration files")
 
-
 def main():
     """Run comprehensive validation."""
     modes_results = validate_modes()
@@ -295,7 +287,6 @@ def main():
     legacy_files = check_legacy_files()
 
     print_results(modes_results, rules_results, mcp_result, legacy_files)
-
 
 if __name__ == "__main__":
     main()

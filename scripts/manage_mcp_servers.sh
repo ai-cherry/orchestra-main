@@ -22,10 +22,10 @@ mkdir -p "$LOG_DIR"
 
 # Server configurations
 declare -A SERVERS
-SERVERS["secret_manager"]="gcp_secret_manager_server.py:8002"
+SERVERS["secret_manager"]="Vultr_secret_manager_server.py:8002"
 SERVERS["firestore"]="firestore_server.py:8080"
 SERVERS["dragonfly"]="dragonfly_server.py:8004"
-SERVERS["cloud_run"]="gcp_cloud_run_server.py:8001"
+SERVERS["cloud_run"]="Vultr_cloud_run_server.py:8001"
 
 # Function to check if a server is running
 is_running() {

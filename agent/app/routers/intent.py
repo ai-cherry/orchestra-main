@@ -9,13 +9,11 @@ from agent.app.routers.admin import verify_api_key
 
 router = APIRouter(prefix="/api/intent", tags=["intent"])
 
-
 class IntentRequest(BaseModel):
     """Request model for intent detection."""
 
     query: str
     context: Optional[Dict] = None
-
 
 class IntentResponse(BaseModel):
     """Response model for intent detection."""
@@ -23,7 +21,6 @@ class IntentResponse(BaseModel):
     type: str
     confidence: float
     entities: Optional[Dict] = None
-
 
 class IntentDetector:
     """Simple rule-based intent detection for MVP.
@@ -81,10 +78,8 @@ class IntentDetector:
 
         return entities if entities else None
 
-
 # Initialize detector
 detector = IntentDetector()
-
 
 @router.post("/detect", response_model=IntentResponse)
 async def detect_intent(request: IntentRequest, api_key: str = Depends(verify_api_key)) -> IntentResponse:

@@ -15,10 +15,8 @@ from typing import Any, Dict, List, Set, Union
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class MetadataValidationError(Exception):
     """Exception raised when metadata validation fails."""
-
 
 class DevNoteType(str, Enum):
     """Types of development notes."""
@@ -33,14 +31,12 @@ class DevNoteType(str, Enum):
     DEPLOYMENT = "deployment"
     DOCUMENTATION = "documentation"
 
-
 class PrivacyLevel(str, Enum):
     """Privacy levels for data classification."""
 
     STANDARD = "standard"
     SENSITIVE = "sensitive"
     CRITICAL = "critical"
-
 
 class MetadataValidator:
     """Base class for metadata validators."""
@@ -97,7 +93,6 @@ class MetadataValidator:
                     validated_metadata[field] = default_value
 
         return validated_metadata
-
 
 class DevNoteMetadata(MetadataValidator):
     """Validator for development note metadata."""
@@ -180,7 +175,6 @@ class DevNoteMetadata(MetadataValidator):
         "expiration": validate_expiration,
     }
 
-
 class UserDataMetadata(MetadataValidator):
     """Validator for user data metadata."""
 
@@ -258,7 +252,6 @@ class UserDataMetadata(MetadataValidator):
         "expiration": validate_expiration,
     }
 
-
 def validate_metadata(metadata: Dict[str, Any], validator_class: type) -> Dict[str, Any]:
     """
     Validate metadata using the specified validator class.
@@ -275,7 +268,6 @@ def validate_metadata(metadata: Dict[str, Any], validator_class: type) -> Dict[s
     """
     return validator_class.validate(metadata)
 
-
 def validate_dev_note_metadata(metadata: Dict[str, Any]) -> Dict[str, Any]:
     """
     Validate development note metadata.
@@ -291,7 +283,6 @@ def validate_dev_note_metadata(metadata: Dict[str, Any]) -> Dict[str, Any]:
     """
     return validate_metadata(metadata, DevNoteMetadata)
 
-
 def validate_user_data_metadata(metadata: Dict[str, Any]) -> Dict[str, Any]:
     """
     Validate user data metadata.
@@ -306,7 +297,6 @@ def validate_user_data_metadata(metadata: Dict[str, Any]) -> Dict[str, Any]:
         MetadataValidationError: If validation fails
     """
     return validate_metadata(metadata, UserDataMetadata)
-
 
 def add_standard_metadata_fields(metadata: Dict[str, Any]) -> Dict[str, Any]:
     """

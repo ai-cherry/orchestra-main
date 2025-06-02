@@ -17,13 +17,12 @@ import pytest
 
 from packages.shared.src.memory.concrete_memory_manager import FirestoreV1MemoryManager
 from packages.shared.src.models.base_models import MemoryItem
-from packages.shared.src.storage.firestore.firestore_memory import FirestoreMemoryManager
-from packages.shared.src.storage.firestore.v2 import FirestoreMemoryManagerV2
+from packages.shared.src.storage.postgresql.firestore_memory import FirestoreMemoryManager
+from packages.shared.src.storage.postgresql.v2 import FirestoreMemoryManagerV2
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
 
 class MemoryBenchmark:
     """Benchmark for memory manager implementations."""
@@ -335,7 +334,6 @@ class MemoryBenchmark:
             # Clean up
             await self.teardown()
 
-
 @pytest.mark.asyncio
 async def test_memory_benchmark():
     """Run the memory benchmark."""
@@ -354,7 +352,6 @@ async def test_memory_benchmark():
     assert results["get"]["improvement_factor"] > 1.0
     assert results["search"]["improvement_factor"] > 1.0
     assert results["history"]["improvement_factor"] > 1.0
-
 
 if __name__ == "__main__":
     """Run the benchmark directly."""

@@ -16,7 +16,6 @@ from .extensions.pool_extensions import PoolExtensionsMixin
 
 logger = logging.getLogger(__name__)
 
-
 class PostgreSQLConnectionManagerEnhanced(PostgreSQLConnectionManager, PoolExtensionsMixin):
     """
     Enhanced connection manager that includes all missing pool methods.
@@ -271,10 +270,8 @@ class PostgreSQLConnectionManagerEnhanced(PostgreSQLConnectionManager, PoolExten
 
         return alerts
 
-
 # Global instance management for enhanced version
 _connection_manager_enhanced: Optional[PostgreSQLConnectionManagerEnhanced] = None
-
 
 async def get_connection_manager_enhanced() -> PostgreSQLConnectionManagerEnhanced:
     """
@@ -292,14 +289,12 @@ async def get_connection_manager_enhanced() -> PostgreSQLConnectionManagerEnhanc
         await _connection_manager_enhanced.initialize()
     return _connection_manager_enhanced
 
-
 async def close_connection_manager_enhanced() -> None:
     """Close the global enhanced connection manager."""
     global _connection_manager_enhanced
     if _connection_manager_enhanced:
         await _connection_manager_enhanced.close()
         _connection_manager_enhanced = None
-
 
 # Import datetime for monitoring methods
 from datetime import datetime

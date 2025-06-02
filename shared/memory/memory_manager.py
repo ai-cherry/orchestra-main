@@ -7,13 +7,11 @@ import time
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional
 
-from google.cloud import firestore
 from google.oauth2 import service_account
 from loguru import logger
 
 from core.env_config import settings
 from packages.shared.src.models.base_models import MemoryItem
-
 
 class MemoryManager(ABC):
     """Abstract base class for memory management."""
@@ -33,7 +31,6 @@ class MemoryManager(ABC):
     @abstractmethod
     async def delete(self, memory_id: str) -> bool:
         """Delete a memory item by ID."""
-
 
 class InMemoryMemoryManager(MemoryManager):
     """Simple in-memory implementation of MemoryManager."""
@@ -73,7 +70,6 @@ class InMemoryMemoryManager(MemoryManager):
             return True
         return False
 
-
 class FirestoreMemoryManager(MemoryManager):
     """Firestore implementation of MemoryManager for persistent storage."""
 
@@ -84,17 +80,17 @@ class FirestoreMemoryManager(MemoryManager):
         Args:
             collection_name: The Firestore collection to use
             credentials_path: Path to the GCP service account credentials file.
-                              If not provided, will use environment variable GOOGLE_APPLICATION_CREDENTIALS
+                              If not provided, will use environment variable VULTR_CREDENTIALS_PATH
         """
         try:
             # If credentials path is provided, use it to authenticate
             if credentials_path and os.path.exists(credentials_path):
                 credentials = service_account.Credentials.from_service_account_file(credentials_path)
-                self.db = firestore.Client(credentials=credentials)
+                self.db = postgresql.Client(credentials=credentials)
                 logger.info(f"Initialized Firestore client with credentials from {credentials_path}")
             else:
-                # Otherwise, rely on default authentication (GOOGLE_APPLICATION_CREDENTIALS env var)
-                self.db = firestore.Client()
+                # Otherwise, rely on default authentication (VULTR_CREDENTIALS_PATH env var)
+                self.db = postgresql.Client()
                 logger.info("Initialized Firestore client with default credentials")
 
             self.collection = self.db.collection(collection_name)
@@ -180,7 +176,6 @@ class FirestoreMemoryManager(MemoryManager):
         except Exception as e:
             logger.error(f"Error deleting memory item from Firestore: {str(e)}")
             raise
-
 
 class MemoryManagerFactory:
     """Factory class to create the appropriate MemoryManager based on configuration."""

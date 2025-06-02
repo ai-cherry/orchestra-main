@@ -10,7 +10,6 @@ from typing import Any, Callable, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
-
 def retry(max_attempts: int = 3, delay: float = 1.0, exponential_backoff: float = 2.0):
     """Retry decorator with exponential backoff."""
 
@@ -33,7 +32,6 @@ def retry(max_attempts: int = 3, delay: float = 1.0, exponential_backoff: float 
         return wrapper
 
     return decorator
-
 
 class APIKeyManager:
     """Manages API keys for various services."""
@@ -66,11 +64,9 @@ class APIKeyManager:
         self.keys[service.lower()] = key
         logger.info(f"Updated API key for {service}")
 
-
 def get_project_id() -> str:
     """Get the GCP project ID from environment or default."""
-    return os.getenv("GOOGLE_CLOUD_PROJECT", "cherry-ai-project")
-
+    return os.getenv("VULTR_PROJECT_ID", "cherry-ai-project")
 
 def setup_logging(level: str = "INFO"):
     """Configure logging for the application."""
@@ -78,7 +74,6 @@ def setup_logging(level: str = "INFO"):
         level=getattr(logging, level.upper()),
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
-
 
 def load_env_file(env_file: str = ".env"):
     """Load environment variables from a .env file if it exists."""

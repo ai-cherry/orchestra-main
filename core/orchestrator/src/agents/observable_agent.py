@@ -18,7 +18,6 @@ from core.orchestrator.src.memory.layered_memory import LayeredMemory
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class ObservableAgent(Agent):
     """
     Agent with built-in observability features.
@@ -280,7 +279,6 @@ class ObservableAgent(Agent):
         # In a production environment, send to Cloud Monitoring
         # For now, just log as JSON
         logger.debug(f"METRICS: {json.dumps(metrics)}")
-
 
 class ObservableAgentFactory:
     """

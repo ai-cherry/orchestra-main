@@ -7,7 +7,6 @@ import subprocess
 from pathlib import Path
 from typing import Any, Dict
 
-
 def get_pulumi_config() -> Dict[str, Any]:
     """Get all Pulumi configuration including secrets."""
     # Change to infra directory
@@ -31,7 +30,6 @@ def get_pulumi_config() -> Dict[str, Any]:
         return config
     finally:
         os.chdir(original_dir)
-
 
 def generate_env_file(config: Dict[str, Any], output_path: Path) -> None:
     """Generate .env file from Pulumi config."""
@@ -132,7 +130,6 @@ PYTHONPATH=/workspace
     example_path.write_text(example_content)
     print(f"✅ Generated {example_path}")
 
-
 def main():
     """Main function."""
     try:
@@ -162,7 +159,6 @@ def main():
         return 1
 
     return 0
-
 
 if __name__ == "__main__":
     exit(main())

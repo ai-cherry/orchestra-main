@@ -14,7 +14,6 @@ try:
 except ImportError:
     pytest.skip("MCP integration module not available", allow_module_level=True)
 
-
 class TestMCPServers:
     """Test MCP server connectivity and functionality"""
 
@@ -100,7 +99,6 @@ class TestMCPServers:
 
         except Exception as e:
             pytest.skip(f"MCP servers not available: {e}")
-
 
 @pytest.mark.asyncio
 async def test_mcp_server_health():

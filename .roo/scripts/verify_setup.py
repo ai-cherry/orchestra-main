@@ -6,7 +6,6 @@ import os
 from pathlib import Path
 from typing import Dict, List
 
-
 def check_modes() -> Dict[str, bool]:
     """Check that all mode files exist."""
     modes_dir = Path(".roo/modes")
@@ -39,7 +38,6 @@ def check_modes() -> Dict[str, bool]:
 
     return results
 
-
 def check_rules() -> Dict[str, bool]:
     """Check that all rules directories exist with at least one file."""
     rules_base = Path(".roo")
@@ -67,7 +65,6 @@ def check_rules() -> Dict[str, bool]:
 
     return results
 
-
 def check_mcp_config() -> bool:
     """Check that MCP configuration exists and is valid."""
     mcp_file = Path(".roo/mcp.json")
@@ -80,7 +77,6 @@ def check_mcp_config() -> bool:
             return "mcpServers" in data and "orchestra-mcp" in data["mcpServers"]
     except Exception:
         return False
-
 
 def main():
     """Run all verification checks."""
@@ -127,7 +123,6 @@ def main():
             print("\n⚠️  Missing rules files - check .roo/rules-*/")
         if not mcp_ok:
             print("\n⚠️  MCP configuration issue - check .roo/mcp.json")
-
 
 if __name__ == "__main__":
     main()

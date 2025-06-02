@@ -1,37 +1,3021 @@
-# DO NOT MODIFY WITHOUT TEAM APPROVAL
-# Last updated: 2025-01-20
-# This file locks ALL tool versions for the project
-
-# Core Languages
-PYTHON_VERSION=3.10.12
-NODE_VERSION=18.20.2
-GO_VERSION=1.21.5
-
-# Infrastructure Tools
-PULUMI_VERSION=3.88.0
-DOCKER_VERSION=24.0.7
-DOCKER_COMPOSE_VERSION=2.23.3
-TERRAFORM_VERSION=1.5.7
-GCLOUD_VERSION=455.0.0
-
-# Python Package Versions (Critical)
-FASTAPI_VERSION=0.115.12
-PYDANTIC_VERSION=2.11.4
-SQLALCHEMY_VERSION=2.0.30
-LITELLM_VERSION=1.70.4
-
-# Development Tools
-BLACK_VERSION=24.4.2
-MYPY_VERSION=1.8.0
-FLAKE8_VERSION=7.0.0
-PRECOMMIT_VERSION=3.5.0
-PYTEST_VERSION=7.4.3
-
-# OS Requirements
-UBUNTU_VERSION=20.04
-DEBIAN_VERSION=bullseye
-
-# Container Base Images
-PYTHON_BASE_IMAGE=python:3.10.12-slim-bullseye
-NODE_BASE_IMAGE=node:18.20.2-alpine3.18
-PULUMI_BASE_IMAGE=pulumi/pulumi:3.88.0
+{
+  "dependencies": {
+    "Arpeggio": {
+      "constraint": "Arpeggio==2.0.2",
+      "hash": "895fc3dce9d551ef",
+      "name": "Arpeggio",
+      "source": "constraints.txt:7",
+      "type": "python",
+      "version": "2.0.2"
+    },
+    "Authlib": {
+      "constraint": "Authlib==1.3.1",
+      "hash": "c086f0c89e838b5b",
+      "name": "Authlib",
+      "source": "constraints.txt:8",
+      "type": "python",
+      "version": "1.3.1"
+    },
+    "Deprecated": {
+      "constraint": "Deprecated==1.2.18",
+      "hash": "9929916794cb8e3e",
+      "name": "Deprecated",
+      "source": "constraints.txt:9",
+      "type": "python",
+      "version": "1.2.18"
+    },
+    "Flask": {
+      "constraint": "Flask==3.0.3",
+      "hash": "c88ca5bd05f9ac31",
+      "name": "Flask",
+      "source": "constraints.txt:10",
+      "type": "python",
+      "version": "3.0.3"
+    },
+    "GitPython": {
+      "constraint": "GitPython==3.1.44",
+      "hash": "2590dff5f5b60a12",
+      "name": "GitPython",
+      "source": "constraints.txt:11",
+      "type": "python",
+      "version": "3.1.44"
+    },
+    "Jinja2": {
+      "constraint": "Jinja2==3.1.6",
+      "hash": "2dc26f6d84780576",
+      "name": "Jinja2",
+      "source": "constraints.txt:12",
+      "type": "python",
+      "version": "3.1.6"
+    },
+    "MarkupSafe": {
+      "constraint": "MarkupSafe==3.0.2",
+      "hash": "3a03646f80e1a1be",
+      "name": "MarkupSafe",
+      "source": "constraints.txt:13",
+      "type": "python",
+      "version": "3.0.2"
+    },
+    "PyJWT": {
+      "constraint": "PyJWT==2.8.0",
+      "hash": "e99a5994692e47fc",
+      "name": "PyJWT",
+      "source": "unified.txt:37",
+      "type": "python",
+      "version": "2.8.0"
+    },
+    "PyPika": {
+      "constraint": "PyPika==0.48.9",
+      "hash": "ec09fb04eebc22b9",
+      "name": "PyPika",
+      "source": "constraints.txt:15",
+      "type": "python",
+      "version": "0.48.9"
+    },
+    "PyYAML": {
+      "constraint": "PyYAML==6.0.2",
+      "hash": "46710b65ebe8337f",
+      "name": "PyYAML",
+      "source": "constraints.txt:16",
+      "type": "python",
+      "version": "6.0.2"
+    },
+    "Pygments": {
+      "constraint": "Pygments==2.19.1",
+      "hash": "fe692d61e35603b0",
+      "name": "Pygments",
+      "source": "constraints.txt:17",
+      "type": "python",
+      "version": "2.19.1"
+    },
+    "SQLAlchemy": {
+      "constraint": "SQLAlchemy==2.0.30",
+      "hash": "7897e9d2739b4569",
+      "name": "SQLAlchemy",
+      "source": "constraints.txt:18",
+      "type": "python",
+      "version": "2.0.30"
+    },
+    "Werkzeug": {
+      "constraint": "Werkzeug==3.1.3",
+      "hash": "7d5a4033790d1fc5",
+      "name": "Werkzeug",
+      "source": "constraints.txt:19",
+      "type": "python",
+      "version": "3.1.3"
+    },
+    "aiohappyeyeballs": {
+      "constraint": "aiohappyeyeballs==2.6.1",
+      "hash": "a3a3a90bdfe3c929",
+      "name": "aiohappyeyeballs",
+      "source": "constraints.txt:20",
+      "type": "python",
+      "version": "2.6.1"
+    },
+    "aiohttp": {
+      "constraint": "aiohttp==3.11.18",
+      "hash": "e9ef22df3211b03d",
+      "name": "aiohttp",
+      "source": "base.txt:29",
+      "type": "python",
+      "version": "3.11.18"
+    },
+    "aiosignal": {
+      "constraint": "aiosignal==1.3.2",
+      "hash": "70b0ec1f8df382f1",
+      "name": "aiosignal",
+      "source": "constraints.txt:22",
+      "type": "python",
+      "version": "1.3.2"
+    },
+    "alembic": {
+      "constraint": "alembic==1.13.1",
+      "hash": "c36087801da258a8",
+      "name": "alembic",
+      "source": "dev.txt:52",
+      "type": "python",
+      "version": "1.13.1"
+    },
+    "annotated-types": {
+      "constraint": "annotated-types==0.7.0",
+      "hash": "78384a6644b9a7f4",
+      "name": "annotated-types",
+      "source": "constraints.txt:23",
+      "type": "python",
+      "version": "0.7.0"
+    },
+    "anthropic": {
+      "constraint": "anthropic==0.39.0",
+      "hash": "41032910e32a3178",
+      "name": "anthropic",
+      "source": "base.txt:23",
+      "type": "python",
+      "version": "0.39.0"
+    },
+    "anyio": {
+      "constraint": "anyio==4.9.0",
+      "hash": "b785c6620fc3d473",
+      "name": "anyio",
+      "source": "base.txt:53",
+      "type": "python",
+      "version": "4.9.0"
+    },
+    "asgiref": {
+      "constraint": "asgiref==3.8.1",
+      "hash": "6277452a222c7ed1",
+      "name": "asgiref",
+      "source": "constraints.txt:26",
+      "type": "python",
+      "version": "3.8.1"
+    },
+    "astroid": {
+      "constraint": "astroid==3.3.10",
+      "hash": "f418e9369ae26bc2",
+      "name": "astroid",
+      "source": "constraints.txt:27",
+      "type": "python",
+      "version": "3.3.10"
+    },
+    "async-timeout": {
+      "constraint": "async-timeout==5.0.1",
+      "hash": "759a05142ff2bc3f",
+      "name": "async-timeout",
+      "source": "constraints.txt:28",
+      "type": "python",
+      "version": "5.0.1"
+    },
+    "asyncio": {
+      "constraint": "asyncio==3.4.3",
+      "hash": "f4ef8cdd9aec3870",
+      "name": "asyncio",
+      "source": "constraints.txt:29",
+      "type": "python",
+      "version": "3.4.3"
+    },
+    "asyncio-mqtt": {
+      "constraint": "asyncio-mqtt==0.16.2",
+      "hash": "2e427d8449471176",
+      "name": "asyncio-mqtt",
+      "source": "unified.txt:60",
+      "type": "python",
+      "version": "0.16.2"
+    },
+    "asyncio-throttle": {
+      "constraint": "asyncio-throttle>=1.0.0",
+      "hash": "35bb8a80a9043ece",
+      "name": "asyncio-throttle",
+      "source": "pay_ready.txt:7",
+      "type": "python",
+      "version": "1.0.0"
+    },
+    "asyncpg": {
+      "constraint": "asyncpg==0.29.0",
+      "hash": "11e6ef66c3721935",
+      "name": "asyncpg",
+      "source": "unified.txt:16",
+      "type": "python",
+      "version": "0.29.0"
+    },
+    "attrs": {
+      "constraint": "attrs==25.3.0",
+      "hash": "7094b7b6fd8a62e6",
+      "name": "attrs",
+      "source": "constraints.txt:30",
+      "type": "python",
+      "version": "25.3.0"
+    },
+    "autoflake": {
+      "constraint": "autoflake==1.4",
+      "hash": "b20a12fc733a9a7a",
+      "name": "autoflake",
+      "source": "dev.txt:20",
+      "type": "python",
+      "version": "1.4.0"
+    },
+    "backoff": {
+      "constraint": "backoff==1.11.1",
+      "hash": "15e685fc3c86962f",
+      "name": "backoff",
+      "source": "unified.txt:91",
+      "type": "python",
+      "version": "1.11.1"
+    },
+    "bandit": {
+      "constraint": "bandit==1.7.6",
+      "hash": "89cd8dcd19155d2c",
+      "name": "bandit",
+      "source": "dev.txt:21",
+      "type": "python",
+      "version": "1.7.6"
+    },
+    "bcrypt": {
+      "constraint": "bcrypt==4.3.0",
+      "hash": "65a26d280522bcb0",
+      "name": "bcrypt",
+      "source": "unified.txt:40",
+      "type": "python",
+      "version": "4.3.0"
+    },
+    "beautifulsoup4": {
+      "constraint": "beautifulsoup4==4.13.4",
+      "hash": "309ba01578567187",
+      "name": "beautifulsoup4",
+      "source": "constraints.txt:34",
+      "type": "python",
+      "version": "4.13.4"
+    },
+    "black": {
+      "constraint": "black==24.4.2",
+      "hash": "5d6f803fe791252d",
+      "name": "black",
+      "source": "dev.txt:15",
+      "type": "python",
+      "version": "24.4.2"
+    },
+    "blinker": {
+      "constraint": "blinker==1.9.0",
+      "hash": "707e6abb1c5cf7a1",
+      "name": "blinker",
+      "source": "constraints.txt:36",
+      "type": "python",
+      "version": "1.9.0"
+    },
+    "build": {
+      "constraint": "build==1.2.2.post1",
+      "hash": "12527ad63d7ec804",
+      "name": "build",
+      "source": "constraints.txt:37",
+      "type": "python",
+      "version": "1.2.2"
+    },
+    "cachetools": {
+      "constraint": "cachetools==5.5.2",
+      "hash": "d171d08a5bf6e772",
+      "name": "cachetools",
+      "source": "constraints.txt:38",
+      "type": "python",
+      "version": "5.5.2"
+    },
+    "celery": {
+      "constraint": "celery==5.3.4",
+      "hash": "900847334b67f7c9",
+      "name": "celery",
+      "source": "superagi.txt:31",
+      "type": "python",
+      "version": "5.3.4"
+    },
+    "certifi": {
+      "constraint": "certifi==2025.4.26",
+      "hash": "e793a93c1abaec92",
+      "name": "certifi",
+      "source": "constraints.txt:39",
+      "type": "python",
+      "version": "2025.4.26"
+    },
+    "cffi": {
+      "constraint": "cffi==1.17.1",
+      "hash": "a81178a78d0cc2a5",
+      "name": "cffi",
+      "source": "constraints.txt:40",
+      "type": "python",
+      "version": "1.17.1"
+    },
+    "charset-normalizer": {
+      "constraint": "charset-normalizer==3.4.2",
+      "hash": "ffffdb3a898232cc",
+      "name": "charset-normalizer",
+      "source": "constraints.txt:41",
+      "type": "python",
+      "version": "3.4.2"
+    },
+    "chroma-hnswlib": {
+      "constraint": "chroma-hnswlib==0.7.3",
+      "hash": "6729c13de900e5da",
+      "name": "chroma-hnswlib",
+      "source": "constraints.txt:42",
+      "type": "python",
+      "version": "0.7.3"
+    },
+    "chromadb": {
+      "constraint": "chromadb==0.4.22",
+      "hash": "8a12e9babfd46981",
+      "name": "chromadb",
+      "source": "base.txt:50",
+      "type": "python",
+      "version": "0.4.22"
+    },
+    "click": {
+      "constraint": "click==8.1.8",
+      "hash": "ae20029a10c73265",
+      "name": "click",
+      "source": "base.txt:35",
+      "type": "python",
+      "version": "8.1.8"
+    },
+    "colorama": {
+      "constraint": "colorama==0.4.6",
+      "hash": "db3c3095b6b47a7e",
+      "name": "colorama",
+      "source": "constraints.txt:45",
+      "type": "python",
+      "version": "0.4.6"
+    },
+    "coloredlogs": {
+      "constraint": "coloredlogs==15.0.1",
+      "hash": "aeeaa0ea3157b824",
+      "name": "coloredlogs",
+      "source": "constraints.txt:46",
+      "type": "python",
+      "version": "15.0.1"
+    },
+    "coverage": {
+      "constraint": "coverage==7.8.2",
+      "hash": "7f3628e10687b229",
+      "name": "coverage",
+      "source": "constraints.txt:47",
+      "type": "python",
+      "version": "7.8.2"
+    },
+    "croniter": {
+      "constraint": "croniter==5.0.1",
+      "hash": "5b0a44f776fb7ca6",
+      "name": "croniter",
+      "source": "unified.txt:93",
+      "type": "python",
+      "version": "5.0.1"
+    },
+    "cryptography": {
+      "constraint": "cryptography==45.0.3",
+      "hash": "b67846df93ce3a9a",
+      "name": "cryptography",
+      "source": "constraints.txt:48",
+      "type": "python",
+      "version": "45.0.3"
+    },
+    "dataclasses-json": {
+      "constraint": "dataclasses-json==0.6.7",
+      "hash": "7363918165f4cc95",
+      "name": "dataclasses-json",
+      "source": "constraints.txt:49",
+      "type": "python",
+      "version": "0.6.7"
+    },
+    "debugpy": {
+      "constraint": "debugpy==1.8.0",
+      "hash": "bd0f29c4733a1c8c",
+      "name": "debugpy",
+      "source": "dev.txt:56",
+      "type": "python",
+      "version": "1.8.0"
+    },
+    "decorator": {
+      "constraint": "decorator==5.1.1",
+      "hash": "ef7c87b0afab63d5",
+      "name": "decorator",
+      "source": "unified.txt:92",
+      "type": "python",
+      "version": "5.1.1"
+    },
+    "deprecation": {
+      "constraint": "deprecation==2.1.0",
+      "hash": "9e455fc2852bb828",
+      "name": "deprecation",
+      "source": "constraints.txt:51",
+      "type": "python",
+      "version": "2.1.0"
+    },
+    "dill": {
+      "constraint": "dill==0.4.0",
+      "hash": "5de9ef1b911e0fdd",
+      "name": "dill",
+      "source": "constraints.txt:52",
+      "type": "python",
+      "version": "0.4.0"
+    },
+    "dirtyjson": {
+      "constraint": "dirtyjson==1.0.8",
+      "hash": "c1d2cdf6d1b5e2a1",
+      "name": "dirtyjson",
+      "source": "constraints.txt:53",
+      "type": "python",
+      "version": "1.0.8"
+    },
+    "distro": {
+      "constraint": "distro==1.9.0",
+      "hash": "c04b69b07d728b9a",
+      "name": "distro",
+      "source": "constraints.txt:54",
+      "type": "python",
+      "version": "1.9.0"
+    },
+    "dnspython": {
+      "constraint": "dnspython==2.7.0",
+      "hash": "2da595b8dfc4275b",
+      "name": "dnspython",
+      "source": "constraints.txt:55",
+      "type": "python",
+      "version": "2.7.0"
+    },
+    "docstring_parser": {
+      "constraint": "docstring_parser==0.16",
+      "hash": "b2b5f4b5a68af5a7",
+      "name": "docstring_parser",
+      "source": "constraints.txt:56",
+      "type": "python",
+      "version": "0.16.0"
+    },
+    "durationpy": {
+      "constraint": "durationpy==0.10",
+      "hash": "553a23878cc196aa",
+      "name": "durationpy",
+      "source": "constraints.txt:57",
+      "type": "python",
+      "version": "0.10.0"
+    },
+    "elevenlabs": {
+      "constraint": "elevenlabs==2.1.0",
+      "hash": "88d10c80379d5642",
+      "name": "elevenlabs",
+      "source": "base.txt:64",
+      "type": "python",
+      "version": "2.1.0"
+    },
+    "email-validator": {
+      "constraint": "email-validator>=2.1.0,<3.0.0",
+      "hash": "a53fac843e498205",
+      "name": "email-validator",
+      "source": "pay_ready.txt:17",
+      "type": "python",
+      "version": "2.1.0"
+    },
+    "email_validator": {
+      "constraint": "email_validator==2.1.2",
+      "hash": "78c4dc335a581b9f",
+      "name": "email_validator",
+      "source": "constraints.txt:58",
+      "type": "python",
+      "version": "2.1.2"
+    },
+    "envparse": {
+      "constraint": "envparse==0.2.0",
+      "hash": "5f321c2665f8e4f7",
+      "name": "envparse",
+      "source": "unified.txt:45",
+      "type": "python",
+      "version": "0.2.0"
+    },
+    "exceptiongroup": {
+      "constraint": "exceptiongroup==1.3.0",
+      "hash": "e7349397ddc9af43",
+      "name": "exceptiongroup",
+      "source": "constraints.txt:59",
+      "type": "python",
+      "version": "1.3.0"
+    },
+    "fastapi": {
+      "constraint": "fastapi==0.115.12",
+      "hash": "3e86f6e8a7314d60",
+      "name": "fastapi",
+      "source": "base.txt:7",
+      "type": "python",
+      "version": "0.115.12"
+    },
+    "fastapi-users": {
+      "constraint": "fastapi-users==12.1.3",
+      "hash": "8932fb023d142fdc",
+      "name": "fastapi-users",
+      "source": "base.txt:55",
+      "type": "python",
+      "version": "12.1.3"
+    },
+    "filelock": {
+      "constraint": "filelock==3.18.0",
+      "hash": "a6ddb8b385f120cd",
+      "name": "filelock",
+      "source": "constraints.txt:61",
+      "type": "python",
+      "version": "3.18.0"
+    },
+    "flake8": {
+      "constraint": "flake8==7.0.0",
+      "hash": "4e3559c02e15b142",
+      "name": "flake8",
+      "source": "dev.txt:16",
+      "type": "python",
+      "version": "7.0.0"
+    },
+    "flatbuffers": {
+      "constraint": "flatbuffers==25.2.10",
+      "hash": "98887b336bf65b52",
+      "name": "flatbuffers",
+      "source": "constraints.txt:63",
+      "type": "python",
+      "version": "25.2.10"
+    },
+    "flower": {
+      "constraint": "flower==2.0.1",
+      "hash": "4d48e3476aa45f21",
+      "name": "flower",
+      "source": "superagi.txt:32",
+      "type": "python",
+      "version": "2.0.1"
+    },
+    "frozenlist": {
+      "constraint": "frozenlist==1.6.0",
+      "hash": "8c048364af4f8966",
+      "name": "frozenlist",
+      "source": "constraints.txt:64",
+      "type": "python",
+      "version": "1.6.0"
+    },
+    "fsspec": {
+      "constraint": "fsspec==2025.5.1",
+      "hash": "28b089ab190aacc8",
+      "name": "fsspec",
+      "source": "constraints.txt:65",
+      "type": "python",
+      "version": "2025.5.1"
+    },
+    "gitdb": {
+      "constraint": "gitdb==4.0.12",
+      "hash": "e7ea49426bb3af87",
+      "name": "gitdb",
+      "source": "constraints.txt:66",
+      "type": "python",
+      "version": "4.0.12"
+    },
+    "google-auth": {
+      "constraint": "google-auth==2.40.1",
+      "hash": "5a5db2c4385fb338",
+      "name": "google-auth",
+      "source": "constraints.txt:68",
+      "type": "python",
+      "version": "2.40.1"
+    },
+    "google-cloud-aiplatform": {
+      "constraint": "google-cloud-aiplatform==1.93.1",
+      "hash": "01af77999e89e3c2",
+      "name": "google-cloud-aiplatform",
+      "source": "constraints.txt:69",
+      "type": "python",
+      "version": "1.93.1"
+    },
+    "google-cloud-bigquery": {
+      "constraint": "google-cloud-bigquery==3.33.0",
+      "hash": "ca323d9c820cff9c",
+      "name": "google-cloud-bigquery",
+      "source": "constraints.txt:70",
+      "type": "python",
+      "version": "3.33.0"
+    },
+    "google-cloud-core": {
+      "constraint": "google-cloud-core==2.4.3",
+      "hash": "1c9a6bd86891f27d",
+      "name": "google-cloud-core",
+      "source": "constraints.txt:71",
+      "type": "python",
+      "version": "2.4.3"
+    },
+    "google-cloud-firestore": {
+      "constraint": "google-cloud-firestore==2.20.2",
+      "hash": "51be33346132bdbe",
+      "name": "google-cloud-firestore",
+      "source": "constraints.txt:72",
+      "type": "python",
+      "version": "2.20.2"
+    },
+    "google-cloud-resource-manager": {
+      "constraint": "google-cloud-resource-manager==1.14.2",
+      "hash": "0047bb2c0ce5467d",
+      "name": "google-cloud-resource-manager",
+      "source": "constraints.txt:73",
+      "type": "python",
+      "version": "1.14.2"
+    },
+    "google-cloud-run": {
+      "constraint": "google-cloud-run==0.10.18",
+      "hash": "411d9fdd397782df",
+      "name": "google-cloud-run",
+      "source": "constraints.txt:74",
+      "type": "python",
+      "version": "0.10.18"
+    },
+    "google-cloud-secret-manager": {
+      "constraint": "google-cloud-secret-manager==2.23.3",
+      "hash": "a40e64e881e1ce32",
+      "name": "google-cloud-secret-manager",
+      "source": "constraints.txt:75",
+      "type": "python",
+      "version": "2.23.3"
+    },
+    "google-cloud-storage": {
+      "constraint": "google-cloud-storage==2.19.0",
+      "hash": "39c84b2dc49c405a",
+      "name": "google-cloud-storage",
+      "source": "constraints.txt:76",
+      "type": "python",
+      "version": "2.19.0"
+    },
+    "google-crc32c": {
+      "constraint": "google-crc32c==1.7.1",
+      "hash": "b658b8630d0da696",
+      "name": "google-crc32c",
+      "source": "constraints.txt:77",
+      "type": "python",
+      "version": "1.7.1"
+    },
+    "google-genai": {
+      "constraint": "google-genai==1.16.1",
+      "hash": "9a7287c19d289814",
+      "name": "google-genai",
+      "source": "constraints.txt:78",
+      "type": "python",
+      "version": "1.16.1"
+    },
+    "google-resumable-media": {
+      "constraint": "google-resumable-media==2.7.2",
+      "hash": "6b96e6ff608c1b41",
+      "name": "google-resumable-media",
+      "source": "constraints.txt:79",
+      "type": "python",
+      "version": "2.7.2"
+    },
+    "googleapis-common-protos": {
+      "constraint": "googleapis-common-protos==1.70.0",
+      "hash": "1149c1471b47c025",
+      "name": "googleapis-common-protos",
+      "source": "constraints.txt:80",
+      "type": "python",
+      "version": "1.70.0"
+    },
+    "greenlet": {
+      "constraint": "greenlet==3.2.2",
+      "hash": "4c0f2a53cef37093",
+      "name": "greenlet",
+      "source": "constraints.txt:81",
+      "type": "python",
+      "version": "3.2.2"
+    },
+    "grpc-google-iam-v1": {
+      "constraint": "grpc-google-iam-v1==0.14.2",
+      "hash": "9c5e45bff9366e48",
+      "name": "grpc-google-iam-v1",
+      "source": "constraints.txt:82",
+      "type": "python",
+      "version": "0.14.2"
+    },
+    "grpcio-health-checking": {
+      "constraint": "grpcio-health-checking==1.71.0",
+      "hash": "be1f77dfc95f86f7",
+      "name": "grpcio-health-checking",
+      "source": "constraints.txt:84",
+      "type": "python",
+      "version": "1.71.0"
+    },
+    "grpcio-status": {
+      "constraint": "grpcio-status==1.71.0",
+      "hash": "eab1028f9da7c685",
+      "name": "grpcio-status",
+      "source": "constraints.txt:85",
+      "type": "python",
+      "version": "1.71.0"
+    },
+    "grpcio-tools": {
+      "constraint": "grpcio-tools==1.71.0",
+      "hash": "10f0582dd64eb67e",
+      "name": "grpcio-tools",
+      "source": "constraints.txt:86",
+      "type": "python",
+      "version": "1.71.0"
+    },
+    "h11": {
+      "constraint": "h11==0.16.0",
+      "hash": "a363f31ee520de1e",
+      "name": "h11",
+      "source": "constraints.txt:87",
+      "type": "python",
+      "version": "0.16.0"
+    },
+    "hf-xet": {
+      "constraint": "hf-xet==1.1.2",
+      "hash": "6fd8e2b6947f2ee7",
+      "name": "hf-xet",
+      "source": "constraints.txt:88",
+      "type": "python",
+      "version": "1.1.2"
+    },
+    "httpcore": {
+      "constraint": "httpcore==1.0.9",
+      "hash": "892886b240a4096e",
+      "name": "httpcore",
+      "source": "constraints.txt:89",
+      "type": "python",
+      "version": "1.0.9"
+    },
+    "httpie": {
+      "constraint": "httpie>=3.2.4",
+      "hash": "1f47c79298b4791f",
+      "name": "httpie",
+      "source": "dev.txt:48",
+      "type": "python",
+      "version": "3.2.4"
+    },
+    "httptools": {
+      "constraint": "httptools==0.6.4",
+      "hash": "688e62d16d1d6a41",
+      "name": "httptools",
+      "source": "constraints.txt:90",
+      "type": "python",
+      "version": "0.6.4"
+    },
+    "httpx": {
+      "constraint": "httpx==0.28.1",
+      "hash": "d4a888ad706dd199",
+      "name": "httpx",
+      "source": "base.txt:62",
+      "type": "python",
+      "version": "0.28.1"
+    },
+    "httpx-sse": {
+      "constraint": "httpx-sse==0.4.0",
+      "hash": "7fb74526cb6eeac4",
+      "name": "httpx-sse",
+      "source": "constraints.txt:92",
+      "type": "python",
+      "version": "0.4.0"
+    },
+    "huggingface-hub": {
+      "constraint": "huggingface-hub==0.32.0",
+      "hash": "ad95182987993c8f",
+      "name": "huggingface-hub",
+      "source": "constraints.txt:93",
+      "type": "python",
+      "version": "0.32.0"
+    },
+    "humanfriendly": {
+      "constraint": "humanfriendly==10.0",
+      "hash": "7216a1a1311a2fbf",
+      "name": "humanfriendly",
+      "source": "constraints.txt:94",
+      "type": "python",
+      "version": "10.0.0"
+    },
+    "idna": {
+      "constraint": "idna==3.3",
+      "hash": "dd439b9ab926332b",
+      "name": "idna",
+      "source": "constraints.txt:95",
+      "type": "python",
+      "version": "3.3.0"
+    },
+    "importlib_metadata": {
+      "constraint": "importlib_metadata==8.6.1",
+      "hash": "e94087407767ffed",
+      "name": "importlib_metadata",
+      "source": "constraints.txt:96",
+      "type": "python",
+      "version": "8.6.1"
+    },
+    "importlib_resources": {
+      "constraint": "importlib_resources==6.5.2",
+      "hash": "42d8fe9a1a857d0e",
+      "name": "importlib_resources",
+      "source": "constraints.txt:97",
+      "type": "python",
+      "version": "6.5.2"
+    },
+    "iniconfig": {
+      "constraint": "iniconfig==2.1.0",
+      "hash": "1f9acc48bd95e728",
+      "name": "iniconfig",
+      "source": "constraints.txt:98",
+      "type": "python",
+      "version": "2.1.0"
+    },
+    "ipdb": {
+      "constraint": "ipdb==0.13.13",
+      "hash": "bcf201f131bc114d",
+      "name": "ipdb",
+      "source": "dev.txt:39",
+      "type": "python",
+      "version": "0.13.13"
+    },
+    "ipython": {
+      "constraint": "ipython==8.20.0",
+      "hash": "4bfdbff56e8f1eb9",
+      "name": "ipython",
+      "source": "dev.txt:38",
+      "type": "python",
+      "version": "8.20.0"
+    },
+    "isort": {
+      "constraint": "isort==5.13.2",
+      "hash": "fc15adc6ec88455c",
+      "name": "isort",
+      "source": "dev.txt:19",
+      "type": "python",
+      "version": "5.13.2"
+    },
+    "itsdangerous": {
+      "constraint": "itsdangerous==2.2.0",
+      "hash": "6a1685dd7ff6b432",
+      "name": "itsdangerous",
+      "source": "constraints.txt:100",
+      "type": "python",
+      "version": "2.2.0"
+    },
+    "jiter": {
+      "constraint": "jiter==0.10.0",
+      "hash": "37a381c9b6786459",
+      "name": "jiter",
+      "source": "constraints.txt:101",
+      "type": "python",
+      "version": "0.10.0"
+    },
+    "joblib": {
+      "constraint": "joblib==1.5.1",
+      "hash": "d0a50a3ce6383aa0",
+      "name": "joblib",
+      "source": "base.txt:42",
+      "type": "python",
+      "version": "1.5.1"
+    },
+    "jsonschema": {
+      "constraint": "jsonschema==4.23.0",
+      "hash": "bbb1fbf248d215f7",
+      "name": "jsonschema",
+      "source": "constraints.txt:103",
+      "type": "python",
+      "version": "4.23.0"
+    },
+    "jsonschema-specifications": {
+      "constraint": "jsonschema-specifications==2025.4.1",
+      "hash": "86e45a21924da9cb",
+      "name": "jsonschema-specifications",
+      "source": "constraints.txt:104",
+      "type": "python",
+      "version": "2025.4.1"
+    },
+    "kubernetes": {
+      "constraint": "kubernetes==32.0.1",
+      "hash": "7936bad7cba6db82",
+      "name": "kubernetes",
+      "source": "monitoring.txt:10",
+      "type": "python",
+      "version": "32.0.1"
+    },
+    "langchain": {
+      "constraint": "langchain>=0.2.5",
+      "hash": "f94f093ecea3cf4e",
+      "name": "langchain",
+      "source": "superagi.txt:12",
+      "type": "python",
+      "version": "0.2.5"
+    },
+    "line-profiler": {
+      "constraint": "line-profiler==4.1.2",
+      "hash": "73c19b051ac75006",
+      "name": "line-profiler",
+      "source": "dev.txt:45",
+      "type": "python",
+      "version": "4.1.2"
+    },
+    "litellm": {
+      "constraint": "litellm==1.70.4",
+      "hash": "61c404c6cca8326b",
+      "name": "litellm",
+      "source": "base.txt:21",
+      "type": "python",
+      "version": "1.70.4"
+    },
+    "llama-index": {
+      "constraint": "llama-index==0.10.38",
+      "hash": "367aaab603036ee0",
+      "name": "llama-index",
+      "source": "base.txt:61",
+      "type": "python",
+      "version": "0.10.38"
+    },
+    "llama-index-agent-openai": {
+      "constraint": "llama-index-agent-openai==0.2.9",
+      "hash": "117418d4c4dc98cb",
+      "name": "llama-index-agent-openai",
+      "source": "constraints.txt:108",
+      "type": "python",
+      "version": "0.2.9"
+    },
+    "llama-index-cli": {
+      "constraint": "llama-index-cli==0.1.13",
+      "hash": "7522448069825ea9",
+      "name": "llama-index-cli",
+      "source": "constraints.txt:109",
+      "type": "python",
+      "version": "0.1.13"
+    },
+    "llama-index-core": {
+      "constraint": "llama-index-core==0.10.68.post1",
+      "hash": "b8fbe760291c1c98",
+      "name": "llama-index-core",
+      "source": "constraints.txt:110",
+      "type": "python",
+      "version": "0.10.68"
+    },
+    "llama-index-embeddings-openai": {
+      "constraint": "llama-index-embeddings-openai==0.1.11",
+      "hash": "33dc84b80b83c36d",
+      "name": "llama-index-embeddings-openai",
+      "source": "constraints.txt:111",
+      "type": "python",
+      "version": "0.1.11"
+    },
+    "llama-index-indices-managed-llama-cloud": {
+      "constraint": "llama-index-indices-managed-llama-cloud==0.1.6",
+      "hash": "672224a2d546395e",
+      "name": "llama-index-indices-managed-llama-cloud",
+      "source": "constraints.txt:112",
+      "type": "python",
+      "version": "0.1.6"
+    },
+    "llama-index-legacy": {
+      "constraint": "llama-index-legacy==0.9.48.post4",
+      "hash": "2963d4d3c9d12d14",
+      "name": "llama-index-legacy",
+      "source": "constraints.txt:113",
+      "type": "python",
+      "version": "0.9.48"
+    },
+    "llama-index-llms-openai": {
+      "constraint": "llama-index-llms-openai==0.1.31",
+      "hash": "50ef1d298faed7bc",
+      "name": "llama-index-llms-openai",
+      "source": "constraints.txt:114",
+      "type": "python",
+      "version": "0.1.31"
+    },
+    "llama-index-multi-modal-llms-openai": {
+      "constraint": "llama-index-multi-modal-llms-openai==0.1.9",
+      "hash": "25f2cf2672d452a1",
+      "name": "llama-index-multi-modal-llms-openai",
+      "source": "constraints.txt:115",
+      "type": "python",
+      "version": "0.1.9"
+    },
+    "llama-index-program-openai": {
+      "constraint": "llama-index-program-openai==0.1.7",
+      "hash": "cc129aa34e073f21",
+      "name": "llama-index-program-openai",
+      "source": "constraints.txt:116",
+      "type": "python",
+      "version": "0.1.7"
+    },
+    "llama-index-question-gen-openai": {
+      "constraint": "llama-index-question-gen-openai==0.1.3",
+      "hash": "e7c61c372e9dde9f",
+      "name": "llama-index-question-gen-openai",
+      "source": "constraints.txt:117",
+      "type": "python",
+      "version": "0.1.3"
+    },
+    "llama-index-readers-file": {
+      "constraint": "llama-index-readers-file==0.1.33",
+      "hash": "9a6cd14016e7967a",
+      "name": "llama-index-readers-file",
+      "source": "constraints.txt:118",
+      "type": "python",
+      "version": "0.1.33"
+    },
+    "llama-index-readers-llama-parse": {
+      "constraint": "llama-index-readers-llama-parse==0.1.6",
+      "hash": "674969a8189efed3",
+      "name": "llama-index-readers-llama-parse",
+      "source": "constraints.txt:119",
+      "type": "python",
+      "version": "0.1.6"
+    },
+    "llama-parse": {
+      "constraint": "llama-parse==0.4.9",
+      "hash": "733d8cc809de6db0",
+      "name": "llama-parse",
+      "source": "constraints.txt:120",
+      "type": "python",
+      "version": "0.4.9"
+    },
+    "llamaindex-py-client": {
+      "constraint": "llamaindex-py-client==0.1.19",
+      "hash": "b7f936ba3f632efa",
+      "name": "llamaindex-py-client",
+      "source": "constraints.txt:121",
+      "type": "python",
+      "version": "0.1.19"
+    },
+    "locust": {
+      "constraint": "locust==2.20.1",
+      "hash": "96704324a9634630",
+      "name": "locust",
+      "source": "dev.txt:49",
+      "type": "python",
+      "version": "2.20.1"
+    },
+    "makefun": {
+      "constraint": "makefun==1.16.0",
+      "hash": "43c8a21bbea59510",
+      "name": "makefun",
+      "source": "constraints.txt:122",
+      "type": "python",
+      "version": "1.16.0"
+    },
+    "markdown-it-py": {
+      "constraint": "markdown-it-py==3.0.0",
+      "hash": "153ae9f0f11ad37c",
+      "name": "markdown-it-py",
+      "source": "constraints.txt:123",
+      "type": "python",
+      "version": "3.0.0"
+    },
+    "marshmallow": {
+      "constraint": "marshmallow==3.26.1",
+      "hash": "197a13ce53314c8f",
+      "name": "marshmallow",
+      "source": "constraints.txt:124",
+      "type": "python",
+      "version": "3.26.1"
+    },
+    "mccabe": {
+      "constraint": "mccabe==0.7.0",
+      "hash": "6991610bf9a91257",
+      "name": "mccabe",
+      "source": "constraints.txt:125",
+      "type": "python",
+      "version": "0.7.0"
+    },
+    "mcp": {
+      "constraint": "mcp==1.9.2",
+      "hash": "6278f57a6f5816b6",
+      "name": "mcp",
+      "source": "unified.txt:87",
+      "type": "python",
+      "version": "1.9.2"
+    },
+    "mdurl": {
+      "constraint": "mdurl==0.1.2",
+      "hash": "5c8775383242e17c",
+      "name": "mdurl",
+      "source": "constraints.txt:127",
+      "type": "python",
+      "version": "0.1.2"
+    },
+    "memory-profiler": {
+      "constraint": "memory-profiler==0.61.0",
+      "hash": "6a613f303f926d83",
+      "name": "memory-profiler",
+      "source": "dev.txt:44",
+      "type": "python",
+      "version": "0.61.0"
+    },
+    "mmh3": {
+      "constraint": "mmh3==5.1.0",
+      "hash": "3e6d87e28d63fbe8",
+      "name": "mmh3",
+      "source": "constraints.txt:128",
+      "type": "python",
+      "version": "5.1.0"
+    },
+    "mpmath": {
+      "constraint": "mpmath==1.3.0",
+      "hash": "011d0f86a22fb631",
+      "name": "mpmath",
+      "source": "constraints.txt:129",
+      "type": "python",
+      "version": "1.3.0"
+    },
+    "msgpack": {
+      "constraint": "msgpack==1.1.0",
+      "hash": "70273e90f74702d8",
+      "name": "msgpack",
+      "source": "unified.txt:71",
+      "type": "python",
+      "version": "1.1.0"
+    },
+    "multidict": {
+      "constraint": "multidict==6.4.4",
+      "hash": "87afe1d073ce4baf",
+      "name": "multidict",
+      "source": "constraints.txt:130",
+      "type": "python",
+      "version": "6.4.4"
+    },
+    "mypy": {
+      "constraint": "mypy==1.8.0",
+      "hash": "550dc7184012beaa",
+      "name": "mypy",
+      "source": "dev.txt:17",
+      "type": "python",
+      "version": "1.8.0"
+    },
+    "mypy_extensions": {
+      "constraint": "mypy_extensions==1.1.0",
+      "hash": "79795f9c92aca5fb",
+      "name": "mypy_extensions",
+      "source": "constraints.txt:132",
+      "type": "python",
+      "version": "1.1.0"
+    },
+    "myst-parser": {
+      "constraint": "myst-parser==2.0.0",
+      "hash": "2e3e12a61615cb6d",
+      "name": "myst-parser",
+      "source": "dev.txt:35",
+      "type": "python",
+      "version": "2.0.0"
+    },
+    "nest-asyncio": {
+      "constraint": "nest-asyncio==1.6.0",
+      "hash": "7733a0ef0f935207",
+      "name": "nest-asyncio",
+      "source": "constraints.txt:133",
+      "type": "python",
+      "version": "1.6.0"
+    },
+    "networkx": {
+      "constraint": "networkx==3.4.2",
+      "hash": "5d3321301adf78c0",
+      "name": "networkx",
+      "source": "constraints.txt:134",
+      "type": "python",
+      "version": "3.4.2"
+    },
+    "nltk": {
+      "constraint": "nltk==3.9.1",
+      "hash": "d95f23aad2b55564",
+      "name": "nltk",
+      "source": "constraints.txt:135",
+      "type": "python",
+      "version": "3.9.1"
+    },
+    "npm:@heroicons/react": {
+      "constraint": "^2.0.18",
+      "hash": "1a170bf6d8a37a98",
+      "name": "@heroicons/react",
+      "source": "dashboard/package.json",
+      "type": "javascript",
+      "version": "2.0.18"
+    },
+    "npm:@playwright/test": {
+      "constraint": "^1.52.0",
+      "hash": "1b156c95a2a018d4",
+      "name": "@playwright/test",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "1.52.0"
+    },
+    "npm:@pulumi/docker": {
+      "constraint": "^4.5.0",
+      "hash": "c848320e8c796157",
+      "name": "@pulumi/docker",
+      "source": "dashboard/package.json",
+      "type": "javascript",
+      "version": "4.5.0"
+    },
+    "npm:@pulumi/gcp": {
+      "constraint": "^7.0.0",
+      "hash": "4668b7d07b298e0b",
+      "name": "@pulumi/gcp",
+      "source": "dashboard/package.json",
+      "type": "javascript",
+      "version": "7.0.0"
+    },
+    "npm:@pulumi/pulumi": {
+      "constraint": "^3.94.0",
+      "hash": "ea3b5086bc0ac174",
+      "name": "@pulumi/pulumi",
+      "source": "dashboard/package.json",
+      "type": "javascript",
+      "version": "3.94.0"
+    },
+    "npm:@radix-ui/react-dropdown-menu": {
+      "constraint": "^2.1.15",
+      "hash": "04a9c12a9c7d2133",
+      "name": "@radix-ui/react-dropdown-menu",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "2.1.15"
+    },
+    "npm:@radix-ui/react-label": {
+      "constraint": "^2.1.7",
+      "hash": "fb27a1e796064559",
+      "name": "@radix-ui/react-label",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "2.1.7"
+    },
+    "npm:@radix-ui/react-radio-group": {
+      "constraint": "^1.3.7",
+      "hash": "6f11a011da7d3a7b",
+      "name": "@radix-ui/react-radio-group",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "1.3.7"
+    },
+    "npm:@radix-ui/react-select": {
+      "constraint": "^2.2.5",
+      "hash": "22863981956f3f46",
+      "name": "@radix-ui/react-select",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "2.2.5"
+    },
+    "npm:@radix-ui/react-slider": {
+      "constraint": "^1.3.5",
+      "hash": "3c9f0d436cbe9f2a",
+      "name": "@radix-ui/react-slider",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "1.3.5"
+    },
+    "npm:@radix-ui/react-slot": {
+      "constraint": "^1.2.3",
+      "hash": "17b113e9d07071a1",
+      "name": "@radix-ui/react-slot",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "1.2.3"
+    },
+    "npm:@radix-ui/react-switch": {
+      "constraint": "^1.2.5",
+      "hash": "8368759d5918cc91",
+      "name": "@radix-ui/react-switch",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "1.2.5"
+    },
+    "npm:@radix-ui/react-tabs": {
+      "constraint": "^1.1.12",
+      "hash": "f53d6abd5952e1f0",
+      "name": "@radix-ui/react-tabs",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "1.1.12"
+    },
+    "npm:@tanstack/react-query": {
+      "constraint": "^5.77.2",
+      "hash": "0b7e78316d3b1663",
+      "name": "@tanstack/react-query",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "5.77.2"
+    },
+    "npm:@tanstack/react-router": {
+      "constraint": "^1.120.11",
+      "hash": "abae8d00ed555323",
+      "name": "@tanstack/react-router",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "1.120.11"
+    },
+    "npm:@tanstack/router-vite-plugin": {
+      "constraint": "^1.120.11",
+      "hash": "adce6fedcff5bfee",
+      "name": "@tanstack/router-vite-plugin",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "1.120.11"
+    },
+    "npm:@testing-library/jest-dom": {
+      "constraint": "^6.6.3",
+      "hash": "281edcc4b583e980",
+      "name": "@testing-library/jest-dom",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "6.6.3"
+    },
+    "npm:@testing-library/react": {
+      "constraint": "^16.3.0",
+      "hash": "2a34441b3f9b8562",
+      "name": "@testing-library/react",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "16.3.0"
+    },
+    "npm:@testing-library/user-event": {
+      "constraint": "^14.6.1",
+      "hash": "4c2920aa14d4e861",
+      "name": "@testing-library/user-event",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "14.6.1"
+    },
+    "npm:@types/cli-progress": {
+      "constraint": "^3.11.5",
+      "hash": "7528c5403772088d",
+      "name": "@types/cli-progress",
+      "source": "migration/package.json",
+      "type": "javascript",
+      "version": "3.11.5"
+    },
+    "npm:@types/jest": {
+      "constraint": "^29.5.10",
+      "hash": "c7a2a53222127cd1",
+      "name": "@types/jest",
+      "source": "migration/package.json",
+      "type": "javascript",
+      "version": "29.5.10"
+    },
+    "npm:@types/lodash": {
+      "constraint": "^4.14.202",
+      "hash": "f5d8cc02753d819f",
+      "name": "@types/lodash",
+      "source": "dashboard/package.json",
+      "type": "javascript",
+      "version": "4.14.202"
+    },
+    "npm:@types/node": {
+      "constraint": "^20.0.0",
+      "hash": "f3f591b7946ba96f",
+      "name": "@types/node",
+      "source": "dashboard/package.json",
+      "type": "javascript",
+      "version": "20.0.0"
+    },
+    "npm:@types/react": {
+      "constraint": "^18.2.45",
+      "hash": "7454c2a70683a8ca",
+      "name": "@types/react",
+      "source": "dashboard/package.json",
+      "type": "javascript",
+      "version": "18.2.45"
+    },
+    "npm:@types/react-dom": {
+      "constraint": "^18.2.18",
+      "hash": "e02e57324973bdb2",
+      "name": "@types/react-dom",
+      "source": "dashboard/package.json",
+      "type": "javascript",
+      "version": "18.2.18"
+    },
+    "npm:@types/yargs": {
+      "constraint": "^17.0.32",
+      "hash": "bb8875d51dbaaef9",
+      "name": "@types/yargs",
+      "source": "migration/package.json",
+      "type": "javascript",
+      "version": "17.0.32"
+    },
+    "npm:@typescript-eslint/eslint-plugin": {
+      "constraint": "^6.13.0",
+      "hash": "5bbd918fb72cc42c",
+      "name": "@typescript-eslint/eslint-plugin",
+      "source": "migration/package.json",
+      "type": "javascript",
+      "version": "6.13.0"
+    },
+    "npm:@typescript-eslint/parser": {
+      "constraint": "^6.13.0",
+      "hash": "84351c61711cf715",
+      "name": "@typescript-eslint/parser",
+      "source": "migration/package.json",
+      "type": "javascript",
+      "version": "6.13.0"
+    },
+    "npm:@vitejs/plugin-react": {
+      "constraint": "^4.5.0",
+      "hash": "c11035df5d40280b",
+      "name": "@vitejs/plugin-react",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "4.5.0"
+    },
+    "npm:@vitest/ui": {
+      "constraint": "^3.1.4",
+      "hash": "9e076b3358eaeacb",
+      "name": "@vitest/ui",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "3.1.4"
+    },
+    "npm:@xyflow/react": {
+      "constraint": "^12.6.4",
+      "hash": "5b23068a26601577",
+      "name": "@xyflow/react",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "12.6.4"
+    },
+    "npm:autoprefixer": {
+      "constraint": "^10.4.16",
+      "hash": "ee1f73d100287042",
+      "name": "autoprefixer",
+      "source": "dashboard/package.json",
+      "type": "javascript",
+      "version": "10.4.16"
+    },
+    "npm:axios": {
+      "constraint": "^1.6.5",
+      "hash": "cfa056a712f2736c",
+      "name": "axios",
+      "source": "scripts/package.json",
+      "type": "javascript",
+      "version": "1.6.5"
+    },
+    "npm:chalk": {
+      "constraint": "^5.3.0",
+      "hash": "69a386a252021906",
+      "name": "chalk",
+      "source": "migration/package.json",
+      "type": "javascript",
+      "version": "5.3.0"
+    },
+    "npm:class-variance-authority": {
+      "constraint": "^0.7.1",
+      "hash": "c255a1add39e3f3f",
+      "name": "class-variance-authority",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "0.7.1"
+    },
+    "npm:cli-progress": {
+      "constraint": "^3.12.0",
+      "hash": "83693be4ec2ea7f0",
+      "name": "cli-progress",
+      "source": "migration/package.json",
+      "type": "javascript",
+      "version": "3.12.0"
+    },
+    "npm:clsx": {
+      "constraint": "^2.0.0",
+      "hash": "b17f76737e78e90e",
+      "name": "clsx",
+      "source": "dashboard/package.json",
+      "type": "javascript",
+      "version": "2.0.0"
+    },
+    "npm:cssnano": {
+      "constraint": "^7.0.7",
+      "hash": "eeece4319de00982",
+      "name": "cssnano",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "7.0.7"
+    },
+    "npm:dotenv": {
+      "constraint": "^16.3.1",
+      "hash": "b2c0063c2e1fd757",
+      "name": "dotenv",
+      "source": "migration/package.json",
+      "type": "javascript",
+      "version": "16.3.1"
+    },
+    "npm:eslint": {
+      "constraint": "^8.55.0",
+      "hash": "1ddda41eaa13e3dc",
+      "name": "eslint",
+      "source": "migration/package.json",
+      "type": "javascript",
+      "version": "8.55.0"
+    },
+    "npm:eslint-config-next": {
+      "constraint": "14.0.4",
+      "hash": "f4f7c1a716bf442b",
+      "name": "eslint-config-next",
+      "source": "dashboard/package.json",
+      "type": "javascript",
+      "version": "14.0.4"
+    },
+    "npm:eslint-config-prettier": {
+      "constraint": "^9.1.0",
+      "hash": "ff801dbbf9998b7f",
+      "name": "eslint-config-prettier",
+      "source": "migration/package.json",
+      "type": "javascript",
+      "version": "9.1.0"
+    },
+    "npm:eslint-plugin-prettier": {
+      "constraint": "^5.0.1",
+      "hash": "388238e64247d4d4",
+      "name": "eslint-plugin-prettier",
+      "source": "migration/package.json",
+      "type": "javascript",
+      "version": "5.0.1"
+    },
+    "npm:eslint-plugin-react-hooks": {
+      "constraint": "^4.6.0",
+      "hash": "4b6e39c5c8bc1284",
+      "name": "eslint-plugin-react-hooks",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "4.6.0"
+    },
+    "npm:eslint-plugin-react-refresh": {
+      "constraint": "^0.4.5",
+      "hash": "5e8e29d107a870aa",
+      "name": "eslint-plugin-react-refresh",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "0.4.5"
+    },
+    "npm:express": {
+      "constraint": "^4.18.2",
+      "hash": "2119d0e476274f36",
+      "name": "express",
+      "source": "scripts/package.json",
+      "type": "javascript",
+      "version": "4.18.2"
+    },
+    "npm:immer": {
+      "constraint": "^10.1.1",
+      "hash": "c04e41c30621084a",
+      "name": "immer",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "10.1.1"
+    },
+    "npm:jest": {
+      "constraint": "^29.7.0",
+      "hash": "92312293c36327c0",
+      "name": "jest",
+      "source": "migration/package.json",
+      "type": "javascript",
+      "version": "29.7.0"
+    },
+    "npm:jsdom": {
+      "constraint": "^26.1.0",
+      "hash": "413b227002ec5d8c",
+      "name": "jsdom",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "26.1.0"
+    },
+    "npm:lodash": {
+      "constraint": "^4.17.21",
+      "hash": "9885dd9837010959",
+      "name": "lodash",
+      "source": "dashboard/package.json",
+      "type": "javascript",
+      "version": "4.17.21"
+    },
+    "npm:lucide-react": {
+      "constraint": "^0.300.0",
+      "hash": "bae63b02e5959ba9",
+      "name": "lucide-react",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "0.300.0"
+    },
+    "npm:morgan": {
+      "constraint": "^1.10.0",
+      "hash": "c83f65f5537947f5",
+      "name": "morgan",
+      "source": "scripts/package.json",
+      "type": "javascript",
+      "version": "1.10.0"
+    },
+    "npm:next": {
+      "constraint": "14.0.4",
+      "hash": "3d2770f237702843",
+      "name": "next",
+      "source": "dashboard/package.json",
+      "type": "javascript",
+      "version": "14.0.4"
+    },
+    "npm:nodemon": {
+      "constraint": "^3.0.2",
+      "hash": "2b989169527281b6",
+      "name": "nodemon",
+      "source": "scripts/package.json",
+      "type": "javascript",
+      "version": "3.0.2"
+    },
+    "npm:ora": {
+      "constraint": "^7.0.1",
+      "hash": "82e61f4337d7aea5",
+      "name": "ora",
+      "source": "migration/package.json",
+      "type": "javascript",
+      "version": "7.0.1"
+    },
+    "npm:p-queue": {
+      "constraint": "^7.4.1",
+      "hash": "21344c72d5d50463",
+      "name": "p-queue",
+      "source": "migration/package.json",
+      "type": "javascript",
+      "version": "7.4.1"
+    },
+    "npm:portkey-ai": {
+      "constraint": "^1.9.1",
+      "hash": "ba3913dcd69b2984",
+      "name": "portkey-ai",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "1.9.1"
+    },
+    "npm:postcss": {
+      "constraint": "^8.4.32",
+      "hash": "1b1122972fa1d0dc",
+      "name": "postcss",
+      "source": "dashboard/package.json",
+      "type": "javascript",
+      "version": "8.4.32"
+    },
+    "npm:prettier": {
+      "constraint": "^3.1.0",
+      "hash": "c924ae4aba162225",
+      "name": "prettier",
+      "source": "migration/package.json",
+      "type": "javascript",
+      "version": "3.1.0"
+    },
+    "npm:react": {
+      "constraint": "^18.2.0",
+      "hash": "91afcc5c81603902",
+      "name": "react",
+      "source": "dashboard/package.json",
+      "type": "javascript",
+      "version": "18.2.0"
+    },
+    "npm:react-dom": {
+      "constraint": "^18.2.0",
+      "hash": "00365636b722f21a",
+      "name": "react-dom",
+      "source": "dashboard/package.json",
+      "type": "javascript",
+      "version": "18.2.0"
+    },
+    "npm:react-dropzone": {
+      "constraint": "^14.3.8",
+      "hash": "1e934ab49656ce9e",
+      "name": "react-dropzone",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "14.3.8"
+    },
+    "npm:recharts": {
+      "constraint": "^2.15.3",
+      "hash": "1a92e1216942d30a",
+      "name": "recharts",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "2.15.3"
+    },
+    "npm:socket.io-client": {
+      "constraint": "^4.8.1",
+      "hash": "14161682bcb6c027",
+      "name": "socket.io-client",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "4.8.1"
+    },
+    "npm:tailwind-merge": {
+      "constraint": "^2.6.0",
+      "hash": "7b87b87e2140d097",
+      "name": "tailwind-merge",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "2.6.0"
+    },
+    "npm:tailwindcss": {
+      "constraint": "^3.4.0",
+      "hash": "34dd778e5053c479",
+      "name": "tailwindcss",
+      "source": "dashboard/package.json",
+      "type": "javascript",
+      "version": "3.4.0"
+    },
+    "npm:tailwindcss-animate": {
+      "constraint": "^1.0.7",
+      "hash": "0bf546bebc227fd9",
+      "name": "tailwindcss-animate",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "1.0.7"
+    },
+    "npm:ts-jest": {
+      "constraint": "^29.1.1",
+      "hash": "3822d55e9d0307c1",
+      "name": "ts-jest",
+      "source": "migration/package.json",
+      "type": "javascript",
+      "version": "29.1.1"
+    },
+    "npm:ts-node": {
+      "constraint": "^10.9.1",
+      "hash": "d8dcbcf832685e43",
+      "name": "ts-node",
+      "source": "migration/package.json",
+      "type": "javascript",
+      "version": "10.9.1"
+    },
+    "npm:typescript": {
+      "constraint": "^5.0.0",
+      "hash": "071e8aa28f2fb17f",
+      "name": "typescript",
+      "source": "dashboard/package.json",
+      "type": "javascript",
+      "version": "5.0.0"
+    },
+    "npm:uuid": {
+      "constraint": "^11.1.0",
+      "hash": "48194a13e56704bb",
+      "name": "uuid",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "11.1.0"
+    },
+    "npm:vite": {
+      "constraint": "^5.4.19",
+      "hash": "9f051ace7d29a736",
+      "name": "vite",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "5.4.19"
+    },
+    "npm:vitest": {
+      "constraint": "^3.1.4",
+      "hash": "7938e502b81411ee",
+      "name": "vitest",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "3.1.4"
+    },
+    "npm:winston": {
+      "constraint": "^3.11.0",
+      "hash": "45d3532f12ff3be5",
+      "name": "winston",
+      "source": "migration/package.json",
+      "type": "javascript",
+      "version": "3.11.0"
+    },
+    "npm:yargs": {
+      "constraint": "^17.7.2",
+      "hash": "d206c1afc18269ac",
+      "name": "yargs",
+      "source": "migration/package.json",
+      "type": "javascript",
+      "version": "17.7.2"
+    },
+    "npm:zustand": {
+      "constraint": "^4.5.7",
+      "hash": "d06738dd8b158192",
+      "name": "zustand",
+      "source": "admin-ui/package.json",
+      "type": "javascript",
+      "version": "4.5.7"
+    },
+    "numpy": {
+      "constraint": "numpy==1.26.4",
+      "hash": "c9b266c7c89cd7af",
+      "name": "numpy",
+      "source": "base.txt:40",
+      "type": "python",
+      "version": "1.26.4"
+    },
+    "nvidia-cublas-cu12": {
+      "constraint": "nvidia-cublas-cu12==12.6.4.1",
+      "hash": "822672dec4424e54",
+      "name": "nvidia-cublas-cu12",
+      "source": "constraints.txt:137",
+      "type": "python",
+      "version": "12.6.4"
+    },
+    "nvidia-cuda-cupti-cu12": {
+      "constraint": "nvidia-cuda-cupti-cu12==12.6.80",
+      "hash": "13242f846ec7ae4e",
+      "name": "nvidia-cuda-cupti-cu12",
+      "source": "constraints.txt:138",
+      "type": "python",
+      "version": "12.6.80"
+    },
+    "nvidia-cuda-nvrtc-cu12": {
+      "constraint": "nvidia-cuda-nvrtc-cu12==12.6.77",
+      "hash": "6c09dbc93ddeb30c",
+      "name": "nvidia-cuda-nvrtc-cu12",
+      "source": "constraints.txt:139",
+      "type": "python",
+      "version": "12.6.77"
+    },
+    "nvidia-cuda-runtime-cu12": {
+      "constraint": "nvidia-cuda-runtime-cu12==12.6.77",
+      "hash": "96907c52c8988e99",
+      "name": "nvidia-cuda-runtime-cu12",
+      "source": "constraints.txt:140",
+      "type": "python",
+      "version": "12.6.77"
+    },
+    "nvidia-cudnn-cu12": {
+      "constraint": "nvidia-cudnn-cu12==9.5.1.17",
+      "hash": "4427d6c5daeced79",
+      "name": "nvidia-cudnn-cu12",
+      "source": "constraints.txt:141",
+      "type": "python",
+      "version": "9.5.1"
+    },
+    "nvidia-cufft-cu12": {
+      "constraint": "nvidia-cufft-cu12==11.3.0.4",
+      "hash": "42c57a2b42164572",
+      "name": "nvidia-cufft-cu12",
+      "source": "constraints.txt:142",
+      "type": "python",
+      "version": "11.3.0"
+    },
+    "nvidia-cufile-cu12": {
+      "constraint": "nvidia-cufile-cu12==1.11.1.6",
+      "hash": "1953be9fc60a3d08",
+      "name": "nvidia-cufile-cu12",
+      "source": "constraints.txt:143",
+      "type": "python",
+      "version": "1.11.1"
+    },
+    "nvidia-curand-cu12": {
+      "constraint": "nvidia-curand-cu12==10.3.7.77",
+      "hash": "1a5c7d7b65b841a1",
+      "name": "nvidia-curand-cu12",
+      "source": "constraints.txt:144",
+      "type": "python",
+      "version": "10.3.7"
+    },
+    "nvidia-cusolver-cu12": {
+      "constraint": "nvidia-cusolver-cu12==11.7.1.2",
+      "hash": "0d79873c044a59a0",
+      "name": "nvidia-cusolver-cu12",
+      "source": "constraints.txt:145",
+      "type": "python",
+      "version": "11.7.1"
+    },
+    "nvidia-cusparse-cu12": {
+      "constraint": "nvidia-cusparse-cu12==12.5.4.2",
+      "hash": "5c6f422ea26ec1cd",
+      "name": "nvidia-cusparse-cu12",
+      "source": "constraints.txt:146",
+      "type": "python",
+      "version": "12.5.4"
+    },
+    "nvidia-cusparselt-cu12": {
+      "constraint": "nvidia-cusparselt-cu12==0.6.3",
+      "hash": "c2c3eb11e0ca938f",
+      "name": "nvidia-cusparselt-cu12",
+      "source": "constraints.txt:147",
+      "type": "python",
+      "version": "0.6.3"
+    },
+    "nvidia-nccl-cu12": {
+      "constraint": "nvidia-nccl-cu12==2.26.2",
+      "hash": "7768f3d750c3efef",
+      "name": "nvidia-nccl-cu12",
+      "source": "constraints.txt:148",
+      "type": "python",
+      "version": "2.26.2"
+    },
+    "nvidia-nvjitlink-cu12": {
+      "constraint": "nvidia-nvjitlink-cu12==12.6.85",
+      "hash": "bdaabdc5bc2f44ff",
+      "name": "nvidia-nvjitlink-cu12",
+      "source": "constraints.txt:149",
+      "type": "python",
+      "version": "12.6.85"
+    },
+    "nvidia-nvtx-cu12": {
+      "constraint": "nvidia-nvtx-cu12==12.6.77",
+      "hash": "2a8d2795aff8e176",
+      "name": "nvidia-nvtx-cu12",
+      "source": "constraints.txt:150",
+      "type": "python",
+      "version": "12.6.77"
+    },
+    "oauthlib": {
+      "constraint": "oauthlib==3.2.2",
+      "hash": "2701dd49650b258c",
+      "name": "oauthlib",
+      "source": "constraints.txt:151",
+      "type": "python",
+      "version": "3.2.2"
+    },
+    "onnxruntime": {
+      "constraint": "onnxruntime==1.22.0",
+      "hash": "4fc0d6a2fa2954bc",
+      "name": "onnxruntime",
+      "source": "constraints.txt:152",
+      "type": "python",
+      "version": "1.22.0"
+    },
+    "openai": {
+      "constraint": "openai==1.82.0",
+      "hash": "fb2cad97f1ef97c2",
+      "name": "openai",
+      "source": "base.txt:22",
+      "type": "python",
+      "version": "1.82.0"
+    },
+    "opentelemetry-api": {
+      "constraint": "opentelemetry-api==1.33.1",
+      "hash": "bd180956c58d1938",
+      "name": "opentelemetry-api",
+      "source": "unified.txt:65",
+      "type": "python",
+      "version": "1.33.1"
+    },
+    "opentelemetry-exporter-otlp-proto-grpc": {
+      "constraint": "opentelemetry-exporter-otlp-proto-grpc==1.11.1",
+      "hash": "5653b2dde9c4be02",
+      "name": "opentelemetry-exporter-otlp-proto-grpc",
+      "source": "constraints.txt:155",
+      "type": "python",
+      "version": "1.11.1"
+    },
+    "opentelemetry-proto": {
+      "constraint": "opentelemetry-proto==1.11.1",
+      "hash": "6e866d036bf046db",
+      "name": "opentelemetry-proto",
+      "source": "constraints.txt:159",
+      "type": "python",
+      "version": "1.11.1"
+    },
+    "opentelemetry-sdk": {
+      "constraint": "opentelemetry-sdk==1.33.1",
+      "hash": "e78650b6aa498fc9",
+      "name": "opentelemetry-sdk",
+      "source": "unified.txt:66",
+      "type": "python",
+      "version": "1.33.1"
+    },
+    "overrides": {
+      "constraint": "overrides==7.7.0",
+      "hash": "0d47980e40ac07cc",
+      "name": "overrides",
+      "source": "constraints.txt:163",
+      "type": "python",
+      "version": "7.7.0"
+    },
+    "package_name": {
+      "constraint": "package_name==0.1",
+      "hash": "c5529f8d0e0ec1ac",
+      "name": "package_name",
+      "source": "constraints.txt:164",
+      "type": "python",
+      "version": "0.1.0"
+    },
+    "packaging": {
+      "constraint": "packaging==25.0",
+      "hash": "234caa159989d7ce",
+      "name": "packaging",
+      "source": "constraints.txt:165",
+      "type": "python",
+      "version": "25.0.0"
+    },
+    "pandas": {
+      "constraint": "pandas==2.2.0",
+      "hash": "5da9e34034df202d",
+      "name": "pandas",
+      "source": "base.txt:41",
+      "type": "python",
+      "version": "2.2.0"
+    },
+    "parver": {
+      "constraint": "parver==0.5",
+      "hash": "1827a534ed7c384f",
+      "name": "parver",
+      "source": "constraints.txt:167",
+      "type": "python",
+      "version": "0.5.0"
+    },
+    "passlib": {
+      "constraint": "passlib[bcrypt]==1.7.4",
+      "hash": "df06751e203b6763",
+      "name": "passlib",
+      "source": "base.txt:56",
+      "type": "python",
+      "version": "1.7.4"
+    },
+    "pathspec": {
+      "constraint": "pathspec==0.12.1",
+      "hash": "0e2c52af0b29693a",
+      "name": "pathspec",
+      "source": "constraints.txt:169",
+      "type": "python",
+      "version": "0.12.1"
+    },
+    "pdbpp": {
+      "constraint": "pdbpp==0.10.3",
+      "hash": "afc12a42bb2f1001",
+      "name": "pdbpp",
+      "source": "dev.txt:57",
+      "type": "python",
+      "version": "0.10.3"
+    },
+    "pgcli": {
+      "constraint": "pgcli==4.0.1",
+      "hash": "233200f95f257cd6",
+      "name": "pgcli",
+      "source": "dev.txt:53",
+      "type": "python",
+      "version": "4.0.1"
+    },
+    "pgvector": {
+      "constraint": "pgvector==0.2.5",
+      "hash": "74518a3f4f3181a1",
+      "name": "pgvector",
+      "source": "base.txt:49",
+      "type": "python",
+      "version": "0.2.5"
+    },
+    "phidata": {
+      "constraint": "phidata==2.7.10",
+      "hash": "5da3d126ea81d342",
+      "name": "phidata",
+      "source": "base.txt:24",
+      "type": "python",
+      "version": "2.7.10"
+    },
+    "phonenumbers": {
+      "constraint": "phonenumbers>=8.13.0  # For phone number normalization if needed",
+      "hash": "b9a7f3c079d8418b",
+      "name": "phonenumbers",
+      "source": "pay_ready.txt:18",
+      "type": "python",
+      "version": "8.13.0"
+    },
+    "pillow": {
+      "constraint": "pillow==11.2.1",
+      "hash": "c60f5f8f4d1f218c",
+      "name": "pillow",
+      "source": "constraints.txt:172",
+      "type": "python",
+      "version": "11.2.1"
+    },
+    "pip": {
+      "constraint": "pip==24.0",
+      "hash": "1411f49b5c3219c4",
+      "name": "pip",
+      "source": "constraints.txt:173",
+      "type": "python",
+      "version": "24.0.0"
+    },
+    "pip-tools": {
+      "constraint": "pip-tools==7.4.1",
+      "hash": "e3d12254de667814",
+      "name": "pip-tools",
+      "source": "constraints.txt:174",
+      "type": "python",
+      "version": "7.4.1"
+    },
+    "platformdirs": {
+      "constraint": "platformdirs==4.3.8",
+      "hash": "aa7a2c2ef7ff7c3a",
+      "name": "platformdirs",
+      "source": "constraints.txt:175",
+      "type": "python",
+      "version": "4.3.8"
+    },
+    "pluggy": {
+      "constraint": "pluggy==1.6.0",
+      "hash": "f5a9732356492d29",
+      "name": "pluggy",
+      "source": "constraints.txt:176",
+      "type": "python",
+      "version": "1.6.0"
+    },
+    "portkey-ai": {
+      "constraint": "portkey-ai==1.13.0",
+      "hash": "bce26377e760cdb9",
+      "name": "portkey-ai",
+      "source": "base.txt:63",
+      "type": "python",
+      "version": "1.13.0"
+    },
+    "posthog": {
+      "constraint": "posthog==4.2.0",
+      "hash": "718302d0f48aca03",
+      "name": "posthog",
+      "source": "constraints.txt:177",
+      "type": "python",
+      "version": "4.2.0"
+    },
+    "pre-commit": {
+      "constraint": "pre-commit==3.5.0",
+      "hash": "a12233bbc003ff8a",
+      "name": "pre-commit",
+      "source": "dev.txt:30",
+      "type": "python",
+      "version": "3.5.0"
+    },
+    "prefect": {
+      "constraint": "prefect>=2.14.0,<3.0.0",
+      "hash": "9f93d58d29e7a734",
+      "name": "prefect",
+      "source": "pay_ready.txt:11",
+      "type": "python",
+      "version": "2.14.0"
+    },
+    "prefect-aws": {
+      "constraint": "prefect-aws>=0.4.0  # For S3 result storage if needed",
+      "hash": "ba70b25c7538ac51",
+      "name": "prefect-aws",
+      "source": "pay_ready.txt:12",
+      "type": "python",
+      "version": "0.4.0"
+    },
+    "prefect-slack": {
+      "constraint": "prefect-slack>=0.2.0  # For Slack notifications",
+      "hash": "4644094d0991786b",
+      "name": "prefect-slack",
+      "source": "pay_ready.txt:13",
+      "type": "python",
+      "version": "0.2.0"
+    },
+    "prometheus-client": {
+      "constraint": "prometheus-client==0.19.0",
+      "hash": "464177bce2ed2832",
+      "name": "prometheus-client",
+      "source": "base.txt:45",
+      "type": "python",
+      "version": "0.19.0"
+    },
+    "propcache": {
+      "constraint": "propcache==0.3.1",
+      "hash": "e6cefc09d98b7606",
+      "name": "propcache",
+      "source": "constraints.txt:179",
+      "type": "python",
+      "version": "0.3.1"
+    },
+    "proto-plus": {
+      "constraint": "proto-plus==1.26.1",
+      "hash": "786c9aee4470bbc2",
+      "name": "proto-plus",
+      "source": "constraints.txt:180",
+      "type": "python",
+      "version": "1.26.1"
+    },
+    "protobuf": {
+      "constraint": "protobuf==6.31.0",
+      "hash": "e47460c490b9bcab",
+      "name": "protobuf",
+      "source": "base.txt:59",
+      "type": "python",
+      "version": "6.31.0"
+    },
+    "psutil": {
+      "constraint": "psutil==7.0.0",
+      "hash": "730c60f0c4ab3e9a",
+      "name": "psutil",
+      "source": "constraints.txt:182",
+      "type": "python",
+      "version": "7.0.0"
+    },
+    "psycopg": {
+      "constraint": "psycopg==3.1.18",
+      "hash": "b37667778d66b99e",
+      "name": "psycopg",
+      "source": "base.txt:15",
+      "type": "python",
+      "version": "3.1.18"
+    },
+    "psycopg-pool": {
+      "constraint": "psycopg-pool>=3.1.0",
+      "hash": "33bde9d659982903",
+      "name": "psycopg-pool",
+      "source": "base.txt:16",
+      "type": "python",
+      "version": "3.1.0"
+    },
+    "psycopg2-binary": {
+      "constraint": "psycopg2-binary==2.9.9",
+      "hash": "cc576249b96dcbd6",
+      "name": "psycopg2-binary",
+      "source": "superagi.txt:18",
+      "type": "python",
+      "version": "2.9.9"
+    },
+    "pulsar-client": {
+      "constraint": "pulsar-client==3.7.0",
+      "hash": "a9678b75a1d8806a",
+      "name": "pulsar-client",
+      "source": "constraints.txt:184",
+      "type": "python",
+      "version": "3.7.0"
+    },
+    "pulumi": {
+      "constraint": "pulumi==3.171.0",
+      "hash": "587cb7ee3a7197db",
+      "name": "pulumi",
+      "source": "constraints.txt:185",
+      "type": "python",
+      "version": "3.171.0"
+    },
+    "pulumi_command": {
+      "constraint": "pulumi_command==0.11.1",
+      "hash": "8b65f637206b7e30",
+      "name": "pulumi_command",
+      "source": "constraints.txt:186",
+      "type": "python",
+      "version": "0.11.1"
+    },
+    "pulumi_gcp": {
+      "constraint": "pulumi_gcp==7.38.0",
+      "hash": "71765e663885a9c9",
+      "name": "pulumi_gcp",
+      "source": "constraints.txt:188",
+      "type": "python",
+      "version": "7.38.0"
+    },
+    "pulumi_kubernetes": {
+      "constraint": "pulumi_kubernetes==4.23.0",
+      "hash": "bd47ff85014f0b68",
+      "name": "pulumi_kubernetes",
+      "source": "constraints.txt:189",
+      "type": "python",
+      "version": "4.23.0"
+    },
+    "py-spy": {
+      "constraint": "py-spy==0.3.14",
+      "hash": "7707441be04a85ff",
+      "name": "py-spy",
+      "source": "dev.txt:43",
+      "type": "python",
+      "version": "0.3.14"
+    },
+    "pyarrow": {
+      "constraint": "pyarrow>=14.0.0  # For efficient data serialization",
+      "hash": "2f949ccf54dc7b3d",
+      "name": "pyarrow",
+      "source": "pay_ready.txt:25",
+      "type": "python",
+      "version": "14.0.0"
+    },
+    "pyasn1": {
+      "constraint": "pyasn1==0.6.1",
+      "hash": "ed28070a973a3f9e",
+      "name": "pyasn1",
+      "source": "constraints.txt:190",
+      "type": "python",
+      "version": "0.6.1"
+    },
+    "pyasn1_modules": {
+      "constraint": "pyasn1_modules==0.4.2",
+      "hash": "c1c1fb327aa7966b",
+      "name": "pyasn1_modules",
+      "source": "constraints.txt:191",
+      "type": "python",
+      "version": "0.4.2"
+    },
+    "pycodestyle": {
+      "constraint": "pycodestyle==2.13.0",
+      "hash": "6fe42b3f35a474ee",
+      "name": "pycodestyle",
+      "source": "constraints.txt:192",
+      "type": "python",
+      "version": "2.13.0"
+    },
+    "pycparser": {
+      "constraint": "pycparser==2.22",
+      "hash": "93fe5458ed44872a",
+      "name": "pycparser",
+      "source": "constraints.txt:193",
+      "type": "python",
+      "version": "2.22.0"
+    },
+    "pydantic": {
+      "constraint": "pydantic==2.11.4",
+      "hash": "131b1f0b3e43faf3",
+      "name": "pydantic",
+      "source": "base.txt:9",
+      "type": "python",
+      "version": "2.11.4"
+    },
+    "pydantic-settings": {
+      "constraint": "pydantic-settings==2.9.1",
+      "hash": "45b0344eb02c564e",
+      "name": "pydantic-settings",
+      "source": "base.txt:10",
+      "type": "python",
+      "version": "2.9.1"
+    },
+    "pydantic_core": {
+      "constraint": "pydantic_core==2.33.2",
+      "hash": "de3055dc4b1e393d",
+      "name": "pydantic_core",
+      "source": "constraints.txt:196",
+      "type": "python",
+      "version": "2.33.2"
+    },
+    "pyflakes": {
+      "constraint": "pyflakes==3.3.2",
+      "hash": "feec0bee70a64c1c",
+      "name": "pyflakes",
+      "source": "constraints.txt:197",
+      "type": "python",
+      "version": "3.3.2"
+    },
+    "pylint": {
+      "constraint": "pylint==3.0.3",
+      "hash": "c1ec386ee1e66ba3",
+      "name": "pylint",
+      "source": "dev.txt:18",
+      "type": "python",
+      "version": "3.0.3"
+    },
+    "pymongo": {
+      "constraint": "pymongo==4.13.0",
+      "hash": "f04b34636ca52e9e",
+      "name": "pymongo",
+      "source": "constraints.txt:199",
+      "type": "python",
+      "version": "4.13.0"
+    },
+    "pypdf": {
+      "constraint": "pypdf==4.3.1",
+      "hash": "c2ffa0ac051e0912",
+      "name": "pypdf",
+      "source": "constraints.txt:200",
+      "type": "python",
+      "version": "4.3.1"
+    },
+    "pyproject_hooks": {
+      "constraint": "pyproject_hooks==1.2.0",
+      "hash": "4814fe049b77fb3f",
+      "name": "pyproject_hooks",
+      "source": "constraints.txt:201",
+      "type": "python",
+      "version": "1.2.0"
+    },
+    "pytest": {
+      "constraint": "pytest==7.4.3",
+      "hash": "e686251aa677415a",
+      "name": "pytest",
+      "source": "dev.txt:7",
+      "type": "python",
+      "version": "7.4.3"
+    },
+    "pytest-asyncio": {
+      "constraint": "pytest-asyncio==0.21.1",
+      "hash": "ae750e9da74dacee",
+      "name": "pytest-asyncio",
+      "source": "dev.txt:8",
+      "type": "python",
+      "version": "0.21.1"
+    },
+    "pytest-cov": {
+      "constraint": "pytest-cov==4.1.0",
+      "hash": "89ad8979be2b9e1b",
+      "name": "pytest-cov",
+      "source": "dev.txt:9",
+      "type": "python",
+      "version": "4.1.0"
+    },
+    "pytest-mock": {
+      "constraint": "pytest-mock==3.12.0",
+      "hash": "5a28d8a637e09df7",
+      "name": "pytest-mock",
+      "source": "dev.txt:10",
+      "type": "python",
+      "version": "3.12.0"
+    },
+    "pytest-timeout": {
+      "constraint": "pytest-timeout==2.2.0",
+      "hash": "147b71d6d088595e",
+      "name": "pytest-timeout",
+      "source": "dev.txt:11",
+      "type": "python",
+      "version": "2.2.0"
+    },
+    "pytest-xdist": {
+      "constraint": "pytest-xdist==3.5.0",
+      "hash": "acef903ae172086b",
+      "name": "pytest-xdist",
+      "source": "dev.txt:12",
+      "type": "python",
+      "version": "3.5.0"
+    },
+    "python-dateutil": {
+      "constraint": "python-dateutil==2.9.0.post0",
+      "hash": "a6516e532c3ec2f0",
+      "name": "python-dateutil",
+      "source": "monitoring.txt:19",
+      "type": "python",
+      "version": "2.9.0"
+    },
+    "python-dotenv": {
+      "constraint": "python-dotenv==1.1.0",
+      "hash": "61c942d083d2f810",
+      "name": "python-dotenv",
+      "source": "base.txt:33",
+      "type": "python",
+      "version": "1.1.0"
+    },
+    "python-jose": {
+      "constraint": "python-jose[cryptography]==3.3.0",
+      "hash": "c87d60b507c88dd4",
+      "name": "python-jose",
+      "source": "unified.txt:39",
+      "type": "python",
+      "version": "3.3.0"
+    },
+    "python-jose[cryptography]": {
+      "constraint": "*",
+      "hash": "36177d06f5364a6a",
+      "name": "python-jose[cryptography]",
+      "source": "base.txt:66",
+      "type": "python",
+      "version": "0.0.0"
+    },
+    "python-json-logger": {
+      "constraint": "python-json-logger==2.0.7",
+      "hash": "d28998b53e1ba54c",
+      "name": "python-json-logger",
+      "source": "superagi.txt:37",
+      "type": "python",
+      "version": "2.0.7"
+    },
+    "python-multipart": {
+      "constraint": "*",
+      "hash": "74d9a47bfa557501",
+      "name": "python-multipart",
+      "source": "base.txt:67",
+      "type": "python",
+      "version": "0.0.0"
+    },
+    "pytz": {
+      "constraint": "pytz==2025.2",
+      "hash": "1017e45bae3354f2",
+      "name": "pytz",
+      "source": "constraints.txt:208",
+      "type": "python",
+      "version": "2025.2.0"
+    },
+    "pyyaml": {
+      "constraint": "pyyaml==6.0.2",
+      "hash": "4fc463b292e60e8e",
+      "name": "pyyaml",
+      "source": "base.txt:34",
+      "type": "python",
+      "version": "6.0.2"
+    },
+    "rapidfuzz": {
+      "constraint": "rapidfuzz>=3.5.0,<4.0.0",
+      "hash": "160e1465582a9abf",
+      "name": "rapidfuzz",
+      "source": "pay_ready.txt:16",
+      "type": "python",
+      "version": "3.5.0"
+    },
+    "redis": {
+      "constraint": "redis==5.0.1",
+      "hash": "7879b53287769c76",
+      "name": "redis",
+      "source": "base.txt:14",
+      "type": "python",
+      "version": "5.0.1"
+    },
+    "referencing": {
+      "constraint": "referencing==0.36.2",
+      "hash": "394b18c5cd3ae369",
+      "name": "referencing",
+      "source": "constraints.txt:210",
+      "type": "python",
+      "version": "0.36.2"
+    },
+    "regex": {
+      "constraint": "regex==2024.11.6",
+      "hash": "bfd2b9951370cbde",
+      "name": "regex",
+      "source": "constraints.txt:211",
+      "type": "python",
+      "version": "2024.11.6"
+    },
+    "requests": {
+      "constraint": "requests==2.32.3",
+      "hash": "2b40f808447a28ba",
+      "name": "requests",
+      "source": "base.txt:28",
+      "type": "python",
+      "version": "2.32.3"
+    },
+    "requests-oauthlib": {
+      "constraint": "requests-oauthlib==2.0.0",
+      "hash": "53e4242401aeb984",
+      "name": "requests-oauthlib",
+      "source": "constraints.txt:213",
+      "type": "python",
+      "version": "2.0.0"
+    },
+    "rich": {
+      "constraint": "rich==14.0.0",
+      "hash": "6dbae8da3f89c3f8",
+      "name": "rich",
+      "source": "base.txt:36",
+      "type": "python",
+      "version": "14.0.0"
+    },
+    "rpds-py": {
+      "constraint": "rpds-py==0.25.1",
+      "hash": "3d64a4f779f9cb58",
+      "name": "rpds-py",
+      "source": "constraints.txt:215",
+      "type": "python",
+      "version": "0.25.1"
+    },
+    "rsa": {
+      "constraint": "rsa==4.9.1",
+      "hash": "58860e5eb05109da",
+      "name": "rsa",
+      "source": "constraints.txt:216",
+      "type": "python",
+      "version": "4.9.1"
+    },
+    "safetensors": {
+      "constraint": "safetensors==0.5.3",
+      "hash": "8ebb528360dada6a",
+      "name": "safetensors",
+      "source": "constraints.txt:217",
+      "type": "python",
+      "version": "0.5.3"
+    },
+    "scikit-learn": {
+      "constraint": "scikit-learn==1.5.1",
+      "hash": "9a9a6261eef541bb",
+      "name": "scikit-learn",
+      "source": "unified.txt:56",
+      "type": "python",
+      "version": "1.5.1"
+    },
+    "scipy": {
+      "constraint": "scipy==1.15.3",
+      "hash": "95175750796b4848",
+      "name": "scipy",
+      "source": "constraints.txt:219",
+      "type": "python",
+      "version": "1.15.3"
+    },
+    "semver": {
+      "constraint": "semver==3.0.4",
+      "hash": "68fc73ede55ff766",
+      "name": "semver",
+      "source": "constraints.txt:220",
+      "type": "python",
+      "version": "3.0.4"
+    },
+    "sentence-transformers": {
+      "constraint": "sentence-transformers==2.2.2",
+      "hash": "14868f8653bd8f06",
+      "name": "sentence-transformers",
+      "source": "constraints.txt:221",
+      "type": "python",
+      "version": "2.2.2"
+    },
+    "sentencepiece": {
+      "constraint": "sentencepiece==0.2.0",
+      "hash": "df22e7b2579fd30e",
+      "name": "sentencepiece",
+      "source": "constraints.txt:222",
+      "type": "python",
+      "version": "0.2.0"
+    },
+    "setuptools": {
+      "constraint": "setuptools==80.8.0",
+      "hash": "3308dec340a56ebe",
+      "name": "setuptools",
+      "source": "constraints.txt:223",
+      "type": "python",
+      "version": "80.8.0"
+    },
+    "shapely": {
+      "constraint": "shapely==2.1.1",
+      "hash": "3ca2f3f832283218",
+      "name": "shapely",
+      "source": "constraints.txt:224",
+      "type": "python",
+      "version": "2.1.1"
+    },
+    "shellingham": {
+      "constraint": "shellingham==1.5.4",
+      "hash": "35c5417ef5338ba1",
+      "name": "shellingham",
+      "source": "constraints.txt:225",
+      "type": "python",
+      "version": "1.5.4"
+    },
+    "six": {
+      "constraint": "six==1.16.0",
+      "hash": "4e7c03fbced45e75",
+      "name": "six",
+      "source": "constraints.txt:226",
+      "type": "python",
+      "version": "1.16.0"
+    },
+    "smmap": {
+      "constraint": "smmap==5.0.2",
+      "hash": "9ddc72b84592e9ca",
+      "name": "smmap",
+      "source": "constraints.txt:227",
+      "type": "python",
+      "version": "5.0.2"
+    },
+    "sniffio": {
+      "constraint": "sniffio==1.3.1",
+      "hash": "d0312c1c7871484c",
+      "name": "sniffio",
+      "source": "constraints.txt:228",
+      "type": "python",
+      "version": "1.3.1"
+    },
+    "soupsieve": {
+      "constraint": "soupsieve==2.7",
+      "hash": "96e33d968a778c68",
+      "name": "soupsieve",
+      "source": "constraints.txt:229",
+      "type": "python",
+      "version": "2.7.0"
+    },
+    "sphinx": {
+      "constraint": "sphinx==7.2.6",
+      "hash": "84e810c949abf231",
+      "name": "sphinx",
+      "source": "dev.txt:33",
+      "type": "python",
+      "version": "7.2.6"
+    },
+    "sphinx-rtd-theme": {
+      "constraint": "sphinx-rtd-theme==2.0.0",
+      "hash": "5a478d7e3e57db1d",
+      "name": "sphinx-rtd-theme",
+      "source": "dev.txt:34",
+      "type": "python",
+      "version": "2.0.0"
+    },
+    "sqlalchemy": {
+      "constraint": "sqlalchemy==2.0.30",
+      "hash": "91c83445ddcda76b",
+      "name": "sqlalchemy",
+      "source": "base.txt:13",
+      "type": "python",
+      "version": "2.0.30"
+    },
+    "sse-starlette": {
+      "constraint": "sse-starlette==2.3.5",
+      "hash": "8d3a8d2b45cca20b",
+      "name": "sse-starlette",
+      "source": "constraints.txt:230",
+      "type": "python",
+      "version": "2.3.5"
+    },
+    "starlette": {
+      "constraint": "starlette==0.46.2",
+      "hash": "00ca634a8484b06a",
+      "name": "starlette",
+      "source": "constraints.txt:231",
+      "type": "python",
+      "version": "0.46.2"
+    },
+    "striprtf": {
+      "constraint": "striprtf==0.0.26",
+      "hash": "b30ff7890576eb8b",
+      "name": "striprtf",
+      "source": "constraints.txt:232",
+      "type": "python",
+      "version": "0.0.26"
+    },
+    "structlog": {
+      "constraint": "structlog==24.1.0",
+      "hash": "0007f5ee37eb9e6a",
+      "name": "structlog",
+      "source": "base.txt:46",
+      "type": "python",
+      "version": "24.1.0"
+    },
+    "superagi": {
+      "constraint": "superagi==0.0.1",
+      "hash": "ade63c69dbcbc5c5",
+      "name": "superagi",
+      "source": "superagi.txt:3",
+      "type": "python",
+      "version": "0.0.1"
+    },
+    "sympy": {
+      "constraint": "sympy==1.14.0",
+      "hash": "ca03651898d671b7",
+      "name": "sympy",
+      "source": "constraints.txt:234",
+      "type": "python",
+      "version": "1.14.0"
+    },
+    "tabulate": {
+      "constraint": "tabulate==0.9.0",
+      "hash": "1ce86b8238215973",
+      "name": "tabulate",
+      "source": "constraints.txt:235",
+      "type": "python",
+      "version": "0.9.0"
+    },
+    "tenacity": {
+      "constraint": "tenacity==8.2.3",
+      "hash": "8f7e1dda49dd9856",
+      "name": "tenacity",
+      "source": "base.txt:37",
+      "type": "python",
+      "version": "8.2.3"
+    },
+    "threadpoolctl": {
+      "constraint": "threadpoolctl==3.6.0",
+      "hash": "d0b9a1f2849593f3",
+      "name": "threadpoolctl",
+      "source": "constraints.txt:237",
+      "type": "python",
+      "version": "3.6.0"
+    },
+    "tiktoken": {
+      "constraint": "tiktoken==0.7.0",
+      "hash": "ca1ac1021262df41",
+      "name": "tiktoken",
+      "source": "constraints.txt:238",
+      "type": "python",
+      "version": "0.7.0"
+    },
+    "tokenizers": {
+      "constraint": "tokenizers==0.15.2",
+      "hash": "e2e3364e7a7169bc",
+      "name": "tokenizers",
+      "source": "constraints.txt:239",
+      "type": "python",
+      "version": "0.15.2"
+    },
+    "tomli": {
+      "constraint": "tomli==2.2.1",
+      "hash": "5cc9b444c194d25d",
+      "name": "tomli",
+      "source": "constraints.txt:240",
+      "type": "python",
+      "version": "2.2.1"
+    },
+    "tomlkit": {
+      "constraint": "tomlkit==0.13.2",
+      "hash": "460d27a705fab3e1",
+      "name": "tomlkit",
+      "source": "constraints.txt:241",
+      "type": "python",
+      "version": "0.13.2"
+    },
+    "torch": {
+      "constraint": "torch==2.7.0",
+      "hash": "2b3c812cd6d5261b",
+      "name": "torch",
+      "source": "constraints.txt:242",
+      "type": "python",
+      "version": "2.7.0"
+    },
+    "torchvision": {
+      "constraint": "torchvision==0.22.0",
+      "hash": "79526714064853c0",
+      "name": "torchvision",
+      "source": "constraints.txt:243",
+      "type": "python",
+      "version": "0.22.0"
+    },
+    "tqdm": {
+      "constraint": "tqdm==4.67.1",
+      "hash": "93d994b468c4f081",
+      "name": "tqdm",
+      "source": "constraints.txt:244",
+      "type": "python",
+      "version": "4.67.1"
+    },
+    "transformers": {
+      "constraint": "transformers==4.36.2",
+      "hash": "4712f5673e481d9c",
+      "name": "transformers",
+      "source": "constraints.txt:245",
+      "type": "python",
+      "version": "4.36.2"
+    },
+    "triton": {
+      "constraint": "triton==3.3.0",
+      "hash": "eb353410366eff07",
+      "name": "triton",
+      "source": "constraints.txt:246",
+      "type": "python",
+      "version": "3.3.0"
+    },
+    "typer": {
+      "constraint": "typer==0.12.3",
+      "hash": "8f616391328c0be2",
+      "name": "typer",
+      "source": "unified.txt:50",
+      "type": "python",
+      "version": "0.12.3"
+    },
+    "types-PyYAML": {
+      "constraint": "types-PyYAML==6.0.12.20250516",
+      "hash": "38840f9c0811dd1b",
+      "name": "types-PyYAML",
+      "source": "dev.txt:24",
+      "type": "python",
+      "version": "6.0.12"
+    },
+    "types-aiofiles": {
+      "constraint": "types-aiofiles>=23.2.0",
+      "hash": "399c19ad94ddd3f1",
+      "name": "types-aiofiles",
+      "source": "pay_ready.txt:45",
+      "type": "python",
+      "version": "23.2.0"
+    },
+    "types-protobuf": {
+      "constraint": "types-protobuf==4.24.0.20240129",
+      "hash": "c1dce307e7db4a72",
+      "name": "types-protobuf",
+      "source": "dev.txt:27",
+      "type": "python",
+      "version": "4.24.0"
+    },
+    "types-redis": {
+      "constraint": "types-redis==4.6.0.20240106",
+      "hash": "6970859fc14ca58e",
+      "name": "types-redis",
+      "source": "dev.txt:26",
+      "type": "python",
+      "version": "4.6.0"
+    },
+    "types-requests": {
+      "constraint": "types-requests==2.31.0.20240125",
+      "hash": "5bf1d7b9dc968101",
+      "name": "types-requests",
+      "source": "dev.txt:25",
+      "type": "python",
+      "version": "2.31.0"
+    },
+    "typing-inspect": {
+      "constraint": "typing-inspect==0.9.0",
+      "hash": "a9d894e91a8d5152",
+      "name": "typing-inspect",
+      "source": "constraints.txt:250",
+      "type": "python",
+      "version": "0.9.0"
+    },
+    "typing-inspection": {
+      "constraint": "typing-inspection==0.4.1",
+      "hash": "61dd357a333c1a25",
+      "name": "typing-inspection",
+      "source": "constraints.txt:251",
+      "type": "python",
+      "version": "0.4.1"
+    },
+    "typing_extensions": {
+      "constraint": "typing_extensions==4.13.2",
+      "hash": "cf640d378bc19d4e",
+      "name": "typing_extensions",
+      "source": "constraints.txt:252",
+      "type": "python",
+      "version": "4.13.2"
+    },
+    "tzdata": {
+      "constraint": "tzdata==2025.2",
+      "hash": "a02726b64fb5d5da",
+      "name": "tzdata",
+      "source": "constraints.txt:253",
+      "type": "python",
+      "version": "2025.2.0"
+    },
+    "urllib3": {
+      "constraint": "urllib3==2.4.0",
+      "hash": "a67a641c27e5abe0",
+      "name": "urllib3",
+      "source": "constraints.txt:254",
+      "type": "python",
+      "version": "2.4.0"
+    },
+    "uvicorn": {
+      "constraint": "uvicorn==0.29.0",
+      "hash": "b71d9db6a3d64ae1",
+      "name": "uvicorn",
+      "source": "base.txt:8",
+      "type": "python",
+      "version": "0.29.0"
+    },
+    "uvloop": {
+      "constraint": "uvloop==0.21.0",
+      "hash": "907df415dd3b321a",
+      "name": "uvloop",
+      "source": "constraints.txt:256",
+      "type": "python",
+      "version": "0.21.0"
+    },
+    "validators": {
+      "constraint": "validators==0.34.0",
+      "hash": "d33a20cb59d4ce93",
+      "name": "validators",
+      "source": "constraints.txt:257",
+      "type": "python",
+      "version": "0.34.0"
+    },
+    "watchdog": {
+      "constraint": "watchdog==3.0.0",
+      "hash": "964004f430765f9f",
+      "name": "watchdog",
+      "source": "dev.txt:40",
+      "type": "python",
+      "version": "3.0.0"
+    },
+    "watchfiles": {
+      "constraint": "watchfiles==1.0.5",
+      "hash": "362196c3ecc984c2",
+      "name": "watchfiles",
+      "source": "constraints.txt:258",
+      "type": "python",
+      "version": "1.0.5"
+    },
+    "weaviate-client": {
+      "constraint": "weaviate-client==4.14.4",
+      "hash": "762f99825166f06d",
+      "name": "weaviate-client",
+      "source": "base.txt:65",
+      "type": "python",
+      "version": "4.14.4"
+    },
+    "websocket-client": {
+      "constraint": "websocket-client==1.8.0",
+      "hash": "0e479cb328cc8827",
+      "name": "websocket-client",
+      "source": "constraints.txt:260",
+      "type": "python",
+      "version": "1.8.0"
+    },
+    "websockets": {
+      "constraint": "websockets==15.0.1",
+      "hash": "8f9287d3084bc827",
+      "name": "websockets",
+      "source": "base.txt:30",
+      "type": "python",
+      "version": "15.0.1"
+    },
+    "wheel": {
+      "constraint": "wheel==0.45.1",
+      "hash": "93bde6938519fd56",
+      "name": "wheel",
+      "source": "constraints.txt:262",
+      "type": "python",
+      "version": "0.45.1"
+    },
+    "wrapt": {
+      "constraint": "wrapt==1.17.2",
+      "hash": "8652d6b97751ec24",
+      "name": "wrapt",
+      "source": "constraints.txt:263",
+      "type": "python",
+      "version": "1.17.2"
+    },
+    "yarl": {
+      "constraint": "yarl==1.20.0",
+      "hash": "97930fa2cd61f7ab",
+      "name": "yarl",
+      "source": "constraints.txt:264",
+      "type": "python",
+      "version": "1.20.0"
+    },
+    "zipp": {
+      "constraint": "zipp==3.21.0",
+      "hash": "5febf3e3d3ca2654",
+      "name": "zipp",
+      "source": "constraints.txt:265",
+      "type": "python",
+      "version": "3.21.0"
+    }
+  },
+  "generated_at": "2025-06-02T08:14:04.664588+00:00"
+}

@@ -10,12 +10,10 @@ import time
 from enum import Enum
 from typing import Any, Dict, Optional
 
-from google.cloud import aiplatform
 from pydantic import BaseModel
 
 # Configure logging
 logger = logging.getLogger(__name__)
-
 
 class QueryType(str, Enum):
     """Types of queries for memory retrieval optimization."""
@@ -24,7 +22,6 @@ class QueryType(str, Enum):
     CONCEPTUAL = "conceptual"  # Prioritize semantic matches
     CONVERSATIONAL = "conversational"  # Balance between exact and semantic
     UNKNOWN = "unknown"  # Default type
-
 
 class QueryFeatures(BaseModel):
     """
@@ -52,7 +49,6 @@ class QueryFeatures(BaseModel):
     has_personal_pronouns: bool = False
     has_technical_terms: bool = False
 
-
 class QueryClassificationResult(BaseModel):
     """
     Result of query classification.
@@ -67,7 +63,6 @@ class QueryClassificationResult(BaseModel):
     scores: Dict[str, float]
     features: Optional[QueryFeatures] = None
     processing_time_ms: float = 0.0
-
 
 class QueryClassifier:
     """

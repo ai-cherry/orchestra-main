@@ -37,7 +37,6 @@ from .qdrant_semantic import QdrantSemanticMemory
 
 logger = get_logger(__name__)
 
-
 class LangChainMemoryWrapper(BaseChatMemory):
     """
     LangChain-compatible wrapper for our three-tier memory system.
@@ -385,7 +384,6 @@ class LangChainMemoryWrapper(BaseChatMemory):
         except Exception as e:
             logger.error(f"Failed to get stats: {e}")
             return {"error": str(e)}
-
 
 class ConversationSummaryBufferMemoryWrapper(ConversationSummaryBufferMemory):
     """

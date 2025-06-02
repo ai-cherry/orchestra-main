@@ -14,7 +14,6 @@ redis_client = redis.Redis(
     decode_responses=True,
 )
 
-
 async def cache_get(key: str) -> Optional[str]:
     """Get value from cache."""
     try:
@@ -22,7 +21,6 @@ async def cache_get(key: str) -> Optional[str]:
         return value
     except Exception as e:
         raise Exception(f"Cache get error: {str(e)}")
-
 
 async def cache_set(key: str, value: str, ttl: int = 3600) -> bool:
     """Set value in cache with TTL."""
@@ -34,7 +32,6 @@ async def cache_set(key: str, value: str, ttl: int = 3600) -> bool:
         return True
     except Exception as e:
         raise Exception(f"Cache set error: {str(e)}")
-
 
 async def cache_delete(key: str) -> bool:
     """Delete key from cache."""

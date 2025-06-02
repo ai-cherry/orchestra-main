@@ -9,7 +9,7 @@ This document outlines the comprehensive plan to stabilize, enhance, and automat
 The DevContainer has been updated to provide a more stable and consistent development environment:
 
 - Updated base image to `mcr.microsoft.com/devcontainers/python:3.10-bookworm` for better stability and security
-- Added TFLint to Terraform feature for better validation
+- Added TFLint to Pulumi feature for better validation
 - Enhanced Poetry installation in setup script with proper uninstallation before reinstallation
 - Added verification steps to ensure Poetry is properly installed
 - Implemented retry mechanism for dependency installation
@@ -19,31 +19,31 @@ These changes ensure that all developers work in an identical environment, reduc
 
 ### 1.2 CI/CD Pipeline Fixes
 
-The GitHub Actions workflow has been updated to address Poetry dependency/versioning issues and Terraform validation errors:
+The GitHub Actions workflow has been updated to address Poetry dependency/versioning issues and Pulumi validation errors:
 
 - Added parallel installation for Poetry to speed up CI
 - Implemented cache clearing between retry attempts
-- Enhanced Terraform validation with detailed error output
+- Enhanced Pulumi validation with detailed error output
 - Added verification step to ensure dependencies are properly installed
 - Updated
 These changes make the CI/CD pipeline more reliable and secure, reducing build failures and deployment issues.
 
 ## 2. Infrastructure as Code Enhancements
 
-### 2.1 Terraform Configuration Updates
+### 2.1 Pulumi Configuration Updates
 
-The Terraform configuration has been updated to fix validation errors and improve resource management:
+The Pulumi configuration has been updated to fix validation errors and improve resource management:
 
 - Fixed - Updated IAM binding for - Added - Improved resource naming and organization
 
 These changes ensure that infrastructure can be reliably deployed and managed through code, reducing manual configuration and potential errors.
 
-### 2.2 Terraform Backend Initialization
+### 2.2 Pulumi Backend Initialization
 
-A script has been created to initialize the Terraform backend on
-- Creates a GCS bucket for Terraform state storage
+A script has been created to initialize the Pulumi backend on
+- Creates a GCS bucket for Pulumi state storage
 - Enables versioning and lifecycle policies for state management
-- Initializes Terraform with the correct backend configuration
+- Initializes Pulumi with the correct backend configuration
 
 This script simplifies the setup process for new developers and ensures consistent state management across environments.
 
@@ -84,7 +84,7 @@ A comprehensive layered memory system has been implemented to support multi-agen
 This implementation enables agents to maintain context across conversations and leverage past experiences for better decision-making.
 
 ### 4.2
-A Terraform module has been created to set up
+A Pulumi module has been created to set up
 - Creates a Vector Search index for storing embeddings
 - Sets up an endpoint for querying the index
 - Configures appropriate IAM permissions
@@ -98,15 +98,15 @@ This integration enables powerful semantic search capabilities for long-term mem
 
 1. Update DevContainer configuration
 2. Fix CI/CD pipeline
-3. Update Terraform configuration
-4. Run Terraform validation to ensure configuration is valid
+3. Update Pulumi configuration
+4. Run Pulumi validation to ensure configuration is valid
 
 ### Phase 2: Infrastructure Setup (1-2 days)
 
-1. Run `scripts/init_terraform_backend.sh` to set up Terraform backend
+1. Run `scripts/init_pulumi_backend.sh` to set up Pulumi backend
 2. Run `scripts/setup_workload_identity.sh` to set up Workload Identity Federation
 3. Add WIF_PROVIDER_ID and WIF_SERVICE_ACCOUNT secrets to GitHub repository
-4. Apply Terraform configuration to create required infrastructure
+4. Apply Pulumi configuration to create required infrastructure
 
 ### Phase 3: Memory System Implementation (3-5 days)
 

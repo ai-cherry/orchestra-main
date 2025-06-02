@@ -57,20 +57,17 @@ except ImportError as e:
     print("Make sure unified_mcp_orchestrator.py, workflow manager, and cline_integration.py are available.")
     sys.exit(1)
 
-
 def parse_args() -> Dict[str, Any]:
     """Parse command-line arguments."""
     import docopt
 
     return docopt.docopt(__doc__)
 
-
 def format_output(data: Any) -> str:
     """Format output data for display."""
     if isinstance(data, dict) or isinstance(data, list):
         return json.dumps(data, indent=2)
     return str(data)
-
 
 def handle_memory_commands(args: Dict[str, Any]) -> None:
     """Handle memory-related commands."""
@@ -122,7 +119,6 @@ def handle_memory_commands(args: Dict[str, Any]) -> None:
         result = memory_manager.sync_between_tools(key, source_tool=source_tool, target_tool=target_tool, scope=scope)
         print(f"Memory sync {'succeeded' if result else 'failed'}")
 
-
 def handle_run_command(args: Dict[str, Any]) -> None:
     """Handle the run command to execute a prompt in a specific mode."""
     try:
@@ -155,7 +151,6 @@ def handle_run_command(args: Dict[str, Any]) -> None:
         print("Failed to execute in the specified mode")
         sys.exit(1)
 
-
 def handle_workflow_command(args: Dict[str, Any]) -> None:
     """Handle the workflow command to execute a predefined workflow."""
     workflow_name = args["<workflow-name>"]
@@ -178,7 +173,6 @@ def handle_workflow_command(args: Dict[str, Any]) -> None:
     orchestrator = UnifiedWorkflowOrchestrator()
     result = orchestrator.execute_workflow(workflow_name, tool=tool)
     print(result)
-
 
 def handle_cross_tool_command(args: Dict[str, Any]) -> None:
     """Handle the cross-tool command to execute a workflow across multiple tools."""
@@ -203,7 +197,6 @@ def handle_cross_tool_command(args: Dict[str, Any]) -> None:
     orchestrator = UnifiedWorkflowOrchestrator()
     result = orchestrator.execute_cross_tool_workflow(workflow_name, tools=tools)
     print(result)
-
 
 def handle_server_commands(args: Dict[str, Any]) -> None:
     """Handle server-related commands."""
@@ -257,7 +250,6 @@ def handle_server_commands(args: Dict[str, Any]) -> None:
             print("Operation failed")
             sys.exit(1)
 
-
 def handle_list_command(args: Dict[str, Any]) -> None:
     """Handle the list command to display available resources."""
     # List workflows
@@ -291,7 +283,6 @@ def handle_list_command(args: Dict[str, Any]) -> None:
         print("\nCline modes:")
         for mode, display_name in CLINE_MODES.items():
             print(f"  - {mode}: {display_name}")
-
 
 def main() -> None:
     """Main entry point."""
@@ -331,7 +322,6 @@ def main() -> None:
     except Exception as e:
         print(f"Error: {e}")
         sys.exit(1)
-
 
 if __name__ == "__main__":
     main()

@@ -24,7 +24,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("simple-mcp")
 
-
 class SimpleMemoryStore:
     """Simple in-memory store without complex security and synchronization."""
 
@@ -110,7 +109,6 @@ class SimpleMemoryStore:
 
         return True
 
-
 class SimpleMCPServer:
     """Simplified MCP Server without excessive security measures."""
 
@@ -190,7 +188,6 @@ class SimpleMCPServer:
         logger.info(f"Starting Simple MCP server on port {self.port}")
         self.app.run(host="0.0.0.0", port=self.port, debug=False)
 
-
 def main():
     """Main entry point for the Simple MCP server."""
     parser = argparse.ArgumentParser(description="Simple Model Context Protocol (MCP) Server")
@@ -202,7 +199,6 @@ def main():
     # Create and run server
     server = SimpleMCPServer(storage_path=args.storage, port=args.port)
     server.run()
-
 
 if __name__ == "__main__":
     main()

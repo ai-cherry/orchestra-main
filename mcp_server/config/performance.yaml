@@ -10,7 +10,7 @@ connection_pools:
     socket_timeout: 5000 # ms
     retry_on_timeout: true
 
-  firestore:
+  postgresql:
     max_concurrent_requests: 50
     max_retries: 3
     timeout: 30000 # ms

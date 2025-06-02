@@ -21,7 +21,6 @@ from ..models.memory import MemoryEntry, MemoryScope, MemoryType
 
 logger = logging.getLogger(__name__)
 
-
 class InMemoryStorage(IMemoryStorage):
     """Optimized in-memory implementation of memory storage."""
 

@@ -9,7 +9,6 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
-
 class ServerConfig(BaseModel):
     """Configuration for an individual MCP server."""
 
@@ -23,7 +22,6 @@ class ServerConfig(BaseModel):
     class Config:
         extra = "allow"
 
-
 class StorageConfig(BaseModel):
     """Configuration for storage backends."""
 
@@ -34,7 +32,6 @@ class StorageConfig(BaseModel):
 
     class Config:
         extra = "allow"
-
 
 class CopilotConfig(BaseModel):
     """Configuration for GitHub Copilot adapter."""
@@ -49,7 +46,6 @@ class CopilotConfig(BaseModel):
     class Config:
         extra = "allow"
 
-
 class GeminiConfig(BaseModel):
     """Configuration for Google Gemini adapter."""
 
@@ -62,11 +58,9 @@ class GeminiConfig(BaseModel):
     class Config:
         extra = "allow"
 
-
 # Ensure forward references are resolved for servers: Dict[str, ServerConfig]
 # (Must be at module scope, not indented)
 # (Removed MCPConfig.update_forward_refs() to resolve Flake8 error; Pydantic should handle string forward refs automatically)
-
 
 class MCPConfig(BaseModel):
     """Main configuration for MCP server."""

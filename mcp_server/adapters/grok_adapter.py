@@ -7,7 +7,6 @@ Implements the IToolAdapter interface for standardized tool access.
 
 from mcp_server.interfaces.tool_adapter import IToolAdapter
 
-
 class GrokAdapter(IToolAdapter):
     """
     Adapter for Grok (xAI) AI assistant.

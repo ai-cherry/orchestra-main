@@ -15,7 +15,6 @@ from core.orchestrator.src.memory.layered_memory_manager import LayeredMemoryMan
 
 logger = logging.getLogger(__name__)
 
-
 class MemoryFactory:
     """Factory for creating memory instances."""
 

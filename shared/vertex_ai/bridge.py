@@ -17,7 +17,6 @@ from typing import Optional, Dict, Any, List, Union
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class EnvironmentType(Enum):
     """Enum representing different execution environments."""
 
@@ -28,7 +27,6 @@ class EnvironmentType(Enum):
     KUBERNETES = "kubernetes"
     COMPUTE_ENGINE = "compute_engine"
     GITHUB_ACTIONS = "github_actions"
-
 
 class VertexAIBridge:
     """
@@ -46,7 +44,7 @@ class VertexAIBridge:
             project_id: Google Cloud project ID. If None, will attempt to detect from environment.
             location: Google Cloud region for VertexAI services.
         """
-        self.project_id = project_id or os.environ.get("GOOGLE_CLOUD_PROJECT")
+        self.project_id = project_id or os.environ.get("VULTR_PROJECT_ID")
         self.location = location
         self.environment = self._detect_environment()
         self.authenticated = False
@@ -126,7 +124,7 @@ class VertexAIBridge:
         """
         try:
             # Import here to avoid hard dependency
-            from google.cloud import aiplatform
+            # Removed GCP import import aiplatform
 
             # Initialize the VertexAI SDK with ADC
             aiplatform.init(project=self.project_id, location=self.location)
@@ -156,7 +154,7 @@ class VertexAIBridge:
         """
         try:
             # Import here to avoid hard dependency
-            from google.cloud import aiplatform
+            # Removed GCP import import aiplatform
 
             # Workload Identity should be configured in GitHub Actions
             # and proper ambient credentials should be available
@@ -201,7 +199,7 @@ class VertexAIBridge:
 
         try:
             # Import here to avoid hard dependency
-            from google.cloud import aiplatform
+            # Removed GCP import import aiplatform
 
             # Get the model
             model = aiplatform.TextGenerationModel.from_pretrained(model_name)
@@ -233,7 +231,7 @@ class VertexAIBridge:
 
         try:
             # Import here to avoid hard dependency
-            from google.cloud import aiplatform
+            # Removed GCP import import aiplatform
 
             # Get the model
             model = aiplatform.ChatModel.from_pretrained(model_name)
@@ -258,10 +256,8 @@ class VertexAIBridge:
             logger.error(f"Chat prediction failed: {str(e)}")
             raise
 
-
 # Singleton instance for easy access
 default_bridge = VertexAIBridge()
-
 
 def authenticate(project_id: Optional[str] = None, location: str = "us-central1") -> bool:
     """
@@ -278,7 +274,6 @@ def authenticate(project_id: Optional[str] = None, location: str = "us-central1"
     default_bridge = VertexAIBridge(project_id=project_id, location=location)
     return default_bridge.authenticate()
 
-
 def predict_text(prompt: str, model_name: str = "text-bison") -> Dict[str, Any]:
     """
     Generate text predictions using the default bridge.
@@ -291,7 +286,6 @@ def predict_text(prompt: str, model_name: str = "text-bison") -> Dict[str, Any]:
         Dictionary containing the prediction results
     """
     return default_bridge.predict_text(prompt=prompt, model_name=model_name)
-
 
 def predict_chat(messages: List[Dict[str, str]], model_name: str = "chat-bison") -> Dict[str, Any]:
     """

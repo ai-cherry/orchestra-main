@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to deploy the LLM chat interface to Google Cloud Storage as a static website
+# Script to deploy the LLM chat interface to Vultr Storage as a static website
 # This provides a quick production environment for testing your LLM strategy
 
 set -e  # Exit immediately if a command exits with a non-zero status
@@ -12,7 +12,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Default values
-PROJECT_ID=$(gcloud config get-value project 2>/dev/null)
+PROJECT_ID=$(# vultr-cli config get-value project 2>/dev/null)
 REGION="us-central1"
 BUCKET_NAME=""
 DOMAIN_NAME=""
@@ -48,7 +48,7 @@ done
 # Validate inputs
 if [ -z "$PROJECT_ID" ]; then
   echo -e "${RED}Error: Project ID is required${NC}"
-  echo "Please specify with --project or set default project with: gcloud config set project PROJECT_ID"
+  echo "Please specify with --project or set default project with: # vultr-cli config set project PROJECT_ID"
   exit 1
 fi
 
@@ -66,15 +66,15 @@ if [ ! -z "$DOMAIN_NAME" ]; then
   echo -e "Domain: ${GREEN}$DOMAIN_NAME${NC}"
 fi
 
-# Check if user is authenticated with GCP
-if ! gcloud auth list --filter=status:ACTIVE --format="value(account)" &> /dev/null; then
-  echo -e "${RED}Error: Not authenticated with Google Cloud SDK${NC}"
-  echo "Please run: gcloud auth login"
+# Check if user is authenticated with Vultr
+if ! # vultr-cli auth list --filter=status:ACTIVE --format="value(account)" &> /dev/null; then
+  echo -e "${RED}Error: Not authenticated with Vultr SDK${NC}"
+  echo "Please run: # vultr-cli auth login"
   exit 1
 fi
 
 # Set project
-gcloud config set project "$PROJECT_ID"
+# Removed gcloud command
 
 # Check if the bucket exists, create if it doesn't
 if ! gsutil ls -b "gs://${BUCKET_NAME}" &> /dev/null; then

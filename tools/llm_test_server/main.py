@@ -44,7 +44,6 @@ TOKEN_COUNT = prom.Counter(
     ["provider", "model", "direction"],  # direction: input/output
 )
 
-
 # Request models
 class TestRequest(BaseModel):
     """Request model for testing LLM providers."""
@@ -56,7 +55,6 @@ class TestRequest(BaseModel):
     max_tokens: int = 500
     timeout: float = 15.0
 
-
 class BenchmarkRequest(BaseModel):
     """Request for benchmarking multiple providers with the same prompt."""
 
@@ -64,7 +62,6 @@ class BenchmarkRequest(BaseModel):
     runs: int = 5
     providers: List[str] = ["openrouter", "portkey", "openai", "anthropic", "deepseek"]
     models: Dict[str, str] = None  # Maps provider to model, optional
-
 
 class CascadeTestRequest(BaseModel):
     """Request for testing the cascade failover setup."""
@@ -80,7 +77,6 @@ class CascadeTestRequest(BaseModel):
     inject_failures: List[str] = []  # List of providers to simulate failures for
     runs: int = 3
 
-
 class ProviderResponse(BaseModel):
     """Response from a single LLM provider."""
 
@@ -92,7 +88,6 @@ class ProviderResponse(BaseModel):
     error: Optional[str] = None
     tokens: Optional[Dict[str, int]] = None
 
-
 class TestResponse(BaseModel):
     """Response model for test endpoints."""
 
@@ -101,7 +96,6 @@ class TestResponse(BaseModel):
     cascade_used: Optional[bool] = None
     successful_providers: List[str]
     failed_providers: List[str]
-
 
 # Provider initialization logic
 def get_provider_client(provider_name: str):
@@ -154,7 +148,6 @@ def get_provider_client(provider_name: str):
     except Exception as e:
         logger.error(f"Failed to initialize {provider_name}: {e}")
         raise ValueError(f"Failed to initialize {provider_name}: {e}")
-
 
 async def call_provider(
     provider_name: str,
@@ -353,7 +346,6 @@ async def call_provider(
             error=str(e),
         )
 
-
 async def cascade_call(
     prompt: str,
     cascade_order: List[str],
@@ -390,12 +382,10 @@ async def cascade_call(
         error="All providers in cascade failed",
     )
 
-
 @app.get("/health")
 def health_check():
     """Health check endpoint."""
     return {"status": "healthy", "timestamp": datetime.now().isoformat()}
-
 
 @app.post("/test", response_model=TestResponse)
 async def test_providers(request: TestRequest):
@@ -428,7 +418,6 @@ async def test_providers(request: TestRequest):
         successful_providers=successful,
         failed_providers=failed,
     )
-
 
 @app.post("/benchmark", response_model=TestResponse)
 async def benchmark_providers(request: BenchmarkRequest, background_tasks: BackgroundTasks):
@@ -494,7 +483,6 @@ async def benchmark_providers(request: BenchmarkRequest, background_tasks: Backg
         failed_providers=list(failed),
     )
 
-
 @app.post("/cascade", response_model=TestResponse)
 async def test_cascade(request: CascadeTestRequest):
     """Test the cascade failover setup."""
@@ -523,18 +511,15 @@ async def test_cascade(request: CascadeTestRequest):
         failed_providers=failed_providers,
     )
 
-
 @app.get("/metrics")
 def metrics():
     """Prometheus metrics endpoint."""
     return prom.generate_latest()
 
-
 # Define main function to run server
 def start_server():
     """Start the LLM testing server."""
     uvicorn.run("llm_test_server.main:app", host="0.0.0.0", port=8001, log_level="info")
-
 
 if __name__ == "__main__":
     start_server()

@@ -6,7 +6,6 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
-
 class ToolParameter(BaseModel):
     """Definition of a tool parameter."""
 
@@ -15,7 +14,6 @@ class ToolParameter(BaseModel):
     description: str
     required: bool = True
     default: Optional[Any] = None
-
 
 class ToolDefinition(BaseModel):
     """Rich definition of a tool with metadata."""
@@ -30,7 +28,6 @@ class ToolDefinition(BaseModel):
     examples: Optional[List[str]] = None
     cost_indicator: Optional[str] = None  # "low", "medium", "high"
     related_tools: Optional[List[str]] = None
-
 
 class ToolRegistry:
     """Central registry for all available tools."""

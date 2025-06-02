@@ -130,7 +130,7 @@ For developing new API endpoints or services:
 ###
 For setting up or modifying
 1. **🏗 Architect**: Design the infrastructure components and dependencies
-2. **💻 Code**: Implement the Terraform/HCL code for the infrastructure
+2. **💻 Code**: Implement the Pulumi/Python code for the infrastructure
 3. **🪃 Orchestrator**: Review for security best practices and compliance
 4. **🪲 Debug**: Test deployments in a staging environment
 5. **🕵️ Reviewer**: Validate the infrastructure against requirements

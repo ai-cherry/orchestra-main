@@ -34,7 +34,6 @@ TEST_COMMANDS = [
     "What can you do?",
 ]
 
-
 async def test_text_command(text: str) -> Dict[str, Any]:
     """Test a text command"""
     async with httpx.AsyncClient() as client:
@@ -47,13 +46,11 @@ async def test_text_command(text: str) -> Dict[str, Any]:
         except httpx.HTTPError as e:
             return {"error": str(e)}
 
-
 async def test_websocket():
     """Test WebSocket connection"""
     # This is a placeholder - actual WebSocket testing would use websockets library
     print("\n📡 WebSocket test (placeholder)")
     print("WebSocket endpoint available at: ws://localhost:8000/api/nl/stream")
-
 
 async def main():
     """Run all tests"""
@@ -83,7 +80,6 @@ async def main():
     await test_websocket()
 
     print("\n✅ All tests completed!")
-
 
 if __name__ == "__main__":
     # Check if the API is running

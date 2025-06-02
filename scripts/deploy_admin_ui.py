@@ -26,7 +26,6 @@ ROOT: Final[Path] = Path(__file__).resolve().parents[1]
 UI_DIST: Final[Path] = ROOT / "admin-ui" / "dist"
 INFRA_DIR: Final[Path] = ROOT / "infra" / "admin_ui_site"
 
-
 def run(cmd: list[str], allow_failure: bool = False) -> None:
     """Run *cmd* and exit on non-zero return code unless allow_failure is True."""
     try:
@@ -37,7 +36,6 @@ def run(cmd: list[str], allow_failure: bool = False) -> None:
             sys.exit(exc.returncode)
         else:
             sys.stderr.write(f"[deploy_admin_ui] command failed but continuing: {exc.cmd}\n")
-
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Deploy the Admin UI static site via Pulumi.")
@@ -105,7 +103,6 @@ def main() -> None:
     run(["gsutil", "-m", "rsync", "-r", str(UI_DIST), bucket_name])
 
     print("Admin UI deployed successfully! 🎉")
-
 
 if __name__ == "__main__":
     main()

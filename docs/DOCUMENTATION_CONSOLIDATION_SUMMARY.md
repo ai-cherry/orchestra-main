@@ -20,9 +20,9 @@
 - Updated all references to use 3.10
 - Removed conflicting version requirements
 
-**Infrastructure Approach**: Standardized on Pulumi (not Terraform)
+**Infrastructure Approach**: Standardized on Pulumi (not Pulumi)
 - All infrastructure documentation now references Pulumi
-- Removed Terraform references
+- Removed Pulumi references
 
 **Package Management**: Standardized on pip/venv (not Poetry)
 - Removed Poetry references

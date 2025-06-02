@@ -34,7 +34,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("mcp-memory-sync-demo")
 
-
 class MockToolAdapter:
     """Mock adapter for simulating AI tool integration."""
 
@@ -98,7 +97,6 @@ class MockToolAdapter:
             "estimated_tokens": total_size // 4,  # Rough estimation: 4 bytes per token
         }
 
-
 def setup_demo_environment() -> MemorySyncEngine:
     """Set up the demo environment with mock tools."""
     # Create tool adapters with different context windows
@@ -131,7 +129,6 @@ def setup_demo_environment() -> MemorySyncEngine:
 
     logger.info("Demo environment set up successfully")
     return sync_engine
-
 
 def create_demo_memories(sync_engine: MemorySyncEngine) -> None:
     """Create demo memories for testing."""
@@ -268,12 +265,10 @@ def create_demo_memories(sync_engine: MemorySyncEngine) -> None:
 
     logger.info("Created demo memories")
 
-
 def process_all_operations(sync_engine: MemorySyncEngine) -> None:
     """Process all pending synchronization operations."""
     count = sync_engine.process_pending_operations()
     logger.info(f"Processed {count} pending operations")
-
 
 def display_memory_stats(sync_engine: MemorySyncEngine) -> None:
     """Display memory statistics for each tool."""
@@ -318,7 +313,6 @@ def display_memory_stats(sync_engine: MemorySyncEngine) -> None:
             for level, count in stats.get("compression_counts", {}).items():
                 print(f"    - Level {level}: {count}")
 
-
 def demonstrate_memory_retrieval(sync_engine: MemorySyncEngine) -> None:
     """Demonstrate memory retrieval with optimization for different tools."""
     print("\n=== Memory Retrieval Demonstration ===")
@@ -351,7 +345,6 @@ def demonstrate_memory_retrieval(sync_engine: MemorySyncEngine) -> None:
                 print(f"  Compression Ratio: {ratio:.2%}")
                 print(f"  Original Size: {original_size} chars")
                 print(f"  Compressed Size: {compressed_size} chars")
-
 
 def demonstrate_context_window_optimization(sync_engine: MemorySyncEngine) -> None:
     """Demonstrate context window optimization for a specific tool."""
@@ -402,7 +395,6 @@ def demonstrate_context_window_optimization(sync_engine: MemorySyncEngine) -> No
         for level, count in stats.get("compression_counts", {}).items():
             print(f"    - Level {level}: {count}")
 
-
 def main():
     """Run the Memory Synchronization Engine demonstration."""
     parser = argparse.ArgumentParser(description="Demonstrate the Memory Synchronization Engine")
@@ -436,7 +428,6 @@ def main():
     demonstrate_context_window_optimization(sync_engine)
 
     print("\n=== Demonstration Complete ===")
-
 
 if __name__ == "__main__":
     main()

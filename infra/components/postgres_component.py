@@ -30,7 +30,6 @@ import pulumi_digitalocean as do
 import pulumi_command as command
 from pulumi import ComponentResource, ResourceOptions, Output
 
-
 class PostgresComponent(ComponentResource):
     """
     Reusable PostgreSQL component for the AI Orchestra system.

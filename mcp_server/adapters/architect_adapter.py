@@ -12,7 +12,6 @@ from .factory_mcp_adapter import FactoryMCPAdapter
 
 logger = logging.getLogger(__name__)
 
-
 class ArchitectAdapter(FactoryMCPAdapter):
     """Adapter for Architect Droid to orchestrator MCP server communication.
 

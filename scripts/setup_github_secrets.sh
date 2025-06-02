@@ -13,7 +13,7 @@ NC='\033[0m'
 
 # Configuration
 GITHUB_REPO="${GITHUB_REPOSITORY:-}"
-GCP_PROJECT_ID="${GCP_PROJECT_ID:-}"
+Vultr_PROJECT_ID="${Vultr_PROJECT_ID:-}"
 
 log_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
@@ -48,8 +48,8 @@ check_prerequisites() {
         exit 1
     fi
 
-    if [[ -z "$GCP_PROJECT_ID" ]]; then
-        log_error "GCP_PROJECT_ID environment variable not set"
+    if [[ -z "$Vultr_PROJECT_ID" ]]; then
+        log_error "Vultr_PROJECT_ID environment variable not set"
         exit 1
     fi
 
@@ -61,12 +61,12 @@ setup_workload_identity() {
 
     # Create service account for GitHub Actions
     SA_NAME="github-actions-sa"
-    SA_EMAIL="${SA_NAME}@${GCP_PROJECT_ID}.iam.gserviceaccount.com"
+    SA_EMAIL="${SA_NAME}@${Vultr_PROJECT_ID}.iam.gserviceaccount.com"
 
     # Create service account
     gcloud iam service-accounts create $SA_NAME \
         --display-name="GitHub Actions Service Account" \
-        --project=$GCP_PROJECT_ID || true
+        --project=$Vultr_PROJECT_ID || true
 
     # Grant necessary permissions
     log_info "Granting permissions to service account..."
@@ -79,7 +79,7 @@ setup_workload_identity() {
     )
 
     for role in "${roles[@]}"; do
-        gcloud projects add-iam-policy-binding $GCP_PROJECT_ID \
+        gcloud projects add-iam-policy-binding $Vultr_PROJECT_ID \
             --member="serviceAccount:${SA_EMAIL}" \
             --role="$role" \
             --condition=None
@@ -93,7 +93,7 @@ setup_workload_identity() {
     gcloud iam workload-identity-pools create $POOL_NAME \
         --location="global" \
         --display-name="GitHub Actions Pool" \
-        --project=$GCP_PROJECT_ID || true
+        --project=$Vultr_PROJECT_ID || true
 
     # Create Workload Identity Provider
     log_info "Creating Workload Identity Provider..."
@@ -103,13 +103,13 @@ setup_workload_identity() {
         --display-name="GitHub Provider" \
         --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository" \
         --issuer-uri="https://token.actions.githubusercontent.com" \
-        --project=$GCP_PROJECT_ID || true
+        --project=$Vultr_PROJECT_ID || true
 
     # Get provider resource name
     PROVIDER_RESOURCE=$(gcloud iam workload-identity-pools providers describe $PROVIDER_NAME \
         --location="global" \
         --workload-identity-pool=$POOL_NAME \
-        --project=$GCP_PROJECT_ID \
+        --project=$Vultr_PROJECT_ID \
         --format="value(name)")
 
     # Grant service account access
@@ -117,7 +117,7 @@ setup_workload_identity() {
     gcloud iam service-accounts add-iam-policy-binding $SA_EMAIL \
         --role="roles/iam.workloadIdentityUser" \
         --member="principalSet://iam.googleapis.com/${PROVIDER_RESOURCE}/attribute.repository/${GITHUB_REPO}" \
-        --project=$GCP_PROJECT_ID
+        --project=$Vultr_PROJECT_ID
 
     echo
     log_success "Workload Identity Federation configured!"
@@ -136,8 +136,8 @@ set_github_secrets() {
     log_info "Setting PULUMI_ACCESS_TOKEN..."
     echo "$PULUMI_TOKEN" | gh secret set PULUMI_ACCESS_TOKEN --repo=$GITHUB_REPO
 
-    log_info "Setting GCP_PROJECT_ID..."
-    echo "$GCP_PROJECT_ID" | gh secret set GCP_PROJECT_ID --repo=$GITHUB_REPO
+    log_info "Setting Vultr_PROJECT_ID..."
+    echo "$Vultr_PROJECT_ID" | gh secret set Vultr_PROJECT_ID --repo=$GITHUB_REPO
 
     log_info "Setting WIF_PROVIDER..."
     echo "$PROVIDER_RESOURCE" | gh secret set WIF_PROVIDER --repo=$GITHUB_REPO
@@ -161,7 +161,7 @@ print_summary() {
     echo "GitHub Actions is now configured with:"
     echo "- Workload Identity Federation for keyless authentication"
     echo "- Pulumi access token for infrastructure deployments"
-    echo "- GCP project configuration"
+    echo "- Vultr project configuration"
     echo
     echo "Next steps:"
     echo "1. Commit and push your changes to trigger the workflow"

@@ -22,10 +22,8 @@ from core.services.agents.examples import register_example_agents
 
 logger = logging.getLogger(__name__)
 
-
 # Global orchestra system instance
 orchestra_system = None
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -133,7 +131,6 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"Error during shutdown: {e}", exc_info=True)
 
-
 # Create FastAPI application
 app = FastAPI(
     title="Orchestra AI API",
@@ -158,13 +155,11 @@ app.add_middleware(
 # Include routers
 app.include_router(conversation.router, prefix="/api/v1")
 
-
 # Root endpoint
 @app.get("/")
 async def root():
     """Root endpoint."""
     return {"name": "Orchestra AI API", "version": "1.0.0", "status": "running"}
-
 
 # Health check endpoint
 @app.get("/health", response_model=HealthCheckResponse)
@@ -225,7 +220,6 @@ async def health_check() -> HealthCheckResponse:
             break
 
     return HealthCheckResponse(success=True, status=overall_status, services=services_health, version="1.0.0")
-
 
 if __name__ == "__main__":
     import uvicorn

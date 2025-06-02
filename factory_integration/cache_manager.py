@@ -22,7 +22,6 @@ from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
-
 class CacheEntry(BaseModel):
     """Model for cache entries."""
 
@@ -32,7 +31,6 @@ class CacheEntry(BaseModel):
     expires_at: Optional[float] = None
     access_count: int = 0
     last_accessed: float = Field(default_factory=time.time)
-
 
 class CacheMetrics(BaseModel):
     """Cache performance metrics."""
@@ -60,7 +58,6 @@ class CacheMetrics(BaseModel):
         if l1_requests == 0:
             return 0.0
         return (self.l1_hits / l1_requests) * 100
-
 
 class L1Cache:
     """Ultra-fast in-memory cache with LRU eviction.
@@ -167,7 +164,6 @@ class L1Cache:
             "misses": self.misses,
             "hit_rate": (self.hits / max(self.hits + self.misses, 1)) * 100,
         }
-
 
 class L2Cache:
     """Distributed Redis cache for shared state.
@@ -299,7 +295,6 @@ class L2Cache:
             "misses": self.misses,
             "hit_rate": (self.hits / max(self.hits + self.misses, 1)) * 100,
         }
-
 
 class L3Cache:
     """Persistent cache in PostgreSQL for long-term storage.
@@ -459,7 +454,6 @@ class L3Cache:
             "misses": self.misses,
             "hit_rate": (self.hits / max(self.hits + self.misses, 1)) * 100,
         }
-
 
 class CacheManager:
     """Unified cache manager with multi-layer caching.
@@ -658,7 +652,6 @@ class CacheManager:
                 break
             except Exception as e:
                 logger.error(f"Cache warming error: {e}")
-
 
 # Factory function for easy initialization
 async def create_cache_manager(config: Dict[str, Any]) -> CacheManager:

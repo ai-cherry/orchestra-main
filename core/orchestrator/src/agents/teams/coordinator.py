@@ -18,7 +18,6 @@ from core.orchestrator.src.config.models import TeamMode
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class ExecutionStep(BaseModel):
     """
     Step in an execution plan.
@@ -34,7 +33,6 @@ class ExecutionStep(BaseModel):
     step_id: str = ""
     is_parallel: bool = False
 
-
 class ExecutionPlan(BaseModel):
     """
     Plan for executing a task with multiple agents.
@@ -47,7 +45,6 @@ class ExecutionPlan(BaseModel):
     coordinator_notes: str = ""
     max_iterations: int = 5
     team_mode: TeamMode = TeamMode.COORDINATE
-
 
 class StepResult(BaseModel):
     """
@@ -63,7 +60,6 @@ class StepResult(BaseModel):
     success: bool = True
     error: Optional[str] = None
     execution_time_ms: float = 0
-
 
 class AgentTeam:
     """
@@ -555,7 +551,6 @@ class AgentTeam:
                 "results_count": len(results),
             },
         )
-
 
 class TeamCoordinator(StatefulAgent):
     """

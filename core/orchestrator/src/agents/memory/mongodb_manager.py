@@ -13,7 +13,6 @@ from pymongo.errors import ConnectionFailure, OperationFailure
 
 logger = logging.getLogger(__name__)
 
-
 class MongoDBMemoryManager:
     """Memory manager using MongoDB Atlas instead of Firestore."""
 

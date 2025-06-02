@@ -83,7 +83,6 @@ DELETE_DIRS = [
     "deploy/cloud_run",
 ]
 
-
 class InfrastructurePurger:
     def __init__(self, root_dir: Path):
         self.root_dir = root_dir
@@ -292,7 +291,6 @@ class InfrastructurePurger:
 
         return "\n".join(cleaned_lines)
 
-
 def main():
     """Main entry point."""
     # Get the root directory (parent of scripts)
@@ -323,7 +321,6 @@ def main():
     print("2. Update any broken imports")
     print("3. Implement PostgreSQL-based replacements for removed features")
     print("4. Test thoroughly")
-
 
 if __name__ == "__main__":
     main()

@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 
 # Optional: Google Cloud Tasks integration
 
-
 class TaskQueueManager:
     """
     Manager for scheduling retry tasks using Google Cloud Tasks.
@@ -186,7 +185,6 @@ class TaskQueueManager:
             logger.error(f"Failed to cancel retry tasks for agent '{agent_id}': {str(e)}")
             return 0
 
-
 class VertexAiFallbackHandler:
     """
     Handler for falling back to Vertex AI when Phidata agents fail.
@@ -282,14 +280,12 @@ class VertexAiFallbackHandler:
                 "Please try again later or contact support if this persists."
             )
 
-
 # Global instances
 _task_queue_manager = None
 _task_queue_lock = threading.Lock()
 
 _fallback_handler = None
 _fallback_handler_lock = threading.Lock()
-
 
 def get_task_queue_manager() -> TaskQueueManager:
     """
@@ -310,8 +306,8 @@ def get_task_queue_manager() -> TaskQueueManager:
             settings = get_settings()
 
             project_id = os.environ.get(
-                "GCP_PROJECT_ID",
-                getattr(settings, "GCP_PROJECT_ID", "cherry-ai-project"),
+                "VULTR_PROJECT_ID",
+                getattr(settings, "VULTR_PROJECT_ID", "cherry-ai-project"),
             )
 
             location_id = os.environ.get(
@@ -348,7 +344,6 @@ def get_task_queue_manager() -> TaskQueueManager:
             logger.info(f"Created global Task Queue Manager for project {project_id}")
 
         return _task_queue_manager
-
 
 def get_fallback_handler() -> VertexAiFallbackHandler:
     """

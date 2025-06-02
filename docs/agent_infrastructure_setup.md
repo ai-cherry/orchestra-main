@@ -27,7 +27,7 @@ Before running the bootstrap script, ensure you have the following:
 1. **2. **Command Line Tools**:
 
    - `gcloud` CLI installed and configured
-   - `terraform` CLI installed (version 1.0.0+)
+   - `pulumi` CLI installed (version 1.0.0+)
    - `jq` installed for JSON processing
 
 3. **GitHub Repository**: A GitHub repository where you'll deploy the code
@@ -37,9 +37,9 @@ Before running the bootstrap script, ensure you have the following:
 We've created a comprehensive bootstrap script that sets up the entire infrastructure in one go. The script handles:
 
 1. Authentication with 2. Enabling necessary APIs
-3. Creating Terraform state bucket
+3. Creating Pulumi state bucket
 4. Setting up 5. Configuring Workload Identity Federation for GitHub Actions
-6. Initializing and applying Terraform configuration
+6. Initializing and applying Pulumi configuration
 7. Updating GitHub Actions workflow file
 8. Cleaning up temporary credentials
 
@@ -63,9 +63,9 @@ The script will output progress information and provide next steps at the end.
 
 ### What the Bootstrap Script Does
 
-1. **Authentication**: Uses the provided service account key to authenticate with 2. **API Enablement**: Enables all necessary 3. **Terraform Backend**: Creates a GCS bucket for Terraform state
+1. **Authentication**: Uses the provided service account key to authenticate with 2. **API Enablement**: Enables all necessary 3. **Pulumi Backend**: Creates a GCS bucket for Pulumi state
 4. **Secret Management**: Creates initial secrets in 5. **Workload Identity**: Sets up Workload Identity Federation for GitHub Actions
-6. **Infrastructure**: Applies Terraform configuration to create infrastructure
+6. **Infrastructure**: Applies Pulumi configuration to create infrastructure
 7. **GitHub Actions**: Updates the GitHub Actions workflow file
 8. **Cleanup**: Revokes and deletes the service account key
 

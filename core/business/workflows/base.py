@@ -18,7 +18,6 @@ from core.services.events.event_bus import Event, get_event_bus
 
 logger = logging.getLogger(__name__)
 
-
 class TaskStatus(Enum):
     """Task execution status."""
 
@@ -29,7 +28,6 @@ class TaskStatus(Enum):
     CANCELLED = "cancelled"
     SKIPPED = "skipped"
 
-
 class TaskPriority(Enum):
     """Task execution priority."""
 
@@ -37,7 +35,6 @@ class TaskPriority(Enum):
     NORMAL = 5
     HIGH = 10
     CRITICAL = 20
-
 
 @dataclass
 class TaskResult:
@@ -50,7 +47,6 @@ class TaskResult:
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
-
 
 @dataclass
 class TaskDefinition:
@@ -67,7 +63,6 @@ class TaskDefinition:
 
     def __hash__(self):
         return hash(self.id)
-
 
 @dataclass
 class WorkflowContext:
@@ -90,7 +85,6 @@ class WorkflowContext:
         """Set a workflow output value."""
         self.outputs[key] = value
 
-
 class Task(ABC):
     """Abstract base class for workflow tasks."""
 
@@ -103,7 +97,6 @@ class Task(ABC):
     def validate_inputs(self, context: WorkflowContext) -> bool:
         """Validate task inputs from context."""
         pass
-
 
 class Workflow:
     """Workflow definition and execution logic."""
@@ -342,7 +335,6 @@ class Workflow:
             )
         )
 
-
 class WorkflowEngine:
     """Engine for managing and executing workflows."""
 
@@ -396,10 +388,8 @@ class WorkflowEngine:
 
         return True
 
-
 # Global workflow engine instance
 _workflow_engine: Optional[WorkflowEngine] = None
-
 
 def get_workflow_engine() -> WorkflowEngine:
     """Get the global workflow engine instance."""

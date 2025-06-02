@@ -8,8 +8,8 @@ This document summarizes the removal of GCP (Google Cloud Platform) references f
 ### Python Files
 1. **mcp_server/roo/modes.py**
    - Updated ARCHITECT_MODE role description from mentioning "GCP" to "cloud infrastructure"
-   - Changed: "specializing in Python, FastAPI, multi-agent systems, GCP, Terraform" 
-   - To: "specializing in Python, FastAPI, multi-agent systems, cloud infrastructure, Terraform"
+   - Changed: "specializing in Python, FastAPI, multi-agent systems, GCP, Pulumi" 
+   - To: "specializing in Python, FastAPI, multi-agent systems, cloud infrastructure, Pulumi"
 
 2. **mcp_server/health_check.py**
    - Updated module docstring from "for Cloud Run deployment" to "for deployment monitoring"

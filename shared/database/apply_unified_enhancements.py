@@ -13,7 +13,6 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 def update_imports_in_file(file_path: Path, replacements: dict) -> bool:
     """
     Update imports in a Python file.
@@ -43,7 +42,6 @@ def update_imports_in_file(file_path: Path, replacements: dict) -> bool:
     except Exception as e:
         logger.error(f"Error updating {file_path}: {e}")
         return False
-
 
 def create_compatibility_wrapper():
     """
@@ -83,7 +81,6 @@ __all__ = [
     wrapper_path.write_text(wrapper_content)
     logger.info(f"Created compatibility wrapper at {wrapper_path}")
 
-
 def update_unified_db_v2():
     """
     Update unified_db_v2.py to fix method signature issues.
@@ -109,7 +106,6 @@ def update_unified_db_v2():
     except Exception as e:
         logger.error(f"Error updating unified_db_v2.py: {e}")
 
-
 def create_initialization_script():
     """
     Create a script to initialize the enhanced system.
@@ -129,7 +125,6 @@ from shared.database.unified_db_v2 import get_unified_database
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
 
 async def initialize_enhanced_system():
     """Initialize all enhanced components."""
@@ -173,7 +168,6 @@ async def initialize_enhanced_system():
         logger.error(f"Failed to initialize enhanced system: {e}")
         raise
 
-
 if __name__ == "__main__":
     asyncio.run(initialize_enhanced_system())
 '''
@@ -182,7 +176,6 @@ if __name__ == "__main__":
     init_path.write_text(init_content)
     os.chmod(init_path, 0o755)
     logger.info(f"Created initialization script at {init_path}")
-
 
 def create_test_enhanced_methods():
     """
@@ -198,7 +191,6 @@ import uuid
 from datetime import datetime
 from shared.database.connection_manager_enhanced import get_connection_manager_enhanced
 from shared.database.unified_postgresql_enhanced import get_unified_postgresql_enhanced
-
 
 async def test_enhanced_methods():
     """Test all methods added by mixins."""
@@ -285,7 +277,6 @@ async def test_enhanced_methods():
     
     print("\\n✅ All enhanced methods tested successfully!")
 
-
 if __name__ == "__main__":
     asyncio.run(test_enhanced_methods())
 '''
@@ -294,7 +285,6 @@ if __name__ == "__main__":
     test_path.write_text(test_content)
     os.chmod(test_path, 0o755)
     logger.info(f"Created test script at {test_path}")
-
 
 def main():
     """
@@ -348,7 +338,6 @@ def main():
     print("3. Run the migration if upgrading:")
     print("   python scripts/migrate_to_unified_postgresql.py")
     print("=" * 60)
-
 
 if __name__ == "__main__":
     main()

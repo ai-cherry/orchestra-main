@@ -15,14 +15,12 @@ client = TestClient(app)
 
 # --- Fixtures for common mocks ---
 
-
 @pytest.fixture
 def mock_memory_service():
     service = MagicMock()
     service.add_memory_item_async = AsyncMock()
     service.add_memory_items_async = AsyncMock()
     return service
-
 
 @pytest.fixture
 def mock_litellm_client_instance():
@@ -36,7 +34,6 @@ def mock_litellm_client_instance():
     )
     return client_instance
 
-
 @pytest.fixture
 def mock_weaviate_adapter_instance():
     adapter_instance = MagicMock()
@@ -44,9 +41,7 @@ def mock_weaviate_adapter_instance():
     adapter_instance.batch_upsert = AsyncMock()
     return adapter_instance
 
-
 # --- Test Cases ---
-
 
 @patch("core.orchestrator.src.api.endpoints.resources.get_memory_service")
 @patch("core.orchestrator.src.api.endpoints.resources.LiteLLMClient")
@@ -90,7 +85,6 @@ def test_upload_csv_success(
     mock_weaviate_adapter_instance.connect.assert_called_once()
     mock_weaviate_adapter_instance.batch_upsert.assert_called_once()
 
-
 @patch("core.orchestrator.src.api.endpoints.resources.get_memory_service")
 @patch("core.orchestrator.src.api.endpoints.resources.LiteLLMClient")
 @patch("core.orchestrator.src.api.endpoints.resources.WeaviateAdapter")
@@ -128,7 +122,6 @@ def test_upload_jsonl_success(
     else:
         assert mock_memory_service.add_memory_item_async.call_count == 2
     mock_weaviate_adapter_instance.batch_upsert.assert_called_once()
-
 
 @patch("core.orchestrator.src.api.endpoints.resources.get_memory_service")
 @patch("core.orchestrator.src.api.endpoints.resources.LiteLLMClient")
@@ -168,7 +161,6 @@ def test_upload_json_success(
         assert mock_memory_service.add_memory_item_async.call_count == 2
     mock_weaviate_adapter_instance.batch_upsert.assert_called_once()
 
-
 @patch("core.orchestrator.src.api.endpoints.resources.get_memory_service")
 @patch("core.orchestrator.src.api.endpoints.resources.LiteLLMClient")
 @patch("core.orchestrator.src.api.endpoints.resources.WeaviateAdapter")
@@ -202,7 +194,6 @@ def test_upload_unsupported_file_type(
     mock_memory_service.add_memory_item_async.assert_not_called()
     mock_memory_service.add_memory_items_async.assert_not_called()
     mock_weaviate_adapter_instance.batch_upsert.assert_not_called()
-
 
 @patch("core.orchestrator.src.api.endpoints.resources.get_memory_service")
 @patch("core.orchestrator.src.api.endpoints.resources.LiteLLMClient")
@@ -243,7 +234,6 @@ def test_upload_embedding_error(
     mock_memory_service.add_memory_items_async.assert_not_called()
     mock_weaviate_adapter_instance.batch_upsert.assert_not_called()
 
-
 @patch("core.orchestrator.src.api.endpoints.resources.get_memory_service")
 @patch("core.orchestrator.src.api.endpoints.resources.LiteLLMClient")
 @patch("core.orchestrator.src.api.endpoints.resources.WeaviateAdapter")
@@ -280,7 +270,6 @@ def test_upload_memory_service_store_error(
     assert "Could not store processed data to Firestore: Firestore Error" in json_response["detail"]
 
     mock_weaviate_adapter_instance.batch_upsert.assert_not_called()
-
 
 @patch("core.orchestrator.src.api.endpoints.resources.get_memory_service")
 @patch("core.orchestrator.src.api.endpoints.resources.LiteLLMClient")
@@ -323,7 +312,6 @@ def test_upload_weaviate_store_error(
         mock_weaviate_adapter_instance.batch_upsert.assert_called_once()
         mock_logger.error.assert_any_call("Error adding batch to Weaviate for test.csv: Weaviate Error", exc_info=True)
 
-
 @patch("core.orchestrator.src.api.endpoints.resources.shutil.copyfileobj")
 @patch("core.orchestrator.src.api.endpoints.resources.get_memory_service")
 @patch("core.orchestrator.src.api.endpoints.resources.LiteLLMClient")
@@ -361,7 +349,6 @@ def test_upload_file_save_error(
     mock_memory_service.add_memory_item_async.assert_not_called()
     mock_memory_service.add_memory_items_async.assert_not_called()
     mock_weaviate_adapter_instance.batch_upsert.assert_not_called()
-
 
 @patch("core.orchestrator.src.api.endpoints.resources.get_memory_service")
 @patch("core.orchestrator.src.api.endpoints.resources.LiteLLMClient")

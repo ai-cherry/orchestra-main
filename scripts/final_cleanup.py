@@ -5,7 +5,6 @@ import re
 from pathlib import Path
 from typing import List
 
-
 class FinalCleanup:
     """Handles final cleanup of GCP references and outdated files."""
 
@@ -14,8 +13,8 @@ class FinalCleanup:
         self.files_to_delete = []
         self.files_to_update = []
         self.gcp_patterns = [
-            r"GCP_PROJECT_ID",
-            r"GOOGLE_CLOUD_PROJECT",
+            r"VULTR_PROJECT_ID",
+            r"VULTR_PROJECT_ID",
             r"google-cloud-",
             r"gcp-secret",
             r"secret-manager",
@@ -123,8 +122,8 @@ class FinalCleanup:
 
             # Replace GCP references
             replacements = {
-                r"GCP_PROJECT_ID": "PROJECT_ID",
-                r"GOOGLE_CLOUD_PROJECT": "PROJECT_ID",
+                r"VULTR_PROJECT_ID": "PROJECT_ID",
+                r"VULTR_PROJECT_ID": "PROJECT_ID",
                 r"google-cloud-secret-manager": "# google-cloud-secret-manager (removed)",
                 r"google-cloud-firestore": "# google-cloud-firestore (removed)",
                 r"google-cloud-storage": "# google-cloud-storage (removed)",
@@ -215,8 +214,8 @@ class FinalCleanup:
         updates = {
             # Update docker-compose.yml
             "docker-compose.yml": [
-                ("GOOGLE_CLOUD_PROJECT:", "# GOOGLE_CLOUD_PROJECT: (removed)"),
-                ("GCP_PROJECT_ID:", "# GCP_PROJECT_ID: (removed)"),
+                ("VULTR_PROJECT_ID:", "# VULTR_PROJECT_ID: (removed)"),
+                ("VULTR_PROJECT_ID:", "# VULTR_PROJECT_ID: (removed)"),
             ],
             # Update .github/workflows/main.yml
             ".github/workflows/main.yml": [
@@ -243,12 +242,10 @@ class FinalCleanup:
                 except Exception as e:
                     print(f"  ✗ Error updating {file_path}: {e}")
 
-
 def main():
     """Main entry point."""
     cleanup = FinalCleanup()
     cleanup.run()
-
 
 if __name__ == "__main__":
     main()

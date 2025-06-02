@@ -13,10 +13,8 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 import httpx
 
-
 API_KEY = "4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd"
 BASE_URL = "http://localhost:8000"
-
 
 async def test_personas_api():
     """Test the personas admin API endpoints."""
@@ -92,7 +90,6 @@ async def test_personas_api():
 
         print("\n" + "=" * 50)
         print("API test completed!")
-
 
 if __name__ == "__main__":
     # Check if the server is running

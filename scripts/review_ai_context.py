@@ -34,7 +34,6 @@ FORBIDDEN_PATTERNS = [
 
 REQUIRED_PATTERNS = ["Python 3.10", "pip/venv", "subprocess.run()", "Simple > Complex"]
 
-
 def check_python_version() -> bool:
     """Check if Python version meets requirements."""
     logger.info(f"Current Python version: {sys.version}")
@@ -45,7 +44,6 @@ def check_python_version() -> bool:
         return False
     logger.info("✅ Python version meets requirements")
     return True
-
 
 def validate_ai_context_files() -> Dict[str, Any]:
     """Validate all AI context files exist and contain required patterns."""
@@ -72,7 +70,6 @@ def validate_ai_context_files() -> Dict[str, Any]:
 
     return results
 
-
 def check_project_structure() -> Dict[str, List[str]]:
     """Check that project follows required structure."""
     structure: Dict[str, List[str]] = {
@@ -98,7 +95,6 @@ def check_project_structure() -> Dict[str, List[str]]:
 
     return structure
 
-
 def check_existing_tools() -> List[str]:
     """List existing tools that should be reused."""
     tools = []
@@ -117,7 +113,6 @@ def check_existing_tools() -> List[str]:
             logger.info(f"✅ Existing tool: {script}")
 
     return tools
-
 
 def main() -> None:
     """Run all validation checks."""
@@ -166,7 +161,6 @@ def main() -> None:
     logger.info("❌ Poetry, Pipenv")
     logger.info("❌ Complex patterns (metaclasses, etc)")
     logger.info("❌ New services on ports 8002, 8080")
-
 
 if __name__ == "__main__":
     main()

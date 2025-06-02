@@ -12,7 +12,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from core.orchestrator.src.agents.agent_base import AgentResponse
-from core.orchestrator.src.agents.enhanced_agent_registry import get_enhanced_agent_registry, select_agent_for_context
+from core.orchestrator.src.agents.simplified_agent_registry import get_simplified_agent_registry
 
 # Import the settings instance directly
 from core.orchestrator.src.personas.dependency import get_persona_manager
@@ -21,7 +21,6 @@ from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
 
 # Configure logging
 logger = logging.getLogger(__name__)
-
 
 class AgentOrchestrator(BaseOrchestrator):
     """
@@ -212,8 +211,8 @@ class AgentOrchestrator(BaseOrchestrator):
             context=context,
         )
 
-        # Get enhanced agent registry
-        agent_registry = get_enhanced_agent_registry()
+        # Get simplified agent registry
+        agent_registry = get_simplified_agent_registry()
 
         # Select appropriate agent
         try:
@@ -221,8 +220,8 @@ class AgentOrchestrator(BaseOrchestrator):
             # agent_type = persona.preferred_agent_type
             # agent = agent_registry.get_agent(agent_type)
 
-            # For context-based selection using enhanced registry:
-            agent = select_agent_for_context(agent_context)
+            # For context-based selection using simplified registry:
+            agent = agent_registry.select_agent_for_context(agent_context)
 
             logger.info(f"Selected agent type: {agent.__class__.__name__} for interaction {interaction_id}")
         except Exception as e:
@@ -261,10 +260,8 @@ class AgentOrchestrator(BaseOrchestrator):
                 },
             )
 
-
 # Global agent orchestrator instance
 _agent_orchestrator = None
-
 
 def get_agent_orchestrator() -> AgentOrchestrator:
     """

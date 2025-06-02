@@ -9,7 +9,6 @@ from enum import Enum
 from typing import Dict, Any, Optional, List, Union
 from pydantic import BaseModel, Field
 
-
 class UseCase(str, Enum):
     """Defined use cases with specific model requirements"""
 
@@ -22,14 +21,12 @@ class UseCase(str, Enum):
     WORKFLOW_ORCHESTRATION = "workflow_orchestration"
     GENERAL_PURPOSE = "general_purpose"
 
-
 class ModelTier(str, Enum):
     """Model tiers for cost optimization"""
 
     PREMIUM = "premium"  # Most capable, highest cost
     STANDARD = "standard"  # Balanced performance/cost
     ECONOMY = "economy"  # Fast, low cost
-
 
 class RouterConfig(BaseModel):
     """Configuration for the unified LLM router"""
@@ -61,7 +58,6 @@ class RouterConfig(BaseModel):
         validate_assignment = True
         extra = "forbid"
 
-
 class ModelMapping(BaseModel):
     """Model mapping for each use case and tier"""
 
@@ -78,7 +74,6 @@ class ModelMapping(BaseModel):
 
         validate_assignment = True
 
-
 class LLMRequest(BaseModel):
     """Standard request format for LLM operations"""
 
@@ -93,7 +88,6 @@ class LLMRequest(BaseModel):
     cache: bool = True
     metadata: Optional[Dict[str, Any]] = None
 
-
 class LLMResponse(BaseModel):
     """Standard response format for LLM operations"""
 
@@ -106,7 +100,6 @@ class LLMResponse(BaseModel):
     cached: bool = False
     latency_ms: Optional[float] = None
 
-
 class ProviderStatus(BaseModel):
     """Provider health status"""
 
@@ -116,7 +109,6 @@ class ProviderStatus(BaseModel):
     error_rate: float = 0.0
     avg_latency_ms: Optional[float] = None
     models_available: int = 0
-
 
 class RouterHealth(BaseModel):
     """Overall router health status"""

@@ -27,7 +27,6 @@ from typing import Any, Dict, List, Optional
 
 import yaml
 
-
 @dataclass
 class WorkflowIssue:
     """Issue found in a workflow file."""
@@ -37,7 +36,6 @@ class WorkflowIssue:
     description: str
     line_number: Optional[int] = None
     suggested_fix: Optional[str] = None
-
 
 def scan_action_versions(workflow_data: Dict[str, Any]) -> List[WorkflowIssue]:
     """
@@ -61,7 +59,7 @@ def scan_action_versions(workflow_data: Dict[str, Any]) -> List[WorkflowIssue]:
         "google-github-actions/setup-gcloud": "v2",
         "docker/setup-buildx-action": "v3",
         "docker/build-push-action": "v5",
-        "hashicorp/setup-terraform": "v2",
+        "hashicorp/setup-pulumi": "v2",
     }
 
     # Check steps in all jobs
@@ -86,7 +84,6 @@ def scan_action_versions(workflow_data: Dict[str, Any]) -> List[WorkflowIssue]:
                                 )
 
     return issues
-
 
 def scan_hardcoded_values(workflow_data: Dict[str, Any]) -> List[WorkflowIssue]:
     """
@@ -154,7 +151,6 @@ def scan_hardcoded_values(workflow_data: Dict[str, Any]) -> List[WorkflowIssue]:
 
     return issues
 
-
 def scan_authentication_methods(workflow_data: Dict[str, Any]) -> List[WorkflowIssue]:
     """
     Scan for different authentication methods.
@@ -200,7 +196,6 @@ def scan_authentication_methods(workflow_data: Dict[str, Any]) -> List[WorkflowI
 
     return issues
 
-
 def scan_python_versions(workflow_data: Dict[str, Any]) -> List[WorkflowIssue]:
     """
     Scan for inconsistent Python versions.
@@ -232,7 +227,6 @@ def scan_python_versions(workflow_data: Dict[str, Any]) -> List[WorkflowIssue]:
                                 )
 
     return issues
-
 
 def scan_workflow_file(file_path: Path) -> List[WorkflowIssue]:
     """
@@ -273,7 +267,6 @@ def scan_workflow_file(file_path: Path) -> List[WorkflowIssue]:
 
     return issues
 
-
 def scan_directory(directory: Path) -> List[WorkflowIssue]:
     """
     Scan a directory for workflow files.
@@ -293,7 +286,6 @@ def scan_directory(directory: Path) -> List[WorkflowIssue]:
         issues.extend(scan_workflow_file(file_path))
 
     return issues
-
 
 def print_issues(issues: List[WorkflowIssue]) -> None:
     """
@@ -323,7 +315,6 @@ def print_issues(issues: List[WorkflowIssue]) -> None:
             if issue.suggested_fix:
                 print(f"    Suggested fix: {issue.suggested_fix}")
 
-
 def main() -> None:
     """Main function."""
     parser = argparse.ArgumentParser(description="Scan GitHub workflow files for inconsistencies")
@@ -344,7 +335,6 @@ def main() -> None:
     print(f"Scanning {directory} for GitHub workflow files...")
     issues = scan_directory(directory)
     print_issues(issues)
-
 
 if __name__ == "__main__":
     main()

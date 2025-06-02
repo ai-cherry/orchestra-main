@@ -26,18 +26,15 @@ from .models import (
     VoiceConfiguration,
 )
 
-
 class PersonaConfigError(Exception):
     """Raised when there's an error in persona configuration."""
 
     pass
 
-
 class PersonaNotFoundError(PersonaConfigError):
     """Raised when a requested persona is not found."""
 
     pass
-
 
 class PersonaConfigManager:
     """

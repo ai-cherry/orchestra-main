@@ -12,7 +12,6 @@ import sys
 
 from mcp_server.main import main_async
 
-
 def main():
     """
     Main entry point for the MCP server when invoked via Poetry.
@@ -28,7 +27,6 @@ def main():
 
     exit_code = asyncio.run(main_async(args.config))
     sys.exit(exit_code)
-
 
 if __name__ == "__main__":
     main()

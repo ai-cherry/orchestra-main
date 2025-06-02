@@ -12,7 +12,6 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-
 class PersonaStatus(str, Enum):
     """Status of a persona in the system."""
 
@@ -20,7 +19,6 @@ class PersonaStatus(str, Enum):
     INACTIVE = "inactive"
     DRAFT = "draft"
     ARCHIVED = "archived"
-
 
 class TraitCategory(str, Enum):
     """Categories for persona traits."""
@@ -30,7 +28,6 @@ class TraitCategory(str, Enum):
     EXPERTISE = "expertise"
     BEHAVIORAL = "behavioral"
     COGNITIVE = "cognitive"
-
 
 class ResponseStyleType(str, Enum):
     """Types of response styles for personas."""
@@ -42,7 +39,6 @@ class ResponseStyleType(str, Enum):
     EDUCATIONAL = "educational"
     EMPATHETIC = "empathetic"
 
-
 class InteractionMode(str, Enum):
     """Modes of interaction for personas."""
 
@@ -51,7 +47,6 @@ class InteractionMode(str, Enum):
     ANALYTICAL = "analytical"
     CREATIVE = "creative"
     ADVISORY = "advisory"
-
 
 class PersonaTrait(BaseModel):
     """
@@ -92,7 +87,6 @@ class PersonaTrait(BaseModel):
             }
         }
 
-
 class ResponseStyle(BaseModel):
     """
     Configuration for how a persona structures and delivers responses.
@@ -126,7 +120,6 @@ class ResponseStyle(BaseModel):
                 "formatting_preferences": {"use_code_blocks": True, "prefer_lists": True},
             }
         }
-
 
 class KnowledgeDomain(BaseModel):
     """
@@ -165,7 +158,6 @@ class KnowledgeDomain(BaseModel):
             }
         }
 
-
 class BehaviorRule(BaseModel):
     """
     Defines specific behavioral rules and constraints for a persona.
@@ -195,7 +187,6 @@ class BehaviorRule(BaseModel):
                 "exceptions": ["user_requests_technical_details"],
             }
         }
-
 
 class MemoryConfiguration(BaseModel):
     """
@@ -234,7 +225,6 @@ class MemoryConfiguration(BaseModel):
             }
         }
 
-
 class VoiceConfiguration(BaseModel):
     """
     Configuration for text-to-speech voice settings.
@@ -267,7 +257,6 @@ class VoiceConfiguration(BaseModel):
                 "emotion_style": "friendly",
             }
         }
-
 
 class PersonaTemplate(BaseModel):
     """
@@ -304,7 +293,6 @@ class PersonaTemplate(BaseModel):
                 "tags": ["technical", "support", "professional"],
             }
         }
-
 
 class PersonaMetrics(BaseModel):
     """
@@ -349,7 +337,6 @@ class PersonaMetrics(BaseModel):
                 "token_usage": {"input": 125000, "output": 98000, "total": 223000},
             }
         }
-
 
 class PersonaConfiguration(BaseModel):
     """
@@ -458,7 +445,6 @@ class PersonaConfiguration(BaseModel):
                 "tags": ["technical", "architecture", "expert"],
             }
         }
-
 
 # Export all models
 __all__ = [

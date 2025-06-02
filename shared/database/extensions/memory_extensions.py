@@ -13,7 +13,6 @@ import json
 
 logger = logging.getLogger(__name__)
 
-
 class MemoryExtensionsMixin:
     """
     Mixin that adds missing memory snapshot functionality to UnifiedPostgreSQL.

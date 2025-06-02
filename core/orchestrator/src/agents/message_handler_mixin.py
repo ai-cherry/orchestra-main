@@ -14,7 +14,6 @@ from core.orchestrator.src.services.message_queue import AgentMessage, get_messa
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class MessageHandlerMixin:
     """
     Mixin class that adds message handling capabilities to agents.

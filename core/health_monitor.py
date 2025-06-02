@@ -18,14 +18,12 @@ from core.connection_manager import get_connection_manager
 
 logger = logging.getLogger(__name__)
 
-
 class HealthStatus(str, Enum):
     """Overall health status levels"""
 
     HEALTHY = "healthy"
     DEGRADED = "degraded"
     UNHEALTHY = "unhealthy"
-
 
 @dataclass
 class ComponentHealth:
@@ -36,7 +34,6 @@ class ComponentHealth:
     last_check: float
     error_message: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
-
 
 class HealthMonitor:
     """
@@ -268,10 +265,8 @@ class HealthMonitor:
             "last_check": datetime.utcnow().isoformat(),
         }
 
-
 # Global health monitor instance
 _health_monitor: Optional[HealthMonitor] = None
-
 
 async def get_health_monitor(
     check_interval: Optional[int] = None, check_timeout: Optional[int] = None

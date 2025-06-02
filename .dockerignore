@@ -60,10 +60,9 @@ build/
 *.egg-info/
 .eggs/
 
-# Terraform
-.terraform/
-*.tfstate
-*.tfstate.*
+# Pulumi
+.pulumi/
+Pulumi.*.yaml
 
 # Docker
 docker-compose.override.yml

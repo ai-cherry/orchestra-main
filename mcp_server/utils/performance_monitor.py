@@ -17,7 +17,6 @@ from typing import Any, Dict, List, Optional
 # Configure logging
 logger = logging.getLogger("mcp-performance")
 
-
 class PerformanceMonitor:
     """Performance monitoring and optimization utilities."""
 
@@ -173,10 +172,8 @@ class PerformanceMonitor:
 
         return recommendations
 
-
 # Global performance monitor instance
 _performance_monitor = None
-
 
 def get_performance_monitor(
     config: Optional[Dict[str, Any]] = None,

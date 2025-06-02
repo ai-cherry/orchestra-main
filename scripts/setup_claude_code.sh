@@ -81,18 +81,18 @@ cat > "$MCP_REGISTRY_FILE" << 'EOF'
 {
   "version": "1.0.0",
   "servers": {
-    "gcp-cloud-run": {
-      "path": "servers/gcp_cloud_run_server.py",
+    "Vultr-cloud-run": {
+      "path": "servers/Vultr_cloud_run_server.py",
       "command": "python",
       "description": "Deploy and manage Cloud Run services",
-      "required_env": ["GCP_PROJECT_ID", "GCP_REGION"],
+      "required_env": ["Vultr_PROJECT_ID", "Vultr_REGION"],
       "optional_env": ["GOOGLE_APPLICATION_CREDENTIALS"]
     },
-    "gcp-secrets": {
-      "path": "servers/gcp_secret_manager_server.py",
+    "Vultr-secrets": {
+      "path": "servers/Vultr_secret_manager_server.py",
       "command": "python",
       "description": "Manage Google Secret Manager",
-      "required_env": ["GCP_PROJECT_ID"],
+      "required_env": ["Vultr_PROJECT_ID"],
       "optional_env": ["GOOGLE_APPLICATION_CREDENTIALS"]
     },
     "dragonfly": {
@@ -106,7 +106,7 @@ cat > "$MCP_REGISTRY_FILE" << 'EOF'
       "path": "servers/firestore_server.py",
       "command": "python",
       "description": "Manage Firestore documents",
-      "required_env": ["GCP_PROJECT_ID"],
+      "required_env": ["Vultr_PROJECT_ID"],
       "optional_env": ["GOOGLE_APPLICATION_CREDENTIALS"]
     }
   }
@@ -145,14 +145,14 @@ for server_file in "$PROJECT_ROOT/mcp_server/servers/"*.py; do
 
         # Add environment variables based on server type
         case "$server_name" in
-            "gcp-cloud-run")
+            "Vultr-cloud-run")
                 MCP_CONFIG+="
-        \"GCP_PROJECT_ID\": \"\${GCP_PROJECT_ID}\",
-        \"GCP_REGION\": \"\${GCP_REGION}\""
+        \"Vultr_PROJECT_ID\": \"\${Vultr_PROJECT_ID}\",
+        \"Vultr_REGION\": \"\${Vultr_REGION}\""
                 ;;
-            "gcp-secret-manager")
+            "Vultr-secret-manager")
                 MCP_CONFIG+="
-        \"GCP_PROJECT_ID\": \"\${GCP_PROJECT_ID}\""
+        \"Vultr_PROJECT_ID\": \"\${Vultr_PROJECT_ID}\""
                 ;;
             "dragonfly")
                 MCP_CONFIG+="
@@ -162,7 +162,7 @@ for server_file in "$PROJECT_ROOT/mcp_server/servers/"*.py; do
                 ;;
             "firestore")
                 MCP_CONFIG+="
-        \"GCP_PROJECT_ID\": \"\${GCP_PROJECT_ID}\""
+        \"Vultr_PROJECT_ID\": \"\${Vultr_PROJECT_ID}\""
                 ;;
         esac
 
@@ -208,11 +208,11 @@ cat > "$PROJECT_ROOT/.mcp.json" << 'EOF'
   "name": "AI Orchestra MCP Configuration",
   "description": "MCP servers for AI Orchestra development",
   "servers": {
-    "gcp-cloud-run": {
+    "Vultr-cloud-run": {
       "description": "Deploy and manage Cloud Run services",
       "capabilities": ["deploy", "status", "list"]
     },
-    "gcp-secrets": {
+    "Vultr-secrets": {
       "description": "Manage Google Secret Manager",
       "capabilities": ["get", "create", "update", "list"]
     },
@@ -295,11 +295,11 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MCP_SERVER_DIR="$PROJECT_ROOT/mcp_server"
 
 # Ensure environment is loaded
-if [ -f ~/.gcp_env_setup.sh ]; then
-    source ~/.gcp_env_setup.sh
-    log_info "Loaded GCP environment setup"
+if [ -f ~/.Vultr_env_setup.sh ]; then
+    source ~/.Vultr_env_setup.sh
+    log_info "Loaded Vultr environment setup"
 else
-    log_warning "GCP environment setup not found at ~/.gcp_env_setup.sh"
+    log_warning "Vultr environment setup not found at ~/.Vultr_env_setup.sh"
 fi
 
 # Load server registry if it exists
@@ -367,8 +367,8 @@ log_info "Starting MCP servers..."
 
 # Define available servers and their paths
 declare -A AVAILABLE_SERVERS=(
-    ["gcp-cloud-run"]="$MCP_SERVER_DIR/servers/gcp_cloud_run_server.py"
-    ["gcp-secrets"]="$MCP_SERVER_DIR/servers/gcp_secret_manager_server.py"
+    ["Vultr-cloud-run"]="$MCP_SERVER_DIR/servers/Vultr_cloud_run_server.py"
+    ["Vultr-secrets"]="$MCP_SERVER_DIR/servers/Vultr_secret_manager_server.py"
     ["dragonfly"]="$MCP_SERVER_DIR/servers/dragonfly_server.py"
     ["firestore"]="$MCP_SERVER_DIR/servers/firestore_server.py"
 )

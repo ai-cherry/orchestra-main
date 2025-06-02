@@ -17,7 +17,6 @@ from optional_integrations import aiplatform, mongodb  # Optional integrations
 
 logger = logging.getLogger(__name__)
 
-
 class LayeredMemoryManager:
     """
     Manages different memory layers (short-term, mid-term, long-term) with semantic search.
@@ -43,8 +42,8 @@ class LayeredMemoryManager:
 
         # Load settings
         settings = get_settings()
-        self.project_id = project_id or settings.gcp_project_id
-        self.region = settings.gcp_region
+        self.project_id = project_id or settings.vultr_project_id
+        self.region = settings.vultr_region
 
         # Initialize Redis for short-term memory
         self.redis_url = redis_url or f"redis://{settings.redis_host}:{settings.redis_port}"

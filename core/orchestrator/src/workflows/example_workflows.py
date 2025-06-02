@@ -18,22 +18,18 @@ from core.orchestrator.src.workflows.state_machine import (
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 # Example condition functions
 def has_query_result(context: Dict[str, Any]) -> bool:
     """Check if the context has query results."""
     return "query_result" in context and context["query_result"] is not None
 
-
 def has_error(context: Dict[str, Any]) -> bool:
     """Check if the context has an error."""
     return "error" in context and context["error"] is not None
 
-
 def is_approved(context: Dict[str, Any]) -> bool:
     """Check if the workflow is approved."""
     return context.get("approved", False)
-
 
 # Example action functions
 async def query_knowledge_base(context: Dict[str, Any]) -> Dict[str, Any]:
@@ -54,7 +50,6 @@ async def query_knowledge_base(context: Dict[str, Any]) -> Dict[str, Any]:
 
     return {"query_result": result}
 
-
 async def generate_response(context: Dict[str, Any]) -> Dict[str, Any]:
     """
     Generate a response based on query results.
@@ -73,7 +68,6 @@ async def generate_response(context: Dict[str, Any]) -> Dict[str, Any]:
 
     return {"response": response}
 
-
 async def format_response(context: Dict[str, Any]) -> Dict[str, Any]:
     """
     Format the response for presentation.
@@ -90,7 +84,6 @@ async def format_response(context: Dict[str, Any]) -> Dict[str, Any]:
     formatted = f"FORMATTED: {response}"
 
     return {"formatted_response": formatted}
-
 
 # Define example workflows
 def create_query_workflow() -> WorkflowDefinition:
@@ -147,7 +140,6 @@ def create_query_workflow() -> WorkflowDefinition:
         metadata={"category": "query_processing", "version": "1.0"},
     )
 
-
 def create_multi_agent_workflow() -> WorkflowDefinition:
     """
     Create a workflow for multi-agent collaboration.
@@ -201,7 +193,6 @@ def create_multi_agent_workflow() -> WorkflowDefinition:
         ],
         metadata={"category": "multi_agent", "version": "1.0"},
     )
-
 
 async def register_example_workflows():
     """Register example workflows and their actions/conditions."""

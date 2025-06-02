@@ -23,7 +23,6 @@ logger = logging.getLogger(__name__)
 # Type variable for generic config type
 T = TypeVar("T", bound=BaseModel)
 
-
 class ConfigLoader(Generic[T]):
     """
     Generic configuration loader that supports multiple file formats
@@ -215,7 +214,6 @@ class ConfigLoader(Generic[T]):
             return self.load_config()
         return self._config
 
-
 # Reusable configuration loaders for common configurations
 @functools.lru_cache(maxsize=1)
 def get_app_config_loader() -> ConfigLoader:
@@ -244,7 +242,6 @@ def get_app_config_loader() -> ConfigLoader:
         auto_create_config=False,
     )
 
-
 def get_app_config() -> Any:
     """
     Get the application configuration.
@@ -254,7 +251,6 @@ def get_app_config() -> Any:
     """
     loader = get_app_config_loader()
     return loader.get_config()
-
 
 def get_module_config(
     module_name: str,

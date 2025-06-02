@@ -23,7 +23,6 @@ from agent.app.core.database import get_db
 
 router = APIRouter(prefix="/admin/llm", tags=["llm-admin"])
 
-
 # Pydantic models for requests/responses
 class ProviderUpdate(BaseModel):
     """Model for updating provider configuration"""
@@ -31,7 +30,6 @@ class ProviderUpdate(BaseModel):
     api_key_env_var: Optional[str] = None
     is_active: Optional[bool] = None
     priority: Optional[int] = None
-
 
 class ModelAssignmentCreate(BaseModel):
     """Model for creating/updating model assignments"""
@@ -44,7 +42,6 @@ class ModelAssignmentCreate(BaseModel):
     max_tokens_override: Optional[int] = Field(None, ge=1, le=32000)
     system_prompt_override: Optional[str] = None
 
-
 class ModelTestRequest(BaseModel):
     """Model for testing a specific configuration"""
 
@@ -54,13 +51,11 @@ class ModelTestRequest(BaseModel):
     temperature: float = 0.5
     max_tokens: int = 100
 
-
 class BulkModelUpdate(BaseModel):
     """Model for bulk updating model availability"""
 
     model_ids: List[int]
     is_available: bool
-
 
 @router.get("/providers")
 async def get_providers(db: AsyncSession = Depends(get_db), include_inactive: bool = False) -> List[Dict[str, Any]]:
@@ -73,7 +68,6 @@ async def get_providers(db: AsyncSession = Depends(get_db), include_inactive: bo
     providers = result.scalars().all()
 
     return [provider.to_dict() for provider in providers]
-
 
 @router.put("/providers/{provider_name}")
 async def update_provider(
@@ -99,7 +93,6 @@ async def update_provider(
 
     return provider.to_dict()
 
-
 @router.get("/models")
 async def get_models(
     db: AsyncSession = Depends(get_db),
@@ -121,7 +114,6 @@ async def get_models(
 
     return [model.to_dict() for model in models]
 
-
 @router.post("/models/discover")
 async def discover_models(background_tasks: BackgroundTasks, force_refresh: bool = False) -> Dict[str, Any]:
     """Discover available models from providers"""
@@ -141,7 +133,6 @@ async def discover_models(background_tasks: BackgroundTasks, force_refresh: bool
         "total_models": sum(len(models) for models in discovered.values()),
     }
 
-
 @router.put("/models/availability")
 async def update_model_availability(update: BulkModelUpdate, db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
     """Bulk update model availability"""
@@ -157,7 +148,6 @@ async def update_model_availability(update: BulkModelUpdate, db: AsyncSession = 
     await db.commit()
 
     return {"updated": updated_count, "is_available": update.is_available}
-
 
 @router.get("/use-cases")
 async def get_use_cases(db: AsyncSession = Depends(get_db), include_assignments: bool = True) -> List[Dict[str, Any]]:
@@ -175,7 +165,6 @@ async def get_use_cases(db: AsyncSession = Depends(get_db), include_assignments:
     use_cases = result.scalars().all()
 
     return [use_case.to_dict() for use_case in use_cases]
-
 
 @router.get("/assignments")
 async def get_model_assignments(
@@ -198,7 +187,6 @@ async def get_model_assignments(
     assignments = result.scalars().all()
 
     return [assignment.to_dict() for assignment in assignments]
-
 
 @router.post("/assignments")
 async def create_or_update_assignment(
@@ -266,7 +254,6 @@ async def create_or_update_assignment(
 
     return db_assignment.to_dict()
 
-
 @router.delete("/assignments/{assignment_id}")
 async def delete_assignment(assignment_id: int, db: AsyncSession = Depends(get_db)) -> Dict[str, str]:
     """Delete a model assignment"""
@@ -280,7 +267,6 @@ async def delete_assignment(assignment_id: int, db: AsyncSession = Depends(get_d
     await db.commit()
 
     return {"status": "deleted"}
-
 
 @router.post("/test")
 async def test_model_configuration(test_request: ModelTestRequest) -> Dict[str, Any]:
@@ -311,7 +297,6 @@ async def test_model_configuration(test_request: ModelTestRequest) -> Dict[str, 
 
     except Exception as e:
         return {"status": "error", "error": str(e), "model": test_request.model_identifier}
-
 
 @router.get("/metrics")
 async def get_metrics(
@@ -387,7 +372,6 @@ async def get_metrics(
         "by_model": by_model,
         "metrics": [metric.to_dict() for metric in metrics[:100]],  # Limit to 100 for performance
     }
-
 
 @router.get("/configuration-summary")
 async def get_configuration_summary() -> Dict[str, Any]:

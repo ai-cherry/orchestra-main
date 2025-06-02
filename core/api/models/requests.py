@@ -8,7 +8,6 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
-
 class ConversationRequest(BaseModel):
     """Request for conversation endpoint."""
 
@@ -17,14 +16,12 @@ class ConversationRequest(BaseModel):
     context: Optional[Dict[str, Any]] = Field(default=None, description="Additional context")
     persona_id: Optional[str] = Field(default=None, description="Specific persona to use")
 
-
 class WorkflowExecutionRequest(BaseModel):
     """Request for workflow execution."""
 
     workflow_name: str = Field(..., description="Name of workflow to execute")
     inputs: Dict[str, Any] = Field(..., description="Workflow inputs")
     async_execution: bool = Field(default=False, description="Execute asynchronously")
-
 
 class AgentMessageRequest(BaseModel):
     """Request to send message to an agent."""
@@ -34,7 +31,6 @@ class AgentMessageRequest(BaseModel):
     message_type: str = Field(default="text", description="Type of message")
     metadata: Optional[Dict[str, Any]] = Field(default=None, description="Additional metadata")
 
-
 class AgentTaskRequest(BaseModel):
     """Request to assign task to an agent."""
 
@@ -42,7 +38,6 @@ class AgentTaskRequest(BaseModel):
     required_capability: str = Field(..., description="Required agent capability")
     priority: Optional[str] = Field(default="normal", description="Task priority")
     context: Optional[Dict[str, Any]] = Field(default=None, description="Task context")
-
 
 class MemoryStoreRequest(BaseModel):
     """Request to store data in memory."""
@@ -52,7 +47,6 @@ class MemoryStoreRequest(BaseModel):
     metadata: Optional[Dict[str, Any]] = Field(default=None, description="Additional metadata")
     ttl_seconds: Optional[int] = Field(default=None, description="Time to live in seconds")
 
-
 class MemorySearchRequest(BaseModel):
     """Request to search memory."""
 
@@ -60,7 +54,6 @@ class MemorySearchRequest(BaseModel):
     limit: int = Field(default=10, ge=1, le=100, description="Maximum results")
     metadata_filter: Optional[Dict[str, Any]] = Field(default=None, description="Metadata filters")
     similarity_threshold: float = Field(default=0.7, ge=0.0, le=1.0, description="Similarity threshold")
-
 
 class PersonaCreateRequest(BaseModel):
     """Request to create a new persona."""
@@ -74,7 +67,6 @@ class PersonaCreateRequest(BaseModel):
     temperature: float = Field(default=0.7, ge=0.0, le=2.0, description="LLM temperature")
     max_tokens: int = Field(default=2000, ge=1, le=8000, description="Maximum tokens")
 
-
 class LLMCompletionRequest(BaseModel):
     """Request for LLM completion."""
 
@@ -85,7 +77,6 @@ class LLMCompletionRequest(BaseModel):
     temperature: Optional[float] = Field(default=None, description="Temperature")
     persona_id: Optional[str] = Field(default=None, description="Persona to use")
 
-
 class DocumentAnalysisRequest(BaseModel):
     """Request for document analysis."""
 
@@ -95,7 +86,6 @@ class DocumentAnalysisRequest(BaseModel):
         default=["summary", "entities", "keywords"],
         description="Types of analysis to perform",
     )
-
 
 class ResearchRequest(BaseModel):
     """Request for research task."""

@@ -8,7 +8,6 @@ from agent.app.routers.admin import verify_api_key
 
 router = APIRouter(prefix="/api", tags=["suggestions"])
 
-
 class Suggestion(BaseModel):
     """Individual suggestion model."""
 
@@ -18,12 +17,10 @@ class Suggestion(BaseModel):
     metadata: Optional[dict] = None
     score: Optional[float] = None
 
-
 class SuggestionsResponse(BaseModel):
     """Response model for suggestions."""
 
     suggestions: List[Suggestion]
-
 
 class SuggestionEngine:
     """Simple suggestion engine for MVP.
@@ -134,10 +131,8 @@ class SuggestionEngine:
         suggestions.sort(key=lambda x: x.score or 0, reverse=True)
         return suggestions[:limit]
 
-
 # Initialize engine
 suggestion_engine = SuggestionEngine()
-
 
 @router.get("/suggestions", response_model=SuggestionsResponse)
 async def get_suggestions(

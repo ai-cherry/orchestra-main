@@ -7,7 +7,6 @@ import sys
 from pathlib import Path
 from typing import List, Tuple
 
-
 def validate_python_file(file_path: Path) -> Tuple[bool, str]:
     """Validate a single Python file for syntax errors."""
     try:
@@ -21,7 +20,6 @@ def validate_python_file(file_path: Path) -> Tuple[bool, str]:
         return False, f"SyntaxError at line {e.lineno}: {e.msg}"
     except Exception as e:
         return False, f"Error: {str(e)}"
-
 
 def find_python_files(root_dir: Path) -> List[Path]:
     """Find all Python files in the project."""
@@ -39,7 +37,6 @@ def find_python_files(root_dir: Path) -> List[Path]:
                 python_files.append(Path(root) / file)
 
     return python_files
-
 
 def main():
     """Main function to validate all Python files."""
@@ -76,7 +73,6 @@ def main():
     else:
         print(f"\n✅ All {len(python_files)} Python files have valid syntax!")
         return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

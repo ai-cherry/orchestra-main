@@ -30,7 +30,6 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
 # Import the credential manager
 from core.security.credential_manager import get_credential_manager
 
-
 async def example_basic_usage():
     """Example of basic credential manager usage."""
     print("\n=== Basic Usage Example ===")
@@ -70,7 +69,6 @@ async def example_basic_usage():
 
     return api_key, config
 
-
 async def example_gcp_services():
     """Example of using credentials with GCP services."""
     print("\n=== GCP Services Example ===")
@@ -107,7 +105,6 @@ async def example_gcp_services():
     # )
 
     return vertex_credentials
-
 
 async def example_memory_system():
     """Example of using credentials with the memory system."""
@@ -181,7 +178,6 @@ async def example_memory_system():
         "mongodb": firestore_credentials,
     }
 
-
 async def example_fastapi_integration():
     """Example of integrating with FastAPI."""
     print("\n=== FastAPI Integration Example ===")
@@ -208,7 +204,6 @@ async def example_fastapi_integration():
     print("    )")
     print("    # Use Vertex AI...")
     print("    return {'prediction': 'result'}")
-
 
 async def example_credential_rotation():
     """Example of handling credential rotation."""
@@ -263,8 +258,7 @@ async def example_credential_rotation():
     print(
         "\nIn a production environment, credentials are automatically rotated using Cloud Scheduler and Cloud Functions."
     )
-    print("The rotation schedule is defined in the Terraform configuration.")
-
+    print("The rotation schedule is defined in the Pulumi configuration.")
 
 async def main():
     """Main function to run all examples."""
@@ -279,7 +273,6 @@ async def main():
     await example_credential_rotation()
 
     print("\nAll examples completed successfully!")
-
 
 if __name__ == "__main__":
     # Run the main function

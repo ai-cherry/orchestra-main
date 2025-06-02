@@ -18,7 +18,6 @@ from core.orchestrator.src.agents.memory.layered_memory import get_memory_manage
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class AgentState(BaseModel):
     """
     Structured state for agents using Pydantic.
@@ -96,7 +95,6 @@ class AgentState(BaseModel):
             "timestamp": datetime.utcnow().isoformat(),
         }
         self.updated_at = datetime.utcnow()
-
 
 class StatefulAgent(Agent):
     """
@@ -329,7 +327,6 @@ class StatefulAgent(Agent):
 
         if expired_keys:
             logger.debug(f"Cleaned up {len(expired_keys)} expired states")
-
 
 class ConversationalAgent(StatefulAgent):
     """

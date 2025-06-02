@@ -8,7 +8,6 @@ import sys
 from pathlib import Path
 from typing import List, Tuple
 
-
 def fix_unused_imports(file_path: Path) -> bool:
     """Remove unused imports from a Python file."""
     try:
@@ -23,7 +22,6 @@ def fix_unused_imports(file_path: Path) -> bool:
         print("autoflake not found. Installing...")
         subprocess.run([sys.executable, "-m", "pip", "install", "autoflake"])
         return fix_unused_imports(file_path)
-
 
 def fix_f_strings_without_placeholders(file_path: Path) -> bool:
     """Convert f-strings without placeholders to regular strings."""
@@ -55,7 +53,6 @@ def fix_f_strings_without_placeholders(file_path: Path) -> bool:
 
     return modified
 
-
 def fix_escape_sequences(file_path: Path) -> bool:
     """Fix invalid escape sequences by converting to raw strings or escaping properly."""
     modified = False
@@ -83,13 +80,11 @@ def fix_escape_sequences(file_path: Path) -> bool:
 
     return modified
 
-
 def add_type_annotations(file_path: Path) -> bool:
     """Add basic type annotations to functions missing them."""
     # This is a placeholder - adding proper type annotations requires more context
     # For now, we'll just report files that need manual attention
     return False
-
 
 def get_python_files() -> List[Path]:
     """Get all Python files in the project."""
@@ -105,7 +100,6 @@ def get_python_files() -> List[Path]:
                 python_files.append(Path(root) / file)
 
     return python_files
-
 
 def main():
     """Main function to fix pre-commit issues."""
@@ -151,7 +145,6 @@ def main():
     subprocess.run(["black", "."])
 
     print("\nDone! Please review the changes and run 'pre-commit run --all-files' to verify.")
-
 
 if __name__ == "__main__":
     main()

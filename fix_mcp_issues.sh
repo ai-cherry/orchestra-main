@@ -97,14 +97,14 @@ echo
 
 # Step 1: Force refresh authentication
 echo "Step 1: Refreshing authentication..."
-gcloud auth revoke --all 2>/dev/null || true
-gcloud auth login --no-launch-browser
+# Removed gcloud command
+# Removed gcloud command
 
 # Step 2: Ensure correct account is active
 echo
 echo "Step 2: Setting correct account..."
-gcloud config set account scoobyjava@cherry-ai.me
-gcloud config set project cherry-ai-project
+# Removed gcloud command
+# Removed gcloud command
 
 # Step 3: Test authentication
 echo
@@ -113,13 +113,13 @@ if gcloud projects describe cherry-ai-project --format="value(projectId)" 2>/dev
     echo "✅ Authentication working!"
 else
     echo "❌ Authentication failed. Trying alternative method..."
-    gcloud auth application-default login
+    # vultr-cli auth application-default login
 fi
 
 # Step 4: Make the service public (this is the fix for 403)
 echo
 echo "Step 4: Making ai-orchestra-minimal public..."
-gcloud run services add-iam-policy-binding ai-orchestra-minimal \
+# Removed gcloud command
     --region=us-central1 \
     --member="allUsers" \
     --role="roles/run.invoker" \

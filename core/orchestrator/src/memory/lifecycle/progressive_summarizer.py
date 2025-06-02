@@ -10,12 +10,10 @@ import re
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
 
-from google.cloud import aiplatform
 from pydantic import BaseModel, Field
 
 # Configure logging
 logger = logging.getLogger(__name__)
-
 
 class SummaryLevel(str, Enum):
     """Summary levels for progressive summarization."""
@@ -24,7 +22,6 @@ class SummaryLevel(str, Enum):
     CONDENSED = "condensed"  # Condensed highlights (about 30-40% of original)
     KEY_POINTS = "key_points"  # Key points and entities (about 10-20% of original)
     HEADLINE = "headline"  # Single sentence headline (about 5% of original)
-
 
 class SummaryResult(BaseModel):
     """
@@ -52,7 +49,6 @@ class SummaryResult(BaseModel):
 
     # Timestamp
     created_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
-
 
 class ProgressiveSummarizerConfig(BaseModel):
     """
@@ -87,7 +83,6 @@ class ProgressiveSummarizerConfig(BaseModel):
 
     # Fallback to rule-based summarization if AI fails
     enable_fallback: bool = True
-
 
 class ProgressiveSummarizer:
     """
@@ -586,7 +581,6 @@ class ProgressiveSummarizer:
             results[SummaryLevel.HEADLINE] = headline
 
         return results
-
 
 # Import datetime here to avoid circular import
 from datetime import datetime

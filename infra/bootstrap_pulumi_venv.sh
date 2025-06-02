@@ -1,5 +1,5 @@
 #!/bin/bash
-# Bootstrap script for Pulumi GCP infra-as-code using Python venv + pip (no Poetry)
+# Bootstrap script for Pulumi Vultr infra-as-code using Python venv + pip (no Poetry)
 # Ensures a clean, minimal, and reproducible setup for a single-developer workflow.
 
 set -e
@@ -22,15 +22,15 @@ echo "==> Pulumi dependencies installed."
 echo
 echo "==> Next steps:"
 echo "1. Initialize your Pulumi project (if not already done):"
-echo "   pulumi new gcp-python"
+echo "   pulumi new Vultr-python"
 echo "   # Follow prompts for project name, stack, and region."
 echo
 echo "2. Configure your stack (example for dev):"
 echo "   pulumi stack init dev"
-echo "   pulumi config set gcp:project <your-gcp-project-id>"
-echo "   pulumi config set gcp:region <your-gcp-region>"
+echo "   pulumi config set Vultr:project <your-Vultr-project-id>"
+echo "   pulumi config set Vultr:region <your-Vultr-region>"
 echo
-echo "3. Define your GCP resources in infra/__main__.py"
+echo "3. Define your Vultr resources in infra/__main__.py"
 echo
 echo "4. Deploy with:"
 echo "   pulumi up"

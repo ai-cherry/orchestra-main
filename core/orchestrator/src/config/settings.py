@@ -23,7 +23,6 @@ except ImportError:
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class Settings(BaseSettings):
     """
     Configuration settings for the AI Orchestration System.
@@ -73,7 +72,6 @@ class Settings(BaseSettings):
     # Configure Pydantic to load from .env file
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=True)
 
-
 def load_all_persona_configs(settings_instance: Settings) -> Dict[str, PersonaConfig]:
     """
     Load all persona configurations from YAML files.
@@ -120,13 +118,11 @@ def load_all_persona_configs(settings_instance: Settings) -> Dict[str, PersonaCo
 
     return personas
 
-
 # Global settings instance for singleton pattern
 settings = Settings()
 
 # Log that settings have been loaded
 logger.info(f"Loaded configuration for {settings.APP_NAME} in {settings.ENVIRONMENT} environment")
-
 
 def get_settings() -> Settings:
     """
@@ -136,7 +132,6 @@ def get_settings() -> Settings:
         Settings: Application settings instance.
     """
     return settings
-
 
 def get_persona_configs() -> Dict[str, PersonaConfig]:
     """

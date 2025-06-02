@@ -17,7 +17,6 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_ex
 logger = logging.getLogger(__name__)
 T = TypeVar("T")
 
-
 class ServiceStatus(Enum):
     """Service health status."""
 
@@ -25,7 +24,6 @@ class ServiceStatus(Enum):
     DEGRADED = "degraded"
     UNHEALTHY = "unhealthy"
     UNKNOWN = "unknown"
-
 
 @dataclass
 class ServiceHealth:
@@ -39,7 +37,6 @@ class ServiceHealth:
     def __post_init__(self):
         if self.metadata is None:
             self.metadata = {}
-
 
 class ServiceConnection(ABC):
     """Abstract base class for service connections."""
@@ -93,7 +90,6 @@ class ServiceConnection(ABC):
                 return await self._fallback_handler(operation, *args, **kwargs)
             raise
 
-
 class ConnectionPool:
     """Manages a pool of service connections with load balancing."""
 
@@ -141,7 +137,6 @@ class ConnectionPool:
             except Exception as e:
                 logger.error(f"Error closing connection {conn.name}: {e}")
 
-
 class RetryableConnection(ServiceConnection):
     """Base class for connections with built-in retry logic."""
 
@@ -153,7 +148,6 @@ class RetryableConnection(ServiceConnection):
     async def execute_with_retry(self, operation: str, *args, **kwargs) -> Any:
         """Execute operation with automatic retries."""
         return await self.execute(operation, *args, **kwargs)
-
 
 class ServiceRegistry:
     """Registry for all service connections."""

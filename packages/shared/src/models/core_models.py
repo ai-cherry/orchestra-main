@@ -20,7 +20,6 @@ except ImportError:
     def Field(*args, **kwargs):
         return field(default=None)
 
-
 class PersonaConfig(BaseModel):
     """
     Configuration for personas used within the system.
@@ -41,7 +40,6 @@ class PersonaConfig(BaseModel):
         description="Description of the persona's voice for potential text-to-speech use",
     )
 
-
 class UserInteraction(BaseModel):
     """
     Represents a single turn in a conversation or task request.
@@ -61,7 +59,6 @@ class UserInteraction(BaseModel):
         default=None,
         description="Optional user feedback (e.g., 1 for thumbs up, -1 for thumbs down)",
     )
-
 
 class AgentData(BaseModel):
     """

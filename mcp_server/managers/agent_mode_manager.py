@@ -20,7 +20,6 @@ from ..utils.structured_logging import get_logger, with_correlation_id
 
 logger = get_logger(__name__)
 
-
 class AgentModeManager:
     """Manager for agent modes and their configurations."""
 
@@ -323,10 +322,8 @@ class AgentModeManager:
             logger.error(f"Error saving agent mode configurations: {e}")
             return False
 
-
 # Singleton instance for global use
 _default_instance: Optional[AgentModeManager] = None
-
 
 def get_agent_mode_manager() -> AgentModeManager:
     """Get the default AgentModeManager instance."""
@@ -335,16 +332,13 @@ def get_agent_mode_manager() -> AgentModeManager:
         _default_instance = AgentModeManager()
     return _default_instance
 
-
 def get_active_mode() -> Optional[AgentMode]:
     """Convenience function to get the active agent mode."""
     return get_agent_mode_manager().get_active_mode()
 
-
 def set_active_mode(mode_type: AgentModeType) -> bool:
     """Convenience function to set the active agent mode."""
     return get_agent_mode_manager().set_active_mode(mode_type)
-
 
 def format_prompt(task: str, context: Dict[str, Any] = None) -> str:
     """Convenience function to format a prompt using the active agent mode."""

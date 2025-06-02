@@ -38,14 +38,12 @@ KEY_MAPPINGS = {
     },
 }
 
-
 def check_existing_keys() -> Dict[str, bool]:
     """Check which direct API keys are currently set"""
     results = {}
     for key in KEY_MAPPINGS:
         results[key] = bool(os.environ.get(key))
     return results
-
 
 def generate_portkey_config() -> List[str]:
     """Generate Portkey configuration based on existing keys"""
@@ -62,7 +60,6 @@ def generate_portkey_config() -> List[str]:
             config_lines.append(f"{mapping['env_var']}={mapping['virtual_key']}  # {mapping['provider']}")
 
     return config_lines
-
 
 def update_code_references():
     """Generate code update suggestions"""
@@ -93,7 +90,6 @@ def update_code_references():
     print("   // Generate images")
     print("   const image = await portkey.generateImage(prompt);")
     print("   ```")
-
 
 def main():
     """Main migration function"""
@@ -164,7 +160,6 @@ def main():
     print("   • Orchestra Docs: docs/SECRETS_CONFIGURATION.md")
 
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

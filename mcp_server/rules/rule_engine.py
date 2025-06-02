@@ -20,7 +20,6 @@ from ..utils.structured_logging import get_logger, with_correlation_id
 
 logger = get_logger(__name__)
 
-
 class RuleSeverity(str, Enum):
     """Severity levels for rules."""
 
@@ -28,7 +27,6 @@ class RuleSeverity(str, Enum):
     WARNING = "warning"
     ERROR = "error"
     CRITICAL = "critical"
-
 
 class RuleCategory(str, Enum):
     """Categories of rules."""
@@ -40,7 +38,6 @@ class RuleCategory(str, Enum):
     API_USAGE = "api_usage"
     DOCUMENTATION = "documentation"
     TESTING = "testing"
-
 
 @dataclass
 class RuleViolation:
@@ -72,7 +69,6 @@ class RuleViolation:
             category=RuleCategory(data["category"]),
             context=data.get("context", {}),
         )
-
 
 @dataclass
 class Rule:
@@ -182,7 +178,6 @@ class Rule:
             enabled=data.get("enabled", True),
             tags=data.get("tags", []),
         )
-
 
 class RuleEngine:
     """Engine for checking content against rules."""
@@ -550,10 +545,8 @@ class RuleEngine:
             logger.error(f"Error saving rules to file: {e}")
             return False
 
-
 # Singleton instance for global use
 _default_instance: Optional[RuleEngine] = None
-
 
 def get_rule_engine() -> RuleEngine:
     """Get the default RuleEngine instance."""
@@ -561,7 +554,6 @@ def get_rule_engine() -> RuleEngine:
     if _default_instance is None:
         _default_instance = RuleEngine()
     return _default_instance
-
 
 def check_content(
     content: Any,
@@ -572,7 +564,6 @@ def check_content(
 ) -> List[RuleViolation]:
     """Convenience function to check content using the default rule engine."""
     return get_rule_engine().check_content(content, rule_set, categories, severities, tags)
-
 
 def load_rules_from_file(file_path: str) -> bool:
     """Convenience function to load rules from a file using the default rule engine."""

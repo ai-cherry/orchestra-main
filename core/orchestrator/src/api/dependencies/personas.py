@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 # Global persona cache
 _personas_cache = {}
 
-
 def load_personas(settings: Settings) -> Dict[str, PersonaConfig]:
     """
     Load available personas from configuration.
@@ -57,7 +56,6 @@ def load_personas(settings: Settings) -> Dict[str, PersonaConfig]:
     _personas_cache = personas
 
     return personas
-
 
 def get_persona_config(
     request: Request,

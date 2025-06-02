@@ -10,7 +10,6 @@ import sys
 import time
 from pathlib import Path
 
-
 class OrchestraSetupWizard:
     """Interactive setup wizard for Orchestra AI."""
 
@@ -310,7 +309,6 @@ class OrchestraSetupWizard:
         print("=" * 60)
         print("You can now use Orchestra CLI and Admin UI.")
         print("=" * 60)
-
 
 if __name__ == "__main__":
     wizard = OrchestraSetupWizard()

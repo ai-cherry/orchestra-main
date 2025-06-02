@@ -28,14 +28,12 @@ intent_classifier = IntentClassifier()
 voice_transcriber = VoiceTranscriber()
 response_generator = ResponseGenerator()
 
-
 class TextCommand(BaseModel):
     """Text command from user"""
 
     text: str
     context: Optional[Dict[str, Any]] = None
     domain: Optional[str] = None  # No default domain
-
 
 class VoiceCommand(BaseModel):
     """Voice command from user"""
@@ -45,7 +43,6 @@ class VoiceCommand(BaseModel):
     context: Optional[Dict[str, Any]] = None
     domain: Optional[str] = None  # No default domain
 
-
 class NLResponse(BaseModel):
     """Natural language response"""
 
@@ -54,7 +51,6 @@ class NLResponse(BaseModel):
     actions_taken: List[Dict[str, Any]] = []
     suggestions: List[str] = []
     domain: str
-
 
 @router.post("/text", response_model=NLResponse)
 async def process_text_command(command: TextCommand, api_key: str = Depends(verify_api_key)) -> NLResponse:
@@ -83,7 +79,6 @@ async def process_text_command(command: TextCommand, api_key: str = Depends(veri
         domain=command.domain or "general",
     )
 
-
 @router.post("/voice", response_model=NLResponse)
 async def process_voice_command(command: VoiceCommand, api_key: str = Depends(verify_api_key)) -> NLResponse:
     """Process natural language voice command"""
@@ -101,7 +96,6 @@ async def process_voice_command(command: VoiceCommand, api_key: str = Depends(ve
     result.speech_url = speech_url
 
     return result
-
 
 @router.websocket("/stream")
 async def websocket_nl_interface(websocket: WebSocket, api_key: str = Depends(verify_api_key)):
@@ -132,7 +126,6 @@ async def websocket_nl_interface(websocket: WebSocket, api_key: str = Depends(ve
     finally:
         await websocket.close()
 
-
 # Handler functions
 async def handle_agent_command(intent, context):
     """Handle agent control commands"""
@@ -151,7 +144,6 @@ async def handle_agent_command(intent, context):
 
     return {"actions": [], "data": {}}
 
-
 async def handle_query(intent, context):
     """Handle information queries"""
     # Example: "What's the status of X?"
@@ -162,7 +154,6 @@ async def handle_query(intent, context):
         "data": {"placeholder": "Query results will appear here once data sources are connected"},
     }
 
-
 async def handle_workflow_command(intent, context):
     """Handle workflow commands"""
     # Example: "Process all X"
@@ -171,7 +162,6 @@ async def handle_workflow_command(intent, context):
         "actions": [{"type": "workflow", "name": intent.workflow_name}],
         "data": {"status": "Workflow initiated (placeholder)"},
     }
-
 
 async def handle_general_command(intent, context):
     """Handle general commands"""

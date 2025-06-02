@@ -75,7 +75,6 @@ app = FastAPI(
     version="2.0.0",
 )
 
-
 # --- Models ---
 class MemoryItem(BaseModel):
     id: Optional[str] = None
@@ -89,7 +88,6 @@ class MemoryItem(BaseModel):
     memory_type: str = Field(default="episode")
     embedding: Optional[List[float]] = None
 
-
 class EntityItem(BaseModel):
     id: str
     group_id: str
@@ -97,7 +95,6 @@ class EntityItem(BaseModel):
     type: str
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     metadata: Optional[Dict[str, Any]] = Field(default_factory=dict)
-
 
 class MemoryQuery(BaseModel):
     group_id: str
@@ -107,36 +104,29 @@ class MemoryQuery(BaseModel):
     max_results: int = Field(default=10, ge=1, le=100)
     similarity_threshold: float = Field(default=0.7, ge=0.0, le=1.0)
 
-
 class DeleteMemoryArgs(BaseModel):
     memory_id: str
     group_id: str
 
-
 class ClearGraphArgs(BaseModel):
     group_id: str
-
 
 class MCPToolDefinition(BaseModel):
     name: str
     description: str
     parameters: Dict[str, Any]
 
-
 # --- Utility Functions ---
 def generate_id(content: str, group_id: str, prefix: str = "mem") -> str:
     return f"{prefix}_{group_id[:8]}_{hashlib.sha256(f'{content}{group_id}{datetime.utcnow().isoformat()}'.encode()).hexdigest()[:12]}"
-
 
 def get_neo4j_session():
     if not neo4j_driver:
         raise ConnectionError("Neo4j driver not initialized.")
     return neo4j_driver.session()
 
-
 async def run_sync_neo4j_op(fn):
     return await asyncio.to_thread(fn)
-
 
 # --- Core Logic ---
 async def store_memory_logic(memory: MemoryItem) -> Dict[str, Any]:
@@ -188,7 +178,6 @@ async def store_memory_logic(memory: MemoryItem) -> Dict[str, Any]:
             logger.error(f"Entity extraction failed for memory {memory.id}: {e}")
     return {"status": "success", "memory_id": memory.id, "group_id": memory.group_id}
 
-
 async def extract_entities_with_llm(text_content: str, group_id: str) -> List[Dict[str, Any]]:
     if not llm_client:
         logger.info("LLM client not available. Skipping entity extraction.")
@@ -228,7 +217,6 @@ async def extract_entities_with_llm(text_content: str, group_id: str) -> List[Di
         logger.error(f"LLM entity extraction error: {e}")
         return []
 
-
 async def store_extracted_entities(episode_id: str, entities: List[Dict[str, Any]], group_id: str):
     if not neo4j_driver:
         return
@@ -258,7 +246,6 @@ async def store_extracted_entities(episode_id: str, entities: List[Dict[str, Any
             )
 
     await run_sync_neo4j_op(lambda: get_neo4j_session().execute_write(_tx_logic))
-
 
 async def query_memory_logic(query: MemoryQuery) -> List[Dict[str, Any]]:
     if not neo4j_driver or not embedder:
@@ -325,7 +312,6 @@ async def query_memory_logic(query: MemoryQuery) -> List[Dict[str, Any]]:
         await cache_client.setex(cache_key, CACHE_TTL_SECONDS, json.dumps(final_results))
     return final_results
 
-
 async def get_agent_memories_logic(agent_id: str, group_id: str) -> List[Dict[str, Any]]:
     if not neo4j_driver:
         raise ConnectionError("Neo4j driver not initialized.")
@@ -352,7 +338,6 @@ async def get_agent_memories_logic(agent_id: str, group_id: str) -> List[Dict[st
         results.append(node_data)
     return results
 
-
 async def delete_memory_logic(memory_id: str, group_id: str) -> Dict[str, Any]:
     if not neo4j_driver:
         raise ConnectionError("Neo4j driver not initialized.")
@@ -370,7 +355,6 @@ async def delete_memory_logic(memory_id: str, group_id: str) -> Dict[str, Any]:
         return {"status": "success", "deleted_count": deleted_count}
     raise ValueError(f"Memory {memory_id} not found in group {group_id} or already deleted.")
 
-
 async def clear_graph_logic(group_id: str) -> Dict[str, Any]:
     if not neo4j_driver:
         raise ConnectionError("Neo4j driver not initialized.")
@@ -384,7 +368,6 @@ async def clear_graph_logic(group_id: str) -> Dict[str, Any]:
 
     deleted_count = await run_sync_neo4j_op(lambda: get_neo4j_session().execute_write(_tx))
     return {"status": "success", "nodes_deleted": deleted_count}
-
 
 # --- API Endpoints ---
 @app.get("/mcp/tools")
@@ -425,7 +408,6 @@ async def get_tools() -> List[MCPToolDefinition]:
         ),
     ]
 
-
 @app.post("/mcp/store_memory")
 async def store_memory(memory: MemoryItem) -> Dict[str, Any]:
     """Store a memory item in Neo4j and extract entities if applicable."""
@@ -434,7 +416,6 @@ async def store_memory(memory: MemoryItem) -> Dict[str, Any]:
     except Exception as e:
         logger.error(f"Error storing memory: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.post("/mcp/query_memory")
 async def query_memory(query: MemoryQuery) -> List[Dict[str, Any]]:
@@ -445,7 +426,6 @@ async def query_memory(query: MemoryQuery) -> List[Dict[str, Any]]:
         logger.error(f"Error querying memory: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.get("/mcp/agent_memories/{agent_id}/{group_id}")
 async def get_agent_memories(agent_id: str, group_id: str) -> List[Dict[str, Any]]:
     """Get all memories for a specific agent and group."""
@@ -454,7 +434,6 @@ async def get_agent_memories(agent_id: str, group_id: str) -> List[Dict[str, Any
     except Exception as e:
         logger.error(f"Error getting agent memories: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.post("/mcp/delete_memory")
 async def delete_memory(args: DeleteMemoryArgs) -> Dict[str, Any]:
@@ -465,7 +444,6 @@ async def delete_memory(args: DeleteMemoryArgs) -> Dict[str, Any]:
         logger.error(f"Error deleting memory: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.post("/mcp/clear_graph")
 async def clear_graph(args: ClearGraphArgs) -> Dict[str, Any]:
     """Clear all data for a group_id."""
@@ -474,7 +452,6 @@ async def clear_graph(args: ClearGraphArgs) -> Dict[str, Any]:
     except Exception as e:
         logger.error(f"Error clearing graph: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.get("/health")
 async def health_check():
@@ -492,7 +469,6 @@ async def health_check():
     all_healthy = all(status["backends"].values())
     status["status"] = "healthy" if all_healthy else "degraded"
     return status
-
 
 if __name__ == "__main__":
     import uvicorn

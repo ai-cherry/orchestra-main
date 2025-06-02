@@ -20,7 +20,6 @@ from core.orchestrator.src.memory.lifecycle import (
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
 async def importance_scorer_example():
     """Example of using the ImportanceScorer."""
     # Create an importance scorer with custom configuration
@@ -64,7 +63,6 @@ async def importance_scorer_example():
     logger.info(f"  Semantic: {score.semantic_score:.2f}")
 
     return score
-
 
 async def progressive_summarizer_example():
     """Example of using the ProgressiveSummarizer."""
@@ -119,7 +117,6 @@ async def progressive_summarizer_example():
         logger.info(f"Summary: {result.summary_text[:100]}...")
 
     return summaries
-
 
 async def memory_chunker_example():
     """Example of using the MemoryChunker."""
@@ -192,7 +189,6 @@ async def memory_chunker_example():
         "sentence": sentence_chunks,
         "fixed": fixed_chunks,
     }
-
 
 async def integrated_example():
     """Example of using all memory lifecycle components together."""
@@ -293,7 +289,6 @@ async def integrated_example():
         "scores": scores,
         "decisions": storage_decisions,
     }
-
 
 # Import datetime here to avoid circular import
 from datetime import datetime

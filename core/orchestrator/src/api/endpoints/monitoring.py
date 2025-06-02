@@ -15,7 +15,6 @@ from core.orchestrator.src.api.dependencies.llm import get_llm_client
 logger = get_logger(__name__)
 router = APIRouter(prefix="/monitoring", tags=["monitoring"])
 
-
 class MonitoringSummaryResponse(BaseModel):
     """Response model for monitoring summary"""
 
@@ -32,7 +31,6 @@ class MonitoringSummaryResponse(BaseModel):
     errors_by_type: Dict[str, int]
     period: Dict[str, Any]
 
-
 class CostBreakdownResponse(BaseModel):
     """Response model for cost breakdown"""
 
@@ -41,7 +39,6 @@ class CostBreakdownResponse(BaseModel):
     cost_by_day: Dict[str, float]
     cost_by_user: Dict[str, float]
     cost_by_session: Dict[str, float]
-
 
 @router.get("/summary", response_model=MonitoringSummaryResponse)
 async def get_monitoring_summary(
@@ -88,7 +85,6 @@ async def get_monitoring_summary(
     except Exception as e:
         logger.error(f"Error getting monitoring summary: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @router.get("/costs", response_model=CostBreakdownResponse)
 async def get_cost_breakdown(
@@ -148,7 +144,6 @@ async def get_cost_breakdown(
         logger.error(f"Error getting cost breakdown: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @router.get("/export")
 async def export_monitoring_data(
     format: str = Query("json", description="Export format (json or csv)"),
@@ -191,7 +186,6 @@ async def export_monitoring_data(
         logger.error(f"Error exporting monitoring data: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @router.post("/alerts/test")
 async def test_monitoring_alerts(
     alert_type: str = Query(..., description="Alert type to test (cost or error)"),
@@ -221,7 +215,6 @@ async def test_monitoring_alerts(
     except Exception as e:
         logger.error(f"Error testing alerts: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @router.get("/health")
 async def monitoring_health_check() -> Dict[str, Any]:

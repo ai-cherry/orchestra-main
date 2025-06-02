@@ -20,7 +20,6 @@ T = TypeVar("T")
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class CircuitState(Enum):
     """Circuit breaker states."""
 
@@ -28,12 +27,10 @@ class CircuitState(Enum):
     OPEN = "open"
     HALF_OPEN = "half_open"
 
-
 class CircuitBreakerError(Exception):
     """Raised when circuit breaker is open."""
 
     pass
-
 
 class CircuitBreaker:
     """Circuit breaker implementation for fault tolerance.
@@ -108,7 +105,6 @@ class CircuitBreaker:
         self.last_failure_time = datetime.now()
         if self.failure_count >= self.failure_threshold:
             self.state = CircuitState.OPEN
-
 
 class FactoryMCPAdapter(ABC):
     """Base adapter for Factory AI Droid to MCP server communication.

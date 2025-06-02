@@ -17,7 +17,6 @@ from core.infrastructure.config.settings import get_settings
 
 logger = logging.getLogger(__name__)
 
-
 class LLMProvider(Enum):
     """Supported LLM providers."""
 
@@ -27,14 +26,12 @@ class LLMProvider(Enum):
     GOOGLE = "google"
     COHERE = "cohere"
 
-
 class CompletionMode(Enum):
     """Completion modes for different use cases."""
 
     CHAT = "chat"
     COMPLETION = "completion"
     EMBEDDING = "embedding"
-
 
 @dataclass
 class LLMRequest:
@@ -53,7 +50,6 @@ class LLMRequest:
         if self.metadata is None:
             self.metadata = {}
 
-
 @dataclass
 class LLMResponse:
     """Response from an LLM provider."""
@@ -68,7 +64,6 @@ class LLMResponse:
     def __post_init__(self):
         if self.metadata is None:
             self.metadata = {}
-
 
 class LLMService:
     """
@@ -341,10 +336,8 @@ class LLMService:
 
         return prompt_cost + completion_cost
 
-
 # Global instance
 _llm_service: Optional[LLMService] = None
-
 
 def get_llm_service() -> LLMService:
     """Get the global LLM service instance."""

@@ -6,7 +6,6 @@ Import this module wherever environment configuration is needed.
 
 from pydantic import BaseSettings, Field
 
-
 class OrchestraSettings(BaseSettings):
     """
     Centralized environment variables for Orchestra AI.
@@ -18,9 +17,7 @@ class OrchestraSettings(BaseSettings):
     3. Dragonfly - Optional micro-cache for high-throughput scenarios
     """
 
-    # Legacy GCP fields (deprecated, kept for compatibility)
-    gcp_project_id: str = Field(default=None, env="GCP_PROJECT")
-    gcp_service_account_key: str = Field(default=None, env="GOOGLE_APPLICATION_CREDENTIALS")
+    gcp_service_account_key: str = Field(default=None, env="VULTR_CREDENTIALS_PATH")
 
     # GitHub and CI/CD
     github_token: str = Field(default=None, env="GITHUB_TOKEN")
@@ -51,8 +48,6 @@ class OrchestraSettings(BaseSettings):
     enable_micro_cache: bool = Field(default=False, env="ENABLE_MICRO_CACHE")
     use_redis: bool = Field(default=False, env="USE_REDIS")
 
-    # Legacy Vector DB endpoints (deprecated, use Weaviate instead)
-    pinecone_api_key: str = Field(default=None, env="PINECONE_API_KEY")
     pinecone_environment: str = Field(default=None, env="PINECONE_ENVIRONMENT")
     qdrant_url: str = Field(default=None, env="QDRANT_URL")
 
@@ -82,7 +77,6 @@ class OrchestraSettings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
-
 
 # Singleton instance for use throughout the project
 settings = OrchestraSettings()

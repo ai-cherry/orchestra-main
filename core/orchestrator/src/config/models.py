@@ -10,7 +10,6 @@ from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field, root_validator, validator
 
-
 class MemoryType(str, Enum):
     """Memory storage types supported by the system."""
 
@@ -19,7 +18,6 @@ class MemoryType(str, Enum):
     mongodb = "mongodb"
     OPENAI_VECTOR = "vertex_vector"
     IN_MEMORY = "in_memory"
-
 
 class MemoryConfig(BaseModel):
     """Configuration for agent memory systems."""
@@ -43,14 +41,12 @@ class MemoryConfig(BaseModel):
             raise ValueError(f"vector_dimension required for {values['memory_type']} memory type")
         return v
 
-
 class ToolConfig(BaseModel):
     """Configuration for agent tools."""
 
     name: str
     path: str
     params: Optional[Dict[str, Any]] = None
-
 
 class AgentCapability(str, Enum):
     """Capabilities that agents can provide."""
@@ -64,7 +60,6 @@ class AgentCapability(str, Enum):
     CODE_GENERATION = "code_generation"
     MULTI_MODAL = "multi_modal"
     GENERAL = "general"
-
 
 class AgentConfig(BaseModel):
     """Configuration for individual agents."""
@@ -92,7 +87,6 @@ class AgentConfig(BaseModel):
             raise ValueError(f"PhiData agents must use agno.* classes, got {v}")
         return v
 
-
 class TeamMode(str, Enum):
     """Team coordination modes."""
 
@@ -101,7 +95,6 @@ class TeamMode(str, Enum):
     COLLABORATE = "collaborate"
     DEBATE = "debate"
 
-
 class ControllerConfig(BaseModel):
     """Configuration for team controllers."""
 
@@ -109,7 +102,6 @@ class ControllerConfig(BaseModel):
     llm_ref: str
     role: str
     instructions: List[str]
-
 
 class TeamConfig(BaseModel):
     """Configuration for agent teams."""
@@ -121,7 +113,6 @@ class TeamConfig(BaseModel):
     members: List[str]
     controller: ControllerConfig
     memory: Optional[MemoryConfig] = None
-
 
 class AgentRegistry(BaseModel):
     """Registry of all agent and team configurations."""
@@ -141,7 +132,6 @@ class AgentRegistry(BaseModel):
                         raise ValueError(f"Team {agent_id} references unknown agent {member}")
         return values
 
-
 class LLMProvider(str, Enum):
     """Supported LLM providers."""
 
@@ -151,7 +141,6 @@ class LLMProvider(str, Enum):
     OPENAI = "vertex"
     PORTKEY = "portkey"
     OPENROUTER = "openrouter"
-
 
 class LLMConfig(BaseModel):
     """Configuration for LLM models."""
@@ -165,7 +154,6 @@ class LLMConfig(BaseModel):
 
     # Provider-specific parameters
     provider_params: Optional[Dict[str, Any]] = None
-
 
 class LLMRegistry(BaseModel):
     """Registry of all LLM configurations."""

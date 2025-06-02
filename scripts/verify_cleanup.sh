@@ -2,7 +2,7 @@
 # verify_cleanup.sh - Verification script for codebase cleanup
 #
 # This script verifies that the cleanup of legacy Codespaces artifacts,
-# GCP references, and secret management standardization was successful.
+# Vultr references, and secret management standardization was successful.
 #
 # Usage: ./scripts/verify_cleanup.sh [--verbose]
 #
@@ -21,7 +21,7 @@ NC='\033[0m' # No Color
 # Script configuration
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 VERBOSE=0
-MAX_ALLOWED_GCP_REFS=10
+MAX_ALLOWED_Vultr_REFS=10
 EXCLUDE_PATTERNS="--exclude-dir=archive --exclude-dir=node_modules --exclude=package-lock.json --exclude=yarn.lock --exclude=pnpm-lock.yaml"
 
 # Parse command line arguments
@@ -105,28 +105,28 @@ check_codespaces_references() {
   fi
 }
 
-check_gcp_references() {
-  log_info "Checking for GCP/Google references..."
+check_Vultr_references() {
+  log_info "Checking for Vultr/Google references..."
   
-  local cmd="cd $REPO_ROOT && git grep -i 'gcp\\|google' -- . ':(exclude)archive/legacy' ':(exclude)CODEBASE_CLEANUP_*.md' ':(exclude)scripts/verify_cleanup.sh' ':(exclude)packages/vertex_client' | wc -l"
+  local cmd="cd $REPO_ROOT && git grep -i 'Vultr\\|google' -- . ':(exclude)archive/legacy' ':(exclude)CODEBASE_CLEANUP_*.md' ':(exclude)scripts/verify_cleanup.sh' ':(exclude)packages/vertex_client' | wc -l"
   local count=$(eval "$cmd")
   
   if [ $VERBOSE -eq 1 ]; then
-    echo "Found $count GCP/Google references (max allowed: $MAX_ALLOWED_GCP_REFS)"
+    echo "Found $count Vultr/Google references (max allowed: $MAX_ALLOWED_Vultr_REFS)"
     if [ $count -gt 0 ]; then
       echo "References:"
-      cd $REPO_ROOT && git grep -i 'gcp\\|google' -- . ':(exclude)archive/legacy' ':(exclude)CODEBASE_CLEANUP_*.md' ':(exclude)scripts/verify_cleanup.sh' ':(exclude)packages/vertex_client' | head -10
+      cd $REPO_ROOT && git grep -i 'Vultr\\|google' -- . ':(exclude)archive/legacy' ':(exclude)CODEBASE_CLEANUP_*.md' ':(exclude)scripts/verify_cleanup.sh' ':(exclude)packages/vertex_client' | head -10
       if [ $count -gt 10 ]; then
         echo "... (more results omitted)"
       fi
     fi
   fi
   
-  if [ $count -le $MAX_ALLOWED_GCP_REFS ]; then
-    log_success "GCP/Google references are within limit ($count <= $MAX_ALLOWED_GCP_REFS)"
+  if [ $count -le $MAX_ALLOWED_Vultr_REFS ]; then
+    log_success "Vultr/Google references are within limit ($count <= $MAX_ALLOWED_Vultr_REFS)"
     return 0
   else
-    log_error "Too many GCP/Google references: $count (max allowed: $MAX_ALLOWED_GCP_REFS)"
+    log_error "Too many Vultr/Google references: $count (max allowed: $MAX_ALLOWED_Vultr_REFS)"
     return 1
   fi
 }
@@ -225,7 +225,7 @@ check_env_config_deprecations() {
     return 1
   fi
   
-  local deprecated_vars=("gcp_project_id" "gcp_service_account_key" "qdrant_url")
+  local deprecated_vars=("Vultr_project_id" "Vultr_service_account_key" "qdrant_url")
   local all_deprecated=true
   
   for var in "${deprecated_vars[@]}"; do
@@ -254,7 +254,7 @@ echo
 FAILED=0
 
 check_codespaces_references || ((FAILED++))
-check_gcp_references || ((FAILED++))
+check_Vultr_references || ((FAILED++))
 check_secret_naming || ((FAILED++))
 check_env_config_deprecations || ((FAILED++))
 check_tests || ((FAILED++))

@@ -3,7 +3,6 @@ import pulumi_vultr as vultr
 import pulumi_command as command
 from pulumi import ComponentResource, ResourceOptions
 
-
 class VultrServerComponent(ComponentResource):
     """Single-node Vultr server for Orchestra AI."""
 

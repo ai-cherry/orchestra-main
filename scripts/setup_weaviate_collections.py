@@ -40,7 +40,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("weaviate-setup")
 
-
 def parse_args():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(description="Set up Weaviate collections for Orchestra AI")
@@ -60,7 +59,6 @@ def parse_args():
         help="Verify collections only, don't create them",
     )
     return parser.parse_args()
-
 
 def connect_to_weaviate(endpoint: str, api_key: Optional[str] = None) -> weaviate.Client:
     """
@@ -105,7 +103,6 @@ def connect_to_weaviate(endpoint: str, api_key: Optional[str] = None) -> weaviat
     # If we get here, all retries failed
     raise ConnectionError(f"Failed to connect to Weaviate at {endpoint} after {max_retries} attempts")
 
-
 def collection_exists(client: weaviate.Client, class_name: str) -> bool:
     """
     Check if a collection already exists in Weaviate.
@@ -124,7 +121,6 @@ def collection_exists(client: weaviate.Client, class_name: str) -> bool:
     except Exception as e:
         logger.error(f"Error checking if collection {class_name} exists: {str(e)}")
         return False
-
 
 def create_collection(client: weaviate.Client, class_config: Dict[str, Any]) -> bool:
     """
@@ -151,7 +147,6 @@ def create_collection(client: weaviate.Client, class_config: Dict[str, Any]) -> 
     except Exception as e:
         logger.error(f"Error creating collection {class_name}: {str(e)}")
         return False
-
 
 def get_personal_collection_config() -> Dict[str, Any]:
     """
@@ -227,7 +222,6 @@ def get_personal_collection_config() -> Dict[str, Any]:
         },
         "replicationConfig": {"factor": 1},
     }
-
 
 def get_payready_collection_config() -> Dict[str, Any]:
     """
@@ -312,7 +306,6 @@ def get_payready_collection_config() -> Dict[str, Any]:
         "replicationConfig": {"factor": 1},
     }
 
-
 def get_paragonrx_collection_config() -> Dict[str, Any]:
     """
     Get the configuration for the ParagonRX collection.
@@ -395,7 +388,6 @@ def get_paragonrx_collection_config() -> Dict[str, Any]:
         },
         "replicationConfig": {"factor": 1},
     }
-
 
 def get_session_collection_config() -> Dict[str, Any]:
     """
@@ -489,7 +481,6 @@ def get_session_collection_config() -> Dict[str, Any]:
         "replicationConfig": {"factor": 1},
     }
 
-
 def verify_collection(client: weaviate.Client, class_name: str) -> bool:
     """
     Verify that a collection exists and has the expected configuration.
@@ -521,7 +512,6 @@ def verify_collection(client: weaviate.Client, class_name: str) -> bool:
     except Exception as e:
         logger.error(f"Error verifying collection {class_name}: {str(e)}")
         return False
-
 
 def enable_acorn(client: weaviate.Client) -> bool:
     """
@@ -557,7 +547,6 @@ def enable_acorn(client: weaviate.Client) -> bool:
     except Exception as e:
         logger.error(f"Error enabling ACORN: {str(e)}")
         return False
-
 
 def main():
     """Main entry point for the script."""
@@ -608,7 +597,6 @@ def main():
     except Exception as e:
         logger.error(f"An unexpected error occurred: {str(e)}")
         return 1
-
 
 if __name__ == "__main__":
     sys.exit(main())

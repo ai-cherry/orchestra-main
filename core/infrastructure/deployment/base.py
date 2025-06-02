@@ -11,14 +11,12 @@ from typing import Any, Dict, List, Optional
 
 from pulumi import Output
 
-
 class DeploymentEnvironment(Enum):
     """Deployment environment types."""
 
     DEV = "dev"
     STAGING = "staging"
     PROD = "prod"
-
 
 class ResourceSize(Enum):
     """Standard resource sizes."""
@@ -27,7 +25,6 @@ class ResourceSize(Enum):
     MEDIUM = "medium"  # 2 vCPU, 4GB RAM
     LARGE = "large"  # 4 vCPU, 8GB RAM
     XLARGE = "xlarge"  # 8 vCPU, 16GB RAM
-
 
 @dataclass
 class DeploymentConfig:
@@ -48,7 +45,6 @@ class DeploymentConfig:
                 "environment": self.environment.value,
                 "managed-by": "pulumi",
             }
-
 
 class CloudProvider(ABC):
     """Abstract base class for cloud providers."""
@@ -75,7 +71,6 @@ class CloudProvider(ABC):
     def create_firewall_rules(self, name: str, rules: List[Dict[str, Any]]) -> Any:
         """Create firewall rules for security."""
         pass
-
 
 class DeploymentOrchestrator:
     """Orchestrates deployments across different cloud providers."""

@@ -53,7 +53,6 @@ ISSUE_SEVERITY = {
     "missing_docstring": "info",
 }
 
-
 class Issue:
     """Represents a code issue found during analysis."""
 
@@ -76,7 +75,6 @@ class Issue:
         severity_color = {"error": RED, "warning": YELLOW, "info": BLUE}.get(self.severity, RESET)
 
         return f"{self.file_path}:{self.line} - {severity_color}{self.severity.upper()}{RESET}: {self.message}"
-
 
 class CodeVisitor(ast.NodeVisitor):
     """AST visitor to analyze Python code for issues."""
@@ -284,7 +282,6 @@ class CodeVisitor(ast.NodeVisitor):
 
         return self.issues
 
-
 def find_python_files(start_dir: str) -> List[str]:
     """Find all Python files in the given directory and its subdirectories."""
     python_files = []
@@ -298,7 +295,6 @@ def find_python_files(start_dir: str) -> List[str]:
                 python_files.append(os.path.join(root, file))
 
     return python_files
-
 
 def analyze_file(file_path: str) -> List[Issue]:
     """Analyze a single Python file for issues."""
@@ -316,7 +312,6 @@ def analyze_file(file_path: str) -> List[Issue]:
     except Exception as e:
         return [Issue(file_path, 1, "undefined_name", f"Error analyzing file: {str(e)}")]
 
-
 def analyze_codebase(directory: str) -> List[Issue]:
     """Analyze all Python files in the given directory."""
     python_files = find_python_files(directory)
@@ -332,7 +327,6 @@ def analyze_codebase(directory: str) -> List[Issue]:
         all_issues.extend(issues)
 
     return all_issues
-
 
 def print_summary(issues: List[Issue]) -> None:
     """Print a summary of the issues found."""
@@ -367,7 +361,6 @@ def print_summary(issues: List[Issue]) -> None:
     ):
         print(f"  {i+1}. {file_path}: {len(file_issues)} issues")
 
-
 def print_detailed_report(issues: List[Issue]) -> None:
     """Print a detailed report of all issues."""
     if not issues:
@@ -389,7 +382,6 @@ def print_detailed_report(issues: List[Issue]) -> None:
 
             print(f"  Line {issue.line}: {severity_color}{issue.category}{RESET} - {issue.message}")
 
-
 def main() -> int:
     """Main entry point."""
     import argparse
@@ -410,7 +402,6 @@ def main() -> int:
         print("\nRun with --detailed for a full report of all issues")
 
     return 1 if issues else 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

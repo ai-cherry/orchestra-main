@@ -19,7 +19,6 @@ from ..models.memory import CompressionLevel, MemoryEntry
 
 logger = logging.getLogger(__name__)
 
-
 class MemoryCompressionEngine:
     """Optimized memory compression engine with support for multiple content types."""
 

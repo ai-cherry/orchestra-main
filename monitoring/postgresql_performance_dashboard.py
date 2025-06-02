@@ -22,7 +22,6 @@ from shared.database.connection_manager import get_connection_manager
 from shared.database.unified_postgresql import get_unified_postgresql
 from shared.database.unified_db_v2 import get_unified_database
 
-
 class PerformanceMonitor:
     """Collects and aggregates performance metrics."""
 
@@ -156,14 +155,12 @@ class PerformanceMonitor:
 
         return [dict(stat) for stat in table_stats]
 
-
 # Create FastAPI app
 app = FastAPI(title="PostgreSQL Performance Dashboard")
 monitor = PerformanceMonitor()
 
 # WebSocket connections
 connected_clients = set()
-
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -184,7 +181,6 @@ async def websocket_endpoint(websocket: WebSocket):
         print(f"WebSocket error: {e}")
         if websocket in connected_clients:
             connected_clients.remove(websocket)
-
 
 @app.get("/")
 async def dashboard():
@@ -510,30 +506,25 @@ async def dashboard():
     """
     )
 
-
 @app.get("/api/metrics/current")
 async def get_current_metrics():
     """Get current performance metrics."""
     return await monitor.collect_metrics()
-
 
 @app.get("/api/metrics/history")
 async def get_metrics_history(minutes: int = 5):
     """Get historical metrics."""
     return await monitor.get_historical_metrics(minutes)
 
-
 @app.get("/api/query-performance")
 async def get_query_performance():
     """Get query performance statistics."""
     return await monitor.get_query_performance()
 
-
 @app.get("/api/table-stats")
 async def get_table_stats():
     """Get table statistics."""
     return await monitor.get_table_stats()
-
 
 async def periodic_metrics_collection():
     """Background task to collect metrics periodically."""
@@ -545,12 +536,10 @@ async def periodic_metrics_collection():
             print(f"Error collecting metrics: {e}")
             await asyncio.sleep(5)
 
-
 @app.on_event("startup")
 async def startup_event():
     """Start background tasks on startup."""
     asyncio.create_task(periodic_metrics_collection())
-
 
 @app.on_event("shutdown")
 async def shutdown_event():
@@ -562,7 +551,6 @@ async def shutdown_event():
     await close_unified_database()
     await close_unified_postgresql()
     await close_connection_manager()
-
 
 if __name__ == "__main__":
     # Run the dashboard

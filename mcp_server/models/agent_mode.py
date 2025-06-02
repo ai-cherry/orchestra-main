@@ -13,7 +13,6 @@ from typing import Any, Dict, List
 
 from pydantic import BaseModel, Field, validator
 
-
 class AgentModeType(str, Enum):
     """Types of specialized agent modes."""
 
@@ -27,7 +26,6 @@ class AgentModeType(str, Enum):
     PLANNER = "planner"
     ORCHESTRATOR = "orchestrator"
     DEFAULT = "default"
-
 
 class AgentModeConfig(BaseModel):
     """Configuration for an agent mode using Pydantic for validation."""
@@ -52,7 +50,6 @@ class AgentModeConfig(BaseModel):
         """Pydantic configuration."""
 
         extra = "forbid"  # Forbid extra fields
-
 
 class AgentMode(BaseModel):
     """Agent mode with configuration and state."""
@@ -130,7 +127,6 @@ Perform the following task:
         """Pydantic configuration."""
 
         arbitrary_types_allowed = True
-
 
 # Default agent mode configurations
 DEFAULT_AGENT_MODES = {

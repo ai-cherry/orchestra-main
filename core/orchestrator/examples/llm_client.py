@@ -11,7 +11,6 @@ from typing import Optional
 
 import httpx
 
-
 async def llm_interact(
     api_url: str,
     message: str,
@@ -74,7 +73,6 @@ async def llm_interact(
             print(f"Error: {response.status_code}")
             print(response.text)
 
-
 async def direct_completion(api_url: str, system_prompt: str, user_message: str, model: Optional[str] = None):
     """
     Make a direct LLM completion request.
@@ -120,7 +118,6 @@ async def direct_completion(api_url: str, system_prompt: str, user_message: str,
             print(f"Error: {response.status_code}")
             print(response.text)
 
-
 async def main():
     """Run the LLM client example."""
     # Parse command line arguments
@@ -160,7 +157,6 @@ async def main():
             user_message=args.message,
             model=args.model,
         )
-
 
 if __name__ == "__main__":
     # Run main

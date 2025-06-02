@@ -16,7 +16,6 @@ from ..utils.performance_monitor import get_performance_monitor
 
 logger = logging.getLogger(__name__)
 
-
 class SyncStorageAdapter:
     """Adapter to use async storage implementations in a synchronous context."""
 

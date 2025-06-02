@@ -20,7 +20,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.database.llm_config_models import Base
 from core.llm_router import UseCase, ModelTier, UnifiedLLMRouter
 
-
 async def create_tables(db_url: str):
     """Create all LLM configuration tables"""
     engine = create_async_engine(db_url, echo=True)
@@ -31,7 +30,6 @@ async def create_tables(db_url: str):
 
     await engine.dispose()
     print("✅ Created LLM configuration tables")
-
 
 async def migrate_existing_config(db_url: str):
     """Migrate hardcoded configurations to database"""
@@ -250,7 +248,6 @@ async def migrate_existing_config(db_url: str):
     await engine.dispose()
     print("✅ Migrated existing configurations to database")
 
-
 async def update_env_example():
     """Update env.example with new variables"""
     env_example_path = Path(__file__).parent.parent / "env.example"
@@ -278,7 +275,6 @@ OR_APP_NAME=Orchestra AI
             print("✅ Updated env.example with LLM configuration variables")
     else:
         print("⚠️  env.example not found")
-
 
 async def main():
     """Run the setup process"""
@@ -313,7 +309,6 @@ async def main():
     except Exception as e:
         print(f"\n❌ Setup failed: {str(e)}")
         raise
-
 
 if __name__ == "__main__":
     asyncio.run(main())

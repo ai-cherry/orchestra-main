@@ -17,7 +17,6 @@ from typing import Any, AsyncGenerator, Dict, List
 
 from .base_processor import BaseProcessor, StorageAdapter
 
-
 class CSVProcessor(BaseProcessor):
     """
     Async processor for CSV/TSV files.
@@ -42,7 +41,6 @@ class CSVProcessor(BaseProcessor):
         if batch:
             yield batch
 
-
 class JSONLProcessor(BaseProcessor):
     """
     Async processor for JSONL (JSON Lines) files.
@@ -58,7 +56,6 @@ class JSONLProcessor(BaseProcessor):
                 batch = []
         if batch:
             yield batch
-
 
 class JSONProcessor(BaseProcessor):
     """
@@ -76,7 +73,6 @@ class JSONProcessor(BaseProcessor):
         if batch:
             yield batch
 
-
 # Stubs for advanced formats (implementations can use aiofiles, pandas, pyarrow, etc.)
 class XMLProcessor(BaseProcessor):
     """
@@ -87,7 +83,6 @@ class XMLProcessor(BaseProcessor):
         # TODO: Implement efficient, streaming XML parsing (e.g., with lxml or xml.etree)
         raise NotImplementedError
 
-
 class PDFProcessor(BaseProcessor):
     """
     Async processor for PDF files (extracts text per page).
@@ -96,7 +91,6 @@ class PDFProcessor(BaseProcessor):
     async def batch_generator(self, source: Any) -> AsyncGenerator[List[Dict[str, Any]], None]:
         # TODO: Implement PDF text extraction (e.g., with PyPDF2 or pdfminer.six)
         raise NotImplementedError
-
 
 class ExcelProcessor(BaseProcessor):
     """
@@ -107,7 +101,6 @@ class ExcelProcessor(BaseProcessor):
         # TODO: Implement Excel reading (e.g., with openpyxl or pandas)
         raise NotImplementedError
 
-
 class ParquetProcessor(BaseProcessor):
     """
     Async processor for Parquet files.
@@ -116,7 +109,6 @@ class ParquetProcessor(BaseProcessor):
     async def batch_generator(self, source: Any) -> AsyncGenerator[List[Dict[str, Any]], None]:
         # TODO: Implement Parquet reading (e.g., with pyarrow or pandas)
         raise NotImplementedError
-
 
 class AvroProcessor(BaseProcessor):
     """

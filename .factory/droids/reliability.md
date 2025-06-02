@@ -5,7 +5,7 @@ The Reliability Droid specializes in deployment, monitoring, and infrastructure 
 
 ## Capabilities
 - **Deployment Automation**: Creates and manages deployment pipelines
-- **Infrastructure as Code**: Develops Pulumi/Terraform configurations
+- **Infrastructure as Code**: Develops Pulumi/Pulumi configurations
 - **Monitoring Setup**: Implements comprehensive monitoring solutions
 - **Incident Response**: Provides runbooks and automated remediation
 - **Capacity Planning**: Analyzes and predicts resource needs

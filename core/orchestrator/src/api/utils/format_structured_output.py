@@ -8,7 +8,6 @@ into well-formatted markdown suitable for display in the Phidata Agent UI.
 import json
 from typing import Any, Dict, Optional
 
-
 def format_dictionary_as_markdown(data: Dict[str, Any], title: Optional[str] = None) -> str:
     """
     Format a dictionary as Markdown for better UI display.
@@ -81,7 +80,6 @@ def format_dictionary_as_markdown(data: Dict[str, Any], title: Optional[str] = N
 
     return markdown
 
-
 def format_movie_script(data: Dict[str, Any]) -> str:
     """
     Format a movie script structured output as Markdown.
@@ -115,7 +113,6 @@ def format_movie_script(data: Dict[str, Any]) -> str:
                 markdown += "```\n" + scene["script_content"] + "\n```\n\n"
 
     return markdown
-
 
 def format_salesforce_results(data: Dict[str, Any]) -> str:
     """
@@ -168,7 +165,6 @@ def format_salesforce_results(data: Dict[str, Any]) -> str:
             markdown += "\n"
 
     return markdown
-
 
 def format_analysis_results(data: Dict[str, Any]) -> str:
     """
@@ -231,7 +227,6 @@ def format_analysis_results(data: Dict[str, Any]) -> str:
                 markdown += f"{value}\n\n"
 
     return markdown
-
 
 def format_structured_output_as_markdown(data: Any, output_type: Optional[str] = None) -> str:
     """

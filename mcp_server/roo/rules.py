@@ -15,7 +15,6 @@ from pydantic import BaseModel, Field, validator
 
 logger = logging.getLogger(__name__)
 
-
 class RuleType(str, Enum):
     """Types of rules that can be applied to Roo operations."""
 
@@ -27,7 +26,6 @@ class RuleType(str, Enum):
     ARCHITECTURE = "architecture"
     MEMORY_ACCESS = "memory_access"
     MODE_TRANSITION = "mode_transition"
-
 
 class RuleIntent(str, Enum):
     """Developer intents that rules can capture."""
@@ -41,14 +39,12 @@ class RuleIntent(str, Enum):
     PROTECT_MEMORY = "protect_memory"
     GUIDE_WORKFLOW = "guide_workflow"
 
-
 class RuleSeverity(str, Enum):
     """Severity levels for rule violations."""
 
     INFO = "info"
     WARNING = "warning"
     ERROR = "error"
-
 
 class RuleCondition(BaseModel):
     """A condition that must be met for a rule to apply."""
@@ -88,7 +84,6 @@ class RuleCondition(BaseModel):
 
         return not result if self.negated else result
 
-
 class Rule(BaseModel):
     """
     A rule that captures developer intent and enforces constraints
@@ -125,7 +120,6 @@ class Rule(BaseModel):
                 return False
 
         return True
-
 
 class RuleEngine:
     """
@@ -213,7 +207,6 @@ class RuleEngine:
             List of rules of the specified type
         """
         return [rule for rule in self.rules.values() if rule.type == rule_type and rule.enabled]
-
 
 # Example rule definitions
 FILE_PATTERN_RULES = [
@@ -354,7 +347,6 @@ MODE_TRANSITION_RULES = [
 
 # Combine all rules
 DEFAULT_RULES = FILE_PATTERN_RULES + CODE_STYLE_RULES + SECURITY_RULES + MEMORY_ACCESS_RULES + MODE_TRANSITION_RULES
-
 
 def create_rule_engine() -> RuleEngine:
     """

@@ -21,7 +21,6 @@ from packages.shared.src.storage.base import ToolRegistry
 
 logger = logging.getLogger(__name__)
 
-
 class OrchestraAgentBase(ABC):
     """
     Abstract Base Class for all agent wrappers in the Orchestra system.

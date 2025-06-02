@@ -34,7 +34,6 @@ AsyncF = TypeVar("AsyncF", bound=Callable[..., Any])
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class ErrorSeverity(enum.Enum):
     """Error severity levels for standardized error handling."""
 
@@ -43,7 +42,6 @@ class ErrorSeverity(enum.Enum):
     WARNING = "warning"
     ERROR = "error"
     CRITICAL = "critical"
-
 
 class BaseError(Exception):
     """Base class for all custom exceptions in the codebase."""
@@ -98,7 +96,6 @@ class BaseError(Exception):
         if self.cause:
             return f"{self.message} (caused by: {type(self.cause).__name__}: {str(self.cause)})"
         return self.message
-
 
 def handle_exception(
     target_error: Optional[Type[BaseError]] = None,
@@ -178,7 +175,6 @@ def handle_exception(
 
     return decorator
 
-
 def handle_async_exception(
     target_error: Optional[Type[BaseError]] = None,
     logger: Optional[logging.Logger] = None,
@@ -257,7 +253,6 @@ def handle_async_exception(
 
     return decorator
 
-
 @contextmanager
 def error_context(
     target_error: Type[BaseError],
@@ -326,7 +321,6 @@ def error_context(
             cause=e,
         ) from e
 
-
 def safe_execute(
     func: Callable[..., T],
     *args: Any,
@@ -363,7 +357,6 @@ def safe_execute(
             logger.debug(traceback.format_exc())
         return default
 
-
 async def safe_execute_async(
     func: Callable[..., Any],
     *args: Any,
@@ -399,7 +392,6 @@ async def safe_execute_async(
             logger.error(f"Error executing {func.__name__}: {str(e)}")
             logger.debug(traceback.format_exc())
         return default
-
 
 def with_retry(
     max_attempts: int = 3,
@@ -474,7 +466,6 @@ def with_retry(
         return cast(F, wrapper)
 
     return decorator
-
 
 async def with_async_retry(
     max_attempts: int = 3,
@@ -552,7 +543,6 @@ async def with_async_retry(
 
     return decorator
 
-
 def map_exception(
     exception: Exception,
     target_error: Type[BaseError],
@@ -581,44 +571,33 @@ def map_exception(
     error_message = message or str(exception)
     return target_error(message=error_message, cause=exception)
 
-
 # Domain-specific error examples (to be moved to their own modules)
-
 
 class ConfigError(BaseError):
     """Error related to configuration issues."""
 
-
 class DataProcessingError(BaseError):
     """Error related to data processing."""
-
 
 class NetworkError(BaseError):
     """Error related to network operations."""
 
-
 class DatabaseError(BaseError):
     """Error related to database operations."""
-
 
 class ValidationError(BaseError):
     """Error related to validation failures."""
 
-
 class AuthenticationError(BaseError):
     """Error related to authentication failures."""
-
 
 class AuthorizationError(BaseError):
     """Error related to authorization failures."""
 
-
 class ResourceNotFoundError(BaseError):
     """Error raised when a resource cannot be found."""
 
-
 # Usage examples
-
 
 def example_with_decorator() -> None:
     """Example of using the error handling decorator."""
@@ -635,7 +614,6 @@ def example_with_decorator() -> None:
     except ConfigError as e:
         print(f"Caught error: {e}")
 
-
 def example_with_context_manager() -> None:
     """Example of using the error context manager."""
 
@@ -649,7 +627,6 @@ def example_with_context_manager() -> None:
     except DataProcessingError as e:
         print(f"Caught error: {e}")
 
-
 def example_with_safe_execute() -> None:
     """Example of using safe execution."""
 
@@ -661,7 +638,6 @@ def example_with_safe_execute() -> None:
     # This will return the default value ({}) instead of raising an exception
     result = safe_execute(parse_json, "{invalid: json}", default={})
     print(f"Result: {result}")
-
 
 async def example_with_retry() -> None:
     """Example of using retry logic."""
@@ -683,7 +659,6 @@ async def example_with_retry() -> None:
         print(f"Result after {attempt_count} attempts: {result}")
     except Exception as e:
         print(f"Failed after {attempt_count} attempts: {e}")
-
 
 if __name__ == "__main__":
     # Configure logging

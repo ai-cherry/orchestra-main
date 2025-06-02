@@ -23,13 +23,11 @@ from pathlib import Path
 from typing import Dict, List, Set, Tuple, Optional
 import yaml
 
-
 # Constants
 ORG_SECRET_PREFIX = "ORG_"
 GITHUB_SECRET_PATTERN = re.compile(r"secrets\.([A-Za-z0-9_]+)")
 ENV_SECRET_PATTERN = re.compile(r"\$\{\{\s*secrets\.([A-Za-z0-9_]+)\s*\}\}")
 PROD_SUFFIX_PATTERN = re.compile(r"(.+)_PROD$")
-
 
 class SecretAnalyzer:
     """Analyzes GitHub workflow files for secret usage patterns."""
@@ -203,7 +201,6 @@ class SecretAnalyzer:
         self.analyze_naming_conventions()
         return True
 
-
 def main():
     parser = argparse.ArgumentParser(description="Analyze GitHub workflow files for secret usage patterns")
     parser.add_argument("--fix", action="store_true", help="Apply recommended changes to workflow files")
@@ -242,7 +239,6 @@ def main():
             print("No changes needed in workflow file")
 
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

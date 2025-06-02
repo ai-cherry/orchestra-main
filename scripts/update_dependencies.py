@@ -14,7 +14,6 @@ from typing import List
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
 def check_pip_tools() -> bool:
     """Check if pip-tools is installed."""
     try:
@@ -23,7 +22,6 @@ def check_pip_tools() -> bool:
     except ImportError:
         logger.error("pip-tools not installed. Run: pip install pip-tools")
         return False
-
 
 def compile_requirements(in_file: str, out_file: str, upgrade: bool = False) -> bool:
     """Compile requirements.in to requirements.txt."""
@@ -43,7 +41,6 @@ def compile_requirements(in_file: str, out_file: str, upgrade: bool = False) -> 
         logger.error(f"Error compiling requirements: {e}")
         return False
 
-
 def check_outdated() -> List[str]:
     """Check for outdated packages."""
     try:
@@ -60,7 +57,6 @@ def check_outdated() -> List[str]:
     except Exception as e:
         logger.error(f"Error checking outdated packages: {e}")
     return []
-
 
 def security_audit() -> List[str]:
     """Run security audit on installed packages."""
@@ -80,7 +76,6 @@ def security_audit() -> List[str]:
         logger.error(f"Error running security audit: {e}")
 
     return vulnerabilities
-
 
 def main():
     """Main dependency update workflow."""
@@ -163,7 +158,6 @@ def main():
             f.write(f"  - {vuln}\n")
 
     logger.info(f"\n📄 Report saved to: {report_file}")
-
 
 if __name__ == "__main__":
     main()

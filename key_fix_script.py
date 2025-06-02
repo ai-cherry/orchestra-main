@@ -17,7 +17,6 @@ import json
 import re
 import sys
 
-
 def fix_private_key(private_key: str) -> str:
     """Fix common issues with private key formatting."""
     # Replace escaped newlines with actual newlines
@@ -46,7 +45,6 @@ def fix_private_key(private_key: str) -> str:
     private_key = "".join(c for c in private_key if c.isprintable() or c == "\n")
 
     return private_key
-
 
 def main():
     parser = argparse.ArgumentParser(description="Fix GCP service account key file issues")
@@ -114,7 +112,6 @@ def main():
     except FileNotFoundError:
         print(f"Error: Key file not found: {args.input}")
         sys.exit(1)
-
 
 if __name__ == "__main__":
     main()

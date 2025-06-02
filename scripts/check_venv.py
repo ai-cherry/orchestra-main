@@ -2,7 +2,6 @@ import sys
 
 MIN_PYTHON_VERSION = (3, 10)  # Require Python 3.10+
 
-
 def check_virtual_environment() -> None:
     """Check if we're in a virtual environment and provide guidance if not."""
     if not hasattr(sys, "prefix") or sys.prefix == sys.base_prefix:
@@ -24,7 +23,6 @@ def check_virtual_environment() -> None:
 
     print("Virtual environment and Python version are OK.")
     sys.exit(0)
-
 
 if __name__ == "__main__":
     check_virtual_environment()

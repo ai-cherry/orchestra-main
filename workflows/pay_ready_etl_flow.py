@@ -22,7 +22,6 @@ from services.pay_ready.etl_orchestrator import SourceType
 
 logger = logging.getLogger(__name__)
 
-
 @task(
     name="Initialize Services",
     description="Initialize all required services for the ETL pipeline",
@@ -42,7 +41,6 @@ async def initialize_services() -> Dict[str, Any]:
         "entity_resolver": orchestrator.entity_resolver,
         "memory_manager": orchestrator.memory_manager,
     }
-
 
 @task(
     name="Trigger Source Sync",
@@ -70,7 +68,6 @@ async def trigger_source_sync(orchestrator: PayReadyETLOrchestrator, source: str
             "timestamp": datetime.utcnow().isoformat(),
         }
 
-
 @task(
     name="Wait for Sync Completion",
     description="Wait for Airbyte sync job to complete",
@@ -97,7 +94,6 @@ async def wait_for_sync_completion(
     sync_info.update({"status": "completed" if success else "failed", "completed_at": datetime.utcnow().isoformat()})
 
     return sync_info
-
 
 @task(name="Process Source Data", description="Process new data from a source", retries=2, retry_delay_seconds=60)
 async def process_source_data(
@@ -127,7 +123,6 @@ async def process_source_data(
             "timestamp": datetime.utcnow().isoformat(),
         }
 
-
 @task(name="Run Entity Resolution", description="Run batch entity resolution", retries=2, retry_delay_seconds=30)
 async def run_entity_resolution(entity_resolver: PayReadyEntityResolver) -> Dict[str, Any]:
     """Run batch entity resolution."""
@@ -146,7 +141,6 @@ async def run_entity_resolution(entity_resolver: PayReadyEntityResolver) -> Dict
         logger.error(f"Entity resolution failed: {e}")
         return {"status": "failed", "error": str(e), "timestamp": datetime.utcnow().isoformat()}
 
-
 @task(name="Update Analytics Cache", description="Update analytics and warm caches", retries=1, retry_delay_seconds=30)
 async def update_analytics_cache(orchestrator: PayReadyETLOrchestrator) -> Dict[str, Any]:
     """Update analytics cache and warm memory caches."""
@@ -164,7 +158,6 @@ async def update_analytics_cache(orchestrator: PayReadyETLOrchestrator) -> Dict[
         logger.error(f"Failed to update analytics cache: {e}")
         return {"status": "failed", "error": str(e), "timestamp": datetime.utcnow().isoformat()}
 
-
 @task(
     name="Flush Pending Vectors", description="Flush any pending vectors to Weaviate", retries=2, retry_delay_seconds=30
 )
@@ -180,7 +173,6 @@ async def flush_pending_vectors(memory_manager: PayReadyMemoryManager) -> Dict[s
     except Exception as e:
         logger.error(f"Failed to flush vectors: {e}")
         return {"status": "failed", "error": str(e), "timestamp": datetime.utcnow().isoformat()}
-
 
 @task(name="Generate Pipeline Report", description="Generate a summary report of the pipeline execution", retries=1)
 async def generate_pipeline_report(
@@ -252,7 +244,6 @@ async def generate_pipeline_report(
     )
 
     return report
-
 
 @flow(
     name="pay-ready-etl-pipeline",
@@ -343,7 +334,6 @@ async def pay_ready_etl_pipeline(
 
     return summary
 
-
 @flow(
     name="pay-ready-incremental-sync",
     description="Incremental sync for a specific Pay Ready source",
@@ -396,7 +386,6 @@ async def pay_ready_incremental_sync(source: str, batch_size: int = 100) -> Dict
         "error": sync_result.get("error"),
         "timestamp": datetime.utcnow().isoformat(),
     }
-
 
 # CLI entry point for testing
 if __name__ == "__main__":

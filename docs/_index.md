@@ -17,7 +17,7 @@ Welcome! Start here to navigate the most relevant, up-to-date documentation for 
 
 - [- [cloud_run_deployment.md](cloud_run_deployment.md)
 - [infra.md](infra.md) — high-level infra topology
-- **Legacy Terraform appendix:** [TERRAFORM_INFRASTRUCTURE_GUIDE.md](TERRAFORM_INFRASTRUCTURE_GUIDE.md)
+- **Pulumi guide:** [PULUMI_INFRASTRUCTURE_GUIDE.md](PULUMI_INFRASTRUCTURE_GUIDE.md)
 
 ## 4 — Memory System
 

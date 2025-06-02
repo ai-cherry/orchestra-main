@@ -13,14 +13,12 @@ from typing import Optional
 from core.personas.manager import PersonaConfigManager, PersonaConfigError, PersonaNotFoundError
 from core.personas.models import PersonaStatus
 
-
 def setup_logging() -> None:
     """Configure logging for the example."""
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
-
 
 def demonstrate_persona_loading(config_dir: Path) -> None:
     """
@@ -46,7 +44,6 @@ def demonstrate_persona_loading(config_dir: Path) -> None:
 
     except PersonaConfigError as e:
         print(f"Error loading personas: {e}")
-
 
 def demonstrate_persona_access(config_dir: Path) -> None:
     """
@@ -79,7 +76,6 @@ def demonstrate_persona_access(config_dir: Path) -> None:
         except PersonaNotFoundError as e:
             print(f"  Error: {e}")
 
-
 def demonstrate_filtering(config_dir: Path) -> None:
     """
     Demonstrate filtering personas by various criteria.
@@ -103,7 +99,6 @@ def demonstrate_filtering(config_dir: Path) -> None:
     print(f"\nStrategic Personas: {len(strategic_personas)}")
     for persona in strategic_personas:
         print(f"  - {persona.name}")
-
 
 def demonstrate_persona_details(config_dir: Path, slug: str = "cherry") -> None:
     """
@@ -165,7 +160,6 @@ def demonstrate_persona_details(config_dir: Path, slug: str = "cherry") -> None:
     except PersonaNotFoundError as e:
         print(f"Error: {e}")
 
-
 def demonstrate_validation(config_dir: Path) -> None:
     """
     Demonstrate persona validation.
@@ -188,7 +182,6 @@ def demonstrate_validation(config_dir: Path) -> None:
             print(f"\n{slug}:")
             for issue in persona_issues:
                 print(f"  - {issue}")
-
 
 def demonstrate_export(config_dir: Path, output_dir: Optional[Path] = None) -> None:
     """
@@ -221,7 +214,6 @@ def demonstrate_export(config_dir: Path, output_dir: Optional[Path] = None) -> N
     except Exception as e:
         print(f"Error exporting: {e}")
 
-
 def main() -> None:
     """Run all demonstrations."""
     setup_logging()
@@ -250,7 +242,6 @@ def main() -> None:
 
     print("\n" + "=" * 50)
     print("Example completed!")
-
 
 if __name__ == "__main__":
     main()

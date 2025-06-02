@@ -26,7 +26,6 @@ except ImportError:
 # Configure logging
 logger = logging.getLogger(__name__)
 
-
 class ConversationState(BaseModel):
     """
     Represents the state of an active conversation.
@@ -41,7 +40,6 @@ class ConversationState(BaseModel):
     start_time: datetime = datetime.utcnow()
     last_activity: datetime = datetime.utcnow()
     turn_count: int = 0
-
 
 class ConversationService:
     """
@@ -349,7 +347,6 @@ class ConversationService:
             StorageError: If the storage operation fails
         """
         return await self._memory_manager.add_memory_item(item)
-
 
 @lru_cache()
 def get_conversation_service() -> ConversationService:

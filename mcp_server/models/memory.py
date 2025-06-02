@@ -14,7 +14,6 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-
 class MemoryType(str, Enum):
     """Memory type classification."""
 
@@ -24,7 +23,6 @@ class MemoryType(str, Enum):
     HISTORY = "history"  # Conversation or operation history
     KNOWLEDGE = "knowledge"  # Long-term knowledge base content
 
-
 class MemoryScope(str, Enum):
     """Memory scope classification."""
 
@@ -32,7 +30,6 @@ class MemoryScope(str, Enum):
     GLOBAL = "global"  # Globally available across sessions
     PROJECT = "project"  # Specific to a project or workspace
     USER = "user"  # Specific to a user
-
 
 class CompressionLevel(int, Enum):
     """Memory compression levels."""
@@ -44,14 +41,12 @@ class CompressionLevel(int, Enum):
     EXTREME = 4
     REFERENCE_ONLY = 5
 
-
 class StorageTier(str, Enum):
     """Memory storage tiers with implementation mapping."""
 
     HOT = "hot"  # Real-time layer (Redis)
     WARM = "warm"  # Recent but not critical (Redis with longer TTL)
     COLD = "cold"  # Historical content (AlloyDB/PostgreSQL)
-
 
 @dataclass
 class MemoryMetadata:
@@ -98,7 +93,6 @@ class MemoryMetadata:
             embedding_model=data.get("embedding_model"),
             tags=data.get("tags", []),
         )
-
 
 @dataclass
 class MemoryEntry:
