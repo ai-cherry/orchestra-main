@@ -15,7 +15,7 @@ tiktoken==0.5.2
 
 # Memory and storage
 redis==5.0.1
-psycopg2-binary==2.9.9
+psycopg2-binary==2.9.10
 
 # Orchestra integration
 
