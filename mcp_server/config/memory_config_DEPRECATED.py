@@ -1,3 +1,22 @@
+"""
+# #####################################################################################
+# DEPRECATION WARNING (2024-07-24):
+# This configuration file appears to be unused by the primary memory management
+# systems (`UnifiedMemoryManager`, `UnifiedMemoryService`, `UnifiedDatabase`).
+# It defines a tiered memory system (Redis, Firestore, AlloyDB) that does not seem
+# to be actively loaded or utilized by any of the current server implementations
+# or core memory services.
+#
+# Please verify if any part of the system still relies on these specific dictionary
+# configurations (REDIS_CONFIG, FIRESTORE_CONFIG, ALLOYDB_CONFIG, MEMORY_TIER_CONFIG)
+# before final removal.
+#
+# Refs:
+# - `core/config/unified_config.py` (used by `UnifiedDatabase`)
+# - `core/memory/config.py` (used by `UnifiedMemoryManager`)
+# - `core/infrastructure/config/settings.py` (used by `UnifiedMemoryService` via `MCPServiceRegistry`)
+# #####################################################################################
+"""
 #!/usr/bin/env python3
 """
 Memory configuration for the MCP server.
