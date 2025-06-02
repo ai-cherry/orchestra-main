@@ -1,5 +1,6 @@
 # Auto-generated constraints file
 # Generated: 2025-05-30T22:12:54.681523
+# Updated: 2025-06-02 (Security fixes applied)
 # Python: 3.10.12 (main, Feb  4 2025, 14:57:36) [GCC 11.4.0]
 # Total packages: 258
 # This file locks EVERY package version to prevent conflicts
@@ -104,9 +105,9 @@ jsonschema==4.23.0
 jsonschema-specifications==2025.4.1
 kubernetes==32.0.1
 litellm==1.70.4
-llama-index==0.10.38
+llama-index==0.12.9
 llama-index-agent-openai==0.2.9
-llama-index-cli==0.1.13
+llama-index-cli==0.4.1
 llama-index-core==0.10.68.post1
 llama-index-embeddings-openai==0.1.11
 llama-index-indices-managed-llama-cloud==0.1.6
