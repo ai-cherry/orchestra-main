@@ -2,7 +2,11 @@
   "compilerOptions": {
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "skipLibCheck": true,
     "moduleResolution": "bundler",
@@ -18,10 +22,31 @@
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
-    "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"] // Added Vitest and testing library types
+    "types": [
+      "vite/client",
+      "vitest/globals",
+      "@testing-library/jest-dom"
+    ],
+    // Enhanced strictness - gradual adoption
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": false, // Start false, enable later
+    "noUncheckedIndexedAccess": false, // Start false, enable later
+    "exactOptionalPropertyTypes": false, // Start false, enable later
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false
   },
-  "include": ["src", "vite.config.ts", "vitest.config.ts"], // Ensure vite.config.ts is included if it defines test types. vitest.config.ts if you separate it
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": [
+    "src",
+    "vite.config.ts",
+    "vitest.config.ts"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }

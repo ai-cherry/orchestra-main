@@ -1378,3 +1378,5 @@ INFO:     148.113.214.206:34250 - "GET / HTTP/1.1" 404 Not Found
 INFO:     40.71.224.172:0 - "GET /api/healthz HTTP/1.1" 404 Not Found
 INFO:     127.0.0.1:33186 - "GET /health HTTP/1.1" 404 Not Found
 INFO:     127.0.0.1:55308 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:47410 - "GET /health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:43934 - "GET /health HTTP/1.1" 404 Not Found
