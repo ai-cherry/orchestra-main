@@ -2,9 +2,9 @@
 # This file contains environment-specific settings for the production deployment
 
 config:
-  # GCP Configuration
-  gcp:project: ${GCP_PROJECT_ID}
-  gcp:region: us-central1
+  # Vultr Configuration
+  vultr:project: ${Vultr_PROJECT_ID}
+  vultr:region: us-central1
   
   # Application Configuration
   admin-ui-infrastructure:environment: production

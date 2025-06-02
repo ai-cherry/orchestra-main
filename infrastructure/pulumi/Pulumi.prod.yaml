@@ -1,0 +1,7 @@
+# Production environment configuration
+config:
+  cherry-ai-infrastructure:region: ewr
+  cherry-ai-infrastructure:k8s_node_plan: vc2-4c-8gb  # Production-grade instances
+  cherry-ai-infrastructure:monitoring_plan: vc2-2c-4gb  # Better monitoring
+  cherry-ai-infrastructure:postgres_plan: vultr-dbaas-business-cc-2-110-4  # Production DB
+  cherry-ai-infrastructure:redis_plan: vultr-dbaas-startup-cc-1-55-2  # Better Redis

@@ -133,8 +133,8 @@ docker run -d \
     -v /opt/pulumi-migration/state:/app/.pulumi-migration \
     -v /opt/pulumi-migration/reports:/app/reports \
     -e PULUMI_ACCESS_TOKEN="${PULUMI_ACCESS_TOKEN}" \
-    -e GCP_PROJECT_ID="${GCP_PROJECT_ID}" \
-    -e GCP_REGION="${GCP_REGION:-us-central1}" \
+    -e Vultr_PROJECT_ID="${Vultr_PROJECT_ID}" \
+    -e Vultr_REGION="${Vultr_REGION:-us-central1}" \
     -e NODE_ENV=production \
     --memory="4g" \
     --cpus="2" \
@@ -161,8 +161,8 @@ EOF
          DOCKER_IMAGE='${DOCKER_IMAGE}' \
          DOCKER_TAG='${DOCKER_TAG}' \
          PULUMI_ACCESS_TOKEN='${PULUMI_ACCESS_TOKEN:-}' \
-         GCP_PROJECT_ID='${GCP_PROJECT_ID:-}' \
-         GCP_REGION='${GCP_REGION:-}' \
+         Vultr_PROJECT_ID='${Vultr_PROJECT_ID:-}' \
+         Vultr_REGION='${Vultr_REGION:-}' \
          /tmp/deploy-remote.sh"
     
     # Clean up

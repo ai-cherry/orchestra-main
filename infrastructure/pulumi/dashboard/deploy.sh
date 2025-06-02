@@ -39,7 +39,7 @@ check_prerequisites() {
     
     # Check if gcloud is installed
     if ! command -v gcloud &> /dev/null; then
-        print_color "$RED" "Error: Google Cloud SDK is not installed. Please install gcloud CLI."
+        print_color "$RED" "Error: Vultr SDK is not installed. Please install gcloud CLI."
         exit 1
     fi
     
@@ -86,9 +86,9 @@ load_env_vars() {
     
     # Verify required environment variables
     local required_vars=(
-        "GCP_PROJECT_ID"
+        "Vultr_PROJECT_ID"
         "PULUMI_ACCESS_TOKEN"
-        "GCP_SA_KEY"
+        "Vultr_SA_KEY"
         "API_URL"
     )
     
@@ -100,25 +100,25 @@ load_env_vars() {
     done
 }
 
-# Function to configure GCP authentication
-configure_gcp() {
-    print_color "$BLUE" "Configuring GCP authentication..."
+# Function to configure Vultr authentication
+configure_Vultr() {
+    print_color "$BLUE" "Configuring Vultr authentication..."
     
     # Create temporary key file
-    local key_file="/tmp/gcp-key-$$.json"
-    echo "$GCP_SA_KEY" > "$key_file"
+    local key_file="/tmp/Vultr-key-$$.json"
+    echo "$Vultr_SA_KEY" > "$key_file"
     
-    # Authenticate with GCP
-    gcloud auth activate-service-account --key-file="$key_file"
-    gcloud config set project "$GCP_PROJECT_ID"
+    # Authenticate with Vultr
+    # vultr-cli auth activate-service-account --key-file="$key_file"
+    # vultr-cli config set project "$Vultr_PROJECT_ID"
     
     # Configure Docker for GCR
-    gcloud auth configure-docker --quiet
+    # vultr-cli auth configure-docker --quiet
     
     # Clean up key file
     rm -f "$key_file"
     
-    print_color "$GREEN" "✓ GCP authentication configured"
+    print_color "$GREEN" "✓ Vultr authentication configured"
 }
 
 # Function to select Pulumi stack
@@ -150,13 +150,13 @@ configure_stack() {
     print_color "$BLUE" "Configuring Pulumi stack..."
     
     # Set configuration values
-    pulumi config set gcp:project "$GCP_PROJECT_ID"
-    pulumi config set gcp:region "${GCP_REGION:-us-central1}"
+    pulumi config set Vultr:project "$Vultr_PROJECT_ID"
+    pulumi config set Vultr:region "${Vultr_REGION:-us-central1}"
     pulumi config set apiUrl "$API_URL"
     
     # Set secrets
     pulumi config set --secret apiKey "${API_KEY:-}"
-    pulumi config set --secret gcpServiceAccountKey "$GCP_SA_KEY"
+    pulumi config set --secret VultrServiceAccountKey "$Vultr_SA_KEY"
     
     # Set optional values
     [ -n "${ALERT_CHANNEL:-}" ] && pulumi config set alertChannelId "$ALERT_CHANNEL"
@@ -252,7 +252,7 @@ main() {
     # Run deployment steps
     check_prerequisites
     load_env_vars "$env"
-    configure_gcp
+    configure_Vultr
     select_stack "$env"
     configure_stack "$env"
     run_pulumi "$action" "$env"

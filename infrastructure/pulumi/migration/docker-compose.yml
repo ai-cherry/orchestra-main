@@ -15,10 +15,10 @@ services:
       PULUMI_CONFIG_PASSPHRASE: ${PULUMI_CONFIG_PASSPHRASE:-}
       PULUMI_BACKEND_URL: ${PULUMI_BACKEND_URL:-file://~/.pulumi}
       
-      # GCP configuration
-      GOOGLE_APPLICATION_CREDENTIALS: /app/credentials/gcp-key.json
-      GCP_PROJECT_ID: ${GCP_PROJECT_ID}
-      GCP_REGION: ${GCP_REGION:-us-central1}
+      # Vultr configuration
+      VULTR_CREDENTIALS_PATH: /app/credentials/Vultr-key.json
+      Vultr_PROJECT_ID: ${Vultr_PROJECT_ID}
+      Vultr_REGION: ${Vultr_REGION:-us-central1}
       
       # Migration configuration
       MIGRATION_ENVIRONMENT: ${MIGRATION_ENVIRONMENT:-dev}
@@ -31,7 +31,7 @@ services:
       UV_THREADPOOL_SIZE: 128
     volumes:
       # Mount credentials
-      - ${GCP_CREDENTIALS_PATH:-./credentials}:/app/credentials:ro
+      - ${Vultr_CREDENTIALS_PATH:-./credentials}:/app/credentials:ro
       
       # Mount Pulumi state (for file backend)
       - ${PULUMI_HOME:-~/.pulumi}:/root/.pulumi

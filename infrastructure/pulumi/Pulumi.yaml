@@ -1,0 +1,3 @@
+name: orchestra-vultr
+runtime: python
+description: AI Orchestra infrastructure on Vultr
