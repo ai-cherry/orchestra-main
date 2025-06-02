@@ -24,7 +24,9 @@ async def test_elevenlabs():
         print("export ELEVENLABS_API_KEY=your_key_here")
         return False
     
-    print(f"✅ API Key found: {api_key[:10]}...")
+    # Show only partial key for security
+    masked_key = f"{api_key[:10]}...{api_key[-4:]}" if len(api_key) > 14 else "***"
+    print(f"✅ API Key found: {masked_key}")
     
     try:
         from agent.app.services.natural_language_processor import ResponseGenerator
