@@ -2,6 +2,7 @@
 Orchestra AI Application Configuration
 Central configuration management for the Orchestra API
 """
+
 import os
 from typing import Optional
 
@@ -48,7 +49,7 @@ ENABLE_MULTIMODAL = os.getenv("ENABLE_MULTIMODAL", "true").lower() == "true"
 
 # Media Services
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY", "")
-RESEMBLE_API_KEY = os.getenv("RESEMBLE_API_KEY", "")
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
 
 # Monitoring
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
@@ -72,10 +73,10 @@ POSTGRES_SCHEMA_KAREN = os.getenv("POSTGRES_SCHEMA_KAREN", "karen")
 def get_database_url(schema: Optional[str] = None) -> str:
     """
     Get database URL with optional schema specification
-    
+
     Args:
         schema: Optional schema name for persona-specific databases
-        
+
     Returns:
         Database URL string
     """
