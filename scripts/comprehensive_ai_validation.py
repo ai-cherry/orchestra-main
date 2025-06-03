@@ -1,35 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Comprehensive AI System Validation
-Tests all components: Cursor AI, Claude, Roo Code, Factory AI Droids, and MCP servers
 """
-
-import os
-import sys
-import json
-import time
-import asyncio
-import aiohttp
-from typing import Dict, List, Optional, Any
-from datetime import datetime
-from pathlib import Path
-import logging
-
-# Add parent directory to path for imports
-sys.path.append(str(Path(__file__).parent.parent))
-
-from shared.database import initialize_database
-from ai_components.orchestration.ai_orchestrator import WeaviateManager
-
-logger = logging.getLogger(__name__)
-
-class AISystemValidator:
     """Comprehensive validation of all AI system components"""
-    
-    def __init__(self):
-        self.db = None
-        self.weaviate_manager = WeaviateManager()
-        self.validation_results = {
             "timestamp": datetime.now().isoformat(),
             "components": {},
             "performance": {},
@@ -50,23 +23,7 @@ class AISystemValidator:
     
     async def __aenter__(self):
         """Async context manager entry"""
-        # Initialize database
-        postgres_url = os.environ.get(
-            'POSTGRES_URL',
-            'postgresql://postgres:password@localhost:5432/orchestra'
-        )
-        weaviate_url = os.environ.get('WEAVIATE_URL', 'http://localhost:8080')
-        weaviate_api_key = os.environ.get('WEAVIATE_API_KEY')
-        
-        self.db = await initialize_database(postgres_url, weaviate_url, weaviate_api_key)
-        return self
-    
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Async context manager exit"""
-        if self.db:
-            await self.db.close()
-    
-    async def validate_all_components(self) -> Dict:
         """Run comprehensive validation of all system components"""
         print("🚀 Starting Comprehensive AI System Validation...")
         
@@ -114,10 +71,6 @@ class AISystemValidator:
     
     async def _validate_mcp_servers(self) -> None:
         """Validate all MCP servers"""
-        mcp_results = {}
-        
-        for server_name, url in self.mcp_servers.items():
-            server_result = {
                 "url": url,
                 "status": "unknown",
                 "latency": 0,
@@ -126,6 +79,9 @@ class AISystemValidator:
             }
             
             try:
+
+            
+                pass
                 start_time = time.time()
                 
                 async with aiohttp.ClientSession() as session:
@@ -147,14 +103,21 @@ class AISystemValidator:
                     # Test capabilities if server is healthy
                     if server_result["status"] == "healthy":
                         try:
+
+                            pass
                             async with session.get(f"{url}/capabilities") as cap_response:
                                 if cap_response.status == 200:
                                     capabilities = await cap_response.json()
                                     server_result["capabilities"] = capabilities
-                        except Exception as e:
+                        except Exception:
+
+                            pass
                             server_result["errors"].append(f"Capabilities check failed: {e}")
                 
-            except Exception as e:
+            except Exception:
+
+                
+                pass
                 server_result["status"] = "error"
                 server_result["errors"].append(str(e))
             
@@ -169,20 +132,13 @@ class AISystemValidator:
     
     async def _validate_database_systems(self) -> None:
         """Validate PostgreSQL and Weaviate"""
-        db_results = {}
-        
-        # Test PostgreSQL
-        try:
-            start_time = time.time()
-            result = await self.db.execute_query("SELECT 1")
+            result = await self.db.# TODO: Consider adding EXPLAIN ANALYZE for performance
+execute_query("SELECT 1")
             pg_latency = time.time() - start_time
             
             # Test table access
             tables_result = await self.db.execute_query("""
-                SELECT table_name FROM information_schema.tables 
-                WHERE table_schema = 'public'
-            """)
-            
+            """
             db_results["postgresql"] = {
                 "status": "healthy",
                 "latency": pg_latency,
@@ -190,7 +146,10 @@ class AISystemValidator:
                 "version": await self._get_pg_version()
             }
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             db_results["postgresql"] = {
                 "status": "error",
                 "error": str(e)
@@ -198,6 +157,8 @@ class AISystemValidator:
         
         # Test Weaviate
         try:
+
+            pass
             start_time = time.time()
             schema = self.weaviate_manager.client.schema.get()
             weaviate_latency = time.time() - start_time
@@ -209,7 +170,10 @@ class AISystemValidator:
                 "schema": schema
             }
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             db_results["weaviate"] = {
                 "status": "error",
                 "error": str(e)
@@ -219,7 +183,6 @@ class AISystemValidator:
     
     async def _validate_cursor_ai(self) -> None:
         """Validate Cursor AI integration"""
-        cursor_results = {
             "integration_status": "unknown",
             "api_connectivity": False,
             "mcp_integration": False,
@@ -228,6 +191,9 @@ class AISystemValidator:
         }
         
         try:
+
+        
+            pass
             # Import and test Cursor AI
             from ai_components.cursor_ai.cursor_integration_enhanced import CursorAIClient
             
@@ -257,7 +223,10 @@ class AISystemValidator:
                 
                 cursor_results["integration_status"] = "operational"
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             cursor_results["integration_status"] = "error"
             cursor_results["errors"].append(str(e))
         
@@ -265,7 +234,6 @@ class AISystemValidator:
     
     async def _validate_claude(self) -> None:
         """Validate Claude integration"""
-        claude_results = {
             "integration_status": "unknown",
             "api_connectivity": False,
             "performance": {},
@@ -273,6 +241,9 @@ class AISystemValidator:
         }
         
         try:
+
+        
+            pass
             # Import and test Claude
             from ai_components.claude.claude_analyzer import ClaudeAnalyzer
             
@@ -307,7 +278,10 @@ class AISystemValidator:
                 
                 claude_results["integration_status"] = "operational"
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             claude_results["integration_status"] = "error"
             claude_results["errors"].append(str(e))
         
@@ -315,7 +289,6 @@ class AISystemValidator:
     
     async def _validate_roo_code(self) -> None:
         """Validate Roo Code integration"""
-        roo_results = {
             "configuration_status": "unknown",
             "modes_available": 0,
             "mcp_integration": False,
@@ -323,6 +296,9 @@ class AISystemValidator:
         }
         
         try:
+
+        
+            pass
             # Check Roo configuration
             roo_config_path = Path(".roo")
             if roo_config_path.exists():
@@ -348,6 +324,8 @@ class AISystemValidator:
             
             # Test memory server integration (used by Roo)
             try:
+
+                pass
                 async with aiohttp.ClientSession() as session:
                     async with session.get(
                         f"{self.mcp_servers['memory']}/roo/modes"
@@ -356,10 +334,15 @@ class AISystemValidator:
                             roo_results["memory_integration"] = True
                         else:
                             roo_results["memory_integration"] = False
-            except:
+            except Exception:
+
+                pass
                 roo_results["memory_integration"] = False
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             roo_results["configuration_status"] = "error"
             roo_results["errors"].append(str(e))
         
@@ -367,7 +350,6 @@ class AISystemValidator:
     
     async def _validate_factory_ai(self) -> None:
         """Validate Factory AI Droids"""
-        factory_results = {
             "configuration_status": "unknown",
             "droids_available": 0,
             "adapters_ready": False,
@@ -375,6 +357,9 @@ class AISystemValidator:
         }
         
         try:
+
+        
+            pass
             # Check Factory AI configuration
             factory_config_path = Path(".factory")
             if factory_config_path.exists():
@@ -409,7 +394,10 @@ class AISystemValidator:
                 factory_results["api_key_configured"] = False
                 factory_results["errors"].append("FACTORY_AI_API_KEY not configured")
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             factory_results["configuration_status"] = "error"
             factory_results["errors"].append(str(e))
         
@@ -417,7 +405,6 @@ class AISystemValidator:
     
     async def _test_performance(self) -> None:
         """Test system performance under load"""
-        performance_results = {
             "concurrent_requests": {},
             "database_performance": {},
             "memory_usage": {},
@@ -425,6 +412,9 @@ class AISystemValidator:
         }
         
         try:
+
+        
+            pass
             # Test concurrent requests to MCP servers
             print("   Testing concurrent MCP requests...")
             concurrent_tasks = []
@@ -463,6 +453,8 @@ class AISystemValidator:
             
             # Get system memory usage
             try:
+
+                pass
                 import psutil
                 memory = psutil.virtual_memory()
                 performance_results["memory_usage"] = {
@@ -471,17 +463,21 @@ class AISystemValidator:
                     "available_gb": memory.available / (1024**3),
                     "percent_used": memory.percent
                 }
-            except ImportError:
+            except Exception:
+
+                pass
                 performance_results["memory_usage"] = {"error": "psutil not available"}
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             performance_results["error"] = str(e)
         
         self.validation_results["performance"].update(performance_results)
     
     async def _test_security(self) -> None:
         """Test security aspects"""
-        security_results = {
             "api_key_security": {},
             "database_security": {},
             "network_security": {},
@@ -489,6 +485,9 @@ class AISystemValidator:
         }
         
         try:
+
+        
+            pass
             # Check API key configuration
             api_keys_configured = []
             api_keys_missing = []
@@ -512,10 +511,14 @@ class AISystemValidator:
             
             # Test database connection security
             try:
+
+                pass
                 # Check if connection uses SSL
                 ssl_result = await self.db.execute_query("SHOW ssl")
                 security_results["database_security"]["ssl_enabled"] = ssl_result[0][0] == 'on' if ssl_result else False
-            except:
+            except Exception:
+
+                pass
                 security_results["database_security"]["ssl_enabled"] = "unknown"
             
             # Test network security (basic checks)
@@ -538,14 +541,16 @@ class AISystemValidator:
             overall_security_score = (api_score + ssl_score + network_score) / 3
             security_results["scores"]["overall_security_score"] = overall_security_score
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             security_results["error"] = str(e)
         
         self.validation_results["security"] = security_results
     
     async def _test_scalability(self) -> None:
         """Test system scalability"""
-        scalability_results = {
             "horizontal_scaling": {},
             "vertical_scaling": {},
             "bottlenecks": [],
@@ -553,6 +558,9 @@ class AISystemValidator:
         }
         
         try:
+
+        
+            pass
             # Test MCP server load handling
             print("   Testing MCP server scalability...")
             load_test_results = {}
@@ -600,7 +608,10 @@ class AISystemValidator:
                     "Implement caching for frequently accessed endpoints"
                 ])
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             scalability_results["error"] = str(e)
         
         self.validation_results["scalability"] = scalability_results
@@ -692,17 +703,13 @@ class AISystemValidator:
     
     async def _measure_response_time(self, url: str) -> Dict:
         """Measure response time for a URL"""
-        try:
-            start_time = time.time()
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url, timeout=aiohttp.ClientTimeout(total=5)) as response:
-                    duration = time.time() - start_time
-                    return {
                         "success": response.status == 200,
                         "status_code": response.status,
                         "duration": duration
                     }
-        except Exception as e:
+        except Exception:
+
+            pass
             return {
                 "success": False,
                 "error": str(e),
@@ -711,10 +718,11 @@ class AISystemValidator:
     
     async def _get_pg_version(self) -> str:
         """Get PostgreSQL version"""
-        try:
             result = await self.db.execute_query("SELECT version()")
             return result[0][0] if result else "unknown"
-        except:
+        except Exception:
+
+            pass
             return "unknown"
     
     async def save_validation_report(self) -> str:
@@ -727,15 +735,15 @@ class AISystemValidator:
         
         # Also save to database
         try:
+
+            pass
             await self.db.execute_query("""
-                INSERT INTO system_validation_reports 
-                (report_data, overall_score, created_at)
-                VALUES ($1, $2, $3)
-            """, 
-            json.dumps(self.validation_results), 
+            """
             self.validation_results["overall_score"],
             datetime.now())
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.warning(f"Could not save report to database: {e}")
         
         return report_path
@@ -743,37 +751,10 @@ class AISystemValidator:
 
 async def setup_validation_database():
     """Setup database table for validation reports"""
-    # Get database URL from environment or use default
-    postgres_url = os.environ.get(
-        'POSTGRES_URL',
-        'postgresql://postgres:password@localhost:5432/orchestra'
-    )
-    
-    weaviate_url = os.environ.get('WEAVIATE_URL', 'http://localhost:8080')
-    weaviate_api_key = os.environ.get('WEAVIATE_API_KEY')
-    
-    db = await initialize_database(postgres_url, weaviate_url, weaviate_api_key)
-    
-    try:
         await db.execute_query("""
-            CREATE TABLE IF NOT EXISTS system_validation_reports (
-                id SERIAL PRIMARY KEY,
-                report_data JSONB NOT NULL,
-                overall_score FLOAT,
-                created_at TIMESTAMP WITH TIME ZONE NOT NULL
-            );
-        """, fetch=False)
-        
+        """
         await db.execute_query("""
-            CREATE INDEX IF NOT EXISTS idx_validation_reports_created_at 
-            ON system_validation_reports(created_at DESC);
-        """, fetch=False)
-    
-    finally:
-        await db.close()
-
-
-async def main():
+        """
     """Run comprehensive system validation"""
     print("🚀 Starting Comprehensive AI System Validation...")
     

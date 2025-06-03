@@ -1,55 +1,11 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Simple API key setup script for AI Orchestration
-Works without psycopg2 dependency
 """
-
-import os
-import sys
-from pathlib import Path
-from typing import Dict, Optional
-
-class SimpleSecretsManager:
     """Simple secrets manager without database dependency"""
-    
-    def __init__(self):
-        self.api_keys = {}
-        self._load_from_environment()
-    
-    def _load_from_environment(self):
         """Load API keys from environment"""
-        # List of API keys to check
-        api_key_names = [
-            'ANTHROPIC_API_KEY',
-            'OPENAI_API_KEY', 
-            'OPENROUTER_API_KEY',
-            'GROK_AI_API_KEY',
-            'MISTRAL_API_KEY',
-            'PERPLEXITY_API_KEY',
-            'ELEVEN_LABS_API_KEY',
-            'FIGMA_PERSONAL_ACCESS_TOKEN',
-            'NOTION_API_KEY',
-            'PORTKEY_API_KEY',
-            'PORTKEY_CONFIG',
-            'PHANTOM_BUSTER_API_KEY',
-            'GITHUB_TOKEN',
-            'GH_CLASSIC_PAT_TOKEN',
-            'GH_FINE_GRAINED_TOKEN'
-        ]
-        
-        for key in api_key_names:
-            value = os.environ.get(key)
-            if value:
-                self.api_keys[key] = value
-    
-    def add_api_key(self, key: str, value: str):
         """Add an API key"""
-        if value and value.strip():
-            self.api_keys[key] = value.strip()
-    
-    def save_to_env_file(self, filepath: str = '.env'):
         """Save API keys to .env file"""
-        with open(filepath, 'w') as f:
             f.write("# AI Orchestration API Keys\n")
             f.write("# DO NOT COMMIT THIS FILE TO GIT\n\n")
             
@@ -76,8 +32,6 @@ class SimpleSecretsManager:
     
     def export_to_environment(self):
         """Export keys to current environment"""
-        for key, value in self.api_keys.items():
-            os.environ[key] = value
         print(f"✓ Exported {len(self.api_keys)} API keys to environment")
     
     def display_status(self):

@@ -1,17 +1,17 @@
+# TODO: Consider adding connection pooling configuration
 """
-Base models for AI Orchestra agent orchestration system.
-
-This module defines the base data models used throughout the agent orchestration system.
+Orchestra AI - Database Models
+This module contains Pydantic models for database entities.
 """
 
+from typing import List, Dict, Any, Optional, Union
+from uuid import uuid4, UUID
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from enum import Enum
+from pydantic import BaseModel, Field, field_validator, model_validator
 
-from pydantic import BaseModel, Field
-
-class MemoryItem(BaseModel):
+""
     """Memory item stored by agents."""
-
     id: str = Field(..., description="Unique identifier for this memory item")
     content: str = Field(..., description="Content of the memory")
     source: str = Field(..., description="Source of the memory (e.g., agent ID)")
@@ -25,7 +25,6 @@ class MemoryItem(BaseModel):
 
 class AgentMessage(BaseModel):
     """Message exchanged between agents."""
-
     content: str = Field(..., description="Content of the message")
     sender: str = Field(..., description="ID of the sender agent")
     recipient: str = Field(..., description="ID of the recipient agent")
@@ -40,11 +39,6 @@ class AgentMessage(BaseModel):
 
 class PersonaTraits(BaseModel):
     """Traits that define a persona."""
-
-    adaptability: int = Field(
-        default=50,
-        ge=0,
-        le=100,
         description="Ability to adapt to new situations (0-100)",
     )
     creativity: int = Field(default=50, ge=0, le=100, description="Creativity level (0-100)")
@@ -57,7 +51,6 @@ class PersonaTraits(BaseModel):
 
 class PersonaConfig(BaseModel):
     """Configuration for a persona."""
-
     id: str = Field(..., description="Unique identifier for this persona")
     name: str = Field(..., description="Name of the persona")
     description: str = Field(..., description="Description of the persona")
@@ -75,7 +68,6 @@ class PersonaConfig(BaseModel):
 
 class AgentConfig(BaseModel):
     """Configuration for an agent."""
-
     id: str = Field(..., description="Unique identifier for this agent")
     name: str = Field(..., description="Name of the agent")
     description: str = Field(..., description="Description of the agent")
@@ -94,6 +86,5 @@ class AgentConfig(BaseModel):
 
 class AgentData(BaseModel):
     """Minimal data payload for agent runtime interactions (placeholder)."""
-
     id: str = Field(..., description="Unique identifier for the data item")
     payload: Dict[str, Any] = Field(default_factory=dict, description="Arbitrary data payload for the agent")

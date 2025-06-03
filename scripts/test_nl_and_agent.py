@@ -1,20 +1,6 @@
 #!/usr/bin/env python3
 """
-Test Natural Language Interface and Simple Agent Demo
 """
-
-import asyncio
-import os
-import sys
-from datetime import datetime
-
-# Add parent directory to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from agent.app.services.natural_language_processor import IntentClassifier, ResponseGenerator, IntentCategory
-
-# Simple Agent Demo (without full infrastructure)
-class SimpleAgent:
     def __init__(self, name="Data Monitor & Processor"):
         self.name = name
         self.id = f"agent_{datetime.now().timestamp()}"

@@ -1,17 +1,6 @@
 #!/usr/bin/env python3
 """
-Test script to verify ElevenLabs voice synthesis integration
 """
-
-import os
-import sys
-import asyncio
-from pathlib import Path
-
-# Add parent directory to path
-sys.path.insert(0, str(Path(__file__).parent))
-
-async def test_elevenlabs():
     """Test ElevenLabs voice synthesis"""
     print("🎤 Testing ElevenLabs Voice Synthesis")
     print("=" * 50)
@@ -29,6 +18,9 @@ async def test_elevenlabs():
     print(f"✅ API Key found: {masked_key}")
     
     try:
+
+    
+        pass
         from agent.app.services.natural_language_processor import ResponseGenerator
         print("✅ Successfully imported ResponseGenerator")
         
@@ -82,12 +74,17 @@ async def test_elevenlabs():
         
         return True
         
-    except ImportError as e:
+    except Exception:
+
+        
+        pass
         print(f"❌ Import error: {e}")
         print("\nMake sure to install requirements:")
         print("pip install -r requirements/base.txt")
         return False
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"❌ Error: {e}")
         import traceback
         traceback.print_exc()
@@ -99,6 +96,9 @@ async def test_voice_settings():
     print("=" * 50)
     
     try:
+
+    
+        pass
         from elevenlabs import VoiceSettings
         
         # Test different configurations
@@ -143,7 +143,10 @@ async def test_voice_settings():
         print("\n✅ Voice settings configurations ready")
         return True
         
-    except Exception as e:
+    except Exception:
+
+        
+        pass
         print(f"❌ Error testing voice settings: {e}")
         return False
 

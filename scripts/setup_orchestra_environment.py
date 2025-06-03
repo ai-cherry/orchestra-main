@@ -1,21 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Complete setup script for Orchestra AI environment.
-Sets up all configurations, dependencies, and validates the setup.
 """
-
-import os
-import shutil
-import subprocess
-import sys
-from pathlib import Path
-from typing import List
-
-class OrchestraSetup:
     """Setup Orchestra AI environment."""
-
-    def __init__(self):
-        self.root_dir = Path(__file__).parent.parent
         self.env_file = self.root_dir / ".env"
         self.env_example = self.root_dir / "env.example"
         self.errors: List[str] = []
@@ -125,6 +112,8 @@ class OrchestraSetup:
         # Install requirements
         print("  Installing Python packages...")
         try:
+
+            pass
             subprocess.run(
                 [
                     sys.executable,
@@ -138,7 +127,9 @@ class OrchestraSetup:
                 check=True,
             )
             print("  ✓ Dependencies installed")
-        except subprocess.CalledProcessError as e:
+        except Exception:
+
+            pass
             self.errors.append(f"Failed to install dependencies: {e}")
             print("  ✗ Failed to install dependencies")
 
@@ -171,89 +162,16 @@ class OrchestraSetup:
 
         # Update .ai-context-index.md
         context_index = self.root_dir / ".ai-context-index.md"
-        new_content = """# AI Context Index - Orchestra AI (GCP-Free)
-
-This index provides context for AI coding assistants working with the Orchestra AI codebase.
-
-## Architecture Overview
-
-Orchestra AI is now a **GCP-free** system using:
-- **MongoDB Atlas** for persistent memory storage
-- **DragonflyDB** (Aiven) for high-performance caching
-- **Weaviate Cloud** for vector search
-- **DigitalOcean** for deployment (optional)
-
-## Key Components
-
-### Memory System
-- `core/orchestrator/src/agents/memory/mongodb_manager.py` - MongoDB memory manager
-- `core/orchestrator/src/agents/memory/manager.py` - Memory management interface
-
-### Configuration
-- `core/orchestrator/src/config/settings.py` - Main settings (GCP-free)
-- `.env` - Environment variables
-- `.mcp.json` - MCP server configuration
-
-### External Services
-- **MongoDB Atlas**: Document storage for agent memories
-- **DragonflyDB**: Redis-compatible in-memory cache
-- **Weaviate**: Vector database for semantic search
-
-## Development Workflow
-
-1. **Local Development**: Use `docker-compose up` with local Redis/PostgreSQL
-2. **External Services**: Configure via environment variables
-3. **Testing**: Run `python scripts/test_new_setup.py`
-4. **Deployment**: Use Pulumi with DigitalOcean provider
-
-## Important Notes
-
-- No GCP dependencies remain in the codebase
-- All Google Cloud imports have been removed
-- mongodb replaced with MongoDB
-- Secret Manager replaced with environment variables
+        new_content = """
 """
-
         with open(context_index, "w") as f:
             f.write(new_content)
         print("  ✓ Updated AI context index")
 
         # Create a new context file for the current architecture
         arch_context = self.root_dir / "ARCHITECTURE_CONTEXT.md"
-        arch_content = """# Orchestra AI Architecture (Post-GCP)
-
-## System Architecture
-
-### Core Services
-1. **Orchestrator** (`core/orchestrator/`) - Main coordination service
-2. **Memory Manager** - Layered memory system with MongoDB/Redis/Weaviate
-3. **Agent System** - Phidata-based agents
-4. **API Layer** - FastAPI endpoints
-
-### Memory Architecture
-```
-┌─────────────────┐
-│   Short-term    │ → DragonflyDB (Aiven)
-├─────────────────┤
-│   Mid-term      │ → MongoDB Atlas
-├─────────────────┤
-│   Long-term     │ → Weaviate Cloud
-└─────────────────┘
-```
-
-### External Dependencies
-- **LLM Providers**: OpenRouter, OpenAI, Anthropic (via Portkey)
-- **Memory Storage**: MongoDB Atlas, DragonflyDB, Weaviate
-- **Deployment**: DigitalOcean Droplets
-
-### Development Stack
-- Python 3.10
-- FastAPI
-- Phidata (agent framework)
-- Docker Compose (local dev)
-- Pulumi (infrastructure as code)
+        arch_content = """
 """
-
         with open(arch_context, "w") as f:
             f.write(arch_content)
         print("  ✓ Created architecture context")

@@ -1,24 +1,6 @@
 #!/usr/bin/env python3
 """
-optimized_memory_sync.py - Performance-Optimized Memory Synchronization Demo
-
-A streamlined version of the memory synchronization demo that prioritizes
-performance over security for single-developer, single-user projects.
 """
-
-import json
-import logging
-import os
-import sys
-from typing import Any, Dict, Optional
-
-# Import from simple_mcp instead of the complex memory_sync_engine
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from simple_mcp import SimpleMemoryStore
-
-# Configure minimal logging
-logging.basicConfig(
-    level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[logging.StreamHandler(sys.stdout)],
 )
@@ -26,34 +8,14 @@ logger = logging.getLogger("optimized-memory-sync")
 
 class FastToolAdapter:
     """Lightweight adapter for simulating AI tool integration."""
-
-    def __init__(self, name: str, context_window: int):
         """Initialize the tool adapter with minimal overhead."""
-        self.name = name
-        self.context_window = context_window
-        self.memory = {}
         logger.info(f"Initialized {name} with context window: {context_window}")
 
     def store(self, key: str, content: Any) -> bool:
         """Store content directly without metadata overhead."""
-        self.memory[key] = content
-        return True
-
-    def retrieve(self, key: str) -> Optional[Any]:
         """Retrieve content directly."""
-        return self.memory.get(key)
-
-    def delete(self, key: str) -> bool:
         """Delete content directly."""
-        if key in self.memory:
-            del self.memory[key]
-            return True
-        return False
-
-    def get_stats(self) -> Dict[str, Any]:
         """Get simple memory statistics."""
-        total_size = sum(len(json.dumps(v)) for v in self.memory.values())
-        return {
             "entry_count": len(self.memory),
             "total_size_bytes": total_size,
             "estimated_tokens": total_size // 4,
@@ -61,21 +23,10 @@ class FastToolAdapter:
 
 class OptimizedMemoryManager:
     """Optimized memory manager for single-developer projects."""
-
     def __init__(self, storage_path: str = "./.mcp_memory"):
         """Initialize with a simple memory store."""
-        self.memory_store = SimpleMemoryStore(storage_path)
-        self.tools = {}
-
-    def register_tool(self, name: str, context_window: int) -> FastToolAdapter:
         """Register a tool with the memory manager."""
-        adapter = FastToolAdapter(name, context_window)
-        self.tools[name] = adapter
-        return adapter
-
-    def share_memory(self, key: str, content: Any, source_tool: str) -> None:
         """Share memory between tools without complex synchronization."""
-        # Store in central memory store
         self.memory_store.set(f"{source_tool}:{key}", content)
 
         # Share with other tools directly

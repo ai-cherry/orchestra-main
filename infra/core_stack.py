@@ -1,31 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 """
-DigitalOcean infrastructure core stack with ESC integration.
-Modular, type-safe Pulumi implementation for AI workloads.
 """
-
-from typing import Dict
-
-import pulumi
-import pulumi_digitalocean as do
-from pulumi import Config, Output
-
-class CoreStack:
-    def __init__(self, name: str, config: Dict[str, str]):
         """
-        Initialize core infrastructure components with ESC support.
-
-        Args:
-            name: Stack name prefix for resources
-            config: Dictionary of configuration values
         """
-        self._name = name
-        self.config = config
-        self._setup_esc_environment()
-        self._setup_networking()
-        self._setup_databases()
-        self._setup_compute()
-
-    def _setup_esc_environment(self) -> None:
         """Create ESC environment configuration with Paperspace support."""
         env = self.config.get("env", "dev")
         provider = self.config.get("provider", "digitalocean")
@@ -45,7 +22,6 @@ class CoreStack:
 
     def _setup_networking(self) -> None:
         """Configure VPC and firewall rules."""
-        self.vpc = do.Vpc(
             f"{self._name}-vpc",
             region=self.config.get("region", "nyc3"),
             ip_range="10.0.0.0/16",
@@ -62,9 +38,6 @@ class CoreStack:
 
     def _setup_databases(self) -> None:
         """Provision database services with Paperspace support."""
-        if not self.is_paperspace:
-            # DigitalOcean managed services
-            self.dragonfly = do.DatabaseCluster(
                 f"{self._name}-dragonfly",
                 engine="dragonfly",
                 version="1.8",
@@ -120,19 +93,8 @@ class CoreStack:
 
         if not self.is_paperspace:
             # DigitalOcean droplet configuration
-            startup_script = f"""#!/bin/bash
-            # Load ESC environment variables
-            eval $(pulumi env open {self.esc_env_name} --shell=sh)
-
-            # Start application
-            docker run -d \\
-                -p 3000:3000 \\
-                -e DB_URL=$MONGO_URI \\
-                -e WEAVIATE_URL=$WEAVIATE_URL \\
-                transformeroptimus/superagi
+            startup_script = f"""
             """
-
-            self.superagi = do.Droplet(
                 f"{self._name}-superagi",
                 image="docker-20-04",
                 region=self.config["region"],
@@ -144,18 +106,8 @@ class CoreStack:
             pulumi.export("superagi_ip", self.superagi.ipv4_address)
         else:
             # Paperspace local configuration
-            startup_script = f"""#!/bin/bash
-            # Load ESC environment variables
-            eval $(pulumi env open {self.esc_env_name} --shell=sh)
-
-            # Start application with Paperspace-specific ports
-            docker run -d \\
-                -p 8000:8000 \\
-                -e DB_URL=${self.env_prefix}_MONGO_URI \\
-                -e WEAVIATE_URL=${self.env_prefix}_WEAVIATE_URL \\
-                transformeroptimus/superagi
+            startup_script = f"""
             """
-
             pulumi.export("startup_script", startup_script)
 
 # Example usage

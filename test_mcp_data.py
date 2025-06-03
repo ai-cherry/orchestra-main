@@ -1,9 +1,6 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """Test script to check what data MCP servers have access to"""
-
-import os
-
-# Set environment variables before importing
 os.environ["POSTGRES_USER"] = "orchestrator"
 os.environ["POSTGRES_PASSWORD"] = "orch3str4_2024"
 os.environ["POSTGRES_DB"] = "orchestrator"
@@ -19,6 +16,9 @@ def check_mcp_data():
     print("=" * 50)
 
     try:
+
+
+        pass
         db = UnifiedDatabase()
 
         # Check PostgreSQL data
@@ -26,7 +26,8 @@ def check_mcp_data():
 
         # Sessions
         print("\n🗂️  Sessions:")
-        sessions = db.postgres.execute_query("SELECT id, data, created_at FROM orchestra.sessions LIMIT 5")
+        sessions = db.postgres.# TODO: Consider adding EXPLAIN ANALYZE for performance
+execute_query("SELECT id, data, created_at FROM orchestra.sessions LIMIT 5")
         if sessions:
             for s in sessions:
                 data = json.loads(s["data"]) if isinstance(s["data"], str) else s["data"]
@@ -66,6 +67,8 @@ def check_mcp_data():
 
         # Try to get memories
         try:
+
+            pass
             memories = db.weaviate.search_memories(agent_id="test", query="test", limit=5)
             if memories:
                 print(f"  - Found {len(memories)} memories")
@@ -73,11 +76,15 @@ def check_mcp_data():
                     print(f"    • {m.get('content', 'N/A')[:50]}...")
             else:
                 print("  - No memories found")
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"  - Error accessing memories: {str(e)}")
 
         # Try to get conversation history
         try:
+
+            pass
             conversations = db.weaviate.search_conversations(query="hello", limit=5)
             if conversations:
                 print(f"\n💬 Conversations: Found {len(conversations)} messages")
@@ -85,7 +92,9 @@ def check_mcp_data():
                     print(f"    • [{c.get('role', 'N/A')}] {c.get('message', 'N/A')[:50]}...")
             else:
                 print("\n💬 Conversations: No conversations found")
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"\n💬 Conversations: Error accessing - {str(e)}")
 
         # Add some test data if empty
@@ -94,6 +103,8 @@ def check_mcp_data():
 
         # Add a test knowledge entry
         try:
+
+            pass
             kb_id = db.add_to_knowledge_base(
                 title="MCP Test Pattern",
                 content="This is a test pattern added to verify MCP functionality. The MCP servers can search and retrieve this content.",
@@ -101,11 +112,15 @@ def check_mcp_data():
                 tags=["mcp", "test", "verification"],
             )
             print(f"✅ Added test knowledge base entry: {kb_id}")
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"⚠️  Could not add knowledge base entry: {e}")
 
         # Add a test memory
         try:
+
+            pass
             memory_id = db.weaviate.store_memory(
                 agent_id="mcp_test",
                 content="MCP servers are configured and working. PostgreSQL and Weaviate are both accessible.",
@@ -113,19 +128,27 @@ def check_mcp_data():
                 importance=0.9,
             )
             print(f"✅ Added test memory: {memory_id}")
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"⚠️  Could not add memory: {e}")
 
         # Create a test session
         try:
+
+            pass
             session_id = "test-mcp-" + datetime.now().strftime("%Y%m%d%H%M%S")
             session = db.create_session(session_id=session_id, user_id="mcp_tester", ttl_hours=24)
             print(f"✅ Created test session: {session_id}")
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"⚠️  Could not create session: {e}")
 
         # Create a test agent
         try:
+
+            pass
             agent = db.postgres.create_agent(
                 {
                     "name": "MCP Test Agent",
@@ -136,7 +159,9 @@ def check_mcp_data():
                 }
             )
             print(f"✅ Created test agent: {agent['name']} (ID: {agent['id']})")
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"⚠️  Could not create agent: {e}")
 
         print("\n✨ MCP servers can now access this test data!")
@@ -151,7 +176,10 @@ def check_mcp_data():
         print('  @orchestra-memory search_memories "MCP test"')
         print('  @orchestra-memory search_knowledge "test pattern"')
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         print(f"\n❌ Error: {e}")
         print("\nMake sure:")
         print("  1. PostgreSQL is running: sudo systemctl status postgresql")

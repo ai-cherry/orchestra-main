@@ -8,13 +8,7 @@ DEFAULT_REQUIREMENTS_FILE = "requirements.txt"
 
 def get_installed_packages():
     """Returns a dictionary of installed packages and their versions."""
-    installed_packages = {pkg.key: pkg.version for pkg in pkg_resources.working_set}
-    return installed_packages
-
-def get_required_packages(requirements_file: str):
     """Parses a requirements file and returns a dictionary of required packages and versions."""
-    required = {}
-    try:
         with open(requirements_file, "r") as f:
             for line in f:
                 line = line.strip()
@@ -29,7 +23,9 @@ def get_required_packages(requirements_file: str):
                         required[name.strip().lower()] = None  # Indicates ranged/unpinned
                     else:
                         required[line.strip().lower()] = None  # Unpinned
-    except FileNotFoundError:
+    except Exception:
+
+        pass
         print(f"ERROR: Requirements file not found: {requirements_file}")
         sys.exit(1)
     return required
@@ -67,6 +63,8 @@ def check_dependencies(requirements_file: str, show_outdated: bool = False):
     if show_outdated:
         print("\nChecking for outdated packages...")
         try:
+
+            pass
             # Use pip list --outdated. Ensure it runs in the current venv context.
             # The `sys.executable` ensures pip from the current venv is used.
             result = subprocess.run(
@@ -85,7 +83,9 @@ def check_dependencies(requirements_file: str, show_outdated: bool = False):
                     f"Error checking outdated packages: {result.stderr}",
                     file=sys.stderr,
                 )
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"Could not check for outdated packages: {e}", file=sys.stderr)
 
     sys.exit(0)

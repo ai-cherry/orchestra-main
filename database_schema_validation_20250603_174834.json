@@ -1,0 +1,110 @@
+{
+  "timestamp": "2025-06-03T17:48:29.004816",
+  "summary": {
+    "migration_files": 4,
+    "sql_files": 4,
+    "model_files": 21,
+    "schema_files": 13,
+    "total_tables": 5,
+    "total_indexes": 30,
+    "total_models": 0,
+    "duplicate_tables_count": 0,
+    "invalid_fks_count": 2,
+    "duplicate_indexes_count": 1,
+    "migration_conflicts_count": 1,
+    "model_mismatches_count": 0
+  },
+  "duplicate_tables": [],
+  "invalid_foreign_keys": [
+    {
+      "file": "/root/orchestra-main/factory_integration/schema.sql",
+      "referenced_table": "FACTORY_CONTEXT_METADATA",
+      "defined_tables": [
+        "WORKFLOW_EXECUTIONS",
+        "WORKFLOW_CHECKPOINTS",
+        "WORKFLOW_TASKS",
+        "USER_SEARCH_HISTORY",
+        "PARSED_CONTENT_2025_02"
+      ],
+      "severity": "high"
+    },
+    {
+      "file": "/root/orchestra-main/factory_integration/schema.sql",
+      "referenced_table": "FACTORY_CONTEXT_METADATA",
+      "defined_tables": [
+        "WORKFLOW_EXECUTIONS",
+        "WORKFLOW_CHECKPOINTS",
+        "WORKFLOW_TASKS",
+        "USER_SEARCH_HISTORY",
+        "PARSED_CONTENT_2025_02"
+      ],
+      "severity": "high"
+    }
+  ],
+  "duplicate_indexes": [
+    {
+      "index": "IF",
+      "count": 25,
+      "files": [
+        "/root/orchestra-main/migrations/001_llm_orchestration_schema.sql",
+        "/root/orchestra-main/migrations/001_llm_orchestration_schema.sql",
+        "/root/orchestra-main/migrations/001_llm_orchestration_schema.sql",
+        "/root/orchestra-main/migrations/001_llm_orchestration_schema.sql",
+        "/root/orchestra-main/migrations/001_llm_orchestration_schema.sql",
+        "/root/orchestra-main/migrations/004_roo_integration_tables.sql",
+        "/root/orchestra-main/migrations/004_roo_integration_tables.sql",
+        "/root/orchestra-main/migrations/004_roo_integration_tables.sql",
+        "/root/orchestra-main/migrations/004_roo_integration_tables.sql",
+        "/root/orchestra-main/scripts/pay_ready_schema.sql",
+        "/root/orchestra-main/scripts/pay_ready_schema.sql",
+        "/root/orchestra-main/scripts/pay_ready_schema.sql",
+        "/root/orchestra-main/scripts/pay_ready_schema.sql",
+        "/root/orchestra-main/scripts/pay_ready_schema.sql",
+        "/root/orchestra-main/scripts/pay_ready_schema.sql",
+        "/root/orchestra-main/scripts/pay_ready_schema.sql",
+        "/root/orchestra-main/scripts/pay_ready_schema.sql",
+        "/root/orchestra-main/scripts/pay_ready_schema.sql",
+        "/root/orchestra-main/scripts/pay_ready_schema.sql",
+        "/root/orchestra-main/factory_integration/schema.sql",
+        "/root/orchestra-main/factory_integration/schema.sql",
+        "/root/orchestra-main/factory_integration/schema.sql",
+        "/root/orchestra-main/factory_integration/schema.sql",
+        "/root/orchestra-main/factory_integration/schema.sql",
+        "/root/orchestra-main/factory_integration/schema.sql"
+      ],
+      "severity": "medium"
+    }
+  ],
+  "migration_conflicts": [
+    {
+      "type": "duplicate_table_creation",
+      "table": "data_ingestion",
+      "occurrences": [
+        [
+          "/root/orchestra-main/migrations/003_deduplication_audit_schema.sql",
+          3
+        ],
+        [
+          "/root/orchestra-main/migrations/003_deduplication_audit_schema.sql",
+          3
+        ]
+      ],
+      "severity": "high"
+    }
+  ],
+  "model_schema_mismatches": [],
+  "recommendations": [
+    {
+      "category": "Migration Management",
+      "issue": "1 migration conflicts found",
+      "recommendation": "Fix migration sequence and resolve table creation conflicts",
+      "priority": "critical"
+    },
+    {
+      "category": "Data Integrity",
+      "issue": "2 invalid foreign key references",
+      "recommendation": "Create missing referenced tables or fix foreign key references",
+      "priority": "high"
+    }
+  ]
+}

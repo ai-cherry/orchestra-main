@@ -1,19 +1,6 @@
+# TODO: Consider adding connection pooling configuration
 """
-Cherry AI Infrastructure - Pulumi IaC for Vultr Deployment
-
-This module defines the infrastructure for the Cherry AI admin interface
-using Pulumi with Python, targeting Vultr cloud infrastructure.
 """
-
-import pulumi
-import pulumi_vultr as vultr
-from pulumi import Config, Output, export
-import json
-from typing import Dict, List, Optional
-
-# Configuration
-config = Config()
-environment = pulumi.get_stack()
 region = config.get("region") or "ewr"  # Default to New Jersey
 project_name = "cherry-ai"
 
@@ -27,26 +14,10 @@ tags = {
 
 class CherryAIInfrastructure:
     """
-    Main infrastructure class for Cherry AI deployment on Vultr
-    Implements blue-green deployment capability and auto-scaling
     """
-    
-    def __init__(self):
         """Initialize infrastructure components"""
-        self.vpc = self._create_vpc()
-        self.firewall = self._create_firewall()
-        self.load_balancer = self._create_load_balancer()
-        self.database = self._create_database()
-        self.redis = self._create_redis()
-        self.kubernetes = self._create_kubernetes_cluster()
-        self.object_storage = self._create_object_storage()
-        self.monitoring = self._setup_monitoring()
-        
-    def _create_vpc(self) -> vultr.Vpc:
         """
-        Create Virtual Private Cloud for network isolation
         """
-        vpc = vultr.Vpc(
             f"{project_name}-vpc-{environment}",
             region=region,
             description=f"VPC for {project_name} {environment}",
@@ -62,9 +33,7 @@ class CherryAIInfrastructure:
     
     def _create_firewall(self) -> vultr.FirewallGroup:
         """
-        Create firewall rules for security
         """
-        firewall_group = vultr.FirewallGroup(
             f"{project_name}-firewall-{environment}",
             description=f"Firewall for {project_name} {environment}"
         )
@@ -109,9 +78,7 @@ class CherryAIInfrastructure:
     
     def _create_load_balancer(self) -> vultr.LoadBalancer:
         """
-        Create load balancer for high availability
         """
-        load_balancer = vultr.LoadBalancer(
             f"{project_name}-lb-{environment}",
             region=region,
             label=f"{project_name}-lb-{environment}",
@@ -152,9 +119,7 @@ class CherryAIInfrastructure:
     
     def _create_database(self) -> vultr.Database:
         """
-        Create managed PostgreSQL database with vector extensions
         """
-        database = vultr.Database(
             f"{project_name}-postgres-{environment}",
             database_engine="pg",
             database_engine_version="15",
@@ -183,9 +148,7 @@ class CherryAIInfrastructure:
     
     def _create_redis(self) -> vultr.Database:
         """
-        Create managed Redis instance for caching
         """
-        redis = vultr.Database(
             f"{project_name}-redis-{environment}",
             database_engine="redis",
             database_engine_version="7",
@@ -205,9 +168,7 @@ class CherryAIInfrastructure:
     
     def _create_kubernetes_cluster(self) -> vultr.Kubernetes:
         """
-        Create Kubernetes cluster for container orchestration
         """
-        k8s_cluster = vultr.Kubernetes(
             f"{project_name}-k8s-{environment}",
             region=region,
             label=f"{project_name}-k8s-{environment}",
@@ -235,9 +196,7 @@ class CherryAIInfrastructure:
     
     def _create_object_storage(self) -> vultr.ObjectStorage:
         """
-        Create object storage for static assets and backups
         """
-        object_storage = vultr.ObjectStorage(
             f"{project_name}-storage-{environment}",
             cluster_id=1,  # New Jersey cluster
             label=f"{project_name}-storage-{environment}"
@@ -252,10 +211,7 @@ class CherryAIInfrastructure:
     
     def _setup_monitoring(self) -> Dict[str, any]:
         """
-        Setup monitoring and alerting infrastructure
         """
-        # Create monitoring instance
-        monitoring_instance = vultr.Instance(
             f"{project_name}-monitoring-{environment}",
             region=region,
             plan="vc2-1c-2gb",  # 1 vCPU, 2GB RAM
@@ -279,17 +235,8 @@ class CherryAIInfrastructure:
     
     def _get_monitoring_user_data(self) -> str:
         """
-        Generate cloud-init user data for monitoring setup
         """
-        return """#!/bin/bash
-# Update system
-apt-get update && apt-get upgrade -y
-
-# Install Docker
-curl -fsSL https://get.docker.com -o get-docker.sh
-sh get-docker.sh
-
-# Install Docker Compose
+        return """
 curl -L "https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 
@@ -367,11 +314,6 @@ ufw --force enable
 
 echo "Monitoring setup complete!"
 """
-
-# Create infrastructure instance
-infrastructure = CherryAIInfrastructure()
-
-# Export deployment information
 export("deployment_info", {
     "environment": environment,
     "region": region,
@@ -385,16 +327,4 @@ export("deployment_info", {
 
 # Export deployment instructions
 export("deployment_instructions", """
-Cherry AI Infrastructure Deployment Complete!
-
-Next Steps:
-1. Configure DNS to point to the load balancer IP
-2. Deploy the application to Kubernetes cluster
-3. Access monitoring at the monitoring endpoint
-4. Configure SSL certificates on the load balancer
-
-For kubectl access:
-pulumi stack output kubeconfig --show-secrets > kubeconfig.yaml
-export KUBECONFIG=./kubeconfig.yaml
-kubectl get nodes
-""")
+"""

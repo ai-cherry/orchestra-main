@@ -1,25 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 """
-Tool Registry - Central registry for all available tools with rich metadata
 """
-
-from typing import Any, Dict, List, Optional
-
-from pydantic import BaseModel
-
-class ToolParameter(BaseModel):
     """Definition of a tool parameter."""
-
-    name: str
-    type: str
-    description: str
-    required: bool = True
-    default: Optional[Any] = None
-
-class ToolDefinition(BaseModel):
     """Rich definition of a tool with metadata."""
-
-    name: str
-    description: str
     category: str  # "database", "cache", "deployment", "analysis", etc.
     parameters: List[ToolParameter]
     output_type: str
@@ -31,17 +14,7 @@ class ToolDefinition(BaseModel):
 
 class ToolRegistry:
     """Central registry for all available tools."""
-
-    def __init__(self):
-        self.tools: Dict[str, ToolDefinition] = {}
-        self._load_builtin_tools()
-
-    def _load_builtin_tools(self):
         """Load built-in tool definitions."""
-
-        # MongoDB Tools
-        self.register_tool(
-            ToolDefinition(
                 name="mongodb_query",
                 description="Query MongoDB for agent memories and persistent data",
                 category="database",
@@ -239,29 +212,9 @@ class ToolRegistry:
 
     def register_tool(self, tool: ToolDefinition):
         """Register a new tool."""
-        self.tools[tool.name] = tool
-
-    def get_tool(self, name: str) -> Optional[ToolDefinition]:
         """Get tool definition by name."""
-        return self.tools.get(name)
-
-    def list_tools(self, category: Optional[str] = None) -> List[ToolDefinition]:
         """List all tools, optionally filtered by category."""
-        if category:
-            return [t for t in self.tools.values() if t.category == category]
-        return list(self.tools.values())
-
-    def search_tools(self, query: str, category: Optional[str] = None) -> List[ToolDefinition]:
         """Search tools by query and optional category."""
-        results = []
-        query_lower = query.lower()
-
-        for tool in self.tools.values():
-            if category and tool.category != category:
-                continue
-
-            # Search in multiple fields
-            searchable_text = (
                 f"{tool.name} {tool.description} {tool.when_to_use} " f"{' '.join(tool.examples or [])} {tool.category}"
             ).lower()
 
@@ -279,13 +232,6 @@ class ToolRegistry:
 
     def to_function_calling_schema(self) -> List[Dict]:
         """Convert to OpenAI function calling format."""
-        functions = []
-        for tool in self.tools.values():
-            properties = {}
-            required = []
-
-            for param in tool.parameters:
-                properties[param.name] = {
                     "type": param.type,
                     "description": param.description,
                 }

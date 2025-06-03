@@ -1,49 +1,9 @@
 """
-Interaction Service for AI Orchestration System.
-
-This module provides a service for handling user interactions,
-following the hexagonal architecture pattern by separating business logic
-from infrastructure concerns.
 """
-
-import logging
-from datetime import datetime
-from typing import Dict, List, Optional, Tuple
-
-from packages.shared.src.llm_client.interface import LLMClient
-from packages.shared.src.memory.services.memory_service import MemoryService
-from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-class InteractionService:
     """
-    Service for handling user interactions.
-
-    This class encapsulates the business logic for processing user interactions,
-    following the hexagonal architecture pattern by depending on abstractions
-    rather than concrete implementations.
     """
-
-    def __init__(
-        self,
-        memory_service: MemoryService,
-        llm_client: LLMClient,
-        default_model: str,
-    ):
         """
-        Initialize the interaction service.
-
-        Args:
-            memory_service: Memory service for storing and retrieving conversation history
-            llm_client: LLM client for generating responses
-            default_model: Default LLM model to use
         """
-        self._memory = memory_service
-        self._llm_client = llm_client
-        self._default_model = default_model
-        logger.debug("InteractionService initialized")
 
     async def process_interaction(
         self,
@@ -57,29 +17,7 @@ class InteractionService:
         max_tokens: int = 1000,
     ) -> Tuple[str, str]:
         """
-        Process a user interaction.
-
-        This method handles the business logic of processing a user interaction,
-        including retrieving conversation history, calling the LLM, and storing
-        the response.
-
-        Args:
-            user_id: The ID of the user
-            user_message: The user's message
-            persona_config: The active persona configuration
-            session_id: Optional session ID
-            request_id: Optional request ID for tracing
-            history_limit: Maximum number of history items to retrieve
-            temperature: Temperature for LLM sampling
-            max_tokens: Maximum tokens for LLM response
-
-        Returns:
-            Tuple of (response text, persona name)
-
-        Raises:
-            Exception: If processing fails
         """
-        # Log the interaction
         logger.info(f"Processing interaction with persona: {persona_config.name} for user: {user_id}")
 
         # Get conversation history using our memory service
@@ -151,20 +89,7 @@ class InteractionService:
 
     def _format_history_for_llm(self, history_items: List[MemoryItem], persona_name: str) -> List[Dict[str, str]]:
         """
-        Format conversation history for the LLM.
-
-        Args:
-            history_items: List of history items to format
-            persona_name: Name of the active persona
-
-        Returns:
-            Formatted history for the LLM
         """
-        formatted_history = []
-
-        # Process items in order (oldest to newest)
-        for item in reversed(history_items):
-            if item.persona_active == persona_name:
                 formatted_history.append({"role": "assistant", "content": item.text_content})
             else:
                 formatted_history.append({"role": "user", "content": item.text_content})

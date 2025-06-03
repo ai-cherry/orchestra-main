@@ -1,33 +1,13 @@
+# TODO: Consider adding connection pooling configuration
+import asyncio
 #!/usr/bin/env python3
 """
-Simple Health Monitor for AI Orchestra
-
-Replaces fixed sleeps with dynamic health checks and sends notifications
-to the admin UI when issues are detected.
-
-Usage:
-    python scripts/health_monitor.py --check-services
-    python scripts/health_monitor.py --monitor --interval=30
 """
-
-import asyncio
-import json
-import logging
-import socket
-import sys
-import time
-from datetime import datetime
-from typing import Any
-
-import requests
-
-# Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 class HealthMonitor:
     """Simple health monitoring for Orchestra services."""
-
     def __init__(self, admin_ui_url: str = "http://localhost:3000") -> None:
         self.admin_ui_url = admin_ui_url
         self.services: dict[str, dict[str, Any]] = {
@@ -38,12 +18,11 @@ class HealthMonitor:
 
     def check_port(self, port: int, timeout: float = 2.0) -> bool:
         """Check if a port is responding."""
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-                sock.settimeout(timeout)
                 result = sock.connect_ex(("localhost", port))
                 return result == 0
         except Exception:
+
+            pass
             return False
 
     def check_service_health(self, service_name: str, config: dict[str, Any]) -> dict[str, Any]:
@@ -74,6 +53,8 @@ class HealthMonitor:
 
             # Try HTTP health check if possible
             try:
+
+                pass
                 health_url = f"http://localhost:{port}/health"
                 response = requests.get(health_url, timeout=5)
                 if response.status_code == 200:
@@ -81,7 +62,9 @@ class HealthMonitor:
                     result["details"]["http_response"] = response.json()
                 else:
                     result["details"]["http_health"] = f"status_{response.status_code}"
-            except Exception as e:
+            except Exception:
+
+                pass
                 result["details"]["http_health"] = f"error: {str(e)}"
         else:
             result["status"] = "unhealthy"
@@ -117,8 +100,6 @@ class HealthMonitor:
 
     def send_notification(self, message: str, level: str = "info", data: dict[str, Any] | None = None) -> bool:
         """Send notification to admin UI."""
-        try:
-            notification_payload = {
                 "message": message,
                 "level": level,
                 "timestamp": datetime.now().isoformat(),
@@ -140,7 +121,10 @@ class HealthMonitor:
                 logger.warning(f"Notification failed with status {response.status_code}")
                 return False
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Failed to send notification: {e}")
             # Fall back to console logging
             logger.warning(f"NOTIFICATION: [{level.upper()}] {message}")
@@ -148,10 +132,7 @@ class HealthMonitor:
 
     def wait_for_service(self, service_name: str, max_wait: int = 120, check_interval: int = 5) -> bool:
         """
-        Wait for a service to become healthy with dynamic checking.
-        Replaces fixed sleep with intelligent waiting.
         """
-        if service_name not in self.services:
             logger.error(f"Unknown service: {service_name}")
             return False
 
@@ -172,8 +153,7 @@ class HealthMonitor:
                 )
                 return True
 
-            logger.debug(f"{config['name']} not ready, waiting {check_interval}s...")
-            time.sleep(check_interval)
+            await asyncio.sleep(check_interval)
 
         # Service didn't come up in time
         elapsed = round(time.time() - start_time, 1)
@@ -194,6 +174,8 @@ class HealthMonitor:
 
         while True:
             try:
+
+                pass
                 current_status = self.check_all_services()
 
                 # Check for status changes
@@ -227,16 +209,20 @@ class HealthMonitor:
                 previous_status = current_status
                 await asyncio.sleep(interval)
 
-            except KeyboardInterrupt:
+            except Exception:
+
+
+                pass
                 logger.info("Monitoring stopped by user")
                 break
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Error during monitoring: {e}")
                 await asyncio.sleep(interval)
 
     def check_prerequisites(self) -> dict[str, Any]:
         """Check system prerequisites and dependencies."""
-        results: dict[str, Any] = {
             "timestamp": datetime.now().isoformat(),
             "status": "ok",
             "checks": {},
@@ -285,8 +271,6 @@ class HealthMonitor:
 
 def main() -> int:
     """Main entry point for the health monitor."""
-    import argparse
-
     parser = argparse.ArgumentParser(description="AI Orchestra Health Monitor")
     parser.add_argument("--check-services", action="store_true", help="Check all services once")
     parser.add_argument("--monitor", action="store_true", help="Monitor continuously")
@@ -324,8 +308,12 @@ def main() -> int:
 
     if args.monitor:
         try:
+
+            pass
             asyncio.run(monitor.monitor_continuously(interval=args.interval))
-        except KeyboardInterrupt:
+        except Exception:
+
+            pass
             logger.info("Monitoring stopped")
         return 0
 

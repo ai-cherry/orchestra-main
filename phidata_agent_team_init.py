@@ -37,32 +37,14 @@ def __init__(
     tool_registry: ToolRegistry,
 ):
     """
-    Initialize the PhidataAgentWrapper with a Hacker News Team configuration.
-
-    This implementation specifically handles instantiating an agno.team.Team based on
-    the phidata_hn_team configuration. It parses the members list, instantiates
-    each member Agent with specific tools and models, and then creates the Team.
-
-    Args:
-        agent_config: Agent-specific configuration dict from the registry
-        memory_manager: Orchestra's centralized memory management system
-        llm_client: Configured LLM provider (usually via Portkey)
-        tool_registry: Access to registered system tools
     """
-    # Call parent constructor to set up base properties
-    super().__init__(agent_config, memory_manager, llm_client, tool_registry)
-
-    # Set flag indicating this is a Team
-    self._is_team = True
-
-    # Import required modules for Team initialization
-    try:
-        # Import agno modules
         agno_team = importlib.import_module("agno.team")
         agno_agent = importlib.import_module("agno.agent")
         Team = getattr(agno_team, "Team")
         Agent = getattr(agno_agent, "Agent")
-    except ImportError as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to import Phidata/Agno modules: {e}")
         raise ImportError(f"Phidata/Agno modules not available: {e}")
 
@@ -105,8 +87,12 @@ def __init__(
 
         # Get the LLM model for this member from Portkey client
         try:
+
+            pass
             member_model = self._get_llm_from_ref(member_llm_ref)
-        except ValueError as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to get LLM for member '{name}': {e}")
             continue
 
@@ -114,6 +100,8 @@ def __init__(
         member_tools = []
         for tool_config in tools_config:
             try:
+
+                pass
                 # Process tool configuration
                 tool_type = tool_config.get("type")
                 tool_params = tool_config.get("params", {})
@@ -146,7 +134,10 @@ def __init__(
                 member_tools.append(tool_instance)
                 logger.info(f"Added tool '{tool_type}' to member '{name}'")
 
-            except Exception as e:
+            except Exception:
+
+
+                pass
                 logger.error(f"Failed to initialize tool for member '{name}': {e}")
 
         # Setup member-specific storage/memory or use team's
@@ -159,13 +150,18 @@ def __init__(
             cloudsql_config = self.team_config.get("cloudsql_config", {})
 
             try:
+
+
+                pass
                 member_storage = get_pg_agent_storage(
                     agent_id=f"{self.id}_{name.lower()}",
                     config=cloudsql_config,
                     table_name=storage_table,
                 )
                 logger.info(f"Initialized member-specific storage for '{name}'")
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Failed to initialize storage for member '{name}': {e}")
 
         # Use member-specific memory if configured
@@ -174,17 +170,24 @@ def __init__(
             cloudsql_config = self.team_config.get("cloudsql_config", {})
 
             try:
+
+
+                pass
                 member_memory = get_pgvector_memory(
                     user_id=f"{self.id}_{name.lower()}",
                     config=cloudsql_config,
                     table_name=memory_table,
                 )
                 logger.info(f"Initialized member-specific memory for '{name}'")
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Failed to initialize memory for member '{name}': {e}")
 
         # Create the member Agent
         try:
+
+            pass
             member_agent = Agent(
                 model=member_model,
                 tools=member_tools,
@@ -199,7 +202,9 @@ def __init__(
 
             members.append(member_agent)
             logger.info(f"Initialized team member: '{name}' with role '{role}'")
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to initialize team member '{name}': {e}")
 
     # Ensure we have at least one member
@@ -211,6 +216,8 @@ def __init__(
 
     # Finally, initialize the Team with all members
     try:
+
+        pass
         self.phidata_agent = Team(
             members=members,
             model=team_model,
@@ -223,6 +230,8 @@ def __init__(
             memory=self.agent_memory,
         )
         logger.info(f"Successfully initialized Phidata Team '{self.team_name}' with {len(members)} members")
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to initialize Phidata Team: {e}")
         raise RuntimeError(f"Failed to initialize Phidata Team: {e}")

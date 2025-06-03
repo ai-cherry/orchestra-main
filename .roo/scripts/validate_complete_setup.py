@@ -1,27 +1,22 @@
 #!/usr/bin/env python3
 """Comprehensive validation of Roo and MCP setup for Orchestra project."""
-
-import json
-import os
-import sys
-from pathlib import Path
-from typing import Dict, List, Tuple
-
-def check_json_validity(file_path: Path) -> Tuple[bool, str]:
     """Check if a JSON file is valid."""
-    try:
-        with open(file_path) as f:
-            json.load(f)
         return True, "Valid JSON"
-    except json.JSONDecodeError as e:
+    except Exception:
+
+        pass
         return False, f"JSON Error: {e}"
-    except Exception as e:
+    except Exception:
+
+        pass
         return False, f"Error: {e}"
 
 def validate_mode_structure(mode_data: dict, mode_name: str) -> List[str]:
     """Validate the structure of a mode configuration."""
-    errors = []
     required_fields = ["slug", "name", "roleDefinition", "groups", "fileRegex", "apiConfiguration"]
+
+    # TODO: Consider using list comprehension for better performance
+
 
     for field in required_fields:
         if field not in mode_data:
@@ -30,6 +25,9 @@ def validate_mode_structure(mode_data: dict, mode_name: str) -> List[str]:
     if "apiConfiguration" in mode_data:
         api_config = mode_data["apiConfiguration"]
         api_required = ["provider", "model", "temperature", "maxTokens"]
+
+        # TODO: Consider using list comprehension for better performance
+
 
         for field in api_required:
             if field not in api_config:
@@ -176,9 +174,6 @@ def validate_mcp_config() -> Dict[str, any]:
 
 def check_legacy_files() -> List[str]:
     """Check for legacy configuration files that might interfere."""
-    potential_conflicts = []
-
-    # Check for old modes.json
     if Path(".roo/modes.json").exists():
         potential_conflicts.append(".roo/modes.json (legacy file - may cause conflicts)")
 
@@ -281,12 +276,5 @@ def print_results(modes_results, rules_results, mcp_result, legacy_files):
 
 def main():
     """Run comprehensive validation."""
-    modes_results = validate_modes()
-    rules_results = validate_rules()
-    mcp_result = validate_mcp_config()
-    legacy_files = check_legacy_files()
-
-    print_results(modes_results, rules_results, mcp_result, legacy_files)
-
 if __name__ == "__main__":
     main()

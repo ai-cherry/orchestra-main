@@ -1,34 +1,9 @@
-"""Debug Adapter for Factory AI integration.
-
-This adapter bridges the Debug Droid with the tools MCP server,
-handling error diagnosis and query optimization capabilities.
+# TODO: Consider adding connection pooling configuration
 """
-
-import json
-import logging
-import traceback
-from typing import Any, Dict, List, Optional, Tuple
-
-from .factory_mcp_adapter import FactoryMCPAdapter
-
-logger = logging.getLogger(__name__)
-
-class DebugAdapter(FactoryMCPAdapter):
-    """Adapter for Debug Droid to tools MCP server communication.
-
-    Specializes in:
-    - Error diagnosis and root cause analysis
-    - Query optimization (SQL, GraphQL, etc.)
-    - Stack trace analysis
-    - Performance profiling integration
+"""
     """
-
-    def __init__(self, mcp_server: Any, droid_config: Dict[str, Any]) -> None:
-        """Initialize the Debug adapter.
-
-        Args:
-            mcp_server: The tools MCP server instance
-            droid_config: Configuration for the Debug droid
+    """
+        """
         """
         super().__init__(mcp_server, droid_config, "debug")
         self.supported_methods = [
@@ -43,13 +18,7 @@ class DebugAdapter(FactoryMCPAdapter):
         self.max_stack_depth = droid_config.get("max_stack_depth", 50)
 
     async def translate_to_factory(self, mcp_request: Dict[str, Any]) -> Dict[str, Any]:
-        """Translate MCP request to Factory AI Debug format.
-
-        Args:
-            mcp_request: Request in MCP format
-
-        Returns:
-            Request in Factory AI Debug format
+        """
         """
         method = mcp_request.get("method", "")
         params = mcp_request.get("params", {})
@@ -92,17 +61,10 @@ class DebugAdapter(FactoryMCPAdapter):
             factory_request["context"]["bottlenecks"] = params.get("bottlenecks", [])
             factory_request["context"]["resource_usage"] = params.get("resource_usage", {})
 
-        logger.debug(f"Translated to Factory request: {factory_request}")
         return factory_request
 
     async def translate_to_mcp(self, factory_response: Dict[str, Any]) -> Dict[str, Any]:
-        """Translate Factory AI Debug response to MCP format.
-
-        Args:
-            factory_response: Response from Factory AI Debug
-
-        Returns:
-            Response in MCP format
+        """
         """
         if "error" in factory_response:
             return {
@@ -149,24 +111,11 @@ class DebugAdapter(FactoryMCPAdapter):
                 "recommendations": result["profile"].get("recommendations", []),
             }
 
-        logger.debug(f"Translated to MCP response: {mcp_response}")
         return mcp_response
 
     async def _call_factory_droid(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
-        """Call the Factory AI Debug droid.
-
-        Args:
-            factory_request: Request in Factory AI format
-
-        Returns:
-            Response from Factory AI Debug droid
         """
-        try:
-            # Import Factory AI client dynamically
-            from factory_ai import FactoryAI
-
-            if not self._factory_client:
-                self._factory_client = FactoryAI(
+        """
                     api_key=self.droid_config.get("api_key"),
                     base_url=self.droid_config.get("base_url", "https://api.factory.ai"),
                 )
@@ -180,24 +129,23 @@ class DebugAdapter(FactoryMCPAdapter):
 
             return {"result": response}
 
-        except ImportError:
+        except Exception:
+
+
+            pass
             logger.warning("Factory AI SDK not available, using mock response")
             return self._get_mock_response(factory_request)
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error calling Debug droid: {e}", exc_info=True)
             raise
 
     def _map_method_to_action(self, method: str) -> str:
-        """Map MCP method to Factory AI Debug action.
-
-        Args:
-            method: MCP method name
-
-        Returns:
-            Factory AI action name
         """
-        method_mapping = {
+        """
             "diagnose_error": "diagnose",
             "analyze_stack_trace": "analyze_stack",
             "optimize_query": "optimize_query",
@@ -208,18 +156,8 @@ class DebugAdapter(FactoryMCPAdapter):
         return method_mapping.get(method, "diagnose")
 
     def _format_solutions(self, solutions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Format debug solutions for MCP response.
-
-        Args:
-            solutions: List of solution data from Factory AI
-
-        Returns:
-            Formatted solutions for MCP
         """
-        formatted_solutions = []
-        for idx, solution in enumerate(solutions):
-            formatted_solutions.append(
-                {
+        """
                     "id": idx + 1,
                     "description": solution.get("description", ""),
                     "code_fix": solution.get("code_fix", ""),
@@ -232,13 +170,7 @@ class DebugAdapter(FactoryMCPAdapter):
         return formatted_solutions
 
     def _get_mock_response(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
-        """Generate mock response for testing.
-
-        Args:
-            factory_request: The Factory AI request
-
-        Returns:
-            Mock response
+        """
         """
         action = factory_request["action"]
 
@@ -254,27 +186,8 @@ class DebugAdapter(FactoryMCPAdapter):
                     "solutions": [
                         {
                             "description": "Implement connection pooling with proper cleanup",
-                            "code_fix": """# Add connection pool configuration
-from sqlalchemy.pool import QueuePool
-
-engine = create_engine(
-    DATABASE_URL,
-    poolclass=QueuePool,
-    pool_size=20,
-    max_overflow=0,
-    pool_pre_ping=True,
-    pool_recycle=3600
-)
-
-# Ensure connections are properly closed
-@contextmanager
-def get_db_connection():
-    conn = engine.connect()
-    try:
-                yield conn
-    finally:
-        conn.close()
-""",
+                            "code_fix": """
+"""
                             "explanation": "This implements proper connection pooling with automatic cleanup",
                             "confidence": 0.95,
                             "impact": "high",
@@ -303,19 +216,8 @@ def get_db_connection():
             return {
                 "result": {
                     "original_query": factory_request["context"].get("query", ""),
-                    "optimized_query": """-- Optimized query with proper indexing
-SELECT u.id, u.name, COUNT(o.id) as order_count
-FROM users u
-LEFT JOIN orders o ON u.id = o.user_id
-WHERE u.created_at >= '2024-01-01'
-GROUP BY u.id, u.name
-HAVING COUNT(o.id) > 5
-ORDER BY order_count DESC
-LIMIT 100;
-
--- Create index for better performance
-CREATE INDEX idx_users_created_at ON users(created_at);
-CREATE INDEX idx_orders_user_id ON orders(user_id);""",
+                    "optimized_query": """
+CREATE INDEX idx_orders_user_id ON orders(user_id);"""
                     "improvements": [
                         "Added appropriate indexes",
                         "Optimized JOIN strategy",
@@ -382,19 +284,8 @@ CREATE INDEX idx_orders_user_id ON orders(user_id);""",
         }
 
     async def analyze_error_context(self, error: Exception, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Analyze error with additional context.
-
-        Args:
-            error: The exception to analyze
-            context: Additional context about the error
-
-        Returns:
-            Analysis results
         """
-        stack_trace = traceback.format_exc()
-        error_type = type(error).__name__
-
-        request = {
+        """
             "method": "diagnose_error",
             "params": {
                 "error_type": error_type,

@@ -1,0 +1,15 @@
+[Unit]
+Description=Orchestra AI Automation Service
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/orchestra-main
+Environment="PATH=/root/.cursor-server/bin/02270c8441bdc4b2fdbc30e6f470a589ec78d600/bin/remote-cli:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
+ExecStart=/root/orchestra-main/venv/bin/python /root/orchestra-main/scripts/orchestrator_daemon.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

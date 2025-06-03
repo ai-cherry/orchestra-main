@@ -1,26 +1,19 @@
 """
-Roo integration with MCP working memory system.
-
-This package provides the integration between Roo modes and the MCP working memory system,
-enabling context preservation across mode transitions, efficient memory access patterns,
-and structured rule definitions.
+Roo MCP Integration Module
 """
 
-from .memory_hooks import BoomerangOperation
-from .modes import MODES, RooMode, RooModeCapability, get_mode
-from .rules import Rule, RuleEngine, RuleIntent, RuleType
-from .transitions import ModeTransitionManager, TransitionContext
-
-__all__ = [
-    "RooMode",
-    "RooModeCapability",
-    "get_mode",
-    "MODES",
-    "TransitionContext",
-    "ModeTransitionManager",
-    "BoomerangOperation",
-    "Rule",
-    "RuleType",
-    "RuleIntent",
-    "RuleEngine",
-]
+# Import only what exists
+try:
+    from .orchestra_integration import (
+        OrchestraRooIntegration,
+        orchestra_roo,
+        initialize_orchestra_roo
+    )
+    __all__ = [
+        "OrchestraRooIntegration",
+        "orchestra_roo",
+        "initialize_orchestra_roo"
+    ]
+except ImportError:
+    # If orchestra_integration is not available, provide empty exports
+    __all__ = []

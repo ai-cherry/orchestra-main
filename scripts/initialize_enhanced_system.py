@@ -1,28 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Initialize the enhanced unified PostgreSQL system.
-
-This script ensures all components are properly initialized with the enhanced versions.
 """
-
-import sys
-import os
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-import asyncio
-import logging
-from shared.database.connection_manager_enhanced import get_connection_manager_enhanced
-from shared.database.unified_postgresql_enhanced import get_unified_postgresql_enhanced
-from shared.database.unified_db_v2 import get_unified_database
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-async def initialize_enhanced_system():
     """Initialize all enhanced components."""
-    try:
-        # Initialize enhanced connection manager
         logger.info("Initializing enhanced connection manager...")
         manager = await get_connection_manager_enhanced()
 
@@ -57,7 +37,10 @@ async def initialize_enhanced_system():
 
         logger.info("Enhanced system initialized successfully!")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Failed to initialize enhanced system: {e}")
         raise
 

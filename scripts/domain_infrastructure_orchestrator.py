@@ -1,22 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Multi-Model Domain Infrastructure Orchestrator
-Implements domain separation with Weaviate clusters and Airbyte integration
 """
-
-import os
-import json
-import asyncio
-import aiohttp
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, List, Any
-
-class DomainInfrastructureOrchestrator:
     """Orchestrates domain separation across infrastructure components"""
-    
-    def __init__(self):
-        self.domains = {
             "Personal": {
                 "name": "Cherry",
                 "weaviate_cluster": "personal-cherry-cluster",
@@ -46,8 +32,6 @@ class DomainInfrastructureOrchestrator:
         
     async def create_weaviate_cluster_config(self, domain: str, config: Dict[str, Any]):
         """Generate Weaviate cluster configuration for a domain"""
-        
-        cluster_config = {
             "cluster_name": config["weaviate_cluster"],
             "domain": domain,
             "persona": config["name"],
@@ -118,8 +102,6 @@ class DomainInfrastructureOrchestrator:
     
     async def create_airbyte_config(self, domain: str, config: Dict[str, Any]):
         """Generate Airbyte configuration for domain-specific data flows"""
-        
-        airbyte_config = {
             "namespace": config["airbyte_namespace"],
             "connections": [
                 {
@@ -189,8 +171,6 @@ class DomainInfrastructureOrchestrator:
     
     async def create_domain_api_gateway(self, domain: str, config: Dict[str, Any]):
         """Generate API gateway configuration for domain routing"""
-        
-        gateway_config = {
             "domain": domain,
             "base_path": f"/api/{domain.lower()}",
             "upstream": {
@@ -239,28 +219,14 @@ class DomainInfrastructureOrchestrator:
     
     async def create_weaviate_provisioning_script(self):
         """Create script to provision Weaviate clusters via API"""
-        
-        script_content = '''#!/usr/bin/env python3
 """
-Weaviate Cluster Provisioning Script
-Automatically creates and configures Weaviate clusters for each domain
 """
-
-import os
-import json
-import requests
-from pathlib import Path
-
-class WeaviateProvisioner:
-    def __init__(self):
         self.wcs_api_key = os.getenv("WCS_API_KEY")
         self.wcs_url = "https://console.weaviate.cloud/api/v1"
         self.config_dir = Path("config/domains")
         
     def create_cluster(self, domain_config):
         """Create a Weaviate cluster via WCS API"""
-        
-        headers = {
             "Authorization": f"Bearer {self.wcs_api_key}",
             "Content-Type": "application/json"
         }
@@ -285,7 +251,7 @@ class WeaviateProvisioner:
             f"{self.wcs_url}/clusters",
             headers=headers,
             json=cluster_data
-        )
+        , timeout=30)
         
         if response.status_code == 201:
             cluster_info = response.json()
@@ -297,8 +263,6 @@ class WeaviateProvisioner:
     
     def configure_collections(self, cluster_url, collections_config):
         """Configure collections in the Weaviate cluster"""
-        
-        headers = {
             "Content-Type": "application/json"
         }
         
@@ -314,7 +278,7 @@ class WeaviateProvisioner:
                 f"{cluster_url}/v1/schema",
                 headers=headers,
                 json=schema
-            )
+            , timeout=30)
             
             if response.status_code == 200:
                 print(f"  ✅ Created collection: {collection_name}")
@@ -323,7 +287,6 @@ class WeaviateProvisioner:
     
     def provision_all_domains(self):
         """Provision clusters for all domains"""
-        
         for config_file in self.config_dir.glob("*_weaviate.json"):
             with open(config_file) as f:
                 config = json.load(f)
@@ -351,10 +314,6 @@ if __name__ == "__main__":
     provisioner = WeaviateProvisioner()
     provisioner.provision_all_domains()
 '''
-        
-        script_path = self.scripts_dir / "provision_weaviate_clusters.py"
-        script_path.parent.mkdir(parents=True, exist_ok=True)
-        
         with open(script_path, 'w') as f:
             f.write(script_content)
         
@@ -363,27 +322,14 @@ if __name__ == "__main__":
     
     async def create_airbyte_automation_script(self):
         """Create script to configure Airbyte connections via API"""
-        
-        script_content = '''#!/usr/bin/env python3
 """
-Airbyte Configuration Automation
-Sets up domain-specific data pipelines via Airbyte API
 """
-
-import os
-import json
-import requests
-from pathlib import Path
-
-class AirbyteAutomator:
-    def __init__(self):
         self.airbyte_url = os.getenv("AIRBYTE_URL", "http://localhost:8000")
         self.airbyte_api = f"{self.airbyte_url}/api/v1"
         self.config_dir = Path("config/domains")
         
     def create_source(self, source_config):
         """Create an Airbyte source"""
-        
         endpoint = f"{self.airbyte_api}/sources/create"
         
         source_data = {
@@ -392,7 +338,7 @@ class AirbyteAutomator:
             "connectionConfiguration": source_config["config"]
         }
         
-        response = requests.post(endpoint, json=source_data)
+        response = requests.post(endpoint, json=source_data, timeout=30)
         
         if response.status_code == 200:
             return response.json()["sourceId"]
@@ -402,7 +348,6 @@ class AirbyteAutomator:
     
     def create_destination(self, destination_config):
         """Create an Airbyte destination"""
-        
         endpoint = f"{self.airbyte_api}/destinations/create"
         
         destination_data = {
@@ -411,7 +356,7 @@ class AirbyteAutomator:
             "connectionConfiguration": destination_config["config"]
         }
         
-        response = requests.post(endpoint, json=destination_data)
+        response = requests.post(endpoint, json=destination_data, timeout=30)
         
         if response.status_code == 200:
             return response.json()["destinationId"]
@@ -421,7 +366,6 @@ class AirbyteAutomator:
     
     def create_connection(self, connection_config, source_id, destination_id):
         """Create an Airbyte connection"""
-        
         endpoint = f"{self.airbyte_api}/connections/create"
         
         connection_data = {
@@ -439,7 +383,7 @@ class AirbyteAutomator:
             "namespaceFormat": connection_config["namespace"]
         }
         
-        response = requests.post(endpoint, json=connection_data)
+        response = requests.post(endpoint, json=connection_data, timeout=30)
         
         if response.status_code == 200:
             return response.json()["connectionId"]
@@ -449,8 +393,6 @@ class AirbyteAutomator:
     
     def get_source_definition_id(self, source_type):
         """Get source definition ID by type"""
-        # In production, fetch from API
-        definitions = {
             "postgres": "decd338e-5647-4c0b-adf4-da0e75f5a750",
             "http_api": "68e63de2-bb83-4714-b4c7-6f0b1b5bdc8e"
         }
@@ -458,8 +400,6 @@ class AirbyteAutomator:
     
     def get_destination_definition_id(self, destination_type):
         """Get destination definition ID by type"""
-        # In production, fetch from API
-        definitions = {
             "postgres": "25c5221d-dce2-4163-ade9-739ef790f503",
             "weaviate": "7b96c012-e2c9-4d3c-b0f3-8b1f4f2e4b5e"
         }
@@ -467,7 +407,6 @@ class AirbyteAutomator:
     
     def configure_all_domains(self):
         """Configure Airbyte for all domains"""
-        
         for config_file in self.config_dir.glob("*_airbyte.json"):
             with open(config_file) as f:
                 config = json.load(f)
@@ -506,9 +445,6 @@ if __name__ == "__main__":
     automator = AirbyteAutomator()
     automator.configure_all_domains()
 '''
-        
-        script_path = self.scripts_dir / "configure_airbyte_pipelines.py"
-        
         with open(script_path, 'w') as f:
             f.write(script_content)
         
@@ -517,105 +453,27 @@ if __name__ == "__main__":
     
     async def create_domain_interfaces(self):
         """Create clean interfaces between domains"""
-        
-        interface_content = '''#!/usr/bin/env python3
 """
-Domain Interface Contracts
-Defines clean interfaces for cross-domain communication
 """
-
-from abc import ABC, abstractmethod
-from typing import Dict, Any, List, Optional
-from pydantic import BaseModel
-
-class DomainRequest(BaseModel):
     """Base request model for cross-domain communication"""
-    source_domain: str
-    target_domain: str
-    request_id: str
-    timestamp: str
-    data: Dict[str, Any]
-
-class DomainResponse(BaseModel):
     """Base response model for cross-domain communication"""
-    request_id: str
-    status: str
-    data: Optional[Dict[str, Any]]
-    error: Optional[str]
-
-class IDomainService(ABC):
     """Interface for domain services"""
-    
-    @abstractmethod
-    async def process_request(self, request: DomainRequest) -> DomainResponse:
         """Process a cross-domain request"""
-        pass
-    
-    @abstractmethod
-    async def get_capabilities(self) -> List[str]:
         """Return list of capabilities this domain provides"""
-        pass
-    
-    @abstractmethod
-    async def health_check(self) -> Dict[str, Any]:
         """Return health status of the domain"""
-        pass
-
-class PersonalDomainInterface(IDomainService):
     """Interface for Personal (Cherry) domain"""
-    
-    async def get_user_preferences(self, user_id: str) -> Dict[str, Any]:
         """Get user preferences"""
-        pass
-    
-    async def update_user_context(self, user_id: str, context: Dict[str, Any]) -> bool:
         """Update user context"""
-        pass
-
-class PayReadyDomainInterface(IDomainService):
     """Interface for PayReady (Sophia) domain"""
-    
-    async def analyze_payment_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Analyze payment data"""
-        pass
-    
-    async def get_market_insights(self, query: str) -> List[Dict[str, Any]]:
         """Get market insights"""
-        pass
-
-class ParagonRXDomainInterface(IDomainService):
     """Interface for ParagonRX (Karen) domain"""
-    
-    async def search_medical_info(self, query: str) -> List[Dict[str, Any]]:
         """Search medical information"""
-        pass
-    
-    async def get_health_metrics(self) -> Dict[str, Any]:
         """Get system health metrics"""
-        pass
-
-class DomainRegistry:
     """Registry for domain services"""
-    
-    def __init__(self):
-        self._domains = {}
-    
-    def register(self, domain: str, service: IDomainService):
         """Register a domain service"""
-        self._domains[domain] = service
-    
-    def get(self, domain: str) -> Optional[IDomainService]:
         """Get a domain service"""
-        return self._domains.get(domain)
-    
-    def list_domains(self) -> List[str]:
         """List all registered domains"""
-        return list(self._domains.keys())
-
-# Global registry instance
-domain_registry = DomainRegistry()
-'''
-        
         interface_path = self.base_dir / "shared" / "interfaces" / "domain_contracts.py"
         interface_path.parent.mkdir(parents=True, exist_ok=True)
         
@@ -626,18 +484,8 @@ domain_registry = DomainRegistry()
     
     async def create_pulumi_infrastructure(self):
         """Create Pulumi infrastructure code for domain separation"""
-        
-        pulumi_content = '''#!/usr/bin/env python3
 """
-Pulumi Infrastructure for Domain-Separated Architecture
 """
-
-import pulumi
-import pulumi_kubernetes as k8s
-from pulumi import Config, Output
-
-# Configuration
-config = Config()
 environment = config.get("environment") or "development"
 
 # Domain configurations
@@ -792,9 +640,6 @@ pulumi.export("personal_endpoint", Output.concat("https://api.orchestra.ai/perso
 pulumi.export("payready_endpoint", Output.concat("https://api.orchestra.ai/payready"))
 pulumi.export("paragonrx_endpoint", Output.concat("https://api.orchestra.ai/paragonrx"))
 '''
-        
-        pulumi_path = self.base_dir / "infrastructure" / "domain_separation.py"
-        
         with open(pulumi_path, 'w') as f:
             f.write(pulumi_content)
         
@@ -802,100 +647,10 @@ pulumi.export("paragonrx_endpoint", Output.concat("https://api.orchestra.ai/para
     
     async def create_github_actions_workflow(self):
         """Create GitHub Actions workflow for automated deployment"""
-        
-        workflow_content = '''name: Domain Infrastructure Deployment
-
-on:
-  push:
-    branches: [main]
-    paths:
-      - 'config/domains/**'
-      - 'infrastructure/domain_separation.py'
-      - 'scripts/domain_setup/**'
-  workflow_dispatch:
-
-env:
-  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-  WCS_API_KEY: ${{ secrets.WCS_API_KEY }}
-  AIRBYTE_URL: ${{ secrets.AIRBYTE_URL }}
-
-jobs:
-  provision-weaviate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-      
-      - name: Install dependencies
-        run: |
-          pip install requests
-      
-      - name: Provision Weaviate Clusters
-        run: |
-          python scripts/domain_setup/provision_weaviate_clusters.py
-      
-      - name: Upload cluster configs
-        uses: actions/upload-artifact@v3
-        with:
-          name: weaviate-configs
-          path: config/domains/*_weaviate.json
-
-  configure-airbyte:
-    runs-on: ubuntu-latest
-    needs: provision-weaviate
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-      
-      - name: Install dependencies
-        run: |
-          pip install requests
-      
-      - name: Configure Airbyte Pipelines
-        run: |
-          python scripts/domain_setup/configure_airbyte_pipelines.py
-
-  deploy-infrastructure:
-    runs-on: ubuntu-latest
-    needs: [provision-weaviate, configure-airbyte]
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Configure Pulumi
-        uses: pulumi/actions@v3
-        with:
-          command: up
-          stack-name: production
-          work-dir: ./infrastructure
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-
-  validate-deployment:
-    runs-on: ubuntu-latest
-    needs: deploy-infrastructure
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Validate Domain Endpoints
-        run: |
-          # Test each domain endpoint
-          for domain in personal payready paragonrx; do
             echo "Testing $domain domain..."
             curl -f https://api.orchestra.ai/$domain/health || exit 1
           done
 '''
-        
-        workflow_path = self.base_dir / ".github" / "workflows" / "domain_infrastructure.yml"
-        workflow_path.parent.mkdir(parents=True, exist_ok=True)
-        
         with open(workflow_path, 'w') as f:
             f.write(workflow_content)
         
@@ -903,7 +658,6 @@ jobs:
     
     async def orchestrate_complete_setup(self):
         """Orchestrate the complete domain infrastructure setup"""
-        
         print("🚀 Starting Multi-Model Domain Infrastructure Orchestration")
         print("=" * 60)
         

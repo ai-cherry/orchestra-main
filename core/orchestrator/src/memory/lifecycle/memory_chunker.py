@@ -1,23 +1,6 @@
 """
-Memory Chunker for AI Orchestra Memory System.
-
-This module provides functionality to split large documents into semantic chunks
-for more efficient storage and retrieval.
 """
-
-import logging
-import re
-from enum import Enum
-from typing import Any, Dict, List, Optional
-
-from pydantic import BaseModel, Field
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-class ChunkingStrategy(str, Enum):
     """Strategies for chunking memory items."""
-
     PARAGRAPH = "paragraph"  # Split by paragraphs
     SENTENCE = "sentence"  # Split by sentences
     FIXED_SIZE = "fixed_size"  # Split by fixed token/character count
@@ -26,21 +9,7 @@ class ChunkingStrategy(str, Enum):
 
 class ChunkMetadata(BaseModel):
     """
-    Metadata for a memory chunk.
-
-    This class encapsulates metadata about a chunk, including its
-    position in the original document and relationships to other chunks.
     """
-
-    # Chunk identifiers
-    chunk_id: str
-    parent_id: str  # ID of the original document
-
-    # Position information
-    sequence_num: int
-    total_chunks: int
-
-    # Content information
     chunk_type: str = "text"
     content_start_idx: int
     content_end_idx: int
@@ -58,76 +27,13 @@ class ChunkMetadata(BaseModel):
 
 class Chunk(BaseModel):
     """
-    A chunk of a memory item.
-
-    This class represents a chunk of a larger memory item,
-    including the chunk content and metadata.
     """
-
-    # Chunk content
-    content: str
-
-    # Chunk metadata
-    metadata: ChunkMetadata
-
-    # Optional embedding for semantic search
-    embedding: Optional[List[float]] = None
-
-class ChunkerConfig(BaseModel):
     """
-    Configuration for memory chunker.
-
-    This class encapsulates the configuration parameters for the
-    memory chunking algorithm.
     """
-
-    # Default chunking strategy
-    default_strategy: ChunkingStrategy = ChunkingStrategy.PARAGRAPH
-
-    # Paragraph chunking parameters
-    min_paragraph_length: int = 100
-    max_paragraph_length: int = 1000
-
-    # Sentence chunking parameters
-    min_sentences_per_chunk: int = 3
-    max_sentences_per_chunk: int = 10
-
-    # Fixed size chunking parameters
-    chunk_size_chars: int = 500
-    chunk_overlap_chars: int = 50
-
-    # Semantic chunking parameters
-    use_openai: bool = True
-    openai_config: Dict[str, Any] = Field(default_factory=dict)
-
-    # Hybrid chunking parameters
-    hybrid_strategies: List[ChunkingStrategy] = Field(
-        default_factory=lambda: [ChunkingStrategy.PARAGRAPH, ChunkingStrategy.SENTENCE]
-    )
-
-    # General parameters
-    preserve_headings: bool = True
-    generate_summaries: bool = False
-    min_chunk_length: int = 50
-    max_chunks_per_item: int = 100
-
-class MemoryChunker:
     """
-    Splits large documents into semantic chunks.
-
-    This class provides functionality to split large memory items into
-    smaller chunks for more efficient storage and retrieval.
     """
-
-    def __init__(self, config: Optional[ChunkerConfig] = None):
         """
-        Initialize memory chunker.
-
-        Args:
-            config: Optional configuration for memory chunking
         """
-        self.config = config or ChunkerConfig()
-
         logger.info(f"MemoryChunker initialized (strategy: {self.config.default_strategy})")
 
     async def chunk_item(
@@ -138,33 +44,7 @@ class MemoryChunker:
         metadata: Optional[Dict[str, Any]] = None,
     ) -> List[Chunk]:
         """
-        Split a memory item into chunks.
-
-        Args:
-            item_id: ID of the memory item
-            content: Content to chunk
-            strategy: Optional chunking strategy (defaults to config)
-            metadata: Optional metadata about the content
-
-        Returns:
-            List of chunks
         """
-        # Use default strategy if not specified
-        if strategy is None:
-            strategy = self.config.default_strategy
-
-        # Select chunking method based on strategy
-        if strategy == ChunkingStrategy.PARAGRAPH:
-            chunks = self._chunk_by_paragraph(item_id, content)
-        elif strategy == ChunkingStrategy.SENTENCE:
-            chunks = self._chunk_by_sentence(item_id, content)
-        elif strategy == ChunkingStrategy.FIXED_SIZE:
-            chunks = self._chunk_by_fixed_size(item_id, content)
-        elif strategy == ChunkingStrategy.SEMANTIC:
-            chunks = await self._chunk_by_semantic(item_id, content)
-        elif strategy == ChunkingStrategy.HYBRID:
-            chunks = await self._chunk_by_hybrid(item_id, content)
-        else:
             logger.warning(f"Unknown chunking strategy: {strategy}, falling back to paragraph")
             chunks = self._chunk_by_paragraph(item_id, content)
 
@@ -194,16 +74,7 @@ class MemoryChunker:
 
     def _chunk_by_paragraph(self, item_id: str, content: str) -> List[Chunk]:
         """
-        Split content by paragraphs.
-
-        Args:
-            item_id: ID of the memory item
-            content: Content to chunk
-
-        Returns:
-            List of chunks
         """
-        # Split by double newlines (paragraphs)
         paragraphs = re.split(r"\n\s*\n", content)
 
         # Filter out empty paragraphs
@@ -266,16 +137,7 @@ class MemoryChunker:
 
     def _chunk_by_sentence(self, item_id: str, content: str) -> List[Chunk]:
         """
-        Split content by sentences.
-
-        Args:
-            item_id: ID of the memory item
-            content: Content to chunk
-
-        Returns:
-            List of chunks
         """
-        # Split by sentences
         sentences = re.split(r"(?<=[.!?])\s+", content)
 
         # Filter out empty sentences
@@ -335,29 +197,7 @@ class MemoryChunker:
 
     def _chunk_by_fixed_size(self, item_id: str, content: str) -> List[Chunk]:
         """
-        Split content by fixed size chunks.
-
-        Args:
-            item_id: ID of the memory item
-            content: Content to chunk
-
-        Returns:
-            List of chunks
         """
-        chunks = []
-        chunk_size = self.config.chunk_size_chars
-        overlap = self.config.chunk_overlap_chars
-
-        # Create chunks with overlap
-        for i in range(0, len(content), chunk_size - overlap):
-            # Get chunk content
-            chunk_content = content[i : i + chunk_size]
-
-            # Skip if chunk is too small
-            if len(chunk_content) < self.config.min_chunk_length:
-                continue
-
-            # Create chunk
             chunk_id = f"{item_id}_chunk_{len(chunks)}"
             chunk = Chunk(
                 content=chunk_content,
@@ -376,52 +216,32 @@ class MemoryChunker:
 
     async def _chunk_by_semantic(self, item_id: str, content: str) -> List[Chunk]:
         """
-        Split content by semantic boundaries using AI.
-
-        Args:
-            item_id: ID of the memory item
-            content: Content to chunk
-
-        Returns:
-            List of chunks
         """
-        # If Vertex AI is not available, fall back to paragraph chunking
-        if not self.config.use_openai:
             logger.warning("Semantic chunking not available, falling back to paragraph chunking")
             return self._chunk_by_paragraph(item_id, content)
 
         try:
+
+
+            pass
             # Create prompt for semantic chunking
             prompt = f"""
-            Split the following text into coherent semantic chunks. Each chunk should be a self-contained unit of information.
-
-            Rules for chunking:
-            1. Each chunk should be coherent and self-contained
-            2. Preserve paragraph boundaries when possible
-            3. Keep related information together
-            4. Split at natural semantic boundaries
-            5. Aim for chunks of roughly similar length
-
-            Format your response as a JSON array of chunks, where each chunk is a string.
-
-            Text to chunk:
-            {content}
-
-            Chunks:
             """
-
-            # Call Vertex AI
             if hasattr(self.config.openai_client, "predict"):
                 # Using custom endpoint
                 response = await self.config.openai_client.predict_async(instances=[{"prompt": prompt}])
 
                 # Extract chunks from response
                 try:
+
+                    pass
                     import json
 
                     chunks_text = response[0].get("content", "[]")
                     chunks_list = json.loads(chunks_text)
-                except (json.JSONDecodeError, IndexError, KeyError):
+                except Exception:
+
+                    pass
                     logger.error("Failed to parse semantic chunks from response")
                     return self._chunk_by_paragraph(item_id, content)
 
@@ -433,6 +253,8 @@ class MemoryChunker:
 
                 # Extract chunks from response
                 try:
+
+                    pass
                     import json
 
                     chunks_text = response.text
@@ -442,7 +264,9 @@ class MemoryChunker:
                         chunks_list = json.loads(json_match.group(0))
                     else:
                         raise ValueError("No JSON array found in response")
-                except (json.JSONDecodeError, ValueError):
+                except Exception:
+
+                    pass
                     logger.error("Failed to parse semantic chunks from response")
                     return self._chunk_by_paragraph(item_id, content)
 
@@ -482,48 +306,16 @@ class MemoryChunker:
 
             return chunks
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Semantic chunking failed: {e}")
             return self._chunk_by_paragraph(item_id, content)
 
     async def _chunk_by_hybrid(self, item_id: str, content: str) -> List[Chunk]:
         """
-        Split content using a hybrid of multiple strategies.
-
-        Args:
-            item_id: ID of the memory item
-            content: Content to chunk
-
-        Returns:
-            List of chunks
         """
-        # Use the first strategy as primary
-        primary_strategy = (
-            self.config.hybrid_strategies[0] if self.config.hybrid_strategies else ChunkingStrategy.PARAGRAPH
-        )
-
-        # Get chunks using primary strategy
-        if primary_strategy == ChunkingStrategy.SEMANTIC:
-            chunks = await self._chunk_by_semantic(item_id, content)
-        elif primary_strategy == ChunkingStrategy.PARAGRAPH:
-            chunks = self._chunk_by_paragraph(item_id, content)
-        elif primary_strategy == ChunkingStrategy.SENTENCE:
-            chunks = self._chunk_by_sentence(item_id, content)
-        elif primary_strategy == ChunkingStrategy.FIXED_SIZE:
-            chunks = self._chunk_by_fixed_size(item_id, content)
-        else:
-            chunks = self._chunk_by_paragraph(item_id, content)
-
-        # If we have multiple strategies, refine chunks using secondary strategy
-        if len(self.config.hybrid_strategies) > 1:
-            secondary_strategy = self.config.hybrid_strategies[1]
-
-            # Refine large chunks using secondary strategy
-            refined_chunks = []
-            for chunk in chunks:
-                # If chunk is too large, refine it
-                if len(chunk.content) > self.config.max_paragraph_length:
-                    # Create a temporary ID for sub-chunking
                     temp_id = f"{chunk.metadata.chunk_id}_sub"
 
                     # Apply secondary strategy
@@ -554,45 +346,9 @@ class MemoryChunker:
 
     def _post_process_chunks(self, chunks: List[Chunk], metadata: Optional[Dict[str, Any]] = None) -> List[Chunk]:
         """
-        Apply post-processing to chunks.
-
-        Args:
-            chunks: List of chunks to process
-            metadata: Optional metadata about the content
-
-        Returns:
-            Processed chunks
         """
-        # Skip if no chunks
-        if not chunks:
-            return chunks
-
-        # Extract headings if enabled
-        if self.config.preserve_headings:
-            chunks = self._extract_headings(chunks)
-
-        # Generate summaries if enabled
-        if self.config.generate_summaries:
-            chunks = self._generate_summaries(chunks)
-
-        # Add custom metadata if provided
-        if metadata:
-            for chunk in chunks:
-                chunk.metadata.custom_metadata.update(metadata)
-
-        return chunks
-
-    def _extract_headings(self, chunks: List[Chunk]) -> List[Chunk]:
         """
-        Extract headings from chunks.
-
-        Args:
-            chunks: List of chunks to process
-
-        Returns:
-            Processed chunks with headings
         """
-        # Simple heading extraction using regex
         heading_pattern = r"^#+\s+(.+)$|^(.+)\n[=\-]{3,}$"
 
         for chunk in chunks:
@@ -607,17 +363,7 @@ class MemoryChunker:
 
     def _generate_summaries(self, chunks: List[Chunk]) -> List[Chunk]:
         """
-        Generate summaries for chunks.
-
-        Args:
-            chunks: List of chunks to process
-
-        Returns:
-            Processed chunks with summaries
         """
-        # Simple summary generation (first sentence)
-        for chunk in chunks:
-            # Extract first sentence
             match = re.search(r"^(.+?[.!?])(?:\s|$)", chunk.content)
             if match:
                 summary = match.group(1).strip()

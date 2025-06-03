@@ -1,25 +1,7 @@
 """
-Utility to format structured output from Phidata agents as Markdown.
-
-This module provides functions to convert structured Python objects (dicts, lists, Pydantic models)
-into well-formatted markdown suitable for display in the Phidata Agent UI.
 """
-
-import json
-from typing import Any, Dict, Optional
-
-def format_dictionary_as_markdown(data: Dict[str, Any], title: Optional[str] = None) -> str:
     """
-    Format a dictionary as Markdown for better UI display.
-
-    Args:
-        data: Dictionary to format
-        title: Optional title to display at the top
-
-    Returns:
-        Markdown formatted string
     """
-    # Start with title if provided
     markdown = f"## {title}\n\n" if title else ""
 
     # Format each key-value pair
@@ -82,13 +64,6 @@ def format_dictionary_as_markdown(data: Dict[str, Any], title: Optional[str] = N
 
 def format_movie_script(data: Dict[str, Any]) -> str:
     """
-    Format a movie script structured output as Markdown.
-
-    Args:
-        data: Movie script data (title, scenes, etc.)
-
-    Returns:
-        Markdown formatted string
     """
     markdown = f"# {data.get('title', 'Movie Script')}\n\n"
 
@@ -116,13 +91,6 @@ def format_movie_script(data: Dict[str, Any]) -> str:
 
 def format_salesforce_results(data: Dict[str, Any]) -> str:
     """
-    Format Salesforce query results as Markdown.
-
-    Args:
-        data: Salesforce results (records, query, etc.)
-
-    Returns:
-        Markdown formatted string
     """
     markdown = "# Salesforce Results\n\n"
 
@@ -168,13 +136,6 @@ def format_salesforce_results(data: Dict[str, Any]) -> str:
 
 def format_analysis_results(data: Dict[str, Any]) -> str:
     """
-    Format analysis results as Markdown.
-
-    Args:
-        data: Analysis data (summary, findings, recommendations, etc.)
-
-    Returns:
-        Markdown formatted string
     """
     markdown = f"# {data.get('title', 'Analysis Results')}\n\n"
 
@@ -230,16 +191,7 @@ def format_analysis_results(data: Dict[str, Any]) -> str:
 
 def format_structured_output_as_markdown(data: Any, output_type: Optional[str] = None) -> str:
     """
-    Convert structured output to markdown based on the output type.
-
-    Args:
-        data: Structured data (dict, list, Pydantic model instance)
-        output_type: Optional hint about the type of data (movie_script, salesforce, analysis)
-
-    Returns:
-        Formatted markdown string
     """
-    # Convert Pydantic models to dict
     if hasattr(data, "dict") and callable(data.dict):
         data = data.dict()
 

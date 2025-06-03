@@ -1,13 +1,5 @@
 #!/usr/bin/env python3
 """Simple MCP-compatible server for Roo integration"""
-
-import json
-import http.server
-import socketserver
-from urllib.parse import urlparse, parse_qs
-
-class MCPHandler(http.server.BaseHTTPRequestHandler):
-    def do_GET(self):
         """Handle GET requests"""
         if self.path == "/health":
             self.send_response(200)

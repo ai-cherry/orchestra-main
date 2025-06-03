@@ -1,25 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Test script to verify the new GCP-free setup is functional.
-Tests all major components and connections.
 """
-
-import asyncio
-import os
-import sys
-from typing import Dict, List, Tuple
-
-# Add project root to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-class SetupTester:
     """Test the new GCP-free setup."""
-
-    def __init__(self):
-        self.results: Dict[str, Tuple[bool, str]] = {}
-        self.critical_failures: List[str] = []
-
-    async def test_environment_variables(self) -> bool:
         """Test that required environment variables are set."""
         print("\n🔍 Testing Environment Variables...")
 
@@ -49,6 +32,9 @@ class SetupTester:
         print("\n🔍 Testing MongoDB Connection...")
 
         try:
+
+
+            pass
             from core.orchestrator.src.agents.memory.mongodb_manager import MongoDBMemoryManager
 
             # Try to connect
@@ -77,7 +63,10 @@ class SetupTester:
             self.results["mongodb"] = (True, "MongoDB connection successful")
             return True
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             self.results["mongodb"] = (False, f"MongoDB connection failed: {str(e)}")
             print(f"  ✗ MongoDB connection failed: {e}")
             self.critical_failures.append("MongoDB")
@@ -88,6 +77,9 @@ class SetupTester:
         print("\n🔍 Testing Redis/Dragonfly Connection...")
 
         try:
+
+
+            pass
             import redis
 
             # Try local Redis first
@@ -114,11 +106,16 @@ class SetupTester:
             self.results["redis"] = (True, "Redis connection successful")
             return True
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             print("  ⚠️  Local Redis failed, trying Dragonfly...")
 
             # Try Dragonfly
             try:
+
+                pass
                 dragonfly_uri = os.getenv("DRAGONFLY_URI")
                 if dragonfly_uri:
                     # Parse URI and connect
@@ -129,6 +126,9 @@ class SetupTester:
                     raise Exception("No Dragonfly URI configured")
 
             except Exception:
+
+
+                pass
                 self.results["redis"] = (
                     False,
                     f"Redis/Dragonfly connection failed: {str(e)}",
@@ -141,6 +141,9 @@ class SetupTester:
         print("\n🔍 Testing Weaviate Connection...")
 
         try:
+
+
+            pass
             import weaviate
 
             weaviate_url = os.getenv("WEAVIATE_URL")
@@ -163,14 +166,19 @@ class SetupTester:
             else:
                 raise Exception("Weaviate not ready")
 
-        except ImportError:
+        except Exception:
+
+
+            pass
             self.results["weaviate"] = (
                 False,
                 "Weaviate client not installed (pip install weaviate-client)",
             )
             print("  ⚠️  Weaviate client not installed")
             return False
-        except Exception as e:
+        except Exception:
+
+            pass
             self.results["weaviate"] = (False, f"Weaviate connection failed: {str(e)}")
             print(f"  ✗ Weaviate connection failed: {e}")
             return False
@@ -180,6 +188,9 @@ class SetupTester:
         print("\n🔍 Testing Settings Import...")
 
         try:
+
+
+            pass
             from core.orchestrator.src.config.settings import get_settings
 
             settings = get_settings()
@@ -205,7 +216,10 @@ class SetupTester:
                 self.results["settings"] = (False, "Settings still has GCP attributes")
                 return False
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             self.results["settings"] = (False, f"Settings import failed: {str(e)}")
             print(f"  ✗ Settings import failed: {e}")
             return False
@@ -215,6 +229,9 @@ class SetupTester:
         print("\n🔍 Testing Docker Compose Configuration...")
 
         try:
+
+
+            pass
             with open("docker-compose.yml", "r") as f:
                 content = f.read()
 
@@ -230,7 +247,10 @@ class SetupTester:
                 self.results["docker"] = (True, "Docker compose is clean")
                 return True
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             self.results["docker"] = (
                 False,
                 f"Could not check docker-compose.yml: {str(e)}",
@@ -243,6 +263,9 @@ class SetupTester:
         print("\n🔍 Testing LLM API Connections...")
 
         try:
+
+
+            pass
             from litellm import completion
 
             # Test with a simple prompt
@@ -264,7 +287,10 @@ class SetupTester:
             else:
                 raise Exception("Unexpected LLM response")
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             self.results["llm"] = (False, f"LLM API test failed: {str(e)}")
             print(f"  ⚠️  LLM API test failed: {e}")
             return False
@@ -312,8 +338,5 @@ class SetupTester:
 
 async def main():
     """Main test runner."""
-    tester = SetupTester()
-    await tester.run_all_tests()
-
 if __name__ == "__main__":
     asyncio.run(main())

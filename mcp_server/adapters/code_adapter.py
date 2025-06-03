@@ -1,34 +1,8 @@
-"""Code Adapter for Factory AI integration.
-
-This adapter bridges the Code Droid with the tools MCP server,
-handling fast code generation and optimization capabilities.
 """
-
-import asyncio
-import json
-import logging
-from typing import Any, AsyncIterator, Dict, List, Optional
-
-from .factory_mcp_adapter import FactoryMCPAdapter
-
-logger = logging.getLogger(__name__)
-
-class CodeAdapter(FactoryMCPAdapter):
-    """Adapter for Code Droid to tools MCP server communication.
-
-    Specializes in:
-    - Fast code generation
-    - Code optimization
-    - Streaming responses for real-time generation
-    - Incremental code updates
+"""
     """
-
-    def __init__(self, mcp_server: Any, droid_config: Dict[str, Any]) -> None:
-        """Initialize the Code adapter.
-
-        Args:
-            mcp_server: The tools MCP server instance
-            droid_config: Configuration for the Code droid
+    """
+        """
         """
         super().__init__(mcp_server, droid_config, "code")
         self.supported_methods = [
@@ -43,13 +17,7 @@ class CodeAdapter(FactoryMCPAdapter):
         self.chunk_size = droid_config.get("chunk_size", 1024)
 
     async def translate_to_factory(self, mcp_request: Dict[str, Any]) -> Dict[str, Any]:
-        """Translate MCP request to Factory AI Code format.
-
-        Args:
-            mcp_request: Request in MCP format
-
-        Returns:
-            Request in Factory AI Code format
+        """
         """
         method = mcp_request.get("method", "")
         params = mcp_request.get("params", {})
@@ -93,17 +61,10 @@ class CodeAdapter(FactoryMCPAdapter):
             factory_request["context"]["cursor_position"] = params.get("cursor_position", 0)
             factory_request["context"]["completion_type"] = params.get("completion_type", "line")
 
-        logger.debug(f"Translated to Factory request: {factory_request}")
         return factory_request
 
     async def translate_to_mcp(self, factory_response: Dict[str, Any]) -> Dict[str, Any]:
-        """Translate Factory AI Code response to MCP format.
-
-        Args:
-            factory_response: Response from Factory AI Code
-
-        Returns:
-            Response in MCP format
+        """
         """
         if "error" in factory_response:
             return {
@@ -151,24 +112,11 @@ class CodeAdapter(FactoryMCPAdapter):
                 "preview": result["refactoring"].get("preview", ""),
             }
 
-        logger.debug(f"Translated to MCP response: {mcp_response}")
         return mcp_response
 
     async def _call_factory_droid(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
-        """Call the Factory AI Code droid.
-
-        Args:
-            factory_request: Request in Factory AI format
-
-        Returns:
-            Response from Factory AI Code droid
         """
-        try:
-            # Import Factory AI client dynamically
-            from factory_ai import FactoryAI
-
-            if not self._factory_client:
-                self._factory_client = FactoryAI(
+        """
                     api_key=self.droid_config.get("api_key"),
                     base_url=self.droid_config.get("base_url", "https://api.factory.ai"),
                 )
@@ -186,25 +134,23 @@ class CodeAdapter(FactoryMCPAdapter):
 
             return {"result": response}
 
-        except ImportError:
+        except Exception:
+
+
+            pass
             logger.warning("Factory AI SDK not available, using mock response")
             return self._get_mock_response(factory_request)
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error calling Code droid: {e}", exc_info=True)
             raise
 
     async def _handle_streaming_request(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
-        """Handle streaming code generation request.
-
-        Args:
-            factory_request: Request in Factory AI format
-
-        Returns:
-            Streaming response setup
         """
-        try:
-            # Create streaming session
+        """
             stream_id = f"stream_{id(factory_request)}"
 
             # Start async streaming task
@@ -216,19 +162,15 @@ class CodeAdapter(FactoryMCPAdapter):
                     "stream_id": stream_id,
                 }
             }
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Error setting up streaming: {e}", exc_info=True)
             raise
 
     async def _stream_code_generation(self, stream_id: str, factory_request: Dict[str, Any]) -> None:
-        """Stream code generation responses.
-
-        Args:
-            stream_id: Unique stream identifier
-            factory_request: Request in Factory AI format
         """
-        try:
-            async for chunk in self._factory_client.droids.code.stream(
+        """
                 action=factory_request["action"],
                 context=factory_request["context"],
                 options=factory_request["options"],
@@ -237,21 +179,17 @@ class CodeAdapter(FactoryMCPAdapter):
                 if hasattr(self.mcp_server, "send_stream_chunk"):
                     await self.mcp_server.send_stream_chunk(stream_id, chunk)
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error in streaming: {e}", exc_info=True)
             if hasattr(self.mcp_server, "close_stream"):
                 await self.mcp_server.close_stream(stream_id, error=str(e))
 
     def _map_method_to_action(self, method: str) -> str:
-        """Map MCP method to Factory AI Code action.
-
-        Args:
-            method: MCP method name
-
-        Returns:
-            Factory AI action name
         """
-        method_mapping = {
+        """
             "generate_code": "generate",
             "optimize_code": "optimize",
             "refactor_code": "refactor",
@@ -262,13 +200,7 @@ class CodeAdapter(FactoryMCPAdapter):
         return method_mapping.get(method, "generate")
 
     def _get_mock_response(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
-        """Generate mock response for testing.
-
-        Args:
-            factory_request: The Factory AI request
-
-        Returns:
-            Mock response
+        """
         """
         action = factory_request["action"]
         language = factory_request["context"].get("language", "python")
@@ -333,19 +265,10 @@ class CodeAdapter(FactoryMCPAdapter):
         }
 
     def _generate_mock_code(self, language: str, context: Dict[str, Any]) -> str:
-        """Generate mock code based on language and context.
-
-        Args:
-            language: Programming language
-            context: Request context
-
-        Returns:
-            Mock code string
+        """
         """
         if language == "python":
-            return """from typing import List, Dict, Any
-
-class DataProcessor:
+            return """
     \"\"\"Process data with optimized algorithms.\"\"\"
     
     def __init__(self, config: Dict[str, Any]) -> None:
@@ -366,51 +289,15 @@ class DataProcessor:
         return {"processed": True, **item}
 """
         elif language == "typescript":
-            return """interface DataItem {
-  id: string;
-  value: any;
-}
-
-class DataProcessor {
-  private config: Record<string, any>;
-  private cache: Map<string, any>;
-
-  constructor(config: Record<string, any>) {
-    this.config = config;
-    this.cache = new Map();
-  }
-
-  async process(data: DataItem[]): Promise<DataItem[]> {
-    const results = await Promise.all(
-      data.map(item => this.processItem(item))
-    );
-    return results;
-  }
-
-  private async processItem(item: DataItem): Promise<DataItem> {
-    // Implementation here
-    return { ...item, processed: true };
-  }
-}
+            return """
 """
         return f"// Mock {language} code\n// Generated based on context"
 
     def _generate_mock_tests(self, language: str) -> str:
-        """Generate mock test code.
-
-        Args:
-            language: Programming language
-
-        Returns:
-            Mock test code
+        """
         """
         if language == "python":
-            return """import pytest
-from unittest.mock import Mock, patch
-
-class TestDataProcessor:
-    def test_process_data(self):
-        processor = DataProcessor({})
+            return """
         result = processor.process([{"id": 1}])
         assert len(result) == 1
         assert result[0]["processed"] is True

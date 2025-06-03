@@ -1,27 +1,7 @@
 #!/usr/bin/env python3
 """
-Enhanced Natural Language Interface for Orchestra AI MVP
-Provides intelligent conversational AI with deep context, memory, and multi-modal capabilities.
 """
-
-import logging
-import re
-from dataclasses import dataclass, field
-from datetime import datetime
-from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
-
-import portkey
-from enhanced_vector_memory_system import ContextualMemory, ConversationContext, EnhancedVectorMemorySystem
-from weaviate.preview import generative_models
-
-from data_source_integrations import DataAggregationOrchestrator
-
-logger = logging.getLogger(__name__)
-
-class ConversationMode(Enum):
     """Different conversation modes for context-aware responses."""
-
     CASUAL = "casual"
     ANALYTICAL = "analytical"
     TECHNICAL = "technical"
@@ -31,35 +11,8 @@ class ConversationMode(Enum):
 @dataclass
 class ConversationMessage:
     """Individual conversation message with metadata."""
-
-    id: str
-    user_id: str
-    conversation_id: str
-    content: str
-    role: str  # 'user', 'assistant', 'system'
-    timestamp: datetime
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    intent: Optional[str] = None
-    entities: List[Dict[str, Any]] = field(default_factory=list)
-
-@dataclass
-class ConversationSession:
     """Complete conversation session with context."""
-
-    id: str
-    user_id: str
-    title: Optional[str]
-    mode: ConversationMode
-    messages: List[ConversationMessage]
-    context: ConversationContext
-    created_at: datetime
-    updated_at: datetime
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
-class IntentClassifier:
     """Classifies user intents from natural language input."""
-
-    INTENT_PATTERNS = {
         "search_memory": [
             r"what.*about",
             r"tell me.*about",
@@ -89,22 +42,10 @@ class IntentClassifier:
 
     def classify_intent(self, text: str) -> Optional[str]:
         """Classify the intent of user input."""
-        text_lower = text.lower()
-
-        for intent, patterns in self.INTENT_PATTERNS.items():
-            for pattern in patterns:
-                if re.search(pattern, text_lower):
-                    return intent
-
         return "general_query"
 
 class ContextualResponseGenerator:
     """Generates context-aware responses using multiple AI models."""
-
-    def __init__(self, project_id: str, portkey_api_key: str):
-        self.project_id = project_id
-
-        # Initialize AI models
         self.gemini = generative_models.GenerativeModel("gemini-1.5-pro")
         self.portkey = portkey.Client(api_key=portkey_api_key, config={"virtual_key": "vertex-agent-special"})
 
@@ -125,14 +66,12 @@ class ContextualResponseGenerator:
         intent: Optional[str] = None,
     ) -> Tuple[str, Dict[str, Any]]:
         """Generate a contextual response with metadata."""
-
-        # Build enhanced prompt with context
-        enhanced_prompt = await self._build_enhanced_prompt(query, context, mode, intent)
-
-        # Select appropriate model
         model = self.model_routing.get(mode.value, "gemini-pro")
 
         try:
+
+
+            pass
             # Try primary model
             response = await self._generate_with_model(enhanced_prompt, model)
 
@@ -141,18 +80,25 @@ class ContextualResponseGenerator:
 
             return response, metadata
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.warning(f"Primary model failed, falling back to Gemini: {e}")
 
             # Fallback to Gemini
             try:
+
+                pass
                 response = self.gemini.generate_content(enhanced_prompt).text
                 metadata = {
                     "model": "gemini-fallback",
                     "timestamp": datetime.utcnow().isoformat(),
                 }
                 return response, metadata
-            except Exception as fallback_error:
+            except Exception:
+
+                pass
                 logger.error(f"All models failed: {fallback_error}")
                 return (
                     "I'm having trouble processing your request right now. Please try again.",
@@ -167,8 +113,6 @@ class ContextualResponseGenerator:
         intent: Optional[str],
     ) -> str:
         """Build an enhanced prompt with rich context."""
-
-        prompt_parts = [
             "You are an advanced AI assistant with access to comprehensive business data and context.",
             f"Current conversation mode: {mode.value}",
             f"User query intent: {intent or 'general'}",
@@ -214,12 +158,6 @@ class ContextualResponseGenerator:
 
     def _generate_source_summary(self, memories: List[ContextualMemory]) -> str:
         """Generate a summary of available data sources."""
-        source_counts = {}
-        for memory in memories:
-            source = memory.source
-            source_counts[source] = source_counts.get(source, 0) + 1
-
-        if not source_counts:
             return "No specific data sources available."
 
         summary_parts = []
@@ -230,12 +168,6 @@ class ContextualResponseGenerator:
 
     async def _generate_with_model(self, prompt: str, model: str) -> str:
         """Generate response using specified model via Portkey."""
-
-        try:
-            response = self.portkey.chat.completions.create(
-                model=model,
-                messages=[
-                    {
                         "role": "system",
                         "content": "You are an expert AI assistant with access to comprehensive business data.",
                     },
@@ -246,14 +178,15 @@ class ContextualResponseGenerator:
             )
             return response.choices[0].message.content
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Portkey generation failed with model {model}: {e}")
             raise
 
     async def _extract_response_metadata(self, response: str, context: ConversationContext) -> Dict[str, Any]:
         """Extract metadata from the generated response."""
-
-        metadata = {
             "timestamp": datetime.utcnow().isoformat(),
             "context_memories_used": len(context.active_memories),
             "sources_referenced": list(set(m.source for m in context.active_memories)),
@@ -282,44 +215,8 @@ class ContextualResponseGenerator:
 
 class EnhancedNaturalLanguageInterface:
     """
-    Advanced natural language interface for Orchestra AI.
-
-    Features:
-    - Context-aware conversations
-    - Multi-modal AI model routing
-    - Intent classification
-    - Memory-powered responses
-    - Real-time data integration
     """
-
-    def __init__(
-        self,
-        memory_system: EnhancedVectorMemorySystem,
-        data_orchestrator: DataAggregationOrchestrator,
-        project_id: str,
-        portkey_api_key: str,
-    ):
-        self.memory_system = memory_system
-        self.data_orchestrator = data_orchestrator
-        self.project_id = project_id
-
-        # Initialize components
-        self.intent_classifier = IntentClassifier()
-        self.response_generator = ContextualResponseGenerator(project_id, portkey_api_key)
-
-        # Active conversations
-        self.active_sessions: Dict[str, ConversationSession] = {}
-
-    async def start_conversation(
-        self,
-        user_id: str,
-        initial_query: Optional[str] = None,
-        mode: ConversationMode = ConversationMode.CASUAL,
-        conversation_id: Optional[str] = None,
-    ) -> ConversationSession:
         """Start a new conversation session or resume existing one."""
-
-        if not conversation_id:
             conversation_id = f"conv_{user_id}_{int(datetime.utcnow().timestamp())}"
 
         # Get conversation context from memory system
@@ -352,9 +249,6 @@ class EnhancedNaturalLanguageInterface:
         self, conversation_id: str, message: str, user_id: Optional[str] = None
     ) -> ConversationMessage:
         """Process a user message and generate a response."""
-
-        session = self.active_sessions.get(conversation_id)
-        if not session:
             raise ValueError(f"No active session found for conversation {conversation_id}")
 
         # Classify intent
@@ -385,9 +279,6 @@ class EnhancedNaturalLanguageInterface:
 
     async def _handle_data_sync(self, session: ConversationSession, message: str) -> ConversationMessage:
         """Handle data synchronization requests."""
-
-        # Extract data sources from message
-        sources_mentioned = []
         for source in ["gong", "salesforce", "hubspot", "slack", "looker"]:
             if source in message.lower():
                 sources_mentioned.append(source)
@@ -430,9 +321,6 @@ class EnhancedNaturalLanguageInterface:
 
     async def _handle_memory_search(self, session: ConversationSession, message: str) -> ConversationMessage:
         """Handle memory search requests."""
-
-        # Extract search parameters from message
-        sources = None
         if "gong" in message.lower():
             sources = ["gong"]
         elif "salesforce" in message.lower():
@@ -475,17 +363,6 @@ class EnhancedNaturalLanguageInterface:
 
     async def _handle_data_analysis(self, session: ConversationSession, message: str) -> ConversationMessage:
         """Handle data analysis requests."""
-
-        # Update context with analytical focus
-        context = await self.memory_system.get_conversation_context(
-            user_id=session.user_id, conversation_id=session.id, query=message
-        )
-
-        # Generate analytical response
-        response_content, metadata = await self.response_generator.generate_response(
-            query=message,
-            context=context,
-            mode=ConversationMode.ANALYTICAL,
             intent="analyze_data",
         )
 
@@ -506,24 +383,6 @@ class EnhancedNaturalLanguageInterface:
 
     async def _handle_general_query(self, session: ConversationSession, message: str) -> ConversationMessage:
         """Handle general queries with full context."""
-
-        # Update conversation context
-        context = await self.memory_system.get_conversation_context(
-            user_id=session.user_id, conversation_id=session.id, query=message
-        )
-
-        # Update session context
-        session.context = context
-
-        # Generate contextual response
-        response_content, metadata = await self.response_generator.generate_response(
-            query=message,
-            context=context,
-            mode=session.mode,
-            intent=session.messages[-1].intent if session.messages else None,
-        )
-
-        response_message = ConversationMessage(
             id=f"msg_{len(session.messages) + 1}",
             user_id=session.user_id,
             conversation_id=session.id,
@@ -542,25 +401,7 @@ class EnhancedNaturalLanguageInterface:
         self, conversation_id: str, limit: Optional[int] = None
     ) -> List[ConversationMessage]:
         """Get conversation history."""
-
-        session = self.active_sessions.get(conversation_id)
-        if not session:
-            return []
-
-        messages = session.messages
-        if limit:
-            messages = messages[-limit:]
-
-        return messages
-
-    async def end_conversation(self, conversation_id: str) -> None:
         """End and clean up a conversation session."""
-
-        if conversation_id in self.active_sessions:
-            session = self.active_sessions[conversation_id]
-
-            # Save conversation summary to memory
-            if session.messages:
                 conversation_summary = f"Conversation Summary: {len(session.messages)} messages exchanged"
 
                 await self.memory_system.add_memory(
@@ -581,4 +422,3 @@ class EnhancedNaturalLanguageInterface:
 
     def get_active_conversations(self, user_id: str) -> List[ConversationSession]:
         """Get all active conversations for a user."""
-        return [session for session in self.active_sessions.values() if session.user_id == user_id]

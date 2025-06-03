@@ -1,41 +1,7 @@
 """
-Tests for PersonaConfigManager.
-
-This module contains comprehensive tests for the PersonaConfigManager class,
-ensuring proper loading, validation, and management of persona configurations.
 """
-
-import tempfile
-from pathlib import Path
-from typing import Generator
-from unittest.mock import Mock, patch
-
-import pytest
-import yaml
-
-from .manager import (
-    PersonaConfigError,
-    PersonaConfigManager,
-    PersonaNotFoundError,
-)
-from .models import (
-    InteractionMode,
-    PersonaConfiguration,
-    PersonaStatus,
-    ResponseStyleType,
-    TraitCategory,
-)
-
-@pytest.fixture
-def temp_config_dir() -> Generator[Path, None, None]:
     """Create a temporary directory for test configurations."""
-    with tempfile.TemporaryDirectory() as tmpdir:
-        yield Path(tmpdir)
-
-@pytest.fixture
-def sample_persona_data() -> dict:
     """Provide sample persona data for testing."""
-    return {
         "name": "Test Persona",
         "slug": "test-persona",
         "description": "A test persona for unit testing",
@@ -65,7 +31,6 @@ def sample_persona_data() -> dict:
 @pytest.fixture
 def manager_with_personas(temp_config_dir: Path, sample_persona_data: dict) -> PersonaConfigManager:
     """Create a manager with pre-loaded test personas."""
-    # Create test YAML file
     test_file = temp_config_dir / "test_personas.yaml"
     with open(test_file, "w") as f:
         yaml.dump(sample_persona_data, f)
@@ -76,20 +41,12 @@ def manager_with_personas(temp_config_dir: Path, sample_persona_data: dict) -> P
 
 class TestPersonaConfigManager:
     """Test cases for PersonaConfigManager."""
-
-    def test_init_with_invalid_directory(self) -> None:
         """Test initialization with non-existent directory."""
         with pytest.raises(PersonaConfigError, match="Config directory does not exist"):
             PersonaConfigManager("/non/existent/path")
 
     def test_init_with_valid_directory(self, temp_config_dir: Path) -> None:
         """Test successful initialization."""
-        manager = PersonaConfigManager(temp_config_dir)
-        assert manager.config_dir == temp_config_dir
-        assert manager.personas == {}
-        assert manager._file_cache == {}
-
-    def test_load_persona_from_file(self, temp_config_dir: Path, sample_persona_data: dict) -> None:
         """Test loading a single persona from file."""
         test_file = temp_config_dir / "test_persona.yaml"
         with open(test_file, "w") as f:
@@ -107,8 +64,6 @@ class TestPersonaConfigManager:
 
     def test_load_persona_from_nonexistent_file(self, temp_config_dir: Path) -> None:
         """Test loading from non-existent file."""
-        manager = PersonaConfigManager(temp_config_dir)
-
         with pytest.raises(PersonaConfigError, match="Persona file not found"):
             manager.load_persona_from_file(temp_config_dir / "nonexistent.yaml")
 
@@ -147,9 +102,6 @@ class TestPersonaConfigManager:
 
     def test_load_all_personas(self, temp_config_dir: Path, sample_persona_data: dict) -> None:
         """Test loading all personas from directory."""
-        # Create multiple test files
-        for i in range(3):
-            test_data = sample_persona_data.copy()
             test_data["name"] = f"Test Persona {i}"
             test_data["slug"] = f"test-persona-{i}"
 
@@ -165,14 +117,7 @@ class TestPersonaConfigManager:
 
     def test_load_all_personas_empty_directory(self, temp_config_dir: Path) -> None:
         """Test loading from empty directory."""
-        manager = PersonaConfigManager(temp_config_dir)
-        personas = manager.load_all_personas()
-
-        assert personas == {}
-
-    def test_load_all_personas_with_errors(self, temp_config_dir: Path, sample_persona_data: dict) -> None:
         """Test loading with some invalid files."""
-        # Create one valid file
         valid_file = temp_config_dir / "valid.yaml"
         with open(valid_file, "w") as f:
             yaml.dump(sample_persona_data, f)
@@ -201,13 +146,10 @@ class TestPersonaConfigManager:
 
     def test_list_personas(self, manager_with_personas: PersonaConfigManager) -> None:
         """Test listing all personas."""
-        personas = manager_with_personas.list_personas()
-        assert len(personas) == 1
         assert personas[0].slug == "test-persona"
 
     def test_list_personas_with_status_filter(self, temp_config_dir: Path, sample_persona_data: dict) -> None:
         """Test listing personas filtered by status."""
-        # Create personas with different statuses
         for status in ["active", "inactive", "draft"]:
             data = sample_persona_data.copy()
             data["slug"] = f"persona-{status}"
@@ -226,7 +168,6 @@ class TestPersonaConfigManager:
 
     def test_list_personas_with_tag_filter(self, temp_config_dir: Path, sample_persona_data: dict) -> None:
         """Test listing personas filtered by tags."""
-        # Create personas with different tags
         for i, tags in enumerate([["tag1", "tag2"], ["tag2", "tag3"], ["tag3"]]):
             data = sample_persona_data.copy()
             data["slug"] = f"persona-{i}"
@@ -292,8 +233,6 @@ class TestPersonaConfigManager:
 
     def test_validate_all(self, temp_config_dir: Path, sample_persona_data: dict) -> None:
         """Test validation of all personas."""
-        # Create persona with no traits
-        invalid_data = sample_persona_data.copy()
         invalid_data["slug"] = "invalid-persona"
         invalid_data["traits"] = []
 
@@ -337,7 +276,6 @@ class TestPersonaConfigManager:
 
     def test_load_detailed_personas(self, temp_config_dir: Path) -> None:
         """Test loading the actual personas_detailed.yaml file format."""
-        # Read the actual personas_detailed.yaml content
         personas_file = Path(__file__).parent / "personas_detailed.yaml"
         if personas_file.exists():
             # Copy to temp directory

@@ -1,21 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Test all enhanced methods to ensure they work correctly.
 """
-
-import asyncio
-import uuid
-from datetime import datetime
-from shared.database.connection_manager_enhanced import get_connection_manager_enhanced
-from shared.database.unified_postgresql_enhanced import get_unified_postgresql_enhanced
-
-async def test_enhanced_methods():
     """Test all methods added by mixins."""
-
-    # Get enhanced instances
-    manager = await get_connection_manager_enhanced()
-    postgres = await get_unified_postgresql_enhanced()
-
     print("Testing Enhanced Connection Manager Methods:")
     print("-" * 50)
 

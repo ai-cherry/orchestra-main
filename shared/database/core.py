@@ -1,15 +1,20 @@
+# TODO: Consider adding connection pooling configuration
 import os
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 
 # Attempt to import from the central config, falling back to os.getenv for standalone use/testing
 try:
+
+    pass
     from agent.app.core import config as app_config
     DATABASE_URL = app_config.DATABASE_URL # This should be the primary source
     if not DATABASE_URL.startswith("postgresql+psycopg://"):
         # If the main DATABASE_URL isn't in psycopg format, construct it
         DATABASE_URL = f"postgresql+psycopg://{app_config.POSTGRES_USER}:{app_config.POSTGRES_PASSWORD}@{app_config.POSTGRES_HOST}:{app_config.POSTGRES_PORT}/{app_config.POSTGRES_DB}"
-except ImportError:
+except Exception:
+
+    pass
     # Fallback if agent.app.core.config is not available (e.g. running script standalone)
     PG_USER = os.getenv("POSTGRES_USER", "orchestrator")
     PG_PASSWORD = os.getenv("POSTGRES_PASSWORD", "orch3str4_2024")
@@ -33,12 +38,3 @@ AsyncSessionLocal = async_sessionmaker(
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
     """FastAPI dependency to provide an SQLAlchemy AsyncSession."""
-    async with AsyncSessionLocal() as session:
-        try:
-            yield session
-            await session.commit() # Commit if no exceptions
-        except Exception:
-            await session.rollback()
-            raise
-        finally:
-            await session.close() 

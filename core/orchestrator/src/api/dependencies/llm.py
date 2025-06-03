@@ -1,35 +1,7 @@
 """
-LLM client dependency for AI Orchestration System.
-
-This module provides the dependency injection function for the LLM client,
-supporting both traditional LangChain-based clients and Phidata/Agno models
-with Portkey integration.
 """
-
-import logging
-import os
-from functools import lru_cache
-from typing import Any
-
-from core.orchestrator.src.config.settings import Settings, get_settings
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-@lru_cache()
-def get_llm_client() -> Any:  # Return type could be LLMClient or an Agno model
     """
-    Get the LLM client instance.
-
-    Returns an initialized LLM model, using the Phidata/Agno implementation with
-    Portkey integration if available, or falling back to the legacy PortkeyClient.
-
-    Returns:
-        An initialized LLM client or model
     """
-    settings = get_settings()
-
-    # Check if we should use monitored LiteLLM client
     use_monitored_litellm = os.environ.get("USE_MONITORED_LITELLM", "").lower() in (
         "true",
         "1",
@@ -39,6 +11,8 @@ def get_llm_client() -> Any:  # Return type could be LLMClient or an Agno model
     if use_monitored_litellm:
         logger.info("Using MonitoredLiteLLMClient for Claude API monitoring")
         try:
+
+            pass
             from core.monitoring.monitored_litellm_client import MonitoredLiteLLMClient
 
             return MonitoredLiteLLMClient(
@@ -49,7 +23,9 @@ def get_llm_client() -> Any:  # Return type could be LLMClient or an Agno model
                 vertex_project=settings.vultr_project_id,
                 vertex_location=settings.vultr_region,
             )
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to initialize MonitoredLiteLLMClient: {e}")
             # Fall through to other options
 
@@ -61,13 +37,18 @@ def get_llm_client() -> Any:  # Return type could be LLMClient or an Agno model
 
     # Legacy path - try to load the real Portkey client first
     try:
+
+        pass
         # Import separately to catch import errors specifically
         from packages.shared.src.llm_client.portkey_client import PortkeyClient
 
         logger.info("Using legacy PortkeyClient")
         return PortkeyClient(settings)
 
-    except ImportError as e:
+    except Exception:
+
+
+        pass
         # Fall back to mock client if the real client can't be loaded
         logger.warning(f"Failed to import PortkeyClient: {e}")
         logger.info("Falling back to MockPortkeyClient")
@@ -76,7 +57,10 @@ def get_llm_client() -> Any:  # Return type could be LLMClient or an Agno model
 
         return MockPortkeyClient(settings)
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         # Handle other initialization errors
         logger.error(f"Error initializing PortkeyClient: {e}")
         logger.info("Falling back to MockPortkeyClient")
@@ -87,43 +71,32 @@ def get_llm_client() -> Any:  # Return type could be LLMClient or an Agno model
 
 def use_phidata_implementation(settings: Settings) -> bool:
     """
-    Determine whether to use the Phidata/Agno implementation.
-
-    This can be controlled through environment variables or settings.
-
-    Args:
-        settings: Application settings
-
-    Returns:
-        Boolean indicating whether to use Phidata implementation
     """
-    # Check if an environment variable is set to disable Phidata implementation
     if os.environ.get("USE_LEGACY_LLM_CLIENT", "").lower() in ("true", "1", "yes"):
         return False
 
     # Check if required packages are available
     try:
+
+        pass
         pass
 
         return True
-    except ImportError:
+    except Exception:
+
+        pass
         logger.warning("Phidata/Agno packages not available, using legacy LLM client")
         return False
 
 def get_phidata_llm_model(settings: Settings) -> Any:
     """
-    Get a Phidata/Agno LLM model instance with Portkey integration.
-
-    Args:
-        settings: Application settings
-
-    Returns:
-        An initialized Phidata/Agno LLM model
     """
-    # Determine which provider to use based on settings
     provider = getattr(settings, "PREFERRED_LLM_PROVIDER", "openrouter").lower()
 
     try:
+
+
+        pass
         if provider == "openai":
             from packages.llm.src.models.openai import create_openai_model
 
@@ -146,7 +119,10 @@ def get_phidata_llm_model(settings: Settings) -> Any:
 
             return create_openrouter_model(settings)
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Error initializing Phidata/Agno model: {e}")
         logger.info("Falling back to legacy PortkeyClient")
 

@@ -1,28 +1,6 @@
 """
-Example usage of the Secret Manager integration.
-
-This module demonstrates how to use the Secret Manager utility to
-access secrets from both environment variables and Google Secret Manager
-while maintaining backward compatibility.
 """
-
-import logging
-import os
-import sys
-from pathlib import Path
-
-# Add parent directory to path for imports
-sys.path.append(str(Path(__file__).parent.parent))
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-
-# Import the secret manager module
-from config.os.environ import get_secret, secrets
-
-def main():
     """Demonstrate different ways to access secrets."""
-
     print("=== Secret Manager Usage Examples ===\n")
 
     # Example 1: Direct function call

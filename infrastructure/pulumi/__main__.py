@@ -1,13 +1,5 @@
 """
-Pulumi infrastructure for AI Orchestra on Vultr
 """
-import pulumi
-import pulumi_vultr as vultr
-import pulumi_command as command
-from pulumi import Config, Output, export
-
-# Get configuration
-config = Config()
 region = config.get("region") or "ewr"  # New Jersey by default
 instance_type = config.get("instanceType") or "vc2-2c-4gb"  # 2 vCPU, 4GB RAM
 ssh_key_name = config.get("sshKeyName") or "orchestra-key"
@@ -73,17 +65,7 @@ instance = vultr.Instance("orchestra-instance",
     activation_email=False,
     ssh_key_ids=[ssh_key.id],
     firewall_group_id=firewall_group.id,
-    user_data="""#!/bin/bash
-# Update system
-apt-get update
-apt-get upgrade -y
-
-# Install Docker
-curl -fsSL https://get.docker.com -o get-docker.sh
-sh get-docker.sh
-usermod -aG docker ubuntu
-
-# Install Docker Compose
+    user_data="""
 curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 
@@ -118,9 +100,6 @@ ln -s /etc/nginx/sites-available/orchestra /etc/nginx/sites-enabled/
 rm /etc/nginx/sites-enabled/default
 systemctl restart nginx
 """
-)
-
-# Copy and deploy the Docker image
 deploy_script = command.remote.Command("deploy-orchestra",
     connection=command.remote.ConnectionArgs(
         host=instance.main_ip,
@@ -128,16 +107,8 @@ deploy_script = command.remote.Command("deploy-orchestra",
         private_key=config.require_secret("sshPrivateKey"),
     ),
     create=Output.concat("""
-# Wait for instance to be ready
-sleep 30
-
-# Copy Docker image
 echo "Copying Docker image..."
-"""),
-    opts=pulumi.ResourceOptions(depends_on=[instance])
-)
-
-# Export outputs
+"""
 export("instance_id", instance.id)
 export("instance_ip", instance.main_ip)
 export("instance_ipv6", instance.v6_main_ip)

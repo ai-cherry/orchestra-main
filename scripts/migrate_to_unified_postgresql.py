@@ -1,42 +1,12 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Migration script to transition from duplicated PostgreSQL implementations
-to the new unified architecture.
-
-This script:
-1. Migrates data from old tables to new unified structure
-2. Updates all references to use the new unified clients
-3. Removes deprecated code and tables
-4. Validates the migration
 """
-
-import asyncio
-import os
-import sys
-import logging
-from pathlib import Path
-from typing import Dict, List, Any, Optional
-import json
-from datetime import datetime
-
-# Add parent directory to path
-sys.path.append(str(Path(__file__).parent.parent))
-
-from shared.database.connection_manager_enhanced import get_connection_manager_enhanced as get_connection_manager
-from shared.database.unified_postgresql_enhanced import get_unified_postgresql_enhanced as get_unified_postgresql
-from shared.database.unified_db_v2 import get_unified_database
-
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 class UnifiedPostgreSQLMigration:
     """Handles migration to unified PostgreSQL architecture."""
-
-    def __init__(self):
-        self.manager = None
-        self.unified_pg = None
-        self.unified_db = None
-        self.migration_stats = {
             "sessions_migrated": 0,
             "cache_entries_migrated": 0,
             "deprecated_tables_removed": 0,
@@ -54,10 +24,6 @@ class UnifiedPostgreSQLMigration:
 
     async def run_migration(self):
         """Run the complete migration process."""
-        try:
-            await self.initialize()
-
-            # Step 1: Backup existing data
             logger.info("Step 1: Creating backup...")
             await self.create_backup()
 
@@ -84,7 +50,10 @@ class UnifiedPostgreSQLMigration:
             # Print summary
             self.print_summary()
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Migration failed: {e}")
             self.migration_stats["errors"].append(str(e))
             raise
@@ -105,6 +74,8 @@ class UnifiedPostgreSQLMigration:
 
         for table, filename in tables_to_backup:
             try:
+
+                pass
                 rows = await self.manager.fetch(f"SELECT * FROM {table}")
                 data = [dict(row) for row in rows]
 
@@ -118,23 +89,15 @@ class UnifiedPostgreSQLMigration:
                     json.dump(data, f, indent=2, default=str)
 
                 logger.info(f"Backed up {len(data)} rows from {table}")
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.warning(f"Could not backup {table}: {e}")
 
     async def migrate_sessions(self):
         """Migrate sessions from old structure to new."""
-        try:
-            # Check if old sessions table exists
-            old_sessions = await self.manager.fetch(
                 """
-                SELECT * FROM orchestra.sessions 
-                WHERE expires_at > CURRENT_TIMESTAMP
             """
-            )
-
-            for session in old_sessions:
-                try:
-                    # Parse session data
                     session_data = session["data"]
                     if isinstance(session_data, str):
                         session_data = json.loads(session_data)
@@ -150,39 +113,32 @@ class UnifiedPostgreSQLMigration:
 
                     self.migration_stats["sessions_migrated"] += 1
 
-                except Exception as e:
+                except Exception:
+
+
+                    pass
                     logger.error(f"Failed to migrate session {session['id']}: {e}")
                     self.migration_stats["errors"].append(f"Session {session['id']}: {e}")
 
             logger.info(f"Migrated {self.migration_stats['sessions_migrated']} sessions")
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.warning(f"No existing sessions to migrate: {e}")
 
     async def migrate_cache(self):
         """Migrate cache entries if any exist."""
-        try:
-            # Check for any existing cache tables
-            cache_tables = await self.manager.fetch(
                 """
-                SELECT tablename FROM pg_tables 
-                WHERE schemaname = 'public' 
-                AND tablename LIKE '%cache%'
             """
-            )
-
-            for table in cache_tables:
                 table_name = table["tablename"]
                 try:
+
+                    pass
                     rows = await self.manager.fetch(
                         f"""
-                        SELECT * FROM public.{table_name}
-                        WHERE expires_at > CURRENT_TIMESTAMP
                     """
-                    )
-
-                    for row in rows:
-                        await self.unified_pg.cache_set(
                             key=row.get("key", row.get("id")),
                             value=row.get("value", row.get("data")),
                             ttl=3600,
@@ -190,19 +146,22 @@ class UnifiedPostgreSQLMigration:
                         )
                         self.migration_stats["cache_entries_migrated"] += 1
 
-                except Exception as e:
+                except Exception:
+
+
+                    pass
                     logger.warning(f"Could not migrate from {table_name}: {e}")
 
             logger.info(f"Migrated {self.migration_stats['cache_entries_migrated']} cache entries")
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.warning(f"No cache entries to migrate: {e}")
 
     async def update_code_references(self):
         """Update Python files to use new unified clients."""
-        replacements = [
-            # Old imports to new imports
-            (
                 "from shared.database.postgresql_client import PostgreSQLClient",
                 "from shared.database.unified_postgresql_enhanced import get_unified_postgresql_enhanced as get_unified_postgresql",
             ),
@@ -245,6 +204,9 @@ class UnifiedPostgreSQLMigration:
                 continue
 
             try:
+
+
+                pass
                 content = py_file.read_text()
                 original_content = content
 
@@ -259,14 +221,15 @@ class UnifiedPostgreSQLMigration:
                     self.migration_stats["files_updated"] += 1
                     logger.info(f"Updated {py_file}")
 
-            except Exception as e:
+            except Exception:
+
+
+                pass
                 logger.error(f"Failed to update {py_file}: {e}")
                 self.migration_stats["errors"].append(f"File update {py_file}: {e}")
 
     async def cleanup_deprecated_tables(self):
         """Remove deprecated tables and schemas."""
-        deprecated_items = [
-            # Old session tables in wrong schema
             "DROP TABLE IF EXISTS orchestra.sessions CASCADE",
             # Old cache tables
             "DROP TABLE IF EXISTS public.cache CASCADE",
@@ -279,18 +242,18 @@ class UnifiedPostgreSQLMigration:
 
         for sql in deprecated_items:
             try:
+
+                pass
                 await self.manager.execute(sql)
                 self.migration_stats["deprecated_tables_removed"] += 1
                 logger.info(f"Executed: {sql}")
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.warning(f"Could not execute {sql}: {e}")
 
     async def validate_migration(self):
         """Validate the migration was successful."""
-        validations = []
-
-        # Check new tables exist
-        required_tables = [
             ("cache.entries", "Cache table"),
             ("sessions.sessions", "Sessions table"),
             ("orchestra.agents", "Agents table"),
@@ -302,18 +265,13 @@ class UnifiedPostgreSQLMigration:
         for table, description in required_tables:
             exists = await self.manager.fetchval(
                 f"""
-                SELECT EXISTS (
-                    SELECT FROM information_schema.tables 
-                    WHERE table_schema = split_part('{table}', '.', 1)
-                    AND table_name = split_part('{table}', '.', 2)
-                )
             """
-            )
-
             validations.append({"check": description, "passed": exists, "message": "Exists" if exists else "Missing"})
 
         # Check connection pool is working
         try:
+
+            pass
             health = await self.unified_pg.health_check()
             validations.append(
                 {
@@ -322,11 +280,15 @@ class UnifiedPostgreSQLMigration:
                     "message": f"Pool: {health['pool']['used_connections']}/{health['pool']['max_size']} connections",
                 }
             )
-        except Exception as e:
+        except Exception:
+
+            pass
             validations.append({"check": "Connection pool health", "passed": False, "message": str(e)})
 
         # Check unified database is working
         try:
+
+            pass
             db_health = await self.unified_db.health_check()
             validations.append(
                 {
@@ -335,7 +297,9 @@ class UnifiedPostgreSQLMigration:
                     "message": "All systems operational",
                 }
             )
-        except Exception as e:
+        except Exception:
+
+            pass
             validations.append({"check": "Unified database health", "passed": False, "message": str(e)})
 
         # Print validation results
@@ -379,8 +343,6 @@ class UnifiedPostgreSQLMigration:
 
 async def main():
     """Run the migration."""
-    migration = UnifiedPostgreSQLMigration()
-
     logger.info("=== PostgreSQL Unification Migration ===")
     logger.info("This will migrate all PostgreSQL components to the unified architecture.")
 
@@ -391,8 +353,13 @@ async def main():
         return
 
     try:
+
+
+        pass
         await migration.run_migration()
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Migration failed: {e}")
         sys.exit(1)
     finally:

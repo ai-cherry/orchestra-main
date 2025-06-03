@@ -1,55 +1,25 @@
 #!/usr/bin/env python3
 """
-Performance Testing Suite for SuperAGI
-=====================================
-Load testing and performance benchmarking for AI Orchestra
 """
-
-import asyncio
-import logging
-import time
-from dataclasses import dataclass
-from datetime import datetime
-from typing import Dict, List, Optional
-
-import aiohttp
-import numpy as np
-import requests
-from kubernetes import client, config
-
-# Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
 @dataclass
 class TestResult:
     """Performance test result"""
-
-    test_name: str
-    duration_seconds: float
-    requests_total: int
-    requests_successful: int
-    requests_failed: int
-    avg_latency_ms: float
-    p50_latency_ms: float
-    p95_latency_ms: float
-    p99_latency_ms: float
-    throughput_rps: float
-    error_rate: float
-    timestamp: datetime
-
-class PerformanceTester:
     """Performance testing for SuperAGI deployment"""
-
-    def __init__(self, superagi_endpoint: str, prometheus_endpoint: Optional[str] = None):
         self.superagi_endpoint = superagi_endpoint.rstrip("/")
         self.prometheus_endpoint = prometheus_endpoint
         self.results: List[TestResult] = []
 
         # Load Kubernetes config
         try:
+
+            pass
             config.load_incluster_config()
-        except config.ConfigException as e:
+        except Exception:
+
+            pass
             logger.warning(f"Could not load Kubernetes config, proceeding with defaults or limited functionality: {e}")
             config.load_kube_config()
 
@@ -70,7 +40,6 @@ class PerformanceTester:
 
         async def execute_request(session: aiohttp.ClientSession) -> float:
             """Execute a single agent request"""
-            payload = {
                 "agent_id": agent_id,
                 "task": f"Test task {datetime.now().isoformat()}",
                 "memory_context": True,
@@ -78,6 +47,8 @@ class PerformanceTester:
 
             request_start = time.time()
             try:
+
+                pass
                 async with session.post(
                     f"{self.superagi_endpoint}/agents/execute",
                     json=payload,
@@ -89,7 +60,9 @@ class PerformanceTester:
                     else:
                         logger.error(f"Request failed with status: {response.status}")
                         return -1
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Request error: {str(e)}")
                 return -1
 
@@ -105,6 +78,10 @@ class PerformanceTester:
             results = await asyncio.gather(*tasks)
 
         # Process results
+        # TODO: Consider using list comprehension for better performance
+
+        # TODO: Consider using list comprehension for better performance
+
         for latency in results:
             if latency >= 0:
                 latencies.append(latency)
@@ -160,7 +137,6 @@ class PerformanceTester:
 
         async def memory_operation(session: aiohttp.ClientSession, operation_id: int) -> float:
             """Perform a memory store and retrieve operation"""
-            memory_data = {
                 "agent_id": "test_agent",
                 "memory_type": "short_term",
                 "content": f"Test memory content {operation_id}",
@@ -172,6 +148,8 @@ class PerformanceTester:
 
             request_start = time.time()
             try:
+
+                pass
                 # Store memory
                 async with session.post(
                     f"{self.superagi_endpoint}/memory/store",
@@ -195,7 +173,10 @@ class PerformanceTester:
                     else:
                         return -1
 
-            except Exception as e:
+            except Exception:
+
+
+                pass
                 logger.error(f"Memory operation error: {str(e)}")
                 return -1
 
@@ -267,10 +248,6 @@ class PerformanceTester:
 
         async def agent_tasks(session: aiohttp.ClientSession, agent_id: str) -> List[float]:
             """Execute multiple tasks for a single agent"""
-            agent_latencies = []
-
-            for i in range(tasks_per_agent):
-                payload = {
                     "agent_id": agent_id,
                     "task": f"Task {i} for {agent_id}",
                     "memory_context": True,
@@ -278,6 +255,8 @@ class PerformanceTester:
 
                 request_start = time.time()
                 try:
+
+                    pass
                     async with session.post(
                         f"{self.superagi_endpoint}/agents/execute",
                         json=payload,
@@ -289,6 +268,8 @@ class PerformanceTester:
                         else:
                             agent_latencies.append(-1)
                 except Exception:
+
+                    pass
                     agent_latencies.append(-1)
 
             return agent_latencies
@@ -300,6 +281,8 @@ class PerformanceTester:
 
         # Process results
         for agent_results in all_results:
+            # TODO: Consider using list comprehension for better performance
+
             for latency in agent_results:
                 if latency >= 0:
                     latencies.append(latency)
@@ -348,16 +331,18 @@ class PerformanceTester:
 
     def get_resource_metrics(self) -> Dict[str, Dict[str, float]]:
         """Get current resource usage from Prometheus"""
-        if not self.prometheus_endpoint:
             logger.warning("Prometheus endpoint not configured")
             return {}
 
         try:
+
+
+            pass
             # Query Prometheus metrics
             response = requests.get(
                 f"{self.prometheus_endpoint}/api/v1/query",
                 params={"query": 'container_memory_usage_bytes{namespace="superagi"}'},
-            )
+            , timeout=30)
 
             if response.status_code == 200:
                 data = response.json()
@@ -373,7 +358,10 @@ class PerformanceTester:
                 logger.error(f"Failed to get metrics: {response.status_code}")
                 return {}
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error getting resource metrics: {str(e)}")
             return {}
 
@@ -396,10 +384,12 @@ class PerformanceTester:
 
     def generate_report(self) -> str:
         """Generate performance test report"""
-        report = []
         report.append("# SuperAGI Performance Test Report")
         report.append(f"\nGenerated: {datetime.now().isoformat()}")
         report.append(f"\nEndpoint: {self.superagi_endpoint}")
+
+        # TODO: Consider using list comprehension for better performance
+
 
         for result in self.results:
             report.append(f"\n## {result.test_name}")
@@ -423,8 +413,6 @@ class PerformanceTester:
 
 async def main():
     """Main function for CLI usage"""
-    import argparse
-
     parser = argparse.ArgumentParser(description="SuperAGI Performance Testing")
     parser.add_argument("--endpoint", required=True, help="SuperAGI endpoint URL")
     parser.add_argument("--prometheus", help="Prometheus endpoint URL")

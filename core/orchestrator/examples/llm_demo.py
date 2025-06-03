@@ -1,41 +1,12 @@
 #!/usr/bin/env python
 """
-LLM Integration Demo for AI Orchestration System.
-
-This script demonstrates a complete workflow using the LLM integration:
-1. Setting up the environment
-2. Initializing components
-3. Processing interactions with different personas
-4. Showing direct LLM completions
-
-Run this script with:
-    python core/orchestrator/examples/llm_demo.py
 """
-
-import asyncio
-import logging
-import os
-
-from core.orchestrator.src.agents.llm_agent import ConversationFormatter
-from core.orchestrator.src.config.config import get_settings
-from core.orchestrator.src.personas.loader import PersonaManager
-from core.orchestrator.src.services.llm.providers import get_llm_provider
-
-# Removed load_dotenv for production: all secrets are managed via GCP Secret Manager and Pulumi config.
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
 logger = logging.getLogger(__name__)
 
 async def demo_conversation_with_persona(persona_id: str):
     """
-    Run a demo conversation with a specific persona.
-
-    Args:
-        persona_id: The persona to use
     """
     print(f"\n\n=== Conversation with Persona: {persona_id} ===\n")
 
@@ -68,6 +39,8 @@ async def demo_conversation_with_persona(persona_id: str):
         messages.append(system_message)
 
         # Add conversation history
+        # TODO: Consider using list comprehension for better performance
+
         for entry in conversation_history:
             messages.append(entry)
 
@@ -76,6 +49,8 @@ async def demo_conversation_with_persona(persona_id: str):
 
         # Generate response
         try:
+
+            pass
             response = await llm_provider.generate_chat_completion(messages=messages, temperature=0.7)
 
             # Extract response text
@@ -101,7 +76,9 @@ async def demo_conversation_with_persona(persona_id: str):
 
             # Small delay for better readability
             await asyncio.sleep(1)
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"Error: {e}")
             break
 
@@ -134,6 +111,9 @@ async def demo_direct_completion():
         ]
 
         try:
+
+
+            pass
             response = await llm_provider.generate_chat_completion(messages=messages, temperature=0.8)
 
             # Print the response
@@ -152,16 +132,13 @@ async def demo_direct_completion():
 
             # Small delay for better readability
             await asyncio.sleep(1)
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"Error: {e}")
 
 async def main():
     """Run the complete demo."""
-    # Environment variables for secrets are injected by GCP infra or set in CI/CD.
-    # Do NOT use load_dotenv in production.
-
-    # Check for API key
-    settings = get_settings()
     if not hasattr(settings, "OPENROUTER_API_KEY") or not settings.OPENROUTER_API_KEY:
         print("Warning: OpenRouter API key not found. Please set OPENROUTER_API_KEY in your environment.")
 

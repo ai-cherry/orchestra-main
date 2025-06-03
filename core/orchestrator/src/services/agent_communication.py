@@ -1,28 +1,7 @@
 """
-Agent Communication Service for AI Orchestra.
-
-This module provides a service for agent communication using PubSub.
-It handles message routing, event distribution, and task coordination.
 """
-
-import asyncio
-import logging
-import time
-import uuid
-from typing import Any, Awaitable, Callable, Dict, List, Optional, Set
-
-from core.orchestrator.src.config.config import settings
-from core.orchestrator.src.services.pubsub_client import get_pubsub_client
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-class AgentCommunicationService:
     """Service for agent communication using PubSub."""
-
-    def __init__(self):
         """Initialize the agent communication service."""
-        self.pubsub_client = get_pubsub_client()
         self.environment = settings.ENVIRONMENT or "dev"
         self.agent_id = None
         self.conversation_id = None
@@ -32,16 +11,7 @@ class AgentCommunicationService:
 
     async def initialize(self, agent_id: str, conversation_id: Optional[str] = None) -> None:
         """
-        Initialize the communication service.
-
-        Args:
-            agent_id: The ID of this agent
-            conversation_id: Optional conversation ID
         """
-        self.agent_id = agent_id
-        self.conversation_id = conversation_id
-
-        # Create topics if they don't exist
         self.pubsub_client.create_topic("agent-events")
         self.pubsub_client.create_topic("agent-tasks")
         self.pubsub_client.create_topic("agent-results")
@@ -83,8 +53,12 @@ class AgentCommunicationService:
             if event_type in self.event_handlers:
                 for handler in self.event_handlers[event_type]:
                     try:
+
+                        pass
                         await handler(data)
-                    except Exception as e:
+                    except Exception:
+
+                        pass
                         logger.error(f"Error in event handler for {event_type}: {e}")
 
         # Start the subscription
@@ -107,6 +81,8 @@ class AgentCommunicationService:
             # Call registered handler for this task type
             if task_type in self.task_handlers:
                 try:
+
+                    pass
                     # Process the task
                     result = await self.task_handlers[task_type](data)
 
@@ -116,7 +92,9 @@ class AgentCommunicationService:
                         result=result,
                         task_type=task_type,
                     )
-                except Exception as e:
+                except Exception:
+
+                    pass
                     logger.error(f"Error in task handler for {task_type}: {e}")
 
                     # Publish error result
@@ -135,43 +113,16 @@ class AgentCommunicationService:
 
     def register_event_handler(self, event_type: str, handler: Callable[[Dict[str, Any]], Awaitable[None]]) -> None:
         """
-        Register a handler for a specific event type.
-
-        Args:
-            event_type: The type of event to handle
-            handler: Async function to handle the event
         """
-        if event_type not in self.event_handlers:
-            self.event_handlers[event_type] = []
-        self.event_handlers[event_type].append(handler)
-
-    def register_task_handler(
-        self,
-        task_type: str,
-        handler: Callable[[Dict[str, Any]], Awaitable[Dict[str, Any]]],
-    ) -> None:
         """
-        Register a handler for a specific task type.
-
-        Args:
-            task_type: The type of task to handle
-            handler: Async function to handle the task
         """
-        self.task_handlers[task_type] = handler
-
     async def publish_event(self, event_type: str, data: Dict[str, Any], recipient_id: str = "all") -> str:
         """
-        Publish an event.
-
-        Args:
-            event_type: The type of event
-            data: The event data
             recipient_id: The recipient agent ID or "all"
 
         Returns:
             The published message ID
         """
-        attributes = {
             "event_type": event_type,
             "sender_id": self.agent_id,
             "recipient_id": recipient_id,
@@ -196,20 +147,7 @@ class AgentCommunicationService:
         task_id: Optional[str] = None,
     ) -> str:
         """
-        Publish a task.
-
-        Args:
-            task_type: The type of task
-            data: The task data
-            agent_id: The agent ID to assign the task to
-            task_id: Optional task ID
-
-        Returns:
-            The published message ID
         """
-        task_id = task_id or str(uuid.uuid4())
-
-        attributes = {
             "task_type": task_type,
             "task_id": task_id,
             "sender_id": self.agent_id,
@@ -228,18 +166,7 @@ class AgentCommunicationService:
         self, task_id: str, result: Dict[str, Any], task_type: str, success: bool = True
     ) -> str:
         """
-        Publish a task result.
-
-        Args:
-            task_id: The task ID
-            result: The task result
-            task_type: The type of task
-            success: Whether the task was successful
-
-        Returns:
-            The published message ID
         """
-        attributes = {
             "task_id": task_id,
             "task_type": task_type,
             "agent_id": self.agent_id,
@@ -256,11 +183,6 @@ class AgentCommunicationService:
 
     async def close(self) -> None:
         """Close the communication service."""
-        # Stop all subscriptions
-        for subscription_name in self.subscriptions:
-            self.pubsub_client.stop_subscription(subscription_name)
-
-        self.subscriptions.clear()
         logger.info(f"Agent communication closed for agent {self.agent_id}")
 
 # Singleton instance
@@ -270,20 +192,4 @@ async def get_agent_communication(
     agent_id: Optional[str] = None, conversation_id: Optional[str] = None
 ) -> AgentCommunicationService:
     """
-    Get the global agent communication service instance.
-
-    Args:
-        agent_id: Optional agent ID to initialize with
-        conversation_id: Optional conversation ID
-
-    Returns:
-        The global AgentCommunicationService instance
     """
-    global _agent_communication
-    if _agent_communication is None:
-        _agent_communication = AgentCommunicationService()
-
-    if agent_id and not _agent_communication.agent_id:
-        await _agent_communication.initialize(agent_id, conversation_id)
-
-    return _agent_communication

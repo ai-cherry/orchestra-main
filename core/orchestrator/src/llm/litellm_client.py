@@ -1,24 +1,6 @@
 """
-LiteLLM Client for AI Orchestra
-Provides a unified interface for accessing multiple LLM providers.
 """
-
-import logging
-import os
-from enum import Enum
-from typing import Any, Dict, List, Optional, Union
-
-import litellm
-from pydantic import BaseModel, Field
-
-from core.orchestrator.src.config.loader import get_settings
-from core.orchestrator.src.utils.error_handling import retry
-
-logger = logging.getLogger(__name__)
-
-class ModelProvider(str, Enum):
     """Supported model providers."""
-
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
     GOOGLE = "google"
@@ -27,65 +9,17 @@ class ModelProvider(str, Enum):
 
 class ModelType(str, Enum):
     """Types of models."""
-
     CHAT = "chat"
     COMPLETION = "completion"
     EMBEDDING = "embedding"
 
 class LLMMessage(BaseModel):
     """A message for LLM interaction."""
-
-    role: str
-    content: str
-    name: Optional[str] = None
-
-class LLMResponse(BaseModel):
     """Response from an LLM."""
-
-    model: str
-    content: str
-    usage: Dict[str, int] = Field(default_factory=dict)
-    finish_reason: Optional[str] = None
-    raw_response: Optional[Dict[str, Any]] = None
-
-class LLMEmbeddingResponse(BaseModel):
     """Response from an embedding model."""
-
-    model: str
-    embedding: List[float]
-    usage: Dict[str, int] = Field(default_factory=dict)
-    raw_response: Optional[Dict[str, Any]] = None
-
-class LiteLLMClient:
     """
-    Client for interacting with various LLM providers through LiteLLM.
-
-    This client provides a unified interface for:
-    - Chat completions
-    - Text completions
-    - Embeddings
-
-    It supports multiple providers including OpenAI, Anthropic, Google, and Azure.
     """
-
-    def __init__(
-        self,
-        default_model: Optional[str] = None,
-        default_embedding_model: Optional[str] = None,
-        api_key_openai: Optional[str] = None,
-        api_key_anthropic: Optional[str] = None,
-        api_key_google: Optional[str] = None,
-        api_key_azure: Optional[str] = None,
-        api_base_azure: Optional[str] = None,
-        vertex_project: Optional[str] = None,
-        vertex_location: Optional[str] = None,
-    ):
         """Initialize the LiteLLM client."""
-        # Load settings
-        settings = get_settings()
-
-        # Set API keys from parameters or environment variables
-        self.api_keys = {
             ModelProvider.OPENAI: api_key_openai or os.environ.get("OPENAI_API_KEY"),
             ModelProvider.ANTHROPIC: api_key_anthropic or os.environ.get("ANTHROPIC_API_KEY"),
             ModelProvider.GOOGLE: api_key_google or os.environ.get("GEMINI_API_KEY"),
@@ -108,14 +42,6 @@ class LiteLLMClient:
 
     def _configure_litellm(self):
         """Configure LiteLLM with API keys and settings."""
-        # Set API keys
-        for provider, api_key in self.api_keys.items():
-            if api_key:
-                if provider == ModelProvider.OPENAI:
-                    litellm.openai_api_key = api_key
-                elif provider == ModelProvider.ANTHROPIC:
-                    litellm.anthropic_api_key = api_key
-                elif provider == ModelProvider.GOOGLE:
                     os.environ["GOOGLE_API_KEY"] = api_key
                 elif provider == ModelProvider.AZURE_OPENAI:
                     litellm.azure_api_key = api_key
@@ -145,28 +71,7 @@ class LiteLLMClient:
         timeout: Optional[int] = None,
     ) -> LLMResponse:
         """
-        Generate a chat completion using the specified model.
-
-        Args:
-            messages: List of messages in the conversation
-            model: Model to use (defaults to self.default_model)
-            temperature: Sampling temperature (0-2)
-            max_tokens: Maximum number of tokens to generate
-            top_p: Nucleus sampling parameter
-            frequency_penalty: Frequency penalty parameter
-            presence_penalty: Presence penalty parameter
-            stop: Stop sequences
-            user: User identifier
-            timeout: Request timeout in seconds
-
-        Returns:
-            LLMResponse object containing the model's response
         """
-        model = model or self.default_model
-
-        # Convert messages to LiteLLM format
-        litellm_messages = [
-            {
                 "role": msg.role,
                 "content": msg.content,
                 **({"name": msg.name} if msg.name else {}),
@@ -175,6 +80,9 @@ class LiteLLMClient:
         ]
 
         try:
+
+
+            pass
             response = await litellm.acompletion(
                 model=model,
                 messages=litellm_messages,
@@ -206,7 +114,10 @@ class LiteLLMClient:
                 raw_response=(response.model_dump() if hasattr(response, "model_dump") else response.dict()),
             )
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error in chat completion: {str(e)}")
             raise
 
@@ -225,24 +136,7 @@ class LiteLLMClient:
         timeout: Optional[int] = None,
     ) -> LLMResponse:
         """
-        Generate a text completion using the specified model.
-
-        Args:
-            prompt: Text prompt
-            model: Model to use (defaults to self.default_model)
-            temperature: Sampling temperature (0-2)
-            max_tokens: Maximum number of tokens to generate
-            top_p: Nucleus sampling parameter
-            frequency_penalty: Frequency penalty parameter
-            presence_penalty: Presence penalty parameter
-            stop: Stop sequences
-            user: User identifier
-            timeout: Request timeout in seconds
-
-        Returns:
-            LLMResponse object containing the model's response
         """
-        # For text completion, we'll use the chat completion API with a single user message
         messages = [LLMMessage(role="user", content=prompt)]
         return await self.chat_completion(
             messages=messages,
@@ -266,32 +160,7 @@ class LiteLLMClient:
         timeout: Optional[int] = None,
     ) -> LLMEmbeddingResponse:
         """
-        Generate an embedding for the given text.
-
-        Args:
-            text: Text to embed
-            model: Model to use (defaults to self.default_embedding_model)
-            user: User identifier
-            timeout: Request timeout in seconds
-
-        Returns:
-            LLMEmbeddingResponse object containing the embedding
         """
-        model = model or self.default_embedding_model
-
-        try:
-            response = await litellm.aembedding(
-                model=model,
-                input=text,
-                user=user,
-                timeout=timeout,
-            )
-
-            # Extract embedding from response
-            embedding = response.data[0].embedding
-
-            # Extract usage information
-            usage = {
                 "prompt_tokens": response.usage.prompt_tokens,
                 "total_tokens": response.usage.total_tokens,
             }
@@ -303,21 +172,16 @@ class LiteLLMClient:
                 raw_response=(response.model_dump() if hasattr(response, "model_dump") else response.dict()),
             )
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error in embedding: {str(e)}")
             raise
 
     def get_available_models(self) -> Dict[ModelType, List[str]]:
         """
-        Get a list of available models grouped by type.
-
-        Returns:
-            Dictionary mapping model types to lists of model names
         """
-        # This is a simplified implementation
-        # In a real implementation, you would query the providers for available models
-        return {
-            ModelType.CHAT: [
                 "gpt-3.5-turbo",
                 "gpt-4",
                 "gpt-4-turbo",
@@ -343,17 +207,7 @@ class LiteLLMClient:
 
     def get_token_limit(self, model: str) -> int:
         """
-        Get the token limit for a specific model.
-
-        Args:
-            model: Model name
-
-        Returns:
-            Token limit as an integer
         """
-        # This is a simplified implementation with common models
-        # In a real implementation, you would use litellm.get_model_info
-        token_limits = {
             "gpt-3.5-turbo": 4096,
             "gpt-3.5-turbo-16k": 16384,
             "gpt-4": 8192,

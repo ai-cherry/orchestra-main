@@ -1,13 +1,6 @@
+# TODO: Consider adding connection pooling configuration
 """
-Pulumi infrastructure for Orchestra AI on Vultr.
 """
-import pulumi
-import pulumi_vultr as vultr
-from pulumi import Config, Output
-
-# Get configuration
-config = Config()
-environment = pulumi.get_stack()
 region = config.require("vultr:region")
 
 # Create a VPC

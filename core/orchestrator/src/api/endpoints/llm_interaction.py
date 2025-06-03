@@ -1,40 +1,9 @@
 """
-LLM Interaction API Endpoints for AI Orchestration System.
-
-This module provides API endpoints for interacting with LLM providers
-through the orchestration system.
 """
-
-import logging
-from typing import Any, Dict, List, Optional
-
-from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, Field
-
-from core.orchestrator.src.config.config import get_settings
-from core.orchestrator.src.personas.dependency import get_persona_manager
-from core.orchestrator.src.services.enhanced_agent_orchestrator import get_enhanced_agent_orchestrator
-from core.orchestrator.src.services.llm.exceptions import (
-    LLMProviderAuthenticationError,
-    LLMProviderConnectionError,
-    LLMProviderError,
-    LLMProviderInvalidRequestError,
-    LLMProviderModelError,
-    LLMProviderRateLimitError,
-    LLMProviderServiceError,
-    LLMProviderTimeoutError,
-)
-from core.orchestrator.src.services.llm.providers import get_llm_provider
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-# Create router
 router = APIRouter(prefix="/llm", tags=["llm"])
 
 class LLMRequestModel(BaseModel):
     """Request model for LLM interaction API."""
-
     message: str = Field(..., description="The user's message")
     user_id: str = Field(..., description="User identifier")
     session_id: Optional[str] = Field(None, description="Session identifier for conversation continuity")
@@ -46,7 +15,6 @@ class LLMRequestModel(BaseModel):
 
 class LLMResponseModel(BaseModel):
     """Response model for LLM interaction API."""
-
     message: str = Field(..., description="The response message")
     persona_id: str = Field(..., description="The persona identifier used")
     persona_name: str = Field(..., description="The persona name used")
@@ -59,7 +27,6 @@ class LLMResponseModel(BaseModel):
 
 class ErrorResponse(BaseModel):
     """Standard error response model."""
-
     detail: str = Field(..., description="Error detail message")
     error_type: Optional[str] = Field(None, description="Type of error")
     status_code: int = Field(..., description="HTTP status code")
@@ -96,25 +63,7 @@ class ErrorResponse(BaseModel):
 )
 async def llm_interact(request: LLMRequestModel, persona_manager=Depends(get_persona_manager)):
     """
-    Process a user interaction using an LLM provider.
-
-    This endpoint uses the LLM agent to process the user's message
-    and generate a response based on the selected persona.
-
-    Args:
-        request: The LLM interaction request
-
-    Returns:
-        The LLM interaction response
-
-    Raises:
-        HTTPException: If an error occurs during processing
     """
-    try:
-        # Get settings
-        settings = get_settings()
-
-        # Check for API key
         if not hasattr(settings, "OPENROUTER_API_KEY") or not settings.OPENROUTER_API_KEY:
             raise LLMProviderAuthenticationError(
                 "OpenRouter API key not configured. Please set OPENROUTER_API_KEY in your environment."
@@ -170,7 +119,10 @@ async def llm_interact(request: LLMRequestModel, persona_manager=Depends(get_per
             response_time_ms=response_time,
         )
 
-    except LLMProviderAuthenticationError as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Authentication error: {e}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -178,18 +130,27 @@ async def llm_interact(request: LLMRequestModel, persona_manager=Depends(get_per
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    except LLMProviderInvalidRequestError as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Invalid request: {e}")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-    except LLMProviderTimeoutError as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Request timeout: {e}")
         raise HTTPException(
             status_code=status.HTTP_408_REQUEST_TIMEOUT,
             detail=f"Request timed out: {str(e)}",
         )
 
-    except LLMProviderRateLimitError as e:
+    except Exception:
+
+
+        pass
         logger.warning(f"Rate limit exceeded: {e}")
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
@@ -197,7 +158,10 @@ async def llm_interact(request: LLMRequestModel, persona_manager=Depends(get_per
             headers={"Retry-After": "30"},  # Suggest retry after 30 seconds
         )
 
-    except LLMProviderConnectionError as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Connection error: {e}")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -205,11 +169,17 @@ async def llm_interact(request: LLMRequestModel, persona_manager=Depends(get_per
             headers={"Retry-After": "10"},  # Suggest retry after 10 seconds
         )
 
-    except LLMProviderModelError as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Model error: {e}")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Model error: {str(e)}")
 
-    except LLMProviderServiceError as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Service error: {e}")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -217,14 +187,20 @@ async def llm_interact(request: LLMRequestModel, persona_manager=Depends(get_per
             headers={"Retry-After": "60"},  # Suggest retry after 60 seconds
         )
 
-    except LLMProviderError as e:
+    except Exception:
+
+
+        pass
         logger.error(f"LLM provider error: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"LLM provider error: {str(e)}",
         )
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Error processing LLM interaction: {e}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -267,26 +243,7 @@ async def direct_llm_completion(
     max_tokens: Optional[int] = None,
 ):
     """
-    Send messages directly to LLM provider without orchestration.
-
-    This endpoint provides a direct pass-through to the LLM provider,
-    bypassing the orchestration layer for simple completions.
-
-    Args:
-        messages: List of chat messages with role and content
-        model: Optional model to use
-        temperature: Optional temperature for generation
-        max_tokens: Optional maximum tokens to generate
-
-    Returns:
-        The completion result from the LLM provider
-
-    Raises:
-        HTTPException: If an error occurs during processing
     """
-    try:
-        # Validate input
-        if not messages or not isinstance(messages, list):
             raise LLMProviderInvalidRequestError("Messages must be a non-empty list")
 
         for msg in messages:
@@ -307,7 +264,10 @@ async def direct_llm_completion(
         # Return result directly
         return result
 
-    except LLMProviderAuthenticationError as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Authentication error: {e}", exc_info=True)
         logger.warning("Authentication failure may prevent direct LLM completion.")
         raise HTTPException(
@@ -316,12 +276,18 @@ async def direct_llm_completion(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    except LLMProviderInvalidRequestError as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Invalid request: {e}", exc_info=True)
         logger.warning("Invalid request may indicate input or configuration issues in direct completion.")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-    except LLMProviderTimeoutError as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Request timeout: {e}", exc_info=True)
         logger.warning("Timeout may impact direct completion; consider retrying or adjusting timeout settings.")
         raise HTTPException(
@@ -329,7 +295,10 @@ async def direct_llm_completion(
             detail=f"Request timed out: {str(e)}",
         )
 
-    except LLMProviderRateLimitError as e:
+    except Exception:
+
+
+        pass
         logger.warning(f"Rate limit exceeded: {e}", exc_info=True)
         logger.warning("Rate limit exceeded; direct completion may be delayed.")
         raise HTTPException(
@@ -338,7 +307,10 @@ async def direct_llm_completion(
             headers={"Retry-After": "30"},  # Suggest retry after 30 seconds
         )
 
-    except LLMProviderConnectionError as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Connection error: {e}", exc_info=True)
         logger.warning("Connection issues may prevent direct LLM completion; check network or provider status.")
         raise HTTPException(
@@ -347,12 +319,18 @@ async def direct_llm_completion(
             headers={"Retry-After": "10"},  # Suggest retry after 10 seconds
         )
 
-    except LLMProviderModelError as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Model error: {e}", exc_info=True)
         logger.warning("Model error may require configuration or model selection adjustments for direct completion.")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Model error: {str(e)}")
 
-    except LLMProviderServiceError as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Service error: {e}", exc_info=True)
         logger.warning("Service error may indicate provider issues; consider fallback options for direct completion.")
         raise HTTPException(
@@ -361,7 +339,10 @@ async def direct_llm_completion(
             headers={"Retry-After": "60"},  # Suggest retry after 60 seconds
         )
 
-    except LLMProviderError as e:
+    except Exception:
+
+
+        pass
         logger.error(f"LLM provider error: {e}", exc_info=True)
         logger.warning("Provider error may disrupt direct LLM completion.")
         raise HTTPException(
@@ -369,7 +350,10 @@ async def direct_llm_completion(
             detail=f"LLM provider error: {str(e)}",
         )
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Error in direct LLM completion: {e}", exc_info=True)
         logger.warning("Unexpected error may impact direct completion processing; review logs for details.")
         raise HTTPException(

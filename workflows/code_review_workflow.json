@@ -1,0 +1,22 @@
+{
+  "id": "code_review_workflow",
+  "name": "Automated Code Review",
+  "description": "AI-powered code review and suggestions",
+  "tasks": [
+    {
+      "id": "analyze_code",
+      "type": "code_analysis",
+      "agent": "code_agent"
+    },
+    {
+      "id": "security_check",
+      "type": "security_scan",
+      "agent": "security_agent"
+    },
+    {
+      "id": "generate_report",
+      "type": "report",
+      "agent": "documentation_agent"
+    }
+  ]
+}

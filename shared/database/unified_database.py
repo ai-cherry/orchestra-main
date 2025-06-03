@@ -1,148 +1,25 @@
+# TODO: Consider adding connection pooling configuration
 """
-Unified Database Interface for Orchestra AI
-
-This module provides a single, comprehensive database interface that consolidates
-PostgreSQL and Weaviate operations with proper connection pooling, error handling,
-and async support.
-
-Key Features:
-- Unified interface for PostgreSQL (relational) and Weaviate (vector) operations
-- Connection pooling and automatic reconnection
-- Comprehensive error handling and retry logic
-- Async-first design with sync compatibility
-- Transaction support for PostgreSQL
-- Type-safe query building and result handling
-- Monitoring and health checking
 """
-
-import asyncio
-import logging
-import time
-from abc import ABC, abstractmethod
-from contextlib import asynccontextmanager
-from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Union, AsyncGenerator, Tuple
-from uuid import UUID, uuid4
-import json
-
-import asyncpg
-# Remove direct weaviate SDK imports from here if they are fully encapsulated by ProdWeaviateClient
-# For now, keep `weaviate` for `weaviate.exceptions.WeaviateQueryError` or similar if used directly.
-import weaviate 
-# from weaviate.classes.init import Auth, AdditionalConfig, Timeout # Now handled by ProdWeaviateClient
-# from weaviate.classes.query import MetadataQuery, QueryReturn # Now handled by ProdWeaviateClient
-# from weaviate.classes.config import Configure, Property, DataType # Now handled by ProdWeaviateClient
-from pydantic import BaseModel, Field
-
-from core.config.unified_config import get_database_config, DatabaseConfig
-from shared.database.weaviate_client import WeaviateClient as ProdWeaviateClient
-# Implied: COLLECTION_AGENT_MEMORY, etc. might be needed if WeaviateInterface logic becomes collection-aware
-
-logger = logging.getLogger(__name__)
-
-class DatabaseError(Exception):
     """Base database error"""
-    def __init__(self, message: str, retryable: bool = True, original_error: Optional[Exception] = None):
-        super().__init__(message)
-        self.retryable = retryable
-        self.original_error = original_error
-
-class ConnectionError(DatabaseError):
     """Database connection error"""
-    pass
-
-class QueryError(DatabaseError):
     """Database query error"""
-    pass
-
-class TransactionError(DatabaseError):
     """Database transaction error"""
-    pass
-
-@dataclass
-class QueryResult:
     """Standardized query result"""
-    rows: List[Dict[str, Any]]
-    count: int
-    execution_time: float
-    metadata: Dict[str, Any] = None
-    
-    def __post_init__(self):
-        if self.metadata is None:
-            self.metadata = {}
-
-@dataclass
-class VectorSearchResult:
     """Vector search result with scores"""
-    objects: List[Dict[str, Any]]
-    scores: List[float]
-    total_count: int
-    execution_time: float
-    metadata: Dict[str, Any] = None
-    
-    def __post_init__(self):
-        if self.metadata is None:
-            self.metadata = {}
-
-class DatabaseInterface(ABC):
     """Abstract database interface"""
-    
-    @abstractmethod
-    async def connect(self) -> None:
         """Establish database connection"""
-        pass
-    
-    @abstractmethod
-    async def disconnect(self) -> None:
         """Close database connection"""
-        pass
-    
-    @abstractmethod
-    async def health_check(self) -> bool:
         """Check database health"""
-        pass
-    
-    @abstractmethod
-    async def execute(self, query: str, params: Optional[Dict[str, Any]] = None) -> QueryResult:
         """Execute a query"""
-        pass
-
-class PostgreSQLInterface(DatabaseInterface):
     """PostgreSQL database interface with async support"""
-    
-    def __init__(self, config: DatabaseConfig):
-        self.config = config
-        self.pool: Optional[asyncpg.Pool] = None
-        self._connection_retries = 0
-        self._max_retries = 3
-    
-    async def connect(self) -> None:
         """Establish PostgreSQL connection pool"""
-        try:
-            self.pool = await asyncpg.create_pool(
-                host=self.config.postgresql_host,
-                port=self.config.postgresql_port,
-                database=self.config.postgresql_database,
-                user=self.config.postgresql_username,
-                password=self.config.postgresql_password,
-                ssl=self.config.postgresql_ssl_mode,
-                min_size=1,
-                max_size=self.config.postgresql_pool_size,
-                max_inactive_connection_lifetime=300,
-                command_timeout=30,
-                server_settings={
-                    'jit': 'off',  # Disable JIT for faster startup
-                    'application_name': 'orchestra_ai'
-                }
-            )
-            
-            # Test connection
-            async with self.pool.acquire() as conn:
-                await conn.fetchval('SELECT 1')
-            
             logger.info("PostgreSQL connection pool established")
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             self._connection_retries += 1
             if self._connection_retries <= self._max_retries:
                 logger.warning(f"PostgreSQL connection failed (attempt {self._connection_retries}): {e}")
@@ -153,31 +30,23 @@ class PostgreSQLInterface(DatabaseInterface):
     
     async def disconnect(self) -> None:
         """Close PostgreSQL connection pool"""
-        if self.pool:
-            await self.pool.close()
-            self.pool = None
             logger.info("PostgreSQL connection pool closed")
     
     async def health_check(self) -> bool:
         """Check PostgreSQL health"""
-        try:
-            if not self.pool:
-                return False
-            async with self.pool.acquire() as conn:
-                result = await conn.fetchval('SELECT 1')
-                return result == 1
-        except Exception as e:
             logger.error(f"PostgreSQL health check failed: {e}")
             return False
     
     async def execute(self, query: str, params: Optional[Dict[str, Any]] = None) -> QueryResult:
         """Execute PostgreSQL query"""
-        if not self.pool:
             raise ConnectionError("PostgreSQL pool not initialized")
         
         start_time = time.time()
         
         try:
+
+        
+            pass
             async with self.pool.acquire() as conn:
                 if params:
                     # Convert named parameters to positional if needed
@@ -198,31 +67,38 @@ class PostgreSQLInterface(DatabaseInterface):
                     metadata={"query": query, "params": params}
                 )
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             execution_time = time.time() - start_time
             logger.error(f"PostgreSQL query failed in {execution_time:.3f}s: {e}")
             raise QueryError(f"PostgreSQL query failed: {e}", retryable=True, original_error=e)
     
     async def execute_many(self, query: str, params_list: List[Dict[str, Any]]) -> int:
         """Execute query with multiple parameter sets"""
-        if not self.pool:
             raise ConnectionError("PostgreSQL pool not initialized")
         
         try:
+
+        
+            pass
             async with self.pool.acquire() as conn:
                 # Convert to tuple list for executemany
                 param_tuples = [tuple(params.values()) for params in params_list]
                 result = await conn.executemany(query, param_tuples)
                 return len(param_tuples)
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             logger.error(f"PostgreSQL executemany failed: {e}")
             raise QueryError(f"PostgreSQL executemany failed: {e}", retryable=True, original_error=e)
     
     @asynccontextmanager
     async def transaction(self):
         """Async context manager for transactions"""
-        if not self.pool:
             raise ConnectionError("PostgreSQL pool not initialized")
         
         async with self.pool.acquire() as conn:
@@ -231,37 +107,19 @@ class PostgreSQLInterface(DatabaseInterface):
     
     async def create_table_if_not_exists(self, table_name: str, schema: Dict[str, str]) -> None:
         """Create table if it doesn't exist"""
-        columns = []
-        for col_name, col_type in schema.items():
             columns.append(f"{col_name} {col_type}")
         
         create_query = f"""
-        CREATE TABLE IF NOT EXISTS {table_name} (
-            {', '.join(columns)}
-        )
         """
-        
-        await self.execute(create_query)
         logger.info(f"Table {table_name} created or verified")
 
 class WeaviateInterface(DatabaseInterface):
     """Weaviate vector database interface"""
-    
-    def __init__(self, config: DatabaseConfig):
-        self.config = config
-        self._prod_client = ProdWeaviateClient(config) # Instantiate new client
-        # self.client is no longer the SDK client directly, but the instance of ProdWeaviateClient's _client
-        # This might be None if _prod_client hasn't connected.
-        # Generally, methods should use self._prod_client.specific_method()
-        self.client: Optional[weaviate.Client] = None # This will be set after connection
-    
-    async def connect(self) -> None:
         """Establish Weaviate connection via the production client."""
-        try:
-            await self._prod_client.connect()
-            self.client = self._prod_client._client # Expose underlying SDK client if needed, after connection
             logger.info("WeaviateInterface connected via ProdWeaviateClient.")
-        except Exception as e:
+        except Exception:
+
+            pass
             # self.client should remain None or be explicitly set to None on failure
             self.client = None
             logger.error(f"WeaviateInterface failed to connect ProdWeaviateClient: {e}", exc_info=True)
@@ -272,31 +130,23 @@ class WeaviateInterface(DatabaseInterface):
     
     async def disconnect(self) -> None:
         """Close Weaviate connection via the production client."""
-        if self._prod_client:
-            await self._prod_client.close()
-            self.client = None # Clear the SDK client instance too
             logger.info("WeaviateInterface disconnected via ProdWeaviateClient.")
     
     async def health_check(self) -> bool:
         """Check Weaviate health via the production client."""
-        if not self._prod_client:
-            return False
-        try:
-            return await self._prod_client.health_check()
-        except Exception as e:
             logger.error(f"WeaviateInterface health check failed: {e}", exc_info=True)
             return False
     
     async def execute(self, query: str, params: Optional[Dict[str, Any]] = None) -> QueryResult:
         """Execute Weaviate query (GraphQL) via the production client."""
-        # This method assumes ProdWeaviateClient will get a raw_graphql_query method
-        # or this method needs to access _prod_client._client directly.
-        if not self._prod_client or not self._prod_client._client: # check _client for direct access
             raise ConnectionError("Weaviate client not initialized or not connected in ProdWeaviateClient.")
         
         start_time = time.time()
         
         try:
+
+        
+            pass
             # Assuming direct access to underlying client for raw GraphQL if not encapsulated
             # This is a temporary measure. Ideally ProdWeaviateClient would expose this.
             # result = self._prod_client._client.query.raw(query)
@@ -317,7 +167,10 @@ class WeaviateInterface(DatabaseInterface):
                 metadata={"query": query, "params": params}
             )
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             execution_time = time.time() - start_time
             logger.error(f"WeaviateInterface query failed in {execution_time:.3f}s: {e}", exc_info=True)
             raise QueryError(f"WeaviateInterface query failed: {e}", retryable=True, original_error=e)
@@ -326,11 +179,12 @@ class WeaviateInterface(DatabaseInterface):
                            limit: int = 10, where_filter: Optional[Dict] = None,
                            return_properties: Optional[List[str]] = None) -> VectorSearchResult:
         """Perform vector similarity search using ProdWeaviateClient."""
-        if not self._prod_client:
             raise ConnectionError("ProdWeaviateClient not initialized in WeaviateInterface.")
         
         start_time = time.time()
         try:
+
+            pass
             # This assumes ProdWeaviateClient will have a generic search method.
             # Let's name it `search_objects_near_vector` for now.
             # This method needs to be added to ProdWeaviateClient.
@@ -373,17 +227,22 @@ class WeaviateInterface(DatabaseInterface):
                 metadata={"collection": collection_name, "vector_dim": len(vector)}
             )
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             execution_time = time.time() - start_time
             logger.error(f"WeaviateInterface vector search failed: {e}", exc_info=True)
             raise QueryError(f"WeaviateInterface vector search failed: {e}", retryable=True, original_error=e)
     
     async def insert_objects(self, collection_name: str, objects: List[Dict[str, Any]]) -> int:
         """Insert multiple objects into collection using ProdWeaviateClient."""
-        if not self._prod_client:
             raise ConnectionError("ProdWeaviateClient not initialized in WeaviateInterface.")
         
         try:
+
+        
+            pass
             # This assumes ProdWeaviateClient will have a generic batch insert method.
             # Let's name it `add_objects_batch`. This needs to be added to ProdWeaviateClient.
             if not hasattr(self._prod_client, 'add_objects_batch'):
@@ -397,7 +256,10 @@ class WeaviateInterface(DatabaseInterface):
             )
             return num_inserted
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             logger.error(f"WeaviateInterface insert_objects failed: {e}", exc_info=True)
             raise QueryError(f"WeaviateInterface insert_objects failed: {e}", retryable=True, original_error=e)
     
@@ -405,10 +267,12 @@ class WeaviateInterface(DatabaseInterface):
                                             properties: List[Dict[str, Any]], # e.g. [{"name": "prop_name", "data_type": "TEXT"}]
                                             vectorizer_config: Optional[Dict] = None) -> None: # vectorizer_config is not directly used by current _ensure_schema
         """Create collection if it doesn't exist using ProdWeaviateClient."""
-        if not self._prod_client:
             raise ConnectionError("ProdWeaviateClient not initialized in WeaviateInterface.")
         
         try:
+
+        
+            pass
             # ProdWeaviateClient._ensure_schema takes properties in a slightly different format
             # e.g. {"name": "prop_name", "dataType": ["text"]}
             # This method needs to map from WeaviateInterface's property format if different.
@@ -429,31 +293,16 @@ class WeaviateInterface(DatabaseInterface):
             )
             logger.info(f"WeaviateInterface: Collection {collection_name} ensured via ProdWeaviateClient.")
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             logger.error(f"WeaviateInterface failed to create collection {collection_name}: {e}", exc_info=True)
             raise QueryError(f"WeaviateInterface failed to create collection: {e}", retryable=False, original_error=e)
 
 class UnifiedDatabase:
     """
-    Unified database interface that provides seamless access to both
-    PostgreSQL (relational) and Weaviate (vector) databases.
-    
-    This class follows the Orchestra AI rule of using ONLY PostgreSQL + Weaviate
-    and provides a single interface for all database operations.
     """
-    
-    def __init__(self, config: Optional[DatabaseConfig] = None):
-        self.config = config or get_database_config()
-        self.postgresql = PostgreSQLInterface(self.config)
-        self.weaviate = WeaviateInterface(self.config)
-        self._connected = False
-        
-        # Connection health monitoring
-        self._health_check_interval = 60  # seconds
-        self._health_check_task: Optional[asyncio.Task] = None
-        
-        # Metrics
-        self.metrics = {
             "postgresql_queries": 0,
             "weaviate_queries": 0,
             "total_execution_time": 0.0,
@@ -463,53 +312,25 @@ class UnifiedDatabase:
     
     async def connect(self) -> None:
         """Connect to both PostgreSQL and Weaviate"""
-        try:
-            # Connect to both databases
-            await asyncio.gather(
-                self.postgresql.connect(),
-                self.weaviate.connect()
-            )
-            
-            self._connected = True
             logger.info("Unified database connection established")
             
             # Start health monitoring
             self._health_check_task = asyncio.create_task(self._monitor_health())
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             self.metrics["connection_errors"] += 1
             logger.error(f"Failed to establish unified database connection: {e}")
             raise ConnectionError(f"Database connection failed: {e}")
     
     async def disconnect(self) -> None:
         """Disconnect from both databases"""
-        # Stop health monitoring
-        if self._health_check_task:
-            self._health_check_task.cancel()
-            try:
-                await self._health_check_task
-            except asyncio.CancelledError:
-                pass
-        
-        # Disconnect from databases
-        await asyncio.gather(
-            self.postgresql.disconnect(),
-            self.weaviate.disconnect(),
-            return_exceptions=True
-        )
-        
-        self._connected = False
         logger.info("Unified database disconnected")
     
     async def health_check(self) -> Dict[str, bool]:
         """Check health of both databases"""
-        postgresql_health, weaviate_health = await asyncio.gather(
-            self.postgresql.health_check(),
-            self.weaviate.health_check(),
-            return_exceptions=True
-        )
-        
-        return {
             "postgresql": isinstance(postgresql_health, bool) and postgresql_health,
             "weaviate": isinstance(weaviate_health, bool) and weaviate_health,
             "unified": (
@@ -521,33 +342,40 @@ class UnifiedDatabase:
     # PostgreSQL Operations
     async def sql_execute(self, query: str, params: Optional[Dict[str, Any]] = None) -> QueryResult:
         """Execute SQL query on PostgreSQL"""
-        if not self._connected:
             raise ConnectionError("Database not connected")
         
         try:
+
+        
+            pass
             self.metrics["postgresql_queries"] += 1
             result = await self.postgresql.execute(query, params)
             self.metrics["total_execution_time"] += result.execution_time
             return result
-        except Exception as e:
+        except Exception:
+
+            pass
             self.metrics["query_errors"] += 1
             raise
     
     async def sql_execute_many(self, query: str, params_list: List[Dict[str, Any]]) -> int:
         """Execute SQL query with multiple parameter sets"""
-        if not self._connected:
             raise ConnectionError("Database not connected")
         
         try:
+
+        
+            pass
             return await self.postgresql.execute_many(query, params_list)
-        except Exception as e:
+        except Exception:
+
+            pass
             self.metrics["query_errors"] += 1
             raise
     
     @asynccontextmanager
     async def sql_transaction(self):
         """SQL transaction context manager"""
-        if not self._connected:
             raise ConnectionError("Database not connected")
         
         async with self.postgresql.transaction() as tx:
@@ -555,35 +383,37 @@ class UnifiedDatabase:
     
     async def create_table(self, table_name: str, schema: Dict[str, str]) -> None:
         """Create table if not exists"""
-        await self.postgresql.create_table_if_not_exists(table_name, schema)
-    
-    # Weaviate Operations
-    async def vector_search(self, collection_name: str, vector: List[float], 
-                           limit: int = 10, where_filter: Optional[Dict] = None,
-                           return_properties: Optional[List[str]] = None) -> VectorSearchResult:
         """Perform vector similarity search"""
-        if not self._connected:
             raise ConnectionError("Database not connected")
         
         try:
+
+        
+            pass
             self.metrics["weaviate_queries"] += 1
             result = await self.weaviate.vector_search(
                 collection_name, vector, limit, where_filter, return_properties
             )
             self.metrics["total_execution_time"] += result.execution_time
             return result
-        except Exception as e:
+        except Exception:
+
+            pass
             self.metrics["query_errors"] += 1
             raise
     
     async def vector_insert(self, collection_name: str, objects: List[Dict[str, Any]]) -> int:
         """Insert objects into vector collection"""
-        if not self._connected:
             raise ConnectionError("Database not connected")
         
         try:
+
+        
+            pass
             return await self.weaviate.insert_objects(collection_name, objects)
-        except Exception as e:
+        except Exception:
+
+            pass
             self.metrics["query_errors"] += 1
             raise
     
@@ -591,16 +421,7 @@ class UnifiedDatabase:
                                properties: List[Dict[str, Any]],
                                vectorizer_config: Optional[Dict] = None) -> None:
         """Create vector collection if not exists"""
-        await self.weaviate.create_collection_if_not_exists(
-            collection_name, properties, vectorizer_config
-        )
-    
-    # Hybrid Operations (combining SQL and Vector)
-    async def hybrid_search(self, sql_query: str, sql_params: Optional[Dict[str, Any]],
-                           collection_name: str, vector: List[float],
-                           limit: int = 10) -> Tuple[QueryResult, VectorSearchResult]:
         """Perform both SQL and vector search simultaneously"""
-        if not self._connected:
             raise ConnectionError("Database not connected")
         
         # Execute both queries concurrently
@@ -613,7 +434,6 @@ class UnifiedDatabase:
     async def store_with_vector(self, table_name: str, sql_data: Dict[str, Any],
                                collection_name: str, vector_data: Dict[str, Any]) -> Tuple[str, str]:
         """Store data in both SQL table and vector collection"""
-        if not self._connected:
             raise ConnectionError("Database not connected")
         
         # Generate IDs
@@ -626,6 +446,9 @@ class UnifiedDatabase:
         vector_data["sql_reference_id"] = sql_id  # Link to SQL record
         
         try:
+
+        
+            pass
             # Use transaction for SQL, batch for vector
             async with self.sql_transaction() as tx:
                 # Insert SQL data
@@ -637,45 +460,44 @@ class UnifiedDatabase:
                 INSERT INTO {table_name} ({", ".join(columns)})
                 VALUES ({placeholders})
                 """
-                
-                await tx.execute(sql_query, *values)
-                
-                # Insert vector data
-                await self.vector_insert(collection_name, [vector_data])
-                
-            return sql_id, vector_id
-            
-        except Exception as e:
             logger.error(f"Hybrid storage failed: {e}")
             raise QueryError(f"Hybrid storage failed: {e}", retryable=True, original_error=e)
     
     # Monitoring and Maintenance
     async def _monitor_health(self) -> None:
         """Background task to monitor database health"""
-        while self._connected:
-            try:
-                await asyncio.sleep(self._health_check_interval)
-                health = await self.health_check()
-                
                 if not health["unified"]:
                     logger.warning(f"Database health check failed: {health}")
                     
                     # Attempt reconnection if needed
                     if not health["postgresql"]:
                         try:
+
+                            pass
                             await self.postgresql.connect()
-                        except Exception as e:
+                        except Exception:
+
+                            pass
                             logger.error(f"PostgreSQL reconnection failed: {e}")
                     
                     if not health["weaviate"]:
                         try:
+
+                            pass
                             await self.weaviate.connect()
-                        except Exception as e:
+                        except Exception:
+
+                            pass
                             logger.error(f"Weaviate reconnection failed: {e}")
                             
-            except asyncio.CancelledError:
+            except Exception:
+
+                            
+                pass
                 break
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Health monitoring error: {e}")
     
     def get_metrics(self) -> Dict[str, Any]:
@@ -708,20 +530,7 @@ _database_instance: Optional[UnifiedDatabase] = None
 
 def get_database(config: Optional[DatabaseConfig] = None) -> UnifiedDatabase:
     """Get or create the global database instance"""
-    global _database_instance
-    if _database_instance is None:
-        _database_instance = UnifiedDatabase(config)
-    return _database_instance
-
-async def reset_database() -> None:
     """Reset the global database instance"""
-    global _database_instance
-    if _database_instance:
-        await _database_instance.disconnect()
-    _database_instance = None
-
-# Export main classes and functions
-__all__ = [
     "UnifiedDatabase",
     "DatabaseError",
     "ConnectionError", 

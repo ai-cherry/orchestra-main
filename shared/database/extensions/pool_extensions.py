@@ -1,37 +1,9 @@
 """
-Pool extensions mixin for unified PostgreSQL connection manager.
-
-Provides missing pool-related methods through composition without
-modifying the core PostgreSQLConnectionManager class.
 """
-
-from typing import Dict, Any, Optional
-import logging
-import asyncpg
-
-logger = logging.getLogger(__name__)
-
-class PoolExtensionsMixin:
     """
-    Mixin that adds missing pool functionality to PostgreSQLConnectionManager.
-
-    Provides enhanced pool statistics and monitoring capabilities
-    for optimal performance tuning and resource management.
     """
-
-    async def get_pool_stats(self) -> Dict[str, int]:
         """
-        Get detailed connection pool statistics.
-
-        This method was called but not defined in the original implementation.
-        It provides comprehensive pool metrics for monitoring and optimization.
-
-        Returns:
-            Dictionary with pool statistics
         """
-        try:
-            if not self._pool:
-                return {
                     "total_connections": 0,
                     "idle_connections": 0,
                     "used_connections": 0,
@@ -57,7 +29,10 @@ class PoolExtensionsMixin:
 
             return stats
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error getting pool statistics: {e}")
             return {
                 "total_connections": 0,
@@ -71,52 +46,11 @@ class PoolExtensionsMixin:
 
     async def get_extended_pool_stats(self) -> Dict[str, Any]:
         """
-        Get extended pool statistics with performance metrics.
-
-        Returns:
-            Dictionary with comprehensive pool and performance statistics
         """
-        try:
-            basic_stats = await self.get_pool_stats()
-
-            # Get database connection statistics
-            db_stats = await self.fetchrow(
                 """
-                SELECT 
-                    (SELECT count(*) FROM pg_stat_activity) as total_connections,
-                    (SELECT count(*) FROM pg_stat_activity WHERE state = 'active') as active_queries,
-                    (SELECT count(*) FROM pg_stat_activity WHERE state = 'idle') as idle_connections,
-                    (SELECT count(*) FROM pg_stat_activity WHERE state = 'idle in transaction') as idle_in_transaction,
-                    (SELECT count(*) FROM pg_stat_activity WHERE wait_event_type IS NOT NULL) as waiting_connections,
-                    (SELECT max(EXTRACT(EPOCH FROM (now() - query_start))) 
-                     FROM pg_stat_activity 
-                     WHERE state = 'active') as longest_query_seconds,
-                    (SELECT avg(EXTRACT(EPOCH FROM (now() - query_start))) 
-                     FROM pg_stat_activity 
-                     WHERE state = 'active') as avg_query_seconds
             """
-            )
-
-            # Get pool efficiency metrics
-            efficiency_stats = await self.fetchrow(
                 """
-                SELECT 
-                    pg_stat_database.numbackends as backend_connections,
-                    pg_stat_database.xact_commit as transactions_committed,
-                    pg_stat_database.xact_rollback as transactions_rolled_back,
-                    pg_stat_database.blks_hit as cache_hits,
-                    pg_stat_database.blks_read as disk_reads,
-                    pg_stat_database.tup_returned as rows_returned,
-                    pg_stat_database.tup_fetched as rows_fetched,
-                    pg_stat_database.conflicts as conflicts,
-                    pg_stat_database.deadlocks as deadlocks
-                FROM pg_stat_database
-                WHERE datname = current_database()
             """
-            )
-
-            # Calculate derived metrics
-            cache_hit_ratio = 0.0
             if efficiency_stats and efficiency_stats["cache_hits"] + efficiency_stats["disk_reads"] > 0:
                 cache_hit_ratio = float(efficiency_stats["cache_hits"]) / (
                     float(efficiency_stats["cache_hits"]) + float(efficiency_stats["disk_reads"])
@@ -149,7 +83,10 @@ class PoolExtensionsMixin:
                 },
             }
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error getting extended pool statistics: {e}")
             return {
                 "pool": await self.get_pool_stats(),
@@ -162,17 +99,7 @@ class PoolExtensionsMixin:
 
     async def adjust_pool_size(self, min_size: Optional[int] = None, max_size: Optional[int] = None) -> bool:
         """
-        Dynamically adjust pool size limits.
-
-        Args:
-            min_size: New minimum pool size
-            max_size: New maximum pool size
-
-        Returns:
-            True if adjustment successful, False otherwise
         """
-        try:
-            if not self._pool:
                 logger.error("Cannot adjust pool size: pool not initialized")
                 return False
 
@@ -196,61 +123,20 @@ class PoolExtensionsMixin:
 
             return True
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error adjusting pool size: {e}")
             return False
 
     async def get_connection_diagnostics(self) -> Dict[str, Any]:
         """
-        Get detailed diagnostics for troubleshooting connection issues.
-
-        Returns:
-            Dictionary with connection diagnostics
         """
-        try:
-            # Get current connections with details
-            active_connections = await self.fetch(
                 """
-                SELECT 
-                    pid,
-                    usename,
-                    application_name,
-                    client_addr,
-                    state,
-                    query_start,
-                    state_change,
-                    wait_event_type,
-                    wait_event,
-                    SUBSTRING(query, 1, 100) as query_preview
-                FROM pg_stat_activity
-                WHERE datname = current_database()
-                ORDER BY query_start
             """
-            )
-
-            # Get lock information
-            locks = await self.fetch(
                 """
-                SELECT 
-                    l.pid,
-                    l.mode,
-                    l.granted,
-                    l.relation::regclass as table_name,
-                    a.query_start,
-                    SUBSTRING(a.query, 1, 100) as query_preview
-                FROM pg_locks l
-                JOIN pg_stat_activity a ON l.pid = a.pid
-                WHERE l.relation IS NOT NULL
-                ORDER BY l.granted, a.query_start
             """
-            )
-
-            # Get pool internals
-            pool_stats = await self.get_pool_stats()
-
-            # Analyze connection states
-            state_summary = {}
-            for conn in active_connections:
                 state = conn["state"] or "unknown"
                 state_summary[state] = state_summary.get(state, 0) + 1
 
@@ -270,7 +156,10 @@ class PoolExtensionsMixin:
                 },
             }
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error getting connection diagnostics: {e}")
             return {
                 "error": str(e),
@@ -283,48 +172,23 @@ class PoolExtensionsMixin:
 
     async def terminate_idle_connections(self, idle_seconds: int = 300) -> int:
         """
-        Terminate connections that have been idle for too long.
-
-        Args:
-            idle_seconds: Terminate connections idle longer than this
-
-        Returns:
-            Number of connections terminated
         """
-        try:
-            # Find and terminate idle connections
-            result = await self.execute(
                 """
-                SELECT pg_terminate_backend(pid)
-                FROM pg_stat_activity
-                WHERE datname = current_database()
-                  AND state = 'idle'
-                  AND state_change < CURRENT_TIMESTAMP - INTERVAL '%s seconds'
-                  AND pid != pg_backend_pid()  -- Don't terminate self
-            """,
-                idle_seconds,
-            )
-
-            # Extract count from result
-            count = int(result.split()[-1]) if result else 0
+            """
             logger.info(f"Terminated {count} idle connections (idle > {idle_seconds}s)")
 
             return count
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error terminating idle connections: {e}")
             return 0
 
     async def get_pool_recommendations(self) -> Dict[str, Any]:
         """
-        Get recommendations for optimal pool configuration based on usage patterns.
-
-        Returns:
-            Dictionary with pool configuration recommendations
         """
-        try:
-            # Get current stats
-            stats = await self.get_extended_pool_stats()
             pool_stats = stats["pool"]
             db_stats = stats["database"]
 
@@ -392,7 +256,10 @@ class PoolExtensionsMixin:
                 },
             }
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error getting pool recommendations: {e}")
             return {
                 "current_config": {"min_size": self.min_connections, "max_size": self.max_connections},

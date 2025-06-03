@@ -1,21 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 """
-Test infrastructure components.
 """
-
-from unittest.mock import AsyncMock, patch
-
-import pytest
-
-from core.infrastructure.config.settings import Environment, Settings
-from core.infrastructure.connectivity.base import ServiceHealth, ServiceRegistry, ServiceStatus
-from core.services.events.event_bus import Event, EventBus, EventPriority
-
-class TestConfiguration:
     """Test configuration management."""
-
-    def test_settings_defaults(self):
         """Test default settings."""
-        with patch.dict(
             "os.environ",
             {
                 "SECRET_KEY": "test-secret",
@@ -34,7 +21,6 @@ class TestConfiguration:
 
     def test_environment_detection(self):
         """Test environment detection."""
-        with patch.dict(
             "os.environ",
             {
                 "ENVIRONMENT": "prod",
@@ -52,17 +38,7 @@ class TestConfiguration:
 
 class TestServiceRegistry:
     """Test service registry."""
-
-    @pytest.mark.asyncio
-    async def test_service_registration(self):
         """Test registering and retrieving services."""
-        registry = ServiceRegistry()
-
-        # Create mock service
-        mock_service = AsyncMock()
-        mock_service.health_check.return_value = ServiceHealth(status=ServiceStatus.HEALTHY, latency_ms=10.0)
-
-        # Register service
         registry.register_service("test_service", mock_service)
 
         # Retrieve service
@@ -76,17 +52,7 @@ class TestServiceRegistry:
 
 class TestEventBus:
     """Test event bus functionality."""
-
-    @pytest.mark.asyncio
-    async def test_publish_subscribe(self):
         """Test basic publish/subscribe."""
-        event_bus = EventBus()
-        received_events = []
-
-        # Subscribe to event
-        async def handler(event: Event):
-            received_events.append(event)
-
         event_bus.subscribe("test.event", handler)
 
         # Publish event
@@ -100,13 +66,6 @@ class TestEventBus:
     @pytest.mark.asyncio
     async def test_wildcard_subscription(self):
         """Test wildcard event subscription."""
-        event_bus = EventBus()
-        received_events = []
-
-        # Subscribe to all events
-        async def handler(event: Event):
-            received_events.append(event)
-
         event_bus.subscribe("*", handler)
 
         # Publish different events
@@ -121,11 +80,6 @@ class TestEventBus:
     @pytest.mark.asyncio
     async def test_priority_ordering(self):
         """Test event priority ordering."""
-        event_bus = EventBus()
-        execution_order = []
-
-        # Subscribe handlers with different priorities
-        async def high_priority_handler(event: Event):
             execution_order.append("high")
 
         async def normal_priority_handler(event: Event):
@@ -146,10 +100,6 @@ class TestEventBus:
 
     def test_event_history(self):
         """Test event history tracking."""
-        event_bus = EventBus(history_size=5)
-
-        # Publish events synchronously
-        for i in range(10):
             event_bus.publish_sync(f"event.{i}", {"index": i})
 
         # Check history (should only have last 5)
@@ -160,12 +110,6 @@ class TestEventBus:
 
     def test_statistics(self):
         """Test event bus statistics."""
-        event_bus = EventBus()
-
-        # Add handler
-        def handler(event: Event):
-            pass
-
         event_bus.subscribe("test.event", handler)
 
         # Publish events

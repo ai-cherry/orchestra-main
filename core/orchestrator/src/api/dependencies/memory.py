@@ -1,40 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 """
-Memory manager dependency for AI Orchestration System.
-
-This module provides the dependency injection functions for memory management,
-supporting both the legacy MemoryManager and the new hexagonal architecture
-with MemoryService and storage adapters.
 """
-
-import logging
-from typing import Optional
-
-from fastapi import Depends
-
-# Configure logging first, before it's used
-logger = logging.getLogger(__name__)
-
-# Import settings
-from core.orchestrator.src.config.settings import Settings, get_settings
-from core.orchestrator.src.exceptions import DependencyError, MemoryConnectionError, MemoryError, MemoryOperationError
-
-# Import error handling utilities and exceptions
-from core.orchestrator.src.utils.error_handling import error_boundary
-
-# Import required components - moved to functions to avoid circular imports
-# Use flag variables to track availability
-MEMORY_MANAGER_AVAILABLE = False
-MONGODB_AVAILABLE = False
-HEX_ARCH_AVAILABLE = False
-USE_STUBS = False
-
-# Initialize imports safely
-def _initialize_imports():
     """Initialize imports and set availability flags."""
-    global MEMORY_MANAGER_AVAILABLE, MONGODB_AVAILABLE, HEX_ARCH_AVAILABLE, USE_STUBS
-
-    # Import the memory manager interface and implementations
-    try:
         logger.info("Attempting to import memory managers from packages.shared.src.memory")
         # Importing here to avoid module-level imports that could cause circular dependencies
         global MemoryManager, InMemoryMemoryManager
@@ -45,26 +12,35 @@ def _initialize_imports():
 
         # Try to import the MongoDB adapter
         try:
+
+            pass
             logger.info("Attempting to import MongoDBMemoryAdapter")
             global MongoDBMemoryAdapter
             from packages.shared.src.memory.mongodb_adapter import MongoDBMemoryAdapter
 
             MONGODB_AVAILABLE = True
             logger.info("Successfully imported MongoDBMemoryAdapter")
-        except ImportError as e:
+        except Exception:
+
+            pass
             logger.warning(f"Failed to import MongoDBMemoryAdapter, MongoDB storage will not be available: {str(e)}")
             MONGODB_AVAILABLE = False
 
         # Using main implementation, not stubs
         USE_STUBS = False
 
-    except ImportError as e:
+    except Exception:
+
+
+        pass
         logger.warning(
             f"Failed to import memory managers from packages.shared.src.memory, falling back to stub implementation: {str(e)}"
         )
 
         # Try to import base memory manager and stubs
         try:
+
+            pass
             global MemoryManager, InMemoryMemoryManager
             from packages.shared.src.memory.memory_manager import MemoryManager
             from packages.shared.src.memory.stubs import InMemoryMemoryManagerStub as InMemoryMemoryManager
@@ -73,12 +49,16 @@ def _initialize_imports():
             MONGODB_AVAILABLE = False
             USE_STUBS = True
             logger.info("Using stub memory manager implementation")
-        except ImportError as stub_error:
+        except Exception:
+
+            pass
             logger.error(f"Failed to import even stub memory managers: {str(stub_error)}")
             MEMORY_MANAGER_AVAILABLE = False
 
     # Import hexagonal architecture components
     try:
+
+        pass
         logger.info("Attempting to import hexagonal architecture components for memory service")
         global MemoryService, MemoryServiceFactory, MongoDBStorageAdapter, PostgresStorageAdapter
         from packages.shared.src.memory.adapters.mongodb_adapter import MongoDBStorageAdapter
@@ -88,8 +68,11 @@ def _initialize_imports():
 
         HEX_ARCH_AVAILABLE = True
         logger.info("Successfully imported hexagonal architecture components")
-    except ImportError as e:
+    except Exception:
+
+        pass
         logger.warning(
+            f"Failed to import hexagonal architecture components for memory service: {str(e)}"
         )
         HEX_ARCH_AVAILABLE = False
 
@@ -103,23 +86,7 @@ _memory_service: Optional["MemoryService"] = None
 @error_boundary(fallback_value=None, propagate_types=[MemoryError], log_to_monitoring=True)
 def create_memory_manager(settings: Settings) -> "MemoryManager":
     """
-    Create a memory manager instance based on settings.
-
-    This function selects the appropriate memory manager based on
-    environment and configuration, but does not initialize it.
-    Initialization happens in the application's lifespan event.
-
-    Args:
-        settings: Application settings
-
-    Returns:
-        A memory manager instance (not initialized)
-
-    Raises:
-        MemoryError: If unable to create any memory manager
-        DependencyError: If memory manager components are not available
     """
-    if not MEMORY_MANAGER_AVAILABLE:
         raise DependencyError("Memory manager components are not available")
 
     # Determine if we need cloud storage based on environment and project ID
@@ -132,13 +99,17 @@ def create_memory_manager(settings: Settings) -> "MemoryManager":
     # Use MongoDB if available and configured
     if use_mongodb:
         try:
+
+            pass
             logger.info(f"Creating MongoDB memory adapter for environment: {settings.ENVIRONMENT}")
             return MongoDBMemoryAdapter(
                 project_id=settings.get_vultr_project_id(),
                 credentials_path=settings.get_vultr_credentials_path(),
                 namespace=settings.MONGODB_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}",
             )
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to create MongoDB memory adapter: {str(e)}")
             logger.warning("Falling back to in-memory implementation")
             # Convert general exception to a specific memory error
@@ -154,50 +125,46 @@ async def get_memory_manager(
     settings: Settings = Depends(get_settings),
 ) -> "MemoryManager":
     """
-    Get an initialized memory manager instance.
-
-    This dependency function creates and initializes a memory manager
-    if one doesn't exist, or returns the existing one.
-
-    Args:
-        settings: Application settings
-
-    Returns:
-        An initialized memory manager
-
-    Raises:
-        MemoryError: If unable to initialize the memory manager
-        DependencyError: If memory manager components are not available
     """
-    global _memory_manager
-
-    if not MEMORY_MANAGER_AVAILABLE:
         raise DependencyError("Memory manager components are not available")
 
     # Create the memory manager if it doesn't exist
     if _memory_manager is None:
         try:
+
+            pass
             _memory_manager = create_memory_manager(settings)
-        except MemoryError as e:
+        except Exception:
+
+            pass
             # If we can't create the MongoDB adapter, fall back to in-memory
             logger.warning(f"Creating in-memory manager due to error: {str(e)}")
             namespace = settings.MONGODB_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
             _memory_manager = InMemoryMemoryManager(namespace=namespace)
 
         try:
+
+
+            pass
             # Initialize the memory manager
             await _memory_manager.initialize()
             logger.info(f"Memory manager initialized: {type(_memory_manager).__name__}")
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to initialize memory manager: {str(e)}")
             # Fall back to in-memory if initialization fails
             if not isinstance(_memory_manager, InMemoryMemoryManager):
                 logger.warning("Falling back to in-memory implementation")
                 try:
+
+                    pass
                     namespace = settings.MONGODB_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
                     _memory_manager = InMemoryMemoryManager(namespace=namespace)
                     await _memory_manager.initialize()
-                except Exception as fallback_error:
+                except Exception:
+
+                    pass
                     # If even in-memory initialization fails, we're in trouble
                     _memory_manager = None
                     raise MemoryOperationError(
@@ -210,17 +177,7 @@ async def get_memory_manager(
 @error_boundary(propagate_types=[MemoryError], log_to_monitoring=True)
 async def initialize_memory_manager(settings: Settings = None) -> None:
     """
-    Initialize the memory manager during application startup.
-
-    Args:
-        settings: Optional application settings
-
-    Raises:
-        MemoryError: If unable to initialize the memory manager
     """
-    global _memory_manager
-
-    if not MEMORY_MANAGER_AVAILABLE:
         logger.error("Memory manager components are not available")
         return
 
@@ -230,8 +187,12 @@ async def initialize_memory_manager(settings: Settings = None) -> None:
     # Create the memory manager if it doesn't exist
     if _memory_manager is None:
         try:
+
+            pass
             _memory_manager = create_memory_manager(settings)
-        except MemoryError as e:
+        except Exception:
+
+            pass
             # If we can't create the preferred adapter, fall back to in-memory
             logger.warning(f"Creating in-memory manager due to error: {str(e)}")
             namespace = settings.MONGODB_NAMESPACE or f"orchestra-{settings.ENVIRONMENT}"
@@ -239,10 +200,14 @@ async def initialize_memory_manager(settings: Settings = None) -> None:
 
     # Initialize the memory manager
     try:
+
+        pass
         logger.info(f"Initializing memory manager: {type(_memory_manager).__name__}")
         await _memory_manager.initialize()
         logger.info("Memory manager initialized successfully")
-    except Exception as e:
+    except Exception:
+
+        pass
         # If initialization fails with a specific type, fall back to in-memory
         if not isinstance(_memory_manager, InMemoryMemoryManager):
             logger.warning(f"Falling back to in-memory implementation after error: {str(e)}")
@@ -256,24 +221,25 @@ async def initialize_memory_manager(settings: Settings = None) -> None:
     # Perform a health check
     if hasattr(_memory_manager, "health_check"):
         try:
+
+            pass
             health_info = await _memory_manager.health_check()
             logger.info(f"Memory manager health check: {health_info}")
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.warning(f"Memory manager health check failed: {str(e)}")
 
 @error_boundary(log_to_monitoring=True)
 async def close_memory_manager() -> None:
     """
-    Close the memory manager during application shutdown.
     """
-    global _memory_manager
-
-    if _memory_manager is not None:
-        try:
             logger.info(f"Closing memory manager: {type(_memory_manager).__name__}")
             await _memory_manager.close()
             logger.info("Memory manager closed successfully")
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Error closing memory manager: {str(e)}")
         finally:
             _memory_manager = None
@@ -283,29 +249,7 @@ async def get_memory_service(
     settings: Settings = Depends(get_settings),
 ) -> "MemoryService":
     """
-    Get an initialized memory service instance.
-
-    This dependency function creates and initializes a memory service
-    following the hexagonal architecture pattern, with the appropriate
-    storage adapter based on the environment.
-
-    Args:
-        settings: Application settings
-
-    Returns:
-        An initialized memory service
-
-    Raises:
-        MemoryError: If unable to create or initialize the memory service
-        DependencyError: If hexagonal architecture components are not available
     """
-    global _memory_service
-
-    # Create the memory service if it doesn't exist
-    if _memory_service is None:
-        try:
-            # Check if hexagonal architecture components are available
-            if not HEX_ARCH_AVAILABLE:
                 raise DependencyError("Hexagonal architecture components are not available")
 
             # Determine storage type and configuration based on settings
@@ -328,11 +272,15 @@ async def get_memory_service(
 
             # Create the memory service with the appropriate storage adapter
             try:
+
+                pass
                 _memory_service = await MemoryServiceFactory.create_memory_service(
                     storage_type=storage_type, config=storage_config
                 )
                 logger.info(f"Memory service initialized with {storage_type} storage adapter")
-            except Exception as adapter_error:
+            except Exception:
+
+                pass
                 # If specific adapter fails, try with memory adapter
                 if storage_type != "memory":
                     logger.warning(f"Failed to initialize {storage_type} adapter, falling back to memory adapter")
@@ -348,12 +296,17 @@ async def get_memory_service(
                         original_error=adapter_error,
                     )
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Failed to create memory service with hexagonal architecture: {str(e)}")
             logger.warning("Creating simple wrapper service around legacy memory manager")
 
             # Fall back to using the legacy memory manager with a wrapper
             try:
+
+                pass
                 memory_manager = await get_memory_manager(settings)
                 if memory_manager is None:
                     raise MemoryError("Failed to get memory manager for wrapper service")
@@ -362,7 +315,9 @@ async def get_memory_service(
                 _memory_service = MemoryService(memory_manager)
                 await _memory_service.initialize()
                 logger.info("Memory service initialized with legacy wrapper")
-            except Exception as wrapper_error:
+            except Exception:
+
+                pass
                 logger.error(f"Failed to create wrapper service: {str(wrapper_error)}")
                 raise MemoryOperationError(
                     f"Failed to create any memory service: {str(wrapper_error)}",
@@ -374,16 +329,13 @@ async def get_memory_service(
 @error_boundary(log_to_monitoring=True)
 async def close_memory_service() -> None:
     """
-    Close the memory service during application shutdown.
     """
-    global _memory_service
-
-    if _memory_service is not None:
-        try:
             logger.info("Closing memory service")
             await _memory_service.close()
             logger.info("Memory service closed successfully")
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Error closing memory service: {str(e)}")
         finally:
             _memory_service = None

@@ -2,6 +2,10 @@
   "cluster_name": "paragonrx-karen-cluster",
   "domain": "ParagonRX",
   "persona": "Karen",
+  "url": "http://weaviate-paragonrx:8080",
+  "schema": {
+    "classes": []
+  },
   "collections": {
     "paragonrx_memories": {
       "description": "Vector store for Karen's memories",

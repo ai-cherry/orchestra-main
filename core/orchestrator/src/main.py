@@ -1,17 +1,5 @@
 """
-Main entry point for AI Orchestration System.
-
-This module provides the FastAPI application and starts the web server. It also
-initializes the unified service components and maintains backward compatibility
-with existing components.
 """
-
-import os
-
-# Use the new centralized logging setup
-from core.logging_config import get_logger, setup_logging
-
-# Determine if running in production (Cloud Run) or development
 is_production = os.environ.get("K_SERVICE") is not None
 # Assuming settings.log_level is available, otherwise use a default
 # from core.orchestrator.src.config.loader import get_settings # This will be loaded later
@@ -66,8 +54,12 @@ print(f"   Active mode settings: RECOVERY_MODE={RECOVERY_MODE}, STANDARD_MODE={S
 
 # Import memory service for hexagonal architecture
 try:
+
+    pass
     from core.orchestrator.src.api.dependencies.memory import HEX_ARCH_AVAILABLE
-except ImportError:
+except Exception:
+
+    pass
     HEX_ARCH_AVAILABLE = False
 
 # Load configurations at module level
@@ -75,26 +67,25 @@ settings = get_settings()
 persona_configs: Dict[str, PersonaConfig] = {}
 
 try:
+
+
+    pass
     from core.orchestrator.src.api.endpoints import conversations
     _HAS_CONVERSATIONS = True
-except ImportError:
+except Exception:
+
+    pass
     logger.warning("conversations endpoint not available; skipping conversations routes")
     _HAS_CONVERSATIONS = False
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    FastAPI lifespan event handler for application startup and shutdown.
-
-    Args:
-        app: The FastAPI application instance
     """
-    # Load persona configurations
-    global persona_configs
-    try:
-        persona_configs = load_persona_configs()
         logger.info(f"Loaded {len(persona_configs)} persona configurations")
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to load persona configurations: {e}", exc_info=True)
         logger.warning("Application may run with incomplete or default persona configurations due to loading failure.")
 
@@ -102,11 +93,15 @@ async def lifespan(app: FastAPI):
     # Initialize memory service for hexagonal architecture if available
     if HEX_ARCH_AVAILABLE:
         try:
+
+            pass
             logger.info("Initializing memory service with hexagonal architecture")
             # Memory service initialization happens lazily in the dependency
             # but we can log that it's available
             logger.info("Memory service with hexagonal architecture is available")
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(
                 f"Failed to initialize memory service with hexagonal architecture: {e}",
                 exc_info=True,
@@ -120,10 +115,14 @@ async def lifespan(app: FastAPI):
 
     # Register default agents
     try:
+
+        pass
         logger.info("Registering default agents")
         register_default_agents()
         logger.info("Default agents registered successfully")
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to register default agents: {e}", exc_info=True)
         logger.warning("Default agent registration failed; some functionalities may be unavailable.")
 
@@ -135,14 +134,22 @@ async def lifespan(app: FastAPI):
 
     # Close memory services
     try:
+
+        pass
         # Close hexagonal architecture memory service if available
         if HEX_ARCH_AVAILABLE:
             try:
+
+                pass
                 logger.info("Closing memory service with hexagonal architecture")
                 await close_memory_service()
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Error closing memory service with hexagonal architecture: {e}")
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error during memory service cleanup: {e}")
 
     # Close other services
@@ -150,44 +157,22 @@ async def lifespan(app: FastAPI):
 
 def initialize_services(test_mode: bool = False) -> None:
     """
-    Initialize and register unified services.
-
-    This function sets up all the core services using the unified
-    components, providing a cleaner architecture with better
-    dependency management.
-
-    Args:
-        test_mode: If True, skip initialization of external services and use mocks
     """
-    # Get the service registry
-    registry = get_service_registry()
-
-    # Register the event bus as a service (it's also self-registering)
-    event_bus = get_event_bus()
-    register(event_bus)
-
-    # Register the agent registry as a service
-    agent_registry = get_simplified_agent_registry()
-    register(agent_registry)
-
-    # Initialize LLM providers (skip in test mode unless explicitly mocked)
-    if not test_mode:
-        try:
-            from core.orchestrator.src.services.llm.providers import initialize_llm_providers
-
-            initialize_llm_providers()
-        except Exception as e:
             logger.warning(f"Failed to initialize LLM providers: {e}", exc_info=True)
             logger.error("LLM providers initialization failed; AI functionalities may be limited or unavailable.")
 
     # Initialize the LLM agent and register it with the unified registry (skip in test mode)
     if not test_mode:
         try:
+
+            pass
             from core.orchestrator.src.agents.llm_agent import LLMAgent
 
             llm_agent = LLMAgent()
             register(llm_agent)
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.warning(f"Failed to initialize LLM agent: {e}", exc_info=True)
             logger.error("LLM agent initialization failed; related functionalities will not work.")
 

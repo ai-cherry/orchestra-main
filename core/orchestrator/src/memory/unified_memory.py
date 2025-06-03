@@ -1,17 +1,6 @@
+# TODO: Consider adding connection pooling configuration
 """
-Unified Memory Management Layer for AI Orchestra
-
-Provides a single interface for agent memory operations, with pluggable adapters for MongoDB, Weaviate, and DragonflyDB.
-Supports async operations, connection pooling, adapter registration, and MCP server integration.
-
-Author: Orchestra AI Platform
 """
-
-import asyncio
-import functools
-import logging
-from typing import Any, Dict, List, Optional, Protocol, Type
-
 logger = logging.getLogger("unified_memory")
 
 # --- Error Handling Decorator ---
@@ -19,8 +8,12 @@ def log_and_handle_errors(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:
+
+            pass
             return func(*args, **kwargs)
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Memory operation failed in {func.__name__}: {e}", exc_info=True)
             raise
 
@@ -30,8 +23,12 @@ def async_log_and_handle_errors(func):
     @functools.wraps(func)
     async def wrapper(*args, **kwargs):
         try:
+
+            pass
             return await func(*args, **kwargs)
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Async memory operation failed in {func.__name__}: {e}", exc_info=True)
             raise
 
@@ -65,7 +62,6 @@ class MemoryAdapterRegistry:
 # --- MongoDB Adapter (Sync) ---
 class MongoDBMemoryAdapter:
     """MongoDB-backed memory adapter with connection pooling."""
-
     def __init__(self, mongo_uri: str, db_name: str = "orchestra", collection: str = "memory"):
         from pymongo import MongoClient
 
@@ -95,16 +91,6 @@ MemoryAdapterRegistry.register("mongodb", MongoDBMemoryAdapter)
 # --- Weaviate Adapter (Async) ---
 class WeaviateMemoryAdapter:
     """Weaviate-backed semantic memory adapter (async)."""
-
-    def __init__(self, weaviate_url: str, api_key: str):
-        import weaviate
-
-        self.client = weaviate.Client(url=weaviate_url, auth_client_secret=weaviate.AuthApiKey(api_key))
-
-    @async_log_and_handle_errors
-    async def get(self, key: str) -> Optional[Any]:
-        loop = asyncio.get_event_loop()
-        res = await loop.run_in_executor(None, lambda: self.client.data_object.get_by_id(key))
         return res["properties"] if res else None
 
     @async_log_and_handle_errors
@@ -137,26 +123,6 @@ MemoryAdapterRegistry.register("weaviate", WeaviateMemoryAdapter)
 # --- Dragonfly Adapter (Sync) ---
 class DragonflyMemoryAdapter:
     """DragonflyDB-backed key-value memory adapter."""
-
-    def __init__(self, redis_url: str):
-        import redis
-
-        self.client = redis.from_url(redis_url, decode_responses=True)
-
-    @log_and_handle_errors
-    def get(self, key: str) -> Optional[Any]:
-        return self.client.get(key)
-
-    @log_and_handle_errors
-    def set(self, key: str, value: Any) -> None:
-        self.client.set(key, value)
-
-    @log_and_handle_errors
-    def delete(self, key: str) -> None:
-        self.client.delete(key)
-
-    @log_and_handle_errors
-    def search(self, query: str, top_k: int = 5) -> List[Any]:
         keys = self.client.keys("*")
         matches = [k for k in keys if query in k]
         return [self.client.get(k) for k in matches[:top_k]]
@@ -166,11 +132,7 @@ MemoryAdapterRegistry.register("dragonfly", DragonflyMemoryAdapter)
 # --- Unified Memory Manager ---
 class UnifiedMemoryManager:
     """
-    Unified memory manager that delegates to the appropriate backend.
-    Supports both sync and async adapters.
     """
-
-    def __init__(self, config: Dict[str, Any]):
         backend = config.get("backend")
         adapter_cls = MemoryAdapterRegistry.get_adapter(backend)
         if not adapter_cls:

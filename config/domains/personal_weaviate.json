@@ -2,6 +2,10 @@
   "cluster_name": "personal-cherry-cluster",
   "domain": "Personal",
   "persona": "Cherry",
+  "url": "http://weaviate-personal:8080",
+  "schema": {
+    "classes": []
+  },
   "collections": {
     "personal_memories": {
       "description": "Vector store for Cherry's memories",

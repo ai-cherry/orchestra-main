@@ -1,13 +1,5 @@
+# TODO: Consider adding connection pooling configuration
 """
-PostgreSQL Component for Pulumi Infrastructure
-==============================================
-Provisions an existing DigitalOcean droplet as a PostgreSQL 16 + pgvector database node.
-Also sets up the Python virtual environment for the orchestrator application.
-
-Usage:
-    from .postgres_component import PostgresComponent
-
-    postgres_node = PostgresComponent(
         name="postgres-node",
         config={
             "droplet_id": "existing-droplet-id",  # ID of existing droplet
@@ -22,22 +14,8 @@ Usage:
         opts=ResourceOptions(...)
     )
 """
-
-from typing import Any, Dict, List, Optional
-
-import pulumi
-import pulumi_digitalocean as do
-import pulumi_command as command
-from pulumi import ComponentResource, ResourceOptions, Output
-
-class PostgresComponent(ComponentResource):
     """
-    Reusable PostgreSQL component for the AI Orchestra system.
-    Configures an existing DigitalOcean droplet with PostgreSQL 16 + pgvector.
-    Also sets up the Python virtual environment for the orchestrator.
     """
-
-    def __init__(self, name: str, config: Dict[str, Any], opts: Optional[ResourceOptions] = None):
         super().__init__("orchestra:postgres:Component", name, None, opts)
 
         self.config = config
@@ -69,7 +47,6 @@ class PostgresComponent(ComponentResource):
             f"{name}-install-postgres",
             connection=connection,
             create="""
-                # Add PostgreSQL repository
                 echo "Installing PostgreSQL 16..."
                 
                 # Create the repository configuration file
@@ -89,12 +66,7 @@ class PostgresComponent(ComponentResource):
                 systemctl start postgresql
                 
                 echo "PostgreSQL 16 installed successfully"
-            """,
-            opts=ResourceOptions(parent=self),
-        )
-
-        # Install pgvector extension
-        self.install_pgvector = command.remote.Command(
+            """
             f"{name}-install-pgvector",
             connection=connection,
             create="""
@@ -113,12 +85,7 @@ class PostgresComponent(ComponentResource):
                 make install
                 
                 echo "pgvector extension installed successfully"
-            """,
-            opts=ResourceOptions(parent=self, depends_on=[self.install_postgres]),
-        )
-
-        # Create database, user, and enable extensions
-        self.setup_database = command.remote.Command(
+            """
             f"{name}-setup-database",
             connection=connection,
             create=Output.concat(
@@ -126,50 +93,35 @@ class PostgresComponent(ComponentResource):
                 echo "Setting up PostgreSQL database and user..."
                 
                 # Create database if not exists
-                sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname = '""",
-                self.db_name,
+                sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname = '"""
                 """'" | grep -q 1 || \
-                    sudo -u postgres psql -c "CREATE DATABASE """,
-                self.db_name,
+                    sudo -u postgres psql -c "CREATE DATABASE """
                 """;"
                 
                 # Create user if not exists
-                sudo -u postgres psql -tc "SELECT 1 FROM pg_roles WHERE rolname = '""",
-                self.db_user,
+                sudo -u postgres psql -tc "SELECT 1 FROM pg_roles WHERE rolname = '"""
                 """'" | grep -q 1 || \
-                    sudo -u postgres psql -c "CREATE USER """,
-                self.db_user,
-                """ WITH ENCRYPTED PASSWORD '""",
-                self.db_password,
+                    sudo -u postgres psql -c "CREATE USER """
+                """ WITH ENCRYPTED PASSWORD '"""
                 """';"
                 
                 # Grant privileges
-                sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE """,
-                self.db_name,
-                """ TO """,
-                self.db_user,
+                sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE """
+                """ TO """
                 """;"
                 
                 # Enable pgvector extension
-                sudo -u postgres psql -d """,
-                self.db_name,
+                sudo -u postgres psql -d """
                 """ -c "CREATE EXTENSION IF NOT EXISTS vector;"
                 
                 # Enable additional useful extensions
-                sudo -u postgres psql -d """,
-                self.db_name,
+                sudo -u postgres psql -d """
                 """ -c "CREATE EXTENSION IF NOT EXISTS pg_stat_statements;"
-                sudo -u postgres psql -d """,
-                self.db_name,
+                sudo -u postgres psql -d """
                 """ -c "CREATE EXTENSION IF NOT EXISTS pgcrypto;"
                 
                 echo "Database setup completed successfully"
-                """,
-            ),
-            opts=ResourceOptions(parent=self, depends_on=[self.install_pgvector]),
-        )
-
-        # Configure PostgreSQL for network access
+                """
         allowed_hosts_lines = "\n".join(
             [f"host    {self.db_name}    {self.db_user}    {host}    md5" for host in self.allowed_hosts]
         )
@@ -187,24 +139,15 @@ class PostgresComponent(ComponentResource):
                 # Add VPC network access to pg_hba.conf
                 cat >> /etc/postgresql/16/main/pg_hba.conf << 'EOF'
 # Allow connections from VPC network for Orchestra
-""",
-                allowed_hosts_lines,
+"""
                 """
-EOF
-                
-                # Configure postgresql.conf to listen on all interfaces
                 sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" /etc/postgresql/16/main/postgresql.conf
                 
                 # Restart PostgreSQL to apply changes
                 systemctl restart postgresql
                 
                 echo "PostgreSQL network configuration completed"
-                """,
-            ),
-            opts=ResourceOptions(parent=self, depends_on=[self.setup_database]),
-        )
-
-        # Setup Python virtual environment
+                """
         packages_str = " ".join(self.python_packages)
 
         self.setup_python_env = command.remote.Command(
@@ -219,51 +162,25 @@ EOF
                 apt-get install -y python3 python3-pip python3-venv git
                 
                 # Create app directory if not exists
-                mkdir -p """,
-                self.app_path,
+                mkdir -p """
                 """
-                
-                # Clone repository if not exists
-                if [ ! -d """,
-                self.app_path,
-                """/.git ]; then
-                    git clone https://github.com/ai-cherry/orchestra-main.git """,
-                self.app_path,
+                if [ ! -d """
                 """
-                else
-                    cd """,
-                self.app_path,
-                """ && git pull
-                fi
-                
-                # Create and activate virtual environment
-                python3 -m venv """,
-                self.venv_path,
+                    git clone https://github.com/ai-cherry/orchestra-main.git """
                 """
-                
-                # Install required packages
-                """,
-                self.venv_path,
-                """/bin/pip install --upgrade pip
-                """,
-                self.venv_path,
-                """/bin/pip install """,
-                packages_str,
+                    cd """
                 """
-                
-                # Create directory for logs
-                mkdir -p """,
-                self.app_path,
-                """/logs
-                
+                python3 -m venv """
+                """
+                """
+                """
+                """
+                """/bin/pip install """
+                """
+                mkdir -p """
+                """
                 echo "Python environment setup completed"
-                """,
-            ),
-            opts=ResourceOptions(parent=self),
-        )
-
-        # Create systemd service for orchestrator
-        self.create_service = command.remote.Command(
+                """
             f"{name}-create-service",
             connection=connection,
             create=Output.concat(
@@ -279,41 +196,18 @@ After=network.target postgresql.service
 [Service]
 Type=simple
 User=root
-WorkingDirectory=""",
-                self.app_path,
+WorkingDirectory="""
                 """
-Environment="PYTHONPATH=""",
-                self.app_path,
+Environment="PYTHONPATH="""
                 """"
-Environment="POSTGRES_DSN=postgres://""",
-                self.db_user,
-                """:""",
-                self.db_password,
-                """@localhost/""",
-                self.db_name,
+Environment="POSTGRES_DSN=postgres://"""
+                """:"""
+                """@localhost/"""
                 """"
-ExecStart=""",
-                self.venv_path,
-                """/bin/python -m uvicorn core.api.main:app --host 0.0.0.0 --port 8080
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-EOF
-                
-                # Reload systemd and enable service
-                systemctl daemon-reload
-                systemctl enable orchestra-api
-                
+ExecStart="""
+                """
                 echo "Systemd service created successfully"
-                """,
-            ),
-            opts=ResourceOptions(parent=self, depends_on=[self.setup_python_env]),
-        )
-
-        # Setup Langfuse monitoring
-        self.setup_langfuse = command.remote.Command(
+                """
             f"{name}-setup-langfuse",
             connection=connection,
             create="""
@@ -365,12 +259,7 @@ EOF
                 docker-compose up -d
                 
                 echo "Langfuse monitoring setup completed"
-            """,
-            opts=ResourceOptions(parent=self),
-        )
-
-        # Setup firewall rules
-        self.firewall = do.Firewall(
+            """
             f"{name}-firewall",
             droplet_ids=[self.droplet_id],
             inbound_rules=[

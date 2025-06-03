@@ -1,47 +1,9 @@
 """
-Layered memory implementation for AI Orchestra.
-
-This module provides a unified memory system with short-term, mid-term, and long-term memory capabilities.
 """
-
-import logging
-import time
-from typing import Any, Dict, List, Optional
-
-from core.orchestrator.src.memory.interface import MemoryInterface
-
-logger = logging.getLogger(__name__)
-
-class LayeredMemory:
     """
-    Layered memory implementation for AI Orchestra.
-
-    This class provides a unified memory system with multiple layers:
-    - Short-term memory: Fast, ephemeral storage (Redis)
-    - Mid-term memory: Structured storage (Firestore)
-    - Long-term memory: Persistent storage (Firestore)
-    - Semantic memory: Vector-based storage (Vertex AI)
     """
-
-    def __init__(
-        self,
-        layers: Dict[str, MemoryInterface],
-        auto_promote: bool = True,
-        auto_demote: bool = False,
-    ):
         """
-        Initialize layered memory.
-
-        Args:
-            layers: Dictionary mapping layer names to memory backends
-            auto_promote: Whether to automatically promote items to higher memory layers
-            auto_demote: Whether to automatically demote items to lower memory layers
         """
-        self.layers = layers
-        self.auto_promote = auto_promote
-        self.auto_demote = auto_demote
-
-        # Define layer hierarchy for promotion/demotion
         self.layer_hierarchy = ["short_term", "mid_term", "long_term"]
 
         logger.info(f"LayeredMemory initialized with layers: {list(layers.keys())}")
@@ -55,23 +17,7 @@ class LayeredMemory:
         cascade: bool = False,
     ) -> bool:
         """
-        Store an item in memory.
-        Logs operation duration and errors for observability.
-
-        Args:
-            key: The key to store the value under
-            value: The value to store
-            layer: The layer to store in
-            ttl: Time-to-live in seconds (optional)
-            cascade: Whether to cascade storage to lower layers
-
-        Returns:
-            True if successful, False otherwise
         """
-        start_time = time.perf_counter()
-        try:
-            # Check if the specified layer exists
-            if layer not in self.layers:
                 logger.error(f"Layer '{layer}' not found")
                 return False
 
@@ -98,7 +44,9 @@ class LayeredMemory:
                         await self.layers[lower_layer].store(key, document, ttl)
 
             return True
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.exception(f"Exception during store operation for key {key} in layer {layer}: {e}")
             return False
         finally:
@@ -109,53 +57,7 @@ class LayeredMemory:
         self, key: str, layers: Optional[List[str]] = None, migrate: bool = True
     ) -> Optional[Dict[str, Any]]:
         """
-        Retrieve an item from memory.
-        Logs operation duration and errors for observability.
-
-        Args:
-            key: The key to retrieve
-            layers: The layers to search in (default: all layers in hierarchy order)
-            migrate: Whether to migrate items between layers
-
-        Returns:
-            The stored value, or None if not found
         """
-        start_time = time.perf_counter()
-        try:
-            result = None
-            found_layer = None
-
-            # If no layers specified, use all layers in hierarchy order
-            if layers is None:
-                search_layers = self.layer_hierarchy.copy()
-
-                # Add any layers not in the hierarchy
-                for layer in self.layers:
-                    if layer not in search_layers:
-                        search_layers.append(layer)
-            else:
-                search_layers = layers
-
-            # Search in each layer
-            for layer in search_layers:
-                if layer in self.layers:
-                    result = await self.layers[layer].retrieve(key)
-
-                    if result is not None:
-                        found_layer = layer
-                        break
-
-            # If item was found and migration is enabled, handle promotion
-            if result is not None and migrate and found_layer in self.layer_hierarchy and self.auto_promote:
-                layer_index = self.layer_hierarchy.index(found_layer)
-
-                # Promote to all layers above the found layer
-                for higher_layer in self.layer_hierarchy[layer_index + 1 :]:
-                    if higher_layer in self.layers:
-                        await self.layers[higher_layer].store(key, result)
-
-            return result
-        except Exception as e:
             logger.exception(f"Exception during retrieve operation for key {key}: {e}")
             return None
         finally:
@@ -164,82 +66,20 @@ class LayeredMemory:
 
     async def delete(self, key: str, layers: Optional[List[str]] = None) -> bool:
         """
-        Delete an item from memory.
-
-        Args:
-            key: The key to delete
-            layers: The layers to delete from (default: all layers)
-
-        Returns:
-            True if successful, False otherwise
         """
-        success = True
-
-        # If no layers specified, use all layers
-        if layers is None:
-            delete_layers = list(self.layers.keys())
-        else:
-            delete_layers = layers
-
-        # Delete from each layer
-        for layer in delete_layers:
-            if layer in self.layers:
-                if not await self.layers[layer].delete(key):
-                    success = False
                     logger.error(f"Failed to delete item with key {key} from layer {layer}")
 
         return success
 
     async def exists(self, key: str, layers: Optional[List[str]] = None) -> bool:
         """
-        Check if an item exists in memory.
-
-        Args:
-            key: The key to check
-            layers: The layers to check in (default: all layers)
-
-        Returns:
-            True if the item exists, False otherwise
         """
-        # If no layers specified, use all layers
-        if layers is None:
-            check_layers = list(self.layers.keys())
-        else:
-            check_layers = layers
-
-        # Check each layer
-        for layer in check_layers:
-            if layer in self.layers and await self.layers[layer].exists(key):
-                return True
-
-        return False
-
-    async def search(
-        self,
-        field: str,
-        value: Any,
         operator: str = "==",
         limit: int = 10,
         layers: Optional[List[str]] = None,
     ) -> List[Dict[str, Any]]:
         """
-        Search for items in memory.
-        Logs operation duration and errors for observability.
-
-        Args:
-            field: The field to search on
-            value: The value to search for
-            operator: The comparison operator to use
-            limit: Maximum number of results to return
-            layers: The layers to search in (default: all layers in hierarchy order)
-
-        Returns:
-            List of matching items
         """
-        start_time = time.perf_counter()
-        try:
-            results = []
-
             # If field is "semantic", use semantic search
             if field == "semantic" and "semantic" in self.layers:
                 return await self.layers["semantic"].search("semantic", value, operator, limit)
@@ -249,6 +89,8 @@ class LayeredMemory:
                 search_layers = self.layer_hierarchy.copy()
 
                 # Add any layers not in the hierarchy
+                # TODO: Consider using list comprehension for better performance
+
                 for layer in self.layers:
                     if layer not in search_layers:
                         search_layers.append(layer)
@@ -274,7 +116,9 @@ class LayeredMemory:
                             existing_keys.add(item_key)
 
             return results
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.exception(f"Exception during search operation for field {field}: {e}")
             return []
         finally:
@@ -283,20 +127,7 @@ class LayeredMemory:
 
     async def update(self, key: str, updates: Dict[str, Any], layers: Optional[List[str]] = None) -> bool:
         """
-        Update an item in memory.
-
-        Args:
-            key: The key of the item to update
-            updates: The fields to update
-            layers: The layers to update in (default: all layers)
-
-        Returns:
-            True if successful, False otherwise
         """
-        success = True
-
-        # Add metadata
-        document = updates.copy()
         document["updated_at"] = int(time.time())
 
         # If no layers specified, use all layers
@@ -316,25 +147,7 @@ class LayeredMemory:
 
     async def clear(self, layers: Optional[List[str]] = None) -> bool:
         """
-        Clear all items from memory.
-
-        Args:
-            layers: The layers to clear (default: all layers)
-
-        Returns:
-            True if successful, False otherwise
         """
-        success = True
-
-        # If no layers specified, use all layers
-        if layers is None:
-            clear_layers = list(self.layers.keys())
-        else:
-            clear_layers = layers
-
-        # Clear each layer
-        for layer in clear_layers:
-            if layer in self.layers:
                 if hasattr(self.layers[layer], "clear_all") and callable(getattr(self.layers[layer], "clear_all")):
                     if not await self.layers[layer].clear_all():
                         success = False
@@ -350,18 +163,7 @@ class LayeredMemory:
 
     async def promote(self, key: str, from_layer: str, to_layer: str) -> bool:
         """
-        Promote an item from one layer to another.
-
-        Args:
-            key: The key of the item to promote
-            from_layer: The source layer
-            to_layer: The target layer
-
-        Returns:
-            True if successful, False otherwise
         """
-        # Check if the layers exist
-        if from_layer not in self.layers:
             logger.error(f"Layer '{from_layer}' not found")
             return False
 
@@ -384,25 +186,8 @@ class LayeredMemory:
 
     async def demote(self, key: str, from_layer: str, to_layer: str) -> bool:
         """
-        Demote an item from one layer to another.
-
-        Args:
-            key: The key of the item to demote
-            from_layer: The source layer
-            to_layer: The target layer
-
-        Returns:
-            True if successful, False otherwise
         """
-        # This is essentially the same as promote, but with different semantics
-        return await self.promote(key, from_layer, to_layer)
-
-    async def semantic_search(
-        self, query: str, limit: int = 10, layers: Optional[List[str]] = None
-    ) -> List[Dict[str, Any]]:
         """
-        Perform semantic search.
-
         This method always prioritizes the "semantic" layer (e.g., Weaviate or other vector DB) if available,
         offloading heavy computation to the vector DB for optimal scalability and performance.
         If the "semantic" layer is not present, falls back to text search in other layers.
@@ -421,9 +206,6 @@ class LayeredMemory:
         List[Dict[str, Any]]
             List of matching items.
         """
-
-        # If no layers specified, use semantic layer if available
-        if layers is None:
             if "semantic" in self.layers:
                 return await self.layers["semantic"].search("semantic", query, "==", limit)
             else:
@@ -468,21 +250,15 @@ class LayeredMemory:
 
     async def get_stats(self) -> Dict[str, Any]:
         """
-        Get statistics about all memory layers.
-
-        Returns:
-            Dictionary of statistics by layer
         """
-        stats = {}
-
-        for layer_name, layer_backend in self.layers.items():
-            try:
                 if hasattr(layer_backend, "get_stats") and callable(getattr(layer_backend, "get_stats")):
                     layer_stats = await layer_backend.get_stats()
                     stats[layer_name] = layer_stats
                 else:
                     stats[layer_name] = {"error": "get_stats not implemented"}
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Error getting stats from layer {layer_name}: {e}")
                 stats[layer_name] = {"error": str(e)}
 
@@ -490,27 +266,7 @@ class LayeredMemory:
 
     async def ttl(self, key: str, ttl: int, layers: Optional[List[str]] = None) -> bool:
         """
-        Set the time-to-live for a key in the specified layers.
-
-        Args:
-            key: The key to set TTL for
-            ttl: Time-to-live in seconds
-            layers: List of layers to set TTL in (defaults to all layers)
-
-        Returns:
-            True if successful in at least one layer, False otherwise
         """
-        # Default to all layers
-        if layers is None:
-            ttl_layers = list(self.layers.keys())
-        else:
-            ttl_layers = layers
-
-        success = False
-
-        # Set TTL in each layer
-        for layer_name in ttl_layers:
-            if layer_name not in self.layers:
                 logger.warning(f"Layer {layer_name} not found in memory layers")
                 continue
 

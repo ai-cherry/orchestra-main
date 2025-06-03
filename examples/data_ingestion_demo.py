@@ -1,21 +1,6 @@
 #!/usr/bin/env python3
 """
-Orchestra AI Data Ingestion Demo
-Demonstrates various data ingestion capabilities.
 """
-
-import asyncio
-import json
-
-# Add parent directory to path for imports
-import sys
-from pathlib import Path
-
-sys.path.append(str(Path(__file__).parent.parent))
-
-from shared.data_ingestion.ingestion_pipeline import DataIngestionPipeline
-
-async def demo_file_ingestion(pipeline: DataIngestionPipeline) -> None:
     """Demonstrate file ingestion capabilities."""
     print("\n=== FILE INGESTION DEMO ===")
 
@@ -26,15 +11,8 @@ async def demo_file_ingestion(pipeline: DataIngestionPipeline) -> None:
     # Create CSV file
     csv_file = sample_dir / "sales_data.csv"
     csv_file.write_text(
-        """date,product,quantity,price
-2024-01-01,Widget A,100,29.99
-2024-01-02,Widget B,75,39.99
-2024-01-03,Widget A,120,29.99
-2024-01-04,Widget C,50,49.99
+        """
 2024-01-05,Widget B,90,39.99"""
-    )
-
-    # Create JSON file
     json_file = sample_dir / "customer_data.json"
     json_file.write_text(
         json.dumps(
@@ -76,9 +54,6 @@ async def demo_file_ingestion(pipeline: DataIngestionPipeline) -> None:
         <location>Warehouse B</location>
     </item>
 </inventory>"""
-    )
-
-    # Ingest CSV file
     print("\n1. Ingesting CSV file...")
     csv_results = await pipeline.ingest_file(csv_file, processor_kwargs={"chunk_size": 2})  # Small chunk for demo
     print(f"   - Processed {len(csv_results)} chunks from CSV")
@@ -108,6 +83,9 @@ async def demo_api_ingestion(pipeline: DataIngestionPipeline) -> None:
     print("\n1. Ingesting from REST API (JSONPlaceholder)...")
 
     try:
+
+
+        pass
         # Fetch posts with pagination
         api_results = await pipeline.ingest_api(
             api_type="rest",
@@ -126,7 +104,10 @@ async def demo_api_ingestion(pipeline: DataIngestionPipeline) -> None:
             first_item = json.loads(api_results[0].raw_content)
             print(f"   - Sample post title: '{first_item.get('title', 'N/A')}'")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         print(f"   - API demo failed: {e}")
         print("   - Note: Requires internet connection")
 
@@ -190,6 +171,9 @@ async def main():
     pipeline = DataIngestionPipeline(enable_embedding_generation=False, batch_size=10)  # Disabled for demo
 
     try:
+
+
+        pass
         # Run demonstrations
         await demo_file_ingestion(pipeline)
         await demo_api_ingestion(pipeline)

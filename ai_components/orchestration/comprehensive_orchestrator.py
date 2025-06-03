@@ -1,49 +1,9 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Comprehensive AI Orchestrator - Main entry point that integrates all components
 """
-
-import os
-import sys
-import asyncio
-import logging
-from typing import Dict, List, Optional, Any
-from datetime import datetime
-import signal
-
-# Add parent directory to path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from orchestration.coding_activity_monitor import CodingActivityMonitor, ScheduledAutomation
-from orchestration.mcp_integration import (
-    MCPOrchestrator, MCPContextManager, MCPWebSocketServer,
-    RooAgent, FactoryAIAgent
-)
-from orchestration.cursor_integration import CursorIntegrationServer
-from orchestration.vultr_autoscaling import VultrOrchestrator
-from orchestration.ai_orchestrator import AIOrchestrator
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
-
-class ComprehensiveOrchestrator:
     """Main orchestrator that coordinates all AI components"""
-    
-    def __init__(self):
-        self.components = {}
-        self.running = False
-        self.tasks = []
-        
-        # Initialize configuration
-        self.config = self._load_configuration()
-        
-    def _load_configuration(self) -> Dict[str, Any]:
         """Load orchestrator configuration"""
-        return {
             "workspace_path": os.getenv("WORKSPACE_PATH", "/root/orchestra-main"),
             "weaviate_url": os.getenv("WEAVIATE_URL", "http://localhost:8080"),
             "postgres_url": os.getenv("DATABASE_URL"),
@@ -188,6 +148,8 @@ class ComprehensiveOrchestrator:
         
         # Execute workflow through MCP orchestrator
         try:
+
+            pass
             mcp_orchestrator = self.components["mcp_orchestrator"]
             result = await mcp_orchestrator.coordinate_workflow(workflow)
             
@@ -198,7 +160,10 @@ class ComprehensiveOrchestrator:
                 "result": result
             })
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             logger.error(f"Workflow execution failed: {e}")
     
     async def handle_scheduled_trigger(self, context: Dict[str, Any]):
@@ -242,11 +207,16 @@ class ComprehensiveOrchestrator:
         
         # Execute through AI orchestrator for scheduled tasks
         try:
+
+            pass
             ai_orchestrator = self.components["ai_orchestrator"]
             result = await ai_orchestrator.execute_workflow(workflow)
             logger.info(f"Scheduled workflow completed: {result}")
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             logger.error(f"Scheduled workflow failed: {e}")
     
     async def start(self):
@@ -296,8 +266,12 @@ class ComprehensiveOrchestrator:
         
         # Keep running
         try:
+
+            pass
             await asyncio.gather(*self.tasks)
-        except asyncio.CancelledError:
+        except Exception:
+
+            pass
             logger.info("Orchestrator shutdown requested")
     
     async def stop(self):
@@ -321,7 +295,6 @@ class ComprehensiveOrchestrator:
     
     def get_status(self) -> Dict[str, Any]:
         """Get orchestrator status"""
-        status = {
             "running": self.running,
             "components": {},
             "timestamp": datetime.now().isoformat()
@@ -348,10 +321,6 @@ class ComprehensiveOrchestrator:
 
 async def main():
     """Main entry point"""
-    orchestrator = ComprehensiveOrchestrator()
-    
-    # Handle shutdown signals
-    def signal_handler(sig, frame):
         logger.info("Shutdown signal received")
         asyncio.create_task(orchestrator.stop())
     
@@ -359,9 +328,14 @@ async def main():
     signal.signal(signal.SIGTERM, signal_handler)
     
     try:
+
+    
+        pass
         # Start orchestrator
         await orchestrator.start()
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Orchestrator error: {e}")
     finally:
         await orchestrator.stop()

@@ -1,18 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """Final cleanup script to remove GCP references and outdated files."""
-
-import re
-from pathlib import Path
-from typing import List
-
-class FinalCleanup:
     """Handles final cleanup of GCP references and outdated files."""
-
-    def __init__(self):
-        self.root_dir = Path(__file__).parent.parent
-        self.files_to_delete = []
-        self.files_to_update = []
-        self.gcp_patterns = [
             r"VULTR_PROJECT_ID",
             r"VULTR_PROJECT_ID",
             r"google-cloud-",
@@ -26,8 +15,6 @@ class FinalCleanup:
 
     def find_outdated_files(self) -> List[Path]:
         """Find files that should be deleted."""
-        outdated_patterns = [
-            # GCP cleanup files
             "GCP_CLEANUP_*.md",
             "cleanup_gcp*.sh",
             "deep_gcp_cleanup.py",
@@ -96,27 +83,27 @@ class FinalCleanup:
 
     def find_files_with_gcp_references(self) -> List[Path]:
         """Find files that contain GCP references."""
-        files_with_gcp = []
-
-        # Skip these directories
         skip_dirs = {".git", ".mypy_cache", "venv", "__pycache__", "node_modules"}
 
         for file_path in self.root_dir.rglob("*"):
             if file_path.is_file() and not any(skip in str(file_path) for skip in skip_dirs):
                 try:
+
+                    pass
                     content = file_path.read_text(encoding="utf-8")
                     for pattern in self.gcp_patterns:
                         if re.search(pattern, content, re.IGNORECASE):
                             files_with_gcp.append(file_path)
                             break
                 except Exception:
+
+                    pass
                     pass
 
         return files_with_gcp
 
     def update_file_content(self, file_path: Path) -> bool:
         """Update file to remove GCP references."""
-        try:
             content = file_path.read_text(encoding="utf-8")
             original_content = content
 
@@ -139,7 +126,9 @@ class FinalCleanup:
                 file_path.write_text(content)
                 return True
             return False
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"Error updating {file_path}: {e}")
             return False
 
@@ -160,9 +149,13 @@ class FinalCleanup:
             if response.lower() == "y":
                 for f in outdated_files:
                     try:
+
+                        pass
                         f.unlink()
                         print(f"  ✓ Deleted {f.relative_to(self.root_dir)}")
-                    except Exception as e:
+                    except Exception:
+
+                        pass
                         print(f"  ✗ Error deleting {f}: {e}")
 
         # Find files with GCP references
@@ -211,8 +204,6 @@ class FinalCleanup:
 
     def update_config_files(self):
         """Update specific configuration files."""
-        updates = {
-            # Update docker-compose.yml
             "docker-compose.yml": [
                 ("VULTR_PROJECT_ID:", "# VULTR_PROJECT_ID: (removed)"),
                 ("VULTR_PROJECT_ID:", "# VULTR_PROJECT_ID: (removed)"),
@@ -234,18 +225,19 @@ class FinalCleanup:
             full_path = self.root_dir / file_path
             if full_path.exists():
                 try:
+
+                    pass
                     content = full_path.read_text()
                     for old, new in replacements:
                         content = content.replace(old, new)
                     full_path.write_text(content)
                     print(f"  ✓ Updated {file_path}")
-                except Exception as e:
+                except Exception:
+
+                    pass
                     print(f"  ✗ Error updating {file_path}: {e}")
 
 def main():
     """Main entry point."""
-    cleanup = FinalCleanup()
-    cleanup.run()
-
 if __name__ == "__main__":
     main()

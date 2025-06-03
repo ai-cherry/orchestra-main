@@ -1,23 +1,6 @@
 #!/usr/bin/env python3
 """
-Quick Check Utility for Patrick's Orchestrator Experience
-
-This script provides a rapid check of the most common issues affecting
-Patrick's experience with the Orchestrator system. It's designed to be
-fast and minimally invasive, checking only configuration and structure
-without making any actual API calls.
-
-For a more thorough diagnostic, use diagnose_patrick_issues.py.
 """
-
-import logging
-import os
-import sys
-from pathlib import Path
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
 )
 logger = logging.getLogger("quick-check")
@@ -113,12 +96,14 @@ def check_api_configuration():
 
     # Read the file to check for required route registrations
     try:
+
+        pass
         with open(api_app_path, "r") as f:
             content = f.read()
 
         # Check for essential route registrations
         checks = [
-            ("from .endpoints import interaction", "Interaction endpoint import"),
+            ("from shared.endpoints import interaction", "Interaction endpoint import"),
             (".include_router(interaction.router", "Interaction router registration"),
             ("from .middleware", "Middleware imports (for persona handling)"),
         ]
@@ -132,7 +117,9 @@ def check_api_configuration():
                 all_found = False
 
         return all_found
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"  {Colors.RED}✗ Error checking API configuration: {e}{Colors.ENDC}")
         return False
 
@@ -156,6 +143,8 @@ def check_hardcoded_references():
     issues_found = False
     for file_path in files_to_check:
         try:
+
+            pass
             path = Path(file_path)
             if not path.exists():
                 continue
@@ -170,7 +159,9 @@ def check_hardcoded_references():
                     )
                     print(f"  {Colors.YELLOW}⚠ {description} found in {file_path}:{line_num}{Colors.ENDC}")
                     issues_found = True
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"  {Colors.YELLOW}⚠ Error checking {file_path}: {e}{Colors.ENDC}")
 
     if not issues_found:

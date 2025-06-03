@@ -1,19 +1,5 @@
 """
-Simple auth endpoints for the orchestrator API.
 """
-
-import os
-from datetime import datetime, timedelta
-from typing import Dict
-
-import jwt
-from fastapi import APIRouter, HTTPException, Depends
-from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import BaseModel
-
-router = APIRouter()
-
-# Configuration
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "orchestra-admin-jwt-secret-key-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 720  # 12 hours
@@ -77,7 +63,6 @@ async def login_json(credentials: LoginRequest):
 @router.get("/me")
 async def get_current_user():
     """Get current user info - simplified version."""
-    return {
         "username": "scoobyjava",
         "email": "admin@orchestra.ai",
         "is_active": True

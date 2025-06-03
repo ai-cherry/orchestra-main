@@ -1,40 +1,5 @@
 """
-Agent Orchestrator for Managing Multi-Agent Workflows
-
-This module implements the orchestration layer that coordinates:
-- Inter-agent communication
-- Parallel task execution
-- Shared knowledge bases
-- Workflow state management
-- Performance monitoring
 """
-
-import asyncio
-import json
-import uuid
-from typing import Dict, Any, List, Optional, Set, Tuple
-from datetime import datetime, timedelta
-from dataclasses import dataclass, field
-from enum import Enum
-import logging
-from collections import defaultdict
-import networkx as nx
-
-import redis.asyncio as redis
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, func
-
-from agent.app.services.specialized_agents import (
-    get_specialized_agent,
-    AgentType,
-    BaseSpecializedAgent
-)
-from core.llm_intelligent_router import get_intelligent_llm_router
-from agent.app.core.database import get_db
-
-logger = logging.getLogger(__name__)
-
-class WorkflowStatus(Enum):
     """Workflow execution status"""
     PENDING = "pending"
     RUNNING = "running"
@@ -55,88 +20,13 @@ class TaskStatus(Enum):
 @dataclass
 class WorkflowTask:
     """Individual task in a workflow"""
-    id: str
-    agent_type: AgentType
-    task_data: Dict[str, Any]
-    dependencies: List[str] = field(default_factory=list)
-    status: TaskStatus = TaskStatus.PENDING
-    result: Optional[Dict[str, Any]] = None
-    error: Optional[str] = None
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
-    retry_count: int = 0
-    max_retries: int = 3
-
-@dataclass
-class Workflow:
     """Workflow definition and state"""
-    id: str
-    name: str
-    tasks: Dict[str, WorkflowTask]
-    status: WorkflowStatus = WorkflowStatus.PENDING
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
-    context: Dict[str, Any] = field(default_factory=dict)
-    checkpoints: List[Dict[str, Any]] = field(default_factory=list)
-
-class CircuitBreaker:
     """Circuit breaker for external service calls"""
-    
-    def __init__(self, failure_threshold: int = 5, recovery_timeout: int = 60):
-        self.failure_threshold = failure_threshold
-        self.recovery_timeout = recovery_timeout
-        self.failure_count = 0
-        self.last_failure_time = None
-        self.is_open = False
-    
-    def record_success(self):
         """Record successful call"""
-        self.failure_count = 0
-        self.is_open = False
-    
-    def record_failure(self):
         """Record failed call"""
-        self.failure_count += 1
-        self.last_failure_time = datetime.utcnow()
-        
-        if self.failure_count >= self.failure_threshold:
-            self.is_open = True
-    
-    def can_execute(self) -> bool:
         """Check if circuit allows execution"""
-        if not self.is_open:
-            return True
-        
-        # Check if recovery timeout has passed
-        if self.last_failure_time:
-            time_since_failure = (datetime.utcnow() - self.last_failure_time).seconds
-            if time_since_failure > self.recovery_timeout:
-                self.is_open = False
-                self.failure_count = 0
-                return True
-        
-        return False
-
-class AgentOrchestrator:
     """
-    Main orchestrator for coordinating multi-agent workflows
     """
-    
-    def __init__(self):
-        self.workflows: Dict[str, Workflow] = {}
-        self.agent_pool: Dict[AgentType, List[BaseSpecializedAgent]] = defaultdict(list)
-        self.circuit_breakers: Dict[str, CircuitBreaker] = {}
-        self.shared_context: Dict[str, Any] = {}
-        self.message_queue: asyncio.Queue = asyncio.Queue()
-        self.llm_router = get_intelligent_llm_router()
-        
-        # Redis for distributed state
-        self.redis_client = None
-        self._init_redis()
-        
-        # Performance metrics
-        self.metrics = {
             "workflows_completed": 0,
             "tasks_completed": 0,
             "average_task_duration": 0,
@@ -149,13 +39,6 @@ class AgentOrchestrator:
     
     def _init_redis(self):
         """Initialize Redis connection"""
-        try:
-            self.redis_client = redis.Redis(
-                host='localhost',
-                port=6379,
-                decode_responses=True
-            )
-        except Exception as e:
             logger.error(f"Failed to initialize Redis: {e}")
     
     async def create_workflow(
@@ -165,13 +48,6 @@ class AgentOrchestrator:
         context: Optional[Dict[str, Any]] = None
     ) -> Workflow:
         """Create a new workflow with dependency resolution"""
-        
-        workflow_id = str(uuid.uuid4())
-        workflow_tasks = {}
-        
-        # Create task objects
-        for task_def in tasks:
-            task = WorkflowTask(
                 id=task_def["id"],
                 agent_type=AgentType(task_def["agent_type"]),
                 task_data=task_def["data"],
@@ -209,13 +85,6 @@ class AgentOrchestrator:
     
     def _validate_dependencies(self, tasks: Dict[str, WorkflowTask]):
         """Validate task dependencies form a DAG"""
-        
-        # Build dependency graph
-        graph = nx.DiGraph()
-        for task_id, task in tasks.items():
-            graph.add_node(task_id)
-            for dep in task.dependencies:
-                if dep not in tasks:
                     raise ValueError(f"Task {task_id} depends on unknown task {dep}")
                 graph.add_edge(dep, task_id)
         
@@ -225,15 +94,15 @@ class AgentOrchestrator:
     
     async def execute_workflow(self, workflow_id: str) -> Dict[str, Any]:
         """Execute a workflow with parallel task execution"""
-        
-        workflow = self.workflows.get(workflow_id)
-        if not workflow:
             raise ValueError(f"Workflow {workflow_id} not found")
         
         workflow.status = WorkflowStatus.RUNNING
         workflow.started_at = datetime.utcnow()
         
         try:
+
+        
+            pass
             # Build execution plan
             execution_plan = self._build_execution_plan(workflow)
             
@@ -261,76 +130,18 @@ class AgentOrchestrator:
                 }
             }
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             workflow.status = WorkflowStatus.FAILED
             logger.error(f"Workflow {workflow_id} failed: {e}")
             raise
     
     def _build_execution_plan(self, workflow: Workflow) -> List[List[str]]:
         """Build parallel execution plan based on dependencies"""
-        
-        # Build dependency graph
-        graph = nx.DiGraph()
-        for task_id, task in workflow.tasks.items():
-            graph.add_node(task_id)
-            for dep in task.dependencies:
-                graph.add_edge(dep, task_id)
-        
-        # Topological sort to get execution order
-        execution_order = list(nx.topological_sort(graph))
-        
-        # Group tasks that can run in parallel
-        batches = []
-        processed = set()
-        
-        for task_id in execution_order:
-            if task_id in processed:
-                continue
-            
-            # Find all tasks that can run in parallel with this one
-            batch = [task_id]
-            processed.add(task_id)
-            
-            for other_id in execution_order:
-                if other_id in processed:
-                    continue
-                
-                # Check if all dependencies are satisfied
-                task = workflow.tasks[other_id]
-                if all(dep in processed or dep in batch for dep in task.dependencies):
-                    batch.append(other_id)
-                    processed.add(other_id)
-            
-            batches.append(batch)
-        
-        return batches
-    
-    async def _execute_task_batch(
-        self,
-        workflow: Workflow,
-        task_ids: List[str]
-    ):
         """Execute a batch of tasks in parallel"""
-        
-        tasks = []
-        for task_id in task_ids:
-            task = workflow.tasks[task_id]
-            if task.status == TaskStatus.COMPLETED:
-                continue
-            
-            tasks.append(self._execute_single_task(workflow, task))
-        
-        # Execute all tasks in parallel
-        await asyncio.gather(*tasks, return_exceptions=True)
-    
-    async def _execute_single_task(
-        self,
-        workflow: Workflow,
-        task: WorkflowTask
-    ):
         """Execute a single task with retry logic"""
-        
-        # Check circuit breaker
         breaker_key = f"{task.agent_type.value}:{task.task_data.get('type', 'default')}"
         breaker = self.circuit_breakers.get(breaker_key)
         if not breaker:
@@ -345,6 +156,8 @@ class AgentOrchestrator:
         # Execute with retries
         for attempt in range(task.max_retries + 1):
             try:
+
+                pass
                 task.status = TaskStatus.RUNNING
                 task.started_at = datetime.utcnow()
                 
@@ -382,7 +195,10 @@ class AgentOrchestrator:
                 
                 return
                 
-            except Exception as e:
+            except Exception:
+
+                
+                pass
                 task.retry_count = attempt + 1
                 task.error = str(e)
                 breaker.record_failure()
@@ -408,8 +224,6 @@ class AgentOrchestrator:
     
     async def _create_checkpoint(self, workflow: Workflow):
         """Create workflow checkpoint for recovery"""
-        
-        checkpoint = {
             "timestamp": datetime.utcnow().isoformat(),
             "task_states": {
                 task_id: {
@@ -438,8 +252,6 @@ class AgentOrchestrator:
         checkpoint_timestamp: Optional[str] = None
     ) -> Workflow:
         """Recover workflow from checkpoint"""
-        
-        if not self.redis_client:
             raise RuntimeError("Redis not available for recovery")
         
         # Get workflow metadata
@@ -469,12 +281,6 @@ class AgentOrchestrator:
     
     async def _message_processor(self):
         """Process inter-agent messages"""
-        
-        while True:
-            try:
-                message = await self.message_queue.get()
-                
-                # Route message based on type
                 if message["type"] == "task_completed":
                     # Update shared context with results
                     task_id = message["task_id"]
@@ -489,22 +295,16 @@ class AgentOrchestrator:
                     data = message["data"]
                     # Implementation for agent-to-agent messaging
                 
-            except Exception as e:
+            except Exception:
+
+                
+                pass
                 logger.error(f"Error processing message: {e}")
             
             await asyncio.sleep(0.1)
     
     async def _health_monitor(self):
         """Monitor agent health and performance"""
-        
-        while True:
-            try:
-                # Check all agents
-                for agent_type in AgentType:
-                    agent = await get_specialized_agent(agent_type.value)
-                    status = await agent.get_status()
-                    
-                    # Update utilization metrics
                     if status["status"] == "active":
                         self.metrics["agent_utilization"][agent_type.value] += 1
                 
@@ -516,16 +316,16 @@ class AgentOrchestrator:
                 # Log metrics
                 logger.info(f"Orchestrator metrics: {self.metrics}")
                 
-            except Exception as e:
+            except Exception:
+
+                
+                pass
                 logger.error(f"Error in health monitor: {e}")
             
             await asyncio.sleep(30)  # Check every 30 seconds
     
     async def get_workflow_status(self, workflow_id: str) -> Dict[str, Any]:
         """Get detailed workflow status"""
-        
-        workflow = self.workflows.get(workflow_id)
-        if not workflow:
             raise ValueError(f"Workflow {workflow_id} not found")
         
         # Calculate progress
@@ -556,9 +356,6 @@ class AgentOrchestrator:
     
     async def cancel_workflow(self, workflow_id: str):
         """Cancel a running workflow"""
-        
-        workflow = self.workflows.get(workflow_id)
-        if not workflow:
             raise ValueError(f"Workflow {workflow_id} not found")
         
         if workflow.status != WorkflowStatus.RUNNING:
@@ -578,24 +375,7 @@ _orchestrator_instance: Optional[AgentOrchestrator] = None
 
 def get_agent_orchestrator() -> AgentOrchestrator:
     """Get or create the singleton orchestrator instance"""
-    global _orchestrator_instance
-    if _orchestrator_instance is None:
-        _orchestrator_instance = AgentOrchestrator()
-    return _orchestrator_instance
-
-# Example workflow definitions
-
-async def create_comprehensive_search_workflow(
-    user_id: str,
-    search_query: str,
-    include_medical: bool = False
-) -> Workflow:
     """Create a comprehensive search workflow using multiple agents"""
-    
-    orchestrator = get_agent_orchestrator()
-    
-    tasks = [
-        {
             "id": "personal_search",
             "agent_type": "personal",
             "data": {

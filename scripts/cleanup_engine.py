@@ -88,14 +88,20 @@ class IntelligentCleanup:
 
     def _load_json(self, file_path: Path, default: Optional[Any] = None) -> Any:
         try:
+
+            pass
             with file_path.open('r') as f:
                 return json.load(f)
-        except FileNotFoundError:
+        except Exception:
+
+            pass
             if default is not None:
                 return default
             logging.error(f"File not found: {file_path}")
             sys.exit(1)
-        except json.JSONDecodeError:
+        except Exception:
+
+            pass
             logging.error(f"Invalid JSON in file: {file_path}")
             if default is not None:
                 return default
@@ -103,26 +109,21 @@ class IntelligentCleanup:
 
     def _find_scheduled_scripts(self) -> set[str]:
         """Rudimentary check for scheduled scripts (crontab for current user). More robust checks needed for system-wide."""
-        scheduled = set()
-        try:
-            cron_output = subprocess.check_output(['crontab', '-l'], stderr=subprocess.DEVNULL, text=True)
-            # This is a very basic parser, real cron parsing is complex
-            for line in cron_output.splitlines():
-                if line.strip().startswith('#') or not line.strip():
-                    continue
-                parts = line.split()
-                if len(parts) > 5:
                     command_part = " ".join(parts[5:])
                     # Try to find scripts within the project root
                     # This requires script paths in cron to be absolute or identifiable
                     for item in re.split(r'\s+|;|&', command_part):
                         if item.startswith(str(self.project_root)) and Path(item).is_file():
                             scheduled.add(str(Path(item).resolve()))
-        except (subprocess.CalledProcessError, FileNotFoundError):
+        except Exception:
+
+            pass
             logging.warning("Crontab not found or no entries for current user. Scheduled script check may be incomplete.")
         
         # Check for systemd timers
         try:
+
+            pass
             systemctl_output = subprocess.check_output(
                 ['systemctl', 'list-timers', '--all', '--no-pager'], 
                 stderr=subprocess.DEVNULL, 
@@ -137,19 +138,15 @@ class IntelligentCleanup:
                         service_name = parts[4].replace('.timer', '.service')
                         # This is simplified - would need to parse service files properly
                         logging.debug(f"Found potential systemd service: {service_name}")
-        except (subprocess.CalledProcessError, FileNotFoundError):
+        except Exception:
+
+            pass
             logging.debug("systemctl not available or no timers found.")
         
         return scheduled
 
     def is_safe_to_remove(self, file_info: Dict[str, Any]) -> Tuple[bool, str]:
         """Determine if file is safe to remove based on multiple criteria. Returns (is_safe, reason)."""
-        file_path = Path(file_info['path']).resolve()
-        
-        # Ensure file is within project root
-        try:
-            relative_path_str = str(file_path.relative_to(self.project_root))
-        except ValueError:
             return False, "File is outside project root"
 
         # 1. Critical Directory Check
@@ -175,13 +172,17 @@ class IntelligentCleanup:
         
         if expiration_str and expiration_str != 'none':
             try:
+
+                pass
                 # Attempt to parse various common date formats
                 exp_date = datetime.fromisoformat(expiration_str.replace('Z', '+00:00'))
                 if exp_date.tzinfo is None: # Assume UTC if no timezone
                     exp_date = exp_date.replace(tzinfo=timezone.utc)
                 if datetime.now(timezone.utc) < exp_date:
                     return False, f"Not yet expired (expires {expiration_str})"
-            except ValueError:
+            except Exception:
+
+                pass
                 logging.warning(f"Could not parse expiration date '{expiration_str}' for {file_path}")
                 # If unparsable, treat as non-expiring for safety unless other flags apply
 
@@ -218,25 +219,22 @@ class IntelligentCleanup:
             entry = self.cleanup_registry[str(file_path)]
             if entry.get('expires'):
                 try:
+
+                    pass
                     exp_dt = datetime.fromisoformat(entry['expires'].replace('Z', '+00:00'))
                     if exp_dt.tzinfo is None: 
                         exp_dt = exp_dt.replace(tzinfo=timezone.utc)
                     if datetime.now(timezone.utc) > exp_dt:
                         return True, f"Registered for cleanup and past expiration ({entry['expires']})"
-                except ValueError: 
+                except Exception:
+
+                    pass
                     pass # Already logged
 
         return False, "No specific cleanup rule matched"
 
     def interactive_cleanup(self):
         """Interactive cleanup with user confirmation."""
-        candidates_for_review = []
-        for file_info in self.inventory:
-            is_safe, reason = self.is_safe_to_remove(file_info)
-            if is_safe:
-                candidates_for_review.append((file_info, reason))
-        
-        if not candidates_for_review:
             logging.info("No files flagged for cleanup based on current rules.")
             return
 
@@ -287,13 +285,6 @@ class IntelligentCleanup:
 
     def non_interactive_cleanup(self, max_deletions: int = 50):
         """Non-interactive cleanup for automation."""
-        candidates_for_review = []
-        for file_info in self.inventory:
-            is_safe, reason = self.is_safe_to_remove(file_info)
-            if is_safe:
-                candidates_for_review.append((file_info, reason))
-        
-        if not candidates_for_review:
             logging.info("No files flagged for cleanup based on current rules.")
             return
         
@@ -320,23 +311,31 @@ class IntelligentCleanup:
         for file_info, reason in to_delete:
             path = Path(file_info['path'])
             try:
+
+                pass
                 logging.info(f"Deleting: {path.relative_to(self.project_root)} - {reason}")
                 self._perform_delete(file_info)
                 deleted_count += 1
-            except Exception as e:
+            except Exception:
+
+                pass
                 logging.error(f"Failed to delete {path}: {e}")
         
         logging.info(f"Non-interactive cleanup complete. Deleted {deleted_count} files.")
 
     def _view_file(self, file_path: Path):
         try:
+
+            pass
             content = file_path.read_text(errors='ignore')
             print("\n--- File Content (first 500 chars) ---")
             print(content[:500])
             if len(content) > 500:
                 print("... (file truncated)")
             print("--- End File Content ---\n")
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"Error viewing file {file_path}: {e}")
 
     def _perform_delete(self, file_info: Dict[str, Any]):
@@ -348,6 +347,9 @@ class IntelligentCleanup:
             return
 
         try:
+
+
+            pass
             if file_info.get('git_tracked', False):
                 # For git-tracked files, prefer `git rm`
                 subprocess.run(['git', 'rm', str(path)], check=True, cwd=self.project_root)
@@ -361,25 +363,25 @@ class IntelligentCleanup:
                 del self.cleanup_registry[str(path)]
                 self._save_json(self.project_root / CLEANUP_REGISTRY_FILE, self.cleanup_registry)
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logging.error(f"Error deleting {path}: {e}")
     
     def _save_json(self, file_path: Path, data: Any):
         try:
+
+            pass
             with file_path.open('w') as f:
                 json.dump(data, f, indent=2)
-        except Exception as e:
+        except Exception:
+
+            pass
             logging.error(f"Error saving JSON to {file_path}: {e}")
 
     def generate_report(self) -> Dict[str, Any]:
         """Generate a cleanup report without interactive mode."""
-        candidates_for_review = []
-        for file_info in self.inventory:
-            is_safe, reason = self.is_safe_to_remove(file_info)
-            if is_safe:
-                candidates_for_review.append((file_info, reason))
-        
-        report = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "total_files_analyzed": len(self.inventory),
             "cleanup_candidates": len(candidates_for_review),
@@ -405,19 +407,18 @@ class IntelligentCleanup:
 
 def transient_file(lifetime_hours: int = 72):
     """
-    Decorator for functions that create temporary files.
-    Registers the file for automatic cleanup after the specified lifetime.
     """
-    from functools import wraps
-    
-    def register_for_cleanup(filepath: Path, expiration_dt: datetime):
         registry_path = Path(".cleanup_registry.json")
         current_registry = {}
         if registry_path.exists():
             with registry_path.open('r') as f:
                 try:
+
+                    pass
                     current_registry = json.load(f)
-                except json.JSONDecodeError:
+                except Exception:
+
+                    pass
                     pass # ignore if malformed, will overwrite
         
         current_registry[str(filepath.resolve())] = {

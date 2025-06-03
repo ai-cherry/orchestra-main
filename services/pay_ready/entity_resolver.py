@@ -1,38 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 """
-Pay Ready Entity Resolver
-========================
-
-Handles entity resolution and fuzzy matching for the Pay Ready domain,
-unifying persons and companies across multiple data sources.
 """
-
-import asyncio
-import logging
-from typing import Dict, List, Tuple, Optional, Set
-from datetime import datetime
-from uuid import uuid4
-import json
-
-from rapidfuzz import fuzz, process
-from email_validator import validate_email, EmailNotValidError
-
-logger = logging.getLogger(__name__)
-
-class PayReadyEntityResolver:
     """
-    Resolves entities (persons and companies) across different systems.
-
-    Features:
-    - Email-based exact matching
-    - Fuzzy name matching with configurable thresholds
-    - Domain-based company matching
-    - Confidence scoring
-    - Caching for performance
     """
-
-    def __init__(self, postgres_client):
-        self.postgres = postgres_client
-        self.cache = {
             "persons": {},  # source_system:source_id -> unified_id
             "companies": {},  # source_system:source_id -> unified_id
             "emails": {},  # email -> unified_id
@@ -44,21 +14,12 @@ class PayReadyEntityResolver:
 
     async def initialize(self):
         """Load existing mappings into cache"""
-        if self._cache_loaded:
-            return
-
         logger.info("Loading entity mappings into cache")
 
         # Load person mappings
         persons = await self.postgres.fetch_raw(
             """
-            SELECT unified_id, source_system, source_id, metadata
-            FROM pay_ready.entity_mappings
-            WHERE entity_type = 'person'
         """
-        )
-
-        for person in persons:
             cache_key = f"{person['source_system']}:{person['source_id']}"
             self.cache["persons"][cache_key] = str(person["unified_id"])
 
@@ -73,13 +34,7 @@ class PayReadyEntityResolver:
         # Load company mappings
         companies = await self.postgres.fetch_raw(
             """
-            SELECT unified_id, source_system, source_id, metadata
-            FROM pay_ready.entity_mappings
-            WHERE entity_type = 'company'
         """
-        )
-
-        for company in companies:
             cache_key = f"{company['source_system']}:{company['source_id']}"
             self.cache["companies"][cache_key] = str(company["unified_id"])
 
@@ -106,22 +61,7 @@ class PayReadyEntityResolver:
         additional_context: Optional[Dict] = None,
     ) -> Optional[str]:
         """
-        Resolve a person to a unified ID.
-
-        Args:
-            name: Person's name
-            email: Person's email address
-            source_system: Source system identifier
-            source_id: ID in the source system
-            additional_context: Additional context for matching
-
-        Returns:
-            Unified person ID (UUID string)
         """
-        await self.initialize()
-
-        # Try cache first (source system mapping)
-        if source_system and source_id:
             cache_key = f"{source_system}:{source_id}"
             if cache_key in self.cache["persons"]:
                 return self.cache["persons"][cache_key]
@@ -141,15 +81,7 @@ class PayReadyEntityResolver:
                 # Check database
                 result = await self.postgres.fetchrow(
                     """
-                    SELECT unified_id FROM pay_ready.entity_mappings
-                    WHERE entity_type = 'person' 
-                    AND metadata->>'email' = $1
-                    LIMIT 1
-                """,
-                    normalized_email,
-                )
-
-                if result:
+                """
                     unified_id = str(result["unified_id"])
                     self.cache["emails"][normalized_email] = unified_id
                     if source_system and source_id:
@@ -179,22 +111,7 @@ class PayReadyEntityResolver:
         additional_context: Optional[Dict] = None,
     ) -> Optional[str]:
         """
-        Resolve a company to a unified ID.
-
-        Args:
-            name: Company name
-            domain: Company domain
-            source_system: Source system identifier
-            source_id: ID in the source system
-            additional_context: Additional context for matching
-
-        Returns:
-            Unified company ID (UUID string)
         """
-        await self.initialize()
-
-        # Try cache first (source system mapping)
-        if source_system and source_id:
             cache_key = f"{source_system}:{source_id}"
             if cache_key in self.cache["companies"]:
                 return self.cache["companies"][cache_key]
@@ -211,15 +128,7 @@ class PayReadyEntityResolver:
             # Check database
             result = await self.postgres.fetchrow(
                 """
-                SELECT unified_id FROM pay_ready.entity_mappings
-                WHERE entity_type = 'company' 
-                AND metadata->>'domain' = $1
-                LIMIT 1
-            """,
-                normalized_domain,
-            )
-
-            if result:
+            """
                 unified_id = str(result["unified_id"])
                 self.cache["domains"][normalized_domain] = unified_id
                 if source_system and source_id:
@@ -242,33 +151,9 @@ class PayReadyEntityResolver:
 
     async def _fuzzy_match_person(self, name: str, context: Optional[Dict] = None) -> Optional[Tuple[str, float]]:
         """
-        Perform fuzzy matching for a person.
-
-        Returns:
-            Tuple of (unified_id, confidence_score) or None
         """
-        # Get candidates from database
-        candidates = await self.postgres.fetch_raw(
             """
-            SELECT 
-                unified_id,
-                metadata->>'name' as name,
-                metadata->>'company' as company,
-                confidence_score
-            FROM pay_ready.entity_mappings
-            WHERE entity_type = 'person'
-            AND metadata->>'name' IS NOT NULL
         """
-        )
-
-        if not candidates:
-            return None
-
-        # Prepare candidate list
-        candidate_names = []
-        candidate_map = {}
-
-        for candidate in candidates:
             cand_name = candidate["name"]
             if cand_name:
                 # If we have company context, prefer matches from same company
@@ -305,37 +190,9 @@ class PayReadyEntityResolver:
 
     async def _fuzzy_match_company(self, name: str, context: Optional[Dict] = None) -> Optional[Tuple[str, float]]:
         """
-        Perform fuzzy matching for a company.
-
-        Returns:
-            Tuple of (unified_id, confidence_score) or None
         """
-        # Normalize company name
-        normalized_name = self._normalize_company_name(name)
-
-        # Get candidates from database
-        candidates = await self.postgres.fetch_raw(
             """
-            SELECT 
-                unified_id,
-                metadata->>'name' as name,
-                metadata->>'normalized_name' as normalized_name,
-                confidence_score
-            FROM pay_ready.entity_mappings
-            WHERE entity_type = 'company'
-            AND (metadata->>'name' IS NOT NULL OR metadata->>'normalized_name' IS NOT NULL)
         """
-        )
-
-        if not candidates:
-            return None
-
-        # Prepare candidate list
-        candidate_names = []
-        candidate_map = {}
-
-        for candidate in candidates:
-            # Use normalized name if available, otherwise regular name
             cand_name = candidate.get("normalized_name") or candidate.get("name")
             if cand_name:
                 candidate_names.append(cand_name)
@@ -361,9 +218,6 @@ class PayReadyEntityResolver:
         context: Optional[Dict],
     ) -> str:
         """Create a new unified person ID"""
-        unified_id = str(uuid4())
-
-        metadata = {
             "name": name,
             "email": self._normalize_email(email) if email else None,
             "created_at": datetime.utcnow().isoformat(),
@@ -376,18 +230,7 @@ class PayReadyEntityResolver:
         # Insert into database
         await self.postgres.execute_raw(
             """
-            INSERT INTO pay_ready.entity_mappings 
-            (entity_type, unified_id, source_system, source_id, metadata, confidence_score)
-            VALUES ('person', $1, $2, $3, $4, 1.0)
-        """,
-            unified_id,
-            source_system,
-            source_id,
-            json.dumps(metadata),
-        )
-
-        # Update cache
-        if source_system and source_id:
+        """
             cache_key = f"{source_system}:{source_id}"
             self.cache["persons"][cache_key] = unified_id
 
@@ -408,9 +251,6 @@ class PayReadyEntityResolver:
         context: Optional[Dict],
     ) -> str:
         """Create a new unified company ID"""
-        unified_id = str(uuid4())
-
-        metadata = {
             "name": name,
             "normalized_name": self._normalize_company_name(name) if name else None,
             "domain": domain.lower().strip() if domain else None,
@@ -424,18 +264,7 @@ class PayReadyEntityResolver:
         # Insert into database
         await self.postgres.execute_raw(
             """
-            INSERT INTO pay_ready.entity_mappings 
-            (entity_type, unified_id, source_system, source_id, metadata, confidence_score)
-            VALUES ('company', $1, $2, $3, $4, 1.0)
-        """,
-            unified_id,
-            source_system,
-            source_id,
-            json.dumps(metadata),
-        )
-
-        # Update cache
-        if source_system and source_id:
+        """
             cache_key = f"{source_system}:{source_id}"
             self.cache["companies"][cache_key] = unified_id
 
@@ -450,7 +279,6 @@ class PayReadyEntityResolver:
         self, entity_type: str, unified_id: str, source_system: str, source_id: str, confidence_score: float = 1.0
     ):
         """Add a new source system mapping for an existing entity"""
-        # Check if mapping already exists
         cache_key = f"{source_system}:{source_id}"
         cache_dict = self.cache["persons"] if entity_type == "person" else self.cache["companies"]
 
@@ -460,15 +288,7 @@ class PayReadyEntityResolver:
         # Get existing metadata
         result = await self.postgres.fetchrow(
             """
-            SELECT metadata FROM pay_ready.entity_mappings
-            WHERE entity_type = $1 AND unified_id = $2
-            LIMIT 1
-        """,
-            entity_type,
-            unified_id,
-        )
-
-        if result:
+        """
             metadata = result["metadata"]
             if isinstance(metadata, str):
                 metadata = json.loads(metadata)
@@ -482,33 +302,10 @@ class PayReadyEntityResolver:
             # Insert new mapping
             await self.postgres.execute_raw(
                 """
-                INSERT INTO pay_ready.entity_mappings 
-                (entity_type, unified_id, source_system, source_id, metadata, confidence_score)
-                VALUES ($1, $2, $3, $4, $5, $6)
-                ON CONFLICT (source_system, source_id) DO NOTHING
-            """,
-                entity_type,
-                unified_id,
-                source_system,
-                source_id,
-                json.dumps(metadata),
-                confidence_score,
-            )
-
-            # Update cache
-            cache_dict[cache_key] = unified_id
-
-    async def _check_person_company_match(self, person_id: str, company_name: str) -> bool:
-        """Check if a person is associated with a company"""
-        # This is a simplified check - can be enhanced
-        result = await self.postgres.fetchrow(
             """
-            SELECT 1 FROM pay_ready.entity_mappings
-            WHERE unified_id = $1
-            AND metadata->>'company' ILIKE $2
-            LIMIT 1
-        """,
-            person_id,
+        """Check if a person is associated with a company"""
+            """
+        """
             f"%{company_name}%",
         )
 
@@ -516,20 +313,11 @@ class PayReadyEntityResolver:
 
     def _normalize_email(self, email: Optional[str]) -> Optional[str]:
         """Normalize and validate email address"""
-        if not email:
-            return None
-
-        try:
-            # Validate and normalize
-            validation = validate_email(email, check_deliverability=False)
-            return validation.email.lower()
-        except EmailNotValidError:
             logger.warning(f"Invalid email address: {email}")
             return None
 
     def _normalize_company_name(self, name: str) -> str:
         """Normalize company name for matching"""
-        if not name:
             return ""
 
         # Remove common suffixes
@@ -561,6 +349,9 @@ class PayReadyEntityResolver:
         words = normalized.split()
         filtered_words = []
 
+        # TODO: Consider using list comprehension for better performance
+
+
         for word in words:
             if word not in suffixes:
                 filtered_words.append(word)
@@ -574,20 +365,7 @@ class PayReadyEntityResolver:
         # Find unresolved persons (those without unified_id in metadata)
         unresolved_persons = await self.postgres.fetch_raw(
             """
-            SELECT DISTINCT 
-                source_system,
-                source_id,
-                metadata
-            FROM pay_ready.interactions
-            WHERE unified_person_id IS NULL
-            AND source_system IS NOT NULL
-            AND source_id IS NOT NULL
-            LIMIT 1000
         """
-        )
-
-        resolved_count = 0
-        for person in unresolved_persons:
             metadata = person.get("metadata", {})
             if isinstance(metadata, str):
                 metadata = json.loads(metadata)
@@ -603,11 +381,7 @@ class PayReadyEntityResolver:
                 # Update interactions with resolved ID
                 await self.postgres.execute_raw(
                     """
-                    UPDATE pay_ready.interactions
-                    SET unified_person_id = $1
-                    WHERE source_system = $2 AND source_id = $3
-                """,
-                    unified_id,
+                """
                     person["source_system"],
                     person["source_id"],
                 )
@@ -618,31 +392,8 @@ class PayReadyEntityResolver:
 
     async def get_entity_details(self, unified_id: str, entity_type: str = "person") -> Optional[Dict]:
         """Get detailed information about an entity"""
-        # Get all mappings for this entity
-        mappings = await self.postgres.fetch_raw(
             """
-            SELECT 
-                source_system,
-                source_id,
-                metadata,
-                confidence_score,
-                created_at
-            FROM pay_ready.entity_mappings
-            WHERE entity_type = $1 AND unified_id = $2
-            ORDER BY confidence_score DESC, created_at ASC
-        """,
-            entity_type,
-            unified_id,
-        )
-
-        if not mappings:
-            return None
-
-        # Merge metadata from all sources
-        merged_metadata = {}
-        source_systems = []
-
-        for mapping in mappings:
+        """
             metadata = mapping.get("metadata", {})
             if isinstance(metadata, str):
                 metadata = json.loads(metadata)

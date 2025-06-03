@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
 """Verify Roo setup for the Orchestra project."""
-
-import json
-import os
-from pathlib import Path
-from typing import Dict, List
-
-def check_modes() -> Dict[str, bool]:
     """Check that all mode files exist."""
     modes_dir = Path(".roo/modes")
     expected_modes = [
@@ -27,10 +20,14 @@ def check_modes() -> Dict[str, bool]:
         mode_file = modes_dir / f"{mode}.json"
         if mode_file.exists():
             try:
+
+                pass
                 with open(mode_file) as f:
                     data = json.load(f)
                     results[mode] = data.get("slug") == mode
-            except Exception as e:
+            except Exception:
+
+                pass
                 results[mode] = False
                 print(f"Error reading {mode}.json: {e}")
         else:
@@ -72,10 +69,15 @@ def check_mcp_config() -> bool:
         return False
 
     try:
+
+
+        pass
         with open(mcp_file) as f:
             data = json.load(f)
             return "mcpServers" in data and "orchestra-mcp" in data["mcpServers"]
     except Exception:
+
+        pass
         return False
 
 def main():

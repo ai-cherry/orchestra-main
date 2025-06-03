@@ -1,25 +1,7 @@
 """
-Centralized configuration management for the LLM routing system.
-
-This module provides a single source of truth for all configuration,
-with validation, environment variable loading, and default values.
 """
-
-import os
-from typing import Optional, Dict, Any
-from functools import lru_cache
-from pydantic import BaseSettings, validator, Field
-from core.llm_types import RouterConfig
-
-class Settings(BaseSettings):
     """
-    Application settings with environment variable support.
-
-    All settings can be overridden via environment variables with
-    the same name in uppercase (e.g., portkey_api_key -> PORTKEY_API_KEY).
     """
-
-    # API Keys
     portkey_api_key: str = Field(default="", env="PORTKEY_API_KEY")
     portkey_config: str = Field(default="", env="PORTKEY_CONFIG")
     openrouter_api_key: str = Field(default="", env="OPENROUTER_API_KEY")
@@ -81,30 +63,9 @@ class Settings(BaseSettings):
                 raise ValueError("At least one API key (Portkey or OpenRouter) must be provided")
         return v
 
-    def to_router_config(self) -> RouterConfig:
+def to_router_config(self) -> RouterConfig:
         """Convert settings to RouterConfig"""
-        return RouterConfig(
-            portkey_api_key=self.portkey_api_key,
-            portkey_config=self.portkey_config,
-            openrouter_api_key=self.openrouter_api_key,
-            enable_fallback=self.enable_fallback,
-            enable_caching=self.enable_caching,
-            cache_ttl=self.cache_ttl,
-            max_retries=self.max_retries,
-            timeout=self.timeout,
-            enable_monitoring=self.enable_monitoring,
-            connection_pool_size=self.connection_pool_size,
-            connection_pool_overflow=self.connection_pool_overflow,
-            cache_max_size=self.cache_max_size,
-            cache_memory_limit_mb=self.cache_memory_limit_mb,
-            database_url=self.database_url,
-            db_pool_size=self.db_pool_size,
-            db_pool_overflow=self.db_pool_overflow,
-        )
-
-    class Config:
         """Pydantic configuration"""
-
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = False
@@ -113,16 +74,5 @@ class Settings(BaseSettings):
 @lru_cache()
 def get_settings() -> Settings:
     """
-    Get cached settings instance.
-
-    This function returns a singleton instance of Settings,
-    ensuring configuration is loaded only once.
     """
-    return Settings()
-
-def get_router_config() -> RouterConfig:
     """Get router configuration from settings"""
-    return get_settings().to_router_config()
-
-# Export commonly used settings
-settings = get_settings()

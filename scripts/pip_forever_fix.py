@@ -1,21 +1,7 @@
 #!/usr/bin/env python3
 """
-Pip Forever Fix - Solve dependency conflicts permanently.
-This creates a complete locked environment with exact versions and hashes.
 """
-import json
-import os
-import subprocess
-import sys
-from datetime import datetime
-from typing import Dict, List, Tuple
-
-def run_command(cmd: List[str]) -> Tuple[int, str, str]:
     """Run a command and return exit code, stdout, stderr."""
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    return result.returncode, result.stdout, result.stderr
-
-def get_installed_packages() -> Dict[str, str]:
     """Get all installed packages with their versions."""
     code, stdout, _ = run_command([sys.executable, "-m", "pip", "list", "--format=json"])
     if code != 0:
@@ -27,9 +13,6 @@ def get_installed_packages() -> Dict[str, str]:
 
 def generate_constraints_file() -> str:
     """Generate a complete constraints file with ALL current versions."""
-    packages = get_installed_packages()
-
-    constraints = [
         "# Auto-generated constraints file",
         f"# Generated: {datetime.now().isoformat()}",
         f"# Python: {sys.version}",
@@ -129,11 +112,7 @@ def create_deployment_requirements() -> None:
     print(f"✅ Created: {prod_path}")
 
     # Create install script
-    install_script = """#!/bin/bash
-# Safe pip install script that prevents version conflicts
-
-set -euo pipefail
-
+    install_script = """
 echo "🚀 Orchestra Safe Install"
 echo "========================"
 
@@ -157,7 +136,6 @@ pip check || echo "⚠️  Some conflicts detected but may be ignorable"
 
 echo "✅ Installation complete!"
 """
-
     with open("scripts/safe_install.sh", "w") as f:
         f.write(install_script)
     os.chmod("scripts/safe_install.sh", 0o755)
@@ -165,7 +143,6 @@ echo "✅ Installation complete!"
 
 def create_forever_fix_config() -> None:
     """Create a configuration that ensures pip peace forever."""
-    config = {
         "version": "1.0",
         "generated": datetime.now().isoformat(),
         "python_version": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",

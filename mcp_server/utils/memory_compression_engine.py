@@ -1,78 +1,17 @@
 #!/usr/bin/env python3
 """
-memory_compression_engine.py - Optimized Memory Compression Engine
-
-This module provides an optimized memory compression engine for compressing and
-decompressing memory entries. It supports multiple compression levels and content
-types, using efficient algorithms for each scenario.
 """
-
-import copy
-import json
-import logging
-import pickle
-import zlib
-from typing import Any, Dict
-
-# Import from relative paths
-from ..models.memory import CompressionLevel, MemoryEntry
-
-logger = logging.getLogger(__name__)
-
-class MemoryCompressionEngine:
     """Optimized memory compression engine with support for multiple content types."""
-
-    @staticmethod
-    def compress(entry: MemoryEntry) -> MemoryEntry:
-        """Compress a memory entry based on its compression level and content type.
-
-        Args:
-            entry: The memory entry to compress
-
-        Returns:
-            MemoryEntry: The compressed memory entry
         """
-        if entry.compression_level == CompressionLevel.NONE:
-            return entry
-
-        # Create a copy to avoid modifying the original
-        compressed_entry = copy.deepcopy(entry)
-
-        # Apply different compression strategies based on content type
-        if isinstance(entry.content, str):
-            compressed_entry.content = MemoryCompressionEngine._compress_string(entry.content, entry.compression_level)
-        elif isinstance(entry.content, dict):
-            compressed_entry.content = MemoryCompressionEngine._compress_dict(entry.content, entry.compression_level)
-        elif isinstance(entry.content, list):
-            compressed_entry.content = MemoryCompressionEngine._compress_list(entry.content, entry.compression_level)
-        else:
-            # For other types, try to convert to string and compress
-            try:
-                content_str = str(entry.content)
-                compressed_entry.content = MemoryCompressionEngine._compress_string(
-                    content_str, entry.compression_level
-                )
-            except Exception as e:
+        """
                 logger.warning(f"Failed to compress content of type {type(entry.content)}: {e}")
 
         return compressed_entry
 
     @staticmethod
     def _compress_string(content: str, level: CompressionLevel) -> Any:
-        """Compress string content based on compression level.
-
-        Args:
-            content: The string content to compress
-            level: The compression level to apply
-
-        Returns:
-            Any: The compressed content
         """
-        content_len = len(content)
-
-        if level == CompressionLevel.LIGHT:
-            # Basic compression: truncate long strings with ellipsis
-            if content_len > 1000:
+        """
                 return content[:900] + "... [compressed]"
 
         elif level == CompressionLevel.MEDIUM:
@@ -124,30 +63,8 @@ class MemoryCompressionEngine:
 
     @staticmethod
     def _compress_dict(content: Dict, level: CompressionLevel) -> Any:
-        """Compress dictionary content based on compression level.
-
-        Args:
-            content: The dictionary content to compress
-            level: The compression level to apply
-
-        Returns:
-            Any: The compressed content
         """
-        # Get dictionary size metrics
-        key_count = len(content)
-        try:
-            content_size = len(json.dumps(content))
-        except (TypeError, ValueError):
-            # Fallback for non-serializable content
-            content_size = sum(len(str(k)) + len(str(v)) for k, v in content.items())
-
-        if level == CompressionLevel.LIGHT:
-            # Keep only key fields
-            if key_count > 5:
-                # Sort keys by length (assuming shorter keys are more important)
-                sorted_keys = sorted(content.keys(), key=lambda k: len(str(k)))
-                important_keys = set(sorted_keys[:5])
-                result = {k: v for k, v in content.items() if k in important_keys}
+        """
                 result["_compressed"] = True
                 result["_total_keys"] = key_count
                 return result
@@ -167,6 +84,8 @@ class MemoryCompressionEngine:
             # Binary compression for large dictionaries
             if content_size > 500:
                 try:
+
+                    pass
                     # Try to pickle and compress
                     pickled = pickle.dumps(content)
                     compressed = zlib.compress(pickled, level=6)
@@ -177,7 +96,9 @@ class MemoryCompressionEngine:
                         "_keys": list(content.keys()),
                         "_original_size": content_size,
                     }
-                except (pickle.PickleError, TypeError):
+                except Exception:
+
+                    pass
                     # Fallback for non-picklable content: keep only keys
                     return {
                         "_compressed": True,
@@ -207,26 +128,8 @@ class MemoryCompressionEngine:
 
     @staticmethod
     def _compress_list(content: list, level: CompressionLevel) -> Any:
-        """Compress list content based on compression level.
-
-        Args:
-            content: The list content to compress
-            level: The compression level to apply
-
-        Returns:
-            Any: The compressed content
         """
-        # Get list size metrics
-        item_count = len(content)
-        try:
-            content_size = len(json.dumps(content))
-        except (TypeError, ValueError):
-            # Fallback for non-serializable content
-            content_size = sum(len(str(item)) for item in content)
-
-        if level == CompressionLevel.LIGHT:
-            # Keep only first few items
-            if item_count > 10:
+        """
                 return content[:5] + ["..."] + content[-2:]
 
         elif level == CompressionLevel.MEDIUM:
@@ -238,6 +141,8 @@ class MemoryCompressionEngine:
             # Binary compression for large lists
             if content_size > 500:
                 try:
+
+                    pass
                     # Try to pickle and compress
                     pickled = pickle.dumps(content)
                     compressed = zlib.compress(pickled, level=6)
@@ -248,7 +153,9 @@ class MemoryCompressionEngine:
                         "_length": item_count,
                         "_original_size": content_size,
                     }
-                except (pickle.PickleError, TypeError):
+                except Exception:
+
+                    pass
                     # Fallback for non-picklable content: keep only a few items
                     if item_count > 3:
                         return content[:1] + ["..."] + [f"[{item_count-2} items compressed]"]
@@ -270,28 +177,16 @@ class MemoryCompressionEngine:
 
     @staticmethod
     def decompress(entry: MemoryEntry) -> MemoryEntry:
-        """Decompress a memory entry if needed.
-
-        Args:
-            entry: The memory entry to decompress
-
-        Returns:
-            MemoryEntry: The decompressed memory entry
         """
-        if not entry or entry.compression_level == CompressionLevel.NONE:
-            return entry
-
-        # Create a copy to avoid modifying the original
-        decompressed_entry = copy.deepcopy(entry)
-
-        # Check if content is a compressed object
-        if isinstance(entry.content, dict):
-            # Check for binary compression
+        """
             if "_compressed_data" in entry.content:
                 compression_type = entry.content.get("_compression_type")
                 original_type = entry.content.get("_original_type")
 
                 try:
+
+
+                    pass
                     if compression_type == "zlib" and original_type == "str":
                         # Decompress zlib-compressed string
                         compressed_data = bytes.fromhex(entry.content["_compressed_data"])
@@ -303,8 +198,9 @@ class MemoryCompressionEngine:
                         decompressed_data = zlib.decompress(compressed_data)
                         decompressed_entry.content = pickle.loads(decompressed_data)
 
-                    logger.debug(f"Decompressed content of type {original_type}")
-                except Exception as e:
+                except Exception:
+
+                    pass
                     logger.error(f"Failed to decompress content: {e}")
                     # Keep the compressed content if decompression fails
 
@@ -312,15 +208,8 @@ class MemoryCompressionEngine:
 
     @staticmethod
     def get_compression_stats(entry: MemoryEntry) -> Dict[str, Any]:
-        """Get compression statistics for a memory entry.
-
-        Args:
-            entry: The memory entry to get statistics for
-
-        Returns:
-            Dict[str, Any]: Compression statistics
         """
-        stats = {
+        """
             "compression_level": entry.compression_level,
             "is_compressed": entry.compression_level != CompressionLevel.NONE,
         }
@@ -339,12 +228,16 @@ class MemoryCompressionEngine:
 
             # Estimate compressed size
             try:
+
+                pass
                 compressed_size = len(json.dumps(entry.content))
                 stats["compressed_size"] = compressed_size
 
                 if "original_size" in stats:
                     stats["compression_ratio"] = round(stats["original_size"] / compressed_size, 2)
-            except (TypeError, ValueError):
+            except Exception:
+
+                pass
                 pass
 
         return stats

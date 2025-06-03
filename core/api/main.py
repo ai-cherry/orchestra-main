@@ -1,43 +1,13 @@
 """
-Main API application for Orchestra AI.
-
-This module sets up the FastAPI application with all endpoints,
-middleware, and configurations.
 """
-
-import logging
-from contextlib import asynccontextmanager
-
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
-from core.api.endpoints import conversation
-from core.api.middleware.error_handler import ErrorHandlerMiddleware
-from core.api.models.responses import HealthCheckResponse
-from core.business.personas.base import PersonaConfig, PersonaTrait, ResponseStyle, get_persona_manager
-from core.business.workflows.examples import register_example_workflows
-from core.infrastructure.config.settings import get_settings
-from core.main import OrchestraSystem
-from core.services.agents.examples import register_example_agents
-
-logger = logging.getLogger(__name__)
-
-# Global orchestra system instance
-orchestra_system = None
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
     """
-    Manage application lifecycle.
-
-    This function handles startup and shutdown events.
     """
-    global orchestra_system
-
-    # Startup
     logger.info("Starting Orchestra AI API...")
 
     try:
+
+
+        pass
         # Initialize Orchestra system
         orchestra_system = OrchestraSystem()
         await orchestra_system.initialize()
@@ -109,7 +79,10 @@ async def lifespan(app: FastAPI):
 
         logger.info("Orchestra AI API started successfully")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Failed to start Orchestra AI API: {e}", exc_info=True)
         raise
 
@@ -119,6 +92,9 @@ async def lifespan(app: FastAPI):
     logger.info("Shutting down Orchestra AI API...")
 
     try:
+
+
+        pass
         if orchestra_system:
             await orchestra_system.shutdown()
 
@@ -128,7 +104,10 @@ async def lifespan(app: FastAPI):
 
         logger.info("Orchestra AI API shut down successfully")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Error during shutdown: {e}", exc_info=True)
 
 # Create FastAPI application
@@ -165,33 +144,30 @@ async def root():
 @app.get("/health", response_model=HealthCheckResponse)
 async def health_check() -> HealthCheckResponse:
     """
-    Health check endpoint.
-
-    Returns the health status of the system and its services.
     """
-    global orchestra_system
-
-    services_health = {}
-
-    # Check Orchestra system
-    if orchestra_system and orchestra_system._initialized:
         services_health["orchestra"] = {"status": "healthy", "initialized": True}
     else:
         services_health["orchestra"] = {"status": "unhealthy", "initialized": False}
 
     # Check memory service
     try:
+
+        pass
         from core.services.memory.unified_memory import get_memory_service
 
         memory_service = get_memory_service()
         # Simple health check - try to get a non-existent key
         await memory_service.get("health_check_test")
         services_health["memory"] = {"status": "healthy"}
-    except Exception as e:
+    except Exception:
+
+        pass
         services_health["memory"] = {"status": "unhealthy", "error": str(e)}
 
     # Check event bus
     try:
+
+        pass
         from core.services.events.event_bus import get_event_bus
 
         event_bus = get_event_bus()
@@ -199,17 +175,23 @@ async def health_check() -> HealthCheckResponse:
             "status": "healthy",
             "subscribers": len(event_bus._subscribers),
         }
-    except Exception as e:
+    except Exception:
+
+        pass
         services_health["event_bus"] = {"status": "unhealthy", "error": str(e)}
 
     # Check agents
     try:
+
+        pass
         from core.services.agents.base import get_agent_manager
 
         agent_manager = get_agent_manager()
         agents = agent_manager.list_agents()
         services_health["agents"] = {"status": "healthy", "count": len(agents)}
-    except Exception as e:
+    except Exception:
+
+        pass
         services_health["agents"] = {"status": "unhealthy", "error": str(e)}
 
     # Determine overall status

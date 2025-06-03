@@ -1,12 +1,6 @@
+# TODO: Consider adding connection pooling configuration
 """
-Orchestra AI Application Configuration
-Central configuration management for the Orchestra API
 """
-
-import os
-from typing import Optional
-
-# API Configuration
 API_PORT = int(os.getenv("API_PORT", "8000"))
 API_URL = os.getenv("API_URL", "http://localhost:3000")
 SERVER_HOST = os.getenv("SERVER_HOST", "45.32.69.157")
@@ -71,15 +65,7 @@ POSTGRES_SCHEMA_KAREN = os.getenv("POSTGRES_SCHEMA_KAREN", "karen")
 
 def get_database_url(schema: Optional[str] = None) -> str:
     """
-    Get database URL with optional schema specification
-
-    Args:
-        schema: Optional schema name for persona-specific databases
-
-    Returns:
-        Database URL string
     """
-    if schema:
         return f"{DATABASE_URL}?options=-csearch_path%3D{schema}"
     return DATABASE_URL
 

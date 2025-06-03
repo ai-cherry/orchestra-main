@@ -1,18 +1,6 @@
 #!/usr/bin/env python3
 """
-Configuration validation script for AI Orchestrator
-Validates YAML configurations and environment variables
 """
-
-import sys
-import os
-import yaml
-import json
-from pathlib import Path
-from jsonschema import validate, ValidationError
-
-# Configuration schema
-CONFIG_SCHEMA = {
     "type": "object",
     "properties": {
         "orchestrator": {
@@ -89,26 +77,26 @@ CONFIG_SCHEMA = {
 
 def validate_yaml_config(config_path: Path) -> bool:
     """Validate YAML configuration file"""
-    try:
-        with open(config_path, 'r') as f:
-            config = yaml.safe_load(f)
-        
-        validate(config, CONFIG_SCHEMA)
         print(f"✓ Configuration file {config_path} is valid")
         return True
-    except FileNotFoundError:
+    except Exception:
+
+        pass
         print(f"✗ Configuration file {config_path} not found")
         return False
-    except yaml.YAMLError as e:
+    except Exception:
+
+        pass
         print(f"✗ YAML parsing error in {config_path}: {e}")
         return False
-    except ValidationError as e:
+    except Exception:
+
+        pass
         print(f"✗ Configuration validation error in {config_path}: {e.message}")
         return False
 
 def validate_workflow_config(config_path: Path) -> bool:
     """Validate workflow configuration JSON"""
-    workflow_schema = {
         "type": "object",
         "properties": {
             "workflow_id": {"type": "string"},
@@ -133,19 +121,28 @@ def validate_workflow_config(config_path: Path) -> bool:
     }
     
     try:
+
+    
+        pass
         with open(config_path, 'r') as f:
             config = json.load(f)
         
         validate(config, workflow_schema)
         print(f"✓ Workflow configuration {config_path} is valid")
         return True
-    except FileNotFoundError:
+    except Exception:
+
+        pass
         print(f"✗ Workflow configuration {config_path} not found")
         return False
-    except json.JSONDecodeError as e:
+    except Exception:
+
+        pass
         print(f"✗ JSON parsing error in {config_path}: {e}")
         return False
-    except ValidationError as e:
+    except Exception:
+
+        pass
         print(f"✗ Workflow validation error in {config_path}: {e.message}")
         return False
 

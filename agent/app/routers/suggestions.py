@@ -1,35 +1,11 @@
 """Search suggestions API endpoints for OmniSearch functionality."""
-
-from typing import List, Optional
-from fastapi import APIRouter, Depends, Query
-from pydantic import BaseModel
-
-from agent.app.routers.admin import verify_api_key
-
 router = APIRouter(prefix="/api", tags=["suggestions"])
 
 class Suggestion(BaseModel):
     """Individual suggestion model."""
-
-    text: str
-    type: str
-    description: Optional[str] = None
-    metadata: Optional[dict] = None
-    score: Optional[float] = None
-
-class SuggestionsResponse(BaseModel):
     """Response model for suggestions."""
-
-    suggestions: List[Suggestion]
-
-class SuggestionEngine:
-    """Simple suggestion engine for MVP.
-
-    In production, this would use ML models and user history for personalization.
     """
-
-    # Static suggestions for different contexts
-    SUGGESTIONS = {
+    """
         "agent_creation": [
             Suggestion(
                 text="Create a data analysis agent",
@@ -96,10 +72,6 @@ class SuggestionEngine:
 
     async def get_suggestions(self, query: str, mode: str = "auto", limit: int = 10) -> List[Suggestion]:
         """Get suggestions based on partial query."""
-        query_lower = query.lower().strip()
-        suggestions = []
-
-        # Determine which suggestion categories to search
         if mode == "auto":
             # Check query to determine likely intent
             if any(word in query_lower for word in ["create", "build", "new", "agent"]):
@@ -141,18 +113,8 @@ async def get_suggestions(
     limit: int = Query(10, ge=1, le=50, description="Maximum suggestions to return"),
     api_key: str = Depends(verify_api_key),
 ) -> SuggestionsResponse:
-    """Get search suggestions based on partial query.
-
-    This endpoint provides intelligent suggestions as the user types,
-    helping them discover available actions and content.
     """
-    try:
-        # Get suggestions
-        suggestions = await suggestion_engine.get_suggestions(partial_query, mode, limit)
-
-        return SuggestionsResponse(suggestions=suggestions)
-
-    except Exception as e:
+    """
         print(f"Suggestions error: {str(e)}")
         # Return empty suggestions on error
         return SuggestionsResponse(suggestions=[])

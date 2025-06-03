@@ -1,26 +1,6 @@
 #!/usr/bin/env python3
 """
-run_optimized_server.py - Performance-Optimized MCP Server Launcher
-
-This script launches the MCP server with performance-optimized settings
-for single-developer, single-user projects. It prioritizes speed and
-reduced overhead over security measures.
 """
-
-import argparse
-import json
-import logging
-import os
-import sys
-from typing import Any, Dict
-
-# Add parent directory to path for imports
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-# Import the simple MCP server
-try:
-    from simple_mcp import SimpleMCPServer
-except ImportError:
     print("simple_mcp.py not found. Make sure it's in the correct location.")
     sys.exit(1)
 
@@ -34,10 +14,11 @@ logger = logging.getLogger("optimized-mcp-server")
 
 def load_config(config_path: str) -> Dict[str, Any]:
     """Load configuration from JSON file."""
-    try:
         with open(config_path, "r") as f:
             return json.load(f)
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error loading configuration: {e}")
         logger.info("Using default configuration")
         return {}
@@ -89,7 +70,6 @@ def optimize_for_speed(config: Dict[str, Any]) -> Dict[str, Any]:
 
 def run_server(config: Dict[str, Any], debug: bool = False) -> None:
     """Run the MCP server with the provided configuration."""
-    # Extract server configuration
     server_config = config.get("server", {})
     memory_config = config.get("memory", {})
 
@@ -114,10 +94,16 @@ def run_server(config: Dict[str, Any], debug: bool = False) -> None:
 
     # Run the server
     try:
+
+        pass
         server.run()
-    except KeyboardInterrupt:
+    except Exception:
+
+        pass
         logger.info("Server stopped by user")
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error running server: {e}")
         sys.exit(1)
 

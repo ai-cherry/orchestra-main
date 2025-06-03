@@ -1,24 +1,5 @@
 """
-Pulumi DigitalOcean Stack for SuperAGI & AI Orchestra
-Automates Droplet provisioning, Docker setup, and SuperAGI deployment for dev/prod environments.
-Also deploys the Admin UI static assets to DigitalOcean App Platform.
-Author: Orchestra AI Platform
-
-Instructions:
-- Set DIGITALOCEAN_TOKEN in Pulumi config or environment.
-- Store all secrets (DB URIs, API keys) in Pulumi config/secrets.
-- Run `pulumi up` to provision and deploy.
 """
-
-import os  # Added for path joining
-
-import pulumi
-import pulumi_command as command
-import pulumi_digitalocean as do
-from pulumi import Config, Output
-
-# --- CONFIGURATION ---
-config = Config()
 env = config.require("env")  # "dev" or "prod"
 droplet_size = config.get("droplet_size") or ("s-1vcpu-2gb" if env == "dev" else "s-2vcpu-4gb")
 region = config.get("region") or "sfo2"  # Ensure this region supports App Platform
@@ -54,21 +35,10 @@ if ssh_pubkey_path:
     ssh_key_resource = do.SshKey(f"{env}-ssh-key", name=f"{env}-ssh-key-{env}", public_key=ssh_pubkey_content)
 
 # --- DROPLET ---
-cloud_init = f"""#cloud-config
-package_update: true
-package_upgrade: true
-packages:
-  - docker.io
-  - python3-pip
-runcmd:
-  - systemctl enable docker
-  - systemctl start docker
-  - usermod -aG docker root
+cloud_init = f"""
   - pip3 install "pymongo[srv]" weaviate-client dragonfly
   - docker pull {superagi_image}
 """
-
-droplet = do.Droplet(
     f"superagi-{env}-droplet",
     name=hostname,
     region=region,
@@ -115,24 +85,6 @@ run_superagi = command.remote.Command(
         weaviate_api_key=weaviate_api_key,
     ).apply(
         lambda args: f"""
-# Install Python and dependencies
-apt-get update && apt-get install -y python3-pip git
-cd /opt
-git clone https://github.com/ai-cherry/orchestra-main.git orchestra
-cd orchestra
-pip3 install -r requirements/base.txt
-pip3 install uvicorn portkey-ai weaviate-client
-
-# Create systemd service
-cat > /etc/systemd/system/orchestra-api.service << 'EOF'
-[Unit]
-Description=Orchestra AI API
-After=network.target
-
-[Service]
-Type=simple
-User=root
-WorkingDirectory=/opt/orchestra
 Environment="PYTHONPATH=/opt/orchestra"
 Environment="DRAGONFLY_URI={args['dragonfly_uri']}"
 Environment="MONGO_URI={args['mongo_uri']}"
@@ -150,13 +102,6 @@ systemctl daemon-reload
 systemctl enable orchestra-api
 systemctl start orchestra-api
 """
-    ),
-    opts=pulumi.ResourceOptions(depends_on=[droplet]),
-)
-
-# --- FIREWALL ---
-firewall_rules_inbound = [
-    do.FirewallInboundRuleArgs(
         protocol="tcp",
         port_range="8080",  # SuperAGI
         source_addresses=["0.0.0.0/0", "::/0"],

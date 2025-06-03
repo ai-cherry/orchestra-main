@@ -1,34 +1,8 @@
 """
-Tool Executor - Execute tools with error handling
 """
-
-import asyncio
-import time
-import traceback
-from typing import Any, Dict, List
-
-from .registry import ToolRegistry
-
-class ToolExecutor:
     """Execute tools with proper error handling."""
-
-    def __init__(self, registry: ToolRegistry):
-        self.registry = registry
-        self.execution_history: List[Dict[str, Any]] = []
-        self._tool_implementations: Dict[str, Any] = {}
-
-    def register_implementation(self, tool_name: str, implementation):
         """Register a tool implementation."""
-        self._tool_implementations[tool_name] = implementation
-
-    async def execute(self, tool_name: str, parameters: Dict[str, Any]) -> Dict[str, Any]:
         """Execute a tool and return results."""
-        start_time = time.time()
-
-        # Validate tool exists
-        tool_def = self.registry.get_tool(tool_name)
-        if not tool_def:
-            return {
                 "success": False,
                 "error": f"Tool '{tool_name}' not found",
                 "tool_name": tool_name,
@@ -44,6 +18,9 @@ class ToolExecutor:
             }
 
         try:
+
+
+            pass
             # Execute tool
             if asyncio.iscoroutinefunction(implementation):
                 result = await implementation(**parameters)
@@ -70,7 +47,10 @@ class ToolExecutor:
                 "execution_time": execution_time,
             }
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             execution_time = time.time() - start_time
 
             self.execution_history.append(
@@ -94,8 +74,6 @@ class ToolExecutor:
 
     def get_execution_stats(self) -> Dict[str, Any]:
         """Get execution statistics."""
-        if not self.execution_history:
-            return {
                 "total_executions": 0,
                 "success_rate": 0.0,
                 "average_execution_time": 0.0,

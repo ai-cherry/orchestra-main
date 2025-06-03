@@ -1,0 +1,92 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Orchestra Advanced API",
+    "version": "2.0.0",
+    "description": "Advanced search, ingestion, and multimedia APIs"
+  },
+  "paths": {
+    "/api/search": {
+      "get": {
+        "summary": "Advanced search with multiple modes",
+        "parameters": [
+          {
+            "name": "mode",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "normal",
+                "creative",
+                "deep",
+                "super_deep",
+                "uncensored"
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ingest-file": {
+      "post": {
+        "summary": "Ingest large files",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "domain": {
+                    "type": "string",
+                    "enum": [
+                      "personal",
+                      "payready",
+                      "paragonrx"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Ingestion started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngestionStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

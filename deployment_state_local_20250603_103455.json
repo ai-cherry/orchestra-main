@@ -1,0 +1,98 @@
+{
+  "timestamp": "2025-06-03T10:34:49.226956",
+  "environment": "local-simulation",
+  "components": {
+    "kubernetes_cluster": {
+      "status": "created",
+      "nodes": 3,
+      "version": "v1.28.2",
+      "endpoint": "https://k8s.local.orchestra.ai"
+    },
+    "postgresql": {
+      "status": "created",
+      "version": "15",
+      "endpoint": "postgres://localhost:5432/orchestra",
+      "replicas": 2
+    },
+    "redis": {
+      "status": "created",
+      "version": "7.0",
+      "endpoint": "redis://localhost:6379",
+      "mode": "cluster"
+    },
+    "weaviate": {
+      "status": "created",
+      "version": "1.24.0",
+      "endpoint": "http://localhost:8090",
+      "modules": [
+        "text2vec-openai",
+        "generative-openai"
+      ]
+    },
+    "load_balancer": {
+      "status": "created",
+      "ip": "10.0.0.100",
+      "dns": "orchestra.local"
+    }
+  },
+  "services": {
+    "mcp_orchestrator": {
+      "status": "running",
+      "port": 8000,
+      "health": "healthy"
+    },
+    "mcp_memory": {
+      "status": "running",
+      "port": 8001,
+      "health": "healthy"
+    },
+    "mcp_weaviate_direct": {
+      "status": "running",
+      "port": 8002,
+      "health": "healthy"
+    },
+    "mcp_tools": {
+      "status": "running",
+      "port": 8003,
+      "health": "healthy"
+    },
+    "mcp_deployment": {
+      "status": "running",
+      "port": 8004,
+      "health": "healthy"
+    },
+    "prometheus": {
+      "status": "running",
+      "config": {
+        "port": 9090,
+        "retention": "30d",
+        "scrape_interval": "15s"
+      }
+    },
+    "grafana": {
+      "status": "running",
+      "config": {
+        "port": 3000,
+        "dashboards": [
+          "system",
+          "application",
+          "mcp"
+        ],
+        "datasources": [
+          "prometheus",
+          "postgres"
+        ]
+      }
+    },
+    "alertmanager": {
+      "status": "running",
+      "config": {
+        "port": 9093,
+        "receivers": [
+          "email",
+          "slack"
+        ]
+      }
+    }
+  }
+}

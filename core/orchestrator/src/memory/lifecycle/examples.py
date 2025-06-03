@@ -1,43 +1,10 @@
 """
-Examples for Memory Lifecycle Components.
-
-This module provides examples of how to use the memory lifecycle components
-for importance scoring, progressive summarization, and chunking.
 """
-
-import asyncio
-import logging
-
-from core.orchestrator.src.memory.lifecycle import (
-    ChunkingStrategy,
-    ImportanceScorer,
-    ImportanceScoringConfig,
-    MemoryChunker,
-    ProgressiveSummarizer,
-)
-
-# Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 async def importance_scorer_example():
     """Example of using the ImportanceScorer."""
-    # Create an importance scorer with custom configuration
-    scorer = ImportanceScorer(
-        config=ImportanceScoringConfig(
-            recency_weight=0.3,
-            usage_weight=0.2,
-            content_weight=0.2,
-            metadata_weight=0.1,
-            relationship_weight=0.1,
-            semantic_weight=0.1,
-        )
-    )
-
-    # Create a sample memory item
-    from datetime import datetime, timedelta
-
-    item = {
         "id": "mem123",
         "content": "This is an important memory about AI Orchestra architecture.",
         "created_at": datetime.utcnow() - timedelta(days=2),
@@ -66,46 +33,8 @@ async def importance_scorer_example():
 
 async def progressive_summarizer_example():
     """Example of using the ProgressiveSummarizer."""
-    # Create a progressive summarizer
-    summarizer = ProgressiveSummarizer()
-
-    # Sample content to summarize
     content = """
-    # AI Orchestra Memory System
-
-    The AI Orchestra memory system is designed to provide a unified interface for managing
-    different types of memory storage (short-term, mid-term, semantic) across various backends
-    (Redis, Firestore, Vertex AI Vector Search, etc.).
-
-    ## Key Components
-
-    1. **Layered Memory**: Manages multiple memory layers with different characteristics
-    2. **Memory Store**: Abstract interface for memory storage backends
-    3. **Memory Query**: Encapsulates parameters for memory retrieval
-
-    ## Memory Types
-
-    - **Short-term memory**: Fast, ephemeral storage using Redis
-    - **Mid-term memory**: Structured storage using Firestore
-    - **Long-term memory**: Persistent storage using Firestore
-    - **Semantic memory**: Vector-based storage using Vertex AI Vector Search
-
-    ## Recent Enhancements
-
-    The memory system has been enhanced with several new capabilities:
-
-    1. **Parallel Retrieval**: Execute searches across multiple memory layers concurrently
-    2. **Hybrid Search**: Combine keyword-based and semantic search for better results
-    3. **Query Classification**: Dynamically adjust retrieval strategies based on query type
-    4. **Importance Scoring**: Evaluate the importance of memory items for retention decisions
-    5. **Progressive Summarization**: Create multi-level summaries for efficient storage
-    6. **Memory Chunking**: Split large documents into semantic chunks for better retrieval
-
-    These enhancements significantly improve the performance, scalability, and intelligence
-    of the memory system while maintaining its clean architectural design.
     """
-
-    # Create summaries at different levels
     item_id = "doc123"
     summaries = await summarizer.create_progressive_summaries(content, item_id)
 
@@ -120,46 +49,8 @@ async def progressive_summarizer_example():
 
 async def memory_chunker_example():
     """Example of using the MemoryChunker."""
-    # Create a memory chunker
-    chunker = MemoryChunker()
-
-    # Sample content to chunk
     content = """
-    # AI Orchestra Memory System
-
-    The AI Orchestra memory system is designed to provide a unified interface for managing
-    different types of memory storage (short-term, mid-term, semantic) across various backends
-    (Redis, Firestore, Vertex AI Vector Search, etc.).
-
-    ## Key Components
-
-    1. **Layered Memory**: Manages multiple memory layers with different characteristics
-    2. **Memory Store**: Abstract interface for memory storage backends
-    3. **Memory Query**: Encapsulates parameters for memory retrieval
-
-    ## Memory Types
-
-    - **Short-term memory**: Fast, ephemeral storage using Redis
-    - **Mid-term memory**: Structured storage using Firestore
-    - **Long-term memory**: Persistent storage using Firestore
-    - **Semantic memory**: Vector-based storage using Vertex AI Vector Search
-
-    ## Recent Enhancements
-
-    The memory system has been enhanced with several new capabilities:
-
-    1. **Parallel Retrieval**: Execute searches across multiple memory layers concurrently
-    2. **Hybrid Search**: Combine keyword-based and semantic search for better results
-    3. **Query Classification**: Dynamically adjust retrieval strategies based on query type
-    4. **Importance Scoring**: Evaluate the importance of memory items for retention decisions
-    5. **Progressive Summarization**: Create multi-level summaries for efficient storage
-    6. **Memory Chunking**: Split large documents into semantic chunks for better retrieval
-
-    These enhancements significantly improve the performance, scalability, and intelligence
-    of the memory system while maintaining its clean architectural design.
     """
-
-    # Chunk the content using different strategies
     item_id = "doc123"
 
     # Paragraph chunking
@@ -192,44 +83,8 @@ async def memory_chunker_example():
 
 async def integrated_example():
     """Example of using all memory lifecycle components together."""
-    # Create components
-    scorer = ImportanceScorer()
-    summarizer = ProgressiveSummarizer()
-    chunker = MemoryChunker()
-
-    # Sample content
     content = """
-    # AI Orchestra Memory System Architecture
-
-    The AI Orchestra memory system provides a unified interface for managing different types
-    of memory across various storage backends. This document outlines the key architectural
-    components and recent enhancements.
-
-    ## System Components
-
-    The memory system consists of several key components:
-
-    1. **Layered Memory Manager**: Coordinates access to different memory layers
-    2. **Memory Stores**: Implementations for different storage backends
-    3. **Query Engine**: Processes and optimizes memory queries
-    4. **Memory Lifecycle**: Manages the lifecycle of memory items
-
-    ## Recent Enhancements
-
-    Several enhancements have been made to improve performance and functionality:
-
-    - Parallel retrieval for faster search across memory layers
-    - Hybrid search combining keyword and semantic approaches
-    - Query classification for optimized retrieval strategies
-    - Importance scoring for intelligent memory management
-    - Progressive summarization for efficient storage
-    - Memory chunking for better handling of large documents
-
-    These improvements significantly enhance the system's capabilities while
-    maintaining its clean architectural design.
     """
-
-    # Process the content
     item_id = "doc456"
 
     # Step 1: Chunk the content

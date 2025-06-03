@@ -1,31 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Unified Design Orchestrator for UI/UX Automation
-Integrates Recraft, DALL-E, Claude analysis, and workflow automation
 """
-
-import os
-import sys
-import json
-import time
-import asyncio
-from typing import Dict, List, Optional, Any, Tuple
-from datetime import datetime
-from pathlib import Path
-import logging
-from enum import Enum
-
-# Add parent directory to path for imports
-sys.path.append(str(Path(__file__).parent.parent.parent))
-
-from shared.database import initialize_database
-from ai_components.orchestration.intelligent_cache import CacheType, cache_decorator, get_cache
-from ai_components.design.recraft_integration import RecraftDesignGenerator
-from ai_components.design.dalle_integration import DALLEImageGenerator
-
-logger = logging.getLogger(__name__)
-
-class DesignPhase(Enum):
     ANALYSIS = "analysis"
     CONCEPT = "concept"
     DESIGN = "design"
@@ -34,18 +10,6 @@ class DesignPhase(Enum):
 
 class DesignOrchestrator:
     """Unified orchestrator for automated UI/UX design workflow"""
-    
-    def __init__(self):
-        self.recraft = None
-        self.dalle = None
-        self.db = None
-        self.cache = None
-        
-        # Workflow state management
-        self.active_projects = {}
-        
-        # Performance metrics
-        self.metrics = {
             "projects_created": 0,
             "designs_generated": 0,
             "images_created": 0,
@@ -122,45 +86,17 @@ class DesignOrchestrator:
     
     async def __aenter__(self):
         """Async context manager entry"""
-        # Initialize database
-        postgres_url = os.environ.get(
-            'POSTGRES_URL',
-            'postgresql://postgres:password@localhost:5432/orchestra'
-        )
-        weaviate_url = os.environ.get('WEAVIATE_URL', 'http://localhost:8080')
-        weaviate_api_key = os.environ.get('WEAVIATE_API_KEY')
-        
-        self.db = await initialize_database(postgres_url, weaviate_url, weaviate_api_key)
-        self.cache = await get_cache()
-        
-        # Initialize design tools
-        self.recraft = RecraftDesignGenerator()
-        self.dalle = DALLEImageGenerator()
-        
-        await self.recraft.__aenter__()
-        await self.dalle.__aenter__()
-        
-        await self._setup_orchestrator_database()
-        return self
-    
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Async context manager exit"""
-        if self.recraft:
-            await self.recraft.__aexit__(exc_type, exc_val, exc_tb)
-        if self.dalle:
-            await self.dalle.__aexit__(exc_type, exc_val, exc_tb)
-        if self.db:
-            await self.db.close()
-    
-    @cache_decorator(CacheType.CODE_GENERATION)
     async def create_design_project(self, project_brief: str, project_type: str = "complete_website",
                                   target_audience: str = "general", brand_guidelines: Dict = None,
                                   style_preferences: Dict = None) -> Dict:
         """Create and execute a complete design project"""
-        start_time = time.time()
         project_id = f"project_{int(time.time())}"
         
         try:
+
+        
+            pass
             # Get workflow template
             workflow = self.workflow_templates.get(project_type, self.workflow_templates["complete_website"])
             
@@ -204,7 +140,10 @@ class DesignOrchestrator:
             
             return final_project
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             self.metrics["errors"] += 1
             await self._log_error("create_design_project", project_id, str(e))
             raise
@@ -212,13 +151,6 @@ class DesignOrchestrator:
     async def analyze_design_requirements(self, brief: str, target_audience: str = "general",
                                         existing_assets: List[str] = None) -> Dict:
         """Analyze design requirements using Claude via OpenRouter"""
-        start_time = time.time()
-        
-        try:
-            # Create comprehensive analysis prompt
-            analysis_prompt = await self._create_analysis_prompt(brief, target_audience, existing_assets)
-            
-            # Route through OpenRouter (Claude) for analysis
             analysis_result = await self._route_through_claude(analysis_prompt, "design_analysis")
             
             # Process and structure the analysis
@@ -244,7 +176,10 @@ class DesignOrchestrator:
             
             return result
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             self.metrics["errors"] += 1
             await self._log_error("analyze_design_requirements", brief, str(e))
             raise
@@ -252,15 +187,6 @@ class DesignOrchestrator:
     async def generate_design_assets(self, design_requirements: Dict, asset_types: List[str],
                                    framework: str = "react") -> Dict:
         """Generate design assets using Recraft and DALL-E"""
-        start_time = time.time()
-        
-        try:
-            generated_assets = {}
-            
-            # Parallel asset generation
-            tasks = []
-            
-            for asset_type in asset_types:
                 if asset_type in ["hero_design", "layout_structure", "navigation_design"]:
                     # Use Recraft for UI/UX design generation
                     task = self._generate_recraft_asset(design_requirements, asset_type, framework)
@@ -312,7 +238,10 @@ class DesignOrchestrator:
             
             return final_result
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             self.metrics["errors"] += 1
             await self._log_error("generate_design_assets", str(design_requirements), str(e))
             raise
@@ -320,10 +249,6 @@ class DesignOrchestrator:
     async def refine_design_with_feedback(self, project_id: str, feedback: List[str],
                                         specific_assets: List[str] = None) -> Dict:
         """Refine design based on feedback"""
-        start_time = time.time()
-        
-        try:
-            if project_id not in self.active_projects:
                 raise ValueError(f"Project {project_id} not found")
             
             project_state = self.active_projects[project_id]
@@ -339,6 +264,8 @@ class DesignOrchestrator:
             
             for asset_name, refinement_details in refinement_plan.items():
                 try:
+
+                    pass
                     if refinement_details["tool"] == "recraft":
                         refined_asset = await self.recraft.refine_design(
                             refinement_details["asset_id"],
@@ -354,7 +281,10 @@ class DesignOrchestrator:
                     
                     refined_assets[asset_name] = refined_asset
                     
-                except Exception as e:
+                except Exception:
+
+                    
+                    pass
                     logger.error(f"Failed to refine {asset_name}: {e}")
                     refined_assets[asset_name] = {"error": str(e)}
             
@@ -379,19 +309,23 @@ class DesignOrchestrator:
             
             return result
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             self.metrics["errors"] += 1
             await self._log_error("refine_design_with_feedback", project_id, str(e))
             raise
     
     async def _execute_design_workflow(self, project_state: Dict) -> Dict:
         """Execute the complete design workflow"""
-        workflow_results = {}
-        
         for phase in project_state["workflow"]["phases"]:
             phase_start = time.time()
             
             try:
+
+            
+                pass
                 if phase == DesignPhase.ANALYSIS:
                     analysis = await self.analyze_design_requirements(
                         project_state["brief"],
@@ -425,7 +359,10 @@ class DesignOrchestrator:
                 
                 logger.info(f"Completed phase {phase.value} in {time.time() - phase_start:.2f}s")
                 
-            except Exception as e:
+            except Exception:
+
+                
+                pass
                 logger.error(f"Failed to complete phase {phase.value}: {e}")
                 workflow_results[f"{phase.value}_error"] = str(e)
         
@@ -433,15 +370,6 @@ class DesignOrchestrator:
     
     async def _route_through_claude(self, content: str, task_type: str) -> str:
         """Route content through Claude via OpenRouter"""
-        openrouter_key = os.environ.get('OPENROUTER_API_KEY')
-        if not openrouter_key:
-            return content
-        
-        try:
-            import aiohttp
-            
-            async with aiohttp.ClientSession() as session:
-                headers = {
                     "Authorization": f"Bearer {openrouter_key}",
                     "Content-Type": "application/json"
                 }
@@ -481,72 +409,23 @@ class DesignOrchestrator:
                         logger.warning(f"Claude routing failed: {response.status}")
                         return content
         
-        except Exception as e:
+        except Exception:
+
+        
+            pass
             logger.warning(f"Claude routing error: {e}")
             return content
     
     async def _create_analysis_prompt(self, brief: str, target_audience: str, existing_assets: List[str] = None) -> str:
         """Create comprehensive analysis prompt"""
         prompt = f"""
-Analyze the following design project requirements:
-
-Project Brief: {brief}
-Target Audience: {target_audience}
-
-Please provide a comprehensive analysis including:
-
-1. Design Objectives
-   - Primary goals and success metrics
-   - User experience priorities
-   - Business objectives alignment
-
-2. Target Audience Analysis
-   - User personas and demographics
-   - User needs and pain points
-   - Design preferences and expectations
-
-3. Design Strategy
-   - Visual style recommendations
-   - Layout and navigation approach
-   - Color palette and typography suggestions
-   - Content hierarchy recommendations
-
-4. Technical Considerations
-   - Platform requirements (web, mobile, etc.)
-   - Accessibility requirements
-   - Performance considerations
-   - Responsive design needs
-
-5. Competitive Analysis
-   - Industry standards and best practices
-   - Differentiation opportunities
-   - Trending design patterns
-
-6. Implementation Roadmap
-   - Priority deliverables
-   - Development phases
-   - Resource requirements
-   - Timeline estimates
-
-Please structure your analysis in JSON format for easy processing.
 """
-        
-        if existing_assets:
             prompt += f"\nExisting Assets to Consider: {', '.join(existing_assets)}"
         
         return prompt
     
     async def _process_analysis_result(self, analysis_text: str, brief: str) -> Dict:
         """Process and structure analysis result"""
-        try:
-            # Try to parse as JSON first
-            if analysis_text.strip().startswith('{'):
-                return json.loads(analysis_text)
-        except:
-            pass
-        
-        # Fallback: create structured response
-        return {
             "design_objectives": ["Enhance user experience", "Achieve business goals", "Create engaging interface"],
             "target_audience_insights": {
                 "primary_persona": "Target user based on brief",
@@ -570,9 +449,6 @@ Please structure your analysis in JSON format for easy processing.
     
     async def _generate_recraft_asset(self, requirements: Dict, asset_type: str, framework: str) -> Dict:
         """Generate asset using Recraft"""
-        design_brief = self._create_asset_brief(requirements, asset_type)
-        
-        design_type_mapping = {
             "hero_design": "landing_page",
             "layout_structure": "web_app",
             "navigation_design": "web_app",
@@ -590,9 +466,6 @@ Please structure your analysis in JSON format for easy processing.
     
     async def _generate_dalle_asset(self, requirements: Dict, asset_type: str) -> Dict:
         """Generate asset using DALL-E"""
-        image_prompt = self._create_image_prompt(requirements, asset_type)
-        
-        image_type_mapping = {
             "hero_images": "hero_images",
             "icons": "feature_icons",
             "supporting_images": "background_patterns",
@@ -646,20 +519,8 @@ Please structure your analysis in JSON format for easy processing.
     async def _develop_design_concept(self, project_state: Dict, analysis: Dict = None) -> Dict:
         """Develop design concept based on analysis"""
         concept_prompt = f"""
-Based on the project brief: {project_state['brief']}
-Target audience: {project_state['target_audience']}
-
-Develop a comprehensive design concept including:
-1. Visual style direction
-2. Color palette recommendations
-3. Typography choices
-4. Layout philosophy
-5. User interaction patterns
-6. Content strategy
-
 {f"Analysis insights: {json.dumps(analysis.get('design_direction', {}), indent=2)}" if analysis else ""}
 """
-        
         concept_result = await self._route_through_claude(concept_prompt, "concept_development")
         
         return {
@@ -673,9 +534,6 @@ Develop a comprehensive design concept including:
     
     async def _auto_refine_designs(self, design_assets: Dict) -> Dict:
         """Automatically refine designs based on best practices"""
-        refinement_suggestions = []
-        
-        # Analyze generated assets for improvements
         for asset_name, asset_data in design_assets.get("generated_assets", {}).items():
             if "error" not in asset_data:
                 suggestions = [
@@ -697,9 +555,6 @@ Develop a comprehensive design concept including:
     
     async def _finalize_design_assets(self, workflow_results: Dict) -> Dict:
         """Finalize all design assets"""
-        finalized_assets = {}
-        
-        # Collect all generated assets
         design_assets = workflow_results.get("design_assets", {}).get("generated_assets", {})
         
         for asset_name, asset_data in design_assets.items():
@@ -726,7 +581,6 @@ Develop a comprehensive design concept including:
     
     async def _finalize_project(self, project_state: Dict, workflow_results: Dict) -> Dict:
         """Finalize the complete project"""
-        final_project = {
             "project_id": project_state["project_id"],
             "project_type": project_state["project_type"],
             "brief": project_state["brief"],
@@ -749,9 +603,6 @@ Develop a comprehensive design concept including:
     async def _analyze_feedback_with_claude(self, feedback: List[str], project_state: Dict) -> Dict:
         """Analyze feedback using Claude"""
         feedback_prompt = f"""
-Analyze the following design feedback for project: {project_state['brief']}
-
-Feedback received:
 {chr(10).join(f"- {fb}" for fb in feedback)}
 
 Please provide:
@@ -763,7 +614,6 @@ Please provide:
 
 Format as structured JSON response.
 """
-        
         analysis_result = await self._route_through_claude(feedback_prompt, "feedback_analysis")
         
         return {
@@ -773,9 +623,6 @@ Format as structured JSON response.
     
     async def _create_refinement_plan(self, feedback_analysis: Dict, specific_assets: List[str] = None) -> Dict:
         """Create refinement plan based on feedback analysis"""
-        refinement_plan = {}
-        
-        # Mock refinement plan - in real implementation, this would be more sophisticated
         assets_to_refine = specific_assets or ["hero_design", "navigation_design"]
         
         for asset_name in assets_to_refine:
@@ -792,86 +639,43 @@ Format as structured JSON response.
     async def _setup_orchestrator_database(self) -> None:
         """Setup database tables for orchestrator operations"""
         await self.db.execute_query("""
-            CREATE TABLE IF NOT EXISTS design_projects (
-                id SERIAL PRIMARY KEY,
-                project_id VARCHAR(200) UNIQUE,
-                project_type VARCHAR(100) NOT NULL,
-                brief TEXT NOT NULL,
-                status VARCHAR(50) NOT NULL,
-                result JSONB,
-                created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-                completed_at TIMESTAMP WITH TIME ZONE
-            );
-        """, fetch=False)
-        
+        """
         await self.db.execute_query("""
-            CREATE TABLE IF NOT EXISTS design_analyses (
-                id SERIAL PRIMARY KEY,
-                analysis_id VARCHAR(200),
-                brief TEXT NOT NULL,
-                target_audience VARCHAR(200),
-                result JSONB,
-                created_at TIMESTAMP WITH TIME ZONE NOT NULL
-            );
-        """, fetch=False)
-        
+        """
         await self.db.execute_query("""
-            CREATE INDEX IF NOT EXISTS idx_design_projects_status 
-            ON design_projects(status);
-        """, fetch=False)
-    
-    async def _log_project_completion(self, project_id: str, project_type: str, result: Dict) -> None:
+        """
         """Log project completion to database"""
-        try:
             await self.db.execute_query("""
-                INSERT INTO design_projects 
-                (project_id, project_type, brief, status, result, created_at, completed_at)
-                VALUES ($1, $2, $3, $4, $5, $6, $7)
-                ON CONFLICT (project_id) 
-                DO UPDATE SET 
-                    status = EXCLUDED.status,
-                    result = EXCLUDED.result,
-                    completed_at = EXCLUDED.completed_at
-            """,
+            """
             project_id, project_type, result.get("brief", ""), "completed",
             json.dumps(result), datetime.now(), datetime.now(), fetch=False)
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to log project completion: {e}")
     
     async def _log_analysis(self, brief: str, target_audience: str, result: Dict) -> None:
         """Log analysis to database"""
-        try:
             await self.db.execute_query("""
-                INSERT INTO design_analyses 
-                (analysis_id, brief, target_audience, result, created_at)
-                VALUES ($1, $2, $3, $4, $5)
-            """,
+            """
             result.get("analysis_id"), brief, target_audience,
             json.dumps(result), datetime.now(), fetch=False)
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to log analysis: {e}")
     
     async def _log_asset_generation(self, requirements: Dict, asset_types: List[str], result: Dict) -> None:
         """Log asset generation to database"""
-        # Implementation would log asset generation details
-        pass
-    
-    async def _log_refinement(self, project_id: str, feedback: List[str], result: Dict) -> None:
         """Log refinement to database"""
-        # Implementation would log refinement details
-        pass
-    
-    async def _log_error(self, action: str, identifier: str, error: str) -> None:
         """Log error to database"""
-        try:
             await self.db.execute_query("""
-                INSERT INTO design_projects 
-                (project_id, project_type, brief, status, result, created_at)
-                VALUES ($1, $2, $3, $4, $5, $6)
-            """,
+            """
             f"error_{int(time.time())}", action, f"{action}: {identifier}", "error",
             json.dumps({"error": error}), datetime.now(), fetch=False)
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to log error: {e}")
     
     def get_performance_metrics(self) -> Dict:
@@ -900,6 +704,8 @@ async def main():
         # Test project creation
         print("\n1. Testing complete project creation...")
         try:
+
+            pass
             project_result = await orchestrator.create_design_project(
                 "Create a modern SaaS dashboard for project management",
                 project_type="dashboard",
@@ -908,18 +714,24 @@ async def main():
             )
             print(f"   ✅ Project created: {project_result['project_id']}")
             print(f"   📊 Success rate: {project_result['metadata']['success_rate']:.1%}")
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"   ❌ Project creation failed: {e}")
         
         # Test analysis
         print("\n2. Testing design analysis...")
         try:
+
+            pass
             analysis_result = await orchestrator.analyze_design_requirements(
                 "E-commerce mobile app for sustainable products",
                 target_audience="environmentally conscious millennials"
             )
             print(f"   ✅ Analysis completed: {analysis_result['analysis_id']}")
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"   ❌ Analysis failed: {e}")
         
         # Performance metrics

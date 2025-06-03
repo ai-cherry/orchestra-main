@@ -1,22 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 """
-Centralized environment configuration for Orchestra AI.
-Uses Pydantic BaseSettings to provide a single source of truth for all environment variables.
-Import this module wherever environment configuration is needed.
 """
-
-from pydantic import BaseSettings, Field
-
-class OrchestraSettings(BaseSettings):
     """
-    Centralized environment variables for Orchestra AI.
-    All secrets and endpoints should be managed via Pulumi/environment.
-
-    Database Priority (Weaviate-first architecture):
-    1. Weaviate - Primary vector/document store with ACORN hybrid search
-    2. PostgreSQL - ACID operations, structured data, pgvector fallback
-    3. Dragonfly - Optional micro-cache for high-throughput scenarios
     """
-
     gcp_service_account_key: str = Field(default=None, env="VULTR_CREDENTIALS_PATH")
 
     # GitHub and CI/CD

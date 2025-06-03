@@ -1,183 +1,42 @@
 """
-Orchestrator module for AI Orchestration System.
-
-This module provides the orchestration layer that ties together the memory,
-personas, and agents components to handle user interactions.
 """
-
-import logging
-import uuid
-from datetime import datetime
-from typing import Any, Dict, List, Optional
-
-from core.orchestrator.src.core.agents import Agent, AgentContext, get_agent_registry
-from core.orchestrator.src.core.memory import MemoryManager, get_memory_manager
-from core.orchestrator.src.core.personas import PersonaManager, get_persona_manager
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-class InteractionResult:
     """
-    Result of an interaction processing.
-
-    This class encapsulates the result of processing a user interaction,
-    including the response message and metadata.
     """
-
-    def __init__(
-        self,
-        message: str,
-        persona_id: str,
-        persona_name: str,
-        session_id: str,
-        interaction_id: str,
-        metadata: Optional[Dict[str, Any]] = None,
-    ):
         """
-        Initialize an interaction result.
-
-        Args:
-            message: The response message
-            persona_id: The ID of the persona used
-            persona_name: The name of the persona used
-            session_id: The session ID
-            interaction_id: The interaction ID
-            metadata: Optional metadata
         """
-        self.message = message
-        self.persona_id = persona_id
-        self.persona_name = persona_name
-        self.session_id = session_id
-        self.interaction_id = interaction_id
-        self.timestamp = datetime.utcnow()
-        self.metadata = metadata or {}
-
-class EventEmitter:
     """
-    Simple event emitter for orchestrator events.
-
-    This class provides a basic publish-subscribe mechanism for
-    handling events within the orchestrator.
     """
-
-    def __init__(self):
         """Initialize the event emitter."""
-        self._handlers: Dict[str, List[callable]] = {}
-
-    def subscribe(self, event: str, handler: callable) -> None:
         """
-        Subscribe to an event.
-
-        Args:
-            event: The event to subscribe to
-            handler: The handler function
         """
-        if event not in self._handlers:
-            self._handlers[event] = []
-
-        self._handlers[event].append(handler)
-
-    def unsubscribe(self, event: str, handler: callable) -> None:
         """
-        Unsubscribe from an event.
-
-        Args:
-            event: The event to unsubscribe from
-            handler: The handler function
         """
-        if event in self._handlers:
-            self._handlers[event] = [h for h in self._handlers[event] if h != handler]
-
-    def publish(self, event: str, data: Any = None) -> None:
         """
-        Publish an event.
-
-        Args:
-            event: The event to publish
-            data: The event data
         """
-        if event in self._handlers:
-            for handler in self._handlers[event]:
-                try:
-                    handler(data)
-                except Exception as e:
                     logger.error(f"Error in event handler for {event}: {e}")
 
 class Orchestrator:
     """
-    Main orchestrator for AI interactions.
-
-    This class coordinates the memory, personas, and agents components
-    to process user interactions and generate responses.
     """
-
-    def __init__(
-        self,
-        memory_manager: Optional[MemoryManager] = None,
-        persona_manager: Optional[PersonaManager] = None,
-    ):
         """
-        Initialize the orchestrator.
-
-        Args:
-            memory_manager: Optional memory manager
-            persona_manager: Optional persona manager
         """
-        self._memory_manager = memory_manager or get_memory_manager()
-        self._persona_manager = persona_manager or get_persona_manager()
-        self._agent_registry = get_agent_registry()
-        self._events = EventEmitter()
-
         logger.info("Orchestrator initialized")
 
     def subscribe(self, event: str, handler: callable) -> None:
         """
-        Subscribe to an orchestrator event.
-
-        Args:
-            event: The event to subscribe to
-            handler: The handler function
         """
-        self._events.subscribe(event, handler)
-
-    def unsubscribe(self, event: str, handler: callable) -> None:
         """
-        Unsubscribe from an orchestrator event.
-
-        Args:
-            event: The event to unsubscribe from
-            handler: The handler function
         """
-        self._events.unsubscribe(event, handler)
-
-    async def process_interaction(
-        self,
-        user_input: str,
-        user_id: str,
-        session_id: Optional[str] = None,
-        persona_id: Optional[str] = None,
-        context: Optional[Dict[str, Any]] = None,
-    ) -> InteractionResult:
         """
-        Process a user interaction and generate a response.
-
-        Args:
-            user_input: The user's input message
-            user_id: The ID of the user
-            session_id: Optional session ID for conversation continuity
-            persona_id: Optional ID of persona to use
-            context: Additional context for the interaction
-
-        Returns:
-            The interaction result
         """
-        # Generate IDs if not provided
         session_id = session_id or f"session_{uuid.uuid4().hex[:8]}"
         interaction_id = f"interaction_{uuid.uuid4().hex}"
         context = context or {}
 
         try:
+
+
+            pass
             # Get persona
             persona = self._persona_manager.get_persona(persona_id)
             logger.info(f"Using persona {persona.name} for interaction {interaction_id}")
@@ -290,7 +149,9 @@ class Orchestrator:
             self._events.publish("interaction_complete", complete_event_data)
 
             return result
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Error processing interaction: {e}", exc_info=True)
 
             # Publish interaction error event
@@ -320,30 +181,6 @@ class Orchestrator:
 
     def _select_agent_for_context(self, context: AgentContext) -> Agent:
         """
-        Select the most appropriate agent for a context.
-
-        Args:
-            context: The agent context
-
-        Returns:
-            The selected agent
         """
-        # Use the agent registry to select an agent
-        return self._agent_registry.select_agent_for_context(context)
-
-# Global orchestrator instance
-_orchestrator = None
-
-def get_orchestrator() -> Orchestrator:
     """
-    Get the global orchestrator instance.
-
-    Returns:
-        The orchestrator instance
     """
-    global _orchestrator
-
-    if _orchestrator is None:
-        _orchestrator = Orchestrator()
-
-    return _orchestrator

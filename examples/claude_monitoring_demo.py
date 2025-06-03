@@ -1,19 +1,6 @@
 #!/usr/bin/env python3
 """
-Claude API Monitoring Demo
-
-Demonstrates how to use the Claude monitoring system.
 """
-
-import asyncio
-import os
-
-from core.logging_config import get_logger, setup_logging
-from core.monitoring.claude_monitor import ClaudeMonitor
-from core.monitoring.monitored_litellm_client import MonitoredLiteLLMClient
-from core.orchestrator.src.llm.litellm_client import LLMMessage
-
-# Setup logging
 setup_logging(level="INFO", json_format=False)
 logger = get_logger(__name__)
 
@@ -43,6 +30,9 @@ async def demo_basic_monitoring():
     ]
 
     try:
+
+
+        pass
         # Test with Claude 3 Sonnet
         logger.info("Making API call to Claude 3 Sonnet...")
         response = await client.chat_completion(
@@ -65,7 +55,10 @@ async def demo_basic_monitoring():
         )
         logger.info(f"Response: {response.content}")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"API call failed: {str(e)}")
 
     # Get monitoring summary
@@ -94,8 +87,12 @@ async def demo_error_handling():
     # Try multiple calls to trigger error alert
     for i in range(3):
         try:
+
+            pass
             await client.chat_completion(messages=messages, model="claude-3-sonnet", session_id="error_demo")
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Expected error {i+1}: {str(e)}")
 
     # Check error metrics
@@ -125,6 +122,9 @@ async def demo_cost_tracking():
         ]
 
         try:
+
+
+            pass
             await client.chat_completion(
                 messages=messages,
                 model="claude-3-haiku",
@@ -132,7 +132,9 @@ async def demo_cost_tracking():
                 **session,  # Use cheaper model
             )
             logger.info(f"Generated story for {session['user_id']}")
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed for {session['user_id']}: {str(e)}")
 
     # Get cost breakdown
@@ -157,6 +159,8 @@ async def demo_export_data():
 
     for i in range(3):
         try:
+
+            pass
             await client.chat_completion(
                 messages=messages,
                 model="claude-3-haiku",
@@ -164,7 +168,9 @@ async def demo_export_data():
                 user_id=f"test_user_{i}",
                 metadata={"test_run": i},
             )
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Call {i} failed: {str(e)}")
 
     # Export data in different formats
@@ -190,13 +196,17 @@ async def demo_performance_monitoring():
 
         for i in range(3):
             try:
+
+                pass
                 await client.chat_completion(
                     messages=messages,
                     model=model,
                     max_tokens=10,
                     metadata={"test": "performance", "iteration": i},
                 )
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Error with {model}: {str(e)}")
 
     # Analyze performance by model

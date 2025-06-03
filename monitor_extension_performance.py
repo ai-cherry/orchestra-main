@@ -1,21 +1,6 @@
 #!/usr/bin/env python3
 """
-monitor_extension_performance.py - Monitor VS Code extension performance
-
-This script monitors the performance of VS Code extensions by tracking resource usage
-and identifying problematic extensions. It can be run periodically to collect data
-and provide recommendations for optimizing extension usage.
 """
-
-import json
-import subprocess
-from datetime import datetime
-from pathlib import Path
-from typing import Any, Dict, List, Tuple
-import logging
-
-# Configuration
-WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 PERFORMANCE_LOG = WORKSPACE_ROOT / ".vscode" / "extension_performance.json"
 LOG_DIR = WORKSPACE_ROOT / "logs"
 MONITOR_LOG = LOG_DIR / "extension_monitor.log"
@@ -38,14 +23,7 @@ logger = get_logger(__name__)
 
 def get_extension_processes() -> List[Dict[str, Any]]:
     """
-    Get VS Code extension host processes and their resource usage.
-
-    Returns:
-        List of dictionaries containing process information
     """
-    try:
-        # This works on Linux
-        result = subprocess.run(
             ["ps", "-eo", "pid,%cpu,%mem,command", "--sort=-%cpu"],
             capture_output=True,
             text=True,
@@ -53,6 +31,8 @@ def get_extension_processes() -> List[Dict[str, Any]]:
         )
 
         processes = []
+        # TODO: Consider using list comprehension for better performance
+
         for line in result.stdout.splitlines():
             if "extensionHost" in line:
                 parts = line.strip().split()
@@ -69,19 +49,16 @@ def get_extension_processes() -> List[Dict[str, Any]]:
                         }
                     )
         return processes
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error getting extension processes: {e}")
         return []
 
 def get_installed_extensions() -> List[str]:
     """
-    Get list of installed VS Code extensions.
-
-    Returns:
         List of installed extensions in format "publisher.name@version"
     """
-    try:
-        result = subprocess.run(
             ["code", "--list-extensions", "--show-versions"],
             capture_output=True,
             text=True,
@@ -93,22 +70,20 @@ def get_installed_extensions() -> List[str]:
             if line:
                 extensions.append(line)
         return extensions
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error getting installed extensions: {e}")
         return []
 
 def load_performance_log() -> Dict[str, Any]:
     """
-    Load existing performance log.
-
-    Returns:
-        Dictionary containing performance data
     """
-    if PERFORMANCE_LOG.exists():
-        try:
             with open(PERFORMANCE_LOG, "r") as f:
                 return json.load(f)
-        except json.JSONDecodeError:
+        except Exception:
+
+            pass
             logger.warning("Performance log exists but is not valid JSON. Creating new log.")
             return {"extensions": {}, "last_updated": "", "high_usage_events": []}
 
@@ -116,28 +91,13 @@ def load_performance_log() -> Dict[str, Any]:
 
 def save_performance_log(data: Dict[str, Any]) -> None:
     """
-    Save performance log.
-
-    Args:
-        data: Performance data to save
     """
     with open(PERFORMANCE_LOG, "w") as f:
         json.dump(data, f, indent=2)
 
 def check_resource_usage(processes: List[Dict[str, Any]]) -> Tuple[bool, bool]:
     """
-    Check for high resource usage in extension processes.
-
-    Args:
-        processes: List of process information dictionaries
-
-    Returns:
-        Tuple of (high_cpu, high_memory) booleans
     """
-    high_cpu = False
-    high_memory = False
-
-    for proc in processes:
         if proc["cpu"] > THRESHOLD_CPU_PERCENT:
             high_cpu = True
             logger.warning(f"High CPU usage detected: {proc['cpu']}% (PID: {proc['pid']})")
@@ -150,10 +110,6 @@ def check_resource_usage(processes: List[Dict[str, Any]]) -> Tuple[bool, bool]:
 
 def get_extension_categories() -> Dict[str, str]:
     """
-    Get extension categories from extensions.json.
-
-    Returns:
-        Dictionary mapping extension IDs to their categories
     """
     extensions_config_path = WORKSPACE_ROOT / "extensions.json"
     categories = {}
@@ -162,6 +118,9 @@ def get_extension_categories() -> Dict[str, str]:
         return categories
 
     try:
+
+
+        pass
         with open(extensions_config_path, "r") as f:
             config = json.load(f)
 
@@ -170,22 +129,15 @@ def get_extension_categories() -> Dict[str, str]:
                 categories[ext] = category
 
         return categories
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error loading extension categories: {e}")
         return categories
 
 def get_problematic_extensions(performance_log: Dict[str, Any]) -> List[Dict[str, Any]]:
     """
-    Identify problematic extensions based on performance history.
-
-    Args:
-        performance_log: Performance log data
-
-    Returns:
-        List of problematic extension information
     """
-    problematic = []
-
     for ext_id, data in performance_log.get("extensions", {}).items():
         if (
             data.get("high_cpu_count", 0) > HIGH_USAGE_COUNT_THRESHOLD
@@ -205,7 +157,6 @@ def get_problematic_extensions(performance_log: Dict[str, Any]) -> List[Dict[str
 
 def main() -> None:
     """Main entry point for the script."""
-    # Set up centralized logging (INFO level, JSON format for standard log aggregators)
     setup_logging(level="INFO", json_format=True)
     logger.info("Starting VS Code Extension Performance Monitor")
 

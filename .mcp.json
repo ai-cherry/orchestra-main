@@ -77,7 +77,7 @@
       },
       "capabilities": {
         "tools": true,
-        "resources": true"
+        "resources": true
       },
       "description": "Tool discovery and execution server with rich metadata"
     }

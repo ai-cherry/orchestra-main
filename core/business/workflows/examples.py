@@ -1,23 +1,5 @@
 """
-Example workflow implementations for Orchestra AI.
-
-This module provides concrete workflow examples that demonstrate
-the workflow engine capabilities.
 """
-
-import logging
-from typing import Any, Dict, List
-
-from core.business.llm.provider import LLMRequest, get_llm_service
-from core.business.personas.base import get_persona_manager
-from core.business.workflows.base import TaskPriority, Workflow, WorkflowContext, get_workflow_engine
-from core.services.memory.unified_memory import get_memory_service
-
-logger = logging.getLogger(__name__)
-
-# Task implementations
-
-async def fetch_user_context(context: WorkflowContext) -> Dict[str, Any]:
     """Fetch user context from memory."""
     user_id = context.inputs.get("user_id")
     if not user_id:
@@ -44,24 +26,8 @@ async def analyze_intent(context: WorkflowContext) -> str:
     llm_service = get_llm_service()
 
     # Create intent analysis prompt
-    prompt = f"""Analyze the following user input and determine the primary intent.
-
-User Input: {user_input}
-
-Possible intents:
-- question: User is asking a question
-- command: User wants to perform an action
-- conversation: User wants to have a discussion
-- feedback: User is providing feedback
-
+    prompt = f"""
 Return only the intent category."""
-
-    request = LLMRequest(prompt=prompt, max_tokens=50, temperature=0.3)
-
-    response = await llm_service.complete(request)
-    intent = response.text.strip().lower()
-
-    # Store in context
     context.set_output("intent", intent)
 
     return intent
@@ -85,23 +51,8 @@ async def generate_response(context: WorkflowContext) -> str:
         persona_id = "conversationalist"
 
     # Build context-aware prompt
-    prompt = f"""User Input: {user_input}
-
-Intent: {intent}
-
-Recent Context: {user_context.get('recent_interactions', [])}
-
+    prompt = f"""
 Please provide an appropriate response."""
-
-    # Generate response with persona
-    response = await llm_service.complete_with_persona(
-        prompt=prompt,
-        persona=persona_manager.get_persona(persona_id) or persona_manager.get_default_persona(),
-    )
-
-    return response.text
-
-async def store_interaction(context: WorkflowContext) -> None:
     """Store the interaction in memory."""
     user_id = context.inputs.get("user_id")
     user_input = context.inputs.get("user_input")
@@ -151,24 +102,8 @@ async def extract_entities(context: WorkflowContext) -> List[Dict[str, str]]:
     llm_service = get_llm_service()
 
     request = LLMRequest(
-        prompt=f"""Extract all named entities from the following document.
-
-Document: {document}
-
-Return as a JSON list with format: [{{"type": "PERSON|ORG|LOCATION", "name": "entity name"}}]""",
-        max_tokens=1000,
-        temperature=0.2,
-    )
-
-    response = await llm_service.complete(request)
-
-    # Parse JSON response
-    import json
-
-    try:
-        entities = json.loads(response.text)
-        return entities
-    except json.JSONDecodeError:
+        prompt=f"""
+Return as a JSON list with format: [{{"type": "PERSON|ORG|LOCATION", "name": "entity name"}}]"""
         logger.error(f"Failed to parse entities: {response.text}")
         return []
 
@@ -180,18 +115,8 @@ async def generate_keywords(context: WorkflowContext) -> List[str]:
     llm_service = get_llm_service()
 
     request = LLMRequest(
-        prompt=f"""Based on this document and its summary, generate 5-10 relevant keywords.
-
-Summary: {summary}
-
-Document excerpt: {document[:500]}...
-
-Return keywords as a comma-separated list.""",
-        max_tokens=100,
-        temperature=0.4,
-    )
-
-    response = await llm_service.complete(request)
+        prompt=f"""
+Return keywords as a comma-separated list."""
     keywords = [k.strip() for k in response.text.split(",")]
 
     return keywords
@@ -225,7 +150,6 @@ async def store_analysis(context: WorkflowContext) -> None:
 
 def create_conversation_workflow() -> Workflow:
     """Create a conversation handling workflow."""
-    workflow = Workflow(
         name="conversation_workflow",
         description="Handle user conversations with context awareness",
     )
@@ -267,7 +191,6 @@ def create_conversation_workflow() -> Workflow:
 
 def create_document_analysis_workflow() -> Workflow:
     """Create a document analysis workflow."""
-    workflow = Workflow(
         name="document_analysis",
         description="Analyze documents to extract summary, entities, and keywords",
     )
@@ -310,14 +233,4 @@ def create_document_analysis_workflow() -> Workflow:
 
 def register_example_workflows() -> None:
     """Register all example workflows with the engine."""
-    engine = get_workflow_engine()
-
-    # Register conversation workflow
-    conversation_workflow = create_conversation_workflow()
-    engine.register_workflow(conversation_workflow)
-
-    # Register document analysis workflow
-    document_workflow = create_document_analysis_workflow()
-    engine.register_workflow(document_workflow)
-
     logger.info("Registered example workflows")

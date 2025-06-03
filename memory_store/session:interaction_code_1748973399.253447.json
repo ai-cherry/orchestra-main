@@ -1,0 +1,19 @@
+{
+  "content": {
+    "type": "roo_interaction",
+    "mode": "code",
+    "request": {
+      "code": "def test(): return 'Orchestra AI is working!'",
+      "language": "python"
+    },
+    "response": {
+      "agents": {},
+      "message": "Mode not specifically handled, using general processing"
+    },
+    "timestamp": "2025-06-03T17:56:39.253441"
+  },
+  "scope": "session",
+  "tool": null,
+  "created": "2025-06-03T17:56:39.253458",
+  "expiry": "2025-06-03T18:56:39.253455"
+}

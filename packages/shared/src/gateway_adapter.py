@@ -1,78 +1,15 @@
 """
-Gateway Adapter for AI Orchestra Agent Orchestration System.
-
-This module implements adapters for connecting various LLM gateways (Portkey, Kong, OpenRouter, etc.)
-to the AI Orchestra agent orchestration system. It provides a unified interface for agent-to-LLM
-communication while abstracting away the specifics of each gateway implementation.
 """
-
-import logging
-import os
-import time
-from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import Any, Dict, List, Optional
-
-import yaml
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-class GatewayAdapter(ABC):
     """Abstract base class for LLM gateway adapters."""
-
-    @abstractmethod
-    async def initialize(self) -> bool:
         """Initialize the gateway connection."""
-
-    @abstractmethod
-    async def generate_completion(
-        self,
-        prompt: str,
-        agent_type: Optional[str] = None,
-        model: Optional[str] = None,
-        temperature: float = 0.7,
-        max_tokens: Optional[int] = None,
-    ) -> Dict[str, Any]:
         """Generate text completion using the gateway."""
-
-    @abstractmethod
-    async def generate_chat_completion(
-        self,
-        messages: List[Dict[str, str]],
-        agent_type: Optional[str] = None,
-        model: Optional[str] = None,
-        temperature: float = 0.7,
-        max_tokens: Optional[int] = None,
-    ) -> Dict[str, Any]:
         """Generate chat completion using the gateway."""
-
-    @abstractmethod
-    async def close(self) -> None:
         """Close gateway connections and release resources."""
-
-    @property
-    @abstractmethod
-    def provider_name(self) -> str:
         """Get the provider name."""
-
-    @property
-    @abstractmethod
-    def is_initialized(self) -> bool:
         """Check if gateway is initialized."""
-
-    @abstractmethod
-    async def monitor_credits(self) -> Dict[str, Any]:
         """Monitor credit usage."""
-
-class PortkeyGatewayAdapter(GatewayAdapter):
     """Adapter for Portkey API Gateway."""
-
-    def __init__(self, config: Dict[str, Any]):
         """Initialize with configuration."""
-        self.config = config
-        self._client = None
-        self._initialized = False
         self._virtual_keys = config.get("virtual_keys", {})
         self._default_models = config.get("default_models", {})
         self._route_cache = {}
@@ -80,12 +17,6 @@ class PortkeyGatewayAdapter(GatewayAdapter):
 
     async def initialize(self) -> bool:
         """Initialize the Portkey client."""
-        try:
-            # Dynamically import to avoid hard dependency
-            import portkey_ai
-
-            # Initialize Portkey client with API key
-            self._client = portkey_ai.Portkey(
                 api_key=self.config.get("api_key"),
                 # Include other options like retries
                 max_retries=3,
@@ -95,10 +26,14 @@ class PortkeyGatewayAdapter(GatewayAdapter):
             logger.info("Portkey gateway adapter initialized successfully")
             self._initialized = True
             return True
-        except ImportError:
+        except Exception:
+
+            pass
             logger.error("Failed to import portkey_ai - please install with: pip install portkey-ai")
             return False
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to initialize Portkey gateway: {str(e)}")
             return False
 
@@ -111,7 +46,6 @@ class PortkeyGatewayAdapter(GatewayAdapter):
         max_tokens: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Generate text completion using Portkey."""
-        if not self._initialized:
             raise RuntimeError("Portkey gateway not initialized")
 
         # Select appropriate model based on agent type
@@ -122,6 +56,9 @@ class PortkeyGatewayAdapter(GatewayAdapter):
         virtual_key = self._get_virtual_key_for_provider(provider)
 
         try:
+
+
+            pass
             # Use the Portkey client with specific virtual key
             with self._client.use_virtual_key(virtual_key):
                 response = await self._client.completions.create(
@@ -143,7 +80,9 @@ class PortkeyGatewayAdapter(GatewayAdapter):
                 },
                 "finish_reason": response.choices[0].finish_reason,
             }
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Portkey completion error: {str(e)}")
             self._record_error(provider)
             raise
@@ -157,7 +96,6 @@ class PortkeyGatewayAdapter(GatewayAdapter):
         max_tokens: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Generate chat completion using Portkey."""
-        if not self._initialized:
             raise RuntimeError("Portkey gateway not initialized")
 
         # Select appropriate model based on agent type
@@ -168,6 +106,9 @@ class PortkeyGatewayAdapter(GatewayAdapter):
         virtual_key = self._get_virtual_key_for_provider(provider)
 
         try:
+
+
+            pass
             # Use the Portkey client with specific virtual key
             with self._client.use_virtual_key(virtual_key):
                 response = await self._client.chat.completions.create(
@@ -190,15 +131,15 @@ class PortkeyGatewayAdapter(GatewayAdapter):
                 },
                 "finish_reason": response.choices[0].finish_reason,
             }
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Portkey chat completion error: {str(e)}")
             self._record_error(provider)
             raise
 
     async def close(self) -> None:
         """Close Portkey client connections."""
-        self._initialized = False
-        # Portkey client doesn't need explicit cleanup
         logger.info("Portkey adapter connections closed")
 
     @property
@@ -209,14 +150,13 @@ class PortkeyGatewayAdapter(GatewayAdapter):
     @property
     def is_initialized(self) -> bool:
         """Check if gateway is initialized."""
-        return self._initialized
-
-    async def monitor_credits(self) -> Dict[str, Any]:
         """Monitor credit usage for Portkey."""
-        if not self._initialized:
             raise RuntimeError("Portkey gateway not initialized")
 
         try:
+
+
+            pass
             # This is a placeholder - implement actual credit monitoring
             # when Portkey provides this API
             return {
@@ -224,7 +164,9 @@ class PortkeyGatewayAdapter(GatewayAdapter):
                 "credits_remaining": 0,
                 "credits_limit": 0,
             }
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to monitor Portkey credits: {str(e)}")
             return {
                 "credits_used": 0,
@@ -235,13 +177,6 @@ class PortkeyGatewayAdapter(GatewayAdapter):
 
     def _select_model(self, agent_type: Optional[str], model: Optional[str]) -> str:
         """Select appropriate model based on agent type or explicit model."""
-        # If model is explicitly provided, use it
-        if model:
-            return model
-
-        # If agent type is provided, check agent-model mapping
-        if agent_type:
-            # Get agent model mapping from config
             agent_mapping = self.config.get("agent_model_mapping", {})
             if agent_type in agent_mapping:
                 return agent_mapping[agent_type]
@@ -260,42 +195,13 @@ class PortkeyGatewayAdapter(GatewayAdapter):
 
     def _get_virtual_key_for_provider(self, provider: str) -> str:
         """Get virtual key for specified provider."""
-        provider_lower = provider.lower()
-
-        # Check if we have a virtual key for this provider
-        if provider_lower in self._virtual_keys:
-            return self._virtual_keys[provider_lower]
-
-        # Default to using the openai virtual key
         return self._virtual_keys.get("openai", "")
 
     def _record_error(self, provider: str) -> None:
         """Record error for provider to support circuit breaker logic."""
-        now = time.time()
-        provider_lower = provider.lower()
-
-        if provider_lower not in self._last_errors:
-            self._last_errors[provider_lower] = []
-
-        # Add current error timestamp
-        self._last_errors[provider_lower].append(now)
-
-        # Keep only errors from the last 5 minutes
-        self._last_errors[provider_lower] = [t for t in self._last_errors[provider_lower] if now - t < 300]  # 5 minutes
-
-class KongGatewayAdapter(GatewayAdapter):
     """Adapter for Kong AI Gateway."""
-
-    def __init__(self, config: Dict[str, Any]):
         """Initialize with configuration."""
-        self.config = config
-        self._initialized = False
-        # Additional Kong-specific initialization here
-
-    async def initialize(self) -> bool:
         """Initialize Kong client connection."""
-        # Kong integration would be implemented here
-        # For now, return a placeholder
         logger.info("Kong gateway adapter initialization not implemented yet")
         return False
 
@@ -308,7 +214,6 @@ class KongGatewayAdapter(GatewayAdapter):
         max_tokens: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Generate text completion using Kong."""
-        # Kong integration would be implemented here
         raise NotImplementedError("Kong gateway adapter is not implemented yet")
 
     async def generate_chat_completion(
@@ -324,7 +229,6 @@ class KongGatewayAdapter(GatewayAdapter):
 
     async def close(self) -> None:
         """Close Kong client connections."""
-        self._initialized = False
         logger.info("Kong adapter connections closed")
 
     @property
@@ -335,23 +239,12 @@ class KongGatewayAdapter(GatewayAdapter):
     @property
     def is_initialized(self) -> bool:
         """Check if gateway is initialized."""
-        return self._initialized
-
-    async def monitor_credits(self) -> Dict[str, Any]:
         """Monitor credit usage for Kong."""
-        # Kong integration would be implemented here
         raise NotImplementedError("Kong gateway adapter is not implemented yet")
 
 class GatewayAdapterFactory:
     """Factory for creating gateway adapters."""
-
-    @staticmethod
-    async def create_adapter(config_path: str = None) -> GatewayAdapter:
         """Create appropriate adapter based on configuration."""
-        # Load configuration
-        gateway_config = GatewayAdapterFactory._load_config(config_path)
-
-        # Get primary provider from config
         primary_provider = gateway_config.get("llm_gateway", {}).get("primary_provider", "portkey")
 
         # Create adapter based on primary provider
@@ -387,14 +280,14 @@ class GatewayAdapterFactory:
     @staticmethod
     def _load_config(config_path: str = None) -> Dict[str, Any]:
         """Load gateway configuration from yaml file."""
-        if not config_path:
-            # Default config path
-            config_path = os.environ.get(
                 "LLM_GATEWAY_CONFIG_PATH",
                 str(Path(__file__).parent.parent / "config" / "llm_gateway_config.yaml"),
             )
 
         try:
+
+
+            pass
             with open(config_path, "r") as f:
                 config = yaml.safe_load(f)
 
@@ -402,7 +295,9 @@ class GatewayAdapterFactory:
             config = GatewayAdapterFactory._process_env_vars(config)
 
             return config
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to load gateway configuration: {str(e)}")
             # Return default configuration
             return {
@@ -420,8 +315,6 @@ class GatewayAdapterFactory:
     @staticmethod
     def _process_env_vars(config: Dict[str, Any]) -> Dict[str, Any]:
         """Process environment variables in configuration."""
-        if isinstance(config, dict):
-            for key, value in config.items():
                 if isinstance(value, str) and value.startswith("${") and value.endswith("}"):
                     # Extract environment variable name
                     env_var = value[2:-1]

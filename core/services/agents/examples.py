@@ -1,26 +1,7 @@
 """
-Example agent implementations for Orchestra AI.
-
-This module provides concrete agent examples that demonstrate
-different agent capabilities and behaviors.
 """
-
-import asyncio
-import logging
-from typing import Any, Dict, List, Optional
-
-from core.business.llm.provider import LLMRequest, get_llm_service
-from core.business.personas.base import PersonaTrait, ResponseStyle, get_persona_manager
-from core.services.agents.base import Agent, AgentCapability, AgentConfig, AgentMessage, get_agent_manager
-
-logger = logging.getLogger(__name__)
-
-class ConversationalAgent(Agent):
     """Agent specialized in natural conversations."""
-
-    async def process_message(self, message: AgentMessage) -> Optional[AgentMessage]:
         """Process conversation messages."""
-        # Check if this is a conversation request
         if message.metadata.get("type") != "conversation":
             return None
 
@@ -66,21 +47,14 @@ class ConversationalAgent(Agent):
 
     async def think(self) -> None:
         """Think about conversation patterns and user preferences."""
-        # Analyze recent conversations
         recent_conversations = await self.recall("conversation:", limit=20)
 
         if recent_conversations:
             # Could analyze patterns, sentiment, topics, etc.
-            logger.debug(f"Analyzed {len(recent_conversations)} recent conversations")
 
     async def act(self) -> None:
         """No autonomous actions for conversational agent."""
-        pass
-
-class TaskExecutorAgent(Agent):
     """Agent specialized in executing specific tasks."""
-
-    async def process_message(self, message: AgentMessage) -> Optional[AgentMessage]:
         """Process task execution requests."""
         message_type = message.metadata.get("type")
 
@@ -116,16 +90,10 @@ class TaskExecutorAgent(Agent):
 
     async def think(self) -> None:
         """Think about task optimization and resource allocation."""
-        # Check active workflows
-        if len(self.state.active_workflows) > self.config.max_concurrent_tasks * 0.8:
             logger.warning(f"Agent {self.config.name} approaching task limit")
 
     async def act(self) -> None:
         """Check for pending tasks and optimize execution."""
-        # Could implement task queue optimization, resource management, etc.
-        pass
-
-    async def _execute_task(self, task: str, metadata: Dict[str, Any]) -> Any:
         """Execute a specific task."""
         task_type = metadata.get("task_type", "generic")
 
@@ -147,8 +115,6 @@ class TaskExecutorAgent(Agent):
 
 class ResearchAgent(Agent):
     """Agent specialized in research and information gathering."""
-
-    async def process_message(self, message: AgentMessage) -> Optional[AgentMessage]:
         """Process research requests."""
         if message.metadata.get("type") != "research_request":
             return None
@@ -174,25 +140,8 @@ class ResearchAgent(Agent):
 
     async def think(self) -> None:
         """Think about research strategies and knowledge gaps."""
-        # Could analyze research patterns, identify knowledge gaps, etc.
-        pass
-
-    async def act(self) -> None:
         """Proactively research trending topics."""
-        # Could implement autonomous research based on patterns
-        pass
-
-    async def _research_topic(self, topic: str, depth: str) -> Dict[str, Any]:
         """Research a specific topic."""
-        llm_service = get_llm_service()
-
-        # Generate research queries
-        queries = await self._generate_research_queries(topic, depth)
-
-        # Gather information
-        results = []
-        for query in queries:
-            request = LLMRequest(
                 prompt=f"Provide detailed information about: {query}",
                 max_tokens=1000,
                 temperature=0.3,
@@ -219,8 +168,6 @@ class ResearchAgent(Agent):
 
     async def _generate_research_queries(self, topic: str, depth: str) -> List[str]:
         """Generate research queries based on topic and depth."""
-        llm_service = get_llm_service()
-
         num_queries = 3 if depth == "standard" else 5 if depth == "deep" else 2
 
         request = LLMRequest(
@@ -246,8 +193,6 @@ class ResearchAgent(Agent):
 
 class CollaborativeAgent(Agent):
     """Agent that coordinates with other agents."""
-
-    async def process_message(self, message: AgentMessage) -> Optional[AgentMessage]:
         """Process collaboration requests."""
         message_type = message.metadata.get("type")
 
@@ -268,29 +213,10 @@ class CollaborativeAgent(Agent):
 
     async def think(self) -> None:
         """Think about collaboration strategies."""
-        # Analyze agent capabilities and workloads
-        agent_manager = get_agent_manager()
-        agents = agent_manager.list_agents()
-
-        # Could optimize agent assignments based on capabilities and workload
-        logger.debug(f"Monitoring {len(agents)} agents for collaboration")
 
     async def act(self) -> None:
         """Proactively identify collaboration opportunities."""
-        # Could analyze pending tasks and suggest collaborations
-        pass
-
-    async def _coordinate_task(self, task: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """Coordinate task execution across multiple agents."""
-        agent_manager = get_agent_manager()
-
-        # Determine required capabilities
-        required_capabilities = self._analyze_task_requirements(task)
-
-        # Assign subtasks to agents
-        assignments = {}
-        for capability in required_capabilities:
-            agent_id = await agent_manager.assign_task(
                 task=f"Subtask for {task}: {capability.value}",
                 required_capability=capability,
             )
@@ -304,11 +230,6 @@ class CollaborativeAgent(Agent):
 
     def _analyze_task_requirements(self, task: str) -> List[AgentCapability]:
         """Analyze task to determine required capabilities."""
-        # Simple keyword-based analysis
-        task_lower = task.lower()
-
-        capabilities = []
-
         if any(word in task_lower for word in ["analyze", "research", "investigate"]):
             capabilities.append(AgentCapability.RESEARCH)
 
@@ -329,11 +250,6 @@ class CollaborativeAgent(Agent):
 
 def create_example_agents() -> List[Agent]:
     """Create example agent instances."""
-    agents = []
-
-    # Conversational Agent
-    conv_agent = ConversationalAgent(
-        AgentConfig(
             id="conv_agent_1",
             name="Friendly Conversationalist",
             description="Engages in natural conversations with users",
@@ -384,10 +300,4 @@ def create_example_agents() -> List[Agent]:
 
 def register_example_agents() -> None:
     """Register all example agents with the manager."""
-    agent_manager = get_agent_manager()
-
-    agents = create_example_agents()
-    for agent in agents:
-        agent_manager.register_agent(agent)
-
     logger.info(f"Registered {len(agents)} example agents")

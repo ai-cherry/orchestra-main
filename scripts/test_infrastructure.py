@@ -1,21 +1,12 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Test Infrastructure Setup
-========================
-Quick tests to verify the AI Orchestra infrastructure is working
 """
-
-import json
-import subprocess
-import sys
-from typing import Any, Dict, List
-
-def run_command(cmd: List[str]) -> Dict[str, Any]:
     """Run a command and return the result"""
-    try:
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         return {"success": True, "output": result.stdout, "error": None}
-    except subprocess.CalledProcessError as e:
+    except Exception:
+
+        pass
         return {"success": False, "output": e.stdout, "error": e.stderr}
 
 def test_pulumi_stack():
@@ -69,6 +60,8 @@ def test_pod_status():
 
     if result["success"]:
         try:
+
+            pass
             pods = json.loads(result["output"])
             running_pods = 0
             failed_pods = []
@@ -88,7 +81,10 @@ def test_pod_status():
 
             return running_pods > 0
 
-        except json.JSONDecodeError:
+        except Exception:
+
+
+            pass
             print("❌ Failed to parse pod status")
             return False
     else:
@@ -107,6 +103,8 @@ def test_services():
 
         if result["success"]:
             try:
+
+                pass
                 svc = json.loads(result["output"])
                 svc_type = svc["spec"]["type"]
 
@@ -122,7 +120,10 @@ def test_services():
 
                 available_services.append(service)
 
-            except json.JSONDecodeError:
+            except Exception:
+
+
+                pass
                 print(f"⚠️  {service}: Cannot parse service info")
         else:
             print(f"❌ {service}: Not found")
@@ -137,6 +138,8 @@ def test_pulumi_outputs():
 
     if result["success"]:
         try:
+
+            pass
             outputs = json.loads(result["output"])
             print("✅ Available outputs:")
             for key, value in outputs.items():
@@ -145,7 +148,9 @@ def test_pulumi_outputs():
                 else:
                     print(f"   - {key}: {value}")
             return True
-        except json.JSONDecodeError:
+        except Exception:
+
+            pass
             print("❌ Failed to parse outputs")
             return False
     else:
@@ -171,11 +176,15 @@ def main():
 
     for test_name, test_func in tests:
         try:
+
+            pass
             if test_func():
                 passed += 1
             else:
                 failed += 1
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"❌ {test_name} failed with error: {e}")
             failed += 1
 

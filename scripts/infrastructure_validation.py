@@ -1,19 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Infrastructure Validation Script
-Tests all API connections, tokens, and services
 """
-
-import json
-import os
-import subprocess
-import sys
-from datetime import datetime
-from typing import Tuple
-
-import requests
-
-# Color codes for output
 GREEN = "\033[92m"
 RED = "\033[91m"
 YELLOW = "\033[93m"
@@ -34,16 +22,12 @@ def print_header(title: str):
 
 def check_env_var(var_name: str) -> Tuple[bool, str]:
     """Check if environment variable is set"""
-    value = os.environ.get(var_name)
-    if value:
-        # Mask sensitive data
         masked = value[:8] + "..." + value[-4:] if len(value) > 12 else "***"
         return True, masked
     return False, "Not set"
 
 def test_digitalocean_api(token: str) -> Tuple[bool, str]:
     """Test DigitalOcean API access"""
-    try:
         headers = {"Authorization": f"Bearer {token}"}
         response = requests.get("https://api.digitalocean.com/v2/account", headers=headers, timeout=10)
         if response.status_code == 200:
@@ -51,37 +35,34 @@ def test_digitalocean_api(token: str) -> Tuple[bool, str]:
             return True, f"Account: {data['account']['email']}"
         else:
             return False, f"API returned {response.status_code}"
-    except Exception as e:
+    except Exception:
+
+        pass
         return False, str(e)
 
 def test_mongodb_connection(uri: str) -> Tuple[bool, str]:
     """Test MongoDB connection"""
-    try:
-        from pymongo import MongoClient
-
-        client = MongoClient(uri, serverSelectionTimeoutMS=5000)
-        # Force connection
-        client.server_info()
-        db_names = client.list_database_names()
         return True, f"Connected, {len(db_names)} databases found"
-    except Exception as e:
+    except Exception:
+
+        pass
         return False, str(e)
 
 def test_weaviate_connection(url: str, api_key: str) -> Tuple[bool, str]:
     """Test Weaviate connection"""
-    try:
         headers = {"Authorization": f"Bearer {api_key}"}
         response = requests.get(f"{url}/v1/meta", headers=headers, timeout=10)
         if response.status_code == 200:
             return True, "Weaviate cluster accessible"
         else:
             return False, f"API returned {response.status_code}"
-    except Exception as e:
+    except Exception:
+
+        pass
         return False, str(e)
 
 def test_github_pat(pat: str) -> Tuple[bool, str]:
     """Test GitHub Personal Access Token"""
-    try:
         headers = {"Authorization": f"token {pat}"}
         response = requests.get("https://api.github.com/user", headers=headers, timeout=10)
         if response.status_code == 200:
@@ -89,13 +70,13 @@ def test_github_pat(pat: str) -> Tuple[bool, str]:
             return True, f"User: {data['login']}"
         else:
             return False, f"API returned {response.status_code}"
-    except Exception as e:
+    except Exception:
+
+        pass
         return False, str(e)
 
 def check_pulumi_state() -> Tuple[bool, str]:
     """Check Pulumi stack state"""
-    try:
-        # Check if we're in infra directory
         if os.path.exists("infra"):
             os.chdir("infra")
 
@@ -109,7 +90,9 @@ def check_pulumi_state() -> Tuple[bool, str]:
             return True, "No stacks configured yet"
         else:
             return False, "Pulumi not configured"
-    except Exception as e:
+    except Exception:
+
+        pass
         return False, str(e)
     finally:
         # Return to original directory

@@ -1,37 +1,7 @@
 """
-Configuration module for AI Orchestration System.
-
-This module provides configuration loading and access for the orchestration
-system, centralizing settings management for clarity and maintainability.
 """
-
-import logging
-import os
-from typing import Dict, List, Optional
-
-import yaml
-from pydantic import SecretStr
-from pydantic_settings import BaseSettings, SettingsConfigDict
-
-# Use relative import for packages within the same project
-try:
-    from ....packages.shared.src.models.core_models import PersonaConfig
-except ImportError:
-    # Fallback to absolute import if relative import fails
-    from packages.shared.src.models.core_models import PersonaConfig
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-class Settings(BaseSettings):
     """
-    Configuration settings for the AI Orchestration System.
-
-    Centralizes all configuration settings for the application,
-    with automatic loading from environment variables and sensible defaults.
     """
-
-    # Basic configuration
     APP_NAME: str = "AI Orchestration System"
     ENVIRONMENT: str = "development"
     DEBUG: bool = False
@@ -74,22 +44,7 @@ class Settings(BaseSettings):
 
 def load_all_persona_configs(settings_instance: Settings) -> Dict[str, PersonaConfig]:
     """
-    Load all persona configurations from YAML files.
-
-    Scans the persona config directory specified in the settings
-    and loads each YAML file into a PersonaConfig object.
-
-    Args:
-        settings_instance: The settings instance containing configuration paths
-
-    Returns:
-        Dict[str, PersonaConfig]: A dictionary mapping persona names to their configuration objects
     """
-    personas: Dict[str, PersonaConfig] = {}
-    persona_dir = settings_instance.PERSONA_CONFIG_PATH
-
-    # Check if the directory exists
-    if not os.path.exists(persona_dir):
         logger.warning(f"Persona config directory '{persona_dir}' not found")
         return personas
 
@@ -98,6 +53,8 @@ def load_all_persona_configs(settings_instance: Settings) -> Dict[str, PersonaCo
         if filename.endswith((".yaml", ".yml")):
             file_path = os.path.join(persona_dir, filename)
             try:
+
+                pass
                 with open(file_path, "r") as file:
                     # Load YAML content
                     yaml_data = yaml.safe_load(file)
@@ -110,7 +67,9 @@ def load_all_persona_configs(settings_instance: Settings) -> Dict[str, PersonaCo
                     personas[persona_name] = persona_config
 
                     logger.info(f"Loaded persona configuration for '{persona_name}'")
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Error loading persona config from {file_path}: {str(e)}")
 
     if not personas:
@@ -126,21 +85,6 @@ logger.info(f"Loaded configuration for {settings.APP_NAME} in {settings.ENVIRONM
 
 def get_settings() -> Settings:
     """
-    Get application settings.
-
-    Returns:
-        Settings: Application settings instance.
     """
-    return settings
-
-def get_persona_configs() -> Dict[str, PersonaConfig]:
     """
-    Get all persona configurations.
-
-    This function is a convenience wrapper around load_all_persona_configs
-    that uses the global settings instance.
-
-    Returns:
-        Dict[str, PersonaConfig]: A dictionary mapping persona names to their configuration objects
     """
-    return load_all_persona_configs(settings)

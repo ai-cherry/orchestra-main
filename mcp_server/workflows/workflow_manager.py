@@ -1,40 +1,13 @@
 #!/usr/bin/env python3
 """
-workflow_manager.py - Cross-Tool Workflow Manager
-
-This module provides a manager for executing workflows across different AI tools,
-handling workflow loading, parameter substitution, and result aggregation.
 """
-
-import json
-import logging
-from pathlib import Path
-from typing import Any, Dict, List, Optional
-
-# Configure logging
 logger = logging.getLogger("mcp-workflow-manager")
 
 class WorkflowManager:
     """Manager for cross-tool workflows."""
-
-    def __init__(self, tool_manager, memory_store):
-        """Initialize the workflow manager.
-
-        Args:
-            tool_manager: ToolManager instance for executing tool operations
-            memory_store: MemoryStore instance for storing workflow results
         """
-        self.tool_manager = tool_manager
-        self.memory_store = memory_store
-        self.workflows = {}
-
-        # Load workflows from directories
-        self._load_workflows()
-
-    def _load_workflows(self):
+        """
         """Load workflows from directories."""
-        # Directories to search for workflows
-        workflow_dirs = [
             Path("/workspaces/orchestra-main/mcp_workflows"),
             Path("/workspaces/orchestra-main/user_workflows"),
         ]
@@ -43,23 +16,22 @@ class WorkflowManager:
             if workflow_dir.exists():
                 for workflow_file in workflow_dir.glob("*.json"):
                     try:
+
+                        pass
                         with open(workflow_file, "r") as f:
                             workflow_def = json.load(f)
                             workflow_id = workflow_def.get("workflow_id")
                             if workflow_id:
                                 self.workflows[workflow_id] = workflow_def
                                 logger.info(f"Loaded workflow: {workflow_id}")
-                    except Exception as e:
+                    except Exception:
+
+                        pass
                         logger.error(f"Error loading workflow {workflow_file}: {e}")
 
     def get_available_workflows(self) -> Dict[str, Any]:
-        """Get all available workflows.
-
-        Returns:
-            Dictionary of workflow IDs to workflow metadata
         """
-        return {
-            workflow_id: {
+        """
                 "description": workflow_def.get("description", ""),
                 "target_tools": workflow_def.get("target_tools", []),
                 "steps": len(workflow_def.get("steps", [])),
@@ -73,17 +45,8 @@ class WorkflowManager:
         parameters: Dict[str, Any] = None,
         tool: Optional[str] = None,
     ) -> Optional[str]:
-        """Execute a workflow.
-
-        Args:
-            workflow_id: The ID of the workflow to execute
-            parameters: Optional parameters to substitute in the workflow
-            tool: Optional tool to use for execution
-
-        Returns:
-            The workflow result if successful, None otherwise
         """
-        if workflow_id not in self.workflows:
+        """
             logger.error(f"Workflow not found: {workflow_id}")
             return None
 
@@ -154,16 +117,8 @@ class WorkflowManager:
         return final_result
 
     def execute_cross_tool_workflow(self, workflow_id: str, tools: List[str] = None) -> Optional[str]:
-        """Execute a workflow across multiple tools.
-
-        Args:
-            workflow_id: The ID of the workflow to execute
-            tools: Optional list of tools to use for execution
-
-        Returns:
-            The workflow result if successful, None otherwise
         """
-        if workflow_id not in self.workflows:
+        """
             logger.error(f"Workflow not found: {workflow_id}")
             return None
 

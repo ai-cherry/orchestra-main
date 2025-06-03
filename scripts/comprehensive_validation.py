@@ -1,37 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Comprehensive Validation Script for AI Orchestration System
-Tests all components, integrations, and workflows
 """
-
-import os
-import sys
-import json
-import asyncio
-import time
-import subprocess
-from datetime import datetime
-from typing import Dict, List, Tuple, Optional
-from pathlib import Path
-import requests
-import psycopg2
-import yaml
-import aiohttp
-
-# Add parent directory to path
-sys.path.append(str(Path(__file__).parent.parent))
-
-from ai_components.orchestration.ai_orchestrator import (
-    WorkflowOrchestrator, TaskDefinition, AgentRole,
-    DatabaseLogger, WeaviateManager
-)
-
-
-class SystemValidator:
     """Comprehensive system validation"""
-    
-    def __init__(self):
-        self.results = {
             "timestamp": datetime.now().isoformat(),
             "components": {},
             "integrations": {},
@@ -90,11 +61,15 @@ class SystemValidator:
         for name, validator in components.items():
             print(f"   Checking {name}...", end=" ")
             try:
+
+                pass
                 result = await validator()
                 self.results["components"][name] = result
                 status = "✓" if result["status"] == "healthy" else "✗"
                 print(f"{status} {result.get('message', '')}")
-            except Exception as e:
+            except Exception:
+
+                pass
                 self.results["components"][name] = {
                     "status": "error",
                     "error": str(e)
@@ -124,6 +99,8 @@ class SystemValidator:
                 
                 # Check version
                 try:
+
+                    pass
                     version_result = subprocess.run(
                         [path, "version"],
                         capture_output=True,
@@ -133,7 +110,9 @@ class SystemValidator:
                     if version_result.returncode == 0:
                         result["checks"]["version"] = version_result.stdout.strip()
                         result["status"] = "healthy"
-                except:
+                except Exception:
+
+                    pass
                     pass
                 break
         
@@ -143,12 +122,16 @@ class SystemValidator:
         
         # Check API connectivity
         try:
+
+            pass
             response = requests.get("https://api.eigencode.dev/health", timeout=5)
             result["checks"]["api"] = {
                 "reachable": response.status_code == 200,
                 "status_code": response.status_code
             }
-        except:
+        except Exception:
+
+            pass
             result["checks"]["api"] = {"reachable": False}
         
         return result
@@ -163,6 +146,8 @@ class SystemValidator:
         
         # Check module
         try:
+
+            pass
             from ai_components.cursor_ai.cursor_integration import CursorAIClient
             result["checks"]["module"] = "available"
             
@@ -170,7 +155,10 @@ class SystemValidator:
             client = CursorAIClient(api_key)
             result["checks"]["client"] = "initialized"
             
-        except ImportError:
+        except Exception:
+
+            
+            pass
             result["checks"]["module"] = "missing"
             result["status"] = "unhealthy"
         
@@ -186,6 +174,8 @@ class SystemValidator:
         
         # Check module
         try:
+
+            pass
             from ai_components.roo_code.roo_integration import RooCodeClient
             result["checks"]["module"] = "available"
             
@@ -193,7 +183,10 @@ class SystemValidator:
             client = RooCodeClient(api_key)
             result["checks"]["client"] = "initialized"
             
-        except ImportError:
+        except Exception:
+
+            
+            pass
             result["checks"]["module"] = "missing"
             result["status"] = "unhealthy"
         
@@ -207,17 +200,23 @@ class SystemValidator:
         
         # Check health endpoint
         try:
+
+            pass
             response = requests.get(f"{mcp_url}/", timeout=5)
             if response.status_code == 200:
                 data = response.json()
                 if data.get("message") == "AI Orchestrator MCP Server":
                     result["status"] = "healthy"
                     result["checks"]["health"] = "ok"
-        except Exception as e:
+        except Exception:
+
+            pass
             result["checks"]["health"] = f"error: {str(e)}"
         
         # Check task endpoints
         try:
+
+            pass
             # Test task creation
             test_task = {
                 "task_id": f"validation_test_{int(time.time())}",
@@ -240,7 +239,9 @@ class SystemValidator:
                 requests.delete(f"{mcp_url}/tasks/{task_id}")
             else:
                 result["checks"]["task_creation"] = f"failed: {response.status_code}"
-        except Exception as e:
+        except Exception:
+
+            pass
             result["checks"]["task_creation"] = f"error: {str(e)}"
         
         return result
@@ -250,6 +251,9 @@ class SystemValidator:
         result = {"status": "unhealthy", "checks": {}}
         
         try:
+
+        
+            pass
             # Initialize database logger
             self.db_logger = DatabaseLogger()
             
@@ -260,12 +264,7 @@ class SystemValidator:
                 # Check tables
                 with conn.cursor() as cur:
                     cur.execute("""
-                        SELECT table_name 
-                        FROM information_schema.tables 
-                        WHERE table_schema = 'public'
-                    """)
-                    tables = [row[0] for row in cur.fetchall()]
-                    
+                    """
                     if "orchestration_logs" in tables:
                         result["checks"]["tables"] = "ok"
                         result["status"] = "healthy"
@@ -274,14 +273,13 @@ class SystemValidator:
                     
                     # Check recent logs
                     cur.execute("""
-                        SELECT COUNT(*) 
-                        FROM orchestration_logs 
-                        WHERE created_at > NOW() - INTERVAL '1 hour'
-                    """)
-                    count = cur.fetchone()[0]
+                    """
                     result["checks"]["recent_logs"] = count
                     
-        except Exception as e:
+        except Exception:
+
+                    
+            pass
             result["checks"]["connection"] = f"error: {str(e)}"
         
         return result
@@ -291,6 +289,9 @@ class SystemValidator:
         result = {"status": "unhealthy", "checks": {}}
         
         try:
+
+        
+            pass
             # Test workflow creation
             orchestrator = WorkflowOrchestrator()
             workflow_id = f"validation_{int(time.time())}"
@@ -317,7 +318,10 @@ class SystemValidator:
             else:
                 result["checks"]["workflow_creation"] = "failed"
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             result["checks"]["error"] = str(e)
         
         return result
@@ -335,11 +339,15 @@ class SystemValidator:
         for name, validator in integrations.items():
             print(f"   Checking {name}...", end=" ")
             try:
+
+                pass
                 result = await validator()
                 self.results["integrations"][name] = result
                 status = "✓" if result["status"] == "connected" else "✗"
                 print(f"{status} {result.get('message', '')}")
-            except Exception as e:
+            except Exception:
+
+                pass
                 self.results["integrations"][name] = {
                     "status": "error",
                     "error": str(e)
@@ -351,6 +359,9 @@ class SystemValidator:
         result = {"status": "disconnected", "checks": {}}
         
         try:
+
+        
+            pass
             # Initialize Weaviate manager
             self.weaviate_manager = WeaviateManager()
             
@@ -383,7 +394,10 @@ class SystemValidator:
             else:
                 result["checks"]["connection"] = "not ready"
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             result["checks"]["error"] = str(e)
         
         return result
@@ -400,6 +414,9 @@ class SystemValidator:
             return result
         
         try:
+
+        
+            pass
             # Check API connectivity
             headers = {'Authorization': f'Bearer {api_key}'}
             response = requests.get(
@@ -418,7 +435,7 @@ class SystemValidator:
                     workspace_response = requests.get(
                         f"{api_url}/v1/workspaces/{workspace_id}",
                         headers=headers
-                    )
+                    , timeout=30)
                     if workspace_response.status_code == 200:
                         result["checks"]["workspace"] = "ok"
                     else:
@@ -426,7 +443,10 @@ class SystemValidator:
             else:
                 result["checks"]["api"] = f"error: {response.status_code}"
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             result["checks"]["error"] = str(e)
         
         return result
@@ -471,11 +491,15 @@ class SystemValidator:
         for name, validator in workflows.items():
             print(f"   Testing {name}...", end=" ")
             try:
+
+                pass
                 result = await validator()
                 self.results["workflows"][name] = result
                 status = "✓" if result["status"] == "passed" else "✗"
                 print(f"{status} {result.get('message', '')}")
-            except Exception as e:
+            except Exception:
+
+                pass
                 self.results["workflows"][name] = {
                     "status": "error",
                     "error": str(e)
@@ -492,6 +516,9 @@ class SystemValidator:
         start_time = time.time()
         
         try:
+
+        
+            pass
             context = await orchestrator.create_workflow(workflow_id)
             
             # Create simple task
@@ -508,7 +535,9 @@ class SystemValidator:
                 result["status"] = "passed"
                 result["metrics"]["duration"] = time.time() - start_time
                 result["metrics"]["tasks_completed"] = 1
-        except Exception as e:
+        except Exception:
+
+            pass
             result["error"] = str(e)
         
         return result
@@ -523,6 +552,9 @@ class SystemValidator:
         start_time = time.time()
         
         try:
+
+        
+            pass
             context = await orchestrator.create_workflow(workflow_id)
             
             # Create parallel tasks
@@ -543,7 +575,9 @@ class SystemValidator:
                 result["metrics"]["duration"] = time.time() - start_time
                 result["metrics"]["tasks_completed"] = len(tasks)
                 result["metrics"]["parallelism_efficiency"] = len(tasks) / result["metrics"]["duration"]
-        except Exception as e:
+        except Exception:
+
+            pass
             result["error"] = str(e)
         
         return result
@@ -553,6 +587,9 @@ class SystemValidator:
         result = {"status": "failed", "checks": {}}
         
         try:
+
+        
+            pass
             from scripts.error_handling_enhancements import ErrorRecoveryOrchestrator
             
             recovery = ErrorRecoveryOrchestrator()
@@ -577,7 +614,10 @@ class SystemValidator:
             else:
                 result["checks"]["retry"] = "failed"
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             result["error"] = str(e)
         
         return result
@@ -589,6 +629,9 @@ class SystemValidator:
         result = {"status": "unknown", "metrics": {}}
         
         try:
+
+        
+            pass
             from scripts.performance_analyzer import PerformanceAnalyzer
             
             analyzer = PerformanceAnalyzer()
@@ -615,7 +658,10 @@ class SystemValidator:
                 result["status"] = "needs_optimization"
                 print("⚠️  Performance needs optimization")
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             result["error"] = str(e)
             print(f"✗ Error: {str(e)}")
         
@@ -628,6 +674,9 @@ class SystemValidator:
         result = {"status": "unknown", "score": 0, "issues": []}
         
         try:
+
+        
+            pass
             from scripts.security_audit import SecurityAuditor
             
             auditor = SecurityAuditor()
@@ -653,7 +702,10 @@ class SystemValidator:
                 result["status"] = "vulnerable"
                 print(f"✗ Security score: {result['score']}/100")
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             result["error"] = str(e)
             print(f"✗ Error: {str(e)}")
         
@@ -673,6 +725,8 @@ class SystemValidator:
             
             # Validate workflow syntax
             try:
+
+                pass
                 with open(workflow_file, 'r') as f:
                     workflow = yaml.safe_load(f)
                 
@@ -684,7 +738,9 @@ class SystemValidator:
                 else:
                     result["checks"]["syntax"] = "invalid"
                     print("   ✗ Invalid workflow syntax")
-            except Exception as e:
+            except Exception:
+
+                pass
                 result["checks"]["syntax"] = f"error: {str(e)}"
                 print(f"   ✗ Error parsing workflow: {str(e)}")
         else:
@@ -701,22 +757,30 @@ class SystemValidator:
         
         # Check Prometheus
         try:
+
+            pass
             response = requests.get("http://localhost:9090/-/healthy", timeout=2)
             if response.status_code == 200:
                 result["checks"]["prometheus"] = "healthy"
             else:
                 result["checks"]["prometheus"] = f"unhealthy: {response.status_code}"
-        except:
+        except Exception:
+
+            pass
             result["checks"]["prometheus"] = "not running"
         
         # Check Grafana
         try:
+
+            pass
             response = requests.get("http://localhost:3000/api/health", timeout=2)
             if response.status_code == 200:
                 result["checks"]["grafana"] = "healthy"
             else:
                 result["checks"]["grafana"] = f"unhealthy: {response.status_code}"
-        except:
+        except Exception:
+
+            pass
             result["checks"]["grafana"] = "not running"
         
         # Determine overall status
@@ -731,10 +795,6 @@ class SystemValidator:
     
     def calculate_overall_status(self):
         """Calculate overall system status"""
-        total_checks = 0
-        passed_checks = 0
-        
-        # Count component checks
         for component, result in self.results["components"].items():
             total_checks += 1
             if result.get("status") == "healthy":
@@ -774,12 +834,6 @@ class SystemValidator:
 
 async def main():
     """Main validation function"""
-    validator = SystemValidator()
-    
-    # Run validation
-    results = await validator.validate_all()
-    
-    # Print summary
     print("\n" + "=" * 60)
     print("VALIDATION SUMMARY")
     print("=" * 60)
@@ -824,6 +878,8 @@ async def main():
     # Store in Weaviate if available
     if validator.weaviate_manager:
         try:
+
+            pass
             validator.weaviate_manager.store_context(
                 workflow_id="system_validation",
                 task_id=f"validation_{int(time.time())}",
@@ -835,7 +891,9 @@ async def main():
                 }
             )
             print("Report stored in Weaviate Cloud")
-        except:
+        except Exception:
+
+            pass
             pass
     
     # Return exit code based on status

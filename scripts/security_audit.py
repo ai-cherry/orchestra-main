@@ -1,37 +1,7 @@
 #!/usr/bin/env python3
 """
-Security Audit Script for AI Orchestrator
-Checks API secret handling, validates configurations, and implements security enhancements
 """
-
-import os
-import sys
-import json
-import re
-import subprocess
-import hashlib
-import secrets
-from datetime import datetime
-from typing import Dict, List, Optional, Tuple
-from pathlib import Path
-import yaml
-import psycopg2
-from cryptography.fernet import Fernet
-import requests
-
-# Add parent directory to path
-sys.path.append(str(Path(__file__).parent.parent))
-
-from ai_components.orchestration.ai_orchestrator import DatabaseLogger, WeaviateManager
-
-
-class SecurityAuditor:
     """Performs comprehensive security audit of the AI orchestration system"""
-    
-    def __init__(self):
-        self.db_logger = DatabaseLogger()
-        self.weaviate_manager = WeaviateManager()
-        self.audit_results = {
             "timestamp": datetime.now().isoformat(),
             "findings": [],
             "recommendations": [],
@@ -44,7 +14,6 @@ class SecurityAuditor:
     def add_finding(self, category: str, severity: str, issue: str, 
                    details: str, recommendation: str, code_fix: Optional[str] = None):
         """Add a security finding to the audit results"""
-        finding = {
             "category": category,
             "severity": severity,
             "issue": issue,
@@ -139,10 +108,13 @@ class SecurityAuditor:
                     # Skip .git and __pycache__
                     dirs[:] = [d for d in dirs if d not in ['.git', '__pycache__']]
                     
-                    for file in files:
+                    # TODO: Consider using list comprehension for better performance
+ for file in files:
                         if file.endswith(('.py', '.yml', '.yaml', '.json', '.sh')):
                             file_path = os.path.join(root, file)
                             try:
+
+                                pass
                                 with open(file_path, 'r') as f:
                                     content = f.read()
                                     
@@ -167,7 +139,9 @@ class SecurityAuditor:
                                                 "Remove hardcoded secrets and use environment variables",
                                                 f"# Replace with:\n{var_name} = os.environ.get('{var_name.upper()}')"
                                             )
-                            except Exception as e:
+                            except Exception:
+
+                                pass
                                 pass
         
         # Check GitHub Actions for proper secret usage
@@ -185,7 +159,6 @@ class SecurityAuditor:
     
     def _check_workflow_secrets(self, workflow: Dict, file_path: Path, results: Dict):
         """Check GitHub workflow for proper secret usage"""
-        # Look for direct secret usage without secrets context
         def check_dict(d, path=""):
             if isinstance(d, dict):
                 for k, v in d.items():
@@ -235,23 +208,12 @@ class SecurityAuditor:
                         "MCP server lacks authentication",
                         "The MCP server does not implement authentication mechanisms",
                         "Implement JWT or API key authentication",
-                        """from fastapi import Depends, HTTPException, Security
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-
-security = HTTPBearer()
-
-async def verify_token(credentials: HTTPAuthorizationCredentials = Security(security)):
-    token = credentials.credentials
-    # Verify token logic here
-    if not is_valid_token(token):
+                        """
         raise HTTPException(status_code=403, detail="Invalid authentication")
     return token
 
 # Add to endpoints:
 @app.post("/tasks", dependencies=[Depends(verify_token)])"""
-                    )
-                
-                # Check for HTTPS
                 if "https" not in content.lower() and "ssl" not in content.lower():
                     self.add_finding(
                         "mcp_server",
@@ -259,17 +221,12 @@ async def verify_token(credentials: HTTPAuthorizationCredentials = Security(secu
                         "MCP server not configured for HTTPS",
                         "The MCP server is not configured to use HTTPS",
                         "Enable HTTPS with SSL certificates",
-                        """# Add SSL configuration
-uvicorn.run(
-    app,
+                        """
     host="0.0.0.0",
     port=8080,
     ssl_keyfile="/path/to/key.pem",
     ssl_certfile="/path/to/cert.pem"
 )"""
-                    )
-                
-                # Check for CORS configuration
                 if "CORS" not in content and "cors" not in content:
                     self.add_finding(
                         "mcp_server",
@@ -277,18 +234,12 @@ uvicorn.run(
                         "CORS not configured",
                         "Cross-Origin Resource Sharing (CORS) is not configured",
                         "Configure CORS with specific allowed origins",
-                        """from fastapi.middleware.cors import CORSMiddleware
-
-app.add_middleware(
-    CORSMiddleware,
+                        """
     allow_origins=["https://trusted-domain.com"],
     allow_credentials=True,
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )"""
-                    )
-                
-                # Check for rate limiting
                 if "ratelimit" not in content.lower() and "throttle" not in content.lower():
                     self.add_finding(
                         "mcp_server",
@@ -296,19 +247,10 @@ app.add_middleware(
                         "No rate limiting implemented",
                         "The MCP server does not implement rate limiting",
                         "Implement rate limiting to prevent abuse",
-                        """from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-
-limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-
+                        """
 @app.post("/tasks")
 @limiter.limit("10/minute")
 async def create_task(...):"""
-                    )
-                
-                # Check for input validation
                 if "validator" not in content and "BaseModel" in content:
                     # Check if Pydantic models have validators
                     model_count = content.count("class") 
@@ -322,22 +264,8 @@ async def create_task(...):"""
                             "Insufficient input validation",
                             "Not all Pydantic models have validators",
                             "Add validators to all input models",
-                            """from pydantic import validator
-
-class TaskCreate(BaseModel):
-    task_id: str
-    name: str
-    
-    @validator('task_id')
-    def validate_task_id(cls, v):
-        if not re.match(r'^[a-zA-Z0-9_-]+$', v):
-            raise ValueError('Invalid task_id format')
+                            """
         return v"""
-                        )
-        
-        return results
-    
-    def assess_weaviate_airbyte_access(self) -> Dict:
         """Assess Weaviate Cloud and Airbyte Cloud access controls"""
         print("Assessing cloud service access controls...")
         
@@ -400,10 +328,14 @@ class TaskCreate(BaseModel):
                 if file.endswith('.py'):
                     file_path = os.path.join(root, file)
                     try:
+
+                        pass
                         with open(file_path, 'r') as f:
                             if 'weaviate' in f.read().lower():
                                 weaviate_usage_files.append(file_path)
-                    except:
+                    except Exception:
+
+                        pass
                         pass
         
         # Check each file for proper client initialization
@@ -419,15 +351,8 @@ class TaskCreate(BaseModel):
                         f"Weaviate client without authentication in {file_path}",
                         "Weaviate client initialized without authentication",
                         "Always use authentication when connecting to Weaviate",
-                        """client = weaviate.Client(
-    url=WEAVIATE_URL,
-    auth_client_secret=AuthApiKey(api_key=WEAVIATE_API_KEY)
+                        """
 )"""
-                    )
-        
-        return results
-    
-    def review_postgresql_security(self) -> Dict:
         """Review PostgreSQL database security settings"""
         print("Reviewing PostgreSQL security...")
         
@@ -439,6 +364,9 @@ class TaskCreate(BaseModel):
         }
         
         try:
+
+        
+            pass
             # Check database connection parameters
             with self.db_logger._get_connection() as conn:
                 with conn.cursor() as cur:
@@ -479,12 +407,7 @@ class TaskCreate(BaseModel):
                     
                     # Check for audit logging
                     cur.execute("""
-                        SELECT name, setting 
-                        FROM pg_settings 
-                        WHERE name LIKE 'log_%' 
-                        AND setting != 'off'
-                    """)
-                    log_settings = cur.fetchall()
+                    """
                     results["audit_logging"] = len(log_settings) > 5
                     
                     if not results["audit_logging"]:
@@ -494,25 +417,10 @@ class TaskCreate(BaseModel):
                             "Insufficient audit logging",
                             "Database audit logging is not properly configured",
                             "Enable comprehensive audit logging",
-                            """-- Enable audit logging
-ALTER SYSTEM SET log_statement = 'all';
-ALTER SYSTEM SET log_connections = on;
-ALTER SYSTEM SET log_disconnections = on;
-ALTER SYSTEM SET log_duration = on;
+                            """
 SELECT pg_reload_conf();"""
-                        )
-                    
-                    # Check for default passwords
                     cur.execute("""
-                        SELECT usename 
-                        FROM pg_user 
-                        WHERE passwd IS NULL 
-                        OR passwd = md5(usename || usename)
-                    """)
-                    weak_passwords = cur.fetchall()
-                    
-                    if weak_passwords:
-                        self.add_finding(
+                    """
                             "database",
                             "critical",
                             "Users with weak or default passwords",
@@ -521,7 +429,10 @@ SELECT pg_reload_conf();"""
                             "ALTER USER username WITH PASSWORD 'strong_password';"
                         )
                     
-        except Exception as e:
+        except Exception:
+
+                    
+            pass
             self.add_finding(
                 "database",
                 "high",
@@ -579,9 +490,7 @@ SELECT pg_reload_conf();"""
                     "Implement log aggregation and analysis",
                     "Configure security alerts"
                 ],
-                "implementation": """# Security monitoring setup
-# 1. Install and configure Falco for runtime security
-curl -s https://falco.org/repo/falcosecurity-3672BA8F.asc | apt-key add -
+                "implementation": """
 echo "deb https://download.falco.org/packages/deb stable main" > /etc/apt/sources.list.d/falcosecurity.list
 apt-get update -y
 apt-get install -y falco
@@ -595,8 +504,6 @@ EOF
 apt-get install -y fail2ban
 systemctl enable fail2ban
 """
-            },
-            {
                 "priority": "medium",
                 "title": "Implement Secret Rotation",
                 "description": "Set up automated secret rotation",
@@ -605,33 +512,9 @@ systemctl enable fail2ban
                     "Use short-lived tokens where possible",
                     "Set up secret versioning"
                 ],
-                "implementation": """# Secret rotation implementation
-import boto3
-from datetime import datetime, timedelta
-
-class SecretRotationManager:
-    def __init__(self):
-        self.secrets_client = boto3.client('secretsmanager')
-    
-    def rotate_secret(self, secret_name: str):
-        # Generate new secret
-        new_secret = secrets.token_urlsafe(32)
-        
-        # Update in AWS Secrets Manager
-        self.secrets_client.update_secret(
-            SecretId=secret_name,
-            SecretString=new_secret
-        )
-        
-        # Update application configuration
-        os.environ[secret_name] = new_secret
-        
-        # Log rotation
+                "implementation": """
         logger.info(f"Rotated secret: {secret_name}")
 """
-            }
-        ])
-        
         self.audit_results["recommendations"] = recommendations
         
         # Generate summary
@@ -648,9 +531,6 @@ class SecretRotationManager:
     
     def _calculate_security_score(self) -> int:
         """Calculate overall security score (0-100)"""
-        base_score = 100
-        
-        # Deduct points based on findings
         base_score -= self.audit_results["critical_issues"] * 20
         base_score -= self.audit_results["high_issues"] * 10
         base_score -= self.audit_results["medium_issues"] * 5
@@ -660,20 +540,7 @@ class SecretRotationManager:
     
     def _calculate_entropy(self, string: str) -> float:
         """Calculate Shannon entropy of a string"""
-        if not string:
-            return 0
-        
-        entropy = 0
-        for i in range(256):
-            pi = string.count(chr(i)) / len(string)
-            if pi > 0:
-                entropy -= pi * math.log2(pi)
-        
-        return entropy
-    
-    def implement_security_enhancements(self, report: Dict) -> Dict:
         """Implement security enhancements using Cursor AI"""
-        implementation_results = {
             "implemented": [],
             "failed": [],
             "manual_required": []
@@ -683,6 +550,8 @@ class SecretRotationManager:
         for finding in report["findings"]:
             if finding["severity"] in ["critical", "high"] and finding["code_fix"]:
                 try:
+
+                    pass
                     # Log implementation attempt
                     self.db_logger.log_action(
                         workflow_id="security_enhancement",
@@ -722,7 +591,10 @@ class SecretRotationManager:
                         metadata={"result": "simulated"}
                     )
                     
-                except Exception as e:
+                except Exception:
+
+                    
+                    pass
                     implementation_results["failed"].append({
                         "finding": finding["issue"],
                         "error": str(e)
@@ -739,10 +611,6 @@ class SecretRotationManager:
 
 async def main():
     """Main function"""
-    import math  # Import here for entropy calculation
-    
-    auditor = SecurityAuditor()
-    
     print("Starting comprehensive security audit...")
     print("=" * 60)
     

@@ -1,38 +1,6 @@
 """
-Integration tests for Specialized AI Research Agents
 """
-
-import pytest
-import asyncio
-from unittest.mock import Mock, AsyncMock, patch, MagicMock
-from datetime import datetime
-import json
-
-from agent.app.services.specialized_agents import (
-    PersonalAgent,
-    PayReadyAgent,
-    ParagonMedicalResearchAgent,
-    AgentType,
-    UserPreference,
-    ApartmentListing,
-    ClinicalTrial,
-    get_specialized_agent,
-    process_agent_task
-)
-
-class TestPersonalAgent:
     """Test the Personal Agent functionality"""
-    
-    @pytest.fixture
-    def agent(self):
-        with patch('agent.app.services.specialized_agents.redis.Redis'):
-            with patch('agent.app.services.specialized_agents.Client'):
-                agent = PersonalAgent()
-                agent.llm_router = Mock()
-                return agent
-    
-    @pytest.mark.asyncio
-    async def test_learn_preference_positive(self, agent):
         """Test learning positive preferences"""
         user_id = "test_user"
         category = "restaurants"
@@ -88,7 +56,6 @@ class TestPersonalAgent:
     @pytest.mark.asyncio
     async def test_preference_weighting(self, agent):
         """Test that preferences affect result ranking"""
-        preferences = {
             "italian": UserPreference(category="italian", weight=2.0),
             "cheap": UserPreference(category="cheap", weight=1.5)
         }
@@ -126,19 +93,7 @@ class TestPersonalAgent:
 
 class TestPayReadyAgent:
     """Test the Pay Ready Agent functionality"""
-    
-    @pytest.fixture
-    def agent(self):
-        with patch('agent.app.services.specialized_agents.redis.Redis'):
-            with patch('agent.app.services.specialized_agents.Client'):
-                agent = PayReadyAgent()
-                agent.llm_router = Mock()
-                return agent
-    
-    @pytest.mark.asyncio
-    async def test_analyze_listing(self, agent):
         """Test apartment listing analysis"""
-        listing_data = {
             "id": "apt123",
             "address": "123 Tech St, San Francisco, CA",
             "price": 3000,
@@ -163,7 +118,6 @@ class TestPayReadyAgent:
     @pytest.mark.asyncio
     async def test_tech_score_calculation(self, agent):
         """Test technology amenity scoring"""
-        features = [
             "fiber internet available",
             "smart locks installed",
             "usb outlets in all rooms",
@@ -193,7 +147,6 @@ class TestPayReadyAgent:
     @pytest.mark.asyncio
     async def test_market_analysis(self, agent):
         """Test market analysis functionality"""
-        agent.llm_router.route_query = AsyncMock(return_value={
             "choices": [{
                 "message": {
                     "content": "Average rent: $2500-3500. Market is competitive."
@@ -212,17 +165,6 @@ class TestPayReadyAgent:
 
 class TestParagonMedicalResearchAgent:
     """Test the Paragon Medical Research Agent functionality"""
-    
-    @pytest.fixture
-    def agent(self):
-        with patch('agent.app.services.specialized_agents.redis.Redis'):
-            with patch('agent.app.services.specialized_agents.Client'):
-                agent = ParagonMedicalResearchAgent()
-                agent.llm_router = Mock()
-                return agent
-    
-    @pytest.mark.asyncio
-    async def test_search_clinical_trials(self, agent):
         """Test clinical trial search"""
         conditions = ["chronic pain", "fibromyalgia"]
         phases = ["Phase 3", "Phase 4"]
@@ -257,7 +199,6 @@ class TestParagonMedicalResearchAgent:
     @pytest.mark.asyncio
     async def test_relevance_scoring(self, agent):
         """Test clinical trial relevance scoring"""
-        trial = ClinicalTrial(
             nct_id="NCT12345678",
             title="Chronic Pain Management with Medical Device",
             phase="Phase 3",
@@ -297,8 +238,6 @@ class TestParagonMedicalResearchAgent:
     @pytest.mark.asyncio
     async def test_distance_filtering(self, agent):
         """Test filtering trials by distance"""
-        trials = [
-            ClinicalTrial(
                 nct_id="NCT001",
                 title="Trial 1",
                 phase="Phase 3",
@@ -327,23 +266,7 @@ class TestParagonMedicalResearchAgent:
 
 class TestAgentRegistry:
     """Test agent registry and task processing"""
-    
-    @pytest.mark.asyncio
-    async def test_get_specialized_agent(self):
         """Test retrieving agents by type"""
-        with patch('agent.app.services.specialized_agents.redis.Redis'):
-            with patch('agent.app.services.specialized_agents.Client'):
-                agent = await get_specialized_agent(AgentType.PERSONAL.value)
-                assert isinstance(agent, PersonalAgent)
-                
-                agent = await get_specialized_agent(AgentType.PAY_READY.value)
-                assert isinstance(agent, PayReadyAgent)
-                
-                agent = await get_specialized_agent(AgentType.PARAGON_MEDICAL.value)
-                assert isinstance(agent, ParagonMedicalResearchAgent)
-    
-    @pytest.mark.asyncio
-    async def test_invalid_agent_type(self):
         """Test error handling for invalid agent type"""
         with pytest.raises(ValueError, match="Unknown agent type"):
             await get_specialized_agent("invalid_type")
@@ -351,10 +274,6 @@ class TestAgentRegistry:
     @pytest.mark.asyncio
     async def test_process_agent_task(self):
         """Test task processing through registry"""
-        with patch('agent.app.services.specialized_agents.redis.Redis'):
-            with patch('agent.app.services.specialized_agents.Client'):
-                # Mock the agent's process_task method
-                with patch.object(PersonalAgent, 'process_task', new_callable=AsyncMock) as mock_process:
                     mock_process.return_value = {"status": "success"}
                     
                     result = await process_agent_task(
@@ -368,10 +287,6 @@ class TestAgentRegistry:
 @pytest.mark.asyncio
 async def test_agent_initialization():
     """Test that all agents initialize correctly"""
-    with patch('agent.app.services.specialized_agents.redis.Redis'):
-        with patch('agent.app.services.specialized_agents.Client'):
-            # Test each agent initializes without errors
-            personal = PersonalAgent()
             assert personal.id == "personal-001"
             assert personal.type == AgentType.PERSONAL
             

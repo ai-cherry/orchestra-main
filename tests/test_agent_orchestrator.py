@@ -1,80 +1,12 @@
 """
-Tests for Agent Orchestrator and Workflow Management
 """
-
-import pytest
-import asyncio
-from unittest.mock import Mock, AsyncMock, patch, MagicMock
-from datetime import datetime, timedelta
-import uuid
-
-from agent.app.services.agent_orchestrator import (
-    AgentOrchestrator,
-    Workflow,
-    WorkflowTask,
-    WorkflowStatus,
-    TaskStatus,
-    CircuitBreaker,
-    get_agent_orchestrator,
-    create_comprehensive_search_workflow
-)
-from agent.app.services.specialized_agents import AgentType
-
-class TestCircuitBreaker:
     """Test circuit breaker functionality"""
-    
-    def test_circuit_breaker_initial_state(self):
         """Test circuit breaker starts closed"""
-        breaker = CircuitBreaker(failure_threshold=3, recovery_timeout=60)
-        
-        assert breaker.can_execute() is True
-        assert breaker.is_open is False
-        assert breaker.failure_count == 0
-    
-    def test_circuit_breaker_opens_after_threshold(self):
         """Test circuit breaker opens after failure threshold"""
-        breaker = CircuitBreaker(failure_threshold=3, recovery_timeout=60)
-        
-        # Record failures
-        for _ in range(3):
-            breaker.record_failure()
-        
-        assert breaker.is_open is True
-        assert breaker.can_execute() is False
-        assert breaker.failure_count == 3
-    
-    def test_circuit_breaker_resets_on_success(self):
         """Test circuit breaker resets on success"""
-        breaker = CircuitBreaker(failure_threshold=3, recovery_timeout=60)
-        
-        breaker.record_failure()
-        breaker.record_failure()
-        breaker.record_success()
-        
-        assert breaker.failure_count == 0
-        assert breaker.is_open is False
-    
-    def test_circuit_breaker_recovery_timeout(self):
         """Test circuit breaker recovers after timeout"""
-        breaker = CircuitBreaker(failure_threshold=3, recovery_timeout=1)  # 1 second timeout
-        
-        # Open the breaker
-        for _ in range(3):
-            breaker.record_failure()
-        
-        assert breaker.can_execute() is False
-        
-        # Mock time passing
-        breaker.last_failure_time = datetime.utcnow() - timedelta(seconds=2)
-        
-        assert breaker.can_execute() is True
-
-class TestWorkflowTask:
     """Test workflow task functionality"""
-    
-    def test_task_creation(self):
         """Test creating a workflow task"""
-        task = WorkflowTask(
             id="task1",
             agent_type=AgentType.PERSONAL,
             task_data={"query": "test"},
@@ -90,19 +22,7 @@ class TestWorkflowTask:
 
 class TestAgentOrchestrator:
     """Test agent orchestrator functionality"""
-    
-    @pytest.fixture
-    def orchestrator(self):
-        with patch('agent.app.services.agent_orchestrator.redis.Redis'):
-            with patch('agent.app.services.agent_orchestrator.get_intelligent_llm_router'):
-                orchestrator = AgentOrchestrator()
-                return orchestrator
-    
-    @pytest.mark.asyncio
-    async def test_create_workflow(self, orchestrator):
         """Test workflow creation"""
-        tasks = [
-            {
                 "id": "task1",
                 "agent_type": "personal",
                 "data": {"query": "test"},
@@ -128,8 +48,6 @@ class TestAgentOrchestrator:
     @pytest.mark.asyncio
     async def test_validate_dependencies_with_cycle(self, orchestrator):
         """Test that cyclic dependencies are detected"""
-        tasks = [
-            {
                 "id": "task1",
                 "agent_type": "personal",
                 "data": {},
@@ -149,8 +67,6 @@ class TestAgentOrchestrator:
     @pytest.mark.asyncio
     async def test_build_execution_plan(self, orchestrator):
         """Test building parallel execution plan"""
-        # Create workflow with parallel and sequential tasks
-        workflow = Workflow(
             id="test",
             name="Test",
             tasks={
@@ -246,7 +162,6 @@ class TestAgentOrchestrator:
     @pytest.mark.asyncio
     async def test_create_checkpoint(self, orchestrator):
         """Test checkpoint creation"""
-        workflow = Workflow(
             id="test",
             name="Test",
             tasks={
@@ -271,9 +186,6 @@ class TestAgentOrchestrator:
     @pytest.mark.asyncio
     async def test_workflow_execution_end_to_end(self, orchestrator):
         """Test complete workflow execution"""
-        # Create workflow
-        tasks = [
-            {
                 "id": "task1",
                 "agent_type": "personal",
                 "data": {"query": "test1"},
@@ -311,7 +223,6 @@ class TestAgentOrchestrator:
     @pytest.mark.asyncio
     async def test_cancel_workflow(self, orchestrator):
         """Test workflow cancellation"""
-        workflow = await orchestrator.create_workflow(
             "Test",
             [{"id": "task1", "agent_type": "personal", "data": {}, "dependencies": []}]
         )
@@ -325,7 +236,6 @@ class TestAgentOrchestrator:
     @pytest.mark.asyncio
     async def test_get_workflow_status(self, orchestrator):
         """Test getting workflow status"""
-        workflow = await orchestrator.create_workflow(
             "Test",
             [
                 {"id": "task1", "agent_type": "personal", "data": {}, "dependencies": []},
@@ -345,14 +255,7 @@ class TestAgentOrchestrator:
 
 class TestWorkflowCreation:
     """Test workflow creation helpers"""
-    
-    @pytest.mark.asyncio
-    async def test_create_comprehensive_search_workflow(self):
         """Test creating a comprehensive search workflow"""
-        with patch('agent.app.services.agent_orchestrator.get_agent_orchestrator') as mock_get:
-            mock_orchestrator = Mock()
-            mock_orchestrator.create_workflow = AsyncMock(
-                return_value=Workflow(
                     id="test",
                     name="Comprehensive Search",
                     tasks={}
@@ -387,22 +290,7 @@ class TestWorkflowCreation:
 @pytest.mark.asyncio
 async def test_singleton_orchestrator():
     """Test that orchestrator is a singleton"""
-    with patch('agent.app.services.agent_orchestrator.redis.Redis'):
-        with patch('agent.app.services.agent_orchestrator.get_intelligent_llm_router'):
-            orchestrator1 = get_agent_orchestrator()
-            orchestrator2 = get_agent_orchestrator()
-            
-            assert orchestrator1 is orchestrator2
-
-@pytest.mark.asyncio
-async def test_message_queue_processing():
     """Test inter-agent message processing"""
-    with patch('agent.app.services.agent_orchestrator.redis.Redis'):
-        with patch('agent.app.services.agent_orchestrator.get_intelligent_llm_router'):
-            orchestrator = AgentOrchestrator()
-            
-            # Add message to queue
-            message = {
                 "type": "task_completed",
                 "workflow_id": "test",
                 "task_id": "task1",

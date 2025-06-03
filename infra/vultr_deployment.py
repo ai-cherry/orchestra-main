@@ -1,13 +1,6 @@
+# TODO: Consider adding connection pooling configuration
 """
-Pulumi deployment script for Cherry-AI.me on Vultr
 """
-
-import pulumi
-import pulumi_vultr as vultr
-from pulumi import Config, Output, export
-
-# Get configuration
-config = Config()
 project_name = "cherry-ai"
 environment = config.get("environment") or "production"
 
@@ -136,15 +129,7 @@ export("database_user", database.user)
 # Create a startup script for the server
 startup_script = vultr.StartupScript(f"{project_name}-startup",
     name=f"{project_name}-{environment}-startup",
-    script="""#!/bin/bash
-# Update system
-apt-get update && apt-get upgrade -y
-
-# Install Docker
-curl -fsSL https://get.docker.com -o get-docker.sh
-sh get-docker.sh
-
-# Install Docker Compose
+    script="""
 curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 
@@ -189,7 +174,7 @@ ufw allow 443/tcp
 ufw --force enable
 
 echo "Server setup complete!"
-""",
+"""
     type="boot"
 )
 

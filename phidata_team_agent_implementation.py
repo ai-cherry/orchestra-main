@@ -1,50 +1,7 @@
 """
-Implementation of the PhidataAgentWrapper's __init__ method for instantiating
-an agno.team.Team based on the phidata_hn_team configuration.
-
-This code snippet shows how to parse members from the config, instantiate each
-member Agent with its specific tools and model (via llm_ref), and then
-instantiate the Team with these members, team mode, team model, etc.
 """
-
-import importlib
-import logging
-from typing import Any, Dict, List
-
-from packages.llm.src.portkey_client import PortkeyClient
-from packages.memory.src.base import MemoryManager
-from packages.phidata.src.cloudsql_pgvector import get_pg_agent_storage, get_pgvector_memory
-from packages.tools.src.base import ToolRegistry
-
-logger = logging.getLogger(__name__)
-
-class PhidataAgentWrapper:
-    def __init__(
-        self,
-        agent_config: Dict[str, Any],
-        memory_manager: MemoryManager,
-        llm_client: PortkeyClient,
-        tool_registry: ToolRegistry,
-    ):
         """
-        Initialize the PhidataAgentWrapper specifically for a Hacker News team configuration.
-
-        This method instantiates an agno.team.Team based on the phidata_hn_team configuration
-        from the agent_config dictionary.
-
-        Args:
-            agent_config: Agent configuration containing phidata_hn_team settings
-            memory_manager: Orchestra's memory management system
-            llm_client: Configured LLM provider client (Portkey)
-            tool_registry: Access to registered system tools
         """
-        # Store base properties necessary for the wrapper
-        self.agent_config = agent_config
-        self.memory = memory_manager
-        self.llm = llm_client
-        self.tools = tool_registry
-
-        # Extract agent identification information
         self.id = agent_config.get("id", "phidata_team_agent")
         self.name = agent_config.get("name", "Phidata Team Agent")
 
@@ -53,11 +10,15 @@ class PhidataAgentWrapper:
 
         # Import required Phidata/Agno modules
         try:
+
+            pass
             agno_team = importlib.import_module("agno.team")
             agno_agent = importlib.import_module("agno.agent")
             Team = getattr(agno_team, "Team")
             Agent = getattr(agno_agent, "Agent")
-        except ImportError as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to import Phidata/Agno modules: {e}")
             raise ImportError(f"Phidata/Agno modules not available: {e}")
 
@@ -119,6 +80,9 @@ class PhidataAgentWrapper:
                 continue
 
             try:
+
+
+                pass
                 # Get the actual LLM model from the client using the reference
                 member_model = self._get_llm_model(member_llm_ref)
 
@@ -145,7 +109,10 @@ class PhidataAgentWrapper:
                 members.append(member_agent)
                 logger.info(f"Initialized team member: {name} with role: {role}")
 
-            except Exception as e:
+            except Exception:
+
+
+                pass
                 logger.error(f"Failed to initialize team member '{name}': {e}")
                 # Continue with other members even if one fails
 
@@ -176,34 +143,14 @@ class PhidataAgentWrapper:
 
     def _get_llm_model(self, model_ref: str) -> Any:
         """
-        Get the LLM model from the Portkey client using the reference name.
-
-        Args:
-            model_ref: Reference name for the model in the Portkey client
-
-        Returns:
-            LLM model instance
         """
-        if not hasattr(self.llm, model_ref):
             raise ValueError(f"LLM reference '{model_ref}' not found in LLM client")
 
         return getattr(self.llm, model_ref)
 
     def _init_member_tools(self, tools_config: List[Dict], member_name: str) -> List:
         """
-        Initialize tools for a team member based on configuration.
-
-        Args:
-            tools_config: List of tool configurations
-            member_name: Name of the member for logging
-
-        Returns:
-            List of initialized tool instances
         """
-        member_tools = []
-
-        for tool_config in tools_config:
-            try:
                 tool_type = tool_config.get("type")
                 tool_params = tool_config.get("params", {})
                 tool_name = tool_config.get("name")
@@ -237,7 +184,10 @@ class PhidataAgentWrapper:
                 member_tools.append(tool_instance)
                 logger.info(f"Added tool '{tool_type}' to member '{member_name}'")
 
-            except Exception as e:
+            except Exception:
+
+
+                pass
                 logger.error(f"Failed to initialize tool for member '{member_name}': {e}")
                 # Continue with other tools even if one fails
 
@@ -245,31 +195,23 @@ class PhidataAgentWrapper:
 
     def _init_member_storage(self, member_config: Dict, member_name: str, cloudsql_config: Dict) -> Any:
         """
-        Initialize member-specific storage or use team's shared storage.
-
-        Args:
-            member_config: Configuration for the team member
-            member_name: Name of the team member
-            cloudsql_config: CloudSQL configuration
-
-        Returns:
-            Storage instance
         """
-        # By default, use the team's storage
-        storage = self.agent_storage
-
-        # Set up member-specific storage if configured
         if "storage" in member_config:
             storage_table = member_config["storage"].get("table_name", f"{member_name.lower()}_storage")
 
             try:
+
+
+                pass
                 storage = get_pg_agent_storage(
                     agent_id=f"{self.id}_{member_name.lower()}",
                     config=cloudsql_config,
                     table_name=storage_table,
                 )
                 logger.info(f"Initialized member-specific storage for '{member_name}'")
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Failed to initialize storage for member '{member_name}': {e}")
                 # Fall back to team storage
                 storage = self.agent_storage
@@ -278,31 +220,23 @@ class PhidataAgentWrapper:
 
     def _init_member_memory(self, member_config: Dict, member_name: str, cloudsql_config: Dict) -> Any:
         """
-        Initialize member-specific memory or use team's shared memory.
-
-        Args:
-            member_config: Configuration for the team member
-            member_name: Name of the team member
-            cloudsql_config: CloudSQL configuration
-
-        Returns:
-            Memory instance
         """
-        # By default, use the team's memory
-        memory = self.agent_memory
-
-        # Set up member-specific memory if configured
         if "memory" in member_config:
             memory_table = member_config["memory"].get("table_name", f"{member_name.lower()}_memory")
 
             try:
+
+
+                pass
                 memory = get_pgvector_memory(
                     user_id=f"{self.id}_{member_name.lower()}",
                     config=cloudsql_config,
                     table_name=memory_table,
                 )
                 logger.info(f"Initialized member-specific memory for '{member_name}'")
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Failed to initialize memory for member '{member_name}': {e}")
                 # Fall back to team memory
                 memory = self.agent_memory

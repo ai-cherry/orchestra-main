@@ -1,35 +1,6 @@
 """
-Unified LLM Router for Orchestra Project
-
-This module provides a unified interface for routing LLM requests through
-Portkey (primary) and OpenRouter (fallback), with dynamic model selection
-based on use case requirements.
-
-Key Features:
-- Automatic model selection based on use case
-- Fallback routing for high availability
-- Cost optimization through model tiering
-- Performance monitoring and caching
-- Unified interface for all LLM operations
 """
-
-import os
-import json
-import time
-import asyncio
-from typing import Dict, Any, Optional, List, Union, Literal
-from enum import Enum
-import logging
-from functools import lru_cache
-
-import httpx
-from pydantic import BaseModel, Field
-
-logger = logging.getLogger(__name__)
-
-class UseCase(str, Enum):
     """Defined use cases with specific model requirements"""
-
     CODE_GENERATION = "code_generation"
     ARCHITECTURE_DESIGN = "architecture_design"
     DEBUGGING = "debugging"
@@ -41,14 +12,12 @@ class UseCase(str, Enum):
 
 class ModelTier(str, Enum):
     """Model tiers for cost optimization"""
-
     PREMIUM = "premium"  # Most capable, highest cost
     STANDARD = "standard"  # Balanced performance/cost
     ECONOMY = "economy"  # Fast, low cost
 
 class RouterConfig(BaseModel):
     """Configuration for the unified LLM router"""
-
     portkey_api_key: str = Field(default_factory=lambda: os.getenv("PORTKEY_API_KEY", ""))
     portkey_config: str = Field(default_factory=lambda: os.getenv("PORTKEY_CONFIG", ""))
     openrouter_api_key: str = Field(default_factory=lambda: os.getenv("OPENROUTER_API_KEY", ""))
@@ -61,29 +30,8 @@ class RouterConfig(BaseModel):
 
 class ModelMapping(BaseModel):
     """Model mapping for each use case and tier"""
-
-    use_case: UseCase
-    tier: ModelTier
-    primary_model: str
-    fallback_models: List[str]
-    max_tokens: int
-    temperature: float
-    system_prompt: Optional[str] = None
-
-class UnifiedLLMRouter:
     """
-    Unified router for all LLM operations in Orchestra.
-
-    This router automatically selects the best model based on use case,
-    handles fallbacks, and provides a consistent interface across the project.
     """
-
-    # Model mappings for each use case and tier
-    MODEL_MAPPINGS: Dict[UseCase, Dict[ModelTier, ModelMapping]] = {
-        UseCase.CODE_GENERATION: {
-            ModelTier.PREMIUM: ModelMapping(
-                use_case=UseCase.CODE_GENERATION,
-                tier=ModelTier.PREMIUM,
                 primary_model="anthropic/claude-3-opus",
                 fallback_models=["openai/gpt-4-turbo", "google/gemini-1.5-pro"],
                 max_tokens=4096,
@@ -192,11 +140,6 @@ class UnifiedLLMRouter:
 
     def __init__(self, config: Optional[RouterConfig] = None):
         """Initialize the unified LLM router"""
-        self.config = config or RouterConfig()
-        self._validate_config()
-
-        # Initialize HTTP clients
-        self.portkey_client = httpx.AsyncClient(
             base_url="https://api.portkey.ai/v1",
             headers={
                 "x-portkey-api-key": self.config.portkey_api_key,
@@ -233,29 +176,11 @@ class UnifiedLLMRouter:
 
     def _validate_config(self):
         """Validate router configuration"""
-        if not self.config.portkey_api_key and not self.config.openrouter_api_key:
             raise ValueError("At least one API key (Portkey or OpenRouter) must be provided")
 
     @lru_cache(maxsize=128)
     def get_model_mapping(self, use_case: UseCase, tier: ModelTier = ModelTier.STANDARD) -> ModelMapping:
         """Get model mapping for a specific use case and tier"""
-        use_case_mappings = self.MODEL_MAPPINGS.get(use_case, {})
-
-        # Fall back to standard tier if requested tier not available
-        if tier not in use_case_mappings and ModelTier.STANDARD in use_case_mappings:
-            tier = ModelTier.STANDARD
-
-        # Fall back to general purpose if use case not found
-        if not use_case_mappings:
-            use_case = UseCase.GENERAL_PURPOSE
-            use_case_mappings = self.MODEL_MAPPINGS.get(use_case, {})
-
-        mapping = use_case_mappings.get(tier)
-        if not mapping:
-            # Create default mapping
-            mapping = ModelMapping(
-                use_case=use_case,
-                tier=tier,
                 primary_model="anthropic/claude-3-sonnet",
                 fallback_models=["openai/gpt-4", "google/gemini-1.5-flash"],
                 max_tokens=2048,
@@ -266,9 +191,6 @@ class UnifiedLLMRouter:
 
     def _get_cache_key(self, **kwargs) -> str:
         """Generate cache key from request parameters"""
-        # Create deterministic cache key
-        key_parts = []
-        for k, v in sorted(kwargs.items()):
             if k not in ["stream", "cache"]:  # Exclude non-deterministic params
                 if isinstance(v, (list, dict)):
                     v = json.dumps(v, sort_keys=True)
@@ -285,8 +207,6 @@ class UnifiedLLMRouter:
 
     async def _make_openrouter_request(self, model: str, messages: List[Dict[str, str]], **kwargs) -> Dict[str, Any]:
         """Make request through OpenRouter"""
-        # OpenRouter uses different model naming
-        model_map = {
             "anthropic/claude-3-opus": "anthropic/claude-3-opus:beta",
             "anthropic/claude-3-sonnet": "anthropic/claude-3-sonnet:beta",
             "anthropic/claude-3-haiku": "anthropic/claude-3-haiku:beta",
@@ -314,24 +234,7 @@ class UnifiedLLMRouter:
         **kwargs,
     ) -> Dict[str, Any]:
         """
-        Main method for LLM completion with automatic routing.
-
-        Args:
-            messages: Either a string prompt or list of message dicts
-            use_case: The use case for model selection
-            tier: Model tier for cost/performance tradeoff
-            model_override: Override automatic model selection
-            temperature_override: Override default temperature
-            max_tokens_override: Override default max tokens
-            system_prompt_override: Override default system prompt
-            stream: Whether to stream the response
-            cache: Whether to use caching
-            **kwargs: Additional parameters to pass to the LLM
-
-        Returns:
-            Dict containing the completion response
         """
-        start_time = time.time()
         self.metrics["requests"] += 1
 
         # Convert string to messages format
@@ -360,7 +263,6 @@ class UnifiedLLMRouter:
 
             if cache_key in self._cache:
                 self.metrics["cache_hits"] += 1
-                logger.debug(f"Cache hit for {use_case.value} request")
                 return self._cache[cache_key]
 
         # Prepare request parameters
@@ -372,13 +274,13 @@ class UnifiedLLMRouter:
 
         for i, current_model in enumerate(models_to_try):
             try:
+
+                pass
                 if i == 0 and self.config.portkey_api_key:
                     # Try Portkey first
-                    logger.debug(f"Trying {current_model} via Portkey for {use_case.value}")
                     response = await self._make_portkey_request(current_model, messages, **request_params)
                 elif self.config.openrouter_api_key and self.config.enable_fallback:
                     # Fallback to OpenRouter
-                    logger.debug(f"Trying {current_model} via OpenRouter for {use_case.value}")
                     self.metrics["fallbacks"] += 1
                     response = await self._make_openrouter_request(current_model, messages, **request_params)
                 else:
@@ -405,7 +307,10 @@ class UnifiedLLMRouter:
 
                 return response
 
-            except Exception as e:
+            except Exception:
+
+
+                pass
                 last_error = e
                 logger.warning(f"Failed with {current_model}: {str(e)}")
 
@@ -426,20 +331,15 @@ class UnifiedLLMRouter:
         **kwargs,
     ) -> Dict[str, Any]:
         """Complete with tool/function calling support"""
-        # Only premium models support tools reliably
-        return await self.complete(messages=messages, use_case=use_case, tier=ModelTier.PREMIUM, tools=tools, **kwargs)
-
-    async def embed(
         self, text: Union[str, List[str]], model: str = "openai/text-embedding-3-small"
     ) -> Union[List[float], List[List[float]]]:
         """Generate embeddings for text"""
-        is_single = isinstance(text, str)
-        texts = [text] if is_single else text
-
         payload = {"model": model, "input": texts}
 
         # Try Portkey first, then OpenRouter
         try:
+
+            pass
             if self.config.portkey_api_key:
                 response = await self.portkey_client.post("/embeddings", json=payload)
             else:
@@ -451,14 +351,15 @@ class UnifiedLLMRouter:
             embeddings = [item["embedding"] for item in data["data"]]
             return embeddings[0] if is_single else embeddings
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Embedding generation failed: {str(e)}")
             raise
 
     def get_metrics(self) -> Dict[str, Any]:
         """Get router metrics"""
-        return {
-            **self.metrics,
             "success_rate": (
                 self.metrics["successes"] / self.metrics["requests"] if self.metrics["requests"] > 0 else 0
             ),
@@ -472,35 +373,16 @@ class UnifiedLLMRouter:
 
     async def close(self):
         """Close HTTP clients"""
-        await self.portkey_client.aclose()
-        await self.openrouter_client.aclose()
-
-# Singleton instance
-_router_instance: Optional[UnifiedLLMRouter] = None
-
-def get_llm_router(config: Optional[RouterConfig] = None) -> UnifiedLLMRouter:
     """Get or create the singleton LLM router instance"""
-    global _router_instance
-    if _router_instance is None:
-        _router_instance = UnifiedLLMRouter(config)
-    return _router_instance
-
-# Convenience functions for common use cases
-async def generate_code(prompt: str, tier: ModelTier = ModelTier.STANDARD, **kwargs) -> str:
     """Generate code using the appropriate model"""
-    router = get_llm_router()
-    response = await router.complete(prompt, use_case=UseCase.CODE_GENERATION, tier=tier, **kwargs)
     return response["choices"][0]["message"]["content"]
 
 async def design_architecture(requirements: str, tier: ModelTier = ModelTier.PREMIUM, **kwargs) -> str:
     """Design system architecture based on requirements"""
-    router = get_llm_router()
-    response = await router.complete(requirements, use_case=UseCase.ARCHITECTURE_DESIGN, tier=tier, **kwargs)
     return response["choices"][0]["message"]["content"]
 
 async def debug_code(code: str, error: str, **kwargs) -> str:
     """Debug code with error context"""
-    router = get_llm_router()
     prompt = f"Debug this code:\n\n{code}\n\nError:\n{error}"
     response = await router.complete(prompt, use_case=UseCase.DEBUGGING, tier=ModelTier.PREMIUM, **kwargs)
     return response["choices"][0]["message"]["content"]
@@ -509,8 +391,6 @@ async def chat(
     message: str, history: Optional[List[Dict[str, str]]] = None, tier: ModelTier = ModelTier.STANDARD, **kwargs
 ) -> str:
     """Chat conversation with context"""
-    router = get_llm_router()
-    messages = history or []
     messages.append({"role": "user", "content": message})
 
     response = await router.complete(messages, use_case=UseCase.CHAT_CONVERSATION, tier=tier, **kwargs)

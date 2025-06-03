@@ -1,21 +1,6 @@
 #!/usr/bin/env python3
 """
-code_analysis.py - A custom static code analyzer for the AI Orchestra project.
-
-This script performs static analysis on Python code without requiring external dependencies.
-It identifies common issues like unused imports, unused variables, duplicate code patterns,
-and potential security vulnerabilities.
 """
-
-import ast
-import os
-import re
-import sys
-from collections import defaultdict
-from pathlib import Path
-from typing import Dict, List, Optional, Set
-
-# ANSI color codes for terminal output
 GREEN = "\033[92m"
 YELLOW = "\033[93m"
 RED = "\033[91m"
@@ -55,20 +40,6 @@ ISSUE_SEVERITY = {
 
 class Issue:
     """Represents a code issue found during analysis."""
-
-    def __init__(
-        self,
-        file_path: str,
-        line: int,
-        category: str,
-        message: str,
-        code: Optional[str] = None,
-    ):
-        self.file_path = file_path
-        self.line = line
-        self.category = category
-        self.message = message
-        self.code = code
         self.severity = ISSUE_SEVERITY.get(category, "warning")
 
     def __str__(self) -> str:
@@ -78,20 +49,7 @@ class Issue:
 
 class CodeVisitor(ast.NodeVisitor):
     """AST visitor to analyze Python code for issues."""
-
-    def __init__(self, file_path: str):
-        self.file_path = file_path
-        self.issues: List[Issue] = []
-        self.imported_names: Set[str] = set()
-        self.defined_names: Set[str] = set()
-        self.used_names: Set[str] = set()
-        self.function_complexities: Dict[str, int] = {}
-        self.current_function: Optional[str] = None
-        self.current_class: Optional[str] = None
-
-    def visit_Import(self, node: ast.Import) -> None:
         """Visit import statements."""
-        for name in node.names:
             self.imported_names.add(name.name.split(".")[0])
 
             # Check for absolute imports within packages
@@ -109,7 +67,6 @@ class CodeVisitor(ast.NodeVisitor):
 
     def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
         """Visit from-import statements."""
-        if node.module:
             module_name = node.module.split(".")[0]
             self.imported_names.add(module_name)
 
@@ -132,24 +89,7 @@ class CodeVisitor(ast.NodeVisitor):
 
     def visit_Name(self, node: ast.Name) -> None:
         """Visit name references."""
-        if isinstance(node.ctx, ast.Load):
-            self.used_names.add(node.id)
-        elif isinstance(node.ctx, ast.Store):
-            self.defined_names.add(node.id)
-        self.generic_visit(node)
-
-    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         """Visit function definitions."""
-        prev_function = self.current_function
-        self.current_function = node.name
-        self.defined_names.add(node.name)
-
-        # Check for missing docstring
-        if not ast.get_docstring(node):
-            self.issues.append(
-                Issue(
-                    self.file_path,
-                    node.lineno,
                     "missing_docstring",
                     f"Function '{node.name}' is missing a docstring",
                 )
@@ -197,16 +137,6 @@ class CodeVisitor(ast.NodeVisitor):
 
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
         """Visit class definitions."""
-        prev_class = self.current_class
-        self.current_class = node.name
-        self.defined_names.add(node.name)
-
-        # Check for missing docstring
-        if not ast.get_docstring(node):
-            self.issues.append(
-                Issue(
-                    self.file_path,
-                    node.lineno,
                     "missing_docstring",
                     f"Class '{node.name}' is missing a docstring",
                 )
@@ -217,44 +147,7 @@ class CodeVisitor(ast.NodeVisitor):
 
     def _calculate_complexity(self, node: ast.FunctionDef) -> int:
         """Calculate cyclomatic complexity of a function."""
-        complexity = 1  # Base complexity
-
-        class ComplexityVisitor(ast.NodeVisitor):
-            def __init__(self):
-                self.complexity = 0
-
-            def visit_If(self, node):
-                self.complexity += 1
-                self.generic_visit(node)
-
-            def visit_For(self, node):
-                self.complexity += 1
-                self.generic_visit(node)
-
-            def visit_While(self, node):
-                self.complexity += 1
-                self.generic_visit(node)
-
-            def visit_Try(self, node):
-                self.complexity += len(node.handlers)
-                self.generic_visit(node)
-
-            def visit_ExceptHandler(self, node):
-                self.complexity += 1
-                self.generic_visit(node)
-
-            def visit_BoolOp(self, node):
-                if isinstance(node.op, ast.And) or isinstance(node.op, ast.Or):
-                    self.complexity += len(node.values) - 1
-                self.generic_visit(node)
-
-        visitor = ComplexityVisitor()
-        visitor.visit(node)
-        return complexity + visitor.complexity
-
-    def _is_in_package(self) -> bool:
         """Check if the current file is part of a package."""
-        path = Path(self.file_path)
         return (path.parent / "__init__.py").exists()
 
     def _is_test_function(self, name: str) -> bool:
@@ -263,8 +156,6 @@ class CodeVisitor(ast.NodeVisitor):
 
     def analyze(self) -> List[Issue]:
         """Analyze the collected data for issues."""
-        # Check for unused imports
-        for name in self.imported_names:
             if name not in self.used_names and name != "__future__":
                 self.issues.append(Issue(self.file_path, 1, "unused_import", f"Unused import: '{name}'"))
 
@@ -284,21 +175,7 @@ class CodeVisitor(ast.NodeVisitor):
 
 def find_python_files(start_dir: str) -> List[str]:
     """Find all Python files in the given directory and its subdirectories."""
-    python_files = []
-
-    for root, dirs, files in os.walk(start_dir):
-        # Skip excluded directories
-        dirs[:] = [d for d in dirs if d not in EXCLUDED_DIRS]
-
-        for file in files:
-            if any(re.match(pattern, file) for pattern in INCLUDED_PATTERNS):
-                python_files.append(os.path.join(root, file))
-
-    return python_files
-
-def analyze_file(file_path: str) -> List[Issue]:
     """Analyze a single Python file for issues."""
-    try:
         with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
 
@@ -307,16 +184,18 @@ def analyze_file(file_path: str) -> List[Issue]:
         visitor.visit(tree)
         return visitor.analyze()
 
-    except SyntaxError as e:
+    except Exception:
+
+
+        pass
         return [Issue(file_path, e.lineno or 1, "undefined_name", f"Syntax error: {str(e)}")]
-    except Exception as e:
+    except Exception:
+
+        pass
         return [Issue(file_path, 1, "undefined_name", f"Error analyzing file: {str(e)}")]
 
 def analyze_codebase(directory: str) -> List[Issue]:
     """Analyze all Python files in the given directory."""
-    python_files = find_python_files(directory)
-    all_issues = []
-
     print(f"Found {len(python_files)} Python files to analyze")
 
     for i, file_path in enumerate(python_files):
@@ -330,7 +209,6 @@ def analyze_codebase(directory: str) -> List[Issue]:
 
 def print_summary(issues: List[Issue]) -> None:
     """Print a summary of the issues found."""
-    if not issues:
         print(f"{GREEN}No issues found!{RESET}")
         return
 
@@ -363,14 +241,6 @@ def print_summary(issues: List[Issue]) -> None:
 
 def print_detailed_report(issues: List[Issue]) -> None:
     """Print a detailed report of all issues."""
-    if not issues:
-        return
-
-    # Group issues by file
-    issues_by_file = defaultdict(list)
-    for issue in issues:
-        issues_by_file[issue.file_path].append(issue)
-
     print(f"\n{BLUE}===== Detailed Issue Report ====={RESET}")
 
     for file_path, file_issues in sorted(issues_by_file.items()):
@@ -384,8 +254,6 @@ def print_detailed_report(issues: List[Issue]) -> None:
 
 def main() -> int:
     """Main entry point."""
-    import argparse
-
     parser = argparse.ArgumentParser(description="Analyze Python code for issues")
     parser.add_argument("--path", type=str, default=".", help="Path to analyze")
     parser.add_argument("--detailed", action="store_true", help="Show detailed report")

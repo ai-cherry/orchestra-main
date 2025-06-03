@@ -1,23 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 """
-Query Classifier for AI Orchestra.
-
-This module provides a query classifier that categorizes queries into different types
-(factual, conceptual, conversational) to optimize retrieval strategies.
 """
-
-import logging
-import time
-from enum import Enum
-from typing import Any, Dict, Optional
-
-from pydantic import BaseModel
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-class QueryType(str, Enum):
     """Types of queries for memory retrieval optimization."""
-
     FACTUAL = "factual"  # Prioritize exact matches
     CONCEPTUAL = "conceptual"  # Prioritize semantic matches
     CONVERSATIONAL = "conversational"  # Balance between exact and semantic
@@ -25,78 +9,13 @@ class QueryType(str, Enum):
 
 class QueryFeatures(BaseModel):
     """
-    Features extracted from a query for classification.
-
-    This class encapsulates various features that can be used to classify
-    a query into different types.
     """
-
-    # Query metadata
-    query_length: int
-    contains_question_mark: bool
-
-    # Linguistic features
-    factual_indicators: int = 0
-    conceptual_indicators: int = 0
-    conversational_indicators: int = 0
-
-    # Word counts
-    question_words: int = 0
-    action_verbs: int = 0
-    greeting_terms: int = 0
-
-    # Additional features
-    has_personal_pronouns: bool = False
-    has_technical_terms: bool = False
-
-class QueryClassificationResult(BaseModel):
     """
-    Result of query classification.
-
-    This class encapsulates the result of classifying a query,
-    including the determined type and confidence scores.
     """
-
-    query: str
-    query_type: QueryType
-    confidence: float
-    scores: Dict[str, float]
-    features: Optional[QueryFeatures] = None
-    processing_time_ms: float = 0.0
-
-class QueryClassifier:
     """
-    Query classifier for AI Orchestra.
-
-    This class provides functionality to classify queries into different types
-    to optimize retrieval strategies.
     """
-
-    def __init__(
-        self,
-        use_openai: bool = False,
-        openai_config: Optional[Dict[str, Any]] = None,
-        confidence_threshold: float = 0.6,
-    ):
         """
-        Initialize query classifier.
-
-        Args:
-            use_openai: Whether to use Vertex AI for classification
-            openai_config: Configuration for Vertex AI
-            confidence_threshold: Minimum confidence threshold for classification
         """
-        self.use_openai = use_openai
-        self.openai_config = openai_config or {}
-        self.confidence_threshold = confidence_threshold
-        self.openai_client = None
-
-        # Initialize Vertex AI client if enabled
-        if self.use_openai:
-            self._init_openai()
-
-        # Define indicator terms for rule-based classification
-        self.factual_indicators = [
             "what is",
             "who is",
             "when did",
@@ -158,13 +77,7 @@ class QueryClassifier:
 
     def _init_openai(self) -> None:
         """
-        Initialize Vertex AI client for query classification.
-
-        This method sets up the Vertex AI client for text classification.
         """
-        try:
-
-            # Extract configuration
             project = self.openai_config.get("project", "cherry-ai-project")
             location = self.openai_config.get("location", "us-central1")
 
@@ -181,42 +94,21 @@ class QueryClassifier:
                 self.openai_client = aiplatform.TextEmbeddingModel.from_pretrained("textembedding-gecko@latest")
                 logger.info("Vertex AI foundation model initialized for query classification")
 
-        except ImportError:
+        except Exception:
+
+
+            pass
             logger.warning("google-cloud-aiplatform package not installed. Falling back to rule-based classification.")
             self.use_openai = False
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to initialize Vertex AI: {e}")
             self.use_openai = False
 
     async def classify(self, query: str) -> QueryClassificationResult:
         """
-        Classify a query into a specific type.
-
-        Args:
-            query: The query to classify
-
-        Returns:
-            Classification result with query type and confidence
         """
-        start_time = time.time()
-
-        if not query:
-            # Empty query, return unknown
-            return QueryClassificationResult(
-                query=query,
-                query_type=QueryType.UNKNOWN,
-                confidence=1.0,
-                scores={t.value: 0.0 for t in QueryType},
-                processing_time_ms=0.0,
-            )
-
-        # Use Vertex AI if enabled and available
-        if self.use_openai and self.openai_client:
-            try:
-                result = await self._classify_with_openai(query)
-                result.processing_time_ms = (time.time() - start_time) * 1000
-                return result
-            except Exception as e:
                 logger.error(f"Vertex AI classification failed: {e}")
                 # Fall back to rule-based classification
 
@@ -227,21 +119,8 @@ class QueryClassifier:
 
     async def _classify_with_openai(self, query: str) -> QueryClassificationResult:
         """
-        Classify a query using Vertex AI.
-
-        Args:
-            query: The query to classify
-
-        Returns:
-            Classification result with query type and confidence
         """
-        try:
-            # Extract features for additional context
-            features = self._extract_features(query)
-
-            # Prepare prompt for classification
             prompt = f"""
-            Classify the following query into one of these types:
             - FACTUAL: Seeking specific information or facts (e.g., "What is X?", "Who invented Y?")
             - CONCEPTUAL: Seeking understanding of concepts, theories, or relationships (e.g., "Why does X happen?", "How does Y work?")
             - CONVERSATIONAL: General conversation, greetings, or requests (e.g., "Can you help me?", "Hello")
@@ -250,8 +129,6 @@ class QueryClassifier:
 
             Classification:
             """
-
-            # Call Vertex AI endpoint
             if hasattr(self.openai_client, "predict"):
                 # Using custom endpoint
                 response = await self.openai_client.predict_async(instances=[{"prompt": prompt}])
@@ -286,70 +163,19 @@ class QueryClassifier:
                 features=features,
             )
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error in Vertex AI classification: {e}")
             # Fall back to rule-based classification
             return self._classify_with_rules(query)
 
     def _classify_with_rules(self, query: str) -> QueryClassificationResult:
         """
-        Classify a query using rule-based approach.
-
-        Args:
-            query: The query to classify
-
-        Returns:
-            Classification result with query type and confidence
         """
-        # Extract features
-        features = self._extract_features(query)
-
-        # Calculate scores for each type
-        scores = {
-            QueryType.FACTUAL.value: features.factual_indicators * 0.2 + features.question_words * 0.1,
-            QueryType.CONCEPTUAL.value: features.conceptual_indicators * 0.2 + (features.has_technical_terms * 0.2),
-            QueryType.CONVERSATIONAL.value: features.conversational_indicators * 0.2
-            + features.greeting_terms * 0.2
-            + (features.has_personal_pronouns * 0.1),
-            QueryType.UNKNOWN.value: 0.1,
-        }
-
-        # Normalize scores
-        total = sum(scores.values())
-        if total > 0:
-            for key in scores:
-                scores[key] /= total
-
-        # Determine the type with highest score
-        query_type = max(scores.items(), key=lambda x: x[1])[0]
-        confidence = scores[query_type]
-
-        # If confidence is below threshold, use UNKNOWN
-        if confidence < self.confidence_threshold:
-            query_type = QueryType.UNKNOWN.value
-            confidence = scores[QueryType.UNKNOWN.value]
-
-        return QueryClassificationResult(
-            query=query,
-            query_type=QueryType(query_type),
-            confidence=confidence,
-            scores=scores,
-            features=features,
-        )
-
-    def _extract_features(self, query: str) -> QueryFeatures:
         """
-        Extract features from a query for classification.
-
-        Args:
-            query: The query to extract features from
-
-        Returns:
-            Extracted features
         """
-        query_lower = query.lower()
-
-        # Basic features
         features = QueryFeatures(query_length=len(query), contains_question_mark="?" in query)
 
         # Count indicator terms

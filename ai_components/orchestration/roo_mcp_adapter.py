@@ -1,26 +1,5 @@
 """Roo MCP Adapter for wrapping Roo modes as MCP-compatible agents."""
-
-import asyncio
-import json
-import logging
-from dataclasses import dataclass, field
-from datetime import datetime
-from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple
-
-import httpx
-from pydantic import BaseModel, Field
-
-from shared.database import UnifiedDatabase
-from shared.utils.error_handling import handle_errors
-from shared.utils.performance import benchmark
-
-logger = logging.getLogger(__name__)
-
-
-class RooMode(str, Enum):
     """Available Roo modes."""
-
     CODE = "code"
     ARCHITECT = "architect"
     ASK = "ask"
@@ -36,58 +15,12 @@ class RooMode(str, Enum):
 
 class AgentCapability(BaseModel):
     """MCP-compatible agent capability."""
-
-    name: str
-    description: str
-    input_schema: Dict[str, Any]
-    output_schema: Dict[str, Any]
-    performance_metrics: Dict[str, float] = Field(default_factory=dict)
-
-
-class RooContext(BaseModel):
     """Roo-specific context format."""
-
-    mode: RooMode
-    task: str
-    history: List[Dict[str, Any]] = Field(default_factory=list)
-    files: List[str] = Field(default_factory=list)
-    environment: Dict[str, Any] = Field(default_factory=dict)
-    custom_instructions: Optional[str] = None
-
-
-class MCPContext(BaseModel):
     """MCP-compatible context format."""
-
-    agent_id: str
-    task_id: str
-    messages: List[Dict[str, str]] = Field(default_factory=list)
-    resources: List[Dict[str, Any]] = Field(default_factory=list)
-    metadata: Dict[str, Any] = Field(default_factory=dict)
-
-
-@dataclass
-class RooModeConfig:
     """Configuration for a Roo mode."""
-
-    mode: RooMode
-    model: str
-    role: str
-    capabilities: List[str]
-    file_patterns: Optional[List[str]] = None
-    max_tokens: int = 4096
-    temperature: float = 0.7
-
-
-class RooMCPAdapter:
     """Adapter for wrapping Roo modes as MCP-compatible agents."""
-
-    def __init__(self, openrouter_api_key: str):
-        """Initialize the adapter.
-
-        Args:
-            openrouter_api_key: API key for OpenRouter
         """
-        if not openrouter_api_key:
+        """
             raise ValueError("OpenRouter API key is required")
         
         self.api_key = openrouter_api_key
@@ -106,9 +39,6 @@ class RooMCPAdapter:
 
     def _initialize_mode_configs(self) -> Dict[RooMode, RooModeConfig]:
         """Initialize configurations for all Roo modes."""
-        return {
-            RooMode.CODE: RooModeConfig(
-                mode=RooMode.CODE,
                 model="anthropic/claude-opus-4",
                 role="Expert Python/TypeScript developer",
                 capabilities=[
@@ -232,15 +162,8 @@ class RooMCPAdapter:
     async def wrap_mode_as_agent(
         self, mode: RooMode
     ) -> Tuple[str, List[AgentCapability]]:
-        """Wrap a Roo mode as an MCP-compatible agent.
-
-        Args:
-            mode: The Roo mode to wrap
-
-        Returns:
-            Tuple of (agent_id, capabilities)
         """
-        if mode in self._capability_cache:
+        """
             agent_id = f"roo_{mode.value}_agent"
             return agent_id, self._capability_cache[mode]
 
@@ -282,19 +205,8 @@ class RooMCPAdapter:
     async def transform_context(
         self, source_format: str, target_format: str, context: Dict[str, Any]
     ) -> Dict[str, Any]:
-        """Transform context between Roo and MCP formats.
-
-        Args:
-            source_format: Source format ('roo' or 'mcp')
-            target_format: Target format ('roo' or 'mcp')
-            context: Context to transform
-
-        Returns:
-            Transformed context
         """
-        if source_format == target_format:
-            return context
-
+        """
         if source_format == "roo" and target_format == "mcp":
             roo_ctx = RooContext(**context)
             return MCPContext(
@@ -336,18 +248,8 @@ class RooMCPAdapter:
     async def execute_mode_task(
         self, mode: RooMode, task: str, context: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
-        """Execute a task using a specific Roo mode.
-
-        Args:
-            mode: The Roo mode to use
-            task: Task description
-            context: Optional context
-
-        Returns:
-            Execution result
         """
-        config = self.mode_configs.get(mode)
-        if not config:
+        """
             raise ValueError(f"Unknown Roo mode: {mode}")
 
         # Prepare the request
@@ -363,6 +265,9 @@ class RooMCPAdapter:
             messages.extend(context["history"])
 
         try:
+
+
+            pass
             response = await self.client.post(
                 f"{self.base_url}/chat/completions",
                 headers={
@@ -392,18 +297,7 @@ class RooMCPAdapter:
             async with UnifiedDatabase() as db:
                 await db.execute(
                     """
-                    INSERT INTO roo_mode_executions 
-                    (mode, task, context, result, created_at)
-                    VALUES ($1, $2, $3, $4, $5)
-                    """,
-                    mode.value,
-                    task,
-                    json.dumps(context or {}),
-                    completion,
-                    datetime.utcnow(),
-                )
-
-            return {
+                    """
                 "result": completion,
                 "mode": mode.value,
                 "model": config.model,
@@ -411,31 +305,17 @@ class RooMCPAdapter:
                 "next_steps": [],
             }
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error executing mode task: {e}")
             raise
 
     async def get_mode_capabilities(self, mode: RooMode) -> List[Dict[str, Any]]:
-        """Get capabilities for a specific mode.
-
-        Args:
-            mode: The Roo mode
-
-        Returns:
-            List of capability definitions
         """
-        _, capabilities = await self.wrap_mode_as_agent(mode)
-        return [cap.dict() for cap in capabilities]
-
-    async def create_session(self, mode: RooMode, task: str) -> str:
-        """Create a new Roo session.
-
-        Args:
-            mode: The Roo mode
-            task: Initial task
-
-        Returns:
-            Session ID
+        """
+        """
         """
         session_id = f"session_{datetime.utcnow().timestamp()}"
         self.active_sessions[session_id] = RooContext(mode=mode, task=task)
@@ -444,24 +324,8 @@ class RooMCPAdapter:
     async def update_session(
         self, session_id: str, message: Dict[str, str]
     ) -> None:
-        """Update an existing session.
-
-        Args:
-            session_id: Session ID
-            message: Message to add
         """
-        if session_id in self.active_sessions:
-            self.active_sessions[session_id].history.append(message)
-
-    async def close_session(self, session_id: str) -> None:
-        """Close a session.
-
-        Args:
-            session_id: Session ID to close
         """
-        if session_id in self.active_sessions:
-            del self.active_sessions[session_id]
-
-    async def close(self) -> None:
+        """
+        """
         """Close the adapter and clean up resources."""
-        await self.client.aclose()

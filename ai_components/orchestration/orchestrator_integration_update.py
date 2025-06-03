@@ -1,42 +1,7 @@
 #!/usr/bin/env python3
 """
-Orchestrator Integration Update
-Updates the enhanced orchestrator to use new Cursor AI and Claude integrations
 """
-
-import os
-import sys
-import json
-import asyncio
-from pathlib import Path
-from typing import Dict, List, Optional
-from datetime import datetime
-
-# Add parent directory to path
-sys.path.append(str(Path(__file__).parent.parent.parent))
-
-from ai_components.orchestration.ai_orchestrator_enhanced import (
-    EnhancedWorkflowOrchestrator, TaskDefinition, AgentRole, 
-    TaskPriority, EnhancedAgentCoordinator
-)
-from ai_components.agents.cursor_ai_enhanced import get_enhanced_cursor_ai
-from ai_components.agents.claude_integration import get_claude_integration
-
-
-class UpdatedAgentCoordinator(EnhancedAgentCoordinator):
     """Updated agent coordinator with new integrations"""
-    
-    def __init__(self, db_logger, weaviate_manager):
-        super().__init__(db_logger, weaviate_manager)
-        
-        # Replace agents with enhanced versions
-        self.agents[AgentRole.IMPLEMENTER] = get_enhanced_cursor_ai()
-        
-        # Add Claude for deep analysis
-        self.claude = get_claude_integration(use_claude_max=True)
-        
-        # Update agent capabilities
-        self.agent_capabilities = {
             AgentRole.ANALYZER: ["analyze", "architecture", "dependencies"],
             AgentRole.IMPLEMENTER: ["implement", "generate", "refactor", "optimize", "debug"],
             AgentRole.REFINER: ["refine", "review", "document", "test"]
@@ -44,9 +9,6 @@ class UpdatedAgentCoordinator(EnhancedAgentCoordinator):
     
     async def execute_task(self, task: TaskDefinition, context) -> Dict:
         """Execute task with enhanced agents"""
-        # For analyzer tasks, use Cursor AI's analysis + Claude's architecture analysis
-        if task.agent_role == AgentRole.ANALYZER:
-            cursor_result = await self.agents[AgentRole.IMPLEMENTER].analyze_project(
                 task.inputs.get("codebase_path", "."),
                 task.inputs.get("options", {})
             )
@@ -88,7 +50,6 @@ class UpdatedAgentCoordinator(EnhancedAgentCoordinator):
 
 def update_orchestrator_config():
     """Update orchestrator configuration for new integrations"""
-    config_updates = {
         "agents": {
             "cursor_ai": {
                 "enabled": True,
@@ -228,6 +189,8 @@ async def test_integrated_workflow():
     
     # Execute workflow
     try:
+
+        pass
         result = await orchestrator.execute_workflow(workflow_id, tasks)
         
         print(f"\n✅ Integrated workflow completed!")
@@ -251,7 +214,10 @@ async def test_integrated_workflow():
                       f"{metrics['failures']} failures, "
                       f"{metrics['total_time']/metrics['calls']:.2f}s avg")
         
-    except Exception as e:
+    except Exception:
+
+        
+        pass
         print(f"❌ Workflow failed: {e}")
         import traceback
         traceback.print_exc()

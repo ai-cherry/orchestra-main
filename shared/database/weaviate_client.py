@@ -1,27 +1,6 @@
+# TODO: Consider adding connection pooling configuration
 """
-Production-ready Weaviate client adapter for vector database operations.
-
-This module replaces the mock implementation and provides a robust interface
-to Weaviate, handling connections, schema, CRUD operations, and search.
 """
-
-import logging
-import uuid
-from typing import Dict, List, Any, Optional, Union
-from datetime import datetime
-import asyncio
-
-import weaviate
-from weaviate import Client as WeaviateSDKClient # Alias to avoid confusion with our WeaviateClient
-from weaviate.auth import AuthApiKey
-from weaviate.exceptions import WeaviateException
-from weaviate.gql.get import HybridFusion
-
-from core.config.unified_config import DatabaseConfig
-
-logger = logging.getLogger(__name__)
-
-# Define collection names based on DATABASE_CONSOLIDATION_PLAN.md and mock client methods
 COLLECTION_AGENT_MEMORY = "AgentMemory"
 COLLECTION_KNOWLEDGE = "Knowledge"
 COLLECTION_CONVERSATIONS = "Conversations"
@@ -29,28 +8,17 @@ COLLECTION_DOCUMENTS = "Documents"
 
 class WeaviateClient:
     """
-    Production Weaviate client for vector database operations.
     """
-
-    def __init__(self, config: DatabaseConfig):
         """
-        Initialize Weaviate client. Does not connect automatically.
-        Call connect() to establish the connection.
-
-        Args:
-            config: DatabaseConfig object with connection parameters.
         """
-        self.config = config
-        self._client: Optional[WeaviateSDKClient] = None
-        self._connected = False # Internal flag
-
-    async def connect(self) -> None:
         """Establish connection to Weaviate and ensure schemas."""
-        if self._connected and self._client and self._client.is_ready():
             logger.info("Weaviate client is already connected and healthy.")
             return
 
         try:
+
+
+            pass
             auth_config = None
             if self.config.weaviate_api_key:
                 auth_config = AuthApiKey(api_key=self.config.weaviate_api_key)
@@ -77,7 +45,9 @@ class WeaviateClient:
             self._connected = True
             logger.info(f"Successfully connected to Weaviate at {self.config.weaviate_host}")
             await self._ensure_all_schemas() # Make schema ensuring async as well
-        except Exception as e:
+        except Exception:
+
+            pass
             self._connected = False
             self._client = None # Ensure client is None if connection failed
             logger.error(f"Failed to connect to Weaviate: {e}", exc_info=True)
@@ -85,17 +55,20 @@ class WeaviateClient:
 
     async def _ensure_schema(self, collection_name: str, properties: List[Dict[str, Any]], description: str = "") -> None:
         """Ensure a specific collection schema exists in Weaviate."""
-        if not self._client:
             logger.error(f"Cannot ensure schema for {collection_name}: Weaviate client not connected.")
             raise ConnectionError("Weaviate client not connected for schema creation.")
 
         loop = asyncio.get_event_loop()
         try:
+
+            pass
             existing_schema = await loop.run_in_executor(None, lambda: self._client.schema.get(collection_name))
             if existing_schema:
                 # logger.info(f"Schema for collection '{collection_name}' already exists.")
                 return
-        except WeaviateException as e:
+        except Exception:
+
+            pass
             if "status_code: 404" in str(e) or "does not exist" in str(e).lower() or ("detail" in str(e) and "404" in str(e)): # More robust check for 404
                  pass # Class doesn't exist, proceed to create
             else:
@@ -112,16 +85,18 @@ class WeaviateClient:
             },
         }
         try:
+
+            pass
             await loop.run_in_executor(None, lambda: self._client.schema.create_class(class_schema))
             logger.info(f"Created Weaviate schema for collection: {collection_name}")
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to create schema for {collection_name}: {e}", exc_info=True)
             raise
 
     async def _ensure_all_schemas(self) -> None:
         """Ensure all predefined schemas exist."""
-        # Schemas definitions remain the same as before
-        agent_memory_properties = [
             {"name": "agent_id", "dataType": ["text"]}, {"name": "content", "dataType": ["text"]},
             {"name": "memory_type", "dataType": ["text"]}, {"name": "context", "dataType": ["text"], "description": "Optional context for the memory"},
             {"name": "importance", "dataType": ["number"], "description": "Importance score (0-1)"},
@@ -164,8 +139,12 @@ class WeaviateClient:
         if not self._client or not self._connected: return False
         loop = asyncio.get_event_loop()
         try:
+
+            pass
             return await loop.run_in_executor(None, self._client.is_ready)
-        except WeaviateException as e:
+        except Exception:
+
+            pass
             logger.error(f"Weaviate health check failed: {e}", exc_info=True)
             return False
 
@@ -173,6 +152,8 @@ class WeaviateClient:
         if not self._client or not self._connected: return {"error": "Client not connected"}
         loop = asyncio.get_event_loop()
         try:
+
+            pass
             stats = {}
             # Simplified example for one collection
             response = await loop.run_in_executor(None, lambda: self._client.query.aggregate(COLLECTION_AGENT_MEMORY).with_meta_count().do())
@@ -185,7 +166,9 @@ class WeaviateClient:
                 "cluster_status": cluster_status,
                 "version": client_meta.get("version", "unknown")
             }
-        except WeaviateException as e:
+        except Exception:
+
+            pass
             logger.error(f"Error getting Weaviate stats: {e}", exc_info=True)
             return {"error": str(e)}
 
@@ -204,18 +187,23 @@ class WeaviateClient:
         obj_uuid = str(uuid.uuid4())
         data_object = self._prepare_data_object(properties)
         try:
+
+            pass
             await loop.run_in_executor(None, lambda: self._client.data_object.create(
                 data_object=data_object,
                 class_name=collection_name,
                 uuid=obj_uuid,
                 vector=vector
             ))
-            logger.debug(f"Stored object {obj_uuid} in {collection_name}")
             return obj_uuid
-        except WeaviateException as e:
+        except Exception:
+
+            pass
             logger.error(f"Weaviate error storing object in {collection_name}: {e}", exc_info=True)
             raise
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Generic error storing object in {collection_name}: {e}", exc_info=True)
             raise
 
@@ -234,6 +222,8 @@ class WeaviateClient:
         if not self._client or not self._connected: raise ConnectionError("Weaviate client not connected.")
         loop = asyncio.get_event_loop()
         try:
+
+            pass
             # Note: The .do() method itself might be blocking.
             result = await loop.run_in_executor(None, lambda:
                 self._client.query.get(COLLECTION_AGENT_MEMORY, ["agent_id", "content", "memory_type", "context", "importance", "metadata", "created_at", "_additional {id}"])
@@ -244,7 +234,9 @@ class WeaviateClient:
             )
             memories = result.get("data", {}).get("Get", {}).get(COLLECTION_AGENT_MEMORY, [])
             return [{**mem.pop("_additional"), **mem} for mem in memories]
-        except WeaviateException as e:
+        except Exception:
+
+            pass
             logger.error(f"Error fetching recent memories for agent {agent_id}: {e}", exc_info=True)
             return []
 
@@ -254,6 +246,8 @@ class WeaviateClient:
         if not self._client or not self._connected: raise ConnectionError("Weaviate client not connected.")
         loop = asyncio.get_event_loop()
         try:
+
+            pass
             where_filter = {"operator": "And", "operands": [{"path": ["agent_id"], "operator": "Equal", "valueText": agent_id}]}
             if memory_type:
                 where_filter["operands"].append({"path": ["memory_type"], "operator": "Equal", "valueText": memory_type})
@@ -269,7 +263,9 @@ class WeaviateClient:
             result = await loop.run_in_executor(None, query_obj_builder.do)
             memories = result.get("data", {}).get("Get", {}).get(COLLECTION_AGENT_MEMORY, [])
             return [{**mem.pop("_additional"), **mem} for mem in memories]
-        except WeaviateException as e:
+        except Exception:
+
+            pass
             logger.error(f"Error searching memories for agent {agent_id} with query '{query}': {e}", exc_info=True)
             return []
 
@@ -286,6 +282,8 @@ class WeaviateClient:
         if not self._client or not self._connected: raise ConnectionError("Weaviate client not connected.")
         loop = asyncio.get_event_loop()
         try:
+
+            pass
             result = await loop.run_in_executor(None, lambda:
                 self._client.query.get(COLLECTION_CONVERSATIONS, ["session_id", "agent_id", "user_id", "message", "role", "metadata", "created_at", "_additional {id}"])
                 .with_where({"path": ["session_id"], "operator": "Equal", "valueText": session_id})
@@ -295,7 +293,9 @@ class WeaviateClient:
             )
             messages = result.get("data", {}).get("Get", {}).get(COLLECTION_CONVERSATIONS, [])
             return [{**msg.pop("_additional"), **msg} for msg in messages]
-        except WeaviateException as e:
+        except Exception:
+
+            pass
             logger.error(f"Error fetching conversation history for session {session_id}: {e}", exc_info=True)
             return []
             
@@ -309,6 +309,8 @@ class WeaviateClient:
         if session_id: operands.append({"path": ["session_id"], "operator": "Equal", "valueText": session_id})
         where_filter = {"operator": "And", "operands": operands} if operands else None
         try:
+
+            pass
             query_builder = self._client.query.get(
                 COLLECTION_CONVERSATIONS, 
                 ["session_id", "agent_id", "user_id", "message", "role", "metadata", "created_at", "_additional {id, score, distance}"]
@@ -317,7 +319,9 @@ class WeaviateClient:
             result = await loop.run_in_executor(None, query_builder.do)
             conversations = result.get("data", {}).get("Get", {}).get(COLLECTION_CONVERSATIONS, [])
             return [{**conv.pop("_additional"), **conv} for conv in conversations]
-        except WeaviateException as e:
+        except Exception:
+
+            pass
             logger.error(f"Error searching conversations with query '{query}': {e}", exc_info=True)
             return []
 
@@ -340,6 +344,8 @@ class WeaviateClient:
         if doc_type: operands.append({"path": ["doc_type"], "operator": "Equal", "valueText": doc_type})
         where_filter = {"operator": "And", "operands": operands} if operands else None
         try:
+
+            pass
             query_builder = self._client.query.get(COLLECTION_DOCUMENTS, ["title", "content", "source", "doc_type", "metadata", "created_at", "_additional {id, score, distance}"])
             if query: query_builder = query_builder.with_near_text({"concepts": [query]})
             query_builder = query_builder.with_limit(limit)
@@ -347,7 +353,9 @@ class WeaviateClient:
             result = await loop.run_in_executor(None, query_builder.do)
             documents = result.get("data", {}).get("Get", {}).get(COLLECTION_DOCUMENTS, [])
             return [{**doc.pop("_additional"), **doc} for doc in documents]
-        except WeaviateException as e:
+        except Exception:
+
+            pass
             logger.error(f"Error searching documents with query '{query}': {e}", exc_info=True)
             return []
 
@@ -372,6 +380,8 @@ class WeaviateClient:
         if tags: operands.append({"path": ["tags"], "operator": "ContainsAny", "valueTextArray": tags})
         where_filter = {"operator": "And", "operands": operands} if operands else None
         try:
+
+            pass
             query_builder = self._client.query.get(COLLECTION_KNOWLEDGE, ["title", "content", "source", "category", "tags", "metadata", "created_at", "updated_at", "_additional {id, score, distance}"])
             if query: query_builder = query_builder.with_near_text({"concepts": [query]})
             query_builder = query_builder.with_limit(limit)
@@ -379,20 +389,25 @@ class WeaviateClient:
             result = await loop.run_in_executor(None, query_builder.do)
             knowledge_items = result.get("data", {}).get("Get", {}).get(COLLECTION_KNOWLEDGE, [])
             return [{**k.pop("_additional"), **k} for k in knowledge_items]
-        except WeaviateException as e:
+        except Exception:
+
+            pass
             logger.error(f"Error searching knowledge with query '{query}': {e}", exc_info=True)
             return []
 
     # Methods for WeaviateInterface compatibility
     async def raw_graphql_query(self, query_string: str) -> Dict[str, Any]:
         """Executes a raw GraphQL query."""
-        if not self._client or not self._connected:
             raise ConnectionError("Weaviate client not connected.")
         loop = asyncio.get_event_loop()
         try:
+
+            pass
             result = await loop.run_in_executor(None, lambda: self._client.query.raw(query_string))
             return result
-        except WeaviateException as e:
+        except Exception:
+
+            pass
             logger.error(f"Error executing raw GraphQL query: {e}", exc_info=True)
             raise QueryError(f"Raw GraphQL query failed: {e}") from e
 
@@ -401,7 +416,6 @@ class WeaviateClient:
         filters: Optional[Dict] = None, return_properties: Optional[List[str]] = None
     ) -> List[Dict[str, Any]]:
         """Generic search by vector in a specified collection."""
-        if not self._client or not self._connected:
             raise ConnectionError("Weaviate client not connected.")
         loop = asyncio.get_event_loop()
 
@@ -428,6 +442,10 @@ class WeaviateClient:
 
 
         try:
+
+
+
+            pass
             query_builder = self._client.query.get(collection_name, props_to_fetch) \
                 .with_near_vector({"vector": vector}) \
                 .with_limit(limit)
@@ -446,7 +464,9 @@ class WeaviateClient:
             items = data_get.get(collection_name, [])
             # Flatten _additional into the main dict for consistency with other search methods
             return [{**item.pop("_additional"), **item} for item in items]
-        except WeaviateException as e:
+        except Exception:
+
+            pass
             logger.error(f"Error searching objects near vector in {collection_name}: {e}", exc_info=True)
             return []
         except Exception as e: # Catch broader errors
@@ -456,7 +476,6 @@ class WeaviateClient:
 
     async def add_objects_batch(self, collection_name: str, objects: List[Dict[str, Any]]) -> int:
         """Adds objects to a collection in batch."""
-        if not self._client or not self._connected:
             raise ConnectionError("Weaviate client not connected.")
         loop = asyncio.get_event_loop()
 
@@ -466,6 +485,8 @@ class WeaviateClient:
         
         processed_objects = 0
         try:
+
+            pass
             # Using configure_batch for a more direct async-wrapped approach if available,
             # or manual batching. The Python client's batch is stateful.
             # For simplicity, we'll add objects one by one within an executor for batching,
@@ -497,14 +518,8 @@ class WeaviateClient:
                 # The batch context manager handles submission.
                 # The number of successfully imported objects is harder to get directly here
                 # unless the batch result processing is enhanced.
-                # For now, assume success if no exception.
-                return len(objects) # This is an assumption of success.
-
-            processed_objects = await loop.run_in_executor(None, batch_creation_sync)
-            logger.info(f"Batch inserted {processed_objects} objects into {collection_name}.")
-            return processed_objects
-
-        except WeaviateException as e:
+                # For now, assume success if no except Exception:
+     pass
             logger.error(f"Weaviate error batch inserting into {collection_name}: {e}", exc_info=True)
             raise QueryError(f"Batch insert failed: {e}") from e
         except Exception as e: # Catch broader errors
@@ -534,6 +549,9 @@ async def main_test():
     client = WeaviateClient(mock_config)
 
     try:
+
+
+        pass
         await client.connect()
         if await client.health_check():
             logger.info("Weaviate client is healthy.")
@@ -570,9 +588,14 @@ async def main_test():
         else:
             logger.error("Weaviate client is not healthy post-connect.")
             
-    except ConnectionError as ce:
+    except Exception:
+
+            
+        pass
         logger.error(f"Connection Error during test: {ce}", exc_info=True)
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"An unexpected error occurred during test: {e}", exc_info=True)
     finally:
         if client._connected: # only close if connect was successful

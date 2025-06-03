@@ -1,51 +1,6 @@
 #!/usr/bin/env python3
 """
-quick_verify_admin_ui.py - Comprehensive Admin UI Verification Tool
-
-This script performs a series of checks on the Cherry Admin UI deployment:
-1. Verifies site accessibility at cherry-ai.me
-2. Validates proper loading of JavaScript and CSS resources
-3. Tests API endpoints with optional mocking
-4. Reports on page load times and performance metrics
-5. Provides detailed reporting for manual or CI/CD use
-
-Usage:
-    python quick_verify_admin_ui.py [options]
-
-Options:
-    --url URL                 Site URL to check (default: https://cherry-ai.me)
-    --api-url URL             API URL to check (default: https://cherry-ai.me/api)
-    --timeout SECONDS         Request timeout in seconds (default: 10)
-    --output FILE             Write report to file
-    --format {text,json,html} Output format (default: text)
-    --skip-api                Skip API endpoint testing
-    --mock-api                Use mock API responses instead of real requests
-    --verbose                 Show detailed output
-    --ci                      CI mode (exit code based on critical checks only)
-    --threshold-js SIZE       Minimum expected JS file size in bytes (default: 100000)
-    --threshold-css SIZE      Minimum expected CSS file size in bytes (default: 10000)
-    --performance             Run performance checks (requires Chrome)
-
-Requirements:
-    pip install requests beautifulsoup4 colorama tabulate selenium webdriver-manager
 """
-
-import argparse
-import json
-import os
-import re
-import sys
-import time
-from datetime import datetime
-from typing import Dict, List, Optional, Tuple, Union, Any
-from urllib.parse import urljoin, urlparse
-
-try:
-    import requests
-    from bs4 import BeautifulSoup
-    from colorama import Fore, Style, init
-    from tabulate import tabulate
-except ImportError:
     print("Error: Required packages not installed. Run:")
     print("pip install requests beautifulsoup4 colorama tabulate")
     sys.exit(1)
@@ -69,24 +24,7 @@ STATUS_INFO = f"{Fore.BLUE}ℹ{Style.RESET_ALL}"
 
 class AdminUIVerifier:
     """Main verifier class for Cherry Admin UI."""
-
-    def __init__(self, args: argparse.Namespace):
         """Initialize with command line arguments."""
-        self.url = args.url
-        self.api_url = args.api_url
-        self.timeout = args.timeout
-        self.output_file = args.output
-        self.output_format = args.format
-        self.skip_api = args.skip_api
-        self.mock_api = args.mock_api
-        self.verbose = args.verbose
-        self.ci_mode = args.ci
-        self.js_threshold = args.threshold_js
-        self.css_threshold = args.threshold_css
-        self.run_performance = args.performance
-
-        # Results storage
-        self.results = {
             "accessibility": {"status": "Unknown", "details": [], "critical": True},
             "resources": {"status": "Unknown", "details": [], "critical": True},
             "api": {"status": "Unknown", "details": [], "critical": False},
@@ -103,13 +41,6 @@ class AdminUIVerifier:
 
     def run(self) -> Dict[str, Any]:
         """Run all verification checks and return results."""
-        start_time = time.time()
-
-        try:
-            # Check site accessibility
-            self._check_accessibility()
-
-            # If site is accessible, check resources
             if self.results["accessibility"]["status"] == "OK":
                 self._check_resources()
 
@@ -124,11 +55,16 @@ class AdminUIVerifier:
             # Generate summary
             self._generate_summary()
 
-        except KeyboardInterrupt:
+        except Exception:
+
+
+            pass
             print(f"\n{STATUS_INFO} Verification interrupted by user.")
             self.results["summary"]["status"] = "Interrupted"
             self.results["summary"]["details"].append("Verification was interrupted by user.")
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"\n{STATUS_ERROR} Unexpected error: {str(e)}")
             self.results["summary"]["status"] = "Error"
             self.results["summary"]["details"].append(f"Unexpected error: {str(e)}")
@@ -145,6 +81,9 @@ class AdminUIVerifier:
         print(f"\n{Fore.CYAN}Checking site accessibility...{Style.RESET_ALL}")
 
         try:
+
+
+            pass
             start_time = time.time()
             response = self.session.get(self.url, timeout=self.timeout)
             response_time = time.time() - start_time
@@ -177,17 +116,26 @@ class AdminUIVerifier:
                 self.results["accessibility"]["details"].append(f"Unexpected HTTP status: {response.status_code}")
                 print(f"{STATUS_ERROR} Site returned HTTP {response.status_code}")
 
-        except requests.exceptions.Timeout:
+        except Exception:
+
+
+            pass
             self.results["accessibility"]["status"] = "Error"
             self.results["accessibility"]["details"].append(f"Connection timed out after {self.timeout}s")
             print(f"{STATUS_ERROR} Connection timed out after {self.timeout}s")
 
-        except requests.exceptions.ConnectionError:
+        except Exception:
+
+
+            pass
             self.results["accessibility"]["status"] = "Error"
             self.results["accessibility"]["details"].append("Connection error. Site may be down or unreachable.")
             print(f"{STATUS_ERROR} Connection error. Site may be down or unreachable.")
 
-        except requests.exceptions.RequestException as e:
+        except Exception:
+
+
+            pass
             self.results["accessibility"]["status"] = "Error"
             self.results["accessibility"]["details"].append(f"Request error: {str(e)}")
             print(f"{STATUS_ERROR} Request error: {str(e)}")
@@ -197,6 +145,9 @@ class AdminUIVerifier:
         print(f"\n{Fore.CYAN}Checking resources...{Style.RESET_ALL}")
 
         try:
+
+
+            pass
             soup = BeautifulSoup(self.html_content, "html.parser")
 
             # Check for JavaScript files
@@ -232,6 +183,8 @@ class AdminUIVerifier:
                 for js_file in js_files:
                     js_url = urljoin(self.url, js_file)
                     try:
+
+                        pass
                         js_response = self.session.head(js_url, timeout=self.timeout)
 
                         if js_response.status_code == 200:
@@ -262,7 +215,10 @@ class AdminUIVerifier:
                             print(f"{STATUS_ERROR} JavaScript file {js_file} returned HTTP {js_response.status_code}")
                             js_issues += 1
 
-                    except requests.exceptions.RequestException as e:
+                    except Exception:
+
+
+                        pass
                         self.results["resources"]["details"].append(
                             f"Error accessing JavaScript file {js_file}: {str(e)}"
                         )
@@ -286,6 +242,8 @@ class AdminUIVerifier:
                 for css_file in css_files:
                     css_url = urljoin(self.url, css_file)
                     try:
+
+                        pass
                         css_response = self.session.head(css_url, timeout=self.timeout)
 
                         if css_response.status_code == 200:
@@ -316,7 +274,10 @@ class AdminUIVerifier:
                             print(f"{STATUS_ERROR} CSS file {css_file} returned HTTP {css_response.status_code}")
                             css_issues += 1
 
-                    except requests.exceptions.RequestException as e:
+                    except Exception:
+
+
+                        pass
                         self.results["resources"]["details"].append(f"Error accessing CSS file {css_file}: {str(e)}")
                         print(f"{STATUS_ERROR} Error accessing CSS file {css_file}: {str(e)}")
                         css_issues += 1
@@ -331,7 +292,10 @@ class AdminUIVerifier:
                 self.results["resources"]["status"] = "OK"
                 print(f"{STATUS_OK} All resources checked successfully")
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             self.results["resources"]["status"] = "Error"
             self.results["resources"]["details"].append(f"Error checking resources: {str(e)}")
             print(f"{STATUS_ERROR} Error checking resources: {str(e)}")
@@ -367,6 +331,9 @@ class AdminUIVerifier:
             expected_status = endpoint["expected_status"]
 
             try:
+
+
+                pass
                 start_time = time.time()
 
                 if method == "GET":
@@ -391,7 +358,10 @@ class AdminUIVerifier:
                     )
                     api_issues += 1
 
-            except requests.exceptions.RequestException as e:
+            except Exception:
+
+
+                pass
                 self.results["api"]["details"].append(f"{method} {endpoint['path']}: Error - {str(e)}")
                 print(f"{STATUS_ERROR} {method} {endpoint['path']}: Error - {str(e)}")
                 api_issues += 1
@@ -412,12 +382,17 @@ class AdminUIVerifier:
         print(f"\n{Fore.CYAN}Checking performance...{Style.RESET_ALL}")
 
         try:
+
+
+            pass
             # Dynamically import Selenium to avoid dependency if not needed
             from selenium import webdriver
             from selenium.webdriver.chrome.service import Service
             from selenium.webdriver.chrome.options import Options
             from webdriver_manager.chrome import ChromeDriverManager
-        except ImportError:
+        except Exception:
+
+            pass
             self.results["performance"]["status"] = "Skipped"
             self.results["performance"]["details"].append(
                 "Selenium not installed. Run: pip install selenium webdriver-manager"
@@ -426,6 +401,9 @@ class AdminUIVerifier:
             return
 
         try:
+
+
+            pass
             # Set up Chrome options
             chrome_options = Options()
             chrome_options.add_argument("--headless")
@@ -449,32 +427,7 @@ class AdminUIVerifier:
             # Get performance metrics using JavaScript
             navigation_timing = driver.execute_script(
                 """
-                var performance = window.performance;
-                var timingObj = performance.timing;
-                var loadEventEnd = timingObj.loadEventEnd;
-                var navigationStart = timingObj.navigationStart;
-                var connectEnd = timingObj.connectEnd;
-                var connectStart = timingObj.connectStart;
-                var domComplete = timingObj.domComplete;
-                var domInteractive = timingObj.domInteractive;
-                var domLoading = timingObj.domLoading;
-                var domContentLoadedEventEnd = timingObj.domContentLoadedEventEnd;
-                
-                return {
-                    'pageLoadTime': (loadEventEnd - navigationStart) / 1000,
-                    'connectionTime': (connectEnd - connectStart) / 1000,
-                    'domProcessingTime': (domComplete - domLoading) / 1000,
-                    'domContentLoadedTime': (domContentLoadedEventEnd - navigationStart) / 1000,
-                    'domInteractiveTime': (domInteractive - navigationStart) / 1000
-                };
             """
-            )
-
-            # Store metrics
-            self.performance_metrics = navigation_timing
-
-            # Add metrics to results
-            for metric, value in navigation_timing.items():
                 self.results["performance"]["details"].append(f"{metric}: {value:.2f}s")
 
             # Add Selenium measured load time
@@ -487,11 +440,7 @@ class AdminUIVerifier:
             # Check for JavaScript errors
             js_errors = driver.execute_script(
                 """
-                return window.JSErrors || [];
             """
-            )
-
-            if js_errors:
                 self.results["performance"]["details"].append(f"JavaScript Errors: {len(js_errors)}")
                 for error in js_errors:
                     self.results["performance"]["details"].append(f"JS Error: {error}")
@@ -520,7 +469,10 @@ class AdminUIVerifier:
             # Close the browser
             driver.quit()
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             self.results["performance"]["status"] = "Error"
             self.results["performance"]["details"].append(f"Error measuring performance: {str(e)}")
             print(f"{STATUS_ERROR} Error measuring performance: {str(e)}")
@@ -587,9 +539,6 @@ class AdminUIVerifier:
 
     def _generate_text_report(self) -> str:
         """Generate a text report."""
-        lines = []
-
-        # Header
         lines.append("=" * 80)
         lines.append(f"Cherry Admin UI Verification Report - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         lines.append("=" * 80)
@@ -612,6 +561,8 @@ class AdminUIVerifier:
             )
         )
         lines.append(f"Overall Status: {status_icon} {self.results['summary']['status']}")
+        # TODO: Consider using list comprehension for better performance
+
         for detail in self.results["summary"]["details"]:
             lines.append(f"  {detail}")
         lines.append("")
@@ -633,6 +584,8 @@ class AdminUIVerifier:
                 )
             )
             lines.append(f"Status: {status_icon} {result['status']}")
+            # TODO: Consider using list comprehension for better performance
+
             for detail in result["details"]:
                 lines.append(f"  {detail}")
             lines.append("")
@@ -654,31 +607,8 @@ class AdminUIVerifier:
 
     def _generate_json_report(self) -> str:
         """Generate a JSON report."""
-        return json.dumps(self.results, indent=2)
-
-    def _generate_html_report(self) -> str:
         """Generate an HTML report."""
-        html = f"""<!DOCTYPE html>
-<html>
-<head>
-    <title>Cherry Admin UI Verification Report</title>
-    <style>
-        body {{ font-family: Arial, sans-serif; margin: 20px; }}
-        h1, h2 {{ color: #333; }}
-        .container {{ max-width: 1200px; margin: 0 auto; }}
-        .summary {{ background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; }}
-        .section {{ margin-bottom: 30px; }}
-        .status-ok {{ color: green; }}
-        .status-warning {{ color: orange; }}
-        .status-error {{ color: red; }}
-        .status-info {{ color: blue; }}
-        table {{ width: 100%; border-collapse: collapse; }}
-        th, td {{ padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }}
-        th {{ background-color: #f2f2f2; }}
-        .metric {{ font-weight: bold; }}
-    </style>
-</head>
-<body>
+        html = f"""
     <div class="container">
         <h1>Cherry Admin UI Verification Report</h1>
         <p>Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
@@ -693,16 +623,11 @@ class AdminUIVerifier:
             </p>
             <ul>
 """
-
         for detail in self.results["summary"]["details"]:
             html += f"                <li>{detail}</li>\n"
 
-        html += """            </ul>
-        </div>
+        html += """
 """
-
-        # Detailed results
-        for key, result in self.results.items():
             if key in ["summary", "execution_time", "timestamp"]:
                 continue
 
@@ -711,16 +636,11 @@ class AdminUIVerifier:
             <p class="status-{result['status'].lower()}">Status: {result['status']}</p>
             <ul>
 """
-
             for detail in result["details"]:
                 html += f"                <li>{detail}</li>\n"
 
-            html += """            </ul>
-        </div>
+            html += """
 """
-
-        # Performance metrics if available
-        if self.performance_metrics:
             html += """        <div class="section">
             <h2>Performance Metrics</h2>
             <table>
@@ -729,42 +649,26 @@ class AdminUIVerifier:
                     <th>Value</th>
                 </tr>
 """
-
-            for metric, value in self.performance_metrics.items():
-                html += f"""                <tr>
+                html += f"""
                     <td class="metric">{metric}</td>
                     <td>{value:.2f}s</td>
                 </tr>
 """
-
-            html += """            </table>
-        </div>
+            html += """
 """
-
-        html += """    </div>
-</body>
-</html>
+        html += """
 """
-
-        return html
-
-    def save_report(self, report: str) -> None:
         """Save the report to a file if output_file is specified."""
-        if not self.output_file:
-            return
-
-        try:
             with open(self.output_file, "w") as f:
                 f.write(report)
             print(f"{STATUS_OK} Report saved to {self.output_file}")
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"{STATUS_ERROR} Failed to save report: {str(e)}")
 
     def get_exit_code(self) -> int:
         """Get exit code based on results for CI/CD integration."""
-        if self.ci_mode:
-            # In CI mode, only consider critical checks
-            for key, result in self.results.items():
                 if key in ["summary", "execution_time", "timestamp"]:
                     continue
 
@@ -820,14 +724,6 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     """Main function."""
-    args = parse_args()
-
-    # Create and run verifier
-    verifier = AdminUIVerifier(args)
-    verifier.run()
-
-    # Generate and save report
-    report = verifier.generate_report()
     print("\n" + report)
     verifier.save_report(report)
 

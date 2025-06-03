@@ -1,18 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 """
-LiteLLM Component for AI Orchestra
-==================================
-Provides a unified OpenAI-compatible API for multiple LLM providers
 """
-
-from typing import Any, Dict, Optional
-
-import pulumi_kubernetes as k8s
-from pulumi import ComponentResource, Output, ResourceOptions
-
-class LiteLLMComponent(ComponentResource):
     """LiteLLM gateway for unified LLM access"""
-
-    def __init__(self, name: str, config: Dict[str, Any], opts: Optional[ResourceOptions] = None):
         super().__init__("orchestra:llm:LiteLLM", name, {}, opts)
 
         namespace = config["namespace"]
@@ -27,52 +16,7 @@ class LiteLLMComponent(ComponentResource):
             metadata=k8s.meta.v1.ObjectMetaArgs(name="litellm-config", namespace=namespace),
             data={
                 "config.yaml": """
-model_list:
-  - model_name: gpt-4
-    litellm_params:
-      model: gpt-4
-      api_key: os.environ/OPENAI_API_KEY
-
-  - model_name: gpt-3.5-turbo
-    litellm_params:
-      model: gpt-3.5-turbo
-      api_key: os.environ/OPENAI_API_KEY
-
-  - model_name: claude-3-opus
-    litellm_params:
-      model: claude-3-opus-20240229
-      api_key: os.environ/ANTHROPIC_API_KEY
-
-  - model_name: claude-3-sonnet
-    litellm_params:
-      model: claude-3-sonnet-20240229
-      api_key: os.environ/ANTHROPIC_API_KEY
-
-  - model_name: llama-2-70b
-    litellm_params:
-      model: huggingface/meta-llama/Llama-2-70b-chat-hf
-      api_key: os.environ/HUGGINGFACE_API_KEY
-
-litellm_settings:
-  drop_params: true
-  set_verbose: false
-  cache: true
-  cache_params:
-    type: redis
-    host: dragonfly.superagi.svc.cluster.local
-    port: 6379
-    ttl: 3600
-
-general_settings:
-  master_key: os.environ/LITELLM_MASTER_KEY
-  database_url: os.environ/DATABASE_URL
 """
-            },
-            opts=ResourceOptions(parent=self),
-        )
-
-        # Create Secret for API keys
-        litellm_secret = k8s.core.v1.Secret(
             f"{name}-secret",
             metadata=k8s.meta.v1.ObjectMetaArgs(name="litellm-secret", namespace=namespace),
             string_data={

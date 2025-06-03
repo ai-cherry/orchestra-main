@@ -1,32 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Reference implementation of improvements for memory management components.
-
-This file provides complete examples of improved implementations for the
-memory management system, focusing on performance, error handling, and
-cloud optimization.
 """
-
-import asyncio
-import concurrent.futures
-import datetime
-import functools
-import logging
-import time
-import uuid
-from typing import List, Optional, TypeVar, Dict, Any
-
-# Imports would normally be from the actual codebase
-# These are placeholders to demonstrate patterns
-from google.api_core.exceptions import GoogleAPIError
-
-from packages.shared.src.memory.memory_manager import MemoryHealth, MemoryManager
-from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
-
-# Set up logger
-logger = logging.getLogger(__name__)
-
-# Generic type for function return
 T = TypeVar("T")
 
 # Define MEMORY_ITEMS_COLLECTION if it's a constant
@@ -38,15 +13,7 @@ MEMORY_ITEMS_COLLECTION = "memory_items_default_collection"  # Placeholder value
 
 class ThreadPoolManager:
     """
-    Singleton thread pool manager to prevent resource exhaustion.
-
-    This class provides a managed thread pool for offloading blocking I/O
-    operations, ensuring controlled concurrency and proper resource cleanup.
     """
-
-    _instance = None
-    _thread_pool = None
-    _max_workers = 20
     _thread_name_prefix = "memory_worker_"
 
     def __new__(cls, *args, **kwargs):
@@ -57,39 +24,14 @@ class ThreadPoolManager:
 
     def _initialize(self):
         """Initialize the thread pool."""
-        self._thread_pool = concurrent.futures.ThreadPoolExecutor(
-            max_workers=self._max_workers, thread_name_prefix=self._thread_name_prefix
-        )
         logger.info(f"Thread pool initialized with {self._max_workers} workers")
 
     @classmethod
     def get_pool(cls):
         """Get the thread pool instance."""
-        if cls._instance is None:
-            cls._instance = cls()
-        return cls._instance._thread_pool
-
-    @classmethod
-    async def run_in_thread(cls, func, *args, **kwargs):
         """
-        Run a function in the thread pool.
-
-        Args:
-            func: The function to run
-            *args: Positional arguments for the function
-            **kwargs: Keyword arguments for the function
-
-        Returns:
-            The result of the function
         """
-        return await asyncio.wrap_future(cls.get_pool().submit(func, *args, **kwargs))
-
-    @classmethod
-    async def shutdown(cls):
         """Shutdown the thread pool."""
-        if cls._instance and cls._instance._thread_pool:
-            cls._instance._thread_pool.shutdown(wait=True)
-            cls._instance._thread_pool = None
             logger.info("Thread pool shut down")
 
 # ============================
@@ -98,42 +40,23 @@ class ThreadPoolManager:
 
 class StorageError(Exception):
     """Base exception for storage-related errors."""
-
-class ValidationError(Exception):
     """Exception for validation errors in storage operations."""
-
-class ConnectionError(Exception):
     """Exception for connection-related errors."""
-
-def handle_storage_errors(func):
     """
-    Decorator for standardizing error handling in storage operations.
-
-    This decorator catches and transforms exceptions into consistent
-    StorageError exceptions, adding appropriate logging.
-
-    Args:
-        func: The async function to decorate
-
-    Returns:
-        Decorated function with standardized error handling
     """
-
-    @functools.wraps(func)
-    async def wrapper(*args, **kwargs):
-        try:
-            return await func(*args, **kwargs)
-        except ValidationError as e:
-            # Don't wrap validation errors, just log them
             logger.warning(f"Validation error in {func.__name__}: {e}")
             raise
-        except GoogleAPIError as e:
+        except Exception:
+
+            pass
             error_msg = f"{func.__name__} operation failed: {e}"
             logger.error(error_msg)
             raise StorageError(error_msg) from e
-        except Exception as e:
-            # Don't wrap other known exceptions, only unexpected ones
-            if isinstance(e, (StorageError, ConnectionError)):
+        except Exception:
+
+            pass
+            # Don't wrap other known except Exception:
+     pass
                 raise
             error_msg = f"Unexpected error in {func.__name__}: {e}"
             logger.error(error_msg)
@@ -147,27 +70,7 @@ def with_retry(
     retryable_exceptions=(GoogleAPIError, ConnectionError),
 ):
     """
-    Decorator for adding exponential backoff retry logic to async functions.
-
-    Args:
-        max_retries: Maximum number of retry attempts
-        base_delay: Base delay in seconds between retries
-        retryable_exceptions: Tuple of exception types that should trigger retry
-
-    Returns:
-        Decorator function that adds retry logic
     """
-
-    def decorator(func):
-        @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
-            retries = 0
-            while True:
-                try:
-                    return await func(*args, **kwargs)
-                except retryable_exceptions as e:
-                    retries += 1
-                    if retries > max_retries:
                         logger.error(f"Operation {func.__name__} failed after {max_retries} retries: {e}")
                         raise
 
@@ -193,34 +96,19 @@ async def optimized_semantic_search(
     top_k: int = 5,
 ) -> List[MemoryItem]:
     """
-    Improved semantic search implementation using batched processing and pagination.
-
-    This implementation:
-    1. Uses pagination to avoid loading all embeddings at once
-    2. Processes embeddings in batches to reduce memory usage
-    3. Uses numpy for efficient vector calculations when available
-    4. Is ready to integrate with GCP Vector Search for production
-
-    Args:
-        user_id: The user ID to search memories for
-        query_embedding: The vector embedding of the query
-        persona_context: Optional persona context for personalized results
-        top_k: Maximum number of results to return
-
-    Returns:
-        List of memory items ordered by relevance
     """
-    self._check_initialized()
-
-    if not query_embedding:
         raise ValidationError("Query embedding cannot be empty")
 
     # Try to use numpy for efficient vector calculations if available
     try:
+
+        pass
         import numpy as np
 
         use_numpy = True
-    except ImportError:
+    except Exception:
+
+        pass
         use_numpy = False
 
     # Calculate query embedding magnitude once
@@ -238,6 +126,9 @@ async def optimized_semantic_search(
     total_processed = 0
 
     try:
+
+
+        pass
         # Paginate through results to avoid memory issues
         while True:
             batch_count += 1
@@ -271,6 +162,8 @@ async def optimized_semantic_search(
             for doc in docs:
                 total_processed += 1
                 try:
+
+                    pass
                     item_data = doc.to_dict()
                     embedding = item_data.get("embedding")
                     if not embedding:
@@ -296,7 +189,9 @@ async def optimized_semantic_search(
 
                     item = MemoryItem(**item_data)
                     batch_items_with_scores.append((item, similarity))
-                except Exception as e:
+                except Exception:
+
+                    pass
                     logger.warning(f"Error processing item during semantic search: {e}")
                     continue
 
@@ -320,11 +215,16 @@ async def optimized_semantic_search(
         )
         return top_items
 
-    except GoogleAPIError as e:
+    except Exception:
+
+
+        pass
         error_msg = f"Failed to perform semantic search in mongodb: {e}"
         logger.error(error_msg)
         raise StorageError(error_msg)
-    except Exception as e:
+    except Exception:
+
+        pass
         error_msg = f"Unexpected error during semantic search: {e}"
         logger.error(error_msg)
         raise StorageError(error_msg)
@@ -335,29 +235,7 @@ async def optimized_semantic_search(
 
 async def cleanup_expired_items_with_progress(self) -> int:
     """
-    Remove expired items from storage with progress reporting.
-
-    This improved implementation:
-    1. Uses configurable batch sizes
-    2. Reports progress for long-running operations
-    3. Includes proper error handling
-
-    Returns:
-        Number of items removed
     """
-    self._check_initialized()
-
-    # Configurable batch sizes
-    QUERY_BATCH_SIZE = 100
-    DELETE_BATCH_SIZE = 400  # mongodb limit is 500
-
-    try:
-        # Get current time
-        now = datetime.utcnow()
-        total_deleted = 0
-        total_batches = 0
-        start_time = time.time()
-
         logger.info(f"Starting cleanup of expired items older than {now}")
 
         # Process in multiple query batches as there might be many expired items
@@ -426,11 +304,15 @@ async def cleanup_expired_items_with_progress(self) -> int:
         )
 
         return total_deleted
-    except GoogleAPIError as e:
+    except Exception:
+
+        pass
         error_msg = f"Failed to cleanup expired items in mongodb: {e}"
         logger.error(error_msg)
         raise StorageError(error_msg)
-    except Exception as e:
+    except Exception:
+
+        pass
         error_msg = f"Unexpected error during cleanup: {e}"
         logger.error(error_msg)
         raise StorageError(error_msg)
@@ -441,45 +323,12 @@ async def cleanup_expired_items_with_progress(self) -> int:
 
 class ImprovedFirestoreMemoryAdapter(MemoryManager):
     """
-    Improved mongodb memory adapter with optimized performance, error handling, and cloud-native patterns.
-
-    This class demonstrates the recommended implementation patterns for
-    a production-ready FirestoreMemoryAdapter.
     """
-
-    def __init__(
-        self,
-        project_id: Optional[str] = None,
-        credentials_json: Optional[str] = None,
-        credentials_path: Optional[str] = None,
         namespace: str = "default",
         batch_size: int = 400,
     ):
         """
-        Initialize the improved mongodb memory adapter.
-
-        Args:
-            project_id: Optional Google Cloud project ID
-            credentials_json: Optional JSON string containing service account credentials
-            credentials_path: Optional path to service account credentials file
-            namespace: Namespace for collection prefixing
-            batch_size: Batch size for batch operations
         """
-        # Initialize the underlying mongodb manager
-        # In actual implementation, this would be replaced with direct mongodb clients
-        self._firestore_manager = None  # Placeholder
-
-        # Store configuration
-        self.namespace = namespace
-        self.batch_size = batch_size
-        self._project_id = project_id
-        self._credentials_json = credentials_json
-        self._credentials_path = credentials_path
-
-        # Initialization state
-        self._is_initialized = False
-
-        # Collection names with namespace
         self._memory_collection = f"{namespace}_memory_items"
         self._agent_data_collection = f"{namespace}_agent_data"
         self._user_sessions_collection = f"{namespace}_user_sessions"
@@ -488,33 +337,16 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
     @with_retry()
     async def initialize(self) -> None:
         """Initialize the memory manager with retry and error handling."""
-        if self._is_initialized:
-            return
-
-        try:
-            # In a real implementation, would initialize mongodb clients directly
-            # For demonstration, using ThreadPoolManager to run sync initialization
-            await ThreadPoolManager.run_in_thread(self._initialize_sync)
-            self._is_initialized = True
             logger.info(f"ImprovedFirestoreMemoryAdapter initialized with namespace {self.namespace}")
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to initialize mongodb adapter: {e}")
             raise ConnectionError(f"Failed to initialize mongodb connection: {e}")
 
     def _initialize_sync(self):
         """Synchronous initialization for running in thread pool."""
-        # In a real implementation, would initialize clients and create collections if needed
-
-    @handle_storage_errors
-    async def close(self) -> None:
         """Close the memory manager and release resources."""
-        if not self._is_initialized:
-            return
-
-        try:
-            # Close clients properly, using an async context manager pattern
-            await ThreadPoolManager.run_in_thread(self._close_sync)
-            self._is_initialized = False
             logger.info("ImprovedFirestoreMemoryAdapter closed")
         finally:
             # Ensure consistent state even if close fails
@@ -522,56 +354,24 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
 
     def _close_sync(self):
         """Synchronous close method for running in thread pool."""
-        # In a real implementation, would close mongodb clients
-
-    def _check_initialized(self) -> None:
         """Check if initialized and raise appropriate exception if not."""
-        if not self._is_initialized:
             raise RuntimeError("Memory manager is not initialized. Call initialize() first.")
 
     @handle_storage_errors
     @with_retry()
     async def add_memory_item(self, item: MemoryItem) -> str:
         """Add a memory item to storage with retry and error handling."""
-        self._check_initialized()
-
-        # Generate an ID if not provided
-        if not item.id:
-            item.id = str(uuid.uuid4())
-
-        # Validate required fields
-        if not item.user_id:
             raise ValidationError("user_id is required for memory items")
 
         # Store in mongodb using ThreadPoolManager
         await ThreadPoolManager.run_in_thread(self._add_item_sync, item)
 
-        logger.debug(f"Saved memory item {item.id} for user {item.user_id}")
         return item.id
 
     def _add_item_sync(self, item: MemoryItem) -> None:
         """Synchronous add item method for running in thread pool."""
-        # In a real implementation, would convert item to dict and store in mongodb
-
-    # Other methods would be implemented similarly using the patterns demonstrated above
-    # Each method would use the ThreadPoolManager, error handling, and retry decorators
-
-    # Implementing the semantic search method using the optimized version
-    semantic_search = optimized_semantic_search
-
-    # Implementing the cleanup method using the improved version
-    cleanup_expired_items = cleanup_expired_items_with_progress
-
-    @handle_storage_errors
-    @with_retry()
-    async def health_check(self) -> MemoryHealth:
         """
-        Perform a health check on the mongodb connection.
-
-        Returns:
-            Dictionary with health status information
         """
-        health: MemoryHealth = {
             "status": "healthy",
             "mongodb": False,
             "redis": False,  # Not using Redis directly
@@ -585,21 +385,30 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
 
         if not self._is_initialized:
             try:
+
+                pass
                 await self.initialize()
                 health["details"]["initialization"] = "Initialized during health check"
-            except Exception as e:
+            except Exception:
+
+                pass
                 health["status"] = "error"
                 health["details"]["initialization_error"] = str(e)
                 return health
 
         try:
+
+
+            pass
             # Attempt a lightweight operation to verify connection
             # In a real implementation, would check actual mongodb connection
             await ThreadPoolManager.run_in_thread(self._check_connection_sync)
 
             health["mongodb"] = True
             return health
-        except Exception as e:
+        except Exception:
+
+            pass
             return {
                 "status": "error",
                 "mongodb": False,
@@ -614,21 +423,8 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
 
     def _check_connection_sync(self) -> bool:
         """Synchronous connection check for running in thread pool."""
-        # In a real implementation, would perform a lightweight mongodb operation
-        return True
-
-    def is_production_ready(self) -> bool:
         """Check if the memory system is production-ready."""
-        return all([
-            self.is_optimized(),
-            self.has_comprehensive_monitoring(),
-            self.is_secure(),
-            self.weaviate_manager.is_healthy() # Changed from GCP Vector Search
-        ])
-
-    def get_production_readiness_report(self) -> Dict[str, Any]:
         """Get a report on production readiness."""
-        return {
             "optimized": self.is_optimized(),
             "monitored": self.has_comprehensive_monitoring(),
             "secure": self.is_secure(),
@@ -642,11 +438,12 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
 
 async def usage_example():
     """Example of using the improved FirestoreMemoryAdapter."""
-
-    # Initialize the adapter
     memory_manager = ImprovedFirestoreMemoryAdapter(project_id="your-project-id", namespace="example-namespace")
 
     try:
+
+
+        pass
         # Initialize
         await memory_manager.initialize()
 
@@ -676,7 +473,10 @@ async def usage_example():
         await memory_manager.close()
         await ThreadPoolManager.shutdown()
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Error in usage example: {e}")
         # Ensure proper cleanup
         await memory_manager.close()

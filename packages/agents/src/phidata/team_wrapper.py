@@ -1,50 +1,15 @@
 """
-Enhanced Phidata Agent Wrapper for Team Member Resolution
-
-This module extends the PhidataAgentWrapper to properly handle team configurations
-where members are referenced by name/ID from other agent definitions.
 """
-
-import importlib
-import logging
-from typing import Any, List
-
-# Import the base PhidataAgentWrapper implementation
-from packages.agents.src.phidata.wrapper import PhidataAgentWrapper
-from packages.agents.src.protocols import AgentProtocol
-
-# Import registry to resolve agent references
-from packages.agents.src.registry import get_registry
-from packages.phidata.src.cloudsql_pgvector import get_pg_agent_storage, get_pgvector_memory
-
-logger = logging.getLogger(__name__)
-
-class PhidataTeamAgentWrapper(PhidataAgentWrapper, AgentProtocol):
     """
-    Enhanced PhidataAgentWrapper that supports resolving team member references.
-
-    This wrapper extends the standard PhidataAgentWrapper to correctly handle
-    team configurations where members are referenced by name/ID from other agent
-    definitions in the registry.
     """
-
-    def _init_team_members(self) -> List[Any]:
         """
-        Initialize Phidata team members based on the configuration or reference.
-
-        This enhanced method handles two scenarios:
-        1. Direct member configuration in the YAML (existing behavior)
-        2. References to other agent definitions by name/ID
-
-        Returns:
-            List of initialized Phidata agent instances for the team
         """
-        # Import Agent class for member initialization
-        try:
             agent_module_path = "agno.agent"
             agent_module = importlib.import_module(agent_module_path)
             Agent = getattr(agent_module, "Agent")
-        except ImportError as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to import Phidata Agent module: {e}")
             raise ImportError(f"Phidata Agent module not available: {e}")
 
@@ -57,6 +22,8 @@ class PhidataTeamAgentWrapper(PhidataAgentWrapper, AgentProtocol):
         members = []
         for member_entry in self.members_config:
             try:
+
+                pass
                 # Check if this is a direct configuration or a reference
                 if isinstance(member_entry, str):
                     # This is a reference to another agent definition
@@ -110,6 +77,8 @@ class PhidataTeamAgentWrapper(PhidataAgentWrapper, AgentProtocol):
                     member_tools = []
                     for tool_config in tools_config:
                         try:
+
+                            pass
                             tool_type = tool_config.get("type")
                             tool_params = tool_config.get("params", {})
 
@@ -134,7 +103,10 @@ class PhidataTeamAgentWrapper(PhidataAgentWrapper, AgentProtocol):
                             tool_instance = tool_class(**tool_params)
                             member_tools.append(tool_instance)
 
-                        except Exception as e:
+                        except Exception:
+
+
+                            pass
                             logger.error(f"Failed to initialize tool for member {name}: {e}")
 
                     # Initialize member-specific storage if needed
@@ -189,7 +161,10 @@ class PhidataTeamAgentWrapper(PhidataAgentWrapper, AgentProtocol):
                     members.append(member)
                     logger.info(f"Initialized directly configured team member: {name}")
 
-            except Exception as e:
+            except Exception:
+
+
+                pass
                 logger.error(f"Failed to initialize team member: {e}")
                 # Skip this member but continue with others
 

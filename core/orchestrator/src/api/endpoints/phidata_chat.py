@@ -1,45 +1,7 @@
 """
-Phidata Chat Endpoint for AI Orchestration System.
-
-This module provides API endpoints for integrating with the Phidata Agent UI,
-supporting the /phidata/chat endpoint to process chat requests with proper markdown
-formatting and structured output handling.
 """
-
-import logging
-from datetime import datetime
-from typing import Any, Dict, List, Optional
-
-from fastapi import APIRouter, Depends, HTTPException, Request
-from pydantic import BaseModel, Field
-
-from core.orchestrator.src.agents.simplified_agent_registry import get_simplified_agent_registry
-from core.orchestrator.src.api.dependencies.llm import get_llm_client
-from core.orchestrator.src.api.dependencies.memory import get_memory_manager
-from core.orchestrator.src.api.utils.format_structured_output import format_structured_output_as_markdown
-from packages.ingestion.src.api.chat_integration import (
-    IngestionChatMiddleware,
-    get_ingestion_middleware,
-    process_phidata_message,
-)
-from packages.shared.src.llm_client.interface import LLMClient
-from packages.shared.src.memory.memory_manager import MemoryManager
-from packages.shared.src.models.base_models import MemoryItem
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-# Create router
-router = APIRouter()
-
-class PhidataRequest(BaseModel):
     """
-    Request model for Phidata chat endpoint.
-
-    This model captures the structure expected by the Phidata Agent UI.
-    It includes the message content as well as session and user identification.
     """
-
     message: str = Field(..., min_length=1, description="User's message text")
     session_id: str = Field(..., description="Session identifier")
     user_id: str = Field(..., description="User identifier")
@@ -51,13 +13,7 @@ class PhidataRequest(BaseModel):
 
 class PhidataResponse(BaseModel):
     """
-    Response model for Phidata chat endpoint.
-
-    This model defines the structure expected by the Phidata Agent UI
-    for responses from the API. Includes support for markdown content and
-    tool call visibility control.
     """
-
     response_content: str = Field(..., description="Assistant's response text (markdown supported)")
     response_type: str = Field("text", description="Type of response (text, image, etc.)")
     content_format: str = Field("markdown", description="Format of response content (markdown, plain, etc.)")
@@ -80,34 +36,7 @@ async def phidata_chat(
     ingestion_middleware: Optional[IngestionChatMiddleware] = Depends(get_ingestion_middleware),
 ) -> PhidataResponse:
     """
-    Process a Phidata chat request with markdown formatting support.
-
-    This endpoint receives input from the Phidata Agent UI, processes it through
-    the appropriate agent, and returns a well-formatted markdown response suitable
-    for display in the UI. Supports:
-
-    1. Markdown formatting for all text responses
-    2. Structured output formatting for data like movie scripts, analysis results, etc.
-    3. Tool call visibility control
-    4. Session management for conversation persistence
-
-    Args:
-        request: The Phidata chat request
-        req: The HTTP request object
-        memory: Memory manager for conversation history
-        llm_client: LLM client for generating responses
-
-    Returns:
-        A PhidataResponse containing the agent's well-formatted response
-
-    Raises:
-        HTTPException: If processing fails
     """
-    try:
-        # Get agent registry
-        agent_registry = get_simplified_agent_registry()
-
-        logger.info(
             f"Processing Phidata chat request for user_id: {request.user_id}, " f"session_id: {request.session_id}"
         )
 
@@ -160,16 +89,24 @@ async def phidata_chat(
 
         # Get appropriate agent
         try:
+
+            pass
             agent = agent_registry.get_agent(agent_type)
             logger.info(f"Using agent type: {agent_type or 'default'}")
-        except KeyError:
+        except Exception:
+
+            pass
             agent = agent_registry.select_agent_for_context(context)
             logger.info(f"Selected agent based on context: {agent.agent_type}")
 
         # Process with agent
         try:
+
+            pass
             agent_response = await agent.process(context)
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Agent processing failed: {e}", exc_info=True)
             raise HTTPException(status_code=500, detail=f"Agent processing failed: {str(e)}")
 
@@ -245,6 +182,9 @@ async def phidata_chat(
 
         return response
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Phidata chat processing failed: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Failed to process Phidata chat: {str(e)}")

@@ -1,16 +1,6 @@
 #!/usr/bin/env python3
 """
-Migrate to Portkey Configuration
-Helps transition from direct API keys to Portkey virtual keys
 """
-
-import os
-import sys
-from typing import Dict, List
-from pathlib import Path
-
-# Mapping of direct API keys to Portkey virtual keys
-KEY_MAPPINGS = {
     "OPENAI_API_KEY": {
         "virtual_key": "openai-api-key-345cc9",
         "env_var": "PORTKEY_OPENAI_VIRTUAL_KEY",
@@ -40,14 +30,7 @@ KEY_MAPPINGS = {
 
 def check_existing_keys() -> Dict[str, bool]:
     """Check which direct API keys are currently set"""
-    results = {}
-    for key in KEY_MAPPINGS:
-        results[key] = bool(os.environ.get(key))
-    return results
-
-def generate_portkey_config() -> List[str]:
     """Generate Portkey configuration based on existing keys"""
-    config_lines = []
     config_lines.append("# Portkey Configuration")
     config_lines.append("PORTKEY_API_KEY=your-portkey-api-key  # Get from https://app.portkey.ai")
     config_lines.append("PORTKEY_BASE_URL=https://api.portkey.ai/v1")

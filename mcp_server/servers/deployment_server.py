@@ -1,29 +1,6 @@
 """
-Deployment MCP Server - Manages deployments to Vultr
 """
-
-import asyncio
-import logging
-import os
-from typing import Any, Dict, List, Optional
-
-# Assuming BaseMCPServer and MCPServerConfig are in a shared location or adjusted path
-# For this example, let's assume they are accessible via a relative import path
-# from ..base_mcp_server import BaseMCPServer, MCPServerConfig # Adjust if Base is elsewhere
-# For now, as BaseMCPServer is in the same directory as per previous reads:
-from .base_mcp_server import BaseMCPServer, MCPServerConfig 
-
-from mcp.server import Server # This seems to be from a different MCP framework, might need reconciliation
-from mcp.server.stdio import stdio_server
-from mcp.types import TextContent, Tool
-
-logger = logging.getLogger(__name__)
-
-class DeploymentServer(BaseMCPServer):
     """MCP server for deployment to Vultr."""
-
-    def __init__(self, config: MCPServerConfig):
-        super().__init__(config)
         # self.server = Server("deployment") # This line seems to be from a different MCP framework
                                         # If BaseMCPServer handles MCP protocol, this might not be needed
                                         # or needs integration. For now, BaseMCPServer handles tool listing/calling.
@@ -50,8 +27,6 @@ class DeploymentServer(BaseMCPServer):
 
     async def list_tools(self) -> List[Dict[str, Any]]:
         """List available tools."""
-        return [
-            {
                 "name": "deploy_to_vultr",
                 "description": "Deploy application to a Vultr instance.",
                 "inputSchema": {
@@ -92,9 +67,6 @@ class DeploymentServer(BaseMCPServer):
 
 async def main():
     """Run the Deployment MCP server."""
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    
-    server_config = MCPServerConfig(
         name="VultrDeploymentServer",
         service_type="deployment",
         required_secrets=["VULTR_API_KEY"], # Example, adjust as needed
@@ -102,13 +74,17 @@ async def main():
     )
     server = DeploymentServer(config=server_config)
     try:
+
+        pass
         await server.start()
         # Keep server running (e.g., by waiting on a shutdown event)
         # For this example, we'll just let it run for a short period or until interrupted.
         # In a real deployment, this would be managed by a process supervisor (systemd, Docker, K8s)
         while True: # Loop indefinitely or until KeyboardInterrupt
             await asyncio.sleep(3600) 
-    except KeyboardInterrupt:
+    except Exception:
+ 
+        pass
         logger.info("DeploymentServer shutting down...")
     finally:
         await server.stop()

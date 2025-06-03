@@ -1,45 +1,21 @@
 #!/usr/bin/env python3
 """
-Cherry AI Infrastructure Deployment Script
-
-This script manages the deployment of Cherry AI infrastructure using Pulumi.
-It supports multiple environments and implements blue-green deployment strategy.
 """
-
-import os
-import sys
-import subprocess
-import argparse
-import json
-from datetime import datetime
-from typing import Dict, List, Optional
-
-class InfrastructureDeployer:
     """
-    Manages infrastructure deployment with Pulumi
     """
-    
-    def __init__(self, stack: str):
         """
-        Initialize deployer with target stack
-        
-        Args:
-            stack: Target stack name (dev, staging, prod)
         """
-        self.stack = stack
         self.project_name = "cherry-ai-infrastructure"
         
     def check_prerequisites(self) -> bool:
         """
-        Check if all prerequisites are met
-        
-        Returns:
-            bool: True if all prerequisites are met
         """
         print("🔍 Checking prerequisites...")
         
         # Check Pulumi CLI
         try:
+
+            pass
             result = subprocess.run(
                 ["pulumi", "version"],
                 capture_output=True,
@@ -49,7 +25,9 @@ class InfrastructureDeployer:
                 print("❌ Pulumi CLI not found. Please install Pulumi.")
                 return False
             print(f"✅ Pulumi version: {result.stdout.strip()}")
-        except FileNotFoundError:
+        except Exception:
+
+            pass
             print("❌ Pulumi CLI not found. Please install Pulumi.")
             return False
         
@@ -73,10 +51,6 @@ class InfrastructureDeployer:
     
     def select_stack(self) -> bool:
         """
-        Select the target Pulumi stack
-        
-        Returns:
-            bool: True if stack selection successful
         """
         print(f"\n🎯 Selecting stack: {self.stack}")
         
@@ -104,10 +78,6 @@ class InfrastructureDeployer:
     
     def preview_changes(self) -> bool:
         """
-        Preview infrastructure changes
-        
-        Returns:
-            bool: True if preview successful
         """
         print("\n🔍 Previewing infrastructure changes...")
         
@@ -120,13 +90,6 @@ class InfrastructureDeployer:
     
     def deploy(self, auto_approve: bool = False) -> bool:
         """
-        Deploy infrastructure
-        
-        Args:
-            auto_approve: Skip confirmation prompt
-            
-        Returns:
-            bool: True if deployment successful
         """
         print(f"\n🚀 Deploying to {self.stack} environment...")
         
@@ -158,13 +121,6 @@ class InfrastructureDeployer:
     
     def destroy(self, auto_approve: bool = False) -> bool:
         """
-        Destroy infrastructure
-        
-        Args:
-            auto_approve: Skip confirmation prompt
-            
-        Returns:
-            bool: True if destruction successful
         """
         print(f"\n🗑️  Destroying {self.stack} environment...")
         
@@ -181,7 +137,6 @@ class InfrastructureDeployer:
     
     def export_outputs(self):
         """
-        Export stack outputs to file
         """
         print("\n📤 Exporting stack outputs...")
         
@@ -216,13 +171,7 @@ class InfrastructureDeployer:
     
     def save_deployment_record(self, deployment_id: str, status: str):
         """
-        Save deployment record for audit trail
-        
-        Args:
-            deployment_id: Unique deployment identifier
-            status: Deployment status (success/failed)
         """
-        record = {
             "deployment_id": deployment_id,
             "stack": self.stack,
             "status": status,
@@ -237,7 +186,6 @@ class InfrastructureDeployer:
     
     def rollback(self):
         """
-        Rollback to previous deployment
         """
         print("\n⏪ Rolling back to previous deployment...")
         
@@ -261,9 +209,7 @@ class InfrastructureDeployer:
 
 def main():
     """
-    Main entry point
     """
-    parser = argparse.ArgumentParser(
         description="Deploy Cherry AI infrastructure"
     )
     parser.add_argument(

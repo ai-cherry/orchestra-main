@@ -1,28 +1,6 @@
+# TODO: Consider adding connection pooling configuration
 """
-Claude API Monitoring System
-
-Provides comprehensive monitoring for Claude API usage including:
-- Token usage tracking
-- Cost calculation
-- Request/response logging
-- Performance metrics
-- Error tracking
 """
-
-import json
-import time
-from collections import defaultdict
-from contextlib import asynccontextmanager
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Union
-
-from core.logging_config import get_logger
-
-logger = get_logger(__name__)
-
-# Claude pricing as of 2025 (prices per 1M tokens)
-CLAUDE_PRICING = {
     "claude-3-opus-20240229": {"input": 15.00, "output": 75.00},
     "claude-3-sonnet-20240229": {"input": 3.00, "output": 15.00},
     "claude-3-haiku-20240229": {"input": 0.25, "output": 1.25},
@@ -34,34 +12,7 @@ CLAUDE_PRICING = {
 @dataclass
 class APICallMetrics:
     """Metrics for a single API call"""
-
-    request_id: str
-    model: str
-    timestamp: datetime
-    input_tokens: int
-    output_tokens: int
-    total_tokens: int
-    latency_ms: float
-    cost_usd: float
-    status: str  # success, error, timeout
-    error_message: Optional[str] = None
-    user_id: Optional[str] = None
-    session_id: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
-
-@dataclass
-class AggregatedMetrics:
     """Aggregated metrics for reporting"""
-
-    total_calls: int = 0
-    successful_calls: int = 0
-    failed_calls: int = 0
-    total_input_tokens: int = 0
-    total_output_tokens: int = 0
-    total_cost_usd: float = 0.0
-    average_latency_ms: float = 0.0
-    calls_by_model: Dict[str, int] = field(default_factory=lambda: defaultdict(int))
-    tokens_by_model: Dict[str, Dict[str, int]] = field(
         default_factory=lambda: defaultdict(lambda: {"input": 0, "output": 0})
     )
     cost_by_model: Dict[str, float] = field(default_factory=lambda: defaultdict(float))
@@ -69,23 +20,7 @@ class AggregatedMetrics:
 
 class ClaudeMonitor:
     """
-    Monitoring system for Claude API usage.
-
-    Features:
-    - Real-time token usage tracking
-    - Cost calculation based on model pricing
-    - Request/response logging
-    - Performance metrics collection
-    - Error tracking and alerting
-    - Aggregated reporting
     """
-
-    def __init__(
-        self,
-        log_responses: bool = True,
-        log_prompts: bool = True,
-        alert_threshold_cost: float = 10.0,  # Alert when cost exceeds $10
-        alert_threshold_errors: int = 5,  # Alert after 5 consecutive errors
         storage_backend: Optional[str] = "memory",  # memory, redis, mongodb
     ):
         self.log_responses = log_responses
@@ -124,7 +59,6 @@ class ClaudeMonitor:
 
     def calculate_cost(self, model: str, input_tokens: int, output_tokens: int) -> float:
         """Calculate the cost for a Claude API call"""
-        if model not in CLAUDE_PRICING:
             logger.warning(f"Unknown model {model}, using default pricing")
             # Use Claude 3 Sonnet as default pricing
             pricing = CLAUDE_PRICING["claude-3-sonnet-20240229"]
@@ -147,9 +81,6 @@ class ClaudeMonitor:
         metadata: Optional[Dict[str, Any]] = None,
     ):
         """
-        Context manager for monitoring a Claude API call.
-
-        Usage:
             async with monitor.monitor_call(model="claude-3-opus") as ctx:
                 response = await claude_api_call()
                 ctx.set_tokens(response.usage)
@@ -175,6 +106,9 @@ class ClaudeMonitor:
         ctx = CallContext(self, request_id)
 
         try:
+
+
+            pass
             yield ctx
 
             # Calculate metrics
@@ -210,7 +144,10 @@ class ClaudeMonitor:
                 if self.session_costs[session_id] > self.alert_threshold_cost:
                     await self._send_cost_alert(session_id, self.session_costs[session_id])
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             # Record error metrics
             latency_ms = (time.time() - start_time) * 1000
 
@@ -242,11 +179,6 @@ class ClaudeMonitor:
 
     async def _store_metrics(self, metrics: APICallMetrics):
         """Store metrics in the configured backend"""
-        # Always store in memory for quick access
-        self.metrics.append(metrics)
-
-        # Log the metrics
-        logger.info(
             "Claude API call completed",
             extra={
                 "request_id": metrics.request_id,
@@ -272,7 +204,6 @@ class ClaudeMonitor:
 
     async def _send_cost_alert(self, session_id: str, total_cost: float):
         """Send alert when cost threshold is exceeded"""
-        logger.warning(
             f"Cost threshold exceeded for session {session_id}",
             extra={
                 "session_id": session_id,
@@ -284,7 +215,6 @@ class ClaudeMonitor:
 
     async def _send_error_alert(self, model: str, error_count: int):
         """Send alert when error threshold is exceeded"""
-        logger.error(
             f"Error threshold exceeded for model {model}",
             extra={
                 "model": model,
@@ -303,29 +233,7 @@ class ClaudeMonitor:
         model: Optional[str] = None,
     ) -> AggregatedMetrics:
         """
-        Get aggregated metrics for the specified time period and filters.
         """
-        # Filter metrics
-        filtered_metrics = self.metrics
-
-        if start_time:
-            filtered_metrics = [m for m in filtered_metrics if m.timestamp >= start_time]
-        if end_time:
-            filtered_metrics = [m for m in filtered_metrics if m.timestamp <= end_time]
-        if user_id:
-            filtered_metrics = [m for m in filtered_metrics if m.user_id == user_id]
-        if session_id:
-            filtered_metrics = [m for m in filtered_metrics if m.session_id == session_id]
-        if model:
-            filtered_metrics = [m for m in filtered_metrics if m.model == model]
-
-        # Aggregate metrics
-        summary = AggregatedMetrics()
-        total_latency = 0.0
-
-        for metric in filtered_metrics:
-            summary.total_calls += 1
-
             if metric.status == "success":
                 summary.successful_calls += 1
             else:
@@ -358,17 +266,7 @@ class ClaudeMonitor:
         end_time: Optional[datetime] = None,
     ) -> Union[str, List[Dict[str, Any]]]:
         """
-        Export metrics in the specified format.
-
-        Supported formats: json, csv
         """
-        # Filter metrics
-        filtered_metrics = self.metrics
-        if start_time:
-            filtered_metrics = [m for m in filtered_metrics if m.timestamp >= start_time]
-        if end_time:
-            filtered_metrics = [m for m in filtered_metrics if m.timestamp <= end_time]
-
         if format == "json":
             return json.dumps(
                 [
@@ -387,6 +285,8 @@ class ClaudeMonitor:
                         "session_id": m.session_id,
                         "metadata": m.metadata,
                     }
+                    # TODO: Consider using list comprehension for better performance
+
                     for m in filtered_metrics
                 ],
                 indent=2,

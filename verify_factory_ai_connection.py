@@ -1,16 +1,6 @@
 #!/usr/bin/env python3
 """
-Verify Factory AI Connection
-This script checks that Factory AI is connected to the correct environment
 """
-
-import os
-import sys
-import subprocess
-import json
-from pathlib import Path
-
-def check_environment():
     """Check and display environment information"""
     print("🔍 Factory AI Connection Verification")
     print("=" * 50)
@@ -29,6 +19,8 @@ def check_environment():
     # Check git repository
     print("\n🔗 Git Repository:")
     try:
+
+        pass
         remote = subprocess.check_output(["git", "remote", "get-url", "origin"], text=True).strip()
         branch = subprocess.check_output(["git", "branch", "--show-current"], text=True).strip()
         commit = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()[:8]
@@ -44,7 +36,9 @@ def check_environment():
             print("   Status: ✅ Up to date with remote")
         else:
             print("   Status: ⚠️  Not synced with remote")
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"   Error checking git: {e}")
 
     # Check Factory AI config

@@ -1,20 +1,17 @@
+# TODO: Consider adding connection pooling configuration
 """
-Pydantic models for the orchestrator persona configuration system.
-
-This module contains all data models for managing personas in the admin interface,
-including configuration, traits, behaviors, and runtime settings.
+Orchestra AI - Database Models
+This module contains Pydantic models for database entities.
 """
 
+from typing import List, Dict, Any, Optional, Union
+from uuid import uuid4, UUID
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union
-from uuid import UUID, uuid4
-
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-class PersonaStatus(str, Enum):
+""
     """Status of a persona in the system."""
-
     ACTIVE = "active"
     INACTIVE = "inactive"
     DRAFT = "draft"
@@ -22,7 +19,6 @@ class PersonaStatus(str, Enum):
 
 class TraitCategory(str, Enum):
     """Categories for persona traits."""
-
     PERSONALITY = "personality"
     COMMUNICATION = "communication"
     EXPERTISE = "expertise"
@@ -31,7 +27,6 @@ class TraitCategory(str, Enum):
 
 class ResponseStyleType(str, Enum):
     """Types of response styles for personas."""
-
     FORMAL = "formal"
     CASUAL = "casual"
     TECHNICAL = "technical"
@@ -41,7 +36,6 @@ class ResponseStyleType(str, Enum):
 
 class InteractionMode(str, Enum):
     """Modes of interaction for personas."""
-
     CONVERSATIONAL = "conversational"
     TASK_ORIENTED = "task_oriented"
     ANALYTICAL = "analytical"
@@ -50,12 +44,7 @@ class InteractionMode(str, Enum):
 
 class PersonaTrait(BaseModel):
     """
-    Individual trait configuration for a persona.
-
-    Traits define specific characteristics that influence persona behavior
-    and response generation.
     """
-
     id: UUID = Field(default_factory=uuid4, description="Unique identifier for the trait")
     name: str = Field(..., min_length=1, max_length=100, description="Name of the trait")
     category: TraitCategory = Field(..., description="Category of the trait")
@@ -70,14 +59,11 @@ class PersonaTrait(BaseModel):
     @classmethod
     def validate_numeric_range(cls, v: Any, info) -> Any:
         """Validate numeric values are within acceptable range."""
-        if isinstance(v, (int, float)) and not 0 <= v <= 100:
             raise ValueError("Numeric trait values must be between 0 and 100")
         return v
 
     class Config:
         """Pydantic configuration."""
-
-        json_schema_extra = {
             "example": {
                 "name": "analytical_thinking",
                 "category": "cognitive",
@@ -89,11 +75,7 @@ class PersonaTrait(BaseModel):
 
 class ResponseStyle(BaseModel):
     """
-    Configuration for how a persona structures and delivers responses.
-
-    Defines formatting preferences, tone, and communication patterns.
     """
-
     id: UUID = Field(default_factory=uuid4, description="Unique identifier for the style")
     type: ResponseStyleType = Field(..., description="Type of response style")
     tone: str = Field(..., min_length=1, max_length=50, description="Overall tone (e.g., friendly, professional)")
@@ -109,8 +91,6 @@ class ResponseStyle(BaseModel):
 
     class Config:
         """Pydantic configuration."""
-
-        json_schema_extra = {
             "example": {
                 "type": "technical",
                 "tone": "professional",
@@ -123,11 +103,7 @@ class ResponseStyle(BaseModel):
 
 class KnowledgeDomain(BaseModel):
     """
-    Represents a domain of knowledge or expertise for a persona.
-
-    Defines areas where the persona has specialized knowledge or capabilities.
     """
-
     id: UUID = Field(default_factory=uuid4, description="Unique identifier for the domain")
     name: str = Field(..., min_length=1, max_length=100, description="Name of the knowledge domain")
     expertise_level: int = Field(..., ge=1, le=10, description="Level of expertise (1=basic, 10=expert)")
@@ -143,12 +119,7 @@ class KnowledgeDomain(BaseModel):
     @classmethod
     def validate_list_items(cls, v: List[str]) -> List[str]:
         """Ensure list items are non-empty strings."""
-        return [item.strip() for item in v if item.strip()]
-
-    class Config:
         """Pydantic configuration."""
-
-        json_schema_extra = {
             "example": {
                 "name": "Software Development",
                 "expertise_level": 9,
@@ -160,11 +131,7 @@ class KnowledgeDomain(BaseModel):
 
 class BehaviorRule(BaseModel):
     """
-    Defines specific behavioral rules and constraints for a persona.
-
-    Rules that govern how the persona should or should not behave in certain situations.
     """
-
     id: UUID = Field(default_factory=uuid4, description="Unique identifier for the rule")
     name: str = Field(..., min_length=1, max_length=100, description="Name of the rule")
     condition: str = Field(..., min_length=1, description="Condition that triggers this rule")
@@ -176,8 +143,6 @@ class BehaviorRule(BaseModel):
 
     class Config:
         """Pydantic configuration."""
-
-        json_schema_extra = {
             "example": {
                 "name": "Avoid Technical Jargon",
                 "condition": "user_expertise_level < 5",
@@ -190,11 +155,7 @@ class BehaviorRule(BaseModel):
 
 class MemoryConfiguration(BaseModel):
     """
-    Configuration for persona memory and context retention.
-
-    Defines how the persona maintains and uses conversation history and context.
     """
-
     id: UUID = Field(default_factory=uuid4, description="Unique identifier")
     retention_period_hours: int = Field(
         default=24, ge=0, description="How long to retain conversation history (0=forever)"
@@ -215,8 +176,6 @@ class MemoryConfiguration(BaseModel):
 
     class Config:
         """Pydantic configuration."""
-
-        json_schema_extra = {
             "example": {
                 "retention_period_hours": 48,
                 "max_context_tokens": 8000,
@@ -227,11 +186,7 @@ class MemoryConfiguration(BaseModel):
 
 class VoiceConfiguration(BaseModel):
     """
-    Configuration for text-to-speech voice settings.
-
-    Defines voice characteristics for audio output generation.
     """
-
     id: UUID = Field(default_factory=uuid4, description="Unique identifier")
     voice_id: Optional[str] = Field(None, description="ID of the voice model to use (provider-specific)")
     provider: Optional[str] = Field(None, description="TTS provider (e.g., 'elevenlabs', 'azure', 'google')")
@@ -246,8 +201,6 @@ class VoiceConfiguration(BaseModel):
 
     class Config:
         """Pydantic configuration."""
-
-        json_schema_extra = {
             "example": {
                 "provider": "elevenlabs",
                 "voice_id": "21m00Tcm4TlvDq8ikWAM",
@@ -260,11 +213,7 @@ class VoiceConfiguration(BaseModel):
 
 class PersonaTemplate(BaseModel):
     """
-    Template for creating new personas with predefined configurations.
-
-    Provides a reusable blueprint for persona creation.
     """
-
     id: UUID = Field(default_factory=uuid4, description="Unique identifier")
     name: str = Field(..., min_length=1, max_length=100, description="Template name")
     description: str = Field(..., min_length=1, max_length=500, description="Template description")
@@ -283,8 +232,6 @@ class PersonaTemplate(BaseModel):
 
     class Config:
         """Pydantic configuration."""
-
-        json_schema_extra = {
             "example": {
                 "name": "Technical Assistant",
                 "description": "Template for creating technical support personas",
@@ -296,11 +243,7 @@ class PersonaTemplate(BaseModel):
 
 class PersonaMetrics(BaseModel):
     """
-    Runtime metrics and analytics for persona performance.
-
-    Tracks usage statistics and performance indicators.
     """
-
     id: UUID = Field(default_factory=uuid4, description="Unique identifier")
     persona_id: UUID = Field(..., description="ID of the persona these metrics belong to")
     total_interactions: int = Field(default=0, ge=0, description="Total number of interactions")
@@ -327,8 +270,6 @@ class PersonaMetrics(BaseModel):
 
     class Config:
         """Pydantic configuration."""
-
-        json_schema_extra = {
             "example": {
                 "persona_id": "123e4567-e89b-12d3-a456-426614174000",
                 "total_interactions": 1523,
@@ -340,11 +281,7 @@ class PersonaMetrics(BaseModel):
 
 class PersonaConfiguration(BaseModel):
     """
-    Complete configuration for an orchestrator persona.
-
-    This is the main model that combines all aspects of a persona definition.
     """
-
     id: UUID = Field(default_factory=uuid4, description="Unique identifier for the persona")
     name: str = Field(..., min_length=1, max_length=100, description="Display name of the persona")
     slug: str = Field(
@@ -400,13 +337,10 @@ class PersonaConfiguration(BaseModel):
     @classmethod
     def validate_slug_unique(cls, v: str) -> str:
         """Ensure slug is lowercase and valid."""
-        return v.lower()
-
     @field_validator("model_preferences")
     @classmethod
     def validate_model_preferences(cls, v: List[str]) -> List[str]:
         """Ensure model preferences are valid."""
-        valid_models = [
             "gpt-4",
             "gpt-4-turbo",
             "gpt-3.5-turbo",
@@ -426,14 +360,11 @@ class PersonaConfiguration(BaseModel):
     @model_validator(mode="after")
     def validate_relationships(self) -> "PersonaConfiguration":
         """Validate persona relationships."""
-        if self.parent_persona_id and self.template_id:
             raise ValueError("A persona cannot have both a parent and a template")
         return self
 
     class Config:
         """Pydantic configuration."""
-
-        json_schema_extra = {
             "example": {
                 "name": "Technical Architect",
                 "slug": "technical-architect",

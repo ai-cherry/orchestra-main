@@ -1,23 +1,6 @@
 """
-Rule configurations for Roo.
-
-This module provides a rule engine for defining and enforcing constraints
-on Roo operations, capturing developer intent and ensuring consistent
-behavior across different modes.
 """
-
-import logging
-import re
-from enum import Enum
-from typing import Any, Dict, List, Pattern, Union
-
-from pydantic import BaseModel, Field, validator
-
-logger = logging.getLogger(__name__)
-
-class RuleType(str, Enum):
     """Types of rules that can be applied to Roo operations."""
-
     FILE_ACCESS = "file_access"
     CODE_STYLE = "code_style"
     DEPENDENCY = "dependency"
@@ -29,7 +12,6 @@ class RuleType(str, Enum):
 
 class RuleIntent(str, Enum):
     """Developer intents that rules can capture."""
-
     ENFORCE_STYLE = "enforce_style"
     PREVENT_BUGS = "prevent_bugs"
     ENSURE_SECURITY = "ensure_security"
@@ -41,14 +23,12 @@ class RuleIntent(str, Enum):
 
 class RuleSeverity(str, Enum):
     """Severity levels for rule violations."""
-
     INFO = "info"
     WARNING = "warning"
     ERROR = "error"
 
 class RuleCondition(BaseModel):
     """A condition that must be met for a rule to apply."""
-
     type: str = Field(..., description="Type of value to check")
     pattern: Union[str, Pattern] = Field(..., description="Pattern to match against")
     negated: bool = Field(default=False, description="Whether to negate the match")
@@ -58,38 +38,21 @@ class RuleCondition(BaseModel):
         """Compile string patterns into regex patterns if they look like regex."""
         if isinstance(v, str) and v.startswith("^") or v.endswith("$") or "*" in v or "+" in v or "?" in v:
             try:
+
+                pass
                 return re.compile(v)
-            except re.error:
+            except Exception:
+
+                pass
                 # If it's not a valid regex, treat it as a literal string
                 return v
         return v
 
     def matches(self, value: str) -> bool:
         """
-        Check if the condition matches a value.
-
-        Args:
-            value: The value to check against the pattern
-
-        Returns:
-            True if the condition matches, False otherwise
         """
-        if value is None:
-            return False
-
-        if isinstance(self.pattern, Pattern):
-            result = bool(self.pattern.search(str(value)))
-        else:
-            result = self.pattern == value
-
-        return not result if self.negated else result
-
-class Rule(BaseModel):
     """
-    A rule that captures developer intent and enforces constraints
-    on Roo operations.
     """
-
     id: str = Field(..., description="Unique identifier for the rule")
     name: str = Field(..., description="Display name for the rule")
     description: str = Field(..., description="Detailed description of the rule's purpose")
@@ -103,75 +66,18 @@ class Rule(BaseModel):
 
     def matches(self, context: Dict[str, Any]) -> bool:
         """
-        Check if the rule matches a context.
-
-        Args:
-            context: Dictionary of values to check against the rule conditions
-
-        Returns:
-            True if all conditions match, False otherwise
         """
-        if not self.enabled:
-            return False
-
-        for condition in self.conditions:
-            value = context.get(condition.type)
-            if not condition.matches(value):
-                return False
-
-        return True
-
-class RuleEngine:
     """
-    Engine for evaluating rules against operations and
-    capturing developer intent.
-
-    This class provides a centralized mechanism for registering and evaluating
-    rules against operations, ensuring consistent behavior across different
-    modes and operations.
     """
-
-    def __init__(self):
         """Initialize the rule engine."""
-        self.rules: Dict[str, Rule] = {}
-
-    def register_rule(self, rule: Rule) -> None:
         """
-        Register a rule with the engine.
-
-        Args:
-            rule: The rule to register
         """
-        self.rules[rule.id] = rule
-        logger.debug(f"Registered rule: {rule.id}")
 
     def register_rules(self, rules: List[Rule]) -> None:
         """
-        Register multiple rules with the engine.
-
-        Args:
-            rules: The rules to register
         """
-        for rule in rules:
-            self.register_rule(rule)
-
-    def evaluate(self, context: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
-        Evaluate all rules against a context and return
-        matching rules with their actions.
-
-        Args:
-            context: Dictionary of values to check against rule conditions
-
-        Returns:
-            List of dictionaries containing rule information and actions
         """
-        results = []
-
-        for rule_id, rule in self.rules.items():
-            if rule.matches(context):
-                results.append(
-                    {
                         "rule_id": rule_id,
                         "name": rule.name,
                         "description": rule.description,
@@ -186,31 +92,9 @@ class RuleEngine:
 
     def get_rules_by_intent(self, intent: RuleIntent) -> List[Rule]:
         """
-        Get all rules with a specific intent.
-
-        Args:
-            intent: The intent to filter by
-
-        Returns:
-            List of rules with the specified intent
         """
-        return [rule for rule in self.rules.values() if rule.intent == intent and rule.enabled]
-
-    def get_rules_by_type(self, rule_type: RuleType) -> List[Rule]:
         """
-        Get all rules of a specific type.
-
-        Args:
-            rule_type: The type to filter by
-
-        Returns:
-            List of rules of the specified type
         """
-        return [rule for rule in self.rules.values() if rule.type == rule_type and rule.enabled]
-
-# Example rule definitions
-FILE_PATTERN_RULES = [
-    Rule(
         id="python_file_naming",
         name="Python File Naming Convention",
         description="Python files should use snake_case naming",
@@ -350,11 +234,4 @@ DEFAULT_RULES = FILE_PATTERN_RULES + CODE_STYLE_RULES + SECURITY_RULES + MEMORY_
 
 def create_rule_engine() -> RuleEngine:
     """
-    Create a rule engine with the default rules.
-
-    Returns:
-        A rule engine initialized with the default rules
     """
-    engine = RuleEngine()
-    engine.register_rules(DEFAULT_RULES)
-    return engine

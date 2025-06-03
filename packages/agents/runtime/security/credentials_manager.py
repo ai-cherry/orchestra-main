@@ -1,35 +1,7 @@
 """
-Credentials Manager for Orchestra.
-
-This module provides centralized credential management capabilities for the Orchestra system,
-allowing agents and services to securely access and handle sensitive credentials while
-maintaining security best practices.
 """
-
-import logging
-import os
-from typing import Any, Dict, List, Optional
-
-from packages.agents.base import BaseAgent
-
-# Import from future directory since OnePasswordAgent has been moved
-# TODO: OnePasswordAgent integration import removed due to obsolete or missing module.
-# If 1Password integration is required, refactor and implement OnePasswordAgent in the correct location.
-# from future.packages.agents.runtime.security.onepassword_agent import OnePasswordAgent
-
-logger = logging.getLogger(__name__)
-
-class CredentialsManager(BaseAgent):
     """
-    Agent responsible for securely managing credentials across the Orchestra platform.
-
-    This agent serves as a central hub for credential management, integrating with
-    various secure credential stores (like 1Password) and providing a unified interface
-    for obtaining and managing credentials without exposing sensitive information.
     """
-
-    def __init__(
-        self,
         agent_id: str = "credentials-manager",
         name: str = "Credentials Manager",
         description: str = "Manages secure access to credentials across the Orchestra platform",
@@ -37,17 +9,7 @@ class CredentialsManager(BaseAgent):
         persona: Dict[str, Any] = None,
     ):
         """
-        Initialize the Credentials Manager.
-
-        Args:
-            agent_id: Unique identifier for the agent
-            name: Human-readable name
-            description: Description of agent's purpose
-            config: Agent-specific configuration
-            persona: Optional persona configuration
         """
-        # Create config dictionary if not provided
-        if config is None:
             config = {"id": agent_id, "name": name, "description": description}
 
         super().__init__(config=config, persona=persona)
@@ -59,14 +21,17 @@ class CredentialsManager(BaseAgent):
 
     async def initialize(self) -> None:
         """Initialize the agent and set up credential providers."""
-        # Set up 1Password integration if configured
         op_service_token = os.environ.get("OP_SERVICE_ACCOUNT_TOKEN")
         if op_service_token:
             try:
+
+                pass
                 # OnePasswordAgent integration is currently disabled due to missing implementation.
                 # To re-enable, implement OnePasswordAgent and restore this logic.
                 logger.warning("1Password integration is currently disabled: OnePasswordAgent not implemented.")
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Failed to initialize 1Password provider: {str(e)}")
         else:
             logger.info("1Password service token not found in environment, provider not registered")
@@ -80,20 +45,7 @@ class CredentialsManager(BaseAgent):
 
     async def run(self, context: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Process a credential access request.
-
-        Args:
-            context: Dictionary containing:
-                - request_type: Type of credential request
-                - provider: (Optional) Provider to use
-                - credential_name: (Optional) Name of the credential
-                - vault: (Optional) Vault or collection
-                - category: (Optional) Category filter
-
-        Returns:
-            Dictionary containing the request result
         """
-        # Extract request details
         request_type = context.get("request_type", "unknown")
         provider = context.get("provider", self.default_provider)
         context.get("input_text", "")
@@ -176,25 +128,7 @@ class CredentialsManager(BaseAgent):
         field: str = None,
     ) -> Optional[str]:
         """
-        Get a credential from the specified provider.
-
-        Args:
-            credential_name: The name of the credential
-            provider: The provider to use (default: self.default_provider)
-            vault: The vault or collection within the provider
-            field: The specific field to retrieve
-
-        Returns:
-            The credential value, or None if it could not be retrieved
-
-        Note:
-            This method returns the actual credential and should NEVER be
-            directly exposed through an API or response. It should only
-            be used internally by trusted agents.
         """
-        provider = provider or self.default_provider
-
-        if not provider or provider not in self.providers:
             logger.error(f"Unknown credential provider: {provider}")
             return None
 
@@ -209,19 +143,7 @@ class CredentialsManager(BaseAgent):
 
     async def check_credential_exists(self, credential_name: str, provider: str = None, vault: str = None) -> bool:
         """
-        Check if a credential exists in the specified provider.
-
-        Args:
-            credential_name: The name of the credential
-            provider: The provider to use (default: self.default_provider)
-            vault: The vault or collection within the provider
-
-        Returns:
-            True if the credential exists, False otherwise
         """
-        provider = provider or self.default_provider
-
-        if not provider or provider not in self.providers:
             logger.error(f"Unknown credential provider: {provider}")
             return False
 
@@ -238,19 +160,7 @@ class CredentialsManager(BaseAgent):
         self, provider: str = None, vault: str = None, category: str = None
     ) -> List[Dict[str, Any]]:
         """
-        List available credentials in the specified provider.
-
-        Args:
-            provider: The provider to use (default: self.default_provider)
-            vault: The vault or collection within the provider
-            category: Filter by category
-
-        Returns:
-            List of credential metadata (never includes actual secrets)
         """
-        provider = provider or self.default_provider
-
-        if not provider or provider not in self.providers:
             logger.error(f"Unknown credential provider: {provider}")
             return []
 
@@ -271,20 +181,7 @@ class CredentialsManager(BaseAgent):
         env_map: Dict[str, str] = None,
     ) -> Dict[str, str]:
         """
-        Inject credentials into environment variables.
-
-        Args:
-            credential_names: Names of the credentials to inject
-            provider: The provider to use (default: self.default_provider)
-            vault: The vault or collection within the provider
-            env_map: Mapping of credential names to env var names
-
-        Returns:
-            Dictionary of environment variables (without values for security)
         """
-        provider = provider or self.default_provider
-
-        if not provider or provider not in self.providers:
             logger.error(f"Unknown credential provider: {provider}")
             return {}
 
@@ -301,12 +198,6 @@ class CredentialsManager(BaseAgent):
         self, agent_id: str, credential_mapping: Dict[str, Dict[str, Any]]
     ) -> bool:
         """
-        Provision credentials for a specific agent.
-
-        Args:
-            agent_id: ID of the agent that needs credentials
-            credential_mapping: Mapping of agent credential needs to provider credentials
-                Format: {
                     "env_var_name": {
                         "provider": "provider_name",
                         "credential_name": "name_in_provider",
@@ -319,7 +210,6 @@ class CredentialsManager(BaseAgent):
         Returns:
             True if all credentials were successfully provisioned, False otherwise
         """
-        if not credential_mapping:
             logger.warning(f"No credential mapping provided for agent {agent_id}")
             return False
 
@@ -373,14 +263,4 @@ _credentials_manager = None
 
 def get_credentials_manager() -> CredentialsManager:
     """
-    Get the global credentials manager instance.
-
-    Returns:
-        The global CredentialsManager instance
     """
-    global _credentials_manager
-
-    if _credentials_manager is None:
-        _credentials_manager = CredentialsManager()
-
-    return _credentials_manager

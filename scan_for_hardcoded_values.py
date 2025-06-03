@@ -1,41 +1,7 @@
 #!/usr/bin/env python3
 """
-Scan for Hardcoded Values in AI Orchestra Codebase
-
-This script scans the codebase for hardcoded values that should be replaced with
-environment variables. It looks for common patterns like project IDs, regions,
-and service account names.
-
-Usage:
-    python scan_for_hardcoded_values.py [--path PATH] [--fix]
-
-Options:
-    --path PATH    Path to scan (default: current directory)
-    --fix          Generate suggested fixes (default: False)
 """
-
-import argparse
-import os
-import re
-import sys
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Dict, List, Optional, Pattern, Tuple
-
-@dataclass
-class HardcodedPattern:
     """Pattern for detecting hardcoded values."""
-
-    name: str
-    pattern: Pattern
-    env_var: str
-    description: str
-    file_patterns: List[str]
-    exclude_patterns: List[str] = None
-
-# Define patterns to search for
-PATTERNS = [
-    HardcodedPattern(
         name="Vultr API Key",
         pattern=re.compile(r'["\'][A-Z0-9]{30,60}["\']'), # Generic strong API key pattern
         env_var="VULTR_API_KEY",
@@ -83,7 +49,6 @@ PATTERNS = [
 
 def should_scan_file(file_path: Path, pattern: HardcodedPattern) -> bool:
     """Check if a file should be scanned based on patterns."""
-    # Skip .env files
     if file_path.name.startswith(".env"):
         return False
 
@@ -99,23 +64,14 @@ def should_scan_file(file_path: Path, pattern: HardcodedPattern) -> bool:
 
 def scan_file(file_path: Path, pattern: HardcodedPattern) -> List[Tuple[int, str, str]]:
     """
-    Scan a file for hardcoded values.
-
-    Args:
-        file_path: Path to the file to scan
-        pattern: Pattern to search for
-
-    Returns:
-        List of tuples (line_number, line, match)
     """
-    results = []
-
-    try:
         with open(file_path, "r", encoding="utf-8") as f:
             for i, line in enumerate(f, 1):
                 for match in pattern.pattern.finditer(line):
                     results.append((i, line.strip(), match.group(0)))
-    except UnicodeDecodeError:
+    except Exception:
+
+        pass
         # Skip binary files
         pass
 
@@ -123,16 +79,6 @@ def scan_file(file_path: Path, pattern: HardcodedPattern) -> List[Tuple[int, str
 
 def generate_fix(file_path: Path, pattern: HardcodedPattern, line: str, match: str) -> str:
     """
-    Generate a suggested fix for a hardcoded value.
-
-    Args:
-        file_path: Path to the file
-        pattern: Pattern that matched
-        line: Line containing the match
-        match: Matched text
-
-    Returns:
-        Suggested fix
     """
     if file_path.suffix == ".sh":
         # For shell scripts
@@ -151,54 +97,9 @@ def scan_directory(
     directory: Path, fix: bool = False
 ) -> Dict[Path, Dict[str, List[Tuple[int, str, str, Optional[str]]]]]:
     """
-    Scan a directory for hardcoded values.
-
-    Args:
-        directory: Directory to scan
-        fix: Whether to generate suggested fixes
-
-    Returns:
-        Dictionary mapping file paths to dictionaries mapping pattern names to
-        lists of tuples (line_number, line, match, suggested_fix)
     """
-    results = {}
-
-    for root, _, files in os.walk(directory):
-        for file in files:
-            file_path = Path(root) / file
-
-            file_results = {}
-            for pattern in PATTERNS:
-                if should_scan_file(file_path, pattern):
-                    matches = scan_file(file_path, pattern)
-                    if matches:
-                        file_results[pattern.name] = [
-                            (
-                                line_num,
-                                line,
-                                match,
-                                (generate_fix(file_path, pattern, line, match) if fix else None),
-                            )
-                            for line_num, line, match in matches
-                        ]
-
-            if file_results:
-                results[file_path] = file_results
-
-    return results
-
-def print_results(
-    results: Dict[Path, Dict[str, List[Tuple[int, str, str, Optional[str]]]]],
-) -> None:
     """
-    Print scan results.
-
-    Args:
-        results: Scan results
     """
-    total_files = len(results)
-    total_matches = sum(len(match) for file_results in results.values() for match in file_results.values())
-
     print(f"Found {total_matches} hardcoded values in {total_files} files:\n")
 
     for file_path, file_results in sorted(results.items()):

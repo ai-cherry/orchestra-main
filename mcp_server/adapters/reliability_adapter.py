@@ -1,23 +1,6 @@
-"""Reliability Adapter for Factory AI integration.
-
-This adapter bridges the Reliability Droid with the deployment MCP server,
-handling incident management and monitoring capabilities.
 """
-
-import asyncio
-import json
-import logging
-from datetime import datetime, timedelta
-from enum import Enum
-from typing import Any, Dict, List, Optional, Set
-
-from .factory_mcp_adapter import FactoryMCPAdapter
-
-logger = logging.getLogger(__name__)
-
-class IncidentSeverity(Enum):
+"""
     """Incident severity levels."""
-
     CRITICAL = "critical"
     HIGH = "high"
     MEDIUM = "medium"
@@ -26,28 +9,15 @@ class IncidentSeverity(Enum):
 
 class RemediationStatus(Enum):
     """Remediation action status."""
-
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
     FAILED = "failed"
 
 class ReliabilityAdapter(FactoryMCPAdapter):
-    """Adapter for Reliability Droid to deployment MCP server communication.
-
-    Specializes in:
-    - Incident detection and management
-    - System monitoring and alerting
-    - Alert aggregation and correlation
-    - Automated remediation triggers
     """
-
-    def __init__(self, mcp_server: Any, droid_config: Dict[str, Any]) -> None:
-        """Initialize the Reliability adapter.
-
-        Args:
-            mcp_server: The deployment MCP server instance
-            droid_config: Configuration for the Reliability droid
+    """
+        """
         """
         super().__init__(mcp_server, droid_config, "reliability")
         self.supported_methods = [
@@ -65,13 +35,7 @@ class ReliabilityAdapter(FactoryMCPAdapter):
         self.remediation_history: List[Dict[str, Any]] = []
 
     async def translate_to_factory(self, mcp_request: Dict[str, Any]) -> Dict[str, Any]:
-        """Translate MCP request to Factory AI Reliability format.
-
-        Args:
-            mcp_request: Request in MCP format
-
-        Returns:
-            Request in Factory AI Reliability format
+        """
         """
         method = mcp_request.get("method", "")
         params = mcp_request.get("params", {})
@@ -112,17 +76,10 @@ class ReliabilityAdapter(FactoryMCPAdapter):
             factory_request["context"]["target_resources"] = params.get("resources", [])
             factory_request["context"]["playbook"] = params.get("playbook", {})
 
-        logger.debug(f"Translated to Factory request: {factory_request}")
         return factory_request
 
     async def translate_to_mcp(self, factory_response: Dict[str, Any]) -> Dict[str, Any]:
-        """Translate Factory AI Reliability response to MCP format.
-
-        Args:
-            factory_response: Response from Factory AI Reliability
-
-        Returns:
-            Response in MCP format
+        """
         """
         if "error" in factory_response:
             return {
@@ -168,24 +125,11 @@ class ReliabilityAdapter(FactoryMCPAdapter):
                 "correlation_insights": result.get("correlation_insights", []),
             }
 
-        logger.debug(f"Translated to MCP response: {mcp_response}")
         return mcp_response
 
     async def _call_factory_droid(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
-        """Call the Factory AI Reliability droid.
-
-        Args:
-            factory_request: Request in Factory AI format
-
-        Returns:
-            Response from Factory AI Reliability droid
         """
-        try:
-            # Import Factory AI client dynamically
-            from factory_ai import FactoryAI
-
-            if not self._factory_client:
-                self._factory_client = FactoryAI(
+        """
                     api_key=self.droid_config.get("api_key"),
                     base_url=self.droid_config.get("base_url", "https://api.factory.ai"),
                 )
@@ -204,24 +148,23 @@ class ReliabilityAdapter(FactoryMCPAdapter):
 
             return {"result": response}
 
-        except ImportError:
+        except Exception:
+
+
+            pass
             logger.warning("Factory AI SDK not available, using mock response")
             return self._get_mock_response(factory_request)
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error calling Reliability droid: {e}", exc_info=True)
             raise
 
     def _map_method_to_action(self, method: str) -> str:
-        """Map MCP method to Factory AI Reliability action.
-
-        Args:
-            method: MCP method name
-
-        Returns:
-            Factory AI action name
         """
-        method_mapping = {
+        """
             "detect_incident": "detect",
             "manage_incident": "manage",
             "aggregate_alerts": "aggregate",
@@ -232,18 +175,8 @@ class ReliabilityAdapter(FactoryMCPAdapter):
         return method_mapping.get(method, "detect")
 
     def _format_incidents(self, incidents: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Format incidents for MCP response.
-
-        Args:
-            incidents: List of incident data from Factory AI
-
-        Returns:
-            Formatted incidents for MCP
         """
-        formatted_incidents = []
-        for incident in incidents:
-            formatted_incidents.append(
-                {
+        """
                     "id": incident.get("id", ""),
                     "title": incident.get("title", ""),
                     "description": incident.get("description", ""),
@@ -260,17 +193,8 @@ class ReliabilityAdapter(FactoryMCPAdapter):
         return formatted_incidents
 
     def _format_remediation_actions(self, actions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Format remediation actions for MCP response.
-
-        Args:
-            actions: List of remediation action data
-
-        Returns:
-            Formatted remediation actions
         """
-        formatted_actions = []
-        for action in actions:
-            formatted_action = {
+        """
                 "id": action.get("id", ""),
                 "type": action.get("type", "manual"),
                 "description": action.get("description", ""),
@@ -295,13 +219,7 @@ class ReliabilityAdapter(FactoryMCPAdapter):
         return formatted_actions
 
     def _get_mock_response(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
-        """Generate mock response for testing.
-
-        Args:
-            factory_request: The Factory AI request
-
-        Returns:
-            Mock response
+        """
         """
         action = factory_request["action"]
 
@@ -385,11 +303,9 @@ class ReliabilityAdapter(FactoryMCPAdapter):
                             "status": RemediationStatus.IN_PROGRESS.value,
                             "priority": 1,
                             "automated": True,
-                            "script": """#!/bin/bash
-# Scale PostgreSQL connection pool
-kubectl patch configmap postgres-config \
+                            "script": """
   -p '{"data":{"max_connections":"200"}}'
-kubectl rollout restart deployment/postgres""",
+kubectl rollout restart deployment/postgres"""
                             "expected_outcome": "Increased connection capacity",
                             "rollback_plan": "Revert configmap and restart",
                         }
@@ -403,19 +319,8 @@ kubectl rollout restart deployment/postgres""",
             return {
                 "result": {
                     "runbook": {
-                        "content": """# High API Latency Runbook
-
-## Overview
-This runbook addresses high API latency incidents.
-
-## Steps
-1. Check database connection pool metrics
-2. Verify API gateway health
-3. Scale resources if needed
-4. Monitor recovery
-
-## Rollback
-If issues persist, revert to previous configuration.""",
+                        "content": """
+If issues persist, revert to previous configuration."""
                         "format": "markdown",
                         "steps": [
                             {
@@ -444,20 +349,8 @@ If issues persist, revert to previous configuration.""",
         }
 
     async def process_alert_stream(self, alerts: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Process a stream of alerts for correlation and aggregation.
-
-        Args:
-            alerts: List of incoming alerts
-
-        Returns:
-            Processing results
         """
-        # Add to buffer
-        self.alert_buffer.extend(alerts)
-
-        # Check if we should trigger aggregation
-        if len(self.alert_buffer) >= self.alert_threshold:
-            request = {
+        """
                 "method": "aggregate_alerts",
                 "params": {
                     "alerts": self.alert_buffer,

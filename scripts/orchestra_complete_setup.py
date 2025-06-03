@@ -1,19 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Orchestra AI Complete Setup - Clean, Configure, and Automate Everything
 """
-
-import json
-import shutil
-import time
-from pathlib import Path
-from typing import List
-
-class OrchestraCompleteSetup:
     """Complete setup and cleanup for Orchestra AI."""
-
-    def __init__(self):
-        self.root_dir = Path(__file__).parent.parent
         self.env_file = self.root_dir / ".env"
         self.config = {}
         self.removed_files: List[str] = []
@@ -280,148 +269,12 @@ class OrchestraCompleteSetup:
         servers_dir.mkdir(parents=True, exist_ok=True)
 
         # Base server template
-        base_server = '''"""
-{description}
-"""
-
-import asyncio
-import json
-from typing import Any, Dict, List
-
-from mcp.server import Server
-from mcp.server.stdio import stdio_server
-from mcp.types import Tool, TextContent
-
-class {class_name}:
-    """MCP server for {name}."""
-
-    def __init__(self):
-        self.server = Server("{name}")
-        self.setup_handlers()
-
-    def setup_handlers(self):
-        """Setup MCP handlers."""
-
-        @self.server.list_tools()
-        async def list_tools() -> List[Tool]:
-            """List available tools."""
-            return {tools}
-
-        @self.server.call_tool()
-        async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
-            """Handle tool calls."""
-            {tool_handlers}
-
-            return [TextContent(type="text", text=f"Unknown tool: {{name}}")]
-
-    async def run(self):
-        """Run the MCP server."""
-        async with stdio_server() as (read_stream, write_stream):
-            await self.server.run(read_stream, write_stream)
-
-if __name__ == "__main__":
-    server = {class_name}()
-    asyncio.run(server.run())
+        base_server = '''
 '''
-
-        # Server definitions
-        servers = {
-            "orchestrator_server.py": {
-                "description": "Orchestrator MCP Server - Manages agent coordination",
-                "class_name": "OrchestratorServer",
-                "name": "orchestrator",
-                "tools": [
-                    {
-                        "name": "switch_mode",
-                        "description": "Switch orchestrator mode",
-                        "inputSchema": {
-                            "type": "object",
-                            "properties": {
-                                "mode": {"type": "string"},
-                                "context": {"type": "object"},
-                            },
-                        },
-                    },
-                    {
-                        "name": "run_workflow",
-                        "description": "Run an orchestration workflow",
-                        "inputSchema": {
-                            "type": "object",
-                            "properties": {
-                                "workflow": {"type": "string"},
-                                "params": {"type": "object"},
-                            },
-                        },
-                    },
-                ],
-            },
-            "memory_server.py": {
-                "description": "Memory MCP Server - Manages agent memory",
-                "class_name": "MemoryServer",
-                "name": "memory",
-                "tools": [
-                    {
-                        "name": "store_memory",
-                        "description": "Store a memory",
-                        "inputSchema": {
-                            "type": "object",
-                            "properties": {
-                                "agent_id": {"type": "string"},
-                                "content": {"type": "string"},
-                                "metadata": {"type": "object"},
-                            },
-                        },
-                    },
-                    {
-                        "name": "query_memory",
-                        "description": "Query memories",
-                        "inputSchema": {
-                            "type": "object",
-                            "properties": {
-                                "agent_id": {"type": "string"},
-                                "query": {"type": "string"},
-                                "limit": {"type": "integer"},
-                            },
-                        },
-                    },
-                ],
-            },
-            "deployment_server.py": {
-                "description": "Deployment MCP Server - Manages deployments",
-                "class_name": "DeploymentServer",
-                "name": "deployment",
-                "tools": [
-                    {
-                        "name": "deploy",
-                        "description": "Deploy to DigitalOcean",
-                        "inputSchema": {
-                            "type": "object",
-                            "properties": {
-                                "environment": {"type": "string"},
-                                "version": {"type": "string"},
-                            },
-                        },
-                    }
-                ],
-            },
-        }
-
-        # Create server files
-        for filename, config in servers.items():
-            server_path = servers_dir / filename
-
-            # Generate tool handlers
-            tool_handlers = []
-            for tool in config["tools"]:
-                handler = f"""
             if name == "{tool['name']}":
                 # TODO: Implement {tool['name']}
                 result = f"Executed {tool['name']} with {{arguments}}"
                 return [TextContent(type="text", text=result)]"""
-                tool_handlers.append(handler)
-
-            # Generate content
-            content = base_server.format(
                 description=config["description"],
                 class_name=config["class_name"],
                 name=config["name"],
@@ -440,9 +293,7 @@ if __name__ == "__main__":
         print("-" * 40)
 
         # Start script
-        start_script = """#!/bin/bash
-# Orchestra AI - Start Everything
-
+        start_script = """
 echo "🎼 Starting Orchestra AI..."
 
 # Check environment
@@ -490,11 +341,7 @@ echo "   Docs: http://localhost:8000/docs"
 echo ""
 echo "To stop: ./stop_orchestra.sh"
 """
-
-        # Stop script
-        stop_script = """#!/bin/bash
-# Orchestra AI - Stop Everything
-
+        stop_script = """
 echo "🛑 Stopping Orchestra AI..."
 
 # Stop Python processes
@@ -509,8 +356,6 @@ fi
 
 echo "✓ Orchestra AI stopped"
 """
-
-        # Save scripts
         scripts = {"start_orchestra.sh": start_script, "stop_orchestra.sh": stop_script}
 
         for filename, content in scripts.items():

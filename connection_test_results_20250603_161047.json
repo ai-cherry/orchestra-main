@@ -1,0 +1,50 @@
+{
+  "timestamp": "2025-06-03T16:10:46.495012",
+  "tests": {
+    "docker": {
+      "passed": true,
+      "message": "Docker running. 1 containers active"
+    },
+    "weaviate": {
+      "passed": true,
+      "message": "Connected. Found 4 collections"
+    },
+    "postgresql": {
+      "passed": false,
+      "message": "All credential combinations failed"
+    },
+    "redis": {
+      "passed": true,
+      "message": "Connected. Redis version: 7.0.15"
+    },
+    "mcp_weaviate_direct": {
+      "passed": false,
+      "message": "Connection failed: All connection attempts failed"
+    },
+    "mcp_api_docs": {
+      "passed": false,
+      "message": "Not accessible"
+    },
+    "mcp_openapi": {
+      "passed": false,
+      "message": "Not accessible"
+    },
+    "mcp_tools": {
+      "passed": false,
+      "message": "Not accessible"
+    },
+    "orchestrator_api": {
+      "passed": false,
+      "message": "No endpoints accessible"
+    },
+    "unified_database": {
+      "passed": true,
+      "message": "UnifiedDatabase module imported successfully"
+    }
+  },
+  "summary": {
+    "total": 10,
+    "passed": 4,
+    "failed": 6
+  }
+}

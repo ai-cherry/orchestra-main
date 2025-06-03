@@ -1,21 +1,6 @@
 """
-Monitoring Component for SuperAGI
-================================
-Deploys Prometheus, Grafana, and alerting infrastructure
 """
-
-from typing import Optional
-
-import pulumi_kubernetes as k8s
-from pulumi import ComponentResource, Output, ResourceOptions
-
-class MonitoringComponent(ComponentResource):
     """Monitoring stack with Prometheus, Grafana, and alerting"""
-
-    def __init__(
-        self,
-        name: str,
-        namespace: str,
         storage_class: str = "standard",
         grafana_admin_password: Optional[str] = None,
         opts: Optional[ResourceOptions] = None,
@@ -35,91 +20,11 @@ class MonitoringComponent(ComponentResource):
             metadata=k8s.meta.v1.ObjectMetaArgs(name="prometheus-config", namespace=namespace),
             data={
                 "prometheus.yml": """
-global:
-  scrape_interval: 15s
-  evaluation_interval: 15s
-
-alerting:
-  alertmanagers:
-    - static_configs:
-        - targets: ['alertmanager:9093']
-
-rule_files:
-  - '/etc/prometheus/rules/*.yml'
-
-scrape_configs:
-  - job_name: 'kubernetes-apiservers'
-    kubernetes_sd_configs:
-      - role: endpoints
-    scheme: https
-    tls_config:
-      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-    relabel_configs:
-      - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
-        action: keep
-        regex: default;kubernetes;https
-
-  - job_name: 'kubernetes-nodes'
-    kubernetes_sd_configs:
-      - role: node
-    scheme: https
-    tls_config:
-      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-    relabel_configs:
-      - action: labelmap
-        regex: __meta_kubernetes_node_label_(.+)
-
-  - job_name: 'kubernetes-pods'
-    kubernetes_sd_configs:
-      - role: pod
-    relabel_configs:
-      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-        action: keep
-        regex: true
-      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
-        action: replace
-        target_label: __metrics_path__
-        regex: (.+)
-      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
-        action: replace
-        regex: r'\1'
-        replacement: $1:$2
-        target_label: __address__
-      - action: labelmap
-        regex: __meta_kubernetes_pod_label_(.+)
-      - source_labels: [__meta_kubernetes_namespace]
-        action: replace
-        target_label: kubernetes_namespace
-      - source_labels: [__meta_kubernetes_pod_name]
-        action: replace
-        target_label: kubernetes_pod_name
-
-  - job_name: 'superagi'
-    static_configs:
-      - targets: ['superagi.superagi.svc.cluster.local:8080']
-    metrics_path: '/metrics'
-
-  - job_name: 'dragonfly'
-    static_configs:
-      - targets: ['dragonfly.superagi.svc.cluster.local:6379']
 """
-            },
-            opts=ResourceOptions(parent=self, depends_on=[monitoring_ns]),
-        )
-
-        # Alerting rules ConfigMap
-        alerting_rules = k8s.core.v1.ConfigMap(
             f"{name}-alerting-rules",
             metadata=k8s.meta.v1.ObjectMetaArgs(name="alerting-rules", namespace=namespace),
             data={
                 "alerts.yml": """
-groups:
-  - name: superagi_alerts
-    interval: 30s
-    rules:
-      - alert: HighAgentErrorRate
         expr: rate(superagi_agent_executions_total{status="failed"}[5m]) > 0.1
         for: 5m
         labels:
@@ -155,12 +60,6 @@ groups:
           summary: "High agent execution latency"
           description: "95th percentile latency is {{ $value }} seconds"
 """
-            },
-            opts=ResourceOptions(parent=self, depends_on=[monitoring_ns]),
-        )
-
-        # Prometheus RBAC
-        prometheus_sa = k8s.core.v1.ServiceAccount(
             f"{name}-prometheus-sa",
             metadata=k8s.meta.v1.ObjectMetaArgs(name="prometheus", namespace=namespace),
             opts=ResourceOptions(parent=self, depends_on=[monitoring_ns]),
@@ -297,35 +196,9 @@ groups:
             metadata=k8s.meta.v1.ObjectMetaArgs(name="grafana-config", namespace=namespace),
             data={
                 "grafana.ini": """
-[server]
-root_url = %(protocol)s://%(domain)s:%(http_port)s/
-
-[security]
-admin_password = ${GRAFANA_ADMIN_PASSWORD}
-
-[auth.anonymous]
-enabled = true
-org_role = Viewer
-
-[dashboards]
-default_home_dashboard_path = /var/lib/grafana/dashboards/superagi-dashboard.json
-""",
+"""
                 "datasources.yaml": """
-apiVersion: 1
-datasources:
-  - name: Prometheus
-    type: prometheus
-    access: proxy
-    url: http://prometheus:9090
-    isDefault: true
-    editable: true
-""",
-            },
-            opts=ResourceOptions(parent=self, depends_on=[monitoring_ns]),
-        )
-
-        # Grafana Dashboard ConfigMap
-        grafana_dashboards = k8s.core.v1.ConfigMap(
+"""
             f"{name}-grafana-dashboards",
             metadata=k8s.meta.v1.ObjectMetaArgs(name="grafana-dashboards", namespace=namespace),
             data={"superagi-dashboard.json": self._get_grafana_dashboard()},
@@ -428,7 +301,7 @@ datasources:
 
     def _get_grafana_dashboard(self) -> str:
         """Return the SuperAGI monitoring dashboard JSON"""
-        return """{
+        return """
   "dashboard": {
     "id": null,
     "uid": "superagi-monitoring",

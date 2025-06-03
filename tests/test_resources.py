@@ -55,12 +55,7 @@ def test_upload_csv_success(
     mock_weaviate_adapter_instance,
 ):
     """
-    Test successful CSV upload and ingestion.
     """
-    mock_get_memory_service_dep.return_value = mock_memory_service
-    mock_litellm_client_constructor.return_value = mock_litellm_client_instance
-    mock_weaviate_adapter_constructor.return_value = mock_weaviate_adapter_instance
-
     csv_content = "header1,header2\nvalue1,value2\nvalue3,value4"
     file_bytes = BytesIO(csv_content.encode("utf-8"))
 
@@ -97,12 +92,7 @@ def test_upload_jsonl_success(
     mock_weaviate_adapter_instance,
 ):
     """
-    Test successful JSONL upload and ingestion.
     """
-    mock_get_memory_service_dep.return_value = mock_memory_service
-    mock_litellm_client_constructor.return_value = mock_litellm_client_instance
-    mock_weaviate_adapter_constructor.return_value = mock_weaviate_adapter_instance
-
     jsonl_content = '{"key": "value1", "num": 1}\n{"key": "value2", "num": 2}'
     file_bytes = BytesIO(jsonl_content.encode("utf-8"))
 
@@ -135,12 +125,7 @@ def test_upload_json_success(
     mock_weaviate_adapter_instance,
 ):
     """
-    Test successful JSON array upload and ingestion.
     """
-    mock_get_memory_service_dep.return_value = mock_memory_service
-    mock_litellm_client_constructor.return_value = mock_litellm_client_instance
-    mock_weaviate_adapter_constructor.return_value = mock_weaviate_adapter_instance
-
     json_content = '[{"key": "value1", "num": 1},{"key": "value2", "num": 2}]'
     file_bytes = BytesIO(json_content.encode("utf-8"))
 
@@ -173,12 +158,7 @@ def test_upload_unsupported_file_type(
     mock_weaviate_adapter_instance,
 ):
     """
-    Test upload of unsupported file type returns 400.
     """
-    mock_get_memory_service_dep.return_value = mock_memory_service
-    mock_litellm_client_constructor.return_value = mock_litellm_client_instance
-    mock_weaviate_adapter_constructor.return_value = mock_weaviate_adapter_instance
-
     txt_content = "This is a text file."
     file_bytes = BytesIO(txt_content.encode("utf-8"))
 
@@ -207,12 +187,7 @@ def test_upload_embedding_error(
     mock_weaviate_adapter_instance,
 ):
     """
-    Test error during embedding generation returns 500.
     """
-    mock_get_memory_service_dep.return_value = mock_memory_service
-    mock_litellm_client_constructor.return_value = mock_litellm_client_instance
-    mock_weaviate_adapter_constructor.return_value = mock_weaviate_adapter_instance
-
     mock_litellm_client_instance.get_embedding.side_effect = Exception("Embedding API Error")
 
     csv_content = "header1,header2\nvalue1,value2"
@@ -246,12 +221,7 @@ def test_upload_memory_service_store_error(
     mock_weaviate_adapter_instance,
 ):
     """
-    Test error during Firestore storage returns 500 and skips Weaviate.
     """
-    mock_get_memory_service_dep.return_value = mock_memory_service
-    mock_litellm_client_constructor.return_value = mock_litellm_client_instance
-    mock_weaviate_adapter_constructor.return_value = mock_weaviate_adapter_instance
-
     if hasattr(mock_memory_service, "add_memory_items_async"):
         mock_memory_service.add_memory_items_async.side_effect = Exception("Firestore Error")
     else:
@@ -283,12 +253,7 @@ def test_upload_weaviate_store_error(
     mock_weaviate_adapter_instance,
 ):
     """
-    Test error during Weaviate storage logs error but returns 200.
     """
-    mock_get_memory_service_dep.return_value = mock_memory_service
-    mock_litellm_client_constructor.return_value = mock_litellm_client_instance
-    mock_weaviate_adapter_constructor.return_value = mock_weaviate_adapter_instance
-
     mock_weaviate_adapter_instance.batch_upsert.side_effect = Exception("Weaviate Error")
 
     csv_content = "header1,header2\nvalue1,value2"
@@ -326,12 +291,7 @@ def test_upload_file_save_error(
     mock_weaviate_adapter_instance,
 ):
     """
-    Test error during file save returns 500.
     """
-    mock_get_memory_service_dep.return_value = mock_memory_service
-    mock_litellm_client_constructor.return_value = mock_litellm_client_instance
-    mock_weaviate_adapter_constructor.return_value = mock_weaviate_adapter_instance
-
     mock_shutil_copy.side_effect = Exception("Disk full error")
 
     csv_content = "header1,header2\nvalue1,value2"
@@ -362,12 +322,7 @@ def test_upload_no_filename(
     mock_weaviate_adapter_instance,
 ):
     """
-    Test upload with missing filename returns 400.
     """
-    mock_get_memory_service_dep.return_value = mock_memory_service
-    mock_litellm_client_constructor.return_value = mock_litellm_client_instance
-    mock_weaviate_adapter_constructor.return_value = mock_weaviate_adapter_instance
-
     file_bytes = BytesIO(b"content")
 
     response = client.post("/api/resources/upload", files={"uploaded_file": ("", file_bytes, "text/csv")})

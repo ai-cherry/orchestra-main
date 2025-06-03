@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 """
-key_fix_script.py - Fix common issues with GCP service account key files
-
 This script specifically addresses the "Invalid JWT Signature" error by:
 1. Checking for and fixing escaped newlines in the private key
 2. Ensuring proper PEM formatting of the private key
@@ -11,15 +9,7 @@ This script specifically addresses the "Invalid JWT Signature" error by:
 Usage:
   python key_fix_script.py --input credentials.json --output fixed_credentials.json
 """
-
-import argparse
-import json
-import re
-import sys
-
-def fix_private_key(private_key: str) -> str:
     """Fix common issues with private key formatting."""
-    # Replace escaped newlines with actual newlines
     if "\\n" in private_key and "\n" not in private_key:
         print("Fixing: Replacing escaped newlines (\\n) with actual newlines")
         private_key = private_key.replace("\\n", "\n")
@@ -55,13 +45,20 @@ def main():
     print(f"Reading key file: {args.input}")
 
     try:
+
+
+        pass
         with open(args.input, "r") as f:
             content = f.read()
 
         # Try to parse as JSON
         try:
+
+            pass
             key_data = json.loads(content)
-        except json.JSONDecodeError as e:
+        except Exception:
+
+            pass
             print(f"Error: Key file is not valid JSON: {e}")
             sys.exit(1)
 
@@ -109,7 +106,10 @@ def main():
             print("Error: No private_key field found in the key file.")
             sys.exit(1)
 
-    except FileNotFoundError:
+    except Exception:
+
+
+        pass
         print(f"Error: Key file not found: {args.input}")
         sys.exit(1)
 

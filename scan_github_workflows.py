@@ -1,56 +1,9 @@
 #!/usr/bin/env python3
 """
-Scan GitHub Workflow Files for Inconsistencies
-
-This script scans GitHub workflow files for inconsistencies and suggests
-standardized approaches. It looks for:
-
-1. Inconsistent GitHub Action versions
-2. Hardcoded values that should be environment variables
-3. Different authentication methods
-4. Inconsistent Python versions
-
-Usage:
-    python scan_github_workflows.py [--path PATH] [--fix]
-
-Options:
-    --path PATH    Path to scan (default: .github/workflows)
-    --fix          Generate suggested fixes (default: False)
 """
-
-import argparse
-import re
-import sys
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Any, Dict, List, Optional
-
-import yaml
-
-@dataclass
-class WorkflowIssue:
     """Issue found in a workflow file."""
-
-    file_path: Path
-    issue_type: str
-    description: str
-    line_number: Optional[int] = None
-    suggested_fix: Optional[str] = None
-
-def scan_action_versions(workflow_data: Dict[str, Any]) -> List[WorkflowIssue]:
     """
-    Scan for inconsistent GitHub Action versions.
-
-    Args:
-        workflow_data: Parsed workflow YAML data
-
-    Returns:
-        List of issues found
     """
-    issues = []
-
-    # Define latest versions of common actions
-    latest_versions = {
         "actions/checkout": "v4",
         "actions/setup-python": "v4",
         "actions/setup-node": "v3",
@@ -87,18 +40,7 @@ def scan_action_versions(workflow_data: Dict[str, Any]) -> List[WorkflowIssue]:
 
 def scan_hardcoded_values(workflow_data: Dict[str, Any]) -> List[WorkflowIssue]:
     """
-    Scan for hardcoded values that should be environment variables.
-
-    Args:
-        workflow_data: Parsed workflow YAML data
-
-    Returns:
-        List of issues found
     """
-    issues = []
-
-    # Define patterns for hardcoded values
-    hardcoded_patterns = {
         "Project ID": (r"cherry-ai-project", "PROJECT_ID", "${{ env.PROJECT_ID }}"),
         "Region": (r"us-central1", "REGION", "${{ env.REGION }}"),
         "Service Account": (
@@ -153,17 +95,7 @@ def scan_hardcoded_values(workflow_data: Dict[str, Any]) -> List[WorkflowIssue]:
 
 def scan_authentication_methods(workflow_data: Dict[str, Any]) -> List[WorkflowIssue]:
     """
-    Scan for different authentication methods.
-
-    Args:
-        workflow_data: Parsed workflow YAML data
-
-    Returns:
-        List of issues found
     """
-    issues = []
-
-    # Check steps in all jobs
     if "jobs" in workflow_data:
         for job_name, job_data in workflow_data["jobs"].items():
             if "steps" in job_data:
@@ -198,17 +130,7 @@ def scan_authentication_methods(workflow_data: Dict[str, Any]) -> List[WorkflowI
 
 def scan_python_versions(workflow_data: Dict[str, Any]) -> List[WorkflowIssue]:
     """
-    Scan for inconsistent Python versions.
-
-    Args:
-        workflow_data: Parsed workflow YAML data
-
-    Returns:
-        List of issues found
     """
-    issues = []
-
-    # Check steps in all jobs
     if "jobs" in workflow_data:
         for job_name, job_data in workflow_data["jobs"].items():
             if "steps" in job_data:
@@ -230,17 +152,7 @@ def scan_python_versions(workflow_data: Dict[str, Any]) -> List[WorkflowIssue]:
 
 def scan_workflow_file(file_path: Path) -> List[WorkflowIssue]:
     """
-    Scan a workflow file for issues.
-
-    Args:
-        file_path: Path to the workflow file
-
-    Returns:
-        List of issues found
     """
-    issues = []
-
-    try:
         with open(file_path, "r") as f:
             workflow_data = yaml.safe_load(f)
 
@@ -256,7 +168,10 @@ def scan_workflow_file(file_path: Path) -> List[WorkflowIssue]:
                 issue.file_path = file_path
             issues.extend(scanner_issues)
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         issues.append(
             WorkflowIssue(
                 file_path=file_path,
@@ -269,16 +184,7 @@ def scan_workflow_file(file_path: Path) -> List[WorkflowIssue]:
 
 def scan_directory(directory: Path) -> List[WorkflowIssue]:
     """
-    Scan a directory for workflow files.
-
-    Args:
-        directory: Directory to scan
-
-    Returns:
-        List of issues found
     """
-    issues = []
-
     for file_path in directory.glob("*.yml"):
         issues.extend(scan_workflow_file(file_path))
 
@@ -289,12 +195,7 @@ def scan_directory(directory: Path) -> List[WorkflowIssue]:
 
 def print_issues(issues: List[WorkflowIssue]) -> None:
     """
-    Print issues found.
-
-    Args:
-        issues: List of issues found
     """
-    if not issues:
         print("No issues found.")
         return
 

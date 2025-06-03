@@ -1,46 +1,13 @@
 #!/usr/bin/env python3
 """
-Cursor AI Integration - Enables AI models to execute code editing operations
 """
-
-import os
-import json
-import asyncio
-import logging
-from typing import Dict, List, Optional, Any, Tuple
-from dataclasses import dataclass
-from datetime import datetime
-import aiohttp
-import jwt
-from pathlib import Path
-
-logger = logging.getLogger(__name__)
-
-@dataclass
-class CodeEditOperation:
     """Represents a code editing operation"""
-    operation_type: str  # create, modify, delete, refactor
-    file_path: str
-    content: Optional[str] = None
-    line_start: Optional[int] = None
-    line_end: Optional[int] = None
     description: str = ""
 
 @dataclass
 class CursorSession:
     """Represents an active Cursor AI session"""
-    session_id: str
-    workspace_path: str
-    active_file: Optional[str] = None
-    created_at: datetime = None
-    last_activity: datetime = None
-
-class CursorAPIClient:
     """Client for Cursor AI API interactions"""
-    
-    def __init__(self, api_key: str, workspace_path: str):
-        self.api_key = api_key
-        self.workspace_path = workspace_path
         self.base_url = os.getenv("CURSOR_API_URL", "http://localhost:8080")
         self.session: Optional[CursorSession] = None
         
@@ -68,9 +35,6 @@ class CursorAPIClient:
     
     async def execute_edit(self, operation: CodeEditOperation) -> Dict[str, Any]:
         """Execute a code editing operation"""
-        if not self.session:
-            await self.initialize_session()
-        
         headers = {"Authorization": f"Bearer {self.api_key}"}
         
         payload = {
@@ -109,17 +73,12 @@ class CursorAPIClient:
 
 class SecureAPIEndpoint:
     """Secure API endpoints for AI model access"""
-    
-    def __init__(self, secret_key: str):
-        self.secret_key = secret_key
-        self.authorized_models = {
             "openai": ["gpt-4", "gpt-3.5-turbo"],
             "anthropic": ["claude-3-opus", "claude-3-sonnet"]
         }
         
     def generate_token(self, model_id: str, provider: str) -> str:
         """Generate JWT token for model authentication"""
-        payload = {
             "model_id": model_id,
             "provider": provider,
             "issued_at": datetime.now().isoformat(),
@@ -130,7 +89,6 @@ class SecureAPIEndpoint:
     
     def verify_token(self, token: str) -> Tuple[bool, Dict[str, Any]]:
         """Verify JWT token"""
-        try:
             payload = jwt.decode(token, self.secret_key, algorithms=["HS256"])
             
             # Check expiration
@@ -147,24 +105,15 @@ class SecureAPIEndpoint:
             
             return False, {"error": "Model not authorized"}
             
-        except jwt.InvalidTokenError as e:
+        except Exception:
+
+            
+            pass
             return False, {"error": str(e)}
 
 class AIModelBridge:
     """Bridge between AI models and Cursor operations"""
-    
-    def __init__(self, cursor_client: CursorAPIClient, 
-                 security: SecureAPIEndpoint):
-        self.cursor_client = cursor_client
-        self.security = security
-        self.operation_history: List[Dict[str, Any]] = []
-        
-    async def handle_ai_request(self, request: Dict[str, Any], 
-                               auth_token: str) -> Dict[str, Any]:
         """Handle code editing request from AI model"""
-        # Verify authentication
-        is_valid, auth_info = self.security.verify_token(auth_token)
-        if not is_valid:
             return {"error": "Authentication failed", "details": auth_info}
         
         # Parse request
@@ -187,6 +136,8 @@ class AIModelBridge:
         
         # Execute through Cursor
         try:
+
+            pass
             result = await self.cursor_client.execute_edit(operation)
             
             # Log operation
@@ -201,41 +152,35 @@ class AIModelBridge:
             
             return result
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             logger.error(f"AI model bridge error: {e}")
             return {"error": "Operation failed", "details": str(e)}
     
     async def get_code_context(self, file_paths: List[str], 
                               auth_token: str) -> Dict[str, Any]:
         """Get code context for AI models"""
-        # Verify authentication
-        is_valid, auth_info = self.security.verify_token(auth_token)
-        if not is_valid:
             return {"error": "Authentication failed", "details": auth_info}
         
         context = {}
         for file_path in file_paths:
             try:
+
+                pass
                 content = await self.cursor_client.get_file_content(file_path)
                 context[file_path] = content
-            except Exception as e:
+            except Exception:
+
+                pass
                 context[file_path] = {"error": str(e)}
         
         return {"context": context, "workspace": self.cursor_client.workspace_path}
 
 class CursorIntegrationServer:
     """HTTP server for Cursor AI integration"""
-    
-    def __init__(self, port: int = 8090):
-        self.port = port
-        self.app = None
-        self.cursor_client = None
-        self.security = None
-        self.bridge = None
-        
-    async def initialize(self):
         """Initialize server components"""
-        # Load configuration
         api_key = os.getenv("CURSOR_API_KEY")
         workspace = os.getenv("CURSOR_WORKSPACE", "/root/orchestra-main")
         secret_key = os.getenv("JWT_SECRET_KEY", "your-secret-key")
@@ -285,9 +230,6 @@ class CursorIntegrationServer:
     
     async def handle_token_request(self, request: aiohttp.web.Request):
         """Generate authentication token for AI models"""
-        data = await request.json()
-        
-        # Verify API credentials
         api_key = data.get("api_key")
         if api_key != os.getenv("MASTER_API_KEY"):
             return aiohttp.web.json_response(
@@ -307,7 +249,6 @@ class CursorIntegrationServer:
     
     async def handle_status(self, request: aiohttp.web.Request):
         """Get integration status"""
-        status = {
             "cursor_session": self.cursor_client.session.session_id if self.cursor_client.session else None,
             "workspace": self.cursor_client.workspace_path,
             "operations_count": len(self.bridge.operation_history),
@@ -318,9 +259,6 @@ class CursorIntegrationServer:
     
     def create_app(self):
         """Create aiohttp application"""
-        app = aiohttp.web.Application()
-        
-        # Add routes
         app.router.add_post("/api/v1/edit", self.handle_edit_request)
         app.router.add_post("/api/v1/context", self.handle_context_request)
         app.router.add_post("/api/v1/token", self.handle_token_request)
@@ -330,12 +268,6 @@ class CursorIntegrationServer:
     
     async def start(self):
         """Start the integration server"""
-        await self.initialize()
-        
-        self.app = self.create_app()
-        runner = aiohttp.web.AppRunner(self.app)
-        await runner.setup()
-        
         site = aiohttp.web.TCPSite(runner, "0.0.0.0", self.port)
         await site.start()
         

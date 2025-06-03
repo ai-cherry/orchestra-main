@@ -1,7 +1,13 @@
+# TODO: Consider adding connection pooling configuration
 """
-MCP Server models module.
+Orchestra AI - Database Models
+This module contains Pydantic models for database entities.
+"""
 
-This module provides the data models used throughout the MCP system,
-including memory entries, metadata, and enumerations for memory types,
-scopes, compression levels, and storage tiers.
-"""
+from typing import List, Dict, Any, Optional, Union
+from uuid import uuid4, UUID
+from datetime import datetime
+from enum import Enum
+from pydantic import BaseModel, Field, field_validator, model_validator
+
+""

@@ -1,25 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-MCP Integration Module for AI Orchestra
-=======================================
-Provides natural language query interfaces for MongoDB and Weaviate
 """
-
-import asyncio
-import json
-import logging
-from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
-
-from mcp import MCPClient, Tool
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-@dataclass
-class MCPConfig:
     """Configuration for MCP servers"""
-
     mongodb_endpoint: str = "http://mcp-mongodb:8080"
     weaviate_endpoint: str = "http://mcp-weaviate:8080"
     timeout: int = 30
@@ -27,48 +10,23 @@ class MCPConfig:
 
 class MCPIntegration:
     """
-    MCP Integration for natural language queries to MongoDB and Weaviate
     """
-
-    def __init__(self, config: Optional[MCPConfig] = None):
-        self.config = config or MCPConfig()
-        self.mongodb_client: Optional[MCPClient] = None
-        self.weaviate_client: Optional[MCPClient] = None
-        self._initialized = False
-
-    async def initialize(self) -> None:
         """Initialize MCP clients"""
-        try:
-            # Initialize MongoDB MCP client
-            self.mongodb_client = MCPClient(server_url=self.config.mongodb_endpoint, timeout=self.config.timeout)
-            await self.mongodb_client.connect()
-
-            # Initialize Weaviate MCP client
-            self.weaviate_client = MCPClient(server_url=self.config.weaviate_endpoint, timeout=self.config.timeout)
-            await self.weaviate_client.connect()
-
-            self._initialized = True
             logger.info("MCP clients initialized successfully")
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Failed to initialize MCP clients: {e}")
             raise
 
     async def query_mongodb(self, natural_language_query: str) -> Dict[str, Any]:
         """
-        Execute natural language query against MongoDB
-
-        Examples:
         - "Show all users created in the last 24 hours"
         - "Find agents with status 'active' and high memory usage"
         - "Get conversation history for user john@example.com"
         """
-        if not self._initialized:
-            await self.initialize()
-
-        try:
-            # Use MongoDB MCP's natural language tool
-            result = await self.mongodb_client.call_tool(
                 "query",
                 {
                     "prompt": natural_language_query,
@@ -84,25 +42,19 @@ class MCPIntegration:
                 "query_interpretation": result.get("interpretation", ""),
             }
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"MongoDB query failed: {e}")
             return {"success": False, "error": str(e), "data": []}
 
     async def semantic_search(self, query: str, limit: int = 10) -> Dict[str, Any]:
         """
-        Perform semantic search using Weaviate
-
-        Examples:
         - "Find documents about machine learning optimization"
         - "Search for conversations discussing API integration"
         - "Get similar agents to the research assistant"
         """
-        if not self._initialized:
-            await self.initialize()
-
-        try:
-            # Use Weaviate MCP's semantic search
-            result = await self.weaviate_client.call_tool(
                 "semantic_search",
                 {
                     "query": query,
@@ -118,26 +70,17 @@ class MCPIntegration:
                 "query_vector": result.get("vector", []),
             }
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Weaviate search failed: {e}")
             return {"success": False, "error": str(e), "results": []}
 
     async def hybrid_query(self, query: str) -> Dict[str, Any]:
         """
-        Execute hybrid query combining MongoDB filters with Weaviate semantic search
-
         Example: "Find active agents similar to research assistant created this week"
         """
-        if not self._initialized:
-            await self.initialize()
-
-        try:
-            # Parse query to identify structured vs semantic parts
-            # This is a simplified example - in production, use NLP
-
-            # First, get semantic results from Weaviate
-            semantic_results = await self.semantic_search(query)
-
             if not semantic_results["success"]:
                 return semantic_results
 
@@ -156,7 +99,10 @@ class MCPIntegration:
                 "query": query,
             }
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Hybrid query failed: {e}")
             return {"success": False, "error": str(e)}
 
@@ -168,6 +114,9 @@ class MCPIntegration:
             await self.initialize()
 
         try:
+
+
+            pass
             # Get MongoDB tools
             if self.mongodb_client:
                 mongodb_tools = await self.mongodb_client.list_tools()
@@ -192,32 +141,20 @@ class MCPIntegration:
                     for tool in weaviate_tools
                 ]
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Failed to list tools: {e}")
 
         return tools
 
     async def close(self) -> None:
         """Close MCP connections"""
-        if self.mongodb_client:
-            await self.mongodb_client.close()
-        if self.weaviate_client:
-            await self.weaviate_client.close()
-        self._initialized = False
-
-class MCPAgentInterface:
     """
-    High-level interface for AI agents to use MCP
     """
-
-    def __init__(self, mcp_integration: MCPIntegration):
-        self.mcp = mcp_integration
-
-    async def answer_question(self, question: str) -> str:
         """
-        Answer a question using available data sources
         """
-        # Determine if question needs semantic search, structured query, or both
         keywords_semantic = ["similar", "like", "about", "related", "semantic"]
         keywords_structured = ["count", "list", "show", "find", "get", "filter"]
 
@@ -250,9 +187,7 @@ class MCPAgentInterface:
 
     async def store_memory(self, memory_type: str, content: Dict[str, Any]) -> bool:
         """
-        Store memory in appropriate backend
         """
-        # Short-term memories go to MongoDB
         if memory_type in ["conversation", "short_term", "cache"]:
             query = f"Insert into {memory_type} collection: {json.dumps(content)}"
             result = await self.mcp.query_mongodb(query)
@@ -270,9 +205,6 @@ class MCPAgentInterface:
 # Example usage and testing
 async def main():
     """Example usage of MCP integration"""
-
-    # Initialize MCP integration
-    config = MCPConfig(
         mongodb_endpoint="http://localhost:8081",  # For local testing
         weaviate_endpoint="http://localhost:8082",
     )
@@ -281,6 +213,9 @@ async def main():
     agent_interface = MCPAgentInterface(mcp)
 
     try:
+
+
+        pass
         # Initialize connections
         await mcp.initialize()
 

@@ -1,13 +1,5 @@
+# TODO: Consider adding connection pooling configuration
 """
-Vector Droplet Component for Pulumi Infrastructure
-==================================================
-Provisions an existing DigitalOcean droplet as a Weaviate vector database node.
-Configures Docker, attaches block storage, and deploys Weaviate 1.30+ with Agents runtime.
-
-Usage:
-    from .vector_droplet_component import VectorDropletComponent
-
-    vector_node = VectorDropletComponent(
         name="vector-node",
         config={
             "droplet_id": "existing-droplet-id",  # ID of existing droplet
@@ -22,21 +14,8 @@ Usage:
         opts=ResourceOptions(...)
     )
 """
-
-from typing import Any, Dict, Optional
-
-import pulumi
-import pulumi_digitalocean as do
-import pulumi_command as command
-from pulumi import ComponentResource, ResourceOptions, Output
-
-class VectorDropletComponent(ComponentResource):
     """
-    Reusable Vector Droplet component for the AI Orchestra system.
-    Configures an existing DigitalOcean droplet for Weaviate with Docker.
     """
-
-    def __init__(self, name: str, config: Dict[str, Any], opts: Optional[ResourceOptions] = None):
         super().__init__("orchestra:vector:DropletComponent", name, None, opts)
 
         self.config = config
@@ -84,20 +63,7 @@ class VectorDropletComponent(ComponentResource):
             f"{name}-setup-docker",
             connection=connection,
             create="""
-                # Update and install Docker
-                apt-get update
-                apt-get install -y docker.io docker-compose curl jq
-                systemctl enable docker
-                systemctl start docker
-                
-                # Create mount directory
-                mkdir -p /mnt/vector-data
-            """,
-            opts=ResourceOptions(parent=self, depends_on=[self.volume_attachment]),
-        )
-
-        # Mount volume
-        self.mount_volume = command.remote.Command(
+            """
             f"{name}-mount-volume",
             connection=connection,
             create=Output.concat(
@@ -128,12 +94,7 @@ class VectorDropletComponent(ComponentResource):
                 # Set permissions
                 chown -R root:root /mnt/vector-data
                 chmod -R 755 /mnt/vector-data
-                """,
-            ),
-            opts=ResourceOptions(parent=self, depends_on=[self.setup_docker]),
-        )
-
-        # Create Weaviate docker-compose.yml
+                """
         modules = "text2vec-openai,reranker-openai"
         if self.enable_agents:
             modules += ",agents"
@@ -161,23 +122,13 @@ class VectorDropletComponent(ComponentResource):
             connection=connection,
             create=Output.concat(
                 f"""
-                # Create docker-compose.yml for Weaviate
-                cat > /root/weaviate-compose.yml << 'EOF'
-version: '3.4'
-services:
-  weaviate:
-    image: semitechnologies/weaviate:{self.weaviate_version}
-    restart: always
-    ports:
       - "8080:8080"
       - "50051:50051"
     volumes:
       - /mnt/vector-data:/var/lib/weaviate
     environment:
-      - """,
-                env_vars_str,
+      - """
                 """
-    healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/v1/.well-known/ready"]
       interval: 10s
       timeout: 5s
@@ -192,13 +143,7 @@ EOF
                 echo "Waiting for Weaviate to be ready..."
                 timeout 300 bash -c 'until curl -s -f http://localhost:8080/v1/.well-known/ready; do sleep 5; done'
                 echo "Weaviate is ready!"
-                """,
-            ),
-            opts=ResourceOptions(parent=self, depends_on=[self.mount_volume]),
-        )
-
-        # Create firewall rules
-        self.firewall = do.Firewall(
+                """
             f"{name}-firewall",
             droplet_ids=[self.droplet_id],
             inbound_rules=[
@@ -238,14 +183,6 @@ EOF
             f"{name}-snapshot-cron",
             connection=connection,
             create="""
-                # Create snapshot script
-                cat > /root/snapshot-weaviate.sh << 'EOF'
-#!/bin/bash
-# Stop Weaviate to ensure data consistency
-cd /root
-docker-compose -f weaviate-compose.yml stop weaviate
-
-# Create snapshot directory
 SNAPSHOT_DIR="/mnt/vector-data-snapshots"
 mkdir -p $SNAPSHOT_DIR
 
@@ -265,13 +202,7 @@ EOF
 
                 # Add to crontab
                 (crontab -l 2>/dev/null || echo "") | grep -v "snapshot-weaviate.sh" | { cat; echo "0 3 * * * /root/snapshot-weaviate.sh > /var/log/weaviate-snapshot.log 2>&1"; } | crontab -
-            """,
-            opts=ResourceOptions(parent=self, depends_on=[self.deploy_weaviate]),
-        )
-
-        # Export outputs
-        self.register_outputs(
-            {
+            """
                 "droplet_id": self.droplet_id,
                 "droplet_name": self.droplet_name,
                 "weaviate_endpoint": Output.concat("http://", self.droplet.ipv4_address, ":8080"),

@@ -1,44 +1,12 @@
 """
-Health check endpoints for the AI Orchestration System.
-
-This module provides API endpoints for checking the health and status
-of various system components, including storage backends, caching systems,
-and cloud platform connections.
 """
-
-import logging
-import platform
-import sys
-from datetime import datetime
-from typing import Any, Dict, Optional
-
-from fastapi import APIRouter, Depends, Request
-from pydantic import BaseModel
-
-from core.orchestrator.src.api.dependencies.cache import get_redis_cache
-
-# Import dependencies
-from core.orchestrator.src.api.dependencies.memory import get_memory_manager
-
-# Import application settings
-from core.orchestrator.src.config.settings import Settings, get_settings
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-# Create router
-router = APIRouter()
-
-class ComponentHealth(BaseModel):
     """Schema for a system component's health status."""
-
     status: str  # "healthy", "degraded", "unavailable"
     message: Optional[str] = None
     details: Dict[str, Any] = {}
 
 class HealthStatus(BaseModel):
     """Schema for system health status."""
-
     status: str  # "healthy", "degraded", "unavailable"
     environment: str
     version: str = "1.0.0"
@@ -55,18 +23,7 @@ async def check_health(
     redis_cache=Depends(get_redis_cache),
 ) -> HealthStatus:
     """
-    Check the health of the system components.
-
-    This endpoint checks the status of various system components including:
-    - Storage backends (mongodb)
-    - Cache system (Redis)
-    - Cloud platform connectivity
-    - Runtime information
-
-    Returns:
-        HealthStatus: A health status response with component statuses
     """
-    # Initialize health status
     overall_status = "healthy"
     components = {
         "api": ComponentHealth(status="healthy", message="API is responding normally"),
@@ -85,6 +42,8 @@ async def check_health(
 
     # Check memory system health
     try:
+
+        pass
         if hasattr(memory_manager, "health_check"):
             memory_health = await memory_manager.health_check()
 
@@ -109,7 +68,9 @@ async def check_health(
                 message="Memory system is available (basic check)",
                 details={"type": memory_manager.__class__.__name__},
             )
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error checking memory system health: {e}")
         components["memory"] = ComponentHealth(
             status="unavailable",
@@ -120,6 +81,8 @@ async def check_health(
 
     # Check Redis cache health
     try:
+
+        pass
         if hasattr(redis_cache, "health_check"):
             cache_health = await redis_cache.health_check()
 
@@ -153,7 +116,9 @@ async def check_health(
                 message="Cache system health check unavailable",
                 details={"type": redis_cache.__class__.__name__},
             )
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error checking cache health: {e}")
         components["cache"] = ComponentHealth(
             status="unavailable",
@@ -174,9 +139,6 @@ async def check_health(
 @router.get("/ping", summary="Simple ping endpoint")
 async def ping() -> Dict[str, str]:
     """
-    Simple ping endpoint to check if the API is responsive.
-
-    Returns:
         Dict with a "status" key set to "ok"
     """
     return {"status": "ok"}

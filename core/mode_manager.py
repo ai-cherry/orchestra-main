@@ -1,172 +1,31 @@
 #!/usr/bin/env python3
 """
-Mode Manager for AI Orchestra
-
-This module provides a comprehensive mode management system for AI Orchestra,
-enabling the use of different AI models for specific tasks and managing workflows
-that transition between modes. It supports:
-
-1. Loading configurations from YAML
-2. Switching between modes with context preservation
-3. Running predefined workflow sequences
-4. Suggesting next modes based on current state
-5. Enforcing file access permissions
-
-The system optimizes model usage by assigning:
-- Gemini 1.5 Pro: architect, orchestrator, and reviewer modes
-- GPT-4: code and debug modes
-- Claude 3 Opus: strategy, ask, and creative modes
 """
-
-import logging
-import os
-import re
-from dataclasses import dataclass, field
-from datetime import datetime
-from pathlib import Path
-from typing import Any, ClassVar, Dict, List, Optional, Tuple, Union
-
-import yaml
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Constants
-PROJECT_ROOT = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 CONFIG_DIR = PROJECT_ROOT / "config"
 MODE_CONFIG_PATH = CONFIG_DIR / "mode_definitions.yaml"
 WORKFLOW_STATE_PATH = CONFIG_DIR / "workflow_state.yaml"
 
 class FileAccessError(Exception):
     """Exception raised when a mode attempts to access a restricted file."""
-
-class WorkflowError(Exception):
     """Exception raised for workflow-related errors."""
-
-@dataclass
-class Mode:
     """
-    Represents an operation mode with specific AI model and capabilities.
-
-    Each mode represents a specialized role with access to specific file patterns
-    and a designated AI model optimized for its tasks.
     """
-
-    slug: str
-    name: str
-    model: str
-    description: str
-    write_access: bool = False
-    file_patterns: List[str] = field(default_factory=list)
-    capabilities: List[str] = field(default_factory=list)
-    token_limit: int = 32000
-    suggested_transitions: List[str] = field(default_factory=list)
-
-    def can_write_file(self, file_path: str) -> bool:
         """
-        Check if this mode can write to the specified file path.
-
-        Args:
-            file_path: Path to the file to check
-
-        Returns:
-            True if the mode has write access to this file, False otherwise
         """
-        if not self.write_access:
-            return False
-
-        # If no specific patterns are defined but write_access is True,
-        # allow all files
-        if not self.file_patterns:
-            return True
-
-        # Check if the file matches any of the allowed patterns
-        for pattern in self.file_patterns:
-            if re.match(pattern, file_path):
-                return True
-
-        return False
-
-@dataclass
-class WorkflowStep:
     """
-    A single step in a workflow sequence.
-
-    Each step specifies a mode to use and a task to perform.
     """
-
-    mode: str
-    task: str
-    context: Dict[str, Any] = field(default_factory=dict)
-    completed: bool = False
-
-@dataclass
-class Workflow:
     """
-    A sequence of mode transitions for a specific development task.
-
-    Workflows define predefined sequences of mode transitions for common
-    development tasks like feature development, bug fixes, etc.
     """
-
-    slug: str
-    name: str
-    description: str
-    steps: List[WorkflowStep]
-    current_step: int = 0
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
-    global_context: Dict[str, Any] = field(default_factory=dict)
-
-    @property
-    def completed(self) -> bool:
         """Check if all steps in the workflow are completed."""
-        return self.current_step >= len(self.steps) or all(step.completed for step in self.steps)
-
-class ModeManager:
     """
-    Manages modes, workflows, and transitions between modes.
-
-    This class is responsible for:
-    1. Loading mode and workflow configurations
-    2. Switching between modes
-    3. Managing workflow execution
-    4. Suggesting next modes based on current context
-    5. Validating file access permissions
     """
-
     _instance: ClassVar[Optional["ModeManager"]] = None
 
     def __init__(self, config_path: Optional[str] = None):
         """
-        Initialize the mode manager.
-
-        Args:
-            config_path: Path to the configuration file (optional)
         """
-        self.modes: Dict[str, Mode] = {}
-        self.workflows: Dict[str, Workflow] = {}
-        self.current_mode: Optional[Mode] = None
-        self.current_workflow: Optional[Workflow] = None
-        self.history: List[str] = []
-        self.context: Dict[str, Any] = {}
-
-        # Load configuration
-        config_path = config_path or MODE_CONFIG_PATH
-        self.load_configuration(config_path)
-
-    def load_configuration(self, config_path: Union[str, Path]) -> bool:
         """
-        Load mode and workflow configuration from YAML file.
-
-        Args:
-            config_path: Path to the configuration file
-
-        Returns:
-            True if configuration was successfully loaded, False otherwise
         """
-        try:
             with open(config_path, "r") as f:
                 config = yaml.safe_load(f)
 
@@ -191,6 +50,8 @@ class ModeManager:
             # Load workflows
             for slug, workflow_config in config.get("workflows", {}).items():
                 steps = []
+                # TODO: Consider using list comprehension for better performance
+
                 for step_config in workflow_config.get("steps", []):
                     steps.append(
                         WorkflowStep(
@@ -209,21 +70,16 @@ class ModeManager:
             logger.info(f"Loaded {len(self.modes)} modes and {len(self.workflows)} workflows")
             return True
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Failed to load configuration: {e}")
             return False
 
     def switch_mode(self, mode_slug: str) -> Tuple[bool, str]:
         """
-        Switch to a different mode.
-
-        Args:
-            mode_slug: Slug of the mode to switch to
-
-        Returns:
-            Tuple of (success, message)
         """
-        if mode_slug not in self.modes:
             return False, f"Mode '{mode_slug}' not found"
 
         # Save current mode to history
@@ -238,30 +94,9 @@ class ModeManager:
 
     def can_write_file(self, file_path: str) -> bool:
         """
-        Check if the current mode can write to the specified file path.
-
-        Args:
-            file_path: Path to the file to check
-
-        Returns:
-            True if the current mode has write access to this file, False otherwise
         """
-        if not self.current_mode:
-            return False
-
-        return self.current_mode.can_write_file(file_path)
-
-    def validate_file_access(self, file_path: str) -> Tuple[bool, str]:
         """
-        Validate if the current mode can write to the specified file path.
-
-        Args:
-            file_path: Path to the file to check
-
-        Returns:
-            Tuple of (success, message)
         """
-        if not self.current_mode:
             return False, "No active mode selected"
 
         if not self.current_mode.write_access:
@@ -278,15 +113,7 @@ class ModeManager:
 
     def start_workflow(self, workflow_slug: str) -> Tuple[bool, str]:
         """
-        Start a workflow sequence.
-
-        Args:
-            workflow_slug: Slug of the workflow to start
-
-        Returns:
-            Tuple of (success, message)
         """
-        if workflow_slug not in self.workflows:
             return False, f"Workflow '{workflow_slug}' not found"
 
         # Initialize workflow
@@ -312,12 +139,7 @@ class ModeManager:
 
     def advance_workflow(self) -> Tuple[bool, str]:
         """
-        Advance to the next step in the current workflow.
-
-        Returns:
-            Tuple of (success, message)
         """
-        if not self.current_workflow:
             return False, "No active workflow"
 
         # Mark current step as completed
@@ -346,18 +168,7 @@ class ModeManager:
 
     def suggest_next_modes(self, limit: int = 3) -> List[Dict[str, str]]:
         """
-        Suggest next modes based on current context and configuration.
-
-        Args:
-            limit: Maximum number of suggestions to return
-
-        Returns:
-            List of suggested modes with reasons
         """
-        suggestions = []
-
-        if not self.current_mode:
-            # No current mode, suggest popular starting modes
             starter_modes = ["code", "ask", "strategy"]
             for slug in starter_modes:
                 if slug in self.modes:
@@ -396,29 +207,14 @@ class ModeManager:
 
     def get_model_for_current_mode(self) -> str:
         """
-        Get the AI model assigned to the current mode.
-
-        Returns:
-            Model identifier for the current mode
         """
-        if not self.current_mode:
             return "default"
 
         return self.current_mode.model
 
     def save_workflow_state(self) -> bool:
         """
-        Save current workflow state to a file.
-
-        Returns:
-            True if state was successfully saved, False otherwise
         """
-        if not self.current_workflow:
-            return False
-
-        try:
-            # Convert workflow to serializable dict
-            state = {
                 "workflow": self.current_workflow.slug,
                 "current_step": self.current_workflow.current_step,
                 "start_time": (
@@ -446,21 +242,16 @@ class ModeManager:
             logger.info(f"Saved workflow state to {WORKFLOW_STATE_PATH}")
             return True
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Failed to save workflow state: {e}")
             return False
 
     def load_workflow_state(self) -> bool:
         """
-        Load workflow state from file.
-
-        Returns:
-            True if state was successfully loaded, False otherwise
         """
-        if not os.path.exists(WORKFLOW_STATE_PATH):
-            return False
-
-        try:
             with open(WORKFLOW_STATE_PATH, "r") as f:
                 state = yaml.safe_load(f)
 
@@ -494,7 +285,10 @@ class ModeManager:
             logger.info(f"Loaded workflow state from {WORKFLOW_STATE_PATH}")
             return True
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Failed to load workflow state: {e}")
             return False
 
@@ -503,11 +297,6 @@ _instance = None
 
 def get_mode_manager() -> ModeManager:
     """Get singleton instance of ModeManager."""
-    global _instance
-    if _instance is None:
-        _instance = ModeManager()
-    return _instance
-
 if __name__ == "__main__":
     # Simple CLI for testing
     import argparse

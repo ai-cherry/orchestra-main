@@ -1,40 +1,6 @@
 #!/usr/bin/env python3
 """
-Weaviate Collections Setup Script
-=================================
-Creates and configures the core domain collections for the Orchestra AI system:
-- Personal: Personal information and use
-- PayReady: Apartment-focused software company data
-- ParagonRX: Clinical trial company data
-- Session: Multi-tenant chat sessions with daily partitioning
-
-Features:
-- Idempotent execution (safe to run multiple times)
-- ACORN hybrid search enabled for all collections
-- text2vec-openai vectorizer configured
-- Proper schema validation
-- Multi-tenant support for Session collection
-
-Usage:
-    python setup_weaviate_collections.py [--endpoint ENDPOINT] [--api-key API_KEY]
-
-Author: Orchestra AI Platform
 """
-
-import argparse
-import json
-import logging
-import os
-import sys
-import time
-from typing import Dict, List, Optional, Any
-
-import weaviate
-from weaviate.exceptions import WeaviateBaseError
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[logging.StreamHandler(), logging.FileHandler("weaviate_setup.log")],
 )
@@ -62,14 +28,6 @@ def parse_args():
 
 def connect_to_weaviate(endpoint: str, api_key: Optional[str] = None) -> weaviate.Client:
     """
-    Connect to Weaviate instance with retry logic.
-
-    Args:
-        endpoint: Weaviate endpoint URL
-        api_key: Weaviate API key (optional)
-
-    Returns:
-        Weaviate client instance
     """
     logger.info(f"Connecting to Weaviate at {endpoint}")
 
@@ -83,6 +41,8 @@ def connect_to_weaviate(endpoint: str, api_key: Optional[str] = None) -> weaviat
 
     for attempt in range(max_retries):
         try:
+
+            pass
             client = weaviate.Client(
                 url=endpoint, auth_client_secret=auth_config, timeout_config=(5, 60)  # (connect_timeout, read_timeout)
             )
@@ -93,7 +53,9 @@ def connect_to_weaviate(endpoint: str, api_key: Optional[str] = None) -> weaviat
                 return client
             else:
                 logger.warning("Weaviate is not ready")
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.warning(f"Connection attempt {attempt+1}/{max_retries} failed: {str(e)}")
 
         if attempt < max_retries - 1:
@@ -105,37 +67,24 @@ def connect_to_weaviate(endpoint: str, api_key: Optional[str] = None) -> weaviat
 
 def collection_exists(client: weaviate.Client, class_name: str) -> bool:
     """
-    Check if a collection already exists in Weaviate.
-
-    Args:
-        client: Weaviate client
-        class_name: Name of the collection/class
-
-    Returns:
-        True if collection exists, False otherwise
     """
-    try:
-        schema = client.schema.get()
         classes = schema.get("classes", [])
         return any(cls["class"] == class_name for cls in classes)
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error checking if collection {class_name} exists: {str(e)}")
         return False
 
 def create_collection(client: weaviate.Client, class_config: Dict[str, Any]) -> bool:
     """
-    Create a collection in Weaviate with the given configuration.
-
-    Args:
-        client: Weaviate client
-        class_config: Collection configuration dictionary
-
-    Returns:
-        True if successful, False otherwise
     """
     class_name = class_config["class"]
 
     try:
+
+
+        pass
         if collection_exists(client, class_name):
             logger.info(f"Collection {class_name} already exists, skipping creation")
             return True
@@ -144,18 +93,15 @@ def create_collection(client: weaviate.Client, class_config: Dict[str, Any]) -> 
         client.schema.create_class(class_config)
         logger.info(f"Successfully created collection {class_name}")
         return True
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error creating collection {class_name}: {str(e)}")
         return False
 
 def get_personal_collection_config() -> Dict[str, Any]:
     """
-    Get the configuration for the Personal collection.
-
-    Returns:
-        Collection configuration dictionary
     """
-    return {
         "class": "Personal",
         "description": "Personal information and use",
         "vectorizer": "text2vec-openai",
@@ -225,12 +171,7 @@ def get_personal_collection_config() -> Dict[str, Any]:
 
 def get_payready_collection_config() -> Dict[str, Any]:
     """
-    Get the configuration for the PayReady collection.
-
-    Returns:
-        Collection configuration dictionary
     """
-    return {
         "class": "PayReady",
         "description": "Apartment-focused software company data",
         "vectorizer": "text2vec-openai",
@@ -308,12 +249,7 @@ def get_payready_collection_config() -> Dict[str, Any]:
 
 def get_paragonrx_collection_config() -> Dict[str, Any]:
     """
-    Get the configuration for the ParagonRX collection.
-
-    Returns:
-        Collection configuration dictionary
     """
-    return {
         "class": "ParagonRX",
         "description": "Clinical trial company data",
         "vectorizer": "text2vec-openai",
@@ -391,13 +327,7 @@ def get_paragonrx_collection_config() -> Dict[str, Any]:
 
 def get_session_collection_config() -> Dict[str, Any]:
     """
-    Get the configuration for the Session collection.
-    This collection uses multi-tenant design with threadId and tenant (date) fields.
-
-    Returns:
-        Collection configuration dictionary
     """
-    return {
         "class": "Session",
         "description": "Multi-tenant chat sessions with daily partitioning",
         "vectorizer": "text2vec-openai",
@@ -483,18 +413,7 @@ def get_session_collection_config() -> Dict[str, Any]:
 
 def verify_collection(client: weaviate.Client, class_name: str) -> bool:
     """
-    Verify that a collection exists and has the expected configuration.
-
-    Args:
-        client: Weaviate client
-        class_name: Name of the collection/class
-
-    Returns:
-        True if collection exists and is properly configured, False otherwise
     """
-    try:
-        # Check if collection exists
-        if not collection_exists(client, class_name):
             logger.error(f"Collection {class_name} does not exist")
             return False
 
@@ -509,26 +428,15 @@ def verify_collection(client: weaviate.Client, class_name: str) -> bool:
             logger.info(f"Collection {class_name} exists but is empty")
 
         return True
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error verifying collection {class_name}: {str(e)}")
         return False
 
 def enable_acorn(client: weaviate.Client) -> bool:
     """
-    Enable ACORN hybrid search for all collections.
-
-    Args:
-        client: Weaviate client
-
-    Returns:
-        True if successful, False otherwise
     """
-    try:
-        # Check if ACORN is already enabled
-        node_config = client.cluster.get_nodes_status()
-
-        # In newer versions, ACORN settings are in the node config
-        for node in node_config:
             if "config" in node and "query" in node["config"]:
                 if node["config"]["query"].get("defaultACORNEnabled", False):
                     logger.info("ACORN is already enabled")
@@ -544,32 +452,14 @@ def enable_acorn(client: weaviate.Client) -> bool:
         logger.info("If not enabled, please restart Weaviate with this environment variable set")
 
         return True
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error enabling ACORN: {str(e)}")
         return False
 
 def main():
     """Main entry point for the script."""
-    args = parse_args()
-
-    try:
-        # Connect to Weaviate
-        client = connect_to_weaviate(args.endpoint, args.api_key)
-
-        # Enable ACORN hybrid search
-        enable_acorn(client)
-
-        # Get collection configurations
-        collections = [
-            get_personal_collection_config(),
-            get_payready_collection_config(),
-            get_paragonrx_collection_config(),
-            get_session_collection_config(),
-        ]
-
-        # Create or verify collections
-        success_count = 0
-        for collection_config in collections:
             class_name = collection_config["class"]
 
             if args.verify:
@@ -594,7 +484,10 @@ def main():
             )
             return 1
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"An unexpected error occurred: {str(e)}")
         return 1
 

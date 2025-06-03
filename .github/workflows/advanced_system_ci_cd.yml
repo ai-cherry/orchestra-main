@@ -1,0 +1,205 @@
+name: Advanced System CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+  VULTR_API_KEY: ${{ secrets.VULTR_API_KEY }}
+  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-unified.txt
+          pip install pytest pytest-asyncio pytest-cov
+      
+      - name: Run tests
+        run: |
+          pytest tests/ -v --cov=. --cov-report=xml
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install linters
+        run: |
+          pip install ruff black mypy
+      
+      - name: Run linters
+        run: |
+          ruff check .
+          black --check .
+          mypy . --ignore-missing-imports
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run security scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+      
+      - name: Upload security results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  build:
+    needs: [test, lint]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build Docker images
+        run: |
+          docker build -t orchestra-api:${{ github.sha }} -f Dockerfile.minimal .
+          docker build -t orchestra-webscraping:${{ github.sha }} -f Dockerfile.webscraping .
+      
+      - name: Save Docker images
+        run: |
+          docker save orchestra-api:${{ github.sha }} | gzip > orchestra-api.tar.gz
+          docker save orchestra-webscraping:${{ github.sha }} | gzip > orchestra-webscraping.tar.gz
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-images
+          path: |
+            orchestra-api.tar.gz
+            orchestra-webscraping.tar.gz
+
+  deploy-staging:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Pulumi
+        uses: pulumi/actions@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install Pulumi dependencies
+        run: |
+          cd infrastructure
+          pip install -r requirements.txt
+      
+      - name: Deploy to staging
+        run: |
+          cd infrastructure
+          pulumi stack select staging
+          pulumi up --yes
+        env:
+          PULUMI_STACK: staging
+
+  deploy-production:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Pulumi
+        uses: pulumi/actions@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install Pulumi dependencies
+        run: |
+          cd infrastructure
+          pip install -r requirements.txt
+      
+      - name: Deploy to production (Blue)
+        run: |
+          cd infrastructure
+          pulumi stack select production-blue
+          pulumi up --yes
+        env:
+          PULUMI_STACK: production-blue
+      
+      - name: Run smoke tests
+        run: |
+          python scripts/smoke_tests.py --environment production-blue
+      
+      - name: Switch traffic to Blue
+        run: |
+          cd infrastructure
+          pulumi config set active-deployment blue
+          pulumi up --yes
+      
+      - name: Monitor deployment
+        run: |
+          python scripts/monitoring_improvements.py --check-deployment --timeout 300
+
+  rollback:
+    needs: deploy-production
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Pulumi
+        uses: pulumi/actions@v4
+      
+      - name: Rollback to Green
+        run: |
+          cd infrastructure
+          pulumi stack select production
+          pulumi config set active-deployment green
+          pulumi up --yes
+      
+      - name: Alert on rollback
+        run: |
+          curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+            -H 'Content-type: application/json' \
+            --data '{"text":"⚠️ Production deployment rolled back to previous version"}'

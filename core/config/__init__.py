@@ -1,22 +1,5 @@
-"""Package version of core.config.
-
-This file replaces the former `core/config.py` module, enabling
-`core.config` to be treated as a package so sub-modules such as
-`core.config.unified_config` can be imported without conflict.
 """
-
-from __future__ import annotations
-
-import os
-from functools import lru_cache
-from typing import Any, Dict, Optional
-
-from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings
-
-from core.llm_types import RouterConfig
-
-__all__ = [
+"""
     "Settings",
     "get_settings",
     "get_router_config",
@@ -25,8 +8,6 @@ __all__ = [
 
 class Settings(BaseSettings):
     """Application settings with environment variable support."""
-
-    # API Keys
     portkey_api_key: str = Field(default="", env="PORTKEY_API_KEY")
     portkey_config: str = Field(default="", env="PORTKEY_CONFIG")
     openrouter_api_key: str = Field(default="", env="OPENROUTER_API_KEY")
@@ -94,26 +75,6 @@ class Settings(BaseSettings):
 
     def to_router_config(self) -> RouterConfig:  # type: ignore[name-defined]
         """Convert settings to RouterConfig"""
-        return RouterConfig(
-            portkey_api_key=self.portkey_api_key,
-            portkey_config=self.portkey_config,
-            openrouter_api_key=self.openrouter_api_key,
-            enable_fallback=self.enable_fallback,
-            enable_caching=self.enable_caching,
-            cache_ttl=self.cache_ttl,
-            max_retries=self.max_retries,
-            timeout=self.timeout,
-            enable_monitoring=self.enable_monitoring,
-            connection_pool_size=self.connection_pool_size,
-            connection_pool_overflow=self.connection_pool_overflow,
-            cache_max_size=self.cache_max_size,
-            cache_memory_limit_mb=self.cache_memory_limit_mb,
-            database_url=self.database_url,
-            db_pool_size=self.db_pool_size,
-            db_pool_overflow=self.db_pool_overflow,
-        )
-
-    model_config = {
         "env_file": ".env",
         "env_file_encoding": "utf-8",
         "case_sensitive": False,
@@ -124,11 +85,4 @@ class Settings(BaseSettings):
 @lru_cache()
 def get_settings() -> Settings:
     """Return cached settings instance."""
-    return Settings()
-
-def get_router_config() -> RouterConfig:
     """Return RouterConfig built from settings."""
-    return get_settings().to_router_config()
-
-# Eagerly load settings for convenience
-settings = get_settings() 

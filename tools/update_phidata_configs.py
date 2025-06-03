@@ -1,60 +1,17 @@
 #!/usr/bin/env python
 """
-Helper script to update existing Phidata agent configurations with UI optimization settings.
-
-This script:
-1. Scans a directory for YAML files containing Phidata agent configurations
-2. Updates them to include settings for optimal UI display (markdown, show_tool_calls)
-3. Adds storage and memory configurations if missing
-
-Usage:
-  python tools/update_phidata_configs.py --config-dir /path/to/configs [--dry-run]
 """
-
-import argparse
-import logging
-import os
-import sys
-from typing import Any, Dict, Tuple
-
-import yaml
-
-# Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 def is_phidata_agent_config(config: Dict[str, Any]) -> bool:
     """
-    Check if a dictionary is a Phidata agent configuration.
-
-    Args:
-        config: Dictionary to check
-
-    Returns:
-        True if it's a Phidata agent config, False otherwise
     """
-    # Check for wrapper_type = phidata or phidata_agent_class
     return isinstance(config, dict) and (config.get("wrapper_type") == "phidata" or "phidata_agent_class" in config)
 
 def update_agent_config(config: Dict[str, Any], agent_key: str) -> Tuple[Dict[str, Any], bool]:
     """
-    Update a Phidata agent configuration with optimal UI display settings.
-
-    Args:
-        config: Agent configuration dictionary
-        agent_key: Key of the agent in the parent dictionary
-
-    Returns:
-        Tuple of (updated config, whether changes were made)
     """
-    agent_config = config[agent_key]
-    changes_made = False
-
-    # Only process Phidata agent configurations
-    if not is_phidata_agent_config(agent_config):
-        return config, False
-
-    # Add markdown: true if missing
     if "markdown" not in agent_config:
         agent_config["markdown"] = True
         changes_made = True
@@ -112,16 +69,7 @@ def update_agent_config(config: Dict[str, Any], agent_key: str) -> Tuple[Dict[st
 
 def process_yaml_file(file_path: str, dry_run: bool = False) -> bool:
     """
-    Process a YAML file to update Phidata agent configurations.
-
-    Args:
-        file_path: Path to the YAML file
-        dry_run: If True, don't actually write changes
-
-    Returns:
-        True if changes were made, False otherwise
     """
-    try:
         with open(file_path, "r") as f:
             config = yaml.safe_load(f)
 
@@ -147,26 +95,16 @@ def process_yaml_file(file_path: str, dry_run: bool = False) -> bool:
 
         return any_changes
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Error processing {file_path}: {e}")
         return False
 
 def process_directory(directory: str, dry_run: bool = False) -> Tuple[int, int]:
     """
-    Process all YAML files in a directory.
-
-    Args:
-        directory: Directory path
-        dry_run: If True, don't actually write changes
-
-    Returns:
-        Tuple of (files processed, files changed)
     """
-    files_processed = 0
-    files_changed = 0
-
-    for root, _, files in os.walk(directory):
-        for file in files:
             if file.endswith((".yaml", ".yml")):
                 file_path = os.path.join(root, file)
                 files_processed += 1

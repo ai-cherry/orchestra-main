@@ -1,44 +1,18 @@
+# TODO: Consider adding connection pooling configuration
 """
-Memory MCP Server - Manages memory using PostgreSQL and Weaviate
 """
-
-import asyncio
-import os
-import sys
-from typing import Any, Dict, List, Optional
-from datetime import datetime
-import json
-import uuid
-
-# Add project root to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
-from mcp.server import Server
-from mcp.server.stdio import stdio_server
-from mcp.types import TextContent, Tool
-
-from shared.database import UnifiedDatabase
-
-class MemoryServer:
     """MCP server for memory management using PostgreSQL and Weaviate."""
-
-    def __init__(self):
         self.server = Server("memory")
         self.setup_database()
         self.setup_handlers()
 
     def setup_database(self):
         """Setup unified database connection."""
-        self.db = UnifiedDatabase()
+        self.db = UnifiedDatabase(postgres_url=os.getenv("POSTGRES_URL", "postgresql://postgres:postgres@localhost:5432/orchestra"))
 
     def setup_handlers(self):
         """Setup MCP handlers."""
-
-        @self.server.list_tools()
-        async def list_tools() -> List[Tool]:
             """List available tools."""
-            return [
-                {
                     "name": "store_memory",
                     "description": "Store agent memory in Weaviate",
                     "inputSchema": {
@@ -177,8 +151,6 @@ class MemoryServer:
         @self.server.call_tool()
         async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
             """Handle tool calls."""
-
-            try:
                 if name == "store_memory":
                     memory_id = self.db.weaviate.store_memory(
                         agent_id=arguments["agent_id"],
@@ -344,13 +316,14 @@ class MemoryServer:
                 else:
                     return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
-            except Exception as e:
+            except Exception:
+
+
+                pass
                 return [TextContent(type="text", text=f"❌ Error executing {name}: {str(e)}")]
 
     async def run(self):
         """Run the MCP server."""
-        # Test database connections on startup
-        health = self.db.health_check()
         if not health["overall"]:
             print(f"⚠️  Database health check failed: {health}")
         else:

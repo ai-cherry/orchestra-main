@@ -1,0 +1,48 @@
+{
+  "orchestra_integration": {
+    "enabled": true,
+    "auto_start": true,
+    "services": {
+      "postgresql": {
+        "host": "127.0.0.1",
+        "port": 5432
+      },
+      "redis": {
+        "host": "localhost",
+        "port": 6379
+      },
+      "weaviate": {
+        "host": "localhost",
+        "port": 8080
+      },
+      "mcp_servers": {
+        "orchestrator": {
+          "port": 8002
+        },
+        "memory": {
+          "port": 8003
+        },
+        "weaviate": {
+          "port": 8001
+        },
+        "tools": {
+          "port": 8006
+        },
+        "deployment": {
+          "port": 8005
+        }
+      }
+    },
+    "modes": {
+      "all": {
+        "auto_enhance": true,
+        "agents": [
+          "code-analyzer",
+          "task-planner",
+          "quality-checker",
+          "doc-generator"
+        ]
+      }
+    }
+  }
+}

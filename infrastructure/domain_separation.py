@@ -1,14 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Pulumi Infrastructure for Domain-Separated Architecture
 """
-
-import pulumi
-import pulumi_kubernetes as k8s
-from pulumi import Config, Output
-
-# Configuration
-config = Config()
 environment = config.get("environment") or "development"
 
 # Domain configurations

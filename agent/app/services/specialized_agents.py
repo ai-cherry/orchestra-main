@@ -1,34 +1,5 @@
 """
-Specialized AI Research Agents
-
-This module implements three domain-specific AI research agents:
-1. Personal Agent - User preference learning and adaptive search
-2. Pay Ready Agent - Apartment rental market analysis
-3. Paragon Medical Research Agent - Clinical trial discovery
 """
-
-import asyncio
-import json
-from typing import Dict, Any, List, Optional, Set
-from datetime import datetime, timedelta
-from dataclasses import dataclass, field
-import logging
-from enum import Enum
-import numpy as np
-from collections import defaultdict
-import aiohttp
-
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, func
-from weaviate import Client
-import redis.asyncio as redis
-
-from core.llm_intelligent_router import get_intelligent_llm_router, QueryType
-from agent.app.core.database import get_db
-
-logger = logging.getLogger(__name__)
-
-class AgentType(Enum):
     """Types of specialized agents"""
     PERSONAL = "personal"
     PAY_READY = "pay_ready"
@@ -37,47 +8,9 @@ class AgentType(Enum):
 @dataclass
 class UserPreference:
     """User preference data structure"""
-    category: str
-    weight: float = 1.0
-    positive_signals: int = 0
-    negative_signals: int = 0
-    last_updated: datetime = field(default_factory=datetime.utcnow)
-
-@dataclass
-class ApartmentListing:
     """Apartment listing data structure"""
-    id: str
-    address: str
-    price: float
-    bedrooms: int
-    bathrooms: float
-    sqft: int
-    amenities: List[str]
-    smart_home_features: List[str]
-    neighborhood_score: float
-    tech_score: float
-    overall_score: float = 0.0
-
-@dataclass
-class ClinicalTrial:
     """Clinical trial data structure"""
-    nct_id: str
-    title: str
-    phase: str
-    conditions: List[str]
-    interventions: List[str]
-    eligibility_criteria: Dict[str, Any]
-    locations: List[Dict[str, Any]]
-    distance_miles: Optional[float] = None
-    relevance_score: float = 0.0
-
-class BaseSpecializedAgent:
     """Base class for specialized agents"""
-    
-    def __init__(self, agent_id: str, name: str, agent_type: AgentType):
-        self.id = agent_id
-        self.name = name
-        self.type = agent_type
         self.status = "idle"
         self.created_at = datetime.utcnow()
         self.last_activity = datetime.utcnow()
@@ -94,32 +27,21 @@ class BaseSpecializedAgent:
         
     def _init_redis(self):
         """Initialize Redis connection"""
-        try:
-            self.redis_client = redis.Redis(
-                host='localhost',
-                port=6379,
-                decode_responses=True
-            )
-        except Exception as e:
             logger.error(f"Failed to initialize Redis: {e}")
     
     def _init_weaviate(self):
         """Initialize Weaviate connection"""
-        try:
-            self.weaviate_client = Client(
                 url="http://localhost:8080",
                 timeout_config=(5, 15)
             )
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to initialize Weaviate: {e}")
     
     async def process_task(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """Process a task - to be implemented by subclasses"""
-        raise NotImplementedError
-    
-    async def get_status(self) -> Dict[str, Any]:
         """Get agent status"""
-        return {
             "id": self.id,
             "name": self.name,
             "type": self.type.value,
@@ -131,11 +53,7 @@ class BaseSpecializedAgent:
 
 class PersonalAgent(BaseSpecializedAgent):
     """
-    Personal Agent with user preference learning and adaptive search refinement
     """
-    
-    def __init__(self):
-        super().__init__(
             agent_id="personal-001",
             name="Personal Assistant",
             agent_type=AgentType.PERSONAL
@@ -152,11 +70,6 @@ class PersonalAgent(BaseSpecializedAgent):
         context: Optional[Dict[str, Any]] = None
     ):
         """Learn from user interaction"""
-        if category not in self.user_preferences[user_id]:
-            self.user_preferences[user_id][category] = UserPreference(category=category)
-        
-        pref = self.user_preferences[user_id][category]
-        
         if signal_type == "positive":
             pref.positive_signals += 1
             pref.weight = min(2.0, pref.weight * 1.1)  # Increase weight up to 2x
@@ -186,17 +99,6 @@ class PersonalAgent(BaseSpecializedAgent):
         search_type: str = "general"
     ) -> Dict[str, Any]:
         """Perform adaptive search based on user preferences"""
-        
-        # Get user preferences
-        preferences = self.user_preferences.get(user_id, {})
-        
-        # Build preference-weighted query
-        enhanced_query = await self._enhance_query_with_preferences(query, preferences)
-        
-        # Classify and route query
-        response = await self.llm_router.route_query(
-            enhanced_query,
-            context={
                 "user_id": user_id,
                 "search_type": search_type,
                 "preferences": {k: v.weight for k, v in preferences.items()}
@@ -233,16 +135,6 @@ class PersonalAgent(BaseSpecializedAgent):
         preferences: Dict[str, UserPreference]
     ) -> str:
         """Enhance query based on user preferences"""
-        
-        # Sort preferences by weight
-        sorted_prefs = sorted(
-            preferences.items(),
-            key=lambda x: x[1].weight,
-            reverse=True
-        )
-        
-        # Add top preferences to query context
-        if sorted_prefs:
             pref_context = ", ".join([
                 f"{cat} (importance: {pref.weight:.1f})"
                 for cat, pref in sorted_prefs[:3]
@@ -259,8 +151,6 @@ class PersonalAgent(BaseSpecializedAgent):
         preferences: Dict[str, UserPreference]
     ) -> List[Dict[str, Any]]:
         """Extract and rank results based on preferences"""
-        
-        # Extract content from LLM response
         content = response.get("choices", [{}])[0].get("message", {}).get("content", "")
         
         # Parse results (simplified - in production would use structured output)
@@ -293,12 +183,6 @@ class PersonalAgent(BaseSpecializedAgent):
         results: List[Dict[str, Any]]
     ):
         """Update vector store with search results"""
-        if not self.weaviate_client:
-            return
-        
-        try:
-            # Store query and results for semantic similarity
-            data_object = {
                 "user_id": user_id,
                 "query": query,
                 "timestamp": datetime.utcnow().isoformat(),
@@ -309,7 +193,9 @@ class PersonalAgent(BaseSpecializedAgent):
                 data_object=data_object,
                 class_name="UserSearchHistory"
             )
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to update vector store: {e}")
     
     async def process_task(self, task: Dict[str, Any]) -> Dict[str, Any]:
@@ -318,6 +204,9 @@ class PersonalAgent(BaseSpecializedAgent):
         self.last_activity = datetime.utcnow()
         
         try:
+
+        
+            pass
             task_type = task.get("type", "search")
             
             if task_type == "search":
@@ -345,11 +234,7 @@ class PersonalAgent(BaseSpecializedAgent):
 
 class PayReadyAgent(BaseSpecializedAgent):
     """
-    Pay Ready Agent for apartment rental market analysis
     """
-    
-    def __init__(self):
-        super().__init__(
             agent_id="payready-001",
             name="Pay Ready Rental Assistant",
             agent_type=AgentType.PAY_READY
@@ -373,9 +258,6 @@ class PayReadyAgent(BaseSpecializedAgent):
         user_preferences: Optional[Dict[str, Any]] = None
     ) -> ApartmentListing:
         """Analyze an apartment listing"""
-        
-        # Create listing object
-        listing = ApartmentListing(
             id=listing_data["id"],
             address=listing_data["address"],
             price=listing_data["price"],
@@ -413,8 +295,6 @@ class PayReadyAgent(BaseSpecializedAgent):
         preferences: Optional[Dict[str, Any]] = None
     ) -> float:
         """Calculate neighborhood score based on demographics and amenities"""
-        
-        # Check cache
         cache_key = f"neighborhood:{address}"
         if self.redis_client:
             cached = await self.redis_client.get(cache_key)
@@ -423,29 +303,20 @@ class PayReadyAgent(BaseSpecializedAgent):
         
         # Analyze neighborhood using LLM
         prompt = f"""
-        Analyze the neighborhood for: {address}
-        
-        Consider:
-        1. Walkability and transit access
-        2. Safety ratings
-        3. Nearby amenities (grocery, restaurants, parks)
-        4. Demographics and community
-        5. Tech infrastructure (internet providers, cell coverage)
-        
-        Provide a score from 0-100.
         """
-        
-        response = await self.llm_router.route_query(
-            prompt,
             context={"query_type": QueryType.ANALYTICAL.value}
         )
         
         # Extract score (simplified - would use structured output)
         content = response.get("choices", [{}])[0].get("message", {}).get("content", "")
         try:
+
+            pass
             score = float(content.split("Score:")[-1].split()[0])
             score = max(0, min(100, score))  # Clamp to 0-100
-        except:
+        except Exception:
+
+            pass
             score = 50.0  # Default
         
         # Cache result
@@ -456,25 +327,7 @@ class PayReadyAgent(BaseSpecializedAgent):
     
     def _calculate_tech_score(self, features: List[str]) -> float:
         """Calculate technology amenity score"""
-        score = 50.0  # Base score
-        
-        for feature in features:
-            feature_lower = feature.lower()
-            for tech_amenity, weight in self.tech_amenity_weights.items():
-                if tech_amenity in feature_lower:
-                    score += weight * 5  # Each match adds weighted points
-        
-        return min(100, score)  # Cap at 100
-    
-    async def _calculate_overall_score(
-        self,
-        listing: ApartmentListing,
-        preferences: Optional[Dict[str, Any]] = None
-    ) -> float:
         """Calculate overall listing score"""
-        
-        # Default weights
-        weights = {
             "price": 0.3,
             "location": 0.25,
             "tech": 0.2,
@@ -512,25 +365,8 @@ class PayReadyAgent(BaseSpecializedAgent):
         criteria: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Perform comprehensive market analysis"""
-        
-        # Get market data using LLM
         prompt = f"""
-        Perform rental market analysis for: {location}
-        
-        Criteria:
-        - Bedrooms: {criteria.get('bedrooms', 'any')}
-        - Max price: ${criteria.get('max_price', 'no limit')}
-        - Must have: {', '.join(criteria.get('must_have', []))}
-        
-        Provide:
-        1. Average rental prices
-        2. Market trends
-        3. Best neighborhoods for tech professionals
-        4. Availability outlook
         """
-        
-        response = await self.llm_router.route_query(
-            prompt,
             context={"query_type": QueryType.DEEP_SEARCH.value}
         )
         
@@ -550,6 +386,9 @@ class PayReadyAgent(BaseSpecializedAgent):
         self.last_activity = datetime.utcnow()
         
         try:
+
+        
+            pass
             task_type = task.get("type", "analyze_listing")
             
             if task_type == "analyze_listing":
@@ -577,11 +416,7 @@ class PayReadyAgent(BaseSpecializedAgent):
 
 class ParagonMedicalResearchAgent(BaseSpecializedAgent):
     """
-    Paragon Medical Research Agent for clinical trial discovery
     """
-    
-    def __init__(self):
-        super().__init__(
             agent_id="paragon-001",
             name="Paragon Medical Research Assistant",
             agent_type=AgentType.PARAGON_MEDICAL
@@ -598,31 +433,12 @@ class ParagonMedicalResearchAgent(BaseSpecializedAgent):
         max_distance_miles: float = 50
     ) -> List[ClinicalTrial]:
         """Search for clinical trials matching criteria"""
-        
-        # Build search query
-        query_parts = []
         query_parts.extend([f"condition:{cond}" for cond in conditions])
         query_parts.extend([f"phase:{phase}" for phase in phases])
         
         # Use LLM to search and parse trials
         prompt = f"""
-        Search ClinicalTrials.gov for trials matching:
-        - Conditions: {', '.join(conditions)}
-        - Phases: {', '.join(phases)}
-        - Focus: Internal medicine, pain management, medical devices
-        
-        For each trial, extract:
-        1. NCT ID
-        2. Title
-        3. Phase
-        4. Conditions
-        5. Interventions
-        6. Key eligibility criteria
-        7. Locations
         """
-        
-        response = await self.llm_router.route_query(
-            prompt,
             context={"query_type": QueryType.DEEP_SEARCH.value}
         )
         
@@ -648,9 +464,6 @@ class ParagonMedicalResearchAgent(BaseSpecializedAgent):
     
     async def _parse_clinical_trials(self, response: Dict[str, Any]) -> List[ClinicalTrial]:
         """Parse clinical trials from LLM response"""
-        trials = []
-        
-        # Extract content
         content = response.get("choices", [{}])[0].get("message", {}).get("content", "")
         
         # Simple parsing - in production would use structured output
@@ -691,13 +504,6 @@ class ParagonMedicalResearchAgent(BaseSpecializedAgent):
         max_distance: float
     ) -> List[ClinicalTrial]:
         """Filter trials by distance from user"""
-        
-        filtered = []
-        for trial in trials:
-            # Calculate distance to nearest location
-            min_distance = float('inf')
-            for location in trial.locations:
-                # Simple distance calculation (would use proper geo library)
                 lat_diff = location.get("lat", 0) - user_location["lat"]
                 lon_diff = location.get("lon", 0) - user_location["lon"]
                 distance = (lat_diff**2 + lon_diff**2)**0.5 * 69  # Rough miles conversion
@@ -716,19 +522,6 @@ class ParagonMedicalResearchAgent(BaseSpecializedAgent):
         target_phases: List[str]
     ) -> float:
         """Calculate trial relevance score"""
-        
-        score = 0.0
-        
-        # Condition match
-        for condition in target_conditions:
-            if any(condition.lower() in tc.lower() for tc in trial.conditions):
-                score += 30
-        
-        # Phase match
-        if trial.phase in target_phases:
-            score += 20
-        
-        # Internal medicine focus
         im_keywords = ["internal medicine", "pain management", "chronic pain", "medical device"]
         if any(keyword in trial.title.lower() for keyword in im_keywords):
             score += 25
@@ -746,35 +539,13 @@ class ParagonMedicalResearchAgent(BaseSpecializedAgent):
         filters: Optional[Dict[str, Any]] = None
     ) -> List[Dict[str, Any]]:
         """Search PubMed for relevant literature"""
-        
-        # Check cache
         cache_key = f"pubmed:{query}:{json.dumps(filters or {})}"
         if cache_key in self.pubmed_cache:
             return self.pubmed_cache[cache_key]
         
         # Use LLM to search PubMed
         prompt = f"""
-        Search PubMed for recent research on: {query}
-        
-        Filters: {json.dumps(filters or {})}
-        
-        Focus on:
-        1. Clinical trials and studies
-        2. Recent publications (last 2 years)
-        3. High-impact journals
-        
-        For each result, provide:
-        - PMID
-        - Title
-        - Authors
-        - Journal
-        - Publication date
-        - Abstract summary
-        - Relevance to query
         """
-        
-        response = await self.llm_router.route_query(
-            prompt,
             context={"query_type": QueryType.DEEP_SEARCH.value}
         )
         
@@ -793,7 +564,6 @@ class ParagonMedicalResearchAgent(BaseSpecializedAgent):
         notification_method: str = "email"
     ) -> Dict[str, Any]:
         """Set up automated alerts for new matching trials"""
-        
         alert_id = f"alert_{user_id}_{datetime.utcnow().timestamp()}"
         
         self.alert_subscriptions[alert_id] = {
@@ -821,11 +591,6 @@ class ParagonMedicalResearchAgent(BaseSpecializedAgent):
     
     async def check_trial_alerts(self):
         """Check all active alerts for new matches"""
-        
-        for alert_id, alert_data in self.alert_subscriptions.items():
-            try:
-                # Search for new trials
-                trials = await self.search_clinical_trials(
                     conditions=alert_data["criteria"].get("conditions", []),
                     phases=alert_data["criteria"].get("phases", ["Phase 3", "Phase 4"])
                 )
@@ -844,7 +609,10 @@ class ParagonMedicalResearchAgent(BaseSpecializedAgent):
                 
                 alert_data["last_checked"] = datetime.utcnow().isoformat()
                 
-            except Exception as e:
+            except Exception:
+
+                
+                pass
                 logger.error(f"Error checking alert {alert_id}: {e}")
     
     async def process_task(self, task: Dict[str, Any]) -> Dict[str, Any]:
@@ -853,6 +621,9 @@ class ParagonMedicalResearchAgent(BaseSpecializedAgent):
         self.last_activity = datetime.utcnow()
         
         try:
+
+        
+            pass
             task_type = task.get("type", "search_trials")
             
             if task_type == "search_trials":
@@ -896,8 +667,6 @@ SPECIALIZED_AGENTS = {
 
 async def get_specialized_agent(agent_type: str) -> BaseSpecializedAgent:
     """Get a specialized agent by type"""
-    agent = SPECIALIZED_AGENTS.get(agent_type)
-    if not agent:
         raise ValueError(f"Unknown agent type: {agent_type}")
     return agent
 
@@ -906,7 +675,3 @@ async def process_agent_task(
     task: Dict[str, Any]
 ) -> Dict[str, Any]:
     """Process a task with the appropriate specialized agent"""
-    agent = await get_specialized_agent(agent_type)
-    return await agent.process_task(task)
-
-# Background task to check medical trial alerts

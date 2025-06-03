@@ -1,18 +1,6 @@
 #!/usr/bin/env python3
 """
-Example usage of the Simplified Agent Registry.
-
-This script demonstrates how to use the simplified agent registry
-for agent management and selection without security overhead.
 """
-
-import logging
-import sys
-from typing import Any, Dict
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     handlers=[logging.StreamHandler(sys.stdout)],
 )
@@ -29,11 +17,7 @@ from core.orchestrator.src.agents.simplified_agent_registry import (
 
 class SimpleAgent:
     """A simple agent implementation for demonstration purposes."""
-
-    def __init__(self, agent_type: str, capabilities: list = None):
         """Initialize the simple agent."""
-        self.agent_type = agent_type
-        self.capabilities = capabilities or [AgentCapability.GENERAL]
         logger.info(f"Created SimpleAgent with type: {agent_type}")
 
     async def process(self, user_input: str) -> str:
@@ -42,8 +26,6 @@ class SimpleAgent:
 
 class CodeAgent:
     """A simple code-focused agent implementation."""
-
-    def __init__(self):
         """Initialize the code agent."""
         self.agent_type = "code_agent"
         self.capabilities = [AgentCapability.CODE_GENERATION]
@@ -55,9 +37,6 @@ class CodeAgent:
 
 def create_context(user_input: str, metadata: Dict[str, Any] = None) -> AgentContext:
     """Create a simple agent context for testing."""
-    return AgentContext(
-        user_input=user_input,
-        metadata=metadata or {},
         conversation_id="test-conversation",
         message_id="test-message",
     )

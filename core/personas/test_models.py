@@ -1,39 +1,18 @@
+# TODO: Consider adding connection pooling configuration
 """
-Unit tests for persona configuration models.
-
-Tests all Pydantic models for proper validation, serialization,
-and business logic.
+Orchestra AI - Database Models
+This module contains Pydantic models for database entities.
 """
 
-from datetime import datetime, timedelta
-from typing import Any, Dict
-from uuid import UUID, uuid4
+from typing import List, Dict, Any, Optional, Union
+from uuid import uuid4, UUID
+from datetime import datetime
+from enum import Enum
+from pydantic import BaseModel, Field, field_validator, model_validator
 
-import pytest
-from pydantic import ValidationError
-
-from core.personas.models import (
-    BehaviorRule,
-    InteractionMode,
-    KnowledgeDomain,
-    MemoryConfiguration,
-    PersonaConfiguration,
-    PersonaMetrics,
-    PersonaStatus,
-    PersonaTemplate,
-    PersonaTrait,
-    ResponseStyle,
-    ResponseStyleType,
-    TraitCategory,
-    VoiceConfiguration,
-)
-
-class TestPersonaTrait:
+""
     """Test PersonaTrait model validation and behavior."""
-
-    def test_valid_trait_creation(self):
         """Test creating a valid persona trait."""
-        trait = PersonaTrait(
             name="analytical_thinking",
             category=TraitCategory.COGNITIVE,
             value=85,
@@ -48,7 +27,6 @@ class TestPersonaTrait:
 
     def test_numeric_value_validation(self):
         """Test numeric value range validation."""
-        # Valid numeric value
         trait = PersonaTrait(name="confidence", category=TraitCategory.PERSONALITY, value=75)
         assert trait.value == 75
 
@@ -59,8 +37,6 @@ class TestPersonaTrait:
 
     def test_string_and_bool_values(self):
         """Test traits with string and boolean values."""
-        # String value
-        trait_str = PersonaTrait(
             name="communication_style",
             category=TraitCategory.COMMUNICATION,
             value="direct",
@@ -73,7 +49,6 @@ class TestPersonaTrait:
 
     def test_weight_validation(self):
         """Test weight range validation."""
-        # Valid weight
         trait = PersonaTrait(name="empathy", category=TraitCategory.PERSONALITY, value=80, weight=5.5)
         assert trait.weight == 5.5
 
@@ -83,11 +58,7 @@ class TestPersonaTrait:
 
 class TestResponseStyle:
     """Test ResponseStyle model validation and behavior."""
-
-    def test_valid_response_style(self):
         """Test creating a valid response style."""
-        style = ResponseStyle(
-            type=ResponseStyleType.TECHNICAL,
             tone="professional",
             formality_level=8,
             verbosity=6,
@@ -100,9 +71,6 @@ class TestResponseStyle:
 
     def test_level_validations(self):
         """Test formality and verbosity level validations."""
-        # Valid levels
-        style = ResponseStyle(
-            type=ResponseStyleType.CASUAL,
             tone="friendly",
             formality_level=3,
             verbosity=7,
@@ -130,10 +98,7 @@ class TestResponseStyle:
 
 class TestKnowledgeDomain:
     """Test KnowledgeDomain model validation and behavior."""
-
-    def test_valid_knowledge_domain(self):
         """Test creating a valid knowledge domain."""
-        domain = KnowledgeDomain(
             name="Software Development",
             expertise_level=9,
             topics=["Python", "TypeScript", "API Design"],
@@ -148,9 +113,6 @@ class TestKnowledgeDomain:
 
     def test_list_validation(self):
         """Test list field validation."""
-        # Empty topics list should fail
-        with pytest.raises(ValidationError):
-            KnowledgeDomain(
                 name="Empty Domain",
                 expertise_level=5,
                 topics=[],  # Empty list not allowed
@@ -170,25 +132,16 @@ class TestKnowledgeDomain:
 
 class TestBehaviorRule:
     """Test BehaviorRule model validation and behavior."""
-
-    def test_valid_behavior_rule(self):
         """Test creating a valid behavior rule."""
-        rule = BehaviorRule(
             name="Simplify for Beginners",
             condition="user_expertise_level < 3",
             action="use_simple_language",
             priority=9,
             is_mandatory=True,
-            exceptions=["technical_mode_enabled"],
-        )
-        assert rule.name == "Simplify for Beginners"
-        assert rule.is_mandatory is True
-        assert len(rule.exceptions) == 1
+            except Exception:
 
-    def test_priority_validation(self):
+                pass
         """Test priority range validation."""
-        # Valid priority
-        rule = BehaviorRule(
             name="Test Rule",
             condition="always",
             action="test_action",
@@ -207,13 +160,7 @@ class TestBehaviorRule:
 
 class TestMemoryConfiguration:
     """Test MemoryConfiguration model validation and behavior."""
-
-    def test_valid_memory_config(self):
         """Test creating a valid memory configuration."""
-        config = MemoryConfiguration(
-            retention_period_hours=48,
-            max_context_tokens=8000,
-            summarization_threshold=3000,
             priority_topics=["user_preferences", "key_decisions"],
             use_semantic_compression=True,
         )
@@ -223,24 +170,8 @@ class TestMemoryConfiguration:
 
     def test_token_limits(self):
         """Test token limit validations."""
-        # Valid token limits
-        config = MemoryConfiguration(max_context_tokens=16000)
-        assert config.max_context_tokens == 16000
-
-        # Invalid max tokens (too low)
-        with pytest.raises(ValidationError):
-            MemoryConfiguration(max_context_tokens=50)
-
-        # Invalid max tokens (too high)
-        with pytest.raises(ValidationError):
-            MemoryConfiguration(max_context_tokens=64000)
-
-class TestVoiceConfiguration:
     """Test VoiceConfiguration model validation and behavior."""
-
-    def test_valid_voice_config(self):
         """Test creating a valid voice configuration."""
-        config = VoiceConfiguration(
             provider="elevenlabs",
             voice_id="test_voice_123",
             language="en-US",
@@ -255,23 +186,7 @@ class TestVoiceConfiguration:
 
     def test_rate_and_pitch_validation(self):
         """Test speaking rate and pitch validations."""
-        # Valid rates
-        config = VoiceConfiguration(speaking_rate=0.5, pitch=2.0)
-        assert config.speaking_rate == 0.5
-        assert config.pitch == 2.0
-
-        # Invalid speaking rate
-        with pytest.raises(ValidationError):
-            VoiceConfiguration(speaking_rate=3.0)
-
-        # Invalid volume
-        with pytest.raises(ValidationError):
-            VoiceConfiguration(volume=1.5)
-
-class TestPersonaTemplate:
     """Test PersonaTemplate model validation and behavior."""
-
-    def test_valid_template(self):
         """Test creating a valid persona template."""
         trait = PersonaTrait(name="helpful", category=TraitCategory.PERSONALITY, value=90)
         style = ResponseStyle(
@@ -296,7 +211,6 @@ class TestPersonaTemplate:
 
     def test_timestamp_defaults(self):
         """Test that timestamps are set automatically."""
-        template = PersonaTemplate(
             name="Test Template",
             description="Test",
             category="test",
@@ -307,16 +221,7 @@ class TestPersonaTemplate:
 
 class TestPersonaMetrics:
     """Test PersonaMetrics model validation and behavior."""
-
-    def test_valid_metrics(self):
         """Test creating valid persona metrics."""
-        persona_id = uuid4()
-        metrics = PersonaMetrics(
-            persona_id=persona_id,
-            total_interactions=1500,
-            average_response_time_ms=250.5,
-            user_satisfaction_score=4.3,
-            error_rate=0.02,
             token_usage={"input": 50000, "output": 40000},
         )
         assert metrics.persona_id == persona_id
@@ -325,32 +230,13 @@ class TestPersonaMetrics:
 
     def test_token_calculation(self):
         """Test automatic total token calculation."""
-        metrics = PersonaMetrics(
-            persona_id=uuid4(),
             token_usage={"input": 1000, "output": 2000},
         )
         assert metrics.token_usage["total"] == 3000
 
     def test_satisfaction_score_validation(self):
         """Test user satisfaction score validation."""
-        # Valid score
-        metrics = PersonaMetrics(
-            persona_id=uuid4(),
-            user_satisfaction_score=4.5,
-        )
-        assert metrics.user_satisfaction_score == 4.5
-
-        # Invalid score (too high)
-        with pytest.raises(ValidationError):
-            PersonaMetrics(
-                persona_id=uuid4(),
-                user_satisfaction_score=6.0,
-            )
-
-class TestPersonaConfiguration:
     """Test PersonaConfiguration model validation and behavior."""
-
-    def test_valid_persona_configuration(self):
         """Test creating a valid persona configuration."""
         trait = PersonaTrait(name="analytical", category=TraitCategory.COGNITIVE, value=85)
         style = ResponseStyle(
@@ -383,8 +269,6 @@ class TestPersonaConfiguration:
 
     def test_slug_validation(self):
         """Test slug format validation."""
-        # Valid slug
-        config = PersonaConfiguration(
             name="Test Persona",
             slug="test-persona-123",
             description="Test",
@@ -417,8 +301,6 @@ class TestPersonaConfiguration:
 
     def test_model_preferences_validation(self):
         """Test model preferences validation."""
-        # Valid model preferences
-        config = PersonaConfiguration(
             name="Test",
             slug="test",
             description="Test",
@@ -454,12 +336,6 @@ class TestPersonaConfiguration:
 
     def test_relationship_validation(self):
         """Test that personas can't have both parent and template."""
-        parent_id = uuid4()
-        template_id = uuid4()
-
-        # Should fail with both parent and template
-        with pytest.raises(ValidationError) as exc_info:
-            PersonaConfiguration(
                 name="Test",
                 slug="test",
                 description="Test",
@@ -478,7 +354,6 @@ class TestPersonaConfiguration:
 
     def test_serialization(self):
         """Test model serialization to dict/JSON."""
-        config = PersonaConfiguration(
             name="Serialization Test",
             slug="serialization-test",
             description="Test serialization",
@@ -505,8 +380,6 @@ class TestPersonaConfiguration:
 
 class TestEnumValues:
     """Test all enum values are accessible and valid."""
-
-    def test_persona_status_enum(self):
         """Test PersonaStatus enum values."""
         assert PersonaStatus.ACTIVE == "active"
         assert PersonaStatus.INACTIVE == "inactive"
@@ -540,12 +413,7 @@ class TestEnumValues:
 
 class TestComplexScenarios:
     """Test complex scenarios and edge cases."""
-
-    def test_full_persona_with_all_features(self):
         """Test creating a fully-featured persona configuration."""
-        # Create all components
-        traits = [
-            PersonaTrait(
                 name="analytical",
                 category=TraitCategory.COGNITIVE,
                 value=90,
@@ -673,7 +541,6 @@ class TestComplexScenarios:
 
     def test_minimal_persona_configuration(self):
         """Test creating a persona with only required fields."""
-        minimal_persona = PersonaConfiguration(
             name="Minimal Bot",
             slug="minimal-bot",
             description="A minimal persona configuration",

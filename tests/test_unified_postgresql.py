@@ -1,44 +1,13 @@
 #!/usr/bin/env python3
 """
-Comprehensive test suite for the unified PostgreSQL architecture.
-Tests all components: connection manager, unified PostgreSQL client, and unified database.
 """
-
-import asyncio
-import pytest
-import json
-import time
-from datetime import datetime, timedelta
-from typing import Dict, List, Any
-import uuid
-
-from shared.database.connection_manager_enhanced import (
-    get_connection_manager_enhanced as get_connection_manager,
-    close_connection_manager,
-)
-from shared.database.unified_postgresql_enhanced import (
-    get_unified_postgresql_enhanced as get_unified_postgresql,
-    close_unified_postgresql,
-)
-from shared.database.unified_db_v2 import get_unified_database, close_unified_database
-
-class TestConnectionManager:
     """Test the connection manager singleton and pooling."""
-
-    @pytest.mark.asyncio
-    async def test_singleton_pattern(self):
         """Test that connection manager is a singleton."""
-        manager1 = await get_connection_manager()
-        manager2 = await get_connection_manager()
-
         assert manager1 is manager2, "Connection manager should be a singleton"
 
     @pytest.mark.asyncio
     async def test_connection_pool(self):
         """Test connection pool functionality."""
-        manager = await get_connection_manager()
-
-        # Test basic query
         result = await manager.fetchval("SELECT 1")
         assert result == 1
 
@@ -51,9 +20,6 @@ class TestConnectionManager:
     @pytest.mark.asyncio
     async def test_health_check(self):
         """Test health check functionality."""
-        manager = await get_connection_manager()
-        health = await manager.health_check()
-
         assert health["status"] == "healthy"
         assert "pool" in health
         assert "database" in health
@@ -62,11 +28,6 @@ class TestConnectionManager:
     @pytest.mark.asyncio
     async def test_concurrent_connections(self):
         """Test concurrent connection usage."""
-        manager = await get_connection_manager()
-
-        # Run multiple queries concurrently
-        tasks = []
-        for i in range(10):
             task = manager.fetchval(f"SELECT {i}")
             tasks.append(task)
 
@@ -81,13 +42,7 @@ class TestConnectionManager:
 
 class TestUnifiedPostgreSQL:
     """Test the unified PostgreSQL client."""
-
-    @pytest.mark.asyncio
-    async def test_cache_operations(self):
         """Test cache functionality."""
-        client = await get_unified_postgresql()
-
-        # Test set and get
         key = f"test_key_{uuid.uuid4()}"
         value = {"test": "data", "number": 42}
 
@@ -113,9 +68,6 @@ class TestUnifiedPostgreSQL:
     @pytest.mark.asyncio
     async def test_cache_expiration(self):
         """Test cache TTL and expiration."""
-        client = await get_unified_postgresql()
-
-        # Set with short TTL
         key = f"expire_test_{uuid.uuid4()}"
         await client.cache_set(key, "will_expire", ttl=1)
 
@@ -131,9 +83,6 @@ class TestUnifiedPostgreSQL:
     @pytest.mark.asyncio
     async def test_session_operations(self):
         """Test session functionality."""
-        client = await get_unified_postgresql()
-
-        # Create session
         session_data = {"user_id": "test_user", "agent_id": "test_agent", "context": {"key": "value"}}
 
         session_id = await client.session_create(
@@ -169,10 +118,6 @@ class TestUnifiedPostgreSQL:
     @pytest.mark.asyncio
     async def test_agent_operations(self):
         """Test agent CRUD operations."""
-        client = await get_unified_postgresql()
-
-        # Create agent
-        agent_data = {
             "name": f"Test Agent {uuid.uuid4()}",
             "type": "assistant",
             "config": {"model": "gpt-4", "temperature": 0.7},
@@ -209,10 +154,6 @@ class TestUnifiedPostgreSQL:
     @pytest.mark.asyncio
     async def test_workflow_operations(self):
         """Test workflow CRUD operations."""
-        client = await get_unified_postgresql()
-
-        # Create workflow
-        workflow_data = {
             "name": f"Test Workflow {uuid.uuid4()}",
             "description": "Test workflow for unit tests",
             "definition": {
@@ -253,10 +194,6 @@ class TestUnifiedPostgreSQL:
     @pytest.mark.asyncio
     async def test_audit_log(self):
         """Test audit logging functionality."""
-        client = await get_unified_postgresql()
-
-        # Create audit log entry
-        await client.audit_log(
             action="test_action",
             entity_type="test_entity",
             entity_id="test_123",
@@ -276,10 +213,6 @@ class TestUnifiedPostgreSQL:
     @pytest.mark.asyncio
     async def test_memory_snapshot(self):
         """Test memory snapshot functionality."""
-        client = await get_unified_postgresql()
-
-        # Create memory snapshot
-        snapshot_data = {
             "conversation_history": [
                 {"role": "user", "content": "Hello"},
                 {"role": "assistant", "content": "Hi there!"},
@@ -307,14 +240,7 @@ class TestUnifiedPostgreSQL:
 
 class TestUnifiedDatabase:
     """Test the unified database interface."""
-
-    @pytest.mark.asyncio
-    async def test_agent_with_cache(self):
         """Test agent operations with caching."""
-        db = await get_unified_database()
-
-        # Create agent
-        agent_data = {
             "name": f"Cached Agent {uuid.uuid4()}",
             "type": "assistant",
             "config": {"model": "gpt-4"},
@@ -347,10 +273,6 @@ class TestUnifiedDatabase:
     @pytest.mark.asyncio
     async def test_parallel_search(self):
         """Test parallel search across data types."""
-        db = await get_unified_database()
-
-        # Create test data
-        agent_id = await db.create_agent(
             name="Search Test Agent", type="assistant", config={}, capabilities=["search"], status="active"
         )
 
@@ -376,10 +298,6 @@ class TestUnifiedDatabase:
     @pytest.mark.asyncio
     async def test_health_check(self):
         """Test unified database health check."""
-        db = await get_unified_database()
-
-        health = await db.health_check()
-
         assert health["status"] == "healthy"
         assert health["postgresql"]["status"] == "healthy"
         assert health["weaviate"]["status"] == "healthy"
@@ -388,11 +306,6 @@ class TestUnifiedDatabase:
     @pytest.mark.asyncio
     async def test_performance_metrics(self):
         """Test performance tracking."""
-        db = await get_unified_database()
-
-        # Perform some operations
-        for i in range(5):
-            agent_id = await db.create_agent(
                 name=f"Perf Test Agent {i}", type="assistant", config={}, capabilities=[], status="active"
             )
             await db.get_agent(agent_id)
@@ -408,13 +321,7 @@ class TestUnifiedDatabase:
 
 class TestBackgroundTasks:
     """Test background cleanup tasks."""
-
-    @pytest.mark.asyncio
-    async def test_cache_cleanup(self):
         """Test automatic cache cleanup."""
-        client = await get_unified_postgresql()
-
-        # Create expired cache entry
         expired_key = f"expired_{uuid.uuid4()}"
         await client.cache_set(expired_key, "will_be_cleaned", ttl=-1)  # Already expired
 
@@ -432,10 +339,6 @@ class TestBackgroundTasks:
     @pytest.mark.asyncio
     async def test_session_cleanup(self):
         """Test automatic session cleanup."""
-        client = await get_unified_postgresql()
-
-        # Create expired session
-        expired_id = await client.session_create(
             user_id="test_user", agent_id="test_agent", data={}, ttl=-1  # Already expired
         )
 
@@ -452,20 +355,7 @@ class TestBackgroundTasks:
 @pytest.fixture(scope="session")
 def event_loop():
     """Create an instance of the default event loop for the test session."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
-@pytest.fixture(autouse=True)
-async def cleanup():
     """Cleanup after each test."""
-    yield
-
-    # Close all connections
-    await close_unified_database()
-    await close_unified_postgresql()
-    await close_connection_manager()
-
 if __name__ == "__main__":
     # Run tests
     pytest.main([__file__, "-v", "-s"])

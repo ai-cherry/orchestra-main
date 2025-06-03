@@ -1,14 +1,6 @@
 #!/usr/bin/env python3
 """Parallel mode execution for independent tasks"""
-
-import asyncio
-import json
-from datetime import datetime
-
-class ParallelModeExecutor:
     """Execute multiple modes in parallel"""
-    
-    async def execute_mode(self, mode_name, task_data):
         """Simulate mode execution"""
         print(f"[{datetime.now().strftime('%H:%M:%S')}] Starting {mode_name}")
         
@@ -27,20 +19,7 @@ class ParallelModeExecutor:
     
     async def execute_parallel(self, mode_tasks):
         """Execute multiple mode tasks in parallel"""
-        tasks = [
-            self.execute_mode(mode, data) 
-            for mode, data in mode_tasks.items()
-        ]
-        
-        results = await asyncio.gather(*tasks)
-        return results
-
-async def main():
     """Demo parallel execution"""
-    executor = ParallelModeExecutor()
-    
-    # Define parallel tasks
-    mode_tasks = {
         "code": {"task": "implement feature"},
         "test": {"task": "write unit tests"},
         "documentation": {"task": "update docs"}

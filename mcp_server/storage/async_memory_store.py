@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-"""
-async_memory_store.py - Async Memory Store for MCP Server
-
-This module provides an asynchronous version of the MemoryStore class,
-using asyncio for improved performance with I/O operations.
-"""
+"""Asynchronous memory store for MCP server."""
 
 import asyncio
 import json
@@ -13,27 +8,22 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-# Configure logging
 logger = logging.getLogger("mcp-async-memory-store")
+
 
 class AsyncMemoryStore:
     """Asynchronous memory store for MCP server."""
-
+    
     def __init__(self, config: Dict[str, Any]):
-        """Initialize the memory store with configuration.
-
+        """Initialize the async memory store.
+        
         Args:
-            config: Dictionary containing configuration parameters:
-                - storage_path: Path to store memory files
-                - ttl_seconds: Default time-to-live for memory items
-                - max_items_per_key: Maximum items to store per key
-                - enable_compression: Whether to compress stored data
+            config: Configuration dictionary with storage settings
         """
-        self.config = config
-        self.storage_path = Path(config["storage_path"])
-        self.ttl_seconds = config["ttl_seconds"]
-        self.max_items = config["max_items_per_key"]
-        self.enable_compression = config["enable_compression"]
+        self.storage_path = Path(config.get("storage_path", "./memory_store"))
+        self.ttl_seconds = config.get("ttl_seconds", 3600)
+        self.max_items = config.get("max_items_per_key", 100)
+        self.enable_compression = config.get("enable_compression", False)
 
         # Create storage directory if it doesn't exist
         self.storage_path.mkdir(exist_ok=True, parents=True)
@@ -43,12 +33,9 @@ class AsyncMemoryStore:
 
         # Lock for thread safety
         self.lock = asyncio.Lock()
-
-        # Load existing memory items
-        asyncio.create_task(self._load_memory())
-
-        # Start background cleanup task
-        asyncio.create_task(self._cleanup_task())
+        
+        # Flag to track initialization
+        self._initialized = False
 
     async def _load_memory(self):
         """Load existing memory items from storage."""
@@ -81,11 +68,11 @@ class AsyncMemoryStore:
             logger.error(f"Error loading memory: {e}")
 
     def _read_file(self, path: Path) -> str:
-        """Read file content (used with asyncio.to_thread).
-
+        """Read file content synchronously.
+        
         Args:
             path: Path to the file
-
+            
         Returns:
             File content as string
         """
@@ -93,12 +80,12 @@ class AsyncMemoryStore:
             return f.read()
 
     def _write_file(self, path: Path, content: str) -> bool:
-        """Write content to file (used with asyncio.to_thread).
-
+        """Write content to file synchronously.
+        
         Args:
             path: Path to the file
             content: Content to write
-
+            
         Returns:
             True if successful, False otherwise
         """
@@ -114,10 +101,7 @@ class AsyncMemoryStore:
         """Background task to clean up expired memory items."""
         while True:
             try:
-                # Sleep for a while before cleaning up
-                await asyncio.sleep(3600)  # Run every hour
-
-                # Find and delete expired memory files
+                await asyncio.sleep(300)  # Run every 5 minutes
                 memory_files = list(self.storage_path.glob("*.json"))
                 for memory_file in memory_files:
                     try:
@@ -144,24 +128,23 @@ class AsyncMemoryStore:
 
     async def get(self, key: str, scope: str = "session", tool: Optional[str] = None) -> Optional[Any]:
         """Get a memory item.
-
+        
         Args:
-            key: The key to retrieve
+            key: The memory key
             scope: The scope of the memory item (default: "session")
             tool: Optional tool identifier
 
         Returns:
             The memory item content if found, None otherwise
         """
-        # Construct the full key based on scope and tool
         full_key = self._get_full_key(key, scope, tool)
-
-        # Check if the memory item is in the cache
+        
+        # Check cache first
         async with self.lock:
             if full_key in self.memory_cache:
                 return self.memory_cache[full_key]
-
-        # Check if the memory item is in storage
+        
+        # Check storage
         memory_file = self.storage_path / f"{full_key}.json"
         if memory_file.exists():
             try:
@@ -195,9 +178,9 @@ class AsyncMemoryStore:
         ttl: Optional[int] = None,
     ) -> bool:
         """Set a memory item.
-
+        
         Args:
-            key: The key to store the item under
+            key: The memory key
             content: The content to store
             scope: The scope of the memory item (default: "session")
             tool: Optional tool identifier
@@ -206,17 +189,12 @@ class AsyncMemoryStore:
         Returns:
             True if successful, False otherwise
         """
-        # Construct the full key based on scope and tool
         full_key = self._get_full_key(key, scope, tool)
-
-        # Add to cache
-        async with self.lock:
-            self.memory_cache[full_key] = content
-
+        
         # Calculate expiry time
-        ttl = ttl or self.ttl_seconds
-        expiry_time = datetime.now() + timedelta(seconds=ttl)
-
+        ttl_seconds = ttl if ttl is not None else self.ttl_seconds
+        expiry_time = datetime.now() + timedelta(seconds=ttl_seconds)
+        
         # Prepare memory data
         memory_data = {
             "content": content,
@@ -230,28 +208,32 @@ class AsyncMemoryStore:
         memory_file = self.storage_path / f"{full_key}.json"
         json_content = json.dumps(memory_data, indent=2)
         success = await asyncio.to_thread(self._write_file, memory_file, json_content)
+        
+        if success:
+            # Update cache
+            async with self.lock:
+                self.memory_cache[full_key] = content
 
         return success
 
     async def delete(self, key: str, scope: str = "session", tool: Optional[str] = None) -> bool:
         """Delete a memory item.
-
+        
         Args:
-            key: The key to delete
+            key: The memory key
             scope: The scope of the memory item (default: "session")
             tool: Optional tool identifier
 
         Returns:
             True if successful, False otherwise
         """
-        # Construct the full key based on scope and tool
         full_key = self._get_full_key(key, scope, tool)
-
+        
         # Remove from cache
         async with self.lock:
             if full_key in self.memory_cache:
                 del self.memory_cache[full_key]
-
+        
         # Remove from storage
         memory_file = self.storage_path / f"{full_key}.json"
         if memory_file.exists():
@@ -265,10 +247,10 @@ class AsyncMemoryStore:
         return True
 
     async def sync(self, key: str, source_tool: str, target_tool: str, scope: str = "session") -> bool:
-        """Sync a memory item between tools.
-
+        """Sync memory between tools.
+        
         Args:
-            key: The key to sync
+            key: The memory key
             source_tool: Source tool identifier
             target_tool: Target tool identifier
             scope: The scope of the memory item (default: "session")
@@ -276,25 +258,37 @@ class AsyncMemoryStore:
         Returns:
             True if successful, False otherwise
         """
-        # Get the memory item from the source tool
-        source_content = await self.get(key, scope, source_tool)
-        if source_content is None:
-            return False
+        # Get content from source
+        content = await self.get(key, scope, source_tool)
+        if content is not None:
+            # Set content to target
+            return await self.set(key, content, scope, target_tool)
+        return False
 
-        # Set the memory item for the target tool
-        return await self.set(key, source_content, scope, target_tool)
-
-    def _get_full_key(self, key: str, scope: str, tool: Optional[str] = None) -> str:
-        """Construct the full key based on scope and tool.
-
+    def _get_full_key(self, key: str, scope: str, tool: Optional[str]) -> str:
+        """Generate full key for storage.
+        
         Args:
-            key: The base key
-            scope: The scope of the memory item
+            key: The memory key
+            scope: The scope
             tool: Optional tool identifier
-
+            
         Returns:
-            The full key
+            Full key string
         """
         if tool:
             return f"{scope}:{tool}:{key}"
         return f"{scope}:{key}"
+    
+    async def initialize(self):
+        """Initialize async components."""
+        if self._initialized:
+            return
+            
+        # Load existing memory items
+        asyncio.create_task(self._load_memory())
+
+        # Start background cleanup task
+        asyncio.create_task(self._cleanup_task())
+        
+        self._initialized = True

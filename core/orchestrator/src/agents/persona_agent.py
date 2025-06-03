@@ -1,38 +1,11 @@
+import secrets
 """
-Persona-aware Agent Implementation for AI Orchestration System.
-
-This module provides agent implementations that leverage persona information
-to adapt their responses to match different interaction styles and traits.
 """
-
-import logging
-import random
-from typing import Any, Dict, List, Optional
-
-from core.orchestrator.src.agents.agent_base import Agent, AgentContext, AgentResponse
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-class PersonaAwareAgent(Agent):
     agent_type = "simple_text"
     """
-    Agent that adapts its response style based on persona traits.
-
-    This agent specializes in crafting responses that mimic the style,
-    tone, and personality traits defined in the persona configuration.
-    It demonstrates how agents can be tailored to specific use cases.
     """
-
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
         """
-        Initialize a persona-aware agent.
-
-        Args:
-            config: Optional configuration for the agent
         """
-        super().__init__(config)
-        self.style_mappings = {
             "formal": self._formal_style,
             "casual": self._casual_style,
             "friendly": self._friendly_style,
@@ -86,24 +59,7 @@ class PersonaAwareAgent(Agent):
 
     async def process(self, context: AgentContext) -> AgentResponse:
         """
-        Process user input and generate a persona-aware response.
-
-        This method generates responses that align with the persona's
-        traits and interaction style, creating a more personalized experience.
-
-        Args:
-            context: The context for this interaction
-
-        Returns:
-            A personalized response based on the persona
         """
-        user_input = context.user_input
-        persona = context.persona
-
-        # Analyze input to determine appropriate response content
-        base_response = self._generate_base_response(user_input, persona)
-
-        # Apply persona-specific styling
         persona_traits = persona.traits or ["helpful"]
         interaction_style = persona.interaction_style or "formal"
 
@@ -116,7 +72,7 @@ class PersonaAwareAgent(Agent):
         # Add persona-specific nuances
         if persona.name:
             # Sometimes reference the persona's name
-            if random.random() < 0.2:  # 20% chance
+            if secrets.SystemRandom().random() < 0.2:  # 20% chance
                 final_response = f"As {persona.name}, {final_response.lower()}"
 
         # Generate metadata about how the response was personalized
@@ -131,45 +87,9 @@ class PersonaAwareAgent(Agent):
 
     def can_handle(self, context: AgentContext) -> float:
         """
-        Determine if this agent can handle the given context.
-
-        This agent specializes in persona-aware responses and can handle
-        most general conversation situations.
-
-        Args:
-            context: The context for this interaction
-
-        Returns:
-            A score between 0 and 1
         """
-        # This agent is well-suited for conversations with defined personas
-        persona = context.persona
-
-        # Higher score if the persona has well-defined traits
-        if persona.traits and len(persona.traits) >= 2:
-            return 0.85
-
-        # Still decent score for less defined personas
-        return 0.75
-
-    def _generate_base_response(self, user_input: str, persona: Any) -> str:
         """
-        Generate the base response content.
-
-        In a real implementation, this would leverage an LLM to generate
-        appropriate content based on the user input and persona context.
-
-        Args:
-            user_input: The user's input message
-            persona: The selected persona
-
-        Returns:
-            The base response text
         """
-        # For demonstration, create a simple response
-        # In a real implementation, this would call an LLM
-
-        # Extract topic from user input (simplified)
         topic = user_input.split()[-1] if user_input.split() else "that"
 
         # Generate appropriate responses based on persona expertise
@@ -188,35 +108,9 @@ class PersonaAwareAgent(Agent):
 
     def _apply_interaction_style(self, text: str, style: str) -> str:
         """
-        Apply a specific interaction style to the text.
-
-        Args:
-            text: The base text to style
-            style: The interaction style to apply
-
-        Returns:
-            The styled text
         """
-        # Use the appropriate styling function based on style
-        style_func = self.style_mappings.get(style.lower(), self._formal_style)
-        return style_func(text)
-
-    def _apply_trait_template(self, text: str, traits: List[str]) -> str:
         """
-        Apply a trait-specific template to the response.
-
-        Args:
-            text: The styled response text
-            traits: List of persona traits
-
-        Returns:
-            The response with trait-specific template applied
         """
-        # Select a relevant trait that we have templates for
-        available_traits = [t for t in traits if t.lower() in self.response_templates]
-
-        if not available_traits:
-            # Default to helpful if no matching traits
             trait = "helpful"
         else:
             # Randomly select one of the matching traits
@@ -233,7 +127,6 @@ class PersonaAwareAgent(Agent):
 
     def _formal_style(self, text: str) -> str:
         """Apply a formal style to text."""
-        # In a real implementation, this would use more sophisticated NLP
         return text.replace("I can ", "I am able to ").replace("can't", "cannot")
 
     def _casual_style(self, text: str) -> str:
@@ -250,7 +143,6 @@ class PersonaAwareAgent(Agent):
 
     def _concise_style(self, text: str) -> str:
         """Apply a concise style to text."""
-        # Simplistic implementation - would be more sophisticated in real system
         return text.split(". ")[0] + "."
 
     def _elaborate_style(self, text: str) -> str:
@@ -271,21 +163,9 @@ class PersonaAwareAgent(Agent):
 
 class DomainSpecificAgent(PersonaAwareAgent):
     """
-    Agent specializing in a specific knowledge domain.
-
-    This agent extends the PersonaAwareAgent with additional capabilities
-    for handling domain-specific queries. It demonstrates how the agent
-    framework can be extended for specialized applications.
     """
-
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
         """
-        Initialize a domain-specific agent.
-
-        Args:
-            config: Optional configuration for the agent
         """
-        super().__init__(config)
         self.domain = config.get("domain", "general") if config else "general"
 
         # Domain-specific knowledge repositories would be integrated here
@@ -300,18 +180,7 @@ class DomainSpecificAgent(PersonaAwareAgent):
 
     async def process(self, context: AgentContext) -> AgentResponse:
         """
-        Process user input with domain-specific knowledge.
-
-        Args:
-            context: The context for this interaction
-
-        Returns:
-            A domain-informed response
         """
-        # First, apply persona-aware processing
-        base_response = await super().process(context)
-
-        # Then enhance with domain-specific information
         if self.domain != "general":
             # In a real implementation, this would access domain-specific
             # knowledge bases, APIs, or specialized models
@@ -338,68 +207,11 @@ class DomainSpecificAgent(PersonaAwareAgent):
 
     def can_handle(self, context: AgentContext) -> float:
         """
-        Determine if this agent can handle the given context.
-
-        Args:
-            context: The context for this interaction
-
-        Returns:
-            A score between 0 and 1
         """
-        # Get base score from parent class
-        base_score = super().can_handle(context)
-
-        # Check if the input relates to our domain
-        domain_relevance = self._calculate_domain_relevance(context.user_input)
-
-        # Combine scores, with domain relevance having a significant impact
-        return 0.4 * base_score + 0.6 * domain_relevance
-
-    def _calculate_domain_relevance(self, text: str) -> float:
         """
-        Calculate how relevant the input is to this agent's domain.
-
-        Args:
-            text: The input text to evaluate
-
-        Returns:
-            A score between 0 and 1
         """
-        # Simple keyword-based relevance for demonstration
-        # In a real implementation, this would use more sophisticated
-        # NLP techniques like embeddings or topic modeling
-
-        text_lower = text.lower()
-        keywords = self.domain_knowledge.get(self.domain, [])
-
-        # Count domain-specific keywords in the input
-        matches = sum(1 for keyword in keywords if keyword in text_lower)
-
-        if not keywords:
-            return 0.5  # Neutral for general domain
-
-        # Calculate relevance score based on keyword matches
-        relevance = min(1.0, matches / max(1, len(keywords) * 0.3))
-
-        return relevance
-
-# Factory function to create specialized agents
-def create_specialized_agent(agent_type: str, config: Optional[Dict[str, Any]] = None) -> Agent:
     """
-    Create a specialized agent based on type and configuration.
-
-    Args:
-        agent_type: The type of specialized agent to create
-        config: Optional configuration for the agent
-
-    Returns:
-        An instantiated specialized agent
-
-    Raises:
-        ValueError: If the agent type is unknown
     """
-    config = config or {}
-
     if agent_type == "persona_aware":
         return PersonaAwareAgent(config)
     elif agent_type == "domain_specific":

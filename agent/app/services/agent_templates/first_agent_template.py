@@ -1,38 +1,12 @@
 """
-Template for Your First Real Agent
-This will be customized based on your questionnaire responses
 """
-
-from typing import Dict, Any, List, Optional, Set
-from datetime import datetime
-import asyncio
-import json
-import logging
-from dataclasses import dataclass
-from enum import Enum
-
-from core.services.agents.base import (
-    Agent,
-    AgentConfig as BaseAgentConfig,
-    AgentCapability as BaseAgentCapability,
-    AgentMessage,
-    AgentStatus,
-)
-from core.services.memory.unified_memory import get_memory_service
-from agent.app.services.natural_language_processor import ResponseGenerator
-
-logger = logging.getLogger(__name__)
-
-class CustomAgentCapability(Enum):
     """Additional agent capabilities for your custom agent"""
-
     DATA_COLLECTION = "data_collection"
     TASK_AUTOMATION = "task_automation"
     INTEGRATION = "integration"
 
 class AutonomyLevel(Enum):
     """How autonomous the agent should be"""
-
     FULLY_AUTONOMOUS = "fully_autonomous"
     SEMI_AUTONOMOUS = "semi_autonomous"
     GUIDED = "guided"
@@ -41,44 +15,8 @@ class AutonomyLevel(Enum):
 @dataclass
 class CustomAgentConfig:
     """Extended configuration for your first agent"""
-
-    base_config: BaseAgentConfig
-    autonomy_level: AutonomyLevel
-    data_types: List[str]
-    communication_methods: List[str]
-    trigger_mechanism: str
-    complexity_level: str
-    response_time_target: str
-    memory_type: str
-    voice_personality: str
-    custom_capability: Optional[CustomAgentCapability] = None
-
-class YourFirstAgent(Agent):
     """
-    Your first real agent - customized based on your needs
     """
-
-    def __init__(self, custom_config: CustomAgentConfig):
-        # Map custom capabilities to base capabilities
-        capability_map = {
-            CustomAgentCapability.DATA_COLLECTION: BaseAgentCapability.MONITORING,
-            CustomAgentCapability.TASK_AUTOMATION: BaseAgentCapability.TASK_EXECUTION,
-            CustomAgentCapability.INTEGRATION: BaseAgentCapability.COLLABORATION,
-        }
-
-        # Add mapped capability to base config if custom capability exists
-        if custom_config.custom_capability:
-            base_cap = capability_map.get(custom_config.custom_capability)
-            if base_cap:
-                custom_config.base_config.capabilities.add(base_cap)
-
-        super().__init__(custom_config.base_config)
-        self.custom_config = custom_config
-        self.response_generator = ResponseGenerator()
-        self.task_queue: List[Dict[str, Any]] = []
-        self.approval_queue: List[Dict[str, Any]] = []
-
-    async def process_message(self, message: AgentMessage) -> Optional[AgentMessage]:
         """Process an incoming message and optionally return a response"""
         logger.info(f"{self.config.name} processing message from {message.sender_id}")
 
@@ -117,8 +55,6 @@ class YourFirstAgent(Agent):
 
     async def think(self) -> None:
         """Agent's thinking/reasoning process"""
-        # Check for pending tasks
-        if self.task_queue:
             logger.info(f"{self.config.name} is thinking about {len(self.task_queue)} pending tasks")
 
             # Prioritize tasks based on configuration
@@ -132,10 +68,6 @@ class YourFirstAgent(Agent):
 
     async def act(self) -> None:
         """Agent's action execution process"""
-        if not self.task_queue:
-            return
-
-        # Process tasks based on complexity
         if self.custom_config.complexity_level == "simple":
             # Process one at a time
             task = self.task_queue.pop(0)
@@ -218,14 +150,12 @@ class YourFirstAgent(Agent):
 
     async def _process_single_task(self, task: Dict[str, Any]) -> None:
         """Process a single task"""
-        try:
-            result = await self._execute_task(task)
-
-            # Send result back if there's a sender
             if task.get("sender"):
                 response = await self._generate_response(result)
                 await self.send_message(recipient_id=task["sender"], content=response, metadata=result)
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Error processing task: {e}")
             if task.get("sender"):
                 await self.send_message(
@@ -234,7 +164,6 @@ class YourFirstAgent(Agent):
 
     async def _requires_approval(self, task: Dict[str, Any]) -> bool:
         """Check if task requires approval"""
-        # Define approval rules based on your needs
         high_risk_keywords = ["delete", "modify", "update", "production"]
         task_content = task.get("content", "").lower()
 
@@ -249,22 +178,8 @@ class YourFirstAgent(Agent):
 
     def add_task(self, task: Dict[str, Any]) -> None:
         """Add a task to the queue"""
-        self.task_queue.append(task)
-
-    def approve_task(self, task_id: int) -> bool:
         """Approve a pending task"""
-        if 0 <= task_id < len(self.approval_queue):
-            task = self.approval_queue.pop(task_id)
-            self.task_queue.append(task)
-            return True
-        return False
-
-# Factory function to create agents based on questionnaire answers
-def create_agent_from_answers(answers: Dict[str, str]) -> YourFirstAgent:
     """Create a customized agent based on questionnaire answers"""
-
-    # Map answers to configuration
-    capability_map = {
         "A": CustomAgentCapability.DATA_COLLECTION,
         "B": CustomAgentCapability.TASK_AUTOMATION,
         "E": CustomAgentCapability.INTEGRATION,

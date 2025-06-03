@@ -1,33 +1,7 @@
 """
-Memory manager fixtures for testing.
-
-This module provides pytest fixtures for mocking memory manager
-functionality in tests.
 """
-
-from unittest.mock import AsyncMock
-
-import pytest
-
-from packages.shared.src.memory.memory_manager import MemoryManager
-
-@pytest.fixture
-def mock_memory_manager():
     """
-    Create a mock memory manager for testing.
-
-    Returns:
-        An AsyncMock instance that implements the MemoryManager interface
     """
-    # Create AsyncMock for memory manager
-    memory_manager = AsyncMock(spec=MemoryManager)
-
-    # Mock get_conversation_history to return empty list
-    memory_manager.get_conversation_history.return_value = []
-
-    # Set up required abstract methods from MemoryManager
-    memory_manager.initialize = AsyncMock(return_value=None)
-    memory_manager.close = AsyncMock(return_value=None)
     memory_manager.add_memory_item = AsyncMock(return_value="mock-memory-item-id-12345")
     memory_manager.get_memory_item = AsyncMock(return_value=None)
     memory_manager.semantic_search = AsyncMock(return_value=[])
@@ -55,12 +29,4 @@ mock_memory_manager_instance.health_check = AsyncMock(return_value={"status": "h
 
 def get_memory_manager_stub():
     """
-    Get a memory manager stub for tests.
-
-    This function is used in tests to provide a consistent mock memory manager
-    that can be patched in place of the real get_memory_manager function.
-
-    Returns:
-        A mocked memory manager instance
     """
-    return mock_memory_manager_instance

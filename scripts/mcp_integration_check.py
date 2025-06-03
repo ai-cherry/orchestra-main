@@ -1,23 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-MCP Integration Checker - Verify AI context files and MCP servers are properly configured
-
-This script checks:
-1. AI context files are up to date and consistent
-2. MCP servers are properly configured
-3. Integration files (.cursorrules, .roomodes) are aligned
-4. No conflicting information between files
 """
-
-import json
-import os
-import re
-import subprocess
-import sys
-from pathlib import Path
-from typing import List
-
-# Configure output
 GREEN = "\033[92m"
 RED = "\033[91m"
 YELLOW = "\033[93m"
@@ -25,14 +9,6 @@ RESET = "\033[0m"
 
 class MCPIntegrationChecker:
     """Check MCP and AI context integration."""
-
-    def __init__(self):
-        self.root_dir = Path(__file__).parent.parent
-        self.issues: List[str] = []
-        self.warnings: List[str] = []
-        self.successes: List[str] = []
-
-    def check_ai_context_files(self) -> None:
         """Check AI context files for consistency."""
         print("\n🔍 Checking AI Context Files...")
 
@@ -147,6 +123,9 @@ class MCPIntegrationChecker:
         print("\n🚀 Checking MCP Server Status...")
 
         try:
+
+
+            pass
             result = subprocess.run(["ps", "aux"], capture_output=True, text=True, check=False)
 
             servers_to_check = [
@@ -161,7 +140,10 @@ class MCPIntegrationChecker:
                 else:
                     self.warnings.append(f"{desc} is not running (run ./start_orchestra.sh)")
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             self.warnings.append(f"Could not check server status: {e}")
 
     def check_launch_scripts(self) -> None:
@@ -258,8 +240,5 @@ class MCPIntegrationChecker:
 
 def main():
     """Main entry point."""
-    checker = MCPIntegrationChecker()
-    sys.exit(checker.run())
-
 if __name__ == "__main__":
     main()

@@ -1,35 +1,19 @@
 #!/usr/bin/env python3
 """
-Example usage of PersonaConfigManager.
-
-This script demonstrates how to load and use persona configurations
-from YAML files using the PersonaConfigManager.
 """
-
-import logging
-from pathlib import Path
-from typing import Optional
-
-from core.personas.manager import PersonaConfigManager, PersonaConfigError, PersonaNotFoundError
-from core.personas.models import PersonaStatus
-
-def setup_logging() -> None:
     """Configure logging for the example."""
-    logging.basicConfig(
-        level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
 
 def demonstrate_persona_loading(config_dir: Path) -> None:
     """
-    Demonstrate loading personas from a directory.
-
-    Args:
-        config_dir: Directory containing persona YAML files
     """
     print(f"\n=== Loading Personas from {config_dir} ===")
 
     try:
+
+
+        pass
         # Initialize the manager
         manager = PersonaConfigManager(config_dir)
 
@@ -42,15 +26,14 @@ def demonstrate_persona_loading(config_dir: Path) -> None:
         for persona in manager.list_personas():
             print(f"  - {persona.name} ({persona.slug}): {persona.description[:60]}...")
 
-    except PersonaConfigError as e:
+    except Exception:
+
+
+        pass
         print(f"Error loading personas: {e}")
 
 def demonstrate_persona_access(config_dir: Path) -> None:
     """
-    Demonstrate accessing specific personas and their properties.
-
-    Args:
-        config_dir: Directory containing persona YAML files
     """
     print("\n=== Accessing Specific Personas ===")
 
@@ -60,6 +43,8 @@ def demonstrate_persona_access(config_dir: Path) -> None:
     # Access each persona
     for slug in ["cherry", "sophia", "karen"]:
         try:
+
+            pass
             persona = manager.get_persona(slug)
             print(f"\n{persona.name}:")
             print(f"  Status: {persona.status}")
@@ -73,15 +58,14 @@ def demonstrate_persona_access(config_dir: Path) -> None:
                 trait = persona.traits[0]
                 print(f"  Primary Trait: {trait.name} (value: {trait.value})")
 
-        except PersonaNotFoundError as e:
+        except Exception:
+
+
+            pass
             print(f"  Error: {e}")
 
 def demonstrate_filtering(config_dir: Path) -> None:
     """
-    Demonstrate filtering personas by various criteria.
-
-    Args:
-        config_dir: Directory containing persona YAML files
     """
     print("\n=== Filtering Personas ===")
 
@@ -102,11 +86,6 @@ def demonstrate_filtering(config_dir: Path) -> None:
 
 def demonstrate_persona_details(config_dir: Path, slug: str = "cherry") -> None:
     """
-    Demonstrate accessing detailed persona information.
-
-    Args:
-        config_dir: Directory containing persona YAML files
-        slug: Slug of the persona to examine in detail
     """
     print(f"\n=== Detailed View: {slug} ===")
 
@@ -114,6 +93,9 @@ def demonstrate_persona_details(config_dir: Path, slug: str = "cherry") -> None:
     manager.load_all_personas()
 
     try:
+
+
+        pass
         persona = manager.get_persona(slug)
 
         # Basic info
@@ -157,15 +139,14 @@ def demonstrate_persona_details(config_dir: Path, slug: str = "cherry") -> None:
             print(f"  Max tokens: {mem.max_context_tokens}")
             print(f"  Priority topics: {', '.join(mem.priority_topics[:3])}...")
 
-    except PersonaNotFoundError as e:
+    except Exception:
+
+
+        pass
         print(f"Error: {e}")
 
 def demonstrate_validation(config_dir: Path) -> None:
     """
-    Demonstrate persona validation.
-
-    Args:
-        config_dir: Directory containing persona YAML files
     """
     print("\n=== Validating Personas ===")
 
@@ -185,11 +166,6 @@ def demonstrate_validation(config_dir: Path) -> None:
 
 def demonstrate_export(config_dir: Path, output_dir: Optional[Path] = None) -> None:
     """
-    Demonstrate exporting a persona configuration.
-
-    Args:
-        config_dir: Directory containing persona YAML files
-        output_dir: Directory to export to (uses temp if not provided)
     """
     print("\n=== Exporting Persona ===")
 
@@ -204,6 +180,8 @@ def demonstrate_export(config_dir: Path, output_dir: Optional[Path] = None) -> N
     # Export Cherry persona
     export_path = output_dir / "cherry_exported.yaml"
     try:
+
+        pass
         manager.export_persona("cherry", export_path)
         print(f"Successfully exported Cherry persona to: {export_path}")
 
@@ -211,16 +189,14 @@ def demonstrate_export(config_dir: Path, output_dir: Optional[Path] = None) -> N
         size = export_path.stat().st_size
         print(f"Exported file size: {size} bytes")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         print(f"Error exporting: {e}")
 
 def main() -> None:
     """Run all demonstrations."""
-    setup_logging()
-
-    # Use the current directory (where personas_detailed.yaml should be)
-    config_dir = Path(__file__).parent
-
     print("PersonaConfigManager Example Usage")
     print("=" * 50)
 

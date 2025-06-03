@@ -1,30 +1,14 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Test and demonstrate the AI Orchestrator functionality
 """
-
-import os
-import sys
-import asyncio
-from pathlib import Path
-
-# Add parent directory to path
-sys.path.append(str(Path(__file__).parent.parent))
-
-# Load environment variables from .env
-env_file = Path('.env')
-if env_file.exists():
-    with open(env_file) as f:
-        for line in f:
-            if '=' in line and not line.strip().startswith('#'):
-                key, value = line.strip().split('=', 1)
-                os.environ[key] = value
-
-async def test_orchestrator():
     """Test the AI orchestrator with real workflow"""
     print("=== AI Orchestrator Demo ===\n")
     
     try:
+
+    
+        pass
         # Import orchestrator components
         from ai_components.orchestration.ai_orchestrator import (
             WorkflowOrchestrator, TaskDefinition, AgentRole
@@ -79,6 +63,9 @@ async def test_orchestrator():
         print("=" * 50)
         
         try:
+
+        
+            pass
             result = await orchestrator.execute_workflow(workflow_id, tasks)
             
             print("\n5. Workflow Results:")
@@ -134,7 +121,10 @@ async def test_orchestrator():
                 for error in context.errors:
                     print(f"   - {error}")
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             print(f"\n❌ Workflow execution failed: {e}")
             import traceback
             traceback.print_exc()
@@ -143,7 +133,10 @@ async def test_orchestrator():
         if hasattr(orchestrator, 'weaviate_manager'):
             orchestrator.weaviate_manager.close()
         
-    except Exception as e:
+    except Exception:
+
+        
+        pass
         print(f"\n❌ Demo failed: {e}")
         import traceback
         traceback.print_exc()

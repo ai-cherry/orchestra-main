@@ -1,25 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-MCP Health Monitoring Dashboard
-Real-time monitoring of all MCP servers
 """
-
-import asyncio
-import json
-from datetime import datetime
-
-import click
-import httpx
-from rich.console import Console
-from rich.layout import Layout
-from rich.live import Live
-from rich.panel import Panel
-from rich.table import Table
-
-console = Console()
-
-# MCP server endpoints
-SERVERS = {
     "Gateway": "http://localhost:8000/health",
     "Cloud Run": "http://localhost:8001/health",
     "Secrets": "http://localhost:8002/health",
@@ -32,15 +14,6 @@ METRICS_URL = "http://localhost:8000/metrics"
 
 async def check_health(name: str, url: str) -> dict:
     """Check health of a single server"""
-    try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            start = datetime.now()
-            response = await client.get(url)
-            latency = (datetime.now() - start).total_seconds() * 1000
-
-            if response.status_code == 200:
-                data = response.json()
-                return {
                     "name": name,
                     "status": "✅ Healthy",
                     "latency": f"{latency:.0f}ms",
@@ -53,7 +26,9 @@ async def check_health(name: str, url: str) -> dict:
                     "latency": f"{latency:.0f}ms",
                     "details": {},
                 }
-    except Exception as e:
+    except Exception:
+
+        pass
         return {
             "name": name,
             "status": "❌ Down",
@@ -92,12 +67,6 @@ def create_health_table(health_data: list) -> Table:
 
 async def get_metrics() -> dict:
     """Get Prometheus metrics"""
-    try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            response = await client.get(METRICS_URL)
-            if response.status_code == 200:
-                # Parse Prometheus metrics
-                metrics = {}
                 for line in response.text.split("\n"):
                     if line.startswith("#") or not line:
                         continue
@@ -107,6 +76,8 @@ async def get_metrics() -> dict:
                         metrics["errors"] = metrics.get("errors", 0) + 1
                 return metrics
             return {}
-    except Exception as e:
+    except Exception:
+
+        pass
         console.print(f"Error fetching metrics: {e}", style="red")
         return {}

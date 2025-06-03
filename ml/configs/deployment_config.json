@@ -1,0 +1,38 @@
+{
+  "environments": {
+    "dev": {
+      "endpoint": "http://localhost:8501",
+      "replicas": 1,
+      "resources": {
+        "cpu": "1",
+        "memory": "2Gi"
+      }
+    },
+    "staging": {
+      "endpoint": "https://staging-ml.orchestra.ai",
+      "replicas": 2,
+      "resources": {
+        "cpu": "2",
+        "memory": "4Gi"
+      }
+    },
+    "production": {
+      "endpoint": "https://ml.orchestra.ai",
+      "replicas": 4,
+      "resources": {
+        "cpu": "4",
+        "memory": "8Gi",
+        "gpu": "1"
+      }
+    }
+  },
+  "deployment_strategy": {
+    "type": "canary",
+    "canary_percentage": 10,
+    "promotion_criteria": {
+      "error_rate": "<0.01",
+      "latency_p99": "<100ms",
+      "duration_minutes": 30
+    }
+  }
+}

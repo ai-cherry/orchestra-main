@@ -1,24 +1,12 @@
 #!/usr/bin/env python3
 """
-Weaviate Cluster Provisioning Script
-Automatically creates and configures Weaviate clusters for each domain
 """
-
-import os
-import json
-import requests
-from pathlib import Path
-
-class WeaviateProvisioner:
-    def __init__(self):
         self.wcs_api_key = os.getenv("WCS_API_KEY")
         self.wcs_url = "https://console.weaviate.cloud/api/v1"
         self.config_dir = Path("config/domains")
         
     def create_cluster(self, domain_config):
         """Create a Weaviate cluster via WCS API"""
-        
-        headers = {
             "Authorization": f"Bearer {self.wcs_api_key}",
             "Content-Type": "application/json"
         }
@@ -43,7 +31,7 @@ class WeaviateProvisioner:
             f"{self.wcs_url}/clusters",
             headers=headers,
             json=cluster_data
-        )
+        , timeout=30)
         
         if response.status_code == 201:
             cluster_info = response.json()
@@ -55,8 +43,6 @@ class WeaviateProvisioner:
     
     def configure_collections(self, cluster_url, collections_config):
         """Configure collections in the Weaviate cluster"""
-        
-        headers = {
             "Content-Type": "application/json"
         }
         
@@ -72,7 +58,7 @@ class WeaviateProvisioner:
                 f"{cluster_url}/v1/schema",
                 headers=headers,
                 json=schema
-            )
+            , timeout=30)
             
             if response.status_code == 200:
                 print(f"  ✅ Created collection: {collection_name}")
@@ -81,7 +67,6 @@ class WeaviateProvisioner:
     
     def provision_all_domains(self):
         """Provision clusters for all domains"""
-        
         for config_file in self.config_dir.glob("*_weaviate.json"):
             with open(config_file) as f:
                 config = json.load(f)

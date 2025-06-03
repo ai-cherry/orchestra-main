@@ -1,41 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-EigenCode Availability Monitor
-Continuously monitors EigenCode availability and notifies when it becomes available
 """
-
-import os
-import sys
-import json
-import time
-import asyncio
-import requests
-import subprocess
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
-from pathlib import Path
-import hashlib
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-
-# Add parent directory to path
-sys.path.append(str(Path(__file__).parent.parent))
-
-from ai_components.orchestration.ai_orchestrator import DatabaseLogger, WeaviateManager
-
-
-class EigenCodeMonitor:
     """Monitors EigenCode availability across multiple sources"""
-    
-    def __init__(self, check_interval: int = 3600):  # Check every hour by default
-        self.check_interval = check_interval
-        self.db_logger = DatabaseLogger()
-        self.weaviate_manager = WeaviateManager()
-        self.last_status = None
-        self.check_count = 0
-        self.urls_to_check = [
-            # Direct download URLs
             "https://www.eigencode.dev/stable/latest/linux/eigencode.tar.gz",
             "https://api.eigencode.dev/v1/health",
             "https://download.eigencode.dev/latest/eigencode-linux-amd64.tar.gz",
@@ -69,7 +36,6 @@ class EigenCodeMonitor:
     
     async def check_url_availability(self, url: str) -> Dict:
         """Check if a URL is available and returns relevant info"""
-        result = {
             "url": url,
             "available": False,
             "status_code": None,
@@ -79,6 +45,9 @@ class EigenCodeMonitor:
         }
         
         try:
+
+        
+            pass
             response = requests.head(url, timeout=10, allow_redirects=True)
             result["status_code"] = response.status_code
             result["content_type"] = response.headers.get("content-type", "")
@@ -102,17 +71,20 @@ class EigenCodeMonitor:
                                   for platform in ["linux", "amd64", "x86_64"])
                         ]
                 
-        except requests.exceptions.RequestException as e:
+        except Exception:
+
+                
+            pass
             result["error"] = str(e)
-        except Exception as e:
+        except Exception:
+
+            pass
             result["error"] = f"Unexpected error: {str(e)}"
         
         return result
     
     async def check_all_sources(self) -> Dict:
         """Check all configured sources for EigenCode availability"""
-        self.check_count += 1
-        results = {
             "check_id": f"check_{int(time.time())}",
             "timestamp": datetime.now().isoformat(),
             "check_count": self.check_count,
@@ -226,8 +198,6 @@ class EigenCodeMonitor:
     
     async def _send_email_notification(self, message: str):
         """Send email notification"""
-        try:
-            msg = MIMEMultipart()
             msg['From'] = self.notification_config["email"]["from_email"]
             msg['To'] = self.notification_config["email"]["to_email"]
             msg['Subject'] = "EigenCode is Now Available!"
@@ -245,12 +215,14 @@ class EigenCodeMonitor:
                 )
                 server.send_message(msg)
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             print(f"Failed to send email notification: {e}")
     
     async def _send_slack_notification(self, message: str):
         """Send Slack notification"""
-        try:
             webhook_url = self.notification_config["slack"]["webhook_url"]
             
             payload = {
@@ -259,17 +231,19 @@ class EigenCodeMonitor:
                 "icon_emoji": ":rocket:"
             }
             
-            response = requests.post(webhook_url, json=payload)
+            response = requests.post(webhook_url, json=payload, timeout=30)
             
             if response.status_code != 200:
                 print(f"Failed to send Slack notification: {response.text}")
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             print(f"Failed to send Slack notification: {e}")
     
     def _get_enabled_notifications(self) -> List[str]:
         """Get list of enabled notification types"""
-        enabled = []
         if self.notification_config["email"]["enabled"]:
             enabled.append("email")
         if self.notification_config["slack"]["enabled"]:
@@ -284,6 +258,8 @@ class EigenCodeMonitor:
         
         while True:
             try:
+
+                pass
                 # Check availability
                 results = await self.check_all_sources()
                 
@@ -302,7 +278,10 @@ class EigenCodeMonitor:
                 if self.check_count % 24 == 0:  # Every 24 checks (daily if hourly)
                     await self.generate_monitoring_report()
                 
-            except Exception as e:
+            except Exception:
+
+                
+                pass
                 print(f"Error during monitoring: {e}")
                 self.db_logger.log_action(
                     workflow_id="eigencode_monitor",
@@ -318,8 +297,6 @@ class EigenCodeMonitor:
     
     async def generate_monitoring_report(self):
         """Generate comprehensive monitoring report"""
-        # Retrieve recent checks from Weaviate
-        recent_checks = self.weaviate_manager.retrieve_context(
             "eigencode_monitor",
             limit=100
         )
@@ -391,8 +368,6 @@ class EigenCodeMonitor:
 
 async def main():
     """Main monitoring function"""
-    # Parse command line arguments
-    import argparse
     parser = argparse.ArgumentParser(description="Monitor EigenCode availability")
     parser.add_argument("--interval", type=int, default=3600, 
                        help="Check interval in seconds (default: 3600)")

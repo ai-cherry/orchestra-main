@@ -7,17 +7,24 @@ print("-" * 40)
 # Test 1: Check MCP installation
 try:
 
+    pass
     print("✓ MCP module installed")
-except ImportError:
+except Exception:
+
+    pass
     print("✗ MCP module not installed")
 
 # Test 2: Check configuration
 try:
+
+    pass
     with open("mcp_config.json") as f:
         config = json.load(f)
     print("✓ MCP config loaded successfully")
     print(f"  Servers found: {len(config.get('mcpServers', {}))}")
-except Exception as e:
+except Exception:
+
+    pass
     print(f"✗ Failed to load MCP config: {e}")
 
 # Test 3: Check Claude API key

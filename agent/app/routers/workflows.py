@@ -11,19 +11,12 @@ router = APIRouter(prefix="/api/workflows", tags=["workflows"])
 @router.post("/{workflow_id}/run")
 async def api_run_workflow(workflow_id: str):
     """Trigger a workflow on demand."""
-    return run_workflow(workflow_id)
-
 @router.get("/{workflow_id}/history")
 async def api_get_workflow_history(workflow_id: str):
     """View execution history/results for a workflow."""
-    return get_workflow_history(workflow_id)
-
 @router.get("/schedule")
 async def api_get_workflow_schedule():
     """Get all workflow schedules."""
-    return get_workflow_schedule()
-
 @router.post("/schedule")
 async def api_set_workflow_schedule(schedule: dict):
     """Set a workflow schedule (cron-like)."""
-    return set_workflow_schedule(schedule)

@@ -1,23 +1,6 @@
 #!/usr/bin/env python3
 """
-Weaviate MCP Server Configuration.
-
-This module provides configuration for the Weaviate MCP server, enabling
-connections to a Weaviate instance. It supports various authentication
-methods and connection parameters, configurable via environment variables.
 """
-
-import json
-import logging
-import os
-from typing import Any, Dict, Optional, Tuple, Union
-
-from weaviate.auth import AuthApiKey, AuthClientPassword, AuthClientCredentials
-
-logger = logging.getLogger(__name__)
-
-# --- Environment Variable Definitions ---
-# Connection details
 WEAVIATE_HOST: str = os.getenv("WEAVIATE_HOST", "localhost")
 WEAVIATE_PORT: int = int(os.getenv("WEAVIATE_PORT", "8080"))
 WEAVIATE_GRPC_PORT: int = int(os.getenv("WEAVIATE_GRPC_PORT", "50051"))
@@ -64,25 +47,24 @@ def log_weaviate_config() -> None:
 
     if WEAVIATE_ADDITIONAL_HEADERS_JSON:
         try:
+
+            pass
             headers = json.loads(WEAVIATE_ADDITIONAL_HEADERS_JSON)
             masked_headers = {
                 k: "****" if "key" in k.lower() or "token" in k.lower() or "auth" in k.lower() else v
                 for k, v in headers.items()
             }
             logger.info(f"  Additional Headers: {masked_headers}")
-        except json.JSONDecodeError:
+        except Exception:
+
+            pass
             logger.warning("  Additional Headers: Invalid JSON string provided.")
     else:
         logger.info("  Additional Headers: Not set")
 
 def validate_weaviate_config() -> bool:
     """
-    Validates that essential Weaviate configuration parameters are present.
-
-    Returns:
-        bool: True if the configuration is valid, False otherwise.
     """
-    if not WEAVIATE_HOST:
         logger.error("ERROR: WEAVIATE_HOST is not configured.")
         return False
     if not isinstance(WEAVIATE_PORT, int) or not (0 < WEAVIATE_PORT <= 65535):
@@ -98,14 +80,7 @@ def validate_weaviate_config() -> bool:
 
 def get_weaviate_client_params() -> Dict[str, Any]:
     """
-    Constructs parameters for initializing the Weaviate Python client (v4).
-    This function prioritizes connection parameters suitable for
-    `weaviate.connect_to_custom` or `weaviate.connect_to_local`.
-
-    Returns:
-        Dict[str, Any]: A dictionary of parameters for Weaviate client initialization.
     """
-    params: Dict[str, Any] = {
         "http_host": WEAVIATE_HOST,
         "http_port": WEAVIATE_PORT,
         "http_secure": WEAVIATE_SECURED,
@@ -144,8 +119,12 @@ def get_weaviate_client_params() -> Dict[str, Any]:
     headers: Dict[str, str] = {}
     if WEAVIATE_ADDITIONAL_HEADERS_JSON:
         try:
+
+            pass
             headers.update(json.loads(WEAVIATE_ADDITIONAL_HEADERS_JSON))
-        except json.JSONDecodeError as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to parse WEAVIATE_ADDITIONAL_HEADERS_JSON: {e}")
             # Potentially raise an error or continue without them
 

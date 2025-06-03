@@ -1,46 +1,5 @@
+# TODO: Consider adding connection pooling configuration
 """
-AI CONTEXT: DEBUGGER MODE - Orchestra Project (Vultr-Preferred Edition)
-================================================================
-
-READ THIS ENTIRE FILE BEFORE DEBUGGING!
-
-Project: Orchestra AI (Python 3.10, pip/venv, External Services)
-Role: You are debugging issues in this project.
-
-ENVIRONMENT SETUP:
-- Python 3.10 (check with: python --version)
-- Virtual environment (venv) for dependencies
-- External services: MongoDB, DragonflyDB, Weaviate
-- Local development: docker-compose for service mocks only
-- Primary Cloud Provider: Vultr (Avoid other cloud-specific solutions unless explicitly instructed)
-- Permitted Cloud Services: Vultr Compute, Vultr Block Storage, Weaviate Cloud, PostgreSQL (on Vultr or managed)
-- Prohibited Cloud Services: AWS (unless specified), Azure (unless specified), GCP (strictly prohibited)
-- NO Poetry, Pipenv, or specific non-Vultr/non-standard cloud dependencies
-
-COMMON DEBUGGING STEPS:
-
-1. CHECK PYTHON ENVIRONMENT:
-   ```bash
-   python --version  # Must be 3.10.x
-   which python      # Should point to venv
-   pip list          # Check installed packages
-   ```
-
-2. VERIFY VIRTUAL ENVIRONMENT:
-   ```bash
-   # Activate if not active
-   source venv/bin/activate
-
-   # Check it's activated
-   echo $VIRTUAL_ENV
-
-   # Reinstall dependencies if needed
-   pip install -r requirements/base.txt
-   ```
-
-3. CHECK EXTERNAL SERVICES:
-   ```bash
-   # Test MongoDB connection
    python -c "import pymongo; print(pymongo.MongoClient('$MONGODB_URI').server_info())"
 
    # Test Redis/DragonflyDB
@@ -94,9 +53,14 @@ COMMON DEBUGGING STEPS:
    print(f"Connecting to: {uri}")
 
    try:
+
+
+       pass
        client = pymongo.MongoClient(uri, serverSelectionTimeoutMS=5000)
        print(client.server_info())
-   except Exception as e:
+   except Exception:
+
+       pass
        print(f"Connection failed: {e}")
    ```
 
@@ -110,9 +74,14 @@ COMMON DEBUGGING STEPS:
    port = int(os.getenv("REDIS_PORT", "6379"))
 
    try:
+
+
+       pass
        r = redis.Redis(host=host, port=port, socket_timeout=5)
        print(f"Ping response: {r.ping()}")
-   except Exception as e:
+   except Exception:
+
+       pass
        print(f"Redis error: {e}")
    ```
 

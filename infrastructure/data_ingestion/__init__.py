@@ -1,19 +1,6 @@
+# TODO: Consider adding connection pooling configuration
 """
-Pulumi infrastructure for Data Ingestion System on Vultr.
-
-This module defines all infrastructure components needed for the data ingestion
-system including PostgreSQL, Weaviate, S3-compatible storage, and Kubernetes.
 """
-
-import pulumi
-import pulumi_vultr as vultr
-import pulumi_kubernetes as k8s
-from pulumi import Config, Output, ResourceOptions
-import json
-from typing import Dict, Any
-
-# Load configuration
-config = Config()
 project_name = "data-ingestion"
 environment = config.get("environment") or "production"
 region = config.get("region") or "ewr"  # New Jersey
@@ -33,45 +20,10 @@ common_tags = [
 
 class DataIngestionInfrastructure:
     """
-    Main infrastructure class for data ingestion system.
-    
-    This class creates and manages all infrastructure components
-    following Vultr best practices and optimization guidelines.
     """
-    
-    def __init__(self):
         """Initialize infrastructure components."""
-        self.vpc = None
-        self.postgres_cluster = None
-        self.k8s_cluster = None
-        self.object_storage = None
-        self.redis_instance = None
-        self.load_balancer = None
-        
-    def create_infrastructure(self):
         """Create all infrastructure components."""
-        # Create VPC first for network isolation
-        self.create_vpc()
-        
-        # Create database infrastructure
-        self.create_postgres_cluster()
-        self.create_redis_cache()
-        
-        # Create Kubernetes cluster for services
-        self.create_kubernetes_cluster()
-        
-        # Create object storage
-        self.create_object_storage()
-        
-        # Create load balancer
-        self.create_load_balancer()
-        
-        # Export important values
-        self.export_outputs()
-    
-    def create_vpc(self):
         """Create VPC for network isolation."""
-        self.vpc = vultr.Vpc(
             resource_name("vpc"),
             region=region,
             description=f"VPC for {project_name} {environment}",
@@ -85,8 +37,6 @@ class DataIngestionInfrastructure:
     
     def create_postgres_cluster(self):
         """Create managed PostgreSQL cluster with optimizations."""
-        # PostgreSQL configuration for data ingestion workload
-        postgres_config = {
             "shared_buffers": "256MB",
             "effective_cache_size": "1GB",
             "maintenance_work_mem": "128MB",
@@ -135,7 +85,6 @@ class DataIngestionInfrastructure:
     
     def create_redis_cache(self):
         """Create Redis instance for caching."""
-        self.redis_instance = vultr.Database(
             resource_name("redis"),
             database_engine="redis",
             database_engine_version="7",
@@ -151,9 +100,6 @@ class DataIngestionInfrastructure:
     
     def create_kubernetes_cluster(self):
         """Create Kubernetes cluster for services."""
-        # Node pool configuration for data processing
-        node_pools = [
-            {
                 "node_quantity": 3,
                 "plan": "vc2-4c-8gb",  # 4 vCPU, 8GB RAM
                 "label": "data-processing",
@@ -214,8 +160,6 @@ class DataIngestionInfrastructure:
     
     def deploy_weaviate(self, provider: k8s.Provider):
         """Deploy Weaviate vector database on Kubernetes."""
-        # Weaviate configuration
-        weaviate_config = {
             "authentication": {
                 "anonymous_access": {
                     "enabled": False
@@ -344,7 +288,6 @@ class DataIngestionInfrastructure:
     
     def create_object_storage(self):
         """Create S3-compatible object storage."""
-        self.object_storage = vultr.ObjectStorage(
             resource_name("storage"),
             cluster_id=1,  # New Jersey cluster
             label=resource_name("files"),
@@ -367,7 +310,6 @@ class DataIngestionInfrastructure:
     
     def create_load_balancer(self):
         """Create load balancer for API endpoints."""
-        self.load_balancer = vultr.LoadBalancer(
             resource_name("lb"),
             region=region,
             vpc_id=self.vpc.id,

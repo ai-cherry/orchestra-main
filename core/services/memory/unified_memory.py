@@ -1,45 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 """
-Unified memory service implementation.
-
-This module provides the main memory service that coordinates
-across all memory layers (short-term, mid-term, long-term).
 """
-
-import asyncio
-import json
-import logging
-import uuid
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Literal  # Added Literal
-
-import weaviate  # For Weaviate client types
-import weaviate.classes.query as wvcq  # For Weaviate Client v4 query classes like Filter
-
-from core.infrastructure.connectivity.base import ServiceRegistry
-from core.infrastructure.config.settings import get_settings
-
-from .base import (
-    MemoryItem,
-    MemoryLayer,
-    MemoryPolicy,
-    MemoryService,
-    MemoryStore,
-    SearchResult,
-)
-
-logger = logging.getLogger(__name__)
-
-class ShortTermStore(MemoryStore):
     """Short-term memory store using DragonflyDB."""
-
-    def __init__(self, connection):
-        self.connection = connection
-
-    async def store(self, item: MemoryItem) -> bool:
         """Store item in DragonflyDB."""
-        try:
-            # Serialize the item
-            data = {
                 "content": item.content,
                 "metadata": item.metadata,
                 "timestamp": item.timestamp.isoformat(),
@@ -51,63 +14,43 @@ class ShortTermStore(MemoryStore):
             else:
                 await self.connection.set(item.id, json.dumps(data))  # Use json.dumps
             return True
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Error storing in short-term memory: {e}")
             return False
 
     async def retrieve(self, item_id: str) -> Optional[MemoryItem]:
         """Retrieve item from DragonflyDB."""
-        try:
-            data_str = await self.connection.get(item_id)
-            if data_str:
-                parsed = json.loads(data_str)  # Use json.loads
-                return MemoryItem(
-                    id=item_id,
                     content=parsed["content"],
                     metadata=parsed["metadata"],
                     timestamp=datetime.fromisoformat(parsed["timestamp"]),
                     layer=MemoryLayer(parsed["layer"]),
                 )
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Error retrieving from short-term memory: {e}")
         return None
 
     async def delete(self, item_id: str) -> bool:
         """Delete item from DragonflyDB."""
-        try:
-            await self.connection.delete(item_id)
-            return True
-        except Exception as e:
             logger.error(f"Error deleting from short-term memory: {e}")
             return False
 
     async def search(self, query: str, limit: int = 10, filters: Optional[Dict[str, Any]] = None) -> List[SearchResult]:
         """Search is not supported in short-term memory."""
-        return []
-
-    async def health_check(self) -> bool:
         """Check if DragonflyDB is healthy."""
-        try:
-            await self.connection.ping()
-            return True
-        except Exception as e:  # Broad exception for connection issues
             logger.error(f"Short-term store health check failed: {e}")
             return False
 
 class MidTermStore(MemoryStore):
     """Mid-term memory store using MongoDB."""
-
-    def __init__(self, connection):  # connection is expected to be a MongoDB database object
-        self.db_connection = connection
-        # Ensure collection name is configurable or a sensible default
-        settings = get_settings()
         self.collection_name = getattr(settings.mongodb, "collection_name", "memory_items")
         self.collection = self.db_connection[self.collection_name]
 
     async def store(self, item: MemoryItem) -> bool:
         """Store item in MongoDB."""
-        try:
-            document = {
                 "_id": item.id,
                 "content": item.content,
                 "metadata": item.metadata,
@@ -117,13 +60,14 @@ class MidTermStore(MemoryStore):
             }
             await self.collection.replace_one({"_id": item.id}, document, upsert=True)
             return True
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Error storing in mid-term memory: {e}")
             return False
 
     async def retrieve(self, item_id: str) -> Optional[MemoryItem]:
         """Retrieve item from MongoDB."""
-        try:
             document = await self.collection.find_one({"_id": item_id})
             if document:
                 return MemoryItem(
@@ -134,23 +78,24 @@ class MidTermStore(MemoryStore):
                     layer=MemoryLayer(document["layer"]),
                     ttl=document.get("ttl"),
                 )
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Error retrieving from mid-term memory: {e}")
         return None
 
     async def delete(self, item_id: str) -> bool:
         """Delete item from MongoDB."""
-        try:
             result = await self.collection.delete_one({"_id": item_id})
             return result.deleted_count > 0
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Error deleting from mid-term memory: {e}")
             return False
 
     async def search(self, query: str, limit: int = 10, filters: Optional[Dict[str, Any]] = None) -> List[SearchResult]:
         """Search in MongoDB using text search."""
-        try:
-            # Build query
             search_query: Dict[str, Any] = {"$text": {"$search": query}}
             if filters:  # Assuming filters are MongoDB compatible
                 search_query.update(filters)
@@ -176,21 +121,19 @@ class MidTermStore(MemoryStore):
                 results.append(SearchResult(item=item, score=score))
 
             return results
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Error searching in mid-term memory: {e}")
             return []
 
     async def health_check(self) -> bool:
         """Check if MongoDB is healthy."""
-        try:
             await self.db_connection.command("ping")  # Use the database object for ping
             return True
-        except Exception:  # Broad exception for connection issues
-            return False
-
-class LongTermStore(MemoryStore):
+        except Exception:  # Broad except Exception:
+     pass
     """Long-term memory store using Weaviate."""
-
     def __init__(self, connection: weaviate.WeaviateClient, class_name: str = "MemoryItem"):
         self.client = connection
         self.class_name = class_name
@@ -198,8 +141,6 @@ class LongTermStore(MemoryStore):
 
     async def store(self, item: MemoryItem) -> bool:
         """Store item in Weaviate."""
-        try:
-            properties = {
                 "content": item.content,
                 "metadata_json": json.dumps(item.metadata or {}),
                 "timestamp_iso": item.timestamp.isoformat(),
@@ -210,17 +151,15 @@ class LongTermStore(MemoryStore):
             vector_to_use = item.metadata.get("vector") if item.metadata else None
 
             uuid_generated = collection.data.insert(properties=properties, vector=vector_to_use)
-            logger.debug(f"Stored item {item.id} in Weaviate ({self.class_name}) with Weaviate UUID {uuid_generated}")
             return True
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Error storing item {item.id} in Weaviate ({self.class_name}): {e}", exc_info=True)
             return False
 
     async def retrieve(self, item_id: str) -> Optional[MemoryItem]:
         """Retrieve item from Weaviate using its original item_id."""
-        try:
-            collection = self.client.collections.get(self.class_name)
-            response = collection.query.fetch_objects(
                 filters=wvcq.Filter.by_property("item_id").equal(item_id), limit=1
             )
             if response.objects:
@@ -235,15 +174,14 @@ class LongTermStore(MemoryStore):
                     layer=MemoryLayer(obj.properties.get("layer")),
                 )
             logger.warning(f"Item {item_id} not found in Weaviate ({self.class_name})")
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Error retrieving item {item_id} from Weaviate ({self.class_name}): {e}", exc_info=True)
         return None
 
     async def delete(self, item_id: str) -> bool:
         """Delete item from Weaviate using its original item_id."""
-        try:
-            collection = self.client.collections.get(self.class_name)
-            query_response = collection.query.fetch_objects(
                 filters=wvcq.Filter.by_property("item_id").equal(item_id),
                 limit=1,
                 return_metadata=wvcq.MetadataQuery(uuid=True),
@@ -257,7 +195,9 @@ class LongTermStore(MemoryStore):
                 f"Attempted deletion of item {item_id} (Weaviate UUID {weaviate_uuid}) from {self.class_name}."
             )
             return True
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Error deleting item {item_id} from Weaviate ({self.class_name}): {e}", exc_info=True)
             return False
 
@@ -272,10 +212,6 @@ class LongTermStore(MemoryStore):
         query_properties: Optional[List[str]] = None,
     ) -> List[SearchResult]:
         """Search in Weaviate using specified search type."""
-        try:
-            collection = self.client.collections.get(self.class_name)
-            response = None
-            common_params: Dict[str, Any] = {  # Define type for common_params
                 "limit": limit,
                 "filters": filters,
                 "return_properties": None,
@@ -318,7 +254,9 @@ class LongTermStore(MemoryStore):
                     score = obj.metadata.score if obj.metadata and obj.metadata.score is not None else 0.0
                     results.append(SearchResult(item=item, score=score))
             return results
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(
                 f"Error searching in Weaviate ({self.class_name}) with type '{search_type}': {e}", exc_info=True
             )
@@ -326,46 +264,22 @@ class LongTermStore(MemoryStore):
 
     async def health_check(self) -> bool:
         """Check if Weaviate is healthy."""
-        try:
-            return self.client.is_ready()
-        except Exception as e:
             logger.error(f"Weaviate health check failed: {e}")
             return False
 
 class DefaultMemoryPolicy(MemoryPolicy):
     """Default memory management policy."""
-
-    def should_promote(self, item: MemoryItem, access_count: int) -> Optional[MemoryLayer]:
         """Promote frequently accessed items to higher layers."""
-        if item.layer == MemoryLayer.SHORT_TERM and access_count > 10:
-            return MemoryLayer.MID_TERM
-        elif item.layer == MemoryLayer.MID_TERM and access_count > 50:
-            return MemoryLayer.LONG_TERM
-        return None
-
-    def should_evict(self, item: MemoryItem, last_access: datetime) -> bool:
         """Evict items that haven't been accessed recently."""
-        age_limits = {
-            MemoryLayer.SHORT_TERM: timedelta(hours=1),
-            MemoryLayer.MID_TERM: timedelta(days=7),
-            MemoryLayer.LONG_TERM: timedelta(days=30),  # Or never evict from long-term based on time
-        }
-        # If item has its own TTL, prioritize that for short/mid term
-        if item.ttl and item.layer != MemoryLayer.LONG_TERM:
-            # This logic assumes last_access is creation time if ttl is set from creation
-            # A more robust TTL would be handled by the store itself (e.g. Redis EXPIRE)
-            # For now, we'll compare with timestamp for TTL items.
-            return datetime.utcnow() - item.timestamp > timedelta(seconds=item.ttl)
-
-        age_limit = age_limits.get(item.layer, timedelta(days=36500))  # Default to very long for safety
-        return datetime.utcnow() - last_access > age_limit
-
-    def select_layer(self, content: Any, metadata: Dict[str, Any]) -> MemoryLayer:
         """Select layer based on content type and metadata."""
         if metadata.get("target_layer"):
             try:
+
+                pass
                 return MemoryLayer[metadata["target_layer"].upper()]
-            except KeyError:
+            except Exception:
+
+                pass
                 logger.warning(f"Invalid target_layer '{metadata['target_layer']}' specified. Using default policy.")
 
         if metadata.get("temporary", False) or metadata.get("is_cache", False):
@@ -381,25 +295,8 @@ class DefaultMemoryPolicy(MemoryPolicy):
 
 class UnifiedMemoryService(MemoryService):
     """
-    Unified memory service that coordinates across all memory layers.
     """
-
-    def __init__(self, service_registry: ServiceRegistry, policy: Optional[MemoryPolicy] = None):
-        self.registry = service_registry
-        self.policy = policy or DefaultMemoryPolicy()
-        self.stores: Dict[MemoryLayer, MemoryStore] = {}
-        self._access_counts: Dict[str, int] = {}  # In-memory, consider persistent tracking for scale
-        self._last_access: Dict[str, datetime] = {}  # In-memory
-        self._initialized = False
-
-    async def initialize(self) -> None:
         """Initialize all memory stores."""
-        if self._initialized:
-            return
-
-        settings = get_settings()
-
-        if settings.dragonfly.enabled:
             dragonfly_conn = self.registry.get_service("dragonfly")
             if dragonfly_conn:
                 self.stores[MemoryLayer.SHORT_TERM] = ShortTermStore(dragonfly_conn)
@@ -431,11 +328,6 @@ class UnifiedMemoryService(MemoryService):
         vector: Optional[List[float]] = None,  # Allow providing a vector
     ) -> str:
         """Store content in the appropriate memory layer."""
-        if not self._initialized:
-            await self.initialize()
-        item_id = item_id or str(uuid.uuid4())
-        metadata = metadata or {}
-        if vector:
             metadata["vector"] = vector  # Pass vector via metadata to LongTermStore
 
         effective_layer = layer or self.policy.select_layer(content, metadata)
@@ -454,45 +346,14 @@ class UnifiedMemoryService(MemoryService):
 
         self._access_counts[item_id] = 0
         self._last_access[item_id] = datetime.utcnow()
-        logger.debug(f"Stored item {item_id} in {effective_layer}")
         return item_id
 
     async def retrieve(self, item_id: str) -> Optional[MemoryItem]:
         """Retrieve an item from any layer, handling promotion."""
-        if not self._initialized:
-            await self.initialize()
-
-        # Define search order for retrieval
-        # Typically, we'd check hotter caches first.
-        retrieval_order = [MemoryLayer.SHORT_TERM, MemoryLayer.MID_TERM, MemoryLayer.LONG_TERM]
-
-        for current_layer_enum in retrieval_order:
-            store = self.stores.get(current_layer_enum)
-            if store:
-                item = await store.retrieve(item_id)
-                if item:
-                    self._access_counts[item_id] = self._access_counts.get(item_id, 0) + 1
-                    self._last_access[item_id] = datetime.utcnow()
-
-                    # Policy check for promotion
-                    target_promote_layer = self.policy.should_promote(item, self._access_counts[item_id])
-                    if target_promote_layer and target_promote_layer != item.layer:
-                        # Non-blocking promotion
-                        asyncio.create_task(self.promote(item_id, target_promote_layer, original_item=item))
-                    return item
-        return None
-
-    def _translate_simple_filters_to_weaviate(self, simple_filters: Optional[Dict[str, Any]]) -> Optional[wvcq.Filter]:
         """
-        Translates a simple dictionary of filters into Weaviate's Filter object structure.
         Key format: "path.to.property__operator" (e.g., "metadata.category__eq").
         Supported operators: eq, neq, gt, gte, lt, lte, like, is_none, contains_any, contains_all.
         """
-        if not simple_filters:
-            return None
-
-        conditions = []
-        for key_op, value in simple_filters.items():
             parts = key_op.split("__")
             if len(parts) < 2:
                 logger.warning(f"Invalid filter key format '{key_op}'. Skipping. Expected 'path__operator'.")
@@ -506,6 +367,9 @@ class UnifiedMemoryService(MemoryService):
             path_list = path_str.split(".")
 
             try:
+
+
+                pass
                 prop_filter_starter = (
                     wvcq.Filter.by_property(path_list[0]) if len(path_list) == 1 else wvcq.Filter.by_property(path_list)
                 )
@@ -554,7 +418,9 @@ class UnifiedMemoryService(MemoryService):
                     logger.warning(
                         f"Unsupported Weaviate filter operator '{operator}' for path '{path_str}'. Skipping."
                     )
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Error translating filter '{key_op}': {value} - {e}", exc_info=True)
 
         if not conditions:
@@ -575,11 +441,6 @@ class UnifiedMemoryService(MemoryService):
         weaviate_query_properties: Optional[List[str]] = None,
     ) -> List[SearchResult]:
         """Search across memory layers with specified search type and filters."""
-        if not self._initialized:
-            await self.initialize()
-
-        target_layers: List[MemoryLayer] = layers or []
-        if not target_layers:
             if search_type == "semantic" or search_type == "hybrid":
                 if MemoryLayer.LONG_TERM in self.stores:
                     target_layers.append(MemoryLayer.LONG_TERM)
@@ -595,7 +456,6 @@ class UnifiedMemoryService(MemoryService):
             if not target_layers:
                 target_layers = list(self.stores.keys())
 
-        logger.debug(f"Searching in layers: {target_layers} for query '{query}' with type '{search_type}'")
 
         search_tasks = []
         for layer_enum in target_layers:
@@ -619,7 +479,6 @@ class UnifiedMemoryService(MemoryService):
                 # Or requires a different translation for its find() query filter document.
                 mongo_filters = filters  # Assuming simple filters are for MongoDB if it's the target
                 if search_type != "keyword" and layer_enum == MemoryLayer.MID_TERM:  # Only keyword search for Mongo
-                    logger.debug(f"Skipping non-keyword search for MidTermStore on layer {layer_enum}")
                     continue
                 task = store.search(query, limit, mongo_filters)
             elif isinstance(store, ShortTermStore):
@@ -657,20 +516,11 @@ class UnifiedMemoryService(MemoryService):
         self, item_id: str, target_layer: MemoryLayer, original_item: Optional[MemoryItem] = None
     ) -> bool:
         """Promote an item to a different memory layer. original_item can be passed to avoid re-retrieval."""
-        if not self._initialized:
-            await self.initialize()
-
-        item_to_promote = original_item
-        if not item_to_promote:
-            item_to_promote = await self.retrieve(item_id)  # retrieve already updates access counts
-
-        if not item_to_promote:
             logger.warning(f"Item {item_id} not found, cannot promote.")
             return False
 
         current_layer = item_to_promote.layer
         if current_layer == target_layer:
-            logger.debug(f"Item {item_id} is already in target layer {target_layer}. No promotion needed.")
             return True
 
         target_store = self.stores.get(target_layer)
@@ -699,15 +549,10 @@ class UnifiedMemoryService(MemoryService):
 
     async def evict(self, item_id: str) -> bool:
         """Evict an item from all memory layers."""
-        if not self._initialized:
-            await self.initialize()
-        deleted_any = False
-        for layer, store in self.stores.items():
-            try:
-                if await store.delete(item_id):
-                    logger.debug(f"Evicted item {item_id} from {layer.value}")
                     deleted_any = True
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Error evicting item {item_id} from {layer.value}: {e}", exc_info=True)
 
         if item_id in self._access_counts:
@@ -721,11 +566,11 @@ class UnifiedMemoryService(MemoryService):
 
     async def get_stats(self) -> Dict[str, Any]:
         """Get statistics about memory usage and health of each layer."""
-        if not self._initialized:
-            await self.initialize()
         stats = {"layers": {}}
         for layer, store in self.stores.items():
             try:
+
+                pass
                 is_healthy = await store.health_check()
                 # Item count might be expensive; consider if it's always needed or sampled
                 # For now, not including item count per layer to keep health check fast
@@ -734,7 +579,9 @@ class UnifiedMemoryService(MemoryService):
                     "healthy": is_healthy,
                     # "item_count": await store.count() # If a count method exists
                 }
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Error getting stats for {layer.value}: {e}", exc_info=True)
                 stats["layers"][layer.value] = {"available": False, "healthy": False, "error": str(e)}
 
@@ -743,34 +590,12 @@ class UnifiedMemoryService(MemoryService):
 
     async def cleanup(self) -> None:
         """Clean up old items based on policy."""
-        if not self._initialized:
-            return
-        items_to_evict = []
-        # Create a copy of keys for safe iteration if _last_access can be modified by retrieve->promote
-        for item_id, last_access_dt in list(self._last_access.items()):
-            # Retrieve item to get its current layer for policy check
-            # This also updates its last_access if retrieved, so policy should use the passed last_access_dt
-            item = await self.retrieve(item_id)  # This might trigger promotion
-            if item:  # Re-fetch to get potentially updated layer after promotion
-                current_item_state = await self.retrieve(item_id)  # Could be None if evicted by another process
-                if current_item_state and self.policy.should_evict(current_item_state, last_access_dt):
-                    items_to_evict.append(item_id)
-            elif (datetime.utcnow() - last_access_dt) > timedelta(days=30):  # Fallback for untracked/deleted items
-                items_to_evict.append(item_id)
-
-        evicted_count = 0
-        for item_id_to_evict in items_to_evict:
-            if await self.evict(item_id_to_evict):
-                evicted_count += 1
-        if evicted_count > 0:
             logger.info(f"Memory cleanup: Evicted {evicted_count} items based on policy.")
 
 _memory_service: Optional[UnifiedMemoryService] = None
 
 def get_memory_service(service_registry: ServiceRegistry) -> UnifiedMemoryService:
     """Get the global memory service instance."""
-    global _memory_service
-    if _memory_service is None:
         logger.info("Creating new UnifiedMemoryService instance.")
         _memory_service = UnifiedMemoryService(service_registry)
     elif _memory_service.registry is not service_registry:

@@ -1,0 +1,479 @@
+{
+  "created_at": "2025-06-03T08:22:45.117243",
+  "version": "2.0",
+  "modules": {
+    "search_engine": {
+      "name": "Advanced Search Engine",
+      "path": "src/search_engine",
+      "components": {
+        "search_router.py": {
+          "purpose": "Route search requests to appropriate strategy",
+          "interfaces": [
+            "SearchRequest",
+            "SearchResponse"
+          ],
+          "dependencies": [
+            "all search strategies",
+            "circuit_breaker"
+          ]
+        },
+        "normal_search.py": {
+          "purpose": "Standard keyword and semantic search",
+          "config": {
+            "max_results": 20,
+            "timeout": 5
+          }
+        },
+        "creative_search.py": {
+          "purpose": "Creative associations and lateral thinking",
+          "config": {
+            "temperature": 0.8,
+            "diversity_penalty": 0.3
+          }
+        },
+        "deep_search.py": {
+          "purpose": "Multi-hop reasoning and knowledge synthesis",
+          "config": {
+            "max_hops": 3,
+            "evidence_threshold": 0.7
+          }
+        },
+        "super_deep_search.py": {
+          "purpose": "Research-grade analysis with citations",
+          "config": {
+            "max_sources": 50,
+            "citation_format": "academic"
+          }
+        },
+        "uncensored_search.py": {
+          "purpose": "Unrestricted search with ethical boundaries",
+          "config": {
+            "safety_checks": "minimal",
+            "audit_log": true
+          }
+        }
+      },
+      "api_endpoints": [
+        {
+          "path": "/api/search",
+          "method": "GET",
+          "params": [
+            "mode",
+            "q",
+            "limit",
+            "offset"
+          ],
+          "response": "SearchResponse"
+        },
+        {
+          "path": "/api/search/suggest",
+          "method": "GET",
+          "params": [
+            "q",
+            "mode"
+          ],
+          "response": "SuggestionList"
+        }
+      ]
+    },
+    "file_ingestion": {
+      "name": "Large File Ingestion System",
+      "path": "src/file_ingestion",
+      "components": {
+        "ingestion_controller.py": {
+          "purpose": "Orchestrate file processing pipeline",
+          "max_file_size": "5GB",
+          "supported_formats": [
+            "pdf",
+            "docx",
+            "mp3",
+            "mp4",
+            "zip",
+            "csv",
+            "json"
+          ]
+        },
+        "parsers/doc_parser.py": {
+          "purpose": "Extract text from documents",
+          "libraries": [
+            "pypdf2",
+            "python-docx",
+            "pdfplumber"
+          ]
+        },
+        "parsers/audio_parser.py": {
+          "purpose": "Transcribe audio files",
+          "services": [
+            "whisper",
+            "assembly_ai",
+            "google_speech"
+          ]
+        },
+        "parsers/video_parser.py": {
+          "purpose": "Extract transcripts and keyframes",
+          "features": [
+            "scene_detection",
+            "ocr",
+            "transcript_sync"
+          ]
+        },
+        "parsers/zip_extractor.py": {
+          "purpose": "Recursively process archives",
+          "security": [
+            "path_traversal_check",
+            "bomb_detection"
+          ]
+        },
+        "storage_adapters/weaviate_adapter.py": {
+          "purpose": "Store embeddings and metadata",
+          "batch_size": 100,
+          "embedding_model": "text-embedding-ada-002"
+        },
+        "storage_adapters/postgres_adapter.py": {
+          "purpose": "Store raw content and metadata",
+          "schema": "file_ingestion",
+          "indexes": [
+            "file_hash",
+            "upload_time",
+            "user_id"
+          ]
+        }
+      },
+      "api_endpoints": [
+        {
+          "path": "/api/ingest-file",
+          "method": "POST",
+          "content_type": "multipart/form-data",
+          "response": "IngestionStatus"
+        },
+        {
+          "path": "/api/ingestion/status/{job_id}",
+          "method": "GET",
+          "response": "IngestionProgress"
+        }
+      ],
+      "database_schema": {
+        "ingested_files": {
+          "id": "UUID PRIMARY KEY",
+          "file_name": "VARCHAR(255)",
+          "file_hash": "VARCHAR(64) UNIQUE",
+          "file_size": "BIGINT",
+          "mime_type": "VARCHAR(100)",
+          "upload_time": "TIMESTAMP",
+          "processing_status": "VARCHAR(50)",
+          "extracted_text": "TEXT",
+          "metadata": "JSONB",
+          "embeddings_stored": "BOOLEAN",
+          "user_id": "UUID",
+          "domain": "VARCHAR(50)"
+        }
+      }
+    },
+    "multimedia": {
+      "name": "Multimedia Generation System",
+      "path": "src/multimedia",
+      "components": {
+        "image_gen_controller.py": {
+          "purpose": "Orchestrate image generation",
+          "providers": [
+            "stable_diffusion",
+            "dall_e",
+            "midjourney"
+          ],
+          "features": [
+            "style_transfer",
+            "inpainting",
+            "upscaling"
+          ]
+        },
+        "video_gen_controller.py": {
+          "purpose": "Create and edit videos",
+          "capabilities": [
+            "text_to_video",
+            "video_editing",
+            "animation"
+          ],
+          "max_duration": 300
+        },
+        "operator_mode_coordinator.py": {
+          "purpose": "Multi-step multimedia workflows",
+          "workflows": [
+            "analyze_and_summarize",
+            "create_highlight_reel",
+            "generate_presentation"
+          ]
+        }
+      },
+      "api_endpoints": [
+        {
+          "path": "/api/generate-image",
+          "method": "POST",
+          "body": {
+            "prompt": "string",
+            "mode": "creative|informative|style_transfer",
+            "persona": "Cherry|Sophia|Karen",
+            "options": "object"
+          }
+        },
+        {
+          "path": "/api/generate-video",
+          "method": "POST",
+          "body": {
+            "script": "string",
+            "style": "string",
+            "duration": "number",
+            "assets": "array"
+          }
+        }
+      ]
+    },
+    "operator_mode": {
+      "name": "Operator Mode Framework",
+      "path": "src/operator_mode",
+      "components": {
+        "operator_manager.py": {
+          "purpose": "Central orchestration hub",
+          "features": [
+            "task_decomposition",
+            "agent_assignment",
+            "result_aggregation"
+          ]
+        },
+        "agent_task_queue.py": {
+          "purpose": "Distributed task queue",
+          "backend": "redis",
+          "features": [
+            "priority_queue",
+            "retry_logic",
+            "dead_letter_queue"
+          ]
+        },
+        "agent_supervisor.py": {
+          "purpose": "Monitor and manage agents",
+          "capabilities": [
+            "health_checks",
+            "auto_scaling",
+            "failure_recovery"
+          ]
+        },
+        "workflows/analysis_workflow.py": {
+          "purpose": "Complex analysis pipelines",
+          "steps": [
+            "ingest",
+            "analyze",
+            "synthesize",
+            "report"
+          ]
+        }
+      },
+      "task_schema": {
+        "operator_tasks": {
+          "id": "UUID PRIMARY KEY",
+          "domain": "VARCHAR(50)",
+          "workflow_type": "VARCHAR(100)",
+          "steps": "JSONB",
+          "status": "VARCHAR(50)",
+          "created_at": "TIMESTAMP",
+          "started_at": "TIMESTAMP",
+          "completed_at": "TIMESTAMP",
+          "result": "JSONB",
+          "error": "TEXT"
+        }
+      }
+    },
+    "ui": {
+      "name": "Modern UI System",
+      "path": "src/ui",
+      "components": {
+        "web/react_app": {
+          "framework": "React 18 + TypeScript",
+          "state_management": "Redux Toolkit",
+          "styling": "Tailwind CSS + custom dark theme",
+          "real_time": "WebSocket + Server-Sent Events"
+        },
+        "pages": {
+          "HomePage.tsx": {
+            "sections": [
+              "PersonaSelector",
+              "SearchInterface",
+              "QuickActions"
+            ]
+          },
+          "AgentLabPage.tsx": {
+            "features": [
+              "agent_creation",
+              "team_builder",
+              "tool_assignment"
+            ]
+          },
+          "OrchestratorsPage.tsx": {
+            "personas": [
+              "Cherry",
+              "Sophia",
+              "Karen"
+            ],
+            "customization": [
+              "traits",
+              "memory",
+              "behaviors"
+            ]
+          },
+          "MonitoringPage.tsx": {
+            "widgets": [
+              "api_status",
+              "resource_usage",
+              "cost_tracking"
+            ]
+          }
+        },
+        "components": {
+          "SearchModeSelector.tsx": {
+            "modes": [
+              "Normal",
+              "Creative",
+              "Deep",
+              "Super-Deep",
+              "Uncensored"
+            ]
+          },
+          "FileUploadPanel.tsx": {
+            "features": [
+              "drag_drop",
+              "progress",
+              "chunked_upload"
+            ]
+          },
+          "PersonaSelector.tsx": {
+            "themes": {
+              "Cherry": {
+                "primary": "#FF0000",
+                "accent": "#FF6B6B"
+              },
+              "Sophia": {
+                "primary": "#FFD700",
+                "accent": "#FFA500"
+              },
+              "Karen": {
+                "primary": "#00FF00",
+                "accent": "#32CD32"
+              }
+            }
+          }
+        }
+      }
+    },
+    "personas": {
+      "name": "Deep Persona System",
+      "path": "src/personas",
+      "components": {
+        "cherry_persona.py": {
+          "traits": [
+            "friendly",
+            "creative",
+            "supportive"
+          ],
+          "memory_limit": 10000,
+          "learning_rate": 0.1,
+          "preferred_tools": [
+            "search",
+            "image_gen",
+            "chat"
+          ]
+        },
+        "sophia_persona.py": {
+          "traits": [
+            "professional",
+            "analytical",
+            "precise"
+          ],
+          "memory_limit": 50000,
+          "learning_rate": 0.05,
+          "preferred_tools": [
+            "financial_analysis",
+            "reporting",
+            "compliance"
+          ]
+        },
+        "karen_persona.py": {
+          "traits": [
+            "caring",
+            "knowledgeable",
+            "thorough"
+          ],
+          "memory_limit": 100000,
+          "learning_rate": 0.08,
+          "preferred_tools": [
+            "medical_search",
+            "drug_interaction",
+            "patient_care"
+          ]
+        },
+        "persona_memory_manager.py": {
+          "storage": "PostgreSQL + Weaviate",
+          "features": [
+            "episodic_memory",
+            "semantic_memory",
+            "working_memory"
+          ],
+          "retention_policy": "importance_based"
+        },
+        "persona_behavior_engine.py": {
+          "features": [
+            "adaptive_responses",
+            "mood_tracking",
+            "preference_learning"
+          ],
+          "decision_tree": "ml_powered"
+        }
+      },
+      "database_schema": {
+        "persona_memories": {
+          "id": "UUID PRIMARY KEY",
+          "persona_name": "VARCHAR(50)",
+          "user_id": "UUID",
+          "interaction_type": "VARCHAR(50)",
+          "content": "TEXT",
+          "importance_score": "FLOAT",
+          "timestamp": "TIMESTAMP",
+          "context": "JSONB",
+          "embeddings": "VECTOR(1536)"
+        }
+      }
+    }
+  },
+  "data_flows": {
+    "search_flow": {
+      "steps": [
+        "User Query \u2192 Search Router",
+        "Router \u2192 Strategy Selection",
+        "Strategy \u2192 LLM + Weaviate",
+        "Results \u2192 Ranking & Filtering",
+        "Response \u2192 User"
+      ],
+      "performance_target": "< 2s end-to-end"
+    },
+    "ingestion_flow": {
+      "steps": [
+        "File Upload \u2192 Validation",
+        "Type Detection \u2192 Parser Selection",
+        "Parsing \u2192 Text Extraction",
+        "Embedding Generation \u2192 Weaviate",
+        "Metadata \u2192 PostgreSQL",
+        "Status Update \u2192 User"
+      ],
+      "performance_target": "< 10s for 10MB file"
+    },
+    "operator_flow": {
+      "steps": [
+        "Complex Request \u2192 Task Decomposition",
+        "Tasks \u2192 Agent Assignment",
+        "Parallel Execution \u2192 Progress Tracking",
+        "Result Aggregation \u2192 Quality Check",
+        "Final Output \u2192 User"
+      ],
+      "performance_target": "Depends on complexity"
+    }
+  },
+  "api_design": {},
+  "infrastructure": {}
+}

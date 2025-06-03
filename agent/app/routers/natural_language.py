@@ -1,25 +1,5 @@
 """
-Natural Language Interface for Orchestra AI
-Voice and text interaction with orchestrator and agents
 """
-
-from fastapi import APIRouter, Depends, HTTPException, WebSocket
-from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
-from typing import Optional, Dict, Any, List
-import asyncio
-import json
-from datetime import datetime
-
-from core.auth.simple_auth import verify_api_key
-from agent.app.services.real_agents import run_agent_task, get_all_agents
-from agent.app.services.natural_language_processor import (
-    NaturalLanguageProcessor,
-    IntentClassifier,
-    VoiceTranscriber,
-    ResponseGenerator,
-)
-
 router = APIRouter(prefix="/api/nl", tags=["natural_language"])
 
 # Initialize NLP components
@@ -30,33 +10,16 @@ response_generator = ResponseGenerator()
 
 class TextCommand(BaseModel):
     """Text command from user"""
-
-    text: str
-    context: Optional[Dict[str, Any]] = None
-    domain: Optional[str] = None  # No default domain
-
-class VoiceCommand(BaseModel):
     """Voice command from user"""
-
-    audio_data: str  # Base64 encoded audio
     format: str = "webm"
     context: Optional[Dict[str, Any]] = None
     domain: Optional[str] = None  # No default domain
 
 class NLResponse(BaseModel):
     """Natural language response"""
-
-    text: str
-    speech_url: Optional[str] = None
-    actions_taken: List[Dict[str, Any]] = []
-    suggestions: List[str] = []
-    domain: str
-
 @router.post("/text", response_model=NLResponse)
 async def process_text_command(command: TextCommand, api_key: str = Depends(verify_api_key)) -> NLResponse:
     """Process natural language text command"""
-
-    # Classify intent
     intent = await intent_classifier.classify(command.text, command.domain or "general")
 
     # Route to appropriate handler
@@ -82,31 +45,9 @@ async def process_text_command(command: TextCommand, api_key: str = Depends(veri
 @router.post("/voice", response_model=NLResponse)
 async def process_voice_command(command: VoiceCommand, api_key: str = Depends(verify_api_key)) -> NLResponse:
     """Process natural language voice command"""
-
-    # Transcribe audio to text
-    transcribed_text = await voice_transcriber.transcribe(audio_data=command.audio_data, format=command.format)
-
-    # Process as text command
-    text_command = TextCommand(text=transcribed_text, context=command.context, domain=command.domain)
-
-    result = await process_text_command(text_command, api_key)
-
-    # Generate speech response
-    speech_url = await response_generator.text_to_speech(result.text)
-    result.speech_url = speech_url
-
-    return result
-
 @router.websocket("/stream")
 async def websocket_nl_interface(websocket: WebSocket, api_key: str = Depends(verify_api_key)):
     """WebSocket interface for real-time natural language interaction"""
-    await websocket.accept()
-
-    try:
-        while True:
-            # Receive command
-            data = await websocket.receive_json()
-
             if data.get("type") == "text":
                 command = TextCommand(**data.get("payload", {}))
                 response = await process_text_command(command, api_key)
@@ -121,7 +62,10 @@ async def websocket_nl_interface(websocket: WebSocket, api_key: str = Depends(ve
                 {"type": "response", "payload": response.dict() if hasattr(response, "dict") else response}
             )
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         await websocket.send_json({"type": "error", "payload": {"error": str(e)}})
     finally:
         await websocket.close()

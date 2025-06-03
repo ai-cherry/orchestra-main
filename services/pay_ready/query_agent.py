@@ -1,36 +1,7 @@
 """
-Pay Ready Query Agent
-====================
-
-Natural language query interface for the Pay Ready domain using Weaviate's
-Query Agent capabilities.
 """
-
-import logging
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timedelta
-
-import weaviate
-from weaviate.classes import Auth
-from weaviate.agents.query import QueryAgent
-
-logger = logging.getLogger(__name__)
-
-class PayReadyQueryAgent:
     """
-    Provides natural language query capabilities for Pay Ready domain data.
-
-    Uses Weaviate's Query Agent to:
-    - Answer questions about customer interactions
-    - Generate summaries and reports
-    - Find patterns across data sources
-    - Create timelines of events
     """
-
-    def __init__(self, weaviate_client: weaviate.Client):
-        self.client = weaviate_client
-        self.query_agent = None
-        self.collections = [
             "PayReadySlackMessage",
             "PayReadyGongCallSegment",
             "PayReadyHubSpotNote",
@@ -40,9 +11,6 @@ class PayReadyQueryAgent:
 
     async def initialize(self):
         """Initialize the Query Agent with Pay Ready collections"""
-        if self._initialized:
-            return
-
         logger.info("Initializing Pay Ready Query Agent")
 
         # Initialize Query Agent with our collections
@@ -55,19 +23,7 @@ class PayReadyQueryAgent:
         self, question: str, context: Optional[Dict[str, Any]] = None, filters: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
-        Execute a natural language query.
-
-        Args:
-            question: Natural language question
-            context: Optional context for the query
-            filters: Optional filters (date range, source, etc.)
-
-        Returns:
-            Query response with answer and metadata
         """
-        if not self._initialized:
-            await self.initialize()
-
         logger.info(f"Processing query: {question}")
 
         # Build context string if provided
@@ -92,6 +48,8 @@ class PayReadyQueryAgent:
 
         # Execute query
         try:
+
+            pass
             response = self.query_agent.run(context_str + question)
 
             return {
@@ -101,7 +59,9 @@ class PayReadyQueryAgent:
                 "confidence": response.get("confidence", 0.0),
                 "metadata": {"timestamp": datetime.utcnow().isoformat(), "filters": filters, "context": context},
             }
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Query failed: {e}")
             return {
                 "question": question,
@@ -114,17 +74,7 @@ class PayReadyQueryAgent:
         self, entity_id: str, entity_type: str = "person", time_range_days: int = 30
     ) -> Dict[str, Any]:
         """
-        Generate a summary for a specific entity.
-
-        Args:
-            entity_id: Unified entity ID
-            entity_type: Type of entity (person/company)
-            time_range_days: Number of days to include
-
-        Returns:
-            Summary with key insights
         """
-        # Build appropriate question based on entity type
         if entity_type == "person":
             question = f"Summarize all interactions and activities for person with ID {entity_id} in the last {time_range_days} days"
         else:
@@ -155,15 +105,6 @@ class PayReadyQueryAgent:
         self, reference_text: str, limit: int = 10, threshold: float = 0.7
     ) -> List[Dict[str, Any]]:
         """
-        Find interactions similar to a reference text.
-
-        Args:
-            reference_text: Text to find similar interactions for
-            limit: Maximum number of results
-            threshold: Similarity threshold (0-1)
-
-        Returns:
-            List of similar interactions
         """
         question = f"Find interactions similar to: '{reference_text}'"
 
@@ -175,6 +116,8 @@ class PayReadyQueryAgent:
         # This depends on how the Query Agent formats responses
         interactions = []
         if response.get("sources"):
+            # TODO: Consider using list comprehension for better performance
+
             for source in response["sources"]:
                 interactions.append(
                     {
@@ -197,20 +140,7 @@ class PayReadyQueryAgent:
         sources: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """
-        Generate a timeline of interactions.
-
-        Args:
-            entity_id: Optional entity to filter by
-            entity_type: Type of entity
-            start_date: Start date for timeline
-            end_date: End date for timeline
-            sources: Optional list of sources to include
-
-        Returns:
-            Timeline with chronologically ordered events
         """
-        # Build question
-        if entity_id:
             question = f"Create a timeline of all interactions for {entity_type} with ID {entity_id}"
         else:
             question = "Create a timeline of all interactions"
@@ -243,17 +173,7 @@ class PayReadyQueryAgent:
         self, entity_id: Optional[str] = None, time_range_days: int = 30, group_by: str = "day"
     ) -> Dict[str, Any]:
         """
-        Analyze sentiment trends over time.
-
-        Args:
-            entity_id: Optional entity to analyze
-            time_range_days: Number of days to analyze
-            group_by: Grouping period (day/week/month)
-
-        Returns:
-            Sentiment analysis results
         """
-        if entity_id:
             question = f"Analyze sentiment trends for entity {entity_id} over the last {time_range_days} days grouped by {group_by}"
         else:
             question = f"Analyze overall sentiment trends over the last {time_range_days} days grouped by {group_by}"
@@ -276,15 +196,6 @@ class PayReadyQueryAgent:
         self, time_range_days: int = 7, min_frequency: int = 3, sources: Optional[List[str]] = None
     ) -> Dict[str, Any]:
         """
-        Identify trending topics in recent interactions.
-
-        Args:
-            time_range_days: Number of days to analyze
-            min_frequency: Minimum frequency for a topic
-            sources: Optional sources to analyze
-
-        Returns:
-            Identified topics with frequency and examples
         """
         question = f"What are the most frequently discussed topics in the last {time_range_days} days?"
 
@@ -311,14 +222,6 @@ class PayReadyQueryAgent:
 
     async def generate_coaching_report(self, rep_name: str, period_days: int = 30) -> Dict[str, Any]:
         """
-        Generate a coaching report for a sales rep.
-
-        Args:
-            rep_name: Name of the sales rep
-            period_days: Period to analyze
-
-        Returns:
-            Coaching report with insights and recommendations
         """
         question = f"Generate a coaching report for sales rep {rep_name} covering the last {period_days} days"
 

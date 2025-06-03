@@ -5,8 +5,6 @@ from pulumi import ComponentResource, ResourceOptions
 
 class VultrServerComponent(ComponentResource):
     """Single-node Vultr server for Orchestra AI."""
-
-    def __init__(self, name: str, config: dict, opts: ResourceOptions | None = None):
         super().__init__("orchestra:vultr:ServerComponent", name, None, opts)
         self.config = config
 
@@ -40,38 +38,17 @@ class VultrServerComponent(ComponentResource):
             f"{name}-setup",
             connection=conn,
             create="""
-                apt-get update && apt-get install -y docker.io docker-compose curl vultr-cli
-                mkdir -p /data
-                if [ -b /dev/vdb ]; then
-                  if ! blkid /dev/vdb;
-                  then
-                    mkfs.ext4 -F /dev/vdb
-                  fi
-                  mount /dev/vdb /data
-                else
                   echo "ERROR: /dev/vdb not found"
                 fi
-            """,
-        )
-
-        # Nightly snapshot cron job
-        self.snapshot_cron = command.remote.Command(
+            """
             f"{name}-snapshot-cron",
             connection=conn,
             create="""
-                cat > /root/snapshot.sh <<'EOF'
-#!/bin/bash
-set -e
 VOLUME_ID="{volume_id}"
 SNAP_ID=$(vultr-cli snapshot create "$VOLUME_ID" | awk '{{print $NF}}')
 echo "Snapshot $SNAP_ID created" >> /var/log/vultr-snapshot.log
 EOF
                 chmod +x /root/snapshot.sh
                 (crontab -l 2>/dev/null || echo "") | grep -v 'snapshot.sh' | {{ cat; echo '0 3 * * * /root/snapshot.sh'; }} | crontab -
-            """.format(
-                volume_id=self.volume.id
-            ),
-            opts=ResourceOptions(parent=self.attach),
-        )
-
+            """
         self.register_outputs({"ip": self.server.main_ip, "volume_id": self.volume.id})

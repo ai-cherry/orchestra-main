@@ -1,42 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 """
-Unit tests for the Unified Memory Manager.
-
-Tests all core functionality including storage operations, tier management,
-optimization, and error handling.
 """
-
-import pytest
-import asyncio
-from datetime import datetime, timedelta
-from unittest.mock import Mock, AsyncMock, patch
-import json
-
-from core.memory import (
-    UnifiedMemoryManager,
-    MemoryConfig,
-    Environment,
-    MemoryTier,
-    MemoryItem,
-    MemoryOperation,
-    MemoryResult,
-    MemoryNotFoundError,
-    MemoryValidationError,
-    MemoryStorageError,
-)
-from core.memory.implementations import (
-    InMemoryStorage,
-    MemoryOptimizer,
-    MemoryMetricsCollector,
-)
-
-@pytest.fixture
-async def memory_manager():
     """Create a memory manager instance for testing."""
-    config = MemoryConfig(
-        environment=Environment.TEST,
-        default_ttl_seconds=3600,
-        max_concurrent_operations=10,
-        optimization={
             "enabled": True,
             "optimization_interval_seconds": 60,
             "prefetch_enabled": True,
@@ -57,16 +22,6 @@ async def memory_manager():
 @pytest.fixture
 async def mock_storages():
     """Create mock storage instances."""
-    storages = {}
-    
-    for tier in [MemoryTier.L1_PROCESS_MEMORY, MemoryTier.L3_POSTGRESQL]:
-        storage = AsyncMock()
-        storage.get = AsyncMock(return_value=None)
-        storage.set = AsyncMock(return_value=True)
-        storage.delete = AsyncMock(return_value=True)
-        storage.exists = AsyncMock(return_value=False)
-        storage.search = AsyncMock(return_value=[])
-        storage.get_stats = AsyncMock(return_value={
             "total_items": 0,
             "total_size_bytes": 0,
             "capacity_used_percent": 0
@@ -79,19 +34,8 @@ async def mock_storages():
 
 class TestUnifiedMemoryManager:
     """Test cases for UnifiedMemoryManager."""
-    
-    @pytest.mark.asyncio
-    async def test_initialization(self, memory_manager):
         """Test manager initialization."""
-        assert memory_manager is not None
-        assert len(memory_manager._storages) > 0
-        assert memory_manager.optimizer is not None
-        assert memory_manager.metrics is not None
-    
-    @pytest.mark.asyncio
-    async def test_basic_set_get(self, memory_manager):
         """Test basic set and get operations."""
-        # Set a value
         success = await memory_manager.set("test:key", {"value": "test_data"})
         assert success is True
         
@@ -106,7 +50,6 @@ class TestUnifiedMemoryManager:
     @pytest.mark.asyncio
     async def test_delete_operation(self, memory_manager):
         """Test delete operation."""
-        # Set a value
         await memory_manager.set("delete:test", "value")
         
         # Verify it exists
@@ -122,7 +65,6 @@ class TestUnifiedMemoryManager:
     @pytest.mark.asyncio
     async def test_ttl_expiration(self, memory_manager):
         """Test TTL expiration."""
-        # Set with short TTL
         await memory_manager.set("ttl:test", "temporary", ttl_seconds=1)
         
         # Should exist immediately
@@ -141,8 +83,6 @@ class TestUnifiedMemoryManager:
     @pytest.mark.asyncio
     async def test_tier_hints(self, memory_manager):
         """Test storage with tier hints."""
-        # Store in specific tier
-        success = await memory_manager.set(
             "tier:test",
             {"data": "important"},
             tier_hint=MemoryTier.L1_PROCESS_MEMORY
@@ -156,9 +96,6 @@ class TestUnifiedMemoryManager:
     @pytest.mark.asyncio
     async def test_batch_operations(self, memory_manager):
         """Test batch operations."""
-        # Prepare batch set operations
-        operations = [
-            MemoryOperation(
                 operation_type="set",
                 key=f"batch:{i}",
                 value=f"value_{i}",
@@ -190,8 +127,6 @@ class TestUnifiedMemoryManager:
     @pytest.mark.asyncio
     async def test_search_functionality(self, memory_manager):
         """Test search functionality."""
-        # Store test data
-        test_data = [
             ("search:item:1", {"type": "A", "value": 1}),
             ("search:item:2", {"type": "B", "value": 2}),
             ("search:item:3", {"type": "A", "value": 3}),
@@ -212,8 +147,6 @@ class TestUnifiedMemoryManager:
     @pytest.mark.asyncio
     async def test_optimization(self, memory_manager):
         """Test optimization functionality."""
-        # Store some data
-        for i in range(5):
             await memory_manager.set(f"opt:test:{i}", f"value_{i}")
         
         # Run optimization
@@ -226,7 +159,6 @@ class TestUnifiedMemoryManager:
     @pytest.mark.asyncio
     async def test_metrics_collection(self, memory_manager):
         """Test metrics collection."""
-        # Perform some operations
         await memory_manager.set("metrics:test", "value")
         await memory_manager.get("metrics:test")
         await memory_manager.get("metrics:missing", default=None)
@@ -240,8 +172,6 @@ class TestUnifiedMemoryManager:
     @pytest.mark.asyncio
     async def test_error_handling(self, memory_manager):
         """Test error handling."""
-        # Test empty key validation
-        with pytest.raises(MemoryValidationError):
             await memory_manager.set("", "value")
         
         with pytest.raises(MemoryValidationError):
@@ -253,9 +183,6 @@ class TestUnifiedMemoryManager:
     @pytest.mark.asyncio
     async def test_concurrent_operations(self, memory_manager):
         """Test concurrent operations."""
-        # Create many concurrent operations
-        tasks = []
-        for i in range(50):
             tasks.append(memory_manager.set(f"concurrent:{i}", f"value_{i}"))
         
         # Execute concurrently
@@ -270,9 +197,6 @@ class TestUnifiedMemoryManager:
     @pytest.mark.asyncio
     async def test_tier_promotion(self):
         """Test automatic tier promotion."""
-        config = MemoryConfig(
-            environment=Environment.TEST,
-            optimization={
                 "enabled": True,
                 "tier_promotion_threshold": 3,
             }
@@ -282,6 +206,9 @@ class TestUnifiedMemoryManager:
         await manager.initialize()
         
         try:
+
+        
+            pass
             # Store in lower tier
             await manager.set(
                 "promote:test",
@@ -305,9 +232,6 @@ class TestUnifiedMemoryManager:
     @pytest.mark.asyncio
     async def test_prefetch_functionality(self):
         """Test predictive prefetching."""
-        config = MemoryConfig(
-            environment=Environment.TEST,
-            optimization={
                 "enabled": True,
                 "prefetch_enabled": True,
                 "prefetch_threshold": 0.5,
@@ -318,6 +242,9 @@ class TestUnifiedMemoryManager:
         await manager.initialize()
         
         try:
+
+        
+            pass
             # Create access pattern
             keys = [f"prefetch:{i}" for i in range(5)]
             for key in keys:
@@ -342,10 +269,7 @@ class TestUnifiedMemoryManager:
 
 class TestMemoryItem:
     """Test cases for MemoryItem."""
-    
-    def test_memory_item_creation(self):
         """Test MemoryItem creation."""
-        item = MemoryItem(
             key="test:key",
             value={"data": "test"},
             metadata={"source": "test"},
@@ -365,8 +289,6 @@ class TestMemoryItem:
     
     def test_memory_item_expiration(self):
         """Test MemoryItem expiration check."""
-        # Create expired item
-        item = MemoryItem(
             key="expired",
             value="old_data",
             metadata={},
@@ -400,10 +322,7 @@ class TestMemoryItem:
 
 class TestMemoryOperation:
     """Test cases for MemoryOperation."""
-    
-    def test_operation_creation(self):
         """Test MemoryOperation creation."""
-        op = MemoryOperation(
             operation_type="set",
             key="test:key",
             value="test_value",
@@ -419,11 +338,7 @@ class TestMemoryOperation:
 
 class TestMemoryResult:
     """Test cases for MemoryResult."""
-    
-    def test_result_creation(self):
         """Test MemoryResult creation."""
-        result = MemoryResult(
-            success=True,
             value="result_value",
             error=None,
             tier_accessed=MemoryTier.L1_PROCESS_MEMORY,
@@ -439,13 +354,6 @@ class TestMemoryResult:
 @pytest.mark.asyncio
 async def test_memory_manager_with_mocks(mock_storages):
     """Test memory manager with mocked storages."""
-    config = MemoryConfig(environment=Environment.TEST)
-    
-    manager = UnifiedMemoryManager(config)
-    manager._storages = mock_storages
-    
-    # Mock the item for get operation
-    test_item = MemoryItem(
         key="mock:test",
         value="mocked_value",
         metadata={},

@@ -1,42 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 """
-Unified database interface for Orchestra AI.
-
-Provides a single interface for both PostgreSQL (structured data) and
-Weaviate (vector/semantic data) operations.
 """
-
-import os
-import logging
-from typing import Dict, List, Optional, Any, Union
-from datetime import datetime, timedelta
-from functools import lru_cache
-import json
-from uuid import UUID
-
-from .postgresql_client import PostgreSQLClient
-from .weaviate_client import WeaviateClient
-
-logger = logging.getLogger(__name__)
-
-class UnifiedDatabase:
     """Unified interface for all database operations."""
-
-    def __init__(
-        self, postgres_config: Optional[Dict[str, Any]] = None, weaviate_config: Optional[Dict[str, Any]] = None
-    ):
         """Initialize unified database with both clients."""
-        # Initialize PostgreSQL
-        pg_config = postgres_config or {}
-        self.postgres = PostgreSQLClient(**pg_config)
-
-        # Initialize Weaviate
-        wv_config = weaviate_config or {}
-        self.weaviate = WeaviateClient(**wv_config)
-
-        # In-memory cache for frequently accessed data
-        self._cache = {}
-        self._cache_ttl = 300  # 5 minutes default TTL
-
         logger.info("Unified database interface initialized")
 
     # ==================== Agent Operations ====================
@@ -51,8 +17,6 @@ class UnifiedDatabase:
         initial_memory: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Create an agent with both structured data and initial memory."""
-        # Create agent in PostgreSQL
-        agent_data = {
             "name": name,
             "description": description,
             "capabilities": capabilities,
@@ -84,12 +48,6 @@ class UnifiedDatabase:
 
     def get_agent_with_memory(self, agent_id: Union[str, UUID]) -> Optional[Dict[str, Any]]:
         """Get agent with recent memories."""
-        agent = self.postgres.get_agent(agent_id)
-        if not agent:
-            return None
-
-        # Get recent memories from Weaviate
-        memories = self.weaviate.get_recent_memories(str(agent_id), limit=10)
         agent["recent_memories"] = memories
 
         return agent
@@ -98,10 +56,6 @@ class UnifiedDatabase:
         self, agent_id: Union[str, UUID], updates: Dict[str, Any], actor: str = "system"
     ) -> Optional[Dict[str, Any]]:
         """Update agent and create audit log."""
-        agent = self.postgres.update_agent(agent_id, updates)
-
-        if agent:
-            self.postgres.create_audit_log(
                 event_type="agent_updated",
                 actor=actor,
                 resource_type="agent",
@@ -113,13 +67,6 @@ class UnifiedDatabase:
 
     def delete_agent_complete(self, agent_id: Union[str, UUID], actor: str = "system") -> bool:
         """Delete agent and all associated data."""
-        # Delete from PostgreSQL
-        deleted = self.postgres.delete_agent(agent_id)
-
-        if deleted:
-            # Delete memories from Weaviate (would need to implement batch delete by agent_id)
-            # For now, log the deletion
-            self.postgres.create_audit_log(
                 event_type="agent_deleted",
                 actor=actor,
                 resource_type="agent",
@@ -141,12 +88,6 @@ class UnifiedDatabase:
         metadata: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Store a complete interaction including memory and conversation."""
-        # Store user message in conversation
-        self.weaviate.store_conversation(
-            session_id=session_id,
-            agent_id=agent_id,
-            user_id=user_id,
-            message=user_input,
             role="user",
             metadata=metadata,
         )
@@ -191,9 +132,6 @@ class UnifiedDatabase:
         limit: int = 20,
     ) -> Dict[str, List[Dict[str, Any]]]:
         """Search all agent context including memories and conversations."""
-        results = {}
-
-        if include_memories:
             results["memories"] = self.weaviate.search_memories(
                 agent_id=agent_id, query=query, limit=limit // 2 if include_conversations else limit
             )
@@ -211,7 +149,6 @@ class UnifiedDatabase:
         self, name: str, definition: Dict[str, Any], related_documents: Optional[List[Dict[str, Any]]] = None
     ) -> Dict[str, Any]:
         """Create workflow and store related documents."""
-        # Create workflow in PostgreSQL
         workflow = self.postgres.create_workflow({"name": name, "definition": definition, "status": "draft"})
 
         # Store related documents in Weaviate
@@ -229,12 +166,6 @@ class UnifiedDatabase:
 
     def get_workflow_with_documents(self, workflow_id: Union[str, UUID]) -> Optional[Dict[str, Any]]:
         """Get workflow with related documents."""
-        workflow = self.postgres.get_workflow(workflow_id)
-        if not workflow:
-            return None
-
-        # Get related documents from Weaviate
-        documents = self.weaviate.search_documents(
             query="", source=f"workflow:{workflow_id}", limit=50  # Empty query to get all
         )
         workflow["documents"] = documents
@@ -253,7 +184,6 @@ class UnifiedDatabase:
         metadata: Optional[Dict[str, Any]] = None,
     ) -> str:
         """Add item to knowledge base."""
-        knowledge_id = self.weaviate.store_knowledge(
             title=title, content=content, source=source or "manual", category=category, tags=tags, metadata=metadata
         )
 
@@ -272,15 +202,7 @@ class UnifiedDatabase:
         self, query: str, category: Optional[str] = None, tags: Optional[List[str]] = None, limit: int = 10
     ) -> List[Dict[str, Any]]:
         """Search knowledge base."""
-        return self.weaviate.search_knowledge(query=query, category=category, tags=tags, limit=limit)
-
-    # ==================== Session Management ====================
-
-    def create_session(
-        self, session_id: str, user_id: str, agent_id: Optional[str] = None, ttl_hours: int = 24
-    ) -> Dict[str, Any]:
         """Create a new session."""
-        session_data = {
             "user_id": user_id,
             "agent_id": agent_id,
             "created_at": datetime.utcnow().isoformat(),
@@ -293,22 +215,12 @@ class UnifiedDatabase:
 
     def get_session_with_history(self, session_id: str) -> Optional[Dict[str, Any]]:
         """Get session with conversation history."""
-        session = self.postgres.get_session(session_id)
-        if not session:
-            return None
-
-        # Get conversation history from Weaviate
-        history = self.weaviate.get_conversation_history(session_id)
         session["conversation_history"] = history
 
         return session
 
     def update_session_activity(self, session_id: str) -> bool:
         """Update session last activity timestamp."""
-        session = self.postgres.get_session(session_id)
-        if not session:
-            return False
-
         session_data = json.loads(session["data"]) if isinstance(session["data"], str) else session["data"]
         session_data["last_activity"] = datetime.utcnow().isoformat()
 
@@ -320,7 +232,6 @@ class UnifiedDatabase:
 
     def get_system_stats(self) -> Dict[str, Any]:
         """Get comprehensive system statistics."""
-        stats = {
             "timestamp": datetime.utcnow().isoformat(),
             "postgresql": {
                 "agents": len(self.postgres.list_agents(limit=1000)),
@@ -328,7 +239,8 @@ class UnifiedDatabase:
                 "active_sessions": len(
                     [
                         s
-                        for s in self.postgres.execute_query(
+                        for s in self.postgres.# TODO: Consider adding EXPLAIN ANALYZE for performance
+execute_query(
                             "SELECT id FROM orchestra.sessions WHERE expires_at > CURRENT_TIMESTAMP"
                         )
                     ]
@@ -343,9 +255,6 @@ class UnifiedDatabase:
 
     def get_agent_activity_report(self, agent_id: str, days: int = 7) -> Dict[str, Any]:
         """Get agent activity report."""
-        # Get agent info
-        agent = self.postgres.get_agent(agent_id)
-        if not agent:
             return {"error": "Agent not found"}
 
         # Get recent memories count
@@ -368,16 +277,8 @@ class UnifiedDatabase:
     @lru_cache(maxsize=128)
     def cached_get_agent(self, agent_id: str) -> Optional[Dict[str, Any]]:
         """Cached agent retrieval for performance."""
-        return self.postgres.get_agent(agent_id)
-
-    def clear_cache(self) -> None:
         """Clear all caches."""
-        self.cached_get_agent.cache_clear()
-        self._cache.clear()
-
-    def health_check(self) -> Dict[str, bool]:
         """Check health of both databases."""
-        return {
             "postgresql": self.postgres.health_check(),
             "weaviate": self.weaviate.health_check(),
             "overall": self.postgres.health_check() and self.weaviate.health_check(),
@@ -385,6 +286,4 @@ class UnifiedDatabase:
 
     def close(self) -> None:
         """Close all database connections."""
-        self.postgres.close()
-        # Weaviate client doesn't need explicit closing
         logger.info("Database connections closed")

@@ -1,21 +1,5 @@
 """
-Test script for the modular Orchestra AI system.
-
-This script tests the core functionality of the modular architecture.
 """
-
-import asyncio
-import logging
-
-from core.business.personas.base import PersonaConfig, PersonaTrait, ResponseStyle, get_persona_manager
-from core.business.workflows.examples import register_example_workflows
-from core.main import OrchestraSystem
-from core.services.agents.examples import register_example_agents
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-async def test_system():
     """Test the modular Orchestra AI system."""
     logger.info("Starting modular system test...")
 
@@ -52,6 +36,8 @@ async def test_system():
 
     logger.info("\nTesting document analysis workflow...")
     try:
+
+        pass
         context = await workflow_engine.execute_workflow(
             workflow_name="document_analysis",
             inputs={
@@ -62,7 +48,9 @@ async def test_system():
         logger.info("✓ Workflow completed successfully")
         logger.info(f"  Summary: {context.outputs.get('summary', 'N/A')[:100]}...")
         logger.info(f"  Keywords: {context.outputs.get('keywords', [])}")
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"✗ Workflow failed: {e}")
 
     # Test agent communication
