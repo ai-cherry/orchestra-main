@@ -16,9 +16,10 @@ env:
   NODE_VERSION: '18'
   PULUMI_VERSION: '3.94.0'
   DOCKER_REGISTRY: registry.vultr.com
-  Vultr_PROJECT_ID: ${{ secrets.Vultr_PROJECT_ID }}
+  VULTR_PROJECT_ID: ${{ secrets.VULTR_PROJECT_ID }}
   DEPLOYMENT_ENVIRONMENT: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
   PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+  VULTR_API_KEY: ${{ secrets.VULTR_API_KEY }}
 
 jobs:
   # Stage 1: Code Quality & Security Checks
@@ -26,13 +27,7 @@ jobs:
     name: Code Quality Analysis
     runs-on: ubuntu-latest
     steps:
-    runs-on: ubuntu-latest
-    steps:
       - uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -125,20 +120,11 @@ jobs:
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
       
-      - name: Authenticate to Vultr
-        uses: # Removed GCP action/auth@v1
-        with:
-          credentials_json: ${{ secrets.Vultr_SA_KEY }}
-      
-      - name: Configure Docker for GCR
-        run: |
-          vultr-cli auth configure-docker
-      
       - name: Docker Meta
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.DOCKER_REGISTRY }}/${{ env.Vultr_PROJECT_ID }}/admin-ui
+          images: ${{ env.DOCKER_REGISTRY }}/${{ env.VULTR_PROJECT_ID }}/admin-ui
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -201,15 +187,9 @@ jobs:
         with:
           pulumi-version: ${{ env.PULUMI_VERSION }}
       
-      - name: Authenticate to Vultr
-        uses: # Removed GCP action/auth@v1
-        with:
-          credentials_json: ${{ secrets.Vultr_SA_KEY }}
-      
-      - name: Configure Vultr
+      - name: Configure Vultr CLI (if needed)
         run: |
-          vultr-cli auth configure-docker
-          vultr-cli config set project ${{ env.Vultr_PROJECT_ID }}
+          vultr-cli config set project ${{ env.VULTR_PROJECT_ID }}
       
       - name: Install Pulumi Dependencies
         run: |
@@ -225,11 +205,11 @@ jobs:
         run: |
           cd infrastructure/pulumi/dashboard
           # Set configuration values from secrets
-          pulumi config set vultr:project ${{ env.Vultr_PROJECT_ID }}
+          pulumi config set vultr:project ${{ env.VULTR_PROJECT_ID }}
           pulumi config set vultr:region us-central1
           pulumi config set apiUrl ${{ secrets.API_URL }}
           pulumi config set --secret apiKey ${{ secrets.API_KEY }}
-          pulumi config set --secret VultrServiceAccountKey ${{ secrets.Vultr_SA_KEY }}
+          pulumi config set --secret VultrServiceAccountKey ${{ secrets.VULTR_API_KEY }}
           pulumi config set alertChannelId ${{ secrets.ALERT_CHANNEL }} || true
       
       - name: Pulumi Preview
@@ -260,17 +240,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Authenticate to Vultr
-        uses: # Removed GCP action/auth@v1
-        with:
-          credentials_json: ${{ secrets.Vultr_SA_KEY }}
-      
       - name: Run Migrations
         run: |
-          # Connect to Cloud SQL and run migrations
-          vultr-cli sql connect ${{ secrets.DB_INSTANCE }} --user=postgres << EOF
-          \i migrations/latest.sql
-          EOF
+          # Ensure VULTR_API_KEY is available if vultr-cli needs it here
+          # Connect to Vultr Database and run migrations
+          # The command below is a placeholder and needs to be Vultr-specific
+          echo "Placeholder for Vultr database migration: ${{ secrets.DB_INSTANCE }}"
+          # Example: vultr-cli database sql ${{ secrets.VULTR_DB_ID }} < migrations/latest.sql
+          # Or use psql via an SSH tunnel if self-managed PostgreSQL on a Vultr VPS
 
   # Stage 7: Deploy Application
   deploy:
@@ -284,29 +261,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Authenticate to Vultr
-        uses: # Removed GCP action/auth@v1
-        with:
-          credentials_json: ${{ secrets.Vultr_SA_KEY }}
-      
-      - name: Deploy to Cloud Run (Blue-Green)
+      - name: Deploy to Vultr Instance (Example for VPS)
         id: deploy
         run: |
-          # Deploy new version as blue
-          vultr-cli run deploy admin-ui-blue \
-            --image=${{ needs.build.outputs.image-tag }} \
-            --region=us-central1 \
-            --platform=managed \
-            --allow-unauthenticated \
-            --set-env-vars="NEXT_PUBLIC_API_URL=${{ secrets.API_URL }}" \
-            --max-instances=10 \
-            --min-instances=1 \
-            --cpu=1 \
-            --memory=512Mi
+          echo "Deploying to Vultr instance..."
+          # Example using vultr-cli to deploy a container or update an app
+          # This is highly dependent on your Vultr setup (Kubernetes, VPS with Docker, etc.)
+          # If deploying to a Vultr VPS with Docker:
+          # 1. Ensure SSH key is set up for the instance
+          # 2. Use scp/rsync to copy new image or docker-compose file
+          # 3. SSH into instance and run docker-compose up -d or docker run ...
+          # For Vultr Kubernetes (VKE):
+          # vultr-cli kubernetes config > kubeconfig.yaml
+          # KUBECONFIG=kubeconfig.yaml kubectl set image deployment/admin-ui-deployment admin-ui=${{ needs.build.outputs.image-tag }}
           
-          # Get blue service URL
-          BLUE_URL=$(vultr-cli run services describe admin-ui-blue --region=us-central1 --format='value(status.url)')
-          echo "url=$BLUE_URL" >> $GITHUB_OUTPUT
+          # Placeholder for actual Vultr deployment logic:
+          echo "Vultr deployment target URL would be: https://admin.${{ env.DEPLOYMENT_ENVIRONMENT }}.example.com"
+          # The following lines assume a Vultr Cloud Run equivalent or Load Balancer IP for url output
+          # You will need to replace this with actual URL/IP from your Vultr deployment
+          echo "url=https://placeholder-url.vultr.com" >> $GITHUB_OUTPUT 
 
   # Stage 8: Performance Tests
   performance-tests:
@@ -365,24 +338,17 @@ jobs:
     needs: validate-deployment
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment:
-      name: production-switch
+      name: production
     steps:
-      - name: Authenticate to Vultr
-        uses: # Removed GCP action/auth@v1
-        with:
-          credentials_json: ${{ secrets.Vultr_SA_KEY }}
-      
-      - name: Switch Traffic
+      - name: Switch Traffic (Example for Vultr Load Balancer or DNS)
         run: |
-          # Update traffic split to new version
-          vultr-cli run services update-traffic admin-ui \
-            --to-revisions=admin-ui-blue=100 \
-            --region=us-central1
-          
-          # Tag old version for rollback
-          vultr-cli run services update-traffic admin-ui \
-            --to-tags=previous=0 \
-            --region=us-central1
+          echo "Switching traffic on Vultr..."
+          # This is highly dependent on your Vultr setup.
+          # If using Vultr Load Balancer: 
+          # vultr-cli load-balancer update <LB_ID> --forwarding-rules "...new_instance_id..."
+          # If using Vultr DNS for traffic switch:
+          # vultr-cli dns records update <DOMAIN> <RECORD_ID> --data <NEW_INSTANCE_IP>
+          echo "Traffic switched (placeholder)"
 
   # Stage 11: Monitoring & Alerting Setup
   monitoring:
@@ -409,18 +375,12 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
     steps:
-      - name: Authenticate to Vultr
-        uses: # Removed GCP action/auth@v1
-        with:
-          credentials_json: ${{ secrets.Vultr_SA_KEY }}
-      
-      - name: Rollback to Previous Version
+      - name: Rollback to Previous Version (Example for Vultr)
         run: |
-          vultr-cli run services update-traffic admin-ui \
-            --to-tags=previous=100 \
-            --region=us-central1
-          
-          echo "Rollback completed successfully"
+          echo "Rolling back to previous version on Vultr..."
+          # This depends on your deployment strategy on Vultr
+          # e.g., point Load Balancer to old instance, or redeploy previous Docker image tag
+          echo "Rollback completed (placeholder)"
 
   # Cleanup Job
   cleanup:
@@ -433,9 +393,9 @@ jobs:
         run: |
           # Remove images older than 7 days
           vultr-cli container images list-tags \
-            ${{ env.DOCKER_REGISTRY }}/${{ env.Vultr_PROJECT_ID }}/admin-ui \
+            ${{ env.DOCKER_REGISTRY }}/${{ env.VULTR_PROJECT_ID }}/admin-ui \
             --filter='-tags:*' \
             --filter='timestamp.datetime < -P7D' \
             --format='get(digest)' | \
           xargs -I {} vultr-cli container images delete \
-            "${{ env.DOCKER_REGISTRY }}/${{ env.Vultr_PROJECT_ID }}/admin-ui@{}" --quiet
+            "${{ env.DOCKER_REGISTRY }}/${{ env.VULTR_PROJECT_ID }}/admin-ui@{}" --quiet

@@ -2093,17 +2093,6 @@ dependencies:
       update_priority: 0
       license: null
       last_updated: '2025-06-02T08:14:03.958040+00:00'
-    pulumi_gcp:
-      name: pulumi_gcp
-      current_version: 7.38.0
-      latest_version: null
-      constraint: pulumi_gcp==7.38.0
-      type: python
-      source_file: constraints.txt:188
-      vulnerabilities: 0
-      update_priority: 0
-      license: null
-      last_updated: '2025-06-02T08:14:03.958119+00:00'
     pulumi_kubernetes:
       name: pulumi_kubernetes
       current_version: 4.23.0

@@ -64,9 +64,13 @@ class APIKeyManager:
         self.keys[service.lower()] = key
         logger.info(f"Updated API key for {service}")
 
-def get_project_id() -> str:
-    """Get the GCP project ID from environment or default."""
-    return os.getenv("VULTR_PROJECT_ID", "cherry-ai-project")
+def get_vultr_project_id() -> str:
+    """Get the Vultr project ID from environment or default."""
+    project_id = os.getenv("VULTR_PROJECT_ID")
+    if not project_id:
+        logger.warning("VULTR_PROJECT_ID not set, using default 'cherry-ai-project'")
+        return "cherry-ai-project"
+    return project_id
 
 def setup_logging(level: str = "INFO"):
     """Configure logging for the application."""

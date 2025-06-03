@@ -36,46 +36,48 @@ class HardcodedPattern:
 # Define patterns to search for
 PATTERNS = [
     HardcodedPattern(
-        name="GCP Project ID",
-        pattern=re.compile(r'["\']cherry-ai-project["\']'),
-        env_var="VULTR_PROJECT_ID",
-        description="Google Cloud project ID",
-        file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.py$"],
-    ),
-    HardcodedPattern(
-        name="GCP Region",
-        pattern=re.compile(r'["\']us-central1["\']'),
-        env_var="VULTR_REGION",
-        description="Google Cloud region",
-        file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.py$"],
-    ),
-    HardcodedPattern(
-        name="GCP Zone",
-        pattern=re.compile(r'["\']us-central1-[a-z]["\']'),
-        env_var="VULTR_ZONE",
-        description="Google Cloud zone",
-        file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.py$"],
-    ),
-    HardcodedPattern(
-        name="Service Account",
-        pattern=re.compile(r'["\'][a-z-]+@cherry-ai-project\.iam\.gserviceaccount\.com["\']'),
+        name="Vultr API Key",
+        pattern=re.compile(r'["\'][A-Z0-9]{30,60}["\']'), # Generic strong API key pattern
         env_var="VULTR_API_KEY",
-        description="Service account email",
+        description="Potential Vultr API Key or similar secret.",
         file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.py$"],
     ),
     HardcodedPattern(
-        name="Cloud Run Service",
-        pattern=re.compile(r'["\']orchestra-api(?:-[a-z]+)?["\']'),
-        env_var="CLOUD_RUN_SERVICE_NAME",
-        description="Cloud Run service name",
+        name="Generic Project ID",
+        pattern=re.compile(r'["\'][a-z0-9-]+-[a-z0-9]+(?:-[a-z0-9]+)?["\']'),
+        env_var="PROJECT_ID", # Generic, user can map to VULTR_PROJECT_ID
+        description="Potential cloud project ID. Verify if it relates to Vultr.",
         file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.py$"],
     ),
     HardcodedPattern(
-        name="Artifact Registry",
-        pattern=re.compile(r'["\']orchestra-repo["\']'),
-        env_var="ARTIFACT_REGISTRY_REPO",
-        description="Artifact Registry repository name",
+        name="Generic Region/Zone",
+        pattern=re.compile(r'["\'][a-z]+(?:-[a-z]+)-\d[a-z]?["\']'), # e.g., fra-1, ams-1a
+        env_var="VULTR_REGION", # Or VULTR_ZONE
+        description="Potential cloud region/zone. Verify if it relates to Vultr.",
         file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.py$"],
+    ),
+    HardcodedPattern(
+        name="Vultr Resource Name",
+        pattern=re.compile(r'["\']vultr-[a-zA-Z0-9_.-]+["\']'),
+        env_var="VULTR_RESOURCE_NAME_VAR", # Placeholder for specific Vultr resource names
+        description="Potential hardcoded Vultr-specific resource name.",
+        file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.py$"],
+    ),
+    HardcodedPattern(
+        name="IP Address",
+        pattern=re.compile(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b'),
+        env_var="SERVER_IP_ADDRESS",
+        description="Potential hardcoded IP address. Should be configurable.",
+        file_patterns=[r"\.sh$", r"\.ya?ml$", r"\.py$", r"\.conf$", r"nginx\.conf$"],
+        exclude_patterns=[r"127\.0\.0\.1", r"0\.0\.0\.0", r"localhost"], # Exclude common local IPs
+    ),
+    HardcodedPattern(
+        name="Domain Name",
+        pattern=re.compile(r'["\'][a-zA-Z0-9.-]+\.(?:com|org|net|io|ai|dev)["\']'),
+        env_var="DOMAIN_NAME",
+        description="Potential hardcoded domain name.",
+        file_patterns=[r"\.py$", r"\.ya?ml$", r"\.conf$", r"nginx\.conf$"],
+        exclude_patterns=[r"localhost", r"example\.com"], # Exclude common examples
     ),
 ]
 

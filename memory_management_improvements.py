@@ -14,7 +14,7 @@ import functools
 import logging
 import time
 import uuid
-from typing import List, Optional, TypeVar
+from typing import List, Optional, TypeVar, Dict, Any
 
 # Imports would normally be from the actual codebase
 # These are placeholders to demonstrate patterns
@@ -616,6 +616,25 @@ class ImprovedFirestoreMemoryAdapter(MemoryManager):
         """Synchronous connection check for running in thread pool."""
         # In a real implementation, would perform a lightweight mongodb operation
         return True
+
+    def is_production_ready(self) -> bool:
+        """Check if the memory system is production-ready."""
+        return all([
+            self.is_optimized(),
+            self.has_comprehensive_monitoring(),
+            self.is_secure(),
+            self.weaviate_manager.is_healthy() # Changed from GCP Vector Search
+        ])
+
+    def get_production_readiness_report(self) -> Dict[str, Any]:
+        """Get a report on production readiness."""
+        return {
+            "optimized": self.is_optimized(),
+            "monitored": self.has_comprehensive_monitoring(),
+            "secure": self.is_secure(),
+            "vector_search_ready": self.weaviate_manager.is_healthy(),
+            "overall_production_ready": self.is_production_ready()
+        }
 
 # ============================
 # Usage Example
