@@ -1,0 +1,59 @@
+{
+  "namespace": "payready",
+  "connections": [
+    {
+      "name": "PayReady_postgres_to_weaviate",
+      "source": {
+        "type": "postgres",
+        "database": "orchestra_db",
+        "schema": "payready_domain",
+        "tables": [
+          "payready_events",
+          "payready_interactions",
+          "payready_analytics"
+        ]
+      },
+      "destination": {
+        "type": "weaviate",
+        "cluster_url": "https://payready-sophia-cluster.weaviate.network",
+        "collection": "payready_knowledge"
+      },
+      "schedule": {
+        "type": "cron",
+        "expression": "0 */6 * * *"
+      },
+      "transformations": [
+        {
+          "type": "field_mapping",
+          "mappings": {
+            "event_data": "content",
+            "event_type": "category",
+            "created_at": "timestamp"
+          }
+        }
+      ]
+    },
+    {
+      "name": "PayReady_api_to_postgres",
+      "source": {
+        "type": "http_api",
+        "endpoint": "/api/payready/events",
+        "method": "GET",
+        "pagination": {
+          "type": "offset",
+          "limit": 1000
+        }
+      },
+      "destination": {
+        "type": "postgres",
+        "database": "orchestra_db",
+        "schema": "payready_domain",
+        "table": "payready_raw_events"
+      },
+      "schedule": {
+        "type": "interval",
+        "minutes": 30
+      }
+    }
+  ]
+}

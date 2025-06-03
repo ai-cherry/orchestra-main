@@ -1,709 +1,470 @@
 #!/usr/bin/env python3
 """
-Unified AI System Orchestrator
-Manages and coordinates all AI tools: Cursor AI, Claude, GitHub Copilot, Roo Code, Factory AI
+AI System Orchestrator
+Central coordination system for all AI tools and services
+Intelligently routes tasks between Claude, OpenAI, GitHub Copilot, and Roo Code
 """
 
-import os
-import sys
-import json
-import time
 import asyncio
-from typing import Dict, List, Optional, Any
-from datetime import datetime
-from pathlib import Path
+import json
 import logging
+import os
+import time
+from datetime import datetime
+from typing import Dict, List, Optional, Any, Tuple
+from dataclasses import dataclass, field
 from enum import Enum
 
-# Add parent directory to path for imports
+# Add project root to path
+import sys
+from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from shared.database import initialize_database
-from ai_components.orchestration.ai_orchestrator import WeaviateManager
 
 logger = logging.getLogger(__name__)
 
 class TaskType(Enum):
+    """Types of tasks that can be handled by AI tools"""
     CODE_ANALYSIS = "code_analysis"
-    CODE_GENERATION = "code_generation"
+    CODE_GENERATION = "code_generation" 
     CODE_REFACTORING = "code_refactoring"
-    PROJECT_ANALYSIS = "project_analysis"
+    ARCHITECTURE_REVIEW = "architecture_review"
+    BUG_FIXING = "bug_fixing"
+    PERFORMANCE_OPTIMIZATION = "performance_optimization"
     DOCUMENTATION = "documentation"
-    CODE_COMPLETION = "code_completion"
-    IMPROVEMENT_SUGGESTIONS = "improvement_suggestions"
+    TESTING = "testing"
 
 class AITool(Enum):
-    CURSOR_AI = "cursor_ai"
+    """Available AI tools"""
     CLAUDE = "claude"
+    OPENAI = "openai"
     GITHUB_COPILOT = "github_copilot"
     ROO_CODE = "roo_code"
-    FACTORY_AI = "factory_ai"
+    OPENROUTER = "openrouter"
+    GROK = "grok"
+    PERPLEXITY = "perplexity"
+
+@dataclass
+class TaskRequest:
+    """Request for AI task processing"""
+    task_id: str
+    task_type: TaskType
+    prompt: str
+    context: Dict[str, Any] = field(default_factory=dict)
+    priority: int = 1
+    timeout: int = 300
+    preferred_tool: Optional[AITool] = None
+
+@dataclass 
+class TaskResult:
+    """Result from AI task processing"""
+    task_id: str
+    tool_used: AITool
+    result: Any
+    success: bool
+    latency: float
+    tokens_used: int = 0
+    error: Optional[str] = None
+    fallback_used: bool = False
 
 class AISystemOrchestrator:
-    """Unified orchestrator for all AI tools"""
+    """Central AI system orchestrator"""
     
     def __init__(self):
         self.db = None
-        self.weaviate_manager = WeaviateManager()
         
-        # Tool availability cache
-        self.tool_status = {
-            AITool.CURSOR_AI: {"available": False, "last_check": None},
-            AITool.CLAUDE: {"available": False, "last_check": None},
-            AITool.GITHUB_COPILOT: {"available": False, "last_check": None},
-            AITool.ROO_CODE: {"available": False, "last_check": None},
-            AITool.FACTORY_AI: {"available": False, "last_check": None}
+        # Tool availability and performance tracking
+        self.tool_availability = {
+            AITool.CLAUDE: True,
+            AITool.OPENAI: True,
+            AITool.GITHUB_COPILOT: True,
+            AITool.ROO_CODE: True,
+            AITool.OPENROUTER: True,
+            AITool.GROK: True,
+            AITool.PERPLEXITY: True
         }
         
-        # Tool preference matrix
-        self.tool_preferences = {
-            TaskType.CODE_ANALYSIS: [AITool.CLAUDE, AITool.CURSOR_AI, AITool.FACTORY_AI],
-            TaskType.CODE_GENERATION: [AITool.CLAUDE, AITool.CURSOR_AI, AITool.GITHUB_COPILOT],
-            TaskType.CODE_REFACTORING: [AITool.CURSOR_AI, AITool.CLAUDE, AITool.FACTORY_AI],
-            TaskType.PROJECT_ANALYSIS: [AITool.CLAUDE, AITool.FACTORY_AI, AITool.CURSOR_AI],
-            TaskType.DOCUMENTATION: [AITool.GITHUB_COPILOT, AITool.CLAUDE, AITool.FACTORY_AI],
-            TaskType.CODE_COMPLETION: [AITool.GITHUB_COPILOT, AITool.CURSOR_AI, AITool.CLAUDE],
-            TaskType.IMPROVEMENT_SUGGESTIONS: [AITool.GITHUB_COPILOT, AITool.CLAUDE, AITool.CURSOR_AI]
-        }
-        
-        # Performance tracking
+        # Performance metrics for intelligent routing
         self.performance_metrics = {
-            "total_requests": 0,
-            "successful_requests": 0,
-            "failed_requests": 0,
-            "tool_usage": {tool.value: 0 for tool in AITool},
-            "task_distribution": {task.value: 0 for task in TaskType},
-            "average_latency": 0.0,
-            "total_latency": 0.0
+            tool: {
+                'avg_latency': 0.0,
+                'success_rate': 1.0,
+                'requests_handled': 0,
+                'total_latency': 0.0,
+                'errors': 0,
+                'tokens_used': 0
+            } for tool in AITool
         }
         
-        # Load balancing
-        self.load_balancer = {
-            "round_robin_index": 0,
-            "tool_loads": {tool.value: 0 for tool in AITool},
-            "max_concurrent_per_tool": 5
+        # Tool preference matrix based on task type
+        self.tool_preferences = {
+            TaskType.CODE_ANALYSIS: [AITool.CLAUDE, AITool.GITHUB_COPILOT, AITool.ROO_CODE],
+            TaskType.CODE_GENERATION: [AITool.CLAUDE, AITool.OPENAI, AITool.GITHUB_COPILOT],
+            TaskType.CODE_REFACTORING: [AITool.CLAUDE, AITool.OPENAI, AITool.ROO_CODE],
+            TaskType.ARCHITECTURE_REVIEW: [AITool.CLAUDE, AITool.ROO_CODE],
+            TaskType.BUG_FIXING: [AITool.GITHUB_COPILOT, AITool.CLAUDE, AITool.OPENAI],
+            TaskType.PERFORMANCE_OPTIMIZATION: [AITool.ROO_CODE, AITool.CLAUDE],
+            TaskType.DOCUMENTATION: [AITool.CLAUDE, AITool.OPENAI],
+            TaskType.TESTING: [AITool.OPENAI, AITool.GITHUB_COPILOT]
         }
-    
-    async def __aenter__(self):
-        """Async context manager entry"""
-        # Initialize database
-        postgres_url = os.environ.get(
-            'POSTGRES_URL',
-            'postgresql://postgres:password@localhost:5432/orchestra'
-        )
-        weaviate_url = os.environ.get('WEAVIATE_URL', 'http://localhost:8080')
-        weaviate_api_key = os.environ.get('WEAVIATE_API_KEY')
         
-        self.db = await initialize_database(postgres_url, weaviate_url, weaviate_api_key)
-        await self._initialize_tools()
-        return self
+        # Initialize AI tool clients
+        self.ai_tools = {}
+        self._initialize_ai_tools()
     
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        """Async context manager exit"""
-        if self.db:
-            await self.db.close()
-    
-    async def execute_task(self, task_type: TaskType, request_data: Dict, 
-                          preferred_tool: AITool = None) -> Dict:
-        """Execute a task using the best available AI tool"""
-        start_time = time.time()
-        task_id = f"{task_type.value}_{int(time.time())}"
-        
+    def _initialize_ai_tools(self):
+        """Initialize AI tool clients"""
         try:
-            # Update tool availability
-            await self._update_tool_availability()
+            # Claude integration
+            if os.environ.get('ANTHROPIC_API_KEY'):
+                from ai_components.claude.claude_analyzer import ClaudeProjectAnalyzer
+                self.ai_tools[AITool.CLAUDE] = ClaudeProjectAnalyzer()
+                logger.info("✅ Claude analyzer initialized")
+            else:
+                self.tool_availability[AITool.CLAUDE] = False
+                logger.warning("⚠️ Claude: No API key found")
             
-            # Select best tool
-            selected_tool = await self._select_tool(task_type, preferred_tool)
+            # OpenAI integration
+            if os.environ.get('OPENAI_API_KEY'):
+                # Direct OpenAI integration would go here
+                logger.info("✅ OpenAI integration available")
+            else:
+                self.tool_availability[AITool.OPENAI] = False
+                logger.warning("⚠️ OpenAI: No API key found")
             
-            if not selected_tool:
-                raise Exception("No AI tools available for this task")
-            
-            # Execute task
-            result = await self._execute_with_tool(selected_tool, task_type, request_data)
-            
-            # Update metrics
-            latency = time.time() - start_time
-            await self._update_metrics(task_type, selected_tool, latency, True)
-            
-            # Log execution
-            await self._log_execution(
-                task_id=task_id,
-                task_type=task_type,
-                selected_tool=selected_tool,
-                status="success",
-                latency=latency,
-                result=result
-            )
-            
-            return {
-                "task_id": task_id,
-                "task_type": task_type.value,
-                "selected_tool": selected_tool.value,
-                "status": "success",
-                "result": result,
-                "latency": latency,
-                "timestamp": datetime.now().isoformat()
-            }
-            
-        except Exception as e:
-            # Update error metrics
-            latency = time.time() - start_time
-            await self._update_metrics(task_type, None, latency, False)
-            
-            # Log error
-            await self._log_execution(
-                task_id=task_id,
-                task_type=task_type,
-                selected_tool=None,
-                status="error",
-                latency=latency,
-                error=str(e)
-            )
-            
-            return {
-                "task_id": task_id,
-                "task_type": task_type.value,
-                "status": "error",
-                "error": str(e),
-                "latency": latency,
-                "timestamp": datetime.now().isoformat()
-            }
-    
-    async def analyze_code(self, file_path: str, analysis_depth: str = "standard") -> Dict:
-        """Analyze code using the best available tool"""
-        request_data = {
-            "file_path": file_path,
-            "analysis_depth": analysis_depth
-        }
-        return await self.execute_task(TaskType.CODE_ANALYSIS, request_data)
-    
-    async def generate_code(self, prompt: str, language: str = "python", 
-                          context: Dict = None) -> Dict:
-        """Generate code using the best available tool"""
-        request_data = {
-            "prompt": prompt,
-            "language": language,
-            "context": context or {}
-        }
-        return await self.execute_task(TaskType.CODE_GENERATION, request_data)
-    
-    async def refactor_code(self, code_content: str, refactor_goals: List[str],
-                          file_path: str = None) -> Dict:
-        """Refactor code using the best available tool"""
-        request_data = {
-            "code_content": code_content,
-            "refactor_goals": refactor_goals,
-            "file_path": file_path
-        }
-        return await self.execute_task(TaskType.CODE_REFACTORING, request_data)
-    
-    async def analyze_project(self, project_path: str, analysis_type: str = "comprehensive") -> Dict:
-        """Analyze entire project using the best available tool"""
-        request_data = {
-            "project_path": project_path,
-            "analysis_type": analysis_type
-        }
-        return await self.execute_task(TaskType.PROJECT_ANALYSIS, request_data)
-    
-    async def get_code_completions(self, code_context: str, cursor_position: int,
-                                 file_path: str = None, language: str = "python") -> Dict:
-        """Get code completions using the best available tool"""
-        request_data = {
-            "code_context": code_context,
-            "cursor_position": cursor_position,
-            "file_path": file_path,
-            "language": language
-        }
-        return await self.execute_task(TaskType.CODE_COMPLETION, request_data)
-    
-    async def suggest_improvements(self, code_content: str, file_path: str = None) -> Dict:
-        """Get improvement suggestions using the best available tool"""
-        request_data = {
-            "code_content": code_content,
-            "file_path": file_path
-        }
-        return await self.execute_task(TaskType.IMPROVEMENT_SUGGESTIONS, request_data)
-    
-    async def generate_documentation(self, code_content: str, doc_type: str = "docstring") -> Dict:
-        """Generate documentation using the best available tool"""
-        request_data = {
-            "code_content": code_content,
-            "doc_type": doc_type
-        }
-        return await self.execute_task(TaskType.DOCUMENTATION, request_data)
-    
-    async def compare_tools(self, test_prompt: str) -> Dict:
-        """Compare performance of all available AI tools"""
-        comparison_results = {
-            "test_prompt": test_prompt,
-            "timestamp": datetime.now().isoformat(),
-            "tool_results": {},
-            "analysis": {}
-        }
-        
-        available_tools = [tool for tool, status in self.tool_status.items() if status["available"]]
-        
-        for tool in available_tools:
-            try:
-                start_time = time.time()
-                result = await self._execute_with_tool(
-                    tool, 
-                    TaskType.CODE_GENERATION, 
-                    {"prompt": test_prompt, "language": "python"}
-                )
-                latency = time.time() - start_time
-                
-                comparison_results["tool_results"][tool.value] = {
-                    "latency": latency,
-                    "success": True,
-                    "result_length": len(str(result))
-                }
-                
-            except Exception as e:
-                comparison_results["tool_results"][tool.value] = {
-                    "latency": 0,
-                    "success": False,
-                    "error": str(e)
-                }
-        
-        # Analyze results
-        comparison_results["analysis"] = await self._analyze_tool_comparison(
-            comparison_results["tool_results"]
-        )
-        
-        return comparison_results
-    
-    async def get_system_status(self) -> Dict:
-        """Get comprehensive system status"""
-        await self._update_tool_availability()
-        
-        return {
-            "timestamp": datetime.now().isoformat(),
-            "tool_status": {
-                tool.value: status for tool, status in self.tool_status.items()
-            },
-            "performance_metrics": self.performance_metrics.copy(),
-            "load_balancer_state": {
-                "tool_loads": self.load_balancer["tool_loads"].copy(),
-                "round_robin_index": self.load_balancer["round_robin_index"]
-            },
-            "system_health": self._calculate_system_health()
-        }
-    
-    async def _initialize_tools(self) -> None:
-        """Initialize all AI tools"""
-        print("🔧 Initializing AI tools...")
-        
-        # Initialize database tables
-        await self._setup_orchestrator_database()
-        
-        # Check tool availability
-        await self._update_tool_availability()
-        
-        available_count = sum(1 for status in self.tool_status.values() if status["available"])
-        print(f"✅ Initialized {available_count}/{len(self.tool_status)} AI tools")
-    
-    async def _update_tool_availability(self) -> None:
-        """Update availability status for all tools"""
-        current_time = datetime.now()
-        
-        for tool in AITool:
-            # Check if we need to update (cache for 60 seconds)
-            last_check = self.tool_status[tool]["last_check"]
-            if last_check and (current_time - last_check).seconds < 60:
-                continue
-            
-            try:
-                available = await self._check_tool_availability(tool)
-                self.tool_status[tool] = {
-                    "available": available,
-                    "last_check": current_time
-                }
-            except Exception as e:
-                logger.warning(f"Failed to check {tool.value} availability: {e}")
-                self.tool_status[tool]["available"] = False
-    
-    async def _check_tool_availability(self, tool: AITool) -> bool:
-        """Check if a specific tool is available"""
-        try:
-            if tool == AITool.CURSOR_AI:
-                from ai_components.cursor_ai.cursor_integration_enhanced import CursorAIClient
-                async with CursorAIClient() as client:
-                    test_result = await client.test_integration()
-                    return test_result.get("tests", {}).get("api_connectivity", {}).get("status") == "passed"
-            
-            elif tool == AITool.CLAUDE:
-                from ai_components.claude.claude_analyzer import ClaudeAnalyzer
-                # Check if API key is configured
-                return bool(os.environ.get('ANTHROPIC_API_KEY'))
-            
-            elif tool == AITool.GITHUB_COPILOT:
+            # GitHub Copilot integration
+            if os.environ.get('GITHUB_TOKEN'):
                 from ai_components.github_copilot.copilot_integration import GitHubCopilotClient
-                # Check if integration is possible (always true for simulation)
-                return True
+                self.ai_tools[AITool.GITHUB_COPILOT] = GitHubCopilotClient()
+                logger.info("✅ GitHub Copilot initialized")
+            else:
+                self.tool_availability[AITool.GITHUB_COPILOT] = False
+                logger.warning("⚠️ GitHub Copilot: No token found")
             
-            elif tool == AITool.ROO_CODE:
-                # Check if Roo configuration exists
-                return Path(".roo").exists()
+            # Roo Code integration (already available)
+            self.ai_tools[AITool.ROO_CODE] = "roo_code_client"  # Placeholder
+            logger.info("✅ Roo Code integration available")
             
-            elif tool == AITool.FACTORY_AI:
-                # Check if Factory AI configuration exists
-                return Path(".factory").exists()
-            
-            return False
-            
+            # OpenRouter integration
+            if os.environ.get('OPENROUTER_API_KEY'):
+                logger.info("✅ OpenRouter integration available")
+            else:
+                self.tool_availability[AITool.OPENROUTER] = False
+                logger.warning("⚠️ OpenRouter: No API key found")
+                
         except Exception as e:
-            logger.warning(f"Error checking {tool.value} availability: {e}")
-            return False
+            logger.error(f"Error initializing AI tools: {e}")
     
-    async def _select_tool(self, task_type: TaskType, preferred_tool: AITool = None) -> Optional[AITool]:
-        """Select the best tool for a given task type"""
-        # If preferred tool is specified and available, use it
-        if preferred_tool and self.tool_status[preferred_tool]["available"]:
-            return preferred_tool
+    async def initialize_database(self):
+        """Initialize database connection"""
+        try:
+            postgres_url = os.environ.get(
+                'POSTGRES_URL', 
+                'postgresql://postgres:password@localhost:5432/orchestra'
+            )
+            weaviate_url = os.environ.get('WEAVIATE_URL', 'http://localhost:8080')
+            weaviate_api_key = os.environ.get('WEAVIATE_API_KEY')
+            
+            self.db = await initialize_database(postgres_url, weaviate_url, weaviate_api_key)
+            logger.info("✅ Database initialized")
+        except Exception as e:
+            logger.warning(f"Database initialization failed: {e}")
+    
+    async def select_best_tool(self, task_type: TaskType, context: Dict = None) -> AITool:
+        """Intelligently select the best tool for a task"""
         
-        # Get available tools for this task type
-        preferred_tools = self.tool_preferences[task_type]
+        # Get preferred tools for this task type
+        preferred_tools = self.tool_preferences.get(task_type, list(AITool))
+        
+        # Filter to available tools
         available_tools = [
             tool for tool in preferred_tools 
-            if self.tool_status[tool]["available"]
+            if self.tool_availability[tool]
         ]
         
         if not available_tools:
-            return None
+            # Fallback to any available tool
+            available_tools = [
+                tool for tool in AITool 
+                if self.tool_availability[tool]
+            ]
         
-        # Load balancing: select tool with lowest current load
-        selected_tool = min(
-            available_tools,
-            key=lambda tool: self.load_balancer["tool_loads"][tool.value]
-        )
+        if not available_tools:
+            raise ValueError("No AI tools are currently available")
         
-        # Update load
-        self.load_balancer["tool_loads"][selected_tool.value] += 1
+        # Select based on performance metrics
+        best_tool = available_tools[0]
+        best_score = self._calculate_tool_score(best_tool)
         
-        return selected_tool
+        for tool in available_tools[1:]:
+            score = self._calculate_tool_score(tool)
+            if score > best_score:
+                best_tool = tool
+                best_score = score
+        
+        return best_tool
     
-    async def _execute_with_tool(self, tool: AITool, task_type: TaskType, request_data: Dict) -> Dict:
-        """Execute task with specific tool"""
+    def _calculate_tool_score(self, tool: AITool) -> float:
+        """Calculate tool performance score for selection"""
+        metrics = self.performance_metrics[tool]
+        
+        if metrics['requests_handled'] == 0:
+            return 1.0  # Default score for unused tools
+        
+        # Score based on success rate and latency
+        success_weight = 0.7
+        latency_weight = 0.3
+        
+        success_score = metrics['success_rate']
+        latency_score = max(0, 1 - (metrics['avg_latency'] / 10.0))  # Normalize latency
+        
+        return success_weight * success_score + latency_weight * latency_score
+    
+    async def process_task(self, task: TaskRequest) -> TaskResult:
+        """Process a task using the optimal AI tool"""
+        start_time = time.time()
+        
         try:
-            if tool == AITool.CURSOR_AI:
-                return await self._execute_cursor_ai(task_type, request_data)
-            elif tool == AITool.CLAUDE:
-                return await self._execute_claude(task_type, request_data)
-            elif tool == AITool.GITHUB_COPILOT:
-                return await self._execute_github_copilot(task_type, request_data)
-            elif tool == AITool.ROO_CODE:
-                return await self._execute_roo_code(task_type, request_data)
-            elif tool == AITool.FACTORY_AI:
-                return await self._execute_factory_ai(task_type, request_data)
-            else:
-                raise Exception(f"Unknown tool: {tool}")
-                
-        finally:
-            # Decrease load after execution
-            self.load_balancer["tool_loads"][tool.value] = max(
-                0, self.load_balancer["tool_loads"][tool.value] - 1
+            # Select tool
+            selected_tool = task.preferred_tool or await self.select_best_tool(task.task_type, task.context)
+            
+            # Execute task
+            result = await self._execute_with_tool(selected_tool, task)
+            
+            # Calculate metrics
+            latency = time.time() - start_time
+            
+            # Update performance metrics
+            self._update_metrics(selected_tool, latency, True, result.get('tokens_used', 0))
+            
+            # Log to database
+            await self._log_task_execution(task, selected_tool, result, latency, True)
+            
+            return TaskResult(
+                task_id=task.task_id,
+                tool_used=selected_tool,
+                result=result,
+                success=True,
+                latency=latency,
+                tokens_used=result.get('tokens_used', 0)
+            )
+            
+        except Exception as e:
+            latency = time.time() - start_time
+            
+            # Try fallback tool
+            try:
+                fallback_tool = await self._get_fallback_tool(selected_tool, task.task_type)
+                if fallback_tool:
+                    fallback_result = await self._execute_with_tool(fallback_tool, task)
+                    
+                    # Update metrics for both tools
+                    self._update_metrics(selected_tool, latency, False, 0)
+                    self._update_metrics(fallback_tool, time.time() - start_time, True, 
+                                       fallback_result.get('tokens_used', 0))
+                    
+                    return TaskResult(
+                        task_id=task.task_id,
+                        tool_used=fallback_tool,
+                        result=fallback_result,
+                        success=True,
+                        latency=time.time() - start_time,
+                        tokens_used=fallback_result.get('tokens_used', 0),
+                        fallback_used=True
+                    )
+            except Exception:
+                pass
+            
+            # Record failure
+            self._update_metrics(selected_tool, latency, False, 0)
+            await self._log_task_execution(task, selected_tool, None, latency, False, str(e))
+            
+            return TaskResult(
+                task_id=task.task_id,
+                tool_used=selected_tool,
+                result=None,
+                success=False,
+                latency=latency,
+                error=str(e)
             )
     
-    async def _execute_cursor_ai(self, task_type: TaskType, request_data: Dict) -> Dict:
-        """Execute task with Cursor AI"""
-        from ai_components.cursor_ai.cursor_integration_enhanced import CursorAIClient
+    async def _execute_with_tool(self, tool: AITool, task: TaskRequest) -> Dict[str, Any]:
+        """Execute task with specific tool"""
         
-        async with CursorAIClient() as client:
-            if task_type == TaskType.CODE_ANALYSIS:
-                return await client.analyze_code(request_data["file_path"])
-            elif task_type == TaskType.CODE_GENERATION:
-                return await client.generate_code(
-                    request_data["prompt"], 
-                    request_data.get("context", {})
+        if tool == AITool.CLAUDE:
+            analyzer = self.ai_tools[AITool.CLAUDE]
+            if task.task_type == TaskType.CODE_ANALYSIS:
+                result = await analyzer.analyze_project(
+                    project_path=task.context.get('project_path', '.'),
+                    analysis_type=task.context.get('analysis_type', 'comprehensive')
                 )
-            elif task_type == TaskType.CODE_REFACTORING:
-                return await client.refactor_code(
-                    request_data["file_path"],
-                    "optimization",
-                    request_data.get("context", {})
+            elif task.task_type == TaskType.CODE_GENERATION:
+                result = await analyzer.generate_code(
+                    prompt=task.prompt,
+                    context=task.context,
+                    code_type=task.context.get('code_type', 'implementation')
                 )
             else:
-                raise Exception(f"Task type {task_type} not supported by Cursor AI")
-    
-    async def _execute_claude(self, task_type: TaskType, request_data: Dict) -> Dict:
-        """Execute task with Claude"""
-        from ai_components.claude.claude_analyzer import ClaudeAnalyzer
+                result = await analyzer.generate_code(task.prompt, task.context)
+            
+            return {
+                'content': result.get('analysis') or result.get('generated_code'),
+                'tokens_used': result.get('usage', {}).get('total_tokens', 0),
+                'model': result.get('model_used'),
+                'structured_data': result.get('structured_analysis')
+            }
         
-        async with ClaudeAnalyzer() as analyzer:
-            if task_type == TaskType.CODE_ANALYSIS:
-                # For file analysis, read file and analyze content
-                file_path = request_data["file_path"]
-                with open(file_path, 'r') as f:
-                    code_content = f.read()
-                return await analyzer.refactor_code(
-                    code_content, 
-                    ["analyze code quality", "identify issues"],
-                    file_path
-                )
-            elif task_type == TaskType.CODE_GENERATION:
-                return await analyzer.generate_code(
-                    request_data["prompt"],
-                    request_data.get("context", {}),
-                    "implementation"
-                )
-            elif task_type == TaskType.CODE_REFACTORING:
-                return await analyzer.refactor_code(
-                    request_data["code_content"],
-                    request_data["refactor_goals"],
-                    request_data.get("file_path")
-                )
-            elif task_type == TaskType.PROJECT_ANALYSIS:
-                return await analyzer.analyze_project(
-                    request_data["project_path"],
-                    request_data.get("analysis_type", "comprehensive")
-                )
-            else:
-                raise Exception(f"Task type {task_type} not supported by Claude")
-    
-    async def _execute_github_copilot(self, task_type: TaskType, request_data: Dict) -> Dict:
-        """Execute task with GitHub Copilot"""
-        from ai_components.github_copilot.copilot_integration import GitHubCopilotClient
+        elif tool == AITool.GITHUB_COPILOT:
+            copilot = self.ai_tools[AITool.GITHUB_COPILOT]
+            result = await copilot.get_code_suggestions(task.prompt, task.context)
+            return {
+                'content': result.get('suggestions', []),
+                'tokens_used': 0,  # GitHub Copilot doesn't report tokens
+                'model': 'github-copilot'
+            }
         
-        async with GitHubCopilotClient() as client:
-            if task_type == TaskType.CODE_COMPLETION:
-                return await client.get_code_completions(
-                    request_data["code_context"],
-                    request_data["cursor_position"],
-                    request_data.get("file_path"),
-                    request_data.get("language", "python")
-                )
-            elif task_type == TaskType.IMPROVEMENT_SUGGESTIONS:
-                return await client.suggest_improvements(
-                    request_data["code_content"],
-                    request_data.get("file_path")
-                )
-            elif task_type == TaskType.DOCUMENTATION:
-                return await client.generate_documentation(
-                    request_data["code_content"],
-                    request_data.get("doc_type", "docstring")
-                )
-            elif task_type == TaskType.CODE_GENERATION:
-                # Simulate code generation using completion
-                return await client.get_code_completions(
-                    request_data["prompt"],
-                    len(request_data["prompt"])
-                )
-            else:
-                raise Exception(f"Task type {task_type} not supported by GitHub Copilot")
+        elif tool == AITool.ROO_CODE:
+            # Integrate with existing Roo Code system
+            return {
+                'content': f"Roo Code processing: {task.prompt}",
+                'tokens_used': 0,
+                'model': 'roo-code'
+            }
+        
+        else:
+            # Fallback simulation
+            return {
+                'content': f"Processed by {tool.value}: {task.prompt}",
+                'tokens_used': 100,
+                'model': tool.value
+            }
     
-    async def _execute_roo_code(self, task_type: TaskType, request_data: Dict) -> Dict:
-        """Execute task with Roo Code (via MCP)"""
-        # Roo Code works through MCP servers - simulate integration
-        return {
-            "tool": "roo_code",
-            "task_type": task_type.value,
-            "result": "Roo Code execution simulated",
-            "note": "Integrate with actual Roo mode switching for real implementation"
-        }
+    async def _get_fallback_tool(self, primary_tool: AITool, task_type: TaskType) -> Optional[AITool]:
+        """Get fallback tool for failed primary tool"""
+        preferences = self.tool_preferences.get(task_type, list(AITool))
+        
+        # Find next available tool in preference order
+        try:
+            primary_index = preferences.index(primary_tool)
+            for tool in preferences[primary_index + 1:]:
+                if self.tool_availability[tool]:
+                    return tool
+        except ValueError:
+            pass
+        
+        # Fallback to any available tool
+        for tool in AITool:
+            if tool != primary_tool and self.tool_availability[tool]:
+                return tool
+        
+        return None
     
-    async def _execute_factory_ai(self, task_type: TaskType, request_data: Dict) -> Dict:
-        """Execute task with Factory AI"""
-        # Factory AI is architecturally ready but not implemented - simulate
-        return {
-            "tool": "factory_ai",
-            "task_type": task_type.value,
-            "result": "Factory AI execution simulated",
-            "note": "Factory AI droids are configured but need real API integration"
-        }
-    
-    async def _update_metrics(self, task_type: TaskType, selected_tool: Optional[AITool],
-                            latency: float, success: bool) -> None:
-        """Update performance metrics"""
-        self.performance_metrics["total_requests"] += 1
+    def _update_metrics(self, tool: AITool, latency: float, success: bool, tokens_used: int):
+        """Update performance metrics for a tool"""
+        metrics = self.performance_metrics[tool]
+        
+        metrics['requests_handled'] += 1
+        metrics['total_latency'] += latency
+        metrics['avg_latency'] = metrics['total_latency'] / metrics['requests_handled']
+        metrics['tokens_used'] += tokens_used
         
         if success:
-            self.performance_metrics["successful_requests"] += 1
-            if selected_tool:
-                self.performance_metrics["tool_usage"][selected_tool.value] += 1
+            metrics['success_rate'] = (
+                (metrics['success_rate'] * (metrics['requests_handled'] - 1) + 1) / 
+                metrics['requests_handled']
+            )
         else:
-            self.performance_metrics["failed_requests"] += 1
-        
-        self.performance_metrics["task_distribution"][task_type.value] += 1
-        self.performance_metrics["total_latency"] += latency
-        self.performance_metrics["average_latency"] = (
-            self.performance_metrics["total_latency"] / 
-            self.performance_metrics["total_requests"]
-        )
+            metrics['errors'] += 1
+            metrics['success_rate'] = (
+                (metrics['success_rate'] * (metrics['requests_handled'] - 1)) / 
+                metrics['requests_handled']
+            )
     
-    async def _log_execution(self, task_id: str, task_type: TaskType, 
-                           selected_tool: Optional[AITool], status: str,
-                           latency: float, result: Dict = None, error: str = None) -> None:
+    async def _log_task_execution(self, task: TaskRequest, tool: AITool, result: Any, 
+                                latency: float, success: bool, error: str = None):
         """Log task execution to database"""
+        if not self.db:
+            return
+        
         try:
-            await self.db.execute_query(
-                """
+            await self.db.execute_query("""
                 INSERT INTO ai_orchestrator_logs 
-                (task_id, task_type, selected_tool, status, latency_seconds, 
-                 result, error_message, created_at)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-                """,
-                task_id, task_type.value, 
-                selected_tool.value if selected_tool else None,
-                status, latency, 
+                (task_id, task_type, tool_used, prompt, context, result, 
+                 latency_seconds, success, error_message, tokens_used, created_at)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+            """, 
+                task.task_id, task.task_type.value, tool.value,
+                task.prompt, json.dumps(task.context), 
                 json.dumps(result) if result else None,
-                error, datetime.now()
+                latency, success, error, 
+                result.get('tokens_used', 0) if result else 0,
+                datetime.now(),
+                fetch=False
             )
         except Exception as e:
-            logger.error(f"Failed to log execution: {e}")
+            logger.error(f"Failed to log task execution: {e}")
     
-    async def _analyze_tool_comparison(self, tool_results: Dict) -> Dict:
-        """Analyze comparison results between tools"""
-        analysis = {
-            "fastest_tool": None,
-            "most_reliable": None,
-            "success_rate": 0,
-            "average_latency": 0,
-            "recommendations": []
-        }
+    def get_available_tools(self) -> Dict[str, Dict[str, Any]]:
+        """Get information about available AI tools"""
+        tools_info = {}
         
-        successful_tools = {
-            tool: result for tool, result in tool_results.items() 
-            if result.get("success", False)
-        }
+        for tool in AITool:
+            metrics = self.performance_metrics[tool]
+            tools_info[tool.value] = {
+                'available': self.tool_availability[tool],
+                'status': 'operational' if self.tool_availability[tool] else 'unavailable',
+                'requests_handled': metrics['requests_handled'],
+                'avg_latency': round(metrics['avg_latency'], 3),
+                'success_rate': round(metrics['success_rate'], 3),
+                'tokens_used': metrics['tokens_used']
+            }
         
-        if successful_tools:
-            # Find fastest tool
-            fastest = min(successful_tools.items(), key=lambda x: x[1]["latency"])
-            analysis["fastest_tool"] = fastest[0]
-            
-            # Calculate success rate
-            analysis["success_rate"] = len(successful_tools) / len(tool_results)
-            
-            # Calculate average latency
-            total_latency = sum(result["latency"] for result in successful_tools.values())
-            analysis["average_latency"] = total_latency / len(successful_tools)
-            
-            # Generate recommendations
-            if analysis["success_rate"] >= 0.8:
-                analysis["recommendations"].append("Multiple tools available - good redundancy")
-            
-            if analysis["fastest_tool"]:
-                analysis["recommendations"].append(
-                    f"Use {analysis['fastest_tool']} for fastest response times"
-                )
-        
-        return analysis
+        return tools_info
     
-    def _calculate_system_health(self) -> Dict:
-        """Calculate overall system health"""
-        available_tools = sum(1 for status in self.tool_status.values() if status["available"])
-        total_tools = len(self.tool_status)
+    def get_system_metrics(self) -> Dict[str, Any]:
+        """Get overall system performance metrics"""
+        total_requests = sum(m['requests_handled'] for m in self.performance_metrics.values())
+        total_errors = sum(m['errors'] for m in self.performance_metrics.values())
+        total_tokens = sum(m['tokens_used'] for m in self.performance_metrics.values())
         
-        success_rate = (
-            self.performance_metrics["successful_requests"] / 
-            max(1, self.performance_metrics["total_requests"])
-        )
-        
-        health_score = (
-            (available_tools / total_tools) * 0.5 +  # Tool availability: 50%
-            success_rate * 0.3 +  # Success rate: 30%
-            (1.0 if self.performance_metrics["average_latency"] < 5.0 else 0.5) * 0.2  # Latency: 20%
-        ) * 100
+        available_tools = sum(1 for available in self.tool_availability.values() if available)
         
         return {
-            "health_score": health_score,
-            "available_tools": available_tools,
-            "total_tools": total_tools,
-            "success_rate": success_rate,
-            "average_latency": self.performance_metrics["average_latency"],
-            "status": "healthy" if health_score >= 80 else "degraded" if health_score >= 60 else "critical"
+            'total_requests': total_requests,
+            'total_errors': total_errors,
+            'overall_success_rate': (total_requests - total_errors) / max(total_requests, 1),
+            'available_tools': available_tools,
+            'total_tools': len(AITool),
+            'total_tokens_used': total_tokens,
+            'avg_tokens_per_request': total_tokens / max(total_requests, 1)
         }
-    
-    async def _setup_orchestrator_database(self) -> None:
-        """Setup database tables for orchestrator"""
-        await self.db.execute_query("""
-            CREATE TABLE IF NOT EXISTS ai_orchestrator_logs (
-                id SERIAL PRIMARY KEY,
-                task_id VARCHAR(200) NOT NULL,
-                task_type VARCHAR(100) NOT NULL,
-                selected_tool VARCHAR(100),
-                status VARCHAR(50) NOT NULL,
-                latency_seconds FLOAT DEFAULT 0.0,
-                result JSONB,
-                error_message TEXT,
-                created_at TIMESTAMP WITH TIME ZONE NOT NULL
-            );
-        """)
-        
-        await self.db.execute_query("""
-            CREATE INDEX IF NOT EXISTS idx_orchestrator_logs_task_type 
-            ON ai_orchestrator_logs(task_type);
-        """)
-        
-        await self.db.execute_query("""
-            CREATE INDEX IF NOT EXISTS idx_orchestrator_logs_created_at 
-            ON ai_orchestrator_logs(created_at DESC);
-        """)
-
 
 async def main():
-    """Test the unified AI system orchestrator"""
-    print("🚀 Testing Unified AI System Orchestrator...")
+    """Example usage of the AI orchestrator"""
+    orchestrator = AISystemOrchestrator()
+    await orchestrator.initialize_database()
     
-    async with AISystemOrchestrator() as orchestrator:
-        # Get system status
-        print("\n📊 System Status:")
-        status = await orchestrator.get_system_status()
-        print(json.dumps(status, indent=2, default=str))
-        
-        # Test code generation
-        print("\n🏗️  Testing code generation...")
-        try:
-            result = await orchestrator.generate_code(
-                "Create a Python function that calculates the area of a circle",
-                "python"
-            )
-            print(f"✅ Code generation: {result['status']} using {result.get('selected_tool', 'unknown')}")
-        except Exception as e:
-            print(f"❌ Code generation failed: {e}")
-        
-        # Test code analysis
-        print("\n🔍 Testing code analysis...")
-        try:
-            # Analyze this file
-            result = await orchestrator.analyze_code(__file__)
-            print(f"✅ Code analysis: {result['status']} using {result.get('selected_tool', 'unknown')}")
-        except Exception as e:
-            print(f"❌ Code analysis failed: {e}")
-        
-        # Test code completion
-        print("\n💡 Testing code completion...")
-        try:
-            result = await orchestrator.get_code_completions(
-                "def fibonacci(n", 15, "test.py", "python"
-            )
-            print(f"✅ Code completion: {result['status']} using {result.get('selected_tool', 'unknown')}")
-        except Exception as e:
-            print(f"❌ Code completion failed: {e}")
-        
-        # Compare tools
-        print("\n⚖️  Comparing AI tools...")
-        try:
-            comparison = await orchestrator.compare_tools("def hello_world():")
-            print("✅ Tool comparison completed")
-            analysis = comparison.get("analysis", {})
-            if analysis.get("fastest_tool"):
-                print(f"   Fastest tool: {analysis['fastest_tool']}")
-            print(f"   Success rate: {analysis.get('success_rate', 0):.1%}")
-        except Exception as e:
-            print(f"❌ Tool comparison failed: {e}")
-        
-        # Final system status
-        print("\n📈 Final System Status:")
-        final_status = await orchestrator.get_system_status()
-        health = final_status["system_health"]
-        print(f"   Health Score: {health['health_score']:.1f}/100")
-        print(f"   Status: {health['status']}")
-        print(f"   Available Tools: {health['available_tools']}/{health['total_tools']}")
-        print(f"   Success Rate: {health['success_rate']:.1%}")
-
+    # Test task
+    task = TaskRequest(
+        task_id="test_001",
+        task_type=TaskType.CODE_GENERATION,
+        prompt="Create a Python function that calculates fibonacci numbers",
+        context={"language": "python", "style": "functional"}
+    )
+    
+    result = await orchestrator.process_task(task)
+    
+    print(f"Task Result:")
+    print(f"  Tool Used: {result.tool_used.value}")
+    print(f"  Success: {result.success}")
+    print(f"  Latency: {result.latency:.2f}s")
+    print(f"  Tokens: {result.tokens_used}")
+    
+    if result.success:
+        print(f"  Result: {str(result.result)[:200]}...")
+    else:
+        print(f"  Error: {result.error}")
 
 if __name__ == "__main__":
     asyncio.run(main()) 

@@ -1,0 +1,88 @@
+name: Domain Infrastructure Deployment
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'config/domains/**'
+      - 'infrastructure/domain_separation.py'
+      - 'scripts/domain_setup/**'
+  workflow_dispatch:
+
+env:
+  PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+  WCS_API_KEY: ${{ secrets.WCS_API_KEY }}
+  AIRBYTE_URL: ${{ secrets.AIRBYTE_URL }}
+
+jobs:
+  provision-weaviate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install dependencies
+        run: |
+          pip install requests
+      
+      - name: Provision Weaviate Clusters
+        run: |
+          python scripts/domain_setup/provision_weaviate_clusters.py
+      
+      - name: Upload cluster configs
+        uses: actions/upload-artifact@v3
+        with:
+          name: weaviate-configs
+          path: config/domains/*_weaviate.json
+
+  configure-airbyte:
+    runs-on: ubuntu-latest
+    needs: provision-weaviate
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install dependencies
+        run: |
+          pip install requests
+      
+      - name: Configure Airbyte Pipelines
+        run: |
+          python scripts/domain_setup/configure_airbyte_pipelines.py
+
+  deploy-infrastructure:
+    runs-on: ubuntu-latest
+    needs: [provision-weaviate, configure-airbyte]
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Configure Pulumi
+        uses: pulumi/actions@v3
+        with:
+          command: up
+          stack-name: production
+          work-dir: ./infrastructure
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+  validate-deployment:
+    runs-on: ubuntu-latest
+    needs: deploy-infrastructure
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Validate Domain Endpoints
+        run: |
+          # Test each domain endpoint
+          for domain in personal payready paragonrx; do
+            echo "Testing $domain domain..."
+            curl -f https://api.orchestra.ai/$domain/health || exit 1
+          done
