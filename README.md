@@ -1,150 +1,73 @@
-# Orchestra AI - Multi-Agent System
+# AI Orchestra
 
-A sophisticated multi-agent AI system built with Python, featuring autonomous agents, workflow orchestration, and advanced memory management.
+## Quick Start
 
-## 🏗️ Architecture
+1. **SSH to Vultr server**:
+   ```bash
+   ssh root@45.32.69.157
+   cd /root/orchestra-main
+   ```
 
-- **Multi-Agent System** with specialized agents for different tasks
-- **Layered Memory** using PostgreSQL and Weaviate
-- **Natural Language Interface** for intuitive interaction
-- **MCP Integration** for tool discovery and execution
-- **Workflow Orchestration** for complex task automation
+2. **Code directly on Vultr**:
+   - Edit files on the server
+   - Test changes locally on the server
+   - Commit and push from the server
 
-## 🗄️ Database Architecture
+3. **Deploy changes**:
+   ```bash
+   ./deploy.sh
+   ```
+   Or push to GitHub for auto-deploy:
+   ```bash
+   git push origin main
+   ```
 
-Orchestra AI uses a simplified two-database approach:
+## Architecture
 
-### PostgreSQL (Relational Data)
-- **Agent configurations** and metadata
-- **Workflow definitions** and execution history
-- **Session management** (replacing Redis)
-- **Audit logs** and system events
-- **API keys** and access control
+- **API**: Python FastAPI backend
+- **Admin UI**: React frontend
+- **Database**: PostgreSQL
+- **Cache**: Redis
+- **Vector DB**: Weaviate
+- **Deployment**: Docker Compose on Vultr
+- **Domain**: cherry-ai.me
 
-### Weaviate (Vector & Semantic Data)
-- **Agent memories** and context
-- **Conversation history** with embeddings
-- **Knowledge base** for RAG operations
-- **Document storage** with semantic search
+## Essential Files
 
-## 🚀 Quick Start
+- `docker-compose.yml` - Service definitions
+- `nginx.conf` - Reverse proxy config
+- `.github/workflows/deploy.yml` - Auto-deployment
+- `deploy.sh` - Manual deployment script
+- `.env` - Environment variables (add your API keys)
 
-### Prerequisites
-- Python 3.10+
-- PostgreSQL 15+
-- Weaviate 1.20+
-- Virtual environment
+## Working on Vultr
 
-### Installation
-
+**Connect to server:**
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/orchestra-ai.git
-cd orchestra-ai
-
-# Create and activate virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements/base.txt
-
-# Setup PostgreSQL schema
-python scripts/setup_postgres_schema.py
-
-# Configure environment
-cp .env.template .env
-# Edit .env with your database credentials
+ssh root@45.32.69.157
+cd /root/orchestra-main
 ```
 
-### Configuration
-
-Set the following environment variables in your `.env` file:
-
+**Edit files:**
 ```bash
-# PostgreSQL
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-POSTGRES_DB=orchestra
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=your_password
-
-# Weaviate
-WEAVIATE_HOST=localhost
-WEAVIATE_PORT=8080
-WEAVIATE_API_KEY=your_api_key  # Optional
-
-# API Configuration
-API_URL=http://localhost:8080
-API_KEY=your_api_key
+nano file.py  # or vim, or install your preferred editor
 ```
 
-### Running the System
-
+**Deploy changes:**
 ```bash
-# Start the API server
-python -m uvicorn agent.app.main:app --reload
-
-# Start MCP servers (in separate terminals)
-python mcp_server/servers/orchestrator_server.py
-python mcp_server/servers/memory_server.py
-python mcp_server/servers/weaviate_direct_mcp_server.py
+./deploy.sh
 ```
 
-## 📚 Documentation
-
-- [Database Consolidation Plan](DATABASE_CONSOLIDATION_PLAN.md)
-- [AI Coding Agent Guide](AI_CODING_AGENT_GUIDE.md)
-- [MCP Integration Guide](MCP_AI_INTEGRATION_GUIDE.md)
-
-## 🛠️ Development
-
-### Project Structure
-```
-orchestra-ai/
-├── agent/                 # Main agent application
-├── mcp_server/           # MCP server implementations
-├── shared/               # Shared utilities and database clients
-│   └── database/         # PostgreSQL and Weaviate clients
-├── scripts/              # Utility scripts
-└── tests/                # Test suite
-```
-
-### Database Management
-
+**View logs:**
 ```bash
-# Setup PostgreSQL schema
-python scripts/setup_postgres_schema.py
-
-# Verify schema
-python scripts/setup_postgres_schema.py --verify-only
-
-# Reset database (caution!)
-python scripts/setup_postgres_schema.py --drop
+docker-compose logs -f
 ```
 
-## 🧪 Testing
+## Workflow
 
-```bash
-# Run tests
-pytest tests/
+1. SSH to Vultr server
+2. Edit code directly on server
+3. Run `./deploy.sh` to deploy
+4. Changes live at cherry-ai.me
 
-# Run specific test module
-pytest tests/test_database.py
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Persona Memory Architecture
-See [docs/PERSONA_MEMORY_ARCHITECTURE.md](docs/PERSONA_MEMORY_ARCHITECTURE.md) for the proposed four-layer memory system and routing approach.
-
+No local development. No Paperspace. Just Vultr.

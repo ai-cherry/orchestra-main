@@ -21,7 +21,7 @@ const formatLastRun = (lastRun: string) => {
   const diffMs = now.getTime() - date.getTime();
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMins / 60);
-  
+
   if (diffMins < 60) return `${diffMins}m ago`;
   if (diffHours < 24) return `${diffHours}h ago`;
   return date.toLocaleDateString();
@@ -49,7 +49,7 @@ export function DashboardPage() {
             console.error('Failed to parse auth data:', e);
           }
         }
-        
+
         const response = await fetch(`${window.location.origin}/api/metrics`, {
           headers: {
             'X-API-Key': token,
@@ -70,7 +70,7 @@ export function DashboardPage() {
   const activeAgents = agentsData.filter((agent: any) => agent.status === 'active').length;
   const totalAgents = agentsData.length;
   const totalTasksCompleted = agentsData.reduce((sum: number, agent: any) => sum + (agent.tasks_completed || 0), 0);
-  const avgMemoryUsage = agentsData.length > 0 
+  const avgMemoryUsage = agentsData.length > 0
     ? (agentsData.reduce((sum: number, agent: any) => sum + (agent.memory_usage || 0), 0) / agentsData.length).toFixed(1)
     : '0';
 
@@ -119,8 +119,8 @@ export function DashboardPage() {
     }
   };
 
-  const pageTitle = currentPersona 
-    ? `${currentPersona.name} Dashboard - ${currentPersona.domain}` 
+  const pageTitle = currentPersona
+    ? `${currentPersona.name} Dashboard - ${currentPersona.domain}`
     : `Welcome, ${userName}!`;
 
   return (
@@ -179,7 +179,7 @@ export function DashboardPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {agentsData.slice(0,4).map((agent: any) => (
+                  {agentsData.slice(0, 4).map((agent: any) => (
                     <TableRow key={agent.id}>
                       <TableCell className="font-medium">{agent.name}</TableCell>
                       <TableCell>{agent.type}</TableCell>
@@ -247,7 +247,7 @@ export function DashboardPage() {
             </Button>
             <Button asChild variant="secondary">
               <Link to="/workflows">
-                 <PlusCircle className="mr-2 h-4 w-4" /> View Workflows
+                <PlusCircle className="mr-2 h-4 w-4" /> View Workflows
               </Link>
             </Button>
             <Button asChild variant="secondary">
