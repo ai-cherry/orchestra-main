@@ -1,26 +1,18 @@
+# TODO: Consider adding connection pooling configuration
 """
-Metadata schema definitions for the AI Orchestration System.
-
-This module provides structured metadata schemas and validation utilities
-for different types of data stored in the memory system, ensuring consistency
-and proper data classification.
+Orchestra AI - Database Models
+This module contains Pydantic models for database entities.
 """
 
-import logging
-import re
+from typing import List, Dict, Any, Optional, Union
+from uuid import uuid4, UUID
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Set, Union
+from pydantic import BaseModel, Field, field_validator, model_validator
 
-# Configure logging
-logger = logging.getLogger(__name__)
-
-class MetadataValidationError(Exception):
+""
     """Exception raised when metadata validation fails."""
-
-class DevNoteType(str, Enum):
     """Types of development notes."""
-
     IMPLEMENTATION = "implementation"
     ARCHITECTURE = "architecture"
     ISSUE = "issue"
@@ -33,35 +25,14 @@ class DevNoteType(str, Enum):
 
 class PrivacyLevel(str, Enum):
     """Privacy levels for data classification."""
-
     STANDARD = "standard"
     SENSITIVE = "sensitive"
     CRITICAL = "critical"
 
 class MetadataValidator:
     """Base class for metadata validators."""
-
-    required_fields: Set[str] = set()
-    optional_fields: Set[str] = set()
-    field_validators: Dict[str, callable] = {}
-
-    @classmethod
-    def validate(cls, metadata: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Validate metadata against the schema.
-
-        Args:
-            metadata: Metadata to validate
-
-        Returns:
-            Validated and potentially modified metadata
-
-        Raises:
-            MetadataValidationError: If validation fails
         """
-        # Check required fields
-        missing_fields = cls.required_fields - set(metadata.keys())
-        if missing_fields:
             raise MetadataValidationError(f"Missing required metadata fields: {', '.join(missing_fields)}")
 
         # Check for unknown fields
@@ -77,8 +48,12 @@ class MetadataValidator:
                 # Run field-specific validation if available
                 if field in cls.field_validators:
                     try:
+
+                        pass
                         validated_metadata[field] = cls.field_validators[field](value)
-                    except Exception as e:
+                    except Exception:
+
+                        pass
                         raise MetadataValidationError(f"Validation failed for field '{field}': {e}")
                 else:
                     validated_metadata[field] = value
@@ -96,8 +71,6 @@ class MetadataValidator:
 
 class DevNoteMetadata(MetadataValidator):
     """Validator for development note metadata."""
-
-    required_fields = {
         "component",
         "note_type",
     }
@@ -133,10 +106,6 @@ class DevNoteMetadata(MetadataValidator):
     @staticmethod
     def validate_note_type(value: str) -> str:
         """Validate note type."""
-        try:
-            return DevNoteType(value).value
-        except ValueError:
-            valid_types = [t.value for t in DevNoteType]
             raise ValueError(f"Invalid note type: {value}. Must be one of: {', '.join(valid_types)}")
 
     @staticmethod
@@ -157,10 +126,6 @@ class DevNoteMetadata(MetadataValidator):
     @staticmethod
     def validate_expiration(value: Union[str, datetime]) -> datetime:
         """Validate and convert expiration date."""
-        if isinstance(value, str):
-            try:
-                return datetime.fromisoformat(value)
-            except ValueError:
                 raise ValueError("Expiration must be a valid ISO format date string")
         elif isinstance(value, datetime):
             return value
@@ -177,8 +142,6 @@ class DevNoteMetadata(MetadataValidator):
 
 class UserDataMetadata(MetadataValidator):
     """Validator for user data metadata."""
-
-    required_fields = {
         "data_classification",
     }
 
@@ -206,21 +169,12 @@ class UserDataMetadata(MetadataValidator):
     @staticmethod
     def default_retention_period() -> int:
         """Default retention period in days."""
-        return 90
-
-    @staticmethod
-    def validate_data_classification(value: str) -> str:
         """Validate data classification."""
-        try:
-            return PrivacyLevel(value).value
-        except ValueError:
-            valid_levels = [l.value for l in PrivacyLevel]
             raise ValueError(f"Invalid privacy level: {value}. Must be one of: {', '.join(valid_levels)}")
 
     @staticmethod
     def validate_retention_period(value: int) -> int:
         """Validate retention period."""
-        if not isinstance(value, int) or value < 1:
             raise ValueError("Retention period must be a positive integer")
         return value
 
@@ -234,10 +188,6 @@ class UserDataMetadata(MetadataValidator):
     @staticmethod
     def validate_expiration(value: Union[str, datetime]) -> datetime:
         """Validate and convert expiration date."""
-        if isinstance(value, str):
-            try:
-                return datetime.fromisoformat(value)
-            except ValueError:
                 raise ValueError("Expiration must be a valid ISO format date string")
         elif isinstance(value, datetime):
             return value
@@ -254,63 +204,13 @@ class UserDataMetadata(MetadataValidator):
 
 def validate_metadata(metadata: Dict[str, Any], validator_class: type) -> Dict[str, Any]:
     """
-    Validate metadata using the specified validator class.
-
-    Args:
-        metadata: Metadata to validate
-        validator_class: Validator class to use
-
-    Returns:
-        Validated metadata
-
-    Raises:
-        MetadataValidationError: If validation fails
     """
-    return validator_class.validate(metadata)
-
-def validate_dev_note_metadata(metadata: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Validate development note metadata.
-
-    Args:
-        metadata: Metadata to validate
-
-    Returns:
-        Validated metadata
-
-    Raises:
-        MetadataValidationError: If validation fails
     """
-    return validate_metadata(metadata, DevNoteMetadata)
-
-def validate_user_data_metadata(metadata: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Validate user data metadata.
-
-    Args:
-        metadata: Metadata to validate
-
-    Returns:
-        Validated metadata
-
-    Raises:
-        MetadataValidationError: If validation fails
     """
-    return validate_metadata(metadata, UserDataMetadata)
-
-def add_standard_metadata_fields(metadata: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Add standard metadata fields like timestamps and system version.
-
-    Args:
-        metadata: Original metadata
-
-    Returns:
-        Enhanced metadata with standard fields
     """
-    result = metadata.copy()
-
-    # Add created timestamp if not present
     if "created_at" not in result:
         result["created_at"] = datetime.utcnow()
 
@@ -319,10 +219,14 @@ def add_standard_metadata_fields(metadata: Dict[str, Any]) -> Dict[str, Any]:
 
     # Add system version if available
     try:
+
+        pass
         from packages.shared.src.version import VERSION
 
         result["system_version"] = VERSION
-    except ImportError:
+    except Exception:
+
+        pass
         result["system_version"] = "unknown"
 
     return result

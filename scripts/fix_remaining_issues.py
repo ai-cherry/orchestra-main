@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 """Fix remaining flake8 issues in the codebase."""
-
-import re
-from pathlib import Path
-
-def fix_file(file_path: Path, fixes: list) -> bool:
     """Apply fixes to a specific file."""
-    try:
         with open(file_path, "r") as f:
             content = f.read()
 
@@ -27,15 +21,14 @@ def fix_file(file_path: Path, fixes: list) -> bool:
                 f.write(content)
             return True
         return False
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"Error fixing {file_path}: {e}")
         return False
 
 def main():
     """Main function to fix issues."""
-
-    # Define fixes for each file
-    fixes = {
         "infra/components/monitoring_component.py": [
             ("regex", r"regex: r'([^']+)'", r"regex: r'\\1'"),
         ],

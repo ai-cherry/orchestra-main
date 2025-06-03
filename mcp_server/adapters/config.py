@@ -1,25 +1,7 @@
-"""Configuration for Factory AI MCP Server Adapters.
-
-This module provides configuration classes and utilities for setting up
-the adapter system with proper defaults and validation.
 """
-
-import os
-from dataclasses import dataclass, field
-from typing import Any, Dict, Optional
-
-@dataclass
-class CircuitBreakerConfig:
+"""
     """Configuration for circuit breaker functionality."""
-
-    failure_threshold: int = 5
-    recovery_timeout: int = 60
-    expected_exception: type[Exception] = Exception
-
-@dataclass
-class DroidConfig:
     """Base configuration for Factory AI droids."""
-
     api_key: str = field(default_factory=lambda: os.getenv("FACTORY_AI_API_KEY", ""))
     base_url: str = "https://api.factory.ai"
     circuit_breaker: CircuitBreakerConfig = field(default_factory=CircuitBreakerConfig)
@@ -29,18 +11,12 @@ class DroidConfig:
 @dataclass
 class ArchitectConfig(DroidConfig):
     """Configuration for Architect droid adapter."""
-
-    generate_diagrams: bool = True
-    include_iac: bool = True
     default_cloud_provider: str = "vultr"
     output_format: str = "pulumi"
 
 @dataclass
 class CodeConfig(DroidConfig):
     """Configuration for Code droid adapter."""
-
-    streaming: bool = True
-    chunk_size: int = 1024
     default_language: str = "python"
     optimization_level: str = "balanced"
     include_tests: bool = True
@@ -50,30 +26,18 @@ class CodeConfig(DroidConfig):
 @dataclass
 class DebugConfig(DroidConfig):
     """Configuration for Debug droid adapter."""
-
-    profiling_enabled: bool = True
-    max_stack_depth: int = 50
-    deep_analysis: bool = True
-    include_suggestions: bool = True
     profile_depth: str = "detailed"
     max_solutions: int = 5
 
 @dataclass
 class ReliabilityConfig(DroidConfig):
     """Configuration for Reliability droid adapter."""
-
-    alert_threshold: int = 5
-    auto_remediation: bool = True
-    correlation_window: int = 300
-    include_predictions: bool = True
     runbook_format: str = "markdown"
     severity_threshold: str = "medium"
 
 @dataclass
 class KnowledgeConfig(DroidConfig):
     """Configuration for Knowledge droid adapter."""
-
-    vector_dimension: int = 1536
     embedding_model: str = "text-embedding-ada-002"
     cache_embeddings: bool = True
     similarity_threshold: float = 0.7
@@ -90,28 +54,12 @@ class KnowledgeConfig(DroidConfig):
 @dataclass
 class AdapterSystemConfig:
     """Complete configuration for the adapter system."""
-
-    architect: ArchitectConfig = field(default_factory=ArchitectConfig)
-    code: CodeConfig = field(default_factory=CodeConfig)
-    debug: DebugConfig = field(default_factory=DebugConfig)
-    reliability: ReliabilityConfig = field(default_factory=ReliabilityConfig)
-    knowledge: KnowledgeConfig = field(default_factory=KnowledgeConfig)
-
-    # Global settings
-    enable_metrics: bool = True
-    metrics_port: int = 9090
     log_level: str = "INFO"
     health_check_interval: int = 60
 
 def load_config_from_env() -> AdapterSystemConfig:
-    """Load configuration from environment variables.
-
-    Returns:
-        Complete adapter system configuration
     """
-    config = AdapterSystemConfig()
-
-    # Load API key for all droids
+    """
     api_key = os.getenv("FACTORY_AI_API_KEY", "")
     if api_key:
         for droid_config in [
@@ -166,16 +114,8 @@ def load_config_from_env() -> AdapterSystemConfig:
     return config
 
 def validate_config(config: AdapterSystemConfig) -> None:
-    """Validate adapter configuration.
-
-    Args:
-        config: Configuration to validate
-
-    Raises:
-        ValueError: If configuration is invalid
     """
-    # Validate API keys
-    for name, droid_config in [
+    """
         ("architect", config.architect),
         ("code", config.code),
         ("debug", config.debug),
@@ -241,7 +181,7 @@ DEVELOPMENT_CONFIG = AdapterSystemConfig(
         max_results=5,
     ),
     enable_metrics=True,
-    log_level="DEBUG",
+    log_level="INFO",
 )
 
 PRODUCTION_CONFIG = AdapterSystemConfig(

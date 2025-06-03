@@ -1,35 +1,6 @@
 #!/usr/bin/env python3
 """
-Mode System Initializer for AI Orchestra Project
-
-This script initializes the enhanced mode system by setting up the necessary directories
-and configuration files. It also provides utilities for migrating from the previous
-mode system and setting up the recommended model assignments:
-
-- Gemini 1.5 Pro: architect, review, and orchestrator modes
-- GPT-4: code and debug modes
-- Claude 3 Opus: strategy, ask, and creative modes
-
-This ensures optimal performance and capabilities for each mode.
 """
-
-import argparse
-import logging
-from pathlib import Path
-
-import colorama
-import yaml
-from colorama import Fore, Style
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Initialize colorama
-colorama.init()
-
-# Constants
-PROJECT_ROOT = Path(__file__).parent.parent
 CONFIG_DIR = PROJECT_ROOT / "config"
 CORE_DIR = PROJECT_ROOT / "core"
 TOOLS_DIR = PROJECT_ROOT / "tools"
@@ -48,19 +19,17 @@ def print_header():
 
 def check_file_exists(path: Path) -> bool:
     """Check if a file exists and print its status."""
-    exists = path.exists()
     status = f"{Fore.GREEN}✓ Found" if exists else f"{Fore.RED}✗ Missing"
     print(f"{status}{Style.RESET_ALL} {path.relative_to(PROJECT_ROOT)}")
     return exists
 
 def create_directory(path: Path) -> bool:
     """Create a directory if it doesn't exist."""
-    if not path.exists():
-        try:
-            path.mkdir(parents=True, exist_ok=True)
             print(f"{Fore.GREEN}✓ Created directory{Style.RESET_ALL} {path.relative_to(PROJECT_ROOT)}")
             return True
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"{Fore.RED}✗ Failed to create directory{Style.RESET_ALL} {path.relative_to(PROJECT_ROOT)}: {str(e)}")
             return False
     else:
@@ -101,6 +70,9 @@ def initialize_mode_system() -> bool:
     print(f"\n{Fore.GREEN}{Style.BRIGHT}Initializing enhanced mode system:{Style.RESET_ALL}")
 
     try:
+
+
+        pass
         # Make sure the project structure is valid
         if not validate_project_structure():
             print(f"{Fore.RED}Aborting initialization due to invalid project structure{Style.RESET_ALL}")
@@ -134,7 +106,10 @@ def initialize_mode_system() -> bool:
 
         return False
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         print(f"{Fore.RED}Error initializing mode system: {str(e)}{Style.RESET_ALL}")
         return False
 
@@ -147,6 +122,9 @@ def verify_model_assignments():
         return
 
     try:
+
+
+        pass
         with open(MODE_DEFINITIONS_PATH, "r") as file:
             config = yaml.safe_load(file)
 
@@ -185,7 +163,10 @@ def verify_model_assignments():
             print(f"\n{Fore.YELLOW}Some model assignments need to be updated.{Style.RESET_ALL}")
             print(f"Please edit {MODE_DEFINITIONS_PATH.relative_to(PROJECT_ROOT)} to correct the assignments.")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         print(f"{Fore.RED}Error verifying model assignments: {str(e)}{Style.RESET_ALL}")
 
 def verify_enhanced_access_permissions():
@@ -197,6 +178,9 @@ def verify_enhanced_access_permissions():
         return
 
     try:
+
+
+        pass
         with open(MODE_DEFINITIONS_PATH, "r") as file:
             config = yaml.safe_load(file)
 
@@ -234,7 +218,10 @@ def verify_enhanced_access_permissions():
                 else:
                     print(f"{Fore.YELLOW}  Warning: Has write access but no file patterns defined{Style.RESET_ALL}")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         print(f"{Fore.RED}Error verifying access permissions: {str(e)}{Style.RESET_ALL}")
 
 def print_workflow_summary():
@@ -246,6 +233,9 @@ def print_workflow_summary():
         return
 
     try:
+
+
+        pass
         with open(MODE_DEFINITIONS_PATH, "r") as file:
             config = yaml.safe_load(file)
 
@@ -265,7 +255,10 @@ def print_workflow_summary():
             for i, step in enumerate(steps):
                 print(f"  {i+1}. [{step.get('mode', 'unknown')}] {step.get('task', 'No task')}")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         print(f"{Fore.RED}Error showing workflows: {str(e)}{Style.RESET_ALL}")
 
 def print_usage_instructions():
@@ -290,7 +283,6 @@ def print_usage_instructions():
 
 def main():
     """Main function for the mode system initializer."""
-    parser = argparse.ArgumentParser(
         description="AI Orchestra Mode System Initializer - Set up the enhanced mode system"
     )
 

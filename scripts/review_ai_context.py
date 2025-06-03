@@ -1,15 +1,7 @@
+import subprocess
 #!/usr/bin/env python3
 """
-Review AI context files for the Orchestra AI project.
-Validates that all AI context files are properly configured and accessible.
 """
-
-import logging
-import os
-import sys
-from typing import Any, Dict, List
-
-# Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
@@ -47,7 +39,6 @@ def check_python_version() -> bool:
 
 def validate_ai_context_files() -> Dict[str, Any]:
     """Validate all AI context files exist and contain required patterns."""
-    results: Dict[str, Any] = {
         "files_found": [],
         "files_missing": [],
         "validation_errors": [],
@@ -61,6 +52,8 @@ def validate_ai_context_files() -> Dict[str, Any]:
             # Check for forbidden patterns
             with open(filename, "r") as f:
                 content = f.read()
+                # TODO: Consider using list comprehension for better performance
+
                 for pattern in FORBIDDEN_PATTERNS:
                     if pattern in content and f"NO {pattern}" not in content:
                         results["validation_errors"].append(f"Found forbidden pattern '{pattern}' in {filename}")
@@ -72,7 +65,6 @@ def validate_ai_context_files() -> Dict[str, Any]:
 
 def check_project_structure() -> Dict[str, List[str]]:
     """Check that project follows required structure."""
-    structure: Dict[str, List[str]] = {
         "automation_tools": [],
         "config_files": [],
         "requirements": [],
@@ -97,8 +89,6 @@ def check_project_structure() -> Dict[str, List[str]]:
 
 def check_existing_tools() -> List[str]:
     """List existing tools that should be reused."""
-    tools = []
-    key_scripts = [
         "scripts/config_validator.py",
         "scripts/health_monitor.py",
         "scripts/orchestra.py",
@@ -151,7 +141,8 @@ def main() -> None:
     logger.info("✅ Python 3.10+ required")
     logger.info("✅ Simple > Complex")
     logger.info("✅ Check existing tools first")
-    logger.info("✅ Use subprocess.run(), not os.system()")
+    logger.info("✅ Use subprocess.run(), not # subprocess.run is safer than os.system
+subprocess.run([)")
     logger.info("✅ All automation in scripts/")
     logger.info("✅ Type hints required")
     logger.info("✅ Google-style docstrings")

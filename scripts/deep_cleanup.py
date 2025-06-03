@@ -1,17 +1,6 @@
 #!/usr/bin/env python3
 """Deep cleanup script to analyze and remove files that don't fit current structure."""
-
-import json
-import re
-from pathlib import Path
-from typing import Dict, List
-
-class DeepCleanup:
     """Performs deep analysis and cleanup of GCP references."""
-
-    def __init__(self):
-        self.root_dir = Path(__file__).parent.parent
-        self.gcp_patterns = [
             r"VULTR_PROJECT_ID",
             r"VULTR_PROJECT_ID",
             r"google-cloud-",
@@ -60,7 +49,6 @@ class DeepCleanup:
 
     def analyze_file(self, file_path: Path) -> Dict[str, any]:
         """Analyze a file for GCP references and categorize it."""
-        analysis = {
             "path": file_path,
             "size": file_path.stat().st_size,
             "gcp_references": [],
@@ -77,12 +65,16 @@ class DeepCleanup:
 
         # Find GCP references
         try:
+
+            pass
             content = file_path.read_text(encoding="utf-8")
             for pattern in self.gcp_patterns:
                 matches = re.findall(pattern, content, re.IGNORECASE)
                 if matches:
                     analysis["gcp_references"].extend(matches)
         except Exception:
+
+            pass
             analysis["reason"] = "Could not read file"
             return analysis
 
@@ -93,9 +85,6 @@ class DeepCleanup:
 
     def recommend_action(self, rel_path: str, analysis: Dict) -> str:
         """Recommend whether to keep, update, or delete a file."""
-
-        # Always keep certain files
-        if any(pattern in rel_path for pattern in self.keep_patterns):
             analysis["reason"] = "Protected file"
             return "keep"
 
@@ -151,18 +140,21 @@ class DeepCleanup:
 
     def find_all_gcp_files(self) -> List[Path]:
         """Find all files with GCP references."""
-        files_with_gcp = []
         skip_dirs = {".git", ".mypy_cache", "venv", "__pycache__", "node_modules"}
 
         for file_path in self.root_dir.rglob("*"):
             if file_path.is_file() and not any(skip in str(file_path) for skip in skip_dirs):
                 try:
+
+                    pass
                     content = file_path.read_text(encoding="utf-8")
                     for pattern in self.gcp_patterns:
                         if re.search(pattern, content, re.IGNORECASE):
                             files_with_gcp.append(file_path)
                             break
                 except Exception:
+
+                    pass
                     pass
 
         return files_with_gcp
@@ -217,10 +209,14 @@ class DeepCleanup:
                 deleted = 0
                 for item in results["delete"]:
                     try:
+
+                        pass
                         item["path"].unlink()
                         print(f"  ✓ Deleted {item['path'].relative_to(self.root_dir)}")
                         deleted += 1
-                    except Exception as e:
+                    except Exception:
+
+                        pass
                         print(f"  ✗ Error deleting {item['path']}: {e}")
                 print(f"\n✅ Deleted {deleted} files")
 
@@ -248,8 +244,5 @@ class DeepCleanup:
 
 def main():
     """Main entry point."""
-    cleanup = DeepCleanup()
-    cleanup.run()
-
 if __name__ == "__main__":
     main()

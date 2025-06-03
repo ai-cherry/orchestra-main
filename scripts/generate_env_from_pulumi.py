@@ -1,20 +1,14 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """Generate .env file from Pulumi secrets."""
-
-import json
-import os
-import subprocess
-from pathlib import Path
-from typing import Any, Dict
-
-def get_pulumi_config() -> Dict[str, Any]:
     """Get all Pulumi configuration including secrets."""
-    # Change to infra directory
-    original_dir = os.getcwd()
     infra_dir = Path(__file__).parent.parent / "infra"
     os.chdir(infra_dir)
 
     try:
+
+
+        pass
         # Set passphrase
         os.environ["PULUMI_CONFIG_PASSPHRASE"] = "orchestra-dev-123"
 
@@ -33,9 +27,6 @@ def get_pulumi_config() -> Dict[str, Any]:
 
 def generate_env_file(config: Dict[str, Any], output_path: Path) -> None:
     """Generate .env file from Pulumi config."""
-
-    # Mapping of Pulumi config keys to env var names
-    mapping = {
         "mongo_uri": "MONGODB_URI",
         "dragonfly_uri": "DRAGONFLY_URI",
         "weaviate_url": "WEAVIATE_URL",
@@ -48,17 +39,8 @@ def generate_env_file(config: Dict[str, Any], output_path: Path) -> None:
         "pulumi_access_token": "PULUMI_ACCESS_TOKEN",
     }
 
-    env_content = """# Orchestra AI Configuration
-# Generated from Pulumi secrets - DO NOT COMMIT!
-# Run: python scripts/generate_env_from_pulumi.py
-
-# Environment
-ENVIRONMENT=development
-PYTHONPATH=/workspace
-
+    env_content = """
 """
-
-    # Add database services
     env_content += "# Database Services\n"
     if "mongo_uri" in config:
         env_content += f"MONGODB_URI={config['mongo_uri']['value']}\n"
@@ -132,8 +114,6 @@ PYTHONPATH=/workspace
 
 def main():
     """Main function."""
-    try:
-        # Get Pulumi config
         print("📥 Reading Pulumi configuration...")
         config = get_pulumi_config()
 
@@ -154,7 +134,10 @@ def main():
         print("\n🎉 Environment setup complete!")
         print("   Run: source .env")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         print(f"❌ Error: {e}")
         return 1
 

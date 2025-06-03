@@ -1,18 +1,6 @@
 #!/usr/bin/env python3
 """
-Script to find critical linting issues across the codebase.
 """
-
-import argparse
-import json
-import re
-import subprocess
-import sys
-from collections import Counter, defaultdict
-from typing import Any, Dict, List
-
-# Critical lint issues to check for
-CRITICAL_ISSUES = {
     "F401": "Unused import",
     "F821": "Undefined name",
     "F841": "Unused variable",
@@ -47,8 +35,6 @@ EXCLUSIONS = [
 
 def run_ruff(path: str, select: str, format_type: str = "text") -> str:
     """Run ruff with the specified options and return the output."""
-    try:
-        cmd = [
             "python",
             "-m",
             "ruff",
@@ -63,17 +49,14 @@ def run_ruff(path: str, select: str, format_type: str = "text") -> str:
         ]
         result = subprocess.run(cmd, capture_output=True, text=True)
         return result.stdout
-    except subprocess.CalledProcessError as e:
+    except Exception:
+
+        pass
         print(f"Error running ruff: {e}")
         return ""
 
 def parse_ruff_text_output(output: str) -> Dict[str, List[Dict[str, Any]]]:
     """Parse ruff text output into a structured format."""
-    results = defaultdict(list)
-
-    current_file = None
-    for line in output.splitlines():
-        # Check if this is a file header line
         if line and not line.startswith(" "):
             current_file = line.strip()
         elif line.strip() and current_file:
@@ -94,22 +77,15 @@ def parse_ruff_text_output(output: str) -> Dict[str, List[Dict[str, Any]]]:
 
 def parse_ruff_json_output(output: str) -> List[Dict[str, Any]]:
     """Parse ruff JSON output into a structured format."""
-    try:
-        return json.loads(output)
-    except json.JSONDecodeError:
-        return []
-
-def print_summary(results: Dict[str, List[Dict[str, Any]]]) -> None:
     """Print a summary of the linting issues."""
-    total_issues = sum(len(issues) for issues in results.values())
-    files_with_issues = len(results)
-
     print("\n===== Critical Linting Issues Summary =====")
     print(f"Found {total_issues} issues in {files_with_issues} files\n")
 
     # Count issues by type
     issue_counts = Counter()
     for issues in results.values():
+        # TODO: Consider using list comprehension for better performance
+
         for issue in issues:
             issue_counts[issue["code"]] += 1
 

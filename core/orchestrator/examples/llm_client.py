@@ -1,37 +1,7 @@
 """
-LLM Client Example for AI Orchestration System.
-
-This script demonstrates how to interact with the LLM endpoints
-of the AI Orchestration System.
 """
-
-import argparse
-import asyncio
-from typing import Optional
-
-import httpx
-
-async def llm_interact(
-    api_url: str,
-    message: str,
-    user_id: str,
-    session_id: Optional[str] = None,
-    persona_id: Optional[str] = None,
-    model: Optional[str] = None,
-):
     """
-    Interact with the LLM endpoint.
-
-    Args:
-        api_url: Base URL of the API
-        message: User message
-        user_id: User ID
-        session_id: Optional session ID
-        persona_id: Optional persona ID
-        model: Optional model to use
     """
-    # Prepare request data
-    data = {
         "message": message,
         "user_id": user_id,
         "session_id": session_id,
@@ -75,16 +45,7 @@ async def llm_interact(
 
 async def direct_completion(api_url: str, system_prompt: str, user_message: str, model: Optional[str] = None):
     """
-    Make a direct LLM completion request.
-
-    Args:
-        api_url: Base URL of the API
-        system_prompt: System prompt
-        user_message: User message
-        model: Optional model to use
     """
-    # Create messages
-    messages = [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_message},
     ]
@@ -120,7 +81,6 @@ async def direct_completion(api_url: str, system_prompt: str, user_message: str,
 
 async def main():
     """Run the LLM client example."""
-    # Parse command line arguments
     parser = argparse.ArgumentParser(description="LLM Client Example")
     parser.add_argument("--url", default="http://localhost:8000", help="API URL")
     parser.add_argument("--mode", choices=["interact", "direct"], default="interact", help="Mode")

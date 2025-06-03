@@ -1,29 +1,6 @@
 #!/usr/bin/env python3
 """
-Web Scraping AI Agents Cloud Run Entry Point
-Standalone FastAPI application for the web scraping agent team.
 """
-
-import asyncio
-import logging
-import os
-import sys
-from typing import Any, Dict, List, Optional
-
-import uvicorn
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-
-# Add current directory to path for imports
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-from mcp_server.servers.web_scraping_mcp_server import OrchestraWebScrapingMCPServer
-
-# Import the web scraping system
-from web_scraping_ai_agents import WebScrapingOrchestrator
-
-# Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
@@ -73,11 +50,12 @@ class BulkScrapeRequest(BaseModel):
 @app.on_event("startup")
 async def startup_event():
     """Initialize the web scraping orchestrator."""
-    global orchestrator, mcp_server
-
     logger.info("Starting Web Scraping AI Agent Team...")
 
     try:
+
+
+        pass
         config = {
             "redis_host": os.getenv("REDIS_HOST", "localhost"),
             "redis_port": int(os.getenv("REDIS_PORT", 6379)),
@@ -99,14 +77,16 @@ async def startup_event():
 
         logger.info("Web Scraping AI Agent Team initialized successfully")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Failed to initialize web scraping system: {e}")
         raise
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """Cleanup on shutdown."""
-    global orchestrator
     logger.info("Shutting down Web Scraping AI Agent Team...")
     if orchestrator:
         await orchestrator.stop()
@@ -114,7 +94,6 @@ async def shutdown_event():
 @app.get("/health")
 async def health_check():
     """Health check endpoint for Cloud Run."""
-    return {
         "status": "healthy",
         "service": "web-scraping-agents",
         "agents_initialized": orchestrator is not None,
@@ -124,7 +103,6 @@ async def health_check():
 @app.get("/")
 async def root():
     """Root endpoint."""
-    return {
         "service": "Web Scraping AI Agents",
         "version": "1.0.0",
         "status": "running",
@@ -143,23 +121,29 @@ async def root():
 @app.get("/mcp/tools")
 async def get_mcp_tools():
     """Get available MCP tools."""
-    if not mcp_server:
         raise HTTPException(status_code=503, detail="MCP server not initialized")
 
     try:
+
+
+        pass
         tools = await mcp_server.list_tools()
         return {"tools": tools}
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error getting MCP tools: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/search")
 async def search_web(request: SearchRequest):
     """Web search endpoint."""
-    if not mcp_server:
         raise HTTPException(status_code=503, detail="MCP server not initialized")
 
     try:
+
+
+        pass
         result = await mcp_server.handle_web_search(
             query=request.query,
             engine=request.engine,
@@ -167,17 +151,21 @@ async def search_web(request: SearchRequest):
             strategy=request.strategy,
         )
         return {"result": result}
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error in web search: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/scrape")
 async def scrape_website(request: ScrapeRequest):
     """Website scraping endpoint."""
-    if not mcp_server:
         raise HTTPException(status_code=503, detail="MCP server not initialized")
 
     try:
+
+
+        pass
         kwargs = {}
         if request.wait_for_selector:
             kwargs["wait_for_selector"] = request.wait_for_selector
@@ -188,89 +176,115 @@ async def scrape_website(request: ScrapeRequest):
 
         result = await mcp_server.handle_scrape_website(url=request.url, strategy=request.strategy, **kwargs)
         return {"result": result}
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error in website scraping: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/analyze")
 async def analyze_content(request: AnalyzeRequest):
     """Content analysis endpoint."""
-    if not mcp_server:
         raise HTTPException(status_code=503, detail="MCP server not initialized")
 
     try:
+
+
+        pass
         result = await mcp_server.handle_analyze_content(content=request.content, analysis_type=request.analysis_type)
         return {"result": result}
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error in content analysis: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/bulk-scrape")
 async def bulk_scrape(request: BulkScrapeRequest):
     """Bulk scraping endpoint."""
-    if not mcp_server:
         raise HTTPException(status_code=503, detail="MCP server not initialized")
 
     try:
+
+
+        pass
         result = await mcp_server.handle_bulk_scrape(
             urls=request.urls,
             strategy=request.strategy,
             max_concurrent=request.max_concurrent,
         )
         return {"result": result}
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error in bulk scraping: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/task/{task_id}")
 async def get_task_status(task_id: str):
     """Get task status endpoint."""
-    if not mcp_server:
         raise HTTPException(status_code=503, detail="MCP server not initialized")
 
     try:
+
+
+        pass
         result = await mcp_server.handle_get_task_status(task_id)
         return {"result": result}
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error getting task status: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/agents/status")
 async def get_agents_status():
     """Get agent status endpoint."""
-    if not mcp_server:
         raise HTTPException(status_code=503, detail="MCP server not initialized")
 
     try:
+
+
+        pass
         status = await mcp_server.get_agent_status()
         return {"status": status}
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error getting agent status: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/tasks/active")
 async def get_active_tasks():
     """Get active tasks endpoint."""
-    if not mcp_server:
         raise HTTPException(status_code=503, detail="MCP server not initialized")
 
     try:
+
+
+        pass
         tasks = await mcp_server.get_active_tasks()
         return {"tasks": tasks}
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error getting active tasks: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/results/recent")
 async def get_recent_results():
     """Get recent results endpoint."""
-    if not mcp_server:
         raise HTTPException(status_code=503, detail="MCP server not initialized")
 
     try:
+
+
+        pass
         results = await mcp_server.get_recent_results()
         return {"results": results}
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error getting recent results: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -278,13 +292,17 @@ async def get_recent_results():
 @app.post("/mcp/call-tool")
 async def call_mcp_tool(tool_name: str, arguments: Dict[str, Any]):
     """Call an MCP tool directly."""
-    if not mcp_server:
         raise HTTPException(status_code=503, detail="MCP server not initialized")
 
     try:
+
+
+        pass
         result = await mcp_server.call_tool(tool_name, arguments)
         return {"result": result}
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error calling MCP tool {tool_name}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 

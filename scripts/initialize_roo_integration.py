@@ -1,35 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """Initialize and test Roo AI Orchestrator integration."""
-
-import asyncio
-import json
-import logging
-import os
-import sys
-from pathlib import Path
-
-import yaml
-from rich.console import Console
-from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, TextColumn
-from rich.table import Table
-
-# Add project root to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from ai_components.orchestration.mcp_integration import UnifiedContextManager
-from ai_components.orchestration.mode_transition_manager import ModeTransitionManager
-from ai_components.orchestration.roo_mcp_adapter import RooMCPAdapter, RooMode
-from ai_components.orchestration.unified_api_router import UnifiedAPIRouter
-from shared.database import UnifiedDatabase
-
-console = Console()
-logger = logging.getLogger(__name__)
-
-
-async def check_environment() -> bool:
     """Check if required environment variables are set."""
-    required_vars = [
         "OPENROUTER_API_KEY",
         "POSTGRES_HOST",
         "POSTGRES_USER",
@@ -75,7 +47,6 @@ async def check_environment() -> bool:
 
 async def run_database_migration() -> bool:
     """Run database migration for Roo integration tables."""
-    try:
         migration_file = Path(__file__).parent.parent / "migrations" / "add_roo_integration_tables.sql"
         
         if not migration_file.exists():
@@ -96,7 +67,10 @@ async def run_database_migration() -> bool:
             console.print("[green]✓ Database migration completed successfully[/green]")
             return True
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         console.print(f"[red]Database migration failed: {e}[/red]")
         logger.error(f"Migration error: {e}", exc_info=True)
         return False
@@ -104,7 +78,6 @@ async def run_database_migration() -> bool:
 
 async def test_roo_adapter() -> bool:
     """Test Roo MCP adapter functionality."""
-    try:
         api_key = os.getenv("OPENROUTER_API_KEY")
         adapter = RooMCPAdapter(api_key)
 
@@ -131,7 +104,10 @@ async def test_roo_adapter() -> bool:
 
         return True
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         console.print(f"[red]Roo adapter test failed: {e}[/red]")
         logger.error(f"Adapter test error: {e}", exc_info=True)
         return False
@@ -139,7 +115,6 @@ async def test_roo_adapter() -> bool:
 
 async def test_unified_router() -> bool:
     """Test unified API router functionality."""
-    try:
         api_key = os.getenv("OPENROUTER_API_KEY")
         orchestrator_url = os.getenv("ORCHESTRATOR_URL", "http://localhost:8000")
         
@@ -171,7 +146,10 @@ async def test_unified_router() -> bool:
         await router.close()
         return True
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         console.print(f"[red]Unified router test failed: {e}[/red]")
         logger.error(f"Router test error: {e}", exc_info=True)
         return False
@@ -179,11 +157,6 @@ async def test_unified_router() -> bool:
 
 async def test_transition_manager() -> bool:
     """Test mode transition manager functionality."""
-    try:
-        manager = ModeTransitionManager()
-
-        # Test transition suggestion
-        suggestion = await manager.suggest_transition(
             "test_session",
             RooMode.CODE,
             {"last_result": {"error": "Test error"}},
@@ -198,7 +171,10 @@ async def test_transition_manager() -> bool:
 
         return True
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         console.print(f"[red]Transition manager test failed: {e}[/red]")
         logger.error(f"Transition manager error: {e}", exc_info=True)
         return False
@@ -206,7 +182,6 @@ async def test_transition_manager() -> bool:
 
 async def test_context_manager() -> bool:
     """Test unified context manager functionality."""
-    try:
         api_key = os.getenv("OPENROUTER_API_KEY")
         weaviate_url = os.getenv("WEAVIATE_URL", "http://localhost:8080")
         
@@ -242,7 +217,10 @@ async def test_context_manager() -> bool:
 
         return True
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         console.print(f"[red]Context manager test failed: {e}[/red]")
         logger.error(f"Context manager error: {e}", exc_info=True)
         return False

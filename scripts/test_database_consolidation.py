@@ -1,20 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Test script for database consolidation.
-
-Verifies that PostgreSQL and Weaviate clients are working correctly.
 """
-
-import os
-import sys
-import logging
-from datetime import datetime, timedelta
-
-# Add parent directory to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from shared.database import UnifiedDatabase
-
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
@@ -23,6 +10,9 @@ def test_postgresql_operations(db: UnifiedDatabase):
     logger.info("Testing PostgreSQL operations...")
 
     try:
+
+
+        pass
         # Test health check
         if not db.postgres.health_check():
             logger.error("PostgreSQL health check failed")
@@ -68,7 +58,10 @@ def test_postgresql_operations(db: UnifiedDatabase):
 
         return True
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"PostgreSQL test failed: {e}")
         return False
 
@@ -77,6 +70,9 @@ def test_weaviate_operations(db: UnifiedDatabase):
     logger.info("\nTesting Weaviate operations...")
 
     try:
+
+
+        pass
         # Test health check
         if not db.weaviate.health_check():
             logger.error("Weaviate health check failed")
@@ -120,7 +116,10 @@ def test_weaviate_operations(db: UnifiedDatabase):
 
         return True
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Weaviate test failed: {e}")
         return False
 
@@ -129,6 +128,9 @@ def test_unified_operations(db: UnifiedDatabase):
     logger.info("\nTesting unified operations...")
 
     try:
+
+
+        pass
         # Test agent interaction storage
         agent_id = f"test_agent_{datetime.now().strftime('%Y%m%d%H%M%S')}"
         session_id = f"test_session_{datetime.now().strftime('%Y%m%d%H%M%S')}"
@@ -156,7 +158,10 @@ def test_unified_operations(db: UnifiedDatabase):
 
         return True
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Unified operations test failed: {e}")
         return False
 
@@ -166,9 +171,13 @@ def main():
 
     # Initialize unified database
     try:
+
+        pass
         db = UnifiedDatabase()
         logger.info("✓ Unified database initialized")
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to initialize database: {e}")
         return 1
 

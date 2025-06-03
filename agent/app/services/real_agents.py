@@ -1,3 +1,4 @@
+import secrets
 import asyncio
 import random
 import subprocess
@@ -12,12 +13,6 @@ AGENT_REGISTRY: Dict[str, "RealAgent"] = {}
 
 class RealAgent:
     """A real agent that actually does something."""
-
-    def __init__(self, agent_id: str, name: str, agent_type: str, description: str):
-        self.id = agent_id
-        self.name = name
-        self.type = agent_type
-        self.description = description
         self.status = "idle"
         self.last_run = datetime.now()
         self.tasks_completed = 0
@@ -27,7 +22,6 @@ class RealAgent:
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert agent to dictionary."""
-        return {
             "id": self.id,
             "name": self.name,
             "type": self.type,
@@ -46,6 +40,9 @@ class RealAgent:
         self.last_run = datetime.now()
 
         try:
+
+
+            pass
             # Different agents do different things
             if self.type == "system":
                 result = await self._run_system_task(task)
@@ -78,16 +75,17 @@ class RealAgent:
         else:
             # Run simple shell command
             try:
+
+                pass
                 result = subprocess.run(["echo", task], capture_output=True, text=True, timeout=5)
                 return f"System output: {result.stdout.strip()}"
-            except Exception as e:
+            except Exception:
+
+                pass
                 return f"System error: {str(e)}"
 
     async def _run_analyzer_task(self, task: str) -> str:
         """Run analysis tasks."""
-        # Simulate analysis
-        await asyncio.sleep(1)
-
         if "count" in task.lower():
             # Count files in current directory
             files = list(Path(".").glob("*.py"))
@@ -115,7 +113,6 @@ class RealAgent:
 # Initialize some real agents
 def initialize_real_agents():
     """Create initial set of real agents."""
-    agents = [
         RealAgent("sys-001", "System Monitor", "system", "Monitors system resources and runs system commands"),
         RealAgent("analyze-001", "Data Analyzer", "analyzer", "Analyzes data and provides insights"),
         RealAgent("monitor-001", "Service Monitor", "monitor", "Monitors services and alerts on issues"),
@@ -131,13 +128,7 @@ initialize_real_agents()
 
 async def get_all_agents() -> List[Dict[str, Any]]:
     """Get all real agents."""
-    # Update agent stats
-    for agent in AGENT_REGISTRY.values():
-        # Update memory usage
-        agent.memory_usage = round(psutil.Process().memory_info().rss / (1024 * 1024), 1)
-
-        # Randomly change status for demo
-        if agent.status == "idle" and random.random() > 0.8:
+        if agent.status == "idle" and secrets.SystemRandom().random() > 0.8:
             # Start a random task
             asyncio.create_task(agent.run_task("Automated check"))
 
@@ -145,8 +136,6 @@ async def get_all_agents() -> List[Dict[str, Any]]:
 
 async def run_agent_task(agent_id: str, task: str) -> Dict[str, Any]:
     """Run a task on a specific agent."""
-    agent = AGENT_REGISTRY.get(agent_id)
-    if not agent:
         raise ValueError(f"Agent {agent_id} not found")
 
     result = await agent.run_task(task)
@@ -154,8 +143,6 @@ async def run_agent_task(agent_id: str, task: str) -> Dict[str, Any]:
 
 async def get_system_metrics() -> Dict[str, Any]:
     """Get real system metrics."""
-    cpu_percent = psutil.cpu_percent(interval=1)
-    memory = psutil.virtual_memory()
     disk = psutil.disk_usage("/")
 
     # Count active agents

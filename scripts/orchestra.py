@@ -1,49 +1,23 @@
 #!/usr/bin/env python3
 """
-Orchestra AI Unified CLI - Real Agents Version
-=============================================
-A unified command-line interface for managing the Orchestra AI platform with real agents.
-
-Usage:
-    python scripts/orchestra.py status       # Check system status
-    python scripts/orchestra.py start        # Start all services
-    python scripts/orchestra.py stop         # Stop all services
     python scripts/orchestra.py query "your question"  # Query agents
     python scripts/orchestra.py health       # Run health checks
 """
-
-import argparse
-import os
-import subprocess
-import sys
-import time
-from pathlib import Path
-from typing import Dict, List
-
-import psutil
-import requests
-
-class OrchestraCLI:
     """Unified CLI for Orchestra AI platform with real agents."""
-
-    def __init__(self):
         self.api_url = "http://localhost:8000"
-        self.api_key = "4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd"
+        self.os.getenv("API_KEY")
         self.project_root = Path(__file__).parent.parent
         self.venv_path = self.project_root / "venv"
         self.python_cmd = str(self.venv_path / "bin" / "python")
 
     def check_python_version(self) -> bool:
         """Check if Python version is 3.10+."""
-        version_info = sys.version_info
-        if version_info.major < 3 or (version_info.major == 3 and version_info.minor < 10):
             print(f"❌ Python 3.10+ required (found {sys.version})")
             return False
         return True
 
     def check_venv(self) -> bool:
         """Check if virtual environment exists."""
-        if not self.venv_path.exists():
             print("❌ Virtual environment not found")
             print("   Create with: python -m venv venv")
             return False
@@ -51,11 +25,7 @@ class OrchestraCLI:
 
     def run_command(self, cmd: List[str], check: bool = True) -> subprocess.CompletedProcess:
         """Run a shell command."""
-        return subprocess.run(cmd, capture_output=True, text=True, check=check)
-
-    def get_service_status(self) -> Dict[str, bool]:
         """Check status of all services."""
-        status = {
             "api_server": False,
             "redis": False,
         }
@@ -63,18 +33,26 @@ class OrchestraCLI:
         # Check API server
         for proc in psutil.process_iter(["pid", "name", "cmdline"]):
             try:
+
+                pass
                 cmdline = proc.info.get("cmdline", [])
                 if cmdline and "uvicorn" in str(cmdline) and "agent.app.main" in str(cmdline):
                     status["api_server"] = True
                     break
-            except (psutil.NoSuchProcess, psutil.AccessDenied):
+            except Exception:
+
+                pass
                 pass
 
         # Check Redis
         try:
+
+            pass
             result = self.run_command(["redis-cli", "ping"], check=False)
             status["redis"] = result.stdout.strip() == "PONG"
-        except:
+        except Exception:
+
+            pass
             status["redis"] = False
 
         return status
@@ -101,12 +79,16 @@ class OrchestraCLI:
         # API health check
         if status["api_server"]:
             try:
+
+                pass
                 response = requests.get(f"{self.api_url}/health", timeout=5)
                 if response.status_code == 200:
                     print("\nAPI Health: ✅ Healthy")
                 else:
                     print(f"\nAPI Health: ⚠️  Status {response.status_code}")
-            except:
+            except Exception:
+
+                pass
                 print("\nAPI Health: ❌ Cannot connect")
 
         return 0
@@ -159,7 +141,6 @@ class OrchestraCLI:
 
     def cmd_query(self, query: str) -> int:
         """Query the agents."""
-        try:
             headers = {"X-API-Key": self.api_key}
             response = requests.post(f"{self.api_url}/api/query", json={"query": query}, headers=headers, timeout=30)
 
@@ -171,11 +152,15 @@ class OrchestraCLI:
             else:
                 print(f"❌ Error: {response.status_code} - {response.text}")
                 return 1
-        except requests.exceptions.ConnectionError:
+        except Exception:
+
+            pass
             print("❌ Cannot connect to API. Is the server running?")
             print("   Run: python scripts/orchestra.py start")
             return 1
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"❌ Error: {e}")
             return 1
 
@@ -193,18 +178,26 @@ class OrchestraCLI:
         # API endpoint check
         if checks["API Server"]:
             try:
+
+                pass
                 response = requests.get(f"{self.api_url}/health", timeout=5)
                 checks["API Health Endpoint"] = response.status_code == 200
-            except:
+            except Exception:
+
+                pass
                 checks["API Health Endpoint"] = False
 
         # Agent check
         if checks["API Server"]:
             try:
+
+                pass
                 headers = {"X-API-Key": self.api_key}
                 response = requests.get(f"{self.api_url}/api/agents", headers=headers, timeout=5)
                 checks["Real Agents"] = response.status_code == 200 and len(response.json()) > 0
-            except:
+            except Exception:
+
+                pass
                 checks["Real Agents"] = False
 
         # Display results
@@ -222,20 +215,12 @@ class OrchestraCLI:
 
 def main():
     """Main entry point."""
-    cli = OrchestraCLI()
-
-    parser = argparse.ArgumentParser(
         description="Orchestra AI Unified CLI",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-Examples:
-  python scripts/orchestra.py status
-  python scripts/orchestra.py start
   python scripts/orchestra.py query "What is the CPU usage?"
   python scripts/orchestra.py health
-        """,
-    )
-
+        """
     subparsers = parser.add_subparsers(dest="command", help="Commands")
 
     # Status command

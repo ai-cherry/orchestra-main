@@ -1,26 +1,16 @@
 #!/usr/bin/env python3
 """
-Orchestra AI Status - Show complete system status
 """
-
-import json
-import subprocess
-from datetime import datetime
-from pathlib import Path
-
-def check_service(name: str, command: list) -> tuple:
     """Check if a service is running."""
-    try:
-        result = subprocess.run(command, capture_output=True, text=True)
         return result.returncode == 0, "Running"
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"  Error checking {name}: {e}")
         return False, "Not running"
 
 def main():
     """Show Orchestra AI status."""
-    root_dir = Path(__file__).parent.parent
-
     print("\n🎼 Orchestra AI System Status")
     print("=" * 60)
     print(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -111,6 +101,8 @@ def main():
 
     # Check for GCP references
     try:
+
+        pass
         result = subprocess.run(
             ["grep", "-r", "google-cloud", "--include=*.txt", "requirements/"],
             capture_output=True,
@@ -120,5 +112,7 @@ def main():
             print("✗ GCP dependencies still in requirements")
         else:
             print("✓ No GCP dependencies in requirements")
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"? Could not check GCP dependencies: {e}")

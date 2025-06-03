@@ -1,24 +1,6 @@
 """
-Ingress Component for Domain Configuration
-==========================================
-Configures NGINX ingress with SSL/TLS for cherry-ai.me
 """
-
-from typing import Any, Dict, Optional
-
-import pulumi_kubernetes as k8s
-from pulumi import ComponentResource, ResourceOptions
-
-class IngressComponent(ComponentResource):
     """Configure ingress with SSL for cherry-ai.me"""
-
-    def __init__(
-        self,
-        name: str,
-        config: Dict[str, Any],
-        service_name: str,
-        opts: Optional[ResourceOptions] = None,
-    ):
         super().__init__("orchestra:ingress:Component", name, None, opts)
 
         self.namespace = config.get("namespace", "superagi")
@@ -49,8 +31,6 @@ class IngressComponent(ComponentResource):
 
     def _install_nginx_ingress(self, opts: ResourceOptions):
         """Install NGINX ingress controller"""
-
-        k8s.yaml.ConfigFile(
             f"{self._name}-nginx-ingress",
             file="https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml",
             opts=opts,
@@ -58,8 +38,6 @@ class IngressComponent(ComponentResource):
 
     def _install_cert_manager(self, opts: ResourceOptions):
         """Install cert-manager for automatic SSL certificates"""
-
-        k8s.yaml.ConfigFile(
             f"{self._name}-cert-manager",
             file="https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml",
             opts=opts,
@@ -67,13 +45,6 @@ class IngressComponent(ComponentResource):
 
     def _create_certificate_issuer(self, opts: ResourceOptions):
         """Create Let's Encrypt certificate issuer"""
-
-        # Wait for cert-manager to be ready
-        import time
-
-        time.sleep(30)  # Give cert-manager time to initialize
-
-        return k8s.apiextensions.CustomResource(
             f"{self._name}-letsencrypt-issuer",
             api_version="cert-manager.io/v1",
             kind="ClusterIssuer",
@@ -103,8 +74,6 @@ class IngressComponent(ComponentResource):
 
     def _create_ingress(self, service_name: str, opts: ResourceOptions) -> k8s.networking.v1.Ingress:
         """Create ingress for cherry-ai.me"""
-
-        return k8s.networking.v1.Ingress(
             f"{self._name}-ingress",
             metadata=k8s.meta.v1.ObjectMetaArgs(
                 name="superagi-ingress",
@@ -123,10 +92,7 @@ more_set_headers "X-Frame-Options: SAMEORIGIN";
 more_set_headers "X-Content-Type-Options: nosniff";
 more_set_headers "X-XSS-Protection: 1; mode=block";
 more_set_headers "Referrer-Policy: strict-origin-when-cross-origin";
-""",
-                },
-            ),
-            spec=k8s.networking.v1.IngressSpecArgs(
+"""
                 ingress_class_name="nginx",
                 tls=[
                     k8s.networking.v1.IngressTLSArgs(

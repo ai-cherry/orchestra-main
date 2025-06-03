@@ -1,33 +1,17 @@
+# TODO: Consider adding connection pooling configuration
 """
-SQLAlchemy models for LLM configuration database schema
+Orchestra AI - Database Models
+This module contains Pydantic models for database entities.
 """
 
+from typing import List, Dict, Any, Optional, Union
+from uuid import uuid4, UUID
 from datetime import datetime
-from decimal import Decimal
-from typing import Optional, List, Dict, Any
-from sqlalchemy import (
-    Column,
-    Integer,
-    String,
-    Boolean,
-    DateTime,
-    ForeignKey,
-    UniqueConstraint,
-    Index,
-    DECIMAL,
-    TEXT,
-    Date,
-)
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, backref
-from sqlalchemy.sql import func
+from enum import Enum
+from pydantic import BaseModel, Field, field_validator, model_validator
 
-Base = declarative_base()
-
-class LLMProvider(Base):
+""
     """Model for LLM provider configurations"""
-
     __tablename__ = "llm_providers"
 
     id = Column(Integer, primary_key=True)
@@ -44,7 +28,6 @@ class LLMProvider(Base):
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for API responses"""
-        return {
             "id": self.id,
             "name": self.name,
             "api_key_env_var": self.api_key_env_var,
@@ -57,7 +40,6 @@ class LLMProvider(Base):
 
 class LLMModel(Base):
     """Model for available LLM models from providers"""
-
     __tablename__ = "llm_models"
 
     id = Column(Integer, primary_key=True)
@@ -88,7 +70,6 @@ class LLMModel(Base):
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for API responses"""
-        return {
             "id": self.id,
             "provider_id": self.provider_id,
             "provider_name": self.provider.name if self.provider else None,
@@ -102,7 +83,6 @@ class LLMModel(Base):
 
 class LLMUseCase(Base):
     """Model for LLM use case configurations"""
-
     __tablename__ = "llm_use_cases"
 
     id = Column(Integer, primary_key=True)
@@ -121,7 +101,6 @@ class LLMUseCase(Base):
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for API responses"""
-        return {
             "id": self.id,
             "use_case": self.use_case,
             "display_name": self.display_name,
@@ -133,7 +112,6 @@ class LLMUseCase(Base):
 
 class LLMModelAssignment(Base):
     """Model for assigning models to use cases and tiers"""
-
     __tablename__ = "llm_model_assignments"
 
     id = Column(Integer, primary_key=True)
@@ -159,7 +137,6 @@ class LLMModelAssignment(Base):
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for API responses"""
-        return {
             "id": self.id,
             "use_case_id": self.use_case_id,
             "use_case": self.use_case.use_case if self.use_case else None,
@@ -173,7 +150,6 @@ class LLMModelAssignment(Base):
 
 class LLMFallbackModel(Base):
     """Model for fallback model configurations"""
-
     __tablename__ = "llm_fallback_models"
 
     id = Column(Integer, primary_key=True)
@@ -191,7 +167,6 @@ class LLMFallbackModel(Base):
 
 class LLMMetric(Base):
     """Model for tracking LLM performance metrics"""
-
     __tablename__ = "llm_metrics"
 
     id = Column(Integer, primary_key=True)
@@ -219,7 +194,6 @@ class LLMMetric(Base):
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for API responses"""
-        return {
             "id": self.id,
             "model": self.model.to_dict() if self.model else None,
             "use_case": self.use_case.use_case if self.use_case else None,

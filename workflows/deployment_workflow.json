@@ -1,0 +1,22 @@
+{
+  "id": "deployment_workflow",
+  "name": "Deployment Automation",
+  "description": "Automated deployment pipeline",
+  "tasks": [
+    {
+      "id": "run_tests",
+      "type": "testing",
+      "agent": "quality_agent"
+    },
+    {
+      "id": "build_image",
+      "type": "build",
+      "agent": "implementation_agent"
+    },
+    {
+      "id": "deploy",
+      "type": "deployment",
+      "agent": "deployment_agent"
+    }
+  ]
+}

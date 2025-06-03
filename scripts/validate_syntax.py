@@ -1,31 +1,23 @@
 #!/usr/bin/env python3
 """Validate Python syntax for all files in the project."""
-
-import ast
-import os
-import sys
-from pathlib import Path
-from typing import List, Tuple
-
-def validate_python_file(file_path: Path) -> Tuple[bool, str]:
     """Validate a single Python file for syntax errors."""
-    try:
         with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
 
         # Try to parse the file
         ast.parse(content, filename=str(file_path))
         return True, "OK"
-    except SyntaxError as e:
+    except Exception:
+
+        pass
         return False, f"SyntaxError at line {e.lineno}: {e.msg}"
-    except Exception as e:
+    except Exception:
+
+        pass
         return False, f"Error: {str(e)}"
 
 def find_python_files(root_dir: Path) -> List[Path]:
     """Find all Python files in the project."""
-    python_files = []
-
-    # Directories to skip
     skip_dirs = {".venv", "venv", "__pycache__", ".git", "node_modules", ".mypy_cache"}
 
     for root, dirs, files in os.walk(root_dir):
@@ -40,7 +32,6 @@ def find_python_files(root_dir: Path) -> List[Path]:
 
 def main():
     """Main function to validate all Python files."""
-    root_dir = Path.cwd()
     print(f"🔍 Validating Python syntax in: {root_dir}")
     print("=" * 60)
 

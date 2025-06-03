@@ -1,29 +1,5 @@
 """
-Main module for the LLM Testing Server.
-
-This server provides endpoints to test multiple LLM providers and analyze
-their performance and reliability for the cascade setup.
 """
-
-import asyncio
-import json
-import logging
-import os
-import time
-from datetime import datetime
-from typing import Dict, List, Optional
-
-import prometheus_client as prom
-import uvicorn
-from fastapi import BackgroundTasks, FastAPI
-from pydantic import BaseModel
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Initialize FastAPI
-app = FastAPI(
     title="Orchestra LLM Testing Service",
     description="Service for testing and benchmarking LLM providers",
 )
@@ -47,27 +23,12 @@ TOKEN_COUNT = prom.Counter(
 # Request models
 class TestRequest(BaseModel):
     """Request model for testing LLM providers."""
-
-    prompt: str
-    providers: List[str]
-    model: Optional[str] = None
-    temperature: float = 0.7
-    max_tokens: int = 500
-    timeout: float = 15.0
-
-class BenchmarkRequest(BaseModel):
     """Request for benchmarking multiple providers with the same prompt."""
-
-    prompt: str
-    runs: int = 5
     providers: List[str] = ["openrouter", "portkey", "openai", "anthropic", "deepseek"]
     models: Dict[str, str] = None  # Maps provider to model, optional
 
 class CascadeTestRequest(BaseModel):
     """Request for testing the cascade failover setup."""
-
-    prompt: str
-    cascade_order: List[str] = [
         "openrouter",
         "portkey",
         "openai",
@@ -79,34 +40,13 @@ class CascadeTestRequest(BaseModel):
 
 class ProviderResponse(BaseModel):
     """Response from a single LLM provider."""
-
-    provider: str
-    model: str
-    content: str
-    latency_ms: float
     status: str = "success"
     error: Optional[str] = None
     tokens: Optional[Dict[str, int]] = None
 
 class TestResponse(BaseModel):
     """Response model for test endpoints."""
-
-    results: List[ProviderResponse]
-    timestamp: str
-    cascade_used: Optional[bool] = None
-    successful_providers: List[str]
-    failed_providers: List[str]
-
-# Provider initialization logic
-def get_provider_client(provider_name: str):
     """Get or initialize a provider client."""
-    global provider_clients
-
-    if provider_name in provider_clients:
-        return provider_clients[provider_name]
-
-    # Initialize based on provider type
-    try:
         if provider_name == "openrouter":
             import openrouter
 
@@ -145,7 +85,10 @@ def get_provider_client(provider_name: str):
         else:
             raise ValueError(f"Unsupported provider: {provider_name}")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Failed to initialize {provider_name}: {e}")
         raise ValueError(f"Failed to initialize {provider_name}: {e}")
 
@@ -159,11 +102,6 @@ async def call_provider(
     inject_failure: bool = False,
 ) -> ProviderResponse:
     """Call an LLM provider and return the response."""
-    # If we're injecting a failure, simulate it
-    if inject_failure:
-        await asyncio.sleep(0.5)  # Brief delay to simulate API call
-        return ProviderResponse(
-            provider=provider_name,
             model=model or "unknown",
             content="",
             latency_ms=500,
@@ -175,6 +113,9 @@ async def call_provider(
     start_time = time.time()
 
     try:
+
+
+        pass
         # Get the appropriate client
         client = get_provider_client(provider_name)
 
@@ -285,8 +226,12 @@ async def call_provider(
 
         # Execute with timeout
         try:
+
+            pass
             await asyncio.wait_for(execute_call(), timeout=timeout)
-        except asyncio.TimeoutError:
+        except Exception:
+
+            pass
             elapsed_ms = (time.time() - start_time) * 1000
             REQUEST_COUNT.labels(provider=provider_name, model=model, status="timeout").inc()
             REQUEST_LATENCY.labels(provider=provider_name, model=model, status="timeout").observe(elapsed_ms / 1000)
@@ -326,7 +271,10 @@ async def call_provider(
             tokens=token_counts,
         )
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         # Calculate latency even for errors
         elapsed_ms = (time.time() - start_time) * 1000
 
@@ -356,19 +304,6 @@ async def cascade_call(
     timeout: float = 10.0,
 ) -> ProviderResponse:
     """Attempt providers in sequence until a successful response."""
-    for provider_name in cascade_order:
-        inject_failure = provider_name in inject_failures
-        response = await call_provider(
-            provider_name=provider_name,
-            prompt=prompt,
-            model=model,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            timeout=timeout,
-            inject_failure=inject_failure,
-        )
-
-        # If successful, return this response
         if response.status == "success":
             return response
 
@@ -390,23 +325,6 @@ def health_check():
 @app.post("/test", response_model=TestResponse)
 async def test_providers(request: TestRequest):
     """Test one or more LLM providers with the same prompt."""
-    results = []
-    successful = []
-    failed = []
-
-    # Call each provider
-    for provider_name in request.providers:
-        response = await call_provider(
-            provider_name=provider_name,
-            prompt=request.prompt,
-            model=request.model,
-            temperature=request.temperature,
-            max_tokens=request.max_tokens,
-            timeout=request.timeout,
-        )
-
-        results.append(response)
-
         if response.status == "success":
             successful.append(provider_name)
         else:
@@ -422,29 +340,6 @@ async def test_providers(request: TestRequest):
 @app.post("/benchmark", response_model=TestResponse)
 async def benchmark_providers(request: BenchmarkRequest, background_tasks: BackgroundTasks):
     """Benchmark multiple providers with the same prompt over multiple runs."""
-    results = []
-    successful = set()
-    failed = set()
-
-    # Prepare models mapping
-    models = request.models or {}
-
-    # Run benchmark
-    for i in range(request.runs):
-        for provider_name in request.providers:
-            model = models.get(provider_name)
-
-            response = await call_provider(
-                provider_name=provider_name,
-                prompt=request.prompt,
-                model=model,
-                temperature=0.7,
-                max_tokens=500,
-                timeout=15.0,
-            )
-
-            # Append run information
-            response_dict = response.dict()
             response_dict["run"] = i + 1
             results.append(ProviderResponse(**response_dict))
 
@@ -456,6 +351,8 @@ async def benchmark_providers(request: BenchmarkRequest, background_tasks: Backg
     # Save results to file in background
     def save_results():
         try:
+
+            pass
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"/app/monitoring/metrics/benchmark_{timestamp}.json"
 
@@ -471,7 +368,9 @@ async def benchmark_providers(request: BenchmarkRequest, background_tasks: Backg
                     indent=2,
                 )
             logger.info(f"Benchmark results saved to {filename}")
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to save benchmark results: {e}")
 
     background_tasks.add_task(save_results)
@@ -486,20 +385,6 @@ async def benchmark_providers(request: BenchmarkRequest, background_tasks: Backg
 @app.post("/cascade", response_model=TestResponse)
 async def test_cascade(request: CascadeTestRequest):
     """Test the cascade failover setup."""
-    results = []
-    successful_providers = []
-    failed_providers = request.inject_failures.copy()
-
-    for i in range(request.runs):
-        response = await cascade_call(
-            prompt=request.prompt,
-            cascade_order=request.cascade_order,
-            inject_failures=request.inject_failures,
-            timeout=15.0,
-        )
-
-        results.append(response)
-
         if response.status == "success" and response.provider not in successful_providers:
             successful_providers.append(response.provider)
 
@@ -514,10 +399,6 @@ async def test_cascade(request: CascadeTestRequest):
 @app.get("/metrics")
 def metrics():
     """Prometheus metrics endpoint."""
-    return prom.generate_latest()
-
-# Define main function to run server
-def start_server():
     """Start the LLM testing server."""
     uvicorn.run("llm_test_server.main:app", host="0.0.0.0", port=8001, log_level="info")
 

@@ -1,18 +1,6 @@
 #!/usr/bin/env python3
 """
-Example script demonstrating the new memory management components.
-
-This script shows how to use the new memory management components, including
-the configuration system, factory, and telemetry integration.
 """
-
-import asyncio
-import logging
-import os
-import sys
-from typing import List
-
-# Add the project root to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from packages.shared.src.memory.config import (
@@ -34,21 +22,7 @@ logger = logging.getLogger("memory_example")
 @trace_operation("example_add_memory_items")
 async def add_memory_items(memory_manager, items: List[MemoryItem]) -> List[str]:
     """
-    Add memory items to the memory manager.
-
-    Args:
-        memory_manager: Memory manager instance
-        items: List of memory items to add
-
-    Returns:
-        List of item IDs
     """
-    item_ids = []
-    for item in items:
-        item_id = await memory_manager.add_memory_item(item)
-        item_ids.append(item_id)
-        log_operation(
-            logging.INFO,
             f"Added memory item {item_id}",
             "add_memory_item",
             user_id=item.user_id,
@@ -61,21 +35,7 @@ async def perform_semantic_search(
     memory_manager, user_id: str, query_embedding: List[float], top_k: int = 5
 ) -> List[MemoryItem]:
     """
-    Perform semantic search using the memory manager.
-
-    Args:
-        memory_manager: Memory manager instance
-        user_id: User ID to search for
-        query_embedding: Query embedding vector
-        top_k: Maximum number of results to return
-
-    Returns:
-        List of memory items
     """
-    results = await memory_manager.semantic_search(user_id=user_id, query_embedding=query_embedding, top_k=top_k)
-
-    log_operation(
-        logging.INFO,
         f"Performed semantic search for user {user_id}, found {len(results)} results",
         "semantic_search",
         user_id=user_id,
@@ -103,6 +63,9 @@ async def example_with_config():
     memory_manager = await MemoryManagerFactory.create_memory_manager(config)
 
     try:
+
+
+        pass
         # Create sample memory items
         items = [
             MemoryItem(
@@ -148,6 +111,9 @@ async def example_from_env():
     memory_manager = await MemoryManagerFactory.create_memory_manager()
 
     try:
+
+
+        pass
         # Get available backends and vector search providers
         available_backends = MemoryManagerFactory.get_available_backends()
         available_providers = MemoryManagerFactory.get_available_vector_search_providers()

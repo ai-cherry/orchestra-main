@@ -1,15 +1,6 @@
+# TODO: Consider adding connection pooling configuration
 """
-Factory AI Integration Package.
-
-This package provides the complete integration between Factory AI Droids
-and the Orchestra/Roo infrastructure, including:
-- Bridge API Gateway
-- MCP Server Adapters
-- Context Management
-- Caching Layer
-- Monitoring Integration
 """
-
 __version__ = "1.0.0"
 __all__ = [
     "FactoryBridgeGateway",
@@ -22,16 +13,8 @@ from .factory.bridge import FactoryBridgeGateway
 from .factory.context import FactoryContextManager
 
 def setup_factory_integration() -> None:
-    """Initialize Factory AI integration.
-
-    This function sets up all necessary components for Factory AI integration,
-    including database connections, cache initialization, and monitoring setup.
     """
-    import logging
-    import os
-
-    # Configure logging
-    logging.basicConfig(
+    """
         level=os.getenv("LOG_LEVEL", "INFO"), format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 

@@ -1,0 +1,43 @@
+=== Dashboard unique components ===
+dashboard/hooks/useOmniSearch.ts
+dashboard/app/layout.tsx
+dashboard/app/page.tsx
+dashboard/app/admin/llm/page.tsx
+dashboard/next-env.d.ts
+dashboard/types/conversation.ts
+dashboard/types/search.ts
+dashboard/types/speech.d.ts
+dashboard/types/llm.ts
+dashboard/components/ConversationalInterface/index.ts
+
+=== React App unique components ===
+src/ui/web/react_app/vite.config.ts
+src/ui/web/react_app/src/pages/HomePage.tsx
+src/ui/web/react_app/src/store/index.ts
+src/ui/web/react_app/src/components/layout/Sidebar.tsx
+src/ui/web/react_app/src/components/search/SearchInput.tsx
+src/ui/web/react_app/src/App.tsx
+src/ui/web/react_app/src/services/api.ts
+src/ui/web/react_app/src/services/websocket.ts
+
+=== Admin UI existing components ===
+admin-ui/src/pages/PersonaCustomizationPage.tsx
+admin-ui/src/pages/DashboardPage.tsx
+admin-ui/src/pages/NotFoundPage.tsx
+admin-ui/src/pages/ResourcesPage.tsx
+admin-ui/src/pages/IntegrationsPage.tsx
+admin-ui/src/pages/PersonasPage.tsx
+admin-ui/src/pages/MonitoringPage.tsx
+admin-ui/src/pages/OrchestratorLandingPage.tsx
+admin-ui/src/pages/LLMOrchestrationPage.tsx
+admin-ui/src/pages/OrchestrationPage.tsx
+admin-ui/src/pages/SettingsPage.tsx
+admin-ui/src/pages/LogsPage.tsx
+admin-ui/src/pages/LoginPage.tsx
+admin-ui/src/pages/WorkflowsPage.tsx
+admin-ui/src/pages/AgentsPage.tsx
+admin-ui/src/hooks/index.ts
+admin-ui/src/hooks/usePersonaApi.ts
+admin-ui/src/hooks/useModelRouter.ts
+admin-ui/src/hooks/useDebounce.ts
+admin-ui/src/hooks/useAgentApi.ts

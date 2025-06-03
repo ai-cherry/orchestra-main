@@ -1,53 +1,14 @@
 """
-LangChain Agent Integration for Orchestra
-
-This module provides integration with LangChain's agent framework,
-enabling modular, plug-and-play use of LangChain agents within the Orchestra system.
 """
-
-import asyncio
-import logging
-
-from packages.shared.src.models.domain_models import AgentResponse as AgentOutput, UserRequest as AgentInput
-
-from ._base import OrchestraAgentBase
-
-logger = logging.getLogger(__name__)
-
-class LangChainAgentWrapper(OrchestraAgentBase):
     """
-    Wrapper for integrating LangChain-based agents with Orchestra.
-
-    This wrapper adapts LangChain's agent framework to work with the
-    Orchestra orchestration system, supporting modular agent execution.
     """
-
     agent_type = "langchain"
 
     def __init__(self, **kwargs):
         """
-        Initialize the LangChain agent wrapper.
-
-        Args:
-            agent_config: Configuration for the LangChain agent
-            memory_manager: Orchestra's memory management system
-            llm_client: LLM client for the agent
-            tool_registry: Tool registry for the agent
         """
-        super().__init__(**kwargs)
-
-        # Initialize LangChain agent
-        self.langchain_agent = None
-        self._initialize_langchain_agent()
-
-    def _initialize_langchain_agent(self):
         """
-        Initialize the LangChain agent based on configuration.
-
-        Dynamically imports and instantiates the LangChain agent class
-        specified in the agent configuration.
         """
-        try:
             agent_class_name = self.agent_config.get("langchain_agent_class")
             if not agent_class_name:
                 raise ValueError("langchain_agent_class not defined in agent config")
@@ -64,31 +25,15 @@ class LangChainAgentWrapper(OrchestraAgentBase):
 
             logger.info(f"Initialized LangChain agent: {agent_class_name}")
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Failed to initialize LangChain agent: {str(e)}")
 
     async def run(self, input_data: AgentInput) -> AgentOutput:
         """
-        Execute the LangChain agent with the given input, including short-term memory.
-
-        Args:
-            input_data: The user input to process
-
-        Returns:
-            AgentOutput containing the agent's response
         """
-        try:
-            # 1. Retrieve recent messages from short-term memory (if available)
-            # NOTE: Replace with actual memory retrieval logic as needed
-            try:
-                from core.orchestrator.src.main import short_term_memory
-
-                recent_messages = short_term_memory
-            except ImportError:
-                recent_messages = []
-
-            # 2. Prepare context for the LangChain agent
-            context = {
                 "user_input": input_data.content,
                 "recent_messages": recent_messages,
             }
@@ -113,7 +58,10 @@ class LangChainAgentWrapper(OrchestraAgentBase):
                 status="completed",
             )
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error running LangChain agent: {str(e)}")
             return AgentOutput(
                 response_id="error-response",
@@ -125,10 +73,4 @@ class LangChainAgentWrapper(OrchestraAgentBase):
 
     async def health_check(self) -> bool:
         """
-        Check if the LangChain agent wrapper and its underlying framework are available.
-
-        Returns:
-            True if the agent is operational, False otherwise
         """
-        # Optionally, implement a more robust health check for LangChain
-        return self.langchain_agent is not None

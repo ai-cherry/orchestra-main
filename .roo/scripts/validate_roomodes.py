@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
 """Validate .roomodes file for correct configuration."""
-
-import yaml
-import sys
-from pathlib import Path
-
-def validate_roomodes():
     """Validate the .roomodes file."""
     roomodes_file = Path(".roomodes")
 
@@ -14,9 +8,14 @@ def validate_roomodes():
         return False
 
     try:
+
+
+        pass
         with open(roomodes_file) as f:
             data = yaml.safe_load(f)
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"❌ Failed to parse .roomodes file: {e}")
         return False
 

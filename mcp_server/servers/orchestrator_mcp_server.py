@@ -1,27 +1,6 @@
 #!/usr/bin/env python3
 """
-MCP Server for AI Agent Orchestration
-Manages agent modes, workflows, and task execution
 """
-
-import asyncio
-import logging
-import os
-import uuid
-from datetime import datetime
-from enum import Enum
-from typing import Any, Dict, List, Optional
-
-import yaml
-from fastapi import BackgroundTasks, FastAPI, HTTPException, Request, Depends
-from pydantic import BaseModel, Field
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Initialize FastAPI app
-app = FastAPI(
     title="Orchestrator MCP Server",
     description="AI agent orchestration and workflow management",
     version="1.0.0",
@@ -44,7 +23,6 @@ agents_config = {}
 
 class AgentMode(str, Enum):
     """Available agent modes"""
-
     STANDARD = "standard"
     CODE = "code"
     DEBUG = "debug"
@@ -56,7 +34,6 @@ class AgentMode(str, Enum):
 
 class WorkflowStatus(str, Enum):
     """Workflow execution status"""
-
     PENDING = "pending"
     RUNNING = "running"
     COMPLETED = "completed"
@@ -65,13 +42,6 @@ class WorkflowStatus(str, Enum):
 
 class Task(BaseModel):
     """Task model"""
-
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    name: str
-    description: str
-    agent_id: Optional[str] = None
-    priority: int = Field(default=5, ge=1, le=10)
-    params: Dict[str, Any] = Field(default_factory=dict)
     status: str = "pending"
     result: Optional[Any] = None
     error: Optional[str] = None
@@ -80,46 +50,10 @@ class Task(BaseModel):
 
 class Workflow(BaseModel):
     """Workflow model"""
-
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    name: str
-    description: str
-    steps: List[Dict[str, Any]]
-    status: WorkflowStatus = WorkflowStatus.PENDING
-    current_step: int = 0
-    context: Dict[str, Any] = Field(default_factory=dict)
-    results: List[Any] = Field(default_factory=list)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    completed_at: Optional[datetime] = None
-
-class ModeSwitch(BaseModel):
     """Mode switch request"""
-
-    mode: AgentMode
-    agent_id: Optional[str] = None
-    context: Dict[str, Any] = Field(default_factory=dict)
-
-class WorkflowRequest(BaseModel):
     """Workflow execution request"""
-
-    name: str
-    params: Dict[str, Any] = Field(default_factory=dict)
-    priority: int = Field(default=5, ge=1, le=10)
-
-class MCPToolDefinition(BaseModel):
     """MCP tool definition"""
-
-    name: str
-    description: str
-    parameters: Dict[str, Any]
-
-def load_configurations():
     """Load mode definitions and agent configurations"""
-    global mode_definitions, agents_config
-
-    try:
-        # Load mode definitions
-        if os.path.exists(MODE_DEFINITIONS_PATH):
             with open(MODE_DEFINITIONS_PATH, "r") as f:
                 mode_definitions = yaml.safe_load(f)
                 logger.info(f"Loaded {len(mode_definitions.get('modes', {}))} mode definitions")
@@ -130,7 +64,10 @@ def load_configurations():
                 agents_config = yaml.safe_load(f)
                 logger.info(f"Loaded {len(agents_config.get('agents', {}))} agent configurations")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Failed to load configurations: {e}")
 
 # Load configurations on startup
@@ -138,7 +75,6 @@ load_configurations()
 
 async def execute_task(task: Task):
     """Execute a single task"""
-    try:
         task.status = "running"
         logger.info(f"Executing task {task.id}: {task.name}")
 
@@ -171,7 +107,10 @@ async def execute_task(task: Task):
         task.completed_at = datetime.utcnow()
         logger.info(f"Task {task.id} completed successfully")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         task.status = "failed"
         task.error = str(e)
         task.completed_at = datetime.utcnow()
@@ -179,11 +118,6 @@ async def execute_task(task: Task):
 
 async def task_worker():
     """Background worker to process tasks"""
-    while True:
-        try:
-            task = await task_queue.get()
-            await execute_task(task)
-        except Exception as e:
             logger.error(f"Error in task worker: {e}")
         await asyncio.sleep(0.1)
 
@@ -200,8 +134,6 @@ async def startup_event():
 @app.get("/mcp/tools")
 async def get_tools() -> List[MCPToolDefinition]:
     """Return available orchestration tools"""
-    return [
-        MCPToolDefinition(
             name="switch_mode",
             description="Switch agent to a different operational mode",
             parameters={
@@ -285,14 +217,6 @@ async def get_tools() -> List[MCPToolDefinition]:
 @app.post("/mcp/switch_mode")
 async def switch_mode(request: ModeSwitch) -> Dict[str, Any]:
     """Switch agent mode"""
-    global current_mode
-
-    previous_mode = current_mode
-    current_mode = request.mode.value
-
-    # Update agent state if specified
-    if request.agent_id:
-        agent_states[request.agent_id] = {
             "mode": current_mode,
             "context": request.context,
             "switched_at": datetime.utcnow().isoformat(),
@@ -329,9 +253,6 @@ async def run_workflow(
     request: WorkflowRequest, background_tasks: BackgroundTasks, _: None = Depends(verify_signature)
 ) -> Dict[str, Any]:
     """Execute a workflow"""
-    # Create workflow instance
-    workflow = Workflow(
-        name=request.name,
         description=f"Automated workflow: {request.name}",
         steps=get_workflow_steps(request.name),
         context=request.params,
@@ -355,7 +276,6 @@ async def run_workflow(
 
 def get_workflow_steps(workflow_name: str) -> List[Dict[str, Any]]:
     """Get workflow steps based on name"""
-    workflows = {
         "code_review": [
             {"name": "analyze_code", "type": "task"},
             {"name": "check_style", "type": "task"},
@@ -386,14 +306,6 @@ def get_workflow_steps(workflow_name: str) -> List[Dict[str, Any]]:
 
 async def execute_workflow(workflow: Workflow):
     """Execute workflow steps"""
-    try:
-        workflow.status = WorkflowStatus.RUNNING
-
-        for i, step in enumerate(workflow.steps):
-            workflow.current_step = i
-
-            # Create task for step
-            task = Task(
                 name=step["name"],
                 description=f"Step {i+1} of workflow {workflow.name}",
                 params={**workflow.context, **step.get("params", {})},
@@ -415,7 +327,10 @@ async def execute_workflow(workflow: Workflow):
         workflow.completed_at = datetime.utcnow()
         logger.info(f"Workflow {workflow.id} completed successfully")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         workflow.status = WorkflowStatus.FAILED
         logger.error(f"Workflow {workflow.id} failed: {e}")
 
@@ -428,18 +343,6 @@ async def execute_task_endpoint(
     agent_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Queue a task for execution"""
-    # Create task
-    task = Task(
-        name=name,
-        description=description,
-        params=params,
-        priority=priority,
-        agent_id=agent_id,
-    )
-
-    # Add to queue
-    await task_queue.put(task)
-
     logger.info(f"Queued task {task.id}: {task.name}")
 
     return {
@@ -454,7 +357,6 @@ async def execute_task_endpoint(
 @app.post("/mcp/get_status")
 async def get_orchestrator_status(include_workflows: bool = True, include_tasks: bool = True) -> Dict[str, Any]:
     """Get current orchestrator status"""
-    status = {
         "current_mode": current_mode,
         "active_agents": len(agent_states),
         "timestamp": datetime.utcnow().isoformat(),
@@ -491,8 +393,6 @@ async def get_orchestrator_status(include_workflows: bool = True, include_tasks:
 @app.get("/mcp/workflows")
 async def list_workflows() -> List[Dict[str, Any]]:
     """List all workflows"""
-    return [
-        {
             "id": w.id,
             "name": w.name,
             "status": w.status,
@@ -507,7 +407,6 @@ async def list_workflows() -> List[Dict[str, Any]]:
 @app.get("/mcp/workflow/{workflow_id}")
 async def get_workflow_details(workflow_id: str) -> Dict[str, Any]:
     """Get detailed workflow information"""
-    if workflow_id not in active_workflows:
         raise HTTPException(status_code=404, detail=f"Workflow {workflow_id} not found")
 
     workflow = active_workflows[workflow_id]
@@ -529,7 +428,6 @@ async def get_workflow_details(workflow_id: str) -> Dict[str, Any]:
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
-    return {
         "status": "healthy",
         "service": "orchestrator-mcp",
         "current_mode": current_mode,

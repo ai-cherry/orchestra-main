@@ -1,34 +1,9 @@
-"""Knowledge Adapter for Factory AI integration.
-
-This adapter bridges the Knowledge Droid with the memory MCP server,
-handling vector operations and documentation capabilities.
+# TODO: Consider adding connection pooling configuration
 """
-
-import json
-import logging
-from typing import Any, Dict, List, Optional, Tuple
-from datetime import datetime
-
-from .factory_mcp_adapter import FactoryMCPAdapter
-
-logger = logging.getLogger(__name__)
-
-class KnowledgeAdapter(FactoryMCPAdapter):
-    """Adapter for Knowledge Droid to memory MCP server communication.
-
-    Specializes in:
-    - Vector database operations (Weaviate)
-    - Documentation generation and management
-    - Semantic search optimization
-    - Knowledge graph operations
+"""
     """
-
-    def __init__(self, mcp_server: Any, droid_config: Dict[str, Any]) -> None:
-        """Initialize the Knowledge adapter.
-
-        Args:
-            mcp_server: The memory MCP server instance
-            droid_config: Configuration for the Knowledge droid
+    """
+        """
         """
         super().__init__(mcp_server, droid_config, "knowledge")
         self.supported_methods = [
@@ -46,13 +21,7 @@ class KnowledgeAdapter(FactoryMCPAdapter):
         self.embedding_cache: Dict[str, List[float]] = {}
 
     async def translate_to_factory(self, mcp_request: Dict[str, Any]) -> Dict[str, Any]:
-        """Translate MCP request to Factory AI Knowledge format.
-
-        Args:
-            mcp_request: Request in MCP format
-
-        Returns:
-            Request in Factory AI Knowledge format
+        """
         """
         method = mcp_request.get("method", "")
         params = mcp_request.get("params", {})
@@ -102,17 +71,10 @@ class KnowledgeAdapter(FactoryMCPAdapter):
             factory_request["context"]["depth"] = params.get("depth", 3)
             factory_request["options"]["visualization"] = params.get("visualization", True)
 
-        logger.debug(f"Translated to Factory request: {factory_request}")
         return factory_request
 
     async def translate_to_mcp(self, factory_response: Dict[str, Any]) -> Dict[str, Any]:
-        """Translate Factory AI Knowledge response to MCP format.
-
-        Args:
-            factory_response: Response from Factory AI Knowledge
-
-        Returns:
-            Response in MCP format
+        """
         """
         if "error" in factory_response:
             return {
@@ -157,24 +119,11 @@ class KnowledgeAdapter(FactoryMCPAdapter):
                 "visualization": result["knowledge_graph"].get("visualization", ""),
             }
 
-        logger.debug(f"Translated to MCP response: {mcp_response}")
         return mcp_response
 
     async def _call_factory_droid(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
-        """Call the Factory AI Knowledge droid.
-
-        Args:
-            factory_request: Request in Factory AI format
-
-        Returns:
-            Response from Factory AI Knowledge droid
         """
-        try:
-            # Import Factory AI client dynamically
-            from factory_ai import FactoryAI
-
-            if not self._factory_client:
-                self._factory_client = FactoryAI(
+        """
                     api_key=self.droid_config.get("api_key"),
                     base_url=self.droid_config.get("base_url", "https://api.factory.ai"),
                 )
@@ -194,24 +143,23 @@ class KnowledgeAdapter(FactoryMCPAdapter):
 
             return {"result": response}
 
-        except ImportError:
+        except Exception:
+
+
+            pass
             logger.warning("Factory AI SDK not available, using mock response")
             return self._get_mock_response(factory_request)
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error calling Knowledge droid: {e}", exc_info=True)
             raise
 
     def _map_method_to_action(self, method: str) -> str:
-        """Map MCP method to Factory AI Knowledge action.
-
-        Args:
-            method: MCP method name
-
-        Returns:
-            Factory AI action name
         """
-        method_mapping = {
+        """
             "store_knowledge": "store",
             "search_knowledge": "search",
             "generate_documentation": "generate_docs",
@@ -222,18 +170,8 @@ class KnowledgeAdapter(FactoryMCPAdapter):
         return method_mapping.get(method, "store")
 
     def _format_search_results(self, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Format search results for MCP response.
-
-        Args:
-            results: List of search result data from Factory AI
-
-        Returns:
-            Formatted search results for MCP
         """
-        formatted_results = []
-        for idx, result in enumerate(results):
-            formatted_results.append(
-                {
+        """
                     "rank": idx + 1,
                     "id": result.get("id", ""),
                     "content": result.get("content", ""),
@@ -248,13 +186,7 @@ class KnowledgeAdapter(FactoryMCPAdapter):
         return formatted_results
 
     def _get_mock_response(self, factory_request: Dict[str, Any]) -> Dict[str, Any]:
-        """Generate mock response for testing.
-
-        Args:
-            factory_request: The Factory AI request
-
-        Returns:
-            Mock response
+        """
         """
         action = factory_request["action"]
 
@@ -319,39 +251,8 @@ class KnowledgeAdapter(FactoryMCPAdapter):
             return {
                 "result": {
                     "status": "success",
-                    "documentation": """# System Documentation
-
-## Overview
-This document provides comprehensive information about the system architecture and components.
-
-## Components
-
-### PostgreSQL Database
-- Connection pooling configuration
-- Performance optimization settings
-- Backup and recovery procedures
-
-### Weaviate Vector Database
-- Schema design
-- Indexing strategies
-- Query optimization
-
-### API Gateway
-- Routing configuration
-- Authentication and authorization
-- Rate limiting
-
-## Best Practices
-1. Always use connection pooling
-2. Implement proper error handling
-3. Monitor system performance
-4. Regular backups
-
-## Troubleshooting
-Common issues and their solutions...
-
----
-Generated by Knowledge Droid v1.0.0""",
+                    "documentation": """
+Generated by Knowledge Droid v1.0.0"""
                     "metadata": {
                         "sections": 5,
                         "word_count": 150,
@@ -422,19 +323,8 @@ Generated by Knowledge Droid v1.0.0""",
         }
 
     async def optimize_embeddings(self, documents: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Optimize embeddings for a batch of documents.
-
-        Args:
-            documents: List of documents to process
-
-        Returns:
-            Optimization results
         """
-        # Check cache first
-        cached_count = 0
-        new_embeddings = []
-
-        for doc in documents:
+        """
             content_key = doc.get("content", "")[:100]
             if content_key in self.embedding_cache:
                 cached_count += 1
@@ -470,16 +360,8 @@ Generated by Knowledge Droid v1.0.0""",
         return result
 
     async def build_knowledge_index(self, collection: str, options: Dict[str, Any]) -> Dict[str, Any]:
-        """Build or rebuild knowledge index for a collection.
-
-        Args:
-            collection: Collection name
-            options: Indexing options
-
-        Returns:
-            Index building results
         """
-        request = {
+        """
             "method": "analyze_knowledge_graph",
             "params": {
                 "collection": collection,

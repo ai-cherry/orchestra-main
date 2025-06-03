@@ -1,0 +1,19 @@
+memory_settings:
+  context_window: 6000
+  encryption: AES-256
+  importance_threshold: 0.7
+  max_memories: 100000
+  retention_days: 3650
+persona_id: karen
+retrieval:
+  context_window: 6000
+  max_memories_per_context: 10
+  similarity_threshold: 0.7
+storage:
+  postgresql:
+    retention_policy: 3650 days
+    table: karen_conversation_history
+  vector_db:
+    collection: karen_memories
+    dimensions: 1536
+    embedding_model: text-embedding-ada-002

@@ -1,30 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Claude Project Analyzer Integration
-Provides comprehensive project analysis and code generation using Claude/Claude Max
 """
-
-import os
-import sys
-import json
-import time
-import asyncio
-import anthropic
-from typing import Dict, List, Optional, Any
-from datetime import datetime
-from pathlib import Path
-import logging
-
-# Add parent directory to path for imports
-sys.path.append(str(Path(__file__).parent.parent.parent))
-
-from shared.database import initialize_database
-
-logger = logging.getLogger(__name__)
-
-class ClaudeAnalyzer:
     """Claude-based project analyzer and code generator"""
-    
     def __init__(self, api_key: str = None, model: str = "claude-3-5-sonnet-20241022"):
         self.api_key = api_key or os.environ.get('ANTHROPIC_API_KEY')
         self.model = model
@@ -50,43 +28,13 @@ class ClaudeAnalyzer:
     
     async def __aenter__(self):
         """Async context manager entry"""
-        # Initialize database
-        try:
-            postgres_url = os.environ.get(
-                'POSTGRES_URL',
-                'postgresql://postgres:password@localhost:5432/orchestra'
-            )
-            weaviate_url = os.environ.get('WEAVIATE_URL', 'http://localhost:8080')
-            weaviate_api_key = os.environ.get('WEAVIATE_API_KEY')
-            
-            self.db = await initialize_database(postgres_url, weaviate_url, weaviate_api_key)
-        except Exception as e:
             logger.warning(f"Database initialization failed: {e}")
         return self
     
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Async context manager exit"""
-        if self.db:
-            await self.db.close()
-    
     async def analyze_project(self, project_path: str, analysis_type: str = "comprehensive") -> Dict:
         """Comprehensive project analysis using Claude"""
-        start_time = time.time()
-        
-        try:
-            # Gather project context
-            project_context = await self._gather_project_context(project_path)
-            
-            # Create analysis prompt
-            analysis_prompt = self._create_analysis_prompt(project_context, analysis_type)
-            
-            # Call Claude API
-            response = self.client.messages.create(
-                model=self.model,
-                max_tokens=4096,
-                temperature=0.3,
-                messages=[
-                    {
                         "role": "user",
                         "content": analysis_prompt
                     }
@@ -110,12 +58,16 @@ class ClaudeAnalyzer:
             
             # Parse structured analysis if possible
             try:
+
+                pass
                 if "```json" in response.content[0].text:
                     json_start = response.content[0].text.find("```json") + 7
                     json_end = response.content[0].text.find("```", json_start)
                     json_content = response.content[0].text[json_start:json_end].strip()
                     analysis_result["structured_analysis"] = json.loads(json_content)
-            except json.JSONDecodeError:
+            except Exception:
+
+                pass
                 logger.warning("Could not parse structured analysis from Claude response")
             
             # Log to database
@@ -140,7 +92,10 @@ class ClaudeAnalyzer:
             
             return analysis_result
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             self.performance_metrics['errors'] += 1
             await self._log_error("analyze_project", project_path, str(e))
             raise
@@ -148,18 +103,6 @@ class ClaudeAnalyzer:
     async def generate_code(self, prompt: str, context: Dict = None, 
                           code_type: str = "implementation") -> Dict:
         """Generate code using Claude"""
-        start_time = time.time()
-        
-        try:
-            # Enhance prompt with context
-            enhanced_prompt = self._create_code_generation_prompt(prompt, context, code_type)
-            
-            response = self.client.messages.create(
-                model=self.model,
-                max_tokens=4096,
-                temperature=0.2,
-                messages=[
-                    {
                         "role": "user",
                         "content": enhanced_prompt
                     }
@@ -204,7 +147,10 @@ class ClaudeAnalyzer:
             
             return generation_result
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             self.performance_metrics['errors'] += 1
             await self._log_error("generate_code", prompt[:100], str(e))
             raise
@@ -212,17 +158,6 @@ class ClaudeAnalyzer:
     async def refactor_code(self, code_content: str, refactor_goals: List[str],
                           file_path: str = None) -> Dict:
         """Refactor code using Claude"""
-        start_time = time.time()
-        
-        try:
-            refactor_prompt = self._create_refactor_prompt(code_content, refactor_goals, file_path)
-            
-            response = self.client.messages.create(
-                model=self.model,
-                max_tokens=4096,
-                temperature=0.1,
-                messages=[
-                    {
                         "role": "user",
                         "content": refactor_prompt
                     }
@@ -267,19 +202,24 @@ class ClaudeAnalyzer:
             
             return refactor_result
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             self.performance_metrics['errors'] += 1
             await self._log_error("refactor_code", file_path or "unknown", str(e))
             raise
     
     async def _gather_project_context(self, project_path: str) -> Dict:
         """Gather comprehensive project context"""
-        context = {
             "project_path": project_path,
             "timestamp": datetime.now().isoformat()
         }
         
         try:
+
+        
+            pass
             project_root = Path(project_path)
             
             # Get project structure
@@ -296,12 +236,18 @@ class ClaudeAnalyzer:
                 config_path = project_root / config_file
                 if config_path.exists() and config_path.stat().st_size < 10000:  # Limit size
                     try:
+
+                        pass
                         context["config_files"][config_file] = config_path.read_text(encoding='utf-8')
                     except Exception:
+
+                        pass
                         context["config_files"][config_file] = "[Could not read file]"
             
             # Get recent git commits if available
             try:
+
+                pass
                 import subprocess
                 result = subprocess.run(
                     ["git", "log", "--oneline", "-10"],
@@ -313,10 +259,14 @@ class ClaudeAnalyzer:
                 if result.returncode == 0:
                     context["recent_commits"] = result.stdout.strip().split('\n')
             except Exception:
+
+                pass
                 pass
             
             # Get MCP context from memory server
             try:
+
+                pass
                 import aiohttp
                 async with aiohttp.ClientSession() as session:
                     async with session.get(
@@ -326,9 +276,14 @@ class ClaudeAnalyzer:
                         if response.status == 200:
                             context["mcp_memory"] = await response.json()
             except Exception:
+
+                pass
                 pass
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             logger.warning(f"Error gathering project context: {e}")
             context["context_error"] = str(e)
         
@@ -336,12 +291,12 @@ class ClaudeAnalyzer:
     
     def _get_project_structure(self, project_root: Path, max_depth: int = 3) -> Dict:
         """Get project directory structure"""
-        def scan_directory(path: Path, current_depth: int = 0) -> Dict:
-            if current_depth > max_depth:
                 return {"...": "max_depth_reached"}
             
             structure = {}
             try:
+
+                pass
                 for item in sorted(path.iterdir()):
                     if item.name.startswith('.') and item.name not in ['.env.example', '.cursorrules']:
                         continue
@@ -355,11 +310,17 @@ class ClaudeAnalyzer:
                     else:
                         # Include file size for context
                         try:
+
+                            pass
                             size = item.stat().st_size
                             structure[item.name] = f"{size} bytes"
-                        except:
+                        except Exception:
+
+                            pass
                             structure[item.name] = "unknown size"
-            except PermissionError:
+            except Exception:
+
+                pass
                 structure["[permission_denied]"] = True
             
             return structure
@@ -369,49 +330,6 @@ class ClaudeAnalyzer:
     def _create_analysis_prompt(self, context: Dict, analysis_type: str) -> str:
         """Create comprehensive analysis prompt for Claude"""
         base_prompt = f"""
-You are an expert software architect and code analyst. Analyze the following project comprehensively.
-
-Project Context:
-{json.dumps(context, indent=2)}
-
-Analysis Type: {analysis_type}
-
-Provide a detailed analysis including:
-
-1. **Architecture Overview**
-   - System design patterns
-   - Component relationships
-   - Data flow analysis
-
-2. **Code Quality Assessment**
-   - Code organization and structure
-   - Adherence to best practices
-   - Potential technical debt
-
-3. **Performance Considerations**
-   - Bottlenecks and optimization opportunities
-   - Scalability concerns
-   - Resource utilization
-
-4. **Security Analysis**
-   - Potential vulnerabilities
-   - Security best practices compliance
-   - Authentication and authorization patterns
-
-5. **Maintainability**
-   - Documentation quality
-   - Testing coverage
-   - Code complexity metrics
-
-6. **Recommendations**
-   - Priority improvements
-   - Architectural enhancements
-   - Performance optimizations
-
-Please provide both a narrative analysis and a structured JSON summary at the end with the following format:
-
-```json
-{{
   "overall_score": 0-100,
   "architecture_score": 0-100,
   "code_quality_score": 0-100,
@@ -431,51 +349,13 @@ Please provide both a narrative analysis and a structured JSON summary at the en
 }}
 ```
 """
-        return base_prompt
-    
-    def _create_code_generation_prompt(self, prompt: str, context: Dict, code_type: str) -> str:
         """Create code generation prompt with context"""
         enhanced_prompt = f"""
-You are an expert Python developer. Generate high-quality, production-ready code.
-
-Request: {prompt}
-Code Type: {code_type}
-Context: {json.dumps(context, indent=2) if context else 'None'}
-
-Requirements:
-1. Use Python 3.10+ features and syntax
-2. Include comprehensive type hints (PEP 484)
-3. Add Google-style docstrings
-4. Follow Black formatting standards
-5. Include error handling and logging
-6. Add performance considerations
-7. Include unit tests when appropriate
-
-Please provide:
-1. The main code implementation
-2. Any necessary imports
-3. Usage examples
-4. Brief explanation of design decisions
-
-Format your response with clear code blocks and explanations.
 """
-        return enhanced_prompt
-    
-    def _create_refactor_prompt(self, code_content: str, refactor_goals: List[str], 
-                              file_path: str = None) -> str:
         """Create refactoring prompt"""
         goals_text = "\n".join(f"- {goal}" for goal in refactor_goals)
         
         refactor_prompt = f"""
-You are an expert Python developer. Refactor the following code to achieve these goals:
-
-{goals_text}
-
-Original Code:
-```python
-{code_content}
-```
-
 File Path: {file_path or "Unknown"}
 
 Requirements for refactoring:
@@ -495,22 +375,7 @@ Please provide:
 
 Format your response with clear code blocks and explanations.
 """
-        return refactor_prompt
-    
-    def _extract_code_blocks(self, text: str) -> List[Dict]:
         """Extract code blocks from Claude response"""
-        code_blocks = []
-        lines = text.split('\n')
-        
-        in_code_block = False
-        current_block = []
-        current_language = None
-        
-        for line in lines:
-            if line.strip().startswith('```'):
-                if in_code_block:
-                    # End of code block
-                    code_blocks.append({
                         "language": current_language,
                         "code": '\n'.join(current_block)
                     })
@@ -528,73 +393,47 @@ Format your response with clear code blocks and explanations.
     async def _log_analysis(self, analysis_type: str, project_path: str, 
                            status: str, result: Dict = None) -> None:
         """Log analysis to PostgreSQL"""
-        try:
-            await self.db.execute_query(
                 """
-                INSERT INTO claude_analysis_logs 
-                (analysis_type, project_path, status, model_used, result, 
-                 input_tokens, output_tokens, latency_seconds, created_at)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-                """,
-                analysis_type, project_path, status, self.model,
-                json.dumps(result) if result else None,
+                """
                 result.get("usage", {}).get("input_tokens", 0) if result else 0,
                 result.get("usage", {}).get("output_tokens", 0) if result else 0,
                 result.get("latency", 0.0) if result else 0.0,
                 datetime.now()
             )
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to log analysis: {e}")
     
     async def _log_error(self, action: str, identifier: str, error: str) -> None:
         """Log error to PostgreSQL"""
-        try:
-            await self.db.execute_query(
                 """
-                INSERT INTO claude_analysis_logs 
-                (analysis_type, project_path, status, error_message, created_at)
-                VALUES ($1, $2, $3, $4, $5)
-                """,
+                """
                 action, identifier, "error", error, datetime.now()
             )
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to log error: {e}")
     
     async def _update_weaviate_context(self, context_type: str, identifier: str, 
                                      data: Dict) -> None:
         """Update Weaviate with analysis results"""
-        # Skip Weaviate updates for now to avoid client issues
-        if not self.weaviate_manager:
-            logger.debug("Weaviate manager not available, skipping context update")
             return
             
         try:
+
+            
+            pass
             # This would be implemented when WeaviateManager is fixed
             pass
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to update Weaviate: {e}")
     
     async def get_performance_metrics(self) -> Dict:
         """Get Claude performance metrics"""
-        avg_latency = (
-            self.performance_metrics['total_latency'] / 
-            self.performance_metrics['requests_made']
-            if self.performance_metrics['requests_made'] > 0 else 0
-        )
-        
-        error_rate = (
-            self.performance_metrics['errors'] / 
-            self.performance_metrics['requests_made']
-            if self.performance_metrics['requests_made'] > 0 else 0
-        )
-        
-        avg_tokens = (
-            self.performance_metrics['total_tokens'] / 
-            self.performance_metrics['requests_made']
-            if self.performance_metrics['requests_made'] > 0 else 0
-        )
-        
-        return {
             "requests_made": self.performance_metrics['requests_made'],
             "average_latency": avg_latency,
             "error_rate": error_rate,
@@ -607,7 +446,6 @@ Format your response with clear code blocks and explanations.
     
     async def compare_with_cursor_ai(self, test_prompt: str) -> Dict:
         """Compare Claude performance with Cursor AI"""
-        comparison_results = {
             "test_prompt": test_prompt,
             "timestamp": datetime.now().isoformat(),
             "claude_results": {},
@@ -616,6 +454,9 @@ Format your response with clear code blocks and explanations.
         }
         
         try:
+
+        
+            pass
             # Test Claude
             claude_start = time.time()
             claude_result = await self.generate_code(test_prompt, {"comparison_test": True})
@@ -630,6 +471,8 @@ Format your response with clear code blocks and explanations.
             
             # Test Cursor AI (if available)
             try:
+
+                pass
                 from ai_components.cursor_ai.cursor_integration_enhanced import CursorAIClient
                 
                 async with CursorAIClient() as cursor_client:
@@ -643,7 +486,10 @@ Format your response with clear code blocks and explanations.
                         "fallback": cursor_result.get("fallback", False)
                     }
                     
-            except Exception as e:
+            except Exception:
+
+                    
+                pass
                 comparison_results["cursor_ai_results"] = {
                     "error": str(e),
                     "success": False
@@ -663,7 +509,10 @@ Format your response with clear code blocks and explanations.
                     "recommendation": "claude"
                 }
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             comparison_results["error"] = str(e)
         
         return comparison_results
@@ -671,48 +520,14 @@ Format your response with clear code blocks and explanations.
 
 async def setup_claude_database():
     """Setup database tables for Claude integration"""
-    # Get database URL from environment or use default
-    postgres_url = os.environ.get(
-        'POSTGRES_URL',
-        'postgresql://postgres:password@localhost:5432/orchestra'
-    )
-    
-    weaviate_url = os.environ.get('WEAVIATE_URL', 'http://localhost:8080')
-    weaviate_api_key = os.environ.get('WEAVIATE_API_KEY')
-    
-    db = await initialize_database(postgres_url, weaviate_url, weaviate_api_key)
-    
-    try:
         print("🗄️  Setting up Claude analysis database tables...")
         
         await db.execute_query("""
-            CREATE TABLE IF NOT EXISTS claude_analysis_logs (
-                id SERIAL PRIMARY KEY,
-                analysis_type VARCHAR(100) NOT NULL,
-                project_path TEXT,
-                status VARCHAR(50) NOT NULL,
-                model_used VARCHAR(100),
-                result JSONB,
-                error_message TEXT,
-                input_tokens INTEGER DEFAULT 0,
-                output_tokens INTEGER DEFAULT 0,
-                latency_seconds FLOAT DEFAULT 0.0,
-                created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-                updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-            );
-        """, fetch=False)
-        
-        # Create indexes
+        """
         await db.execute_query("""
-            CREATE INDEX IF NOT EXISTS idx_claude_analysis_type 
-            ON claude_analysis_logs(analysis_type);
-        """, fetch=False)
-        
+        """
         await db.execute_query("""
-            CREATE INDEX IF NOT EXISTS idx_claude_analysis_created_at 
-            ON claude_analysis_logs(created_at DESC);
-        """, fetch=False)
-        
+        """
         print("✅ Claude analysis database tables created!")
     
     finally:
@@ -721,10 +536,6 @@ async def setup_claude_database():
 
 async def main():
     """Example usage of Claude analyzer"""
-    try:
-        async with ClaudeAnalyzer() as analyzer:
-            # Test project analysis
-            result = await analyzer.analyze_project(
                 project_path="/root/orchestra-main",
                 analysis_type="architecture"
             )
@@ -740,7 +551,10 @@ async def main():
             print("\nCode Generation Result:")
             print(json.dumps(code_result, indent=2, default=str))
             
-    except Exception as e:
+    except Exception:
+
+            
+        pass
         logger.error(f"Error in main: {e}")
 
 # Add alias for consistent naming

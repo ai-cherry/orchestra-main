@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 """Test real agents directly."""
-
-import asyncio
-import sys
-
 sys.path.insert(0, ".")
 
 async def test():

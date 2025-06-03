@@ -1,0 +1,2158 @@
+{
+  "timestamp": "2025-06-03T17:36:47.939277",
+  "summary": {
+    "total_env_files": 16,
+    "total_yaml_configs": 48,
+    "total_json_configs": 26,
+    "total_docker_configs": 16,
+    "total_pulumi_configs": 13,
+    "total_python_configs": 29,
+    "duplicate_env_vars_count": 38,
+    "security_issues_count": 44,
+    "naming_issues_count": 103,
+    "schema_issues_count": 12
+  },
+  "duplicate_env_vars": [
+    {
+      "variable": "OPENROUTER_API_KEY",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.example",
+          "line": 4,
+          "value": "your-openrouter-api-key"
+        },
+        {
+          "file": "/root/orchestra-main/.env",
+          "line": 2,
+          "value": "test-openrouter-key-123"
+        }
+      ],
+      "different_values": true,
+      "severity": "high"
+    },
+    {
+      "variable": "API_KEY",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.example",
+          "line": 5,
+          "value": "your-api-key"
+        },
+        {
+          "file": "/root/orchestra-main/.env",
+          "line": 3,
+          "value": "test-api-key-456"
+        }
+      ],
+      "different_values": true,
+      "severity": "high"
+    },
+    {
+      "variable": "OPENAI_API_KEY",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.example",
+          "line": 6,
+          "value": "your-openai-api-key"
+        },
+        {
+          "file": "/root/orchestra-main/.env.development",
+          "line": 34,
+          "value": ""${API_KEY}""
+        }
+      ],
+      "different_values": true,
+      "severity": "high"
+    },
+    {
+      "variable": "ANTHROPIC_API_KEY",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.example",
+          "line": 7,
+          "value": "your-anthropic-api-key"
+        },
+        {
+          "file": "/root/orchestra-main/.env.development",
+          "line": 35,
+          "value": ""${API_KEY}""
+        }
+      ],
+      "different_values": true,
+      "severity": "high"
+    },
+    {
+      "variable": "POSTGRES_HOST",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.example",
+          "line": 11,
+          "value": "localhost"
+        },
+        {
+          "file": "/root/orchestra-main/.env.development",
+          "line": 19,
+          "value": "postgres"
+        },
+        {
+          "file": "/root/orchestra-main/.env",
+          "line": 6,
+          "value": "localhost"
+        }
+      ],
+      "different_values": true,
+      "severity": "high"
+    },
+    {
+      "variable": "POSTGRES_PORT",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.example",
+          "line": 12,
+          "value": "5432"
+        },
+        {
+          "file": "/root/orchestra-main/.env.development",
+          "line": 18,
+          "value": "5432"
+        },
+        {
+          "file": "/root/orchestra-main/.env",
+          "line": 7,
+          "value": "5432"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "POSTGRES_DB",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.example",
+          "line": 13,
+          "value": "orchestra"
+        },
+        {
+          "file": "/root/orchestra-main/.env.development",
+          "line": 17,
+          "value": "orchestra"
+        },
+        {
+          "file": "/root/orchestra-main/.env",
+          "line": 8,
+          "value": "orchestra"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "POSTGRES_USER",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.example",
+          "line": 14,
+          "value": "postgres"
+        },
+        {
+          "file": "/root/orchestra-main/.env.development",
+          "line": 15,
+          "value": "orchestra"
+        },
+        {
+          "file": "/root/orchestra-main/.env",
+          "line": 9,
+          "value": "postgres"
+        }
+      ],
+      "different_values": true,
+      "severity": "high"
+    },
+    {
+      "variable": "POSTGRES_PASSWORD",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.example",
+          "line": 15,
+          "value": "your-postgres-password"
+        },
+        {
+          "file": "/root/orchestra-main/.env.development",
+          "line": 16,
+          "value": "orchestra"
+        },
+        {
+          "file": "/root/orchestra-main/.env",
+          "line": 10,
+          "value": "postgres"
+        }
+      ],
+      "different_values": true,
+      "severity": "high"
+    },
+    {
+      "variable": "WEAVIATE_HOST",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.example",
+          "line": 20,
+          "value": "localhost"
+        },
+        {
+          "file": "/root/orchestra-main/.env.development",
+          "line": 28,
+          "value": "weaviate"
+        },
+        {
+          "file": "/root/orchestra-main/.env",
+          "line": 13,
+          "value": "localhost"
+        }
+      ],
+      "different_values": true,
+      "severity": "high"
+    },
+    {
+      "variable": "WEAVIATE_PORT",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.example",
+          "line": 21,
+          "value": "8080"
+        },
+        {
+          "file": "/root/orchestra-main/.env.development",
+          "line": 29,
+          "value": "8080"
+        },
+        {
+          "file": "/root/orchestra-main/.env",
+          "line": 14,
+          "value": "8080"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "WEAVIATE_API_KEY",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.example",
+          "line": 23,
+          "value": "your-weaviate-api-key"
+        },
+        {
+          "file": "/root/orchestra-main/.env",
+          "line": 15,
+          "value": "test-weaviate-key-789"
+        }
+      ],
+      "different_values": true,
+      "severity": "high"
+    },
+    {
+      "variable": "API_URL",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.example",
+          "line": 32,
+          "value": "http://localhost:8080"
+        },
+        {
+          "file": "/root/orchestra-main/.env",
+          "line": 18,
+          "value": "http://localhost:8080"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "API_PORT",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.example",
+          "line": 34,
+          "value": "8080"
+        },
+        {
+          "file": "/root/orchestra-main/.env.development",
+          "line": 10,
+          "value": "8000"
+        }
+      ],
+      "different_values": true,
+      "severity": "high"
+    },
+    {
+      "variable": "MCP_ORCHESTRATOR_PORT",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.example",
+          "line": 40,
+          "value": "8002"
+        },
+        {
+          "file": "/root/orchestra-main/.env",
+          "line": 21,
+          "value": "8002"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "MCP_MEMORY_PORT",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.example",
+          "line": 41,
+          "value": "8003"
+        },
+        {
+          "file": "/root/orchestra-main/.env",
+          "line": 22,
+          "value": "8003"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "MCP_WEAVIATE_DIRECT_PORT",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.example",
+          "line": 42,
+          "value": "8001"
+        },
+        {
+          "file": "/root/orchestra-main/.env",
+          "line": 23,
+          "value": "8001"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "MCP_DEPLOYMENT_PORT",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.example",
+          "line": 43,
+          "value": "8005"
+        },
+        {
+          "file": "/root/orchestra-main/.env",
+          "line": 24,
+          "value": "8005"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "MCP_TOOLS_PORT",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.example",
+          "line": 44,
+          "value": "8006"
+        },
+        {
+          "file": "/root/orchestra-main/.env",
+          "line": 25,
+          "value": "8006"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "GCP_PROJECT_ID",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.development",
+          "line": 5,
+          "value": "cherry-ai-project"
+        },
+        {
+          "file": "/root/orchestra-main/.env.template",
+          "line": 5,
+          "value": "cherry-ai-project"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "GCP_REGION",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.development",
+          "line": 6,
+          "value": "us-west4"
+        },
+        {
+          "file": "/root/orchestra-main/.env.template",
+          "line": 6,
+          "value": "us-central1"
+        }
+      ],
+      "different_values": true,
+      "severity": "high"
+    },
+    {
+      "variable": "export VULTR_API_KEY",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.deployment",
+          "line": 3,
+          "value": "DEMO-VULTR-API-KEY-REPLACE-WITH-REAL"
+        },
+        {
+          "file": "/root/orchestra-main/.envrc",
+          "line": 14,
+          "value": "${VULTR_API_KEY:-}"
+        },
+        {
+          "file": "/root/orchestra-main/.envrc",
+          "line": 14,
+          "value": "${VULTR_API_KEY:-}"
+        }
+      ],
+      "different_values": true,
+      "severity": "high"
+    },
+    {
+      "variable": "export DRAGONFLY_URL",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.envrc.example",
+          "line": 4,
+          "value": "redis://localhost:6379"
+        },
+        {
+          "file": "/root/orchestra-main/.envrc.example",
+          "line": 4,
+          "value": "redis://localhost:6379"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "export MONGODB_URI",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.envrc.example",
+          "line": 5,
+          "value": "mongodb://localhost:27017"
+        },
+        {
+          "file": "/root/orchestra-main/.envrc.example",
+          "line": 5,
+          "value": "mongodb://localhost:27017"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "export WEAVIATE_URL",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.envrc.example",
+          "line": 6,
+          "value": "http://localhost:8080"
+        },
+        {
+          "file": "/root/orchestra-main/.envrc.example",
+          "line": 6,
+          "value": "http://localhost:8080"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "export PULUMI_CONFIG_PASSPHRASE",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.envrc",
+          "line": 2,
+          "value": "orchestra-dev-123"
+        },
+        {
+          "file": "/root/orchestra-main/.envrc",
+          "line": 2,
+          "value": "orchestra-dev-123"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "export PULUMI_SKIP_UPDATE_CHECK",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.envrc",
+          "line": 3,
+          "value": "true"
+        },
+        {
+          "file": "/root/orchestra-main/.envrc",
+          "line": 3,
+          "value": "true"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "alias pulumi",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.envrc",
+          "line": 11,
+          "value": "$PWD/scripts/pulumi_wrapper.sh"
+        },
+        {
+          "file": "/root/orchestra-main/.envrc",
+          "line": 11,
+          "value": "$PWD/scripts/pulumi_wrapper.sh"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "export VULTR_SERVER_IP",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.envrc",
+          "line": 15,
+          "value": "45.32.69.157"
+        },
+        {
+          "file": "/root/orchestra-main/.envrc",
+          "line": 15,
+          "value": "45.32.69.157"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "export ENVIRONMENT",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.envrc",
+          "line": 18,
+          "value": "production"
+        },
+        {
+          "file": "/root/orchestra-main/.envrc",
+          "line": 18,
+          "value": "production"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "export PROJECT_ROOT",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.envrc",
+          "line": 19,
+          "value": "${PWD}"
+        },
+        {
+          "file": "/root/orchestra-main/.envrc",
+          "line": 19,
+          "value": "${PWD}"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "VITE_API_URL",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/.env.compose",
+          "line": 1,
+          "value": "http://localhost:8000"
+        },
+        {
+          "file": "/root/orchestra-main/admin-ui/.env",
+          "line": 1,
+          "value": "https://cherry-ai.me"
+        }
+      ],
+      "different_values": true,
+      "severity": "high"
+    },
+    {
+      "variable": "NEXT_PUBLIC_API_URL",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/dashboard/.env.example",
+          "line": 5,
+          "value": "http://localhost:8080"
+        },
+        {
+          "file": "/root/orchestra-main/ui_projects_backup_20250603_162302/dashboard/.env.example",
+          "line": 5,
+          "value": "http://localhost:8080"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "NEXT_PUBLIC_API_KEY",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/dashboard/.env.example",
+          "line": 6,
+          "value": "your-api-key-here"
+        },
+        {
+          "file": "/root/orchestra-main/ui_projects_backup_20250603_162302/dashboard/.env.example",
+          "line": 6,
+          "value": "your-api-key-here"
+        }
+      ],
+      "different_values": false,
+      "severity": "medium"
+    },
+    {
+      "variable": "MEMORY",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/config/environments/staging.env",
+          "line": 2,
+          "value": "2Gi"
+        },
+        {
+          "file": "/root/orchestra-main/config/environments/prod.env",
+          "line": 2,
+          "value": "4Gi"
+        },
+        {
+          "file": "/root/orchestra-main/config/environments/dev.env",
+          "line": 2,
+          "value": "1Gi"
+        }
+      ],
+      "different_values": true,
+      "severity": "high"
+    },
+    {
+      "variable": "CPU",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/config/environments/staging.env",
+          "line": 3,
+          "value": "1"
+        },
+        {
+          "file": "/root/orchestra-main/config/environments/prod.env",
+          "line": 3,
+          "value": "2"
+        },
+        {
+          "file": "/root/orchestra-main/config/environments/dev.env",
+          "line": 3,
+          "value": "1"
+        }
+      ],
+      "different_values": true,
+      "severity": "high"
+    },
+    {
+      "variable": "MIN_INSTANCES",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/config/environments/staging.env",
+          "line": 4,
+          "value": "1"
+        },
+        {
+          "file": "/root/orchestra-main/config/environments/prod.env",
+          "line": 4,
+          "value": "2"
+        },
+        {
+          "file": "/root/orchestra-main/config/environments/dev.env",
+          "line": 4,
+          "value": "0"
+        }
+      ],
+      "different_values": true,
+      "severity": "high"
+    },
+    {
+      "variable": "MAX_INSTANCES",
+      "occurrences": [
+        {
+          "file": "/root/orchestra-main/config/environments/staging.env",
+          "line": 5,
+          "value": "10"
+        },
+        {
+          "file": "/root/orchestra-main/config/environments/prod.env",
+          "line": 5,
+          "value": "20"
+        },
+        {
+          "file": "/root/orchestra-main/config/environments/dev.env",
+          "line": 5,
+          "value": "5"
+        }
+      ],
+      "different_values": true,
+      "severity": "high"
+    }
+  ],
+  "naming_convention_issues": [
+    {
+      "variable": "OPENROUTER_API_KEY",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "API_KEY",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "OPENAI_API_KEY",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "ANTHROPIC_API_KEY",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "GEMINI_API_KEY",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "DATABASE_URL",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "REDIS_URL",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "DRAGONFLY_URI",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "API_URL",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "API_HOST",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "API_PORT",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "PROMETHEUS_PORT",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "PROMETHEUS_URL",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "GRAFANA_PORT",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "GRAFANA_URL",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "GRAFANA_API_KEY",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "METRICS_PORT",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "LITELLM_VERBOSE",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "MAX_CONCURRENT_REQUESTS",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "CACHE_TTL",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "OPTIMIZE_PERFORMANCE",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "CPU_LIMIT",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "MEMORY_LIMIT",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "CIRCUIT_BREAKER_FAILURE_THRESHOLD",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "CIRCUIT_BREAKER_RECOVERY_TIMEOUT",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "CIRCUIT_BREAKER_MAX_RETRY_TIMEOUT",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "PULUMI_CONFIG_PASSPHRASE",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "AIRBYTE_API_URL",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "AIRBYTE_API_KEY",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "AIRBYTE_WORKSPACE_ID",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "SMTP_SERVER",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "SMTP_PORT",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "SMTP_PASSWORD",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "MONITOR_FROM_EMAIL",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "MONITOR_TO_EMAIL",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "ALERT_EMAIL",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "SLACK_WEBHOOK_URL",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "SLACK_BOT_TOKEN",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "SENTRY_DSN",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "MONGODB_URI",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "GITHUB_TOKEN",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "GCP_PROJECT_ID",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "GCP_REGION",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "ENVIRONMENT",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "DEBUG",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "LOG_LEVEL",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "REDIS_HOST",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "REDIS_PORT",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "REDIS_PASSWORD",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "REDIS_DB",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "DEFAULT_LLM_PROVIDER",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "SHORT_TERM_MEMORY_TTL",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "MID_TERM_MEMORY_TTL",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "VECTOR_DIMENSION",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "ENABLE_SEMANTIC_SEARCH",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "ENABLE_STREAMING",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "ENABLE_RATE_LIMITING",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "export VULTR_API_KEY",
+      "issues": [
+        "not_uppercase",
+        "invalid_characters",
+        "no_standard_prefix"
+      ],
+      "occurrences": 3,
+      "severity": "low"
+    },
+    {
+      "variable": "export POSTGRES_PASSWORD",
+      "issues": [
+        "not_uppercase",
+        "invalid_characters",
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "export GRAFANA_ADMIN_PASSWORD",
+      "issues": [
+        "not_uppercase",
+        "invalid_characters",
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "export PULUMI_ACCESS_TOKEN",
+      "issues": [
+        "not_uppercase",
+        "invalid_characters",
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "GCP_ZONE",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "GCP_SERVICE_ACCOUNT",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "CLOUD_RUN_SERVICE_NAME",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "CLOUD_RUN_MIN_INSTANCES",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "CLOUD_RUN_MAX_INSTANCES",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "CLOUD_RUN_MEMORY",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "CLOUD_RUN_CPU",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "CLOUD_RUN_CONCURRENCY",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "CLOUD_RUN_TIMEOUT",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "CLOUD_RUN_ALLOW_UNAUTHENTICATED",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "ARTIFACT_REGISTRY_REPO",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "WORKSTATION_CONFIG",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "WORKSTATION_NAME",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "WORKSTATION_MACHINE_TYPE",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "NOTEBOOK_NAME",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "NOTEBOOK_MACHINE_TYPE",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "REPO_URL",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "DEPLOYMENT_ENVIRONMENT",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "GONG_API_KEY",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "SALESFORCE_CLIENT_ID",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "SALESFORCE_CLIENT_SECRET",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "HUBSPOT_API_KEY",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "SLACK_API_KEY",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "LOOKER_CLIENT_ID",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "LOOKER_CLIENT_SECRET",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "export DRAGONFLY_URL",
+      "issues": [
+        "not_uppercase",
+        "invalid_characters",
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "export MONGODB_URI",
+      "issues": [
+        "not_uppercase",
+        "invalid_characters",
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "export WEAVIATE_URL",
+      "issues": [
+        "not_uppercase",
+        "invalid_characters",
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "export PULUMI_CONFIG_PASSPHRASE",
+      "issues": [
+        "not_uppercase",
+        "invalid_characters",
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "export PULUMI_SKIP_UPDATE_CHECK",
+      "issues": [
+        "not_uppercase",
+        "invalid_characters",
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "alias pulumi",
+      "issues": [
+        "not_uppercase",
+        "invalid_characters",
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "export VULTR_SERVER_IP",
+      "issues": [
+        "not_uppercase",
+        "invalid_characters",
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "export ENVIRONMENT",
+      "issues": [
+        "not_uppercase",
+        "invalid_characters",
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "export PROJECT_ROOT",
+      "issues": [
+        "not_uppercase",
+        "invalid_characters",
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "VITE_API_URL",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "VITE_API_KEY",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 1,
+      "severity": "low"
+    },
+    {
+      "variable": "NEXT_PUBLIC_API_URL",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "NEXT_PUBLIC_API_KEY",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 2,
+      "severity": "low"
+    },
+    {
+      "variable": "MEMORY",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 3,
+      "severity": "low"
+    },
+    {
+      "variable": "CPU",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 3,
+      "severity": "low"
+    },
+    {
+      "variable": "MIN_INSTANCES",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 3,
+      "severity": "low"
+    },
+    {
+      "variable": "MAX_INSTANCES",
+      "issues": [
+        "no_standard_prefix"
+      ],
+      "occurrences": 3,
+      "severity": "low"
+    }
+  ],
+  "security_issues": [
+    {
+      "variable": "OPENROUTER_API_KEY",
+      "file": "/root/orchestra-main/.env.example",
+      "line": 4,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 23,
+      "severity": "high"
+    },
+    {
+      "variable": "OPENROUTER_API_KEY",
+      "file": "/root/orchestra-main/.env",
+      "line": 2,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 23,
+      "severity": "high"
+    },
+    {
+      "variable": "API_KEY",
+      "file": "/root/orchestra-main/.env.example",
+      "line": 5,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 12,
+      "severity": "high"
+    },
+    {
+      "variable": "API_KEY",
+      "file": "/root/orchestra-main/.env",
+      "line": 3,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 16,
+      "severity": "high"
+    },
+    {
+      "variable": "OPENAI_API_KEY",
+      "file": "/root/orchestra-main/.env.example",
+      "line": 6,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 19,
+      "severity": "high"
+    },
+    {
+      "variable": "OPENAI_API_KEY",
+      "file": "/root/orchestra-main/.env.development",
+      "line": 34,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 33,
+      "severity": "high"
+    },
+    {
+      "variable": "ANTHROPIC_API_KEY",
+      "file": "/root/orchestra-main/.env.example",
+      "line": 7,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 22,
+      "severity": "high"
+    },
+    {
+      "variable": "ANTHROPIC_API_KEY",
+      "file": "/root/orchestra-main/.env.development",
+      "line": 35,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 37,
+      "severity": "high"
+    },
+    {
+      "variable": "GEMINI_API_KEY",
+      "file": "/root/orchestra-main/.env.example",
+      "line": 8,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 19,
+      "severity": "high"
+    },
+    {
+      "variable": "POSTGRES_PASSWORD",
+      "file": "/root/orchestra-main/.env.example",
+      "line": 15,
+      "sensitive_type": "password",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 22,
+      "severity": "high"
+    },
+    {
+      "variable": "POSTGRES_PASSWORD",
+      "file": "/root/orchestra-main/.env.development",
+      "line": 16,
+      "sensitive_type": "password",
+      "is_hardcoded": false,
+      "hardcoded_type": "unknown",
+      "value_length": 9,
+      "severity": "medium"
+    },
+    {
+      "variable": "POSTGRES_PASSWORD",
+      "file": "/root/orchestra-main/.env",
+      "line": 10,
+      "sensitive_type": "password",
+      "is_hardcoded": false,
+      "hardcoded_type": "unknown",
+      "value_length": 8,
+      "severity": "medium"
+    },
+    {
+      "variable": "WEAVIATE_API_KEY",
+      "file": "/root/orchestra-main/.env.example",
+      "line": 23,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 21,
+      "severity": "high"
+    },
+    {
+      "variable": "WEAVIATE_API_KEY",
+      "file": "/root/orchestra-main/.env",
+      "line": 15,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 21,
+      "severity": "high"
+    },
+    {
+      "variable": "GRAFANA_API_KEY",
+      "file": "/root/orchestra-main/.env.example",
+      "line": 57,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 20,
+      "severity": "high"
+    },
+    {
+      "variable": "VULTR_API_KEY",
+      "file": "/root/orchestra-main/.env.example",
+      "line": 78,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 18,
+      "severity": "high"
+    },
+    {
+      "variable": "AIRBYTE_API_KEY",
+      "file": "/root/orchestra-main/.env.example",
+      "line": 84,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 20,
+      "severity": "high"
+    },
+    {
+      "variable": "SMTP_PASSWORD",
+      "file": "/root/orchestra-main/.env.example",
+      "line": 90,
+      "sensitive_type": "password",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 18,
+      "severity": "high"
+    },
+    {
+      "variable": "SLACK_BOT_TOKEN",
+      "file": "/root/orchestra-main/.env.example",
+      "line": 97,
+      "sensitive_type": "token",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 19,
+      "severity": "high"
+    },
+    {
+      "variable": "GITHUB_TOKEN",
+      "file": "/root/orchestra-main/.env.example",
+      "line": 102,
+      "sensitive_type": "token",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 17,
+      "severity": "high"
+    },
+    {
+      "variable": "REDIS_PASSWORD",
+      "file": "/root/orchestra-main/.env.development",
+      "line": 24,
+      "sensitive_type": "password",
+      "is_hardcoded": false,
+      "hardcoded_type": "unknown",
+      "value_length": 0,
+      "severity": "medium"
+    },
+    {
+      "variable": "export VULTR_API_KEY",
+      "file": "/root/orchestra-main/.env.deployment",
+      "line": 3,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 36,
+      "severity": "high"
+    },
+    {
+      "variable": "export VULTR_API_KEY",
+      "file": "/root/orchestra-main/.envrc",
+      "line": 14,
+      "sensitive_type": "api_key",
+      "is_hardcoded": false,
+      "hardcoded_type": "unknown",
+      "value_length": 18,
+      "severity": "medium"
+    },
+    {
+      "variable": "export VULTR_API_KEY",
+      "file": "/root/orchestra-main/.envrc",
+      "line": 14,
+      "sensitive_type": "api_key",
+      "is_hardcoded": false,
+      "hardcoded_type": "unknown",
+      "value_length": 18,
+      "severity": "medium"
+    },
+    {
+      "variable": "export POSTGRES_PASSWORD",
+      "file": "/root/orchestra-main/.env.deployment",
+      "line": 4,
+      "sensitive_type": "password",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 44,
+      "severity": "high"
+    },
+    {
+      "variable": "export GRAFANA_ADMIN_PASSWORD",
+      "file": "/root/orchestra-main/.env.deployment",
+      "line": 5,
+      "sensitive_type": "password",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 24,
+      "severity": "high"
+    },
+    {
+      "variable": "export PULUMI_ACCESS_TOKEN",
+      "file": "/root/orchestra-main/.env.deployment",
+      "line": 6,
+      "sensitive_type": "token",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 44,
+      "severity": "high"
+    },
+    {
+      "variable": "GONG_API_KEY",
+      "file": "/root/orchestra-main/.env.template",
+      "line": 45,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 22,
+      "severity": "high"
+    },
+    {
+      "variable": "SALESFORCE_CLIENT_SECRET",
+      "file": "/root/orchestra-main/.env.template",
+      "line": 49,
+      "sensitive_type": "secret",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 34,
+      "severity": "high"
+    },
+    {
+      "variable": "HUBSPOT_API_KEY",
+      "file": "/root/orchestra-main/.env.template",
+      "line": 52,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 25,
+      "severity": "high"
+    },
+    {
+      "variable": "SLACK_API_KEY",
+      "file": "/root/orchestra-main/.env.template",
+      "line": 55,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 23,
+      "severity": "high"
+    },
+    {
+      "variable": "LOOKER_CLIENT_SECRET",
+      "file": "/root/orchestra-main/.env.template",
+      "line": 59,
+      "sensitive_type": "secret",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 30,
+      "severity": "high"
+    },
+    {
+      "variable": "PORTKEY_API_KEY",
+      "file": "/root/orchestra-main/.env.template",
+      "line": 62,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 25,
+      "severity": "high"
+    },
+    {
+      "variable": "VITE_API_KEY",
+      "file": "/root/orchestra-main/admin-ui/.env",
+      "line": 2,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 64,
+      "severity": "high"
+    },
+    {
+      "variable": "NEXT_PUBLIC_API_KEY",
+      "file": "/root/orchestra-main/dashboard/.env.example",
+      "line": 6,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 17,
+      "severity": "high"
+    },
+    {
+      "variable": "NEXT_PUBLIC_API_KEY",
+      "file": "/root/orchestra-main/ui_projects_backup_20250603_162302/dashboard/.env.example",
+      "line": 6,
+      "sensitive_type": "api_key",
+      "is_hardcoded": true,
+      "hardcoded_type": "suspicious_length",
+      "value_length": 17,
+      "severity": "high"
+    },
+    {
+      "file": "/root/orchestra-main/config/litellm_config.yaml",
+      "file_type": "yaml",
+      "path": "model_list[4].litellm_params.extra_headers.x-portkey-provider",
+      "issue": "hardcoded_sensitive_value",
+      "key": "x-portkey-provider",
+      "severity": "high"
+    },
+    {
+      "file": "/root/orchestra-main/config/litellm_config.yaml",
+      "file_type": "yaml",
+      "path": "model_list[5].litellm_params.extra_headers.x-portkey-provider",
+      "issue": "hardcoded_sensitive_value",
+      "key": "x-portkey-provider",
+      "severity": "high"
+    },
+    {
+      "file": "/root/orchestra-main/config/agents_new.yaml",
+      "file_type": "yaml",
+      "path": "memory.redis.password_secret",
+      "issue": "hardcoded_sensitive_value",
+      "key": "password_secret",
+      "severity": "high"
+    },
+    {
+      "file": "/root/orchestra-main/factory_integration/config/context.yaml",
+      "file_type": "yaml",
+      "path": "embeddings.api_key_env",
+      "issue": "hardcoded_sensitive_value",
+      "key": "api_key_env",
+      "severity": "high"
+    },
+    {
+      "file": "/root/orchestra-main/infrastructure/pulumi/migration/docker-compose.yml",
+      "file_type": "yaml",
+      "path": "services.pulumi-migration.environment.VULTR_CREDENTIALS_PATH",
+      "issue": "hardcoded_sensitive_value",
+      "key": "VULTR_CREDENTIALS_PATH",
+      "severity": "high"
+    },
+    {
+      "file": "/root/orchestra-main/mcp_config.json",
+      "file_type": "json",
+      "path": "tool_specific_settings.agno.key_prefix",
+      "issue": "hardcoded_sensitive_value",
+      "key": "key_prefix",
+      "severity": "high"
+    },
+    {
+      "file": "/root/orchestra-main/mcp_config.json",
+      "file_type": "json",
+      "path": "tools.gemini.api_key_env_var",
+      "issue": "hardcoded_sensitive_value",
+      "key": "api_key_env_var",
+      "severity": "high"
+    },
+    {
+      "file": "/root/orchestra-main/config/orchestrator_config.json",
+      "file_type": "json",
+      "path": "roo_integration.openrouter_api_key_env",
+      "issue": "hardcoded_sensitive_value",
+      "key": "openrouter_api_key_env",
+      "severity": "high"
+    }
+  ],
+  "schema_mismatches": [
+    {
+      "file": "/root/orchestra-main/config/litellm_config.yaml",
+      "file_type": "yaml",
+      "schema_type": "llm",
+      "missing_fields": [
+        "provider",
+        "model",
+        "temperature",
+        "max_tokens"
+      ],
+      "severity": "medium"
+    },
+    {
+      "file": "/root/orchestra-main/config/llm_gateway_config.yaml",
+      "file_type": "yaml",
+      "schema_type": "llm",
+      "missing_fields": [
+        "provider",
+        "model",
+        "temperature",
+        "max_tokens"
+      ],
+      "severity": "medium"
+    },
+    {
+      "file": "/root/orchestra-main/core/orchestrator/src/config/personas.yaml",
+      "file_type": "yaml",
+      "schema_type": "persona",
+      "missing_fields": [
+        "name",
+        "description",
+        "model",
+        "temperature"
+      ],
+      "severity": "medium"
+    },
+    {
+      "file": "/root/orchestra-main/core/orchestrator/src/config/personas/gordon.yaml",
+      "file_type": "yaml",
+      "schema_type": "persona",
+      "missing_fields": [
+        "description",
+        "model",
+        "temperature"
+      ],
+      "severity": "medium"
+    },
+    {
+      "file": "/root/orchestra-main/core/orchestrator/src/config/personas/cherry.yaml",
+      "file_type": "yaml",
+      "schema_type": "persona",
+      "missing_fields": [
+        "description",
+        "model",
+        "temperature"
+      ],
+      "severity": "medium"
+    },
+    {
+      "file": "/root/orchestra-main/core/orchestrator/src/config/personas/sophia.yaml",
+      "file_type": "yaml",
+      "schema_type": "persona",
+      "missing_fields": [
+        "description",
+        "model",
+        "temperature"
+      ],
+      "severity": "medium"
+    },
+    {
+      "file": "/root/orchestra-main/config/personas/cherry.yaml",
+      "file_type": "yaml",
+      "schema_type": "persona",
+      "missing_fields": [
+        "model",
+        "temperature"
+      ],
+      "severity": "medium"
+    },
+    {
+      "file": "/root/orchestra-main/config/personas/technical-architect.yaml",
+      "file_type": "yaml",
+      "schema_type": "persona",
+      "missing_fields": [
+        "model",
+        "temperature"
+      ],
+      "severity": "medium"
+    },
+    {
+      "file": "/root/orchestra-main/config/personas/ai-assistant.yaml",
+      "file_type": "yaml",
+      "schema_type": "persona",
+      "missing_fields": [
+        "model",
+        "temperature"
+      ],
+      "severity": "medium"
+    },
+    {
+      "file": "/root/orchestra-main/config/domains/personal_airbyte.json",
+      "file_type": "json",
+      "schema_type": "persona",
+      "missing_fields": [
+        "name",
+        "description",
+        "model",
+        "temperature"
+      ],
+      "severity": "medium"
+    },
+    {
+      "file": "/root/orchestra-main/config/domains/personal_rate_limits.json",
+      "file_type": "json",
+      "schema_type": "persona",
+      "missing_fields": [
+        "name",
+        "description",
+        "model",
+        "temperature"
+      ],
+      "severity": "medium"
+    },
+    {
+      "file": "/root/orchestra-main/config/domains/personal_weaviate.json",
+      "file_type": "json",
+      "schema_type": "persona",
+      "missing_fields": [
+        "name",
+        "description",
+        "model",
+        "temperature"
+      ],
+      "severity": "medium"
+    }
+  ],
+  "recommendations": [
+    {
+      "category": "Environment Variables",
+      "issue": "Duplicate environment variables found",
+      "recommendation": "Consolidate duplicate environment variables into a single source file",
+      "priority": "high"
+    },
+    {
+      "category": "Security",
+      "issue": "39 hardcoded credentials found",
+      "recommendation": "Replace hardcoded credentials with environment variables or secret management",
+      "priority": "critical"
+    },
+    {
+      "category": "Naming Conventions",
+      "issue": "Inconsistent environment variable naming",
+      "recommendation": "Standardize environment variables to use UPPERCASE with project prefixes",
+      "priority": "medium"
+    }
+  ]
+}

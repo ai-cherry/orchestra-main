@@ -1,0 +1,878 @@
+/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+  warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/fields.py:1076: PydanticDeprecatedSince20: Using extra keyword arguments on `Field` is deprecated and will be removed. Use `json_schema_extra` instead. (Extra keys: 'env'). Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+  warn(
+/root/orchestra-main/ai_context_reviewer.py:1: SyntaxWarning: invalid escape sequence '\.'
+  """
+/root/orchestra-main/scripts/complete_domain_orchestration.py:66: SyntaxWarning: invalid escape sequence '\.'
+  migration_script_content = '''#!/bin/bash
+/root/orchestra-main/scripts/comprehensive_production_deploy.py:272: SyntaxWarning: invalid escape sequence '\.'
+  validation_module = """
+/root/orchestra-main/scripts/ui_integration_spec.py:530: SyntaxWarning: invalid escape sequence '\.'
+  "nginx.conf": """server {
+/root/orchestra-main/scripts/integration_plan.py:427: SyntaxWarning: invalid escape sequence '\.'
+  nginx_config = """
+/root/orchestra-main/infra/vultr_deployment.py:139: SyntaxWarning: invalid escape sequence '\$'
+  script="""#!/bin/bash
+/root/orchestra-main/infrastructure/pulumi/__main__.py:76: SyntaxWarning: invalid escape sequence '\$'
+  user_data="""#!/bin/bash
+/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/fields.py:1076: PydanticDeprecatedSince20: Using extra keyword arguments on `Field` is deprecated and will be removed. Use `json_schema_extra` instead. (Extra keys: 'env'). Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+  warn(
+Failed to register default storages: No module named 'lz4'
+/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+  warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+/root/orchestra-main/venv/lib/python3.12/site-packages/pydantic/fields.py:1045: PydanticDeprecatedSince20: `min_items` is deprecated and will be removed, use `min_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+  warn('`min_items` is deprecated and will be removed, use `min_length` instead', DeprecationWarning)
+🔍 Starting Python Codebase Analysis...
+📁 Found 825 Python files to analyze
+📊 Analyzing file 1/825: test_elevenlabs_voice.py
+⚠️  Failed to parse /root/orchestra-main/analyze_code_wrapper.py: unterminated string literal (detected at line 16) (analyze_code_wrapper.py, line 16)
+📊 Analyzing file 51/825: memory_management_integration.py
+📊 Analyzing file 101/825: test_mcp_connection.py
+📊 Analyzing file 151/825: ai_code_reviewer.py
+⚠️  Failed to parse /root/orchestra-main/scripts/apply_audit_fixes.py: invalid syntax. Perhaps you forgot a comma? (apply_audit_fixes.py, line 15)
+📊 Analyzing file 201/825: validate_config.py
+📊 Analyzing file 251/825: test_infrastructure.py
+📊 Analyzing file 301/825: deploy.py
+⚠️  Failed to parse /root/orchestra-main/shared/memory/unified_memory.py: unexpected indent (unified_memory.py, line 35)
+⚠️  Failed to parse /root/orchestra-main/shared/memory/unified_postgresql_weaviate.py: expected 'except' or 'finally' block (unified_postgresql_weaviate.py, line 176)
+⚠️  Failed to parse /root/orchestra-main/shared/database/decorators.py: unterminated triple-quoted string literal (detected at line 113) (decorators.py, line 106)
+📊 Analyzing file 351/825: interfaces.py
+⚠️  Failed to parse /root/orchestra-main/core/persistency/mode_config_persistence.py: unexpected indent (mode_config_persistence.py, line 73)
+📊 Analyzing file 401/825: factory.py
+📊 Analyzing file 451/825: tasks.py
+⚠️  Failed to parse /root/orchestra-main/core/orchestrator/src/config/secret_manager.py: expected an indented block after 'try' statement on line 79 (secret_manager.py, line 81)
+📊 Analyzing file 501/825: credentials.py
+📊 Analyzing file 551/825: __init__.py
+📊 Analyzing file 601/825: vector_droplet_component.py
+📊 Analyzing file 651/825: structured_logging.py
+📊 Analyzing file 701/825: enhanced_server_base.py
+📊 Analyzing file 751/825: __init__.py
+📊 Analyzing file 801/825: resources.py
+🔄 Analyzing dependencies and usage...
+
+🐍 Python Codebase Analysis Report - Orchestra AI
+==================================================
+Generated: 2025-06-03T17:26:20.989786
+
+📊 EXECUTIVE SUMMARY
+--------------------
+Total Python Files Analyzed: 825
+Files with Issues: 135
+
+🚨 CRITICAL ISSUES FOUND:
+• Broken Imports: 361
+• Circular Dependencies: 6
+• Unused Functions: 526
+• Unused Classes: 1461
+• Duplicate Functions: 312
+• Duplicate Classes: 151
+• Import Style Issues: 76
+
+
+🔴 BROKEN IMPORTS
+-----------------
+❌ /root/orchestra-main/dragonfly_config.py:14 - Cannot import 'dragonfly_secrets'
+❌ /root/orchestra-main/dragonfly_config.py:14 - Cannot import 'dragonfly_secrets'
+❌ /root/orchestra-main/dragonfly_config.py:14 - Cannot import 'dragonfly_secrets'
+❌ /root/orchestra-main/dragonfly_config.py:14 - Cannot import 'dragonfly_secrets'
+❌ /root/orchestra-main/dragonfly_config.py:14 - Cannot import 'dragonfly_secrets'
+❌ /root/orchestra-main/web_scraping_ai_agents.py:23 - Cannot import 'bs4'
+❌ /root/orchestra-main/web_scraping_ai_agents.py:26 - Cannot import 'playwright.async_api'
+❌ /root/orchestra-main/web_scraping_ai_agents.py:26 - Cannot import 'playwright.async_api'
+❌ /root/orchestra-main/web_scraping_ai_agents.py:27 - Cannot import 'sentence_transformers'
+❌ /root/orchestra-main/redis_semantic_cache_example.py:25 - Cannot import 'langchain_google_genai'
+❌ /root/orchestra-main/redis_semantic_cache_example.py:26 - Cannot import 'langchain_redis.cache'
+❌ /root/orchestra-main/redis_semantic_cache_example.py:27 - Cannot import 'redisvl'
+❌ /root/orchestra-main/redis_semantic_cache_example.py:29 - Cannot import 'packages.shared.src.memory.redis_semantic_cacher'
+❌ /root/orchestra-main/quick_verify_admin_ui.py:45 - Cannot import 'bs4'
+❌ /root/orchestra-main/quick_verify_admin_ui.py:46 - Cannot import 'colorama'
+❌ /root/orchestra-main/quick_verify_admin_ui.py:46 - Cannot import 'colorama'
+❌ /root/orchestra-main/quick_verify_admin_ui.py:46 - Cannot import 'colorama'
+❌ /root/orchestra-main/quick_verify_admin_ui.py:47 - Cannot import 'tabulate'
+❌ /root/orchestra-main/quick_verify_admin_ui.py:416 - Cannot import 'selenium'
+❌ /root/orchestra-main/quick_verify_admin_ui.py:417 - Cannot import 'selenium.webdriver.chrome.service'
+... and 341 more
+
+🔄 CIRCULAR DEPENDENCIES
+-------------------------
+🔄 core.orchestrator.src.agents.simplified_agent_registry → core.orchestrator.src.agents.simplified_agent_registry → packages.agents.src.phidata_agent → core.orchestrator.src.main
+🔄 core.orchestrator.src.agents.simplified_agent_registry → packages.agents.src.phidata_agent → core.orchestrator.src.main → core.orchestrator.src.main
+🔄 mcp_server.main → mcp_server.main
+🔄 core.orchestrator.src.agents.simplified_agent_registry → packages.agents.src.phidata_agent → packages.agents.src.phidata_agent → core.orchestrator.src.main
+🔄 packages.agents.src.phidata.team_wrapper → packages.agents.src.registry → packages.agents.src.registry
+🔄 packages.agents.src.phidata.team_wrapper → packages.agents.src.phidata.team_wrapper → packages.agents.src.registry
+
+🔀 DUPLICATE FUNCTIONS
+----------------------
+⚠️  get_secret defined in 6 places:
+   - /root/orchestra-main/dragonfly_config.py:42
+   - /root/orchestra-main/core/security/postgresql_secrets.py:77
+   - /root/orchestra-main/core/security/postgresql_secrets.py:37
+   - /root/orchestra-main/mcp_server/utils/secret_manager.py:177
+   - /root/orchestra-main/mcp_server/utils/secret_manager.py:68
+   - /root/orchestra-main/ai_components/orchestration/ai_orchestrator_enhanced.py:146
+⚠️  print_summary defined in 9 places:
+   - /root/orchestra-main/find_critical_lint_issues.py:102
+   - /root/orchestra-main/code_analysis.py:331
+   - /root/orchestra-main/scripts/setup_orchestra_environment.py:305
+   - /root/orchestra-main/scripts/migrate_to_unified_postgresql.py:353
+   - /root/orchestra-main/scripts/orchestra_setup_wizard.py:272
+   - /root/orchestra-main/scripts/domain_separation_analyzer.py:407
+   - /root/orchestra-main/scripts/orchestra_complete_setup.py:547
+   - /root/orchestra-main/scripts/test_new_setup.py:272
+   - /root/orchestra-main/scripts/verify_orchestrator_mcp_connection.py:332
+⚠️  print_detailed_report defined in 2 places:
+   - /root/orchestra-main/find_critical_lint_issues.py:128
+   - /root/orchestra-main/code_analysis.py:364
+⚠️  main defined in 91 places:
+   - /root/orchestra-main/find_critical_lint_issues.py:148
+   - /root/orchestra-main/key_fix_script.py:49
+   - /root/orchestra-main/quick_check.py:181
+   - /root/orchestra-main/execute_strategy_workflow.py:73
+   - /root/orchestra-main/scan_github_workflows.py:318
+   - /root/orchestra-main/quick_verify_admin_ui.py:821
+   - /root/orchestra-main/mcp_cli.py:287
+   - /root/orchestra-main/code_analysis.py:385
+   - /root/orchestra-main/monitor_extension_performance.py:206
+   - /root/orchestra-main/scan_for_hardcoded_values.py:214
+   - /root/orchestra-main/migration_orchestrator.py:474
+   - /root/orchestra-main/simple_mcp.py:191
+   - /root/orchestra-main/scripts/setup_secrets_manager.py:238
+   - /root/orchestra-main/scripts/generate_env_from_pulumi.py:133
+   - /root/orchestra-main/scripts/mcp_integration_check.py:259
+   - /root/orchestra-main/scripts/setup_api_keys.py:109
+   - /root/orchestra-main/scripts/validate_domain_infrastructure.py:311
+   - /root/orchestra-main/scripts/validate_docs.py:8
+   - /root/orchestra-main/scripts/infrastructure_validation.py:119
+   - /root/orchestra-main/scripts/verify_orchestra_deployment.py:360
+   - /root/orchestra-main/scripts/health_monitor.py:286
+   - /root/orchestra-main/scripts/validate_weaviate_migration.py:725
+   - /root/orchestra-main/scripts/orchestra.py:223
+   - /root/orchestra-main/scripts/final_cleanup.py:245
+   - /root/orchestra-main/scripts/technical_roadmap_generator.py:498
+   - /root/orchestra-main/scripts/create_first_agent.py:140
+   - /root/orchestra-main/scripts/deep_cleanup.py:249
+   - /root/orchestra-main/scripts/update_dependencies.py:80
+   - /root/orchestra-main/scripts/fix_remaining_issues.py:34
+   - /root/orchestra-main/scripts/test_database_consolidation.py:163
+   - /root/orchestra-main/scripts/check_pre_commit_status.py:100
+   - /root/orchestra-main/scripts/complete_orchestrator_setup.py:254
+   - /root/orchestra-main/scripts/deploy_admin_ui.py:40
+   - /root/orchestra-main/scripts/verify_enhancements.py:37
+   - /root/orchestra-main/scripts/orchestra_status.py:20
+   - /root/orchestra-main/scripts/update_github_secrets.py:204
+   - /root/orchestra-main/scripts/verify_roo_mcp_integration.py:171
+   - /root/orchestra-main/scripts/validate_syntax.py:41
+   - /root/orchestra-main/scripts/symphony_orchestrator.py:486
+   - /root/orchestra-main/scripts/roo_orchestrator_quickstart.py:142
+   - /root/orchestra-main/scripts/review_ai_context.py:117
+   - /root/orchestra-main/scripts/rollback_infrastructure.py:266
+   - /root/orchestra-main/scripts/ai_code_reviewer.py:318
+   - /root/orchestra-main/scripts/how_to_use_roo_orchestrator.py:112
+   - /root/orchestra-main/scripts/orchestra_deployment_summary.py:209
+   - /root/orchestra-main/scripts/migrate_to_portkey.py:94
+   - /root/orchestra-main/scripts/auto_start_orchestra_roo.py:403
+   - /root/orchestra-main/scripts/fix_orchestration_config.py:239
+   - /root/orchestra-main/scripts/check_env_config.py:102
+   - /root/orchestra-main/scripts/comprehensive_codebase_audit.py:889
+   - /root/orchestra-main/scripts/setup_weaviate_collections.py:551
+   - /root/orchestra-main/scripts/configure_airbyte.py:197
+   - /root/orchestra-main/scripts/purge_unwanted_infrastructure.py:294
+   - /root/orchestra-main/scripts/fix_pre_commit_issues.py:104
+   - /root/orchestra-main/scripts/pip_forever_fix.py:193
+   - /root/orchestra-main/scripts/orchestra_system_status.py:40
+   - /root/orchestra-main/scripts/test_infrastructure.py:155
+   - /root/orchestra-main/scripts/validate_config.py:152
+   - /root/orchestra-main/scripts/verify_local_deployment.py:311
+   - /root/orchestra-main/scripts/smoke_tests.py:287
+   - /root/orchestra-main/scripts/verify_environment.py:174
+   - /root/orchestra-main/scripts/orchestrated_codebase_fix.py:880
+   - /root/orchestra-main/scripts/eigencode_installer_simple.py:39
+   - /root/orchestra-main/scripts/validate_environment.py:46
+   - /root/orchestra-main/scripts/monitoring_improvements.py:678
+   - /root/orchestra-main/scripts/python_codebase_analyzer.py:591
+   - /root/orchestra-main/scripts/vultr_provision.py:41
+   - /root/orchestra-main/scripts/roo_enhanced_launcher.py:134
+   - /root/orchestra-main/scripts/test_roo_integration_simple.py:46
+   - /root/orchestra-main/scripts/setup_postgres_schema.py:231
+   - /root/orchestra-main/scripts/test_orchestrator_demo.py:154
+   - /root/orchestra-main/scripts/setup_ai_services.py:240
+   - /root/orchestra-main/scripts/fix_python_version_permanently.py:258
+   - /root/orchestra-main/scripts/test_orchestration_setup.py:123
+   - /root/orchestra-main/scripts/verify_orchestrator_mcp_connection.py:357
+   - /root/orchestra-main/mcp_server/async_server.py:319
+   - /root/orchestra-main/mcp_server/mcp_server_runner.py:15
+   - /root/orchestra-main/mcp_server/demo_memory_sync.py:398
+   - /root/orchestra-main/mcp_server/main.py:15
+   - /root/orchestra-main/mcp_server/run_optimized_server.py:124
+   - /root/orchestra-main/mcp_server/run_mcp_server.py:152
+   - /root/orchestra-main/tools/mode_system_initializer.py:291
+   - /root/orchestra-main/tools/mode_switcher.py:259
+   - /root/orchestra-main/tools/update_phidata_configs.py:179
+   - /root/orchestra-main/.roo/scripts/validate_complete_setup.py:282
+   - /root/orchestra-main/.roo/scripts/verify_setup.py:81
+   - /root/orchestra-main/infrastructure/pulumi/deploy.py:262
+   - /root/orchestra-main/shared/database/apply_unified_enhancements.py:289
+   - /root/orchestra-main/core/personas/example_usage.py:217
+   - /root/orchestra-main/core/orchestrator/examples/secret_manager_example.py:23
+   - /root/orchestra-main/mcp_server/monitoring/health_dashboard_enhanced.py:393
+⚠️  load_workflow defined in 2 places:
+   - /root/orchestra-main/execute_strategy_workflow.py:24
+   - /root/orchestra-main/scripts/update_github_secrets.py:43
+⚠️  health defined in 2 places:
+   - /root/orchestra-main/main_app.py:32
+   - /root/orchestra-main/tools/orchestra_cli.py:362
+⚠️  info defined in 2 places:
+   - /root/orchestra-main/main_app.py:36
+   - /root/orchestra-main/mcp_server/utils/structured_logging.py:131
+⚠️  handle_exception defined in 2 places:
+   - /root/orchestra-main/main_app.py:91
+   - /root/orchestra-main/error_handling_consolidation.py:100
+⚠️  __init__ defined in 587 places:
+   - /root/orchestra-main/web_scraping_ai_agents.py:97
+   - /root/orchestra-main/web_scraping_ai_agents.py:163
+   - /root/orchestra-main/web_scraping_ai_agents.py:311
+   - /root/orchestra-main/web_scraping_ai_agents.py:570
+   - /root/orchestra-main/web_scraping_ai_agents.py:724
+   - /root/orchestra-main/web_scraping_ai_agents.py:915
+   - /root/orchestra-main/error_handling_consolidation.py:49
+   - /root/orchestra-main/quick_verify_admin_ui.py:73
+   - /root/orchestra-main/mvp_orchestra_ai.py:38
+   - /root/orchestra-main/code_analysis.py:59
+   - /root/orchestra-main/code_analysis.py:82
+   - /root/orchestra-main/code_analysis.py:223
+   - /root/orchestra-main/enhanced_natural_language_interface.py:104
+   - /root/orchestra-main/enhanced_natural_language_interface.py:295
+   - /root/orchestra-main/memory_management_improvements.py:450
+   - /root/orchestra-main/test_dragonfly_connection.py:30
+   - /root/orchestra-main/service_management_consolidation.py:91
+   - /root/orchestra-main/data_source_integrations.py:33
+   - /root/orchestra-main/data_source_integrations.py:176
+   - /root/orchestra-main/data_source_integrations.py:529
+   - /root/orchestra-main/data_source_integrations.py:630
+   - /root/orchestra-main/utils.py:39
+   - /root/orchestra-main/migration_orchestrator.py:31
+   - /root/orchestra-main/simple_mcp.py:30
+   - /root/orchestra-main/simple_mcp.py:115
+   - /root/orchestra-main/phidata_agent_team_init.py:32
+   - /root/orchestra-main/phidata_team_agent_implementation.py:22
+   - /root/orchestra-main/examples/simplified_agent_example.py:33
+   - /root/orchestra-main/examples/simplified_agent_example.py:46
+   - /root/orchestra-main/examples/memory_management_integration.py:31
+   - /root/orchestra-main/shared/circuit_breaker.py:7
+   - /root/orchestra-main/shared/enhanced_circuit_breaker.py:32
+   - /root/orchestra-main/shared/enhanced_circuit_breaker.py:242
+   - /root/orchestra-main/shared/database.py:55
+   - /root/orchestra-main/core/health_monitor.py:49
+   - /root/orchestra-main/core/mode_manager.py:141
+   - /root/orchestra-main/core/main.py:26
+   - /root/orchestra-main/core/connection_manager.py:50
+   - /root/orchestra-main/orchestration/version_management_implementation.py:103
+   - /root/orchestra-main/orchestration/version_management_implementation.py:278
+   - /root/orchestra-main/orchestration/version_management_implementation.py:343
+   - /root/orchestra-main/scripts/complete_roo_integration_setup.py:19
+   - /root/orchestra-main/scripts/test_orchestra_final.py:29
+   - /root/orchestra-main/scripts/deploy_orchestra_system.py:28
+   - /root/orchestra-main/scripts/setup_secrets_manager.py:19
+   - /root/orchestra-main/scripts/ai_code_assistant.py:29
+   - /root/orchestra-main/scripts/roo_integration_standalone.py:13
+   - /root/orchestra-main/scripts/mcp_integration_check.py:29
+   - /root/orchestra-main/scripts/setup_api_keys.py:15
+   - /root/orchestra-main/scripts/architecture_analyzer.py:17
+   - /root/orchestra-main/scripts/validate_domain_infrastructure.py:16
+   - /root/orchestra-main/scripts/start_orchestra_services.py:26
+   - /root/orchestra-main/scripts/comprehensive_production_deploy.py:22
+   - /root/orchestra-main/scripts/verify_orchestra_deployment.py:27
+   - /root/orchestra-main/scripts/health_monitor.py:31
+   - /root/orchestra-main/scripts/setup_orchestra_environment.py:17
+   - /root/orchestra-main/scripts/orchestra.py:29
+   - /root/orchestra-main/scripts/refactoring_orchestrator.py:98
+   - /root/orchestra-main/scripts/implement_infrastructure_optimizations.py:12
+   - /root/orchestra-main/scripts/final_cleanup.py:11
+   - /root/orchestra-main/scripts/next_phase_orchestrator.py:16
+   - /root/orchestra-main/scripts/technical_roadmap_generator.py:15
+   - /root/orchestra-main/scripts/deep_cleanup.py:12
+   - /root/orchestra-main/scripts/ui_integration_spec.py:14
+   - /root/orchestra-main/scripts/version_monitor.py:109
+   - /root/orchestra-main/scripts/version_monitor.py:605
+   - /root/orchestra-main/scripts/ml_model_registry.py:40
+   - /root/orchestra-main/scripts/performance_analyzer.py:30
+   - /root/orchestra-main/scripts/system_validation.py:34
+   - /root/orchestra-main/scripts/deploy_enhanced_orchestration.py:32
+   - /root/orchestra-main/scripts/deploy_design_automation.py:28
+   - /root/orchestra-main/scripts/update_github_secrets.py:35
+   - /root/orchestra-main/scripts/version_manager.py:416
+   - /root/orchestra-main/scripts/eigencode_installer.py:33
+   - /root/orchestra-main/scripts/enhanced_provisioning.py:30
+   - /root/orchestra-main/scripts/enhanced_provisioning.py:72
+   - /root/orchestra-main/scripts/maintain_uiux_design_system.py:30
+   - /root/orchestra-main/scripts/symphony_orchestrator.py:77
+   - /root/orchestra-main/scripts/roo_orchestrator_quickstart.py:16
+   - /root/orchestra-main/scripts/ai_infrastructure_monitor.py:17
+   - /root/orchestra-main/scripts/deploy_ai_system.py:22
+   - /root/orchestra-main/scripts/performance_test.py:44
+   - /root/orchestra-main/scripts/infrastructure_improvement_orchestrator.py:17
+   - /root/orchestra-main/scripts/live_integration_demo.py:20
+   - /root/orchestra-main/scripts/rollback_infrastructure.py:29
+   - /root/orchestra-main/scripts/ai_code_reviewer.py:33
+   - /root/orchestra-main/scripts/migrate_to_unified_postgresql.py:35
+   - /root/orchestra-main/scripts/orchestra_setup_wizard.py:16
+   - /root/orchestra-main/scripts/orchestra_deployment_summary.py:27
+   - /root/orchestra-main/scripts/auto_start_orchestra_roo.py:23
+   - /root/orchestra-main/scripts/initialize_unified_postgresql.py:28
+   - /root/orchestra-main/scripts/agent_health_monitor.py:35
+   - /root/orchestra-main/scripts/quick_start_design_system.py:26
+   - /root/orchestra-main/scripts/comprehensive_codebase_audit.py:20
+   - /root/orchestra-main/scripts/deploy_and_test_enhanced_system.py:29
+   - /root/orchestra-main/scripts/ai_system_orchestrator.py:74
+   - /root/orchestra-main/scripts/persona_config_manager.py:55
+   - /root/orchestra-main/scripts/configure_airbyte.py:17
+   - /root/orchestra-main/scripts/comprehensive_validation.py:33
+   - /root/orchestra-main/scripts/test_orchestra_integration.py:29
+   - /root/orchestra-main/scripts/domain_separation_analyzer.py:18
+   - /root/orchestra-main/scripts/eigencode_monitor.py:31
+   - /root/orchestra-main/scripts/integration_plan.py:16
+   - /root/orchestra-main/scripts/purge_unwanted_infrastructure.py:87
+   - /root/orchestra-main/scripts/test_integration_complete.py:12
+   - /root/orchestra-main/scripts/mobile_app_integration.py:15
+   - /root/orchestra-main/scripts/domain_infrastructure_orchestrator.py:18
+   - /root/orchestra-main/scripts/agent_lifecycle_manager.py:30
+   - /root/orchestra-main/scripts/agent_lifecycle_manager.py:79
+   - /root/orchestra-main/scripts/ml_infrastructure_prep.py:16
+   - /root/orchestra-main/scripts/test_roo_integration.py:37
+   - /root/orchestra-main/scripts/metrics_pipeline.py:40
+   - /root/orchestra-main/scripts/setup_advanced_caching.py:22
+   - /root/orchestra-main/scripts/use_enhanced_cli_workflow.py:29
+   - /root/orchestra-main/scripts/orchestrator_startup_automation.py:27
+   - /root/orchestra-main/scripts/version_updater.py:90
+   - /root/orchestra-main/scripts/comprehensive_ai_validation.py:29
+   - /root/orchestra-main/scripts/system_preparedness.py:32
+   - /root/orchestra-main/scripts/verify_local_deployment.py:19
+   - /root/orchestra-main/scripts/cleanup_engine.py:75
+   - /root/orchestra-main/scripts/smoke_tests.py:19
+   - /root/orchestra-main/scripts/test_orchestra_system.py:21
+   - /root/orchestra-main/scripts/orchestrated_codebase_fix.py:32
+   - /root/orchestra-main/scripts/orchestra_complete_setup.py:15
+   - /root/orchestra-main/scripts/orchestra_implementation_status.py:17
+   - /root/orchestra-main/scripts/infrastructure_robustness_analyzer.py:19
+   - /root/orchestra-main/scripts/mcp_integration.py:33
+   - /root/orchestra-main/scripts/mcp_integration.py:213
+   - /root/orchestra-main/scripts/monitoring_improvements.py:25
+   - /root/orchestra-main/scripts/python_codebase_analyzer.py:21
+   - /root/orchestra-main/scripts/test_nl_and_agent.py:18
+   - /root/orchestra-main/scripts/rapid_production_deploy.py:21
+   - /root/orchestra-main/scripts/roo_enhanced_launcher.py:18
+   - /root/orchestra-main/scripts/architect_advanced_system.py:16
+   - /root/orchestra-main/scripts/security_audit.py:31
+   - /root/orchestra-main/scripts/test_new_setup.py:18
+   - /root/orchestra-main/scripts/error_handling_enhancements.py:74
+   - /root/orchestra-main/scripts/error_handling_enhancements.py:159
+   - /root/orchestra-main/scripts/error_handling_enhancements.py:278
+   - /root/orchestra-main/scripts/error_handling_enhancements.py:379
+   - /root/orchestra-main/scripts/error_handling_enhancements.py:513
+   - /root/orchestra-main/scripts/error_handling_enhancements.py:624
+   - /root/orchestra-main/scripts/deploy_orchestra_local.py:27
+   - /root/orchestra-main/scripts/test_design_system.py:22
+   - /root/orchestra-main/scripts/verify_orchestrator_mcp_connection.py:25
+   - /root/orchestra-main/scripts/optimize_without_eigencode.py:33
+   - /root/orchestra-main/scripts/optimize_without_eigencode.py:642
+   - /root/orchestra-main/scripts/test_orchestra_connections.py:29
+   - /root/orchestra-main/factory_integration/context_manager.py:72
+   - /root/orchestra-main/factory_integration/cache_manager.py:69
+   - /root/orchestra-main/factory_integration/cache_manager.py:175
+   - /root/orchestra-main/factory_integration/cache_manager.py:306
+   - /root/orchestra-main/factory_integration/cache_manager.py:467
+   - /root/orchestra-main/infra/mcp_server.py:26
+   - /root/orchestra-main/infra/core_stack.py:13
+   - /root/orchestra-main/.factory/context.py:63
+   - /root/orchestra-main/deploy/superagi_config.py:18
+   - /root/orchestra-main/mcp_server/async_server.py:125
+   - /root/orchestra-main/mcp_server/memory_sync_engine.py:269
+   - /root/orchestra-main/mcp_server/memory_sync_engine.py:387
+   - /root/orchestra-main/mcp_server/memory_sync_engine.py:463
+   - /root/orchestra-main/mcp_server/optimized_ide_integration.py:31
+   - /root/orchestra-main/mcp_server/optimized_ide_integration.py:103
+   - /root/orchestra-main/mcp_server/demo_memory_sync.py:40
+   - /root/orchestra-main/mcp_server/run_mcp_server.py:37
+   - /root/orchestra-main/mcp_server/optimized_memory_sync.py:30
+   - /root/orchestra-main/mcp_server/optimized_memory_sync.py:65
+   - /root/orchestra-main/mcp_server/exceptions.py:14
+   - /root/orchestra-main/mcp_server/exceptions.py:50
+   - /root/orchestra-main/mcp_server/exceptions.py:61
+   - /root/orchestra-main/mcp_server/exceptions.py:76
+   - /root/orchestra-main/mcp_server/exceptions.py:100
+   - /root/orchestra-main/mcp_server/exceptions.py:124
+   - /root/orchestra-main/mcp_server/exceptions.py:151
+   - /root/orchestra-main/mcp_server/exceptions.py:162
+   - /root/orchestra-main/mcp_server/exceptions.py:168
+   - /root/orchestra-main/mcp_server/exceptions.py:185
+   - /root/orchestra-main/mcp_server/exceptions.py:192
+   - /root/orchestra-main/mcp_server/exceptions.py:203
+   - /root/orchestra-main/mcp_server/exceptions.py:213
+   - /root/orchestra-main/mcp_server/exceptions.py:231
+   - /root/orchestra-main/mcp_server/exceptions.py:245
+   - /root/orchestra-main/mcp_server/exceptions.py:255
+   - /root/orchestra-main/mcp_server/exceptions.py:266
+   - /root/orchestra-main/mcp_server/exceptions.py:277
+   - /root/orchestra-main/mcp_server/exceptions.py:289
+   - /root/orchestra-main/mcp_server/exceptions.py:300
+   - /root/orchestra-main/mcp_server/exceptions.py:311
+   - /root/orchestra-main/mcp_server/exceptions.py:321
+   - /root/orchestra-main/mcp_server/exceptions.py:332
+   - /root/orchestra-main/mcp_server/exceptions.py:343
+   - /root/orchestra-main/mcp_server/exceptions.py:353
+   - /root/orchestra-main/mcp_server/performance_wrapper.py:143
+   - /root/orchestra-main/mcp_server/performance_wrapper.py:178
+   - /root/orchestra-main/monitoring/postgresql_performance_dashboard.py:28
+   - /root/orchestra-main/services/weaviate_service.py:34
+   - /root/orchestra-main/.roo/integrations/orchestra_ai.py:59
+   - /root/orchestra-main/.roo/integrations/orchestra_ai.py:80
+   - /root/orchestra-main/.roo/integrations/orchestra_ai.py:102
+   - /root/orchestra-main/.roo/integrations/orchestra_ai.py:116
+   - /root/orchestra-main/infrastructure/pulumi/deploy.py:22
+   - /root/orchestra-main/infrastructure/pulumi/__init__.py:34
+   - /root/orchestra-main/infrastructure/data_ingestion/__init__.py:42
+   - /root/orchestra-main/shared/memory/pinecone_adapter.py:25
+   - /root/orchestra-main/shared/memory/memory_manager.py:38
+   - /root/orchestra-main/shared/memory/memory_manager.py:76
+   - /root/orchestra-main/shared/memory/weaviate_session_cache.py:13
+   - /root/orchestra-main/shared/memory/weaviate_adapter.py:26
+   - /root/orchestra-main/shared/vertex_ai/bridge.py:39
+   - /root/orchestra-main/shared/utils/performance.py:34
+   - /root/orchestra-main/shared/sessions/postgresql_sessions.py:25
+   - /root/orchestra-main/shared/interfaces/domain_contracts.py:80
+   - /root/orchestra-main/shared/mcp_extensions/mcp_client.py:23
+   - /root/orchestra-main/shared/mcp_extensions/tool_registry.py:22
+   - /root/orchestra-main/shared/cache/postgresql_cache.py:24
+   - /root/orchestra-main/shared/cache/postgresql_cache.py:390
+   - /root/orchestra-main/shared/database/connection_manager_enhanced.py:35
+   - /root/orchestra-main/shared/database/unified_db.py:24
+   - /root/orchestra-main/shared/database/weaviate_client.py:35
+   - /root/orchestra-main/shared/database/__init__.py:85
+   - /root/orchestra-main/shared/database/unified_postgresql.py:29
+   - /root/orchestra-main/shared/database/connection_manager.py:35
+   - /root/orchestra-main/shared/database/unified_database.py:45
+   - /root/orchestra-main/shared/database/unified_database.py:113
+   - /root/orchestra-main/shared/database/unified_database.py:250
+   - /root/orchestra-main/shared/database/unified_database.py:445
+   - /root/orchestra-main/shared/database/unified_postgresql_enhanced.py:35
+   - /root/orchestra-main/shared/database/postgresql_client.py:26
+   - /root/orchestra-main/shared/data_ingestion/api_connectors.py:40
+   - /root/orchestra-main/shared/data_ingestion/api_connectors.py:124
+   - /root/orchestra-main/shared/data_ingestion/api_connectors.py:430
+   - /root/orchestra-main/shared/data_ingestion/file_processors.py:26
+   - /root/orchestra-main/shared/data_ingestion/base_processor.py:42
+   - /root/orchestra-main/shared/data_ingestion/ingestion_pipeline.py:22
+   - /root/orchestra-main/core/memory/exceptions.py:21
+   - /root/orchestra-main/core/memory/exceptions.py:59
+   - /root/orchestra-main/core/memory/exceptions.py:79
+   - /root/orchestra-main/core/memory/exceptions.py:105
+   - /root/orchestra-main/core/memory/exceptions.py:135
+   - /root/orchestra-main/core/memory/exceptions.py:159
+   - /root/orchestra-main/core/memory/exceptions.py:183
+   - /root/orchestra-main/core/memory/exceptions.py:207
+   - /root/orchestra-main/core/memory/exceptions.py:233
+   - /root/orchestra-main/core/memory/exceptions.py:257
+   - /root/orchestra-main/core/memory/exceptions.py:282
+   - /root/orchestra-main/core/memory/exceptions.py:307
+   - /root/orchestra-main/core/shared/error_handler.py:12
+   - /root/orchestra-main/core/utils/file_management.py:237
+   - /root/orchestra-main/core/utils/pydantic_validators.py:184
+   - /root/orchestra-main/core/utils/pydantic_validators.py:312
+   - /root/orchestra-main/core/api/router_registry.py:12
+   - /root/orchestra-main/core/security/credential_manager.py:104
+   - /root/orchestra-main/core/security/postgresql_secrets.py:14
+   - /root/orchestra-main/core/personas/manager.py:67
+   - /root/orchestra-main/core/monitoring/claude_monitor.py:83
+   - /root/orchestra-main/core/monitoring/claude_monitor.py:161
+   - /root/orchestra-main/core/monitoring/monitored_litellm_client.py:24
+   - /root/orchestra-main/core/llm/unified_router.py:121
+   - /root/orchestra-main/core/llm/unified_router.py:130
+   - /root/orchestra-main/core/llm/unified_router.py:136
+   - /root/orchestra-main/core/llm/unified_router.py:141
+   - /root/orchestra-main/core/llm/unified_router.py:175
+   - /root/orchestra-main/core/llm/unified_router.py:356
+   - /root/orchestra-main/core/llm/unified_router.py:556
+   - /root/orchestra-main/core/llm/unified_router.py:659
+   - /root/orchestra-main/core/memory/implementations/metrics.py:67
+   - /root/orchestra-main/core/memory/implementations/metrics.py:198
+   - /root/orchestra-main/core/memory/implementations/manager.py:61
+   - /root/orchestra-main/core/memory/implementations/optimizer.py:35
+   - /root/orchestra-main/core/memory/implementations/optimizer.py:87
+   - /root/orchestra-main/core/memory/implementations/optimizer.py:145
+   - /root/orchestra-main/core/memory/implementations/storage/postgresql.py:45
+   - /root/orchestra-main/core/memory/implementations/storage/inmemory.py:33
+   - /root/orchestra-main/core/memory/implementations/storage/inmemory.py:55
+   - /root/orchestra-main/core/memory/implementations/storage/inmemory.py:81
+   - /root/orchestra-main/core/memory/implementations/storage/inmemory.py:121
+   - /root/orchestra-main/core/memory/implementations/storage/inmemory.py:152
+   - /root/orchestra-main/core/infrastructure/deployment/base.py:52
+   - /root/orchestra-main/core/infrastructure/deployment/base.py:78
+   - /root/orchestra-main/core/infrastructure/connectivity/dragonfly.py:19
+   - /root/orchestra-main/core/infrastructure/connectivity/mongodb.py:18
+   - /root/orchestra-main/core/infrastructure/connectivity/base.py:44
+   - /root/orchestra-main/core/infrastructure/connectivity/base.py:96
+   - /root/orchestra-main/core/infrastructure/connectivity/base.py:155
+   - /root/orchestra-main/core/orchestrator/examples/persona_client.py:39
+   - /root/orchestra-main/core/orchestrator/src/exceptions.py:13
+   - /root/orchestra-main/core/orchestrator/src/exceptions.py:45
+   - /root/orchestra-main/core/orchestrator/src/exceptions.py:62
+   - /root/orchestra-main/core/orchestrator/src/memory/layered_memory_manager.py:30
+   - /root/orchestra-main/core/orchestrator/src/memory/unified_memory.py:69
+   - /root/orchestra-main/core/orchestrator/src/memory/unified_memory.py:99
+   - /root/orchestra-main/core/orchestrator/src/memory/unified_memory.py:141
+   - /root/orchestra-main/core/orchestrator/src/memory/unified_memory.py:173
+   - /root/orchestra-main/core/orchestrator/src/memory/integration.py:25
+   - /root/orchestra-main/core/orchestrator/src/memory/integration.py:147
+   - /root/orchestra-main/core/orchestrator/src/memory/layered_memory.py:26
+   - /root/orchestra-main/core/orchestrator/src/utils/config_loader.py:36
+   - /root/orchestra-main/core/orchestrator/src/core/agents.py:160
+   - /root/orchestra-main/core/orchestrator/src/core/orchestrator.py:28
+   - /root/orchestra-main/core/orchestrator/src/core/orchestrator.py:64
+   - /root/orchestra-main/core/orchestrator/src/core/orchestrator.py:115
+   - /root/orchestra-main/core/orchestrator/src/core/memory.py:81
+   - /root/orchestra-main/core/orchestrator/src/core/memory.py:130
+   - /root/orchestra-main/core/orchestrator/src/core/personas.py:43
+   - /root/orchestra-main/core/orchestrator/src/core/personas.py:86
+   - /root/orchestra-main/core/orchestrator/src/core/personas.py:209
+   - /root/orchestra-main/core/orchestrator/src/agents/persona_agent.py:27
+   - /root/orchestra-main/core/orchestrator/src/agents/persona_agent.py:281
+   - /root/orchestra-main/core/orchestrator/src/agents/message_handler_mixin.py:25
+   - /root/orchestra-main/core/orchestrator/src/agents/simplified_agent_registry.py:39
+   - /root/orchestra-main/core/orchestrator/src/agents/llm_agent.py:96
+   - /root/orchestra-main/core/orchestrator/src/agents/messaging_agent.py:32
+   - /root/orchestra-main/core/orchestrator/src/agents/stateful_agent.py:107
+   - /root/orchestra-main/core/orchestrator/src/agents/observable_agent.py:30
+   - /root/orchestra-main/core/orchestrator/src/agents/observable_agent.py:291
+   - /root/orchestra-main/core/orchestrator/src/agents/agent_base.py:27
+   - /root/orchestra-main/core/orchestrator/src/agents/agent_base.py:91
+   - /root/orchestra-main/core/orchestrator/src/agents/agent_base.py:132
+   - /root/orchestra-main/core/orchestrator/src/resilience/circuit_breaker.py:40
+   - /root/orchestra-main/core/orchestrator/src/resilience/monitoring.py:33
+   - /root/orchestra-main/core/orchestrator/src/resilience/incident_reporter.py:31
+   - /root/orchestra-main/core/orchestrator/src/resilience/tasks.py:31
+   - /root/orchestra-main/core/orchestrator/src/resilience/tasks.py:196
+   - /root/orchestra-main/core/orchestrator/src/personas/loader.py:65
+   - /root/orchestra-main/core/orchestrator/src/personas/enhanced_persona_manager.py:26
+   - /root/orchestra-main/core/orchestrator/src/personas/enhanced_persona_manager.py:83
+   - /root/orchestra-main/core/orchestrator/src/personas/enhanced_persona_manager.py:153
+   - /root/orchestra-main/core/orchestrator/src/workflows/state_machine.py:71
+   - /root/orchestra-main/core/orchestrator/src/llm/litellm_langchain_adapter.py:33
+   - /root/orchestra-main/core/orchestrator/src/llm/litellm_langchain_adapter.py:86
+   - /root/orchestra-main/core/orchestrator/src/llm/litellm_client.py:71
+   - /root/orchestra-main/core/orchestrator/src/tools/executor.py:15
+   - /root/orchestra-main/core/orchestrator/src/tools/registry.py:35
+   - /root/orchestra-main/core/orchestrator/src/services/memory_service.py:22
+   - /root/orchestra-main/core/orchestrator/src/services/unified_registry.py:67
+   - /root/orchestra-main/core/orchestrator/src/services/unified_registry.py:120
+   - /root/orchestra-main/core/orchestrator/src/services/agent_communication.py:23
+   - /root/orchestra-main/core/orchestrator/src/services/interaction_service.py:29
+   - /root/orchestra-main/core/orchestrator/src/services/enhanced_agent_orchestrator.py:32
+   - /root/orchestra-main/core/orchestrator/src/services/conversation_service.py:52
+   - /root/orchestra-main/core/orchestrator/src/services/message_queue.py:41
+   - /root/orchestra-main/core/orchestrator/src/services/agent_orchestrator.py:36
+   - /root/orchestra-main/core/orchestrator/src/services/base_orchestrator.py:38
+   - /root/orchestra-main/core/orchestrator/src/services/semantic_router.py:22
+   - /root/orchestra-main/core/orchestrator/src/services/distributed_task_queue.py:62
+   - /root/orchestra-main/core/orchestrator/src/services/registry.py:26
+   - /root/orchestra-main/core/orchestrator/src/services/enhanced_registry.py:48
+   - /root/orchestra-main/core/orchestrator/src/services/enhanced_registry.py:89
+   - /root/orchestra-main/core/orchestrator/src/memory/lifecycle/progressive_summarizer.py:95
+   - /root/orchestra-main/core/orchestrator/src/memory/lifecycle/importance_scorer.py:114
+   - /root/orchestra-main/core/orchestrator/src/memory/lifecycle/memory_chunker.py:122
+   - /root/orchestra-main/core/orchestrator/src/memory/backends/redis_memory.py:20
+   - /root/orchestra-main/core/orchestrator/src/memory/retrieval/hybrid_search.py:75
+   - /root/orchestra-main/core/orchestrator/src/memory/retrieval/parallel_retriever.py:44
+   - /root/orchestra-main/core/orchestrator/src/memory/retrieval/query_classifier.py:75
+   - /root/orchestra-main/core/orchestrator/src/api/endpoints/resources.py:14
+   - /root/orchestra-main/core/orchestrator/src/agents/examples/agent_usage_example.py:27
+   - /root/orchestra-main/core/orchestrator/src/agents/examples/agent_usage_example.py:61
+   - /root/orchestra-main/core/orchestrator/src/agents/examples/agent_usage_example.py:96
+   - /root/orchestra-main/core/orchestrator/src/agents/examples/agent_usage_example.py:197
+   - /root/orchestra-main/core/orchestrator/src/agents/examples/pubsub_agent_example.py:22
+   - /root/orchestra-main/core/orchestrator/src/agents/memory/mongodb_manager.py:19
+   - /root/orchestra-main/core/orchestrator/src/agents/memory/manager.py:67
+   - /root/orchestra-main/core/orchestrator/src/agents/memory/layered_memory.py:48
+   - /root/orchestra-main/core/orchestrator/src/agents/teams/coordinator.py:72
+   - /root/orchestra-main/core/orchestrator/src/agents/tools/base.py:58
+   - /root/orchestra-main/core/orchestrator/src/agents/tools/base.py:170
+   - /root/orchestra-main/core/orchestrator/src/agents/tools/base.py:259
+   - /root/orchestra-main/core/orchestrator/src/services/llm/circuit_breaker.py:71
+   - /root/orchestra-main/core/orchestrator/src/services/llm/circuit_breaker.py:84
+   - /root/orchestra-main/core/orchestrator/src/services/llm/providers.py:58
+   - /root/orchestra-main/core/orchestrator/src/services/llm/providers.py:238
+   - /root/orchestra-main/core/orchestrator/src/services/llm/providers.py:603
+   - /root/orchestra-main/core/business/personas/base.py:121
+   - /root/orchestra-main/core/business/workflows/base.py:104
+   - /root/orchestra-main/core/business/workflows/base.py:341
+   - /root/orchestra-main/core/business/llm/provider.py:80
+   - /root/orchestra-main/core/data_ingestion/deduplication/duplicate_resolver.py:74
+   - /root/orchestra-main/core/data_ingestion/deduplication/deduplication_engine.py:75
+   - /root/orchestra-main/core/data_ingestion/deduplication/audit_logger.py:84
+   - /root/orchestra-main/core/data_ingestion/interfaces/storage.py:49
+   - /root/orchestra-main/core/data_ingestion/interfaces/parser.py:52
+   - /root/orchestra-main/core/data_ingestion/interfaces/processor.py:71
+   - /root/orchestra-main/core/data_ingestion/parsers/slack_parser.py:29
+   - /root/orchestra-main/core/data_ingestion/parsers/zip_handler.py:28
+   - /root/orchestra-main/core/data_ingestion/storage/postgres_adapter.py:30
+   - /root/orchestra-main/core/data_ingestion/storage/weaviate_adapter.py:32
+   - /root/orchestra-main/core/services/events/event_bus.py:42
+   - /root/orchestra-main/core/services/events/event_bus.py:92
+   - /root/orchestra-main/core/services/memory/unified_memory.py:35
+   - /root/orchestra-main/core/services/memory/unified_memory.py:100
+   - /root/orchestra-main/core/services/memory/unified_memory.py:194
+   - /root/orchestra-main/core/services/memory/unified_memory.py:387
+   - /root/orchestra-main/core/services/memory/base.py:55
+   - /root/orchestra-main/core/services/agents/base.py:87
+   - /root/orchestra-main/core/services/agents/base.py:333
+   - /root/orchestra-main/scripts/domain_setup/configure_airbyte_pipelines.py:13
+   - /root/orchestra-main/scripts/domain_setup/provision_weaviate_clusters.py:13
+   - /root/orchestra-main/tests/shared/test_weaviate_session_cache.py:6
+   - /root/orchestra-main/tests/shared/test_zip_processor.py:10
+   - /root/orchestra-main/tests/mocks/concrete_memory_mock.py:9
+   - /root/orchestra-main/tests/benchmarks/memory_benchmark.py:30
+   - /root/orchestra-main/infra/components/postgres_component.py:40
+   - /root/orchestra-main/infra/components/vultr_server_component.py:9
+   - /root/orchestra-main/infra/components/weaviate_component.py:35
+   - /root/orchestra-main/infra/components/database_component.py:11
+   - /root/orchestra-main/infra/components/litellm_component.py:15
+   - /root/orchestra-main/infra/components/ingress_component.py:15
+   - /root/orchestra-main/infra/components/monitoring_component.py:15
+   - /root/orchestra-main/infra/components/vector_droplet_component.py:39
+   - /root/orchestra-main/.factory/bridge/api_gateway.py:77
+   - /root/orchestra-main/packages/agents/contact_enrichment_agent.py:21
+   - /root/orchestra-main/packages/agents/property_enrichment_agent.py:9
+   - /root/orchestra-main/packages/agents/base.py:22
+   - /root/orchestra-main/packages/shared/src/agent_orchestration.py:52
+   - /root/orchestra-main/packages/shared/src/agent_orchestration.py:164
+   - /root/orchestra-main/packages/shared/src/agent_orchestration.py:385
+   - /root/orchestra-main/packages/shared/src/agent_orchestration.py:597
+   - /root/orchestra-main/packages/shared/src/gateway_adapter.py:71
+   - /root/orchestra-main/packages/shared/src/gateway_adapter.py:289
+   - /root/orchestra-main/packages/shared/src/memory/stubs.py:6
+   - /root/orchestra-main/packages/shared/src/portkey_admin/client.py:63
+   - /root/orchestra-main/packages/shared/src/portkey/manager.py:35
+   - /root/orchestra-main/packages/agents/runtime/web_scraper.py:38
+   - /root/orchestra-main/packages/agents/src/langchain_agent.py:27
+   - /root/orchestra-main/packages/agents/src/phidata_agent.py:25
+   - /root/orchestra-main/packages/agents/src/routing.py:23
+   - /root/orchestra-main/packages/agents/src/_base.py:34
+   - /root/orchestra-main/packages/agents/src/registry.py:35
+   - /root/orchestra-main/packages/agents/runtime/security/credentials_manager.py:31
+   - /root/orchestra-main/mcp_server/memory/langchain_memory.py:51
+   - /root/orchestra-main/mcp_server/memory/langchain_memory.py:398
+   - /root/orchestra-main/mcp_server/memory/base.py:128
+   - /root/orchestra-main/mcp_server/rules/rule_engine.py:185
+   - /root/orchestra-main/mcp_server/utils/performance_monitor.py:23
+   - /root/orchestra-main/mcp_server/utils/secret_manager.py:25
+   - /root/orchestra-main/mcp_server/utils/memory_key.py:36
+   - /root/orchestra-main/mcp_server/utils/memory_key.py:372
+   - /root/orchestra-main/mcp_server/utils/structured_logging.py:361
+   - /root/orchestra-main/mcp_server/utils/token_budget_manager.py:23
+   - /root/orchestra-main/mcp_server/utils/idempotency.py:102
+   - /root/orchestra-main/mcp_server/utils/idempotency.py:202
+   - /root/orchestra-main/mcp_server/utils/idempotency.py:300
+   - /root/orchestra-main/mcp_server/utils/token_estimation.py:305
+   - /root/orchestra-main/mcp_server/utils/performance_tuner.py:25
+   - /root/orchestra-main/mcp_server/servers/weaviate_direct_server.py:30
+   - /root/orchestra-main/mcp_server/servers/base_mcp_server.py:58
+   - /root/orchestra-main/mcp_server/servers/web_scraping_mcp_server.py:32
+   - /root/orchestra-main/mcp_server/servers/deployment_server.py:25
+   - /root/orchestra-main/mcp_server/servers/orchestrator_server.py:67
+   - /root/orchestra-main/mcp_server/servers/memory_server.py:25
+   - /root/orchestra-main/mcp_server/servers/tools_server.py:26
+   - /root/orchestra-main/mcp_server/servers/orchestra_memory_mcp_server.py:57
+   - /root/orchestra-main/mcp_server/servers/enhanced_memory_server.py:29
+   - /root/orchestra-main/mcp_server/servers/enhanced_memory_server.py:49
+   - /root/orchestra-main/mcp_server/interfaces/tool_adapter.py:135
+   - /root/orchestra-main/mcp_server/interfaces/storage.py:58
+   - /root/orchestra-main/mcp_server/interfaces/memory_manager.py:57
+   - /root/orchestra-main/mcp_server/managers/performance_memory_manager.py:46
+   - /root/orchestra-main/mcp_server/managers/standard_memory_manager.py:25
+   - /root/orchestra-main/mcp_server/managers/standard_memory_manager.py:166
+   - /root/orchestra-main/mcp_server/managers/agent_mode_manager.py:26
+   - /root/orchestra-main/mcp_server/adapters/roo_adapter.py:16
+   - /root/orchestra-main/mcp_server/adapters/reliability_adapter.py:45
+   - /root/orchestra-main/mcp_server/adapters/knowledge_adapter.py:26
+   - /root/orchestra-main/mcp_server/adapters/portkey_adapter.py:16
+   - /root/orchestra-main/mcp_server/adapters/codex_adapter.py:16
+   - /root/orchestra-main/mcp_server/adapters/architect_adapter.py:25
+   - /root/orchestra-main/mcp_server/adapters/example_integration.py:34
+   - /root/orchestra-main/mcp_server/adapters/example_integration.py:50
+   - /root/orchestra-main/mcp_server/adapters/openrouter_adapter.py:16
+   - /root/orchestra-main/mcp_server/adapters/copilot_adapter.py:24
+   - /root/orchestra-main/mcp_server/adapters/cursor_adapter.py:16
+   - /root/orchestra-main/mcp_server/adapters/openai_adapter.py:16
+   - /root/orchestra-main/mcp_server/adapters/factory_mcp_adapter.py:42
+   - /root/orchestra-main/mcp_server/adapters/factory_mcp_adapter.py:134
+   - /root/orchestra-main/mcp_server/adapters/debug_adapter.py:26
+   - /root/orchestra-main/mcp_server/adapters/code_adapter.py:26
+   - /root/orchestra-main/mcp_server/adapters/claude_adapter.py:16
+   - /root/orchestra-main/mcp_server/adapters/grok_adapter.py:16
+   - /root/orchestra-main/mcp_server/adapters/deepseek_adapter.py:16
+   - /root/orchestra-main/mcp_server/base/enhanced_server_base.py:35
+   - /root/orchestra-main/mcp_server/base/enhanced_server_base.py:82
+   - /root/orchestra-main/mcp_server/base/enhanced_server_base.py:115
+   - /root/orchestra-main/mcp_server/base/enhanced_server_base.py:159
+   - /root/orchestra-main/mcp_server/workflows/workflow_manager.py:20
+   - /root/orchestra-main/mcp_server/monitoring/health_dashboard_enhanced.py:47
+   - /root/orchestra-main/mcp_server/roo/memory_hooks.py:79
+   - /root/orchestra-main/mcp_server/roo/memory_hooks.py:376
+   - /root/orchestra-main/mcp_server/roo/orchestra_integration.py:29
+   - /root/orchestra-main/mcp_server/roo/rules.py:134
+   - /root/orchestra-main/mcp_server/roo/transitions.py:60
+   - /root/orchestra-main/mcp_server/storage/optimized_memory_storage.py:35
+   - /root/orchestra-main/mcp_server/storage/memory_store.py:23
+   - /root/orchestra-main/mcp_server/storage/sync_storage_adapter.py:22
+   - /root/orchestra-main/mcp_server/storage/in_memory_storage.py:27
+   - /root/orchestra-main/mcp_server/storage/memory_adapter.py:28
+   - /root/orchestra-main/mcp_server/storage/async_memory_store.py:22
+   - /root/orchestra-main/mcp_server/tools/tool_manager.py:19
+   - /root/orchestra-main/mcp_server/roo/adapters/gemini_adapter.py:27
+   - /root/orchestra-main/src/multimedia_generation/image_gen_controller.py:33
+   - /root/orchestra-main/src/multimedia_generation/video_gen_controller.py:32
+   - /root/orchestra-main/src/multimedia_generation/operator_mode_coordinator.py:41
+   - /root/orchestra-main/src/search_engine/search_router.py:21
+   - /root/orchestra-main/src/search_engine/creative_search.py:26
+   - /root/orchestra-main/src/search_engine/deep_search.py:28
+   - /root/orchestra-main/src/search_engine/normal_search.py:24
+   - /root/orchestra-main/src/search_engine/super_deep_search.py:29
+   - /root/orchestra-main/src/search_engine/uncensored_search.py:27
+   - /root/orchestra-main/src/file_ingestion/zip_extractor.py:26
+   - /root/orchestra-main/src/file_ingestion/video_processor.py:32
+   - /root/orchestra-main/src/file_ingestion/document_parser.py:30
+   - /root/orchestra-main/src/file_ingestion/ingestion_controller.py:34
+   - /root/orchestra-main/src/file_ingestion/audio_transcriber.py:33
+   - /root/orchestra-main/src/operator_mode/operator_manager.py:50
+   - /root/orchestra-main/src/operator_mode/agent_supervisor.py:44
+   - /root/orchestra-main/src/operator_mode/agent_task_queue.py:42
+   - /root/orchestra-main/.migration_backups/20250602_074346_duplicate_cleanup/llm_router.py:193
+   - /root/orchestra-main/ai_components/claude/claude_analyzer.py:28
+   - /root/orchestra-main/ai_components/eigencode/mock_analyzer.py:61
+   - /root/orchestra-main/ai_components/orchestration/orchestrator_integration_update.py:29
+   - /root/orchestra-main/ai_components/orchestration/vultr_autoscaling.py:51
+   - /root/orchestra-main/ai_components/orchestration/vultr_autoscaling.py:168
+   - /root/orchestra-main/ai_components/orchestration/vultr_autoscaling.py:266
+   - /root/orchestra-main/ai_components/orchestration/vultr_autoscaling.py:346
+   - /root/orchestra-main/ai_components/orchestration/roo_mcp_adapter.py:84
+   - /root/orchestra-main/ai_components/orchestration/intelligent_cache.py:56
+   - /root/orchestra-main/ai_components/orchestration/coding_activity_monitor.py:23
+   - /root/orchestra-main/ai_components/orchestration/coding_activity_monitor.py:43
+   - /root/orchestra-main/ai_components/orchestration/coding_activity_monitor.py:153
+   - /root/orchestra-main/ai_components/orchestration/mode_transition_manager.py:86
+   - /root/orchestra-main/ai_components/orchestration/ai_orchestrator.py:102
+   - /root/orchestra-main/ai_components/orchestration/ai_orchestrator.py:159
+   - /root/orchestra-main/ai_components/orchestration/ai_orchestrator.py:259
+   - /root/orchestra-main/ai_components/orchestration/ai_orchestrator.py:307
+   - /root/orchestra-main/ai_components/orchestration/ai_orchestrator.py:624
+   - /root/orchestra-main/ai_components/orchestration/cursor_integration.py:41
+   - /root/orchestra-main/ai_components/orchestration/cursor_integration.py:113
+   - /root/orchestra-main/ai_components/orchestration/cursor_integration.py:156
+   - /root/orchestra-main/ai_components/orchestration/cursor_integration.py:229
+   - /root/orchestra-main/ai_components/orchestration/comprehensive_orchestrator.py:36
+   - /root/orchestra-main/ai_components/orchestration/unified_api_router.py:60
+   - /root/orchestra-main/ai_components/orchestration/unified_api_router.py:130
+   - /root/orchestra-main/ai_components/orchestration/unified_api_router.py:166
+   - /root/orchestra-main/ai_components/orchestration/mcp_integration.py:48
+   - /root/orchestra-main/ai_components/orchestration/mcp_integration.py:68
+   - /root/orchestra-main/ai_components/orchestration/mcp_integration.py:120
+   - /root/orchestra-main/ai_components/orchestration/mcp_integration.py:172
+   - /root/orchestra-main/ai_components/orchestration/mcp_integration.py:232
+   - /root/orchestra-main/ai_components/orchestration/mcp_integration.py:486
+   - /root/orchestra-main/ai_components/orchestration/mcp_integration.py:586
+   - /root/orchestra-main/ai_components/orchestration/ai_orchestrator_enhanced.py:111
+   - /root/orchestra-main/ai_components/orchestration/ai_orchestrator_enhanced.py:162
+   - /root/orchestra-main/ai_components/orchestration/ai_orchestrator_enhanced.py:228
+   - /root/orchestra-main/ai_components/orchestration/ai_orchestrator_enhanced.py:314
+   - /root/orchestra-main/ai_components/orchestration/ai_orchestrator_enhanced.py:382
+   - /root/orchestra-main/ai_components/orchestration/ai_orchestrator_enhanced.py:408
+   - /root/orchestra-main/ai_components/orchestration/ai_orchestrator_enhanced.py:434
+   - /root/orchestra-main/ai_components/orchestration/ai_orchestrator_enhanced.py:546
+   - /root/orchestra-main/ai_components/agents/cursor_ai_enhanced.py:50
+   - /root/orchestra-main/ai_components/agents/claude_integration.py:52
+   - /root/orchestra-main/ai_components/github_copilot/copilot_integration.py:30
+   - /root/orchestra-main/ai_components/cursor_ai/cursor_integration_enhanced.py:29
+   - /root/orchestra-main/ai_components/design/dalle_integration.py:30
+   - /root/orchestra-main/ai_components/design/recraft_integration.py:29
+   - /root/orchestra-main/ai_components/design/design_orchestrator.py:38
+   - /root/orchestra-main/agent/app/routers/data_ingestion_enhanced.py:40
+   - /root/orchestra-main/agent/app/services/real_agents.py:16
+   - /root/orchestra-main/agent/app/services/specialized_agents.py:77
+   - /root/orchestra-main/agent/app/services/specialized_agents.py:137
+   - /root/orchestra-main/agent/app/services/specialized_agents.py:351
+   - /root/orchestra-main/agent/app/services/specialized_agents.py:583
+   - /root/orchestra-main/agent/app/services/agent_orchestrator.py:86
+   - /root/orchestra-main/agent/app/services/agent_orchestrator.py:126
+   - /root/orchestra-main/agent/app/services/natural_language_processor.py:51
+   - /root/orchestra-main/agent/app/services/natural_language_processor.py:88
+   - /root/orchestra-main/agent/app/services/natural_language_processor.py:154
+   - /root/orchestra-main/agent/app/services/natural_language_processor.py:194
+   - /root/orchestra-main/agent/app/services/agent_templates/first_agent_template.py:61
+   - /root/orchestra-main/ml/pipelines/inference_pipeline.py:19
+   - /root/orchestra-main/ml/pipelines/inference_pipeline.py:116
+   - /root/orchestra-main/ml/pipelines/training_pipeline.py:18
+   - /root/orchestra-main/services/pay_ready/etl_orchestrator.py:56
+   - /root/orchestra-main/services/pay_ready/etl_orchestrator.py:528
+   - /root/orchestra-main/services/pay_ready/entity_resolver.py:33
+   - /root/orchestra-main/services/pay_ready/memory_manager.py:42
+   - /root/orchestra-main/services/pay_ready/query_agent.py:30
+⚠️  check_environment defined in 3 places:
+   - /root/orchestra-main/verify_factory_ai_connection.py:13
+   - /root/orchestra-main/scripts/orchestra_setup_wizard.py:49
+   - /root/orchestra-main/scripts/test_orchestra_system.py:35
+
+🗑️  POTENTIALLY UNUSED FUNCTIONS
+---------------------------------
+❓ /root/orchestra-main/find_critical_lint_issues.py:95 - parse_ruff_json_output()
+❓ /root/orchestra-main/scan_github_workflows.py:40 - scan_action_versions()
+❓ /root/orchestra-main/scan_github_workflows.py:88 - scan_hardcoded_values()
+❓ /root/orchestra-main/scan_github_workflows.py:154 - scan_authentication_methods()
+❓ /root/orchestra-main/scan_github_workflows.py:199 - scan_python_versions()
+❓ /root/orchestra-main/error_handling_consolidation.py:178 - handle_async_exception()
+❓ /root/orchestra-main/error_handling_consolidation.py:546 - map_exception()
+❓ /root/orchestra-main/error_handling_consolidation.py:123 - decorator()
+❓ /root/orchestra-main/error_handling_consolidation.py:201 - decorator()
+❓ /root/orchestra-main/error_handling_consolidation.py:427 - decorator()
+❓ /root/orchestra-main/error_handling_consolidation.py:503 - decorator()
+❓ /root/orchestra-main/error_handling_consolidation.py:633 - parse_json()
+❓ /root/orchestra-main/mcp_cli.py:66 - format_output()
+❓ /root/orchestra-main/code_analysis.py:92 - visit_Import()
+❓ /root/orchestra-main/code_analysis.py:110 - visit_ImportFrom()
+❓ /root/orchestra-main/code_analysis.py:133 - visit_Name()
+❓ /root/orchestra-main/code_analysis.py:141 - visit_FunctionDef()
+❓ /root/orchestra-main/code_analysis.py:198 - visit_ClassDef()
+❓ /root/orchestra-main/code_analysis.py:226 - visit_If()
+❓ /root/orchestra-main/code_analysis.py:230 - visit_For()
+
+📝 IMPORT STYLE ISSUES
+----------------------
+⚠️  /root/orchestra-main/factory_integration/context_manager.py - Mixed relative and absolute imports
+⚠️  /root/orchestra-main/factory_integration/__init__.py - Mixed relative and absolute imports
+⚠️  /root/orchestra-main/mcp_server/async_server.py - Mixed relative and absolute imports
+⚠️  /root/orchestra-main/shared/memory/weaviate_session_cache.py - Mixed relative and absolute imports
+⚠️  /root/orchestra-main/shared/database/connection_manager_enhanced.py - Mixed relative and absolute imports
+⚠️  /root/orchestra-main/shared/database/dependencies.py - Mixed relative and absolute imports
+⚠️  /root/orchestra-main/shared/database/unified_db.py - Mixed relative and absolute imports
+⚠️  /root/orchestra-main/shared/database/unified_postgresql.py - Mixed relative and absolute imports
+⚠️  /root/orchestra-main/shared/database/unified_postgresql_enhanced.py - Mixed relative and absolute imports
+⚠️  /root/orchestra-main/shared/data_ingestion/file_processors.py - Mixed relative and absolute imports
+
+🔧 RECOMMENDATIONS
+------------------
+1. Fix broken imports by installing missing packages or correcting paths
+2. Resolve circular dependencies by refactoring module structure
+3. Remove or refactor unused functions and classes
+4. Consolidate duplicate function definitions
+5. Standardize import styles (prefer absolute imports)
+6. Consider using tools like isort and black for consistent formatting
+
+📋 NEXT STEPS
+-------------
+1. Review the detailed JSON report for complete analysis
+2. Prioritize fixing broken imports and circular dependencies
+3. Clean up unused code to reduce complexity
+4. Establish coding standards for the team
+
+
+📁 Detailed results saved to: python_analysis_results_20250603_172627.json

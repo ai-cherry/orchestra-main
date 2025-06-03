@@ -1,0 +1,71 @@
+{
+  "domain": "paragonrx",
+  "rate_limiting": {
+    "enabled": true,
+    "rules": {
+      "global": {
+        "requests_per_minute": 200,
+        "burst_size": 300,
+        "cooldown_seconds": 30
+      },
+      "endpoints": {
+        "/paragonrx/api/*": {
+          "requests_per_minute": 120,
+          "burst_size": 180
+        },
+        "/paragonrx/prescriptions/*": {
+          "requests_per_minute": 50,
+          "burst_size": 75,
+          "strict": true
+        },
+        "/paragonrx/inventory/*": {
+          "requests_per_minute": 100,
+          "burst_size": 150
+        },
+        "/paragonrx/analytics/*": {
+          "requests_per_minute": 60,
+          "burst_size": 90
+        },
+        "/paragonrx/webhooks/*": {
+          "requests_per_minute": 40,
+          "burst_size": 60
+        },
+        "/paragonrx/health": {
+          "requests_per_minute": 600,
+          "burst_size": 600
+        }
+      },
+      "user_tiers": {
+        "pharmacy": {
+          "requests_per_minute": 100,
+          "burst_size": 150
+        },
+        "clinic": {
+          "requests_per_minute": 200,
+          "burst_size": 300
+        },
+        "hospital": {
+          "requests_per_minute": 1000,
+          "burst_size": 1500
+        }
+      }
+    }
+  },
+  "circuit_breaker": {
+    "enabled": true,
+    "failure_threshold": 10,
+    "recovery_timeout": 45,
+    "success_threshold": 3
+  },
+  "retry_policy": {
+    "max_retries": 4,
+    "base_delay_ms": 50,
+    "max_delay_ms": 3000,
+    "exponential_base": 2
+  },
+  "compliance": {
+    "hipaa_enabled": true,
+    "audit_logging": true,
+    "encryption_required": true
+  }
+}

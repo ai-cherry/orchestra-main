@@ -1,43 +1,6 @@
 """
-Tests for the personas admin API endpoints.
-
-This module contains comprehensive tests for the personas admin router,
-ensuring proper functionality, error handling, and API contract compliance.
 """
-
-import json
-from pathlib import Path
-from typing import Any, Dict
-from unittest.mock import MagicMock, patch
-
-import pytest
-from fastapi import status
-from fastapi.testclient import TestClient
-
-from core.personas import (
-    PersonaConfigError,
-    PersonaConfigManager,
-    PersonaConfiguration,
-    PersonaNotFoundError,
-    PersonaStatus,
-)
-
-@pytest.fixture
-def mock_persona_config() -> PersonaConfiguration:
     """Create a mock persona configuration for testing."""
-    from datetime import datetime
-    from uuid import uuid4
-
-    from core.personas.models import (
-        InteractionMode,
-        ResponseStyle,
-        ResponseStyleType,
-        PersonaTrait,
-        TraitCategory,
-    )
-
-    return PersonaConfiguration(
-        id=uuid4(),
         name="Test Persona",
         slug="test-persona",
         description="A test persona for unit testing",
@@ -64,7 +27,6 @@ def mock_persona_config() -> PersonaConfiguration:
 @pytest.fixture
 def mock_persona_manager(mock_persona_config: PersonaConfiguration) -> MagicMock:
     """Create a mock PersonaConfigManager."""
-    manager = MagicMock(spec=PersonaConfigManager)
     manager.personas = {"test-persona": mock_persona_config}
     manager.get_persona.return_value = mock_persona_config
     manager.list_personas.return_value = [mock_persona_config]
@@ -91,10 +53,6 @@ def valid_api_key() -> str:
 
 class TestPersonasAdminRouter:
     """Test cases for the personas admin router."""
-
-    def test_list_personas_success(
-        self, test_client: TestClient, valid_api_key: str, mock_persona_config: PersonaConfiguration
-    ) -> None:
         """Test successful listing of personas."""
         response = test_client.get("/api/personas/", headers={"X-API-Key": valid_api_key})
 
@@ -191,7 +149,6 @@ class TestPersonasAdminRouter:
         self, test_client: TestClient, valid_api_key: str, mock_persona_manager: MagicMock
     ) -> None:
         """Test validation when personas have issues."""
-        mock_persona_manager.validate_all.return_value = {
             "test-persona": ["No traits defined", "Empty model preferences list"]
         }
 
@@ -262,9 +219,6 @@ class TestPersonasAdminRouter:
 
 class TestPersonasAdminIntegration:
     """Integration tests for personas admin router."""
-
-    @pytest.mark.integration
-    def test_full_persona_lifecycle(self, test_client: TestClient, valid_api_key: str, tmp_path: Path) -> None:
         """Test complete persona lifecycle: list, get, update, export."""
         headers = {"X-API-Key": valid_api_key}
 

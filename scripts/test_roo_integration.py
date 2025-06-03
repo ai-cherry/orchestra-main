@@ -1,55 +1,13 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """Comprehensive test suite for Roo AI Orchestrator integration."""
-
-import asyncio
-import json
-import logging
-import os
-import sys
-import time
-from pathlib import Path
-from typing import Dict, List, Tuple
-
-import pytest
-from rich.console import Console
-from rich.table import Table
-
-# Add project root to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from ai_components.orchestration.mcp_integration import UnifiedContextManager
-from ai_components.orchestration.mode_transition_manager import (
-    ModeTransitionManager,
-    RooMode,
-    TransitionType,
-)
-from ai_components.orchestration.roo_mcp_adapter import RooMCPAdapter
-from ai_components.orchestration.unified_api_router import UnifiedAPIRouter
-from shared.database import UnifiedDatabase
-
-console = Console()
-logger = logging.getLogger(__name__)
-
-
-class IntegrationTester:
     """Test harness for Roo integration."""
-
-    def __init__(self):
-        self.results: List[Tuple[str, bool, str]] = []
         self.api_key = os.getenv("OPENROUTER_API_KEY", "")
 
     async def test_database_connectivity(self) -> bool:
         """Test database connection and schema."""
-        try:
-            async with UnifiedDatabase() as db:
-                # Check if tables exist
-                result = await db.fetch_one(
                     """
-                    SELECT COUNT(*) as count FROM information_schema.tables 
-                    WHERE table_name IN ('roo_mode_executions', 'mode_transitions')
                     """
-                )
-                
                 if result["count"] != 2:
                     self.results.append(
                         ("Database Schema", False, "Missing required tables")
@@ -59,9 +17,7 @@ class IntegrationTester:
                 # Test insert/select
                 await db.execute(
                     """
-                    INSERT INTO roo_mode_executions (mode, task, context, result)
-                    VALUES ($1, $2, $3, $4)
-                    """,
+                    """
                     "test", "test task", "{}", "test result"
                 )
                 
@@ -82,19 +38,23 @@ class IntegrationTester:
                     )
                     return False
                     
-        except Exception as e:
+        except Exception:
+
+                    
+            pass
             self.results.append(("Database Connectivity", False, str(e)))
             return False
 
     async def test_api_authentication(self) -> bool:
         """Test OpenRouter API authentication."""
-        if not self.api_key:
-            self.results.append(
                 ("API Authentication", False, "OPENROUTER_API_KEY not set")
             )
             return False
 
         try:
+
+
+            pass
             adapter = RooMCPAdapter(self.api_key)
             
             # Test with a minimal request
@@ -115,17 +75,15 @@ class IntegrationTester:
                 )
                 return False
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             self.results.append(("API Authentication", False, str(e)))
             return False
 
     async def test_mode_transitions(self) -> bool:
         """Test mode transition logic."""
-        try:
-            manager = ModeTransitionManager()
-            
-            # Test transition initiation
-            transition_id = await manager.initiate_transition(
                 "test_session",
                 RooMode.CODE,
                 RooMode.DEBUG,
@@ -145,14 +103,15 @@ class IntegrationTester:
                 )
                 return False
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             self.results.append(("Mode Transitions", False, str(e)))
             return False
 
     async def test_circuit_breaker(self) -> bool:
         """Test circuit breaker functionality."""
-        try:
-            router = UnifiedAPIRouter(
                 self.api_key or "test_key",
                 "http://localhost:8000",
                 "https://openrouter.ai/api/v1"
@@ -182,15 +141,15 @@ class IntegrationTester:
             )
             return False
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             self.results.append(("Circuit Breaker", False, str(e)))
             return False
 
     async def test_context_sync(self) -> bool:
         """Test context synchronization."""
-        try:
-            if not self.api_key:
-                self.results.append(
                     ("Context Sync", False, "API key required")
                 )
                 return False
@@ -222,14 +181,15 @@ class IntegrationTester:
                 )
                 return False
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             self.results.append(("Context Sync", False, str(e)))
             return False
 
     async def test_performance_metrics(self) -> bool:
         """Test performance monitoring."""
-        try:
-            router = UnifiedAPIRouter(
                 self.api_key or "test_key",
                 "http://localhost:8000",
                 "https://openrouter.ai/api/v1"
@@ -249,13 +209,15 @@ class IntegrationTester:
                 )
                 return False
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             self.results.append(("Performance Metrics", False, str(e)))
             return False
 
     async def run_all_tests(self) -> None:
         """Run all integration tests."""
-        tests = [
             ("Database Connectivity", self.test_database_connectivity),
             ("API Authentication", self.test_api_authentication),
             ("Mode Transitions", self.test_mode_transitions),
@@ -269,12 +231,16 @@ class IntegrationTester:
         for test_name, test_func in tests:
             console.print(f"Testing {test_name}...", end=" ")
             try:
+
+                pass
                 success = await test_func()
                 if success:
                     console.print("[green]✓[/green]")
                 else:
                     console.print("[red]✗[/red]")
-            except Exception as e:
+            except Exception:
+
+                pass
                 console.print(f"[red]✗ ({str(e)})[/red]")
                 self.results.append((test_name, False, str(e)))
 
@@ -306,9 +272,6 @@ class IntegrationTester:
 
 async def main():
     """Main test runner."""
-    # Setup logging
-    logging.basicConfig(
-        level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         handlers=[
             logging.FileHandler("logs/roo_integration_test.log"),

@@ -1,160 +1,9 @@
 #!/usr/bin/env python3
 """
-Monitoring Stack Improvements for AI Orchestrator
-Enhances Prometheus + Grafana with additional metrics and dashboards
 """
-
-import os
-import sys
-import json
-import yaml
-import requests
-from pathlib import Path
-from typing import Dict, List, Optional
-from datetime import datetime
-
-# Add parent directory to path
-sys.path.append(str(Path(__file__).parent.parent))
-
-from ai_components.orchestration.ai_orchestrator import DatabaseLogger, WeaviateManager
-
-
-class MonitoringEnhancer:
     """Enhances the monitoring stack with additional metrics and dashboards"""
-    
-    def __init__(self):
-        self.prometheus_url = os.environ.get('PROMETHEUS_URL', 'http://localhost:9090')
-        self.grafana_url = os.environ.get('GRAFANA_URL', 'http://localhost:3000')
-        self.grafana_api_key = os.environ.get('GRAFANA_API_KEY', 'admin:admin')
-        self.db_logger = DatabaseLogger()
-        self.weaviate_manager = WeaviateManager()
-    
-    def create_prometheus_config(self) -> Dict:
         """Create enhanced Prometheus configuration"""
-        config = {
-            'global': {
-                'scrape_interval': '15s',
-                'evaluation_interval': '15s',
-                'external_labels': {
-                    'monitor': 'ai-orchestrator',
-                    'environment': os.environ.get('ENVIRONMENT', 'production')
-                }
-            },
-            'alerting': {
-                'alertmanagers': [{
-                    'static_configs': [{
-                        'targets': ['localhost:9093']
-                    }]
-                }]
-            },
-            'rule_files': [
-                'alerts/*.yml'
-            ],
-            'scrape_configs': [
-                {
-                    'job_name': 'prometheus',
-                    'static_configs': [{
-                        'targets': ['localhost:9090']
-                    }]
-                },
-                {
-                    'job_name': 'node-exporter',
-                    'static_configs': [{
-                        'targets': ['localhost:9100']
-                    }]
-                },
-                {
-                    'job_name': 'mcp-server',
-                    'static_configs': [{
-                        'targets': ['localhost:8080']
-                    }],
-                    'metrics_path': '/metrics'
-                },
-                {
-                    'job_name': 'postgres-exporter',
-                    'static_configs': [{
-                        'targets': ['localhost:9187']
-                    }]
-                },
-                {
-                    'job_name': 'eigencode',
-                    'static_configs': [{
-                        'targets': ['localhost:9200']
-                    }],
-                    'metrics_path': '/metrics',
-                    'scrape_interval': '30s'
-                },
-                {
-                    'job_name': 'weaviate',
-                    'static_configs': [{
-                        'targets': [os.environ.get('WEAVIATE_URL', 'localhost:8081').replace('https://', '').replace('http://', '')]
-                    }],
-                    'metrics_path': '/v1/metrics',
-                    'scheme': 'https' if 'https' in os.environ.get('WEAVIATE_URL', '') else 'http'
-                },
-                {
-                    'job_name': 'airbyte',
-                    'static_configs': [{
-                        'targets': ['localhost:9201']
-                    }],
-                    'metrics_path': '/metrics'
-                },
-                {
-                    'job_name': 'orchestrator',
-                    'static_configs': [{
-                        'targets': ['localhost:8000']
-                    }],
-                    'metrics_path': '/metrics'
-                }
-            ]
-        }
-        
-        return config
-    
-    def create_alert_rules(self) -> List[Dict]:
         """Create alert rules for critical thresholds"""
-        rules = [
-            {
-                'alert': 'HighWorkflowFailureRate',
-                'expr': 'rate(orchestrator_workflows_failed_total[5m]) > 0.1',
-                'for': '5m',
-                'labels': {
-                    'severity': 'critical',
-                    'service': 'orchestrator'
-                },
-                'annotations': {
-                    'summary': 'High workflow failure rate detected',
-                    'description': 'More than 10% of workflows are failing in the last 5 minutes'
-                }
-            },
-            {
-                'alert': 'SlowWorkflowExecution',
-                'expr': 'histogram_quantile(0.95, orchestrator_task_duration_seconds_bucket) > 300',
-                'for': '10m',
-                'labels': {
-                    'severity': 'warning',
-                    'service': 'orchestrator'
-                },
-                'annotations': {
-                    'summary': 'Slow workflow execution detected',
-                    'description': '95th percentile of task duration is above 5 minutes'
-                }
-            },
-            {
-                'alert': 'DatabaseConnectionPoolExhausted',
-                'expr': 'pg_stat_database_numbackends / pg_settings_max_connections > 0.8',
-                'for': '5m',
-                'labels': {
-                    'severity': 'critical',
-                    'service': 'postgresql'
-                },
-                'annotations': {
-                    'summary': 'Database connection pool nearly exhausted',
-                    'description': 'PostgreSQL is using more than 80% of available connections'
-                }
-            },
-            {
-                'alert': 'WeaviateHighLatency',
                 'expr': 'weaviate_api_request_duration_seconds{quantile="0.99"} > 1',
                 'for': '5m',
                 'labels': {
@@ -211,10 +60,6 @@ class MonitoringEnhancer:
     
     def create_grafana_dashboards(self) -> List[Dict]:
         """Create comprehensive Grafana dashboards"""
-        dashboards = []
-        
-        # Main Orchestrator Dashboard
-        orchestrator_dashboard = {
             "dashboard": {
                 "title": "AI Orchestrator Overview",
                 "tags": ["orchestrator", "overview"],
@@ -458,7 +303,6 @@ class MonitoringEnhancer:
     
     def setup_postgres_exporter(self) -> Dict:
         """Configure PostgreSQL exporter"""
-        config = {
             "data_source_name": f"postgresql://{os.environ.get('POSTGRES_USER')}:{os.environ.get('POSTGRES_PASSWORD')}@{os.environ.get('POSTGRES_HOST')}:{os.environ.get('POSTGRES_PORT', 5432)}/{os.environ.get('POSTGRES_DB')}?sslmode=require",
             "auto_discover_databases": True,
             "exclude_databases": ["template0", "template1"],
@@ -468,16 +312,7 @@ class MonitoringEnhancer:
             "custom_queries": {
                 "orchestration_metrics": {
                     "query": """
-                        SELECT 
-                            workflow_id,
-                            COUNT(*) as task_count,
-                            SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_tasks,
-                            SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed_tasks,
-                            MAX(created_at) - MIN(created_at) as duration
-                        FROM orchestration_logs
-                        WHERE created_at > NOW() - INTERVAL '1 hour'
-                        GROUP BY workflow_id
-                    """,
+                    """
                     "metrics": [
                         {
                             "task_count": {
@@ -506,7 +341,6 @@ class MonitoringEnhancer:
     
     def deploy_monitoring_stack(self) -> Dict:
         """Deploy the enhanced monitoring configuration"""
-        results = {
             "prometheus": False,
             "grafana": False,
             "exporters": {},
@@ -542,6 +376,8 @@ class MonitoringEnhancer:
         
         # Deploy Grafana dashboards
         try:
+
+            pass
             headers = {
                 'Authorization': f'Bearer {self.grafana_api_key}',
                 'Content-Type': 'application/json'
@@ -552,11 +388,13 @@ class MonitoringEnhancer:
                     f"{self.grafana_url}/api/dashboards/db",
                     headers=headers,
                     json=dashboard
-                )
+                , timeout=30)
                 
                 if response.status_code == 200:
                     results["grafana"] = True
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"Failed to deploy Grafana dashboards: {e}")
         
         # Configure exporters
@@ -584,43 +422,6 @@ class MonitoringEnhancer:
     
     def create_custom_metrics_endpoint(self) -> str:
         """Create custom metrics endpoint for orchestrator"""
-        metrics_code = '''
-from prometheus_client import Counter, Histogram, Gauge, generate_latest
-from flask import Flask, Response
-
-app = Flask(__name__)
-
-# Define metrics
-workflow_counter = Counter('orchestrator_workflows_total', 'Total workflows executed')
-workflow_completed = Counter('orchestrator_workflows_completed_total', 'Completed workflows')
-workflow_failed = Counter('orchestrator_workflows_failed_total', 'Failed workflows')
-task_duration = Histogram('orchestrator_task_duration_seconds', 'Task execution duration')
-active_workflows = Gauge('orchestrator_active_workflows', 'Number of active workflows')
-agent_tasks = Counter('orchestrator_agent_tasks_total', 'Tasks by agent', ['agent'])
-
-# EigenCode specific metrics
-eigencode_analysis_duration = Histogram('eigencode_analysis_duration_seconds', 'EigenCode analysis duration')
-eigencode_files_analyzed = Counter('eigencode_files_analyzed_total', 'Files analyzed by EigenCode')
-eigencode_issues_found = Counter('eigencode_issues_found_total', 'Issues found by EigenCode', ['severity'])
-
-# Weaviate metrics
-weaviate_store_duration = Histogram('weaviate_store_duration_seconds', 'Weaviate store operation duration')
-weaviate_retrieve_duration = Histogram('weaviate_retrieve_duration_seconds', 'Weaviate retrieve operation duration')
-weaviate_objects_stored = Counter('weaviate_objects_stored_total', 'Objects stored in Weaviate')
-
-# Airbyte metrics
-airbyte_sync_duration = Histogram('airbyte_sync_duration_seconds', 'Airbyte sync duration')
-airbyte_records_synced = Counter('airbyte_records_synced_total', 'Records synced by Airbyte')
-
-@app.route('/metrics')
-def metrics():
-    return Response(generate_latest(), mimetype='text/plain')
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
-'''
-        
-        # Save metrics endpoint code
         metrics_path = Path("ai_components/monitoring/metrics_endpoint.py")
         metrics_path.parent.mkdir(parents=True, exist_ok=True)
         
@@ -631,7 +432,6 @@ if __name__ == '__main__':
     
     def verify_monitoring_stack(self) -> Dict:
         """Verify monitoring stack functionality"""
-        verification = {
             "prometheus": {"status": False, "metrics": 0},
             "grafana": {"status": False, "dashboards": 0},
             "exporters": {},
@@ -640,28 +440,38 @@ if __name__ == '__main__':
         
         # Check Prometheus
         try:
-            response = requests.get(f"{self.prometheus_url}/api/v1/targets")
+
+            pass
+            response = requests.get(f"{self.prometheus_url}/api/v1/targets", timeout=30)
             if response.status_code == 200:
                 data = response.json()
                 active_targets = [t for t in data.get('data', {}).get('activeTargets', []) if t['health'] == 'up']
                 verification["prometheus"]["status"] = True
                 verification["prometheus"]["metrics"] = len(active_targets)
-        except:
+        except Exception:
+
+            pass
             pass
         
         # Check Grafana
         try:
+
+            pass
             headers = {'Authorization': f'Bearer {self.grafana_api_key}'}
-            response = requests.get(f"{self.grafana_url}/api/dashboards", headers=headers)
+            response = requests.get(f"{self.grafana_url}/api/dashboards", headers=headers, timeout=30)
             if response.status_code == 200:
                 verification["grafana"]["status"] = True
                 verification["grafana"]["dashboards"] = len(response.json())
-        except:
+        except Exception:
+
+            pass
             pass
         
         # Check alerts
         try:
-            response = requests.get(f"{self.prometheus_url}/api/v1/rules")
+
+            pass
+            response = requests.get(f"{self.prometheus_url}/api/v1/rules", timeout=30)
             if response.status_code == 200:
                 data = response.json()
                 for group in data.get('data', {}).get('groups', []):
@@ -669,7 +479,9 @@ if __name__ == '__main__':
                     for rule in group.get('rules', []):
                         if rule.get('state') == 'firing':
                             verification["alerts"]["firing"] += 1
-        except:
+        except Exception:
+
+            pass
             pass
         
         return verification
@@ -677,8 +489,6 @@ if __name__ == '__main__':
 
 def main():
     """Main function"""
-    enhancer = MonitoringEnhancer()
-    
     print("Enhancing Monitoring Stack for AI Orchestrator")
     print("=" * 50)
     

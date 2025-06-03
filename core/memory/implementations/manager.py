@@ -1,106 +1,10 @@
+# TODO: Consider adding connection pooling configuration
 """
-Unified Memory Manager Implementation
-
-The main orchestrator that manages all memory tiers, handles tier promotion/demotion,
-and provides a unified interface for memory operations.
 """
-
-import asyncio
-import hashlib
-import time
-from typing import Dict, List, Optional, Any, Set
-from datetime import datetime, timedelta
-import logging
-from contextlib import asynccontextmanager
-import json
-from collections import defaultdict
-
-from ..interfaces import (
-    IMemoryManager,
-    IMemoryStorage,
-    IMemoryOptimizer,
-    IMemoryMetrics,
-    MemoryTier,
-    MemoryItem,
-    MemoryOperation,
-    MemoryResult
-)
-from ..config import MemoryConfig, get_config
-from ..exceptions import (
-    MemoryException,
-    MemoryNotFoundError,
-    MemoryStorageError,
-    MemoryTierError,
-    MemoryValidationError,
-    MemoryExceptionHandler
-)
-from .storage import MemoryStorageFactory
-from .optimizer import MemoryOptimizer
-from .metrics import MemoryMetricsCollector
-
-logger = logging.getLogger(__name__)
-
-class UnifiedMemoryManager(IMemoryManager):
     """
-    Production-ready unified memory management system.
-    
-    This manager orchestrates multiple storage tiers, handles automatic
-    tier promotion/demotion, implements predictive prefetching, and
-    provides comprehensive metrics and monitoring.
-    
-    Features:
-    - Multi-tier storage orchestration
-    - Automatic tier optimization based on access patterns
-    - Predictive prefetching for improved performance
-    - Comprehensive metrics and monitoring
-    - Batch operations support
-    - Semantic search capabilities
-    - Graceful error handling and recovery
     """
-    
-    def __init__(
-        self,
-        config: Optional[MemoryConfig] = None,
-        optimizer: Optional[IMemoryOptimizer] = None,
-        metrics_collector: Optional[IMemoryMetrics] = None
-    ):
         """
-        Initialize the unified memory manager.
-        
-        Args:
-            config: Memory system configuration (uses global config if None)
-            optimizer: Memory optimizer instance (creates default if None)
-            metrics_collector: Metrics collector instance (creates default if None)
         """
-        self.config = config or get_config()
-        self.optimizer = optimizer or MemoryOptimizer(self.config.optimization)
-        self.metrics = metrics_collector or MemoryMetricsCollector(self.config.metrics)
-        
-        # Storage backends for each tier
-        self._storages: Dict[MemoryTier, IMemoryStorage] = {}
-        
-        # Tier access order for retrieval
-        self._tier_hierarchy = [
-            MemoryTier.L0_CPU_CACHE,
-            MemoryTier.L1_PROCESS_MEMORY,
-            MemoryTier.L2_SHARED_MEMORY,
-            MemoryTier.L3_POSTGRESQL,
-            MemoryTier.L4_WEAVIATE
-        ]
-        
-        # Background tasks
-        self._background_tasks: List[asyncio.Task] = []
-        self._shutdown_event = asyncio.Event()
-        
-        # Operation semaphore for concurrency control
-        self._operation_semaphore = asyncio.Semaphore(
-            self.config.max_concurrent_operations
-        )
-        
-        # Prefetch queue
-        self._prefetch_queue: asyncio.Queue = asyncio.Queue(maxsize=1000)
-        
-        logger.info(
             f"Initialized UnifiedMemoryManager with {len(self._tier_hierarchy)} tiers"
         )
     
@@ -109,6 +13,9 @@ class UnifiedMemoryManager(IMemoryManager):
         logger.info("Initializing UnifiedMemoryManager...")
         
         try:
+
+        
+            pass
             # Create storage instances for all enabled tiers
             self._storages = await self._initialize_storages()
             
@@ -123,29 +30,33 @@ class UnifiedMemoryManager(IMemoryManager):
                 f"UnifiedMemoryManager initialized with {len(self._storages)} active tiers"
             )
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             logger.error(f"Failed to initialize memory manager: {str(e)}")
             await self.close()
             raise
     
     async def _initialize_storages(self) -> Dict[MemoryTier, IMemoryStorage]:
         """Initialize all storage backends."""
-        storages = {}
-        
-        for tier in self._tier_hierarchy:
-            tier_config = self.config.tiers.get(tier.value)
-            if not tier_config or not tier_config.enabled:
                 logger.info(f"Tier {tier.value} is disabled, skipping initialization")
                 continue
             
             try:
+
+            
+                pass
                 # Create storage instance
                 storage = MemoryStorageFactory.create_storage(tier, self.config)
                 await storage.initialize()
                 storages[tier] = storage
                 logger.info(f"Initialized storage for tier {tier.value}")
                 
-            except Exception as e:
+            except Exception:
+
+                
+                pass
                 logger.error(f"Failed to initialize tier {tier.value}: {str(e)}")
                 # Continue with other tiers
         
@@ -160,29 +71,6 @@ class UnifiedMemoryManager(IMemoryManager):
     
     def _start_background_tasks(self) -> None:
         """Start background maintenance tasks."""
-        # Optimization task
-        if self.config.optimization.enabled:
-            self._background_tasks.append(
-                asyncio.create_task(self._optimization_loop())
-            )
-        
-        # Cleanup task
-        self._background_tasks.append(
-            asyncio.create_task(self._cleanup_loop())
-        )
-        
-        # Prefetch task
-        if self.config.optimization.prefetch_enabled:
-            self._background_tasks.append(
-                asyncio.create_task(self._prefetch_loop())
-            )
-        
-        # Metrics export task
-        if self.config.metrics.enabled:
-            self._background_tasks.append(
-                asyncio.create_task(self._metrics_export_loop())
-            )
-        
         logger.info(f"Started {len(self._background_tasks)} background tasks")
     
     async def get(
@@ -191,13 +79,7 @@ class UnifiedMemoryManager(IMemoryManager):
         default: Optional[Any] = None
     ) -> Optional[Any]:
         """
-        Retrieve a value from memory.
-        
-        Searches through tiers in order until the item is found.
-        Automatically promotes frequently accessed items to faster tiers.
         """
-        if not key:
-            raise MemoryValidationError(
                 validation_type="key",
                 field="key",
                 value=key,
@@ -208,6 +90,8 @@ class UnifiedMemoryManager(IMemoryManager):
         
         async with self._operation_semaphore:
             try:
+
+                pass
                 # Search through tiers
                 for tier in self._tier_hierarchy:
                     if tier not in self._storages:
@@ -250,7 +134,10 @@ class UnifiedMemoryManager(IMemoryManager):
                 
                 return default
                 
-            except Exception as e:
+            except Exception:
+
+                
+                pass
                 await self.metrics.record_operation(
                     operation="get",
                     success=False,
@@ -273,13 +160,7 @@ class UnifiedMemoryManager(IMemoryManager):
         tier_hint: Optional[MemoryTier] = None
     ) -> bool:
         """
-        Store a value in memory.
-        
-        Automatically determines the best tier based on value characteristics
-        and access patterns, unless a tier hint is provided.
         """
-        if not key:
-            raise MemoryValidationError(
                 validation_type="key",
                 field="key",
                 value=key,
@@ -290,6 +171,8 @@ class UnifiedMemoryManager(IMemoryManager):
         
         async with self._operation_semaphore:
             try:
+
+                pass
                 # Create memory item
                 item = self._create_memory_item(key, value, ttl_seconds)
                 
@@ -326,7 +209,10 @@ class UnifiedMemoryManager(IMemoryManager):
                 
                 return success
                 
-            except Exception as e:
+            except Exception:
+
+                
+                pass
                 await self.metrics.record_operation(
                     operation="set",
                     success=False,
@@ -337,8 +223,6 @@ class UnifiedMemoryManager(IMemoryManager):
     
     async def delete(self, key: str) -> bool:
         """Delete a value from all tiers."""
-        if not key:
-            raise MemoryValidationError(
                 validation_type="key",
                 field="key",
                 value=key,
@@ -350,6 +234,8 @@ class UnifiedMemoryManager(IMemoryManager):
         
         async with self._operation_semaphore:
             try:
+
+                pass
                 # Delete from all tiers
                 delete_tasks = []
                 for tier, storage in self._storages.items():
@@ -373,7 +259,10 @@ class UnifiedMemoryManager(IMemoryManager):
                 
                 return deleted
                 
-            except Exception as e:
+            except Exception:
+
+                
+                pass
                 await self.metrics.record_operation(
                     operation="delete",
                     success=False,
@@ -384,36 +273,7 @@ class UnifiedMemoryManager(IMemoryManager):
     
     async def exists(self, key: str) -> bool:
         """Check if a key exists in any tier."""
-        if not key:
-            return False
-        
-        # Check tiers in order
-        for tier in self._tier_hierarchy:
-            if tier not in self._storages:
-                continue
-            
-            if await self._storages[tier].exists(key):
-                return True
-        
-        return False
-    
-    async def batch_operations(
-        self,
-        operations: List[MemoryOperation]
-    ) -> List[MemoryResult]:
         """Execute multiple operations efficiently."""
-        if not operations:
-            return []
-        
-        start_time = time.time()
-        results = []
-        
-        # Group operations by type for efficiency
-        get_ops = []
-        set_ops = []
-        delete_ops = []
-        
-        for op in operations:
             if op.operation_type == "get":
                 get_ops.append(op)
             elif op.operation_type == "set":
@@ -422,6 +282,9 @@ class UnifiedMemoryManager(IMemoryManager):
                 delete_ops.append(op)
         
         try:
+
+        
+            pass
             # Process gets
             if get_ops:
                 get_results = await self._batch_get(get_ops)
@@ -449,7 +312,10 @@ class UnifiedMemoryManager(IMemoryManager):
             
             return results
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             logger.error(f"Batch operation failed: {str(e)}")
             # Return partial results
             return results
@@ -462,50 +328,7 @@ class UnifiedMemoryManager(IMemoryManager):
         limit: int = 100
     ) -> List[MemoryItem]:
         """
-        Search for items across all tiers.
-        
-        Supports pattern matching, metadata filtering, and semantic search.
         """
-        start_time = time.time()
-        all_results = []
-        seen_keys = set()
-        
-        try:
-            # Search each tier
-            search_tasks = []
-            
-            for tier, storage in self._storages.items():
-                # Skip semantic search for non-vector tiers
-                if semantic_query and tier != MemoryTier.L4_WEAVIATE:
-                    continue
-                
-                search_tasks.append(
-                    storage.search(pattern, metadata_filter, limit)
-                )
-            
-            # Gather results
-            tier_results = await asyncio.gather(*search_tasks, return_exceptions=True)
-            
-            # Merge results, avoiding duplicates
-            for results in tier_results:
-                if isinstance(results, list):
-                    for item in results:
-                        if item.key not in seen_keys:
-                            all_results.append(item)
-                            seen_keys.add(item.key)
-                            
-                            if len(all_results) >= limit:
-                                break
-                
-                if len(all_results) >= limit:
-                    break
-            
-            # Sort by access count (most accessed first)
-            all_results.sort(key=lambda x: x.access_count, reverse=True)
-            
-            # Record metrics
-            latency_ms = (time.time() - start_time) * 1000
-            await self.metrics.record_operation(
                 operation="search",
                 success=True,
                 latency_ms=latency_ms
@@ -513,7 +336,10 @@ class UnifiedMemoryManager(IMemoryManager):
             
             return all_results[:limit]
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             await self.metrics.record_operation(
                 operation="search",
                 success=False,
@@ -524,7 +350,6 @@ class UnifiedMemoryManager(IMemoryManager):
     
     async def get_stats(self) -> Dict[str, Any]:
         """Get comprehensive memory system statistics."""
-        stats = {
             "config": {
                 "environment": self.config.environment.value,
                 "total_tiers": len(self._storages),
@@ -565,6 +390,9 @@ class UnifiedMemoryManager(IMemoryManager):
         demoted = 0
         
         try:
+
+        
+            pass
             # Analyze items in each tier
             for tier, storage in self._storages.items():
                 # Skip top tier (can't promote) and bottom tier (can't demote)
@@ -596,7 +424,10 @@ class UnifiedMemoryManager(IMemoryManager):
                 "demoted": demoted
             }
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             logger.error(f"Optimization failed: {str(e)}")
             return {
                 "promoted": promoted,
@@ -610,6 +441,9 @@ class UnifiedMemoryManager(IMemoryManager):
         total_cleaned = 0
         
         try:
+
+        
+            pass
             # Cleanup each tier
             cleanup_tasks = []
             for tier, storage in self._storages.items():
@@ -627,7 +461,10 @@ class UnifiedMemoryManager(IMemoryManager):
             
             return total_cleaned
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             logger.error(f"Cleanup failed: {str(e)}")
             return total_cleaned
     
@@ -648,6 +485,8 @@ class UnifiedMemoryManager(IMemoryManager):
         
         # Close all storages
         close_tasks = []
+        # TODO: Consider using list comprehension for better performance
+
         for storage in self._storages.values():
             close_tasks.append(storage.close())
         
@@ -665,57 +504,8 @@ class UnifiedMemoryManager(IMemoryManager):
         ttl_seconds: Optional[int] = None
     ) -> MemoryItem:
         """Create a MemoryItem instance."""
-        # Calculate checksum
-        value_bytes = json.dumps(value, sort_keys=True).encode() if not isinstance(value, bytes) else value
-        checksum = hashlib.sha256(value_bytes).hexdigest()
-        
-        # Use default TTL if not specified
-        if ttl_seconds is None:
-            ttl_seconds = self.config.default_ttl_seconds
-        
-        return MemoryItem(
-            key=key,
-            value=value,
-            metadata={},
-            tier=MemoryTier.L1_PROCESS_MEMORY,  # Default, will be updated
-            created_at=datetime.utcnow(),
-            accessed_at=datetime.utcnow(),
-            access_count=0,
-            size_bytes=len(value_bytes),
-            ttl_seconds=ttl_seconds,
-            checksum=checksum
-        )
-    
-    async def _determine_tier(self, item: MemoryItem) -> MemoryTier:
         """Determine the best tier for an item based on its characteristics."""
-        # Size-based tiering
-        if item.size_bytes < 1024:  # < 1KB
-            if MemoryTier.L1_PROCESS_MEMORY in self._storages:
-                return MemoryTier.L1_PROCESS_MEMORY
-        elif item.size_bytes < 1024 * 100:  # < 100KB
-            if MemoryTier.L2_SHARED_MEMORY in self._storages:
-                return MemoryTier.L2_SHARED_MEMORY
-        elif item.size_bytes < 1024 * 1024:  # < 1MB
-            if MemoryTier.L3_POSTGRESQL in self._storages:
-                return MemoryTier.L3_POSTGRESQL
-        
-        # Default to lowest available tier
-        for tier in reversed(self._tier_hierarchy):
-            if tier in self._storages:
-                return tier
-        
-        # Should never reach here
-        return MemoryTier.L3_POSTGRESQL
-    
-    async def _promote_item(
-        self,
-        item: MemoryItem,
-        from_tier: MemoryTier,
-        to_tier: MemoryTier
-    ) -> None:
         """Promote an item to a faster tier."""
-        try:
-            logger.debug(f"Promoting {item.key} from {from_tier.value} to {to_tier.value}")
             
             # Store in new tier
             if to_tier in self._storages:
@@ -733,7 +523,10 @@ class UnifiedMemoryManager(IMemoryManager):
                     reason="promotion"
                 )
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             logger.error(f"Failed to promote item {item.key}: {str(e)}")
     
     async def _demote_item(
@@ -743,8 +536,6 @@ class UnifiedMemoryManager(IMemoryManager):
         to_tier: MemoryTier
     ) -> None:
         """Demote an item to a slower tier."""
-        try:
-            logger.debug(f"Demoting {item.key} from {from_tier.value} to {to_tier.value}")
             
             # Store in new tier
             if to_tier in self._storages:
@@ -761,56 +552,20 @@ class UnifiedMemoryManager(IMemoryManager):
                     reason="demotion"
                 )
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             logger.error(f"Failed to demote item {item.key}: {str(e)}")
     
     async def _queue_prefetch(self, key: str) -> None:
         """Queue related keys for prefetching."""
-        try:
-            candidates = await self.optimizer.get_prefetch_candidates(
-                key,
-                limit=self.config.optimization.prefetch_limit
-            )
-            
-            for candidate in candidates:
-                if not self._prefetch_queue.full():
-                    await self._prefetch_queue.put(candidate)
-                    
-        except Exception as e:
-            logger.debug(f"Failed to queue prefetch for {key}: {str(e)}")
     
     async def _batch_get(
         self,
         operations: List[MemoryOperation]
     ) -> List[MemoryResult]:
         """Process batch get operations."""
-        results = []
-        keys = [op.key for op in operations]
-        
-        # Try each tier
-        for tier in self._tier_hierarchy:
-            if tier not in self._storages:
-                continue
-            
-            # Batch get from tier
-            tier_results = await self._storages[tier].get_batch(keys)
-            
-            # Process results
-            for op in operations:
-                if op.key in tier_results and tier_results[op.key]:
-                    item = tier_results[op.key]
-                    results.append(MemoryResult(
-                        success=True,
-                        value=item.value,
-                        tier_accessed=tier
-                    ))
-                    # Remove from keys to search
-                    keys.remove(op.key)
-        
-        # Add not found results
-        for key in keys:
-            results.append(MemoryResult(
-                success=False,
                 error="Not found"
             ))
         
@@ -821,121 +576,34 @@ class UnifiedMemoryManager(IMemoryManager):
         operations: List[MemoryOperation]
     ) -> List[MemoryResult]:
         """Process batch set operations."""
-        results = []
-        
-        # Create items
-        items = []
-        for op in operations:
-            item = self._create_memory_item(
-                op.key,
-                op.value,
-                op.ttl_seconds
-            )
-            items.append(item)
-        
-        # Determine tiers
-        tier_items = defaultdict(list)
-        for i, item in enumerate(items):
-            tier = operations[i].tier_hint or await self._determine_tier(item)
-            tier_items[tier].append(item)
-        
-        # Batch set to each tier
-        for tier, tier_batch in tier_items.items():
-            if tier in self._storages:
-                set_results = await self._storages[tier].set_batch(tier_batch)
-                
-                for item in tier_batch:
-                    results.append(MemoryResult(
-                        success=set_results.get(item.key, False),
-                        tier_accessed=tier
-                    ))
-        
-        return results
-    
-    async def _batch_delete(
-        self,
-        operations: List[MemoryOperation]
-    ) -> List[MemoryResult]:
         """Process batch delete operations."""
-        results = []
-        
-        for op in operations:
-            deleted = await self.delete(op.key)
-            results.append(MemoryResult(success=deleted))
-        
-        return results
-    
-    # Background task loops
-    
-    async def _optimization_loop(self) -> None:
         """Background task for continuous optimization."""
-        interval = self.config.optimization.optimization_interval_seconds
-        
-        while not self._shutdown_event.is_set():
-            try:
-                await asyncio.sleep(interval)
-                
-                if not self._shutdown_event.is_set():
-                    await self.optimize()
-                    
-            except Exception as e:
                 logger.error(f"Optimization loop error: {str(e)}")
     
     async def _cleanup_loop(self) -> None:
         """Background task for cleaning expired items."""
-        interval = self.config.optimization.cleanup_interval_seconds
-        
-        while not self._shutdown_event.is_set():
-            try:
-                await asyncio.sleep(interval)
-                
-                if not self._shutdown_event.is_set():
-                    await self.cleanup()
-                    
-            except Exception as e:
                 logger.error(f"Cleanup loop error: {str(e)}")
     
     async def _prefetch_loop(self) -> None:
         """Background task for prefetching items."""
-        while not self._shutdown_event.is_set():
-            try:
-                # Get next prefetch candidate
-                key = await asyncio.wait_for(
-                    self._prefetch_queue.get(),
-                    timeout=1.0
-                )
-                
-                # Check if already cached in fast tier
-                if not await self._is_in_fast_tier(key):
-                    # Fetch and promote
-                    value = await self.get(key)
-                    if value is not None:
-                        logger.debug(f"Prefetched {key}")
                         
-            except asyncio.TimeoutError:
+            except Exception:
+
+                        
+                pass
                 continue
-            except Exception as e:
-                logger.debug(f"Prefetch loop error: {str(e)}")
+            except Exception:
+
+                pass
     
     async def _metrics_export_loop(self) -> None:
         """Background task for exporting metrics."""
-        interval = 60  # Export every minute
-        
-        while not self._shutdown_event.is_set():
-            try:
-                await asyncio.sleep(interval)
-                
-                if not self._shutdown_event.is_set():
-                    metrics = await self.metrics.export_metrics()
-                    logger.debug(f"Exported metrics: {metrics}")
                     
-            except Exception as e:
+            except Exception:
+
+                    
+                pass
                 logger.error(f"Metrics export loop error: {str(e)}")
     
     async def _is_in_fast_tier(self, key: str) -> bool:
         """Check if key exists in a fast tier (L0-L2)."""
-        fast_tiers = [
-            MemoryTier.L0_CPU_CACHE,
-            MemoryTier.L1_PROCESS_MEMORY,
-            MemoryTier.L2_SHARED_MEMORY
-        ]

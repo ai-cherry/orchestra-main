@@ -1,0 +1,79 @@
+{
+  "timestamp": "2025-06-03T15:50:59.221064",
+  "tests": {
+    "file_structure": {
+      "passed": true,
+      "missing": []
+    },
+    "python_environment": {
+      "python_version": "Python 3.12.3",
+      "venv_active": true,
+      "dependencies_installed": false,
+      "issues": [
+        "Virtual environment exists but not activated",
+        "Missing dependency: pulumi"
+      ]
+    },
+    "mcp_servers": {
+      "orchestrator": {
+        "exists": true,
+        "has_list_tools": true,
+        "has_call_tool": true,
+        "is_async": true,
+        "ready": true
+      },
+      "memory": {
+        "exists": true,
+        "has_list_tools": true,
+        "has_call_tool": true,
+        "is_async": true,
+        "ready": true
+      },
+      "weaviate_direct": {
+        "exists": true,
+        "has_list_tools": true,
+        "has_call_tool": true,
+        "is_async": true,
+        "ready": true
+      },
+      "tools": {
+        "exists": true,
+        "has_list_tools": true,
+        "has_call_tool": true,
+        "is_async": true,
+        "ready": true
+      },
+      "deployment": {
+        "exists": true,
+        "has_list_tools": true,
+        "has_call_tool": true,
+        "is_async": true,
+        "ready": true
+      }
+    },
+    "configurations": {
+      "config/orchestrator_config.json": {
+        "exists": true,
+        "valid": true
+      },
+      "config/roo_mode_mappings.yaml": {
+        "exists": true,
+        "valid": true
+      },
+      "infrastructure/Pulumi.yaml": {
+        "exists": true,
+        "valid": true
+      }
+    },
+    "functionality": {
+      "imports": false,
+      "async_operations": true,
+      "file_operations": true,
+      "logging": true
+    }
+  },
+  "issues": [],
+  "recommendations": [
+    "Install dependencies: pip install -r requirements-unified.txt"
+  ]
+}

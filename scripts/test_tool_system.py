@@ -1,19 +1,6 @@
 #!/usr/bin/env python3
 """
-Test script for the AI Tool Awareness system
 """
-
-import asyncio
-import os
-import sys
-
-# Add parent directory to path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from core.orchestrator.src.tools.executor import ToolExecutor
-from core.orchestrator.src.tools.registry import ToolRegistry
-
-async def test_tool_system():
     """Test the tool awareness system."""
     print("🔧 Testing AI Tool Awareness System")
     print("=" * 50)

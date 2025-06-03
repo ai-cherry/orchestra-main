@@ -1,34 +1,6 @@
 #!/usr/bin/env python3
 """
-demo_memory_sync.py - Demonstration of Memory Synchronization Engine
-
-This script demonstrates the use of the Memory Synchronization Engine
-with simulated AI tool adapters. It shows how memory is synchronized
-between different AI tools with different context window capacities.
 """
-
-import argparse
-import json
-import logging
-import sys
-import time
-from typing import Any, Dict
-
-# Import the memory sync engine
-from memory_sync_engine import (
-    CompressionLevel,
-    InMemoryStorage,
-    MemoryEntry,
-    MemoryMetadata,
-    MemoryScope,
-    MemorySyncEngine,
-    MemoryType,
-    ToolType,
-)
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[logging.StreamHandler(sys.stdout)],
 )
@@ -36,17 +8,11 @@ logger = logging.getLogger("mcp-memory-sync-demo")
 
 class MockToolAdapter:
     """Mock adapter for simulating AI tool integration."""
-
-    def __init__(self, name: str, context_window: int):
         """Initialize the mock tool adapter."""
-        self.name = name
-        self.context_window = context_window
-        self.memory: Dict[str, Any] = {}
         logger.info(f"Initialized mock tool adapter: {name} with context window: {context_window}")
 
     def sync_create(self, key: str, entry: MemoryEntry) -> bool:
         """Create a memory entry in the tool's memory."""
-        if key in self.memory:
             logger.warning(f"Key {key} already exists in {self.name} memory")
             return False
 
@@ -56,7 +22,6 @@ class MockToolAdapter:
 
     def sync_update(self, key: str, entry: MemoryEntry) -> bool:
         """Update a memory entry in the tool's memory."""
-        if key not in self.memory:
             logger.warning(f"Key {key} not found in {self.name} memory")
             return False
 
@@ -66,7 +31,6 @@ class MockToolAdapter:
 
     def sync_delete(self, key: str) -> bool:
         """Delete a memory entry from the tool's memory."""
-        if key not in self.memory:
             logger.warning(f"Key {key} not found in {self.name} memory")
             return False
 
@@ -76,14 +40,7 @@ class MockToolAdapter:
 
     def get_memory_count(self) -> int:
         """Get the number of memory entries in the tool's memory."""
-        return len(self.memory)
-
-    def get_memory_stats(self) -> Dict[str, Any]:
         """Get statistics about the tool's memory."""
-        compression_counts = {}
-        total_size = 0
-
-        for key, entry in self.memory.items():
             compression_level = entry["compression_level"]
             compression_counts[compression_level] = compression_counts.get(compression_level, 0) + 1
 
@@ -99,7 +56,6 @@ class MockToolAdapter:
 
 def setup_demo_environment() -> MemorySyncEngine:
     """Set up the demo environment with mock tools."""
-    # Create tool adapters with different context windows
     roo_adapter = MockToolAdapter("roo", 16000)  # Mid-sized context
     cline_adapter = MockToolAdapter("cline", 8000)  # Smaller context
     gemini_adapter = MockToolAdapter("gemini", 200000)  # Massive context
@@ -132,13 +88,6 @@ def setup_demo_environment() -> MemorySyncEngine:
 
 def create_demo_memories(sync_engine: MemorySyncEngine) -> None:
     """Create demo memories for testing."""
-    # Create a small shared memory entry (fits in all tools)
-    small_entry = MemoryEntry(
-        memory_type=MemoryType.SHARED,
-        scope=MemoryScope.SESSION,
-        priority=10,
-        compression_level=CompressionLevel.NONE,
-        ttl_seconds=3600,
         content="This is a small shared memory entry that should fit in all tools' context windows.",
         metadata=MemoryMetadata(source_tool=ToolType.ROO, last_modified=time.time(), context_relevance=0.9),
     )
@@ -267,14 +216,10 @@ def create_demo_memories(sync_engine: MemorySyncEngine) -> None:
 
 def process_all_operations(sync_engine: MemorySyncEngine) -> None:
     """Process all pending synchronization operations."""
-    count = sync_engine.process_pending_operations()
     logger.info(f"Processed {count} pending operations")
 
 def display_memory_stats(sync_engine: MemorySyncEngine) -> None:
     """Display memory statistics for each tool."""
-    # Get stats from the sync engine
-    memory_status = sync_engine.get_memory_status()
-
     print("\n=== Memory Status ===")
     print(f"Total Entries: {memory_status['entry_count']}")
     print(f"Pending Operations: {memory_status['pending_operations']}")

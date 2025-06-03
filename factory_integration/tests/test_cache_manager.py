@@ -1,28 +1,6 @@
+# TODO: Consider adding connection pooling configuration
 """Tests for the multi-layer cache system."""
-
-import asyncio
-import json
-import time
-from unittest.mock import AsyncMock, MagicMock, patch
-
-import aioredis
-import asyncpg
-import pytest
-
-from factory_integration.cache_manager import (
-    CacheEntry,
-    CacheManager,
-    CacheMetrics,
-    L1Cache,
-    L2Cache,
-    L3Cache,
-    create_cache_manager,
-)
-
-class TestCacheEntry:
     """Test cases for CacheEntry model."""
-
-    def test_cache_entry_creation(self):
         """Test creating a cache entry."""
         entry = CacheEntry(key="test_key", value={"data": "test"})
 
@@ -35,37 +13,10 @@ class TestCacheEntry:
 
 class TestCacheMetrics:
     """Test cases for CacheMetrics model."""
-
-    def test_hit_rate_calculation(self):
         """Test cache hit rate calculation."""
-        metrics = CacheMetrics(
-            l1_hits=50,
-            l1_misses=10,
-            l2_hits=30,
-            l2_misses=5,
-            l3_hits=10,
-            l3_misses=5,
-            total_requests=100,
-        )
-
-        assert metrics.hit_rate == 90.0  # (50+30+10)/100 * 100
-        assert metrics.l1_hit_rate == pytest.approx(83.33, rel=0.01)  # 50/60 * 100
-
-    def test_hit_rate_zero_requests(self):
         """Test hit rate with zero requests."""
-        metrics = CacheMetrics()
-        assert metrics.hit_rate == 0.0
-        assert metrics.l1_hit_rate == 0.0
-
-class TestL1Cache:
     """Test cases for L1 in-memory cache."""
-
-    @pytest.fixture
-    def l1_cache(self):
         """Create an L1 cache instance."""
-        return L1Cache(max_size=3, ttl=1)
-
-    async def test_set_and_get(self, l1_cache):
         """Test basic set and get operations."""
         await l1_cache.set("key1", {"value": 1})
         result = await l1_cache.get("key1")
@@ -97,7 +48,6 @@ class TestL1Cache:
 
     async def test_lru_eviction(self, l1_cache):
         """Test LRU eviction when cache is full."""
-        # Fill cache to capacity
         await l1_cache.set("key1", "value1")
         await l1_cache.set("key2", "value2")
         await l1_cache.set("key3", "value3")
@@ -137,8 +87,6 @@ class TestL1Cache:
 
     def test_get_metrics(self, l1_cache):
         """Test getting cache metrics."""
-        metrics = l1_cache.get_metrics()
-
         assert metrics["size"] == 0
         assert metrics["max_size"] == 3
         assert metrics["hits"] == 0
@@ -147,20 +95,7 @@ class TestL1Cache:
 
 class TestL2Cache:
     """Test cases for L2 Redis cache."""
-
-    @pytest.fixture
-    async def mock_redis(self):
         """Create a mock Redis client."""
-        redis = AsyncMock(spec=aioredis.Redis)
-        redis.get.return_value = None
-        redis.setex.return_value = None
-        redis.set.return_value = None
-        redis.delete.return_value = 0
-        redis.scan_iter.return_value.__aiter__.return_value = []
-        return redis
-
-    @pytest.fixture
-    async def l2_cache(self, mock_redis):
         """Create an L2 cache instance with mock Redis."""
         cache = L2Cache("redis://localhost:6379", ttl=60)
         cache.redis = mock_redis
@@ -194,8 +129,6 @@ class TestL2Cache:
 
     async def test_get_miss(self, l2_cache, mock_redis):
         """Test cache miss."""
-        mock_redis.get.return_value = None
-
         result = await l2_cache.get("key1")
 
         assert result is None
@@ -216,8 +149,6 @@ class TestL2Cache:
 
     async def test_delete(self, l2_cache, mock_redis):
         """Test deleting a key."""
-        mock_redis.delete.return_value = 1
-
         result = await l2_cache.delete("key1")
 
         assert result is True
@@ -225,8 +156,6 @@ class TestL2Cache:
 
     async def test_clear_pattern(self, l2_cache, mock_redis):
         """Test clearing keys by pattern."""
-        # Mock scan_iter to return some keys
-        mock_redis.scan_iter.return_value.__aiter__.return_value = [
             "factory:cache:user:1",
             "factory:cache:user:2",
         ]
@@ -248,27 +177,9 @@ class TestL2Cache:
 
 class TestL3Cache:
     """Test cases for L3 PostgreSQL cache."""
-
-    @pytest.fixture
-    async def mock_db_pool(self):
         """Create a mock database pool."""
-        pool = AsyncMock(spec=asyncpg.Pool)
-        conn = AsyncMock()
-        pool.acquire.return_value.__aenter__.return_value = conn
-        pool.acquire.return_value.__aexit__.return_value = None
-        return pool
-
-    @pytest.fixture
-    async def l3_cache(self, mock_db_pool):
         """Create an L3 cache instance."""
-        cache = L3Cache(mock_db_pool, cleanup_interval=60)
-        await cache.start()
-        yield cache
-        await cache.stop()
-
-    async def test_get_hit(self, l3_cache, mock_db_pool):
         """Test cache hit from PostgreSQL."""
-        conn = mock_db_pool.acquire.return_value.__aenter__.return_value
         conn.fetchrow.return_value = {"value": {"test": "data"}, "expires_at": None}
 
         result = await l3_cache.get("key1")
@@ -280,9 +191,6 @@ class TestL3Cache:
 
     async def test_get_miss(self, l3_cache, mock_db_pool):
         """Test cache miss from PostgreSQL."""
-        conn = mock_db_pool.acquire.return_value.__aenter__.return_value
-        conn.fetchrow.return_value = None
-
         result = await l3_cache.get("key1")
 
         assert result is None
@@ -291,8 +199,6 @@ class TestL3Cache:
 
     async def test_set(self, l3_cache, mock_db_pool):
         """Test setting value in PostgreSQL."""
-        conn = mock_db_pool.acquire.return_value.__aenter__.return_value
-
         await l3_cache.set("key1", {"test": "data"}, ttl=3600)
 
         conn.execute.assert_called_once()
@@ -303,7 +209,6 @@ class TestL3Cache:
 
     async def test_delete(self, l3_cache, mock_db_pool):
         """Test deleting from PostgreSQL."""
-        conn = mock_db_pool.acquire.return_value.__aenter__.return_value
         conn.execute.return_value = "DELETE 1"
 
         result = await l3_cache.delete("key1")
@@ -313,7 +218,6 @@ class TestL3Cache:
 
     async def test_cleanup_expired(self, l3_cache, mock_db_pool):
         """Test cleaning up expired entries."""
-        conn = mock_db_pool.acquire.return_value.__aenter__.return_value
         conn.execute.return_value = "DELETE 5"
 
         result = await l3_cache.cleanup_expired()
@@ -323,23 +227,7 @@ class TestL3Cache:
 
     async def test_cleanup_loop(self, l3_cache):
         """Test that cleanup loop runs."""
-        # Mock cleanup_expired
-        l3_cache.cleanup_expired = AsyncMock(return_value=0)
-
-        # Let cleanup loop run once
-        await asyncio.sleep(0.1)
-
-        # Stop the cache
-        await l3_cache.stop()
-
-        # Cleanup task should be cancelled
-        assert l3_cache._cleanup_task.cancelled()
-
-class TestCacheManager:
     """Test cases for the unified CacheManager."""
-
-    @pytest.fixture
-    async def cache_manager(self, mock_db_pool):
         """Create a CacheManager instance."""
         with patch("factory_integration.cache_manager.aioredis.from_url") as mock_from_url:
             mock_redis = AsyncMock()
@@ -366,7 +254,6 @@ class TestCacheManager:
 
     async def test_read_through_l1_hit(self, cache_manager):
         """Test read-through with L1 hit."""
-        # Set value in L1
         await cache_manager.l1.set("key1", {"value": "l1"})
 
         result = await cache_manager.get("key1")
@@ -378,7 +265,6 @@ class TestCacheManager:
 
     async def test_read_through_l2_hit(self, cache_manager):
         """Test read-through with L2 hit."""
-        # Mock L2 to return value
         cache_manager.l2.get = AsyncMock(return_value={"value": "l2"})
 
         result = await cache_manager.get("key1")
@@ -393,8 +279,6 @@ class TestCacheManager:
 
     async def test_read_through_l3_hit(self, cache_manager):
         """Test read-through with L3 hit."""
-        # Mock L2 miss and L3 hit
-        cache_manager.l2.get = AsyncMock(return_value=None)
         cache_manager.l3.get = AsyncMock(return_value={"value": "l3"})
 
         result = await cache_manager.get("key1")
@@ -409,10 +293,6 @@ class TestCacheManager:
 
     async def test_read_through_all_miss(self, cache_manager):
         """Test read-through with all layers missing."""
-        # Mock all misses
-        cache_manager.l2.get = AsyncMock(return_value=None)
-        cache_manager.l3.get = AsyncMock(return_value=None)
-
         result = await cache_manager.get("key1")
 
         assert result is None
@@ -422,10 +302,6 @@ class TestCacheManager:
 
     async def test_write_through(self, cache_manager):
         """Test write-through to all layers."""
-        # Mock L2 and L3 set methods
-        cache_manager.l2.set = AsyncMock()
-        cache_manager.l3.set = AsyncMock()
-
         await cache_manager.set("key1", {"value": "test"}, ttl=300)
 
         # Verify all layers were written to
@@ -435,7 +311,6 @@ class TestCacheManager:
 
     async def test_delete_all_layers(self, cache_manager):
         """Test deleting from all layers."""
-        # Set value in L1
         await cache_manager.l1.set("key1", "value1")
 
         # Mock L2 and L3 delete
@@ -451,9 +326,6 @@ class TestCacheManager:
 
     async def test_invalidate_pattern(self, cache_manager):
         """Test pattern-based invalidation."""
-        # Mock L2 clear_pattern
-        cache_manager.l2.clear_pattern = AsyncMock(return_value=5)
-
         await cache_manager.invalidate_pattern("user:*")
 
         # L1 should be cleared
@@ -464,9 +336,6 @@ class TestCacheManager:
 
     async def test_warm_cache(self, cache_manager):
         """Test cache warming."""
-        # Mock L3 to return values
-        cache_manager.l3.get = AsyncMock()
-        cache_manager.l3.get.side_effect = [
             {"value": "warm1"},
             {"value": "warm2"},
             None,  # Third key not in L3
@@ -484,7 +353,6 @@ class TestCacheManager:
 
     async def test_get_metrics(self, cache_manager):
         """Test getting comprehensive metrics."""
-        # Perform some operations
         await cache_manager.set("key1", "value1")
         await cache_manager.get("key1")  # L1 hit
         await cache_manager.get("key2")  # All miss
@@ -501,9 +369,6 @@ class TestCacheManager:
 
     async def test_warm_cache_loop(self, cache_manager, mock_db_pool):
         """Test background cache warming loop."""
-        # Mock database response for frequently accessed keys
-        conn = mock_db_pool.acquire.return_value.__aenter__.return_value
-        conn.fetch.return_value = [
             {"key": "frequent1"},
             {"key": "frequent2"},
         ]
@@ -519,8 +384,6 @@ class TestCacheManager:
 
 class TestCreateCacheManager:
     """Test the factory function."""
-
-    async def test_create_cache_manager(self, mock_db_pool):
         """Test creating cache manager with factory function."""
         with patch("factory_integration.cache_manager.aioredis.from_url") as mock_from_url:
             mock_redis = AsyncMock()

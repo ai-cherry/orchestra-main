@@ -1,27 +1,5 @@
 """
-Configuration loader for the AI Orchestration System.
-
-This module provides functions to load and manage system configurations.
 """
-
-import logging
-import os
-import time
-from functools import lru_cache, wraps
-from pathlib import Path
-from typing import Any, Callable, Dict, TypeVar
-
-import portkey_ai as portkey
-import yaml
-
-from packages.shared.src.models.base_models import PersonaConfig
-
-from .settings import Settings
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-# Type variables for the cache decorator
 T = TypeVar("T")
 R = TypeVar("R")
 
@@ -30,29 +8,12 @@ _last_reload_time = time.time()
 
 def refreshable_cache(ttl_seconds: int = 300):
     """
-    A cache decorator that allows refreshing after a specified TTL or on demand.
-
-    Args:
-        ttl_seconds: Time to live in seconds before cache is considered stale
-
-    Returns:
-        Decorated function with refreshable cache
     """
-
-    def decorator(func: Callable[..., R]) -> Callable[..., R]:
-        cached_func = lru_cache()(func)
-
-        @wraps(func)
-        def wrapper(*args: Any, **kwargs: Any) -> R:
-            global _last_reload_time
-
-            # Check if force_refresh is in kwargs and remove it before calling the function
             force_refresh = kwargs.pop("force_refresh", False)
 
             # Check if cache should be refreshed
             current_time = time.time()
             if force_refresh or (current_time - _last_reload_time > ttl_seconds):
-                logger.debug(f"Refreshing cache for {func.__name__}")
                 # Clear the cache
                 cached_func.cache_clear()
                 _last_reload_time = current_time
@@ -70,35 +31,23 @@ def refreshable_cache(ttl_seconds: int = 300):
 @refreshable_cache(ttl_seconds=300)  # Refresh every 5 minutes or on demand
 def load_persona_configs(force_refresh: bool = False) -> Dict[str, PersonaConfig]:
     """
-    Load persona configurations from the personas.yaml file.
-
-    Reads the personas.yaml file, validates the content against the
-    PersonaConfig model, and returns a dictionary mapping persona names
-    to their config objects.
-
-    If the personas.yaml file is not found or cannot be parsed,
-    a default configuration with basic personas will be created.
-
-    Args:
-        force_refresh: If True, force a reload from disk ignoring cached values
-
-    Returns:
-        Dict[str, PersonaConfig]: Dictionary of persona configurations.
-
-    Raises:
-        ValueError: If persona configurations are invalid
     """
-    # Get the path to the personas.yaml file
     config_path = Path(__file__).parent / "personas.yaml"
 
     yaml_data = None
     try:
+
+        pass
         with open(config_path, "r") as file:
             yaml_data = yaml.safe_load(file)
-    except FileNotFoundError:
+    except Exception:
+
+        pass
         logger.warning(f"Personas configuration file not found at: {config_path}. Using default configuration.")
         return create_default_persona_configs()
-    except yaml.YAMLError as e:
+    except Exception:
+
+        pass
         logger.warning(f"Error parsing personas YAML file: {str(e)}. Using default configuration.")
         return create_default_persona_configs()
 
@@ -114,6 +63,8 @@ def load_persona_configs(force_refresh: bool = False) -> Dict[str, PersonaConfig
     # First pass: Validate all personas and collect errors
     for persona_id, config_data in yaml_data.items():
         try:
+
+            pass
             # Handle traits conversion from empty dict to expected format
             if "traits" in config_data and not config_data["traits"]:
                 config_data["traits"] = {}
@@ -124,7 +75,9 @@ def load_persona_configs(force_refresh: bool = False) -> Dict[str, PersonaConfig
 
             # Validate without creating the object yet
             PersonaConfig(**config_data)
-        except Exception as e:
+        except Exception:
+
+            pass
             error_msg = f"Invalid configuration for persona '{persona_id}': {str(e)}"
             validation_errors.append(error_msg)
             logger.error(error_msg)
@@ -143,6 +96,8 @@ def load_persona_configs(force_refresh: bool = False) -> Dict[str, PersonaConfig
     # Second pass: Create valid persona configs
     for persona_id, config_data in yaml_data.items():
         try:
+
+            pass
             # Handle traits conversion from empty dict to expected format
             if "traits" in config_data and not config_data["traits"]:
                 config_data["traits"] = {}
@@ -155,6 +110,8 @@ def load_persona_configs(force_refresh: bool = False) -> Dict[str, PersonaConfig
             persona_config = PersonaConfig(**config_data)
             persona_configs[persona_id] = persona_config
         except Exception:
+
+            pass
             # Skip invalid personas (already logged in first pass)
             continue
 
@@ -175,19 +132,7 @@ def load_persona_configs(force_refresh: bool = False) -> Dict[str, PersonaConfig
 
 def create_default_persona_configs() -> Dict[str, PersonaConfig]:
     """
-    Create a default persona configuration when personas.yaml is missing or invalid.
-
-    This function generates a set of default personas that can be used to ensure
-    the system remains operational even without a valid configuration file.
-
-    Returns:
-        Dict[str, PersonaConfig]: Dictionary of default persona configurations.
     """
-    # Create default persona configurations
-    persona_configs = {}
-
-    # Cherry persona
-    cherry_config = {
         "name": "Cherry",
         "description": "Creative Muse, playful, witty",
         "prompt_template": "You are Cherry, a creative and witty AI with a touch of dark humor. Respond playfully and inspire Patrick.",
@@ -222,36 +167,15 @@ def create_default_persona_configs() -> Dict[str, PersonaConfig]:
 # Function to force reload personas - can be called from API to refresh without restart
 def force_reload_personas() -> Dict[str, PersonaConfig]:
     """
-    Force reload of persona configurations from disk.
-
-    This function can be called from an API endpoint to reload
-    persona configurations without restarting the application.
-
-    Returns:
-        Dict[str, PersonaConfig]: Refreshed dictionary of persona configurations.
     """
     logger.info("Force reloading persona configurations")
     return load_persona_configs(force_refresh=True)
 
 def get_settings() -> Settings:
     """
-    Get application settings.
-
-    Returns a cached instance of the Settings class for efficient access.
-
-    Returns:
-        Settings: Application settings instance.
     """
-    return Settings()
-
-def initialize_portkey():
     """
-    Initialize Portkey for observability with API key from environment variables.
-
-    Returns:
-        bool: True if initialization is successful, False otherwise.
     """
-    try:
         PORTKEY_API_KEY = os.getenv("PORTKEY_API_KEY")
         if not PORTKEY_API_KEY:
             logger.error("PORTKEY_API_KEY environment variable not set")
@@ -269,7 +193,9 @@ def initialize_portkey():
 
         logger.info("Portkey initialized successfully for observability.")
         return True
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to initialize Portkey: {str(e)}")
         return False
 

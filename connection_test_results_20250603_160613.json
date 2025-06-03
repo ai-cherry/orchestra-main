@@ -1,0 +1,50 @@
+{
+  "timestamp": "2025-06-03T16:06:12.701796",
+  "tests": {
+    "docker": {
+      "passed": true,
+      "message": "Docker running. 2 containers active"
+    },
+    "weaviate": {
+      "passed": false,
+      "message": "Connection failed: connect_to_local() got an unexpected keyword argument 'timeout_config'"
+    },
+    "postgresql": {
+      "passed": false,
+      "message": "All credential combinations failed"
+    },
+    "redis": {
+      "passed": true,
+      "message": "Connected. Redis version: 7.0.15"
+    },
+    "mcp_weaviate_direct": {
+      "passed": false,
+      "message": "Internal server error - check logs"
+    },
+    "mcp_api_docs": {
+      "passed": true,
+      "message": "Accessible at http://localhost:8001/docs"
+    },
+    "mcp_openapi": {
+      "passed": true,
+      "message": "Accessible at http://localhost:8001/openapi.json"
+    },
+    "mcp_tools": {
+      "passed": true,
+      "message": "Accessible at http://localhost:8001/mcp/weaviate_direct/tools"
+    },
+    "orchestrator_api": {
+      "passed": true,
+      "message": "API accessible. Working endpoints: 3"
+    },
+    "unified_database": {
+      "passed": true,
+      "message": "UnifiedDatabase module imported successfully"
+    }
+  },
+  "summary": {
+    "total": 10,
+    "passed": 7,
+    "failed": 3
+  }
+}

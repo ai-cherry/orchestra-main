@@ -1,55 +1,9 @@
+import secrets
 """
-Memory Manager Benchmark Tests.
-
-This module provides benchmark tests for comparing the performance
-of different memory manager implementations.
 """
-
-import asyncio
-import json
-import logging
-import time
-from datetime import datetime
-from typing import Any, Dict, List, Optional
-
-import numpy as np
-import pytest
-
-from packages.shared.src.memory.concrete_memory_manager import FirestoreV1MemoryManager
-from packages.shared.src.models.base_models import MemoryItem
-from packages.shared.src.storage.postgresql.firestore_memory import FirestoreMemoryManager
-from packages.shared.src.storage.postgresql.v2 import FirestoreMemoryManagerV2
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-class MemoryBenchmark:
     """Benchmark for memory manager implementations."""
-
-    def __init__(
-        self,
-        project_id: Optional[str] = None,
-        credentials_path: Optional[str] = None,
-        redis_host: Optional[str] = None,
-        redis_port: Optional[int] = None,
-    ):
         """
-        Initialize the benchmark.
-
-        Args:
-            project_id: Optional Google Cloud project ID
-            credentials_path: Optional path to credentials file
-            redis_host: Optional Redis host
-            redis_port: Optional Redis port
         """
-        self.project_id = project_id
-        self.credentials_path = credentials_path
-        self.redis_host = redis_host
-        self.redis_port = redis_port
-
-        self.v1_manager = None
-        self.v2_manager = None
         self.test_user_id = f"benchmark-user-{int(time.time())}"
 
     async def setup(self):
@@ -97,20 +51,13 @@ class MemoryBenchmark:
 
     async def generate_test_data(self, count: int = 100) -> List[MemoryItem]:
         """
-        Generate test data for benchmarking.
-
-        Args:
-            count: Number of items to generate
-
-        Returns:
-            List of memory items
         """
         logger.info(f"Generating {count} test items...")
 
         items = []
         for i in range(count):
             # Generate a random embedding
-            embedding = [np.random.random() for _ in range(768)]
+            embedding = [np.secrets.SystemRandom().random() for _ in range(768)]
 
             # Create a memory item
             item = MemoryItem(
@@ -131,13 +78,6 @@ class MemoryBenchmark:
 
     async def run_add_benchmark(self, items: List[MemoryItem]) -> Dict[str, float]:
         """
-        Benchmark adding items to memory.
-
-        Args:
-            items: List of memory items to add
-
-        Returns:
-            Dictionary with benchmark results
         """
         logger.info("Running add benchmark...")
 
@@ -166,13 +106,6 @@ class MemoryBenchmark:
 
     async def run_get_benchmark(self, item_ids: List[str]) -> Dict[str, float]:
         """
-        Benchmark getting items from memory.
-
-        Args:
-            item_ids: List of item IDs to get
-
-        Returns:
-            Dictionary with benchmark results
         """
         logger.info("Running get benchmark...")
 
@@ -201,14 +134,6 @@ class MemoryBenchmark:
 
     async def run_search_benchmark(self, query_embedding: List[float], top_k: int = 5) -> Dict[str, float]:
         """
-        Benchmark semantic search.
-
-        Args:
-            query_embedding: Query embedding
-            top_k: Number of results to return
-
-        Returns:
-            Dictionary with benchmark results
         """
         logger.info("Running search benchmark...")
 
@@ -243,13 +168,6 @@ class MemoryBenchmark:
 
     async def run_history_benchmark(self, limit: int = 20) -> Dict[str, float]:
         """
-        Benchmark getting conversation history.
-
-        Args:
-            limit: Maximum number of items to retrieve
-
-        Returns:
-            Dictionary with benchmark results
         """
         logger.info("Running history benchmark...")
 
@@ -282,17 +200,13 @@ class MemoryBenchmark:
 
     async def run_all_benchmarks(self, item_count: int = 100) -> Dict[str, Any]:
         """
-        Run all benchmarks.
-
-        Args:
-            item_count: Number of items to use for benchmarks
-
-        Returns:
-            Dictionary with all benchmark results
         """
         logger.info(f"Running all benchmarks with {item_count} items...")
 
         try:
+
+
+            pass
             # Set up
             await self.setup()
 
@@ -309,7 +223,7 @@ class MemoryBenchmark:
             get_results = await self.run_get_benchmark(item_ids)
 
             # Generate query embedding for search benchmark
-            query_embedding = [np.random.random() for _ in range(768)]
+            query_embedding = [np.secrets.SystemRandom().random() for _ in range(768)]
 
             # Run search benchmark
             search_results = await self.run_search_benchmark(query_embedding)
@@ -337,9 +251,6 @@ class MemoryBenchmark:
 @pytest.mark.asyncio
 async def test_memory_benchmark():
     """Run the memory benchmark."""
-    # Skip if running in CI
-    import os
-
     if os.environ.get("CI") == "true":
         pytest.skip("Skipping benchmark in CI")
 
@@ -355,8 +266,6 @@ async def test_memory_benchmark():
 
 if __name__ == "__main__":
     """Run the benchmark directly."""
-    import argparse
-
     parser = argparse.ArgumentParser(description="Memory Manager Benchmark")
     parser.add_argument("--project-id", help="Google Cloud project ID")
     parser.add_argument("--credentials-path", help="Path to credentials file")

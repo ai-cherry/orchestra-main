@@ -1,37 +1,12 @@
 #!/usr/bin/env python3
 """
-Memory Management Integration Example
-
-This example demonstrates how to set up and use the enhanced memory management
-system with LRU caching, tiered storage, context pruning, and memory profiling.
 """
-
-import asyncio
-import logging
-import os
-from datetime import datetime
-
-from packages.shared.src.memory.context_pruner import ContextPruner
-from packages.shared.src.memory.memory_interface import MemoryInterface
-from packages.shared.src.memory.memory_profiler import MemoryProfiler
-from packages.shared.src.memory.redis_lru_cache import RedisLRUCache
-from packages.shared.src.memory.tiered_storage import TieredStorageManager
-from packages.shared.src.models.base_models import MemoryItem
-
-# Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 class BaseMemoryManager(MemoryInterface):
     """
-    Basic memory manager implementation for example purposes.
-    In a real application, this would be your actual base memory implementation.
     """
-
-    def __init__(self):
-        self._items = {}
-
-    async def initialize(self) -> None:
         """Initialize the memory manager."""
         logger.info("Initializing base memory manager")
 
@@ -41,25 +16,13 @@ class BaseMemoryManager(MemoryInterface):
 
     async def add_memory_item(self, item: MemoryItem) -> str:
         """Add a memory item."""
-        if not item.id:
             item.id = f"item-{len(self._items) + 1}"
         self._items[item.id] = item
         return item.id
 
     async def get_memory_item(self, item_id: str) -> MemoryItem:
         """Get a memory item by ID."""
-        return self._items.get(item_id)
-
-    async def get_conversation_history(self, user_id, session_id=None, limit=20, filters=None):
         """Get conversation history."""
-        items = [
-            item
-            for item in self._items.values()
-            if item.user_id == user_id and (session_id is None or item.session_id == session_id)
-        ]
-        return items[:limit]
-
-    async def health_check(self):
         """Health check."""
         return {"status": "healthy", "item_count": len(self._items)}
 

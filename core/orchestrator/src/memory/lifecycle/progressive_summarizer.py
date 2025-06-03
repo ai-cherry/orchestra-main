@@ -1,23 +1,6 @@
 """
-Progressive Summarizer for AI Orchestra Memory System.
-
-This module provides functionality to create multi-level summaries of memory items
-for efficient storage while preserving context.
 """
-
-import logging
-import re
-from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
-
-from pydantic import BaseModel, Field
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-class SummaryLevel(str, Enum):
     """Summary levels for progressive summarization."""
-
     FULL = "full"  # Original full content
     CONDENSED = "condensed"  # Condensed highlights (about 30-40% of original)
     KEY_POINTS = "key_points"  # Key points and entities (about 10-20% of original)
@@ -25,98 +8,18 @@ class SummaryLevel(str, Enum):
 
 class SummaryResult(BaseModel):
     """
-    Result of a summarization operation.
-
-    This class encapsulates the result of summarizing content,
-    including the summary text and metadata.
     """
-
-    # Original content reference
-    original_id: str
-    original_length: int
-
-    # Summary content
-    summary_text: str
-    summary_level: SummaryLevel
-    compression_ratio: float  # Original length / Summary length
-
-    # Metadata
-    preserved_entities: List[str] = Field(default_factory=list)
-    preserved_keywords: List[str] = Field(default_factory=list)
-
-    # Quality metrics
-    estimated_quality: float = 0.0  # 0.0 to 1.0
-
-    # Timestamp
-    created_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
-
-class ProgressiveSummarizerConfig(BaseModel):
     """
-    Configuration for progressive summarizer.
-
-    This class encapsulates the configuration parameters for the
-    progressive summarization algorithm.
     """
-
-    # Target compression ratios for each level
-    condensed_ratio: float = 0.35  # Target 35% of original length
-    key_points_ratio: float = 0.15  # Target 15% of original length
-    headline_ratio: float = 0.05  # Target 5% of original length
-
-    # Minimum content lengths for summarization
-    min_length_for_condensed: int = 100
-    min_length_for_key_points: int = 200
-    min_length_for_headline: int = 500
-
-    # Maximum token limits
-    max_input_tokens: int = 4000
-
-    # Entity and keyword preservation
-    preserve_entities: bool = True
-    preserve_keywords: bool = True
-    max_entities_to_preserve: int = 10
-    max_keywords_to_preserve: int = 15
-
-    # Use Vertex AI for summarization
-    use_openai: bool = True
-    openai_config: Dict[str, Any] = Field(default_factory=dict)
-
-    # Fallback to rule-based summarization if AI fails
-    enable_fallback: bool = True
-
-class ProgressiveSummarizer:
     """
-    Creates multi-level summaries of memory items.
-
-    This class provides functionality to create summaries at different levels
-    of compression, from condensed highlights to single-sentence headlines.
     """
-
-    def __init__(self, config: Optional[ProgressiveSummarizerConfig] = None):
         """
-        Initialize progressive summarizer.
-
-        Args:
-            config: Optional configuration for progressive summarization
         """
-        self.config = config or ProgressiveSummarizerConfig()
-        self.openai_client = None
-
-        # Initialize Vertex AI client if enabled
-        if self.config.use_openai:
-            self._init_openai()
-
         logger.info(f"ProgressiveSummarizer initialized (Vertex AI: {self.config.use_openai})")
 
     def _init_openai(self) -> None:
         """
-        Initialize Vertex AI client for summarization.
-
-        This method sets up the Vertex AI client for text summarization.
         """
-        try:
-
-            # Extract configuration
             project = self.config.openai_config.get("project", "cherry-ai-project")
             location = self.config.openai_config.get("location", "us-central1")
 
@@ -133,10 +36,15 @@ class ProgressiveSummarizer:
                 self.openai_client = aiplatform.TextGenerationModel.from_pretrained("text-bison@latest")
                 logger.info("Vertex AI foundation model initialized for summarization")
 
-        except ImportError:
+        except Exception:
+
+
+            pass
             logger.warning("google-cloud-aiplatform package not installed. Falling back to rule-based summarization.")
             self.config.use_openai = False
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to initialize Vertex AI: {e}")
             self.config.use_openai = False
 
@@ -148,31 +56,7 @@ class ProgressiveSummarizer:
         metadata: Optional[Dict[str, Any]] = None,
     ) -> SummaryResult:
         """
-        Summarize content to the specified level.
-
-        Args:
-            content: The content to summarize
-            item_id: ID of the original item
-            level: The desired summary level
-            metadata: Optional metadata about the content
-
-        Returns:
-            Summary result
         """
-        if level == SummaryLevel.FULL:
-            # No summarization needed
-            return SummaryResult(
-                original_id=item_id,
-                original_length=len(content),
-                summary_text=content,
-                summary_level=SummaryLevel.FULL,
-                compression_ratio=1.0,
-                estimated_quality=1.0,
-            )
-
-        # Check minimum length requirements
-        content_length = len(content)
-        if level == SummaryLevel.CONDENSED and content_length < self.config.min_length_for_condensed:
             logger.info(f"Content too short for {level} summarization, returning full content")
             return SummaryResult(
                 original_id=item_id,
@@ -226,6 +110,8 @@ class ProgressiveSummarizer:
 
         # Perform summarization
         try:
+
+            pass
             if self.config.use_openai and self.openai_client:
                 summary_text = await self._summarize_with_openai(content, level)
             else:
@@ -255,7 +141,10 @@ class ProgressiveSummarizer:
                 estimated_quality=estimated_quality,
             )
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Summarization failed: {e}")
 
             # Fall back to rule-based summarization if AI fails
@@ -275,18 +164,7 @@ class ProgressiveSummarizer:
 
     async def _summarize_with_openai(self, content: str, level: SummaryLevel) -> str:
         """
-        Summarize content using Vertex AI.
-
-        Args:
-            content: The content to summarize
-            level: The desired summary level
-
-        Returns:
-            Summarized text
         """
-        # Determine target length based on level
-        if level == SummaryLevel.CONDENSED:
-            target_ratio = self.config.condensed_ratio
             instruction = "Create a condensed summary that preserves the main points and important details."
         elif level == SummaryLevel.KEY_POINTS:
             target_ratio = self.config.key_points_ratio
@@ -301,17 +179,7 @@ class ProgressiveSummarizer:
 
         # Create prompt for summarization
         prompt = f"""
-        {instruction}
-
-        Target length: approximately {target_length} characters.
-
-        Original content:
-        {content}
-
-        Summary:
         """
-
-        # Call Vertex AI
         if hasattr(self.openai_client, "predict"):
             # Using custom endpoint
             response = await self.openai_client.predict_async(instances=[{"prompt": prompt}])
@@ -335,25 +203,7 @@ class ProgressiveSummarizer:
 
     def _summarize_with_rules(self, content: str, level: SummaryLevel) -> str:
         """
-        Summarize content using rule-based approaches.
-
-        This is a fallback method when AI summarization is not available.
-
-        Args:
-            content: The content to summarize
-            level: The desired summary level
-
-        Returns:
-            Summarized text
         """
-        # Determine target length based on level
-        if level == SummaryLevel.CONDENSED:
-            target_ratio = self.config.condensed_ratio
-        elif level == SummaryLevel.KEY_POINTS:
-            target_ratio = self.config.key_points_ratio
-        elif level == SummaryLevel.HEADLINE:
-            target_ratio = self.config.headline_ratio
-        else:
             raise ValueError(f"Unsupported summary level: {level}")
 
         target_length = int(len(content) * target_ratio)
@@ -388,6 +238,8 @@ class ProgressiveSummarizer:
         selected_sentences = []
         current_length = 0
 
+        # TODO: Consider using list comprehension for better performance
+
         for sentence, _ in sentence_scores:
             if current_length + len(sentence) <= target_length:
                 selected_sentences.append(sentence)
@@ -408,20 +260,7 @@ class ProgressiveSummarizer:
         self, content: str, metadata: Optional[Dict[str, Any]] = None
     ) -> Tuple[List[str], List[str]]:
         """
-        Extract entities and keywords from content.
-
-        Args:
-            content: The content to extract from
-            metadata: Optional metadata that might contain entities/keywords
-
-        Returns:
-            Tuple of (entities, keywords)
         """
-        # Use metadata if available
-        entities = []
-        keywords = []
-
-        if metadata:
             entities = metadata.get("entities", [])
             keywords = metadata.get("keywords", [])
 
@@ -479,27 +318,7 @@ class ProgressiveSummarizer:
 
     def _ensure_entities_preserved(self, summary: str, entities: List[str]) -> str:
         """
-        Ensure entities are preserved in the summary.
-
-        Args:
-            summary: The summary text
-            entities: List of entities to preserve
-
-        Returns:
-            Updated summary with entities preserved
         """
-        # Check which entities are missing
-        missing_entities = []
-        for entity in entities[: self.config.max_entities_to_preserve]:
-            if entity.lower() not in summary.lower():
-                missing_entities.append(entity)
-
-        # If no missing entities, return original summary
-        if not missing_entities:
-            return summary
-
-        # Add missing entities as a postscript
-        if len(missing_entities) > 0:
             entity_str = ", ".join(missing_entities)
             return f"{summary}\n\nKey entities: {entity_str}"
 
@@ -507,27 +326,7 @@ class ProgressiveSummarizer:
 
     def _ensure_keywords_preserved(self, summary: str, keywords: List[str]) -> str:
         """
-        Ensure keywords are preserved in the summary.
-
-        Args:
-            summary: The summary text
-            keywords: List of keywords to preserve
-
-        Returns:
-            Updated summary with keywords preserved
         """
-        # Check which keywords are missing
-        missing_keywords = []
-        for keyword in keywords[: self.config.max_keywords_to_preserve]:
-            if keyword.lower() not in summary.lower():
-                missing_keywords.append(keyword)
-
-        # If no missing keywords, return original summary
-        if not missing_keywords:
-            return summary
-
-        # Add missing keywords as a postscript
-        if len(missing_keywords) > 0:
             keyword_str = ", ".join(missing_keywords)
 
             # Check if we already added entities
@@ -542,45 +341,4 @@ class ProgressiveSummarizer:
         self, content: str, item_id: str, metadata: Optional[Dict[str, Any]] = None
     ) -> Dict[SummaryLevel, SummaryResult]:
         """
-        Create summaries at all levels for a memory item.
-
-        Args:
-            content: The content to summarize
-            item_id: ID of the original item
-            metadata: Optional metadata about the content
-
-        Returns:
-            Dictionary mapping summary levels to summary results
         """
-        # Create summaries for each level
-        results = {}
-
-        # Always include full content
-        results[SummaryLevel.FULL] = SummaryResult(
-            original_id=item_id,
-            original_length=len(content),
-            summary_text=content,
-            summary_level=SummaryLevel.FULL,
-            compression_ratio=1.0,
-            estimated_quality=1.0,
-        )
-
-        # Check if content is long enough for condensed summary
-        if len(content) >= self.config.min_length_for_condensed:
-            condensed = await self.summarize(content, item_id, SummaryLevel.CONDENSED, metadata)
-            results[SummaryLevel.CONDENSED] = condensed
-
-        # Check if content is long enough for key points
-        if len(content) >= self.config.min_length_for_key_points:
-            key_points = await self.summarize(content, item_id, SummaryLevel.KEY_POINTS, metadata)
-            results[SummaryLevel.KEY_POINTS] = key_points
-
-        # Check if content is long enough for headline
-        if len(content) >= self.config.min_length_for_headline:
-            headline = await self.summarize(content, item_id, SummaryLevel.HEADLINE, metadata)
-            results[SummaryLevel.HEADLINE] = headline
-
-        return results
-
-# Import datetime here to avoid circular import
-from datetime import datetime

@@ -1,53 +1,7 @@
 """
-Distributed Task Queue for AI Orchestration System.
-
-This module provides a Redis-backed distributed task queue for
-coordinating work across multiple agents and services.
 """
-
-import asyncio
-import json
-import logging
-import time
-import uuid
-from typing import Any, Awaitable, Callable, Dict, List, Optional, Set
-
-import aioredis
-
-from shared.memory.weaviate_session_cache import cache as weaviate_cache
-
-from core.env_config import settings
-from core.orchestrator.src.services.event_bus import get_event_bus
-
-# Handle both pydantic v1 and v2
-try:
-    from pydantic.v1 import BaseModel, Field  # For pydantic v2
-except ImportError:
-    from pydantic import BaseModel, Field  # For pydantic v1
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-class TaskDefinition(BaseModel):
     """Definition of a task that can be executed by agents"""
-
-    task_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    task_type: str
-    parameters: Dict[str, Any] = Field(default_factory=dict)
-    required_capabilities: List[str] = Field(default_factory=list)
-    priority: int = 0  # Higher values = higher priority
-    timeout: Optional[int] = None  # Timeout in seconds
-    retry_count: int = 0  # Number of retries
-    max_retries: int = 3  # Maximum number of retries
-    created_at: float = Field(default_factory=time.time)
-    metadata: Dict[str, Any] = Field(default_factory=dict)
-
-class TaskInstance(BaseModel):
     """Instance of a task being executed"""
-
-    instance_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    task_id: str
-    agent_id: Optional[str] = None
     status: str = "pending"  # pending, assigned, running, completed, failed
     result: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
@@ -58,79 +12,38 @@ class TaskInstance(BaseModel):
 
 class DistributedTaskQueue:
     """Redis-backed distributed task queue for agent coordination"""
-
-    def __init__(self):
         """Initialize the distributed task queue."""
-        self._use_redis = settings.use_redis
-        self._redis = None
-        self._event_bus = get_event_bus()
-        self._task_handlers: Dict[str, Callable[[TaskInstance], Awaitable[Dict[str, Any]]]] = {}
-        self._running = False
-        self._worker_tasks: List[asyncio.Task] = []
-        self._processing_instances: Set[str] = set()
         logger.info("DistributedTaskQueue initialized")
 
     async def initialize(self):
         """Initialize the Redis connection if enabled."""
-        if not self._use_redis:
             logger.info("Redis disabled via USE_REDIS; using Weaviate session cache")
             return
         if self._redis is None:
             try:
+
+                pass
                 self._redis = await aioredis.create_redis_pool(
                     f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}",
                     password=settings.REDIS_PASSWORD,
                     encoding="utf-8",
                 )
                 logger.info(f"Connected to Redis at {settings.REDIS_HOST}:{settings.REDIS_PORT}")
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Failed to connect to Redis: {e}")
                 raise
 
     async def close(self):
         """Close the Redis connection."""
-        if self._redis is not None:
-            self._running = False
-
-            # Cancel worker tasks
-            for task in self._worker_tasks:
-                task.cancel()
-
-            # Wait for tasks to complete
-            if self._worker_tasks:
-                await asyncio.gather(*self._worker_tasks, return_exceptions=True)
-
-            # Close Redis connection
-            self._redis.close()
-            await self._redis.wait_closed()
-            self._redis = None
             logger.info("DistributedTaskQueue closed")
         else:
             self._running = False
 
     async def enqueue_task(self, task_def: TaskDefinition) -> str:
         """
-        Add a task to the queue.
-
-        Args:
-            task_def: The task definition
-
-        Returns:
-            The instance ID
-
-        Raises:
-            ConnectionError: If Redis is not connected
         """
-        if self._redis is None:
-            await self.initialize()
-
-        instance_id = str(uuid.uuid4())
-        now = time.time()
-
-        # Create task instance
-        task_instance = TaskInstance(
-            instance_id=instance_id,
-            task_id=task_def.task_id,
             status="pending",
             created_at=now,
             updated_at=now,
@@ -151,6 +64,8 @@ class DistributedTaskQueue:
 
         # Publish event
         try:
+
+            pass
             await self._event_bus.publish_async(
                 "task_enqueued",
                 {
@@ -159,10 +74,11 @@ class DistributedTaskQueue:
                     "task_type": task_def.task_type,
                 },
             )
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.warning(f"Failed to publish task_enqueued event: {e}")
 
-        logger.debug(f"Task enqueued: {instance_id} (type: {task_def.task_type})")
         return instance_id
 
     async def register_handler(
@@ -171,23 +87,12 @@ class DistributedTaskQueue:
         handler: Callable[[TaskInstance], Awaitable[Dict[str, Any]]],
     ):
         """
-        Register a handler for a task type.
-
-        Args:
-            task_type: The task type
-            handler: Async function that handles the task
         """
-        self._task_handlers[task_type] = handler
         logger.info(f"Handler registered for task type: {task_type}")
 
     async def start_workers(self, num_workers: int = 5):
         """
-        Start worker tasks to process the queue.
-
-        Args:
-            num_workers: Number of worker tasks to start
         """
-        if not self._use_redis:
             raise NotImplementedError("Non-Redis queue workers not implemented")
         if self._redis is None:
             await self.initialize()
@@ -203,15 +108,13 @@ class DistributedTaskQueue:
 
     async def _worker_loop(self, worker_id: int):
         """
-        Worker loop to process tasks.
-
-        Args:
-            worker_id: The worker ID
         """
         logger.info(f"Worker {worker_id} started")
 
         while self._running:
             try:
+
+                pass
                 # Check for tasks in queues for which we have handlers
                 for task_type in self._task_handlers.keys():
                     # Try to get a task with the highest priority
@@ -229,6 +132,9 @@ class DistributedTaskQueue:
                         self._processing_instances.add(instance_id)
 
                         try:
+
+
+                            pass
                             # Get task instance
                             instance_data = await self._redis.get(f"task:instance:{instance_id}")
                             if not instance_data:
@@ -260,6 +166,8 @@ class DistributedTaskQueue:
 
                             # Publish event
                             try:
+
+                                pass
                                 await self._event_bus.publish_async(
                                     "task_started",
                                     {
@@ -268,11 +176,15 @@ class DistributedTaskQueue:
                                         "worker_id": worker_id,
                                     },
                                 )
-                            except Exception as e:
+                            except Exception:
+
+                                pass
                                 logger.warning(f"Failed to publish task_started event: {e}")
 
                             # Execute handler
                             try:
+
+                                pass
                                 handler = self._task_handlers[task_type]
                                 result = await handler(instance)
 
@@ -284,6 +196,8 @@ class DistributedTaskQueue:
 
                                 # Publish success event
                                 try:
+
+                                    pass
                                     await self._event_bus.publish_async(
                                         "task_completed",
                                         {
@@ -292,10 +206,15 @@ class DistributedTaskQueue:
                                             "worker_id": worker_id,
                                         },
                                     )
-                                except Exception as e:
+                                except Exception:
+
+                                    pass
                                     logger.warning(f"Failed to publish task_completed event: {e}")
 
-                            except Exception as e:
+                            except Exception:
+
+
+                                pass
                                 # Update with failure
                                 instance.status = "failed"
                                 instance.error = str(e)
@@ -331,6 +250,8 @@ class DistributedTaskQueue:
 
                                     # Publish failure event
                                     try:
+
+                                        pass
                                         await self._event_bus.publish_async(
                                             "task_failed",
                                             {
@@ -341,7 +262,9 @@ class DistributedTaskQueue:
                                                 "retries": task_def.retry_count,
                                             },
                                         )
-                                    except Exception as event_error:
+                                    except Exception:
+
+                                        pass
                                         logger.warning(f"Failed to publish task_failed event: {event_error}")
 
                             # Save updated instance
@@ -357,27 +280,21 @@ class DistributedTaskQueue:
                 # Sleep a bit to avoid tight loop
                 await asyncio.sleep(0.1)
 
-            except asyncio.CancelledError:
+            except Exception:
+
+
+                pass
                 logger.info(f"Worker {worker_id} cancelled")
                 break
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Error in worker {worker_id}: {e}")
                 await asyncio.sleep(1.0)  # Avoid tight loop on errors
 
     async def get_task_status(self, instance_id: str) -> Optional[TaskInstance]:
         """
-        Get the status of a task.
-
-        Args:
-            instance_id: The task instance ID
-
-        Returns:
-            The task instance or None if not found
         """
-        if self._redis is None:
-            await self.initialize()
-
-        # Get task instance
         instance_data = await self._redis.get(f"task:instance:{instance_id}")
         if not instance_data:
             return None
@@ -387,18 +304,7 @@ class DistributedTaskQueue:
 
     async def cancel_task(self, instance_id: str) -> bool:
         """
-        Cancel a pending task.
-
-        Args:
-            instance_id: The task instance ID
-
-        Returns:
-            True if the task was cancelled, False otherwise
         """
-        if self._redis is None:
-            await self.initialize()
-
-        # Get task instance
         instance_data = await self._redis.get(f"task:instance:{instance_id}")
         if not instance_data:
             return False
@@ -429,11 +335,15 @@ class DistributedTaskQueue:
 
         # Publish event
         try:
+
+            pass
             await self._event_bus.publish_async(
                 "task_cancelled",
                 {"instance_id": instance_id, "task_id": instance.task_id},
             )
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.warning(f"Failed to publish task_cancelled event: {e}")
 
         return True
@@ -443,14 +353,4 @@ _task_queue = None
 
 async def get_task_queue() -> DistributedTaskQueue:
     """
-    Get the global task queue instance.
-
-    Returns:
-        The global DistributedTaskQueue instance
     """
-    global _task_queue
-    if _task_queue is None:
-        _task_queue = DistributedTaskQueue()
-        if settings.use_redis:
-            await _task_queue.initialize()
-    return _task_queue

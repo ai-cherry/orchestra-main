@@ -1,24 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Comprehensive fix for AI Orchestration configuration issues
-Handles database setup, API keys, and removes conflicts
 """
-
-import os
-import sys
-import subprocess
-import json
-from pathlib import Path
-from typing import Dict, List, Optional
-
-# Add parent directory to path
-sys.path.append(str(Path(__file__).parent.parent))
-
-def run_command(cmd: str, check: bool = True) -> subprocess.CompletedProcess:
     """Run a shell command and return result"""
-    return subprocess.run(cmd, shell=True, capture_output=True, text=True, check=check)
-
-def fix_database_configuration():
     """Fix PostgreSQL database configuration"""
     print("\n=== Fixing Database Configuration ===")
     
@@ -33,34 +17,7 @@ def fix_database_configuration():
     
     # Create SQL script
     sql_script = """
--- Create orchestra user if not exists
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT FROM pg_user WHERE usename = 'orchestra') THEN
-        CREATE USER orchestra WITH PASSWORD 'orchestra';
-    END IF;
-END
-$$;
-
--- Create orchestra database if not exists
-SELECT 'CREATE DATABASE orchestra OWNER orchestra'
-WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'orchestra')\\gexec
-
--- Grant all privileges
-GRANT ALL PRIVILEGES ON DATABASE orchestra TO orchestra;
-
--- Connect to orchestra database and create schema
-\\c orchestra
-
--- Create schema if not exists
-CREATE SCHEMA IF NOT EXISTS public;
-GRANT ALL ON SCHEMA public TO orchestra;
 """
-    
-    # Execute SQL script
-    with open('/tmp/fix_orchestra_db.sql', 'w') as f:
-        f.write(sql_script)
-    
     result = run_command("sudo -u postgres psql -f /tmp/fix_orchestra_db.sql", check=False)
     if result.returncode == 0:
         print("✓ Database configuration fixed")
@@ -106,6 +63,9 @@ def update_gitignore():
         lines = content.strip().split('\n')
         added = False
         
+        # TODO: Consider using list comprehension for better performance
+
+        
         for pattern in env_patterns:
             if pattern not in lines:
                 lines.append(pattern)
@@ -147,14 +107,7 @@ def create_systemd_services():
     print("\n=== Creating Systemd Service Files ===")
     
     # AI Orchestrator service
-    orchestrator_service = """[Unit]
-Description=AI Orchestrator Service
-After=network.target postgresql.service
-
-[Service]
-Type=simple
-User=root
-WorkingDirectory=/opt/ai-orchestrator
+    orchestrator_service = """
 Environment="PYTHONPATH=/opt/ai-orchestrator"
 EnvironmentFile=-/etc/orchestra.env
 ExecStart=/usr/bin/python3 ai_components/orchestration/ai_orchestrator.py
@@ -164,22 +117,10 @@ RestartSec=10
 [Install]
 WantedBy=multi-user.target
 """
-    
-    service_path = Path('/etc/systemd/system/ai-orchestrator.service')
-    if not service_path.exists():
-        with open(service_path, 'w') as f:
-            f.write(orchestrator_service)
         print("✓ Created ai-orchestrator.service")
     
     # MCP Server service
-    mcp_service = """[Unit]
-Description=MCP Server for Orchestration
-After=network.target
-
-[Service]
-Type=simple
-User=root
-WorkingDirectory=/opt/ai-orchestrator
+    mcp_service = """
 Environment="PYTHONPATH=/opt/ai-orchestrator"
 EnvironmentFile=-/etc/orchestra.env
 ExecStart=/usr/bin/python3 mcp_server/main.py
@@ -189,11 +130,6 @@ RestartSec=10
 [Install]
 WantedBy=multi-user.target
 """
-    
-    mcp_service_path = Path('/etc/systemd/system/orchestrator-mcp.service')
-    if not mcp_service_path.exists():
-        with open(mcp_service_path, 'w') as f:
-            f.write(mcp_service)
         print("✓ Created orchestrator-mcp.service")
     
     # Reload systemd
@@ -206,34 +142,23 @@ def verify_configuration():
     
     # Test database connection
     test_script = """
-import sys
-sys.path.append('scripts')
-from setup_secrets_manager import SecretsManager
-
-manager = SecretsManager()
-if manager.verify_database_connection():
     print("✓ Database connection verified")
     sys.exit(0)
 else:
     print("✗ Database connection failed")
     sys.exit(1)
 """
-    
-    with open('/tmp/test_db.py', 'w') as f:
-        f.write(test_script)
-    
     result = run_command("python3 /tmp/test_db.py", check=False)
     os.remove('/tmp/test_db.py')
     
     # Test AI orchestrator imports
     test_import = """
-try:
-    import ai_components.orchestration.ai_orchestrator
     print("✓ AI orchestrator imports successfully")
-except Exception as e:
+except Exception:
+
+    pass
     print(f"✗ AI orchestrator import failed: {e}")
 """
-    
     result = run_command(f"python3 -c '{test_import}'", check=False)
 
 def main():

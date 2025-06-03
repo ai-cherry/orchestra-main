@@ -1,16 +1,6 @@
 #!/usr/bin/env python3
 """
-Simplified EigenCode Installer - Attempts to install EigenCode without dependencies
 """
-
-import os
-import sys
-import subprocess
-import requests
-import json
-from pathlib import Path
-from datetime import datetime
-
 def log_message(message, level="INFO"):
     """Simple logging function"""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -18,21 +8,7 @@ def log_message(message, level="INFO"):
 
 def check_url(url):
     """Check if a URL is accessible"""
-    try:
-        response = requests.head(url, timeout=5, allow_redirects=True)
-        return response.status_code, response.headers.get('content-type', '')
-    except:
-        return None, None
-
-def download_file(url, destination):
     """Download a file from URL"""
-    try:
-        response = requests.get(url, timeout=30)
-        if response.status_code == 200:
-            with open(destination, 'wb') as f:
-                f.write(response.content)
-            return True
-    except Exception as e:
         log_message(f"Download failed: {e}", "ERROR")
     return False
 
@@ -109,6 +85,8 @@ def main():
     if not success:
         log_message("Checking GitHub releases...")
         try:
+
+            pass
             # Try common GitHub organizations
             repos = ["eigencode/eigencode", "eigencode/cli", "eigencode-dev/eigencode"]
             
@@ -147,7 +125,10 @@ def main():
                 if success:
                     break
                     
-        except Exception as e:
+        except Exception:
+
+                    
+            pass
             log_message(f"GitHub check failed: {e}", "ERROR")
     
     # Check if installation was successful
@@ -157,6 +138,8 @@ def main():
         
         # Try to run version command
         try:
+
+            pass
             result = subprocess.run([eigencode_path, 'version'], capture_output=True, text=True)
             if result.returncode == 0:
                 log_message(f"EigenCode version: {result.stdout.strip()}")
@@ -169,7 +152,9 @@ def main():
                 return True
             else:
                 log_message(f"Version command failed: {result.stderr}", "ERROR")
-        except Exception as e:
+        except Exception:
+
+            pass
             log_message(f"Failed to run eigencode: {e}", "ERROR")
     else:
         log_message("EigenCode installation failed", "ERROR")

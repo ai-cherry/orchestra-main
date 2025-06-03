@@ -1,0 +1,74 @@
+
+🎭 Orchestra AI Deployment Summary
+==================================
+Generated: 2025-06-03 15:58:13
+
+📊 SERVICE STATUS
+-----------------
+
+✅ Orchestrator API (Port 8000):
+   Process: Running
+   PIDs: 765730, 765760, 765761, 765762, 765763
+   Port: Closed
+
+✅ Weaviate (Port 8080):
+   Status: Status: 200
+   Endpoint: http://localhost:8080/v1
+
+✅ MCP Weaviate Server (Port 8001):
+   Process: Running
+   PIDs: 1393409
+   Port: Open
+
+✅ PostgreSQL (Port 5432):
+   Port: Open
+
+✅ Redis (Port 6379):
+   Port: Open
+
+
+🐳 DOCKER CONTAINERS
+--------------------
+• orchestra-test - b1ddf27c05be
+  Status: Up 24 hours
+  Ports: 0.0.0.0:8001->8000/tcp, [::]:8001->8000/tcp
+• opt_weaviate_1 - cr.weaviate.io/semitechnologies/weaviate:1.30.1
+  Status: Up 4 days
+  Ports: 0.0.0.0:8080->8080/tcp, :::8080->8080/tcp, 0.0.0.0:50051->50051/tcp, :::50051->50051/tcp
+
+📍 ACCESS URLS
+--------------
+• Orchestrator API: http://localhost:8000
+• Weaviate UI: http://localhost:8080
+• MCP Weaviate: http://localhost:8001
+
+🔧 USEFUL COMMANDS
+------------------
+# Check logs
+tail -f logs/*.log
+
+# Test MCP connection
+python3 mcp_server/test_orchestrator.py
+
+# Run smoke tests
+python3 scripts/smoke_tests.py
+
+# Stop all services
+./scripts/stop_all_services.sh
+
+# Start all services
+./scripts/start_all_services.sh
+
+📝 DEPLOYMENT NOTES
+-------------------
+• This is a local/development deployment
+• For production deployment to Vultr:
+  1. Set VULTR_API_KEY environment variable
+  2. Run: python3 scripts/deploy_orchestra_system.py --environment production
+  
+• Current deployment includes:
+  - Orchestrator API with 4 workers
+  - Weaviate vector database
+  - MCP Weaviate Direct server
+  - PostgreSQL database (if running)
+  - Redis cache (if running)

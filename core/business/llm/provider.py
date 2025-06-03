@@ -1,25 +1,6 @@
 """
-LLM provider integration using Portkey.
-
-This module provides a unified interface for LLM providers
-using Portkey for intelligent routing and fallbacks.
 """
-
-import logging
-from dataclasses import dataclass
-from enum import Enum
-from typing import Any, Dict, List, Optional
-
-from portkey_ai import Portkey
-
-from core.business.personas.base import PersonaConfig
-from core.infrastructure.config.settings import get_settings
-
-logger = logging.getLogger(__name__)
-
-class LLMProvider(Enum):
     """Supported LLM providers."""
-
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
     OPENROUTER = "openrouter"
@@ -28,7 +9,6 @@ class LLMProvider(Enum):
 
 class CompletionMode(Enum):
     """Completion modes for different use cases."""
-
     CHAT = "chat"
     COMPLETION = "completion"
     EMBEDDING = "embedding"
@@ -36,58 +16,10 @@ class CompletionMode(Enum):
 @dataclass
 class LLMRequest:
     """Request to an LLM provider."""
-
-    prompt: str
-    mode: CompletionMode = CompletionMode.CHAT
-    max_tokens: Optional[int] = None
-    temperature: Optional[float] = None
-    top_p: Optional[float] = None
-    stop_sequences: Optional[List[str]] = None
-    system_prompt: Optional[str] = None
-    metadata: Dict[str, Any] = None
-
-    def __post_init__(self):
-        if self.metadata is None:
-            self.metadata = {}
-
-@dataclass
-class LLMResponse:
     """Response from an LLM provider."""
-
-    text: str
-    provider: LLMProvider
-    model: str
-    usage: Dict[str, int]
-    latency_ms: float
-    metadata: Dict[str, Any] = None
-
-    def __post_init__(self):
-        if self.metadata is None:
-            self.metadata = {}
-
-class LLMService:
     """
-    Unified LLM service using Portkey for routing.
-
-    Features:
-    - Automatic provider selection
-    - Fallback handling
-    - Cost optimization
-    - Response caching
-    - Usage tracking
     """
-
-    def __init__(self):
-        self.settings = get_settings()
-        self._portkey_client = None
-        self._provider_configs = {}
-        self._initialize_providers()
-
-    def _initialize_providers(self) -> None:
         """Initialize provider configurations."""
-        # OpenAI configuration
-        if self.settings.llm.openai_api_key:
-            self._provider_configs[LLMProvider.OPENAI] = {
                 "api_key": self.settings.llm.openai_api_key.get_secret_value(),
                 "models": ["gpt-4", "gpt-3.5-turbo"],
                 "priority": 1,
@@ -129,35 +61,8 @@ class LLMService:
         model: Optional[str] = None,
     ) -> LLMResponse:
         """
-        Complete a request using the specified or best available provider.
-
-        Args:
-            request: The LLM request
-            provider: Specific provider to use (auto-selected if None)
-            model: Specific model to use (auto-selected if None)
-
-        Returns:
-            LLM response with completion text and metadata
         """
-        # Use Portkey if available
-        if self._portkey_client:
-            return await self._complete_with_portkey(request, provider, model)
-
-        # Fallback to direct provider calls
-        return await self._complete_direct(request, provider, model)
-
-    async def _complete_with_portkey(
-        self,
-        request: LLMRequest,
-        provider: Optional[LLMProvider] = None,
-        model: Optional[str] = None,
-    ) -> LLMResponse:
         """Complete using Portkey for intelligent routing."""
-        import time
-
-        start_time = time.time()
-
-        # Build Portkey configuration
         config = {"mode": "fallback", "targets": []}
 
         # Add providers based on priority
@@ -182,6 +87,8 @@ class LLMService:
 
         # Make the request
         try:
+
+            pass
             if request.mode == CompletionMode.CHAT:
                 messages = []
 
@@ -251,7 +158,10 @@ class LLMService:
                 },
             )
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Portkey completion failed: {e}")
             raise
 
@@ -262,8 +172,6 @@ class LLMService:
         model: Optional[str] = None,
     ) -> LLMResponse:
         """Direct completion without Portkey (fallback)."""
-        # This would implement direct API calls to providers
-        # For now, we'll raise an error
         raise NotImplementedError("Direct provider calls not yet implemented")
 
     async def complete_with_persona(
@@ -274,15 +182,6 @@ class LLMService:
         model: Optional[str] = None,
     ) -> LLMResponse:
         """Complete a request with persona configuration."""
-        # Build system prompt from persona
-        system_prompt = self._build_system_prompt(persona)
-
-        # Create request
-        request = LLMRequest(
-            prompt=prompt,
-            system_prompt=system_prompt,
-            temperature=persona.temperature,
-            max_tokens=persona.max_tokens,
             metadata={"persona_id": persona.id},
         )
 
@@ -297,11 +196,6 @@ class LLMService:
 
     def _build_system_prompt(self, persona: PersonaConfig) -> str:
         """Build system prompt from persona configuration."""
-        if persona.system_prompt:
-            return persona.system_prompt
-
-        # Build default system prompt from traits and style
-        prompt_parts = [
             f"You are {persona.name}, {persona.description}.",
             f"Your communication style is {persona.style.value}.",
         ]
@@ -314,12 +208,6 @@ class LLMService:
 
     def estimate_cost(self, request: LLMRequest, provider: LLMProvider, model: str) -> float:
         """Estimate the cost of a request."""
-        # Token estimation (rough)
-        prompt_tokens = len(request.prompt.split()) * 1.3
-        completion_tokens = (request.max_tokens or 500) * 0.7
-
-        # Cost per 1K tokens (example rates)
-        cost_rates = {
             ("openai", "gpt-4"): {"prompt": 0.03, "completion": 0.06},
             ("openai", "gpt-3.5-turbo"): {"prompt": 0.0015, "completion": 0.002},
             ("anthropic", "claude-3-opus"): {"prompt": 0.015, "completion": 0.075},
@@ -341,9 +229,3 @@ _llm_service: Optional[LLMService] = None
 
 def get_llm_service() -> LLMService:
     """Get the global LLM service instance."""
-    global _llm_service
-
-    if _llm_service is None:
-        _llm_service = LLMService()
-
-    return _llm_service

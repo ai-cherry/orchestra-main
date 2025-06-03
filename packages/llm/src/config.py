@@ -1,45 +1,8 @@
 """
-Configuration module for LLM models.
-
-This module provides helper functions to configure LLM models from application settings.
 """
-
-import logging
-from typing import Any, Dict, Optional
-
-from pydantic import BaseModel
-
-from core.orchestrator.src.config.settings import Settings
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-class LLMProviderConfig(BaseModel):
     """Provider-specific configuration for LLM models."""
-
-    provider: str
-    api_key: str
-    base_url: Optional[str] = None
-    virtual_key: Optional[str] = None
-    default_model: Optional[str] = None
-    fallback_model: Optional[str] = None
-    extra_params: Dict[str, Any] = {}
-
-def get_provider_config(settings: Settings, provider: str) -> LLMProviderConfig:
     """
-    Get provider-specific configuration from settings.
-
-    Args:
-        settings: Application settings
-        provider: The provider name (e.g., 'openai', 'anthropic', etc.)
-
-    Returns:
-        Provider-specific configuration
     """
-    provider_lower = provider.lower()
-
-    # Map of provider names to their virtual key attribute names in settings
-    virtual_key_attrs = {
         "openai": "PORTKEY_VIRTUAL_KEY_OPENAI",
         "anthropic": "PORTKEY_VIRTUAL_KEY_ANTHROPIC",
         "openrouter": "PORTKEY_VIRTUAL_KEY_OPENROUTER",
@@ -87,17 +50,7 @@ def get_provider_config(settings: Settings, provider: str) -> LLMProviderConfig:
 
 def get_model_name_for_provider(model_name: str, provider: str) -> str:
     """
-    Format the model name appropriately for the given provider.
-
-    Args:
-        model_name: The model name
-        provider: The provider name
-
-    Returns:
-        Properly formatted model name for the provider
     """
-    # Some providers like Anthropic don't use the 'provider/' prefix
-    # But we'll standardize on this format for consistency
     if "/" not in model_name:
         return f"{provider}/{model_name}"
     return model_name

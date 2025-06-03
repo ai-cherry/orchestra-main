@@ -1,17 +1,6 @@
 #!/usr/bin/env python3
 """
-Environment Verification Script for AI Orchestra
-Ensures all environment components are properly configured
 """
-
-import json
-import os
-import subprocess
-import sys
-from pathlib import Path
-from typing import Dict, Tuple
-
-# Color codes for output
 GREEN = "\033[0;32m"
 YELLOW = "\033[1;33m"
 RED = "\033[0;31m"
@@ -24,8 +13,6 @@ def print_status(message: str, status: str) -> None:
 
 def check_python_version() -> Tuple[bool, str]:
     """Check Python version is exactly 3.10."""
-    version = sys.version_info
-    if version.major == 3 and version.minor == 10:
         return True, f"Python {version.major}.{version.minor}.{version.micro}"
     return (
         False,
@@ -40,7 +27,6 @@ def check_virtual_env() -> Tuple[bool, str]:
 
 def check_required_files() -> Dict[str, bool]:
     """Check existence of required files."""
-    required_files = {
         ".env": "Environment configuration",
         ".gitmessage": "Git commit template",
         "requirements/base.txt": "Base requirements",
@@ -86,11 +72,6 @@ def check_environment_variables() -> Dict[str, bool]:
 
 def check_git_config() -> Dict[str, bool]:
     """Check Git configuration."""
-    results = {}
-
-    try:
-        # Check user config
-        user_name = subprocess.run(
             ["git", "config", "user.name"], capture_output=True, text=True, check=False
         ).stdout.strip()
         results["Git user.name"] = bool(user_name)
@@ -110,13 +91,15 @@ def check_git_config() -> Dict[str, bool]:
         results["Git commit template"] = commit_template == ".gitmessage"
 
     except Exception:
+
+
+        pass
         results["Git configuration"] = False
 
     return results
 
 def check_dependencies() -> Dict[str, bool]:
     """Check if required tools are installed."""
-    tools = {
         "gcloud": "Google Cloud SDK",
         "docker": "Docker",
         "kubectl": "Kubernetes CLI",
@@ -126,21 +109,23 @@ def check_dependencies() -> Dict[str, bool]:
     results = {}
     for tool, description in tools.items():
         try:
+
+            pass
             # Add Pulumi bin to PATH for subprocess
             env = os.environ.copy()
             env["PATH"] = f"{env['PATH']}:{os.path.expanduser('~/.pulumi/bin')}"
 
             subprocess.run([tool, "--version"], capture_output=True, check=True, env=env)
             results[f"{tool} ({description})"] = True
-        except (subprocess.CalledProcessError, FileNotFoundError):
+        except Exception:
+
+            pass
             results[f"{tool} ({description})"] = False
 
     return results
 
 def check_gcp_auth() -> Tuple[bool, str]:
     """Check GCP authentication status."""
-    try:
-        result = subprocess.run(
             ["gcloud", "auth", "list", "--filter=status:ACTIVE", "--format=json"],
             capture_output=True,
             text=True,
@@ -150,12 +135,13 @@ def check_gcp_auth() -> Tuple[bool, str]:
         if accounts:
             return True, accounts[0].get("account", "Unknown")
         return False, "No active account"
-    except Exception as e:
+    except Exception:
+
+        pass
         return False, str(e)
 
 def check_directory_structure() -> Dict[str, bool]:
     """Check required directory structure."""
-    required_dirs = [
         "infra/components",
         "scripts",
         "tests/unit",

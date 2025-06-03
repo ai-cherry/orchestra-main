@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Deploy real agents by creating files directly on the server."""
-
 print("🚀 Deploying REAL agents via API...")
 
 # Read the real agent files
@@ -12,30 +11,7 @@ files_to_deploy = {
 }
 
 # Create deployment script
-deploy_script = """#!/bin/bash
-cd /root/orchestra-main
-
-# Create services directory
-mkdir -p agent/app/services
-
-# Write the files
-cat > agent/app/services/real_agents.py << 'EOF'
-{real_agents}
-EOF
-
-cat > agent/app/services/__init__.py << 'EOF'
-{services_init}
-EOF
-
-cat > agent/app/routers/admin.py << 'EOF'
-{admin_router}
-EOF
-
-cat > test_real_agents.py << 'EOF'
-{test_script}
-EOF
-
-# Kill old API
+deploy_script = """
 pkill -f "uvicorn agent.app.main" || true
 sleep 2
 
@@ -52,7 +28,7 @@ sleep 3
 
 # Test it's working
 curl -X GET "http://localhost:8080/api/agents" -H "X-API-Key: 4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd" | jq '.'
-""".format(
+"""
     real_agents=files_to_deploy["agent/app/services/real_agents.py"],
     services_init=files_to_deploy["agent/app/services/__init__.py"],
     admin_router=files_to_deploy["agent/app/routers/admin.py"],

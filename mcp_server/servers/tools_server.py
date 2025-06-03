@@ -1,29 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 """
-Tools MCP Server - Exposes available tools to AI assistants
 """
-
-import asyncio
-import json
-import os
-import sys
-from typing import Any, Dict, List
-
-# Add parent directories to path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
-from mcp.server import Server
-from mcp.server.stdio import stdio_server
-from mcp.types import TextContent, Tool
-
-from core.orchestrator.src.tools.executor import ToolExecutor
-
-# Import our tool system
-from core.orchestrator.src.tools.registry import ToolRegistry
-
-class ToolsServer:
     """MCP server for tool discovery and execution."""
-
-    def __init__(self):
         self.server = Server("tools")
         self.registry = ToolRegistry()
         self.executor = ToolExecutor(self.registry)
@@ -32,10 +10,6 @@ class ToolsServer:
 
     def _register_tool_implementations(self):
         """Register tool implementations with executor."""
-        # Import implementations
-        from core.orchestrator.src.tools.implementations import cache_tools
-
-        # Register cache tools
         self.executor.register_implementation("cache_get", cache_tools.cache_get)
         self.executor.register_implementation("cache_set", cache_tools.cache_set)
         self.executor.register_implementation("cache_delete", cache_tools.cache_delete)
@@ -44,19 +18,7 @@ class ToolsServer:
 
     def setup_handlers(self):
         """Setup MCP handlers."""
-
-        @self.server.list_tools()
-        async def list_tools() -> List[Tool]:
             """List all available tools."""
-            tools = []
-
-            # Add execution tools
-            for tool_name, tool_def in self.registry.tools.items():
-                properties = {}
-                required = []
-
-                for param in tool_def.parameters:
-                    properties[param.name] = {
                         "type": param.type,
                         "description": param.description,
                     }
@@ -123,7 +85,6 @@ class ToolsServer:
         @self.server.call_tool()
         async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
             """Handle tool calls."""
-
             if name == "search_tools":
                 results = self.registry.search_tools(arguments["query"], arguments.get("category"))
 
@@ -204,11 +165,8 @@ class ToolsServer:
 
             return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
-    async def run(self):
+    async def run(self, initialization_options=None):
         """Run the MCP server."""
-        async with stdio_server() as (read_stream, write_stream):
-            await self.server.run(read_stream, write_stream)
-
 if __name__ == "__main__":
     server = ToolsServer()
     asyncio.run(server.run())

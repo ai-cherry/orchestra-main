@@ -1,18 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 """
-Settings configuration for the AI Orchestration System.
-Cleaned version without GCP dependencies.
 """
-
-import json
-import logging
-from typing import Dict, Optional
-
-from pydantic_settings import BaseSettings, SettingsConfigDict
-
-class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
-
-    # General settings
     ENVIRONMENT: str = "development"
     DEFAULT_LLM_MODEL: str = "gpt-4"
     DEFAULT_LLM_MODEL_PRIMARY: str = "openai/gpt-4o"
@@ -88,7 +77,6 @@ class Settings(BaseSettings):
 
     def get_openrouter_headers(self) -> Dict[str, str]:
         """Get OpenRouter custom headers."""
-        headers = {
             "HTTP-Referer": self.SITE_URL,
             "X-Title": self.SITE_TITLE,
         }
@@ -98,12 +86,15 @@ class Settings(BaseSettings):
                 headers["fallback_providers"] = ":".join(free_models)
         if self.OPENROUTER_HEADERS:
             try:
+
+                pass
                 custom_headers = json.loads(self.OPENROUTER_HEADERS)
                 headers.update(custom_headers)
-            except json.JSONDecodeError as e:
+            except Exception:
+
+                pass
                 logging.error(f"Failed to parse OPENROUTER_HEADERS: {e}")
         return headers
 
 def get_settings() -> Settings:
     """Get application settings."""
-    return Settings()

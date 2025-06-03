@@ -1,17 +1,6 @@
 #!/usr/bin/env python3
 """
-Test script for the Natural Language Interface
 """
-
-import asyncio
-import json
-import os
-import sys
-from typing import Dict, Any
-
-import httpx
-
-# Configuration
 API_URL = os.getenv("API_URL", "http://localhost:8000")
 API_KEY = os.getenv("ORCHESTRA_API_KEY", "4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd")
 
@@ -36,19 +25,17 @@ TEST_COMMANDS = [
 
 async def test_text_command(text: str) -> Dict[str, Any]:
     """Test a text command"""
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.post(
                 f"{API_URL}/api/nl/text", headers={"X-API-Key": API_KEY}, json={"text": text}, timeout=30.0
             )
             response.raise_for_status()
             return response.json()
-        except httpx.HTTPError as e:
+        except Exception:
+
+            pass
             return {"error": str(e)}
 
 async def test_websocket():
     """Test WebSocket connection"""
-    # This is a placeholder - actual WebSocket testing would use websockets library
     print("\n📡 WebSocket test (placeholder)")
     print("WebSocket endpoint available at: ws://localhost:8000/api/nl/stream")
 
@@ -84,6 +71,8 @@ async def main():
 if __name__ == "__main__":
     # Check if the API is running
     try:
+
+        pass
         import requests
 
         response = requests.get(f"{API_URL}/health", timeout=5)
@@ -91,7 +80,9 @@ if __name__ == "__main__":
             print("❌ API is not responding. Please start the API first:")
             print("   make dev-start")
             sys.exit(1)
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"❌ Cannot connect to API at {API_URL}")
         print("   Please start the API first: make dev-start")
         sys.exit(1)

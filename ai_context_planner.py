@@ -1,26 +1,6 @@
+# TODO: Consider adding connection pooling configuration
+import subprocess
 """
-AI CONTEXT: PLANNER MODE - Orchestra Project (GCP-Free Edition)
-================================================================
-
-READ THIS ENTIRE FILE BEFORE PLANNING ANY CHANGES!
-
-Project: Orchestra AI (Python 3.10, pip/venv, External Services, Single-developer)
-Role: You are planning a change or feature for this project.
-
-CRITICAL RULES:
-1. Python 3.10 ONLY (system constraint)
-2. pip/venv for dependency management (NO Poetry, Docker, Pipenv)
-3. External managed services for data storage:
-   - MongoDB Atlas for persistent memory
-   - DragonflyDB (Aiven) for caching
-   - Weaviate Cloud for vector search
-4. Local development with docker-compose (for services only, not app)
-5. Simple > Complex, Performance > Security
-6. DigitalOcean for deployment (via Pulumi Python)
-
-TOOL AWARENESS FOR PLANNING:
-Before planning new features, discover available tools:
-1. List tool categories: list_tool_categories()
 2. Search for relevant tools: search_tools("your feature")
 3. Get tool details: get_tool_details("tool_name")
 4. Check tool costs and constraints
@@ -58,7 +38,8 @@ cat docs/AVAILABLE_TOOLS.md
 ARCHITECTURAL PRINCIPLES:
 - All automation tools go in scripts/
 - All configs in appropriate subdirectories
-- Use subprocess.run() (never os.system())
+- Use subprocess.run() (never # subprocess.run is safer than os.system
+subprocess.run([))
 - Type hints for all functions
 - Google-style docstrings
 - Black formatting

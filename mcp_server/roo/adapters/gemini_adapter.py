@@ -1,72 +1,11 @@
 """
-Gemini adapter for Roo integration with MCP.
-
-This module provides an adapter for integrating Gemini with Roo and MCP,
-enabling memory access and mode transitions for Gemini-based agents.
 """
-
-import logging
-import time
-from typing import Any, Dict, List, Optional
-
-from ..memory_hooks import BoomerangOperation, RooMemoryManager
-from ..modes import get_mode
-from ..rules import RuleEngine, create_rule_engine
-from ..transitions import ModeTransitionManager
-
-logger = logging.getLogger(__name__)
-
-class GeminiRooAdapter:
     """
-    Adapter for integrating Gemini with Roo and MCP.
-
-    This class provides methods for handling Gemini requests and responses,
-    integrating with the Roo mode system and MCP memory.
     """
-
-    def __init__(
-        self,
-        memory_manager,
-        transition_manager: Optional[ModeTransitionManager] = None,
-        rule_engine: Optional[RuleEngine] = None,
-    ):
         """
-        Initialize the Gemini Roo adapter.
-
-        Args:
-            memory_manager: The memory manager to use
-            transition_manager: The transition manager to use (optional)
-            rule_engine: The rule engine to use (optional)
         """
-        self.memory_manager = memory_manager
-        self.roo_memory = RooMemoryManager(memory_manager)
-
-        # Create managers if not provided
-        if transition_manager is None:
-            self.transition_manager = ModeTransitionManager(memory_manager)
-        else:
-            self.transition_manager = transition_manager
-
-        if rule_engine is None:
-            self.rule_engine = create_rule_engine()
-        else:
-            self.rule_engine = rule_engine
-
-        self.boomerang = BoomerangOperation(memory_manager, self.transition_manager)
-
-    async def prepare_context(self, mode_slug: str, request_data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Prepare context for a Gemini request based on the current mode.
-
-        Args:
-            mode_slug: The slug of the current mode
-            request_data: The request data from the client
-
-        Returns:
-            Dictionary of context data to include in the request
         """
-        mode = get_mode(mode_slug)
-        if not mode:
             logger.error(f"Invalid mode: {mode_slug}")
             return {}
 
@@ -110,19 +49,7 @@ class GeminiRooAdapter:
 
     async def process_request(self, mode_slug: str, request_data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Process a Gemini request.
-
-        Args:
-            mode_slug: The slug of the current mode
-            request_data: The request data from the client
-
-        Returns:
-            Dictionary of processed request data
         """
-        # Prepare context
-        context = await self.prepare_context(mode_slug, request_data)
-
-        # Store mode context
         await self.roo_memory.store_mode_context(mode_slug, {"request": request_data, "context": context})
 
         # Add context to request
@@ -137,17 +64,7 @@ class GeminiRooAdapter:
         response_data: Dict[str, Any],
     ) -> Dict[str, Any]:
         """
-        Process a Gemini response.
-
-        Args:
-            mode_slug: The slug of the current mode
-            request_data: The original request data
-            response_data: The response data from Gemini
-
-        Returns:
-            Dictionary of processed response data
         """
-        # Check for mode transition request
         if "mode_transition" in response_data:
             transition_request = response_data["mode_transition"]
             target_mode = transition_request.get("target_mode")
@@ -207,18 +124,7 @@ class GeminiRooAdapter:
 
     async def handle_mode_transition(self, transition_id: str, result_data: Dict[str, Any] = None) -> Dict[str, Any]:
         """
-        Handle a completed mode transition.
-
-        Args:
-            transition_id: ID of the completed transition
-            result_data: Results from the target mode
-
-        Returns:
-            Dictionary with transition completion status
         """
-        transition = await self.transition_manager.complete_transition(transition_id, result_data)
-
-        if not transition:
             return {"success": False, "error": "Transition not found"}
 
         return {"success": True, "transition": transition.dict()}
@@ -231,33 +137,11 @@ class GeminiRooAdapter:
         return_mode: str,
     ) -> Dict[str, Any]:
         """
-        Start a boomerang operation.
-
-        Args:
-            initial_mode: Slug of the initial mode
-            target_modes: List of mode slugs to transition through
-            operation_data: Data for the operation
-            return_mode: Slug of the mode to return to after completion
-
-        Returns:
-            Dictionary with operation status
         """
-        operation_id = await self.boomerang.start_operation(initial_mode, target_modes, operation_data, return_mode)
-
-        if not operation_id:
             return {"success": False, "error": "Failed to start operation"}
 
         return {"success": True, "operation_id": operation_id}
 
     async def get_file_history(self, file_path: str, limit: int = 5) -> List[Dict[str, Any]]:
         """
-        Get the history of changes for a file.
-
-        Args:
-            file_path: Path of the file
-            limit: Maximum number of changes to retrieve
-
-        Returns:
-            List of change dictionaries
         """
-        return await self.roo_memory.get_recent_changes_for_file(file_path, limit)

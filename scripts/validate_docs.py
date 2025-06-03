@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 """Scan documentation for outdated cloud references."""
-from pathlib import Path
-import sys
-
 BANNED = ["DigitalOcean", "digitalocean", "GCP"]
 
 def main() -> int:

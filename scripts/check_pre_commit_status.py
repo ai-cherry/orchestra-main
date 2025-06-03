@@ -1,16 +1,6 @@
 #!/usr/bin/env python3
 """Check and summarize pre-commit hook status."""
-
-import subprocess
-import sys
-from collections import defaultdict
-
-def run_command(cmd: str) -> tuple[int, str]:
     """Run a command and return exit code and output."""
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-    return result.returncode, result.stdout + result.stderr
-
-def check_hook_status():
     """Check status of all pre-commit hooks."""
     print("🔍 Checking pre-commit hook status...\n")
 
@@ -19,6 +9,8 @@ def check_hook_status():
 
     # Parse output
     hooks_status = {}
+    # TODO: Consider using list comprehension for better performance
+
     for line in output.split("\n"):
         if "..." in line and (line.endswith("Passed") or line.endswith("Failed")):
             parts = line.split(".")

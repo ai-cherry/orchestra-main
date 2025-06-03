@@ -54,6 +54,8 @@ def handle_query():
 @app.route("/call-llm", methods=["POST"])
 def call_llm():
     try:
+
+        pass
         data = request.json
         prompt = data.get("prompt", "")
         model = data.get("model", "gpt-3.5-turbo")
@@ -63,7 +65,9 @@ def call_llm():
 
         logger.info("LLM API call successful", extra={"model": model})
         return jsonify({"status": "success", "response": response.choices[0].message.content})
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(
             "LLM API call failed",
             exc_info=False,
@@ -74,7 +78,6 @@ def call_llm():
 @app.route("/health/detailed")
 def health_detailed():
     """Detailed health check endpoint"""
-    health_status = {
         "status": "healthy",
         "services": {
             "app": "running",

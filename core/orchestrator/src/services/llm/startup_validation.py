@@ -1,36 +1,7 @@
 """
-Startup Validation for LLM Services
------------------------------------
-
-This module validates the runtime environment and dependencies before starting the application.
-It performs checks to ensure that:
-1. Required environment variables are present
-2. Dependencies are correctly installed
-3. Provider configurations are valid
-4. Secret management is properly set up
-5. Circuit breaker is initialized
-
-Run this validation at application startup to catch configuration issues early.
-
-Usage:
-    from core.orchestrator.src.services.llm.startup_validation import validate_llm_environment
-
-    # In your application startup code
-    if not validate_llm_environment():
         logger.error("LLM environment validation failed. See logs for details.")
         sys.exit(1)
 """
-
-import importlib
-import logging
-import os
-import sys
-from typing import Any, Dict, List, Optional, Tuple
-
-logger = logging.getLogger(__name__)
-
-# Define required environment variables per provider
-PROVIDER_REQUIRED_ENV_VARS = {
     "litellm": {
         "required": [],
         "optional": ["LITELLM_MASTER_KEY", "LITELLM_VERBOSE", "LITELLM_LOG"],
@@ -71,17 +42,14 @@ PROVIDER_REQUIRED_PACKAGES = {
 
 def check_docker_buildkit_support() -> bool:
     """
-    Check if Docker BuildKit is supported in the current environment.
-
-    Returns:
-        True if Docker BuildKit is supported, False otherwise
     """
-    # Check DOCKER_BUILDKIT environment variable
     if os.environ.get("DOCKER_BUILDKIT") == "1":
         return True
 
     # Check Docker version
     try:
+
+        pass
         import subprocess
 
         result = subprocess.run(["docker", "--version"], capture_output=True, text=True, check=True)
@@ -96,7 +64,9 @@ def check_docker_buildkit_support() -> bool:
             # BuildKit is integrated since Docker 18.09
             if (major > 18) or (major == 18 and minor >= 9):
                 return True
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.warning(f"Error checking Docker version: {str(e)}")
 
     return False
@@ -105,23 +75,7 @@ def check_environment_variables(
     providers: Optional[List[str]] = None,
 ) -> Tuple[bool, Dict[str, List[str]]]:
     """
-    Check if required environment variables are set.
-
-    Args:
-        providers: List of providers to check, or None to check all
-
-    Returns:
-        Tuple of (success, missing_vars) where missing_vars is a dict mapping
-        provider name to list of missing required variables
     """
-    if providers is None:
-        providers = list(PROVIDER_REQUIRED_ENV_VARS.keys())
-
-    missing_vars = {}
-    success = True
-
-    for provider in providers:
-        if provider not in PROVIDER_REQUIRED_ENV_VARS:
             logger.warning(f"Unknown provider: {provider}")
             continue
 
@@ -140,24 +94,7 @@ def check_optional_environment_variables(
     providers: Optional[List[str]] = None,
 ) -> Dict[str, List[str]]:
     """
-    Check which optional environment variables are missing.
-
-    Args:
-        providers: List of providers to check, or None to check all
-
-    Returns:
-        Dict mapping provider name to list of missing optional variables
     """
-    if providers is None:
-        providers = list(PROVIDER_REQUIRED_ENV_VARS.keys())
-
-    missing_vars = {}
-
-    for provider in providers:
-        if provider not in PROVIDER_REQUIRED_ENV_VARS:
-            continue
-
-        provider_missing = []
         for var in PROVIDER_REQUIRED_ENV_VARS[provider]["optional"]:
             if not os.environ.get(var):
                 provider_missing.append(var)
@@ -169,37 +106,18 @@ def check_optional_environment_variables(
 
 def check_package_availability(provider: str) -> Tuple[bool, List[str]]:
     """
-    Check if required packages for a provider are installed.
-
-    Args:
-        provider: Provider name
-
-    Returns:
-        Tuple of (success, missing_packages)
     """
-    if provider not in PROVIDER_REQUIRED_PACKAGES:
-        return True, []
-
-    missing_packages = []
-    for package in PROVIDER_REQUIRED_PACKAGES[provider]:
-        try:
             importlib.import_module(package.replace("-", "_"))
-        except ImportError:
+        except Exception:
+
+            pass
             missing_packages.append(package)
 
     return len(missing_packages) == 0, missing_packages
 
 def init_providers(providers: Optional[List[str]] = None) -> bool:
     """
-    Initialize providers and their dependencies.
-
-    Args:
-        providers: List of providers to initialize, or None to initialize all
-
-    Returns:
-        True if all providers were initialized successfully, False otherwise
     """
-    if providers is None:
         providers = ["litellm", "portkey", "openrouter"]
 
     success = True
@@ -209,33 +127,47 @@ def init_providers(providers: Optional[List[str]] = None) -> bool:
         # LiteLLM
         if provider == "litellm":
             try:
+
+                pass
                 import litellm
 
                 litellm.set_verbose = os.environ.get("LITELLM_VERBOSE", "false").lower() == "true"
                 logger.info("LiteLLM initialized successfully")
-            except ImportError:
+            except Exception:
+
+                pass
                 logger.warning("LiteLLM not available. Install with: pip install litellm")
                 success = False
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Error initializing LiteLLM: {str(e)}")
                 success = False
 
         # Portkey
         elif provider == "portkey":
             try:
+
+                pass
                 pass
 
                 logger.info("Portkey initialized successfully")
-            except ImportError:
+            except Exception:
+
+                pass
                 logger.warning("Portkey not available. Install with: pip install portkey-ai")
                 # Not critical, don't set success to False
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Error initializing Portkey: {str(e)}")
                 # Not critical, don't set success to False
 
         # OpenRouter
         elif provider == "openrouter":
             try:
+
+                pass
                 pass
 
                 # Set OpenRouter environment variables if not already set
@@ -247,10 +179,14 @@ def init_providers(providers: Optional[List[str]] = None) -> bool:
                     logger.info("Set default OR_APP_NAME")
 
                 logger.info("OpenRouter initialized successfully")
-            except ImportError:
+            except Exception:
+
+                pass
                 logger.warning("OpenRouter not available. Install with: pip install openrouter")
                 # Not critical, don't set success to False
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Error initializing OpenRouter: {str(e)}")
                 # Not critical, don't set success to False
 
@@ -258,16 +194,7 @@ def init_providers(providers: Optional[List[str]] = None) -> bool:
 
 def init_secret_manager() -> bool:
     """
-    Initialize the Secret Manager.
-
-    Returns:
-        True if successful, False otherwise
     """
-    try:
-        # Import locally to avoid module-level dependency
-        from core.orchestrator.src.services.llm.secret_manager import get_secret_manager
-
-        # Try to get the project ID from environment
         project_id = os.environ.get("VULTR_PROJECT_ID")
 
         # Initialize the Secret Manager
@@ -292,85 +219,74 @@ def init_secret_manager() -> bool:
             logger.warning("Secret Manager initialized but no test keys available")
             return True  # Still return True since this isn't critical
 
-    except ImportError:
+    except Exception:
+
+
+        pass
         logger.warning("Secret Manager module not available")
         return True  # Not critical, can fall back to environment variables
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error initializing Secret Manager: {str(e)}")
         return False
 
 def init_circuit_breaker() -> bool:
     """
-    Initialize the Circuit Breaker.
-
-    Returns:
-        True if successful, False otherwise
     """
-    try:
-        # Import locally to avoid module-level dependency
-        from core.orchestrator.src.services.llm.circuit_breaker import get_circuit_breaker
-
-        # Initialize the Circuit Breaker with default settings
-        get_circuit_breaker(max_failures=5, reset_timeout=60)
-
         logger.info("Circuit Breaker initialized successfully")
 
         # Start Prometheus server if available and configured
         if os.environ.get("START_METRICS_SERVER", "").lower() == "true":
             try:
+
+                pass
                 import prometheus_client
 
                 prometheus_client.start_http_server(port=int(os.environ.get("METRICS_PORT", "8000")))
                 logger.info(f"Prometheus metrics server started on port {os.environ.get('METRICS_PORT', '8000')}")
-            except ImportError:
+            except Exception:
+
+                pass
                 logger.warning("Prometheus client not available. Metrics server not started.")
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Error starting Prometheus metrics server: {str(e)}")
 
         return True
-    except ImportError:
+    except Exception:
+
+        pass
         logger.warning("Circuit Breaker module not available")
         return True  # Not critical
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error initializing Circuit Breaker: {str(e)}")
         return False
 
 def setup_header_validation(app: Any) -> bool:
     """
-    Set up header validation middleware for a FastAPI app.
-
-    Args:
-        app: FastAPI application instance
-
-    Returns:
-        True if successful, False otherwise
     """
-    try:
-        # Import locally to avoid module-level dependency
-        from core.orchestrator.src.services.llm.header_validation import validate_headers_middleware
-
-        # Add the middleware to the app
         app.middleware("http")(validate_headers_middleware)
 
         logger.info("Header validation middleware set up successfully")
         return True
-    except ImportError:
+    except Exception:
+
+        pass
         logger.warning("Header validation module not available")
         return True  # Not critical
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error setting up header validation: {str(e)}")
         return False
 
 def validate_poetry_install() -> bool:
     """
-    Validate that all required Poetry dependency groups are available.
-
-    Returns:
-        True if successful, False otherwise
     """
-    try:
-        import subprocess
-
         result = subprocess.run(["poetry", "env", "info"], capture_output=True, text=True, check=True)
 
         logger.info("Poetry environment is available")
@@ -400,23 +316,20 @@ def validate_poetry_install() -> bool:
             return False
 
         return True
-    except subprocess.CalledProcessError:
+    except Exception:
+
+        pass
         logger.warning("Poetry environment not available or command failed")
         return False
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error validating Poetry environment: {str(e)}")
         return False
 
 def validate_llm_environment() -> bool:
     """
-    Validate the entire LLM environment.
-
-    Returns:
-        True if all validations pass, False otherwise
     """
-    success = True
-
-    # Check BuildKit support if in Docker environment
     if os.environ.get("CONTAINER", "").lower() == "true":
         buildkit_supported = check_docker_buildkit_support()
         if not buildkit_supported:

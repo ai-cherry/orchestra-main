@@ -1,0 +1,17 @@
+{
+  "tracking_server": {
+    "backend_store_uri": "postgresql://user:pass@localhost/mlflow",
+    "artifact_store_uri": "s3://bucket/mlflow-artifacts",
+    "host": "0.0.0.0",
+    "port": 5000
+  },
+  "experiment_defaults": {
+    "tags": {
+      "team": "ai-orchestra",
+      "project": "orchestrator"
+    },
+    "log_models": true,
+    "log_datasets": true,
+    "auto_log": true
+  }
+}

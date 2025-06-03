@@ -1,59 +1,8 @@
 #!/usr/bin/env python3
 """
-Real-time performance monitoring dashboard for the unified PostgreSQL architecture.
-Provides insights into connection pool usage, query performance, cache efficiency,
-and overall system health.
 """
-
-import asyncio
-import json
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional
-import time
-from collections import deque, defaultdict
-import statistics
-
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
-import uvicorn
-
-from shared.database.connection_manager import get_connection_manager
-from shared.database.unified_postgresql import get_unified_postgresql
-from shared.database.unified_db_v2 import get_unified_database
-
-class PerformanceMonitor:
     """Collects and aggregates performance metrics."""
-
-    def __init__(self, history_minutes: int = 60):
-        self.history_minutes = history_minutes
-        self.metrics_history = deque(maxlen=history_minutes * 60)  # Store per-second data
-        self.query_times = defaultdict(list)  # Track query performance by type
-        self.cache_operations = defaultdict(int)  # Track cache hit/miss
-        self.active_connections = []
-        self.start_time = time.time()
-
-    async def collect_metrics(self) -> Dict[str, Any]:
         """Collect current performance metrics."""
-        manager = await get_connection_manager()
-        unified_pg = await get_unified_postgresql()
-        unified_db = await get_unified_database()
-
-        # Get connection pool stats
-        pool_stats = await manager.get_pool_stats()
-
-        # Get health checks
-        manager_health = await manager.health_check()
-        pg_health = await unified_pg.health_check()
-        db_health = await unified_db.health_check()
-
-        # Get performance metrics
-        perf_metrics = await unified_db.get_performance_metrics()
-
-        # Calculate derived metrics
-        uptime = time.time() - self.start_time
-
-        metrics = {
             "timestamp": datetime.utcnow().isoformat(),
             "uptime_seconds": uptime,
             "connection_pool": {
@@ -101,61 +50,15 @@ class PerformanceMonitor:
 
     async def get_historical_metrics(self, minutes: int = 5) -> List[Dict[str, Any]]:
         """Get historical metrics for the specified time range."""
-        if minutes > self.history_minutes:
-            minutes = self.history_minutes
-
-        # Get last N minutes of data
-        samples_needed = minutes * 60
-        return list(self.metrics_history)[-samples_needed:]
-
-    async def get_query_performance(self) -> Dict[str, Any]:
         """Get query performance statistics."""
-        unified_pg = await get_unified_postgresql()
-
-        # Get slow queries
-        slow_queries = await unified_pg._connection_manager.fetch(
             """
-            SELECT 
-                query,
-                calls,
-                mean_exec_time as avg_ms,
-                max_exec_time as max_ms,
-                total_exec_time as total_ms
-            FROM pg_stat_statements
-            WHERE mean_exec_time > 100  -- Queries averaging over 100ms
-            ORDER BY mean_exec_time DESC
-            LIMIT 10
         """
-        )
-
         return {"slow_queries": [dict(q) for q in slow_queries], "query_stats": dict(self.query_times)}
 
     async def get_table_stats(self) -> List[Dict[str, Any]]:
         """Get table size and performance statistics."""
-        manager = await get_connection_manager()
-
-        table_stats = await manager.fetch(
             """
-            SELECT 
-                schemaname,
-                tablename,
-                pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) as total_size,
-                n_tup_ins as inserts,
-                n_tup_upd as updates,
-                n_tup_del as deletes,
-                n_live_tup as live_rows,
-                n_dead_tup as dead_rows,
-                last_vacuum,
-                last_autovacuum
-            FROM pg_stat_user_tables
-            WHERE schemaname IN ('orchestra', 'cache', 'sessions')
-            ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC
         """
-        )
-
-        return [dict(stat) for stat in table_stats]
-
-# Create FastAPI app
 app = FastAPI(title="PostgreSQL Performance Dashboard")
 monitor = PerformanceMonitor()
 
@@ -165,19 +68,6 @@ connected_clients = set()
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     """WebSocket endpoint for real-time metrics."""
-    await websocket.accept()
-    connected_clients.add(websocket)
-
-    try:
-        while True:
-            # Send metrics every second
-            metrics = await monitor.collect_metrics()
-            await websocket.send_json(metrics)
-            await asyncio.sleep(1)
-
-    except WebSocketDisconnect:
-        connected_clients.remove(websocket)
-    except Exception as e:
         print(f"WebSocket error: {e}")
         if websocket in connected_clients:
             connected_clients.remove(websocket)
@@ -185,12 +75,7 @@ async def websocket_endpoint(websocket: WebSocket):
 @app.get("/")
 async def dashboard():
     """Serve the dashboard HTML."""
-    return HTMLResponse(
         content="""
-<!DOCTYPE html>
-<html>
-<head>
-    <title>PostgreSQL Performance Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -504,54 +389,28 @@ async def dashboard():
 </body>
 </html>
     """
-    )
-
 @app.get("/api/metrics/current")
 async def get_current_metrics():
     """Get current performance metrics."""
-    return await monitor.collect_metrics()
-
 @app.get("/api/metrics/history")
 async def get_metrics_history(minutes: int = 5):
     """Get historical metrics."""
-    return await monitor.get_historical_metrics(minutes)
-
 @app.get("/api/query-performance")
 async def get_query_performance():
     """Get query performance statistics."""
-    return await monitor.get_query_performance()
-
 @app.get("/api/table-stats")
 async def get_table_stats():
     """Get table statistics."""
-    return await monitor.get_table_stats()
-
-async def periodic_metrics_collection():
     """Background task to collect metrics periodically."""
-    while True:
-        try:
-            await monitor.collect_metrics()
-            await asyncio.sleep(1)
-        except Exception as e:
             print(f"Error collecting metrics: {e}")
             await asyncio.sleep(5)
 
 @app.on_event("startup")
 async def startup_event():
     """Start background tasks on startup."""
-    asyncio.create_task(periodic_metrics_collection())
-
 @app.on_event("shutdown")
 async def shutdown_event():
     """Cleanup on shutdown."""
-    from shared.database.connection_manager import close_connection_manager
-    from shared.database.unified_postgresql import close_unified_postgresql
-    from shared.database.unified_db_v2 import close_unified_database
-
-    await close_unified_database()
-    await close_unified_postgresql()
-    await close_connection_manager()
-
 if __name__ == "__main__":
     # Run the dashboard
     uvicorn.run("postgresql_performance_dashboard:app", host="0.0.0.0", port=8000, reload=True)

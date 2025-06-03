@@ -1,12 +1,4 @@
 """
-Weaviate Component for Pulumi Infrastructure
-===========================================
-Provisions a Weaviate vector database instance in Kubernetes, with all credentials and endpoints managed via Pulumi secrets and injected as Kubernetes Secrets.
-
-Usage:
-    from .weaviate_component import WeaviateComponent
-
-    weaviate = WeaviateComponent(
         name="orchestra-weaviate",
         config={
             "namespace": "superagi",
@@ -18,21 +10,8 @@ Usage:
         opts=ResourceOptions(...)
     )
 """
-
-from typing import Any, Dict, Optional
-
-import pulumi_kubernetes as k8s
-from pulumi import ComponentResource, ResourceOptions
-
-from .secret_helper import create_k8s_secret_from_config
-
-class WeaviateComponent(ComponentResource):
     """
-    Reusable Weaviate deployment component for the AI Orchestra system.
-    Provisions Weaviate as a Kubernetes Deployment + Service, with secrets managed via Pulumi config.
     """
-
-    def __init__(self, name: str, config: Dict[str, Any], opts: Optional[ResourceOptions] = None):
         super().__init__("orchestra:weaviate:Component", name, None, opts)
 
         self.config = config

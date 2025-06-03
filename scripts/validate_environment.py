@@ -1,16 +1,6 @@
 #!/usr/bin/env python3
 """Environment validator to prevent version issues."""
-
-import os
-import subprocess
-import sys
-
-def check_python():
     """Check Python version."""
-    required = (3, 10)
-    current = sys.version_info[:2]
-
-    if current < required:
         print(f"❌ Python {'.'.join(map(str, required))}+ required, but running {'.'.join(map(str, current))}")
         return False
     print(f"✅ Python version OK: {'.'.join(map(str, current))}")
@@ -27,7 +17,6 @@ def check_venv():
 
 def check_npm():
     """Check Node/NPM for admin UI."""
-    try:
         node_result = subprocess.run(["node", "--version"], capture_output=True, text=True)
         npm_result = subprocess.run(["npm", "--version"], capture_output=True, text=True)
 
@@ -40,7 +29,9 @@ def check_npm():
             print(f"✅ NPM installed: {npm_result.stdout.strip()}")
         else:
             print("⚠️  NPM not found (needed for admin UI)")
-    except FileNotFoundError:
+    except Exception:
+
+        pass
         print("⚠️  Node.js/NPM not found (needed for admin UI)")
 
 def main():

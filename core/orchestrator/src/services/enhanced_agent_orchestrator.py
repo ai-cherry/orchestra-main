@@ -1,80 +1,18 @@
 """
-Enhanced Agent Orchestration Service for AI Orchestration System.
-
-This module provides an extension to the base agent orchestrator with support
-for template-based persona formatting and improved agent selection.
 """
-
-import asyncio
-import logging
-import time
-import uuid
-from datetime import datetime
-from typing import Any, Dict, List, Optional
-
-from core.orchestrator.src.agents.agent_base import AgentResponse
-from core.orchestrator.src.agents.simplified_agent_registry import get_simplified_agent_registry
-from core.orchestrator.src.personas.enhanced_persona_manager import get_enhanced_persona_manager
-from core.orchestrator.src.services.base_orchestrator import BaseOrchestrator
-from packages.shared.src.models.base_models import MemoryItem, PersonaConfig
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-class EnhancedAgentOrchestrator(BaseOrchestrator):
     """
-    Enhanced orchestrator for AI agents with template-based personas.
-
-    This class extends the base agent orchestrator with support for template-based
-    personas and improved agent selection based on persona preferences.
     """
-
-    def __init__(self):
         """Initialize the enhanced agent orchestrator."""
-        super().__init__()
-        self._enhanced_persona_manager = get_enhanced_persona_manager()
-
-    async def process_interaction(
-        self,
-        user_input: str,
-        user_id: str,
-        session_id: Optional[str] = None,
-        persona_id: Optional[str] = None,
-        context: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
         """
-        Process a user interaction and generate a response.
-
-        This method orchestrates the complete interaction flow:
-        1. Select appropriate persona using the enhanced persona manager
-        2. Record user input in memory
-        3. Retrieve relevant context from memory
-        4. Select agent based on persona preferences
-        5. Generate response using appropriate agent
-        6. Apply persona template to format the response
-        7. Record response in memory
-        8. Return formatted response with metadata
-
-        Args:
-            user_input: The user's input message
-            user_id: The ID of the user
-            session_id: Optional session ID for conversation continuity
-            persona_id: Optional ID of persona to use
-            context: Additional context for the interaction
-
-        Returns:
-            Dict containing the response and metadata
-
-        Raises:
-            ValueError: If required parameters are invalid
-            RuntimeError: If processing fails
         """
-        # Generate IDs if not provided
         session_id = session_id or f"session_{uuid.uuid4().hex[:8]}"
         interaction_id = f"interaction_{uuid.uuid4().hex}"
         context = context or {}
 
         try:
+
+
+            pass
             # Get enhanced persona
             enhanced_persona = self._enhanced_persona_manager.get_enhanced_persona(persona_id)
             logger.info(f"Using persona {enhanced_persona.name} for interaction {interaction_id}")
@@ -170,7 +108,9 @@ class EnhancedAgentOrchestrator(BaseOrchestrator):
                     **agent_response.metadata,
                 },
             }
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Error processing interaction: {e}", exc_info=True)
             # Publish interaction error event
             self._publish_interaction_error(
@@ -194,40 +134,7 @@ class EnhancedAgentOrchestrator(BaseOrchestrator):
         context: Dict[str, Any],
     ) -> AgentResponse:
         """
-        Execute the appropriate agent based on persona preferences.
-
-        This method:
-        1. Checks persona's preferred agent type
-        2. Creates agent context with all relevant information
-        3. Selects and executes the appropriate agent
-        4. Handles fallback if needed
-
-        Args:
-            user_input: The user's input message
-            user_id: The ID of the user
-            persona: The selected persona configuration
-            enhanced_persona: The enhanced persona with template
-            session_id: The session ID
-            interaction_id: The unique interaction ID
-            relevant_context: Relevant context from memory
-            context: Additional context for the interaction
-
-        Returns:
-            The agent response
         """
-        # Create agent context using the base method
-        agent_context = self._create_agent_context(
-            user_input=user_input,
-            user_id=user_id,
-            persona=persona,
-            session_id=session_id,
-            interaction_id=interaction_id,
-            relevant_context=relevant_context,
-            context=context,
-        )
-
-        # Get settings
-        settings = self._settings
         timeout_seconds = getattr(settings, "AGENT_TIMEOUT_SECONDS", 30)
         use_preferred_agents = getattr(settings, "PREFERRED_AGENTS_ENABLED", True)
 
@@ -238,6 +145,8 @@ class EnhancedAgentOrchestrator(BaseOrchestrator):
 
         # Select appropriate agent
         try:
+
+            pass
             preferred_agent_type = enhanced_persona.preferred_agent_type if use_preferred_agents else None
 
             if preferred_agent_type:
@@ -251,14 +160,20 @@ class EnhancedAgentOrchestrator(BaseOrchestrator):
                 agent_type = agent.__class__.__name__
 
             logger.info(f"Selected agent type: {agent_type} for interaction {interaction_id}")
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Error selecting agent: {e}", exc_info=True)
             # Fall back to simple text agent
             agent_type = "simple_text"
             try:
+
+                pass
                 agent = agent_registry.get_agent(agent_type)
                 logger.warning(f"Falling back to {agent_type} for interaction {interaction_id}")
-            except Exception as e2:
+            except Exception:
+
+                pass
                 logger.critical(
                     f"Critical failure - even fallback agent unavailable: {e2}",
                     exc_info=True,
@@ -272,13 +187,19 @@ class EnhancedAgentOrchestrator(BaseOrchestrator):
 
         # Execute the agent with timeout
         try:
+
+            pass
             start_time = time.time()
 
             # Create a task with timeout
             try:
+
+                pass
                 response_task = asyncio.create_task(agent.process(agent_context))
                 response = await asyncio.wait_for(response_task, timeout=timeout_seconds)
-            except asyncio.TimeoutError:
+            except Exception:
+
+                pass
                 logger.warning(f"Agent processing timed out after {timeout_seconds}s for interaction {interaction_id}")
                 # Generate a timeout response
                 return AgentResponse(
@@ -310,7 +231,9 @@ class EnhancedAgentOrchestrator(BaseOrchestrator):
 
             logger.info(f"Agent {agent_type} processed interaction {interaction_id} in {process_time}ms")
             return response
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Agent processing failed: {e}", exc_info=True)
             # Create a fallback response
             fallback_msg = (
@@ -328,17 +251,4 @@ _enhanced_agent_orchestrator = None
 
 def get_enhanced_agent_orchestrator() -> EnhancedAgentOrchestrator:
     """
-    Get the global enhanced agent orchestrator instance.
-
-    This function provides a simple dependency injection mechanism
-    for accessing the enhanced agent orchestrator throughout the application.
-
-    Returns:
-        The global EnhancedAgentOrchestrator instance
     """
-    global _enhanced_agent_orchestrator
-
-    if _enhanced_agent_orchestrator is None:
-        _enhanced_agent_orchestrator = EnhancedAgentOrchestrator()
-
-    return _enhanced_agent_orchestrator

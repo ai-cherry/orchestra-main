@@ -1,33 +1,8 @@
+import asyncio
 #!/usr/bin/env python3
 """
-Enhanced MCP Health Dashboard with real-time monitoring, metrics visualization,
-and performance analytics.
 """
-
-import asyncio
-import json
-import time
-import psutil
-import aiohttp
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional, Tuple
-from collections import deque, defaultdict
-import curses
-from dataclasses import dataclass, field
-import argparse
-import os
-import sys
-
-# Add project root to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
-@dataclass
-class ServerMetrics:
     """Metrics for a single server"""
-
-    name: str
-    url: str
-    port: int
     status: str = "unknown"
     response_time: float = 0.0
     memory_usage_mb: float = 0.0
@@ -43,10 +18,6 @@ class ServerMetrics:
 
 class MCPHealthDashboard:
     """Real-time health monitoring dashboard for MCP servers"""
-
-    def __init__(self, refresh_interval: int = 5):
-        self.refresh_interval = refresh_interval
-        self.servers = {
             "orchestrator": ServerMetrics(name="Orchestrator", url="http://localhost:8002/health", port=8002),
             "memory": ServerMetrics(name="Memory", url="http://localhost:8003/health", port=8003),
             "tools": ServerMetrics(name="Tools", url="http://localhost:8006/health", port=8006),
@@ -73,19 +44,6 @@ class MCPHealthDashboard:
 
     async def check_server_health(self, server_key: str, server: ServerMetrics) -> None:
         """Check health of a single server"""
-        start_time = time.time()
-
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(server.url, timeout=aiohttp.ClientTimeout(total=5)) as response:
-                    response_time = (time.time() - start_time) * 1000  # ms
-                    server.response_times.append(response_time)
-                    server.response_time = response_time
-
-                    if response.status == 200:
-                        data = await response.json()
-
-                        # Update metrics from health response
                         server.status = data.get("status", "healthy")
                         server.health_details = data
 
@@ -105,13 +63,19 @@ class MCPHealthDashboard:
                         server.error_history.append({"time": datetime.now(), "error": f"HTTP {response.status}"})
                         self.failed_checks[server_key] += 1
 
-        except asyncio.TimeoutError:
+        except Exception:
+
+
+            pass
             server.status = "timeout"
             server.response_time = 5000  # 5s timeout
             server.error_history.append({"time": datetime.now(), "error": "Timeout"})
             self.failed_checks[server_key] += 1
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             server.status = "error"
             server.error_history.append({"time": datetime.now(), "error": str(e)})
             self.failed_checks[server_key] += 1
@@ -121,8 +85,6 @@ class MCPHealthDashboard:
 
     def _check_alerts(self, server_key: str, server: ServerMetrics) -> None:
         """Check if any metrics exceed thresholds"""
-        alerts = []
-
         if server.response_time > self.thresholds["response_time_ms"]:
             alerts.append(f"High response time: {server.response_time:.0f}ms")
 
@@ -140,23 +102,7 @@ class MCPHealthDashboard:
 
     async def check_all_servers(self) -> None:
         """Check health of all servers concurrently"""
-        tasks = [self.check_server_health(key, server) for key, server in self.servers.items()]
-        await asyncio.gather(*tasks)
-
-    def get_system_metrics(self) -> Dict[str, Any]:
         """Get overall system metrics"""
-        # Calculate uptime
-        uptime = time.time() - self.start_time
-
-        # Calculate success rate
-        success_rate = 0
-        if self.total_checks > 0:
-            failed_total = sum(self.failed_checks.values())
-            success_rate = ((self.total_checks - failed_total) / self.total_checks) * 100
-
-        # Get system resources
-        cpu_percent = psutil.cpu_percent(interval=0.1)
-        memory = psutil.virtual_memory()
         disk = psutil.disk_usage("/")
 
         return {
@@ -172,7 +118,6 @@ class MCPHealthDashboard:
 
     def format_duration(self, seconds: float) -> str:
         """Format duration in human-readable format"""
-        if seconds < 60:
             return f"{seconds:.0f}s"
         elif seconds < 3600:
             return f"{seconds/60:.0f}m {seconds%60:.0f}s"
@@ -183,23 +128,6 @@ class MCPHealthDashboard:
 
     def draw_dashboard(self, stdscr) -> None:
         """Draw the dashboard using curses"""
-        curses.curs_set(0)  # Hide cursor
-        stdscr.nodelay(1)  # Non-blocking input
-
-        # Define colors
-        curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
-        curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
-        curses.init_pair(3, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-        curses.init_pair(4, curses.COLOR_CYAN, curses.COLOR_BLACK)
-        curses.init_pair(5, curses.COLOR_WHITE, curses.COLOR_BLACK)
-
-        while True:
-            try:
-                # Clear screen
-                stdscr.clear()
-                height, width = stdscr.getmaxyx()
-
-                # Header
                 header = "MCP Health Monitoring Dashboard"
                 stdscr.addstr(0, (width - len(header)) // 2, header, curses.A_BOLD)
                 stdscr.addstr(1, 0, "=" * width)
@@ -338,40 +266,22 @@ class MCPHealthDashboard:
                     break
 
                 # Wait before next update
-                time.sleep(0.1)
+                await asyncio.sleep(0.1)
 
-            except KeyboardInterrupt:
+            except Exception:
+
+
+                pass
                 break
-            except curses.error:
+            except Exception:
+
+                pass
                 # Handle resize or other curses errors
                 pass
 
     async def run_monitoring_loop(self, stdscr) -> None:
         """Run the monitoring loop"""
-
-        # Start monitoring task
-        async def monitor():
-            while True:
-                await self.check_all_servers()
-                await asyncio.sleep(self.refresh_interval)
-
-        # Run monitoring in background
-        monitor_task = asyncio.create_task(monitor())
-
-        try:
-            # Run dashboard in separate thread to not block async
-            await asyncio.get_event_loop().run_in_executor(None, self.draw_dashboard, stdscr)
-        finally:
-            monitor_task.cancel()
-            try:
-                await monitor_task
-            except asyncio.CancelledError:
-                pass
-
-    def run_once(self) -> Dict[str, Any]:
         """Run a single health check and return results"""
-        asyncio.run(self.check_all_servers())
-
         results = {"timestamp": datetime.now().isoformat(), "system": self.get_system_metrics(), "servers": {}}
 
         for key, server in self.servers.items():
@@ -414,8 +324,12 @@ def main():
     else:
         # Run interactive dashboard
         try:
+
+            pass
             curses.wrapper(lambda stdscr: asyncio.run(dashboard.run_monitoring_loop(stdscr)))
-        except KeyboardInterrupt:
+        except Exception:
+
+            pass
             print("\nDashboard stopped.")
 
 if __name__ == "__main__":

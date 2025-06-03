@@ -1,20 +1,7 @@
 #!/usr/bin/env python3
 """
-Verify that all enhancement files were created correctly.
 """
-
-import sys
-import os
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-import importlib.util
-from pathlib import Path
-
-def verify_file_exists(filepath):
     """Check if a file exists."""
-    path = Path(filepath)
-    if path.exists():
         print(f"✓ {filepath}")
         return True
     else:
@@ -23,14 +10,11 @@ def verify_file_exists(filepath):
 
 def verify_module_imports(module_path, module_name):
     """Try to import a module to verify syntax."""
-    try:
-        spec = importlib.util.spec_from_file_location(module_name, module_path)
-        if spec and spec.loader:
-            module = importlib.util.module_from_spec(spec)
-            # Don't execute, just check syntax
             print(f"✓ {module_name} - Valid Python syntax")
             return True
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"✗ {module_name} - Error: {e}")
         return False
 
@@ -81,6 +65,8 @@ def main():
 
     # Check if mixins define the required methods
     try:
+
+        pass
         from shared.database.extensions.cache_extensions import CacheExtensionMixin
 
         methods = ["cache_get_by_tags", "cache_get_many", "cache_set_many", "cache_info"]
@@ -89,10 +75,15 @@ def main():
                 print(f"✓ CacheExtensionMixin.{method}")
             else:
                 print(f"✗ CacheExtensionMixin.{method} - MISSING")
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"✗ Could not import CacheExtensionMixin: {e}")
 
     try:
+
+
+        pass
         from shared.database.extensions.session_extensions import SessionExtensionMixin
 
         methods = ["session_list", "session_extend", "session_analytics", "session_get_by_token"]
@@ -101,10 +92,15 @@ def main():
                 print(f"✓ SessionExtensionMixin.{method}")
             else:
                 print(f"✗ SessionExtensionMixin.{method} - MISSING")
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"✗ Could not import SessionExtensionMixin: {e}")
 
     try:
+
+
+        pass
         from shared.database.extensions.memory_extensions import MemoryExtensionMixin
 
         methods = ["memory_snapshot_create", "memory_snapshot_get", "memory_snapshot_list", "memory_snapshot_search"]
@@ -113,10 +109,15 @@ def main():
                 print(f"✓ MemoryExtensionMixin.{method}")
             else:
                 print(f"✗ MemoryExtensionMixin.{method} - MISSING")
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"✗ Could not import MemoryExtensionMixin: {e}")
 
     try:
+
+
+        pass
         from shared.database.extensions.pool_extensions import PoolExtensionMixin
 
         methods = ["get_pool_stats", "get_extended_pool_stats", "adjust_pool_size"]
@@ -125,7 +126,9 @@ def main():
                 print(f"✓ PoolExtensionMixin.{method}")
             else:
                 print(f"✗ PoolExtensionMixin.{method} - MISSING")
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"✗ Could not import PoolExtensionMixin: {e}")
 
     print("\n" + "=" * 60)

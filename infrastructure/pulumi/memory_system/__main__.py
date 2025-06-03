@@ -1,19 +1,6 @@
+# TODO: Consider adding connection pooling configuration
 """
-Pulumi Infrastructure for Orchestra AI Memory System on Vultr.
-
-This module defines the infrastructure needed to deploy the unified memory
-system with PostgreSQL, Redis, and application servers on Vultr.
 """
-
-import pulumi
-import pulumi_vultr as vultr
-import pulumi_kubernetes as k8s
-from pulumi import Config, Output, ResourceOptions
-import json
-import base64
-
-# Load configuration
-config = Config()
 project_name = config.get("project_name") or "orchestra-memory"
 environment = config.get("environment") or "production"
 region = config.get("region") or "ewr"  # New Jersey
@@ -92,90 +79,8 @@ postgres_instance = vultr.Instance(
     ssh_key_ids=[ssh_key_id],
     firewall_group_id=firewall_group.id,
     vpc_ids=[vpc.id],
-    user_data=base64.b64encode("""#!/bin/bash
-# PostgreSQL installation and configuration
-apt-get update
-apt-get install -y postgresql-14 postgresql-contrib-14
-
-# Configure PostgreSQL for production
-cat > /etc/postgresql/14/main/postgresql.conf << EOF
-# Performance Tuning
-shared_buffers = 2GB
-effective_cache_size = 6GB
-maintenance_work_mem = 512MB
-checkpoint_completion_target = 0.9
-wal_buffers = 16MB
-default_statistics_target = 100
-random_page_cost = 1.1
-effective_io_concurrency = 200
-work_mem = 10MB
-min_wal_size = 1GB
-max_wal_size = 4GB
-max_worker_processes = 4
-max_parallel_workers_per_gather = 2
-max_parallel_workers = 4
-max_parallel_maintenance_workers = 2
-
-# Connection Settings
-max_connections = 200
-listen_addresses = '*'
-
-# Logging
-log_destination = 'stderr'
-logging_collector = on
-log_directory = '/var/log/postgresql'
-log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'
-log_rotation_age = 1d
-log_rotation_size = 100MB
-log_line_prefix = '%t [%p]: [%l-1] user=%u,db=%d,app=%a,client=%h '
-log_checkpoints = on
-log_connections = on
-log_disconnections = on
-log_duration = off
-log_lock_waits = on
-log_statement = 'mod'
-log_temp_files = 0
-
-# Replication
-wal_level = replica
-archive_mode = on
-archive_command = 'test ! -f /var/lib/postgresql/14/archive/%f && cp %p /var/lib/postgresql/14/archive/%f'
-max_wal_senders = 3
-EOF
-
-# Configure authentication
-cat > /etc/postgresql/14/main/pg_hba.conf << EOF
-local   all             postgres                                peer
-local   all             all                                     peer
-host    all             all             10.0.0.0/16             md5
-host    all             all             127.0.0.1/32            md5
-host    all             all             ::1/128                 md5
-EOF
-
-# Create archive directory
-mkdir -p /var/lib/postgresql/14/archive
-chown postgres:postgres /var/lib/postgresql/14/archive
-
-# Restart PostgreSQL
-systemctl restart postgresql
-
-# Create database and user
-sudo -u postgres psql << EOF
-CREATE DATABASE orchestra_memory;
-CREATE USER orchestra_user WITH ENCRYPTED PASSWORD 'CHANGE_ME_SECURE_PASSWORD';
-GRANT ALL PRIVILEGES ON DATABASE orchestra_memory TO orchestra_user;
-ALTER DATABASE orchestra_memory SET search_path TO public;
-EOF
-
-# Install monitoring
-apt-get install -y prometheus-postgres-exporter
-systemctl enable prometheus-postgres-exporter
-systemctl start prometheus-postgres-exporter
-""".encode()).decode(),
-)
-
-# Redis Instance (High Performance)
-redis_instance = vultr.Instance(
+    user_data=base64.b64encode("""
+"""
     resource_name("redis"),
     plan="vc2-2c-4gb",  # 2 vCPU, 4GB RAM
     region=region,
@@ -189,61 +94,7 @@ redis_instance = vultr.Instance(
     ssh_key_ids=[ssh_key_id],
     firewall_group_id=firewall_group.id,
     vpc_ids=[vpc.id],
-    user_data=base64.b64encode("""#!/bin/bash
-# Redis installation and configuration
-apt-get update
-apt-get install -y redis-server redis-tools
-
-# Configure Redis for production
-cat > /etc/redis/redis.conf << EOF
-# Network
-bind 0.0.0.0 ::
-protected-mode yes
-port 6379
-tcp-backlog 511
-timeout 0
-tcp-keepalive 300
-
-# General
-daemonize yes
-supervised systemd
-pidfile /var/run/redis/redis-server.pid
-loglevel notice
-logfile /var/log/redis/redis-server.log
-databases 16
-
-# Snapshotting
-save 900 1
-save 300 10
-save 60 10000
-stop-writes-on-bgsave-error yes
-rdbcompression yes
-rdbchecksum yes
-dbfilename dump.rdb
-dir /var/lib/redis
-
-# Replication
-replica-read-only yes
-
-# Security
-requirepass CHANGE_ME_SECURE_PASSWORD
-
-# Limits
-maxclients 10000
-
-# Memory Management
-maxmemory 3gb
-maxmemory-policy allkeys-lru
-maxmemory-samples 5
-
-# Lazy Freeing
-lazyfree-lazy-eviction no
-lazyfree-lazy-expire no
-lazyfree-lazy-server-del no
-replica-lazy-flush no
-
-# Append Only Mode
-appendonly yes
+    user_data=base64.b64encode("""
 appendfilename "appendonly.aof"
 appendfsync everysec
 no-appendfsync-on-rewrite no
@@ -307,13 +158,7 @@ EOF
 systemctl daemon-reload
 systemctl enable redis_exporter
 systemctl start redis_exporter
-""".encode()).decode(),
-)
-
-# Application Servers (Auto-scaling group)
-app_instances = []
-for i in range(2):  # Start with 2 instances
-    app_instance = vultr.Instance(
+"""
         resource_name(f"app-{i+1}"),
         plan="vc2-2c-4gb",  # 2 vCPU, 4GB RAM
         region=region,
@@ -327,49 +172,7 @@ for i in range(2):  # Start with 2 instances
         ssh_key_ids=[ssh_key_id],
         firewall_group_id=firewall_group.id,
         vpc_ids=[vpc.id],
-        user_data=base64.b64encode(f"""#!/bin/bash
-# Application server setup
-apt-get update
-apt-get install -y python3.10 python3-pip python3-venv git nginx supervisor
-
-# Create application user
-useradd -m -s /bin/bash orchestra
-
-# Clone application (replace with your repo)
-cd /home/orchestra
-git clone https://github.com/your-org/orchestra-memory.git app
-chown -R orchestra:orchestra app
-
-# Set up Python environment
-sudo -u orchestra python3 -m venv /home/orchestra/venv
-sudo -u orchestra /home/orchestra/venv/bin/pip install --upgrade pip
-sudo -u orchestra /home/orchestra/venv/bin/pip install -r /home/orchestra/app/requirements.txt
-
-# Create environment configuration
-cat > /home/orchestra/app/.env << EOF
-ENVIRONMENT={environment}
-POSTGRES_HOST={postgres_instance.internal_ip}
-POSTGRES_PORT=5432
-POSTGRES_DB=orchestra_memory
-POSTGRES_USER=orchestra_user
-POSTGRES_PASSWORD=CHANGE_ME_SECURE_PASSWORD
-REDIS_HOST={redis_instance.internal_ip}
-REDIS_PORT=6379
-REDIS_PASSWORD=CHANGE_ME_SECURE_PASSWORD
-METRICS_ENABLED=true
-PROMETHEUS_PORT=9090
-EOF
-
-# Configure Supervisor
-cat > /etc/supervisor/conf.d/orchestra.conf << EOF
-[program:orchestra]
-command=/home/orchestra/venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
-directory=/home/orchestra/app
-user=orchestra
-autostart=true
-autorestart=true
-redirect_stderr=true
-stdout_logfile=/var/log/orchestra/app.log
+        user_data=base64.b64encode(f"""
 environment=PATH="/home/orchestra/venv/bin"
 EOF
 
@@ -431,12 +234,7 @@ EOF
 systemctl daemon-reload
 systemctl enable node_exporter
 systemctl start node_exporter
-""".encode()).decode(),
-    )
-    app_instances.append(app_instance)
-
-# Load Balancer
-load_balancer = vultr.LoadBalancer(
+"""
     resource_name("lb"),
     region=region,
     label=f"{project_name} Load Balancer",
@@ -484,20 +282,7 @@ monitoring_instance = vultr.Instance(
     ssh_key_ids=[ssh_key_id],
     firewall_group_id=firewall_group.id,
     vpc_ids=[vpc.id],
-    user_data=base64.b64encode(f"""#!/bin/bash
-# Monitoring setup
-apt-get update
-apt-get install -y prometheus grafana
-
-# Configure Prometheus
-cat > /etc/prometheus/prometheus.yml << EOF
-global:
-  scrape_interval: 15s
-  evaluation_interval: 15s
-
-scrape_configs:
-  - job_name: 'node'
-    static_configs:
+    user_data=base64.b64encode(f"""
       - targets: [{', '.join([f"'{instance.internal_ip}:9100'" for instance in app_instances])}]
   
   - job_name: 'app'
@@ -559,10 +344,7 @@ EOF
 ln -s /etc/nginx/sites-available/grafana /etc/nginx/sites-enabled/
 rm /etc/nginx/sites-enabled/default
 systemctl restart nginx
-""".encode()).decode(),
-)
-
-# Outputs
+"""
 pulumi.export("vpc_id", vpc.id)
 pulumi.export("postgres_ip", postgres_instance.main_ip)
 pulumi.export("redis_ip", redis_instance.main_ip)

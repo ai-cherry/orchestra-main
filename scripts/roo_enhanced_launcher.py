@@ -1,67 +1,48 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Roo Enhanced Launcher - Seamlessly integrates Roo with AI Orchestrator
-Use Roo normally while automatically leveraging orchestration capabilities
 """
-
-import os
-import sys
-import json
-import sqlite3
-import subprocess
-from pathlib import Path
-from datetime import datetime
-
-class RooEnhancedLauncher:
     """Enhanced Roo launcher with automatic orchestration"""
-    
-    def __init__(self):
         self.db_path = Path("roo_integration.db")
         self.orchestrator_active = self.check_orchestrator_status()
         
     def check_orchestrator_status(self):
         """Check if orchestrator components are active"""
-        try:
-            # Check if database exists
-            if not self.db_path.exists():
-                return False
-            
-            # Check if MCP server is running
-            result = subprocess.run(
                 ["pgrep", "-f", "simple_mcp_server"],
                 capture_output=True
             )
             
             return True  # Orchestrator is available
-        except:
+        except Exception:
+
+            pass
             return False
     
     def auto_select_mode(self, user_input):
         """Automatically select the best Roo mode based on input"""
         sys.path.insert(0, "scripts")
         try:
+
+            pass
             from auto_mode_selector import AutoModeSelector
             selector = AutoModeSelector()
             mode, confidence = selector.suggest_mode(user_input)
             return mode, confidence
-        except:
+        except Exception:
+
+            pass
             return "code", 0  # Default to code mode
     
     def log_to_orchestrator(self, mode, task, result="pending"):
         """Log activity to orchestrator database"""
-        if not self.orchestrator_active:
-            return
-        
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cursor = conn.cursor()
-            cursor.execute(
                 "INSERT INTO mode_executions (mode_name, input_data, output_data) VALUES (?, ?, ?)",
                 (mode, json.dumps({"task": task}), json.dumps({"result": result}))
             )
             conn.commit()
             conn.close()
-        except:
+        except Exception:
+
+            pass
             pass
     
     def launch_roo_with_mode(self, mode, task=None):
@@ -93,6 +74,8 @@ class RooEnhancedLauncher:
         
         while True:
             try:
+
+                pass
                 # Get user input
                 task = input("What would you like to work on? > ").strip()
                 
@@ -125,18 +108,19 @@ class RooEnhancedLauncher:
                     
                 print("\n" + "-" * 50 + "\n")
                 
-            except KeyboardInterrupt:
+            except Exception:
+
+                
+                pass
                 print("\n\n👋 Goodbye!")
                 break
-            except Exception as e:
+            except Exception:
+
+                pass
                 print(f"\n❌ Error: {str(e)}")
 
 def main():
     """Main entry point"""
-    launcher = RooEnhancedLauncher()
-    
-    # Check if orchestrator is active
-    if launcher.orchestrator_active:
         print("✅ AI Orchestrator integration active")
     else:
         print("⚠️  AI Orchestrator not fully active (basic mode selection still works)")

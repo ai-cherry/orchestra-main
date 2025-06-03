@@ -1,46 +1,5 @@
 """
-Orchestra AI FastAPI Application
-Main entry point for the Orchestra API server
 """
-
-import os
-import time
-
-import structlog
-from fastapi import FastAPI, HTTPException, Request
-from pydantic import BaseModel
-
-# Import routers
-from agent.app.routers.admin import router as admin_router
-from agent.app.routers.agents import router as agents_router
-from agent.app.routers.workflows import router as workflows_router
-from agent.app.routers.resources import router as resources_router
-from agent.app.routers.system import router as system_router
-from agent.app.routers.audit import router as audit_router
-from agent.app.routers.automation import router as automation_router
-from agent.app.routers.natural_language import router as natural_language_router
-from agent.app.routers.intent import router as intent_router
-from agent.app.routers.suggestions import router as suggestions_router
-from agent.app.routers.llm import router as llm_router
-from agent.app.routers.personas_admin import router as personas_admin_router
-from agent.app.routers.llm_admin import router as llm_admin_router
-from agent.app.routers.llm_orchestration import router as llm_orchestration_router
-
-# Configure structlog for structured logging
-structlog.configure(
-    processors=[
-        structlog.stdlib.add_logger_name,
-        structlog.stdlib.add_log_level,
-        structlog.processors.StackInfoRenderer(),
-        structlog.dev.set_exc_info,
-        structlog.dev.ConsoleRenderer(),
-    ],
-    logger_factory=structlog.stdlib.LoggerFactory(),
-    wrapper_class=structlog.stdlib.BoundLogger,
-    cache_logger_on_first_use=True,
-)
-logger = structlog.get_logger()
-
 app = FastAPI(title="Orchestra API", version="1.0.0")
 
 # Include the admin router
@@ -99,6 +58,7 @@ async def process_query(query_request: QueryRequest):
     # For now, we'll just simulate a response.
     # Example (replace with actual openai client usage):
     # try:
+     pass
     #     client = openai.OpenAI(api_key=api_key)
     #     chat_completion = await client.chat.completions.create( # Use await if using async client
     #         messages=[
@@ -112,7 +72,8 @@ async def process_query(query_request: QueryRequest):
     #     response_content = chat_completion.choices[0].message.content
     #     logger.info("openai_call_successful")
     #     return {"response": response_content}
-    # except Exception as e:
+    # except Exception:
+     pass
     #     logger.error("openai_call_failed", error=str(e))
     #     raise HTTPException(status_code=500, detail=f"Error communicating with OpenAI: {str(e)}")
 

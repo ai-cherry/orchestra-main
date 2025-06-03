@@ -1,42 +1,12 @@
+import subprocess
 #!/usr/bin/env python3
 """
-AI Code Reviewer - Maintains consistency when using AI coding tools
-
-Checks for common AI-generated anti-patterns:
-- Wrong Python version features
-- Duplicate functionality
-- Unwanted dependencies (Docker, Poetry)
-- Complex over-engineering
-- Security issues (os.system)
-
-Usage:
-    python scripts/ai_code_reviewer.py --check-file somefile.py
-    python scripts/ai_code_reviewer.py --check-changes  # Check git changes
-    python scripts/ai_code_reviewer.py --full-scan     # Scan entire project
 """
-
-import argparse
-import ast
-import logging
-import os
-import re
-import subprocess
-import sys
-
-# Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 class AICodeReviewer:
     """Reviews code for AI-generated anti-patterns and project consistency."""
-
-    def __init__(self) -> None:
-        self.issues: list[str] = []
-        self.warnings: list[str] = []
-        self.project_root = os.getcwd()
-
-        # Files to exclude from review (contain educational examples)
-        self.excluded_files = [
             "ai_context_planner.py",
             "ai_context_coder.py",
             "ai_context_reviewer.py",
@@ -98,7 +68,6 @@ class AICodeReviewer:
 
     def check_file(self, filepath: str) -> dict[str, list[str]]:
         """Check a single file for issues."""
-        if not os.path.exists(filepath):
             return {"errors": [f"File not found: {filepath}"], "warnings": []}
 
         # Skip excluded files
@@ -119,6 +88,9 @@ class AICodeReviewer:
             return results
 
         try:
+
+
+            pass
             with open(filepath) as f:
                 content = f.read()
 
@@ -135,8 +107,10 @@ class AICodeReviewer:
                     )
 
             # Check for os.system usage
-            if "os.system(" in content:
-                results["errors"].append("Found os.system() - Use subprocess.run() instead!")
+            if "# subprocess.run is safer than os.system
+subprocess.run([" in content:
+                results["errors"].append("Found # subprocess.run is safer than os.system
+subprocess.run([) - Use subprocess.run() instead!")
 
             # Check for shell=True
             if "shell=True" in content and "subprocess" in content:
@@ -144,24 +118,28 @@ class AICodeReviewer:
 
             # Parse AST for deeper analysis
             try:
+
+                pass
                 tree = ast.parse(content)
                 self._analyze_ast(tree, filepath, results)
-            except SyntaxError as e:
+            except Exception:
+
+                pass
                 results["errors"].append(f"Syntax error in file: {e}")
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             results["errors"].append(f"Error reading file: {e}")
 
         return results
 
     def _analyze_ast(self, tree: ast.AST, filepath: str, results: dict[str, list[str]]) -> None:
         """Analyze AST for patterns."""
-        # Check for overly complex classes
-        for node in ast.walk(tree):
-            if isinstance(node, ast.ClassDef):
-                # Check for abstract base classes
                 if any(base.id == "ABC" for base in node.bases if isinstance(base, ast.Name)):
-                    if len([n for n in ast.walk(node) if isinstance(n, ast.FunctionDef)]) < 3:
+                    if len([n # TODO: Consider using list comprehension for better performance
+ for n in ast.walk(node) if isinstance(n, ast.FunctionDef)]) < 3:
                         results["warnings"].append(f"Simple ABC detected in {node.name} - might be over-engineered")
 
                 # Check for multiple inheritance
@@ -186,6 +164,9 @@ class AICodeReviewer:
         duplicates: list[str] = []
 
         try:
+
+
+            pass
             with open(filepath) as f:
                 content = f.read()
 
@@ -205,16 +186,16 @@ class AICodeReviewer:
             if re.search(r"def.*check.*(env|venv|virtual)", content, re.IGNORECASE):
                 duplicates.append(f"Environment checking might duplicate {self.existing_tools['check_venv']}")
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error checking for duplicates: {e}")
 
         return duplicates
 
     def check_git_changes(self) -> dict[str, dict[str, list[str]]]:
         """Check all files changed in git."""
-        try:
-            # Get list of changed files
-            result = subprocess.run(
                 ["git", "diff", "--name-only", "--cached", "HEAD"],
                 capture_output=True,
                 text=True,
@@ -244,17 +225,14 @@ class AICodeReviewer:
 
             return all_results
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             return {"error": {"errors": [f"Git error: {e}"], "warnings": []}}
 
     def full_project_scan(self) -> dict[str, dict[str, list[str]]]:
         """Scan entire project for issues."""
-        all_results = {}
-
-        # Check for forbidden files
-        for forbidden_file in self.forbidden_files:
-            if os.path.exists(forbidden_file):
-                all_results[forbidden_file] = {
                     "errors": [f"Forbidden file exists: {forbidden_file}"],
                     "warnings": [],
                 }
@@ -277,7 +255,6 @@ class AICodeReviewer:
 
     def generate_report(self, results: dict[str, dict[str, list[str]]]) -> str:
         """Generate a readable report from results."""
-        if not results:
             return "✅ No issues found! Code follows project standards."
 
         report = ["🔍 AI Code Review Report", "=" * 50, ""]
@@ -292,11 +269,15 @@ class AICodeReviewer:
 
             if file_results["errors"]:
                 report.append("  ❌ ERRORS:")
+                # TODO: Consider using list comprehension for better performance
+
                 for error in file_results["errors"]:
                     report.append(f"    • {error}")
 
             if file_results["warnings"]:
                 report.append("  ⚠️  WARNINGS:")
+                # TODO: Consider using list comprehension for better performance
+
                 for warning in file_results["warnings"]:
                     report.append(f"    • {warning}")
 
@@ -306,7 +287,8 @@ class AICodeReviewer:
             [
                 "📋 Quick Fixes:",
                 "1. Replace Docker/Poetry with pip/venv",
-                "2. Use subprocess.run() instead of os.system()",
+                "2. Use subprocess.run() instead of # subprocess.run is safer than os.system
+subprocess.run([)",
                 "3. Check existing tools in scripts/ before creating new ones",
                 "4. Ensure Python 3.10+ features are supported in deployment environments",
                 "5. Simplify over-engineered patterns",

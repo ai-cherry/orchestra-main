@@ -1,19 +1,5 @@
 """
-Data Ingestion System for Orchestra Platform
-
-This module provides a comprehensive system for ingesting, processing, and querying
-data from multiple enterprise sources including Slack, Gong.io, Salesforce, 
-Looker, and HubSpot.
-
-Key Components:
-- Parser interfaces for hot-swappable source-specific parsers
-- Storage adapters for PostgreSQL, Weaviate, and S3
-- Processing pipeline with vector embedding
-- Query engine with cross-source search capabilities
 """
-
-from typing import Dict, Any
-
 __version__ = "1.0.0"
 
 # Module configuration

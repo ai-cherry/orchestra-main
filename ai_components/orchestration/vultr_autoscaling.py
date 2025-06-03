@@ -1,21 +1,7 @@
+import subprocess
 #!/usr/bin/env python3
 """
-Vultr Cloud Platform Integration with Automated Scaling
 """
-
-import os
-import json
-import asyncio
-import logging
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass
-from datetime import datetime, timedelta
-import aiohttp
-from enum import Enum
-
-logger = logging.getLogger(__name__)
-
-class ScalingMetric(Enum):
     """Metrics used for scaling decisions"""
     CPU_USAGE = "cpu_usage"
     MEMORY_USAGE = "memory_usage"
@@ -26,30 +12,8 @@ class ScalingMetric(Enum):
 @dataclass
 class ScalingPolicy:
     """Defines scaling policies"""
-    name: str
-    metric: ScalingMetric
-    scale_up_threshold: float
-    scale_down_threshold: float
-    cooldown_seconds: int = 300
-    min_instances: int = 1
-    max_instances: int = 10
-
-@dataclass
-class VultrInstance:
     """Represents a Vultr compute instance"""
-    instance_id: str
-    label: str
-    ip_address: str
-    status: str
-    created_at: datetime
-    instance_type: str
-    region: str
-
-class VultrAPIClient:
     """Client for Vultr API operations"""
-    
-    def __init__(self, api_key: str):
-        self.api_key = api_key
         self.base_url = "https://api.vultr.com/v2"
         self.headers = {
             "Authorization": f"Bearer {api_key}",
@@ -58,7 +22,6 @@ class VultrAPIClient:
     
     async def create_instance(self, config: Dict[str, Any]) -> VultrInstance:
         """Create a new Vultr instance"""
-        payload = {
             "region": config.get("region", "ewr"),  # New Jersey
             "plan": config.get("plan", "vc2-1c-1gb"),  # 1 vCPU, 1GB RAM
             "os_id": config.get("os_id", 387),  # Ubuntu 20.04
@@ -93,8 +56,6 @@ class VultrAPIClient:
     
     async def delete_instance(self, instance_id: str):
         """Delete a Vultr instance"""
-        async with aiohttp.ClientSession() as session:
-            async with session.delete(
                 f"{self.base_url}/instances/{instance_id}",
                 headers=self.headers
             ) as response:
@@ -104,8 +65,6 @@ class VultrAPIClient:
     
     async def list_instances(self, label_prefix: str = "orchestra") -> List[VultrInstance]:
         """List Vultr instances with specific label prefix"""
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
                 f"{self.base_url}/instances",
                 headers=self.headers
             ) as response:
@@ -128,9 +87,6 @@ class VultrAPIClient:
     
     async def get_instance_metrics(self, instance_id: str) -> Dict[str, float]:
         """Get instance metrics for scaling decisions"""
-        # In production, this would fetch real metrics from Vultr monitoring
-        # For now, simulate metrics
-        return {
             "cpu_usage": 0.75,  # 75%
             "memory_usage": 0.60,  # 60%
             "network_in": 1024 * 1024 * 10,  # 10 MB/s
@@ -139,56 +95,10 @@ class VultrAPIClient:
     
     def _generate_user_data(self, config: Dict[str, Any]) -> str:
         """Generate cloud-init user data for instance initialization"""
-        user_data = f"""#!/bin/bash
-# Orchestra AI Agent Setup
-apt-get update
-apt-get install -y docker.io docker-compose python3-pip
-
-# Clone orchestra repository
-git clone https://github.com/orchestra/main.git /opt/orchestra
-cd /opt/orchestra
-
-# Set environment variables
-cat > .env << EOF
-ORCHESTRATOR_MODE=agent
-ORCHESTRATOR_ROLE={config.get('role', 'worker')}
-ORCHESTRATOR_ID={config.get('label')}
-WEAVIATE_URL={os.getenv('WEAVIATE_URL')}
-POSTGRES_URL={os.getenv('DATABASE_URL')}
-EOF
-
-# Start services
-docker-compose up -d
+        user_data = f"""
 """
-        return user_data
-
-class AutoScaler:
     """Handles automatic scaling of Vultr instances"""
-    
-    def __init__(self, vultr_client: VultrAPIClient, 
-                 policies: List[ScalingPolicy]):
-        self.vultr_client = vultr_client
-        self.policies = policies
-        self.last_scaling_action: Dict[str, datetime] = {}
-        self.metrics_history: Dict[str, List[Dict]] = {}
-        
-    async def evaluate_scaling(self) -> List[Dict[str, Any]]:
         """Evaluate scaling policies and return scaling decisions"""
-        decisions = []
-        instances = await self.vultr_client.list_instances()
-        
-        for policy in self.policies:
-            # Check cooldown period
-            if policy.name in self.last_scaling_action:
-                time_since_last = datetime.now() - self.last_scaling_action[policy.name]
-                if time_since_last.seconds < policy.cooldown_seconds:
-                    continue
-            
-            # Collect metrics from all instances
-            total_metric_value = 0
-            instance_count = len(instances)
-            
-            for instance in instances:
                 if instance.status == "active":
                     metrics = await self.vultr_client.get_instance_metrics(
                         instance.instance_id
@@ -230,6 +140,9 @@ class AutoScaler:
         policy_name = decision["policy"]
         
         try:
+
+        
+            pass
             if action == "scale_up":
                 # Create new instance
                 config = {
@@ -256,23 +169,16 @@ class AutoScaler:
             # Update last scaling action
             self.last_scaling_action[policy_name] = datetime.now()
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             logger.error(f"Scaling execution failed: {e}")
             raise
 
 class LoadBalancer:
     """Manages load balancing across Vultr instances"""
-    
-    def __init__(self, vultr_client: VultrAPIClient):
-        self.vultr_client = vultr_client
-        self.health_checks: Dict[str, Dict] = {}
-        
-    async def update_backend_pool(self):
         """Update load balancer backend pool with active instances"""
-        instances = await self.vultr_client.list_instances()
-        active_backends = []
-        
-        for instance in instances:
             if instance.status == "active":
                 # Check instance health
                 is_healthy = await self._check_instance_health(instance)
@@ -296,54 +202,32 @@ class LoadBalancer:
     
     async def _check_instance_health(self, instance: VultrInstance) -> bool:
         """Check if instance is healthy"""
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(
                     f"http://{instance.ip_address}:8080/health",
                     timeout=aiohttp.ClientTimeout(total=5)
                 ) as response:
                     return response.status == 200
-        except:
+        except Exception:
+
+            pass
             return False
     
     async def _update_nginx_config(self, backends: List[Dict]):
         """Update NGINX configuration with active backends"""
         config = """
-upstream orchestra_backend {
-    least_conn;
 """
-        
-        for backend in backends:
             config += f"    server {backend['ip']}:{backend['port']} weight={backend['weight']};\n"
         
         config += """
-}
-
-server {
-    listen 80;
-    server_name orchestra.ai;
-    
-    location / {
-        proxy_pass http://orchestra_backend;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
 """
-        
-        # Write config to file
         with open("/etc/nginx/sites-available/orchestra", "w") as f:
             f.write(config)
         
         # Reload NGINX
-        os.system("nginx -s reload")
+        # subprocess.run is safer than os.system
+subprocess.run(["nginx -s reload")
 
 class VultrOrchestrator:
     """Main orchestrator for Vultr infrastructure"""
-    
-    def __init__(self):
         self.vultr_client = VultrAPIClient(os.getenv("VULTR_API_KEY"))
         self.policies = self._initialize_policies()
         self.autoscaler = AutoScaler(self.vultr_client, self.policies)
@@ -352,8 +236,6 @@ class VultrOrchestrator:
         
     def _initialize_policies(self) -> List[ScalingPolicy]:
         """Initialize scaling policies"""
-        return [
-            ScalingPolicy(
                 name="cpu_scaling",
                 metric=ScalingMetric.CPU_USAGE,
                 scale_up_threshold=0.80,  # 80%
@@ -383,6 +265,8 @@ class VultrOrchestrator:
         # Start monitoring loop
         while True:
             try:
+
+                pass
                 # Evaluate scaling
                 decisions = await self.autoscaler.evaluate_scaling()
                 
@@ -398,17 +282,15 @@ class VultrOrchestrator:
                 # Wait for next iteration
                 await asyncio.sleep(self.monitoring_interval)
                 
-            except Exception as e:
+            except Exception:
+
+                
+                pass
                 logger.error(f"Orchestrator error: {e}")
                 await asyncio.sleep(self.monitoring_interval)
     
     async def _ensure_minimum_instances(self):
         """Ensure minimum number of instances are running"""
-        instances = await self.vultr_client.list_instances()
-        min_required = min(p.min_instances for p in self.policies)
-        
-        current_count = len(instances)
-        if current_count < min_required:
             logger.info(f"Creating {min_required - current_count} instances")
             
             for i in range(min_required - current_count):

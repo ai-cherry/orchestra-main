@@ -1,51 +1,14 @@
 """
-Incident Reporting for Agent Failures.
-
-This module provides functionality for logging and reporting incidents
-when agent failures occur, enabling better visibility and debugging.
 """
-
-import json
-import logging
-import uuid
-from datetime import datetime
-from typing import Any, Dict, Optional
-
-# Optional: Google Cloud Logging integration
-try:
-    from optional_integrations import cloud_logging
-except ImportError:
-    cloud_logging = None
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-class IncidentReporter:
     """
-    Reporter for agent failure incidents.
-
-    This class provides methods for logging and reporting incidents
-    when agent failures occur, with integration to Cloud Logging.
     """
-
     def __init__(self, project_id: str, log_name: str = "agent_incidents"):
         """
-        Initialize incident reporter.
-
-        Args:
-            project_id: GCP project ID
-            log_name: Name of the Cloud Logging log
         """
-        self.project_id = project_id
-        self.log_name = log_name
-
-        # Initialize Cloud Logging client
-        try:
-            self.logging_client = cloud_logging.Client(project=project_id)
-            self.logger = self.logging_client.logger(log_name)
-            self._gcp_logging_available = True
             logger.info(f"Initialized Cloud Logging client for project {project_id}")
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.warning(f"Failed to initialize Cloud Logging client: {str(e)}")
             self._gcp_logging_available = False
 
@@ -57,22 +20,7 @@ class IncidentReporter:
         severity: str = "ERROR",
     ) -> str:
         """
-        Report an incident to Cloud Logging.
-
-        Args:
-            agent_id: ID of the agent that triggered the incident
-            incident_type: Type of incident (e.g., 'agent_failure', 'circuit_trip')
-            details: Additional details about the incident
-            severity: Severity level (ERROR, WARNING, INFO, etc.)
-
-        Returns:
-            Incident ID
         """
-        # Generate incident ID
-        incident_id = str(uuid.uuid4())
-
-        # Create incident data
-        incident_data = {
             "incident_id": incident_id,
             "agent_id": agent_id,
             "incident_type": incident_type,
@@ -83,9 +31,13 @@ class IncidentReporter:
         # Try to log to Cloud Logging
         if self._gcp_logging_available:
             try:
+
+                pass
                 self.logger.log_struct(incident_data, severity=severity)
                 logger.info(f"Reported incident {incident_id} to Cloud Logging")
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Failed to report incident to Cloud Logging: {str(e)}")
                 self._fallback_logging(incident_data, severity)
         else:
@@ -102,18 +54,7 @@ class IncidentReporter:
         retry_scheduled_at: Optional[str] = None,
     ) -> str:
         """
-        Report a circuit trip incident.
-
-        Args:
-            agent_id: ID of the agent
-            failure_count: Number of consecutive failures
-            last_error: Last error message
-            retry_scheduled_at: ISO timestamp of scheduled retry
-
-        Returns:
-            Incident ID
         """
-        details = {
             "failure_count": failure_count,
             "last_error": last_error,
             "recovery": {
@@ -137,19 +78,7 @@ class IncidentReporter:
         original_error: Optional[str] = None,
     ) -> str:
         """
-        Report a fallback activation incident.
-
-        Args:
-            agent_id: ID of the original agent that failed
-            user_input: Original user input (truncated if needed)
-            fallback_agent_id: ID of the fallback agent
-            original_error: Original error message if available
-
-        Returns:
-            Incident ID
         """
-        # Truncate user input if too long
-        if len(user_input) > 200:
             truncated_input = user_input[:200] + "..."
         else:
             truncated_input = user_input
@@ -170,17 +99,7 @@ class IncidentReporter:
 
     def report_recovery(self, agent_id: str, retry_attempt: int, recovery_time_seconds: int) -> str:
         """
-        Report an agent recovery incident.
-
-        Args:
-            agent_id: ID of the agent
-            retry_attempt: Retry attempt number
-            recovery_time_seconds: Time in seconds from first failure to recovery
-
-        Returns:
-            Incident ID
         """
-        details = {
             "recovery": {
                 "retry_attempt": retry_attempt,
                 "recovery_time_seconds": recovery_time_seconds,
@@ -196,14 +115,7 @@ class IncidentReporter:
 
     def _fallback_logging(self, incident_data: Dict[str, Any], severity: str) -> None:
         """
-        Fallback to standard logging if Cloud Logging fails.
-
-        Args:
-            incident_data: Incident data
-            severity: Severity level
         """
-        # Map severity to logging level
-        level_map = {
             "DEBUG": logging.DEBUG,
             "INFO": logging.INFO,
             "WARNING": logging.WARNING,
@@ -220,21 +132,7 @@ _incident_reporter = None
 
 def get_incident_reporter() -> IncidentReporter:
     """
-    Get the global incident reporter instance.
-
-    Returns:
-        Global IncidentReporter instance
     """
-    global _incident_reporter
-
-    if _incident_reporter is None:
-        # Get GCP project ID from environment or config
-        import os
-
-        from core.orchestrator.src.config.config import get_settings
-
-        settings = get_settings()
-
         project_id = os.environ.get("VULTR_PROJECT_ID", getattr(settings, "VULTR_PROJECT_ID", "cherry-ai-project"))
 
         log_name = os.environ.get(

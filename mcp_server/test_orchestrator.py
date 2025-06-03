@@ -1,17 +1,6 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """Test script for orchestrator server functions."""
-
-import asyncio
-import sys
-import os
-
-# Add project root to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-# Import the functions we created
-from servers.orchestrator_server import get_all_agents, run_agent_task, run_workflow
-
-async def test_functions():
     """Test the orchestrator functions."""
     print("Testing Orchestrator Server Functions...\n")
 

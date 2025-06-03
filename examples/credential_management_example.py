@@ -1,36 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Example script demonstrating how to use the AI Orchestra credential management system.
-
-This script shows how to:
-1. Access secrets from Secret Manager
-2. Use service account credentials for GCP services
-3. Integrate with FastAPI
-4. Handle credential rotation
-
-Usage:
-    python credential_management_example.py
-
-Requirements:
-    - google-cloud-secret-manager
-    - google-cloud-mongodb
-    - google-cloud-aiplatform
-    - fastapi
-    - redis
 """
-
-import asyncio
-import json
-import os
-import sys
-
-# Add the project root to the Python path
-sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
-
-# Import the credential manager
-from core.security.credential_manager import get_credential_manager
-
-async def example_basic_usage():
     """Example of basic credential manager usage."""
     print("\n=== Basic Usage Example ===")
 
@@ -39,20 +10,28 @@ async def example_basic_usage():
 
     # Get a secret
     try:
+
+        pass
         # Note: This will fail if the secret doesn't exist
         api_key = credential_manager.get_secret("example-api-key")
         print(f"API Key: {api_key[:5]}...")  # Only show first 5 chars for security
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"Error getting secret: {str(e)}")
         print("Creating a mock secret for demonstration purposes...")
         api_key = "mock-api-key-12345"
 
     # Get a JSON secret
     try:
+
+        pass
         # Note: This will fail if the secret doesn't exist
         config = credential_manager.get_json_secret("example-config")
         print(f"Config: {json.dumps(config, indent=2)}")
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"Error getting JSON secret: {str(e)}")
         print("Creating a mock config for demonstration purposes...")
         config = {
@@ -78,10 +57,14 @@ async def example_gcp_services():
 
     # Get service account credentials
     try:
+
+        pass
         # Note: This will fail if the service account key doesn't exist
         vertex_credentials = credential_manager.get_service_account_key("vertex-ai-agent")
         print(f"Vertex AI Credentials: {vertex_credentials['client_email']}")
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"Error getting service account key: {str(e)}")
         print("Creating mock credentials for demonstration purposes...")
         vertex_credentials = {
@@ -115,6 +98,8 @@ async def example_memory_system():
 
     # Get Redis credentials
     try:
+
+        pass
         # Note: These will fail if the secrets don't exist
         redis_host = credential_manager.get_secret("redis-host")
         redis_port = credential_manager.get_secret("redis-port")
@@ -123,19 +108,25 @@ async def example_memory_system():
         print(f"Redis Host: {redis_host}")
         print(f"Redis Port: {redis_port}")
         print(f"Redis Password: {'*' * len(redis_password)}")  # Don't print actual password
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"Error getting Redis credentials: {str(e)}")
         print("Creating mock Redis credentials for demonstration purposes...")
         redis_host = "redis-12345.c123.us-central1-1.gce.cloud.redislabs.com"
         redis_port = "12345"
-        redis_password = "mock-password"
+        redis_os.getenv("API_KEY")
 
     # Get mongodb credentials
     try:
+
+        pass
         # Note: This will fail if the service account key doesn't exist
         firestore_credentials = credential_manager.get_service_account_key("memory-system")
         print(f"\nFirestore Credentials: {firestore_credentials['client_email']}")
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"\nError getting mongodb credentials: {str(e)}")
         print("Creating mock mongodb credentials for demonstration purposes...")
         firestore_credentials = {
@@ -223,20 +214,28 @@ async def example_credential_rotation():
 
     # Get a secret (this will be cached)
     try:
+
+        pass
         # Note: This will fail if the secret doesn't exist
         api_key = credential_manager.get_secret("example-api-key")
         print(f"   API Key: {api_key[:5]}...")  # Only show first 5 chars for security
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"   Error getting secret: {str(e)}")
         print("   Creating a mock secret for demonstration purposes...")
         api_key = "mock-api-key-12345"
 
     print("\n2. Second access (cached credential):")
     try:
+
+        pass
         # This should use the cached value
         api_key = credential_manager.get_secret("example-api-key")
         print(f"   API Key: {api_key[:5]}...")
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"   Error getting secret: {str(e)}")
         api_key = "mock-api-key-12345"
 
@@ -247,10 +246,14 @@ async def example_credential_rotation():
     # In a real scenario, the credential would have been rotated in Secret Manager
     # Here we're just simulating by clearing the cache
     try:
+
+        pass
         # This should fetch the new value
         api_key = credential_manager.get_secret("example-api-key")
         print(f"   API Key: {api_key[:5]}...")
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"   Error getting secret: {str(e)}")
         api_key = "mock-api-key-67890"  # Simulate a new key
         print(f"   API Key: {api_key[:5]}...")

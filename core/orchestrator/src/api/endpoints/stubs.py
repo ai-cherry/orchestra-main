@@ -1,18 +1,5 @@
 """
-Stub endpoints to prevent frontend crashes.
-These return empty data structures that match what the frontend expects.
 """
-
-from typing import List, Dict, Any
-from fastapi import APIRouter, Query
-from pydantic import BaseModel
-
-router = APIRouter()
-
-class Agent(BaseModel):
-    id: str
-    name: str
-    type: str
     status: str = "active"
     created_at: str
     updated_at: str
@@ -43,16 +30,12 @@ async def get_agents(
     status: str = Query(None)
 ):
     """Return empty list of agents to prevent frontend crash."""
-    return []
-
 @router.get("/personas", response_model=List[Persona])
 async def get_personas(
     limit: int = Query(10, ge=1, le=100),
     offset: int = Query(0, ge=0)
 ):
     """Return empty list of personas to prevent frontend crash."""
-    return []
-
 @router.get("/workflows", response_model=List[Workflow])
 async def get_workflows(
     limit: int = Query(10, ge=1, le=100),
@@ -60,23 +43,15 @@ async def get_workflows(
     status: str = Query(None)
 ):
     """Return empty list of workflows to prevent frontend crash."""
-    return []
-
 @router.get("/integrations")
 async def get_integrations():
     """Return empty list of integrations to prevent frontend crash."""
-    return []
-
 @router.get("/resources")
 async def get_resources():
     """Return empty list of resources to prevent frontend crash."""
-    return []
-
 @router.get("/logs")
 async def get_logs(limit: int = Query(50, ge=1, le=1000)):
     """Return empty list of logs to prevent frontend crash."""
-    return []
-
 @router.get("/query")
 async def query_endpoint():
     """Return empty query response to prevent frontend crash."""

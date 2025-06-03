@@ -1,20 +1,7 @@
 #!/usr/bin/env python3
 """
-Architecture Analyzer for Orchestra AI System
-Analyzes modularity, domain separation, and infrastructure scalability
 """
-
-import os
-import json
-import re
-from pathlib import Path
-from collections import defaultdict
-from datetime import datetime
-
-class ArchitectureAnalyzer:
     """Comprehensive architecture analysis tool"""
-    
-    def __init__(self):
         self.base_dir = Path("/root/orchestra-main")
         self.domains = ["Personal", "PayReady", "ParagonRX"]
         self.analysis_results = {
@@ -75,7 +62,8 @@ class ArchitectureAnalyzer:
         domain_files = defaultdict(list)
         cross_domain_dependencies = []
         
-        # Scan for domain-specific files
+        # Scan # TODO: Consider using list comprehension for better performance
+ for domain-specific files
         for root, dirs, files in os.walk(self.base_dir):
             for file in files:
                 if file.endswith(('.py', '.ts', '.js')):
@@ -93,6 +81,8 @@ class ArchitectureAnalyzer:
                     # Check for cross-domain imports
                     if file_domain and file_path.suffix == '.py':
                         try:
+
+                            pass
                             with open(file_path, 'r') as f:
                                 content = f.read()
                                 for other_domain in self.domains:
@@ -102,7 +92,9 @@ class ArchitectureAnalyzer:
                                             "from_domain": file_domain,
                                             "references": other_domain
                                         })
-                        except:
+                        except Exception:
+
+                            pass
                             pass
         
         # Analyze results
@@ -208,6 +200,8 @@ class ArchitectureAnalyzer:
                 if file.endswith(('.py', '.ts', '.js', '.yaml', '.json')):
                     file_path = Path(root) / file
                     try:
+
+                        pass
                         with open(file_path, 'r') as f:
                             content = f.read().lower()
                             
@@ -221,7 +215,9 @@ class ArchitectureAnalyzer:
                                 integration_patterns["event_bus"] = True
                             if 'plugin' in content or 'extension' in content:
                                 integration_patterns["plugin_system"] = True
-                    except:
+                    except Exception:
+
+                        pass
                         pass
         
         integration_score = sum(integration_patterns.values()) * 20
@@ -250,53 +246,28 @@ class ArchitectureAnalyzer:
                 "category": "Domain Separation",
                 "action": "Create dedicated directory structure for each domain",
                 "implementation": """
-mkdir -p domains/{Personal,PayReady,ParagonRX}/{services,models,api,config}
                 """
-            })
-        
-        # Modularity recommendations
         if self.analysis_results["modularity_score"] < 70:
             recommendations.append({
                 "priority": "HIGH",
                 "category": "Modularity",
                 "action": "Implement a modular architecture pattern",
                 "implementation": """
-mkdir -p {core,shared,services,infrastructure,config}
-mv ai_components services/
-mv config/* config/
                 """
-            })
-        
-        # Infrastructure recommendations
         if self.analysis_results["infrastructure_flexibility"]["score"] < 75:
             recommendations.append({
                 "priority": "MEDIUM",
                 "category": "Infrastructure",
                 "action": "Enhance infrastructure flexibility",
                 "implementation": """
-# Create environment-specific configs
-touch config/{development,staging,production}.yaml
-# Add service discovery
-touch infrastructure/service-registry.yaml
                 """
-            })
-        
-        # Integration recommendations
         if self.analysis_results["service_integration"]["score"] < 60:
             recommendations.append({
                 "priority": "MEDIUM",
                 "category": "Integration",
                 "action": "Implement service integration patterns",
                 "implementation": """
-# Create API Gateway
-touch services/gateway/api_gateway.py
-# Add event bus
-touch core/event_bus.py
-# Create plugin system
-mkdir -p plugins/{interfaces,loaders}
                 """
-            })
-        
         self.analysis_results["recommendations"] = recommendations
         
         for rec in recommendations:

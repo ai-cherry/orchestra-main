@@ -1,77 +1,18 @@
 """
-Enhanced Connection Manager for PostgreSQL with pool extensions.
-
-This module extends the original PostgreSQLConnectionManager with missing
-pool-related methods through composition.
 """
-
-import logging
-from typing import Optional, Dict, Any
-
-# Import the original class
-from .connection_manager import PostgreSQLConnectionManager, get_connection_manager, close_connection_manager
-
-# Import pool extensions
-from .extensions.pool_extensions import PoolExtensionsMixin
-
-logger = logging.getLogger(__name__)
-
-class PostgreSQLConnectionManagerEnhanced(PostgreSQLConnectionManager, PoolExtensionsMixin):
     """
-    Enhanced connection manager that includes all missing pool methods.
-
-    This class extends the original PostgreSQLConnectionManager with the
-    PoolExtensionsMixin that provides:
-    - get_pool_stats: Get detailed connection pool statistics
-    - get_extended_pool_stats: Get comprehensive pool and performance metrics
-    - adjust_pool_size: Dynamically adjust pool configuration
-    - get_connection_diagnostics: Detailed diagnostics for troubleshooting
-    - terminate_idle_connections: Clean up idle connections
-    - get_pool_recommendations: Get optimization recommendations
-
-    The enhancement maintains full backward compatibility.
     """
-
-    def __init__(self):
         """Initialize enhanced connection manager."""
-        super().__init__()
         logger.info("Initialized PostgreSQLConnectionManagerEnhanced with pool extensions")
 
     async def initialize(self) -> None:
         """
-        Initialize the enhanced connection pool.
-
-        Extends the base initialization with additional monitoring setup.
         """
-        await super().initialize()
-
-        # Log initial pool configuration
-        initial_stats = await self.get_pool_stats()
         logger.info(f"Pool initialized with stats: {initial_stats}")
 
     async def health_check(self) -> Dict[str, Any]:
         """
-        Enhanced health check with additional pool metrics.
-
-        Extends the base health check to include comprehensive pool statistics
-        and recommendations.
-
-        Returns:
-            Dictionary with enhanced health information
         """
-        try:
-            # Get base health check
-            base_health = await super().health_check()
-
-            # Add extended pool statistics
-            extended_stats = await self.get_extended_pool_stats()
-
-            # Add recommendations
-            recommendations = await self.get_pool_recommendations()
-
-            # Combine all health information
-            return {
-                **base_health,
                 "extended_pool_stats": extended_stats,
                 "recommendations": recommendations["recommendations"],
                 "pool_health_summary": {
@@ -82,7 +23,10 @@ class PostgreSQLConnectionManagerEnhanced(PostgreSQLConnectionManager, PoolExten
                 },
             }
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Enhanced health check failed: {e}")
             return {
                 "status": "unhealthy",
@@ -94,17 +38,7 @@ class PostgreSQLConnectionManagerEnhanced(PostgreSQLConnectionManager, PoolExten
 
     def _calculate_health_score(self, stats: Dict[str, Any]) -> float:
         """
-        Calculate overall health score from 0 to 1.
-
-        Args:
-            stats: Extended pool statistics
-
-        Returns:
-            Health score between 0 (unhealthy) and 1 (healthy)
         """
-        score = 1.0
-
-        # Penalize high utilization
         utilization = stats["derived_metrics"]["pool_utilization"]
         if utilization > 0.9:
             score -= 0.3
@@ -130,18 +64,7 @@ class PostgreSQLConnectionManagerEnhanced(PostgreSQLConnectionManager, PoolExten
 
     async def auto_tune_pool(self) -> Dict[str, Any]:
         """
-        Automatically tune pool settings based on usage patterns.
-
-        Analyzes current usage and applies recommended settings.
-
-        Returns:
-            Dictionary with tuning results
         """
-        try:
-            # Get recommendations
-            recommendations = await self.get_pool_recommendations()
-
-            # Check if adjustment is needed
             current = recommendations["current_config"]
             suggested = recommendations["suggested_config"]
 
@@ -168,25 +91,16 @@ class PostgreSQLConnectionManagerEnhanced(PostgreSQLConnectionManager, PoolExten
                 "message": "Configuration updated for next pool initialization",
             }
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Auto-tune pool failed: {e}")
             return {"adjusted": False, "error": str(e)}
 
     async def get_monitoring_dashboard_data(self) -> Dict[str, Any]:
         """
-        Get all data needed for a monitoring dashboard.
-
-        Returns:
-            Dictionary with comprehensive monitoring data
         """
-        try:
-            # Gather all monitoring data
-            pool_stats = await self.get_pool_stats()
-            extended_stats = await self.get_extended_pool_stats()
-            diagnostics = await self.get_connection_diagnostics()
-            recommendations = await self.get_pool_recommendations()
-
-            # Calculate trend indicators
             utilization = extended_stats["derived_metrics"]["pool_utilization"]
             utilization_status = "critical" if utilization > 0.9 else "warning" if utilization > 0.7 else "healthy"
 
@@ -214,7 +128,10 @@ class PostgreSQLConnectionManagerEnhanced(PostgreSQLConnectionManager, PoolExten
                 "alerts": self._generate_alerts(extended_stats, diagnostics),
             }
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error getting monitoring dashboard data: {e}")
             return {
                 "timestamp": datetime.utcnow().isoformat(),
@@ -230,8 +147,6 @@ class PostgreSQLConnectionManagerEnhanced(PostgreSQLConnectionManager, PoolExten
 
     def _generate_alerts(self, stats: Dict[str, Any], diagnostics: Dict[str, Any]) -> List[Dict[str, str]]:
         """Generate alerts based on current metrics."""
-        alerts = []
-
         if stats["health_indicators"]["pool_exhausted"]:
             alerts.append(
                 {
@@ -275,26 +190,5 @@ _connection_manager_enhanced: Optional[PostgreSQLConnectionManagerEnhanced] = No
 
 async def get_connection_manager_enhanced() -> PostgreSQLConnectionManagerEnhanced:
     """
-    Get or create the global enhanced connection manager.
-
-    This is a drop-in replacement for get_connection_manager() that includes
-    all missing pool methods through mixins.
-
-    Returns:
-        Enhanced connection manager instance
     """
-    global _connection_manager_enhanced
-    if _connection_manager_enhanced is None:
-        _connection_manager_enhanced = PostgreSQLConnectionManagerEnhanced()
-        await _connection_manager_enhanced.initialize()
-    return _connection_manager_enhanced
-
-async def close_connection_manager_enhanced() -> None:
     """Close the global enhanced connection manager."""
-    global _connection_manager_enhanced
-    if _connection_manager_enhanced:
-        await _connection_manager_enhanced.close()
-        _connection_manager_enhanced = None
-
-# Import datetime for monitoring methods
-from datetime import datetime

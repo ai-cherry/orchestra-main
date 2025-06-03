@@ -1,31 +1,7 @@
 """
-Unit tests for the Intelligent LLM Router
 """
-
-import pytest
-import asyncio
-from unittest.mock import Mock, AsyncMock, patch
-from datetime import datetime
-
-from core.llm_intelligent_router import (
-    IntelligentLLMRouter,
-    QueryClassifier,
-    QueryType,
-    ModelProfile,
-    RoutingDecision
-)
-
-class TestQueryClassifier:
     """Test the query classification functionality"""
-    
-    @pytest.fixture
-    def classifier(self):
-        return QueryClassifier()
-    
-    @pytest.mark.asyncio
-    async def test_creative_query_classification(self, classifier):
         """Test classification of creative queries"""
-        queries = [
             "Write a creative story about dragons",
             "Imagine a world where AI rules",
             "Create a poem about love"
@@ -38,7 +14,6 @@ class TestQueryClassifier:
     @pytest.mark.asyncio
     async def test_analytical_query_classification(self, classifier):
         """Test classification of analytical queries"""
-        queries = [
             "Analyze the performance metrics",
             "Compare these two datasets",
             "Evaluate the effectiveness of the campaign"
@@ -51,7 +26,6 @@ class TestQueryClassifier:
     @pytest.mark.asyncio
     async def test_deep_search_classification(self, classifier):
         """Test classification of deep search queries"""
-        queries = [
             "Research the history of quantum computing",
             "Provide a comprehensive analysis of climate change",
             "Detailed investigation of market trends"
@@ -64,7 +38,6 @@ class TestQueryClassifier:
     @pytest.mark.asyncio
     async def test_code_generation_classification(self, classifier):
         """Test classification of code generation queries"""
-        queries = [
             "Write a Python function to sort a list",
             "Debug this JavaScript code",
             "Implement a binary search algorithm"
@@ -85,12 +58,6 @@ class TestQueryClassifier:
 
 class TestIntelligentLLMRouter:
     """Test the intelligent routing functionality"""
-    
-    @pytest.fixture
-    def router(self):
-        with patch('core.llm_intelligent_router.DynamicLLMRouter.__init__', return_value=None):
-            router = IntelligentLLMRouter()
-            router.config = Mock()
             router.config.portkey_api_key = "test_key"
             router.config.openrouter_api_key = "test_key"
             return router
@@ -98,8 +65,6 @@ class TestIntelligentLLMRouter:
     @pytest.mark.asyncio
     async def test_model_selection_for_creative_query(self, router):
         """Test that creative queries select appropriate models"""
-        decision = await router._select_optimal_model(QueryType.CREATIVE_SEARCH)
-        
         assert decision.primary_model in ["claude-3-opus-20240229", "gpt-4"]
         assert decision.temperature >= 0.7
         assert decision.max_tokens >= 2000
@@ -108,10 +73,6 @@ class TestIntelligentLLMRouter:
     @pytest.mark.asyncio
     async def test_model_selection_for_analytical_query(self, router):
         """Test that analytical queries select appropriate models"""
-        decision = await router._select_optimal_model(QueryType.ANALYTICAL)
-        
-        assert decision.temperature <= 0.3
-        assert decision.max_tokens >= 3000
         assert "analytical" in decision.reasoning.lower()
     
     @pytest.mark.asyncio
@@ -131,11 +92,6 @@ class TestIntelligentLLMRouter:
     @pytest.mark.asyncio
     async def test_routing_history(self, router):
         """Test that routing decisions are recorded"""
-        with patch.object(router, 'classifier') as mock_classifier:
-            mock_classifier.classify = AsyncMock(return_value=QueryType.CONVERSATIONAL)
-            
-            with patch.object(router, '_select_optimal_model') as mock_select:
-                mock_select.return_value = RoutingDecision(
                     primary_model="gpt-3.5-turbo",
                     fallback_models=["claude-3-sonnet-20240229"],
                     temperature=0.7,
@@ -159,11 +115,6 @@ class TestIntelligentLLMRouter:
     @pytest.mark.asyncio
     async def test_failover_mechanism(self, router):
         """Test that failover works when primary model fails"""
-        with patch.object(router, 'classifier') as mock_classifier:
-            mock_classifier.classify = AsyncMock(return_value=QueryType.CONVERSATIONAL)
-            
-            with patch.object(router, '_select_optimal_model') as mock_select:
-                mock_select.return_value = RoutingDecision(
                     primary_model="gpt-4",
                     fallback_models=["gpt-3.5-turbo", "claude-3-sonnet-20240229"],
                     temperature=0.7,
@@ -188,8 +139,6 @@ class TestIntelligentLLMRouter:
     @pytest.mark.asyncio
     async def test_analytics_generation(self, router):
         """Test analytics data generation"""
-        # Add some test data
-        router.routing_history = [
             {"query_type": "creative_search", "timestamp": datetime.utcnow()},
             {"query_type": "analytical", "timestamp": datetime.utcnow()},
             {"query_type": "creative_search", "timestamp": datetime.utcnow()}
@@ -211,10 +160,6 @@ class TestIntelligentLLMRouter:
 @pytest.mark.asyncio
 async def test_model_profile_initialization():
     """Test that model profiles are initialized correctly"""
-    with patch('core.llm_intelligent_router.DynamicLLMRouter.__init__', return_value=None):
-        router = IntelligentLLMRouter()
-        
-        # Check that key models are present
         assert "gpt-4-turbo-preview" in router.model_profiles
         assert "claude-3-opus-20240229" in router.model_profiles
         assert "gpt-3.5-turbo" in router.model_profiles

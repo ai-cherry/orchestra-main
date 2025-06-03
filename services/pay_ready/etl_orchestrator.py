@@ -1,33 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 """
-Pay Ready ETL Orchestrator
-=========================
-
-Orchestrates ETL operations for the Pay Ready domain, managing data ingestion
-from Gong, Slack, HubSpot, and Salesforce through Airbyte Cloud.
 """
-
-import asyncio
-import os
-from typing import Dict, List, Optional, Any, Tuple
-from datetime import datetime, timedelta
-import logging
-from enum import Enum
-import json
-
-import aiohttp
-from prefect import task, flow
-from prefect.task_runners import ConcurrentTaskRunner
-
-from shared.database.unified_postgresql_enhanced import get_unified_postgresql_enhanced
-from services.weaviate_service import WeaviateService, WeaviateConfig
-from .entity_resolver import PayReadyEntityResolver
-from .memory_manager import PayReadyMemoryManager
-
-logger = logging.getLogger(__name__)
-
-class SourceType(Enum):
     """Supported data source types"""
-
     GONG = "gong"
     SLACK = "slack"
     HUBSPOT = "hubspot"
@@ -35,7 +9,6 @@ class SourceType(Enum):
 
 class SyncStatus(Enum):
     """Sync job status"""
-
     PENDING = "pending"
     RUNNING = "running"
     SUCCEEDED = "succeeded"
@@ -43,17 +16,7 @@ class SyncStatus(Enum):
 
 class PayReadyETLOrchestrator:
     """
-    Orchestrates ETL operations for Pay Ready domain.
-
-    This class manages:
-    - Airbyte sync triggering and monitoring
-    - Data processing and transformation
-    - Entity resolution
-    - Vector storage in Weaviate
-    - Checkpoint management
     """
-
-    def __init__(self):
         self.domain = "pay_ready"
         self.postgres = None
         self.weaviate = None
@@ -64,9 +27,6 @@ class PayReadyETLOrchestrator:
 
     async def initialize(self):
         """Initialize all required connections and services"""
-        if self._initialized:
-            return
-
         logger.info("Initializing Pay Ready ETL Orchestrator")
 
         # Initialize database connection
@@ -95,7 +55,6 @@ class PayReadyETLOrchestrator:
 
     async def _init_airbyte_client(self) -> "AirbyteClient":
         """Initialize Airbyte Cloud API client"""
-        return AirbyteClient(
             client_id=os.getenv("AIRBYTE_CLIENT_ID"),
             client_secret=os.getenv("AIRBYTE_CLIENT_SECRET"),
             api_url=os.getenv("AIRBYTE_API_URL", "https://api.airbyte.com/v1"),
@@ -104,13 +63,6 @@ class PayReadyETLOrchestrator:
     @task(retries=3, retry_delay_seconds=60)
     async def trigger_airbyte_sync(self, source_type: SourceType) -> str:
         """
-        Trigger Airbyte sync for a specific source.
-
-        Args:
-            source_type: The type of source to sync
-
-        Returns:
-            Job ID for the sync operation
         """
         logger.info(f"Triggering Airbyte sync for {source_type.value}")
 
@@ -130,34 +82,19 @@ class PayReadyETLOrchestrator:
 
     async def _get_connection_id(self, source_type: SourceType) -> Optional[str]:
         """Get Airbyte connection ID for a source type"""
-        result = await self.postgres.fetchrow(
             """
-            SELECT connection_id 
-            FROM pay_ready.data_sources 
-            WHERE source_type = $1
-        """,
-            source_type.value,
-        )
-
+        """
         return result["connection_id"] if result else None
 
     async def _update_sync_state(
         self, source_type: SourceType, job_id: str, status: SyncStatus, checkpoint_data: Optional[Dict] = None
     ):
         """Update sync state in database"""
-        checkpoint = checkpoint_data or {}
         checkpoint.update({"job_id": job_id, "status": status.value, "updated_at": datetime.utcnow().isoformat()})
 
         await self.postgres.execute_raw(
             """
-            INSERT INTO pay_ready.sync_state (source_type, stream_name, checkpoint_data)
-            VALUES ($1, $2, $3)
-            ON CONFLICT (source_type, stream_name) 
-            DO UPDATE SET 
-                checkpoint_data = $3,
-                updated_at = CURRENT_TIMESTAMP
-        """,
-            source_type.value,
+        """
             f"{source_type.value}_sync",
             json.dumps(checkpoint),
         )
@@ -165,21 +102,7 @@ class PayReadyETLOrchestrator:
     @task(retries=5, retry_delay_seconds=30)
     async def wait_for_sync(self, job_id: str, timeout_minutes: int = 60) -> bool:
         """
-        Wait for Airbyte sync to complete.
-
-        Args:
-            job_id: The sync job ID
-            timeout_minutes: Maximum time to wait
-
-        Returns:
-            True if sync succeeded, False otherwise
         """
-        start_time = datetime.utcnow()
-        timeout = timedelta(minutes=timeout_minutes)
-
-        while datetime.utcnow() - start_time < timeout:
-            status = await self.airbyte_client.get_job_status(job_id)
-
             if status == "succeeded":
                 logger.info(f"Sync job {job_id} completed successfully")
                 return True
@@ -199,14 +122,6 @@ class PayReadyETLOrchestrator:
     @task
     async def process_new_data(self, source_type: SourceType, batch_size: int = 100) -> int:
         """
-        Process new data from a source.
-
-        Args:
-            source_type: The source to process data from
-            batch_size: Number of records to process in each batch
-
-        Returns:
-            Number of records processed
         """
         logger.info(f"Processing new data from {source_type.value}")
 
@@ -242,13 +157,8 @@ class PayReadyETLOrchestrator:
 
     async def _get_last_processed(self, source_type: SourceType) -> Optional[Dict]:
         """Get last processed checkpoint for a source"""
-        result = await self.postgres.fetchrow(
             """
-            SELECT last_processed_timestamp, last_processed_id, checkpoint_data
-            FROM pay_ready.sync_state
-            WHERE source_type = $1 AND stream_name = $2
-        """,
-            source_type.value,
+        """
             f"{source_type.value}_processing",
         )
 
@@ -264,8 +174,6 @@ class PayReadyETLOrchestrator:
         self, source_type: SourceType, last_processed: Optional[Dict], batch_size: int
     ) -> List[Dict]:
         """Fetch new records from PostgreSQL staging tables"""
-        # Build query based on source type
-        table_map = {
             SourceType.SLACK: "airbyte_slack_messages",
             SourceType.GONG: "airbyte_gong_calls",
             SourceType.HUBSPOT: "airbyte_hubspot_engagements",
@@ -289,20 +197,8 @@ class PayReadyETLOrchestrator:
                 params.append(last_processed["id"])
 
         query = f"""
-            SELECT * FROM {table}
-            {where_clause}
-            ORDER BY created_at ASC
-            LIMIT $1
         """
-
-        rows = await self.postgres.fetch_raw(query, *params)
-        return [dict(row) for row in rows]
-
-    async def _process_slack_messages(self, messages: List[Dict]):
         """Process Slack messages"""
-        for msg in messages:
-            # Resolve user to unified person ID
-            unified_person_id = await self.entity_resolver.resolve_person(
                 name=msg.get("user_name"), source_system="slack", source_id=msg.get("user_id")
             )
 
@@ -327,8 +223,6 @@ class PayReadyETLOrchestrator:
 
     async def _process_gong_calls(self, calls: List[Dict]):
         """Process Gong call transcripts"""
-        for call in calls:
-            # Chunk transcript
             transcript = call.get("transcript", "")
             if not transcript:
                 continue
@@ -369,21 +263,7 @@ class PayReadyETLOrchestrator:
 
     def _chunk_transcript(self, transcript: str, speakers: List[Dict], chunk_size: int = 500) -> List[Dict]:
         """
-        Chunk transcript into segments.
-
-        Args:
-            transcript: Full transcript text
-            speakers: List of speaker information
-            chunk_size: Target size for each chunk in words
-
-        Returns:
-            List of transcript segments
         """
-        segments = []
-
-        # Simple implementation - can be enhanced with speaker detection
-        words = transcript.split()
-        current_chunk = []
         current_speaker = "Unknown"
 
         for i, word in enumerate(words):
@@ -415,9 +295,6 @@ class PayReadyETLOrchestrator:
 
     async def _process_hubspot_notes(self, notes: List[Dict]):
         """Process HubSpot notes"""
-        for note in notes:
-            # Resolve associated contact
-            unified_person_id = None
             if note.get("contact_id"):
                 unified_person_id = await self.entity_resolver.resolve_person(
                     source_system="hubspot", source_id=note["contact_id"]
@@ -439,8 +316,6 @@ class PayReadyETLOrchestrator:
 
     async def _process_salesforce_records(self, records: List[Dict]):
         """Process Salesforce records"""
-        for record in records:
-            # Determine record type and process accordingly
             if record.get("type") == "Task" and record.get("description"):
                 # Process task descriptions
                 unified_person_id = await self.entity_resolver.resolve_person(
@@ -467,24 +342,9 @@ class PayReadyETLOrchestrator:
 
     async def _extract_company_from_text(self, text: str) -> Optional[str]:
         """Extract company mentions from text using NER or pattern matching"""
-        # Simple implementation - can be enhanced with NLP
-        # For now, return None and let entity resolver handle it
-        return None
-
-    async def _update_checkpoint(self, source_type: SourceType, last_record: Dict):
         """Update processing checkpoint"""
-        await self.postgres.execute_raw(
             """
-            INSERT INTO pay_ready.sync_state 
-            (source_type, stream_name, last_processed_timestamp, last_processed_id)
-            VALUES ($1, $2, $3, $4)
-            ON CONFLICT (source_type, stream_name) 
-            DO UPDATE SET 
-                last_processed_timestamp = $3,
-                last_processed_id = $4,
-                updated_at = CURRENT_TIMESTAMP
-        """,
-            source_type.value,
+        """
             f"{source_type.value}_processing",
             last_record.get("created_at"),
             last_record.get("id"),
@@ -505,44 +365,10 @@ class PayReadyETLOrchestrator:
         # Update interaction counts
         await self.postgres.execute_raw(
             """
-            INSERT INTO pay_ready.analytics_cache (metric_name, metric_value, updated_at)
-            SELECT 
-                source_type || '_count' as metric_name,
-                COUNT(*) as metric_value,
-                CURRENT_TIMESTAMP as updated_at
-            FROM pay_ready.interactions
-            GROUP BY source_type
-            ON CONFLICT (metric_name) 
-            DO UPDATE SET 
-                metric_value = EXCLUDED.metric_value,
-                updated_at = EXCLUDED.updated_at
         """
-        )
-
-        # Cache recent interactions
-        await self.memory_manager.warm_cache()
-
-class AirbyteClient:
     """Client for Airbyte Cloud API"""
-
-    def __init__(self, client_id: str, client_secret: str, api_url: str):
-        self.client_id = client_id
-        self.client_secret = client_secret
-        self.api_url = api_url
-        self.session = None
-        self.token = None
-
-    async def _ensure_session(self):
         """Ensure we have an active session with auth token"""
-        if not self.session:
-            self.session = aiohttp.ClientSession()
-
-        if not self.token:
-            await self._authenticate()
-
-    async def _authenticate(self):
         """Authenticate with Airbyte Cloud"""
-        async with self.session.post(
             f"{self.api_url}/auth/token",
             json={"client_id": self.client_id, "client_secret": self.client_secret, "grant_type": "client_credentials"},
         ) as resp:
@@ -551,8 +377,6 @@ class AirbyteClient:
 
     async def trigger_sync(self, connection_id: str) -> str:
         """Trigger a sync for a connection"""
-        await self._ensure_session()
-
         headers = {"Authorization": f"Bearer {self.token}"}
         async with self.session.post(f"{self.api_url}/connections/{connection_id}/sync", headers=headers) as resp:
             data = await resp.json()
@@ -560,8 +384,6 @@ class AirbyteClient:
 
     async def get_job_status(self, job_id: str) -> str:
         """Get status of a sync job"""
-        await self._ensure_session()
-
         headers = {"Authorization": f"Bearer {self.token}"}
         async with self.session.get(f"{self.api_url}/jobs/{job_id}", headers=headers) as resp:
             data = await resp.json()
@@ -569,5 +391,3 @@ class AirbyteClient:
 
     async def close(self):
         """Close the session"""
-        if self.session:
-            await self.session.close()

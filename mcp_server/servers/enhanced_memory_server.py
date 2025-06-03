@@ -1,52 +1,8 @@
 """
-Enhanced Memory MCP Server with improved performance, caching, and error handling.
-Uses PostgreSQL and Weaviate with connection pooling and batch processing.
 """
-
-import asyncio
-import os
-import sys
-import json
-import uuid
-import hashlib
-import time
-from typing import Any, Dict, List, Optional, Tuple
-from datetime import datetime, timedelta, timezone
-from collections import OrderedDict
-import numpy as np
-
-# Add project root to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
-from mcp.types import TextContent, Tool
-from mcp_server.base.enhanced_server_base import EnhancedMCPServerBase, logger
-from shared.database import UnifiedDatabase
-from ai_components.orchestration.intelligent_cache import get_cache as get_intelligent_cache, CacheType as IntelligentCacheType
-
-class VectorBatchProcessor:
     """Process vectors in batches to optimize memory usage"""
-
-    def __init__(self, batch_size: int = 100):
-        self.batch_size = batch_size
-
-    async def process_vectors_in_batches(self, vectors: List[Dict[str, Any]], process_func: callable) -> List[Any]:
         """Process large vector arrays in memory-efficient batches"""
-        results = []
-
-        for i in range(0, len(vectors), self.batch_size):
-            batch = vectors[i : i + self.batch_size]
-            batch_results = await process_func(batch)
-            results.extend(batch_results)
-
-            # Allow garbage collection between batches
-            await asyncio.sleep(0)
-
-        return results
-
-class EnhancedMemoryServer(EnhancedMCPServerBase):
     """Enhanced MCP server for all memory management tasks"""
-
-    def __init__(self):
         super().__init__("enhanced_memory_orchestrator", "3.0.0")
 
         # Initialize components
@@ -60,8 +16,6 @@ class EnhancedMemoryServer(EnhancedMCPServerBase):
 
     async def initialize(self):
         """Initialize server resources. Called by EnhancedMCPServerBase.run()"""
-        self.db = UnifiedDatabase()
-        postgres_dsn = (
             f"postgresql://{os.getenv('POSTGRES_USER', 'postgres')}:"
             f"{os.getenv('POSTGRES_PASSWORD', '')}@"
             f"{os.getenv('POSTGRES_HOST', 'localhost')}:"
@@ -84,8 +38,6 @@ class EnhancedMemoryServer(EnhancedMCPServerBase):
 
     async def get_custom_tools(self) -> List[Tool]:
         """Get memory server specific tools"""
-        tools = [
-            {
                 "name": "store_memory_batch",
                 "description": "Store multiple memories in batch for better performance",
                 "inputSchema": {
@@ -298,12 +250,6 @@ class EnhancedMemoryServer(EnhancedMCPServerBase):
 
     async def handle_custom_tool(self, name: str, arguments: Dict[str, Any]) -> List[TextContent]:
         """Handle memory server specific tool calls"""
-        self.request_count += 1
-        try:
-            result = await self.execute_with_retry(self._handle_tool_internal, name, arguments)
-            return result
-        except Exception as e:
-            self.error_count += 1
             logger.error(f"Error executing tool {name}: {e}", exc_info=True)
             return [TextContent(type="text", text=f"❌ Error executing {name}: {str(e)}")]
 
@@ -384,9 +330,13 @@ class EnhancedMemoryServer(EnhancedMCPServerBase):
                         invalidated_count += await self.intelligent_cache.invalidate_pattern(pattern=f"", cache_type=ct)
                 else:
                     try:
+
+                        pass
                         ct_enum = IntelligentCacheType(cache_type_str)
                         invalidated_count = await self.intelligent_cache.invalidate_pattern(pattern=f"", cache_type=ct_enum)
-                    except ValueError:
+                    except Exception:
+
+                        pass
                         return [TextContent(type="text", text=f"❌ Invalid cache_type: {cache_type_str}")]
             return [TextContent(type="text", text=f"✅ Cleared {invalidated_count} entries from {cache_type_str} intelligent cache(s)")]
 
@@ -504,7 +454,8 @@ class EnhancedMemoryServer(EnhancedMCPServerBase):
             return [TextContent(type="text", text=f"✅ Session created: {session_id}, Expires: {expires_at.isoformat()}")]
 
         elif name == "get_session":
-            session_rows = await self.db.execute_query(
+            session_rows = await self.db.# TODO: Consider adding EXPLAIN ANALYZE for performance
+execute_query(
                 "SELECT session_id, user_id, agent_id, created_at, expires_at, metadata FROM sessions WHERE session_id = $1",
                 [arguments["session_id"]]
             )
@@ -573,6 +524,8 @@ class EnhancedMemoryServer(EnhancedMCPServerBase):
         batch_results = []
         for memory in memories_batch:
             try:
+
+                pass
                 vector_class_name = memory.get("vector_class_name", f"AgentMemory_{memory['agent_id']}")
                 memory_data = {
                     "agent_id": memory["agent_id"],
@@ -590,7 +543,9 @@ class EnhancedMemoryServer(EnhancedMCPServerBase):
                 batch_results.append({"success": True, "id": memory_id})
                 if self.intelligent_cache:
                     await self.intelligent_cache.invalidate_pattern(pattern=memory["agent_id"]) 
-            except Exception as e:
+            except Exception:
+ 
+                pass
                 logger.error(f"Failed to store memory item in batch: {e}")
                 batch_results.append({"success": False, "error": str(e)})
         return batch_results
@@ -625,13 +580,6 @@ class EnhancedMemoryServer(EnhancedMCPServerBase):
 
     async def cleanup(self):
         """Cleanup resources on shutdown, including database pool from base class."""
-        if self.db:
-            await self.db.close()
-        await super().cleanup() # Call base class cleanup for its connection_pool
-
-# Note: The main execution block from EnhancedMCPServerBase would typically run this server.
-# If this server is run directly, it would need its own asyncio.run() block.
-# Example for direct execution (if needed):
 # if __name__ == "__main__":
 #     server = EnhancedMemoryServer()
 #     asyncio.run(server.run()) # `run` is from EnhancedMCPServerBase

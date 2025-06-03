@@ -1,36 +1,6 @@
 #!/usr/bin/env python3
 """
-LiteLLM Integration Example for Orchestra
------------------------------------------
-
-This script demonstrates how to use LiteLLM in the Orchestra environment,
-with best practices for:
-- Model provider abstraction
-- Fallback handling
-- Caching
-- Cost monitoring
-- Integration with Portkey and OpenRouter (if available)
-
-Usage:
-  python -m examples.litellm_integration
-
-Environment variables:
-  AZURE_API_BASE: Base URL for Azure OpenAI
-  AZURE_API_KEY: API key for Azure OpenAI
-  ANTHROPIC_API_KEY: API key for Anthropic
-  LITELLM_MASTER_KEY: Master key for LiteLLM proxy (optional)
-  REDIS_HOST, REDIS_PORT, REDIS_PASSWORD: Redis connection details (optional)
 """
-
-import logging
-import os
-import sys
-from pathlib import Path
-from typing import Dict
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[logging.StreamHandler()],
 )
@@ -38,30 +8,46 @@ logger = logging.getLogger("litellm-example")
 
 # Apply nest_asyncio to handle event loop issues when mixing async libraries (httpx/aiohttp)
 try:
+
+    pass
     import nest_asyncio
 
     nest_asyncio.apply()
     logger.info("Applied nest_asyncio to handle event loop conflicts")
-except ImportError:
+except Exception:
+
+    pass
     logger.warning("nest_asyncio not found, may encounter event loop issues with mixed async libraries")
 
 try:
+
+
+    pass
     import litellm
     from litellm import completion
-except ImportError:
+except Exception:
+
+    pass
     logger.error("LiteLLM not installed. Run: poetry install")
     sys.exit(1)
 
 # Try to import optional dependencies
 try:
+
+    pass
     import portkey_ai
 
     HAS_PORTKEY = True
-except ImportError:
+except Exception:
+
+    pass
     HAS_PORTKEY = False
     logger.warning("Portkey not installed. Run: poetry install --with llm_gateways")
 
 try:
+
+
+    pass
     pass
 
     HAS_OPENROUTER = True
@@ -71,14 +57,14 @@ try:
     if not os.environ.get("OR_APP_NAME"):
         os.environ["OR_APP_NAME"] = "OrchestraLLM"
     logger.info(f"OpenRouter configured with site: {os.environ.get('OR_SITE_URL')}")
-except ImportError:
+except Exception:
+
+    pass
     HAS_OPENROUTER = False
     logger.warning("OpenRouter not installed. Run: poetry install --with llm_gateways")
 
 def setup_litellm() -> None:
     """Initialize LiteLLM with configuration"""
-
-    # Path to config file
     config_path = Path(__file__).parent.parent / "config" / "litellm_config.yaml"
 
     if config_path.exists():
@@ -139,6 +125,9 @@ def basic_completion_example() -> None:
     prompt = "Explain the advantages of using Poetry for Python dependency management in 3 bullet points."
 
     try:
+
+
+        pass
         response = completion(
             model="gpt-3.5-turbo",  # Will be routed to the appropriate provider
             messages=[{"role": "user", "content": prompt}],
@@ -152,7 +141,10 @@ def basic_completion_example() -> None:
         )
         logger.info(f"Cost: ${response.usage.cost_usd:.6f} USD")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Error in basic completion: {str(e)}")
 
 def advanced_routing_example(input_length: int = 500) -> None:
@@ -165,6 +157,9 @@ def advanced_routing_example(input_length: int = 500) -> None:
     prompt = f"Write {word_count} words about Poetry, the Python dependency management tool."
 
     try:
+
+
+        pass
         # For shorter prompts, use a smaller model
         if len(prompt) < 1000:
             logger.info("Using standard model for short prompt")
@@ -184,12 +179,14 @@ def advanced_routing_example(input_length: int = 500) -> None:
         logger.info(f"Content snippet: {response.choices[0].message.content[:100]}...")
         logger.info(f"Tokens: {response.usage.total_tokens}")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Error in advanced routing: {str(e)}")
 
 def portkey_integration_example() -> None:
     """Demonstrate integration with Portkey for advanced features"""
-    if not HAS_PORTKEY:
         logger.warning("Skipping Portkey example - package not installed")
         return
 
@@ -198,6 +195,9 @@ def portkey_integration_example() -> None:
     prompt = "What are the key considerations when choosing between LiteLLM, Portkey, and OpenRouter?"
 
     try:
+
+
+        pass
         # Initialize Portkey
         portkey = portkey_ai.Portkey(
             api_key=os.getenv("PORTKEY_API_KEY", "demo"),
@@ -219,12 +219,14 @@ def portkey_integration_example() -> None:
         logger.info(f"Portkey response from: {response.model}")
         logger.info(f"Content snippet: {response.choices[0].message.content[:100]}...")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Error in Portkey integration: {str(e)}")
 
 def openrouter_integration_example() -> None:
     """Demonstrate integration with OpenRouter for wide model access"""
-    if not HAS_OPENROUTER:
         logger.warning("Skipping OpenRouter example - package not installed")
         return
 
@@ -233,6 +235,9 @@ def openrouter_integration_example() -> None:
     prompt = "Compare the performance characteristics of LLaMA 3 and Mixtral models."
 
     try:
+
+
+        pass
         # Configure LiteLLM for OpenRouter
         openrouter_key = os.getenv("OPENROUTER_API_KEY", "")
         if not openrouter_key:
@@ -250,7 +255,10 @@ def openrouter_integration_example() -> None:
         logger.info(f"OpenRouter response from: {response.model}")
         logger.info(f"Content snippet: {response.choices[0].message.content[:100]}...")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Error in OpenRouter integration: {str(e)}")
 
 def fallback_example() -> None:
@@ -260,6 +268,9 @@ def fallback_example() -> None:
     prompt = "Explain how LiteLLM handles fallbacks between different model providers."
 
     try:
+
+
+        pass
         # Use a purposely invalid API key to trigger a fallback
         original_api_key = os.environ.get("AZURE_API_KEY", "")
         os.environ["AZURE_API_KEY"] = "invalid-key-to-trigger-fallback"
@@ -273,7 +284,10 @@ def fallback_example() -> None:
         logger.info(f"Fallback response from: {response.model}")
         logger.info(f"Content snippet: {response.choices[0].message.content[:100]}...")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Error in fallback example: {str(e)}")
     finally:
         # Restore the original API key
@@ -284,7 +298,6 @@ def fallback_example() -> None:
 
 def multi_provider_example() -> None:
     """Demonstrate using all three tools in the same environment"""
-    if not (HAS_PORTKEY and HAS_OPENROUTER):
         logger.warning("Skipping multi-provider example - required packages not installed")
         return
 
@@ -336,6 +349,9 @@ def multi_provider_example() -> None:
         route = smart_model_router(case["prompt"], case["requirement"])
 
         try:
+
+
+            pass
             if route["provider"] == "openrouter":
                 response = completion(
                     model=route["model"],
@@ -362,7 +378,10 @@ def multi_provider_example() -> None:
             logger.info(f"Provider: {route['provider']}, Model: {response.model}")
             logger.info(f"Response: {response.choices[0].message.content[:100]}...")
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"Error with {route['provider']}: {str(e)}")
 
 if __name__ == "__main__":
@@ -382,6 +401,8 @@ if __name__ == "__main__":
 
     # Run examples
     try:
+
+        pass
         basic_completion_example()
         advanced_routing_example()
 
@@ -398,10 +419,15 @@ if __name__ == "__main__":
         if HAS_PORTKEY and HAS_OPENROUTER:
             multi_provider_example()
 
-    except KeyboardInterrupt:
+    except Exception:
+
+
+        pass
         logger.info("Examples interrupted.")
         sys.exit(0)
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error running examples: {str(e)}")
         sys.exit(1)
 

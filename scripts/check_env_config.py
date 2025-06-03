@@ -1,15 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Environment Configuration Checker
-Validates that all required environment variables are properly set
 """
-
-import os
-import sys
-from typing import Dict, List, Tuple
-
-# Define required and optional environment variables
-REQUIRED_VARS = {
     "Core": ["NODE_ENV", "ENVIRONMENT", "API_PORT", "SERVER_HOST"],
     "Database": [
         "DATABASE_URL",
@@ -71,9 +63,6 @@ PORTKEY_VIRTUAL_KEYS = {
 
 def check_env_var(var_name: str) -> Tuple[bool, str]:
     """Check if an environment variable is set and return its value (masked)"""
-    value = os.environ.get(var_name)
-    if value:
-        # Mask sensitive values
         if "KEY" in var_name or "SECRET" in var_name or "PASSWORD" in var_name or "TOKEN" in var_name:
             masked = value[:4] + "*" * (len(value) - 8) + value[-4:] if len(value) > 8 else "*" * len(value)
             return True, masked
@@ -83,9 +72,6 @@ def check_env_var(var_name: str) -> Tuple[bool, str]:
 
 def validate_portkey_virtual_key(key_value: str) -> bool:
     """Validate if a virtual key matches known Portkey virtual keys"""
-    return key_value in PORTKEY_VIRTUAL_KEYS
-
-def print_section(title: str):
     """Print a formatted section header"""
     print(f"\n{'=' * 60}")
     print(f"{title:^60}")
@@ -109,6 +95,8 @@ def main():
     # Check required variables
     for category, vars_list in REQUIRED_VARS.items():
         print(f"\n{category}:")
+        # TODO: Consider using list comprehension for better performance
+
         for var in vars_list:
             exists, value = check_env_var(var)
             status = "✅" if exists else "❌"

@@ -1,51 +1,10 @@
 #!/usr/bin/env python3
 """
-optimized_memory_storage.py - Optimized In-Memory Storage Implementation
-
-This module provides a high-performance in-memory storage implementation
-optimized for single-instance, development, and test environments.
 """
-
-import asyncio
-import json
-import logging
-import os
-import time
-from typing import Any, Dict, List, Optional, Set
-
-from ..interfaces.storage import IMemoryStorage
-from ..models.memory import MemoryEntry
-from ..utils.performance_monitor import get_performance_monitor
-
-logger = logging.getLogger(__name__)
-
-class OptimizedMemoryStorage(IMemoryStorage):
-    """High-performance in-memory storage implementation.
-
-    This implementation is optimized for speed and simplicity in development environments.
-    It stores all data in memory with the following optimizations:
-    - Uses dictionaries for O(1) key lookup
-    - Implements simple expiration without background threads
-    - Provides basic search capabilities
-    - Optimizes for common operation patterns
-
-    It is NOT recommended for production use with large datasets due to memory constraints.
     """
-
-    def __init__(self, config: Dict[str, Any] = None):
-        """Initialize with optional configuration.
-
-        Args:
-            config: Optional configuration dictionary
+    """
         """
-        self.config = config or {}
-        self.data: Dict[str, Dict[str, Dict[str, Any]]] = {}  # scope -> key -> data
-        self.ttls: Dict[str, Dict[str, float]] = {}  # scope -> key -> expiration time
-        self.lock = asyncio.Lock()
-        self.perf = get_performance_monitor()
-        self._initialized = False
-
-        # Optional persistence configuration
+        """
         self.persistence_path = self.config.get("persistence_path")
         self.persist_on_change = self.config.get("persist_on_change", False)
         self.auto_load = self.config.get("auto_load", True)
@@ -69,15 +28,8 @@ class OptimizedMemoryStorage(IMemoryStorage):
         }
 
     async def initialize(self) -> bool:
-        """Initialize the storage backend.
-
-        Returns:
-            True if successful, False otherwise
         """
-        start_time = time.time()
-        try:
-            # First-time initialization
-            if not self._initialized:
+        """
                 logger.info("Initializing optimized memory storage")
 
                 # Create initial data structure
@@ -86,8 +38,12 @@ class OptimizedMemoryStorage(IMemoryStorage):
                 # Auto-load from persistence if configured
                 if self.persistence_path and self.auto_load:
                     try:
+
+                        pass
                         await self._load_from_persistence()
-                    except Exception as e:
+                    except Exception:
+
+                        pass
                         logger.warning(f"Could not load data from persistence: {e}")
 
                 self._initialized = True
@@ -95,25 +51,17 @@ class OptimizedMemoryStorage(IMemoryStorage):
             duration = time.time() - start_time
             self.perf.record_operation("storage.initialize", duration)
             return True
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to initialize optimized memory storage: {e}")
             duration = time.time() - start_time
             self.perf.record_operation("storage.initialize.error", duration)
             return False
 
     async def store(self, key: str, entry: Any, scope: str = "default") -> bool:
-        """Store an entry in memory.
-
-        Args:
-            key: The key to store under
-            entry: The entry to store (can be any JSON-serializable object)
-            scope: The scope to store in
-
-        Returns:
-            True if successful, False otherwise
         """
-        start_time = time.time()
-        try:
+        """
             self.stats["stores"] += 1
 
             async with self.lock:
@@ -148,8 +96,12 @@ class OptimizedMemoryStorage(IMemoryStorage):
                     self.data[scope][key] = entry
                 else:
                     try:
+
+                        pass
                         self.data[scope][key] = json.loads(json.dumps(entry))
-                    except (TypeError, json.JSONDecodeError):
+                    except Exception:
+
+                        pass
                         # Fall back to string representation
                         self.data[scope][key] = str(entry)
 
@@ -177,24 +129,17 @@ class OptimizedMemoryStorage(IMemoryStorage):
             duration = time.time() - start_time
             self.perf.record_operation("storage.store", duration)
             return True
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to store entry: {e}")
             duration = time.time() - start_time
             self.perf.record_operation("storage.store.error", duration)
             return False
 
     async def retrieve(self, key: str, scope: str = "default") -> Optional[Any]:
-        """Retrieve an entry from memory.
-
-        Args:
-            key: The key to retrieve
-            scope: The scope to retrieve from
-
-        Returns:
-            The entry, or None if not found or expired
         """
-        start_time = time.time()
-        try:
+        """
             self.stats["retrievals"] += 1
 
             async with self.lock:
@@ -235,24 +180,17 @@ class OptimizedMemoryStorage(IMemoryStorage):
             duration = time.time() - start_time
             self.perf.record_operation("storage.retrieve", duration)
             return result
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to retrieve entry: {e}")
             duration = time.time() - start_time
             self.perf.record_operation("storage.retrieve.error", duration)
             return None
 
     async def delete(self, key: str, scope: str = "default") -> bool:
-        """Delete an entry from memory.
-
-        Args:
-            key: The key to delete
-            scope: The scope to delete from
-
-        Returns:
-            True if deleted, False if not found or error
         """
-        start_time = time.time()
-        try:
+        """
             self.stats["deletes"] += 1
 
             async with self.lock:
@@ -284,56 +222,30 @@ class OptimizedMemoryStorage(IMemoryStorage):
             duration = time.time() - start_time
             self.perf.record_operation("storage.delete", duration)
             return True
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to delete entry: {e}")
             duration = time.time() - start_time
             self.perf.record_operation("storage.delete.error", duration)
             return False
 
     async def list_keys(self, scope: str = "default") -> List[str]:
-        """List all keys in a scope.
-
-        Args:
-            scope: The scope to list keys from
-
-        Returns:
-            A list of keys
         """
-        start_time = time.time()
-        try:
-            async with self.lock:
-                # Check if scope exists
-                if scope not in self.data:
-                    return []
-
-                # Clean expired keys first
-                await self._clean_expired_keys(scope)
-
-                # Return list of keys
-                keys = list(self.data[scope].keys())
-
-            duration = time.time() - start_time
+        """
             self.perf.record_operation("storage.list_keys", duration)
             return keys
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to list keys: {e}")
             duration = time.time() - start_time
             self.perf.record_operation("storage.list_keys.error", duration)
             return []
 
     async def search(self, query: str, scope: str = "default", limit: int = 10) -> List[Dict[str, Any]]:
-        """Search for entries matching a query.
-
-        Args:
-            query: The query to search for
-            scope: The scope to search in
-            limit: Maximum number of results to return
-
-        Returns:
-            A list of matching entries
         """
-        start_time = time.time()
-        try:
+        """
             self.stats["searches"] += 1
 
             results = []
@@ -401,31 +313,17 @@ class OptimizedMemoryStorage(IMemoryStorage):
             duration = time.time() - start_time
             self.perf.record_operation("storage.search", duration)
             return results
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to search entries: {e}")
             duration = time.time() - start_time
             self.perf.record_operation("storage.search.error", duration)
             return []
 
     async def get_health(self) -> Dict[str, Any]:
-        """Get health information about the storage backend.
-
-        Returns:
-            A dictionary containing health information
         """
-        start_time = time.time()
-        try:
-            async with self.lock:
-                # Get memory usage statistics
-                memory_usage = {}
-                total_keys = 0
-                total_scopes = len(self.data)
-
-                for scope, keys in self.data.items():
-                    total_keys += len(keys)
-                    memory_usage[scope] = len(keys)
-
-                health = {
+        """
                     "status": "healthy",
                     "type": "in-memory",
                     "initialized": self._initialized,
@@ -440,163 +338,49 @@ class OptimizedMemoryStorage(IMemoryStorage):
             duration = time.time() - start_time
             self.perf.record_operation("storage.get_health", duration)
             return health
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to get health information: {e}")
             duration = time.time() - start_time
             self.perf.record_operation("storage.get_health.error", duration)
             return {"status": "unhealthy", "error": str(e), "type": "in-memory"}
 
     async def save(self, key: str, entry: MemoryEntry) -> bool:
-        """Save a memory entry to storage.
-
-        Args:
-            key: The key to store the entry under
-            entry: The memory entry to store
-
-        Returns:
-            True if successful, False otherwise
         """
-        # Map to the store method
+        """
         return await self.store(key, entry, getattr(entry, "scope", "default"))
 
     async def get(self, key: str) -> Optional[MemoryEntry]:
-        """Retrieve a memory entry from storage.
-
-        Args:
-            key: The key to retrieve
-
-        Returns:
-            The memory entry if found, None otherwise
         """
-        # Map to the retrieve method
-        return await self.retrieve(key)
-
-    async def get_by_hash(self, content_hash: str) -> Optional[MemoryEntry]:
-        """Retrieve a memory entry by its content hash.
-
-        Args:
-            content_hash: The content hash to search for
-
-        Returns:
-            The memory entry if found, None otherwise
         """
-        # This is a slow operation as we need to scan all entries
-        try:
-            async with self.lock:
-                for scope_data in self.data.values():
-                    for key, value in scope_data.items():
-                        # Check if it's a MemoryEntry with matching hash
+        """
+        """
                         if isinstance(value, dict) and value.get("metadata", {}).get("content_hash") == content_hash:
                             entry = await self.retrieve(key)
                             if entry:
                                 return entry
             return None
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Error retrieving by hash: {e}")
             return None
 
     async def health_check(self) -> Dict[str, Any]:
-        """Get health information about the storage backend.
-
-        Returns:
-            A dictionary containing health information
         """
-        # Map to get_health method
-        return await self.get_health()
-
-    async def _clean_expired_keys(self, scope: str) -> int:
-        """Clean expired keys in a scope.
-
-        Args:
-            scope: The scope to clean
-
-        Returns:
-            Number of keys removed
         """
-        if scope not in self.ttls:
-            return 0
-
-        # No need for lock since this is called from methods that already hold the lock
-        current_time = time.time()
-        expired_keys = []
-
-        for key, expiry_time in self.ttls[scope].items():
-            if current_time > expiry_time:
-                expired_keys.append(key)
-
-        # Remove expired keys
-        for key in expired_keys:
-            if key in self.data[scope]:
-                del self.data[scope][key]
-
-            del self.ttls[scope][key]
-
-            # Remove from search index
-            if self.enable_search_index and scope in self.search_index:
-                for term_keys in self.search_index[scope].values():
-                    if key in term_keys:
-                        term_keys.remove(key)
-
+        """
+        """
             self.stats["expirations"] += 1
 
         return len(expired_keys)
 
     async def _update_search_index(self, key: str, entry: Any, scope: str) -> None:
-        """Update the search index for an entry.
-
-        Args:
-            key: The key of the entry
-            entry: The entry to index
-            scope: The scope of the entry
         """
-        if not self.enable_search_index:
-            return
-
-        # Create scope index if it doesn't exist
-        if scope not in self.search_index:
-            self.search_index[scope] = {}
-
-        # Get all terms to index
-        terms = self._get_index_terms(key, entry)
-
-        # Remove existing terms for this key
-        for term_dict in self.search_index[scope].values():
-            if key in term_dict:
-                term_dict.remove(key)
-
-        # Add new terms
-        for term in terms:
-            if term not in self.search_index[scope]:
-                self.search_index[scope][term] = set()
-            self.search_index[scope][term].add(key)
-
-    def _get_index_terms(self, key: str, entry: Any) -> Set[str]:
-        """Get all terms to index from an entry.
-
-        Args:
-            key: The key of the entry
-            entry: The entry to get terms from
-
-        Returns:
-            A set of terms
         """
-        terms = set()
-
-        # Add terms from key
-        terms.update(self._get_search_terms(key))
-
-        # Add terms from entry
-        if isinstance(entry, dict):
-            # Add terms from specified fields
-            for field_name, field_value in entry.items():
-                if isinstance(field_value, str):
-                    terms.update(self._get_search_terms(field_value))
-                elif isinstance(field_value, (int, float, bool)):
-                    terms.add(str(field_value).lower())
-        elif isinstance(entry, str):
-            terms.update(self._get_search_terms(entry))
-        elif isinstance(entry, (int, float, bool)):
-            terms.add(str(entry).lower())
+        """
+        """
         elif hasattr(entry, "__dict__"):
             # For objects, use their string representation
             terms.update(self._get_search_terms(str(entry)))
@@ -604,22 +388,8 @@ class OptimizedMemoryStorage(IMemoryStorage):
         return terms
 
     def _get_search_terms(self, text: str) -> Set[str]:
-        """Extract search terms from text.
-
-        Args:
-            text: The text to extract terms from
-
-        Returns:
-            A set of terms
         """
-        if not text:
-            return set()
-
-        # Remove punctuation, convert to lowercase, and split by whitespace
-        terms = set()
-        import re
-
-        # Remove non-alphanumeric characters and split by whitespace
+        """
         words = re.sub(r"[^\w\s]", " ", text.lower()).split()
 
         # Filter out very short words and common stop words
@@ -651,31 +421,8 @@ class OptimizedMemoryStorage(IMemoryStorage):
         return terms
 
     async def _persist_to_storage(self) -> bool:
-        """Persist data to storage.
-
-        Returns:
-            True if successful, False otherwise
         """
-        if not self.persistence_path:
-            return False
-
-        try:
-            import json
-
-            # Create directory if it doesn't exist
-            os.makedirs(os.path.dirname(self.persistence_path), exist_ok=True)
-
-            # Serialize data
-            data_to_persist = {}
-            for scope, keys in self.data.items():
-                data_to_persist[scope] = {}
-                for key, value in keys.items():
-                    # Include TTL information if available
-                    ttl_remaining = None
-                    if scope in self.ttls and key in self.ttls[scope]:
-                        ttl_remaining = max(0, self.ttls[scope][key] - time.time())
-
-                    data_to_persist[scope][key] = {
+        """
                         "value": value,
                         "ttl_remaining": ttl_remaining,
                     }
@@ -689,22 +436,15 @@ class OptimizedMemoryStorage(IMemoryStorage):
             os.replace(temp_path, self.persistence_path)
 
             return True
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to persist data: {e}")
             return False
 
     async def _load_from_persistence(self) -> bool:
-        """Load data from persistence.
-
-        Returns:
-            True if successful, False otherwise
         """
-        if not self.persistence_path or not os.path.exists(self.persistence_path):
-            return False
-
-        try:
-            import json
-
+        """
             with open(self.persistence_path, "r") as f:
                 persisted_data = json.load(f)
 
@@ -737,6 +477,8 @@ class OptimizedMemoryStorage(IMemoryStorage):
 
             logger.info(f"Loaded data from {self.persistence_path}")
             return True
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to load persisted data: {e}")
             return False

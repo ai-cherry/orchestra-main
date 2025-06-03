@@ -1,34 +1,12 @@
 """
-SuperAGI deployment configuration for DigitalOcean.
-Manages containerized deployment with proper environment setup.
 """
-
-import logging
-from typing import Dict
-
-import pulumi
-import pulumi_digitalocean as do
-from pulumi import Config
-
-# Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 class SuperAGIDeployment:
     def __init__(self, name: str, config: Dict[str, str]):
         """
-        Initialize SuperAGI deployment resources.
-
-        Args:
-            name: Deployment name prefix
-            config: Configuration dictionary
         """
-        self.name = name
-        self.config = config
-        self._validate_config()
-        self._deploy_container()
-
-    def _validate_config(self) -> None:
         """Verify required configuration parameters."""
         required_keys = {"region", "db_url", "weaviate_url"}
         if not required_keys.issubset(self.config.keys()):
@@ -37,7 +15,6 @@ class SuperAGIDeployment:
 
     def _deploy_container(self) -> None:
         """Deploy SuperAGI container with proper configuration."""
-        # Get container registry
         registry = do.ContainerRegistry(f"{self.name}-registry", subscription_tier_slug="basic")
 
         # Configure container environment

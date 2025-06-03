@@ -1,16 +1,17 @@
+# TODO: Consider adding connection pooling configuration
 """
-Request models for Orchestra AI API.
-
-This module defines Pydantic models for API request validation.
+Orchestra AI - Database Models
+This module contains Pydantic models for database entities.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import List, Dict, Any, Optional, Union
+from uuid import uuid4, UUID
+from datetime import datetime
+from enum import Enum
+from pydantic import BaseModel, Field, field_validator, model_validator
 
-from pydantic import BaseModel, Field
-
-class ConversationRequest(BaseModel):
+""
     """Request for conversation endpoint."""
-
     user_id: str = Field(..., description="User ID")
     message: str = Field(..., description="User message")
     context: Optional[Dict[str, Any]] = Field(default=None, description="Additional context")
@@ -18,14 +19,12 @@ class ConversationRequest(BaseModel):
 
 class WorkflowExecutionRequest(BaseModel):
     """Request for workflow execution."""
-
     workflow_name: str = Field(..., description="Name of workflow to execute")
     inputs: Dict[str, Any] = Field(..., description="Workflow inputs")
     async_execution: bool = Field(default=False, description="Execute asynchronously")
 
 class AgentMessageRequest(BaseModel):
     """Request to send message to an agent."""
-
     agent_id: str = Field(..., description="Target agent ID")
     message: str = Field(..., description="Message content")
     message_type: str = Field(default="text", description="Type of message")
@@ -33,7 +32,6 @@ class AgentMessageRequest(BaseModel):
 
 class AgentTaskRequest(BaseModel):
     """Request to assign task to an agent."""
-
     task: str = Field(..., description="Task description")
     required_capability: str = Field(..., description="Required agent capability")
     priority: Optional[str] = Field(default="normal", description="Task priority")
@@ -41,7 +39,6 @@ class AgentTaskRequest(BaseModel):
 
 class MemoryStoreRequest(BaseModel):
     """Request to store data in memory."""
-
     key: str = Field(..., description="Storage key")
     value: Any = Field(..., description="Value to store")
     metadata: Optional[Dict[str, Any]] = Field(default=None, description="Additional metadata")
@@ -49,7 +46,6 @@ class MemoryStoreRequest(BaseModel):
 
 class MemorySearchRequest(BaseModel):
     """Request to search memory."""
-
     query: str = Field(..., description="Search query")
     limit: int = Field(default=10, ge=1, le=100, description="Maximum results")
     metadata_filter: Optional[Dict[str, Any]] = Field(default=None, description="Metadata filters")
@@ -57,7 +53,6 @@ class MemorySearchRequest(BaseModel):
 
 class PersonaCreateRequest(BaseModel):
     """Request to create a new persona."""
-
     id: str = Field(..., description="Unique persona ID")
     name: str = Field(..., description="Persona name")
     description: str = Field(..., description="Persona description")
@@ -69,7 +64,6 @@ class PersonaCreateRequest(BaseModel):
 
 class LLMCompletionRequest(BaseModel):
     """Request for LLM completion."""
-
     prompt: str = Field(..., description="Input prompt")
     provider: Optional[str] = Field(default=None, description="Specific LLM provider")
     model: Optional[str] = Field(default=None, description="Specific model")
@@ -79,7 +73,6 @@ class LLMCompletionRequest(BaseModel):
 
 class DocumentAnalysisRequest(BaseModel):
     """Request for document analysis."""
-
     document_id: str = Field(..., description="Document ID")
     document: str = Field(..., description="Document content")
     analysis_types: List[str] = Field(
@@ -89,7 +82,6 @@ class DocumentAnalysisRequest(BaseModel):
 
 class ResearchRequest(BaseModel):
     """Request for research task."""
-
     topic: str = Field(..., description="Research topic")
     depth: str = Field(default="standard", description="Research depth: shallow, standard, deep")
     max_sources: int = Field(default=5, ge=1, le=20, description="Maximum sources to consult")

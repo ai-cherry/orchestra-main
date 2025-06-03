@@ -1,26 +1,7 @@
 #!/usr/bin/env python3
 """
-Setup Advanced Caching System
-Integrates intelligent caching with the AI orchestration system
 """
-
-import os
-import sys
-import asyncio
-from pathlib import Path
-from datetime import datetime
-
-# Add parent directory to path
-sys.path.append(str(Path(__file__).parent.parent))
-
-from ai_components.orchestration.intelligent_cache import IntelligentCache, CacheType, get_cache
-from scripts.ai_system_orchestrator import AISystemOrchestrator
-
-class AdvancedCachingSetup:
     """Setup and configure advanced caching for the AI system"""
-    
-    def __init__(self):
-        self.setup_results = {
             "timestamp": datetime.now().isoformat(),
             "status": "starting",
             "cache_initialized": False,
@@ -35,6 +16,9 @@ class AdvancedCachingSetup:
         print("="*50)
         
         try:
+
+        
+            pass
             # 1. Initialize intelligent cache
             print("\n1️⃣ Initializing Intelligent Cache...")
             await self._initialize_cache()
@@ -58,7 +42,10 @@ class AdvancedCachingSetup:
             self.setup_results["status"] = "completed"
             print("\n✅ Advanced Caching System Setup Complete!")
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             self.setup_results["status"] = "failed"
             self.setup_results["error"] = str(e)
             print(f"\n❌ Setup Failed: {e}")
@@ -68,11 +55,6 @@ class AdvancedCachingSetup:
     
     async def _initialize_cache(self) -> None:
         """Initialize the intelligent cache system"""
-        try:
-            # Test cache initialization
-            async with IntelligentCache(max_memory_mb=256, max_entries=5000) as cache:
-                # Test basic operations
-                await cache.set(
                     "test_init", 
                     {"message": "Cache initialization test"},
                     CacheType.CODE_ANALYSIS,
@@ -91,65 +73,26 @@ class AdvancedCachingSetup:
                 self.setup_results["initial_metrics"] = metrics
                 print(f"   📊 Cache ready: {metrics['total_entries']} entries")
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             print(f"   ❌ Cache initialization failed: {e}")
             raise
     
     async def _integrate_with_orchestrator(self) -> None:
         """Integrate caching with the AI orchestrator"""
-        try:
-            # Create enhanced orchestrator with caching
-            enhanced_orchestrator_code = '''
-# ai_components/orchestration/cached_orchestrator.py
-import asyncio
-from typing import Dict, Any
-from .intelligent_cache import get_cache, CacheType, cache_decorator
-from scripts.ai_system_orchestrator import AISystemOrchestrator, TaskType
-
-class CachedAIOrchestrator(AISystemOrchestrator):
     """AI Orchestrator with intelligent caching"""
-    
-    def __init__(self):
-        super().__init__()
-        self.cache = None
-    
-    async def __aenter__(self):
         """Initialize with cache"""
-        await super().__aenter__()
-        self.cache = await get_cache()
-        return self
-    
-    @cache_decorator(CacheType.CODE_ANALYSIS)
     async def analyze_code(self, file_path: str, analysis_depth: str = "standard") -> Dict:
         """Cached code analysis"""
-        return await super().analyze_code(file_path, analysis_depth)
-    
-    @cache_decorator(CacheType.CODE_GENERATION)
     async def generate_code(self, prompt: str, language: str = "python", 
                           context: Dict = None) -> Dict:
         """Cached code generation"""
-        return await super().generate_code(prompt, language, context)
-    
-    @cache_decorator(CacheType.COMPLETION)
-    async def get_code_completions(self, code_context: str, cursor_position: int,
                                  file_path: str = None, language: str = "python") -> Dict:
         """Cached code completions"""
-        return await super().get_code_completions(code_context, cursor_position, file_path, language)
-    
-    async def invalidate_cache_for_file(self, file_path: str) -> int:
         """Invalidate cache entries for a specific file"""
-        if self.cache:
-            return await self.cache.invalidate_pattern(file_path)
-        return 0
-    
-    async def get_cache_metrics(self) -> Dict:
         """Get cache performance metrics"""
-        if self.cache:
-            return self.cache.get_performance_metrics()
-        return {}
-'''
-            
-            # Write enhanced orchestrator
             enhanced_file = Path("ai_components/orchestration/cached_orchestrator.py")
             enhanced_file.parent.mkdir(parents=True, exist_ok=True)
             enhanced_file.write_text(enhanced_orchestrator_code)
@@ -157,14 +100,15 @@ class CachedAIOrchestrator(AISystemOrchestrator):
             print("   ✅ Enhanced orchestrator created")
             self.setup_results["orchestrator_integrated"] = True
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             print(f"   ❌ Orchestrator integration failed: {e}")
             raise
     
     async def _establish_baseline(self) -> None:
         """Establish performance baseline"""
-        try:
-            # Test without cache
             print("   Testing performance without cache...")
             async with AISystemOrchestrator() as orchestrator:
                 import time
@@ -210,15 +154,15 @@ class CachedAIOrchestrator(AISystemOrchestrator):
                     print(f"   🚀 Performance improvement: {improvement:.1f}%")
                     self.setup_results["performance_baseline"]["improvement_percent"] = improvement
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             print(f"   ⚠️  Baseline establishment warning: {e}")
             # Non-critical failure
     
     async def _configure_optimization(self) -> None:
         """Configure cache optimization settings"""
-        try:
-            async with IntelligentCache() as cache:
-                # Set optimal configuration based on system
                 cache.cache_config[CacheType.CODE_ANALYSIS]["ttl"] = 7200  # 2 hours
                 cache.cache_config[CacheType.CODE_GENERATION]["ttl"] = 3600  # 1 hour
                 cache.cache_config[CacheType.COMPLETION]["ttl"] = 1800  # 30 minutes
@@ -229,6 +173,8 @@ class CachedAIOrchestrator(AISystemOrchestrator):
                 
                 # Configure memory limits based on available system memory
                 try:
+
+                    pass
                     import psutil
                     total_memory_gb = psutil.virtual_memory().total / (1024**3)
                     
@@ -244,17 +190,21 @@ class CachedAIOrchestrator(AISystemOrchestrator):
                     
                     print(f"   ✅ Memory limits configured for {total_memory_gb:.1f}GB system")
                 
-                except ImportError:
+                except Exception:
+
+                
+                    pass
                     print("   ⚠️  psutil not available, using default memory settings")
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             print(f"   ❌ Optimization configuration failed: {e}")
             raise
     
     async def _test_integration(self) -> None:
         """Test the complete cache integration"""
-        try:
-            # Import the enhanced orchestrator
             sys.path.append(str(Path("ai_components/orchestration")))
             
             # Test caching with real operations
@@ -295,14 +245,15 @@ class CachedAIOrchestrator(AISystemOrchestrator):
                 print(f"       Hit Rate: {final_metrics['hit_rate']:.1%}")
                 print(f"       Memory Usage: {final_metrics['memory_usage_mb']:.1f} MB")
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             print(f"   ❌ Integration test failed: {e}")
             raise
     
     def generate_recommendations(self) -> list:
         """Generate optimization recommendations"""
-        recommendations = []
-        
         baseline = self.setup_results.get("performance_baseline", {})
         improvement = baseline.get("improvement_percent", 0)
         
@@ -339,13 +290,6 @@ class CachedAIOrchestrator(AISystemOrchestrator):
 
 async def main():
     """Run advanced caching setup"""
-    setup = AdvancedCachingSetup()
-    
-    try:
-        results = await setup.setup_caching_system()
-        
-        # Generate and display recommendations
-        recommendations = setup.generate_recommendations()
         results["recommendations"] = recommendations
         
         # Display summary
@@ -384,7 +328,10 @@ async def main():
         
         return 0
         
-    except Exception as e:
+    except Exception:
+
+        
+        pass
         print(f"\n💥 Setup failed: {e}")
         return 1
 

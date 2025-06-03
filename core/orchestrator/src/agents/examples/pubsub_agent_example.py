@@ -1,40 +1,14 @@
 """
-Example Agent Using PubSub Communication.
-
-This module demonstrates how to implement an agent that uses the PubSub
-communication system for inter-agent messaging and task coordination.
 """
-
-import asyncio
-import logging
-import uuid
-from typing import Any, Dict, Optional
-
-from core.orchestrator.src.agents.agent_base import Agent, AgentContext, AgentResponse
-from core.orchestrator.src.services.agent_communication import get_agent_communication
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-class PubSubAgent(Agent):
     """Example agent that uses PubSub for communication."""
-
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
         """
-        Initialize the PubSub agent.
-
-        Args:
-            config: Optional configuration for the agent
         """
-        super().__init__(config)
         self.agent_id = config.get("agent_id", f"pubsub-agent-{uuid.uuid4()}")
         self.communication = None
         self.initialized = False
 
     async def initialize_async(self) -> None:
         """Initialize the agent asynchronously."""
-        # Get the communication service
-        self.communication = await get_agent_communication(
             agent_id=self.agent_id, conversation_id=self.config.get("conversation_id")
         )
 
@@ -51,27 +25,11 @@ class PubSubAgent(Agent):
 
     async def close_async(self) -> None:
         """Close the agent and release resources."""
-        if self.communication:
-            await self.communication.close()
         logger.info(f"PubSubAgent closed: {self.agent_id}")
 
     async def process(self, context: AgentContext) -> AgentResponse:
         """
-        Process user input and generate a response.
-
-        This method demonstrates how to use the communication service
-        to collaborate with other agents.
-
-        Args:
-            context: The context for this interaction
-
-        Returns:
-            The agent's response
         """
-        if not self.initialized:
-            await self.initialize_async()
-
-        # Example: Check if we should delegate to another agent
         if "delegate" in context.user_input.lower():
             # Get the delegate agent ID from config
             delegate_id = self.config.get("delegate_agent_id")
@@ -116,31 +74,16 @@ class PubSubAgent(Agent):
 
     async def _handle_agent_message(self, data: Dict[str, Any]) -> None:
         """
-        Handle an agent message event.
-
-        Args:
-            data: The event data
         """
         logger.info(f"Received agent message: {data.get('message')}")
 
     async def _handle_system_notification(self, data: Dict[str, Any]) -> None:
         """
-        Handle a system notification event.
-
-        Args:
-            data: The event data
         """
         logger.info(f"Received system notification: {data}")
 
     async def _handle_process_query_task(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Handle a process query task.
-
-        Args:
-            data: The task data
-
-        Returns:
-            The task result
         """
         query = data.get("query", "")
         logger.info(f"Processing query: {query}")
@@ -151,13 +94,6 @@ class PubSubAgent(Agent):
 
     async def _handle_generate_content_task(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Handle a generate content task.
-
-        Args:
-            data: The task data
-
-        Returns:
-            The task result
         """
         prompt = data.get("prompt", "")
         logger.info(f"Generating content for prompt: {prompt}")
@@ -171,27 +107,17 @@ class PubSubAgent(Agent):
 
     def can_handle(self, context: AgentContext) -> float:
         """
-        Determine if this agent can handle the given context.
-
-        Args:
-            context: The context for this interaction
-
-        Returns:
-            A score between 0 and 1
         """
-        # This agent can handle any context, but with moderate confidence
-        return 0.7
-
-# Example usage
-async def main():
     """Example of using the PubSubAgent."""
-    # Create an agent
     agent = PubSubAgent({"agent_id": "example-agent-1", "conversation_id": "example-conversation-1"})
 
     # Initialize the agent
     await agent.initialize_async()
 
     try:
+
+
+        pass
         # Create a context
         context = AgentContext(
             user_input="Hello, can you help me with a task?",

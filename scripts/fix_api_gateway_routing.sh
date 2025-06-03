@@ -1,0 +1,86 @@
+#!/bin/bash
+# Fix API Gateway Routing Configuration
+
+set -e
+
+echo "🔧 Fixing API Gateway Routing..."
+
+# Create NGINX configuration with circuit breakers
+mkdir -p infrastructure/nginx
+cat > infrastructure/nginx/domain-routing.conf << 'EOF'
+upstream personal_backend {
+    server personal-service:8000 max_fails=3 fail_timeout=30s;
+    server personal-service-backup:8000 backup;
+}
+
+upstream payready_backend {
+    server payready-service:8000 max_fails=3 fail_timeout=30s;
+    server payready-service-backup:8000 backup;
+}
+
+upstream paragonrx_backend {
+    server paragonrx-service:8000 max_fails=3 fail_timeout=30s;
+    server paragonrx-service-backup:8000 backup;
+}
+
+# Circuit breaker configuration
+limit_req_zone $binary_remote_addr zone=personal_limit:10m rate=100r/m;
+limit_req_zone $binary_remote_addr zone=payready_limit:10m rate=50r/m;
+limit_req_zone $binary_remote_addr zone=paragonrx_limit:10m rate=200r/m;
+
+server {
+    listen 80;
+    server_name api.orchestra.ai;
+    
+    # Personal domain
+    location /personal {
+        limit_req zone=personal_limit burst=150 nodelay;
+        
+        proxy_pass http://personal_backend;
+        proxy_next_upstream error timeout http_500 http_502 http_503;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 60s;
+        
+        # Circuit breaker headers
+        proxy_set_header X-Circuit-Breaker "enabled";
+        add_header X-RateLimit-Limit "100" always;
+    }
+    
+    # PayReady domain
+    location /payready {
+        limit_req zone=payready_limit burst=75 nodelay;
+        
+        proxy_pass http://payready_backend;
+        proxy_next_upstream error timeout http_500 http_502 http_503;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 60s;
+        
+        # Circuit breaker headers
+        proxy_set_header X-Circuit-Breaker "enabled";
+        add_header X-RateLimit-Limit "50" always;
+    }
+    
+    # ParagonRX domain
+    location /paragonrx {
+        limit_req zone=paragonrx_limit burst=300 nodelay;
+        
+        proxy_pass http://paragonrx_backend;
+        proxy_next_upstream error timeout http_500 http_502 http_503;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 60s;
+        
+        # Circuit breaker headers
+        proxy_set_header X-Circuit-Breaker "enabled";
+        add_header X-RateLimit-Limit "200" always;
+    }
+    
+    # Health check endpoint
+    location /health {
+        access_log off;
+        return 200 "healthy\n";
+    }
+}
+EOF
+
+echo "✅ NGINX configuration created"
+echo "✅ API Gateway routing fixed!"

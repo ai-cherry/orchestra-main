@@ -1,38 +1,12 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-MemoryMCPServer: Neo4j-backed, LLM-augmented, production-grade memory server for MCP.
-
 - Stores "episodes" as nodes in Neo4j, with embeddings, timestamps, metadata, and group_id namespacing.
 - Extracts entities using LLM (OpenAI/Gemini) and links them in the graph.
 - Supports hybrid semantic+graph search, robust health checks, and optional Redis/Dragonfly caching.
 - All configuration/secrets via environment variables or config files.
 - Exposes a clean, tool-based API for agent integration.
 """
-
-import asyncio
-import hashlib
-import json
-import logging
-import os
-from datetime import datetime
-from typing import Any, Dict, List, Optional
-
-import redis.asyncio as aioredis
-from fastapi import FastAPI, HTTPException
-from neo4j import Driver, GraphDatabase
-from openai import AsyncOpenAI
-from pydantic import BaseModel, Field
-from sentence_transformers import SentenceTransformer
-
-from mcp_server.config.loader import load_config
-from mcp_server.config.models import MCPConfig
-
-# --- Configuration & Logging ---
-memory_config: MCPConfig = load_config()
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# --- Environment Variables & Defaults ---
 NEO4J_URL = os.getenv("NEO4J_URL", "bolt://localhost:7687")
 NEO4J_USERNAME = os.getenv("NEO4J_USERNAME", "neo4j")
 NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "password")
@@ -46,6 +20,8 @@ VECTOR_INDEX_NAME = os.getenv("NEO4J_VECTOR_INDEX_NAME", "memory_embeddings")
 
 # --- Initialize Clients ---
 try:
+
+    pass
     neo4j_driver: Optional[Driver] = GraphDatabase.driver(NEO4J_URL, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
     asyncio.get_event_loop().run_until_complete(asyncio.to_thread(neo4j_driver.verify_connectivity))
     logger.info(f"Connected to Neo4j at {NEO4J_URL}")
@@ -61,7 +37,10 @@ try:
     if cache_client:
         logger.info(f"Cache enabled at {CACHE_URL}")
 
-except Exception as e:
+except Exception:
+
+
+    pass
     logger.error(f"Failed to initialize clients: {e}")
     neo4j_driver = None
     embedder = None
@@ -171,10 +150,14 @@ async def store_memory_logic(memory: MemoryItem) -> Dict[str, Any]:
     # Entity extraction (episodes only)
     if memory.memory_type == "episode" and llm_client:
         try:
+
+            pass
             entities = await extract_entities_with_llm(memory.content, memory.group_id)
             if entities:
                 await store_extracted_entities(memory.id, entities, memory.group_id)
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Entity extraction failed for memory {memory.id}: {e}")
     return {"status": "success", "memory_id": memory.id, "group_id": memory.group_id}
 
@@ -183,6 +166,8 @@ async def extract_entities_with_llm(text_content: str, group_id: str) -> List[Di
         logger.info("LLM client not available. Skipping entity extraction.")
         return []
     try:
+
+        pass
         response = await llm_client.chat.completions.create(
             model=OPENAI_API_MODEL,
             messages=[
@@ -213,7 +198,9 @@ async def extract_entities_with_llm(text_content: str, group_id: str) -> List[Di
             if isinstance(e, dict) and "name" in e and "type" in e
         ]
         return valid_entities
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"LLM entity extraction error: {e}")
         return []
 
@@ -302,8 +289,12 @@ async def query_memory_logic(query: MemoryQuery) -> List[Dict[str, Any]]:
             node_data["timestamp"] = node_data["timestamp"].isoformat()
         if "metadata" in node_data and isinstance(node_data["metadata"], str):
             try:
+
+                pass
                 node_data["metadata"] = json.loads(node_data["metadata"])
             except Exception:
+
+                pass
                 pass
         results.append({**node_data, "score": score if score is not None else 0.0})
     results.sort(key=lambda x: (x.get("score", 0.0), x.get("timestamp", "")), reverse=True)
@@ -332,8 +323,12 @@ async def get_agent_memories_logic(agent_id: str, group_id: str) -> List[Dict[st
             node_data["timestamp"] = node_data["timestamp"].isoformat()
         if "metadata" in node_data and isinstance(node_data["metadata"], str):
             try:
+
+                pass
                 node_data["metadata"] = json.loads(node_data["metadata"])
             except Exception:
+
+                pass
                 pass
         results.append(node_data)
     return results
@@ -373,8 +368,6 @@ async def clear_graph_logic(group_id: str) -> Dict[str, Any]:
 @app.get("/mcp/tools")
 async def get_tools() -> List[MCPToolDefinition]:
     """Return available memory management tools."""
-    return [
-        MCPToolDefinition(
             name="store_memory",
             description="Store a memory item. Extracts entities from episodes.",
             parameters=MemoryItem.schema(),
@@ -411,52 +404,36 @@ async def get_tools() -> List[MCPToolDefinition]:
 @app.post("/mcp/store_memory")
 async def store_memory(memory: MemoryItem) -> Dict[str, Any]:
     """Store a memory item in Neo4j and extract entities if applicable."""
-    try:
-        return await store_memory_logic(memory)
-    except Exception as e:
         logger.error(f"Error storing memory: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/mcp/query_memory")
 async def query_memory(query: MemoryQuery) -> List[Dict[str, Any]]:
     """Query memories using hybrid semantic+graph search."""
-    try:
-        return await query_memory_logic(query)
-    except Exception as e:
         logger.error(f"Error querying memory: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/mcp/agent_memories/{agent_id}/{group_id}")
 async def get_agent_memories(agent_id: str, group_id: str) -> List[Dict[str, Any]]:
     """Get all memories for a specific agent and group."""
-    try:
-        return await get_agent_memories_logic(agent_id, group_id)
-    except Exception as e:
         logger.error(f"Error getting agent memories: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/mcp/delete_memory")
 async def delete_memory(args: DeleteMemoryArgs) -> Dict[str, Any]:
     """Delete a memory item by ID and group_id."""
-    try:
-        return await delete_memory_logic(args.memory_id, args.group_id)
-    except Exception as e:
         logger.error(f"Error deleting memory: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/mcp/clear_graph")
 async def clear_graph(args: ClearGraphArgs) -> Dict[str, Any]:
     """Clear all data for a group_id."""
-    try:
-        return await clear_graph_logic(args.group_id)
-    except Exception as e:
         logger.error(f"Error clearing graph: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
-    status = {
         "status": "healthy",
         "service": "memory-mcp",
         "backends": {

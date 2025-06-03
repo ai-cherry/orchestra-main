@@ -1,47 +1,6 @@
 #!/usr/bin/env python3
 """
-Mode Switcher for AI Orchestra
-
-This CLI tool provides an interactive way to manage Roo's operation modes,
-including:
-
-1. Switching between modes (Code, Debug, Architect, etc.)
-2. Starting and executing workflows (Feature Development, Bug Fix, etc.)
-3. Viewing detailed information about modes and workflows
-4. Getting suggested next steps based on the current context
-
-Each mode is optimized with a specific AI model:
-- Gemini 1.5 Pro: architect, orchestrator, and reviewer modes
-- GPT-4: code and debug modes
-- Claude 3 Opus: strategy, ask, and creative modes
 """
-
-import argparse
-import logging
-import os
-import sys
-from typing import Optional
-
-import colorama
-from colorama import Fore, Style
-
-from core.logging_config import configure_logging
-
-# Add the project root to the Python path for proper imports
-current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(current_dir)
-
-# Import the mode manager
-from core.mode_manager import ModeManager, get_mode_manager
-
-# Configure logging
-configure_logging()
-logger = logging.getLogger(__name__)
-
-# Initialize colorama
-colorama.init()
-
-def print_header():
     """Print a colorized header for the CLI."""
     print(f"\n{Fore.CYAN}============================================={Style.RESET_ALL}")
     print(f"{Fore.CYAN}{Style.BRIGHT}  AI Orchestra Mode Switcher{Style.RESET_ALL}")
@@ -49,11 +8,6 @@ def print_header():
 
 def print_modes(manager: ModeManager, current_slug: Optional[str] = None):
     """
-    Print all available modes with their details.
-
-    Args:
-        manager: The mode manager instance
-        current_slug: The slug of the current active mode (optional)
     """
     print(f"\n{Fore.GREEN}{Style.BRIGHT}Available Modes:{Style.RESET_ALL}")
 
@@ -89,11 +43,6 @@ def print_modes(manager: ModeManager, current_slug: Optional[str] = None):
 
 def print_workflows(manager: ModeManager, current_workflow: Optional[str] = None):
     """
-    Print all available workflows with their details.
-
-    Args:
-        manager: The mode manager instance
-        current_workflow: The slug of the current active workflow (optional)
     """
     print(f"\n{Fore.GREEN}{Style.BRIGHT}Available Workflows:{Style.RESET_ALL}")
 
@@ -112,13 +61,7 @@ def print_workflows(manager: ModeManager, current_workflow: Optional[str] = None
 
 def print_current_state(manager: ModeManager):
     """
-    Print the current mode and workflow state.
-
-    Args:
-        manager: The mode manager instance
     """
-    if manager.current_mode:
-        # Determine color for model name
         if "gemini" in manager.current_mode.model.lower():
             model_color = Fore.MAGENTA
         elif "gpt" in manager.current_mode.model.lower():
@@ -154,16 +97,7 @@ def print_current_state(manager: ModeManager):
 
 def interactive_mode_switcher(manager: ModeManager):
     """
-    Run an interactive mode switching interface.
-
-    Args:
-        manager: The mode manager instance
     """
-    print_header()
-
-    while True:
-        print_current_state(manager)
-
         print(f"\n{Fore.CYAN}Choose an action:{Style.RESET_ALL}")
         print("  1. Switch mode")
         print("  2. Start workflow")
@@ -258,7 +192,6 @@ def interactive_mode_switcher(manager: ModeManager):
 
 def main():
     """Main entry point for the mode switcher CLI."""
-    parser = argparse.ArgumentParser(
         description="AI Orchestra Mode Switcher - Manage Roo's operation modes and workflows"
     )
 

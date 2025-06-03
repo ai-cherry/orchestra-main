@@ -1,29 +1,6 @@
 #!/usr/bin/env python3
 """
-GitHub Secrets Analyzer and Standardizer
-
-This script analyzes GitHub workflow files for secret usage patterns, validates naming
-conventions, and provides recommendations for standardization to ensure consistent
-use of GitHub organization-level secrets.
-
-Usage:
-    python scripts/update_github_secrets.py [--fix] [--workflow FILE] [--report-file FILE]
-
-Options:
-    --fix                Apply recommended changes to workflow files
-    --workflow FILE      Path to workflow file (default: .github/workflows/deploy.yaml)
-    --report-file FILE   Path to output report file (default: secret_analysis_report.md)
 """
-
-import argparse
-import os
-import re
-import sys
-from pathlib import Path
-from typing import Dict, List, Set, Tuple, Optional
-import yaml
-
-# Constants
 ORG_SECRET_PREFIX = "ORG_"
 GITHUB_SECRET_PATTERN = re.compile(r"secrets\.([A-Za-z0-9_]+)")
 ENV_SECRET_PATTERN = re.compile(r"\$\{\{\s*secrets\.([A-Za-z0-9_]+)\s*\}\}")
@@ -31,9 +8,6 @@ PROD_SUFFIX_PATTERN = re.compile(r"(.+)_PROD$")
 
 class SecretAnalyzer:
     """Analyzes GitHub workflow files for secret usage patterns."""
-
-    def __init__(self, workflow_path: str):
-        self.workflow_path = workflow_path
         self.workflow_content = ""
         self.secrets: Set[str] = set()
         self.env_vars_with_secrets: Dict[str, List[str]] = {}
@@ -42,33 +16,22 @@ class SecretAnalyzer:
 
     def load_workflow(self) -> bool:
         """Load the workflow file content."""
-        try:
             with open(self.workflow_path, "r") as f:
                 self.workflow_content = f.read()
             return True
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"Error loading workflow file: {e}", file=sys.stderr)
             return False
 
     def parse_yaml(self) -> Optional[dict]:
         """Parse the workflow YAML content."""
-        try:
-            return yaml.safe_load(self.workflow_content)
-        except Exception as e:
             print(f"Error parsing YAML: {e}", file=sys.stderr)
             return None
 
     def extract_secrets(self):
         """Extract all secrets referenced in the workflow file."""
-        # Direct secret references
-        direct_secrets = GITHUB_SECRET_PATTERN.findall(self.workflow_content)
-        # Template expressions with secrets
-        template_secrets = ENV_SECRET_PATTERN.findall(self.workflow_content)
-
-        self.secrets = set(direct_secrets + template_secrets)
-
-        # Find environment variables that use secrets
-        yaml_content = self.parse_yaml()
         if yaml_content and "jobs" in yaml_content:
             for job_id, job_data in yaml_content["jobs"].items():
                 if "env" in job_data:
@@ -82,11 +45,6 @@ class SecretAnalyzer:
 
     def analyze_naming_conventions(self):
         """Analyze if secrets follow naming conventions."""
-        for secret in self.secrets:
-            issues = []
-
-            # Check if secret follows org-level naming convention
-            if not secret.startswith(ORG_SECRET_PREFIX):
                 issues.append(f"Doesn't use '{ORG_SECRET_PREFIX}' prefix for organization-level secret")
 
                 # Generate recommended name
@@ -178,11 +136,6 @@ class SecretAnalyzer:
 
     def fix_workflow(self) -> Tuple[str, int]:
         """Apply recommended changes to the workflow file."""
-        updated_content = self.workflow_content
-        replacements = 0
-
-        # Replace direct references to secrets
-        for old_name, new_name in self.recommended_mappings.items():
             pattern = f"secrets.{old_name}"
             replacement = f"secrets.{new_name}"
             new_content = updated_content.replace(pattern, replacement)
@@ -194,14 +147,6 @@ class SecretAnalyzer:
 
     def run_analysis(self):
         """Run the complete analysis process."""
-        if not self.load_workflow():
-            return False
-
-        self.extract_secrets()
-        self.analyze_naming_conventions()
-        return True
-
-def main():
     parser = argparse.ArgumentParser(description="Analyze GitHub workflow files for secret usage patterns")
     parser.add_argument("--fix", action="store_true", help="Apply recommended changes to workflow files")
     parser.add_argument("--workflow", default=".github/workflows/deploy.yaml", help="Path to workflow file")

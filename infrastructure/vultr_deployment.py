@@ -1,16 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Pulumi deployment script for Vultr infrastructure with comprehensive orchestrator
 """
-
-import pulumi
-import pulumi_vultr as vultr
-from pulumi import Config, Output, export
-import json
-import base64
-
-# Get configuration
-config = Config()
 project_name = "orchestra-ai"
 
 # Get secrets from environment
@@ -103,36 +94,7 @@ firewall_rules = [
 
 # User data script for instance initialization
 def create_user_data(role: str, db_host: str) -> str:
-    script = f"""#!/bin/bash
-set -e
-
-# Update system
-apt-get update
-apt-get upgrade -y
-
-# Install dependencies
-apt-get install -y docker.io docker-compose git python3-pip postgresql-client nginx
-
-# Clone repository
-git clone https://github.com/orchestra/main.git /opt/orchestra
-cd /opt/orchestra
-
-# Create environment file
-cat > .env << 'EOF'
-# Database
-DATABASE_URL=postgresql://orchestra:{db_password}@{db_host}:5432/orchestra
-
-# Orchestrator Configuration
-ORCHESTRATOR_ROLE={role}
-WORKSPACE_PATH=/opt/orchestra
-ENABLE_AUTOSCALING=true
-
-# API Keys (will be populated from secrets)
-JWT_SECRET={jwt_secret}
-VULTR_API_KEY={vultr_api_key}
-EOF
-
-# Add all API keys from config
+    script = f"""
 echo "$(cat /opt/api_keys.env)" >> .env
 
 # Install Python dependencies
@@ -200,9 +162,6 @@ EOF
 systemctl enable orchestra
 systemctl start orchestra
 """
-    return base64.b64encode(script.encode()).decode()
-
-# Create database instance
 db_instance = vultr.Instance(f"{project_name}-db",
     plan="vc2-2c-4gb",  # 2 vCPU, 4GB RAM for database
     region=region,

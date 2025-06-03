@@ -1,42 +1,7 @@
 #!/usr/bin/env python3
 """
-AI Code Assistant - Direct interface for coding with AI assistance
-Works with Claude, OpenAI, and local orchestrator
 """
-
-import os
-import sys
-import asyncio
-import logging
-from typing import Optional, Dict, Any
-import aiohttp
-import json
-from datetime import datetime
-from pathlib import Path
-
-# Add parent directory to path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from scripts.setup_secrets_manager import SecretsManager
-
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(message)s')
-logger = logging.getLogger(__name__)
-
-class AICodeAssistant:
     """Direct AI coding assistant interface"""
-    
-    def __init__(self):
-        # Load .env file if it exists
-        env_path = Path('.env')
-        if env_path.exists():
-            with open(env_path, 'r') as f:
-                for line in f:
-                    if '=' in line and not line.strip().startswith('#'):
-                        key, value = line.strip().split('=', 1)
-                        os.environ[key] = value
-        
-        self.secrets = SecretsManager()
         self.anthropic_key = self.secrets.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_API_KEY")
         self.openai_key = self.secrets.get("OPENAI_API_KEY") or os.environ.get("OPENAI_API_KEY")
         self.current_model = "claude"  # Default to Claude
@@ -44,8 +9,6 @@ class AICodeAssistant:
         
     async def ask_claude(self, prompt: str) -> str:
         """Ask Claude directly"""
-        try:
-            if not self.anthropic_key:
                 return "Error: ANTHROPIC_API_KEY not found in environment"
                 
             headers = {
@@ -75,13 +38,13 @@ class AICodeAssistant:
                     else:
                         error = await response.text()
                         return f"Claude API error: {error}"
-        except Exception as e:
+        except Exception:
+
+            pass
             return f"Error calling Claude API: {str(e)}"
     
     async def ask_openai(self, prompt: str) -> str:
         """Ask OpenAI directly"""
-        try:
-            if not self.openai_key:
                 return "Error: OPENAI_API_KEY not found in environment"
                 
             headers = {
@@ -110,50 +73,30 @@ class AICodeAssistant:
                     else:
                         error = await response.text()
                         return f"OpenAI API error: {error}"
-        except Exception as e:
+        except Exception:
+
+            pass
             return f"Error calling OpenAI API: {str(e)}"
     
     async def code_review(self, file_path: str) -> str:
         """Review code in a file"""
-        try:
-            with open(file_path, 'r') as f:
-                code = f.read()
-            
-            prompt = f"""Please review this code and provide suggestions for improvement:
-
-File: {file_path}
-
-```python
-{code}
-```
-
-Provide:
-1. Code quality assessment
-2. Potential bugs or issues
-3. Performance improvements
-4. Best practices recommendations
+            prompt = f"""
 """
-            
             if self.current_model == "claude":
                 return await self.ask_claude(prompt)
             else:
                 return await self.ask_openai(prompt)
                 
-        except Exception as e:
+        except Exception:
+
+                
+            pass
             return f"Error reading file: {e}"
     
     async def generate_code(self, description: str) -> str:
         """Generate code based on description"""
-        prompt = f"""Generate Python code for the following requirement:
-
-{description}
-
-Provide:
-1. Complete, working code
-2. Comments explaining key parts
-3. Example usage if applicable
+        prompt = f"""
 """
-        
         if self.current_model == "claude":
             return await self.ask_claude(prompt)
         else:
@@ -161,18 +104,8 @@ Provide:
     
     async def explain_code(self, code_snippet: str) -> str:
         """Explain what code does"""
-        prompt = f"""Explain what this code does in detail:
-
-```python
-{code_snippet}
-```
-
-Provide:
-1. Overall purpose
-2. Step-by-step explanation
-3. Any potential issues or improvements
+        prompt = f"""
 """
-        
         if self.current_model == "claude":
             return await self.ask_claude(prompt)
         else:
@@ -194,6 +127,8 @@ Provide:
         
         while True:
             try:
+
+                pass
                 user_input = input(f"[{self.current_model}]> ").strip()
                 
                 if not user_input:
@@ -255,15 +190,17 @@ Provide:
                         response = await self.ask_openai(user_input)
                     print(f"\n{response}\n")
                     
-            except KeyboardInterrupt:
+            except Exception:
+
+                    
+                pass
                 print("\n\nUse /exit to quit")
-            except Exception as e:
+            except Exception:
+
+                pass
                 print(f"\nError: {e}\n")
 
 async def main():
     """Main entry point"""
-    assistant = AICodeAssistant()
-    await assistant.interactive_session()
-
 if __name__ == "__main__":
     asyncio.run(main())

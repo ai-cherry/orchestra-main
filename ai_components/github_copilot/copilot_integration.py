@@ -1,34 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-GitHub Copilot Integration
-Provides code generation and completion suggestions working alongside Cursor AI and Claude
 """
-
-import os
-import sys
-import json
-import time
-import asyncio
-import aiohttp
-from typing import Dict, List, Optional, Any
-from datetime import datetime
-from pathlib import Path
-import logging
-import subprocess
-
-# Add parent directory to path for imports
-sys.path.append(str(Path(__file__).parent.parent.parent))
-
-from shared.database import initialize_database
-from ai_components.orchestration.ai_orchestrator import WeaviateManager
-
-logger = logging.getLogger(__name__)
-
-class GitHubCopilotClient:
     """GitHub Copilot integration client"""
-    
-    def __init__(self, api_key: str = None):
-        self.api_key = api_key or os.environ.get('GITHUB_COPILOT_API_KEY')
         self.base_url = "https://api.github.com/copilot"
         self.db = None
         self.weaviate_manager = WeaviateManager()
@@ -50,29 +24,9 @@ class GitHubCopilotClient:
     
     async def __aenter__(self):
         """Async context manager entry"""
-        # Initialize database
-        postgres_url = os.environ.get(
-            'POSTGRES_URL',
-            'postgresql://postgres:password@localhost:5432/orchestra'
-        )
-        weaviate_url = os.environ.get('WEAVIATE_URL', 'http://localhost:8080')
-        weaviate_api_key = os.environ.get('WEAVIATE_API_KEY')
-        
-        self.db = await initialize_database(postgres_url, weaviate_url, weaviate_api_key)
-        return self
-    
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Async context manager exit"""
-        if self.db:
-            await self.db.close()
-    
-    async def get_code_completions(self, code_context: str, cursor_position: int, 
                                  file_path: str = None, language: str = "python") -> Dict:
         """Get code completions from GitHub Copilot"""
-        start_time = time.time()
-        
-        try:
-            # Get context from MCP servers
             mcp_context = await self._get_mcp_context(file_path or "unnamed", {
                 "language": language,
                 "cursor_position": cursor_position
@@ -130,7 +84,10 @@ class GitHubCopilotClient:
             
             return result
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             self.performance_metrics['errors'] += 1
             await self._log_error("get_code_completions", file_path or "unknown", str(e))
             
@@ -139,17 +96,6 @@ class GitHubCopilotClient:
     
     async def suggest_improvements(self, code_content: str, file_path: str = None) -> Dict:
         """Suggest code improvements using Copilot patterns"""
-        start_time = time.time()
-        
-        try:
-            # Analyze code patterns
-            patterns = await self._analyze_code_patterns(code_content, file_path)
-            
-            # Get context from other AI tools
-            ai_context = await self._get_ai_tools_context(file_path)
-            
-            # Generate improvement suggestions
-            suggestions = {
                 "performance_improvements": await self._suggest_performance_improvements(code_content),
                 "code_style_improvements": await self._suggest_style_improvements(code_content),
                 "error_handling_improvements": await self._suggest_error_handling(code_content),
@@ -184,20 +130,16 @@ class GitHubCopilotClient:
             
             return result
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             self.performance_metrics['errors'] += 1
             await self._log_error("suggest_improvements", file_path or "unknown", str(e))
             raise
     
     async def generate_documentation(self, code_content: str, doc_type: str = "docstring") -> Dict:
         """Generate documentation for code"""
-        start_time = time.time()
-        
-        try:
-            # Parse code structure
-            code_structure = await self._parse_code_structure(code_content)
-            
-            # Generate documentation based on type
             if doc_type == "docstring":
                 documentation = await self._generate_docstrings(code_structure)
             elif doc_type == "readme":
@@ -227,14 +169,16 @@ class GitHubCopilotClient:
             
             return result
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             self.performance_metrics['errors'] += 1
             await self._log_error("generate_documentation", "documentation", str(e))
             raise
     
     async def compare_with_other_tools(self, test_prompt: str) -> Dict:
         """Compare Copilot performance with Cursor AI and Claude"""
-        comparison_results = {
             "test_prompt": test_prompt,
             "timestamp": datetime.now().isoformat(),
             "copilot_results": {},
@@ -244,6 +188,9 @@ class GitHubCopilotClient:
         }
         
         try:
+
+        
+            pass
             # Test GitHub Copilot
             copilot_start = time.time()
             copilot_result = await self.get_code_completions(test_prompt, len(test_prompt))
@@ -257,6 +204,8 @@ class GitHubCopilotClient:
             
             # Test Cursor AI
             try:
+
+                pass
                 from ai_components.cursor_ai.cursor_integration_enhanced import CursorAIClient
                 
                 async with CursorAIClient() as cursor_client:
@@ -270,7 +219,10 @@ class GitHubCopilotClient:
                         "fallback": cursor_result.get("fallback", False)
                     }
                     
-            except Exception as e:
+            except Exception:
+
+                    
+                pass
                 comparison_results["cursor_ai_results"] = {
                     "error": str(e),
                     "success": False
@@ -278,6 +230,8 @@ class GitHubCopilotClient:
             
             # Test Claude
             try:
+
+                pass
                 from ai_components.claude.claude_analyzer import ClaudeAnalyzer
                 
                 async with ClaudeAnalyzer() as claude_analyzer:
@@ -291,7 +245,10 @@ class GitHubCopilotClient:
                         "success": "error" not in claude_result
                     }
                     
-            except Exception as e:
+            except Exception:
+
+                    
+                pass
                 comparison_results["claude_results"] = {
                     "error": str(e),
                     "success": False
@@ -304,22 +261,29 @@ class GitHubCopilotClient:
                 comparison_results["claude_results"]
             )
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             comparison_results["error"] = str(e)
         
         return comparison_results
     
     async def _get_mcp_context(self, identifier: str, context: Dict = None) -> Dict:
         """Get context from MCP servers"""
-        mcp_context = {
             "timestamp": datetime.now().isoformat(),
             "identifier": identifier
         }
         
         try:
+
+        
+            pass
             async with aiohttp.ClientSession() as session:
                 # Get memory context
                 try:
+
+                    pass
                     async with session.get(
                         f"{self.mcp_servers['memory']}/context/{identifier}",
                         timeout=aiohttp.ClientTimeout(total=5)
@@ -327,10 +291,14 @@ class GitHubCopilotClient:
                         if response.status == 200:
                             mcp_context["memory"] = await response.json()
                 except Exception:
+
+                    pass
                     pass
                 
                 # Get tools context
                 try:
+
+                    pass
                     async with session.get(
                         f"{self.mcp_servers['tools']}/available",
                         timeout=aiohttp.ClientTimeout(total=5)
@@ -338,9 +306,14 @@ class GitHubCopilotClient:
                         if response.status == 200:
                             mcp_context["available_tools"] = await response.json()
                 except Exception:
+
+                    pass
                     pass
         
-        except Exception as e:
+        except Exception:
+
+        
+            pass
             logger.warning(f"Failed to get MCP context: {e}")
             mcp_context["mcp_error"] = str(e)
         
@@ -369,6 +342,8 @@ class GitHubCopilotClient:
             })
         elif "import " in prompt:
             common_imports = ["os", "sys", "json", "time", "asyncio"]
+            # TODO: Consider using list comprehension for better performance
+
             for imp in common_imports:
                 if imp not in prompt:
                     completions.append({
@@ -404,14 +379,6 @@ class GitHubCopilotClient:
     
     async def _analyze_code_patterns(self, code_content: str, file_path: str = None) -> List[Dict]:
         """Analyze code patterns"""
-        patterns = []
-        
-        lines = code_content.split('\n')
-        
-        # Check for common patterns
-        for i, line in enumerate(lines):
-            if 'TODO' in line or 'FIXME' in line:
-                patterns.append({
                     "type": "todo_comment",
                     "line": i + 1,
                     "content": line.strip(),
@@ -438,22 +405,19 @@ class GitHubCopilotClient:
     
     async def _get_ai_tools_context(self, file_path: str = None) -> Dict:
         """Get context from other AI tools"""
-        context = {}
-        
-        # Try to get Cursor AI analysis
-        try:
-            from ai_components.cursor_ai.cursor_integration_enhanced import CursorAIClient
-            async with CursorAIClient() as cursor_client:
-                metrics = await cursor_client.get_performance_metrics()
                 context["cursor_ai"] = {
                     "status": metrics.get("status", "unknown"),
                     "requests_made": metrics.get("requests_made", 0)
                 }
         except Exception:
+
+            pass
             context["cursor_ai"] = {"status": "unavailable"}
         
         # Try to get Claude analysis
         try:
+
+            pass
             from ai_components.claude.claude_analyzer import ClaudeAnalyzer
             async with ClaudeAnalyzer() as claude_analyzer:
                 metrics = await claude_analyzer.get_performance_metrics()
@@ -462,16 +426,14 @@ class GitHubCopilotClient:
                     "requests_made": metrics.get("requests_made", 0)
                 }
         except Exception:
+
+            pass
             context["claude"] = {"status": "unavailable"}
         
         return context
     
     async def _suggest_performance_improvements(self, code_content: str) -> List[Dict]:
         """Suggest performance improvements"""
-        suggestions = []
-        
-        if 'for i in range(len(' in code_content:
-            suggestions.append({
                 "type": "loop_optimization",
                 "description": "Consider using enumerate() instead of range(len())",
                 "example": "for i, item in enumerate(items): instead of for i in range(len(items)):"
@@ -488,10 +450,6 @@ class GitHubCopilotClient:
     
     async def _suggest_style_improvements(self, code_content: str) -> List[Dict]:
         """Suggest code style improvements"""
-        suggestions = []
-        
-        if 'import *' in code_content:
-            suggestions.append({
                 "type": "import_style",
                 "description": "Avoid wildcard imports",
                 "example": "Import specific functions/classes instead of using *"
@@ -511,10 +469,6 @@ class GitHubCopilotClient:
     
     async def _suggest_error_handling(self, code_content: str) -> List[Dict]:
         """Suggest error handling improvements"""
-        suggestions = []
-        
-        if 'open(' in code_content and 'with ' not in code_content:
-            suggestions.append({
                 "type": "file_handling",
                 "description": "Use context managers for file operations",
                 "example": "with open(file_path, 'r') as f: instead of f = open(file_path, 'r')"
@@ -531,20 +485,7 @@ class GitHubCopilotClient:
     
     async def _suggest_documentation(self, code_content: str) -> List[Dict]:
         """Suggest documentation improvements"""
-        suggestions = []
-        
-        # Check for functions without docstrings
-        lines = code_content.split('\n')
-        for i, line in enumerate(lines):
-            if line.strip().startswith('def ') and ':' in line:
-                # Check if next non-empty line is a docstring
-                next_line_idx = i + 1
-                while next_line_idx < len(lines) and not lines[next_line_idx].strip():
-                    next_line_idx += 1
-                
-                if (next_line_idx >= len(lines) or 
-                    not lines[next_line_idx].strip().startswith('"""')):
-                    suggestions.append({
+                    not lines[next_line_idx].strip().startswith('"""
                         "type": "missing_docstring",
                         "line": i + 1,
                         "description": f"Function on line {i + 1} is missing a docstring",
@@ -555,10 +496,6 @@ class GitHubCopilotClient:
     
     async def _suggest_tests(self, code_content: str) -> List[Dict]:
         """Suggest test improvements"""
-        suggestions = []
-        
-        if 'def ' in code_content and 'test_' not in code_content:
-            suggestions.append({
                 "type": "missing_tests",
                 "description": "Consider adding unit tests for the functions",
                 "example": "Create test functions with names starting with 'test_'"
@@ -568,7 +505,6 @@ class GitHubCopilotClient:
     
     async def _parse_code_structure(self, code_content: str) -> Dict:
         """Parse code structure for documentation generation"""
-        structure = {
             "functions": [],
             "classes": [],
             "imports": [],
@@ -611,10 +547,8 @@ class GitHubCopilotClient:
     
     async def _generate_docstrings(self, code_structure: Dict) -> Dict:
         """Generate docstrings for functions and classes"""
-        docstrings = {}
-        
         for func in code_structure["functions"]:
-            docstrings[func["name"]] = f'''"""
+            docstrings[func["name"]] = f'''
     {func["name"].replace('_', ' ').title()} function.
     
     Args:
@@ -624,32 +558,9 @@ class GitHubCopilotClient:
         TODO: Add return value description
     
     Raises:
-        TODO: Add exception descriptions if applicable
-    """'''
-        
-        for cls in code_structure["classes"]:
-            docstrings[cls["name"]] = f'''"""
-    {cls["name"]} class.
-    
-    This class handles TODO: Add class description
-    
-    Attributes:
-        TODO: Add attribute descriptions
-    """'''
-        
-        return docstrings
-    
-    async def _generate_readme(self, code_structure: Dict) -> str:
-        """Generate README content"""
-        readme = f"""# Project Documentation
-
-## Overview
-This project contains {len(code_structure['functions'])} functions and {len(code_structure['classes'])} classes.
-
-## Functions
-"""
-        
-        for func in code_structure["functions"]:
+        TODO: Add except Exception:
+     pass
+            docstrings[cls["name"]] = f'''
             readme += f"- `{func['name']}`: TODO: Add function description\n"
         
         if code_structure["classes"]:
@@ -664,8 +575,6 @@ This project contains {len(code_structure['functions'])} functions and {len(code
     
     async def _generate_inline_comments(self, code_structure: Dict) -> Dict:
         """Generate inline comments suggestions"""
-        comments = {}
-        
         for func in code_structure["functions"]:
             comments[func["line"]] = f"# {func['name'].replace('_', ' ').title()}"
         
@@ -673,7 +582,6 @@ This project contains {len(code_structure['functions'])} functions and {len(code
     
     async def _generate_general_docs(self, code_structure: Dict) -> Dict:
         """Generate general documentation"""
-        return {
             "overview": f"Module contains {len(code_structure['functions'])} functions and {len(code_structure['classes'])} classes",
             "functions": [f["name"] for f in code_structure["functions"]],
             "classes": [c["name"] for c in code_structure["classes"]],
@@ -682,7 +590,6 @@ This project contains {len(code_structure['functions'])} functions and {len(code
     
     async def _analyze_tool_comparison(self, copilot_results: Dict, cursor_results: Dict, claude_results: Dict) -> Dict:
         """Analyze comparison between tools"""
-        comparison = {
             "fastest_tool": None,
             "most_reliable": None,
             "recommendations": []
@@ -726,7 +633,6 @@ This project contains {len(code_structure['functions'])} functions and {len(code
     
     async def _fallback_completion(self, code_context: str, language: str) -> Dict:
         """Fallback completion when API is unavailable"""
-        return {
             "completions": [{
                 "text": "\n    # TODO: Implement functionality",
                 "confidence": 0.3
@@ -738,39 +644,29 @@ This project contains {len(code_structure['functions'])} functions and {len(code
     
     async def _log_completion(self, action: str, file_path: str, status: str, result: Dict = None) -> None:
         """Log completion to PostgreSQL"""
-        try:
-            await self.db.execute_query(
                 """
-                INSERT INTO github_copilot_logs 
-                (action, file_path, status, result, latency_seconds, created_at)
-                VALUES ($1, $2, $3, $4, $5, $6)
-                """,
-                action, file_path, status, 
-                json.dumps(result) if result else None,
+                """
                 result.get("latency", 0.0) if result else 0.0,
                 datetime.now()
             )
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to log completion: {e}")
     
     async def _log_error(self, action: str, file_path: str, error: str) -> None:
         """Log error to PostgreSQL"""
-        try:
-            await self.db.execute_query(
                 """
-                INSERT INTO github_copilot_logs 
-                (action, file_path, status, error_message, created_at)
-                VALUES ($1, $2, $3, $4, $5)
-                """,
+                """
                 action, file_path, "error", error, datetime.now()
             )
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to log error: {e}")
     
     async def _update_weaviate_context(self, context_type: str, identifier: str, data: Dict) -> None:
         """Update Weaviate with completion data"""
-        try:
-            self.weaviate_manager.store_context(
                 workflow_id="github_copilot_operations",
                 task_id=f"{context_type}_{int(time.time())}",
                 context_type=context_type,
@@ -781,30 +677,13 @@ This project contains {len(code_structure['functions'])} functions and {len(code
                     "tool": "github_copilot"
                 }
             )
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to update Weaviate: {e}")
     
     async def get_performance_metrics(self) -> Dict:
         """Get GitHub Copilot performance metrics"""
-        avg_latency = (
-            self.performance_metrics['total_latency'] / 
-            self.performance_metrics['requests_made']
-            if self.performance_metrics['requests_made'] > 0 else 0
-        )
-        
-        error_rate = (
-            self.performance_metrics['errors'] / 
-            self.performance_metrics['requests_made']
-            if self.performance_metrics['requests_made'] > 0 else 0
-        )
-        
-        avg_completions = (
-            self.performance_metrics['completions_generated'] / 
-            self.performance_metrics['requests_made']
-            if self.performance_metrics['requests_made'] > 0 else 0
-        )
-        
-        return {
             "requests_made": self.performance_metrics['requests_made'],
             "average_latency": avg_latency,
             "error_rate": error_rate,
@@ -817,45 +696,14 @@ This project contains {len(code_structure['functions'])} functions and {len(code
 
 async def setup_copilot_database():
     """Setup database tables for GitHub Copilot integration"""
-    # Get database URL from environment or use default
-    postgres_url = os.environ.get(
-        'POSTGRES_URL',
-        'postgresql://postgres:password@localhost:5432/orchestra'
-    )
-    
-    weaviate_url = os.environ.get('WEAVIATE_URL', 'http://localhost:8080')
-    weaviate_api_key = os.environ.get('WEAVIATE_API_KEY')
-    
-    db = await initialize_database(postgres_url, weaviate_url, weaviate_api_key)
-    
-    try:
         print("🗄️  Setting up GitHub Copilot database tables...")
         
         await db.execute_query("""
-            CREATE TABLE IF NOT EXISTS github_copilot_logs (
-                id SERIAL PRIMARY KEY,
-                action VARCHAR(100) NOT NULL,
-                file_path TEXT,
-                status VARCHAR(50) NOT NULL,
-                result JSONB,
-                error_message TEXT,
-                latency_seconds FLOAT DEFAULT 0.0,
-                created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-                updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-            );
-        """, fetch=False)
-        
-        # Create indexes
+        """
         await db.execute_query("""
-            CREATE INDEX IF NOT EXISTS idx_copilot_logs_action 
-            ON github_copilot_logs(action);
-        """, fetch=False)
-        
+        """
         await db.execute_query("""
-            CREATE INDEX IF NOT EXISTS idx_copilot_logs_created_at 
-            ON github_copilot_logs(created_at DESC);
-        """, fetch=False)
-        
+        """
         print("✅ GitHub Copilot database tables created!")
     
     finally:
@@ -873,6 +721,8 @@ async def main():
         # Test code completion
         print("\n🔍 Testing code completion...")
         try:
+
+            pass
             completion_result = await copilot.get_code_completions(
                 "def calculate_fibonacci(n",
                 25,
@@ -882,35 +732,40 @@ async def main():
             print("✅ Code completion completed")
             print(f"Completions generated: {len(completion_result['completions'])}")
             print(f"Latency: {completion_result['latency']:.3f}s")
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"❌ Code completion failed: {e}")
         
         # Test improvement suggestions
         print("\n💡 Testing improvement suggestions...")
         try:
+
+            pass
             test_code = """
-def bad_function():
-    for i in range(len(items)):
-        print(items[i])
-        result.append(process(items[i]))
-    return result
 """
             suggestions_result = await copilot.suggest_improvements(test_code, "test.py")
             print("✅ Improvement suggestions completed")
             print(f"Suggestions generated: {len(suggestions_result['suggestions'])}")
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"❌ Improvement suggestions failed: {e}")
         
         # Test comparison with other tools
         print("\n⚖️  Testing comparison with other AI tools...")
         try:
+
+            pass
             comparison = await copilot.compare_with_other_tools(
                 "def factorial(n):"
             )
             print("✅ Tool comparison completed")
             fastest = comparison["comparison"].get("fastest_tool", "unknown")
             print(f"Fastest tool: {fastest}")
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"❌ Tool comparison failed: {e}")
         
         # Get performance metrics

@@ -1,26 +1,7 @@
 """
-Simplified Agent Registry for AI Orchestration System.
-
-This module provides a streamlined registry for managing AI agents with minimal
-security overhead and simplified implementation for better performance.
 """
-
-import logging
-from enum import Enum
-from typing import Any, Dict, List, Optional, Type
-
-from core.orchestrator.src.agents.agent_base import Agent, AgentContext
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-class AgentCapability(Enum):
     """
-    Basic capabilities that agents can provide.
-
-    These capabilities are used for simple agent selection based on context.
     """
-
     TEXT_GENERATION = "text_generation"
     QUESTION_ANSWERING = "question_answering"
     SUMMARIZATION = "summarization"
@@ -29,32 +10,13 @@ class AgentCapability(Enum):
 
 class SimplifiedAgentRegistry:
     """
-    Simplified registry for managing and selecting AI agents.
-
-    This registry provides basic agent management and selection without
-    the overhead of circuit breakers, complex lifecycle management, or
-    extensive security checks.
     """
-
-    def __init__(self):
         """Initialize the simplified agent registry."""
-        self._agents: Dict[str, Agent] = {}
-        self._agent_types: Dict[str, Type[Agent]] = {}
-        self._capabilities: Dict[str, List[AgentCapability]] = {}
-        self._default_agent_type = None
         logger.info("SimplifiedAgentRegistry initialized")
 
     def register_agent(self, agent: Agent) -> None:
         """
-        Register an agent instance.
-
-        Args:
-            agent: Agent instance to register
         """
-        agent_type = agent.agent_type
-        self._agents[agent_type] = agent
-
-        # Store capabilities if available
         if hasattr(agent, "capabilities"):
             self._capabilities[agent_type] = agent.capabilities
         else:
@@ -69,45 +31,19 @@ class SimplifiedAgentRegistry:
 
     def register_agent_type(self, agent_type: str, agent_class: Type[Agent]) -> None:
         """
-        Register an agent type.
-
-        Args:
-            agent_type: Type identifier
-            agent_class: Agent class
         """
-        self._agent_types[agent_type] = agent_class
         logger.info(f"Registered agent type: {agent_type}")
 
     def set_default_agent_type(self, agent_type: str) -> None:
         """
-        Set the default agent type.
-
-        Args:
-            agent_type: Default agent type
         """
-        if agent_type in self._agent_types or agent_type in self._agents:
-            self._default_agent_type = agent_type
             logger.info(f"Set default agent type: {agent_type}")
         else:
             logger.warning(f"Unknown agent type '{agent_type}' cannot be set as default")
 
     def get_agent(self, agent_type: Optional[str] = None) -> Agent:
         """
-        Get an agent instance by type.
-
-        Args:
-            agent_type: Type of agent to get, or None for default
-
-        Returns:
-            Agent instance
-
-        Raises:
-            KeyError: If the agent type is not registered
         """
-        # Use default if not specified
-        if agent_type is None:
-            agent_type = self._default_agent_type
-            if agent_type is None:
                 raise KeyError("No default agent type set")
 
         # Return existing instance if available
@@ -133,29 +69,19 @@ class SimplifiedAgentRegistry:
 
     def select_agent_for_context(self, context: AgentContext) -> Agent:
         """
-        Select the most appropriate agent for a context.
-
-        This is a simplified selection that checks for keywords in the input
-        and matches them to agent capabilities.
-
-        Args:
-            context: Agent context
-
-        Returns:
-            Selected agent instance
-
-        Raises:
-            RuntimeError: If no agents are registered
         """
-        if not self._agents and not self._agent_types:
             raise RuntimeError("No agents registered")
 
         # Check if a specific agent is requested
         requested_agent = context.metadata.get("agent_type")
         if requested_agent:
             try:
+
+                pass
                 return self.get_agent(requested_agent)
-            except KeyError:
+            except Exception:
+
+                pass
                 logger.warning(f"Requested agent '{requested_agent}' not found, using selection logic")
 
         # Simple keyword-based selection
@@ -194,12 +120,7 @@ class SimplifiedAgentRegistry:
 
     def get_agent_status(self) -> Dict[str, Any]:
         """
-        Get basic status information about registered agents.
-
-        Returns:
-            Dictionary with agent status information
         """
-        return {
             "registered_agents": list(self._agents.keys()),
             "registered_agent_types": list(self._agent_types.keys()),
             "default_agent_type": self._default_agent_type,
@@ -211,31 +132,9 @@ _simplified_agent_registry = None
 
 def get_simplified_agent_registry() -> SimplifiedAgentRegistry:
     """
-    Get the global simplified agent registry instance.
-
-    Returns:
-        The global SimplifiedAgentRegistry instance
     """
-    global _simplified_agent_registry
-
-    if _simplified_agent_registry is None:
-        _simplified_agent_registry = SimplifiedAgentRegistry()
-
-    return _simplified_agent_registry
-
-def register_default_agents():
     """
-    Register default agents in the simplified registry.
-
-    This function registers the standard agent implementations that
-    should be available by default.
     """
-    from core.orchestrator.src.agents.llm_agent import LLMAgent
-    from core.orchestrator.src.agents.persona_agent import PersonaAwareAgent
-
-    registry = get_simplified_agent_registry()
-
-    # Register agent types
     registry.register_agent_type("simple_text", PersonaAwareAgent)
     registry.register_agent_type("llm_agent", LLMAgent)
 
@@ -261,6 +160,8 @@ def register_default_agents():
 
     # Try to register PhidataAgentWrapper if available
     try:
+
+        pass
         from packages.agents.src.phidata_agent import PhidataAgentWrapper
 
         phidata_agent = PhidataAgentWrapper()
@@ -273,7 +174,9 @@ def register_default_agents():
             ]
         registry.register_agent(phidata_agent)
         logger.info("Registered PhidataAgentWrapper instance")
-    except ImportError:
+    except Exception:
+
+        pass
         logger.info("PhidataAgentWrapper not available - skipping registration")
 
     # Set default agent type

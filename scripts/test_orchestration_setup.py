@@ -1,16 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Test script to verify AI Orchestration setup
 """
-
-import os
-import sys
-from pathlib import Path
-
-# Add parent directory to path
-sys.path.append(str(Path(__file__).parent.parent))
-
-def test_environment():
     """Test environment variables"""
     print("=== Testing Environment Variables ===")
     
@@ -51,6 +42,9 @@ def test_database():
     print("\n=== Testing Database Connection ===")
     
     try:
+
+    
+        pass
         # Simple connection test without psycopg2
         db_url = os.environ.get('DATABASE_URL', '')
         if 'postgresql://' in db_url:
@@ -66,7 +60,9 @@ def test_database():
         else:
             print("✗ Invalid database URL format")
             return False
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"✗ Database test failed: {e}")
         return False
 
@@ -103,6 +99,9 @@ def test_orchestrator_import():
     print("\n=== Testing AI Orchestrator Import ===")
     
     try:
+
+    
+        pass
         # Test basic import
         from scripts.setup_api_keys import SimpleSecretsManager
         print("✓ Can import SimpleSecretsManager")
@@ -116,7 +115,10 @@ def test_orchestrator_import():
             print("✗ AI orchestrator file not found")
             return False
             
-    except Exception as e:
+    except Exception:
+
+            
+        pass
         print(f"✗ Import test failed: {e}")
         return False
 

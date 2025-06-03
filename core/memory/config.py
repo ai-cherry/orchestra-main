@@ -1,20 +1,5 @@
 """
-Memory System Configuration
-
-Centralized configuration management for the memory system with
-validation, environment variable support, and type safety.
 """
-
-import os
-from dataclasses import dataclass, field
-from typing import Dict, Optional, Any, List
-from enum import Enum
-import json
-from pathlib import Path
-
-from .exceptions import MemoryConfigurationError
-
-class Environment(Enum):
     """Deployment environment."""
     DEVELOPMENT = "development"
     STAGING = "staging"
@@ -23,10 +8,6 @@ class Environment(Enum):
     @classmethod
     def from_string(cls, value: str) -> 'Environment':
         """Create from string value."""
-        try:
-            return cls(value.lower())
-        except ValueError:
-            raise MemoryConfigurationError(
                 config_section="environment",
                 parameter="ORCHESTRA_ENV",
                 value=value,
@@ -36,16 +17,10 @@ class Environment(Enum):
 @dataclass
 class TierConfig:
     """Configuration for a single memory tier."""
-    enabled: bool = True
-    max_size_bytes: int = 1_073_741_824  # 1GB default
-    max_items: int = 1_000_000
-    ttl_seconds: Optional[int] = None
     eviction_policy: str = "lru"  # lru, lfu, fifo
     
     def validate(self, tier_name: str) -> None:
         """Validate tier configuration."""
-        if self.max_size_bytes <= 0:
-            raise MemoryConfigurationError(
                 config_section=f"tier.{tier_name}",
                 parameter="max_size_bytes",
                 value=self.max_size_bytes,
@@ -89,8 +64,6 @@ class PostgreSQLConfig:
     
     def validate(self) -> None:
         """Validate PostgreSQL configuration."""
-        if not self.host:
-            raise MemoryConfigurationError(
                 config_section="postgresql",
                 parameter="host",
                 value=self.host,
@@ -125,7 +98,6 @@ class PostgreSQLConfig:
     @property
     def connection_string(self) -> str:
         """Generate PostgreSQL connection string."""
-        return (
             f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/"
             f"{self.database}?sslmode={self.ssl_mode}"
         )
@@ -146,8 +118,6 @@ class WeaviateConfig:
     
     def validate(self) -> None:
         """Validate Weaviate configuration."""
-        if not self.url:
-            raise MemoryConfigurationError(
                 config_section="weaviate",
                 parameter="url",
                 value=self.url,
@@ -180,8 +150,6 @@ class RedisConfig:
     
     def validate(self) -> None:
         """Validate Redis configuration."""
-        if not self.host and not self.cluster_nodes:
-            raise MemoryConfigurationError(
                 config_section="redis",
                 parameter="host",
                 value=self.host,
@@ -199,26 +167,7 @@ class RedisConfig:
 @dataclass
 class OptimizationConfig:
     """Memory optimization configuration."""
-    enabled: bool = True
-    
-    # Access pattern analysis
-    access_history_size: int = 1000
-    promotion_threshold: int = 10  # Access count before promotion
-    demotion_threshold_hours: int = 24  # Hours without access before demotion
-    
-    # Prefetching
-    prefetch_enabled: bool = True
-    prefetch_limit: int = 10
-    prefetch_probability_threshold: float = 0.7
-    
-    # Background tasks
-    optimization_interval_seconds: int = 300  # 5 minutes
-    cleanup_interval_seconds: int = 3600  # 1 hour
-    
-    def validate(self) -> None:
         """Validate optimization configuration."""
-        if self.promotion_threshold <= 0:
-            raise MemoryConfigurationError(
                 config_section="optimization",
                 parameter="promotion_threshold",
                 value=self.promotion_threshold,
@@ -236,22 +185,7 @@ class OptimizationConfig:
 @dataclass
 class MetricsConfig:
     """Metrics collection configuration."""
-    enabled: bool = True
-    
-    # Prometheus settings
-    prometheus_enabled: bool = True
-    prometheus_port: int = 9090
-    
-    # Retention
-    metrics_retention_hours: int = 168  # 7 days
-    
-    # Sampling
-    sampling_rate: float = 1.0  # 1.0 = 100% sampling
-    
-    def validate(self) -> None:
         """Validate metrics configuration."""
-        if not 0.0 <= self.sampling_rate <= 1.0:
-            raise MemoryConfigurationError(
                 config_section="metrics",
                 parameter="sampling_rate",
                 value=self.sampling_rate,
@@ -261,14 +195,7 @@ class MetricsConfig:
 @dataclass
 class MemoryConfig:
     """
-    Complete memory system configuration.
-    
-    This is the root configuration object that contains all subsystem configs.
     """
-    environment: Environment = Environment.DEVELOPMENT
-    
-    # Tier configurations
-    tiers: Dict[str, TierConfig] = field(default_factory=lambda: {
         "l0_cpu_cache": TierConfig(max_size_bytes=10_485_760, max_items=10_000),  # 10MB
         "l1_process": TierConfig(max_size_bytes=1_073_741_824, max_items=100_000),  # 1GB
         "l2_shared": TierConfig(max_size_bytes=4_294_967_296, max_items=1_000_000),  # 4GB
@@ -297,22 +224,6 @@ class MemoryConfig:
     
     def validate(self) -> None:
         """Validate entire configuration."""
-        # Validate tier configs
-        for tier_name, tier_config in self.tiers.items():
-            tier_config.validate(tier_name)
-            
-        # Validate backend configs
-        self.postgresql.validate()
-        self.weaviate.validate()
-        self.redis.validate()
-        
-        # Validate feature configs
-        self.optimization.validate()
-        self.metrics.validate()
-        
-        # Validate global settings
-        if self.encryption_enabled and not self.encryption_key:
-            raise MemoryConfigurationError(
                 config_section="global",
                 parameter="encryption_key",
                 value="None",
@@ -330,9 +241,6 @@ class MemoryConfig:
     @classmethod
     def from_env(cls) -> 'MemoryConfig':
         """Create configuration from environment variables."""
-        config = cls()
-        
-        # Environment
         if env := os.getenv("ORCHESTRA_ENV"):
             config.environment = Environment.from_string(env)
             
@@ -372,12 +280,6 @@ class MemoryConfig:
     @classmethod
     def from_file(cls, path: Path) -> 'MemoryConfig':
         """Load configuration from JSON file."""
-        try:
-            with open(path, 'r') as f:
-                data = json.load(f)
-            return cls.from_dict(data)
-        except Exception as e:
-            raise MemoryConfigurationError(
                 config_section="file",
                 parameter="path",
                 value=str(path),
@@ -388,10 +290,6 @@ class MemoryConfig:
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'MemoryConfig':
         """Create configuration from dictionary."""
-        # This would need proper deserialization logic
-        # For now, keeping it simple
-        config = cls()
-        
         if "environment" in data:
             config.environment = Environment.from_string(data["environment"])
             
@@ -402,7 +300,6 @@ class MemoryConfig:
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert configuration to dictionary."""
-        return {
             "environment": self.environment.value,
             "tiers": {
                 name: {
@@ -457,19 +354,5 @@ _config: Optional[MemoryConfig] = None
 
 def get_config() -> MemoryConfig:
     """Get the global configuration instance."""
-    global _config
-    if _config is None:
-        _config = MemoryConfig.from_env()
-        _config.validate()
-    return _config
-
-def set_config(config: MemoryConfig) -> None:
     """Set the global configuration instance."""
-    global _config
-    config.validate()
-    _config = config
-
-def reset_config() -> None:
     """Reset configuration to defaults."""
-    global _config
-    _config = None

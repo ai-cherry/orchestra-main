@@ -1,19 +1,7 @@
 #!/usr/bin/env python3
 """
-Initialize Weaviate schema for AI Orchestrator
-Sets up classes and properties for context storage
 """
-
-import os
-import sys
-from pathlib import Path
-import weaviate
-from weaviate.auth import AuthApiKey
-import json
-
-def create_orchestration_schema():
     """Define the Weaviate schema for orchestration context"""
-    return {
         "classes": [
             {
                 "class": "OrchestrationContext",
@@ -172,17 +160,15 @@ def create_orchestration_schema():
 
 def initialize_weaviate():
     """Initialize Weaviate with the orchestration schema"""
-    # Get Weaviate credentials
-    weaviate_url = os.environ.get('WEAVIATE_URL')
-    weaviate_api_key = os.environ.get('WEAVIATE_API_KEY')
-    
-    if not weaviate_url or not weaviate_api_key:
         print("Error: WEAVIATE_URL and WEAVIATE_API_KEY must be set")
         sys.exit(1)
     
     print(f"Connecting to Weaviate at {weaviate_url}...")
     
     try:
+
+    
+        pass
         # Create client
         client = weaviate.Client(
             url=weaviate_url,
@@ -205,11 +191,15 @@ def initialize_weaviate():
             
             # Check if class already exists
             try:
+
+                pass
                 existing = client.schema.get(class_name)
                 if existing:
                     print(f"Class '{class_name}' already exists, skipping...")
                     continue
-            except:
+            except Exception:
+
+                pass
                 pass  # Class doesn't exist, we'll create it
             
             # Create class
@@ -247,7 +237,10 @@ def initialize_weaviate():
         
         print("\nWeaviate initialization completed successfully!")
         
-    except Exception as e:
+    except Exception:
+
+        
+        pass
         print(f"Error initializing Weaviate: {str(e)}")
         sys.exit(1)
 

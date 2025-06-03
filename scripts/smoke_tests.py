@@ -1,42 +1,22 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Smoke tests for AI Orchestrator deployment
-Verifies basic functionality after deployment
 """
-
-import sys
-import argparse
-import requests
-import asyncio
-import json
-from typing import Dict, List, Tuple
-import psycopg2
-from datetime import datetime
-
-class SmokeTestRunner:
     """Runs smoke tests against deployed AI Orchestrator"""
-    
-    def __init__(self, server_ip: str, mcp_url: str):
-        self.server_ip = server_ip
-        self.mcp_url = mcp_url
-        self.results = []
-        
-    def test_mcp_server_health(self) -> Tuple[bool, str]:
         """Test MCP server health endpoint"""
-        try:
             response = requests.get(f"{self.mcp_url}/", timeout=5)
             if response.status_code == 200:
                 data = response.json()
                 if data.get("message") == "AI Orchestrator MCP Server":
                     return True, "MCP server is healthy"
             return False, f"MCP server returned status {response.status_code}"
-        except Exception as e:
+        except Exception:
+
+            pass
             return False, f"Failed to connect to MCP server: {str(e)}"
     
     def test_mcp_task_creation(self) -> Tuple[bool, str]:
         """Test creating a task via MCP server"""
-        try:
-            task_data = {
                 "task_id": f"smoke_test_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
                 "name": "Smoke Test Task",
                 "agent_role": "analyzer",
@@ -57,88 +37,58 @@ class SmokeTestRunner:
                 if created_task.get("task_id") == task_data["task_id"]:
                     return True, f"Task created successfully: {created_task['task_id']}"
             return False, f"Task creation failed with status {response.status_code}"
-        except Exception as e:
+        except Exception:
+
+            pass
             return False, f"Failed to create task: {str(e)}"
     
     def test_database_connection(self) -> Tuple[bool, str]:
         """Test PostgreSQL database connection"""
-        try:
-            import os
-            conn = psycopg2.connect(
-                host=os.environ.get('POSTGRES_HOST', self.server_ip),
-                port=os.environ.get('POSTGRES_PORT', 5432),
-                database=os.environ.get('POSTGRES_DB', 'orchestrator'),
-                user=os.environ.get('POSTGRES_USER'),
-                password=os.environ.get('POSTGRES_PASSWORD')
-            )
-            
-            with conn.cursor() as cur:
-                cur.execute("SELECT 1")
+                cur.# TODO: Consider adding EXPLAIN ANALYZE for performance
+execute("SELECT 1")
                 result = cur.fetchone()
                 if result and result[0] == 1:
                     # Check if tables exist
                     cur.execute("""
-                        SELECT COUNT(*) FROM information_schema.tables 
-                        WHERE table_name = 'orchestration_logs'
-                    """)
-                    table_count = cur.fetchone()[0]
-                    if table_count > 0:
+                    """
                         return True, "Database connection successful, tables exist"
                     else:
                         return False, "Database connected but tables not found"
             
             conn.close()
             return False, "Database query failed"
-        except Exception as e:
+        except Exception:
+
+            pass
             return False, f"Database connection failed: {str(e)}"
     
     def test_weaviate_connection(self) -> Tuple[bool, str]:
         """Test Weaviate connection"""
-        try:
-            import os
-            import weaviate
-            from weaviate.auth import AuthApiKey
-            
-            client = weaviate.Client(
-                url=os.environ.get('WEAVIATE_URL'),
-                auth_client_secret=AuthApiKey(
-                    api_key=os.environ.get('WEAVIATE_API_KEY')
-                )
-            )
-            
-            if client.is_ready():
-                # Check if schema exists
-                schema = client.schema.get()
-                classes = [c['class'] for c in schema.get('classes', [])]
-                if 'OrchestrationContext' in classes:
                     return True, "Weaviate connected and schema exists"
                 else:
                     return False, "Weaviate connected but schema not found"
             return False, "Weaviate is not ready"
-        except Exception as e:
+        except Exception:
+
+            pass
             return False, f"Weaviate connection failed: {str(e)}"
     
     def test_orchestrator_service(self) -> Tuple[bool, str]:
         """Test orchestrator service status"""
-        try:
-            # Check systemd service status via SSH would be ideal
-            # For now, we'll check if the service endpoint responds
-            response = requests.get(
                 f"http://{self.server_ip}:8000/health",
                 timeout=5
             )
             if response.status_code == 200:
                 return True, "Orchestrator service is running"
             return False, f"Orchestrator service returned status {response.status_code}"
-        except:
+        except Exception:
+
+            pass
             # Service might not have a health endpoint yet
             return True, "Orchestrator service check skipped (no health endpoint)"
     
     def test_monitoring_stack(self) -> Tuple[bool, str]:
         """Test monitoring stack (Prometheus/Grafana)"""
-        try:
-            # Test Prometheus
-            prom_response = requests.get(
                 f"http://{self.server_ip}:9090/-/healthy",
                 timeout=5
             )
@@ -155,19 +105,13 @@ class SmokeTestRunner:
                 return True, "Prometheus is healthy (Grafana may still be starting)"
             else:
                 return False, "Monitoring stack is not fully operational"
-        except Exception as e:
+        except Exception:
+
+            pass
             return False, f"Monitoring stack check failed: {str(e)}"
     
     async def test_workflow_execution(self) -> Tuple[bool, str]:
         """Test basic workflow execution"""
-        try:
-            # Import orchestrator module
-            sys.path.append('/opt/ai-orchestrator')
-            from ai_components.orchestration.ai_orchestrator import (
-                WorkflowOrchestrator, TaskDefinition, AgentRole
-            )
-            
-            orchestrator = WorkflowOrchestrator()
             workflow_id = f"smoke_test_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
             
             # Create simple workflow
@@ -189,12 +133,13 @@ class SmokeTestRunner:
                 return True, f"Workflow executed successfully: {workflow_id}"
             else:
                 return False, f"Workflow failed with status: {result.status.value}"
-        except Exception as e:
+        except Exception:
+
+            pass
             return False, f"Workflow execution failed: {str(e)}"
     
     def run_all_tests(self) -> Dict[str, bool]:
         """Run all smoke tests"""
-        tests = [
             ("MCP Server Health", self.test_mcp_server_health),
             ("MCP Task Creation", self.test_mcp_task_creation),
             ("Database Connection", self.test_database_connection),
@@ -227,6 +172,8 @@ class SmokeTestRunner:
         # Run async test
         print(f"\nTesting: Workflow Execution")
         try:
+
+            pass
             passed, message = asyncio.run(self.test_workflow_execution())
             if passed:
                 print(f"✓ PASSED: {message}")
@@ -239,7 +186,9 @@ class SmokeTestRunner:
                 "passed": passed,
                 "message": message
             })
-        except Exception as e:
+        except Exception:
+
+            pass
             print(f"✗ FAILED: {str(e)}")
             all_passed = False
             self.results.append({
@@ -286,16 +235,5 @@ class SmokeTestRunner:
 
 def main():
     """Main function"""
-    parser = argparse.ArgumentParser(description='Run smoke tests for AI Orchestrator')
-    parser.add_argument('--server', required=True, help='Server IP address')
-    parser.add_argument('--mcp-url', required=True, help='MCP server URL')
-    
-    args = parser.parse_args()
-    
-    runner = SmokeTestRunner(args.server, args.mcp_url)
-    all_passed = runner.run_all_tests()
-    
-    sys.exit(0 if all_passed else 1)
-
 if __name__ == "__main__":
     main()

@@ -1,19 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Simple test script to verify Roo-AI Orchestrator integration components
 """
-
-import os
-import sys
-import json
-from pathlib import Path
-
-# Add parent directory to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-def test_file_exists(filepath, description):
     """Test if a file exists"""
-    if Path(filepath).exists():
         print(f"✅ {description}: {filepath}")
         return True
     else:
@@ -22,11 +11,13 @@ def test_file_exists(filepath, description):
 
 def test_config_valid(filepath, description):
     """Test if a JSON/YAML config file is valid"""
-    if not Path(filepath).exists():
         print(f"❌ {description}: {filepath} NOT FOUND")
         return False
     
     try:
+
+    
+        pass
         with open(filepath, 'r') as f:
             if filepath.endswith('.json'):
                 json.load(f)
@@ -36,7 +27,9 @@ def test_config_valid(filepath, description):
                 if len(content) > 0:
                     print(f"✅ {description}: {filepath} (valid)")
                     return True
-    except Exception as e:
+    except Exception:
+
+        pass
         print(f"❌ {description}: {filepath} (invalid - {e})")
         return False
     

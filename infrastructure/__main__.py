@@ -1,16 +1,6 @@
+# TODO: Consider adding connection pooling configuration
 """
-Pulumi Infrastructure Configuration for AI Orchestrator
-Provisions Vultr server, PostgreSQL, and integrations with Weaviate/Airbyte Cloud
 """
-
-import pulumi
-import pulumi_vultr as vultr
-import pulumi_postgresql as postgresql
-from pulumi import Config, Output, export
-import json
-
-# Get configuration
-config = Config()
 environment = config.get("environment") or "production"
 vultr_region = config.get("vultr_region") or "ewr"  # New Jersey
 instance_plan = config.get("instance_plan") or "vc2-4c-8gb"  # 4 vCPU, 8GB RAM
@@ -95,34 +85,7 @@ vpc = vultr.Vpc("ai-orchestrator-vpc",
 )
 
 # User data script for server initialization
-user_data = """#!/bin/bash
-set -e
-
-# Update system
-apt-get update
-apt-get upgrade -y
-
-# Install required packages
-apt-get install -y \
-    python3.11 \
-    python3.11-venv \
-    python3-pip \
-    postgresql-client \
-    git \
-    curl \
-    wget \
-    htop \
-    vim \
-    tmux \
-    build-essential \
-    libpq-dev
-
-# Install Docker
-curl -fsSL https://get.docker.com -o get-docker.sh
-sh get-docker.sh
-usermod -aG docker root
-
-# Install Docker Compose
+user_data = """
 curl -L "https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 
@@ -205,8 +168,6 @@ EOF
 
 echo "Server initialization complete"
 """
-
-# Create the main server instance
 server = vultr.Instance("ai-orchestrator-server",
     region=vultr_region,
     plan=instance_plan,
@@ -304,20 +265,7 @@ app_schema = postgresql.Schema("orchestrator-schema",
 )
 
 # Create monitoring stack (Prometheus + Grafana)
-monitoring_compose = """version: '3.8'
-
-services:
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
-    restart: unless-stopped
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-    ports:
+monitoring_compose = """
       - "9090:9090"
 
   grafana:
@@ -339,28 +287,8 @@ volumes:
   prometheus_data:
   grafana_data:
 """
-
-# Prometheus configuration
-prometheus_config = """global:
-  scrape_interval: 15s
-  evaluation_interval: 15s
-
-scrape_configs:
-  - job_name: 'node-exporter'
-    static_configs:
-      - targets: ['localhost:9100']
-  
-  - job_name: 'mcp-server'
-    static_configs:
-      - targets: ['localhost:8080']
-    metrics_path: '/metrics'
-  
-  - job_name: 'postgres'
-    static_configs:
-      - targets: ['localhost:9187']
+prometheus_config = """
 """
-
-# Output important values
 export("server_ip", server.main_ip)
 export("server_ipv6", server.v6_main_ip)
 export("vpc_subnet", vpc.v4_subnet)

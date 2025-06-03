@@ -1,110 +1,26 @@
+# TODO: Consider adding connection pooling configuration
 """
-Layered Memory Management for AI Orchestration System.
-
-This module provides a layered memory management system that combines
-different memory stores (short-term, long-term, semantic) to create a
-comprehensive memory system for agents.
 """
-
-import asyncio
-import logging
-from typing import Any, Dict, List, Optional
-
-from pydantic import BaseModel, Field
-
-from core.orchestrator.src.agents.memory.manager import FirestoreMemoryStore, MemoryQuery, MemoryStore, RedisMemoryStore
-from core.orchestrator.src.config.models import MemoryType
-from packages.shared.src.models.base_models import MemoryItem
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-class MemoryLayer(BaseModel):
     """
-    Configuration for a memory layer.
-
-    This class defines a layer in the layered memory system, including
-    the store type, priority, and configuration.
     """
-
-    name: str
-    store_type: MemoryType
-    priority: int
-    config: Dict[str, Any] = Field(default_factory=dict)
-    ttl: Optional[int] = None
-
-    class Config:
-        arbitrary_types_allowed = True
-
-class LayeredMemoryManager:
     """
-    Layered memory management system.
-
-    This class provides a unified interface for managing memory across
-    different stores, with support for layered retrieval, prioritization,
-    and automatic TTL-based memory management.
     """
-
-    def __init__(self, layers: Optional[List[MemoryLayer]] = None):
         """
-        Initialize the layered memory manager.
-
-        Args:
-            layers: Optional list of memory layers to use
         """
-        self.layers = layers or []
-        self._stores: Dict[str, MemoryStore] = {}
-        self._initialized = False
-
-    async def initialize(self) -> None:
         """
-        Initialize all memory stores.
-
-        This method initializes all configured memory stores, establishing
-        connections to the underlying storage systems.
-
-        Raises:
-            ConnectionError: If connection to any storage system fails
         """
-        for layer in self.layers:
-            store = self._create_store(layer)
-            await store.initialize()
-            self._stores[layer.name] = store
-
-        self._initialized = True
         logger.info(f"Initialized {len(self._stores)} memory stores")
 
     async def close(self) -> None:
         """
-        Close all memory stores.
-
-        This method closes all initialized memory stores, releasing any
-        resources they hold.
         """
-        for name, store in self._stores.items():
-            await store.close()
-            logger.debug(f"Closed memory store: {name}")
 
         self._stores = {}
         self._initialized = False
 
     def _create_store(self, layer: MemoryLayer) -> MemoryStore:
         """
-        Create a memory store for a layer.
-
-        Args:
-            layer: The memory layer configuration
-
-        Returns:
-            An initialized memory store
-
-        Raises:
-            ValueError: If the store type is unknown
         """
-        config = layer.config.copy()
-
-        # Add TTL if specified
-        if layer.ttl:
             config["ttl"] = layer.ttl
 
         # Create store based on type
@@ -129,37 +45,7 @@ class LayeredMemoryManager:
 
     async def store(self, item: MemoryItem, layer_name: Optional[str] = None) -> str:
         """
-        Store a memory item.
-
-        Args:
-            item: The memory item to store
-            layer_name: Optional name of the layer to store in (if None, stores in all layers)
-
-        Returns:
-            The ID of the stored item
-
-        Raises:
-            ValueError: If the layer is unknown or the item is invalid
-            ConnectionError: If storage fails due to connection issues
         """
-        if not self._initialized:
-            await self.initialize()
-
-        # If no specific layer is specified, store in all layers
-        if layer_name is None:
-            # Store in all layers and return the ID from the highest priority layer
-            highest_priority = -1
-            item_id = None
-
-            for layer in sorted(self.layers, key=lambda l: l.priority, reverse=True):
-                store = self._stores[layer.name]
-                current_id = await store.store(item)
-
-                if layer.priority > highest_priority:
-                    highest_priority = layer.priority
-                    item_id = current_id
-
-            if item_id is None:
                 raise ValueError("No memory layers configured")
 
             return item_id
@@ -173,25 +59,7 @@ class LayeredMemoryManager:
 
     async def retrieve(self, item_id: str, layer_name: Optional[str] = None) -> Optional[MemoryItem]:
         """
-        Retrieve a memory item.
-
-        Args:
-            item_id: The ID of the item to retrieve
-            layer_name: Optional name of the layer to retrieve from (if None, tries all layers)
-
-        Returns:
-            The retrieved memory item, or None if not found
-
-        Raises:
-            ValueError: If the layer is unknown
-            ConnectionError: If retrieval fails due to connection issues
         """
-        if not self._initialized:
-            await self.initialize()
-
-        # If a specific layer is specified, retrieve from that layer
-        if layer_name is not None:
-            if layer_name not in self._stores:
                 raise ValueError(f"Unknown memory layer: {layer_name}")
 
             store = self._stores[layer_name]
@@ -210,25 +78,7 @@ class LayeredMemoryManager:
 
     async def query(self, query: MemoryQuery, layer_name: Optional[str] = None) -> List[MemoryItem]:
         """
-        Query for memory items.
-
-        Args:
-            query: The query parameters
-            layer_name: Optional name of the layer to query (if None, queries all layers)
-
-        Returns:
-            A list of matching memory items
-
-        Raises:
-            ValueError: If the layer is unknown
-            ConnectionError: If query fails due to connection issues
         """
-        if not self._initialized:
-            await self.initialize()
-
-        # If a specific layer is specified, query that layer
-        if layer_name is not None:
-            if layer_name not in self._stores:
                 raise ValueError(f"Unknown memory layer: {layer_name}")
 
             store = self._stores[layer_name]
@@ -246,6 +96,8 @@ class LayeredMemoryManager:
         # Wait for all queries to complete
         for layer, task in tasks:
             try:
+
+                pass
                 results = await task
                 # Add layer info to metadata
                 for item in results:
@@ -254,7 +106,9 @@ class LayeredMemoryManager:
                     item.metadata["memory_layer"] = layer.name
 
                 all_results.extend(results)
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Error querying layer {layer.name}: {e}")
 
         # Sort by timestamp (newest first) and apply limit
@@ -264,25 +118,7 @@ class LayeredMemoryManager:
 
     async def delete(self, item_id: str, layer_name: Optional[str] = None) -> bool:
         """
-        Delete a memory item.
-
-        Args:
-            item_id: The ID of the item to delete
-            layer_name: Optional name of the layer to delete from (if None, deletes from all layers)
-
-        Returns:
-            True if the item was deleted from any layer, False otherwise
-
-        Raises:
-            ValueError: If the layer is unknown
-            ConnectionError: If deletion fails due to connection issues
         """
-        if not self._initialized:
-            await self.initialize()
-
-        # If a specific layer is specified, delete from that layer
-        if layer_name is not None:
-            if layer_name not in self._stores:
                 raise ValueError(f"Unknown memory layer: {layer_name}")
 
             store = self._stores[layer_name]
@@ -293,33 +129,20 @@ class LayeredMemoryManager:
 
         for layer_name, store in self._stores.items():
             try:
+
+                pass
                 if await store.delete(item_id):
                     deleted = True
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Error deleting from layer {layer_name}: {e}")
 
         return deleted
 
     async def clear(self, layer_name: Optional[str] = None) -> int:
         """
-        Clear memory items.
-
-        Args:
-            layer_name: Optional name of the layer to clear (if None, clears all layers)
-
-        Returns:
-            The number of items cleared
-
-        Raises:
-            ValueError: If the layer is unknown
-            ConnectionError: If clearing fails due to connection issues
         """
-        if not self._initialized:
-            await self.initialize()
-
-        # If a specific layer is specified, clear that layer
-        if layer_name is not None:
-            if layer_name not in self._stores:
                 raise ValueError(f"Unknown memory layer: {layer_name}")
 
             store = self._stores[layer_name]
@@ -330,45 +153,27 @@ class LayeredMemoryManager:
 
         for layer_name, store in self._stores.items():
             try:
+
+                pass
                 cleared = await store.clear()
                 total_cleared += cleared
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Error clearing layer {layer_name}: {e}")
 
         return total_cleared
 
     async def recall_relevant(self, text: str, limit: int = 10) -> List[MemoryItem]:
         """
-        Recall memories relevant to the given text.
-
-        This method is a convenience wrapper around query() that focuses on
-        semantic relevance, using vector search when available.
-
-        Args:
-            text: The text to find relevant memories for
-            limit: Maximum number of memories to return
-
-        Returns:
-            A list of relevant memory items
         """
-        # First try semantic search in vector stores
-        vector_results = []
-
-        for layer in self.layers:
-            if layer.store_type in [MemoryType.PGVECTOR, MemoryType.OPENAI_VECTOR]:
-                store = self._stores[layer.name]
-                query = MemoryQuery(text=text, limit=limit)
-
-                try:
-                    results = await store.query(query)
-                    for item in results:
-                        if item.metadata is None:
-                            item.metadata = {}
                         item.metadata["memory_layer"] = layer.name
                         item.metadata["retrieval_type"] = "semantic"
 
                     vector_results.extend(results)
-                except Exception as e:
+                except Exception:
+
+                    pass
                     logger.error(f"Error querying vector layer {layer.name}: {e}")
 
         # If we have enough vector results, return them
@@ -385,6 +190,9 @@ class LayeredMemoryManager:
                 query = MemoryQuery(text=text, limit=remaining)
 
                 try:
+
+
+                    pass
                     results = await store.query(query)
                     for item in results:
                         if item.metadata is None:
@@ -393,7 +201,9 @@ class LayeredMemoryManager:
                         item.metadata["retrieval_type"] = "keyword"
 
                     keyword_results.extend(results)
-                except Exception as e:
+                except Exception:
+
+                    pass
                     logger.error(f"Error querying layer {layer.name}: {e}")
 
         # Combine and return results
@@ -408,24 +218,7 @@ class LayeredMemoryManager:
         metadata: Optional[Dict[str, Any]] = None,
     ) -> str:
         """
-        Remember a conversation message.
-
-        This is a convenience method for storing conversation messages with
-        appropriate metadata.
-
-        Args:
-            text: The message text
-            user_id: The ID of the user
-            conversation_id: The ID of the conversation
-            metadata: Additional metadata
-
-        Returns:
-            The ID of the stored memory item
         """
-        # Create memory item
-        item = MemoryItem(
-            text_content=text,
-            metadata={
                 "user_id": user_id,
                 "conversation_id": conversation_id,
                 "type": "conversation",
@@ -438,19 +231,7 @@ class LayeredMemoryManager:
 
     async def get_conversation_history(self, conversation_id: str, limit: int = 50) -> List[MemoryItem]:
         """
-        Get conversation history.
-
-        This is a convenience method for retrieving conversation messages.
-
-        Args:
-            conversation_id: The ID of the conversation
-            limit: Maximum number of messages to return
-
-        Returns:
-            A list of conversation messages
         """
-        query = MemoryQuery(
-            metadata_filters={
                 "conversation_id": conversation_id,
                 "type": "conversation",
             },
@@ -461,18 +242,7 @@ class LayeredMemoryManager:
 
 def create_default_memory_manager() -> LayeredMemoryManager:
     """
-    Create a default memory manager with standard layers.
-
-    This function creates a memory manager with three layers:
-    - Short-term memory (Redis)
-    - Long-term memory (mongodb)
-    - Semantic memory (Vertex AI Vector Search)
-
-    Returns:
-        A configured memory manager
     """
-    layers = [
-        MemoryLayer(
             name="short_term",
             store_type=MemoryType.REDIS,
             priority=3,  # Highest priority
@@ -504,18 +274,4 @@ _memory_manager: Optional[LayeredMemoryManager] = None
 
 async def get_memory_manager() -> LayeredMemoryManager:
     """
-    Get the global memory manager instance.
-
-    This function returns the global memory manager instance, initializing
-    it if necessary.
-
-    Returns:
-        The global memory manager
     """
-    global _memory_manager
-
-    if _memory_manager is None:
-        _memory_manager = create_default_memory_manager()
-        await _memory_manager.initialize()
-
-    return _memory_manager

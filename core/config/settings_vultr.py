@@ -1,15 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 """
-Settings configuration for Orchestra AI - Vultr/PostgreSQL/Weaviate version.
 """
-import os
-from typing import Optional
-from pydantic import Field
-from pydantic_settings import BaseSettings
-
-class Settings(BaseSettings):
     """Application settings for Vultr deployment."""
-    
-    # Basic configuration
     environment: str = Field(default="development", env="ENVIRONMENT")
     debug: bool = Field(default=False, env="DEBUG")
     
@@ -48,20 +40,6 @@ class Settings(BaseSettings):
     
     def get_vultr_project_id(self) -> Optional[str]:
         """Get Vultr project ID."""
-        return self.vultr_project_id
-    
-    def get_vultr_credentials_path(self) -> Optional[str]:
         """Get Vultr credentials path."""
-        return self.vultr_credentials_path
-    
-    # Compatibility methods for easier migration
-    def get_project_id(self) -> Optional[str]:
         """Get project ID (Vultr)."""
-        return self.vultr_project_id
-    
-    def get_credentials_path(self) -> Optional[str]:
         """Get credentials path."""
-        return self.vultr_credentials_path
-
-# Global settings instance
-settings = Settings()

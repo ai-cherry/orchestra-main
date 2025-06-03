@@ -1,36 +1,14 @@
 #!/usr/bin/env python3
 """
-Test script to verify all MCP servers work together
 """
-
-import asyncio
-from datetime import datetime
-
-import httpx
-from rich.console import Console
-from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, TextColumn
-from rich.table import Table
-
-console = Console()
-
-# Test configuration
 GATEWAY_URL = "http://localhost:8000"
 TESTS = []
 
 def test(name: str):
     """Decorator to register tests"""
-
-    def decorator(func):
-        TESTS.append((name, func))
-        return func
-
-    return decorator
-
 @test("Gateway Health Check")
 async def test_gateway_health():
     """Test gateway health endpoint"""
-    async with httpx.AsyncClient() as client:
         response = await client.get(f"{GATEWAY_URL}/health")
         assert response.status_code == 200
         data = response.json()
@@ -40,7 +18,6 @@ async def test_gateway_health():
 @test("Server Status Check")
 async def test_server_status():
     """Test detailed server status"""
-    async with httpx.AsyncClient() as client:
         response = await client.get(f"{GATEWAY_URL}/status")
         assert response.status_code == 200
         data = response.json()
@@ -54,7 +31,6 @@ async def test_server_status():
 @test("List Available Tools")
 async def test_list_tools():
     """Test listing all MCP tools"""
-    async with httpx.AsyncClient() as client:
         response = await client.get(f"{GATEWAY_URL}/mcp/tools")
         assert response.status_code == 200
         data = response.json()
@@ -65,8 +41,6 @@ async def test_list_tools():
 @test("Store Memory")
 async def test_store_memory():
     """Test storing a memory"""
-    async with httpx.AsyncClient() as client:
-        memory_data = {
             "server": "memory",
             "action": "store_memory",
             "params": {
@@ -87,8 +61,6 @@ async def test_store_memory():
 @test("Query Memory")
 async def test_query_memory():
     """Test querying memories"""
-    async with httpx.AsyncClient() as client:
-        query_data = {
             "server": "memory",
             "action": "query_memory",
             "params": {"query": "test memory", "max_results": 5},
@@ -103,8 +75,6 @@ async def test_query_memory():
 @test("Create Secret")
 async def test_create_secret():
     """Test creating a secret"""
-    async with httpx.AsyncClient() as client:
-        secret_data = {
             "server": "secrets",
             "action": "create_secret",
             "params": {
@@ -129,8 +99,6 @@ async def test_create_secret():
 @test("Switch Mode")
 async def test_switch_mode():
     """Test switching orchestrator mode"""
-    async with httpx.AsyncClient() as client:
-        mode_data = {
             "server": "orchestrator",
             "action": "switch_mode",
             "params": {"mode": "performance", "context": {"test": True}},
@@ -145,8 +113,6 @@ async def test_switch_mode():
 @test("Run Workflow")
 async def test_run_workflow():
     """Test running a workflow"""
-    async with httpx.AsyncClient() as client:
-        workflow_data = {
             "server": "orchestrator",
             "action": "run_workflow",
             "params": {"name": "code_review", "params": {"test": True}},
@@ -161,8 +127,6 @@ async def test_run_workflow():
 @test("Get Orchestrator Status")
 async def test_orchestrator_status():
     """Test getting orchestrator status"""
-    async with httpx.AsyncClient() as client:
-        status_data = {
             "server": "orchestrator",
             "action": "get_status",
             "params": {"include_workflows": True, "include_tasks": True},
@@ -177,7 +141,6 @@ async def test_orchestrator_status():
 @test("Prometheus Metrics")
 async def test_metrics():
     """Test Prometheus metrics endpoint"""
-    async with httpx.AsyncClient() as client:
         response = await client.get(f"{GATEWAY_URL}/metrics")
         assert response.status_code == 200
         assert "mcp_gateway_requests_total" in response.text
@@ -188,8 +151,6 @@ async def test_metrics():
 
 async def run_tests():
     """Run all tests"""
-    console.print(
-        Panel.fit(
             "[bold blue]MCP System Integration Tests[/bold blue]\n" f"Testing {len(TESTS)} components...",
             border_style="blue",
         )
@@ -214,10 +175,15 @@ async def run_tests():
             task = progress.add_task(f"Running {test_name}...", total=None)
 
             try:
+
+
+                pass
                 result = await test_func()
                 table.add_row(test_name, "[green]✓ PASS[/green]", result)
                 passed += 1
-            except Exception as e:
+            except Exception:
+
+                pass
                 table.add_row(test_name, "[red]✗ FAIL[/red]", f"[red]{str(e)}[/red]")
                 failed += 1
 
@@ -240,14 +206,18 @@ async def run_tests():
 
 async def main():
     """Main test runner"""
-    # Wait a bit for servers to be ready
     console.print("[yellow]Waiting for servers to be ready...[/yellow]")
     await asyncio.sleep(2)
 
     try:
+
+
+        pass
         success = await run_tests()
         exit(0 if success else 1)
-    except Exception as e:
+    except Exception:
+
+        pass
         console.print(f"[bold red]Test execution failed: {e}[/bold red]")
         exit(1)
 

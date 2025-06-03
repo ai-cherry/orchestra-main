@@ -1,48 +1,13 @@
 #!/usr/bin/env python3
 """
-A wrapper script to run the MCP server with the correct import paths
 """
-
-import argparse
-import asyncio
-import json
-import logging
-import os
-import sys
-from typing import Any, Dict, Optional
-
-# Add the project root to the Python path
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, project_root)
-
-import importlib
-import pkgutil
-
-from mcp_server.config import MCPConfig, load_config
-from mcp_server.managers.standard_memory_manager import StandardMemoryManager
-from mcp_server.storage.in_memory_storage import InMemoryStorage
-
-# Now we can import modules with proper package structure
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
 logger = logging.getLogger("mcp-main")
 
 class MCPApplication:
     """Main MCP application class."""
-
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
         """Initialize the MCP application."""
-        self.config: Dict[str, Any] = config or {}
-        self.storage: Optional[InMemoryStorage] = None
-        self.memory_manager: Optional[StandardMemoryManager] = None
-        self.tools = {}
-        self.initialized = False
-
-    async def initialize(self) -> bool:
         """Initialize the MCP application."""
         logger.info("Initializing MCP application")
 
@@ -88,7 +53,6 @@ class MCPApplication:
 
     async def get_status(self) -> Dict[str, Any]:
         """Get the status of the MCP application."""
-        if not self.initialized or self.memory_manager is None:
             return {"status": "not_initialized"}
 
         # Get memory status
@@ -98,9 +62,13 @@ class MCPApplication:
         tool_statuses = {}
         for tool_name, adapter in self.tools.items():
             try:
+
+                pass
                 tool_status = await adapter.get_status()
                 tool_statuses[tool_name] = tool_status
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Error getting status for {tool_name}: {e}")
                 tool_statuses[tool_name] = {"status": "error", "error": str(e)}
 
@@ -112,15 +80,15 @@ class MCPApplication:
 
 async def main_async(config_path: Optional[str] = None):
     """Async main function."""
-    try:
-        # Load configuration
-        config = load_config(config_path)
         logger.info(f"Using configuration with log level: {config.log_level}")
 
         # Set the log level from config
         logging.getLogger().setLevel(config.log_level)
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Error loading configuration: {e}")
         logger.warning("Using default configuration")
         config = MCPConfig()
@@ -141,10 +109,15 @@ async def main_async(config_path: Optional[str] = None):
     logger.info("MCP Server running. Press Ctrl+C to stop.")
 
     try:
+
+
+        pass
         # Keep the server running until interrupted
         while True:
             await asyncio.sleep(1)
-    except KeyboardInterrupt:
+    except Exception:
+
+        pass
         logger.info("MCP Server stopping...")
 
     return 0

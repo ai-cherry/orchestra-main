@@ -1,40 +1,8 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-EigenCode Alternative Installation Methods Script
-Attempts various installation methods and logs results
 """
-
-import os
-import sys
-import json
-import requests
-import subprocess
-import asyncio
-from datetime import datetime
-from typing import Dict, List, Optional, Tuple
-import logging
-from pathlib import Path
-
-# Add parent directory to path
-sys.path.append(str(Path(__file__).parent.parent))
-
-from ai_components.orchestration.ai_orchestrator import DatabaseLogger, WeaviateManager
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
-
-
-class EigenCodeInstaller:
     """Handles alternative installation methods for EigenCode"""
-    
-    def __init__(self):
-        self.db_logger = DatabaseLogger()
-        self.weaviate_manager = WeaviateManager()
-        self.installation_attempts = []
-        self.base_urls = [
             "https://www.eigencode.dev",
             "https://api.eigencode.dev",
             "https://download.eigencode.dev",
@@ -45,7 +13,6 @@ class EigenCodeInstaller:
         
     def log_attempt(self, method: str, status: str, details: Dict):
         """Log installation attempt to database and Weaviate"""
-        attempt = {
             "timestamp": datetime.now().isoformat(),
             "method": method,
             "status": status,
@@ -75,13 +42,6 @@ class EigenCodeInstaller:
     
     async def check_url_availability(self, url: str) -> Tuple[bool, int, Optional[str]]:
         """Check if a URL is available and return status"""
-        try:
-            response = requests.head(url, timeout=5, allow_redirects=True)
-            return True, response.status_code, response.headers.get('content-type')
-        except requests.exceptions.RequestException as e:
-            return False, 0, str(e)
-    
-    async def attempt_direct_download(self) -> bool:
         """Attempt direct download from various URLs"""
         logger.info("Attempting direct download methods...")
         
@@ -105,6 +65,8 @@ class EigenCodeInstaller:
                             
                             # Attempt download
                             try:
+
+                                pass
                                 response = requests.get(url, timeout=30)
                                 
                                 # Save file
@@ -136,7 +98,10 @@ class EigenCodeInstaller:
                                 if await self.install_from_file(download_path):
                                     return True
                                     
-                            except Exception as e:
+                            except Exception:
+
+                                    
+                                pass
                                 self.log_attempt(
                                     "direct_download",
                                     "failed",
@@ -158,14 +123,6 @@ class EigenCodeInstaller:
     
     async def install_from_file(self, file_path: str) -> bool:
         """Attempt to install from downloaded file"""
-        try:
-            # Determine file type
-            file_type = subprocess.run(
-                ['file', '-b', file_path],
-                capture_output=True,
-                text=True
-            ).stdout.strip()
-            
             install_dir = "/root/.eigencode/bin"
             os.makedirs(install_dir, exist_ok=True)
             
@@ -197,7 +154,10 @@ class EigenCodeInstaller:
                     logger.info(f"EigenCode installed successfully: {result.stdout}")
                     return True
                     
-        except Exception as e:
+        except Exception:
+
+                    
+            pass
             logger.error(f"Installation from file failed: {e}")
             
         return False
@@ -241,6 +201,8 @@ class EigenCodeInstaller:
         
         for pm in package_managers:
             try:
+
+                pass
                 # Check if package manager exists
                 check_result = subprocess.run(pm["check"], capture_output=True)
                 if check_result.returncode != 0:
@@ -277,7 +239,10 @@ class EigenCodeInstaller:
                             {"error": install_result.stderr}
                         )
                         
-            except Exception as e:
+            except Exception:
+
+                        
+                pass
                 self.log_attempt(
                     f"package_manager_{pm['name']}",
                     "error",
@@ -314,6 +279,9 @@ class EigenCodeInstaller:
                 url = f"{base_url}{endpoint}"
                 
                 try:
+
+                
+                    pass
                     response = requests.get(url, headers=headers, timeout=10)
                     
                     if response.status_code == 200:
@@ -327,7 +295,7 @@ class EigenCodeInstaller:
                         
                         # Process installation instructions
                         if "download_url" in data:
-                            download_response = requests.get(data["download_url"])
+                            download_response = requests.get(data["download_url"], timeout=30)
                             if download_response.status_code == 200:
                                 file_path = "/tmp/eigencode_api_download"
                                 with open(file_path, 'wb') as f:
@@ -338,7 +306,10 @@ class EigenCodeInstaller:
                         
                         return data
                         
-                except Exception as e:
+                except Exception:
+
+                        
+                    pass
                     self.log_attempt(
                         "api_contact",
                         "failed",
@@ -360,6 +331,8 @@ class EigenCodeInstaller:
         
         for repo in github_repos:
             try:
+
+                pass
                 # Check releases API
                 url = f"https://api.github.com/repos/{repo}/releases/latest"
                 response = requests.get(url, timeout=10)
@@ -374,7 +347,7 @@ class EigenCodeInstaller:
                             download_url = asset['browser_download_url']
                             
                             # Download asset
-                            download_response = requests.get(download_url)
+                            download_response = requests.get(download_url, timeout=30)
                             if download_response.status_code == 200:
                                 file_path = f"/tmp/{asset['name']}"
                                 with open(file_path, 'wb') as f:
@@ -389,7 +362,10 @@ class EigenCodeInstaller:
                                 if await self.install_from_file(file_path):
                                     return True
                                     
-            except Exception as e:
+            except Exception:
+
+                                    
+                pass
                 self.log_attempt(
                     "github_check",
                     "failed",
@@ -419,6 +395,9 @@ class EigenCodeInstaller:
             logger.info(f"Trying method: {method_name}")
             
             try:
+
+            
+                pass
                 result = await method_func()
                 
                 if result:
@@ -427,7 +406,10 @@ class EigenCodeInstaller:
                     logger.info(f"Successfully installed using {method_name}")
                     break
                     
-            except Exception as e:
+            except Exception:
+
+                    
+                pass
                 logger.error(f"Method {method_name} failed with error: {e}")
                 self.log_attempt(
                     method_name.lower().replace(" ", "_"),
@@ -456,12 +438,6 @@ class EigenCodeInstaller:
 
 async def main():
     """Main function"""
-    installer = EigenCodeInstaller()
-    
-    # Run all installation methods
-    results = await installer.run_all_methods()
-    
-    # Print summary
     print("\n" + "=" * 50)
     print("EigenCode Installation Summary")
     print("=" * 50)

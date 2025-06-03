@@ -1,29 +1,11 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-PostgreSQL schema setup for Orchestra AI.
-
-Creates all necessary tables, indexes, and initial data.
 """
-
-import os
-import sys
-import logging
-import argparse
-from pathlib import Path
-
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from shared.database.postgresql_client import PostgreSQLClient
-
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 SCHEMA_SQL = """
--- Create schema if not exists
-CREATE SCHEMA IF NOT EXISTS orchestra;
-
--- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Agents table
@@ -123,9 +105,6 @@ CREATE TRIGGER update_sessions_updated_at BEFORE UPDATE ON orchestra.sessions
 CREATE TRIGGER update_api_keys_updated_at BEFORE UPDATE ON orchestra.api_keys
     FOR EACH ROW EXECUTE FUNCTION orchestra.update_updated_at_column();
 """
-
-DEFAULT_AGENTS = [
-    {
         "name": "research_agent",
         "description": "Specialized in research and information gathering",
         "capabilities": {"web_search": True, "document_analysis": True, "summarization": True},
@@ -150,7 +129,6 @@ DEFAULT_AGENTS = [
 
 def setup_schema(db: PostgreSQLClient, drop_existing: bool = False) -> None:
     """Setup PostgreSQL schema."""
-    if drop_existing:
         logger.warning("Dropping existing schema...")
         with db.get_connection() as conn:
             with conn.cursor() as cur:
@@ -175,7 +153,8 @@ def insert_default_agents(db: PostgreSQLClient) -> None:
 
     for agent_data in DEFAULT_AGENTS:
         # Check if agent already exists
-        existing = db.execute_query("SELECT id FROM orchestra.agents WHERE name = %s", (agent_data["name"],))
+        existing = db.# TODO: Consider adding EXPLAIN ANALYZE for performance
+execute_query("SELECT id FROM orchestra.agents WHERE name = %s", (agent_data["name"],))
 
         if not existing:
             agent = db.create_agent(agent_data)
@@ -189,13 +168,7 @@ def verify_schema(db: PostgreSQLClient) -> None:
 
     # Check tables exist
     tables_query = """
-    SELECT table_name 
-    FROM information_schema.tables 
-    WHERE table_schema = 'orchestra'
-    ORDER BY table_name
     """
-
-    tables = db.execute_query(tables_query)
     table_names = [t["table_name"] for t in tables]
 
     expected_tables = ["agents", "api_keys", "audit_logs", "memory_snapshots", "sessions", "workflows"]
@@ -208,24 +181,12 @@ def verify_schema(db: PostgreSQLClient) -> None:
 
     # Check indexes
     indexes_query = """
-    SELECT indexname 
-    FROM pg_indexes 
-    WHERE schemaname = 'orchestra'
-    ORDER BY indexname
     """
-
-    indexes = db.execute_query(indexes_query)
     logger.info(f"Found {len(indexes)} indexes in orchestra schema")
 
     # Check triggers
     triggers_query = """
-    SELECT trigger_name, event_object_table
-    FROM information_schema.triggers
-    WHERE trigger_schema = 'orchestra'
-    ORDER BY trigger_name
     """
-
-    triggers = db.execute_query(triggers_query)
     logger.info(f"Found {len(triggers)} triggers in orchestra schema")
 
 def main():
@@ -240,6 +201,9 @@ def main():
     db = PostgreSQLClient()
 
     try:
+
+
+        pass
         # Test connection
         if not db.health_check():
             logger.error("Failed to connect to PostgreSQL")
@@ -264,7 +228,10 @@ def main():
 
         return 0
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Setup failed: {e}")
         return 1
     finally:

@@ -1,75 +1,14 @@
 """
-Portkey Management API Client.
-
-This module provides a client for interacting with the Portkey Management API
-to programmatically manage virtual keys, gateway configurations, and other Portkey resources.
-
-Security Note:
-This module requires access to the MASTER_PORTKEY_ADMIN_KEY, which has administrative
-privileges. Ensure this key is stored securely and access to these functions is
-properly controlled and audited.
 """
-
-import logging
-import os
-from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
-
-import requests
-
-# Configure logging
-logger = logging.getLogger(__name__)
-
-# Base URL for Portkey Management API
 PORTKEY_API_BASE_URL = "https://api.portkey.ai/v1"
 
 class PortkeyAdminException(Exception):
     """Exception raised for errors in the Portkey Admin client."""
-
-@dataclass
-class VirtualKey:
     """Data class representing a Portkey Virtual Key."""
-
-    id: str
-    name: str
-    provider: str
-    created_at: str
-    last_used: Optional[str] = None
-    metadata: Optional[Dict[str, Any]] = None
-    usage_stats: Optional[Dict[str, Any]] = None
-
-@dataclass
-class GatewayConfig:
     """Data class representing a Portkey Gateway Configuration."""
-
-    id: str
-    name: str
-    routing_strategy: str
-    provider_configs: List[Dict[str, Any]]
-    cache_config: Optional[Dict[str, Any]] = None
-    created_at: str = None
-    updated_at: str = None
-
-class PortkeyAdminClient:
     """
-    Client for the Portkey Management API.
-
-    This client provides methods to programmatically manage Portkey resources including:
-    - Virtual Keys for different providers (OpenAI, Anthropic, etc.)
-    - Gateway Configurations for routing strategies
-    - Usage statistics and budget controls
     """
-
-    def __init__(self, api_key: Optional[str] = None):
         """
-        Initialize the Portkey Admin client.
-
-        Args:
-            api_key: Portkey Admin API key. If not provided, will attempt to read from
-                     the MASTER_PORTKEY_ADMIN_KEY environment variable.
-
-        Raises:
-            PortkeyAdminException: If no API key is provided or found in environment.
         """
         self.api_key = api_key or os.environ.get("MASTER_PORTKEY_ADMIN_KEY")
 
@@ -90,32 +29,24 @@ class PortkeyAdminClient:
 
     def _handle_response(self, response: requests.Response) -> Dict[str, Any]:
         """
-        Handle API response and errors.
-
-        Args:
-            response: The API response to handle
-
-        Returns:
-            The JSON response data
-
-        Raises:
-            PortkeyAdminException: If the API request failed
         """
-        try:
-            response.raise_for_status()
-            return response.json()
-        except requests.HTTPError as e:
             error_msg = f"Portkey API request failed: {e}"
             try:
+
+                pass
                 error_data = response.json()
                 if "error" in error_data:
                     error_msg = f"{error_msg} - {error_data['error']}"
-            except ValueError:
+            except Exception:
+
+                pass
                 pass
 
             logger.error(error_msg)
             raise PortkeyAdminException(error_msg) from e
-        except ValueError:
+        except Exception:
+
+            pass
             error_msg = "Invalid JSON response from Portkey API"
             logger.error(error_msg)
             raise PortkeyAdminException(error_msg)
@@ -133,22 +64,6 @@ class PortkeyAdminClient:
         metadata: Optional[Dict[str, Any]] = None,
     ) -> VirtualKey:
         """
-        Create a new Virtual Key in Portkey.
-
-        Args:
-            name: Name for the virtual key
-            provider_key: The actual API key for the provider
-            provider: Provider name (e.g., 'openai', 'anthropic', 'mistral')
-            description: Optional description for the key
-            budget_limit: Optional monthly budget limit in USD
-            rate_limit: Optional rate limit (requests per minute)
-            metadata: Optional metadata for the key
-
-        Returns:
-            A VirtualKey object with the created key's details
-
-        Raises:
-            PortkeyAdminException: If the API request failed
         """
         payload = {"name": name, "provider": provider, "provider_key": provider_key}
 
@@ -176,16 +91,6 @@ class PortkeyAdminClient:
 
     def list_virtual_keys(self, provider: Optional[str] = None) -> List[VirtualKey]:
         """
-        List existing Virtual Keys.
-
-        Args:
-            provider: Optional filter by provider
-
-        Returns:
-            List of VirtualKey objects
-
-        Raises:
-            PortkeyAdminException: If the API request failed
         """
         url = f"{PORTKEY_API_BASE_URL}/virtual-keys"
         if provider:
@@ -195,6 +100,10 @@ class PortkeyAdminClient:
         data = self._handle_response(response)
 
         keys = []
+        # TODO: Consider using list comprehension for better performance
+
+        # TODO: Consider using list comprehension for better performance
+
         for item in data.get("virtual_keys", []):
             keys.append(
                 VirtualKey(
@@ -212,16 +121,6 @@ class PortkeyAdminClient:
 
     def get_virtual_key(self, key_id: str) -> VirtualKey:
         """
-        Get details of a specific Virtual Key.
-
-        Args:
-            key_id: ID of the virtual key
-
-        Returns:
-            VirtualKey object with the key's details
-
-        Raises:
-            PortkeyAdminException: If the API request failed or key not found
         """
         url = f"{PORTKEY_API_BASE_URL}/virtual-keys/{key_id}"
         response = self.session.get(url)
@@ -247,24 +146,7 @@ class PortkeyAdminClient:
         metadata: Optional[Dict[str, Any]] = None,
     ) -> VirtualKey:
         """
-        Update a Virtual Key.
-
-        Args:
-            key_id: ID of the virtual key to update
-            name: Optional new name for the key
-            description: Optional new description
-            budget_limit: Optional new budget limit
-            rate_limit: Optional new rate limit
-            metadata: Optional new metadata
-
-        Returns:
-            Updated VirtualKey object
-
-        Raises:
-            PortkeyAdminException: If the API request failed or key not found
         """
-        payload = {}
-        if name:
             payload["name"] = name
         if description:
             payload["description"] = description
@@ -294,16 +176,6 @@ class PortkeyAdminClient:
 
     def delete_virtual_key(self, key_id: str) -> bool:
         """
-        Delete a Virtual Key.
-
-        Args:
-            key_id: ID of the virtual key to delete
-
-        Returns:
-            True if deletion was successful
-
-        Raises:
-            PortkeyAdminException: If the API request failed or key not found
         """
         url = f"{PORTKEY_API_BASE_URL}/virtual-keys/{key_id}"
         response = self.session.delete(url)
@@ -314,17 +186,6 @@ class PortkeyAdminClient:
 
     def rotate_virtual_key(self, key_id: str, new_provider_key: str) -> VirtualKey:
         """
-        Rotate a Virtual Key by updating the provider key.
-
-        Args:
-            key_id: ID of the virtual key to rotate
-            new_provider_key: New provider API key
-
-        Returns:
-            Updated VirtualKey object
-
-        Raises:
-            PortkeyAdminException: If the API request failed or key not found
         """
         url = f"{PORTKEY_API_BASE_URL}/virtual-keys/{key_id}/rotate"
         payload = {"provider_key": new_provider_key}
@@ -351,21 +212,7 @@ class PortkeyAdminClient:
         cache_config: Optional[Dict[str, Any]] = None,
     ) -> GatewayConfig:
         """
-        Create a new Gateway Configuration.
-
-        Args:
-            name: Name for the gateway configuration
-            routing_strategy: Routing strategy (e.g., 'fallback', 'loadbalance', 'cost_aware')
-            provider_configs: List of provider configurations
-            cache_config: Optional cache configuration
-
-        Returns:
-            GatewayConfig object with the created configuration's details
-
-        Raises:
-            PortkeyAdminException: If the API request failed
         """
-        payload = {
             "name": name,
             "routing_strategy": routing_strategy,
             "provider_configs": provider_configs,
@@ -391,13 +238,6 @@ class PortkeyAdminClient:
 
     def list_gateway_configs(self) -> List[GatewayConfig]:
         """
-        List existing Gateway Configurations.
-
-        Returns:
-            List of GatewayConfig objects
-
-        Raises:
-            PortkeyAdminException: If the API request failed
         """
         url = f"{PORTKEY_API_BASE_URL}/gateway-configs"
         response = self.session.get(url)
@@ -421,16 +261,6 @@ class PortkeyAdminClient:
 
     def get_gateway_config(self, config_id: str) -> GatewayConfig:
         """
-        Get details of a specific Gateway Configuration.
-
-        Args:
-            config_id: ID of the gateway configuration
-
-        Returns:
-            GatewayConfig object with the configuration's details
-
-        Raises:
-            PortkeyAdminException: If the API request failed or config not found
         """
         url = f"{PORTKEY_API_BASE_URL}/gateway-configs/{config_id}"
         response = self.session.get(url)
@@ -455,23 +285,7 @@ class PortkeyAdminClient:
         cache_config: Optional[Dict[str, Any]] = None,
     ) -> GatewayConfig:
         """
-        Update a Gateway Configuration.
-
-        Args:
-            config_id: ID of the gateway configuration to update
-            name: Optional new name
-            routing_strategy: Optional new routing strategy
-            provider_configs: Optional new provider configurations
-            cache_config: Optional new cache configuration
-
-        Returns:
-            Updated GatewayConfig object
-
-        Raises:
-            PortkeyAdminException: If the API request failed or config not found
         """
-        payload = {}
-        if name:
             payload["name"] = name
         if routing_strategy:
             payload["routing_strategy"] = routing_strategy
@@ -501,16 +315,6 @@ class PortkeyAdminClient:
 
     def delete_gateway_config(self, config_id: str) -> bool:
         """
-        Delete a Gateway Configuration.
-
-        Args:
-            config_id: ID of the gateway configuration to delete
-
-        Returns:
-            True if deletion was successful
-
-        Raises:
-            PortkeyAdminException: If the API request failed or config not found
         """
         url = f"{PORTKEY_API_BASE_URL}/gateway-configs/{config_id}"
         response = self.session.delete(url)
@@ -529,19 +333,6 @@ class PortkeyAdminClient:
         provider: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
-        Get usage statistics for virtual keys.
-
-        Args:
-            start_date: Optional start date (YYYY-MM-DD)
-            end_date: Optional end date (YYYY-MM-DD)
-            virtual_key_id: Optional filter by virtual key ID
-            provider: Optional filter by provider
-
-        Returns:
-            Dictionary with usage statistics
-
-        Raises:
-            PortkeyAdminException: If the API request failed
         """
         url = f"{PORTKEY_API_BASE_URL}/usage"
         params = {}

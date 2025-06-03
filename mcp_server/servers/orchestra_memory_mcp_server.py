@@ -1,39 +1,6 @@
 #!/usr/bin/env python3
 """
-Orchestra Memory MCP Server.
-
-This server provides a unified MCP interface to the orchestra-main's
-UnifiedMemoryService, allowing AI models (e.g., via Cursor IDE)
-to interact with the multi-layered memory system (caching, document store, vector store).
 """
-
-import asyncio
-import json
-import logging
-import os
-from datetime import datetime
-from typing import Any, Dict, List, Optional, Union, Literal
-
-import uvicorn
-import weaviate  # For Weaviate client types
-import redis.asyncio as redis_async  # For Dragonfly
-from motor.motor_asyncio import AsyncIOMotorClient  # For MongoDB
-
-from fastapi import FastAPI, HTTPException, Depends
-from pydantic import BaseModel, Field
-
-# Assuming core modules are accessible in PYTHONPATH
-from core.services.memory.unified_memory import (
-    UnifiedMemoryService,
-    get_memory_service,
-    MemoryItem as CoreMemoryItem,
-    SearchResult as CoreSearchResult,
-)
-from core.services.memory.base import MemoryLayer
-from core.infrastructure.connectivity.base import ServiceRegistry
-from core.infrastructure.config.settings import get_settings, AppSettings
-
-# Configure logging
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO").upper())
 logger = logging.getLogger(__name__)
 
@@ -50,20 +17,14 @@ mcp_service_registry: Optional["MCPServiceRegistry"] = None
 
 class MCPServiceRegistry(ServiceRegistry):
     """
-    A simplified ServiceRegistry for the MCP server context.
-    Initializes and provides database client connections.
     """
-
-    def __init__(self, settings: AppSettings):
-        self._settings = settings
-        self.dragonfly_client: Optional[redis_async.Redis] = None
-        self.mongodb_client: Optional[AsyncIOMotorClient] = None
-        self.weaviate_client_instance: Optional[weaviate.WeaviateClient] = None
         self._db_name_mongo = "orchestra_default_mongo_db"  # Default, can be from settings
 
     async def initialize_services(self):
         logger.info("MCPServiceRegistry: Initializing services...")
         try:
+
+            pass
             # Dragonfly (Redis-compatible)
             if self._settings.dragonfly.enabled:
                 df_url = f"redis://{self._settings.dragonfly.host}:{self._settings.dragonfly.port}/{self._settings.dragonfly.db_index}"
@@ -96,8 +57,12 @@ class MCPServiceRegistry(ServiceRegistry):
                 headers = {}
                 if self._settings.weaviate.additional_headers:
                     try:
+
+                        pass
                         headers = json.loads(self._settings.weaviate.additional_headers)
-                    except json.JSONDecodeError:
+                    except Exception:
+
+                        pass
                         logger.error("Failed to parse Weaviate additional headers JSON.")
 
                 connection_params = weaviate.config.ConnectionParams.from_params(
@@ -119,7 +84,10 @@ class MCPServiceRegistry(ServiceRegistry):
                     raise ConnectionError("Weaviate client connected but instance is not ready.")
                 logger.info(f"Connected to Weaviate at {self._settings.weaviate.host}:{self._settings.weaviate.port}")
 
-        except Exception as e:
+        except Exception:
+
+
+            pass
             logger.error(f"MCPServiceRegistry: Error during service initialization: {e}", exc_info=True)
             # Ensure clients are None if they failed to initialize
             if not (self.dragonfly_client and await self.dragonfly_client.ping()):
@@ -162,6 +130,8 @@ async def startup_event():
     global unified_memory_service, mcp_service_registry
     logger.info("Orchestra Memory MCP Server starting up...")
     try:
+
+        pass
         settings = get_settings()
         mcp_service_registry = MCPServiceRegistry(settings)
         await mcp_service_registry.initialize_services()
@@ -169,7 +139,9 @@ async def startup_event():
         unified_memory_service = get_memory_service(mcp_service_registry)
         await unified_memory_service.initialize()  # Initialize stores within UnifiedMemoryService
         logger.info("UnifiedMemoryService initialized successfully.")
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.critical(f"Critical error during MCP server startup: {e}", exc_info=True)
         # Optionally, sys.exit(1) if a clean startup is mandatory
 
@@ -326,6 +298,8 @@ async def get_mcp_tools_list():
 @app.post("/mcp/orchestra_memory/remember", response_model=RememberResponse)
 async def remember_endpoint(request: RememberRequest, ums: UnifiedMemoryService = Depends(get_ums)):
     try:
+
+        pass
         metadata = request.metadata or {}
         if request.importance is not None:
             metadata["importance_score"] = request.importance  # Store importance in metadata
@@ -337,13 +311,17 @@ async def remember_endpoint(request: RememberRequest, ums: UnifiedMemoryService 
             # Layer is determined by policy in UMS
         )
         return RememberResponse(status="success", item_id=item_id)
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"MCP Remember error: {e}", exc_info=True)
         return RememberResponse(status="failed", error=str(e))
 
 @app.post("/mcp/orchestra_memory/recall", response_model=Optional[MemoryItemResponse])
 async def recall_endpoint(request: RecallRequest, ums: UnifiedMemoryService = Depends(get_ums)):
     try:
+
+        pass
         item = await ums.retrieve(request.item_id)
         if item:
             return MemoryItemResponse(
@@ -355,20 +333,30 @@ async def recall_endpoint(request: RecallRequest, ums: UnifiedMemoryService = De
                 ttl=item.ttl,
             )
         return None
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"MCP Recall error for item {request.item_id}: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/mcp/orchestra_memory/search_memories", response_model=SearchMemoriesResponse)
 async def search_memories_endpoint(request: SearchMemoriesRequest, ums: UnifiedMemoryService = Depends(get_ums)):
     try:
+
+        pass
         target_layers: Optional[List[MemoryLayer]] = None
         if request.layers:
             target_layers = []
+            # TODO: Consider using list comprehension for better performance
+
             for layer_str in request.layers:
                 try:
+
+                    pass
                     target_layers.append(MemoryLayer[layer_str.upper()])
-                except KeyError:
+                except Exception:
+
+                    pass
                     raise HTTPException(status_code=400, detail=f"Invalid memory layer specified: {layer_str}")
 
         # Note: The UnifiedMemoryService.search might need enhancement to fully distinguish
@@ -406,13 +394,17 @@ async def search_memories_endpoint(request: SearchMemoriesRequest, ums: UnifiedM
             for sr in search_results
         ]
         return SearchMemoriesResponse(results=response_results, count=len(response_results))
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"MCP Search Memories error: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/mcp/orchestra_memory/forget", response_model=ForgetResponse)
 async def forget_endpoint(request: ForgetRequest, ums: UnifiedMemoryService = Depends(get_ums)):
     try:
+
+        pass
         # Check if item exists first to provide a better "not_found" status
         # This adds an extra read, but improves API contract.
         # Alternatively, UMS.evict could return a more detailed status.
@@ -427,16 +419,22 @@ async def forget_endpoint(request: ForgetRequest, ums: UnifiedMemoryService = De
             # This case might be hard to distinguish from "not_found" if evict itself doesn't error
             # but simply finds nothing to delete across layers.
             return ForgetResponse(status="failed", error="Failed to evict item from all layers.")
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"MCP Forget error for item {request.item_id}: {e}", exc_info=True)
         return ForgetResponse(status="failed", error=str(e))
 
 @app.get("/mcp/orchestra_memory/get_memory_stats", response_model=GetMemoryStatsResponse)
 async def get_memory_stats_endpoint(ums: UnifiedMemoryService = Depends(get_ums)):
     try:
+
+        pass
         stats = await ums.get_stats()
         return GetMemoryStatsResponse(stats=stats)
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"MCP Get Memory Stats error: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -444,6 +442,8 @@ async def get_memory_stats_endpoint(ums: UnifiedMemoryService = Depends(get_ums)
 @app.get("/health")
 async def health_check_endpoint(ums: UnifiedMemoryService = Depends(get_ums)):
     try:
+
+        pass
         stats = await ums.get_stats()
         overall_healthy = True
         layer_health_details = {}
@@ -465,7 +465,9 @@ async def health_check_endpoint(ums: UnifiedMemoryService = Depends(get_ums)):
                 status_code=503,
                 detail={"message": "One or more memory layers are unhealthy.", "details": layer_health_details},
             )
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Health check endpoint error: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Health check failed: {str(e)}")
 

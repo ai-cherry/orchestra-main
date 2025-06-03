@@ -1,38 +1,14 @@
 #!/usr/bin/env python3
 """
-Unified Connection Manager for PostgreSQL.
-
-This module provides a single, shared connection pool manager that all PostgreSQL
-components use, eliminating duplicate connections and ensuring optimal resource usage.
 """
-
-import asyncio
-import os
-from typing import Optional, Dict, Any
-from contextlib import asynccontextmanager
-import asyncpg
-from asyncpg.pool import Pool
-import logging
-
-logger = logging.getLogger(__name__)
-
-class PostgreSQLConnectionManager:
     """
-    Singleton connection manager for all PostgreSQL operations.
-    Provides unified connection pooling with optimal performance settings.
     """
-
     _instance: Optional["PostgreSQLConnectionManager"] = None
     _pool: Optional[Pool] = None
     _lock = asyncio.Lock()
 
     def __new__(cls):
         """Ensure singleton pattern."""
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
-
-    def __init__(self):
         """Initialize connection manager configuration."""
         if not hasattr(self, "_initialized"):
             self.dsn = self._build_dsn()
@@ -52,13 +28,7 @@ class PostgreSQLConnectionManager:
 
     async def initialize(self) -> None:
         """
-        Initialize the connection pool with optimized settings.
-        This should be called once at application startup.
         """
-        async with self._lock:
-            if self._pool is not None:
-                return
-
             logger.info("Initializing PostgreSQL connection pool...")
 
             # Create pool with performance optimizations
@@ -99,57 +69,23 @@ class PostgreSQLConnectionManager:
 
     async def close(self) -> None:
         """Close the connection pool gracefully."""
-        async with self._lock:
-            if self._pool:
-                await self._pool.close()
-                self._pool = None
                 logger.info("PostgreSQL connection pool closed")
 
     @property
     def pool(self) -> Pool:
         """Get the connection pool."""
-        if self._pool is None:
             raise RuntimeError("Connection pool not initialized. Call initialize() first.")
         return self._pool
 
     @asynccontextmanager
     async def acquire(self):
         """Acquire a connection from the pool."""
-        async with self.pool.acquire() as conn:
-            yield conn
-
-    @asynccontextmanager
-    async def transaction(self):
         """Acquire a connection and start a transaction."""
-        async with self.pool.acquire() as conn:
-            async with conn.transaction():
-                yield conn
-
-    async def execute(self, query: str, *args, timeout: Optional[float] = None) -> str:
         """Execute a query without returning results."""
-        async with self.acquire() as conn:
-            return await conn.execute(query, *args, timeout=timeout)
-
-    async def fetchval(self, query: str, *args, timeout: Optional[float] = None) -> Any:
         """Execute a query and return a single value."""
-        async with self.acquire() as conn:
-            return await conn.fetchval(query, *args, timeout=timeout)
-
-    async def fetchrow(self, query: str, *args, timeout: Optional[float] = None) -> Optional[asyncpg.Record]:
         """Execute a query and return a single row."""
-        async with self.acquire() as conn:
-            return await conn.fetchrow(query, *args, timeout=timeout)
-
-    async def fetch(self, query: str, *args, timeout: Optional[float] = None) -> list:
         """Execute a query and return all rows."""
-        async with self.acquire() as conn:
-            return await conn.fetch(query, *args, timeout=timeout)
-
-    async def health_check(self) -> Dict[str, Any]:
         """Perform comprehensive health check."""
-        try:
-            # Basic connectivity
-            async with self.acquire() as conn:
                 await conn.fetchval("SELECT 1")
 
             # Pool statistics
@@ -165,14 +101,7 @@ class PostgreSQLConnectionManager:
             async with self.acquire() as conn:
                 db_stats = await conn.fetchrow(
                     """
-                    SELECT 
-                        pg_database_size(current_database()) as db_size,
-                        (SELECT count(*) FROM pg_stat_activity) as active_connections,
-                        (SELECT count(*) FROM pg_stat_activity WHERE state = 'active') as active_queries
                 """
-                )
-
-            return {
                 "status": "healthy",
                 "pool": pool_stats,
                 "database": {
@@ -181,7 +110,9 @@ class PostgreSQLConnectionManager:
                     "active_queries": db_stats["active_queries"],
                 },
             }
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Health check failed: {e}")
             return {"status": "unhealthy", "error": str(e)}
 
@@ -190,15 +121,4 @@ _connection_manager: Optional[PostgreSQLConnectionManager] = None
 
 async def get_connection_manager() -> PostgreSQLConnectionManager:
     """Get or create the global connection manager."""
-    global _connection_manager
-    if _connection_manager is None:
-        _connection_manager = PostgreSQLConnectionManager()
-        await _connection_manager.initialize()
-    return _connection_manager
-
-async def close_connection_manager() -> None:
     """Close the global connection manager."""
-    global _connection_manager
-    if _connection_manager:
-        await _connection_manager.close()
-        _connection_manager = None

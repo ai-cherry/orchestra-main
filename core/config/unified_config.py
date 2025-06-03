@@ -1,33 +1,5 @@
 """
-Unified Configuration System for Orchestra AI
-
-This module provides a centralized, type-safe configuration system that replaces
-all scattered configuration patterns throughout the codebase.
-
-Key Features:
-- Hierarchical configuration with environment-specific overrides
-- Type-safe configuration classes with validation
-- Consistent environment variable handling
-- Hot-reloading for development
-- Configuration schema documentation
 """
-
-import os
-from abc import ABC, abstractmethod
-from enum import Enum
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Type, TypeVar, Union
-from functools import lru_cache
-import json
-import yaml
-
-from pydantic import BaseModel, Field, validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
-
-# Type variable for configuration classes
-ConfigT = TypeVar('ConfigT', bound='BaseConfig')
-
-class Environment(str, Enum):
     """Supported deployment environments"""
     DEVELOPMENT = "development"
     STAGING = "staging"
@@ -44,12 +16,7 @@ class LogLevel(str, Enum):
 
 class BaseConfig(BaseModel, ABC):
     """
-    Abstract base class for all configuration sections.
-    
-    Provides common validation and serialization capabilities.
     """
-    
-    class Config:
         env_prefix = ""
         case_sensitive = False
         validate_assignment = True
@@ -58,16 +25,8 @@ class BaseConfig(BaseModel, ABC):
     @abstractmethod
     def validate_config(self) -> bool:
         """Validate configuration values and dependencies"""
-        pass
-    
-    def to_dict(self) -> Dict[str, Any]:
         """Convert configuration to dictionary"""
-        return self.dict(exclude_none=True)
-
-class DatabaseConfig(BaseConfig):
     """Database configuration for PostgreSQL and Weaviate"""
-    
-    # PostgreSQL Configuration
     postgresql_host: str = Field(default="localhost", env="POSTGRESQL_HOST")
     postgresql_port: int = Field(default=5432, env="POSTGRESQL_PORT")
     postgresql_database: str = Field(default="orchestra", env="POSTGRESQL_DATABASE")
@@ -105,16 +64,7 @@ class DatabaseConfig(BaseConfig):
     
     def validate_config(self) -> bool:
         """Validate database configuration"""
-        if not self.postgresql_host or not self.postgresql_database:
-            return False
-        if not self.weaviate_host:
-            return False
-        return True
-
-class LLMConfig(BaseConfig):
     """LLM provider configuration"""
-    
-    # Provider API Keys
     openai_api_key: Optional[str] = Field(default=None, env="OPENAI_API_KEY")
     anthropic_api_key: Optional[str] = Field(default=None, env="ANTHROPIC_API_KEY")
     google_api_key: Optional[str] = Field(default=None, env="GOOGLE_API_KEY")
@@ -140,19 +90,7 @@ class LLMConfig(BaseConfig):
     
     def validate_config(self) -> bool:
         """Validate LLM configuration"""
-        # At least one provider API key must be configured
-        api_keys = [
-            self.openai_api_key,
-            self.anthropic_api_key,
-            self.google_api_key,
-            self.portkey_api_key,
-            self.openrouter_api_key
-        ]
-        return any(key for key in api_keys)
-
-class APIConfig(BaseConfig):
     """API server configuration"""
-    
     host: str = Field(default="0.0.0.0", env="API_HOST")
     port: int = Field(default=8000, env="API_PORT")
     debug: bool = Field(default=False, env="API_DEBUG")
@@ -180,12 +118,7 @@ class APIConfig(BaseConfig):
     
     def validate_config(self) -> bool:
         """Validate API configuration"""
-        return self.port > 0 and self.port < 65536
-
-class MonitoringConfig(BaseConfig):
     """Monitoring and observability configuration"""
-    
-    # Logging
     log_level: LogLevel = Field(default=LogLevel.INFO, env="LOG_LEVEL")
     log_format: str = Field(default="text", env="LOG_FORMAT")  # text or json
     log_file: Optional[str] = Field(default=None, env="LOG_FILE")
@@ -208,12 +141,7 @@ class MonitoringConfig(BaseConfig):
     
     def validate_config(self) -> bool:
         """Validate monitoring configuration"""
-        return self.metrics_port > 0 and self.metrics_port < 65536
-
-class MemoryConfig(BaseConfig):
     """Memory system configuration"""
-    
-    # Memory Backend
     backend: str = Field(default="hybrid", env="MEMORY_BACKEND")  # postgresql, weaviate, hybrid
     
     # Memory Limits
@@ -240,8 +168,6 @@ class MemoryConfig(BaseConfig):
 
 class OrchestrationConfig(BaseConfig):
     """Orchestration system configuration"""
-    
-    # Agent Configuration
     max_concurrent_agents: int = Field(default=10, env="ORCHESTRATION_MAX_CONCURRENT_AGENTS")
     agent_timeout: int = Field(default=300, env="ORCHESTRATION_AGENT_TIMEOUT")
     agent_retry_attempts: int = Field(default=3, env="ORCHESTRATION_AGENT_RETRY_ATTEMPTS")
@@ -260,21 +186,8 @@ class OrchestrationConfig(BaseConfig):
     
     def validate_config(self) -> bool:
         """Validate orchestration configuration"""
-        return (
-            self.max_concurrent_agents > 0 and
-            self.agent_timeout > 0 and
-            self.max_workflow_steps > 0
-        )
-
-class UnifiedOrchestraConfig(BaseSettings):
     """
-    Main configuration class that unifies all Orchestra AI settings.
-    
-    This class serves as the single source of truth for all configuration
-    and provides environment-specific overrides.
     """
-    
-    model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
@@ -308,19 +221,7 @@ class UnifiedOrchestraConfig(BaseSettings):
     
     def validate_all_configs(self) -> bool:
         """Validate all configuration sections"""
-        validations = [
-            self.database.validate_config(),
-            self.llm.validate_config(),
-            self.api.validate_config(),
-            self.monitoring.validate_config(),
-            self.memory.validate_config(),
-            self.orchestration.validate_config()
-        ]
-        return all(validations)
-    
-    def get_config_summary(self) -> Dict[str, Any]:
         """Get a summary of current configuration (without sensitive data)"""
-        return {
             "environment": self.environment,
             "debug": self.debug,
             "testing": self.testing,
@@ -345,59 +246,14 @@ _config_instance: Optional[UnifiedOrchestraConfig] = None
 @lru_cache(maxsize=1)
 def get_config() -> UnifiedOrchestraConfig:
     """
-    Get the global configuration instance.
-    
-    This function provides a cached singleton configuration that can be
-    imported and used throughout the application.
-    
-    Returns:
-        UnifiedOrchestraConfig: The global configuration instance
     """
-    global _config_instance
-    if _config_instance is None:
-        _config_instance = UnifiedOrchestraConfig()
-    return _config_instance
-
-def reload_config() -> UnifiedOrchestraConfig:
     """
-    Force reload of configuration from environment/files.
-    
-    Useful for development and testing scenarios where configuration
-    might change at runtime.
-    
-    Returns:
-        UnifiedOrchestraConfig: The reloaded configuration instance
     """
-    global _config_instance
-    get_config.cache_clear()
-    _config_instance = None
-    return get_config()
-
-def create_config_from_dict(config_dict: Dict[str, Any]) -> UnifiedOrchestraConfig:
     """
-    Create configuration instance from dictionary.
-    
-    Useful for testing and programmatic configuration.
-    
-    Args:
-        config_dict: Configuration dictionary
-        
-    Returns:
-        UnifiedOrchestraConfig: Configuration instance
     """
-    return UnifiedOrchestraConfig(**config_dict)
-
 def save_config_to_file(config: UnifiedOrchestraConfig, file_path: Path, format: str = "yaml") -> None:
     """
-    Save configuration to file.
-    
-    Args:
-        config: Configuration instance to save
-        file_path: Path to save configuration
-        format: File format (yaml or json)
     """
-    config_dict = config.dict(exclude_none=True)
-    
     if format.lower() == "yaml":
         with open(file_path, 'w') as f:
             yaml.dump(config_dict, f, default_flow_style=False, indent=2)
@@ -409,15 +265,7 @@ def save_config_to_file(config: UnifiedOrchestraConfig, file_path: Path, format:
 
 def load_config_from_file(file_path: Path) -> UnifiedOrchestraConfig:
     """
-    Load configuration from file.
-    
-    Args:
-        file_path: Path to configuration file
-        
-    Returns:
-        UnifiedOrchestraConfig: Configuration instance
     """
-    if not file_path.exists():
         raise FileNotFoundError(f"Configuration file not found: {file_path}")
     
     if file_path.suffix.lower() in ['.yaml', '.yml']:
@@ -434,30 +282,11 @@ def load_config_from_file(file_path: Path) -> UnifiedOrchestraConfig:
 # Convenience functions for accessing specific configuration sections
 def get_database_config() -> DatabaseConfig:
     """Get database configuration"""
-    return get_config().database
-
-def get_llm_config() -> LLMConfig:
     """Get LLM configuration"""
-    return get_config().llm
-
-def get_api_config() -> APIConfig:
     """Get API configuration"""
-    return get_config().api
-
-def get_monitoring_config() -> MonitoringConfig:
     """Get monitoring configuration"""
-    return get_config().monitoring
-
-def get_memory_config() -> MemoryConfig:
     """Get memory configuration"""
-    return get_config().memory
-
-def get_orchestration_config() -> OrchestrationConfig:
     """Get orchestration configuration"""
-    return get_config().orchestration
-
-# Export main configuration function
-__all__ = [
     "UnifiedOrchestraConfig",
     "DatabaseConfig",
     "LLMConfig", 

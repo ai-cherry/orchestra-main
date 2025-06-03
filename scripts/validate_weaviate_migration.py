@@ -1,50 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Weaviate Migration Validation Script
-====================================
-Validates the entire Weaviate-first migration workflow by testing:
-- Collection creation and schema validation
-- Data insertion and retrieval across all collections
-- Embedding generation and vector search
-- Performance benchmarks
-- Domain-specific collection functionality
-
-This script ensures that all three domain collections (Personal, PayReady, ParagonRX)
-and the Session collection are working properly after migration.
-
-Usage:
-    python validate_weaviate_migration.py [--weaviate-endpoint ENDPOINT] [--weaviate-api-key API_KEY]
-                                         [--postgres-dsn DSN] [--dragonfly-uri URI]
-
-Author: Orchestra AI Platform
 """
-
-import argparse
-import json
-import logging
-import os
-import sys
-import time
-import uuid
-from datetime import datetime
-from typing import Dict, List, Optional, Any, Tuple
-
-import numpy as np
-import psycopg2
-import psycopg2.extras
-from sentence_transformers import SentenceTransformer
-import weaviate
-from tqdm import tqdm
-
-# Optional Redis import for Dragonfly testing
-try:
-    import redis
-except ImportError:
-    redis = None
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[logging.StreamHandler(), logging.FileHandler("validation.log")],
 )
@@ -87,14 +44,6 @@ def parse_args():
 
 def connect_to_weaviate(endpoint: str, api_key: Optional[str] = None) -> weaviate.Client:
     """
-    Connect to Weaviate instance with retry logic.
-
-    Args:
-        endpoint: Weaviate endpoint URL
-        api_key: Weaviate API key (optional)
-
-    Returns:
-        Weaviate client
     """
     logger.info(f"Connecting to Weaviate at {endpoint}")
 
@@ -108,6 +57,8 @@ def connect_to_weaviate(endpoint: str, api_key: Optional[str] = None) -> weaviat
 
     for attempt in range(max_retries):
         try:
+
+            pass
             client = weaviate.Client(
                 url=endpoint, auth_client_secret=auth_config, timeout_config=(5, 60)  # (connect_timeout, read_timeout)
             )
@@ -118,7 +69,9 @@ def connect_to_weaviate(endpoint: str, api_key: Optional[str] = None) -> weaviat
                 return client
             else:
                 logger.warning("Weaviate is not ready")
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.warning(f"Connection attempt {attempt+1}/{max_retries} failed: {str(e)}")
 
         if attempt < max_retries - 1:
@@ -130,41 +83,34 @@ def connect_to_weaviate(endpoint: str, api_key: Optional[str] = None) -> weaviat
 
 def connect_to_postgres(dsn: str) -> psycopg2.extensions.connection:
     """
-    Connect to PostgreSQL database.
-
-    Args:
-        dsn: PostgreSQL connection string
-
-    Returns:
-        PostgreSQL connection
     """
     logger.info(f"Connecting to PostgreSQL")
 
     try:
+
+
+        pass
         conn = psycopg2.connect(dsn)
         logger.info("Successfully connected to PostgreSQL")
         return conn
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to connect to PostgreSQL: {str(e)}")
         raise
 
 def connect_to_dragonfly(uri: str) -> Optional[redis.Redis]:
     """
-    Connect to Dragonfly Redis instance.
-
-    Args:
-        uri: Dragonfly Redis URI
-
-    Returns:
-        Redis client or None if Redis is not available
     """
-    if not redis or not uri:
         logger.info("Skipping Dragonfly connection (not configured or redis package not installed)")
         return None
 
     logger.info(f"Connecting to Dragonfly at {uri}")
 
     try:
+
+
+        pass
         client = redis.from_url(uri, decode_responses=True)
         if client.ping():
             logger.info("Successfully connected to Dragonfly")
@@ -172,36 +118,31 @@ def connect_to_dragonfly(uri: str) -> Optional[redis.Redis]:
         else:
             logger.warning("Dragonfly ping failed")
             return None
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.warning(f"Failed to connect to Dragonfly: {str(e)}")
         return None
 
 def load_embedding_model() -> SentenceTransformer:
     """
-    Load the sentence transformer model for generating embeddings.
-
-    Returns:
-        SentenceTransformer model
     """
     logger.info("Loading embedding model (MiniLM)...")
     try:
+
+        pass
         # Use a small, efficient model for embedding generation
         model = SentenceTransformer("all-MiniLM-L6-v2")
         logger.info("Embedding model loaded successfully")
         return model
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to load embedding model: {str(e)}")
         raise
 
 def validate_collections(weaviate_client: weaviate.Client) -> bool:
     """
-    Validate that all required collections exist in Weaviate.
-
-    Args:
-        weaviate_client: Weaviate client
-
-    Returns:
-        True if all collections exist, False otherwise
     """
     logger.info("Validating collections...")
 
@@ -209,6 +150,9 @@ def validate_collections(weaviate_client: weaviate.Client) -> bool:
     existing_collections = []
 
     try:
+
+
+        pass
         schema = weaviate_client.schema.get()
         classes = schema.get("classes", [])
         existing_collections = [cls["class"] for cls in classes]
@@ -221,24 +165,21 @@ def validate_collections(weaviate_client: weaviate.Client) -> bool:
 
         logger.info(f"All required collections exist: {', '.join(required_collections)}")
         return True
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to validate collections: {str(e)}")
         return False
 
 def validate_collection_schema(weaviate_client: weaviate.Client, collection_name: str) -> bool:
     """
-    Validate the schema of a specific collection.
-
-    Args:
-        weaviate_client: Weaviate client
-        collection_name: Name of the collection to validate
-
-    Returns:
-        True if schema is valid, False otherwise
     """
     logger.info(f"Validating schema for collection {collection_name}...")
 
     try:
+
+
+        pass
         schema = weaviate_client.schema.get()
         classes = schema.get("classes", [])
 
@@ -271,7 +212,9 @@ def validate_collection_schema(weaviate_client: weaviate.Client, collection_name
 
         logger.info(f"Schema for collection {collection_name} is valid")
         return True
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to validate schema for collection {collection_name}: {str(e)}")
         return False
 
@@ -279,15 +222,6 @@ def test_insert_retrieve(
     weaviate_client: weaviate.Client, collection_name: str, embedding_model: SentenceTransformer
 ) -> Tuple[bool, Optional[str]]:
     """
-    Test inserting and retrieving data from a collection.
-
-    Args:
-        weaviate_client: Weaviate client
-        collection_name: Name of the collection to test
-        embedding_model: SentenceTransformer model for generating embeddings
-
-    Returns:
-        Tuple of (success, object_id)
     """
     logger.info(f"Testing insert and retrieve for collection {collection_name}...")
 
@@ -324,6 +258,9 @@ def test_insert_retrieve(
         properties["tenant"] = datetime.now().strftime("%Y%m%d")
 
     try:
+
+
+        pass
         # Insert the object
         weaviate_client.data_object.create(
             data_object=properties, class_name=collection_name, uuid=test_id, vector=embedding
@@ -343,7 +280,9 @@ def test_insert_retrieve(
 
         logger.info(f"Successfully inserted and retrieved object from collection {collection_name}")
         return True, test_id
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to insert/retrieve for collection {collection_name}: {str(e)}")
         return False, None
 
@@ -351,20 +290,13 @@ def test_vector_search(
     weaviate_client: weaviate.Client, collection_name: str, object_id: str, embedding_model: SentenceTransformer
 ) -> bool:
     """
-    Test vector search functionality for a collection.
-
-    Args:
-        weaviate_client: Weaviate client
-        collection_name: Name of the collection to test
-        object_id: ID of a known object in the collection
-        embedding_model: SentenceTransformer model for generating embeddings
-
-    Returns:
-        True if vector search works, False otherwise
     """
     logger.info(f"Testing vector search for collection {collection_name}...")
 
     try:
+
+
+        pass
         # Get the object to use as search reference
         obj = weaviate_client.data_object.get_by_id(uuid=object_id, class_name=collection_name)
 
@@ -403,25 +335,21 @@ def test_vector_search(
 
         logger.info(f"Vector search successful for collection {collection_name}")
         return True
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to test vector search for collection {collection_name}: {str(e)}")
         return False
 
 def test_hybrid_search(weaviate_client: weaviate.Client, collection_name: str, object_id: str) -> bool:
     """
-    Test hybrid search functionality for a collection.
-
-    Args:
-        weaviate_client: Weaviate client
-        collection_name: Name of the collection to test
-        object_id: ID of a known object in the collection
-
-    Returns:
-        True if hybrid search works, False otherwise
     """
     logger.info(f"Testing hybrid search for collection {collection_name}...")
 
     try:
+
+
+        pass
         # Get the object to use as search reference
         obj = weaviate_client.data_object.get_by_id(uuid=object_id, class_name=collection_name)
 
@@ -460,7 +388,9 @@ def test_hybrid_search(weaviate_client: weaviate.Client, collection_name: str, o
 
         logger.info(f"Hybrid search successful for collection {collection_name}")
         return True
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to test hybrid search for collection {collection_name}: {str(e)}")
         return False
 
@@ -471,24 +401,16 @@ def test_postgres_integration(
     object_id: str,
 ) -> bool:
     """
-    Test PostgreSQL integration by storing and retrieving data.
-
-    Args:
-        postgres_conn: PostgreSQL connection
-        weaviate_client: Weaviate client
-        collection_name: Name of the Weaviate collection
-        object_id: ID of an object in Weaviate
-
-    Returns:
-        True if PostgreSQL integration works, False otherwise
     """
-    if not postgres_conn:
         logger.info("Skipping PostgreSQL integration test (not configured)")
         return True
 
     logger.info(f"Testing PostgreSQL integration...")
 
     try:
+
+
+        pass
         # Get the object from Weaviate
         obj = weaviate_client.data_object.get_by_id(uuid=object_id, class_name=collection_name, with_vector=True)
 
@@ -506,21 +428,9 @@ def test_postgres_integration(
         with postgres_conn.cursor() as cursor:
             cursor.execute(
                 """
-                CREATE TABLE IF NOT EXISTS validation_test (
-                    id TEXT PRIMARY KEY,
-                    content TEXT NOT NULL,
-                    collection TEXT NOT NULL,
-                    data JSONB,
-                    embedding VECTOR(384)
-                )
                 """
-            )
-
-            cursor.execute(
                 """
-                INSERT INTO validation_test (id, content, collection, data, embedding)
-                VALUES (%s, %s, %s, %s, %s)
-                """,
+                """
                 (object_id, obj.get("content", ""), collection_name, psycopg2.extras.Json(obj), embedding),
             )
 
@@ -530,15 +440,7 @@ def test_postgres_integration(
         with postgres_conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cursor:
             cursor.execute(
                 """
-                SELECT * FROM validation_test
-                WHERE id = %s
-                """,
-                (object_id,),
-            )
-
-            row = cursor.fetchone()
-
-            if not row:
+                """
                 logger.error(f"Failed to retrieve object from PostgreSQL")
                 return False
 
@@ -549,40 +451,38 @@ def test_postgres_integration(
 
         logger.info(f"PostgreSQL integration test successful")
         return True
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to test PostgreSQL integration: {str(e)}")
         return False
     finally:
         # Clean up test table
         try:
+
+            pass
             with postgres_conn.cursor() as cursor:
                 cursor.execute("DROP TABLE IF EXISTS validation_test")
                 postgres_conn.commit()
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.warning(f"Failed to clean up PostgreSQL test table: {str(e)}")
 
 def test_dragonfly_integration(
     dragonfly_client: redis.Redis, weaviate_client: weaviate.Client, collection_name: str, object_id: str
 ) -> bool:
     """
-    Test Dragonfly integration as a cache layer.
-
-    Args:
-        dragonfly_client: Redis client for Dragonfly
-        weaviate_client: Weaviate client
-        collection_name: Name of the Weaviate collection
-        object_id: ID of an object in Weaviate
-
-    Returns:
-        True if Dragonfly integration works, False otherwise
     """
-    if not dragonfly_client:
         logger.info("Skipping Dragonfly integration test (not configured)")
         return True
 
     logger.info(f"Testing Dragonfly integration...")
 
     try:
+
+
+        pass
         # Get the object from Weaviate
         obj = weaviate_client.data_object.get_by_id(uuid=object_id, class_name=collection_name)
 
@@ -615,20 +515,14 @@ def test_dragonfly_integration(
 
         logger.info(f"Dragonfly integration test successful")
         return True
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to test Dragonfly integration: {str(e)}")
         return False
 
 def run_performance_tests(weaviate_client: weaviate.Client, embedding_model: SentenceTransformer) -> Dict[str, Any]:
     """
-    Run performance tests on Weaviate.
-
-    Args:
-        weaviate_client: Weaviate client
-        embedding_model: SentenceTransformer model for generating embeddings
-
-    Returns:
-        Dictionary with performance metrics
     """
     logger.info("Running performance tests...")
 
@@ -640,6 +534,9 @@ def run_performance_tests(weaviate_client: weaviate.Client, embedding_model: Sen
     }
 
     try:
+
+
+        pass
         # Generate test data
         test_texts = [
             f"Performance test text {i} with some additional context for embedding generation" for i in range(10)
@@ -718,35 +615,14 @@ def run_performance_tests(weaviate_client: weaviate.Client, embedding_model: Sen
 
         logger.info("Performance tests completed")
         return results
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to run performance tests: {str(e)}")
         return results
 
 def main():
     """Main validation function."""
-    args = parse_args()
-
-    # Set log level
-    if args.verbose:
-        logging.getLogger().setLevel(logging.DEBUG)
-
-    try:
-        # Connect to services
-        weaviate_client = connect_to_weaviate(args.weaviate_endpoint, args.weaviate_api_key)
-
-        postgres_conn = None
-        if args.postgres_dsn:
-            postgres_conn = connect_to_postgres(args.postgres_dsn)
-
-        dragonfly_client = None
-        if args.dragonfly_uri:
-            dragonfly_client = connect_to_dragonfly(args.dragonfly_uri)
-
-        # Load embedding model
-        embedding_model = load_embedding_model()
-
-        # Track test results
-        results = {
             "collections_exist": False,
             "schema_validation": {},
             "insert_retrieve": {},
@@ -871,7 +747,10 @@ def main():
 
         return 0 if overall_success else 1
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Validation failed with error: {str(e)}")
         return 1
 

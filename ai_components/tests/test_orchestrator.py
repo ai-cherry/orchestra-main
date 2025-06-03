@@ -1,64 +1,11 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Test suite for AI Orchestrator components
-Tests workflow execution, agent coordination, and context management
 """
-
-import pytest
-import asyncio
-import json
-from datetime import datetime
-from unittest.mock import Mock, patch, AsyncMock
-import sys
-from pathlib import Path
-
-# Add parent directory to path
-sys.path.append(str(Path(__file__).parent.parent))
-
-from orchestration.ai_orchestrator import (
-    WorkflowOrchestrator,
-    TaskDefinition,
-    AgentRole,
-    TaskStatus,
-    WorkflowContext,
-    AgentCoordinator,
-    DatabaseLogger,
-    WeaviateManager,
-    MCPContextManager
-)
-
-
-class TestWorkflowOrchestrator:
     """Test WorkflowOrchestrator functionality"""
-    
-    @pytest.fixture
-    def mock_db_logger(self):
         """Mock database logger"""
-        with patch('orchestration.ai_orchestrator.DatabaseLogger') as mock:
-            logger = Mock()
-            logger.log_action = Mock()
-            mock.return_value = logger
-            yield logger
-    
-    @pytest.fixture
-    def mock_weaviate_manager(self):
         """Mock Weaviate manager"""
-        with patch('orchestration.ai_orchestrator.WeaviateManager') as mock:
-            manager = Mock()
-            manager.store_context = Mock()
-            manager.retrieve_context = Mock(return_value=[])
-            mock.return_value = manager
-            yield manager
-    
-    @pytest.fixture
-    def orchestrator(self, mock_db_logger, mock_weaviate_manager):
         """Create orchestrator with mocked dependencies"""
-        with patch('orchestration.ai_orchestrator.DatabaseLogger', return_value=mock_db_logger):
-            with patch('orchestration.ai_orchestrator.WeaviateManager', return_value=mock_weaviate_manager):
-                return WorkflowOrchestrator()
-    
-    @pytest.mark.asyncio
-    async def test_create_workflow(self, orchestrator):
         """Test workflow creation"""
         workflow_id = "test_workflow_001"
         context = await orchestrator.create_workflow(workflow_id)
@@ -221,16 +168,8 @@ class TestWorkflowOrchestrator:
 
 class TestAgentCoordinator:
     """Test AgentCoordinator functionality"""
-    
-    @pytest.fixture
-    def coordinator(self, mock_db_logger, mock_weaviate_manager):
         """Create agent coordinator with mocked dependencies"""
-        return AgentCoordinator(mock_db_logger, mock_weaviate_manager)
-    
-    @pytest.mark.asyncio
-    async def test_agent_execution(self, coordinator):
         """Test agent task execution"""
-        task = TaskDefinition(
             task_id="test_task",
             name="Test Task",
             agent_role=AgentRole.ANALYZER,
@@ -250,7 +189,6 @@ class TestAgentCoordinator:
     @pytest.mark.asyncio
     async def test_agent_role_mapping(self, coordinator):
         """Test correct agent is selected for role"""
-        roles_and_results = [
             (AgentRole.ANALYZER, "analysis"),
             (AgentRole.IMPLEMENTER, "implementation"),
             (AgentRole.REFINER, "refinement")
@@ -275,9 +213,6 @@ class TestAgentCoordinator:
 
 class TestMCPContextManager:
     """Test MCP context manager functionality"""
-    
-    @pytest.mark.asyncio
-    async def test_task_creation(self):
         """Test creating task in MCP server"""
         async with MCPContextManager("http://localhost:8080") as mcp:
             task = TaskDefinition(
@@ -320,30 +255,8 @@ class TestMCPContextManager:
 
 class TestDatabaseLogger:
     """Test database logging functionality"""
-    
-    @pytest.fixture
-    def mock_connection(self):
         """Mock database connection"""
-        with patch('psycopg2.connect') as mock_connect:
-            mock_conn = Mock()
-            mock_cursor = Mock()
-            mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
-            mock_connect.return_value = mock_conn
-            yield mock_conn, mock_cursor
-    
-    def test_log_action(self, mock_connection):
         """Test logging an action"""
-        mock_conn, mock_cursor = mock_connection
-        
-        with patch.dict(os.environ, {
-            'POSTGRES_HOST': 'localhost',
-            'POSTGRES_DB': 'test_db',
-            'POSTGRES_USER': 'test_user',
-            'POSTGRES_PASSWORD': 'test_pass'
-        }):
-            logger = DatabaseLogger()
-            
-            logger.log_action(
                 workflow_id="test_workflow",
                 task_id="test_task",
                 agent_role="analyzer",
@@ -360,15 +273,7 @@ class TestDatabaseLogger:
 
 class TestWeaviateManager:
     """Test Weaviate manager functionality"""
-    
-    @pytest.fixture
-    def mock_client(self):
         """Mock Weaviate client"""
-        with patch('weaviate.Client') as mock_client_class:
-            mock_client = Mock()
-            mock_client.schema.create_class = Mock()
-            mock_client.data_object.create = Mock()
-            mock_client.query.get.return_value.with_where.return_value.with_limit.return_value.do.return_value = {
                 "data": {"Get": {"OrchestrationContext": []}}
             }
             mock_client_class.return_value = mock_client
@@ -376,13 +281,6 @@ class TestWeaviateManager:
     
     def test_store_context(self, mock_client):
         """Test storing context in Weaviate"""
-        with patch.dict(os.environ, {
-            'WEAVIATE_URL': 'http://localhost:8080',
-            'WEAVIATE_API_KEY': 'test_key'
-        }):
-            manager = WeaviateManager()
-            
-            manager.store_context(
                 workflow_id="test_workflow",
                 task_id="test_task",
                 context_type="checkpoint",

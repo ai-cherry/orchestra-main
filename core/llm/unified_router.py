@@ -1,39 +1,5 @@
 """
-Unified LLM Router for Orchestra AI
-
-This module consolidates all LLM routing functionality into a single, comprehensive
-router that provides intelligent model selection, fallback handling, caching,
-monitoring, and cost optimization.
-
-Key Features:
-- Intelligent model selection based on use case and requirements
-- Multi-provider support with automatic failover
-- Comprehensive caching and rate limiting
-- Performance monitoring and cost tracking
-- Async-first design with sync compatibility
-- Type-safe configuration and responses
-- Advanced retry logic with exponential backoff
 """
-
-import asyncio
-import hashlib
-import json
-import time
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from enum import Enum
-from typing import Any, Dict, List, Optional, Union, AsyncGenerator, Callable
-from contextlib import asynccontextmanager
-import logging
-
-import httpx
-from pydantic import BaseModel, Field
-
-from core.config.unified_config import get_llm_config, LLMConfig
-
-logger = logging.getLogger(__name__)
-
-class UseCase(str, Enum):
     """Supported use cases for intelligent model selection"""
     CODE_GENERATION = "code_generation"
     ARCHITECTURE_DESIGN = "architecture_design"
@@ -68,113 +34,20 @@ class Provider(str, Enum):
 @dataclass
 class ModelCapabilities:
     """Model capability metrics for intelligent selection"""
-    context_length: int
-    supports_tools: bool
-    supports_streaming: bool
-    supports_vision: bool
-    supports_code: bool
-    reasoning_quality: float  # 0.0-1.0
-    speed_score: float       # 0.0-1.0 (higher = faster)
-    cost_per_1k_tokens: float
-    languages: List[str]
-
-@dataclass
-class ModelSpec:
     """Complete model specification"""
-    provider: Provider
-    model_name: str
-    display_name: str
-    tier: ModelTier
-    capabilities: ModelCapabilities
-    use_cases: List[UseCase]
-    priority: int = 0  # Higher = preferred
-
-class LLMRequest(BaseModel):
     """Standard LLM request format"""
-    messages: List[Dict[str, str]]
-    model: Optional[str] = None
-    temperature: Optional[float] = None
-    max_tokens: Optional[int] = None
-    stream: bool = False
-    tools: Optional[List[Dict[str, Any]]] = None
-    system_prompt: Optional[str] = None
-    use_case: UseCase = UseCase.GENERAL_PURPOSE
-    tier: ModelTier = ModelTier.STANDARD
-    timeout: Optional[int] = None
-    cache: bool = True
-    metadata: Dict[str, Any] = Field(default_factory=dict)
-
-class LLMResponse(BaseModel):
     """Standard LLM response format"""
-    content: str
-    model: str
-    provider: Provider
-    usage: Dict[str, int]
-    cost: float
-    latency: float
-    cached: bool = False
-    tool_calls: Optional[List[Dict[str, Any]]] = None
-    metadata: Dict[str, Any] = Field(default_factory=dict)
-
-class LLMError(Exception):
     """Base exception for LLM operations"""
-    def __init__(self, message: str, provider: Optional[Provider] = None, 
-                 model: Optional[str] = None, retryable: bool = True):
-        super().__init__(message)
-        self.provider = provider
-        self.model = model
-        self.retryable = retryable
-
-class RateLimitError(LLMError):
     """Rate limit exceeded error"""
-    def __init__(self, message: str, retry_after: Optional[int] = None, **kwargs):
-        super().__init__(message, retryable=True, **kwargs)
-        self.retry_after = retry_after
-
-class ModelUnavailableError(LLMError):
     """Model temporarily unavailable"""
-    def __init__(self, message: str, **kwargs):
-        super().__init__(message, retryable=True, **kwargs)
-
-class ConfigurationError(LLMError):
     """Configuration error"""
-    def __init__(self, message: str, **kwargs):
-        super().__init__(message, retryable=False, **kwargs)
-
-class ProviderInterface(ABC):
     """Abstract interface for LLM providers"""
-    
-    @abstractmethod
-    async def complete(self, request: LLMRequest) -> LLMResponse:
         """Complete a chat request"""
-        pass
-    
-    @abstractmethod
-    async def stream_complete(self, request: LLMRequest) -> AsyncGenerator[str, None]:
         """Stream a chat completion"""
-        pass
-    
-    @abstractmethod
-    async def embed(self, texts: List[str], model: Optional[str] = None) -> List[List[float]]:
         """Generate embeddings"""
-        pass
-    
-    @abstractmethod
-    def get_available_models(self) -> List[ModelSpec]:
         """Get list of available models"""
-        pass
-    
-    @abstractmethod
-    async def check_health(self) -> bool:
         """Check provider health"""
-        pass
-
-class OpenAIProvider(ProviderInterface):
     """OpenAI provider implementation"""
-    
-    def __init__(self, api_key: str):
-        self.api_key = api_key
-        self.client = httpx.AsyncClient(
             base_url="https://api.openai.com/v1",
             headers={"Authorization": f"Bearer {api_key}"},
             timeout=30.0
@@ -183,9 +56,6 @@ class OpenAIProvider(ProviderInterface):
     
     def _load_model_specs(self) -> List[ModelSpec]:
         """Load OpenAI model specifications"""
-        return [
-            ModelSpec(
-                provider=Provider.OPENAI,
                 model_name="gpt-4-turbo",
                 display_name="GPT-4 Turbo",
                 tier=ModelTier.PREMIUM,
@@ -248,9 +118,6 @@ class OpenAIProvider(ProviderInterface):
     
     async def complete(self, request: LLMRequest) -> LLMResponse:
         """Complete a chat request via OpenAI API"""
-        start_time = time.time()
-        
-        payload = {
             "model": request.model or "gpt-4o",
             "messages": request.messages,
             "temperature": request.temperature or 0.7,
@@ -262,6 +129,9 @@ class OpenAIProvider(ProviderInterface):
             payload["tools"] = request.tools
         
         try:
+
+        
+            pass
             response = await self.client.post("/chat/completions", json=payload)
             response.raise_for_status()
             data = response.json()
@@ -276,7 +146,10 @@ class OpenAIProvider(ProviderInterface):
                 tool_calls=data["choices"][0]["message"].get("tool_calls")
             )
             
-        except httpx.HTTPStatusError as e:
+        except Exception:
+
+            
+            pass
             if e.response.status_code == 429:
                 retry_after = int(e.response.headers.get("retry-after", 60))
                 raise RateLimitError(f"Rate limit exceeded: {e}", retry_after=retry_after, 
@@ -290,7 +163,6 @@ class OpenAIProvider(ProviderInterface):
     
     async def stream_complete(self, request: LLMRequest) -> AsyncGenerator[str, None]:
         """Stream completion via OpenAI API"""
-        payload = {
             "model": request.model or "gpt-4o",
             "messages": request.messages,
             "temperature": request.temperature or 0.7,
@@ -306,16 +178,19 @@ class OpenAIProvider(ProviderInterface):
                     if chunk == "[DONE]":
                         break
                     try:
+
+                        pass
                         data = json.loads(chunk)
                         delta = data["choices"][0]["delta"]
                         if "content" in delta:
                             yield delta["content"]
-                    except (json.JSONDecodeError, KeyError):
+                    except Exception:
+
+                        pass
                         continue
     
     async def embed(self, texts: List[str], model: Optional[str] = None) -> List[List[float]]:
         """Generate embeddings via OpenAI API"""
-        payload = {
             "model": model or "text-embedding-3-small",
             "input": texts
         }
@@ -328,19 +203,16 @@ class OpenAIProvider(ProviderInterface):
     
     def get_available_models(self) -> List[ModelSpec]:
         """Get available OpenAI models"""
-        return self._models
-    
-    async def check_health(self) -> bool:
         """Check OpenAI API health"""
-        try:
             response = await self.client.get("/models")
             return response.status_code == 200
-        except:
+        except Exception:
+
+            pass
             return False
     
     def _calculate_cost(self, usage: Dict[str, int], model: str) -> float:
         """Calculate cost based on usage and model"""
-        # Simplified cost calculation - should be based on actual pricing
         tokens = usage.get("total_tokens", 0)
         if "gpt-4-turbo" in model:
             return tokens * 0.03 / 1000
@@ -352,10 +224,6 @@ class OpenAIProvider(ProviderInterface):
 
 class AnthropicProvider(ProviderInterface):
     """Anthropic provider implementation"""
-    
-    def __init__(self, api_key: str):
-        self.api_key = api_key
-        self.client = httpx.AsyncClient(
             base_url="https://api.anthropic.com",
             headers={
                 "x-api-key": api_key,
@@ -367,9 +235,6 @@ class AnthropicProvider(ProviderInterface):
     
     def _load_model_specs(self) -> List[ModelSpec]:
         """Load Anthropic model specifications"""
-        return [
-            ModelSpec(
-                provider=Provider.ANTHROPIC,
                 model_name="claude-3-opus-20240229",
                 display_name="Claude 3 Opus",
                 tier=ModelTier.PREMIUM,
@@ -432,12 +297,6 @@ class AnthropicProvider(ProviderInterface):
     
     async def complete(self, request: LLMRequest) -> LLMResponse:
         """Complete via Anthropic API"""
-        start_time = time.time()
-        
-        # Convert OpenAI format to Anthropic format
-        messages = self._convert_messages(request.messages)
-        
-        payload = {
             "model": request.model or "claude-3-sonnet-20240229",
             "messages": messages,
             "max_tokens": request.max_tokens or 2048,
@@ -449,6 +308,9 @@ class AnthropicProvider(ProviderInterface):
             payload["tools"] = self._convert_tools(request.tools)
         
         try:
+
+        
+            pass
             response = await self.client.post("/v1/messages", json=payload)
             response.raise_for_status()
             data = response.json()
@@ -462,7 +324,10 @@ class AnthropicProvider(ProviderInterface):
                 latency=time.time() - start_time
             )
             
-        except httpx.HTTPStatusError as e:
+        except Exception:
+
+            
+            pass
             if e.response.status_code == 429:
                 raise RateLimitError(f"Rate limit exceeded: {e}", 
                                    provider=Provider.ANTHROPIC, model=payload["model"])
@@ -475,10 +340,6 @@ class AnthropicProvider(ProviderInterface):
     
     async def stream_complete(self, request: LLMRequest) -> AsyncGenerator[str, None]:
         """Stream via Anthropic API"""
-        # Implementation similar to complete but with streaming
-        messages = self._convert_messages(request.messages)
-        
-        payload = {
             "model": request.model or "claude-3-sonnet-20240229",
             "messages": messages,
             "max_tokens": request.max_tokens or 2048,
@@ -494,10 +355,14 @@ class AnthropicProvider(ProviderInterface):
                     if chunk == "[DONE]":
                         break
                     try:
+
+                        pass
                         data = json.loads(chunk)
                         if "delta" in data and "text" in data["delta"]:
                             yield data["delta"]["text"]
-                    except (json.JSONDecodeError, KeyError):
+                    except Exception:
+
+                        pass
                         continue
     
     async def embed(self, texts: List[str], model: Optional[str] = None) -> List[List[float]]:
@@ -506,20 +371,8 @@ class AnthropicProvider(ProviderInterface):
     
     def get_available_models(self) -> List[ModelSpec]:
         """Get available Anthropic models"""
-        return self._models
-    
-    async def check_health(self) -> bool:
         """Check Anthropic API health"""
-        try:
-            # Anthropic doesn't have a dedicated health endpoint, so we'll just check if we can reach the API
-            return True  # Simplified for now
-        except:
-            return False
-    
-    def _convert_messages(self, messages: List[Dict[str, str]]) -> List[Dict[str, str]]:
         """Convert OpenAI message format to Anthropic format"""
-        converted = []
-        for msg in messages:
             if msg.get("role") == "system":
                 # Anthropic handles system messages differently
                 # For now, we'll convert to user message
@@ -536,10 +389,6 @@ class AnthropicProvider(ProviderInterface):
     
     def _convert_tools(self, tools: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Convert OpenAI tools format to Anthropic format"""
-        # Simplified conversion - would need proper implementation
-        return tools
-    
-    def _calculate_cost(self, usage: Dict[str, int], model: str) -> float:
         """Calculate cost based on usage and model"""
         tokens = usage.get("output_tokens", 0) + usage.get("input_tokens", 0)
         if "opus" in model:
@@ -552,20 +401,7 @@ class AnthropicProvider(ProviderInterface):
 
 class IntelligentModelSelector:
     """Intelligent model selection based on use case and requirements"""
-    
-    def __init__(self, models: List[ModelSpec]):
-        self.models = models
-        self.performance_history: Dict[str, Dict[str, float]] = {}
-    
-    def select_model(self, request: LLMRequest, available_providers: List[Provider]) -> ModelSpec:
         """Select the best model for the given request"""
-        # Filter models by available providers
-        candidate_models = [
-            model for model in self.models 
-            if model.provider in available_providers
-        ]
-        
-        if not candidate_models:
             raise ModelUnavailableError("No models available for any configured providers")
         
         # If specific model requested, find it
@@ -594,24 +430,6 @@ class IntelligentModelSelector:
     
     def _score_model(self, model: ModelSpec, request: LLMRequest) -> float:
         """Score a model based on request requirements"""
-        score = model.priority
-        
-        # Prefer models that match the use case
-        if request.use_case in model.use_cases:
-            score += 20
-        
-        # Consider capabilities
-        if model.capabilities.supports_tools and request.tools:
-            score += 10
-        
-        if model.capabilities.supports_streaming and request.stream:
-            score += 5
-        
-        # Consider cost efficiency
-        cost_score = 1.0 / (model.capabilities.cost_per_1k_tokens + 0.001)
-        score += cost_score * 10
-        
-        # Consider performance history
         model_key = f"{model.provider.value}:{model.model_name}"
         if model_key in self.performance_history:
             history = self.performance_history[model_key]
@@ -646,24 +464,8 @@ class IntelligentModelSelector:
 
 class UnifiedLLMRouter:
     """
-    Unified LLM Router with intelligent model selection and multi-provider support.
-    
-    This router consolidates all LLM functionality and provides:
-    - Intelligent model selection
-    - Multi-provider support
-    - Caching and rate limiting
-    - Performance monitoring
-    - Error handling and retries
     """
-    
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
         """Initialize the unified router"""
-        self.config = config or {}
-        self.providers: Dict[Provider, ProviderInterface] = {}
-        self.model_selector: Optional[IntelligentModelSelector] = None
-        self.cache: Dict[str, Any] = {}
-        self.cache_ttl = 300  # 5 minutes
-        self.metrics = {
             "total_requests": 0,
             "successful_requests": 0,
             "failed_requests": 0,
@@ -679,34 +481,16 @@ class UnifiedLLMRouter:
     
     def _initialize_providers(self) -> None:
         """Initialize available providers based on configuration"""
-        # Try to initialize providers with API keys from config or environment
-        try:
-            # Get API keys from config
-            openai_key = None
-            anthropic_key = None
-            
-            if isinstance(self.config, dict):
-                providers_config = self.config.get('providers', {})
-                openai_key = providers_config.get('openai', {}).get('api_key')
-                anthropic_key = providers_config.get('anthropic', {}).get('api_key')
-            
-            # Try environment variables as fallback
-            import os
-            if not openai_key:
-                openai_key = os.getenv('OPENAI_API_KEY')
-            if not anthropic_key:
-                anthropic_key = os.getenv('ANTHROPIC_API_KEY')
-            
-            # Initialize providers if keys are available
-            if openai_key:
-                self.providers[Provider.OPENAI] = OpenAIProvider(openai_key)
                 logger.info("OpenAI provider initialized")
             
             if anthropic_key:
                 self.providers[Provider.ANTHROPIC] = AnthropicProvider(anthropic_key)
                 logger.info("Anthropic provider initialized")
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             logger.warning(f"Provider initialization failed: {e}")
         
         # If no providers are available, log warning but don't fail
@@ -715,16 +499,7 @@ class UnifiedLLMRouter:
     
     def _initialize_model_selector(self) -> None:
         """Initialize the intelligent model selector"""
-        all_models = []
-        for provider in self.providers.values():
-            all_models.extend(provider.get_available_models())
-        
-        self.model_selector = IntelligentModelSelector(all_models)
-    
-    async def complete(self, request: Union[LLMRequest, str, List[Dict[str, str]]]) -> LLMResponse:
         """Complete a request using the optimal model"""
-        # Normalize input to LLMRequest
-        if isinstance(request, str):
             request = LLMRequest(messages=[{"role": "user", "content": request}])
         elif isinstance(request, list):
             request = LLMRequest(messages=request)
@@ -734,7 +509,6 @@ class UnifiedLLMRouter:
         if request.cache and cache_key in self.cache:
             cached_response, timestamp = self.cache[cache_key]
             if time.time() - timestamp < self.cache_ttl:
-                logger.debug(f"Cache hit for request: {cache_key[:8]}...")
                 return cached_response
         
         # Handle case with no providers
@@ -768,6 +542,9 @@ class UnifiedLLMRouter:
         response = None
         
         try:
+
+        
+            pass
             response = await self._attempt_completion(provider, request)
             success = True
             
@@ -789,7 +566,10 @@ class UnifiedLLMRouter:
             
             return response
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             # Update metrics for failure
             self._update_metrics(None, success)
             
@@ -807,8 +587,6 @@ class UnifiedLLMRouter:
     
     async def stream_complete(self, request: Union[LLMRequest, str, List[Dict[str, str]]]) -> AsyncGenerator[str, None]:
         """Stream completion response"""
-        # Normalize input
-        if isinstance(request, str):
             request = LLMRequest(messages=[{"role": "user", "content": request}], stream=True)
         elif isinstance(request, list):
             request = LLMRequest(messages=request, stream=True)
@@ -834,37 +612,19 @@ class UnifiedLLMRouter:
     
     async def embed(self, texts: Union[str, List[str]], model: Optional[str] = None) -> Union[List[float], List[List[float]]]:
         """Generate embeddings for text(s)"""
-        if isinstance(texts, str):
-            texts = [texts]
-            single_text = True
-        else:
-            single_text = False
-        
-        # Try OpenAI provider for embeddings
-        if Provider.OPENAI in self.providers:
-            provider = self.providers[Provider.OPENAI]
-            embeddings = await provider.embed(texts, model)
-            return embeddings[0] if single_text else embeddings
-        else:
             raise ModelUnavailableError("No embedding provider available")
     
     async def _attempt_completion(self, provider: ProviderInterface, request: LLMRequest) -> LLMResponse:
         """Attempt completion with a specific provider"""
-        max_retries = 3
-        
-        for attempt in range(max_retries):
-            try:
-                return await provider.complete(request)
-                
-            except RateLimitError as e:
-                if attempt < max_retries - 1:
-                    wait_time = e.retry_after or (2 ** attempt)
                     logger.warning(f"Rate limited, waiting {wait_time} seconds...")
                     await asyncio.sleep(wait_time)
                     continue
                 raise
                 
-            except ModelUnavailableError as e:
+            except Exception:
+
+                
+                pass
                 if attempt < max_retries - 1:
                     wait_time = 2 ** attempt
                     logger.warning(f"Model unavailable, waiting {wait_time} seconds...")
@@ -872,7 +632,10 @@ class UnifiedLLMRouter:
                     continue
                 raise
                 
-            except Exception as e:
+            except Exception:
+
+                
+                pass
                 if attempt < max_retries - 1:
                     logger.warning(f"Request failed (attempt {attempt + 1}): {e}")
                     await asyncio.sleep(1)
@@ -883,7 +646,6 @@ class UnifiedLLMRouter:
     
     def _get_cache_key(self, request: LLMRequest) -> str:
         """Generate cache key for request"""
-        cache_data = {
             "messages": request.messages,
             "model": request.model,
             "temperature": request.temperature,
@@ -918,9 +680,6 @@ class UnifiedLLMRouter:
     
     def get_metrics(self) -> Dict[str, Any]:
         """Get router performance metrics"""
-        avg_latency = 0.0
-        success_rate = 0.0
-        
         if self.metrics["total_requests"] > 0:
             success_rate = self.metrics["successful_requests"] / self.metrics["total_requests"]
         
@@ -937,19 +696,7 @@ class UnifiedLLMRouter:
     
     def get_available_models(self) -> List[str]:
         """Get list of available models"""
-        if not self.model_selector:
-            return []
-        
-        return [model.model_name for model in self.model_selector.models]
-    
-    async def health_check(self) -> Dict[str, bool]:
         """Perform health check on all providers"""
-        health_status = {}
-        
-        for provider_name, provider in self.providers.items():
-            try:
-                health_status[provider_name.value] = await provider.check_health()
-            except Exception as e:
                 logger.warning(f"Health check failed for {provider_name}: {e}")
                 health_status[provider_name.value] = False
         
@@ -957,27 +704,9 @@ class UnifiedLLMRouter:
     
     async def close(self) -> None:
         """Clean up resources"""
-        # Close any HTTP clients in providers
-        for provider in self.providers.values():
-            if hasattr(provider, 'client') and hasattr(provider.client, 'aclose'):
-                await provider.client.aclose()
-
-def get_llm_router(config: Optional[Dict[str, Any]] = None) -> UnifiedLLMRouter:
     """Get or create the global router instance"""
-    # For now, always create a new instance
-    # In production, you might want to use a singleton pattern
-    return UnifiedLLMRouter(config)
-
-async def reset_router() -> None:
     """Reset the global router instance"""
-    # Implementation would reset global state
-    pass
-
-async def complete(prompt: str, use_case: UseCase = UseCase.GENERAL_PURPOSE, 
-                  tier: ModelTier = ModelTier.STANDARD, **kwargs) -> str:
     """Convenience function for simple completion"""
-    router = get_llm_router()
-    request = LLMRequest(
         messages=[{"role": "user", "content": prompt}],
         use_case=use_case,
         tier=tier,
@@ -988,18 +717,7 @@ async def complete(prompt: str, use_case: UseCase = UseCase.GENERAL_PURPOSE,
 
 async def chat(messages: List[Dict[str, str]], **kwargs) -> str:
     """Convenience function for chat completion"""
-    router = get_llm_router()
-    response = await router.complete(messages)
-    return response.content
-
-async def stream_chat(messages: List[Dict[str, str]], **kwargs) -> AsyncGenerator[str, None]:
     """Convenience function for streaming chat"""
-    router = get_llm_router()
-    async for chunk in router.stream_complete(messages):
-        yield chunk
-
-# Export main classes and functions
-__all__ = [
     "UnifiedLLMRouter",
     "LLMRequest",
     "LLMResponse", 

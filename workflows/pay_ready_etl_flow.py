@@ -1,28 +1,5 @@
 """
-Pay Ready ETL Pipeline Flow
-==========================
-
-Main Prefect flow for orchestrating the Pay Ready domain ETL pipeline.
-Handles data ingestion, processing, entity resolution, and vector storage.
 """
-
-import asyncio
-import os
-from typing import List, Dict, Optional, Any
-from datetime import datetime, timedelta
-import logging
-
-from prefect import flow, task, get_run_logger
-from prefect.task_runners import ConcurrentTaskRunner
-from prefect.artifacts import create_markdown_artifact
-from prefect.context import get_run_context
-
-from services.pay_ready import PayReadyETLOrchestrator, PayReadyEntityResolver, PayReadyMemoryManager
-from services.pay_ready.etl_orchestrator import SourceType
-
-logger = logging.getLogger(__name__)
-
-@task(
     name="Initialize Services",
     description="Initialize all required services for the ETL pipeline",
     retries=2,
@@ -30,7 +7,6 @@ logger = logging.getLogger(__name__)
 )
 async def initialize_services() -> Dict[str, Any]:
     """Initialize and return all required services."""
-    logger = get_run_logger()
     logger.info("Initializing Pay Ready ETL services")
 
     orchestrator = PayReadyETLOrchestrator()
@@ -50,15 +26,19 @@ async def initialize_services() -> Dict[str, Any]:
 )
 async def trigger_source_sync(orchestrator: PayReadyETLOrchestrator, source: str) -> Dict[str, Any]:
     """Trigger sync for a specific source."""
-    logger = get_run_logger()
     logger.info(f"Triggering sync for {source}")
 
     try:
+
+
+        pass
         source_type = SourceType(source)
         job_id = await orchestrator.trigger_airbyte_sync(source_type)
 
         return {"source": source, "job_id": job_id, "status": "triggered", "timestamp": datetime.utcnow().isoformat()}
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to trigger sync for {source}: {e}")
         return {
             "source": source,
@@ -78,8 +58,6 @@ async def wait_for_sync_completion(
     orchestrator: PayReadyETLOrchestrator, sync_info: Dict[str, Any], timeout_minutes: int = 60
 ) -> Dict[str, Any]:
     """Wait for a sync job to complete."""
-    logger = get_run_logger()
-
     if sync_info["status"] == "failed":
         logger.warning(f"Skipping wait for failed sync: {sync_info['source']}")
         return sync_info
@@ -100,10 +78,12 @@ async def process_source_data(
     orchestrator: PayReadyETLOrchestrator, source: str, batch_size: int = 100
 ) -> Dict[str, Any]:
     """Process new data from a source."""
-    logger = get_run_logger()
     logger.info(f"Processing data from {source}")
 
     try:
+
+
+        pass
         source_type = SourceType(source)
         records_processed = await orchestrator.process_new_data(source_type, batch_size)
 
@@ -113,7 +93,9 @@ async def process_source_data(
             "status": "success",
             "timestamp": datetime.utcnow().isoformat(),
         }
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to process data from {source}: {e}")
         return {
             "source": source,
@@ -126,35 +108,43 @@ async def process_source_data(
 @task(name="Run Entity Resolution", description="Run batch entity resolution", retries=2, retry_delay_seconds=30)
 async def run_entity_resolution(entity_resolver: PayReadyEntityResolver) -> Dict[str, Any]:
     """Run batch entity resolution."""
-    logger = get_run_logger()
     logger.info("Running entity resolution batch")
 
     start_time = datetime.utcnow()
 
     try:
+
+
+        pass
         await entity_resolver.run_resolution_batch()
 
         duration = (datetime.utcnow() - start_time).total_seconds()
 
         return {"status": "success", "duration_seconds": duration, "timestamp": datetime.utcnow().isoformat()}
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Entity resolution failed: {e}")
         return {"status": "failed", "error": str(e), "timestamp": datetime.utcnow().isoformat()}
 
 @task(name="Update Analytics Cache", description="Update analytics and warm caches", retries=1, retry_delay_seconds=30)
 async def update_analytics_cache(orchestrator: PayReadyETLOrchestrator) -> Dict[str, Any]:
     """Update analytics cache and warm memory caches."""
-    logger = get_run_logger()
     logger.info("Updating analytics cache")
 
     try:
+
+
+        pass
         await orchestrator.update_analytics_cache()
 
         # Get memory stats
         memory_stats = await orchestrator.memory_manager.get_memory_stats()
 
         return {"status": "success", "memory_stats": memory_stats, "timestamp": datetime.utcnow().isoformat()}
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to update analytics cache: {e}")
         return {"status": "failed", "error": str(e), "timestamp": datetime.utcnow().isoformat()}
 
@@ -163,14 +153,18 @@ async def update_analytics_cache(orchestrator: PayReadyETLOrchestrator) -> Dict[
 )
 async def flush_pending_vectors(memory_manager: PayReadyMemoryManager) -> Dict[str, Any]:
     """Flush pending vectors to ensure all data is indexed."""
-    logger = get_run_logger()
     logger.info("Flushing pending vectors")
 
     try:
+
+
+        pass
         await memory_manager.flush_pending_vectors()
 
         return {"status": "success", "timestamp": datetime.utcnow().isoformat()}
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to flush vectors: {e}")
         return {"status": "failed", "error": str(e), "timestamp": datetime.utcnow().isoformat()}
 
@@ -179,28 +173,13 @@ async def generate_pipeline_report(
     sync_results: List[Dict], processing_results: List[Dict], entity_resolution_result: Dict, analytics_result: Dict
 ) -> str:
     """Generate a markdown report of the pipeline execution."""
-    logger = get_run_logger()
-
-    # Calculate totals
     total_records = sum(r.get("records_processed", 0) for r in processing_results)
     successful_syncs = sum(1 for r in sync_results if r.get("status") == "completed")
     failed_syncs = sum(1 for r in sync_results if r.get("status") == "failed")
 
     # Build report
-    report = f"""# Pay Ready ETL Pipeline Report
-
-## Execution Summary
-- **Date**: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}
-- **Total Records Processed**: {total_records:,}
-- **Successful Syncs**: {successful_syncs}/{len(sync_results)}
-- **Failed Syncs**: {failed_syncs}
-
-## Sync Results
-| Source | Status | Job ID | Duration |
-|--------|--------|--------|----------|
+    report = f"""
 """
-
-    for sync in sync_results:
         duration = "N/A"
         if sync.get("completed_at") and sync.get("timestamp"):
             start = datetime.fromisoformat(sync["timestamp"])
@@ -210,13 +189,7 @@ async def generate_pipeline_report(
         report += f"| {sync['source']} | {sync['status']} | {sync.get('job_id', 'N/A')} | {duration} |\n"
 
     report += f"""
-## Processing Results
-| Source | Records | Status | Error |
-|--------|---------|--------|-------|
 """
-
-    for result in processing_results:
-        error = (
             result.get("error", "None")[:50] + "..."
             if result.get("error") and len(result.get("error", "")) > 50
             else result.get("error", "None")
@@ -224,22 +197,12 @@ async def generate_pipeline_report(
         report += f"| {result['source']} | {result['records_processed']:,} | {result['status']} | {error} |\n"
 
     report += f"""
-## Entity Resolution
-- **Status**: {entity_resolution_result['status']}
-- **Duration**: {entity_resolution_result.get('duration_seconds', 0):.1f}s
-
-## Memory Statistics
 """
-
     if analytics_result.get("status") == "success" and analytics_result.get("memory_stats"):
         stats = analytics_result["memory_stats"]
         hot_cache = stats.get("hot_cache", {})
-        report += f"""- **Hot Cache**: {hot_cache.get('size', 0):,} items ({hot_cache.get('utilization', 0):.1%} utilization)
-- **Pending Vectors**: {stats.get('vector_queue', {}).get('pending', 0)}
+        report += f"""
 """
-
-    # Create artifact
-    await create_markdown_artifact(
         key="pipeline-report", markdown=report, description="Pay Ready ETL Pipeline Execution Report"
     )
 
@@ -258,17 +221,7 @@ async def pay_ready_etl_pipeline(
     sources: List[str] = None, full_sync: bool = False, batch_size: int = 100
 ) -> Dict[str, Any]:
     """
-    Main ETL pipeline for Pay Ready domain.
-
-    Args:
-        sources: List of sources to sync (default: all)
-        full_sync: Whether to perform a full sync
-        batch_size: Number of records to process per batch
-
-    Returns:
-        Pipeline execution summary
     """
-    logger = get_run_logger()
     logger.info(f"Starting Pay Ready ETL Pipeline - Full Sync: {full_sync}")
 
     # Default sources if not specified
@@ -342,16 +295,7 @@ async def pay_ready_etl_pipeline(
 )
 async def pay_ready_incremental_sync(source: str, batch_size: int = 100) -> Dict[str, Any]:
     """
-    Run incremental sync for a specific source.
-
-    Args:
-        source: Source to sync
-        batch_size: Number of records per batch
-
-    Returns:
-        Sync results
     """
-    logger = get_run_logger()
     logger.info(f"Running incremental sync for {source}")
 
     # Initialize services

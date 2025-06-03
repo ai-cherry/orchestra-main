@@ -1,22 +1,6 @@
 #!/usr/bin/env python3
 """
-Create Your First Agent for Orchestra AI
-Based on your questionnaire answers
 """
-
-import os
-import sys
-import asyncio
-from typing import Dict
-
-# Add parent directory to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from agent.app.services.agent_templates import create_agent_from_answers
-from core.services.agents.base import get_agent_manager
-
-# Your answers from the questionnaire
-USER_ANSWERS = {
     "q1": "A and B",  # Data collection and task automation
     "q2": "A",  # Fully autonomous to start
     "q3": "B then A then C",  # Starting with unstructured text

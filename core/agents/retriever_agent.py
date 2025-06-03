@@ -1,8 +1,4 @@
 """Prototype LlamaIndex RetrieverAgent integration."""
-
-from llama_index.agent import RetrieverAgent
-from llama_index import VectorStoreIndex
-
 PERSONAL = VectorStoreIndex.from_weaviate("Personal")
 PAY = VectorStoreIndex.from_weaviate("PayReady")
 RX = VectorStoreIndex.from_weaviate("ParagonRX")

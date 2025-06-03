@@ -1,32 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Intelligent Caching System for AI Orchestration
-Provides ML-based caching with semantic similarity, pattern recognition, and predictive pre-loading
 """
-
-import os
-import sys
-import json
-import time
-import asyncio
-import hashlib
-from typing import Dict, List, Optional, Any, Tuple
-from datetime import datetime, timedelta
-from pathlib import Path
-import logging
-from dataclasses import dataclass, asdict
-from enum import Enum
-import pickle
-import numpy as np
-
-# Add parent directory to path for imports
-sys.path.append(str(Path(__file__).parent.parent.parent))
-
-from shared.database import initialize_database
-
-logger = logging.getLogger(__name__)
-
-class CacheType(Enum):
     CODE_ANALYSIS = "code_analysis"
     CODE_GENERATION = "code_generation"
     COMPLETION = "completion"
@@ -36,33 +11,7 @@ class CacheType(Enum):
 @dataclass
 class CacheEntry:
     """Cache entry with metadata"""
-    key: str
-    value: Any
-    cache_type: CacheType
-    created_at: datetime
-    last_accessed: datetime
-    access_count: int
-    semantic_hash: str
-    context_hash: str
-    ttl_seconds: int
-    confidence_score: float
-    file_path: Optional[str] = None
-    language: Optional[str] = None
-    metadata: Optional[Dict] = None
-
-class IntelligentCache:
     """Advanced caching system with ML-based optimization"""
-    
-    def __init__(self, max_memory_mb: int = 512, max_entries: int = 10000):
-        self.max_memory_bytes = max_memory_mb * 1024 * 1024
-        self.max_entries = max_entries
-        self.cache: Dict[str, CacheEntry] = {}
-        self.semantic_index: Dict[str, List[str]] = {}  # semantic_hash -> [cache_keys]
-        self.context_index: Dict[str, List[str]] = {}   # context_hash -> [cache_keys]
-        self.db = None
-        
-        # Performance metrics
-        self.metrics = {
             "hits": 0,
             "misses": 0,
             "evictions": 0,
@@ -94,32 +43,14 @@ class IntelligentCache:
     
     async def __aenter__(self):
         """Async context manager entry"""
-        # Initialize database for persistent cache
-        postgres_url = os.environ.get(
-            'POSTGRES_URL',
-            'postgresql://postgres:password@localhost:5432/orchestra'
-        )
-        weaviate_url = os.environ.get('WEAVIATE_URL', 'http://localhost:8080')
-        weaviate_api_key = os.environ.get('WEAVIATE_API_KEY')
-        
-        self.db = await initialize_database(postgres_url, weaviate_url, weaviate_api_key)
-        await self._setup_cache_database()
-        await self._load_persistent_cache()
-        return self
-    
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Async context manager exit"""
-        await self._save_persistent_cache()
-        if self.db:
-            await self.db.close()
-    
-    async def get(self, key: str, cache_type: CacheType, 
-                 context: Dict = None) -> Optional[Any]:
         """Get value from cache with intelligent lookup"""
-        start_time = time.time()
         self.metrics["total_requests"] += 1
         
         try:
+
+        
+            pass
             # 1. Exact key match
             if key in self.cache:
                 entry = self.cache[key]
@@ -162,23 +93,6 @@ class IntelligentCache:
                  context: Dict = None, confidence_score: float = 1.0,
                  file_path: str = None, language: str = None) -> None:
         """Set value in cache with intelligent indexing"""
-        # Check if we need to evict entries
-        await self._ensure_capacity()
-        
-        # Create cache entry
-        semantic_hash = self._generate_semantic_hash(key, value, context)
-        context_hash = self._generate_context_hash(context, file_path, language)
-        
-        config = self.cache_config[cache_type]
-        entry = CacheEntry(
-            key=key,
-            value=value,
-            cache_type=cache_type,
-            created_at=datetime.now(),
-            last_accessed=datetime.now(),
-            access_count=1,
-            semantic_hash=semantic_hash,
-            context_hash=context_hash,
             ttl_seconds=config["ttl"],
             confidence_score=confidence_score,
             file_path=file_path,
@@ -206,49 +120,8 @@ class IntelligentCache:
     
     async def invalidate_pattern(self, pattern: str, cache_type: CacheType = None) -> int:
         """Invalidate cache entries matching a pattern"""
-        invalidated = 0
-        keys_to_remove = []
-        
-        for key, entry in self.cache.items():
-            if cache_type and entry.cache_type != cache_type:
-                continue
-            
-            if pattern in key or (entry.file_path and pattern in entry.file_path):
-                keys_to_remove.append(key)
-        
-        for key in keys_to_remove:
-            await self._remove_entry(key)
-            invalidated += 1
-        
-        return invalidated
-    
-    async def get_similar_entries(self, key: str, cache_type: CacheType,
-                                context: Dict = None, max_results: int = 5) -> List[Tuple[str, Any, float]]:
         """Get similar cache entries with similarity scores"""
-        candidates = []
-        target_semantic = self._generate_semantic_hash(key, None, context)
-        target_context = self._generate_context_hash(context)
-        
-        for cache_key, entry in self.cache.items():
-            if entry.cache_type != cache_type or not self._is_valid(entry):
-                continue
-            
-            # Calculate similarity score
-            similarity = self._calculate_similarity(
-                key, cache_key, target_semantic, entry.semantic_hash,
-                target_context, entry.context_hash, context, entry.metadata
-            )
-            
-            if similarity > 0.3:  # Minimum similarity threshold
-                candidates.append((cache_key, entry.value, similarity))
-        
-        # Sort by similarity and return top results
-        candidates.sort(key=lambda x: x[2], reverse=True)
-        return candidates[:max_results]
-    
-    async def optimize_cache(self) -> Dict:
         """Optimize cache performance using ML insights"""
-        optimization_results = {
             "entries_optimized": 0,
             "memory_freed": 0,
             "patterns_identified": 0,
@@ -316,59 +189,9 @@ class IntelligentCache:
     async def _semantic_lookup(self, key: str, cache_type: CacheType, 
                              context: Dict) -> Optional[Any]:
         """Lookup using semantic similarity"""
-        semantic_hash = self._generate_semantic_hash(key, None, context)
-        
-        if semantic_hash in self.semantic_index:
-            candidates = self.semantic_index[semantic_hash]
-            for candidate_key in candidates:
-                if candidate_key in self.cache:
-                    entry = self.cache[candidate_key]
-                    if entry.cache_type == cache_type and self._is_valid(entry):
-                        # Update access statistics
-                        entry.last_accessed = datetime.now()
-                        entry.access_count += 1
-                        return entry.value
-        
-        return None
-    
-    async def _context_lookup(self, key: str, cache_type: CacheType,
-                            context: Dict) -> Optional[Any]:
         """Lookup using context similarity"""
-        context_hash = self._generate_context_hash(context)
-        
-        if context_hash in self.context_index:
-            candidates = self.context_index[context_hash]
-            for candidate_key in candidates:
-                if candidate_key in self.cache:
-                    entry = self.cache[candidate_key]
-                    if entry.cache_type == cache_type and self._is_valid(entry):
-                        # Check if key similarity is reasonable
-                        similarity = self._calculate_key_similarity(key, candidate_key)
-                        if similarity > 0.5:
-                            entry.last_accessed = datetime.now()
-                            entry.access_count += 1
-                            return entry.value
-        
-        return None
-    
-    async def _predictive_lookup(self, key: str, cache_type: CacheType,
-                               context: Dict) -> Optional[Any]:
         """Predictive lookup based on patterns"""
-        # Simple pattern matching - can be enhanced with ML models
-        similar_entries = await self.get_similar_entries(key, cache_type, context, 3)
-        
-        if similar_entries:
-            # Return the most similar entry if confidence is high enough
-            best_match = similar_entries[0]
-            if best_match[2] > 0.8:  # High similarity threshold
-                return best_match[1]
-        
-        return None
-    
-    def _generate_semantic_hash(self, key: str, value: Any = None, 
-                              context: Dict = None) -> str:
         """Generate semantic hash for similarity matching"""
-        # Simple implementation - can be enhanced with embeddings
         content = f"{key}_{context or {}}"
         if value:
             content += f"_{str(type(value))}"
@@ -378,7 +201,6 @@ class IntelligentCache:
     def _generate_context_hash(self, context: Dict = None, file_path: str = None,
                              language: str = None) -> str:
         """Generate context hash for similarity matching"""
-        context_data = {
             "context": context or {},
             "file_path": file_path,
             "language": language
@@ -389,10 +211,6 @@ class IntelligentCache:
     def _calculate_similarity(self, key1: str, key2: str, semantic1: str, semantic2: str,
                             context1: str, context2: str, ctx1: Dict, ctx2: Dict) -> float:
         """Calculate similarity score between two cache entries"""
-        score = 0.0
-        
-        # Exact key match
-        if key1 == key2:
             score += self.pattern_weights["exact_match"]
         else:
             # Key similarity
@@ -416,93 +234,22 @@ class IntelligentCache:
     
     def _calculate_key_similarity(self, key1: str, key2: str) -> float:
         """Calculate similarity between two keys"""
-        # Simple Jaccard similarity
-        set1 = set(key1.lower().split())
-        set2 = set(key2.lower().split())
-        
-        if not set1 and not set2:
-            return 1.0
-        if not set1 or not set2:
-            return 0.0
-        
-        intersection = len(set1.intersection(set2))
-        union = len(set1.union(set2))
-        
-        return intersection / union
-    
-    def _is_valid(self, entry: CacheEntry) -> bool:
         """Check if cache entry is still valid"""
-        age = (datetime.now() - entry.created_at).total_seconds()
-        return age < entry.ttl_seconds
-    
-    async def _ensure_capacity(self) -> None:
         """Ensure cache doesn't exceed capacity limits"""
-        # Check entry count
-        while len(self.cache) >= self.max_entries:
-            await self._evict_lru_entry()
-        
-        # Check memory usage
         while self.metrics["memory_usage_bytes"] > self.max_memory_bytes:
             await self._evict_lru_entry()
     
     async def _evict_lru_entry(self) -> None:
         """Evict least recently used entry"""
-        if not self.cache:
-            return
-        
-        # Find LRU entry
-        lru_key = min(
-            self.cache.keys(),
-            key=lambda k: (
-                self.cache[k].last_accessed,
-                -self.cache[k].access_count  # Prefer keeping frequently accessed items
-            )
-        )
-        
-        await self._remove_entry(lru_key)
         self.metrics["evictions"] += 1
     
     async def _remove_entry(self, key: str) -> None:
         """Remove entry from cache and indexes"""
-        if key not in self.cache:
-            return
-        
-        entry = self.cache[key]
-        
-        # Remove from indexes
-        if entry.semantic_hash in self.semantic_index:
-            if key in self.semantic_index[entry.semantic_hash]:
-                self.semantic_index[entry.semantic_hash].remove(key)
-            if not self.semantic_index[entry.semantic_hash]:
-                del self.semantic_index[entry.semantic_hash]
-        
-        if entry.context_hash in self.context_index:
-            if key in self.context_index[entry.context_hash]:
-                self.context_index[entry.context_hash].remove(key)
-            if not self.context_index[entry.context_hash]:
-                del self.context_index[entry.context_hash]
-        
-        # Remove from cache
-        del self.cache[key]
-        
-        # Update memory usage
-        self._update_memory_usage()
-    
-    def _update_memory_usage(self) -> None:
         """Update memory usage metrics"""
-        total_size = 0
-        for entry in self.cache.values():
-            total_size += sys.getsizeof(pickle.dumps(entry))
         self.metrics["memory_usage_bytes"] = total_size
     
     async def _analyze_access_patterns(self) -> Dict:
         """Analyze cache access patterns for optimization"""
-        patterns = {}
-        
-        for cache_type in CacheType:
-            type_entries = [e for e in self.cache.values() if e.cache_type == cache_type]
-            if type_entries:
-                patterns[cache_type] = {
                     "count": len(type_entries),
                     "avg_access_frequency": sum(e.access_count for e in type_entries) / len(type_entries),
                     "avg_age_hours": sum(
@@ -516,135 +263,41 @@ class IntelligentCache:
     async def _setup_cache_database(self) -> None:
         """Setup database tables for persistent cache"""
         await self.db.execute_query("""
-            CREATE TABLE IF NOT EXISTS intelligent_cache (
-                id SERIAL PRIMARY KEY,
-                cache_key VARCHAR(500) NOT NULL UNIQUE,
-                cache_value BYTEA NOT NULL,
-                cache_type VARCHAR(100) NOT NULL,
-                semantic_hash VARCHAR(32),
-                context_hash VARCHAR(32),
-                confidence_score FLOAT DEFAULT 1.0,
-                file_path TEXT,
-                language VARCHAR(50),
-                metadata JSONB,
-                access_count INTEGER DEFAULT 1,
-                created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-                last_accessed TIMESTAMP WITH TIME ZONE NOT NULL,
-                ttl_seconds INTEGER NOT NULL
-            );
-        """, fetch=False)
-        
+        """
         await self.db.execute_query("""
-            CREATE INDEX IF NOT EXISTS idx_cache_semantic_hash 
-            ON intelligent_cache(semantic_hash);
-        """, fetch=False)
-        
+        """
         await self.db.execute_query("""
-            CREATE INDEX IF NOT EXISTS idx_cache_context_hash 
-            ON intelligent_cache(context_hash);
-        """, fetch=False)
-        
+        """
         await self.db.execute_query("""
-            CREATE INDEX IF NOT EXISTS idx_cache_type_created 
-            ON intelligent_cache(cache_type, created_at DESC);
-        """, fetch=False)
-    
-    async def _load_persistent_cache(self) -> None:
+        """
         """Load cache from persistent storage"""
-        try:
             results = await self.db.execute_query("""
-                SELECT cache_key, cache_value, cache_type, semantic_hash, context_hash,
-                       confidence_score, file_path, language, metadata, access_count,
-                       created_at, last_accessed, ttl_seconds
-                FROM intelligent_cache
-                WHERE created_at > NOW() - INTERVAL '1 day'
-                ORDER BY last_accessed DESC
-                LIMIT 1000
-            """)
-            
-            loaded_count = 0
-            for row in results:
-                try:
-                    entry = CacheEntry(
-                        key=row[0],
-                        value=pickle.loads(row[1]),
-                        cache_type=CacheType(row[2]),
-                        semantic_hash=row[3],
-                        context_hash=row[4],
-                        confidence_score=row[5],
-                        file_path=row[6],
-                        language=row[7],
-                        metadata=row[8],
-                        access_count=row[9],
-                        created_at=row[10],
-                        last_accessed=row[11],
-                        ttl_seconds=row[12]
-                    )
-                    
-                    if self._is_valid(entry):
-                        self.cache[entry.key] = entry
-                        
-                        # Update indexes
-                        if entry.semantic_hash not in self.semantic_index:
-                            self.semantic_index[entry.semantic_hash] = []
-                        self.semantic_index[entry.semantic_hash].append(entry.key)
-                        
-                        if entry.context_hash not in self.context_index:
-                            self.context_index[entry.context_hash] = []
-                        self.context_index[entry.context_hash].append(entry.key)
-                        
-                        loaded_count += 1
-                    
-                except Exception as e:
+            """
                     logger.warning(f"Failed to load cache entry: {e}")
             
             self._update_memory_usage()
             logger.info(f"Loaded {loaded_count} cache entries from persistent storage")
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             logger.error(f"Failed to load persistent cache: {e}")
     
     async def _save_persistent_cache(self) -> None:
         """Save cache to persistent storage"""
-        try:
-            # Save only recently accessed entries
-            cutoff_time = datetime.now() - timedelta(hours=6)
-            recent_entries = [
-                entry for entry in self.cache.values()
-                if entry.last_accessed > cutoff_time
-            ]
-            
-            for entry in recent_entries[:100]:  # Limit to 100 most recent
-                await self._save_entry_to_db(entry)
-            
             logger.info(f"Saved {len(recent_entries)} cache entries to persistent storage")
             
-        except Exception as e:
+        except Exception:
+
+            
+            pass
             logger.error(f"Failed to save persistent cache: {e}")
     
     async def _save_entry_to_db(self, entry: CacheEntry) -> None:
         """Save individual cache entry to database"""
-        try:
-            value_bytes = pickle.dumps(entry.value)
-            
             await self.db.execute_query("""
-                INSERT INTO intelligent_cache 
-                (cache_key, cache_value, cache_type, semantic_hash, context_hash,
-                 confidence_score, file_path, language, metadata, access_count,
-                 created_at, last_accessed, ttl_seconds)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-                ON CONFLICT (cache_key) 
-                DO UPDATE SET 
-                    access_count = EXCLUDED.access_count,
-                    last_accessed = EXCLUDED.last_accessed
-            """, 
-            entry.key, value_bytes, entry.cache_type.value, entry.semantic_hash,
-            entry.context_hash, entry.confidence_score, entry.file_path,
-            entry.language, json.dumps(entry.metadata) if entry.metadata else None,
-            entry.access_count, entry.created_at, entry.last_accessed, entry.ttl_seconds,
-            fetch=False)
-            
-        except Exception as e:
+            """
             logger.warning(f"Failed to save cache entry to DB: {e}")
 
 
@@ -653,17 +306,7 @@ _cache_instance = None
 
 async def get_cache() -> IntelligentCache:
     """Get global cache instance"""
-    global _cache_instance
-    if _cache_instance is None:
-        _cache_instance = IntelligentCache()
-        await _cache_instance.__aenter__()
-    return _cache_instance
-
-def cache_decorator(cache_type: CacheType, ttl: int = None):
     """Decorator for automatic caching of function results"""
-    def decorator(func):
-        async def wrapper(*args, **kwargs):
-            # Generate cache key
             key_data = f"{func.__name__}_{args}_{sorted(kwargs.items())}"
             cache_key = hashlib.md5(key_data.encode()).hexdigest()
             

@@ -1,33 +1,6 @@
 #!/usr/bin/env python3
 """
-Weaviate Direct MCP Server.
-
-This server provides direct access to Weaviate functionalities,
-allowing AI models (e.g., via Cursor IDE) or other services to perform
-fine-grained operations like schema inspection, object manipulation,
-hybrid search, and raw GraphQL queries.
 """
-
-import json
-import logging
-import os
-from typing import Any, Dict, List, Optional, Union
-
-import uvicorn
-import weaviate
-import weaviate.classes as wvc  # For Weaviate Client v4 classes
-from fastapi import FastAPI, HTTPException, Depends
-from pydantic import BaseModel, Field
-
-# Assuming the config module is in the parent directory relative to this file's location
-# Adjust if your project structure is different.
-from mcp_server.config.weaviate_mcp_config import (
-    get_weaviate_client_params,
-    validate_weaviate_config,
-    log_weaviate_config,
-)
-
-# Configure logging
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO").upper())
 logger = logging.getLogger(__name__)
 
@@ -149,6 +122,9 @@ async def init_weaviate_client():
     )
 
     try:
+
+
+        pass
         weaviate_client = weaviate.WeaviateClient(
             connection_params=connection_params,
             auth_client_secret=client_params.get("auth_client_secret"),
@@ -162,7 +138,9 @@ async def init_weaviate_client():
         if not weaviate_client.is_ready():
             raise ConnectionError("Weaviate client connected but instance is not ready.")
         logger.info("Successfully connected to Weaviate and instance is ready.")
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to initialize Weaviate client: {e}", exc_info=True)
         weaviate_client = None  # Ensure client is None if connection failed
         raise RuntimeError(f"Weaviate connection failed: {e}")
@@ -179,8 +157,12 @@ async def get_client() -> weaviate.WeaviateClient:
 async def startup_event():
     logger.info("Weaviate Direct MCP Server starting up...")
     try:
+
+        pass
         await init_weaviate_client()
-    except Exception as e:
+    except Exception:
+
+        pass
         # If init fails, the server might still start but endpoints will fail.
         # Consider exiting if a connection is critical for startup.
         logger.critical(
@@ -292,36 +274,50 @@ async def get_mcp_tools():
 @app.post("/mcp/weaviate_direct/get_schema")
 async def get_schema(request: GetSchemaRequest, client: weaviate.WeaviateClient = Depends(get_client)):
     try:
+
+        pass
         if request.class_names:
             schema_details = {}
             for class_name in request.class_names:
                 try:
+
+                    pass
                     schema_details[class_name] = client.collections.get(class_name).config.get().to_dict()
-                except Exception as e:
+                except Exception:
+
+                    pass
                     logger.warning(f"Could not get schema for class {class_name}: {e}")
                     schema_details[class_name] = {"error": str(e)}
             return schema_details
         else:
             return client.collections.list_all(simple=False)  # simple=False gives full config
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error getting schema: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Error getting schema: {str(e)}")
 
 @app.post("/mcp/weaviate_direct/add_object", response_model=AddObjectResponse)
 async def add_object(request: AddObjectRequest, client: weaviate.WeaviateClient = Depends(get_client)):
     try:
+
+        pass
         collection = client.collections.get(request.collection_name)
         uuid_returned = collection.data.insert(
             properties=request.properties, vector=request.vector, uuid=request.uuid  # Let Weaviate generate if None
         )
         return AddObjectResponse(status="success", uuid=str(uuid_returned))
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error adding object to {request.collection_name}: {e}", exc_info=True)
         return AddObjectResponse(status="failed", error=str(e))
 
 @app.post("/mcp/weaviate_direct/get_object", response_model=GetObjectResponse)
 async def get_object(request: GetObjectRequest, client: weaviate.WeaviateClient = Depends(get_client)):
     try:
+
+        pass
         collection = client.collections.get(request.collection_name)
         obj = collection.query.fetch_object_by_id(uuid=request.uuid, include_vector=request.include_vector)
         if obj:
@@ -333,24 +329,32 @@ async def get_object(request: GetObjectRequest, client: weaviate.WeaviateClient 
         return GetObjectResponse(
             properties=None, error=f"Object with UUID {request.uuid} not found in {request.collection_name}."
         )
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error getting object {request.uuid} from {request.collection_name}: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/mcp/weaviate_direct/delete_object", response_model=DeleteObjectResponse)
 async def delete_object(request: DeleteObjectRequest, client: weaviate.WeaviateClient = Depends(get_client)):
     try:
+
+        pass
         collection = client.collections.get(request.collection_name)
         collection.data.delete_by_id(uuid=request.uuid)
         # Delete by ID in v4 does not return a specific success/fail count, raises on error
         return DeleteObjectResponse(status="success")
-    except weaviate.exceptions.UnexpectedStatusCodeError as e:
+    except Exception:
+
+        pass
         if e.status_code == 404:  # Not found
             logger.warning(f"Object {request.uuid} not found for deletion in {request.collection_name}.")
             return DeleteObjectResponse(status="failed", error="Object not found.")
         logger.error(f"Error deleting object {request.uuid} from {request.collection_name}: {e}", exc_info=True)
         return DeleteObjectResponse(status="failed", error=str(e))
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error deleting object {request.uuid} from {request.collection_name}: {e}", exc_info=True)
         return DeleteObjectResponse(status="failed", error=str(e))
 
@@ -388,6 +392,8 @@ def _translate_simple_filters(filters_dict: Optional[Dict[str, Any]]) -> Optiona
 @app.post("/mcp/weaviate_direct/hybrid_search", response_model=HybridSearchResponse)
 async def hybrid_search(request: HybridSearchRequest, client: weaviate.WeaviateClient = Depends(get_client)):
     try:
+
+        pass
         collection = client.collections.get(request.collection_name)
 
         weaviate_filters = _translate_simple_filters(request.filters)
@@ -405,6 +411,8 @@ async def hybrid_search(request: HybridSearchRequest, client: weaviate.WeaviateC
         )
 
         results = []
+        # TODO: Consider using list comprehension for better performance
+
         for obj in response.objects:
             results.append(
                 SearchResultItem(
@@ -416,17 +424,23 @@ async def hybrid_search(request: HybridSearchRequest, client: weaviate.WeaviateC
                 )
             )
         return HybridSearchResponse(results=results, count=len(results))
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error performing hybrid search on {request.collection_name}: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/mcp/weaviate_direct/raw_graphql_query", response_model=RawGraphQLResponse)
 async def raw_graphql_query(request: RawGraphQLRequest, client: weaviate.WeaviateClient = Depends(get_client)):
     try:
+
+        pass
         result = client.query.raw(request.graphql_query)
         # The result from client.query.raw() is already a dict matching GraphQL response structure
         return RawGraphQLResponse(data=result.get("data"), errors=result.get("errors"))
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error executing raw GraphQL query: {e}", exc_info=True)
         # Try to parse a more specific error if possible from Weaviate exceptions
         error_detail = str(e)

@@ -1,26 +1,7 @@
 """
-Memory System Exceptions
-
-Comprehensive exception hierarchy for the memory system following
-best practices for error handling and debugging.
 """
-
-from typing import Optional, Dict, Any
-
-class MemoryException(Exception):
     """
-    Base exception for all memory system errors.
-    
-    Attributes:
-        message: Human-readable error message
-        error_code: Machine-readable error code for programmatic handling
-        context: Additional context about the error
-        cause: The underlying exception that caused this error
     """
-    
-    def __init__(
-        self,
-        message: str,
         error_code: str = "MEMORY_ERROR",
         context: Optional[Dict[str, Any]] = None,
         cause: Optional[Exception] = None
@@ -32,10 +13,8 @@ class MemoryException(Exception):
         self.cause = cause
         
     def __str__(self) -> str:
-        """Format the exception for logging."""
-        parts = [f"[{self.error_code}] {self.message}"]
-        
-        if self.context:
+        """Format the except Exception:
+     pass
             context_str = ", ".join(f"{k}={v}" for k, v in self.context.items())
             parts.append(f"Context: {context_str}")
             
@@ -46,7 +25,6 @@ class MemoryException(Exception):
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert exception to dictionary for API responses."""
-        return {
             "error": self.error_code,
             "message": self.message,
             "context": self.context,
@@ -55,13 +33,6 @@ class MemoryException(Exception):
 
 class MemoryNotFoundError(MemoryException):
     """Raised when a requested memory item is not found."""
-    
-    def __init__(
-        self,
-        key: str,
-        tier: Optional[str] = None,
-        cause: Optional[Exception] = None
-    ):
         context = {"key": key}
         if tier:
             context["tier"] = tier
@@ -75,16 +46,6 @@ class MemoryNotFoundError(MemoryException):
 
 class MemoryStorageError(MemoryException):
     """Raised when a storage operation fails."""
-    
-    def __init__(
-        self,
-        operation: str,
-        storage_backend: str,
-        reason: str,
-        key: Optional[str] = None,
-        cause: Optional[Exception] = None
-    ):
-        context = {
             "operation": operation,
             "storage_backend": storage_backend,
             "reason": reason
@@ -101,12 +62,6 @@ class MemoryStorageError(MemoryException):
 
 class MemoryTierError(MemoryException):
     """Raised when tier operations fail."""
-    
-    def __init__(
-        self,
-        operation: str,
-        from_tier: Optional[str] = None,
-        to_tier: Optional[str] = None,
         reason: str = "",
         cause: Optional[Exception] = None
     ):
@@ -131,15 +86,6 @@ class MemoryTierError(MemoryException):
 
 class MemoryOptimizationError(MemoryException):
     """Raised when optimization operations fail."""
-    
-    def __init__(
-        self,
-        optimization_type: str,
-        reason: str,
-        items_affected: Optional[int] = None,
-        cause: Optional[Exception] = None
-    ):
-        context = {
             "optimization_type": optimization_type,
             "reason": reason
         }
@@ -155,16 +101,6 @@ class MemoryOptimizationError(MemoryException):
 
 class MemoryConnectionError(MemoryException):
     """Raised when connection to a storage backend fails."""
-    
-    def __init__(
-        self,
-        backend: str,
-        host: str,
-        port: int,
-        reason: str,
-        cause: Optional[Exception] = None
-    ):
-        context = {
             "backend": backend,
             "host": host,
             "port": port
@@ -179,16 +115,6 @@ class MemoryConnectionError(MemoryException):
 
 class MemorySerializationError(MemoryException):
     """Raised when serialization/deserialization fails."""
-    
-    def __init__(
-        self,
-        operation: str,  # 'serialize' or 'deserialize'
-        key: str,
-        value_type: str,
-        reason: str,
-        cause: Optional[Exception] = None
-    ):
-        context = {
             "operation": operation,
             "key": key,
             "value_type": value_type
@@ -203,16 +129,6 @@ class MemorySerializationError(MemoryException):
 
 class MemoryCapacityError(MemoryException):
     """Raised when memory capacity is exceeded."""
-    
-    def __init__(
-        self,
-        tier: str,
-        current_size: int,
-        max_size: int,
-        requested_size: int,
-        cause: Optional[Exception] = None
-    ):
-        context = {
             "tier": tier,
             "current_size": current_size,
             "max_size": max_size,
@@ -229,15 +145,6 @@ class MemoryCapacityError(MemoryException):
 
 class MemoryTimeoutError(MemoryException):
     """Raised when a memory operation times out."""
-    
-    def __init__(
-        self,
-        operation: str,
-        timeout_seconds: float,
-        key: Optional[str] = None,
-        cause: Optional[Exception] = None
-    ):
-        context = {
             "operation": operation,
             "timeout_seconds": timeout_seconds
         }
@@ -253,16 +160,6 @@ class MemoryTimeoutError(MemoryException):
 
 class MemoryValidationError(MemoryException):
     """Raised when validation fails."""
-    
-    def __init__(
-        self,
-        validation_type: str,
-        field: str,
-        value: Any,
-        constraint: str,
-        cause: Optional[Exception] = None
-    ):
-        context = {
             "validation_type": validation_type,
             "field": field,
             "value": str(value)[:100],  # Truncate long values
@@ -278,16 +175,6 @@ class MemoryValidationError(MemoryException):
 
 class MemoryConfigurationError(MemoryException):
     """Raised when configuration is invalid."""
-    
-    def __init__(
-        self,
-        config_section: str,
-        parameter: str,
-        value: Any,
-        reason: str,
-        cause: Optional[Exception] = None
-    ):
-        context = {
             "config_section": config_section,
             "parameter": parameter,
             "value": str(value),
@@ -303,16 +190,6 @@ class MemoryConfigurationError(MemoryException):
 
 class MemoryLockError(MemoryException):
     """Raised when distributed locking fails."""
-    
-    def __init__(
-        self,
-        lock_key: str,
-        operation: str,
-        holder: Optional[str] = None,
-        timeout: Optional[float] = None,
-        cause: Optional[Exception] = None
-    ):
-        context = {
             "lock_key": lock_key,
             "operation": operation
         }
@@ -335,19 +212,8 @@ class MemoryLockError(MemoryException):
 # Exception handler utility
 class MemoryExceptionHandler:
     """
-    Utility class for consistent exception handling across the memory system.
     """
-    
-    @staticmethod
-    def handle_storage_error(
-        operation: str,
-        backend: str,
-        original_error: Exception,
-        key: Optional[str] = None
-    ) -> MemoryStorageError:
         """Convert storage-specific exceptions to MemoryStorageError."""
-        # Handle common storage exceptions
-        error_mappings = {
             "ConnectionError": "Connection failed",
             "TimeoutError": "Operation timed out",
             "AuthenticationError": "Authentication failed",
@@ -368,7 +234,6 @@ class MemoryExceptionHandler:
     @staticmethod
     def is_retryable(error: MemoryException) -> bool:
         """Determine if an error is retryable."""
-        retryable_codes = {
             "MEMORY_TIMEOUT_ERROR",
             "MEMORY_CONNECTION_ERROR",
             "MEMORY_LOCK_ERROR",
@@ -384,7 +249,6 @@ class MemoryExceptionHandler:
     @staticmethod
     def get_retry_delay(error: MemoryException, attempt: int) -> float:
         """Calculate retry delay based on error type and attempt number."""
-        base_delays = {
             "MEMORY_TIMEOUT_ERROR": 1.0,
             "MEMORY_CONNECTION_ERROR": 2.0,
             "MEMORY_LOCK_ERROR": 0.5,

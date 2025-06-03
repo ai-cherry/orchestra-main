@@ -1,16 +1,6 @@
+# TODO: Consider adding connection pooling configuration
 """
-DigitalOcean Database Component for Orchestra
-Handles MongoDB cluster provisioning and configuration
 """
-
-import pulumi
-import pulumi_digitalocean as do
-from pulumi import Output
-
-class DatabaseComponent:
-    def __init__(self, name, config):
-        self._name = name
-        self.config = config
         self.region = config.get("region") or "nyc3"
         self.cluster_size = config.get("cluster_size") or "db-s-1vcpu-2gb"
         self.node_count = config.get("node_count") or 1
@@ -20,8 +10,6 @@ class DatabaseComponent:
 
     def _setup_database(self):
         """Provision MongoDB cluster on DigitalOcean"""
-        # Create database cluster
-        self.cluster = do.DatabaseCluster(
             f"{self._name}-mongodb",
             engine="mongodb",
             version=self.version,

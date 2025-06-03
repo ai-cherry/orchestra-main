@@ -31,6 +31,10 @@
             "created_at": "timestamp"
           }
         }
+      ],
+      "sync_mode": "incremental",
+      "cursor_field": [
+        "updated_at"
       ]
     },
     {
@@ -53,7 +57,11 @@
       "schedule": {
         "type": "interval",
         "minutes": 30
-      }
+      },
+      "sync_mode": "incremental",
+      "cursor_field": [
+        "updated_at"
+      ]
     }
   ]
 }

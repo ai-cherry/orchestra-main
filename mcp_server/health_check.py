@@ -1,18 +1,8 @@
 #!/usr/bin/env python3
 """
-health_check.py - Health check endpoint for the MCP server
-
-This module adds a health check endpoint to the MCP server for deployment monitoring.
 """
-
-def register_health_endpoints(app):
-    """Register health check endpoints for the Flask application.
-
-    Args:
-        app: Flask application instance
     """
-    from flask import jsonify
-
+    """
     @app.route("/health", methods=["GET"])
     def health_check():
         """Health check endpoint for service monitoring."""

@@ -1,26 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 """
-Pay Ready Memory Manager
-=======================
-
-Optimized memory management for the Pay Ready domain with hierarchical storage
-and intelligent caching strategies.
 """
-
-import asyncio
-import json
-import logging
-from typing import Dict, List, Optional, Any, Set
-from datetime import datetime, timedelta
-from collections import OrderedDict
-import hashlib
-
-from services.weaviate_service import WeaviateService
-
-logger = logging.getLogger(__name__)
-
-class MemoryTier:
     """Memory tier levels"""
-
     HOT = "hot"  # In-memory cache (last 24 hours)
     WARM = "warm"  # Redis/Dragonfly (last 7 days)
     COLD = "cold"  # PostgreSQL (everything)
@@ -28,27 +9,7 @@ class MemoryTier:
 
 class PayReadyMemoryManager:
     """
-    Manages memory across multiple tiers for optimal performance.
-
-    Features:
-    - Hot cache for recent interactions
-    - Warm cache with TTL
-    - Cold storage for persistence
-    - Vector storage for semantic search
-    - Intelligent context pruning
-    - Batch operations for efficiency
     """
-
-    def __init__(self, postgres_client, weaviate_client: WeaviateService):
-        self.postgres = postgres_client
-        self.weaviate = weaviate_client
-
-        # Hot cache configuration
-        self.hot_cache = OrderedDict()
-        self.hot_cache_max_size = 10000
-        self.hot_cache_ttl = timedelta(hours=24)
-
-        # Warm cache prefix
         self.cache_prefix = "pr:"
 
         # Batch configuration
@@ -63,9 +24,6 @@ class PayReadyMemoryManager:
 
     async def initialize(self):
         """Initialize memory manager and warm caches"""
-        if self._initialized:
-            return
-
         logger.info("Initializing Pay Ready Memory Manager")
 
         # Warm up hot cache with recent interactions
@@ -76,10 +34,6 @@ class PayReadyMemoryManager:
 
     async def store_interaction(self, interaction: Dict[str, Any]):
         """
-        Store an interaction across all appropriate memory tiers.
-
-        Args:
-            interaction: Interaction data including text, metadata, etc.
         """
         interaction_id = interaction.get("id")
         if not interaction_id:
@@ -108,11 +62,6 @@ class PayReadyMemoryManager:
 
     def _store_in_hot_cache(self, key: str, value: Dict):
         """Store in hot cache with LRU eviction"""
-        # Remove if already exists to update position
-        if key in self.hot_cache:
-            del self.hot_cache[key]
-
-        # Add to end (most recent)
         self.hot_cache[key] = {"data": value, "stored_at": datetime.utcnow()}
 
         # Evict oldest if over size limit
@@ -134,34 +83,14 @@ class PayReadyMemoryManager:
         timestamp = datetime.fromisoformat(value["timestamp"]).timestamp()
         await self.postgres.execute_raw(
             """
-            INSERT INTO orchestra.cache_entries (key, value, expires_at, tags)
-            VALUES ($1, $2, NOW() + INTERVAL '7 days', $3)
-            ON CONFLICT (key) DO UPDATE SET
-                value = $2,
-                expires_at = NOW() + INTERVAL '7 days'
-        """,
-            type_key,
-            json.dumps({key: timestamp}),
+        """
             ["pay_ready", interaction_type],
         )
 
     async def _store_in_cold_storage(self, interaction: Dict):
         """Store in PostgreSQL for persistence"""
-        await self.postgres.execute_raw(
             """
-            INSERT INTO pay_ready.interactions (
-                id, type, text, metadata, 
-                unified_person_id, unified_company_id,
-                source_system, source_id,
-                created_at
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-            ON CONFLICT (id) DO UPDATE SET
-                text = $3,
-                metadata = $4,
-                unified_person_id = $5,
-                unified_company_id = $6,
-                updated_at = CURRENT_TIMESTAMP
-        """,
+        """
             interaction["id"],
             interaction.get("type"),
             interaction.get("text"),
@@ -175,16 +104,6 @@ class PayReadyMemoryManager:
 
     async def _process_vector_batch(self):
         """Process pending vectors in batch"""
-        if not self.pending_vectors:
-            return
-
-        batch = self.pending_vectors[: self.batch_size]
-        self.pending_vectors = self.pending_vectors[self.batch_size :]
-
-        # Prepare batch for Weaviate
-        objects = []
-        for interaction in batch:
-            # Determine collection based on type
             collection = self._get_collection_for_type(interaction["type"])
 
             # Prepare object data
@@ -219,17 +138,20 @@ class PayReadyMemoryManager:
 
         # Batch insert to Weaviate
         try:
+
+            pass
             # This would use Weaviate's batch API
             # Implementation depends on Weaviate client version
             logger.info(f"Stored {len(objects)} vectors in Weaviate")
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Failed to store vectors: {e}")
             # Re-queue failed items
             self.pending_vectors.extend(batch)
 
     def _get_collection_for_type(self, interaction_type: str) -> str:
         """Map interaction type to Weaviate collection"""
-        type_map = {
             "slack_message": "PayReadySlackMessage",
             "gong_call_segment": "PayReadyGongCallSegment",
             "hubspot_note": "PayReadyHubSpotNote",
@@ -239,19 +161,7 @@ class PayReadyMemoryManager:
 
     async def get_interaction(self, interaction_id: str, include_context: bool = False) -> Optional[Dict]:
         """
-        Retrieve an interaction from the most appropriate tier.
-
-        Args:
-            interaction_id: The interaction ID
-            include_context: Whether to include related context
-
-        Returns:
-            Interaction data or None
         """
-        # Check hot cache first
-        if interaction_id in self.hot_cache:
-            entry = self.hot_cache[interaction_id]
-            # Check if not expired
             if datetime.utcnow() - entry["stored_at"] < self.hot_cache_ttl:
                 return entry["data"]
             else:
@@ -269,14 +179,7 @@ class PayReadyMemoryManager:
         # Fall back to cold storage
         result = await self.postgres.fetchrow(
             """
-            SELECT * FROM pay_ready.interactions
-            WHERE id = $1
-        """,
-            interaction_id,
-        )
-
-        if result:
-            interaction = dict(result)
+        """
             interaction["metadata"] = json.loads(interaction.get("metadata", "{}"))
 
             # Promote to caches
@@ -292,8 +195,6 @@ class PayReadyMemoryManager:
 
     async def _get_interaction_context(self, interaction_id: str) -> Dict:
         """Get related context for an interaction"""
-        # This would fetch related interactions, previous messages in thread, etc.
-        # Simplified implementation
         context = {"related_interactions": [], "thread_context": [], "entity_context": {}}
 
         # Get interaction details
@@ -305,13 +206,7 @@ class PayReadyMemoryManager:
         if interaction["type"] == "slack_message" and interaction.get("thread_id"):
             thread_messages = await self.postgres.fetch_raw(
                 """
-                SELECT id, text, user, timestamp
-                FROM pay_ready.interactions
-                WHERE type = 'slack_message'
-                AND metadata->>'thread_id' = $1
-                ORDER BY timestamp ASC
-                LIMIT 10
-            """,
+            """
                 interaction["thread_id"],
             )
 
@@ -321,13 +216,7 @@ class PayReadyMemoryManager:
         if interaction.get("unified_person_id"):
             recent_interactions = await self.postgres.fetch_raw(
                 """
-                SELECT id, type, text, timestamp
-                FROM pay_ready.interactions
-                WHERE unified_person_id = $1
-                AND id != $2
-                ORDER BY timestamp DESC
-                LIMIT 5
-            """,
+            """
                 interaction["unified_person_id"],
                 interaction_id,
             )
@@ -338,17 +227,7 @@ class PayReadyMemoryManager:
 
     async def search_interactions(self, query: str, filters: Optional[Dict] = None, limit: int = 10) -> List[Dict]:
         """
-        Search interactions using vector similarity.
-
-        Args:
-            query: Search query
-            filters: Optional filters (date range, source, etc.)
-            limit: Maximum results
-
-        Returns:
-            List of matching interactions
         """
-        # Build filter conditions for Weaviate
         where_filter = {"path": ["domain"], "operator": "Equal", "valueText": "pay_ready"}
 
         if filters:
@@ -375,11 +254,15 @@ class PayReadyMemoryManager:
 
         for collection in collections:
             try:
+
+                pass
                 # This would use Weaviate's search API
                 # Implementation depends on client version
                 collection_results = await self._search_collection(collection, query, where_filter, limit)
                 results.extend(collection_results)
-            except Exception as e:
+            except Exception:
+
+                pass
                 logger.error(f"Search failed for {collection}: {e}")
 
         # Sort by relevance and limit
@@ -388,28 +271,8 @@ class PayReadyMemoryManager:
 
     async def _search_collection(self, collection: str, query: str, where_filter: Dict, limit: int) -> List[Dict]:
         """Search a specific Weaviate collection"""
-        # This is a placeholder - actual implementation depends on Weaviate client
-        # Would use nearText search with the query
-        return []
-
-    async def prune_context(self, context_id: str, max_size: int = None) -> Dict:
         """
-        Intelligently prune context to fit size constraints.
-
-        Args:
-            context_id: Context identifier
-            max_size: Maximum context size (tokens/items)
-
-        Returns:
-            Pruned context
         """
-        max_size = max_size or self.max_context_size
-
-        # Get full context
-        context = await self._get_full_context(context_id)
-
-        # Prioritize items
-        prioritized = {
             "essential": [],  # Always keep
             "recent": [],  # Recent items (last 7 days)
             "high_relevance": [],  # High relevance score
@@ -467,21 +330,15 @@ class PayReadyMemoryManager:
 
     async def _get_full_context(self, context_id: str) -> Dict:
         """Get full context for pruning"""
-        # This would fetch context from appropriate storage
-        # Simplified implementation
         return {"id": context_id, "items": [], "metadata": {}}
 
     def _estimate_item_size(self, item: Dict) -> int:
         """Estimate size of an item in tokens/characters"""
-        # Simple estimation based on text length
         text = item.get("text", "")
         return len(text) // 4  # Rough token estimate
 
     async def _compress_item(self, item: Dict) -> Dict:
         """Compress an item to reduce size"""
-        compressed = item.copy()
-
-        # Truncate text if too long
         if "text" in compressed and len(compressed["text"]) > 200:
             compressed["text"] = compressed["text"][:200] + "..."
             compressed["compressed"] = True
@@ -500,15 +357,7 @@ class PayReadyMemoryManager:
         # Get recent interactions
         recent = await self.postgres.fetch_raw(
             """
-            SELECT * FROM pay_ready.interactions
-            WHERE created_at > NOW() - INTERVAL '24 hours'
-            ORDER BY created_at DESC
-            LIMIT 1000
         """
-        )
-
-        for row in recent:
-            interaction = dict(row)
             interaction["metadata"] = json.loads(interaction.get("metadata", "{}"))
             self._store_in_hot_cache(interaction["id"], interaction)
 
@@ -516,8 +365,6 @@ class PayReadyMemoryManager:
 
     async def get_memory_stats(self) -> Dict:
         """Get memory usage statistics"""
-        # Hot cache stats
-        hot_cache_size = len(self.hot_cache)
         hot_cache_memory = sum(len(json.dumps(entry["data"])) for entry in self.hot_cache.values())
 
         # Warm cache stats
@@ -526,17 +373,7 @@ class PayReadyMemoryManager:
         # Cold storage stats
         cold_stats = await self.postgres.fetchrow(
             """
-            SELECT 
-                COUNT(*) as total_interactions,
-                COUNT(DISTINCT unified_person_id) as unique_persons,
-                COUNT(DISTINCT unified_company_id) as unique_companies,
-                MIN(created_at) as oldest_interaction,
-                MAX(created_at) as newest_interaction
-            FROM pay_ready.interactions
         """
-        )
-
-        return {
             "hot_cache": {
                 "size": hot_cache_size,
                 "memory_bytes": hot_cache_memory,
@@ -550,11 +387,6 @@ class PayReadyMemoryManager:
 
     async def cleanup_expired(self):
         """Clean up expired cache entries"""
-        # Clean hot cache
-        now = datetime.utcnow()
-        expired_keys = []
-
-        for key, entry in self.hot_cache.items():
             if now - entry["stored_at"] > self.hot_cache_ttl:
                 expired_keys.append(key)
 
@@ -567,5 +399,3 @@ class PayReadyMemoryManager:
 
     async def flush_pending_vectors(self):
         """Force flush any pending vectors"""
-        while self.pending_vectors:
-            await self._process_vector_batch()

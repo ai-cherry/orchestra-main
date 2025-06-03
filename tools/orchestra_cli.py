@@ -1,30 +1,6 @@
 #!/usr/bin/env python3
 """
-Orchestra AI Unified CLI
-
-A comprehensive command-line interface for managing the Orchestra AI system,
-including adapters, credentials, diagnostics, and orchestration.
 """
-
-import os
-import sys
-from pathlib import Path
-from typing import Any, Dict
-
-import click
-from dotenv import set_key
-from rich.console import Console
-from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, TextColumn
-from rich.table import Table
-
-# Add project root to path
-sys.path.append(str(Path(__file__).parent.parent))
-
-console = Console()
-
-# Required secrets configuration
-REQUIRED_SECRETS = {
     "core": [
         "OPENAI_API_KEY",
         "PORTKEY_API_KEY",
@@ -60,27 +36,25 @@ REQUIRED_SECRETS = {
 
 def get_pulumi_secrets() -> Dict[str, str]:
     """Get secrets from Pulumi-generated .env file."""
-    secrets = {}
-    try:
         with open(".env", "r") as f:
             for line in f:
                 line = line.strip()
                 if line and not line.startswith("#") and "=" in line:
                     key, value = line.split("=", 1)
                     secrets[key] = value
-    except FileNotFoundError:
+    except Exception:
+
+        pass
         console.print("[red]Error: .env file not found. Run 'pulumi config' first[/red]")
-    except Exception as e:
+    except Exception:
+
+        pass
         console.print(f"[red]Error reading .env file: {e}[/red]")
     return secrets
 
 class AdapterConfig:
     """Standard adapter configuration interface."""
-
-    @staticmethod
-    def get_adapter_configs() -> Dict[str, Dict[str, Any]]:
         """Get configuration for all adapters."""
-        return {
             "gong": {
                 "name": "Gong.io",
                 "required_secrets": ["GONG_API_KEY"],
@@ -133,7 +107,6 @@ class AdapterConfig:
 @click.pass_context
 def cli(ctx, verbose):
     """Orchestra AI Unified CLI - Manage all aspects of the Orchestra AI system."""
-    ctx.ensure_object(dict)
     ctx.obj["verbose"] = verbose
 
     # Environment variables for secrets are injected by GCP infra or set in CI/CD.
@@ -142,8 +115,6 @@ def cli(ctx, verbose):
 @cli.group()
 def secrets():
     """Manage secrets and credentials."""
-
-@secrets.command()
 @click.option("--env-file", default=".env", help="Path to .env file")
 @click.option("--dry-run", is_flag=True, help="Show what would be synced without making changes")
 @click.pass_context
@@ -255,13 +226,6 @@ def validate(ctx):
 @click.pass_context
 def set(ctx, secret_id, value):
     """Set or update a secret in Pulumi configuration."""
-    # Get current secrets
-    pulumi_secrets = get_pulumi_secrets()
-
-    # Check if secret exists
-    secret_exists = secret_id in pulumi_secrets
-
-    if secret_exists:
         if not click.confirm(f"Secret {secret_id} already exists. Update it?"):
             return
 
@@ -270,25 +234,23 @@ def set(ctx, secret_id, value):
 
     # Update .env file
     try:
+
+        pass
         set_key(".env", secret_id, value)
         if secret_exists:
             console.print(f"[green]✓ Updated secret {secret_id}[/green]")
         else:
             console.print(f"[green]✓ Created secret {secret_id}[/green]")
-    except Exception as e:
+    except Exception:
+
+        pass
         console.print(f"[red]✗ Failed to update secret {secret_id}: {str(e)}[/red]")
         sys.exit(1)
 
 @cli.group()
 def adapters():
     """Manage data source adapters."""
-
-@adapters.command()
-@click.pass_context
-def list(ctx):
     """List all available adapters and their status."""
-    adapters = AdapterConfig.get_adapter_configs()
-
     table = Table(title="Available Adapters")
     table.add_column("Adapter", style="cyan")
     table.add_column("Name", style="white")
@@ -317,9 +279,6 @@ def list(ctx):
 @click.pass_context
 def check_adapter(ctx, adapter_id):
     """Validate adapter configuration and credentials."""
-    adapters = AdapterConfig.get_adapter_configs()
-
-    if adapter_id not in adapters:
         console.print(f"[red]Unknown adapter: {adapter_id}[/red]")
         console.print(f"Available adapters: {', '.join(adapters.keys())}")
         return
@@ -356,10 +315,6 @@ def check_adapter(ctx, adapter_id):
 @cli.group()
 def diagnostics():
     """Run system diagnostics and health checks."""
-
-@diagnostics.command()
-@click.pass_context
-def health(ctx):
     """Check health of all system components."""
     console.print(Panel("[bold blue]Running system health checks[/bold blue]"))
 
@@ -393,17 +348,12 @@ def health(ctx):
 
 def check_secrets_health():
     """Check if all required secrets are present."""
-    total = sum(len(secrets) for secrets in REQUIRED_SECRETS.values())
-    present = sum(1 for secrets in REQUIRED_SECRETS.values() for secret in secrets if os.getenv(secret))
-
-    if present == total:
         return True, f"All {total} required secrets present"
     else:
         return False, f"{present}/{total} secrets present"
 
 def check_pulumi_health():
     """Check Pulumi configuration."""
-    try:
         if not os.path.exists(".env"):
             return False, ".env file missing - run 'pulumi config'"
 
@@ -412,41 +362,38 @@ def check_pulumi_health():
         if missing:
             return False, f"Missing secrets: {', '.join(missing)}"
         return True, "Pulumi config loaded successfully"
-    except Exception as e:
+    except Exception:
+
+        pass
         return False, f"Pulumi check failed: {str(e)[:50]}..."
 
 def check_redis_health():
     """Check Redis connectivity."""
-    try:
-        import redis
-
         host = os.getenv("REDIS_HOST", "localhost")
         password = os.getenv("REDIS_PASSWORD")
 
         r = redis.Redis(host=host, password=password, decode_responses=True)
         r.ping()
         return True, f"Connected to {host}"
-    except Exception as e:
+    except Exception:
+
+        pass
         return False, f"Connection failed: {str(e)[:50]}..."
 
 def check_mcp_health():
     """Check MCP Gateway status."""
-    try:
-        # This would check actual MCP gateway
-        # For now, just check if the module can be imported
-        import importlib.util
-
         spec = importlib.util.find_spec("mcp_server.gateway")
         if spec is not None:
             return True, "MCP Gateway available"
         else:
             return False, "MCP Gateway module not found"
-    except Exception as e:
+    except Exception:
+
+        pass
         return False, f"Import check failed: {str(e)[:50]}..."
 
 def check_adapters_health():
     """Check adapter readiness."""
-    adapters = AdapterConfig.get_adapter_configs()
     ready = sum(1 for config in adapters.values() if all(os.getenv(secret) for secret in config["required_secrets"]))
     total = len(adapters)
 
@@ -458,14 +405,13 @@ def check_adapters_health():
 @cli.group()
 def orchestrator():
     """Manage the orchestration system."""
-
-@orchestrator.command()
-@click.pass_context
-def reload(ctx):
     """Reload orchestrator configuration."""
     console.print("[yellow]Reloading orchestrator configuration...[/yellow]")
 
     try:
+
+
+        pass
         # Validate secrets first
         ctx.invoke(validate)
 
@@ -474,7 +420,9 @@ def reload(ctx):
 
         # Signal orchestrator to reload (this would be implemented based on your orchestrator)
         console.print("[green]✓ Orchestrator configuration reloaded[/green]")
-    except Exception as e:
+    except Exception:
+
+        pass
         console.print(f"[red]✗ Failed to reload: {e}[/red]")
 
 @orchestrator.command()

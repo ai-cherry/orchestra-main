@@ -2,6 +2,10 @@
   "cluster_name": "payready-sophia-cluster",
   "domain": "PayReady",
   "persona": "Sophia",
+  "url": "http://weaviate-payready:8080",
+  "schema": {
+    "classes": []
+  },
   "collections": {
     "payready_memories": {
       "description": "Vector store for Sophia's memories",

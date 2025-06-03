@@ -1,24 +1,6 @@
 #!/usr/bin/env python3
 """
-Orchestra AI MVP - Complete Integration
-Combines enhanced vector memory, data source integrations, and natural language interface.
 """
-
-import argparse
-import asyncio
-import logging
-import os
-from datetime import datetime
-from typing import Any, Dict, Optional
-
-from enhanced_vector_memory_system import EnhancedVectorMemorySystem
-
-from data_source_integrations import DataAggregationOrchestrator, DataSourceConfig
-from enhanced_natural_language_interface import ConversationMode, EnhancedNaturalLanguageInterface
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
     handlers=[logging.StreamHandler(), logging.FileHandler("orchestra_ai_mvp.log")],
 )
@@ -26,15 +8,7 @@ logger = logging.getLogger("orchestra_ai_mvp")
 
 class OrchestraAIMVP:
     """
-    Complete Orchestra AI MVP integration.
-
-    Provides:
-    - Enhanced vector memory with semantic search
-    - Multi-source data aggregation (Gong, Salesforce, HubSpot, Slack, Looker)
-    - Advanced natural language interface with context awareness
-    - Real-time conversation capabilities
     """
-
     def __init__(self, project_id: str = "cherry-ai-project", user_id: str = "default_user"):
         self.project_id = project_id
         self.user_id = user_id
@@ -84,15 +58,7 @@ class OrchestraAIMVP:
 
     async def _setup_data_source_configs(self) -> None:
         """
-        Setup configurations for all data sources.
-
-        Each integration requires specific environment variables to be set.
-        If any required variable is missing, the integration will be skipped and a warning will be logged.
-        See .env.template for required variable names.
         """
-
-        # --- Gong.io ---
-        # Requires: GONG_API_KEY
         if os.getenv("GONG_API_KEY"):
             self.configs["gong"] = DataSourceConfig(
                 name="gong",
@@ -163,7 +129,6 @@ class OrchestraAIMVP:
 
     async def sync_all_data(self, since_hours: int = 24) -> Dict[str, int]:
         """Sync data from all configured sources."""
-        if not self.data_orchestrator:
             raise RuntimeError("MVP not initialized. Call initialize() first.")
 
         since = datetime.utcnow().replace(hour=datetime.utcnow().hour - since_hours)
@@ -178,7 +143,6 @@ class OrchestraAIMVP:
 
     async def start_conversation(self, initial_query: Optional[str] = None, mode: str = "casual") -> str:
         """Start a new conversation session."""
-        if not self.nl_interface:
             raise RuntimeError("MVP not initialized. Call initialize() first.")
 
         conversation_mode = ConversationMode(mode)
@@ -191,7 +155,6 @@ class OrchestraAIMVP:
 
     async def chat(self, conversation_id: str, message: str) -> str:
         """Send a message in an existing conversation."""
-        if not self.nl_interface:
             raise RuntimeError("MVP not initialized. Call initialize() first.")
 
         response_msg = await self.nl_interface.process_message(conversation_id, message)
@@ -201,7 +164,6 @@ class OrchestraAIMVP:
 
     async def search_memory(self, query: str, sources: Optional[list] = None, top_k: int = 5) -> list:
         """Search across all aggregated data with semantic search."""
-        if not self.memory_system:
             raise RuntimeError("MVP not initialized. Call initialize() first.")
 
         memories = await self.memory_system.semantic_search(
@@ -209,6 +171,8 @@ class OrchestraAIMVP:
         )
 
         results = []
+        # TODO: Consider using list comprehension for better performance
+
         for memory in memories:
             results.append(
                 {
@@ -225,7 +189,6 @@ class OrchestraAIMVP:
 
     async def get_conversation_context(self, conversation_id: str) -> Dict[str, Any]:
         """Get full context for a conversation."""
-        if not self.nl_interface:
             raise RuntimeError("MVP not initialized. Call initialize() first.")
 
         history = await self.nl_interface.get_conversation_history(conversation_id)
@@ -249,13 +212,6 @@ class OrchestraAIMVP:
 
     async def close(self) -> None:
         """Clean up and close all connections."""
-        if self.memory_system:
-            await self.memory_system.close()
-
-        if self.data_orchestrator:
-            for integration in self.data_orchestrator.integrations.values():
-                await integration.close()
-
         logger.info("✓ Orchestra AI MVP connections closed")
 
 # CLI Interface
@@ -305,6 +261,9 @@ async def main():
     mvp = OrchestraAIMVP(project_id=args.project_id, user_id=args.user_id)
 
     try:
+
+
+        pass
         if args.command == "init":
             await mvp.initialize()
             print("✅ Orchestra AI MVP initialized successfully!")
@@ -340,6 +299,8 @@ async def main():
 
             while True:
                 try:
+
+                    pass
                     user_input = input("\nYou: ").strip()
 
                     if user_input.lower() in ["quit", "exit", "bye"]:
@@ -369,15 +330,23 @@ async def main():
                     response = await mvp.chat(conversation_id, user_input)
                     print(f"\nAssistant: {response}")
 
-                except KeyboardInterrupt:
+                except Exception:
+
+
+                    pass
                     await mvp.nl_interface.end_conversation(conversation_id)
                     print("\n\n👋 Session ended. Goodbye!")
                     break
-                except Exception as e:
+                except Exception:
+
+                    pass
                     print(f"\n❌ Error: {e}")
                     logger.error(f"Chat error: {e}")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"MVP error: {e}")
         print(f"❌ Error: {e}")
 

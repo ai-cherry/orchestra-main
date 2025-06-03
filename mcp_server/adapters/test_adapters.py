@@ -1,43 +1,13 @@
-"""Tests for Factory AI MCP Server Adapters.
-
-This module contains comprehensive tests for all adapter implementations,
-including circuit breaker functionality, metrics collection, and fallback mechanisms.
+# TODO: Consider adding connection pooling configuration
 """
-
-import asyncio
-import pytest
-from datetime import datetime, timedelta
-from typing import Any, Dict
-from unittest.mock import AsyncMock, MagicMock, patch
-
-from mcp_server.adapters import (
-    FactoryMCPAdapter,
-    CircuitBreaker,
-    CircuitBreakerError,
-    ArchitectAdapter,
-    CodeAdapter,
-    DebugAdapter,
-    ReliabilityAdapter,
-    KnowledgeAdapter,
-)
-from mcp_server.adapters.factory_mcp_adapter import CircuitState
-
-class MockMCPServer:
+"""
     """Mock MCP server for testing."""
-
-    async def handle_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Mock request handler."""
         return {"result": {"mock": True, "method": request.get("method")}}
 
 class TestCircuitBreaker:
     """Test circuit breaker functionality."""
-
-    @pytest.mark.asyncio
-    async def test_circuit_breaker_closed_state(self):
         """Test circuit breaker in closed state allows calls."""
-        cb = CircuitBreaker(failure_threshold=3, recovery_timeout=60)
-
-        async def success_func():
             return "success"
 
         result = await cb.call(success_func)
@@ -47,9 +17,6 @@ class TestCircuitBreaker:
     @pytest.mark.asyncio
     async def test_circuit_breaker_opens_after_failures(self):
         """Test circuit breaker opens after threshold failures."""
-        cb = CircuitBreaker(failure_threshold=3, recovery_timeout=60)
-
-        async def failing_func():
             raise Exception("Test failure")
 
         # Fail 3 times to open circuit
@@ -63,9 +30,6 @@ class TestCircuitBreaker:
     @pytest.mark.asyncio
     async def test_circuit_breaker_half_open_after_timeout(self):
         """Test circuit breaker enters half-open state after timeout."""
-        cb = CircuitBreaker(failure_threshold=1, recovery_timeout=1)
-
-        async def failing_func():
             raise Exception("Test failure")
 
         # Open the circuit
@@ -85,13 +49,7 @@ class TestCircuitBreaker:
 
 class TestFactoryMCPAdapter:
     """Test base adapter functionality."""
-
-    @pytest.fixture
-    def mock_adapter(self):
         """Create a mock adapter for testing."""
-
-        class TestAdapter(FactoryMCPAdapter):
-            async def translate_to_factory(self, mcp_request: Dict[str, Any]) -> Dict[str, Any]:
                 return {"translated": "to_factory", **mcp_request}
 
             async def translate_to_mcp(self, factory_response: Dict[str, Any]) -> Dict[str, Any]:
@@ -120,7 +78,6 @@ class TestFactoryMCPAdapter:
     @pytest.mark.asyncio
     async def test_fallback_on_error(self, mock_adapter):
         """Test fallback to MCP server on error."""
-        # Make factory call fail
         mock_adapter._call_factory_droid = AsyncMock(side_effect=Exception("Factory error"))
 
         request = {"method": "test_method", "params": {"test": "value"}}
@@ -133,7 +90,6 @@ class TestFactoryMCPAdapter:
 
     def test_metrics_calculation(self, mock_adapter):
         """Test metrics calculation."""
-        mock_adapter.metrics = {
             "requests": 100,
             "successes": 85,
             "failures": 15,
@@ -151,18 +107,13 @@ class TestFactoryMCPAdapter:
 
 class TestArchitectAdapter:
     """Test Architect adapter functionality."""
-
-    @pytest.fixture
-    def architect_adapter(self):
         """Create Architect adapter for testing."""
-        mcp_server = MockMCPServer()
         droid_config = {"api_key": "test_key"}
         return ArchitectAdapter(mcp_server, droid_config)
 
     @pytest.mark.asyncio
     async def test_design_system_translation(self, architect_adapter):
         """Test design system request translation."""
-        mcp_request = {
             "method": "design_system",
             "params": {
                 "project_type": "microservices",
@@ -181,7 +132,6 @@ class TestArchitectAdapter:
     @pytest.mark.asyncio
     async def test_infrastructure_generation(self, architect_adapter):
         """Test infrastructure code generation translation."""
-        mcp_request = {
             "method": "generate_infrastructure",
             "params": {
                 "stack_name": "production",
@@ -198,18 +148,13 @@ class TestArchitectAdapter:
 
 class TestCodeAdapter:
     """Test Code adapter functionality."""
-
-    @pytest.fixture
-    def code_adapter(self):
         """Create Code adapter for testing."""
-        mcp_server = MockMCPServer()
         droid_config = {"streaming": True, "chunk_size": 1024}
         return CodeAdapter(mcp_server, droid_config)
 
     @pytest.mark.asyncio
     async def test_code_generation_translation(self, code_adapter):
         """Test code generation request translation."""
-        mcp_request = {
             "method": "generate_code",
             "params": {
                 "language": "python",
@@ -228,7 +173,6 @@ class TestCodeAdapter:
     @pytest.mark.asyncio
     async def test_streaming_response_handling(self, code_adapter):
         """Test streaming response handling."""
-        factory_response = {
             "result": {
                 "streaming": True,
                 "stream_id": "stream_123",
@@ -242,18 +186,13 @@ class TestCodeAdapter:
 
 class TestDebugAdapter:
     """Test Debug adapter functionality."""
-
-    @pytest.fixture
-    def debug_adapter(self):
         """Create Debug adapter for testing."""
-        mcp_server = MockMCPServer()
         droid_config = {"profiling_enabled": True, "max_stack_depth": 50}
         return DebugAdapter(mcp_server, droid_config)
 
     @pytest.mark.asyncio
     async def test_error_diagnosis_translation(self, debug_adapter):
         """Test error diagnosis request translation."""
-        mcp_request = {
             "method": "diagnose_error",
             "params": {
                 "error_type": "ConnectionError",
@@ -272,7 +211,6 @@ class TestDebugAdapter:
     @pytest.mark.asyncio
     async def test_query_optimization_translation(self, debug_adapter):
         """Test query optimization request translation."""
-        mcp_request = {
             "method": "optimize_query",
             "params": {
                 "query": "SELECT * FROM users WHERE...",
@@ -289,18 +227,13 @@ class TestDebugAdapter:
 
 class TestReliabilityAdapter:
     """Test Reliability adapter functionality."""
-
-    @pytest.fixture
-    def reliability_adapter(self):
         """Create Reliability adapter for testing."""
-        mcp_server = MockMCPServer()
         droid_config = {"alert_threshold": 5, "auto_remediation": True}
         return ReliabilityAdapter(mcp_server, droid_config)
 
     @pytest.mark.asyncio
     async def test_incident_detection_translation(self, reliability_adapter):
         """Test incident detection request translation."""
-        mcp_request = {
             "method": "detect_incident",
             "params": {
                 "system_state": {"cpu": 95, "memory": 85},
@@ -318,7 +251,6 @@ class TestReliabilityAdapter:
     @pytest.mark.asyncio
     async def test_alert_aggregation(self, reliability_adapter):
         """Test alert aggregation functionality."""
-        alerts = [
             {"id": "alert1", "message": "High CPU"},
             {"id": "alert2", "message": "High Memory"},
             {"id": "alert3", "message": "Disk Space Low"},
@@ -336,12 +268,7 @@ class TestReliabilityAdapter:
 
 class TestKnowledgeAdapter:
     """Test Knowledge adapter functionality."""
-
-    @pytest.fixture
-    def knowledge_adapter(self):
         """Create Knowledge adapter for testing."""
-        mcp_server = MockMCPServer()
-        droid_config = {
             "vector_dimension": 1536,
             "embedding_model": "text-embedding-ada-002",
             "cache_embeddings": True,
@@ -351,7 +278,6 @@ class TestKnowledgeAdapter:
     @pytest.mark.asyncio
     async def test_store_knowledge_translation(self, knowledge_adapter):
         """Test store knowledge request translation."""
-        mcp_request = {
             "method": "store_knowledge",
             "params": {
                 "content": "PostgreSQL best practices...",
@@ -370,7 +296,6 @@ class TestKnowledgeAdapter:
     @pytest.mark.asyncio
     async def test_search_knowledge_translation(self, knowledge_adapter):
         """Test search knowledge request translation."""
-        mcp_request = {
             "method": "search_knowledge",
             "params": {
                 "query": "connection pooling",
@@ -388,7 +313,6 @@ class TestKnowledgeAdapter:
     @pytest.mark.asyncio
     async def test_embedding_cache(self, knowledge_adapter):
         """Test embedding cache functionality."""
-        documents = [
             {"content": "Test document 1"},
             {"content": "Test document 2"},
         ]
@@ -404,11 +328,7 @@ class TestKnowledgeAdapter:
 # Integration tests
 class TestIntegration:
     """Integration tests for adapter system."""
-
-    @pytest.mark.asyncio
-    async def test_adapter_health_checks(self):
         """Test health check functionality across all adapters."""
-        mcp_server = MockMCPServer()
         droid_config = {"api_key": "test"}
 
         adapters = [
@@ -428,7 +348,6 @@ class TestIntegration:
     @pytest.mark.asyncio
     async def test_circuit_breaker_across_adapters(self):
         """Test circuit breaker behavior is consistent across adapters."""
-        mcp_server = MockMCPServer()
         droid_config = {"failure_threshold": 2, "recovery_timeout": 1}
 
         adapters = [

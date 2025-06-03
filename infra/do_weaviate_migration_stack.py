@@ -1,37 +1,7 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Pulumi DigitalOcean Stack for Weaviate-First Migration
-======================================================
-Deploys the Weaviate-first architecture on two existing DigitalOcean droplets:
-- Vector + Storage Node: Weaviate 1.30+ with Agents runtime
-- App + Orchestrator Node: PostgreSQL 16 + pgvector, Python venv, Admin UI
-
-This stack replaces do_superagi_stack.py with a more modern architecture:
-- Weaviate as primary datastore (replacing DragonflyDB)
-- PostgreSQL for ACID operations and structured data
-- Optional micro-cache with Dragonfly only if latency demands it
-
-Author: Orchestra AI Platform
-
-Instructions:
-- Set DIGITALOCEAN_TOKEN in Pulumi config or environment
-- Store all secrets using ORG_-prefixed pattern (ORG_WEAVIATE_API_KEY, ORG_POSTGRES_PW)
-- Run `pulumi up --stack=do-dev` to provision and deploy
 """
-
-import os
-
-import pulumi
-import pulumi_command as command
-import pulumi_digitalocean as do
-from components.postgres_component import PostgresComponent
-
-# Import custom components
-from components.vector_droplet_component import VectorDropletComponent
-from pulumi import Config, Output, ResourceOptions
-
-# --- CONFIGURATION ---
-config = Config()
 env = config.require("env")  # "dev" or "prod"
 
 # Existing droplet IDs - these should be your actual droplet IDs
@@ -144,26 +114,6 @@ if enable_micro_cache:
         f"deploy-dragonfly-{env}",
         connection=micro_cache_connection,
         create="""
-            # Install Docker
-            apt-get update && apt-get install -y docker.io
-            systemctl enable docker && systemctl start docker
-
-            # Run Dragonfly with 512MB memory limit
-            docker run -d --name dragonfly \
-              --restart always \
-              -p 6379:6379 \
-              -m 512m \
-              --cpus=0.5 \
-              docker.dragonflydb.io/dragonflydb/dragonfly
-
-            # Create snapshot cron job
-            cat > /root/snapshot-dragonfly.sh << 'EOF'
-#!/bin/bash
-# Create snapshot
-docker exec dragonfly df-snapshot-create /data/snapshot.dfs
-# Copy snapshot to safe location
-docker cp dragonfly:/data/snapshot.dfs /root/dragonfly-$(date +%Y%m%d).dfs
-# Cleanup old snapshots (keep last 7)
 find /root -name "dragonfly-*.dfs" -type f -mtime +7 -delete
 EOF
 
@@ -171,12 +121,7 @@ EOF
 
             # Add to crontab
             (crontab -l 2>/dev/null || echo "") | grep -v "snapshot-dragonfly.sh" | { cat; echo "0 4 * * * /root/snapshot-dragonfly.sh > /var/log/dragonfly-snapshot.log 2>&1"; } | crontab -
-        """,
-        opts=ResourceOptions(depends_on=[micro_cache_droplet]),
-    )
-
-    # Create firewall rules for Dragonfly
-    micro_cache_firewall = do.Firewall(
+        """
         f"micro-cache-firewall-{env}",
         droplet_ids=[micro_cache_droplet.id],
         inbound_rules=[
@@ -260,24 +205,6 @@ setup_orchestra_service = command.remote.Command(
         micro_cache_uri=micro_cache_droplet.ipv4_address if enable_micro_cache else None,
     ).apply(
         lambda args: f"""
-# Update environment configuration
-cat > /opt/orchestra/.env << 'EOF'
-WEAVIATE_ENDPOINT={args['weaviate_endpoint']}
-WEAVIATE_API_KEY={args['weaviate_api_key']}
-POSTGRES_DSN={args['postgres_dsn']}
-{'DRAGONFLY_URI=redis://' + args['micro_cache_uri'] + ':6379/0' if args['micro_cache_uri'] else '# DRAGONFLY_URI is not configured (micro-cache disabled)'}
-EOF
-
-# Update systemd service with new environment variables
-cat > /etc/systemd/system/orchestra-api.service << 'EOF'
-[Unit]
-Description=Orchestra AI API
-After=network.target postgresql.service
-
-[Service]
-Type=simple
-User=root
-WorkingDirectory=/opt/orchestra
 Environment="PYTHONPATH=/opt/orchestra"
 EnvironmentFile=/opt/orchestra/.env
 ExecStart=/opt/orchestra/venv/bin/python -m uvicorn core.api.main:app --host 0.0.0.0 --port 8080
@@ -305,12 +232,6 @@ EOF
 
 chmod +x /opt/orchestra/migrations/run_migration.sh
 """
-    ),
-    opts=ResourceOptions(depends_on=[vector_node, app_node]),
-)
-
-# --- LATENCY MONITORING ---
-setup_latency_monitoring = command.remote.Command(
     f"setup-latency-monitoring-{env}",
     connection=command.remote.ConnectionArgs(
         host=app_droplet.ipv4_address,
@@ -321,17 +242,6 @@ setup_latency_monitoring = command.remote.Command(
         weaviate_endpoint=vector_node.weaviate_endpoint,
     ).apply(
         lambda args: f"""
-# Create monitoring script
-cat > /opt/orchestra/monitor_latency.py << 'EOF'
-#!/usr/bin/env python3
-import time
-import requests
-import statistics
-import json
-import os
-import datetime
-
-# Configuration
 WEAVIATE_ENDPOINT = "{args['weaviate_endpoint']}"
 WEAVIATE_API_KEY = os.environ.get("WEAVIATE_API_KEY", "")
 RESULTS_FILE = "/var/log/weaviate_latency.json"
@@ -346,8 +256,10 @@ def measure_weaviate_latency():
     latencies = []
     for _ in range(SAMPLE_SIZE):
         try:
+
+            pass
             start = time.time()
-            response = requests.get(WEAVIATE_ENDPOINT + "/v1/.well-known/ready", headers=headers)
+            response = requests.get(WEAVIATE_ENDPOINT + "/v1/.well-known/ready", headers=headers, timeout=30)
             end = time.time()
 
             if response.status_code == 200:
@@ -355,7 +267,9 @@ def measure_weaviate_latency():
                 latencies.append(latency_ms)
             else:
                 print("Error: Received status code " + str(response.status_code))
-        except Exception as e:
+        except Exception:
+
+            pass
             print("Request failed: " + str(e))
 
         # Small delay between requests
@@ -382,6 +296,8 @@ def measure_weaviate_latency():
 
     # Save results
     try:
+
+        pass
         existing_data = []
         if os.path.exists(RESULTS_FILE):
             with open(RESULTS_FILE, 'r') as f:
@@ -394,7 +310,9 @@ def measure_weaviate_latency():
 
         with open(RESULTS_FILE, 'w') as f:
             json.dump(existing_data, f, indent=2)
-    except Exception as e:
+    except Exception:
+
+        pass
         print("Failed to save results: " + str(e))
 
     return result
@@ -413,11 +331,6 @@ chmod +x /opt/orchestra/monitor_latency.py
 # Fixed the f-string syntax error by escaping the nested quotes
 echo \"0 * * * * /opt/orchestra/venv/bin/python /opt/orchestra/monitor_latency.py >> /var/log/latency_monitor.log 2>&1\" | crontab -
 """
-    ),
-    opts=ResourceOptions(depends_on=[setup_orchestra_service]),
-)
-
-# --- OUTPUTS ---
 pulumi.export("vector_node_ip", vector_droplet.ipv4_address)
 pulumi.export("app_node_ip", app_droplet.ipv4_address)
 pulumi.export("weaviate_endpoint", vector_node.weaviate_endpoint)

@@ -1,20 +1,6 @@
 #!/usr/bin/env python
 """
-Portkey Virtual Keys Demo
-
-This example demonstrates how to use Portkey virtual keys with various LLM providers.
-It shows how the PortkeyClient automatically selects the appropriate virtual key
-based on the model being used.
-
-Example usage:
-python examples/portkey_virtual_keys_demo.py
 """
-
-import asyncio
-import logging
-import os
-
-# Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("portkey-demo")
 
@@ -36,18 +22,20 @@ async def run_model(client: PortkeyClient, model: str, prompt: str) -> None:
     ]
 
     try:
+
+
+        pass
         response = await client.generate_response(model=model, messages=messages, temperature=0.7, max_tokens=150)
 
         logger.info(f"Response from {model}:")
         logger.info(f"{response}\n")
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error with {model}: {e}")
 
 async def main() -> None:
     """Main function demonstrating Portkey virtual keys with multiple providers."""
-    settings = get_settings()
-
-    # Print available virtual keys
     logger.info("Checking for configured virtual keys...")
     available_keys = []
     if settings.PORTKEY_VIRTUAL_KEY_OPENAI:
@@ -70,9 +58,13 @@ async def main() -> None:
 
     # Initialize Portkey client
     try:
+
+        pass
         client = PortkeyClient(settings)
         logger.info("Portkey client initialized successfully")
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to initialize Portkey client: {e}")
         return
 

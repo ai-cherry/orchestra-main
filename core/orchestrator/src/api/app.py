@@ -1,27 +1,5 @@
 """
-FastAPI application for AI Orchestration System.
-
-This module provides the FastAPI application instance with registered routes
-and middleware for the AI Orchestration System. It serves as a simplified
-entrypoint for running the API directly from the api module.
 """
-
-import logging
-import os
-from contextlib import asynccontextmanager
-
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
-from core.orchestrator.src.config.loader import load_persona_configs
-from core.orchestrator.src.config.settings import get_settings
-
-# Import endpoints - only include working ones
-from .endpoints import auth, health, stubs
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
 logger = logging.getLogger(__name__)
@@ -32,34 +10,39 @@ settings = get_settings()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    FastAPI lifespan event handler for application startup and shutdown.
-
-    Args:
-        app: The FastAPI application instance
     """
-    # Load persona configurations
-    try:
-        personas = load_persona_configs()
         logger.info(f"Loaded {len(personas)} persona configurations")
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to load persona configurations: {e}")
 
     # Initialize memory system
     from core.orchestrator.src.api.dependencies.memory import initialize_memory_manager
 
     try:
+
+
+        pass
         await initialize_memory_manager()
         logger.info("Memory manager initialized")
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to initialize memory manager: {e}")
 
     # Initialize Redis cache if available
     from core.orchestrator.src.api.dependencies.cache import initialize_redis_cache
 
     try:
+
+
+        pass
         await initialize_redis_cache()
         logger.info("Redis cache initialized")
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to initialize Redis cache: {e}")
 
     # Log environment information
@@ -77,18 +60,28 @@ async def lifespan(app: FastAPI):
     from core.orchestrator.src.api.dependencies.cache import close_redis_cache
 
     try:
+
+
+        pass
         await close_redis_cache()
         logger.info("Redis cache closed")
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to close Redis cache: {e}")
 
     # Close memory system
     from core.orchestrator.src.api.dependencies.memory import close_memory_manager
 
     try:
+
+
+        pass
         await close_memory_manager()
         logger.info("Memory manager closed")
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Failed to close memory manager: {e}")
 
     logger.info("Application shutdown complete")

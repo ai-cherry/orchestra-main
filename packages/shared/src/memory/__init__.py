@@ -1,3 +1,3 @@
-from .stubs import InMemoryMemoryManagerStub
+from shared.stubs import InMemoryMemoryManagerStub
 
 __all__ = ["InMemoryMemoryManagerStub"] 

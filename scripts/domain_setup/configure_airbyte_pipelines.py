@@ -1,23 +1,13 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Airbyte Configuration Automation
-Sets up domain-specific data pipelines via Airbyte API
 """
-
-import os
-import json
-import requests
-from pathlib import Path
-
-class AirbyteAutomator:
-    def __init__(self):
         self.airbyte_url = os.getenv("AIRBYTE_URL", "http://localhost:8000")
         self.airbyte_api = f"{self.airbyte_url}/api/v1"
         self.config_dir = Path("config/domains")
         
     def create_source(self, source_config):
         """Create an Airbyte source"""
-        
         endpoint = f"{self.airbyte_api}/sources/create"
         
         source_data = {
@@ -26,7 +16,7 @@ class AirbyteAutomator:
             "connectionConfiguration": source_config["config"]
         }
         
-        response = requests.post(endpoint, json=source_data)
+        response = requests.post(endpoint, json=source_data, timeout=30)
         
         if response.status_code == 200:
             return response.json()["sourceId"]
@@ -36,7 +26,6 @@ class AirbyteAutomator:
     
     def create_destination(self, destination_config):
         """Create an Airbyte destination"""
-        
         endpoint = f"{self.airbyte_api}/destinations/create"
         
         destination_data = {
@@ -45,7 +34,7 @@ class AirbyteAutomator:
             "connectionConfiguration": destination_config["config"]
         }
         
-        response = requests.post(endpoint, json=destination_data)
+        response = requests.post(endpoint, json=destination_data, timeout=30)
         
         if response.status_code == 200:
             return response.json()["destinationId"]
@@ -55,7 +44,6 @@ class AirbyteAutomator:
     
     def create_connection(self, connection_config, source_id, destination_id):
         """Create an Airbyte connection"""
-        
         endpoint = f"{self.airbyte_api}/connections/create"
         
         connection_data = {
@@ -73,7 +61,7 @@ class AirbyteAutomator:
             "namespaceFormat": connection_config["namespace"]
         }
         
-        response = requests.post(endpoint, json=connection_data)
+        response = requests.post(endpoint, json=connection_data, timeout=30)
         
         if response.status_code == 200:
             return response.json()["connectionId"]
@@ -83,8 +71,6 @@ class AirbyteAutomator:
     
     def get_source_definition_id(self, source_type):
         """Get source definition ID by type"""
-        # In production, fetch from API
-        definitions = {
             "postgres": "decd338e-5647-4c0b-adf4-da0e75f5a750",
             "http_api": "68e63de2-bb83-4714-b4c7-6f0b1b5bdc8e"
         }
@@ -92,8 +78,6 @@ class AirbyteAutomator:
     
     def get_destination_definition_id(self, destination_type):
         """Get destination definition ID by type"""
-        # In production, fetch from API
-        definitions = {
             "postgres": "25c5221d-dce2-4163-ade9-739ef790f503",
             "weaviate": "7b96c012-e2c9-4d3c-b0f3-8b1f4f2e4b5e"
         }
@@ -101,7 +85,6 @@ class AirbyteAutomator:
     
     def configure_all_domains(self):
         """Configure Airbyte for all domains"""
-        
         for config_file in self.config_dir.glob("*_airbyte.json"):
             with open(config_file) as f:
                 config = json.load(f)

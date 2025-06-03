@@ -1,33 +1,5 @@
 """
-Enhanced data ingestion API with real-time support and deduplication.
-
-This module provides both synchronous and asynchronous endpoints with
-comprehensive duplicate handling and natural language interface support.
 """
-
-from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, BackgroundTasks, Query, WebSocket, WebSocketDisconnect
-from fastapi.responses import JSONResponse, StreamingResponse
-from typing import List, Optional, Dict, Any, AsyncGenerator
-import asyncio
-import uuid
-from datetime import datetime
-import json
-import logging
-
-from sqlalchemy.ext.asyncio import AsyncSession
-from pydantic import BaseModel, Field
-
-from ...core.database import get_db
-from ...core.auth import get_current_user
-from ....core.data_ingestion.deduplication import (
-    DeduplicationEngine, 
-    DuplicateResolver, 
-    DeduplicationAuditLogger,
-    UploadChannel
-)
-
-logger = logging.getLogger(__name__)
-
 router = APIRouter(prefix="/api/v1/data-ingestion/v2", tags=["data-ingestion-v2"])
 
 # Global instances (would be dependency injected in production)
@@ -72,16 +44,6 @@ class UploadRequestV2(BaseModel):
 
 class UploadResponseV2(BaseModel):
     """Enhanced upload response with deduplication info."""
-    file_id: str
-    filename: str
-    source_type: str
-    status: str
-    duplicate_detected: bool = False
-    duplicate_info: Optional[Dict[str, Any]] = None
-    resolution_applied: Optional[str] = None
-    message: str
-
-class NaturalLanguageUploadRequest(BaseModel):
     """Request for natural language data upload."""
     query: str = Field(..., description="Natural language description of data to upload")
     content: str = Field(..., description="The actual content to ingest")
@@ -89,15 +51,6 @@ class NaturalLanguageUploadRequest(BaseModel):
 
 class StreamingUploadResponse(BaseModel):
     """Response for streaming upload progress."""
-    event_type: str
-    file_id: str
-    progress: float
-    status: str
-    message: str
-    metadata: Optional[Dict[str, Any]] = None
-
-# Synchronous endpoints
-
 @router.post("/upload/sync", response_model=List[UploadResponseV2])
 async def upload_files_sync(
     files: List[UploadFile] = File(...),
@@ -106,23 +59,7 @@ async def upload_files_sync(
     current_user: Dict = Depends(get_current_user)
 ):
     """
-    Synchronous file upload with immediate deduplication.
-    
-    Returns complete results including duplicate detection and resolution.
     """
-    responses = []
-    
-    # Start audit logging
-    await audit_logger.start()
-    
-    try:
-        for file in files:
-            file_id = str(uuid.uuid4())
-            
-            # Log upload attempt
-            await audit_logger.log_duplicate_check(
-                content_id=file_id,
-                upload_channel=UploadChannel(request_data.upload_channel),
                 user_id=current_user["id"],
                 metadata={"filename": file.filename}
             )
@@ -132,21 +69,7 @@ async def upload_files_sync(
             
             # Check for existing similar content
             existing_query = """
-                SELECT id, content, content_hash, metadata
-                FROM data_ingestion.parsed_content
-                WHERE source_type = $1
-                ORDER BY created_at DESC
-                LIMIT 1000
             """
-            
-            existing_records = await db.fetch_all(
-                existing_query, 
-                request_data.source_type
-            )
-            
-            # Check for duplicates
-            duplicate_match = await dedup_engine.check_duplicate(
-                content.decode('utf-8') if isinstance(content, bytes) else content,
                 {"filename": file.filename, "source_type": request_data.source_type},
                 [dict(r) for r in existing_records],
                 UploadChannel(request_data.upload_channel)
@@ -195,17 +118,7 @@ async def upload_files_sync(
                 # No duplicate - proceed with upload
                 # Insert file record
                 insert_query = """
-                    INSERT INTO data_ingestion.file_imports 
-                    (id, filename, source_type, file_size, created_by)
-                    VALUES ($1, $2, $3, $4, $5)
                 """
-                
-                await db.execute(
-                    insert_query,
-                    file_id,
-                    file.filename,
-                    request_data.source_type,
-                    len(content),
                     current_user["id"]
                 )
                 
@@ -236,21 +149,7 @@ async def upload_files_async(
     current_user: Dict = Depends(get_current_user)
 ):
     """
-    Asynchronous file upload with background processing.
-    
-    Returns immediately with tracking IDs.
     """
-    tracking_ids = []
-    
-    for file in files:
-        tracking_id = str(uuid.uuid4())
-        
-        # Queue for background processing
-        background_tasks.add_task(
-            process_file_with_deduplication,
-            tracking_id,
-            file,
-            request_data,
             current_user["id"]
         )
         
@@ -275,12 +174,8 @@ async def upload_via_natural_language(
     current_user: Dict = Depends(get_current_user)
 ):
     """
-    Upload data using natural language description.
-    
     Example: "Upload this Slack conversation about the Q4 planning meeting"
     """
-    # Parse natural language to detect intent and source
-    source_keywords = {
         "slack": ["slack", "conversation", "message", "channel"],
         "gong": ["gong", "call", "transcript", "recording"],
         "salesforce": ["salesforce", "crm", "account", "opportunity"],
@@ -336,16 +231,7 @@ async def websocket_endpoint(
     db: AsyncSession = Depends(get_db)
 ):
     """
-    WebSocket endpoint for real-time upload progress and notifications.
     """
-    await manager.connect(websocket, client_id)
-    
-    try:
-        while True:
-            # Wait for messages from client
-            data = await websocket.receive_text()
-            message = json.loads(data)
-            
             if message["type"] == "subscribe":
                 # Subscribe to upload progress
                 await websocket.send_text(json.dumps({
@@ -359,7 +245,10 @@ async def websocket_endpoint(
                 status = await get_upload_status(tracking_id, db)
                 await websocket.send_text(json.dumps(status))
     
-    except WebSocketDisconnect:
+    except Exception:
+
+    
+        pass
         manager.disconnect(client_id)
 
 # Streaming endpoint
@@ -371,13 +260,7 @@ async def upload_stream(
     current_user: Dict = Depends(get_current_user)
 ):
     """
-    Streaming upload endpoint for large files with progress updates.
     """
-    async def generate_progress():
-        file_id = str(uuid.uuid4())
-        
-        # Initial response
-        yield json.dumps(StreamingUploadResponse(
             event_type="started",
             file_id=file_id,
             progress=0.0,
@@ -421,17 +304,7 @@ async def bulk_deduplication(
     current_user: Dict = Depends(get_current_user)
 ):
     """
-    Perform bulk deduplication on existing files.
     """
-    operation_id = str(uuid.uuid4())
-    
-    # Log bulk operation
-    await audit_logger.log_bulk_operation(
-        operation_id=operation_id,
-        item_count=len(file_ids),
-        duplicates_found=0,  # Will be updated
-        resolutions_applied={},
-        upload_channel=UploadChannel.API,
         user_id=current_user["id"]
     )
     
@@ -456,10 +329,6 @@ async def process_file_with_deduplication(
     user_id: str
 ):
     """Background task for file processing with deduplication."""
-    # Implementation would handle actual processing
-    # Send updates via WebSocket
-    await manager.send_personal_message(
-        json.dumps({
             "tracking_id": tracking_id,
             "status": "processing",
             "progress": 0.5
@@ -469,8 +338,6 @@ async def process_file_with_deduplication(
 
 async def get_upload_status(tracking_id: str, db: AsyncSession) -> Dict[str, Any]:
     """Get current status of an upload."""
-    # Query processing status from database
-    return {
         "tracking_id": tracking_id,
         "status": "processing",
         "progress": 0.75,

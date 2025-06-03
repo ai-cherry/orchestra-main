@@ -1,32 +1,12 @@
 """
-API Integration Tests for LLM Orchestration Endpoints
 """
-
-import pytest
-import asyncio
-from httpx import AsyncClient
-from fastapi.testclient import TestClient
-from unittest.mock import Mock, AsyncMock, patch
-import json
-
-from agent.app.main import app
-from agent.app.services.specialized_agents import AgentType
-from core.llm_intelligent_router import QueryType
-
-class TestLLMOrchestrationAPI:
     """Test LLM Orchestration API endpoints"""
-    
-    @pytest.fixture
-    async def client(self):
         async with AsyncClient(app=app, base_url="http://test") as ac:
             yield ac
     
     @pytest.mark.asyncio
     async def test_test_routing_endpoint(self, client):
         """Test the routing test endpoint"""
-        with patch('agent.app.routers.llm_orchestration.get_intelligent_llm_router') as mock_router:
-            mock_instance = Mock()
-            mock_instance.route_query = AsyncMock(return_value={
                 "choices": [{"message": {"content": "Test response"}}],
                 "routing_metadata": {
                     "query_type": "creative_search",
@@ -57,9 +37,6 @@ class TestLLMOrchestrationAPI:
     @pytest.mark.asyncio
     async def test_routing_analytics_endpoint(self, client):
         """Test the routing analytics endpoint"""
-        with patch('agent.app.routers.llm_orchestration.get_intelligent_llm_router') as mock_router:
-            mock_instance = Mock()
-            mock_instance.get_routing_analytics = AsyncMock(return_value={
                 "query_type_distribution": {"creative_search": 10, "analytical": 5},
                 "model_performance": {
                     "gpt-4": {
@@ -95,9 +72,6 @@ class TestLLMOrchestrationAPI:
     @pytest.mark.asyncio
     async def test_agents_status_endpoint(self, client):
         """Test the agents status endpoint"""
-        with patch('agent.app.routers.llm_orchestration.get_specialized_agent') as mock_get_agent:
-            mock_agent = Mock()
-            mock_agent.get_status = AsyncMock(return_value={
                 "id": "test-001",
                 "name": "Test Agent",
                 "type": "personal",
@@ -116,7 +90,6 @@ class TestLLMOrchestrationAPI:
     @pytest.mark.asyncio
     async def test_execute_agent_task_endpoint(self, client):
         """Test executing a task on a specific agent"""
-        with patch('agent.app.routers.llm_orchestration.process_agent_task') as mock_process:
             mock_process.return_value = {"result": "success"}
             
             response = await client.post(
@@ -135,9 +108,6 @@ class TestLLMOrchestrationAPI:
     @pytest.mark.asyncio
     async def test_personal_search_endpoint(self, client):
         """Test personal agent search endpoint"""
-        with patch('agent.app.routers.llm_orchestration.get_specialized_agent') as mock_get_agent:
-            mock_agent = Mock()
-            mock_agent.adaptive_search = AsyncMock(return_value={
                 "query": "test query",
                 "results": [{"id": "1", "content": "result"}],
                 "preferences_applied": ["test_pref"],
@@ -162,10 +132,6 @@ class TestLLMOrchestrationAPI:
     @pytest.mark.asyncio
     async def test_payready_analyze_endpoint(self, client):
         """Test Pay Ready agent analysis endpoint"""
-        with patch('agent.app.routers.llm_orchestration.get_specialized_agent') as mock_get_agent:
-            mock_agent = Mock()
-            mock_listing = Mock()
-            mock_listing.__dict__ = {
                 "id": "apt123",
                 "address": "123 Test St",
                 "price": 2500,
@@ -200,10 +166,6 @@ class TestLLMOrchestrationAPI:
     @pytest.mark.asyncio
     async def test_paragon_search_trials_endpoint(self, client):
         """Test Paragon medical agent trial search endpoint"""
-        with patch('agent.app.routers.llm_orchestration.get_specialized_agent') as mock_get_agent:
-            mock_agent = Mock()
-            mock_trial = Mock()
-            mock_trial.__dict__ = {
                 "nct_id": "NCT12345",
                 "title": "Test Trial",
                 "phase": "Phase 3",
@@ -229,9 +191,6 @@ class TestLLMOrchestrationAPI:
     @pytest.mark.asyncio
     async def test_create_workflow_endpoint(self, client):
         """Test workflow creation endpoint"""
-        with patch('agent.app.routers.llm_orchestration.get_agent_orchestrator') as mock_get_orch:
-            mock_orchestrator = Mock()
-            mock_workflow = Mock()
             mock_workflow.id = "workflow123"
             mock_workflow.name = "Test Workflow"
             mock_workflow.status.value = "pending"
@@ -264,10 +223,6 @@ class TestLLMOrchestrationAPI:
     @pytest.mark.asyncio
     async def test_execute_workflow_endpoint(self, client):
         """Test workflow execution endpoint"""
-        with patch('agent.app.routers.llm_orchestration.get_agent_orchestrator') as mock_get_orch:
-            mock_orchestrator = Mock()
-            mock_get_orch.return_value = mock_orchestrator
-            
             response = await client.post("/api/orchestration/workflows/workflow123/execute")
             
             assert response.status_code == 200
@@ -277,9 +232,6 @@ class TestLLMOrchestrationAPI:
     @pytest.mark.asyncio
     async def test_workflow_status_endpoint(self, client):
         """Test getting workflow status"""
-        with patch('agent.app.routers.llm_orchestration.get_agent_orchestrator') as mock_get_orch:
-            mock_orchestrator = Mock()
-            mock_orchestrator.get_workflow_status = AsyncMock(return_value={
                 "workflow_id": "workflow123",
                 "name": "Test Workflow",
                 "status": "running",
@@ -298,10 +250,6 @@ class TestLLMOrchestrationAPI:
     @pytest.mark.asyncio
     async def test_system_health_endpoint(self, client):
         """Test system health check endpoint"""
-        with patch('agent.app.routers.llm_orchestration.get_intelligent_llm_router'):
-            with patch('agent.app.routers.llm_orchestration.get_agent_orchestrator'):
-                with patch('agent.app.routers.llm_orchestration.get_specialized_agent') as mock_get_agent:
-                    mock_agent = Mock()
                     mock_agent.get_status = AsyncMock(return_value={"status": "idle"})
                     mock_get_agent.return_value = mock_agent
                     
@@ -316,16 +264,12 @@ class TestLLMOrchestrationAPI:
 
 class TestErrorHandling:
     """Test error handling in API endpoints"""
-    
-    @pytest.fixture
-    async def client(self):
         async with AsyncClient(app=app, base_url="http://test") as ac:
             yield ac
     
     @pytest.mark.asyncio
     async def test_invalid_agent_type(self, client):
         """Test error handling for invalid agent type"""
-        response = await client.post(
             "/api/orchestration/agents/invalid_type/execute",
             json={"agent_type": "invalid_type", "task": {}}
         )
@@ -336,9 +280,6 @@ class TestErrorHandling:
     @pytest.mark.asyncio
     async def test_workflow_not_found(self, client):
         """Test error handling for non-existent workflow"""
-        with patch('agent.app.routers.llm_orchestration.get_agent_orchestrator') as mock_get_orch:
-            mock_orchestrator = Mock()
-            mock_orchestrator.get_workflow_status = AsyncMock(
                 side_effect=ValueError("Workflow not found")
             )
             mock_get_orch.return_value = mock_orchestrator
@@ -350,9 +291,6 @@ class TestErrorHandling:
     @pytest.mark.asyncio
     async def test_routing_failure(self, client):
         """Test error handling for routing failures"""
-        with patch('agent.app.routers.llm_orchestration.get_intelligent_llm_router') as mock_router:
-            mock_instance = Mock()
-            mock_instance.route_query = AsyncMock(
                 side_effect=Exception("Routing failed")
             )
             mock_router.return_value = mock_instance

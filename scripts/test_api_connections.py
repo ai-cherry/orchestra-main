@@ -1,11 +1,6 @@
+# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """Test API connections for Roo integration"""
-
-import os
-import json
-from pathlib import Path
-
-def test_openrouter_connection():
     """Test OpenRouter API (mock)"""
     api_key = os.getenv("OPENROUTER_API_KEY", "mock-key")
     if api_key and len(api_key) > 10:
@@ -27,13 +22,13 @@ def test_database_connection():
 
 def test_mcp_server():
     """Test MCP server connection"""
-    try:
-        import urllib.request
         response = urllib.request.urlopen("http://localhost:8765/health", timeout=2)
         if response.status == 200:
             print("✅ MCP server is running")
             return True
-    except:
+    except Exception:
+
+        pass
         print("⚠️  MCP server not running - start with: python3 scripts/simple_mcp_server.py &")
         return False
 

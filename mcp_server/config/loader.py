@@ -1,53 +1,14 @@
 """
-Configuration loading utilities for MCP server.
-
-This module provides utilities for loading, parsing, and validating
-configuration for the MCP server from various sources.
 """
-
-import json
-import logging
-import os
-from typing import Any, Dict, Optional
-
-from .models import MCPConfig
-
-logger = logging.getLogger(__name__)
-
-def load_config_from_file(file_path: str) -> Dict[str, Any]:
     """
-    Load configuration from a JSON file.
-
-    Args:
-        file_path: Path to the JSON configuration file
-
-    Returns:
-        Configuration dictionary
-
-    Raises:
-        FileNotFoundError: If the file doesn't exist
-        json.JSONDecodeError: If the file isn't valid JSON
     """
-    logger.debug(f"Loading config from file: {file_path}")
     with open(file_path, "r") as f:
         config = json.load(f)
     return config
 
 def load_config_from_env() -> Dict[str, Any]:
     """
-    Load configuration from environment variables.
-
-    Environment variables are expected to follow these patterns:
-    - MCP_DEBUG=true/false
-    - MCP_LOG_LEVEL=INFO
-    - MCP_STORAGE_TYPE=in_memory
-    - MCP_COPILOT_API_KEY=xxx
-    - MCP_GEMINI_API_KEY=xxx
-
-    Returns:
-        Configuration dictionary
     """
-    logger.debug("Loading config from environment variables")
     config = {}
 
     # Main config
@@ -131,16 +92,7 @@ def load_config_from_env() -> Dict[str, Any]:
 
 def merge_configs(base_config: Dict[str, Any], override_config: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Merge two configurations, with override_config taking precedence.
-
-    Args:
-        base_config: Base configuration dictionary
-        override_config: Override configuration dictionary
-
-    Returns:
-        Merged configuration dictionary
     """
-    logger.debug("Merging configurations")
     result = base_config.copy()
 
     for key, value in override_config.items():
@@ -155,37 +107,25 @@ def merge_configs(base_config: Dict[str, Any], override_config: Dict[str, Any]) 
 
 def load_config(config_path: Optional[str] = "mcp_config.json") -> MCPConfig:
     """
-    Load and validate configuration from multiple sources.
-
-    Configuration is loaded and merged from the following sources (in order of precedence):
-    1. Environment variables
-    2. Config file (if provided)
-    3. Default values from MCPConfig
-
-    Args:
-        config_path: Path to the JSON configuration file (optional)
-
-    Returns:
-        Validated MCPConfig instance
     """
-    # Start with an empty base config
-    config_dict = {}
-
-    # Load from file if provided
-    if config_path:
-        try:
-            file_config = load_config_from_file(config_path)
-            config_dict = merge_configs(config_dict, file_config)
             logger.info(f"Loaded configuration from file: {config_path}")
-        except FileNotFoundError:
+        except Exception:
+
+            pass
             logger.warning(f"Config file not found: {config_path}")
-        except json.JSONDecodeError:
+        except Exception:
+
+            pass
             logger.error(f"Invalid JSON in config file: {config_path}")
-        except Exception as e:
+        except Exception:
+
+            pass
             logger.error(f"Error loading config file: {e}")
 
     # Load from environment variables
     try:
+
+        pass
         env_config = load_config_from_env()
         config_dict = merge_configs(config_dict, env_config)
 
@@ -196,16 +136,22 @@ def load_config(config_path: Optional[str] = "mcp_config.json") -> MCPConfig:
         if "gemini" in env_config and "api_key" in env_config["gemini"]:
             logger.info("Found Gemini API key in environment")
 
-    except Exception as e:
+    except Exception:
+
+
+        pass
         logger.error(f"Error loading config from environment: {e}")
 
     # Create and validate the config model
     try:
+
+        pass
         config = MCPConfig(**config_dict)
         logger.info("Configuration loaded and validated successfully")
-        logger.debug(f"Final config: {config.dict(exclude={'copilot': {'api_key'}, 'gemini': {'api_key'}})}")
         return config
-    except Exception as e:
+    except Exception:
+
+        pass
         logger.error(f"Error validating configuration: {e}")
         # Fall back to default config
         logger.warning("Using default configuration")
