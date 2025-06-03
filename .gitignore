@@ -1,3 +1,4 @@
+# Ignore all markdown files except README.md and .roo rules
 # Python bytecode and cache
 __pycache__/
 *.py[cod]
@@ -69,3 +70,7 @@ config/managed-services.env
 # Pulumi passphrase file
 .pulumi-passphrase
 nohup.out
+!README.md
+*.md
+!README.md
+!.roo/**/*.md
