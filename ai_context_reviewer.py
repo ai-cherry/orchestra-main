@@ -1,5 +1,5 @@
 """
-AI CONTEXT: REVIEWER MODE - Orchestra Project (GCP-Free Edition)
+AI CONTEXT: REVIEWER MODE - Orchestra Project (Vultr-Preferred Edition)
 ================================================================
 
 READ THIS ENTIRE FILE BEFORE REVIEWING ANY CODE!
@@ -7,13 +7,24 @@ READ THIS ENTIRE FILE BEFORE REVIEWING ANY CODE!
 Project: Orchestra AI (Python 3.10, pip/venv, External Services)
 Role: You are reviewing code changes for compliance, quality, and stability.
 
+Project Stack:
+- Python 3.10 (Strictly)
+- pip/venv for dependency management
+- PostgreSQL (Relational DB)
+- Weaviate (Vector DB)
+- Primary Cloud Provider: Vultr
+- Permitted Cloud Services: Vultr Compute, Vultr Block Storage, Weaviate Cloud, PostgreSQL (on Vultr or managed by a Vultr-compatible service)
+- Prohibited Cloud Services: GCP, AWS, Azure (unless specifically part of a defined, isolated integration for a 3rd party service that *only* runs on them and is approved)
+- External services: May include others if they are cloud-agnostic or run on Vultr.
+- Local development: docker-compose for service mocks only (e.g., local Weaviate, Postgres)
+
 REVIEW CHECKLIST:
 
 1. ENVIRONMENT & DEPENDENCY COMPLIANCE
    ✅ Python 3.10 only (no 3.11+ features)
    ✅ pip/venv workflow (NO Poetry, Pipenv)
    ✅ External services properly configured (MongoDB, Redis, Weaviate)
-   ✅ No GCP dependencies or imports
+   ✅ No GCP, AWS, or Azure specific dependencies or imports (unless part of an explicit, approved integration)
    ✅ No Docker SDK usage (docker-compose for services only)
 
 2. CODE QUALITY & PATTERNS
@@ -75,8 +86,8 @@ APPROVAL CRITERIA:
 
 RED FLAGS:
 - 🚩 Any Poetry/Pipenv references
-- 🚩 GCP imports or configuration
-- 🚩 Docker SDK usage
+- 🚩 GCP/AWS/Azure service imports or direct SDK usage (outside explicitly approved, isolated integrations)
+- 🚩 Docker SDK usage (docker-compose for local service mocks is OK)
 - 🚩 Python 3.11+ features
 - 🚩 Missing type hints
 - 🚩 Hardcoded service URLs/credentials

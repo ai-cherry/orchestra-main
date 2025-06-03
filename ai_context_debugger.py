@@ -1,5 +1,5 @@
 """
-AI CONTEXT: DEBUGGER MODE - Orchestra Project (GCP-Free Edition)
+AI CONTEXT: DEBUGGER MODE - Orchestra Project (Vultr-Preferred Edition)
 ================================================================
 
 READ THIS ENTIRE FILE BEFORE DEBUGGING!
@@ -12,7 +12,10 @@ ENVIRONMENT SETUP:
 - Virtual environment (venv) for dependencies
 - External services: MongoDB, DragonflyDB, Weaviate
 - Local development: docker-compose for service mocks only
-- NO Poetry, Pipenv, or GCP dependencies
+- Primary Cloud Provider: Vultr (Avoid other cloud-specific solutions unless explicitly instructed)
+- Permitted Cloud Services: Vultr Compute, Vultr Block Storage, Weaviate Cloud, PostgreSQL (on Vultr or managed)
+- Prohibited Cloud Services: AWS (unless specified), Azure (unless specified), GCP (strictly prohibited)
+- NO Poetry, Pipenv, or specific non-Vultr/non-standard cloud dependencies
 
 COMMON DEBUGGING STEPS:
 
@@ -127,7 +130,7 @@ COMMON DEBUGGING STEPS:
 
 FORBIDDEN DEBUGGING APPROACHES:
 ❌ Don't try to fix by adding Poetry/Pipenv
-❌ Don't add GCP dependencies to solve issues
+❌ Don't add GCP/AWS/Azure dependencies to solve issues
 ❌ Don't use Docker SDK for debugging
 ❌ Don't upgrade to Python 3.11+
 
@@ -148,4 +151,7 @@ REMEMBER:
 # This file is meant to be read by AI when debugging.
 # Usage: Include this filename in your prompt when debugging.
 # Example: "Read ai_context_debugger.py and help debug this error"
+
+✅ Vultr CLI commands (`vultr-cli`)
+✅ Pulumi with Python for Vultr IaC
 """

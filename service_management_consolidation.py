@@ -1,473 +1,430 @@
+#!/usr/bin/env python3
 """
-Consolidated service management framework for the entire codebase.
+Service Management Consolidation Script
 
-This implementation provides a unified approach to service management across all modules,
-combining the functionality from:
-- gcp_migration/infrastructure/service_factory.py
-- gcp_migration/infrastructure/service_container.py
+This script consolidates service management logic from various parts of the codebase
+into a unified service management framework. It aims to standardize service
+registration, discovery, and lifecycle management.
 
-Usage:
-    1. Import the ServiceContainer or ServiceFactory class from this module
-    2. Create an instance with the appropriate configuration
-    3. Use the instance to manage services
+Key improvements:
+- Centralized service registry (PostgreSQL + Weaviate)
+- Standardized service health checks
+- Unified configuration management
+- Simplified service discovery mechanism
+- Improved error handling and resilience
 """
 
-import inspect
+import asyncio
+import json
 import logging
+import os
+import sys
+from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Callable, Dict, Generic, List, Optional, Type, TypeVar, cast
+from typing import Any, Dict, List, Optional, Tuple, Union
+from uuid import uuid4
 
-# Import error handling from consolidated framework
-from error_handling_consolidation import BaseError, ErrorSeverity, handle_exception
+# Add parent directory to path for imports
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent))
 
-# Type variables
-T = TypeVar("T")
-S = TypeVar("S")
+from shared.database import initialize_database, UnifiedDatabase
+from core.config import ServiceConfig, get_service_config
 
-# Configure logging
 logger = logging.getLogger(__name__)
 
-class ServiceError(BaseError):
-    """Exception raised when there is a service error."""
+# --- Constants ---
+SERVICE_REGISTRY_TABLE = "orchestra_services"
+SERVICE_HEALTH_COLLECTION = "service_health_checks"
+DEFAULT_SERVICE_TTL_SECONDS = 300  # 5 minutes
 
-    def __init__(
-        self,
-        message: str,
-        details: Optional[Dict[str, Any]] = None,
-        cause: Optional[Exception] = None,
-    ):
-        """
-        Initialize the error.
+# --- Enums ---
+class ServiceStatus(str, Enum):
+    """Represents the operational status of a service."""
+    UNKNOWN = "UNKNOWN"
+    STARTING = "STARTING"
+    HEALTHY = "HEALTHY"
+    UNHEALTHY = "UNHEALTHY"
+    DEGRADED = "DEGRADED"
+    STOPPED = "STOPPED"
+    ERROR = "ERROR"
 
-        Args:
-            message: The error message
-            details: Additional details about the error
-            cause: The underlying exception that caused this error
-        """
-        super().__init__(
-            message=message,
-            severity=ErrorSeverity.ERROR,
-            details=details,
-            cause=cause,
-        )
+class ServiceLifecycleEvent(str, Enum):
+    """Represents events in a service's lifecycle."""
+    REGISTERED = "REGISTERED"
+    HEALTH_CHECK_PASSED = "HEALTH_CHECK_PASSED"
+    HEALTH_CHECK_FAILED = "HEALTH_CHECK_FAILED"
+    UPDATED = "UPDATED"
+    DEREGISTERED = "DEREGISTERED"
+    HEARTBEAT_RECEIVED = "HEARTBEAT_RECEIVED"
 
-class ServiceScope(Enum):
-    """Service scope types."""
+# --- Data Models ---
+class ServiceInstance(BaseModel):
+    """Represents a registered service instance."""
+    service_id: str = Field(default_factory=lambda: str(uuid4()))
+    service_name: str
+    service_type: str # e.g., "mcp_server", "ai_tool", "database"
+    version: str
+    endpoint: str
+    status: ServiceStatus = ServiceStatus.UNKNOWN
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+    last_heartbeat_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    registered_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    ttl_seconds: int = DEFAULT_SERVICE_TTL_SECONDS
 
-    # Service is created once and reused throughout the application lifetime
-    SINGLETON = "singleton"
+class ServiceHealthCheck(BaseModel):
+    """Represents a health check result for a service."""
+    check_id: str = Field(default_factory=lambda: str(uuid4()))
+    service_id: str
+    service_name: str
+    status: ServiceStatus
+    details: Dict[str, Any] = Field(default_factory=dict)
+    checked_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    # Service is created for each request/operation and then discarded
-    TRANSIENT = "transient"
-
-    # Service is created for each scope/context and reused within that scope
-    SCOPED = "scoped"
-
-class ServiceLifecycle(Enum):
-    """Service lifecycle events."""
-
-    # Called when the service is constructed
-    INITIALIZE = "initialize"
-
-    # Called when the service is being used
-    ACTIVATE = "activate"
-
-    # Called when the service is being disposed
-    DISPOSE = "dispose"
-
-class ServiceRegistration(Generic[T]):
-    """Registration information for a service."""
-
-    def __init__(
-        self,
-        service_type: Type[T],
-        factory: Callable[..., T],
-        scope: ServiceScope = ServiceScope.TRANSIENT,
-        lifecycle_hooks: Optional[Dict[ServiceLifecycle, Callable[[T], None]]] = None,
-        dependencies: Optional[List[Type]] = None,
-    ):
-        """
-        Initialize the service registration.
-
-        Args:
-            service_type: The type of service being registered
-            factory: Factory function to create the service
-            scope: The service scope
-            lifecycle_hooks: Optional hooks for service lifecycle events
-            dependencies: Optional list of service dependencies
-        """
-        self.service_type = service_type
-        self.factory = factory
-        self.scope = scope
-        self.lifecycle_hooks = lifecycle_hooks or {}
-        self.dependencies = dependencies or []
-
-class ServiceFactory:
+# --- Service Management Class ---
+class UnifiedServiceManager:
     """
-    Factory for creating services.
-
-    This class provides functionality to register and create services.
+    Manages service registration, discovery, and health monitoring.
+    Leverages UnifiedDatabase for persistence.
     """
 
-    def __init__(self):
-        """Initialize the service factory."""
-        self.registrations: Dict[Type, ServiceRegistration] = {}
-        self.instances: Dict[Type, Any] = {}
+    def __init__(self, db: UnifiedDatabase):
+        self.db = db
+        self.service_cache: Dict[str, ServiceInstance] = {}
+        self.last_cache_refresh: Optional[datetime] = None
+        self.cache_ttl_seconds = 60  # Cache services for 60 seconds
 
-    def register(
-        self,
-        service_type: Type[T],
-        factory: Callable[..., T],
-        scope: ServiceScope = ServiceScope.TRANSIENT,
-        lifecycle_hooks: Optional[Dict[ServiceLifecycle, Callable[[T], None]]] = None,
-        dependencies: Optional[List[Type]] = None,
-    ) -> None:
-        """
-        Register a service with the factory.
+    async def initialize(self):
+        """Initialize the service manager and database schema."""
+        await self._setup_service_registry_schema()
+        await self._refresh_service_cache()
+        logger.info("Unified Service Manager initialized.")
 
-        Args:
-            service_type: The type of service to register
-            factory: Factory function to create the service
-            scope: The service scope
-            lifecycle_hooks: Optional hooks for service lifecycle events
-            dependencies: Optional list of service dependencies
-        """
-        registration = ServiceRegistration(
-            service_type=service_type,
-            factory=factory,
-            scope=scope,
-            lifecycle_hooks=lifecycle_hooks,
-            dependencies=dependencies,
-        )
+    async def _setup_service_registry_schema(self):
+        """Create necessary database tables and collections if they don't exist."""
+        # PostgreSQL schema for service registry
+        await self.db.execute_query(f"""
+            CREATE TABLE IF NOT EXISTS {SERVICE_REGISTRY_TABLE} (
+                service_id VARCHAR(36) PRIMARY KEY,
+                service_name VARCHAR(255) NOT NULL,
+                service_type VARCHAR(100) NOT NULL,
+                version VARCHAR(50),
+                endpoint VARCHAR(512) NOT NULL,
+                status VARCHAR(50) NOT NULL,
+                metadata JSONB,
+                last_heartbeat_at TIMESTAMPTZ NOT NULL,
+                registered_at TIMESTAMPTZ NOT NULL,
+                ttl_seconds INTEGER NOT NULL,
+                expires_at TIMESTAMPTZ GENERATED ALWAYS AS (last_heartbeat_at + (ttl_seconds * INTERVAL '1 second')) STORED
+            );
+        """, fetch=False)
+        await self.db.execute_query(f"CREATE INDEX IF NOT EXISTS idx_service_name ON {SERVICE_REGISTRY_TABLE}(service_name);", fetch=False)
+        await self.db.execute_query(f"CREATE INDEX IF NOT EXISTS idx_service_type ON {SERVICE_REGISTRY_TABLE}(service_type);", fetch=False)
+        await self.db.execute_query(f"CREATE INDEX IF NOT EXISTS idx_service_status ON {SERVICE_REGISTRY_TABLE}(status);", fetch=False)
+        await self.db.execute_query(f"CREATE INDEX IF NOT EXISTS idx_service_expires_at ON {SERVICE_REGISTRY_TABLE}(expires_at);", fetch=False)
 
-        self.registrations[service_type] = registration
-        logger.debug(f"Registered service {service_type.__name__} with scope {scope.value}")
-
-    def register_instance(self, service_type: Type[T], instance: T) -> None:
-        """
-        Register an existing instance with the factory.
-
-        Args:
-            service_type: The type of service to register
-            instance: The instance to register
-        """
-        self.instances[service_type] = instance
-        logger.debug(f"Registered instance of {service_type.__name__}")
-
-    @handle_exception(target_error=ServiceError)
-    def create(self, service_type: Type[T], *args: Any, **kwargs: Any) -> T:
-        """
-        Create an instance of the specified service type.
-
-        Args:
-            service_type: The type of service to create
-            *args: Positional arguments to pass to the factory
-            **kwargs: Keyword arguments to pass to the factory
-
-        Returns:
-            An instance of the service
-
-        Raises:
-            ServiceError: If the service cannot be created
-        """
-        # Check if we already have an instance for singleton services
-        if service_type in self.instances:
-            return cast(T, self.instances[service_type])
-
-        # Check if the service is registered
-        if service_type not in self.registrations:
-            raise ServiceError(
-                f"Service {service_type.__name__} not registered",
-                details={"service_type": service_type.__name__},
-            )
-
-        # Get the registration
-        registration = self.registrations[service_type]
-
-        # Create dependencies if needed
-        dependency_instances = {}
-        for dependency_type in registration.dependencies:
-            dependency_instances[dependency_type] = self.create(dependency_type)
-
-        # Create the service instance
-        try:
-            # Combine dependency instances with explicit args and kwargs
-            combined_kwargs = {**dependency_instances, **kwargs}
-            instance = registration.factory(*args, **combined_kwargs)
-        except Exception as e:
-            raise ServiceError(
-                f"Failed to create service {service_type.__name__}",
-                details={"service_type": service_type.__name__},
-                cause=e,
-            )
-
-        # Call initialize hook if present
-        if ServiceLifecycle.INITIALIZE in registration.lifecycle_hooks:
+        # Weaviate schema for health checks (optional, can also store in PostgreSQL)
+        # For this example, we'll assume Weaviate is used for more complex log/event analysis
+        client = self.db.get_weaviate_client()
+        if client:
+            class_obj = {
+                "class": SERVICE_HEALTH_COLLECTION,
+                "description": "Stores service health check records.",
+                "properties": [
+                    {"name": "check_id", "dataType": ["string"]},
+                    {"name": "service_id", "dataType": ["string"]},
+                    {"name": "service_name", "dataType": ["string"]},
+                    {"name": "status", "dataType": ["string"]},
+                    {"name": "details_json", "dataType": ["text"]}, # Store details as JSON string
+                    {"name": "checked_at_unix", "dataType": ["int"]}
+                ]
+            }
             try:
-                registration.lifecycle_hooks[ServiceLifecycle.INITIALIZE](instance)
+                if not client.schema.exists(SERVICE_HEALTH_COLLECTION):
+                    client.schema.create_class(class_obj)
+                    logger.info(f"Weaviate class '{SERVICE_HEALTH_COLLECTION}' created.")
             except Exception as e:
-                raise ServiceError(
-                    f"Failed to initialize service {service_type.__name__}",
-                    details={"service_type": service_type.__name__},
-                    cause=e,
-                )
+                logger.warning(f"Could not create Weaviate class '{SERVICE_HEALTH_COLLECTION}': {e}")
 
-        # Store instance if singleton
-        if registration.scope == ServiceScope.SINGLETON:
-            self.instances[service_type] = instance
-
-        return instance
-
-    def dispose(self) -> None:
-        """Dispose of all singleton services."""
-        for service_type, instance in list(self.instances.items()):
-            if service_type in self.registrations:
-                registration = self.registrations[service_type]
-
-                # Call dispose hook if present
-                if ServiceLifecycle.DISPOSE in registration.lifecycle_hooks:
-                    try:
-                        registration.lifecycle_hooks[ServiceLifecycle.DISPOSE](instance)
-                    except Exception as e:
-                        logger.warning(f"Error disposing service {service_type.__name__}: {str(e)}")
-
-        # Clear instances
-        self.instances.clear()
-
-class ServiceContainer:
-    """
-    Container for services.
-
-    This class provides a more robust approach to service management,
-    with support for dependency injection and scoped services.
-    """
-
-    def __init__(self, parent: Optional["ServiceContainer"] = None):
-        """
-        Initialize the service container.
-
-        Args:
-            parent: Optional parent container for hierarchical resolution
-        """
-        self.factory = ServiceFactory()
-        self.parent = parent
-        self.scoped_containers: List["ServiceContainer"] = []
-        self.is_disposed = False
-
-    def register(
-        self,
-        service_type: Type[T],
-        factory: Callable[..., T],
-        scope: ServiceScope = ServiceScope.TRANSIENT,
-        lifecycle_hooks: Optional[Dict[ServiceLifecycle, Callable[[T], None]]] = None,
-        dependencies: Optional[List[Type]] = None,
-    ) -> None:
-        """
-        Register a service with the container.
-
-        Args:
-            service_type: The type of service to register
-            factory: Factory function to create the service
-            scope: The service scope
-            lifecycle_hooks: Optional hooks for service lifecycle events
-            dependencies: Optional list of service dependencies
-        """
-        self.factory.register(
-            service_type=service_type,
-            factory=factory,
-            scope=scope,
-            lifecycle_hooks=lifecycle_hooks,
-            dependencies=dependencies,
-        )
-
-    def register_instance(self, service_type: Type[T], instance: T) -> None:
-        """
-        Register an existing instance with the container.
-
-        Args:
-            service_type: The type of service to register
-            instance: The instance to register
-        """
-        self.factory.register_instance(service_type, instance)
-
-    def register_auto_factory(
-        self,
-        concrete_type: Type[T],
-        interface_type: Optional[Type[S]] = None,
-        scope: ServiceScope = ServiceScope.TRANSIENT,
-        lifecycle_hooks: Optional[Dict[ServiceLifecycle, Callable[[T], None]]] = None,
-    ) -> None:
-        """
-        Register a service with automatic dependency resolution.
-
-        Args:
-            concrete_type: The concrete type to create
-            interface_type: Optional interface type to register as
-            scope: The service scope
-            lifecycle_hooks: Optional hooks for service lifecycle events
-        """
-        # If no interface type is provided, use the concrete type
-        service_type = interface_type or concrete_type
-
-        # Get the constructor parameters
-        constructor = concrete_type.__init__
-        if not constructor:
-            raise ServiceError(f"Cannot auto-register {concrete_type.__name__} without a constructor")
-
-        signature = inspect.signature(constructor)
-        dependency_types = []
-
-        # Skip 'self' parameter
-        for param in list(signature.parameters.values())[1:]:
-            # If the parameter has a type annotation, add it to the dependencies
-            if param.annotation != inspect.Parameter.empty:
-                dependency_types.append(param.annotation)
-
-        # Create a factory function that creates the concrete type with dependencies
-        def auto_factory(**kwargs: Any) -> T:
-            return concrete_type(**kwargs)
-
-        # Register the service
-        self.register(
-            service_type=service_type,
-            factory=auto_factory,
-            scope=scope,
-            lifecycle_hooks=lifecycle_hooks,
-            dependencies=dependency_types,
-        )
-
-    @handle_exception(target_error=ServiceError)
-    def resolve(self, service_type: Type[T], *args: Any, **kwargs: Any) -> T:
-        """
-        Resolve an instance of the specified service type.
-
-        Args:
-            service_type: The type of service to resolve
-            *args: Positional arguments to pass to the factory
-            **kwargs: Keyword arguments to pass to the factory
-
-        Returns:
-            An instance of the service
-
-        Raises:
-            ServiceError: If the service cannot be resolved
-        """
-        try:
-            # Try to create the service from this container
-            return self.factory.create(service_type, *args, **kwargs)
-        except ServiceError:
-            # If the service is not registered in this container, check the parent
-            if self.parent:
-                return self.parent.resolve(service_type, *args, **kwargs)
-
-            # No parent or parent couldn't resolve, re-raise the error
-            raise
-
-    def create_scope(self) -> "ServiceContainer":
-        """
-        Create a scoped service container.
-
-        Returns:
-            A new scoped service container
-        """
-        scoped_container = ServiceContainer(parent=self)
-        self.scoped_containers.append(scoped_container)
-        return scoped_container
-
-    def dispose(self) -> None:
-        """Dispose of all services in this container and its children."""
-        if self.is_disposed:
+    async def _refresh_service_cache(self, force_refresh: bool = False):
+        """Refresh the local service cache from the database."""
+        now = datetime.now(timezone.utc)
+        if not force_refresh and self.last_cache_refresh and \
+           (now - self.last_cache_refresh).total_seconds() < self.cache_ttl_seconds:
             return
 
-        # Dispose of all scoped containers
-        for container in self.scoped_containers:
-            container.dispose()
+        logger.debug("Refreshing service cache...")
+        rows = await self.db.execute_query(f"""
+            SELECT service_id, service_name, service_type, version, endpoint, status, metadata, last_heartbeat_at, registered_at, ttl_seconds
+            FROM {SERVICE_REGISTRY_TABLE} WHERE expires_at > NOW()
+        """)
+        self.service_cache = {}
+        for row in rows:
+            self.service_cache[row['service_id']] = ServiceInstance(**row)
+        self.last_cache_refresh = now
+        logger.debug(f"Service cache refreshed with {len(self.service_cache)} active services.")
 
-        # Clear scoped containers
-        self.scoped_containers.clear()
+    async def register_service(self, service_instance: ServiceInstance) -> ServiceInstance:
+        """Register a new service instance or update an existing one."""
+        await self.db.execute_query(f"""
+            INSERT INTO {SERVICE_REGISTRY_TABLE} 
+            (service_id, service_name, service_type, version, endpoint, status, metadata, last_heartbeat_at, registered_at, ttl_seconds)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+            ON CONFLICT (service_id) DO UPDATE SET
+                service_name = EXCLUDED.service_name,
+                service_type = EXCLUDED.service_type,
+                version = EXCLUDED.version,
+                endpoint = EXCLUDED.endpoint,
+                status = EXCLUDED.status,
+                metadata = EXCLUDED.metadata,
+                last_heartbeat_at = EXCLUDED.last_heartbeat_at,
+                ttl_seconds = EXCLUDED.ttl_seconds
+        """, params=[
+            service_instance.service_id,
+            service_instance.service_name,
+            service_instance.service_type,
+            service_instance.version,
+            service_instance.endpoint,
+            service_instance.status.value,
+            json.dumps(service_instance.metadata),
+            service_instance.last_heartbeat_at,
+            service_instance.registered_at,
+            service_instance.ttl_seconds
+        ], fetch=False)
+        await self._refresh_service_cache(force_refresh=True)
+        logger.info(f"Service '{service_instance.service_name}' (ID: {service_instance.service_id}) registered/updated.")
+        await self._log_lifecycle_event(service_instance.service_id, ServiceLifecycleEvent.REGISTERED, {"endpoint": service_instance.endpoint})
+        return service_instance
 
-        # Dispose of the factory
-        self.factory.dispose()
+    async def deregister_service(self, service_id: str) -> bool:
+        """Deregister a service instance."""
+        await self.db.execute_query(f"DELETE FROM {SERVICE_REGISTRY_TABLE} WHERE service_id = $1", params=[service_id], fetch=False)
+        if service_id in self.service_cache:
+            del self.service_cache[service_id]
+        logger.info(f"Service (ID: {service_id}) deregistered.")
+        await self._log_lifecycle_event(service_id, ServiceLifecycleEvent.DEREGISTERED)
+        return True
 
-        self.is_disposed = True
+    async def send_heartbeat(self, service_id: str, status: ServiceStatus = ServiceStatus.HEALTHY, metadata_update: Optional[Dict] = None) -> bool:
+        """Update a service's heartbeat and status."""
+        params = [
+            datetime.now(timezone.utc),
+            status.value,
+            service_id
+        ]
+        query = f"UPDATE {SERVICE_REGISTRY_TABLE} SET last_heartbeat_at = $1, status = $2"
+        if metadata_update:
+            query += ", metadata = metadata || $4"
+            params.append(json.dumps(metadata_update))
+        query += " WHERE service_id = $3 RETURNING service_id;"
+        
+        result = await self.db.execute_query(query, params=params, fetch=True)
+        if result and result[0]['service_id'] == service_id:
+            if service_id in self.service_cache:
+                self.service_cache[service_id].last_heartbeat_at = params[0]
+                self.service_cache[service_id].status = status
+                if metadata_update:
+                    self.service_cache[service_id].metadata.update(metadata_update)
+            logger.debug(f"Heartbeat received for service ID: {service_id}, status: {status.value}")
+            await self._log_lifecycle_event(service_id, ServiceLifecycleEvent.HEARTBEAT_RECEIVED, {"status": status.value})
+            return True
+        logger.warning(f"Failed to update heartbeat for service ID: {service_id}")
+        return False
 
-# Factory functions for creating service containers
-def create_container(parent: Optional[ServiceContainer] = None) -> ServiceContainer:
-    """
-    Create a service container.
+    async def find_service(self, service_name: Optional[str] = None, service_type: Optional[str] = None, status: ServiceStatus = ServiceStatus.HEALTHY) -> Optional[ServiceInstance]:
+        """Find a single healthy instance of a service. Implements basic round-robin."""
+        instances = await self.find_services(service_name, service_type, status)
+        if not instances:
+            return None
+        # Basic round-robin for now, could be enhanced with smarter load balancing
+        return instances[0]
 
-    Args:
-        parent: Optional parent container for hierarchical resolution
+    async def find_services(self, service_name: Optional[str] = None, service_type: Optional[str] = None, status: Optional[ServiceStatus] = ServiceStatus.HEALTHY) -> List[ServiceInstance]:
+        """Find all instances of a service matching criteria."""
+        await self._refresh_service_cache()
+        
+        filtered_services = list(self.service_cache.values())
 
-    Returns:
-        A new service container
-    """
-    return ServiceContainer(parent=parent)
+        if service_name:
+            filtered_services = [s for s in filtered_services if s.service_name == service_name]
+        if service_type:
+            filtered_services = [s for s in filtered_services if s.service_type == service_type]
+        if status:
+            filtered_services = [s for s in filtered_services if s.status == status]
+        
+        # Ensure they haven't expired according to their TTL (even if DB query includes this)
+        now = datetime.now(timezone.utc)
+        valid_services = [s for s in filtered_services if (s.last_heartbeat_at + timedelta(seconds=s.ttl_seconds)) > now]
+        
+        return sorted(valid_services, key=lambda s: s.registered_at) # Return oldest first for round-robin
 
-def create_factory() -> ServiceFactory:
-    """
-    Create a service factory.
+    async def record_health_check(self, health_check_data: ServiceHealthCheck):
+        """Record a health check result."""
+        # Update service status based on health check
+        await self.send_heartbeat(health_check_data.service_id, health_check_data.status, health_check_data.details)
 
-    Returns:
-        A new service factory
-    """
-    return ServiceFactory()
+        # Store detailed health check in Weaviate
+        client = self.db.get_weaviate_client()
+        if client:
+            properties = {
+                "check_id": health_check_data.check_id,
+                "service_id": health_check_data.service_id,
+                "service_name": health_check_data.service_name,
+                "status": health_check_data.status.value,
+                "details_json": json.dumps(health_check_data.details),
+                "checked_at_unix": int(health_check_data.checked_at.timestamp())
+            }
+            try:
+                client.data_object.create(
+                    data_object=properties,
+                    class_name=SERVICE_HEALTH_COLLECTION,
+                    uuid=health_check_data.check_id
+                )
+                logger.debug(f"Health check {health_check_data.check_id} for {health_check_data.service_name} stored in Weaviate.")
+            except Exception as e:
+                logger.error(f"Failed to store health check in Weaviate: {e}")
+        else:
+            logger.warning("Weaviate client not available. Health check details not stored in vector store.")
+        
+        event = ServiceLifecycleEvent.HEALTH_CHECK_PASSED if health_check_data.status == ServiceStatus.HEALTHY else ServiceLifecycleEvent.HEALTH_CHECK_FAILED
+        await self._log_lifecycle_event(health_check_data.service_id, event, health_check_data.details)
 
-# Example usage
+    async def get_service_health_history(self, service_id: str, limit: int = 10) -> List[ServiceHealthCheck]:
+        """Get recent health check history for a service (from Weaviate)."""
+        client = self.db.get_weaviate_client()
+        if not client:
+            logger.warning("Weaviate client not available for health history.")
+            return []
+        
+        try:
+            result = (
+                client.query
+                .get(SERVICE_HEALTH_COLLECTION, ["check_id", "service_id", "service_name", "status", "details_json", "checked_at_unix"])
+                .with_where({
+                    "path": ["service_id"],
+                    "operator": "Equal",
+                    "valueString": service_id
+                })
+                .with_sort([{"path": ["checked_at_unix"], "order": "desc"}])
+                .with_limit(limit)
+                .do()
+            )
+            
+            history = []
+            if result and "data" in result and "Get" in result["data"] and SERVICE_HEALTH_COLLECTION in result["data"]["Get"]:
+                for obj in result["data"]["Get"][SERVICE_HEALTH_COLLECTION]:
+                    history.append(ServiceHealthCheck(
+                        check_id=obj["check_id"],
+                        service_id=obj["service_id"],
+                        service_name=obj["service_name"],
+                        status=ServiceStatus(obj["status"]),
+                        details=json.loads(obj["details_json"]),
+                        checked_at=datetime.fromtimestamp(obj["checked_at_unix"], timezone.utc)
+                    ))
+            return history
+        except Exception as e:
+            logger.error(f"Failed to get service health history for {service_id}: {e}")
+            return []
+
+    async def cleanup_expired_services(self) -> int:
+        """Remove services whose TTL has expired."""
+        query = f"DELETE FROM {SERVICE_REGISTRY_TABLE} WHERE expires_at <= NOW() RETURNING service_id"
+        expired_services = await self.db.execute_query(query, fetch=True)
+        count = len(expired_services)
+        if count > 0:
+            expired_ids = [row['service_id'] for row in expired_services]
+            logger.info(f"Cleaned up {count} expired services: {expired_ids}")
+            for service_id in expired_ids:
+                if service_id in self.service_cache:
+                    del self.service_cache[service_id]
+                await self._log_lifecycle_event(service_id, ServiceLifecycleEvent.DEREGISTERED, {"reason": "TTL expired"})
+        return count
+
+    async def _log_lifecycle_event(self, service_id: str, event: ServiceLifecycleEvent, data: Optional[Dict] = None):
+        """Log a service lifecycle event (e.g., to an audit log or event stream)."""
+        # This is a placeholder for actual event logging. 
+        # Could write to a dedicated log, a message queue, or another table.
+        log_message = f"ServiceLifecycleEvent: service_id={service_id}, event={event.value}, data={data or {}}"
+        logger.info(log_message)
+        # Example: await self.db.execute_query("INSERT INTO service_lifecycle_logs ...")
+
+# --- Helper Functions and Main Execution ---
+async def run_service_cleanup_job(service_manager: UnifiedServiceManager):
+    """Periodically run service cleanup tasks."""
+    while True:
+        try:
+            logger.info("Running periodic service cleanup...")
+            cleaned_count = await service_manager.cleanup_expired_services()
+            logger.info(f"Service cleanup job: {cleaned_count} services removed.")
+        except Exception as e:
+            logger.error(f"Error in service cleanup job: {e}")
+        await asyncio.sleep(3600) # Run every hour
+
+async def main():
+    """Demonstrate usage of the UnifiedServiceManager."""
+    # Setup basic logging
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+    
+    # Ensure environment variables are set (POSTGRES_URL, etc.)
+    # Example: os.environ["POSTGRES_URL"] = "postgresql://user:pass@host:port/db"
+    
+    if not os.getenv("POSTGRES_URL"):
+        logger.error("POSTGRES_URL environment variable not set. Exiting.")
+        return
+
+    db = await initialize_database(postgres_url=os.environ["POSTGRES_URL"]) 
+    service_manager = UnifiedServiceManager(db)
+    
+    try:
+        await service_manager.initialize()
+
+        # Start cleanup job in background
+        asyncio.create_task(run_service_cleanup_job(service_manager))
+
+        # Example: Register a service
+        test_service = ServiceInstance(
+            service_name="test_mcp_server",
+            service_type="mcp_server",
+            version="1.0.0",
+            endpoint="http://localhost:8001",
+            status=ServiceStatus.HEALTHY,
+            metadata={"region": "us-west-1", "environment": "dev"}
+        )
+        await service_manager.register_service(test_service)
+
+        # Example: Find the service
+        found_service = await service_manager.find_service(service_name="test_mcp_server")
+        if found_service:
+            logger.info(f"Found service: {found_service.service_name} at {found_service.endpoint}")
+
+        # Example: Send heartbeat
+        await service_manager.send_heartbeat(test_service.service_id)
+
+        # Example: Record health check
+        health_data = ServiceHealthCheck(
+            service_id=test_service.service_id,
+            service_name=test_service.service_name,
+            status=ServiceStatus.DEGRADED,
+            details={"cpu_load": 0.85, "reason": "High CPU usage"}
+        )
+        await service_manager.record_health_check(health_data)
+        
+        health_history = await service_manager.get_service_health_history(test_service.service_id)
+        logger.info(f"Health history for {test_service.service_name}: {health_history}")
+
+        # Simulate waiting for a while to let cleanup run if there were expired services
+        # In a real app, this would be part of a long-running process or scheduled task
+        # await asyncio.sleep(3605) 
+
+    except Exception as e:
+        logger.error(f"Error in main demonstration: {e}")
+    finally:
+        # Clean up
+        if hasattr(service_manager, 'db') and service_manager.db._initialized:
+            await service_manager.deregister_service(test_service.service_id) # Clean up test service
+            await service_manager.db.close()
+        logger.info("Demonstration finished.")
+
 if __name__ == "__main__":
-    # Configure logging
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    )
-
-    # Define some example services
-    class Database:
-        def __init__(self, connection_string: str):
-            self.connection_string = connection_string
-
-        def connect(self) -> None:
-            print(f"Connected to database: {self.connection_string}")
-
-    class Repository:
-        def __init__(self, database: Database):
-            self.database = database
-
-        def get_data(self) -> List[str]:
-            self.database.connect()
-            return ["Item 1", "Item 2", "Item 3"]
-
-    class Service:
-        def __init__(self, repository: Repository):
-            self.repository = repository
-
-        def process(self) -> None:
-            data = self.repository.get_data()
-            print(f"Processing {len(data)} items")
-
-    # Create a container
-    container = create_container()
-
-    # Register services
-    container.register(
-        Database,
-        lambda connection_string: Database(connection_string),
-        scope=ServiceScope.SINGLETON,
-    )
-
-    container.register_auto_factory(
-        Repository,
-        scope=ServiceScope.SINGLETON,
-    )
-
-    container.register_auto_factory(
-        Service,
-        scope=ServiceScope.TRANSIENT,
-    )
-
-    # Resolve and use services
-    database = container.resolve(Database, connection_string="localhost:5432")
-    service = container.resolve(Service)
-    service.process()
-
-    print("Example complete")
+    # This main function is for demonstration; real service management would be part of the application lifecycle.
+    asyncio.run(main())

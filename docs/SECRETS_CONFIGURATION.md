@@ -220,3 +220,48 @@ Some services aren't available through Portkey and require direct API keys:
 | Secret Name | Description | Last Updated | Status |
 |------------|-------------|--------------|---------|
 | `SENTRY_DSN` | Error tracking | 3 months ago | ⚠️ Optional | 
+
+## Core Secrets Configuration
+
+| Environment Variable         | Description                                       | Last Changed | Purpose                 |
+|------------------------------|---------------------------------------------------|--------------|-------------------------|
+| `DATABASE_URL`               | PostgreSQL connection string                      | 1 week ago   | Primary data storage    |
+| `WEAVIATE_URL`               | Weaviate Cloud instance URL                       | 1 week ago   | Vector database         |
+| `WEAVIATE_API_KEY`           | Weaviate Cloud API key                            | 1 week ago   | Vector database auth    |
+| `VULTR_API_KEY`              | Vultr API Key for cloud infrastructure management | New          | Cloud provider          |
+| `OPENAI_API_KEY`             | OpenAI API key for GPT models                     | 2 weeks ago  | LLM access              |
+| `ANTHROPIC_API_KEY`          | Anthropic API key for Claude models               | 2 weeks ago  | LLM access              |
+| `RECRAFT_API_KEY`            | Recraft API key for design generation             | New          | Design AI               |
+| `OPENROUTER_API_KEY`         | OpenRouter API key for model routing              | New          | LLM routing             |
+| `JWT_SECRET_KEY`             | Secret key for signing JWT tokens                 | 3 weeks ago  | Authentication          |
+| `REDIS_URL`                  | Redis connection string (if used for caching)     | 4 weeks ago  | Caching (optional)      |
+| `ROOT_API_KEY`               | Master API key for administrative tasks           | 1 month ago  | System administration   |
+
+---
+
+## Setup and Management
+
+### Environment Variables
+- **Local Development**: Use a `.env` file in the project root. See `.env.example`.
+- **Vultr Deployment**: Set environment variables directly on the Vultr instance or through your deployment automation (e.g., cloud-init, Ansible, Pulumi).
+- **CI/CD (GitHub Actions)**: Store secrets in GitHub repository secrets (`Settings > Secrets and variables > Actions`).
+
+### Secret Management Best Practices
+- **Principle of Least Privilege**: Ensure API keys and service accounts have only the necessary permissions.
+- **Rotation**: Regularly rotate API keys and sensitive credentials.
+- **Storage**: Avoid hardcoding secrets. Use environment variables or a dedicated secret manager (e.g., HashiCorp Vault if self-hosted, or Vultr's metadata service if applicable for instance-specific secrets).
+- **Audit**: Regularly audit access to secrets and their usage.
+
+### Vultr Specifics
+- **VULTR_API_KEY**: This is the primary key for interacting with the Vultr API to manage instances, storage, networks, etc. Secure it carefully.
+- **Instance Metadata**: For services running on Vultr instances, consider if any configuration can be passed via user-data or instance metadata if appropriate and secure for your use case.
+
+### Deprecated Secrets (To Be Removed)
+- Any secrets related to GCP (e.g., `GCP_PROJECT_ID`, `GCP_MASTER_SERVICE_JSON`) should be identified and removed from all configurations and documentation after ensuring they are no longer in use.
+
+---
+
+## Notes
+- The `ROOT_API_KEY` should be a strong, randomly generated key and managed with extreme care.
+- For PostgreSQL, ensure the `DATABASE_URL` includes credentials with appropriate, limited permissions for the application.
+- Weaviate Cloud API keys are managed through the Weaviate Cloud console. 

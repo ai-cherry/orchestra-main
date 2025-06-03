@@ -12,12 +12,18 @@ import subprocess
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
+import logging
 
 # Configuration
-WORKSPACE_ROOT = Path("/workspaces/orchestra-main")
+WORKSPACE_ROOT = Path(__file__).resolve().parent.parent
 PERFORMANCE_LOG = WORKSPACE_ROOT / ".vscode" / "extension_performance.json"
 LOG_DIR = WORKSPACE_ROOT / "logs"
 MONITOR_LOG = LOG_DIR / "extension_monitor.log"
+
+# Set up centralized logging (INFO level, JSON format for standard log aggregators)
+LOG_FILE = WORKSPACE_ROOT / "logs" / "extension_performance.log"
+# Ensure logs directory exists
+LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
 
 # Thresholds for identifying problematic extensions
 THRESHOLD_CPU_PERCENT = 20.0  # CPU usage threshold in percent
@@ -199,7 +205,7 @@ def get_problematic_extensions(performance_log: Dict[str, Any]) -> List[Dict[str
 
 def main() -> None:
     """Main entry point for the script."""
-    # Set up centralized logging (INFO level, JSON format for GCP compatibility)
+    # Set up centralized logging (INFO level, JSON format for standard log aggregators)
     setup_logging(level="INFO", json_format=True)
     logger.info("Starting VS Code Extension Performance Monitor")
 

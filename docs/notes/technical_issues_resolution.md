@@ -431,6 +431,13 @@ Multiple automation scripts are being made executable, but one (`automation_deci
                    "memory_usage": 0.3,
                    "response_time": 0.2,
                    "error_rate": 0.2
+               },
+               "config": {
+                   "name": "Test Service",
+                   "version": "1.0.0",
+                   "host": "localhost",
+                   "port": 8080,
+                   "project_id": "your-vultr-project-id" # Example: Vultr project ID
                }
            }
 

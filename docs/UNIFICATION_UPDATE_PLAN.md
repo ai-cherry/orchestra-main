@@ -82,6 +82,15 @@ jobs:
             make restart-services
 ```
 
+### Obsolete Scripts (To Be Removed or Replaced)
+- `deploy_gcp_infra_quick.sh` - GCP specific, covered by Pulumi/Vultr
+- `deploy_aws_infra.sh` - AWS specific
+- `quick_start_cloud_run.sh` - GCP specific
+- `scripts/migrate_firestore_to_postgres.py` - One-time migration script
+- Any scripts relying on `gcloud` or `aws` CLI heavily without Vultr alternatives.
+
+### Monitoring & Logging (To Be Standardized)
+
 ## Implementation Steps
 1. Create new simplified GitHub workflow
 2. Archive old workflows and scripts
