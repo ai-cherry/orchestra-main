@@ -1,185 +1,125 @@
 #!/bin/bash
-# Setup GitHub Secrets for AI Orchestra CI/CD
-# ===========================================
+# Setup GitHub Secrets for AI Orchestration System
+# This script uses GitHub CLI to set repository secrets
 
-set -euo pipefail
+set -e
 
-# Color codes
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+echo "=== GitHub Secrets Setup for AI Orchestration ==="
+echo
 
-# Configuration
-GITHUB_REPO="${GITHUB_REPOSITORY:-}"
-Vultr_PROJECT_ID="${Vultr_PROJECT_ID:-}"
+# Check if gh CLI is installed
+if ! command -v gh &> /dev/null; then
+    echo "Error: GitHub CLI (gh) is not installed."
+    echo "Install it from: https://cli.github.com/"
+    exit 1
+fi
 
-log_info() {
-    echo -e "${BLUE}[INFO]${NC} $1"
-}
+# Check if authenticated
+if ! gh auth status &> /dev/null; then
+    echo "Error: Not authenticated with GitHub CLI."
+    echo "Run: gh auth login"
+    exit 1
+fi
 
-log_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
-}
+# Get repository info
+REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null || echo "")
+if [ -z "$REPO" ]; then
+    echo "Error: Not in a GitHub repository or cannot determine repository."
+    echo "Make sure you're in the repository directory."
+    exit 1
+fi
 
-log_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
+echo "Setting secrets for repository: $REPO"
+echo
 
-check_prerequisites() {
-    log_info "Checking prerequisites..."
-
-    # Check for GitHub CLI
-    if ! command -v gh &> /dev/null; then
-        log_error "GitHub CLI (gh) is not installed. Install it from: https://cli.github.com/"
-        exit 1
+# Function to set a secret
+set_secret() {
+    local name=$1
+    local value=$2
+    
+    if [ -z "$value" ]; then
+        echo "⚠️  Skipping $name (no value provided)"
+        return
     fi
-
-    # Check GitHub authentication
-    if ! gh auth status &> /dev/null; then
-        log_error "Not authenticated with GitHub. Run: gh auth login"
-        exit 1
+    
+    echo -n "Setting $name... "
+    if gh secret set "$name" --body "$value" &>/dev/null; then
+        echo "✓"
+    else
+        echo "✗ (failed)"
     fi
+}
 
-    # Check environment variables
-    if [[ -z "$GITHUB_REPO" ]]; then
-        log_error "GITHUB_REPOSITORY environment variable not set (format: owner/repo)"
-        exit 1
+# Database Configuration
+echo "=== Database Configuration ==="
+set_secret "POSTGRES_HOST" "localhost"
+set_secret "POSTGRES_PORT" "5432"
+set_secret "POSTGRES_DB" "orchestra"
+set_secret "POSTGRES_USER" "orchestra"
+set_secret "POSTGRES_PASSWORD" "orchestra"
+
+# Weaviate Configuration
+echo -e "\n=== Weaviate Configuration ==="
+set_secret "WEAVIATE_URL" "http://localhost:8080"
+set_secret "WEAVIATE_API_KEY" "local-dev-key"
+
+# AI Service API Keys (from environment or prompt)
+echo -e "\n=== AI Service API Keys ==="
+
+# Function to get API key from environment or prompt
+get_api_key() {
+    local key_name=$1
+    local env_value="${!key_name}"
+    
+    if [ -n "$env_value" ]; then
+        echo "$env_value"
+    else
+        echo ""
     fi
-
-    if [[ -z "$Vultr_PROJECT_ID" ]]; then
-        log_error "Vultr_PROJECT_ID environment variable not set"
-        exit 1
-    fi
-
-    log_success "Prerequisites checked"
 }
 
-setup_workload_identity() {
-    log_info "Setting up Workload Identity Federation..."
+# Set AI service keys
+set_secret "ANTHROPIC_API_KEY" "$(get_api_key ANTHROPIC_API_KEY)"
+set_secret "OPENAI_API_KEY" "$(get_api_key OPENAI_API_KEY)"
+set_secret "OPENROUTER_API_KEY" "$(get_api_key OPENROUTER_API_KEY)"
+set_secret "GROK_AI_API_KEY" "$(get_api_key GROK_AI_API_KEY)"
+set_secret "MISTRAL_API_KEY" "$(get_api_key MISTRAL_API_KEY)"
+set_secret "PERPLEXITY_API_KEY" "$(get_api_key PERPLEXITY_API_KEY)"
 
-    # Create service account for GitHub Actions
-    SA_NAME="github-actions-sa"
-    SA_EMAIL="${SA_NAME}@${Vultr_PROJECT_ID}.iam.gserviceaccount.com"
+# Other Service Keys
+echo -e "\n=== Other Service API Keys ==="
+set_secret "ELEVEN_LABS_API_KEY" "$(get_api_key ELEVEN_LABS_API_KEY)"
+set_secret "FIGMA_PERSONAL_ACCESS_TOKEN" "$(get_api_key FIGMA_PERSONAL_ACCESS_TOKEN)"
+set_secret "NOTION_API_KEY" "$(get_api_key NOTION_API_KEY)"
+set_secret "PORTKEY_API_KEY" "$(get_api_key PORTKEY_API_KEY)"
+set_secret "PORTKEY_CONFIG" "$(get_api_key PORTKEY_CONFIG)"
+set_secret "PHANTOM_BUSTER_API_KEY" "$(get_api_key PHANTOM_BUSTER_API_KEY)"
 
-    # Create service account
-    gcloud iam service-accounts create $SA_NAME \
-        --display-name="GitHub Actions Service Account" \
-        --project=$Vultr_PROJECT_ID || true
+# GitHub Tokens
+echo -e "\n=== GitHub Tokens ==="
+set_secret "GITHUB_TOKEN" "$(get_api_key GITHUB_TOKEN)"
+set_secret "GH_CLASSIC_PAT_TOKEN" "$(get_api_key GH_CLASSIC_PAT_TOKEN)"
+set_secret "GH_FINE_GRAINED_TOKEN" "$(get_api_key GH_FINE_GRAINED_TOKEN)"
 
-    # Grant necessary permissions
-    log_info "Granting permissions to service account..."
+# Infrastructure Keys (for deployment)
+echo -e "\n=== Infrastructure Keys ==="
+set_secret "VULTR_API_KEY" "$(get_api_key VULTR_API_KEY)"
+set_secret "AIRBYTE_API_KEY" "$(get_api_key AIRBYTE_API_KEY)"
+set_secret "AIRBYTE_API_URL" "$(get_api_key AIRBYTE_API_URL)"
+set_secret "AIRBYTE_WORKSPACE_ID" "$(get_api_key AIRBYTE_WORKSPACE_ID)"
 
-    roles=(
-        "roles/container.developer"
-        "roles/storage.admin"
-        "roles/artifactregistry.writer"
-        "roles/iam.serviceAccountUser"
-    )
+# Pulumi Configuration
+set_secret "PULUMI_CONFIG_PASSPHRASE" "$(get_api_key PULUMI_CONFIG_PASSPHRASE)"
+set_secret "AWS_ACCESS_KEY_ID" "$(get_api_key AWS_ACCESS_KEY_ID)"
+set_secret "AWS_SECRET_ACCESS_KEY" "$(get_api_key AWS_SECRET_ACCESS_KEY)"
 
-    for role in "${roles[@]}"; do
-        gcloud projects add-iam-policy-binding $Vultr_PROJECT_ID \
-            --member="serviceAccount:${SA_EMAIL}" \
-            --role="$role" \
-            --condition=None
-    done
-
-    # Create Workload Identity Pool
-    POOL_NAME="github-actions-pool"
-    PROVIDER_NAME="github-provider"
-
-    log_info "Creating Workload Identity Pool..."
-    gcloud iam workload-identity-pools create $POOL_NAME \
-        --location="global" \
-        --display-name="GitHub Actions Pool" \
-        --project=$Vultr_PROJECT_ID || true
-
-    # Create Workload Identity Provider
-    log_info "Creating Workload Identity Provider..."
-    gcloud iam workload-identity-pools providers create-oidc $PROVIDER_NAME \
-        --location="global" \
-        --workload-identity-pool=$POOL_NAME \
-        --display-name="GitHub Provider" \
-        --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository" \
-        --issuer-uri="https://token.actions.githubusercontent.com" \
-        --project=$Vultr_PROJECT_ID || true
-
-    # Get provider resource name
-    PROVIDER_RESOURCE=$(gcloud iam workload-identity-pools providers describe $PROVIDER_NAME \
-        --location="global" \
-        --workload-identity-pool=$POOL_NAME \
-        --project=$Vultr_PROJECT_ID \
-        --format="value(name)")
-
-    # Grant service account access
-    log_info "Configuring service account impersonation..."
-    gcloud iam service-accounts add-iam-policy-binding $SA_EMAIL \
-        --role="roles/iam.workloadIdentityUser" \
-        --member="principalSet://iam.googleapis.com/${PROVIDER_RESOURCE}/attribute.repository/${GITHUB_REPO}" \
-        --project=$Vultr_PROJECT_ID
-
-    echo
-    log_success "Workload Identity Federation configured!"
-    echo "WIF_PROVIDER: ${PROVIDER_RESOURCE}"
-    echo "WIF_SERVICE_ACCOUNT: ${SA_EMAIL}"
-}
-
-set_github_secrets() {
-    log_info "Setting GitHub repository secrets..."
-
-    # Get Pulumi access token
-    read -sp "Enter your Pulumi Access Token: " PULUMI_TOKEN
-    echo
-
-    # Set secrets
-    log_info "Setting PULUMI_ACCESS_TOKEN..."
-    echo "$PULUMI_TOKEN" | gh secret set PULUMI_ACCESS_TOKEN --repo=$GITHUB_REPO
-
-    log_info "Setting Vultr_PROJECT_ID..."
-    echo "$Vultr_PROJECT_ID" | gh secret set Vultr_PROJECT_ID --repo=$GITHUB_REPO
-
-    log_info "Setting WIF_PROVIDER..."
-    echo "$PROVIDER_RESOURCE" | gh secret set WIF_PROVIDER --repo=$GITHUB_REPO
-
-    log_info "Setting WIF_SERVICE_ACCOUNT..."
-    echo "$SA_EMAIL" | gh secret set WIF_SERVICE_ACCOUNT --repo=$GITHUB_REPO
-
-    # Optional secrets
-    if [[ -n "${SLACK_WEBHOOK:-}" ]]; then
-        log_info "Setting SLACK_WEBHOOK..."
-        echo "$SLACK_WEBHOOK" | gh secret set SLACK_WEBHOOK --repo=$GITHUB_REPO
-    fi
-
-    log_success "GitHub secrets configured!"
-}
-
-print_summary() {
-    echo
-    echo -e "${GREEN}=== Setup Complete ===${NC}"
-    echo
-    echo "GitHub Actions is now configured with:"
-    echo "- Workload Identity Federation for keyless authentication"
-    echo "- Pulumi access token for infrastructure deployments"
-    echo "- Vultr project configuration"
-    echo
-    echo "Next steps:"
-    echo "1. Commit and push your changes to trigger the workflow"
-    echo "2. Monitor the Actions tab in your GitHub repository"
-    echo "3. The workflow will automatically deploy on push to main/develop"
-    echo
-    echo "Manual deployment:"
-    echo "gh workflow run pulumi-deploy.yml -f stack=dev"
-}
-
-main() {
-    log_info "Starting GitHub Actions setup for AI Orchestra..."
-
-    check_prerequisites
-    setup_workload_identity
-    set_github_secrets
-    print_summary
-}
-
-# Run main
-main "$@"
+echo -e "\n=== Setup Complete ==="
+echo "GitHub Secrets have been configured for $REPO"
+echo
+echo "To view all secrets:"
+echo "  gh secret list"
+echo
+echo "To update a specific secret:"
+echo "  gh secret set SECRET_NAME"
+echo
+echo "Note: Secrets are encrypted and only available to GitHub Actions workflows."

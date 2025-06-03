@@ -1,0 +1,58 @@
+{
+  "timestamp": "2025-06-03T06:34:40.702460",
+  "modularity_score": 100,
+  "domain_separation": {
+    "Personal": {
+      "file_count": 0,
+      "isolated": false
+    },
+    "PayReady": {
+      "file_count": 0,
+      "isolated": false
+    },
+    "ParagonRX": {
+      "file_count": 0,
+      "isolated": false
+    }
+  },
+  "infrastructure_flexibility": {
+    "iac": "Pulumi",
+    "containerization": true,
+    "config_management": "Good",
+    "env_separation": true,
+    "score": 100
+  },
+  "improvements_needed": [
+    "No dedicated structure for Personal domain",
+    "No dedicated structure for PayReady domain",
+    "No dedicated structure for ParagonRX domain"
+  ],
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "category": "Domain Separation",
+      "action": "Create dedicated directory structure for each domain",
+      "implementation": "\nmkdir -p domains/{Personal,PayReady,ParagonRX}/{services,models,api,config}\n                "
+    }
+  ],
+  "directory_analysis": {
+    "services": 23,
+    "components": 91,
+    "modules": 2571,
+    "domains": 4,
+    "shared": 43,
+    "core": 321,
+    "infrastructure": 19,
+    "config": 76
+  },
+  "service_integration": {
+    "patterns": {
+      "api_gateway": true,
+      "service_registry": true,
+      "message_queue": true,
+      "event_bus": true,
+      "plugin_system": true
+    },
+    "score": 100
+  }
+}

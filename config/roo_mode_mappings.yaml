@@ -1,0 +1,216 @@
+# Roo Mode to Agent Mappings Configuration
+# This file defines how Roo modes are mapped to MCP-compatible agents
+
+roo_modes:
+  code:
+    agent_id: roo_code_agent
+    display_name: "💻 Developer"
+    model: anthropic/claude-opus-4
+    role: "Expert Python/TypeScript developer for orchestration, Postgres, Weaviate, and Pulumi"
+    capabilities:
+      - code_generation
+      - code_review
+      - refactoring
+      - debugging
+      - testing
+    file_patterns:
+      - "*.py"
+      - "*.ts"
+      - "*.js"
+      - "*.tsx"
+      - "*.jsx"
+    max_tokens: 4096
+    temperature: 0.7
+    
+  architect:
+    agent_id: roo_architect_agent
+    display_name: "🏗 Architect"
+    model: anthropic/claude-opus-4
+    role: "AI architect for modular, high-performance orchestration using PostgreSQL, Weaviate, and Pulumi on Vultr"
+    capabilities:
+      - system_design
+      - architecture_review
+      - component_design
+      - integration_planning
+    file_patterns:
+      - "*.md"
+    max_tokens: 4096
+    temperature: 0.7
+    
+  ask:
+    agent_id: roo_ask_agent
+    display_name: "❓ Ask"
+    model: anthropic/claude-3.5-sonnet
+    role: "Knowledgeable technical assistant focused on answering questions and providing information"
+    capabilities:
+      - question_answering
+      - explanation
+      - guidance
+    max_tokens: 4096
+    temperature: 0.5
+    
+  debug:
+    agent_id: roo_debug_agent
+    display_name: "🪲 Debugger"
+    model: anthropic/claude-opus-4
+    role: "Systematic debugger for orchestration, Postgres, Weaviate, and MCP"
+    capabilities:
+      - error_analysis
+      - root_cause_analysis
+      - fix_suggestion
+      - testing
+    max_tokens: 4096
+    temperature: 0.3
+    
+  orchestrator:
+    agent_id: roo_orchestrator_agent
+    display_name: "🪃 Orchestrator"
+    model: anthropic/claude-opus-4
+    role: "AI workflow orchestrator for task decomposition, agent coordination, and context management"
+    capabilities:
+      - task_decomposition
+      - agent_coordination
+      - context_management
+      - workflow_optimization
+    max_tokens: 4096
+    temperature: 0.7
+    
+  strategy:
+    agent_id: roo_strategy_agent
+    display_name: "🧠 Strategist"
+    model: anthropic/claude-opus-4
+    role: "Technical strategist for AI system architecture, Vultr optimization, and tech selection"
+    capabilities:
+      - technology_selection
+      - optimization_planning
+      - risk_assessment
+      - roadmap_creation
+    max_tokens: 4096
+    temperature: 0.8
+    
+  research:
+    agent_id: roo_research_agent
+    display_name: "🔍 Researcher"
+    model: anthropic/claude-3.5-sonnet
+    role: "AI research assistant for best practices, benchmarking, and solution exploration"
+    capabilities:
+      - best_practices_research
+      - benchmarking
+      - solution_exploration
+      - documentation_analysis
+    max_tokens: 4096
+    temperature: 0.6
+    
+  analytics:
+    agent_id: roo_analytics_agent
+    display_name: "📊 Analytics"
+    model: anthropic/claude-3.5-sonnet
+    role: "Data analysis expert for metrics, performance monitoring, and reporting"
+    capabilities:
+      - metrics_analysis
+      - performance_monitoring
+      - reporting
+      - visualization
+    max_tokens: 4096
+    temperature: 0.4
+    
+  implementation:
+    agent_id: roo_implementation_agent
+    display_name: "⚙️ Implementation"
+    model: anthropic/claude-opus-4
+    role: "Operations implementation expert for deployment, process execution, and Pulumi IaC"
+    capabilities:
+      - deployment
+      - process_execution
+      - infrastructure_as_code
+      - automation
+    max_tokens: 4096
+    temperature: 0.5
+    
+  quality:
+    agent_id: roo_quality_agent
+    display_name: "✅ Quality Control"
+    model: anthropic/claude-3.5-sonnet
+    role: "Quality assurance specialist for validation and performance verification"
+    capabilities:
+      - validation
+      - performance_verification
+      - compliance_checking
+      - test_automation
+    max_tokens: 4096
+    temperature: 0.3
+    
+  documentation:
+    agent_id: roo_documentation_agent
+    display_name: "📝 Documentation"
+    model: anthropic/claude-3.5-sonnet
+    role: "Knowledge management specialist for process documentation and standard maintenance"
+    capabilities:
+      - documentation_generation
+      - process_documentation
+      - standard_maintenance
+      - knowledge_organization
+    max_tokens: 4096
+    temperature: 0.5
+
+# Transition rules for automatic mode switching
+transition_rules:
+  - name: code_error_to_debug
+    from_mode: code
+    to_mode: debug
+    condition: "error_detected"
+    priority: 90
+    description: "Automatically switch to debug mode when code errors are detected"
+    
+  - name: research_to_implementation
+    from_mode: research
+    to_mode: implementation
+    condition: "research_complete"
+    priority: 80
+    description: "Move to implementation after research phase is complete"
+    
+  - name: architect_to_code
+    from_mode: architect
+    to_mode: code
+    condition: "design_approved"
+    priority: 85
+    description: "Start coding after architecture design is approved"
+    
+  - name: quality_to_debug
+    from_mode: quality
+    to_mode: debug
+    condition: "quality_issues_found"
+    priority: 75
+    description: "Debug issues found during quality checks"
+    
+  - name: strategy_to_research
+    from_mode: strategy
+    to_mode: research
+    condition: "needs_research"
+    priority: 70
+    description: "Conduct research for strategic decisions"
+
+# Performance optimization settings
+performance:
+  cache_mode_outputs: true
+  cache_ttl_seconds: 3600
+  max_context_size: 100000
+  context_pruning_enabled: true
+  parallel_mode_execution: false
+  
+# Integration settings
+integrations:
+  openrouter:
+    base_url: "https://openrouter.ai/api/v1"
+    timeout_seconds: 30
+    retry_attempts: 3
+    
+  weaviate:
+    index_outputs: true
+    semantic_search: true
+    vector_dimensions: 1536
+    
+  postgresql:
+    store_transitions: true
+    store_outputs: true
+    retention_days: 90

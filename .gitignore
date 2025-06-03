@@ -74,3 +74,9 @@ nohup.out
 *.md
 !README.md
 !.roo/**/*.md
+
+# Environment variables
+# API Keys
+api_keys.txt
+config/secrets.json
+!.env.example

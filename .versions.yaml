@@ -3953,17 +3953,6 @@ dependencies:
       update_priority: 0
       license: null
       last_updated: '2025-06-01T08:34:42.984034+00:00'
-    npm:@pulumi/gcp:
-      name: '@pulumi/gcp'
-      current_version: 7.0.0
-      latest_version: null
-      constraint: ^7.0.0
-      type: javascript
-      source_file: dashboard/package.json
-      vulnerabilities: 0
-      update_priority: 0
-      license: null
-      last_updated: '2025-06-01T08:34:42.984034+00:00'
     npm:p-queue:
       name: p-queue
       current_version: 7.4.1

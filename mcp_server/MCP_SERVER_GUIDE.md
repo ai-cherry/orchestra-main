@@ -51,23 +51,50 @@ The `manage_mcp_servers.sh` script provides comprehensive server control:
 ./manage_mcp_servers.sh restart
 ```
 
-### Available Servers (Example Vultr-centric Setup)
+### Available Servers (Reflecting Actual Deployed Services)
 
-1.  **`vultr-app-deployer`** - Deploy and manage applications on Vultr instances.
-    *   Required: `VULTR_API_KEY`
-    *   Capabilities: deploy, update, status, list, logs, scale (via instance changes or auto-scaling groups if configured)
+This list reflects the MCP servers typically active in your Vultr-based Orchestra AI environment. Refer to `mcp_server/server_registry.json` and individual server scripts in `mcp_server/servers/` for precise details.
 
-2.  **`secret-manager-tool`** - Manage secrets (e.g., using HashiCorp Vault on Vultr, or environment variables for simpler setups).
-    *   Required: Depends on chosen secret management solution (e.g., `VAULT_ADDR`, `VAULT_TOKEN`)
-    *   Capabilities: get, create, update, list, versions
+1.  **`orchestrator` / `orchestrator-mcp`**
+    *   **Likely Role**: Core workflow execution and task management. Coordinates other MCP services and AI agents.
+    *   Required: `POSTGRES_URL` (for state), `WEAVIATE_URL`, `VULTR_API_KEY` (potentially for dynamic resource management).
+    *   Capabilities: Workflow definition, task queuing, agent dispatch, context aggregation.
 
-3.  **`memory-cache-server`** - Short-term memory cache (e.g., Redis or DragonflyDB hosted on Vultr).
-    *   Optional: `CACHE_HOST`, `CACHE_PORT`, `CACHE_PASSWORD`
-    *   Capabilities: get, set, delete, list, ttl, pipeline
+2.  **`memory` / `memory-mcp` / `enhanced-memory` / `orchestra-memory-mcp`**
+    *   **Likely Role**: Provides various forms of memory to AI agents. This could include:
+        *   Short-term conversational context (e.g., Redis/DragonflyDB via `memory-cache-server` if that's one of these).
+        *   Long-term semantic memory (Weaviate via `weaviate-direct-mcp`).
+        *   Episodic or structured memory (PostgreSQL JSONB via `document-db-manager` if that's one of these).
+        *   `enhanced-memory` might offer optimized retrieval or combined memory types.
+    *   Required: `POSTGRES_URL`, `WEAVIATE_URL`, `WEAVIATE_API_KEY`, potentially cache DB connection strings.
+    *   Capabilities: Store, retrieve, update, search memories; manage context windows.
 
-4.  **`document-db-manager`** - Mid-term episodic memory (e.g., PostgreSQL with JSONB, or a dedicated DocumentDB on Vultr).
-    *   Required: `POSTGRES_URL` (if using PostgreSQL for this)
-    *   Capabilities: create, read, update, query, batch, transaction
+3.  **`weaviate-direct-mcp`**
+    *   **Likely Role**: Dedicated MCP interface for direct, optimized interactions with Weaviate Cloud.
+    *   Required: `WEAVIATE_URL`, `WEAVIATE_API_KEY`.
+    *   Capabilities: Vector search, object storage/retrieval, schema management in Weaviate.
+
+4.  **`deployment`**
+    *   **Likely Role**: Handles application deployment tasks, possibly interacting with Vultr instances or container registries.
+    *   Required: `VULTR_API_KEY`, potentially container registry credentials.
+    *   Capabilities: Deploy services, update instances, manage deployment configurations.
+
+5.  **`tools`**
+    *   **Likely Role**: Provides a collection of general-purpose utilities or interfaces to external tools (e.g., web search, calculations, file operations).
+    *   Required: Varies based on the tools provided (e.g., API keys for external services).
+    *   Capabilities: Execution of registered tools, discovery of available tools.
+
+6.  **`web-scraping-mcp`**
+    *   **Likely Role**: Dedicated service for web scraping and data extraction tasks.
+    *   Required: None directly, but may need network access and potentially proxy configurations.
+    *   Capabilities: Fetch web content, parse HTML, extract structured data from web pages.
+
+7.  **`base-mcp`**
+    *   **Likely Role**: Provides foundational functionalities or a common API structure inherited by other MCP servers. May handle very basic context or passthrough requests.
+    *   Required: Minimal, possibly just core application settings.
+    *   Capabilities: Basic health checks, service discovery endpoints.
+
+*(Note: The exact capabilities and requirements should be verified by checking the source code of each server and the `server_registry.json`.)*
 
 ## Logging and Debugging
 

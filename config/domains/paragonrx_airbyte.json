@@ -1,0 +1,59 @@
+{
+  "namespace": "paragonrx",
+  "connections": [
+    {
+      "name": "ParagonRX_postgres_to_weaviate",
+      "source": {
+        "type": "postgres",
+        "database": "orchestra_db",
+        "schema": "paragonrx_domain",
+        "tables": [
+          "paragonrx_events",
+          "paragonrx_interactions",
+          "paragonrx_analytics"
+        ]
+      },
+      "destination": {
+        "type": "weaviate",
+        "cluster_url": "https://paragonrx-karen-cluster.weaviate.network",
+        "collection": "paragonrx_knowledge"
+      },
+      "schedule": {
+        "type": "cron",
+        "expression": "0 */6 * * *"
+      },
+      "transformations": [
+        {
+          "type": "field_mapping",
+          "mappings": {
+            "event_data": "content",
+            "event_type": "category",
+            "created_at": "timestamp"
+          }
+        }
+      ]
+    },
+    {
+      "name": "ParagonRX_api_to_postgres",
+      "source": {
+        "type": "http_api",
+        "endpoint": "/api/paragonrx/events",
+        "method": "GET",
+        "pagination": {
+          "type": "offset",
+          "limit": 1000
+        }
+      },
+      "destination": {
+        "type": "postgres",
+        "database": "orchestra_db",
+        "schema": "paragonrx_domain",
+        "table": "paragonrx_raw_events"
+      },
+      "schedule": {
+        "type": "interval",
+        "minutes": 30
+      }
+    }
+  ]
+}
