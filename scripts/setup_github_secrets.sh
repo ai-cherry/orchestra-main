@@ -1,10 +1,10 @@
 #!/bin/bash
-# Setup GitHub Secrets for AI Orchestration System
+# Setup GitHub Secrets for AI coordination System
 # This script uses GitHub CLI to set repository secrets
 
 set -e
 
-echo "=== GitHub Secrets Setup for AI Orchestration ==="
+echo "=== GitHub Secrets Setup for AI coordination ==="
 echo
 
 # Check if gh CLI is installed
@@ -54,9 +54,9 @@ set_secret() {
 echo "=== Database Configuration ==="
 set_secret "POSTGRES_HOST" "localhost"
 set_secret "POSTGRES_PORT" "5432"
-set_secret "POSTGRES_DB" "orchestra"
-set_secret "POSTGRES_USER" "orchestra"
-set_secret "POSTGRES_PASSWORD" "orchestra"
+set_secret "POSTGRES_DB" "cherry_ai"
+set_secret "POSTGRES_USER" "cherry_ai"
+set_secret "POSTGRES_PASSWORD" "cherry_ai"
 
 # Weaviate Configuration
 echo -e "\n=== Weaviate Configuration ==="

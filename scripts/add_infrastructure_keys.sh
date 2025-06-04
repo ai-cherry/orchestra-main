@@ -52,7 +52,7 @@ if [[ "$response" =~ ^[Yy]$ ]]; then
     
     # Airbyte (probably not needed)
     echo
-    echo "Airbyte keys (press Enter to skip - not needed for AI orchestration):"
+    echo "Airbyte keys (press Enter to skip - not needed for AI coordination):"
     echo -n "AIRBYTE_API_KEY: "
     read -r AIRBYTE_KEY
     add_to_env "AIRBYTE_API_KEY" "$AIRBYTE_KEY"
@@ -72,7 +72,7 @@ if [[ "$response" =~ ^[Yy]$ ]]; then
     echo "✅ They will be loaded automatically - you NEVER need to enter them again!"
 else
     echo
-    echo "No problem! Your AI orchestration works perfectly without these keys."
+    echo "No problem! Your AI coordination works perfectly without these keys."
     echo "Run this script later when you get infrastructure keys."
 fi
 

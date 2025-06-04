@@ -20,7 +20,7 @@ echo "📊 PostgreSQL Status:"
 if systemctl is-active --quiet postgresql; then
     echo "✅ PostgreSQL is running"
     # Test connection
-    if PGPASSWORD=orch3str4_2024 psql -h localhost -U orchestrator -d orchestrator -c "SELECT 1;" >/dev/null 2>&1; then
+    if PGPASSWORD=orch3str4_2024 psql -h localhost -U conductor -d conductor -c "SELECT 1;" >/dev/null 2>&1; then
         echo "✅ PostgreSQL connection successful"
     else
         echo "❌ PostgreSQL connection failed (check password/permissions)"
@@ -32,7 +32,7 @@ echo ""
 
 # Check systemd services
 echo "🔧 Systemd Service Status:"
-for service in mcp-memory mcp-orchestrator mcp-tools mcp-weaviate; do
+for service in mcp-memory mcp-conductor mcp-tools mcp-weaviate; do
     if systemctl is-active --quiet $service; then
         echo "✅ $service is running"
     else
@@ -44,14 +44,14 @@ echo ""
 # Check ports
 echo "🌐 Port Status:"
 check_port 8001 "Weaviate Direct MCP"
-check_port 8002 "Orchestrator MCP"
+check_port 8002 "conductor MCP"
 check_port 8003 "Memory MCP"
 check_port 8006 "Tools MCP"
 echo ""
 
 # Check recent logs for errors
 echo "📝 Recent Errors (last 10 lines):"
-for service in mcp-memory mcp-orchestrator mcp-tools mcp-weaviate; do
+for service in mcp-memory mcp-conductor mcp-tools mcp-weaviate; do
     if systemctl is-enabled --quiet $service 2>/dev/null; then
         errors=$(journalctl -u $service -n 10 --no-pager 2>/dev/null | grep -i error | tail -3)
         if [ -n "$errors" ]; then

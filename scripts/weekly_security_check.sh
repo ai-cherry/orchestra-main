@@ -1,6 +1,6 @@
 #!/bin/bash
-# Weekly Security Check for Orchestra AI
-# Run this with cron: 0 2 * * 1 /root/orchestra-main/scripts/weekly_security_check.sh
+# Weekly Security Check for Cherry AI
+# Run this with cron: 0 2 * * 1 /root/cherry_ai-main/scripts/weekly_security_check.sh
 
 set -e
 
@@ -69,7 +69,7 @@ log "Found $OUTDATED_COUNT outdated packages"
 # Check GitHub Dependabot alerts (requires gh CLI)
 if command -v gh &> /dev/null; then
     print_header "Checking GitHub Dependabot Alerts"
-    gh api repos/ai-cherry/orchestra-main/vulnerability-alerts \
+    gh api repos/ai-cherry/cherry_ai-main/vulnerability-alerts \
         --jq '.[] | {package: .affected_package_name, severity: .severity}' \
         > "$REPORT_DIR/github_alerts_$DATE.json" 2>/dev/null || \
         log "${YELLOW}⚠ Could not fetch GitHub alerts (may need authentication)${NC}"
@@ -109,7 +109,7 @@ log "\n${GREEN}Summary report saved to: $SUMMARY_FILE${NC}"
 
 # Send notification (optional - configure as needed)
 # Example: Send email notification
-# mail -s "Weekly Security Report - Orchestra AI" admin@example.com < "$SUMMARY_FILE"
+# mail -s "Weekly Security Report - Cherry AI" admin@example.com < "$SUMMARY_FILE"
 
 # Cleanup old logs (keep last 4 weeks)
 print_header "Cleaning Up Old Logs"

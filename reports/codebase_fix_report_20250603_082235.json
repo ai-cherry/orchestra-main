@@ -1,0 +1,98 @@
+{
+  "timestamp": "2025-06-03T08:22:35.789042",
+  "audit_file": "/root/cherry_ai-main/audit_report_20250603_080333.json",
+  "completed_phases": [
+    "configurations",
+    "versions",
+    "dependencies",
+    "runtime_errors",
+    "api_contracts",
+    "error_handling",
+    "duplicates",
+    "mcp_servers"
+  ],
+  "success_count": 12,
+  "error_count": 1,
+  "fix_log": [
+    {
+      "timestamp": "2025-06-03T08:22:35.779513",
+      "category": "mcp_servers",
+      "action": "Fixed conductor_server.py",
+      "result": "Success"
+    },
+    {
+      "timestamp": "2025-06-03T08:22:35.780155",
+      "category": "mcp_servers",
+      "action": "Fixed memory_server.py",
+      "result": "Success"
+    },
+    {
+      "timestamp": "2025-06-03T08:22:35.780499",
+      "category": "mcp_servers",
+      "action": "Fixed tools_server.py",
+      "result": "Success"
+    },
+    {
+      "timestamp": "2025-06-03T08:22:35.780711",
+      "category": "mcp_servers",
+      "action": "Failed to fix weaviate_direct_mcp_server.py",
+      "result": "missing ), unterminated subpattern at position 33",
+      "error": "missing ), unterminated subpattern at position 33",
+      "traceback": "Traceback (most recent call last):\n  File \"/root/cherry_ai-main/scripts/cherry_aited_codebase_fix.py\", line 291, in fix_mcp_servers\n    after_count = len(re.findall(replacement, content))\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/re/__init__.py\", line 217, in findall\n    return _compile(pattern, flags).findall(string)\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/re/__init__.py\", line 307, in _compile\n    p = _compiler.compile(pattern, flags)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/re/_compiler.py\", line 745, in compile\n    p = _parser.parse(p, flags)\n        ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/re/_parser.py\", line 979, in parse\n    p = _parse_sub(source, state, flags & SRE_FLAG_VERBOSE, 0)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/re/_parser.py\", line 460, in _parse_sub\n    itemsappend(_parse(source, state, verbose, nested + 1,\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/re/_parser.py\", line 864, in _parse\n    raise source.error(\"missing ), unterminated subpattern\",\nre.error: missing ), unterminated subpattern at position 33\n"
+    },
+    {
+      "timestamp": "2025-06-03T08:22:35.786396",
+      "category": "dependencies",
+      "action": "Created 18 __init__.py files",
+      "result": "Success"
+    },
+    {
+      "timestamp": "2025-06-03T08:22:35.786445",
+      "category": "dependencies",
+      "action": "Fixed 0 import errors",
+      "result": "Success"
+    },
+    {
+      "timestamp": "2025-06-03T08:22:35.786800",
+      "category": "duplicates",
+      "action": "Created shared utilities module",
+      "result": "Success"
+    },
+    {
+      "timestamp": "2025-06-03T08:22:35.786929",
+      "category": "duplicates",
+      "action": "Created shared main utilities",
+      "result": "Success"
+    },
+    {
+      "timestamp": "2025-06-03T08:22:35.787348",
+      "category": "configurations",
+      "action": "Created comprehensive .env.example",
+      "result": "Success"
+    },
+    {
+      "timestamp": "2025-06-03T08:22:35.787642",
+      "category": "configurations",
+      "action": "Fixed tsconfig.json syntax",
+      "result": "Success"
+    },
+    {
+      "timestamp": "2025-06-03T08:22:35.788046",
+      "category": "versions",
+      "action": "Created unified requirements file",
+      "result": "Success"
+    },
+    {
+      "timestamp": "2025-06-03T08:22:35.788433",
+      "category": "api_contracts",
+      "action": "Created API router registry",
+      "result": "Success"
+    },
+    {
+      "timestamp": "2025-06-03T08:22:35.788802",
+      "category": "error_handling",
+      "action": "Created centralized error handler",
+      "result": "Success"
+    }
+  ]
+}

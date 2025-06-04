@@ -1,10 +1,10 @@
-# AI Orchestra Agent Infrastructure
+# AI cherry_ai Agent Infrastructure
 
-This document provides an overview of the AI Orchestra agent infrastructure, focusing on the memory system and agent configuration.
+This document provides an overview of the AI cherry_ai agent infrastructure, focusing on the memory system and agent configuration.
 
 ## Memory Architecture
 
-AI Orchestra uses a layered memory architecture that provides different types of memory for different use cases:
+AI cherry_ai uses a layered memory architecture that provides different types of memory for different use cases:
 
 ### Memory Layers
 
@@ -96,8 +96,8 @@ The memory system is implemented as a set of Python classes:
 Agents can use the memory system through the `ObservableAgent` wrapper:
 
 ```python
-from core.orchestrator.src.agents.observable_agent import ObservableAgentFactory
-from core.orchestrator.src.memory.factory import MemoryFactory
+from core.conductor.src.agents.observable_agent import ObservableAgentFactory
+from core.conductor.src.memory.factory import MemoryFactory
 
 # Get memory factory
 memory_factory = get_service(MemoryFactory)
@@ -237,4 +237,4 @@ The script will:
 
 ## Conclusion
 
-The AI Orchestra memory system provides a robust foundation for building intelligent agents with different types of memory. By leveraging
+The AI cherry_ai memory system provides a robust foundation for building intelligent agents with different types of memory. By leveraging

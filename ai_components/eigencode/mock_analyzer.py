@@ -63,7 +63,7 @@
         """Analyze project architecture"""
     """Get singleton instance of mock analyzer"""
     """Test the mock analyzer"""
-        "/root/orchestra-main",
+        "/root/cherry_ai-main",
         {
             "depth": "comprehensive",
             "include_metrics": True,

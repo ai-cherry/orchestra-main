@@ -536,7 +536,7 @@ async def setup_claude_database():
 
 async def main():
     """Example usage of Claude analyzer"""
-                project_path="/root/orchestra-main",
+                project_path="/root/cherry_ai-main",
                 analysis_type="architecture"
             )
             print("Analysis Result:")

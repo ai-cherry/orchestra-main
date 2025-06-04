@@ -48,7 +48,7 @@ bash diagnose_cherry_deployment.sh
 
 ```bash
 # Build latest frontend
-cd /root/orchestra-main/admin-ui
+cd /root/cherry_ai-main/admin-ui
 npm install
 npm run build
 
@@ -61,7 +61,7 @@ sudo nginx -s reload
 
 ### 2. Fix Backend API
 
-Create environment file `/etc/orchestra.env`:
+Create environment file `/etc/cherry_ai.env`:
 
 ```bash
 # Security
@@ -71,7 +71,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES=720
 # Admin
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=OrchAI_Admin2024!
-ADMIN_EMAIL=admin@orchestra.ai
+ADMIN_EMAIL=admin@cherry_ai.ai
 
 # LLM APIs (add your keys)
 OPENAI_API_KEY=sk-...
@@ -79,19 +79,19 @@ ANTHROPIC_API_KEY=sk-ant-...
 # Add other API keys as needed
 ```
 
-Create systemd service `/etc/systemd/system/orchestra-backend.service`:
+Create systemd service `/etc/systemd/system/cherry_ai-backend.service`:
 
 ```ini
 [Unit]
-Description=Orchestra AI Backend
+Description=Cherry AI Backend
 After=network.target
 
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/root/orchestra-main
-EnvironmentFile=/etc/orchestra.env
-ExecStart=/root/orchestra-main/venv/bin/python -m uvicorn agent.app.main:app --host 0.0.0.0 --port 8000
+WorkingDirectory=/root/cherry_ai-main
+EnvironmentFile=/etc/cherry_ai.env
+ExecStart=/root/cherry_ai-main/venv/bin/python -m uvicorn agent.app.main:app --host 0.0.0.0 --port 8000
 Restart=always
 
 [Install]
@@ -102,8 +102,8 @@ Start the service:
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable orchestra-backend
-sudo systemctl start orchestra-backend
+sudo systemctl enable cherry_ai-backend
+sudo systemctl start cherry_ai-backend
 ```
 
 ### 3. Configure Nginx
@@ -152,17 +152,17 @@ server {
 
 1. **Check Logs**:
    ```bash
-   journalctl -u orchestra-backend -f
+   journalctl -u cherry_ai-backend -f
    ```
 
 2. **Common Issues**:
    - Missing Python dependencies: `pip install -r requirements.txt`
-   - Missing API keys: Add to `/etc/orchestra.env`
+   - Missing API keys: Add to `/etc/cherry_ai.env`
    - Port 8000 in use: `lsof -i :8000`
 
 3. **Test Manually**:
    ```bash
-   cd /root/orchestra-main
+   cd /root/cherry_ai-main
    source venv/bin/activate
    python -m uvicorn agent.app.main:app --host 0.0.0.0 --port 8000
    ```
@@ -171,7 +171,7 @@ server {
 
 1. **Check Backend Status**:
    ```bash
-   systemctl status orchestra-backend
+   systemctl status cherry_ai-backend
    ```
 
 2. **Check Nginx Proxy**:
@@ -188,10 +188,10 @@ server {
 
 ```bash
 # Backend logs
-journalctl -u orchestra-backend -f
+journalctl -u cherry_ai-backend -f
 
 # Backend status
-systemctl status orchestra-backend
+systemctl status cherry_ai-backend
 
 # Nginx access logs
 tail -f /var/log/nginx/access.log
@@ -204,7 +204,7 @@ netstat -tuln | grep 8000
 ## 🔐 Security Notes
 
 1. **Change Default Passwords**: Update admin password in production
-2. **Secure API Keys**: Keep `/etc/orchestra.env` with restricted permissions
+2. **Secure API Keys**: Keep `/etc/cherry_ai.env` with restricted permissions
 3. **SSL Certificate**: Ensure Let's Encrypt auto-renewal is configured
 4. **Firewall**: Only expose necessary ports (80, 443)
 
@@ -212,7 +212,7 @@ netstat -tuln | grep 8000
 
 After fixing the deployment:
 
-1. **Add LLM API Keys**: Edit `/etc/orchestra.env` with your actual API keys
+1. **Add LLM API Keys**: Edit `/etc/cherry_ai.env` with your actual API keys
 2. **Set Up Monitoring**: Configure Prometheus/Grafana for metrics
 3. **Enable Backups**: Set up automated backups for data persistence
 4. **Configure Alerts**: Set up alerts for service failures

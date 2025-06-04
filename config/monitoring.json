@@ -1,0 +1,33 @@
+{
+  "enabled": true,
+  "context": "development",
+  "metrics": {
+    "system": [
+      "cpu",
+      "memory",
+      "disk",
+      "network"
+    ],
+    "application": [
+      "requests",
+      "errors",
+      "latency"
+    ],
+    "custom": [
+      "workflows",
+      "agents",
+      "cache"
+    ]
+  },
+  "thresholds": {
+    "cpu_percent": 85,
+    "memory_percent": 80,
+    "response_time_ms": 200,
+    "error_rate": 0.01
+  },
+  "export": {
+    "enabled": true,
+    "interval_minutes": 60,
+    "retention_days": 7
+  }
+}

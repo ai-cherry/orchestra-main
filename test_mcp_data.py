@@ -1,9 +1,9 @@
 # TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """Test script to check what data MCP servers have access to"""
-os.environ["POSTGRES_USER"] = "orchestrator"
+os.environ["POSTGRES_USER"] = "conductor"
 os.environ["POSTGRES_PASSWORD"] = "orch3str4_2024"
-os.environ["POSTGRES_DB"] = "orchestrator"
+os.environ["POSTGRES_DB"] = "conductor"
 os.environ["POSTGRES_HOST"] = "localhost"
 os.environ["POSTGRES_PORT"] = "5432"
 
@@ -27,7 +27,7 @@ def check_mcp_data():
         # Sessions
         print("\n🗂️  Sessions:")
         sessions = db.postgres.# TODO: Consider adding EXPLAIN ANALYZE for performance
-execute_query("SELECT id, data, created_at FROM orchestra.sessions LIMIT 5")
+execute_query("SELECT id, data, created_at FROM cherry_ai.sessions LIMIT 5")
         if sessions:
             for s in sessions:
                 data = json.loads(s["data"]) if isinstance(s["data"], str) else s["data"]
@@ -37,7 +37,7 @@ execute_query("SELECT id, data, created_at FROM orchestra.sessions LIMIT 5")
 
         # API Keys
         print("\n🔑 API Keys:")
-        keys = db.postgres.execute_query("SELECT name, created_at, last_used FROM orchestra.api_keys LIMIT 5")
+        keys = db.postgres.execute_query("SELECT name, created_at, last_used FROM cherry_ai.api_keys LIMIT 5")
         if keys:
             for k in keys:
                 print(f"  - {k['name']}: Last used: {k['last_used'] or 'Never'}")
@@ -46,7 +46,7 @@ execute_query("SELECT id, data, created_at FROM orchestra.sessions LIMIT 5")
 
         # Knowledge Base
         print("\n📚 Knowledge Base:")
-        kb = db.postgres.execute_query("SELECT id, title, category, created_at FROM orchestra.knowledge_base LIMIT 5")
+        kb = db.postgres.execute_query("SELECT id, title, category, created_at FROM cherry_ai.knowledge_base LIMIT 5")
         if kb:
             for item in kb:
                 print(f"  - {item['title']} ({item['category']})")
@@ -165,7 +165,7 @@ execute_query("SELECT id, data, created_at FROM orchestra.sessions LIMIT 5")
             print(f"⚠️  Could not create agent: {e}")
 
         print("\n✨ MCP servers can now access this test data!")
-        print("   Use @orchestra-memory in Cursor to search for 'MCP test'")
+        print("   Use @cherry_ai-memory in Cursor to search for 'MCP test'")
 
         # Summary
         print("\n" + "=" * 50)
@@ -173,8 +173,8 @@ execute_query("SELECT id, data, created_at FROM orchestra.sessions LIMIT 5")
         print("  • PostgreSQL: Sessions, Agents, Knowledge Base, API Keys")
         print("  • Weaviate: Memories, Conversations, Vector Search")
         print("\n💡 Test in Cursor:")
-        print('  @orchestra-memory search_memories "MCP test"')
-        print('  @orchestra-memory search_knowledge "test pattern"')
+        print('  @cherry_ai-memory search_memories "MCP test"')
+        print('  @cherry_ai-memory search_knowledge "test pattern"')
 
     except Exception:
 
@@ -184,7 +184,7 @@ execute_query("SELECT id, data, created_at FROM orchestra.sessions LIMIT 5")
         print("\nMake sure:")
         print("  1. PostgreSQL is running: sudo systemctl status postgresql")
         print("  2. Weaviate is running: docker ps | grep weaviate")
-        print("  3. Run: orchestra-status")
+        print("  3. Run: cherry_ai-status")
 
 if __name__ == "__main__":
     check_mcp_data()

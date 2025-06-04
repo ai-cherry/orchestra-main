@@ -1,10 +1,11 @@
 # TODO: Consider adding connection pooling configuration
 """
-Orchestra AI - Database Models
+Cherry AI - Database Models
 This module contains Pydantic models for database entities.
 """
 
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Dict, Any, Optional
+from typing_extensions import Optional, Union
 from uuid import uuid4, UUID
 from datetime import datetime
 from enum import Enum
@@ -70,7 +71,7 @@ class MCPConfig(BaseModel):
     host: str = Field(default="0.0.0.0", description="HTTP server host")
     servers: Dict[str, "ServerConfig"] = Field(
         default_factory=dict,
-        description="Registry of all MCP servers (for gateway and orchestration)",
+        description="Registry of all MCP servers (for gateway and coordination)",
     )
 
     class Config:

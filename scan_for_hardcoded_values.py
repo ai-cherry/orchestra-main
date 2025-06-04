@@ -114,7 +114,7 @@ def scan_directory(
 
 def main() -> None:
     """Main function."""
-    parser = argparse.ArgumentParser(description="Scan for hardcoded values in AI Orchestra codebase")
+    parser = argparse.ArgumentParser(description="Scan for hardcoded values in AI cherry_ai codebase")
     parser.add_argument(
         "--path",
         type=str,

@@ -1,0 +1,23 @@
+{
+  "timestamp": "2025-06-03T23:02:20.674196",
+  "integration": "active",
+  "mcp_servers": {
+    "conductor": "\u2705 Configured",
+    "Memory": "\u2705 Configured",
+    "Tools": "\u2705 Configured",
+    "Deployment": "\u2705 Configured",
+    "Weaviate Direct": "\u2705 Configured"
+  },
+  "services": {
+    "api": "running",
+    "postgres": "running",
+    "redis": "running",
+    "weaviate": "running"
+  },
+  "features": {
+    "workflow_coordination": true,
+    "multi_mode_coordination": true,
+    "persistent_context": true,
+    "intelligent_tools": true
+  }
+}

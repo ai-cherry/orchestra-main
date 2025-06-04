@@ -11,6 +11,7 @@ import json
 import shutil
 from pathlib import Path
 from typing import Dict, List, Any, Optional
+from typing_extensions import Optional
 from datetime import datetime
 
 
@@ -359,7 +360,7 @@ class PersonaConfigConsolidator:
             "metadata": {
                 "version": "1.0",
                 "created_at": datetime.now().isoformat(),
-                "description": "Master persona configurations for Orchestra AI",
+                "description": "Master persona configurations for Cherry AI",
                 "personas_count": len(self.standard_personas)
             }
         }
@@ -370,12 +371,12 @@ class PersonaConfigConsolidator:
         self.consolidation_results["master_configs_created"].append(str(master_file))
         print(f"  📄 Created master configuration: {master_file}")
         
-        # Create core orchestrator config
-        core_config_dir = self.root_path / "core" / "orchestrator" / "src" / "config"
+        # Create core conductor config
+        core_config_dir = self.root_path / "core" / "conductor" / "src" / "config"
         core_config_dir.mkdir(parents=True, exist_ok=True)
         
         core_personas_file = core_config_dir / "personas.yaml"
-        # Simplified format for core orchestrator
+        # Simplified format for core conductor
         core_content = {}
         for persona_id, persona_config in self.standard_personas.items():
             core_content[persona_id] = {
@@ -391,7 +392,7 @@ class PersonaConfigConsolidator:
             yaml.dump(core_content, f, default_flow_style=False, indent=2)
         
         self.consolidation_results["master_configs_created"].append(str(core_personas_file))
-        print(f"  📄 Created core orchestrator config: {core_personas_file}")
+        print(f"  📄 Created core conductor config: {core_personas_file}")
     
     def create_individual_persona_files(self):
         """Create individual persona configuration files."""
@@ -418,7 +419,7 @@ class PersonaConfigConsolidator:
         # Create __init__.py
         init_file = personas_dir / "__init__.py"
         init_content = '''"""
-Orchestra AI Persona System
+Cherry AI Persona System
 Provides personality-driven AI interactions.
 """
 
@@ -457,6 +458,7 @@ __all__ = [
 
 import logging
 from typing import Dict, List, Any, Optional
+from typing_extensions import Optional
 from datetime import datetime
 
 try:
@@ -701,7 +703,8 @@ Manages persona instances and routing.
 """
 
 import logging
-from typing import Dict, Optional, Any
+from typing import Dict, Optional
+from typing_extensions import Optional, Any
 from .cherry_persona import CherryPersona
 from .sophia_persona import SophiaPersona
 from .karen_persona import KarenPersona

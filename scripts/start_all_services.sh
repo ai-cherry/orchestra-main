@@ -1,7 +1,7 @@
 #!/bin/bash
-# Start all Orchestra AI services
+# Start all Cherry AI services
 
-echo "🎼 Starting Orchestra AI Services..."
+echo "🎼 Starting Cherry AI Services..."
 echo "=================================="
 
 # Activate virtual environment if it exists
@@ -46,7 +46,7 @@ start_server() {
 mkdir -p logs
 
 # Start each server
-start_server "orchestrator" "mcp_server/servers/orchestrator_server.py" "${MCP_ORCHESTRATOR_PORT:-8002}"
+start_server "conductor" "mcp_server/servers/conductor_server.py" "${CHERRY_AI_CONDUCTOR_PORT:-8002}"
 start_server "memory" "mcp_server/servers/memory_server.py" "${MCP_MEMORY_PORT:-8003}"
 start_server "tools" "mcp_server/servers/tools_server.py" "${MCP_TOOLS_PORT:-8006}"
 start_server "weaviate" "mcp_server/servers/weaviate_direct_mcp_server.py" "${MCP_WEAVIATE_DIRECT_PORT:-8001}"
@@ -63,12 +63,12 @@ python3 scripts/health_check.py
 
 echo ""
 echo "=================================="
-echo "✅ Orchestra AI services started!"
+echo "✅ Cherry AI services started!"
 echo ""
 echo "📋 Quick Commands:"
 echo "  • Check status: ./scripts/check_services.sh"
 echo "  • View logs: tail -f logs/mcp_*.log"
 echo "  • Stop all: ./scripts/stop_all_services.sh"
-echo "  • Use CLI: python3 ai_components/orchestrator_cli_enhanced.py"
+echo "  • Use CLI: python3 ai_components/conductor_cli_enhanced.py"
 echo ""
-echo "🎯 The Orchestra is ready to play! 🎵"
+echo "🎯 The cherry_ai is ready to play! 🎵"

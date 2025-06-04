@@ -1,12 +1,12 @@
 """
 """
-    """Test the modular Orchestra AI system."""
+    """Test the modular Cherry AI system."""
     logger.info("Starting modular system test...")
 
-    # Initialize Orchestra system
-    orchestra = OrchestraSystem()
-    await orchestra.initialize()
-    logger.info("✓ Orchestra system initialized")
+    # Initialize cherry_ai system
+    cherry_ai = cherry_aiSystem()
+    await cherry_ai.initialize()
+    logger.info("✓ cherry_ai system initialized")
 
     # Register workflows
     register_example_workflows()
@@ -108,7 +108,7 @@
     # Shutdown
     logger.info("\nShutting down...")
     await agent_manager.stop_all_agents()
-    await orchestra.shutdown()
+    await cherry_ai.shutdown()
     logger.info("✓ System shut down successfully")
 
     logger.info("\n=== All tests completed ===")

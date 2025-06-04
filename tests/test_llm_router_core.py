@@ -1,3 +1,4 @@
+import os
 """
 """
     """Test cases for CacheManager"""
@@ -154,7 +155,7 @@ class TestHealthMonitor:
 class TestUnifiedLLMRouter:
     """Test cases for UnifiedLLMRouter"""
         """Test getting model mappings"""
-        config = RouterConfig(portkey_api_key="test_key", enable_caching=False)
+        config = RouterConfig(portkey_api_key= os.getenv('API_KEY'), enable_caching=False)
         router = UnifiedLLMRouter(config)
 
         # Test standard mapping
@@ -195,7 +196,7 @@ class TestUnifiedLLMRouter:
     @pytest.mark.asyncio
     async def test_complete_with_mocks(self):
         """Test complete method with mocked dependencies"""
-        config = RouterConfig(portkey_api_key="test_key", enable_caching=True)
+        config = RouterConfig(portkey_api_key= os.getenv('API_KEY'), enable_caching=True)
 
         with (
             patch("core.llm_router_base.get_cache_manager") as mock_cache_mgr,
@@ -243,7 +244,7 @@ class TestUnifiedLLMRouter:
 class TestIntegration:
     """Integration tests for the complete system"""
         """Test complete router lifecycle"""
-        config = RouterConfig(portkey_api_key="test_key", enable_caching=True, enable_monitoring=True)
+        config = RouterConfig(portkey_api_key= os.getenv('API_KEY'), enable_caching=True, enable_monitoring=True)
 
         with (
             patch("core.llm_router_base.get_cache_manager") as mock_cache_mgr,

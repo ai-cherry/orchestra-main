@@ -7,7 +7,7 @@
     DOCUMENTATION = "documentation"
     CHAT_CONVERSATION = "chat_conversation"
     MEMORY_PROCESSING = "memory_processing"
-    WORKFLOW_ORCHESTRATION = "workflow_orchestration"
+    WORKFLOW_COORDINATION = "workflow_coordination"
     GENERAL_PURPOSE = "general_purpose"
 
 class ModelTier(str, Enum):
@@ -125,15 +125,15 @@ class ModelMapping(BaseModel):
                 system_prompt="Extract and structure information efficiently for memory storage.",
             )
         },
-        UseCase.WORKFLOW_ORCHESTRATION: {
+        UseCase.WORKFLOW_COORDINATION: {
             ModelTier.PREMIUM: ModelMapping(
-                use_case=UseCase.WORKFLOW_ORCHESTRATION,
+                use_case=UseCase.WORKFLOW_COORDINATION,
                 tier=ModelTier.PREMIUM,
                 primary_model="google/gemini-1.5-pro",
                 fallback_models=["anthropic/claude-3-opus", "openai/gpt-4-turbo"],
                 max_tokens=8192,
                 temperature=0.4,
-                system_prompt="You are an AI workflow orchestrator. Break down complex tasks and coordinate execution.",
+                system_prompt="You are an AI workflow conductor. Break down complex tasks and coordinate execution.",
             )
         },
     }
@@ -154,8 +154,8 @@ class ModelMapping(BaseModel):
             headers={
                 "Authorization": f"Bearer {self.config.openrouter_api_key}",
                 "Content-Type": "application/json",
-                "HTTP-Referer": os.getenv("OR_SITE_URL", "https://orchestra.ai"),
-                "X-Title": os.getenv("OR_APP_NAME", "Orchestra AI"),
+                "HTTP-Referer": os.getenv("OR_SITE_URL", "https://cherry_ai.ai"),
+                "X-Title": os.getenv("OR_APP_NAME", "Cherry AI"),
             },
             timeout=self.config.timeout,
         )

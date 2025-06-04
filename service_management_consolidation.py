@@ -2,7 +2,7 @@
 #!/usr/bin/env python3
 """
 """
-SERVICE_REGISTRY_TABLE = "orchestra_services"
+SERVICE_REGISTRY_TABLE = "cherry_ai_services"
 SERVICE_HEALTH_COLLECTION = "service_health_checks"
 DEFAULT_SERVICE_TTL_SECONDS = 300  # 5 minutes
 

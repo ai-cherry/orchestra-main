@@ -6,7 +6,7 @@
    python -c "import redis; r=redis.Redis(host='$REDIS_HOST'); print(r.ping())"
 
    # Check service status
-   python scripts/orchestra_status.py
+   python scripts/cherry_ai_status.py
    ```
 
 4. COMMON ISSUES & FIXES:
@@ -88,10 +88,10 @@
 7. MCP SERVER DEBUGGING:
    ```bash
    # Check if MCP servers are running
-   ps aux | grep -E "orchestrator_server|memory_server"
+   ps aux | grep -E "conductor_server|memory_server"
 
    # Start MCP servers manually
-   python mcp_server/servers/orchestrator_server.py
+   python mcp_server/servers/conductor_server.py
 
    # Check MCP logs
    tail -f ~/.mcp/logs/*.log

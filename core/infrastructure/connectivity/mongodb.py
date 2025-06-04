@@ -3,7 +3,7 @@
 """
     """MongoDB connection with health checks and retries."""
         self.connection_string = config.get("connection_string", config.get("uri"))
-        self.database_name = config.get("database", "orchestra")
+        self.database_name = config.get("database", "cherry_ai")
         self.server_selection_timeout = config.get("server_selection_timeout", 5000)
 
     async def connect(self) -> None:

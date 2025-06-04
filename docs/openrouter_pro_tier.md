@@ -1,6 +1,6 @@
 # OpenRouter Pro Tier Configuration Guide
 
-This guide explains how to configure your Orchestra system to leverage OpenRouter's Pro Tier features for improved performance, reliability, and model access.
+This guide explains how to configure your cherry_ai system to leverage OpenRouter's Pro Tier features for improved performance, reliability, and model access.
 
 ## Benefits of OpenRouter Pro Tier
 
@@ -116,4 +116,4 @@ If you experience issues with the OpenRouter Pro Tier configuration:
 
 - [OpenRouter Documentation](https://openrouter.ai/docs)
 - [Portkey Documentation](https://docs.portkey.ai/) (for fallback configuration)
-- [Orchestra Configuration Guide](./configuration.md)
+- [cherry_ai Configuration Guide](./configuration.md)

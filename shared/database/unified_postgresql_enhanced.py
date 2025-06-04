@@ -59,7 +59,7 @@
             # Analyze tables for query optimization
             await self.execute_raw("ANALYZE cache.entries")
             await self.execute_raw("ANALYZE sessions.sessions")
-            await self.execute_raw("ANALYZE orchestra.memory_snapshots")
+            await self.execute_raw("ANALYZE cherry_ai.memory_snapshots")
             results["tables_analyzed"] = True
 
             logger.info(f"Maintenance completed: {results}")

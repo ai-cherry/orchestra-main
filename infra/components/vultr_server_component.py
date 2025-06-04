@@ -4,8 +4,8 @@ import pulumi_command as command
 from pulumi import ComponentResource, ResourceOptions
 
 class VultrServerComponent(ComponentResource):
-    """Single-node Vultr server for Orchestra AI."""
-        super().__init__("orchestra:vultr:ServerComponent", name, None, opts)
+    """Single-node Vultr server for Cherry AI."""
+        super().__init__("cherry_ai:vultr:ServerComponent", name, None, opts)
         self.config = config
 
         self.server = vultr.Instance(

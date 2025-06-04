@@ -1,5 +1,5 @@
 # WEAVIATE-FIRST MIGRATION ROADMAP  
-### Orchestra-Main · May 2025
+### cherry_ai-Main · May 2025
 
 ---
 
@@ -10,7 +10,7 @@ The new stack runs on **two existing DigitalOcean droplets** and satisfies every
 * Dynamic, contextual memory across **Personal**, **PayReady**, **ParagonRX Clinical** domains  
 * Intuitive Admin UI & Android access (voice + text)  
 * Flexible MCP server mesh with standardised storage adapters  
-* Large-dataset ingestion, fuzzy data intelligence, and agent orchestration
+* Large-dataset ingestion, fuzzy data intelligence, and agent coordination
 
 ---
 
@@ -19,7 +19,7 @@ The new stack runs on **two existing DigitalOcean droplets** and satisfies every
 | Role | Droplet | Spec | Containers/Services |
 |------|---------|------|---------------------|
 | Vector + Storage Node | `superagi-dev-sfo2-01` (Ubuntu 22.04) | **4 vCPU / 8 GiB / 160 GB** (resize on demand) | `weaviate:1.30` + Agents runtime |
-| App / Orchestrator Node | `ubuntu-s-2vcpu-8gb-160gb-intel-sfo2-01` | **8 vCPU / 32 GiB** (resize on demand) | Postgres 16 + pgvector, Unified Python venv (SuperAGI/AutoGen & MCP), Nginx, Langfuse |
+| App / conductor Node | `ubuntu-s-2vcpu-8gb-160gb-intel-sfo2-01` | **8 vCPU / 32 GiB** (resize on demand) | Postgres 16 + pgvector, Unified Python venv (SuperAGI/AutoGen & MCP), Nginx, Langfuse |
 | Optional Micro-Cache | basic 1 vCPU / 1 GiB droplet | deployed only if p95 chat latency > 50 ms | Dragonfly 1.7 |
 
 All nodes are in VPC `10.120.0.0/16` (SFO2).  
@@ -34,7 +34,7 @@ Block-storage snapshot nightly via Pulumi.
 ```
 core_stack
  ├─ VectorDropletComponent        # Weaviate + volume + firewall
- ├─ AppStackComponent             # Postgres + orchestrator + Langfuse
+ ├─ AppStackComponent             # Postgres + conductor + Langfuse
  ├─ MicroCacheComponent (opt)     # Dragonfly
  └─ NetworkFirewallComponent      # shared inbound rules
 ```
@@ -44,7 +44,7 @@ core_stack
 | Component | New File | Purpose |
 |-----------|----------|---------|
 | `vector_droplet_component.py` | `infra/components/` | Provision droplet, attach 160 GB volume, install Docker, launch `weaviate.yml` with ACORN + Agents |
-| `postgres_component.py` | `infra/components/` | Install Postgres 16, create `orchestrator` DB, enable pgvector |
+| `postgres_component.py` | `infra/components/` | Install Postgres 16, create `conductor` DB, enable pgvector |
 | `resize_job.py` | `infra/components/` | Conditional droplet resize when Prometheus alert fires |
 | Stack configs | `infra/Pulumi.{dev,prod}.yaml` | ORG_-prefixed secrets (`ORG_WEAVIATE_API_KEY`, `ORG_POSTGRES_PW`) |
 
@@ -113,7 +113,7 @@ Uses COPY FROM STDIN for speed.
 ## 6 · AI-Coder Task Graph
 
 ```
-T0  pull-orchestra-main
+T0  pull-cherry_ai-main
 T1  implement vector_droplet_component.py
 T2  implement postgres_component.py
 T3  update unified_memory + adapters

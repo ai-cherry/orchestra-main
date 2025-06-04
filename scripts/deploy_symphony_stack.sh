@@ -6,14 +6,14 @@ set -e # Exit immediately if a command exits with a non-zero status.
 # set -x # Debug mode: Print each command before executing it (optional)
 
 # --- Configuration ---
-PROJECT_ROOT_ON_SERVER="/root/orchestra-main" # Adjust if your project is cloned elsewhere on the server
+PROJECT_ROOT_ON_SERVER="/root/cherry_ai-main" # Adjust if your project is cloned elsewhere on the server
 ADMIN_UI_DIR_RELATIVE="admin-ui" # Relative to project root
-NGINX_WEBROOT="/var/www/orchestra-admin"
-NGINX_CONFIG_REPO_PATH="orchestra-admin.nginx.conf" # Path to the master Nginx config in your repo
-NGINX_CONFIG_SERVER_PATH="/etc/nginx/sites-available/orchestra-admin" # Standard path on server
-NGINX_ENABLED_LINK="/etc/nginx/sites-enabled/orchestra-admin"
-BACKEND_SERVICE_NAME="orchestra-real.service" # As defined in deploy_to_vultr.sh or similar initial setup
-BACKUP_DIR_ADMIN_UI="/var/www/orchestra-admin-backup_$(date +%Y%m%d%H%M%S)"
+NGINX_WEBROOT="/var/www/cherry_ai-admin"
+NGINX_CONFIG_REPO_PATH="cherry_ai-admin.nginx.conf" # Path to the master Nginx config in your repo
+NGINX_CONFIG_SERVER_PATH="/etc/nginx/sites-available/cherry_ai-admin" # Standard path on server
+NGINX_ENABLED_LINK="/etc/nginx/sites-enabled/cherry_ai-admin"
+BACKEND_SERVICE_NAME="cherry_ai-real.service" # As defined in deploy_to_vultr.sh or similar initial setup
+BACKUP_DIR_ADMIN_UI="/var/www/cherry_ai-admin-backup_$(date +%Y%m%d%H%M%S)"
 
 PYTHON_VENV_PATH="$PROJECT_ROOT_ON_SERVER/venv"
 PRODUCTION_REQUIREMENTS="requirements/production/requirements.txt"
@@ -211,4 +211,4 @@ echo -e "${GREEN}🚀 Symphony Stack deployment process finished.${NC}"
 echo -e "Please verify your application manually at http://cherry-ai.me (or your server IP)."
 
 # Optional: Clean up old backups after a few successful deployments
-# find /var/www -maxdepth 1 -name 'orchestra-admin-backup_*' -mtime +7 -exec rm -rf {} \; 
+# find /var/www -maxdepth 1 -name 'cherry_ai-admin-backup_*' -mtime +7 -exec rm -rf {} \; 

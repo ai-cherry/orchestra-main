@@ -1,7 +1,7 @@
 #!/bin/bash
 # Deploy real agents to production server
 
-echo "🚀 Deploying REAL Orchestra AI agents to production..."
+echo "🚀 Deploying REAL Cherry AI agents to production..."
 
 # Create a tar file with the updated files
 echo "📦 Creating deployment package..."
@@ -18,7 +18,7 @@ scp real_agents.tar.gz root@45.32.69.157:/root/
 
 echo "🔧 Installing on server..."
 ssh root@45.32.69.157 << 'EOF'
-cd /root/orchestra-main
+cd /root/cherry_ai-main
 tar -xzf /root/real_agents.tar.gz
 rm /root/real_agents.tar.gz
 

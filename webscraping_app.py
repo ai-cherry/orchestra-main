@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 # Initialize FastAPI app
 app = FastAPI(
     title="Web Scraping AI Agents",
-    description="Orchestra AI Web Scraping Agent Team",
+    description="Cherry AI Web Scraping Agent Team",
     version="1.0.0",
 )
 
@@ -20,9 +20,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Global orchestrator instance
-orchestrator: Optional[WebScrapingOrchestrator] = None
-mcp_server: Optional[OrchestraWebScrapingMCPServer] = None
+# Global conductor instance
+conductor: Optional[WebScrapingconductor] = None
+mcp_server: Optional[cherry_aiWebScrapingMCPServer] = None
 
 # Request/Response models
 class SearchRequest(BaseModel):
@@ -49,7 +49,7 @@ class BulkScrapeRequest(BaseModel):
 
 @app.on_event("startup")
 async def startup_event():
-    """Initialize the web scraping orchestrator."""
+    """Initialize the web scraping conductor."""
     logger.info("Starting Web Scraping AI Agent Team...")
 
     try:
@@ -69,11 +69,11 @@ async def startup_event():
             "openai_api_key": os.getenv("OPENAI_API_KEY"),
         }
 
-        orchestrator = WebScrapingOrchestrator(config)
-        mcp_server = OrchestraWebScrapingMCPServer()
+        conductor = WebScrapingconductor(config)
+        mcp_server = cherry_aiWebScrapingMCPServer()
 
-        # Start orchestrator in background
-        asyncio.create_task(orchestrator.start())
+        # Start conductor in background
+        asyncio.create_task(conductor.start())
 
         logger.info("Web Scraping AI Agent Team initialized successfully")
 
@@ -88,16 +88,16 @@ async def startup_event():
 async def shutdown_event():
     """Cleanup on shutdown."""
     logger.info("Shutting down Web Scraping AI Agent Team...")
-    if orchestrator:
-        await orchestrator.stop()
+    if conductor:
+        await conductor.stop()
 
 @app.get("/health")
 async def health_check():
     """Health check endpoint for Cloud Run."""
         "status": "healthy",
         "service": "web-scraping-agents",
-        "agents_initialized": orchestrator is not None,
-        "agent_count": len(orchestrator.agents) if orchestrator else 0,
+        "agents_initialized": conductor is not None,
+        "agent_count": len(conductor.agents) if conductor else 0,
     }
 
 @app.get("/")
@@ -106,7 +106,7 @@ async def root():
         "service": "Web Scraping AI Agents",
         "version": "1.0.0",
         "status": "running",
-        "agents": len(orchestrator.agents) if orchestrator else 0,
+        "agents": len(conductor.agents) if conductor else 0,
         "endpoints": {
             "health": "/health",
             "search": "/search",

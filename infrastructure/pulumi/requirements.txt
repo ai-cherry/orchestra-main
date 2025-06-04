@@ -1,7 +1,0 @@
-# Pulumi core and Vultr provider
-pulumi>=3.94.0
-pulumi-vultr>=2.18.0
-
-# Additional dependencies for infrastructure management
-pyyaml>=6.0.1
-requests>=2.31.0

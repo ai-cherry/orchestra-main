@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This document outlines architectural enhancements for the Cherry AI admin interface based on unified AI interface concepts. The enhancements maintain the existing dark theme aesthetic while introducing powerful new capabilities for multi-model orchestration, research analytics, creative workflows, and adaptive routing.
+This document outlines architectural enhancements for the Cherry AI admin interface based on unified AI interface concepts. The enhancements maintain the existing dark theme aesthetic while introducing powerful new capabilities for multi-model coordination, research analytics, creative workflows, and adaptive routing.
 
 ## Current State Analysis
 
@@ -14,7 +14,7 @@ This document outlines architectural enhancements for the Cherry AI admin interf
 - **Real-time Capabilities**: WebSocket/SSE infrastructure for live updates
 
 ### Integration Points
-- **Backend API**: FastAPI with `/api/orchestration/*` endpoints
+- **Backend API**: FastAPI with `/api/coordination/*` endpoints
 - **LLM Router**: Existing intelligent routing with query classification
 - **State Management**: Zustand stores with React Query for server synchronization
 - **MCP Integration**: Ready for context sharing and tool integration
@@ -176,7 +176,7 @@ interface CodeDataWorkshop {
   
   // Live Execution
   ExecutionEnvironment: {
-    sandboxManager: ContainerOrchestrator
+    sandboxManager: Containerconductor
     resultStreamer: ExecutionStreamer
     debugger: RemoteDebugger
   }
@@ -438,4 +438,4 @@ const metrics = {
 
 ## Conclusion
 
-These enhancements transform the Cherry AI admin interface into a comprehensive AI orchestration platform while maintaining the existing dark theme aesthetic and modular architecture. The implementation prioritizes high-value features that directly improve developer productivity and AI-assisted workflows, with a clear path for incremental deployment and testing.
+These enhancements transform the Cherry AI admin interface into a comprehensive AI coordination platform while maintaining the existing dark theme aesthetic and modular architecture. The implementation prioritizes high-value features that directly improve developer productivity and AI-assisted workflows, with a clear path for incremental deployment and testing.

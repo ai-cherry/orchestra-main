@@ -1,10 +1,10 @@
-# AI Orchestra Deployment Guide
+# AI cherry_ai Deployment Guide
 
-This guide covers all deployment options for the AI Orchestra API to Vultr, using GitHub secrets and automated workflows.
+This guide covers all deployment options for the AI cherry_ai API to Vultr, using GitHub secrets and automated workflows.
 
 ## Prerequisites
 
-- Docker image built: `orchestra-api-minimal.tar.gz` (64MB) ✅
+- Docker image built: `cherry_ai-api-minimal.tar.gz` (64MB) ✅
 - GitHub secrets configured (VULTR_API_KEY, VULTR_IP_ADDRESS, etc.) ✅
 - Vultr server (Ubuntu 22.04, 2 vCPU, 4GB RAM)
 
@@ -59,7 +59,7 @@ export VULTR_API_KEY="your-api-key"
 
 ## What Gets Deployed
 
-- **API Container**: Orchestra API with 5 AI personas
+- **API Container**: cherry_ai API with 5 AI personas
 - **Nginx**: Reverse proxy on port 80
 - **Personas**: Cherry, AI Assistant, Technical Architect, Sophia, Gordon Gekko
 - **Environment**: All API keys from GitHub secrets
@@ -105,7 +105,7 @@ The following secrets are used from GitHub:
 .
 ├── .github/workflows/deploy-to-vultr.yml    # GitHub Actions workflow
 ├── .env.example                             # Environment template
-├── orchestra-api-minimal.tar.gz             # Docker image
+├── cherry_ai-api-minimal.tar.gz             # Docker image
 ├── infrastructure/
 │   ├── pulumi/                              # Pulumi IaC
 │   │   ├── Pulumi.yaml
@@ -125,7 +125,7 @@ After deployment:
 
 1. **Container Logs:**
    ```bash
-   ssh root@YOUR_SERVER_IP "docker logs orchestra-api"
+   ssh root@YOUR_SERVER_IP "docker logs cherry_ai-api"
    ```
 
 2. **Container Status:**
@@ -141,7 +141,7 @@ After deployment:
 ## Troubleshooting
 
 ### Container Won't Start
-- Check logs: `docker logs orchestra-api`
+- Check logs: `docker logs cherry_ai-api`
 - Verify personas loaded: Look for "Successfully loaded 5 persona configurations"
 - Check environment variables are set
 
@@ -164,9 +164,9 @@ After deployment:
 ### Rollback
 ```bash
 ssh root@YOUR_SERVER_IP
-docker stop orchestra-api
-docker rm orchestra-api
-docker run -d --name orchestra-api [previous-image-tag]
+docker stop cherry_ai-api
+docker rm cherry_ai-api
+docker run -d --name cherry_ai-api [previous-image-tag]
 ```
 
 ## Security Notes

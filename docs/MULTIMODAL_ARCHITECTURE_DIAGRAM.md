@@ -111,7 +111,7 @@ graph LR
     end
     
     subgraph "Phase 4-5 Components"
-        ORH[Orchestration Hub]
+        ORH[coordination Hub]
         FPH[File Processing]
         MON[Monitoring]
     end

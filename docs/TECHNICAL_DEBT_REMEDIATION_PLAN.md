@@ -1,6 +1,6 @@
 # Technical Debt Remediation Plan
 
-This plan outlines specific actions to address the technical debt identified in the [Codebase Health Assessment](./CODEBASE_HEALTH_ASSESSMENT.md). It provides concrete steps, priorities, and expected outcomes for improving the Orchestrator codebase.
+This plan outlines specific actions to address the technical debt identified in the [Codebase Health Assessment](./CODEBASE_HEALTH_ASSESSMENT.md). It provides concrete steps, priorities, and expected outcomes for improving the conductor codebase.
 
 ## Prioritization Criteria
 

@@ -7,7 +7,7 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-echo -e "${GREEN}🚀 Launching AI Orchestra Development Environment${NC}"
+echo -e "${GREEN}🚀 Launching AI cherry_ai Development Environment${NC}"
 
 # Load environment
 echo -e "${YELLOW}Loading environment...${NC}"
@@ -25,13 +25,13 @@ if [ "${MCP_AUTO_START:-true}" = "true" ]; then
     mkdir -p logs/mcp
 
     echo "Starting Cloud Run MCP server..."
-    python ~/orchestra-main/mcp_server/servers/Vultr_cloud_run_server.py \
+    python ~/cherry_ai-main/mcp_server/servers/Vultr_cloud_run_server.py \
         > logs/mcp/cloud_run.log 2>&1 &
     MCP_PIDS+=($!)
 
     # Add other servers as they're implemented
     # echo "Starting Secret Manager MCP server..."
-    # python ~/orchestra-main/mcp_server/servers/Vultr_secret_manager_server.py \
+    # python ~/cherry_ai-main/mcp_server/servers/Vultr_secret_manager_server.py \
     #     > logs/mcp/secrets.log 2>&1 &
     # MCP_PIDS+=($!)
 
@@ -50,7 +50,7 @@ trap cleanup EXIT
 
 # Launch Cursor
 echo -e "${GREEN}Launching Cursor IDE...${NC}"
-cursor ~/orchestra-main
+cursor ~/cherry_ai-main
 
 # Keep script running
 wait

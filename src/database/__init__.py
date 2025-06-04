@@ -1,4 +1,4 @@
-"""Database module for Orchestra AI"""
+"""Database module for Cherry AI"""
 
 from .unified_database import UnifiedDatabase
 

@@ -5,10 +5,10 @@ import pytest
 from fastapi.testclient import TestClient
 
 # Models for mocking return types if necessary
-from core.orchestrator.src.llm.litellm_client import LLMEmbeddingResponse, LLMUsage
+from core.conductor.src.llm.litellm_client import LLMEmbeddingResponse, LLMUsage
 
 # Import the FastAPI app instance
-from core.orchestrator.src.main import app
+from core.conductor.src.main import app
 
 # Test client for the FastAPI app
 client = TestClient(app)
@@ -43,9 +43,9 @@ def mock_weaviate_adapter_instance():
 
 # --- Test Cases ---
 
-@patch("core.orchestrator.src.api.endpoints.resources.get_memory_service")
-@patch("core.orchestrator.src.api.endpoints.resources.LiteLLMClient")
-@patch("core.orchestrator.src.api.endpoints.resources.WeaviateAdapter")
+@patch("core.conductor.src.api.endpoints.resources.get_memory_service")
+@patch("core.conductor.src.api.endpoints.resources.LiteLLMClient")
+@patch("core.conductor.src.api.endpoints.resources.WeaviateAdapter")
 def test_upload_csv_success(
     mock_weaviate_adapter_constructor,
     mock_litellm_client_constructor,
@@ -80,9 +80,9 @@ def test_upload_csv_success(
     mock_weaviate_adapter_instance.connect.assert_called_once()
     mock_weaviate_adapter_instance.batch_upsert.assert_called_once()
 
-@patch("core.orchestrator.src.api.endpoints.resources.get_memory_service")
-@patch("core.orchestrator.src.api.endpoints.resources.LiteLLMClient")
-@patch("core.orchestrator.src.api.endpoints.resources.WeaviateAdapter")
+@patch("core.conductor.src.api.endpoints.resources.get_memory_service")
+@patch("core.conductor.src.api.endpoints.resources.LiteLLMClient")
+@patch("core.conductor.src.api.endpoints.resources.WeaviateAdapter")
 def test_upload_jsonl_success(
     mock_weaviate_adapter_constructor,
     mock_litellm_client_constructor,
@@ -113,9 +113,9 @@ def test_upload_jsonl_success(
         assert mock_memory_service.add_memory_item_async.call_count == 2
     mock_weaviate_adapter_instance.batch_upsert.assert_called_once()
 
-@patch("core.orchestrator.src.api.endpoints.resources.get_memory_service")
-@patch("core.orchestrator.src.api.endpoints.resources.LiteLLMClient")
-@patch("core.orchestrator.src.api.endpoints.resources.WeaviateAdapter")
+@patch("core.conductor.src.api.endpoints.resources.get_memory_service")
+@patch("core.conductor.src.api.endpoints.resources.LiteLLMClient")
+@patch("core.conductor.src.api.endpoints.resources.WeaviateAdapter")
 def test_upload_json_success(
     mock_weaviate_adapter_constructor,
     mock_litellm_client_constructor,
@@ -146,9 +146,9 @@ def test_upload_json_success(
         assert mock_memory_service.add_memory_item_async.call_count == 2
     mock_weaviate_adapter_instance.batch_upsert.assert_called_once()
 
-@patch("core.orchestrator.src.api.endpoints.resources.get_memory_service")
-@patch("core.orchestrator.src.api.endpoints.resources.LiteLLMClient")
-@patch("core.orchestrator.src.api.endpoints.resources.WeaviateAdapter")
+@patch("core.conductor.src.api.endpoints.resources.get_memory_service")
+@patch("core.conductor.src.api.endpoints.resources.LiteLLMClient")
+@patch("core.conductor.src.api.endpoints.resources.WeaviateAdapter")
 def test_upload_unsupported_file_type(
     mock_weaviate_adapter_constructor,
     mock_litellm_client_constructor,
@@ -175,9 +175,9 @@ def test_upload_unsupported_file_type(
     mock_memory_service.add_memory_items_async.assert_not_called()
     mock_weaviate_adapter_instance.batch_upsert.assert_not_called()
 
-@patch("core.orchestrator.src.api.endpoints.resources.get_memory_service")
-@patch("core.orchestrator.src.api.endpoints.resources.LiteLLMClient")
-@patch("core.orchestrator.src.api.endpoints.resources.WeaviateAdapter")
+@patch("core.conductor.src.api.endpoints.resources.get_memory_service")
+@patch("core.conductor.src.api.endpoints.resources.LiteLLMClient")
+@patch("core.conductor.src.api.endpoints.resources.WeaviateAdapter")
 def test_upload_embedding_error(
     mock_weaviate_adapter_constructor,
     mock_litellm_client_constructor,
@@ -209,9 +209,9 @@ def test_upload_embedding_error(
     mock_memory_service.add_memory_items_async.assert_not_called()
     mock_weaviate_adapter_instance.batch_upsert.assert_not_called()
 
-@patch("core.orchestrator.src.api.endpoints.resources.get_memory_service")
-@patch("core.orchestrator.src.api.endpoints.resources.LiteLLMClient")
-@patch("core.orchestrator.src.api.endpoints.resources.WeaviateAdapter")
+@patch("core.conductor.src.api.endpoints.resources.get_memory_service")
+@patch("core.conductor.src.api.endpoints.resources.LiteLLMClient")
+@patch("core.conductor.src.api.endpoints.resources.WeaviateAdapter")
 def test_upload_memory_service_store_error(
     mock_weaviate_adapter_constructor,
     mock_litellm_client_constructor,
@@ -241,9 +241,9 @@ def test_upload_memory_service_store_error(
 
     mock_weaviate_adapter_instance.batch_upsert.assert_not_called()
 
-@patch("core.orchestrator.src.api.endpoints.resources.get_memory_service")
-@patch("core.orchestrator.src.api.endpoints.resources.LiteLLMClient")
-@patch("core.orchestrator.src.api.endpoints.resources.WeaviateAdapter")
+@patch("core.conductor.src.api.endpoints.resources.get_memory_service")
+@patch("core.conductor.src.api.endpoints.resources.LiteLLMClient")
+@patch("core.conductor.src.api.endpoints.resources.WeaviateAdapter")
 def test_upload_weaviate_store_error(
     mock_weaviate_adapter_constructor,
     mock_litellm_client_constructor,
@@ -259,7 +259,7 @@ def test_upload_weaviate_store_error(
     csv_content = "header1,header2\nvalue1,value2"
     file_bytes = BytesIO(csv_content.encode("utf-8"))
 
-    with patch("core.orchestrator.src.api.endpoints.resources.logger") as mock_logger:
+    with patch("core.conductor.src.api.endpoints.resources.logger") as mock_logger:
         response = client.post(
             "/api/resources/upload",
             files={"uploaded_file": ("test.csv", file_bytes, "text/csv")},
@@ -277,10 +277,10 @@ def test_upload_weaviate_store_error(
         mock_weaviate_adapter_instance.batch_upsert.assert_called_once()
         mock_logger.error.assert_any_call("Error adding batch to Weaviate for test.csv: Weaviate Error", exc_info=True)
 
-@patch("core.orchestrator.src.api.endpoints.resources.shutil.copyfileobj")
-@patch("core.orchestrator.src.api.endpoints.resources.get_memory_service")
-@patch("core.orchestrator.src.api.endpoints.resources.LiteLLMClient")
-@patch("core.orchestrator.src.api.endpoints.resources.WeaviateAdapter")
+@patch("core.conductor.src.api.endpoints.resources.shutil.copyfileobj")
+@patch("core.conductor.src.api.endpoints.resources.get_memory_service")
+@patch("core.conductor.src.api.endpoints.resources.LiteLLMClient")
+@patch("core.conductor.src.api.endpoints.resources.WeaviateAdapter")
 def test_upload_file_save_error(
     mock_weaviate_adapter_constructor,
     mock_litellm_client_constructor,
@@ -310,9 +310,9 @@ def test_upload_file_save_error(
     mock_memory_service.add_memory_items_async.assert_not_called()
     mock_weaviate_adapter_instance.batch_upsert.assert_not_called()
 
-@patch("core.orchestrator.src.api.endpoints.resources.get_memory_service")
-@patch("core.orchestrator.src.api.endpoints.resources.LiteLLMClient")
-@patch("core.orchestrator.src.api.endpoints.resources.WeaviateAdapter")
+@patch("core.conductor.src.api.endpoints.resources.get_memory_service")
+@patch("core.conductor.src.api.endpoints.resources.LiteLLMClient")
+@patch("core.conductor.src.api.endpoints.resources.WeaviateAdapter")
 def test_upload_no_filename(
     mock_weaviate_adapter_constructor,
     mock_litellm_client_constructor,

@@ -12,7 +12,7 @@ import logging
 from pathlib import Path
 from typing import Dict, List, Set, Tuple
 from datetime import datetime
-from collections import defaultdict
+from collections.abc import defaultdict
 
 logger = logging.getLogger(__name__)
 
@@ -234,7 +234,7 @@ class DuplicateEndpointConsolidator:
             try:
                 mod_time = impl['file'].stat().st_mtime
                 score += mod_time / 1000000  # Small bonus for newer files
-            except:
+            except Exception:
                 pass
             
             return score

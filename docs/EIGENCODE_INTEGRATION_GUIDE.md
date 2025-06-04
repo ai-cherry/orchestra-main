@@ -2,7 +2,7 @@
 
 ## Overview
 
-EigenCode is a holistic code analysis tool that provides comprehensive insights into your codebase structure, dependencies, and potential issues. This guide covers installation, configuration, common issues, and optimization strategies for integrating EigenCode with the AI Orchestrator system.
+EigenCode is a holistic code analysis tool that provides comprehensive insights into your codebase structure, dependencies, and potential issues. This guide covers installation, configuration, common issues, and optimization strategies for integrating EigenCode with the AI conductor system.
 
 ## Table of Contents
 
@@ -32,7 +32,7 @@ EigenCode is a holistic code analysis tool that provides comprehensive insights 
 python scripts/eigencode_installer.py
 
 # Check installation status
-./ai_components/orchestrator_cli_enhanced.py eigencode status
+./ai_components/conductor_cli_enhanced.py eigencode status
 ```
 
 #### Method 2: Manual Installation
@@ -86,7 +86,7 @@ output:
   verbose: true
   
 integrations:
-  orchestrator:
+  conductor:
     enabled: true
     api_endpoint: http://localhost:8080
     
@@ -167,7 +167,7 @@ source ~/.bashrc
 
 ### Issue 4: API Connection Failures
 
-**Problem**: EigenCode can't connect to the orchestrator API.
+**Problem**: EigenCode can't connect to the conductor API.
 
 **Solutions**:
 
@@ -185,7 +185,7 @@ source ~/.bashrc
 3. **Update Configuration**
    ```yaml
    integrations:
-     orchestrator:
+     conductor:
        api_endpoint: http://127.0.0.1:8080
        retry_attempts: 3
        timeout: 30
@@ -722,7 +722,7 @@ async def analyze_with_fallback(path: str) -> Dict:
 
 ## Conclusion
 
-EigenCode integration enhances the AI Orchestrator with powerful code analysis capabilities. Follow this guide for smooth installation, configuration, and troubleshooting. Regular monitoring and updates ensure optimal performance and reliability.
+EigenCode integration enhances the AI conductor with powerful code analysis capabilities. Follow this guide for smooth installation, configuration, and troubleshooting. Regular monitoring and updates ensure optimal performance and reliability.
 
 For additional support:
 - Documentation: https://docs.eigencode.dev

@@ -9,7 +9,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 # Set the working directory
-cd /workspaces/orchestra-main
+cd /workspaces/cherry_ai-main
 
 # Check if configuration exists, create if not
 if [ ! -f "mcp_server/config.json" ]; then

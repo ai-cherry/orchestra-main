@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Orchestra Advanced API",
+    "title": "cherry_ai Advanced API",
     "version": "2.0.0",
     "description": "Advanced search, ingestion, and multimedia APIs"
   },

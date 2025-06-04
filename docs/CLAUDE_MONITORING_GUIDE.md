@@ -4,7 +4,7 @@ Comprehensive monitoring system for tracking Claude API usage, costs, and perfor
 
 ## Overview
 
-The Claude API Monitoring System provides real-time tracking and analysis of all Claude API calls made through the orchestra-main system. It monitors:
+The Claude API Monitoring System provides real-time tracking and analysis of all Claude API calls made through the cherry_ai-main system. It monitors:
 
 - **Token Usage**: Input and output token counts for each API call
 - **Cost Tracking**: Real-time cost calculation based on model pricing
@@ -29,7 +29,7 @@ The Claude API Monitoring System provides real-time tracking and analysis of all
    - Transparent integration with existing code
    - Supports all Claude models
 
-3. **Monitoring API** (`core/orchestrator/src/api/endpoints/monitoring.py`)
+3. **Monitoring API** (`core/conductor/src/api/endpoints/monitoring.py`)
 
    - RESTful API endpoints for accessing metrics
    - Summary statistics and cost breakdowns
@@ -68,8 +68,8 @@ export ```
 ### 3. Start the API Server
 
 ```bash
-cd /home/paperspace/orchestra-main
-python -m core.orchestrator.src.api.app
+cd /home/paperspace/cherry_ai-main
+python -m core.conductor.src.api.app
 ```
 
 ### 4. Access the Dashboard
@@ -83,7 +83,7 @@ Open `http://localhost:8000/dashboard/claude-monitoring/` in your browser.
 When `USE_MONITORED_LITELLM=true`, all Claude API calls are automatically monitored:
 
 ```python
-from core.orchestrator.src.api.dependencies.llm import get_llm_client
+from core.conductor.src.api.dependencies.llm import get_llm_client
 
 # Get the monitored client
 client = get_llm_client()
@@ -204,7 +204,7 @@ monitor = ClaudeMonitor(
 
 ```bash
 # Run the comprehensive demo
-cd /home/paperspace/orchestra-main
+cd /home/paperspace/cherry_ai-main
 python examples/claude_monitoring_demo.py
 ```
 

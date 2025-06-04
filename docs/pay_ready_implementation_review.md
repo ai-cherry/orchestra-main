@@ -1,7 +1,7 @@
 # Pay Ready Implementation - Comprehensive Review
 
 ## Overview
-This document provides a comprehensive review of the Pay Ready ETL orchestration implementation, identifying and resolving conflicts, inconsistencies, and potential issues.
+This document provides a comprehensive review of the Pay Ready ETL coordination implementation, identifying and resolving conflicts, inconsistencies, and potential issues.
 
 ## Issues Identified and Resolved
 
@@ -142,7 +142,7 @@ DOMAIN_CONFIG = {
 ```
 services/pay_ready/
 ├── __init__.py (configuration hub)
-├── etl_orchestrator.py
+├── etl_conductor.py
 │   ├── Depends on: entity_resolver, memory_manager
 │   └── External: Airbyte API, PostgreSQL
 ├── entity_resolver.py
@@ -206,7 +206,7 @@ workflows/pay_ready_etl_flow.py
 
 ## Conclusion
 
-The Pay Ready ETL orchestration implementation is well-architected with clear separation of concerns and good use of modern Python patterns. The main issues were:
+The Pay Ready ETL coordination implementation is well-architected with clear separation of concerns and good use of modern Python patterns. The main issues were:
 
 1. Missing query_agent.py file (now created)
 2. Missing database table definitions (documented above)

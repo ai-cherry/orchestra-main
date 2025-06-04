@@ -79,7 +79,7 @@ This section provides a conceptual description of how key pages might look, serv
 *   **Overall Layout:**
     *   Follows the main `AppLayout` with the dark-themed (`#111827` canvas) "tech command center aesthetic."
     *   `Sidebar` (collapsible, initial state could be collapsed to icon rail as per `figma-first-draft-prompt.txt`) on the left, using `#1F2937` surface. "Cherry" theme accent (`#E04DDA`) for active links/icons.
-    *   `TopBar` (64px height) with Orchestra logo, "Dashboard" title, user profile dropdown (using shadcn/ui `DropdownMenu`), and theme toggle.
+    *   `TopBar` (64px height) with cherry_ai logo, "Dashboard" title, user profile dropdown (using shadcn/ui `DropdownMenu`), and theme toggle.
 *   **Main Content Area (12-column grid, 24px gutters, 24px padding around containers):**
     *   **Row 1: Welcome/Quick Stats (Span 12 columns)**
         *   A `Card` component (shadcn/ui) with a subtle shadow and 8px radius.

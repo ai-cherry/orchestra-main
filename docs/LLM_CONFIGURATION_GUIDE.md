@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Orchestra AI project now includes a comprehensive LLM configuration system that allows dynamic model selection and routing through Portkey and OpenRouter without requiring code changes. This guide explains how to set up and use the system.
+The Cherry AI project now includes a comprehensive LLM configuration system that allows dynamic model selection and routing through Portkey and OpenRouter without requiring code changes. This guide explains how to set up and use the system.
 
 ## Key Features
 
@@ -65,7 +65,7 @@ PORTKEY_CONFIG=your_portkey_config_id_here
 # OpenRouter Configuration
 OPENROUTER_API_KEY=your_openrouter_api_key_here
 OR_SITE_URL=https://your-site.com
-OR_APP_NAME=Orchestra AI
+OR_APP_NAME=Cherry AI
 ```
 
 ### 3. Access Admin Dashboard
@@ -103,7 +103,7 @@ Navigate to `/admin/llm` in your browser to access the LLM configuration interfa
 - **Documentation**: Creating technical documentation
 - **Chat Conversation**: General conversational interactions
 - **Memory Processing**: Extracting and structuring information
-- **Workflow Orchestration**: Breaking down complex tasks
+- **Workflow coordination**: Breaking down complex tasks
 
 ### Model Tiers
 - **Premium**: Most capable models (e.g., GPT-4, Claude Opus)

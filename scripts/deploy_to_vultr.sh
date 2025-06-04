@@ -1,5 +1,5 @@
 #!/bin/bash
-# Deploy AI Orchestration to Vultr using Pulumi
+# Deploy AI coordination to Vultr using Pulumi
 
 echo "╔══════════════════════════════════════════════════════════════════╗"
 echo "║              VULTR DEPLOYMENT HELPER                             ║"

@@ -1,5 +1,5 @@
 # TODO: Consider adding connection pooling configuration
-"""Tests for Roo AI Orchestrator integration."""
+"""Tests for Roo AI conductor integration."""
     """Test cases for RooMCPAdapter."""
         """Create adapter instance."""
         return RooMCPAdapter("test_api_key")
@@ -91,12 +91,12 @@ class TestUnifiedAPIRouter:
         )
 
     @pytest.mark.asyncio
-    async def test_routing_decision_orchestrator(self, router):
-        """Test routing decision for orchestrator tasks."""
+    async def test_routing_decision_conductor(self, router):
+        """Test routing decision for conductor tasks."""
             "workflow", {"task": "coordinate multiple agents"}
         )
 
-        assert decision.service == ServiceType.ORCHESTRATOR
+        assert decision.service == ServiceType.CONDUCTOR
         assert decision.confidence > 0
         assert ServiceType.OPENROUTER in decision.fallback_options
 
@@ -107,7 +107,7 @@ class TestUnifiedAPIRouter:
         )
 
         assert decision.service == ServiceType.OPENROUTER
-        assert ServiceType.ORCHESTRATOR in decision.fallback_options
+        assert ServiceType.CONDUCTOR in decision.fallback_options
 
     def test_circuit_breaker_functionality(self, router):
         """Test circuit breaker state transitions."""
@@ -119,7 +119,7 @@ class TestUnifiedAPIRouter:
         async def mock_call_openrouter(*args, **kwargs):
             return {"result": "success"}
 
-        router._call_orchestrator = mock_call_orchestrator
+        router._call_conductor = mock_call_conductor
         router._call_openrouter = mock_call_openrouter
 
         response, decision = await router.route_request(
@@ -240,7 +240,7 @@ class TestModeTransitionManager:
 
 
 class TestIntegration:
-    """Integration tests for the complete Roo orchestrator system."""
+    """Integration tests for the complete Roo conductor system."""
         """Test complete workflow from request to execution."""
         """Test mode transition with bidirectional context sync."""
 if __name__ == "__main__":

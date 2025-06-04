@@ -1,6 +1,6 @@
 # Portkey Integration Guide
 
-This guide explains how to use Portkey with Orchestra, including virtual keys management
+This guide explains how to use Portkey with cherry_ai, including virtual keys management
 for multiple LLM providers, enhanced caching, rate limiting, and smart routing capabilities.
 
 ## Overview
@@ -14,7 +14,7 @@ Portkey is an advanced API gateway for LLMs that provides the following capabili
 - **Budget Controls**: Set spending limits and receive alerts
 - **Observability**: Unified logging and monitoring
 
-This integration allows you to leverage these features throughout Orchestra.
+This integration allows you to leverage these features throughout cherry_ai.
 
 ## Installation
 
@@ -73,7 +73,7 @@ You can also manage virtual keys through the [Portkey Dashboard](https://app.por
 4. Enter a name, select the provider, and paste your API key
 5. (Optional) Set budget limits and rate limits
 
-### Using Virtual Keys in Orchestra
+### Using Virtual Keys in cherry_ai
 
 After creating virtual keys, configure them in your `.env` file:
 

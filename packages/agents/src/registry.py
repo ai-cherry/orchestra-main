@@ -4,8 +4,8 @@
     """
     """
         project_id: str = "cherry-ai-project",
-        spanner_instance_id: str = "orchestra-instance",
-        spanner_database_id: str = "orchestra-db",
+        spanner_instance_id: str = "cherry_ai-instance",
+        spanner_database_id: str = "cherry_ai-db",
     ):
         """Initialize the agent registry with Google Cloud project details for routing."""
         """Register the built-in wrapper implementations."""
@@ -20,7 +20,7 @@
         # Example: self.register_wrapper_class("arno", ArnoAgentWrapper)
         # Example: self.register_wrapper_class("adk", ADKAgentWrapper)
 
-    def register_wrapper_class(self, wrapper_type: str, wrapper_class: Type[OrchestraAgentBase]) -> None:
+    def register_wrapper_class(self, wrapper_type: str, wrapper_class: Type[cherry_aiAgentBase]) -> None:
         """
         """
             logger.warning(f"Overwriting existing wrapper class for type: {wrapper_type}")
@@ -35,7 +35,7 @@
         memory_manager: Any,
         llm_client: Any,
         tool_registry: Any,
-    ) -> Optional[OrchestraAgentBase]:
+    ) -> Optional[cherry_aiAgentBase]:
         """
         """
         wrapper_type = agent_config.get("wrapper_type")
@@ -105,9 +105,9 @@
             module = importlib.import_module(module_path)
             wrapper_class = getattr(module, class_name)
 
-            # Ensure it's a subclass of OrchestraAgentBase
-            if not issubclass(wrapper_class, OrchestraAgentBase):
-                logger.error(f"Class {class_path} is not a subclass of OrchestraAgentBase")
+            # Ensure it's a subclass of cherry_aiAgentBase
+            if not issubclass(wrapper_class, cherry_aiAgentBase):
+                logger.error(f"Class {class_path} is not a subclass of cherry_aiAgentBase")
                 return False
 
             # Register the wrapper
@@ -124,14 +124,14 @@
 # Create a singleton instance with default project settings
 agent_registry = AgentRegistry(
     project_id="cherry-ai-project",
-    spanner_instance_id="orchestra-instance",
-    spanner_database_id="orchestra-db",
+    spanner_instance_id="cherry_ai-instance",
+    spanner_database_id="cherry_ai-db",
 )
 
 def get_registry(
     project_id: str = "cherry-ai-project",
-    spanner_instance_id: str = "orchestra-instance",
-    spanner_database_id: str = "orchestra-db",
+    spanner_instance_id: str = "cherry_ai-instance",
+    spanner_database_id: str = "cherry_ai-db",
 ) -> AgentRegistry:
     """
     """

@@ -11,7 +11,8 @@ import asyncio
 import logging
 import subprocess
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional
+from typing_extensions import Optional, Set
 from datetime import datetime
 import time
 
@@ -348,7 +349,7 @@ class APIConsistencyValidator:
                         server_url = f"http://localhost:{port}"
                         accessibility["server_running"] = True
                         break
-            except:
+            except Exception:
                 continue
         
         if server_url:

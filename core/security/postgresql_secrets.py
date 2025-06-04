@@ -31,6 +31,6 @@ execute("SELECT name, metadata, created_at, updated_at FROM secrets")
 # Helper function for compatibility
 def get_secret(secret_name: str) -> Optional[str]:
     """Get secret from PostgreSQL (replaces GCP Secret Manager)."""
-    database_url = os.getenv("DATABASE_URL", "postgresql://localhost/orchestra")
+    database_url = os.getenv("DATABASE_URL", "postgresql://localhost/cherry_ai")
     manager = PostgreSQLSecretManager(database_url)
     return manager.get_secret(secret_name)

@@ -1,20 +1,20 @@
-# Pay Ready Domain ETL & AI Orchestration - Implementation Summary
+# Pay Ready Domain ETL & AI coordination - Implementation Summary
 
 ## Overview
 
-I've designed a comprehensive ETL and AI orchestration system for the Pay Ready (Sophia) domain that integrates seamlessly with your existing Orchestra AI architecture. The solution provides:
+I've designed a comprehensive ETL and AI coordination system for the Pay Ready (Sophia) domain that integrates seamlessly with your existing Cherry AI architecture. The solution provides:
 
 1. **Domain Isolation**: Complete separation from Personal and Paragon domains
 2. **Modular Architecture**: Reusable components that can be adapted for other domains
 3. **Memory Optimization**: Hierarchical storage with intelligent caching
 4. **Entity Resolution**: Sophisticated fuzzy matching and unification
-5. **Workflow Orchestration**: Atomic tasks with dependency management
+5. **Workflow coordination**: Atomic tasks with dependency management
 
 ## Architecture Components
 
 ### 1. Core Services Created
 
-#### ETL Orchestrator (`services/pay_ready/etl_orchestrator.py`)
+#### ETL conductor (`services/pay_ready/etl_conductor.py`)
 - **Purpose**: Manages data ingestion from Airbyte Cloud
 - **Key Features**:
   - Async task execution with Prefect
@@ -60,7 +60,7 @@ I've designed a comprehensive ETL and AI orchestration system for the Pay Ready 
 - `PayReadyHubSpotNote` - CRM notes
 - `PayReadySalesforceNote` - Salesforce activities
 
-## Workflow Orchestration Strategy
+## Workflow coordination Strategy
 
 ### Task Dependency Graph
 
@@ -142,7 +142,7 @@ class PayReadyMCPAdapter(EnhancedMCPServerBase):
 # workflows/pay_ready_etl_flow.py
 @flow(name="pay-ready-etl-pipeline")
 async def pay_ready_etl_pipeline():
-    # Main orchestration flow
+    # Main coordination flow
     # Scheduled via GitHub Actions
 ```
 
@@ -251,7 +251,7 @@ def prune_context(context, max_size):
 - ⏳ Airbyte configuration
 
 ### Week 2: Core Services
-- ⏳ ETL orchestrator testing
+- ⏳ ETL conductor testing
 - ⏳ Entity resolver validation
 - ⏳ Memory manager optimization
 - ⏳ Integration testing
@@ -314,4 +314,4 @@ def prune_context(context, max_size):
 
 This architecture provides a robust, scalable foundation for the Pay Ready domain's data needs while maintaining clean separation from other domains. The modular design allows for easy extension to Personal and Paragon domains when needed, and the intelligent memory management ensures optimal performance at scale.
 
-The combination of Airbyte for ingestion, PostgreSQL for structure, Weaviate for vectors, and Prefect for orchestration creates a powerful platform for turning raw conversational data into actionable intelligence for the Pay Ready (Sophia) persona.
+The combination of Airbyte for ingestion, PostgreSQL for structure, Weaviate for vectors, and Prefect for coordination creates a powerful platform for turning raw conversational data into actionable intelligence for the Pay Ready (Sophia) persona.

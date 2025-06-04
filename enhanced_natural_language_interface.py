@@ -288,12 +288,12 @@ class EnhancedNaturalLanguageInterface:
 
         # Trigger data sync
         if "all" in sources_mentioned:
-            sync_results = await self.data_orchestrator.sync_all_sources()
+            sync_results = await self.data_conductor.sync_all_sources()
         else:
             sync_results = {}
             for source in sources_mentioned:
-                if source in self.data_orchestrator.integrations:
-                    count = await self.data_orchestrator.integrations[source].sync_data()
+                if source in self.data_conductor.integrations:
+                    count = await self.data_conductor.integrations[source].sync_data()
                     sync_results[source] = count
 
         # Generate response

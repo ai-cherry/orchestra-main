@@ -9,7 +9,7 @@ MCP (Model Context Protocol) servers are started automatically by Cursor when yo
 ### 1. Ensure Dependencies are Installed
 
 ```bash
-cd /root/orchestra-main
+cd /root/cherry_ai-main
 source venv/bin/activate
 pip install mcp psycopg weaviate-client
 ```
@@ -21,30 +21,30 @@ Add to your Cursor settings (Cmd/Ctrl + , → Settings → MCP):
 ```json
 {
   "mcpServers": {
-    "orchestra-memory": {
-      "command": "/root/orchestra-main/venv/bin/python",
-      "args": ["/root/orchestra-main/mcp_server/servers/memory_server.py"],
+    "cherry_ai-memory": {
+      "command": "/root/cherry_ai-main/venv/bin/python",
+      "args": ["/root/cherry_ai-main/mcp_server/servers/memory_server.py"],
       "env": {
         "POSTGRES_HOST": "localhost",
         "POSTGRES_PORT": "5432",
-        "POSTGRES_DB": "orchestrator",
-        "POSTGRES_USER": "orchestrator",
+        "POSTGRES_DB": "conductor",
+        "POSTGRES_USER": "conductor",
         "POSTGRES_PASSWORD": "orch3str4_2024",
         "WEAVIATE_HOST": "localhost",
         "WEAVIATE_PORT": "8080"
       }
     },
-    "orchestra-orchestrator": {
-      "command": "/root/orchestra-main/venv/bin/python",
-      "args": ["/root/orchestra-main/mcp_server/servers/orchestrator_server.py"],
+    "cherry_ai-conductor": {
+      "command": "/root/cherry_ai-main/venv/bin/python",
+      "args": ["/root/cherry_ai-main/mcp_server/servers/conductor_server.py"],
       "env": {
         "API_URL": "http://localhost:8080",
         "API_KEY": "4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd"
       }
     },
-    "orchestra-tools": {
-      "command": "/root/orchestra-main/venv/bin/python",
-      "args": ["/root/orchestra-main/mcp_server/servers/tools_server.py"]
+    "cherry_ai-tools": {
+      "command": "/root/cherry_ai-main/venv/bin/python",
+      "args": ["/root/cherry_ai-main/mcp_server/servers/tools_server.py"]
     }
   }
 }
@@ -56,8 +56,8 @@ Add to your Cursor settings (Cmd/Ctrl + , → Settings → MCP):
 2. Open your project
 3. In the chat, type: `@mcp` to see available servers
 4. Use tools like:
-   - `@orchestra-memory store_memory "Important code pattern discovered"`
-   - `@orchestra-memory search_memories "authentication"`
+   - `@cherry_ai-memory store_memory "Important code pattern discovered"`
+   - `@cherry_ai-memory search_memories "authentication"`
 
 ## Troubleshooting
 
@@ -93,24 +93,24 @@ Cursor logs MCP output. Check:
 ### Store Context
 When you discover important patterns or make decisions:
 ```
-@orchestra-memory store_memory "Using PostgreSQL for all relational data, Weaviate for vectors only"
+@cherry_ai-memory store_memory "Using PostgreSQL for all relational data, Weaviate for vectors only"
 ```
 
 ### Search Past Context
 Before implementing something new:
 ```
-@orchestra-memory search_memories "database architecture decisions"
+@cherry_ai-memory search_memories "database architecture decisions"
 ```
 
 ### Add to Knowledge Base
 When you find a good solution:
 ```
-@orchestra-memory add_knowledge "Async PostgreSQL Connection Pattern" "Use psycopg pool with async context manager..."
+@cherry_ai-memory add_knowledge "Async PostgreSQL Connection Pattern" "Use psycopg pool with async context manager..."
 ```
 
 ## MCP is Working When...
 
-1. You see `@orchestra-memory`, `@orchestra-orchestrator`, etc. in Cursor's autocomplete
+1. You see `@cherry_ai-memory`, `@cherry_ai-conductor`, etc. in Cursor's autocomplete
 2. Tools execute and return results
 3. Memory persists between sessions
 
@@ -126,6 +126,6 @@ sudo systemctl start postgresql
 # Weaviate (if using vector features)
 # Run via Docker or systemd
 
-# API Server (if using orchestrator features)
+# API Server (if using conductor features)
 # Run your FastAPI server
 ``` 

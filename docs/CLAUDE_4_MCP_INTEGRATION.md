@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide explains how to use the Model Context Protocol (MCP) servers with Claude to enable powerful AI-assisted development capabilities for the AI Orchestra project.
+This guide explains how to use the Model Context Protocol (MCP) servers with Claude to enable powerful AI-assisted development capabilities for the AI cherry_ai project.
 
 ## Architecture
 
@@ -22,7 +22,7 @@ This guide explains how to use the Model Context Protocol (MCP) servers with Cla
     ├───────────────────────────────┤
     │ •     │ • Secrets MCP      :8002      │
     │ • Memory MCP       :8003      │
-    │ • Orchestrator MCP :8004      │
+    │ • conductor MCP :8004      │
     └───────────────────────────────┘
 ```
 
@@ -49,9 +49,9 @@ Add the MCP configuration to your Claude settings:
 {
   "mcp": {
     "servers": {
-      "ai-orchestra": {
+      "ai-cherry_ai": {
         "endpoint": "http://localhost:8000",
-        "description": "AI Orchestra MCP Gateway"
+        "description": "AI cherry_ai MCP Gateway"
       }
     }
   }
@@ -80,12 +80,12 @@ Claude can now use these tools:
 - `consolidate_memories` - Move memories between layers
 - `get_agent_memories` - Get all memories for an agent
 
-#### Orchestration
+#### coordination
 
 - `switch_mode` - Change agent operational mode
  - `execute` - Execute predefined workflows
 - `execute_task` - Run specific tasks
-- `get_status` - Get orchestrator status
+- `get_status` - Get conductor status
 
 ## Usage Examples
 
@@ -239,7 +239,7 @@ tail -f /var/log/mcp/Cloud_Run_MCP.log
 
 ### Custom Workflows
 
-Create custom workflows by adding them to the orchestrator configuration.
+Create custom workflows by adding them to the conductor configuration.
 
 ## Best Practices
 

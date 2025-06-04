@@ -1,6 +1,6 @@
 # Comprehensive Action Plan: Codebase Stabilization, Optimization, and Deployment Readiness
 
-This plan addresses all identified issues and opportunities for improvement in the orchestration platform, ensuring a robust, performant, and maintainable system aligned with GCP deployment and single-developer priorities.
+This plan addresses all identified issues and opportunities for improvement in the coordination platform, ensuring a robust, performant, and maintainable system aligned with GCP deployment and single-developer priorities.
 
 ---
 
@@ -8,7 +8,7 @@ This plan addresses all identified issues and opportunities for improvement in t
 
 ### Steps
 - **Audit and Remove Legacy Files:**
-  - Delete all non-canonical requirements files (`requirements.txt`, `requirements-consolidated.txt`, `orchestra_api/requirements.txt`, `orchestrator/requirements.txt`, `agent/requirements.txt`, `packages/shared/requirements.txt`, `requirements-webscraping.txt`).
+  - Delete all non-canonical requirements files (`requirements.txt`, `requirements-consolidated.txt`, `cherry_ai_api/requirements.txt`, `conductor/requirements.txt`, `agent/requirements.txt`, `packages/shared/requirements.txt`, `requirements-webscraping.txt`).
   - Retain only `pyproject.toml` and `poetry.lock` for Python dependencies.
 - **Update Documentation:**
   - Revise all onboarding, CI/CD, and deployment docs/scripts to reference only Poetry.

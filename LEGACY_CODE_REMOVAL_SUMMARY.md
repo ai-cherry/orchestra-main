@@ -1,6 +1,6 @@
 # Legacy Code Removal Summary
 
-This document summarizes all legacy, deprecated, obsolete, and archived code that has been removed from the Orchestra AI codebase.
+This document summarizes all legacy, deprecated, obsolete, and archived code that has been removed from the Cherry AI codebase.
 
 ## Files Removed
 

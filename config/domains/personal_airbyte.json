@@ -5,7 +5,7 @@
       "name": "Personal_postgres_to_weaviate",
       "source": {
         "type": "postgres",
-        "database": "orchestra_db",
+        "database": "cherry_ai_db",
         "schema": "personal_domain",
         "tables": [
           "personal_events",
@@ -50,7 +50,7 @@
       },
       "destination": {
         "type": "postgres",
-        "database": "orchestra_db",
+        "database": "cherry_ai_db",
         "schema": "personal_domain",
         "table": "personal_raw_events"
       },

@@ -14,7 +14,7 @@ class Settings(BaseSettings):
 
     # Database
     database_url: str = Field(
-        default="postgresql+asyncpg://localhost/orchestra", env="DATABASE_URL"
+        default="postgresql+asyncpg://localhost/cherry_ai", env="DATABASE_URL"
     )
 
     # Performance settings
@@ -49,7 +49,7 @@ class Settings(BaseSettings):
     metrics_aggregation_interval: int = Field(default=3600, env="METRICS_AGGREGATION_INTERVAL")
 
     # Application metadata
-    app_name: str = Field(default="Orchestra AI", env="APP_NAME")
+    app_name: str = Field(default="Cherry AI", env="APP_NAME")
     app_version: str = Field(default="1.0.0", env="APP_VERSION")
     environment: str = Field(default="production", env="ENVIRONMENT")
 

@@ -43,13 +43,13 @@ jobs:
       run: |
         # Update code
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/vultr_key root@$VULTR_IP << 'EOF'
-        cd /root/orchestra-main
+        cd /root/cherry_ai-main
         git pull origin main
         source venv/bin/activate
         pip install -r requirements/production/requirements.txt
 
         # Restart services
-        systemctl restart orchestra-real
+        systemctl restart cherry_ai-real
 
         # Health check
         sleep 5
@@ -60,7 +60,7 @@ jobs:
       if: github.event.inputs.deploy_type == 'full'
       run: |
         # Update the deploy script with actual repo URL
-        sed -i "s|https://github.com/yourusername/orchestra-main.git|${{ github.server_url }}/${{ github.repository }}.git|" deploy_to_vultr.sh
+        sed -i "s|https://github.com/yourusername/cherry_ai-main.git|${{ github.server_url }}/${{ github.repository }}.git|" deploy_to_vultr.sh
 
         # Run full deployment
         ./deploy_to_vultr.sh
@@ -69,9 +69,9 @@ jobs:
       if: github.event.inputs.deploy_type == 'rollback'
       run: |
         ssh -i ~/.ssh/vultr_key root@${{ secrets.VULTR_IP_ADDRESS }} << 'EOF'
-        cd /root/orchestra-main
+        cd /root/cherry_ai-main
         git reset --hard HEAD~1
-        systemctl restart orchestra-real
+        systemctl restart cherry_ai-real
         EOF
 
     - name: Post-deployment check
@@ -80,7 +80,7 @@ jobs:
         echo "🔍 Checking deployment status..."
         ssh -i ~/.ssh/vultr_key root@${{ secrets.VULTR_IP_ADDRESS }} << 'EOF'
         echo "=== Service Status ==="
-        systemctl is-active orchestra-real docker postgresql nginx
+        systemctl is-active cherry_ai-real docker postgresql nginx
 
         echo -e "\n=== API Health ==="
         curl -s http://localhost/health | jq . || echo "API not responding"
@@ -90,7 +90,7 @@ jobs:
         df -h /
 
         echo -e "\n=== Recent Logs ==="
-        journalctl -u orchestra-real --no-pager -n 10
+        journalctl -u cherry_ai-real --no-pager -n 10
         EOF
 
     - name: Notify deployment status

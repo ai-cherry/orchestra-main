@@ -1,0 +1,3266 @@
+{
+  "timestamp": "2025-06-03T22:40:10.914823",
+  "summary": {},
+  "configuration": {
+    "statistics": {
+      "total_configs": 1,
+      "valid_configs": 1,
+      "missing_configs": [],
+      "invalid_configs": [
+        {
+          "file": "models.py",
+          "error": "unexpected indent (<unknown>, line 15)"
+        }
+      ],
+      "deprecated_settings": []
+    },
+    "issues": []
+  },
+  "security": {
+    "score": 0,
+    "issues": [
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "scripts/mcp_infrastructure_remediation.py",
+        "line": 84,
+        "pattern": "password=\"postgres\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "scripts/mcp_infrastructure_remediation.py",
+        "line": 85,
+        "pattern": "password=\"postgres\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "scripts/mcp_infrastructure_remediation.py",
+        "line": 86,
+        "pattern": "password=\"postgres\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "scripts/mcp_infrastructure_remediation.py",
+        "line": 87,
+        "pattern": "password=\"postgres\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "scripts/mcp_infrastructure_remediation.py",
+        "line": 98,
+        "pattern": "api_key=\"dev-key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/pycodestyle.py",
+        "line": 2611,
+        "pattern": "token=','..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "venv/lib/python3.12/site-packages/starlette/datastructures.py",
+        "line": 166,
+        "pattern": "password=\"********\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/jose/jws.py",
+        "line": 65,
+        "pattern": "token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJh..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "venv/lib/python3.12/site-packages/psycopg2/errorcodes.py",
+        "line": 268,
+        "pattern": "PASSWORD = '28P01'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "venv/lib/python3.12/site-packages/psycopg2/__init__.py",
+        "line": 90,
+        "pattern": "password=\"secret\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/passlib/totp.py",
+        "line": 1092,
+        "pattern": "token='897212'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/passlib/totp.py",
+        "line": 1781,
+        "pattern": "token='%s'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded secret",
+        "file": "venv/lib/python3.12/site-packages/passlib/context.py",
+        "line": 2446,
+        "pattern": "secret = \"too many secrets\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded secret",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/_webhooks_server.py",
+        "line": 87,
+        "pattern": "secret=\"my_secret_key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded secret",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/_webhooks_server.py",
+        "line": 328,
+        "pattern": "secret='my_secret'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/constants.py",
+        "line": 286,
+        "pattern": "TOKEN = \"X-Xet-Access-Token\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded secret",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/hf_api.py",
+        "line": 9145,
+        "pattern": "secret=\"my-secret\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded secret",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/hf_api.py",
+        "line": 9196,
+        "pattern": "secret=\"my-secret\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded secret",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/hf_api.py",
+        "line": 9259,
+        "pattern": "secret=\"my-secret\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded secret",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/hf_api.py",
+        "line": 9267,
+        "pattern": "secret=\"my-secret\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded secret",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/hf_api.py",
+        "line": 9336,
+        "pattern": "secret=\"my-secret\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded secret",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/hf_api.py",
+        "line": 9344,
+        "pattern": "secret=\"my-secret\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded secret",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/hf_api.py",
+        "line": 9399,
+        "pattern": "secret=\"my-secret\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded secret",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/hf_api.py",
+        "line": 9450,
+        "pattern": "secret=\"my-secret\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/hf_api.py",
+        "line": 4640,
+        "pattern": "token=\"my_token\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/hf_api.py",
+        "line": 4648,
+        "pattern": "token=\"my_token\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/hf_api.py",
+        "line": 4656,
+        "pattern": "token=\"my_token\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/hf_api.py",
+        "line": 4874,
+        "pattern": "token=\"my_token\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/hf_api.py",
+        "line": 4886,
+        "pattern": "token=\"my_token\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/hf_api.py",
+        "line": 4897,
+        "pattern": "token=\"my_token\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/grpc/_server.py",
+        "line": 63,
+        "pattern": "TOKEN = \"receive_close_on_server\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/grpc/_server.py",
+        "line": 64,
+        "pattern": "TOKEN = \"send_initial_metadata\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/grpc/_server.py",
+        "line": 65,
+        "pattern": "TOKEN = \"receive_message\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/grpc/_server.py",
+        "line": 66,
+        "pattern": "TOKEN = \"send_message\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/grpc/_server.py",
+        "line": 70,
+        "pattern": "TOKEN = \"send_status_from_server\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "venv/lib/python3.12/site-packages/fsspec/spec.py",
+        "line": 1640,
+        "pattern": "password='password'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/litellm/main.py",
+        "line": 706,
+        "pattern": "api_key=\"mock-key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/litellm/main.py",
+        "line": 799,
+        "pattern": "api_key=\"my-secret-key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/litellm/utils.py",
+        "line": 6910,
+        "pattern": "api_key=\"my-fake-api-key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "venv/lib/python3.12/site-packages/pydantic/types.py",
+        "line": 1819,
+        "pattern": "password='password1'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "venv/lib/python3.12/site-packages/pydantic/types.py",
+        "line": 1846,
+        "pattern": "password='IAmSensitive'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/realtime_tts.py",
+        "line": 80,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/client.py",
+        "line": 41,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/client.py",
+        "line": 86,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/base_client.py",
+        "line": 60,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/base_client.py",
+        "line": 137,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/git/remote.py",
+        "line": 257,
+        "pattern": "token = \"...\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/git/remote.py",
+        "line": 259,
+        "pattern": "token = \"..\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/git/remote.py",
+        "line": 444,
+        "pattern": "token = \"...\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/git/remote.py",
+        "line": 767,
+        "pattern": "token = \" * [would prune] \"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/git/util.py",
+        "line": 583,
+        "pattern": "TOKEN = \"done.\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "venv/lib/python3.12/site-packages/httpx/_urls.py",
+        "line": 336,
+        "pattern": "password=\"a secret\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "venv/lib/python3.12/site-packages/opentelemetry/sdk/environment_variables/__init__.py",
+        "line": 239,
+        "pattern": "PASSWORD = \"OTEL_EXPORTER_JAEGER_PASSWORD\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded secret",
+        "file": "venv/lib/python3.12/site-packages/opentelemetry/semconv/_incubating/attributes/k8s_attributes.py",
+        "line": 363,
+        "pattern": "SECRET = \"secret\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "venv/lib/python3.12/site-packages/mcp/shared/_httpx_utils.py",
+        "line": 60,
+        "pattern": "password=\"pass\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/dateutil/parser/_parser.py",
+        "line": 122,
+        "pattern": "token = ' '..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/utils/_validators.py",
+        "line": 76,
+        "pattern": "token=\"a token\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/utils/_validators.py",
+        "line": 79,
+        "pattern": "token=\"a use_auth_token\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/utils/_validators.py",
+        "line": 82,
+        "pattern": "token=\"a token\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/utils/_validators.py",
+        "line": 82,
+        "pattern": "token=\"a use_auth_token\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/utils/_validators.py",
+        "line": 96,
+        "pattern": "token = \"use_auth_token\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/utils/_headers.py",
+        "line": 97,
+        "pattern": "token=\"hf_***\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/inference/_client.py",
+        "line": 710,
+        "pattern": "api_key=\"<together_api_key>\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/inference/_client.py",
+        "line": 724,
+        "pattern": "api_key=\"hf_...\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/inference/_client.py",
+        "line": 2436,
+        "pattern": "api_key=\"fal-ai-api-key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/inference/_client.py",
+        "line": 2450,
+        "pattern": "api_key=\"hf_...\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/inference/_client.py",
+        "line": 2464,
+        "pattern": "api_key=\"hf_...\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/inference/_client.py",
+        "line": 2548,
+        "pattern": "api_key=\"fal-ai-api-key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/inference/_client.py",
+        "line": 2563,
+        "pattern": "api_key=\"hf_...\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/inference/_client.py",
+        "line": 2717,
+        "pattern": "api_key=\"hf_...\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/inference/_client.py",
+        "line": 2730,
+        "pattern": "api_key=\"hf_...\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/inference/_generated/_async_client.py",
+        "line": 747,
+        "pattern": "api_key=\"<together_api_key>\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/inference/_generated/_async_client.py",
+        "line": 761,
+        "pattern": "api_key=\"hf_...\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/inference/_generated/_async_client.py",
+        "line": 2493,
+        "pattern": "api_key=\"fal-ai-api-key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/inference/_generated/_async_client.py",
+        "line": 2507,
+        "pattern": "api_key=\"hf_...\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/inference/_generated/_async_client.py",
+        "line": 2521,
+        "pattern": "api_key=\"hf_...\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/inference/_generated/_async_client.py",
+        "line": 2605,
+        "pattern": "api_key=\"fal-ai-api-key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/inference/_generated/_async_client.py",
+        "line": 2620,
+        "pattern": "api_key=\"hf_...\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/inference/_generated/_async_client.py",
+        "line": 2775,
+        "pattern": "api_key=\"hf_...\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/huggingface_hub/inference/_generated/_async_client.py",
+        "line": 2788,
+        "pattern": "api_key=\"hf_...\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/sqlalchemy/orm/path_registry.py",
+        "line": 85,
+        "pattern": "TOKEN = \"_sa_default\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/sqlalchemy/connectors/pyodbc.py",
+        "line": 83,
+        "pattern": "token = \"{%s}\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py",
+        "line": 220,
+        "pattern": "token = \"DEFAULT\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "venv/lib/python3.12/site-packages/sqlalchemy/dialects/sqlite/provision.py",
+        "line": 78,
+        "pattern": "password=\"test\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/sqlalchemy/dialects/sqlite/base.py",
+        "line": 1922,
+        "pattern": "token = \"NULL\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "venv/lib/python3.12/site-packages/sqlalchemy/dialects/mssql/pyodbc.py",
+        "line": 75,
+        "pattern": "password=\"tiger\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "venv/lib/python3.12/site-packages/sqlalchemy/dialects/mssql/pyodbc.py",
+        "line": 200,
+        "pattern": "password=\"tiger\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "venv/lib/python3.12/site-packages/sqlalchemy/dialects/mssql/pyodbc.py",
+        "line": 230,
+        "pattern": "password=\"tiger\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "venv/lib/python3.12/site-packages/sqlalchemy/dialects/mysql/mysqldb.py",
+        "line": 204,
+        "pattern": "password=\"passwd\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "venv/lib/python3.12/site-packages/sqlalchemy/dialects/oracle/cx_oracle.py",
+        "line": 162,
+        "pattern": "password=\"tiger\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "venv/lib/python3.12/site-packages/sqlalchemy/dialects/oracle/cx_oracle.py",
+        "line": 197,
+        "pattern": "password=\"tiger\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "venv/lib/python3.12/site-packages/sqlalchemy/dialects/oracle/provision.py",
+        "line": 193,
+        "pattern": "password=\"xe\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/sqlalchemy/dialects/postgresql/base.py",
+        "line": 4222,
+        "pattern": "token = '(?:\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/authlib/oauth1/rfc5849/signature.py",
+        "line": 35,
+        "pattern": "token=\"kkk9d7dh3k39sjv7\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/authlib/oauth1/rfc5849/authorization_server.py",
+        "line": 222,
+        "pattern": "token=\"hh5s93j4hdidpola\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/portkey_ai/api_resources/global_constants.py",
+        "line": 48,
+        "pattern": "API_KEY = \"OPENAI_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/portkey_ai/llms/langchain/chat.py",
+        "line": 103,
+        "pattern": "api_key=\"PORTKEY_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/portkey_ai/llms/langchain/completion.py",
+        "line": 41,
+        "pattern": "api_key=\"PORTKEY_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/tqdm/contrib/telegram.py",
+        "line": 6,
+        "pattern": "token='{token}'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/tqdm/contrib/telegram.py",
+        "line": 102,
+        "pattern": "token='{token}'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/tqdm/contrib/discord.py",
+        "line": 6,
+        "pattern": "token='{token}'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/tqdm/contrib/discord.py",
+        "line": 105,
+        "pattern": "token='{token}'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/tqdm/contrib/slack.py",
+        "line": 6,
+        "pattern": "token='{token}'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/tqdm/contrib/slack.py",
+        "line": 68,
+        "pattern": "token='{token}'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/litellm/proxy/proxy_server.py",
+        "line": 5870,
+        "pattern": "api_key = \"null\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/litellm/proxy/proxy_server.py",
+        "line": 5982,
+        "pattern": "api_key = \"null\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/litellm/proxy/proxy_server.py",
+        "line": 6076,
+        "pattern": "api_key = \"null\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/litellm/proxy/_types.py",
+        "line": 2491,
+        "pattern": "api_key = \"x-litellm-api-key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/litellm/proxy/proxy_cli.py",
+        "line": 80,
+        "pattern": "api_key=\"My API Key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/litellm/proxy/utils.py",
+        "line": 1696,
+        "pattern": "token = '{token}'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded secret",
+        "file": "venv/lib/python3.12/site-packages/litellm/secret_managers/aws_secret_manager_v2.py",
+        "line": 101,
+        "pattern": "secret='%s'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded secret",
+        "file": "venv/lib/python3.12/site-packages/litellm/secret_managers/aws_secret_manager_v2.py",
+        "line": 153,
+        "pattern": "secret='%s'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded secret",
+        "file": "venv/lib/python3.12/site-packages/litellm/secret_managers/aws_secret_manager_v2.py",
+        "line": 160,
+        "pattern": "secret='%s'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/litellm/integrations/email_templates/templates.py",
+        "line": 24,
+        "pattern": "api_key=\"{key_token}\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/litellm/integrations/SlackAlerting/slack_alerting.py",
+        "line": 1145,
+        "pattern": "api_key=\"your_api_key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/litellm/integrations/prometheus_helpers/prometheus_api.py",
+        "line": 113,
+        "pattern": "api_key=\"{api_key}\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/litellm/proxy/vertex_ai_endpoints/langfuse_endpoints.py",
+        "line": 69,
+        "pattern": "api_key=\"Bearer {}\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/litellm/proxy/spend_tracking/spend_management_endpoints.py",
+        "line": 936,
+        "pattern": "api_key='sk-1234\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/litellm/proxy/spend_tracking/spend_tracking_utils.py",
+        "line": 195,
+        "pattern": "api_key = \"litellm_proxy_master_key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/litellm/proxy/spend_tracking/spend_tracking_utils.py",
+        "line": 219,
+        "pattern": "api_key = \"litellm_proxy_master_key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/litellm/proxy/auth/auth_checks.py",
+        "line": 1068,
+        "pattern": "token=\"ui-token\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/litellm/proxy/auth/auth_exception_handler.py",
+        "line": 69,
+        "pattern": "token=\"failed-to-connect-to-db\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/litellm/litellm_core_utils/prompt_templates/factory.py",
+        "line": 124,
+        "pattern": "token=\"<s>\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/litellm/litellm_core_utils/prompt_templates/factory.py",
+        "line": 125,
+        "pattern": "token=\"</s>\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/litellm/litellm_core_utils/prompt_templates/factory.py",
+        "line": 148,
+        "pattern": "token=\"<s>\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/litellm/litellm_core_utils/prompt_templates/factory.py",
+        "line": 149,
+        "pattern": "token=\"</s>\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/litellm/litellm_core_utils/prompt_templates/factory.py",
+        "line": 431,
+        "pattern": "token=\"<eos>\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/litellm/litellm_core_utils/prompt_templates/factory.py",
+        "line": 432,
+        "pattern": "token=\"<bos>\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/litellm/llms/watsonx/common_utils.py",
+        "line": 269,
+        "pattern": "api_key='.\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/litellm/llms/bedrock/chat/invoke_transformations/amazon_deepseek_transformation.py",
+        "line": 64,
+        "pattern": "token = \"<think>\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/litellm/types/proxy/management_endpoints/common_daily_activity.py",
+        "line": 11,
+        "pattern": "API_KEY = \"api_key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/google/protobuf/text_format.py",
+        "line": 897,
+        "pattern": "token = '>'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/google/protobuf/text_format.py",
+        "line": 900,
+        "pattern": "token = '}'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/google/protobuf/text_format.py",
+        "line": 1058,
+        "pattern": "token = '>'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/google/protobuf/text_format.py",
+        "line": 1061,
+        "pattern": "token = '}'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "venv/lib/python3.12/site-packages/pip/_internal/utils/misc.py",
+        "line": 478,
+        "pattern": "password = \":****\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/client.py",
+        "line": 135,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/client.py",
+        "line": 186,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/client.py",
+        "line": 219,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/client.py",
+        "line": 346,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/client.py",
+        "line": 405,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/client.py",
+        "line": 446,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/client.py",
+        "line": 108,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/client.py",
+        "line": 224,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/forced_alignment/client.py",
+        "line": 65,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/forced_alignment/client.py",
+        "line": 129,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/pronunciation_dictionaries/client.py",
+        "line": 85,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/pronunciation_dictionaries/client.py",
+        "line": 146,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/pronunciation_dictionaries/client.py",
+        "line": 216,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/pronunciation_dictionaries/client.py",
+        "line": 264,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/pronunciation_dictionaries/client.py",
+        "line": 335,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/pronunciation_dictionaries/client.py",
+        "line": 404,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/pronunciation_dictionaries/client.py",
+        "line": 483,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/pronunciation_dictionaries/client.py",
+        "line": 539,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/text_to_speech/client.py",
+        "line": 154,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/text_to_speech/client.py",
+        "line": 287,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/text_to_speech/client.py",
+        "line": 418,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/text_to_speech/client.py",
+        "line": 551,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/text_to_speech/client.py",
+        "line": 704,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/text_to_speech/client.py",
+        "line": 846,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/text_to_speech/client.py",
+        "line": 985,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/text_to_speech/client.py",
+        "line": 1127,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/samples/client.py",
+        "line": 53,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/samples/client.py",
+        "line": 108,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/text_to_sound_effects/client.py",
+        "line": 68,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/text_to_sound_effects/client.py",
+        "line": 140,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/models/client.py",
+        "line": 45,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/models/client.py",
+        "line": 89,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/client.py",
+        "line": 72,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/client.py",
+        "line": 142,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/client.py",
+        "line": 194,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/client.py",
+        "line": 227,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/client.py",
+        "line": 283,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/client.py",
+        "line": 336,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/client.py",
+        "line": 437,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/client.py",
+        "line": 501,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/client.py",
+        "line": 562,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/client.py",
+        "line": 640,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/client.py",
+        "line": 700,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/client.py",
+        "line": 741,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/client.py",
+        "line": 805,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/client.py",
+        "line": 866,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/client.py",
+        "line": 977,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/client.py",
+        "line": 1049,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/history/client.py",
+        "line": 75,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/history/client.py",
+        "line": 113,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/history/client.py",
+        "line": 146,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/history/client.py",
+        "line": 269,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/history/client.py",
+        "line": 315,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/history/client.py",
+        "line": 356,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/usage/client.py",
+        "line": 76,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/usage/client.py",
+        "line": 159,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/user/client.py",
+        "line": 47,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/user/client.py",
+        "line": 92,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/text_to_voice/client.py",
+        "line": 86,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/text_to_voice/client.py",
+        "line": 148,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/text_to_voice/client.py",
+        "line": 239,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/text_to_voice/client.py",
+        "line": 309,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/audio_native/client.py",
+        "line": 103,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/audio_native/client.py",
+        "line": 150,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/audio_native/client.py",
+        "line": 198,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/audio_native/client.py",
+        "line": 298,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/audio_native/client.py",
+        "line": 353,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/audio_native/client.py",
+        "line": 409,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/speech_to_speech/client.py",
+        "line": 103,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/speech_to_speech/client.py",
+        "line": 196,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/speech_to_speech/client.py",
+        "line": 307,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/speech_to_speech/client.py",
+        "line": 409,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/client.py",
+        "line": 98,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/client.py",
+        "line": 134,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/client.py",
+        "line": 219,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/client.py",
+        "line": 263,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/speech_to_text/client.py",
+        "line": 100,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/speech_to_text/client.py",
+        "line": 207,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/client.py",
+        "line": 64,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/client.py",
+        "line": 104,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/client.py",
+        "line": 149,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/client.py",
+        "line": 196,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/client.py",
+        "line": 243,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/client.py",
+        "line": 301,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/client.py",
+        "line": 349,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/client.py",
+        "line": 402,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/client.py",
+        "line": 457,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/client.py",
+        "line": 512,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/transcript/client.py",
+        "line": 61,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/transcript/client.py",
+        "line": 126,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/speaker/client.py",
+        "line": 71,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/speaker/client.py",
+        "line": 110,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/speaker/client.py",
+        "line": 178,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/speaker/client.py",
+        "line": 225,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/language/client.py",
+        "line": 60,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/language/client.py",
+        "line": 118,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/segment/client.py",
+        "line": 74,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/segment/client.py",
+        "line": 120,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/segment/client.py",
+        "line": 192,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/segment/client.py",
+        "line": 246,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/speaker/segment/client.py",
+        "line": 72,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/dubbing/resource/speaker/segment/client.py",
+        "line": 153,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/client.py",
+        "line": 69,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/client.py",
+        "line": 212,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/client.py",
+        "line": 276,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/client.py",
+        "line": 340,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/client.py",
+        "line": 386,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/client.py",
+        "line": 419,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/client.py",
+        "line": 472,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/client.py",
+        "line": 623,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/client.py",
+        "line": 695,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/client.py",
+        "line": 767,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/client.py",
+        "line": 821,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/client.py",
+        "line": 862,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/chapters/client.py",
+        "line": 59,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/chapters/client.py",
+        "line": 103,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/chapters/client.py",
+        "line": 140,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/chapters/client.py",
+        "line": 189,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/chapters/client.py",
+        "line": 228,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/chapters/client.py",
+        "line": 265,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/chapters/client.py",
+        "line": 318,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/chapters/client.py",
+        "line": 370,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/chapters/client.py",
+        "line": 417,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/chapters/client.py",
+        "line": 474,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/chapters/client.py",
+        "line": 521,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/chapters/client.py",
+        "line": 566,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/pronunciation_dictionaries/client.py",
+        "line": 65,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/pronunciation_dictionaries/client.py",
+        "line": 137,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/snapshots/client.py",
+        "line": 54,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/snapshots/client.py",
+        "line": 90,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/snapshots/client.py",
+        "line": 202,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/snapshots/client.py",
+        "line": 246,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/content/client.py",
+        "line": 69,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/content/client.py",
+        "line": 141,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/chapters/snapshots/client.py",
+        "line": 57,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/chapters/snapshots/client.py",
+        "line": 102,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/chapters/snapshots/client.py",
+        "line": 201,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/studio/projects/chapters/snapshots/client.py",
+        "line": 254,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/pronunciation_dictionaries/rules/client.py",
+        "line": 66,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/pronunciation_dictionaries/rules/client.py",
+        "line": 112,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/pronunciation_dictionaries/rules/client.py",
+        "line": 178,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/pronunciation_dictionaries/rules/client.py",
+        "line": 234,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/resources/client.py",
+        "line": 64,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/resources/client.py",
+        "line": 121,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/resources/client.py",
+        "line": 183,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/resources/client.py",
+        "line": 249,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/resources/client.py",
+        "line": 316,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/resources/client.py",
+        "line": 386,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/members/client.py",
+        "line": 68,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/members/client.py",
+        "line": 103,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/members/client.py",
+        "line": 165,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/members/client.py",
+        "line": 208,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/invites/client.py",
+        "line": 68,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/invites/client.py",
+        "line": 110,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/invites/client.py",
+        "line": 143,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/invites/client.py",
+        "line": 205,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/invites/client.py",
+        "line": 255,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/invites/client.py",
+        "line": 298,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/groups/client.py",
+        "line": 52,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/groups/client.py",
+        "line": 104,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/groups/members/client.py",
+        "line": 57,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/groups/members/client.py",
+        "line": 94,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/groups/members/client.py",
+        "line": 149,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/workspace/groups/members/client.py",
+        "line": 194,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/client.py",
+        "line": 74,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/client.py",
+        "line": 129,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/client.py",
+        "line": 176,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/client.py",
+        "line": 245,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/client.py",
+        "line": 308,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/client.py",
+        "line": 363,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/settings/client.py",
+        "line": 49,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/settings/client.py",
+        "line": 78,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/settings/client.py",
+        "line": 113,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/settings/client.py",
+        "line": 166,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/settings/client.py",
+        "line": 203,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/settings/client.py",
+        "line": 246,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/ivc/client.py",
+        "line": 73,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/ivc/client.py",
+        "line": 150,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/samples/client.py",
+        "line": 75,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/samples/client.py",
+        "line": 133,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/samples/client.py",
+        "line": 178,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/samples/client.py",
+        "line": 246,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/samples/client.py",
+        "line": 312,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/samples/client.py",
+        "line": 365,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/verification/client.py",
+        "line": 67,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/verification/client.py",
+        "line": 132,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/samples/waveform/client.py",
+        "line": 53,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/samples/waveform/client.py",
+        "line": 108,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/samples/audio/client.py",
+        "line": 53,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/samples/audio/client.py",
+        "line": 108,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/samples/speakers/client.py",
+        "line": 56,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/samples/speakers/client.py",
+        "line": 93,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/samples/speakers/client.py",
+        "line": 149,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/samples/speakers/client.py",
+        "line": 194,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/samples/speakers/audio/client.py",
+        "line": 56,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/samples/speakers/audio/client.py",
+        "line": 115,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/verification/captcha/client.py",
+        "line": 51,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/verification/captcha/client.py",
+        "line": 87,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/verification/captcha/client.py",
+        "line": 135,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/voices/pvc/verification/captcha/client.py",
+        "line": 179,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/user/subscription/client.py",
+        "line": 45,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/user/subscription/client.py",
+        "line": 89,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/sip_trunk/client.py",
+        "line": 65,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/sip_trunk/client.py",
+        "line": 135,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/phone_numbers/client.py",
+        "line": 59,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/phone_numbers/client.py",
+        "line": 97,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/phone_numbers/client.py",
+        "line": 130,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/phone_numbers/client.py",
+        "line": 169,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/phone_numbers/client.py",
+        "line": 199,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/phone_numbers/client.py",
+        "line": 250,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/phone_numbers/client.py",
+        "line": 296,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/phone_numbers/client.py",
+        "line": 337,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/phone_numbers/client.py",
+        "line": 384,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/phone_numbers/client.py",
+        "line": 422,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/phone_numbers/client.py",
+        "line": 66,
+        "pattern": "token=\"token\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded token",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/phone_numbers/client.py",
+        "line": 260,
+        "pattern": "token=\"token\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/conversations/client.py",
+        "line": 58,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/conversations/client.py",
+        "line": 114,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/conversations/client.py",
+        "line": 153,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/conversations/client.py",
+        "line": 186,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/conversations/client.py",
+        "line": 240,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/conversations/client.py",
+        "line": 304,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/conversations/client.py",
+        "line": 351,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/conversations/client.py",
+        "line": 392,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/batch_calls/client.py",
+        "line": 70,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/batch_calls/client.py",
+        "line": 122,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/batch_calls/client.py",
+        "line": 152,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/batch_calls/client.py",
+        "line": 217,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/batch_calls/client.py",
+        "line": 277,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/batch_calls/client.py",
+        "line": 315,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/client.py",
+        "line": 86,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/client.py",
+        "line": 123,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/client.py",
+        "line": 153,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/client.py",
+        "line": 203,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/client.py",
+        "line": 254,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/client.py",
+        "line": 302,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/client.py",
+        "line": 360,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/client.py",
+        "line": 444,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/client.py",
+        "line": 491,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/client.py",
+        "line": 529,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/client.py",
+        "line": 587,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/client.py",
+        "line": 646,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/client.py",
+        "line": 702,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/client.py",
+        "line": 768,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/twilio/client.py",
+        "line": 65,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/twilio/client.py",
+        "line": 135,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/settings/client.py",
+        "line": 50,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/settings/client.py",
+        "line": 93,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/settings/client.py",
+        "line": 143,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/settings/client.py",
+        "line": 194,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/secrets/client.py",
+        "line": 49,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/secrets/client.py",
+        "line": 81,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/secrets/client.py",
+        "line": 111,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/secrets/client.py",
+        "line": 159,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/secrets/client.py",
+        "line": 199,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/secrets/client.py",
+        "line": 237,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/llm_usage/client.py",
+        "line": 64,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/llm_usage/client.py",
+        "line": 133,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/client.py",
+        "line": 81,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/client.py",
+        "line": 166,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/conversations/feedback/client.py",
+        "line": 60,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/conversations/feedback/client.py",
+        "line": 119,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/widget/client.py",
+        "line": 59,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/widget/client.py",
+        "line": 120,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/link/client.py",
+        "line": 50,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/link/client.py",
+        "line": 101,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/llm_usage/client.py",
+        "line": 67,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/llm_usage/client.py",
+        "line": 138,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/knowledge_base/client.py",
+        "line": 49,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/knowledge_base/client.py",
+        "line": 99,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/widget/avatar/client.py",
+        "line": 57,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/agents/widget/avatar/client.py",
+        "line": 111,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/dashboard/settings/client.py",
+        "line": 51,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/dashboard/settings/client.py",
+        "line": 84,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/dashboard/settings/client.py",
+        "line": 130,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/dashboard/settings/client.py",
+        "line": 171,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/documents/client.py",
+        "line": 62,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/documents/client.py",
+        "line": 102,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/documents/client.py",
+        "line": 136,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/documents/client.py",
+        "line": 169,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/documents/client.py",
+        "line": 202,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/documents/client.py",
+        "line": 238,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/documents/client.py",
+        "line": 283,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/documents/client.py",
+        "line": 315,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/documents/client.py",
+        "line": 370,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/documents/client.py",
+        "line": 418,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/documents/client.py",
+        "line": 460,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/documents/client.py",
+        "line": 501,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/documents/client.py",
+        "line": 542,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/documents/client.py",
+        "line": 586,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/documents/client.py",
+        "line": 639,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/documents/client.py",
+        "line": 681,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/document/client.py",
+        "line": 60,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/document/client.py",
+        "line": 118,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/documents/chunk/client.py",
+        "line": 53,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "venv/lib/python3.12/site-packages/elevenlabs/conversational_ai/knowledge_base/documents/chunk/client.py",
+        "line": 108,
+        "pattern": "api_key=\"YOUR_API_KEY\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "backup_remediation_20250603_223939/scripts/backend_deployment_summary.py",
+        "line": 39,
+        "pattern": "password=\"postgres\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "backup_remediation_20250603_223939/scripts/mcp_infrastructure_remediation.py",
+        "line": 84,
+        "pattern": "password=\"postgres\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "backup_remediation_20250603_223939/scripts/mcp_infrastructure_remediation.py",
+        "line": 85,
+        "pattern": "password=\"postgres\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "backup_remediation_20250603_223939/scripts/mcp_infrastructure_remediation.py",
+        "line": 86,
+        "pattern": "password=\"postgres\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "backup_remediation_20250603_223939/scripts/mcp_infrastructure_remediation.py",
+        "line": 87,
+        "pattern": "password=\"postgres\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "backup_remediation_20250603_223939/scripts/mcp_infrastructure_remediation.py",
+        "line": 98,
+        "pattern": "api_key=\"dev-key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "backup_remediation_20250603_223939/scripts/deploy_backend_services.py",
+        "line": 134,
+        "pattern": "password=\"postgres\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "backup_remediation_20250603_223939/scripts/deploy_backend_services.py",
+        "line": 309,
+        "pattern": "password=\"postgres\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "backup_20250603_215510/scripts/deployment_readiness_check.py",
+        "line": 160,
+        "pattern": "password = \"Huskers1983$\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "backup_20250603_215510/scripts/verify_roo_mcp_integration.py",
+        "line": 67,
+        "pattern": "api_key=\"test\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "backup_20250603_215510/scripts/setup_admin_user.py",
+        "line": 28,
+        "pattern": "password = \"Huskers1983$\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "backup_20250603_215510/scripts/setup_admin_user.py",
+        "line": 36,
+        "pattern": "password='postgres'..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded password",
+        "file": "backup_20250603_215510/scripts/backend_comprehensive_audit.py",
+        "line": 161,
+        "pattern": "password=\" in content and \"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded secret",
+        "file": "backup_20250603_215510/core/persistency/mode_config_persistence.py",
+        "line": 14,
+        "pattern": "SECRET = \"MODE_SYSTEM_SECRET\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "backup_20250603_215510/mcp_server/adapters/config.py",
+        "line": 157,
+        "pattern": "api_key=\"dev-key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "backup_20250603_215510/mcp_server/adapters/config.py",
+        "line": 164,
+        "pattern": "api_key=\"dev-key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "backup_20250603_215510/mcp_server/adapters/config.py",
+        "line": 169,
+        "pattern": "api_key=\"dev-key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "backup_20250603_215510/mcp_server/adapters/config.py",
+        "line": 174,
+        "pattern": "api_key=\"dev-key\"..."
+      },
+      {
+        "severity": "CRITICAL",
+        "type": "Hardcoded API key",
+        "file": "backup_20250603_215510/mcp_server/adapters/config.py",
+        "line": 179,
+        "pattern": "api_key=\"dev-key\"..."
+      }
+    ],
+    "authentication": {
+      "jwt_enabled": true,
+      "rbac_configured": true,
+      "api_key_management": "basic"
+    },
+    "encryption": {
+      "secrets_encrypted": true,
+      "tls_enabled": true
+    }
+  },
+  "performance": {
+    "metrics": {
+      "connection_pooling": true,
+      "caching_enabled": true,
+      "async_operations": 9044,
+      "sync_operations": 266,
+      "database_indexes": [],
+      "optimization_opportunities": []
+    },
+    "issues": [
+      {
+        "severity": "MEDIUM",
+        "type": "Potential N+1 query",
+        "pattern": "for\\s+.*\\s+in\\s+.*:\\s*\\n\\s*.*\\.(get|query|find)",
+        "recommendation": "Use eager loading or batch queries"
+      }
+    ],
+    "recommendations": [
+      "Consider using batch operations to reduce database round trips"
+    ]
+  },
+  "compatibility": {
+    "python_version": "3.12.3",
+    "dependencies": {
+      "fastapi": "0.104.1",
+      "pydantic": "2.5.0",
+      "sqlalchemy": "2.0.23",
+      "asyncpg": "0.29.0",
+      "redis": "5.0.1",
+      "redisvl": "0.2.0",
+      "langchain-redis": "0.0.5",
+      "weaviate-client": "3.25.3",
+      "python-multipart": "0.0.6",
+      "aiofiles": "23.2.1",
+      "httpx": "0.25.2",
+      "python-dotenv": "1.0.0",
+      "psycopg2-binary": "2.9.9"
+    },
+    "issues": [
+      {
+        "severity": "MEDIUM",
+        "type": "Deprecated import",
+        "old": "from typing import",
+        "new": "from typing_extensions import",
+        "reason": "For backward compatibility"
+      }
+    ]
+  },
+  "deployment": {
+    "configuration": {
+      "docker_configured": true,
+      "ci_cd_configured": true,
+      "monitoring_configured": true,
+      "backup_configured": true,
+      "scaling_configured": true
+    },
+    "issues": [],
+    "readiness_score": 100.0
+  },
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "category": "Security",
+      "recommendation": "Implement security hardening measures",
+      "actions": [
+        "Remove all hardcoded credentials",
+        "Implement JWT authentication",
+        "Enable TLS/HTTPS for all endpoints",
+        "Set up API key rotation",
+        "Implement rate limiting"
+      ]
+    }
+  ],
+  "critical_issues": [],
+  "warnings": [],
+  "optimizations": []
+}

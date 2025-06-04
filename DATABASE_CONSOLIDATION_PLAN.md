@@ -1,4 +1,4 @@
-# Database Consolidation Plan - Orchestra AI
+# Database Consolidation Plan - Cherry AI
 
 ## Current State Analysis
 
@@ -65,10 +65,10 @@ Map current database usage to new structure:
 
 ```sql
 -- PostgreSQL Schema
-CREATE SCHEMA IF NOT EXISTS orchestra;
+CREATE SCHEMA IF NOT EXISTS cherry_ai;
 
 -- Agents table
-CREATE TABLE orchestra.agents (
+CREATE TABLE cherry_ai.agents (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
     description TEXT,
@@ -80,7 +80,7 @@ CREATE TABLE orchestra.agents (
 );
 
 -- Workflows table
-CREATE TABLE orchestra.workflows (
+CREATE TABLE cherry_ai.workflows (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
     definition JSONB NOT NULL,
@@ -90,16 +90,16 @@ CREATE TABLE orchestra.workflows (
 );
 
 -- Memory snapshots table
-CREATE TABLE orchestra.memory_snapshots (
+CREATE TABLE cherry_ai.memory_snapshots (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    agent_id UUID REFERENCES orchestra.agents(id),
+    agent_id UUID REFERENCES cherry_ai.agents(id),
     snapshot_data JSONB,
     vector_ids TEXT[], -- References to Weaviate vectors
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Audit logs table
-CREATE TABLE orchestra.audit_logs (
+CREATE TABLE cherry_ai.audit_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     event_type VARCHAR(100),
     actor VARCHAR(255),
@@ -110,7 +110,7 @@ CREATE TABLE orchestra.audit_logs (
 );
 
 -- Sessions table (replacing Redis session storage)
-CREATE TABLE orchestra.sessions (
+CREATE TABLE cherry_ai.sessions (
     id VARCHAR(255) PRIMARY KEY,
     data JSONB,
     expires_at TIMESTAMP,
@@ -119,10 +119,10 @@ CREATE TABLE orchestra.sessions (
 );
 
 -- Create indexes
-CREATE INDEX idx_agents_name ON orchestra.agents(name);
-CREATE INDEX idx_workflows_status ON orchestra.workflows(status);
-CREATE INDEX idx_audit_logs_event_type ON orchestra.audit_logs(event_type);
-CREATE INDEX idx_sessions_expires ON orchestra.sessions(expires_at);
+CREATE INDEX idx_agents_name ON cherry_ai.agents(name);
+CREATE INDEX idx_workflows_status ON cherry_ai.workflows(status);
+CREATE INDEX idx_audit_logs_event_type ON cherry_ai.audit_logs(event_type);
+CREATE INDEX idx_sessions_expires ON cherry_ai.sessions(expires_at);
 ```
 
 ### Phase 3: Weaviate Schema
@@ -168,7 +168,7 @@ KNOWLEDGE_COLLECTION = {
 ### 3. Update MCP Servers
 - Consolidate memory_server.py to use PostgreSQL + Weaviate
 - Remove dragonfly_server.py
-- Update orchestrator_server.py to use new database layer
+- Update conductor_server.py to use new database layer
 
 ### 4. Migration Scripts
 - Create data migration scripts from MongoDB to PostgreSQL

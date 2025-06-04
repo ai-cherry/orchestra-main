@@ -1,7 +1,7 @@
 # GCP Removal Summary
 
 ## Overview
-This document summarizes the removal of GCP (Google Cloud Platform) references from the Orchestra AI codebase, as the system actually uses PostgreSQL and Weaviate for data storage.
+This document summarizes the removal of GCP (Google Cloud Platform) references from the Cherry AI codebase, as the system actually uses PostgreSQL and Weaviate for data storage.
 
 ## Files Updated
 

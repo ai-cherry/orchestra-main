@@ -1,7 +1,7 @@
 {
-  "name": "AI Orchestra MCP Configuration (GCP-Free)",
+  "name": "AI cherry_ai MCP Configuration (GCP-Free)",
   "version": "3.0.0",
-  "description": "MCP servers for AI Orchestra with external cloud services",
+  "description": "MCP servers for AI cherry_ai with external cloud services",
   "servers": {
     "memory": {
       "url": "http://localhost:8003",
@@ -35,9 +35,9 @@
         }
       ]
     },
-    "orchestrator": {
+    "conductor": {
       "url": "http://localhost:8004",
-      "description": "AI agent orchestration and mode management",
+      "description": "AI agent coordination and mode management",
       "capabilities": ["switchMode", "runWorkflow", "getStatus", "executeTask"],
       "modes": [
         "standard",

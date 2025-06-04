@@ -1,7 +1,7 @@
 #!/bin/bash
 # Quick validation script for the Vultr-free setup
 
-echo "🔍 Orchestra AI - Setup Validation"
+echo "🔍 Cherry AI - Setup Validation"
 echo "=================================="
 
 # Check for Vultr references

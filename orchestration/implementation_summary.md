@@ -34,7 +34,7 @@ This document summarizes the implementation of a comprehensive LLM management ar
 - Distance-based filtering for trial locations
 - Automated alert system for new matching trials
 
-#### 1.3 Agent Orchestrator (`agent/app/services/agent_orchestrator.py`)
+#### 1.3 Agent conductor (`agent/app/services/agent_conductor.py`)
 - Workflow management with dependency resolution
 - Parallel task execution with topological sorting
 - Circuit breaker pattern for external service calls
@@ -42,15 +42,15 @@ This document summarizes the implementation of a comprehensive LLM management ar
 - Inter-agent message passing via queue
 - Health monitoring and performance metrics
 
-#### 1.4 API Endpoints (`agent/app/routers/llm_orchestration.py`)
-- `/api/orchestration/test-routing` - Test intelligent routing
-- `/api/orchestration/routing-analytics` - Get routing performance data
-- `/api/orchestration/agents` - Get agent status
-- `/api/orchestration/personal/search` - Personal agent search
-- `/api/orchestration/payready/analyze` - Apartment analysis
-- `/api/orchestration/paragon/search-trials` - Clinical trial search
-- `/api/orchestration/workflows` - Workflow management
-- `/api/orchestration/system/health` - System health check
+#### 1.4 API Endpoints (`agent/app/routers/llm_coordination.py`)
+- `/api/coordination/test-routing` - Test intelligent routing
+- `/api/coordination/routing-analytics` - Get routing performance data
+- `/api/coordination/agents` - Get agent status
+- `/api/coordination/personal/search` - Personal agent search
+- `/api/coordination/payready/analyze` - Apartment analysis
+- `/api/coordination/paragon/search-trials` - Clinical trial search
+- `/api/coordination/workflows` - Workflow management
+- `/api/coordination/system/health` - System health check
 
 ### 2. Frontend Integration
 
@@ -68,7 +68,7 @@ This document summarizes the implementation of a comprehensive LLM management ar
 - Paragon Medical: Clinical trial search with results display
 - Real-time agent status indicators
 
-#### 2.3 Orchestration Page (`admin-ui/src/pages/LLMOrchestrationPage.tsx`)
+#### 2.3 coordination Page (`admin-ui/src/pages/LLMcoordinationPage.tsx`)
 - Unified dashboard with key metrics
 - Integration of routing and agent components
 - Placeholder for workflow visualization
@@ -105,7 +105,7 @@ This document summarizes the implementation of a comprehensive LLM management ar
 - **Pay Ready Agent**: Scores tech amenities, analyzes neighborhoods
 - **Paragon Medical**: Filters by trial phase, calculates relevance scores
 
-### 3. Workflow Orchestration
+### 3. Workflow coordination
 - DAG-based task dependencies
 - Parallel execution of independent tasks
 - Checkpoint-based recovery
@@ -115,7 +115,7 @@ This document summarizes the implementation of a comprehensive LLM management ar
 
 ### 1. Testing Intelligent Routing
 ```bash
-curl -X POST http://localhost:8080/api/orchestration/test-routing \
+curl -X POST http://localhost:8080/api/coordination/test-routing \
   -H "Content-Type: application/json" \
   -d '{
     "query": "Write a creative story about AI",
@@ -125,7 +125,7 @@ curl -X POST http://localhost:8080/api/orchestration/test-routing \
 
 ### 2. Personal Agent Search
 ```bash
-curl -X POST http://localhost:8080/api/orchestration/personal/search \
+curl -X POST http://localhost:8080/api/coordination/personal/search \
   -H "Content-Type: application/json" \
   -d '{
     "user_id": "user123",
@@ -136,7 +136,7 @@ curl -X POST http://localhost:8080/api/orchestration/personal/search \
 
 ### 3. Creating a Workflow
 ```bash
-curl -X POST http://localhost:8080/api/orchestration/workflows \
+curl -X POST http://localhost:8080/api/coordination/workflows \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Comprehensive Search Workflow",

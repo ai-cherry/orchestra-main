@@ -1,1 +1,1 @@
-# MCP extensions for AI Orchestra
+# MCP extensions for AI cherry_ai

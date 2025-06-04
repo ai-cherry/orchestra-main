@@ -41,7 +41,7 @@ def create_llm_module():
     llm_dir.mkdir(parents=True, exist_ok=True)
     
     # Create __init__.py
-    init_content = '''"""LLM module for Orchestra AI"""
+    init_content = '''"""LLM module for Cherry AI"""
 
 from .client import LLMClient
 
@@ -50,10 +50,11 @@ __all__ = ["LLMClient"]
     (llm_dir / "__init__.py").write_text(init_content)
     
     # Create client.py
-    client_content = '''"""LLM client for Orchestra AI"""
+    client_content = '''"""LLM client for Cherry AI"""
 
 import logging
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional
+from typing_extensions import Optional, List
 
 logger = logging.getLogger(__name__)
 
@@ -84,13 +85,13 @@ def create_env_file():
     """Create environment file with required variables"""
     print("\n🔧 Creating environment configuration...")
     
-    env_content = '''# Orchestra AI Environment Configuration
+    env_content = '''# Cherry AI Environment Configuration
 
 # Database
-DATABASE_URL=postgresql://orchestra:orchestra_pass@localhost:5432/orchestra_db
-POSTGRES_USER=orchestra
-POSTGRES_PASSWORD=orchestra_pass
-POSTGRES_DB=orchestra_db
+DATABASE_URL=postgresql://cherry_ai:cherry_ai_pass@localhost:5432/cherry_ai_db
+POSTGRES_USER=cherry_ai
+POSTGRES_PASSWORD=cherry_ai_pass
+POSTGRES_DB=cherry_ai_db
 
 # Redis
 REDIS_URL=redis://localhost:6379/0
@@ -149,7 +150,7 @@ def create_docker_compose_prod():
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: orchestra_postgres
+    container_name: cherry_ai_postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -167,7 +168,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: orchestra_redis
+    container_name: cherry_ai_redis
     ports:
       - "6379:6379"
     volumes:
@@ -181,7 +182,7 @@ services:
 
   weaviate:
     image: semitechnologies/weaviate:latest
-    container_name: orchestra_weaviate
+    container_name: cherry_ai_weaviate
     ports:
       - "8080:8080"
     environment:
@@ -197,7 +198,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: orchestra_api
+    container_name: cherry_ai_api
     environment:
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
@@ -247,8 +248,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Create non-root user
-RUN useradd -m -u 1000 orchestra && chown -R orchestra:orchestra /app
-USER orchestra
+RUN useradd -m -u 1000 cherry_ai && chown -R cherry_ai:cherry_ai /app
+USER cherry_ai
 
 # Expose port
 EXPOSE 8001
@@ -348,11 +349,11 @@ def create_deployment_script():
     print("\n🚀 Creating deployment script...")
     
     script_content = '''#!/bin/bash
-# Deploy Orchestra AI to cherry-ai.me
+# Deploy Cherry AI to cherry-ai.me
 
 set -e
 
-echo "🚀 Deploying Orchestra AI to cherry-ai.me..."
+echo "🚀 Deploying Cherry AI to cherry-ai.me..."
 
 # Load environment variables
 export $(cat .env | grep -v '^#' | xargs)
@@ -398,7 +399,7 @@ echo "3. Login with: ${ADMIN_USERNAME} / ${ADMIN_PASSWORD}"
 
 def main():
     """Prepare system for deployment"""
-    print("🚀 Preparing Orchestra AI for deployment to cherry-ai.me")
+    print("🚀 Preparing Cherry AI for deployment to cherry-ai.me")
     print("=" * 60)
     
     # Run preparation steps

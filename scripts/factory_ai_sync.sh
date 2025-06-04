@@ -8,7 +8,7 @@ echo "🔄 Factory AI Sync Script"
 echo "========================="
 
 # Navigate to the correct directory
-cd /root/orchestra-main
+cd /root/cherry_ai-main
 
 # Activate virtual environment
 source venv/bin/activate
@@ -30,9 +30,9 @@ echo "Python: $(which python)"
 echo "Virtual env: $VIRTUAL_ENV"
 
 # Optional: restart services if needed
-if systemctl is-active --quiet orchestra-api; then
-    echo "🔄 Restarting Orchestra API..."
-    sudo systemctl restart orchestra-api
+if systemctl is-active --quiet cherry_ai-api; then
+    echo "🔄 Restarting cherry_ai API..."
+    sudo systemctl restart cherry_ai-api
 fi
 
 echo ""

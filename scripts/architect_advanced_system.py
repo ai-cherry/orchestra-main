@@ -3,7 +3,7 @@
 """
 """
     """Architect for advanced system features"""
-        self.base_dir = Path("/root/orchestra-main")
+        self.base_dir = Path("/root/cherry_ai-main")
         self.src_dir = self.base_dir / "src"
         self.architecture = {
             "created_at": datetime.now().isoformat(),
@@ -130,7 +130,7 @@
             "path": "src/file_ingestion",
             "components": {
                 "ingestion_controller.py": {
-                    "purpose": "Orchestrate file processing pipeline",
+                    "purpose": "cherry_aite file processing pipeline",
                     "max_file_size": "5GB",
                     "supported_formats": ["pdf", "docx", "mp3", "mp4", "zip", "csv", "json"]
                 },
@@ -201,7 +201,7 @@
             "path": "src/multimedia",
             "components": {
                 "image_gen_controller.py": {
-                    "purpose": "Orchestrate image generation",
+                    "purpose": "cherry_aite image generation",
                     "providers": ["stable_diffusion", "dall_e", "midjourney"],
                     "features": ["style_transfer", "inpainting", "upscaling"]
                 },
@@ -252,7 +252,7 @@
             "path": "src/operator_mode",
             "components": {
                 "operator_manager.py": {
-                    "purpose": "Central orchestration hub",
+                    "purpose": "Central coordination hub",
                     "features": ["task_decomposition", "agent_assignment", "result_aggregation"]
                 },
                 "agent_task_queue.py": {
@@ -306,7 +306,7 @@
                     "AgentLabPage.tsx": {
                         "features": ["agent_creation", "team_builder", "tool_assignment"]
                     },
-                    "OrchestratorsPage.tsx": {
+                    "conductorsPage.tsx": {
                         "personas": ["Cherry", "Sophia", "Karen"],
                         "customization": ["traits", "memory", "behaviors"]
                     },
@@ -432,6 +432,7 @@ Search Router - Routes search requests to appropriate strategies
 \"\"\"
 
 from typing import Dict, Any, Optional
+from typing_extensions import Optional
 from enum import Enum
 import asyncio
 from shared.enhanced_circuit_breaker import circuit_breaker
@@ -497,13 +498,14 @@ class SearchRouter:
 """
         ingestion_controller_content = """
 \"\"\"
-Ingestion Controller - Orchestrates file processing pipeline
+Ingestion Controller - cherry_aites file processing pipeline
 \"\"\"
 
 import asyncio
 import hashlib
 from pathlib import Path
 from typing import Dict, Any, Optional
+from typing_extensions import Optional
 import magic
 from shared.database import UnifiedDatabase
 
@@ -581,7 +583,7 @@ class IngestionController:
         """Create OpenAPI specifications"""
             "openapi": "3.0.0",
             "info": {
-                "title": "Orchestra Advanced API",
+                "title": "cherry_ai Advanced API",
                 "version": "2.0.0",
                 "description": "Advanced search, ingestion, and multimedia APIs"
             },
@@ -674,7 +676,7 @@ class IngestionController:
         print("  • Search Engine: 5 search modes + router")
         print("  • File Ingestion: Multi-format support up to 5GB")
         print("  • Multimedia: Image/video generation + workflows")
-        print("  • Operator Mode: Multi-agent orchestration")
+        print("  • Operator Mode: Multi-agent coordination")
         print("  • UI: React + TypeScript with dark theme")
         print("  • Personas: Cherry, Sophia, Karen with deep customization")
         

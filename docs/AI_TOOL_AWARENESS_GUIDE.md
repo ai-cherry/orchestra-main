@@ -2,7 +2,7 @@
 
 ## 🎯 Overview
 
-This guide implements intelligent tool awareness for AI coding assistants in Orchestra AI, enabling them to:
+This guide implements intelligent tool awareness for AI coding assistants in Cherry AI, enabling them to:
 - Discover available tools dynamically
 - Select the right tool based on task complexity
 - Chain tools together for complex workflows
@@ -37,7 +37,7 @@ This guide implements intelligent tool awareness for AI coding assistants in Orc
 
 ## 📚 Implementation Components
 
-### 1. Tool Registry (`core/orchestrator/src/tools/registry.py`)
+### 1. Tool Registry (`core/conductor/src/tools/registry.py`)
 
 The registry maintains rich metadata for each tool:
 
@@ -55,7 +55,7 @@ class ToolDefinition:
     related_tools: List[str]  # Similar/complementary tools
 ```
 
-### 2. Tool Executor (`core/orchestrator/src/tools/executor.py`)
+### 2. Tool Executor (`core/conductor/src/tools/executor.py`)
 
 Handles tool execution with:
 - Parameter validation
@@ -185,7 +185,7 @@ async def email_send(to: str, subject: str, body: str, html: bool = False) -> di
 In `tools_server.py`:
 
 ```python
-from core.orchestrator.src.tools.implementations import notification_tools
+from core.conductor.src.tools.implementations import notification_tools
 
 self.executor.register_implementation("email_send", notification_tools.email_send)
 ```
@@ -280,4 +280,4 @@ Error Handling
 4. **Auto-optimization** - Suggest better tool sequences
 5. **Tool versioning** - Handle tool evolution gracefully
 
-This system transforms AI assistants from code generators to intelligent tool orchestrators!
+This system transforms AI assistants from code generators to intelligent tool conductors!

@@ -1,12 +1,12 @@
 # TODO: Consider adding connection pooling configuration
-"""Unified database interface for the orchestrator."""
+"""Unified database interface for the conductor."""
     """Unified database interface with connection pooling."""
         """Initialize the connection pool."""
                     host=os.getenv("POSTGRES_HOST", "localhost"),
                     port=int(os.getenv("POSTGRES_PORT", "5432")),
                     user=os.getenv("POSTGRES_USER", "postgres"),
                     password=os.getenv("POSTGRES_PASSWORD", ""),
-                    database=os.getenv("POSTGRES_DB", "orchestrator"),
+                    database=os.getenv("POSTGRES_DB", "conductor"),
                     min_size=5,
                     max_size=20,
                     command_timeout=60,

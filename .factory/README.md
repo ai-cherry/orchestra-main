@@ -1,6 +1,6 @@
 # Factory AI Integration
 
-This directory contains the Factory AI Droid integration for the Orchestra project, providing seamless integration between Factory AI's specialized droids and the existing Roo/MCP infrastructure.
+This directory contains the Factory AI Droid integration for the cherry_ai project, providing seamless integration between Factory AI's specialized droids and the existing Roo/MCP infrastructure.
 
 ## Overview
 
@@ -233,7 +233,7 @@ pytest tests/factory_integration/ -v --cov=factory_integration
 3. Build caching layer (Phase 3.3)
 4. Create API gateway (Phase 3.4)
 5. Add monitoring integration (Phase 3.4)
-6. Implement hybrid orchestrator (Phase 3.5)
+6. Implement hybrid conductor (Phase 3.5)
 7. Comprehensive testing (Phase 3.5)
 
 ## Support

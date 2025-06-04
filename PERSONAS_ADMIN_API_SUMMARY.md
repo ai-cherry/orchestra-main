@@ -121,7 +121,7 @@ The personas admin router integrates seamlessly with:
 1. Deploy the API to your environment
 2. Configure the personas directory path as needed
 3. Add more persona configurations
-4. Integrate with your orchestration system
+4. Integrate with your coordination system
 5. Monitor API usage and performance
 
 ## Code Quality

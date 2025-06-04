@@ -8,8 +8,8 @@
     REFINEMENT = "refinement"
     FINALIZATION = "finalization"
 
-class DesignOrchestrator:
-    """Unified orchestrator for automated UI/UX design workflow"""
+class Designconductor:
+    """Unified conductor for automated UI/UX design workflow"""
             "projects_created": 0,
             "designs_generated": 0,
             "images_created": 0,
@@ -636,8 +636,8 @@ Format as structured JSON response.
         
         return refinement_plan
     
-    async def _setup_orchestrator_database(self) -> None:
-        """Setup database tables for orchestrator operations"""
+    async def _setup_conductor_database(self) -> None:
+        """Setup database tables for conductor operations"""
         await self.db.execute_query("""
         """
         await self.db.execute_query("""
@@ -697,16 +697,16 @@ Format as structured JSON response.
 
 
 async def main():
-    """Test Design Orchestrator"""
-    print("🚀 Testing Unified Design Orchestrator...")
+    """Test Design conductor"""
+    print("🚀 Testing Unified Design conductor...")
     
-    async with DesignOrchestrator() as orchestrator:
+    async with Designconductor() as conductor:
         # Test project creation
         print("\n1. Testing complete project creation...")
         try:
 
             pass
-            project_result = await orchestrator.create_design_project(
+            project_result = await conductor.create_design_project(
                 "Create a modern SaaS dashboard for project management",
                 project_type="dashboard",
                 target_audience="project managers and team leads",
@@ -724,7 +724,7 @@ async def main():
         try:
 
             pass
-            analysis_result = await orchestrator.analyze_design_requirements(
+            analysis_result = await conductor.analyze_design_requirements(
                 "E-commerce mobile app for sustainable products",
                 target_audience="environmentally conscious millennials"
             )
@@ -735,8 +735,8 @@ async def main():
             print(f"   ❌ Analysis failed: {e}")
         
         # Performance metrics
-        metrics = orchestrator.get_performance_metrics()
-        print(f"\n📊 Orchestrator Performance:")
+        metrics = conductor.get_performance_metrics()
+        print(f"\n📊 conductor Performance:")
         print(f"   Projects Created: {metrics['projects_created']}")
         print(f"   Designs Generated: {metrics['designs_generated']}")
         print(f"   Images Created: {metrics['images_created']}")

@@ -1,7 +1,7 @@
 """
 """
     """Create a test client for the FastAPI app."""
-@patch("core.orchestrator.src.agents.retriever_agent.RetrieverAgent.retrieve")
+@patch("core.conductor.src.agents.retriever_agent.RetrieverAgent.retrieve")
 def test_api_query_success(mock_retrieve, client):
     """
     """
@@ -24,7 +24,7 @@ def test_api_query_success(mock_retrieve, client):
     assert "result" in response_data
     assert response_data["result"] == "Mocked retriever response"
 
-@patch("core.orchestrator.src.agents.retriever_agent.RetrieverAgent.retrieve")
+@patch("core.conductor.src.agents.retriever_agent.RetrieverAgent.retrieve")
 def test_api_query_with_documents(mock_retrieve, client):
     """
     """
@@ -61,7 +61,7 @@ def test_api_query_with_documents(mock_retrieve, client):
     assert response_data["documents"][0]["id"] == "doc1"
     assert response_data["documents"][1]["id"] == "doc2"
 
-@patch("core.orchestrator.src.agents.retriever_agent.RetrieverAgent.retrieve")
+@patch("core.conductor.src.agents.retriever_agent.RetrieverAgent.retrieve")
 def test_api_query_error_handling(mock_retrieve, client):
     """
     """

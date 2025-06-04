@@ -1,9 +1,9 @@
-# Orchestra Infrastructure Documentation
+# cherry_ai Infrastructure Documentation
 
-This document describes the infrastructure setup for the Orchestra platform using Pulumi on
+This document describes the infrastructure setup for the cherry_ai platform using Pulumi on
 ## Overview
 
-Orchestra's infrastructure is managed using Pulumi and deployed on
+cherry_ai's infrastructure is managed using Pulumi and deployed on
 ### Key Components
 
 - **- **MongoDB
@@ -208,7 +208,7 @@ pulumi workspace delete test-feature
 For assistance with infrastructure issues:
 
 - Check the [Pulumi - Review the module code in `infra/modules/`
-- Consult the Orchestra team Slack channel
+- Consult the cherry_ai team Slack channel
 
 ## RC-Arena Non-Profit Project Integration
 

@@ -8,12 +8,12 @@ echo ""
 # Check if SSH key exists
 SSH_KEY="$HOME/.ssh/id_rsa"
 if [ ! -f "$SSH_KEY" ]; then
-    SSH_KEY="$HOME/.ssh/orchestra_do_key"
+    SSH_KEY="$HOME/.ssh/cherry_ai_do_key"
 fi
 
 if [ ! -f "$SSH_KEY" ]; then
     echo "❌ No SSH key found. Please ensure you have an SSH key at:"
-    echo "   ~/.ssh/id_rsa or ~/.ssh/orchestra_do_key"
+    echo "   ~/.ssh/id_rsa or ~/.ssh/cherry_ai_do_key"
     exit 1
 fi
 

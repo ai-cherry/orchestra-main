@@ -1,5 +1,5 @@
-# AI Orchestra Agent Configuration
-# This file defines the configuration for AI Orchestra agents
+# AI cherry_ai Agent Configuration
+# This file defines the configuration for AI cherry_ai agents
 
 # Global configuration
 global:
@@ -148,14 +148,14 @@ memory:
   # Firestore configuration for mid/long-term memory
   postgresql:
     project_id: ${Vultr_PROJECT_ID}
-    mid_term_collection: orchestra_mid_term
-    long_term_collection: orchestra_long_term
+    mid_term_collection: cherry_ai_mid_term
+    long_term_collection: cherry_ai_long_term
 
   # Vertex AI configuration for semantic memory
   weaviate:
     project_id: ${Vultr_PROJECT_ID}
     region: ${Vultr_REGION}
-    index_name: orchestra-semantic-memory
-    endpoint_name: orchestra-semantic-memory-endpoint
+    index_name: cherry_ai-semantic-memory
+    endpoint_name: cherry_ai-semantic-memory-endpoint
     embedding_model: textembedding-gecko@003
     vector_dimension: 768

@@ -1,6 +1,6 @@
 # Context-Aware Memory Management System
 
-This document describes the enhanced memory management system implemented for the AI Orchestration System. The system optimizes memory usage while maintaining conversation context integrity through several integrated components.
+This document describes the enhanced memory management system implemented for the AI coordination System. The system optimizes memory usage while maintaining conversation context integrity through several integrated components.
 
 ## System Components
 

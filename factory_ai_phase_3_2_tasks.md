@@ -35,7 +35,7 @@ Create the base adapter class that all droid-specific adapters will inherit from
 
 ### 1. Architect Adapter
 - **File**: `mcp_server/adapters/architect_adapter.py`
-- **MCP Server**: orchestrator_server.py
+- **MCP Server**: conductor_server.py
 - **Capabilities**: System design, Pulumi IaC
 - **Special Requirements**: 
   - Handle complex architectural diagrams

@@ -23,7 +23,7 @@ fi
 
 # Function to run commands on Vultr
 vultr_exec() {
-    ssh -i ~/.ssh/vultr_orchestra root@$VULTR_IP "$@"
+    ssh -i ~/.ssh/vultr_cherry_ai root@$VULTR_IP "$@"
 }
 
 echo "📦 Step 1: Installing Redis on Vultr..."
@@ -168,31 +168,31 @@ for key in sample_keys:
 PYTHON
 
 # Copy and run migration script
-vultr_exec "mkdir -p /opt/orchestra/scripts"
-scp -i ~/.ssh/vultr_orchestra /tmp/migrate_dragonfly_data.py root@$VULTR_IP:/opt/orchestra/scripts/
+vultr_exec "mkdir -p /opt/cherry_ai/scripts"
+scp -i ~/.ssh/vultr_cherry_ai /tmp/migrate_dragonfly_data.py root@$VULTR_IP:/opt/cherry_ai/scripts/
 
 echo "📊 Step 3: Running data migration..."
 vultr_exec << EOF
-cd /opt/orchestra
+cd /opt/cherry_ai
 source venv/bin/activate
 export DRAGONFLY_URI="$DRAGONFLY_URI"
 python scripts/migrate_dragonfly_data.py
 EOF
 
-echo "🔧 Step 4: Updating Orchestra configuration..."
+echo "🔧 Step 4: Updating cherry_ai configuration..."
 vultr_exec << 'EOF'
 # Update environment file
-sed -i 's|DRAGONFLY_URI=.*|REDIS_URL=redis://localhost:6379|g' /opt/orchestra/.env
+sed -i 's|DRAGONFLY_URI=.*|REDIS_URL=redis://localhost:6379|g' /opt/cherry_ai/.env
 
 # Add Redis URL if not exists
-grep -q "REDIS_URL" /opt/orchestra/.env || echo "REDIS_URL=redis://localhost:6379" >> /opt/orchestra/.env
+grep -q "REDIS_URL" /opt/cherry_ai/.env || echo "REDIS_URL=redis://localhost:6379" >> /opt/cherry_ai/.env
 
 # Update any Python files that reference DragonflyDB
-find /opt/orchestra -name "*.py" -type f -exec sed -i 's/DRAGONFLY_URI/REDIS_URL/g' {} \;
-find /opt/orchestra -name "*.py" -type f -exec sed -i 's/dragonfly/redis/gi' {} \;
+find /opt/cherry_ai -name "*.py" -type f -exec sed -i 's/DRAGONFLY_URI/REDIS_URL/g' {} \;
+find /opt/cherry_ai -name "*.py" -type f -exec sed -i 's/dragonfly/redis/gi' {} \;
 
 # Restart services
-systemctl restart orchestra-api orchestra-mcp
+systemctl restart cherry_ai-api conductor-mcp
 EOF
 
 echo "✅ Step 5: Verification..."
@@ -204,8 +204,8 @@ redis-cli ping
 echo -e "\n=== Redis Info ==="
 redis-cli INFO keyspace
 
-echo -e "\n=== Orchestra Services ==="
-systemctl is-active orchestra-api orchestra-mcp
+echo -e "\n=== cherry_ai Services ==="
+systemctl is-active cherry_ai-api conductor-mcp
 
 echo -e "\n=== API Health Check ==="
 sleep 5

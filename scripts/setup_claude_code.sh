@@ -3,7 +3,7 @@
 
 set -e
 
-echo "🚀 Setting up Claude Code with MCP for AI Orchestra..."
+echo "🚀 Setting up Claude Code with MCP for AI cherry_ai..."
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -205,8 +205,8 @@ echo -e "${YELLOW}Creating project MCP configuration...${NC}"
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cat > "$PROJECT_ROOT/.mcp.json" << 'EOF'
 {
-  "name": "AI Orchestra MCP Configuration",
-  "description": "MCP servers for AI Orchestra development",
+  "name": "AI cherry_ai MCP Configuration",
+  "description": "MCP servers for AI cherry_ai development",
   "servers": {
     "Vultr-cloud-run": {
       "description": "Deploy and manage Cloud Run services",

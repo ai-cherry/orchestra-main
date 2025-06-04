@@ -14,7 +14,7 @@ class SyncStatus(Enum):
     SUCCEEDED = "succeeded"
     FAILED = "failed"
 
-class PayReadyETLOrchestrator:
+class PayReadyETLconductor:
     """
     """
         self.domain = "pay_ready"
@@ -27,7 +27,7 @@ class PayReadyETLOrchestrator:
 
     async def initialize(self):
         """Initialize all required connections and services"""
-        logger.info("Initializing Pay Ready ETL Orchestrator")
+        logger.info("Initializing Pay Ready ETL conductor")
 
         # Initialize database connection
         self.postgres = await get_unified_postgresql_enhanced()
@@ -51,7 +51,7 @@ class PayReadyETLOrchestrator:
         await self.memory_manager.initialize()
 
         self._initialized = True
-        logger.info("Pay Ready ETL Orchestrator initialized successfully")
+        logger.info("Pay Ready ETL conductor initialized successfully")
 
     async def _init_airbyte_client(self) -> "AirbyteClient":
         """Initialize Airbyte Cloud API client"""

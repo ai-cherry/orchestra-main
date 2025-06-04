@@ -1,21 +1,21 @@
-# Orchestra AI Quick Reference
+# Cherry AI Quick Reference
 
 ## 🚀 Quick Start
 ```bash
 # SSH to server
-ssh -i ~/.ssh/vultr_orchestra root@45.32.69.157
+ssh -i ~/.ssh/vultr_cherry_ai root@45.32.69.157
 
 # Start development
-cd /root/orchestra-main
+cd /root/cherry_ai-main
 source venv/bin/activate
 ./scripts/start_mcp_for_coding.sh
 ```
 
 ## 📁 Key Directories
-- **App**: `/root/orchestra-main/agent/`
-- **MCP**: `/root/orchestra-main/mcp_server/`
-- **Database**: `/root/orchestra-main/shared/database/`
-- **Scripts**: `/root/orchestra-main/scripts/`
+- **App**: `/root/cherry_ai-main/agent/`
+- **MCP**: `/root/cherry_ai-main/mcp_server/`
+- **Database**: `/root/cherry_ai-main/shared/database/`
+- **Scripts**: `/root/cherry_ai-main/scripts/`
 
 ## 🔧 Common Commands
 ```bash
@@ -42,7 +42,7 @@ python scripts/test_database_consolidation.py  # Test DB
 ## 🌐 Service Ports
 - **Production API**: 8000
 - **Dev API**: 8001
-- **MCP Orchestrator**: 8002
+- **MCP conductor**: 8002
 - **MCP Memory**: 8003
 - **MCP Tools**: 8006
 - **PostgreSQL**: 5432
@@ -70,7 +70,7 @@ make after-ai-coding
 ```bash
 # Check logs
 tail -f /tmp/mcp_*.log
-journalctl -u orchestra-api -f
+journalctl -u cherry_ai-api -f
 
 # Restart everything
 make restart-services
@@ -93,13 +93,13 @@ cp env.example .env
 
 # Key vars:
 POSTGRES_HOST=localhost
-POSTGRES_DB=orchestra
+POSTGRES_DB=cherry_ai
 WEAVIATE_HOST=localhost
 API_KEY=4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd
 ```
 
 ## 🔗 Important URLs
-- **GitHub**: https://github.com/ai-cherry/orchestra-main
+- **GitHub**: https://github.com/ai-cherry/cherry_ai-main
 - **Production**: http://45.32.69.157:8000
 - **Dev**: http://45.32.69.157:8001
 - **Health**: http://45.32.69.157:8000/health

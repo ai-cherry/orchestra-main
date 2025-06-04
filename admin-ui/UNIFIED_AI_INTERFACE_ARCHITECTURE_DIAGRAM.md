@@ -41,7 +41,7 @@ graph TB
         QUEUE[Redis Streams]
         
         API --> AUTH[Auth Service]
-        API --> ORCH[Orchestration Service]
+        API --> ORCH[coordination Service]
         API --> AGENT[Agent Service]
     end
     

@@ -36,6 +36,6 @@ else:
     print("✗ ANTHROPIC_API_KEY not set")
 
 print("\nQuick Start Commands:")
-print("1. Set API key: export ANTHROPIC_API_KEY='your-key-here'")
+print("1. Set API key: export ANTHROPIC_API_KEY= os.getenv('API_KEY')")
 print("2. Start MCP server: python mcp_server/run_mcp_server.py")
 print("3. Test with Claude: claude --mcp-config mcp_config.json")

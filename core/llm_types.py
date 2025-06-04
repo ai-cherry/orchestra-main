@@ -7,7 +7,7 @@
     DOCUMENTATION = "documentation"
     CHAT_CONVERSATION = "chat_conversation"
     MEMORY_PROCESSING = "memory_processing"
-    WORKFLOW_ORCHESTRATION = "workflow_orchestration"
+    WORKFLOW_COORDINATION = "workflow_coordination"
     GENERAL_PURPOSE = "general_purpose"
 
 class ModelTier(str, Enum):

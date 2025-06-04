@@ -1,7 +1,7 @@
 #!/bin/bash
-# Simple AI Orchestra Deployment
+# Simple AI cherry_ai Deployment
 # ==============================
-# One-command deployment for AI Orchestra with SuperAGI
+# One-command deployment for AI cherry_ai with SuperAGI
 
 set -euo pipefail
 
@@ -20,7 +20,7 @@ log_error() {
 }
 
 # Check if we're in the right directory
-if [ ! -f "scripts/deploy_orchestra.sh" ]; then
+if [ ! -f "scripts/deploy_cherry_ai.sh" ]; then
     log_error "Please run this script from the project root directory"
     exit 1
 fi
@@ -28,16 +28,16 @@ fi
 # Set environment
 ENVIRONMENT="${1:-dev}"
 
-log_info "Deploying AI Orchestra (Environment: $ENVIRONMENT)"
+log_info "Deploying AI cherry_ai (Environment: $ENVIRONMENT)"
 log_info "This will deploy:"
 log_info "  - SuperAGI with managed databases"
 log_info "  - MongoDB Atlas, DragonflyDB Cloud, Weaviate Cloud"
 log_info "  - Monitoring stack (optional)"
 
 # Make sure the main script is executable
-chmod +x scripts/deploy_orchestra.sh
+chmod +x scripts/deploy_cherry_ai.sh
 
 # Run the main deployment
-ENVIRONMENT=$ENVIRONMENT ./scripts/deploy_orchestra.sh
+ENVIRONMENT=$ENVIRONMENT ./scripts/deploy_cherry_ai.sh
 
 log_info "Deployment complete! 🎉"

@@ -31,6 +31,7 @@ GOOD EXAMPLE:
 ```python
 import os
 from typing import Optional
+from typing_extensions import Optional
 import pymongo
 from dotenv import load_dotenv
 
@@ -46,7 +47,7 @@ def get_db_connection() -> Optional[pymongo.database.Database]:
 
         pass
         client = pymongo.MongoClient(os.getenv("MONGODB_URI"))
-        return client.orchestra
+        return client.cherry_ai
     except Exception:
 
         pass

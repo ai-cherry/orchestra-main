@@ -1,6 +1,6 @@
 # Roo-MCP Integration Guide
 
-This guide provides comprehensive documentation for the integration between Roo modes and the MCP (Model Context Protocol) working memory system in the AI Orchestra project.
+This guide provides comprehensive documentation for the integration between Roo modes and the MCP (Model Context Protocol) working memory system in the AI cherry_ai project.
 
 ## Table of Contents
 
@@ -59,7 +59,7 @@ The mode system defines different operational modes for Roo, each with specific 
 - **Architect Mode**: For designing system architecture
 - **Debug Mode**: For troubleshooting and debugging
 - **Reviewer Mode**: For code review and quality analysis
-- **Orchestrator Mode**: For coordinating complex operations
+- **conductor Mode**: For coordinating complex operations
 - **Strategy Mode**: For planning and strategic analysis
 - **Creative Mode**: For creative content generation
 - **Ask Mode**: For research and information retrieval

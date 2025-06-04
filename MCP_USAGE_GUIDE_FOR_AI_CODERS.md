@@ -1,7 +1,7 @@
 # MCP Usage Guide for AI Coders
 
 ## Overview
-This guide helps AI coding assistants (like Claude in Cursor, GitHub Copilot, etc.) effectively use the Orchestra MCP servers to provide better coding assistance.
+This guide helps AI coding assistants (like Claude in Cursor, GitHub Copilot, etc.) effectively use the cherry_ai MCP servers to provide better coding assistance.
 
 ## Quick Setup
 
@@ -11,7 +11,7 @@ Ensure these environment variables are set in your `.env` file:
 # PostgreSQL (Relational Data)
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
-POSTGRES_DB=orchestra
+POSTGRES_DB=cherry_ai
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your_password
 
@@ -28,7 +28,7 @@ API_KEY=4010007a9aa5443fc717b54e1fd7a463260965ec9e2fce297280cf86f1b3a4bd
 ### 2. Start MCP Servers
 ```bash
 # In separate terminals (or use screen/tmux)
-python mcp_server/servers/orchestrator_server.py
+python mcp_server/servers/conductor_server.py
 python mcp_server/servers/memory_server.py
 python mcp_server/servers/tools_server.py
 python mcp_server/servers/weaviate_direct_mcp_server.py
@@ -39,17 +39,17 @@ Add to your Cursor's `.mcp.json`:
 ```json
 {
   "mcpServers": {
-    "orchestra-orchestrator": {
+    "cherry_ai-conductor": {
       "command": "python",
-      "args": ["/root/orchestra-main/mcp_server/servers/orchestrator_server.py"]
+      "args": ["/root/cherry_ai-main/mcp_server/servers/conductor_server.py"]
     },
-    "orchestra-memory": {
+    "cherry_ai-memory": {
       "command": "python",
-      "args": ["/root/orchestra-main/mcp_server/servers/memory_server.py"]
+      "args": ["/root/cherry_ai-main/mcp_server/servers/memory_server.py"]
     },
-    "orchestra-tools": {
+    "cherry_ai-tools": {
       "command": "python",
-      "args": ["/root/orchestra-main/mcp_server/servers/tools_server.py"]
+      "args": ["/root/cherry_ai-main/mcp_server/servers/tools_server.py"]
     }
   }
 }
@@ -94,7 +94,7 @@ Use: Before implementing something new
 Example: Search for "authentication patterns"
 ```
 
-### Orchestrator Server Tools
+### conductor Server Tools
 
 #### 1. **list_agents**
 See available AI agents:
@@ -264,7 +264,7 @@ curl http://localhost:8080/v1/meta
 3. **Tool Not Found**
 ```bash
 # List available tools
-curl http://localhost:8002/tools  # Orchestrator
+curl http://localhost:8002/tools  # conductor
 curl http://localhost:8003/tools  # Memory
 ```
 
@@ -281,16 +281,16 @@ curl http://localhost:8003/tools  # Memory
 ### Example Cursor Commands
 ```
 // Search for previous implementation
-@orchestra search_memories "user authentication"
+@cherry_ai search_memories "user authentication"
 
 // Store important context
-@orchestra store_memory "User prefers PostgreSQL over MySQL"
+@cherry_ai store_memory "User prefers PostgreSQL over MySQL"
 
 // Add reusable pattern
-@orchestra add_knowledge "Async request handler pattern"
+@cherry_ai add_knowledge "Async request handler pattern"
 
 // Run specialized agent
-@orchestra run_agent "test_generator" "Create unit tests for auth module"
+@cherry_ai run_agent "test_generator" "Create unit tests for auth module"
 ```
 
 ## Monitoring and Metrics
@@ -304,4 +304,4 @@ system_stats = get_system_stats()
 health = health_check()
 ```
 
-This guide should help AI coders effectively use the Orchestra MCP servers to provide better, more contextual coding assistance. 
+This guide should help AI coders effectively use the cherry_ai MCP servers to provide better, more contextual coding assistance. 

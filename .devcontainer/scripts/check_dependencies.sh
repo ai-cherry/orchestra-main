@@ -6,7 +6,7 @@ set -e
 echo "Validating Python dependencies installation..."
 
 # Ensure we're in the project root
-cd /workspaces/orchestra-main
+cd /workspaces/cherry_ai-main
 
 # Source the virtual environment if it exists
 if [ -d ".venv" ]; then

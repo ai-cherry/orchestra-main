@@ -7,6 +7,7 @@ Creative and innovative AI assistant focused on brainstorming and creative solut
 
 import logging
 from typing import Dict, List, Any, Optional
+from typing_extensions import Optional
 from datetime import datetime
 
 try:

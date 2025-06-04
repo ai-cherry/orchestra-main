@@ -259,7 +259,7 @@ main() {
     fi
     
     # Define servers to stop (in reverse order of startup)
-    local servers=("weaviate-direct" "tools" "orchestrator" "memory")
+    local servers=("weaviate-direct" "tools" "conductor" "memory")
     local failed_servers=()
     
     # Stop each server

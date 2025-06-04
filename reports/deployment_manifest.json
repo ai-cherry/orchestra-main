@@ -1,0 +1,41 @@
+{
+  "deployment_type": "Cherry AI Admin Interface",
+  "version": "1.0.0",
+  "deployed_at": "Tue Jun  3 07:48:47 PM UTC 2025",
+  "components": {
+    "frontend": {
+      "type": "admin-ui",
+      "location": "/var/www/cherry_ai-admin",
+      "source": "/root/cherry_ai-main/admin-ui/dist"
+    },
+    "api": {
+      "type": "FastAPI",
+      "port": 8001,
+      "container": "cherry_ai_api"
+    },
+    "database": {
+      "type": "PostgreSQL",
+      "port": 5432,
+      "container": "cherry_ai_postgres",
+      "schemas": [
+        "public",
+        "personal",
+        "payready",
+        "paragonrx"
+      ]
+    },
+    "cache": {
+      "type": "Redis",
+      "port": 6379,
+      "container": "cherry_ai_redis"
+    },
+    "vector_store": {
+      "type": "Weaviate",
+      "port": 8081,
+      "container": "cherry_ai_weaviate"
+    }
+  },
+  "nginx_config": "/etc/nginx/sites-enabled/cherry_ai-admin",
+  "ssl_certificate": "/etc/letsencrypt/live/cherry-ai.me/",
+  "admin_user": "scoobyjava"
+}

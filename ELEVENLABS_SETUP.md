@@ -1,12 +1,12 @@
-# ElevenLabs Setup for Orchestra AI
+# ElevenLabs Setup for Cherry AI
 
-This guide covers setting up ElevenLabs voice synthesis for Orchestra AI, providing realistic AI voice capabilities for your personal assistant.
+This guide covers setting up ElevenLabs voice synthesis for Cherry AI, providing realistic AI voice capabilities for your personal assistant.
 
 ## Prerequisites
 
 1. ElevenLabs account (sign up at [elevenlabs.io](https://elevenlabs.io))
 2. API key from your ElevenLabs dashboard
-3. Python environment with Orchestra AI installed
+3. Python environment with Cherry AI installed
 
 ## Configuration
 
@@ -104,7 +104,7 @@ audio_url = await generator.text_to_speech("Hello, I'm your AI assistant!")
 
 ## API Endpoints
 
-### Text-to-Speech via Orchestra API
+### Text-to-Speech via cherry_ai API
 
 ```bash
 POST /api/agent/synthesize
@@ -194,9 +194,9 @@ logging.basicConfig(level=logging.DEBUG)
 3. **Input Validation**: Sanitize text input before synthesis
 4. **Audio Storage**: Secure any cached audio files
 
-## Integration with Orchestra Personas
+## Integration with cherry_ai Personas
 
-Each Orchestra persona can have unique voice settings:
+Each cherry_ai persona can have unique voice settings:
 
 ```yaml
 # In persona configuration
@@ -231,5 +231,5 @@ estimated_cost = (len(text) / 1000) * 0.30  # $0.30 per 1000 chars
 ## Support
 
 - ElevenLabs Documentation: [docs.elevenlabs.io](https://docs.elevenlabs.io)
-- Orchestra AI Issues: Create an issue in the repository
+- Cherry AI Issues: Create an issue in the repository
 - API Status: [status.elevenlabs.io](https://status.elevenlabs.io) 

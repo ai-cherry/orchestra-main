@@ -1,4 +1,4 @@
-"""Agent service module for Orchestra AI."""
+"""Agent service module for Cherry AI."""
     "Agent",
     "AgentCapability",
     "AgentConfig",

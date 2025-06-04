@@ -4,7 +4,7 @@
     """Configuration for data source connections."""
     """Base class for all data source integrations."""
         """Get or create HTTP session."""
-            headers = {"User-Agent": "Orchestra-AI/1.0"}
+            headers = {"User-Agent": "cherry_ai-AI/1.0"}
             if self.config.additional_headers:
                 headers.update(self.config.additional_headers)
 
@@ -385,7 +385,7 @@ class LookerIntegration(BaseDataSourceIntegration):
     async def _sync_looks(self, session: aiohttp.ClientSession) -> int:
         """Sync Looker looks (saved queries)."""
         """Sync Looker explores and data models."""
-    """Orchestrates data collection from all sources."""
+    """cherry_aites data collection from all sources."""
         """Add a data source integration."""
         """Sync data from all configured sources."""
                 logger.info(f"Starting sync for {name}")

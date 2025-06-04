@@ -1,6 +1,6 @@
-# AI Orchestra Mode Definitions
+# AI cherry_ai Mode Definitions
 # This configuration defines all available modes with their optimized model assignments:
-# - Gemini 1.5 Pro: architect, orchestrator, and reviewer modes
+# - Gemini 1.5 Pro: architect, conductor, and reviewer modes
 # - GPT-4: code and debug modes
 # - Claude 3 Opus: strategy, ask, and creative modes
 
@@ -23,12 +23,12 @@ modes:
     token_limit: 128000
     suggested_transitions:
       - "debug (for testing)"
-      - "orchestrator (for review)"
+      - "conductor (for review)"
 
   debug:
     name: "🪲 Debug"
     model: "gpt-4.1"
-    description: "Expert troubleshooter and debugger for the AI Orchestra project"
+    description: "Expert troubleshooter and debugger for the AI cherry_ai project"
     write_access: true
     file_patterns:
       - ".*\\.py$"
@@ -41,7 +41,7 @@ modes:
     token_limit: 128000
     suggested_transitions:
       - "code (for implementation)"
-      - "orchestrator (for review)"
+      - "conductor (for review)"
 
   architect:
     name: "🏗 Architect"
@@ -62,8 +62,8 @@ modes:
       - "code (for implementation)"
       - "strategy (for planning)"
 
-  orchestrator:
-    name: "🪃 Orchestrator"
+  conductor:
+    name: "🪃 conductor"
     model: "gemini-2.5-pro"
     description: "Meticulous code reviewer and static analysis expert"
     write_access: true
@@ -97,7 +97,7 @@ modes:
     token_limit: 1000000
     suggested_transitions:
       - "creative (for documentation)"
-      - "orchestrator (for technical review)"
+      - "conductor (for technical review)"
 
   strategy:
     name: "🧠 Strategy"
@@ -151,7 +151,7 @@ modes:
     token_limit: 100000
     suggested_transitions:
       - "ask (for research)"
-      - "orchestrator (for technical review)"
+      - "conductor (for technical review)"
 
 # Workflow definitions for common development patterns
 workflows:
@@ -165,7 +165,7 @@ workflows:
         task: "Design system components and integration points"
       - mode: "code"
         task: "Implement the feature based on the architecture"
-      - mode: "orchestrator"
+      - mode: "conductor"
         task: "Review the implementation for quality and standards"
       - mode: "debug"
         task: "Test and fix any issues"
@@ -180,14 +180,14 @@ workflows:
         task: "Analyze and diagnose the issue"
       - mode: "code"
         task: "Implement the fix"
-      - mode: "orchestrator"
+      - mode: "conductor"
         task: "Review the fix for quality and unintended consequences"
 
   refactoring:
     name: "Code Refactoring Workflow"
     description: "Structured approach to code refactoring"
     steps:
-      - mode: "orchestrator"
+      - mode: "conductor"
         task: "Analyze code for refactoring opportunities"
       - mode: "architect"
         task: "Design improved architecture for the refactored code"
@@ -202,7 +202,7 @@ workflows:
     name: "Security Audit Workflow"
     description: "Comprehensive security review process"
     steps:
-      - mode: "orchestrator"
+      - mode: "conductor"
         task: "Perform static analysis and security scanning"
       - mode: "debug"
         task: "Verify vulnerable components and test exploitability"

@@ -38,12 +38,12 @@ COPY core/ ./core/
 COPY agent/ ./agent/
 
 # Run the app
-CMD ["gunicorn", "core.orchestrator.src.api.app:app", "-k", "uvicorn.workers.UvicornWorker", "-w", "4", "-b", "0.0.0.0:8000"]
+CMD ["gunicorn", "core.conductor.src.api.app:app", "-k", "uvicorn.workers.UvicornWorker", "-w", "4", "-b", "0.0.0.0:8000"]
 EOF
 
 # 3. Build the image
 echo "📦 Building minimal backend image..."
-docker build -t orchestra-api-minimal:latest -f Dockerfile.minimal .
+docker build -t cherry_ai-api-minimal:latest -f Dockerfile.minimal .
 
 # 4. Test locally
 echo "🧪 Testing the API locally..."
@@ -52,7 +52,7 @@ docker stop test-api 2>/dev/null || true
 docker rm test-api 2>/dev/null || true
 
 # Use port 8001 for testing to avoid conflicts
-docker run -d --name test-api -p 8001:8000 orchestra-api-minimal:latest
+docker run -d --name test-api -p 8001:8000 cherry_ai-api-minimal:latest
 sleep 5
 
 # Check if health endpoint works
@@ -84,17 +84,17 @@ docker rm test-api
 echo "🚀 Ready to deploy. Run these commands on your Vultr server:"
 echo ""
 echo "# Save the image"
-echo "docker save orchestra-api-minimal:latest | gzip > orchestra-api-minimal.tar.gz"
+echo "docker save cherry_ai-api-minimal:latest | gzip > cherry_ai-api-minimal.tar.gz"
 echo ""
 echo "# Copy to server"
-echo "scp orchestra-api-minimal.tar.gz root@your-vultr-ip:/tmp/"
+echo "scp cherry_ai-api-minimal.tar.gz root@your-vultr-ip:/tmp/"
 echo ""
 echo "# On the server:"
 echo "cd /tmp"
-echo "docker load < orchestra-api-minimal.tar.gz"
-echo "docker stop orchestra-api || true"
-echo "docker rm orchestra-api || true"
-echo "docker run -d --name orchestra-api -p 8000:8000 --restart always orchestra-api-minimal:latest"
+echo "docker load < cherry_ai-api-minimal.tar.gz"
+echo "docker stop cherry_ai-api || true"
+echo "docker rm cherry_ai-api || true"
+echo "docker run -d --name cherry_ai-api -p 8000:8000 --restart always cherry_ai-api-minimal:latest"
 echo ""
 echo "# Update nginx if needed to proxy to port 8000"
 

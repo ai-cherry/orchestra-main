@@ -132,7 +132,7 @@ PORTKEY_API_KEY=your-key
 OPENROUTER_API_KEY=your-key
 
 # Database (required for dynamic router)
-DATABASE_URL=postgresql+asyncpg://user:pass@localhost/orchestra
+DATABASE_URL=postgresql+asyncpg://user:pass@localhost/cherry_ai
 
 # Performance settings (optional)
 CONNECTION_POOL_SIZE=2
@@ -159,7 +159,7 @@ python scripts/setup_llm_configuration.py
 services:
   api:
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:password@db/orchestra
+      - DATABASE_URL=postgresql+asyncpg://postgres:password@db/cherry_ai
       - PORTKEY_API_KEY=${PORTKEY_API_KEY}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - ENABLE_MONITORING=true

@@ -1,4 +1,4 @@
-# Orchestra AI Deployment Summary
+# Cherry AI Deployment Summary
 
 **Date:** June 1, 2025  
 **Status:** ✅ Partially Complete
@@ -10,10 +10,10 @@
 - Created rules directories for each mode
 - Updated MCP configuration
 - Committed and pushed to GitHub main branch
-- Repository: https://github.com/ai-cherry/orchestra-main
+- Repository: https://github.com/ai-cherry/cherry_ai-main
 
 ### 2. ⚠️ MCP Server Status
-- MCP server has dependency issues (missing imports in orchestrator_server.py)
+- MCP server has dependency issues (missing imports in conductor_server.py)
 - Module is installed but the server code needs fixes
 - Server attempted to start but failed due to import errors
 
@@ -33,7 +33,7 @@
 ### 5. ✅ Infrastructure Status
 - Nginx is running and serving content
 - Domain https://cherry-ai.me is accessible (returns 200 OK)
-- Sites available: default, orchestra, orchestra-admin
+- Sites available: default, cherry_ai, cherry_ai-admin
 
 ## Current Access Points
 - **Domain:** https://cherry-ai.me (currently serving existing content)
@@ -47,7 +47,7 @@
    - Fix import issues in the API routers
 
 2. **Fix MCP Server:**
-   - Update `mcp_server/servers/orchestrator_server.py` to fix import errors
+   - Update `mcp_server/servers/conductor_server.py` to fix import errors
    - Ensure all required functions exist in agent_control module
 
 3. **Fix Admin UI TypeScript Errors:**
@@ -70,7 +70,7 @@ python -m uvicorn agent.app.main:app --host 0.0.0.0 --port 8080
 # Build Admin UI (after fixing TypeScript errors)
 cd admin-ui
 pnpm build
-cp -r dist/* /var/www/orchestra-admin/
+cp -r dist/* /var/www/cherry_ai-admin/
 
 # Restart services
 systemctl reload nginx

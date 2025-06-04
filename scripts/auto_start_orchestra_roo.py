@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Auto-start Orchestra AI with Roo integration"""
+"""Auto-start Cherry AI with Roo integration"""
 
 import asyncio
 import subprocess
@@ -7,13 +7,14 @@ import sys
 import time
 from pathlib import Path
 from typing import List, Optional
+from typing_extensions import Optional
 
 
-class OrchestraRooAutoStarter:
-    """Automatically starts and integrates Orchestra AI with Roo."""
+class cherry_aiRooAutoStarter:
+    """Automatically starts and integrates Cherry AI with Roo."""
     
     def __init__(self):
-        self.project_root = Path("/root/orchestra-main")
+        self.project_root = Path("/root/cherry_ai-main")
         self.venv_python = self.project_root / "venv" / "bin" / "python"
         self.services_started = False
         self.integration_enabled = False
@@ -61,22 +62,22 @@ class OrchestraRooAutoStarter:
         self.services_started = True
         return True
     
-    async def enable_orchestra_integration(self):
-        """Enable Orchestra AI integration in Roo"""
-        print("🎭 Enabling Orchestra AI integration...")
+    async def enable_cherry_ai_integration(self):
+        """Enable Cherry AI integration in Roo"""
+        print("🎭 Enabling Cherry AI integration...")
         
-        integration_script = self.project_root / "scripts" / "activate_orchestra_in_roo.py"
+        integration_script = self.project_root / "scripts" / "activate_cherry_ai_in_roo.py"
         
         if not integration_script.exists():
             # Create the integration activation script
             content = """
 import sys
-sys.path.append('/root/orchestra-main')
+sys.path.append('/root/cherry_ai-main')
 
 try:
-    from .roo.integrations.orchestra_ai import initialize_orchestra_integration
-    initialize_orchestra_integration()
-    print("✅ Orchestra AI integration enabled in Roo")
+    from .roo.integrations.cherry_ai_ai import initialize_cherry_ai_integration
+    initialize_cherry_ai_integration()
+    print("✅ Cherry AI integration enabled in Roo")
 except Exception as e:
     print(f"❌ Failed to enable integration: {e}")
 """
@@ -90,7 +91,7 @@ except Exception as e:
         )
         
         if result.returncode == 0:
-            print("✅ Orchestra AI integration enabled")
+            print("✅ Cherry AI integration enabled")
             self.integration_enabled = True
             return True
         else:
@@ -119,7 +120,7 @@ except Exception as e:
     
     async def run(self):
         """Main execution flow"""
-        print("🚀 Orchestra AI Auto-Starter")
+        print("🚀 Cherry AI Auto-Starter")
         print("=" * 50)
         
         # Start Docker services
@@ -128,7 +129,7 @@ except Exception as e:
             return False
         
         # Enable Roo integration
-        if not await self.enable_orchestra_integration():
+        if not await self.enable_cherry_ai_integration():
             print("❌ Failed to enable Roo integration")
             return False
         
@@ -137,7 +138,7 @@ except Exception as e:
             print("❌ System verification failed")
             return False
         
-        print("\n✅ Orchestra AI is ready!")
+        print("\n✅ Cherry AI is ready!")
         print("🌐 Access the UI at: http://localhost:3000")
         print("📚 API docs at: http://localhost:8001/docs")
         print("🎭 Roo integration is active")
@@ -147,7 +148,7 @@ except Exception as e:
 
 async def main():
     """Main entry point"""
-    starter = OrchestraRooAutoStarter()
+    starter = cherry_aiRooAutoStarter()
     success = await starter.run()
     sys.exit(0 if success else 1)
 

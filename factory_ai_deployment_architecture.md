@@ -404,9 +404,9 @@ chmod +x /usr/local/bin/docker-compose
 # Install monitoring agents
 apt-get install -y prometheus-node-exporter
 
-# Clone Orchestra repository
-git clone https://github.com/your-org/orchestra-main.git /opt/orchestra
-cd /opt/orchestra
+# Clone cherry_ai repository
+git clone https://github.com/your-org/cherry_ai-main.git /opt/cherry_ai
+cd /opt/cherry_ai
 
 # Set up environment
 cp .envrc.example .envrc
@@ -573,9 +573,9 @@ class FactoryAIIntegrationTest:
         """Test Roo system compatibility"""
         # Test existing Roo endpoints
         roo_request = {
-            "method": "orchestrate",
+            "method": "cherry_aite",
             "params": {
-                "task": "test_orchestration",
+                "task": "test_coordination",
                 "context": {"test": True}
             }
         }
@@ -855,7 +855,7 @@ done
 # backup.sh
 
 # PostgreSQL backup
-pg_dump -h postgres-0 -U postgres -d orchestra > backup_$(date +%Y%m%d_%H%M%S).sql
+pg_dump -h postgres-0 -U postgres -d cherry_ai > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Weaviate backup
 curl -X POST http://weaviate-0:8080/v1/backups -H "Content-Type: application/json" -d '{

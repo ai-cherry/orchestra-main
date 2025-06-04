@@ -1,0 +1,47 @@
+{
+  "timestamp": "2025-06-02 17:12:00",
+  "total_vulnerabilities": 0,
+  "scanned_files": 10,
+  "results": {
+    "requirements/base.txt": {
+      "status": "secure",
+      "count": 0
+    },
+    "requirements/dev.txt": {
+      "status": "secure",
+      "count": 0
+    },
+    "requirements/production/requirements.txt": {
+      "status": "secure",
+      "count": 0
+    },
+    "requirements/unified.txt": {
+      "status": "secure",
+      "count": 0
+    },
+    "requirements/pay_ready.txt": {
+      "status": "secure",
+      "count": 0
+    },
+    "requirements/monitoring.txt": {
+      "status": "error",
+      "error": "ERROR:pip_audit._virtual_env:internal pip failure:   error: subprocess-exited-with-error\n  \n  \u00d7 Getting requirements to build wheel did not run successfully.\n  \u2502 exit code: 1\n  \u2570\u2500> [67 lines of output]\n      /tmp/pip-build-env-0z222mnp/overlay/lib/python3.12/site-packages/setuptools/dist.py:759: SetuptoolsDeprecationWarning: License classifiers are deprecated.\n      !!\n      \n              ********************************************************************************\n              Please consider removing the following classifiers in favor of a SPDX license expression:\n      \n              License :: OSI Approved :: MIT License\n      \n              See https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license for details.\n              ********************************************************************************\n      \n      !!\n        self._finalize_license_expression()\n      running egg_info\n      writing lib/PyYAML.egg-info/PKG-INFO\n      writing dependency_links to lib/PyYAML.egg-info/dependency_links.txt\n      writing top-level names to lib/PyYAML.egg-info/top_level.txt\n      Traceback (most recent call last):\n        File \"/tmp/tmpz0903l8f/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py\", line 389, in <module>\n          main()\n        File \"/tmp/tmpz0903l8f/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py\", line 373, in main\n          json_out[\"return_val\"] = hook(**hook_input[\"kwargs\"])\n                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        File \"/tmp/tmpz0903l8f/lib/python3.12/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py\", line 143, in get_requires_for_build_wheel\n          return hook(config_settings)\n                 ^^^^^^^^^^^^^^^^^^^^^\n        File \"/tmp/pip-build-env-0z222mnp/overlay/lib/python3.12/site-packages/setuptools/build_meta.py\", line 331, in get_requires_for_build_wheel\n          return self._get_build_requires(config_settings, requirements=[])\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        File \"/tmp/pip-build-env-0z222mnp/overlay/lib/python3.12/site-packages/setuptools/build_meta.py\", line 301, in _get_build_requires\n          self.run_setup()\n        File \"/tmp/pip-build-env-0z222mnp/overlay/lib/python3.12/site-packages/setuptools/build_meta.py\", line 317, in run_setup\n          exec(code, locals())\n        File \"<string>\", line 288, in <module>\n        File \"/tmp/pip-build-env-0z222mnp/overlay/lib/python3.12/site-packages/setuptools/__init__.py\", line 115, in setup\n          return distutils.core.setup(**attrs)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        File \"/tmp/pip-build-env-0z222mnp/overlay/lib/python3.12/site-packages/setuptools/_distutils/core.py\", line 186, in setup\n          return run_commands(dist)\n                 ^^^^^^^^^^^^^^^^^^\n        File \"/tmp/pip-build-env-0z222mnp/overlay/lib/python3.12/site-packages/setuptools/_distutils/core.py\", line 202, in run_commands\n          dist.run_commands()\n        File \"/tmp/pip-build-env-0z222mnp/overlay/lib/python3.12/site-packages/setuptools/_distutils/dist.py\", line 1002, in run_commands\n          self.run_command(cmd)\n        File \"/tmp/pip-build-env-0z222mnp/overlay/lib/python3.12/site-packages/setuptools/dist.py\", line 1102, in run_command\n          super().run_command(command)\n        File \"/tmp/pip-build-env-0z222mnp/overlay/lib/python3.12/site-packages/setuptools/_distutils/dist.py\", line 1021, in run_command\n          cmd_obj.run()\n        File \"/tmp/pip-build-env-0z222mnp/overlay/lib/python3.12/site-packages/setuptools/command/egg_info.py\", line 312, in run\n          self.find_sources()\n        File \"/tmp/pip-build-env-0z222mnp/overlay/lib/python3.12/site-packages/setuptools/command/egg_info.py\", line 320, in find_sources\n          mm.run()\n        File \"/tmp/pip-build-env-0z222mnp/overlay/lib/python3.12/site-packages/setuptools/command/egg_info.py\", line 543, in run\n          self.add_defaults()\n        File \"/tmp/pip-build-env-0z222mnp/overlay/lib/python3.12/site-packages/setuptools/command/egg_info.py\", line 581, in add_defaults\n          sdist.add_defaults(self)\n        File \"/tmp/pip-build-env-0z222mnp/overlay/lib/python3.12/site-packages/setuptools/command/sdist.py\", line 109, in add_defaults\n          super().add_defaults()\n        File \"/tmp/pip-build-env-0z222mnp/overlay/lib/python3.12/site-packages/setuptools/_distutils/command/sdist.py\", line 245, in add_defaults\n          self._add_defaults_ext()\n        File \"/tmp/pip-build-env-0z222mnp/overlay/lib/python3.12/site-packages/setuptools/_distutils/command/sdist.py\", line 330, in _add_defaults_ext\n          self.filelist.extend(build_ext.get_source_files())\n                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        File \"<string>\", line 204, in get_source_files\n        File \"/tmp/pip-build-env-0z222mnp/overlay/lib/python3.12/site-packages/setuptools/_distutils/cmd.py\", line 131, in __getattr__\n          raise AttributeError(attr)\n      AttributeError: cython_sources\n      [end of output]\n  \n  note: This error originates from a subprocess, and is likely not a problem with pip.\nerror: subprocess-exited-with-error\n\n\u00d7 Getting requirements to build wheel did not run successfully.\n\u2502 exit code: 1\n\u2570\u2500> See above for output.\n\nnote: This error originates from a subprocess, and is likely not a problem with pip.\n\nERROR:pip_audit._cli:Failed to install packages: ['/tmp/tmpz0903l8f/bin/python3.12', '-m', 'pip', 'install', '--no-input', '--keyring-provider=subprocess', '--dry-run', '--report', '/tmp/tmp_hlwoua9/tmpeumd0haz', '-r', 'requirements/monitoring.txt']\n"
+    },
+    "requirements/superagi.txt": {
+      "status": "error",
+      "error": "ERROR:pip_audit._virtual_env:internal pip failure: ERROR: Could not find a version that satisfies the requirement superagi==0.0.1 (from versions: 0.0.26)\nERROR: No matching distribution found for superagi==0.0.1\n\nERROR:pip_audit._cli:Failed to install packages: ['/tmp/tmpvelcdij4/bin/python3.12', '-m', 'pip', 'install', '--no-input', '--keyring-provider=subprocess', '--dry-run', '--report', '/tmp/tmp_vxb4wh5/tmp1yq1epwi', '-r', 'requirements/superagi.txt']\n"
+    },
+    "requirements-webscraping.txt": {
+      "status": "error",
+      "error": "ERROR:pip_audit._virtual_env:internal pip failure: ERROR: Could not open requirements file: [Errno 2] No such file or directory: '/root/cherry_ai-main/requirements-consolidated.txt'\n\nERROR:pip_audit._cli:Failed to install packages: ['/tmp/tmpu_5vtd_6/bin/python3.12', '-m', 'pip', 'install', '--no-input', '--keyring-provider=subprocess', '--dry-run', '--report', '/tmp/tmpftw16ree/tmpp4ahtck5', '-r', 'requirements-webscraping.txt']\n"
+    },
+    "requirements-minimal.txt": {
+      "status": "secure",
+      "count": 0
+    },
+    "requirements-app.txt": {
+      "status": "secure",
+      "count": 0
+    }
+  }
+}

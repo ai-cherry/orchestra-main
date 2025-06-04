@@ -1,3 +1,4 @@
+import json
 #!/usr/bin/env python3
 """
 """
@@ -196,7 +197,7 @@
                         # Decompress zlib+pickle compressed object
                         compressed_data = bytes.fromhex(entry.content["_compressed_data"])
                         decompressed_data = zlib.decompress(compressed_data)
-                        decompressed_entry.content = pickle.loads(decompressed_data)
+                        decompressed_entry.content = json.loads(decompressed_data)
 
                 except Exception:
 

@@ -1,4 +1,4 @@
-# Orchestrator Landing Page - API Design & Integration Plan
+# conductor Landing Page - API Design & Integration Plan
 
 ## API Architecture Overview
 
@@ -32,7 +32,7 @@ export const API_CONFIG = {
 ### Search Endpoints
 
 ```typescript
-// POST /api/v1/orchestrator/search
+// POST /api/v1/conductor/search
 interface SearchEndpoint {
   request: {
     body: {
@@ -110,7 +110,7 @@ interface SearchEndpoint {
   };
 }
 
-// GET /api/v1/orchestrator/search/{searchId}/status
+// GET /api/v1/conductor/search/{searchId}/status
 interface SearchStatusEndpoint {
   request: {
     params: {
@@ -128,7 +128,7 @@ interface SearchStatusEndpoint {
   };
 }
 
-// POST /api/v1/orchestrator/search/{searchId}/cancel
+// POST /api/v1/conductor/search/{searchId}/cancel
 interface CancelSearchEndpoint {
   request: {
     params: {
@@ -141,7 +141,7 @@ interface CancelSearchEndpoint {
   };
 }
 
-// GET /api/v1/orchestrator/suggestions
+// GET /api/v1/conductor/suggestions
 interface SuggestionsEndpoint {
   request: {
     query: {
@@ -169,7 +169,7 @@ interface SuggestionsEndpoint {
 ### Voice Endpoints
 
 ```typescript
-// POST /api/v1/orchestrator/voice/transcribe
+// POST /api/v1/conductor/voice/transcribe
 interface TranscribeEndpoint {
   request: {
     body: FormData; // Contains audio file
@@ -206,7 +206,7 @@ interface TranscribeEndpoint {
   };
 }
 
-// POST /api/v1/orchestrator/voice/synthesize
+// POST /api/v1/conductor/voice/synthesize
 interface SynthesizeEndpoint {
   request: {
     body: {
@@ -244,7 +244,7 @@ interface SynthesizeEndpoint {
   };
 }
 
-// GET /api/v1/orchestrator/voice/voices
+// GET /api/v1/conductor/voice/voices
 interface VoicesEndpoint {
   request: {
     query?: {
@@ -272,7 +272,7 @@ interface VoicesEndpoint {
   };
 }
 
-// GET /api/v1/orchestrator/voice/languages
+// GET /api/v1/conductor/voice/languages
 interface VoiceLanguagesEndpoint {
   response: {
     200: {
@@ -290,7 +290,7 @@ interface VoiceLanguagesEndpoint {
 ### File Management Endpoints
 
 ```typescript
-// POST /api/v1/orchestrator/files/upload
+// POST /api/v1/conductor/files/upload
 interface FileUploadEndpoint {
   request: {
     body: FormData;
@@ -326,7 +326,7 @@ interface FileUploadEndpoint {
   };
 }
 
-// GET /api/v1/orchestrator/files/{fileId}
+// GET /api/v1/conductor/files/{fileId}
 interface FileDetailsEndpoint {
   request: {
     params: {
@@ -356,7 +356,7 @@ interface FileDetailsEndpoint {
   };
 }
 
-// DELETE /api/v1/orchestrator/files/{fileId}
+// DELETE /api/v1/conductor/files/{fileId}
 interface FileDeleteEndpoint {
   request: {
     params: {
@@ -369,7 +369,7 @@ interface FileDeleteEndpoint {
   };
 }
 
-// POST /api/v1/orchestrator/files/{fileId}/process
+// POST /api/v1/conductor/files/{fileId}/process
 interface FileProcessEndpoint {
   request: {
     params: {
@@ -392,7 +392,7 @@ interface FileProcessEndpoint {
   };
 }
 
-// GET /api/v1/orchestrator/files
+// GET /api/v1/conductor/files
 interface ListFilesEndpoint {
   request: {
     query?: {
@@ -423,7 +423,7 @@ interface ListFilesEndpoint {
 
 ```typescript
 // WebSocket connection URL format
-// ws://localhost:8000/ws/orchestrator?token={jwt_token}
+// ws://localhost:8000/ws/conductor?token={jwt_token}
 
 interface WebSocketConnection {
   // Connection lifecycle
@@ -610,10 +610,10 @@ interface ServerEvents {
 ### WebSocket Manager Implementation
 
 ```typescript
-// services/websocket/OrchestratorWebSocket.ts
+// services/websocket/conductorWebSocket.ts
 import { EventEmitter } from 'events';
 
-export class OrchestratorWebSocket extends EventEmitter {
+export class conductorWebSocket extends EventEmitter {
   private ws: WebSocket | null = null;
   private reconnectAttempts = 0;
   private readonly maxReconnectAttempts = 5;
@@ -968,7 +968,7 @@ export class SearchAPI {
     }
     
     const response = await httpClient.post<SearchResponse>(
-      '/api/v1/orchestrator/search',
+      '/api/v1/conductor/search',
       request,
       {
         headers: {
@@ -986,11 +986,11 @@ export class SearchAPI {
   }
   
   async getSearchStatus(searchId: string): Promise<SearchStatus> {
-    return httpClient.get(`/api/v1/orchestrator/search/${searchId}/status`);
+    return httpClient.get(`/api/v1/conductor/search/${searchId}/status`);
   }
   
   async cancelSearch(searchId: string): Promise<void> {
-    return httpClient.post(`/api/v1/orchestrator/search/${searchId}/cancel`);
+    return httpClient.post(`/api/v1/conductor/search/${searchId}/cancel`);
   }
   
   @circuitBreaker({ threshold: 10, timeout: 5000 })
@@ -999,7 +999,7 @@ export class SearchAPI {
       `suggestions:${query}`,
       {
         method: 'GET',
-        url: '/api/v1/orchestrator/suggestions',
+        url: '/api/v1/conductor/suggestions',
         params: {
           q: query,
           ...options,
@@ -1045,7 +1045,7 @@ export const searchAPI = new SearchAPI();
 3. **State Management Integration**
    ```typescript
    // Tasks:
-   - [ ] Create Zustand store for orchestrator
+   - [ ] Create Zustand store for conductor
    - [ ] Implement store persistence
    - [ ] Set up store subscriptions
    - [ ] Create store middleware for logging

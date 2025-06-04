@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-echo "🚀 Setting up Orchestra Version Management System..."
+echo "🚀 Setting up cherry_ai Version Management System..."
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -95,7 +95,7 @@ create_systemd_service() {
     # Create service file content
     cat > /tmp/version-monitor.service << EOF
 [Unit]
-Description=Orchestra Version Monitor
+Description=cherry_ai Version Monitor
 After=network.target
 
 [Service]
@@ -271,7 +271,7 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-echo "🔍 Orchestra Version Management Status"
+echo "🔍 cherry_ai Version Management Status"
 echo "====================================="
 
 # Get latest report
@@ -380,7 +380,7 @@ EOF
 # Main setup flow
 main() {
     echo "======================================"
-    echo "Orchestra Version Management Setup"
+    echo "cherry_ai Version Management Setup"
     echo "======================================"
     echo ""
     

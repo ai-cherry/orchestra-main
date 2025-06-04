@@ -1,3 +1,4 @@
+import os
 # TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
@@ -11,7 +12,7 @@ BACKUP_DIR = CONFIG_DIR / "backups"
 ENV_PROJECT_ID = "MODE_SYSTEM_PROJECT_ID"
 ENV_ENVIRONMENT = "MODE_SYSTEM_ENVIRONMENT"
 ENV_BUCKET = "MODE_SYSTEM_BUCKET"
-ENV_SECRET = "MODE_SYSTEM_SECRET"
+ENV_SECRET = os.getenv('SECRET')
 ENV_COLLECTION = "MODE_SYSTEM_COLLECTION"
 
 # Default values

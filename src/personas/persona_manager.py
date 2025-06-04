@@ -5,7 +5,8 @@ Manages persona instances and routing.
 """
 
 import logging
-from typing import Dict, Optional, Any
+from typing import Dict, Optional
+from typing_extensions import Optional, Any
 from .cherry_persona import CherryPersona
 from .sophia_persona import SophiaPersona
 from .karen_persona import KarenPersona

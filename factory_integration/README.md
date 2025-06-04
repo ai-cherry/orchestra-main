@@ -76,7 +76,7 @@ async def main():
     db_pool = await asyncpg.create_pool(
         host="localhost",
         port=5432,
-        database="orchestra",
+        database="cherry_ai",
         user="your_user",
         password="your_password"
     )
@@ -236,4 +236,4 @@ When contributing to this module:
 
 ## License
 
-This module is part of the Orchestra AI system and follows the same license terms.
+This module is part of the Cherry AI system and follows the same license terms.

@@ -1,11 +1,12 @@
 # TODO: Consider adding connection pooling configuration
 
 """
-Orchestra AI - Database Models
+Cherry AI - Database Models
 This module contains Pydantic models for database entities.
 """
 
-from typing import List, Dict, Any, Optional, Union
+from typing import List, Dict, Any, Optional
+from typing_extensions import Optional, Union
 from uuid import uuid4, UUID
 from datetime import datetime
 from enum import Enum
@@ -23,7 +24,7 @@ from pydantic import BaseModel, Field, field_validator, model_validator
     DOC_WRITER = "doc_writer"
     ARCHITECT = "architect"
     PLANNER = "planner"
-    ORCHESTRATOR = "orchestrator"
+    CONDUCTOR = "conductor"
     DEFAULT = "default"
 
 class AgentModeConfig(BaseModel):
@@ -222,11 +223,11 @@ Your task is to break down complex problems into manageable steps."""
             "Provide realistic time estimates",
         ],
     ),
-    AgentModeType.ORCHESTRATOR: AgentModeConfig(
-        name="OrchestratorAgent",
+    AgentModeType.CONDUCTOR: AgentModeConfig(
+        name="conductorAgent",
         description="Specialized in coordinating multiple agents",
         system_prompt="""
-Your task is to orchestrate the work of multiple specialized agents to solve complex problems."""
+Your task is to cherry_aite the work of multiple specialized agents to solve complex problems."""
         required_context=["goal", "available_agents"],
         suggested_tools=["agent_delegation", "workflow_management"],
         example_prompts=[
@@ -238,7 +239,7 @@ Your task is to orchestrate the work of multiple specialized agents to solve com
             "Maintain context across agent transitions",
             "Synthesize results into a coherent solution",
         ],
-        token_multiplier=1.5,  # Orchestrator needs more context
+        token_multiplier=1.5,  # conductor needs more context
     ),
     AgentModeType.DEFAULT: AgentModeConfig(
         name="DefaultAgent",

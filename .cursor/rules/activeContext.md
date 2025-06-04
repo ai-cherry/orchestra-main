@@ -1,4 +1,4 @@
-# Cursor AI Context – orchestra-main
+# Cursor AI Context – cherry_ai-main
 
 The following context should be provided to the AI assistant for every session.
 
@@ -14,14 +14,14 @@ The following context should be provided to the AI assistant for every session.
 ## Key Directories
 admin-ui/          # React admin interface
 agent/             # FastAPI agent service
-core/              # Core orchestrator
+core/              # Core conductor
 mcp_server/        # MCP server components
 scripts/           # Automation tools
 .github/workflows/ # GitHub sync workflow
 
 ## Development Workflow
 1. SSH to server or use Cursor Remote
-2. Edit files directly in /root/orchestra-main
+2. Edit files directly in /root/cherry_ai-main
 3. Changes are instant
 4. Use `make` commands for service management
 

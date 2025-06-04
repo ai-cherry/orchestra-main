@@ -4,7 +4,7 @@
     """
         agent_id: str = "credentials-manager",
         name: str = "Credentials Manager",
-        description: str = "Manages secure access to credentials across the Orchestra platform",
+        description: str = "Manages secure access to credentials across the cherry_ai platform",
         config: Dict[str, Any] = None,
         persona: Dict[str, Any] = None,
     ):

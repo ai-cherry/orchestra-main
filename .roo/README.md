@@ -1,6 +1,6 @@
-# Roo Configuration for Orchestra Project
+# Roo Configuration for cherry_ai Project
 
-This directory contains the Roo configuration for the Orchestra AI project, optimized for single-developer, AI-assisted workflows.
+This directory contains the Roo configuration for the Cherry AI project, optimized for single-developer, AI-assisted workflows.
 
 ## Overview
 
@@ -13,7 +13,7 @@ Roo has been configured with 10 specialized modes, each using specific OpenRoute
 | 🏗 Architect | anthropic/claude-opus-4 | System design and architecture |
 | 💻 Developer | google/gemini-2.5-flash-preview-05-20 | Code implementation |
 | 🪲 Debugger | openai/gpt-4.1 | Systematic debugging |
-| 🪃 Orchestrator | anthropic/claude-sonnet-4 | Workflow coordination |
+| 🪃 conductor | anthropic/claude-sonnet-4 | Workflow coordination |
 | 🧠 Strategist | anthropic/claude-opus-4 | Technical planning |
 | 🔍 Researcher | anthropic/claude-sonnet-4 | Best practices research |
 | 📊 Analytics | google/gemini-2.5-flash-preview-05-20 | Data analysis |
@@ -43,7 +43,7 @@ The project includes three MCP servers:
 
 1. **memory-bank**: Persistent memory storage for contexts
 2. **portkey-router**: Model routing and management
-3. **orchestra-mcp**: Project-specific tools for context, vector search, database, deployment, and monitoring
+3. **conductor-mcp**: Project-specific tools for context, vector search, database, deployment, and monitoring
 
 ## Usage
 

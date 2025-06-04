@@ -1,13 +1,13 @@
 #!/bin/bash
-# Start the Comprehensive AI Orchestrator
+# Start the Comprehensive AI conductor
 
 set -e
 
-echo "🚀 Starting Comprehensive AI Orchestrator..."
+echo "🚀 Starting Comprehensive AI conductor..."
 
 # Check if running in correct directory
-if [ ! -f "ai_components/orchestration/comprehensive_orchestrator.py" ]; then
-    echo "❌ Error: Must run from orchestra-main directory"
+if [ ! -f "ai_components/coordination/comprehensive_conductor.py" ]; then
+    echo "❌ Error: Must run from cherry_ai-main directory"
     exit 1
 fi
 
@@ -42,34 +42,34 @@ fi
 # Create log directory
 mkdir -p logs
 
-# Start the orchestrator with proper logging
-echo "🎯 Starting orchestrator components..."
+# Start the conductor with proper logging
+echo "🎯 Starting conductor components..."
 
 # Run with nohup for background execution
-nohup python3 -u ai_components/orchestration/comprehensive_orchestrator.py \
-    > logs/orchestrator.log 2>&1 &
+nohup python3 -u ai_components/coordination/comprehensive_conductor.py \
+    > logs/conductor.log 2>&1 &
 
-ORCHESTRATOR_PID=$!
-echo $ORCHESTRATOR_PID > orchestrator.pid
+CONDUCTOR_PID=$!
+echo $CONDUCTOR_PID > conductor.pid
 
-echo "✅ Orchestrator started with PID: $ORCHESTRATOR_PID"
-echo "📝 Logs: tail -f logs/orchestrator.log"
+echo "✅ conductor started with PID: $CONDUCTOR_PID"
+echo "📝 Logs: tail -f logs/conductor.log"
 
 # Wait a moment for startup
 sleep 5
 
-# Check if orchestrator is running
-if ps -p $ORCHESTRATOR_PID > /dev/null; then
-    echo "✅ Orchestrator is running successfully!"
+# Check if conductor is running
+if ps -p $CONDUCTOR_PID > /dev/null; then
+    echo "✅ conductor is running successfully!"
     echo ""
     echo "🔗 Services available at:"
     echo "   - MCP WebSocket: ws://localhost:8765"
     echo "   - Cursor Integration API: http://localhost:8090"
     echo "   - Health Status: http://localhost:8080/health"
     echo ""
-    echo "📊 Monitor with: ./scripts/monitor_orchestrator.sh"
-    echo "🛑 Stop with: ./scripts/stop_orchestrator.sh"
+    echo "📊 Monitor with: ./scripts/monitor_conductor.sh"
+    echo "🛑 Stop with: ./scripts/stop_conductor.sh"
 else
-    echo "❌ Orchestrator failed to start. Check logs/orchestrator.log"
+    echo "❌ conductor failed to start. Check logs/conductor.log"
     exit 1
 fi

@@ -1,7 +1,7 @@
 #!/bin/bash
-# Stop Orchestra AI Services
+# Stop Cherry AI Services
 
-echo "🛑 Stopping Orchestra AI Services..."
+echo "🛑 Stopping Cherry AI Services..."
 
 # Stop API server
 echo "Stopping API server..."
@@ -11,7 +11,7 @@ pkill -f "uvicorn agent.app.main" || echo "API server not running"
 pkill -f "agent.app" || true
 
 # Clean up any orphaned processes
-pkill -f "orchestra" || true
+pkill -f "cherry_ai" || true
 
 echo "✅ All services stopped"
 

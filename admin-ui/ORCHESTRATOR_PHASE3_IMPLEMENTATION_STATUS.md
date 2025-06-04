@@ -1,9 +1,9 @@
-# Orchestrator Landing Page - Phase 3 Implementation Status
+# conductor Landing Page - Phase 3 Implementation Status
 
 ## ✅ Completed Features
 
 ### 1. Voice Recording Component ✅
-**Location**: `admin-ui/src/components/orchestrator/Voice/VoiceRecorder.tsx`
+**Location**: `admin-ui/src/components/conductor/Voice/VoiceRecorder.tsx`
 - Web Speech API integration with browser compatibility checks
 - Visual feedback with pulsing red recording indicator
 - Real-time transcription display
@@ -12,7 +12,7 @@
 - Audio blob capture for server-side processing
 
 ### 2. File Upload Component ✅
-**Location**: `admin-ui/src/components/orchestrator/FileManagement/FileUploader.tsx`
+**Location**: `admin-ui/src/components/conductor/FileManagement/FileUploader.tsx`
 - React-dropzone integration for drag-and-drop functionality
 - File type validation (text, PDF, JSON, XML, images, audio, video)
 - 50MB file size limit
@@ -21,7 +21,7 @@
 - Progress tracking integration with store
 
 ### 3. File Progress Table ✅
-**Location**: `admin-ui/src/components/orchestrator/FileManagement/FileProgressTable.tsx`
+**Location**: `admin-ui/src/components/conductor/FileManagement/FileProgressTable.tsx`
 - Real-time display of upload/download queue
 - Progress bars with percentage indicators
 - Status icons (pending, uploading, downloading, completed, error)
@@ -43,7 +43,7 @@
 - Browser lifecycle handling (page visibility, unload)
 
 ### 5. Voice Synthesis Component ✅
-**Location**: `admin-ui/src/components/orchestrator/Voice/VoiceSynthesizer.tsx`
+**Location**: `admin-ui/src/components/conductor/Voice/VoiceSynthesizer.tsx`
 - Browser Speech Synthesis API integration
 - Custom voice options (Cherry, Sophia, Karen)
 - Voice controls (volume, speed, pitch)
@@ -51,8 +51,8 @@
 - Download synthesized speech
 - Integration with search results
 
-### 6. Enhanced Orchestrator Landing Page ✅
-**Location**: `admin-ui/src/pages/OrchestratorLandingPage.tsx`
+### 6. Enhanced conductor Landing Page ✅
+**Location**: `admin-ui/src/pages/conductorLandingPage.tsx`
 - Tabbed interface for Results, Files, and Voice Synthesis
 - WebSocket connection status indicator
 - Real-time updates integration
@@ -60,14 +60,14 @@
 - Dark theme consistency
 
 ### 7. Store Updates ✅
-**Location**: `admin-ui/src/store/orchestratorStore.ts`
+**Location**: `admin-ui/src/store/conductorStore.ts`
 - Added WebSocket connection state
 - File upload/download management
 - Voice recording state
 - Comprehensive action handlers
 
 ### 8. CSS Enhancements ✅
-**Location**: `admin-ui/src/styles/orchestrator.css`
+**Location**: `admin-ui/src/styles/conductor.css`
 - Progress bar styles
 - File table styling
 - Voice control styles

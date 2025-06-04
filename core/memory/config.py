@@ -9,7 +9,7 @@
     def from_string(cls, value: str) -> 'Environment':
         """Create from string value."""
                 config_section="environment",
-                parameter="ORCHESTRA_ENV",
+                parameter="cherry_ai_ENV",
                 value=value,
                 reason=f"Invalid environment. Must be one of: {', '.join(e.value for e in cls)}"
             )
@@ -49,8 +49,8 @@ class PostgreSQLConfig:
     """PostgreSQL configuration."""
     host: str = "localhost"
     port: int = 5432
-    database: str = "orchestra"
-    user: str = "orchestra"
+    database: str = "cherry_ai"
+    user: str = "cherry_ai"
     password: str = ""
     pool_size_min: int = 10
     pool_size_max: int = 50
@@ -113,7 +113,7 @@ class WeaviateConfig:
     batch_size: int = 1000
     
     # Schema settings
-    schema_name: str = "OrchestraMemory"
+    schema_name: str = "cherry_aiMemory"
     replication_factor: int = 1
     
     def validate(self) -> None:
@@ -241,7 +241,7 @@ class MemoryConfig:
     @classmethod
     def from_env(cls) -> 'MemoryConfig':
         """Create configuration from environment variables."""
-        if env := os.getenv("ORCHESTRA_ENV"):
+        if env := os.getenv("cherry_ai_ENV"):
             config.environment = Environment.from_string(env)
             
         # PostgreSQL
@@ -271,7 +271,7 @@ class MemoryConfig:
             config.redis.password = password
             
         # Encryption
-        if key := os.getenv("ORCHESTRA_ENCRYPTION_KEY"):
+        if key := os.getenv("cherry_ai_ENCRYPTION_KEY"):
             config.encryption_enabled = True
             config.encryption_key = key
             

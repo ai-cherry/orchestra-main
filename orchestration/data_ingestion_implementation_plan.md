@@ -1,6 +1,6 @@
 # Data Ingestion System Implementation Plan
 
-## Integration with Existing Orchestra System
+## Integration with Existing cherry_ai System
 
 ### 1. System Integration Points
 
@@ -8,13 +8,13 @@
 - **LLM Intelligent Router** (`core/llm_intelligent_router.py`) - For query processing
 - **Specialized Agents** (`agent/app/services/specialized_agents.py`) - For data parsing
 - **Memory Manager** (`core/memory/implementations/manager.py`) - For context storage
-- **Agent Orchestrator** (`agent/app/services/agent_orchestrator.py`) - For workflow coordination
+- **Agent conductor** (`agent/app/services/agent_conductor.py`) - For workflow coordination
 
 ### 2. New Components Architecture
 
 ```python
 # Core data ingestion structure
-orchestra-main/
+cherry_ai-main/
 ├── core/
 │   └── data_ingestion/
 │       ├── __init__.py
@@ -33,7 +33,7 @@ orchestra-main/
 │       │   └── zip_handler.py     # ZipFileHandler
 │       ├── processors/
 │       │   ├── __init__.py
-│       │   ├── file_processor.py  # Main processing orchestrator
+│       │   ├── file_processor.py  # Main processing conductor
 │       │   ├── vector_embedder.py # Vector generation
 │       │   └── metadata_extractor.py # Metadata extraction
 │       └── storage/
@@ -406,7 +406,7 @@ services:
     volumes:
       - ./data/uploads:/app/uploads
     networks:
-      - orchestra-network
+      - cherry_ai-network
 
   redis-cache:
     image: redis:7-alpine
@@ -414,7 +414,7 @@ services:
     ports:
       - "6379:6379"
     networks:
-      - orchestra-network
+      - cherry_ai-network
 ```
 
 ### 10. Implementation Timeline
@@ -434,7 +434,7 @@ services:
 - [ ] ZIP file handler
 
 #### Week 5-6: Processing Pipeline
-- [ ] File processor orchestration
+- [ ] File processor coordination
 - [ ] Vector embedding pipeline
 - [ ] Metadata extraction
 - [ ] Error handling & retry logic
@@ -500,4 +500,4 @@ async def test_query_performance():
    - Query performance tracking
    - Storage utilization alerts
 
-This implementation plan provides a complete roadmap for building your data ingestion system with full integration into the existing Orchestra platform.
+This implementation plan provides a complete roadmap for building your data ingestion system with full integration into the existing cherry_ai platform.

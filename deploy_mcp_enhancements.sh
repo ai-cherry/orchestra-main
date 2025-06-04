@@ -139,7 +139,7 @@ update_configuration() {
   "version": "2.0.0",
   "description": "Enhanced MCP configuration with performance optimizations",
   "servers": {
-    "orchestrator": {
+    "conductor": {
       "port": 8002,
       "health_endpoint": "/health",
       "connection_pool": {

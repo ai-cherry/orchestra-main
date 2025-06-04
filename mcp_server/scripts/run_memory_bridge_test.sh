@@ -4,7 +4,7 @@
 set -e
 
 # Change to the project root directory
-cd /workspaces/orchestra-main
+cd /workspaces/cherry_ai-main
 
 # Run the memory bridge test
 python -m mcp_server.tests.test_memory_bridge

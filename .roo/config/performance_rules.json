@@ -6,7 +6,11 @@
         "defaultPythonVersion": "3.10",
         "primaryDataStore": "PostgreSQL",
         "vectorStore": "Weaviate",
-        "databaseAccessClass": "shared.database.UnifiedDatabase"
+        "databaseAccessClass": "shared.database.UnifiedDatabase",
+        "dockerPermitted": true,
+        "redisPermitted": true,
+        "dockerUsage": "Allowed for local development and service coordination. Use Python 3.10 base images, minimize layers, and follow security best practices.",
+        "redisUsage": "Allowed for general-purpose and semantic caching. Configure for performance and resource limits. Not for use as a primary database."
     },
     "modePriorities": {
         "architect": {
@@ -62,7 +66,7 @@
                 "Do not add temporary debug files; use integrated logging."
             ]
         },
-        "orchestrator": {
+        "conductor": {
             "model": "anthropic/claude-opus-4",
             "temperature": 0.3,
             "constraints": [
@@ -159,7 +163,7 @@
     "projectSpecificRules": [
         ".roo/rules-architect/01-core-principles.md",
         ".roo/rules-code/01-coding-standards.md",
-        ".roo/rules-orchestrator/01-workflow.md",
+        ".roo/rules-conductor/01-workflow.md",
         ".roo/rules-debug/01-debugging-standards.md",
         ".roo/rules-quality/01-quality-standards.md"
     ]

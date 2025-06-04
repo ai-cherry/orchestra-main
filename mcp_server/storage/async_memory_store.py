@@ -7,6 +7,7 @@ import logging
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Optional
+from typing_extensions import Optional
 
 logger = logging.getLogger("mcp-async-memory-store")
 

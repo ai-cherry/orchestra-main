@@ -25,8 +25,8 @@ enable_agents = config.get_bool("enable_agents") or True
 
 # PostgreSQL configuration
 postgres_version = config.get("postgres_version") or "16"
-postgres_db_name = config.get("postgres_db_name") or "orchestrator"
-postgres_user = config.get("postgres_user") or "orchestrator"
+postgres_db_name = config.get("postgres_db_name") or "conductor"
+postgres_user = config.get("postgres_user") or "conductor"
 postgres_password = config.require_secret("postgres_password")
 
 # SSH authentication
@@ -62,7 +62,7 @@ vector_node = VectorDropletComponent(
     ),
 )
 
-# --- APP DROPLET COMPONENT (POSTGRES + ORCHESTRATOR) ---
+# --- APP DROPLET COMPONENT (POSTGRES + CONDUCTOR) ---
 app_node = PostgresComponent(
     name=f"app-node-{env}",
     config={
@@ -99,7 +99,7 @@ if enable_micro_cache:
         region=region,
         size=micro_cache_droplet_size,
         image="docker-20-04",
-        tags=[f"orchestra-{env}", "micro-cache"],
+        tags=[f"cherry_ai-{env}", "micro-cache"],
     )
 
     # Setup connection for remote commands
@@ -190,9 +190,9 @@ admin_app = do.App(
     spec=do.AppSpecArgs(**admin_app_spec_dict),
 )
 
-# --- SETUP ORCHESTRA API SERVICE ---
-setup_orchestra_service = command.remote.Command(
-    f"setup-orchestra-service-{env}",
+# --- SETUP cherry_ai API SERVICE ---
+setup_cherry_ai_service = command.remote.Command(
+    f"setup-cherry_ai-service-{env}",
     connection=command.remote.ConnectionArgs(
         host=app_droplet.ipv4_address,
         user="root",
@@ -205,9 +205,9 @@ setup_orchestra_service = command.remote.Command(
         micro_cache_uri=micro_cache_droplet.ipv4_address if enable_micro_cache else None,
     ).apply(
         lambda args: f"""
-Environment="PYTHONPATH=/opt/orchestra"
-EnvironmentFile=/opt/orchestra/.env
-ExecStart=/opt/orchestra/venv/bin/python -m uvicorn core.api.main:app --host 0.0.0.0 --port 8080
+Environment="PYTHONPATH=/opt/cherry_ai"
+EnvironmentFile=/opt/cherry_ai/.env
+ExecStart=/opt/cherry_ai/venv/bin/python -m uvicorn core.api.main:app --host 0.0.0.0 --port 8080
 Restart=always
 RestartSec=10
 
@@ -217,20 +217,20 @@ EOF
 
 # Reload systemd and restart service
 systemctl daemon-reload
-systemctl enable orchestra-api
-systemctl restart orchestra-api
+systemctl enable cherry_ai-api
+systemctl restart cherry_ai-api
 
 # Setup migration scripts
-mkdir -p /opt/orchestra/migrations
-cat > /opt/orchestra/migrations/run_migration.sh << 'EOF'
+mkdir -p /opt/cherry_ai/migrations
+cat > /opt/cherry_ai/migrations/run_migration.sh << 'EOF'
 #!/bin/bash
-cd /opt/orchestra
+cd /opt/cherry_ai
 source venv/bin/activate
 python scripts/setup_weaviate_collections.py
 python scripts/migrate_dragonfly_to_weaviate.py
 EOF
 
-chmod +x /opt/orchestra/migrations/run_migration.sh
+chmod +x /opt/cherry_ai/migrations/run_migration.sh
 """
     f"setup-latency-monitoring-{env}",
     connection=command.remote.ConnectionArgs(
@@ -325,11 +325,11 @@ if __name__ == "__main__":
             print("WARNING: p95 latency exceeds threshold. Consider enabling micro-cache.")
 EOF
 
-chmod +x /opt/orchestra/monitor_latency.py
+chmod +x /opt/cherry_ai/monitor_latency.py
 
 # Create cron job to run every hour
 # Fixed the f-string syntax error by escaping the nested quotes
-echo \"0 * * * * /opt/orchestra/venv/bin/python /opt/orchestra/monitor_latency.py >> /var/log/latency_monitor.log 2>&1\" | crontab -
+echo \"0 * * * * /opt/cherry_ai/venv/bin/python /opt/cherry_ai/monitor_latency.py >> /var/log/latency_monitor.log 2>&1\" | crontab -
 """
 pulumi.export("vector_node_ip", vector_droplet.ipv4_address)
 pulumi.export("app_node_ip", app_droplet.ipv4_address)
@@ -339,4 +339,4 @@ pulumi.export("admin_ui_default_url", admin_app.default_ingress)
 pulumi.export("admin_ui_live_url", admin_app.live_url)
 if enable_micro_cache and micro_cache_droplet:
     pulumi.export("micro_cache_ip", micro_cache_droplet.ipv4_address)
-pulumi.export("orchestra_api_url", Output.concat("http://", app_droplet.ipv4_address, ":8080"))
+pulumi.export("cherry_ai_api_url", Output.concat("http://", app_droplet.ipv4_address, ":8080"))

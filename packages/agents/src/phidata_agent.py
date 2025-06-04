@@ -42,7 +42,7 @@
             logger.info(f"Processing input with Phidata agent: {self.name}")
             agent_response = await self.phidata_agent.process(context)
 
-            # 4. Translate the results back to Orchestra's format
+            # 4. Translate the results back to cherry_ai's format
             return AgentOutput(
                 response_id="phidata-response",  # Replace with actual response ID if available
                 request_id=input_data.request_id,

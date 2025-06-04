@@ -12,15 +12,15 @@
    - Connect using your SSH key
 
 4. **Open the project**:
-   - Once connected, open folder: `/root/orchestra-main`
+   - Once connected, open folder: `/root/cherry_ai-main`
    - Cursor will run on the server, giving you full speed
 
 ## Method 2: Local Development + Push
 
 1. **Clone on your local machine**:
    ```bash
-   git clone https://github.com/ai-cherry/orchestra-main.git
-   cd orchestra-main
+   git clone https://github.com/ai-cherry/cherry_ai-main.git
+   cd cherry_ai-main
    ```
 
 2. **Make changes locally in Cursor**
@@ -31,7 +31,7 @@
    git push origin main
 
    # Then SSH to deploy
-   ssh root@45.32.69.157 "cd /root/orchestra-main && git pull && systemctl restart orchestra-api"
+   ssh root@45.32.69.157 "cd /root/cherry_ai-main && git pull && systemctl restart cherry_ai-api"
    ```
 
 ## Transitioning from Paperspace
@@ -39,7 +39,7 @@
 1. **Backup any local changes**:
    ```bash
    # On Paperspace
-   cd ~/orchestra-main
+   cd ~/cherry_ai-main
    git stash
    git stash show -p > ~/paperspace-changes.patch
    ```

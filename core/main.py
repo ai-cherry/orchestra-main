@@ -3,10 +3,10 @@
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-class OrchestraCore:
-    """Main orchestration core that manages all services."""
+class cherry_aiCore:
+    """Main coordination core that manages all services."""
         """Initialize all core services."""
-        logger.info("Initializing Orchestra AI Core...")
+        logger.info("Initializing Cherry AI Core...")
 
         # Initialize service connections
         await self._initialize_connections()
@@ -25,7 +25,7 @@ class OrchestraCore:
             priority=EventPriority.HIGH,
         )
 
-        logger.info("Orchestra AI Core initialized successfully")
+        logger.info("Cherry AI Core initialized successfully")
 
 async def _initialize_connections(self) -> None:
         """Initialize all service connections."""
@@ -90,12 +90,12 @@ def _setup_event_handlers(self) -> None:
         self.event_bus.subscribe("core.shutdown", handle_shutdown, priority=EventPriority.CRITICAL)
 
 async def start(self) -> None:
-        """Start the orchestration core."""
-            logger.warning("Orchestra Core is already running")
+        """Start the coordination core."""
+            logger.warning("cherry_ai Core is already running")
             return
 
         self._running = True
-        logger.info("Starting Orchestra AI Core...")
+        logger.info("Starting Cherry AI Core...")
 
         # Start periodic tasks
         self._tasks.append(asyncio.create_task(self._periodic_health_check()))
@@ -108,7 +108,7 @@ async def start(self) -> None:
             priority=EventPriority.HIGH,
         )
 
-        logger.info("Orchestra AI Core started")
+        logger.info("Cherry AI Core started")
 
 async def _periodic_health_check(self) -> None:
         """Periodic health check task."""
@@ -135,8 +135,8 @@ async def _periodic_memory_cleanup(self) -> None:
                 logger.error(f"Error in periodic memory cleanup: {e}")
 
 async def shutdown(self) -> None:
-        """Shutdown the orchestration core."""
-        logger.info("Shutting down Orchestra AI Core...")
+        """Shutdown the coordination core."""
+        logger.info("Shutting down Cherry AI Core...")
         self._running = False
 
         # Cancel all tasks
@@ -161,19 +161,19 @@ async def shutdown(self) -> None:
         # Publish shutdown complete event
         await self.event_bus.publish("core.shutdown_complete", {}, priority=EventPriority.CRITICAL)
 
-        logger.info("Orchestra AI Core shutdown complete")
+        logger.info("Cherry AI Core shutdown complete")
 
 async def run(self) -> None:
-        """Run the orchestration core."""
+        """Run the coordination core."""
             logger.info("Keyboard interrupt received")
         finally:
             await self.shutdown()
 
 # Global instance
-_orchestra_core: Optional[OrchestraCore] = None
+_cherry_ai_core: Optional[cherry_aiCore] = None
 
-def get_orchestra_core() -> OrchestraCore:
-    """Get the global orchestra core instance."""
+def get_cherry_ai_core() -> cherry_aiCore:
+    """Get the global cherry_ai core instance."""
     """Main entry point."""
         logger.info(f"Signal {sig} received")
         asyncio.create_task(core.shutdown())

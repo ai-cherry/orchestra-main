@@ -1,4 +1,4 @@
-# Orchestra AI Development & Deployment Strategy
+# Cherry AI Development & Deployment Strategy
 
 ## 🐍 Python Virtual Environment (venv) Strategy
 
@@ -30,13 +30,13 @@ pip install -r requirements/base.txt
 ### Local Development (On Vultr)
 ```bash
 # SSH to Vultr server
-ssh -i ~/.ssh/vultr_orchestra root@45.32.69.157
+ssh -i ~/.ssh/vultr_cherry_ai root@45.32.69.157
 
 # Use screen/tmux for persistent sessions
 screen -S dev
 
 # Development directory
-cd /root/orchestra-main
+cd /root/cherry_ai-main
 
 # Activate venv
 source venv/bin/activate
@@ -103,7 +103,7 @@ make restart-services
 ```
 Production API:      8000
 Development API:     8001 or 8080
-MCP Orchestrator:    8002
+MCP conductor:    8002
 MCP Memory:          8003
 MCP Tools:           8006
 PostgreSQL:          5432
@@ -114,9 +114,9 @@ Admin UI:            80/443 (nginx)
 ### Service Management
 ```bash
 # Using systemd
-systemctl start orchestra-api
-systemctl status orchestra-api
-systemctl restart orchestra-api
+systemctl start cherry_ai-api
+systemctl status cherry_ai-api
+systemctl restart cherry_ai-api
 
 # Using Make
 make start-services
@@ -133,7 +133,7 @@ make service-status
 
 ### Repository Structure
 ```
-orchestra-main/
+cherry_ai-main/
 ├── .github/workflows/    # CI/CD
 ├── agent/               # Main application
 ├── mcp_server/          # MCP servers
@@ -183,7 +183,7 @@ API_PORT=8000
 
 # Databases
 POSTGRES_HOST=localhost
-POSTGRES_DB=orchestra
+POSTGRES_DB=cherry_ai
 WEAVIATE_HOST=localhost
 
 # AI Services
@@ -225,7 +225,7 @@ make health-check
 
 # View logs
 tail -f /tmp/mcp_*.log
-journalctl -u orchestra-api -f
+journalctl -u cherry_ai-api -f
 
 # Database maintenance
 python scripts/setup_postgres_schema.py --verify-only
@@ -256,9 +256,9 @@ lsof -i :8000  # Check what's using ports
 - Database: `make health-check`
 
 ### Logs
-- Application: `/var/log/orchestra/`
+- Application: `/var/log/cherry_ai/`
 - MCP Servers: `/tmp/mcp_*.log`
 - Nginx: `/var/log/nginx/`
-- Systemd: `journalctl -u orchestra-api`
+- Systemd: `journalctl -u cherry_ai-api`
 
 This strategy provides a unified, simple approach focusing on a single Vultr server with clear separation between development and production through ports and process management. 

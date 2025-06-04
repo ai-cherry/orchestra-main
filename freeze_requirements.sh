@@ -60,7 +60,7 @@ pip freeze --all > $FREEZE_DIR/lockfile_with_hashes_$DATE.txt
 
 # Create version report
 cat > $FREEZE_DIR/version_report_$DATE.txt << EOF
-Orchestra Version Report
+cherry_ai Version Report
 =======================
 Date: $(date)
 Python: $(python --version)

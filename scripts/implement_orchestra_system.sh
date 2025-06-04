@@ -1,10 +1,10 @@
 #!/bin/bash
-# Orchestra AI System Implementation Script
-# Orchestrates the complete setup and deployment of the advanced AI system
+# Cherry AI System Implementation Script
+# cherry_aites the complete setup and deployment of the advanced AI system
 
 set -e  # Exit on error
 
-echo "🎭 ORCHESTRA AI SYSTEM IMPLEMENTATION"
+echo "🎭 Cherry AI SYSTEM IMPLEMENTATION"
 echo "===================================="
 echo "Starting at: $(date)"
 echo ""
@@ -110,11 +110,11 @@ fi
 
 # Step 6: Create Initial Templates
 print_status "info" "Creating initial templates..."
-if [ -f "scripts/next_phase_orchestrator.py" ]; then
-    python scripts/next_phase_orchestrator.py
+if [ -f "scripts/next_phase_conductor.py" ]; then
+    python scripts/next_phase_conductor.py
     print_status "success" "Initial templates created"
 else
-    print_status "warning" "Next phase orchestrator script not found"
+    print_status "warning" "Next phase conductor script not found"
 fi
 
 # Step 7: Setup Configuration Files
@@ -123,16 +123,16 @@ print_status "info" "Setting up configuration files..."
 # Create .env file if it doesn't exist
 if [ ! -f ".env" ]; then
     cat > .env << EOF
-# Orchestra AI Configuration
+# Cherry AI Configuration
 ENVIRONMENT=development
 DEBUG=true
 
 # Database
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
-POSTGRES_DB=orchestra
-POSTGRES_USER=orchestra
-POSTGRES_PASSWORD=orchestra_secure_pass
+POSTGRES_DB=cherry_ai
+POSTGRES_USER=cherry_ai
+POSTGRES_PASSWORD=cherry_ai_secure_pass
 
 # Weaviate
 WEAVIATE_HOST=localhost
@@ -170,8 +170,8 @@ fi
 
 # Step 9: Verify Installation
 print_status "info" "Running verification..."
-if [ -f "scripts/verify_orchestra_deployment.py" ]; then
-    python scripts/verify_orchestra_deployment.py
+if [ -f "scripts/verify_cherry_ai_deployment.py" ]; then
+    python scripts/verify_cherry_ai_deployment.py
     verification_result=$?
     if [ $verification_result -eq 0 ]; then
         print_status "success" "Verification passed"
@@ -186,9 +186,9 @@ fi
 print_status "info" "Creating quick start scripts..."
 
 # Create start script
-cat > start_orchestra.sh << 'EOF'
+cat > start_cherry_ai.sh << 'EOF'
 #!/bin/bash
-echo "🚀 Starting Orchestra AI System..."
+echo "🚀 Starting Cherry AI System..."
 
 # Start infrastructure
 echo "Starting infrastructure services..."
@@ -212,7 +212,7 @@ echo "Starting UI development server..."
 cd src/ui/web/react_app && npm run dev &
 
 echo ""
-echo "✅ Orchestra AI is running!"
+echo "✅ Cherry AI is running!"
 echo ""
 echo "🌐 Access points:"
 echo "  • UI: http://localhost:3000"
@@ -226,13 +226,13 @@ echo "Press Ctrl+C to stop all services"
 wait
 EOF
 
-chmod +x start_orchestra.sh
+chmod +x start_cherry_ai.sh
 print_status "success" "Start script created"
 
 # Create stop script
-cat > stop_orchestra.sh << 'EOF'
+cat > stop_cherry_ai.sh << 'EOF'
 #!/bin/bash
-echo "🛑 Stopping Orchestra AI System..."
+echo "🛑 Stopping Cherry AI System..."
 
 # Stop Node processes
 pkill -f "npm run dev" || true
@@ -247,7 +247,7 @@ docker-compose -f docker-compose.local.yml down
 echo "✅ All services stopped"
 EOF
 
-chmod +x stop_orchestra.sh
+chmod +x stop_cherry_ai.sh
 print_status "success" "Stop script created"
 
 # Final Summary
@@ -266,12 +266,12 @@ echo "  • Database schemas: ✅"
 echo ""
 echo "🚀 Next Steps:"
 echo "  1. Review the verification report"
-echo "  2. Start local deployment: ./start_orchestra.sh"
+echo "  2. Start local deployment: ./start_cherry_ai.sh"
 echo "  3. Access the UI at http://localhost:3000"
 echo "  4. Test the API at http://localhost:8000/docs"
 echo ""
 echo "📚 For production deployment:"
 echo "  1. Set VULTR_API_KEY in .env"
-echo "  2. Run: python scripts/deploy_orchestra_local.py"
+echo "  2. Run: python scripts/deploy_cherry_ai_local.py"
 echo ""
 echo "Completed at: $(date)"

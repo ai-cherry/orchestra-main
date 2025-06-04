@@ -1,10 +1,10 @@
-# Pydantic & pnpm Best Practices Guide for Orchestra AI
+# Pydantic & pnpm Best Practices Guide for Cherry AI
 
-This guide documents the implemented best practices for data validation (Pydantic) and package management (pnpm) in the Orchestra AI project.
+This guide documents the implemented best practices for data validation (Pydantic) and package management (pnpm) in the Cherry AI project.
 
 ## 🔍 Overview
 
-Based on analysis of the Orchestra AI codebase, we've implemented targeted improvements focusing on:
+Based on analysis of the Cherry AI codebase, we've implemented targeted improvements focusing on:
 - Enhanced Pydantic validation and error handling
 - Improved pnpm security and dependency management
 - Better integration between backend validation errors and frontend error display

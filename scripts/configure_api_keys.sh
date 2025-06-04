@@ -1,5 +1,5 @@
 #!/bin/bash
-# Configure API keys for AI Orchestration System
+# Configure API keys for AI coordination System
 
 echo "=== Configuring API Keys ==="
 
@@ -46,6 +46,6 @@ echo
 echo "=== API Keys Configuration Complete ==="
 echo
 echo "✅ All keys are saved in .env file - you NEVER need to enter them again!"
-echo "✅ They're automatically loaded every time you run the orchestrator!"
+echo "✅ They're automatically loaded every time you run the conductor!"
 echo
 echo "To add infrastructure keys later, just edit this script and uncomment the lines."

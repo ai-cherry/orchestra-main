@@ -13,7 +13,7 @@ First, make sure all dependencies are installed:
 
 ```bash
 # Navigate to the project root
-cd /workspaces/orchestra-main
+cd /workspaces/cherry_ai-main
 
 # Using pip
 pip install -r requirements.txt
@@ -46,8 +46,8 @@ Start the FastAPI server locally:
 ./run_api.sh
 
 # Alternative options:
-# uvicorn core.orchestrator.src.main:app --reload
-# python -m core.orchestrator.src.main
+# uvicorn core.conductor.src.main:app --reload
+# python -m core.conductor.src.main
 ```
 
 The server should start and display a message indicating it's running, typically at http://localhost:8000.
@@ -90,10 +90,10 @@ FastAPI automatically generates interactive documentation:
 To ensure your API works correctly in a containerized environment similar to
 ```bash
 # Build the Docker image
-docker build -t orchestrator-api-local .
+docker build -t conductor-api-local .
 
 # Run the container
-docker run --env-file .env -p 8000:8000 orchestrator-api-local
+docker run --env-file .env -p 8000:8000 conductor-api-local
 ```
 
 Then test the API endpoints as described in Step 4, but ensure you're using the correct port mapping.
@@ -118,7 +118,7 @@ If you encounter module import errors:
 
 ```bash
 # Make sure your PYTHONPATH includes the project root
-export PYTHONPATH=$PYTHONPATH:/workspaces/orchestra-main
+export PYTHONPATH=$PYTHONPATH:/workspaces/cherry_ai-main
 
 # Then run the API again
 ```

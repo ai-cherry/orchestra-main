@@ -4,7 +4,8 @@
 import asyncio
 import logging
 from typing import Dict, Any, List, Optional
-from collections import deque
+from typing_extensions import Optional
+from collections.abc import deque
 
 logger = logging.getLogger(__name__)
 

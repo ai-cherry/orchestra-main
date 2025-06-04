@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """
 """
@@ -13,9 +14,9 @@
         """Test that the natural language interface can be imported."""
             pytest.skip(f"Natural language interface dependencies not available: {e}")
 
-    def test_mvp_orchestra_ai_import(self):
+    def test_mvp_cherry_ai_ai_import(self):
         """Test that the main MVP integration can be imported."""
-            pytest.skip(f"MVP orchestrator dependencies not available: {e}")
+            pytest.skip(f"MVP conductor dependencies not available: {e}")
 
 class TestBasicFunctionality:
     """Test basic functionality of MVP components."""
@@ -35,7 +36,7 @@ class TestBasicFunctionality:
     def test_data_source_config_creation(self):
         """Test that DataSourceConfig can be created."""
                 name="test",
-                api_key="test_key",
+                api_key= os.getenv('API_KEY'),
                 base_url="https://test.com",
                 rate_limit=1.0,
             )

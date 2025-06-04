@@ -27,18 +27,18 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             set -e
-            echo "🔄 Syncing Orchestra AI from GitHub..."
+            echo "🔄 Syncing Cherry AI from GitHub..."
             
             # Activate the virtual environment
-            if [ -f /root/orchestra-main/venv/bin/activate ]; then
+            if [ -f /root/cherry_ai-main/venv/bin/activate ]; then
               echo "🚀 Activating virtual environment..."
-              source /root/orchestra-main/venv/bin/activate
+              source /root/cherry_ai-main/venv/bin/activate
             else
-              echo "⚠️ Virtual environment not found at /root/orchestra-main/venv/bin/activate. Skipping activation."
+              echo "⚠️ Virtual environment not found at /root/cherry_ai-main/venv/bin/activate. Skipping activation."
               # Optionally, you could attempt to create it here or fail the job
             fi
             
-            cd /root/orchestra-main
+            cd /root/cherry_ai-main
             
             # Pull latest changes
             git pull origin main
@@ -69,7 +69,7 @@ jobs:
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /root/orchestra-main
+            cd /root/cherry_ai-main
             echo "🏥 Running health check..."
             make health-check || echo "⚠️ Some services may need attention"
             

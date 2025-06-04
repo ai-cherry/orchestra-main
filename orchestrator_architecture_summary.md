@@ -1,10 +1,10 @@
-# Orchestrator Landing Page Architecture - Executive Summary
+# conductor Landing Page Architecture - Executive Summary
 
 ## Deliverables Overview
 
-This architecture package contains four comprehensive documents that provide everything needed to implement the Orchestrator Landing Page:
+This architecture package contains four comprehensive documents that provide everything needed to implement the conductor Landing Page:
 
-### 1. **orchestrator_landing_architecture.md** (1053 lines)
+### 1. **conductor_landing_architecture.md** (1053 lines)
 The foundational architecture document containing:
 - Component hierarchy and structure
 - State management architecture using Zustand
@@ -14,7 +14,7 @@ The foundational architecture document containing:
 - Testing strategy
 - Security considerations
 
-### 2. **orchestrator_component_specifications.md** (674 lines)
+### 2. **conductor_component_specifications.md** (674 lines)
 Detailed component specifications including:
 - Complete TypeScript interfaces for all components
 - Props definitions for every component
@@ -24,7 +24,7 @@ Detailed component specifications including:
 - Voice components (Recorder, Synthesizer, Visualizer)
 - File management components (Uploader, DownloadTable)
 
-### 3. **orchestrator_api_integration.md** (674 lines)
+### 3. **conductor_api_integration.md** (674 lines)
 Comprehensive API design and integration plan:
 - REST API endpoint specifications
 - WebSocket protocol design
@@ -34,7 +34,7 @@ Comprehensive API design and integration plan:
 - WebSocket manager with reconnection logic
 - Integration timeline and phases
 
-### 4. **orchestrator_implementation_guide.md** (674 lines)
+### 4. **conductor_implementation_guide.md** (674 lines)
 Step-by-step implementation guide for developers:
 - Complete project structure
 - Implementation steps in order
@@ -114,12 +114,12 @@ Step-by-step implementation guide for developers:
 ## API Architecture
 
 ### REST Endpoints
-- `POST /api/v1/orchestrator/search` - Perform searches
-- `GET /api/v1/orchestrator/suggestions` - Get search suggestions
-- `POST /api/v1/orchestrator/voice/transcribe` - Convert speech to text
-- `POST /api/v1/orchestrator/voice/synthesize` - Convert text to speech
-- `POST /api/v1/orchestrator/files/upload` - Upload files
-- `GET /api/v1/orchestrator/files/{fileId}` - Get file status
+- `POST /api/v1/conductor/search` - Perform searches
+- `GET /api/v1/conductor/suggestions` - Get search suggestions
+- `POST /api/v1/conductor/voice/transcribe` - Convert speech to text
+- `POST /api/v1/conductor/voice/synthesize` - Convert text to speech
+- `POST /api/v1/conductor/files/upload` - Upload files
+- `GET /api/v1/conductor/files/{fileId}` - Get file status
 
 ### WebSocket Events
 - `search:progress` - Real-time search updates
@@ -131,7 +131,7 @@ Step-by-step implementation guide for developers:
 
 ### Zustand Store Structure
 ```typescript
-interface OrchestratorState {
+interface conductorState {
   search: {
     query: string;
     mode: SearchMode;
@@ -159,7 +159,7 @@ interface OrchestratorState {
 ## Component Architecture
 
 ### Core Components
-1. **OrchestratorLandingPage** - Main container component
+1. **conductorLandingPage** - Main container component
 2. **SearchSection** - Search interface with mode selection
 3. **VoiceSection** - Voice recording and synthesis
 4. **FileManager** - File upload and download management
@@ -198,7 +198,7 @@ interface OrchestratorState {
 
 ## Conclusion
 
-This architecture provides a comprehensive, production-ready design for the Orchestrator Landing Page that:
+This architecture provides a comprehensive, production-ready design for the conductor Landing Page that:
 - Integrates seamlessly with existing admin-ui infrastructure
 - Delivers exceptional performance and user experience
 - Maintains high standards for accessibility and security
@@ -207,4 +207,4 @@ This architecture provides a comprehensive, production-ready design for the Orch
 
 The modular design ensures that components can be developed independently and integrated smoothly, while the event-driven architecture enables real-time features that enhance user engagement.
 
-All technical decisions have been made with performance, maintainability, and user experience as top priorities, ensuring the Orchestrator Landing Page will serve as a powerful and intuitive entry point for users.
+All technical decisions have been made with performance, maintainability, and user experience as top priorities, ensuring the conductor Landing Page will serve as a powerful and intuitive entry point for users.

@@ -7,6 +7,7 @@ import logging
 import time
 from enum import Enum
 from typing import Any, Callable, Dict, Optional
+from typing_extensions import Optional
 
 logger = logging.getLogger(__name__)
 

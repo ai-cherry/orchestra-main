@@ -1,6 +1,6 @@
 """
 """
-app = FastAPI(title="Orchestra API", version="1.0.0")
+app = FastAPI(title="cherry_ai API", version="1.0.0")
 
 # Include the admin router
 app.include_router(admin_router)
@@ -16,7 +16,7 @@ app.include_router(suggestions_router)
 app.include_router(llm_router)
 app.include_router(personas_admin_router)
 app.include_router(llm_admin_router)
-app.include_router(llm_orchestration_router)
+app.include_router(llm_coordination_router)
 
 # Middleware for logging requests and latency
 

@@ -1,6 +1,6 @@
 # Business Intelligence Agents Integration Tests
 
-This directory contains integration tests for the Orchestra Business Intelligence Agents and Team implementation using Phidata/Agno.
+This directory contains integration tests for the cherry_ai Business Intelligence Agents and Team implementation using Phidata/Agno.
 
 ## Overview
 
@@ -38,7 +38,7 @@ The individual tools have unit tests that verify their functionality with mocked
 
 Integration tests focus on the interaction between components:
 
-- `test_phidata_team_agents.py`: Tests the orchestration of agents as team members
+- `test_phidata_team_agents.py`: Tests the coordination of agents as team members
   - Verifies individual agent creation
   - Tests team member resolution from references
   - Checks execution flow with mocked responses
@@ -86,7 +86,7 @@ pytest tests/integration/ -v
 ### Adding New Tools
 
 1. Create a new tool module in `packages/tools/src/`
-2. Implement both function-based (`@tool` decorator) and class-based (`OrchestraTool`) interfaces
+2. Implement both function-based (`@tool` decorator) and class-based (`cherry_aiTool`) interfaces
 3. Add appropriate agent configuration to `config/agents.yaml`
 4. Update the team configuration to include the new agent
 

@@ -53,9 +53,9 @@ try:
     HAS_OPENROUTER = True
     # Set OpenRouter environment variables if not already set
     if not os.environ.get("OR_SITE_URL"):
-        os.environ["OR_SITE_URL"] = "https://orchestra.example.com"
+        os.environ["OR_SITE_URL"] = "https://cherry_ai.example.com"
     if not os.environ.get("OR_APP_NAME"):
-        os.environ["OR_APP_NAME"] = "OrchestraLLM"
+        os.environ["OR_APP_NAME"] = "cherry_aiLLM"
     logger.info(f"OpenRouter configured with site: {os.environ.get('OR_SITE_URL')}")
 except Exception:
 

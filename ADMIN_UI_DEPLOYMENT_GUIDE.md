@@ -12,7 +12,7 @@ This guide explains how to build and deploy the React Admin UI on the unified Vu
 ssh root@45.32.69.157
 
 # Navigate to project
-cd /root/orchestra-main
+cd /root/cherry_ai-main
 
 # Build Admin UI
 cd admin-ui
@@ -43,14 +43,14 @@ tail -f /var/log/nginx/access.log
 tail -f /var/log/nginx/error.log
 
 # Rebuild Admin UI
-cd /root/orchestra-main/admin-ui
+cd /root/cherry_ai-main/admin-ui
 npm run build
 ```
 
 ## 5. Development Mode
 For local development on the server:
 ```bash
-cd /root/orchestra-main/admin-ui
+cd /root/cherry_ai-main/admin-ui
 npm run dev
 # Access at http://45.32.69.157:3000
 ```

@@ -1,0 +1,146 @@
+{
+  "name": "Cherry AI MCP",
+  "version": "4.1.0",
+  "description": "Automated MCP setup for Cherry AI - GCP-free edition with tool awareness",
+  "servers": {
+    "conductor": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/conductor_server.py"
+      ],
+      "env": {
+        "API_URL": "${API_URL:-http://api:8080}",
+        "API_KEY": "${API_KEY:-test_key}",
+        "CHERRY_AI_CONDUCTOR_PORT": "${CHERRY_AI_CONDUCTOR_PORT:-8002}",
+        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}",
+        "DATABASE_URL": "${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/cherry_ai}"
+      },
+      "capabilities": {
+        "tools": true,
+        "resources": true,
+        "prompts": true
+      }
+    },
+    "memory": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/memory_server.py"
+      ],
+      "env": {
+        "POSTGRES_HOST": "${POSTGRES_HOST:-postgres}",
+        "POSTGRES_PORT": "${POSTGRES_PORT:-5432}",
+        "POSTGRES_DB": "${POSTGRES_DB:-cherry_ai}",
+        "POSTGRES_USER": "${POSTGRES_USER:-postgres}",
+        "POSTGRES_PASSWORD": "${POSTGRES_PASSWORD:-postgres}",
+        "WEAVIATE_HOST": "${WEAVIATE_HOST:-weaviate}",
+        "WEAVIATE_PORT": "${WEAVIATE_PORT:-8080}",
+        "WEAVIATE_API_KEY": "${WEAVIATE_API_KEY:-}",
+        "MCP_MEMORY_PORT": "${MCP_MEMORY_PORT:-8003}",
+        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}",
+        "DATABASE_URL": "${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/cherry_ai}"
+      },
+      "capabilities": {
+        "tools": true,
+        "resources": true
+      }
+    },
+    "weaviate": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/weaviate_direct_mcp_server.py"
+      ],
+      "env": {
+        "MCP_WEAVIATE_DIRECT_PORT": "${MCP_WEAVIATE_DIRECT_PORT:-8001}",
+        "WEAVIATE_HOST": "${WEAVIATE_HOST:-weaviate}",
+        "WEAVIATE_PORT": "${WEAVIATE_PORT:-8080}",
+        "WEAVIATE_GRPC_PORT": "${WEAVIATE_GRPC_PORT:-50051}",
+        "WEAVIATE_API_KEY": "${WEAVIATE_API_KEY:-}",
+        "WEAVIATE_SECURED": "${WEAVIATE_SECURED:-false}",
+        "WEAVIATE_SKIP_VERIFICATION": "${WEAVIATE_SKIP_VERIFICATION:-false}",
+        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}"
+      }
+    },
+    "deployment": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/deployment_server.py"
+      ],
+      "env": {
+        "MCP_DEPLOYMENT_PORT": "${MCP_DEPLOYMENT_PORT:-8005}",
+        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}",
+        "VULTR_API_KEY": "${VULTR_API_KEY:-}"
+      },
+      "capabilities": {
+        "tools": true
+      }
+    },
+    "tools": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/tools_server.py"
+      ],
+      "env": {
+        "MCP_TOOLS_PORT": "${MCP_TOOLS_PORT:-8006}",
+        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}",
+        "OPENAI_API_KEY": "${OPENAI_API_KEY:-}",
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY:-}",
+        "PORTKEY_API_KEY": "${PORTKEY_API_KEY:-}"
+      },
+      "capabilities": {
+        "tools": true,
+        "resources": true
+      },
+      "description": "Tool discovery and execution server with rich metadata"
+    },
+    "code-intelligence": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/code_intelligence_server.py"
+      ],
+      "env": {
+        "MCP_CODE_INTELLIGENCE_PORT": "${MCP_CODE_INTELLIGENCE_PORT:-8007}",
+        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}"
+      },
+      "capabilities": {
+        "tools": true
+      },
+      "description": "Code analysis and AST intelligence for better AI coding context"
+    },
+    "git-intelligence": {
+      "command": "python",
+      "args": [
+        "mcp_server/servers/git_intelligence_server.py"
+      ],
+      "env": {
+        "MCP_GIT_INTELLIGENCE_PORT": "${MCP_GIT_INTELLIGENCE_PORT:-8008}",
+        "REDIS_URL": "${REDIS_URL:-redis://redis:6379}"
+      },
+      "capabilities": {
+        "tools": true
+      },
+      "description": "Git history and change analysis for understanding code evolution"
+    }
+  },
+  "client": {
+    "mcpServers": {
+      "conductor": {
+        "command": "python",
+        "args": [
+          "mcp_server/servers/conductor_server.py"
+        ]
+      },
+      "memory": {
+        "command": "python",
+        "args": [
+          "mcp_server/servers/memory_server.py"
+        ]
+      },
+      "tools": {
+        "command": "python",
+        "args": [
+          "mcp_server/servers/tools_server.py"
+        ]
+      }
+    }
+  }
+}

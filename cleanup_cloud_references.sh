@@ -3,7 +3,7 @@
 # cleanup_cloud_references.sh
 #
 # This script helps identify and clean up DigitalOcean and Vultr references
-# from the Orchestra AI codebase, ensuring only Vultr infrastructure is referenced
+# from the Cherry AI codebase, ensuring only Vultr infrastructure is referenced
 #
 
 set -e
@@ -99,7 +99,7 @@ PRIORITY_FILES=(
     "infra/Pulumi.yaml"
     "infra/Pulumi.dev.yaml"
     "mcp_server/servers/deployment_server.py"
-    ".bashrc.orchestra"
+    ".bashrc.cherry_ai"
     "DEPLOYMENT_ACTION_PLAN.md"
 )
 
@@ -160,14 +160,14 @@ pnpm run build-no-ts || pnpm build
 
 # Deploy
 echo "🗑️  Clearing old files..."
-sudo rm -rf /var/www/orchestra-admin/*
+sudo rm -rf /var/www/cherry_ai-admin/*
 
 echo "📤 Deploying new build..."
-sudo cp -r dist/* /var/www/orchestra-admin/
+sudo cp -r dist/* /var/www/cherry_ai-admin/
 
 # Set permissions
-sudo chown -R www-data:www-data /var/www/orchestra-admin
-sudo chmod -R 755 /var/www/orchestra-admin
+sudo chown -R www-data:www-data /var/www/cherry_ai-admin
+sudo chmod -R 755 /var/www/cherry_ai-admin
 
 # Reload nginx
 echo "🔄 Reloading nginx..."

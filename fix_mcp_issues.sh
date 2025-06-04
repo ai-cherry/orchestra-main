@@ -118,7 +118,7 @@ fi
 
 # Step 4: Make the service public (this is the fix for 403)
 echo
-echo "Step 4: Making ai-orchestra-minimal public..."
+echo "Step 4: Making ai-cherry_ai-minimal public..."
 # Removed gcloud command
     --region=us-central1 \
     --member="allUsers" \
@@ -128,7 +128,7 @@ echo "Step 4: Making ai-orchestra-minimal public..."
 # Step 5: Test the service
 echo
 echo "Step 5: Testing the service..."
-SERVICE_URL="https://ai-orchestra-minimal-yshgcxa7ta-uc.a.run.app"
+SERVICE_URL="https://ai-cherry_ai-minimal-yshgcxa7ta-uc.a.run.app"
 echo "Testing $SERVICE_URL/health"
 curl -s "$SERVICE_URL/health" | head -20
 
@@ -136,9 +136,9 @@ echo
 echo "=== Summary ==="
 echo "If the service still returns 403/401, please:"
 echo "1. Go to: https://console.cloud.google.com/run?project=cherry-ai-project"
-echo "2. Click on 'ai-orchestra-minimal'"
+echo "2. Click on 'ai-cherry_ai-minimal'"
 echo "3. Go to PERMISSIONS tab"
 echo "4. Add 'allUsers' with 'Cloud Run Invoker' role"
 echo
 echo "Direct link to service:"
-echo "https://console.cloud.google.com/run/detail/us-central1/ai-orchestra-minimal/permissions?project=cherry-ai-project"
+echo "https://console.cloud.google.com/run/detail/us-central1/ai-cherry_ai-minimal/permissions?project=cherry-ai-project"

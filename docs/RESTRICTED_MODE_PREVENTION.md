@@ -1,10 +1,10 @@
 # Preventing VS Code Restricted Mode in GitHub Codespaces
 
-This document explains how the AI Orchestra project prevents VS Code's restricted mode in GitHub Codespaces environments and what to do if you encounter this issue.
+This document explains how the AI cherry_ai project prevents VS Code's restricted mode in GitHub Codespaces environments and what to do if you encounter this issue.
 
 ## Background
 
-GitHub Codespaces may sometimes start in "restricted mode," which limits functionality and prevents certain operations due to workspace trust settings. This can interfere with development workflows and cause unexpected behavior in the AI Orchestra project.
+GitHub Codespaces may sometimes start in "restricted mode," which limits functionality and prevents certain operations due to workspace trust settings. This can interfere with development workflows and cause unexpected behavior in the AI cherry_ai project.
 
 ## Implemented Solutions
 

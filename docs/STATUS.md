@@ -1,7 +1,7 @@
 # Project Status
 
 ## Completed Features
-- Core orchestrator with FastAPI API
+- Core conductor with FastAPI API
 - MCP server scripts and management tools
 - Single-server Vultr deployment via Pulumi
 

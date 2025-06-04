@@ -1,8 +1,8 @@
 # TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Orchestra AI Integration for Roo Coding Agents
-Automatically embeds Orchestra AI capabilities into all Roo modes
+Cherry AI Integration for Roo Coding Agents
+Automatically embeds Cherry AI capabilities into all Roo modes
 """
 
 import os
@@ -10,24 +10,25 @@ import sys
 import json
 import asyncio
 import logging
-from typing import Dict, List, Optional, Any, Callable
+from typing import Dict, List, Optional
+from typing_extensions import Optional, Any, Callable
 from pathlib import Path
 from datetime import datetime
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from mcp_server.servers.orchestrator_server import get_all_agents, run_agent_task
+from mcp_server.servers.conductor_server import get_all_agents, run_agent_task
 from mcp_server.storage.async_memory_store import AsyncMemoryStore
 
 logger = logging.getLogger(__name__)
 
 
-class OrchestraRooIntegration:
-    """Integrates Orchestra AI with Roo coding agents across all modes."""
+class cherry_aiRooIntegration:
+    """Integrates Cherry AI with Roo coding agents across all modes."""
     
     def __init__(self):
-        """Initialize Orchestra-Roo integration."""
+        """Initialize cherry_ai-Roo integration."""
         # Initialize memory store with default config
         memory_config = {
             "storage_path": "./memory_store",
@@ -47,7 +48,7 @@ class OrchestraRooIntegration:
         os.environ["POSTGRES_PORT"] = "5432"
         os.environ["POSTGRES_USER"] = "postgres"
         os.environ["POSTGRES_PASSWORD"] = ""
-        os.environ["POSTGRES_DB"] = "orchestra"
+        os.environ["POSTGRES_DB"] = "cherry_ai"
         
         # Weaviate settings
         os.environ["WEAVIATE_HOST"] = "localhost"
@@ -55,13 +56,13 @@ class OrchestraRooIntegration:
         os.environ["WEAVIATE_GRPC_PORT"] = "50051"
     
     async def initialize(self):
-        """Initialize all Orchestra AI components."""
-        logger.info("Initializing Orchestra-Roo integration...")
+        """Initialize all Cherry AI components."""
+        logger.info("Initializing cherry_ai-Roo integration...")
         
         # Load available agents
         try:
             self.active_agents = await get_all_agents()
-            logger.info(f"Loaded {len(self.active_agents)} Orchestra agents")
+            logger.info(f"Loaded {len(self.active_agents)} cherry_ai agents")
         except Exception as e:
             logger.error(f"Failed to load agents: {e}")
             self.active_agents = self._get_default_agents()
@@ -72,7 +73,7 @@ class OrchestraRooIntegration:
         # Register mode handlers
         self._register_mode_handlers()
         
-        logger.info("Orchestra-Roo integration initialized successfully")
+        logger.info("cherry_ai-Roo integration initialized successfully")
     
     def _get_default_agents(self) -> List[Dict]:
         """Get default agent configurations."""
@@ -110,7 +111,7 @@ class OrchestraRooIntegration:
             "architect": self._handle_architect_mode,
             "debug": self._handle_debug_mode,
             "ask": self._handle_ask_mode,
-            "orchestrator": self._handle_orchestrator_mode,
+            "conductor": self._handle_conductor_mode,
             "strategy": self._handle_strategy_mode,
             "research": self._handle_research_mode,
             "analytics": self._handle_analytics_mode,
@@ -120,7 +121,7 @@ class OrchestraRooIntegration:
         }
     
     async def process_roo_request(self, mode: str, request: Dict[str, Any]) -> Dict[str, Any]:
-        """Process a request from Roo in any mode with Orchestra AI enhancement."""
+        """Process a request from Roo in any mode with Cherry AI enhancement."""
         if not self.auto_enabled:
             return {"enhanced": False, "response": request}
         
@@ -129,7 +130,7 @@ class OrchestraRooIntegration:
         # Get mode-specific handler
         handler = self.mode_handlers.get(mode, self._handle_default_mode)
         
-        # Process with Orchestra AI
+        # Process with Cherry AI
         try:
             enhanced_response = await handler(request)
             
@@ -140,7 +141,7 @@ class OrchestraRooIntegration:
                 "enhanced": True,
                 "mode": mode,
                 "original_request": request,
-                "orchestra_response": enhanced_response,
+                "cherry_ai_response": enhanced_response,
                 "agents_used": list(enhanced_response.get("agents", {}).keys()),
                 "timestamp": datetime.now().isoformat()
             }
@@ -221,8 +222,8 @@ class OrchestraRooIntegration:
         
         return response
     
-    async def _handle_orchestrator_mode(self, request: Dict[str, Any]) -> Dict[str, Any]:
-        """Handle orchestrator mode with multi-agent coordination."""
+    async def _handle_conductor_mode(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Handle conductor mode with multi-agent coordination."""
         response = {"agents": {}}
         
         # Coordinate multiple agents based on task
@@ -352,14 +353,14 @@ class OrchestraRooIntegration:
             logger.error(f"Failed to store interaction: {e}")
     
     def enable_auto_mode(self):
-        """Enable automatic Orchestra AI enhancement."""
+        """Enable automatic Cherry AI enhancement."""
         self.auto_enabled = True
-        logger.info("Orchestra AI auto-enhancement enabled")
+        logger.info("Cherry AI auto-enhancement enabled")
     
     def disable_auto_mode(self):
-        """Disable automatic Orchestra AI enhancement."""
+        """Disable automatic Cherry AI enhancement."""
         self.auto_enabled = False
-        logger.info("Orchestra AI auto-enhancement disabled")
+        logger.info("Cherry AI auto-enhancement disabled")
     
     async def get_status(self) -> Dict[str, Any]:
         """Get current integration status."""
@@ -373,22 +374,22 @@ class OrchestraRooIntegration:
 
 
 # Global instance
-orchestra_roo = OrchestraRooIntegration()
+cherry_ai_roo = cherry_aiRooIntegration()
 
 
-async def initialize_orchestra_roo():
-    """Initialize the Orchestra-Roo integration."""
-    await orchestra_roo.initialize()
-    return orchestra_roo
+async def initialize_cherry_ai_roo():
+    """Initialize the cherry_ai-Roo integration."""
+    await cherry_ai_roo.initialize()
+    return cherry_ai_roo
 
 
 if __name__ == "__main__":
     # Test the integration
     async def test():
-        await initialize_orchestra_roo()
+        await initialize_cherry_ai_roo()
         
         # Test code mode
-        result = await orchestra_roo.process_roo_request(
+        result = await cherry_ai_roo.process_roo_request(
             "code",
             {
                 "code": "def hello(): print('Hello')",
@@ -399,7 +400,7 @@ if __name__ == "__main__":
         print(json.dumps(result, indent=2))
         
         # Get status
-        status = await orchestra_roo.get_status()
+        status = await cherry_ai_roo.get_status()
         print(f"\nStatus: {json.dumps(status, indent=2)}")
     
     asyncio.run(test())

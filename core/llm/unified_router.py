@@ -7,7 +7,7 @@
     DOCUMENTATION = "documentation"
     CHAT_CONVERSATION = "chat_conversation"
     MEMORY_PROCESSING = "memory_processing"
-    WORKFLOW_ORCHESTRATION = "workflow_orchestration"
+    WORKFLOW_COORDINATION = "workflow_coordination"
     DATA_ANALYSIS = "data_analysis"
     CREATIVE_WRITING = "creative_writing"
     SUMMARIZATION = "summarization"
@@ -270,7 +270,7 @@ class AnthropicProvider(ProviderInterface):
                     languages=["en", "es", "fr", "de", "it", "pt", "ru", "ja", "ko", "zh"]
                 ),
                 use_cases=[UseCase.CHAT_CONVERSATION, UseCase.DOCUMENTATION, 
-                          UseCase.WORKFLOW_ORCHESTRATION, UseCase.GENERAL_PURPOSE],
+                          UseCase.WORKFLOW_COORDINATION, UseCase.GENERAL_PURPOSE],
                 priority=88
             ),
             ModelSpec(

@@ -1,1 +1,1 @@
-"""API middleware module for Orchestra AI."""
+"""API middleware module for Cherry AI."""

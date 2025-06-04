@@ -30,7 +30,7 @@ limit_req_zone $binary_remote_addr zone=paragonrx_limit:10m rate=200r/m;
 
 server {
     listen 80;
-    server_name api.orchestra.ai;
+    server_name api.cherry_ai.ai;
     
     # Personal domain
     location /personal {

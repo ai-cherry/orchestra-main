@@ -1,4 +1,4 @@
-"""Performance monitoring utilities for the orchestrator."""
+"""Performance monitoring utilities for the conductor."""
     """Decorator to benchmark async function execution time."""
             logger.info(f"{func.__name__} completed in {elapsed:.3f}s")
             return result

@@ -1,10 +1,10 @@
 #!/bin/bash
-# Enhanced Quick Start Script for AI Orchestration System
+# Enhanced Quick Start Script for AI coordination System
 # Handles EigenCode unavailability with enhanced mock analyzer
 
 set -e
 
-echo "🚀 AI Orchestration System - Enhanced Quick Start"
+echo "🚀 AI coordination System - Enhanced Quick Start"
 echo "================================================"
 echo ""
 
@@ -116,7 +116,7 @@ mkdir -p logs config ai_components/logs
 ENV_VARS_REQUIRED=(
     "POSTGRES_HOST:localhost"
     "POSTGRES_PORT:5432"
-    "POSTGRES_DB:orchestrator"
+    "POSTGRES_DB:conductor"
     "POSTGRES_USER:postgres"
     "POSTGRES_PASSWORD:postgres"
 )
@@ -219,19 +219,19 @@ echo "   export OPENAI_API_KEY='your-key'"
 echo "   export ANTHROPIC_API_KEY='your-key'"
 echo ""
 echo "2. Run the enhanced CLI:"
-echo "   python ai_components/orchestrator_cli_enhanced.py"
+echo "   python ai_components/conductor_cli_enhanced.py"
 echo ""
 echo "3. Create and execute a workflow:"
 echo "   python -c \"
 import asyncio
-from ai_components.orchestration.ai_orchestrator_enhanced import (
-    EnhancedWorkflowOrchestrator, TaskDefinition, AgentRole, TaskPriority
+from ai_components.coordination.ai_conductor_enhanced import (
+    EnhancedWorkflowconductor, TaskDefinition, AgentRole, TaskPriority
 )
 
 async def main():
-    orchestrator = EnhancedWorkflowOrchestrator()
+    conductor = EnhancedWorkflowconductor()
     workflow_id = 'test_workflow'
-    context = await orchestrator.create_workflow(workflow_id)
+    context = await conductor.create_workflow(workflow_id)
     
     task = TaskDefinition(
         task_id='analyze',
@@ -241,21 +241,21 @@ async def main():
         priority=TaskPriority.HIGH
     )
     
-    result = await orchestrator.execute_workflow(workflow_id, [task])
+    result = await conductor.execute_workflow(workflow_id, [task])
     print(f'Workflow completed: {result.status.value}')
 
 asyncio.run(main())
 \""
 echo ""
 echo "4. View logs:"
-echo "   tail -f ai_components/logs/orchestrator_enhanced.log"
+echo "   tail -f ai_components/logs/conductor_enhanced.log"
 echo ""
 echo "5. Check EigenCode monitor status:"
 echo "   tail -f logs/eigencode_monitor.log"
 echo ""
 echo "📚 Documentation:"
 echo "   - System Status: docs/SYSTEM_STATUS_REPORT.md"
-echo "   - Orchestrator Guide: AI_ORCHESTRATOR_GUIDE.md"
+echo "   - conductor Guide: AI_CONDUCTOR_GUIDE.md"
 echo "   - EigenCode Integration: docs/EIGENCODE_INTEGRATION_GUIDE.md"
 echo ""
 echo "🔧 Troubleshooting:"
@@ -265,23 +265,23 @@ echo "   - Analyze performance: python scripts/performance_analyzer.py"
 echo ""
 
 # Create a simple test script
-cat > test_orchestrator.py << 'EOF'
+cat > test_conductor.py << 'EOF'
 #!/usr/bin/env python3
-"""Simple test script for the orchestrator"""
+"""Simple test script for the conductor"""
 
 import asyncio
-from ai_components.orchestration.ai_orchestrator_enhanced import (
-    EnhancedWorkflowOrchestrator, TaskDefinition, AgentRole, TaskPriority
+from ai_components.coordination.ai_conductor_enhanced import (
+    EnhancedWorkflowconductor, TaskDefinition, AgentRole, TaskPriority
 )
 
 async def main():
-    print("Testing AI Orchestrator...")
+    print("Testing AI conductor...")
     
-    orchestrator = EnhancedWorkflowOrchestrator()
+    conductor = EnhancedWorkflowconductor()
     workflow_id = 'test_workflow'
     
     # Create workflow
-    context = await orchestrator.create_workflow(workflow_id)
+    context = await conductor.create_workflow(workflow_id)
     print(f"✓ Workflow created: {workflow_id}")
     
     # Define task
@@ -296,13 +296,13 @@ async def main():
     
     # Execute workflow
     print("✓ Executing workflow...")
-    result = await orchestrator.execute_workflow(workflow_id, [task])
+    result = await conductor.execute_workflow(workflow_id, [task])
     
     print(f"✓ Workflow completed: {result.status.value}")
     print(f"✓ Execution time: {result.performance_metrics.get('execution_time', 0):.2f}s")
     
     # Show agent metrics
-    metrics = orchestrator.get_agent_metrics()
+    metrics = conductor.get_agent_metrics()
     print("\nAgent Metrics:")
     for role, data in metrics.items():
         print(f"  {role.value}: {data['calls']} calls, {data['failures']} failures")
@@ -311,9 +311,9 @@ if __name__ == "__main__":
     asyncio.run(main())
 EOF
 
-chmod +x test_orchestrator.py
-print_status "success" "Created test_orchestrator.py"
+chmod +x test_conductor.py
+print_status "success" "Created test_conductor.py"
 
 echo ""
-echo "Run './test_orchestrator.py' to test the system!"
+echo "Run './test_conductor.py' to test the system!"
 echo ""

@@ -137,7 +137,7 @@ chmod +x /usr/local/bin/docker-compose
 apt-get install -y nginx certbot python3-certbot-nginx
 
 # Create app directory
-mkdir -p /opt/orchestra
+mkdir -p /opt/cherry_ai
 
 # Configure nginx (basic setup, will be updated later)
 cat > /etc/nginx/sites-available/default <<EOF

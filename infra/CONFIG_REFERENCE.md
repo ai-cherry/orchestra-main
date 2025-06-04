@@ -1,6 +1,6 @@
-# Orchestra Configuration & Secret Reference
+# cherry_ai Configuration & Secret Reference
 
-This document lists all required Pulumi-managed secrets and configuration keys for the AI Orchestra stack.
+This document lists all required Pulumi-managed secrets and configuration keys for the AI cherry_ai stack.
 All sensitive values must be set via Pulumi ESC/config and are injected into Kubernetes as secrets or environment variables.
 
 | Key Name                | Pulumi Config? | Secret? | Consumed By                  | Description / Notes                    |

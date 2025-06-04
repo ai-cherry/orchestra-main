@@ -1,4 +1,4 @@
-# Phase 3 Implementation: Advanced Features for Orchestrator Landing Page
+# Phase 3 Implementation: Advanced Features for conductor Landing Page
 
 ## Current Status
 ✅ Core search interface implemented
@@ -9,7 +9,7 @@
 ## Priority Tasks for Phase 3 Completion
 
 ### 1. Voice Recording Component (High Priority)
-Create `admin-ui/src/components/orchestrator/Voice/VoiceRecorder.tsx`:
+Create `admin-ui/src/components/conductor/Voice/VoiceRecorder.tsx`:
 
 ```typescript
 // Key requirements:
@@ -17,11 +17,11 @@ Create `admin-ui/src/components/orchestrator/Voice/VoiceRecorder.tsx`:
 - Visual feedback during recording (pulsing red dot)
 - Browser compatibility checks
 - Error handling for permissions
-- Integration with orchestratorStore
+- Integration with conductorStore
 ```
 
 ### 2. Voice Synthesis Component
-Create `admin-ui/src/components/orchestrator/Voice/VoiceSynthesizer.tsx`:
+Create `admin-ui/src/components/conductor/Voice/VoiceSynthesizer.tsx`:
 
 ```typescript
 // Key requirements:
@@ -32,7 +32,7 @@ Create `admin-ui/src/components/orchestrator/Voice/VoiceSynthesizer.tsx`:
 ```
 
 ### 3. File Upload Component
-Create `admin-ui/src/components/orchestrator/FileManagement/FileUploader.tsx`:
+Create `admin-ui/src/components/conductor/FileManagement/FileUploader.tsx`:
 
 ```typescript
 // Key requirements:
@@ -44,7 +44,7 @@ Create `admin-ui/src/components/orchestrator/FileManagement/FileUploader.tsx`:
 ```
 
 ### 4. File Progress Table
-Create `admin-ui/src/components/orchestrator/FileManagement/FileProgressTable.tsx`:
+Create `admin-ui/src/components/conductor/FileManagement/FileProgressTable.tsx`:
 
 ```typescript
 // Key requirements:
@@ -115,7 +115,7 @@ const onDrop = useCallback((acceptedFiles: File[]) => {
     const formData = new FormData();
     formData.append('file', file);
     
-    orchestratorService.uploadFile(file, (progress) => {
+    conductorService.uploadFile(file, (progress) => {
       store.updateFileProgress(file.name, progress);
     });
   });

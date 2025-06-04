@@ -1,11 +1,11 @@
 #!/bin/bash
-# Quick Start Script for AI Orchestrator
-# Sets up and runs the AI orchestration system
+# Quick Start Script for AI conductor
+# Sets up and runs the AI coordination system
 
 set -e
 
 echo "================================================"
-echo "AI Orchestrator Quick Start"
+echo "AI conductor Quick Start"
 echo "================================================"
 
 # Color codes
@@ -28,8 +28,8 @@ print_error() {
 }
 
 # Check if running in the correct directory
-if [ ! -f "ai_components/orchestration/ai_orchestrator.py" ]; then
-    print_error "Please run this script from the orchestra-main directory"
+if [ ! -f "ai_components/coordination/ai_conductor.py" ]; then
+    print_error "Please run this script from the cherry_ai-main directory"
     exit 1
 fi
 
@@ -88,10 +88,10 @@ python scripts/configure_airbyte.py || print_warning "Airbyte configuration skip
 
 # Step 7: Start MCP server
 print_status "Starting MCP server..."
-if systemctl is-active --quiet orchestrator-mcp; then
+if systemctl is-active --quiet conductor-mcp; then
     print_status "MCP server is already running"
 else
-    sudo systemctl start orchestrator-mcp
+    sudo systemctl start conductor-mcp
     sleep 5
 fi
 
@@ -107,28 +107,28 @@ fi
 # Step 9: Run a test workflow
 print_status "Running test workflow..."
 cd ai_components
-./orchestrator_cli.py orchestrate --config configs/example_workflow.json
+./conductor_cli.py cherry_aite --config configs/example_workflow.json
 
 print_status "================================================"
-print_status "AI Orchestrator is ready!"
+print_status "AI conductor is ready!"
 print_status "================================================"
 print_status ""
 print_status "Available commands:"
-print_status "  ./ai_components/orchestrator_cli.py --help"
+print_status "  ./ai_components/conductor_cli.py --help"
 print_status ""
 print_status "Example usage:"
 print_status "  # Analyze codebase"
-print_status "  ./ai_components/orchestrator_cli.py analyze --codebase . --output analysis.json"
+print_status "  ./ai_components/conductor_cli.py analyze --codebase . --output analysis.json"
 print_status ""
 print_status "  # Implement changes"
-print_status "  ./ai_components/orchestrator_cli.py implement --analysis analysis.json --focus performance"
+print_status "  ./ai_components/conductor_cli.py implement --analysis analysis.json --focus performance"
 print_status ""
 print_status "  # Refine technology stack"
-print_status "  ./ai_components/orchestrator_cli.py refine --stack python_postgres_weaviate"
+print_status "  ./ai_components/conductor_cli.py refine --stack python_postgres_weaviate"
 print_status ""
 print_status "Monitor services:"
 print_status "  # MCP Server logs"
-print_status "  sudo journalctl -u orchestrator-mcp -f"
+print_status "  sudo journalctl -u conductor-mcp -f"
 print_status ""
-print_status "  # Orchestrator logs"
-print_status "  tail -f ai_components/logs/orchestrator.log"
+print_status "  # conductor logs"
+print_status "  tail -f ai_components/logs/conductor.log"

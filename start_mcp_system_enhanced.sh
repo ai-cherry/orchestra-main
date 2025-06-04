@@ -223,7 +223,7 @@ start_all_servers() {
     # Define server configurations
     declare -A servers=(
         ["memory"]="./venv/bin/python -m mcp_server.servers.memory_server|8003|http://localhost:8003/health"
-        ["orchestrator"]="./venv/bin/python -m mcp_server.servers.orchestrator_server|8002|http://localhost:8002/health"
+        ["conductor"]="./venv/bin/python -m mcp_server.servers.conductor_server|8002|http://localhost:8002/health"
         ["tools"]="./venv/bin/python -m mcp_server.servers.tools_server|8006|http://localhost:8006/health"
         ["weaviate-direct"]="./venv/bin/python -m mcp_server.servers.weaviate_direct_mcp_server|8001|http://localhost:8001/mcp/weaviate_direct/health"
     )
@@ -292,9 +292,9 @@ monitor_servers() {
                                 "./venv/bin/python -m mcp_server.servers.memory_server" \
                                 8003 "http://localhost:8003/health"
                             ;;
-                        orchestrator)
-                            start_server_enhanced "orchestrator" \
-                                "./venv/bin/python -m mcp_server.servers.orchestrator_server" \
+                        conductor)
+                            start_server_enhanced "conductor" \
+                                "./venv/bin/python -m mcp_server.servers.conductor_server" \
                                 8002 "http://localhost:8002/health"
                             ;;
                         tools)
@@ -338,7 +338,7 @@ display_status() {
     echo ""
     echo "Endpoints:"
     echo "  - Memory MCP: http://localhost:8003"
-    echo "  - Orchestrator MCP: http://localhost:8002"
+    echo "  - conductor MCP: http://localhost:8002"
     echo "  - Tools MCP: http://localhost:8006"
     echo "  - Weaviate Direct MCP: http://localhost:8001"
     
@@ -370,7 +370,7 @@ main() {
     # Export required environment variables
     export POSTGRES_HOST="${POSTGRES_HOST:-localhost}"
     export POSTGRES_PORT="${POSTGRES_PORT:-5432}"
-    export POSTGRES_DB="${POSTGRES_DB:-orchestra}"
+    export POSTGRES_DB="${POSTGRES_DB:-cherry_ai}"
     export POSTGRES_USER="${POSTGRES_USER:-postgres}"
     export POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-}"
     

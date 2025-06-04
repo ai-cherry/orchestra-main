@@ -18,7 +18,7 @@ import asyncio
 
 class MCPHealthDashboard:
     """Real-time health monitoring dashboard for MCP servers"""
-            "orchestrator": ServerMetrics(name="Orchestrator", url="http://localhost:8002/health", port=8002),
+            "conductor": ServerMetrics(name="conductor", url="http://localhost:8002/health", port=8002),
             "memory": ServerMetrics(name="Memory", url="http://localhost:8003/health", port=8003),
             "tools": ServerMetrics(name="Tools", url="http://localhost:8006/health", port=8006),
             "weaviate": ServerMetrics(

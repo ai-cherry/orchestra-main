@@ -1,4 +1,4 @@
-# Orchestra AI Dependency Management
+# Cherry AI Dependency Management
 
 We use **pip-tools** to manage dependencies while staying with pip/venv.
 This gives us lockfile benefits without abandoning our familiar workflow.

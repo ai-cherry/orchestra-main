@@ -1,7 +1,7 @@
 #!/bin/bash
 # Quick deployment script for real agents
 
-echo "🚀 Deploying Orchestra AI with REAL agents..."
+echo "🚀 Deploying Cherry AI with REAL agents..."
 
 # Server details
 SERVER="45.32.69.157"
@@ -9,7 +9,7 @@ PASSWORD='z+G3D,$n9M3.=Dr}'
 
 # Create deployment command
 DEPLOY_CMD='
-cd /root/orchestra-main
+cd /root/cherry_ai-main
 
 # Stop any existing API
 pkill -f uvicorn || true
@@ -41,16 +41,16 @@ pnpm install --no-frozen-lockfile
 pnpm build
 
 # Deploy to web root
-mkdir -p /var/www/orchestra-admin
-cp -r dist/* /var/www/orchestra-admin/
+mkdir -p /var/www/cherry_ai-admin
+cp -r dist/* /var/www/cherry_ai-admin/
 
 # Configure nginx
-cat > /etc/nginx/sites-available/orchestra-admin << EOF
+cat > /etc/nginx/sites-available/cherry_ai-admin << EOF
 server {
     listen 80;
     server_name cherry-ai.me;
 
-    root /var/www/orchestra-admin;
+    root /var/www/cherry_ai-admin;
     index index.html;
 
     location / {
@@ -71,7 +71,7 @@ server {
 EOF
 
 # Enable site
-ln -sf /etc/nginx/sites-available/orchestra-admin /etc/nginx/sites-enabled/
+ln -sf /etc/nginx/sites-available/cherry_ai-admin /etc/nginx/sites-enabled/
 rm -f /etc/nginx/sites-enabled/default
 nginx -t && systemctl reload nginx
 

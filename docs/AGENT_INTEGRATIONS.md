@@ -1,6 +1,6 @@
-# Orchestra Agent Framework Integrations
+# cherry_ai Agent Framework Integrations
 
-This document provides comprehensive information about integrating Orchestra with modern agent frameworks including SuperAGI, AutoGen, LangChain, and
+This document provides comprehensive information about integrating cherry_ai with modern agent frameworks including SuperAGI, AutoGen, LangChain, and
 ## Table of Contents
 
 1. [Architecture Overview](#architecture-overview)
@@ -14,11 +14,11 @@ This document provides comprehensive information about integrating Orchestra wit
 
 ## Architecture Overview
 
-The integration architecture enhances Orchestra's agent capabilities by connecting to specialized frameworks:
+The integration architecture enhances cherry_ai's agent capabilities by connecting to specialized frameworks:
 
 ```
 ┌─────────────────────────────────────┐
-│         Orchestra Core              │
+│         cherry_ai Core              │
 └───────────┬──────────────┬──────────┘
             │              │
 ┌───────────▼──────┐ ┌─────▼───────────┐
@@ -61,7 +61,7 @@ Leverages Gemini 1.5's large token context window for cross-agent memory sharing
 
 ### 2. SuperAGI Integration
 
-Connects Orchestra to SuperAGI's cloud agent management platform.
+Connects cherry_ai to SuperAGI's cloud agent management platform.
 
 **Key Features:**
 
@@ -83,7 +83,7 @@ Implements AutoGen's multi-agent conversation protocols.
 
 ### 4. LangChain Memory Adapter
 
-Enhances Orchestra's memory system with LangChain's specialized memory modules.
+Enhances cherry_ai's memory system with LangChain's specialized memory modules.
 
 **Key Features:**
 
@@ -192,7 +192,7 @@ langchain:
   use_entity_memory: true # Enable entity extraction
   use_summary_memory: true # Enable conversation summarization
   use_vectorstore: true # Enable vector storage
-  collection_name: "orchestra_memories" # Collection name
+  collection_name: "cherry_ai_memories" # Collection name
   embedding_model: "textembedding-gecko@latest" # Embedding model
 ```
 
@@ -411,7 +411,7 @@ pulumi apply
          │                          │
 ┌────────▼──────────────────────────▼────────┐
 │                                            │
-│             Orchestra Application          │
+│             cherry_ai Application          │
 │                                            │
 └────────┬──────────────────────────┬────────┘
          │                          │

@@ -26,7 +26,7 @@ fi
 
 # Check nginx sites
 echo -e "\n${BLUE}2. Checking Nginx Configuration...${NC}"
-if [ -f "/etc/nginx/sites-enabled/orchestra-admin" ]; then
+if [ -f "/etc/nginx/sites-enabled/cherry_ai-admin" ]; then
     echo -e "${GREEN}✓ Admin UI site configuration found${NC}"
 else
     echo -e "${RED}✗ Admin UI site configuration missing${NC}"
@@ -34,7 +34,7 @@ fi
 
 # Check deployment files
 echo -e "\n${BLUE}3. Checking Deployment Files...${NC}"
-NGINX_DIR="/var/www/orchestra-admin"
+NGINX_DIR="/var/www/cherry_ai-admin"
 
 if [ -d "$NGINX_DIR" ]; then
     echo -e "${GREEN}✓ Deployment directory exists${NC}"
@@ -99,10 +99,10 @@ fi
 # Check recent logs
 echo -e "\n${BLUE}7. Recent Nginx Error Logs...${NC}"
 if [ -f "/var/log/nginx/error.log" ]; then
-    recent_errors=$(sudo tail -5 /var/log/nginx/error.log 2>/dev/null | grep -E "admin|orchestra" | wc -l)
+    recent_errors=$(sudo tail -5 /var/log/nginx/error.log 2>/dev/null | grep -E "admin|cherry_ai" | wc -l)
     if [ "$recent_errors" -gt 0 ]; then
         echo -e "${YELLOW}⚠ Found $recent_errors recent error log entries:${NC}"
-        sudo tail -5 /var/log/nginx/error.log | grep -E "admin|orchestra" | sed 's/^/  /'
+        sudo tail -5 /var/log/nginx/error.log | grep -E "admin|cherry_ai" | sed 's/^/  /'
     else
         echo -e "${GREEN}✓ No recent errors in nginx logs${NC}"
     fi

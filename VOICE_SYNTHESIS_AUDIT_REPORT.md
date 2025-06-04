@@ -1,7 +1,7 @@
 # Voice Synthesis and Infrastructure Audit Report
 
 ## Executive Summary
-Comprehensive audit of voice synthesis implementations and infrastructure references across the Orchestra AI codebase. This report identifies all instances requiring migration to standardize on ElevenLabs API and cloud infrastructure.
+Comprehensive audit of voice synthesis implementations and infrastructure references across the Cherry AI codebase. This report identifies all instances requiring migration to standardize on ElevenLabs API and cloud infrastructure.
 
 ## Audit Findings
 
@@ -21,7 +21,7 @@ Comprehensive audit of voice synthesis implementations and infrastructure refere
 **Key Files:**
 - `VOICE_SYNTHESIS_WORKFLOW_GRAPH.md` - Planning document
 - `VOICE_SYNTHESIS_STANDARDIZATION_PLAN.md` - Migration plan
-- `admin-ui/ORCHESTRATOR_PHASE4_ROADMAP.md` - Mentions Amazon Polly as option
+- `admin-ui/CONDUCTOR_PHASE4_ROADMAP.md` - Mentions Amazon Polly as option
 
 **Critical Implementation Files:**
 - No direct AWS Polly implementation found
@@ -42,8 +42,8 @@ Comprehensive audit of voice synthesis implementations and infrastructure refere
 #### 1.4 Generic Voice Synthesis Patterns (286 references)
 **Key Locations:**
 - `agent/app/services/natural_language_processor.py` - `text_to_speech()` method
-- `admin-ui/src/components/orchestrator/Voice/VoiceSynthesizer.tsx` - Frontend component
-- `orchestrator_implementation_guide.md` - API documentation
+- `admin-ui/src/components/conductor/Voice/VoiceSynthesizer.tsx` - Frontend component
+- `conductor_implementation_guide.md` - API documentation
 - Various planning and architecture documents
 
 ### 2. Infrastructure References
@@ -125,7 +125,7 @@ Comprehensive audit of voice synthesis implementations and infrastructure refere
 ### Files Requiring Modification
 1. **requirements/base.txt** - Remove resemble package
 2. **agent/app/services/natural_language_processor.py** - Verify ElevenLabs implementation
-3. **admin-ui/src/components/orchestrator/Voice/VoiceSynthesizer.tsx** - Standardize on ElevenLabs
+3. **admin-ui/src/components/conductor/Voice/VoiceSynthesizer.tsx** - Standardize on ElevenLabs
 4. **Multiple documentation files** - Update to reflect ElevenLabs only
 
 ### Files for Deletion

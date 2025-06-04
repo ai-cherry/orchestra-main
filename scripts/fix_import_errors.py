@@ -161,7 +161,8 @@ class ImportErrorFixer:
             r'\blogging\b': 'import logging',
             r'\basyncio\b': 'import asyncio',
             r'\btyping\b': 'import typing',
-            r'\bDict\b|\bList\b|\bOptional\b': 'from typing import Dict, List, Optional',
+            r'\bDict\b|\bList\b|\bOptional\b': 'from typing import Dict, List, Optional
+from typing_extensions import Optional',
             r'\bFastAPI\b': 'from fastapi import FastAPI',
             r'\bAPIRouter\b': 'from fastapi import APIRouter',
             r'\bHTTPException\b': 'from fastapi import HTTPException',
@@ -271,7 +272,7 @@ class ImportErrorFixer:
                                 # Comment out the import and add a note
                                 lines[i] = f"# {line.strip()}  # Moved to avoid circular import"
                                 self.fixes_applied.append(f"Commented potential circular import in {file_path.name}")
-                    except:
+                    except Exception:
                         pass
         
         return '\n'.join(lines)

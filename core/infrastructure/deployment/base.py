@@ -27,17 +27,17 @@ class CloudProvider(ABC):
         """Create a managed database and return connection info."""
         """Create object storage and return its URL."""
         """Create firewall rules for security."""
-    """Orchestrates deployments across different cloud providers."""
-        """Deploy the complete Orchestra AI stack."""
+    """cherry_aites deployments across different cloud providers."""
+        """Deploy the complete Cherry AI stack."""
         outputs["api_server_ip"] = self.provider.create_compute_instance(
-            name=f"orchestra-api-{self.provider.config.environment.value}",
+            name=f"cherry_ai-api-{self.provider.config.environment.value}",
             image="ubuntu-22-04-x64",
             user_data=self._generate_api_server_script(),
         )
 
         # Deploy firewall rules
         self.provider.create_firewall_rules(
-            name=f"orchestra-firewall-{self.provider.config.environment.value}",
+            name=f"cherry_ai-firewall-{self.provider.config.environment.value}",
             rules=[
                 {"protocol": "tcp", "port": 22, "source": "0.0.0.0/0"},
                 {"protocol": "tcp", "port": 80, "source": "0.0.0.0/0"},
@@ -51,5 +51,5 @@ class CloudProvider(ABC):
     def _generate_api_server_script(self) -> str:
         """Generate cloud-init script for API server."""
         return """
-echo "Orchestra AI infrastructure ready"
+echo "Cherry AI infrastructure ready"
 """

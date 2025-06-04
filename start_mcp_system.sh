@@ -100,7 +100,7 @@ log "${BLUE}========================================${NC}"
 # Export ONLY the required environment variables for PostgreSQL + Weaviate
 export POSTGRES_HOST="${POSTGRES_HOST:-localhost}"
 export POSTGRES_PORT="${POSTGRES_PORT:-5432}"
-export POSTGRES_DB="${POSTGRES_DB:-orchestra}"
+export POSTGRES_DB="${POSTGRES_DB:-cherry_ai}"
 export POSTGRES_USER="${POSTGRES_USER:-postgres}"
 export POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-}"
 
@@ -118,9 +118,9 @@ start_server "Memory MCP" \
     8003 \
     "http://localhost:8003/health"
 
-# 2. Start Orchestrator Server (uses PostgreSQL)
-start_server "Orchestrator MCP" \
-    "./venv/bin/python -m mcp_server.servers.orchestrator_server" \
+# 2. Start conductor Server (uses PostgreSQL)
+start_server "conductor MCP" \
+    "./venv/bin/python -m mcp_server.servers.conductor_server" \
     8002 \
     "http://localhost:8002/health"
 
@@ -143,7 +143,7 @@ log "${BLUE}========================================${NC}"
 log ""
 log "Services running (PostgreSQL + Weaviate ONLY):"
 log "  - Memory MCP: http://localhost:8003"
-log "  - Orchestrator MCP: http://localhost:8002"  
+log "  - conductor MCP: http://localhost:8002"  
 log "  - Tools MCP: http://localhost:8006"
 log "  - Weaviate Direct MCP: http://localhost:8001"
 log ""

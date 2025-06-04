@@ -102,7 +102,7 @@ class SearchEngineCleanup:
         init_file = search_dir / "__init__.py"
         if not init_file.exists():
             init_content = '''"""
-Orchestra AI Search Engine
+Cherry AI Search Engine
 Provides multiple search strategies for different use cases.
 """
 
@@ -155,6 +155,7 @@ import asyncio
 import logging
 from abc import ABC, abstractmethod
 from typing import Dict, List, Any, Optional
+from typing_extensions import Optional
 from datetime import datetime
 
 # Import shared components (adjust imports based on your project structure)
@@ -376,6 +377,7 @@ class BaseSearcher(ABC):
 import asyncio
 import logging
 from typing import Dict, List, Any, Optional
+from typing_extensions import Optional
 from datetime import datetime
 
 from .base_search import BaseSearcher
@@ -489,6 +491,7 @@ Search Router - Routes search requests to appropriate strategies
 """
 
 from typing import Dict, Any, Optional
+from typing_extensions import Optional
 from enum import Enum
 import asyncio
 import logging

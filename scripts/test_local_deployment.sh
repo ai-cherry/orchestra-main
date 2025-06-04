@@ -1,7 +1,7 @@
 #!/bin/bash
 # Test Local Deployment Script
 
-echo "🚀 Testing Local Orchestra AI Deployment"
+echo "🚀 Testing Local Cherry AI Deployment"
 echo "========================================"
 
 # Colors
@@ -37,7 +37,7 @@ mkdir -p logs
 echo -e "\n🔌 Starting MCP Servers..."
 
 # Start each MCP server
-for server in orchestrator memory weaviate_direct tools deployment; do
+for server in conductor memory weaviate_direct tools deployment; do
     server_file="mcp_server/servers/${server}_server.py"
     if [ -f "$server_file" ]; then
         echo "Starting ${server} server..."
@@ -73,7 +73,7 @@ check_service() {
 # Check each service
 all_good=true
 
-check_service "MCP Orchestrator" "http://localhost:8002/health" || all_good=false
+check_service "MCP conductor" "http://localhost:8002/health" || all_good=false
 check_service "MCP Memory" "http://localhost:8003/health" || all_good=false
 
 # Summary

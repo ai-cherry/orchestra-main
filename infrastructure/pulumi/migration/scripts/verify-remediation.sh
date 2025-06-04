@@ -64,7 +64,7 @@ echo
 # Check critical files
 echo "2. Checking critical files..."
 check "imports.ts exists" "[ -f src/imports.ts ]"
-check "orchestrator-enhanced.ts exists" "[ -f src/orchestrator-enhanced.ts ]"
+check "conductor-enhanced.ts exists" "[ -f src/conductor-enhanced.ts ]"
 check "state-manager-async.ts exists" "[ -f src/state-manager-async.ts ]"
 check "retry-manager.ts exists" "[ -f src/retry-manager.ts ]"
 check "lru-cache.ts exists" "[ -f src/utils/lru-cache.ts ]"
@@ -104,7 +104,7 @@ echo
 echo "7. Checking critical method implementations..."
 check "cleanup method in AsyncStateManager" "grep -q 'cleanup(' src/state-manager-async.ts"
 check "rollback method in AsyncStateManager" "grep -q 'rollback(' src/state-manager-async.ts"
-check "rollback method in EnhancedMigrationOrchestrator" "grep -q 'async rollback(' src/orchestrator-enhanced.ts"
+check "rollback method in EnhancedMigrationconductor" "grep -q 'async rollback(' src/conductor-enhanced.ts"
 check "child method in Logger" "grep -q 'child(' src/logger.ts"
 echo
 

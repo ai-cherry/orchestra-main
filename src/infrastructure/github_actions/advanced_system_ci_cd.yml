@@ -64,7 +64,7 @@ jobs:
         for script in scripts_dir.glob("*.py"):
             with open(script) as f:
                 content = f.read()
-                if "if __name__ == '__main__':" in content and "orchestra.py" not in str(script):
+                if "if __name__ == '__main__':" in content and "cherry_ai.py" not in str(script):
                     violations.append(f"Standalone script detected: {script}")
         
         # Check for direct database connections
@@ -206,7 +206,7 @@ jobs:
         if [ ! -f package.json ]; then
           cat > package.json << 'EOF'
         {
-          "name": "orchestra-advanced-ui",
+          "name": "cherry_ai-advanced-ui",
           "version": "1.0.0",
           "private": true,
           "dependencies": {

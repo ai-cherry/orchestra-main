@@ -1,6 +1,6 @@
-# Orchestra Configuration Management Standards
+# cherry_ai Configuration Management Standards
 
-This document outlines the standards and best practices for configuration management in the Orchestra project.
+This document outlines the standards and best practices for configuration management in the cherry_ai project.
 
 ## Table of Contents
 
@@ -151,7 +151,7 @@ chmod +x add_secrets_to_manager.sh
 
 ```bash
 # Navigate to Pulumi directory
-cd infra/orchestra-pulumi
+cd infra/cherry_ai-pulumi
 
 # Initialize Pulumi
 pulumi init

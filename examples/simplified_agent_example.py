@@ -6,10 +6,10 @@
 )
 logger = logging.getLogger("simplified-agent-example")
 
-from core.orchestrator.src.agents.agent_base import AgentContext
+from core.conductor.src.agents.agent_base import AgentContext
 
 # Import the simplified agent registry
-from core.orchestrator.src.agents.simplified_agent_registry import (
+from core.conductor.src.agents.simplified_agent_registry import (
     AgentCapability,
     get_simplified_agent_registry,
     register_default_agents,

@@ -33,7 +33,7 @@ stop_service() {
 
 # Stop all MCP services
 stop_service "Memory MCP"
-stop_service "Orchestrator MCP"
+stop_service "conductor MCP"
 stop_service "Tools MCP"
 stop_service "Weaviate Direct MCP"
 

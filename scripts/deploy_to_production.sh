@@ -4,16 +4,16 @@ set -euo pipefail
 # Production server configuration
 PROD_SERVER="45.32.69.157"
 PROD_USER="root"
-PROD_DIR="/root/orchestra-main"
-WEB_ROOT="/var/www/orchestra-admin"
+PROD_DIR="/root/cherry_ai-main"
+WEB_ROOT="/var/www/cherry_ai-admin"
 
-echo "=== Orchestra AI Production Deployment ==="
+echo "=== Cherry AI Production Deployment ==="
 echo "Deploying to: $PROD_SERVER"
 
 # Step 1: Pull latest code on production
 echo "1. Pulling latest code on production server..."
 ssh $PROD_USER@$PROD_SERVER << 'EOF'
-cd /root/orchestra-main
+cd /root/cherry_ai-main
 git pull origin main
 echo "✓ Code updated"
 EOF
@@ -21,7 +21,7 @@ EOF
 # Step 2: Install dependencies and build Admin UI
 echo "2. Building Admin UI on production..."
 ssh $PROD_USER@$PROD_SERVER << 'EOF'
-cd /root/orchestra-main/admin-ui
+cd /root/cherry_ai-main/admin-ui
 npm install --legacy-peer-deps
 npm run build
 echo "✓ Admin UI built"
@@ -30,8 +30,8 @@ EOF
 # Step 3: Deploy Admin UI to web root
 echo "3. Deploying Admin UI to web root..."
 ssh $PROD_USER@$PROD_SERVER << 'EOF'
-cd /root/orchestra-main/admin-ui
-sudo rsync -av --delete dist/ /var/www/orchestra-admin/
+cd /root/cherry_ai-main/admin-ui
+sudo rsync -av --delete dist/ /var/www/cherry_ai-admin/
 echo "✓ Admin UI deployed"
 EOF
 
@@ -42,9 +42,9 @@ ssh $PROD_USER@$PROD_SERVER << 'EOF'
 sudo lsof -ti:8001 | xargs -r sudo kill -9 || true
 
 # Start the real agent backend
-cd /root/orchestra-main
+cd /root/cherry_ai-main
 source venv/bin/activate
-nohup python -m agent.app.main > /var/log/orchestra-backend.log 2>&1 &
+nohup python -m agent.app.main > /var/log/cherry_ai-backend.log 2>&1 &
 sleep 3
 echo "✓ Backend restarted"
 EOF

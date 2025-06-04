@@ -43,7 +43,7 @@
 - `scripts/ai_code_reviewer.py` - Automated anti-pattern detection
 - `scripts/config_validator.py` - Configuration validation
 - `scripts/health_monitor.py` - Service health checks
-- `scripts/orchestra.py` - Unified CLI
+- `scripts/cherry_ai.py` - Unified CLI
 
 ### **Documentation (Reference)**
 

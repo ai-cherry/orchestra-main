@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Main API entry point for Orchestra AI"""
+"""Main API entry point for Cherry AI"""
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,13 +14,13 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifecycle"""
-    logger.info("Starting Orchestra AI API...")
+    logger.info("Starting Cherry AI API...")
     yield
-    logger.info("Shutting down Orchestra AI API...")
+    logger.info("Shutting down Cherry AI API...")
 
 app = FastAPI(
-    title="Orchestra AI API",
-    description="Advanced AI orchestration system",
+    title="Cherry AI API",
+    description="Advanced AI coordination system",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -42,7 +42,7 @@ ingestion_controller = IngestionController()
 async def root():
     """Root endpoint"""
     return {
-        "name": "Orchestra AI",
+        "name": "Cherry AI",
         "version": "1.0.0",
         "status": "operational"
     }
@@ -52,7 +52,7 @@ async def health_check():
     """Health check endpoint"""
     return {
         "status": "healthy",
-        "service": "orchestra-ai"
+        "service": "cherry_ai-ai"
     }
 
 @app.post("/search")

@@ -163,7 +163,7 @@ async def demo_statistics(pipeline: DataIngestionPipeline) -> None:
 async def main():
     """Run all demonstrations."""
     print("=" * 60)
-    print("ORCHESTRA AI DATA INGESTION DEMONSTRATION")
+    print("Cherry AI DATA INGESTION DEMONSTRATION")
     print("=" * 60)
 
     # Initialize pipeline

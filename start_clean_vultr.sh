@@ -13,7 +13,7 @@ export PS1="\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
 export PATH=$PATH:/home/paperspace/.pulumi/bin
 
 # Navigate to project
-cd /home/paperspace/orchestra-main
+cd /home/paperspace/cherry_ai-main
 
 # Activate virtual environment
 if [ -f "venv/bin/activate" ]; then
@@ -24,7 +24,7 @@ fi
 export VULTR_SERVER_IP="45.32.69.157"
 export ENVIRONMENT="production"
 export PROJECT_ROOT="${PWD}"
-export PULUMI_CONFIG_PASSPHRASE="orchestra-dev-123"
+export PULUMI_CONFIG_PASSPHRASE="cherry_ai-dev-123"
 export PULUMI_SKIP_UPDATE_CHECK=true
 
 echo "🎉 Clean Vultr environment ready!"

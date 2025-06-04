@@ -1,12 +1,12 @@
 # Unified Vultr Server Architecture
 
 ## Overview
-Orchestra AI runs on a single Vultr server that serves as development, deployment, and production environment.
+Cherry AI runs on a single Vultr server that serves as development, deployment, and production environment.
 
 ## Server Details
 - **IP**: 45.32.69.157
 - **OS**: Ubuntu/Linux
-- **Location**: /root/orchestra-main
+- **Location**: /root/cherry_ai-main
 - **Cost**: ~$160/month
 
 ## Architecture Benefits
@@ -18,11 +18,11 @@ Orchestra AI runs on a single Vultr server that serves as development, deploymen
 ## Development Workflow
 1. **Direct SSH Access**: 
    ```bash
-   ssh -i ~/.ssh/vultr_orchestra root@45.32.69.157
+   ssh -i ~/.ssh/vultr_cherry_ai root@45.32.69.157
    ```
 
 2. **VSCode/Cursor Remote Development**:
-   - Open folder: `/root/orchestra-main`
+   - Open folder: `/root/cherry_ai-main`
    - Edit files directly on server
    - Changes are instant
 
@@ -37,7 +37,7 @@ Orchestra AI runs on a single Vultr server that serves as development, deploymen
 | Port | Service |
 |------|---------|
 | **80**  | Nginx (Admin-UI static files + API proxy) |
-| **8000** | FastAPI Orchestrator (production + dev, reloader enabled) |
+| **8000** | FastAPI conductor (production + dev, reloader enabled) |
 | **5432** | PostgreSQL 14 (structured data) |
 | **6379** | Redis 5 (short-term cache / pub-sub) |
 | **8080** | Weaviate (vector memory) |
@@ -52,7 +52,7 @@ Orchestra AI runs on a single Vultr server that serves as development, deploymen
 1. Always pull latest changes before starting work
 2. Test changes locally before restarting services
 3. Use `make validate` before commits
-4. Monitor logs during development: `tail -f /var/log/orchestra/*`
+4. Monitor logs during development: `tail -f /var/log/cherry_ai/*`
 
 ## Migration Complete
 - ✅ All DigitalOcean resources shut down

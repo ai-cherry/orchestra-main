@@ -1,4 +1,4 @@
-# Orchestra AI Operations Guide
+# Cherry AI Operations Guide
 
 ## Table of Contents
 
@@ -15,7 +15,7 @@
 
 ## System Overview
 
-Orchestra AI is a cloud-native, AI-powered orchestration platform built on
+Cherry AI is a cloud-native, AI-powered coordination platform built on
 - **MCP (Model Context Protocol)** servers for modular AI capabilities
 - **Web scraping AI agent teams** with Zenrows, Apify, and PhantomBuster
 - **Enhanced vector memory system** with Redis caching
@@ -25,7 +25,7 @@ Orchestra AI is a cloud-native, AI-powered orchestration platform built on
 
 | Service                | Purpose           | URL Pattern                              |
 | ---------------------- | ----------------- | ---------------------------------------- |
-| `ai-orchestra-minimal` | Main orchestrator | `https://ai-orchestra-minimal-*.run.app` |
+| `ai-cherry_ai-minimal` | Main conductor | `https://ai-cherry_ai-minimal-*.run.app` |
 | `web-scraping-agents`  | Web scraping team | `https://web-scraping-agents-*.run.app`  |
 | `admin-interface`      | Admin UI          | `https://admin-interface-*.run.app`      |
 
@@ -43,7 +43,7 @@ Orchestra AI is a cloud-native, AI-powered orchestration platform built on
 ```bash
 # Clone repository
 git clone <repo-url>
-cd orchestra-main
+cd cherry_ai-main
 
 # Set up Python environment
 python3.10 -m venv .venv
@@ -55,7 +55,7 @@ pip install -r requirements.txt
 pip install -r requirements-dev.txt
 
 # Initialize system
-python tools/orchestra_cli.py init
+python tools/cherry_ai_cli.py init
 ```
 
 This will:
@@ -67,36 +67,36 @@ This will:
 
 ## CLI Operations
 
-The Orchestra CLI (`tools/orchestra_cli.py`) is your primary interface for system management.
+The cherry_ai CLI (`tools/cherry_ai_cli.py`) is your primary interface for system management.
 
 ### Secrets Management
 
 #### Sync Secrets from
 ```bash
 # Sync all secrets to local .env
-python tools/orchestra_cli.py secrets sync
+python tools/cherry_ai_cli.py secrets sync
 
 # Dry run to see what would be synced
-python tools/orchestra_cli.py secrets sync --dry-run
+python tools/cherry_ai_cli.py secrets sync --dry-run
 
 # Sync to custom env file
-python tools/orchestra_cli.py secrets sync --env-file .env.local
+python tools/cherry_ai_cli.py secrets sync --env-file .env.local
 ```
 
 #### Validate Secrets
 
 ```bash
 # Check all required secrets are present
-python tools/orchestra_cli.py secrets validate
+python tools/cherry_ai_cli.py secrets validate
 ```
 
 #### Set/Update Secrets in
 ```bash
 # Set a new secret (will prompt for value)
-python tools/orchestra_cli.py secrets set MY_API_KEY
+python tools/cherry_ai_cli.py secrets set MY_API_KEY
 
 # Update existing secret
-python tools/orchestra_cli.py secrets set OPENAI_API_KEY
+python tools/cherry_ai_cli.py secrets set OPENAI_API_KEY
 ```
 
 ### Adapter Management
@@ -105,7 +105,7 @@ python tools/orchestra_cli.py secrets set OPENAI_API_KEY
 
 ```bash
 # Show all adapters and their status
-python tools/orchestra_cli.py adapters list
+python tools/cherry_ai_cli.py adapters list
 ```
 
 Output:
@@ -123,7 +123,7 @@ Output:
 
 ```bash
 # Validate specific adapter
-python tools/orchestra_cli.py adapters check salesforce
+python tools/cherry_ai_cli.py adapters check salesforce
 ```
 
 ### System Diagnostics
@@ -132,7 +132,7 @@ python tools/orchestra_cli.py adapters check salesforce
 
 ```bash
 # Run comprehensive health checks
-python tools/orchestra_cli.py diagnostics health
+python tools/cherry_ai_cli.py diagnostics health
 ```
 
 This checks:
@@ -142,20 +142,20 @@ This checks:
 - MCP Gateway status
 - Adapter readiness
 
-### Orchestrator Management
+### conductor Management
 
 #### Reload Configuration
 
 ```bash
 # Reload after config changes
-python tools/orchestra_cli.py orchestrator reload
+python tools/cherry_ai_cli.py conductor reload
 ```
 
 #### Check Status
 
 ```bash
-# Show orchestrator status
-python tools/orchestra_cli.py orchestrator status
+# Show conductor status
+python tools/cherry_ai_cli.py conductor status
 ```
 
 ---
@@ -178,7 +178,7 @@ gcloud builds submit --config cloudbuild.yaml \
   --substitutions=COMMIT_SHA=$(git rev-parse HEAD)
 
 # Deploy specific service
-g  --image us-central1-docker.pkg.dev/cherry-ai-project/orchestra-images/orchestra-main:latest \
+g  --image us-central1-docker.pkg.dev/cherry-ai-project/cherry_ai-images/cherry_ai-main:latest \
   --region us-central1
 ```
 
@@ -211,7 +211,7 @@ Key infrastructure components:
 
 ### Dashboard
 
-Access the Orchestra AI dashboard:
+Access the Cherry AI dashboard:
 
 ```
 https://console.cloud.google.com/monitoring/dashboards/custom/[dashboard-id]?project=cherry-ai-project
@@ -228,7 +228,7 @@ Metrics tracked:
 
 Automated health checks run every 60 seconds for:
 
-- Orchestra API (`/health`)
+- cherry_ai API (`/health`)
 - Web Scraping Service (`/health`)
 - Admin Interface (`/`)
 
@@ -278,7 +278,7 @@ gcloud logging read 'resource.type="cloud_run_revision" AND severity="ERROR"' \
 # Check service logs
 g
 # Check secret availability
-python tools/orchestra_cli.py secrets validate
+python tools/cherry_ai_cli.py secrets validate
 
 # Force service restart
 gg```
@@ -291,13 +291,13 @@ gg```
 
 ```bash
 # List what's missing
-python tools/orchestra_cli.py secrets validate
+python tools/cherry_ai_cli.py secrets validate
 
 # Set missing secrets
-python tools/orchestra_cli.py secrets set MISSING_SECRET_NAME
+python tools/cherry_ai_cli.py secrets set MISSING_SECRET_NAME
 
 # Sync to local environment
-python tools/orchestra_cli.py secrets sync
+python tools/cherry_ai_cli.py secrets sync
 ```
 
 #### 3. Redis Connection Failed
@@ -308,15 +308,15 @@ python tools/orchestra_cli.py secrets sync
 
 ```bash
 # Check Redis instance status
-gcloud redis instances describe orchestra-redis --region us-central1
+gcloud redis instances describe cherry_ai-redis --region us-central1
 
 # Get Redis host
-gcloud redis instances describe orchestra-redis \
+gcloud redis instances describe cherry_ai-redis \
   --region us-central1 \
   --format "value(host)"
 
 # Update secret if needed
-python tools/orchestra_cli.py secrets set REDIS_HOST
+python tools/cherry_ai_cli.py secrets set REDIS_HOST
 ```
 
 #### 4. High Memory Usage
@@ -362,15 +362,15 @@ Each service runs with least-privilege IAM:
 
 | Service      | Service Account             | Key Permissions                     |
 | ------------ | --------------------------- | ----------------------------------- |
-| Orchestrator | `orchestra-orchestrator-sa` | Pub/Sub, Service Directory, Secrets |
-| Web Scraping | `orchestra-webscraping-sa`  | Redis, Pub/Sub, Secrets             |
-| Admin        | `orchestra-admin-sa`        | Read-only monitoring, logs          |
+| conductor | `cherry_ai-conductor-sa` | Pub/Sub, Service Directory, Secrets |
+| Web Scraping | `cherry_ai-webscraping-sa`  | Redis, Pub/Sub, Secrets             |
+| Admin        | `cherry_ai-admin-sa`        | Read-only monitoring, logs          |
 
 ### Secret Rotation
 
 ```bash
 # Rotate a secret
-python tools/orchestra_cli.py secrets set API_KEY_NAME
+python tools/cherry_ai_cli.py secrets set API_KEY_NAME
 
 # Redeploy services to pick up new secret
 g```
@@ -390,7 +390,7 @@ g```
 
 ```
 ┌─────────────────┐     ┌─────────────────┐
-│   Orchestrator  │────▶│    Pub/Sub      │
+│   conductor  │────▶│    Pub/Sub      │
 └─────────────────┘     └─────────────────┘
          │                       │
          ▼                       ▼
@@ -406,14 +406,14 @@ g```
 
 ### Event Flow
 
-1. **Tool Call**: Client → Orchestrator → Pub/Sub
+1. **Tool Call**: Client → conductor → Pub/Sub
 2. **Task Assignment**: Pub/Sub → Agent → Redis Queue
 3. **Result Storage**: Agent → Redis → Vector Memory
 4. **Health Check**: Monitoring → Service → Service Directory
 
 ### Scaling Strategy
 
-- **Orchestrator**: 0-10 instances, CPU-based
+- **conductor**: 0-10 instances, CPU-based
 - **Web Scraping**: 1-20 instances, queue-based
 - **Admin**: 0-5 instances, request-based
 

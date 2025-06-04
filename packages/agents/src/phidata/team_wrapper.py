@@ -31,7 +31,7 @@
                     logger.info(f"Resolving team member reference: {member_id}")
 
                     # Get the agent configuration from the registry
-                    from core.orchestrator.src.core.config import get_agent_config
+                    from core.conductor.src.core.config import get_agent_config
 
                     member_config = get_agent_config(member_id)
 
@@ -88,9 +88,9 @@
                             # Check if this is a registry tool
                             if tool_type.startswith("registry:"):
                                 tool_id = tool_type.replace("registry:", "").strip()
-                                orchestra_tool = self.tools.get_tool(tool_id)
-                                if orchestra_tool and hasattr(orchestra_tool, "to_phidata_tool"):
-                                    phidata_tool = orchestra_tool.to_phidata_tool(**tool_params)
+                                cherry_ai_tool = self.tools.get_tool(tool_id)
+                                if cherry_ai_tool and hasattr(cherry_ai_tool, "to_phidata_tool"):
+                                    phidata_tool = cherry_ai_tool.to_phidata_tool(**tool_params)
                                     if phidata_tool:
                                         member_tools.append(phidata_tool)
                                 continue

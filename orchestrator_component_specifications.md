@@ -1,11 +1,11 @@
-# Orchestrator Landing Page - Component Specifications
+# conductor Landing Page - Component Specifications
 
 ## Component Interface Definitions
 
 ### Core Components
 
 ```typescript
-// types/orchestrator.types.ts
+// types/conductor.types.ts
 export type InputMode = 'text' | 'voice' | 'file';
 export type SearchMode = 'creative' | 'deep' | 'super_deep';
 export type PanelType = 'search' | 'voice' | 'file' | 'suggestions';
@@ -68,29 +68,29 @@ export interface AppError {
 ### Layout Components
 
 ```typescript
-// components/orchestrator/OrchestratorLandingPage.tsx
+// components/conductor/conductorLandingPage.tsx
 import { FC, Suspense, lazy } from 'react';
 import { PageWrapper } from '@/components/layout/PageWrapper';
-import { useOrchestratorStore } from '@/store/orchestratorStore';
+import { useconductorStore } from '@/store/conductorStore';
 
 const VoiceSection = lazy(() => import('./sections/VoiceSection'));
 const FileManager = lazy(() => import('./sections/FileManager'));
 
-export interface OrchestratorLandingPageProps {
+export interface conductorLandingPageProps {
   className?: string;
   initialMode?: SearchMode;
   onSearchComplete?: (results: SearchResult[]) => void;
 }
 
-export const OrchestratorLandingPage: FC<OrchestratorLandingPageProps> = ({
+export const conductorLandingPage: FC<conductorLandingPageProps> = ({
   className,
   initialMode = 'creative',
   onSearchComplete,
 }) => {
-  const { ui, actions } = useOrchestratorStore();
+  const { ui, actions } = useconductorStore();
   
   return (
-    <PageWrapper className={cn('orchestrator-landing', className)}>
+    <PageWrapper className={cn('conductor-landing', className)}>
       <Header />
       <main className="flex-1 overflow-hidden">
         <div className="container mx-auto px-4 py-6">
@@ -109,7 +109,7 @@ export const OrchestratorLandingPage: FC<OrchestratorLandingPageProps> = ({
   );
 };
 
-// components/orchestrator/layout/Header.tsx
+// components/conductor/layout/Header.tsx
 export interface HeaderProps {
   user?: User;
   notifications?: Notification[];
@@ -148,7 +148,7 @@ export const Header: FC<HeaderProps> = ({
 ### Search Components
 
 ```typescript
-// components/orchestrator/search/SearchSection.tsx
+// components/conductor/search/SearchSection.tsx
 export interface SearchSectionProps {
   initialMode?: SearchMode;
   className?: string;
@@ -158,7 +158,7 @@ export const SearchSection: FC<SearchSectionProps> = ({
   initialMode = 'creative',
   className,
 }) => {
-  const { search, actions } = useOrchestratorStore();
+  const { search, actions } = useconductorStore();
   
   return (
     <section className={cn('search-section', className)}>
@@ -188,7 +188,7 @@ export const SearchSection: FC<SearchSectionProps> = ({
   );
 };
 
-// components/orchestrator/search/SearchInput.tsx
+// components/conductor/search/SearchInput.tsx
 export interface SearchInputProps {
   value: string;
   onChange: (value: string) => void;
@@ -268,7 +268,7 @@ export const SearchInput: FC<SearchInputProps> = ({
   );
 };
 
-// components/orchestrator/search/InputModeSelector.tsx
+// components/conductor/search/InputModeSelector.tsx
 export interface InputModeSelectorProps {
   mode: InputMode;
   onChange: (mode: InputMode) => void;
@@ -319,7 +319,7 @@ export const InputModeSelector: FC<InputModeSelectorProps> = ({
   );
 };
 
-// components/orchestrator/search/SearchModeSelector.tsx
+// components/conductor/search/SearchModeSelector.tsx
 export interface SearchModeSelectorProps {
   mode: SearchMode;
   onChange: (mode: SearchMode) => void;
@@ -382,7 +382,7 @@ export const SearchModeSelector: FC<SearchModeSelectorProps> = ({
 ### Voice Components
 
 ```typescript
-// components/orchestrator/voice/VoiceRecorder.tsx
+// components/conductor/voice/VoiceRecorder.tsx
 export interface VoiceRecorderProps {
   onTranscription: (text: string) => void;
   onError: (error: Error) => void;
@@ -398,7 +398,7 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({
   maxDuration = 60000, // 60 seconds
   className,
 }) => {
-  const { voice, actions } = useOrchestratorStore();
+  const { voice, actions } = useconductorStore();
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -507,7 +507,7 @@ export const VoiceRecorder: FC<VoiceRecorderProps> = ({
   );
 };
 
-// components/orchestrator/voice/VoiceSynthesizer.tsx
+// components/conductor/voice/VoiceSynthesizer.tsx
 export interface VoiceSynthesizerProps {
   text: string;
   voice: VoiceOption;
@@ -523,7 +523,7 @@ export const VoiceSynthesizer: FC<VoiceSynthesizerProps> = ({
   onError,
   className,
 }) => {
-  const { voice: voiceState, actions } = useOrchestratorStore();
+  const { voice: voiceState, actions } = useconductorStore();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   
@@ -627,7 +627,7 @@ export const VoiceSynthesizer: FC<VoiceSynthesizerProps> = ({
 ### File Management Components
 
 ```typescript
-// components/orchestrator/files/FileUploader.tsx
+// components/conductor/files/FileUploader.tsx
 export interface FileUploaderProps {
   onUpload: (files: File[]) => void;
   acceptedTypes?: string[];
@@ -645,7 +645,7 @@ export const FileUploader: FC<FileUploaderProps> = ({
   onError,
   className,
 }) => {
-  const { files, actions } = useOrchestratorStore();
+  const { files, actions } = useconductorStore();
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -779,7 +779,7 @@ export const FileUploader: FC<FileUploaderProps> = ({
   );
 };
 
-// components/orchestrator/files/DownloadTable.tsx
+// components/conductor/files/DownloadTable.tsx
 export interface DownloadTableProps {
   downloads: FileDownload[];
   onCancel: (id: string) => void;
@@ -838,7 +838,7 @@ export const DownloadTable: FC<DownloadTableProps> = ({
   );
 };
 
-// components/orchestrator/files/DownloadTableRow.tsx
+// components/conductor/files/DownloadTableRow.tsx
 interface DownloadTableRowProps {
   download: FileDownload;
   onCancel: (id: string) => void;

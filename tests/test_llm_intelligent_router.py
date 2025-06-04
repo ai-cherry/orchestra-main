@@ -1,3 +1,4 @@
+import os
 """
 """
     """Test the query classification functionality"""
@@ -58,8 +59,8 @@
 
 class TestIntelligentLLMRouter:
     """Test the intelligent routing functionality"""
-            router.config.portkey_api_key = "test_key"
-            router.config.openrouter_api_key = "test_key"
+            router.config.portkey_api_key = os.getenv('API_KEY')
+            router.config.openrouter_api_key = os.getenv('API_KEY')
             return router
     
     @pytest.mark.asyncio

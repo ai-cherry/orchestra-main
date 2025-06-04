@@ -7,15 +7,15 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-echo -e "${GREEN}AI Orchestra Deployment Test${NC}"
+echo -e "${GREEN}AI cherry_ai Deployment Test${NC}"
 echo "============================="
 echo ""
 echo -e "${YELLOW}This script shows what will be deployed to cherry-ai.me${NC}"
 echo ""
 
 # Check Docker image
-if [ -f "orchestra-api-minimal.tar.gz" ]; then
-    echo -e "${GREEN}✓ Docker image found: orchestra-api-minimal.tar.gz (64MB)${NC}"
+if [ -f "cherry_ai-api-minimal.tar.gz" ]; then
+    echo -e "${GREEN}✓ Docker image found: cherry_ai-api-minimal.tar.gz (64MB)${NC}"
     echo "  Contains:"
     echo "  - Fixed authentication system"
     echo "  - 5 AI personas (Cherry, AI Assistant, Technical Architect, Sophia, Gordon Gekko)"

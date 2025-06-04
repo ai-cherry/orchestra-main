@@ -1,7 +1,7 @@
 #!/bin/bash
-# Monitor the Comprehensive AI Orchestrator
+# Monitor the Comprehensive AI conductor
 
-echo "📊 Monitoring Comprehensive AI Orchestrator"
+echo "📊 Monitoring Comprehensive AI conductor"
 echo "=========================================="
 
 # Colors for output
@@ -10,17 +10,17 @@ RED='\033[0;31m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Check orchestrator process
+# Check conductor process
 check_process() {
-    if [ -f "orchestrator.pid" ]; then
-        PID=$(cat orchestrator.pid)
+    if [ -f "conductor.pid" ]; then
+        PID=$(cat conductor.pid)
         if ps -p $PID > /dev/null 2>&1; then
-            echo -e "${GREEN}✅ Orchestrator Process: Running (PID: $PID)${NC}"
+            echo -e "${GREEN}✅ conductor Process: Running (PID: $PID)${NC}"
         else
-            echo -e "${RED}❌ Orchestrator Process: Not Running${NC}"
+            echo -e "${RED}❌ conductor Process: Not Running${NC}"
         fi
     else
-        echo -e "${YELLOW}⚠️  Orchestrator Process: No PID file found${NC}"
+        echo -e "${YELLOW}⚠️  conductor Process: No PID file found${NC}"
     fi
 }
 
@@ -60,9 +60,9 @@ check_services() {
 # Check logs
 check_logs() {
     echo -e "\n📝 Recent Log Activity:"
-    if [ -f "logs/orchestrator.log" ]; then
+    if [ -f "logs/conductor.log" ]; then
         echo "Last 10 log entries:"
-        tail -n 10 logs/orchestrator.log | sed 's/^/  /'
+        tail -n 10 logs/conductor.log | sed 's/^/  /'
     else
         echo -e "${YELLOW}⚠️  No log file found${NC}"
     fi
@@ -71,8 +71,8 @@ check_logs() {
 # Check resource usage
 check_resources() {
     echo -e "\n💻 Resource Usage:"
-    if [ -f "orchestrator.pid" ]; then
-        PID=$(cat orchestrator.pid)
+    if [ -f "conductor.pid" ]; then
+        PID=$(cat conductor.pid)
         if ps -p $PID > /dev/null 2>&1; then
             # Get CPU and memory usage
             ps -p $PID -o pid,vsz,rss,pcpu,pmem,comm | tail -n 1 | \
@@ -86,7 +86,7 @@ if [ "$1" == "--watch" ]; then
     # Continuous monitoring mode
     while true; do
         clear
-        echo "📊 Monitoring Comprehensive AI Orchestrator ($(date))"
+        echo "📊 Monitoring Comprehensive AI conductor ($(date))"
         echo "=========================================="
         check_process
         check_services

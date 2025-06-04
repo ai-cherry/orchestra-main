@@ -1,7 +1,7 @@
 # Secrets Configuration Guide
 
 ## Overview
-This document outlines all secrets and environment variables required for the Orchestra AI project, including Portkey virtual keys and other service integrations.
+This document outlines all secrets and environment variables required for the Cherry AI project, including Portkey virtual keys and other service integrations.
 
 ## GitHub Secrets (Production) - Complete List
 
@@ -17,7 +17,7 @@ This document outlines all secrets and environment variables required for the Or
 | `OPENROUTER_API_KEY` | OpenRouter API key | last month | Alternative to Portkey |
 | `CODESTRAL_API_KEY` | Codestral API key | last month | Code generation |
 | `CLAUDE_API_KEY` | Claude API (see ANTHROPIC_API_KEY) | - | Use ANTHROPIC_API_KEY |
-| `LANGCHAIN_API_KEY` | LangChain API key | 3 days ago | LLM orchestration |
+| `LANGCHAIN_API_KEY` | LangChain API key | 3 days ago | LLM coordination |
 | `LANGSMITH_API_KEY` | LangSmith API key | 2 months ago | LLM monitoring |
 | `HUGGINGFACE_API_TOKEN` | HuggingFace API token | 3 days ago | Open source models |
 
@@ -132,7 +132,7 @@ OPENAI_API_KEY=${OPENAI_API_KEY}
 USE_PORTKEY=false
 ```
 
-## Core Required Secrets for Orchestra AI
+## Core Required Secrets for Cherry AI
 
 ### Minimum Required (Production)
 1. `PORTKEY_API_KEY` - For AI/LLM services

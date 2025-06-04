@@ -6,7 +6,7 @@
     "Cloud Run": "http://localhost:8001/health",
     "Secrets": "http://localhost:8002/health",
     "Memory": "http://localhost:8003/health",
-    "Orchestrator": "http://localhost:8004/health",
+    "conductor": "http://localhost:8004/health",
 }
 
 # Metrics endpoint
@@ -54,7 +54,7 @@ def create_health_table(health_data: list) -> Table:
                 if server["name"] == "Memory":
                     backends = server["details"].get("backends", {})
                     details = f"Redis: {backends.get('redis', '❌')}, mongodb: {backends.get('mongodb', '❌')}, Weaviate: {backends.get('weaviate', '❌')}"
-                elif server["name"] == "Orchestrator":
+                elif server["name"] == "conductor":
                     details = f"Mode: {server['details'].get('current_mode', 'N/A')}, Workflows: {server['details'].get('active_workflows', 0)}"
                 elif server["name"] == "Gateway":
                     details = f"Servers: {server['details'].get('healthy_servers', 0)}/{server['details'].get('total_servers', 0)}"

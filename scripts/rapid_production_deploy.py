@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Rapid Production Deploy
-Deploy Orchestra AI to cherry-ai.me production environment.
+Deploy Cherry AI to cherry-ai.me production environment.
 """
 
 import os
@@ -13,6 +13,7 @@ import subprocess
 import shutil
 from pathlib import Path
 from typing import Dict, List, Optional
+from typing_extensions import Optional
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
@@ -331,22 +332,22 @@ python-jose[cryptography]>=3.3.0
         deploy_script = f"""#!/bin/bash
 set -e
 
-echo "🚀 Starting Orchestra AI Production Deployment"
+echo "🚀 Starting Cherry AI Production Deployment"
 
 # Set production environment
 export ENVIRONMENT=production
 export DOMAIN={self.production_domain}
 
 # Create production directory
-sudo mkdir -p /opt/orchestra-ai
-sudo chown $USER:$USER /opt/orchestra-ai
+sudo mkdir -p /opt/cherry_ai-ai
+sudo chown $USER:$USER /opt/cherry_ai-ai
 
 # Copy application files
 echo "📦 Copying application files..."
-rsync -av --exclude='__pycache__' --exclude='.git' --exclude='venv' --exclude='node_modules' . /opt/orchestra-ai/
+rsync -av --exclude='__pycache__' --exclude='.git' --exclude='venv' --exclude='node_modules' . /opt/cherry_ai-ai/
 
 # Set up Python environment
-cd /opt/orchestra-ai
+cd /opt/cherry_ai-ai
 echo "🐍 Setting up Python environment..."
 python3 -m venv venv
 source venv/bin/activate
@@ -355,21 +356,21 @@ pip install -r requirements.production.txt
 
 # Set permissions
 chmod +x scripts/*.py
-chmod 755 /opt/orchestra-ai
+chmod 755 /opt/cherry_ai-ai
 
 # Create systemd service
-sudo tee /etc/systemd/system/orchestra-ai.service > /dev/null <<EOF
+sudo tee /etc/systemd/system/cherry_ai-ai.service > /dev/null <<EOF
 [Unit]
-Description=Orchestra AI Application
+Description=Cherry AI Application
 After=network.target
 
 [Service]
 Type=exec
 User=$USER
-WorkingDirectory=/opt/orchestra-ai
-Environment=PATH=/opt/orchestra-ai/venv/bin
+WorkingDirectory=/opt/cherry_ai-ai
+Environment=PATH=/opt/cherry_ai-ai/venv/bin
 Environment=ENVIRONMENT=production
-ExecStart=/opt/orchestra-ai/venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+ExecStart=/opt/cherry_ai-ai/venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
 Restart=always
 RestartSec=10
 
@@ -378,7 +379,7 @@ WantedBy=multi-user.target
 EOF
 
 # Create nginx configuration
-sudo tee /etc/nginx/sites-available/orchestra-ai > /dev/null <<EOF
+sudo tee /etc/nginx/sites-available/cherry_ai-ai > /dev/null <<EOF
 server {{
     listen 80;
     listen 443 ssl;
@@ -395,7 +396,7 @@ server {{
     
     # Static files
     location /static/ {{
-        alias /opt/orchestra-ai/admin-ui/dist/;
+        alias /opt/cherry_ai-ai/admin-ui/dist/;
         expires 1y;
         add_header Cache-Control "public, no-transform";
     }}
@@ -421,22 +422,22 @@ server {{
     # Frontend application
     location / {{
         try_files \$uri \$uri/ /index.html;
-        root /opt/orchestra-ai/admin-ui/dist/;
+        root /opt/cherry_ai-ai/admin-ui/dist/;
     }}
 }}
 EOF
 
 # Enable nginx site
-sudo ln -sf /etc/nginx/sites-available/orchestra-ai /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/cherry_ai-ai /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
 
 # Start and enable service
 sudo systemctl daemon-reload
-sudo systemctl enable orchestra-ai
-sudo systemctl restart orchestra-ai
+sudo systemctl enable cherry_ai-ai
+sudo systemctl restart cherry_ai-ai
 
-echo "✅ Orchestra AI deployed successfully!"
+echo "✅ Cherry AI deployed successfully!"
 echo "🌐 Available at: https://{self.production_domain}"
 """
         
@@ -452,7 +453,7 @@ echo "🌐 Available at: https://{self.production_domain}"
         
         # For demo purposes, we'll simulate deployment
         print("  🎭 Simulating production deployment...")
-        print(f"  📦 Application would be deployed to /opt/orchestra-ai")
+        print(f"  📦 Application would be deployed to /opt/cherry_ai-ai")
         print(f"  🌐 Nginx would be configured for {self.production_domain}")
         print(f"  🔄 Systemd service would be created and started")
         
@@ -536,7 +537,7 @@ echo "🌐 Available at: https://{self.production_domain}"
 =====================================================
 
 ✅ Application Deployment:
-   • Files deployed to /opt/orchestra-ai
+   • Files deployed to /opt/cherry_ai-ai
    • Python virtual environment created
    • Dependencies installed
    • Systemd service configured
@@ -609,7 +610,7 @@ def main():
     
     if results["deployment_status"] == "success":
         print("\n🎉 PRODUCTION DEPLOYMENT SUCCESSFUL!")
-        print(f"🌐 Orchestra AI is now live at: https://{deployer.production_domain}")
+        print(f"🌐 Cherry AI is now live at: https://{deployer.production_domain}")
         return 0
     else:
         print(f"\n❌ Deployment failed: {results.get('error', 'Unknown error')}")

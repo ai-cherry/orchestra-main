@@ -316,7 +316,7 @@ const cacheConfig = {
   // IndexedDB for offline support
   persistor: createWebStoragePersistor({
     storage: window.localStorage,
-    key: 'orchestra-query-cache',
+    key: 'cherry_ai-query-cache',
   }),
   
   // Service Worker for network caching

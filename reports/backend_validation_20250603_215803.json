@@ -1,0 +1,47 @@
+{
+  "timestamp": "2025-06-03T21:58:02.061511",
+  "checks": {
+    "environment": "\u2705 All required variables set",
+    "database": "\u2705 Connected, 1 tables found",
+    "redis": "\u2705 Connected and operational",
+    "docker": "\u2705 3/3 services running",
+    "dependencies": "\u2705 147 packages installed"
+  },
+  "errors": [
+    {
+      "check": "weaviate",
+      "error": "HTTPConnectionPool(host='localhost', port=8080): Max retries exceeded with url: /v1/meta (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f577ffd3f50>: Failed to establish a new connection: [Errno 111] Connection refused'))"
+    }
+  ],
+  "warnings": [
+    {
+      "check": "database",
+      "warning": "Missing tables: sessions, interactions, personas"
+    },
+    {
+      "check": "api_/health",
+      "warning": "API not running"
+    },
+    {
+      "check": "api_/api/v1/auth/login",
+      "warning": "API not running"
+    },
+    {
+      "check": "api_/api/v1/interactions",
+      "warning": "API not running"
+    },
+    {
+      "check": "api_/api/v1/personas",
+      "warning": "API not running"
+    },
+    {
+      "check": "tests",
+      "warning": "Failed to run tests: [Errno 2] No such file or directory: 'python'"
+    },
+    {
+      "check": "tests",
+      "warning": "Failed to run tests: [Errno 2] No such file or directory: 'python'"
+    }
+  ],
+  "ready_for_deployment": false
+}

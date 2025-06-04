@@ -42,7 +42,7 @@ services:
           cpus: "4.0"
           memory: 8g
 
-  orchestrator:
+  conductor:
     build:
       context: ..
       dockerfile: core/Dockerfile

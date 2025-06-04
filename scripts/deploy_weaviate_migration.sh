@@ -24,7 +24,7 @@
 #   --dry-run           Run in dry-run mode (no actual changes)
 #   --help              Show this help message
 #
-# Author: Orchestra AI Platform
+# Author: Cherry AI Platform
 
 set -e  # Exit on error
 
@@ -333,8 +333,8 @@ setup_pulumi_config() {
     "weaviate_version=1.30.1"
     "enable_acorn=true"
     "enable_agents=true"
-    "postgres_db_name=orchestrator"
-    "postgres_user=orchestrator"
+    "postgres_db_name=conductor"
+    "postgres_user=conductor"
   )
   
   for config in "${config_values[@]}"; do

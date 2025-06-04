@@ -420,8 +420,8 @@ Format the response as structured JSON for processing.
                 "enhancements": ["Code generation improvements"],
                 "config_updates": {}
             },
-            "orchestrator_mode": {
-                "enhancements": ["Orchestration improvements"],
+            "conductor_mode": {
+                "enhancements": ["coordination improvements"],
                 "config_updates": {}
             },
             "performance": {
@@ -502,10 +502,10 @@ def get_claude_integration(use_claude_max: bool = False) -> ClaudeIntegration:
         pass
         analysis = await claude.analyze_architecture(
             {
-                "name": "orchestra-main",
+                "name": "cherry_ai-main",
                 "type": "monorepo",
                 "languages": ["python", "typescript"],
-                "components": ["orchestrator", "agents", "ui/ux"],
+                "components": ["conductor", "agents", "ui/ux"],
                 "size": "large"
             },
             focus_areas=["scalability", "maintainability", "security"]

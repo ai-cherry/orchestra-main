@@ -1,14 +1,14 @@
-# AI Orchestrator System Guide
+# AI conductor System Guide
 
 ## Overview
 
-The AI Orchestrator is a comprehensive workflow orchestration system that coordinates between EigenCode (code analysis), Cursor AI (implementation), and Roo Code (refinement) to provide automated code analysis, optimization, and improvement capabilities.
+The AI conductor is a comprehensive workflow coordination system that coordinates between EigenCode (code analysis), Cursor AI (implementation), and Roo Code (refinement) to provide automated code analysis, optimization, and improvement capabilities.
 
 ## Architecture
 
 ### Core Components
 
-1. **Workflow Orchestrator** (`ai_components/orchestration/ai_orchestrator.py`)
+1. **Workflow conductor** (`ai_components/coordination/ai_conductor.py`)
    - Manages workflow execution with dependency resolution
    - Implements parallel task execution
    - Provides checkpointing and failure recovery
@@ -20,7 +20,7 @@ The AI Orchestrator is a comprehensive workflow orchestration system that coordi
    - **Roo Code Agent**: Refines technology stack for ease of use
 
 3. **Context Management**
-   - **PostgreSQL**: Stores orchestration logs and audit trails
+   - **PostgreSQL**: Stores coordination logs and audit trails
    - **Weaviate Cloud**: Vector storage for context and results
    - **MCP Server**: Real-time task management and coordination
 
@@ -44,12 +44,12 @@ The AI Orchestrator is a comprehensive workflow orchestration system that coordi
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/orchestra-main.git
-cd orchestra-main
+git clone https://github.com/your-org/cherry_ai-main.git
+cd cherry_ai-main
 
 # Run quick start script
-chmod +x quick_start_orchestrator.sh
-./quick_start_orchestrator.sh
+chmod +x quick_start_conductor.sh
+./quick_start_conductor.sh
 ```
 
 ### Manual Installation
@@ -82,7 +82,7 @@ chmod +x quick_start_orchestrator.sh
    python scripts/configure_airbyte.py
    
    # Start MCP server
-   sudo systemctl start orchestrator-mcp
+   sudo systemctl start conductor-mcp
    ```
 
 ## Configuration
@@ -95,7 +95,7 @@ Required environment variables (set in GitHub Secrets for deployment):
 # PostgreSQL
 POSTGRES_HOST=your_postgres_host
 POSTGRES_PORT=5432
-POSTGRES_DB=orchestrator_db
+POSTGRES_DB=conductor_db
 POSTGRES_USER=your_postgres_user
 POSTGRES_PASSWORD=your_postgres_password
 
@@ -117,12 +117,12 @@ ROO_CODE_API_KEY=your_roo_code_api_key
 VULTR_API_KEY=your_vultr_api_key
 ```
 
-### Orchestrator Configuration
+### conductor Configuration
 
-Edit `ai_components/configs/orchestrator_config.yaml`:
+Edit `ai_components/configs/conductor_config.yaml`:
 
 ```yaml
-orchestrator:
+conductor:
   workflow_timeout: 3600  # 1 hour
   max_parallel_tasks: 5
   checkpoint_interval: 300  # 5 minutes
@@ -138,28 +138,28 @@ agents:
 
 ### CLI Commands
 
-The orchestrator provides a comprehensive CLI interface:
+The conductor provides a comprehensive CLI interface:
 
 ```bash
 # Show help
-./ai_components/orchestrator_cli.py --help
+./ai_components/conductor_cli.py --help
 
 # Analyze codebase
-./ai_components/orchestrator_cli.py analyze \
+./ai_components/conductor_cli.py analyze \
   --codebase /path/to/code \
   --output analysis.json
 
 # Implement changes based on analysis
-./ai_components/orchestrator_cli.py implement \
+./ai_components/conductor_cli.py implement \
   --analysis analysis.json \
   --focus performance
 
 # Refine technology stack
-./ai_components/orchestrator_cli.py refine \
+./ai_components/conductor_cli.py refine \
   --stack python_postgres_weaviate
 
-# Run full orchestration workflow
-./ai_components/orchestrator_cli.py orchestrate \
+# Run full coordination workflow
+./ai_components/conductor_cli.py cherry_aite \
   --config configs/example_workflow.json
 ```
 
@@ -167,17 +167,17 @@ The orchestrator provides a comprehensive CLI interface:
 
 ```python
 import asyncio
-from ai_components.orchestration.ai_orchestrator import (
-    WorkflowOrchestrator, TaskDefinition, AgentRole
+from ai_components.coordination.ai_conductor import (
+    Workflowconductor, TaskDefinition, AgentRole
 )
 
 async def run_analysis():
-    # Create orchestrator
-    orchestrator = WorkflowOrchestrator()
+    # Create conductor
+    conductor = Workflowconductor()
     
     # Create workflow
     workflow_id = "my_analysis_workflow"
-    context = await orchestrator.create_workflow(workflow_id)
+    context = await conductor.create_workflow(workflow_id)
     
     # Define tasks
     tasks = [
@@ -197,7 +197,7 @@ async def run_analysis():
     ]
     
     # Execute workflow
-    result = await orchestrator.execute_workflow(workflow_id, tasks)
+    result = await conductor.execute_workflow(workflow_id, tasks)
     print(f"Results: {result.results}")
 
 # Run the workflow
@@ -260,10 +260,10 @@ pulumi up
 
 # Deploy application
 ssh root@your-server-ip
-cd /opt/ai-orchestrator
+cd /opt/ai-conductor
 git pull
-systemctl restart orchestrator-mcp
-systemctl restart ai-orchestrator
+systemctl restart conductor-mcp
+systemctl restart ai-conductor
 ```
 
 ## Monitoring
@@ -272,16 +272,16 @@ systemctl restart ai-orchestrator
 
 ```bash
 # Check MCP server status
-systemctl status orchestrator-mcp
+systemctl status conductor-mcp
 
-# Check orchestrator service
-systemctl status ai-orchestrator
+# Check conductor service
+systemctl status ai-conductor
 
 # View MCP server logs
-sudo journalctl -u orchestrator-mcp -f
+sudo journalctl -u conductor-mcp -f
 
-# View orchestrator logs
-tail -f ai_components/logs/orchestrator.log
+# View conductor logs
+tail -f ai_components/logs/conductor.log
 ```
 
 ### Metrics
@@ -293,18 +293,18 @@ Access monitoring dashboards:
 ### Database Queries
 
 ```sql
--- View recent orchestration logs
-SELECT * FROM orchestration_logs 
+-- View recent coordination logs
+SELECT * FROM coordination_logs 
 ORDER BY created_at DESC 
 LIMIT 100;
 
 -- Check workflow status
 SELECT workflow_id, status, COUNT(*) 
-FROM orchestration_logs 
+FROM coordination_logs 
 GROUP BY workflow_id, status;
 
 -- Find failed tasks
-SELECT * FROM orchestration_logs 
+SELECT * FROM coordination_logs 
 WHERE status = 'failed' 
 ORDER BY created_at DESC;
 ```
@@ -315,7 +315,7 @@ ORDER BY created_at DESC;
 
 ```bash
 cd ai_components
-pytest tests/ -v --cov=orchestration --cov-report=html
+pytest tests/ -v --cov=coordination --cov-report=html
 ```
 
 ### Run Integration Tests
@@ -339,11 +339,11 @@ python scripts/eigencode_installer.py
 
 # Check installation logs
 psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -c \
-  "SELECT * FROM orchestration_logs WHERE agent_role='installer' ORDER BY created_at DESC LIMIT 10;"
+  "SELECT * FROM coordination_logs WHERE agent_role='installer' ORDER BY created_at DESC LIMIT 10;"
 
 # Query Weaviate for installation attempts
 python -c "
-from ai_components.orchestration.ai_orchestrator import WeaviateManager
+from ai_components.coordination.ai_conductor import WeaviateManager
 wm = WeaviateManager()
 results = wm.retrieve_context('eigencode_installation')
 for r in results:
@@ -430,7 +430,7 @@ curl -X POST http://localhost:8080/tasks -H "Content-Type: application/json" \
   -d '{"task_id":"test","name":"Test","agent_role":"analyzer","inputs":{}}'
 
 # Monitor resource usage
-htop -p $(pgrep -f orchestrator_mcp_server)
+htop -p $(pgrep -f coordinator_server)
 ```
 
 ### Performance Issues
@@ -442,22 +442,22 @@ htop -p $(pgrep -f orchestrator_mcp_server)
 # scripts/diagnose_performance.py
 import asyncio
 import time
-from ai_components.orchestration.ai_orchestrator import WorkflowOrchestrator
+from ai_components.coordination.ai_conductor import Workflowconductor
 
 async def measure_performance():
-    orchestrator = WorkflowOrchestrator()
+    conductor = Workflowconductor()
     
     # Measure task creation time
     start = time.time()
-    context = await orchestrator.create_workflow("perf_test")
+    context = await conductor.create_workflow("perf_test")
     creation_time = time.time() - start
     
     print(f"Workflow creation: {creation_time:.3f}s")
     
     # Check database query performance
-    with orchestrator.db_logger._get_connection() as conn:
+    with conductor.db_logger._get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("EXPLAIN ANALYZE SELECT * FROM orchestration_logs LIMIT 1000")
+            cur.execute("EXPLAIN ANALYZE SELECT * FROM coordination_logs LIMIT 1000")
             print(cur.fetchall())
 ```
 
@@ -558,18 +558,18 @@ class CachedWeaviateManager(WeaviateManager):
 ```sql
 -- Create optimized indexes
 CREATE INDEX CONCURRENTLY idx_logs_workflow_task
-ON orchestration_logs(workflow_id, task_id);
+ON coordination_logs(workflow_id, task_id);
 
 CREATE INDEX CONCURRENTLY idx_logs_created_status
-ON orchestration_logs(created_at DESC, status);
+ON coordination_logs(created_at DESC, status);
 
 -- Partial index for active workflows
 CREATE INDEX CONCURRENTLY idx_active_workflows
-ON orchestration_logs(workflow_id)
+ON coordination_logs(workflow_id)
 WHERE status IN ('pending', 'running');
 
 -- Analyze table statistics
-ANALYZE orchestration_logs;
+ANALYZE coordination_logs;
 ```
 
 #### Query Optimization
@@ -595,7 +595,7 @@ class BatchDatabaseLogger(DatabaseLogger):
             with conn.cursor() as cur:
                 # Use COPY for bulk insert
                 cur.execute("""
-                    COPY orchestration_logs (
+                    COPY coordination_logs (
                         workflow_id, task_id, agent_role,
                         action, status, metadata, error_message
                     ) FROM STDIN WITH (FORMAT CSV)
@@ -639,7 +639,7 @@ class OptimizedWeaviateManager(WeaviateManager):
                         "metadata": json.dumps(ctx.get('metadata', {})),
                         "timestamp": datetime.now().isoformat()
                     },
-                    class_name="OrchestrationContext"
+                    class_name="coordinationContext"
                 )
 ```
 
@@ -700,7 +700,7 @@ class SecureSecretManager:
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,
-            salt=b'orchestrator_salt',
+            salt=b'conductor_salt',
             iterations=100000,
         )
         key = base64.urlsafe_b64encode(kdf.derive(master_key.encode()))
@@ -777,7 +777,7 @@ def safe_query(conn, query: str, params: tuple):
 # Example usage
 results = safe_query(
     conn,
-    "SELECT * FROM orchestration_logs WHERE workflow_id = %s AND status = %s",
+    "SELECT * FROM coordination_logs WHERE workflow_id = %s AND status = %s",
     (workflow_id, status)
 )
 ```
@@ -815,8 +815,8 @@ class SecureTaskRequest(BaseModel):
 
 #### Multi-Instance Deployment
 ```python
-# Load balancer for multiple orchestrator instances
-class LoadBalancedOrchestrator:
+# Load balancer for multiple conductor instances
+class LoadBalancedconductor:
     def __init__(self, instances: List[str]):
         self.instances = instances
         self.current_instance = 0
@@ -851,7 +851,7 @@ import pickle
 class DistributedTaskQueue:
     def __init__(self, redis_url: str):
         self.redis_client = redis.from_url(redis_url)
-        self.queue_name = "orchestrator_tasks"
+        self.queue_name = "conductor_tasks"
     
     def enqueue_task(self, task: TaskDefinition):
         """Add task to distributed queue"""
@@ -876,12 +876,12 @@ class DistributedTaskQueue:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: orchestrator-hpa
+  name: conductor-hpa
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: ai-orchestrator
+    name: ai-conductor
   minReplicas: 2
   maxReplicas: 10
   metrics:
@@ -907,12 +907,12 @@ spec:
 from prometheus_client import Counter, Histogram, Gauge
 
 # Define metrics
-workflow_counter = Counter('orchestrator_workflows_total', 'Total workflows executed')
-task_duration = Histogram('orchestrator_task_duration_seconds', 'Task execution duration')
-active_workflows = Gauge('orchestrator_active_workflows', 'Number of active workflows')
+workflow_counter = Counter('conductor_workflows_total', 'Total workflows executed')
+task_duration = Histogram('conductor_task_duration_seconds', 'Task execution duration')
+active_workflows = Gauge('conductor_active_workflows', 'Number of active workflows')
 
-# Use in orchestrator
-class MonitoredOrchestrator(WorkflowOrchestrator):
+# Use in conductor
+class Monitoredconductor(Workflowconductor):
     async def execute_workflow(self, workflow_id: str, tasks: List[TaskDefinition]):
         workflow_counter.inc()
         active_workflows.inc()

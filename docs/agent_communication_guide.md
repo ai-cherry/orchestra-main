@@ -1,6 +1,6 @@
 # Agent Communication System Guide
 
-This guide explains the agent communication system implemented in AI Orchestra, which enables robust multi-agent coordination and collaboration.
+This guide explains the agent communication system implemented in AI cherry_ai, which enables robust multi-agent coordination and collaboration.
 
 ## Overview
 
@@ -26,7 +26,7 @@ The system supports several communication patterns:
 
 ## Message Protocol
 
-All agent communication uses a standardized message protocol defined in `core/orchestrator/src/protocols/agent_protocol.py`. The protocol defines:
+All agent communication uses a standardized message protocol defined in `core/conductor/src/protocols/agent_protocol.py`. The protocol defines:
 
 - Message types (query, response, notification, etc.)
 - Standard message format with sender, recipient, content, etc.
@@ -44,7 +44,7 @@ Example message types:
 
 ## Using the In-Memory Message Queue
 
-The in-memory message queue is implemented in `core/orchestrator/src/services/message_queue.py`. It provides:
+The in-memory message queue is implemented in `core/conductor/src/services/message_queue.py`. It provides:
 
 - Fast, reliable message passing between agents
 - Support for direct messaging and broadcast
@@ -54,7 +54,7 @@ The in-memory message queue is implemented in `core/orchestrator/src/services/me
 ### Example: Sending a Message
 
 ```python
-from core.orchestrator.src.services.message_queue import get_message_queue, AgentMessage
+from core.conductor.src.services.message_queue import get_message_queue, AgentMessage
 
 # Get the message queue
 message_queue = get_message_queue()
@@ -94,7 +94,7 @@ message_queue.register_handler("agent2", handle_query)
 
 ## Using the PubSub-Based Messaging
 
-The PubSub-based messaging system is implemented in `core/orchestrator/src/services/pubsub_client.py` and `core/orchestrator/src/services/agent_communication.py`. It provides:
+The PubSub-based messaging system is implemented in `core/conductor/src/services/pubsub_client.py` and `core/conductor/src/services/agent_communication.py`. It provides:
 
 - Distributed communication across multiple instances
 - Topic-based messaging
@@ -104,7 +104,7 @@ The PubSub-based messaging system is implemented in `core/orchestrator/src/servi
 ### Example: Initializing the Communication Service
 
 ```python
-from core.orchestrator.src.services.agent_communication import get_agent_communication
+from core.conductor.src.services.agent_communication import get_agent_communication
 
 # Initialize the communication service
 communication = await get_agent_communication(
@@ -153,7 +153,7 @@ communication.register_task_handler(
 
 ## Using the Workflow State Machine
 
-The workflow state machine is implemented in `core/orchestrator/src/workflows/state_machine.py`. It provides:
+The workflow state machine is implemented in `core/conductor/src/workflows/state_machine.py`. It provides:
 
 - State-based workflow management
 - Condition-based transitions
@@ -163,7 +163,7 @@ The workflow state machine is implemented in `core/orchestrator/src/workflows/st
 ### Example: Defining a Workflow
 
 ```python
-from core.orchestrator.src.workflows.state_machine import (
+from core.conductor.src.workflows.state_machine import (
     WorkflowDefinition, WorkflowState, WorkflowTransition, get_workflow_engine
 )
 
@@ -215,7 +215,7 @@ await engine.start_instance(instance_id)
 
 ## Using the Distributed Task Queue
 
-The distributed task queue is implemented in `core/orchestrator/src/services/distributed_task_queue.py`. It provides:
+The distributed task queue is implemented in `core/conductor/src/services/distributed_task_queue.py`. It provides:
 
 - Redis-backed task distribution
 - Priority-based queuing
@@ -225,7 +225,7 @@ The distributed task queue is implemented in `core/orchestrator/src/services/dis
 ### Example: Enqueuing a Task
 
 ```python
-from core.orchestrator.src.services.distributed_task_queue import (
+from core.conductor.src.services.distributed_task_queue import (
     get_task_queue, TaskDefinition
 )
 
@@ -260,11 +260,11 @@ await task_queue.start_workers(num_workers=5)
 
 ## Integrating with Agents
 
-The `MessageHandlerMixin` class in `core/orchestrator/src/agents/message_handler_mixin.py` provides a convenient way to add message handling capabilities to agents:
+The `MessageHandlerMixin` class in `core/conductor/src/agents/message_handler_mixin.py` provides a convenient way to add message handling capabilities to agents:
 
 ```python
-from core.orchestrator.src.agents.agent_base import Agent
-from core.orchestrator.src.agents.message_handler_mixin import MessageHandlerMixin
+from core.conductor.src.agents.agent_base import Agent
+from core.conductor.src.agents.message_handler_mixin import MessageHandlerMixin
 
 class MyAgent(Agent, MessageHandlerMixin):
     def __init__(self, config=None):
@@ -287,7 +287,7 @@ class MyAgent(Agent, MessageHandlerMixin):
         # ...
 ```
 
-For a complete example, see `core/orchestrator/src/agents/examples/pubsub_agent_example.py`.
+For a complete example, see `core/conductor/src/agents/examples/pubsub_agent_example.py`.
 
 ## Infrastructure Setup
 

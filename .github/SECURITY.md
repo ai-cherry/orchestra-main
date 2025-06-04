@@ -2,7 +2,7 @@
 
 ## Reporting Security Issues
 
-If you believe you have found a security vulnerability in the AI Orchestra project, please report it to us through coordinated disclosure.
+If you believe you have found a security vulnerability in the AI cherry_ai project, please report it to us through coordinated disclosure.
 
 **Please do not report security vulnerabilities through public GitHub issues, discussions, or pull requests.**
 

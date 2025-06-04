@@ -3,6 +3,7 @@
 
 import logging
 from typing import Dict, List, Any, Optional
+from typing_extensions import Optional
 
 from .base_search import BaseSearcher
 from ..utils.circuit_breaker import circuit_breaker

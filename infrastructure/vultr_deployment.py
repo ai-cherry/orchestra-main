@@ -1,288 +1,261 @@
-# TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
+Vultr Infrastructure Deployment using Pulumi
+Deploys cherry_ai MCP infrastructure on Vultr
 """
-project_name = "orchestra-ai"
 
-# Get secrets from environment
-vultr_api_key = config.require_secret("vultr_api_key")
-db_password = config.require_secret("db_password")
-jwt_secret = config.require_secret("jwt_secret")
+import pulumi
+import pulumi_vultr as vultr
+from pulumi import Config, Output, export
+import os
+import json
 
-# Region configuration
+# Configuration
+config = Config()
+project_name = "conductor-mcp"
+environment = config.get("environment") or "production"
+
+# Vultr regions
 region = config.get("region") or "ewr"  # New Jersey
+
+# Instance sizes (Vultr plan IDs)
+instance_plans = {
+    "small": "vc2-1c-2gb",      # 1 vCPU, 2GB RAM
+    "medium": "vc2-2c-4gb",      # 2 vCPU, 4GB RAM  
+    "large": "vc2-4c-8gb",       # 4 vCPU, 8GB RAM
+    "xlarge": "vc2-8c-16gb"      # 8 vCPU, 16GB RAM
+}
 
 # Create VPC
 vpc = vultr.Vpc(f"{project_name}-vpc",
     region=region,
-    description="Orchestra AI VPC",
+    description=f"{project_name} VPC",
     v4_subnet="10.0.0.0",
     v4_subnet_mask=24
 )
 
-# Create firewall group
+# Create Firewall Group
 firewall_group = vultr.FirewallGroup(f"{project_name}-firewall",
-    description="Orchestra AI Firewall Rules"
+    description=f"{project_name} Firewall Rules"
 )
 
-# Firewall rules
+# Firewall Rules
 firewall_rules = [
     # SSH
-    vultr.FirewallRule(f"{project_name}-ssh-rule",
-        firewall_group_id=firewall_group.id,
-        protocol="tcp",
-        ip_type="v4",
-        subnet="0.0.0.0",
-        subnet_size=0,
-        port="22"
-    ),
-    # HTTP
-    vultr.FirewallRule(f"{project_name}-http-rule",
-        firewall_group_id=firewall_group.id,
-        protocol="tcp",
-        ip_type="v4",
-        subnet="0.0.0.0",
-        subnet_size=0,
-        port="80"
-    ),
-    # HTTPS
-    vultr.FirewallRule(f"{project_name}-https-rule",
-        firewall_group_id=firewall_group.id,
-        protocol="tcp",
-        ip_type="v4",
-        subnet="0.0.0.0",
-        subnet_size=0,
-        port="443"
-    ),
+    {"protocol": "tcp", "port": "22", "source": "0.0.0.0/0", "notes": "SSH"},
+    # HTTP/HTTPS
+    {"protocol": "tcp", "port": "80", "source": "0.0.0.0/0", "notes": "HTTP"},
+    {"protocol": "tcp", "port": "443", "source": "0.0.0.0/0", "notes": "HTTPS"},
+    # API
+    {"protocol": "tcp", "port": "8000", "source": "0.0.0.0/0", "notes": "API"},
     # PostgreSQL (internal only)
-    vultr.FirewallRule(f"{project_name}-postgres-rule",
-        firewall_group_id=firewall_group.id,
-        protocol="tcp",
-        ip_type="v4",
-        subnet="10.0.0.0",
-        subnet_size=24,
-        port="5432"
-    ),
+    {"protocol": "tcp", "port": "5432", "source": "10.0.0.0/24", "notes": "PostgreSQL"},
+    # Redis (internal only)
+    {"protocol": "tcp", "port": "6379", "source": "10.0.0.0/24", "notes": "Redis"},
     # Weaviate
-    vultr.FirewallRule(f"{project_name}-weaviate-rule",
-        firewall_group_id=firewall_group.id,
-        protocol="tcp",
-        ip_type="v4",
-        subnet="0.0.0.0",
-        subnet_size=0,
-        port="8080"
-    ),
-    # MCP WebSocket
-    vultr.FirewallRule(f"{project_name}-mcp-rule",
-        firewall_group_id=firewall_group.id,
-        protocol="tcp",
-        ip_type="v4",
-        subnet="0.0.0.0",
-        subnet_size=0,
-        port="8765"
-    ),
-    # Cursor Integration
-    vultr.FirewallRule(f"{project_name}-cursor-rule",
-        firewall_group_id=firewall_group.id,
-        protocol="tcp",
-        ip_type="v4",
-        subnet="0.0.0.0",
-        subnet_size=0,
-        port="8090"
-    )
+    {"protocol": "tcp", "port": "8080", "source": "10.0.0.0/24", "notes": "Weaviate"},
+    # Monitoring
+    {"protocol": "tcp", "port": "9090", "source": "10.0.0.0/24", "notes": "Prometheus"},
+    {"protocol": "tcp", "port": "3000", "source": "0.0.0.0/0", "notes": "Grafana"},
 ]
 
+for i, rule in enumerate(firewall_rules):
+    vultr.FirewallRule(f"{project_name}-fw-rule-{i}",
+        firewall_group_id=firewall_group.id,
+        protocol=rule["protocol"],
+        port=rule["port"],
+        source=rule["source"],
+        notes=rule["notes"]
+    )
+
+# SSH Key
+ssh_key = vultr.SshKey(f"{project_name}-ssh-key",
+    name=f"{project_name}-key",
+    ssh_key=config.require("ssh_public_key")
+)
+
 # User data script for instance initialization
-def create_user_data(role: str, db_host: str) -> str:
-    script = f"""
-echo "$(cat /opt/api_keys.env)" >> .env
+user_data = """#!/bin/bash
+set -e
 
-# Install Python dependencies
-pip3 install -r requirements.txt
+# Update system
+apt-get update
+apt-get upgrade -y
 
-# Start services based on role
-if [ "{role}" == "master" ]; then
-    # Start comprehensive orchestrator
-    python3 ai_components/orchestration/comprehensive_orchestrator.py &
-    
-    # Configure nginx as load balancer
-    cp /opt/orchestra/nginx.conf /etc/nginx/sites-available/default
-    systemctl restart nginx
-    
-elif [ "{role}" == "worker" ]; then
-    # Start worker agent
-    python3 ai_components/orchestration/worker_agent.py &
-    
-elif [ "{role}" == "database" ]; then
-    # Install and configure PostgreSQL
-    apt-get install -y postgresql postgresql-contrib
-    
-    # Configure PostgreSQL
-    sudo -u postgres psql << SQL
-CREATE USER orchestra WITH PASSWORD '{db_password}';
-CREATE DATABASE orchestra OWNER orchestra;
-GRANT ALL PRIVILEGES ON DATABASE orchestra TO orchestra;
-SQL
-    
-    # Allow remote connections
-    echo "host all all 10.0.0.0/24 md5" >> /etc/postgresql/*/main/pg_hba.conf
-    echo "listen_addresses = '*'" >> /etc/postgresql/*/main/postgresql.conf
-    systemctl restart postgresql
-    
-elif [ "{role}" == "weaviate" ]; then
-    # Run Weaviate
-    docker run -d \\
-        --name weaviate \\
-        --restart always \\
-        -p 8080:8080 \\
-        -e QUERY_DEFAULTS_LIMIT=25 \\
-        -e AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true \\
-        -e PERSISTENCE_DATA_PATH=/var/lib/weaviate \\
-        -e DEFAULT_VECTORIZER_MODULE=text2vec-openai \\
-        semitechnologies/weaviate:latest
-fi
+# Install Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
+usermod -aG docker ubuntu
 
-# Enable service on boot
-cat > /etc/systemd/system/orchestra.service << 'EOF'
-[Unit]
-Description=Orchestra AI Service
-After=network.target
+# Install Docker Compose
+curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
 
-[Service]
-Type=simple
-User=root
-WorkingDirectory=/opt/orchestra
-ExecStart=/usr/bin/python3 /opt/orchestra/ai_components/orchestration/comprehensive_orchestrator.py
-Restart=always
+# Install monitoring tools
+apt-get install -y htop iotop nethogs
 
-[Install]
-WantedBy=multi-user.target
+# Setup swap
+fallocate -l 4G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
+
+# Configure sysctl for performance
+cat >> /etc/sysctl.conf <<EOF
+vm.swappiness=10
+net.core.somaxconn=65535
+net.ipv4.tcp_max_syn_backlog=65535
 EOF
+sysctl -p
 
-systemctl enable orchestra
-systemctl start orchestra
+# Create app directory
+mkdir -p /opt/cherry_ai
+chown -R ubuntu:ubuntu /opt/cherry_ai
 """
-db_instance = vultr.Instance(f"{project_name}-db",
-    plan="vc2-2c-4gb",  # 2 vCPU, 4GB RAM for database
+
+# Database Server
+db_server = vultr.Instance(f"{project_name}-db",
     region=region,
-    os_id=387,  # Ubuntu 20.04
-    label=f"{project_name}-database",
+    plan=instance_plans["large"],  # 4 vCPU, 8GB for DB
+    os_id=1743,  # Ubuntu 22.04 LTS
+    label=f"{project_name}-db-{environment}",
     hostname=f"{project_name}-db",
     enable_ipv6=True,
-    vpc_ids=[vpc.id],
-    firewall_group_id=firewall_group.id,
-    user_data=create_user_data("database", "localhost"),
     backups="enabled",
-    ddos_protection=True
-)
-
-# Create Weaviate instance
-weaviate_instance = vultr.Instance(f"{project_name}-weaviate",
-    plan="vc2-2c-4gb",  # 2 vCPU, 4GB RAM
-    region=region,
-    os_id=387,  # Ubuntu 20.04
-    label=f"{project_name}-weaviate",
-    hostname=f"{project_name}-weaviate",
-    enable_ipv6=True,
-    vpc_ids=[vpc.id],
+    ddos_protection=True,
+    activation_email=False,
+    ssh_key_ids=[ssh_key.id],
     firewall_group_id=firewall_group.id,
-    user_data=create_user_data("weaviate", db_instance.internal_ip),
-    backups="enabled"
-)
-
-# Create master orchestrator instance
-master_instance = vultr.Instance(f"{project_name}-master",
-    plan="vc2-4c-8gb",  # 4 vCPU, 8GB RAM for master
-    region=region,
-    os_id=387,  # Ubuntu 20.04
-    label=f"{project_name}-master",
-    hostname=f"{project_name}-master",
-    enable_ipv6=True,
     vpc_ids=[vpc.id],
-    firewall_group_id=firewall_group.id,
-    user_data=create_user_data("master", db_instance.internal_ip),
-    backups="enabled",
-    ddos_protection=True
+    user_data=user_data,
+    tags=[project_name, environment, "database"]
 )
 
-# Create initial worker instances
-worker_instances = []
-for i in range(2):  # Start with 2 workers
-    worker = vultr.Instance(f"{project_name}-worker-{i}",
-        plan="vc2-1c-2gb",  # 1 vCPU, 2GB RAM for workers
+# Application Servers (multiple for HA)
+app_servers = []
+app_count = config.get_int("app_server_count") or 2
+
+for i in range(app_count):
+    app_server = vultr.Instance(f"{project_name}-app-{i}",
         region=region,
-        os_id=387,  # Ubuntu 20.04
-        label=f"{project_name}-worker-{i}",
-        hostname=f"{project_name}-worker-{i}",
+        plan=instance_plans["medium"],  # 2 vCPU, 4GB for apps
+        os_id=1743,  # Ubuntu 22.04 LTS
+        label=f"{project_name}-app-{i}-{environment}",
+        hostname=f"{project_name}-app-{i}",
         enable_ipv6=True,
-        vpc_ids=[vpc.id],
+        backups="enabled",
+        ddos_protection=True,
+        activation_email=False,
+        ssh_key_ids=[ssh_key.id],
         firewall_group_id=firewall_group.id,
-        user_data=create_user_data("worker", db_instance.internal_ip),
-        backups="enabled"
+        vpc_ids=[vpc.id],
+        user_data=user_data,
+        tags=[project_name, environment, "application"]
     )
-    worker_instances.append(worker)
+    app_servers.append(app_server)
 
-# Create load balancer
+# Load Balancer
 load_balancer = vultr.LoadBalancer(f"{project_name}-lb",
     region=region,
-    label=f"{project_name}-load-balancer",
-    vpc_id=vpc.id,
-    forwarding_rules=[{
-        "frontend_protocol": "http",
-        "frontend_port": 80,
-        "backend_protocol": "http",
-        "backend_port": 8080
-    }, {
-        "frontend_protocol": "tcp",
-        "frontend_port": 8765,
-        "backend_protocol": "tcp",
-        "backend_port": 8765
-    }],
+    label=f"{project_name}-lb-{environment}",
+    balancing_algorithm="roundrobin",
+    proxy_protocol=False,
+    ssl_redirect=True,
+    http2=True,
+    
+    forwarding_rules=[
+        {
+            "frontend_protocol": "https",
+            "frontend_port": 443,
+            "backend_protocol": "http",
+            "backend_port": 8000
+        },
+        {
+            "frontend_protocol": "http",
+            "frontend_port": 80,
+            "backend_protocol": "http", 
+            "backend_port": 8000
+        }
+    ],
+    
     health_check={
         "protocol": "http",
-        "port": 8080,
+        "port": 8000,
         "path": "/health",
         "check_interval": 10,
         "response_timeout": 5,
         "unhealthy_threshold": 3,
         "healthy_threshold": 2
     },
-    instances=[master_instance.id] + [w.id for w in worker_instances]
+    
+    instances=[server.id for server in app_servers],
+    
+    ssl={
+        "private_key": config.get("ssl_private_key"),
+        "certificate": config.get("ssl_certificate"),
+        "chain": config.get("ssl_chain")
+    } if config.get("ssl_certificate") else None
 )
 
-# Create DNS records
-dns_domain = vultr.DnsDomain(f"{project_name}-domain",
-    domain="orchestra-ai.com",
-    ip=load_balancer.ipv4
+# Object Storage for backups
+object_storage = vultr.ObjectStorage(f"{project_name}-storage",
+    cluster_id=1,  # New Jersey cluster
+    label=f"{project_name}-backups-{environment}"
 )
 
-dns_records = [
-    vultr.DnsRecord(f"{project_name}-www",
-        domain=dns_domain.domain,
-        name="www",
-        type="A",
-        data=load_balancer.ipv4
-    ),
-    vultr.DnsRecord(f"{project_name}-api",
-        domain=dns_domain.domain,
-        name="api",
-        type="A",
-        data=load_balancer.ipv4
-    ),
-    vultr.DnsRecord(f"{project_name}-mcp",
-        domain=dns_domain.domain,
-        name="mcp",
-        type="A",
-        data=master_instance.main_ip
-    )
-]
+# Reserved IPs for static addressing
+reserved_ip = vultr.ReservedIp(f"{project_name}-ip",
+    region=region,
+    ip_type="v4",
+    label=f"{project_name}-static-ip"
+)
 
-# Export outputs
+# Attach reserved IP to load balancer
+vultr.ReservedIpAttachment(f"{project_name}-ip-attach",
+    reserved_ip_id=reserved_ip.id,
+    instance_id=load_balancer.id
+)
+
+# Outputs
+export("vpc_id", vpc.id)
 export("load_balancer_ip", load_balancer.ipv4)
-export("master_ip", master_instance.main_ip)
-export("database_ip", db_instance.internal_ip)
-export("weaviate_ip", weaviate_instance.internal_ip)
-export("api_endpoint", Output.concat("http://", load_balancer.ipv4))
-export("mcp_websocket", Output.concat("ws://", master_instance.main_ip, ":8765"))
-export("cursor_api", Output.concat("http://", master_instance.main_ip, ":8090"))
-export("worker_count", len(worker_instances))
+export("load_balancer_ipv6", load_balancer.ipv6)
+export("db_server_ip", db_server.main_ip)
+export("db_server_private_ip", db_server.internal_ip)
+export("app_server_ips", [server.main_ip for server in app_servers])
+export("app_server_private_ips", [server.internal_ip for server in app_servers])
+export("object_storage_endpoint", object_storage.s3_hostname)
+export("reserved_ip", reserved_ip.subnet)
+
+# Create deployment info file
+deployment_info = {
+    "environment": environment,
+    "region": region,
+    "vpc_id": vpc.id,
+    "load_balancer": {
+        "ip": load_balancer.ipv4,
+        "ipv6": load_balancer.ipv6
+    },
+    "database": {
+        "public_ip": db_server.main_ip,
+        "private_ip": db_server.internal_ip,
+        "plan": instance_plans["large"]
+    },
+    "app_servers": [
+        {
+            "public_ip": server.main_ip,
+            "private_ip": server.internal_ip,
+            "plan": instance_plans["medium"]
+        } for server in app_servers
+    ],
+    "storage": {
+        "endpoint": object_storage.s3_hostname,
+        "region": object_storage.region
+    }
+}
+
+# Save deployment info
+Output.all(deployment_info).apply(
+    lambda info: open(f"deployment-{environment}.json", "w").write(json.dumps(info, indent=2))
+)

@@ -17,7 +17,7 @@ graph TD
     A --> E
     
     %% Phase 3: Intelligence
-    D --> F[Agent Orchestration Simplification]
+    D --> F[Agent coordination Simplification]
     E --> F
     F --> G[LLM Router Enhancement]
     
@@ -50,7 +50,7 @@ Location                                          | Lines | Similarity
 --------------------------------------------------|-------|------------
 mcp_server/memory_sync_engine.py                 | 850   | Base
 shared/memory/unified_memory.py                   | 420   | 85%
-core/orchestrator/src/memory/unified_memory.py    | 380   | 80%
+core/conductor/src/memory/unified_memory.py    | 380   | 80%
 mcp_server/managers/standard_memory_manager.py    | 560   | 75%
 services/pay_ready/memory_manager.py              | 570   | 70%
 shared/memory/memory_manager.py                   | 210   | 65%
@@ -90,7 +90,7 @@ Location                                          | Lines | Similarity
 --------------------------------------------------|-------|------------
 shared/database/unified_db.py                     | 450   | Base
 shared/database/unified_db_v2.py                  | 480   | 95%
-core/orchestrator/src/services/memory_service.py  | 320   | 70%
+core/conductor/src/services/memory_service.py  | 320   | 70%
 agent/app/core/database.py                        | 180   | 65%
 ```
 
@@ -139,7 +139,7 @@ except Exception as e:
 | Database Interface | 2,800 | 800 | 71% | High → Medium |
 | Caching Layer | 2,100 | 600 | 71% | Medium → Low |
 | Error Handling | 3,000 | 400 | 87% | Medium → Low |
-| Agent Orchestration | 1,800 | 900 | 50% | High → Medium |
+| Agent coordination | 1,800 | 900 | 50% | High → Medium |
 | **Total** | **15,200** | **3,900** | **74%** | - |
 
 ## Parallel Execution Opportunities
@@ -195,7 +195,7 @@ graph LR
         C3[Caching] --> R1
         C4[Memory Mgmt] --> R2
         C5[Database] --> R3
-        C6[Orchestration] --> R3
+        C6[coordination] --> R3
     end
     
     R1 --> M1
@@ -217,7 +217,7 @@ Component                 | Before | After | Improvement
 Memory Manager            | 45     | 12    | 73%
 Database Interface        | 38     | 15    | 61%
 Cache Manager            | 32     | 10    | 69%
-Agent Orchestrator       | 52     | 20    | 62%
+Agent conductor       | 52     | 20    | 62%
 LLM Router               | 28     | 18    | 36%
 ```
 
@@ -228,7 +228,7 @@ Component                 | Before | After | Target
 Memory Manager            | 45%    | 95%   | 95%
 Database Interface        | 52%    | 90%   | 90%
 Cache Manager            | 38%    | 90%   | 90%
-Agent Orchestrator       | 41%    | 85%   | 85%
+Agent conductor       | 41%    | 85%   | 85%
 LLM Router               | 55%    | 90%   | 90%
 Overall                  | 46%    | 90%   | 90%
 ```
@@ -248,7 +248,7 @@ Overall                  | 46%    | 90%   | 90%
 - [ ] Failover mechanisms verified
 
 ### Checkpoint 3: Intelligence Layer (Week 12)
-- [ ] Agent orchestration simplified
+- [ ] Agent coordination simplified
 - [ ] LLM routing enhanced
 - [ ] Performance targets met
 - [ ] Cost reduction achieved

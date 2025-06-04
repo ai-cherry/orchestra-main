@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run script for Orchestra Docker environment
+# Run script for cherry_ai Docker environment
 
 # Check for Docker and Docker Compose
 if ! command -v docker &> /dev/null; then
@@ -201,7 +201,7 @@ providers:
       path: /etc/grafana/provisioning/dashboards
 EOL
 
-echo "Starting Orchestra environment with Docker Compose..."
+echo "Starting cherry_ai environment with Docker Compose..."
 
 # Export environment variables from .env if it exists
 if [ -f .env ]; then
@@ -217,7 +217,7 @@ docker compose ps
 
 echo ""
 echo "Access the services at:"
-echo "- Orchestra API: http://localhost:8000"
+echo "- cherry_ai API: http://localhost:8000"
 echo "- Agno UI (Phidata): http://localhost:3000"
 echo "- LLM Testing Service: http://localhost:8001"
 echo "- Grafana Dashboards: http://localhost:3001 (admin/admin)"

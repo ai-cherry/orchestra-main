@@ -1,6 +1,6 @@
 # Secure Credential Management Implementation Checklist
 
-This checklist ensures all components of the AI Orchestra secure credential management system are properly implemented and integrated.
+This checklist ensures all components of the AI cherry_ai secure credential management system are properly implemented and integrated.
 
 ## Infrastructure Setup
 

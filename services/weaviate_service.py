@@ -1,3 +1,4 @@
+import os
 """
 """
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -66,6 +67,6 @@ class WeaviateConfig(BaseModel):
 
 # Example usage
 if __name__ == "__main__":
-    service = WeaviateService(WeaviateConfig(host="localhost", api_key="your-api-key"))
+    service = WeaviateService(WeaviateConfig(host="localhost", api_key= os.getenv('API_KEY')))
     results = service.vector_search(collection="Articles", query_vector=[0.1, 0.2, 0.3])
     print(results)

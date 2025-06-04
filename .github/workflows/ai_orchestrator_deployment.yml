@@ -1,4 +1,4 @@
-name: AI Orchestrator Deployment
+name: AI conductor Deployment
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
     paths:
       - 'ai_components/**'
       - 'infrastructure/**'
-      - '.github/workflows/ai_orchestrator_deployment.yml'
+      - '.github/workflows/ai_conductor_deployment.yml'
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -39,7 +39,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Validate orchestrator configuration
+      - name: Validate conductor configuration
         run: |
           python -m pip install pyyaml jsonschema
           python scripts/validate_config.py
@@ -148,7 +148,7 @@ jobs:
 
       - name: Create deployment artifact
         run: |
-          tar -czf ai-orchestrator-${{ github.sha }}.tar.gz \
+          tar -czf ai-conductor-${{ github.sha }}.tar.gz \
             ai_components/ \
             infrastructure/ \
             scripts/ \
@@ -157,8 +157,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ai-orchestrator-${{ github.sha }}
-          path: ai-orchestrator-${{ github.sha }}.tar.gz
+          name: ai-conductor-${{ github.sha }}
+          path: ai-conductor-${{ github.sha }}.tar.gz
           retention-days: 7
 
   deploy-infrastructure:
@@ -222,7 +222,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:
-          name: ai-orchestrator-${{ github.sha }}
+          name: ai-conductor-${{ github.sha }}
 
       - name: Deploy to Vultr server
         uses: appleboy/ssh-action@v0.1.5
@@ -232,18 +232,18 @@ jobs:
           key: ${{ secrets.VULTR_SSH_KEY }}
           script: |
             # Stop existing services
-            systemctl stop orchestrator-mcp || true
-            systemctl stop ai-orchestrator || true
+            systemctl stop conductor-mcp || true
+            systemctl stop ai-conductor || true
             
             # Create deployment directory
-            mkdir -p /opt/ai-orchestrator
-            cd /opt/ai-orchestrator
+            mkdir -p /opt/ai-conductor
+            cd /opt/ai-conductor
             
             # Clean previous deployment
             rm -rf ai_components infrastructure scripts config
             
             # Extract new deployment
-            tar -xzf /tmp/ai-orchestrator-${{ github.sha }}.tar.gz
+            tar -xzf /tmp/ai-conductor-${{ github.sha }}.tar.gz
             
             # Install dependencies
             cd ai_components
@@ -266,15 +266,15 @@ jobs:
             
             # Start services
             systemctl daemon-reload
-            systemctl enable orchestrator-mcp
-            systemctl start orchestrator-mcp
-            systemctl enable ai-orchestrator
-            systemctl start ai-orchestrator
+            systemctl enable conductor-mcp
+            systemctl start conductor-mcp
+            systemctl enable ai-conductor
+            systemctl start ai-conductor
             
             # Run post-deployment checks
             sleep 10
-            systemctl is-active orchestrator-mcp
-            systemctl is-active ai-orchestrator
+            systemctl is-active conductor-mcp
+            systemctl is-active ai-conductor
 
       - name: Copy deployment artifact to server
         uses: appleboy/scp-action@v0.1.4
@@ -282,7 +282,7 @@ jobs:
           host: ${{ needs.deploy-infrastructure.outputs.server_ip }}
           username: root
           key: ${{ secrets.VULTR_SSH_KEY }}
-          source: "ai-orchestrator-${{ github.sha }}.tar.gz"
+          source: "ai-conductor-${{ github.sha }}.tar.gz"
           target: "/tmp/"
 
   post-deployment:
@@ -345,7 +345,7 @@ jobs:
               deployment_id: context.payload.deployment.id,
               state: 'success',
               environment_url: 'http://${{ needs.deploy-infrastructure.outputs.server_ip }}',
-              description: 'AI Orchestrator deployed successfully'
+              description: 'AI conductor deployed successfully'
             });
 
   notify:
@@ -361,11 +361,11 @@ jobs:
           if [[ "${{ needs.post-deployment.result }}" == "success" ]]; then
             echo "status=success" >> $GITHUB_OUTPUT
             echo "color=good" >> $GITHUB_OUTPUT
-            echo "message=AI Orchestrator deployment completed successfully" >> $GITHUB_OUTPUT
+            echo "message=AI conductor deployment completed successfully" >> $GITHUB_OUTPUT
           else
             echo "status=failure" >> $GITHUB_OUTPUT
             echo "color=danger" >> $GITHUB_OUTPUT
-            echo "message=AI Orchestrator deployment failed" >> $GITHUB_OUTPUT
+            echo "message=AI conductor deployment failed" >> $GITHUB_OUTPUT
           fi
 
       - name: Send Slack notification

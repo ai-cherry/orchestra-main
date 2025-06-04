@@ -2,7 +2,7 @@
 
 ## Deliverables Summary
 
-I have successfully completed the architectural design for integrating Factory AI Droids with the Orchestra project. All deliverables requested in the handoff document have been created:
+I have successfully completed the architectural design for integrating Factory AI Droids with the cherry_ai project. All deliverables requested in the handoff document have been created:
 
 ### 1. System Architecture Diagram ✓
 - Created comprehensive architecture with all integration points
@@ -18,7 +18,7 @@ I have successfully completed the architectural design for integrating Factory A
 
 ### 3. Droid-MCP Service Mapping ✓
 - Precise mappings defined for all droids:
-  - Architect Droid → Orchestrator Server
+  - Architect Droid → conductor Server
   - Code Droid → Tools Server
   - Debug Droid → Tools Server
   - Reliability Droid → Deployment Server

@@ -5,7 +5,7 @@ This process ensures the Admin UI always displays **real agent data** (never moc
 ## What the Script Does
 - Sets the correct API URL and API key for the frontend via `.env`.
 - Builds the Admin UI with these settings.
-- Deploys the built UI to the web root (`/var/www/orchestra-admin`).
+- Deploys the built UI to the web root (`/var/www/cherry_ai-admin`).
 - Restarts backend and nginx to pick up changes.
 - Verifies that `/api/agents` returns real agent data (not mock data).
 - Fails if any step is wrong.

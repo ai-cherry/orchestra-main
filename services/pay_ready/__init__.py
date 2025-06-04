@@ -1,7 +1,7 @@
 # TODO: Consider adding connection pooling configuration
 """
 """
-__all__ = ["PayReadyETLOrchestrator", "PayReadyEntityResolver", "PayReadyMemoryManager", "PayReadyQueryAgent"]
+__all__ = ["PayReadyETLconductor", "PayReadyEntityResolver", "PayReadyMemoryManager", "PayReadyQueryAgent"]
 
 # Domain configuration
 DOMAIN_CONFIG = {

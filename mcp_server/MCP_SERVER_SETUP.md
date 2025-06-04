@@ -4,7 +4,7 @@ This document provides instructions for setting up and running the MCP (Model Co
 
 ## Overview
 
-The MCP server provides memory and tool capabilities for AI agents in the AI Orchestra project. It can be run in several ways:
+The MCP server provides memory and tool capabilities for AI agents in the AI cherry_ai project. It can be run in several ways:
 
 - Direct execution (recommended for development)
 - Docker container (recommended for production)
@@ -60,7 +60,7 @@ The script will detect systemd and install/start the service automatically.
 The MCP server uses a configuration file located at:
 
 ```
-/workspaces/orchestra-main/mcp_server/config.json
+/workspaces/cherry_ai-main/mcp_server/config.json
 ```
 
 If this file doesn't exist, it will be created automatically from the example configuration.
@@ -106,9 +106,9 @@ If this file doesn't exist, it will be created automatically from the example co
 - To check the status: `http://localhost:8080/api/status`
 - To stop the server: `pkill -f 'python.*mcp_server.main'`
 
-## Integration with AI Orchestra
+## Integration with AI cherry_ai
 
-The MCP server is designed to work with the AI Orchestra project. For integration details, refer to the API documentation and examples in the project repository.
+The MCP server is designed to work with the AI cherry_ai project. For integration details, refer to the API documentation and examples in the project repository.
 
 ## Advanced Configuration
 

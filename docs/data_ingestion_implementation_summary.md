@@ -2,7 +2,7 @@
 
 ## Overview
 
-I have successfully implemented a comprehensive data ingestion system for the Orchestra platform that enables importing large files from Slack, Gong.io, Salesforce, Looker, and HubSpot with intelligent storage and contextual querying capabilities.
+I have successfully implemented a comprehensive data ingestion system for the cherry_ai platform that enables importing large files from Slack, Gong.io, Salesforce, Looker, and HubSpot with intelligent storage and contextual querying capabilities.
 
 ## Implementation Completed
 
@@ -172,13 +172,13 @@ The implementation follows best practices:
 - ✅ Design patterns (Factory, Adapter)
 - ✅ SOLID principles
 
-## Integration with Orchestra
+## Integration with cherry_ai
 
 The system integrates seamlessly with existing components:
 - Uses existing authentication system
 - Leverages LLM router for query understanding
 - Integrates with memory manager
-- Coordinates through agent orchestrator
+- Coordinates through agent conductor
 - Shares context via MCP
 
 ## Deployment Ready

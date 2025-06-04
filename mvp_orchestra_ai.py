@@ -2,11 +2,13 @@
 """
 """
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    handlers=[logging.StreamHandler(), logging.FileHandler("orchestra_ai_mvp.log")],
+    handlers=[logging.StreamHandler(), logging.FileHandler("cherry_ai_ai_mvp.log")],
 )
-logger = logging.getLogger("orchestra_ai_mvp")
+logger = logging.getLogger("cherry_ai_ai_mvp")
 
-class OrchestraAIMVP:
+import os
+
+class cherry_aiAIMVP:
     """
     """
     def __init__(self, project_id: str = "cherry-ai-project", user_id: str = "default_user"):
@@ -15,46 +17,46 @@ class OrchestraAIMVP:
 
         # Core components
         self.memory_system: Optional[EnhancedVectorMemorySystem] = None
-        self.data_orchestrator: Optional[DataAggregationOrchestrator] = None
+        self.data_conductor: Optional[DataAggregationconductor] = None
         self.nl_interface: Optional[EnhancedNaturalLanguageInterface] = None
 
         # Configuration
         self.configs: Dict[str, DataSourceConfig] = {}
 
-        logger.info(f"Orchestra AI MVP initialized for project {project_id}, user {user_id}")
+        logger.info(f"Cherry AI MVP initialized for project {project_id}, user {user_id}")
 
     async def initialize(self) -> None:
         """Initialize all MVP components."""
-        logger.info("Initializing Orchestra AI MVP components...")
+        logger.info("Initializing Cherry AI MVP components...")
 
         # Initialize memory system
         self.memory_system = EnhancedVectorMemorySystem(
             project_id=self.project_id,
             embedding_model="all-MiniLM-L6-v2",
-            redis_url="redis://localhost:6379",
+            redis_url=os.environ.get("REDIS_URL", "redis://localhost:6379"),  # Standard Redis config
         )
         await self.memory_system.initialize()
         logger.info("✓ Enhanced Vector Memory System initialized")
 
-        # Initialize data orchestrator
-        self.data_orchestrator = DataAggregationOrchestrator(memory_system=self.memory_system, user_id=self.user_id)
+        # Initialize data conductor
+        self.data_conductor = DataAggregationconductor(memory_system=self.memory_system, user_id=self.user_id)
 
         # Setup data source configurations
         await self._setup_data_source_configs()
-        await self.data_orchestrator.setup_default_integrations(self.configs)
-        logger.info("✓ Data Aggregation Orchestrator initialized")
+        await self.data_conductor.setup_default_integrations(self.configs)
+        logger.info("✓ Data Aggregation conductor initialized")
 
         # Initialize natural language interface
         portkey_api_key = os.getenv("PORTKEY_API_KEY", "")
         self.nl_interface = EnhancedNaturalLanguageInterface(
             memory_system=self.memory_system,
-            data_orchestrator=self.data_orchestrator,
+            data_conductor=self.data_conductor,
             project_id=self.project_id,
             portkey_api_key=portkey_api_key,
         )
         logger.info("✓ Enhanced Natural Language Interface initialized")
 
-        logger.info("🚀 Orchestra AI MVP fully initialized and ready!")
+        logger.info("🚀 Cherry AI MVP fully initialized and ready!")
 
     async def _setup_data_source_configs(self) -> None:
         """
@@ -134,7 +136,7 @@ class OrchestraAIMVP:
         since = datetime.utcnow().replace(hour=datetime.utcnow().hour - since_hours)
 
         logger.info(f"Starting data synchronization for last {since_hours} hours...")
-        results = await self.data_orchestrator.sync_all_sources(since)
+        results = await self.data_conductor.sync_all_sources(since)
 
         total_items = sum(count for count in results.values() if count > 0)
         logger.info(f"✓ Synchronization complete: {total_items} total items synced")
@@ -212,12 +214,12 @@ class OrchestraAIMVP:
 
     async def close(self) -> None:
         """Clean up and close all connections."""
-        logger.info("✓ Orchestra AI MVP connections closed")
+        logger.info("✓ Cherry AI MVP connections closed")
 
 # CLI Interface
 async def main():
-    """Command-line interface for Orchestra AI MVP."""
-    parser = argparse.ArgumentParser(description="Orchestra AI MVP - Enhanced AI Assistant")
+    """Command-line interface for Cherry AI MVP."""
+    parser = argparse.ArgumentParser(description="Cherry AI MVP - Enhanced AI Assistant")
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
@@ -258,7 +260,7 @@ async def main():
         return
 
     # Initialize MVP
-    mvp = OrchestraAIMVP(project_id=args.project_id, user_id=args.user_id)
+    mvp = cherry_aiAIMVP(project_id=args.project_id, user_id=args.user_id)
 
     try:
 
@@ -266,7 +268,7 @@ async def main():
         pass
         if args.command == "init":
             await mvp.initialize()
-            print("✅ Orchestra AI MVP initialized successfully!")
+            print("✅ Cherry AI MVP initialized successfully!")
 
         elif args.command == "sync":
             await mvp.initialize()
@@ -291,7 +293,7 @@ async def main():
             await mvp.initialize()
             conversation_id = await mvp.start_conversation(mode=args.mode)
 
-            print(f"\n💬 Orchestra AI Chat Session ({args.mode} mode)")
+            print(f"\n💬 Cherry AI Chat Session ({args.mode} mode)")
             print("Type 'quit', 'exit', or 'bye' to end the conversation.")
             print("Type 'sync' to synchronize data from all sources.")
             print("Type 'search <query>' to search memory.")

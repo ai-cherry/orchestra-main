@@ -1,6 +1,6 @@
 # Maximizing Phidata Agent UI Integration
 
-This guide explains how to maximize the utility of the pre-built Phidata Agent UI container that's connected to your Orchestra backend. Since direct UI code customization isn't feasible with the pre-built container, we'll focus on configuring your backend and agents for optimal UI display.
+This guide explains how to maximize the utility of the pre-built Phidata Agent UI container that's connected to your cherry_ai backend. Since direct UI code customization isn't feasible with the pre-built container, we'll focus on configuring your backend and agents for optimal UI display.
 
 ## Table of Contents
 
@@ -15,7 +15,7 @@ This guide explains how to maximize the utility of the pre-built Phidata Agent U
 
 ## Overview
 
-The Phidata Agent UI provides a web interface for interacting with your Orchestra backend. By properly configuring your backend and agents, you can ensure that responses are displayed in a readable, well-formatted manner in the UI.
+The Phidata Agent UI provides a web interface for interacting with your cherry_ai backend. By properly configuring your backend and agents, you can ensure that responses are displayed in a readable, well-formatted manner in the UI.
 
 Key components:
 
@@ -157,7 +157,7 @@ Proper session management ensures conversation history is maintained correctly.
 
 ## Agent Configuration Examples
 
-See [core/orchestrator/examples/phidata_agent_ui_config.yaml](../core/orchestrator/examples/phidata_agent_ui_config.yaml) for complete examples, including:
+See [core/conductor/examples/phidata_agent_ui_config.yaml](../core/conductor/examples/phidata_agent_ui_config.yaml) for complete examples, including:
 
 - Development agent (with visible tool calls)
 - Production agent (with clean UI)
@@ -189,7 +189,7 @@ See [core/orchestrator/examples/phidata_agent_ui_config.yaml](../core/orchestrat
 
 ### Custom Structured Output Formatters
 
-If you need to add custom formatters for specific output types, extend the `format_structured_output_as_markdown` function in `core/orchestrator/src/api/utils/format_structured_output.py`.
+If you need to add custom formatters for specific output types, extend the `format_structured_output_as_markdown` function in `core/conductor/src/api/utils/format_structured_output.py`.
 
 Example for a custom output type:
 

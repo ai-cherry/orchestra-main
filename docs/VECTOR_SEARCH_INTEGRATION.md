@@ -1,10 +1,10 @@
 # Vector Search Integration Guide
 
-This guide explains how to use the new vector search capabilities in the AI Orchestra project. It covers configuration, usage, and migration of existing embeddings.
+This guide explains how to use the new vector search capabilities in the AI cherry_ai project. It covers configuration, usage, and migration of existing embeddings.
 
 ## Overview
 
-The AI Orchestra project now supports pluggable vector search backends for semantic search operations. This allows for more efficient and scalable semantic search, especially for large datasets.
+The AI cherry_ai project now supports pluggable vector search backends for semantic search operations. This allows for more efficient and scalable semantic search, especially for large datasets.
 
 Two vector search backends are currently supported:
 

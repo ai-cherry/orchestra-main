@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "Verifying AI Orchestra development environment..."
+echo "Verifying AI cherry_ai development environment..."
 
 # Check Python version
 python --version

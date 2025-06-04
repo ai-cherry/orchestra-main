@@ -5,7 +5,7 @@
         grafana_admin_password: Optional[str] = None,
         opts: Optional[ResourceOptions] = None,
     ):
-        super().__init__("orchestra:monitoring:Stack", name, {}, opts)
+        super().__init__("cherry_ai:monitoring:Stack", name, {}, opts)
 
         # Create monitoring namespace
         monitoring_ns = k8s.core.v1.Namespace(

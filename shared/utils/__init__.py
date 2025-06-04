@@ -1,6 +1,6 @@
 """Shared utilities for error handling and performance monitoring."""
     "handle_errors",
-    "OrchestrationError", 
+    "coordinationError", 
     "APIError",
     "ConfigurationError",
     "TransitionError",

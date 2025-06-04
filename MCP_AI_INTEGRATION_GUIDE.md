@@ -1,7 +1,7 @@
 # MCP (Model Context Protocol) AI Integration Guide
 
 ## Overview
-This guide details the integration of MCP servers with the Orchestra AI system, using PostgreSQL for relational data and Weaviate for vector operations.
+This guide details the integration of MCP servers with the Cherry AI system, using PostgreSQL for relational data and Weaviate for vector operations.
 
 ## Architecture
 
@@ -14,14 +14,14 @@ This guide details the integration of MCP servers with the Orchestra AI system, 
 ┌────────────────┴────────────────────────┐
 │            MCP Servers                  │
 ├─────────────────────────────────────────┤
-│  • Orchestrator (Agent coordination)    │
+│  • conductor (Agent coordination)    │
 │  • Memory (PostgreSQL + Weaviate)       │
 │  • Tools (Tool discovery/execution)     │
 │  • Deployment (Infrastructure mgmt)     │
 └────────────────┬────────────────────────┘
                  │
 ┌────────────────┴────────────────────────┐
-│         Orchestra AI System             │
+│         Cherry AI System             │
 ├─────────────────────────────────────────┤
 │  • PostgreSQL (Structured data)         │
 │  • Weaviate (Vector search)             │
@@ -32,21 +32,21 @@ This guide details the integration of MCP servers with the Orchestra AI system, 
 
 ## MCP Servers
 
-### 1. Orchestrator Server
+### 1. conductor Server
 **Purpose**: Agent coordination and workflow management
 
 **Tools**:
 - `list_agents` - List available agents
 - `run_agent` - Execute agent with input
-- `switch_mode` - Change orchestration mode
+- `switch_mode` - Change coordination mode
 - `run_workflow` - Execute multi-agent workflow
 
 **Configuration**:
 ```json
 {
-  "orchestrator": {
+  "conductor": {
     "command": "python",
-    "args": ["mcp_server/servers/orchestrator_server.py"],
+    "args": ["mcp_server/servers/conductor_server.py"],
     "env": {
       "API_URL": "${API_URL:-http://localhost:8080}",
       "API_KEY": "${API_KEY}"
@@ -94,12 +94,12 @@ This guide details the integration of MCP servers with the Orchestra AI system, 
 
 ### PostgreSQL (Relational Data)
 ```sql
-orchestra.agents          -- Agent configurations
-orchestra.workflows       -- Workflow definitions
-orchestra.sessions        -- User sessions
-orchestra.audit_logs      -- System events
-orchestra.api_keys        -- Authentication
-orchestra.memory_snapshots -- Vector references
+cherry_ai.agents          -- Agent configurations
+cherry_ai.workflows       -- Workflow definitions
+cherry_ai.sessions        -- User sessions
+cherry_ai.audit_logs      -- System events
+cherry_ai.api_keys        -- Authentication
+cherry_ai.memory_snapshots -- Vector references
 ```
 
 ### Weaviate (Vector Data)
@@ -171,7 +171,7 @@ await mcp.call_tool("store_conversation", {
 # PostgreSQL
 export POSTGRES_HOST=localhost
 export POSTGRES_PORT=5432
-export POSTGRES_DB=orchestra
+export POSTGRES_DB=cherry_ai
 export POSTGRES_USER=postgres
 export POSTGRES_PASSWORD=your_password
 
@@ -197,7 +197,7 @@ python scripts/setup_postgres_schema.py --verify-only
 ### 3. Start MCP Servers
 ```bash
 # In separate terminals
-python mcp_server/servers/orchestrator_server.py
+python mcp_server/servers/conductor_server.py
 python mcp_server/servers/memory_server.py
 python mcp_server/servers/weaviate_direct_mcp_server.py
 python mcp_server/servers/tools_server.py
@@ -255,7 +255,7 @@ except Exception as e:
 ### Debug Commands
 ```bash
 # Test PostgreSQL
-psql -U postgres -d orchestra -c "\dt orchestra.*"
+psql -U postgres -d cherry_ai -c "\dt cherry_ai.*"
 
 # Test Weaviate
 curl http://localhost:8080/v1/meta

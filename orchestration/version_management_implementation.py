@@ -152,7 +152,7 @@ class DependencyGraph:
             return list(self.graph.nodes())
 
 class VersionManager:
-    """Main version management orchestrator"""
+    """Main version management conductor"""
         self.registry_path = root_dir / ".versions.yaml"
         self.lock_path = root_dir / ".versions.lock"
         
@@ -196,7 +196,7 @@ class VersionManager:
 
 async def main():
     """Main entry point for version management"""
-    parser = argparse.ArgumentParser(description="Orchestra Version Management")
+    parser = argparse.ArgumentParser(description="cherry_ai Version Management")
     parser.add_argument('command', choices=['scan', 'report', 'lock', 'update', 'init'])
     parser.add_argument('--root', default='.', help='Project root directory')
     parser.add_argument('--output', help='Output file for reports')

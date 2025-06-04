@@ -42,9 +42,9 @@ This script:
 ```bash
 cd admin-ui
 VITE_BUILD_TIME=$(date +%s) pnpm run build-no-ts
-sudo rm -rf /var/www/orchestra-admin/*
-sudo cp -r dist/* /var/www/orchestra-admin/
-sudo chown -R www-data:www-data /var/www/orchestra-admin/
+sudo rm -rf /var/www/cherry_ai-admin/*
+sudo cp -r dist/* /var/www/cherry_ai-admin/
+sudo chown -R www-data:www-data /var/www/cherry_ai-admin/
 sudo nginx -s reload
 ```
 

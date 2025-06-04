@@ -1,6 +1,6 @@
 # Dev Container
 
-This dev container provides a reproducible environment for working on Orchestra AI.
+This dev container provides a reproducible environment for working on Cherry AI.
 
 ## Features
 - Python 3.10 with common tools

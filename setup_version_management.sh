@@ -1,5 +1,5 @@
 #!/bin/bash
-# One-command setup for Orchestra Version Management
+# One-command setup for cherry_ai Version Management
 # Just run: ./setup_version_management.sh
 
 set -euo pipefail

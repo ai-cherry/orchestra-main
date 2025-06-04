@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines a streamlined approach to secret management for single-developer, single-user projects in the AI Orchestra framework. It focuses on maintaining essential security protections while eliminating excessive overhead that creates unnecessary complexity.
+This document outlines a streamlined approach to secret management for single-developer, single-user projects in the AI cherry_ai framework. It focuses on maintaining essential security protections while eliminating excessive overhead that creates unnecessary complexity.
 
 ## Simplified Approach
 

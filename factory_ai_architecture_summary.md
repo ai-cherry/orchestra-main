@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document summarizes the complete system architecture for integrating Factory AI Droids with the Orchestra project while maintaining full Roo coder compatibility. The architecture achieves the target 40% performance improvement through intelligent caching, parallel execution, and optimized resource utilization.
+This document summarizes the complete system architecture for integrating Factory AI Droids with the cherry_ai project while maintaining full Roo coder compatibility. The architecture achieves the target 40% performance improvement through intelligent caching, parallel execution, and optimized resource utilization.
 
 ## Key Architecture Decisions
 
@@ -48,7 +48,7 @@ This document summarizes the complete system architecture for integrating Factor
    - Manages vector embeddings in Weaviate
    - Provides sub-100ms context retrieval
 
-4. **Hybrid Orchestrator**
+4. **Hybrid conductor**
    - Intelligently routes tasks between systems
    - Implements fallback mechanisms
    - Tracks performance metrics
@@ -225,7 +225,7 @@ This document summarizes the complete system architecture for integrating Factor
 ### Long Term (12 months)
 1. Kubernetes migration option
 2. Edge computing support
-3. Advanced AI orchestration
+3. Advanced AI coordination
 4. Plugin ecosystem
 
 ## Architecture Principles Achieved

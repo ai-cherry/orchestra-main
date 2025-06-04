@@ -1,10 +1,10 @@
 #!/bin/bash
-# Orchestrated deployment workflow for Cherry AI
+# cherry_aited deployment workflow for Cherry AI
 # Handles TypeScript errors, ensures 24/7 operation, and prevents cache issues
 
 set -e
 
-echo "🎼 Orchestrating Cherry AI Deployment Workflow"
+echo "🎼 cherry_aiting Cherry AI Deployment Workflow"
 echo "============================================="
 
 # Colors
@@ -94,9 +94,9 @@ task_validate_environment() {
     fi
     
     # Check Python environment
-    if [ ! -d "/root/orchestra-main/venv" ]; then
+    if [ ! -d "/root/cherry_ai-main/venv" ]; then
         echo "Creating Python virtual environment..."
-        cd /root/orchestra-main
+        cd /root/cherry_ai-main
         python3 -m venv venv
         source venv/bin/activate
         pip install --upgrade pip
@@ -109,7 +109,7 @@ task_validate_environment() {
 # Task 2: Fix TypeScript Build Issues
 task_fix_typescript() {
     echo "Fixing TypeScript configuration..."
-    cd /root/orchestra-main/admin-ui
+    cd /root/cherry_ai-main/admin-ui
     
     # Create lenient TypeScript config
     cat > tsconfig.json << 'EOF'
@@ -147,7 +147,7 @@ EOF
 # Task 3: Build Frontend with Cache Busting
 task_build_frontend() {
     echo "Building frontend with cache busting..."
-    cd /root/orchestra-main/admin-ui
+    cd /root/cherry_ai-main/admin-ui
     
     # Clean install
     rm -rf node_modules dist package-lock.json
@@ -193,7 +193,7 @@ task_deploy_frontend() {
     # Clear and deploy
     sudo rm -rf "$NGINX_ROOT"/*
     sudo rm -rf "$NGINX_ROOT"/.[^.]*
-    sudo cp -r /root/orchestra-main/admin-ui/dist/* "$NGINX_ROOT/"
+    sudo cp -r /root/cherry_ai-main/admin-ui/dist/* "$NGINX_ROOT/"
     sudo chown -R www-data:www-data "$NGINX_ROOT"
     sudo chmod -R 755 "$NGINX_ROOT"
     
@@ -313,14 +313,14 @@ task_setup_backend() {
     echo "Setting up backend service for 24/7 operation..."
     
     # Create environment file
-    cat > /etc/orchestra.env << EOF
+    cat > /etc/cherry_ai.env << EOF
 ENVIRONMENT=production
 JWT_SECRET_KEY=$(openssl rand -hex 32)
 ACCESS_TOKEN_EXPIRE_MINUTES=720
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=OrchAI_Admin2024!
-ADMIN_EMAIL=admin@orchestra.ai
-DATABASE_URL=postgresql://orchestra:orchestra@localhost/orchestra
+ADMIN_EMAIL=admin@cherry_ai.ai
+DATABASE_URL=postgresql://cherry_ai:cherry_ai@localhost/cherry_ai
 REDIS_URL=redis://localhost:6379
 CORS_ORIGINS=["https://cherry-ai.me","https://www.cherry-ai.me","http://localhost:5173","http://localhost:3000"]
 METRICS_ENABLED=true
@@ -330,9 +330,9 @@ METRICS_ENABLED=true
 EOF
 
     # Create systemd service with health monitoring
-    cat > /etc/systemd/system/orchestra-backend.service << 'EOF'
+    cat > /etc/systemd/system/cherry_ai-backend.service << 'EOF'
 [Unit]
-Description=Orchestra AI Backend API
+Description=Cherry AI Backend API
 After=network.target network-online.target
 Wants=network-online.target
 StartLimitIntervalSec=0
@@ -340,15 +340,15 @@ StartLimitIntervalSec=0
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/root/orchestra-main
-EnvironmentFile=/etc/orchestra.env
+WorkingDirectory=/root/cherry_ai-main
+EnvironmentFile=/etc/cherry_ai.env
 ExecStartPre=/bin/bash -c 'source venv/bin/activate && pip install -r requirements.txt'
-ExecStart=/root/orchestra-main/venv/bin/python -m uvicorn agent.app.main:app --host 0.0.0.0 --port 8000 --workers 2
+ExecStart=/root/cherry_ai-main/venv/bin/python -m uvicorn agent.app.main:app --host 0.0.0.0 --port 8000 --workers 2
 Restart=always
 RestartSec=10
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=orchestra-backend
+SyslogIdentifier=cherry_ai-backend
 
 # Health check
 ExecStartPost=/bin/sleep 5
@@ -364,8 +364,8 @@ WantedBy=multi-user.target
 EOF
 
     sudo systemctl daemon-reload
-    sudo systemctl enable orchestra-backend
-    sudo systemctl restart orchestra-backend
+    sudo systemctl enable cherry_ai-backend
+    sudo systemctl restart cherry_ai-backend
     
     return 0
 }
@@ -375,11 +375,11 @@ task_setup_monitoring() {
     echo "Setting up health monitoring and auto-recovery..."
     
     # Create health check script
-    cat > /usr/local/bin/orchestra-health-check.sh << 'EOF'
+    cat > /usr/local/bin/cherry_ai-health-check.sh << 'EOF'
 #!/bin/bash
-# Orchestra AI Health Check and Recovery
+# Cherry AI Health Check and Recovery
 
-LOG_FILE="/var/log/orchestra-health.log"
+LOG_FILE="/var/log/cherry_ai-health.log"
 
 log_message() {
     echo "[$(date -Iseconds)] $1" >> "$LOG_FILE"
@@ -388,7 +388,7 @@ log_message() {
 # Check backend health
 if ! curl -sf http://localhost:8000/health > /dev/null 2>&1; then
     log_message "Backend health check failed, attempting recovery..."
-    systemctl restart orchestra-backend
+    systemctl restart cherry_ai-backend
     sleep 10
     
     # Verify recovery
@@ -419,14 +419,14 @@ if [ -d /var/cache/nginx ]; then
 fi
 EOF
 
-    chmod +x /usr/local/bin/orchestra-health-check.sh
+    chmod +x /usr/local/bin/cherry_ai-health-check.sh
     
     # Add to crontab
-    (crontab -l 2>/dev/null | grep -v orchestra-health-check; echo "*/5 * * * * /usr/local/bin/orchestra-health-check.sh") | crontab -
+    (crontab -l 2>/dev/null | grep -v cherry_ai-health-check; echo "*/5 * * * * /usr/local/bin/cherry_ai-health-check.sh") | crontab -
     
     # Setup log rotation
-    cat > /etc/logrotate.d/orchestra << 'EOF'
-/var/log/orchestra*.log {
+    cat > /etc/logrotate.d/cherry_ai << 'EOF'
+/var/log/cherry_ai*.log {
     daily
     missingok
     rotate 7
@@ -449,7 +449,7 @@ task_verify_deployment() {
     # Check services
     local all_good=true
     
-    if systemctl is-active --quiet orchestra-backend; then
+    if systemctl is-active --quiet cherry_ai-backend; then
         echo -e "${GREEN}✓ Backend is running${NC}"
     else
         echo -e "${RED}✗ Backend is not running${NC}"
@@ -480,7 +480,7 @@ task_verify_deployment() {
     $all_good
 }
 
-# Main orchestration workflow
+# Main coordination workflow
 main() {
     init_workflow
     
@@ -512,7 +512,7 @@ main() {
     update_state "completed" "success"
     
     echo -e "\n${GREEN}========================================"
-    echo "🎉 Cherry AI Deployment Orchestration Complete!"
+    echo "🎉 Cherry AI Deployment coordination Complete!"
     echo "========================================${NC}"
     echo ""
     echo "📊 Workflow Summary:"
@@ -528,14 +528,14 @@ main() {
     echo "🔑 Login: admin / OrchAI_Admin2024!"
     echo ""
     echo "📝 Next steps:"
-    echo "   1. Add your LLM API keys to /etc/orchestra.env"
-    echo "   2. Run: systemctl restart orchestra-backend"
+    echo "   1. Add your LLM API keys to /etc/cherry_ai.env"
+    echo "   2. Run: systemctl restart cherry_ai-backend"
     echo ""
     echo "📊 Monitor:"
-    echo "   • Logs: journalctl -u orchestra-backend -f"
-    echo "   • Health: tail -f /var/log/orchestra-health.log"
+    echo "   • Logs: journalctl -u cherry_ai-backend -f"
+    echo "   • Health: tail -f /var/log/cherry_ai-health.log"
     echo "   • State: cat $WORKFLOW_STATE"
 }
 
-# Run the orchestrated workflow
+# Run the cherry_aited workflow
 main "$@"

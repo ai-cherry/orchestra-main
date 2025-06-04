@@ -8,8 +8,8 @@ class WorkflowManager:
         """
         """
         """Load workflows from directories."""
-            Path("/workspaces/orchestra-main/mcp_workflows"),
-            Path("/workspaces/orchestra-main/user_workflows"),
+            Path("/workspaces/cherry_ai-main/mcp_workflows"),
+            Path("/workspaces/cherry_ai-main/user_workflows"),
         ]
 
         for workflow_dir in workflow_dirs:

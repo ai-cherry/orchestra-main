@@ -1,4 +1,4 @@
-# LLM Orchestration Deployment Checklist
+# LLM coordination Deployment Checklist
 
 ## Pre-Deployment Requirements
 
@@ -6,10 +6,10 @@
 
 #### PostgreSQL Database
 - [ ] PostgreSQL 14+ installed and running
-- [ ] Database created: `orchestra_db`
+- [ ] Database created: `cherry_ai_db`
 - [ ] User with appropriate permissions created
 - [ ] Connection string configured in environment
-- [ ] Run migration script: `psql -d orchestra_db -f migrations/001_llm_orchestration_schema.sql`
+- [ ] Run migration script: `psql -d cherry_ai_db -f migrations/001_llm_coordination_schema.sql`
 
 #### Redis
 - [ ] Redis 6+ installed and running
@@ -29,7 +29,7 @@ Create `.env` file with the following variables:
 
 ```bash
 # Database
-DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/orchestra_db
+DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/cherry_ai_db
 
 # Redis
 REDIS_URL=redis://localhost:6379/0
@@ -57,7 +57,7 @@ ENVIRONMENT=production
 # Install Python dependencies
 pip install -r requirements.txt
 
-# Additional dependencies for orchestration
+# Additional dependencies for coordination
 pip install redis[hiredis]==4.5.4
 pip install weaviate-client==3.19.2
 pip install networkx==3.1
@@ -85,10 +85,10 @@ npm run build
 #### Run Migrations
 ```bash
 # Apply database migrations
-psql -U $DB_USER -h $DB_HOST -d orchestra_db -f migrations/001_llm_orchestration_schema.sql
+psql -U $DB_USER -h $DB_HOST -d cherry_ai_db -f migrations/001_llm_coordination_schema.sql
 
 # Verify tables created
-psql -U $DB_USER -h $DB_HOST -d orchestra_db -c "\dt"
+psql -U $DB_USER -h $DB_HOST -d cherry_ai_db -c "\dt"
 ```
 
 #### Seed Initial Data
@@ -112,18 +112,18 @@ INSERT INTO llm_use_cases (use_case, display_name, description) VALUES
 ### 5. Service Configuration
 
 #### Systemd Service (Linux)
-Create `/etc/systemd/system/orchestra-api.service`:
+Create `/etc/systemd/system/cherry_ai-api.service`:
 ```ini
 [Unit]
-Description=Orchestra API Service
+Description=cherry_ai API Service
 After=network.target postgresql.service redis.service
 
 [Service]
 Type=simple
-User=orchestra
-WorkingDirectory=/opt/orchestra
-Environment="PATH=/opt/orchestra/venv/bin"
-ExecStart=/opt/orchestra/venv/bin/uvicorn agent.app.main:app --host 0.0.0.0 --port 8080
+User=cherry_ai
+WorkingDirectory=/opt/cherry_ai
+Environment="PATH=/opt/cherry_ai/venv/bin"
+ExecStart=/opt/cherry_ai/venv/bin/uvicorn agent.app.main:app --host 0.0.0.0 --port 8080
 Restart=always
 RestartSec=10
 
@@ -135,7 +135,7 @@ WantedBy=multi-user.target
 ```nginx
 server {
     listen 80;
-    server_name api.orchestra.example.com;
+    server_name api.cherry_ai.example.com;
 
     location / {
         proxy_pass http://localhost:8080;
@@ -157,7 +157,7 @@ server {
 Add to `prometheus.yml`:
 ```yaml
 scrape_configs:
-  - job_name: 'orchestra-api'
+  - job_name: 'cherry_ai-api'
     static_configs:
       - targets: ['localhost:8080']
     metrics_path: '/metrics'
@@ -173,8 +173,8 @@ Import the dashboard from `monitoring/grafana-dashboard.json`
 # Test API health
 curl http://localhost:8080/health
 
-# Test orchestration health
-curl http://localhost:8080/api/orchestration/system/health
+# Test coordination health
+curl http://localhost:8080/api/coordination/system/health
 ```
 
 #### Run Test Suite
@@ -185,7 +185,7 @@ pytest tests/ -v
 # Run specific test categories
 pytest tests/test_llm_intelligent_router.py -v
 pytest tests/test_specialized_agents.py -v
-pytest tests/test_agent_orchestrator.py -v
+pytest tests/test_agent_conductor.py -v
 pytest tests/test_api_integration.py -v
 ```
 
@@ -196,7 +196,7 @@ cd admin-ui
 npm run dev
 
 # Access at http://localhost:5173
-# Navigate to LLM Orchestration page
+# Navigate to LLM coordination page
 ```
 
 ### 8. Production Deployment
@@ -204,14 +204,14 @@ npm run dev
 #### Backend Deployment
 ```bash
 # Start services
-sudo systemctl start orchestra-api
-sudo systemctl enable orchestra-api
+sudo systemctl start cherry_ai-api
+sudo systemctl enable cherry_ai-api
 
 # Check status
-sudo systemctl status orchestra-api
+sudo systemctl status cherry_ai-api
 
 # View logs
-journalctl -u orchestra-api -f
+journalctl -u cherry_ai-api -f
 ```
 
 #### Frontend Deployment
@@ -221,10 +221,10 @@ cd admin-ui
 npm run build
 
 # Deploy to web server
-rsync -avz dist/ user@server:/var/www/orchestra-admin/
+rsync -avz dist/ user@server:/var/www/cherry_ai-admin/
 
 # Or use CDN
-aws s3 sync dist/ s3://orchestra-admin-bucket/
+aws s3 sync dist/ s3://cherry_ai-admin-bucket/
 aws cloudfront create-invalidation --distribution-id ABCD --paths "/*"
 ```
 
@@ -273,15 +273,15 @@ COMMIT;
 #### Service Rollback
 ```bash
 # Stop new service
-sudo systemctl stop orchestra-api
+sudo systemctl stop cherry_ai-api
 
 # Restore previous version
-cd /opt/orchestra
+cd /opt/cherry_ai
 git checkout previous-version
 pip install -r requirements.txt
 
 # Restart service
-sudo systemctl start orchestra-api
+sudo systemctl start cherry_ai-api
 ```
 
 ## Security Checklist

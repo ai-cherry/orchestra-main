@@ -2,7 +2,7 @@
 # populate_pulumi_secrets.sh - Script to configure Pulumi secrets using GitHub org secrets
 # Supports both manual entry (backward compat) and GitHub secrets via env vars
 
-echo "Pulumi Secret Configuration Script for Orchestra AI"
+echo "Pulumi Secret Configuration Script for Cherry AI"
 echo "=============================================="
 echo "This script configures Pulumi secrets using GitHub organization secrets"
 echo "Secrets are read from environment variables when available"
@@ -32,22 +32,22 @@ echo "Proceeding to configure secrets..."
 # List of secret keys to configure
 SECRET_KEYS=(
   "digitalocean:token"
-  "orchestra-infra:dragonfly_uri"
-  "orchestra-infra:mongo_uri"
-  "orchestra-infra:weaviate_url"
-  "orchestra-infra:weaviate_api_key"
-  "orchestra-infra:openai_api_key"
-  "orchestra-infra:anthropic_api_key"
-  "orchestra-infra:openrouter_api_key"
-  "orchestra-infra:portkey_api_key"
-  "orchestra-infra:pulumi_access_token"
-  "orchestra-infra:perplexity_api_key"
-  "orchestra-infra:mongodb_org_id"
-  "orchestra-infra:mongodb_api_public_key"
-  "orchestra-infra:mongodb_api_private_key"
-  "orchestra-infra:mongodb_service_client_id"
-  "orchestra-infra:mongodb_service_client_secret"
-  "orchestra-infra:ssh_private_key_path"
+  "cherry_ai-infra:dragonfly_uri"
+  "cherry_ai-infra:mongo_uri"
+  "cherry_ai-infra:weaviate_url"
+  "cherry_ai-infra:weaviate_api_key"
+  "cherry_ai-infra:openai_api_key"
+  "cherry_ai-infra:anthropic_api_key"
+  "cherry_ai-infra:openrouter_api_key"
+  "cherry_ai-infra:portkey_api_key"
+  "cherry_ai-infra:pulumi_access_token"
+  "cherry_ai-infra:perplexity_api_key"
+  "cherry_ai-infra:mongodb_org_id"
+  "cherry_ai-infra:mongodb_api_public_key"
+  "cherry_ai-infra:mongodb_api_private_key"
+  "cherry_ai-infra:mongodb_service_client_id"
+  "cherry_ai-infra:mongodb_service_client_secret"
+  "cherry_ai-infra:ssh_private_key_path"
 )
 
 # Counter for tracking progress

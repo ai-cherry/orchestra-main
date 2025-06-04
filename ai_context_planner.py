@@ -27,8 +27,8 @@ BEFORE PLANNING NEW FEATURES:
 # Check what already exists
 ls -la scripts/*.py
 grep -r "def.*${FEATURE_KEYWORD}" scripts/
-python scripts/orchestra.py services status
-python scripts/orchestra_status.py
+python scripts/cherry_ai.py services status
+python scripts/cherry_ai_status.py
 
 # Check available tools
 python scripts/test_tool_system.py

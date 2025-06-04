@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Verify Roo setup for the Orchestra project."""
+"""Verify Roo setup for the cherry_ai project."""
     """Check that all mode files exist."""
     modes_dir = Path(".roo/modes")
     expected_modes = [
         "architect",
         "code",
         "debug",
-        "orchestrator",
+        "conductor",
         "strategy",
         "research",
         "analytics",
@@ -42,7 +42,7 @@ def check_rules() -> Dict[str, bool]:
         "architect",
         "code",
         "debug",
-        "orchestrator",
+        "conductor",
         "strategy",
         "research",
         "analytics",
@@ -74,7 +74,7 @@ def check_mcp_config() -> bool:
         pass
         with open(mcp_file) as f:
             data = json.load(f)
-            return "mcpServers" in data and "orchestra-mcp" in data["mcpServers"]
+            return "mcpServers" in data and "conductor-mcp" in data["mcpServers"]
     except Exception:
 
         pass
@@ -82,7 +82,7 @@ def check_mcp_config() -> bool:
 
 def main():
     """Run all verification checks."""
-    print("🔍 Verifying Roo Setup for Orchestra Project\n")
+    print("🔍 Verifying Roo Setup for cherry_ai Project\n")
 
     # Check modes
     print("📋 Checking Mode Configurations:")

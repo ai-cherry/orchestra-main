@@ -9,7 +9,7 @@ This document outlines the complete migration from multiple data stores (Redis, 
 ### Before (Complex Multi-Store)
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                   Orchestra AI                           │
+│                   Cherry AI                           │
 ├─────────────────────────────────────────────────────────┤
 │  Cache Layer:     Redis/DragonflyDB                     │
 │  Session Store:   Redis                                 │
@@ -23,7 +23,7 @@ This document outlines the complete migration from multiple data stores (Redis, 
 ### After (Simplified Two-Store)
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                   Orchestra AI                           │
+│                   Cherry AI                           │
 ├─────────────────────────────────────────────────────────┤
 │  All Data:        PostgreSQL (with JSONB)               │
 │  Vector Search:   Weaviate                              │
@@ -183,7 +183,7 @@ result = client.query.get("Memory", ["content", "metadata"]).with_near_vector({
 
 ### 1. Run Infrastructure Purge Script
 ```bash
-cd /root/orchestra-main
+cd /root/cherry_ai-main
 python scripts/purge_unwanted_infrastructure.py
 ```
 
@@ -198,7 +198,7 @@ GCP_PROJECT_ID=...
 DRAGONFLY_URI=...
 
 # Keep only these
-POSTGRES_DSN=postgresql://user:pass@localhost/orchestra
+POSTGRES_DSN=postgresql://user:pass@localhost/cherry_ai
 WEAVIATE_URL=http://localhost:8080
 WEAVIATE_API_KEY=...
 ```
@@ -342,4 +342,4 @@ nodes = client.nodes.get()
 
 ## Conclusion
 
-This migration simplifies the Orchestra AI infrastructure while maintaining high performance. PostgreSQL with JSONB can handle caching, sessions, documents, and queues effectively, while Weaviate provides specialized vector search capabilities.
+This migration simplifies the Cherry AI infrastructure while maintaining high performance. PostgreSQL with JSONB can handle caching, sessions, documents, and queues effectively, while Weaviate provides specialized vector search capabilities.

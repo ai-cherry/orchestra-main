@@ -244,7 +244,7 @@ check_env_config_deprecations() {
 }
 
 # Main execution
-echo -e "${BLUE}=== Orchestra Codebase Cleanup Verification ===${NC}"
+echo -e "${BLUE}=== cherry_ai Codebase Cleanup Verification ===${NC}"
 echo "Repository: $REPO_ROOT"
 echo "Date: $(date)"
 echo -e "Verbose mode: $([ $VERBOSE -eq 1 ] && echo "${GREEN}ON${NC}" || echo "${YELLOW}OFF${NC}") (use --verbose for detailed output)"

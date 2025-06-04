@@ -8,7 +8,7 @@ Consolidates duplicate environment variables from multiple .env files into a mas
 import os
 import re
 from pathlib import Path
-from collections import defaultdict, OrderedDict
+from collections.abc import defaultdict, OrderedDict
 from typing import Dict, List, Tuple
 
 class EnvConsolidator:
@@ -131,7 +131,7 @@ class EnvConsolidator:
         # Header
         template_content.extend([
             "# =================================================================",
-            "# Orchestra AI - Master Environment Variables Template",
+            "# Cherry AI - Master Environment Variables Template",
             "# =================================================================",
             "# This file consolidates all environment variables from the project",
             "# Generated automatically - edit with caution",

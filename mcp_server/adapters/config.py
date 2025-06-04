@@ -1,3 +1,4 @@
+import os
 """
 """
     """Configuration for circuit breaker functionality."""
@@ -154,29 +155,29 @@ DEFAULT_CONFIG = AdapterSystemConfig()
 # Example configuration for different environments
 DEVELOPMENT_CONFIG = AdapterSystemConfig(
     architect=ArchitectConfig(
-        api_key="dev-key",
+        api_key= os.getenv('API_KEY'),
         circuit_breaker=CircuitBreakerConfig(
             failure_threshold=2,
             recovery_timeout=30,
         ),
     ),
     code=CodeConfig(
-        api_key="dev-key",
+        api_key= os.getenv('API_KEY'),
         streaming=True,
         optimization_level="fast",
     ),
     debug=DebugConfig(
-        api_key="dev-key",
+        api_key= os.getenv('API_KEY'),
         profiling_enabled=True,
         deep_analysis=True,
     ),
     reliability=ReliabilityConfig(
-        api_key="dev-key",
+        api_key= os.getenv('API_KEY'),
         auto_remediation=False,  # Disable in dev
         alert_threshold=3,
     ),
     knowledge=KnowledgeConfig(
-        api_key="dev-key",
+        api_key= os.getenv('API_KEY'),
         cache_embeddings=True,
         max_results=5,
     ),

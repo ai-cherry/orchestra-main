@@ -17,7 +17,7 @@ on:
           - staging
 
 env:
-  DOCKER_IMAGE: orchestra-api
+  DOCKER_IMAGE: cherry_ai-api
   DOCKER_TAG: ${{ github.sha }}
 
 jobs:
@@ -72,16 +72,16 @@ jobs:
           #!/bin/bash
           set -e
           
-          echo "Deploying Orchestra API..."
+          echo "Deploying cherry_ai API..."
           
           # Pull the new image
           docker pull $DOCKER_IMAGE_TAG
           
           # Create config directory
-          mkdir -p /opt/orchestra/config
+          mkdir -p /opt/cherry_ai/config
           
           # Create personas configuration
-          cat > /opt/orchestra/config/personas.yaml << 'PERSONAS'
+          cat > /opt/cherry_ai/config/personas.yaml << 'PERSONAS'
           cherry:
             id: cherry
             name: Cherry
@@ -198,15 +198,15 @@ jobs:
           PERSONAS
           
           # Stop and remove old container
-          docker stop orchestra-api || true
-          docker rm orchestra-api || true
+          docker stop cherry_ai-api || true
+          docker rm cherry_ai-api || true
           
           # Run new container
           docker run -d \
-            --name orchestra-api \
+            --name cherry_ai-api \
             --restart unless-stopped \
             -p 8000:8000 \
-            -v /opt/orchestra/config:/app/core/orchestrator/src/config \
+            -v /opt/cherry_ai/config:/app/core/conductor/src/config \
             -e ENVIRONMENT=production \
             -e CORS_ORIGINS="*" \
             -e PORTKEY_API_KEY="${PORTKEY_API_KEY}" \

@@ -5,7 +5,7 @@
       "name": "ParagonRX_postgres_to_weaviate",
       "source": {
         "type": "postgres",
-        "database": "orchestra_db",
+        "database": "cherry_ai_db",
         "schema": "paragonrx_domain",
         "tables": [
           "paragonrx_events",
@@ -50,7 +50,7 @@
       },
       "destination": {
         "type": "postgres",
-        "database": "orchestra_db",
+        "database": "cherry_ai_db",
         "schema": "paragonrx_domain",
         "table": "paragonrx_raw_events"
       },

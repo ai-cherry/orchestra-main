@@ -1,6 +1,6 @@
-name: orchestra-ai
+name: cherry_ai-ai
 runtime: python
-description: Orchestra AI infrastructure on Vultr
+description: Cherry AI infrastructure on Vultr
 config:
   vultr:region: ewr
-  orchestra:environment: ${PULUMI_STACK}
+  cherry_ai:environment: ${PULUMI_STACK}

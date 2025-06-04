@@ -1,11 +1,11 @@
 # Factory AI Droid Integration Workflow
 
 ## Workflow Overview
-This workflow orchestrates the integration of Factory AI Droid into the existing Orchestra project while preserving the Roo coder setup.
+This workflow cherry_aites the integration of Factory AI Droid into the existing cherry_ai project while preserving the Roo coder setup.
 
 ## Workflow Phases
 
-### Phase 1: Analysis & Planning (Orchestrator)
+### Phase 1: Analysis & Planning (conductor)
 **Status**: ✅ COMPLETED
 **Dependencies**: None
 **Outputs**: 
@@ -110,7 +110,7 @@ T1.2 ──┘                    ├─→ T3.2  ├─→ T4.2
 - Rollback points maintained for each major change
 
 ## Agent Coordination
-1. **Orchestrator**: Overall workflow management and task distribution ✓
+1. **conductor**: Overall workflow management and task distribution ✓
 2. **Architect**: System design and integration planning ✓
 3. **Code**: Implementation of all components 🔄
 4. **Quality**: Validation and testing ⏳

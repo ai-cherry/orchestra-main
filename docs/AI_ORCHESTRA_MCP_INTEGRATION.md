@@ -1,14 +1,14 @@
-# AI Orchestra MCP & LLM Gateway Integration Guide
+# AI cherry_ai MCP & LLM Gateway Integration Guide
 
 ## Overview
 
-This guide documents the architecture and best practices for integrating Model Context Protocol (MCP) servers and a unified LLM gateway (LiteLLM) with SuperAGI, MongoDB, and Weaviate in the AI Orchestra project. It also covers modular Pulumi infrastructure, secure CI/CD, and AI-powered development workflows.
+This guide documents the architecture and best practices for integrating Model Context Protocol (MCP) servers and a unified LLM gateway (LiteLLM) with SuperAGI, MongoDB, and Weaviate in the AI cherry_ai project. It also covers modular Pulumi infrastructure, secure CI/CD, and AI-powered development workflows.
 
 ---
 
 ## Architecture Summary
 
-- **SuperAGI**: Orchestrates multi-agent workflows, deployed as a Kubernetes service.
+- **SuperAGI**: cherry_aites multi-agent workflows, deployed as a Kubernetes service.
 - **MongoDB**: Used for mid/long-term memory, accessed via MCP server for natural language queries.
 - **Weaviate**: Provides semantic search, accessed via MCP server for vector-based queries.
 - **DragonflyDB**: Used for ephemeral/short-term memory, accessed directly (no MCP).
@@ -86,7 +86,7 @@ This guide documents the architecture and best practices for integrating Model C
   ```python
   from components.litellm_component import LiteLLMComponent
   litellm = LiteLLMComponent(
-      "orchestra-litellm",
+      "cherry_ai-litellm",
       config={
           "namespace": "superagi",
           "image": "berriai/litellm:latest",

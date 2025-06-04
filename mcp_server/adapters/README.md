@@ -29,7 +29,7 @@ Factory AI   MCP Server
 ## Adapters
 
 ### 1. ArchitectAdapter
-- **MCP Server**: orchestrator_server.py
+- **MCP Server**: conductor_server.py
 - **Factory Droid**: Architect
 - **Capabilities**: System design, Pulumi IaC generation, architectural diagrams
 - **Special Features**: Complex diagram handling, infrastructure-as-code generation
@@ -66,7 +66,7 @@ Factory AI   MCP Server
 from mcp_server.adapters import ArchitectAdapter
 
 # Initialize adapter
-mcp_server = MCPOrchestratorServer()
+mcp_server = MCPconductorServer()
 droid_config = {
     "api_key": "your-factory-ai-key",
     "failure_threshold": 5,

@@ -1,9 +1,9 @@
 #!/bin/bash
-# Orchestra AI Automated Local Setup Script
+# Cherry AI Automated Local Setup Script
 set -euo pipefail
 
 # Set Pulumi passphrase for non-interactive secret management
-export PULUMI_CONFIG_PASSPHRASE="orchestra-dev-123"
+export PULUMI_CONFIG_PASSPHRASE="cherry_ai-dev-123"
 
 # Install Python dependencies for infra
 pip install -r infra/requirements.txt

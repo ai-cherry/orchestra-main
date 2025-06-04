@@ -4,13 +4,14 @@
 import asyncio
 import logging
 from typing import Dict, Any, List, Optional
+from typing_extensions import Optional
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
 
 class OperatorManager:
-    """Manage operator mode for multi-agent orchestration"""
+    """Manage operator mode for multi-agent coordination"""
     
     def __init__(self):
         self.agents = {}

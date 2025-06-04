@@ -1,6 +1,6 @@
-# Orchestrator Troubleshooting Guide
+# conductor Troubleshooting Guide
 
-This guide provides solutions for common issues encountered in the Orchestrator codebase, particularly those related to the technical debt patterns identified in the [Codebase Health Assessment](./CODEBASE_HEALTH_ASSESSMENT.md).
+This guide provides solutions for common issues encountered in the conductor codebase, particularly those related to the technical debt patterns identified in the [Codebase Health Assessment](./CODEBASE_HEALTH_ASSESSMENT.md).
 
 ## Common Issues and Solutions
 
@@ -20,18 +20,18 @@ This guide provides solutions for common issues encountered in the Orchestrator 
 
    ```python
    # Instead of this at the module level
-   from core.orchestrator.src.services.registry import get_service_registry
+   from core.conductor.src.services.registry import get_service_registry
 
    # Do this inside functions
    def my_function():
-       from core.orchestrator.src.services.registry import get_service_registry
+       from core.conductor.src.services.registry import get_service_registry
        registry = get_service_registry()
    ```
 
 2. **Use the unified service registry**:
 
    ```python
-   from core.orchestrator.src.services.unified_registry import require
+   from core.conductor.src.services.unified_registry import require
 
    def my_function():
        # Get the service by type
@@ -73,7 +73,7 @@ This guide provides solutions for common issues encountered in the Orchestrator 
 
    ```python
    # Get registry and ensure initialization
-   from core.orchestrator.src.services.unified_registry import get_service_registry
+   from core.conductor.src.services.unified_registry import get_service_registry
 
    registry = get_service_registry()
    registry.initialize_all()
@@ -82,7 +82,7 @@ This guide provides solutions for common issues encountered in the Orchestrator 
 2. **Use the Service interface for new services**:
 
    ```python
-   from core.orchestrator.src.services.unified_registry import Service, register
+   from core.conductor.src.services.unified_registry import Service, register
 
    class MyService(Service):
        def initialize(self) -> None:
@@ -101,7 +101,7 @@ This guide provides solutions for common issues encountered in the Orchestrator 
 3. **Check service registry for proper registration**:
 
    ```python
-   from core.orchestrator.src.services.unified_registry import get_service_registry
+   from core.conductor.src.services.unified_registry import get_service_registry
 
    registry = get_service_registry()
    service_names = registry.get_service_names()
@@ -219,7 +219,7 @@ This guide provides solutions for common issues encountered in the Orchestrator 
 1. **Validate configuration at startup**:
 
    ```python
-   from core.orchestrator.src.config.config import get_settings
+   from core.conductor.src.config.config import get_settings
 
    def validate_config():
        settings = get_settings()
@@ -247,7 +247,7 @@ This guide provides solutions for common issues encountered in the Orchestrator 
 3. **Use a centralized configuration utility**:
 
    ```python
-   from core.orchestrator.src.config.config import get_settings
+   from core.conductor.src.config.config import get_settings
 
    def get_config_value(key, default=None):
        settings = get_settings()
@@ -270,7 +270,7 @@ This guide provides solutions for common issues encountered in the Orchestrator 
 
    ```python
    import pytest
-   from core.orchestrator.src.services.unified_registry import get_service_registry, register
+   from core.conductor.src.services.unified_registry import get_service_registry, register
 
    @pytest.fixture
    def mock_service():
@@ -312,7 +312,7 @@ This guide provides solutions for common issues encountered in the Orchestrator 
    class MyComponent:
        def __init__(self, service=None):
            if service is None:
-               from core.orchestrator.src.services.unified_registry import require
+               from core.conductor.src.services.unified_registry import require
                self._service = require(ServiceType)
            else:
                self._service = service
@@ -340,7 +340,7 @@ To identify which component is causing problems:
 2. **Trace service initialization**:
 
    ```python
-   from core.orchestrator.src.services.unified_registry import get_service_registry
+   from core.conductor.src.services.unified_registry import get_service_registry
 
    registry = get_service_registry()
    print(f"Services: {registry.get_service_names()}")
@@ -352,7 +352,7 @@ To identify which component is causing problems:
 3. **Check event subscriptions**:
 
    ```python
-   from core.orchestrator.src.services.unified_event_bus import get_event_bus
+   from core.conductor.src.services.unified_event_bus import get_event_bus
 
    event_bus = get_event_bus()
    print(f"Subscription counts: {event_bus.get_handler_stats()}")

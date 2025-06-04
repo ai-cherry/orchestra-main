@@ -1,8 +1,8 @@
-# Git Best Practices for AI Orchestra
+# Git Best Practices for AI cherry_ai
 
 ## Overview
 
-This guide outlines Git best practices for the AI Orchestra project, ensuring consistent, clean, and meaningful commit history.
+This guide outlines Git best practices for the AI cherry_ai project, ensuring consistent, clean, and meaningful commit history.
 
 ## Commit Message Format
 

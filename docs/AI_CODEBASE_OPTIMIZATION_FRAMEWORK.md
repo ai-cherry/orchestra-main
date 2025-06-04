@@ -22,7 +22,7 @@ These principles must be ingrained in all AI-assisted development workflows and 
 *   **Artifact Documentation:** All significant AI-generated artifacts (models, datasets, complex configuration files) must have documented ownership, purpose, and an expiration/review date.
 *   **No Standalone Scripts (Default):**
     *   Avoid generating one-off executable scripts for cleanup, data migration, or utility tasks.
-    *   **Prefer Integration:** Functionality should be integrated into existing, relevant modules (e.g., `utils.py`, `data_services.py`, `scripts/orchestra.py` CLI commands) as reusable functions, classes, or CLI subcommands.
+    *   **Prefer Integration:** Functionality should be integrated into existing, relevant modules (e.g., `utils.py`, `data_services.py`, `scripts/cherry_ai.py` CLI commands) as reusable functions, classes, or CLI subcommands.
     *   **Exception:** Standalone scripts are permissible only if part of a defined, temporary workflow (e.g., a single-use database migration script that self-documents its completion and obsolescence, and is removed post-execution). Such scripts must be explicitly approved and tracked.
 *   **Read-Only Outputs:**
     *   **Logs:** Configure application logging to use the central logging system with appropriate log levels and rotation. Avoid AI generating ad-hoc log files.
@@ -145,7 +145,7 @@ These configurations and guidelines should be implemented in the respective AI a
     - All significant generated files must declare purpose and an expiration/review date.
     - Prefer in-memory processing for intermediate data over temporary file-based workflows.
 - **Configuration:** Use `config/` directory for configurations. Validate with `scripts/config_validator.py`.
-- **Automation:** New automation tasks should be integrated into `scripts/orchestra.py` or existing scheduled jobs, not as new standalone cron entries without registration.
+- **Automation:** New automation tasks should be integrated into `scripts/cherry_ai.py` or existing scheduled jobs, not as new standalone cron entries without registration.
 ```
 
 **File: `.roo/rules-code/01-coding-standards.md**
@@ -160,7 +160,7 @@ These configurations and guidelines should be implemented in the respective AI a
 - **Subprocesses:** Use `subprocess.run()` instead of `os.system()`.
 - **Database:** ONLY use `shared.database.UnifiedDatabase`. No direct DB connections.
 - **Anti-Patterns to Avoid:**
-    - ❌ Creating standalone cleanup scripts (integrate into `cleanup_engine.py` or `scripts/orchestra.py`).
+    - ❌ Creating standalone cleanup scripts (integrate into `cleanup_engine.py` or `scripts/cherry_ai.py`).
     - ❌ Generating temporary data files without lifecycle management.
     - ❌ Writing one-off utility scripts (integrate into existing `utils` or service modules).
     - ❌ Creating debug output files (use project\'s logging framework).
@@ -259,7 +259,7 @@ code_generation_droid_v3:
     health_monitoring_integration: "suggest_standard_pattern"
     failure_notification_stub: "suggest_logging_critical_error"
     idempotency_check: "analyze_and_warn_if_not_idempotent"
-    target_for_new_automation: "scripts/orchestra.py CLI or registered via AutomationManager"
+    target_for_new_automation: "scripts/cherry_ai.py CLI or registered via AutomationManager"
 
 # Other droids (e.g., RefactoringDroid, TestingDroid) would have similar tailored directives.
 ```
@@ -1030,17 +1030,17 @@ This section details how to reliably schedule and manage the cleanup scripts and
 
 ### Proposed Schedule Framework
 
-Paths are illustrative; adapt them to your project structure (e.g., `/opt/orchestra-main/scripts/` or use relative paths if cron is run as the project user from the project root). Ensure scripts are executable.
+Paths are illustrative; adapt them to your project structure (e.g., `/opt/cherry_ai-main/scripts/` or use relative paths if cron is run as the project user from the project root). Ensure scripts are executable.
 
 **1. Daily Maintenance (via `cron`)**
    *   **Purpose:** Routine cleanup of clearly temporary files, log rotation.
    *   **When:** Low-load hours (e.g., 3:00 - 4:00 AM server time).
-   *   **Example Crontab Entry (e.g., in `/etc/cron.d/orchestra-maintenance` or user\'s crontab):**
+   *   **Example Crontab Entry (e.g., in `/etc/cron.d/cherry_ai-maintenance` or user\'s crontab):**
      ```cron
      # Project Symphony - Daily Maintenance
      SHELL=/bin/bash
      PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-     PROJECT_ROOT=/root/orchestra-main # ADJUST THIS
+     PROJECT_ROOT=/root/cherry_ai-main # ADJUST THIS
 
      # At 3:05 AM: Run the intelligent cleanup engine in a non-interactive, less aggressive mode
      # This assumes cleanup_engine.py can take flags for non-interactive, specific rule sets.
@@ -1099,14 +1099,14 @@ Paths are illustrative; adapt them to your project structure (e.g., `/opt/orches
       [Service]
       Type=oneshot
       User=your_project_user # Run as appropriate user
-      WorkingDirectory=/root/orchestra-main # ADJUST THIS
-      ExecStart=/root/orchestra-main/scripts/quick_health_check.sh # ADJUST THIS
+      WorkingDirectory=/root/cherry_ai-main # ADJUST THIS
+      ExecStart=/root/cherry_ai-main/scripts/quick_health_check.sh # ADJUST THIS
       StandardOutput=journal+console 
       ```
     *   **Associated Script (`scripts/quick_health_check.sh`):**
       ```bash
       #!/bin/bash
-      PROJECT_ROOT=/root/orchestra-main # ADJUST THIS
+      PROJECT_ROOT=/root/cherry_ai-main # ADJUST THIS
       LOG_FILE="$PROJECT_ROOT/logs/quick_health.log"
       echo "$(date): Running quick health check..." >> "$LOG_FILE"
       

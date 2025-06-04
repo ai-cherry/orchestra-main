@@ -125,7 +125,7 @@ class FeatureFlagService:
 #### 2.4.1 Weaviate Cloud Configuration
 ```yaml
 weaviate_config:
-  cluster_url: "https://orchestra-ai.weaviate.network"
+  cluster_url: "https://cherry_ai-ai.weaviate.network"
   auth_type: "api_key"
   collections:
     - name: "voice_embeddings"
@@ -137,7 +137,7 @@ weaviate_config:
 #### 2.4.2 Airbyte Cloud Setup
 ```yaml
 airbyte_config:
-  workspace_id: "orchestra-ai-prod"
+  workspace_id: "cherry_ai-ai-prod"
   connections:
     - source: "postgres"
       destination: "weaviate"

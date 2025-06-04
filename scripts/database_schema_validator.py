@@ -1,7 +1,7 @@
 # TODO: Consider adding connection pooling configuration
 #!/usr/bin/env python3
 """
-Database Schema Validation Script for Orchestra AI
+Database Schema Validation Script for Cherry AI
 Comprehensive validation of database schemas, migrations, and model definitions.
 """
 
@@ -12,7 +12,8 @@ import ast
 import sqlparse
 from pathlib import Path
 from typing import Dict, List, Set, Tuple, Any, Optional
-from collections import defaultdict
+from typing_extensions import Optional
+from collections.abc import defaultdict
 from datetime import datetime
 
 class DatabaseSchemaValidator:

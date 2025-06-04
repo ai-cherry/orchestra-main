@@ -136,10 +136,10 @@ voice_synthesis:
 
 ## Phase 4: Implementation - Frontend Integration (Days 11-13)
 
-### 4.1 Update Orchestrator Voice Components
+### 4.1 Update conductor Voice Components
 **Files**:
-- `admin-ui/src/components/orchestrator/Voice/VoiceSynthesizer.tsx`
-- `admin-ui/src/services/orchestratorService.ts`
+- `admin-ui/src/components/conductor/Voice/VoiceSynthesizer.tsx`
+- `admin-ui/src/services/conductorService.ts`
 
 **Tasks**:
 - [ ] Remove hardcoded voice options (Cherry, Sophia, Karen)
@@ -149,7 +149,7 @@ voice_synthesis:
 
 ### 4.2 Update Voice Recording Integration
 **Files**:
-- `admin-ui/src/components/orchestrator/Voice/VoiceRecorder.tsx`
+- `admin-ui/src/components/conductor/Voice/VoiceRecorder.tsx`
 
 **Tasks**:
 - [ ] Ensure compatibility with ElevenLabs format requirements
