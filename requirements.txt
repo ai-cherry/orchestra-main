@@ -14,3 +14,9 @@ aiofiles==23.2.1
 httpx==0.25.2
 python-dotenv==1.0.0
 psycopg2-binary==2.9.9
+
+# Performance and stability enhancements
+psutil==5.9.6  # System resource monitoring
+pyyaml==6.0.1  # YAML processing for configurations
+weakref  # Built-in, for object pools
+
