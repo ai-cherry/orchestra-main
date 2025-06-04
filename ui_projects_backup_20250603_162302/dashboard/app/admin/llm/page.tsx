@@ -1,3 +1,4 @@
+"use client";
 /**
  * Admin LLM Configuration Page
  * Main entry point for LLM configuration management

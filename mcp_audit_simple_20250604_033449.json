@@ -1,0 +1,46 @@
+{
+  "audit_timestamp": "2025-06-04T03:34:49.187502",
+  "duration_seconds": 6.353950500488281,
+  "overall_status": "healthy",
+  "total_issues": 2,
+  "total_recommendations": 2,
+  "component_results": [
+    {
+      "component": "MCP Configuration",
+      "issues": [],
+      "recommendations": [],
+      "status": "healthy"
+    },
+    {
+      "component": "Database Configuration",
+      "issues": [
+        "Weaviate anonymous access enabled",
+        "Missing environment variables: POSTGRES_HOST, POSTGRES_PORT, POSTGRES_USER, POSTGRES_PASSWORD, REDIS_HOST"
+      ],
+      "recommendations": [
+        "Configure Weaviate authentication for production",
+        "Set all required environment variables"
+      ],
+      "status": "degraded"
+    },
+    {
+      "component": "Redis Configuration",
+      "issues": [],
+      "recommendations": [],
+      "status": "healthy"
+    },
+    {
+      "component": "Code Structure",
+      "issues": [],
+      "recommendations": [],
+      "metrics": {
+        "memory_management_files": 77,
+        "async_implementations": 1581,
+        "connection_pooling_files": 605,
+        "error_handling_files": 3936
+      },
+      "status": "healthy"
+    }
+  ],
+  "summary": "System Status: HEALTHY\n\nComponents Audited: 4\nTotal Issues: 2\nTotal Recommendations: 2\n\nTop Issues:\n- Weaviate anonymous access enabled\n- Missing environment variables: POSTGRES_HOST, POSTGRES_PORT, POSTGRES_USER, POSTGRES_PASSWORD, REDIS_HOST\n\nTop Recommendations:\n- Configure Weaviate authentication for production\n- Set all required environment variables\n"
+}
