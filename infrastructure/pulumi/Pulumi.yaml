@@ -1,0 +1,19 @@
+name: cherry-ai-orchestrator
+runtime: python
+description: Cherry AI Orchestrator Infrastructure
+
+config:
+  vultr_api_key:
+    type: string
+    secret: true
+    description: Vultr API key for infrastructure management
+  ssh_public_key:
+    type: string
+    description: SSH public key for server access
+
+template:
+  config:
+    vultr:apiKey:
+      type: string
+      secret: true
+
