@@ -1,0 +1,31 @@
+{
+  "rules": [
+    {
+      "tags": ["cursor", "ai-assistant"],
+      "message": "You are working on the Cherry AI Orchestrator project - a comprehensive AI-powered infrastructure management system. The project includes:\n\n**Architecture:**\n- Production server: 45.32.69.157 (16 vCPUs, 64GB RAM)\n- Database server: 45.77.87.106 (PostgreSQL, Redis)\n- Staging server: 207.246.108.201\n- Load balancer and Kubernetes cluster\n\n**Tech Stack:**\n- Frontend: HTML5, CSS3, JavaScript (Vanilla)\n- Backend: Python 3.11, Flask, FastAPI\n- Databases: PostgreSQL, Redis, Weaviate, Pinecone\n- Infrastructure: Vultr, Pulumi IaC\n- CI/CD: GitHub Actions\n- AI Services: OpenAI, Anthropic, Google Gemini\n\n**Key Components:**\n- Admin interface with three AI personas (Cherry, Sophia, Karen)\n- MCP servers for AI tool integration\n- Infrastructure automation and monitoring\n- Vector databases for semantic search\n- Real-time deployment pipeline\n\n**Coding Standards:**\n- Use type hints in Python\n- Follow PEP 8 style guide\n- Write comprehensive docstrings\n- Include error handling and logging\n- Use environment variables for secrets\n- Write tests for all new functionality\n\n**Security:**\n- Never hardcode API keys or secrets\n- Use GitHub organization secrets\n- Implement proper authentication\n- Follow OWASP security guidelines\n\nWhen suggesting code changes, consider the production environment and ensure compatibility with the existing infrastructure."
+    },
+    {
+      "tags": ["python"],
+      "message": "For Python code in the Cherry AI project:\n\n**Imports:**\n- Use absolute imports\n- Group imports: standard library, third-party, local\n- Import only what you need\n\n**Error Handling:**\n- Use specific exception types\n- Log errors with context\n- Implement graceful degradation\n\n**Async Code:**\n- Use async/await for I/O operations\n- Handle asyncio exceptions properly\n- Use connection pooling for databases\n\n**Environment Variables:**\n- Load from .env files using python-dotenv\n- Validate required environment variables\n- Provide sensible defaults where appropriate\n\n**Example pattern:**\n```python\nimport os\nfrom typing import Optional\nfrom dotenv import load_dotenv\nimport logging\n\nload_dotenv()\nlogger = logging.getLogger(__name__)\n\nclass ServiceManager:\n    def __init__(self):\n        self.api_key = os.getenv('API_KEY')\n        if not self.api_key:\n            raise ValueError('API_KEY environment variable required')\n    \n    async def process_request(self, data: dict) -> Optional[dict]:\n        try:\n            # Implementation here\n            return result\n        except Exception as e:\n            logger.error(f'Error processing request: {e}')\n            raise\n```"
+    },
+    {
+      "tags": ["javascript", "frontend"],
+      "message": "For JavaScript/Frontend code in the Cherry AI project:\n\n**Modern JavaScript:**\n- Use ES6+ features (const/let, arrow functions, async/await)\n- Implement proper error handling\n- Use fetch API for HTTP requests\n- Follow responsive design principles\n\n**UI/UX Guidelines:**\n- Mobile-first responsive design\n- Accessible components (ARIA labels)\n- Loading states and error messages\n- Consistent color scheme and typography\n\n**API Integration:**\n- Handle loading states\n- Implement retry logic\n- Show user-friendly error messages\n- Use proper HTTP status codes\n\n**Example pattern:**\n```javascript\nclass APIClient {\n  constructor(baseURL) {\n    this.baseURL = baseURL;\n  }\n  \n  async request(endpoint, options = {}) {\n    try {\n      const response = await fetch(`${this.baseURL}${endpoint}`, {\n        headers: {\n          'Content-Type': 'application/json',\n          ...options.headers\n        },\n        ...options\n      });\n      \n      if (!response.ok) {\n        throw new Error(`HTTP ${response.status}: ${response.statusText}`);\n      }\n      \n      return await response.json();\n    } catch (error) {\n      console.error('API request failed:', error);\n      throw error;\n    }\n  }\n}\n```"
+    },
+    {
+      "tags": ["infrastructure", "devops"],
+      "message": "For Infrastructure/DevOps code in the Cherry AI project:\n\n**Pulumi IaC:**\n- Use TypeScript or Python for Pulumi\n- Tag all resources appropriately\n- Implement proper resource dependencies\n- Use stack configurations for environments\n\n**GitHub Actions:**\n- Use organization secrets\n- Implement proper error handling\n- Use matrix builds for multiple environments\n- Include security scanning\n\n**Docker/Containers:**\n- Use multi-stage builds\n- Minimize image size\n- Run as non-root user\n- Include health checks\n\n**Monitoring:**\n- Implement comprehensive logging\n- Use structured logging (JSON)\n- Set up alerts for critical metrics\n- Monitor resource usage\n\n**Example Pulumi pattern:**\n```python\nimport pulumi\nimport pulumi_vultr as vultr\n\n# Create instance with proper configuration\ninstance = vultr.Instance(\n    'cherry-ai-server',\n    plan='vc2-16c-64gb',\n    region='lax',\n    os_id=1743,  # Ubuntu 24.04\n    label='cherry-ai-production',\n    tags=['production', 'cherry-ai'],\n    enable_ipv6=True,\n    backups='enabled'\n)\n\npulumi.export('server_ip', instance.main_ip)\n```"
+    }
+  ],
+  "include": ["**/*"],
+  "exclude": [
+    "node_modules/**",
+    ".git/**",
+    "__pycache__/**",
+    "*.pyc",
+    ".env*",
+    "*.log",
+    ".DS_Store"
+  ]
+}
+
