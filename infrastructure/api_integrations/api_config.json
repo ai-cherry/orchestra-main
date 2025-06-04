@@ -1,0 +1,140 @@
+{
+  "salesforce": {
+    "client_id": "YOUR_SALESFORCE_CLIENT_ID",
+    "client_secret": "YOUR_SALESFORCE_CLIENT_SECRET",
+    "username": "YOUR_SALESFORCE_USERNAME",
+    "password": "YOUR_SALESFORCE_PASSWORD",
+    "security_token": "YOUR_SALESFORCE_SECURITY_TOKEN",
+    "domain": "login",
+    "api_version": "v59.0",
+    "enabled": false,
+    "sync_objects": ["Account", "Opportunity", "Contact", "Lead", "Case"],
+    "sync_frequency": 3600
+  },
+  "hubspot": {
+    "api_key": "YOUR_HUBSPOT_API_KEY",
+    "access_token": "YOUR_HUBSPOT_ACCESS_TOKEN",
+    "portal_id": "YOUR_HUBSPOT_PORTAL_ID",
+    "api_version": "v3",
+    "enabled": false,
+    "sync_objects": ["contacts", "deals", "companies", "tickets"],
+    "sync_frequency": 3600
+  },
+  "apollo": {
+    "api_key": "YOUR_APOLLO_API_KEY",
+    "base_url": "https://api.apollo.io/v1",
+    "enabled": false,
+    "search_filters": {
+      "industries": ["property management", "real estate", "facilities management"],
+      "company_size": ["1-10", "11-50", "51-200", "201-500"],
+      "locations": ["United States", "Canada"]
+    },
+    "sync_frequency": 7200
+  },
+  "gong": {
+    "access_key": "YOUR_GONG_ACCESS_KEY",
+    "access_key_secret": "YOUR_GONG_ACCESS_KEY_SECRET",
+    "base_url": "https://api.gong.io/v2",
+    "enabled": false,
+    "sync_objects": ["calls", "transcripts", "users", "deals"],
+    "sync_frequency": 1800
+  },
+  "slack": {
+    "bot_token": "YOUR_SLACK_BOT_TOKEN",
+    "app_token": "YOUR_SLACK_APP_TOKEN",
+    "signing_secret": "YOUR_SLACK_SIGNING_SECRET",
+    "workspace_id": "YOUR_SLACK_WORKSPACE_ID",
+    "enabled": false,
+    "sync_channels": ["general", "sales", "support", "announcements"],
+    "sync_frequency": 900
+  },
+  "looker": {
+    "base_url": "YOUR_LOOKER_INSTANCE_URL",
+    "client_id": "YOUR_LOOKER_CLIENT_ID",
+    "client_secret": "YOUR_LOOKER_CLIENT_SECRET",
+    "api_version": "4.0",
+    "enabled": false,
+    "sync_objects": ["dashboards", "looks", "queries"],
+    "sync_frequency": 3600
+  },
+  "automation": {
+    "n8n_webhook_url": "YOUR_N8N_WEBHOOK_URL",
+    "zapier_webhook_url": "YOUR_ZAPIER_WEBHOOK_URL",
+    "sync_frequency": 3600,
+    "batch_size": 100,
+    "retry_attempts": 3,
+    "retry_delay": 300,
+    "workflows": {
+      "lead_scoring": {
+        "enabled": true,
+        "trigger_apis": ["salesforce", "hubspot", "apollo"],
+        "actions": ["update_crm", "send_notification", "assign_owner"]
+      },
+      "call_analysis": {
+        "enabled": true,
+        "trigger_apis": ["gong"],
+        "actions": ["extract_insights", "update_deal", "schedule_followup"]
+      },
+      "customer_support": {
+        "enabled": true,
+        "trigger_apis": ["slack", "hubspot"],
+        "actions": ["create_ticket", "assign_agent", "send_update"]
+      }
+    }
+  },
+  "data_quality": {
+    "duplicate_detection": {
+      "enabled": true,
+      "similarity_threshold": 0.85,
+      "fields_to_compare": ["email", "phone", "company_name", "full_name"]
+    },
+    "data_enrichment": {
+      "enabled": true,
+      "sources": ["apollo", "clearbit", "zoominfo"],
+      "auto_update": true
+    },
+    "validation_rules": {
+      "email_format": true,
+      "phone_format": true,
+      "required_fields": ["name", "email"],
+      "custom_validations": []
+    }
+  },
+  "security": {
+    "encryption_at_rest": true,
+    "encryption_in_transit": true,
+    "api_rate_limiting": {
+      "enabled": true,
+      "requests_per_minute": 100,
+      "burst_limit": 200
+    },
+    "access_control": {
+      "require_authentication": true,
+      "allowed_ips": [],
+      "api_key_rotation": 90
+    }
+  },
+  "monitoring": {
+    "health_checks": {
+      "enabled": true,
+      "interval": 300,
+      "timeout": 30
+    },
+    "performance_metrics": {
+      "enabled": true,
+      "track_response_times": true,
+      "track_error_rates": true,
+      "alert_thresholds": {
+        "response_time_ms": 5000,
+        "error_rate_percent": 5
+      }
+    },
+    "logging": {
+      "level": "INFO",
+      "include_request_data": false,
+      "include_response_data": false,
+      "retention_days": 30
+    }
+  }
+}
+
