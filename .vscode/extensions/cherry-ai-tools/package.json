@@ -1,0 +1,120 @@
+{
+  "name": "cherry-ai-tools",
+  "displayName": "Cherry AI Tools",
+  "description": "Integrated AI coding tools for Cherry AI Orchestrator",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other",
+    "Machine Learning",
+    "Snippets"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "cherry-ai.openPanel",
+        "title": "Open Cherry AI Tools",
+        "category": "Cherry AI"
+      },
+      {
+        "command": "cherry-ai.optimizeCode",
+        "title": "Optimize Selected Code",
+        "category": "Cherry AI"
+      },
+      {
+        "command": "cherry-ai.explainCode",
+        "title": "Explain Selected Code",
+        "category": "Cherry AI"
+      },
+      {
+        "command": "cherry-ai.generateTests",
+        "title": "Generate Tests",
+        "category": "Cherry AI"
+      },
+      {
+        "command": "cherry-ai.refactorCode",
+        "title": "Refactor Code",
+        "category": "Cherry AI"
+      },
+      {
+        "command": "cherry-ai.switchPersona",
+        "title": "Switch AI Persona",
+        "category": "Cherry AI"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "cherry-ai.openPanel",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a"
+      },
+      {
+        "command": "cherry-ai.optimizeCode",
+        "key": "ctrl+shift+o",
+        "mac": "cmd+shift+o",
+        "when": "editorHasSelection"
+      },
+      {
+        "command": "cherry-ai.explainCode",
+        "key": "ctrl+shift+e",
+        "mac": "cmd+shift+e",
+        "when": "editorHasSelection"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "cherry-ai-tools",
+          "name": "Cherry AI Tools",
+          "when": "true"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "cherry-ai",
+          "title": "Cherry AI",
+          "icon": "$(robot)"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Cherry AI Tools",
+      "properties": {
+        "cherry-ai.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "OpenRouter API Key for AI tools"
+        },
+        "cherry-ai.defaultPersona": {
+          "type": "string",
+          "default": "cherry",
+          "enum": ["cherry", "sophia", "karen"],
+          "description": "Default AI persona to use"
+        },
+        "cherry-ai.performanceMode": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable performance-focused AI responses"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "typescript": "^4.9.4"
+  }
+}
+
